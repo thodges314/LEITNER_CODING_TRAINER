@@ -134,11 +134,11 @@ export function App() {
   };
 
   const handleResetDeckToDefaults = () => {
-    if (confirm('Reset entire deck back to the 29 original topics? All custom progress will be reset.')) {
-      const def = getDefaultDeckState();
-      saveDeckState(def);
-      setDeckState(def);
-      setSelectedCardId(def.topics[0].id);
+    const defaultDeck = getDefaultDeckState();
+    if (confirm(`Reset entire deck back to the ${defaultDeck.topics.length} original topics? All custom progress will be reset.`)) {
+      saveDeckState(defaultDeck);
+      setDeckState(defaultDeck);
+      setSelectedCardId(defaultDeck.topics[0].id);
     }
   };
 
@@ -249,9 +249,10 @@ export function App() {
                 color: activeView === 'dashboard' ? 'var(--text-primary)' : 'var(--text-secondary)',
                 boxShadow: activeView === 'dashboard' ? 'var(--shadow-sm)' : 'none',
               }}
+              title={`${activeCount} active in rotation • ${deckState.topics.length - activeCount} locked in reserve`}
             >
               <Layers size={15} color={activeView === 'dashboard' ? '#c084fc' : undefined} />
-              Deck Catalog ({activeCount})
+              Deck Catalog ({deckState.topics.length})
             </button>
           </nav>
 

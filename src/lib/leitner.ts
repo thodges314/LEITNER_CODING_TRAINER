@@ -154,12 +154,25 @@ export function loadDeckState(): LeitnerDeckState {
       };
     });
 
-    return {
-      topics: hydratedTopics,
+    // Automatically incorporate any newly added seed topics from topics.json
+    const existingIds = new Set(parsed.topics.map((t) => t.id));
+    const newSeedTopics = (seedTopicsData as unknown as TopicItem[])
+      .filter((t) => !existingIds.has(t.id))
+      .map((t) => ({ ...t }));
+
+    const mergedTopics = [...hydratedTopics, ...newSeedTopics];
+    const loadedState: LeitnerDeckState = {
+      topics: mergedTopics,
       totalCompletedReviews: Number.isInteger(parsed.totalCompletedReviews) ? parsed.totalCompletedReviews : 0,
       lastReviewedTrack: parsed.lastReviewedTrack,
       unlockedStageCount: parsed.unlockedStageCount ?? 0,
     };
+
+    if (newSeedTopics.length > 0) {
+      saveDeckState(loadedState);
+    }
+
+    return loadedState;
   } catch (err) {
     console.error('Failed to load deck from localStorage, resetting to seed:', err);
     const defaultState = getDefaultDeckState();
