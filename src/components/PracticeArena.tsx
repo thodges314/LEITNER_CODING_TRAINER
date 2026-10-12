@@ -5,7 +5,6 @@ import { transform } from 'sucrase';
 import {
   getTrackMeta,
   intervalForBox,
-  getTopicTestCases,
 } from '../lib/leitner';
 import type { TopicItem } from '../lib/leitner';
 import { evaluateCodeSubmission } from '../lib/ai';
@@ -64,6 +63,121 @@ function formatConsoleArg(arg: unknown): string {
   } catch {
     return String(arg);
   }
+}
+
+function parseContractFromHarness(harnessStr?: string): Array<{ input: string; expected: string; description?: string }> {
+  if (!harnessStr || !harnessStr.trim()) return [];
+
+  const results: Array<{ input: string; expected: string; description?: string }> = [];
+  const lines = harnessStr.split('\n');
+
+  // Map variable declarations: const r = arrayIntersection(...), let count = 0, etc.
+  const varMap: Record<string, string> = {};
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    const varDecl = line.match(/(?:const|let|var)\s+([a-zA-Z0-9_$]+)\s*=\s*(?:await\s+)?(.+?);?$/);
+    if (varDecl) {
+      varMap[varDecl[1]] = varDecl[2].replace(/;$/, '').trim();
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // 1. Ternary PASS checks: console.log('description:', condition ? 'PASS' : 'FAIL')
+    const logMatches = line.matchAll(/console\.(?:log|info)\(\s*(['"`])(.*?)\1\s*,\s*(.+?)\s*\?\s*(['"`])PASS\4/g);
+    for (const logMatch of logMatches) {
+      const description = logMatch[2].replace(/:\s*$/, '').trim();
+      const condition = logMatch[3].trim();
+
+      let input = condition;
+      let expected = 'truthy';
+
+      if (condition.includes('===')) {
+        const parts = condition.split('===');
+        input = parts[0].trim();
+        expected = parts[1].trim();
+      } else if (condition.includes('==')) {
+        const parts = condition.split('==');
+        input = parts[0].trim();
+        expected = parts[1].trim();
+      }
+
+      // Unwrap JSON.stringify(...)
+      if (input.startsWith('JSON.stringify(') && input.endsWith(')')) {
+        input = input.slice(15, -1).trim();
+      }
+      if (expected.startsWith('JSON.stringify(') && expected.endsWith(')')) {
+        expected = expected.slice(15, -1).trim();
+      }
+
+      // Resolve variables if input references an assigned variable
+      if (varMap[input]) {
+        input = varMap[input];
+      } else if (input.includes('.')) {
+        const baseVar = input.split('.')[0];
+        if (varMap[baseVar]) {
+          input = `${varMap[baseVar]}${input.slice(baseVar.length)}`;
+        }
+      }
+
+      results.push({ description, input, expected });
+    }
+
+    // 2. Error / Rejection checks in try/catch blocks:
+    if (/console\.(?:error|warn)\(\s*(['"`]).*?FAIL/i.test(line)) {
+      const errMatch = line.match(/console\.(?:error|warn)\(\s*(['"`])(.*?)\1/i);
+      if (errMatch) {
+        const rawDesc = errMatch[2].trim();
+        const expMatch = rawDesc.match(/\((?:Expected\s+)?([^)]+)\)/i);
+        const expected = expMatch ? `Throws Error (${expMatch[1]})` : 'Throws Error';
+
+        let input = 'Invalid call / boundary case';
+        for (let j = i - 1; j >= Math.max(0, i - 5); j--) {
+          const prev = lines[j].trim();
+          if (
+            prev.includes('(') &&
+            prev.includes(')') &&
+            !prev.startsWith('try') &&
+            !prev.startsWith('//') &&
+            !prev.startsWith('console.')
+          ) {
+            input = prev
+              .replace(/^(?:const|let|var)\s+[a-zA-Z0-9_$]+\s*=\s*/, '')
+              .replace(/^await\s+/, '')
+              .replace(/;$/, '')
+              .trim();
+            break;
+          }
+        }
+
+        const cleanDesc = rawDesc.replace(/:\s*FAIL.*$/i, '').replace(/FAIL.*$/i, '').trim() || 'Error / Rejection Case';
+        results.push({
+          description: cleanDesc,
+          input,
+          expected,
+        });
+      }
+    }
+  }
+
+  // Fallback: If no assertions could be extracted, generate representative function calls
+  if (results.length === 0) {
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      const call = line.match(/([a-zA-Z0-9_$]+\s*\([^)]*\));?$/);
+      if (call && !call[1].startsWith('console.') && !call[1].startsWith('setTimeout') && !call[1].startsWith('clearTimeout')) {
+        results.push({
+          description: 'Example Execution Contract',
+          input: call[1],
+          expected: 'Valid execution',
+        });
+        if (results.length >= 2) break;
+      }
+    }
+  }
+
+  return results;
 }
 
 function formatAssertionFailure(args: unknown[], currentCard: TopicItem | null): string | null {
@@ -137,8 +251,12 @@ function formatAssertionFailure(args: unknown[], currentCard: TopicItem | null):
     }
   }
 
-  // Lookup expected value from currentCard testCases
-  const testCases = currentCard ? getTopicTestCases(currentCard) : [];
+  // Lookup expected value from currentCard testCases or parseContractFromHarness
+  const testCases = currentCard
+    ? (currentCard.testCases && currentCard.testCases.length > 0
+        ? currentCard.testCases
+        : parseContractFromHarness(currentCard.testHarness))
+    : [];
   if (!expected && testCases.length > 0) {
     const descLower = description.toLowerCase();
     const matchedTc = testCases.find((tc) => {
@@ -928,91 +1046,215 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           {currentCard.promptSeed}
         </div>
 
-        {/* Test Contract & Harness Example */}
-        {currentCard.testHarness && (
-          <div
-            style={{
-              borderRadius: '8px',
-              border: '1px solid rgba(56, 189, 248, 0.25)',
-              backgroundColor: 'rgba(15, 23, 42, 0.8)',
-              overflow: 'hidden',
-            }}
-          >
+        {/* Target Contract (Input vs Expected Output) */}
+        {(() => {
+          const contractCases =
+            currentCard.testCases && currentCard.testCases.length > 0
+              ? currentCard.testCases
+              : parseContractFromHarness(currentCard.testHarness);
+
+          if (!contractCases || contractCases.length === 0) return null;
+
+          return (
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '8px 14px',
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                borderBottom: showHarness ? '1px solid rgba(56, 189, 248, 0.15)' : 'none',
-                userSelect: 'none',
+                borderRadius: '8px',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                overflow: 'hidden',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FlaskConical size={14} color="var(--accent-cyan)" />
-                <span style={{ fontSize: '12px', fontWeight: 600, color: '#f1f5f9', letterSpacing: '0.01em' }}>
-                  Test Contract & Harness Example
-                </span>
-                <span
-                  style={{
-                    fontSize: '10px',
-                    fontWeight: 600,
-                    padding: '1px 6px',
-                    borderRadius: '10px',
-                    backgroundColor: 'rgba(56, 189, 248, 0.12)',
-                    color: 'var(--accent-cyan)',
-                  }}
-                >
-                  Assertions & Inputs
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowHarness((prev) => !prev)}
+              <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '4px',
-                  fontSize: '11px',
-                  color: 'var(--text-muted)',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
+                  justifyContent: 'space-between',
+                  padding: '8px 14px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                  borderBottom: showHarness ? '1px solid rgba(56, 189, 248, 0.15)' : 'none',
+                  userSelect: 'none',
                 }}
-                title={showHarness ? 'Collapse harness example' : 'Expand harness example'}
-                aria-label={showHarness ? 'Collapse harness example' : 'Expand harness example'}
               >
-                <span>{showHarness ? 'Hide' : 'Show'}</span>
-                {showHarness ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-              </button>
-            </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FlaskConical size={14} color="var(--accent-cyan)" />
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#f1f5f9', letterSpacing: '0.01em' }}>
+                    Target Contract: Input vs Expected Output
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      fontWeight: 600,
+                      padding: '1px 6px',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                      color: 'var(--accent-cyan)',
+                      border: '1px solid rgba(56, 189, 248, 0.25)',
+                    }}
+                  >
+                    {contractCases.length} {contractCases.length === 1 ? 'case' : 'cases'}
+                  </span>
+                </div>
 
-            {showHarness && (
-              <pre
-                style={{
-                  margin: 0,
-                  padding: '12px 14px',
-                  backgroundColor: '#030712',
-                  color: '#93c5fd',
-                  fontFamily: '"Fira Code", "JetBrains Mono", Menlo, Monaco, Consolas, monospace',
-                  fontSize: '12px',
-                  lineHeight: 1.55,
-                  overflowX: 'auto',
-                  fontVariantLigatures: 'normal',
-                  fontFeatureSettings: '"calt" 1, "liga" 1',
-                  borderTop: 'none',
-                  whiteSpace: 'pre',
-                }}
-              >
-                <code>{currentCard.testHarness}</code>
-              </pre>
-            )}
-          </div>
-        )}
+                <button
+                  type="button"
+                  onClick={() => setShowHarness((prev) => !prev)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '11px',
+                    color: 'var(--text-muted)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                  }}
+                  title={showHarness ? 'Collapse contract table' : 'Expand contract table'}
+                  aria-label={showHarness ? 'Collapse contract table' : 'Expand contract table'}
+                >
+                  <span>{showHarness ? 'Hide' : 'Show'}</span>
+                  {showHarness ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                </button>
+              </div>
+
+              {showHarness && (
+                <div
+                  style={{
+                    overflowX: 'auto',
+                    backgroundColor: 'rgba(2, 6, 23, 0.6)',
+                  }}
+                >
+                  <table
+                    style={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      fontSize: '12px',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          borderBottom: '1px solid var(--border-subtle)',
+                          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                          color: 'var(--text-muted)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        <th style={{ padding: '8px 12px', width: '28%' }}>Test Case / Scenario</th>
+                        <th style={{ padding: '8px 12px', width: '42%' }}>Target Input / Call Signature</th>
+                        <th style={{ padding: '8px 12px', width: '30%' }}>Expected Output / Condition</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contractCases.map((tc, idx) => {
+                        const isError =
+                          tc.expected.toLowerCase().includes('throw') ||
+                          tc.expected.toLowerCase().includes('error') ||
+                          tc.expected.toLowerCase().includes('reject');
+
+                        return (
+                          <tr
+                            key={idx}
+                            style={{
+                              borderBottom:
+                                idx < contractCases.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none',
+                            }}
+                          >
+                            <td
+                              style={{
+                                padding: '8px 12px',
+                                color: 'var(--text-secondary)',
+                                fontWeight: 500,
+                                verticalAlign: 'top',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '16px',
+                                    height: '16px',
+                                    borderRadius: '50%',
+                                    backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                                    color: 'var(--accent-cyan)',
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {idx + 1}
+                                </span>
+                                <span>{tc.description || `Case #${idx + 1}`}</span>
+                              </div>
+                            </td>
+                            <td
+                              style={{
+                                padding: '8px 12px',
+                                verticalAlign: 'top',
+                              }}
+                            >
+                              <code
+                                style={{
+                                  fontFamily: '"Fira Code", "JetBrains Mono", Menlo, monospace',
+                                  fontSize: '11.5px',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.45)',
+                                  color: '#93c5fd',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  display: 'inline-block',
+                                  whiteSpace: 'pre-wrap',
+                                  wordBreak: 'break-all',
+                                  fontVariantLigatures: 'normal',
+                                  fontFeatureSettings: '"calt" 1, "liga" 1',
+                                }}
+                              >
+                                {tc.input}
+                              </code>
+                            </td>
+                            <td
+                              style={{
+                                padding: '8px 12px',
+                                verticalAlign: 'top',
+                              }}
+                            >
+                              <code
+                                style={{
+                                  fontFamily: '"Fira Code", "JetBrains Mono", Menlo, monospace',
+                                  fontSize: '11.5px',
+                                  backgroundColor: isError
+                                    ? 'rgba(239, 68, 68, 0.15)'
+                                    : 'rgba(16, 185, 129, 0.15)',
+                                  color: isError ? '#f87171' : '#34d399',
+                                  border: isError
+                                    ? '1px solid rgba(239, 68, 68, 0.3)'
+                                    : '1px solid rgba(16, 185, 129, 0.3)',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  display: 'inline-block',
+                                  whiteSpace: 'pre-wrap',
+                                  wordBreak: 'break-all',
+                                  fontWeight: 600,
+                                  fontVariantLigatures: 'normal',
+                                  fontFeatureSettings: '"calt" 1, "liga" 1',
+                                }}
+                              >
+                                {tc.expected}
+                              </code>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Tags */}
         {currentCard.tags.length > 0 && (
