@@ -71,7 +71,6 @@ export function setStoredBaseUrl(url: string): void {
 }
 
 const EVALUATION_SYSTEM_PROMPT = `Evaluate cold-start code practice against invariants and functional correctness. Do NOT grade based on verbatim similarity to a reference solution.
-Whenever an evaluation receives a failing grade ("passed": false), you MUST append a \`### Canonical Reference Pattern\` code block in the "critique" markdown text demonstrating the clean, optimal, canonical implementation pattern.
 Return pure JSON:
 {
   "passed": boolean,
