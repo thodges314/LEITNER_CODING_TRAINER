@@ -234,6 +234,15 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const [outputLogs, setOutputLogs] = useState<ConsoleLogEntry[]>([]);
   const [isOutputOpen, setIsOutputOpen] = useState(false);
 
+  // Reveal canonical solution state
+  const [showSolution, setShowSolution] = useState(false);
+  const [prevCardId, setPrevCardId] = useState(currentCard?.id);
+
+  if (currentCard?.id !== prevCardId) {
+    setPrevCardId(currentCard?.id);
+    setShowSolution(false);
+  }
+
   // Autofocus and place cursor at start on mount
   useEffect(() => {
     if (textareaRef.current) {
@@ -515,6 +524,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const handleSubmit = async () => {
     if (!currentCard || !code.trim() || isEvaluating) return;
     setIsEvaluating(true);
+    setShowSolution(false);
     try {
       const res = await evaluateCodeSubmission(currentCard, code);
       setEvalResult(res);
@@ -529,6 +539,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const handleCommit = (passed: boolean) => {
     onCommitReview(passed);
     setEvalResult(null);
+    setShowSolution(false);
     setCode('');
     setOutputLogs([]);
     setExecutionStatus('idle');
@@ -537,6 +548,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   const handleSkip = () => {
     setMountedComponent(null);
+    setShowSolution(false);
     onSkipCard();
   };
 
@@ -755,7 +767,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           result={evalResult}
           totalCompletedReviews={totalCompletedReviews}
           onCommit={handleCommit}
-          onRetry={() => setEvalResult(null)}
+          onRetry={() => {
+            setEvalResult(null);
+            setShowSolution(false);
+          }}
+          showSolution={showSolution}
+          onToggleShowSolution={() => setShowSolution((prev) => !prev)}
         />
       )}
 

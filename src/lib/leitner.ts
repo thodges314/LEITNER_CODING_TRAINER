@@ -24,6 +24,8 @@ export interface TopicItem {
   promptSeed: string;
   starterCode?: string;
   testHarness?: string;
+  solution?: string;
+  referenceSolution?: string;
 }
 
 export interface LeitnerDeckState {
@@ -147,10 +149,13 @@ export function loadDeckState(): LeitnerDeckState {
     const seedMap = new Map((seedTopicsData as unknown as TopicItem[]).map((t) => [t.id, t]));
     const hydratedTopics = parsed.topics.map((t) => {
       const seed = seedMap.get(t.id);
+      const fallbackSol = seed?.referenceSolution ?? seed?.solution ?? seed?.starterCode;
       return {
         ...t,
         starterCode: t.starterCode ?? seed?.starterCode,
         testHarness: t.testHarness ?? seed?.testHarness,
+        solution: t.solution ?? seed?.solution ?? fallbackSol,
+        referenceSolution: t.referenceSolution ?? seed?.referenceSolution ?? fallbackSol,
       };
     });
 

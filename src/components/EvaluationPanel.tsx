@@ -6,11 +6,14 @@ import {
   Database,
   ArrowRight,
   RotateCcw,
-  ShieldAlert,
   ShieldCheck,
+  ShieldAlert,
   Check,
   X,
   Sparkles,
+  Eye,
+  EyeOff,
+  Copy,
 } from 'lucide-react';
 import { intervalForBox } from '../lib/leitner';
 import type { TopicItem } from '../lib/leitner';
@@ -23,6 +26,8 @@ interface EvaluationPanelProps {
   totalCompletedReviews: number;
   onCommit: (passed: boolean) => void;
   onRetry: () => void;
+  showSolution?: boolean;
+  onToggleShowSolution?: () => void;
 }
 
 export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
@@ -31,10 +36,31 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   totalCompletedReviews,
   onCommit,
   onRetry,
+  showSolution,
+  onToggleShowSolution,
 }) => {
   // Human override state, initialized to AI verdict
   const [effectiveVerdict, setEffectiveVerdict] = useState<boolean>(result.passed);
   const isOverridden = effectiveVerdict !== result.passed;
+
+  // Canonical solution reveal state
+  const [internalShowSolution, setInternalShowSolution] = useState(false);
+  const isSolutionVisible = showSolution !== undefined ? showSolution : internalShowSolution;
+  const toggleSolution = onToggleShowSolution ?? (() => setInternalShowSolution((prev) => !prev));
+  const [copied, setCopied] = useState(false);
+
+  const canonicalCode = topic.referenceSolution || topic.solution || topic.starterCode || '';
+
+  const handleCopySolution = async () => {
+    if (!canonicalCode) return;
+    try {
+      await navigator.clipboard.writeText(canonicalCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.warn('Clipboard copy failed:', err);
+    }
+  };
 
   // Project state transition preview
   const previewBox = effectiveVerdict ? Math.min(5, topic.box + 1) : 1;
@@ -197,7 +223,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               }}
             />
             <span style={{ color: 'var(--text-primary)' }}>
-              Override AI verdict (Mark as {effectiveVerdict ? 'Failed' : 'Passed'})
+              {result.passed
+                ? 'Override AI verdict (Mark as Failed)'
+                : 'Override AI verdict (Mark as Passed)'}
             </span>
           </label>
         </div>
@@ -303,6 +331,95 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
           {result.critique}
         </p>
       </div>
+
+      {/* Reveal Canonical Solution (shown on failed attempt or failed override) */}
+      {(!effectiveVerdict || !result.passed) && canonicalCode && (
+        <div
+          style={{
+            borderRadius: '10px',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-subtle)',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: '12px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              borderBottom: isSolutionVisible ? '1px solid var(--border-subtle)' : 'none',
+              flexWrap: 'wrap',
+              gap: '10px',
+            }}
+          >
+            <button
+              type="button"
+              onClick={toggleSolution}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--text-primary)',
+                fontSize: '13.5px',
+                fontWeight: 600,
+                padding: 0,
+              }}
+            >
+              {isSolutionVisible ? <EyeOff size={16} color="#38bdf8" /> : <Eye size={16} color="#38bdf8" />}
+              <span>{isSolutionVisible ? 'Hide Canonical Solution' : '👁 Reveal Canonical Solution'}</span>
+            </button>
+
+            {isSolutionVisible && (
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={handleCopySolution}
+                style={{
+                  padding: '4px 10px',
+                  fontSize: '11.5px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  height: 'auto',
+                }}
+                title="Copy reference code to clipboard"
+              >
+                {copied ? <Check size={13} color="#34d399" /> : <Copy size={13} />}
+                <span>{copied ? 'Copied!' : 'Copy Solution'}</span>
+              </button>
+            )}
+          </div>
+
+          {isSolutionVisible && (
+            <div
+              style={{
+                padding: '16px',
+                backgroundColor: 'var(--bg-editor)',
+                borderTop: '1px solid var(--border-subtle)',
+              }}
+            >
+              <pre
+                style={{
+                  margin: 0,
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '13px',
+                  lineHeight: 1.6,
+                  color: '#e2e8f0',
+                  overflowX: 'auto',
+                  whiteSpace: 'pre',
+                }}
+              >
+                <code>{canonicalCode}</code>
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Leitner State Transition Preview & Commit Action */}
       <div

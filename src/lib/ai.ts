@@ -70,7 +70,9 @@ export function setStoredBaseUrl(url: string): void {
   localStorage.setItem(API_BASE_URL_KEY, url.trim());
 }
 
-const EVALUATION_SYSTEM_PROMPT = `Evaluate cold-start code practice against invariants and functional correctness. Do NOT grade based on verbatim similarity to a reference solution. Return pure JSON:
+const EVALUATION_SYSTEM_PROMPT = `Evaluate cold-start code practice against invariants and functional correctness. Do NOT grade based on verbatim similarity to a reference solution.
+Whenever an evaluation receives a failing grade ("passed": false), you MUST append a \`### Canonical Reference Pattern\` code block in the "critique" markdown text demonstrating the clean, optimal, canonical implementation pattern.
+Return pure JSON:
 {
   "passed": boolean,
   "timeComplexity": string,
@@ -201,7 +203,11 @@ function heuristicEvaluateCode(topic: TopicItem, code: string): EvaluationResult
     invariantsMissed: invariantsMissed.length > 0 ? invariantsMissed : ['Verify edge cases for null/empty collections'],
     critique: passed
       ? `Solid cold-start reconstruction for "${topic.title}". The logic demonstrates solid command of the underlying invariant pattern without relying on IDE hints.`
-      : `Good retrieval attempt, but essential invariants were omitted or incompletely wired. Review the problem constraints, especially boundary condition handling and error branches.`,
+      : `Good retrieval attempt, but essential invariants were omitted or incompletely wired. Review the problem constraints, especially boundary condition handling and error branches.${
+          (topic.referenceSolution || topic.solution || topic.starterCode)
+            ? `\n\n### Canonical Reference Pattern\n\`\`\`typescript\n${topic.referenceSolution || topic.solution || topic.starterCode}\n\`\`\``
+            : ''
+        }`,
     evaluationSource: 'heuristic-mock',
   };
 }
