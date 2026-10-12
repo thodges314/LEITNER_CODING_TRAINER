@@ -9,7 +9,8 @@ export type TrackType =
   | 'async-web-plumbing'
   | 'collections-transformations'
   | 'react-patterns'
-  | 'algorithmic-screens';
+  | 'algorithmic-screens'
+  | 'typescript-patterns';
 
 export interface TopicItem {
   id: string;
@@ -96,6 +97,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#eab308',
     bg: 'rgba(234, 179, 8, 0.12)',
     border: 'rgba(234, 179, 8, 0.35)',
+  },
+  'typescript-patterns': {
+    label: 'TypeScript Patterns',
+    color: '#3178c6',
+    bg: 'rgba(49, 120, 198, 0.12)',
+    border: 'rgba(49, 120, 198, 0.35)',
   },
 };
 

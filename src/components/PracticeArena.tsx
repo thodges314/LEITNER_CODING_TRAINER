@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, Component } from 'react';
 import type { KeyboardEvent, ErrorInfo } from 'react';
 import ReactDOM from 'react-dom/client';
+import { transform } from 'sucrase';
 import {
   getTrackMeta,
   intervalForBox,
@@ -374,6 +375,30 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       }),
     };
 
+    let executableCode: string;
+    try {
+      // Pre-execution transpilation: compile TypeScript and JSX into browser JavaScript
+      const transpiled = transform(code, {
+        transforms: ['typescript', 'jsx'],
+      });
+      executableCode = transpiled.code;
+    } catch (transpileErr: unknown) {
+      const errStr =
+        transpileErr instanceof Error
+          ? `${transpileErr.name}: ${transpileErr.message}`
+          : String(transpileErr);
+      const errorEntry: ConsoleLogEntry = {
+        type: 'error',
+        content: `Transpilation Error: ${errStr}`,
+        timestamp: now(),
+      };
+      logs.push(errorEntry);
+      setOutputLogs([...logs]);
+      setExecutionStatus('error');
+      setIsRunning(false);
+      return;
+    }
+
     try {
       // Async IIFE execution engine with React, ReactDOM, mount, and native hooks
       const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
@@ -390,7 +415,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         'useCallback',
         'useContext',
         'createContext',
-        code
+        executableCode
       );
 
       const result = await fn(

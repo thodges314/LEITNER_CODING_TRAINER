@@ -1016,5 +1016,83 @@
     "promptSeed": "Merge overlapping intervals after sorting by start, handling touching intervals and unsorted input. Then solve longest substring without repeating characters using a sliding window in O(n).",
     "starterCode": "function mergeIntervals(intervals) {\n  intervals.sort((a, b) => a[0] - b[0]);\n  const res = [intervals[0]];\n  for (let i = 1; i < intervals.length; i++) {\n    const [s, e] = intervals[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}",
     "testHarness": "const r = mergeIntervals([[1,4],[4,5]]);\nconsole.log('Touching intervals merged [[1,5]]:', JSON.stringify(r) === '[[1,5]]' ? 'PASS' : 'FAIL');"
+  },
+{
+    "id": "ts-discriminated-unions-exhaustiveness",
+    "track": "typescript-patterns",
+    "title": "Discriminated Unions & Exhaustiveness Checking",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": ["typescript", "discriminated-unions", "never", "type-narrowing"],
+    "promptSeed": "Define an async state union (Loading, Success<T>, ErrorState). Write a function formatState(state) that exhausts all cases using a switch statement. Enforce compile-time exhaustiveness by assigning the unhandled state to type never in the default branch.",
+    "starterCode": "type AsyncState<T> =\n  | { status: 'idle' }\n  | { status: 'loading' }\n  | { status: 'success'; data: T }\n  | { status: 'error'; error: Error };\n\nfunction formatState<T>(state: AsyncState<T>): string {\n  switch (state.status) {\n    case 'idle': return 'Idle';\n    case 'loading': return 'Loading...';\n    case 'success': return `Loaded: ${JSON.stringify(state.data)}`;\n    case 'error': return `Failed: ${state.error.message}`;\n    default: {\n      const _exhaustiveCheck: never = state;\n      throw new Error(`Unhandled state: ${_exhaustiveCheck}`);\n    }\n  }\n}",
+    "testHarness": "console.log('Success state format:', formatState({ status: 'success', data: { id: 1 } }) === 'Loaded: {\"id\":1}' ? 'PASS' : 'FAIL');\nconsole.log('Loading state format:', formatState({ status: 'loading' }) === 'Loading...' ? 'PASS' : 'FAIL');"
+  },
+  {
+    "id": "ts-generic-api-client",
+    "track": "typescript-patterns",
+    "title": "Generic Fetch Client with Typed Payloads",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": ["typescript", "generics", "fetch", "promises"],
+    "promptSeed": "Write a generic async wrapper apiGet<T>(url: string): Promise<T>. Ensure the returned Promise explicitly resolves to type T and handles non-200 responses with typed error handling.",
+    "starterCode": "async function apiGet<T>(url: string): Promise<T> {\n  const res = await fetch(url);\n  if (!res.ok) {\n    throw new Error(`Request failed with status ${res.status}`);\n  }\n  return (await res.json()) as T;\n}",
+    "testHarness": "interface Todo { id: number; title: string; completed: boolean; }\ntry {\n  const todo = await apiGet<Todo>('https://jsonplaceholder.typicode.com/todos/1');\n  console.log('Typed GET matches structure:', typeof todo.id === 'number' && typeof todo.title === 'string' ? 'PASS' : 'FAIL', todo);\n} catch (err) {\n  console.error('apiGet error:', err.message);\n}"
+  },
+  {
+    "id": "ts-custom-utility-types",
+    "track": "typescript-patterns",
+    "title": "Custom Utility Types (DeepPartial & PickByType)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": ["typescript", "generics", "utility-types", "conditional-types"],
+    "promptSeed": "Implement DeepPartial<T> recursively so all nested object properties become optional, while leaving primitives unchanged. Then implement PickByType<T, ValueType> using mapped and conditional types with key remapping.",
+    "starterCode": "type DeepPartial<T> = {\n  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];\n};\n\ntype PickByType<T, ValueType> = {\n  [P in keyof T as T[P] extends ValueType ? P : never]: T[P];\n};",
+    "testHarness": "type TestObj = { id: number; name: string; age: number; active: boolean };\ntype OnlyNumbers = PickByType<TestObj, number>;\n// In-runner runtime type reflection:\nconst check: OnlyNumbers = { id: 1, age: 30 };\nconsole.log('PickByType evaluated correctly:', check.id === 1 && check.age === 30 ? 'PASS' : 'FAIL');"
+  },
+  {
+    "id": "ts-generic-component-props",
+    "track": "typescript-patterns",
+    "title": "Generic React Component Props (Generic Select<T>)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": ["typescript", "react", "generics", "props"],
+    "promptSeed": "Define props and signature for a generic Select component: SelectProps<T> where items is T[], value is T, onChange is (item: T) => void, and getLabel is (item: T) => string. Ensure TypeScript enforces that items and value share the exact same type.",
+    "starterCode": "interface SelectProps<T> {\n  items: T[];\n  value: T;\n  onChange: (item: T) => void;\n  getLabel: (item: T) => string;\n}\n\nfunction renderSelect<T>(props: SelectProps<T>): string {\n  return props.items.map(item => props.getLabel(item)).join(', ');\n}",
+    "testHarness": "interface Item { code: string; label: string; }\nconst items: Item[] = [{ code: 'a', label: 'Option A' }, { code: 'b', label: 'Option B' }];\nconst output = renderSelect<Item>({\n  items,\n  value: items[0],\n  onChange: (i) => console.log(i.code),\n  getLabel: (i) => i.label\n});\nconsole.log('renderSelect output:', output === 'Option A, Option B' ? 'PASS' : 'FAIL');"
+  },
+  {
+    "id": "ts-custom-type-guards",
+    "track": "typescript-patterns",
+    "title": "Custom User-Defined Type Guards (isRecord, isError)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": ["typescript", "type-guards", "narrowing"],
+    "promptSeed": "Write user-defined type guards: isRecord(val: unknown): val is Record<string, unknown> (returns true for non-null plain objects and false for arrays/primitives), and isError(val: unknown): val is Error.",
+    "starterCode": "function isRecord(val: unknown): val is Record<string, unknown> {\n  return typeof val === 'object' && val !== null && !Array.isArray(val);\n}\n\nfunction isError(val: unknown): val is Error {\n  return val instanceof Error || (isRecord(val) && typeof val.message === 'string');\n}",
+    "testHarness": "console.log('isRecord({}):', isRecord({}) === true ? 'PASS' : 'FAIL');\nconsole.log('isRecord([]):', isRecord([]) === false ? 'PASS' : 'FAIL');\nconsole.log('isRecord(null):', isRecord(null) === false ? 'PASS' : 'FAIL');\nconsole.log('isError(new Error()):', isError(new Error('boom')) === true ? 'PASS' : 'FAIL');\nconsole.log('isError(\"boom\"):', isError('boom') === false ? 'PASS' : 'FAIL');"
+  },
+  {
+    "id": "ts-typed-event-emitter",
+    "track": "typescript-patterns",
+    "title": "Strictly Typed Event Emitter Map",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": ["typescript", "generics", "mapped-types", "pub-sub"],
+    "promptSeed": "Create a TypedEmitter<Events extends Record<string, any>> where .on<K extends keyof Events>(event: K, listener: (payload: Events[K]) => void) and .emit<K extends keyof Events>(event: K, payload: Events[K]) are strictly type-checked against the event map.",
+    "starterCode": "class TypedEmitter<Events extends Record<string, any>> {\n  private listeners = new Map<keyof Events, Array<(payload: any) => void>>();\n\n  on<K extends keyof Events>(event: K, listener: (payload: Events[K]) => void): void {\n    if (!this.listeners.has(event)) this.listeners.set(event, []);\n    this.listeners.get(event)!.push(listener);\n  }\n\n  emit<K extends keyof Events>(event: K, payload: Events[K]): void {\n    (this.listeners.get(event) || []).forEach(fn => fn(payload));\n  }\n}",
+    "testHarness": "interface AppEvents { login: { userId: string }; logout: undefined; }\nconst emitter = new TypedEmitter<AppEvents>();\nlet capturedId = '';\nemitter.on('login', (data) => { capturedId = data.userId; });\nemitter.emit('login', { userId: 'usr_42' });\nconsole.log('TypedEmitter handled payload:', capturedId === 'usr_42' ? 'PASS' : 'FAIL');"
   }
 ]
