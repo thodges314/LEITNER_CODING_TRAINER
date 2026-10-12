@@ -21,6 +21,8 @@ export interface TopicItem {
   status: 'active' | 'locked';
   tags: string[];
   promptSeed: string;
+  starterCode?: string;
+  testHarness?: string;
 }
 
 export interface LeitnerDeckState {
@@ -135,8 +137,18 @@ export function loadDeckState(): LeitnerDeckState {
     if (!Array.isArray(parsed.topics)) {
       throw new Error('Invalid deck structure');
     }
+    const seedMap = new Map((seedTopicsData as unknown as TopicItem[]).map((t) => [t.id, t]));
+    const hydratedTopics = parsed.topics.map((t) => {
+      const seed = seedMap.get(t.id);
+      return {
+        ...t,
+        starterCode: t.starterCode ?? seed?.starterCode,
+        testHarness: t.testHarness ?? seed?.testHarness,
+      };
+    });
+
     return {
-      topics: parsed.topics,
+      topics: hydratedTopics,
       totalCompletedReviews: Number.isInteger(parsed.totalCompletedReviews) ? parsed.totalCompletedReviews : 0,
       lastReviewedTrack: parsed.lastReviewedTrack,
       unlockedStageCount: parsed.unlockedStageCount ?? 0,
