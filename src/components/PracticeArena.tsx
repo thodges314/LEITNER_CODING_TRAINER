@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import type { KeyboardEvent } from 'react';
+import React, { useState, useEffect, useRef, Component } from 'react';
+import type { KeyboardEvent, ErrorInfo } from 'react';
+import ReactDOM from 'react-dom/client';
 import {
   getTrackMeta,
   intervalForBox,
@@ -26,6 +27,7 @@ import {
   XCircle,
   Trash2,
   Code2,
+  Layers,
 } from 'lucide-react';
 
 interface PracticeArenaProps {
@@ -59,6 +61,74 @@ function formatConsoleArg(arg: unknown): string {
   }
 }
 
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  resetKey?: string | number;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ReactTestErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
+  }
+
+  override componentDidUpdate(prevProps: ErrorBoundaryProps) {
+    if (prevProps.resetKey !== this.props.resetKey && this.state.hasError) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div
+          style={{
+            padding: '16px',
+            borderRadius: '6px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#f87171',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '12px',
+          }}
+        >
+          <div style={{ fontWeight: 700, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span>⚠️ React Component Render Exception</span>
+          </div>
+          <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: '#fca5a5', lineHeight: 1.5 }}>
+            {this.state.error?.name}: {this.state.error?.message}
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline"
+            style={{ marginTop: '12px', fontSize: '11px', padding: '4px 10px', height: 'auto' }}
+            onClick={() => this.setState({ hasError: false, error: null })}
+          >
+            Retry Render
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 /**
  * Constructs the default starter code template and commented test harness snippet
  * tailored to the card and its track.
@@ -66,12 +136,43 @@ function formatConsoleArg(arg: unknown): string {
 function getStarterSnippet(card: TopicItem | null): string {
   if (!card) return '';
 
+  const isReactTrack = card.track === 'react' || card.track === 'react-patterns';
+
   let commentedSnippet: string;
   if (card.testHarness?.trim()) {
     const lines = card.testHarness.trim().split('\n');
-    commentedSnippet = lines
+    const commentedLines = lines
       .map((l) => (l.trim().length > 0 ? `// ${l}` : '//'))
       .join('\n');
+
+    if (isReactTrack) {
+      commentedSnippet = `${commentedLines}
+//
+// // Inline Component / Hook Test Harness:
+// function Harness() {
+//   // Call your hook or component here
+//   const [status, setStatus] = React.useState('Mounted');
+//   return React.createElement('div', { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' } },
+//     React.createElement('div', { style: { fontWeight: 600, color: '#06b6d4' } }, '⚛️ React Live Hook Test'),
+//     React.createElement('div', null, 'Status: ' + status),
+//     React.createElement('button', {
+//       className: 'btn btn-secondary',
+//       style: { width: 'fit-content', padding: '4px 10px', fontSize: '11px' },
+//       onClick: () => setStatus('State updated @ ' + new Date().toLocaleTimeString())
+//     }, 'Trigger State Update')
+//   );
+// }
+// mount(Harness);`;
+    } else {
+      commentedSnippet = commentedLines;
+    }
+  } else if (isReactTrack) {
+    commentedSnippet = `// // Inline Component / Hook Test Harness:
+// function Harness() {
+//   const [state, setState] = React.useState('Ready');
+//   return React.createElement('div', { style: { padding: '10px' } }, '⚛️ React Live Test: ' + state);
+// }
+// mount(Harness);`;
   } else {
     const titleLower = card.title.toLowerCase();
     const idLower = card.id.toLowerCase();
@@ -110,6 +211,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const [isRunning, setIsRunning] = useState(false);
   const [executionStatus, setExecutionStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
   const [evalResult, setEvalResult] = useState<EvaluationResult | null>(null);
+
+  // Live React component mounting state
+  const [mountedComponent, setMountedComponent] = useState<{
+    element: React.ReactElement;
+    key: number;
+  } | null>(null);
 
   // 10-minute countdown stopwatch
   const [timeRemaining, setTimeRemaining] = useState(INITIAL_TIME);
@@ -189,6 +296,26 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setCode(header + toggledLines.join('\n'));
   };
 
+  const appendConsoleLog = (type: 'log' | 'warn' | 'error' | 'info', content: string) => {
+    const now = new Date().toLocaleTimeString([], {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    setOutputLogs((prev) => [
+      ...prev,
+      {
+        type,
+        content,
+        timestamp: now,
+      },
+    ]);
+    if (type === 'error') {
+      setExecutionStatus('error');
+    }
+  };
+
   // Async Execution Handler with AsyncFunction and captured console
   const handleRunCode = async () => {
     if (!code.trim() || isRunning) return;
@@ -225,15 +352,68 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       },
     };
 
-    try {
-      // Async IIFE execution engine
-      const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-      const fn = new AsyncFunction('console', code);
+    const mount = (compOrElem: unknown, props: Record<string, unknown> = {}) => {
+      if (!compOrElem) return;
+      if (React.isValidElement(compOrElem)) {
+        setMountedComponent({ element: compOrElem, key: Date.now() });
+        appendLog('info', '↳ React Element mounted to live preview');
+      } else if (typeof compOrElem === 'function') {
+        const el = React.createElement(compOrElem as React.ComponentType, props);
+        setMountedComponent({ element: el, key: Date.now() });
+        appendLog('info', '↳ Component mounted to live preview');
+      } else {
+        appendLog('warn', `mount() received unsupported argument type: ${typeof compOrElem}`);
+      }
+    };
 
-      const result = await fn(customConsole);
+    const customReactDOM = {
+      ...ReactDOM,
+      createRoot: () => ({
+        render: (element: React.ReactElement) => mount(element),
+        unmount: () => setMountedComponent(null),
+      }),
+    };
+
+    try {
+      // Async IIFE execution engine with React, ReactDOM, mount, and native hooks
+      const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+      const fn = new AsyncFunction(
+        'console',
+        'React',
+        'ReactDOM',
+        'mount',
+        'useState',
+        'useEffect',
+        'useRef',
+        'useReducer',
+        'useMemo',
+        'useCallback',
+        'useContext',
+        'createContext',
+        code
+      );
+
+      const result = await fn(
+        customConsole,
+        React,
+        customReactDOM,
+        mount,
+        React.useState,
+        React.useEffect,
+        React.useRef,
+        React.useReducer,
+        React.useMemo,
+        React.useCallback,
+        React.useContext,
+        React.createContext
+      );
 
       if (result !== undefined) {
-        appendLog('info', `↳ Return: ${formatConsoleArg(result)}`);
+        if (React.isValidElement(result) || typeof result === 'function') {
+          mount(result);
+        } else {
+          appendLog('info', `↳ Return: ${formatConsoleArg(result)}`);
+        }
       }
 
       if (logs.length === 0) {
@@ -285,6 +465,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setCode('');
     setOutputLogs([]);
     setExecutionStatus('idle');
+    setMountedComponent(null);
+  };
+
+  const handleSkip = () => {
+    setMountedComponent(null);
+    onSkipCard();
   };
 
   if (!currentCard) {
@@ -312,6 +498,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     );
   }
 
+  const isReactTrack = currentCard.track === 'react' || currentCard.track === 'react-patterns';
   const trackMeta = getTrackMeta(currentCard.track);
   const linesCount = code.split('\n').length;
   const charsCount = code.length;
@@ -615,7 +802,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           <button
             type="button"
             className="btn btn-outline"
-            onClick={onSkipCard}
+            onClick={handleSkip}
             disabled={isEvaluating || isRunning}
             style={{ fontSize: '13px' }}
           >
@@ -664,275 +851,437 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </div>
         </div>
 
-        {/* Dark Terminal / Console Output Container */}
+        {/* Test Runner & Live Preview Container */}
         <div
           style={{
             marginTop: '12px',
-            borderRadius: '8px',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            backgroundColor: '#030712',
-            overflow: 'hidden',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+            display: 'grid',
+            gridTemplateColumns: isReactTrack ? 'repeat(auto-fit, minmax(420px, 1fr))' : '1fr',
+            gap: '14px',
+            alignItems: 'start',
           }}
         >
-          {/* Terminal Title Bar */}
+          {/* Dark Terminal / Console Output Container */}
           <div
-            onClick={() => setIsOutputOpen(!isOutputOpen)}
             style={{
-              padding: '10px 14px',
-              backgroundColor: '#080d1a',
-              borderBottom: isOutputOpen ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              cursor: 'pointer',
-              userSelect: 'none',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backgroundColor: '#030712',
+              overflow: 'hidden',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <Terminal size={15} color="var(--accent-cyan)" />
-              <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#f1f5f9', letterSpacing: '0.01em' }}>
-                Console & Test Runner
-              </span>
-
-              {/* Status Indicators (Green / Red / Running / Ready) */}
-              {isRunning ? (
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#38bdf8',
-                    backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(56, 189, 248, 0.3)',
-                  }}
-                >
-                  <Loader2 size={11} className="animate-spin" /> Running...
-                </span>
-              ) : executionStatus === 'success' ? (
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#34d399',
-                    backgroundColor: 'rgba(52, 211, 153, 0.12)',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(52, 211, 153, 0.35)',
-                  }}
-                >
-                  <span
-                    style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: '#10b981',
-                      boxShadow: '0 0 6px #10b981',
-                    }}
-                  />
-                  Passed (0 Errors)
-                </span>
-              ) : executionStatus === 'error' ? (
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#f87171',
-                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(239, 68, 68, 0.35)',
-                  }}
-                >
-                  <span
-                    style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: '#ef4444',
-                      boxShadow: '0 0 6px #ef4444',
-                    }}
-                  />
-                  Failed ({errorCount} Error{errorCount === 1 ? '' : 's'})
-                </span>
-              ) : (
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '11px',
-                    color: 'var(--text-dim)',
-                  }}
-                >
-                  <span
-                    style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: '#64748b',
-                    }}
-                  />
-                  Ready
-                </span>
-              )}
-
-              {/* Log count badge */}
-              {outputLogs.length > 0 && (
-                <span
-                  style={{
-                    fontSize: '11px',
-                    padding: '1px 7px',
-                    borderRadius: '10px',
-                    backgroundColor: errorCount > 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(56, 189, 248, 0.12)',
-                    color: errorCount > 0 ? '#f87171' : '#38bdf8',
-                    fontWeight: 600,
-                  }}
-                >
-                  {outputLogs.length} {outputLogs.length === 1 ? 'entry' : 'entries'}
-                </span>
-              )}
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {outputLogs.length > 0 && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOutputLogs([]);
-                    setExecutionStatus('idle');
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-dim)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '11px',
-                    padding: '2px 6px',
-                  }}
-                  title="Clear console output"
-                >
-                  <Trash2 size={12} /> Clear
-                </button>
-              )}
-              <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
-                {isOutputOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </span>
-            </div>
-          </div>
-
-          {/* Terminal Console Output Body */}
-          {isOutputOpen && (
+            {/* Terminal Title Bar */}
             <div
+              onClick={() => setIsOutputOpen(!isOutputOpen)}
               style={{
-                padding: '12px 14px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '12.5px',
-                maxHeight: '260px',
-                overflowY: 'auto',
-                lineHeight: 1.6,
-                backgroundColor: '#030712',
-                color: '#cbd5e1',
+                padding: '10px 14px',
+                backgroundColor: '#080d1a',
+                borderBottom: isOutputOpen ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                userSelect: 'none',
               }}
             >
-              {outputLogs.length === 0 ? (
-                <div style={{ color: '#64748b', fontStyle: 'italic', fontSize: '12px', padding: '6px 2px' }}>
-                  $ Terminal ready. Click 'Run Code / Test' above to execute your solution and capture console outputs.
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  {outputLogs.map((log, index) => {
-                    let textColor = '#e2e8f0';
-                    let badgeBg = 'rgba(56, 189, 248, 0.15)';
-                    let badgeColor = '#38bdf8';
-                    let badgeLabel = 'LOG';
-                    let rowBg = 'transparent';
-                    let icon = null;
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                <Terminal size={15} color="var(--accent-cyan)" />
+                <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#f1f5f9', letterSpacing: '0.01em' }}>
+                  Console & Test Runner
+                </span>
 
-                    if (log.type === 'error') {
-                      textColor = '#f87171';
-                      badgeBg = 'rgba(239, 68, 68, 0.2)';
-                      badgeColor = '#ef4444';
-                      badgeLabel = 'ERROR';
-                      rowBg = 'rgba(239, 68, 68, 0.08)';
-                      icon = <XCircle size={13} color="#ef4444" style={{ flexShrink: 0, marginTop: '3px' }} />;
-                    } else if (log.type === 'warn') {
-                      textColor = '#fbbf24';
-                      badgeBg = 'rgba(245, 158, 11, 0.2)';
-                      badgeColor = '#f59e0b';
-                      badgeLabel = 'WARN';
-                      rowBg = 'rgba(245, 158, 11, 0.08)';
-                      icon = <AlertTriangle size={13} color="#f59e0b" style={{ flexShrink: 0, marginTop: '3px' }} />;
-                    } else if (log.type === 'info') {
-                      textColor = '#38bdf8';
-                      badgeBg = 'rgba(56, 189, 248, 0.15)';
-                      badgeColor = '#38bdf8';
-                      badgeLabel = 'INFO';
-                    } else {
-                      // Check if output includes test PASS indicator
-                      if (log.content.includes('PASS')) {
-                        badgeBg = 'rgba(16, 185, 129, 0.2)';
-                        badgeColor = '#10b981';
-                        badgeLabel = 'PASS';
+                {/* Status Indicators (Green / Red / Running / Ready) */}
+                {isRunning ? (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: '#38bdf8',
+                      backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                    }}
+                  >
+                    <Loader2 size={11} className="animate-spin" /> Running...
+                  </span>
+                ) : executionStatus === 'success' ? (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: '#34d399',
+                      backgroundColor: 'rgba(52, 211, 153, 0.12)',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(52, 211, 153, 0.35)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        backgroundColor: '#10b981',
+                        boxShadow: '0 0 6px #10b981',
+                      }}
+                    />
+                    Passed (0 Errors)
+                  </span>
+                ) : executionStatus === 'error' ? (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: '#f87171',
+                      backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                      padding: '2px 8px',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(239, 68, 68, 0.35)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        backgroundColor: '#ef4444',
+                        boxShadow: '0 0 6px #ef4444',
+                      }}
+                    />
+                    Failed ({errorCount} Error{errorCount === 1 ? '' : 's'})
+                  </span>
+                ) : (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '11px',
+                      color: 'var(--text-dim)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        backgroundColor: '#64748b',
+                      }}
+                    />
+                    Ready
+                  </span>
+                )}
+
+                {/* Log count badge */}
+                {outputLogs.length > 0 && (
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      padding: '1px 7px',
+                      borderRadius: '10px',
+                      backgroundColor: errorCount > 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(56, 189, 248, 0.12)',
+                      color: errorCount > 0 ? '#f87171' : '#38bdf8',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {outputLogs.length} {outputLogs.length === 1 ? 'entry' : 'entries'}
+                  </span>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {outputLogs.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOutputLogs([]);
+                      setExecutionStatus('idle');
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-dim)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '11px',
+                      padding: '2px 6px',
+                    }}
+                    title="Clear console output"
+                  >
+                    <Trash2 size={12} /> Clear
+                  </button>
+                )}
+                <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>
+                  {isOutputOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                </span>
+              </div>
+            </div>
+
+            {/* Terminal Console Output Body */}
+            {isOutputOpen && (
+              <div
+                style={{
+                  padding: '12px 14px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '12.5px',
+                  maxHeight: '260px',
+                  overflowY: 'auto',
+                  lineHeight: 1.6,
+                  backgroundColor: '#030712',
+                  color: '#cbd5e1',
+                }}
+              >
+                {outputLogs.length === 0 ? (
+                  <div style={{ color: '#64748b', fontStyle: 'italic', fontSize: '12px', padding: '6px 2px' }}>
+                    $ Terminal ready. Click 'Run Code / Test' above to execute your solution and capture console outputs.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    {outputLogs.map((log, index) => {
+                      let textColor = '#e2e8f0';
+                      let badgeBg = 'rgba(56, 189, 248, 0.15)';
+                      let badgeColor = '#38bdf8';
+                      let badgeLabel = 'LOG';
+                      let rowBg = 'transparent';
+                      let icon = null;
+
+                      if (log.type === 'error') {
+                        textColor = '#f87171';
+                        badgeBg = 'rgba(239, 68, 68, 0.2)';
+                        badgeColor = '#ef4444';
+                        badgeLabel = 'ERROR';
+                        rowBg = 'rgba(239, 68, 68, 0.08)';
+                        icon = <XCircle size={13} color="#ef4444" style={{ flexShrink: 0, marginTop: '3px' }} />;
+                      } else if (log.type === 'warn') {
+                        textColor = '#fbbf24';
+                        badgeBg = 'rgba(245, 158, 11, 0.2)';
+                        badgeColor = '#f59e0b';
+                        badgeLabel = 'WARN';
+                        rowBg = 'rgba(245, 158, 11, 0.08)';
+                        icon = <AlertTriangle size={13} color="#f59e0b" style={{ flexShrink: 0, marginTop: '3px' }} />;
+                      } else if (log.type === 'info') {
+                        textColor = '#38bdf8';
+                        badgeBg = 'rgba(56, 189, 248, 0.15)';
+                        badgeColor = '#38bdf8';
+                        badgeLabel = 'INFO';
+                      } else {
+                        // Check if output includes test PASS indicator
+                        if (log.content.includes('PASS')) {
+                          badgeBg = 'rgba(16, 185, 129, 0.2)';
+                          badgeColor = '#10b981';
+                          badgeLabel = 'PASS';
+                        }
                       }
-                    }
 
-                    return (
-                      <div
-                        key={index}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'flex-start',
-                          gap: '8px',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          backgroundColor: rowBg,
-                          wordBreak: 'break-word',
-                          whiteSpace: 'pre-wrap',
-                        }}
-                      >
-                        <span style={{ color: '#475569', fontSize: '11px', flexShrink: 0, userSelect: 'none', marginTop: '2px' }}>
-                          [{log.timestamp}]
-                        </span>
-                        <span
+                      return (
+                        <div
+                          key={index}
                           style={{
-                            fontSize: '10px',
-                            fontWeight: 700,
-                            padding: '1px 5px',
-                            borderRadius: '3px',
-                            backgroundColor: badgeBg,
-                            color: badgeColor,
-                            userSelect: 'none',
-                            flexShrink: 0,
-                            letterSpacing: '0.03em',
-                            marginTop: '2px',
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: '8px',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            backgroundColor: rowBg,
+                            wordBreak: 'break-word',
+                            whiteSpace: 'pre-wrap',
                           }}
                         >
-                          {badgeLabel}
-                        </span>
-                        {icon}
-                        <span style={{ color: textColor, flex: 1, whiteSpace: 'pre-wrap' }}>
-                          {log.content}
-                        </span>
-                      </div>
-                    );
-                  })}
+                          <span style={{ color: '#475569', fontSize: '11px', flexShrink: 0, userSelect: 'none', marginTop: '2px' }}>
+                            [{log.timestamp}]
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              padding: '1px 5px',
+                              borderRadius: '3px',
+                              backgroundColor: badgeBg,
+                              color: badgeColor,
+                              userSelect: 'none',
+                              flexShrink: 0,
+                              letterSpacing: '0.03em',
+                              marginTop: '2px',
+                            }}
+                          >
+                            {badgeLabel}
+                          </span>
+                          {icon}
+                          <span style={{ color: textColor, flex: 1, whiteSpace: 'pre-wrap' }}>
+                            {log.content}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Component Preview / Hook Test Container (React Track Only) */}
+          {isReactTrack && (
+            <div
+              style={{
+                borderRadius: '8px',
+                border: '1px solid rgba(6, 182, 212, 0.3)',
+                backgroundColor: '#030712',
+                overflow: 'hidden',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {/* Title Bar */}
+              <div
+                style={{
+                  padding: '10px 14px',
+                  backgroundColor: '#061320',
+                  borderBottom: '1px solid rgba(6, 182, 212, 0.18)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  userSelect: 'none',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Layers size={15} color="#06b6d4" />
+                  <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#f1f5f9' }}>
+                    Component Preview / Hook Test
+                  </span>
+                  {mountedComponent ? (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        color: '#34d399',
+                        backgroundColor: 'rgba(52, 211, 153, 0.12)',
+                        padding: '2px 8px',
+                        borderRadius: '12px',
+                        border: '1px solid rgba(52, 211, 153, 0.35)',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          backgroundColor: '#10b981',
+                          boxShadow: '0 0 6px #10b981',
+                        }}
+                      />
+                      Live Mounted
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        fontSize: '11px',
+                        color: 'var(--text-dim)',
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          backgroundColor: '#64748b',
+                        }}
+                      />
+                      Unmounted
+                    </span>
+                  )}
                 </div>
-              )}
+
+                {mountedComponent && (
+                  <button
+                    type="button"
+                    onClick={() => setMountedComponent(null)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-dim)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      fontSize: '11px',
+                      padding: '2px 6px',
+                    }}
+                    title="Unmount and reset preview"
+                  >
+                    <RotateCcw size={12} /> Reset Mount
+                  </button>
+                )}
+              </div>
+
+              {/* Preview Content Area */}
+              <div
+                style={{
+                  padding: '16px',
+                  minHeight: '200px',
+                  maxHeight: '260px',
+                  overflowY: 'auto',
+                  backgroundColor: '#050a14',
+                  color: '#cbd5e1',
+                  fontSize: '13px',
+                }}
+              >
+                <ReactTestErrorBoundary
+                  resetKey={mountedComponent?.key}
+                  onError={(err) => {
+                    appendConsoleLog('error', `React Render Exception: ${err.name}: ${err.message}`);
+                    setIsOutputOpen(true);
+                  }}
+                >
+                  {mountedComponent ? (
+                    <div key={mountedComponent.key} style={{ width: '100%' }}>
+                      {mountedComponent.element}
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        height: '100%',
+                        minHeight: '160px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        textAlign: 'center',
+                        padding: '20px 12px',
+                        color: '#64748b',
+                      }}
+                    >
+                      <Layers size={28} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+                        No Component Mounted
+                      </div>
+                      <div style={{ fontSize: '11.5px', maxWidth: '340px', lineHeight: 1.5 }}>
+                        Call <code>mount(Harness)</code> or <code>mount(Component)</code> in your code or test runner to preview live hook state and UI updates.
+                      </div>
+                    </div>
+                  )}
+                </ReactTestErrorBoundary>
+              </div>
             </div>
           )}
         </div>
