@@ -29,7 +29,9 @@ import {
   Trash2,
   Code2,
   Layers,
+  ShieldCheck,
 } from 'lucide-react';
+import { checkAndTranspileTS } from '../utils/typeChecker';
 
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
@@ -219,6 +221,11 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     key: number;
   } | null>(null);
 
+  // Execution mode: JS (Fast) vs TS (Strict Type Check)
+  const [executionMode, setExecutionMode] = useState<'js' | 'ts'>(() =>
+    currentCard?.track === 'typescript-patterns' ? 'ts' : 'js'
+  );
+
   // 10-minute countdown stopwatch
   const [timeRemaining, setTimeRemaining] = useState(INITIAL_TIME);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -376,27 +383,62 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     };
 
     let executableCode: string;
-    try {
-      // Pre-execution transpilation: compile TypeScript and JSX into browser JavaScript
-      const transpiled = transform(code, {
-        transforms: ['typescript', 'jsx'],
-      });
-      executableCode = transpiled.code;
-    } catch (transpileErr: unknown) {
-      const errStr =
-        transpileErr instanceof Error
-          ? `${transpileErr.name}: ${transpileErr.message}`
-          : String(transpileErr);
-      const errorEntry: ConsoleLogEntry = {
-        type: 'error',
-        content: `Transpilation Error: ${errStr}`,
-        timestamp: now(),
-      };
-      logs.push(errorEntry);
-      setOutputLogs([...logs]);
-      setExecutionStatus('error');
-      setIsRunning(false);
-      return;
+
+    if (executionMode === 'ts') {
+      // TypeScript Strict Type Checking Mode
+      const typeCheckResult = checkAndTranspileTS(code);
+
+      // Display all compiler warnings/errors directly in console output panel before running tests
+      if (typeCheckResult.diagnostics.length > 0) {
+        for (const diag of typeCheckResult.diagnostics) {
+          logs.push({
+            type: diag.type === 'warn' ? 'warn' : 'error',
+            content: diag.formatted,
+            timestamp: now(),
+          });
+        }
+        setOutputLogs([...logs]);
+      }
+
+      // Halt execution if strict type errors are present so mismatched interfaces and bad generics cannot pass silently
+      if (!typeCheckResult.success) {
+        setExecutionStatus('error');
+        setIsRunning(false);
+        return;
+      }
+
+      // If strict type checking passes, transpile via sucrase (or use typeCheckResult.code)
+      try {
+        const transpiled = transform(code, {
+          transforms: ['typescript', 'jsx'],
+        });
+        executableCode = transpiled.code;
+      } catch {
+        executableCode = typeCheckResult.code;
+      }
+    } else {
+      // JS (Fast) mode: direct rapid transpilation via sucrase
+      try {
+        const transpiled = transform(code, {
+          transforms: ['typescript', 'jsx'],
+        });
+        executableCode = transpiled.code;
+      } catch (transpileErr: unknown) {
+        const errStr =
+          transpileErr instanceof Error
+            ? `${transpileErr.name}: ${transpileErr.message}`
+            : String(transpileErr);
+        const errorEntry: ConsoleLogEntry = {
+          type: 'error',
+          content: `Transpilation Error: ${errStr}`,
+          timestamp: now(),
+        };
+        logs.push(errorEntry);
+        setOutputLogs([...logs]);
+        setExecutionStatus('error');
+        setIsRunning(false);
+        return;
+      }
     }
 
     try {
@@ -821,6 +863,83 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           autoComplete="off"
           style={{ minHeight: '340px' }}
         />
+
+        {/* Mode Selector Bar: JS (Fast) vs TS (Strict Type Check) */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid var(--border-subtle)',
+            flexWrap: 'wrap',
+            gap: '8px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+              Mode:
+            </span>
+            <div
+              style={{
+                display: 'inline-flex',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                padding: '2px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setExecutionMode('js')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  fontSize: '11.5px',
+                  fontWeight: executionMode === 'js' ? 600 : 400,
+                  backgroundColor: executionMode === 'js' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+                  color: executionMode === 'js' ? '#38bdf8' : 'var(--text-dim)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                title="Fast transpilation (Sucrase) without strict compile-time type-checking"
+              >
+                JS (Fast)
+              </button>
+              <button
+                type="button"
+                onClick={() => setExecutionMode('ts')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '4px',
+                  border: 'none',
+                  fontSize: '11.5px',
+                  fontWeight: executionMode === 'ts' ? 600 : 400,
+                  backgroundColor: executionMode === 'ts' ? 'rgba(49, 120, 198, 0.25)' : 'transparent',
+                  color: executionMode === 'ts' ? '#60a5fa' : 'var(--text-dim)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+                title="Full TypeScript compiler type-checking (strict checks, interfaces, generics)"
+              >
+                TS (Strict Type Check)
+              </button>
+            </div>
+          </div>
+
+          {executionMode === 'ts' ? (
+            <span style={{ fontSize: '11.5px', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <ShieldCheck size={13} /> Strict TS compiler diagnostics active
+            </span>
+          ) : (
+            <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+              Fast runtime evaluation
+            </span>
+          )}
+        </div>
 
         {/* Action Controls Bar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', flexWrap: 'wrap', gap: '10px' }}>
