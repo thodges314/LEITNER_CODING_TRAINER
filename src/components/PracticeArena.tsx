@@ -276,7 +276,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  // Plain Tab key handling: inserts 2 spaces without unfocusing or autocompleting
+  // Keyboard shortcuts: Tab (2 spaces) & Cmd+/ or Ctrl+/ (line commenting)
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -291,6 +291,65 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       requestAnimationFrame(() => {
         target.selectionStart = target.selectionEnd = start + 2;
       });
+      return;
+    }
+
+    if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+      e.preventDefault();
+      const target = e.currentTarget;
+      const start = target.selectionStart;
+      const end = target.selectionEnd;
+
+      const lineStart = code.lastIndexOf('\n', start - 1) + 1;
+      const effectiveEnd = (end > start && code[end - 1] === '\n') ? end - 1 : end;
+      let lineEnd = code.indexOf('\n', effectiveEnd);
+      if (lineEnd === -1) lineEnd = code.length;
+
+      const prefix = code.substring(0, lineStart);
+      const selectedBlock = code.substring(lineStart, lineEnd);
+      const suffix = code.substring(lineEnd);
+
+      const lines = selectedBlock.split('\n');
+      const allCommented = lines.every((l) => l.startsWith('// ') || l === '//');
+
+      const newLines = lines.map((line) => {
+        if (allCommented) {
+          if (line.startsWith('// ')) return line.slice(3);
+          if (line.startsWith('//')) return line.slice(2);
+          return line;
+        } else {
+          return `// ${line}`;
+        }
+      });
+
+      const newBlock = newLines.join('\n');
+      const newCode = prefix + newBlock + suffix;
+
+      let newStart: number;
+      let newEnd: number;
+
+      if (allCommented) {
+        const firstLineRemoved = lines[0].startsWith('// ') ? 3 : lines[0].startsWith('//') ? 2 : 0;
+        newStart = Math.max(lineStart, start - firstLineRemoved);
+        const totalRemoved = selectedBlock.length - newBlock.length;
+        newEnd = Math.max(newStart, end - totalRemoved);
+      } else {
+        if (start === lineStart && end > start) {
+          newStart = lineStart;
+        } else {
+          newStart = start + 3;
+        }
+        const totalAdded = newBlock.length - selectedBlock.length;
+        newEnd = end + totalAdded;
+      }
+
+      setCode(newCode);
+
+      requestAnimationFrame(() => {
+        target.selectionStart = newStart;
+        target.selectionEnd = newEnd;
+      });
+      return;
     }
   };
 
@@ -877,8 +936,11 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           spellCheck={false}
           autoCorrect="off"
           autoCapitalize="off"
-          autoComplete="off"
-          style={{ minHeight: '340px' }}
+          style={{
+            minHeight: '340px',
+            fontVariantLigatures: 'normal',
+            fontFeatureSettings: '"calt" 1, "liga" 1',
+          }}
         />
 
         {/* Mode Selector Bar: JS (Fast) vs TS (Strict Type Check) */}
@@ -1204,6 +1266,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   lineHeight: 1.6,
                   backgroundColor: '#030712',
                   color: '#cbd5e1',
+                  fontVariantLigatures: 'normal',
+                  fontFeatureSettings: '"calt" 1, "liga" 1',
                 }}
               >
                 {outputLogs.length === 0 ? (

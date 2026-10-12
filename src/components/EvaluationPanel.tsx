@@ -412,6 +412,8 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   color: '#e2e8f0',
                   overflowX: 'auto',
                   whiteSpace: 'pre',
+                  fontVariantLigatures: 'normal',
+                  fontFeatureSettings: '"calt" 1, "liga" 1',
                 }}
               >
                 <code>{canonicalCode}</code>

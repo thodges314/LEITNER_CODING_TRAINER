@@ -74,13 +74,22 @@ button, input, textarea, select {
   background: var(--text-dim);
 }
 
-/* Code Editor Specific Font & Reset */
-.code-buffer {
+/* Code Editor Specific Font & Reset with Ligatures */
+.code-buffer,
+pre,
+code {
   font-family: var(--font-mono) !important;
+  font-variant-ligatures: normal;
+  font-feature-settings: "calt" 1, "liga" 1;
+}
+
+.code-buffer {
   font-size: 13.5px;
   line-height: 1.6;
   tab-size: 2;
   letter-spacing: -0.01em;
+  font-variant-ligatures: normal;
+  font-feature-settings: "calt" 1, "liga" 1;
   background-color: var(--bg-editor);
   color: #e2e8f0;
   border: 1px solid var(--border-medium);
