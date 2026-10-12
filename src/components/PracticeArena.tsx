@@ -5,6 +5,7 @@ import { transform } from 'sucrase';
 import {
   getTrackMeta,
   intervalForBox,
+  getTopicTestCases,
 } from '../lib/leitner';
 import type { TopicItem } from '../lib/leitner';
 import { evaluateCodeSubmission } from '../lib/ai';
@@ -30,6 +31,7 @@ import {
   Code2,
   Layers,
   ShieldCheck,
+  FlaskConical,
 } from 'lucide-react';
 import { checkAndTranspileTS } from '../utils/typeChecker';
 
@@ -62,6 +64,128 @@ function formatConsoleArg(arg: unknown): string {
   } catch {
     return String(arg);
   }
+}
+
+function formatAssertionFailure(args: unknown[], currentCard: TopicItem | null): string | null {
+  // Check if any arg indicates an assertion FAIL
+  const hasFail = args.some((arg) => {
+    if (typeof arg === 'string') {
+      return /\bFAIL\b/i.test(arg);
+    }
+    if (Array.isArray(arg)) {
+      return arg.some((item) => typeof item === 'string' && /\bFAIL\b/i.test(item));
+    }
+    return false;
+  });
+
+  if (!hasFail) return null;
+
+  let description = '';
+  let expected = '';
+  let received = '';
+  let foundReceived = false;
+
+  // Case 1: args has a string with FAIL
+  const failIndex = args.findIndex((arg) => typeof arg === 'string' && /\bFAIL\b/i.test(arg));
+  if (failIndex !== -1) {
+    if (failIndex > 0 && typeof args[0] === 'string') {
+      description = args[0].replace(/:$/, '').trim();
+    }
+    const failArg = args[failIndex] as string;
+
+    // Check if failArg has inline "(Expected ...)" or "(<val>)"
+    const expectedMatch = failArg.match(/FAIL\s*\(\s*(?:Expected\s+)?([^)]+)\)/i);
+    if (expectedMatch) {
+      if (/expected/i.test(failArg)) {
+        expected = expectedMatch[1].trim();
+      } else {
+        received = expectedMatch[1].trim();
+        foundReceived = true;
+      }
+    }
+
+    if (args.length > failIndex + 1) {
+      received = args.slice(failIndex + 1).map(formatConsoleArg).join(' ');
+      foundReceived = true;
+    }
+  }
+
+  // Case 2: Array format like ['Test 1:', ['FAIL', rawReceived]] or [['FAIL', rawReceived]]
+  if (!foundReceived) {
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      if (Array.isArray(arg) && arg.length >= 2 && typeof arg[0] === 'string' && /\bFAIL\b/i.test(arg[0])) {
+        if (i > 0 && typeof args[0] === 'string') {
+          description = args[0].replace(/:$/, '').trim();
+        } else if (!description) {
+          description = 'Assertion';
+        }
+        received = formatConsoleArg(arg[1]);
+        foundReceived = true;
+        break;
+      }
+    }
+  }
+
+  // If description not populated yet, check args[0]
+  if (!description && typeof args[0] === 'string' && !/\bFAIL\b/i.test(args[0])) {
+    description = args[0].replace(/:$/, '').trim();
+  } else if (!description && typeof args[0] === 'string') {
+    const match = args[0].match(/^(.*?):\s*FAIL/i);
+    if (match) {
+      description = match[1].trim();
+    }
+  }
+
+  // Lookup expected value from currentCard testCases
+  const testCases = currentCard ? getTopicTestCases(currentCard) : [];
+  if (!expected && testCases.length > 0) {
+    const descLower = description.toLowerCase();
+    const matchedTc = testCases.find((tc) => {
+      const tcDescLower = (tc.description || '').toLowerCase();
+      const tcInputLower = (tc.input || '').toLowerCase();
+      if (!descLower) return false;
+      return (
+        (tcDescLower && (descLower.includes(tcDescLower) || tcDescLower.includes(descLower))) ||
+        (tcInputLower && descLower.includes(tcInputLower))
+      );
+    });
+
+    if (matchedTc) {
+      expected = matchedTc.expected;
+    } else {
+      const numMatch = description.match(/test\s*(\d+)/i);
+      if (numMatch) {
+        const idx = parseInt(numMatch[1], 10) - 1;
+        if (testCases[idx]) {
+          expected = testCases[idx].expected;
+        }
+      }
+    }
+  }
+
+  // If still not found, check regex patterns in description
+  if (!expected && description) {
+    const expRegexMatch =
+      description.match(/\(Expected\s+([^)]+)\)/i) ||
+      description.match(/===\s*([^):,]+)/i) ||
+      description.match(/->\s*([^):,]+)/i) ||
+      description.match(/\(([0-9a-zA-Z_'".[\]\s]+)\):?$/);
+    if (expRegexMatch) {
+      expected = expRegexMatch[1].trim();
+    }
+  }
+
+  if (!expected) {
+    expected = 'truthy / expected contract';
+  }
+
+  if (!foundReceived || !received) {
+    received = 'falsy / check evaluated to false';
+  }
+
+  const prefix = description ? `${description}: FAIL` : 'Assertion: FAIL';
+  return `${prefix} | Expected: ${expected} | Received: ${received}`;
 }
 
 interface ErrorBoundaryProps {
@@ -236,11 +360,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   // Reveal canonical solution state
   const [showSolution, setShowSolution] = useState(false);
+  const [showTestCases, setShowTestCases] = useState(true);
   const [prevCardId, setPrevCardId] = useState(currentCard?.id);
 
   if (currentCard?.id !== prevCardId) {
     setPrevCardId(currentCard?.id);
     setShowSolution(false);
+    setShowTestCases(true);
   }
 
   // Autofocus and place cursor at start on mount
@@ -409,9 +535,14 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       });
 
     const appendLog = (type: 'log' | 'warn' | 'error' | 'info', ...args: unknown[]) => {
+      const failFormatted = formatAssertionFailure(args, currentCard);
+      const isFail = Boolean(failFormatted);
+      if (isFail) {
+        setExecutionStatus('error');
+      }
       const entry: ConsoleLogEntry = {
-        type,
-        content: args.map(formatConsoleArg).join(' '),
+        type: isFail ? 'error' : type,
+        content: failFormatted || args.map(formatConsoleArg).join(' '),
         timestamp: now(),
       };
       logs.push(entry);
@@ -817,6 +948,211 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </div>
         )}
       </div>
+
+      {/* Target Input / Expected Output Contract View */}
+      {currentCard && (
+        (() => {
+          const testCases = getTopicTestCases(currentCard);
+          if (!testCases || testCases.length === 0) return null;
+          return (
+            <div
+              className="glass-panel"
+              style={{
+                padding: '16px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.65) 100%)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  userSelect: 'none',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FlaskConical size={16} color="var(--accent-cyan)" />
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.01em' }}>
+                    Target Input / Expected Output Contract
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      padding: '1px 7px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                      color: 'var(--accent-cyan)',
+                      border: '1px solid rgba(56, 189, 248, 0.25)',
+                    }}
+                  >
+                    {testCases.length} {testCases.length === 1 ? 'case' : 'cases'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowTestCases((prev) => !prev)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '11px',
+                    color: 'var(--text-muted)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                  }}
+                  title={showTestCases ? 'Collapse test cases' : 'Expand test cases'}
+                  aria-label={showTestCases ? 'Collapse test cases' : 'Expand test cases'}
+                >
+                  <span>{showTestCases ? 'Hide' : 'Show'}</span>
+                  {showTestCases ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                </button>
+              </div>
+
+              {showTestCases && (
+                <div
+                  style={{
+                    overflowX: 'auto',
+                    borderRadius: '6px',
+                    border: '1px solid var(--border-subtle)',
+                    backgroundColor: 'rgba(2, 6, 23, 0.6)',
+                  }}
+                >
+                  <table
+                    style={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      fontSize: '12px',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <thead>
+                      <tr
+                        style={{
+                          borderBottom: '1px solid var(--border-subtle)',
+                          backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                          color: 'var(--text-muted)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        <th style={{ padding: '8px 12px', width: '28%' }}>Test Case / Scenario</th>
+                        <th style={{ padding: '8px 12px', width: '42%' }}>Target Input / Call Signature</th>
+                        <th style={{ padding: '8px 12px', width: '30%' }}>Expected Return / Condition</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {testCases.map((tc, idx) => {
+                        const isError =
+                          tc.expected.toLowerCase().includes('throw') ||
+                          tc.expected.toLowerCase().includes('error') ||
+                          tc.expected.toLowerCase().includes('reject');
+
+                        return (
+                          <tr
+                            key={idx}
+                            style={{
+                              borderBottom:
+                                idx < testCases.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none',
+                            }}
+                          >
+                            <td
+                              style={{
+                                padding: '8px 12px',
+                                color: 'var(--text-secondary)',
+                                fontWeight: 500,
+                                verticalAlign: 'top',
+                              }}
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '16px',
+                                    height: '16px',
+                                    borderRadius: '50%',
+                                    backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                                    color: 'var(--accent-cyan)',
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {idx + 1}
+                                </span>
+                                <span>{tc.description || `Test Scenario ${idx + 1}`}</span>
+                              </div>
+                            </td>
+                            <td
+                              style={{
+                                padding: '8px 12px',
+                                verticalAlign: 'top',
+                              }}
+                            >
+                              <code
+                                style={{
+                                  fontFamily: 'JetBrains Mono, monospace',
+                                  fontSize: '11.5px',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.45)',
+                                  color: '#93c5fd',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  display: 'inline-block',
+                                  whiteSpace: 'pre-wrap',
+                                  wordBreak: 'break-all',
+                                }}
+                              >
+                                {tc.input}
+                              </code>
+                            </td>
+                            <td
+                              style={{
+                                padding: '8px 12px',
+                                verticalAlign: 'top',
+                              }}
+                            >
+                              <code
+                                style={{
+                                  fontFamily: 'JetBrains Mono, monospace',
+                                  fontSize: '11.5px',
+                                  backgroundColor: isError
+                                    ? 'rgba(239, 68, 68, 0.15)'
+                                    : 'rgba(16, 185, 129, 0.15)',
+                                  color: isError ? '#f87171' : '#34d399',
+                                  border: isError
+                                    ? '1px solid rgba(239, 68, 68, 0.3)'
+                                    : '1px solid rgba(16, 185, 129, 0.3)',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  display: 'inline-block',
+                                  whiteSpace: 'pre-wrap',
+                                  wordBreak: 'break-all',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {tc.expected}
+                              </code>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })()
+      )}
 
       {/* Evaluation Results (if already evaluated) */}
       {evalResult && (
@@ -1284,7 +1620,14 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                       let rowBg = 'transparent';
                       let icon = null;
 
-                      if (log.type === 'error') {
+                      if (log.content.includes('FAIL')) {
+                        textColor = '#f87171';
+                        badgeBg = 'rgba(239, 68, 68, 0.25)';
+                        badgeColor = '#ef4444';
+                        badgeLabel = 'FAIL';
+                        rowBg = 'rgba(239, 68, 68, 0.1)';
+                        icon = <XCircle size={13} color="#ef4444" style={{ flexShrink: 0, marginTop: '3px' }} />;
+                      } else if (log.type === 'error') {
                         textColor = '#f87171';
                         badgeBg = 'rgba(239, 68, 68, 0.2)';
                         badgeColor = '#ef4444';
@@ -1347,7 +1690,23 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                           </span>
                           {icon}
                           <span style={{ color: textColor, flex: 1, whiteSpace: 'pre-wrap' }}>
-                            {log.content}
+                            {log.content.includes(' | Expected: ') && log.content.includes(' | Received: ') ? (
+                              (() => {
+                                const [header, rest] = log.content.split(' | Expected: ');
+                                const [expectedPart, receivedPart] = (rest || '').split(' | Received: ');
+                                return (
+                                  <span>
+                                    <span style={{ fontWeight: 600 }}>{header}</span>
+                                    <span style={{ color: '#94a3b8' }}> | Expected: </span>
+                                    <span style={{ color: '#34d399', fontWeight: 600 }}>{expectedPart}</span>
+                                    <span style={{ color: '#94a3b8' }}> | Received: </span>
+                                    <span style={{ color: '#f87171', fontWeight: 600 }}>{receivedPart}</span>
+                                  </span>
+                                );
+                              })()
+                            ) : (
+                              log.content
+                            )}
                           </span>
                         </div>
                       );

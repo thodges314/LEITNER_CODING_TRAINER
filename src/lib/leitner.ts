@@ -12,6 +12,12 @@ export type TrackType =
   | 'algorithmic-screens'
   | 'typescript-patterns';
 
+export interface TestCaseItem {
+  input: string;
+  expected: string;
+  description?: string;
+}
+
 export interface TopicItem {
   id: string;
   track: TrackType;
@@ -26,6 +32,7 @@ export interface TopicItem {
   testHarness?: string;
   solution?: string;
   referenceSolution?: string;
+  testCases?: TestCaseItem[];
 }
 
 export interface LeitnerDeckState {
@@ -156,6 +163,7 @@ export function loadDeckState(): LeitnerDeckState {
         testHarness: t.testHarness ?? seed?.testHarness,
         solution: t.solution ?? seed?.solution ?? fallbackSol,
         referenceSolution: t.referenceSolution ?? seed?.referenceSolution ?? fallbackSol,
+        testCases: t.testCases ?? seed?.testCases,
       };
     });
 
@@ -193,6 +201,83 @@ export function saveDeckState(state: LeitnerDeckState): void {
   } catch (err) {
     console.error('Failed to save deck to localStorage:', err);
   }
+}
+
+/**
+ * Extracts or derives structured test cases from topic.testCases or falls back to
+ * parsing topic.testHarness assertions.
+ */
+export function getTopicTestCases(topic: TopicItem): TestCaseItem[] {
+  if (topic.testCases && topic.testCases.length > 0) {
+    return topic.testCases;
+  }
+
+  const harness = topic.testHarness || '';
+  if (!harness.trim()) {
+    return [
+      {
+        description: 'Contract Validation',
+        input: `${topic.id}(...)`,
+        expected: 'Valid execution return',
+      },
+    ];
+  }
+
+  const cases: TestCaseItem[] = [];
+  const lines = harness.split('\n');
+  const callMap: Record<string, string> = {};
+
+  for (const line of lines) {
+    const callMatch = line.match(/(?:const|let|var)?\s*([a-zA-Z0-9_]+)\s*=\s*(?:await\s+)?([a-zA-Z0-9_$.]+\s*\(.*?\));/);
+    if (callMatch) {
+      callMap[callMatch[1]] = callMatch[2];
+    }
+  }
+
+  for (const line of lines) {
+    const logMatch = line.match(/console\.(?:log|error)\(\s*(['"])(.*?)\1\s*,\s*(.*?)\s*\?\s*(['"])PASS\4/);
+    if (logMatch) {
+      const desc = logMatch[2].replace(/:\s*$/, '').trim();
+      const condition = logMatch[3].trim();
+      const expMatch = condition.match(/===\s*(.+)$/);
+      let expected = expMatch ? expMatch[1].trim() : 'truthy';
+      expected = expected.replace(/JSON\.stringify\(/g, '').replace(/\)$/, '').trim();
+
+      let input = condition.split('===')[0].trim();
+      input = input.replace(/JSON\.stringify\(/g, '').replace(/\)$/, '').trim();
+      if (callMap[input]) {
+        input = callMap[input];
+      } else if (input.includes('.') && callMap[input.split('.')[0]]) {
+        const base = input.split('.')[0];
+        input = `${callMap[base]}${input.slice(base.length)}`;
+      }
+
+      cases.push({ description: desc, input, expected });
+      continue;
+    }
+
+    const errMatch = line.match(/console\.error\(\s*(['"])(.*?FAIL.*?)\1/);
+    if (errMatch) {
+      const desc = errMatch[2].trim();
+      const expMatch = desc.match(/\((?:Expected\s+)?([^)]+)\)/);
+      const expected = expMatch ? `Throws/Rejects (${expMatch[1]})` : 'Throws Error';
+      cases.push({
+        description: desc,
+        input: 'Invalid parameter / rejected call',
+        expected,
+      });
+    }
+  }
+
+  if (cases.length === 0) {
+    cases.push({
+      description: 'Default Example Contract',
+      input: `${topic.id}(...)`,
+      expected: 'Adheres to prompt constraints',
+    });
+  }
+
+  return cases;
 }
 
 /**
