@@ -1,6 +1,15 @@
 import seedTopicsData from '../data/topics.json';
 
-export type TrackType = 'async-js' | 'data-structures' | 'react' | 'algorithms';
+export type TrackType =
+  | 'async-js'
+  | 'data-structures'
+  | 'react'
+  | 'algorithms'
+  | 'js-runtime-fundamentals'
+  | 'async-web-plumbing'
+  | 'collections-transformations'
+  | 'react-patterns'
+  | 'algorithmic-screens';
 
 export interface TopicItem {
   id: string;
@@ -31,7 +40,7 @@ export const BOX_INTERVALS: Record<number, number> = {
   5: 45, // +45 trials (Mastered)
 };
 
-export const TRACK_METADATA: Record<TrackType, { label: string; color: string; bg: string; border: string }> = {
+export const TRACK_METADATA: Record<string, { label: string; color: string; bg: string; border: string }> = {
   'async-js': {
     label: 'Async JS',
     color: '#38bdf8',
@@ -56,7 +65,48 @@ export const TRACK_METADATA: Record<TrackType, { label: string; color: string; b
     bg: 'rgba(245, 158, 11, 0.12)',
     border: 'rgba(245, 158, 11, 0.35)',
   },
+  'js-runtime-fundamentals': {
+    label: 'JS Runtime',
+    color: '#ec4899',
+    bg: 'rgba(236, 72, 153, 0.12)',
+    border: 'rgba(236, 72, 153, 0.35)',
+  },
+  'async-web-plumbing': {
+    label: 'Async Plumbing',
+    color: '#6366f1',
+    bg: 'rgba(99, 102, 241, 0.12)',
+    border: 'rgba(99, 102, 241, 0.35)',
+  },
+  'collections-transformations': {
+    label: 'Collections',
+    color: '#10b981',
+    bg: 'rgba(168, 85, 247, 0.12)',
+    border: 'rgba(16, 185, 129, 0.35)',
+  },
+  'react-patterns': {
+    label: 'React Patterns',
+    color: '#14b8a6',
+    bg: 'rgba(20, 184, 166, 0.12)',
+    border: 'rgba(20, 184, 166, 0.35)',
+  },
+  'algorithmic-screens': {
+    label: 'Algorithms Screen',
+    color: '#eab308',
+    bg: 'rgba(234, 179, 8, 0.12)',
+    border: 'rgba(234, 179, 8, 0.35)',
+  },
 };
+
+export function getTrackMeta(track: string): { label: string; color: string; bg: string; border: string } {
+  return (
+    TRACK_METADATA[track] ?? {
+      label: track,
+      color: '#94a3b8',
+      bg: 'rgba(148, 163, 184, 0.12)',
+      border: 'rgba(148, 163, 184, 0.35)',
+    }
+  );
+}
 
 export function intervalForBox(box: number): number {
   return BOX_INTERVALS[box] ?? 1;
@@ -350,6 +400,21 @@ export function addCustomTopicToDeck(
     topics: [createdTopic, ...state.topics],
   };
 
+  saveDeckState(nextState);
+  return nextState;
+}
+
+/**
+ * Removes a topic by id from state array and persists the filtered array back
+ * to localStorage under 'leitner_coding_deck'.
+ */
+export function deleteTopic(id: string): LeitnerDeckState {
+  const current = loadDeckState();
+  const updatedTopics = current.topics.filter((t) => t.id !== id);
+  const nextState: LeitnerDeckState = {
+    ...current,
+    topics: updatedTopics,
+  };
   saveDeckState(nextState);
   return nextState;
 }

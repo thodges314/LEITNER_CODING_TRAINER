@@ -1,12 +1,12 @@
 import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 import {
-  TRACK_METADATA,
+  getTrackMeta,
   BOX_INTERVALS,
   exportDeckBackup,
   importDeckBackup,
 } from '../lib/leitner';
-import type { TopicItem, TrackType, LeitnerDeckState } from '../lib/leitner';
+import type { TopicItem, LeitnerDeckState } from '../lib/leitner';
 import {
   Unlock,
   Lock,
@@ -39,10 +39,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onStateUpdated,
   onOpenAddModal,
 }) => {
-  const [selectedTrack, setSelectedTrack] = useState<TrackType | 'all'>('all');
+  const [selectedTrack, setSelectedTrack] = useState<string>('all');
   const [selectedBox, setSelectedBox] = useState<number | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'active' | 'locked'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [topicToDelete, setTopicToDelete] = useState<TopicItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { topics, totalCompletedReviews, unlockedStageCount = 0 } = state;
@@ -256,9 +257,9 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       >
         {/* Track Filters */}
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          {(['all', 'async-js', 'data-structures', 'react', 'algorithms'] as const).map((trk) => {
+          {['all', ...Array.from(new Set(topics.map((t) => t.track)))].map((trk) => {
             const isActive = selectedTrack === trk;
-            const label = trk === 'all' ? 'All Tracks' : TRACK_METADATA[trk].label;
+            const label = trk === 'all' ? 'All Tracks' : getTrackMeta(trk).label;
             return (
               <button
                 key={trk}
@@ -355,7 +356,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               </tr>
             ) : (
               filteredTopics.map((topic) => {
-                const trkMeta = TRACK_METADATA[topic.track];
+                const trkMeta = getTrackMeta(topic.track);
                 const isEligible = topic.status === 'active' && topic.nextEligibleTrial <= totalCompletedReviews;
 
                 return (
@@ -536,16 +537,15 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                           </button>
                         )}
 
-                        {topic.id.startsWith('custom-') && (
-                          <button
-                            className="btn btn-danger"
-                            style={{ padding: '5px 8px', fontSize: '12px' }}
-                            onClick={() => onDeleteTopic(topic.id)}
-                            title="Delete custom topic"
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        )}
+                        <button
+                          className="btn btn-danger"
+                          style={{ padding: '5px 8px', fontSize: '12px' }}
+                          onClick={() => setTopicToDelete(topic)}
+                          title={`Delete topic '${topic.title}'`}
+                          aria-label={`Delete topic '${topic.title}'`}
+                        >
+                          <Trash2 size={12} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -555,6 +555,53 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           </tbody>
         </table>
       </div>
+
+      {/* Lightweight Delete Confirmation Modal */}
+      {topicToDelete && (
+        <div
+          className="modal-overlay"
+          onClick={() => setTopicToDelete(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-confirm-title"
+        >
+          <div
+            className="modal-content"
+            style={{ maxWidth: '440px', padding: '24px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', color: 'var(--accent-rose)' }}>
+              <Trash2 size={22} />
+              <h3 id="delete-confirm-title" style={{ fontSize: '17px', fontWeight: 600 }}>
+                Delete Topic
+              </h3>
+            </div>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '22px' }}>
+              Delete topic '{topicToDelete.title}'? This cannot be undone.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setTopicToDelete(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                style={{ backgroundColor: 'rgba(239, 68, 68, 0.85)', color: '#ffffff' }}
+                onClick={() => {
+                  onDeleteTopic(topicToDelete.id);
+                  setTopicToDelete(null);
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

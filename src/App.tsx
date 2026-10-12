@@ -115,11 +115,9 @@ export function App() {
   };
 
   const handleDeleteTopic = (topicId: string) => {
-    if (confirm('Delete this custom topic from your deck?')) {
-      const next = deleteTopicFromDeck(deckState, topicId);
-      setDeckState(next);
-      if (selectedCardId === topicId) setSelectedCardId(null);
-    }
+    const next = deleteTopicFromDeck(deckState, topicId);
+    setDeckState(next);
+    if (selectedCardId === topicId) setSelectedCardId(null);
   };
 
   const handleAddTopic = (newTopic: {
