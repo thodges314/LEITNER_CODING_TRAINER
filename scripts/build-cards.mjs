@@ -19,6 +19,30 @@ const read = (id, suffix) => {
   return fs.existsSync(p) ? fs.readFileSync(p, 'utf8').replace(/\s+$/, '') : null;
 };
 
+// New cards are declared by scripts/cards/<id>.meta.json ({ track, title, tags }); existing cards may use a
+// meta file to override title/tags/track. New cards start locked, at the end of the deck.
+const metaFiles = fs.readdirSync(path.join(here, 'cards')).filter((f) => f.endsWith('.meta.json'));
+for (const f of metaFiles) {
+  const id = f.replace(/\.meta\.json$/, '');
+  const meta = JSON.parse(fs.readFileSync(path.join(here, 'cards', f), 'utf8'));
+  const existing = topics.find((t) => t.id === id);
+  if (existing) Object.assign(existing, meta);
+  else {
+    for (const k of ['track', 'title', 'tags']) if (!meta[k]) throw new Error(`${f}: missing "${k}"`);
+    topics.push({
+      id,
+      track: meta.track,
+      title: meta.title,
+      box: 1,
+      streak: 0,
+      nextEligibleTrial: 0,
+      status: 'locked',
+      tags: meta.tags,
+      promptSeed: '',
+    });
+  }
+}
+
 let n = 0;
 for (const t of topics) {
   if (!cases[t.id]) throw new Error(`No cases authored for ${t.id}`);

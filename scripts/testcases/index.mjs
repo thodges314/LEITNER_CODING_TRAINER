@@ -2,6 +2,7 @@ import p1 from './part1.mjs';
 import p2 from './part2.mjs';
 import p3 from './part3.mjs';
 import { overrides, appends } from './part4.mjs';
+import { newCards } from './newcards.mjs';
 
 // Cards whose reference solutions were completed: their previously "spec only" cases are now real checks.
 const NOW_VERIFIED = new Set([
@@ -34,6 +35,10 @@ export function loadCases() {
   for (const [id, list] of Object.entries(appends)) {
     if (!all[id]) throw new Error(`append for unknown card ${id}`);
     all[id] = [...all[id], ...list];
+  }
+  for (const [id, list] of Object.entries(newCards)) {
+    if (all[id]) throw new Error(`new card ${id} already exists`);
+    all[id] = list;
   }
   return all;
 }

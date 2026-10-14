@@ -9,6 +9,13 @@ const { renderHook, wait } = $dom;
   h.unmount();
 }
 {
+  const h = renderHook(({ v }) => useLatest(v), { initialProps: { v: 'one' } });
+  const ref = h.result.current;
+  h.rerender({ v: 'two' });
+  $test.check('useLatest keeps one stable ref holding the newest value', h.result.current === ref && ref.current === 'two', ref.current);
+  h.unmount();
+}
+{
   let a = 0;
   const h = renderHook(({ cb, d }) => useInterval(cb, d), { initialProps: { cb: () => a++, d: 30 } });
   await wait(110);

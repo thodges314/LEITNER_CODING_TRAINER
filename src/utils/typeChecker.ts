@@ -16,176 +16,79 @@ export interface TypeCheckResult {
 }
 
 /**
- * Minimal ambient declarations so common JavaScript and React primitives
- * do not report missing lib/DOM errors in an isolated browser environment.
+ * TypeScript's own lib files (ES2022 and its dependencies) are bundled into this lazily loaded chunk,
+ * so strict mode behaves like a real project: String/Array/Promise/Map/... all have their real types.
  */
-const AMBIENT_DECLARATIONS = `
-  interface Boolean {}
-  interface Function {}
-  interface CallableFunction {}
-  interface NewableFunction {}
-  interface IArguments {}
-  interface Number {}
-  interface String {}
-  interface RegExp {}
-  interface Object {}
-  interface Array<T> {
-    [n: number]: T;
-    length: number;
-    push(...items: T[]): number;
-    pop(): T | undefined;
-    shift(): T | undefined;
-    unshift(...items: T[]): number;
-    slice(start?: number, end?: number): T[];
-    splice(start: number, deleteCount?: number, ...items: T[]): T[];
-    map<U>(cb: (val: T, index: number, array: T[]) => U): U[];
-    filter(cb: (val: T, index: number, array: T[]) => boolean): T[];
-    forEach(cb: (val: T, index: number, array: T[]) => void): void;
-    reduce<U>(cb: (acc: U, curr: T, index: number) => U, initialValue: U): U;
-    find(cb: (val: T, index: number) => boolean): T | undefined;
-    findIndex(cb: (val: T, index: number) => boolean): number;
-    some(cb: (val: T, index: number) => boolean): boolean;
-    every(cb: (val: T, index: number) => boolean): boolean;
-    includes(searchElement: T, fromIndex?: number): boolean;
-    indexOf(searchElement: T, fromIndex?: number): number;
-    join(separator?: string): string;
-    sort(compareFn?: (a: T, b: T) => number): this;
-  }
-  interface ArrayConstructor {
-    isArray(arg: any): arg is any[];
-    from<T>(iterable: Iterable<T> | ArrayLike<T>): T[];
-    new <T = any>(length?: number): T[];
-  }
-  declare var Array: ArrayConstructor;
-  interface ArrayLike<T> { readonly length: number; readonly [n: number]: T; }
-  interface Iterable<T> {}
-  interface ObjectConstructor {
-    keys(o: object): string[];
-    values<T>(o: { [k: string]: T } | ArrayLike<T>): T[];
-    entries<T>(o: { [k: string]: T }): [string, T][];
-    assign<T, U>(target: T, source: U): T & U;
-    freeze<T>(o: T): Readonly<T>;
-    fromEntries(entries: Iterable<readonly [string, any]>): any;
-  }
-  declare var Object: ObjectConstructor;
-  interface JSON {
-    parse(text: string): any;
-    stringify(value: any, replacer?: any, space?: string | number): string;
-  }
-  declare var JSON: JSON;
-  interface Math {
-    max(...values: number[]): number;
-    min(...values: number[]): number;
-    floor(x: number): number;
-    ceil(x: number): number;
-    round(x: number): number;
-    abs(x: number): number;
-    random(): number;
-  }
-  declare var Math: Math;
-  declare function String(value?: any): string;
-  declare function Number(value?: any): number;
-  declare function Boolean(value?: any): boolean;
-  declare function parseInt(s: string, radix?: number): number;
-  declare function parseFloat(s: string): number;
-  type Record<K extends keyof any, T> = { [P in K]: T };
-  type Partial<T> = { [P in keyof T]?: T[P] };
-  type Required<T> = { [P in keyof T]-?: T[P] };
-  type Readonly<T> = { readonly [P in keyof T]: T[P] };
-  type Pick<T, K extends keyof T> = { [P in K]: T[P] };
-  type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
-  type Exclude<T, U> = T extends U ? never : T;
-  type Extract<T, U> = T extends U ? T : never;
-  type NonNullable<T> = T extends null | undefined ? never : T;
-  type ReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R ? R : any;
-  type Parameters<T extends (...args: any) => any> = T extends (...args: infer P) => any ? P : any;
+const LIB_SOURCES = import.meta.glob('../../node_modules/typescript/lib/lib.es*.d.ts', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
 
-  interface Promise<T> {
-    then<TResult1 = T, TResult2 = never>(
-      onfulfilled?: ((value: T) => TResult1 | Promise<TResult1>) | null,
-      onrejected?: ((reason: any) => TResult2 | Promise<TResult2>) | null
-    ): Promise<TResult1 | TResult2>;
-    catch<TResult = never>(
-      onrejected?: ((reason: any) => TResult | Promise<TResult>) | null
-    ): Promise<T | TResult>;
-    finally(onfinally?: (() => void) | null): Promise<T>;
-  }
+const LIBS: Record<string, string> = {};
+for (const [path, text] of Object.entries(LIB_SOURCES)) {
+  LIBS[path.split('/').pop() as string] = text;
+}
+const DEFAULT_LIB = 'lib.es2022.d.ts';
 
-  interface PromiseConstructor {
-    resolve<T>(value: T | Promise<T>): Promise<T>;
-    reject<T = never>(reason?: any): Promise<T>;
-    all<T>(values: Iterable<T | Promise<T>>): Promise<T[]>;
-    allSettled<T>(values: Iterable<T | Promise<T>>): Promise<any[]>;
+/**
+ * Globals that exist in the browser or in the harness sandbox but not in the ES libs
+ * (a deliberately small stand-in for lib.dom, so editors' DOM types do not leak in).
+ */
+const GLOBALS_FILE = 'sandbox-globals.d.ts';
+const SANDBOX_GLOBALS = `
+  interface AbortSignal {
+    readonly aborted: boolean;
+    readonly reason: any;
+    addEventListener(type: 'abort', listener: () => void, options?: { once?: boolean }): void;
+    removeEventListener(type: 'abort', listener: () => void): void;
   }
-  declare var Promise: PromiseConstructor;
-
-  interface Map<K, V> {
-    get(key: K): V | undefined;
-    set(key: K, value: V): this;
-    has(key: K): boolean;
-    delete(key: K): boolean;
-    clear(): void;
-    size: number;
-    forEach(callbackfn: (value: V, key: K, map: Map<K, V>) => void): void;
-  }
-  interface MapConstructor {
-    new <K = any, V = any>(entries?: readonly (readonly [K, V])[] | null): Map<K, V>;
-  }
-  declare var Map: MapConstructor;
-
-  interface Set<T> {
-    add(value: T): this;
-    has(value: T): boolean;
-    delete(value: T): boolean;
-    clear(): void;
-    size: number;
-    forEach(callbackfn: (value: T, value2: T, set: Set<T>) => void): void;
-  }
-  interface SetConstructor {
-    new <T = any>(values?: readonly T[] | null): Set<T>;
-  }
-  declare var Set: SetConstructor;
-
-  interface Error {
-    name: string;
-    message: string;
-    stack?: string;
-  }
-  interface ErrorConstructor {
-    new (message?: string): Error;
-    (message?: string): Error;
-  }
-  declare var Error: ErrorConstructor;
-
-  declare var console: any;
-  declare var $test: any;
-  declare var $dom: any;
-  declare var globalThis: any;
-  declare var DOMException: any;
-  interface Date { getTime(): number; toISOString(): string }
-  interface DateConstructor { new (value?: number | string | Date): Date; now(): number }
-  declare var Date: DateConstructor;
-  declare var TypeError: ErrorConstructor;
-  declare var RangeError: ErrorConstructor;
-  declare var fetch: (input: any, init?: any) => Promise<any>;
-  declare var setTimeout: any;
-  declare var clearTimeout: any;
-  declare var setInterval: any;
-  declare var clearInterval: any;
-  declare var queueMicrotask: (fn: () => void) => void;
-  declare var AbortController: any;
+  declare var AbortSignal: { prototype: AbortSignal; abort(reason?: any): AbortSignal; timeout(ms: number): AbortSignal };
+  interface AbortController { readonly signal: AbortSignal; abort(reason?: any): void }
+  declare var AbortController: { new (): AbortController; prototype: AbortController };
+  declare class DOMException extends Error { constructor(message?: string, name?: string); readonly code: number }
+  declare var console: { log(...a: any[]): void; error(...a: any[]): void; warn(...a: any[]): void; info(...a: any[]): void };
+  declare function fetch(input: any, init?: any): Promise<any>;
+  declare function setTimeout(cb: (...args: any[]) => void, ms?: number, ...args: any[]): any;
+  declare function clearTimeout(id: any): void;
+  declare function setInterval(cb: (...args: any[]) => void, ms?: number, ...args: any[]): any;
+  declare function clearInterval(id: any): void;
+  declare function queueMicrotask(cb: () => void): void;
   declare var React: any;
   declare var ReactDOM: any;
   declare var mount: (componentOrElement: any, props?: any) => void;
   declare var useState: any;
   declare var useEffect: any;
+  declare var useLayoutEffect: any;
   declare var useRef: any;
   declare var useReducer: any;
   declare var useMemo: any;
   declare var useCallback: any;
   declare var useContext: any;
+  declare var useId: any;
+  declare var useSyncExternalStore: any;
+  declare var useImperativeHandle: any;
+  declare var forwardRef: any;
   declare var createContext: any;
+  declare var IntersectionObserver: any;
+  declare var $test: any;
+  declare var $dom: any;
 `;
+
+const sourceFileCache = new Map<string, ts.SourceFile>();
+function cachedLibSource(
+  name: string,
+  text: string,
+  languageVersion: ts.ScriptTarget | ts.CreateSourceFileOptions
+): ts.SourceFile {
+  const key = `${name}@${JSON.stringify(languageVersion)}`;
+  let file = sourceFileCache.get(key);
+  if (!file) {
+    file = ts.createSourceFile(name, text, languageVersion);
+    sourceFileCache.set(key, file);
+  }
+  return file;
+}
 
 /**
  * Format raw TypeScript diagnostic into structured user-friendly error item.
@@ -252,37 +155,44 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
     }
   }
 
-  // 2. Semantic strict type-checking using in-memory virtual program
+  // 2. Semantic strict type-checking using an in-memory virtual program
   const fileName = 'solution.tsx';
-  const libName = 'lib.d.ts';
 
   // Type-check as a module so top-level await is allowed (appended after a newline; positions are unchanged).
   const checkedSource = `${rawCode}\nexport {};`;
 
+  const fileText = (name: string): string | undefined => {
+    if (name === fileName) return checkedSource;
+    if (name === GLOBALS_FILE) return SANDBOX_GLOBALS;
+    return LIBS[name.split('/').pop() as string];
+  };
+
   const host: ts.CompilerHost = {
     getSourceFile: (name, languageVersion) => {
-      if (name === fileName) return ts.createSourceFile(name, checkedSource, languageVersion);
-      if (name === libName) return ts.createSourceFile(name, AMBIENT_DECLARATIONS, languageVersion);
-      return undefined;
+      const text = fileText(name);
+      if (text === undefined) return undefined;
+      // Lib files are immutable, so parse them once and reuse them across runs.
+      return name === fileName || name === GLOBALS_FILE
+        ? ts.createSourceFile(name, text, languageVersion)
+        : cachedLibSource(name, text, languageVersion);
     },
-    getDefaultLibFileName: () => libName,
+    getDefaultLibFileName: () => DEFAULT_LIB,
     writeFile: () => {},
-    getCurrentDirectory: () => '/',
+    getCurrentDirectory: () => '',
     getDirectories: () => [],
-    fileExists: (name) => name === fileName || name === libName,
-    readFile: (name) => (name === fileName ? checkedSource : name === libName ? AMBIENT_DECLARATIONS : undefined),
+    fileExists: (name) => fileText(name) !== undefined,
+    readFile: fileText,
     getCanonicalFileName: (name) => name,
     useCaseSensitiveFileNames: () => true,
     getNewLine: () => '\n',
   };
 
   try {
-    const program = ts.createProgram([fileName], compilerOptions, host);
+    const program = ts.createProgram([fileName, GLOBALS_FILE], { ...compilerOptions, noLib: false, types: [] }, host);
     const semanticDiags = program.getSemanticDiagnostics();
 
     for (const diag of semanticDiags) {
-      // Filter out internal ambient file diagnostics if any
-      if (diag.file?.fileName === libName) continue;
+      if (diag.file && diag.file.fileName !== fileName) continue; // only report problems in the user's code
       formattedDiagnostics.push(formatDiagnostic(diag, rawCode));
     }
   } catch (err) {

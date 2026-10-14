@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     // The TypeScript compiler chunk is lazy-loaded (only for strict TS mode), so it is allowed to be large.
-    chunkSizeWarningLimit: 3600,
+    chunkSizeWarningLimit: 6000,
   },
   test: {
     environment: 'node',

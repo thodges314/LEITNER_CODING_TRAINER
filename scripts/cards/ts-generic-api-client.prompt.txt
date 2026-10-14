@@ -1,0 +1,1 @@
+Write a generic async wrapper apiGet<T>(url: string): Promise<T> that resolves to the parsed JSON typed as T. For a non-2xx response throw an ApiError (a class extending Error with a numeric `status` property and a message that includes the status). Network failures propagate unchanged.

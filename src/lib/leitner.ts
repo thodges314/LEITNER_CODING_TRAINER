@@ -11,7 +11,11 @@ export type TrackType =
   | 'collections-transformations'
   | 'react-patterns'
   | 'algorithmic-screens'
-  | 'typescript-patterns';
+  | 'typescript-patterns'
+  | 'js-language'
+  | 'dom-browser'
+  | 'react-components'
+  | 'testing-tooling';
 
 export interface TestCaseItem {
   input: string;
@@ -115,6 +119,30 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#3178c6',
     bg: 'rgba(49, 120, 198, 0.12)',
     border: 'rgba(49, 120, 198, 0.35)',
+  },
+  'js-language': {
+    label: 'JS Language & Utils',
+    color: '#f97316',
+    bg: 'rgba(249, 115, 22, 0.12)',
+    border: 'rgba(249, 115, 22, 0.35)',
+  },
+  'dom-browser': {
+    label: 'DOM & Browser',
+    color: '#84cc16',
+    bg: 'rgba(132, 204, 22, 0.12)',
+    border: 'rgba(132, 204, 22, 0.35)',
+  },
+  'react-components': {
+    label: 'React Components',
+    color: '#22d3ee',
+    bg: 'rgba(34, 211, 238, 0.12)',
+    border: 'rgba(34, 211, 238, 0.35)',
+  },
+  'testing-tooling': {
+    label: 'Testing & Libraries',
+    color: '#f43f5e',
+    bg: 'rgba(244, 63, 94, 0.12)',
+    border: 'rgba(244, 63, 94, 0.35)',
   },
 };
 

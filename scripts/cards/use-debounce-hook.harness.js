@@ -34,3 +34,23 @@ const { renderHook, wait } = $dom;
   await wait(80);
   $test.check('Unmounting with a pending update is safe', h.result.current === 'a', h.result.current);
 }
+
+{
+  const h = renderHook(({ v }) => useThrottle(v, 60), { initialProps: { v: 'a' } });
+  $test.check('useThrottle returns the initial value immediately', h.result.current === 'a', h.result.current);
+  h.rerender({ v: 'b' });
+  h.rerender({ v: 'c' });
+  h.rerender({ v: 'd' });
+  const early = h.result.current;
+  await wait(120);
+  const seen = [...new Set(h.result.history)];
+  $test.check(
+    'useThrottle delivers only the latest value at the end of the interval',
+    early === 'a' && h.result.current === 'd' && seen.join() === 'a,d',
+    { early, end: h.result.current, seen }
+  );
+  await wait(80);
+  h.rerender({ v: 'e' });
+  $test.check('useThrottle applies a change immediately once the interval has elapsed', h.result.current === 'e', h.result.current);
+  h.unmount();
+}

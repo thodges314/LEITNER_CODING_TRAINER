@@ -210,3 +210,36 @@ export const appends = {
     c('off() can remove a once() listener before it fires', "const ee = new EventEmitter();\nlet n = 0;\nconst fn = () => n++;\nee.once('e', fn);\nee.off('e', fn);\nee.emit('e');\nn", '0'),
   ],
 };
+
+
+// ---- prompt/title audit fixes ----
+appends['set-unique-operations'] = [
+  c('arrayUnion: unique elements of both, a first', 'arrayUnion([1, 2, 2], [2, 3, 1, 4])', '[1, 2, 3, 4]'),
+  c('arrayUnion: with an empty side', 'arrayUnion([], [5, 5])', '[5]'),
+  c('arrayDifference: elements of a that are not in b', 'arrayDifference([1, 2, 3, 3, 4], [2, 4])', '[1, 3]'),
+  c('arrayDifference: nothing removed', "arrayDifference(['x'], [])", "['x']"),
+];
+appends['bind-call-apply'] = [
+  c('myCall sets this and spreads the arguments', 'function f(a, b) { return this.x + a + b; }\nf.myCall({ x: 1 }, 2, 3)', '6'),
+  c('myApply takes an array of arguments', 'function f(a, b) { return this.x + a + b; }\nf.myApply({ x: 1 }, [2, 3])', '6'),
+  c('myCall leaves no stray property on the context', 'function f() { return this.x; }\nconst ctx = { x: 1 };\nf.myCall(ctx);\nReflect.ownKeys(ctx)', "['x']"),
+  c('myBind partial application plus a call-time argument', 'function add(a, b, c) { return a + b + c; }\nadd.myBind(null, 1, 2)(3)', '6'),
+];
+overrides['ts-generic-api-client'] = [
+  c('Resolves typed JSON', `interface Todo { id: number; title: string; completed: boolean; }\n(await apiGet<Todo>('${U}/todos/1')).title`, "'delectus aut autem'"),
+  c('Whole payload', `interface Todo { id: number; title: string; completed: boolean; }\nawait apiGet<Todo>('${U}/todos/1')`, "{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }"),
+  c('Non-2xx rejects with an ApiError carrying the status', `const err = await apiGet<unknown>('${U}/invalid-path-404').catch((e: unknown) => e);\n[err instanceof ApiError, (err as ApiError).status, err instanceof Error]`, '[true, 404, true]'),
+  c('The ApiError message includes the status', `const err = await apiGet<unknown>('${U}/invalid-path-404').catch((e: unknown) => e);\n(err as Error).message.includes('404')`, 'true'),
+  c('Compile time: result is typed as T', "const t = await apiGet<Todo>(url);\nt.nope", "TS2339 — Property 'nope' does not exist on type 'Todo'", { v: false, note: 'type-level' }),
+];
+overrides['use-debounce-hook'] = [
+  ...overrides['use-debounce-hook'],
+  r('useThrottle returns the initial value immediately', "useThrottle('a', 60)", "'a'"),
+  r('useThrottle delivers only the latest value at the end of the interval', "rerender 'a' → 'b' → 'c' → 'd' immediately; read at t = 0 ms and t = 120 ms", "'a' at once, then 'd' (values seen: a, d — never b or c)"),
+  r('useThrottle applies a change immediately once the interval has elapsed', "after the interval has passed, rerender → 'e'", "'e' straight away"),
+];
+overrides['use-previous-latest-ref'] = [
+  overrides['use-previous-latest-ref'][0],
+  r('useLatest keeps one stable ref holding the newest value', "useLatest('one'), then rerender with 'two'", "same ref object; ref.current === 'two'"),
+  ...overrides['use-previous-latest-ref'].slice(1),
+];

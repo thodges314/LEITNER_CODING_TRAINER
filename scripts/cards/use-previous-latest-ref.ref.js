@@ -6,13 +6,16 @@ function usePrevious(value) {
   return ref.current;
 }
 
-function useInterval(callback, delay) {
-  const saved = useRef(callback);
-
-  // Keep the newest callback without touching the timer.
+function useLatest(value) {
+  const ref = useRef(value);
   useEffect(() => {
-    saved.current = callback;
-  }, [callback]);
+    ref.current = value;
+  });
+  return ref;
+}
+
+function useInterval(callback, delay) {
+  const saved = useLatest(callback); // newest callback, without touching the timer
 
   useEffect(() => {
     if (delay === null) return; // paused
