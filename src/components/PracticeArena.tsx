@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { loadDraft, saveDraft, clearDraft } from '../lib/drafts';
 import type { KeyboardEvent } from 'react';
 import ReactDOM from 'react-dom/client';
 import {
@@ -55,7 +56,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   onSkipCard,
   onOpenDeckView,
 }) => {
-  const [code, setCode] = useState(() => getStarterSnippet(currentCard));
+  const [code, setCode] = useState(() => loadDraft(currentCard?.id) ?? getStarterSnippet(currentCard));
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [executionStatus, setExecutionStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
@@ -84,6 +85,16 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const [showSolution, setShowSolution] = useState(false);
   const [showHarness, setShowHarness] = useState(true);
   const [prevCardId, setPrevCardId] = useState(currentCard?.id);
+
+  // Autosave the editor buffer (debounced) so a frozen tab or reload never loses work.
+  useEffect(() => {
+    if (!currentCard) return;
+    const timer = setTimeout(() => {
+      if (code === getStarterSnippet(currentCard)) clearDraft(currentCard.id);
+      else saveDraft(currentCard.id, code);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [code, currentCard]);
 
   if (currentCard?.id !== prevCardId) {
     setPrevCardId(currentCard?.id);
@@ -387,6 +398,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   };
 
   const handleCommit = (passed: boolean) => {
+    clearDraft(currentCard?.id);
     onCommitReview(passed);
     setEvalResult(null);
     setShowSolution(false);
@@ -884,7 +896,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             {/* Reset to starter snippet */}
             <button
               type="button"
-              onClick={() => setCode(getStarterSnippet(currentCard))}
+              onClick={() => {
+                clearDraft(currentCard?.id);
+                setCode(getStarterSnippet(currentCard));
+              }}
               style={{
                 background: 'none',
                 border: 'none',

@@ -40,7 +40,24 @@ export interface TopicItem {
   testCases?: TestCaseItem[];
 }
 
+/**
+ * Narrows which cards are scheduled for practice. Excludes always win; an empty include list means "everything".
+ * Cards outside the filter keep their Leitner state untouched.
+ */
+export interface PracticeFilter {
+  includeTracks: string[];
+  excludeTracks: string[];
+  includeTags: string[];
+  excludeTags: string[];
+}
+
+export const EMPTY_FILTER: PracticeFilter = { includeTracks: [], excludeTracks: [], includeTags: [], excludeTags: [] };
+
 export interface LeitnerDeckState {
+  /** Practice focus: only matching cards are scheduled. */
+  practiceFilter?: PracticeFilter;
+  /** Named focus presets, e.g. "React screen". */
+  filterPresets?: Record<string, PracticeFilter>;
   topics: TopicItem[];
   totalCompletedReviews: number;
   lastReviewedTrack?: TrackType;
@@ -163,6 +180,67 @@ export function getTrackMeta(track: string): { label: string; color: string; bg:
   );
 }
 
+function stringList(value: unknown): string[] {
+  return Array.isArray(value) ? Array.from(new Set(value.map(String))) : [];
+}
+
+export function normalizeFilter(value: unknown): PracticeFilter {
+  const v = (value ?? {}) as Partial<Record<keyof PracticeFilter, unknown>>;
+  return {
+    includeTracks: stringList(v.includeTracks),
+    excludeTracks: stringList(v.excludeTracks),
+    includeTags: stringList(v.includeTags),
+    excludeTags: stringList(v.excludeTags),
+  };
+}
+
+export function normalizePresets(value: unknown): Record<string, PracticeFilter> {
+  const out: Record<string, PracticeFilter> = {};
+  if (value && typeof value === 'object') {
+    for (const [name, f] of Object.entries(value as Record<string, unknown>)) out[name] = normalizeFilter(f);
+  }
+  return out;
+}
+
+export function isFilterActive(filter: PracticeFilter | undefined): boolean {
+  if (!filter) return false;
+  return (
+    filter.includeTracks.length + filter.excludeTracks.length + filter.includeTags.length + filter.excludeTags.length > 0
+  );
+}
+
+export function cardMatchesFilter(card: Pick<TopicItem, 'track' | 'tags'>, filter: PracticeFilter | undefined): boolean {
+  if (!isFilterActive(filter)) return true;
+  const f = filter as PracticeFilter;
+  if (f.excludeTracks.includes(card.track)) return false;
+  if (card.tags.some((tag) => f.excludeTags.includes(tag))) return false;
+  if (f.includeTracks.length > 0 && !f.includeTracks.includes(card.track)) return false;
+  if (f.includeTags.length > 0 && !card.tags.some((tag) => f.includeTags.includes(tag))) return false;
+  return true;
+}
+
+export function setPracticeFilter(state: LeitnerDeckState, filter: PracticeFilter): LeitnerDeckState {
+  const nextState = { ...state, practiceFilter: normalizeFilter(filter) };
+  saveDeckState(nextState);
+  return nextState;
+}
+
+export function savePreset(state: LeitnerDeckState, name: string, filter: PracticeFilter): LeitnerDeckState {
+  const trimmed = name.trim();
+  if (!trimmed) return state;
+  const nextState = { ...state, filterPresets: { ...(state.filterPresets ?? {}), [trimmed]: normalizeFilter(filter) } };
+  saveDeckState(nextState);
+  return nextState;
+}
+
+export function deletePreset(state: LeitnerDeckState, name: string): LeitnerDeckState {
+  const presets = { ...(state.filterPresets ?? {}) };
+  delete presets[name];
+  const nextState = { ...state, filterPresets: presets };
+  saveDeckState(nextState);
+  return nextState;
+}
+
 export function intervalForBox(box: number): number {
   return BOX_INTERVALS[box] ?? 1;
 }
@@ -227,6 +305,8 @@ export function mergeStoredWithSeed(parsed: LeitnerDeckState, seedTopics: TopicI
     lastReviewedTrack: parsed.lastReviewedTrack,
     unlockedStageCount: parsed.unlockedStageCount ?? 0,
     deletedSeedIds: [...deleted],
+    practiceFilter: parsed.practiceFilter ? normalizeFilter(parsed.practiceFilter) : undefined,
+    filterPresets: normalizePresets(parsed.filterPresets),
   };
 }
 
@@ -423,9 +503,10 @@ export function getNextCard(
   topics: TopicItem[],
   totalCompletedReviews: number,
   lastTrack?: TrackType,
-  currentCardId?: string
+  currentCardId?: string,
+  filter?: PracticeFilter
 ): TopicItem | null {
-  const activeTopics = topics.filter((t) => t.status === 'active');
+  const activeTopics = topics.filter((t) => t.status === 'active' && cardMatchesFilter(t, filter));
   if (activeTopics.length === 0) return null;
   if (activeTopics.length === 1) return activeTopics[0];
 
@@ -615,6 +696,8 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     lastReviewedTrack: isTrackType(parsed.lastReviewedTrack) ? parsed.lastReviewedTrack : undefined,
     unlockedStageCount: Number.isInteger(parsed.unlockedStageCount) ? parsed.unlockedStageCount : 0,
     deletedSeedIds: Array.isArray(parsed.deletedSeedIds) ? parsed.deletedSeedIds.map(String) : [],
+    practiceFilter: parsed.practiceFilter ? normalizeFilter(parsed.practiceFilter) : undefined,
+    filterPresets: normalizePresets(parsed.filterPresets),
   };
 }
 

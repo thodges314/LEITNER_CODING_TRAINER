@@ -52,8 +52,7 @@ Helper scripts are in `scripts/`:
   `renderError`, `fire.click/change/keyDown/submit/focus`, `wait`, `q`, `qa`, `intersect`, `observers`). They render with
   the page's real DOM in the browser and jsdom in tests, with a mock `IntersectionObserver` and a deterministic `fetch`.
   Built-in prototypes patched by a solution (polyfill cards) are restored after each run.
-- `scripts/merge.cjs` merges `scripts/claude_topics.json` (extra drafted topics) into the seed file.
-- `scripts/generate_all_fixtures.cjs` is a legacy generator that overwrites starter code and harnesses. **Do not run it**; it corrupts cards.
+- The old `generate_all_fixtures.cjs` generator was removed (it corrupted cards); cards are authored in `scripts/cards` and built with `npm run build:cards`.
 
 `src/lib/seedCards.test.ts` runs every card's harness against its reference solution (must pass), checks that every documented
 case is asserted under the same label, and checks that an empty solution does NOT pass.

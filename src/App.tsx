@@ -10,8 +10,14 @@ import {
   addCustomTopicToDeck,
   deleteTopicFromDeck,
   getDefaultDeckState,
+  EMPTY_FILTER,
+  isFilterActive,
+  setPracticeFilter,
+  savePreset,
+  deletePreset,
 } from './lib/leitner';
 import type {
+  PracticeFilter,
   LeitnerDeckState,
   TopicItem,
   TrackType,
@@ -21,6 +27,7 @@ import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
 import { AddTopicModal } from './components/AddTopicModal';
 import { SettingsModal } from './components/SettingsModal';
+import { FocusModal } from './components/FocusModal';
 import {
   Terminal,
   Layers,
@@ -29,6 +36,7 @@ import {
   Zap,
   Sparkles,
   RotateCcw,
+  Crosshair,
 } from 'lucide-react';
 
 export function App() {
@@ -39,6 +47,9 @@ export function App() {
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isFocusOpen, setIsFocusOpen] = useState(false);
+  const filter = deckState.practiceFilter ?? EMPTY_FILTER;
+  const filterActive = isFilterActive(filter);
 
   // Unlocked notification toast
   const [unlockToast, setUnlockToast] = useState<string | null>(null);
@@ -52,7 +63,9 @@ export function App() {
     return getNextCard(
       deckState.topics,
       deckState.totalCompletedReviews,
-      deckState.lastReviewedTrack
+      deckState.lastReviewedTrack,
+      undefined,
+      filter
     );
   })();
 
@@ -76,7 +89,8 @@ export function App() {
       nextState.topics,
       nextState.totalCompletedReviews,
       updatedCard.track,
-      currentCard.id
+      currentCard.id,
+      filter
     );
     setSelectedCardId(next?.id ?? null);
   };
@@ -87,9 +101,15 @@ export function App() {
       deckState.topics,
       deckState.totalCompletedReviews,
       currentCard.track,
-      currentCard.id
+      currentCard.id,
+      filter
     );
     setSelectedCardId(next?.id ?? null);
+  };
+
+  const handleFilterChange = (next: PracticeFilter) => {
+    setDeckState(setPracticeFilter(deckState, next));
+    setSelectedCardId(null);
   };
 
   const handleSelectCardToPractice = (card: TopicItem) => {
@@ -268,6 +288,22 @@ export function App() {
 
             <button
               className="btn btn-outline"
+              style={{
+                padding: '7px 12px',
+                fontSize: '12.5px',
+                gap: '6px',
+                borderColor: filterActive ? '#38bdf8' : undefined,
+                color: filterActive ? '#38bdf8' : undefined,
+              }}
+              onClick={() => setIsFocusOpen(true)}
+              title="Choose which tracks and tags to practice"
+            >
+              <Crosshair size={15} />
+              {filterActive ? 'Focus on' : 'Focus'}
+            </button>
+
+            <button
+              className="btn btn-outline"
               style={{ padding: '7px 12px', fontSize: '12.5px', gap: '6px' }}
               onClick={() => setIsSettingsOpen(true)}
               title="Configure API key and AI evaluation engine"
@@ -376,6 +412,16 @@ export function App() {
         onAddTopic={handleAddTopic}
       />
 
+      <FocusModal
+          isOpen={isFocusOpen}
+          onClose={() => setIsFocusOpen(false)}
+          topics={deckState.topics}
+          filter={filter}
+          presets={deckState.filterPresets ?? {}}
+          onChange={handleFilterChange}
+          onSavePreset={(name, f) => setDeckState(savePreset(deckState, name, f))}
+          onDeletePreset={(name) => setDeckState(deletePreset(deckState, name))}
+        />
       {isSettingsOpen && (
         <SettingsModal
           isOpen={isSettingsOpen}
