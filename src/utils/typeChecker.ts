@@ -51,6 +51,43 @@ const AMBIENT_DECLARATIONS = `
     join(separator?: string): string;
     sort(compareFn?: (a: T, b: T) => number): this;
   }
+  interface ArrayConstructor {
+    isArray(arg: any): arg is any[];
+    from<T>(iterable: Iterable<T> | ArrayLike<T>): T[];
+    new <T = any>(length?: number): T[];
+  }
+  declare var Array: ArrayConstructor;
+  interface ArrayLike<T> { readonly length: number; readonly [n: number]: T; }
+  interface Iterable<T> {}
+  interface ObjectConstructor {
+    keys(o: object): string[];
+    values<T>(o: { [k: string]: T } | ArrayLike<T>): T[];
+    entries<T>(o: { [k: string]: T }): [string, T][];
+    assign<T, U>(target: T, source: U): T & U;
+    freeze<T>(o: T): Readonly<T>;
+    fromEntries(entries: Iterable<readonly [string, any]>): any;
+  }
+  declare var Object: ObjectConstructor;
+  interface JSON {
+    parse(text: string): any;
+    stringify(value: any, replacer?: any, space?: string | number): string;
+  }
+  declare var JSON: JSON;
+  interface Math {
+    max(...values: number[]): number;
+    min(...values: number[]): number;
+    floor(x: number): number;
+    ceil(x: number): number;
+    round(x: number): number;
+    abs(x: number): number;
+    random(): number;
+  }
+  declare var Math: Math;
+  declare function String(value?: any): string;
+  declare function Number(value?: any): number;
+  declare function Boolean(value?: any): boolean;
+  declare function parseInt(s: string, radix?: number): number;
+  declare function parseFloat(s: string): number;
   type Record<K extends keyof any, T> = { [P in K]: T };
   type Partial<T> = { [P in keyof T]?: T[P] };
   type Required<T> = { [P in keyof T]-?: T[P] };

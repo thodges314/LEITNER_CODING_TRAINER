@@ -1,4 +1,6 @@
-import type { TopicItem } from './leitner';
+import { TRACK_TYPES, isTrackType } from './leitner';
+import type { TopicItem, TrackType } from './leitner';
+import type { HarnessReport } from './runner';
 
 export interface EvaluationResult {
   passed: boolean;
@@ -8,11 +10,13 @@ export interface EvaluationResult {
   invariantsMissed: string[];
   critique: string;
   evaluationSource?: 'api' | 'heuristic-mock';
+  /** Result of running the card's test harness; when present it decides pass/fail. */
+  harness?: HarnessReport;
 }
 
 export interface DraftedTopic {
   id: string;
-  track: 'async-js' | 'data-structures' | 'react' | 'algorithms';
+  track: TrackType;
   title: string;
   promptSeed: string;
   tags: string[];
@@ -85,11 +89,12 @@ Return pure JSON:
  * Intelligent client-side heuristic evaluator used when no API key is provided
  * or when the user desires instant offline evaluation.
  */
-function heuristicEvaluateCode(topic: TopicItem, code: string): EvaluationResult {
+function heuristicEvaluateCode(topic: TopicItem, code: string, harness?: HarnessReport): EvaluationResult {
   const trimmed = code.trim();
   const lines = trimmed.split('\n').filter((l) => l.trim().length > 0);
 
-  if (trimmed.length < 20 || lines.length <= 2) {
+  if (!harness?.ran && (trimmed.length < 20 || lines.length <= 2)) {
+    // Only trust the stub check when the harness could not run; otherwise tests decide.
     return {
       passed: false,
       timeComplexity: 'N/A',
@@ -101,86 +106,84 @@ function heuristicEvaluateCode(topic: TopicItem, code: string): EvaluationResult
       ],
       critique: 'The code buffer appears to be empty or an unfinished stub. Write the complete cold-start implementation before submitting.',
       evaluationSource: 'heuristic-mock',
+      harness,
     };
   }
 
   const invariantsMet: string[] = [];
   const invariantsMissed: string[] = [];
-  let score = 0;
 
   // Track-specific invariant heuristics
   if (topic.track === 'async-js') {
     if (trimmed.includes('async') || trimmed.includes('Promise') || trimmed.includes('.then')) {
       invariantsMet.push('Asynchronous handling mechanics present (async/await or Promise)');
-      score += 2;
     } else {
       invariantsMissed.push('Missing async execution or Promise wrapper');
     }
 
     if (trimmed.includes('try') && (trimmed.includes('catch') || trimmed.includes('.catch'))) {
       invariantsMet.push('Error handling / rejection capture implemented');
-      score += 2;
     } else {
       invariantsMissed.push('Potential unhandled rejection: error boundary or try/catch not detected');
     }
 
     if (trimmed.includes('setTimeout') || trimmed.includes('clearTimeout') || trimmed.includes('AbortController') || trimmed.includes('signal')) {
       invariantsMet.push('Timing/cancellation lifecycle lifecycle awareness');
-      score += 1;
     }
   } else if (topic.track === 'data-structures') {
     if (trimmed.includes('new Map') || trimmed.includes('new Set') || trimmed.includes('WeakMap') || trimmed.includes('reduce')) {
       invariantsMet.push('Core data structure primitive instantiated properly');
-      score += 2;
     } else {
       invariantsMissed.push('Expected standard data structure primitive (Map/Set/WeakMap/reduce)');
     }
 
     if (trimmed.includes('.get(') || trimmed.includes('.set(') || trimmed.includes('.has(') || trimmed.includes('.delete(')) {
       invariantsMet.push('Map/Set operational API methods invoked with correct semantics');
-      score += 2;
     }
   } else if (topic.track === 'react') {
     if (trimmed.includes('use') || trimmed.includes('useState') || trimmed.includes('useEffect') || trimmed.includes('useRef') || trimmed.includes('useCallback')) {
       invariantsMet.push('React hook primitives declared and structured');
-      score += 2;
     } else {
       invariantsMissed.push('React hook convention or lifecycle primitives absent');
     }
 
     if (trimmed.includes('return () =>') || trimmed.includes('cleanup') || trimmed.includes('cancel')) {
       invariantsMet.push('Component cleanup / tear-down lifecycle accounted for');
-      score += 1;
     }
   } else if (topic.track === 'algorithms') {
     if (trimmed.includes('while') || trimmed.includes('for (') || trimmed.includes('for(')) {
       invariantsMet.push('Iterative pointer / boundary traversal implemented');
-      score += 2;
     } else if (trimmed.includes('function') && trimmed.includes('(') && trimmed.includes('return')) {
       invariantsMet.push('Algorithmic recursion or function breakdown');
-      score += 1;
     }
 
     if (trimmed.includes('left') || trimmed.includes('right') || trimmed.includes('Math.max') || trimmed.includes('Math.min') || trimmed.includes('stack')) {
       invariantsMet.push('Boundary indices or invariant tracking logic correctly updated');
-      score += 2;
     }
   }
 
   // General code quality checks
   if (trimmed.includes('return ')) {
     invariantsMet.push('Function produces explicit return value');
-    score += 1;
   } else {
     invariantsMissed.push('Missing explicit return statement');
   }
 
   if (trimmed.includes('const ') || trimmed.includes('let ')) {
     invariantsMet.push('Block-scoped variable hygiene maintained');
-    score += 1;
   }
 
-  const passed = score >= 4 && invariantsMissed.length <= 1;
+  // The test harness is the source of truth. Structural heuristics are advisory only:
+  // without an executed harness result, an unverified submission is never auto-passed.
+  const harnessRan = Boolean(harness?.ran);
+  const passed = harnessRan ? Boolean(harness?.passed) : false;
+  if (harness) {
+    if (harness.passed) {
+      invariantsMet.unshift(`Test harness: ${harness.summary}`);
+    } else {
+      invariantsMissed.unshift(`Test harness: ${harness.summary}`);
+    }
+  }
 
   let timeComplexity = 'O(n)';
   let spaceComplexity = 'O(1)';
@@ -200,9 +203,14 @@ function heuristicEvaluateCode(topic: TopicItem, code: string): EvaluationResult
     spaceComplexity,
     invariantsMet: invariantsMet.length > 0 ? invariantsMet : ['Code syntactically constructed'],
     invariantsMissed: invariantsMissed.length > 0 ? invariantsMissed : ['Verify edge cases for null/empty collections'],
+    harness,
     critique: passed
-      ? `Solid cold-start reconstruction for "${topic.title}". The logic demonstrates solid command of the underlying invariant pattern without relying on IDE hints.`
-      : `Good retrieval attempt, but essential invariants were omitted or incompletely wired. Review the problem constraints, especially boundary condition handling and error branches.${
+      ? `Test harness passed (${harness?.summary}) for "${topic.title}". Structural checks below are advisory; use the override if a test depends on the network or timing.`
+      : `${
+          harnessRan
+            ? `Test harness did not pass (${harness?.summary}).`
+            : `Could not verify automatically (${harness?.summary ?? 'no harness result'}); structural checks are advisory only. Use the override if you judge the solution correct.`
+        } Review the problem constraints, especially boundary condition handling and error branches.${
           (topic.referenceSolution || topic.solution || topic.starterCode)
             ? `\n\n### Canonical Reference Pattern\n\`\`\`typescript\n${topic.referenceSolution || topic.solution || topic.starterCode}\n\`\`\``
             : ''
@@ -213,7 +221,8 @@ function heuristicEvaluateCode(topic: TopicItem, code: string): EvaluationResult
 
 export async function evaluateCodeSubmission(
   topic: TopicItem,
-  submittedCode: string
+  submittedCode: string,
+  harness?: HarnessReport
 ): Promise<EvaluationResult> {
   const apiKey = getStoredApiKey();
   const provider = getStoredProvider();
@@ -222,7 +231,7 @@ export async function evaluateCodeSubmission(
   if (!apiKey) {
     // Artificial small delay for realistic UX feedback
     await new Promise((r) => setTimeout(r, 600));
-    return heuristicEvaluateCode(topic, submittedCode);
+    return heuristicEvaluateCode(topic, submittedCode, harness);
   }
 
   try {
@@ -236,17 +245,22 @@ Submitted Cold-Start Code:
 ${submittedCode}
 \`\`\`
 
+${
+      harness?.ran
+        ? `\nAutomated test harness result: ${harness.summary}.\nHarness output:\n${harness.lines.slice(0, 40).join('\n')}\n`
+        : ''
+    }
 Evaluate functional correctness and invariants according to your system instructions.`;
 
     let rawJson = '';
 
     if (provider === 'gemini') {
       const model = getStoredModel() || 'gemini-2.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify({
           system_instruction: {
             parts: [{ text: EVALUATION_SYSTEM_PROMPT }],
@@ -318,18 +332,24 @@ Evaluate functional correctness and invariants according to your system instruct
     const cleanedJson = rawJson.replace(/```(?:json)?\s*([\s\S]*?)\s*```/g, '$1').trim();
     const parsed = JSON.parse(cleanedJson);
 
+    // A failing automated harness always wins over the model's opinion.
+    const harnessFailed = Boolean(harness?.ran && !harness.passed);
+    const missed: string[] = Array.isArray(parsed.invariantsMissed) ? parsed.invariantsMissed.map(String) : [];
+    if (harnessFailed && harness) missed.unshift(`Test harness: ${harness.summary}`);
+
     return {
-      passed: Boolean(parsed.passed),
+      harness,
+      passed: Boolean(parsed.passed) && !harnessFailed,
       timeComplexity: String(parsed.timeComplexity || 'O(n)'),
       spaceComplexity: String(parsed.spaceComplexity || 'O(1)'),
       invariantsMet: Array.isArray(parsed.invariantsMet) ? parsed.invariantsMet.map(String) : [],
-      invariantsMissed: Array.isArray(parsed.invariantsMissed) ? parsed.invariantsMissed.map(String) : [],
+      invariantsMissed: missed,
       critique: String(parsed.critique || 'Evaluation complete.'),
       evaluationSource: 'api',
     };
   } catch (err: unknown) {
     console.warn('API Evaluation failed or rate limited; falling back to heuristic evaluation:', err);
-    const fallback = heuristicEvaluateCode(topic, submittedCode);
+    const fallback = heuristicEvaluateCode(topic, submittedCode, harness);
     const msg = err instanceof Error ? err.message : String(err);
     fallback.critique = `[Notice: Live API call returned an error (${msg || 'connection failure'}). Fallback offline evaluation applied]: ${fallback.critique}`;
     return fallback;
@@ -340,7 +360,7 @@ const DRAFT_SYSTEM_PROMPT = `The user will describe a coding pattern or intervie
 Extract and return ONLY a valid JSON object matching this schema:
 {
   "id": string (kebab-case),
-  "track": 'async-js' | 'data-structures' | 'react' | 'algorithms',
+  "track": one of ${TRACK_TYPES.map((t) => `'${t}'`).join(' | ')},
   "title": string (concise name),
   "promptSeed": string (a clear, cold-start prompt describing what to write without giving away boilerplate),
   "tags": string[]
@@ -355,7 +375,7 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
     await new Promise((r) => setTimeout(r, 500));
     const lower = userNote.toLowerCase();
 
-    let track: 'async-js' | 'data-structures' | 'react' | 'algorithms' = 'algorithms';
+    let track: TrackType = 'algorithms';
     if (lower.includes('hook') || lower.includes('react') || lower.includes('state') || lower.includes('render') || lower.includes('reducer')) {
       track = 'react';
     } else if (lower.includes('async') || lower.includes('promise') || lower.includes('fetch') || lower.includes('timeout') || lower.includes('await')) {
@@ -381,11 +401,11 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
 
     if (provider === 'gemini') {
       const model = getStoredModel() || 'gemini-2.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify({
           system_instruction: {
             parts: [{ text: DRAFT_SYSTEM_PROMPT }],
@@ -452,8 +472,7 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
     const cleaned = rawJson.replace(/```(?:json)?\s*([\s\S]*?)\s*```/g, '$1').trim();
     const parsed = JSON.parse(cleaned);
 
-    const validTracks = ['async-js', 'data-structures', 'react', 'algorithms'];
-    const track = validTracks.includes(parsed.track) ? parsed.track : 'algorithms';
+    const track: TrackType = isTrackType(parsed.track) ? parsed.track : 'algorithms';
 
     return {
       id: String(parsed.id || `topic-${Date.now()}`),

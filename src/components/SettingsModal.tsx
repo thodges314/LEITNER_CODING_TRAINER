@@ -178,7 +178,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             />
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '5px', display: 'flex', gap: '4px' }}>
               <ShieldCheck size={14} color="#34d399" />
-              Stored exclusively in your local browser (`localStorage`). Never sent to any intermediary server.
+              Stored in plain text in this browser's localStorage and sent only to the provider you select, with each request. Use a restricted or low-limit key, and don't use this on a shared machine.
             </p>
           </div>
 

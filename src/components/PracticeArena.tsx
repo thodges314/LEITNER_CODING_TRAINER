@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef, Component } from 'react';
-import type { KeyboardEvent, ErrorInfo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import type { KeyboardEvent } from 'react';
 import ReactDOM from 'react-dom/client';
-import { transform } from 'sucrase';
 import {
   getTrackMeta,
   intervalForBox,
@@ -32,7 +31,12 @@ import {
   ShieldCheck,
   FlaskConical,
 } from 'lucide-react';
-import { checkAndTranspileTS } from '../utils/typeChecker';
+import { transpileForExecution, runHarness } from '../lib/runner';
+import { extractHarnessContracts } from '../lib/harnessContracts';
+import { formatConsoleArg, formatAssertionFailure } from './practice/consoleFormat';
+import type { ConsoleLogEntry } from './practice/consoleFormat';
+import { ReactTestErrorBoundary } from './practice/ReactTestErrorBoundary';
+import { getStarterSnippet } from './practice/starterSnippet';
 
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
@@ -42,407 +46,7 @@ interface PracticeArenaProps {
   onOpenDeckView: () => void;
 }
 
-interface ConsoleLogEntry {
-  type: 'log' | 'warn' | 'error' | 'info';
-  content: string;
-  timestamp: string;
-}
-
 const INITIAL_TIME = 10 * 60; // 600 seconds
-
-function formatConsoleArg(arg: unknown): string {
-  if (arg === undefined) return 'undefined';
-  if (arg === null) return 'null';
-  if (typeof arg === 'string') return arg;
-  if (typeof arg === 'function') return arg.toString();
-  if (arg instanceof Error) {
-    return `${arg.name}: ${arg.message}${arg.stack ? `\n${arg.stack}` : ''}`;
-  }
-  try {
-    return JSON.stringify(arg, null, 2);
-  } catch {
-    return String(arg);
-  }
-}
-
-function parseContractFromHarness(harnessStr?: string): Array<{ input: string; expected: string; description?: string }> {
-  if (!harnessStr || !harnessStr.trim()) return [];
-
-  const results: Array<{ input: string; expected: string; description?: string }> = [];
-  const lines = harnessStr.split('\n');
-
-  // Map variable declarations: const r = arrayIntersection(...), let count = 0, etc.
-  const varMap: Record<string, string> = {};
-  for (const rawLine of lines) {
-    const line = rawLine.trim();
-    const varDecl = line.match(/(?:const|let|var)\s+([a-zA-Z0-9_$]+)\s*=\s*(?:await\s+)?(.+?);?$/);
-    if (varDecl) {
-      varMap[varDecl[1]] = varDecl[2].replace(/;$/, '').trim();
-    }
-  }
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-
-    // 1. Ternary PASS checks: console.log('description:', condition ? 'PASS' : 'FAIL')
-    const logMatches = line.matchAll(/console\.(?:log|info)\(\s*(['"`])(.*?)\1\s*,\s*(.+?)\s*\?\s*(['"`])PASS\4/g);
-    for (const logMatch of logMatches) {
-      const description = logMatch[2].replace(/:\s*$/, '').trim();
-      const condition = logMatch[3].trim();
-
-      let input = condition;
-      let expected = 'truthy';
-
-      if (condition.includes('===')) {
-        const parts = condition.split('===');
-        input = parts[0].trim();
-        expected = parts[1].trim();
-      } else if (condition.includes('==')) {
-        const parts = condition.split('==');
-        input = parts[0].trim();
-        expected = parts[1].trim();
-      }
-
-      // Unwrap JSON.stringify(...)
-      if (input.startsWith('JSON.stringify(') && input.endsWith(')')) {
-        input = input.slice(15, -1).trim();
-      }
-      if (expected.startsWith('JSON.stringify(') && expected.endsWith(')')) {
-        expected = expected.slice(15, -1).trim();
-      }
-
-      // Resolve variables if input references an assigned variable
-      if (varMap[input]) {
-        input = varMap[input];
-      } else if (input.includes('.')) {
-        const baseVar = input.split('.')[0];
-        if (varMap[baseVar]) {
-          input = `${varMap[baseVar]}${input.slice(baseVar.length)}`;
-        }
-      }
-
-      results.push({ description, input, expected });
-    }
-
-    // 2. Error / Rejection checks in try/catch blocks:
-    if (/console\.(?:error|warn)\(\s*(['"`]).*?FAIL/i.test(line)) {
-      const errMatch = line.match(/console\.(?:error|warn)\(\s*(['"`])(.*?)\1/i);
-      if (errMatch) {
-        const rawDesc = errMatch[2].trim();
-        const expMatch = rawDesc.match(/\((?:Expected\s+)?([^)]+)\)/i);
-        const expected = expMatch ? `Throws Error (${expMatch[1]})` : 'Throws Error';
-
-        let input = 'Invalid call / boundary case';
-        for (let j = i - 1; j >= Math.max(0, i - 5); j--) {
-          const prev = lines[j].trim();
-          if (
-            prev.includes('(') &&
-            prev.includes(')') &&
-            !prev.startsWith('try') &&
-            !prev.startsWith('//') &&
-            !prev.startsWith('console.')
-          ) {
-            input = prev
-              .replace(/^(?:const|let|var)\s+[a-zA-Z0-9_$]+\s*=\s*/, '')
-              .replace(/^await\s+/, '')
-              .replace(/;$/, '')
-              .trim();
-            break;
-          }
-        }
-
-        const cleanDesc = rawDesc.replace(/:\s*FAIL.*$/i, '').replace(/FAIL.*$/i, '').trim() || 'Error / Rejection Case';
-        results.push({
-          description: cleanDesc,
-          input,
-          expected,
-        });
-      }
-    }
-  }
-
-  // Fallback: If no assertions could be extracted, generate representative function calls
-  if (results.length === 0) {
-    for (const rawLine of lines) {
-      const line = rawLine.trim();
-      const call = line.match(/([a-zA-Z0-9_$]+\s*\([^)]*\));?$/);
-      if (call && !call[1].startsWith('console.') && !call[1].startsWith('setTimeout') && !call[1].startsWith('clearTimeout')) {
-        results.push({
-          description: 'Example Execution Contract',
-          input: call[1],
-          expected: 'Valid execution',
-        });
-        if (results.length >= 2) break;
-      }
-    }
-  }
-
-  return results;
-}
-
-function formatAssertionFailure(args: unknown[], currentCard: TopicItem | null): string | null {
-  // Check if any arg indicates an assertion FAIL
-  const hasFail = args.some((arg) => {
-    if (typeof arg === 'string') {
-      return /\bFAIL\b/i.test(arg);
-    }
-    if (Array.isArray(arg)) {
-      return arg.some((item) => typeof item === 'string' && /\bFAIL\b/i.test(item));
-    }
-    return false;
-  });
-
-  if (!hasFail) return null;
-
-  let description = '';
-  let expected = '';
-  let received = '';
-  let foundReceived = false;
-
-  // Case 1: args has a string with FAIL
-  const failIndex = args.findIndex((arg) => typeof arg === 'string' && /\bFAIL\b/i.test(arg));
-  if (failIndex !== -1) {
-    if (failIndex > 0 && typeof args[0] === 'string') {
-      description = args[0].replace(/:$/, '').trim();
-    }
-    const failArg = args[failIndex] as string;
-
-    // Check if failArg has inline "(Expected ...)" or "(<val>)"
-    const expectedMatch = failArg.match(/FAIL\s*\(\s*(?:Expected\s+)?([^)]+)\)/i);
-    if (expectedMatch) {
-      if (/expected/i.test(failArg)) {
-        expected = expectedMatch[1].trim();
-      } else {
-        received = expectedMatch[1].trim();
-        foundReceived = true;
-      }
-    }
-
-    if (args.length > failIndex + 1) {
-      received = args.slice(failIndex + 1).map(formatConsoleArg).join(' ');
-      foundReceived = true;
-    }
-  }
-
-  // Case 2: Array format like ['Test 1:', ['FAIL', rawReceived]] or [['FAIL', rawReceived]]
-  if (!foundReceived) {
-    for (let i = 0; i < args.length; i++) {
-      const arg = args[i];
-      if (Array.isArray(arg) && arg.length >= 2 && typeof arg[0] === 'string' && /\bFAIL\b/i.test(arg[0])) {
-        if (i > 0 && typeof args[0] === 'string') {
-          description = args[0].replace(/:$/, '').trim();
-        } else if (!description) {
-          description = 'Assertion';
-        }
-        received = formatConsoleArg(arg[1]);
-        foundReceived = true;
-        break;
-      }
-    }
-  }
-
-  // If description not populated yet, check args[0]
-  if (!description && typeof args[0] === 'string' && !/\bFAIL\b/i.test(args[0])) {
-    description = args[0].replace(/:$/, '').trim();
-  } else if (!description && typeof args[0] === 'string') {
-    const match = args[0].match(/^(.*?):\s*FAIL/i);
-    if (match) {
-      description = match[1].trim();
-    }
-  }
-
-  // Lookup expected value from currentCard testCases or parseContractFromHarness
-  const testCases = currentCard
-    ? (currentCard.testCases && currentCard.testCases.length > 0
-        ? currentCard.testCases
-        : parseContractFromHarness(currentCard.testHarness))
-    : [];
-  if (!expected && testCases.length > 0) {
-    const descLower = description.toLowerCase();
-    const matchedTc = testCases.find((tc) => {
-      const tcDescLower = (tc.description || '').toLowerCase();
-      const tcInputLower = (tc.input || '').toLowerCase();
-      if (!descLower) return false;
-      return (
-        (tcDescLower && (descLower.includes(tcDescLower) || tcDescLower.includes(descLower))) ||
-        (tcInputLower && descLower.includes(tcInputLower))
-      );
-    });
-
-    if (matchedTc) {
-      expected = matchedTc.expected;
-    } else {
-      const numMatch = description.match(/test\s*(\d+)/i);
-      if (numMatch) {
-        const idx = parseInt(numMatch[1], 10) - 1;
-        if (testCases[idx]) {
-          expected = testCases[idx].expected;
-        }
-      }
-    }
-  }
-
-  // If still not found, check regex patterns in description
-  if (!expected && description) {
-    const expRegexMatch =
-      description.match(/\(Expected\s+([^)]+)\)/i) ||
-      description.match(/===\s*([^):,]+)/i) ||
-      description.match(/->\s*([^):,]+)/i) ||
-      description.match(/\(([0-9a-zA-Z_'".[\]\s]+)\):?$/);
-    if (expRegexMatch) {
-      expected = expRegexMatch[1].trim();
-    }
-  }
-
-  if (!expected) {
-    expected = 'truthy / expected contract';
-  }
-
-  if (!foundReceived || !received) {
-    received = 'falsy / check evaluated to false';
-  }
-
-  const prefix = description ? `${description}: FAIL` : 'Assertion: FAIL';
-  return `${prefix} | Expected: ${expected} | Received: ${received}`;
-}
-
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
-  resetKey?: string | number;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class ReactTestErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    if (this.props.onError) {
-      this.props.onError(error, errorInfo);
-    }
-  }
-
-  override componentDidUpdate(prevProps: ErrorBoundaryProps) {
-    if (prevProps.resetKey !== this.props.resetKey && this.state.hasError) {
-      this.setState({ hasError: false, error: null });
-    }
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div
-          style={{
-            padding: '16px',
-            borderRadius: '6px',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            color: '#f87171',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '12px',
-          }}
-        >
-          <div style={{ fontWeight: 700, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>⚠️ React Component Render Exception</span>
-          </div>
-          <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: '#fca5a5', lineHeight: 1.5 }}>
-            {this.state.error?.name}: {this.state.error?.message}
-          </div>
-          <button
-            type="button"
-            className="btn btn-outline"
-            style={{ marginTop: '12px', fontSize: '11px', padding: '4px 10px', height: 'auto' }}
-            onClick={() => this.setState({ hasError: false, error: null })}
-          >
-            Retry Render
-          </button>
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
-
-/**
- * Constructs the default starter code template and commented test harness snippet
- * tailored to the card and its track.
- */
-function getStarterSnippet(card: TopicItem | null): string {
-  if (!card) return '';
-
-  const isReactTrack = card.track === 'react' || card.track === 'react-patterns';
-
-  let commentedSnippet: string;
-  if (card.testHarness?.trim()) {
-    const lines = card.testHarness.trim().split('\n');
-    const commentedLines = lines
-      .map((l) => (l.trim().length > 0 ? `// ${l}` : '//'))
-      .join('\n');
-
-    if (isReactTrack) {
-      commentedSnippet = `${commentedLines}
-//
-// // Inline Component / Hook Test Harness:
-// function Harness() {
-//   // Call your hook or component here
-//   const [status, setStatus] = React.useState('Mounted');
-//   return React.createElement('div', { style: { padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' } },
-//     React.createElement('div', { style: { fontWeight: 600, color: '#06b6d4' } }, '⚛️ React Live Hook Test'),
-//     React.createElement('div', null, 'Status: ' + status),
-//     React.createElement('button', {
-//       className: 'btn btn-secondary',
-//       style: { width: 'fit-content', padding: '4px 10px', fontSize: '11px' },
-//       onClick: () => setStatus('State updated @ ' + new Date().toLocaleTimeString())
-//     }, 'Trigger State Update')
-//   );
-// }
-// mount(Harness);`;
-    } else {
-      commentedSnippet = commentedLines;
-    }
-  } else if (isReactTrack) {
-    commentedSnippet = `// // Inline Component / Hook Test Harness:
-// function Harness() {
-//   const [state, setState] = React.useState('Ready');
-//   return React.createElement('div', { style: { padding: '10px' } }, '⚛️ React Live Test: ' + state);
-// }
-// mount(Harness);`;
-  } else {
-    const titleLower = card.title.toLowerCase();
-    const idLower = card.id.toLowerCase();
-    if (
-      card.track === 'async-js' ||
-      card.track === 'async-web-plumbing' ||
-      titleLower.includes('fetch') ||
-      idLower.includes('fetch')
-    ) {
-      commentedSnippet = `// fetchData('https://jsonplaceholder.typicode.com/todos/1').then(console.log).catch(console.error);`;
-    } else if (
-      card.track === 'algorithms' ||
-      card.track === 'algorithmic-screens' ||
-      titleLower.includes('two sum') ||
-      idLower.includes('two-sum') ||
-      titleLower.includes('sorted')
-    ) {
-      commentedSnippet = `// console.log(twoSumSorted([2, 7, 11, 15], 9));`;
-    } else {
-      commentedSnippet = `// console.log("Run test snippet here");`;
-    }
-  }
-
-  return `// Write your implementation below\n\n\n// Test runner example:\n${commentedSnippet}`;
-}
 
 export const PracticeArena: React.FC<PracticeArenaProps> = ({
   currentCard,
@@ -699,64 +303,21 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       }),
     };
 
-    let executableCode: string;
-
-    if (executionMode === 'ts') {
-      // TypeScript Strict Type Checking Mode
-      const typeCheckResult = checkAndTranspileTS(code);
-
-      // Display all compiler warnings/errors directly in console output panel before running tests
-      if (typeCheckResult.diagnostics.length > 0) {
-        for (const diag of typeCheckResult.diagnostics) {
-          logs.push({
-            type: diag.type === 'warn' ? 'warn' : 'error',
-            content: diag.formatted,
-            timestamp: now(),
-          });
-        }
-        setOutputLogs([...logs]);
-      }
-
-      // Halt execution if strict type errors are present so mismatched interfaces and bad generics cannot pass silently
-      if (!typeCheckResult.success) {
-        setExecutionStatus('error');
-        setIsRunning(false);
-        return;
-      }
-
-      // If strict type checking passes, transpile via sucrase (or use typeCheckResult.code)
-      try {
-        const transpiled = transform(code, {
-          transforms: ['typescript', 'jsx'],
-        });
-        executableCode = transpiled.code;
-      } catch {
-        executableCode = typeCheckResult.code;
-      }
-    } else {
-      // JS (Fast) mode: direct rapid transpilation via sucrase
-      try {
-        const transpiled = transform(code, {
-          transforms: ['typescript', 'jsx'],
-        });
-        executableCode = transpiled.code;
-      } catch (transpileErr: unknown) {
-        const errStr =
-          transpileErr instanceof Error
-            ? `${transpileErr.name}: ${transpileErr.message}`
-            : String(transpileErr);
-        const errorEntry: ConsoleLogEntry = {
-          type: 'error',
-          content: `Transpilation Error: ${errStr}`,
-          timestamp: now(),
-        };
-        logs.push(errorEntry);
-        setOutputLogs([...logs]);
-        setExecutionStatus('error');
-        setIsRunning(false);
-        return;
-      }
+    const transpiled = await transpileForExecution(code, executionMode);
+    for (const diag of transpiled.diagnostics) {
+      logs.push({
+        type: diag.type === 'warn' ? 'warn' : 'error',
+        content: diag.formatted,
+        timestamp: now(),
+      });
     }
+    if (transpiled.diagnostics.length > 0) setOutputLogs([...logs]);
+    if (!transpiled.ok) {
+      setExecutionStatus('error');
+      setIsRunning(false);
+      return;
+    }
+    const executableCode = transpiled.code;
 
     try {
       // Async IIFE execution engine with React, ReactDOM, mount, and native hooks
@@ -834,7 +395,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setIsEvaluating(true);
     setShowSolution(false);
     try {
-      const res = await evaluateCodeSubmission(currentCard, code);
+      // Run the card's test harness headlessly; its result decides pass/fail.
+      const harness = await runHarness(currentCard, code, executionMode);
+      const res = await evaluateCodeSubmission(currentCard, code, harness);
       setEvalResult(res);
       setIsTimerRunning(false);
     } catch (err) {
@@ -1051,7 +614,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           const contractCases =
             currentCard.testCases && currentCard.testCases.length > 0
               ? currentCard.testCases
-              : parseContractFromHarness(currentCard.testHarness);
+              : extractHarnessContracts(currentCard.testHarness);
 
           if (!contractCases || contractCases.length === 0) return null;
 

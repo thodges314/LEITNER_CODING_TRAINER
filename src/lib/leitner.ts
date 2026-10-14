@@ -1,4 +1,5 @@
 import seedTopicsData from '../data/topics.json';
+import { extractHarnessContracts } from './harnessContracts';
 
 export type TrackType =
   | 'async-js'
@@ -40,6 +41,8 @@ export interface LeitnerDeckState {
   totalCompletedReviews: number;
   lastReviewedTrack?: TrackType;
   unlockedStageCount?: number;
+  /** Seed topic ids the user deleted, so they are not re-added on the next load. */
+  deletedSeedIds?: string[];
 }
 
 export const STORAGE_KEY = 'leitner_coding_deck';
@@ -92,7 +95,7 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
   'collections-transformations': {
     label: 'Collections',
     color: '#10b981',
-    bg: 'rgba(168, 85, 247, 0.12)',
+    bg: 'rgba(16, 185, 129, 0.12)',
     border: 'rgba(16, 185, 129, 0.35)',
   },
   'react-patterns': {
@@ -115,6 +118,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
   },
 };
 
+export const TRACK_TYPES = Object.keys(TRACK_METADATA) as TrackType[];
+
+export function isTrackType(value: unknown): value is TrackType {
+  return typeof value === 'string' && Object.prototype.hasOwnProperty.call(TRACK_METADATA, value);
+}
+
 export function getTrackMeta(track: string): { label: string; color: string; bg: string; border: string } {
   return (
     TRACK_METADATA[track] ?? {
@@ -136,6 +145,60 @@ export function getDefaultDeckState(): LeitnerDeckState {
     totalCompletedReviews: 0,
     lastReviewedTrack: undefined,
     unlockedStageCount: 0,
+    deletedSeedIds: [],
+  };
+}
+
+/** Fields describing the card itself (owned by the seed file), as opposed to review progress. */
+const SEED_CONTENT_FIELDS = [
+  'track',
+  'title',
+  'tags',
+  'promptSeed',
+  'starterCode',
+  'testHarness',
+  'solution',
+  'referenceSolution',
+  'testCases',
+] as const;
+
+/**
+ * Merges a stored deck with the current seed topics.
+ * - Progress (box, streak, schedule, status) always comes from the stored card.
+ * - Content of seed-backed cards is refreshed from the seed so edits to topics.json take effect.
+ * - Seed topics that are new and were not deleted by the user are appended.
+ * - Custom (non-seed) cards are left untouched.
+ */
+export function mergeStoredWithSeed(parsed: LeitnerDeckState, seedTopics: TopicItem[]): LeitnerDeckState {
+  const seedMap = new Map(seedTopics.map((t) => [t.id, t]));
+  const deleted = new Set(parsed.deletedSeedIds ?? []);
+
+  const hydratedTopics = parsed.topics.map((t) => {
+    const seed = seedMap.get(t.id);
+    if (!seed) return t;
+    const merged: TopicItem = { ...t };
+    for (const field of SEED_CONTENT_FIELDS) {
+      if (seed[field] !== undefined) {
+        (merged as unknown as Record<string, unknown>)[field] = seed[field];
+      }
+    }
+    const fallbackSol = merged.referenceSolution ?? merged.solution ?? merged.starterCode;
+    merged.solution = merged.solution ?? fallbackSol;
+    merged.referenceSolution = merged.referenceSolution ?? fallbackSol;
+    return merged;
+  });
+
+  const existingIds = new Set(parsed.topics.map((t) => t.id));
+  const newSeedTopics = seedTopics
+    .filter((t) => !existingIds.has(t.id) && !deleted.has(t.id))
+    .map((t) => ({ ...t }));
+
+  return {
+    topics: [...hydratedTopics, ...newSeedTopics],
+    totalCompletedReviews: Number.isInteger(parsed.totalCompletedReviews) ? parsed.totalCompletedReviews : 0,
+    lastReviewedTrack: parsed.lastReviewedTrack,
+    unlockedStageCount: parsed.unlockedStageCount ?? 0,
+    deletedSeedIds: [...deleted],
   };
 }
 
@@ -153,38 +216,8 @@ export function loadDeckState(): LeitnerDeckState {
     if (!Array.isArray(parsed.topics)) {
       throw new Error('Invalid deck structure');
     }
-    const seedMap = new Map((seedTopicsData as unknown as TopicItem[]).map((t) => [t.id, t]));
-    const hydratedTopics = parsed.topics.map((t) => {
-      const seed = seedMap.get(t.id);
-      const fallbackSol = seed?.referenceSolution ?? seed?.solution ?? seed?.starterCode;
-      return {
-        ...t,
-        starterCode: t.starterCode ?? seed?.starterCode,
-        testHarness: t.testHarness ?? seed?.testHarness,
-        solution: t.solution ?? seed?.solution ?? fallbackSol,
-        referenceSolution: t.referenceSolution ?? seed?.referenceSolution ?? fallbackSol,
-        testCases: t.testCases ?? seed?.testCases,
-      };
-    });
-
-    // Automatically incorporate any newly added seed topics from topics.json
-    const existingIds = new Set(parsed.topics.map((t) => t.id));
-    const newSeedTopics = (seedTopicsData as unknown as TopicItem[])
-      .filter((t) => !existingIds.has(t.id))
-      .map((t) => ({ ...t }));
-
-    const mergedTopics = [...hydratedTopics, ...newSeedTopics];
-    const loadedState: LeitnerDeckState = {
-      topics: mergedTopics,
-      totalCompletedReviews: Number.isInteger(parsed.totalCompletedReviews) ? parsed.totalCompletedReviews : 0,
-      lastReviewedTrack: parsed.lastReviewedTrack,
-      unlockedStageCount: parsed.unlockedStageCount ?? 0,
-    };
-
-    if (newSeedTopics.length > 0) {
-      saveDeckState(loadedState);
-    }
-
+    const loadedState = mergeStoredWithSeed(parsed, seedTopicsData as unknown as TopicItem[]);
+    saveDeckState(loadedState);
     return loadedState;
   } catch (err) {
     console.error('Failed to load deck from localStorage, resetting to seed:', err);
@@ -223,51 +256,7 @@ export function getTopicTestCases(topic: TopicItem): TestCaseItem[] {
     ];
   }
 
-  const cases: TestCaseItem[] = [];
-  const lines = harness.split('\n');
-  const callMap: Record<string, string> = {};
-
-  for (const line of lines) {
-    const callMatch = line.match(/(?:const|let|var)?\s*([a-zA-Z0-9_]+)\s*=\s*(?:await\s+)?([a-zA-Z0-9_$.]+\s*\(.*?\));/);
-    if (callMatch) {
-      callMap[callMatch[1]] = callMatch[2];
-    }
-  }
-
-  for (const line of lines) {
-    const logMatch = line.match(/console\.(?:log|error)\(\s*(['"])(.*?)\1\s*,\s*(.*?)\s*\?\s*(['"])PASS\4/);
-    if (logMatch) {
-      const desc = logMatch[2].replace(/:\s*$/, '').trim();
-      const condition = logMatch[3].trim();
-      const expMatch = condition.match(/===\s*(.+)$/);
-      let expected = expMatch ? expMatch[1].trim() : 'truthy';
-      expected = expected.replace(/JSON\.stringify\(/g, '').replace(/\)$/, '').trim();
-
-      let input = condition.split('===')[0].trim();
-      input = input.replace(/JSON\.stringify\(/g, '').replace(/\)$/, '').trim();
-      if (callMap[input]) {
-        input = callMap[input];
-      } else if (input.includes('.') && callMap[input.split('.')[0]]) {
-        const base = input.split('.')[0];
-        input = `${callMap[base]}${input.slice(base.length)}`;
-      }
-
-      cases.push({ description: desc, input, expected });
-      continue;
-    }
-
-    const errMatch = line.match(/console\.error\(\s*(['"])(.*?FAIL.*?)\1/);
-    if (errMatch) {
-      const desc = errMatch[2].trim();
-      const expMatch = desc.match(/\((?:Expected\s+)?([^)]+)\)/);
-      const expected = expMatch ? `Throws/Rejects (${expMatch[1]})` : 'Throws Error';
-      cases.push({
-        description: desc,
-        input: 'Invalid parameter / rejected call',
-        expected,
-      });
-    }
-  }
+  const cases = extractHarnessContracts(harness);
 
   if (cases.length === 0) {
     cases.push({
@@ -282,11 +271,10 @@ export function getTopicTestCases(topic: TopicItem): TestCaseItem[] {
 
 /**
  * Checks staged unlock condition:
- * When at least 4 active cards reach Box 3 or higher, automatically unlock the next 4 locked cards.
+ * For every 4 active cards in Box 3 or higher (cumulative), unlock 4 more locked cards.
  */
 export function checkStagedUnlocks(topics: TopicItem[], currentStageCount: number): { updatedTopics: TopicItem[]; newStageCount: number; newlyUnlocked: number } {
   const activeBox3Plus = topics.filter((t) => t.status === 'active' && t.box >= 3).length;
-  // Each stage requires (stage + 1) * 4 cards in Box 3+
   const targetStages = Math.floor(activeBox3Plus / 4);
 
   if (targetStages > currentStageCount) {
@@ -526,24 +514,16 @@ export function addCustomTopicToDeck(
   return nextState;
 }
 
-/**
- * Removes a topic by id from state array and persists the filtered array back
- * to localStorage under 'leitner_coding_deck'.
- */
-export function deleteTopic(id: string): LeitnerDeckState {
-  const current = loadDeckState();
-  const updatedTopics = current.topics.filter((t) => t.id !== id);
-  const nextState: LeitnerDeckState = {
-    ...current,
-    topics: updatedTopics,
-  };
-  saveDeckState(nextState);
-  return nextState;
-}
-
+/** Removes a topic and remembers deleted seed topics so they are not re-added on load. */
 export function deleteTopicFromDeck(state: LeitnerDeckState, topicId: string): LeitnerDeckState {
-  const updated = state.topics.filter((t) => t.id !== topicId);
-  const nextState = { ...state, topics: updated };
+  const isSeed = (seedTopicsData as unknown as TopicItem[]).some((t) => t.id === topicId);
+  const deleted = new Set(state.deletedSeedIds ?? []);
+  if (isSeed) deleted.add(topicId);
+  const nextState: LeitnerDeckState = {
+    ...state,
+    topics: state.topics.filter((t) => t.id !== topicId),
+    deletedSeedIds: [...deleted],
+  };
   saveDeckState(nextState);
   return nextState;
 }
@@ -562,16 +542,31 @@ export function exportDeckBackup(state: LeitnerDeckState): void {
   URL.revokeObjectURL(url);
 }
 
-export function importDeckBackup(jsonText: string): LeitnerDeckState {
+function optionalString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
+}
+
+function parseTestCases(value: unknown): TestCaseItem[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const cases = value
+    .filter((c): c is Record<string, unknown> => typeof c === 'object' && c !== null)
+    .map((c) => ({
+      input: String(c.input ?? ''),
+      expected: String(c.expected ?? ''),
+      description: optionalString(c.description),
+    }));
+  return cases.length > 0 ? cases : undefined;
+}
+
+/** Validates and normalizes a backup file, preserving every card field. */
+export function parseDeckBackup(jsonText: string): LeitnerDeckState {
   const parsed = JSON.parse(jsonText);
   if (!parsed || !Array.isArray(parsed.topics)) {
     throw new Error('Invalid Leitner backup file: missing topics array.');
   }
   const validTopics: TopicItem[] = parsed.topics.map((item: Record<string, unknown>) => ({
-    id: String(item.id || `topic-${Math.random()}`),
-    track: (typeof item.track === 'string' && ['async-js', 'data-structures', 'react', 'algorithms'].includes(item.track))
-      ? (item.track as TrackType)
-      : 'algorithms',
+    id: String(item.id || `topic-${Math.random().toString(36).slice(2)}`),
+    track: isTrackType(item.track) ? item.track : 'algorithms',
     title: String(item.title || 'Untitled Topic'),
     box: Math.max(1, Math.min(5, Number(item.box) || 1)),
     streak: Math.max(0, Number(item.streak) || 0),
@@ -579,15 +574,24 @@ export function importDeckBackup(jsonText: string): LeitnerDeckState {
     status: item.status === 'locked' ? 'locked' : 'active',
     tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
     promptSeed: String(item.promptSeed || ''),
+    starterCode: optionalString(item.starterCode),
+    testHarness: optionalString(item.testHarness),
+    solution: optionalString(item.solution),
+    referenceSolution: optionalString(item.referenceSolution),
+    testCases: parseTestCases(item.testCases),
   }));
 
-  const newState: LeitnerDeckState = {
+  return {
     topics: validTopics,
     totalCompletedReviews: Number.isInteger(parsed.totalCompletedReviews) ? parsed.totalCompletedReviews : 0,
-    lastReviewedTrack: parsed.lastReviewedTrack,
+    lastReviewedTrack: isTrackType(parsed.lastReviewedTrack) ? parsed.lastReviewedTrack : undefined,
     unlockedStageCount: Number.isInteger(parsed.unlockedStageCount) ? parsed.unlockedStageCount : 0,
+    deletedSeedIds: Array.isArray(parsed.deletedSeedIds) ? parsed.deletedSeedIds.map(String) : [],
   };
+}
 
+export function importDeckBackup(jsonText: string): LeitnerDeckState {
+  const newState = parseDeckBackup(jsonText);
   saveDeckState(newState);
   return newState;
 }

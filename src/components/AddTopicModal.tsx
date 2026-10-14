@@ -8,6 +8,7 @@ import {
   Layers,
   Wand2,
 } from 'lucide-react';
+import { TRACK_TYPES, getTrackMeta } from '../lib/leitner';
 import type { TrackType } from '../lib/leitner';
 import { draftTopicWithAI } from '../lib/ai';
 import type { DraftedTopic } from '../lib/ai';
@@ -243,10 +244,11 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
                     backgroundColor: 'var(--bg-elevated)',
                   }}
                 >
-                  <option value="async-js">Async JS</option>
-                  <option value="data-structures">Data Structures</option>
-                  <option value="react">React</option>
-                  <option value="algorithms">Algorithms</option>
+                  {TRACK_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {getTrackMeta(t).label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

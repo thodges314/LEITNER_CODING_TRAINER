@@ -1,75 +1,56 @@
-# React + TypeScript + Vite
+# Leitner Coding Trainer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A personal spaced-repetition trainer for cold-start coding practice. You rebuild a pattern
+from a prompt (debounce, LRU cache, `usePrevious`, a discriminated-union exhaustiveness check, ...),
+run it against a test harness, and the Leitner box system decides when the card comes back.
 
-Currently, two official plugins are available:
+React 19 + TypeScript + Vite. Everything runs in the browser; progress lives in `localStorage`.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run it
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev        # dev server
+npm test           # vitest (scheduler, runner, harness parsing, seed cards)
+npm run lint
+npm run build      # type-check + production build into dist/
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## How it works
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Scheduling** (`src/lib/leitner.ts`): 5 boxes with trial-based intervals (+1, +4, +10, +22, +45 reviews).
+  A pass promotes a card, a fail sends it back to box 1. Tracks are interleaved, and every 4 cards in
+  box 3+ unlock 4 more locked cards.
+- **Grading** (`src/lib/runner.ts`): on submit the card's test harness is run headlessly against your code.
+  A card passes only if the harness logs at least one `PASS` and no `FAIL`/errors. An AI model (optional) adds
+  critique but cannot override a failing harness. You can always override the verdict by hand
+  (useful for harnesses that need the network).
+- **Offline mode**: with no API key, grading is harness-only plus advisory structural notes.
+- **TypeScript mode**: strict type-checking with the TypeScript compiler, loaded lazily on first use.
+- **Persistence**: seed content from `src/data/topics.json` is merged into your stored deck on load. Progress is
+  kept, content updates flow in, new seed cards are added, and seed cards you delete stay deleted.
+  Use the dashboard to export/import JSON backups.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## AI evaluator (optional)
 
-```
+Settings accepts Gemini, OpenAI, Groq, OpenRouter, or any OpenAI-compatible endpoint. The key is stored in plain
+text in this browser's `localStorage` and sent only to the provider you pick. Use a restricted key.
+
+## Content
+
+Cards live in `src/data/topics.json` (`promptSeed`, `starterCode`, `testHarness`, `referenceSolution`, `testCases`).
+Harnesses report with `console.log('label:', cond ? 'PASS' : 'FAIL')`.
+
+Helper scripts are in `scripts/`:
+
+- `npx vite-node scripts/generate-testcases.ts` fills in `testCases` (shown in the contract table) from harness assertions
+  for cards that lack them.
+- `scripts/merge.cjs` merges `scripts/claude_topics.json` (extra drafted topics) into the seed file.
+- `scripts/generate_all_fixtures.cjs` writes starter code and harnesses for seed cards.
+
+`src/lib/seedCards.test.ts` runs every offline seed harness against its reference solution, so a broken card fails the test run.
+Harnesses that call the network are skipped there.
+
+## Deploy
+
+Pushing to `master` builds and deploys to GitHub Pages (`.github/workflows/deploy.yml`), after lint and tests pass.

@@ -130,7 +130,19 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                       fontSize: '11px',
                     }}
                   >
-                    Structural Heuristic
+                    {result.harness?.ran ? 'Offline (harness-graded)' : 'Offline (unverified)'}
+                  </span>
+                )}
+                {result.harness?.ran && (
+                  <span
+                    className="badge"
+                    style={{
+                      backgroundColor: result.harness.passed ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                      color: result.harness.passed ? '#34d399' : '#f87171',
+                      fontSize: '11px',
+                    }}
+                  >
+                    Tests: {result.harness.summary}
                   </span>
                 )}
               </div>
