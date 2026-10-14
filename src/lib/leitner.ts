@@ -80,9 +80,18 @@ export interface LeitnerDeckState {
   unlockedStageCount?: number;
   /** Seed topic ids the user deleted, so they are not re-added on the next load. */
   deletedSeedIds?: string[];
+  /** Spaced repetition algorithm mode: 'leitner' (discrete boxes) or 'graduated-interval' (graduated-interval recall & chaining). */
+  algorithm?: SpacedAlgorithm;
 }
 
+export type SpacedAlgorithm = 'leitner' | 'graduated-interval';
+
 export const STORAGE_KEY = 'leitner_coding_deck';
+export const ALGORITHM_STORAGE_KEY = 'spaced_repetition_algorithm';
+export const DEFAULT_ALGORITHM: SpacedAlgorithm = 'leitner';
+
+/** Focused active working chain capacity before introducing new unseen topics in graduated-interval mode. */
+export const GRADUATED_ACTIVE_CHAIN_LIMIT = 4;
 
 export const BOX_INTERVALS: Record<number, number> = {
   1: 1,  // immediate rotation (+1 trial)
@@ -90,6 +99,22 @@ export const BOX_INTERVALS: Record<number, number> = {
   3: 10, // +10 trials
   4: 22, // +22 trials
   5: 45, // +45 trials (Mastered)
+};
+
+/**
+ * Graduated expanding intervals:
+ * Step 1: +1 trial (immediate reinforcement recall)
+ * Step 2: +3 trials (graduated expansion)
+ * Step 3: +7 trials (graduated consolidation)
+ * Step 4: +16 trials (intermediate retention)
+ * Step 5: +35 trials (mastered long-term memory)
+ */
+export const GRADUATED_INTERVALS: Record<number, number> = {
+  1: 1,
+  2: 3,
+  3: 7,
+  4: 16,
+  5: 35,
 };
 
 export const TRACK_METADATA: Record<string, { label: string; color: string; bg: string; border: string }> = {
@@ -271,8 +296,49 @@ export function deletePreset(state: LeitnerDeckState, name: string): LeitnerDeck
   return nextState;
 }
 
-export function intervalForBox(box: number): number {
+export function intervalForBox(box: number, algorithm: SpacedAlgorithm = 'leitner'): number {
+  if (algorithm === 'graduated-interval') {
+    return GRADUATED_INTERVALS[box] ?? 1;
+  }
   return BOX_INTERVALS[box] ?? 1;
+}
+
+export function getStoredAlgorithm(): SpacedAlgorithm {
+  if (typeof window === 'undefined') return DEFAULT_ALGORITHM;
+  try {
+    const val = localStorage.getItem(ALGORITHM_STORAGE_KEY);
+    if (val === 'graduated-interval') return 'graduated-interval';
+    if (val === 'leitner') return 'leitner';
+  } catch {
+    // ignore
+  }
+  return DEFAULT_ALGORITHM;
+}
+
+export function setStoredAlgorithm(algo: SpacedAlgorithm): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(ALGORITHM_STORAGE_KEY, algo);
+  } catch (err) {
+    console.error('Failed to save algorithm setting to localStorage:', err);
+  }
+}
+
+export function getSchedulingAlgorithm(state?: LeitnerDeckState): SpacedAlgorithm {
+  if (state?.algorithm === 'graduated-interval') {
+    return 'graduated-interval';
+  }
+  if (state?.algorithm === 'leitner') {
+    return 'leitner';
+  }
+  return getStoredAlgorithm();
+}
+
+export function setSchedulingAlgorithm(state: LeitnerDeckState, algo: SpacedAlgorithm): LeitnerDeckState {
+  setStoredAlgorithm(algo);
+  const nextState: LeitnerDeckState = { ...state, algorithm: algo };
+  saveDeckState(nextState);
+  return nextState;
 }
 
 export function getDefaultDeckState(): LeitnerDeckState {
@@ -282,6 +348,7 @@ export function getDefaultDeckState(): LeitnerDeckState {
     lastReviewedTrack: undefined,
     unlockedStageCount: 0,
     deletedSeedIds: [],
+    algorithm: getStoredAlgorithm(),
   };
 }
 
@@ -339,6 +406,7 @@ export function mergeStoredWithSeed(parsed: LeitnerDeckState, seedTopics: TopicI
     deletedSeedIds: [...deleted],
     practiceFilter: parsed.practiceFilter ? normalizeFilter(parsed.practiceFilter) : undefined,
     filterPresets: normalizePresets(parsed.filterPresets),
+    algorithm: parsed.algorithm === 'graduated-interval' ? 'graduated-interval' : parsed.algorithm === 'leitner' ? 'leitner' : getStoredAlgorithm(),
   };
 }
 
@@ -477,8 +545,10 @@ export function checkStagedUnlocks(topics: TopicItem[], currentStageCount: numbe
 export function commitCardReview(
   state: LeitnerDeckState,
   topicId: string,
-  passed: boolean
+  passed: boolean,
+  algorithmOverride?: SpacedAlgorithm
 ): { nextState: LeitnerDeckState; newlyUnlockedCount: number; updatedCard: TopicItem } {
+  const algo = algorithmOverride ?? getSchedulingAlgorithm(state);
   const currentTotal = state.totalCompletedReviews;
   const nextTotal = currentTotal + 1;
   let reviewedTrack: TrackType | undefined = state.lastReviewedTrack;
@@ -495,7 +565,7 @@ export function commitCardReview(
     if (passed) {
       nextBox = Math.min(5, item.box + 1);
       nextStreak = item.streak + 1;
-      nextEligibleTrial = nextTotal + intervalForBox(nextBox);
+      nextEligibleTrial = nextTotal + intervalForBox(nextBox, algo);
     } else {
       nextBox = 1;
       nextStreak = 0;
@@ -520,10 +590,12 @@ export function commitCardReview(
   );
 
   const nextState: LeitnerDeckState = {
+    ...state,
     topics: finalTopics,
     totalCompletedReviews: nextTotal,
     lastReviewedTrack: reviewedTrack,
     unlockedStageCount: newStageCount,
+    algorithm: algo,
   };
 
   saveDeckState(nextState);
@@ -536,19 +608,118 @@ export function commitCardReview(
 }
 
 /**
- * Next Card Selection (getNextCard(topics, totalCompletedReviews)):
- * - Filter to status === 'active'
- * - Eligible pool: cards where nextEligibleTrial <= totalCompletedReviews
- * - If the eligible pool is empty (all cards are spaced out ahead), pick the card whose nextEligibleTrial is closest to the current trial count.
- * - Prioritize lower box levels first, interleaving tracks so the exact same track is not presented consecutively when options exist.
+ * Graduated-Interval Recall & Chaining Selection:
+ * 1. Immediate / Graduated Recall Priority: Any in-flight card whose recall interval is due
+ *    (nextEligibleTrial <= totalCompletedReviews) is recalled immediately before new cards are introduced.
+ * 2. Active Chaining: If no cards are due, and the active working chain (< GRADUATED_ACTIVE_CHAIN_LIMIT unmastered cards)
+ *    has capacity, introduce a new unseen card (easiest rung first, ladder-gated).
+ * 3. Soonest-due fallback: If chain is full and no card is due yet, pick the in-flight card closest to being due.
+ * 4. Interleaves tracks across reviews whenever alternatives exist.
  */
-export function getNextCard(
+export function getNextCardGraduatedInterval(
   topics: TopicItem[],
   totalCompletedReviews: number,
   lastTrack?: TrackType,
   currentCardId?: string,
   filter?: PracticeFilter
 ): TopicItem | null {
+  const activeTopics = topics.filter((t) => t.status === 'active' && cardMatchesFilter(t, filter));
+  if (activeTopics.length === 0) return null;
+  if (activeTopics.length === 1) return activeTopics[0];
+
+  const poolExcludingCurrent = activeTopics.filter((t) => t.id !== currentCardId);
+  const candidates = poolExcludingCurrent.length > 0 ? poolExcludingCurrent : activeTopics;
+
+  // An unseen card is an active card that has never been reviewed (box 1, streak 0, nextEligibleTrial 0)
+  const isUnseen = (t: TopicItem) => t.box === 1 && t.streak === 0 && t.nextEligibleTrial === 0;
+
+  const inFlight = candidates.filter((t) => !isUnseen(t));
+  const unseen = candidates.filter((t) => isUnseen(t));
+
+  // 1. Check for due in-flight cards (graduated recall interval has elapsed)
+  const dueInFlight = inFlight.filter((t) => t.nextEligibleTrial <= totalCompletedReviews);
+
+  if (dueInFlight.length > 0) {
+    let duePool = dueInFlight;
+    if (lastTrack) {
+      const altTrack = dueInFlight.filter((t) => t.track !== lastTrack);
+      if (altTrack.length > 0) duePool = altTrack;
+    }
+
+    const sortedDue = [...duePool].sort((a, b) => {
+      // Lower box first (box 1 immediate reinforcement > box 2 > box 3)
+      if (a.box !== b.box) return a.box - b.box;
+      // Cards waiting longest past their scheduled review
+      if (a.nextEligibleTrial !== b.nextEligibleTrial) return a.nextEligibleTrial - b.nextEligibleTrial;
+      // Easier rungs first
+      if (difficultyOf(a) !== difficultyOf(b)) return difficultyOf(a) - difficultyOf(b);
+      return a.streak - b.streak;
+    });
+
+    return sortedDue[0] ?? null;
+  }
+
+  // 2. No in-flight cards are due. Can we introduce an unseen card into the active chain?
+  const activeChain = inFlight.filter((t) => t.box < 5);
+  const shouldIntroduceNew =
+    unseen.length > 0 && (activeChain.length < GRADUATED_ACTIVE_CHAIN_LIMIT || inFlight.length === 0);
+
+  if (shouldIntroduceNew) {
+    // Prefer cards whose ladder is open
+    const openUnseen = unseen.filter((t) => isLadderOpen(t, topics));
+    const unseenPoolBase = openUnseen.length > 0 ? openUnseen : unseen;
+
+    let unseenPool = unseenPoolBase;
+    if (lastTrack) {
+      const altTrack = unseenPoolBase.filter((t) => t.track !== lastTrack);
+      if (altTrack.length > 0) unseenPool = altTrack;
+    }
+
+    const sortedUnseen = [...unseenPool].sort((a, b) => {
+      if (difficultyOf(a) !== difficultyOf(b)) return difficultyOf(a) - difficultyOf(b);
+      return 0;
+    });
+
+    return sortedUnseen[0] ?? null;
+  }
+
+  // 3. Chain is full or no unseen cards exist, and nothing is due yet.
+  // Fall back to the in-flight card closest to being due.
+  const poolToWait = inFlight.length > 0 ? inFlight : candidates;
+  let waitPool = poolToWait;
+  if (lastTrack) {
+    const altTrack = poolToWait.filter((t) => t.track !== lastTrack);
+    if (altTrack.length > 0) waitPool = altTrack;
+  }
+
+  const sortedByDistance = [...waitPool].sort((a, b) => {
+    const distA = Math.max(0, a.nextEligibleTrial - totalCompletedReviews);
+    const distB = Math.max(0, b.nextEligibleTrial - totalCompletedReviews);
+    if (distA !== distB) return distA - distB;
+    if (a.box !== b.box) return a.box - b.box;
+    if (difficultyOf(a) !== difficultyOf(b)) return difficultyOf(a) - difficultyOf(b);
+    return a.streak - b.streak;
+  });
+
+  return sortedByDistance[0] ?? null;
+}
+
+/**
+ * Next Card Selection (getNextCard(topics, totalCompletedReviews, lastTrack, currentCardId, filter, algorithm)):
+ * Supports 'leitner' (discrete box tiers) and 'graduated-interval' (graduated-interval recall & chaining).
+ */
+export function getNextCard(
+  topics: TopicItem[],
+  totalCompletedReviews: number,
+  lastTrack?: TrackType,
+  currentCardId?: string,
+  filter?: PracticeFilter,
+  algorithm: SpacedAlgorithm = 'leitner'
+): TopicItem | null {
+  if (algorithm === 'graduated-interval') {
+    return getNextCardGraduatedInterval(topics, totalCompletedReviews, lastTrack, currentCardId, filter);
+  }
+
   const activeTopics = topics.filter((t) => t.status === 'active' && cardMatchesFilter(t, filter));
   if (activeTopics.length === 0) return null;
   if (activeTopics.length === 1) return activeTopics[0];
@@ -746,6 +917,7 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     deletedSeedIds: Array.isArray(parsed.deletedSeedIds) ? parsed.deletedSeedIds.map(String) : [],
     practiceFilter: parsed.practiceFilter ? normalizeFilter(parsed.practiceFilter) : undefined,
     filterPresets: normalizePresets(parsed.filterPresets),
+    algorithm: parsed.algorithm === 'graduated-interval' ? 'graduated-interval' : 'leitner',
   };
 }
 

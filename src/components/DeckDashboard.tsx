@@ -4,6 +4,8 @@ import type { ChangeEvent } from 'react';
 import {
   getTrackMeta,
   BOX_INTERVALS,
+  GRADUATED_INTERVALS,
+  getSchedulingAlgorithm,
   exportDeckBackup,
   importDeckBackup,
 } from '../lib/leitner';
@@ -46,6 +48,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [topicToDelete, setTopicToDelete] = useState<TopicItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const algorithm = getSchedulingAlgorithm(state);
+  const intervals = algorithm === 'graduated-interval' ? GRADUATED_INTERVALS : BOX_INTERVALS;
+  const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
   const { topics, totalCompletedReviews, unlockedStageCount = 0 } = state;
 
@@ -114,7 +120,9 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             Catalog & Deck Performance
           </h1>
           <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>
-            Trial-spaced Leitner retrieval queue with staged progression unlocking
+            {algorithm === 'graduated-interval'
+              ? 'Graduated-interval chained retrieval with expanding recall intervals'
+              : 'Trial-spaced Leitner retrieval queue with staged progression unlocking'}
           </p>
         </div>
 
@@ -228,7 +236,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 }}
               />
               <span style={{ fontSize: '12.5px', fontWeight: 600 }}>
-                Box {b} (+{BOX_INTERVALS[b]})
+                {tierName} {b} (+{intervals[b]})
               </span>
               <span
                 style={{

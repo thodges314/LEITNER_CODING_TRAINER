@@ -7,7 +7,7 @@ import {
   getTrackMeta,
   intervalForBox,
 } from '../lib/leitner';
-import type { TopicItem } from '../lib/leitner';
+import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { evaluateCodeSubmission } from '../lib/ai';
 import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
@@ -43,6 +43,7 @@ import { getStarterSnippet } from './practice/starterSnippet';
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
   totalCompletedReviews: number;
+  algorithm?: SpacedAlgorithm;
   onCommitReview: (passed: boolean) => void;
   onSkipCard: () => void;
   onOpenDeckView: () => void;
@@ -53,6 +54,7 @@ const INITIAL_TIME = 10 * 60; // 600 seconds
 export const PracticeArena: React.FC<PracticeArenaProps> = ({
   currentCard,
   totalCompletedReviews,
+  algorithm = 'leitner',
   onCommitReview,
   onSkipCard,
   onOpenDeckView,
@@ -502,7 +504,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                       border: isCurrent ? '1px solid white' : '1px solid transparent',
                       transition: 'all 0.2s',
                     }}
-                    title={`Box ${b} (+${intervalForBox(b)} reviews)`}
+                    title={`${algorithm === 'graduated-interval' ? 'Tier' : 'Box'} ${b} (+${intervalForBox(b, algorithm)} reviews)`}
                   >
                     B{b}
                   </div>
@@ -840,6 +842,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           submittedCode={code}
           result={evalResult}
           totalCompletedReviews={totalCompletedReviews}
+          algorithm={algorithm}
           onCommit={handleCommit}
           onRetry={() => {
             setEvalResult(null);

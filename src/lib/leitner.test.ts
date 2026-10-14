@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   BOX_INTERVALS,
+  GRADUATED_INTERVALS,
   checkStagedUnlocks,
   commitCardReview,
   deleteTopicFromDeck,
@@ -9,6 +10,8 @@ import {
   isTrackType,
   mergeStoredWithSeed,
   parseDeckBackup,
+  getSchedulingAlgorithm,
+  setSchedulingAlgorithm,
 } from './leitner';
 import type { LeitnerDeckState, TopicItem } from './leitner';
 
@@ -211,5 +214,103 @@ describe('isTrackType', () => {
     expect(isTrackType('react-patterns')).toBe(true);
     expect(isTrackType('toString')).toBe(false);
     expect(isTrackType(5)).toBe(false);
+  });
+});
+
+describe('Graduated Interval Recall & chaining', () => {
+  it('promotes on pass using graduated intervals', () => {
+    // Step 1 -> 2: +3 trials
+    const { updatedCard } = commitCardReview(deck([card({ id: 'a', box: 1, streak: 0 })]), 'a', true, 'graduated-interval');
+    expect(updatedCard.box).toBe(2);
+    expect(updatedCard.streak).toBe(1);
+    expect(updatedCard.nextEligibleTrial).toBe(1 + GRADUATED_INTERVALS[2]); // 1 + 3 = 4
+
+    // Step 2 -> 3: +7 trials
+    const r2 = commitCardReview(deck([card({ id: 'b', box: 2, streak: 1 })], { totalCompletedReviews: 4 }), 'b', true, 'graduated-interval');
+    expect(r2.updatedCard.box).toBe(3);
+    expect(r2.updatedCard.nextEligibleTrial).toBe(5 + GRADUATED_INTERVALS[3]); // 5 + 7 = 12
+
+    // Step 3 -> 4: +16 trials
+    const r3 = commitCardReview(deck([card({ id: 'c', box: 3, streak: 2 })], { totalCompletedReviews: 12 }), 'c', true, 'graduated-interval');
+    expect(r3.updatedCard.box).toBe(4);
+    expect(r3.updatedCard.nextEligibleTrial).toBe(13 + GRADUATED_INTERVALS[4]); // 13 + 16 = 29
+
+    // Step 4 -> 5: +35 trials
+    const r4 = commitCardReview(deck([card({ id: 'd', box: 4, streak: 3 })], { totalCompletedReviews: 29 }), 'd', true, 'graduated-interval');
+    expect(r4.updatedCard.box).toBe(5);
+    expect(r4.updatedCard.nextEligibleTrial).toBe(30 + GRADUATED_INTERVALS[5]); // 30 + 35 = 65
+  });
+
+  it('resets failed card to box 1 and schedules immediate re-test (+1 trial)', () => {
+    const { updatedCard } = commitCardReview(deck([card({ id: 'a', box: 4, streak: 3 })], { totalCompletedReviews: 10 }), 'a', false, 'graduated-interval');
+    expect(updatedCard.box).toBe(1);
+    expect(updatedCard.streak).toBe(0);
+    expect(updatedCard.nextEligibleTrial).toBe(12); // 11 + 1
+  });
+
+  it('prioritizes due in-flight cards over introducing new unseen cards', () => {
+    const unseen = [card({ id: 'new1' }), card({ id: 'new2' })];
+    const dueInFlight = card({ id: 'in-flight-due', box: 2, streak: 1, nextEligibleTrial: 4 });
+    const topics = [...unseen, dueInFlight];
+
+    // At review 4, dueInFlight is due (nextEligibleTrial 4 <= 4)
+    expect(getNextCard(topics, 4, undefined, undefined, undefined, 'graduated-interval')?.id).toBe('in-flight-due');
+  });
+
+  it('chains in unseen cards when in-flight cards are not yet due and chain is under limit', () => {
+    const inFlight = [
+      card({ id: 'active1', box: 2, streak: 1, nextEligibleTrial: 5 }),
+      card({ id: 'active2', box: 2, streak: 1, nextEligibleTrial: 6 }),
+    ];
+    const unseen = [card({ id: 'new-card', difficulty: 1 })];
+    const topics = [...inFlight, ...unseen];
+
+    expect(getNextCard(topics, 2, undefined, undefined, undefined, 'graduated-interval')?.id).toBe('new-card');
+  });
+
+  it('falls back to soonest-due card when active chain is full and nothing is due yet', () => {
+    const inFlight = [
+      card({ id: 'card1', box: 2, streak: 1, nextEligibleTrial: 10 }),
+      card({ id: 'card2', box: 2, streak: 1, nextEligibleTrial: 7 }),
+      card({ id: 'card3', box: 2, streak: 1, nextEligibleTrial: 12 }),
+      card({ id: 'card4', box: 2, streak: 1, nextEligibleTrial: 9 }),
+    ];
+    const unseen = [card({ id: 'new-blocked' })];
+    // Chain limit is 4, 4 cards in-flight, reviews = 4. Soonest due is card2 (due at 7)
+    expect(getNextCard([...inFlight, ...unseen], 4, undefined, undefined, undefined, 'graduated-interval')?.id).toBe('card2');
+  });
+
+  it('prioritizes failed box 1 card over higher box cards among due items', () => {
+    const failedDue = card({ id: 'failed', box: 1, streak: 0, nextEligibleTrial: 5 });
+    const regularDue = card({ id: 'advanced', box: 3, streak: 2, nextEligibleTrial: 5 });
+    expect(getNextCard([regularDue, failedDue], 5, undefined, undefined, undefined, 'graduated-interval')?.id).toBe('failed');
+  });
+
+  it('respects ladder gating when selecting unseen cards to chain', () => {
+    const gatedHard = card({ id: 'hard', concept: 'closures', difficulty: 3 });
+    const openEasy = card({ id: 'easy', concept: 'closures', difficulty: 1 });
+    expect(getNextCard([gatedHard, openEasy], 0, undefined, undefined, undefined, 'graduated-interval')?.id).toBe('easy');
+  });
+
+  it('interleaves tracks for due cards when alternative track is available', () => {
+    const dueReact1 = card({ id: 'r1', track: 'react', box: 2, nextEligibleTrial: 3 });
+    const dueReact2 = card({ id: 'r2', track: 'react', box: 2, nextEligibleTrial: 3 });
+    const dueAsync = card({ id: 'a1', track: 'async-js', box: 2, nextEligibleTrial: 3 });
+    expect(getNextCard([dueReact1, dueReact2, dueAsync], 3, 'react', undefined, undefined, 'graduated-interval')?.id).toBe('a1');
+  });
+});
+
+describe('scheduling algorithm switching and backup', () => {
+  it('stores and retrieves algorithm mode', () => {
+    const st = deck([]);
+    const updated = setSchedulingAlgorithm(st, 'graduated-interval');
+    expect(updated.algorithm).toBe('graduated-interval');
+    expect(getSchedulingAlgorithm(updated)).toBe('graduated-interval');
+  });
+
+  it('preserves algorithm in backup serialization and parsing', () => {
+    const json = JSON.stringify({ topics: [card({ id: 'x' })], algorithm: 'graduated-interval' });
+    const parsed = parseDeckBackup(json);
+    expect(parsed.algorithm).toBe('graduated-interval');
   });
 });

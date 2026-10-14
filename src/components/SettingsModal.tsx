@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import {
   X,
-  Key,
+  Sliders,
   ShieldCheck,
   Info,
   CheckCircle2,
@@ -19,13 +19,26 @@ import {
   setStoredBaseUrl,
 } from '../lib/ai';
 import type { AIProvider } from '../lib/ai';
+import {
+  getStoredAlgorithm,
+  setStoredAlgorithm,
+} from '../lib/leitner';
+import type { SpacedAlgorithm } from '../lib/leitner';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentAlgorithm?: SpacedAlgorithm;
+  onAlgorithmChange?: (algo: SpacedAlgorithm) => void;
 }
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
+export const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose,
+  currentAlgorithm,
+  onAlgorithmChange,
+}) => {
+  const [algorithm, setAlgorithm] = useState<SpacedAlgorithm>(() => currentAlgorithm ?? getStoredAlgorithm());
   const [apiKey, setApiKey] = useState(() => getStoredApiKey());
   const [provider, setProvider] = useState<AIProvider>(() => getStoredProvider());
   const [model, setModel] = useState(() => getStoredModel());
@@ -36,6 +49,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
+    setStoredAlgorithm(algorithm);
+    onAlgorithmChange?.(algorithm);
     setStoredApiKey(apiKey);
     setStoredProvider(provider);
     setStoredModel(model);
@@ -75,14 +90,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 color: '#38bdf8',
               }}
             >
-              <Key size={20} />
+              <Sliders size={20} />
             </div>
             <div>
               <h2 id="settings-title" style={{ fontSize: '18px', fontWeight: 600 }}>
-                AI Evaluator Settings
+                Trainer Settings
               </h2>
               <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                Configures client-side evaluation & draft models
+                Spaced repetition method & AI evaluation engine
               </p>
             </div>
           </div>
@@ -97,6 +112,116 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         </div>
 
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          {/* Spaced Repetition Algorithm Switch */}
+          <div
+            style={{
+              padding: '16px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                  Graduated Interval Recall & Chaining
+                </label>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  Graduated intervals (+1, +3, +7, +16, +35) with focused 4-card active chaining
+                </span>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={algorithm === 'graduated-interval'}
+                aria-label="Toggle Graduated Interval Recall & Chaining"
+                onClick={() => setAlgorithm((prev) => (prev === 'graduated-interval' ? 'leitner' : 'graduated-interval'))}
+                style={{
+                  position: 'relative',
+                  width: '46px',
+                  height: '24px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  backgroundColor: algorithm === 'graduated-interval' ? 'var(--accent-cyan)' : 'var(--bg-editor)',
+                  boxShadow: algorithm === 'graduated-interval' ? '0 0 10px rgba(56, 189, 248, 0.4)' : 'none',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+                  flexShrink: 0,
+                  padding: '2px',
+                }}
+              >
+                <div
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    transform: algorithm === 'graduated-interval' ? 'translateX(22px)' : 'translateX(0)',
+                    transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  }}
+                />
+              </button>
+            </div>
+
+            {/* Algorithm Selector Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <div
+                onClick={() => setAlgorithm('graduated-interval')}
+                style={{
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  border: algorithm === 'graduated-interval' ? '1px solid #38bdf8' : '1px solid var(--border-subtle)',
+                  backgroundColor: algorithm === 'graduated-interval' ? 'rgba(56, 189, 248, 0.1)' : 'var(--bg-surface)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '12.5px', fontWeight: 600, color: algorithm === 'graduated-interval' ? '#38bdf8' : 'var(--text-primary)' }}>
+                    Graduated Interval
+                  </span>
+                  {algorithm === 'graduated-interval' && (
+                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(56, 189, 248, 0.25)', color: '#38bdf8', padding: '1px 5px', borderRadius: '4px', fontWeight: 600 }}>
+                      ACTIVE
+                    </span>
+                  )}
+                </div>
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                  Tests due cards immediately before introducing new topics. Expanding graduated intervals (+1, +3, +7, +16, +35).
+                </p>
+              </div>
+
+              <div
+                onClick={() => setAlgorithm('leitner')}
+                style={{
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  border: algorithm === 'leitner' ? '1px solid #a855f7' : '1px solid var(--border-subtle)',
+                  backgroundColor: algorithm === 'leitner' ? 'rgba(168, 85, 247, 0.1)' : 'var(--bg-surface)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '12.5px', fontWeight: 600, color: algorithm === 'leitner' ? '#c084fc' : 'var(--text-primary)' }}>
+                    Pure Leitner Box
+                  </span>
+                  {algorithm === 'leitner' && (
+                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(168, 85, 247, 0.25)', color: '#c084fc', padding: '1px 5px', borderRadius: '4px', fontWeight: 600 }}>
+                      ACTIVE
+                    </span>
+                  )}
+                </div>
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                  Traditional 5-tier box queue (+1, +4, +10, +22, +45). Drains entire lower boxes before higher tiers.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Provider Selection */}
           <div>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '6px' }}>

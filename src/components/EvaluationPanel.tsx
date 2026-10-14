@@ -16,7 +16,7 @@ import {
   Copy,
 } from 'lucide-react';
 import { intervalForBox } from '../lib/leitner';
-import type { TopicItem } from '../lib/leitner';
+import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import type { EvaluationResult } from '../lib/ai';
 
 interface EvaluationPanelProps {
@@ -24,6 +24,7 @@ interface EvaluationPanelProps {
   submittedCode: string;
   result: EvaluationResult;
   totalCompletedReviews: number;
+  algorithm?: SpacedAlgorithm;
   onCommit: (passed: boolean) => void;
   onRetry: () => void;
   showSolution?: boolean;
@@ -34,6 +35,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   topic,
   result,
   totalCompletedReviews,
+  algorithm = 'leitner',
   onCommit,
   onRetry,
   showSolution,
@@ -65,8 +67,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   // Project state transition preview
   const previewBox = effectiveVerdict ? Math.min(5, topic.box + 1) : 1;
   const previewStreak = effectiveVerdict ? topic.streak + 1 : 0;
-  const previewInterval = effectiveVerdict ? intervalForBox(previewBox) : 1;
+  const previewInterval = effectiveVerdict ? intervalForBox(previewBox, algorithm) : 1;
   const previewNextTrial = totalCompletedReviews + 1 + previewInterval;
+  const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
   return (
     <div
@@ -456,7 +459,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
               <span style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-secondary)' }}>
-                Box {topic.box}
+                {tierName} {topic.box}
               </span>
               <ArrowRight size={14} color="var(--text-muted)" />
               <span
@@ -466,7 +469,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   color: effectiveVerdict ? 'var(--accent-emerald)' : 'var(--accent-rose)',
                 }}
               >
-                Box {previewBox} {previewBox === 5 ? '(Mastered)' : ''}
+                {tierName} {previewBox} {previewBox === 5 ? '(Mastered)' : ''}
               </span>
               <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginLeft: '6px' }}>
                 {effectiveVerdict

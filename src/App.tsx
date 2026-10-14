@@ -15,12 +15,15 @@ import {
   setPracticeFilter,
   savePreset,
   deletePreset,
+  getSchedulingAlgorithm,
+  setSchedulingAlgorithm,
 } from './lib/leitner';
 import type {
   PracticeFilter,
   LeitnerDeckState,
   TopicItem,
   TrackType,
+  SpacedAlgorithm,
 } from './lib/leitner';
 import { getStoredApiKey, getStoredProvider } from './lib/ai';
 import { PracticeArena } from './components/PracticeArena';
@@ -50,6 +53,7 @@ export function App() {
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
   const filterActive = isFilterActive(filter);
+  const algorithm = getSchedulingAlgorithm(deckState);
 
   // Unlocked notification toast
   const [unlockToast, setUnlockToast] = useState<string | null>(null);
@@ -65,7 +69,8 @@ export function App() {
       deckState.totalCompletedReviews,
       deckState.lastReviewedTrack,
       undefined,
-      filter
+      filter,
+      algorithm
     );
   })();
 
@@ -75,7 +80,8 @@ export function App() {
     const { nextState, newlyUnlockedCount, updatedCard } = commitCardReview(
       deckState,
       currentCard.id,
-      passed
+      passed,
+      algorithm
     );
     setDeckState(nextState);
 
@@ -90,7 +96,8 @@ export function App() {
       nextState.totalCompletedReviews,
       updatedCard.track,
       currentCard.id,
-      filter
+      filter,
+      algorithm
     );
     setSelectedCardId(next?.id ?? null);
   };
@@ -102,9 +109,15 @@ export function App() {
       deckState.totalCompletedReviews,
       currentCard.track,
       currentCard.id,
-      filter
+      filter,
+      algorithm
     );
     setSelectedCardId(next?.id ?? null);
+  };
+
+  const handleAlgorithmChange = (nextAlgo: SpacedAlgorithm) => {
+    const next = setSchedulingAlgorithm(deckState, nextAlgo);
+    setDeckState(next);
   };
 
   const handleFilterChange = (next: PracticeFilter) => {
@@ -216,17 +229,19 @@ export function App() {
                 <span
                   className="badge"
                   style={{
-                    backgroundColor: 'rgba(56, 189, 248, 0.12)',
-                    color: '#38bdf8',
+                    backgroundColor: algorithm === 'graduated-interval' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(168, 85, 247, 0.15)',
+                    color: algorithm === 'graduated-interval' ? '#38bdf8' : '#c084fc',
                     fontSize: '10.5px',
-                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    border: `1px solid ${algorithm === 'graduated-interval' ? 'rgba(56, 189, 248, 0.35)' : 'rgba(168, 85, 247, 0.35)'}`,
                   }}
                 >
-                  Cold-Start
+                  {algorithm === 'graduated-interval' ? 'Graduated Recall' : 'Leitner Boxes'}
                 </span>
               </div>
               <p style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                No Autocomplete • Trial Spacing • Invariant Retrieval
+                {algorithm === 'graduated-interval'
+                  ? 'Graduated Interval Recall • Active Queue Chaining • Invariant Retrieval'
+                  : 'No Autocomplete • Trial Spacing • Invariant Retrieval'}
               </p>
             </div>
           </div>
@@ -347,6 +362,7 @@ export function App() {
             key={currentCard?.id || 'none'}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
+            algorithm={algorithm}
             onCommitReview={handleCommitReview}
             onSkipCard={handleSkipCard}
             onOpenDeckView={() => setActiveView('dashboard')}
@@ -383,7 +399,9 @@ export function App() {
         }}
       >
         <div>
-          Leitner Spaced Retrieval: Box 1 (+1) • Box 2 (+4) • Box 3 (+10) • Box 4 (+22) • Box 5 (+45)
+          {algorithm === 'graduated-interval'
+            ? 'Graduated Interval Recall: Tier 1 (+1) • Tier 2 (+3) • Tier 3 (+7) • Tier 4 (+16) • Tier 5 (+35)'
+            : 'Leitner Spaced Retrieval: Box 1 (+1) • Box 2 (+4) • Box 3 (+10) • Box 4 (+22) • Box 5 (+45)'}
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <button
@@ -426,6 +444,8 @@ export function App() {
         <SettingsModal
           isOpen={isSettingsOpen}
           onClose={() => setIsSettingsOpen(false)}
+          currentAlgorithm={algorithm}
+          onAlgorithmChange={handleAlgorithmChange}
         />
       )}
     </div>
