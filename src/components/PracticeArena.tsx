@@ -1,7 +1,12 @@
 import { DifficultyBadge } from './DifficultyBadge';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import CodeMirror from '@uiw/react-codemirror';
+import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import rainbowBrackets from 'rainbowbrackets';
+import { EditorView, keymap } from '@codemirror/view';
+import { indentWithTab } from '@codemirror/commands';
 import { loadDraft, saveDraft, clearDraft } from '../lib/drafts';
-import type { KeyboardEvent } from 'react';
 import ReactDOM from 'react-dom/client';
 import {
   getTrackMeta,
@@ -32,6 +37,7 @@ import {
   Layers,
   ShieldCheck,
   FlaskConical,
+  Sparkles,
 } from 'lucide-react';
 import { transpileForExecution, runHarness, createSandboxScope } from '../lib/runner';
 import { extractHarnessContracts } from '../lib/harnessContracts';
@@ -39,6 +45,7 @@ import { formatConsoleArg, formatAssertionFailure } from './practice/consoleForm
 import type { ConsoleLogEntry } from './practice/consoleFormat';
 import { ReactTestErrorBoundary } from './practice/ReactTestErrorBoundary';
 import { getStarterSnippet } from './practice/starterSnippet';
+import { formatCode } from '../lib/formatter';
 
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
@@ -79,7 +86,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   // 10-minute countdown stopwatch
   const [timeRemaining, setTimeRemaining] = useState(INITIAL_TIME);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<ReactCodeMirrorRef>(null);
+  const [isFormatting, setIsFormatting] = useState(false);
+  const [formatToast, setFormatToast] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   const [outputLogs, setOutputLogs] = useState<ConsoleLogEntry[]>([]);
   const [isOutputOpen, setIsOutputOpen] = useState(false);
@@ -105,13 +117,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setShowHarness(true);
   }
 
-  // Autofocus and place cursor at start on mount
+  // Autofocus editor on mount and card switch
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.setSelectionRange(0, 0);
+    if (editorRef.current?.view) {
+      editorRef.current.view.focus();
     }
-  }, []);
+  }, [currentCard?.id]);
 
   // Timer interval
   useEffect(() => {
@@ -138,82 +149,128 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
-  // Keyboard shortcuts: Tab (2 spaces) & Cmd+/ or Ctrl+/ (line commenting)
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const target = e.currentTarget;
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-
-      const newCode = code.substring(0, start) + '  ' + code.substring(end);
-      setCode(newCode);
-
-      // Re-position cursor after the 2 spaces
-      requestAnimationFrame(() => {
-        target.selectionStart = target.selectionEnd = start + 2;
-      });
-      return;
-    }
-
-    if ((e.metaKey || e.ctrlKey) && e.key === '/') {
-      e.preventDefault();
-      const target = e.currentTarget;
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-
-      const lineStart = code.lastIndexOf('\n', start - 1) + 1;
-      const effectiveEnd = (end > start && code[end - 1] === '\n') ? end - 1 : end;
-      let lineEnd = code.indexOf('\n', effectiveEnd);
-      if (lineEnd === -1) lineEnd = code.length;
-
-      const prefix = code.substring(0, lineStart);
-      const selectedBlock = code.substring(lineStart, lineEnd);
-      const suffix = code.substring(lineEnd);
-
-      const lines = selectedBlock.split('\n');
-      const allCommented = lines.every((l) => l.startsWith('// ') || l === '//');
-
-      const newLines = lines.map((line) => {
-        if (allCommented) {
-          if (line.startsWith('// ')) return line.slice(3);
-          if (line.startsWith('//')) return line.slice(2);
-          return line;
-        } else {
-          return `// ${line}`;
-        }
-      });
-
-      const newBlock = newLines.join('\n');
-      const newCode = prefix + newBlock + suffix;
-
-      let newStart: number;
-      let newEnd: number;
-
-      if (allCommented) {
-        const firstLineRemoved = lines[0].startsWith('// ') ? 3 : lines[0].startsWith('//') ? 2 : 0;
-        newStart = Math.max(lineStart, start - firstLineRemoved);
-        const totalRemoved = selectedBlock.length - newBlock.length;
-        newEnd = Math.max(newStart, end - totalRemoved);
+  // Format code with Prettier standalone
+  const handleFormatCode = async () => {
+    if (!code.trim() || isFormatting) return;
+    setIsFormatting(true);
+    try {
+      const res = await formatCode(code, executionMode === 'ts');
+      if (res.success && res.code !== code) {
+        setCode(res.code);
+        setFormatToast({ message: 'Formatted with Prettier', type: 'success' });
+      } else if (!res.success) {
+        setFormatToast({
+          message: `Format error: ${res.error?.split('\n')[0] ?? 'Syntax error'}`,
+          type: 'error',
+        });
       } else {
-        if (start === lineStart && end > start) {
-          newStart = lineStart;
-        } else {
-          newStart = start + 3;
-        }
-        const totalAdded = newBlock.length - selectedBlock.length;
-        newEnd = end + totalAdded;
+        setFormatToast({ message: 'Already formatted', type: 'success' });
       }
-
-      setCode(newCode);
-
-      requestAnimationFrame(() => {
-        target.selectionStart = newStart;
-        target.selectionEnd = newEnd;
-      });
-      return;
+    } finally {
+      setIsFormatting(false);
+      setTimeout(() => setFormatToast(null), 3500);
     }
   };
+
+  // Mutable refs to handlers so CodeMirror keymap bindings always call latest functions
+  const runCodeRef = useRef<() => void>(() => {});
+  const submitRef = useRef<() => void>(() => {});
+
+  const formatCodeRef = useRef(handleFormatCode);
+  formatCodeRef.current = handleFormatCode;
+
+  // CodeMirror 6 setup: autocomplete and IntelliSense are STRICTLY disabled for cold-start recall.
+  // Bracket matching and autoclosing of brackets and quotes are enabled.
+  const cmBasicSetup = useMemo(
+    () => ({
+      lineNumbers: true,
+      highlightActiveLineGutter: true,
+      highlightSpecialChars: true,
+      history: true,
+      foldGutter: false,
+      drawSelection: true,
+      dropCursor: true,
+      allowMultipleSelections: true,
+      indentOnInput: true,
+      bracketMatching: true,
+      closeBrackets: true,
+      closeBracketsKeymap: true,
+      autocompletion: false, // Explicitly disabled
+      completionKeymap: false, // Explicitly disabled
+      rectangularSelection: true,
+      crosshairCursor: false,
+      highlightActiveLine: true,
+      highlightSelectionMatches: true,
+      tabSize: 2,
+    }),
+    []
+  );
+
+  // CodeMirror extensions: JS/TS language support, Rainbow Brackets (Path B), and shortcut keymaps
+  const extensions = useMemo(() => {
+    return [
+      javascript({ jsx: true, typescript: executionMode === 'ts' }),
+      rainbowBrackets(),
+      EditorView.lineWrapping,
+      keymap.of([
+        indentWithTab,
+        {
+          key: 'Mod-Enter',
+          run: () => {
+            runCodeRef.current();
+            return true;
+          },
+        },
+        {
+          key: 'Mod-Shift-Enter',
+          run: () => {
+            submitRef.current();
+            return true;
+          },
+        },
+        {
+          key: 'Shift-Alt-f',
+          run: () => {
+            formatCodeRef.current();
+            return true;
+          },
+        },
+        {
+          key: 'Mod-Shift-f',
+          run: () => {
+            formatCodeRef.current();
+            return true;
+          },
+        },
+      ]),
+    ];
+  }, [executionMode]);
+
+  // Global window shortcut listener as fallback (Cmd+Enter, Cmd+Shift+Enter, Shift+Alt+F)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.tagName === 'INPUT') return;
+
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          submitRef.current();
+        } else {
+          runCodeRef.current();
+        }
+      } else if (
+        (e.shiftKey && e.altKey && (e.key === 'f' || e.key === 'F')) ||
+        ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'f' || e.key === 'F'))
+      ) {
+        e.preventDefault();
+        formatCodeRef.current();
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   // Toggle comments on the bottom test runner block
   const handleToggleTestComments = () => {
@@ -399,6 +456,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       setIsEvaluating(false);
     }
   };
+
+  runCodeRef.current = handleRunCode;
+  submitRef.current = handleSubmit;
 
   const handleCommit = (passed: boolean) => {
     clearDraft(currentCard?.id);
@@ -872,7 +932,29 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+            {formatToast && (
+              <span
+                style={{
+                  fontSize: '11px',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  backgroundColor:
+                    formatToast.type === 'success'
+                      ? 'rgba(52, 211, 153, 0.15)'
+                      : 'rgba(239, 68, 68, 0.15)',
+                  color: formatToast.type === 'success' ? '#34d399' : '#f87171',
+                  border: `1px solid ${
+                    formatToast.type === 'success'
+                      ? 'rgba(52, 211, 153, 0.3)'
+                      : 'rgba(239, 68, 68, 0.3)'
+                  }`,
+                }}
+              >
+                {formatToast.message}
+              </span>
+            )}
+
             <span>{linesCount} lines</span>
             <span>{charsCount} chars</span>
 
@@ -897,6 +979,28 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 <Code2 size={12} /> Toggle Test Comments
               </button>
             )}
+
+            {/* Auto-format code button */}
+            <button
+              type="button"
+              onClick={handleFormatCode}
+              disabled={isFormatting || !code.trim()}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: isFormatting ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                cursor: isFormatting ? 'wait' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '11.5px',
+                transition: 'color 0.15s ease',
+              }}
+              title="Auto-format code with Prettier (Shift+Alt+F / Cmd+Shift+F)"
+            >
+              <Sparkles size={12} color={isFormatting ? 'var(--accent-cyan)' : '#a78bfa'} />
+              {isFormatting ? 'Formatting...' : 'Format'}
+            </button>
 
             {/* Reset to starter snippet */}
             <button
@@ -943,26 +1047,22 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </div>
         </div>
 
-        {/* The Plain HTML Textarea */}
-        <textarea
-          ref={textareaRef}
-          className="code-buffer"
-          rows={16}
-          placeholder="// Type your solution from scratch without autocomplete or hints...
+        {/* CodeMirror 6 Editor with Rainbow Brackets & Cold-Start Mode */}
+        <div className="cm-theme-container">
+          <CodeMirror
+            ref={editorRef}
+            value={code}
+            height="380px"
+            theme="dark"
+            basicSetup={cmBasicSetup}
+            extensions={extensions}
+            onChange={(val) => setCode(val)}
+            placeholder="// Type your solution from scratch without autocomplete or hints...
 // Press [Tab] for 2-space indentation.
-// Focus on boundary conditions and invariants."
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          onKeyDown={handleKeyDown}
-          spellCheck={false}
-          autoCorrect="off"
-          autoCapitalize="off"
-          style={{
-            minHeight: '340px',
-            fontVariantLigatures: 'normal',
-            fontFeatureSettings: '"calt" 1, "liga" 1',
-          }}
-        />
+// Bracket pair colorization and autoclosing brackets/quotes are enabled."
+            autoFocus
+          />
+        </div>
 
         {/* Mode Selector Bar: JS (Fast) vs TS (Strict Type Check) */}
         <div

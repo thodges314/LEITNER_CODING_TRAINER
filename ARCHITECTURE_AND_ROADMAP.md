@@ -6,10 +6,13 @@ Last updated on branch `improvements/audit-fixes` (not yet merged to `master`; p
 ## 1. What this is
 
 A personal, client-only spaced-repetition trainer for **front-end coding-interview building blocks**. You are shown a
-prompt with no autocomplete, write the solution from memory in a textarea, run it against a hidden harness, and the card
-moves between Leitner boxes based on pass/fail. Everything runs in the browser; state lives in `localStorage`.
+prompt with strictly no autocomplete or IntelliSense, write the solution from memory in a **CodeMirror 6** cold-start buffer
+(with rainbow bracket pair colorization, autoclosing brackets/quotes, and in-browser Prettier formatting), run it against
+a hidden harness, and the card moves through spaced-retrieval boxes or graduated tiers based on pass/fail. Everything runs
+in the browser; state lives in `localStorage`.
 
-- Stack: React 19, Vite, TypeScript (strict), Vitest (+ jsdom), ESLint. No backend.
+- Stack: React 19, Vite, TypeScript (strict), CodeMirror 6, Vitest (+ jsdom), ESLint. No backend.
+- Scheduling: Choice of **Classic Leitner Boxes** (5 boxes) or **Graduated Interval Recall & Chaining** (7 tiers with micro-spaced chaining and half-tier setbacks).
 - Owner use: personal. Quality bar: every card must have a *correct reference solution*, a *real harness*, and
   *explicit input/expected test cases* (the owner reads these to understand what "success" means).
 - **Hard rule from the owner:** cards are authored by hand under `scripts/cards/` and `scripts/testcases/`. Never generate
@@ -24,7 +27,7 @@ moves between Leitner boxes based on pass/fail. Everything runs in the browser; 
 | Difficulty spread | d1: 14 · d2: 29 · d3: 36 · d4: 20 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms, js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser |
 | Tracks defined but empty | `testing-tooling` (`react-components` has 16 cards) |
-| Automated tests | ~370 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution** |
+| Automated tests | 439 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution**, plus unit tests for scheduling algorithms and formatting |
 | Manual verification | The 66 original cards and all React cards (31 cards incl. every `react-components` card) were run in the production build in a real browser. The other cards added later pass in jsdom only |
 
 ## 3. Repository map
@@ -33,19 +36,24 @@ moves between Leitner boxes based on pass/fail. Everything runs in the browser; 
 src/
   App.tsx                      app shell: deck state, view switch, header (Focus / Settings / Add Topic)
   components/
-    PracticeArena.tsx          editor, Run Code, Submit, timer, console, draft autosave
-    DeckDashboard.tsx          catalog table, filters, lock/unlock/reset/delete
+    PracticeArena.tsx          CodeMirror 6 buffer, Run Code, Submit, timer, console, Prettier format, draft autosave
+    DeckDashboard.tsx          catalog table, filters, lock/unlock/reset/delete, tier/box badges
     FocusModal.tsx             practice focus: include/exclude tracks+tags, difficulty range, presets
     DifficultyBadge.tsx        ●●●○○ label
     AddTopicModal.tsx, SettingsModal.tsx, EvaluationPanel.tsx
     practice/                  consoleFormat.ts (log -> pass/fail classification), starterSnippet.ts, ReactTestErrorBoundary.tsx
   lib/
-    leitner.ts                 ALL scheduling/state logic (pure functions + localStorage persistence)
+    leitner.ts                 ALL scheduling/state logic (Leitner + Graduated Interval Recall, localStorage persistence)
+    leitner.test.ts            unit tests for Leitner & Graduated Interval algorithms
+    formatter.ts               in-browser Prettier standalone formatting for JS/TS/JSX
+    formatter.test.ts          unit tests for formatting and syntax error resilience
     runner.ts                  sandbox + harness execution (see §5)
     domTools.ts, mockFetch.ts  headless DOM test tools ($dom) and deterministic fetch mock
     harnessContracts.ts        extracts the "Target Contract" table shown for a card
     ai.ts                      optional AI evaluator (Gemini/OpenAI-compatible); advisory only
     drafts.ts                  per-card editor autosave (localStorage `leitner_draft:<id>`)
+  types/
+    rainbowbrackets.d.ts       type declarations for rainbowbrackets extension
   utils/typeChecker.ts         lazy-loaded TS compiler + real ES2022 lib files for strict-mode checking
   data/topics.json             GENERATED seed deck (do not hand-edit; see §4)
 scripts/
@@ -55,7 +63,7 @@ scripts/
   testcases/part1-8.mjs, index.mjs   hand-written input/expected pairs
 ```
 
-State keys in `localStorage`: `leitner_coding_deck` (deck + filter + presets), `leitner_draft:<cardId>`, AI settings keys
+State keys in `localStorage`: `leitner_coding_deck` (deck + filter + presets + algorithm preference), `leitner_draft:<cardId>`, AI settings keys
 (see `ai.ts`). The API key is stored in plaintext in `localStorage` (acceptable for personal use, documented in Settings).
 
 ## 4. Card authoring pipeline
@@ -84,8 +92,21 @@ see `mergeStoredWithSeed`).
 Case fields: `v:false` = "documentation only, asserted elsewhere"; `t:'TypeError'` = expect a throw matching the regex; `ev` = evaluate this
 expression to produce the expected value instead of the display text `x`.
 
-## 5. Execution model (runner)
+## 5. Execution model and code editor
 
+### 5.1 Cold-start editor & aesthetics (`PracticeArena.tsx`)
+- Replaces raw textareas with **CodeMirror 6** (`@uiw/react-codemirror` and `@codemirror/lang-javascript`).
+- **Autocompletion & IntelliSense strictly disabled**: `basicSetup={{ autocompletion: false, completionKeymap: false }}`. No autocomplete popups or suggestions appear, strictly honoring the "cold-start interview recall" training philosophy.
+- **Autoclosing brackets & quotes**: Parentheses `()`, brackets `[]`, braces `{}`, and quotes (`""`, `''`, `` ` ``) auto-close upon typing, with jump-over on closing characters and balanced pair deletion on backspace (`closeBrackets`, `closeBracketsKeymap`).
+- **Rainbow bracket pair colorization (Path B)**: Integrated via `rainbowbrackets` with tailored neon/pastel dark-mode palette (`#f43f5e`, `#fb923c`, `#facc15`, `#4ade80`, `#38bdf8`, `#818cf8`, `#c084fc`) in `src/index.css`.
+- **In-browser code formatting (`src/lib/formatter.ts`)**: Prettier standalone (`prettier/standalone` with `@prettier/plugins/babel`, `estree`, and `typescript`) runs 100% in-browser with zero backend dependencies. Format triggered via UI button or shortcuts:
+  - `Shift + Alt + F` or `Cmd + Shift + F` (`Ctrl + Shift + F` on Win/Linux): Format code
+  - `Cmd + Enter` / `Ctrl + Enter`: Run Code / Test
+  - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit for Evaluation
+  - `Tab`: Indent 2 spaces (`indentWithTab`, `indentUnit.of('  ')`)
+  - `Cmd + /` / `Ctrl + /`: Toggle line comments (`defaultKeymap`)
+
+### 5.2 Sandbox runner
 `PracticeArena` -> `transpileForExecution` (lazy-loaded TypeScript, JS or TS mode) -> `runHarness(card, code, mode)`.
 User code + harness are concatenated and run inside an `AsyncFunction` in the **page itself** (not an iframe/worker).
 
@@ -109,26 +130,39 @@ Gotchas learned the hard way:
   `await wait(30)` first (5 cards needed this when first smoke-tested). Always run new React cards through "Run Code" in `vite preview`.
 - A synchronous infinite loop freezes the tab (no timeout is possible in-page). Drafts are autosaved so nothing is lost.
 
-## 6. Scheduling model (all in `leitner.ts`)
+## 6. Scheduling models (all in `src/lib/leitner.ts`)
 
-- **Boxes 1-5**, intervals in *trials* (completed reviews), not time: `BOX_INTERVALS = {1:1, 2:4, 3:10, 4:22, 5:45}`.
-  Pass: box+1, streak+1, `nextEligibleTrial = reviews + interval(box)`. Fail: box 1, streak 0, eligible next trial.
+The trainer supports two user-selectable algorithms via the Settings modal (`algorithm: 'leitner' | 'graduated-interval'`):
+
+### 6.1 Classic Leitner Boxes (`leitner`)
+- **Boxes 1–5**, intervals in *trials* (completed reviews), not calendar time: `BOX_INTERVALS = {1: 1, 2: 4, 3: 10, 4: 22, 5: 45}`.
+- **Pass**: Box promotes (`box + 1`, max 5), streak incremented (`streak + 1`), `nextEligibleTrial = reviews + interval(box)`.
+- **Fail**: Hard reset to **Box 1**, streak reset to 0, eligible on the very next review trial (`nextEligibleTrial = reviews + 1`).
+
+### 6.2 Graduated Interval Recall & Chaining (`graduated-interval`)
+- **Tiers 1–7**, exponential micro-spaced intervals: `GRADUATED_INTERVALS = {1: 1, 2: 2, 3: 5, 4: 12, 5: 28, 6: 65, 7: 150}`.
+- **Pass**: Tier promotes (`tier + 1`, max 7), streak incremented (`streak + 1`), `nextEligibleTrial = reviews + interval(tier)`.
+- **Fail (Graduated Setback)**: Instead of resetting to Tier 1, sets back by half (`Math.max(1, Math.floor(tier / 2))`). Preserves long-term memory progress while enforcing necessary review.
+- **Chaining Queue Prioritization**: Newly failed cards (streak 0) and Tier 1 warm-up cards are interleaved immediately into the next eligible review slots, chaining them into short-interval recall before longer gaps.
+
+### 6.3 Shared Scheduling Engine
 - **getNextCard**: candidates = active cards matching the practice filter, excluding the current card; eligible =
-  `nextEligibleTrial <= reviews`; prefer a different track than the last one; sort by **box asc, then difficulty asc**, then earliest
+  `nextEligibleTrial <= reviews`; prefer a different track than the last one; sort by **tier/box asc, then difficulty asc**, then earliest
   eligibility, then streak.
-- **Staged unlocks**: every 4 active cards in box ≥ 3 unlocks 4 more. They are chosen **easiest-first**, and only if the card's
+- **Staged unlocks**: every 4 active cards in box/tier ≥ 3 unlocks 4 more. They are chosen **easiest-first**, and only if the card's
   *ladder is open*.
 - **Difficulty ladder**: `difficulty` 1 Warm-up · 2 Basic · 3 Intermediate · 4 Advanced · 5 Expert. Cards that share a `concept`
   (e.g. `rate-limiting`, `promise`, `lru`) form a ladder. A locked card is unlock-eligible only when every *easier* card of the same
-  concept is active and in box ≥ 2 (`isLadderOpen`, `LADDER_PASS_BOX`). Custom cards without a concept are never gated.
+  concept is active and in box/tier ≥ 2 (`isLadderOpen`, `LADDER_PASS_BOX`). Custom cards without a concept are never gated.
   Manual unlock from the catalog bypasses the ladder on purpose.
 - **Practice focus** (`PracticeFilter`): include/exclude tracks and tags (excludes win; empty include = all) plus an inclusive
   difficulty range. Only matching active cards are scheduled; others keep their state. Stored in the deck state, included in
-  backup export/import, with named presets. Gap: staged unlocks ignore the focus.
-- **Merge on load** (`mergeStoredWithSeed`): progress (box, streak, schedule, status) comes from the stored deck; content fields
+  backup export/import, with named presets.
+- **Merge on load** (`mergeStoredWithSeed`): progress (box/tier, streak, schedule, status) comes from the stored deck; content fields
   (`track,title,tags,difficulty,concept,promptSeed,starterCode,testHarness,solution,referenceSolution,testCases`) are refreshed from
   the seed so edits to cards take effect; new seed cards are appended locked; seed cards the user deleted stay deleted
-  (`deletedSeedIds`). Note: a card whose contract changed keeps its old box; reset it manually if you want a fresh start.
+  (`deletedSeedIds`).
+- **UI Dynamic Terms**: All badges, headers, modals, tooltips, and dashboard filters dynamically switch between "Box" and "Tier" terminology depending on the active algorithm.
 
 ## 7. Roadmap
 

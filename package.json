@@ -13,7 +13,11 @@
     "build:cards": "node scripts/build-cards.mjs"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@uiw/react-codemirror": "^4.25.12",
     "lucide-react": "^1.55.0",
+    "prettier": "^3.9.10",
+    "rainbowbrackets": "^2.0.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "sucrase": "^3.35.1"

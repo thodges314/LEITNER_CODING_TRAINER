@@ -18,9 +18,22 @@ npm run build      # type-check + production build into dist/
 
 ## How it works
 
-- **Scheduling** (`src/lib/leitner.ts`): 5 boxes with trial-based intervals (+1, +4, +10, +22, +45 reviews).
-  A pass promotes a card, a fail sends it back to box 1. Tracks are interleaved, and every 4 cards in
-  box 3+ unlock 4 more locked cards.
+- **Scheduling Algorithms** (`src/lib/leitner.ts`): Switchable in Settings between two spaced-repetition models:
+  - **Classic Leitner Boxes**: 5 boxes with trial-based intervals (+1, +4, +10, +22, +45 reviews). A pass promotes to the next box; any failure resets the card to Box 1 for immediate restudy.
+  - **Graduated Interval Recall & Chaining**: 7 graduated recall tiers with micro-spaced chaining (+1, +2, +5, +12, +28, +65, +150 reviews). On pass, advances to the next tier; on failure, applies a gentle half-tier setback (`Math.max(1, Math.floor(tier / 2))`) rather than losing all progress, prioritizing newly failed cards into chaining review.
+  - In both algorithms, tracks are interleaved, and every 4 cards in box/tier 3+ unlock 4 more locked cards along the difficulty ladder.
+- **Cold-Start Editor & Aesthetics** (`src/components/PracticeArena.tsx`):
+  - Powered by **CodeMirror 6** (`@uiw/react-codemirror`) styled for high-contrast dark themes.
+  - **Autocomplete & IntelliSense strictly disabled**: No ghost text, no dropdown suggestions, preserving cold-start recall conditions for realistic interview drills.
+  - **Autoclosing brackets & quotes**: Automatic closing and jump-over for `()`, `[]`, `{}`, `""`, `''`, and `` ` ``.
+  - **Rainbow Bracket Pair Colorization (Path B)**: Bracket pairs are color-coded in nested neon/pastel hues (`rainbowbrackets`) for rapid structural scanning.
+  - **In-Browser Code Formatting**: Client-side formatting powered by **Prettier Standalone** (`prettier/standalone` with Babel, TypeScript, and Estree plugins). Format via the toolbar button or **`Shift + Alt + F`** / **`Cmd + Shift + F`**.
+- **Keyboard Shortcuts**:
+  - `Shift + Alt + F` / `Cmd + Shift + F`: Format code with Prettier
+  - `Cmd + Enter` / `Ctrl + Enter`: Run Code against test harness in sandbox
+  - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit for evaluation
+  - `Tab`: Indent with 2 spaces
+  - `Cmd + /` / `Ctrl + /`: Toggle line comments
 - **Grading** (`src/lib/runner.ts`): on submit the card's test harness is run headlessly against your code.
   A card passes only if the harness logs at least one `PASS` and no `FAIL`/errors. An AI model (optional) adds
   critique but cannot override a failing harness. You can always override the verdict by hand
@@ -29,6 +42,7 @@ npm run build      # type-check + production build into dist/
 - **TypeScript mode**: strict type-checking with the TypeScript compiler, loaded lazily on first use.
 - **Persistence**: seed content from `src/data/topics.json` is merged into your stored deck on load. Progress is
   kept, content updates flow in, new seed cards are added, and seed cards you delete stay deleted.
+  Algorithm preference and draft code are persisted in `localStorage`.
   Use the dashboard to export/import JSON backups.
 
 ## AI evaluator (optional)
