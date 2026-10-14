@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Toast Notifications (Provider + useToast)",
+  "tags": [
+    "component",
+    "context",
+    "timers",
+    "a11y"
+  ]
+}

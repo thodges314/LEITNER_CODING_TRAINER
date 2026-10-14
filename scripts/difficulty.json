@@ -462,5 +462,17 @@
  "virtual-list": {
   "difficulty": 4,
   "concept": "virtualization"
+ },
+ "toast-queue": {
+  "difficulty": 3,
+  "concept": "notifications"
+ },
+ "image-carousel": {
+  "difficulty": 3,
+  "concept": "carousel"
+ },
+ "optimistic-like-button": {
+  "difficulty": 3,
+  "concept": "optimistic-ui"
  }
 }

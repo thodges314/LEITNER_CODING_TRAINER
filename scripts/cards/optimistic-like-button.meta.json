@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Optimistic Like Button with Rollback",
+  "tags": [
+    "component",
+    "optimistic-ui",
+    "async",
+    "error-handling"
+  ]
+}

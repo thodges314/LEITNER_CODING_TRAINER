@@ -19,11 +19,11 @@ moves between Leitner boxes based on pass/fail. Everything runs in the browser; 
 
 | Item | Value |
 |---|---|
-| Cards | 116 (≈40 active at first run) |
-| Documented test cases | 711 (each shown as input → expected in the UI) |
+| Cards | 119 (46 active at first run) |
+| Documented test cases | 731 (each shown as input → expected in the UI) |
 | Difficulty spread | d1: 14 · d2: 29 · d3: 36 · d4: 20 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms, js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser |
-| Tracks defined but empty | `testing-tooling` (`react-components` has 13 cards) |
+| Tracks defined but empty | `testing-tooling` (`react-components` has 16 cards) |
 | Automated tests | ~370 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution** |
 | Manual verification | The 66 original cards and all React cards (31 cards incl. every `react-components` card) were run in the production build in a real browser. The other cards added later pass in jsdom only |
 
@@ -145,7 +145,7 @@ algorithms, TS). This is a judgement from experience with those formats, not a l
 | String/format utilities | **Medium** | 5 | classNames, query string, formatters, style parsing, CSS specificity. Missing: template engine, markdown-lite, slugify, diffing |
 | DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize/Intersection observers (outside React), `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame` loops, Web Workers |
 | React hooks and state | **Medium** | ~25 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer. Missing: undo/redo, form-state hook, `useLayoutEffect`, `useDeferredValue`/`useTransition`, optimistic updates, React 19 APIs |
-| React components ("build this") | **Weak** | ~11 | Typeahead, modal, tabs, infinite list, star rating, countdown, file tree, filter list, accordion, error boundary, a11y field, load-more list, memo list, simple + full data table, dropdown menu, virtual list; hooks: useToggle/useCounter, useHistory, useForm. Still missing: multi-step form, toast queue, optimistic UI, drag-sortable list, carousel, tooltip/popover, React 19 APIs |
+| React components ("build this") | **Weak** | ~11 | Typeahead, modal, tabs, infinite list, star rating, countdown, file tree, filter list, accordion, error boundary, a11y field, load-more list, memo list, simple + full data table, dropdown menu, virtual list; hooks: useToggle/useCounter, useHistory, useForm. Still missing: multi-step form wizard, tooltip/popover, drag-sortable list (keyboard fallback), pagination controls, tag/chip input, stepper/progress bar, lazy image (IntersectionObserver), copy-to-clipboard button, theme switcher (context + localStorage), kanban board, nested comments, React 19 APIs |
 | Algorithms | **Weak** | ~19 | arrays/hash/two-pointer/window/stack/binary-search/BFS/intervals/trees-basics. Missing: linked lists, heaps, tries, graphs (grid DFS, topo sort), DP, backtracking, sorting, matrix, bit tricks |
 | TypeScript | **Weak-medium** | 6 | unions, generics, utility types, guards, typed emitter. Missing: conditional/`infer`, template-literal types, overloads, branded types, `satisfies`, assertion functions |
 | Accessibility | **Weak** | 3 | modal focus, tabs ARIA, typeahead. Missing: menu/dropdown roving focus, `aria-live`, accessible forms/errors, skip links, focus trap utilities |
