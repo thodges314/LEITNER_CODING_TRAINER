@@ -19,11 +19,11 @@ moves between Leitner boxes based on pass/fail. Everything runs in the browser; 
 
 | Item | Value |
 |---|---|
-| Cards | 100 (36 active at first run, 64 locked) |
-| Documented test cases | 612 (each shown as input → expected in the UI) |
+| Cards | 103 (36 active at first run, 67 locked) |
+| Documented test cases | 631 (each shown as input → expected in the UI) |
 | Difficulty spread | d1: 14 · d2: 29 · d3: 36 · d4: 20 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms, js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser |
-| Tracks defined but empty | `react-components`, `testing-tooling` |
+| Tracks defined but empty | `testing-tooling` (`react-components` has 3 cards: star rating, countdown, file tree) |
 | Automated tests | ~370 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution** |
 | Manual verification | All 66 original cards were run in the production build in a real browser. The ~34 cards added later pass in jsdom only (browser smoke test not re-run) |
 
@@ -141,7 +141,7 @@ algorithms, TS). This is a judgement from experience with those formats, not a l
 | String/format utilities | **Medium** | 5 | classNames, query string, formatters, style parsing, CSS specificity. Missing: template engine, markdown-lite, slugify, diffing |
 | DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize/Intersection observers (outside React), `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame` loops, Web Workers |
 | React hooks and state | **Medium** | ~25 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer. Missing: undo/redo, form-state hook, `useLayoutEffect`, `useDeferredValue`/`useTransition`, optimistic updates, React 19 APIs |
-| React components ("build this") | **Weak** | ~8 | Typeahead, modal, tabs, infinite list only. **`react-components` track is empty** |
+| React components ("build this") | **Weak** | ~11 | Typeahead, modal, tabs, infinite list, star rating, countdown, file tree. Still missing data table, virtual list, dropdown menu, forms, undo/redo |
 | Algorithms | **Weak** | ~19 | arrays/hash/two-pointer/window/stack/binary-search/BFS/intervals/trees-basics. Missing: linked lists, heaps, tries, graphs (grid DFS, topo sort), DP, backtracking, sorting, matrix, bit tricks |
 | TypeScript | **Weak-medium** | 6 | unions, generics, utility types, guards, typed emitter. Missing: conditional/`infer`, template-literal types, overloads, branded types, `satisfies`, assertion functions |
 | Accessibility | **Weak** | 3 | modal focus, tabs ARIA, typeahead. Missing: menu/dropdown roving focus, `aria-live`, accessible forms/errors, skip links, focus trap utilities |
@@ -188,11 +188,9 @@ Grading approaches available today: (a) **pure functions** graded from input/exp
 (c) **type-level** graded with `@ts-expect-error` lines in `<id>.extra.js` (TS mode, strict).
 
 1. **React components** (new cards go in the empty `react-components` track; hand-written harness, approach b). Specs already drafted:
-   - `StarRating({value,onChange,max})` radiogroup, hover preview, arrow keys, roving tabindex (d2).
-   - `Countdown({seconds,onDone,tickMs})` Start/Pause/Reset, `role="timer"`, cleanup (d2).
+   - DONE: `StarRating`, `Countdown`, `FileTree` (track `react-components`; see `scripts/cards/*` for the DOM-contract style to copy).
    - `DataTable({rows,columns,pageSize})` sortable headers with `aria-sort` cycling, numeric vs string sort, filter input, `Page x of y`
      (d4). Add an easy rung: static table from rows/columns (d1) and sort-only (d2).
-   - `FileTree({nodes,onSelect})` recursive, `aria-expanded`, only expanded children rendered (d3).
    - `VirtualList({items,itemHeight,height,overscan})` windowed rendering from `scrollTop` (d4; note jsdom has no layout, so the
      harness defines `scrollTop` via `Object.defineProperty` and fires `scroll`).
    - `DropdownMenu` roving focus, Escape/outside-click close, disabled items (d4). `useHistory` undo/redo (d3), `useForm` (d3).
@@ -241,8 +239,8 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 ### 7.4 Engineering / quality
 - **Browser smoke test in CI** (Playwright against `vite preview`): for each card run reference + harness via "Run Code" and assert pass;
   also assert an empty buffer fails. This is the repeatable version of the manual loop used before.
-- **Timing tests**: several hook harnesses use 15-60 ms margins with real timers (`useDebounce`, `useThrottle`, `useInterval`,
-  countdown-style cards). Widen margins (≈ 60-100 ms), add one retry, or switch those harnesses to fake timers.
+- **Timing tests**: hook/typeahead harnesses use real timers. Their delays and waits were scaled ×3 (e.g. debounce 180 ms with margins of 30-90 ms)
+  and passed 3 consecutive runs; the countdown card polls with `until()` instead of fixed waits. Still possible: one retry on failure, or fake timers.
 - Bundle: main chunk ≈ 0.65 MB; lazy TypeScript chunk ≈ 4.1 MB (acceptable for personal use; `chunkSizeWarningLimit` raised).
 - AI evaluator (`ai.ts`) was only exercised offline (heuristic, harness-aware). The live Gemini/OpenAI call path (key sent in a header) is
   untested against real APIs; default model names may be stale.

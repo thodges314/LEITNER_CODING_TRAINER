@@ -398,5 +398,17 @@
  "focus-on-mount": {
   "difficulty": 1,
   "concept": "refs"
+ },
+ "star-rating-component": {
+  "difficulty": 2,
+  "concept": "rating-controls"
+ },
+ "countdown-component": {
+  "difficulty": 2,
+  "concept": "react-timers"
+ },
+ "file-explorer-tree": {
+  "difficulty": 3,
+  "concept": "tree-ui"
  }
 }

@@ -17,30 +17,30 @@ const { renderHook, wait } = $dom;
 }
 {
   let a = 0;
-  const h = renderHook(({ cb, d }) => useInterval(cb, d), { initialProps: { cb: () => a++, d: 30 } });
-  await wait(110);
+  const h = renderHook(({ cb, d }) => useInterval(cb, d), { initialProps: { cb: () => a++, d: 90 } });
+  await wait(330);
   const ticks = a;
   h.unmount();
-  await wait(70);
+  await wait(210);
   $test.check('useInterval ticks at the given delay and stops on unmount', ticks >= 2 && ticks <= 4 && a === ticks, { ticks, after: a });
 }
 {
   let a = 0;
   let b = 0;
-  const h = renderHook(({ cb, d }) => useInterval(cb, d), { initialProps: { cb: () => a++, d: 60 } });
-  await wait(35);
-  h.rerender({ cb: () => b++, d: 60 }); // new callback at ~35 ms; the 60 ms tick must not be postponed
-  await wait(45); // ~80 ms: the original timer has ticked once, using the new callback
+  const h = renderHook(({ cb, d }) => useInterval(cb, d), { initialProps: { cb: () => a++, d: 180 } });
+  await wait(105);
+  h.rerender({ cb: () => b++, d: 180 }); // new callback at ~105 ms; the 180 ms tick must not be postponed
+  await wait(135); // ~240 ms: the original timer has ticked once, using the new callback
   $test.check('useInterval always calls the latest callback without resetting the timer', a === 0 && b === 1, { a, b });
   h.unmount();
 }
 {
   let a = 0;
   const h = renderHook(({ cb, d }) => useInterval(cb, d), { initialProps: { cb: () => a++, d: null } });
-  await wait(90);
+  await wait(270);
   $test.check('A null delay pauses the interval', a === 0, a);
-  h.rerender({ cb: () => a++, d: 30 });
-  await wait(100);
+  h.rerender({ cb: () => a++, d: 90 });
+  await wait(300);
   $test.check('Switching from null to a delay resumes', a >= 2, a);
   h.unmount();
 }

@@ -4,7 +4,7 @@ const { render, fire, wait, q, qa, act } = $dom;
   const selected = [];
   const { container } = render(
     <Typeahead
-      delay={30}
+      delay={90}
       onSelect={(v) => selected.push(v)}
       fetchSuggestions={async (text) => {
         calls.push(text);
@@ -16,7 +16,7 @@ const { render, fire, wait, q, qa, act } = $dom;
   fire.change(input, 'r');
   fire.change(input, 're');
   fire.change(input, 'rea');
-  await wait(100);
+  await wait(300);
   $test.check('Debounces input into a single fetch', calls.length === 1 && calls[0] === 'rea', calls);
   const options = qa('[role="option"]', container);
   $test.check(
@@ -31,20 +31,20 @@ const { render, fire, wait, q, qa, act } = $dom;
   fire.keyDown(input, 'Enter');
   $test.check('Enter selects the active option', selected.length === 1 && selected[0] === 'read' && q('[role="listbox"]', container) === null, selected);
   fire.change(input, 'real');
-  await wait(100);
+  await wait(300);
   fire.keyDown(input, 'Escape');
   $test.check('Escape closes the list', q('[role="listbox"]', container) === null && input.getAttribute('aria-expanded') === 'false');
 }
 {
   const pending = {};
   const { container } = render(
-    <Typeahead delay={20} onSelect={() => {}} fetchSuggestions={(text) => new Promise((resolve) => { pending[text] = resolve; })} />
+    <Typeahead delay={60} onSelect={() => {}} fetchSuggestions={(text) => new Promise((resolve) => { pending[text] = resolve; })} />
   );
   const input = q('input', container);
   fire.change(input, 're');
-  await wait(60);
+  await wait(180);
   fire.change(input, 'rea');
-  await wait(60);
+  await wait(180);
   await act(async () => { pending['rea'](['real']); });
   await act(async () => { pending['re'](['stale']); });
   const texts = qa('[role="option"]', container).map((o) => o.textContent);
