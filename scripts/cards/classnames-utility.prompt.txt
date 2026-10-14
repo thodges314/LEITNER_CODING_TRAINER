@@ -1,0 +1,1 @@
+Write classNames(...args) (like clsx): strings and numbers are included (falsy values such as '', 0, null, undefined and false are skipped), arrays are flattened recursively, and for an object each key is included when its value is truthy. Return the class names joined by single spaces in argument order; classNames() returns ''.

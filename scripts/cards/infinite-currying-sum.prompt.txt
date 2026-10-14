@@ -1,0 +1,1 @@
+Write sum(...numbers) that supports unlimited chained calls: sum(1)(2)(3)() returns 6 (calling with no arguments returns the total), arguments can be grouped any way (sum(1, 2)(3, 4)()), the chain also coerces to a number/string (+sum(1)(2) is 3, String(sum(1)(2)) is '3'), sum()() is 0, and chains are immutable: branching from an intermediate result must not affect the original.

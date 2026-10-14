@@ -1,0 +1,10 @@
+{
+  "track": "async-js",
+  "title": "promisify: Callback API to Promise",
+  "tags": [
+    "promisify",
+    "callbacks",
+    "node-style",
+    "this"
+  ]
+}

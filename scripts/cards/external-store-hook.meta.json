@@ -1,0 +1,10 @@
+{
+  "track": "react",
+  "title": "External Store with useSyncExternalStore",
+  "tags": [
+    "hooks",
+    "state-management",
+    "useSyncExternalStore",
+    "selectors"
+  ]
+}

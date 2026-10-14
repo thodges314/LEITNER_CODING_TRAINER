@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Render a Virtual Node Tree to the DOM",
+  "tags": [
+    "dom",
+    "virtual-dom",
+    "createElement",
+    "rendering"
+  ]
+}

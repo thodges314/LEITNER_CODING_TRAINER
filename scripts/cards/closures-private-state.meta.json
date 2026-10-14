@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Closures: Private State, once, and Loop Capture",
+  "tags": [
+    "closures",
+    "scope",
+    "encapsulation",
+    "once"
+  ]
+}

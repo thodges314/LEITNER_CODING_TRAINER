@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Infinite Currying: sum(1)(2)(3)()",
+  "tags": [
+    "currying",
+    "closures",
+    "valueOf",
+    "functional"
+  ]
+}

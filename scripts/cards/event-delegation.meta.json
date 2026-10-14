@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Event Delegation",
+  "tags": [
+    "dom",
+    "events",
+    "bubbling",
+    "closest"
+  ]
+}

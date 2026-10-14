@@ -1,0 +1,10 @@
+{
+  "track": "async-web-plumbing",
+  "title": "Promise Class from Scratch",
+  "tags": [
+    "promise",
+    "thenable",
+    "microtask",
+    "chaining"
+  ]
+}

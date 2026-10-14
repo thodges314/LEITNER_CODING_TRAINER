@@ -1,0 +1,10 @@
+{
+  "track": "react",
+  "title": "useOnClickOutside Hook",
+  "tags": [
+    "hooks",
+    "events",
+    "refs",
+    "cleanup"
+  ]
+}

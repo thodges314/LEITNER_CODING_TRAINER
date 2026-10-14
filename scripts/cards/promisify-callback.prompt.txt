@@ -1,0 +1,1 @@
+Write promisify(fn) that converts a Node-style callback function (the last argument is a callback (err, result) => void) into a function returning a Promise. The promise resolves with `result`, or rejects with `err` when err is truthy. It must forward all arguments, preserve `this`, and reject if fn throws synchronously.

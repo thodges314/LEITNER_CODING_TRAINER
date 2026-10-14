@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Implement new, instanceof and Object.create",
+  "tags": [
+    "prototype",
+    "new",
+    "instanceof",
+    "object.create"
+  ]
+}

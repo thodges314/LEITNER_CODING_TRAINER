@@ -1,0 +1,10 @@
+{
+  "track": "react",
+  "title": "Error Boundary with Reset",
+  "tags": [
+    "error-boundary",
+    "class-component",
+    "resilience",
+    "resetKeys"
+  ]
+}

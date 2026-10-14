@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "JSON.stringify Polyfill",
+  "tags": [
+    "json",
+    "recursion",
+    "serialization",
+    "edge-cases"
+  ]
+}

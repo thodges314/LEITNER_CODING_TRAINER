@@ -1,0 +1,10 @@
+{
+  "track": "react",
+  "title": "React.memo and Stable Callbacks",
+  "tags": [
+    "performance",
+    "memo",
+    "useCallback",
+    "re-renders"
+  ]
+}

@@ -201,6 +201,13 @@ export function createDomTools() {
         el.focus();
       });
     },
+    /** Dispatches any DOM event inside act() (mousedown, scroll, storage, mouseover, ...). */
+    event(target: EventTarget, event: Event) {
+      act(() => {
+        target.dispatchEvent(event);
+      });
+      return event;
+    },
   };
 
   return {

@@ -1,0 +1,10 @@
+{
+  "track": "react",
+  "title": "useLocalStorage Hook",
+  "tags": [
+    "hooks",
+    "localstorage",
+    "storage-event",
+    "sync"
+  ]
+}
