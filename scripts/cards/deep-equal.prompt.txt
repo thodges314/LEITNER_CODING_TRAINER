@@ -1,0 +1,1 @@
+Implement deepEqual(a, b) for primitives, arrays, plain objects, Dates, and NaN (NaN equals NaN). Compare key sets rather than just values, treat an array and an object as different, and handle circular references.

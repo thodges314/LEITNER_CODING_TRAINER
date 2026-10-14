@@ -158,6 +158,15 @@ const AMBIENT_DECLARATIONS = `
   declare var Error: ErrorConstructor;
 
   declare var console: any;
+  declare var $test: any;
+  declare var $dom: any;
+  declare var globalThis: any;
+  declare var DOMException: any;
+  interface Date { getTime(): number; toISOString(): string }
+  interface DateConstructor { new (value?: number | string | Date): Date; now(): number }
+  declare var Date: DateConstructor;
+  declare var TypeError: ErrorConstructor;
+  declare var RangeError: ErrorConstructor;
   declare var fetch: (input: any, init?: any) => Promise<any>;
   declare var setTimeout: any;
   declare var clearTimeout: any;
@@ -247,9 +256,12 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
   const fileName = 'solution.tsx';
   const libName = 'lib.d.ts';
 
+  // Type-check as a module so top-level await is allowed (appended after a newline; positions are unchanged).
+  const checkedSource = `${rawCode}\nexport {};`;
+
   const host: ts.CompilerHost = {
     getSourceFile: (name, languageVersion) => {
-      if (name === fileName) return ts.createSourceFile(name, rawCode, languageVersion);
+      if (name === fileName) return ts.createSourceFile(name, checkedSource, languageVersion);
       if (name === libName) return ts.createSourceFile(name, AMBIENT_DECLARATIONS, languageVersion);
       return undefined;
     },
@@ -258,7 +270,7 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
     getCurrentDirectory: () => '/',
     getDirectories: () => [],
     fileExists: (name) => name === fileName || name === libName,
-    readFile: (name) => (name === fileName ? rawCode : name === libName ? AMBIENT_DECLARATIONS : undefined),
+    readFile: (name) => (name === fileName ? checkedSource : name === libName ? AMBIENT_DECLARATIONS : undefined),
     getCanonicalFileName: (name) => name,
     useCaseSensitiveFileNames: () => true,
     getNewLine: () => '\n',

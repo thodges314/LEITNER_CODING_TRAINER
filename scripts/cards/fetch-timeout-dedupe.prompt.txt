@@ -1,0 +1,1 @@
+Write dedupeFetch(key, fn, timeoutMs = 5000) where fn(signal) starts a request. Concurrent calls with the same key must share one in-flight promise. Each shared request is aborted (via the AbortSignal passed to fn) and rejected with an Error if it takes longer than timeoutMs. The entry must be removed when the request settles (success, failure or timeout) so later calls refetch.

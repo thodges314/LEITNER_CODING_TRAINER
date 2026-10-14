@@ -19,7 +19,7 @@ describe('classifyLogLine', () => {
   it('classifies pass, fail, error and neutral output', () => {
     expect(classifyLogLine('log', ['x', 'PASS'])).toBe('pass');
     expect(classifyLogLine('log', ['x: FAIL'])).toBe('fail');
-    expect(classifyLogLine('error', ['boom'])).toBe('error');
+    expect(classifyLogLine('error', ['boom'])).toBe('neutral');
     expect(classifyLogLine('log', ['hello'])).toBe('neutral');
     expect(classifyLogLine('log', ['Test 1: ', ['FAIL', 3]])).toBe('fail');
   });
@@ -80,5 +80,27 @@ describe('runHarness', () => {
     expect(bad.passed).toBe(false); // implicit any
     const good = await runHarness(base, 'function add(a: number, b: number): number { return a + b; }', 'ts');
     expect(good.passed).toBe(true);
+  });
+});
+
+describe('sandbox hygiene', () => {
+  it('restores built-in prototypes patched by a solution', async () => {
+    const card: TopicItem = { ...base, id: 'poly', testHarness: "$test.check('x', typeof [].myThing === 'function');" };
+    const r = await runHarness(card, "Object.defineProperty(Array.prototype, 'myThing', { value() {}, configurable: true });", 'js');
+    expect(r.passed).toBe(true);
+    expect(typeof ([] as unknown as { myThing?: unknown }).myThing).toBe('undefined');
+  });
+
+  it('does not treat console.error output as a failure', async () => {
+    const card: TopicItem = { ...base, id: 'err', testHarness: "console.error('just logging'); $test.check('ok', true);" };
+    const r = await runHarness(card, '', 'js');
+    expect(r.passed).toBe(true);
+  });
+
+  it('$test.run reports FAIL with received/expected', async () => {
+    const card: TopicItem = { ...base, id: 'run', testHarness: "await $test.run('adds', async () => 1 + 1, () => 3);" };
+    const r = await runHarness(card, '', 'js');
+    expect(r.passed).toBe(false);
+    expect(r.lines.join('\n')).toMatch(/received 2, expected 3/);
   });
 });

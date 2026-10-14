@@ -1,0 +1,1 @@
+Write mergeIntervals(intervals): sort by start (without mutating the input), merge overlapping and touching intervals, and handle an empty list. Then write lengthOfLongestSubstring(s) returning the length of the longest substring without repeating characters using a sliding window in O(n).

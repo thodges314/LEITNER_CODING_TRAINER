@@ -23,7 +23,7 @@ export default {
     c('Sparse holes are skipped (and stay holes)', '[1, , 3].myMap((x) => x * 2)', '[2, <1 empty item>, 6]', { ev: '[2, , 6]' }),
     c('myFilter keeps matching items', '[1, 2, 3, 4].myFilter((x) => x % 2 === 0)', '[2, 4]', { v: false, note: 'reference solution only implements myMap' }),
     c('myReduce sums', '[1, 2, 3].myReduce((a, b) => a + b)', '6', { v: false, note: 'reference solution only implements myMap' }),
-    c('myReduce on an empty array with no initial value throws', '[].myReduce((a, b) => a + b)', 'Throws TypeError', { v: false }),
+    c('myReduce on an empty array with no initial value throws', '[].myReduce((a, b) => a + b)', '', { t: 'TypeError: .*(empty|initial)', x: 'Throws TypeError: Reduce of empty array with no initial value' }),
   ],
   'get-set-path': [
     c('Dot + bracket path', "const o = { a: [{ b: { c: 99 } }] };\nget(o, 'a[0].b.c')", '99'),

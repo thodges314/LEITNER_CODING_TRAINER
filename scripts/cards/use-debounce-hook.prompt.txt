@@ -1,0 +1,1 @@
+Write useDebounce(value, delay) returning the value only after it has been stable for delay ms (the initial value is returned immediately). Clear the timer when the value or delay changes and on unmount, and always use the latest delay (no stale closures).

@@ -31,7 +31,7 @@ import {
   ShieldCheck,
   FlaskConical,
 } from 'lucide-react';
-import { transpileForExecution, runHarness } from '../lib/runner';
+import { transpileForExecution, runHarness, createSandboxScope } from '../lib/runner';
 import { extractHarnessContracts } from '../lib/harnessContracts';
 import { formatConsoleArg, formatAssertionFailure } from './practice/consoleFormat';
 import type { ConsoleLogEntry } from './practice/consoleFormat';
@@ -266,6 +266,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         type: isFail ? 'error' : type,
         content: failFormatted || args.map(formatConsoleArg).join(' '),
         timestamp: now(),
+        failure: isFail,
       };
       logs.push(entry);
       setOutputLogs([...logs]);
@@ -275,10 +276,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       log: (...args: unknown[]) => appendLog('log', ...args),
       info: (...args: unknown[]) => appendLog('info', ...args),
       warn: (...args: unknown[]) => appendLog('warn', ...args),
-      error: (...args: unknown[]) => {
-        appendLog('error', ...args);
-        setExecutionStatus('error');
-      },
+      error: (...args: unknown[]) => appendLog('error', ...args),
     };
 
     const mount = (compOrElem: unknown, props: Record<string, unknown> = {}) => {
@@ -309,6 +307,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         type: diag.type === 'warn' ? 'warn' : 'error',
         content: diag.formatted,
         timestamp: now(),
+        failure: diag.type !== 'warn',
       });
     }
     if (transpiled.diagnostics.length > 0) setOutputLogs([...logs]);
@@ -319,39 +318,17 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     }
     const executableCode = transpiled.code;
 
-    try {
-      // Async IIFE execution engine with React, ReactDOM, mount, and native hooks
-      const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-      const fn = new AsyncFunction(
-        'console',
-        'React',
-        'ReactDOM',
-        'mount',
-        'useState',
-        'useEffect',
-        'useRef',
-        'useReducer',
-        'useMemo',
-        'useCallback',
-        'useContext',
-        'createContext',
-        executableCode
-      );
+    const scope = createSandboxScope({
+      console: customConsole,
+      mount,
+      reactDOM: customReactDOM,
+    });
 
-      const result = await fn(
-        customConsole,
-        React,
-        customReactDOM,
-        mount,
-        React.useState,
-        React.useEffect,
-        React.useRef,
-        React.useReducer,
-        React.useMemo,
-        React.useCallback,
-        React.useContext,
-        React.createContext
-      );
+    try {
+      // Async IIFE execution engine with React, ReactDOM, mount, native hooks, mock fetch and `dom` tools
+      const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+      const fn = new AsyncFunction(...scope.names, executableCode);
+      const result = await fn(...scope.values);
 
       if (result !== undefined) {
         if (React.isValidElement(result) || typeof result === 'function') {
@@ -368,7 +345,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         );
       }
 
-      const hasError = logs.some((l) => l.type === 'error');
+      const hasError = logs.some((l) => l.failure);
       setExecutionStatus(hasError ? 'error' : 'success');
     } catch (err: unknown) {
       // Catch and display runtime syntax, reference, and async errors cleanly in readable red text
@@ -381,11 +358,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         type: 'error',
         content: errorMsg,
         timestamp: now(),
+        failure: true,
       };
       logs.push(errorEntry);
       setOutputLogs([...logs]);
       setExecutionStatus('error');
     } finally {
+      scope.cleanup();
       setIsRunning(false);
     }
   };
@@ -452,7 +431,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const trackMeta = getTrackMeta(currentCard.track);
   const linesCount = code.split('\n').length;
   const charsCount = code.length;
-  const errorCount = outputLogs.filter((l) => l.type === 'error').length;
+  const errorCount = outputLogs.filter((l) => l.failure).length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>

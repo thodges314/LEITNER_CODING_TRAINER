@@ -5,6 +5,8 @@ export interface ConsoleLogEntry {
   type: 'log' | 'warn' | 'error' | 'info';
   content: string;
   timestamp: string;
+  /** True for assertion failures, compile errors and uncaught exceptions (plain console.error output is not a failure). */
+  failure?: boolean;
 }
 
 export function formatConsoleArg(arg: unknown): string {
@@ -26,10 +28,10 @@ export function formatAssertionFailure(args: unknown[], currentCard: TopicItem |
   // Check if any arg indicates an assertion FAIL
   const hasFail = args.some((arg) => {
     if (typeof arg === 'string') {
-      return /\bFAIL\b/i.test(arg);
+      return /\bFAIL\b/.test(arg);
     }
     if (Array.isArray(arg)) {
-      return arg.some((item) => typeof item === 'string' && /\bFAIL\b/i.test(item));
+      return arg.some((item) => typeof item === 'string' && /\bFAIL\b/.test(item));
     }
     return false;
   });
@@ -42,7 +44,7 @@ export function formatAssertionFailure(args: unknown[], currentCard: TopicItem |
   let foundReceived = false;
 
   // Case 1: args has a string with FAIL
-  const failIndex = args.findIndex((arg) => typeof arg === 'string' && /\bFAIL\b/i.test(arg));
+  const failIndex = args.findIndex((arg) => typeof arg === 'string' && /\bFAIL\b/.test(arg));
   if (failIndex !== -1) {
     if (failIndex > 0 && typeof args[0] === 'string') {
       description = args[0].replace(/:$/, '').trim();
@@ -70,7 +72,7 @@ export function formatAssertionFailure(args: unknown[], currentCard: TopicItem |
   if (!foundReceived) {
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
-      if (Array.isArray(arg) && arg.length >= 2 && typeof arg[0] === 'string' && /\bFAIL\b/i.test(arg[0])) {
+      if (Array.isArray(arg) && arg.length >= 2 && typeof arg[0] === 'string' && /\bFAIL\b/.test(arg[0])) {
         if (i > 0 && typeof args[0] === 'string') {
           description = args[0].replace(/:$/, '').trim();
         } else if (!description) {
@@ -84,7 +86,7 @@ export function formatAssertionFailure(args: unknown[], currentCard: TopicItem |
   }
 
   // If description not populated yet, check args[0]
-  if (!description && typeof args[0] === 'string' && !/\bFAIL\b/i.test(args[0])) {
+  if (!description && typeof args[0] === 'string' && !/\bFAIL\b/.test(args[0])) {
     description = args[0].replace(/:$/, '').trim();
   } else if (!description && typeof args[0] === 'string') {
     const match = args[0].match(/^(.*?):\s*FAIL/i);

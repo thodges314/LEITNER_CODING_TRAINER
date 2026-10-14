@@ -44,14 +44,19 @@ Harnesses report with `console.log('label:', cond ? 'PASS' : 'FAIL')`.
 Helper scripts are in `scripts/`:
 
 - `scripts/testcases/*.mjs` holds the hand-written input/output pairs for every card (the "Target Contract" table).
-  `npm run verify:cases` runs each pair against the card's reference solution (fetch is mocked, timers are real) and lists
-  the pairs that can't be machine-checked (React/DOM behaviour, type-level checks, features the reference solution lacks).
-  `npm run apply:cases` writes them into `topics.json`. Only `testCases` is touched.
+  `scripts/cards/<id>.{prompt.txt,ref.js,harness.js,extra.js}` hold prompts, reference solutions and hand-written harnesses.
+  `npm run build:cards` regenerates `promptSeed`, the reference solution, `testCases` and `testHarness` in `topics.json`.
+  Harnesses are generated from the cases (each case becomes one `$test.run(...)` assertion) unless a card has a
+  hand-written `harness.js` (React/DOM cards), and `extra.js` appends type-level (`@ts-expect-error`) checks for TS cards.
+- Harness globals: `$test` (`run`, `rejects`, `logs`, `check`, `equal`, `sleep`) and `$dom` (`render`, `renderHook`,
+  `renderError`, `fire.click/change/keyDown/submit/focus`, `wait`, `q`, `qa`, `intersect`, `observers`). They render with
+  the page's real DOM in the browser and jsdom in tests, with a mock `IntersectionObserver` and a deterministic `fetch`.
+  Built-in prototypes patched by a solution (polyfill cards) are restored after each run.
 - `scripts/merge.cjs` merges `scripts/claude_topics.json` (extra drafted topics) into the seed file.
 - `scripts/generate_all_fixtures.cjs` is a legacy generator that overwrites starter code and harnesses. **Do not run it**; it corrupts cards.
 
-`src/lib/seedCards.test.ts` runs every offline seed harness against its reference solution, so a broken card fails the test run.
-Harnesses that call the network are skipped there.
+`src/lib/seedCards.test.ts` runs every card's harness against its reference solution (must pass), checks that every documented
+case is asserted under the same label, and checks that an empty solution does NOT pass.
 
 ## Deploy
 

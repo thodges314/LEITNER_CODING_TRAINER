@@ -1,0 +1,1 @@
+Implement todoReducer(state, action) for a todo list held in useReducer. State is an array of { id, text, done }. Support 'ADD_TODO' (payload: text; assign the next id as max existing id + 1, starting at 1), 'TOGGLE_TODO' (payload: id) and 'REMOVE_TODO' (payload: id); unknown actions return the same state. Use it with useReducer(todoReducer, []).

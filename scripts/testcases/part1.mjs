@@ -19,7 +19,7 @@ export default {
       x: 'Rejects with Error — message contains "404"',
     }),
     c('Network failure is not swallowed', `fetchData('https://invalid-non-existent-url-domain.org')`, '', {
-      t: 'fetch',
+      t: 'TypeError: Failed to fetch',
       x: 'Rejects with the network error (TypeError: Failed to fetch)',
     }),
   ],

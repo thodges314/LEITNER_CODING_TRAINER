@@ -1,0 +1,1 @@
+Write dedupeAndSort(records, sortBy = 'id') returning a NEW array deduped by id (the latest record wins) and sorted by one key or an array of keys (earlier keys take priority). The sort must be stable, must not mutate the input, and the comparator must handle strings, numbers and null/undefined (nulls sort last).

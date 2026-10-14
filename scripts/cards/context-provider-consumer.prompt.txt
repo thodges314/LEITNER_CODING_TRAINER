@@ -1,0 +1,1 @@
+Write createThemeContext() returning { ThemeProvider, useTheme }. ThemeProvider manages 'light' | 'dark' state (starts as 'light', or the optional defaultTheme prop) and provides { theme, setTheme, toggle }. useTheme() returns that value and throws an Error mentioning ThemeProvider when called outside the provider.

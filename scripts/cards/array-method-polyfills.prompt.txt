@@ -1,0 +1,1 @@
+Implement Array.prototype.myMap, myFilter and myReduce. Each callback receives (value, index, array) and honors thisArg (myReduce's callback receives (accumulator, value, index, array)). Sparse holes are skipped. myReduce without an initial value uses the first present element, and on an empty array it throws TypeError.
