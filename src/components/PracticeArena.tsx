@@ -199,13 +199,25 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     []
   );
 
-  // CodeMirror extensions: JS/TS language support, Rainbow Brackets (Path B), and tab indentation
+  // CodeMirror extensions: JS/TS language support, Rainbow Brackets (Path B), tab indentation, and Fira Code ligatures
   const extensions = useMemo(() => {
     return [
       javascript({ jsx: true, typescript: executionMode === 'ts' }),
       rainbowBrackets(),
       EditorView.lineWrapping,
       keymap.of([indentWithTab]),
+      EditorView.theme({
+        '&': {
+          fontFamily: 'var(--font-mono) !important',
+        },
+        '.cm-content, .cm-line, .cm-line *': {
+          fontFamily: 'var(--font-mono) !important',
+          fontVariantLigatures: 'normal !important',
+          fontFeatureSettings: '"calt" 1, "liga" 1, "zero" 1 !important',
+          letterSpacing: 'normal !important',
+          textRendering: 'optimizeLegibility !important',
+        },
+      }),
     ];
   }, [executionMode]);
 
