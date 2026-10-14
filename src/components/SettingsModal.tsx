@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Sliders,
@@ -7,6 +6,8 @@ import {
   Info,
   CheckCircle2,
   Trash2,
+  KeyRound,
+  Check,
 } from 'lucide-react';
 import {
   getStoredApiKey,
@@ -30,6 +31,7 @@ interface SettingsModalProps {
   onClose: () => void;
   currentAlgorithm?: SpacedAlgorithm;
   onAlgorithmChange?: (algo: SpacedAlgorithm) => void;
+  onSettingsSaved?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -37,43 +39,88 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   currentAlgorithm,
   onAlgorithmChange,
+  onSettingsSaved,
 }) => {
   const [algorithm, setAlgorithm] = useState<SpacedAlgorithm>(() => currentAlgorithm ?? getStoredAlgorithm());
   const [apiKey, setApiKey] = useState(() => getStoredApiKey());
+  const [keyInput, setKeyInput] = useState(() => getStoredApiKey());
   const [provider, setProvider] = useState<AIProvider>(() => getStoredProvider());
   const [model, setModel] = useState(() => getStoredModel());
   const [baseUrl, setBaseUrl] = useState(() => getStoredBaseUrl());
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    onSettingsSaved?.();
+    setTimeout(() => setToastMessage(null), 2500);
+  };
 
   const handleSelectAlgorithm = (algo: SpacedAlgorithm) => {
     setAlgorithm(algo);
     setStoredAlgorithm(algo);
     onAlgorithmChange?.(algo);
+    showToast('Spaced repetition method saved');
   };
 
-  const handleSave = (e: FormEvent) => {
-    e.preventDefault();
-    setStoredAlgorithm(algorithm);
-    onAlgorithmChange?.(algorithm);
-    setStoredApiKey(apiKey);
-    setStoredProvider(provider);
-    setStoredModel(model);
-    setStoredBaseUrl(baseUrl);
-    setSavedSuccess(true);
-    setTimeout(() => {
-      setSavedSuccess(false);
-      onClose();
-    }, 600);
+  const handleSelectProvider = (p: AIProvider) => {
+    setProvider(p);
+    setStoredProvider(p);
+    let defaultModel = model;
+    if (p === 'gemini') defaultModel = 'gemini-2.5-flash';
+    else if (p === 'groq') defaultModel = 'llama-3.3-70b-versatile';
+    else if (p === 'openai') defaultModel = 'gpt-4o-mini';
+    else if (p === 'openrouter') defaultModel = 'google/gemini-2.5-flash';
+    setModel(defaultModel);
+    setStoredModel(defaultModel);
+    showToast(`Provider switched to ${p.toUpperCase()}`);
+  };
+
+  const handleModelChange = (val: string) => {
+    setModel(val);
+    setStoredModel(val);
+    onSettingsSaved?.();
+  };
+
+  const handleBaseUrlChange = (val: string) => {
+    setBaseUrl(val);
+    setStoredBaseUrl(val);
+    onSettingsSaved?.();
+  };
+
+  const handleSaveKey = () => {
+    const trimmed = keyInput.trim();
+    if (!trimmed) {
+      if (apiKey) handleClearKey();
+      return;
+    }
+
+    if (apiKey && apiKey !== trimmed) {
+      const confirmed = window.confirm(
+        'Are you sure you want to replace your existing API key?\n\nThe previous key will be permanently overwritten in your browser localStorage.'
+      );
+      if (!confirmed) return;
+    }
+
+    setStoredApiKey(trimmed);
+    setApiKey(trimmed);
+    showToast(apiKey ? 'API key replaced' : 'API key saved');
   };
 
   const handleClearKey = () => {
-    setApiKey('');
+    const confirmed = window.confirm(
+      'Are you sure you want to clear your stored API key?\n\nThis will remove it from your browser localStorage and switch evaluation to Keyless mode.'
+    );
+    if (!confirmed) return;
+
     setStoredApiKey('');
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 1200);
+    setApiKey('');
+    setKeyInput('');
+    showToast('API key cleared');
   };
+
+  const isKeyModified = keyInput.trim() !== apiKey;
 
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="settings-title">
@@ -117,7 +164,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           {/* Spaced Repetition Algorithm Selection */}
           <div
             style={{
@@ -225,13 +272,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   type="button"
                   key={p.id}
-                  onClick={() => {
-                    setProvider(p.id);
-                    if (p.id === 'gemini') setModel('gemini-2.5-flash');
-                    else if (p.id === 'groq') setModel('llama-3.3-70b-versatile');
-                    else if (p.id === 'openai') setModel('gpt-4o-mini');
-                    else if (p.id === 'openrouter') setModel('google/gemini-2.5-flash');
-                  }}
+                  onClick={() => handleSelectProvider(p.id)}
                   className="btn"
                   style={{
                     padding: '8px 10px',
@@ -239,6 +280,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     backgroundColor: provider === p.id ? 'rgba(56, 189, 248, 0.2)' : 'var(--bg-elevated)',
                     borderColor: provider === p.id ? 'var(--accent-cyan)' : 'var(--border-subtle)',
                     color: provider === p.id ? '#ffffff' : 'var(--text-secondary)',
+                    transition: 'all 0.15s ease',
                   }}
                 >
                   {p.label}
@@ -250,45 +292,88 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* API Key */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 500 }}>
+              <label style={{ fontSize: '13px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <KeyRound size={14} color="var(--accent-cyan)" />
                 {provider === 'gemini' ? 'Gemini API Key' : 'API Key / Bearer Token'}
               </label>
+
               {apiKey && (
-                <button
-                  type="button"
-                  onClick={handleClearKey}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--accent-rose)',
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <Trash2 size={12} /> Clear Key
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      color: '#34d399',
+                      backgroundColor: 'rgba(52, 211, 153, 0.12)',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(52, 211, 153, 0.25)',
+                    }}
+                  >
+                    Key Active (••••{apiKey.slice(-4)})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleClearKey}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--accent-rose)',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                    title="Clear and remove stored API key"
+                  >
+                    <Trash2 size={12} /> Clear Key
+                  </button>
+                </div>
               )}
             </div>
-            <input
-              type="password"
-              placeholder={provider === 'gemini' ? 'AIzaSy...' : 'sk-...'}
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="code-buffer"
-              style={{
-                height: '42px',
-                padding: '10px 12px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '13px',
-              }}
-              autoComplete="off"
-            />
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '5px', display: 'flex', gap: '4px' }}>
-              <ShieldCheck size={14} color="#34d399" />
-              Stored in plain text in this browser's localStorage and sent only to the provider you select, with each request. Use a restricted or low-limit key, and don't use this on a shared machine.
+
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input
+                type="password"
+                placeholder={provider === 'gemini' ? 'AIzaSy...' : 'sk-...'}
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSaveKey();
+                  }
+                }}
+                className="code-buffer"
+                style={{
+                  height: '42px',
+                  padding: '10px 12px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '13px',
+                  flex: 1,
+                }}
+                autoComplete="off"
+              />
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSaveKey}
+                disabled={!keyInput.trim() || (!isKeyModified && Boolean(apiKey))}
+                style={{
+                  height: '42px',
+                  padding: '0 16px',
+                  fontSize: '12.5px',
+                  whiteSpace: 'nowrap',
+                }}
+                title={apiKey ? 'Replace currently stored API key' : 'Save API key'}
+              >
+                {apiKey ? (isKeyModified ? 'Replace Key' : 'Saved') : 'Save Key'}
+              </button>
+            </div>
+
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', display: 'flex', gap: '4px' }}>
+              <ShieldCheck size={14} color="#34d399" style={{ flexShrink: 0, marginTop: '1px' }} />
+              Stored in plain text in this browser's localStorage and sent only to the provider you select with each evaluation request.
             </p>
           </div>
 
@@ -297,16 +382,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '6px' }}>
               Model Identifier
             </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                type="text"
-                placeholder={provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o-mini'}
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                className="code-buffer"
-                style={{ height: '40px', padding: '10px 12px', fontSize: '13px' }}
-              />
-            </div>
+            <input
+              type="text"
+              placeholder={provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o-mini'}
+              value={model}
+              onChange={(e) => handleModelChange(e.target.value)}
+              className="code-buffer"
+              style={{ height: '40px', padding: '10px 12px', fontSize: '13px' }}
+            />
           </div>
 
           {/* Custom base URL if needed */}
@@ -319,7 +402,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="text"
                 placeholder="https://api.openai.com/v1"
                 value={baseUrl}
-                onChange={(e) => setBaseUrl(e.target.value)}
+                onChange={(e) => handleBaseUrlChange(e.target.value)}
                 className="code-buffer"
                 style={{ height: '40px', padding: '10px 12px', fontSize: '13px' }}
               />
@@ -346,23 +429,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
-          {/* Buttons */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
-            <button type="button" className="btn btn-outline" onClick={onClose}>
-              Cancel
-            </button>
-            <button type="submit" className="btn btn-primary">
-              {savedSuccess ? (
-                <>
-                  <CheckCircle2 size={16} /> Saved!
-                </>
-              ) : (
-                'Save Settings'
-              )}
+          {/* Footer Controls & Auto-save confirmation */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingTop: '8px',
+              borderTop: '1px solid var(--border-subtle)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#34d399' }}>
+              <CheckCircle2 size={15} />
+              <span>{toastMessage ?? 'All settings auto-saved to browser localStorage'}</span>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={onClose}
+              style={{ padding: '8px 24px', fontSize: '13px' }}
+            >
+              <Check size={14} /> Done
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 };
+

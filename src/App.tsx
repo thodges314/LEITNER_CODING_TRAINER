@@ -40,6 +40,7 @@ import {
   Sparkles,
   RotateCcw,
   Crosshair,
+  ShieldCheck,
 } from 'lucide-react';
 
 export function App() {
@@ -51,6 +52,7 @@ export function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFocusOpen, setIsFocusOpen] = useState(false);
+  const [aiSettingsVersion, setAiSettingsVersion] = useState(0);
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
   const filterActive = isFilterActive(filter);
   const algorithm = getSchedulingAlgorithm(deckState);
@@ -175,8 +177,10 @@ export function App() {
     }
   };
 
+  // Read AI settings with aiSettingsVersion dependency for live updates
   const apiKey = getStoredApiKey();
   const provider = getStoredProvider();
+  void aiSettingsVersion;
   const activeCount = deckState.topics.filter((t) => t.status === 'active').length;
 
   return (
@@ -317,16 +321,56 @@ export function App() {
               {filterActive ? 'Focus on' : 'Focus'}
             </button>
 
+            {/* AI Engine Status Indicator */}
+            {apiKey ? (
+              <div
+                className="badge"
+                style={{
+                  backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                  color: '#38bdf8',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  padding: '6px 11px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  borderRadius: '7px',
+                }}
+                title={`AI Evaluator active: ${provider.toUpperCase()}`}
+              >
+                <Sparkles size={13} color="#38bdf8" />
+                <span>AI: {provider.toUpperCase()}</span>
+              </div>
+            ) : (
+              <div
+                className="badge"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  color: 'var(--text-muted)',
+                  border: '1px solid var(--border-subtle)',
+                  padding: '6px 11px',
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  borderRadius: '7px',
+                }}
+                title="Operating in Keyless mode (deterministic harness & structural invariant analysis)"
+              >
+                <ShieldCheck size={13} color="var(--text-dim)" />
+                <span>Keyless Engine</span>
+              </div>
+            )}
+
+            {/* Dedicated Settings Button */}
             <button
               className="btn btn-outline"
               style={{ padding: '7px 12px', fontSize: '12.5px', gap: '6px' }}
               onClick={() => setIsSettingsOpen(true)}
-              title="Configure API key and AI evaluation engine"
+              title="Configure Spaced Repetition method and AI engine"
             >
               <Settings size={15} />
-              <span style={{ fontSize: '12px' }}>
-                {apiKey ? `${provider.toUpperCase()}` : 'Keyless Engine'}
-              </span>
+              <span>Settings</span>
             </button>
           </div>
         </div>
@@ -443,9 +487,13 @@ export function App() {
       {isSettingsOpen && (
         <SettingsModal
           isOpen={isSettingsOpen}
-          onClose={() => setIsSettingsOpen(false)}
+          onClose={() => {
+            setIsSettingsOpen(false);
+            setAiSettingsVersion((v) => v + 1);
+          }}
           currentAlgorithm={algorithm}
           onAlgorithmChange={handleAlgorithmChange}
+          onSettingsSaved={() => setAiSettingsVersion((v) => v + 1)}
         />
       )}
     </div>
