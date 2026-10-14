@@ -25,7 +25,7 @@ moves between Leitner boxes based on pass/fail. Everything runs in the browser; 
 | Tracks with cards | async-js, data-structures, react, algorithms, js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser |
 | Tracks defined but empty | `testing-tooling` (`react-components` has 13 cards) |
 | Automated tests | ~370 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution** |
-| Manual verification | All 66 original cards were run in the production build in a real browser. The ~34 cards added later pass in jsdom only (browser smoke test not re-run) |
+| Manual verification | The 66 original cards and all React cards (31 cards incl. every `react-components` card) were run in the production build in a real browser. The other cards added later pass in jsdom only |
 
 ## 3. Repository map
 
@@ -104,6 +104,9 @@ Gotchas learned the hard way:
 - Built-in prototypes patched by a solution (polyfill cards) are snapshotted and restored after each run.
 - Strict TS uses TypeScript's real `lib.es2022.d.ts` (bundled with `import.meta.glob(...?raw)` into the lazy chunk, ~4 MB);
   DOM types are intentionally replaced by a small `SANDBOX_GLOBALS` declaration.
+- **jsdom passes ≠ browser passes.** In the production build `act` is the `flushSync` fallback: sync updates and discrete events flush at once, but
+  state set from an *effect* and *continuous* events (`mouseover`, `scroll`) render on the next tick. Harnesses that check such results must
+  `await wait(30)` first (5 cards needed this when first smoke-tested). Always run new React cards through "Run Code" in `vite preview`.
 - A synchronous infinite loop freezes the tab (no timeout is possible in-page). Drafts are autosaved so nothing is lost.
 
 ## 6. Scheduling model (all in `leitner.ts`)

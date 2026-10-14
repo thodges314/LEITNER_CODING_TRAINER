@@ -1,4 +1,4 @@
-const { renderHook, fire, act } = $dom;
+const { renderHook, fire, act, wait } = $dom;
 const KEY = 'lc-test-key';
 const cleanup = () => localStorage.removeItem(KEY);
 cleanup();
@@ -60,6 +60,7 @@ cleanup();
   localStorage.setItem(KEY + '-b', JSON.stringify('B'));
   const h = renderHook(({ k }) => useLocalStorage(k, 'init'), { initialProps: { k: KEY } });
   h.rerender({ k: KEY + '-b' });
+  await wait(30); // a re-read triggered from an effect renders on the next tick in production builds
   $test.check('Changing the key reads the new key', h.result.current[0] === 'B', h.result.current[0]);
   h.unmount();
   localStorage.removeItem(KEY + '-b');

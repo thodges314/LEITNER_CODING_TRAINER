@@ -51,6 +51,7 @@ const { renderHook, wait } = $dom;
   );
   await wait(240);
   h.rerender({ v: 'e' });
+  await wait(30); // applied right away (well inside the 180 ms interval), once React has rendered
   $test.check('useThrottle applies a change immediately once the interval has elapsed', h.result.current === 'e', h.result.current);
   h.unmount();
 }

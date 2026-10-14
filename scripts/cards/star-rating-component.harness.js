@@ -1,4 +1,4 @@
-const { render, fire, q, qa } = $dom;
+const { render, fire, q, qa, wait } = $dom;
 const stars = (c) => qa('[role="radio"]', c);
 const filled = (c) => stars(c).filter((s) => s.getAttribute('data-filled') === 'true').length;
 {
@@ -37,8 +37,10 @@ const filled = (c) => stars(c).filter((s) => s.getAttribute('data-filled') === '
   const r = render(<StarRating value={1} />);
   const group = q('[role="radiogroup"]', r.container);
   fire.event(stars(r.container)[3], new MouseEvent('mouseover', { bubbles: true }));
+  await wait(30); // hover is a continuous-priority update: let React render it
   const during = filled(r.container);
   fire.event(group, new MouseEvent('mouseout', { bubbles: true }));
+  await wait(30);
   $test.check('Hovering previews a rating and leaving the group restores it', during === 4 && filled(r.container) === 1, { during, after: filled(r.container) });
   r.unmount();
 }

@@ -1,4 +1,4 @@
-const { render, fire, q, qa, act } = $dom;
+const { render, fire, q, qa, act, wait } = $dom;
 const makeApi = () => {
   const calls = [];
   const fetchPage = (page) => new Promise((resolve, reject) => calls.push({ page, resolve, reject }));
@@ -10,6 +10,7 @@ const settle = (fn) => act(async () => { fn(); });
 {
   const api = makeApi();
   const r = render(<LoadMoreList fetchPage={api.fetchPage} />);
+  await wait(30); // state set from an effect renders on the next tick in production builds
   $test.check('Loads the first page on mount and shows a loading state', api.calls.length === 1 && api.calls[0].page === 1 && q('[role="status"]', r.container) !== null && btn(r.container, 'Load more') === undefined, { calls: api.calls.length });
   await settle(() => api.calls[0].resolve({ items: ['a'], hasMore: false }));
   r.unmount();
