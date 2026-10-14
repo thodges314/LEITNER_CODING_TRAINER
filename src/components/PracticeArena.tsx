@@ -172,13 +172,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     }
   };
 
-  // Mutable refs to handlers so CodeMirror keymap bindings always call latest functions
-  const runCodeRef = useRef<() => void>(() => {});
-  const submitRef = useRef<() => void>(() => {});
-
-  const formatCodeRef = useRef(handleFormatCode);
-  formatCodeRef.current = handleFormatCode;
-
   // CodeMirror 6 setup: autocomplete and IntelliSense are STRICTLY disabled for cold-start recall.
   // Bracket matching and autoclosing of brackets and quotes are enabled.
   const cmBasicSetup = useMemo(
@@ -206,45 +199,26 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     []
   );
 
-  // CodeMirror extensions: JS/TS language support, Rainbow Brackets (Path B), and shortcut keymaps
+  // CodeMirror extensions: JS/TS language support, Rainbow Brackets (Path B), and tab indentation
   const extensions = useMemo(() => {
     return [
       javascript({ jsx: true, typescript: executionMode === 'ts' }),
       rainbowBrackets(),
       EditorView.lineWrapping,
-      keymap.of([
-        indentWithTab,
-        {
-          key: 'Mod-Enter',
-          run: () => {
-            runCodeRef.current();
-            return true;
-          },
-        },
-        {
-          key: 'Mod-Shift-Enter',
-          run: () => {
-            submitRef.current();
-            return true;
-          },
-        },
-        {
-          key: 'Shift-Alt-f',
-          run: () => {
-            formatCodeRef.current();
-            return true;
-          },
-        },
-        {
-          key: 'Mod-Shift-f',
-          run: () => {
-            formatCodeRef.current();
-            return true;
-          },
-        },
-      ]),
+      keymap.of([indentWithTab]),
     ];
   }, [executionMode]);
+
+  // Keep a ref to the latest action handlers updated in an effect (not during render)
+  const actionsRef = useRef<{
+    handleRunCode: () => Promise<void>;
+    handleSubmit: () => Promise<void>;
+    handleFormatCode: () => Promise<void>;
+  }>({
+    handleRunCode: () => Promise.resolve(),
+    handleSubmit: () => Promise.resolve(),
+    handleFormatCode: () => Promise.resolve(),
+  });
 
   // Global window shortcut listener as fallback (Cmd+Enter, Cmd+Shift+Enter, Shift+Alt+F)
   useEffect(() => {
@@ -255,16 +229,16 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
         if (e.shiftKey) {
-          submitRef.current();
+          void actionsRef.current.handleSubmit();
         } else {
-          runCodeRef.current();
+          void actionsRef.current.handleRunCode();
         }
       } else if (
         (e.shiftKey && e.altKey && (e.key === 'f' || e.key === 'F')) ||
         ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'f' || e.key === 'F'))
       ) {
         e.preventDefault();
-        formatCodeRef.current();
+        void actionsRef.current.handleFormatCode();
       }
     };
 
@@ -457,8 +431,33 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     }
   };
 
-  runCodeRef.current = handleRunCode;
-  submitRef.current = handleSubmit;
+  // Sync latest handlers into actionsRef inside an effect (after render)
+  useEffect(() => {
+    actionsRef.current = {
+      handleRunCode,
+      handleSubmit,
+      handleFormatCode,
+    };
+  });
+
+  const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.shiftKey) {
+        void handleSubmit();
+      } else {
+        void handleRunCode();
+      }
+    } else if (
+      (e.shiftKey && e.altKey && (e.key === 'f' || e.key === 'F')) ||
+      ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'f' || e.key === 'F'))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      void handleFormatCode();
+    }
+  };
 
   const handleCommit = (passed: boolean) => {
     clearDraft(currentCard?.id);
@@ -1048,7 +1047,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         </div>
 
         {/* CodeMirror 6 Editor with Rainbow Brackets & Cold-Start Mode */}
-        <div className="cm-theme-container">
+        <div className="cm-theme-container" onKeyDown={handleEditorKeyDown}>
           <CodeMirror
             ref={editorRef}
             value={code}
