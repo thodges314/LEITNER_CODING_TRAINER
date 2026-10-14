@@ -4,4 +4,6 @@ import p6 from './part6.mjs';
 import p7 from './part7.mjs';
 import p8 from './part8.mjs';
 import p9 from './part9.mjs';
-export const newCards = { ...p5, ...p6, ...p7, ...p8, ...p9 };
+import p10 from './part10.mjs';
+import p11 from './part11.mjs';
+export const newCards = { ...p5, ...p6, ...p7, ...p8, ...p9, ...p10, ...p11 };

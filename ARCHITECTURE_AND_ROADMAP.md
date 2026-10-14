@@ -19,11 +19,11 @@ moves between Leitner boxes based on pass/fail. Everything runs in the browser; 
 
 | Item | Value |
 |---|---|
-| Cards | 103 (36 active at first run, 67 locked) |
-| Documented test cases | 631 (each shown as input → expected in the UI) |
+| Cards | 116 (≈40 active at first run) |
+| Documented test cases | 711 (each shown as input → expected in the UI) |
 | Difficulty spread | d1: 14 · d2: 29 · d3: 36 · d4: 20 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms, js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser |
-| Tracks defined but empty | `testing-tooling` (`react-components` has 3 cards: star rating, countdown, file tree) |
+| Tracks defined but empty | `testing-tooling` (`react-components` has 13 cards) |
 | Automated tests | ~370 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution** |
 | Manual verification | All 66 original cards were run in the production build in a real browser. The ~34 cards added later pass in jsdom only (browser smoke test not re-run) |
 
@@ -92,7 +92,8 @@ User code + harness are concatenated and run inside an `AsyncFunction` in the **
 Injected globals: React hooks and `React`, `createContext`, `forwardRef`, `useImperativeHandle`, `useSyncExternalStore`,
 `$dom` (render, renderHook, renderError, fire.click/change/keyDown/submit/focus/event, q, qa, wait, flush, act, intersect),
 `$test` (check, equal, run, rejects, logs, sleep), `MockIntersectionObserver`, and a mocked `fetch` for the jsonplaceholder URLs.
-Helpers are `$`-prefixed so they cannot collide with user declarations. Do **not** add common bare words (`memo`, `render`) as
+Helpers are `$`-prefixed so they cannot collide with user declarations. Harness authors: `mount`, `render`? (`render` is destructured from `$dom` inside harnesses, which is fine), but **`mount` is an injected global** — do not declare `const mount` in a harness (use `setup`).
+Do **not** add common bare words (`memo`, `render`) as
 injected parameters: a user `const memo = ...` would throw "already declared".
 
 Console classification (`consoleFormat.ts`): only assertion lines containing the word `FAIL`, compile errors and uncaught
@@ -141,7 +142,7 @@ algorithms, TS). This is a judgement from experience with those formats, not a l
 | String/format utilities | **Medium** | 5 | classNames, query string, formatters, style parsing, CSS specificity. Missing: template engine, markdown-lite, slugify, diffing |
 | DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize/Intersection observers (outside React), `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame` loops, Web Workers |
 | React hooks and state | **Medium** | ~25 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer. Missing: undo/redo, form-state hook, `useLayoutEffect`, `useDeferredValue`/`useTransition`, optimistic updates, React 19 APIs |
-| React components ("build this") | **Weak** | ~11 | Typeahead, modal, tabs, infinite list, star rating, countdown, file tree. Still missing data table, virtual list, dropdown menu, forms, undo/redo |
+| React components ("build this") | **Weak** | ~11 | Typeahead, modal, tabs, infinite list, star rating, countdown, file tree, filter list, accordion, error boundary, a11y field, load-more list, memo list, simple + full data table, dropdown menu, virtual list; hooks: useToggle/useCounter, useHistory, useForm. Still missing: multi-step form, toast queue, optimistic UI, drag-sortable list, carousel, tooltip/popover, React 19 APIs |
 | Algorithms | **Weak** | ~19 | arrays/hash/two-pointer/window/stack/binary-search/BFS/intervals/trees-basics. Missing: linked lists, heaps, tries, graphs (grid DFS, topo sort), DP, backtracking, sorting, matrix, bit tricks |
 | TypeScript | **Weak-medium** | 6 | unions, generics, utility types, guards, typed emitter. Missing: conditional/`infer`, template-literal types, overloads, branded types, `satisfies`, assertion functions |
 | Accessibility | **Weak** | 3 | modal focus, tabs ARIA, typeahead. Missing: menu/dropdown roving focus, `aria-live`, accessible forms/errors, skip links, focus trap utilities |

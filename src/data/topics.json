@@ -5561,5 +5561,717 @@
       }
     ],
     "testHarness": "const { render, fire, q, qa } = $dom;\nconst stars = (c) => qa('[role=\"radio\"]', c);\nconst filled = (c) => stars(c).filter((s) => s.getAttribute('data-filled') === 'true').length;\n{\n  const r = render(<StarRating value={2} />);\n  const radios = stars(r.container);\n  $test.check(\n    'Renders a labelled radiogroup with max stars (default 5)',\n    q('[role=\"radiogroup\"]', r.container) !== null && radios.length === 5 && radios[0].getAttribute('aria-label') === '1 star' && radios[1].getAttribute('aria-label') === '2 stars',\n    radios.length\n  );\n  r.rerender(<StarRating value={2} max={8} />);\n  $test.check('The max prop changes the number of stars', stars(r.container).length === 8, stars(r.container).length);\n  r.unmount();\n}\n{\n  const r = render(<StarRating value={3} />);\n  const checked = stars(r.container).map((s) => s.getAttribute('aria-checked')).join();\n  $test.check('The selected star is aria-checked and stars up to the value are filled', checked === 'false,false,true,false,false' && filled(r.container) === 3, { checked, filled: filled(r.container) });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<StarRating value={2} onChange={(n) => calls.push(n)} />);\n  fire.click(stars(r.container)[3]);\n  $test.check('Clicking a star calls onChange with its number', calls.join() === '4', calls);\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<StarRating value={2} onChange={(n) => calls.push(n)} />);\n  fire.click(stars(r.container)[1]);\n  $test.check('Clicking the current rating clears it (onChange(0))', calls.join() === '0', calls);\n  r.unmount();\n}\n{\n  const r = render(<StarRating value={1} />);\n  const group = q('[role=\"radiogroup\"]', r.container);\n  fire.event(stars(r.container)[3], new MouseEvent('mouseover', { bubbles: true }));\n  const during = filled(r.container);\n  fire.event(group, new MouseEvent('mouseout', { bubbles: true }));\n  $test.check('Hovering previews a rating and leaving the group restores it', during === 4 && filled(r.container) === 1, { during, after: filled(r.container) });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<StarRating value={5} onChange={(n) => calls.push(n)} />);\n  const first = stars(r.container)[0];\n  fire.keyDown(first, 'ArrowRight');\n  fire.keyDown(first, 'ArrowLeft');\n  r.rerender(<StarRating value={1} onChange={(n) => calls.push(n)} />);\n  fire.keyDown(stars(r.container)[0], 'ArrowLeft');\n  fire.keyDown(stars(r.container)[0], 'ArrowUp');\n  $test.check('Arrow keys change the rating within 1..max', calls.join() === '5,4,1,2', calls);\n  r.unmount();\n}\n{\n  const r = render(<StarRating value={3} />);\n  const tabs = stars(r.container).map((s) => s.tabIndex).join();\n  r.rerender(<StarRating value={0} />);\n  const tabsZero = stars(r.container).map((s) => s.tabIndex).join();\n  $test.check('Only one star is in the tab order (roving tabindex)', tabs === '-1,-1,0,-1,-1' && tabsZero === '0,-1,-1,-1,-1', { tabs, tabsZero });\n  r.unmount();\n}"
+  },
+  {
+    "id": "a11y-form-field",
+    "track": "react-components",
+    "title": "Accessible Form Field and Toggle Button",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "a11y",
+      "aria",
+      "forms",
+      "labels"
+    ],
+    "promptSeed": "Build two small accessible components. ToggleButton({ pressed, onPressedChange, children }) renders <button type=\"button\" aria-pressed={pressed}> and calls onPressedChange(!pressed) when clicked. FormField({ label, hint, error, children }) renders a <label htmlFor> with the label text, then calls children(props) — a render function — where props = { id, 'aria-describedby', 'aria-invalid' }, then the optional hint <p id> and error <p id role=\"alert\">. Generate ids with useId; 'aria-describedby' lists the ids of the hint and/or error that are present (space-separated) and is undefined when neither exists; 'aria-invalid' is true only when there is an error (otherwise undefined).",
+    "difficulty": 2,
+    "concept": "a11y-components",
+    "referenceSolution": "function ToggleButton({ pressed, onPressedChange, children }) {\n  return (\n    <button type=\"button\" aria-pressed={pressed} onClick={() => onPressedChange(!pressed)}>\n      {children}\n    </button>\n  );\n}\n\nfunction FormField({ label, hint, error, children }) {\n  const id = useId();\n  const hintId = `${id}-hint`;\n  const errorId = `${id}-error`;\n  const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined;\n\n  return (\n    <div>\n      <label htmlFor={id}>{label}</label>\n      {children({ id, 'aria-describedby': describedBy, 'aria-invalid': error ? true : undefined })}\n      {hint && <p id={hintId}>{hint}</p>}\n      {error && (\n        <p id={errorId} role=\"alert\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}",
+    "solution": "function ToggleButton({ pressed, onPressedChange, children }) {\n  return (\n    <button type=\"button\" aria-pressed={pressed} onClick={() => onPressedChange(!pressed)}>\n      {children}\n    </button>\n  );\n}\n\nfunction FormField({ label, hint, error, children }) {\n  const id = useId();\n  const hintId = `${id}-hint`;\n  const errorId = `${id}-error`;\n  const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined;\n\n  return (\n    <div>\n      <label htmlFor={id}>{label}</label>\n      {children({ id, 'aria-describedby': describedBy, 'aria-invalid': error ? true : undefined })}\n      {hint && <p id={hintId}>{hint}</p>}\n      {error && (\n        <p id={errorId} role=\"alert\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}",
+    "starterCode": "function ToggleButton({ pressed, onPressedChange, children }) {\n  return (\n    <button type=\"button\" aria-pressed={pressed} onClick={() => onPressedChange(!pressed)}>\n      {children}\n    </button>\n  );\n}\n\nfunction FormField({ label, hint, error, children }) {\n  const id = useId();\n  const hintId = `${id}-hint`;\n  const errorId = `${id}-error`;\n  const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(' ') || undefined;\n\n  return (\n    <div>\n      <label htmlFor={id}>{label}</label>\n      {children({ id, 'aria-describedby': describedBy, 'aria-invalid': error ? true : undefined })}\n      {hint && <p id={hintId}>{hint}</p>}\n      {error && (\n        <p id={errorId} role=\"alert\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "ToggleButton exposes aria-pressed and reports the toggled value",
+        "input": "pressed=false, click; then pressed=true, click",
+        "expected": "aria-pressed 'false' then 'true'; onPressedChange called with true, then false"
+      },
+      {
+        "description": "FormField links the label to the control",
+        "input": "<FormField label='Email'>{(p) => <input {...p} />}</FormField>",
+        "expected": "label.htmlFor === input.id (non-empty)"
+      },
+      {
+        "description": "Hint and error are referenced by aria-describedby",
+        "input": "hint='We never share it', error='Required'",
+        "expected": "aria-describedby = '<hintId> <errorId>' pointing at both paragraphs"
+      },
+      {
+        "description": "An error marks the control aria-invalid and is announced with role=\"alert\"",
+        "input": "error='Required'",
+        "expected": "input aria-invalid='true'; <p role='alert'>Required</p> referenced by aria-describedby"
+      },
+      {
+        "description": "Without hint or error there is no aria-describedby or aria-invalid",
+        "input": "no hint, no error",
+        "expected": "neither attribute on the input; no role=alert"
+      }
+    ],
+    "testHarness": "const { render, fire, q } = $dom;\nconst field = (props) => (\n  <FormField label=\"Email\" {...props}>\n    {(p) => <input {...p} />}\n  </FormField>\n);\n{\n  const calls = [];\n  const r = render(<ToggleButton pressed={false} onPressedChange={(v) => calls.push(v)}>Bold</ToggleButton>);\n  const button = q('button', r.container);\n  const before = button.getAttribute('aria-pressed');\n  fire.click(button);\n  r.rerender(<ToggleButton pressed onPressedChange={(v) => calls.push(v)}>Bold</ToggleButton>);\n  fire.click(q('button', r.container));\n  $test.check('ToggleButton exposes aria-pressed and reports the toggled value', before === 'false' && q('button', r.container).getAttribute('aria-pressed') === 'true' && calls.join() === 'true,false', { before, calls });\n  r.unmount();\n}\n{\n  const r = render(field({}));\n  const label = q('label', r.container);\n  const input = q('input', r.container);\n  $test.check('FormField links the label to the control', input.id !== '' && label.htmlFor === input.id && label.textContent === 'Email', { for: label.htmlFor, id: input.id });\n  r.unmount();\n}\n{\n  const r = render(field({ hint: 'We never share it', error: 'Required' }));\n  const input = q('input', r.container);\n  const ids = input.getAttribute('aria-describedby').split(' ');\n  const texts = ids.map((id) => document.getElementById(id).textContent).join();\n  $test.check('Hint and error are referenced by aria-describedby', ids.length === 2 && texts === 'We never share it,Required', { describedby: input.getAttribute('aria-describedby'), texts });\n  r.unmount();\n}\n{\n  const r = render(field({ error: 'Required' }));\n  const input = q('input', r.container);\n  const alert = q('[role=\"alert\"]', r.container);\n  $test.check('An error marks the control aria-invalid and is announced with role=\"alert\"', input.getAttribute('aria-invalid') === 'true' && alert !== null && alert.textContent === 'Required' && input.getAttribute('aria-describedby') === alert.id, { invalid: input.getAttribute('aria-invalid') });\n  r.unmount();\n}\n{\n  const r = render(field({}));\n  const input = q('input', r.container);\n  $test.check('Without hint or error there is no aria-describedby or aria-invalid', !input.hasAttribute('aria-describedby') && !input.hasAttribute('aria-invalid') && q('[role=\"alert\"]', r.container) === null, input.outerHTML);\n  r.unmount();\n}"
+  },
+  {
+    "id": "accordion-component",
+    "track": "react-components",
+    "title": "Accordion Component",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "aria",
+      "disclosure",
+      "state"
+    ],
+    "promptSeed": "Build Accordion({ items, allowMultiple = false }) where items is [{ id, title, content }]. Each item renders a heading <h3> containing a <button aria-expanded aria-controls=\"<panelId>\" id=\"<buttonId>\"> with the title, followed by its panel <div role=\"region\" id=\"<panelId>\" aria-labelledby=\"<buttonId>\"> that is rendered ONLY while open (use useId so ids are unique per instance). All panels start closed. Clicking a title opens its panel; by default opening one closes the others; clicking an open title closes it; with allowMultiple several panels may be open.",
+    "difficulty": 2,
+    "concept": "compound",
+    "referenceSolution": "function Accordion({ items, allowMultiple = false }) {\n  const [open, setOpen] = useState([]);\n  const base = useId();\n\n  const toggle = (id) => {\n    setOpen((current) => {\n      if (current.includes(id)) return current.filter((x) => x !== id);\n      return allowMultiple ? [...current, id] : [id];\n    });\n  };\n\n  return (\n    <div>\n      {items.map((item) => {\n        const isOpen = open.includes(item.id);\n        const buttonId = `${base}-btn-${item.id}`;\n        const panelId = `${base}-panel-${item.id}`;\n        return (\n          <div key={item.id}>\n            <h3>\n              <button id={buttonId} aria-expanded={isOpen} aria-controls={panelId} onClick={() => toggle(item.id)}>\n                {item.title}\n              </button>\n            </h3>\n            {isOpen && (\n              <div role=\"region\" id={panelId} aria-labelledby={buttonId}>\n                {item.content}\n              </div>\n            )}\n          </div>\n        );\n      })}\n    </div>\n  );\n}",
+    "solution": "function Accordion({ items, allowMultiple = false }) {\n  const [open, setOpen] = useState([]);\n  const base = useId();\n\n  const toggle = (id) => {\n    setOpen((current) => {\n      if (current.includes(id)) return current.filter((x) => x !== id);\n      return allowMultiple ? [...current, id] : [id];\n    });\n  };\n\n  return (\n    <div>\n      {items.map((item) => {\n        const isOpen = open.includes(item.id);\n        const buttonId = `${base}-btn-${item.id}`;\n        const panelId = `${base}-panel-${item.id}`;\n        return (\n          <div key={item.id}>\n            <h3>\n              <button id={buttonId} aria-expanded={isOpen} aria-controls={panelId} onClick={() => toggle(item.id)}>\n                {item.title}\n              </button>\n            </h3>\n            {isOpen && (\n              <div role=\"region\" id={panelId} aria-labelledby={buttonId}>\n                {item.content}\n              </div>\n            )}\n          </div>\n        );\n      })}\n    </div>\n  );\n}",
+    "starterCode": "function Accordion({ items, allowMultiple = false }) {\n  const [open, setOpen] = useState([]);\n  const base = useId();\n\n  const toggle = (id) => {\n    setOpen((current) => {\n      if (current.includes(id)) return current.filter((x) => x !== id);\n      return allowMultiple ? [...current, id] : [id];\n    });\n  };\n\n  return (\n    <div>\n      {items.map((item) => {\n        const isOpen = open.includes(item.id);\n        const buttonId = `${base}-btn-${item.id}`;\n        const panelId = `${base}-panel-${item.id}`;\n        return (\n          <div key={item.id}>\n            <h3>\n              <button id={buttonId} aria-expanded={isOpen} aria-controls={panelId} onClick={() => toggle(item.id)}>\n                {item.title}\n              </button>\n            </h3>\n            {isOpen && (\n              <div role=\"region\" id={panelId} aria-labelledby={buttonId}>\n                {item.content}\n              </div>\n            )}\n          </div>\n        );\n      })}\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "All panels start closed",
+        "input": "<Accordion items={[First, Second, Third]} />",
+        "expected": "no role='region'; every button aria-expanded='false'; 3 <h3>"
+      },
+      {
+        "description": "Clicking a title opens its panel (aria-expanded=true)",
+        "input": "click 'Second'",
+        "expected": "panel 'Beta text'; aria-expanded='true'"
+      },
+      {
+        "description": "Opening another panel closes the first by default",
+        "input": "click 'First', then 'Third'",
+        "expected": "only 'Gamma text'; First aria-expanded='false'"
+      },
+      {
+        "description": "Clicking an open title closes it",
+        "input": "click 'First' twice",
+        "expected": "no panel rendered"
+      },
+      {
+        "description": "allowMultiple keeps several panels open",
+        "input": "allowMultiple; click 'First', then 'Third'",
+        "expected": "'Alpha text' and 'Gamma text' both rendered"
+      },
+      {
+        "description": "Buttons are wired to their panels with aria-controls and aria-labelledby",
+        "input": "open 'Second'",
+        "expected": "button.aria-controls === panel.id; panel.aria-labelledby === button.id"
+      }
+    ],
+    "testHarness": "const { render, fire, qa } = $dom;\nconst ITEMS = [\n  { id: 'a', title: 'First', content: 'Alpha text' },\n  { id: 'b', title: 'Second', content: 'Beta text' },\n  { id: 'c', title: 'Third', content: 'Gamma text' },\n];\nconst btn = (c, text) => qa('button', c).find((b) => b.textContent === text);\nconst panels = (c) => qa('[role=\"region\"]', c).map((p) => p.textContent).join();\n{\n  const r = render(<Accordion items={ITEMS} />);\n  const expanded = qa('button', r.container).map((b) => b.getAttribute('aria-expanded')).join();\n  $test.check('All panels start closed', panels(r.container) === '' && expanded === 'false,false,false' && qa('h3', r.container).length === 3, { expanded });\n  r.unmount();\n}\n{\n  const r = render(<Accordion items={ITEMS} />);\n  fire.click(btn(r.container, 'Second'));\n  $test.check('Clicking a title opens its panel (aria-expanded=true)', panels(r.container) === 'Beta text' && btn(r.container, 'Second').getAttribute('aria-expanded') === 'true', panels(r.container));\n  r.unmount();\n}\n{\n  const r = render(<Accordion items={ITEMS} />);\n  fire.click(btn(r.container, 'First'));\n  fire.click(btn(r.container, 'Third'));\n  $test.check('Opening another panel closes the first by default', panels(r.container) === 'Gamma text' && btn(r.container, 'First').getAttribute('aria-expanded') === 'false', panels(r.container));\n  r.unmount();\n}\n{\n  const r = render(<Accordion items={ITEMS} />);\n  fire.click(btn(r.container, 'First'));\n  fire.click(btn(r.container, 'First'));\n  $test.check('Clicking an open title closes it', panels(r.container) === '', panels(r.container));\n  r.unmount();\n}\n{\n  const r = render(<Accordion items={ITEMS} allowMultiple />);\n  fire.click(btn(r.container, 'First'));\n  fire.click(btn(r.container, 'Third'));\n  $test.check('allowMultiple keeps several panels open', panels(r.container) === 'Alpha text,Gamma text', panels(r.container));\n  r.unmount();\n}\n{\n  const r = render(<Accordion items={ITEMS} />);\n  fire.click(btn(r.container, 'Second'));\n  const button = btn(r.container, 'Second');\n  const panel = qa('[role=\"region\"]', r.container)[0];\n  $test.check('Buttons are wired to their panels with aria-controls and aria-labelledby', button.getAttribute('aria-controls') === panel.id && panel.getAttribute('aria-labelledby') === button.id && panel.id !== '', { controls: button.getAttribute('aria-controls'), panelId: panel.id });\n  r.unmount();\n}"
+  },
+  {
+    "id": "filter-list",
+    "track": "react-components",
+    "title": "Filterable List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "controlled-input",
+      "derived-state",
+      "a11y"
+    ],
+    "promptSeed": "Build FilterList({ items }) for an array of strings. Render <input aria-label=\"Filter\"> (controlled), a <ul> with one <li> per visible item, and <p role=\"status\"> reporting the count: '5 results', '1 result' (singular) or 'No matches'. Matching is case-insensitive substring matching on the trimmed query; an empty query shows everything. Do not store the filtered list in state — derive it from the query during render.",
+    "difficulty": 2,
+    "concept": "typeahead",
+    "referenceSolution": "function FilterList({ items }) {\n  const [query, setQuery] = useState('');\n  const q = query.trim().toLowerCase();\n  const visible = q ? items.filter((item) => item.toLowerCase().includes(q)) : items;\n\n  return (\n    <div>\n      <input aria-label=\"Filter\" value={query} onChange={(e) => setQuery(e.target.value)} />\n      <ul>\n        {visible.map((item) => (\n          <li key={item}>{item}</li>\n        ))}\n      </ul>\n      <p role=\"status\">\n        {visible.length === 0 ? 'No matches' : `${visible.length} result${visible.length === 1 ? '' : 's'}`}\n      </p>\n    </div>\n  );\n}",
+    "solution": "function FilterList({ items }) {\n  const [query, setQuery] = useState('');\n  const q = query.trim().toLowerCase();\n  const visible = q ? items.filter((item) => item.toLowerCase().includes(q)) : items;\n\n  return (\n    <div>\n      <input aria-label=\"Filter\" value={query} onChange={(e) => setQuery(e.target.value)} />\n      <ul>\n        {visible.map((item) => (\n          <li key={item}>{item}</li>\n        ))}\n      </ul>\n      <p role=\"status\">\n        {visible.length === 0 ? 'No matches' : `${visible.length} result${visible.length === 1 ? '' : 's'}`}\n      </p>\n    </div>\n  );\n}",
+    "starterCode": "function FilterList({ items }) {\n  const [query, setQuery] = useState('');\n  const q = query.trim().toLowerCase();\n  const visible = q ? items.filter((item) => item.toLowerCase().includes(q)) : items;\n\n  return (\n    <div>\n      <input aria-label=\"Filter\" value={query} onChange={(e) => setQuery(e.target.value)} />\n      <ul>\n        {visible.map((item) => (\n          <li key={item}>{item}</li>\n        ))}\n      </ul>\n      <p role=\"status\">\n        {visible.length === 0 ? 'No matches' : `${visible.length} result${visible.length === 1 ? '' : 's'}`}\n      </p>\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Shows every item and the count before typing",
+        "input": "<FilterList items={['Apple','Banana','Cherry','apricot','Blueberry']} />",
+        "expected": "5 <li>; status '5 results'"
+      },
+      {
+        "description": "Filters case-insensitively as you type",
+        "input": "type 'AP'",
+        "expected": "Apple, apricot; '2 results'"
+      },
+      {
+        "description": "Whitespace around the query is ignored",
+        "input": "type '  blue '",
+        "expected": "Blueberry"
+      },
+      {
+        "description": "Shows \"No matches\" when nothing matches",
+        "input": "type 'zzz'",
+        "expected": "no <li>; status 'No matches'"
+      },
+      {
+        "description": "Uses the singular \"1 result\" and an empty query shows everything again",
+        "input": "type 'cher', then clear",
+        "expected": "'1 result', then '5 results'"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst ITEMS = ['Apple', 'Banana', 'Cherry', 'apricot', 'Blueberry'];\nconst lis = (c) => qa('li', c).map((li) => li.textContent).join();\nconst status = (c) => q('[role=\"status\"]', c).textContent;\n{\n  const r = render(<FilterList items={ITEMS} />);\n  $test.check('Shows every item and the count before typing', lis(r.container) === 'Apple,Banana,Cherry,apricot,Blueberry' && status(r.container) === '5 results', { items: lis(r.container), status: status(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<FilterList items={ITEMS} />);\n  fire.change(q('input', r.container), 'AP');\n  $test.check('Filters case-insensitively as you type', lis(r.container) === 'Apple,apricot' && status(r.container) === '2 results', { items: lis(r.container), status: status(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<FilterList items={ITEMS} />);\n  fire.change(q('input', r.container), '  blue ');\n  $test.check('Whitespace around the query is ignored', lis(r.container) === 'Blueberry', lis(r.container));\n  r.unmount();\n}\n{\n  const r = render(<FilterList items={ITEMS} />);\n  fire.change(q('input', r.container), 'zzz');\n  $test.check('Shows \"No matches\" when nothing matches', lis(r.container) === '' && status(r.container) === 'No matches', { items: lis(r.container), status: status(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<FilterList items={ITEMS} />);\n  fire.change(q('input', r.container), 'cher');\n  const one = status(r.container);\n  fire.change(q('input', r.container), '');\n  $test.check('Uses the singular \"1 result\" and an empty query shows everything again', one === '1 result' && status(r.container) === '5 results', { one, after: status(r.container) });\n  r.unmount();\n}"
+  },
+  {
+    "id": "load-more-list",
+    "track": "react-components",
+    "title": "Paginated List with \"Load more\"",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "async",
+      "pagination",
+      "error-handling"
+    ],
+    "promptSeed": "Build LoadMoreList({ fetchPage }) where fetchPage(page) returns a Promise of { items: string[], hasMore: boolean } and pages start at 1. On mount load page 1. Render <ul> with one <li> per loaded item; while a request is in flight render <p role=\"status\">Loading…</p>. When more pages exist and nothing is loading, show a <button>Load more</button> that loads the next page and APPENDS its items; ignore clicks while a request is in flight; hide the button after the last page. If a request fails render <p role=\"alert\">Failed to load</p> and a <button>Retry</button> that re-requests the SAME page (no items are lost).",
+    "difficulty": 2,
+    "concept": "infinite-scroll",
+    "referenceSolution": "function LoadMoreList({ fetchPage }) {\n  const [items, setItems] = useState([]);\n  const [loadedPage, setLoadedPage] = useState(0);\n  const [hasMore, setHasMore] = useState(true);\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState(null);\n  const inFlight = useRef(false);\n\n  const load = useCallback(\n    async (page) => {\n      if (inFlight.current) return; // ignore clicks while a request is running\n      inFlight.current = true;\n      setLoading(true);\n      setError(null);\n      try {\n        const result = await fetchPage(page);\n        setItems((prev) => [...prev, ...result.items]);\n        setLoadedPage(page);\n        setHasMore(result.hasMore);\n      } catch (e) {\n        setError(e);\n      } finally {\n        inFlight.current = false;\n        setLoading(false);\n      }\n    },\n    [fetchPage]\n  );\n\n  useEffect(() => {\n    load(1);\n  }, []);\n\n  return (\n    <div>\n      <ul>\n        {items.map((item) => (\n          <li key={item}>{item}</li>\n        ))}\n      </ul>\n      {loading && <p role=\"status\">Loading…</p>}\n      {error && (\n        <>\n          <p role=\"alert\">Failed to load</p>\n          <button onClick={() => load(loadedPage + 1)}>Retry</button>\n        </>\n      )}\n      {hasMore && !loading && !error && <button onClick={() => load(loadedPage + 1)}>Load more</button>}\n    </div>\n  );\n}",
+    "solution": "function LoadMoreList({ fetchPage }) {\n  const [items, setItems] = useState([]);\n  const [loadedPage, setLoadedPage] = useState(0);\n  const [hasMore, setHasMore] = useState(true);\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState(null);\n  const inFlight = useRef(false);\n\n  const load = useCallback(\n    async (page) => {\n      if (inFlight.current) return; // ignore clicks while a request is running\n      inFlight.current = true;\n      setLoading(true);\n      setError(null);\n      try {\n        const result = await fetchPage(page);\n        setItems((prev) => [...prev, ...result.items]);\n        setLoadedPage(page);\n        setHasMore(result.hasMore);\n      } catch (e) {\n        setError(e);\n      } finally {\n        inFlight.current = false;\n        setLoading(false);\n      }\n    },\n    [fetchPage]\n  );\n\n  useEffect(() => {\n    load(1);\n  }, []);\n\n  return (\n    <div>\n      <ul>\n        {items.map((item) => (\n          <li key={item}>{item}</li>\n        ))}\n      </ul>\n      {loading && <p role=\"status\">Loading…</p>}\n      {error && (\n        <>\n          <p role=\"alert\">Failed to load</p>\n          <button onClick={() => load(loadedPage + 1)}>Retry</button>\n        </>\n      )}\n      {hasMore && !loading && !error && <button onClick={() => load(loadedPage + 1)}>Load more</button>}\n    </div>\n  );\n}",
+    "starterCode": "function LoadMoreList({ fetchPage }) {\n  const [items, setItems] = useState([]);\n  const [loadedPage, setLoadedPage] = useState(0);\n  const [hasMore, setHasMore] = useState(true);\n  const [loading, setLoading] = useState(false);\n  const [error, setError] = useState(null);\n  const inFlight = useRef(false);\n\n  const load = useCallback(\n    async (page) => {\n      if (inFlight.current) return; // ignore clicks while a request is running\n      inFlight.current = true;\n      setLoading(true);\n      setError(null);\n      try {\n        const result = await fetchPage(page);\n        setItems((prev) => [...prev, ...result.items]);\n        setLoadedPage(page);\n        setHasMore(result.hasMore);\n      } catch (e) {\n        setError(e);\n      } finally {\n        inFlight.current = false;\n        setLoading(false);\n      }\n    },\n    [fetchPage]\n  );\n\n  useEffect(() => {\n    load(1);\n  }, []);\n\n  return (\n    <div>\n      <ul>\n        {items.map((item) => (\n          <li key={item}>{item}</li>\n        ))}\n      </ul>\n      {loading && <p role=\"status\">Loading…</p>}\n      {error && (\n        <>\n          <p role=\"alert\">Failed to load</p>\n          <button onClick={() => load(loadedPage + 1)}>Retry</button>\n        </>\n      )}\n      {hasMore && !loading && !error && <button onClick={() => load(loadedPage + 1)}>Load more</button>}\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Loads the first page on mount and shows a loading state",
+        "input": "mount <LoadMoreList fetchPage={fn} />",
+        "expected": "fetchPage(1) called once; <p role='status'> shown; no 'Load more' button"
+      },
+      {
+        "description": "Shows the items and a Load more button while hasMore is true",
+        "input": "page 1 resolves { items: ['a','b'], hasMore: true }",
+        "expected": "<li> a, b; 'Load more' button; no loading status"
+      },
+      {
+        "description": "Load more appends the next page",
+        "input": "click 'Load more'; page 2 resolves ['c']",
+        "expected": "requested pages 1, 2; list a, b, c"
+      },
+      {
+        "description": "The button disappears after the last page",
+        "input": "page 2 resolves { items: ['b'], hasMore: false }",
+        "expected": "no 'Load more'; list a, b"
+      },
+      {
+        "description": "A failed page shows an alert and Retry reloads the same page",
+        "input": "page 2 rejects, click 'Retry'",
+        "expected": "alert 'Failed to load' and list 'a'; page 2 requested again; after success list a, b and no alert"
+      },
+      {
+        "description": "Ignores extra clicks while a page is loading",
+        "input": "click 'Load more' three times quickly",
+        "expected": "fetchPage called only twice in total"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa, act } = $dom;\nconst makeApi = () => {\n  const calls = [];\n  const fetchPage = (page) => new Promise((resolve, reject) => calls.push({ page, resolve, reject }));\n  return { calls, fetchPage };\n};\nconst lis = (c) => qa('li', c).map((li) => li.textContent).join();\nconst btn = (c, text) => qa('button', c).find((b) => b.textContent === text);\nconst settle = (fn) => act(async () => { fn(); });\n{\n  const api = makeApi();\n  const r = render(<LoadMoreList fetchPage={api.fetchPage} />);\n  $test.check('Loads the first page on mount and shows a loading state', api.calls.length === 1 && api.calls[0].page === 1 && q('[role=\"status\"]', r.container) !== null && btn(r.container, 'Load more') === undefined, { calls: api.calls.length });\n  await settle(() => api.calls[0].resolve({ items: ['a'], hasMore: false }));\n  r.unmount();\n}\n{\n  const api = makeApi();\n  const r = render(<LoadMoreList fetchPage={api.fetchPage} />);\n  await settle(() => api.calls[0].resolve({ items: ['a', 'b'], hasMore: true }));\n  $test.check('Shows the items and a Load more button while hasMore is true', lis(r.container) === 'a,b' && btn(r.container, 'Load more') !== undefined && q('[role=\"status\"]', r.container) === null, { items: lis(r.container) });\n  r.unmount();\n}\n{\n  const api = makeApi();\n  const r = render(<LoadMoreList fetchPage={api.fetchPage} />);\n  await settle(() => api.calls[0].resolve({ items: ['a', 'b'], hasMore: true }));\n  fire.click(btn(r.container, 'Load more'));\n  const requested = api.calls.map((c) => c.page).join();\n  await settle(() => api.calls[1].resolve({ items: ['c'], hasMore: true }));\n  $test.check('Load more appends the next page', requested === '1,2' && lis(r.container) === 'a,b,c', { requested, items: lis(r.container) });\n  r.unmount();\n}\n{\n  const api = makeApi();\n  const r = render(<LoadMoreList fetchPage={api.fetchPage} />);\n  await settle(() => api.calls[0].resolve({ items: ['a'], hasMore: true }));\n  fire.click(btn(r.container, 'Load more'));\n  await settle(() => api.calls[1].resolve({ items: ['b'], hasMore: false }));\n  $test.check('The button disappears after the last page', btn(r.container, 'Load more') === undefined && lis(r.container) === 'a,b', { items: lis(r.container) });\n  r.unmount();\n}\n{\n  const api = makeApi();\n  const r = render(<LoadMoreList fetchPage={api.fetchPage} />);\n  await settle(() => api.calls[0].resolve({ items: ['a'], hasMore: true }));\n  fire.click(btn(r.container, 'Load more'));\n  await settle(() => api.calls[1].reject(new Error('network')));\n  const alertShown = q('[role=\"alert\"]', r.container) !== null && lis(r.container) === 'a';\n  fire.click(btn(r.container, 'Retry'));\n  const retried = api.calls.map((c) => c.page).join();\n  await settle(() => api.calls[2].resolve({ items: ['b'], hasMore: false }));\n  $test.check('A failed page shows an alert and Retry reloads the same page', alertShown && retried === '1,2,2' && lis(r.container) === 'a,b' && q('[role=\"alert\"]', r.container) === null, { alertShown, retried, items: lis(r.container) });\n  r.unmount();\n}\n{\n  const api = makeApi();\n  const r = render(<LoadMoreList fetchPage={api.fetchPage} />);\n  await settle(() => api.calls[0].resolve({ items: ['a'], hasMore: true }));\n  const button = btn(r.container, 'Load more');\n  fire.click(button);\n  fire.click(button);\n  fire.click(button);\n  $test.check('Ignores extra clicks while a page is loading', api.calls.length === 2, api.calls.length);\n  await settle(() => api.calls[1].resolve({ items: ['b'], hasMore: false }));\n  r.unmount();\n}"
+  },
+  {
+    "id": "simple-error-boundary",
+    "track": "react-components",
+    "title": "Minimal Error Boundary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "error-boundary",
+      "class-component",
+      "fallback",
+      "basics"
+    ],
+    "promptSeed": "Write SimpleErrorBoundary({ fallback, onError, children }) as a class component: it renders `children` normally; if any descendant throws while rendering it renders `fallback` instead (and keeps doing so), and calls onError(error) once with the thrown error. A failure inside one boundary must not affect other boundaries or components outside it. (Error boundaries can only be class components.)",
+    "difficulty": 2,
+    "concept": "resilience",
+    "referenceSolution": "class SimpleErrorBoundary extends React.Component {\n  state = { failed: false };\n\n  static getDerivedStateFromError() {\n    return { failed: true };\n  }\n\n  componentDidCatch(error) {\n    if (this.props.onError) this.props.onError(error);\n  }\n\n  render() {\n    return this.state.failed ? this.props.fallback : this.props.children;\n  }\n}",
+    "solution": "class SimpleErrorBoundary extends React.Component {\n  state = { failed: false };\n\n  static getDerivedStateFromError() {\n    return { failed: true };\n  }\n\n  componentDidCatch(error) {\n    if (this.props.onError) this.props.onError(error);\n  }\n\n  render() {\n    return this.state.failed ? this.props.fallback : this.props.children;\n  }\n}",
+    "starterCode": "class SimpleErrorBoundary extends React.Component {\n  state = { failed: false };\n\n  static getDerivedStateFromError() {\n    return { failed: true };\n  }\n\n  componentDidCatch(error) {\n    if (this.props.onError) this.props.onError(error);\n  }\n\n  render() {\n    return this.state.failed ? this.props.fallback : this.props.children;\n  }\n}",
+    "testCases": [
+      {
+        "description": "Renders its children when nothing throws",
+        "input": "<SimpleErrorBoundary fallback={<p>oops</p>}><p>fine</p></...>",
+        "expected": "'fine'"
+      },
+      {
+        "description": "Shows the fallback when a child throws",
+        "input": "a child component throws while rendering",
+        "expected": "'oops' is rendered instead"
+      },
+      {
+        "description": "An error in one boundary does not affect a sibling boundary",
+        "input": "two boundaries side by side, only the first child throws",
+        "expected": "first shows 'failed', second shows 'healthy'"
+      },
+      {
+        "description": "onError is called once with the error",
+        "input": "child throws Error('kaput'); onError={fn}",
+        "expected": "fn called once with the 'kaput' error"
+      }
+    ],
+    "testHarness": "const { render, q, qa } = $dom;\nfunction Bomb({ message = 'boom' }) {\n  throw new Error(message);\n}\n{\n  const r = render(<SimpleErrorBoundary fallback={<p>oops</p>}><p id=\"ok\">fine</p></SimpleErrorBoundary>);\n  $test.check('Renders its children when nothing throws', q('#ok', r.container) !== null && r.container.textContent === 'fine', r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<SimpleErrorBoundary fallback={<p id=\"fb\">oops</p>}><Bomb /></SimpleErrorBoundary>);\n  $test.check('Shows the fallback when a child throws', q('#fb', r.container) !== null && r.container.textContent === 'oops', r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(\n    <div>\n      <section id=\"one\"><SimpleErrorBoundary fallback={<p>failed</p>}><Bomb /></SimpleErrorBoundary></section>\n      <section id=\"two\"><SimpleErrorBoundary fallback={<p>failed</p>}><p>healthy</p></SimpleErrorBoundary></section>\n    </div>\n  );\n  $test.check('An error in one boundary does not affect a sibling boundary', q('#one', r.container).textContent === 'failed' && q('#two', r.container).textContent === 'healthy', r.container.innerHTML);\n  r.unmount();\n}\n{\n  const seen = [];\n  const r = render(<SimpleErrorBoundary fallback={<p>x</p>} onError={(e) => seen.push(e.message)}><Bomb message=\"kaput\" /></SimpleErrorBoundary>);\n  $test.check('onError is called once with the error', seen.join() === 'kaput', seen);\n  r.unmount();\n}"
+  },
+  {
+    "id": "use-toggle-counter",
+    "track": "react",
+    "title": "useToggle and useCounter",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "hooks",
+      "state",
+      "useCallback",
+      "basics"
+    ],
+    "promptSeed": "Write useToggle(initial = false) returning [value, toggle, setValue]: toggle() flips the value (it must ignore any arguments, e.g. a click event) and has a stable identity across renders. Write useCounter({ initial = 0, min = -Infinity, max = Infinity, step = 1 } = {}) returning { count, increment, decrement, reset, set }: increment/decrement move by `step`, everything is clamped to [min, max] (including the initial value and set(n)), reset returns to the (clamped) initial value, and the functions keep a stable identity while their options do not change.",
+    "difficulty": 1,
+    "concept": "react-hooks-utility",
+    "referenceSolution": "function useToggle(initial = false) {\n  const [value, setValue] = useState(initial);\n  const toggle = useCallback(() => setValue((v) => !v), []);\n  return [value, toggle, setValue];\n}\n\nfunction useCounter({ initial = 0, min = -Infinity, max = Infinity, step = 1 } = {}) {\n  const clamp = useCallback((n) => Math.min(max, Math.max(min, n)), [min, max]);\n  const [count, setCount] = useState(() => clamp(initial));\n  const increment = useCallback(() => setCount((c) => clamp(c + step)), [clamp, step]);\n  const decrement = useCallback(() => setCount((c) => clamp(c - step)), [clamp, step]);\n  const reset = useCallback(() => setCount(clamp(initial)), [clamp, initial]);\n  const set = useCallback((n) => setCount(clamp(n)), [clamp]);\n  return { count, increment, decrement, reset, set };\n}",
+    "solution": "function useToggle(initial = false) {\n  const [value, setValue] = useState(initial);\n  const toggle = useCallback(() => setValue((v) => !v), []);\n  return [value, toggle, setValue];\n}\n\nfunction useCounter({ initial = 0, min = -Infinity, max = Infinity, step = 1 } = {}) {\n  const clamp = useCallback((n) => Math.min(max, Math.max(min, n)), [min, max]);\n  const [count, setCount] = useState(() => clamp(initial));\n  const increment = useCallback(() => setCount((c) => clamp(c + step)), [clamp, step]);\n  const decrement = useCallback(() => setCount((c) => clamp(c - step)), [clamp, step]);\n  const reset = useCallback(() => setCount(clamp(initial)), [clamp, initial]);\n  const set = useCallback((n) => setCount(clamp(n)), [clamp]);\n  return { count, increment, decrement, reset, set };\n}",
+    "starterCode": "function useToggle(initial = false) {\n  const [value, setValue] = useState(initial);\n  const toggle = useCallback(() => setValue((v) => !v), []);\n  return [value, toggle, setValue];\n}\n\nfunction useCounter({ initial = 0, min = -Infinity, max = Infinity, step = 1 } = {}) {\n  const clamp = useCallback((n) => Math.min(max, Math.max(min, n)), [min, max]);\n  const [count, setCount] = useState(() => clamp(initial));\n  const increment = useCallback(() => setCount((c) => clamp(c + step)), [clamp, step]);\n  const decrement = useCallback(() => setCount((c) => clamp(c - step)), [clamp, step]);\n  const reset = useCallback(() => setCount(clamp(initial)), [clamp, initial]);\n  const set = useCallback((n) => setCount(clamp(n)), [clamp]);\n  return { count, increment, decrement, reset, set };\n}",
+    "testCases": [
+      {
+        "description": "useToggle starts with the initial value (default false)",
+        "input": "useToggle()",
+        "expected": "value === false"
+      },
+      {
+        "description": "useToggle accepts an initial value",
+        "input": "useToggle(true)",
+        "expected": "value === true"
+      },
+      {
+        "description": "toggle flips the value, ignores its arguments and keeps a stable identity",
+        "input": "toggle({ type: 'click' }), then toggle()",
+        "expected": "true, then false; the same toggle function on every render"
+      },
+      {
+        "description": "setValue sets the value explicitly",
+        "input": "setValue(true) twice",
+        "expected": "true both times"
+      },
+      {
+        "description": "useCounter increments, decrements and resets",
+        "input": "useCounter({ initial: 5 }): increment, increment, decrement, reset",
+        "expected": "count 6, then 5 after reset"
+      },
+      {
+        "description": "useCounter respects step, min and max (including the initial value)",
+        "input": "useCounter({ step: 5, min: 0, max: 12 }): 3x increment, decrement, set(-50); useCounter({ initial: 99, max: 10 })",
+        "expected": "count 12, then 0; initial count 10"
+      },
+      {
+        "description": "useCounter functions keep a stable identity",
+        "input": "useCounter({ initial: 1, step: 2 }), increment once, compare functions",
+        "expected": "increment, decrement, reset, set are unchanged"
+      }
+    ],
+    "testHarness": "const { renderHook, act } = $dom;\n{\n  const h = renderHook(() => useToggle());\n  $test.check('useToggle starts with the initial value (default false)', h.result.current[0] === false, h.result.current[0]);\n  h.unmount();\n  const h2 = renderHook(() => useToggle(true));\n  $test.check('useToggle accepts an initial value', h2.result.current[0] === true, h2.result.current[0]);\n  h2.unmount();\n}\n{\n  const h = renderHook(() => useToggle());\n  const first = h.result.current[1];\n  act(() => h.result.current[1]({ type: 'click' }));\n  const afterOne = h.result.current[0];\n  act(() => h.result.current[1]());\n  $test.check('toggle flips the value, ignores its arguments and keeps a stable identity', afterOne === true && h.result.current[0] === false && h.result.current[1] === first, { afterOne, now: h.result.current[0] });\n  h.unmount();\n}\n{\n  const h = renderHook(() => useToggle());\n  act(() => h.result.current[2](true));\n  const on = h.result.current[0];\n  act(() => h.result.current[2](true));\n  $test.check('setValue sets the value explicitly', on === true && h.result.current[0] === true, h.result.current[0]);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useCounter({ initial: 5 }));\n  act(() => h.result.current.increment());\n  act(() => h.result.current.increment());\n  act(() => h.result.current.decrement());\n  const mid = h.result.current.count;\n  act(() => h.result.current.reset());\n  $test.check('useCounter increments, decrements and resets', mid === 6 && h.result.current.count === 5, { mid, end: h.result.current.count });\n  h.unmount();\n}\n{\n  const h = renderHook(() => useCounter({ initial: 0, step: 5, min: 0, max: 12 }));\n  act(() => { h.result.current.increment(); h.result.current.increment(); h.result.current.increment(); });\n  const top = h.result.current.count;\n  act(() => { h.result.current.decrement(); h.result.current.set(-50); });\n  const bottom = h.result.current.count;\n  const clampedInitial = renderHook(() => useCounter({ initial: 99, max: 10 }));\n  $test.check('useCounter respects step, min and max (including the initial value)', top === 12 && bottom === 0 && clampedInitial.result.current.count === 10, { top, bottom, initial: clampedInitial.result.current.count });\n  clampedInitial.unmount();\n  h.unmount();\n}\n{\n  const h = renderHook(() => useCounter({ initial: 1, step: 2 }));\n  const a = h.result.current;\n  act(() => h.result.current.increment());\n  const b = h.result.current;\n  $test.check('useCounter functions keep a stable identity', a.increment === b.increment && a.decrement === b.decrement && a.reset === b.reset && a.set === b.set, 'identities changed');\n  h.unmount();\n}"
+  },
+  {
+    "id": "data-table",
+    "track": "react-components",
+    "title": "Data Table: Sort, Filter, Paginate",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "table",
+      "sorting",
+      "pagination"
+    ],
+    "promptSeed": "Build DataTable({ rows, columns, pageSize = 5 }) with columns [{ key, label }]. Each <th> holds a <button> with the label and carries aria-sort (\"none\" | \"ascending\" | \"descending\"). Clicking a header cycles that column none → ascending → descending → none (sorting a different column starts at ascending); numbers sort numerically, everything else with localeCompare; sorting applies to ALL rows before pagination. <input aria-label=\"Filter\"> keeps rows where ANY column's text contains the query (case-insensitive) and returns to page 1. Pagination: <button>Previous</button>, <span>Page X of Y</span> (Y is at least 1) and <button>Next</button>, each disabled at its end. With no matching rows show one <td colSpan> cell 'No results'.",
+    "difficulty": 4,
+    "concept": "tables",
+    "referenceSolution": "function DataTable({ rows, columns, pageSize = 5 }) {\n  const [sort, setSort] = useState({ key: null, dir: 'none' });\n  const [filter, setFilter] = useState('');\n  const [page, setPage] = useState(1);\n\n  const visible = useMemo(() => {\n    const q = filter.trim().toLowerCase();\n    let out = q ? rows.filter((row) => columns.some((c) => String(row[c.key]).toLowerCase().includes(q))) : rows;\n    if (sort.dir !== 'none') {\n      const factor = sort.dir === 'ascending' ? 1 : -1;\n      out = [...out].sort((a, b) => {\n        const x = a[sort.key];\n        const y = b[sort.key];\n        const cmp = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y));\n        return cmp * factor;\n      });\n    }\n    return out;\n  }, [rows, columns, filter, sort]);\n\n  const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));\n  const current = Math.min(page, totalPages);\n  const pageRows = visible.slice((current - 1) * pageSize, current * pageSize);\n\n  const toggleSort = (key) =>\n    setSort((s) => {\n      if (s.key !== key) return { key, dir: 'ascending' };\n      const dir = s.dir === 'none' ? 'ascending' : s.dir === 'ascending' ? 'descending' : 'none';\n      return { key, dir };\n    });\n\n  return (\n    <div>\n      <input\n        aria-label=\"Filter\"\n        value={filter}\n        onChange={(e) => {\n          setFilter(e.target.value);\n          setPage(1);\n        }}\n      />\n      <table>\n        <thead>\n          <tr>\n            {columns.map((c) => (\n              <th key={c.key} aria-sort={sort.key === c.key ? sort.dir : 'none'}>\n                <button onClick={() => toggleSort(c.key)}>{c.label}</button>\n              </th>\n            ))}\n          </tr>\n        </thead>\n        <tbody>\n          {pageRows.length === 0 ? (\n            <tr>\n              <td colSpan={columns.length}>No results</td>\n            </tr>\n          ) : (\n            pageRows.map((row, i) => (\n              <tr key={i}>\n                {columns.map((c) => (\n                  <td key={c.key}>{String(row[c.key])}</td>\n                ))}\n              </tr>\n            ))\n          )}\n        </tbody>\n      </table>\n      <button disabled={current <= 1} onClick={() => setPage(current - 1)}>\n        Previous\n      </button>\n      <span>\n        Page {current} of {totalPages}\n      </span>\n      <button disabled={current >= totalPages} onClick={() => setPage(current + 1)}>\n        Next\n      </button>\n    </div>\n  );\n}",
+    "solution": "function DataTable({ rows, columns, pageSize = 5 }) {\n  const [sort, setSort] = useState({ key: null, dir: 'none' });\n  const [filter, setFilter] = useState('');\n  const [page, setPage] = useState(1);\n\n  const visible = useMemo(() => {\n    const q = filter.trim().toLowerCase();\n    let out = q ? rows.filter((row) => columns.some((c) => String(row[c.key]).toLowerCase().includes(q))) : rows;\n    if (sort.dir !== 'none') {\n      const factor = sort.dir === 'ascending' ? 1 : -1;\n      out = [...out].sort((a, b) => {\n        const x = a[sort.key];\n        const y = b[sort.key];\n        const cmp = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y));\n        return cmp * factor;\n      });\n    }\n    return out;\n  }, [rows, columns, filter, sort]);\n\n  const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));\n  const current = Math.min(page, totalPages);\n  const pageRows = visible.slice((current - 1) * pageSize, current * pageSize);\n\n  const toggleSort = (key) =>\n    setSort((s) => {\n      if (s.key !== key) return { key, dir: 'ascending' };\n      const dir = s.dir === 'none' ? 'ascending' : s.dir === 'ascending' ? 'descending' : 'none';\n      return { key, dir };\n    });\n\n  return (\n    <div>\n      <input\n        aria-label=\"Filter\"\n        value={filter}\n        onChange={(e) => {\n          setFilter(e.target.value);\n          setPage(1);\n        }}\n      />\n      <table>\n        <thead>\n          <tr>\n            {columns.map((c) => (\n              <th key={c.key} aria-sort={sort.key === c.key ? sort.dir : 'none'}>\n                <button onClick={() => toggleSort(c.key)}>{c.label}</button>\n              </th>\n            ))}\n          </tr>\n        </thead>\n        <tbody>\n          {pageRows.length === 0 ? (\n            <tr>\n              <td colSpan={columns.length}>No results</td>\n            </tr>\n          ) : (\n            pageRows.map((row, i) => (\n              <tr key={i}>\n                {columns.map((c) => (\n                  <td key={c.key}>{String(row[c.key])}</td>\n                ))}\n              </tr>\n            ))\n          )}\n        </tbody>\n      </table>\n      <button disabled={current <= 1} onClick={() => setPage(current - 1)}>\n        Previous\n      </button>\n      <span>\n        Page {current} of {totalPages}\n      </span>\n      <button disabled={current >= totalPages} onClick={() => setPage(current + 1)}>\n        Next\n      </button>\n    </div>\n  );\n}",
+    "starterCode": "function DataTable({ rows, columns, pageSize = 5 }) {\n  const [sort, setSort] = useState({ key: null, dir: 'none' });\n  const [filter, setFilter] = useState('');\n  const [page, setPage] = useState(1);\n\n  const visible = useMemo(() => {\n    const q = filter.trim().toLowerCase();\n    let out = q ? rows.filter((row) => columns.some((c) => String(row[c.key]).toLowerCase().includes(q))) : rows;\n    if (sort.dir !== 'none') {\n      const factor = sort.dir === 'ascending' ? 1 : -1;\n      out = [...out].sort((a, b) => {\n        const x = a[sort.key];\n        const y = b[sort.key];\n        const cmp = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y));\n        return cmp * factor;\n      });\n    }\n    return out;\n  }, [rows, columns, filter, sort]);\n\n  const totalPages = Math.max(1, Math.ceil(visible.length / pageSize));\n  const current = Math.min(page, totalPages);\n  const pageRows = visible.slice((current - 1) * pageSize, current * pageSize);\n\n  const toggleSort = (key) =>\n    setSort((s) => {\n      if (s.key !== key) return { key, dir: 'ascending' };\n      const dir = s.dir === 'none' ? 'ascending' : s.dir === 'ascending' ? 'descending' : 'none';\n      return { key, dir };\n    });\n\n  return (\n    <div>\n      <input\n        aria-label=\"Filter\"\n        value={filter}\n        onChange={(e) => {\n          setFilter(e.target.value);\n          setPage(1);\n        }}\n      />\n      <table>\n        <thead>\n          <tr>\n            {columns.map((c) => (\n              <th key={c.key} aria-sort={sort.key === c.key ? sort.dir : 'none'}>\n                <button onClick={() => toggleSort(c.key)}>{c.label}</button>\n              </th>\n            ))}\n          </tr>\n        </thead>\n        <tbody>\n          {pageRows.length === 0 ? (\n            <tr>\n              <td colSpan={columns.length}>No results</td>\n            </tr>\n          ) : (\n            pageRows.map((row, i) => (\n              <tr key={i}>\n                {columns.map((c) => (\n                  <td key={c.key}>{String(row[c.key])}</td>\n                ))}\n              </tr>\n            ))\n          )}\n        </tbody>\n      </table>\n      <button disabled={current <= 1} onClick={() => setPage(current - 1)}>\n        Previous\n      </button>\n      <span>\n        Page {current} of {totalPages}\n      </span>\n      <button disabled={current >= totalPages} onClick={() => setPage(current + 1)}>\n        Next\n      </button>\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders a header per column and the first page of rows",
+        "input": "rows: Ada 36, Grace 45, Linus 10, Alan 41, Margaret 9, Dennis 70, Barbara 33; pageSize 3",
+        "expected": "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"
+      },
+      {
+        "description": "Clicking a header sorts ascending, then descending, then restores the original order",
+        "input": "click 'Name' three times",
+        "expected": "Ada,Alan,Barbara (ascending) → Margaret,Linus,Grace (descending) → Ada,Grace,Linus (none)"
+      },
+      {
+        "description": "Numbers sort numerically (9 before 10) and other columns reset to none",
+        "input": "click 'Age'",
+        "expected": "Margaret (9), Linus (10), Barbara (33); Name aria-sort='none', Age 'ascending'"
+      },
+      {
+        "description": "Filter matches any column, case-insensitively",
+        "input": "type 'ALAN', then '4'",
+        "expected": "'Alan'; then 'Grace, Alan' (ages 45 and 41)"
+      },
+      {
+        "description": "No matches shows \"No results\" and Page 1 of 1",
+        "input": "type 'zzz'",
+        "expected": "one row with <td colSpan=2>No results</td>; 'Page 1 of 1'"
+      },
+      {
+        "description": "Pagination: Next / Previous move between pages and are disabled at the ends",
+        "input": "click 'Next' twice",
+        "expected": "Previous disabled on page 1; page 2 = Alan, Margaret, Dennis ('Page 2 of 3'); page 3 = Barbara with Next disabled"
+      },
+      {
+        "description": "Filtering returns to page 1",
+        "input": "go to page 2, then type '4'",
+        "expected": "'Page 1 of 1' showing Grace, Alan"
+      },
+      {
+        "description": "Sorting applies across all pages, not just the visible one",
+        "input": "click 'Age' twice (descending), then 'Next'",
+        "expected": "page 2 shows Ada, Barbara, Linus (36, 33, 10)"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst COLUMNS = [{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }];\nconst ROWS = [\n  { name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }, { name: 'Linus', age: 10 }, { name: 'Alan', age: 41 },\n  { name: 'Margaret', age: 9 }, { name: 'Dennis', age: 70 }, { name: 'Barbara', age: 33 },\n];\nconst setup = () => render(<DataTable rows={ROWS} columns={COLUMNS} pageSize={3} />);\nconst names = (c) => qa('tbody tr', c).map((tr) => tr.querySelector('td').textContent).join();\nconst btn = (c, text) => qa('button', c).find((b) => b.textContent === text);\nconst label = (c) => q('span', c).textContent;\nconst sortOf = (c, i) => qa('th', c)[i].getAttribute('aria-sort');\n{\n  const r = setup();\n  $test.check('Renders a header per column and the first page of rows', qa('th', r.container).map((th) => th.textContent).join() === 'Name,Age' && names(r.container) === 'Ada,Grace,Linus' && label(r.container) === 'Page 1 of 3', { names: names(r.container), label: label(r.container) });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(btn(r.container, 'Name'));\n  const asc = names(r.container) + '|' + sortOf(r.container, 0);\n  fire.click(btn(r.container, 'Name'));\n  const desc = names(r.container) + '|' + sortOf(r.container, 0);\n  fire.click(btn(r.container, 'Name'));\n  const none = names(r.container) + '|' + sortOf(r.container, 0);\n  $test.check('Clicking a header sorts ascending, then descending, then restores the original order', asc === 'Ada,Alan,Barbara|ascending' && desc === 'Margaret,Linus,Grace|descending' && none === 'Ada,Grace,Linus|none', { asc, desc, none });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(btn(r.container, 'Age'));\n  $test.check('Numbers sort numerically (9 before 10) and other columns reset to none', names(r.container) === 'Margaret,Linus,Barbara' && sortOf(r.container, 0) === 'none' && sortOf(r.container, 1) === 'ascending', { names: names(r.container) });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.change(q('input', r.container), 'ALAN');\n  const byName = names(r.container);\n  fire.change(q('input', r.container), '4');\n  $test.check('Filter matches any column, case-insensitively', byName === 'Alan' && names(r.container) === 'Grace,Alan', { byName, byAge: names(r.container) });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.change(q('input', r.container), 'zzz');\n  const td = q('tbody td', r.container);\n  $test.check('No matches shows \"No results\" and Page 1 of 1', qa('tbody tr', r.container).length === 1 && td.textContent === 'No results' && td.colSpan === 2 && label(r.container) === 'Page 1 of 1', { label: label(r.container) });\n  r.unmount();\n}\n{\n  const r = setup();\n  const prevDisabled = btn(r.container, 'Previous').disabled;\n  fire.click(btn(r.container, 'Next'));\n  const page2 = names(r.container) + '|' + label(r.container);\n  fire.click(btn(r.container, 'Next'));\n  $test.check('Pagination: Next / Previous move between pages and are disabled at the ends', prevDisabled && page2 === 'Alan,Margaret,Dennis|Page 2 of 3' && names(r.container) === 'Barbara' && btn(r.container, 'Next').disabled && !btn(r.container, 'Previous').disabled, { page2, last: names(r.container) });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(btn(r.container, 'Next'));\n  fire.change(q('input', r.container), '4');\n  $test.check('Filtering returns to page 1', label(r.container) === 'Page 1 of 1' && names(r.container) === 'Grace,Alan', { label: label(r.container) });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(btn(r.container, 'Age'));\n  fire.click(btn(r.container, 'Age')); // descending: 70, 45, 41 | 36, 33, 10 | 9\n  fire.click(btn(r.container, 'Next'));\n  $test.check('Sorting applies across all pages, not just the visible one', names(r.container) === 'Ada,Barbara,Linus', names(r.container));\n  r.unmount();\n}"
+  },
+  {
+    "id": "dropdown-menu",
+    "track": "react-components",
+    "title": "Accessible Dropdown Menu",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "keyboard",
+      "focus-management"
+    ],
+    "promptSeed": "Build DropdownMenu({ label, items, onSelect }) with items [{ id, label, disabled? }]. A trigger <button aria-haspopup=\"menu\" aria-expanded> shows `label` and toggles the menu. While open render <ul role=\"menu\"> with <li role=\"menuitem\" tabIndex={-1}> items (disabled ones get aria-disabled=\"true\"). Opening focuses the first ENABLED item. ArrowDown/ArrowUp move focus between enabled items and wrap; Home/End jump to the first/last enabled item; Enter or Space on an item selects it. Selecting (by click or key) calls onSelect(id), closes the menu and returns focus to the trigger; disabled items cannot be selected. Escape closes the menu and returns focus to the trigger; a mousedown outside the component closes it; Tab closes it.",
+    "difficulty": 4,
+    "concept": "a11y-components",
+    "referenceSolution": "function DropdownMenu({ label, items, onSelect }) {\n  const [open, setOpen] = useState(false);\n  const rootRef = useRef(null);\n  const triggerRef = useRef(null);\n  const menuRef = useRef(null);\n\n  const enabledItems = () => [...menuRef.current.querySelectorAll('[role=\"menuitem\"]:not([aria-disabled=\"true\"])')];\n\n  useEffect(() => {\n    if (open) enabledItems()[0]?.focus();\n  }, [open]);\n\n  useEffect(() => {\n    if (!open) return;\n    const onMouseDown = (e) => {\n      if (!rootRef.current.contains(e.target)) setOpen(false);\n    };\n    document.addEventListener('mousedown', onMouseDown);\n    return () => document.removeEventListener('mousedown', onMouseDown);\n  }, [open]);\n\n  const close = (refocus) => {\n    setOpen(false);\n    if (refocus) triggerRef.current.focus();\n  };\n\n  const choose = (item) => {\n    if (item.disabled) return;\n    if (onSelect) onSelect(item.id);\n    close(true);\n  };\n\n  const onMenuKeyDown = (e) => {\n    const els = enabledItems();\n    const index = els.indexOf(document.activeElement);\n    const focusAt = (n) => {\n      e.preventDefault();\n      els[(n + els.length) % els.length]?.focus();\n    };\n    if (e.key === 'ArrowDown') focusAt(index + 1);\n    else if (e.key === 'ArrowUp') focusAt(index - 1);\n    else if (e.key === 'Home') focusAt(0);\n    else if (e.key === 'End') focusAt(els.length - 1);\n    else if (e.key === 'Escape') {\n      e.preventDefault();\n      close(true);\n    } else if (e.key === 'Tab') setOpen(false);\n  };\n\n  return (\n    <div ref={rootRef}>\n      <button ref={triggerRef} aria-haspopup=\"menu\" aria-expanded={open} onClick={() => setOpen((o) => !o)}>\n        {label}\n      </button>\n      {open && (\n        <ul role=\"menu\" ref={menuRef} onKeyDown={onMenuKeyDown}>\n          {items.map((item) => (\n            <li\n              key={item.id}\n              role=\"menuitem\"\n              tabIndex={-1}\n              aria-disabled={item.disabled ? 'true' : undefined}\n              onClick={() => choose(item)}\n              onKeyDown={(e) => {\n                if (e.key === 'Enter' || e.key === ' ') {\n                  e.preventDefault();\n                  choose(item);\n                }\n              }}\n            >\n              {item.label}\n            </li>\n          ))}\n        </ul>\n      )}\n    </div>\n  );\n}",
+    "solution": "function DropdownMenu({ label, items, onSelect }) {\n  const [open, setOpen] = useState(false);\n  const rootRef = useRef(null);\n  const triggerRef = useRef(null);\n  const menuRef = useRef(null);\n\n  const enabledItems = () => [...menuRef.current.querySelectorAll('[role=\"menuitem\"]:not([aria-disabled=\"true\"])')];\n\n  useEffect(() => {\n    if (open) enabledItems()[0]?.focus();\n  }, [open]);\n\n  useEffect(() => {\n    if (!open) return;\n    const onMouseDown = (e) => {\n      if (!rootRef.current.contains(e.target)) setOpen(false);\n    };\n    document.addEventListener('mousedown', onMouseDown);\n    return () => document.removeEventListener('mousedown', onMouseDown);\n  }, [open]);\n\n  const close = (refocus) => {\n    setOpen(false);\n    if (refocus) triggerRef.current.focus();\n  };\n\n  const choose = (item) => {\n    if (item.disabled) return;\n    if (onSelect) onSelect(item.id);\n    close(true);\n  };\n\n  const onMenuKeyDown = (e) => {\n    const els = enabledItems();\n    const index = els.indexOf(document.activeElement);\n    const focusAt = (n) => {\n      e.preventDefault();\n      els[(n + els.length) % els.length]?.focus();\n    };\n    if (e.key === 'ArrowDown') focusAt(index + 1);\n    else if (e.key === 'ArrowUp') focusAt(index - 1);\n    else if (e.key === 'Home') focusAt(0);\n    else if (e.key === 'End') focusAt(els.length - 1);\n    else if (e.key === 'Escape') {\n      e.preventDefault();\n      close(true);\n    } else if (e.key === 'Tab') setOpen(false);\n  };\n\n  return (\n    <div ref={rootRef}>\n      <button ref={triggerRef} aria-haspopup=\"menu\" aria-expanded={open} onClick={() => setOpen((o) => !o)}>\n        {label}\n      </button>\n      {open && (\n        <ul role=\"menu\" ref={menuRef} onKeyDown={onMenuKeyDown}>\n          {items.map((item) => (\n            <li\n              key={item.id}\n              role=\"menuitem\"\n              tabIndex={-1}\n              aria-disabled={item.disabled ? 'true' : undefined}\n              onClick={() => choose(item)}\n              onKeyDown={(e) => {\n                if (e.key === 'Enter' || e.key === ' ') {\n                  e.preventDefault();\n                  choose(item);\n                }\n              }}\n            >\n              {item.label}\n            </li>\n          ))}\n        </ul>\n      )}\n    </div>\n  );\n}",
+    "starterCode": "function DropdownMenu({ label, items, onSelect }) {\n  const [open, setOpen] = useState(false);\n  const rootRef = useRef(null);\n  const triggerRef = useRef(null);\n  const menuRef = useRef(null);\n\n  const enabledItems = () => [...menuRef.current.querySelectorAll('[role=\"menuitem\"]:not([aria-disabled=\"true\"])')];\n\n  useEffect(() => {\n    if (open) enabledItems()[0]?.focus();\n  }, [open]);\n\n  useEffect(() => {\n    if (!open) return;\n    const onMouseDown = (e) => {\n      if (!rootRef.current.contains(e.target)) setOpen(false);\n    };\n    document.addEventListener('mousedown', onMouseDown);\n    return () => document.removeEventListener('mousedown', onMouseDown);\n  }, [open]);\n\n  const close = (refocus) => {\n    setOpen(false);\n    if (refocus) triggerRef.current.focus();\n  };\n\n  const choose = (item) => {\n    if (item.disabled) return;\n    if (onSelect) onSelect(item.id);\n    close(true);\n  };\n\n  const onMenuKeyDown = (e) => {\n    const els = enabledItems();\n    const index = els.indexOf(document.activeElement);\n    const focusAt = (n) => {\n      e.preventDefault();\n      els[(n + els.length) % els.length]?.focus();\n    };\n    if (e.key === 'ArrowDown') focusAt(index + 1);\n    else if (e.key === 'ArrowUp') focusAt(index - 1);\n    else if (e.key === 'Home') focusAt(0);\n    else if (e.key === 'End') focusAt(els.length - 1);\n    else if (e.key === 'Escape') {\n      e.preventDefault();\n      close(true);\n    } else if (e.key === 'Tab') setOpen(false);\n  };\n\n  return (\n    <div ref={rootRef}>\n      <button ref={triggerRef} aria-haspopup=\"menu\" aria-expanded={open} onClick={() => setOpen((o) => !o)}>\n        {label}\n      </button>\n      {open && (\n        <ul role=\"menu\" ref={menuRef} onKeyDown={onMenuKeyDown}>\n          {items.map((item) => (\n            <li\n              key={item.id}\n              role=\"menuitem\"\n              tabIndex={-1}\n              aria-disabled={item.disabled ? 'true' : undefined}\n              onClick={() => choose(item)}\n              onKeyDown={(e) => {\n                if (e.key === 'Enter' || e.key === ' ') {\n                  e.preventDefault();\n                  choose(item);\n                }\n              }}\n            >\n              {item.label}\n            </li>\n          ))}\n        </ul>\n      )}\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Closed by default: the trigger has aria-haspopup and aria-expanded=false",
+        "input": "<DropdownMenu label='Actions' items={[Edit, Copy, Delete (disabled), Share]} />",
+        "expected": "no role='menu'; aria-haspopup='menu'; aria-expanded='false'"
+      },
+      {
+        "description": "Clicking the trigger opens the menu (aria-expanded=true, four items)",
+        "input": "click 'Actions'",
+        "expected": "role='menu' with 4 menuitems; aria-expanded='true'"
+      },
+      {
+        "description": "Opening focuses the first enabled item",
+        "input": "click 'Actions'",
+        "expected": "document.activeElement is 'Edit'"
+      },
+      {
+        "description": "ArrowDown/ArrowUp move between enabled items, skip disabled ones and wrap",
+        "input": "open, then ArrowDown ×3, ArrowUp",
+        "expected": "focus: Edit → Copy → Share → Edit → Share (Delete is skipped)"
+      },
+      {
+        "description": "Home and End jump to the first and last enabled items",
+        "input": "open, End, then Home",
+        "expected": "focus 'Share', then 'Edit'"
+      },
+      {
+        "description": "Clicking an item calls onSelect, closes the menu and refocuses the trigger",
+        "input": "open, click 'Copy'",
+        "expected": "onSelect('copy'); menu gone; focus on the trigger"
+      },
+      {
+        "description": "Enter on a focused item selects it",
+        "input": "open, ArrowDown (Copy), Enter",
+        "expected": "onSelect('copy'); menu closed"
+      },
+      {
+        "description": "Escape closes the menu and refocuses the trigger",
+        "input": "open, Escape",
+        "expected": "menu gone; focus on the trigger"
+      },
+      {
+        "description": "A mousedown outside closes the menu",
+        "input": "open, mousedown on a button outside",
+        "expected": "menu gone"
+      },
+      {
+        "description": "Disabled items cannot be selected (the menu stays open)",
+        "input": "open, click 'Delete'",
+        "expected": "onSelect not called; menu still open; aria-disabled='true'"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst ITEMS = [\n  { id: 'edit', label: 'Edit' },\n  { id: 'copy', label: 'Copy' },\n  { id: 'del', label: 'Delete', disabled: true },\n  { id: 'share', label: 'Share' },\n];\nconst setup = (onSelect = () => {}) => render(<div><DropdownMenu label=\"Actions\" items={ITEMS} onSelect={onSelect} /><button id=\"outside\">outside</button></div>);\nconst trigger = (c) => qa('button', c).find((b) => b.textContent === 'Actions');\nconst items = (c) => qa('[role=\"menuitem\"]', c);\nconst focused = () => document.activeElement && document.activeElement.textContent;\nconst key = (k) => fire.keyDown(document.activeElement, k);\n{\n  const r = setup();\n  const t = trigger(r.container);\n  $test.check('Closed by default: the trigger has aria-haspopup and aria-expanded=false', q('[role=\"menu\"]', r.container) === null && t.getAttribute('aria-haspopup') === 'menu' && t.getAttribute('aria-expanded') === 'false', t.outerHTML);\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(trigger(r.container));\n  $test.check('Clicking the trigger opens the menu (aria-expanded=true, four items)', trigger(r.container).getAttribute('aria-expanded') === 'true' && q('[role=\"menu\"]', r.container) !== null && items(r.container).length === 4, items(r.container).length);\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(trigger(r.container));\n  $test.check('Opening focuses the first enabled item', focused() === 'Edit', focused());\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(trigger(r.container));\n  const seen = [focused()];\n  key('ArrowDown'); seen.push(focused());\n  key('ArrowDown'); seen.push(focused());\n  key('ArrowDown'); seen.push(focused());\n  key('ArrowUp'); seen.push(focused());\n  $test.check('ArrowDown/ArrowUp move between enabled items, skip disabled ones and wrap', seen.join() === 'Edit,Copy,Share,Edit,Share', seen);\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(trigger(r.container));\n  key('End');\n  const last = focused();\n  key('Home');\n  $test.check('Home and End jump to the first and last enabled items', last === 'Share' && focused() === 'Edit', { last, first: focused() });\n  r.unmount();\n}\n{\n  const picked = [];\n  const r = setup((id) => picked.push(id));\n  fire.click(trigger(r.container));\n  fire.click(items(r.container)[1]);\n  $test.check('Clicking an item calls onSelect, closes the menu and refocuses the trigger', picked.join() === 'copy' && q('[role=\"menu\"]', r.container) === null && document.activeElement === trigger(r.container), { picked, active: focused() });\n  r.unmount();\n}\n{\n  const picked = [];\n  const r = setup((id) => picked.push(id));\n  fire.click(trigger(r.container));\n  key('ArrowDown');\n  key('Enter');\n  $test.check('Enter on a focused item selects it', picked.join() === 'copy' && q('[role=\"menu\"]', r.container) === null, picked);\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(trigger(r.container));\n  key('Escape');\n  $test.check('Escape closes the menu and refocuses the trigger', q('[role=\"menu\"]', r.container) === null && document.activeElement === trigger(r.container), focused());\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(trigger(r.container));\n  fire.event(q('#outside', r.container), new MouseEvent('mousedown', { bubbles: true }));\n  $test.check('A mousedown outside closes the menu', q('[role=\"menu\"]', r.container) === null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  const picked = [];\n  const r = setup((id) => picked.push(id));\n  fire.click(trigger(r.container));\n  fire.click(items(r.container)[2]);\n  $test.check('Disabled items cannot be selected (the menu stays open)', picked.length === 0 && q('[role=\"menu\"]', r.container) !== null && items(r.container)[2].getAttribute('aria-disabled') === 'true', picked);\n  r.unmount();\n}"
+  },
+  {
+    "id": "form-state-hook",
+    "track": "react",
+    "title": "useForm: Values, Errors, Touched, Submit",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "forms",
+      "validation",
+      "async"
+    ],
+    "promptSeed": "Write useForm({ initialValues, validate = () => ({}), onSubmit }) returning { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset }. handleChange(e) reads e.target.{name, type, value, checked} and updates that field (checkboxes use `checked`). handleBlur(e) marks e.target.name touched. `errors` is validate(values) for the CURRENT values. handleSubmit(e) calls e.preventDefault(), marks EVERY field touched, and — only if validate returns no errors — awaits onSubmit(values) with isSubmitting true while it runs. reset() restores initialValues and clears touched.",
+    "difficulty": 3,
+    "concept": "react-forms",
+    "referenceSolution": "function useForm({ initialValues, validate = () => ({}), onSubmit }) {\n  const [values, setValues] = useState(initialValues);\n  const [touched, setTouched] = useState({});\n  const [isSubmitting, setIsSubmitting] = useState(false);\n\n  const errors = useMemo(() => validate(values), [validate, values]);\n\n  const handleChange = useCallback((e) => {\n    const { name, type, value, checked } = e.target;\n    setValues((v) => ({ ...v, [name]: type === 'checkbox' ? checked : value }));\n  }, []);\n\n  const handleBlur = useCallback((e) => {\n    const { name } = e.target;\n    setTouched((t) => ({ ...t, [name]: true }));\n  }, []);\n\n  const handleSubmit = async (e) => {\n    if (e && e.preventDefault) e.preventDefault();\n    setTouched(Object.fromEntries(Object.keys(values).map((key) => [key, true])));\n    if (Object.keys(validate(values)).length > 0) return;\n    setIsSubmitting(true);\n    try {\n      if (onSubmit) await onSubmit(values);\n    } finally {\n      setIsSubmitting(false);\n    }\n  };\n\n  const reset = useCallback(() => {\n    setValues(initialValues);\n    setTouched({});\n  }, [initialValues]);\n\n  return { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset };\n}",
+    "solution": "function useForm({ initialValues, validate = () => ({}), onSubmit }) {\n  const [values, setValues] = useState(initialValues);\n  const [touched, setTouched] = useState({});\n  const [isSubmitting, setIsSubmitting] = useState(false);\n\n  const errors = useMemo(() => validate(values), [validate, values]);\n\n  const handleChange = useCallback((e) => {\n    const { name, type, value, checked } = e.target;\n    setValues((v) => ({ ...v, [name]: type === 'checkbox' ? checked : value }));\n  }, []);\n\n  const handleBlur = useCallback((e) => {\n    const { name } = e.target;\n    setTouched((t) => ({ ...t, [name]: true }));\n  }, []);\n\n  const handleSubmit = async (e) => {\n    if (e && e.preventDefault) e.preventDefault();\n    setTouched(Object.fromEntries(Object.keys(values).map((key) => [key, true])));\n    if (Object.keys(validate(values)).length > 0) return;\n    setIsSubmitting(true);\n    try {\n      if (onSubmit) await onSubmit(values);\n    } finally {\n      setIsSubmitting(false);\n    }\n  };\n\n  const reset = useCallback(() => {\n    setValues(initialValues);\n    setTouched({});\n  }, [initialValues]);\n\n  return { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset };\n}",
+    "starterCode": "function useForm({ initialValues, validate = () => ({}), onSubmit }) {\n  const [values, setValues] = useState(initialValues);\n  const [touched, setTouched] = useState({});\n  const [isSubmitting, setIsSubmitting] = useState(false);\n\n  const errors = useMemo(() => validate(values), [validate, values]);\n\n  const handleChange = useCallback((e) => {\n    const { name, type, value, checked } = e.target;\n    setValues((v) => ({ ...v, [name]: type === 'checkbox' ? checked : value }));\n  }, []);\n\n  const handleBlur = useCallback((e) => {\n    const { name } = e.target;\n    setTouched((t) => ({ ...t, [name]: true }));\n  }, []);\n\n  const handleSubmit = async (e) => {\n    if (e && e.preventDefault) e.preventDefault();\n    setTouched(Object.fromEntries(Object.keys(values).map((key) => [key, true])));\n    if (Object.keys(validate(values)).length > 0) return;\n    setIsSubmitting(true);\n    try {\n      if (onSubmit) await onSubmit(values);\n    } finally {\n      setIsSubmitting(false);\n    }\n  };\n\n  const reset = useCallback(() => {\n    setValues(initialValues);\n    setTouched({});\n  }, [initialValues]);\n\n  return { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset };\n}",
+    "testCases": [
+      {
+        "description": "Starts with the initial values and no touched fields",
+        "input": "useForm({ initialValues: { email: '', agree: false } })",
+        "expected": "values.email ''; touched {}; isSubmitting false"
+      },
+      {
+        "description": "handleChange updates the named field",
+        "input": "handleChange({ target: { name: 'email', value: 'a@b.co' } })",
+        "expected": "values.email 'a@b.co'; agree stays false"
+      },
+      {
+        "description": "Checkbox inputs use checked instead of value",
+        "input": "handleChange({ target: { name: 'agree', type: 'checkbox', checked: true } })",
+        "expected": "values.agree === true"
+      },
+      {
+        "description": "errors come from validate(values) for the current values",
+        "input": "email '' then 'ada@example.com'",
+        "expected": "errors.email 'Invalid email', then undefined"
+      },
+      {
+        "description": "handleBlur marks only that field touched",
+        "input": "handleBlur({ target: { name: 'email' } })",
+        "expected": "touched.email true; touched.agree undefined"
+      },
+      {
+        "description": "handleSubmit prevents default, touches every field and does not submit invalid values",
+        "input": "handleSubmit({ preventDefault }) with an invalid email",
+        "expected": "preventDefault called once; onSubmit not called; touched.email and touched.agree true"
+      },
+      {
+        "description": "handleSubmit calls onSubmit with the values and isSubmitting is true while it runs",
+        "input": "valid values; onSubmit returns a pending promise",
+        "expected": "isSubmitting true until it resolves, then false; onSubmit called once with the values"
+      },
+      {
+        "description": "reset restores the initial values and clears touched",
+        "input": "change + blur email, then reset()",
+        "expected": "values.email ''; touched {}"
+      }
+    ],
+    "testHarness": "const { renderHook, act } = $dom;\nconst INITIAL = { email: '', agree: false };\nconst validate = (v) => {\n  const errors = {};\n  if (!/^\\S+@\\S+$/.test(v.email)) errors.email = 'Invalid email';\n  return errors;\n};\nconst evt = (name, value, extra = {}) => ({ target: { name, value, ...extra } });\n{\n  const h = renderHook(() => useForm({ initialValues: INITIAL, validate }));\n  $test.check('Starts with the initial values and no touched fields', h.result.current.values.email === '' && Object.keys(h.result.current.touched).length === 0 && h.result.current.isSubmitting === false, h.result.current);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useForm({ initialValues: INITIAL, validate }));\n  act(() => h.result.current.handleChange(evt('email', 'a@b.co')));\n  $test.check('handleChange updates the named field', h.result.current.values.email === 'a@b.co' && h.result.current.values.agree === false, h.result.current.values);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useForm({ initialValues: INITIAL, validate }));\n  act(() => h.result.current.handleChange(evt('agree', 'on', { type: 'checkbox', checked: true })));\n  $test.check('Checkbox inputs use checked instead of value', h.result.current.values.agree === true, h.result.current.values);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useForm({ initialValues: INITIAL, validate }));\n  const invalid = h.result.current.errors.email;\n  act(() => h.result.current.handleChange(evt('email', 'ada@example.com')));\n  $test.check('errors come from validate(values) for the current values', invalid === 'Invalid email' && h.result.current.errors.email === undefined, { invalid, now: h.result.current.errors });\n  h.unmount();\n}\n{\n  const h = renderHook(() => useForm({ initialValues: INITIAL, validate }));\n  act(() => h.result.current.handleBlur(evt('email', '')));\n  $test.check('handleBlur marks only that field touched', h.result.current.touched.email === true && h.result.current.touched.agree === undefined, h.result.current.touched);\n  h.unmount();\n}\n{\n  const calls = [];\n  let prevented = 0;\n  const h = renderHook(() => useForm({ initialValues: INITIAL, validate, onSubmit: (v) => calls.push(v) }));\n  await act(async () => {\n    await h.result.current.handleSubmit({ preventDefault: () => prevented++ });\n  });\n  $test.check('handleSubmit prevents default, touches every field and does not submit invalid values', prevented === 1 && calls.length === 0 && h.result.current.touched.email === true && h.result.current.touched.agree === true, { prevented, calls: calls.length, touched: h.result.current.touched });\n  h.unmount();\n}\n{\n  const calls = [];\n  let release;\n  const gate = new Promise((resolve) => { release = resolve; });\n  const h = renderHook(() => useForm({ initialValues: { email: 'ada@example.com', agree: true }, validate, onSubmit: async (v) => { calls.push(v); await gate; } }));\n  let pending;\n  act(() => {\n    pending = h.result.current.handleSubmit({ preventDefault() {} });\n  });\n  const during = h.result.current.isSubmitting;\n  release();\n  await act(async () => {\n    await pending;\n  });\n  $test.check('handleSubmit calls onSubmit with the values and isSubmitting is true while it runs', during === true && h.result.current.isSubmitting === false && calls.length === 1 && calls[0].email === 'ada@example.com', { during, after: h.result.current.isSubmitting, calls });\n  h.unmount();\n}\n{\n  const h = renderHook(() => useForm({ initialValues: INITIAL, validate }));\n  act(() => h.result.current.handleChange(evt('email', 'x')));\n  act(() => h.result.current.handleBlur(evt('email', 'x')));\n  act(() => h.result.current.reset());\n  $test.check('reset restores the initial values and clears touched', h.result.current.values.email === '' && Object.keys(h.result.current.touched).length === 0, h.result.current);\n  h.unmount();\n}"
+  },
+  {
+    "id": "memo-derived-list",
+    "track": "react-components",
+    "title": "useMemo for a Derived List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "performance",
+      "useMemo",
+      "derived-state",
+      "re-renders"
+    ],
+    "promptSeed": "Build SortedList({ items, onCompute }) with useMemo. It renders a <button> labelled `Count: N` (an unrelated counter that increments on click) and a <ul> with one <li> per item sorted ascending as numbers WITHOUT mutating the `items` prop. The sorting must run inside useMemo, keyed on `items`, and call onCompute() each time it actually runs — so clicking the counter must NOT call onCompute again, while passing a new items array must.",
+    "difficulty": 2,
+    "concept": "react-perf",
+    "referenceSolution": "function SortedList({ items, onCompute }) {\n  const [count, setCount] = useState(0);\n\n  const sorted = useMemo(() => {\n    if (onCompute) onCompute();\n    return [...items].sort((a, b) => a - b); // copy first: never mutate props\n  }, [items]);\n\n  return (\n    <div>\n      <button onClick={() => setCount((c) => c + 1)}>Count: {count}</button>\n      <ul>\n        {sorted.map((n) => (\n          <li key={n}>{n}</li>\n        ))}\n      </ul>\n    </div>\n  );\n}",
+    "solution": "function SortedList({ items, onCompute }) {\n  const [count, setCount] = useState(0);\n\n  const sorted = useMemo(() => {\n    if (onCompute) onCompute();\n    return [...items].sort((a, b) => a - b); // copy first: never mutate props\n  }, [items]);\n\n  return (\n    <div>\n      <button onClick={() => setCount((c) => c + 1)}>Count: {count}</button>\n      <ul>\n        {sorted.map((n) => (\n          <li key={n}>{n}</li>\n        ))}\n      </ul>\n    </div>\n  );\n}",
+    "starterCode": "function SortedList({ items, onCompute }) {\n  const [count, setCount] = useState(0);\n\n  const sorted = useMemo(() => {\n    if (onCompute) onCompute();\n    return [...items].sort((a, b) => a - b); // copy first: never mutate props\n  }, [items]);\n\n  return (\n    <div>\n      <button onClick={() => setCount((c) => c + 1)}>Count: {count}</button>\n      <ul>\n        {sorted.map((n) => (\n          <li key={n}>{n}</li>\n        ))}\n      </ul>\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders the items sorted ascending without mutating the prop",
+        "input": "<SortedList items={[30, 4, 100, 12]} />",
+        "expected": "<li> 4, 12, 30, 100; the items prop is still [30, 4, 100, 12]"
+      },
+      {
+        "description": "Clicking the counter does not recompute the sorted list",
+        "input": "click 'Count: 0' twice",
+        "expected": "button 'Count: 2'; onCompute called 1 time in total"
+      },
+      {
+        "description": "A new items array does recompute it",
+        "input": "rerender with items [9, 8]",
+        "expected": "onCompute called 2 times; list 8, 9"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst ITEMS = [30, 4, 100, 12];\n{\n  const items = [...ITEMS];\n  const r = render(<SortedList items={items} />);\n  $test.check('Renders the items sorted ascending without mutating the prop', qa('li', r.container).map((li) => li.textContent).join() === '4,12,30,100' && items.join() === '30,4,100,12', { shown: qa('li', r.container).map((li) => li.textContent).join(), prop: items.join() });\n  r.unmount();\n}\n{\n  let computes = 0;\n  const items = [...ITEMS];\n  const r = render(<SortedList items={items} onCompute={() => computes++} />);\n  const initial = computes;\n  fire.click(q('button', r.container));\n  fire.click(q('button', r.container));\n  $test.check('Clicking the counter does not recompute the sorted list', initial === 1 && computes === 1 && q('button', r.container).textContent === 'Count: 2', { initial, computes });\n  r.unmount();\n}\n{\n  let computes = 0;\n  const onCompute = () => computes++;\n  const r = render(<SortedList items={[3, 1, 2]} onCompute={onCompute} />);\n  r.rerender(<SortedList items={[9, 8]} onCompute={onCompute} />);\n  $test.check('A new items array does recompute it', computes === 2 && qa('li', r.container).map((li) => li.textContent).join() === '8,9', { computes });\n  r.unmount();\n}"
+  },
+  {
+    "id": "simple-table",
+    "track": "react-components",
+    "title": "Simple Data Table",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "table",
+      "props",
+      "empty-state"
+    ],
+    "promptSeed": "Build SimpleTable({ columns, rows }) where columns is [{ key, label }] and rows is an array of objects. Render a <table> with a <thead> row of <th> cells showing each label, and a <tbody> with one <tr> per row and one <td> per column showing String(row[column.key]) (an empty string for a missing/undefined/null value). When rows is empty render a single <tr> with one <td colSpan={columns.length}> reading 'No rows'.",
+    "difficulty": 1,
+    "concept": "tables",
+    "referenceSolution": "function SimpleTable({ columns, rows }) {\n  return (\n    <table>\n      <thead>\n        <tr>\n          {columns.map((column) => (\n            <th key={column.key}>{column.label}</th>\n          ))}\n        </tr>\n      </thead>\n      <tbody>\n        {rows.length === 0 ? (\n          <tr>\n            <td colSpan={columns.length}>No rows</td>\n          </tr>\n        ) : (\n          rows.map((row, index) => (\n            <tr key={index}>\n              {columns.map((column) => (\n                <td key={column.key}>{row[column.key] == null ? '' : String(row[column.key])}</td>\n              ))}\n            </tr>\n          ))\n        )}\n      </tbody>\n    </table>\n  );\n}",
+    "solution": "function SimpleTable({ columns, rows }) {\n  return (\n    <table>\n      <thead>\n        <tr>\n          {columns.map((column) => (\n            <th key={column.key}>{column.label}</th>\n          ))}\n        </tr>\n      </thead>\n      <tbody>\n        {rows.length === 0 ? (\n          <tr>\n            <td colSpan={columns.length}>No rows</td>\n          </tr>\n        ) : (\n          rows.map((row, index) => (\n            <tr key={index}>\n              {columns.map((column) => (\n                <td key={column.key}>{row[column.key] == null ? '' : String(row[column.key])}</td>\n              ))}\n            </tr>\n          ))\n        )}\n      </tbody>\n    </table>\n  );\n}",
+    "starterCode": "function SimpleTable({ columns, rows }) {\n  return (\n    <table>\n      <thead>\n        <tr>\n          {columns.map((column) => (\n            <th key={column.key}>{column.label}</th>\n          ))}\n        </tr>\n      </thead>\n      <tbody>\n        {rows.length === 0 ? (\n          <tr>\n            <td colSpan={columns.length}>No rows</td>\n          </tr>\n        ) : (\n          rows.map((row, index) => (\n            <tr key={index}>\n              {columns.map((column) => (\n                <td key={column.key}>{row[column.key] == null ? '' : String(row[column.key])}</td>\n              ))}\n            </tr>\n          ))\n        )}\n      </tbody>\n    </table>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders one header cell per column label",
+        "input": "columns [{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]",
+        "expected": "<th> texts: 'Name', 'Age'"
+      },
+      {
+        "description": "Renders one row per item with cells in column order",
+        "input": "rows [{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]",
+        "expected": "2 <tr>; <td> texts: Ada, 36, Grace, 45"
+      },
+      {
+        "description": "Missing, undefined and null values render as empty cells",
+        "input": "rows [{ name: 'Ada' }, { age: null, name: 'Bob' }]",
+        "expected": "<td> texts: 'Ada', '', 'Bob', ''"
+      },
+      {
+        "description": "An empty table shows a single \"No rows\" cell spanning all columns",
+        "input": "rows = []",
+        "expected": "one <tr> with <td colSpan=2>No rows</td>"
+      }
+    ],
+    "testHarness": "const { render, q, qa } = $dom;\nconst COLUMNS = [{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }];\nconst cells = (c, sel) => qa(sel, c).map((x) => x.textContent).join();\n{\n  const r = render(<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }]} />);\n  $test.check('Renders one header cell per column label', cells(r.container, 'thead th') === 'Name,Age', cells(r.container, 'thead th'));\n  r.unmount();\n}\n{\n  const r = render(<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />);\n  $test.check('Renders one row per item with cells in column order', qa('tbody tr', r.container).length === 2 && cells(r.container, 'tbody td') === 'Ada,36,Grace,45', cells(r.container, 'tbody td'));\n  r.unmount();\n}\n{\n  const r = render(<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />);\n  $test.check('Missing, undefined and null values render as empty cells', cells(r.container, 'tbody td') === 'Ada,,Bob,', cells(r.container, 'tbody td'));\n  r.unmount();\n}\n{\n  const r = render(<SimpleTable columns={COLUMNS} rows={[]} />);\n  const td = q('tbody td', r.container);\n  $test.check('An empty table shows a single \"No rows\" cell spanning all columns', qa('tbody tr', r.container).length === 1 && td.textContent === 'No rows' && td.colSpan === 2, td && td.outerHTML);\n  r.unmount();\n}"
+  },
+  {
+    "id": "undo-redo-hook",
+    "track": "react",
+    "title": "useHistory: Undo / Redo",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "state",
+      "undo-redo",
+      "immutability"
+    ],
+    "promptSeed": "Write useHistory(initial, limit = 100) returning { state, set, undo, redo, canUndo, canRedo }. set(valueOrUpdater) pushes a new present state (an updater function receives the current state); setting a value that is Object.is-equal to the current one does nothing. undo() moves to the previous state and redo() back; both do nothing at the ends. Calling set() after undo discards the redo branch. At most `limit` past states are kept (the oldest are dropped). set/undo/redo keep a stable identity.",
+    "difficulty": 3,
+    "concept": "history-state",
+    "referenceSolution": "function useHistory(initial, limit = 100) {\n  const [history, setHistory] = useState({ past: [], present: initial, future: [] });\n\n  const set = useCallback(\n    (next) =>\n      setHistory((h) => {\n        const value = typeof next === 'function' ? next(h.present) : next;\n        if (Object.is(value, h.present)) return h;\n        return { past: [...h.past, h.present].slice(-limit), present: value, future: [] };\n      }),\n    [limit]\n  );\n\n  const undo = useCallback(\n    () =>\n      setHistory((h) =>\n        h.past.length === 0\n          ? h\n          : { past: h.past.slice(0, -1), present: h.past[h.past.length - 1], future: [h.present, ...h.future] }\n      ),\n    []\n  );\n\n  const redo = useCallback(\n    () =>\n      setHistory((h) =>\n        h.future.length === 0\n          ? h\n          : { past: [...h.past, h.present], present: h.future[0], future: h.future.slice(1) }\n      ),\n    []\n  );\n\n  return { state: history.present, set, undo, redo, canUndo: history.past.length > 0, canRedo: history.future.length > 0 };\n}",
+    "solution": "function useHistory(initial, limit = 100) {\n  const [history, setHistory] = useState({ past: [], present: initial, future: [] });\n\n  const set = useCallback(\n    (next) =>\n      setHistory((h) => {\n        const value = typeof next === 'function' ? next(h.present) : next;\n        if (Object.is(value, h.present)) return h;\n        return { past: [...h.past, h.present].slice(-limit), present: value, future: [] };\n      }),\n    [limit]\n  );\n\n  const undo = useCallback(\n    () =>\n      setHistory((h) =>\n        h.past.length === 0\n          ? h\n          : { past: h.past.slice(0, -1), present: h.past[h.past.length - 1], future: [h.present, ...h.future] }\n      ),\n    []\n  );\n\n  const redo = useCallback(\n    () =>\n      setHistory((h) =>\n        h.future.length === 0\n          ? h\n          : { past: [...h.past, h.present], present: h.future[0], future: h.future.slice(1) }\n      ),\n    []\n  );\n\n  return { state: history.present, set, undo, redo, canUndo: history.past.length > 0, canRedo: history.future.length > 0 };\n}",
+    "starterCode": "function useHistory(initial, limit = 100) {\n  const [history, setHistory] = useState({ past: [], present: initial, future: [] });\n\n  const set = useCallback(\n    (next) =>\n      setHistory((h) => {\n        const value = typeof next === 'function' ? next(h.present) : next;\n        if (Object.is(value, h.present)) return h;\n        return { past: [...h.past, h.present].slice(-limit), present: value, future: [] };\n      }),\n    [limit]\n  );\n\n  const undo = useCallback(\n    () =>\n      setHistory((h) =>\n        h.past.length === 0\n          ? h\n          : { past: h.past.slice(0, -1), present: h.past[h.past.length - 1], future: [h.present, ...h.future] }\n      ),\n    []\n  );\n\n  const redo = useCallback(\n    () =>\n      setHistory((h) =>\n        h.future.length === 0\n          ? h\n          : { past: [...h.past, h.present], present: h.future[0], future: h.future.slice(1) }\n      ),\n    []\n  );\n\n  return { state: history.present, set, undo, redo, canUndo: history.past.length > 0, canRedo: history.future.length > 0 };\n}",
+    "testCases": [
+      {
+        "description": "Starts with the initial state and nothing to undo or redo",
+        "input": "useHistory('a')",
+        "expected": "state 'a'; canUndo false; canRedo false"
+      },
+      {
+        "description": "undo and redo do nothing at the ends",
+        "input": "undo() then redo() on a fresh history",
+        "expected": "state still 'a'"
+      },
+      {
+        "description": "set pushes a new state and enables undo",
+        "input": "set('b')",
+        "expected": "state 'b'; canUndo true; canRedo false"
+      },
+      {
+        "description": "undo and redo walk back and forth",
+        "input": "useHistory(0): set(1), set(2), undo, undo, redo",
+        "expected": "states 1, 0, then 1; canRedo true"
+      },
+      {
+        "description": "set after undo discards the redo branch",
+        "input": "set(1), set(2), undo, set(99)",
+        "expected": "state 99; canRedo false"
+      },
+      {
+        "description": "set accepts an updater function and ignores an unchanged value",
+        "input": "useHistory(5): set(n => n + 1), set(6), undo",
+        "expected": "state 5; canUndo false (the repeated 6 added nothing)"
+      },
+      {
+        "description": "limit drops the oldest history entries",
+        "input": "useHistory(0, 2): set 1, 2, 3; undo three times",
+        "expected": "state 1; canUndo false"
+      },
+      {
+        "description": "set, undo and redo keep a stable identity",
+        "input": "call set(1) and compare functions",
+        "expected": "unchanged references"
+      }
+    ],
+    "testHarness": "const { renderHook, act } = $dom;\n{\n  const h = renderHook(() => useHistory('a'));\n  $test.check('Starts with the initial state and nothing to undo or redo', h.result.current.state === 'a' && !h.result.current.canUndo && !h.result.current.canRedo, h.result.current);\n  act(() => h.result.current.undo());\n  act(() => h.result.current.redo());\n  $test.check('undo and redo do nothing at the ends', h.result.current.state === 'a', h.result.current.state);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useHistory('a'));\n  act(() => h.result.current.set('b'));\n  $test.check('set pushes a new state and enables undo', h.result.current.state === 'b' && h.result.current.canUndo && !h.result.current.canRedo, h.result.current);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useHistory(0));\n  act(() => h.result.current.set(1));\n  act(() => h.result.current.set(2));\n  act(() => h.result.current.undo());\n  const back = h.result.current.state;\n  act(() => h.result.current.undo());\n  const back2 = h.result.current.state;\n  act(() => h.result.current.redo());\n  $test.check('undo and redo walk back and forth', back === 1 && back2 === 0 && h.result.current.state === 1 && h.result.current.canRedo, { back, back2, now: h.result.current.state });\n  h.unmount();\n}\n{\n  const h = renderHook(() => useHistory(0));\n  act(() => h.result.current.set(1));\n  act(() => h.result.current.set(2));\n  act(() => h.result.current.undo());\n  act(() => h.result.current.set(99));\n  $test.check('set after undo discards the redo branch', h.result.current.state === 99 && !h.result.current.canRedo, h.result.current);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useHistory(5));\n  act(() => h.result.current.set((n) => n + 1));\n  act(() => h.result.current.set(6));\n  act(() => h.result.current.undo());\n  $test.check('set accepts an updater function and ignores an unchanged value', h.result.current.state === 5 && !h.result.current.canUndo, h.result.current);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useHistory(0, 2));\n  act(() => h.result.current.set(1));\n  act(() => h.result.current.set(2));\n  act(() => h.result.current.set(3));\n  act(() => h.result.current.undo());\n  act(() => h.result.current.undo());\n  act(() => h.result.current.undo());\n  $test.check('limit drops the oldest history entries', h.result.current.state === 1 && !h.result.current.canUndo, h.result.current.state);\n  h.unmount();\n}\n{\n  const h = renderHook(() => useHistory(0));\n  const a = h.result.current;\n  act(() => a.set(1));\n  const b = h.result.current;\n  $test.check('set, undo and redo keep a stable identity', a.set === b.set && a.undo === b.undo && a.redo === b.redo, 'identity changed');\n  h.unmount();\n}"
+  },
+  {
+    "id": "virtual-list",
+    "track": "react-components",
+    "title": "Virtualized (Windowed) List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "performance",
+      "virtualization",
+      "scroll"
+    ],
+    "promptSeed": "Build VirtualList({ items, itemHeight, height, overscan = 3 }) for long lists of strings. Render <div role=\"list\" style={{ height, overflowY: 'auto', position: 'relative' }} onScroll> containing ONE inner <div> whose style.height is items.length * itemHeight (the full scroll height, position: relative). Inside it render only the visible window: items from max(0, floor(scrollTop / itemHeight) - overscan) up to min(items.length, ceil((scrollTop + height) / itemHeight) + overscan), each as <div role=\"listitem\"> with style position: absolute, top: index * itemHeight, height: itemHeight and the item text. Track scrollTop from the scroll event.",
+    "difficulty": 4,
+    "concept": "virtualization",
+    "referenceSolution": "function VirtualList({ items, itemHeight, height, overscan = 3 }) {\n  const [scrollTop, setScrollTop] = useState(0);\n\n  const start = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);\n  const end = Math.min(items.length, Math.ceil((scrollTop + height) / itemHeight) + overscan);\n\n  const visible = [];\n  for (let i = start; i < end; i++) {\n    visible.push(\n      <div key={i} role=\"listitem\" style={{ position: 'absolute', left: 0, right: 0, top: i * itemHeight, height: itemHeight }}>\n        {items[i]}\n      </div>\n    );\n  }\n\n  return (\n    <div\n      role=\"list\"\n      style={{ height, overflowY: 'auto', position: 'relative' }}\n      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}\n    >\n      <div style={{ height: items.length * itemHeight, position: 'relative' }}>{visible}</div>\n    </div>\n  );\n}",
+    "solution": "function VirtualList({ items, itemHeight, height, overscan = 3 }) {\n  const [scrollTop, setScrollTop] = useState(0);\n\n  const start = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);\n  const end = Math.min(items.length, Math.ceil((scrollTop + height) / itemHeight) + overscan);\n\n  const visible = [];\n  for (let i = start; i < end; i++) {\n    visible.push(\n      <div key={i} role=\"listitem\" style={{ position: 'absolute', left: 0, right: 0, top: i * itemHeight, height: itemHeight }}>\n        {items[i]}\n      </div>\n    );\n  }\n\n  return (\n    <div\n      role=\"list\"\n      style={{ height, overflowY: 'auto', position: 'relative' }}\n      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}\n    >\n      <div style={{ height: items.length * itemHeight, position: 'relative' }}>{visible}</div>\n    </div>\n  );\n}",
+    "starterCode": "function VirtualList({ items, itemHeight, height, overscan = 3 }) {\n  const [scrollTop, setScrollTop] = useState(0);\n\n  const start = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);\n  const end = Math.min(items.length, Math.ceil((scrollTop + height) / itemHeight) + overscan);\n\n  const visible = [];\n  for (let i = start; i < end; i++) {\n    visible.push(\n      <div key={i} role=\"listitem\" style={{ position: 'absolute', left: 0, right: 0, top: i * itemHeight, height: itemHeight }}>\n        {items[i]}\n      </div>\n    );\n  }\n\n  return (\n    <div\n      role=\"list\"\n      style={{ height, overflowY: 'auto', position: 'relative' }}\n      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}\n    >\n      <div style={{ height: items.length * itemHeight, position: 'relative' }}>{visible}</div>\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders only the visible window plus overscan",
+        "input": "1000 items, itemHeight 20, height 100, overscan 2",
+        "expected": "7 listitems: 'Item 0' … 'Item 6'"
+      },
+      {
+        "description": "The scroll area has the full virtual height",
+        "input": "same props",
+        "expected": "an inner element with style.height '20000px'"
+      },
+      {
+        "description": "Scrolling moves the rendered window",
+        "input": "scrollTop = 2000 (+ scroll event)",
+        "expected": "9 listitems from 'Item 98'; includes 'Item 100'; no 'Item 0'"
+      },
+      {
+        "description": "Items are absolutely positioned at index * itemHeight",
+        "input": "scrollTop = 2000",
+        "expected": "'Item 100' has position absolute, top '2000px', height '20px'"
+      },
+      {
+        "description": "The window is clamped at the end of the list",
+        "input": "scrollTop = 19900",
+        "expected": "last rendered is 'Item 999'; at most 10 items"
+      },
+      {
+        "description": "Short lists render everything",
+        "input": "items ['a', 'b', 'c']",
+        "expected": "listitems a, b, c"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst ITEMS = Array.from({ length: 1000 }, (_, i) => `Item ${i}`);\nconst setup = (items = ITEMS) => render(<VirtualList items={items} itemHeight={20} height={100} overscan={2} />);\nconst texts = (c) => qa('[role=\"listitem\"]', c).map((el) => el.textContent);\nconst scrollTo = (c, top) => {\n  const list = q('[role=\"list\"]', c);\n  Object.defineProperty(list, 'scrollTop', { value: top, configurable: true });\n  fire.event(list, new Event('scroll'));\n};\n{\n  const r = setup();\n  const t = texts(r.container);\n  $test.check('Renders only the visible window plus overscan', t.length === 7 && t[0] === 'Item 0' && t[6] === 'Item 6', { count: t.length, first: t[0], last: t[t.length - 1] });\n  r.unmount();\n}\n{\n  const r = setup();\n  $test.check('The scroll area has the full virtual height', qa('div', r.container).some((d) => d.style.height === '20000px'), 'no 20000px inner element');\n  r.unmount();\n}\n{\n  const r = setup();\n  scrollTo(r.container, 2000);\n  const t = texts(r.container);\n  $test.check('Scrolling moves the rendered window', t.includes('Item 100') && !t.includes('Item 0') && t[0] === 'Item 98' && t.length === 9, { first: t[0], count: t.length });\n  r.unmount();\n}\n{\n  const r = setup();\n  scrollTo(r.container, 2000);\n  const row = qa('[role=\"listitem\"]', r.container).find((el) => el.textContent === 'Item 100');\n  $test.check('Items are absolutely positioned at index * itemHeight', row && row.style.position === 'absolute' && row.style.top === '2000px' && row.style.height === '20px', row && row.getAttribute('style'));\n  r.unmount();\n}\n{\n  const r = setup();\n  scrollTo(r.container, 19900);\n  const t = texts(r.container);\n  $test.check('The window is clamped at the end of the list', t[t.length - 1] === 'Item 999' && t.length <= 10, { last: t[t.length - 1], count: t.length });\n  r.unmount();\n}\n{\n  const r = setup(['a', 'b', 'c']);\n  $test.check('Short lists render everything', texts(r.container).join() === 'a,b,c', texts(r.container));\n  r.unmount();\n}"
   }
 ]

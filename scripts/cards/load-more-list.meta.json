@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Paginated List with \"Load more\"",
+  "tags": [
+    "component",
+    "async",
+    "pagination",
+    "error-handling"
+  ]
+}

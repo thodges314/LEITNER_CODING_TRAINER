@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Filterable List",
+  "tags": [
+    "component",
+    "controlled-input",
+    "derived-state",
+    "a11y"
+  ]
+}

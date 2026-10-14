@@ -410,5 +410,57 @@
  "file-explorer-tree": {
   "difficulty": 3,
   "concept": "tree-ui"
+ },
+ "use-toggle-counter": {
+  "difficulty": 1,
+  "concept": "react-hooks-utility"
+ },
+ "filter-list": {
+  "difficulty": 2,
+  "concept": "typeahead"
+ },
+ "accordion-component": {
+  "difficulty": 2,
+  "concept": "compound"
+ },
+ "simple-error-boundary": {
+  "difficulty": 2,
+  "concept": "resilience"
+ },
+ "a11y-form-field": {
+  "difficulty": 2,
+  "concept": "a11y-components"
+ },
+ "load-more-list": {
+  "difficulty": 2,
+  "concept": "infinite-scroll"
+ },
+ "memo-derived-list": {
+  "difficulty": 2,
+  "concept": "react-perf"
+ },
+ "undo-redo-hook": {
+  "difficulty": 3,
+  "concept": "history-state"
+ },
+ "form-state-hook": {
+  "difficulty": 3,
+  "concept": "react-forms"
+ },
+ "simple-table": {
+  "difficulty": 1,
+  "concept": "tables"
+ },
+ "data-table": {
+  "difficulty": 4,
+  "concept": "tables"
+ },
+ "dropdown-menu": {
+  "difficulty": 4,
+  "concept": "a11y-components"
+ },
+ "virtual-list": {
+  "difficulty": 4,
+  "concept": "virtualization"
  }
 }

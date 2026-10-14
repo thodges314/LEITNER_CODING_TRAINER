@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "useMemo for a Derived List",
+  "tags": [
+    "performance",
+    "useMemo",
+    "derived-state",
+    "re-renders"
+  ]
+}
