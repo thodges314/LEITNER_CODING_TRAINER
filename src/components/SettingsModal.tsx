@@ -8,6 +8,7 @@ import {
   Trash2,
   KeyRound,
   Check,
+  AlertTriangle,
 } from 'lucide-react';
 import {
   getStoredApiKey,
@@ -48,6 +49,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [model, setModel] = useState(() => getStoredModel());
   const [baseUrl, setBaseUrl] = useState(() => getStoredBaseUrl());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<'clear' | 'replace' | null>(null);
 
   if (!isOpen) return null;
 
@@ -89,34 +91,38 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     onSettingsSaved?.();
   };
 
-  const handleSaveKey = () => {
+  const handleSaveKeyClick = () => {
     const trimmed = keyInput.trim();
     if (!trimmed) {
-      if (apiKey) handleClearKey();
+      if (apiKey) setConfirmAction('clear');
       return;
     }
 
     if (apiKey && apiKey !== trimmed) {
-      const confirmed = window.confirm(
-        'Are you sure you want to replace your existing API key?\n\nThe previous key will be permanently overwritten in your browser localStorage.'
-      );
-      if (!confirmed) return;
+      setConfirmAction('replace');
+      return;
     }
 
+    executeSaveKey(trimmed);
+  };
+
+  const executeSaveKey = (valToSave?: string) => {
+    const trimmed = (valToSave ?? keyInput).trim();
     setStoredApiKey(trimmed);
     setApiKey(trimmed);
+    setConfirmAction(null);
     showToast(apiKey ? 'API key replaced' : 'API key saved');
   };
 
-  const handleClearKey = () => {
-    const confirmed = window.confirm(
-      'Are you sure you want to clear your stored API key?\n\nThis will remove it from your browser localStorage and switch evaluation to Keyless mode.'
-    );
-    if (!confirmed) return;
+  const handleClearKeyClick = () => {
+    setConfirmAction('clear');
+  };
 
+  const executeClearKey = () => {
     setStoredApiKey('');
     setApiKey('');
     setKeyInput('');
+    setConfirmAction(null);
     showToast('API key cleared');
   };
 
@@ -313,7 +319,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </span>
                   <button
                     type="button"
-                    onClick={handleClearKey}
+                    onClick={handleClearKeyClick}
                     style={{
                       background: 'none',
                       border: 'none',
@@ -337,11 +343,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="password"
                 placeholder={provider === 'gemini' ? 'AIzaSy...' : 'sk-...'}
                 value={keyInput}
-                onChange={(e) => setKeyInput(e.target.value)}
+                onChange={(e) => {
+                  setKeyInput(e.target.value);
+                  if (confirmAction) setConfirmAction(null);
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    handleSaveKey();
+                    handleSaveKeyClick();
                   }
                 }}
                 className="code-buffer"
@@ -357,7 +366,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={handleSaveKey}
+                onClick={handleSaveKeyClick}
                 disabled={!keyInput.trim() || (!isKeyModified && Boolean(apiKey))}
                 style={{
                   height: '42px',
@@ -370,6 +379,97 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {apiKey ? (isKeyModified ? 'Replace Key' : 'Saved') : 'Save Key'}
               </button>
             </div>
+
+            {/* In-App Confirmation: Clear Key */}
+            {confirmAction === 'clear' && (
+              <div
+                style={{
+                  marginTop: '10px',
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(244, 63, 94, 0.12)',
+                  border: '1px solid rgba(244, 63, 94, 0.35)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f43f5e', fontSize: '13px', fontWeight: 600 }}>
+                  <AlertTriangle size={16} />
+                  Clear stored API key?
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                  This removes your key from this browser's localStorage. The trainer will automatically switch to Keyless mode.
+                </p>
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '2px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    style={{ padding: '4px 12px', fontSize: '12px' }}
+                    onClick={() => setConfirmAction(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="btn"
+                    style={{
+                      padding: '4px 14px',
+                      fontSize: '12px',
+                      backgroundColor: '#f43f5e',
+                      color: '#ffffff',
+                      border: 'none',
+                      fontWeight: 600,
+                    }}
+                    onClick={executeClearKey}
+                  >
+                    Yes, Clear Key
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* In-App Confirmation: Replace Key */}
+            {confirmAction === 'replace' && (
+              <div
+                style={{
+                  marginTop: '10px',
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.35)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b', fontSize: '13px', fontWeight: 600 }}>
+                  <AlertTriangle size={16} />
+                  Replace stored API key?
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                  Your previous key will be permanently overwritten in your browser's localStorage.
+                </p>
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '2px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    style={{ padding: '4px 12px', fontSize: '12px' }}
+                    onClick={() => setConfirmAction(null)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ padding: '4px 14px', fontSize: '12px', fontWeight: 600 }}
+                    onClick={() => executeSaveKey()}
+                  >
+                    Yes, Replace Key
+                  </button>
+                </div>
+              </div>
+            )}
 
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', display: 'flex', gap: '4px' }}>
               <ShieldCheck size={14} color="#34d399" style={{ flexShrink: 0, marginTop: '1px' }} />
