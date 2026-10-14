@@ -80,6 +80,16 @@ describe('practice filter', () => {
     expect(next.practiceFilter).toEqual(f);
   });
 
+  it('difficulty range filters cards (unset difficulty counts as 3)', () => {
+    const cards = [card('e', 'react', [], { difficulty: 1 }), card('m', 'react', []), card('h', 'react', [], { difficulty: 5 })];
+    const ids = (f: Parameters<typeof cardMatchesFilter>[1]) => cards.filter((c) => cardMatchesFilter(c, f)).map((c) => c.id);
+    expect(ids({ ...EMPTY_FILTER, maxDifficulty: 2 })).toEqual(['e']);
+    expect(ids({ ...EMPTY_FILTER, minDifficulty: 3 })).toEqual(['m', 'h']);
+    expect(ids({ ...EMPTY_FILTER, minDifficulty: 2, maxDifficulty: 4 })).toEqual(['m']);
+    expect(isFilterActive({ ...EMPTY_FILTER, maxDifficulty: 2 })).toBe(true);
+    expect(normalizeFilter({ minDifficulty: 9, maxDifficulty: '4' })).toEqual({ ...EMPTY_FILTER, maxDifficulty: 4 });
+  });
+
   it('normalizeFilter tolerates junk', () => {
     expect(normalizeFilter(null)).toEqual(EMPTY_FILTER);
     expect(normalizeFilter({ includeTracks: 'x', excludeTags: ['a', 'a', 1] })).toEqual({ ...EMPTY_FILTER, excludeTags: ['a', '1'] });

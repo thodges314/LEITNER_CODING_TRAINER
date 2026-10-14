@@ -32,6 +32,10 @@ export interface TopicItem {
   nextEligibleTrial: number; // The global trial index when this card can next appear
   status: 'active' | 'locked';
   tags: string[];
+  /** 1 (warm-up) to 5 (expert). Easier rungs of a concept are mastered before harder ones unlock. */
+  difficulty?: number;
+  /** Cards sharing a concept form a ladder ordered by difficulty (e.g. 'rate-limiting', 'promise'). */
+  concept?: string;
   promptSeed: string;
   starterCode?: string;
   testHarness?: string;
@@ -45,10 +49,22 @@ export interface TopicItem {
  * Cards outside the filter keep their Leitner state untouched.
  */
 export interface PracticeFilter {
+  /** Inclusive difficulty range (1-5). Unset = no limit. */
+  minDifficulty?: number;
+  maxDifficulty?: number;
   includeTracks: string[];
   excludeTracks: string[];
   includeTags: string[];
   excludeTags: string[];
+}
+
+export const DIFFICULTY_LABELS: Record<number, string> = { 1: 'Warm-up', 2: 'Basic', 3: 'Intermediate', 4: 'Advanced', 5: 'Expert' };
+export const DEFAULT_DIFFICULTY = 3;
+export const LADDER_PASS_BOX = 2; // an easier rung must reach this box before the next rung unlocks
+
+export function difficultyOf(card: Pick<TopicItem, 'difficulty'>): number {
+  const d = Number(card.difficulty);
+  return Number.isInteger(d) && d >= 1 && d <= 5 ? d : DEFAULT_DIFFICULTY;
 }
 
 export const EMPTY_FILTER: PracticeFilter = { includeTracks: [], excludeTracks: [], includeTags: [], excludeTags: [] };
@@ -186,12 +202,21 @@ function stringList(value: unknown): string[] {
 
 export function normalizeFilter(value: unknown): PracticeFilter {
   const v = (value ?? {}) as Partial<Record<keyof PracticeFilter, unknown>>;
-  return {
+  const bound = (x: unknown) => {
+    const n = Number(x);
+    return Number.isInteger(n) && n >= 1 && n <= 5 ? n : undefined;
+  };
+  const out: PracticeFilter = {
     includeTracks: stringList(v.includeTracks),
     excludeTracks: stringList(v.excludeTracks),
     includeTags: stringList(v.includeTags),
     excludeTags: stringList(v.excludeTags),
   };
+  const min = bound(v.minDifficulty);
+  const max = bound(v.maxDifficulty);
+  if (min !== undefined) out.minDifficulty = min;
+  if (max !== undefined) out.maxDifficulty = max;
+  return out;
 }
 
 export function normalizePresets(value: unknown): Record<string, PracticeFilter> {
@@ -205,13 +230,18 @@ export function normalizePresets(value: unknown): Record<string, PracticeFilter>
 export function isFilterActive(filter: PracticeFilter | undefined): boolean {
   if (!filter) return false;
   return (
-    filter.includeTracks.length + filter.excludeTracks.length + filter.includeTags.length + filter.excludeTags.length > 0
+    filter.includeTracks.length + filter.excludeTracks.length + filter.includeTags.length + filter.excludeTags.length > 0 ||
+    filter.minDifficulty !== undefined ||
+    filter.maxDifficulty !== undefined
   );
 }
 
-export function cardMatchesFilter(card: Pick<TopicItem, 'track' | 'tags'>, filter: PracticeFilter | undefined): boolean {
+export function cardMatchesFilter(card: Pick<TopicItem, 'track' | 'tags' | 'difficulty'>, filter: PracticeFilter | undefined): boolean {
   if (!isFilterActive(filter)) return true;
   const f = filter as PracticeFilter;
+  const d = difficultyOf(card);
+  if (f.minDifficulty !== undefined && d < f.minDifficulty) return false;
+  if (f.maxDifficulty !== undefined && d > f.maxDifficulty) return false;
   if (f.excludeTracks.includes(card.track)) return false;
   if (card.tags.some((tag) => f.excludeTags.includes(tag))) return false;
   if (f.includeTracks.length > 0 && !f.includeTracks.includes(card.track)) return false;
@@ -260,6 +290,8 @@ const SEED_CONTENT_FIELDS = [
   'track',
   'title',
   'tags',
+  'difficulty',
+  'concept',
   'promptSeed',
   'starterCode',
   'testHarness',
@@ -378,6 +410,18 @@ export function getTopicTestCases(topic: TopicItem): TestCaseItem[] {
 }
 
 /**
+ * A locked card may unlock once every easier card of the same concept is active and has passed at least once.
+ * Cards without a concept (custom topics) are never gated.
+ */
+export function isLadderOpen(card: TopicItem, topics: TopicItem[]): boolean {
+  if (!card.concept) return true;
+  const d = difficultyOf(card);
+  return topics
+    .filter((o) => o.id !== card.id && o.concept === card.concept && difficultyOf(o) < d)
+    .every((o) => o.status === 'active' && o.box >= LADDER_PASS_BOX);
+}
+
+/**
  * Checks staged unlock condition:
  * For every 4 active cards in Box 3 or higher (cumulative), unlock 4 more locked cards.
  */
@@ -388,21 +432,20 @@ export function checkStagedUnlocks(topics: TopicItem[], currentStageCount: numbe
   if (targetStages > currentStageCount) {
     const stagesToUnlock = targetStages - currentStageCount;
     const cardsToUnlock = stagesToUnlock * 4;
-    let unlockedCount = 0;
+    // Unlock easiest-first, and only cards whose easier rungs (same concept) are already learned.
+    const toUnlock = new Set(
+      topics
+        .map((t, index) => ({ t, index }))
+        .filter(({ t }) => t.status === 'locked' && isLadderOpen(t, topics))
+        .sort((a, b) => difficultyOf(a.t) - difficultyOf(b.t) || a.index - b.index)
+        .slice(0, cardsToUnlock)
+        .map(({ t }) => t.id)
+    );
+    const unlockedCount = toUnlock.size;
 
-    const updatedTopics = topics.map((t) => {
-      if (t.status === 'locked' && unlockedCount < cardsToUnlock) {
-        unlockedCount++;
-        return {
-          ...t,
-          status: 'active' as const,
-          box: 1,
-          streak: 0,
-          nextEligibleTrial: 0,
-        };
-      }
-      return t;
-    });
+    const updatedTopics = topics.map((t) =>
+      toUnlock.has(t.id) ? { ...t, status: 'active' as const, box: 1, streak: 0, nextEligibleTrial: 0 } : t
+    );
 
     return {
       updatedTopics,
@@ -545,6 +588,9 @@ export function getNextCard(
     if (a.box !== b.box) {
       return a.box - b.box; // lowest box first
     }
+    if (difficultyOf(a) !== difficultyOf(b)) {
+      return difficultyOf(a) - difficultyOf(b); // easier first within a box
+    }
     if (a.nextEligibleTrial !== b.nextEligibleTrial) {
       return a.nextEligibleTrial - b.nextEligibleTrial; // earliest eligibility first
     }
@@ -682,6 +728,8 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     nextEligibleTrial: Math.max(0, Number(item.nextEligibleTrial) || 0),
     status: item.status === 'locked' ? 'locked' : 'active',
     tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
+    difficulty: Number.isInteger(Number(item.difficulty)) && Number(item.difficulty) >= 1 && Number(item.difficulty) <= 5 ? Number(item.difficulty) : undefined,
+    concept: optionalString(item.concept),
     promptSeed: String(item.promptSeed || ''),
     starterCode: optionalString(item.starterCode),
     testHarness: optionalString(item.testHarness),

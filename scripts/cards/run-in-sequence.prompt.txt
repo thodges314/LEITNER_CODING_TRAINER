@@ -1,0 +1,1 @@
+Tasks are functions returning a promise (or a value). Write runSequentially(tasks) that starts each task only after the previous one has finished and resolves to the array of results in order (stopping and rejecting at the first failure, without starting later tasks), and runInParallel(tasks) that starts them all at once and resolves to the results in the original order.

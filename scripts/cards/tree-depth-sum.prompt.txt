@@ -1,0 +1,1 @@
+Nodes look like { val, left, right } (missing children are null or undefined). Write maxDepth(root) (number of nodes on the longest root-to-leaf path; 0 for an empty tree), sumTree(root) (sum of all values) and countLeaves(root).

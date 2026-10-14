@@ -1,0 +1,10 @@
+{
+  "track": "collections-transformations",
+  "title": "Shallow Copy and Shallow Equal",
+  "tags": [
+    "objects",
+    "copy",
+    "equality",
+    "basics"
+  ]
+}

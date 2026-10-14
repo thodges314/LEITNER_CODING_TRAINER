@@ -1,0 +1,1 @@
+Write parsePath(pattern, path) where the pattern uses ':name' segments, e.g. parsePath('/users/:id/posts/:postId', '/users/7/posts/42') -> { id: '7', postId: '42' }. Return null when the number of segments differs or a static segment does not match; ignore a trailing slash and any '?query' or '#hash' on the path.

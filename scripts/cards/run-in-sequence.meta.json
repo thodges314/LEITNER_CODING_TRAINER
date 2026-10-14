@@ -1,0 +1,10 @@
+{
+  "track": "async-js",
+  "title": "Run Async Tasks in Sequence and in Parallel",
+  "tags": [
+    "async-await",
+    "promises",
+    "sequencing",
+    "basics"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Tiny Event Emitter (on / emit)",
+  "tags": [
+    "events",
+    "callbacks",
+    "observer",
+    "basics"
+  ]
+}

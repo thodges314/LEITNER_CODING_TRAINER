@@ -1,0 +1,10 @@
+{
+  "track": "async-js",
+  "title": "sleep(ms) and delay(value, ms)",
+  "tags": [
+    "promise",
+    "timers",
+    "async-await",
+    "basics"
+  ]
+}

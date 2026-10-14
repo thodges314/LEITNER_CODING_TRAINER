@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Memoize a Single-Argument Function",
+  "tags": [
+    "memoize",
+    "cache",
+    "map",
+    "closures"
+  ]
+}

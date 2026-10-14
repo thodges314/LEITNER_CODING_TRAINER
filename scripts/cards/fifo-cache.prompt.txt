@@ -1,0 +1,1 @@
+Write class FifoCache(capacity) with get(key) (undefined when missing), set(key, value) and size. When a NEW key is added beyond the capacity, evict the oldest inserted key (first-in, first-out). Updating an existing key changes its value but not its age, and get() never changes the order. (A later card adds LRU ordering on top of this.)

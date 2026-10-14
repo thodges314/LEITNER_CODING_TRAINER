@@ -1,0 +1,402 @@
+{
+ "async-fetch-error-handling": {
+  "difficulty": 2,
+  "concept": "fetch"
+ },
+ "promise-chaining-syntax": {
+  "difficulty": 2,
+  "concept": "promise"
+ },
+ "promise-all-vs-settled": {
+  "difficulty": 3,
+  "concept": "promise-combinators"
+ },
+ "fetch-abort-controller": {
+  "difficulty": 3,
+  "concept": "fetch"
+ },
+ "debounce-implementation": {
+  "difficulty": 2,
+  "concept": "rate-limiting"
+ },
+ "throttle-implementation": {
+  "difficulty": 2,
+  "concept": "rate-limiting"
+ },
+ "event-loop-microtasks": {
+  "difficulty": 3,
+  "concept": "event-loop"
+ },
+ "map-frequency-counter": {
+  "difficulty": 1,
+  "concept": "collections"
+ },
+ "set-unique-operations": {
+  "difficulty": 1,
+  "concept": "collections"
+ },
+ "array-flatten-recursive": {
+  "difficulty": 2,
+  "concept": "flatten"
+ },
+ "custom-array-reduce": {
+  "difficulty": 2,
+  "concept": "array-polyfills"
+ },
+ "object-deep-clone": {
+  "difficulty": 3,
+  "concept": "equality-clone"
+ },
+ "lru-cache-implementation": {
+  "difficulty": 3,
+  "concept": "lru"
+ },
+ "currying-function": {
+  "difficulty": 2,
+  "concept": "currying"
+ },
+ "hook-fetch-cleanup": {
+  "difficulty": 2,
+  "concept": "react-fetch"
+ },
+ "hook-use-debounce": {
+  "difficulty": 2,
+  "concept": "react-timers"
+ },
+ "controlled-vs-uncontrolled-input": {
+  "difficulty": 1,
+  "concept": "react-forms"
+ },
+ "hook-use-previous": {
+  "difficulty": 1,
+  "concept": "react-hooks-utility"
+ },
+ "use-reducer-todo-list": {
+  "difficulty": 2,
+  "concept": "reducer"
+ },
+ "infinite-scroll-observer": {
+  "difficulty": 3,
+  "concept": "infinite-scroll"
+ },
+ "context-provider-consumer": {
+  "difficulty": 2,
+  "concept": "context"
+ },
+ "two-pointer-sorted-sum": {
+  "difficulty": 2,
+  "concept": "two-pointer"
+ },
+ "sliding-window-dynamic": {
+  "difficulty": 3,
+  "concept": "sliding-window"
+ },
+ "sliding-window-fixed": {
+  "difficulty": 2,
+  "concept": "sliding-window"
+ },
+ "valid-parentheses-stack": {
+  "difficulty": 2,
+  "concept": "stack"
+ },
+ "binary-search-exact": {
+  "difficulty": 2,
+  "concept": "binary-search"
+ },
+ "tree-level-order-bfs": {
+  "difficulty": 3,
+  "concept": "trees"
+ },
+ "merge-intervals": {
+  "difficulty": 3,
+  "concept": "intervals"
+ },
+ "debounce": {
+  "difficulty": 3,
+  "concept": "rate-limiting"
+ },
+ "throttle": {
+  "difficulty": 3,
+  "concept": "rate-limiting"
+ },
+ "memoize": {
+  "difficulty": 3,
+  "concept": "memoize"
+ },
+ "bind-call-apply": {
+  "difficulty": 4,
+  "concept": "this-binding"
+ },
+ "deep-clone": {
+  "difficulty": 4,
+  "concept": "equality-clone"
+ },
+ "event-emitter": {
+  "difficulty": 3,
+  "concept": "emitter"
+ },
+ "curry-compose": {
+  "difficulty": 3,
+  "concept": "currying"
+ },
+ "promise-all-polyfill": {
+  "difficulty": 3,
+  "concept": "promise-combinators"
+ },
+ "promise-pool": {
+  "difficulty": 4,
+  "concept": "async-control"
+ },
+ "retry-with-backoff": {
+  "difficulty": 3,
+  "concept": "async-control"
+ },
+ "fetch-timeout-dedupe": {
+  "difficulty": 4,
+  "concept": "fetch"
+ },
+ "async-queue-scheduler": {
+  "difficulty": 4,
+  "concept": "async-control"
+ },
+ "express-middleware-chain": {
+  "difficulty": 4,
+  "concept": "middleware"
+ },
+ "rate-limiter-middleware": {
+  "difficulty": 4,
+  "concept": "rate-limiting"
+ },
+ "lru-cache-ttl": {
+  "difficulty": 4,
+  "concept": "lru"
+ },
+ "flatten-array-object": {
+  "difficulty": 3,
+  "concept": "flatten"
+ },
+ "group-by-count-by": {
+  "difficulty": 2,
+  "concept": "collections"
+ },
+ "array-method-polyfills": {
+  "difficulty": 3,
+  "concept": "array-polyfills"
+ },
+ "get-set-path": {
+  "difficulty": 3,
+  "concept": "collections"
+ },
+ "deep-equal": {
+  "difficulty": 4,
+  "concept": "equality-clone"
+ },
+ "unique-sort-dedupe": {
+  "difficulty": 2,
+  "concept": "collections"
+ },
+ "use-debounce-hook": {
+  "difficulty": 3,
+  "concept": "react-timers"
+ },
+ "use-fetch-hook": {
+  "difficulty": 3,
+  "concept": "react-fetch"
+ },
+ "typeahead-autocomplete": {
+  "difficulty": 4,
+  "concept": "typeahead"
+ },
+ "use-previous-latest-ref": {
+  "difficulty": 3,
+  "concept": "react-hooks-utility"
+ },
+ "infinite-scroll-list": {
+  "difficulty": 4,
+  "concept": "infinite-scroll"
+ },
+ "modal-portal-focus": {
+  "difficulty": 4,
+  "concept": "a11y-components"
+ },
+ "todo-list-reducer": {
+  "difficulty": 3,
+  "concept": "reducer"
+ },
+ "tabs-accordion-compound": {
+  "difficulty": 3,
+  "concept": "compound"
+ },
+ "two-sum-hashmap": {
+  "difficulty": 1,
+  "concept": "hashing"
+ },
+ "tree-traversal-dom": {
+  "difficulty": 4,
+  "concept": "trees"
+ },
+ "interval-merge-sliding-window": {
+  "difficulty": 4,
+  "concept": "intervals"
+ },
+ "ts-discriminated-unions-exhaustiveness": {
+  "difficulty": 3,
+  "concept": "ts-unions"
+ },
+ "ts-generic-api-client": {
+  "difficulty": 3,
+  "concept": "ts-generics"
+ },
+ "ts-custom-utility-types": {
+  "difficulty": 4,
+  "concept": "ts-types"
+ },
+ "ts-generic-component-props": {
+  "difficulty": 3,
+  "concept": "ts-generics"
+ },
+ "ts-custom-type-guards": {
+  "difficulty": 2,
+  "concept": "ts-narrowing"
+ },
+ "ts-typed-event-emitter": {
+  "difficulty": 4,
+  "concept": "emitter"
+ },
+ "classnames-utility": {
+  "difficulty": 1,
+  "concept": "string-utils"
+ },
+ "closures-private-state": {
+  "difficulty": 2,
+  "concept": "closures"
+ },
+ "css-specificity": {
+  "difficulty": 3,
+  "concept": "css"
+ },
+ "format-utilities": {
+  "difficulty": 2,
+  "concept": "string-utils"
+ },
+ "infinite-currying-sum": {
+  "difficulty": 3,
+  "concept": "currying"
+ },
+ "iterators-generators": {
+  "difficulty": 3,
+  "concept": "iterators"
+ },
+ "json-stringify-polyfill": {
+  "difficulty": 4,
+  "concept": "serialization"
+ },
+ "new-instanceof-create": {
+  "difficulty": 4,
+  "concept": "this-binding"
+ },
+ "promise-class-scratch": {
+  "difficulty": 5,
+  "concept": "promise"
+ },
+ "promisify-callback": {
+  "difficulty": 2,
+  "concept": "promise"
+ },
+ "query-string-url": {
+  "difficulty": 2,
+  "concept": "string-utils"
+ },
+ "client-side-router": {
+  "difficulty": 4,
+  "concept": "router"
+ },
+ "event-delegation": {
+  "difficulty": 2,
+  "concept": "dom"
+ },
+ "storage-ttl-wrapper": {
+  "difficulty": 3,
+  "concept": "storage"
+ },
+ "vnode-to-dom": {
+  "difficulty": 3,
+  "concept": "dom"
+ },
+ "error-boundary-reset": {
+  "difficulty": 3,
+  "concept": "resilience"
+ },
+ "external-store-hook": {
+  "difficulty": 4,
+  "concept": "state-management"
+ },
+ "forward-ref-imperative-handle": {
+  "difficulty": 3,
+  "concept": "refs"
+ },
+ "memo-stable-callbacks": {
+  "difficulty": 3,
+  "concept": "react-perf"
+ },
+ "on-click-outside-hook": {
+  "difficulty": 3,
+  "concept": "react-hooks-utility"
+ },
+ "use-local-storage-hook": {
+  "difficulty": 2,
+  "concept": "react-hooks-utility"
+ },
+ "sleep-and-delay": {
+  "difficulty": 1,
+  "concept": "promise"
+ },
+ "memoize-basics": {
+  "difficulty": 1,
+  "concept": "memoize"
+ },
+ "callback-emitter": {
+  "difficulty": 1,
+  "concept": "emitter"
+ },
+ "fifo-cache": {
+  "difficulty": 2,
+  "concept": "lru"
+ },
+ "shallow-copy-equal": {
+  "difficulty": 1,
+  "concept": "equality-clone"
+ },
+ "tree-depth-sum": {
+  "difficulty": 1,
+  "concept": "trees"
+ },
+ "interval-overlap": {
+  "difficulty": 2,
+  "concept": "intervals"
+ },
+ "bind-method-partial": {
+  "difficulty": 2,
+  "concept": "this-binding"
+ },
+ "safe-json-storage": {
+  "difficulty": 1,
+  "concept": "storage"
+ },
+ "run-in-sequence": {
+  "difficulty": 2,
+  "concept": "async-control"
+ },
+ "parse-style-string": {
+  "difficulty": 1,
+  "concept": "css"
+ },
+ "parse-path-params": {
+  "difficulty": 2,
+  "concept": "router"
+ },
+ "focus-on-mount": {
+  "difficulty": 1,
+  "concept": "refs"
+ }
+}

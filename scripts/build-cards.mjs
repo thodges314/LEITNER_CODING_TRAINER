@@ -43,6 +43,20 @@ for (const f of metaFiles) {
   }
 }
 
+// Difficulty ladder: scripts/difficulty.json maps id -> { difficulty 1-5, concept }.
+// Seed status: a card starts active only if it is on the bottom rung of its concept AND difficulty <= 2.
+const ladder = JSON.parse(fs.readFileSync(path.join(here, 'difficulty.json'), 'utf8'));
+for (const t of topics) {
+  const info = ladder[t.id];
+  if (!info) throw new Error(`scripts/difficulty.json has no entry for "${t.id}"`);
+  t.difficulty = info.difficulty;
+  t.concept = info.concept;
+}
+for (const t of topics) {
+  const lowest = Math.min(...topics.filter((o) => o.concept === t.concept).map((o) => o.difficulty));
+  t.status = t.difficulty === lowest && t.difficulty <= 2 ? 'active' : 'locked';
+}
+
 let n = 0;
 for (const t of topics) {
   if (!cases[t.id]) throw new Error(`No cases authored for ${t.id}`);

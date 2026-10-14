@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Losing and Keeping this: bindMethod and partial",
+  "tags": [
+    "this",
+    "bind",
+    "partial-application",
+    "basics"
+  ]
+}

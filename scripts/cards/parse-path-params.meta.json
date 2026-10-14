@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Parse Path Params from a URL Pattern",
+  "tags": [
+    "router",
+    "url",
+    "params",
+    "basics"
+  ]
+}

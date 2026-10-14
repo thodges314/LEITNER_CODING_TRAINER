@@ -1,0 +1,1 @@
+Methods lose their `this` when extracted (const f = obj.method). Write bindMethod(obj, name) returning a function that calls obj[name] with this = obj and forwards the arguments, using an arrow function or closure (not Function.prototype.bind). Also write partial(fn, ...preset) returning a function that calls fn with the preset arguments followed by the new ones.

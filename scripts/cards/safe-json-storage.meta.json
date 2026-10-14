@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Safe JSON Read and Write",
+  "tags": [
+    "json",
+    "localstorage",
+    "error-handling",
+    "basics"
+  ]
+}

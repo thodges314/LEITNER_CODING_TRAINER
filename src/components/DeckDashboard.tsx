@@ -1,3 +1,4 @@
+import { DifficultyBadge } from './DifficultyBadge';
 import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 import {
@@ -404,6 +405,9 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                       >
                         {trkMeta.label}
                       </span>
+                      <div style={{ marginTop: '4px' }}>
+                        <DifficultyBadge card={topic} showLabel={false} />
+                      </div>
                     </td>
 
                     {/* Box */}

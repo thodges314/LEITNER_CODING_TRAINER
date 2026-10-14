@@ -1,0 +1,1 @@
+Write createEmitter() returning { on(event, fn), emit(event, ...args) }. on registers a listener (several per event are allowed, called in registration order); emit calls every listener of that event with the given arguments and returns the number of listeners called (0 if none). Emitting an event nobody listens to must not throw.

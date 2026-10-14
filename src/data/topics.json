@@ -33,7 +33,9 @@
         "input": "fetchData('https://invalid-non-existent-url-domain.org')",
         "expected": "Rejects with the network error (TypeError: Failed to fetch)"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "fetch"
   },
   {
     "id": "promise-chaining-syntax",
@@ -42,7 +44,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "promises",
       "then",
@@ -74,7 +76,9 @@
         "input": "const lines = [];\nconst realConsole = console;\nconsole = { log: (...a) => lines.push(a.join(' ')), error() {}, warn() {}, info() {} };\ntry { await getUserData('https://jsonplaceholder.typicode.com/invalid-path-404'); } catch {} finally { console = realConsole; }\nlines.length",
         "expected": "1  (exactly one console.log, from .finally())"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "promise"
   },
   {
     "id": "promise-all-vs-settled",
@@ -83,7 +87,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "promises",
       "concurrency"
@@ -109,7 +113,9 @@
         "input": "fetchAllUsers(['https://invalid-non-existent-url-domain.org'])",
         "expected": "[]"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "promise-combinators"
   },
   {
     "id": "fetch-abort-controller",
@@ -118,7 +124,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "fetch",
       "abort-controller",
@@ -145,7 +151,9 @@
         "input": "const realClear = globalThis.clearTimeout;\nlet cleared = 0;\nglobalThis.clearTimeout = (id) => { cleared++; return realClear(id); };\ntry { await fetchWithTimeout('https://jsonplaceholder.typicode.com/todos/1', 5000); } finally { globalThis.clearTimeout = realClear; }\ncleared >= 1",
         "expected": "true"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "fetch"
   },
   {
     "id": "debounce-implementation",
@@ -186,7 +194,9 @@
         "input": "let seen;\nconst o = { n: 7, f: debounce(function () { seen = this.n; }, 20) };\no.f();\nawait sleep(60);\nseen",
         "expected": "7"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "rate-limiting"
   },
   {
     "id": "throttle-implementation",
@@ -195,7 +205,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "closures",
       "throttle",
@@ -222,7 +232,9 @@
         "input": "const got = [];\nconst t = throttle((x) => got.push(x), 50);\nt('a'); t('b');\ngot",
         "expected": "['a']"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "rate-limiting"
   },
   {
     "id": "event-loop-microtasks",
@@ -258,7 +270,9 @@
         "input": "const a = await getExecutionOrder();\nconst b = await getExecutionOrder();\na !== b",
         "expected": "true"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "event-loop"
   },
   {
     "id": "map-frequency-counter",
@@ -293,7 +307,9 @@
         "input": "countFrequencies([1, '1', 1])",
         "expected": "Map(2) { 1 => 2, '1' => 1 }"
       }
-    ]
+    ],
+    "difficulty": 1,
+    "concept": "collections"
   },
   {
     "id": "set-unique-operations",
@@ -354,7 +370,9 @@
         "input": "arrayDifference(['x'], [])",
         "expected": "['x']"
       }
-    ]
+    ],
+    "difficulty": 1,
+    "concept": "collections"
   },
   {
     "id": "array-flatten-recursive",
@@ -394,7 +412,9 @@
         "input": "flatten([1, 2, 3])",
         "expected": "[1, 2, 3]"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "flatten"
   },
   {
     "id": "custom-array-reduce",
@@ -403,7 +423,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "arrays",
       "prototypes",
@@ -440,7 +460,9 @@
         "input": "myReduce([], (a, b) => a + b)",
         "expected": "Throws TypeError: Reduce of empty array with no initial value"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "array-polyfills"
   },
   {
     "id": "object-deep-clone",
@@ -481,7 +503,9 @@
         "input": "[deepClone(5), deepClone(null), deepClone(\"s\")]",
         "expected": "[5, null, 's']"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "equality-clone"
   },
   {
     "id": "lru-cache-implementation",
@@ -527,7 +551,9 @@
         "input": "new LRUCache(1).get(9)",
         "expected": "-1"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "lru"
   },
   {
     "id": "currying-function",
@@ -536,7 +562,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "currying",
       "closures"
@@ -562,7 +588,9 @@
         "input": "curry((a, b) => a + b)(1)(2)",
         "expected": "3"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "currying"
   },
   {
     "id": "hook-fetch-cleanup",
@@ -608,7 +636,9 @@
         "input": "unmount() while '/api/a' is still pending",
         "expected": "signal.aborted === true"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "react-fetch"
   },
   {
     "id": "hook-use-debounce",
@@ -654,7 +684,9 @@
         "input": "rerender 'a' → 'x', then unmount(); wait 80 ms",
         "expected": "no error; last returned value stays 'a'"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "react-timers"
   },
   {
     "id": "controlled-vs-uncontrolled-input",
@@ -700,7 +732,9 @@
         "input": "type '   ', submit the form",
         "expected": "onSearch is not called again"
       }
-    ]
+    ],
+    "difficulty": 1,
+    "concept": "react-forms"
   },
   {
     "id": "hook-use-previous",
@@ -709,7 +743,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "react",
       "custom-hooks",
@@ -741,7 +775,9 @@
         "input": "values a = { id: 1 } → b = { id: 2 }",
         "expected": "second render returns exactly a (=== a)"
       }
-    ]
+    ],
+    "difficulty": 1,
+    "concept": "react-hooks-utility"
   },
   {
     "id": "use-reducer-todo-list",
@@ -750,7 +786,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "react",
       "usereducer",
@@ -792,7 +828,9 @@
         "input": "useReducer(todoReducer, []): dispatch ADD_TODO 'Practice', ADD_TODO 'Rest', TOGGLE_TODO 1, REMOVE_TODO 2",
         "expected": "[{ id: 1, text: 'Practice', done: true }]"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "reducer"
   },
   {
     "id": "infinite-scroll-observer",
@@ -838,7 +876,9 @@
         "input": "unmount()",
         "expected": "observer.disconnect() called"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "infinite-scroll"
   },
   {
     "id": "context-provider-consumer",
@@ -847,7 +887,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "react",
       "context"
@@ -873,7 +913,9 @@
         "input": "useTheme() with no <ThemeProvider> above",
         "expected": "throws Error('useTheme must be used within a ThemeProvider')"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "context"
   },
   {
     "id": "two-pointer-sorted-sum",
@@ -918,7 +960,9 @@
         "input": "twoSumSorted([1, 2, 3], 7)",
         "expected": "[]"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "two-pointer"
   },
   {
     "id": "sliding-window-dynamic",
@@ -927,7 +971,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "algorithms",
       "sliding-window",
@@ -964,7 +1008,9 @@
         "input": "lengthOfLongestSubstring('abba')",
         "expected": "2"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "sliding-window"
   },
   {
     "id": "sliding-window-fixed",
@@ -1009,7 +1055,9 @@
         "input": "maxSubarraySum([4], 1)",
         "expected": "4"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "sliding-window"
   },
   {
     "id": "valid-parentheses-stack",
@@ -1018,7 +1066,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "algorithms",
       "stack"
@@ -1064,7 +1112,9 @@
         "input": "isValidParentheses('')",
         "expected": "true"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "stack"
   },
   {
     "id": "binary-search-exact",
@@ -1073,7 +1123,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "algorithms",
       "binary-search"
@@ -1114,7 +1164,9 @@
         "input": "binarySearch([5], 5)",
         "expected": "0"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "binary-search"
   },
   {
     "id": "tree-level-order-bfs",
@@ -1155,7 +1207,9 @@
         "input": "levelOrder({ val: 1, left: { val: 2, left: { val: 3 } } })",
         "expected": "[[1], [2], [3]]"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "trees"
   },
   {
     "id": "merge-intervals",
@@ -1206,7 +1260,9 @@
         "input": "mergeIntervals([])",
         "expected": "[]"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "intervals"
   },
   {
     "id": "debounce",
@@ -1215,7 +1271,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "closures",
       "timers",
@@ -1252,7 +1308,9 @@
         "input": "let n = 0;\nconst d = debounce(() => n++, 30);\nd(); d.flush();\nawait sleep(80);\nn",
         "expected": "1"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "rate-limiting"
   },
   {
     "id": "throttle",
@@ -1261,7 +1319,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "closures",
       "timers",
@@ -1303,7 +1361,9 @@
         "input": "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: false, trailing: true });\nt('a');\nawait sleep(90);\ngot",
         "expected": "['a']"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "rate-limiting"
   },
   {
     "id": "memoize",
@@ -1312,7 +1372,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "closures",
       "caching",
@@ -1349,7 +1409,9 @@
         "input": "const o = { k: 10, f: memoize(function (x) { return this.k + x; }) };\no.f(1)",
         "expected": "11"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "memoize"
   },
   {
     "id": "bind-call-apply",
@@ -1410,7 +1472,9 @@
         "input": "function add(a, b, c) { return a + b + c; }\nadd.myBind(null, 1, 2)(3)",
         "expected": "6"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "this-binding"
   },
   {
     "id": "deep-clone",
@@ -1461,7 +1525,9 @@
         "input": "const s = new Set([1, 2]);\nconst c = deepClone(s);\n[c !== s, c.size, c.has(2)]",
         "expected": "[true, 2, true]"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "equality-clone"
   },
   {
     "id": "event-emitter",
@@ -1522,7 +1588,9 @@
         "input": "const ee = new EventEmitter();\nlet n = 0;\nconst fn = () => n++;\nee.once('e', fn);\nee.off('e', fn);\nee.emit('e');\nn",
         "expected": "0"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "emitter"
   },
   {
     "id": "curry-compose",
@@ -1568,7 +1636,9 @@
         "input": "compose((x) => x + 1, (x) => x * 2)(2)",
         "expected": "5"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "currying"
   },
   {
     "id": "promise-all-polyfill",
@@ -1577,7 +1647,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "promises",
       "polyfill",
@@ -1619,7 +1689,9 @@
         "input": "await promiseRace([new Promise((r) => setTimeout(r, 30, 'slow')), new Promise((r) => setTimeout(r, 5, 'fast'))])",
         "expected": "'fast'"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "promise-combinators"
   },
   {
     "id": "promise-pool",
@@ -1628,7 +1700,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "concurrency",
       "queue",
@@ -1665,7 +1737,9 @@
         "input": "await pool([], 3)",
         "expected": "[]"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "async-control"
   },
   {
     "id": "retry-with-backoff",
@@ -1674,7 +1748,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "async",
       "abortcontroller",
@@ -1721,7 +1795,9 @@
         "input": "const ac = new AbortController();\nac.abort();\nlet called = false;\nawait retry(async () => { called = true; }, { signal: ac.signal }).catch(() => {});\ncalled",
         "expected": "false"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "async-control"
   },
   {
     "id": "fetch-timeout-dedupe",
@@ -1762,7 +1838,9 @@
         "input": "await dedupeFetch('k', () => Promise.reject(new Error('x'))).catch(() => {});\nawait dedupeFetch('k', () => Promise.resolve('ok'))",
         "expected": "'ok'"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "fetch"
   },
   {
     "id": "async-queue-scheduler",
@@ -1803,7 +1881,9 @@
         "input": "const q = new AsyncQueue();\nconst bad = q.add(async () => { throw new Error('boom'); }).catch((e) => e.message);\nconst good = q.add(async () => 'ok');\n[await bad, await good]",
         "expected": "['boom', 'ok']"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "async-control"
   },
   {
     "id": "express-middleware-chain",
@@ -1869,7 +1949,9 @@
         "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use(() => { throw new Error('x'); });\napp.handle({}, res);\nres.statusCode",
         "expected": "500"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "middleware"
   },
   {
     "id": "rate-limiter-middleware",
@@ -1915,7 +1997,9 @@
         "input": "let t = 0;\nconst mw = rateLimiter({ limit: 2, windowMs: 1000, now: () => t });\nconst call = (ip) => { const res = { statusCode: 200, headers: {}, setHeader(k, v) { this.headers[k] = v; }, end() {} }; let passed = false; mw({ ip }, res, () => { passed = true; }); return [passed, res.statusCode, res.headers['Retry-After']]; };\ncall('a'); call('b');\nt = 2000;\ncall('c');\nmw.size()",
         "expected": "1"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "rate-limiting"
   },
   {
     "id": "lru-cache-ttl",
@@ -1957,7 +2041,9 @@
         "input": "const l = new LRUCacheTTL(2);\nl.set('a', 1); l.set('b', 2);\nl.get('a');\nl.set('c', 3);\n[l.get('a'), l.get('b'), l.get('c')]",
         "expected": "[1, -1, 3]"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "lru"
   },
   {
     "id": "flatten-array-object",
@@ -1966,7 +2052,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "recursion",
       "arrays",
@@ -2018,7 +2104,9 @@
         "input": "flattenObject({ a: {}, b: { c: [] } })",
         "expected": "{ a: {}, 'b.c': [] }"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "flatten"
   },
   {
     "id": "group-by-count-by",
@@ -2027,7 +2115,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "reduce",
       "aggregation",
@@ -2069,7 +2157,9 @@
         "input": "keyBy([{ id: 1, n: 'x' }, { id: 2, n: 'y' }], 'id')",
         "expected": "{ 1: { id: 1, n: 'x' }, 2: { id: 2, n: 'y' } }"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "collections"
   },
   {
     "id": "array-method-polyfills",
@@ -2078,7 +2168,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "polyfill",
       "arrays",
@@ -2125,7 +2215,9 @@
         "input": "[].myReduce((a, b) => a + b)",
         "expected": "Throws TypeError: Reduce of empty array with no initial value"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "array-polyfills"
   },
   {
     "id": "get-set-path",
@@ -2181,7 +2273,9 @@
         "input": "const o = {};\nset(o, 'list[0]', 1);\no",
         "expected": "{ list: [1] }"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "collections"
   },
   {
     "id": "deep-equal",
@@ -2257,7 +2351,9 @@
         "input": "deepEqual([], {})",
         "expected": "false"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "equality-clone"
   },
   {
     "id": "unique-sort-dedupe",
@@ -2308,7 +2404,9 @@
         "input": "dedupeAndSort([{ id: 1, team: 'b', n: 1 }, { id: 2, team: 'a', n: 2 }, { id: 3, team: 'a', n: 1 }], ['team', 'n']).map((r) => r.id)",
         "expected": "[3, 2, 1]"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "collections"
   },
   {
     "id": "use-debounce-hook",
@@ -2317,7 +2415,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "hooks",
       "effects",
@@ -2369,7 +2467,9 @@
         "input": "after the interval has passed, rerender → 'e'",
         "expected": "'e' straight away"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "react-timers"
   },
   {
     "id": "use-fetch-hook",
@@ -2378,7 +2478,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "hooks",
       "fetch",
@@ -2421,7 +2521,9 @@
         "input": "unmount() while the request is pending",
         "expected": "signal.aborted === true"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "react-fetch"
   },
   {
     "id": "typeahead-autocomplete",
@@ -2430,7 +2532,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "components",
       "debounce",
@@ -2473,7 +2575,9 @@
         "input": "request for 're' resolves AFTER request for 'rea' (['stale'] after ['real'])",
         "expected": "options: ['real']"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "typeahead"
   },
   {
     "id": "use-previous-latest-ref",
@@ -2524,7 +2628,9 @@
         "input": "rerender delay null → 30; wait 100 ms",
         "expected": "cb called at least 2 times"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "react-hooks-utility"
   },
   {
     "id": "infinite-scroll-list",
@@ -2570,7 +2676,9 @@
         "input": "unmount()",
         "expected": "observer.disconnect() called"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "infinite-scroll"
   },
   {
     "id": "modal-portal-focus",
@@ -2632,7 +2740,9 @@
         "input": "close the modal",
         "expected": "document.body.style.overflow is no longer 'hidden'"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "a11y-components"
   },
   {
     "id": "todo-list-reducer",
@@ -2699,7 +2809,9 @@
         "input": "selectCounts({ todos: [{ id: 1, text: 'a', done: true }, { id: 2, text: 'b', done: false }], filter: 'all' })",
         "expected": "{ total: 2, active: 1, done: 1 }"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "reducer"
   },
   {
     "id": "tabs-accordion-compound",
@@ -2746,7 +2858,9 @@
         "input": "<Tabs value='one' onChange={fn}>, click 'two'; then rerender value='two'",
         "expected": "fn('two') called; 'Panel one' stays until the prop changes, then 'Panel two'"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "compound"
   },
   {
     "id": "two-sum-hashmap",
@@ -2797,7 +2911,9 @@
         "input": "twoSum([1, 2, 3], 7)",
         "expected": "[]"
       }
-    ]
+    ],
+    "difficulty": 1,
+    "concept": "hashing"
   },
   {
     "id": "tree-traversal-dom",
@@ -2864,7 +2980,9 @@
         "input": "const mk = (id, children = [], cls = []) => ({ id, children, classList: { contains: (c) => cls.includes(c) } });\nlet node = mk('n0');\nfor (let i = 1; i < 20000; i++) node = mk('n' + i, [node]);\ndfsIterative(node).length",
         "expected": "20000"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "trees"
   },
   {
     "id": "interval-merge-sliding-window",
@@ -2925,7 +3043,9 @@
         "input": "lengthOfLongestSubstring('pwwkew')",
         "expected": "3"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "intervals"
   },
   {
     "id": "ts-discriminated-unions-exhaustiveness",
@@ -2934,7 +3054,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "typescript",
       "discriminated-unions",
@@ -2977,7 +3097,9 @@
         "input": "add { status: 'cancelled' } to AsyncState without a case",
         "expected": "TS2322 — Type '{ status: \"cancelled\" }' is not assignable to type 'never' (in the default branch)"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "ts-unions"
   },
   {
     "id": "ts-generic-api-client",
@@ -2986,7 +3108,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "typescript",
       "generics",
@@ -3024,7 +3146,9 @@
         "input": "const t = await apiGet<Todo>(url);\nt.nope",
         "expected": "TS2339 — Property 'nope' does not exist on type 'Todo'"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "ts-generics"
   },
   {
     "id": "ts-custom-utility-types",
@@ -3076,7 +3200,9 @@
         "input": "const x: PickByType<{ id: number; name: string }, number> = { id: 1, name: 'x' };",
         "expected": "TS2353 — Object literal may only specify known properties; 'name' does not exist"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "ts-types"
   },
   {
     "id": "ts-generic-component-props",
@@ -3118,7 +3244,9 @@
         "input": "renderSelect<string>({ items: ['a'], value: 5, onChange: () => {}, getLabel: (s) => s })",
         "expected": "TS2322 — Type 'number' is not assignable to type 'string'"
       }
-    ]
+    ],
+    "difficulty": 3,
+    "concept": "ts-generics"
   },
   {
     "id": "ts-custom-type-guards",
@@ -3127,7 +3255,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "typescript",
       "type-guards",
@@ -3189,7 +3317,9 @@
         "input": "const v: unknown = { a: 1 };\nif (isRecord(v)) { v.a }  // OK\nv.a                       // outside the guard",
         "expected": "TS2339 outside the guard — Property 'a' does not exist on type 'unknown'"
       }
-    ]
+    ],
+    "difficulty": 2,
+    "concept": "ts-narrowing"
   },
   {
     "id": "ts-typed-event-emitter",
@@ -3236,7 +3366,9 @@
         "input": "emitter.emit('nope', 1)",
         "expected": "TS2345 — Argument of type '\"nope\"' is not assignable to parameter of type 'keyof AppEvents'"
       }
-    ]
+    ],
+    "difficulty": 4,
+    "concept": "emitter"
   },
   {
     "id": "classnames-utility",
@@ -3245,7 +3377,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "css",
       "classnames",
@@ -3288,7 +3420,9 @@
         "expected": "'btn btn-active'"
       }
     ],
-    "testHarness": "await $test.run(\"Strings are joined, falsy values skipped\", async () => {\n  const sleep = $test.sleep;\n  return (classNames('a', null, 'b', undefined, false, ''));\n}, () => ('a b'));\n\nawait $test.run(\"Object keys with truthy values\", async () => {\n  const sleep = $test.sleep;\n  return (classNames({ a: true, b: false, c: 1, d: '' }));\n}, () => ('a c'));\n\nawait $test.run(\"Nested arrays and objects flatten in order\", async () => {\n  const sleep = $test.sleep;\n  return (classNames('x', ['y', { z: true }, [false, 'w']]));\n}, () => ('x y z w'));\n\nawait $test.run(\"Numbers: 0 is skipped, others are included\", async () => {\n  const sleep = $test.sleep;\n  return (classNames(0, 1, 2));\n}, () => ('1 2'));\n\nawait $test.run(\"No arguments\", async () => {\n  const sleep = $test.sleep;\n  return (classNames());\n}, () => (''));\n\nawait $test.run(\"Conditional pattern\", async () => {\n  const sleep = $test.sleep;\n  const active = true, disabled = false;\n  return (classNames('btn', { 'btn-active': active, 'btn-disabled': disabled }));\n}, () => ('btn btn-active'));"
+    "testHarness": "await $test.run(\"Strings are joined, falsy values skipped\", async () => {\n  const sleep = $test.sleep;\n  return (classNames('a', null, 'b', undefined, false, ''));\n}, () => ('a b'));\n\nawait $test.run(\"Object keys with truthy values\", async () => {\n  const sleep = $test.sleep;\n  return (classNames({ a: true, b: false, c: 1, d: '' }));\n}, () => ('a c'));\n\nawait $test.run(\"Nested arrays and objects flatten in order\", async () => {\n  const sleep = $test.sleep;\n  return (classNames('x', ['y', { z: true }, [false, 'w']]));\n}, () => ('x y z w'));\n\nawait $test.run(\"Numbers: 0 is skipped, others are included\", async () => {\n  const sleep = $test.sleep;\n  return (classNames(0, 1, 2));\n}, () => ('1 2'));\n\nawait $test.run(\"No arguments\", async () => {\n  const sleep = $test.sleep;\n  return (classNames());\n}, () => (''));\n\nawait $test.run(\"Conditional pattern\", async () => {\n  const sleep = $test.sleep;\n  const active = true, disabled = false;\n  return (classNames('btn', { 'btn-active': active, 'btn-disabled': disabled }));\n}, () => ('btn btn-active'));",
+    "difficulty": 1,
+    "concept": "string-utils"
   },
   {
     "id": "closures-private-state",
@@ -3297,7 +3431,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "closures",
       "scope",
@@ -3350,7 +3484,9 @@
         "expected": "[10, 11, 12]"
       }
     ],
-    "testHarness": "await $test.run(\"createCounter counts with its step\", async () => {\n  const sleep = $test.sleep;\n  const c = createCounter({ start: 5, step: 2 });\n  c.increment(); c.increment(); c.decrement();\n  return (c.value());\n}, () => (7));\n\nawait $test.run(\"reset returns to the start value\", async () => {\n  const sleep = $test.sleep;\n  const c = createCounter({ start: 5, step: 2 });\n  c.increment(); c.increment();\n  c.reset();\n  return (c.value());\n}, () => (5));\n\nawait $test.run(\"Defaults: start 0, step 1\", async () => {\n  const sleep = $test.sleep;\n  const c = createCounter();\n  c.increment();\n  return (c.value());\n}, () => (1));\n\nawait $test.run(\"The count is private: only the four methods are exposed\", async () => {\n  const sleep = $test.sleep;\n  return (Object.keys(createCounter({})).sort());\n}, () => (['decrement', 'increment', 'reset', 'value']));\n\nawait $test.run(\"Counters are independent\", async () => {\n  const sleep = $test.sleep;\n  const a = createCounter({});\n  const b = createCounter({});\n  a.increment();\n  return ([a.value(), b.value()]);\n}, () => ([1, 0]));\n\nawait $test.run(\"once calls fn a single time and caches the first result\", async () => {\n  const sleep = $test.sleep;\n  let n = 0;\n  const f = once(() => ++n);\n  return ([f(), f(), f(), n]);\n}, () => ([1, 1, 1, 1]));\n\nawait $test.run(\"once forwards the arguments of the first call\", async () => {\n  const sleep = $test.sleep;\n  const f = once((a, b) => a + b);\n  return ([f(2, 3), f(10, 10)]);\n}, () => ([5, 5]));\n\nawait $test.run(\"makeAdders gives each function its own i\", async () => {\n  const sleep = $test.sleep;\n  return (makeAdders(3).map((add) => add(10)));\n}, () => ([10, 11, 12]));"
+    "testHarness": "await $test.run(\"createCounter counts with its step\", async () => {\n  const sleep = $test.sleep;\n  const c = createCounter({ start: 5, step: 2 });\n  c.increment(); c.increment(); c.decrement();\n  return (c.value());\n}, () => (7));\n\nawait $test.run(\"reset returns to the start value\", async () => {\n  const sleep = $test.sleep;\n  const c = createCounter({ start: 5, step: 2 });\n  c.increment(); c.increment();\n  c.reset();\n  return (c.value());\n}, () => (5));\n\nawait $test.run(\"Defaults: start 0, step 1\", async () => {\n  const sleep = $test.sleep;\n  const c = createCounter();\n  c.increment();\n  return (c.value());\n}, () => (1));\n\nawait $test.run(\"The count is private: only the four methods are exposed\", async () => {\n  const sleep = $test.sleep;\n  return (Object.keys(createCounter({})).sort());\n}, () => (['decrement', 'increment', 'reset', 'value']));\n\nawait $test.run(\"Counters are independent\", async () => {\n  const sleep = $test.sleep;\n  const a = createCounter({});\n  const b = createCounter({});\n  a.increment();\n  return ([a.value(), b.value()]);\n}, () => ([1, 0]));\n\nawait $test.run(\"once calls fn a single time and caches the first result\", async () => {\n  const sleep = $test.sleep;\n  let n = 0;\n  const f = once(() => ++n);\n  return ([f(), f(), f(), n]);\n}, () => ([1, 1, 1, 1]));\n\nawait $test.run(\"once forwards the arguments of the first call\", async () => {\n  const sleep = $test.sleep;\n  const f = once((a, b) => a + b);\n  return ([f(2, 3), f(10, 10)]);\n}, () => ([5, 5]));\n\nawait $test.run(\"makeAdders gives each function its own i\", async () => {\n  const sleep = $test.sleep;\n  return (makeAdders(3).map((add) => add(10)));\n}, () => ([10, 11, 12]));",
+    "difficulty": 2,
+    "concept": "closures"
   },
   {
     "id": "css-specificity",
@@ -3432,7 +3568,9 @@
         "expected": "0"
       }
     ],
-    "testHarness": "await $test.run(\"Type selector\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('div'));\n}, () => ([0, 0, 1]));\n\nawait $test.run(\"Id, classes and pseudo-classes\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('#nav .item:hover'));\n}, () => ([1, 2, 0]));\n\nawait $test.run(\"Descendant chain with a pseudo-element\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('ul li a::before'));\n}, () => ([0, 0, 4]));\n\nawait $test.run(\"Attribute selector counts as a class\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('a[href^=\"http\"]'));\n}, () => ([0, 1, 1]));\n\nawait $test.run(\"Universal selector adds nothing\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('*'));\n}, () => ([0, 0, 0]));\n\nawait $test.run(\"Combinators add nothing\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('div > p + span ~ em'));\n}, () => ([0, 0, 4]));\n\nawait $test.run(\":not() counts its argument, not itself\", async () => {\n  const sleep = $test.sleep;\n  return (specificity(':not(#a)'));\n}, () => ([1, 0, 0]));\n\nawait $test.run(\":not() mixed with other parts\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('li:not(.x):first-child'));\n}, () => ([0, 2, 1]));\n\nawait $test.run(\":where() adds nothing\", async () => {\n  const sleep = $test.sleep;\n  return (specificity(':where(#a) p'));\n}, () => ([0, 0, 1]));\n\nawait $test.run(\"compareSpecificity: one id beats many classes\", async () => {\n  const sleep = $test.sleep;\n  return (compareSpecificity('#a', '.b.c.d'));\n}, () => (1));\n\nawait $test.run(\"compareSpecificity: the more specific selector loses → -1\", async () => {\n  const sleep = $test.sleep;\n  return (compareSpecificity('.a', '.b span'));\n}, () => (-1));\n\nawait $test.run(\"compareSpecificity: ties give 0\", async () => {\n  const sleep = $test.sleep;\n  return (compareSpecificity('p', 'span'));\n}, () => (0));"
+    "testHarness": "await $test.run(\"Type selector\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('div'));\n}, () => ([0, 0, 1]));\n\nawait $test.run(\"Id, classes and pseudo-classes\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('#nav .item:hover'));\n}, () => ([1, 2, 0]));\n\nawait $test.run(\"Descendant chain with a pseudo-element\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('ul li a::before'));\n}, () => ([0, 0, 4]));\n\nawait $test.run(\"Attribute selector counts as a class\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('a[href^=\"http\"]'));\n}, () => ([0, 1, 1]));\n\nawait $test.run(\"Universal selector adds nothing\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('*'));\n}, () => ([0, 0, 0]));\n\nawait $test.run(\"Combinators add nothing\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('div > p + span ~ em'));\n}, () => ([0, 0, 4]));\n\nawait $test.run(\":not() counts its argument, not itself\", async () => {\n  const sleep = $test.sleep;\n  return (specificity(':not(#a)'));\n}, () => ([1, 0, 0]));\n\nawait $test.run(\":not() mixed with other parts\", async () => {\n  const sleep = $test.sleep;\n  return (specificity('li:not(.x):first-child'));\n}, () => ([0, 2, 1]));\n\nawait $test.run(\":where() adds nothing\", async () => {\n  const sleep = $test.sleep;\n  return (specificity(':where(#a) p'));\n}, () => ([0, 0, 1]));\n\nawait $test.run(\"compareSpecificity: one id beats many classes\", async () => {\n  const sleep = $test.sleep;\n  return (compareSpecificity('#a', '.b.c.d'));\n}, () => (1));\n\nawait $test.run(\"compareSpecificity: the more specific selector loses → -1\", async () => {\n  const sleep = $test.sleep;\n  return (compareSpecificity('.a', '.b span'));\n}, () => (-1));\n\nawait $test.run(\"compareSpecificity: ties give 0\", async () => {\n  const sleep = $test.sleep;\n  return (compareSpecificity('p', 'span'));\n}, () => (0));",
+    "difficulty": 3,
+    "concept": "css"
   },
   {
     "id": "format-utilities",
@@ -3499,7 +3637,9 @@
         "expected": "['Hello w…', 'short']"
       }
     ],
-    "testHarness": "await $test.run(\"formatNumber: thousands separators and decimals\", async () => {\n  const sleep = $test.sleep;\n  return (formatNumber(1234567.891, 2));\n}, () => ('1,234,567.89'));\n\nawait $test.run(\"formatNumber: small and negative numbers\", async () => {\n  const sleep = $test.sleep;\n  return ([formatNumber(999), formatNumber(-1000), formatNumber(0)]);\n}, () => (['999', '-1,000', '0']));\n\nawait $test.run(\"formatBytes: 1024-based units\", async () => {\n  const sleep = $test.sleep;\n  return ([formatBytes(0), formatBytes(500), formatBytes(1536), formatBytes(1048576)]);\n}, () => (['0 B', '500 B', '1.5 KB', '1 MB']));\n\nawait $test.run(\"formatBytes: honors decimals\", async () => {\n  const sleep = $test.sleep;\n  return (formatBytes(1234567, 2));\n}, () => ('1.18 MB'));\n\nawait $test.run(\"timeAgo: under a minute is just now\", async () => {\n  const sleep = $test.sleep;\n  return (timeAgo(0, 30000));\n}, () => ('just now'));\n\nawait $test.run(\"timeAgo: minutes, hours, days with plurals\", async () => {\n  const sleep = $test.sleep;\n  const now = 1000000000000;\n  return ([timeAgo(now - 5 * 60000, now), timeAgo(now - 3600000, now), timeAgo(now - 2 * 86400000, now)]);\n}, () => (['5 minutes ago', '1 hour ago', '2 days ago']));\n\nawait $test.run(\"timeAgo: the future\", async () => {\n  const sleep = $test.sleep;\n  const now = 1000000000000;\n  return (timeAgo(now + 3 * 3600000, now));\n}, () => ('in 3 hours'));\n\nawait $test.run(\"timeAgo: years\", async () => {\n  const sleep = $test.sleep;\n  const now = 1000000000000;\n  return (timeAgo(now - 400 * 86400000, now));\n}, () => ('1 year ago'));\n\nawait $test.run(\"truncate: adds an ellipsis within the limit\", async () => {\n  const sleep = $test.sleep;\n  return ([truncate('Hello world', 8), truncate('short', 8)]);\n}, () => (['Hello w…', 'short']));"
+    "testHarness": "await $test.run(\"formatNumber: thousands separators and decimals\", async () => {\n  const sleep = $test.sleep;\n  return (formatNumber(1234567.891, 2));\n}, () => ('1,234,567.89'));\n\nawait $test.run(\"formatNumber: small and negative numbers\", async () => {\n  const sleep = $test.sleep;\n  return ([formatNumber(999), formatNumber(-1000), formatNumber(0)]);\n}, () => (['999', '-1,000', '0']));\n\nawait $test.run(\"formatBytes: 1024-based units\", async () => {\n  const sleep = $test.sleep;\n  return ([formatBytes(0), formatBytes(500), formatBytes(1536), formatBytes(1048576)]);\n}, () => (['0 B', '500 B', '1.5 KB', '1 MB']));\n\nawait $test.run(\"formatBytes: honors decimals\", async () => {\n  const sleep = $test.sleep;\n  return (formatBytes(1234567, 2));\n}, () => ('1.18 MB'));\n\nawait $test.run(\"timeAgo: under a minute is just now\", async () => {\n  const sleep = $test.sleep;\n  return (timeAgo(0, 30000));\n}, () => ('just now'));\n\nawait $test.run(\"timeAgo: minutes, hours, days with plurals\", async () => {\n  const sleep = $test.sleep;\n  const now = 1000000000000;\n  return ([timeAgo(now - 5 * 60000, now), timeAgo(now - 3600000, now), timeAgo(now - 2 * 86400000, now)]);\n}, () => (['5 minutes ago', '1 hour ago', '2 days ago']));\n\nawait $test.run(\"timeAgo: the future\", async () => {\n  const sleep = $test.sleep;\n  const now = 1000000000000;\n  return (timeAgo(now + 3 * 3600000, now));\n}, () => ('in 3 hours'));\n\nawait $test.run(\"timeAgo: years\", async () => {\n  const sleep = $test.sleep;\n  const now = 1000000000000;\n  return (timeAgo(now - 400 * 86400000, now));\n}, () => ('1 year ago'));\n\nawait $test.run(\"truncate: adds an ellipsis within the limit\", async () => {\n  const sleep = $test.sleep;\n  return ([truncate('Hello world', 8), truncate('short', 8)]);\n}, () => (['Hello w…', 'short']));",
+    "difficulty": 2,
+    "concept": "string-utils"
   },
   {
     "id": "infinite-currying-sum",
@@ -3556,7 +3696,9 @@
         "expected": "[1, 3, 4]"
       }
     ],
-    "testHarness": "await $test.run(\"Chained calls end with an empty call\", async () => {\n  const sleep = $test.sleep;\n  return (sum(1)(2)(3)());\n}, () => (6));\n\nawait $test.run(\"Arguments can be grouped any way\", async () => {\n  const sleep = $test.sleep;\n  return (sum(1, 2)(3, 4)());\n}, () => (10));\n\nawait $test.run(\"Coerces to a number with unary plus\", async () => {\n  const sleep = $test.sleep;\n  return (+sum(1)(2)(3));\n}, () => (6));\n\nawait $test.run(\"Coerces to a string\", async () => {\n  const sleep = $test.sleep;\n  return (String(sum(1)(2)));\n}, () => ('3'));\n\nawait $test.run(\"Single argument\", async () => {\n  const sleep = $test.sleep;\n  return (sum(5)());\n}, () => (5));\n\nawait $test.run(\"No arguments at all is 0\", async () => {\n  const sleep = $test.sleep;\n  return (sum()());\n}, () => (0));\n\nawait $test.run(\"Branching from an intermediate result does not affect the original\", async () => {\n  const sleep = $test.sleep;\n  const a = sum(1);\n  const b = a(2);\n  const c = a(3);\n  return ([a(), b(), c()]);\n}, () => ([1, 3, 4]));"
+    "testHarness": "await $test.run(\"Chained calls end with an empty call\", async () => {\n  const sleep = $test.sleep;\n  return (sum(1)(2)(3)());\n}, () => (6));\n\nawait $test.run(\"Arguments can be grouped any way\", async () => {\n  const sleep = $test.sleep;\n  return (sum(1, 2)(3, 4)());\n}, () => (10));\n\nawait $test.run(\"Coerces to a number with unary plus\", async () => {\n  const sleep = $test.sleep;\n  return (+sum(1)(2)(3));\n}, () => (6));\n\nawait $test.run(\"Coerces to a string\", async () => {\n  const sleep = $test.sleep;\n  return (String(sum(1)(2)));\n}, () => ('3'));\n\nawait $test.run(\"Single argument\", async () => {\n  const sleep = $test.sleep;\n  return (sum(5)());\n}, () => (5));\n\nawait $test.run(\"No arguments at all is 0\", async () => {\n  const sleep = $test.sleep;\n  return (sum()());\n}, () => (0));\n\nawait $test.run(\"Branching from an intermediate result does not affect the original\", async () => {\n  const sleep = $test.sleep;\n  const a = sum(1);\n  const b = a(2);\n  const c = a(3);\n  return ([a(), b(), c()]);\n}, () => ([1, 3, 4]));",
+    "difficulty": 3,
+    "concept": "currying"
   },
   {
     "id": "iterators-generators",
@@ -3628,7 +3770,9 @@
         "expected": "[[2, 1], [2, 1]]"
       }
     ],
-    "testHarness": "await $test.run(\"range: end is exclusive\", async () => {\n  const sleep = $test.sleep;\n  return ([...range(0, 5)]);\n}, () => ([0, 1, 2, 3, 4]));\n\nawait $test.run(\"range with a positive step\", async () => {\n  const sleep = $test.sleep;\n  return ([...range(0, 10, 3)]);\n}, () => ([0, 3, 6, 9]));\n\nawait $test.run(\"range with a negative step\", async () => {\n  const sleep = $test.sleep;\n  return ([...range(5, 0, -2)]);\n}, () => ([5, 3, 1]));\n\nawait $test.run(\"take is lazy: works on an infinite generator\", async () => {\n  const sleep = $test.sleep;\n  function* naturals() { let i = 0; while (true) yield i++; }\n  return ([...take(naturals(), 3)]);\n}, () => ([0, 1, 2]));\n\nawait $test.run(\"take does not consume an extra item\", async () => {\n  const sleep = $test.sleep;\n  let pulled = 0;\n  function* source() { while (true) { pulled++; yield pulled; } }\n  [...take(source(), 2)];\n  return (pulled);\n}, () => (2));\n\nawait $test.run(\"take closes the source iterator (runs finally)\", async () => {\n  const sleep = $test.sleep;\n  let closed = false;\n  function* source() { try { yield 1; yield 2; yield 3; } finally { closed = true; } }\n  [...take(source(), 2)];\n  return (closed);\n}, () => (true));\n\nawait $test.run(\"mapIter is lazy and composes with take and range\", async () => {\n  const sleep = $test.sleep;\n  return ([...take(mapIter(range(0, Infinity), (x) => x * x), 4)]);\n}, () => ([0, 1, 4, 9]));\n\nawait $test.run(\"zip pairs items and stops at the shortest input\", async () => {\n  const sleep = $test.sleep;\n  return ([...zip([1, 2, 3], 'ab')]);\n}, () => ([[1, 'a'], [2, 'b']]));\n\nawait $test.run(\"Countdown is iterable\", async () => {\n  const sleep = $test.sleep;\n  return ([...new Countdown(3)]);\n}, () => ([3, 2, 1]));\n\nawait $test.run(\"Countdown can be iterated more than once\", async () => {\n  const sleep = $test.sleep;\n  const c = new Countdown(2);\n  return ([[...c], [...c]]);\n}, () => ([[2, 1], [2, 1]]));"
+    "testHarness": "await $test.run(\"range: end is exclusive\", async () => {\n  const sleep = $test.sleep;\n  return ([...range(0, 5)]);\n}, () => ([0, 1, 2, 3, 4]));\n\nawait $test.run(\"range with a positive step\", async () => {\n  const sleep = $test.sleep;\n  return ([...range(0, 10, 3)]);\n}, () => ([0, 3, 6, 9]));\n\nawait $test.run(\"range with a negative step\", async () => {\n  const sleep = $test.sleep;\n  return ([...range(5, 0, -2)]);\n}, () => ([5, 3, 1]));\n\nawait $test.run(\"take is lazy: works on an infinite generator\", async () => {\n  const sleep = $test.sleep;\n  function* naturals() { let i = 0; while (true) yield i++; }\n  return ([...take(naturals(), 3)]);\n}, () => ([0, 1, 2]));\n\nawait $test.run(\"take does not consume an extra item\", async () => {\n  const sleep = $test.sleep;\n  let pulled = 0;\n  function* source() { while (true) { pulled++; yield pulled; } }\n  [...take(source(), 2)];\n  return (pulled);\n}, () => (2));\n\nawait $test.run(\"take closes the source iterator (runs finally)\", async () => {\n  const sleep = $test.sleep;\n  let closed = false;\n  function* source() { try { yield 1; yield 2; yield 3; } finally { closed = true; } }\n  [...take(source(), 2)];\n  return (closed);\n}, () => (true));\n\nawait $test.run(\"mapIter is lazy and composes with take and range\", async () => {\n  const sleep = $test.sleep;\n  return ([...take(mapIter(range(0, Infinity), (x) => x * x), 4)]);\n}, () => ([0, 1, 4, 9]));\n\nawait $test.run(\"zip pairs items and stops at the shortest input\", async () => {\n  const sleep = $test.sleep;\n  return ([...zip([1, 2, 3], 'ab')]);\n}, () => ([[1, 'a'], [2, 'b']]));\n\nawait $test.run(\"Countdown is iterable\", async () => {\n  const sleep = $test.sleep;\n  return ([...new Countdown(3)]);\n}, () => ([3, 2, 1]));\n\nawait $test.run(\"Countdown can be iterated more than once\", async () => {\n  const sleep = $test.sleep;\n  const c = new Countdown(2);\n  return ([[...c], [...c]]);\n}, () => ([[2, 1], [2, 1]]));",
+    "difficulty": 3,
+    "concept": "iterators"
   },
   {
     "id": "json-stringify-polyfill",
@@ -3705,7 +3849,9 @@
         "expected": "'[{\"v\":1},{\"v\":1}]'"
       }
     ],
-    "testHarness": "await $test.run(\"Objects, arrays, strings, booleans and null\", async () => {\n  const sleep = $test.sleep;\n  return (stringify({ a: 1, b: [true, null, 'x'], c: { d: 'y' } }));\n}, () => ('{\"a\":1,\"b\":[true,null,\"x\"],\"c\":{\"d\":\"y\"}}'));\n\nawait $test.run(\"Quotes and backslashes are escaped\", async () => {\n  const sleep = $test.sleep;\n  return (stringify('say \"hi\" \\\\ bye'));\n}, () => ('\"say \\\\\"hi\\\\\" \\\\\\\\ bye\"'));\n\nawait $test.run(\"Control characters are escaped\", async () => {\n  const sleep = $test.sleep;\n  return (stringify('a\\nb\\tc\\u0001'));\n}, () => ('\"a\\\\nb\\\\tc\\\\u0001\"'));\n\nawait $test.run(\"Non-finite numbers become null; -0 becomes 0\", async () => {\n  const sleep = $test.sleep;\n  return (stringify([1, NaN, Infinity, -0, 1.5e3]));\n}, () => ('[1,null,null,0,1500]'));\n\nawait $test.run(\"Object properties holding undefined, functions or symbols are skipped\", async () => {\n  const sleep = $test.sleep;\n  return (stringify({ a: undefined, b: () => 1, c: Symbol('s'), d: 1 }));\n}, () => ('{\"d\":1}'));\n\nawait $test.run(\"Array items that are undefined or functions become null\", async () => {\n  const sleep = $test.sleep;\n  return (stringify([undefined, () => 1, 2]));\n}, () => ('[null,null,2]'));\n\nawait $test.run(\"A top-level undefined or function gives undefined\", async () => {\n  const sleep = $test.sleep;\n  return ([stringify(undefined), stringify(() => 1)]);\n}, () => ([undefined, undefined]));\n\nawait $test.run(\"Date and toJSON() are honored\", async () => {\n  const sleep = $test.sleep;\n  return ([stringify({ d: new Date(0) }), stringify({ toJSON() { return { x: 1 }; } })]);\n}, () => (['{\"d\":\"1970-01-01T00:00:00.000Z\"}', '{\"x\":1}']));\n\nawait $test.run(\"Empty containers and nesting\", async () => {\n  const sleep = $test.sleep;\n  return (stringify([{}, [], [[1]]]));\n}, () => ('[{},[],[[1]]]'));\n\nawait $test.rejects(\"A circular reference throws TypeError\", async () => {\n  const sleep = $test.sleep;\n  const a = {};\n  a.self = a;\n  return (stringify(a));\n}, \"TypeError\");\n\nawait $test.run(\"Shared (non-circular) references are fine\", async () => {\n  const sleep = $test.sleep;\n  const shared = { v: 1 };\n  return (stringify([shared, shared]));\n}, () => ('[{\"v\":1},{\"v\":1}]'));"
+    "testHarness": "await $test.run(\"Objects, arrays, strings, booleans and null\", async () => {\n  const sleep = $test.sleep;\n  return (stringify({ a: 1, b: [true, null, 'x'], c: { d: 'y' } }));\n}, () => ('{\"a\":1,\"b\":[true,null,\"x\"],\"c\":{\"d\":\"y\"}}'));\n\nawait $test.run(\"Quotes and backslashes are escaped\", async () => {\n  const sleep = $test.sleep;\n  return (stringify('say \"hi\" \\\\ bye'));\n}, () => ('\"say \\\\\"hi\\\\\" \\\\\\\\ bye\"'));\n\nawait $test.run(\"Control characters are escaped\", async () => {\n  const sleep = $test.sleep;\n  return (stringify('a\\nb\\tc\\u0001'));\n}, () => ('\"a\\\\nb\\\\tc\\\\u0001\"'));\n\nawait $test.run(\"Non-finite numbers become null; -0 becomes 0\", async () => {\n  const sleep = $test.sleep;\n  return (stringify([1, NaN, Infinity, -0, 1.5e3]));\n}, () => ('[1,null,null,0,1500]'));\n\nawait $test.run(\"Object properties holding undefined, functions or symbols are skipped\", async () => {\n  const sleep = $test.sleep;\n  return (stringify({ a: undefined, b: () => 1, c: Symbol('s'), d: 1 }));\n}, () => ('{\"d\":1}'));\n\nawait $test.run(\"Array items that are undefined or functions become null\", async () => {\n  const sleep = $test.sleep;\n  return (stringify([undefined, () => 1, 2]));\n}, () => ('[null,null,2]'));\n\nawait $test.run(\"A top-level undefined or function gives undefined\", async () => {\n  const sleep = $test.sleep;\n  return ([stringify(undefined), stringify(() => 1)]);\n}, () => ([undefined, undefined]));\n\nawait $test.run(\"Date and toJSON() are honored\", async () => {\n  const sleep = $test.sleep;\n  return ([stringify({ d: new Date(0) }), stringify({ toJSON() { return { x: 1 }; } })]);\n}, () => (['{\"d\":\"1970-01-01T00:00:00.000Z\"}', '{\"x\":1}']));\n\nawait $test.run(\"Empty containers and nesting\", async () => {\n  const sleep = $test.sleep;\n  return (stringify([{}, [], [[1]]]));\n}, () => ('[{},[],[[1]]]'));\n\nawait $test.rejects(\"A circular reference throws TypeError\", async () => {\n  const sleep = $test.sleep;\n  const a = {};\n  a.self = a;\n  return (stringify(a));\n}, \"TypeError\");\n\nawait $test.run(\"Shared (non-circular) references are fine\", async () => {\n  const sleep = $test.sleep;\n  const shared = { v: 1 };\n  return (stringify([shared, shared]));\n}, () => ('[{\"v\":1},{\"v\":1}]'));",
+    "difficulty": 4,
+    "concept": "serialization"
   },
   {
     "id": "new-instanceof-create",
@@ -3772,7 +3918,9 @@
         "expected": "Throws TypeError: Object prototype may only be an Object or null"
       }
     ],
-    "testHarness": "await $test.run(\"myNew links the prototype and runs the constructor on the new object\", async () => {\n  const sleep = $test.sleep;\n  function P(x) { this.x = x; }\n  P.prototype.get = function () { return this.x; };\n  const p = myNew(P, 5);\n  return ([p.x, p.get(), p instanceof P]);\n}, () => ([5, 5, true]));\n\nawait $test.run(\"A constructor returning an object replaces the result\", async () => {\n  const sleep = $test.sleep;\n  function F() { this.a = 1; return { b: 2 }; }\n  return (myNew(F));\n}, () => ({ b: 2 }));\n\nawait $test.run(\"A constructor returning a primitive is ignored\", async () => {\n  const sleep = $test.sleep;\n  function G() { this.a = 1; return 5; }\n  return (Object.keys(myNew(G)));\n}, () => (['a']));\n\nawait $test.run(\"myInstanceOf walks the prototype chain\", async () => {\n  const sleep = $test.sleep;\n  class A {}\n  class B extends A {}\n  return ([myInstanceOf(new B(), A), myInstanceOf(new A(), B), myInstanceOf({}, Object)]);\n}, () => ([true, false, true]));\n\nawait $test.run(\"Primitives and null are never instances\", async () => {\n  const sleep = $test.sleep;\n  return ([myInstanceOf(null, Object), myInstanceOf(5, Number), myInstanceOf('s', String)]);\n}, () => ([false, false, false]));\n\nawait $test.run(\"objectCreate links the prototype\", async () => {\n  const sleep = $test.sleep;\n  const proto = { greet() { return 'hi ' + this.n; } };\n  const o = objectCreate(proto);\n  o.n = 'x';\n  return ([o.greet(), Object.getPrototypeOf(o) === proto]);\n}, () => (['hi x', true]));\n\nawait $test.run(\"objectCreate(null) has no prototype\", async () => {\n  const sleep = $test.sleep;\n  return (Object.getPrototypeOf(objectCreate(null)));\n}, () => (null));\n\nawait $test.run(\"objectCreate applies a propertiesObject\", async () => {\n  const sleep = $test.sleep;\n  const o = objectCreate({}, { a: { value: 1, enumerable: true } });\n  return (o.a);\n}, () => (1));\n\nawait $test.rejects(\"objectCreate rejects primitive prototypes\", async () => {\n  const sleep = $test.sleep;\n  return (objectCreate(5));\n}, \"TypeError\");"
+    "testHarness": "await $test.run(\"myNew links the prototype and runs the constructor on the new object\", async () => {\n  const sleep = $test.sleep;\n  function P(x) { this.x = x; }\n  P.prototype.get = function () { return this.x; };\n  const p = myNew(P, 5);\n  return ([p.x, p.get(), p instanceof P]);\n}, () => ([5, 5, true]));\n\nawait $test.run(\"A constructor returning an object replaces the result\", async () => {\n  const sleep = $test.sleep;\n  function F() { this.a = 1; return { b: 2 }; }\n  return (myNew(F));\n}, () => ({ b: 2 }));\n\nawait $test.run(\"A constructor returning a primitive is ignored\", async () => {\n  const sleep = $test.sleep;\n  function G() { this.a = 1; return 5; }\n  return (Object.keys(myNew(G)));\n}, () => (['a']));\n\nawait $test.run(\"myInstanceOf walks the prototype chain\", async () => {\n  const sleep = $test.sleep;\n  class A {}\n  class B extends A {}\n  return ([myInstanceOf(new B(), A), myInstanceOf(new A(), B), myInstanceOf({}, Object)]);\n}, () => ([true, false, true]));\n\nawait $test.run(\"Primitives and null are never instances\", async () => {\n  const sleep = $test.sleep;\n  return ([myInstanceOf(null, Object), myInstanceOf(5, Number), myInstanceOf('s', String)]);\n}, () => ([false, false, false]));\n\nawait $test.run(\"objectCreate links the prototype\", async () => {\n  const sleep = $test.sleep;\n  const proto = { greet() { return 'hi ' + this.n; } };\n  const o = objectCreate(proto);\n  o.n = 'x';\n  return ([o.greet(), Object.getPrototypeOf(o) === proto]);\n}, () => (['hi x', true]));\n\nawait $test.run(\"objectCreate(null) has no prototype\", async () => {\n  const sleep = $test.sleep;\n  return (Object.getPrototypeOf(objectCreate(null)));\n}, () => (null));\n\nawait $test.run(\"objectCreate applies a propertiesObject\", async () => {\n  const sleep = $test.sleep;\n  const o = objectCreate({}, { a: { value: 1, enumerable: true } });\n  return (o.a);\n}, () => (1));\n\nawait $test.rejects(\"objectCreate rejects primitive prototypes\", async () => {\n  const sleep = $test.sleep;\n  return (objectCreate(5));\n}, \"TypeError\");",
+    "difficulty": 4,
+    "concept": "this-binding"
   },
   {
     "id": "promise-class-scratch",
@@ -3854,7 +4002,9 @@
         "expected": "true"
       }
     ],
-    "testHarness": "await $test.run(\"then callbacks run asynchronously, after the synchronous code\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  new MyPromise((resolve) => resolve(1)).then(() => log.push('then'));\n  log.push('sync');\n  await sleep(0);\n  return (log);\n}, () => (['sync', 'then']));\n\nawait $test.run(\"Chaining passes each return value along\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((resolve) => resolve(1)).then((v) => v + 1).then((v) => v * 10));\n}, () => (20));\n\nawait $test.run(\"A rejection skips then() and reaches catch()\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((_, reject) => reject(new Error('x'))).then(() => 'skipped').catch((e) => e.message));\n}, () => ('x'));\n\nawait $test.run(\"A throw inside a handler rejects the derived promise\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then(() => { throw new Error('boom'); }).catch((e) => e.message));\n}, () => ('boom'));\n\nawait $test.run(\"Returning a MyPromise from then() adopts its eventual value\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then((v) => new MyPromise((resolve) => setTimeout(() => resolve(v + 1), 10))));\n}, () => (2));\n\nawait $test.run(\"Returning a native promise (any thenable) is adopted too\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then((v) => Promise.resolve(v + 5)));\n}, () => (6));\n\nawait $test.run(\"Only the first resolve/reject call counts\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((resolve, reject) => { resolve('a'); reject(new Error('b')); resolve('c'); }));\n}, () => ('a'));\n\nawait $test.run(\"An executor that throws rejects the promise\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise(() => { throw new Error('exec'); }).catch((e) => e.message));\n}, () => ('exec'));\n\nawait $test.run(\"Missing handlers pass the value through\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(7).then().then(undefined, () => 0));\n}, () => (7));\n\nawait $test.run(\"Several then() calls on one promise run in registration order\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const p = MyPromise.resolve(1);\n  p.then(() => log.push('a'));\n  p.then(() => log.push('b'));\n  await p.then(() => log.push('c'));\n  return (log);\n}, () => (['a', 'b', 'c']));\n\nawait $test.run(\"finally() runs on both outcomes and passes the result through\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const a = await MyPromise.resolve(1).finally(() => log.push('f'));\n  const b = await MyPromise.reject(new Error('e')).finally(() => log.push('f')).catch((e) => e.message);\n  return ([a, b, log.length]);\n}, () => ([1, 'e', 2]));\n\nawait $test.run(\"Resolving a promise with itself rejects with a TypeError\", async () => {\n  const sleep = $test.sleep;\n  const p = MyPromise.resolve(1).then(() => p);\n  return (await p.catch((e) => e instanceof TypeError));\n}, () => (true));"
+    "testHarness": "await $test.run(\"then callbacks run asynchronously, after the synchronous code\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  new MyPromise((resolve) => resolve(1)).then(() => log.push('then'));\n  log.push('sync');\n  await sleep(0);\n  return (log);\n}, () => (['sync', 'then']));\n\nawait $test.run(\"Chaining passes each return value along\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((resolve) => resolve(1)).then((v) => v + 1).then((v) => v * 10));\n}, () => (20));\n\nawait $test.run(\"A rejection skips then() and reaches catch()\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((_, reject) => reject(new Error('x'))).then(() => 'skipped').catch((e) => e.message));\n}, () => ('x'));\n\nawait $test.run(\"A throw inside a handler rejects the derived promise\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then(() => { throw new Error('boom'); }).catch((e) => e.message));\n}, () => ('boom'));\n\nawait $test.run(\"Returning a MyPromise from then() adopts its eventual value\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then((v) => new MyPromise((resolve) => setTimeout(() => resolve(v + 1), 10))));\n}, () => (2));\n\nawait $test.run(\"Returning a native promise (any thenable) is adopted too\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then((v) => Promise.resolve(v + 5)));\n}, () => (6));\n\nawait $test.run(\"Only the first resolve/reject call counts\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((resolve, reject) => { resolve('a'); reject(new Error('b')); resolve('c'); }));\n}, () => ('a'));\n\nawait $test.run(\"An executor that throws rejects the promise\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise(() => { throw new Error('exec'); }).catch((e) => e.message));\n}, () => ('exec'));\n\nawait $test.run(\"Missing handlers pass the value through\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(7).then().then(undefined, () => 0));\n}, () => (7));\n\nawait $test.run(\"Several then() calls on one promise run in registration order\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const p = MyPromise.resolve(1);\n  p.then(() => log.push('a'));\n  p.then(() => log.push('b'));\n  await p.then(() => log.push('c'));\n  return (log);\n}, () => (['a', 'b', 'c']));\n\nawait $test.run(\"finally() runs on both outcomes and passes the result through\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const a = await MyPromise.resolve(1).finally(() => log.push('f'));\n  const b = await MyPromise.reject(new Error('e')).finally(() => log.push('f')).catch((e) => e.message);\n  return ([a, b, log.length]);\n}, () => ([1, 'e', 2]));\n\nawait $test.run(\"Resolving a promise with itself rejects with a TypeError\", async () => {\n  const sleep = $test.sleep;\n  const p = MyPromise.resolve(1).then(() => p);\n  return (await p.catch((e) => e instanceof TypeError));\n}, () => (true));",
+    "difficulty": 5,
+    "concept": "promise"
   },
   {
     "id": "promisify-callback",
@@ -3906,7 +4056,9 @@
         "expected": "0"
       }
     ],
-    "testHarness": "await $test.run(\"Resolves with the callback result\", async () => {\n  const sleep = $test.sleep;\n  const readLater = (name, cb) => setTimeout(() => cb(null, name.toUpperCase()), 5);\n  return (await promisify(readLater)('abc'));\n}, () => ('ABC'));\n\nawait $test.run(\"Rejects with the callback error\", async () => {\n  const sleep = $test.sleep;\n  const failing = (cb) => setTimeout(() => cb(new Error('disk full')), 5);\n  return (await promisify(failing)().catch((e) => e.message));\n}, () => ('disk full'));\n\nawait $test.run(\"Forwards every argument\", async () => {\n  const sleep = $test.sleep;\n  const add = (a, b, cb) => cb(null, a + b);\n  return (await promisify(add)(2, 3));\n}, () => (5));\n\nawait $test.run(\"Preserves this\", async () => {\n  const sleep = $test.sleep;\n  const obj = { n: 10, plus(x, cb) { cb(null, this.n + x); } };\n  obj.plusAsync = promisify(obj.plus);\n  return (await obj.plusAsync(5));\n}, () => (15));\n\nawait $test.run(\"A synchronous throw becomes a rejection\", async () => {\n  const sleep = $test.sleep;\n  const bad = () => { throw new Error('sync'); };\n  return (await promisify(bad)().catch((e) => e.message));\n}, () => ('sync'));\n\nawait $test.run(\"A falsy error means success\", async () => {\n  const sleep = $test.sleep;\n  return (await promisify((cb) => cb(null, 0))());\n}, () => (0));"
+    "testHarness": "await $test.run(\"Resolves with the callback result\", async () => {\n  const sleep = $test.sleep;\n  const readLater = (name, cb) => setTimeout(() => cb(null, name.toUpperCase()), 5);\n  return (await promisify(readLater)('abc'));\n}, () => ('ABC'));\n\nawait $test.run(\"Rejects with the callback error\", async () => {\n  const sleep = $test.sleep;\n  const failing = (cb) => setTimeout(() => cb(new Error('disk full')), 5);\n  return (await promisify(failing)().catch((e) => e.message));\n}, () => ('disk full'));\n\nawait $test.run(\"Forwards every argument\", async () => {\n  const sleep = $test.sleep;\n  const add = (a, b, cb) => cb(null, a + b);\n  return (await promisify(add)(2, 3));\n}, () => (5));\n\nawait $test.run(\"Preserves this\", async () => {\n  const sleep = $test.sleep;\n  const obj = { n: 10, plus(x, cb) { cb(null, this.n + x); } };\n  obj.plusAsync = promisify(obj.plus);\n  return (await obj.plusAsync(5));\n}, () => (15));\n\nawait $test.run(\"A synchronous throw becomes a rejection\", async () => {\n  const sleep = $test.sleep;\n  const bad = () => { throw new Error('sync'); };\n  return (await promisify(bad)().catch((e) => e.message));\n}, () => ('sync'));\n\nawait $test.run(\"A falsy error means success\", async () => {\n  const sleep = $test.sleep;\n  return (await promisify((cb) => cb(null, 0))());\n}, () => (0));",
+    "difficulty": 2,
+    "concept": "promise"
   },
   {
     "id": "query-string-url",
@@ -3973,7 +4125,9 @@
         "expected": "{ n: '1', list: ['a', 'b'] }"
       }
     ],
-    "testHarness": "await $test.run(\"parseQuery: basic pairs, optional leading ?\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('?a=1&b=two'));\n}, () => ({ a: '1', b: 'two' }));\n\nawait $test.run(\"parseQuery: repeated keys become an array\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('tag=x&tag=y&tag=z'));\n}, () => ({ tag: ['x', 'y', 'z'] }));\n\nawait $test.run(\"parseQuery: percent-escapes and + decode\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('q=hello%20world&r=a+b'));\n}, () => ({ q: 'hello world', r: 'a b' }));\n\nawait $test.run(\"parseQuery: keys without a value\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('flag&x='));\n}, () => ({ flag: '', x: '' }));\n\nawait $test.run(\"parseQuery: empty input\", async () => {\n  const sleep = $test.sleep;\n  return ([parseQuery(''), parseQuery('?')]);\n}, () => ([{}, {}]));\n\nawait $test.run(\"parseQuery: a value may contain =\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('eq=a=b'));\n}, () => ({ eq: 'a=b' }));\n\nawait $test.run(\"stringifyQuery: encodes, repeats arrays, skips null/undefined\", async () => {\n  const sleep = $test.sleep;\n  return (stringifyQuery({ a: 1, b: 'x y', c: ['p', 'q'], d: undefined, e: null }));\n}, () => ('a=1&b=x%20y&c=p&c=q'));\n\nawait $test.run(\"stringifyQuery: reserved characters are percent-encoded\", async () => {\n  const sleep = $test.sleep;\n  return (stringifyQuery({ q: 'a&b=c' }));\n}, () => ('q=a%26b%3Dc'));\n\nawait $test.run(\"Round trip\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery(stringifyQuery({ n: '1', list: ['a', 'b'] })));\n}, () => ({ n: '1', list: ['a', 'b'] }));"
+    "testHarness": "await $test.run(\"parseQuery: basic pairs, optional leading ?\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('?a=1&b=two'));\n}, () => ({ a: '1', b: 'two' }));\n\nawait $test.run(\"parseQuery: repeated keys become an array\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('tag=x&tag=y&tag=z'));\n}, () => ({ tag: ['x', 'y', 'z'] }));\n\nawait $test.run(\"parseQuery: percent-escapes and + decode\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('q=hello%20world&r=a+b'));\n}, () => ({ q: 'hello world', r: 'a b' }));\n\nawait $test.run(\"parseQuery: keys without a value\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('flag&x='));\n}, () => ({ flag: '', x: '' }));\n\nawait $test.run(\"parseQuery: empty input\", async () => {\n  const sleep = $test.sleep;\n  return ([parseQuery(''), parseQuery('?')]);\n}, () => ([{}, {}]));\n\nawait $test.run(\"parseQuery: a value may contain =\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery('eq=a=b'));\n}, () => ({ eq: 'a=b' }));\n\nawait $test.run(\"stringifyQuery: encodes, repeats arrays, skips null/undefined\", async () => {\n  const sleep = $test.sleep;\n  return (stringifyQuery({ a: 1, b: 'x y', c: ['p', 'q'], d: undefined, e: null }));\n}, () => ('a=1&b=x%20y&c=p&c=q'));\n\nawait $test.run(\"stringifyQuery: reserved characters are percent-encoded\", async () => {\n  const sleep = $test.sleep;\n  return (stringifyQuery({ q: 'a&b=c' }));\n}, () => ('q=a%26b%3Dc'));\n\nawait $test.run(\"Round trip\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery(stringifyQuery({ n: '1', list: ['a', 'b'] })));\n}, () => ({ n: '1', list: ['a', 'b'] }));",
+    "difficulty": 2,
+    "concept": "string-utils"
   },
   {
     "id": "client-side-router",
@@ -4050,7 +4204,9 @@
         "expected": "['/b']"
       }
     ],
-    "testHarness": "await $test.run(\"matchRoute: captures params\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/users/:id', '/users/42'));\n}, () => ({ id: '42' }));\n\nawait $test.run(\"matchRoute: too few or too many segments do not match\", async () => {\n  const sleep = $test.sleep;\n  return ([matchRoute('/users/:id', '/users'), matchRoute('/a/b', '/a/b/c')]);\n}, () => ([null, null]));\n\nawait $test.run(\"matchRoute: static segments must be equal; trailing slash ignored\", async () => {\n  const sleep = $test.sleep;\n  return ([matchRoute('/about', '/about/'), matchRoute('/about', '/contact')]);\n}, () => ([{}, null]));\n\nawait $test.run(\"matchRoute: params are URL-decoded\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/tag/:name', '/tag/a%20b'));\n}, () => ({ name: 'a b' }));\n\nawait $test.run(\"matchRoute: wildcard captures the rest\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/files/*', '/files/a/b.txt'));\n}, () => ({ '*': 'a/b.txt' }));\n\nawait $test.run(\"router: starts at the initial path\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/', name: 'home' }]);\n  return (r.current());\n}, () => ({ path: '/', name: 'home', params: {}, query: {} }));\n\nawait $test.run(\"router: navigate resolves params and the query string\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/', name: 'home' }, { pattern: '/users/:id', name: 'user' }]);\n  r.navigate('/users/7?tab=posts&x=1');\n  return (r.current());\n}, () => ({ path: '/users/7', name: 'user', params: { id: '7' }, query: { tab: 'posts', x: '1' } }));\n\nawait $test.run(\"router: unmatched paths give name null\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/', name: 'home' }]);\n  r.navigate('/nope');\n  return (r.current().name);\n}, () => (null));\n\nawait $test.run(\"router: back and forward walk the history\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/:p', name: 'p' }], '/a');\n  r.navigate('/b'); r.navigate('/c');\n  const trail = [r.current().path];\n  r.back(); trail.push(r.current().path);\n  r.back(); trail.push(r.current().path);\n  r.back(); trail.push(r.current().path);\n  r.forward(); trail.push(r.current().path);\n  return (trail);\n}, () => (['/c', '/b', '/a', '/a', '/b']));\n\nawait $test.run(\"router: navigating after back discards the forward entries\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/:p', name: 'p' }], '/a');\n  r.navigate('/b');\n  r.back();\n  r.navigate('/c');\n  r.forward();\n  return (r.current().path);\n}, () => ('/c'));\n\nawait $test.run(\"router: subscribers are called with the new state until unsubscribed\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/:p', name: 'p' }], '/a');\n  const seen = [];\n  const off = r.subscribe((s) => seen.push(s.path));\n  r.navigate('/b');\n  off();\n  r.navigate('/c');\n  return (seen);\n}, () => (['/b']));"
+    "testHarness": "await $test.run(\"matchRoute: captures params\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/users/:id', '/users/42'));\n}, () => ({ id: '42' }));\n\nawait $test.run(\"matchRoute: too few or too many segments do not match\", async () => {\n  const sleep = $test.sleep;\n  return ([matchRoute('/users/:id', '/users'), matchRoute('/a/b', '/a/b/c')]);\n}, () => ([null, null]));\n\nawait $test.run(\"matchRoute: static segments must be equal; trailing slash ignored\", async () => {\n  const sleep = $test.sleep;\n  return ([matchRoute('/about', '/about/'), matchRoute('/about', '/contact')]);\n}, () => ([{}, null]));\n\nawait $test.run(\"matchRoute: params are URL-decoded\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/tag/:name', '/tag/a%20b'));\n}, () => ({ name: 'a b' }));\n\nawait $test.run(\"matchRoute: wildcard captures the rest\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/files/*', '/files/a/b.txt'));\n}, () => ({ '*': 'a/b.txt' }));\n\nawait $test.run(\"router: starts at the initial path\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/', name: 'home' }]);\n  return (r.current());\n}, () => ({ path: '/', name: 'home', params: {}, query: {} }));\n\nawait $test.run(\"router: navigate resolves params and the query string\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/', name: 'home' }, { pattern: '/users/:id', name: 'user' }]);\n  r.navigate('/users/7?tab=posts&x=1');\n  return (r.current());\n}, () => ({ path: '/users/7', name: 'user', params: { id: '7' }, query: { tab: 'posts', x: '1' } }));\n\nawait $test.run(\"router: unmatched paths give name null\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/', name: 'home' }]);\n  r.navigate('/nope');\n  return (r.current().name);\n}, () => (null));\n\nawait $test.run(\"router: back and forward walk the history\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/:p', name: 'p' }], '/a');\n  r.navigate('/b'); r.navigate('/c');\n  const trail = [r.current().path];\n  r.back(); trail.push(r.current().path);\n  r.back(); trail.push(r.current().path);\n  r.back(); trail.push(r.current().path);\n  r.forward(); trail.push(r.current().path);\n  return (trail);\n}, () => (['/c', '/b', '/a', '/a', '/b']));\n\nawait $test.run(\"router: navigating after back discards the forward entries\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/:p', name: 'p' }], '/a');\n  r.navigate('/b');\n  r.back();\n  r.navigate('/c');\n  r.forward();\n  return (r.current().path);\n}, () => ('/c'));\n\nawait $test.run(\"router: subscribers are called with the new state until unsubscribed\", async () => {\n  const sleep = $test.sleep;\n  const r = createRouter([{ pattern: '/:p', name: 'p' }], '/a');\n  const seen = [];\n  const off = r.subscribe((s) => seen.push(s.path));\n  r.navigate('/b');\n  off();\n  r.navigate('/c');\n  return (seen);\n}, () => (['/b']));",
+    "difficulty": 4,
+    "concept": "router"
   },
   {
     "id": "event-delegation",
@@ -4059,7 +4215,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "dom",
       "events",
@@ -4112,7 +4268,9 @@
         "expected": "'x'"
       }
     ],
-    "testHarness": "await $test.run(\"Fires for a click on a matching element\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\">One</button>';\n  const got = [];\n  delegate(root, '.b', 'click', (e, el) => got.push(el.textContent));\n  root.querySelector('.b').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => (['One']));\n\nawait $test.run(\"A click on a child of the match still counts (closest)\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\"><span>One</span></button>';\n  const got = [];\n  delegate(root, '.b', 'click', (e, el) => got.push(el.tagName));\n  root.querySelector('span').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => (['BUTTON']));\n\nawait $test.run(\"Non-matching targets are ignored\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\">One</button><p>text</p>';\n  const got = [];\n  delegate(root, '.b', 'click', () => got.push('hit'));\n  root.querySelector('p').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => ([]));\n\nawait $test.run(\"Elements added after delegate() are handled\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  const got = [];\n  delegate(root, '.b', 'click', (e, el) => got.push(el.id));\n  const late = document.createElement('button');\n  late.className = 'b';\n  late.id = 'late';\n  root.append(late);\n  late.dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => (['late']));\n\nawait $test.run(\"The returned function removes the listener\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\">One</button>';\n  const got = [];\n  const off = delegate(root, '.b', 'click', () => got.push('hit'));\n  off();\n  root.querySelector('.b').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => ([]));\n\nawait $test.run(\"Matches outside the root are ignored\", async () => {\n  const sleep = $test.sleep;\n  const outer = document.createElement('div');\n  outer.className = 'b';\n  const root = document.createElement('div');\n  root.innerHTML = '<p>inside</p>';\n  outer.append(root);\n  const got = [];\n  delegate(root, '.b', 'click', () => got.push('hit'));\n  root.querySelector('p').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => ([]));\n\nawait $test.run(\"Nested matches: the nearest one is used, once\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<div class=\"item\" id=\"outer\"><div class=\"item\" id=\"inner\"><i>x</i></div></div>';\n  const got = [];\n  delegate(root, '.item', 'click', (e, el) => got.push(el.id));\n  root.querySelector('i').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => (['inner']));\n\nawait $test.run(\"`this` is the matched element too\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\" id=\"x\">One</button>';\n  let seen;\n  delegate(root, '.b', 'click', function () { seen = this.id; });\n  root.querySelector('.b').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (seen);\n}, () => ('x'));"
+    "testHarness": "await $test.run(\"Fires for a click on a matching element\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\">One</button>';\n  const got = [];\n  delegate(root, '.b', 'click', (e, el) => got.push(el.textContent));\n  root.querySelector('.b').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => (['One']));\n\nawait $test.run(\"A click on a child of the match still counts (closest)\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\"><span>One</span></button>';\n  const got = [];\n  delegate(root, '.b', 'click', (e, el) => got.push(el.tagName));\n  root.querySelector('span').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => (['BUTTON']));\n\nawait $test.run(\"Non-matching targets are ignored\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\">One</button><p>text</p>';\n  const got = [];\n  delegate(root, '.b', 'click', () => got.push('hit'));\n  root.querySelector('p').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => ([]));\n\nawait $test.run(\"Elements added after delegate() are handled\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  const got = [];\n  delegate(root, '.b', 'click', (e, el) => got.push(el.id));\n  const late = document.createElement('button');\n  late.className = 'b';\n  late.id = 'late';\n  root.append(late);\n  late.dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => (['late']));\n\nawait $test.run(\"The returned function removes the listener\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\">One</button>';\n  const got = [];\n  const off = delegate(root, '.b', 'click', () => got.push('hit'));\n  off();\n  root.querySelector('.b').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => ([]));\n\nawait $test.run(\"Matches outside the root are ignored\", async () => {\n  const sleep = $test.sleep;\n  const outer = document.createElement('div');\n  outer.className = 'b';\n  const root = document.createElement('div');\n  root.innerHTML = '<p>inside</p>';\n  outer.append(root);\n  const got = [];\n  delegate(root, '.b', 'click', () => got.push('hit'));\n  root.querySelector('p').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => ([]));\n\nawait $test.run(\"Nested matches: the nearest one is used, once\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<div class=\"item\" id=\"outer\"><div class=\"item\" id=\"inner\"><i>x</i></div></div>';\n  const got = [];\n  delegate(root, '.item', 'click', (e, el) => got.push(el.id));\n  root.querySelector('i').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (got);\n}, () => (['inner']));\n\nawait $test.run(\"`this` is the matched element too\", async () => {\n  const sleep = $test.sleep;\n  const root = document.createElement('div');\n  root.innerHTML = '<button class=\"b\" id=\"x\">One</button>';\n  let seen;\n  delegate(root, '.b', 'click', function () { seen = this.id; });\n  root.querySelector('.b').dispatchEvent(new MouseEvent('click', { bubbles: true }));\n  return (seen);\n}, () => ('x'));",
+    "difficulty": 2,
+    "concept": "dom"
   },
   {
     "id": "storage-ttl-wrapper",
@@ -4179,7 +4337,9 @@
         "expected": "[0, '', false]"
       }
     ],
-    "testHarness": "await $test.run(\"set then get returns the JSON value\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const store = createStorage(memory());\n  store.set('user', { name: 'Ada', tags: ['x'] });\n  return (store.get('user'));\n}, () => ({ name: 'Ada', tags: ['x'] }));\n\nawait $test.run(\"Missing key returns the fallback\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const store = createStorage(memory());\n  return ([store.get('nope'), store.get('nope', 'dflt')]);\n}, () => ([null, 'dflt']));\n\nawait $test.run(\"An entry is available until its TTL, then it expires and is removed\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  let t = 1000;\n  const backend = memory();\n  const store = createStorage(backend, { now: () => t });\n  store.set('k', 'v', { ttlMs: 500 });\n  const fresh = store.get('k');\n  t = 1600;\n  return ([fresh, store.get('k', 'gone'), backend.length]);\n}, () => (['v', 'gone', 0]));\n\nawait $test.run(\"Keys are namespaced with the prefix\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const backend = memory();\n  const store = createStorage(backend, { prefix: 'a:' });\n  store.set('x', 1);\n  return ([...backend.raw.keys()]);\n}, () => (['a:x']));\n\nawait $test.run(\"keys() lists only this namespace, clear() removes only it\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const backend = memory();\n  backend.setItem('other:keep', '1');\n  const store = createStorage(backend, { prefix: 'a:' });\n  store.set('x', 1); store.set('y', 2);\n  const before = store.keys().sort();\n  store.clear();\n  return ([before, store.keys(), backend.getItem('other:keep')]);\n}, () => ([['x', 'y'], [], '1']));\n\nawait $test.run(\"Corrupt JSON returns the fallback and is cleaned up\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const backend = memory();\n  backend.setItem('app:bad', '{not json');\n  const store = createStorage(backend);\n  return ([store.get('bad', 'fallback'), backend.getItem('app:bad')]);\n}, () => (['fallback', null]));\n\nawait $test.run(\"set returns false when the backend throws (quota exceeded)\", async () => {\n  const sleep = $test.sleep;\n  const store = createStorage({ getItem: () => null, setItem: () => { throw new Error('QuotaExceededError'); }, removeItem() {}, key: () => null, length: 0 });\n  return (store.set('k', 'v'));\n}, () => (false));\n\nawait $test.run(\"remove deletes a key\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const store = createStorage(memory());\n  store.set('k', 1);\n  store.remove('k');\n  return (store.get('k'));\n}, () => (null));\n\nawait $test.run(\"Falsy values are stored faithfully\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const store = createStorage(memory());\n  store.set('zero', 0); store.set('empty', ''); store.set('no', false);\n  return ([store.get('zero', 'd'), store.get('empty', 'd'), store.get('no', 'd')]);\n}, () => ([0, '', false]));"
+    "testHarness": "await $test.run(\"set then get returns the JSON value\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const store = createStorage(memory());\n  store.set('user', { name: 'Ada', tags: ['x'] });\n  return (store.get('user'));\n}, () => ({ name: 'Ada', tags: ['x'] }));\n\nawait $test.run(\"Missing key returns the fallback\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const store = createStorage(memory());\n  return ([store.get('nope'), store.get('nope', 'dflt')]);\n}, () => ([null, 'dflt']));\n\nawait $test.run(\"An entry is available until its TTL, then it expires and is removed\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  let t = 1000;\n  const backend = memory();\n  const store = createStorage(backend, { now: () => t });\n  store.set('k', 'v', { ttlMs: 500 });\n  const fresh = store.get('k');\n  t = 1600;\n  return ([fresh, store.get('k', 'gone'), backend.length]);\n}, () => (['v', 'gone', 0]));\n\nawait $test.run(\"Keys are namespaced with the prefix\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const backend = memory();\n  const store = createStorage(backend, { prefix: 'a:' });\n  store.set('x', 1);\n  return ([...backend.raw.keys()]);\n}, () => (['a:x']));\n\nawait $test.run(\"keys() lists only this namespace, clear() removes only it\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const backend = memory();\n  backend.setItem('other:keep', '1');\n  const store = createStorage(backend, { prefix: 'a:' });\n  store.set('x', 1); store.set('y', 2);\n  const before = store.keys().sort();\n  store.clear();\n  return ([before, store.keys(), backend.getItem('other:keep')]);\n}, () => ([['x', 'y'], [], '1']));\n\nawait $test.run(\"Corrupt JSON returns the fallback and is cleaned up\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const backend = memory();\n  backend.setItem('app:bad', '{not json');\n  const store = createStorage(backend);\n  return ([store.get('bad', 'fallback'), backend.getItem('app:bad')]);\n}, () => (['fallback', null]));\n\nawait $test.run(\"set returns false when the backend throws (quota exceeded)\", async () => {\n  const sleep = $test.sleep;\n  const store = createStorage({ getItem: () => null, setItem: () => { throw new Error('QuotaExceededError'); }, removeItem() {}, key: () => null, length: 0 });\n  return (store.set('k', 'v'));\n}, () => (false));\n\nawait $test.run(\"remove deletes a key\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const store = createStorage(memory());\n  store.set('k', 1);\n  store.remove('k');\n  return (store.get('k'));\n}, () => (null));\n\nawait $test.run(\"Falsy values are stored faithfully\", async () => {\n  const sleep = $test.sleep;\n  const memory = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); }, removeItem: (k) => { m.delete(k); }, key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; }, raw: m }; };\n  const store = createStorage(memory());\n  store.set('zero', 0); store.set('empty', ''); store.set('no', false);\n  return ([store.get('zero', 'd'), store.get('empty', 'd'), store.get('no', 'd')]);\n}, () => ([0, '', false]));",
+    "difficulty": 3,
+    "concept": "storage"
   },
   {
     "id": "vnode-to-dom",
@@ -4241,7 +4401,9 @@
         "expected": "'<span>new</span>'"
       }
     ],
-    "testHarness": "await $test.run(\"Element with class, id and text\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'div', props: { className: 'box', id: 'a' }, children: ['hi'] }).outerHTML);\n}, () => ('<div class=\"box\" id=\"a\">hi</div>'));\n\nawait $test.run(\"Nested children, numbers become text\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'ul', children: [{ type: 'li', children: ['a'] }, { type: 'li', children: [1] }] }).outerHTML);\n}, () => ('<ul><li>a</li><li>1</li></ul>'));\n\nawait $test.run(\"Style objects are applied\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'p', props: { style: { color: 'red' } }, children: ['x'] }).outerHTML);\n}, () => ('<p style=\"color: red;\">x</p>'));\n\nawait $test.run(\"onClick becomes a click listener\", async () => {\n  const sleep = $test.sleep;\n  let n = 0;\n  const el = createDom({ type: 'button', props: { onClick: () => n++ }, children: ['go'] });\n  el.click();\n  el.click();\n  return (n);\n}, () => (2));\n\nawait $test.run(\"Boolean and null props\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'input', props: { disabled: true, hidden: false, value: 'v', placeholder: null } }).outerHTML);\n}, () => ('<input disabled=\"\" value=\"v\">'));\n\nawait $test.run(\"Nested arrays, null and booleans in children\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'div', children: [null, ['a', ['b']], false, 'c', undefined] }).outerHTML);\n}, () => ('<div>abc</div>'));\n\nawait $test.run(\"Text is never parsed as HTML\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'p', children: ['<b>x</b>'] }).innerHTML);\n}, () => ('&lt;b&gt;x&lt;/b&gt;'));\n\nawait $test.run(\"render replaces the container content\", async () => {\n  const sleep = $test.sleep;\n  const container = document.createElement('div');\n  container.innerHTML = '<p>old</p>';\n  render({ type: 'span', children: ['new'] }, container);\n  return (container.innerHTML);\n}, () => ('<span>new</span>'));"
+    "testHarness": "await $test.run(\"Element with class, id and text\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'div', props: { className: 'box', id: 'a' }, children: ['hi'] }).outerHTML);\n}, () => ('<div class=\"box\" id=\"a\">hi</div>'));\n\nawait $test.run(\"Nested children, numbers become text\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'ul', children: [{ type: 'li', children: ['a'] }, { type: 'li', children: [1] }] }).outerHTML);\n}, () => ('<ul><li>a</li><li>1</li></ul>'));\n\nawait $test.run(\"Style objects are applied\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'p', props: { style: { color: 'red' } }, children: ['x'] }).outerHTML);\n}, () => ('<p style=\"color: red;\">x</p>'));\n\nawait $test.run(\"onClick becomes a click listener\", async () => {\n  const sleep = $test.sleep;\n  let n = 0;\n  const el = createDom({ type: 'button', props: { onClick: () => n++ }, children: ['go'] });\n  el.click();\n  el.click();\n  return (n);\n}, () => (2));\n\nawait $test.run(\"Boolean and null props\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'input', props: { disabled: true, hidden: false, value: 'v', placeholder: null } }).outerHTML);\n}, () => ('<input disabled=\"\" value=\"v\">'));\n\nawait $test.run(\"Nested arrays, null and booleans in children\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'div', children: [null, ['a', ['b']], false, 'c', undefined] }).outerHTML);\n}, () => ('<div>abc</div>'));\n\nawait $test.run(\"Text is never parsed as HTML\", async () => {\n  const sleep = $test.sleep;\n  return (createDom({ type: 'p', children: ['<b>x</b>'] }).innerHTML);\n}, () => ('&lt;b&gt;x&lt;/b&gt;'));\n\nawait $test.run(\"render replaces the container content\", async () => {\n  const sleep = $test.sleep;\n  const container = document.createElement('div');\n  container.innerHTML = '<p>old</p>';\n  render({ type: 'span', children: ['new'] }, container);\n  return (container.innerHTML);\n}, () => ('<span>new</span>'));",
+    "difficulty": 3,
+    "concept": "dom"
   },
   {
     "id": "error-boundary-reset",
@@ -4293,7 +4455,9 @@
         "expected": "'static fallback' rendered"
       }
     ],
-    "testHarness": "const { render, fire, q } = $dom;\nlet shouldThrow = true;\nfunction Bomb() {\n  if (shouldThrow) throw new Error('boom');\n  return <p id=\"ok\">all good</p>;\n}\n{\n  shouldThrow = false;\n  const r = render(<ErrorBoundary fallback={<p>oops</p>}><Bomb /></ErrorBoundary>);\n  $test.check('Renders its children when nothing throws', q('#ok', r.container) !== null && q('#ok', r.container).textContent === 'all good', r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={(error) => <p id=\"fb\">failed: {error.message}</p>}><Bomb /></ErrorBoundary>);\n  $test.check('Shows the fallback (called with the error) when a child throws', q('#fb', r.container) !== null && q('#fb', r.container).textContent === 'failed: boom' && q('#ok', r.container) === null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const seen = [];\n  const r = render(<ErrorBoundary fallback={<p>oops</p>} onError={(error, info) => seen.push([error.message, typeof info.componentStack])}><Bomb /></ErrorBoundary>);\n  $test.check('onError receives the error and React error info, once', seen.length === 1 && seen[0][0] === 'boom' && seen[0][1] === 'string', seen);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={(error, reset) => <button id=\"retry\" onClick={reset}>retry</button>}><Bomb /></ErrorBoundary>);\n  shouldThrow = false;\n  fire.click(q('#retry', r.container));\n  $test.check('reset() from the fallback retries the children', q('#ok', r.container) !== null && q('#retry', r.container) === null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const make = (key) => <ErrorBoundary resetKeys={[key]} fallback={<p id=\"fb\">oops</p>}><Bomb /></ErrorBoundary>;\n  const r = render(make(1));\n  const showing = q('#fb', r.container) !== null;\n  shouldThrow = false;\n  r.rerender(make(1));\n  const stillShowing = q('#fb', r.container) !== null;\n  r.rerender(make(2));\n  $test.check('Changing resetKeys resets the boundary automatically', showing && stillShowing && q('#ok', r.container) !== null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={<p id=\"fb\">static fallback</p>}><Bomb /></ErrorBoundary>);\n  $test.check('A plain element works as the fallback', q('#fb', r.container) !== null && q('#fb', r.container).textContent === 'static fallback', r.container.innerHTML);\n  r.unmount();\n}"
+    "testHarness": "const { render, fire, q } = $dom;\nlet shouldThrow = true;\nfunction Bomb() {\n  if (shouldThrow) throw new Error('boom');\n  return <p id=\"ok\">all good</p>;\n}\n{\n  shouldThrow = false;\n  const r = render(<ErrorBoundary fallback={<p>oops</p>}><Bomb /></ErrorBoundary>);\n  $test.check('Renders its children when nothing throws', q('#ok', r.container) !== null && q('#ok', r.container).textContent === 'all good', r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={(error) => <p id=\"fb\">failed: {error.message}</p>}><Bomb /></ErrorBoundary>);\n  $test.check('Shows the fallback (called with the error) when a child throws', q('#fb', r.container) !== null && q('#fb', r.container).textContent === 'failed: boom' && q('#ok', r.container) === null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const seen = [];\n  const r = render(<ErrorBoundary fallback={<p>oops</p>} onError={(error, info) => seen.push([error.message, typeof info.componentStack])}><Bomb /></ErrorBoundary>);\n  $test.check('onError receives the error and React error info, once', seen.length === 1 && seen[0][0] === 'boom' && seen[0][1] === 'string', seen);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={(error, reset) => <button id=\"retry\" onClick={reset}>retry</button>}><Bomb /></ErrorBoundary>);\n  shouldThrow = false;\n  fire.click(q('#retry', r.container));\n  $test.check('reset() from the fallback retries the children', q('#ok', r.container) !== null && q('#retry', r.container) === null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const make = (key) => <ErrorBoundary resetKeys={[key]} fallback={<p id=\"fb\">oops</p>}><Bomb /></ErrorBoundary>;\n  const r = render(make(1));\n  const showing = q('#fb', r.container) !== null;\n  shouldThrow = false;\n  r.rerender(make(1));\n  const stillShowing = q('#fb', r.container) !== null;\n  r.rerender(make(2));\n  $test.check('Changing resetKeys resets the boundary automatically', showing && stillShowing && q('#ok', r.container) !== null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={<p id=\"fb\">static fallback</p>}><Bomb /></ErrorBoundary>);\n  $test.check('A plain element works as the fallback', q('#fb', r.container) !== null && q('#fb', r.container).textContent === 'static fallback', r.container.innerHTML);\n  r.unmount();\n}",
+    "difficulty": 3,
+    "concept": "resilience"
   },
   {
     "id": "external-store-hook",
@@ -4345,7 +4509,9 @@
         "expected": "1 active subscription, then 0"
       }
     ],
-    "testHarness": "const { render, act, q } = $dom;\n{\n  const store = createStore({ count: 0, name: 'Ada' });\n  store.setState({ count: 1 });\n  store.setState((s) => ({ count: s.count + 1 }));\n  $test.check('setState shallow-merges a partial or an updater result', JSON.stringify(store.getState()) === '{\"count\":2,\"name\":\"Ada\"}', store.getState());\n}\n{\n  const store = createStore({ n: 0 });\n  const seen = [];\n  const off = store.subscribe(() => seen.push(store.getState().n));\n  store.setState({ n: 1 });\n  off();\n  store.setState({ n: 2 });\n  $test.check('subscribe notifies listeners until the returned unsubscribe is called', seen.join() === '1', seen);\n}\n{\n  const store = createStore({ n: 0 });\n  let calls = 0;\n  store.subscribe(() => calls++);\n  store.setState({ n: 0 });\n  store.setState((s) => ({ n: s.n }));\n  store.setState({ n: 1 });\n  $test.check('setState does not notify when no value changed', calls === 1, calls);\n}\nfunction Count({ store }) {\n  const count = useStore(store, (s) => s.count);\n  return <p id=\"count\">count: {count}</p>;\n}\n{\n  const store = createStore({ count: 0, name: 'Ada' });\n  const r = render(<Count store={store} />);\n  const first = q('#count', r.container).textContent;\n  act(() => store.setState({ count: 5 }));\n  $test.check('useStore renders the selected slice and updates on change', first === 'count: 0' && q('#count', r.container).textContent === 'count: 5', { first, now: q('#count', r.container).textContent });\n  r.unmount();\n}\n{\n  const store = createStore({ count: 0, name: 'Ada' });\n  let countRenders = 0;\n  let nameRenders = 0;\n  function CountView() {\n    const count = useStore(store, (s) => s.count);\n    countRenders++;\n    return <span>{count}</span>;\n  }\n  function NameView() {\n    const name = useStore(store, (s) => s.name);\n    nameRenders++;\n    return <span>{name}</span>;\n  }\n  const r = render(<><CountView /><NameView /></>);\n  const baseName = nameRenders;\n  act(() => store.setState({ count: 1 }));\n  act(() => store.setState({ count: 2 }));\n  $test.check('A component re-renders only when its selected slice changes', nameRenders === baseName && countRenders >= 3, { countRenders, nameRenders, baseName });\n  r.unmount();\n}\n{\n  const store = createStore({ count: 0 });\n  let active = 0;\n  const original = store.subscribe;\n  store.subscribe = (listener) => {\n    active++;\n    const off = original(listener);\n    return () => {\n      active--;\n      off();\n    };\n  };\n  const r = render(<Count store={store} />);\n  const mounted = active;\n  r.unmount();\n  $test.check('useStore unsubscribes on unmount', mounted === 1 && active === 0, { mounted, after: active });\n}"
+    "testHarness": "const { render, act, q } = $dom;\n{\n  const store = createStore({ count: 0, name: 'Ada' });\n  store.setState({ count: 1 });\n  store.setState((s) => ({ count: s.count + 1 }));\n  $test.check('setState shallow-merges a partial or an updater result', JSON.stringify(store.getState()) === '{\"count\":2,\"name\":\"Ada\"}', store.getState());\n}\n{\n  const store = createStore({ n: 0 });\n  const seen = [];\n  const off = store.subscribe(() => seen.push(store.getState().n));\n  store.setState({ n: 1 });\n  off();\n  store.setState({ n: 2 });\n  $test.check('subscribe notifies listeners until the returned unsubscribe is called', seen.join() === '1', seen);\n}\n{\n  const store = createStore({ n: 0 });\n  let calls = 0;\n  store.subscribe(() => calls++);\n  store.setState({ n: 0 });\n  store.setState((s) => ({ n: s.n }));\n  store.setState({ n: 1 });\n  $test.check('setState does not notify when no value changed', calls === 1, calls);\n}\nfunction Count({ store }) {\n  const count = useStore(store, (s) => s.count);\n  return <p id=\"count\">count: {count}</p>;\n}\n{\n  const store = createStore({ count: 0, name: 'Ada' });\n  const r = render(<Count store={store} />);\n  const first = q('#count', r.container).textContent;\n  act(() => store.setState({ count: 5 }));\n  $test.check('useStore renders the selected slice and updates on change', first === 'count: 0' && q('#count', r.container).textContent === 'count: 5', { first, now: q('#count', r.container).textContent });\n  r.unmount();\n}\n{\n  const store = createStore({ count: 0, name: 'Ada' });\n  let countRenders = 0;\n  let nameRenders = 0;\n  function CountView() {\n    const count = useStore(store, (s) => s.count);\n    countRenders++;\n    return <span>{count}</span>;\n  }\n  function NameView() {\n    const name = useStore(store, (s) => s.name);\n    nameRenders++;\n    return <span>{name}</span>;\n  }\n  const r = render(<><CountView /><NameView /></>);\n  const baseName = nameRenders;\n  act(() => store.setState({ count: 1 }));\n  act(() => store.setState({ count: 2 }));\n  $test.check('A component re-renders only when its selected slice changes', nameRenders === baseName && countRenders >= 3, { countRenders, nameRenders, baseName });\n  r.unmount();\n}\n{\n  const store = createStore({ count: 0 });\n  let active = 0;\n  const original = store.subscribe;\n  store.subscribe = (listener) => {\n    active++;\n    const off = original(listener);\n    return () => {\n      active--;\n      off();\n    };\n  };\n  const r = render(<Count store={store} />);\n  const mounted = active;\n  r.unmount();\n  $test.check('useStore unsubscribes on unmount', mounted === 1 && active === 0, { mounted, after: active });\n}",
+    "difficulty": 4,
+    "concept": "state-management"
   },
   {
     "id": "forward-ref-imperative-handle",
@@ -4392,7 +4558,9 @@
         "expected": "['clear', 'focus', 'getValue']; not an HTMLElement"
       }
     ],
-    "testHarness": "const { render, fire, q } = $dom;\n{\n  const r = render(<FancyInput placeholder=\"Your name\" type=\"search\" />);\n  const input = q('input', r.container);\n  $test.check('Other props reach the input', input !== null && input.placeholder === 'Your name' && input.type === 'search', input && input.outerHTML);\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  $dom.act(() => ref.current.focus());\n  $test.check('ref.current.focus() focuses the input', document.activeElement === q('input', r.container), document.activeElement && document.activeElement.tagName);\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  fire.change(q('input', r.container), 'hello');\n  $test.check('ref.current.getValue() returns the typed text', ref.current.getValue() === 'hello', ref.current.getValue());\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  const input = q('input', r.container);\n  fire.change(input, 'hello');\n  $dom.act(() => ref.current.clear());\n  $test.check('ref.current.clear() empties the input and focuses it', input.value === '' && document.activeElement === input, { value: input.value });\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  const keys = Object.keys(ref.current).sort().join();\n  $test.check('The ref exposes only focus, clear and getValue (not the DOM node)', keys === 'clear,focus,getValue' && !(ref.current instanceof HTMLElement), keys);\n  r.unmount();\n}"
+    "testHarness": "const { render, fire, q } = $dom;\n{\n  const r = render(<FancyInput placeholder=\"Your name\" type=\"search\" />);\n  const input = q('input', r.container);\n  $test.check('Other props reach the input', input !== null && input.placeholder === 'Your name' && input.type === 'search', input && input.outerHTML);\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  $dom.act(() => ref.current.focus());\n  $test.check('ref.current.focus() focuses the input', document.activeElement === q('input', r.container), document.activeElement && document.activeElement.tagName);\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  fire.change(q('input', r.container), 'hello');\n  $test.check('ref.current.getValue() returns the typed text', ref.current.getValue() === 'hello', ref.current.getValue());\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  const input = q('input', r.container);\n  fire.change(input, 'hello');\n  $dom.act(() => ref.current.clear());\n  $test.check('ref.current.clear() empties the input and focuses it', input.value === '' && document.activeElement === input, { value: input.value });\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  const keys = Object.keys(ref.current).sort().join();\n  $test.check('The ref exposes only focus, clear and getValue (not the DOM node)', keys === 'clear,focus,getValue' && !(ref.current instanceof HTMLElement), keys);\n  r.unmount();\n}",
+    "difficulty": 3,
+    "concept": "refs"
   },
   {
     "id": "memo-stable-callbacks",
@@ -4439,7 +4607,9 @@
         "expected": "onListRender called 2 times; 2 <li> rendered"
       }
     ],
-    "testHarness": "const { render, fire, q, qa } = $dom;\nconst ITEMS = ['apple', 'banana', 'cherry'];\n{\n  const r = render(<Parent items={ITEMS} onListRender={() => {}} />);\n  $test.check('Renders one list item per item', qa('li', r.container).map((li) => li.textContent).join() === 'apple,banana,cherry', qa('li', r.container).length);\n  r.unmount();\n}\n{\n  const r = render(<Parent items={ITEMS} onListRender={() => {}} />);\n  fire.click(qa('li', r.container)[1]);\n  $test.check('Clicking an item shows it as selected', q('p', r.container).textContent === 'Selected: banana', q('p', r.container).textContent);\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  const initial = renders;\n  const button = q('button', r.container);\n  fire.click(button);\n  fire.click(button);\n  $test.check('Incrementing the counter does not re-render the memoized List', initial === 1 && renders === 1 && button.textContent === 'Count: 2', { initial, renders, label: button.textContent });\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  fire.click(qa('li', r.container)[0]);\n  fire.click(qa('li', r.container)[2]);\n  $test.check('Selecting an item re-renders Parent but not the List', renders === 1 && q('p', r.container).textContent === 'Selected: cherry', { renders });\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  r.rerender(<Parent items={['x', 'y']} onListRender={onListRender} />);\n  $test.check('A new items array does re-render the List', renders === 2 && qa('li', r.container).length === 2, { renders });\n  r.unmount();\n}"
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst ITEMS = ['apple', 'banana', 'cherry'];\n{\n  const r = render(<Parent items={ITEMS} onListRender={() => {}} />);\n  $test.check('Renders one list item per item', qa('li', r.container).map((li) => li.textContent).join() === 'apple,banana,cherry', qa('li', r.container).length);\n  r.unmount();\n}\n{\n  const r = render(<Parent items={ITEMS} onListRender={() => {}} />);\n  fire.click(qa('li', r.container)[1]);\n  $test.check('Clicking an item shows it as selected', q('p', r.container).textContent === 'Selected: banana', q('p', r.container).textContent);\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  const initial = renders;\n  const button = q('button', r.container);\n  fire.click(button);\n  fire.click(button);\n  $test.check('Incrementing the counter does not re-render the memoized List', initial === 1 && renders === 1 && button.textContent === 'Count: 2', { initial, renders, label: button.textContent });\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  fire.click(qa('li', r.container)[0]);\n  fire.click(qa('li', r.container)[2]);\n  $test.check('Selecting an item re-renders Parent but not the List', renders === 1 && q('p', r.container).textContent === 'Selected: cherry', { renders });\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  r.rerender(<Parent items={['x', 'y']} onListRender={onListRender} />);\n  $test.check('A new items array does re-render the List', renders === 2 && qa('li', r.container).length === 2, { renders });\n  r.unmount();\n}",
+    "difficulty": 3,
+    "concept": "react-perf"
   },
   {
     "id": "on-click-outside-hook",
@@ -4486,7 +4656,9 @@
         "expected": "handler not called"
       }
     ],
-    "testHarness": "const { render, fire, q } = $dom;\nfunction Demo({ onOutside }) {\n  const ref = useRef(null);\n  useOnClickOutside(ref, onOutside);\n  return (\n    <div>\n      <div ref={ref} id=\"inside\">\n        <button id=\"inner\">inner</button>\n      </div>\n      <button id=\"outside\">outside</button>\n    </div>\n  );\n}\nconst down = (el, type = 'mousedown') => fire.event(el, new Event(type, { bubbles: true }));\n{\n  let n = 0;\n  const r = render(<Demo onOutside={() => n++} />);\n  down(q('#outside', r.container));\n  $test.check('Calls the handler on a mousedown outside the element', n === 1, n);\n  r.unmount();\n}\n{\n  let n = 0;\n  const r = render(<Demo onOutside={() => n++} />);\n  down(q('#inside', r.container));\n  down(q('#inner', r.container));\n  $test.check('Ignores mousedown inside the element (including children)', n === 0, n);\n  r.unmount();\n}\n{\n  let n = 0;\n  const r = render(<Demo onOutside={() => n++} />);\n  down(q('#outside', r.container), 'touchstart');\n  $test.check('Also reacts to touchstart', n === 1, n);\n  r.unmount();\n}\n{\n  let a = 0;\n  let b = 0;\n  const r = render(<Demo onOutside={() => a++} />);\n  r.rerender(<Demo onOutside={() => b++} />);\n  down(q('#outside', r.container));\n  $test.check('Uses the latest handler', a === 0 && b === 1, { a, b });\n  r.unmount();\n}\n{\n  let n = 0;\n  const outside = document.createElement('button');\n  document.body.appendChild(outside);\n  const r = render(<Demo onOutside={() => n++} />);\n  r.unmount();\n  down(outside);\n  outside.remove();\n  $test.check('Removes its listeners on unmount', n === 0, n);\n}"
+    "testHarness": "const { render, fire, q } = $dom;\nfunction Demo({ onOutside }) {\n  const ref = useRef(null);\n  useOnClickOutside(ref, onOutside);\n  return (\n    <div>\n      <div ref={ref} id=\"inside\">\n        <button id=\"inner\">inner</button>\n      </div>\n      <button id=\"outside\">outside</button>\n    </div>\n  );\n}\nconst down = (el, type = 'mousedown') => fire.event(el, new Event(type, { bubbles: true }));\n{\n  let n = 0;\n  const r = render(<Demo onOutside={() => n++} />);\n  down(q('#outside', r.container));\n  $test.check('Calls the handler on a mousedown outside the element', n === 1, n);\n  r.unmount();\n}\n{\n  let n = 0;\n  const r = render(<Demo onOutside={() => n++} />);\n  down(q('#inside', r.container));\n  down(q('#inner', r.container));\n  $test.check('Ignores mousedown inside the element (including children)', n === 0, n);\n  r.unmount();\n}\n{\n  let n = 0;\n  const r = render(<Demo onOutside={() => n++} />);\n  down(q('#outside', r.container), 'touchstart');\n  $test.check('Also reacts to touchstart', n === 1, n);\n  r.unmount();\n}\n{\n  let a = 0;\n  let b = 0;\n  const r = render(<Demo onOutside={() => a++} />);\n  r.rerender(<Demo onOutside={() => b++} />);\n  down(q('#outside', r.container));\n  $test.check('Uses the latest handler', a === 0 && b === 1, { a, b });\n  r.unmount();\n}\n{\n  let n = 0;\n  const outside = document.createElement('button');\n  document.body.appendChild(outside);\n  const r = render(<Demo onOutside={() => n++} />);\n  r.unmount();\n  down(outside);\n  outside.remove();\n  $test.check('Removes its listeners on unmount', n === 0, n);\n}",
+    "difficulty": 3,
+    "concept": "react-hooks-utility"
   },
   {
     "id": "use-local-storage-hook",
@@ -4548,6 +4720,679 @@
         "expected": "'B'"
       }
     ],
-    "testHarness": "const { renderHook, fire, act } = $dom;\nconst KEY = 'lc-test-key';\nconst cleanup = () => localStorage.removeItem(KEY);\ncleanup();\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  $test.check('Uses the initial value when nothing is stored', h.result.current[0] === 'init', h.result.current[0]);\n  h.unmount();\n}\n{\n  localStorage.setItem(KEY, JSON.stringify({ a: 1 }));\n  const h = renderHook(() => useLocalStorage(KEY, null));\n  $test.check('Reads an existing JSON value on mount', JSON.stringify(h.result.current[0]) === '{\"a\":1}', h.result.current[0]);\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 0));\n  act(() => h.result.current[1](5));\n  $test.check('setValue updates state and stores JSON', h.result.current[0] === 5 && localStorage.getItem(KEY) === '5', { state: h.result.current[0], stored: localStorage.getItem(KEY) });\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 0));\n  act(() => {\n    h.result.current[1]((n) => n + 1);\n    h.result.current[1]((n) => n + 1);\n  });\n  $test.check('setValue accepts an updater function (two calls in one batch)', h.result.current[0] === 2 && localStorage.getItem(KEY) === '2', { state: h.result.current[0], stored: localStorage.getItem(KEY) });\n  h.unmount();\n  cleanup();\n}\n{\n  localStorage.setItem(KEY, '{not valid json');\n  const h = renderHook(() => useLocalStorage(KEY, 'safe'));\n  $test.check('Falls back to the initial value when the stored JSON is corrupt', h.result.current[0] === 'safe', h.result.current[0]);\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  fire.event(window, new StorageEvent('storage', { key: KEY, newValue: JSON.stringify('from another tab') }));\n  const updated = h.result.current[0];\n  fire.event(window, new StorageEvent('storage', { key: KEY, newValue: null }));\n  $test.check(\n    'A storage event for the same key updates the value (removal restores the initial value)',\n    updated === 'from another tab' && h.result.current[0] === 'init',\n    { updated, afterRemoval: h.result.current[0] }\n  );\n  h.unmount();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  fire.event(window, new StorageEvent('storage', { key: 'some-other-key', newValue: JSON.stringify('nope') }));\n  $test.check('Storage events for other keys are ignored', h.result.current[0] === 'init', h.result.current[0]);\n  h.unmount();\n}\n{\n  localStorage.setItem(KEY + '-b', JSON.stringify('B'));\n  const h = renderHook(({ k }) => useLocalStorage(k, 'init'), { initialProps: { k: KEY } });\n  h.rerender({ k: KEY + '-b' });\n  $test.check('Changing the key reads the new key', h.result.current[0] === 'B', h.result.current[0]);\n  h.unmount();\n  localStorage.removeItem(KEY + '-b');\n}"
+    "testHarness": "const { renderHook, fire, act } = $dom;\nconst KEY = 'lc-test-key';\nconst cleanup = () => localStorage.removeItem(KEY);\ncleanup();\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  $test.check('Uses the initial value when nothing is stored', h.result.current[0] === 'init', h.result.current[0]);\n  h.unmount();\n}\n{\n  localStorage.setItem(KEY, JSON.stringify({ a: 1 }));\n  const h = renderHook(() => useLocalStorage(KEY, null));\n  $test.check('Reads an existing JSON value on mount', JSON.stringify(h.result.current[0]) === '{\"a\":1}', h.result.current[0]);\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 0));\n  act(() => h.result.current[1](5));\n  $test.check('setValue updates state and stores JSON', h.result.current[0] === 5 && localStorage.getItem(KEY) === '5', { state: h.result.current[0], stored: localStorage.getItem(KEY) });\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 0));\n  act(() => {\n    h.result.current[1]((n) => n + 1);\n    h.result.current[1]((n) => n + 1);\n  });\n  $test.check('setValue accepts an updater function (two calls in one batch)', h.result.current[0] === 2 && localStorage.getItem(KEY) === '2', { state: h.result.current[0], stored: localStorage.getItem(KEY) });\n  h.unmount();\n  cleanup();\n}\n{\n  localStorage.setItem(KEY, '{not valid json');\n  const h = renderHook(() => useLocalStorage(KEY, 'safe'));\n  $test.check('Falls back to the initial value when the stored JSON is corrupt', h.result.current[0] === 'safe', h.result.current[0]);\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  fire.event(window, new StorageEvent('storage', { key: KEY, newValue: JSON.stringify('from another tab') }));\n  const updated = h.result.current[0];\n  fire.event(window, new StorageEvent('storage', { key: KEY, newValue: null }));\n  $test.check(\n    'A storage event for the same key updates the value (removal restores the initial value)',\n    updated === 'from another tab' && h.result.current[0] === 'init',\n    { updated, afterRemoval: h.result.current[0] }\n  );\n  h.unmount();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  fire.event(window, new StorageEvent('storage', { key: 'some-other-key', newValue: JSON.stringify('nope') }));\n  $test.check('Storage events for other keys are ignored', h.result.current[0] === 'init', h.result.current[0]);\n  h.unmount();\n}\n{\n  localStorage.setItem(KEY + '-b', JSON.stringify('B'));\n  const h = renderHook(({ k }) => useLocalStorage(k, 'init'), { initialProps: { k: KEY } });\n  h.rerender({ k: KEY + '-b' });\n  $test.check('Changing the key reads the new key', h.result.current[0] === 'B', h.result.current[0]);\n  h.unmount();\n  localStorage.removeItem(KEY + '-b');\n}",
+    "difficulty": 2,
+    "concept": "react-hooks-utility"
+  },
+  {
+    "id": "bind-method-partial",
+    "track": "js-language",
+    "title": "Losing and Keeping this: bindMethod and partial",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "this",
+      "bind",
+      "partial-application",
+      "basics"
+    ],
+    "promptSeed": "Methods lose their `this` when extracted (const f = obj.method). Write bindMethod(obj, name) returning a function that calls obj[name] with this = obj and forwards the arguments, using an arrow function or closure (not Function.prototype.bind). Also write partial(fn, ...preset) returning a function that calls fn with the preset arguments followed by the new ones.",
+    "difficulty": 2,
+    "concept": "this-binding",
+    "referenceSolution": "function bindMethod(obj, name) {\n  return (...args) => obj[name](...args);\n}\n\nfunction partial(fn, ...preset) {\n  return function (...later) {\n    return fn.apply(this, [...preset, ...later]);\n  };\n}",
+    "solution": "function bindMethod(obj, name) {\n  return (...args) => obj[name](...args);\n}\n\nfunction partial(fn, ...preset) {\n  return function (...later) {\n    return fn.apply(this, [...preset, ...later]);\n  };\n}",
+    "starterCode": "function bindMethod(obj, name) {\n  return (...args) => obj[name](...args);\n}\n\nfunction partial(fn, ...preset) {\n  return function (...later) {\n    return fn.apply(this, [...preset, ...later]);\n  };\n}",
+    "testCases": [
+      {
+        "description": "bindMethod keeps this when the method is extracted",
+        "input": "const user = { name: 'Ada', hi(greeting) { return greeting + ', ' + this.name; } };\nconst hi = bindMethod(user, 'hi');\nhi('Hello')",
+        "expected": "'Hello, Ada'"
+      },
+      {
+        "description": "bindMethod follows later changes to the object",
+        "input": "const o = { n: 1, get() { return this.n; } };\nconst get = bindMethod(o, 'get');\no.n = 2;\nget()",
+        "expected": "2"
+      },
+      {
+        "description": "partial prepends preset arguments",
+        "input": "const add3 = (a, b, c) => a + b + c;\npartial(add3, 1, 2)(3)",
+        "expected": "6"
+      },
+      {
+        "description": "partial can be called many times",
+        "input": "const greet = (greeting, name) => greeting + ' ' + name;\nconst hello = partial(greet, 'Hello');\n[hello('Ada'), hello('Grace')]",
+        "expected": "['Hello Ada', 'Hello Grace']"
+      },
+      {
+        "description": "partial with no presets behaves like the original",
+        "input": "partial(Math.max)(3, 9, 4)",
+        "expected": "9"
+      }
+    ],
+    "testHarness": "await $test.run(\"bindMethod keeps this when the method is extracted\", async () => {\n  const sleep = $test.sleep;\n  const user = { name: 'Ada', hi(greeting) { return greeting + ', ' + this.name; } };\n  const hi = bindMethod(user, 'hi');\n  return (hi('Hello'));\n}, () => ('Hello, Ada'));\n\nawait $test.run(\"bindMethod follows later changes to the object\", async () => {\n  const sleep = $test.sleep;\n  const o = { n: 1, get() { return this.n; } };\n  const get = bindMethod(o, 'get');\n  o.n = 2;\n  return (get());\n}, () => (2));\n\nawait $test.run(\"partial prepends preset arguments\", async () => {\n  const sleep = $test.sleep;\n  const add3 = (a, b, c) => a + b + c;\n  return (partial(add3, 1, 2)(3));\n}, () => (6));\n\nawait $test.run(\"partial can be called many times\", async () => {\n  const sleep = $test.sleep;\n  const greet = (greeting, name) => greeting + ' ' + name;\n  const hello = partial(greet, 'Hello');\n  return ([hello('Ada'), hello('Grace')]);\n}, () => (['Hello Ada', 'Hello Grace']));\n\nawait $test.run(\"partial with no presets behaves like the original\", async () => {\n  const sleep = $test.sleep;\n  return (partial(Math.max)(3, 9, 4));\n}, () => (9));"
+  },
+  {
+    "id": "callback-emitter",
+    "track": "js-language",
+    "title": "Tiny Event Emitter (on / emit)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "events",
+      "callbacks",
+      "observer",
+      "basics"
+    ],
+    "promptSeed": "Write createEmitter() returning { on(event, fn), emit(event, ...args) }. on registers a listener (several per event are allowed, called in registration order); emit calls every listener of that event with the given arguments and returns the number of listeners called (0 if none). Emitting an event nobody listens to must not throw.",
+    "difficulty": 1,
+    "concept": "emitter",
+    "referenceSolution": "function createEmitter() {\n  const listeners = {};\n  return {\n    on(event, fn) {\n      (listeners[event] ||= []).push(fn);\n    },\n    emit(event, ...args) {\n      const list = listeners[event] || [];\n      list.forEach((fn) => fn(...args));\n      return list.length;\n    },\n  };\n}",
+    "solution": "function createEmitter() {\n  const listeners = {};\n  return {\n    on(event, fn) {\n      (listeners[event] ||= []).push(fn);\n    },\n    emit(event, ...args) {\n      const list = listeners[event] || [];\n      list.forEach((fn) => fn(...args));\n      return list.length;\n    },\n  };\n}",
+    "starterCode": "function createEmitter() {\n  const listeners = {};\n  return {\n    on(event, fn) {\n      (listeners[event] ||= []).push(fn);\n    },\n    emit(event, ...args) {\n      const list = listeners[event] || [];\n      list.forEach((fn) => fn(...args));\n      return list.length;\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "emit calls the listener with the arguments",
+        "input": "const e = createEmitter();\nconst got = [];\ne.on('msg', (a, b) => got.push([a, b]));\ne.emit('msg', 1, 2);\ngot",
+        "expected": "[[1, 2]]"
+      },
+      {
+        "description": "Several listeners run in registration order",
+        "input": "const e = createEmitter();\nconst order = [];\ne.on('x', () => order.push('first'));\ne.on('x', () => order.push('second'));\ne.emit('x');\norder",
+        "expected": "['first', 'second']"
+      },
+      {
+        "description": "emit returns the number of listeners called",
+        "input": "const e = createEmitter();\ne.on('x', () => {});\ne.on('x', () => {});\n[e.emit('x'), e.emit('nobody')]",
+        "expected": "[2, 0]"
+      },
+      {
+        "description": "Events are independent",
+        "input": "const e = createEmitter();\nlet a = 0, b = 0;\ne.on('a', () => a++);\ne.on('b', () => b++);\ne.emit('a'); e.emit('a'); e.emit('b');\n[a, b]",
+        "expected": "[2, 1]"
+      },
+      {
+        "description": "Emitting without listeners does not throw",
+        "input": "createEmitter().emit('ghost', 1, 2, 3)",
+        "expected": "0"
+      }
+    ],
+    "testHarness": "await $test.run(\"emit calls the listener with the arguments\", async () => {\n  const sleep = $test.sleep;\n  const e = createEmitter();\n  const got = [];\n  e.on('msg', (a, b) => got.push([a, b]));\n  e.emit('msg', 1, 2);\n  return (got);\n}, () => ([[1, 2]]));\n\nawait $test.run(\"Several listeners run in registration order\", async () => {\n  const sleep = $test.sleep;\n  const e = createEmitter();\n  const order = [];\n  e.on('x', () => order.push('first'));\n  e.on('x', () => order.push('second'));\n  e.emit('x');\n  return (order);\n}, () => (['first', 'second']));\n\nawait $test.run(\"emit returns the number of listeners called\", async () => {\n  const sleep = $test.sleep;\n  const e = createEmitter();\n  e.on('x', () => {});\n  e.on('x', () => {});\n  return ([e.emit('x'), e.emit('nobody')]);\n}, () => ([2, 0]));\n\nawait $test.run(\"Events are independent\", async () => {\n  const sleep = $test.sleep;\n  const e = createEmitter();\n  let a = 0, b = 0;\n  e.on('a', () => a++);\n  e.on('b', () => b++);\n  e.emit('a'); e.emit('a'); e.emit('b');\n  return ([a, b]);\n}, () => ([2, 1]));\n\nawait $test.run(\"Emitting without listeners does not throw\", async () => {\n  const sleep = $test.sleep;\n  return (createEmitter().emit('ghost', 1, 2, 3));\n}, () => (0));"
+  },
+  {
+    "id": "fifo-cache",
+    "track": "data-structures",
+    "title": "Fixed-Size Cache (evict oldest)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "cache",
+      "map",
+      "eviction",
+      "basics"
+    ],
+    "promptSeed": "Write class FifoCache(capacity) with get(key) (undefined when missing), set(key, value) and size. When a NEW key is added beyond the capacity, evict the oldest inserted key (first-in, first-out). Updating an existing key changes its value but not its age, and get() never changes the order. (A later card adds LRU ordering on top of this.)",
+    "difficulty": 2,
+    "concept": "lru",
+    "referenceSolution": "class FifoCache {\n  constructor(capacity) {\n    this.capacity = capacity;\n    this.map = new Map(); // a Map iterates in insertion order\n  }\n\n  get size() {\n    return this.map.size;\n  }\n\n  get(key) {\n    return this.map.get(key);\n  }\n\n  set(key, value) {\n    if (!this.map.has(key) && this.map.size >= this.capacity) {\n      const oldest = this.map.keys().next().value;\n      this.map.delete(oldest);\n    }\n    this.map.set(key, value);\n  }\n}",
+    "solution": "class FifoCache {\n  constructor(capacity) {\n    this.capacity = capacity;\n    this.map = new Map(); // a Map iterates in insertion order\n  }\n\n  get size() {\n    return this.map.size;\n  }\n\n  get(key) {\n    return this.map.get(key);\n  }\n\n  set(key, value) {\n    if (!this.map.has(key) && this.map.size >= this.capacity) {\n      const oldest = this.map.keys().next().value;\n      this.map.delete(oldest);\n    }\n    this.map.set(key, value);\n  }\n}",
+    "starterCode": "class FifoCache {\n  constructor(capacity) {\n    this.capacity = capacity;\n    this.map = new Map(); // a Map iterates in insertion order\n  }\n\n  get size() {\n    return this.map.size;\n  }\n\n  get(key) {\n    return this.map.get(key);\n  }\n\n  set(key, value) {\n    if (!this.map.has(key) && this.map.size >= this.capacity) {\n      const oldest = this.map.keys().next().value;\n      this.map.delete(oldest);\n    }\n    this.map.set(key, value);\n  }\n}",
+    "testCases": [
+      {
+        "description": "get returns stored values, undefined when missing",
+        "input": "const c = new FifoCache(2);\nc.set('a', 1);\n[c.get('a'), c.get('zzz')]",
+        "expected": "[1, undefined]"
+      },
+      {
+        "description": "The oldest key is evicted past the capacity",
+        "input": "const c = new FifoCache(2);\nc.set('a', 1); c.set('b', 2); c.set('c', 3);\n[c.get('a'), c.get('b'), c.get('c'), c.size]",
+        "expected": "[undefined, 2, 3, 2]"
+      },
+      {
+        "description": "Updating an existing key does not change its age",
+        "input": "const c = new FifoCache(2);\nc.set('a', 1); c.set('b', 2);\nc.set('a', 10);\nc.set('c', 3);\n[c.get('a'), c.get('b'), c.get('c')]",
+        "expected": "[undefined, 2, 3]"
+      },
+      {
+        "description": "get never changes the eviction order",
+        "input": "const c = new FifoCache(2);\nc.set('a', 1); c.set('b', 2);\nc.get('a');\nc.set('c', 3);\n[c.get('a'), c.get('b')]",
+        "expected": "[undefined, 2]"
+      },
+      {
+        "description": "Falsy values are stored",
+        "input": "const c = new FifoCache(1);\nc.set('z', 0);\n[c.get('z'), c.size]",
+        "expected": "[0, 1]"
+      }
+    ],
+    "testHarness": "await $test.run(\"get returns stored values, undefined when missing\", async () => {\n  const sleep = $test.sleep;\n  const c = new FifoCache(2);\n  c.set('a', 1);\n  return ([c.get('a'), c.get('zzz')]);\n}, () => ([1, undefined]));\n\nawait $test.run(\"The oldest key is evicted past the capacity\", async () => {\n  const sleep = $test.sleep;\n  const c = new FifoCache(2);\n  c.set('a', 1); c.set('b', 2); c.set('c', 3);\n  return ([c.get('a'), c.get('b'), c.get('c'), c.size]);\n}, () => ([undefined, 2, 3, 2]));\n\nawait $test.run(\"Updating an existing key does not change its age\", async () => {\n  const sleep = $test.sleep;\n  const c = new FifoCache(2);\n  c.set('a', 1); c.set('b', 2);\n  c.set('a', 10);\n  c.set('c', 3);\n  return ([c.get('a'), c.get('b'), c.get('c')]);\n}, () => ([undefined, 2, 3]));\n\nawait $test.run(\"get never changes the eviction order\", async () => {\n  const sleep = $test.sleep;\n  const c = new FifoCache(2);\n  c.set('a', 1); c.set('b', 2);\n  c.get('a');\n  c.set('c', 3);\n  return ([c.get('a'), c.get('b')]);\n}, () => ([undefined, 2]));\n\nawait $test.run(\"Falsy values are stored\", async () => {\n  const sleep = $test.sleep;\n  const c = new FifoCache(1);\n  c.set('z', 0);\n  return ([c.get('z'), c.size]);\n}, () => ([0, 1]));"
+  },
+  {
+    "id": "focus-on-mount",
+    "track": "react",
+    "title": "Focus an Input on Mount (useRef + useEffect)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "refs",
+      "useEffect",
+      "basics"
+    ],
+    "promptSeed": "Write FocusInput({ placeholder, label }): it renders a <label> with the text `label` wrapping an <input placeholder={placeholder}>, and focuses that input when the component first mounts (use useRef and useEffect). It must not steal focus again on later re-renders.",
+    "difficulty": 1,
+    "concept": "refs",
+    "referenceSolution": "function FocusInput({ placeholder, label }) {\n  const inputRef = useRef(null);\n\n  useEffect(() => {\n    inputRef.current.focus(); // only once: the dependency list is empty\n  }, []);\n\n  return (\n    <label>\n      {label}\n      <input ref={inputRef} placeholder={placeholder} />\n    </label>\n  );\n}",
+    "solution": "function FocusInput({ placeholder, label }) {\n  const inputRef = useRef(null);\n\n  useEffect(() => {\n    inputRef.current.focus(); // only once: the dependency list is empty\n  }, []);\n\n  return (\n    <label>\n      {label}\n      <input ref={inputRef} placeholder={placeholder} />\n    </label>\n  );\n}",
+    "starterCode": "function FocusInput({ placeholder, label }) {\n  const inputRef = useRef(null);\n\n  useEffect(() => {\n    inputRef.current.focus(); // only once: the dependency list is empty\n  }, []);\n\n  return (\n    <label>\n      {label}\n      <input ref={inputRef} placeholder={placeholder} />\n    </label>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders a labelled input with the placeholder",
+        "input": "<FocusInput label='Name' placeholder='Ada' />",
+        "expected": "<label> text 'Name' wrapping an <input placeholder='Ada'>"
+      },
+      {
+        "description": "The input is focused after mount",
+        "input": "mount <FocusInput />",
+        "expected": "document.activeElement is the input"
+      },
+      {
+        "description": "Re-rendering does not steal focus again",
+        "input": "focus another button, then rerender FocusInput with new props",
+        "expected": "the other button keeps focus"
+      }
+    ],
+    "testHarness": "const { render, q, act } = $dom;\n{\n  const r = render(<FocusInput label=\"Name\" placeholder=\"Ada\" />);\n  const input = q('input', r.container);\n  $test.check('Renders a labelled input with the placeholder', input !== null && input.placeholder === 'Ada' && r.container.querySelector('label').textContent === 'Name', r.container.innerHTML);\n  $test.check('The input is focused after mount', document.activeElement === input, document.activeElement && document.activeElement.tagName);\n  r.unmount();\n}\n{\n  const r = render(<FocusInput label=\"Name\" placeholder=\"Ada\" />);\n  const other = document.createElement('button');\n  document.body.appendChild(other);\n  act(() => other.focus());\n  r.rerender(<FocusInput label=\"Name\" placeholder=\"Grace\" />);\n  const kept = document.activeElement === other;\n  other.remove();\n  $test.check('Re-rendering does not steal focus again', kept, document.activeElement && document.activeElement.tagName);\n  r.unmount();\n}"
+  },
+  {
+    "id": "interval-overlap",
+    "track": "algorithms",
+    "title": "Do Two Intervals Overlap?",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "intervals",
+      "arrays",
+      "basics"
+    ],
+    "promptSeed": "Intervals are [start, end] with start <= end and are CLOSED (touching endpoints overlap). Write overlaps(a, b) -> boolean, intersection(a, b) -> the overlapping [start, end] or null, and totalLength(intervals) -> the sum of the lengths (end - start) of the intervals, counting overlapping parts only once (the input may be unsorted).",
+    "difficulty": 2,
+    "concept": "intervals",
+    "referenceSolution": "function overlaps(a, b) {\n  return a[0] <= b[1] && b[0] <= a[1];\n}\n\nfunction intersection(a, b) {\n  if (!overlaps(a, b)) return null;\n  return [Math.max(a[0], b[0]), Math.min(a[1], b[1])];\n}\n\nfunction totalLength(intervals) {\n  const sorted = [...intervals].sort((x, y) => x[0] - y[0]);\n  let total = 0;\n  let curStart = null;\n  let curEnd = null;\n  for (const [start, end] of sorted) {\n    if (curEnd === null || start > curEnd) {\n      if (curEnd !== null) total += curEnd - curStart;\n      curStart = start;\n      curEnd = end;\n    } else {\n      curEnd = Math.max(curEnd, end);\n    }\n  }\n  if (curEnd !== null) total += curEnd - curStart;\n  return total;\n}",
+    "solution": "function overlaps(a, b) {\n  return a[0] <= b[1] && b[0] <= a[1];\n}\n\nfunction intersection(a, b) {\n  if (!overlaps(a, b)) return null;\n  return [Math.max(a[0], b[0]), Math.min(a[1], b[1])];\n}\n\nfunction totalLength(intervals) {\n  const sorted = [...intervals].sort((x, y) => x[0] - y[0]);\n  let total = 0;\n  let curStart = null;\n  let curEnd = null;\n  for (const [start, end] of sorted) {\n    if (curEnd === null || start > curEnd) {\n      if (curEnd !== null) total += curEnd - curStart;\n      curStart = start;\n      curEnd = end;\n    } else {\n      curEnd = Math.max(curEnd, end);\n    }\n  }\n  if (curEnd !== null) total += curEnd - curStart;\n  return total;\n}",
+    "starterCode": "function overlaps(a, b) {\n  return a[0] <= b[1] && b[0] <= a[1];\n}\n\nfunction intersection(a, b) {\n  if (!overlaps(a, b)) return null;\n  return [Math.max(a[0], b[0]), Math.min(a[1], b[1])];\n}\n\nfunction totalLength(intervals) {\n  const sorted = [...intervals].sort((x, y) => x[0] - y[0]);\n  let total = 0;\n  let curStart = null;\n  let curEnd = null;\n  for (const [start, end] of sorted) {\n    if (curEnd === null || start > curEnd) {\n      if (curEnd !== null) total += curEnd - curStart;\n      curStart = start;\n      curEnd = end;\n    } else {\n      curEnd = Math.max(curEnd, end);\n    }\n  }\n  if (curEnd !== null) total += curEnd - curStart;\n  return total;\n}",
+    "testCases": [
+      {
+        "description": "overlaps: partial overlap and containment",
+        "input": "[overlaps([1, 5], [4, 8]), overlaps([1, 10], [3, 4])]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "overlaps: touching endpoints count (closed intervals)",
+        "input": "overlaps([1, 3], [3, 5])",
+        "expected": "true"
+      },
+      {
+        "description": "overlaps: disjoint intervals",
+        "input": "[overlaps([1, 2], [3, 4]), overlaps([5, 6], [1, 4])]",
+        "expected": "[false, false]"
+      },
+      {
+        "description": "intersection returns the shared part",
+        "input": "[intersection([1, 5], [3, 9]), intersection([1, 10], [4, 6])]",
+        "expected": "[[3, 5], [4, 6]]"
+      },
+      {
+        "description": "intersection is null when disjoint, a point when touching",
+        "input": "[intersection([1, 2], [3, 4]), intersection([1, 3], [3, 5])]",
+        "expected": "[null, [3, 3]]"
+      },
+      {
+        "description": "totalLength counts overlapping parts once",
+        "input": "totalLength([[1, 4], [3, 6], [8, 10]])",
+        "expected": "7"
+      },
+      {
+        "description": "totalLength handles unsorted input and empty input",
+        "input": "[totalLength([[8, 10], [1, 4], [2, 3]]), totalLength([])]",
+        "expected": "[5, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"overlaps: partial overlap and containment\", async () => {\n  const sleep = $test.sleep;\n  return ([overlaps([1, 5], [4, 8]), overlaps([1, 10], [3, 4])]);\n}, () => ([true, true]));\n\nawait $test.run(\"overlaps: touching endpoints count (closed intervals)\", async () => {\n  const sleep = $test.sleep;\n  return (overlaps([1, 3], [3, 5]));\n}, () => (true));\n\nawait $test.run(\"overlaps: disjoint intervals\", async () => {\n  const sleep = $test.sleep;\n  return ([overlaps([1, 2], [3, 4]), overlaps([5, 6], [1, 4])]);\n}, () => ([false, false]));\n\nawait $test.run(\"intersection returns the shared part\", async () => {\n  const sleep = $test.sleep;\n  return ([intersection([1, 5], [3, 9]), intersection([1, 10], [4, 6])]);\n}, () => ([[3, 5], [4, 6]]));\n\nawait $test.run(\"intersection is null when disjoint, a point when touching\", async () => {\n  const sleep = $test.sleep;\n  return ([intersection([1, 2], [3, 4]), intersection([1, 3], [3, 5])]);\n}, () => ([null, [3, 3]]));\n\nawait $test.run(\"totalLength counts overlapping parts once\", async () => {\n  const sleep = $test.sleep;\n  return (totalLength([[1, 4], [3, 6], [8, 10]]));\n}, () => (7));\n\nawait $test.run(\"totalLength handles unsorted input and empty input\", async () => {\n  const sleep = $test.sleep;\n  return ([totalLength([[8, 10], [1, 4], [2, 3]]), totalLength([])]);\n}, () => ([5, 0]));"
+  },
+  {
+    "id": "memoize-basics",
+    "track": "js-language",
+    "title": "Memoize a Single-Argument Function",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "memoize",
+      "cache",
+      "map",
+      "closures"
+    ],
+    "promptSeed": "Write memoizeOne(fn) for functions of ONE argument: return a function that caches results in a Map keyed by the argument, so fn runs once per distinct argument (cache hits must work for results that are undefined or falsy too). Also write memoizeLast(fn) that remembers only the most recent argument and result.",
+    "difficulty": 1,
+    "concept": "memoize",
+    "referenceSolution": "function memoizeOne(fn) {\n  const cache = new Map();\n  return function (arg) {\n    if (cache.has(arg)) return cache.get(arg);\n    const result = fn.call(this, arg);\n    cache.set(arg, result);\n    return result;\n  };\n}\n\nfunction memoizeLast(fn) {\n  let hasValue = false;\n  let lastArg;\n  let lastResult;\n  return function (arg) {\n    if (hasValue && Object.is(arg, lastArg)) return lastResult;\n    lastResult = fn.call(this, arg);\n    lastArg = arg;\n    hasValue = true;\n    return lastResult;\n  };\n}",
+    "solution": "function memoizeOne(fn) {\n  const cache = new Map();\n  return function (arg) {\n    if (cache.has(arg)) return cache.get(arg);\n    const result = fn.call(this, arg);\n    cache.set(arg, result);\n    return result;\n  };\n}\n\nfunction memoizeLast(fn) {\n  let hasValue = false;\n  let lastArg;\n  let lastResult;\n  return function (arg) {\n    if (hasValue && Object.is(arg, lastArg)) return lastResult;\n    lastResult = fn.call(this, arg);\n    lastArg = arg;\n    hasValue = true;\n    return lastResult;\n  };\n}",
+    "starterCode": "function memoizeOne(fn) {\n  const cache = new Map();\n  return function (arg) {\n    if (cache.has(arg)) return cache.get(arg);\n    const result = fn.call(this, arg);\n    cache.set(arg, result);\n    return result;\n  };\n}\n\nfunction memoizeLast(fn) {\n  let hasValue = false;\n  let lastArg;\n  let lastResult;\n  return function (arg) {\n    if (hasValue && Object.is(arg, lastArg)) return lastResult;\n    lastResult = fn.call(this, arg);\n    lastArg = arg;\n    hasValue = true;\n    return lastResult;\n  };\n}",
+    "testCases": [
+      {
+        "description": "memoizeOne calls fn once per distinct argument",
+        "input": "let calls = 0;\nconst sq = memoizeOne((n) => { calls++; return n * n; });\n[sq(3), sq(3), sq(4), sq(3), calls]",
+        "expected": "[9, 9, 16, 9, 2]"
+      },
+      {
+        "description": "memoizeOne caches undefined and falsy results",
+        "input": "let calls = 0;\nconst f = memoizeOne((x) => { calls++; return x === 'u' ? undefined : 0; });\nf('u'); f('u'); f('z'); f('z');\ncalls",
+        "expected": "2"
+      },
+      {
+        "description": "memoizeOne works with object keys by reference",
+        "input": "let calls = 0;\nconst f = memoizeOne((o) => { calls++; return o.v; });\nconst a = { v: 1 };\n[f(a), f(a), f({ v: 1 }), calls]",
+        "expected": "[1, 1, 1, 2]"
+      },
+      {
+        "description": "memoizeLast remembers only the last argument",
+        "input": "let calls = 0;\nconst f = memoizeLast((n) => { calls++; return n + 1; });\n[f(1), f(1), f(2), f(1), calls]",
+        "expected": "[2, 2, 3, 2, 3]"
+      },
+      {
+        "description": "memoizeLast treats NaN as equal to NaN",
+        "input": "let calls = 0;\nconst f = memoizeLast((n) => { calls++; return 'x'; });\nf(NaN); f(NaN);\ncalls",
+        "expected": "1"
+      }
+    ],
+    "testHarness": "await $test.run(\"memoizeOne calls fn once per distinct argument\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const sq = memoizeOne((n) => { calls++; return n * n; });\n  return ([sq(3), sq(3), sq(4), sq(3), calls]);\n}, () => ([9, 9, 16, 9, 2]));\n\nawait $test.run(\"memoizeOne caches undefined and falsy results\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeOne((x) => { calls++; return x === 'u' ? undefined : 0; });\n  f('u'); f('u'); f('z'); f('z');\n  return (calls);\n}, () => (2));\n\nawait $test.run(\"memoizeOne works with object keys by reference\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeOne((o) => { calls++; return o.v; });\n  const a = { v: 1 };\n  return ([f(a), f(a), f({ v: 1 }), calls]);\n}, () => ([1, 1, 1, 2]));\n\nawait $test.run(\"memoizeLast remembers only the last argument\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeLast((n) => { calls++; return n + 1; });\n  return ([f(1), f(1), f(2), f(1), calls]);\n}, () => ([2, 2, 3, 2, 3]));\n\nawait $test.run(\"memoizeLast treats NaN as equal to NaN\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeLast((n) => { calls++; return 'x'; });\n  f(NaN); f(NaN);\n  return (calls);\n}, () => (1));"
+  },
+  {
+    "id": "parse-path-params",
+    "track": "dom-browser",
+    "title": "Parse Path Params from a URL Pattern",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "router",
+      "url",
+      "params",
+      "basics"
+    ],
+    "promptSeed": "Write parsePath(pattern, path) where the pattern uses ':name' segments, e.g. parsePath('/users/:id/posts/:postId', '/users/7/posts/42') -> { id: '7', postId: '42' }. Return null when the number of segments differs or a static segment does not match; ignore a trailing slash and any '?query' or '#hash' on the path.",
+    "difficulty": 2,
+    "concept": "router",
+    "referenceSolution": "function parsePath(pattern, path) {\n  const clean = (s) => s.split(/[?#]/)[0].split('/').filter(Boolean);\n  const patternParts = clean(pattern);\n  const parts = clean(path);\n  if (patternParts.length !== parts.length) return null;\n  const params = {};\n  for (let i = 0; i < patternParts.length; i++) {\n    if (patternParts[i].startsWith(':')) params[patternParts[i].slice(1)] = parts[i];\n    else if (patternParts[i] !== parts[i]) return null;\n  }\n  return params;\n}",
+    "solution": "function parsePath(pattern, path) {\n  const clean = (s) => s.split(/[?#]/)[0].split('/').filter(Boolean);\n  const patternParts = clean(pattern);\n  const parts = clean(path);\n  if (patternParts.length !== parts.length) return null;\n  const params = {};\n  for (let i = 0; i < patternParts.length; i++) {\n    if (patternParts[i].startsWith(':')) params[patternParts[i].slice(1)] = parts[i];\n    else if (patternParts[i] !== parts[i]) return null;\n  }\n  return params;\n}",
+    "starterCode": "function parsePath(pattern, path) {\n  const clean = (s) => s.split(/[?#]/)[0].split('/').filter(Boolean);\n  const patternParts = clean(pattern);\n  const parts = clean(path);\n  if (patternParts.length !== parts.length) return null;\n  const params = {};\n  for (let i = 0; i < patternParts.length; i++) {\n    if (patternParts[i].startsWith(':')) params[patternParts[i].slice(1)] = parts[i];\n    else if (patternParts[i] !== parts[i]) return null;\n  }\n  return params;\n}",
+    "testCases": [
+      {
+        "description": "Captures named params",
+        "input": "parsePath('/users/:id/posts/:postId', '/users/7/posts/42')",
+        "expected": "{ id: '7', postId: '42' }"
+      },
+      {
+        "description": "A static pattern returns an empty object",
+        "input": "parsePath('/about', '/about')",
+        "expected": "{}"
+      },
+      {
+        "description": "Different segment counts do not match",
+        "input": "[parsePath('/users/:id', '/users'), parsePath('/users/:id', '/users/1/extra')]",
+        "expected": "[null, null]"
+      },
+      {
+        "description": "A different static segment does not match",
+        "input": "parsePath('/users/:id', '/people/3')",
+        "expected": "null"
+      },
+      {
+        "description": "Trailing slash, query and hash are ignored",
+        "input": "parsePath('/users/:id', '/users/9/?tab=posts#top')",
+        "expected": "{ id: '9' }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Captures named params\", async () => {\n  const sleep = $test.sleep;\n  return (parsePath('/users/:id/posts/:postId', '/users/7/posts/42'));\n}, () => ({ id: '7', postId: '42' }));\n\nawait $test.run(\"A static pattern returns an empty object\", async () => {\n  const sleep = $test.sleep;\n  return (parsePath('/about', '/about'));\n}, () => ({}));\n\nawait $test.run(\"Different segment counts do not match\", async () => {\n  const sleep = $test.sleep;\n  return ([parsePath('/users/:id', '/users'), parsePath('/users/:id', '/users/1/extra')]);\n}, () => ([null, null]));\n\nawait $test.run(\"A different static segment does not match\", async () => {\n  const sleep = $test.sleep;\n  return (parsePath('/users/:id', '/people/3'));\n}, () => (null));\n\nawait $test.run(\"Trailing slash, query and hash are ignored\", async () => {\n  const sleep = $test.sleep;\n  return (parsePath('/users/:id', '/users/9/?tab=posts#top'));\n}, () => ({ id: '9' }));"
+  },
+  {
+    "id": "parse-style-string",
+    "track": "js-language",
+    "title": "Parse and Build Inline Style Strings",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "css",
+      "strings",
+      "parsing",
+      "basics"
+    ],
+    "promptSeed": "Write parseStyle(text) turning 'color: red; margin-top: 4px;' into { color: 'red', marginTop: '4px' } (trim whitespace, ignore empty declarations, convert kebab-case property names to camelCase; values may contain ':' as in urls, so split on the FIRST colon only) and styleToString(obj) doing the reverse ({ marginTop: '4px' } -> 'margin-top: 4px;' with declarations joined by a single space).",
+    "difficulty": 1,
+    "concept": "css",
+    "referenceSolution": "function parseStyle(text) {\n  const out = {};\n  for (const decl of text.split(';')) {\n    const colon = decl.indexOf(':');\n    if (colon === -1) continue;\n    const name = decl.slice(0, colon).trim();\n    const value = decl.slice(colon + 1).trim();\n    if (!name || !value) continue;\n    out[name.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = value;\n  }\n  return out;\n}\n\nfunction styleToString(obj) {\n  return Object.entries(obj)\n    .map(([name, value]) => `${name.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())}: ${value};`)\n    .join(' ');\n}",
+    "solution": "function parseStyle(text) {\n  const out = {};\n  for (const decl of text.split(';')) {\n    const colon = decl.indexOf(':');\n    if (colon === -1) continue;\n    const name = decl.slice(0, colon).trim();\n    const value = decl.slice(colon + 1).trim();\n    if (!name || !value) continue;\n    out[name.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = value;\n  }\n  return out;\n}\n\nfunction styleToString(obj) {\n  return Object.entries(obj)\n    .map(([name, value]) => `${name.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())}: ${value};`)\n    .join(' ');\n}",
+    "starterCode": "function parseStyle(text) {\n  const out = {};\n  for (const decl of text.split(';')) {\n    const colon = decl.indexOf(':');\n    if (colon === -1) continue;\n    const name = decl.slice(0, colon).trim();\n    const value = decl.slice(colon + 1).trim();\n    if (!name || !value) continue;\n    out[name.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = value;\n  }\n  return out;\n}\n\nfunction styleToString(obj) {\n  return Object.entries(obj)\n    .map(([name, value]) => `${name.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())}: ${value};`)\n    .join(' ');\n}",
+    "testCases": [
+      {
+        "description": "parseStyle reads declarations and camelCases names",
+        "input": "parseStyle('color: red; margin-top: 4px;')",
+        "expected": "{ color: 'red', marginTop: '4px' }"
+      },
+      {
+        "description": "parseStyle trims whitespace and ignores empty declarations",
+        "input": "parseStyle('  color :  blue ;; ; padding: 0 ')",
+        "expected": "{ color: 'blue', padding: '0' }"
+      },
+      {
+        "description": "parseStyle splits on the first colon only",
+        "input": "parseStyle('background: url(http://x.test/a.png)')",
+        "expected": "{ background: 'url(http://x.test/a.png)' }"
+      },
+      {
+        "description": "parseStyle of an empty string",
+        "input": "parseStyle('')",
+        "expected": "{}"
+      },
+      {
+        "description": "styleToString converts back to kebab-case",
+        "input": "styleToString({ marginTop: '4px', color: 'red' })",
+        "expected": "'margin-top: 4px; color: red;'"
+      },
+      {
+        "description": "Round trip",
+        "input": "styleToString(parseStyle('font-size: 12px; z-index: 3;'))",
+        "expected": "'font-size: 12px; z-index: 3;'"
+      }
+    ],
+    "testHarness": "await $test.run(\"parseStyle reads declarations and camelCases names\", async () => {\n  const sleep = $test.sleep;\n  return (parseStyle('color: red; margin-top: 4px;'));\n}, () => ({ color: 'red', marginTop: '4px' }));\n\nawait $test.run(\"parseStyle trims whitespace and ignores empty declarations\", async () => {\n  const sleep = $test.sleep;\n  return (parseStyle('  color :  blue ;; ; padding: 0 '));\n}, () => ({ color: 'blue', padding: '0' }));\n\nawait $test.run(\"parseStyle splits on the first colon only\", async () => {\n  const sleep = $test.sleep;\n  return (parseStyle('background: url(http://x.test/a.png)'));\n}, () => ({ background: 'url(http://x.test/a.png)' }));\n\nawait $test.run(\"parseStyle of an empty string\", async () => {\n  const sleep = $test.sleep;\n  return (parseStyle(''));\n}, () => ({}));\n\nawait $test.run(\"styleToString converts back to kebab-case\", async () => {\n  const sleep = $test.sleep;\n  return (styleToString({ marginTop: '4px', color: 'red' }));\n}, () => ('margin-top: 4px; color: red;'));\n\nawait $test.run(\"Round trip\", async () => {\n  const sleep = $test.sleep;\n  return (styleToString(parseStyle('font-size: 12px; z-index: 3;')));\n}, () => ('font-size: 12px; z-index: 3;'));"
+  },
+  {
+    "id": "run-in-sequence",
+    "track": "async-js",
+    "title": "Run Async Tasks in Sequence and in Parallel",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "async-await",
+      "promises",
+      "sequencing",
+      "basics"
+    ],
+    "promptSeed": "Tasks are functions returning a promise (or a value). Write runSequentially(tasks) that starts each task only after the previous one has finished and resolves to the array of results in order (stopping and rejecting at the first failure, without starting later tasks), and runInParallel(tasks) that starts them all at once and resolves to the results in the original order.",
+    "difficulty": 2,
+    "concept": "async-control",
+    "referenceSolution": "async function runSequentially(tasks) {\n  const results = [];\n  for (const task of tasks) {\n    results.push(await task());\n  }\n  return results;\n}\n\nfunction runInParallel(tasks) {\n  return Promise.all(tasks.map((task) => task()));\n}",
+    "solution": "async function runSequentially(tasks) {\n  const results = [];\n  for (const task of tasks) {\n    results.push(await task());\n  }\n  return results;\n}\n\nfunction runInParallel(tasks) {\n  return Promise.all(tasks.map((task) => task()));\n}",
+    "starterCode": "async function runSequentially(tasks) {\n  const results = [];\n  for (const task of tasks) {\n    results.push(await task());\n  }\n  return results;\n}\n\nfunction runInParallel(tasks) {\n  return Promise.all(tasks.map((task) => task()));\n}",
+    "testCases": [
+      {
+        "description": "runSequentially returns the results in order",
+        "input": "await runSequentially([() => 1, async () => 2, () => Promise.resolve(3)])",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "runSequentially starts a task only after the previous finished",
+        "input": "const log = [];\nconst task = (name, ms) => async () => { log.push('start ' + name); await sleep(ms); log.push('end ' + name); return name; };\nawait runSequentially([task('a', 30), task('b', 5)]);\nlog",
+        "expected": "['start a', 'end a', 'start b', 'end b']"
+      },
+      {
+        "description": "runSequentially stops at the first failure",
+        "input": "const log = [];\nawait runSequentially([async () => log.push('one'), async () => { throw new Error('stop'); }, async () => log.push('three')]).catch(() => {});\nlog",
+        "expected": "['one']"
+      },
+      {
+        "description": "runSequentially rejects with the failing error",
+        "input": "await runSequentially([() => 1, () => { throw new Error('boom'); }]).catch((e) => e.message)",
+        "expected": "'boom'"
+      },
+      {
+        "description": "runInParallel starts everything at once but keeps result order",
+        "input": "const log = [];\nconst task = (name, ms) => async () => { log.push('start ' + name); await sleep(ms); return name; };\nconst out = await runInParallel([task('slow', 30), task('fast', 5)]);\n[out, log]",
+        "expected": "[['slow', 'fast'], ['start slow', 'start fast']]"
+      },
+      {
+        "description": "Empty task lists resolve to an empty array",
+        "input": "[await runSequentially([]), await runInParallel([])]",
+        "expected": "[[], []]"
+      }
+    ],
+    "testHarness": "await $test.run(\"runSequentially returns the results in order\", async () => {\n  const sleep = $test.sleep;\n  return (await runSequentially([() => 1, async () => 2, () => Promise.resolve(3)]));\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"runSequentially starts a task only after the previous finished\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const task = (name, ms) => async () => { log.push('start ' + name); await sleep(ms); log.push('end ' + name); return name; };\n  await runSequentially([task('a', 30), task('b', 5)]);\n  return (log);\n}, () => (['start a', 'end a', 'start b', 'end b']));\n\nawait $test.run(\"runSequentially stops at the first failure\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  await runSequentially([async () => log.push('one'), async () => { throw new Error('stop'); }, async () => log.push('three')]).catch(() => {});\n  return (log);\n}, () => (['one']));\n\nawait $test.run(\"runSequentially rejects with the failing error\", async () => {\n  const sleep = $test.sleep;\n  return (await runSequentially([() => 1, () => { throw new Error('boom'); }]).catch((e) => e.message));\n}, () => ('boom'));\n\nawait $test.run(\"runInParallel starts everything at once but keeps result order\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const task = (name, ms) => async () => { log.push('start ' + name); await sleep(ms); return name; };\n  const out = await runInParallel([task('slow', 30), task('fast', 5)]);\n  return ([out, log]);\n}, () => ([['slow', 'fast'], ['start slow', 'start fast']]));\n\nawait $test.run(\"Empty task lists resolve to an empty array\", async () => {\n  const sleep = $test.sleep;\n  return ([await runSequentially([]), await runInParallel([])]);\n}, () => ([[], []]));"
+  },
+  {
+    "id": "safe-json-storage",
+    "track": "dom-browser",
+    "title": "Safe JSON Read and Write",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "json",
+      "localstorage",
+      "error-handling",
+      "basics"
+    ],
+    "promptSeed": "Write safeParse(text, fallback) returning the parsed JSON or `fallback` when text is not valid JSON (or not a string). Write safeGet(storage, key, fallback) that reads storage.getItem(key) (a localStorage-like object) and returns the parsed value or fallback when the key is missing or the stored text is corrupt, and safeSet(storage, key, value) that stores JSON and returns true, or false if storage.setItem throws.",
+    "difficulty": 1,
+    "concept": "storage",
+    "referenceSolution": "function safeParse(text, fallback) {\n  if (typeof text !== 'string') return fallback;\n  try {\n    return JSON.parse(text);\n  } catch {\n    return fallback;\n  }\n}\n\nfunction safeGet(storage, key, fallback) {\n  return safeParse(storage.getItem(key), fallback);\n}\n\nfunction safeSet(storage, key, value) {\n  try {\n    storage.setItem(key, JSON.stringify(value));\n    return true;\n  } catch {\n    return false;\n  }\n}",
+    "solution": "function safeParse(text, fallback) {\n  if (typeof text !== 'string') return fallback;\n  try {\n    return JSON.parse(text);\n  } catch {\n    return fallback;\n  }\n}\n\nfunction safeGet(storage, key, fallback) {\n  return safeParse(storage.getItem(key), fallback);\n}\n\nfunction safeSet(storage, key, value) {\n  try {\n    storage.setItem(key, JSON.stringify(value));\n    return true;\n  } catch {\n    return false;\n  }\n}",
+    "starterCode": "function safeParse(text, fallback) {\n  if (typeof text !== 'string') return fallback;\n  try {\n    return JSON.parse(text);\n  } catch {\n    return fallback;\n  }\n}\n\nfunction safeGet(storage, key, fallback) {\n  return safeParse(storage.getItem(key), fallback);\n}\n\nfunction safeSet(storage, key, value) {\n  try {\n    storage.setItem(key, JSON.stringify(value));\n    return true;\n  } catch {\n    return false;\n  }\n}",
+    "testCases": [
+      {
+        "description": "safeParse parses valid JSON",
+        "input": "[safeParse('{\"a\":[1,2]}', null), safeParse('7', 0), safeParse('\"x\"', '')]",
+        "expected": "[{ a: [1, 2] }, 7, 'x']"
+      },
+      {
+        "description": "safeParse returns the fallback on invalid JSON",
+        "input": "[safeParse('{oops', 'fb'), safeParse('', 'fb'), safeParse(undefined, 'fb'), safeParse(null, 'fb')]",
+        "expected": "['fb', 'fb', 'fb', 'fb']"
+      },
+      {
+        "description": "safeSet stores JSON and returns true",
+        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\n[safeSet(s, 'k', { a: 1 }), s.getItem('k')]",
+        "expected": "[true, '{\"a\":1}']"
+      },
+      {
+        "description": "safeGet reads it back and falls back when missing",
+        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\nsafeSet(s, 'k', [1, 2]);\n[safeGet(s, 'k', null), safeGet(s, 'missing', 'none')]",
+        "expected": "[[1, 2], 'none']"
+      },
+      {
+        "description": "safeGet falls back on corrupt stored text",
+        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\ns.setItem('bad', '{not json');\nsafeGet(s, 'bad', 'recovered')",
+        "expected": "'recovered'"
+      },
+      {
+        "description": "safeSet returns false when the storage throws",
+        "input": "safeSet({ setItem() { throw new Error('QuotaExceededError'); } }, 'k', 1)",
+        "expected": "false"
+      }
+    ],
+    "testHarness": "await $test.run(\"safeParse parses valid JSON\", async () => {\n  const sleep = $test.sleep;\n  return ([safeParse('{\"a\":[1,2]}', null), safeParse('7', 0), safeParse('\"x\"', '')]);\n}, () => ([{ a: [1, 2] }, 7, 'x']));\n\nawait $test.run(\"safeParse returns the fallback on invalid JSON\", async () => {\n  const sleep = $test.sleep;\n  return ([safeParse('{oops', 'fb'), safeParse('', 'fb'), safeParse(undefined, 'fb'), safeParse(null, 'fb')]);\n}, () => (['fb', 'fb', 'fb', 'fb']));\n\nawait $test.run(\"safeSet stores JSON and returns true\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  return ([safeSet(s, 'k', { a: 1 }), s.getItem('k')]);\n}, () => ([true, '{\"a\":1}']));\n\nawait $test.run(\"safeGet reads it back and falls back when missing\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  safeSet(s, 'k', [1, 2]);\n  return ([safeGet(s, 'k', null), safeGet(s, 'missing', 'none')]);\n}, () => ([[1, 2], 'none']));\n\nawait $test.run(\"safeGet falls back on corrupt stored text\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  s.setItem('bad', '{not json');\n  return (safeGet(s, 'bad', 'recovered'));\n}, () => ('recovered'));\n\nawait $test.run(\"safeSet returns false when the storage throws\", async () => {\n  const sleep = $test.sleep;\n  return (safeSet({ setItem() { throw new Error('QuotaExceededError'); } }, 'k', 1));\n}, () => (false));"
+  },
+  {
+    "id": "shallow-copy-equal",
+    "track": "collections-transformations",
+    "title": "Shallow Copy and Shallow Equal",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "objects",
+      "copy",
+      "equality",
+      "basics"
+    ],
+    "promptSeed": "Write shallowCopy(value) (arrays and plain objects get a new container with the same items; anything else is returned as is) and shallowEqual(a, b): true when both are the same value (Object.is), or both are plain objects (or both arrays) with the same keys whose values are equal by Object.is. Nested objects are compared by reference, not deeply.",
+    "difficulty": 1,
+    "concept": "equality-clone",
+    "referenceSolution": "function shallowCopy(value) {\n  if (Array.isArray(value)) return [...value];\n  if (value !== null && typeof value === 'object') return { ...value };\n  return value;\n}\n\nfunction shallowEqual(a, b) {\n  if (Object.is(a, b)) return true;\n  if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') return false;\n  if (Array.isArray(a) !== Array.isArray(b)) return false;\n  const keysA = Object.keys(a);\n  const keysB = Object.keys(b);\n  if (keysA.length !== keysB.length) return false;\n  return keysA.every((key) => Object.prototype.hasOwnProperty.call(b, key) && Object.is(a[key], b[key]));\n}",
+    "solution": "function shallowCopy(value) {\n  if (Array.isArray(value)) return [...value];\n  if (value !== null && typeof value === 'object') return { ...value };\n  return value;\n}\n\nfunction shallowEqual(a, b) {\n  if (Object.is(a, b)) return true;\n  if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') return false;\n  if (Array.isArray(a) !== Array.isArray(b)) return false;\n  const keysA = Object.keys(a);\n  const keysB = Object.keys(b);\n  if (keysA.length !== keysB.length) return false;\n  return keysA.every((key) => Object.prototype.hasOwnProperty.call(b, key) && Object.is(a[key], b[key]));\n}",
+    "starterCode": "function shallowCopy(value) {\n  if (Array.isArray(value)) return [...value];\n  if (value !== null && typeof value === 'object') return { ...value };\n  return value;\n}\n\nfunction shallowEqual(a, b) {\n  if (Object.is(a, b)) return true;\n  if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') return false;\n  if (Array.isArray(a) !== Array.isArray(b)) return false;\n  const keysA = Object.keys(a);\n  const keysB = Object.keys(b);\n  if (keysA.length !== keysB.length) return false;\n  return keysA.every((key) => Object.prototype.hasOwnProperty.call(b, key) && Object.is(a[key], b[key]));\n}",
+    "testCases": [
+      {
+        "description": "shallowCopy copies the container but shares nested values",
+        "input": "const nested = { n: 1 };\nconst copy = shallowCopy({ a: 1, nested });\n[copy.a, copy.nested === nested, copy !== undefined]",
+        "expected": "[1, true, true]"
+      },
+      {
+        "description": "shallowCopy of an array is a new array",
+        "input": "const a = [1, 2, 3];\nconst b = shallowCopy(a);\nb.push(4);\n[a.length, b.length, Array.isArray(b)]",
+        "expected": "[3, 4, true]"
+      },
+      {
+        "description": "shallowCopy returns primitives as they are",
+        "input": "[shallowCopy(5), shallowCopy('s'), shallowCopy(null)]",
+        "expected": "[5, 's', null]"
+      },
+      {
+        "description": "shallowEqual: same keys and Object.is values",
+        "input": "[shallowEqual({ a: 1, b: 'x' }, { b: 'x', a: 1 }), shallowEqual({ a: 1 }, { a: 2 })]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "shallowEqual: nested objects compare by reference",
+        "input": "const n = {};\n[shallowEqual({ n }, { n }), shallowEqual({ n: {} }, { n: {} })]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "shallowEqual: different key counts, arrays vs objects, NaN",
+        "input": "[shallowEqual({ a: 1 }, { a: 1, b: 2 }), shallowEqual([1], { 0: 1 }), shallowEqual({ x: NaN }, { x: NaN }), shallowEqual([1, 2], [1, 2])]",
+        "expected": "[false, false, true, true]"
+      },
+      {
+        "description": "shallowEqual: primitives and null",
+        "input": "[shallowEqual(1, 1), shallowEqual(null, {}), shallowEqual(null, null)]",
+        "expected": "[true, false, true]"
+      }
+    ],
+    "testHarness": "await $test.run(\"shallowCopy copies the container but shares nested values\", async () => {\n  const sleep = $test.sleep;\n  const nested = { n: 1 };\n  const copy = shallowCopy({ a: 1, nested });\n  return ([copy.a, copy.nested === nested, copy !== undefined]);\n}, () => ([1, true, true]));\n\nawait $test.run(\"shallowCopy of an array is a new array\", async () => {\n  const sleep = $test.sleep;\n  const a = [1, 2, 3];\n  const b = shallowCopy(a);\n  b.push(4);\n  return ([a.length, b.length, Array.isArray(b)]);\n}, () => ([3, 4, true]));\n\nawait $test.run(\"shallowCopy returns primitives as they are\", async () => {\n  const sleep = $test.sleep;\n  return ([shallowCopy(5), shallowCopy('s'), shallowCopy(null)]);\n}, () => ([5, 's', null]));\n\nawait $test.run(\"shallowEqual: same keys and Object.is values\", async () => {\n  const sleep = $test.sleep;\n  return ([shallowEqual({ a: 1, b: 'x' }, { b: 'x', a: 1 }), shallowEqual({ a: 1 }, { a: 2 })]);\n}, () => ([true, false]));\n\nawait $test.run(\"shallowEqual: nested objects compare by reference\", async () => {\n  const sleep = $test.sleep;\n  const n = {};\n  return ([shallowEqual({ n }, { n }), shallowEqual({ n: {} }, { n: {} })]);\n}, () => ([true, false]));\n\nawait $test.run(\"shallowEqual: different key counts, arrays vs objects, NaN\", async () => {\n  const sleep = $test.sleep;\n  return ([shallowEqual({ a: 1 }, { a: 1, b: 2 }), shallowEqual([1], { 0: 1 }), shallowEqual({ x: NaN }, { x: NaN }), shallowEqual([1, 2], [1, 2])]);\n}, () => ([false, false, true, true]));\n\nawait $test.run(\"shallowEqual: primitives and null\", async () => {\n  const sleep = $test.sleep;\n  return ([shallowEqual(1, 1), shallowEqual(null, {}), shallowEqual(null, null)]);\n}, () => ([true, false, true]));"
+  },
+  {
+    "id": "sleep-and-delay",
+    "track": "async-js",
+    "title": "sleep(ms) and delay(value, ms)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "promise",
+      "timers",
+      "async-await",
+      "basics"
+    ],
+    "promptSeed": "Write sleep(ms) returning a Promise that resolves (with undefined) after ms milliseconds, and delay(value, ms) that resolves with `value` after ms milliseconds. Then write measure(fn) (async) that awaits fn() and returns the elapsed milliseconds as a number.",
+    "difficulty": 1,
+    "concept": "promise",
+    "referenceSolution": "function sleep(ms) {\n  return new Promise((resolve) => setTimeout(resolve, ms));\n}\n\nfunction delay(value, ms) {\n  return sleep(ms).then(() => value);\n}\n\nasync function measure(fn) {\n  const start = Date.now();\n  await fn();\n  return Date.now() - start;\n}",
+    "solution": "function sleep(ms) {\n  return new Promise((resolve) => setTimeout(resolve, ms));\n}\n\nfunction delay(value, ms) {\n  return sleep(ms).then(() => value);\n}\n\nasync function measure(fn) {\n  const start = Date.now();\n  await fn();\n  return Date.now() - start;\n}",
+    "starterCode": "function sleep(ms) {\n  return new Promise((resolve) => setTimeout(resolve, ms));\n}\n\nfunction delay(value, ms) {\n  return sleep(ms).then(() => value);\n}\n\nasync function measure(fn) {\n  const start = Date.now();\n  await fn();\n  return Date.now() - start;\n}",
+    "testCases": [
+      {
+        "description": "sleep resolves with undefined after about ms",
+        "input": "const t = Date.now();\nconst v = await sleep(40);\n[v, Date.now() - t >= 35]",
+        "expected": "[undefined, true]"
+      },
+      {
+        "description": "sleep does not resolve early",
+        "input": "let done = false;\nsleep(60).then(() => { done = true; });\nawait sleep(20);\ndone",
+        "expected": "false"
+      },
+      {
+        "description": "delay resolves with the value",
+        "input": "await delay('hello', 20)",
+        "expected": "'hello'"
+      },
+      {
+        "description": "delay keeps non-string values",
+        "input": "await delay({ a: 1 }, 5)",
+        "expected": "{ a: 1 }"
+      },
+      {
+        "description": "measure returns elapsed milliseconds",
+        "input": "const ms = await measure(() => sleep(50));\nms >= 45 && ms < 400",
+        "expected": "true"
+      },
+      {
+        "description": "measure waits for the promise returned by fn",
+        "input": "let finished = false;\nawait measure(async () => { await sleep(20); finished = true; });\nfinished",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"sleep resolves with undefined after about ms\", async () => {\n  const sleep = $test.sleep;\n  const t = Date.now();\n  const v = await sleep(40);\n  return ([v, Date.now() - t >= 35]);\n}, () => ([undefined, true]));\n\nawait $test.run(\"sleep does not resolve early\", async () => {\n  const sleep = $test.sleep;\n  let done = false;\n  sleep(60).then(() => { done = true; });\n  await sleep(20);\n  return (done);\n}, () => (false));\n\nawait $test.run(\"delay resolves with the value\", async () => {\n  const sleep = $test.sleep;\n  return (await delay('hello', 20));\n}, () => ('hello'));\n\nawait $test.run(\"delay keeps non-string values\", async () => {\n  const sleep = $test.sleep;\n  return (await delay({ a: 1 }, 5));\n}, () => ({ a: 1 }));\n\nawait $test.run(\"measure returns elapsed milliseconds\", async () => {\n  const sleep = $test.sleep;\n  const ms = await measure(() => sleep(50));\n  return (ms >= 45 && ms < 400);\n}, () => (true));\n\nawait $test.run(\"measure waits for the promise returned by fn\", async () => {\n  const sleep = $test.sleep;\n  let finished = false;\n  await measure(async () => { await sleep(20); finished = true; });\n  return (finished);\n}, () => (true));"
+  },
+  {
+    "id": "tree-depth-sum",
+    "track": "algorithms",
+    "title": "Binary Tree: Depth, Sum, Count",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tree",
+      "recursion",
+      "dfs",
+      "basics"
+    ],
+    "promptSeed": "Nodes look like { val, left, right } (missing children are null or undefined). Write maxDepth(root) (number of nodes on the longest root-to-leaf path; 0 for an empty tree), sumTree(root) (sum of all values) and countLeaves(root).",
+    "difficulty": 1,
+    "concept": "trees",
+    "referenceSolution": "function maxDepth(root) {\n  if (!root) return 0;\n  return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));\n}\n\nfunction sumTree(root) {\n  if (!root) return 0;\n  return root.val + sumTree(root.left) + sumTree(root.right);\n}\n\nfunction countLeaves(root) {\n  if (!root) return 0;\n  if (!root.left && !root.right) return 1;\n  return countLeaves(root.left) + countLeaves(root.right);\n}",
+    "solution": "function maxDepth(root) {\n  if (!root) return 0;\n  return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));\n}\n\nfunction sumTree(root) {\n  if (!root) return 0;\n  return root.val + sumTree(root.left) + sumTree(root.right);\n}\n\nfunction countLeaves(root) {\n  if (!root) return 0;\n  if (!root.left && !root.right) return 1;\n  return countLeaves(root.left) + countLeaves(root.right);\n}",
+    "starterCode": "function maxDepth(root) {\n  if (!root) return 0;\n  return 1 + Math.max(maxDepth(root.left), maxDepth(root.right));\n}\n\nfunction sumTree(root) {\n  if (!root) return 0;\n  return root.val + sumTree(root.left) + sumTree(root.right);\n}\n\nfunction countLeaves(root) {\n  if (!root) return 0;\n  if (!root.left && !root.right) return 1;\n  return countLeaves(root.left) + countLeaves(root.right);\n}",
+    "testCases": [
+      {
+        "description": "maxDepth of an empty tree is 0",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[maxDepth(null), maxDepth(undefined)]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "maxDepth of a single node is 1",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nmaxDepth(n(5))",
+        "expected": "1"
+      },
+      {
+        "description": "maxDepth follows the longest path",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nmaxDepth(n(1, n(2, n(4, n(8))), n(3)))",
+        "expected": "4"
+      },
+      {
+        "description": "sumTree adds every value",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nsumTree(n(1, n(2), n(3, n(4), null)))",
+        "expected": "10"
+      },
+      {
+        "description": "sumTree of an empty tree",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nsumTree(null)",
+        "expected": "0"
+      },
+      {
+        "description": "countLeaves counts nodes without children",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[countLeaves(n(1, n(2), n(3, n(4), n(5)))), countLeaves(n(1)), countLeaves(null)]",
+        "expected": "[3, 1, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"maxDepth of an empty tree is 0\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([maxDepth(null), maxDepth(undefined)]);\n}, () => ([0, 0]));\n\nawait $test.run(\"maxDepth of a single node is 1\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (maxDepth(n(5)));\n}, () => (1));\n\nawait $test.run(\"maxDepth follows the longest path\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (maxDepth(n(1, n(2, n(4, n(8))), n(3))));\n}, () => (4));\n\nawait $test.run(\"sumTree adds every value\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (sumTree(n(1, n(2), n(3, n(4), null))));\n}, () => (10));\n\nawait $test.run(\"sumTree of an empty tree\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (sumTree(null));\n}, () => (0));\n\nawait $test.run(\"countLeaves counts nodes without children\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([countLeaves(n(1, n(2), n(3, n(4), n(5)))), countLeaves(n(1)), countLeaves(null)]);\n}, () => ([3, 1, 0]));"
   }
 ]

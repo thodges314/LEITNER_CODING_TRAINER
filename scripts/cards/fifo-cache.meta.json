@@ -1,0 +1,10 @@
+{
+  "track": "data-structures",
+  "title": "Fixed-Size Cache (evict oldest)",
+  "tags": [
+    "cache",
+    "map",
+    "eviction",
+    "basics"
+  ]
+}

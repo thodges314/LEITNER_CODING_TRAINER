@@ -1,0 +1,1 @@
+Write memoizeOne(fn) for functions of ONE argument: return a function that caches results in a Map keyed by the argument, so fn runs once per distinct argument (cache hits must work for results that are undefined or falsy too). Also write memoizeLast(fn) that remembers only the most recent argument and result.

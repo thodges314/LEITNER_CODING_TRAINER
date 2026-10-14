@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { X, Crosshair, Save, Trash2 } from 'lucide-react';
-import { EMPTY_FILTER, cardMatchesFilter, getTrackMeta, isFilterActive } from '../lib/leitner';
+import { DIFFICULTY_LABELS, EMPTY_FILTER, cardMatchesFilter, getTrackMeta, isFilterActive } from '../lib/leitner';
 import type { PracticeFilter, TopicItem } from '../lib/leitner';
 
 interface FocusModalProps {
@@ -111,6 +111,40 @@ export const FocusModal: React.FC<FocusModalProps> = ({
         <p style={{ fontSize: '13px', marginBottom: '14px', color: matching === 0 ? '#f87171' : '#34d399' }}>
           {matching} of {active.length} active cards match{isFilterActive(filter) ? '' : ' (no filter)'}
         </p>
+
+        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Difficulty</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', fontSize: '12.5px' }}>
+          <label>
+            From{' '}
+            <select
+              aria-label="Minimum difficulty"
+              value={filter.minDifficulty ?? ''}
+              onChange={(e) => set({ minDifficulty: e.target.value ? Number(e.target.value) : undefined })}
+            >
+              <option value="">any</option>
+              {[1, 2, 3, 4, 5].map((d) => (
+                <option key={d} value={d}>
+                  {d} · {DIFFICULTY_LABELS[d]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            to{' '}
+            <select
+              aria-label="Maximum difficulty"
+              value={filter.maxDifficulty ?? ''}
+              onChange={(e) => set({ maxDifficulty: e.target.value ? Number(e.target.value) : undefined })}
+            >
+              <option value="">any</option>
+              {[1, 2, 3, 4, 5].map((d) => (
+                <option key={d} value={d}>
+                  {d} · {DIFFICULTY_LABELS[d]}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
 
         <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Tracks</h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>

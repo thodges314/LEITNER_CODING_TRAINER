@@ -1,3 +1,4 @@
+import { DifficultyBadge } from './DifficultyBadge';
 import React, { useState, useEffect, useRef } from 'react';
 import { loadDraft, saveDraft, clearDraft } from '../lib/drafts';
 import type { KeyboardEvent } from 'react';
@@ -473,6 +474,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             >
               {trackMeta.label}
             </span>
+            <DifficultyBadge card={currentCard} />
 
             {/* Leitner Box Progression Badges */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
