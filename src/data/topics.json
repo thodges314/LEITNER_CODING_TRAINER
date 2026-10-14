@@ -19,14 +19,19 @@
     "referenceSolution": "async function fetchData(url) {\n  const response = await fetch(url);\n  if (!response.ok) {\n    throw new Error(`HTTP error! status: ${response.status}`);\n  }\n  return await response.json();\n}",
     "testCases": [
       {
-        "description": "Test 1 (Valid 200)",
-        "input": "fetchData('https://jsonplaceholder.typicode.com/todos/1').id",
-        "expected": "1"
+        "description": "200 OK resolves with the parsed JSON body",
+        "input": "fetchData('https://jsonplaceholder.typicode.com/todos/1')",
+        "expected": "{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }"
       },
       {
-        "description": "Test 2: FAIL (Expected 404 to throw)",
+        "description": "Non-2xx response rejects with an Error that includes the status code",
         "input": "fetchData('https://jsonplaceholder.typicode.com/invalid-path-404')",
-        "expected": "Throws Error (404 to throw)"
+        "expected": "Rejects with Error — message contains \"404\""
+      },
+      {
+        "description": "Network failure is not swallowed",
+        "input": "fetchData('https://invalid-non-existent-url-domain.org')",
+        "expected": "Rejects with the network error (TypeError: Failed to fetch)"
       }
     ]
   },
@@ -50,14 +55,19 @@
     "referenceSolution": "function getUserData(url) {\n  return fetch(url)\n    .then(res => {\n      if (!res.ok) throw new Error(`HTTP ${res.status}`);\n      return res.json();\n    })\n    .catch(err => {\n      console.error('Caught in chain:', err.message);\n      throw err;\n    })\n    .finally(() => {\n      console.log('Cleanup: fetch attempt completed');\n    });\n}",
     "testCases": [
       {
-        "description": "Fetch user by ID (200 OK)",
-        "input": "getUserData('https://jsonplaceholder.typicode.com/users/1')",
-        "expected": "Promise resolving to { id: 1, ... }"
+        "description": "Resolves with parsed JSON (no async/await)",
+        "input": "(await getUserData('https://jsonplaceholder.typicode.com/users/1')).name",
+        "expected": "'Leanne Graham'"
       },
       {
-        "description": "Handle non-200 HTTP response (404)",
+        "description": "HTTP error still rejects after the .catch() log (error is rethrown)",
         "input": "getUserData('https://jsonplaceholder.typicode.com/invalid-path-404')",
-        "expected": "Promise rejecting with Error('HTTP 404')"
+        "expected": "Rejects with Error — message contains \"404\""
+      },
+      {
+        "description": "Cleanup log runs in .finally() on success AND on failure",
+        "input": "getUserData('https://jsonplaceholder.typicode.com/users/1')   // then getUserData('https://jsonplaceholder.typicode.com/invalid-path-404')",
+        "expected": "console.log called once per call from .finally(), after the result/rejection is settled; the failing call still rejects"
       }
     ]
   },
@@ -80,9 +90,19 @@
     "referenceSolution": "async function fetchAllUsers(urls) {\n  const results = await Promise.allSettled(urls.map(url => fetch(url).then(r => r.json())));\n  return results\n    .filter(r => r.status === 'fulfilled')\n    .map(r => r.value);\n}",
     "testCases": [
       {
-        "description": "Test 1 (Settled payloads length === 2)",
-        "input": "fetchAllUsers(urls).length",
-        "expected": "2"
+        "description": "Fulfilled payloads only; the failing URL is dropped",
+        "input": "fetchAllUsers(['https://jsonplaceholder.typicode.com/todos/1', 'https://invalid-non-existent-url-domain.org', 'https://jsonplaceholder.typicode.com/todos/2'])",
+        "expected": "[{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }, { userId: 1, id: 2, title: 'quis ut nam facilis et officia qui', completed: false }]"
+      },
+      {
+        "description": "Empty input",
+        "input": "fetchAllUsers([])",
+        "expected": "[]"
+      },
+      {
+        "description": "All requests fail",
+        "input": "fetchAllUsers(['https://invalid-non-existent-url-domain.org'])",
+        "expected": "[]"
       }
     ]
   },
@@ -106,14 +126,19 @@
     "referenceSolution": "async function fetchWithTimeout(url, timeoutMs) {\n  const controller = new AbortController();\n  const timer = setTimeout(() => controller.abort(), timeoutMs);\n  try {\n    const res = await fetch(url, { signal: controller.signal });\n    clearTimeout(timer);\n    return await res.json();\n  } catch (err) {\n    clearTimeout(timer);\n    throw err;\n  }\n}",
     "testCases": [
       {
-        "description": "Test 1: FAIL (Expected abort on 1ms timeout)",
+        "description": "Request slower than timeoutMs is aborted",
         "input": "fetchWithTimeout('https://jsonplaceholder.typicode.com/photos', 1)",
-        "expected": "Throws Error (abort on 1ms timeout)"
+        "expected": "Rejects with AbortError (err.name === 'AbortError')"
       },
       {
-        "description": "Test 1 (Abort timeout caught): PASS ->",
-        "input": "err.name",
-        "expected": "'AbortError' || err.message.includes('abort')"
+        "description": "Fast request resolves with its JSON and the timer is cleared",
+        "input": "fetchWithTimeout('https://jsonplaceholder.typicode.com/todos/1', 5000)",
+        "expected": "{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }"
+      },
+      {
+        "description": "Timer cleanup",
+        "input": "fetchWithTimeout('https://jsonplaceholder.typicode.com/todos/1', 5000)  // then wait past 5000 ms",
+        "expected": "No abort fires after the response arrived (clearTimeout was called)"
       }
     ]
   },
@@ -137,9 +162,24 @@
     "referenceSolution": "function debounce(fn, delay) {\n  let timer = null;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), delay);\n  };\n}",
     "testCases": [
       {
-        "description": "Debounce fires once (count === 1)",
-        "input": "0",
+        "description": "Three rapid calls collapse to one invocation",
+        "input": "let count = 0;\nconst d = debounce(() => count++, 50);\nd(); d(); d();\nawait sleep(100);\ncount",
         "expected": "1"
+      },
+      {
+        "description": "Not invoked before the delay has elapsed",
+        "input": "let count = 0;\nconst d = debounce(() => count++, 50);\nd();\nawait sleep(20);\ncount",
+        "expected": "0"
+      },
+      {
+        "description": "Last call wins: forwards the latest arguments",
+        "input": "const got = [];\nconst d = debounce((...a) => got.push(a), 50);\nd(1); d(2); d(3);\nawait sleep(100);\ngot",
+        "expected": "[[3]]"
+      },
+      {
+        "description": "Preserves the calling `this`",
+        "input": "let seen;\nconst o = { n: 7, f: debounce(function () { seen = this.n; }, 20) };\no.f();\nawait sleep(60);\nseen",
+        "expected": "7"
       }
     ]
   },
@@ -163,14 +203,19 @@
     "referenceSolution": "function throttle(fn, limit) {\n  let inThrottle = false;\n  return function (...args) {\n    if (!inThrottle) {\n      fn.apply(this, args);\n      inThrottle = true;\n      setTimeout(() => inThrottle = false, limit);\n    }\n  };\n}",
     "testCases": [
       {
-        "description": "Immediate run (runs === 1)",
-        "input": "0",
+        "description": "Burst of 3 calls runs fn once immediately",
+        "input": "let runs = 0;\nconst t = throttle(() => runs++, 60);\nt(); t(); t();\nruns",
         "expected": "1"
       },
       {
-        "description": "After window run (runs === 2)",
-        "input": "0",
+        "description": "Runs again once the window has passed",
+        "input": "let runs = 0;\nconst t = throttle(() => runs++, 60);\nt(); t(); t();\nawait sleep(80);\nt();\nruns",
         "expected": "2"
+      },
+      {
+        "description": "Forwards arguments of the call that ran",
+        "input": "const got = [];\nconst t = throttle((x) => got.push(x), 50);\nt('a'); t('b');\ngot",
+        "expected": "['a']"
       }
     ]
   },
@@ -194,9 +239,14 @@
     "referenceSolution": "function getExecutionOrder() {\n  // Return array representing order of execution:\n  // 1: Synchronous script\n  // 2: Microtasks (Promise.then, queueMicrotask)\n  // 3: Macrotasks (setTimeout, setInterval)\n  return ['sync', 'microtask', 'macrotask'];\n}",
     "testCases": [
       {
-        "description": "Event loop sequence",
+        "description": "Order of sync code, promise.then, queueMicrotask and setTimeout(0)",
+        "input": "console.log('A: sync');\nsetTimeout(() => console.log('D: setTimeout'), 0);\nPromise.resolve().then(() => console.log('B: promise.then'));\nqueueMicrotask(() => console.log('C: queueMicrotask'));\nconsole.log('E: sync end');",
+        "expected": "['A: sync', 'E: sync end', 'B: promise.then', 'C: queueMicrotask', 'D: setTimeout']"
+      },
+      {
+        "description": "Order summary returned by getExecutionOrder()",
         "input": "getExecutionOrder()",
-        "expected": "'[\"sync\",\"microtask\",\"macrotask\"]'"
+        "expected": "['sync', 'microtask', 'macrotask']"
       }
     ]
   },
@@ -219,14 +269,19 @@
     "referenceSolution": "function countFrequencies(arr) {\n  const map = new Map();\n  for (const item of arr) {\n    map.set(item, (map.get(item) || 0) + 1);\n  }\n  return map;\n}",
     "testCases": [
       {
-        "description": "Frequency of a === 3",
-        "input": "countFrequencies(['a', 'b', 'a', 'c', 'b', 'a']).get('a')",
-        "expected": "3"
+        "description": "Counts repeated items",
+        "input": "countFrequencies(['a', 'b', 'a', 'c', 'b', 'a'])",
+        "expected": "Map(3) { 'a' => 3, 'b' => 2, 'c' => 1 }"
       },
       {
-        "description": "Frequency of b === 2",
-        "input": "countFrequencies(['a', 'b', 'a', 'c', 'b', 'a']).get('b')",
-        "expected": "2"
+        "description": "Empty array",
+        "input": "countFrequencies([])",
+        "expected": "Map(0) {}"
+      },
+      {
+        "description": "1 and \"1\" are different keys",
+        "input": "countFrequencies([1, '1', 1])",
+        "expected": "Map(2) { 1 => 2, '1' => 1 }"
       }
     ]
   },
@@ -250,9 +305,24 @@
     "referenceSolution": "function arrayIntersection(a, b) {\n  const setA = new Set(a);\n  const intersection = new Set();\n  for (const item of b) {\n    if (setA.has(item)) intersection.add(item);\n  }\n  return Array.from(intersection);\n}",
     "testCases": [
       {
-        "description": "Intersection ([2])",
+        "description": "Duplicates collapse to a single value",
         "input": "arrayIntersection([1, 2, 2, 1], [2, 2])",
-        "expected": "'[2]'"
+        "expected": "[2]"
+      },
+      {
+        "description": "No common elements",
+        "input": "arrayIntersection([1, 2], [3, 4])",
+        "expected": "[]"
+      },
+      {
+        "description": "Either side empty",
+        "input": "arrayIntersection([], [1, 2])",
+        "expected": "[]"
+      },
+      {
+        "description": "Order of first appearance in the second array",
+        "input": "arrayIntersection([4, 9, 5], [9, 4, 9, 8, 4])",
+        "expected": "[9, 4]"
       }
     ]
   },
@@ -275,9 +345,24 @@
     "referenceSolution": "function flatten(arr) {\n  let res = [];\n  for (const item of arr) {\n    if (Array.isArray(item)) res = res.concat(flatten(item));\n    else res.push(item);\n  }\n  return res;\n}",
     "testCases": [
       {
-        "description": "Flattened deep array [1,2,3,4,5]",
+        "description": "Mixed nesting",
         "input": "flatten([1, [2, [3, 4], 5]])",
-        "expected": "'[1,2,3,4,5]'"
+        "expected": "[1, 2, 3, 4, 5]"
+      },
+      {
+        "description": "Deeply nested single value",
+        "input": "flatten([[[[1]]]])",
+        "expected": "[1]"
+      },
+      {
+        "description": "Empty arrays at any depth vanish",
+        "input": "flatten([[], [[]]])",
+        "expected": "[]"
+      },
+      {
+        "description": "Already flat",
+        "input": "flatten([1, 2, 3])",
+        "expected": "[1, 2, 3]"
       }
     ]
   },
@@ -301,9 +386,29 @@
     "referenceSolution": "function myReduce(arr, callback, initialValue) {\n  let hasInitial = arguments.length >= 3;\n  if (arr.length === 0 && !hasInitial) throw new TypeError('Reduce of empty array with no initial value');\n  let acc = hasInitial ? initialValue : arr[0];\n  let start = hasInitial ? 0 : 1;\n  for (let i = start; i < arr.length; i++) {\n    if (i in arr) acc = callback(acc, arr[i], i, arr);\n  }\n  return acc;\n}",
     "testCases": [
       {
-        "description": "Reduce sum (10)",
+        "description": "With initialValue",
         "input": "myReduce([1, 2, 3, 4], (a, b) => a + b, 0)",
         "expected": "10"
+      },
+      {
+        "description": "Without initialValue the first element is the accumulator",
+        "input": "myReduce([1, 2, 3, 4], (a, b) => a + b)",
+        "expected": "10"
+      },
+      {
+        "description": "Callback receives (acc, value, index)",
+        "input": "myReduce(['a', 'b'], (acc, v, i) => acc + i + v, '')",
+        "expected": "'0a1b'"
+      },
+      {
+        "description": "Empty array WITH initialValue returns it",
+        "input": "myReduce([], (a, b) => a + b, 'x')",
+        "expected": "'x'"
+      },
+      {
+        "description": "Empty array WITHOUT initialValue throws",
+        "input": "myReduce([], (a, b) => a + b)",
+        "expected": "Throws TypeError: Reduce of empty array with no initial value"
       }
     ]
   },
@@ -327,9 +432,24 @@
     "referenceSolution": "function deepClone(value) {\n  if (value === null || typeof value !== 'object') return value;\n  const copy = Array.isArray(value) ? [] : {};\n  for (const k of Object.keys(value)) copy[k] = deepClone(value[k]);\n  return copy;\n}",
     "testCases": [
       {
-        "description": "Deep clone isolated original",
-        "input": "{ x: [1, 2], y: { z: 3 } }.x.length",
-        "expected": "2 && c.x.length === 3"
+        "description": "Changing the clone does not change the original",
+        "input": "const o = { x: [1, 2], y: { z: 3 } };\nconst c = deepClone(o);\nc.x.push(3);\n[o.x.length, c.x.length]",
+        "expected": "[2, 3]"
+      },
+      {
+        "description": "Structure is copied exactly",
+        "input": "deepClone({ a: 1, b: { c: [1, { d: 2 }] } })",
+        "expected": "{ a: 1, b: { c: [1, { d: 2 }] } }"
+      },
+      {
+        "description": "Nested objects are new references",
+        "input": "const o = { n: { v: 1 } };\nconst c = deepClone(o);\nc.n === o.n",
+        "expected": "false"
+      },
+      {
+        "description": "Primitives and null pass through",
+        "input": "[deepClone(5), deepClone(null), deepClone(\"s\")]",
+        "expected": "[5, null, 's']"
       }
     ]
   },
@@ -353,13 +473,28 @@
     "referenceSolution": "class LRUCache {\n  constructor(capacity) {\n    this.capacity = capacity;\n    this.map = new Map();\n  }\n  get(key) {\n    if (!this.map.has(key)) return -1;\n    const val = this.map.get(key);\n    this.map.delete(key);\n    this.map.set(key, val);\n    return val;\n  }\n  put(key, val) {\n    this.map.delete(key);\n    if (this.map.size >= this.capacity) this.map.delete(this.map.keys().next().value);\n    this.map.set(key, val);\n  }\n}",
     "testCases": [
       {
-        "description": "Get 1",
-        "input": "new LRUCache(2).get(1)",
+        "description": "get returns a stored value",
+        "input": "const lru = new LRUCache(2);\nlru.put(1, 1); lru.put(2, 2);\nlru.get(1)",
         "expected": "1"
       },
       {
-        "description": "Key 2 evicted",
-        "input": "new LRUCache(2).get(2)",
+        "description": "Least recently used key is evicted (key 1 was just read, so 2 goes)",
+        "input": "const lru = new LRUCache(2);\nlru.put(1, 1); lru.put(2, 2);\nlru.get(1);\nlru.put(3, 3);\nlru.get(2)",
+        "expected": "-1"
+      },
+      {
+        "description": "Recently read key survives eviction",
+        "input": "const lru = new LRUCache(2);\nlru.put(1, 1); lru.put(2, 2);\nlru.get(1);\nlru.put(3, 3);\n[lru.get(1), lru.get(3)]",
+        "expected": "[1, 3]"
+      },
+      {
+        "description": "Updating an existing key refreshes it and overwrites its value",
+        "input": "const lru = new LRUCache(2);\nlru.put(1, 1); lru.put(2, 2);\nlru.put(1, 10);\nlru.put(3, 3);\n[lru.get(1), lru.get(2)]",
+        "expected": "[10, -1]"
+      },
+      {
+        "description": "Missing key",
+        "input": "new LRUCache(1).get(9)",
         "expected": "-1"
       }
     ]
@@ -383,9 +518,19 @@
     "referenceSolution": "function curry(fn) {\n  return function curried(...args) {\n    if (args.length >= fn.length) return fn.apply(this, args);\n    return (...next) => curried.apply(this, [...args, ...next]);\n  };\n}",
     "testCases": [
       {
-        "description": "Curried multiply (24)",
-        "input": "cMult(2)(3)(4)",
+        "description": "One argument at a time",
+        "input": "const mult = (a, b, c) => a * b * c;\ncurry(mult)(2)(3)(4)",
         "expected": "24"
+      },
+      {
+        "description": "Arguments may be grouped any way",
+        "input": "const mult = (a, b, c) => a * b * c;\nconst f = curry(mult);\n[f(2, 3)(4), f(2)(3, 4), f(2, 3, 4)]",
+        "expected": "[24, 24, 24]"
+      },
+      {
+        "description": "Two-argument function",
+        "input": "curry((a, b) => a + b)(1)(2)",
+        "expected": "3"
       }
     ]
   },
@@ -409,9 +554,29 @@
     "referenceSolution": "// React custom hook signature\nfunction useFetch(url) {\n  // Implement state { data, loading, error }\n  // Use AbortController in useEffect cleanup\n}",
     "testCases": [
       {
-        "description": "useFetch defined as function",
-        "input": "typeof useFetch",
-        "expected": "'function'"
+        "description": "Initial render",
+        "input": "useFetch('https://jsonplaceholder.typicode.com/todos/1')  // render, before fetch resolves",
+        "expected": "{ data: null, loading: true, error: null }"
+      },
+      {
+        "description": "After the fetch resolves with 200",
+        "input": "useFetch('https://jsonplaceholder.typicode.com/todos/1')  // after resolve",
+        "expected": "{ data: { userId: 1, id: 1, title: 'delectus aut autem', completed: false }, loading: false, error: null }"
+      },
+      {
+        "description": "After a 404 response",
+        "input": "useFetch('https://jsonplaceholder.typicode.com/invalid-path-404')  // after resolve",
+        "expected": "{ data: null, loading: false, error: Error (mentions 404) }"
+      },
+      {
+        "description": "url changes while the first request is pending",
+        "input": "rerender url: '.../todos/1' → '.../todos/2'",
+        "expected": "First request: controller.abort() called. Final state holds todos/2 data only: { id: 2, ... }"
+      },
+      {
+        "description": "Unmount while pending",
+        "input": "unmount()",
+        "expected": "controller.abort() called; no state update happens afterwards"
       }
     ]
   },
@@ -435,9 +600,29 @@
     "referenceSolution": "function useDebounce(value, delay) {\n  // Custom hook returning debounced value\n}",
     "testCases": [
       {
-        "description": "useDebounce defined as function",
-        "input": "typeof useDebounce",
-        "expected": "'function'"
+        "description": "First render returns the initial value immediately",
+        "input": "useDebounce('a', 300)",
+        "expected": "'a'"
+      },
+      {
+        "description": "Value changes, delay not yet elapsed",
+        "input": "rerender 'a' → 'ab', read at t = 299 ms",
+        "expected": "'a'"
+      },
+      {
+        "description": "Value changes, delay elapsed",
+        "input": "rerender 'a' → 'ab', read at t = 300 ms",
+        "expected": "'ab'"
+      },
+      {
+        "description": "Rapid changes only surface the last value",
+        "input": "'a' → 'ab' (t=0) → 'abc' (t=100), read at t = 399 ms and t = 400 ms",
+        "expected": "'a' at 399 ms, 'abc' at 400 ms (never 'ab')"
+      },
+      {
+        "description": "Unmount with a pending timer",
+        "input": "rerender 'a' → 'ab', then unmount()",
+        "expected": "clearTimeout called; no state update after unmount"
       }
     ]
   },
@@ -461,9 +646,24 @@
     "referenceSolution": "function SearchForm({ onSearch }) {\n  // Controlled input component with onSubmit\n}",
     "testCases": [
       {
-        "description": "SearchForm component defined",
-        "input": "typeof SearchForm",
-        "expected": "'function'"
+        "description": "Input mirrors state (controlled)",
+        "input": "type 'react' into the input",
+        "expected": "input.value === 'react' after each keystroke (value + onChange, never defaultValue)"
+      },
+      {
+        "description": "Submit trims whitespace",
+        "input": "type '  react hooks  ', submit the form",
+        "expected": "onSearch called once with 'react hooks'"
+      },
+      {
+        "description": "Submit does not reload the page",
+        "input": "submit the form",
+        "expected": "event.preventDefault() was called"
+      },
+      {
+        "description": "Submit passes the query string only",
+        "input": "type 'a', submit",
+        "expected": "onSearch.mock.calls → [['a']]"
       }
     ]
   },
@@ -487,9 +687,19 @@
     "referenceSolution": "function usePrevious(value) {\n  // Return previous render value using useRef & useEffect\n}",
     "testCases": [
       {
-        "description": "usePrevious defined as function",
-        "input": "typeof usePrevious",
-        "expected": "'function'"
+        "description": "Value from the previous render",
+        "input": "renders with value 1, then 2, then 3 → read usePrevious(value) each time",
+        "expected": "[undefined, 1, 2]"
+      },
+      {
+        "description": "Re-render with the same value",
+        "input": "renders with value 5, then 5 again",
+        "expected": "[undefined, 5]"
+      },
+      {
+        "description": "Works with objects (reference, not copy)",
+        "input": "renders with a = {id:1}, then b = {id:2}",
+        "expected": "second render returns the exact object a (=== a)"
       }
     ]
   },
@@ -513,9 +723,24 @@
     "referenceSolution": "function todoReducer(state, action) {\n  switch (action.type) {\n    case 'ADD_TODO': return [...state, { id: Date.now(), text: action.payload, done: false }];\n    case 'TOGGLE_TODO': return state.map(t => t.id === action.payload ? { ...t, done: !t.done } : t);\n    case 'REMOVE_TODO': return state.filter(t => t.id !== action.payload);\n    default: return state;\n  }\n}",
     "testCases": [
       {
-        "description": "Reducer added todo",
-        "input": "todoReducer(s0, { type: 'ADD_TODO', payload: 'Practice' }).length",
-        "expected": "1 && s1[0].text === 'Practice'"
+        "description": "ADD_TODO appends an item with done: false (generated id ignored here)",
+        "input": "todoReducer([], { type: 'ADD_TODO', payload: 'Practice' }).map(({ text, done }) => ({ text, done }))",
+        "expected": "[{ text: 'Practice', done: false }]"
+      },
+      {
+        "description": "TOGGLE_TODO flips only the matching item",
+        "input": "todoReducer([{ id: 1, text: 'A', done: false }, { id: 2, text: 'B', done: true }], { type: 'TOGGLE_TODO', payload: 1 })",
+        "expected": "[{ id: 1, text: 'A', done: true }, { id: 2, text: 'B', done: true }]"
+      },
+      {
+        "description": "REMOVE_TODO removes the matching item",
+        "input": "todoReducer([{ id: 1, text: 'A', done: false }, { id: 2, text: 'B', done: true }], { type: 'REMOVE_TODO', payload: 2 })",
+        "expected": "[{ id: 1, text: 'A', done: false }]"
+      },
+      {
+        "description": "Unknown action returns the same state object",
+        "input": "const s = [{ id: 1, text: 'A', done: false }];\ntodoReducer(s, { type: 'NOOP' }) === s",
+        "expected": "true"
       }
     ]
   },
@@ -539,9 +764,24 @@
     "referenceSolution": "function useInfiniteScroll(onLoadMore) {\n  // Attach IntersectionObserver to sentinel ref\n}",
     "testCases": [
       {
-        "description": "useInfiniteScroll defined",
-        "input": "typeof useInfiniteScroll",
-        "expected": "'function'"
+        "description": "Sentinel enters the viewport",
+        "input": "IntersectionObserver callback([{ isIntersecting: true }])",
+        "expected": "onLoadMore called 1 time"
+      },
+      {
+        "description": "Sentinel not visible",
+        "input": "callback([{ isIntersecting: false }])",
+        "expected": "onLoadMore called 0 times"
+      },
+      {
+        "description": "Becomes visible twice",
+        "input": "callback([{ isIntersecting: true }]) twice",
+        "expected": "onLoadMore called 2 times"
+      },
+      {
+        "description": "Unmount",
+        "input": "unmount()",
+        "expected": "observer.disconnect() called"
       }
     ]
   },
@@ -564,9 +804,19 @@
     "referenceSolution": "function createThemeContext() {\n  // ThemeContext with useTheme hook\n}",
     "testCases": [
       {
-        "description": "createThemeContext defined",
-        "input": "typeof createThemeContext",
-        "expected": "'function'"
+        "description": "Default theme inside the provider",
+        "input": "useTheme() inside <ThemeProvider>",
+        "expected": "theme === 'light'"
+      },
+      {
+        "description": "Toggling",
+        "input": "call toggle once, then twice",
+        "expected": "theme === 'dark', then 'light'"
+      },
+      {
+        "description": "Used outside the provider",
+        "input": "useTheme() with no <ThemeProvider> ancestor",
+        "expected": "Throws Error with a helpful message, e.g. 'useTheme must be used within a ThemeProvider'"
       }
     ]
   },
@@ -589,14 +839,29 @@
     "referenceSolution": "function twoSumSorted(numbers, target) {\n  let l = 0, r = numbers.length - 1;\n  while (l < r) {\n    const s = numbers[l] + numbers[r];\n    if (s === target) return [l + 1, r + 1];\n    if (s < target) l++;\n    else r--;\n  }\n  return [];\n}",
     "testCases": [
       {
-        "description": "twoSumSorted [2,7,11,15], target 9 -> [1,2]",
+        "description": "Pair at the ends",
         "input": "twoSumSorted([2, 7, 11, 15], 9)",
-        "expected": "'[1,2]'"
+        "expected": "[1, 2]"
       },
       {
-        "description": "twoSumSorted [2,3,4], target 6 -> [1,3]",
+        "description": "1-indexed result",
         "input": "twoSumSorted([2, 3, 4], 6)",
-        "expected": "'[1,3]'"
+        "expected": "[1, 3]"
+      },
+      {
+        "description": "Negative numbers",
+        "input": "twoSumSorted([-1, 0], -1)",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "Duplicate values",
+        "input": "twoSumSorted([3, 3], 6)",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "No pair sums to target (empty array)",
+        "input": "twoSumSorted([1, 2, 3], 7)",
+        "expected": "[]"
       }
     ]
   },
@@ -620,19 +885,29 @@
     "referenceSolution": "function lengthOfLongestSubstring(s) {\n  const map = new Map();\n  let maxLen = 0, start = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (map.has(s[i]) && map.get(s[i]) >= start) start = map.get(s[i]) + 1;\n    map.set(s[i], i);\n    maxLen = Math.max(maxLen, i - start + 1);\n  }\n  return maxLen;\n}",
     "testCases": [
       {
-        "description": "\"abcabcbb\" (3)",
-        "input": "lengthOfLongestSubstring(\"abcabcbb\")",
+        "description": "Repeats are skipped (\"abc\" is the longest unique run)",
+        "input": "lengthOfLongestSubstring('abcabcbb')",
         "expected": "3"
       },
       {
-        "description": "\"bbbbb\" (1)",
-        "input": "lengthOfLongestSubstring(\"bbbbb\")",
+        "description": "All identical",
+        "input": "lengthOfLongestSubstring('bbbbb')",
         "expected": "1"
       },
       {
-        "description": "\"pwwkew\" (3)",
-        "input": "lengthOfLongestSubstring(\"pwwkew\")",
+        "description": "Window must restart after the repeat (\"wke\")",
+        "input": "lengthOfLongestSubstring('pwwkew')",
         "expected": "3"
+      },
+      {
+        "description": "Empty string",
+        "input": "lengthOfLongestSubstring('')",
+        "expected": "0"
+      },
+      {
+        "description": "Repeat that lies before the window start must not shrink it",
+        "input": "lengthOfLongestSubstring('abba')",
+        "expected": "2"
       }
     ]
   },
@@ -655,14 +930,29 @@
     "referenceSolution": "function maxSubarraySum(arr, k) {\n  if (arr.length < k) return null;\n  let max = 0, window = 0;\n  for (let i = 0; i < k; i++) window += arr[i];\n  max = window;\n  for (let i = k; i < arr.length; i++) {\n    window += arr[i] - arr[i - k];\n    max = Math.max(max, window);\n  }\n  return max;\n}",
     "testCases": [
       {
-        "description": "[2,1,5,1,3,2], k=3 (9)",
+        "description": "Best window of 3 is [5, 1, 3]",
         "input": "maxSubarraySum([2, 1, 5, 1, 3, 2], 3)",
         "expected": "9"
       },
       {
-        "description": "[2,3,4,1,5], k=2 (7)",
+        "description": "Best window of 2 is [3, 4]",
         "input": "maxSubarraySum([2, 3, 4, 1, 5], 2)",
         "expected": "7"
+      },
+      {
+        "description": "Window larger than the array",
+        "input": "maxSubarraySum([1, 2], 3)",
+        "expected": "null"
+      },
+      {
+        "description": "All negatives",
+        "input": "maxSubarraySum([-1, -2, -3], 2)",
+        "expected": "-3"
+      },
+      {
+        "description": "k equals length",
+        "input": "maxSubarraySum([4], 1)",
+        "expected": "4"
       }
     ]
   },
@@ -685,14 +975,39 @@
     "referenceSolution": "function isValidParentheses(s) {\n  const stack = [];\n  const pairs = { ')': '(', '}': '{', ']': '[' };\n  for (const char of s) {\n    if (char === '(' || char === '{' || char === '[') stack.push(char);\n    else if (stack.pop() !== pairs[char]) return false;\n  }\n  return stack.length === 0;\n}",
     "testCases": [
       {
-        "description": "\"()[]{}\" (true)",
-        "input": "isValidParentheses(\"()[]{}\")",
+        "description": "All three bracket types, in order",
+        "input": "isValidParentheses('()[]{}')",
         "expected": "true"
       },
       {
-        "description": "\"(]\" (false)",
-        "input": "isValidParentheses(\"(]\")",
+        "description": "Mismatched closer",
+        "input": "isValidParentheses('(]')",
         "expected": "false"
+      },
+      {
+        "description": "Properly nested",
+        "input": "isValidParentheses('([{}])')",
+        "expected": "true"
+      },
+      {
+        "description": "Interleaved, not nested",
+        "input": "isValidParentheses('{[}]')",
+        "expected": "false"
+      },
+      {
+        "description": "Unclosed opener",
+        "input": "isValidParentheses('(')",
+        "expected": "false"
+      },
+      {
+        "description": "Closer with nothing open",
+        "input": "isValidParentheses(')')",
+        "expected": "false"
+      },
+      {
+        "description": "Empty string",
+        "input": "isValidParentheses('')",
+        "expected": "true"
       }
     ]
   },
@@ -715,14 +1030,34 @@
     "referenceSolution": "function binarySearch(nums, target) {\n  let l = 0, r = nums.length - 1;\n  while (l <= r) {\n    const mid = Math.floor((l + r) / 2);\n    if (nums[mid] === target) return mid;\n    if (nums[mid] < target) l = mid + 1;\n    else r = mid - 1;\n  }\n  return -1;\n}",
     "testCases": [
       {
-        "description": "Target 9 at index 4",
-        "input": "binarySearch(arr, 9)",
+        "description": "Target in the right half",
+        "input": "binarySearch([-1, 0, 3, 5, 9, 12], 9)",
         "expected": "4"
       },
       {
-        "description": "Target 2 not found (-1)",
-        "input": "binarySearch(arr, 2)",
+        "description": "Target absent",
+        "input": "binarySearch([-1, 0, 3, 5, 9, 12], 2)",
         "expected": "-1"
+      },
+      {
+        "description": "Last element",
+        "input": "binarySearch([-1, 0, 3, 5, 9, 12], 12)",
+        "expected": "5"
+      },
+      {
+        "description": "First element",
+        "input": "binarySearch([-1, 0, 3, 5, 9, 12], -1)",
+        "expected": "0"
+      },
+      {
+        "description": "Empty array",
+        "input": "binarySearch([], 5)",
+        "expected": "-1"
+      },
+      {
+        "description": "Single element hit",
+        "input": "binarySearch([5], 5)",
+        "expected": "0"
       }
     ]
   },
@@ -746,9 +1081,24 @@
     "referenceSolution": "function levelOrder(root) {\n  if (!root) return [];\n  const res = [];\n  const q = [root];\n  while (q.length) {\n    const size = q.length;\n    const level = [];\n    for (let i = 0; i < size; i++) {\n      const node = q.shift();\n      level.push(node.val);\n      if (node.left) q.push(node.left);\n      if (node.right) q.push(node.right);\n    }\n    res.push(level);\n  }\n  return res;\n}",
     "testCases": [
       {
-        "description": "BFS Levels [[3],[9,20],[15,7]]",
-        "input": "levelOrder(tree)",
-        "expected": "'[[3],[9,20],[15,7]]'"
+        "description": "Three levels",
+        "input": "const tree = { val: 3, left: { val: 9 }, right: { val: 20, left: { val: 15 }, right: { val: 7 } } };\nlevelOrder(tree)",
+        "expected": "[[3], [9, 20], [15, 7]]"
+      },
+      {
+        "description": "Empty tree",
+        "input": "levelOrder(null)",
+        "expected": "[]"
+      },
+      {
+        "description": "Single node",
+        "input": "levelOrder({ val: 1 })",
+        "expected": "[[1]]"
+      },
+      {
+        "description": "Left-only chain",
+        "input": "levelOrder({ val: 1, left: { val: 2, left: { val: 3 } } })",
+        "expected": "[[1], [2], [3]]"
       }
     ]
   },
@@ -772,9 +1122,34 @@
     "referenceSolution": "function mergeIntervals(intervals) {\n  if (!intervals.length) return [];\n  intervals.sort((a, b) => a[0] - b[0]);\n  const res = [intervals[0]];\n  for (let i = 1; i < intervals.length; i++) {\n    const curr = intervals[i];\n    const prev = res[res.length - 1];\n    if (curr[0] <= prev[1]) prev[1] = Math.max(prev[1], curr[1]);\n    else res.push(curr);\n  }\n  return res;\n}",
     "testCases": [
       {
-        "description": "Merged [[1,6],[8,10],[15,18]]",
-        "input": "mergeIntervals([[1,3],[2,6],[8,10],[15,18]])",
-        "expected": "'[[1,6],[8,10],[15,18]]'"
+        "description": "Overlaps merge, gaps stay",
+        "input": "mergeIntervals([[1, 3], [2, 6], [8, 10], [15, 18]])",
+        "expected": "[[1, 6], [8, 10], [15, 18]]"
+      },
+      {
+        "description": "Touching intervals merge",
+        "input": "mergeIntervals([[1, 4], [4, 5]])",
+        "expected": "[[1, 5]]"
+      },
+      {
+        "description": "Unsorted input",
+        "input": "mergeIntervals([[8, 10], [1, 3], [2, 6]])",
+        "expected": "[[1, 6], [8, 10]]"
+      },
+      {
+        "description": "One interval swallows another",
+        "input": "mergeIntervals([[1, 10], [2, 3]])",
+        "expected": "[[1, 10]]"
+      },
+      {
+        "description": "Single interval",
+        "input": "mergeIntervals([[1, 2]])",
+        "expected": "[[1, 2]]"
+      },
+      {
+        "description": "Empty input",
+        "input": "mergeIntervals([])",
+        "expected": "[]"
       }
     ]
   },
@@ -798,14 +1173,29 @@
     "referenceSolution": "function debounce(fn, wait) {\n  let timer = null;\n  let lastArgs = null;\n  let lastThis = null;\n  function debounced(...args) {\n    lastArgs = args;\n    lastThis = this;\n    clearTimeout(timer);\n    timer = setTimeout(() => {\n      fn.apply(lastThis, lastArgs);\n      timer = null;\n    }, wait);\n  }\n  debounced.cancel = () => { clearTimeout(timer); timer = null; };\n  debounced.flush = () => {\n    if (timer) {\n      clearTimeout(timer);\n      fn.apply(lastThis, lastArgs);\n      timer = null;\n    }\n  };\n  return debounced;\n}",
     "testCases": [
       {
-        "description": "Flush executed immediately (val === 5)",
-        "input": "0",
+        "description": "flush() runs the pending call immediately",
+        "input": "let val = 0;\nconst d = debounce((n) => { val = n; }, 50);\nd(5); d.flush();\nval",
         "expected": "5"
       },
       {
-        "description": "Cancel prevented run (val === 5)",
-        "input": "0",
-        "expected": "5"
+        "description": "cancel() drops the pending call",
+        "input": "let val = 0;\nconst d = debounce((n) => { val = n; }, 50);\nd(10); d.cancel();\nawait sleep(80);\nval",
+        "expected": "0"
+      },
+      {
+        "description": "Trailing call uses the latest arguments",
+        "input": "const got = [];\nconst d = debounce((x) => got.push(x), 30);\nd(1); d(2);\nawait sleep(60);\ngot",
+        "expected": "[2]"
+      },
+      {
+        "description": "flush() with nothing pending does nothing",
+        "input": "let n = 0;\nconst d = debounce(() => n++, 30);\nd.flush();\nn",
+        "expected": "0"
+      },
+      {
+        "description": "A flushed call does not run a second time when the timer would have fired",
+        "input": "let n = 0;\nconst d = debounce(() => n++, 30);\nd(); d.flush();\nawait sleep(80);\nn",
+        "expected": "1"
       }
     ]
   },
@@ -829,14 +1219,34 @@
     "referenceSolution": "function throttle(fn, wait, options = { leading: true, trailing: true }) {\n  let timeout = null;\n  let previous = 0;\n  let lastArgs, lastThis;\n  return function (...args) {\n    const now = Date.now();\n    if (!previous && options.leading === false) previous = now;\n    const remaining = wait - (now - previous);\n    lastArgs = args; lastThis = this;\n    if (remaining <= 0 || remaining > wait) {\n      if (timeout) { clearTimeout(timeout); timeout = null; }\n      previous = now;\n      fn.apply(lastThis, lastArgs);\n    } else if (!timeout && options.trailing !== false) {\n      timeout = setTimeout(() => {\n        previous = options.leading === false ? 0 : Date.now();\n        timeout = null;\n        fn.apply(lastThis, lastArgs);\n      }, remaining);\n    }\n  };\n}",
     "testCases": [
       {
-        "description": "Leading fired (c === 1)",
-        "input": "0",
+        "description": "Leading edge fires immediately, second call waits",
+        "input": "let c = 0;\nconst t = throttle(() => c++, 50, { leading: true, trailing: true });\nt(); t();\nc",
         "expected": "1"
       },
       {
-        "description": "Trailing fired (c === 2)",
-        "input": "0",
+        "description": "Trailing edge fires at the end of the window",
+        "input": "let c = 0;\nconst t = throttle(() => c++, 50, { leading: true, trailing: true });\nt(); t();\nawait sleep(80);\nc",
         "expected": "2"
+      },
+      {
+        "description": "Trailing call uses the latest arguments",
+        "input": "const got = [];\nconst t = throttle((x) => got.push(x), 50);\nt('a'); t('b'); t('c');\nawait sleep(90);\ngot",
+        "expected": "['a', 'c']"
+      },
+      {
+        "description": "trailing: false drops the in-window calls",
+        "input": "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: true, trailing: false });\nt('a'); t('b');\nawait sleep(90);\ngot",
+        "expected": "['a']"
+      },
+      {
+        "description": "leading: false does not fire immediately",
+        "input": "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: false, trailing: true });\nt('a');\ngot",
+        "expected": "[]"
+      },
+      {
+        "description": "leading: false fires at the end of the window",
+        "input": "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: false, trailing: true });\nt('a');\nawait sleep(90);\ngot",
+        "expected": "['a']"
       }
     ]
   },
@@ -860,14 +1270,29 @@
     "referenceSolution": "function memoize(fn, resolver) {\n  const cache = new Map();\n  return function (...args) {\n    const key = resolver ? resolver.apply(this, args) : args[0];\n    if (cache.has(key)) return cache.get(key);\n    const result = fn.apply(this, args);\n    cache.set(key, result);\n    return result;\n  };\n}",
     "testCases": [
       {
-        "description": "Memoized duplicate call (calls === 1)",
-        "input": "0",
+        "description": "Duplicate call is served from cache",
+        "input": "let calls = 0;\nconst sq = memoize((x) => { calls++; return x * x; });\nsq(4); sq(4);\n[calls, sq(4)]",
+        "expected": "[1, 16]"
+      },
+      {
+        "description": "Falsy results are cached too (has(), not truthiness)",
+        "input": "let calls = 0;\nconst f = memoize(() => { calls++; return 0; });\nf('k'); f('k');\ncalls",
         "expected": "1"
       },
       {
-        "description": "Correct return value (16)",
-        "input": "sq(4)",
-        "expected": "16"
+        "description": "Custom resolver builds the cache key",
+        "input": "let calls = 0;\nconst add = memoize((a, b) => { calls++; return a + b; }, (a, b) => a + ':' + b);\n[add(1, 2), add(1, 2), add(1, 3), calls]",
+        "expected": "[3, 3, 4, 2]"
+      },
+      {
+        "description": "Default key is the FIRST argument only",
+        "input": "const f = memoize((a, b) => a + b);\n[f(1, 2), f(1, 99)]",
+        "expected": "[3, 3]"
+      },
+      {
+        "description": "Preserves `this`",
+        "input": "const o = { k: 10, f: memoize(function (x) { return this.k + x; }) };\no.f(1)",
+        "expected": "11"
       }
     ]
   },
@@ -891,9 +1316,24 @@
     "referenceSolution": "Function.prototype.myBind = function (context, ...boundArgs) {\n  const fn = this;\n  return function bound(...args) {\n    if (this instanceof bound) {\n      return new fn(...boundArgs, ...args);\n    }\n    return fn.apply(context, [...boundArgs, ...args]);\n  };\n};",
     "testCases": [
       {
-        "description": "Bound context (Hello, Alice!)",
-        "input": "bound('!')",
+        "description": "Bound this + one pre-filled argument",
+        "input": "function greet(greeting, punctuation) { return `${greeting}, ${this.name}${punctuation}`; }\ngreet.myBind({ name: 'Alice' }, 'Hello')('!')",
         "expected": "'Hello, Alice!'"
+      },
+      {
+        "description": "All arguments pre-filled",
+        "input": "function greet(greeting, punctuation) { return `${greeting}, ${this.name}${punctuation}`; }\ngreet.myBind({ name: 'Bob' }, 'Hi', '?')()",
+        "expected": "'Hi, Bob?'"
+      },
+      {
+        "description": "new on a bound function ignores the bound this, keeps partial args",
+        "input": "function Point(x, y) { this.x = x; this.y = y; }\nconst P = Point.myBind({ ignored: true }, 1);\nconst p = new P(2);\n[p.x, p.y, p.ignored]",
+        "expected": "[1, 2, undefined]"
+      },
+      {
+        "description": "Instances still inherit from the original constructor",
+        "input": "function Point(x, y) { this.x = x; this.y = y; }\nconst P = Point.myBind(null, 1);\nnew P(2) instanceof Point",
+        "expected": "true"
       }
     ]
   },
@@ -917,14 +1357,34 @@
     "referenceSolution": "function deepClone(value, map = new WeakMap()) {\n  if (value === null || typeof value !== 'object') return value;\n  if (value instanceof Date) return new Date(value);\n  if (map.has(value)) return map.get(value);\n  const copy = Array.isArray(value) ? [] : {};\n  map.set(value, copy);\n  for (const key of Object.keys(value)) {\n    copy[key] = deepClone(value[key], map);\n  }\n  return copy;\n}",
     "testCases": [
       {
-        "description": "Cycle preserved",
-        "input": "deepClone(obj).self",
-        "expected": "clone"
+        "description": "Circular reference is preserved in the clone",
+        "input": "const obj = { a: 1, nested: { b: 2 } };\nobj.self = obj;\nconst clone = deepClone(obj);\n[clone.self === clone, clone !== obj]",
+        "expected": "[true, true]"
       },
       {
-        "description": "Nested cloned",
-        "input": "deepClone(obj).nested",
-        "expected": "not obj.nested && clone.nested.b === 2"
+        "description": "Nested objects are new references with equal contents",
+        "input": "const obj = { a: 1, nested: { b: 2 } };\nconst clone = deepClone(obj);\n[clone.nested !== obj.nested, clone.nested.b]",
+        "expected": "[true, 2]"
+      },
+      {
+        "description": "Date is copied, not shared",
+        "input": "const d = new Date(0);\nconst c = deepClone({ d });\n[c.d !== d, c.d.getTime()]",
+        "expected": "[true, 0]"
+      },
+      {
+        "description": "Arrays",
+        "input": "deepClone([1, [2, 3]])",
+        "expected": "[1, [2, 3]]"
+      },
+      {
+        "description": "Map is cloned deeply",
+        "input": "const m = new Map([['k', { v: 1 }]]);\nconst c = deepClone(m);\n[c !== m, c.get('k').v, c.get('k') !== m.get('k')]",
+        "expected": "[true, 1, true]"
+      },
+      {
+        "description": "Set is cloned deeply",
+        "input": "const s = new Set([1, 2]);\nconst c = deepClone(s);\n[c !== s, c.size, c.has(2)]",
+        "expected": "[true, 2, true]"
       }
     ]
   },
@@ -948,9 +1408,39 @@
     "referenceSolution": "class EventEmitter {\n  constructor() { this.events = new Map(); }\n  on(name, listener) {\n    if (!this.events.has(name)) this.events.set(name, []);\n    this.events.get(name).push(listener);\n  }\n  off(name, listener) {\n    if (!this.events.has(name)) return;\n    this.events.set(name, this.events.get(name).filter(l => l !== listener));\n  }\n  emit(name, ...args) {\n    if (!this.events.has(name)) return;\n    [...this.events.get(name)].forEach(fn => fn(...args));\n  }\n}",
     "testCases": [
       {
-        "description": "Emitter fired and unsubscribed (count === 5)",
-        "input": "0",
+        "description": "Listener receives the payload",
+        "input": "const ee = new EventEmitter();\nconst got = [];\nee.on('msg', (x) => got.push(x));\nee.emit('msg', 'hi');\ngot",
+        "expected": "['hi']"
+      },
+      {
+        "description": "off() unsubscribes",
+        "input": "const ee = new EventEmitter();\nlet count = 0;\nconst handler = (x) => count += x;\nee.on('inc', handler);\nee.emit('inc', 5);\nee.off('inc', handler);\nee.emit('inc', 5);\ncount",
         "expected": "5"
+      },
+      {
+        "description": "Listeners fire in registration order",
+        "input": "const ee = new EventEmitter();\nconst got = [];\nee.on('e', () => got.push('first'));\nee.on('e', () => got.push('second'));\nee.emit('e');\ngot",
+        "expected": "['first', 'second']"
+      },
+      {
+        "description": "Multiple arguments are forwarded",
+        "input": "const ee = new EventEmitter();\nconst got = [];\nee.on('sum', (a, b) => got.push(a + b));\nee.emit('sum', 2, 3);\ngot",
+        "expected": "[5]"
+      },
+      {
+        "description": "Removing a listener during emit does not skip the next one",
+        "input": "const ee = new EventEmitter();\nconst got = [];\nconst a = () => { got.push('a'); ee.off('e', a); };\nconst b = () => got.push('b');\nee.on('e', a); ee.on('e', b);\nee.emit('e');\ngot",
+        "expected": "['a', 'b']"
+      },
+      {
+        "description": "Emitting an event with no listeners is a no-op",
+        "input": "new EventEmitter().emit('nothing')",
+        "expected": "undefined"
+      },
+      {
+        "description": "once() fires a single time",
+        "input": "const ee = new EventEmitter();\nlet n = 0;\nee.once('e', () => n++);\nee.emit('e'); ee.emit('e');\nn",
+        "expected": "1"
       }
     ]
   },
@@ -974,14 +1464,29 @@
     "referenceSolution": "function curry(fn) {\n  return function curried(...args) {\n    if (args.length >= fn.length) return fn.apply(this, args);\n    return (...nextArgs) => curried.apply(this, [...args, ...nextArgs]);\n  };\n}\nfunction pipe(...fns) {\n  return (x) => fns.reduce((v, f) => f(v), x);\n}",
     "testCases": [
       {
-        "description": "Curry 3 args",
-        "input": "cAdd(1)(2)(3)",
+        "description": "curry: one argument at a time",
+        "input": "const add = (a, b, c) => a + b + c;\ncurry(add)(1)(2)(3)",
         "expected": "6"
       },
       {
-        "description": "Pipe result ((2+1)*2 === 6)",
-        "input": "pipeline(2)",
+        "description": "curry: grouped arguments",
+        "input": "const add = (a, b, c) => a + b + c;\ncurry(add)(1, 2)(3)",
         "expected": "6"
+      },
+      {
+        "description": "pipe runs left to right: (2 + 1) * 2",
+        "input": "pipe((x) => x + 1, (x) => x * 2)(2)",
+        "expected": "6"
+      },
+      {
+        "description": "pipe with no functions is the identity",
+        "input": "pipe()(5)",
+        "expected": "5"
+      },
+      {
+        "description": "compose runs right to left: (2 * 2) + 1",
+        "input": "compose((x) => x + 1, (x) => x * 2)(2)",
+        "expected": "5"
       }
     ]
   },
@@ -1005,9 +1510,34 @@
     "referenceSolution": "function promiseAll(iterable) {\n  return new Promise((resolve, reject) => {\n    const items = Array.from(iterable);\n    if (items.length === 0) return resolve([]);\n    const results = new Array(items.length);\n    let completed = 0;\n    items.forEach((item, i) => {\n      Promise.resolve(item).then(val => {\n        results[i] = val;\n        if (++completed === items.length) resolve(results);\n      }, reject);\n    });\n  });\n}",
     "testCases": [
       {
-        "description": "Promise.all polyfill [1,2,3]",
-        "input": "promiseAll([Promise.resolve(1), 2, Promise.resolve(3)])",
-        "expected": "'[1,2,3]'"
+        "description": "Mix of promises and plain values keeps order",
+        "input": "await promiseAll([Promise.resolve(1), 2, Promise.resolve(3)])",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "Order follows input, not completion time",
+        "input": "await promiseAll([new Promise((r) => setTimeout(r, 30, 'slow')), new Promise((r) => setTimeout(r, 5, 'fast'))])",
+        "expected": "['slow', 'fast']"
+      },
+      {
+        "description": "Empty iterable resolves to []",
+        "input": "await promiseAll([])",
+        "expected": "[]"
+      },
+      {
+        "description": "First rejection rejects the result",
+        "input": "promiseAll([Promise.resolve(1), Promise.reject(new Error('boom'))])",
+        "expected": "Rejects with Error: boom"
+      },
+      {
+        "description": "allSettled variant",
+        "input": "await promiseAllSettled([Promise.resolve(1), Promise.reject('x')])",
+        "expected": "[{ status: 'fulfilled', value: 1 }, { status: 'rejected', reason: 'x' }]"
+      },
+      {
+        "description": "race variant resolves with the first to settle",
+        "input": "await promiseRace([new Promise((r) => setTimeout(r, 30, 'slow')), new Promise((r) => setTimeout(r, 5, 'fast'))])",
+        "expected": "'fast'"
       }
     ]
   },
@@ -1031,9 +1561,29 @@
     "referenceSolution": "async function pool(tasks, limit) {\n  const results = [];\n  let index = 0;\n  async function worker() {\n    while (index < tasks.length) {\n      const currentIndex = index++;\n      results[currentIndex] = await tasks[currentIndex]();\n    }\n  }\n  await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, worker));\n  return results;\n}",
     "testCases": [
       {
-        "description": "Pool executed in order",
-        "input": "pool(tasks, 2)",
-        "expected": "'[\"a\",\"b\",\"c\"]'"
+        "description": "Results come back in input order",
+        "input": "await pool([() => Promise.resolve('a'), () => Promise.resolve('b'), () => Promise.resolve('c')], 2)",
+        "expected": "['a', 'b', 'c']"
+      },
+      {
+        "description": "Order follows input even if a later task finishes first",
+        "input": "await pool([() => new Promise((r) => setTimeout(r, 30, 'slow')), () => Promise.resolve('fast')], 2)",
+        "expected": "['slow', 'fast']"
+      },
+      {
+        "description": "Never more than `limit` tasks at once (5 tasks, limit 2)",
+        "input": "let running = 0, peak = 0;\nconst task = () => new Promise((r) => { running++; peak = Math.max(peak, running); setTimeout(() => { running--; r(); }, 20); });\nawait pool([task, task, task, task, task], 2);\npeak",
+        "expected": "2"
+      },
+      {
+        "description": "A failing task rejects the pool",
+        "input": "pool([() => Promise.resolve(1), () => Promise.reject(new Error('bad'))], 2)",
+        "expected": "Rejects with Error: bad"
+      },
+      {
+        "description": "No tasks",
+        "input": "await pool([], 3)",
+        "expected": "[]"
       }
     ]
   },
@@ -1057,9 +1607,39 @@
     "referenceSolution": "async function retry(fn, { retries = 3, baseDelay = 20, factor = 2, signal }) {\n  let attempt = 0;\n  while (true) {\n    if (signal?.aborted) throw new Error('Aborted');\n    try {\n      return await fn();\n    } catch (err) {\n      if (attempt++ >= retries) throw err;\n      await new Promise(r => setTimeout(r, baseDelay * Math.pow(factor, attempt)));\n    }\n  }\n}",
     "testCases": [
       {
-        "description": "Retried to success",
-        "input": "retry(flaky, { retries: 3, baseDelay: 10 })",
+        "description": "Succeeds after one failure",
+        "input": "let calls = 0;\nconst flaky = async () => { if (++calls < 2) throw new Error('fail'); return 'success'; };\nawait retry(flaky, { retries: 3, baseDelay: 10 })",
         "expected": "'success'"
+      },
+      {
+        "description": "Attempt count is failures + 1",
+        "input": "let calls = 0;\nconst flaky = async () => { if (++calls < 3) throw new Error('fail'); return 'ok'; };\nawait retry(flaky, { retries: 5, baseDelay: 5 });\ncalls",
+        "expected": "3"
+      },
+      {
+        "description": "Gives up after `retries` retries and rethrows the last error (1 try + 2 retries = 3 calls)",
+        "input": "let calls = 0;\nawait retry(async () => { calls++; throw new Error('nope'); }, { retries: 2, baseDelay: 5 }).catch(() => {});\ncalls",
+        "expected": "3"
+      },
+      {
+        "description": "The last error is what rejects",
+        "input": "retry(async () => { throw new Error('nope'); }, { retries: 1, baseDelay: 5 })",
+        "expected": "Rejects with Error: nope"
+      },
+      {
+        "description": "Delay between attempts grows by `factor`",
+        "input": "baseDelay: 20, factor: 2, always failing; record timestamps of each attempt",
+        "expected": "gaps ≈ 20 ms, 40 ms, 80 ms (each gap = previous × factor)"
+      },
+      {
+        "description": "Aborting during a backoff wait rejects promptly",
+        "input": "const ac = new AbortController();\nconst p = retry(async () => { throw new Error('fail'); }, { retries: 5, baseDelay: 1000, signal: ac.signal });\nsetTimeout(() => ac.abort(), 20);\nconst t0 = Date.now();\nawait p.catch(() => {});\nDate.now() - t0 < 200",
+        "expected": "true"
+      },
+      {
+        "description": "Already-aborted signal rejects without calling fn",
+        "input": "const ac = new AbortController(); ac.abort();\nretry(async () => \"x\", { signal: ac.signal })",
+        "expected": "Rejects (abort reason), fn never called"
       }
     ]
   },
@@ -1083,9 +1663,24 @@
     "referenceSolution": "const inFlight = new Map();\nfunction dedupeFetch(key, fn) {\n  if (inFlight.has(key)) return inFlight.get(key);\n  const promise = fn().finally(() => inFlight.delete(key));\n  inFlight.set(key, promise);\n  return promise;\n}",
     "testCases": [
       {
-        "description": "Deduplicated network calls (calls === 1)",
-        "input": "0",
-        "expected": "1"
+        "description": "Two concurrent calls with the same key share one request",
+        "input": "let calls = 0;\nconst req = () => new Promise((r) => setTimeout(() => { calls++; r('data'); }, 30));\nconst [a, b] = await Promise.all([dedupeFetch('item-1', req), dedupeFetch('item-1', req)]);\n[a, b, calls]",
+        "expected": "['data', 'data', 1]"
+      },
+      {
+        "description": "Different keys are not shared",
+        "input": "let calls = 0;\nconst req = () => new Promise((r) => setTimeout(() => { calls++; r('d'); }, 10));\nawait Promise.all([dedupeFetch('k1', req), dedupeFetch('k2', req)]);\ncalls",
+        "expected": "2"
+      },
+      {
+        "description": "Entry is removed once settled, so a later call refetches",
+        "input": "let calls = 0;\nconst req = () => new Promise((r) => setTimeout(() => { calls++; r('d'); }, 10));\nawait dedupeFetch('k', req);\nawait dedupeFetch('k', req);\ncalls",
+        "expected": "2"
+      },
+      {
+        "description": "A rejected request is also removed",
+        "input": "await dedupeFetch('k', () => Promise.reject(new Error('x'))).catch(() => {});\nawait dedupeFetch('k', () => Promise.resolve('ok'))",
+        "expected": "'ok'"
       }
     ]
   },
@@ -1109,9 +1704,24 @@
     "referenceSolution": "class AsyncQueue {\n  constructor() { this.queue = Promise.resolve(); }\n  add(task) {\n    return new Promise((resolve, reject) => {\n      this.queue = this.queue.then(() => task().then(resolve, reject));\n    });\n  }\n}",
     "testCases": [
       {
-        "description": "Sequential async order",
-        "input": "[]",
-        "expected": "'[1,2,3]'"
+        "description": "Tasks run in the order added",
+        "input": "const q = new AsyncQueue();\nconst order = [];\nq.add(async () => { order.push(1); });\nq.add(async () => { order.push(2); });\nawait q.add(async () => { order.push(3); });\norder",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "add() resolves with the task's own result",
+        "input": "const q = new AsyncQueue();\nconst [a, b] = await Promise.all([q.add(async () => 'x'), q.add(async () => 'y')]);\n[a, b]",
+        "expected": "['x', 'y']"
+      },
+      {
+        "description": "A slow first task still finishes before the next starts",
+        "input": "const q = new AsyncQueue();\nconst order = [];\nq.add(() => new Promise((r) => setTimeout(() => { order.push('slow'); r(); }, 30)));\nawait q.add(async () => { order.push('fast'); });\norder",
+        "expected": "['slow', 'fast']"
+      },
+      {
+        "description": "A failing task rejects only its own promise; the queue continues",
+        "input": "const q = new AsyncQueue();\nconst bad = q.add(async () => { throw new Error('boom'); }).catch((e) => e.message);\nconst good = q.add(async () => 'ok');\n[await bad, await good]",
+        "expected": "['boom', 'ok']"
       }
     ]
   },
@@ -1135,9 +1745,34 @@
     "referenceSolution": "class MiddlewarePipeline {\n  constructor() { this.stack = []; }\n  use(fn) { this.stack.push(fn); }\n  handle(req, res) {\n    let idx = 0;\n    const next = (err) => {\n      const layer = this.stack[idx++];\n      if (!layer) return;\n      try { layer(req, res, next); } catch(e) { next(e); }\n    };\n    next();\n  }\n}",
     "testCases": [
       {
-        "description": "Middleware executed in order",
-        "input": "[]",
-        "expected": "'[\"A\",\"B\"]'"
+        "description": "Runs in registration order via next()",
+        "input": "const app = new MiddlewarePipeline();\nconst trail = [];\napp.use((req, res, next) => { trail.push('A'); next(); });\napp.use((req, res, next) => { trail.push('B'); next(); });\napp.handle({}, {});\ntrail",
+        "expected": "['A', 'B']"
+      },
+      {
+        "description": "Middleware shares req/res",
+        "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use((req, res, next) => { req.user = 'tom'; next(); });\napp.use((req, res) => { res.body = 'hi ' + req.user; });\napp.handle({}, res);\nres.body",
+        "expected": "'hi tom'"
+      },
+      {
+        "description": "Chain stops when next() is not called",
+        "input": "const app = new MiddlewarePipeline();\nconst trail = [];\napp.use(() => { trail.push('A'); });\napp.use(() => { trail.push('B'); });\napp.handle({}, {});\ntrail",
+        "expected": "['A']"
+      },
+      {
+        "description": "Async handler: next() after await still continues the chain",
+        "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use(async (req, res, next) => { await sleep(10); res.v = 1; next(); });\napp.use((req, res) => { res.done = true; });\napp.handle({}, res);\nawait sleep(40);\nres",
+        "expected": "{ v: 1, done: true }"
+      },
+      {
+        "description": "Error-handling middleware (err, req, res, next) receives a thrown error",
+        "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use(() => { throw new Error('boom'); });\napp.use((err, req, res, next) => { res.status = 500; res.msg = err.message; });\napp.handle({}, res);\nres",
+        "expected": "{ status: 500, msg: 'boom' }"
+      },
+      {
+        "description": "Calling next() twice must not run later layers twice",
+        "input": "const app = new MiddlewarePipeline();\nconst ran = [];\napp.use((req, res, next) => { next(); next(); });\napp.use(() => { ran.push('B'); });\napp.use(() => { ran.push('C'); });\napp.handle({}, {});\nran",
+        "expected": "['B']"
       }
     ]
   },
@@ -1161,19 +1796,29 @@
     "referenceSolution": "class TokenBucket {\n  constructor(capacity, fillRatePerSec) {\n    this.capacity = capacity;\n    this.tokens = capacity;\n    this.fillRate = fillRatePerSec;\n    this.last = Date.now();\n  }\n  allow() {\n    const now = Date.now();\n    this.tokens = Math.min(this.capacity, this.tokens + ((now - this.last) / 1000) * this.fillRate);\n    this.last = now;\n    if (this.tokens >= 1) { this.tokens -= 1; return true; }\n    return false;\n  }\n}",
     "testCases": [
       {
-        "description": "Token 1 allowed",
-        "input": "new TokenBucket(2, 1).allow()",
+        "description": "Capacity 2: two allowed, third blocked",
+        "input": "const tb = new TokenBucket(2, 1);\n[tb.allow(), tb.allow(), tb.allow()]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "Tokens refill over time (10 tokens/sec ⇒ 1 token per 100 ms)",
+        "input": "const tb = new TokenBucket(1, 10);\ntb.allow();\nawait sleep(150);\ntb.allow()",
         "expected": "true"
       },
       {
-        "description": "Token 2 allowed",
-        "input": "new TokenBucket(2, 1).allow()",
-        "expected": "true"
+        "description": "Refill never exceeds capacity",
+        "input": "const tb = new TokenBucket(2, 100);\nawait sleep(100);\n[tb.allow(), tb.allow(), tb.allow()]",
+        "expected": "[true, true, false]"
       },
       {
-        "description": "Token 3 blocked",
-        "input": "new TokenBucket(2, 1).allow()",
-        "expected": "false"
+        "description": "Middleware: 6th request in the window from one client (limit 5)",
+        "input": "5 requests from client '1.2.3.4' → next() each time; 6th request from '1.2.3.4'",
+        "expected": "res.status === 429 and header 'Retry-After' = seconds until a token is available (e.g. '12'); next() NOT called"
+      },
+      {
+        "description": "Middleware: a different client is unaffected",
+        "input": "client '1.2.3.4' exhausted; request from '5.6.7.8'",
+        "expected": "next() called, no 429"
       }
     ]
   },
@@ -1198,14 +1843,24 @@
     "referenceSolution": "class LRUCacheTTL {\n  constructor(capacity) {\n    this.capacity = capacity;\n    this.cache = new Map();\n  }\n  get(key) {\n    if (!this.cache.has(key)) return -1;\n    const entry = this.cache.get(key);\n    if (entry.expiry && Date.now() > entry.expiry) { this.cache.delete(key); return -1; }\n    this.cache.delete(key); this.cache.set(key, entry);\n    return entry.value;\n  }\n  set(key, value, ttl = 0) {\n    this.cache.delete(key);\n    if (this.cache.size >= this.capacity) this.cache.delete(this.cache.keys().next().value);\n    this.cache.set(key, { value, expiry: ttl ? Date.now() + ttl : 0 });\n  }\n}",
     "testCases": [
       {
-        "description": "Valid get (10)",
-        "input": "new LRUCacheTTL(2).get('a')",
+        "description": "Fresh entry is returned",
+        "input": "const l = new LRUCacheTTL(2);\nl.set('a', 10, 50);\nl.get('a')",
         "expected": "10"
       },
       {
-        "description": "Expired get (-1)",
-        "input": "new LRUCacheTTL(2).get('a')",
+        "description": "Expired entry is never returned",
+        "input": "const l = new LRUCacheTTL(2);\nl.set('a', 10, 50);\nawait sleep(70);\nl.get('a')",
         "expected": "-1"
+      },
+      {
+        "description": "Entry without a TTL never expires",
+        "input": "const l = new LRUCacheTTL(2);\nl.set('b', 1);\nawait sleep(70);\nl.get('b')",
+        "expected": "1"
+      },
+      {
+        "description": "Reading refreshes recency (b is evicted, not a)",
+        "input": "const l = new LRUCacheTTL(2);\nl.set('a', 1); l.set('b', 2);\nl.get('a');\nl.set('c', 3);\n[l.get('a'), l.get('b'), l.get('c')]",
+        "expected": "[1, -1, 3]"
       }
     ]
   },
@@ -1229,9 +1884,39 @@
     "referenceSolution": "function flattenObject(obj, prefix = '') {\n  const res = {};\n  for (const [k, v] of Object.entries(obj)) {\n    const newKey = prefix ? `${prefix}.${k}` : k;\n    if (v && typeof v === 'object' && !Array.isArray(v)) Object.assign(res, flattenObject(v, newKey));\n    else res[newKey] = v;\n  }\n  return res;\n}",
     "testCases": [
       {
-        "description": "Dot path flattened",
-        "input": "flattenObject(nested)['b.c']",
-        "expected": "2 && flat['b.d.e'] === 3"
+        "description": "flattenObject: dot-path keys",
+        "input": "flattenObject({ a: 1, b: { c: 2, d: { e: 3 } } })",
+        "expected": "{ a: 1, 'b.c': 2, 'b.d.e': 3 }"
+      },
+      {
+        "description": "flattenObject: arrays are kept as values",
+        "input": "flattenObject({ a: [1, 2], b: { c: [3] } })",
+        "expected": "{ a: [1, 2], 'b.c': [3] }"
+      },
+      {
+        "description": "flattenObject: null values are kept",
+        "input": "flattenObject({ x: null, y: { z: null } })",
+        "expected": "{ x: null, 'y.z': null }"
+      },
+      {
+        "description": "flattenObject: empty object",
+        "input": "flattenObject({})",
+        "expected": "{}"
+      },
+      {
+        "description": "flatten with a depth limit",
+        "input": "flatten([1, [2, [3, [4]]]], 1)",
+        "expected": "[1, 2, [3, [4]]]"
+      },
+      {
+        "description": "flatten with no depth flattens fully",
+        "input": "flatten([1, [2, [3, [4]]]])",
+        "expected": "[1, 2, 3, 4]"
+      },
+      {
+        "description": "flatten does not mutate its input",
+        "input": "const a = [1, [2]];\nflatten(a);\na",
+        "expected": "[1, [2]]"
       }
     ]
   },
@@ -1255,9 +1940,34 @@
     "referenceSolution": "function groupBy(items, keyFnOrProp) {\n  const fn = typeof keyFnOrProp === 'function' ? keyFnOrProp : (x) => x[keyFnOrProp];\n  return items.reduce((acc, item, idx) => {\n    const key = fn(item, idx);\n    if (!acc[key]) acc[key] = [];\n    acc[key].push(item);\n    return acc;\n  }, {});\n}",
     "testCases": [
       {
-        "description": "Grouped admins (length === 2)",
-        "input": "groupBy(data, 'role').admin",
-        "expected": "truthy"
+        "description": "Group by property name; order within a group is insertion order",
+        "input": "groupBy([{ role: 'admin', name: 'A' }, { role: 'user', name: 'B' }, { role: 'admin', name: 'C' }], 'role')",
+        "expected": "{ admin: [{ role: 'admin', name: 'A' }, { role: 'admin', name: 'C' }], user: [{ role: 'user', name: 'B' }] }"
+      },
+      {
+        "description": "Group by function",
+        "input": "groupBy([1, 2, 3, 4, 5], (n) => (n % 2 === 0 ? 'even' : 'odd'))",
+        "expected": "{ odd: [1, 3, 5], even: [2, 4] }"
+      },
+      {
+        "description": "Key function receives the index as 2nd argument",
+        "input": "groupBy(['a', 'b', 'c', 'd'], (x, i) => i % 2)",
+        "expected": "{ 0: ['a', 'c'], 1: ['b', 'd'] }"
+      },
+      {
+        "description": "Empty input",
+        "input": "groupBy([], 'k')",
+        "expected": "{}"
+      },
+      {
+        "description": "countBy",
+        "input": "countBy(['a', 'b', 'a'], (x) => x)",
+        "expected": "{ a: 2, b: 1 }"
+      },
+      {
+        "description": "keyBy (last item wins on duplicate keys)",
+        "input": "keyBy([{ id: 1, n: 'x' }, { id: 2, n: 'y' }], 'id')",
+        "expected": "{ 1: { id: 1, n: 'x' }, 2: { id: 2, n: 'y' } }"
       }
     ]
   },
@@ -1281,9 +1991,39 @@
     "referenceSolution": "Array.prototype.myMap = function (callback, thisArg) {\n  const res = new Array(this.length);\n  for (let i = 0; i < this.length; i++) {\n    if (i in this) res[i] = callback.call(thisArg, this[i], i, this);\n  }\n  return res;\n};",
     "testCases": [
       {
-        "description": "myMap doubled [2,4,6]",
-        "input": "[1, 2, 3].myMap(x => x * 2)",
-        "expected": "'[2,4,6]'"
+        "description": "myMap doubles",
+        "input": "[1, 2, 3].myMap((x) => x * 2)",
+        "expected": "[2, 4, 6]"
+      },
+      {
+        "description": "Callback gets (value, index, array)",
+        "input": "['a', 'b'].myMap((v, i, arr) => v + i + arr.length)",
+        "expected": "['a02', 'b12']"
+      },
+      {
+        "description": "thisArg is honoured",
+        "input": "[1, 2].myMap(function (x) { return x * this.k; }, { k: 10 })",
+        "expected": "[10, 20]"
+      },
+      {
+        "description": "Sparse holes are skipped (and stay holes)",
+        "input": "[1, , 3].myMap((x) => x * 2)",
+        "expected": "[2, <1 empty item>, 6]"
+      },
+      {
+        "description": "myFilter keeps matching items",
+        "input": "[1, 2, 3, 4].myFilter((x) => x % 2 === 0)",
+        "expected": "[2, 4]"
+      },
+      {
+        "description": "myReduce sums",
+        "input": "[1, 2, 3].myReduce((a, b) => a + b)",
+        "expected": "6"
+      },
+      {
+        "description": "myReduce on an empty array with no initial value throws",
+        "input": "[].myReduce((a, b) => a + b)",
+        "expected": "Throws TypeError"
       }
     ]
   },
@@ -1307,14 +2047,39 @@
     "referenceSolution": "function get(obj, path, defaultValue) {\n  const keys = path.replace(/\\[(\\d+)\\]/g, '.$1').split('.');\n  let curr = obj;\n  for (const k of keys) {\n    if (curr == null) return defaultValue;\n    curr = curr[k];\n  }\n  return curr === undefined ? defaultValue : curr;\n}",
     "testCases": [
       {
-        "description": "get path (99)",
-        "input": "get(o, 'a[0].b.c')",
+        "description": "Dot + bracket path",
+        "input": "const o = { a: [{ b: { c: 99 } }] };\nget(o, 'a[0].b.c')",
         "expected": "99"
       },
       {
-        "description": "get missing with default (0)",
-        "input": "get(o, 'a[0].b.missing', 0)",
+        "description": "Missing path returns the default",
+        "input": "const o = { a: [{ b: { c: 99 } }] };\nget(o, 'a[0].b.missing', 0)",
         "expected": "0"
+      },
+      {
+        "description": "Default applies only to undefined — a stored 0 is returned",
+        "input": "get({ a: { b: 0 } }, 'a.b', 'd')",
+        "expected": "0"
+      },
+      {
+        "description": "Path through null returns the default",
+        "input": "get({ a: null }, 'a.b', 'd')",
+        "expected": "'d'"
+      },
+      {
+        "description": "No default → undefined",
+        "input": "get({}, 'x.y.z')",
+        "expected": "undefined"
+      },
+      {
+        "description": "set creates intermediate objects and arrays",
+        "input": "const o = {};\nset(o, 'a.b[0].c', 5);\no",
+        "expected": "{ a: { b: [{ c: 5 }] } }"
+      },
+      {
+        "description": "set with a numeric segment creates an array",
+        "input": "const o = {};\nset(o, 'list[0]', 1);\no",
+        "expected": "{ list: [1] }"
       }
     ]
   },
@@ -1338,13 +2103,48 @@
     "referenceSolution": "function deepEqual(a, b) {\n  if (a === b) return true;\n  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;\n  const keysA = Object.keys(a);\n  const keysB = Object.keys(b);\n  if (keysA.length !== keysB.length) return false;\n  for (const k of keysA) {\n    if (!keysB.includes(k) || !deepEqual(a[k], b[k])) return false;\n  }\n  return true;\n}",
     "testCases": [
       {
-        "description": "Equal objects match",
+        "description": "Same structure",
         "input": "deepEqual({ a: [1, 2] }, { a: [1, 2] })",
         "expected": "true"
       },
       {
-        "description": "Unequal objects fail",
+        "description": "Different value",
         "input": "deepEqual({ a: 1 }, { a: 2 })",
+        "expected": "false"
+      },
+      {
+        "description": "Extra key on one side",
+        "input": "deepEqual({ a: 1, b: 2 }, { a: 1 })",
+        "expected": "false"
+      },
+      {
+        "description": "Same count of keys but different names",
+        "input": "deepEqual({ a: undefined }, { b: undefined })",
+        "expected": "false"
+      },
+      {
+        "description": "Arrays",
+        "input": "deepEqual([1, [2]], [1, [2]])",
+        "expected": "true"
+      },
+      {
+        "description": "null vs object",
+        "input": "deepEqual(null, {})",
+        "expected": "false"
+      },
+      {
+        "description": "NaN equals NaN",
+        "input": "deepEqual(NaN, NaN)",
+        "expected": "true"
+      },
+      {
+        "description": "Equal Dates",
+        "input": "deepEqual(new Date(5), new Date(5))",
+        "expected": "true"
+      },
+      {
+        "description": "Different Dates",
+        "input": "deepEqual(new Date(5), new Date(6))",
         "expected": "false"
       }
     ]
@@ -1363,15 +2163,40 @@
       "stability"
     ],
     "promptSeed": "Given a list of records, return a new array deduped by id (latest wins) and sorted by multiple keys with stable ordering. Input must not be mutated and a comparator must handle strings, numbers, and nulls.",
-    "starterCode": "function dedupeAndSort(records, sortBy = 'id') {\n  const map = new Map();\n  for (const r of records) map.set(r.id, r); // latest wins\n  return Array.from(map.values()).sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1));\n}",
+    "starterCode": "function dedupeAndSort(records, sortBy = 'id') {\n  const map = new Map();\n  for (const r of records) map.set(r.id, r); // latest wins\n  return Array.from(map.values()).sort((a, b) => {\n    const av = a[sortBy], bv = b[sortBy];\n    if (av == null && bv == null) return 0;\n    if (av == null) return 1; // nulls last\n    if (bv == null) return -1;\n    return av > bv ? 1 : av < bv ? -1 : 0; // equal keys compare as 0 (stable)\n  });\n}",
     "testHarness": "const recs = [{ id: 1, v: 'old' }, { id: 2, v: 'mid' }, { id: 1, v: 'latest' }];\nconst out = dedupeAndSort(recs);\nconsole.log('Latest won and deduped (length 2):', out.length === 2 && out[0].v === 'latest' ? 'PASS' : 'FAIL', out);",
-    "solution": "function dedupeAndSort(records, sortBy = 'id') {\n  const map = new Map();\n  for (const r of records) map.set(r.id, r); // latest wins\n  return Array.from(map.values()).sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1));\n}",
-    "referenceSolution": "function dedupeAndSort(records, sortBy = 'id') {\n  const map = new Map();\n  for (const r of records) map.set(r.id, r); // latest wins\n  return Array.from(map.values()).sort((a, b) => (a[sortBy] > b[sortBy] ? 1 : -1));\n}",
+    "solution": "function dedupeAndSort(records, sortBy = 'id') {\n  const map = new Map();\n  for (const r of records) map.set(r.id, r); // latest wins\n  return Array.from(map.values()).sort((a, b) => {\n    const av = a[sortBy], bv = b[sortBy];\n    if (av == null && bv == null) return 0;\n    if (av == null) return 1; // nulls last\n    if (bv == null) return -1;\n    return av > bv ? 1 : av < bv ? -1 : 0; // equal keys compare as 0 (stable)\n  });\n}",
+    "referenceSolution": "function dedupeAndSort(records, sortBy = 'id') {\n  const map = new Map();\n  for (const r of records) map.set(r.id, r); // latest wins\n  return Array.from(map.values()).sort((a, b) => {\n    const av = a[sortBy], bv = b[sortBy];\n    if (av == null && bv == null) return 0;\n    if (av == null) return 1; // nulls last\n    if (bv == null) return -1;\n    return av > bv ? 1 : av < bv ? -1 : 0; // equal keys compare as 0 (stable)\n  });\n}",
     "testCases": [
       {
-        "description": "Latest won and deduped (length 2)",
-        "input": "dedupeAndSort(recs).length",
-        "expected": "2 && out[0].v === 'latest'"
+        "description": "Latest record per id wins",
+        "input": "dedupeAndSort([{ id: 1, v: 'old' }, { id: 2, v: 'mid' }, { id: 1, v: 'latest' }])",
+        "expected": "[{ id: 1, v: 'latest' }, { id: 2, v: 'mid' }]"
+      },
+      {
+        "description": "Sorted by the given key",
+        "input": "dedupeAndSort([{ id: 3, n: 'c' }, { id: 1, n: 'a' }, { id: 2, n: 'b' }], 'n').map((r) => r.id)",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "Input is not mutated",
+        "input": "const r = [{ id: 2 }, { id: 1 }];\ndedupeAndSort(r);\nr.map((x) => x.id)",
+        "expected": "[2, 1]"
+      },
+      {
+        "description": "Equal keys keep their original relative order (stable)",
+        "input": "dedupeAndSort([{ id: 1, g: 'x' }, { id: 2, g: 'x' }, { id: 3, g: 'x' }], 'g').map((r) => r.id)",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "null sorts last",
+        "input": "dedupeAndSort([{ id: 1, v: null }, { id: 2, v: 'b' }, { id: 3, v: 'a' }], 'v').map((r) => r.id)",
+        "expected": "[3, 2, 1]"
+      },
+      {
+        "description": "Multiple sort keys (array of keys, first wins)",
+        "input": "dedupeAndSort([{ id: 1, team: 'b', n: 1 }, { id: 2, team: 'a', n: 2 }, { id: 3, team: 'a', n: 1 }], ['team', 'n']).map((r) => r.id)",
+        "expected": "[3, 2, 1]"
       }
     ]
   },
@@ -1395,9 +2220,34 @@
     "referenceSolution": "function useDebounce(value, delay) {\n  // Custom hook returning debounced value\n}",
     "testCases": [
       {
-        "description": "useDebounce defined as function",
-        "input": "typeof useDebounce",
-        "expected": "'function'"
+        "description": "Initial render returns the value immediately",
+        "input": "useDebounce('a', 300)",
+        "expected": "'a'"
+      },
+      {
+        "description": "Before the delay elapses",
+        "input": "rerender 'a' → 'b' at t = 0, read at t = 299 ms",
+        "expected": "'a'"
+      },
+      {
+        "description": "After the delay elapses",
+        "input": "rerender 'a' → 'b' at t = 0, read at t = 300 ms",
+        "expected": "'b'"
+      },
+      {
+        "description": "Each change restarts the timer",
+        "input": "'b' (t=0) → 'c' (t=100) → 'd' (t=200), read at t = 499 / 500 ms",
+        "expected": "'a' at 499 ms, 'd' at 500 ms"
+      },
+      {
+        "description": "No stale closure when delay prop changes",
+        "input": "useDebounce('x', 100) → rerender delay 500",
+        "expected": "new delay is used for the next change"
+      },
+      {
+        "description": "Unmount",
+        "input": "unmount() with a timer pending",
+        "expected": "clearTimeout called; no state update"
       }
     ]
   },
@@ -1422,9 +2272,34 @@
     "referenceSolution": "function useFetch(url) {\n  // Implement state { data, error, loading }\n  // Abort request and guard against setting state on unmount\n}",
     "testCases": [
       {
-        "description": "useFetch defined as function",
-        "input": "typeof useFetch",
-        "expected": "'function'"
+        "description": "Initial state",
+        "input": "useFetch('/api/a')  // before fetch resolves",
+        "expected": "{ data: null, error: null, loading: true }"
+      },
+      {
+        "description": "Success",
+        "input": "fetch resolves { id: 1 } for '/api/a'",
+        "expected": "{ data: { id: 1 }, error: null, loading: false }"
+      },
+      {
+        "description": "Failure",
+        "input": "fetch rejects Error('offline') for '/api/a'",
+        "expected": "{ data: null, error: Error('offline'), loading: false }"
+      },
+      {
+        "description": "url changes: previous request is aborted",
+        "input": "'/api/a' (slow, 200 ms) → rerender '/api/b' (fast, 20 ms)",
+        "expected": "abort() called on /api/a's controller; final data is from /api/b"
+      },
+      {
+        "description": "Stale response never sets state",
+        "input": "'/api/a' resolves AFTER '/api/b' has resolved",
+        "expected": "data stays equal to /api/b result"
+      },
+      {
+        "description": "Unmount",
+        "input": "unmount() while pending",
+        "expected": "abort() called; no \"state update on unmounted component\""
       }
     ]
   },
@@ -1449,9 +2324,34 @@
     "referenceSolution": "function Typeahead({ onSelect, fetchSuggestions }) {\n  // Debounced input with keyboard navigation\n}",
     "testCases": [
       {
-        "description": "Typeahead defined",
-        "input": "typeof Typeahead",
-        "expected": "'function'"
+        "description": "Debounced fetch",
+        "input": "type 'r', 're', 'rea' within 100 ms; wait 300 ms",
+        "expected": "fetchSuggestions called once, with 'rea'"
+      },
+      {
+        "description": "Suggestions render with combobox ARIA",
+        "input": "fetchSuggestions → ['react', 'read', 'real']",
+        "expected": "input role='combobox' aria-expanded='true'; 3 elements role='option' inside role='listbox'"
+      },
+      {
+        "description": "Arrow-key navigation",
+        "input": "ArrowDown, ArrowDown",
+        "expected": "second option has aria-selected='true' (input aria-activedescendant points to it)"
+      },
+      {
+        "description": "Enter selects",
+        "input": "ArrowDown, ArrowDown, Enter",
+        "expected": "onSelect('read') called once; listbox closes"
+      },
+      {
+        "description": "Escape closes",
+        "input": "Escape",
+        "expected": "listbox removed; aria-expanded='false'"
+      },
+      {
+        "description": "Out-of-order responses are ignored",
+        "input": "request for 're' resolves AFTER request for 'rea'",
+        "expected": "list shows results for 'rea'"
       }
     ]
   },
@@ -1475,9 +2375,29 @@
     "referenceSolution": "function useLatest(value) {\n  // Return ref holding latest value\n}\nfunction useInterval(callback, delay) {\n  // Set up interval with ref to prevent stale closures\n}",
     "testCases": [
       {
-        "description": "useLatest & useInterval defined",
-        "input": "typeof useLatest",
-        "expected": "'function' && typeof useInterval === 'function'"
+        "description": "usePrevious sequence",
+        "input": "values 1 → 2 → 3",
+        "expected": "[undefined, 1, 2]"
+      },
+      {
+        "description": "useInterval ticks",
+        "input": "useInterval(cb, 100); advance 350 ms",
+        "expected": "cb called 3 times"
+      },
+      {
+        "description": "Latest callback is used without resetting the timer",
+        "input": "tick at 100 ms; rerender with a new cb at 150 ms; tick at 200 ms",
+        "expected": "new cb is called at 200 ms (timer not restarted at 150)"
+      },
+      {
+        "description": "null delay pauses",
+        "input": "useInterval(cb, null); advance 1000 ms",
+        "expected": "cb called 0 times"
+      },
+      {
+        "description": "Resuming",
+        "input": "delay null → 100; advance 250 ms",
+        "expected": "cb called 2 times"
       }
     ]
   },
@@ -1501,9 +2421,24 @@
     "referenceSolution": "function InfiniteList({ onLoadMore }) {\n  // Render sentinel div with IntersectionObserver\n}",
     "testCases": [
       {
-        "description": "InfiniteList defined",
-        "input": "typeof InfiniteList",
-        "expected": "'function'"
+        "description": "Sentinel becomes visible",
+        "input": "observer callback([{ isIntersecting: true }])",
+        "expected": "onLoadMore called once"
+      },
+      {
+        "description": "Already loading",
+        "input": "callback([{ isIntersecting: true }]) while a page is in flight",
+        "expected": "onLoadMore NOT called again"
+      },
+      {
+        "description": "Last page reached",
+        "input": "hasMore = false, then callback([{ isIntersecting: true }])",
+        "expected": "onLoadMore not called; observer.disconnect() called"
+      },
+      {
+        "description": "Unmount",
+        "input": "unmount()",
+        "expected": "observer.disconnect() called"
       }
     ]
   },
@@ -1528,9 +2463,39 @@
     "referenceSolution": "function Modal({ isOpen, onClose, children }) {\n  // Render via createPortal with Escape key and focus trap\n}",
     "testCases": [
       {
-        "description": "Modal component defined",
-        "input": "typeof Modal",
-        "expected": "'function'"
+        "description": "Closed",
+        "input": "<Modal isOpen={false}>",
+        "expected": "nothing rendered in document.body"
+      },
+      {
+        "description": "Open renders through a portal",
+        "input": "<Modal isOpen>Hi</Modal> inside <div id=\"root\">",
+        "expected": "'Hi' is a descendant of document.body but NOT of #root"
+      },
+      {
+        "description": "Escape",
+        "input": "press 'Escape'",
+        "expected": "onClose called once"
+      },
+      {
+        "description": "Backdrop click vs content click",
+        "input": "click backdrop, then click inside the dialog",
+        "expected": "onClose called once (only for the backdrop)"
+      },
+      {
+        "description": "Focus trap",
+        "input": "focus last button, press Tab; focus first button, press Shift+Tab",
+        "expected": "focus wraps to the first button; then to the last button"
+      },
+      {
+        "description": "Focus restore",
+        "input": "open from <button id=\"trigger\">, then close",
+        "expected": "document.activeElement === trigger"
+      },
+      {
+        "description": "Scroll lock",
+        "input": "while open / after close",
+        "expected": "document.body.style.overflow === 'hidden' / restored to the previous value"
       }
     ]
   },
@@ -1555,9 +2520,29 @@
     "referenceSolution": "function todoReducer(state, action) {\n  switch (action.type) {\n    case 'ADD': return [...state, action.payload];\n    case 'TOGGLE': return state.map(t => t.id === action.id ? { ...t, done: !t.done } : t);\n    case 'DELETE': return state.filter(t => t.id !== action.id);\n    default: return state;\n  }\n}",
     "testCases": [
       {
-        "description": "Reducer toggled done",
-        "input": "todoReducer([{ id: 1, done: false }], { type: 'TOGGLE', id: 1 })[0].done",
+        "description": "TOGGLE flips done",
+        "input": "todoReducer([{ id: 1, done: false }], { type: 'TOGGLE', id: 1 })",
+        "expected": "[{ id: 1, done: true }]"
+      },
+      {
+        "description": "ADD appends",
+        "input": "todoReducer([], { type: 'ADD', payload: { id: 1, text: 'a', done: false } })",
+        "expected": "[{ id: 1, text: 'a', done: false }]"
+      },
+      {
+        "description": "DELETE removes by id",
+        "input": "todoReducer([{ id: 1 }, { id: 2 }], { type: 'DELETE', id: 1 })",
+        "expected": "[{ id: 2 }]"
+      },
+      {
+        "description": "Unknown action returns the same state",
+        "input": "const s = [{ id: 1 }];\ntodoReducer(s, { type: 'NOOP' }) === s",
         "expected": "true"
+      },
+      {
+        "description": "EDIT changes text only",
+        "input": "todoReducer([{ id: 1, text: 'a', done: false }], { type: 'EDIT', id: 1, text: 'b' })",
+        "expected": "[{ id: 1, text: 'b', done: false }]"
       }
     ]
   },
@@ -1582,9 +2567,29 @@
     "referenceSolution": "function Tabs({ children, defaultValue }) {\n  // Context-backed compound tabs container\n}",
     "testCases": [
       {
-        "description": "Tabs component defined",
-        "input": "typeof Tabs",
-        "expected": "'function'"
+        "description": "defaultValue selects the first visible panel",
+        "input": "<Tabs defaultValue='one'> with tabs one, two",
+        "expected": "panel 'one' visible; panel 'two' hidden/not rendered"
+      },
+      {
+        "description": "Click switches panel",
+        "input": "click tab 'two'",
+        "expected": "panel 'two' visible; tab two aria-selected='true', tab one 'false'"
+      },
+      {
+        "description": "ARIA wiring",
+        "input": "inspect tab + panel",
+        "expected": "tab: role='tab', aria-controls = panel id; panel: role='tabpanel', aria-labelledby = tab id; list: role='tablist'"
+      },
+      {
+        "description": "Arrow keys move focus (roving tabindex)",
+        "input": "focus tab 'one', ArrowRight, ArrowRight",
+        "expected": "focus on 'two', then wraps to 'one'; only the focused tab has tabindex=0"
+      },
+      {
+        "description": "Controlled mode",
+        "input": "<Tabs value='one' onChange={fn}>, click 'two'",
+        "expected": "fn('two') called; panel 'one' stays visible until the value prop changes"
       }
     ]
   },
@@ -1608,9 +2613,34 @@
     "referenceSolution": "function twoSum(nums, target) {\n  const map = new Map();\n  for (let i = 0; i < nums.length; i++) {\n    const diff = target - nums[i];\n    if (map.has(diff)) return [map.get(diff), i];\n    map.set(nums[i], i);\n  }\n  return [];\n}",
     "testCases": [
       {
-        "description": "twoSum hashmap ([0, 1])",
+        "description": "Basic pair",
         "input": "twoSum([2, 7, 11, 15], 9)",
-        "expected": "'[0,1]'"
+        "expected": "[0, 1]"
+      },
+      {
+        "description": "Pair not at the start",
+        "input": "twoSum([3, 2, 4], 6)",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "Duplicate values form the pair",
+        "input": "twoSum([3, 3], 6)",
+        "expected": "[0, 1]"
+      },
+      {
+        "description": "Zero target with zeros",
+        "input": "twoSum([0, 4, 3, 0], 0)",
+        "expected": "[0, 3]"
+      },
+      {
+        "description": "The same element is not used twice",
+        "input": "twoSum([5], 10)",
+        "expected": "[]"
+      },
+      {
+        "description": "No solution",
+        "input": "twoSum([1, 2, 3], 7)",
+        "expected": "[]"
       }
     ]
   },
@@ -1635,9 +2665,29 @@
     "referenceSolution": "function getElementsByClassName(node, className) {\n  let results = [];\n  if (node.classList && node.classList.contains(className)) results.push(node);\n  for (const child of (node.children || [])) {\n    results = results.concat(getElementsByClassName(child, className));\n  }\n  return results;\n}",
     "testCases": [
       {
-        "description": "Found 2 elements by class name",
-        "input": "getElementsByClassName(mockDom, 'hit').length",
-        "expected": "2"
+        "description": "Matches in document order",
+        "input": "const mk = (cls, id, children = []) => ({ id, classList: { contains: (c) => cls.includes(c) }, children });\nconst dom = mk([], 'root', [mk(['hit'], 'el-1'), mk([], 'wrap', [mk(['hit'], 'el-2')])]);\ngetElementsByClassName(dom, 'hit').map((n) => n.id)",
+        "expected": "['el-1', 'el-2']"
+      },
+      {
+        "description": "No match",
+        "input": "const mk = (cls, id, children = []) => ({ id, classList: { contains: (c) => cls.includes(c) }, children });\ngetElementsByClassName(mk([], 'root', [mk(['a'], 'x')]), 'hit')",
+        "expected": "[]"
+      },
+      {
+        "description": "The root itself can match",
+        "input": "const mk = (cls, id, children = []) => ({ id, classList: { contains: (c) => cls.includes(c) }, children });\ngetElementsByClassName(mk(['hit'], 'r'), 'hit').map((n) => n.id)",
+        "expected": "['r']"
+      },
+      {
+        "description": "DFS (pre-order) visits depth first",
+        "input": "tree: root → [A → [A1, A2], B]\ndfs(root)",
+        "expected": "['root', 'A', 'A1', 'A2', 'B']"
+      },
+      {
+        "description": "BFS visits level by level",
+        "input": "tree: root → [A → [A1, A2], B]\nbfs(root)",
+        "expected": "['root', 'A', 'B', 'A1', 'A2']"
       }
     ]
   },
@@ -1655,15 +2705,50 @@
       "sliding-window"
     ],
     "promptSeed": "Merge overlapping intervals after sorting by start, handling touching intervals and unsorted input. Then solve longest substring without repeating characters using a sliding window in O(n).",
-    "starterCode": "function mergeIntervals(intervals) {\n  intervals.sort((a, b) => a[0] - b[0]);\n  const res = [intervals[0]];\n  for (let i = 1; i < intervals.length; i++) {\n    const [s, e] = intervals[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}",
+    "starterCode": "function mergeIntervals(intervals) {\n  if (!intervals.length) return [];\n  intervals.sort((a, b) => a[0] - b[0]);\n  const res = [intervals[0]];\n  for (let i = 1; i < intervals.length; i++) {\n    const [s, e] = intervals[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}",
     "testHarness": "const r = mergeIntervals([[1,4],[4,5]]);\nconsole.log('Touching intervals merged [[1,5]]:', JSON.stringify(r) === '[[1,5]]' ? 'PASS' : 'FAIL');",
-    "solution": "function mergeIntervals(intervals) {\n  intervals.sort((a, b) => a[0] - b[0]);\n  const res = [intervals[0]];\n  for (let i = 1; i < intervals.length; i++) {\n    const [s, e] = intervals[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}",
-    "referenceSolution": "function mergeIntervals(intervals) {\n  intervals.sort((a, b) => a[0] - b[0]);\n  const res = [intervals[0]];\n  for (let i = 1; i < intervals.length; i++) {\n    const [s, e] = intervals[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}",
+    "solution": "function mergeIntervals(intervals) {\n  if (!intervals.length) return [];\n  intervals.sort((a, b) => a[0] - b[0]);\n  const res = [intervals[0]];\n  for (let i = 1; i < intervals.length; i++) {\n    const [s, e] = intervals[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}",
+    "referenceSolution": "function mergeIntervals(intervals) {\n  if (!intervals.length) return [];\n  intervals.sort((a, b) => a[0] - b[0]);\n  const res = [intervals[0]];\n  for (let i = 1; i < intervals.length; i++) {\n    const [s, e] = intervals[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}",
     "testCases": [
       {
-        "description": "Touching intervals merged [[1,5]]",
-        "input": "mergeIntervals([[1,4],[4,5]])",
-        "expected": "'[[1,5]]'"
+        "description": "Touching intervals merge",
+        "input": "mergeIntervals([[1, 4], [4, 5]])",
+        "expected": "[[1, 5]]"
+      },
+      {
+        "description": "Unsorted input",
+        "input": "mergeIntervals([[8, 10], [1, 3], [2, 6]])",
+        "expected": "[[1, 6], [8, 10]]"
+      },
+      {
+        "description": "Disjoint intervals stay separate",
+        "input": "mergeIntervals([[1, 2], [3, 4]])",
+        "expected": "[[1, 2], [3, 4]]"
+      },
+      {
+        "description": "Contained interval",
+        "input": "mergeIntervals([[1, 4], [2, 3]])",
+        "expected": "[[1, 4]]"
+      },
+      {
+        "description": "Empty input",
+        "input": "mergeIntervals([])",
+        "expected": "[]"
+      },
+      {
+        "description": "Longest substring without repeating characters",
+        "input": "lengthOfLongestSubstring('abcabcbb')",
+        "expected": "3"
+      },
+      {
+        "description": "…all identical",
+        "input": "lengthOfLongestSubstring('bbbbb')",
+        "expected": "1"
+      },
+      {
+        "description": "…repeat inside the window",
+        "input": "lengthOfLongestSubstring('pwwkew')",
+        "expected": "3"
       }
     ]
   },
@@ -1688,14 +2773,34 @@
     "referenceSolution": "type AsyncState<T> =\n  | { status: 'idle' }\n  | { status: 'loading' }\n  | { status: 'success'; data: T }\n  | { status: 'error'; error: Error };\n\nfunction formatState<T>(state: AsyncState<T>): string {\n  switch (state.status) {\n    case 'idle': return 'Idle';\n    case 'loading': return 'Loading...';\n    case 'success': return `Loaded: ${JSON.stringify(state.data)}`;\n    case 'error': return `Failed: ${state.error.message}`;\n    default: {\n      const _exhaustiveCheck: never = state;\n      throw new Error(`Unhandled state: ${_exhaustiveCheck}`);\n    }\n  }\n}",
     "testCases": [
       {
-        "description": "Success state format",
+        "description": "idle",
+        "input": "formatState({ status: 'idle' })",
+        "expected": "'Idle'"
+      },
+      {
+        "description": "loading",
+        "input": "formatState({ status: 'loading' })",
+        "expected": "'Loading...'"
+      },
+      {
+        "description": "success serialises its data",
         "input": "formatState({ status: 'success', data: { id: 1 } })",
         "expected": "'Loaded: {\"id\":1}'"
       },
       {
-        "description": "Loading state format",
-        "input": "formatState({ status: 'loading' })",
-        "expected": "'Loading...'"
+        "description": "error shows the message",
+        "input": "formatState({ status: 'error', error: new Error('boom') })",
+        "expected": "'Failed: boom'"
+      },
+      {
+        "description": "Compile time: unknown status is rejected",
+        "input": "formatState({ status: 'oops' })",
+        "expected": "TS2345 — Argument of type '{ status: \"oops\"; }' is not assignable to parameter of type 'AsyncState<unknown>'"
+      },
+      {
+        "description": "Compile time: forgetting a case",
+        "input": "add { status: 'cancelled' } to AsyncState without a case",
+        "expected": "TS2322 — Type '{ status: \"cancelled\" }' is not assignable to type 'never' (in the default branch)"
       }
     ]
   },
@@ -1720,9 +2825,24 @@
     "referenceSolution": "async function apiGet<T>(url: string): Promise<T> {\n  const res = await fetch(url);\n  if (!res.ok) {\n    throw new Error(`Request failed with status ${res.status}`);\n  }\n  return (await res.json()) as T;\n}",
     "testCases": [
       {
-        "description": "Typed GET matches structure",
-        "input": "typeof todo.id",
-        "expected": "'number' && typeof todo.title === 'string'"
+        "description": "Resolves typed JSON",
+        "input": "interface Todo { id: number; title: string; completed: boolean; }\n(await apiGet<Todo>('https://jsonplaceholder.typicode.com/todos/1')).title",
+        "expected": "'delectus aut autem'"
+      },
+      {
+        "description": "Whole payload",
+        "input": "interface Todo { id: number; title: string; completed: boolean; }\nawait apiGet<Todo>('https://jsonplaceholder.typicode.com/todos/1')",
+        "expected": "{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }"
+      },
+      {
+        "description": "Non-2xx rejects with an Error including the status",
+        "input": "apiGet<unknown>('https://jsonplaceholder.typicode.com/invalid-path-404')",
+        "expected": "Rejects with Error — message contains \"404\""
+      },
+      {
+        "description": "Compile time: result is typed as T",
+        "input": "const t = await apiGet<Todo>(url);\nt.nope",
+        "expected": "TS2339 — Property 'nope' does not exist on type 'Todo'"
       }
     ]
   },
@@ -1747,9 +2867,34 @@
     "referenceSolution": "type DeepPartial<T> = {\n  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];\n};\n\ntype PickByType<T, ValueType> = {\n  [P in keyof T as T[P] extends ValueType ? P : never]: T[P];\n};",
     "testCases": [
       {
-        "description": "PickByType evaluated correctly",
-        "input": "check.id",
-        "expected": "1 && check.age === 30"
+        "description": "PickByType keeps only number-valued keys",
+        "input": "PickByType<{ id: number; name: string; age: number; active: boolean }, number>",
+        "expected": "{ id: number; age: number }"
+      },
+      {
+        "description": "PickByType, string",
+        "input": "PickByType<{ a: string; b: boolean }, string>",
+        "expected": "{ a: string }"
+      },
+      {
+        "description": "PickByType, nothing matches",
+        "input": "PickByType<{ a: string }, number>",
+        "expected": "{}"
+      },
+      {
+        "description": "DeepPartial makes every nested property optional",
+        "input": "DeepPartial<{ a: number; b: { c: string; d: { e: boolean } } }>",
+        "expected": "{ a?: number; b?: { c?: string; d?: { e?: boolean } } }"
+      },
+      {
+        "description": "Runtime: value typed with PickByType compiles and runs",
+        "input": "const check: PickByType<{ id: number; name: string; age: number }, number> = { id: 1, age: 30 };\n[check.id, check.age]",
+        "expected": "[1, 30]"
+      },
+      {
+        "description": "Compile time: extra key is rejected",
+        "input": "const x: PickByType<{ id: number; name: string }, number> = { id: 1, name: 'x' };",
+        "expected": "TS2353 — Object literal may only specify known properties; 'name' does not exist"
       }
     ]
   },
@@ -1774,9 +2919,24 @@
     "referenceSolution": "interface SelectProps<T> {\n  items: T[];\n  value: T;\n  onChange: (item: T) => void;\n  getLabel: (item: T) => string;\n}\n\nfunction renderSelect<T>(props: SelectProps<T>): string {\n  return props.items.map(item => props.getLabel(item)).join(', ');\n}",
     "testCases": [
       {
-        "description": "renderSelect output",
-        "input": "renderSelect<Item>({",
+        "description": "Labels joined",
+        "input": "interface Item { code: string; label: string; }\nconst items: Item[] = [{ code: 'a', label: 'Option A' }, { code: 'b', label: 'Option B' }];\nrenderSelect<Item>({ items, value: items[0], onChange: () => {}, getLabel: (i) => i.label })",
         "expected": "'Option A, Option B'"
+      },
+      {
+        "description": "Works with other T",
+        "input": "renderSelect<number>({ items: [1, 2, 3], value: 2, onChange: () => {}, getLabel: (n) => `#${n}` })",
+        "expected": "'#1, #2, #3'"
+      },
+      {
+        "description": "No items",
+        "input": "renderSelect<string>({ items: [], value: '', onChange: () => {}, getLabel: (s) => s })",
+        "expected": "''"
+      },
+      {
+        "description": "Compile time: value must have the same type as items",
+        "input": "renderSelect<string>({ items: ['a'], value: 5, onChange: () => {}, getLabel: (s) => s })",
+        "expected": "TS2322 — Type 'number' is not assignable to type 'string'"
       }
     ]
   },
@@ -1800,29 +2960,54 @@
     "referenceSolution": "function isRecord(val: unknown): val is Record<string, unknown> {\n  return typeof val === 'object' && val !== null && !Array.isArray(val);\n}\n\nfunction isError(val: unknown): val is Error {\n  return val instanceof Error || (isRecord(val) && typeof val.message === 'string');\n}",
     "testCases": [
       {
-        "description": "isRecord({})",
+        "description": "Plain object",
         "input": "isRecord({})",
         "expected": "true"
       },
       {
-        "description": "isRecord([])",
+        "description": "Object with keys",
+        "input": "isRecord({ a: 1 })",
+        "expected": "true"
+      },
+      {
+        "description": "Array is not a record",
         "input": "isRecord([])",
         "expected": "false"
       },
       {
-        "description": "isRecord(null)",
+        "description": "null is not a record",
         "input": "isRecord(null)",
         "expected": "false"
       },
       {
-        "description": "isError(new Error())",
+        "description": "Primitive is not a record",
+        "input": "isRecord('x')",
+        "expected": "false"
+      },
+      {
+        "description": "Real Error",
         "input": "isError(new Error('boom'))",
         "expected": "true"
       },
       {
-        "description": "isError(\"boom\")",
+        "description": "Error subclass",
+        "input": "isError(new TypeError('t'))",
+        "expected": "true"
+      },
+      {
+        "description": "String is not an Error",
         "input": "isError('boom')",
         "expected": "false"
+      },
+      {
+        "description": "null / empty object are not Errors",
+        "input": "isError(null) || isError({})",
+        "expected": "false"
+      },
+      {
+        "description": "Compile time: narrowing",
+        "input": "const v: unknown = { a: 1 };\nif (isRecord(v)) { v.a }  // OK\nv.a                       // outside the guard",
+        "expected": "TS2339 outside the guard — Property 'a' does not exist on type 'unknown'"
       }
     ]
   },
@@ -1847,9 +3032,29 @@
     "referenceSolution": "class TypedEmitter<Events extends Record<string, any>> {\n  private listeners = new Map<keyof Events, Array<(payload: any) => void>>();\n\n  on<K extends keyof Events>(event: K, listener: (payload: Events[K]) => void): void {\n    if (!this.listeners.has(event)) this.listeners.set(event, []);\n    this.listeners.get(event)!.push(listener);\n  }\n\n  emit<K extends keyof Events>(event: K, payload: Events[K]): void {\n    (this.listeners.get(event) || []).forEach(fn => fn(payload));\n  }\n}",
     "testCases": [
       {
-        "description": "TypedEmitter handled payload",
-        "input": "''",
+        "description": "Listener receives the typed payload",
+        "input": "interface AppEvents { login: { userId: string }; logout: undefined; }\nconst emitter = new TypedEmitter<AppEvents>();\nlet capturedId = '';\nemitter.on('login', (data) => { capturedId = data.userId; });\nemitter.emit('login', { userId: 'usr_42' });\ncapturedId",
         "expected": "'usr_42'"
+      },
+      {
+        "description": "Several listeners run in order",
+        "input": "const e = new TypedEmitter<{ n: number }>();\nconst got: number[] = [];\ne.on('n', (x) => got.push(x));\ne.on('n', (x) => got.push(x * 10));\ne.emit('n', 2);\ngot",
+        "expected": "[2, 20]"
+      },
+      {
+        "description": "Emitting with no listeners is a no-op",
+        "input": "const e = new TypedEmitter<{ n: number }>();\ne.emit('n', 1)",
+        "expected": "undefined"
+      },
+      {
+        "description": "Compile time: wrong payload type",
+        "input": "emitter.emit('login', { userId: 42 })",
+        "expected": "TS2322 — Type 'number' is not assignable to type 'string'"
+      },
+      {
+        "description": "Compile time: unknown event name",
+        "input": "emitter.emit('nope', 1)",
+        "expected": "TS2345 — Argument of type '\"nope\"' is not assignable to parameter of type 'keyof AppEvents'"
       }
     ]
   }
