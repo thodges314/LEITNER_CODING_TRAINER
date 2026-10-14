@@ -128,30 +128,104 @@ Gotchas learned the hard way:
 
 ## 7. Roadmap
 
-### 7.1 Difficulty ladder holes (highest value: the owner wants "simple first, then harder" on every topic)
-Concepts whose lowest rung is still ≥ 3 (so the topic opens at intermediate level): `event-loop`, `promise-combinators`,
-`compound`, `resilience`, `react-perf`, `state-management`, `a11y-components`, `typeahead`, `infinite-scroll`, `middleware`,
-`iterators`, `serialization`, `ts-types`, `ts-unions`, `ts-generics`. Add d1/d2 cards, e.g.:
-event-loop output-ordering quiz as a function; `Promise.all` by hand from loops; static `Tabs` without ARIA; a minimal
-`ErrorBoundary`; `useCounter` + `React.memo` basics; `useSyncExternalStore` read-only subscription; `Object.entries` serializers;
-basic utility types (`Partial`, `Pick` re-implemented); simple discriminated union `switch`; identity generic `<T>`.
-Also only one d5 card exists; add a few expert cards per core area (e.g. Promise/A+ edge cases, virtualized list with variable
-heights, reconciler diffing).
+### 7.0 Coverage assessment against contemporary front-end interviews
 
-### 7.2 Missing card families (from the interview-coverage audit)
-- **CSS/layout** (none): centering, flex/grid layouts, specificity (a pure-JS specificity card exists), responsive/sticky. Hard to
-  auto-grade in jsdom (no layout engine); consider Playwright-based visual harnesses or "write CSS that satisfies computed-style assertions".
-- **React components**: star rating, countdown/stopwatch, data table (sort/filter/paginate), file-explorer tree, virtualized list,
-  dropdown menu with roving focus, undo/redo hook, form-state hook, multi-step form, toast queue, optimistic like button,
-  drag-sortable list, carousel. (Specs for ~14 of these were drafted; none built yet — the `react-components` track is empty.)
-- **Algorithms**: linked lists (reverse, cycle), min-stack / queue-from-stacks, BST (validate, invert, LCA), grid DFS (islands), trie,
-  heap/top-K, DP basics (stairs, coin change), backtracking (permutations, subsets, parentheses), sorting implementations,
-  matrix rotate/spiral, string basics (anagram, palindrome, longest common prefix), binary-search variants.
-- **TypeScript**: conditional types with `infer` (`ReturnType`, `Awaited`), template-literal types, overloads, branded types,
-  `satisfies`/`as const`, assertion functions, typed reducer/context.
-- **Testing & libraries** (`testing-tooling` track): implement `jest.fn`/spy, fake timers, a tiny `expect`; D3-flavoured pure logic
-  (`scaleLinear`, band scale, SVG path generator); Next.js-flavoured pure logic (file-based route matching with `[id]`/`[...slug]`).
-- **Modern React 19** (`use`, `useOptimistic`, `useActionState`, `useTransition`): needs sandbox globals and async-transition-safe `act`.
+Basis: what typical front-end loops ask (JS-utility rounds, "build this component" rounds, React/hooks questions, a11y, light
+algorithms, TS). This is a judgement from experience with those formats, not a live survey. Re-assess when the deck changes.
+
+| Area | Status | Cards now | What is there / what is missing |
+|---|---|---|---|
+| JS utilities (debounce, throttle, memoize, curry, bind, deep-clone, emitter, LRU) | **Strong** (some duplication) | ~35 | Full ladders for rate-limiting, currying, LRU, clone/equality. Duplicates are intentional variants (see 7.3) |
+| Async plumbing (pool, retry, queue, allSettled, abort, timeout) | **Strong** | ~20 | Plus `Promise` class from scratch and `promisify`. Missing: `Promise.any`/`AggregateError`, cancelable promise, polling, async generators |
+| Core language (closures, `this`, prototypes, iterators) | **Medium** | ~10 | closures, `new`/`instanceof`/`Object.create`, generators, `JSON.stringify`. Missing: output-prediction/hoisting/TDZ quizzes, `Symbol`/`Proxy`/`WeakMap`, getters/setters, class fields, tagged templates |
+| String/format utilities | **Medium** | 5 | classNames, query string, formatters, style parsing, CSS specificity. Missing: template engine, markdown-lite, slugify, diffing |
+| DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize/Intersection observers (outside React), `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame` loops, Web Workers |
+| React hooks and state | **Medium** | ~25 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer. Missing: undo/redo, form-state hook, `useLayoutEffect`, `useDeferredValue`/`useTransition`, optimistic updates, React 19 APIs |
+| React components ("build this") | **Weak** | ~8 | Typeahead, modal, tabs, infinite list only. **`react-components` track is empty** |
+| Algorithms | **Weak** | ~19 | arrays/hash/two-pointer/window/stack/binary-search/BFS/intervals/trees-basics. Missing: linked lists, heaps, tries, graphs (grid DFS, topo sort), DP, backtracking, sorting, matrix, bit tricks |
+| TypeScript | **Weak-medium** | 6 | unions, generics, utility types, guards, typed emitter. Missing: conditional/`infer`, template-literal types, overloads, branded types, `satisfies`, assertion functions |
+| Accessibility | **Weak** | 3 | modal focus, tabs ARIA, typeahead. Missing: menu/dropdown roving focus, `aria-live`, accessible forms/errors, skip links, focus trap utilities |
+| CSS/layout | **None** (specificity only) | 1 | Needs a different grading approach (see below) |
+| Testing (Jest/RTL) | **None** | 0 | `testing-tooling` track empty |
+| Frameworks/libs (Next.js, D3) | **None** | 0 | listed in the owner's stack; see pure-logic approach below |
+| System-design style prompts | **None** | 0 | Out of scope for auto-graded cards; see "complete projects" note |
+
+Bottom line: JS utilities and async are the strongest part of the deck. The weakest relative to interview frequency are
+**React component builds, algorithms (graph/DP/linked-list/heap/trie), accessibility, TypeScript type-level, CSS and testing**.
+
+### 7.1 Difficulty ladder holes (the owner wants "simple first, then harder" on every concept)
+Concepts whose lowest rung is still ≥ 3 (computed from `scripts/difficulty.json`): `a11y-components`(4), `compound`(3), `event-loop`(3),
+`infinite-scroll`(3), `iterators`(3), `middleware`(4), `promise-combinators`(3), `react-perf`(3), `resilience`(3), `serialization`(4),
+`state-management`(4), `ts-generics`(3), `ts-types`(4), `ts-unions`(3), `typeahead`(4). Also only one d5 card exists.
+Add the rung(s) below; each must follow §4 (reference, cases, harness, empty-solution test, `difficulty.json` entry, same `concept`).
+
+| concept | proposed easy rung (d1/d2) | the ladder then continues with |
+|---|---|---|
+| event-loop | d2 "order of sync/microtask/timeout": function `order()` returning the log array for a fixed snippet it must *schedule itself* | existing trace card (d3), then d4 `nextTick`/`setImmediate`-style scheduler |
+| promise-combinators | d2 "all by hand": `all(promises)` using a counter, no `Promise.all` | existing allSettled/all polyfill (d3), d4 `any` + `AggregateError`, d4 `race` with cancellation |
+| compound | d1 static `Tabs` (no context); d2 `Accordion` with `useState` | Tabs compound (d3), d4 controlled/uncontrolled + roving focus |
+| resilience | d2 minimal `ErrorBoundary` (fallback only) | reset/resetKeys (d3), d4 retry with backoff around Suspense |
+| react-perf | d1 "why did it re-render" counter component; d2 `useMemo` for a derived list | `memo` + `useCallback` (d3), d4 context-split to avoid re-renders, d5 virtualization |
+| state-management | d2 read-only `useSyncExternalStore` subscribe to `window` width | external store (d4), d5 middleware/devtools-style store |
+| a11y-components | d2 accessible `Button` toggle (`aria-pressed`), d2 labelled form field with error (`aria-describedby`) | modal focus (d4), menu with roving focus (d4), d5 combobox |
+| typeahead | d2 filter-as-you-type list (no async) | async typeahead with race handling (d4), d5 keyboard + a11y combobox |
+| infinite-scroll | d2 "paginated list with Load more" | observer-based (d3), list variant (d4), d5 virtualized infinite list |
+| middleware | d2 `compose(fns)` for `(ctx, next)` functions | express chain (d4), d5 error-handling + async middleware |
+| iterators | d1 class with `[Symbol.iterator]`; d2 custom `Range` iterable | generators/lazy utilities (d3), d4 async generators + `for await` |
+| serialization | d1 serialize primitives/arrays only | `JSON.stringify` full (d4), d5 `JSON.parse` from scratch |
+| ts-generics | d1 identity/`first<T>(arr)`; d2 `Box<T>`/`Result<T,E>` | api client (d3), props generics (d3), d4 constrained/`keyof` generics |
+| ts-unions | d1 narrow with `typeof`/`in`; d2 discriminated union switch | exhaustiveness (d3), d4 reducer action unions |
+| ts-types | d1 re-implement `Partial`/`Readonly`/`Pick`; d2 `Record`, `Omit` | custom utility types (d4), d5 `infer` + template-literal types |
+
+How to fill: authoring recipe is §4. Keep the rung's **concept** string identical to its siblings so the ladder gates correctly; for a
+new concept pick a short kebab-case name and add it to `difficulty.json`. Aim for 4-8 explicit cases per card; each case a concrete
+input and a concrete expected value, never "returns something sensible".
+
+### 7.2 Missing card families — what to build and how to grade it
+
+Grading approaches available today: (a) **pure functions** graded from input/expected pairs (generated harness; best, cheapest);
+(b) **React/DOM** graded with `$dom` in jsdom/real DOM (hand-written harness + labelled `r()` cases);
+(c) **type-level** graded with `@ts-expect-error` lines in `<id>.extra.js` (TS mode, strict).
+
+1. **React components** (new cards go in the empty `react-components` track; hand-written harness, approach b). Specs already drafted:
+   - `StarRating({value,onChange,max})` radiogroup, hover preview, arrow keys, roving tabindex (d2).
+   - `Countdown({seconds,onDone,tickMs})` Start/Pause/Reset, `role="timer"`, cleanup (d2).
+   - `DataTable({rows,columns,pageSize})` sortable headers with `aria-sort` cycling, numeric vs string sort, filter input, `Page x of y`
+     (d4). Add an easy rung: static table from rows/columns (d1) and sort-only (d2).
+   - `FileTree({nodes,onSelect})` recursive, `aria-expanded`, only expanded children rendered (d3).
+   - `VirtualList({items,itemHeight,height,overscan})` windowed rendering from `scrollTop` (d4; note jsdom has no layout, so the
+     harness defines `scrollTop` via `Object.defineProperty` and fires `scroll`).
+   - `DropdownMenu` roving focus, Escape/outside-click close, disabled items (d4). `useHistory` undo/redo (d3), `useForm` (d3).
+   - Further: toast queue, multi-step form, optimistic like button (rollback on rejection), drag-sortable list (keyboard fallback),
+     image carousel, star/like counters, accordion, pagination, progress bar, tooltip/popover positioning, theme switcher.
+   - Each component card should state its **exact DOM contract** (roles, labels, button texts) in the prompt, because the harness queries by those.
+2. **Algorithms** (pure functions, approach a; track `algorithms`): linked list (`reverseList`, `hasCycle`, `mergeTwoLists`; nodes `{val,next}`
+   built with a one-line helper in each case), `MinStack` + queue from two stacks, BST (`isValidBST`, `invertTree`, `lowestCommonAncestor`),
+   `numIslands` (grid DFS/BFS) + `floodFill`, `Trie` (+ `wordsWithPrefix`), `MinHeap` + `topKFrequent`, DP (`climbStairs`, `coinChange`, LIS),
+   backtracking (`permute`, `subsets`, `generateParenthesis` — normalise ordering in the case input), sorting (`mergeSort`, `quickSort`
+   compared with native sort), matrix (`rotate90`, `spiralOrder`), strings (`isAnagram`, `isPalindrome`, `groupAnagrams`, `longestCommonPrefix`),
+   binary-search variants (`lowerBound`, rotated array, `sqrt`). Give each family a d1 rung (e.g. `reverseList` before `hasCycle`).
+3. **TypeScript** (approach c; track `typescript-patterns`): conditional types with `infer` (`ReturnTypeOf`, `Unwrap`, `ElementOf`), template-literal
+   types (`CamelCase`, `EventName`), overloads, branded IDs, `satisfies`/`as const`, assertion functions, typed reducer/context. The harness is
+   mostly `// @ts-expect-error` lines plus a few runtime `$test.check`s (see `ts-custom-utility-types.extra.js`). Real lib types are available.
+4. **Testing & libraries** (`testing-tooling`; pure functions): `mockFn()` (`calls`, `mockReturnValue`, `mockImplementation`), `spyOn`, fake timers
+   (`advanceTimersByTime`), a mini `expect().toBe/toEqual`; D3-flavoured `scaleLinear`/`scaleBand`/SVG `linePath`; Next.js-flavoured file-route
+   matcher (`[id]`, `[...slug]`, route groups) — all gradable as pure input/output without the real libraries.
+5. **CSS/layout**: jsdom has no layout engine, so only logic-level cards work there (specificity, shorthand parsing, BEM name builders,
+   media-query matching, grid-template parsing). For real "make this centre/flex" cards add **Playwright** (7.4) and grade with
+   `getBoundingClientRect` assertions in a real browser; until then treat CSS as out of scope and say so in the UI.
+6. **DOM/browser**: drag-and-drop reorder (simulate `dragstart/dragover/drop`), `MutationObserver` wrapper, `ResizeObserver`/
+   `IntersectionObserver` lazy loader (mock exists), keyboard-shortcut manager, `history.pushState` router bound to `window`, `postMessage`
+   channel, `requestAnimationFrame` throttling, `Worker` message protocol (grade with a fake worker).
+7. **Language depth**: output-prediction drills expressed as functions that return the observed order/values (hoisting, TDZ, closures in loops,
+   `this` in callbacks), `Proxy`/`Reflect` validators, `WeakMap` private data, getters/setters, tagged templates, `Symbol.asyncIterator`.
+8. **React 19**: `useOptimistic`, `useActionState`, `use(promise)`, `useTransition`. Needs these hooks injected into the sandbox (add to
+   `runner.ts` names *carefully*, see §5) and an async-safe `act` path in `domTools.ts`.
+9. **"Build a complete project"**: not auto-gradable end to end. Keep this deck as the *building blocks*; optionally add "project recipes"
+   (checklists of which cards compose a todo app, typeahead page, kanban board) in the catalog as a reading aid, not graded cards.
+
+Priority for filling (value ÷ effort): ladder holes (7.1) → React components → algorithm families → TS type-level → testing/D3/Next pure-logic →
+DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 
 ### 7.3 Product features
 1. **Stats view**: per-track/concept accuracy, weak spots, streaks, time-to-solve (needs a review-history log: add
