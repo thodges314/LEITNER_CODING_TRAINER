@@ -1,8 +1,8 @@
-// generate_all_fixtures.cjs
+// scripts/generate_all_fixtures.cjs
 const fs = require("fs");
 const path = require("path");
 
-const filePath = path.join(__dirname, "src/data/topics.json");
+const filePath = path.join(__dirname, "..", "src/data/topics.json");
 if (!fs.existsSync(filePath)) {
   console.error("Error: src/data/topics.json not found.");
   process.exit(1);

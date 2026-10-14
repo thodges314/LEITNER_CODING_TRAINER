@@ -1,12 +1,12 @@
-// merge.cjs
+// scripts/merge.cjs
 const fs = require("fs");
 const path = require("path");
 
-const topicsPath = path.join(__dirname, "src/data/topics.json");
+const topicsPath = path.join(__dirname, "..", "src/data/topics.json");
 const claudePath = path.join(__dirname, "claude_topics.json");
 
 if (!fs.existsSync(claudePath)) {
-  console.error("Error: claude_topics.json not found in root.");
+  console.error("Error: claude_topics.json not found next to this script.");
   process.exit(1);
 }
 
