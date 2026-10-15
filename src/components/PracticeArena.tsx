@@ -397,7 +397,15 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       // Async IIFE execution engine with React, ReactDOM, mount, native hooks, mock fetch and `dom` tools
       const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
       const fn = new AsyncFunction(...scope.names, executableCode);
-      const result = await fn(...scope.values);
+      let runTimer: ReturnType<typeof setTimeout> | undefined;
+      const timeoutPromise = new Promise((_, reject) => {
+        runTimer = setTimeout(
+          () => reject(new Error('Execution timed out after 6000ms. Check for infinite loops or unresolved promises.')),
+          6000
+        );
+      });
+      const result = await Promise.race([fn(...scope.values), timeoutPromise]);
+      clearTimeout(runTimer);
 
       if (result !== undefined) {
         if (React.isValidElement(result) || typeof result === 'function') {
