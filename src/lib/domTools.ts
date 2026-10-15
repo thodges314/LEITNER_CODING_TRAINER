@@ -167,13 +167,24 @@ export function createDomTools() {
 
   const fire = {
     click(el: Element) {
+      if (!el || typeof el.dispatchEvent !== 'function') {
+        throw new Error('fire.click received null or invalid element. Check that the element was rendered and the selector matched.');
+      }
       act(() => {
         el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
       });
     },
     /** Types a value into an input/textarea like a user would (fires React's onChange). */
     change(el: HTMLInputElement | HTMLTextAreaElement, value: string) {
-      const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+      if (!el) {
+        throw new Error('fire.change received null or undefined element. Check that the element was rendered and the selector matched.');
+      }
+      const isTextArea = typeof HTMLTextAreaElement !== 'undefined' && el instanceof HTMLTextAreaElement;
+      const isInput = typeof HTMLInputElement !== 'undefined' && el instanceof HTMLInputElement;
+      if (!isTextArea && !isInput) {
+        throw new Error(`fire.change expected an <input> or <textarea>, but received ${el.tagName || typeof el}`);
+      }
+      const proto = isTextArea ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
       const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
       act(() => {
         setter?.call(el, value);
@@ -182,6 +193,9 @@ export function createDomTools() {
     },
     /** Dispatches keydown and returns the event so callers can inspect defaultPrevented. */
     keyDown(el: Element, key: string, init: KeyboardEventInit = {}) {
+      if (!el || typeof el.dispatchEvent !== 'function') {
+        throw new Error('fire.keyDown received null or invalid element. Check that the element was rendered and the selector matched.');
+      }
       const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init });
       act(() => {
         el.dispatchEvent(event);
@@ -190,6 +204,9 @@ export function createDomTools() {
     },
     /** Dispatches submit and returns the event (check defaultPrevented). */
     submit(el: Element) {
+      if (!el || typeof el.dispatchEvent !== 'function') {
+        throw new Error('fire.submit received null or invalid element. Check that the element was rendered and the selector matched.');
+      }
       const event = new Event('submit', { bubbles: true, cancelable: true });
       act(() => {
         el.dispatchEvent(event);
@@ -197,12 +214,18 @@ export function createDomTools() {
       return event;
     },
     focus(el: HTMLElement) {
+      if (!el || typeof el.focus !== 'function') {
+        throw new Error('fire.focus received null or invalid element. Check that the element was rendered and the selector matched.');
+      }
       act(() => {
         el.focus();
       });
     },
     /** Dispatches any DOM event inside act() (mousedown, scroll, storage, mouseover, ...). */
     event(target: EventTarget, event: Event) {
+      if (!target || typeof target.dispatchEvent !== 'function') {
+        throw new Error('fire.event received null or invalid target');
+      }
       act(() => {
         target.dispatchEvent(event);
       });
