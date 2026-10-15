@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   BOX_INTERVALS,
   GRADUATED_INTERVALS,
+  intervalForBox,
+  getGraduatedTierInterval,
   checkStagedUnlocks,
   commitCardReview,
   deleteTopicFromDeck,
@@ -222,33 +224,145 @@ describe('isTrackType', () => {
 
 describe('Graduated Interval Recall & chaining', () => {
   it('promotes on pass using graduated intervals', () => {
+    const filler = Array.from({ length: 100 }, (_, i) => card({ id: `fill-${i}` }));
+    const bigDeck = (cards: TopicItem[], over = {}) => deck([...cards, ...filler], over);
+
     // Step 1 -> 2: +3 trials
-    const { updatedCard } = commitCardReview(deck([card({ id: 'a', box: 1, streak: 0 })]), 'a', true, 'graduated-interval');
+    const { updatedCard } = commitCardReview(bigDeck([card({ id: 'a', box: 1, streak: 0 })]), 'a', true, 'graduated-interval');
     expect(updatedCard.box).toBe(2);
     expect(updatedCard.streak).toBe(1);
     expect(updatedCard.nextEligibleTrial).toBe(1 + GRADUATED_INTERVALS[2]); // 1 + 3 = 4
 
     // Step 2 -> 3: +7 trials
-    const r2 = commitCardReview(deck([card({ id: 'b', box: 2, streak: 1 })], { totalCompletedReviews: 4 }), 'b', true, 'graduated-interval');
+    const r2 = commitCardReview(bigDeck([card({ id: 'b', box: 2, streak: 1 })], { totalCompletedReviews: 4 }), 'b', true, 'graduated-interval');
     expect(r2.updatedCard.box).toBe(3);
     expect(r2.updatedCard.nextEligibleTrial).toBe(5 + GRADUATED_INTERVALS[3]); // 5 + 7 = 12
 
     // Step 3 -> 4: +16 trials
-    const r3 = commitCardReview(deck([card({ id: 'c', box: 3, streak: 2 })], { totalCompletedReviews: 12 }), 'c', true, 'graduated-interval');
+    const r3 = commitCardReview(bigDeck([card({ id: 'c', box: 3, streak: 2 })], { totalCompletedReviews: 12 }), 'c', true, 'graduated-interval');
     expect(r3.updatedCard.box).toBe(4);
     expect(r3.updatedCard.nextEligibleTrial).toBe(13 + GRADUATED_INTERVALS[4]); // 13 + 16 = 29
 
     // Step 4 -> 5: +35 trials
-    const r4 = commitCardReview(deck([card({ id: 'd', box: 4, streak: 3 })], { totalCompletedReviews: 29 }), 'd', true, 'graduated-interval');
+    const r4 = commitCardReview(bigDeck([card({ id: 'd', box: 4, streak: 3 })], { totalCompletedReviews: 29 }), 'd', true, 'graduated-interval');
     expect(r4.updatedCard.box).toBe(5);
     expect(r4.updatedCard.nextEligibleTrial).toBe(30 + GRADUATED_INTERVALS[5]); // 30 + 35 = 65
   });
 
+  it('extends tier progression beyond Tier 5 through Tier 9 and dynamically for Tier 10+', () => {
+    const filler = Array.from({ length: 2000 }, (_, i) => card({ id: `fill-${i}` }));
+    const bigDeck = (cards: TopicItem[], over = {}) => deck([...cards, ...filler], over);
+
+    // Tier 5 -> 6: +75 trials
+    const r5 = commitCardReview(bigDeck([card({ id: 'c5', box: 5, streak: 4 })], { totalCompletedReviews: 100 }), 'c5', true, 'graduated-interval');
+    expect(r5.updatedCard.box).toBe(6);
+    expect(r5.updatedCard.nextEligibleTrial).toBe(101 + GRADUATED_INTERVALS[6]); // 101 + 75 = 176
+
+    // Tier 6 -> 7: +165 trials
+    const r6 = commitCardReview(bigDeck([card({ id: 'c6', box: 6, streak: 5 })], { totalCompletedReviews: 176 }), 'c6', true, 'graduated-interval');
+    expect(r6.updatedCard.box).toBe(7);
+    expect(r6.updatedCard.nextEligibleTrial).toBe(177 + GRADUATED_INTERVALS[7]); // 177 + 165 = 342
+
+    // Tier 7 -> 8: +360 trials
+    const r7 = commitCardReview(bigDeck([card({ id: 'c7', box: 7, streak: 6 })], { totalCompletedReviews: 342 }), 'c7', true, 'graduated-interval');
+    expect(r7.updatedCard.box).toBe(8);
+    expect(r7.updatedCard.nextEligibleTrial).toBe(343 + GRADUATED_INTERVALS[8]); // 343 + 360 = 703
+
+    // Tier 8 -> 9: +800 trials
+    const r8 = commitCardReview(bigDeck([card({ id: 'c8', box: 8, streak: 7 })], { totalCompletedReviews: 703 }), 'c8', true, 'graduated-interval');
+    expect(r8.updatedCard.box).toBe(9);
+    expect(r8.updatedCard.nextEligibleTrial).toBe(704 + GRADUATED_INTERVALS[9]); // 704 + 800 = 1504
+
+    // Tier 9 -> 10: dynamic (~2.2x: Math.round(800 * 2.2) = 1760)
+    const r9 = commitCardReview(bigDeck([card({ id: 'c9', box: 9, streak: 8 })], { totalCompletedReviews: 1504 }), 'c9', true, 'graduated-interval');
+    expect(r9.updatedCard.box).toBe(10);
+    expect(getGraduatedTierInterval(10)).toBe(1760);
+    expect(intervalForBox(10, 'graduated-interval')).toBe(1760);
+    expect(r9.updatedCard.nextEligibleTrial).toBe(1505 + 1760);
+
+    // Tier 10 -> 11: dynamic (~2.2x: Math.round(1760 * 2.2) = 3872)
+    const r10 = commitCardReview(bigDeck([card({ id: 'c10', box: 10, streak: 9 })], { totalCompletedReviews: 3265 }), 'c10', true, 'graduated-interval');
+    expect(r10.updatedCard.box).toBe(11);
+    expect(getGraduatedTierInterval(11)).toBe(3872);
+    expect(intervalForBox(11, 'graduated-interval')).toBe(3872);
+  });
+
+  it('enforces active deck size ceiling guard so cards do not disappear past a deck cycle', () => {
+    // If active deck size N = 20, a promotion to Tier 6 (nominal +75) or Tier 9 (+800) is capped to N = 20 trials out
+    const activeCards = Array.from({ length: 20 }, (_, i) => card({ id: `c-${i}` }));
+    const d = deck(activeCards, { totalCompletedReviews: 10 });
+    const { updatedCard } = commitCardReview(d, 'c-0', true, 'graduated-interval');
+    // c-0 was box 1, promoted to box 2 (+3), which is <= 20, so scheduled at 11 + 3 = 14
+    expect(updatedCard.box).toBe(2);
+    expect(updatedCard.nextEligibleTrial).toBe(14);
+
+    // Promote a card from Tier 5 (next box 6, nominal +75) with 20 active cards:
+    const d5 = deck([card({ id: 'top-card', box: 5, streak: 4 }), ...activeCards.slice(1)], { totalCompletedReviews: 50 });
+    const res5 = commitCardReview(d5, 'top-card', true, 'graduated-interval');
+    expect(res5.updatedCard.box).toBe(6);
+    // 50 + 1 + min(75, 20) = 51 + 20 = 71
+    expect(res5.updatedCard.nextEligibleTrial).toBe(71);
+
+    // Promote a card from Tier 8 (next box 9, nominal +800) with 20 active cards:
+    const d8 = deck([card({ id: 'high-card', box: 8, streak: 7 }), ...activeCards.slice(1)], { totalCompletedReviews: 100 });
+    const res8 = commitCardReview(d8, 'high-card', true, 'graduated-interval');
+    expect(res8.updatedCard.box).toBe(9);
+    // 100 + 1 + min(800, 20) = 101 + 20 = 121
+    expect(res8.updatedCard.nextEligibleTrial).toBe(121);
+  });
+
   it('applies half-tier setback on failure in graduated-interval and schedules setback interval', () => {
-    const { updatedCard } = commitCardReview(deck([card({ id: 'a', box: 4, streak: 3 })], { totalCompletedReviews: 10 }), 'a', false, 'graduated-interval');
+    const filler = Array.from({ length: 100 }, (_, i) => card({ id: `fill-${i}` }));
+    const { updatedCard } = commitCardReview(deck([card({ id: 'a', box: 4, streak: 3 }), ...filler], { totalCompletedReviews: 10 }), 'a', false, 'graduated-interval');
     expect(updatedCard.box).toBe(2); // half of Tier 4
     expect(updatedCard.streak).toBe(0);
     expect(updatedCard.nextEligibleTrial).toBe(14); // nextTotal (11) + intervalForBox(2) (3) = 14
+
+    // Tier 6 failure -> Tier 3
+    const r6 = commitCardReview(deck([card({ id: 't6', box: 6, streak: 5 }), ...filler], { totalCompletedReviews: 20 }), 't6', false, 'graduated-interval');
+    expect(r6.updatedCard.box).toBe(3);
+    expect(r6.updatedCard.nextEligibleTrial).toBe(21 + 7);
+
+    // Tier 7 failure -> Tier 3
+    const r7 = commitCardReview(deck([card({ id: 't7', box: 7, streak: 6 }), ...filler], { totalCompletedReviews: 30 }), 't7', false, 'graduated-interval');
+    expect(r7.updatedCard.box).toBe(3);
+
+    // Tier 8 failure -> Tier 4
+    const r8 = commitCardReview(deck([card({ id: 't8', box: 8, streak: 7 }), ...filler], { totalCompletedReviews: 40 }), 't8', false, 'graduated-interval');
+    expect(r8.updatedCard.box).toBe(4);
+  });
+
+  it('preserves existing localStorage state and allows existing Tier 5 cards to advance to Tier 6', () => {
+    // Simulate existing stored deck where a card has progressed to Tier 5
+    const storedState: LeitnerDeckState = {
+      topics: [
+        card({ id: 'veteran-card', box: 5, streak: 8, nextEligibleTrial: 65, status: 'active' }),
+        card({ id: 'other-card', box: 2, streak: 1, nextEligibleTrial: 15, status: 'active' }),
+        ...Array.from({ length: 100 }, (_, i) => card({ id: `deck-${i}`, box: 3, streak: 2, nextEligibleTrial: 20, status: 'active' })),
+      ],
+      totalCompletedReviews: 65,
+      unlockedStageCount: 3,
+      algorithm: 'graduated-interval',
+    };
+
+    // Hydrate state through mergeStoredWithSeed
+    const seedTopics = [card({ id: 'veteran-card' }), card({ id: 'other-card' })];
+    const hydrated = mergeStoredWithSeed(storedState, seedTopics);
+
+    // Strict requirement checks:
+    const veteranHydrated = hydrated.topics.find((t) => t.id === 'veteran-card')!;
+    expect(veteranHydrated.box).toBe(5);
+    expect(veteranHydrated.streak).toBe(8);
+    expect(veteranHydrated.nextEligibleTrial).toBe(65);
+    expect(hydrated.totalCompletedReviews).toBe(65);
+
+    // Seamlessly promote Tier 5 card on next pass:
+    const reviewResult = commitCardReview(hydrated, 'veteran-card', true, 'graduated-interval');
+    expect(reviewResult.updatedCard.box).toBe(6);
+    expect(reviewResult.updatedCard.streak).toBe(9);
+    // Scheduled at 66 + 75 = 141 (within 102 active cards)
+    expect(reviewResult.updatedCard.nextEligibleTrial).toBe(66 + 75);
+    expect(reviewResult.nextState.totalCompletedReviews).toBe(66);
   });
 
   it('prioritizes due in-flight cards over introducing new unseen cards', () => {
@@ -311,10 +425,14 @@ describe('scheduling algorithm switching and backup', () => {
     expect(getSchedulingAlgorithm(updated)).toBe('graduated-interval');
   });
 
-  it('preserves algorithm in backup serialization and parsing', () => {
-    const json = JSON.stringify({ topics: [card({ id: 'x' })], algorithm: 'graduated-interval' });
+  it('preserves algorithm and high-tier cards in backup serialization and parsing', () => {
+    const json = JSON.stringify({
+      topics: [card({ id: 'x', box: 7, streak: 6 })],
+      algorithm: 'graduated-interval',
+    });
     const parsed = parseDeckBackup(json);
     expect(parsed.algorithm).toBe('graduated-interval');
+    expect(parsed.topics[0].box).toBe(7);
   });
 
   it('clears drafts on review commit, card reset, and card deletion', () => {

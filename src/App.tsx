@@ -442,6 +442,7 @@ export function App() {
             key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
+            activeDeckSize={deckState.topics.filter((t) => t.status === 'active').length}
             algorithm={algorithm}
             onCommitReview={handleCommitReview}
             onSkipCard={handleSkipCard}
@@ -482,7 +483,7 @@ export function App() {
       >
         <div>
           {algorithm === 'graduated-interval'
-            ? 'Graduated Interval Recall: Tier 1 (+1) • Tier 2 (+3) • Tier 3 (+7) • Tier 4 (+16) • Tier 5 (+35)'
+            ? 'Graduated Interval Recall: Tier 1 (+1) • Tier 2 (+3) • Tier 3 (+7) • Tier 4 (+16) • Tier 5 (+35) • Tier 6 (+75) • Tier 7 (+165) • Tier 8 (+360) • Tier 9 (+800)'
             : 'Leitner Spaced Retrieval: Box 1 (+1) • Box 2 (+4) • Box 3 (+10) • Box 4 (+22) • Box 5 (+45)'}
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>

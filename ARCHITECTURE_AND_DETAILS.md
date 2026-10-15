@@ -76,11 +76,13 @@ Located in [leitner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_C
 - **Immediate Reinforcement Drill**: Triggers an immediate practice drill on the failed card (see Section 3.3).
 
 ### 3.2 Graduated Interval Recall & Chaining (`graduated-interval`)
-- **Tiers 1–7**: Exponential micro-spaced review intervals: `[1, 2, 5, 12, 28, 65, 150]`.
-- **Pass Rule**: Promotes card to next tier (`tier + 1`, max 7).
-- **Fail Rule**: Applies a half-tier setback `Math.max(1, Math.floor(currentTier / 2))` with streak reset to 0, scheduled at setback interval `nextTotal + intervalForBox(setbackTier)`.
+- **Tiers 1–9**: Geometric spaced review intervals: `Tier 1 (+1) • Tier 2 (+3) • Tier 3 (+7) • Tier 4 (+16) • Tier 5 (+35) • Tier 6 (+75) • Tier 7 (+165) • Tier 8 (+360) • Tier 9 (+800)`.
+- **Dynamic Tier 10+ Scaling**: Dynamically continues geometric growth factor (~2.2x per tier, `Math.round(800 * Math.pow(2.2, tier - 9))`) so mastered cards continuously cycle on long maintenance intervals rather than stalling or hard-capping.
+- **Active Deck Ceiling Guard**: If a calculated tier offset exceeds the active deck size $N$, the scheduled offset is safely capped to $N$ trials out so cards don't disappear past a full rotation through the deck.
+- **Pass Rule**: Promotes card to next tier (`tier + 1`, extensible beyond Tier 5 into Tiers 6, 7, 8, 9, 10+).
+- **Fail Rule**: Applies a half-tier setback `Math.max(1, Math.floor(currentTier / 2))` with streak reset to 0, scheduled at setback interval `nextTotal + intervalForBox(setbackTier, 'graduated-interval', activeDeckSize)`.
 - **Immediate Reinforcement Drill**: Triggers an immediate practice drill on the failed card (see Section 3.3).
-- **Micro-Chaining Queue**: Cards with streak 0 or Tier 1 are prioritized at the front of the eligibility queue for immediate chaining reinforcement before longer intervals.
+- **Active Working Memory Chaining**: Cards below Tier 5 form an active working chain (capacity 4). Once cards consolidate to Tier 5+, new unseen rungs enter the rotation.
 
 ### 3.3 Immediate Reinforcement Drill (Zero Stat Impact)
 - When a user commits a failed card review, the cold-start failure is recorded into deck statistics (applying the appropriate setback tier and scheduling its future recall trial).

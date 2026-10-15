@@ -51,6 +51,7 @@ import { getTimedModeEnabled, getTimedModeDuration } from '../lib/timedMode';
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
   totalCompletedReviews: number;
+  activeDeckSize?: number;
   algorithm?: SpacedAlgorithm;
   onCommitReview: (passed: boolean) => void;
   onSkipCard: () => void;
@@ -62,6 +63,7 @@ interface PracticeArenaProps {
 export const PracticeArena: React.FC<PracticeArenaProps> = ({
   currentCard,
   totalCompletedReviews,
+  activeDeckSize,
   algorithm = 'leitner',
   onCommitReview,
   onSkipCard,
@@ -668,9 +670,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             </span>
             <DifficultyBadge card={currentCard} />
 
-            {/* Leitner Box Progression Badges */}
+            {/* Leitner Box / Tier Progression Badges */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {[1, 2, 3, 4, 5].map((b) => {
+              {(algorithm === 'graduated-interval'
+                ? Array.from({ length: Math.max(5, Math.min(9, currentCard.box)) }, (_, i) => i + 1)
+                : [1, 2, 3, 4, 5]
+              ).map((b) => {
                 const isCurrent = currentCard.box === b;
                 const isPast = currentCard.box > b;
                 return (
@@ -686,7 +691,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                       fontSize: '11px',
                       fontWeight: isCurrent ? 700 : 500,
                       backgroundColor: isCurrent
-                        ? `var(--box-${b})`
+                        ? `var(--box-${Math.min(9, b)})`
                         : isPast
                         ? 'rgba(255, 255, 255, 0.12)'
                         : 'rgba(255, 255, 255, 0.04)',
@@ -694,12 +699,32 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                       border: isCurrent ? '1px solid white' : '1px solid transparent',
                       transition: 'all 0.2s',
                     }}
-                    title={`${algorithm === 'graduated-interval' ? 'Tier' : 'Box'} ${b} (+${intervalForBox(b, algorithm)} reviews)`}
+                    title={`${algorithm === 'graduated-interval' ? 'Tier' : 'Box'} ${b} (+${intervalForBox(b, algorithm, activeDeckSize)} reviews)`}
                   >
-                    B{b}
+                    {algorithm === 'graduated-interval' ? `T${b}` : `B${b}`}
                   </div>
                 );
               })}
+              {algorithm === 'graduated-interval' && currentCard.box > 9 && (
+                <div
+                  style={{
+                    width: '32px',
+                    height: '24px',
+                    borderRadius: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    backgroundColor: 'var(--box-9)',
+                    color: '#090c12',
+                    border: '1px solid white',
+                  }}
+                  title={`Tier ${currentCard.box} (+${intervalForBox(currentCard.box, algorithm, activeDeckSize)} reviews)`}
+                >
+                  T{currentCard.box}
+                </div>
+              )}
             </div>
 
             {/* Streak Badge */}
@@ -1050,6 +1075,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           submittedCode={code}
           result={evalResult}
           totalCompletedReviews={totalCompletedReviews}
+          activeDeckSize={activeDeckSize}
           algorithm={algorithm}
           onCommit={handleCommit}
           onRetry={() => {

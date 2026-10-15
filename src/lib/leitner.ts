@@ -28,7 +28,7 @@ export interface TopicItem {
   id: string;
   track: TrackType;
   title: string;
-  box: number; // 1 to 5
+  box: number; // 1 to 5 (Leitner) or 1+ (Graduated Tiers)
   streak: number;
   nextEligibleTrial: number; // The global trial index when this card can next appear
   status: 'active' | 'locked';
@@ -109,6 +109,11 @@ export const BOX_INTERVALS: Record<number, number> = {
  * Step 3: +7 trials (graduated consolidation)
  * Step 4: +16 trials (intermediate retention)
  * Step 5: +35 trials (mastered long-term memory)
+ * Step 6: +75 trials (~2.2x geometric expansion)
+ * Step 7: +165 trials
+ * Step 8: +360 trials
+ * Step 9: +800 trials
+ * Step 10+: dynamic geometric growth (~2.2x per tier) for continuous maintenance
  */
 export const GRADUATED_INTERVALS: Record<number, number> = {
   1: 1,
@@ -116,6 +121,10 @@ export const GRADUATED_INTERVALS: Record<number, number> = {
   3: 7,
   4: 16,
   5: 35,
+  6: 75,
+  7: 165,
+  8: 360,
+  9: 800,
 };
 
 export const TRACK_METADATA: Record<string, { label: string; color: string; bg: string; border: string }> = {
@@ -297,9 +306,26 @@ export function deletePreset(state: LeitnerDeckState, name: string): LeitnerDeck
   return nextState;
 }
 
-export function intervalForBox(box: number, algorithm: SpacedAlgorithm = 'leitner'): number {
+export function getGraduatedTierInterval(tier: number): number {
+  if (tier <= 1) return 1;
+  if (tier in GRADUATED_INTERVALS) {
+    return GRADUATED_INTERVALS[tier];
+  }
+  // Dynamic geometric progression (~2.2x) for Tier 10 and beyond
+  return Math.round(800 * Math.pow(2.2, tier - 9));
+}
+
+export function intervalForBox(
+  box: number,
+  algorithm: SpacedAlgorithm = 'leitner',
+  activeDeckSize?: number
+): number {
   if (algorithm === 'graduated-interval') {
-    return GRADUATED_INTERVALS[box] ?? 1;
+    const raw = getGraduatedTierInterval(box);
+    if (typeof activeDeckSize === 'number' && activeDeckSize > 0) {
+      return Math.max(1, Math.min(raw, activeDeckSize));
+    }
+    return raw;
   }
   return BOX_INTERVALS[box] ?? 1;
 }
@@ -555,6 +581,7 @@ export function commitCardReview(
   const nextTotal = currentTotal + 1;
   let reviewedTrack: TrackType | undefined = state.lastReviewedTrack;
   let updatedCard: TopicItem | null = null;
+  const activeDeckSize = state.topics.filter((t) => t.status === 'active').length;
 
   const updatedTopics = state.topics.map((item) => {
     if (item.id !== topicId) return item;
@@ -565,13 +592,13 @@ export function commitCardReview(
     let nextEligibleTrial: number;
 
     if (passed) {
-      nextBox = Math.min(5, item.box + 1);
+      nextBox = algo === 'graduated-interval' ? item.box + 1 : Math.min(5, item.box + 1);
       nextStreak = item.streak + 1;
-      nextEligibleTrial = nextTotal + intervalForBox(nextBox, algo);
+      nextEligibleTrial = nextTotal + intervalForBox(nextBox, algo, activeDeckSize);
     } else {
       nextBox = algo === 'graduated-interval' ? Math.max(1, Math.floor(item.box / 2)) : 1;
       nextStreak = 0;
-      nextEligibleTrial = nextTotal + intervalForBox(nextBox, algo);
+      nextEligibleTrial = nextTotal + intervalForBox(nextBox, algo, activeDeckSize);
     }
 
     const modified: TopicItem = {
@@ -894,14 +921,18 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
   if (!parsed || !Array.isArray(parsed.topics)) {
     throw new Error('Invalid Leitner backup file: missing topics array.');
   }
-  const validTopics: TopicItem[] = parsed.topics.map((item: Record<string, unknown>) => ({
-    id: String(item.id || `topic-${Math.random().toString(36).slice(2)}`),
-    track: isTrackType(item.track) ? item.track : 'algorithms',
-    title: String(item.title || 'Untitled Topic'),
-    box: Math.max(1, Math.min(5, Number(item.box) || 1)),
-    streak: Math.max(0, Number(item.streak) || 0),
-    nextEligibleTrial: Math.max(0, Number(item.nextEligibleTrial) || 0),
-    status: item.status === 'locked' ? 'locked' : 'active',
+  const isGraduated = parsed.algorithm === 'graduated-interval';
+  const validTopics: TopicItem[] = parsed.topics.map((item: Record<string, unknown>) => {
+    const rawBox = Math.max(1, Math.floor(Number(item.box)) || 1);
+    const box = isGraduated ? rawBox : Math.min(5, rawBox);
+    return {
+      id: String(item.id || `topic-${Math.random().toString(36).slice(2)}`),
+      track: isTrackType(item.track) ? item.track : 'algorithms',
+      title: String(item.title || 'Untitled Topic'),
+      box,
+      streak: Math.max(0, Number(item.streak) || 0),
+      nextEligibleTrial: Math.max(0, Number(item.nextEligibleTrial) || 0),
+      status: item.status === 'locked' ? 'locked' : 'active',
     tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
     difficulty: Number.isInteger(Number(item.difficulty)) && Number(item.difficulty) >= 1 && Number(item.difficulty) <= 5 ? Number(item.difficulty) : undefined,
     concept: optionalString(item.concept),
@@ -911,7 +942,8 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     solution: optionalString(item.solution),
     referenceSolution: optionalString(item.referenceSolution),
     testCases: parseTestCases(item.testCases),
-  }));
+    };
+  });
 
   return {
     topics: validTopics,

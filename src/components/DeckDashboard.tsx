@@ -3,8 +3,7 @@ import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
 import {
   getTrackMeta,
-  BOX_INTERVALS,
-  GRADUATED_INTERVALS,
+  intervalForBox,
   getSchedulingAlgorithm,
   exportDeckBackup,
   importDeckBackup,
@@ -50,7 +49,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const algorithm = getSchedulingAlgorithm(state);
-  const intervals = algorithm === 'graduated-interval' ? GRADUATED_INTERVALS : BOX_INTERVALS;
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
   const { topics, totalCompletedReviews, unlockedStageCount = 0 } = state;
@@ -58,10 +56,14 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   // Compute Statistics
   const activeCount = topics.filter((t) => t.status === 'active').length;
   const lockedCount = topics.filter((t) => t.status === 'locked').length;
-  const masteredCount = topics.filter((t) => t.status === 'active' && t.box === 5).length;
+  const masteredCount = topics.filter((t) => t.status === 'active' && (algorithm === 'graduated-interval' ? t.box >= 5 : t.box === 5)).length;
   const box3PlusCount = topics.filter((t) => t.status === 'active' && t.box >= 3).length;
 
-  const boxCounts = [1, 2, 3, 4, 5].map(
+  const maxActiveBox = topics.reduce((max, t) => (t.status === 'active' ? Math.max(max, t.box) : max), 5);
+  const displayedBoxes = algorithm === 'graduated-interval'
+    ? Array.from({ length: Math.max(9, maxActiveBox) }, (_, i) => i + 1)
+    : [1, 2, 3, 4, 5];
+  const boxCounts = displayedBoxes.map(
     (b) => topics.filter((t) => t.status === 'active' && t.box === b).length
   );
 
@@ -172,12 +174,14 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
 
         {/* Mastered */}
         <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Mastered (Box 5)</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
+            {algorithm === 'graduated-interval' ? 'Mastered / Long-term (Tier 5+)' : 'Mastered (Box 5)'}
+          </div>
           <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#34d399' }}>
             {masteredCount}
           </div>
           <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            +45 review interval reached
+            {algorithm === 'graduated-interval' ? '+35 to +800+ review intervals' : '+45 review interval reached'}
           </div>
         </div>
 
@@ -211,7 +215,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           Active Spacing Tiers:
         </div>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          {[1, 2, 3, 4, 5].map((b, idx) => (
+          {displayedBoxes.map((b, idx) => (
             <div
               key={b}
               onClick={() => setSelectedBox(selectedBox === b ? 'all' : b)}
@@ -222,7 +226,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 padding: '6px 12px',
                 borderRadius: '8px',
                 backgroundColor: selectedBox === b ? 'var(--bg-elevated)' : 'rgba(255, 255, 255, 0.03)',
-                border: selectedBox === b ? `1px solid var(--box-${b})` : '1px solid var(--border-subtle)',
+                border: selectedBox === b ? `1px solid var(--box-${Math.min(9, b)})` : '1px solid var(--border-subtle)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
@@ -232,11 +236,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                   width: '10px',
                   height: '10px',
                   borderRadius: '50%',
-                  backgroundColor: `var(--box-${b})`,
+                  backgroundColor: `var(--box-${Math.min(9, b)})`,
                 }}
               />
               <span style={{ fontSize: '12.5px', fontWeight: 600 }}>
-                {tierName} {b} (+{intervals[b]})
+                {tierName} {b} (+{intervalForBox(b, algorithm)})
               </span>
               <span
                 style={{
@@ -425,12 +429,12 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                           className="badge"
                           style={{
                             backgroundColor: `rgba(255, 255, 255, 0.05)`,
-                            border: `1px solid var(--box-${topic.box})`,
-                            color: `var(--box-${topic.box})`,
+                            border: `1px solid var(--box-${Math.min(9, topic.box)})`,
+                            color: `var(--box-${Math.min(9, topic.box)})`,
                             fontWeight: 600,
                           }}
                         >
-                          Box {topic.box}
+                          {tierName} {topic.box}
                         </span>
                       ) : (
                         <span style={{ color: 'var(--text-dim)', fontSize: '12px' }}>—</span>

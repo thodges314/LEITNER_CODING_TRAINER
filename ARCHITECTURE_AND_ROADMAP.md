@@ -140,10 +140,12 @@ The trainer supports two user-selectable algorithms via the Settings modal (`alg
 - **Fail**: Hard reset to **Box 1**, streak reset to 0, eligible for immediate replay (`nextEligibleTrial = reviews`). The trainer immediately reloads the card with a clean cold-start buffer so the user can replicate the correct pattern from memory before moving on.
 
 ### 6.2 Graduated Interval Recall & Chaining (`graduated-interval`)
-- **Tiers 1–7**, exponential micro-spaced intervals: `GRADUATED_INTERVALS = {1: 1, 2: 2, 3: 5, 4: 12, 5: 28, 6: 65, 7: 150}`.
-- **Pass**: Tier promotes (`tier + 1`, max 7), streak incremented (`streak + 1`), `nextEligibleTrial = reviews + interval(tier)`.
-- **Fail (Immediate Replication & Setback)**: Reset to Tier 1 / streak 0 and scheduled for immediate replay (`nextEligibleTrial = reviews`), allowing the user to replicate the pattern once before returning to interleaved practice.
-- **Chaining Queue Prioritization**: Newly failed cards (streak 0) and Tier 1 warm-up cards are prioritized immediately into review slots, chaining them into short-interval recall before longer gaps.
+- **Tiers 1–9**, geometric spaced intervals: `GRADUATED_INTERVALS = {1: 1, 2: 3, 3: 7, 4: 16, 5: 35, 6: 75, 7: 165, 8: 360, 9: 800}`.
+- **Extensible Tier 10+ Scaling**: Dynamic geometric growth factor (~2.2x per tier, `Math.round(800 * Math.pow(2.2, tier - 9))`) for cards continuing maintenance past Tier 9.
+- **Active Deck Ceiling Guard**: If a tier offset exceeds active deck size $N$, the offset is capped to $N$ trials out so cards don't disappear past a full deck cycle.
+- **Pass**: Tier promotes (`tier + 1`), streak incremented (`streak + 1`), `nextEligibleTrial = reviews + min(interval(tier), activeDeckSize)`.
+- **Fail (Immediate Replication & Setback)**: Half-tier setback `Math.max(1, Math.floor(tier / 2))` with streak reset to 0, scheduled at setback interval, followed by an immediate practice drill.
+- **Chaining Queue Prioritization**: In-flight cards due for graduated recall are prioritized immediately into review slots before introducing new unseen rungs into the active working chain.
 
 ### 6.3 Shared Scheduling Engine
 - **getNextCard**: candidates = active cards matching the practice filter, excluding the current card; eligible =

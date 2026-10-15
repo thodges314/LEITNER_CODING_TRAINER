@@ -24,6 +24,7 @@ interface EvaluationPanelProps {
   submittedCode: string;
   result: EvaluationResult;
   totalCompletedReviews: number;
+  activeDeckSize?: number;
   algorithm?: SpacedAlgorithm;
   onCommit: (passed: boolean) => void;
   onRetry: () => void;
@@ -37,6 +38,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   topic,
   result,
   totalCompletedReviews,
+  activeDeckSize,
   algorithm = 'leitner',
   onCommit,
   onRetry,
@@ -70,10 +72,10 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
 
   // Project state transition preview
   const previewBox = effectiveVerdict
-    ? Math.min(5, topic.box + 1)
+    ? (algorithm === 'graduated-interval' ? topic.box + 1 : Math.min(5, topic.box + 1))
     : (algorithm === 'graduated-interval' ? Math.max(1, Math.floor(topic.box / 2)) : 1);
   const previewStreak = effectiveVerdict ? topic.streak + 1 : 0;
-  const previewInterval = effectiveVerdict ? intervalForBox(previewBox, algorithm) : 0;
+  const previewInterval = effectiveVerdict ? intervalForBox(previewBox, algorithm, activeDeckSize) : 0;
   const previewNextTrial = totalCompletedReviews + 1 + previewInterval;
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
@@ -555,7 +557,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     color: effectiveVerdict ? 'var(--accent-emerald)' : 'var(--accent-rose)',
                   }}
                 >
-                  {tierName} {previewBox} {previewBox === 5 ? '(Mastered)' : ''}
+                  {tierName} {previewBox} {algorithm === 'leitner' && previewBox === 5 ? '(Mastered)' : ''}
                 </span>
                 <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginLeft: '6px' }}>
                   {effectiveVerdict
