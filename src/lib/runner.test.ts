@@ -103,4 +103,34 @@ describe('sandbox hygiene', () => {
     expect(r.passed).toBe(false);
     expect(r.lines.join('\n')).toMatch(/received 2, expected 3/);
   });
+
+  it('safely recovers from a synchronous infinite loop in user code', async () => {
+    const card: TopicItem = {
+      ...base,
+      id: 'loop',
+      testHarness: "console.log('loop:', add(1, 2) === 3 ? 'PASS' : 'FAIL');",
+    };
+    const r = await runHarness(card, 'function add(a, b) { while (true) {} return a + b; }', 'js', 300);
+    expect(r.passed).toBe(false);
+    expect(r.timedOut).toBe(true);
+    expect(r.lines.join('\n')).toMatch(/infinite loop detected/);
+  });
+});
+
+describe('runWithTimeout', () => {
+  it('resolves successful code result', async () => {
+    const { runWithTimeout } = await import('./runner');
+    const result = await runWithTimeout('return 40 + 2;');
+    expect(result).toBe(42);
+  });
+
+  it('rejects on execution error', async () => {
+    const { runWithTimeout } = await import('./runner');
+    await expect(runWithTimeout('throw new Error("worker error");')).rejects.toThrow('worker error');
+  });
+
+  it('times out and rejects on infinite loop', async () => {
+    const { runWithTimeout } = await import('./runner');
+    await expect(runWithTimeout('while(true) {}', 100)).rejects.toThrow(/Execution timed out after 100ms/);
+  });
 });

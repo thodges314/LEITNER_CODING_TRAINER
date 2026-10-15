@@ -19,7 +19,11 @@ export interface TranspileOutcome {
  * Transpiles TS/JSX to executable JS. Sucrase and the TypeScript compiler are
  * loaded on demand so they stay out of the initial bundle.
  */
-export async function transpileForExecution(code: string, mode: ExecutionMode): Promise<TranspileOutcome> {
+export async function transpileForExecution(
+  code: string,
+  mode: ExecutionMode,
+  loopTimeoutMs = 3000
+): Promise<TranspileOutcome> {
   const diagnostics: TranspileOutcome['diagnostics'] = [];
 
   if (mode === 'ts') {
@@ -35,7 +39,9 @@ export async function transpileForExecution(code: string, mode: ExecutionMode): 
   try {
     const { transform } = await import('sucrase');
     const out = transform(code, { transforms: ['typescript', 'jsx'] });
-    return { ok: true, code: out.code, diagnostics };
+    const { injectLoopGuards } = await import('./loopGuards');
+    const guardedCode = injectLoopGuards(out.code, loopTimeoutMs);
+    return { ok: true, code: guardedCode, diagnostics };
   } catch (err) {
     const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     diagnostics.push({ type: 'error', formatted: `Transpilation Error: ${msg}` });
@@ -350,7 +356,7 @@ export async function runHarness(
   if (card.track === 'typescript-patterns') mode = 'ts';
 
   const combined = bufferContainsHarness(code, harness) ? code : `${code}\n\n${harness}\n`;
-  const transpiled = await transpileForExecution(combined, mode);
+  const transpiled = await transpileForExecution(combined, mode, Math.min(timeoutMs, 3000));
   if (!transpiled.ok) {
     return notRun(`Code did not compile: ${transpiled.diagnostics.map((d) => d.formatted).join('; ')}`, 1);
   }
@@ -393,6 +399,10 @@ export async function runHarness(
     // Give timer-based assertions (setTimeout in harnesses) a moment to log.
     else await new Promise((r) => setTimeout(r, 300));
   } catch (err) {
+    const isInfiniteLoop = err instanceof Error && err.message.includes('infinite loop detected');
+    if (isInfiniteLoop) {
+      timedOut = true;
+    }
     errorCount++;
     lines.push(`[error] ${stringifyArg(err)}`);
   } finally {
@@ -408,3 +418,102 @@ export async function runHarness(
     `${passCount} passed, ${failCount} failed` + (errorCount ? `, ${errorCount} error(s)` : '') + (timedOut ? ', timed out' : '');
   return { ran: true, passCount, failCount, errorCount, timedOut, passed, summary, lines };
 }
+
+/**
+ * Runs arbitrary JavaScript code inside an isolated Web Worker thread with a hard timeout.
+ * If execution exceeds `timeoutMs`, the worker thread is forcefully terminated
+ * via `worker.terminate()`, safely recovering from synchronous infinite loops.
+ */
+export async function runWithTimeout(code: string, timeoutMs = 3000): Promise<unknown> {
+  const { injectLoopGuards } = await import('./loopGuards');
+  const guardedCode = injectLoopGuards(code, timeoutMs);
+
+  return new Promise((resolve, reject) => {
+    if (typeof Worker === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined') {
+      // Non-browser environment fallback (Node / Vitest jsdom)
+      const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+      const fn = new AsyncFunction(guardedCode);
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const timeoutPromise = new Promise((_, rej) => {
+        timer = setTimeout(
+          () => rej(new Error(`Execution timed out after ${timeoutMs}ms (infinite loop detected)`)),
+          timeoutMs
+        );
+      });
+      Promise.race([fn(), timeoutPromise])
+        .then((res) => {
+          clearTimeout(timer);
+          resolve(res);
+        })
+        .catch((err) => {
+          clearTimeout(timer);
+          reject(err);
+        });
+      return;
+    }
+
+    const workerScript = `
+      self.onmessage = async () => {
+        try {
+          const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+          const fn = new AsyncFunction(${JSON.stringify(guardedCode)});
+          const result = await fn();
+          self.postMessage({ type: 'success', result });
+        } catch (err) {
+          self.postMessage({ type: 'error', error: err instanceof Error ? err.message : String(err) });
+        }
+      };
+    `;
+
+    const blob = new Blob([workerScript], { type: 'application/javascript' });
+    const blobUrl = URL.createObjectURL(blob);
+    let worker: Worker | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const cleanup = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = undefined;
+      }
+      if (worker) {
+        worker.terminate();
+        worker = null;
+      }
+      try {
+        URL.revokeObjectURL(blobUrl);
+      } catch {
+        // ignore
+      }
+    };
+
+    try {
+      worker = new Worker(blobUrl);
+
+      timer = setTimeout(() => {
+        cleanup(); // Forcefully kills the OS execution thread
+        reject(new Error(`Execution timed out after ${timeoutMs}ms (infinite loop detected)`));
+      }, timeoutMs);
+
+      worker.onmessage = (e: MessageEvent) => {
+        const data = e.data;
+        cleanup();
+        if (data.type === 'error') {
+          reject(new Error(data.error));
+        } else {
+          resolve(data.result);
+        }
+      };
+
+      worker.onerror = (e: ErrorEvent) => {
+        cleanup();
+        reject(new Error(e.message || 'Worker execution error'));
+      };
+
+      worker.postMessage({ run: true });
+    } catch (err) {
+      cleanup();
+      reject(err);
+    }
+  });
+}
+

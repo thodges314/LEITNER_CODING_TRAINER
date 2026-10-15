@@ -96,13 +96,18 @@ Located in [leitner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_C
 
 Located in [runner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/runner.ts):
 
-1. **Transpilation**:
+1. **Transpilation & Loop Protection**:
    - JS Mode: Fast in-browser transformation via Sucrase.
    - TS Mode: Strict compile-time type diagnostics via lazy-loaded TypeScript compiler with ES2022 lib files.
-2. **Sandbox Scope**:
+   - **Loop Guard Protection** ([loopGuards.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/loopGuards.ts)): Automatically instruments all loops (`while`, `for`, `do..while`, `for..of`, `for..in`) with lightweight bitwise-checked iteration timers (`(++iter & 1023) === 0 && Date.now() - start > timeoutMs`). If code gets trapped in a synchronous infinite loop, it throws an informative timeout error after 3000ms, completely preventing browser freezing.
+2. **Web Worker Thread Isolation (`runWithTimeout`)**:
+   - Located in [runner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/runner.ts).
+   - Executes code in a dedicated Web Worker on an isolated OS background thread.
+   - If execution exceeds `timeoutMs`, the main thread triggers `worker.terminate()`, instantly killing the runaway thread.
+3. **Sandbox Scope**:
    - User code and harness concatenated in an `AsyncFunction`.
    - Injected globals: React, ReactDOM, native hooks, `$dom` (render, query, fire events, act, wait), `$test` (check, run, equal, rejects, sleep), mock `fetch`, mock `IntersectionObserver`.
-3. **Verdict**:
+4. **Verdict**:
    - Harness logs `PASS` and `FAIL` markers.
    - Submission passes if and only if harness logs ≥ 1 `PASS` and 0 `FAIL`/runtime errors.
 
