@@ -439,7 +439,7 @@ export function App() {
       <main style={{ flex: 1, padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
         {activeView === 'practice' ? (
           <PracticeArena
-            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}`}
+            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
             algorithm={algorithm}

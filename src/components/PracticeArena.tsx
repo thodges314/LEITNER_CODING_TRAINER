@@ -46,6 +46,7 @@ import type { ConsoleLogEntry } from './practice/consoleFormat';
 import { ReactTestErrorBoundary } from './practice/ReactTestErrorBoundary';
 import { getStarterSnippet } from './practice/starterSnippet';
 import { formatCode } from '../lib/formatter';
+import { getTimedModeEnabled, getTimedModeDuration } from '../lib/timedMode';
 
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
@@ -57,8 +58,6 @@ interface PracticeArenaProps {
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
 }
-
-const INITIAL_TIME = 10 * 60; // 600 seconds
 
 export const PracticeArena: React.FC<PracticeArenaProps> = ({
   currentCard,
@@ -89,9 +88,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     currentCard?.track === 'typescript-patterns' ? 'ts' : 'js'
   );
 
-  // 10-minute countdown stopwatch
-  const [timeRemaining, setTimeRemaining] = useState(INITIAL_TIME);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  // Countdown stopwatch (supports Timed Recall Mode with auto-start and auto-submit)
+  const timedMode = getTimedModeEnabled();
+  const configuredDuration = getTimedModeDuration();
+  const [timeRemaining, setTimeRemaining] = useState(configuredDuration);
+  const [isTimerRunning, setIsTimerRunning] = useState(timedMode);
+  const [timeExpiredToast, setTimeExpiredToast] = useState<string | null>(null);
   const editorRef = useRef<ReactCodeMirrorRef>(null);
   const [isFormatting, setIsFormatting] = useState(false);
   const [formatToast, setFormatToast] = useState<{
@@ -135,25 +137,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       editorRef.current.view.focus();
     }
   }, [currentCard?.id]);
-
-  // Timer interval
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
-    if (isTimerRunning && timeRemaining > 0) {
-      interval = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            setIsTimerRunning(false);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isTimerRunning, timeRemaining]);
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -243,32 +226,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     handleSubmit: () => Promise.resolve(),
     handleFormatCode: () => Promise.resolve(),
   });
-
-  // Global window shortcut listener as fallback (Cmd+Enter, Cmd+Shift+Enter, Shift+Alt+F)
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (target?.tagName === 'INPUT') return;
-
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-        e.preventDefault();
-        if (e.shiftKey) {
-          void actionsRef.current.handleSubmit();
-        } else {
-          void actionsRef.current.handleRunCode();
-        }
-      } else if (
-        (e.shiftKey && e.altKey && (e.key === 'f' || e.key === 'F')) ||
-        ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'f' || e.key === 'F'))
-      ) {
-        e.preventDefault();
-        void actionsRef.current.handleFormatCode();
-      }
-    };
-
-    window.addEventListener('keydown', handleGlobalKeyDown);
-    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
-  }, []);
 
   // Toggle comments on the bottom test runner block
   const handleToggleTestComments = () => {
@@ -472,6 +429,57 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     };
   });
 
+  // Global window shortcut listener as fallback (Cmd+Enter, Cmd+Shift+Enter, Shift+Alt+F)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.tagName === 'INPUT') return;
+
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          void actionsRef.current.handleSubmit();
+        } else {
+          void actionsRef.current.handleRunCode();
+        }
+      } else if (
+        (e.shiftKey && e.altKey && (e.key === 'f' || e.key === 'F')) ||
+        ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'f' || e.key === 'F'))
+      ) {
+        e.preventDefault();
+        void actionsRef.current.handleFormatCode();
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
+  // Timer interval (runs after actionsRef is synchronized)
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    if (isTimerRunning && timeRemaining > 0) {
+      interval = setInterval(() => {
+        setTimeRemaining((prev) => {
+          if (prev <= 1) {
+            setIsTimerRunning(false);
+            if (timedMode && !evalResult && !isEvaluating) {
+              setTimeExpiredToast('⏰ Time expired! Your buffer is being automatically submitted for evaluation...');
+              setTimeout(() => {
+                void actionsRef.current.handleSubmit();
+              }, 120);
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isTimerRunning, timeRemaining, timedMode, evalResult, isEvaluating]);
+
   const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -602,6 +610,36 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         </div>
       )}
 
+      {/* Time Expired Toast */}
+      {timeExpiredToast && (
+        <div
+          style={{
+            padding: '12px 18px',
+            borderRadius: '10px',
+            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            color: '#fbbf24',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13.5px', fontWeight: 600 }}>
+            <span>{timeExpiredToast}</span>
+          </div>
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => setTimeExpiredToast(null)}
+            style={{ padding: '3px 8px', fontSize: '11px', borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Top Header Card */}
       <div
         className="glass-panel"
@@ -711,11 +749,28 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             >
               {formatTimer(timeRemaining)}
             </span>
+            {timedMode && (
+              <span
+                style={{
+                  fontSize: '9.5px',
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                  color: '#fbbf24',
+                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                  border: '1px solid rgba(245, 158, 11, 0.35)',
+                  padding: '2px 5px',
+                  borderRadius: '4px',
+                }}
+                title="Timed Mode active: countdown auto-starts and buffer auto-submits when expired"
+              >
+                TIMED
+              </span>
+            )}
             <button
               className="btn btn-outline"
               style={{ padding: '4px 6px', fontSize: '11px', height: '26px' }}
               onClick={() => setIsTimerRunning(!isTimerRunning)}
-              title={isTimerRunning ? 'Pause timer' : 'Start 10m timer'}
+              title={isTimerRunning ? 'Pause timer' : `Start ${Math.round(configuredDuration / 60)}m timer`}
               aria-label={isTimerRunning ? 'Pause timer' : 'Start timer'}
             >
               {isTimerRunning ? <Pause size={12} /> : <Play size={12} />}
@@ -724,10 +779,11 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               className="btn btn-outline"
               style={{ padding: '4px 6px', fontSize: '11px', height: '26px' }}
               onClick={() => {
-                setIsTimerRunning(false);
-                setTimeRemaining(INITIAL_TIME);
+                setIsTimerRunning(timedMode);
+                setTimeRemaining(configuredDuration);
+                setTimeExpiredToast(null);
               }}
-              title="Reset timer to 10:00"
+              title={`Reset timer to ${formatTimer(configuredDuration)}`}
               aria-label="Reset timer"
             >
               <RotateCcw size={12} />

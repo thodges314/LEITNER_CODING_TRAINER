@@ -9,6 +9,7 @@ import {
   KeyRound,
   Check,
   AlertTriangle,
+  Timer,
 } from 'lucide-react';
 import {
   getStoredApiKey,
@@ -20,6 +21,8 @@ import {
   getStoredBaseUrl,
   setStoredBaseUrl,
   detectProviderFromKey,
+  getAllStoredKeys,
+  clearStoredApiKey,
 } from '../lib/ai';
 import type { AIProvider } from '../lib/ai';
 import {
@@ -27,6 +30,13 @@ import {
   setStoredAlgorithm,
 } from '../lib/leitner';
 import type { SpacedAlgorithm } from '../lib/leitner';
+import {
+  getTimedModeEnabled,
+  setTimedModeEnabled,
+  getTimedModeDuration,
+  setTimedModeDuration,
+  DURATION_OPTIONS,
+} from '../lib/timedMode';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -49,6 +59,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [provider, setProvider] = useState<AIProvider>(() => getStoredProvider());
   const [model, setModel] = useState(() => getStoredModel());
   const [baseUrl, setBaseUrl] = useState(() => getStoredBaseUrl());
+  const [storedKeys, setStoredKeys] = useState(() => getAllStoredKeys());
+  const [timedMode, setTimedMode] = useState(() => getTimedModeEnabled());
+  const [timedDuration, setTimedDuration] = useState(() => getTimedModeDuration());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<'clear' | 'replace' | null>(null);
 
@@ -67,6 +80,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     showToast('Spaced repetition method saved');
   };
 
+  const handleToggleTimedMode = (enabled: boolean) => {
+    setTimedMode(enabled);
+    setTimedModeEnabled(enabled);
+    onSettingsSaved?.();
+    showToast(enabled ? 'Timed Mode enabled (countdown auto-submits)' : 'Timed Mode disabled');
+  };
+
+  const handleSelectDuration = (seconds: number) => {
+    setTimedDuration(seconds);
+    setTimedModeDuration(seconds);
+    onSettingsSaved?.();
+    showToast(`Timer duration set to ${Math.round(seconds / 60)} minutes`);
+  };
+
   const handleSelectProvider = (p: AIProvider) => {
     setProvider(p);
     setStoredProvider(p);
@@ -77,6 +104,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     else if (p === 'openrouter') defaultModel = 'google/gemini-2.5-flash';
     setModel(defaultModel);
     setStoredModel(defaultModel);
+
+    // Retrieve and activate this provider's key from the vault
+    const provKey = getStoredApiKey(p);
+    setApiKey(provKey);
+    setKeyInput(provKey);
+    setStoredKeys(getAllStoredKeys());
+    setConfirmAction(null);
     showToast(`Provider switched to ${p.toUpperCase()}`);
   };
 
@@ -109,8 +143,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const executeSaveKey = (valToSave?: string) => {
     const trimmed = (valToSave ?? keyInput).trim();
-    setStoredApiKey(trimmed);
+    setStoredApiKey(trimmed, provider);
     setApiKey(trimmed);
+    setStoredKeys(getAllStoredKeys());
     setConfirmAction(null);
 
     const detected = detectProviderFromKey(trimmed);
@@ -119,7 +154,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       return;
     }
 
-    showToast(apiKey ? 'API key replaced' : 'API key saved');
+    showToast(apiKey ? `${provider.toUpperCase()} key replaced` : `${provider.toUpperCase()} key saved`);
   };
 
   const handleClearKeyClick = () => {
@@ -127,11 +162,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const executeClearKey = () => {
-    setStoredApiKey('');
+    clearStoredApiKey(provider);
     setApiKey('');
     setKeyInput('');
+    setStoredKeys(getAllStoredKeys());
     setConfirmAction(null);
-    showToast('API key cleared');
+    showToast(`${provider.toUpperCase()} key cleared`);
   };
 
   const isKeyModified = keyInput.trim() !== apiKey;
@@ -268,11 +304,91 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
+          {/* Timed Recall Mode Section */}
+          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Timer size={15} color="#f59e0b" />
+                  Timed Recall Mode
+                </label>
+                <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: '3px 0 0 0', lineHeight: 1.45 }}>
+                  Countdown starts automatically when each card loads. Automatically submits whatever you have for AI evaluation if time expires.
+                </p>
+              </div>
+
+              {/* Toggle switch */}
+              <button
+                type="button"
+                onClick={() => handleToggleTimedMode(!timedMode)}
+                style={{
+                  width: '46px',
+                  height: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: timedMode ? 'var(--accent-cyan)' : 'rgba(255, 255, 255, 0.1)',
+                  position: 'relative',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                  flexShrink: 0,
+                }}
+                aria-label="Toggle Timed Mode"
+              >
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '2px',
+                    left: timedMode ? '24px' : '2px',
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    transition: 'left 0.2s',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.35)',
+                  }}
+                />
+              </button>
+            </div>
+
+            {timedMode && (
+              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                  Countdown Duration:
+                </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                  {DURATION_OPTIONS.map((opt) => (
+                    <button
+                      type="button"
+                      key={opt.seconds}
+                      onClick={() => handleSelectDuration(opt.seconds)}
+                      className="btn"
+                      style={{
+                        padding: '6px 8px',
+                        fontSize: '11px',
+                        backgroundColor: timedDuration === opt.seconds ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-elevated)',
+                        borderColor: timedDuration === opt.seconds ? '#f59e0b' : 'var(--border-subtle)',
+                        color: timedDuration === opt.seconds ? '#fbbf24' : 'var(--text-secondary)',
+                        fontWeight: timedDuration === opt.seconds ? 600 : 400,
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Provider Selection */}
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '6px' }}>
-              AI Provider
-            </label>
+          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 500 }}>
+                AI Provider & Multi-Key Vault
+              </label>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                Keys are stored per provider
+              </span>
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
               {(
                 [
@@ -282,24 +398,42 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   { id: 'openrouter', label: 'OpenRouter' },
                   { id: 'custom', label: 'Custom URL' },
                 ] as const
-              ).map((p) => (
-                <button
-                  type="button"
-                  key={p.id}
-                  onClick={() => handleSelectProvider(p.id)}
-                  className="btn"
-                  style={{
-                    padding: '8px 10px',
-                    fontSize: '12.5px',
-                    backgroundColor: provider === p.id ? 'rgba(56, 189, 248, 0.2)' : 'var(--bg-elevated)',
-                    borderColor: provider === p.id ? 'var(--accent-cyan)' : 'var(--border-subtle)',
-                    color: provider === p.id ? '#ffffff' : 'var(--text-secondary)',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  {p.label}
-                </button>
-              ))}
+              ).map((p) => {
+                const hasKey = Boolean(storedKeys[p.id]);
+                const isActive = provider === p.id;
+                return (
+                  <button
+                    type="button"
+                    key={p.id}
+                    onClick={() => handleSelectProvider(p.id)}
+                    className="btn"
+                    style={{
+                      padding: '8px 10px',
+                      fontSize: '12px',
+                      backgroundColor: isActive ? 'rgba(56, 189, 248, 0.2)' : 'var(--bg-elevated)',
+                      borderColor: isActive ? 'var(--accent-cyan)' : 'var(--border-subtle)',
+                      color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                      transition: 'all 0.15s ease',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <span style={{ fontWeight: isActive ? 600 : 400 }}>{p.label}</span>
+                    {hasKey ? (
+                      <span style={{ fontSize: '10px', color: '#34d399', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#34d399' }} />
+                        Key Saved
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>
+                        No Key
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

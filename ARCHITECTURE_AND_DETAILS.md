@@ -108,11 +108,39 @@ Located in [runner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CO
 
 ---
 
-## 5. Verification & Testing
+## 5. AI Evaluator & Multi-Key Vault
 
-- **Vitest Suite**: 439 tests verifying:
+Located in [ai.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/ai.ts) and [SettingsModal.tsx](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/components/SettingsModal.tsx):
+
+- **Independent Multi-Key Storage**: Stores API keys per provider in an isolated vault in `localStorage` (`ai_evaluator_keys_vault`).
+- **Instant 1-Click Provider Switching**: Users can switch between Gemini, Groq, OpenAI, OpenRouter, and Custom endpoints with a single click. The active provider's key is automatically loaded and activated.
+- **Provider Status Badges**: The Settings UI displays badges indicating which providers have keys saved (`● Key Saved` vs `No Key`).
+- **Prefix-Based Auto-Detection**: Automatically detects provider and default models upon key entry:
+  - `gsk_` -> Groq (`llama-3.3-70b-versatile`)
+  - `AIzaSy` -> Gemini (`gemini-2.5-flash`)
+  - `sk-or-` -> OpenRouter (`anthropic/claude-3.5-sonnet`)
+  - `sk-` -> OpenAI (`gpt-4o-mini`)
+
+---
+
+## 6. Timed Recall Mode
+
+Located in [timedMode.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/timedMode.ts) and [PracticeArena.tsx](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/components/PracticeArena.tsx):
+
+- **Configurable Durations**: 5m, 10m (default), 15m, and 20m options with persistent toggle in Settings.
+- **Automatic Countdown**: When enabled, the countdown timer initiates automatically upon card mount.
+- **Visual Status Indicator**: Displays a `TIMED` badge beside the stopwatch in the Practice Arena header card.
+- **Auto-Submission on Expiry**: When the timer reaches 0:00, the arena automatically halts editing, submits the current buffer for test harness execution and AI evaluation, and displays a warning notification to the user.
+
+---
+
+## 7. Verification & Testing
+
+- **Vitest Suite**: Tests verifying:
   - Reference solutions pass for all 119 topic cards.
   - Empty submissions fail for all cards.
   - Leitner and Graduated Interval algorithms, intervals, promotions, and setbacks.
   - Prettier standalone formatter for JS, JSX, TS, and syntax errors.
+  - Multi-key vault persistence, prefix detection, and provider switching.
+  - Timed Recall Mode configuration and persistence.
 - **Production Build**: Verified via `npm run build` (`tsc -b && vite build`) with zero lint or type errors.

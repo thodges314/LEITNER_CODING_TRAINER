@@ -23,6 +23,7 @@ export interface DraftedTopic {
 }
 
 export const API_KEY_KEY = 'ai_evaluator_key';
+export const API_KEYS_VAULT_KEY = 'ai_evaluator_keys_vault';
 export const API_PROVIDER_KEY = 'ai_evaluator_provider';
 export const API_MODEL_KEY = 'ai_evaluator_model';
 export const API_BASE_URL_KEY = 'ai_evaluator_base_url';
@@ -38,18 +39,74 @@ export function detectProviderFromKey(key: string): AIProvider | null {
   return null;
 }
 
-export function getStoredApiKey(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem(API_KEY_KEY) || '';
+export function getAllStoredKeys(): Record<AIProvider, string> {
+  if (typeof window === 'undefined') {
+    return { gemini: '', groq: '', openai: '', openrouter: '', custom: '' };
+  }
+  let vault: Record<string, string> = {};
+  try {
+    const raw = localStorage.getItem(API_KEYS_VAULT_KEY);
+    if (raw) vault = JSON.parse(raw);
+  } catch {
+    vault = {};
+  }
+  // Migrate legacy single key into vault if missing
+  const legacyKey = localStorage.getItem(API_KEY_KEY) || '';
+  const detected = detectProviderFromKey(legacyKey);
+  const currentProvider = detected || (localStorage.getItem(API_PROVIDER_KEY) as AIProvider) || 'gemini';
+  if (legacyKey && !vault[currentProvider]) {
+    vault[currentProvider] = legacyKey;
+    try {
+      localStorage.setItem(API_KEYS_VAULT_KEY, JSON.stringify(vault));
+    } catch {
+      /* ignore */
+    }
+  }
+  return {
+    gemini: vault.gemini || '',
+    groq: vault.groq || '',
+    openai: vault.openai || '',
+    openrouter: vault.openrouter || '',
+    custom: vault.custom || '',
+  };
 }
 
-export function setStoredApiKey(key: string): void {
+export function getStoredApiKey(targetProvider?: AIProvider): string {
+  if (typeof window === 'undefined') return '';
+  const prov = targetProvider || getStoredProvider();
+  const all = getAllStoredKeys();
+  if (all[prov]) return all[prov];
+  if (!targetProvider || targetProvider === getStoredProvider()) {
+    return localStorage.getItem(API_KEY_KEY) || '';
+  }
+  return '';
+}
+
+export function setStoredApiKey(key: string, targetProvider?: AIProvider): void {
   if (typeof window === 'undefined') return;
   const trimmed = key.trim();
-  localStorage.setItem(API_KEY_KEY, trimmed);
+  const detected = detectProviderFromKey(trimmed);
+  const prov = targetProvider || detected || getStoredProvider();
+
+  // Save into keys vault
+  const all = getAllStoredKeys();
+  if (trimmed) {
+    all[prov] = trimmed;
+  } else {
+    delete all[prov];
+  }
+  try {
+    localStorage.setItem(API_KEYS_VAULT_KEY, JSON.stringify(all));
+  } catch {
+    /* ignore */
+  }
+
+  // If this key is for the active provider or auto-detected, update active API_KEY_KEY
+  if (!targetProvider || targetProvider === getStoredProvider() || detected) {
+    localStorage.setItem(API_KEY_KEY, trimmed);
+  }
 
   // Auto-set provider and model if key unambiguously belongs to a provider
-  const detected = detectProviderFromKey(trimmed);
   if (detected) {
     setStoredProvider(detected);
     if (detected === 'gemini') setStoredModel('gemini-2.5-flash');
@@ -59,14 +116,29 @@ export function setStoredApiKey(key: string): void {
   }
 }
 
+export function clearStoredApiKey(providerToClear?: AIProvider): void {
+  if (typeof window === 'undefined') return;
+  const prov = providerToClear || getStoredProvider();
+  const all = getAllStoredKeys();
+  delete all[prov];
+  try {
+    localStorage.setItem(API_KEYS_VAULT_KEY, JSON.stringify(all));
+  } catch {
+    /* ignore */
+  }
+
+  if (!providerToClear || providerToClear === getStoredProvider()) {
+    localStorage.removeItem(API_KEY_KEY);
+  }
+}
+
 export function getStoredProvider(): AIProvider {
   if (typeof window === 'undefined') return 'gemini';
   const stored = localStorage.getItem(API_PROVIDER_KEY) as AIProvider | null;
-  const key = getStoredApiKey();
+  const key = localStorage.getItem(API_KEY_KEY) || '';
   const detected = detectProviderFromKey(key);
 
-  // If a key with a known unambiguous prefix is stored, honor the key's provider
-  // if stored is missing or if stored is the default 'gemini' while key is clearly groq/openai/openrouter
+  // If a key with a known unambiguous prefix is active, honor it
   if (detected) {
     if (!stored || (stored === 'gemini' && detected !== 'gemini')) {
       localStorage.setItem(API_PROVIDER_KEY, detected);
@@ -80,6 +152,14 @@ export function getStoredProvider(): AIProvider {
 export function setStoredProvider(provider: AIProvider): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(API_PROVIDER_KEY, provider);
+
+  // Auto-activate the key for this provider from the vault
+  const all = getAllStoredKeys();
+  if (all[provider]) {
+    localStorage.setItem(API_KEY_KEY, all[provider]);
+  } else {
+    localStorage.removeItem(API_KEY_KEY);
+  }
 }
 
 export function getStoredModel(): string {

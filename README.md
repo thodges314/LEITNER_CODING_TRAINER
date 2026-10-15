@@ -43,13 +43,22 @@ npm run build      # type-check + production build into dist/
 - **TypeScript mode**: strict type-checking with the TypeScript compiler, loaded lazily on first use.
 - **Persistence**: seed content from `src/data/topics.json` is merged into your stored deck on load. Progress is
   kept, content updates flow in, new seed cards are added, and seed cards you delete stay deleted.
-  Algorithm preference and draft code are persisted in `localStorage`.
+- **Timed Recall Mode** (`src/lib/timedMode.ts`): Toggle in Settings to simulate realistic time-pressured interview rounds.
+  - Configurable duration: 5, 10 (default), 15, or 20 minutes.
+  - Automatically begins countdown as soon as a practice card loads.
+  - When the countdown reaches 0:00, the arena automatically submits whatever code is currently in the editor for test harness execution and AI evaluation.
+- **Persistence**: seed content from `src/data/topics.json` is merged into your stored deck on load. Progress is
+  kept, content updates flow in, new seed cards are added, and seed cards you delete stay deleted.
+  Algorithm preference, timed mode settings, multi-key vault, and draft code are persisted in `localStorage`.
   Use the dashboard to export/import JSON backups.
 
-## AI evaluator (optional)
+## AI evaluator & Multi-Key Vault (optional)
 
-Settings accepts Gemini, OpenAI, Groq, OpenRouter, or any OpenAI-compatible endpoint. The key is stored in plain
-text in this browser's `localStorage` and sent only to the provider you pick. Use a restricted key.
+Settings accepts Gemini, OpenAI, Groq, OpenRouter, or any OpenAI-compatible endpoint:
+- **Multi-Key Vault**: Store keys independently for multiple AI providers in `localStorage`.
+- **Instant 1-Click Switching**: Seamlessly switch between saved providers without having to re-enter your API keys. Provider buttons show active badges indicating whether a key is saved.
+- **Key Prefix Detection**: Pasting or loading a key with recognizable prefixes (`gsk_` for Groq, `AIzaSy` for Gemini, `sk-or-` for OpenRouter, `sk-` for OpenAI) automatically configures the appropriate provider and model.
+- Keys are kept locally in your browser's `localStorage` and sent only to the provider you select. Use restricted keys.
 
 ## Content
 
