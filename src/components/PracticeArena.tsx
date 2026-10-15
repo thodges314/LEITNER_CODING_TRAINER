@@ -70,7 +70,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   isReinforcement,
   onFinishReinforcement,
 }) => {
-  const [code, setCode] = useState(() => loadDraft(currentCard?.id) ?? getStarterSnippet(currentCard));
+  const [code, setCode] = useState(() =>
+    isReinforcement ? getStarterSnippet(currentCard) : (loadDraft(currentCard?.id) ?? getStarterSnippet(currentCard))
+  );
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [executionStatus, setExecutionStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
@@ -106,14 +108,20 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const [prevCardId, setPrevCardId] = useState(currentCard?.id);
 
   // Autosave the editor buffer (debounced) so a frozen tab or reload never loses work.
+  // Never save drafts during an isolated reinforcement drill or when code is empty/matches starter.
   useEffect(() => {
-    if (!currentCard) return;
+    if (!currentCard || isReinforcement) return;
+    const starter = getStarterSnippet(currentCard);
+    const trimmed = code.trim();
+    if (!trimmed || code === starter) {
+      clearDraft(currentCard.id);
+      return;
+    }
     const timer = setTimeout(() => {
-      if (code === getStarterSnippet(currentCard)) clearDraft(currentCard.id);
-      else saveDraft(currentCard.id, code);
+      saveDraft(currentCard.id, code);
     }, 300);
     return () => clearTimeout(timer);
-  }, [code, currentCard]);
+  }, [code, currentCard, isReinforcement]);
 
   if (currentCard?.id !== prevCardId) {
     setPrevCardId(currentCard?.id);
@@ -475,13 +483,24 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     }
   };
 
+  const handleFinishDrill = () => {
+    clearDraft(currentCard?.id);
+    setEvalResult(null);
+    setShowSolution(false);
+    setCode('');
+    setOutputLogs([]);
+    setExecutionStatus('idle');
+    setMountedComponent(null);
+    onFinishReinforcement?.();
+  };
+
   const handleCommit = (passed: boolean) => {
     clearDraft(currentCard?.id);
-    if (isReinforcement && onFinishReinforcement) {
-      onFinishReinforcement();
-    } else {
-      onCommitReview(passed);
+    if (isReinforcement) {
+      handleFinishDrill();
+      return;
     }
+    onCommitReview(passed);
     setEvalResult(null);
     setShowSolution(false);
     setCode('');
@@ -491,6 +510,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   };
 
   const handleSkip = () => {
+    clearDraft(currentCard?.id);
     setMountedComponent(null);
     setShowSolution(false);
     onSkipCard();
@@ -565,7 +585,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             <button
               type="button"
               className="btn btn-outline"
-              onClick={onFinishReinforcement}
+              onClick={handleFinishDrill}
               style={{ fontSize: '12px', padding: '4px 10px', borderColor: 'rgba(168, 85, 247, 0.4)', color: '#e9d5ff' }}
             >
               Skip Drill →
@@ -975,7 +995,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           showSolution={showSolution}
           onToggleShowSolution={() => setShowSolution((prev) => !prev)}
           isReinforcement={isReinforcement}
-          onFinishReinforcement={onFinishReinforcement}
+          onFinishReinforcement={handleFinishDrill}
         />
       )}
 

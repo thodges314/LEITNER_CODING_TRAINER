@@ -26,6 +26,7 @@ import type {
   SpacedAlgorithm,
 } from './lib/leitner';
 import { getStoredApiKey, getStoredProvider } from './lib/ai';
+import { clearDraft, clearAllDrafts } from './lib/drafts';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
 import { AddTopicModal } from './components/AddTopicModal';
@@ -79,6 +80,7 @@ export function App() {
 
   const handleCommitReview = (passed: boolean) => {
     if (!currentCard) return;
+    clearDraft(currentCard.id);
 
     const { nextState, newlyUnlockedCount, updatedCard } = commitCardReview(
       deckState,
@@ -95,6 +97,7 @@ export function App() {
 
     // If failed, enter immediate reinforcement drill for this card (practice-only, zero stat impact)
     if (!passed) {
+      clearDraft(currentCard.id);
       setReinforcingCardId(currentCard.id);
       setSelectedCardId(currentCard.id);
       return;
@@ -110,11 +113,13 @@ export function App() {
       filter,
       algorithm
     );
+    if (next) clearDraft(next.id);
     setSelectedCardId(next?.id ?? null);
   };
 
   const handleFinishReinforcement = () => {
     if (!currentCard) return;
+    clearDraft(currentCard.id);
     setReinforcingCardId(null);
     const next = getNextCard(
       deckState.topics,
@@ -124,11 +129,13 @@ export function App() {
       filter,
       algorithm
     );
+    if (next) clearDraft(next.id);
     setSelectedCardId(next?.id ?? null);
   };
 
   const handleSkipCard = () => {
     if (!currentCard) return;
+    clearDraft(currentCard.id);
     setReinforcingCardId(null);
     const next = getNextCard(
       deckState.topics,
@@ -138,6 +145,7 @@ export function App() {
       filter,
       algorithm
     );
+    if (next) clearDraft(next.id);
     setSelectedCardId(next?.id ?? null);
   };
 
@@ -154,6 +162,7 @@ export function App() {
 
   const handleSelectCardToPractice = (card: TopicItem) => {
     setReinforcingCardId(null);
+    clearDraft(card.id);
     // If card is locked, unlock it first
     if (card.status === 'locked') {
       const updated = unlockSingleCard(deckState, card.id);
@@ -197,6 +206,7 @@ export function App() {
   const handleResetDeckToDefaults = () => {
     const defaultDeck = getDefaultDeckState();
     if (confirm(`Reset entire deck back to the ${defaultDeck.topics.length} original topics? All custom progress will be reset.`)) {
+      clearAllDrafts();
       saveDeckState(defaultDeck);
       setDeckState(defaultDeck);
       setSelectedCardId(defaultDeck.topics[0].id);

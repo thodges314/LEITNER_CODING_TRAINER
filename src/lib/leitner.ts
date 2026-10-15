@@ -1,5 +1,6 @@
 import seedTopicsData from '../data/topics.json';
 import { extractHarnessContracts } from './harnessContracts';
+import { clearDraft } from './drafts';
 
 export type TrackType =
   | 'async-js'
@@ -548,6 +549,7 @@ export function commitCardReview(
   passed: boolean,
   algorithmOverride?: SpacedAlgorithm
 ): { nextState: LeitnerDeckState; newlyUnlockedCount: number; updatedCard: TopicItem } {
+  clearDraft(topicId);
   const algo = algorithmOverride ?? getSchedulingAlgorithm(state);
   const currentTotal = state.totalCompletedReviews;
   const nextTotal = currentTotal + 1;
@@ -792,6 +794,7 @@ export function lockSingleCard(state: LeitnerDeckState, topicId: string): Leitne
 }
 
 export function resetCardBox(state: LeitnerDeckState, topicId: string): LeitnerDeckState {
+  clearDraft(topicId);
   const updated = state.topics.map((t) =>
     t.id === topicId
       ? { ...t, box: 1, streak: 0, nextEligibleTrial: state.totalCompletedReviews }
@@ -842,6 +845,7 @@ export function addCustomTopicToDeck(
 
 /** Removes a topic and remembers deleted seed topics so they are not re-added on load. */
 export function deleteTopicFromDeck(state: LeitnerDeckState, topicId: string): LeitnerDeckState {
+  clearDraft(topicId);
   const isSeed = (seedTopicsData as unknown as TopicItem[]).some((t) => t.id === topicId);
   const deleted = new Set(state.deletedSeedIds ?? []);
   if (isSeed) deleted.add(topicId);

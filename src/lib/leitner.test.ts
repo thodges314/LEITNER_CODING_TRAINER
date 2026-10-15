@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 import {
   BOX_INTERVALS,
@@ -12,7 +13,9 @@ import {
   parseDeckBackup,
   getSchedulingAlgorithm,
   setSchedulingAlgorithm,
+  resetCardBox,
 } from './leitner';
+import { saveDraft, loadDraft } from './drafts';
 import type { LeitnerDeckState, TopicItem } from './leitner';
 
 function card(over: Partial<TopicItem> & { id: string }): TopicItem {
@@ -312,5 +315,31 @@ describe('scheduling algorithm switching and backup', () => {
     const json = JSON.stringify({ topics: [card({ id: 'x' })], algorithm: 'graduated-interval' });
     const parsed = parseDeckBackup(json);
     expect(parsed.algorithm).toBe('graduated-interval');
+  });
+
+  it('clears drafts on review commit, card reset, and card deletion', () => {
+    const c1 = card({ id: 'c1' });
+    const c2 = card({ id: 'c2' });
+    const st = deck([c1, c2]);
+
+    saveDraft('c1', 'in-progress code');
+    expect(loadDraft('c1')).toBe('in-progress code');
+    commitCardReview(st, 'c1', true);
+    expect(loadDraft('c1')).toBeNull();
+
+    saveDraft('c1', 'in-progress code 2');
+    expect(loadDraft('c1')).toBe('in-progress code 2');
+    commitCardReview(st, 'c1', false);
+    expect(loadDraft('c1')).toBeNull();
+
+    saveDraft('c2', 'card 2 code');
+    expect(loadDraft('c2')).toBe('card 2 code');
+    resetCardBox(st, 'c2');
+    expect(loadDraft('c2')).toBeNull();
+
+    saveDraft('c2', 'card 2 code again');
+    expect(loadDraft('c2')).toBe('card 2 code again');
+    deleteTopicFromDeck(st, 'c2');
+    expect(loadDraft('c2')).toBeNull();
   });
 });
