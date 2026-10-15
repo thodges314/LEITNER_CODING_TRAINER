@@ -47,11 +47,11 @@ describe('commitCardReview', () => {
     expect(updatedCard.box).toBe(5);
   });
 
-  it('resets to box 1 on failure', () => {
+  it('resets to box 1 on failure and schedules immediate replay', () => {
     const { updatedCard } = commitCardReview(deck([card({ id: 'a', box: 4, streak: 3 })], { totalCompletedReviews: 7 }), 'a', false);
     expect(updatedCard.box).toBe(1);
     expect(updatedCard.streak).toBe(0);
-    expect(updatedCard.nextEligibleTrial).toBe(9);
+    expect(updatedCard.nextEligibleTrial).toBe(8);
   });
 
   it('records the reviewed track', () => {
@@ -241,11 +241,11 @@ describe('Graduated Interval Recall & chaining', () => {
     expect(r4.updatedCard.nextEligibleTrial).toBe(30 + GRADUATED_INTERVALS[5]); // 30 + 35 = 65
   });
 
-  it('resets failed card to box 1 and schedules immediate re-test (+1 trial)', () => {
+  it('resets failed card to box 1 and schedules immediate re-test (0 intervening cards)', () => {
     const { updatedCard } = commitCardReview(deck([card({ id: 'a', box: 4, streak: 3 })], { totalCompletedReviews: 10 }), 'a', false, 'graduated-interval');
     expect(updatedCard.box).toBe(1);
     expect(updatedCard.streak).toBe(0);
-    expect(updatedCard.nextEligibleTrial).toBe(12); // 11 + 1
+    expect(updatedCard.nextEligibleTrial).toBe(11); // nextTotal (immediate retry)
   });
 
   it('prioritizes due in-flight cards over introducing new unseen cards', () => {

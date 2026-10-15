@@ -72,12 +72,13 @@ Located in [leitner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_C
 ### 3.1 Classic Leitner Boxes (`leitner`)
 - **Boxes 1–5**: Review intervals in trial counts: `[1, 4, 10, 22, 45]`.
 - **Pass Rule**: Promotes card to next box (`box + 1`, max 5).
-- **Fail Rule**: Complete reset to **Box 1** for immediate re-learning.
+- **Fail Rule**: Complete reset to **Box 1** with immediate replay next (`nextEligibleTrial = totalCompletedReviews`). The trainer reloads the card with a blank cold-start buffer so the user can immediately replicate the correct pattern from memory before moving to other cards.
 
 ### 3.2 Graduated Interval Recall & Chaining (`graduated-interval`)
 - **Tiers 1–7**: Exponential micro-spaced review intervals: `[1, 2, 5, 12, 28, 65, 150]`.
 - **Pass Rule**: Promotes card to next tier (`tier + 1`, max 7).
-- **Graduated Setback Rule**: On failure, resets to half its current tier (`Math.max(1, Math.floor(tier / 2))`). Preserves long-term memory progress without wiping all retention out.
+- **Fail Rule**: Resets card to Tier 1 and streak 0 with immediate replay next (`nextEligibleTrial = totalCompletedReviews`).
+- **Immediate Replication**: Failing a card triggers immediate repeating of that card, solidifying the pattern in memory before returning to interleaved practice.
 - **Micro-Chaining Queue**: Cards with streak 0 (newly failed) or Tier 1 are prioritized at the front of the eligibility queue for immediate chaining reinforcement before longer intervals.
 
 ---

@@ -137,13 +137,13 @@ The trainer supports two user-selectable algorithms via the Settings modal (`alg
 ### 6.1 Classic Leitner Boxes (`leitner`)
 - **Boxes 1–5**, intervals in *trials* (completed reviews), not calendar time: `BOX_INTERVALS = {1: 1, 2: 4, 3: 10, 4: 22, 5: 45}`.
 - **Pass**: Box promotes (`box + 1`, max 5), streak incremented (`streak + 1`), `nextEligibleTrial = reviews + interval(box)`.
-- **Fail**: Hard reset to **Box 1**, streak reset to 0, eligible on the very next review trial (`nextEligibleTrial = reviews + 1`).
+- **Fail**: Hard reset to **Box 1**, streak reset to 0, eligible for immediate replay (`nextEligibleTrial = reviews`). The trainer immediately reloads the card with a clean cold-start buffer so the user can replicate the correct pattern from memory before moving on.
 
 ### 6.2 Graduated Interval Recall & Chaining (`graduated-interval`)
 - **Tiers 1–7**, exponential micro-spaced intervals: `GRADUATED_INTERVALS = {1: 1, 2: 2, 3: 5, 4: 12, 5: 28, 6: 65, 7: 150}`.
 - **Pass**: Tier promotes (`tier + 1`, max 7), streak incremented (`streak + 1`), `nextEligibleTrial = reviews + interval(tier)`.
-- **Fail (Graduated Setback)**: Instead of resetting to Tier 1, sets back by half (`Math.max(1, Math.floor(tier / 2))`). Preserves long-term memory progress while enforcing necessary review.
-- **Chaining Queue Prioritization**: Newly failed cards (streak 0) and Tier 1 warm-up cards are interleaved immediately into the next eligible review slots, chaining them into short-interval recall before longer gaps.
+- **Fail (Immediate Replication & Setback)**: Reset to Tier 1 / streak 0 and scheduled for immediate replay (`nextEligibleTrial = reviews`), allowing the user to replicate the pattern once before returning to interleaved practice.
+- **Chaining Queue Prioritization**: Newly failed cards (streak 0) and Tier 1 warm-up cards are prioritized immediately into review slots, chaining them into short-interval recall before longer gaps.
 
 ### 6.3 Shared Scheduling Engine
 - **getNextCard**: candidates = active cards matching the practice filter, excluding the current card; eligible =

@@ -67,7 +67,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   // Project state transition preview
   const previewBox = effectiveVerdict ? Math.min(5, topic.box + 1) : 1;
   const previewStreak = effectiveVerdict ? topic.streak + 1 : 0;
-  const previewInterval = effectiveVerdict ? intervalForBox(previewBox, algorithm) : 1;
+  const previewInterval = effectiveVerdict ? intervalForBox(previewBox, algorithm) : 0;
   const previewNextTrial = totalCompletedReviews + 1 + previewInterval;
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
@@ -474,7 +474,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginLeft: '6px' }}>
                 {effectiveVerdict
                   ? `(+${previewInterval} reviews spacing • Due Trial #${previewNextTrial})`
-                  : `(immediate review reset • Due Trial #${previewNextTrial})`}
+                  : `(reset to ${tierName} 1 • Immediate Replay Next)`}
               </span>
             </div>
           </div>
@@ -504,9 +504,17 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             type="button"
             className={effectiveVerdict ? 'btn btn-success' : 'btn btn-primary'}
             onClick={() => onCommit(effectiveVerdict)}
-            style={{ fontSize: '13.5px', padding: '10px 20px', fontWeight: 600 }}
+            style={{ fontSize: '13.5px', padding: '10px 20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
           >
-            <Check size={16} /> Commit Result to Deck
+            {effectiveVerdict ? (
+              <>
+                <Check size={16} /> Commit Result & Continue
+              </>
+            ) : (
+              <>
+                <RotateCcw size={16} /> Commit & Repeat Now
+              </>
+            )}
           </button>
         </div>
       </div>

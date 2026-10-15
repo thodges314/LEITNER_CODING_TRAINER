@@ -92,6 +92,12 @@ export function App() {
       setTimeout(() => setUnlockToast(null), 5000);
     }
 
+    // If failed, immediately repeat the same card so the user can replicate the pattern while fresh in memory
+    if (!passed) {
+      setSelectedCardId(currentCard.id);
+      return;
+    }
+
     // Pick next card with interleaved tracks
     const next = getNextCard(
       nextState.topics,
@@ -403,7 +409,7 @@ export function App() {
       <main style={{ flex: 1, padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
         {activeView === 'practice' ? (
           <PracticeArena
-            key={currentCard?.id || 'none'}
+            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}`}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
             algorithm={algorithm}

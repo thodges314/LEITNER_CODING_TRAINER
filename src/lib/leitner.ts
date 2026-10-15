@@ -569,7 +569,7 @@ export function commitCardReview(
     } else {
       nextBox = 1;
       nextStreak = 0;
-      nextEligibleTrial = nextTotal + 1;
+      nextEligibleTrial = nextTotal;
     }
 
     const modified: TopicItem = {
