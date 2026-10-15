@@ -410,7 +410,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     try {
       // Run the card's test harness headlessly; its result decides pass/fail.
       const harness = await runHarness(currentCard, code, executionMode);
-      const res = await evaluateCodeSubmission(currentCard, code, harness);
+      const res = await evaluateCodeSubmission(currentCard, code, harness, executionMode);
       setEvalResult(res);
       setIsTimerRunning(false);
     } catch (err) {

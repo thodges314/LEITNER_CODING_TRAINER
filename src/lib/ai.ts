@@ -195,6 +195,7 @@ export function setStoredBaseUrl(url: string): void {
 }
 
 const EVALUATION_SYSTEM_PROMPT = `Evaluate cold-start code practice against invariants and functional correctness. Do NOT grade based on verbatim similarity to a reference solution.
+Respect the indicated language mode (JavaScript vs TypeScript). Do NOT criticize, dock points, or demand TypeScript type annotations or interfaces unless the problem is explicitly in TypeScript mode or requires TypeScript invariants. Valid idiomatic JavaScript without types is expected and completely correct when running in JavaScript mode.
 Return pure JSON:
 {
   "passed": boolean,
@@ -342,7 +343,8 @@ function heuristicEvaluateCode(topic: TopicItem, code: string, harness?: Harness
 export async function evaluateCodeSubmission(
   topic: TopicItem,
   submittedCode: string,
-  harness?: HarnessReport
+  harness?: HarnessReport,
+  mode?: 'js' | 'ts'
 ): Promise<EvaluationResult> {
   const apiKey = getStoredApiKey();
   const provider = getStoredProvider();
@@ -354,14 +356,19 @@ export async function evaluateCodeSubmission(
     return heuristicEvaluateCode(topic, submittedCode, harness);
   }
 
+  const isTypeScript = mode === 'ts' || topic.track === 'typescript-patterns';
+  const languageLabel = isTypeScript ? 'TypeScript' : 'JavaScript';
+  const codeFence = isTypeScript ? 'typescript' : 'javascript';
+
   try {
     const userPrompt = `Topic: ${topic.title} (Track: ${topic.track})
 ID: ${topic.id}
+Language: ${languageLabel}
 Instructions & Invariants:
 ${topic.promptSeed}
 
 Submitted Cold-Start Code:
-\`\`\`typescript
+\`\`\`${codeFence}
 ${submittedCode}
 \`\`\`
 
