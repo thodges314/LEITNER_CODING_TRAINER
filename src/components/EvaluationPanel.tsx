@@ -370,8 +370,8 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         </p>
       </div>
 
-      {/* Reveal Canonical Solution (shown on failed attempt or failed override) */}
-      {(!effectiveVerdict || !result.passed) && canonicalCode && (
+      {/* Reveal Canonical / Recommended Solution (available on both passed and failed attempts) */}
+      {canonicalCode && (
         <div
           style={{
             borderRadius: '10px',
@@ -409,7 +409,13 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               }}
             >
               {isSolutionVisible ? <EyeOff size={16} color="#38bdf8" /> : <Eye size={16} color="#38bdf8" />}
-              <span>{isSolutionVisible ? 'Hide Canonical Solution' : '👁 Reveal Canonical Solution'}</span>
+              <span>
+                {isSolutionVisible
+                  ? 'Hide Recommended Solution'
+                  : effectiveVerdict
+                  ? '👁 Compare with Recommended Solution'
+                  : '👁 Reveal Canonical Solution'}
+              </span>
             </button>
 
             {isSolutionVisible && (
