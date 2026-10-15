@@ -73,6 +73,18 @@ const SANDBOX_GLOBALS = `
   declare var IntersectionObserver: any;
   declare var $test: any;
   declare var $dom: any;
+  declare module 'react' {
+    const React: any;
+    export = React;
+  }
+  declare module 'react-dom' {
+    const ReactDOM: any;
+    export = ReactDOM;
+  }
+  declare module 'react-dom/client' {
+    const ReactDOMClient: any;
+    export = ReactDOMClient;
+  }
 `;
 
 const sourceFileCache = new Map<string, ts.SourceFile>();

@@ -133,4 +133,21 @@ describe('runWithTimeout', () => {
     const { runWithTimeout } = await import('./runner');
     await expect(runWithTimeout('while(true) {}', 100)).rejects.toThrow(/Execution timed out after 100ms/);
   });
+
+  it('supports explicit import statements from react', async () => {
+    const card: TopicItem = {
+      ...base,
+      id: 'import-test',
+      testHarness: "console.log('hook:', typeof useTest === 'function' ? 'PASS' : 'FAIL');",
+    };
+    const code = `
+      import React, { useState } from 'react';
+      function useTest() {
+        return useState(0);
+      }
+    `;
+    const r = await runHarness(card, code, 'js');
+    expect(r.passed).toBe(true);
+    expect(r.passCount).toBe(1);
+  });
 });

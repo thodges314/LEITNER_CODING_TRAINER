@@ -38,7 +38,7 @@ export async function transpileForExecution(
 
   try {
     const { transform } = await import('sucrase');
-    const out = transform(code, { transforms: ['typescript', 'jsx'] });
+    const out = transform(code, { transforms: ['typescript', 'jsx', 'imports'] });
     const { injectLoopGuards } = await import('./loopGuards');
     const guardedCode = injectLoopGuards(out.code, loopTimeoutMs);
     return { ok: true, code: guardedCode, diagnostics };
@@ -193,6 +193,7 @@ function snapshotBuiltins() {
 }
 
 const SANDBOX_NAMES = [
+  'require',
   'console',
   'React',
   'ReactDOM',
@@ -242,10 +243,18 @@ export function createSandboxScope(options: {
     },
   });
   const realFetch = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
+  const customReactDOM = { ...ReactDOMClient, createPortal, ...options.reactDOM };
+  const requireShim = (mod: string) => {
+    if (mod === 'react') return { default: React, ...React };
+    if (mod === 'react-dom') return { default: customReactDOM, ...customReactDOM };
+    if (mod === 'react-dom/client') return { default: customReactDOM, ...customReactDOM };
+    throw new Error(`Cannot find module '${mod}' in browser sandbox`);
+  };
   const values: unknown[] = [
+    requireShim,
     options.console,
     React,
-    { ...ReactDOMClient, createPortal, ...options.reactDOM },
+    customReactDOM,
     options.mount,
     React.useState,
     React.useEffect,

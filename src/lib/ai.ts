@@ -196,6 +196,7 @@ export function setStoredBaseUrl(url: string): void {
 
 const EVALUATION_SYSTEM_PROMPT = `Evaluate cold-start code practice against invariants and functional correctness. Do NOT grade based on verbatim similarity to a reference solution.
 Respect the indicated language mode (JavaScript vs TypeScript). Do NOT criticize, dock points, or demand TypeScript type annotations or interfaces unless the problem is explicitly in TypeScript mode or requires TypeScript invariants. Valid idiomatic JavaScript without types is expected and completely correct when running in JavaScript mode.
+Standard React hooks and primitives (React, useState, useEffect, useRef, useMemo, useCallback, useReducer, etc.) are pre-injected environment globals in this trainer. Do NOT criticize, dock points, or comment on the absence of explicit import statements (such as 'import { useState } from "react"'). Both implicit globals and explicit imports are valid and accepted in this environment.
 Return pure JSON:
 {
   "passed": boolean,
