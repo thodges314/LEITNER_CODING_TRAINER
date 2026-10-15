@@ -19,6 +19,7 @@ import {
   setStoredModel,
   getStoredBaseUrl,
   setStoredBaseUrl,
+  detectProviderFromKey,
 } from '../lib/ai';
 import type { AIProvider } from '../lib/ai';
 import {
@@ -111,6 +112,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setStoredApiKey(trimmed);
     setApiKey(trimmed);
     setConfirmAction(null);
+
+    const detected = detectProviderFromKey(trimmed);
+    if (detected && detected !== provider) {
+      handleSelectProvider(detected);
+      return;
+    }
+
     showToast(apiKey ? 'API key replaced' : 'API key saved');
   };
 
@@ -300,11 +308,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
               <label style={{ fontSize: '13px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <KeyRound size={14} color="var(--accent-cyan)" />
-                {provider === 'gemini' ? 'Gemini API Key' : 'API Key / Bearer Token'}
+                {provider === 'gemini'
+                  ? 'Gemini API Key'
+                  : provider === 'groq'
+                  ? 'Groq API Key'
+                  : provider === 'openai'
+                  ? 'OpenAI API Key'
+                  : 'API Key / Bearer Token'}
               </label>
 
-              {apiKey && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {detectProviderFromKey(keyInput) && (
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      color: '#38bdf8',
+                      backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(56, 189, 248, 0.25)',
+                    }}
+                  >
+                    Detected: {detectProviderFromKey(keyInput)?.toUpperCase()}
+                  </span>
+                )}
+                {apiKey && (
                   <span
                     style={{
                       fontSize: '11px',
@@ -317,6 +345,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   >
                     Key Active (••••{apiKey.slice(-4)})
                   </span>
+                )}
+                {apiKey && (
                   <button
                     type="button"
                     onClick={handleClearKeyClick}
@@ -334,18 +364,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   >
                     <Trash2 size={12} /> Clear Key
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <input
                 type="password"
-                placeholder={provider === 'gemini' ? 'AIzaSy...' : 'sk-...'}
+                placeholder={
+                  provider === 'gemini'
+                    ? 'AIzaSy...'
+                    : provider === 'groq'
+                    ? 'gsk_...'
+                    : 'sk-...'
+                }
                 value={keyInput}
                 onChange={(e) => {
-                  setKeyInput(e.target.value);
+                  const val = e.target.value;
+                  setKeyInput(val);
                   if (confirmAction) setConfirmAction(null);
+                  const detected = detectProviderFromKey(val);
+                  if (detected && detected !== provider) {
+                    handleSelectProvider(detected);
+                  }
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {

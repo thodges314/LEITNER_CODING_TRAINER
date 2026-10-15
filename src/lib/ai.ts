@@ -29,6 +29,15 @@ export const API_BASE_URL_KEY = 'ai_evaluator_base_url';
 
 export type AIProvider = 'gemini' | 'openai' | 'groq' | 'openrouter' | 'custom';
 
+export function detectProviderFromKey(key: string): AIProvider | null {
+  const trimmed = key.trim();
+  if (trimmed.startsWith('gsk_')) return 'groq';
+  if (trimmed.startsWith('AIzaSy')) return 'gemini';
+  if (trimmed.startsWith('sk-or-')) return 'openrouter';
+  if (trimmed.startsWith('sk-')) return 'openai';
+  return null;
+}
+
 export function getStoredApiKey(): string {
   if (typeof window === 'undefined') return '';
   return localStorage.getItem(API_KEY_KEY) || '';
@@ -36,12 +45,36 @@ export function getStoredApiKey(): string {
 
 export function setStoredApiKey(key: string): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(API_KEY_KEY, key.trim());
+  const trimmed = key.trim();
+  localStorage.setItem(API_KEY_KEY, trimmed);
+
+  // Auto-set provider and model if key unambiguously belongs to a provider
+  const detected = detectProviderFromKey(trimmed);
+  if (detected) {
+    setStoredProvider(detected);
+    if (detected === 'gemini') setStoredModel('gemini-2.5-flash');
+    else if (detected === 'groq') setStoredModel('llama-3.3-70b-versatile');
+    else if (detected === 'openai') setStoredModel('gpt-4o-mini');
+    else if (detected === 'openrouter') setStoredModel('google/gemini-2.5-flash');
+  }
 }
 
 export function getStoredProvider(): AIProvider {
   if (typeof window === 'undefined') return 'gemini';
-  return (localStorage.getItem(API_PROVIDER_KEY) as AIProvider) || 'gemini';
+  const stored = localStorage.getItem(API_PROVIDER_KEY) as AIProvider | null;
+  const key = getStoredApiKey();
+  const detected = detectProviderFromKey(key);
+
+  // If a key with a known unambiguous prefix is stored, honor the key's provider
+  // if stored is missing or if stored is the default 'gemini' while key is clearly groq/openai/openrouter
+  if (detected) {
+    if (!stored || (stored === 'gemini' && detected !== 'gemini')) {
+      localStorage.setItem(API_PROVIDER_KEY, detected);
+      return detected;
+    }
+  }
+
+  return stored || 'gemini';
 }
 
 export function setStoredProvider(provider: AIProvider): void {
@@ -51,11 +84,18 @@ export function setStoredProvider(provider: AIProvider): void {
 
 export function getStoredModel(): string {
   if (typeof window === 'undefined') return 'gemini-2.5-flash';
-  const val = localStorage.getItem(API_MODEL_KEY);
-  if (val) return val;
   const prov = getStoredProvider();
+  const val = localStorage.getItem(API_MODEL_KEY);
+  if (val) {
+    // If model conflicts with provider (e.g. model is gemini-2.5-flash but provider is groq)
+    if (prov === 'groq' && val.includes('gemini')) return 'llama-3.3-70b-versatile';
+    if (prov === 'gemini' && (val.includes('llama') || val.includes('gpt'))) return 'gemini-2.5-flash';
+    if (prov === 'openai' && (val.includes('gemini') || val.includes('llama'))) return 'gpt-4o-mini';
+    return val;
+  }
   if (prov === 'gemini') return 'gemini-2.5-flash';
   if (prov === 'groq') return 'llama-3.3-70b-versatile';
+  if (prov === 'openrouter') return 'google/gemini-2.5-flash';
   return 'gpt-4o-mini';
 }
 
