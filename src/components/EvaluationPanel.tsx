@@ -29,6 +29,8 @@ interface EvaluationPanelProps {
   onRetry: () => void;
   showSolution?: boolean;
   onToggleShowSolution?: () => void;
+  isReinforcement?: boolean;
+  onFinishReinforcement?: () => void;
 }
 
 export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
@@ -40,6 +42,8 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   onRetry,
   showSolution,
   onToggleShowSolution,
+  isReinforcement,
+  onFinishReinforcement,
 }) => {
   // Human override state, initialized to AI verdict
   const [effectiveVerdict, setEffectiveVerdict] = useState<boolean>(result.passed);
@@ -65,7 +69,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   };
 
   // Project state transition preview
-  const previewBox = effectiveVerdict ? Math.min(5, topic.box + 1) : 1;
+  const previewBox = effectiveVerdict
+    ? Math.min(5, topic.box + 1)
+    : (algorithm === 'graduated-interval' ? Math.max(1, Math.floor(topic.box / 2)) : 1);
   const previewStreak = effectiveVerdict ? topic.streak + 1 : 0;
   const previewInterval = effectiveVerdict ? intervalForBox(previewBox, algorithm) : 0;
   const previewNextTrial = totalCompletedReviews + 1 + previewInterval;
@@ -109,8 +115,23 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     color: effectiveVerdict ? '#34d399' : '#f87171',
                   }}
                 >
-                  {effectiveVerdict ? 'PASSED' : 'NEEDS REVISION'}
+                  {isReinforcement
+                    ? (effectiveVerdict ? 'PATTERN REPLICATED!' : 'NEEDS REVISION (DRILL)')
+                    : (effectiveVerdict ? 'PASSED' : 'NEEDS REVISION')}
                 </span>
+                {isReinforcement && (
+                  <span
+                    className="badge"
+                    style={{
+                      backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                      border: '1px solid rgba(168, 85, 247, 0.4)',
+                      color: '#c084fc',
+                      fontSize: '11px',
+                    }}
+                  >
+                    Reinforcement Drill
+                  </span>
+                )}
                 {isOverridden && (
                   <span
                     className="badge"
@@ -439,85 +460,153 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
       )}
 
       {/* Leitner State Transition Preview & Commit Action */}
-      <div
-        style={{
-          padding: '18px 20px',
-          borderRadius: '12px',
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-medium)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '16px',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-          <div>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>
-              Deck Spacing Transition
-            </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
-              <span style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-secondary)' }}>
-                {tierName} {topic.box}
+      {isReinforcement ? (
+        <div
+          style={{
+            padding: '18px 20px',
+            borderRadius: '12px',
+            backgroundColor: 'rgba(168, 85, 247, 0.08)',
+            border: '1px solid rgba(168, 85, 247, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+            <div>
+              <span style={{ fontSize: '12px', color: '#c084fc', display: 'block', fontWeight: 600 }}>
+                Reinforcement Practice (No Stat Impact)
               </span>
-              <ArrowRight size={14} color="var(--text-muted)" />
-              <span
-                style={{
-                  fontWeight: 700,
-                  fontSize: '15px',
-                  color: effectiveVerdict ? 'var(--accent-emerald)' : 'var(--accent-rose)',
-                }}
-              >
-                {tierName} {previewBox} {previewBox === 5 ? '(Mastered)' : ''}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  Card scheduled at <strong>{tierName} {topic.box}</strong> • Due trial <strong>#{topic.nextEligibleTrial}</strong>
+                </span>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  (This drill reinforces the solution pattern before moving on)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={onRetry}
+              style={{ fontSize: '13px' }}
+            >
+              <RotateCcw size={15} /> {effectiveVerdict ? 'Practice Again' : 'Edit & Try Again'}
+            </button>
+            <button
+              type="button"
+              className={effectiveVerdict ? 'btn btn-success' : 'btn btn-outline'}
+              onClick={onFinishReinforcement || (() => onCommit(effectiveVerdict))}
+              style={{
+                fontSize: '13.5px',
+                padding: '10px 20px',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              {effectiveVerdict ? (
+                <>
+                  <Check size={16} /> Continue to Next Card
+                </>
+              ) : (
+                <>
+                  <ArrowRight size={16} /> Skip Drill & Continue
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{
+            padding: '18px 20px',
+            borderRadius: '12px',
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-medium)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+            <div>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>
+                Deck Spacing Transition
               </span>
-              <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginLeft: '6px' }}>
-                {effectiveVerdict
-                  ? `(+${previewInterval} reviews spacing • Due Trial #${previewNextTrial})`
-                  : `(reset to ${tierName} 1 • Immediate Replay Next)`}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                <span style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-secondary)' }}>
+                  {tierName} {topic.box}
+                </span>
+                <ArrowRight size={14} color="var(--text-muted)" />
+                <span
+                  style={{
+                    fontWeight: 700,
+                    fontSize: '15px',
+                    color: effectiveVerdict ? 'var(--accent-emerald)' : 'var(--accent-rose)',
+                  }}
+                >
+                  {tierName} {previewBox} {previewBox === 5 ? '(Mastered)' : ''}
+                </span>
+                <span style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginLeft: '6px' }}>
+                  {effectiveVerdict
+                    ? `(+${previewInterval} reviews spacing • Due Trial #${previewNextTrial})`
+                    : algorithm === 'graduated-interval'
+                    ? `(half-tier setback to Tier ${previewBox} • Immediate Drill Next)`
+                    : `(reset to Box 1 • Immediate Drill Next)`}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ width: '1px', height: '32px', backgroundColor: 'var(--border-subtle)' }} />
+
+            <div>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>
+                Streak
+              </span>
+              <span style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
+                {topic.streak} → {previewStreak}
               </span>
             </div>
           </div>
 
-          <div style={{ width: '1px', height: '32px', backgroundColor: 'var(--border-subtle)' }} />
-
-          <div>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>
-              Streak
-            </span>
-            <span style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
-              {topic.streak} → {previewStreak}
-            </span>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={onRetry}
+              style={{ fontSize: '13px' }}
+            >
+              <RotateCcw size={15} /> Edit & Retest
+            </button>
+            <button
+              type="button"
+              className={effectiveVerdict ? 'btn btn-success' : 'btn btn-primary'}
+              onClick={() => onCommit(effectiveVerdict)}
+              style={{ fontSize: '13.5px', padding: '10px 20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              {effectiveVerdict ? (
+                <>
+                  <Check size={16} /> Commit Result & Continue
+                </>
+              ) : (
+                <>
+                  <RotateCcw size={16} /> Commit & Practice Pattern
+                </>
+              )}
+            </button>
           </div>
         </div>
-
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            type="button"
-            className="btn btn-outline"
-            onClick={onRetry}
-            style={{ fontSize: '13px' }}
-          >
-            <RotateCcw size={15} /> Edit & Retest
-          </button>
-          <button
-            type="button"
-            className={effectiveVerdict ? 'btn btn-success' : 'btn btn-primary'}
-            onClick={() => onCommit(effectiveVerdict)}
-            style={{ fontSize: '13.5px', padding: '10px 20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
-          >
-            {effectiveVerdict ? (
-              <>
-                <Check size={16} /> Commit Result & Continue
-              </>
-            ) : (
-              <>
-                <RotateCcw size={16} /> Commit & Repeat Now
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

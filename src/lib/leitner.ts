@@ -567,9 +567,9 @@ export function commitCardReview(
       nextStreak = item.streak + 1;
       nextEligibleTrial = nextTotal + intervalForBox(nextBox, algo);
     } else {
-      nextBox = 1;
+      nextBox = algo === 'graduated-interval' ? Math.max(1, Math.floor(item.box / 2)) : 1;
       nextStreak = 0;
-      nextEligibleTrial = nextTotal;
+      nextEligibleTrial = nextTotal + intervalForBox(nextBox, algo);
     }
 
     const modified: TopicItem = {

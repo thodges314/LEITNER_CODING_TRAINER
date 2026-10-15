@@ -54,6 +54,8 @@ interface PracticeArenaProps {
   onCommitReview: (passed: boolean) => void;
   onSkipCard: () => void;
   onOpenDeckView: () => void;
+  isReinforcement?: boolean;
+  onFinishReinforcement?: () => void;
 }
 
 const INITIAL_TIME = 10 * 60; // 600 seconds
@@ -65,6 +67,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   onCommitReview,
   onSkipCard,
   onOpenDeckView,
+  isReinforcement,
+  onFinishReinforcement,
 }) => {
   const [code, setCode] = useState(() => loadDraft(currentCard?.id) ?? getStarterSnippet(currentCard));
   const [isEvaluating, setIsEvaluating] = useState(false);
@@ -473,7 +477,11 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   const handleCommit = (passed: boolean) => {
     clearDraft(currentCard?.id);
-    onCommitReview(passed);
+    if (isReinforcement && onFinishReinforcement) {
+      onFinishReinforcement();
+    } else {
+      onCommitReview(passed);
+    }
     setEvalResult(null);
     setShowSolution(false);
     setCode('');
@@ -521,6 +529,51 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+      {/* Reinforcement Drill Banner */}
+      {isReinforcement && (
+        <div
+          style={{
+            padding: '12px 18px',
+            borderRadius: '10px',
+            backgroundColor: 'rgba(168, 85, 247, 0.12)',
+            border: '1px solid rgba(168, 85, 247, 0.35)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#c084fc',
+                boxShadow: '0 0 8px #c084fc',
+              }}
+            />
+            <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#e9d5ff' }}>
+              Immediate Reinforcement Drill
+            </span>
+            <span style={{ fontSize: '12.5px', color: '#c084fc' }}>
+              Solidify pattern memory before moving on. This drill has zero effect on tier, box, or streak stats.
+            </span>
+          </div>
+          {onFinishReinforcement && (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={onFinishReinforcement}
+              style={{ fontSize: '12px', padding: '4px 10px', borderColor: 'rgba(168, 85, 247, 0.4)', color: '#e9d5ff' }}
+            >
+              Skip Drill →
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Top Header Card */}
       <div
         className="glass-panel"
@@ -921,6 +974,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           }}
           showSolution={showSolution}
           onToggleShowSolution={() => setShowSolution((prev) => !prev)}
+          isReinforcement={isReinforcement}
+          onFinishReinforcement={onFinishReinforcement}
         />
       )}
 

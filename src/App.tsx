@@ -53,6 +53,7 @@ export function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [aiSettingsVersion, setAiSettingsVersion] = useState(0);
+  const [reinforcingCardId, setReinforcingCardId] = useState<string | null>(null);
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
   const filterActive = isFilterActive(filter);
   const algorithm = getSchedulingAlgorithm(deckState);
@@ -92,13 +93,15 @@ export function App() {
       setTimeout(() => setUnlockToast(null), 5000);
     }
 
-    // If failed, immediately repeat the same card so the user can replicate the pattern while fresh in memory
+    // If failed, enter immediate reinforcement drill for this card (practice-only, zero stat impact)
     if (!passed) {
+      setReinforcingCardId(currentCard.id);
       setSelectedCardId(currentCard.id);
       return;
     }
 
-    // Pick next card with interleaved tracks
+    // Cold-start review passed: clear any reinforcement drill state and advance
+    setReinforcingCardId(null);
     const next = getNextCard(
       nextState.topics,
       nextState.totalCompletedReviews,
@@ -110,8 +113,23 @@ export function App() {
     setSelectedCardId(next?.id ?? null);
   };
 
+  const handleFinishReinforcement = () => {
+    if (!currentCard) return;
+    setReinforcingCardId(null);
+    const next = getNextCard(
+      deckState.topics,
+      deckState.totalCompletedReviews,
+      currentCard.track,
+      currentCard.id,
+      filter,
+      algorithm
+    );
+    setSelectedCardId(next?.id ?? null);
+  };
+
   const handleSkipCard = () => {
     if (!currentCard) return;
+    setReinforcingCardId(null);
     const next = getNextCard(
       deckState.topics,
       deckState.totalCompletedReviews,
@@ -129,11 +147,13 @@ export function App() {
   };
 
   const handleFilterChange = (next: PracticeFilter) => {
+    setReinforcingCardId(null);
     setDeckState(setPracticeFilter(deckState, next));
     setSelectedCardId(null);
   };
 
   const handleSelectCardToPractice = (card: TopicItem) => {
+    setReinforcingCardId(null);
     // If card is locked, unlock it first
     if (card.status === 'locked') {
       const updated = unlockSingleCard(deckState, card.id);
@@ -409,13 +429,15 @@ export function App() {
       <main style={{ flex: 1, padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
         {activeView === 'practice' ? (
           <PracticeArena
-            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}`}
+            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}`}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
             algorithm={algorithm}
             onCommitReview={handleCommitReview}
             onSkipCard={handleSkipCard}
             onOpenDeckView={() => setActiveView('dashboard')}
+            isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
+            onFinishReinforcement={handleFinishReinforcement}
           />
         ) : (
           <DeckDashboard

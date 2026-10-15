@@ -19,8 +19,9 @@ npm run build      # type-check + production build into dist/
 ## How it works
 
 - **Scheduling Algorithms** (`src/lib/leitner.ts`): Switchable in Settings between two spaced-repetition models:
-  - **Classic Leitner Boxes**: 5 boxes with trial-based intervals (+1, +4, +10, +22, +45 reviews). A pass promotes to the next box; any failure resets the card to Box 1 for immediate restudy.
-  - **Graduated Interval Recall & Chaining**: 7 graduated recall tiers with micro-spaced chaining (+1, +2, +5, +12, +28, +65, +150 reviews). On pass, advances to the next tier; on failure, applies a gentle half-tier setback (`Math.max(1, Math.floor(tier / 2))`) rather than losing all progress, prioritizing newly failed cards into chaining review.
+  - **Classic Leitner Boxes**: 5 boxes with trial-based intervals (+1, +4, +10, +22, +45 reviews). A pass promotes to the next box; a failure resets the card to Box 1 and schedules its setback trial.
+  - **Graduated Interval Recall & Chaining**: 7 graduated recall tiers with micro-spaced chaining (+1, +2, +5, +12, +28, +65, +150 reviews). On pass, advances to the next tier; on failure, applies a gentle half-tier setback (`Math.max(1, Math.floor(tier / 2))`) rather than losing all progress.
+  - **Immediate Reinforcement Drill**: Committing a card failure launches an isolated practice drill on the same card. The user can replicate the solution and retest until they get it right; practice in the drill has **zero effect on tier/box or streak stats**. Once replicated, they continue to the next card.
   - In both algorithms, tracks are interleaved, and every 4 cards in box/tier 3+ unlock 4 more locked cards along the difficulty ladder.
 - **Cold-Start Editor & Aesthetics** (`src/components/PracticeArena.tsx`):
   - Powered by **CodeMirror 6** (`@uiw/react-codemirror`) styled for high-contrast dark themes.
