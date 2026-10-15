@@ -1,0 +1,1 @@
+Implement flatten(arr, depth) for nested arrays (no depth flattens fully; a depth limit flattens that many levels) and flattenObject(obj) producing dot-path keys ({ a: { b: 1 } } -> { 'a.b': 1 }). In flattenObject only plain nested objects are expanded: arrays, null, empty objects ({}) and empty arrays are kept as leaf values. Do not mutate the input.

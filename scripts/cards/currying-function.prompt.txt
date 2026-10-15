@@ -1,0 +1,1 @@
+Implement curry(fn) returning a function that collects arguments across calls, in any grouping (f(1)(2)(3), f(1, 2)(3), f(1)(2, 3) and f(1, 2, 3) all work), and calls fn once at least fn.length arguments have been supplied, returning fn's result.

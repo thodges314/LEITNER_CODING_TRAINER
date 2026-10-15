@@ -1,0 +1,1 @@
+Write mergeIntervals(intervals) for an array of [start, end] pairs. The input may be unsorted: sort by start (O(n log n)), then merge intervals that overlap, are contained in one another, or merely touch at an endpoint (e.g. [1, 4] and [4, 5] become [1, 5]). Return the merged intervals in ascending order; an empty input returns [].

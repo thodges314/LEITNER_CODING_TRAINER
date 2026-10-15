@@ -1,0 +1,1 @@
+Implement class LRUCache(capacity) with get(key) and put(key, value), both in O(1). get(key) returns the stored value, or -1 if the key is absent, and marks the key as most recently used. put(key, value) inserts or updates a key (an update overwrites the value and marks it most recently used); when the cache exceeds capacity, evict the least recently used key.

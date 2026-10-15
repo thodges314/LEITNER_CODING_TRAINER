@@ -1,0 +1,1 @@
+Implement a leading-edge throttle(fn, limit) from scratch in vanilla JavaScript: the first call runs fn immediately; any calls made during the following limit ms are ignored (no trailing call); the first call after the window has passed runs fn again. Forward the arguments (and `this`) of the call that actually runs.

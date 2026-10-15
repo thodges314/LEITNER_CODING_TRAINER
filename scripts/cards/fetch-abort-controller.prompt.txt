@@ -1,0 +1,1 @@
+Write fetchWithTimeout(url, timeoutMs) that uses an AbortController to abort the fetch if it has not settled within timeoutMs; in that case the returned promise rejects with the AbortError (err.name === 'AbortError'). If the request finishes first, resolve with the parsed JSON and clear the timer with clearTimeout so it never fires later.

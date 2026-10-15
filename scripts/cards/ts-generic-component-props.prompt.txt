@@ -1,0 +1,1 @@
+Define interface SelectProps<T> { items: T[]; value: T; onChange: (item: T) => void; getLabel: (item: T) => string } and a generic function renderSelect<T>(props: SelectProps<T>): string that returns the label of every item (via getLabel) joined with ', ' ('' when there are no items). TypeScript must enforce that items and value share the exact same type T.

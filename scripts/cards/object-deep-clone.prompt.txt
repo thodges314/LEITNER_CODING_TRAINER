@@ -1,0 +1,1 @@
+Write a function deepClone(value) that deep-copies nested objects and arrays without using JSON.parse(JSON.stringify()) or structuredClone(). Nested objects/arrays must be new references (changing the clone never changes the original), and primitives and null are returned as they are.

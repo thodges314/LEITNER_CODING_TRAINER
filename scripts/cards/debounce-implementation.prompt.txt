@@ -1,0 +1,1 @@
+Implement a trailing-edge debounce(fn, delay) from scratch: fn is not called until delay ms have passed since the LAST call to the returned function, and then it runs once with the arguments of that last call (so several rapid calls collapse into one invocation). The returned function must preserve the calling `this` context and forward all arguments to fn.

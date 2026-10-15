@@ -1,0 +1,1 @@
+Write an async function fetchAllUsers(urls) that requests all URLs in parallel using Promise.allSettled. Return an array of the parsed JSON payloads of the requests that succeeded, in input order, dropping any request that failed. Empty input, or every request failing, returns [].

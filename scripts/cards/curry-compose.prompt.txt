@@ -1,0 +1,1 @@
+Implement curry(fn) that collects arguments across calls (in any grouping) until fn.length is satisfied, then invokes fn. Also implement pipe(...fns) (left-to-right) and compose(...fns) (right-to-left) composition; with no functions, both return an identity function (pipe()(5) === 5).
