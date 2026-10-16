@@ -34,6 +34,7 @@ import { DeckDashboard } from './components/DeckDashboard';
 import { AddTopicModal } from './components/AddTopicModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FocusModal } from './components/FocusModal';
+import { AboutModal } from './components/AboutModal';
 import {
   Terminal,
   Layers,
@@ -70,6 +71,7 @@ export function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFocusOpen, setIsFocusOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [aiSettingsVersion, setAiSettingsVersion] = useState(0);
   const [reinforcingCardId, setReinforcingCardId] = useState<string | null>(null);
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
@@ -516,6 +518,41 @@ export function App() {
           <span>© {new Date().getFullYear()} Thomas Hodges</span>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '12px' }}>
+          <button
+            type="button"
+            onClick={() => setIsAboutOpen(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              fontSize: '12px',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              textDecoration: 'none',
+              transition: 'color 0.15s ease',
+              fontWeight: 500,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+          >
+            About
+          </button>
+          <span style={{ color: 'var(--border-medium)' }}>•</span>
+          <a
+            href="https://www.javascriptonline.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+              transition: 'color 0.15s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+          >
+            Portfolio
+          </a>
+          <span style={{ color: 'var(--border-medium)' }}>•</span>
           <a
             href="https://www.linkedin.com/in/thodges314"
             target="_blank"
@@ -549,6 +586,11 @@ export function App() {
       </footer>
 
       {/* Modals */}
+      <AboutModal
+        isOpen={isAboutOpen}
+        onClose={() => setIsAboutOpen(false)}
+      />
+
       <AddTopicModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
