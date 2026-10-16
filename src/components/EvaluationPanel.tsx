@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   CheckCircle2,
   XCircle,
@@ -51,21 +51,14 @@ const JoshuaLineReveal: React.FC<{
   isNew?: boolean;
   onScrollToBottom?: () => void;
 }> = ({ text, isNew = false, onScrollToBottom }) => {
-  const lines = useRef<string[]>(splitIntoTerminalLines(text)).current;
+  const lines = useMemo(() => splitIntoTerminalLines(text), [text]);
   const [lineCount, setLineCount] = useState(() => (isNew ? 0 : lines.length));
   const [isDone, setIsDone] = useState(!isNew);
 
   useEffect(() => {
-    if (!isNew) {
-      setLineCount(lines.length);
-      setIsDone(true);
-      return;
-    }
+    if (!isNew) return;
 
     let current = 0;
-    setLineCount(0);
-    setIsDone(false);
-
     const interval = setInterval(() => {
       current++;
       setLineCount(current);
