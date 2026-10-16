@@ -1,0 +1,1 @@
+Write mergeSort(arr) and quickSort(arr), each returning a NEW array sorted ascending by number and leaving the input untouched. mergeSort must be stable and use a merge helper over two sorted halves; quickSort picks a pivot and partitions into less / equal / greater parts. Do not use Array.prototype.sort. Both handle empty and one-element arrays and duplicates.

@@ -1,0 +1,1 @@
+Write rob(nums): the maximum sum of values you can take from an array when no two chosen elements are adjacent (0 for an empty array). Write lengthOfLIS(nums): the length of the longest strictly increasing subsequence (not necessarily contiguous; 0 for an empty array). An O(n^2) lengthOfLIS is fine.

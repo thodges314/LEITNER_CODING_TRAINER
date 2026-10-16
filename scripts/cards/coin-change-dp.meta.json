@@ -1,0 +1,9 @@
+{
+  "track": "algorithms",
+  "title": "Dynamic Programming: Coin Change",
+  "tags": [
+    "dp",
+    "bottom-up",
+    "array"
+  ]
+}

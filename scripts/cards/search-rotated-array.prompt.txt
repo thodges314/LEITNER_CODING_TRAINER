@@ -1,0 +1,1 @@
+A sorted ascending array of distinct numbers was rotated at an unknown pivot (e.g. [4,5,6,7,0,1,2]). Write findMin(nums) returning the smallest value (undefined for an empty array) and searchRotated(nums, target) returning the index of target or -1, both in O(log n).

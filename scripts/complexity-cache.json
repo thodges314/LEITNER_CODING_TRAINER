@@ -593,5 +593,105 @@
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
     "complexityExplanation": "All operations (show, dismiss, render) handle at most a fixed limit of toasts, so they run in constant time and use constant extra space."
+  },
+  "reverse-linked-list": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each node is visited once by both reverseList and middleNode, relinking or advancing pointers in place."
+  },
+  "linked-list-cycle-merge": {
+    "targetTime": "O(n + m)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Floyd's pointers and the merge each walk the lists once while relinking existing nodes, with no extra storage."
+  },
+  "min-stack": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Every operation is constant time; a parallel minimum stack (or two stacks) stores up to n extra entries."
+  },
+  "anagram-palindrome": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "One pass over each string with a character-count map (bounded by alphabet size); prefix comparison is linear in total characters."
+  },
+  "group-anagrams-top-k": {
+    "targetTime": "O(n·k log k + d log d)",
+    "targetSpace": "O(n·k)",
+    "complexityExplanation": "Sorting each word (length k) builds the group key; top-K counts in one pass then sorts the d distinct values."
+  },
+  "climb-stairs-fib-dp": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Iterating with two rolling values computes each Fibonacci step once without storing the whole table."
+  },
+  "coin-change-dp": {
+    "targetTime": "O(amount × coins)",
+    "targetSpace": "O(amount)",
+    "complexityExplanation": "The DP table has amount+1 entries and each entry tries every coin denomination."
+  },
+  "lis-house-robber-dp": {
+    "targetTime": "O(n²)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "House robber is O(n) with two rolling values; the quadratic LIS compares each element with all earlier ones using an O(n) table."
+  },
+  "bst-search-insert": {
+    "targetTime": "O(h)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "Search, insert and min/max follow a single root-to-leaf path of height h (O(log n) balanced, O(n) skewed); recursion uses O(h) stack."
+  },
+  "bst-validate-lca-invert": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "Validation and inversion visit every node once; LCA walks one path; recursion depth is the tree height h."
+  },
+  "flood-fill-islands": {
+    "targetTime": "O(rows × cols)",
+    "targetSpace": "O(rows × cols)",
+    "complexityExplanation": "Each cell is visited at most once; the recursion stack and the visited set can grow to the grid size."
+  },
+  "course-schedule-topo": {
+    "targetTime": "O(V + E)",
+    "targetSpace": "O(V + E)",
+    "complexityExplanation": "Kahn's algorithm processes each course and prerequisite edge once, storing an adjacency list and in-degrees (the smallest-first sort adds a log factor)."
+  },
+  "trie-prefix-tree": {
+    "targetTime": "O(L)",
+    "targetSpace": "O(total characters)",
+    "complexityExplanation": "Insert, search and startsWith cost one step per character of the word (L); the trie stores a node per distinct prefix character."
+  },
+  "min-heap-class": {
+    "targetTime": "O(log n) per op",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Sift-up and sift-down traverse the tree height of log n; the heap array stores all n elements (kSmallest is O(n log n))."
+  },
+  "merge-sort-quick-sort": {
+    "targetTime": "O(n log n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Divide-and-conquer halves the input log n times with linear merging or partitioning per level; the copying versions allocate O(n)."
+  },
+  "permutations-subsets-backtracking": {
+    "targetTime": "O(n · n!) / O(n · 2ⁿ) / O(4ⁿ/√n)",
+    "targetSpace": "O(n) recursion",
+    "complexityExplanation": "Output size dominates: n! permutations, 2ⁿ subsets and Catalan-many parentheses strings, while the recursion depth stays at most O(n)."
+  },
+  "binary-search-variants": {
+    "targetTime": "O(log n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each iteration halves the search range using only a few index variables."
+  },
+  "search-rotated-array": {
+    "targetTime": "O(log n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "At each step one half is guaranteed sorted, so the range halves with constant extra state."
+  },
+  "matrix-rotate-spiral": {
+    "targetTime": "O(rows × cols)",
+    "targetSpace": "O(rows × cols)",
+    "complexityExplanation": "Every cell is read exactly once and the new rotated or spiral output holds all cells."
+  },
+  "kadane-prefix-sum": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each function is a single pass; productExceptSelf and subarraySum keep an O(n) output array or prefix-sum map (Kadane alone is O(1) space)."
   }
 }

@@ -22,12 +22,13 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 119 (46 active at first run) |
-| Documented test cases | 731 (each shown as input → expected in the UI) |
-| Difficulty spread | d1: 14 · d2: 29 · d3: 36 · d4: 20 · d5: 1 |
-| Tracks with cards | async-js, data-structures, react, algorithms, js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser |
-| Tracks defined but empty | `testing-tooling` (`react-components` has 16 cards) |
-| Automated tests | 439 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution**, plus unit tests for scheduling algorithms and formatting |
+| Cards | 139 (53 active at first run) |
+| Documented test cases | 874 (each shown as input → expected in the UI) |
+| Difficulty spread | d1: 19 · d2: 43 · d3: 50 · d4: 26 · d5: 1 |
+| Tracks with cards | async-js, data-structures, react, algorithms (29), js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser, react-components (16) |
+| Tracks defined but empty | `testing-tooling` |
+| Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
+| Automated tests | 528 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution**, plus unit tests for scheduling algorithms and formatting |
 | Manual verification | The 66 original cards and all React cards (31 cards incl. every `react-components` card) were run in the production build in a real browser. The other cards added later pass in jsdom only |
 
 ## 3. Repository map
@@ -84,6 +85,13 @@ Rules that tests enforce (`seedCards.test.ts`, `testCases.test.ts`, `ladder.test
 1. Reference solution passes its own harness. 2. An empty solution does **not** pass. 3. Every documented case is asserted by the
 harness under the **same label** (for hand-written harnesses the `r()` description must equal the `$test.check` label).
 4. Every card has difficulty 1-5 and a concept. 5. Seed-active cards are bottom-rung and d ≤ 2.
+
+**Complexity metadata (second pipeline step, not part of `build:cards`).** `targetTime`, `targetSpace` and `complexityExplanation` are stored
+on each card in `topics.json` and shown in the UI as the target complexity. They come from `scripts/complexity-cache.json` (id → fields),
+applied by `scripts/enrich-complexities.mjs`, which asks a cheap model (Groq `openai/gpt-oss-120b`, key via `GROQ_API_KEY`/`OPENAI_API_KEY`) only for
+cards missing from the cache, then merges the cache into `topics.json`. Cached cards need no network (`GROQ_API_KEY=unused` works). Batch-13 entries
+were written by hand into the cache. **Checklist after adding cards:** `npm run build:cards` → add cache entries (or run the enrich script with a key)
+→ `node scripts/enrich-complexities.mjs` → `npm test`. A card with no cache entry has no complexity fields.
 
 Adding a card: create the files above, add cases to a `testcases/partN.mjs` registered in `newcards.mjs`, add a `difficulty.json`
 entry, run `npm run build:cards && npm test`. New seed cards start locked at the end of the deck (existing users' progress is kept;
@@ -182,7 +190,7 @@ algorithms, TS). This is a judgement from experience with those formats, not a l
 | DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize/Intersection observers (outside React), `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame` loops, Web Workers |
 | React hooks and state | **Medium** | ~25 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer. Missing: undo/redo, form-state hook, `useLayoutEffect`, `useDeferredValue`/`useTransition`, optimistic updates, React 19 APIs |
 | React components ("build this") | **Weak** | ~11 | Typeahead, modal, tabs, infinite list, star rating, countdown, file tree, filter list, accordion, error boundary, a11y field, load-more list, memo list, simple + full data table, dropdown menu, virtual list; hooks: useToggle/useCounter, useHistory, useForm. Still missing: multi-step form wizard, tooltip/popover, drag-sortable list (keyboard fallback), pagination controls, tag/chip input, stepper/progress bar, lazy image (IntersectionObserver), copy-to-clipboard button, theme switcher (context + localStorage), kanban board, nested comments, React 19 APIs |
-| Algorithms | **Weak** | ~19 | arrays/hash/two-pointer/window/stack/binary-search/BFS/intervals/trees-basics. Missing: linked lists, heaps, tries, graphs (grid DFS, topo sort), DP, backtracking, sorting, matrix, bit tricks |
+| Algorithms | **Medium-strong** (batch 13) | ~39 | arrays/hash/two-pointer/window/stack/BFS/intervals/trees, plus batch 13: linked lists, MinStack/queue, strings, anagrams, DP (fib, coin change, LIS, robber), BST/LCA, grid DFS, topo sort, trie, heap, sorting, backtracking, binary-search variants, matrix, Kadane/prefix sums. Missing: graph shortest path (Dijkstra, union-find), bit tricks, monotonic stack/deque, 2D DP (LCS, edit distance, knapsack), intervals/greedy variants, LRU-style design with linked lists |
 | TypeScript | **Weak-medium** | 6 | unions, generics, utility types, guards, typed emitter. Missing: conditional/`infer`, template-literal types, overloads, branded types, `satisfies`, assertion functions |
 | Accessibility | **Weak** | 3 | modal focus, tabs ARIA, typeahead. Missing: menu/dropdown roving focus, `aria-live`, accessible forms/errors, skip links, focus trap utilities |
 | CSS/layout | **None** (specificity only) | 1 | Needs a different grading approach (see below) |
@@ -237,7 +245,7 @@ Grading approaches available today: (a) **pure functions** graded from input/exp
    - Further: toast queue, multi-step form, optimistic like button (rollback on rejection), drag-sortable list (keyboard fallback),
      image carousel, star/like counters, accordion, pagination, progress bar, tooltip/popover positioning, theme switcher.
    - Each component card should state its **exact DOM contract** (roles, labels, button texts) in the prompt, because the harness queries by those.
-2. **Algorithms** (pure functions, approach a; track `algorithms`): linked list (`reverseList`, `hasCycle`, `mergeTwoLists`; nodes `{val,next}`
+2. **Algorithms** (pure functions, approach a; track `algorithms`). **DONE in batch 13** (20 cards, `scripts/testcases/part13.mjs`, authored via `scripts/cards-batch13.mjs`, which can be deleted): linked list (`reverseList`, `hasCycle`, `mergeTwoLists`; nodes `{val,next}`
    built with a one-line helper in each case), `MinStack` + queue from two stacks, BST (`isValidBST`, `invertTree`, `lowestCommonAncestor`),
    `numIslands` (grid DFS/BFS) + `floodFill`, `Trie` (+ `wordsWithPrefix`), `MinHeap` + `topKFrequent`, DP (`climbStairs`, `coinChange`, LIS),
    backtracking (`permute`, `subsets`, `generateParenthesis` — normalise ordering in the case input), sorting (`mergeSort`, `quickSort`
@@ -287,8 +295,23 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 - Consider moving seed-deck merge/migration into a versioned schema (`deckVersion`) before the next breaking change.
 
 ### 7.5 Suggested next steps (in order)
-1. Fill ladder holes (§7.1) so every concept starts at d1/d2. 2. Build the `react-components` cards. 3. Playwright smoke test + wider timing margins.
-4. Stats/history. 5. Algorithms and TypeScript families. 6. Sandboxed execution.
+1. Fill ladder holes (§7.1) so every concept starts at d1/d2. 2. Playwright smoke test + wider timing margins (batch 13 and later cards are jsdom-only).
+3. Stats/history. 4. Next card category (see below). 5. Sandboxed execution.
+
+### 7.6 DECISION NEEDED: next card categories
+Algorithms were filled in batch 13. Candidates, with the owner's goal in mind (re-typing interview algorithms by hand), in recommended order:
+
+| # | Category | Why | Grading | Effort |
+|---|---|---|---|---|
+| 1 | **Algorithms, round 2** | Still the most common interview content: 2D DP (LCS, edit distance, knapsack), Dijkstra, union-find, monotonic stack, bit tricks, greedy/intervals, LRU with a doubly linked list | pure input/expected | low |
+| 2 | **Ladder holes (§7.1)** | Every concept should start at d1/d2 | mixed | medium |
+| 3 | **Language depth (§7.2.7)** | Output-prediction, hoisting/TDZ, `Proxy`, `WeakMap`, getters/setters | pure input/expected | low |
+| 4 | **TypeScript type-level (§7.2.3)** | Conditional/`infer`, template-literal types, overloads | `@ts-expect-error` extras | medium |
+| 5 | **Testing & libs, pure logic (§7.2.4)** | `mockFn`, fake timers, mini `expect`, D3 scales, Next route matcher | pure input/expected | low |
+| 6 | **DOM/browser extras (§7.2.6)** | drag-and-drop, observers, `pushState` router | DOM harness | medium |
+| 7 | **React 19 / a11y** | `useOptimistic`, `useTransition`, roving focus, `aria-live` | needs sandbox changes (§7.2.8) | high |
+
+Pick the order; each batch follows the §4 checklist including the complexity step.
 
 ## 8. Conventions and pitfalls for assistants
 

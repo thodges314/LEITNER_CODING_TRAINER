@@ -1,0 +1,9 @@
+{
+  "track": "algorithms",
+  "title": "Strings: Anagram, Palindrome, Common Prefix",
+  "tags": [
+    "string",
+    "hash-map",
+    "basics"
+  ]
+}

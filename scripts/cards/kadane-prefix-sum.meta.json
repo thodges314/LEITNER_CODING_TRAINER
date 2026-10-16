@@ -1,0 +1,10 @@
+{
+  "track": "algorithms",
+  "title": "Arrays: Maximum Subarray and Prefix Sums",
+  "tags": [
+    "array",
+    "dp",
+    "prefix-sum",
+    "kadane"
+  ]
+}

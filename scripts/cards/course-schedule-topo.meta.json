@@ -1,0 +1,10 @@
+{
+  "track": "algorithms",
+  "title": "Graph: Course Schedule (Topological Sort)",
+  "tags": [
+    "graph",
+    "topological-sort",
+    "bfs",
+    "cycle"
+  ]
+}

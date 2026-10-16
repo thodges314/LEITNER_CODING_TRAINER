@@ -1,0 +1,1 @@
+Write binarySearch(sorted, target) returning the index of target in an ascending array or -1; lowerBound(sorted, target) returning the first index whose value is >= target (sorted.length if none; works with duplicates); and mySqrt(x) returning the floor of the square root of a non-negative integer using binary search (no Math.sqrt).

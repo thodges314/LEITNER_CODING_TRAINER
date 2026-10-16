@@ -1,0 +1,1 @@
+Write coinChange(coins, amount): the fewest coins (unlimited supply of each denomination) needed to make amount, or -1 when it is impossible. amount 0 needs 0 coins. Also write countWays(coins, amount): the number of distinct combinations (order does not matter) that make amount; countWays(coins, 0) is 1.

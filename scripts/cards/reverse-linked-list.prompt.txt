@@ -1,0 +1,1 @@
+Nodes look like { val, next } (the last node has next: null). Write reverseList(head) that reverses the list in place and returns the new head (null for an empty list), and middleNode(head) that returns the middle node (the second of the two middles when the length is even; null for an empty list). Use the slow/fast pointer technique for middleNode.

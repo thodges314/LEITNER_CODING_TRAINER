@@ -1,0 +1,1 @@
+Write rotate90(matrix) returning a NEW n x m matrix rotated 90 degrees clockwise (rows become columns; an empty matrix gives []), transpose(matrix) returning the transpose, and spiralOrder(matrix) returning the elements in clockwise spiral order starting at the top-left (works for non-square matrices; [] for an empty matrix).
