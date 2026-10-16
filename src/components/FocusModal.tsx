@@ -108,37 +108,76 @@ export const FocusModal: React.FC<FocusModalProps> = ({
           </button>
         </div>
 
-        <p style={{ fontSize: '13px', marginBottom: '14px', color: matching === 0 ? '#f87171' : '#34d399' }}>
-          {matching} of {active.length} active cards match{isFilterActive(filter) ? '' : ' (no filter)'}
-        </p>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            borderRadius: '8px',
+            backgroundColor: matching === 0 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(52, 211, 153, 0.12)',
+            border: `1px solid ${matching === 0 ? 'rgba(239, 68, 68, 0.35)' : 'rgba(52, 211, 153, 0.35)'}`,
+            marginBottom: '16px',
+            fontSize: '12.5px',
+            color: matching === 0 ? '#f87171' : '#34d399',
+            fontWeight: 500,
+          }}
+        >
+          <span>●</span>
+          <span>
+            {matching} of {active.length} active cards match{isFilterActive(filter) ? '' : ' (no filter)'}
+          </span>
+        </div>
 
-        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Difficulty</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', fontSize: '12.5px' }}>
-          <label>
-            From{' '}
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
+          Difficulty Range
+        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px', flexWrap: 'wrap' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <span>From:</span>
             <select
               aria-label="Minimum difficulty"
               value={filter.minDifficulty ?? ''}
               onChange={(e) => set({ minDifficulty: e.target.value ? Number(e.target.value) : undefined })}
+              style={{
+                backgroundColor: 'var(--bg-elevated)',
+                color: '#f1f5f9',
+                border: '1px solid var(--border-medium)',
+                borderRadius: '8px',
+                padding: '6px 12px',
+                fontSize: '13px',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
             >
-              <option value="">any</option>
+              <option value="" style={{ backgroundColor: '#141b29', color: '#f1f5f9' }}>Any Level</option>
               {[1, 2, 3, 4, 5].map((d) => (
-                <option key={d} value={d}>
+                <option key={d} value={d} style={{ backgroundColor: '#141b29', color: '#f1f5f9' }}>
                   {d} · {DIFFICULTY_LABELS[d]}
                 </option>
               ))}
             </select>
           </label>
-          <label>
-            to{' '}
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <span>To:</span>
             <select
               aria-label="Maximum difficulty"
               value={filter.maxDifficulty ?? ''}
               onChange={(e) => set({ maxDifficulty: e.target.value ? Number(e.target.value) : undefined })}
+              style={{
+                backgroundColor: 'var(--bg-elevated)',
+                color: '#f1f5f9',
+                border: '1px solid var(--border-medium)',
+                borderRadius: '8px',
+                padding: '6px 12px',
+                fontSize: '13px',
+                cursor: 'pointer',
+                outline: 'none',
+              }}
             >
-              <option value="">any</option>
+              <option value="" style={{ backgroundColor: '#141b29', color: '#f1f5f9' }}>Any Level</option>
               {[1, 2, 3, 4, 5].map((d) => (
-                <option key={d} value={d}>
+                <option key={d} value={d} style={{ backgroundColor: '#141b29', color: '#f1f5f9' }}>
                   {d} · {DIFFICULTY_LABELS[d]}
                 </option>
               ))}
@@ -146,8 +185,10 @@ export const FocusModal: React.FC<FocusModalProps> = ({
           </label>
         </div>
 
-        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Tracks</h3>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px' }}>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
+          Tracks
+        </h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '18px' }}>
           {tracks.map((track) => {
             const meta = getTrackMeta(track);
             const mode = modeOf(track, filter.includeTracks, filter.excludeTracks);
@@ -164,16 +205,29 @@ export const FocusModal: React.FC<FocusModalProps> = ({
           })}
         </div>
 
-        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Tags</h3>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
+          Tags
+        </h3>
         <input
           type="search"
           value={tagQuery}
           onChange={(e) => setTagQuery(e.target.value)}
-          placeholder="Search tags (e.g. graph, a11y, promise)…"
+          placeholder="Search tags (e.g. graph, a11y, promise, closures)…"
           aria-label="Search tags"
-          style={{ width: '100%', marginBottom: '8px' }}
+          style={{
+            width: '100%',
+            height: '38px',
+            padding: '8px 12px',
+            fontSize: '13px',
+            backgroundColor: 'var(--bg-elevated)',
+            color: '#f1f5f9',
+            border: '1px solid var(--border-medium)',
+            borderRadius: '8px',
+            outline: 'none',
+            marginBottom: '10px',
+          }}
         />
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px', minHeight: '28px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '18px', minHeight: '28px' }}>
           {visibleTags.length === 0 && (
             <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Type to find tags; chosen tags stay listed here.</span>
           )}
@@ -192,7 +246,9 @@ export const FocusModal: React.FC<FocusModalProps> = ({
           })}
         </div>
 
-        <h3 style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Presets</h3>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
+          Presets
+        </h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
           {Object.keys(presets).length === 0 && <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>No saved presets yet.</span>}
           {Object.entries(presets).map(([name, preset]) => (
@@ -212,13 +268,23 @@ export const FocusModal: React.FC<FocusModalProps> = ({
             </span>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '18px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
           <input
             value={presetName}
             onChange={(e) => setPresetName(e.target.value)}
-            placeholder="Save current focus as… (e.g. React screen)"
+            placeholder="Save current focus as… (e.g. React screen, Async drill)"
             aria-label="Preset name"
-            style={{ flex: 1 }}
+            style={{
+              flex: 1,
+              height: '38px',
+              padding: '8px 12px',
+              fontSize: '13px',
+              backgroundColor: 'var(--bg-elevated)',
+              color: '#f1f5f9',
+              border: '1px solid var(--border-medium)',
+              borderRadius: '8px',
+              outline: 'none',
+            }}
           />
           <button
             type="button"
@@ -227,6 +293,13 @@ export const FocusModal: React.FC<FocusModalProps> = ({
             onClick={() => {
               onSavePreset(presetName, filter);
               setPresetName('');
+            }}
+            style={{
+              padding: '8px 16px',
+              fontSize: '13px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
             }}
           >
             <Save size={14} /> Save

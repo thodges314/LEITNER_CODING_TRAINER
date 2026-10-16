@@ -59,7 +59,29 @@ html, body {
 
 button, input, textarea, select {
   font-family: inherit;
-  color: inherit;
+  color: var(--text-primary);
+}
+
+input, select, textarea {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-dim);
+}
+
+select option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--border-focus);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
 }
 
 /* Custom Scrollbar */
