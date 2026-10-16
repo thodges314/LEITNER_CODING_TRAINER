@@ -1,5 +1,5 @@
 import { DifficultyBadge } from './DifficultyBadge';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
 import type { AppTheme } from '../lib/theme';
 import {
@@ -8,6 +8,8 @@ import {
   getSchedulingAlgorithm,
   exportDeckBackup,
   importDeckBackup,
+  difficultyOf,
+  DIFFICULTY_LABELS,
 } from '../lib/leitner';
 import type { TopicItem, LeitnerDeckState } from '../lib/leitner';
 import {
@@ -21,7 +23,29 @@ import {
   Search,
   Flame,
   Trash2,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Check,
 } from 'lucide-react';
+
+export type CatalogSortOption =
+  | 'track-asc'
+  | 'track-desc'
+  | 'difficulty-asc'
+  | 'difficulty-desc'
+  | 'streak-desc'
+  | 'streak-asc'
+  | 'box-desc'
+  | 'box-asc'
+  | 'title-asc'
+  | 'title-desc'
+  | 'due-asc'
+  | 'due-desc'
+  | 'status-asc'
+  | 'status-desc';
+
+export type CatalogStatusFilter = 'all' | 'active' | 'locked' | 'due' | 'scheduled' | 'mastered';
 
 const LIGHT_TRACK_STYLES: Record<string, { color: string; bg: string; border: string }> = {
   'async-js': {
@@ -118,9 +142,12 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onOpenAddModal,
 }) => {
   const isLight = theme === 'apple-gsos';
-  const [selectedTrack, setSelectedTrack] = useState<string>('all');
+  const allAvailableTracks = useMemo(() => Array.from(new Set(state.topics.map((t) => t.track))), [state.topics]);
+  const [selectedTracks, setSelectedTracks] = useState<string[]>(['all']);
   const [selectedBox, setSelectedBox] = useState<number | 'all'>('all');
-  const [selectedStatus, setSelectedStatus] = useState<'all' | 'active' | 'locked'>('all');
+  const [selectedStatus, setSelectedStatus] = useState<CatalogStatusFilter>('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<number | 'all'>('all');
+  const [sortOption, setSortOption] = useState<CatalogSortOption>('track-asc');
   const [searchQuery, setSearchQuery] = useState('');
   const [topicToDelete, setTopicToDelete] = useState<TopicItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -129,6 +156,62 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
   const { topics, totalCompletedReviews, unlockedStageCount = 0 } = state;
+
+  const isAllTracks =
+    selectedTracks.includes('all') ||
+    selectedTracks.length === 0 ||
+    selectedTracks.length === allAvailableTracks.length;
+
+  const trackCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const t of topics) {
+      counts[t.track] = (counts[t.track] || 0) + 1;
+    }
+    return counts;
+  }, [topics]);
+
+  const handleToggleTrack = (trk: string) => {
+    if (trk === 'all') {
+      setSelectedTracks(['all']);
+      return;
+    }
+    if (isAllTracks) {
+      setSelectedTracks([trk]);
+      return;
+    }
+    if (selectedTracks.includes(trk)) {
+      const next = selectedTracks.filter((t) => t !== trk);
+      if (next.length === 0 || next.length === allAvailableTracks.length) {
+        setSelectedTracks(['all']);
+      } else {
+        setSelectedTracks(next);
+      }
+    } else {
+      const next = [...selectedTracks, trk];
+      if (next.length >= allAvailableTracks.length) {
+        setSelectedTracks(['all']);
+      } else {
+        setSelectedTracks(next);
+      }
+    }
+  };
+
+  const handleResetFilters = () => {
+    setSelectedTracks(['all']);
+    setSelectedBox('all');
+    setSelectedStatus('all');
+    setSelectedDifficulty('all');
+    setSearchQuery('');
+    setSortOption('track-asc');
+  };
+
+  const hasActiveFilters =
+    !isAllTracks ||
+    selectedBox !== 'all' ||
+    selectedStatus !== 'all' ||
+    selectedDifficulty !== 'all' ||
+    searchQuery.trim() !== '' ||
+    sortOption !== 'track-asc';
 
   // Compute Statistics
   const activeCount = topics.filter((t) => t.status === 'active').length;
@@ -148,20 +231,172 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const nextUnlockTarget = (unlockedStageCount + 1) * 4;
   const cardsNeededForNextUnlock = Math.max(0, nextUnlockTarget - box3PlusCount);
 
-  // Filtered topics
-  const filteredTopics = topics.filter((t) => {
-    if (selectedTrack !== 'all' && t.track !== selectedTrack) return false;
-    if (selectedBox !== 'all' && t.box !== selectedBox) return false;
-    if (selectedStatus !== 'all' && t.status !== selectedStatus) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchTitle = t.title.toLowerCase().includes(q);
-      const matchTags = t.tags.some((tag) => tag.toLowerCase().includes(q));
-      const matchId = t.id.toLowerCase().includes(q);
-      if (!matchTitle && !matchTags && !matchId) return false;
+  const compareTopics = (a: TopicItem, b: TopicItem): number => {
+    switch (sortOption) {
+      case 'track-asc': {
+        const trkCmp = getTrackMeta(a.track).label.localeCompare(getTrackMeta(b.track).label);
+        if (trkCmp !== 0) return trkCmp;
+        const diffA = difficultyOf(a);
+        const diffB = difficultyOf(b);
+        if (diffA !== diffB) return diffA - diffB;
+        return a.title.localeCompare(b.title);
+      }
+      case 'track-desc': {
+        const trkCmp = getTrackMeta(b.track).label.localeCompare(getTrackMeta(a.track).label);
+        if (trkCmp !== 0) return trkCmp;
+        const diffA = difficultyOf(a);
+        const diffB = difficultyOf(b);
+        if (diffA !== diffB) return diffA - diffB;
+        return a.title.localeCompare(b.title);
+      }
+      case 'difficulty-asc': {
+        const diffA = difficultyOf(a);
+        const diffB = difficultyOf(b);
+        if (diffA !== diffB) return diffA - diffB;
+        const trkCmp = getTrackMeta(a.track).label.localeCompare(getTrackMeta(b.track).label);
+        if (trkCmp !== 0) return trkCmp;
+        return a.title.localeCompare(b.title);
+      }
+      case 'difficulty-desc': {
+        const diffA = difficultyOf(a);
+        const diffB = difficultyOf(b);
+        if (diffB !== diffA) return diffB - diffA;
+        const trkCmp = getTrackMeta(a.track).label.localeCompare(getTrackMeta(b.track).label);
+        if (trkCmp !== 0) return trkCmp;
+        return a.title.localeCompare(b.title);
+      }
+      case 'streak-desc': {
+        const streakA = a.status === 'active' ? (a.streak ?? 0) : -1;
+        const streakB = b.status === 'active' ? (b.streak ?? 0) : -1;
+        if (streakB !== streakA) return streakB - streakA;
+        return a.title.localeCompare(b.title);
+      }
+      case 'streak-asc': {
+        const streakA = a.status === 'active' ? (a.streak ?? 0) : -1;
+        const streakB = b.status === 'active' ? (b.streak ?? 0) : -1;
+        if (streakA !== streakB) return streakA - streakB;
+        return a.title.localeCompare(b.title);
+      }
+      case 'box-desc': {
+        if (b.box !== a.box) return b.box - a.box;
+        return a.title.localeCompare(b.title);
+      }
+      case 'box-asc': {
+        if (a.box !== b.box) return a.box - b.box;
+        return a.title.localeCompare(b.title);
+      }
+      case 'title-asc': {
+        return a.title.localeCompare(b.title);
+      }
+      case 'title-desc': {
+        return b.title.localeCompare(a.title);
+      }
+      case 'due-asc': {
+        const isDueA = a.status === 'active' && a.nextEligibleTrial <= totalCompletedReviews;
+        const isDueB = b.status === 'active' && b.nextEligibleTrial <= totalCompletedReviews;
+        if (isDueA && !isDueB) return -1;
+        if (!isDueA && isDueB) return 1;
+        if (a.status === 'active' && b.status === 'active') {
+          if (a.nextEligibleTrial !== b.nextEligibleTrial) return a.nextEligibleTrial - b.nextEligibleTrial;
+        }
+        if (a.status !== b.status) return a.status === 'active' ? -1 : 1;
+        return a.title.localeCompare(b.title);
+      }
+      case 'due-desc': {
+        const isDueA = a.status === 'active' && a.nextEligibleTrial <= totalCompletedReviews;
+        const isDueB = b.status === 'active' && b.nextEligibleTrial <= totalCompletedReviews;
+        if (isDueA && !isDueB) return 1;
+        if (!isDueA && isDueB) return -1;
+        if (a.status === 'active' && b.status === 'active') {
+          if (b.nextEligibleTrial !== a.nextEligibleTrial) return b.nextEligibleTrial - a.nextEligibleTrial;
+        }
+        if (a.status !== b.status) return a.status === 'active' ? -1 : 1;
+        return a.title.localeCompare(b.title);
+      }
+      case 'status-asc': {
+        if (a.status !== b.status) return a.status === 'active' ? -1 : 1;
+        return a.title.localeCompare(b.title);
+      }
+      case 'status-desc': {
+        if (a.status !== b.status) return a.status === 'locked' ? -1 : 1;
+        return a.title.localeCompare(b.title);
+      }
+      default:
+        return 0;
     }
-    return true;
-  });
+  };
+
+  const handleHeaderSort = (column: 'title' | 'track' | 'difficulty' | 'box' | 'streak' | 'due' | 'status') => {
+    if (column === 'title') {
+      setSortOption((prev) => (prev === 'title-asc' ? 'title-desc' : 'title-asc'));
+    } else if (column === 'track') {
+      setSortOption((prev) => (prev === 'track-asc' ? 'track-desc' : 'track-asc'));
+    } else if (column === 'difficulty') {
+      setSortOption((prev) => (prev === 'difficulty-asc' ? 'difficulty-desc' : 'difficulty-asc'));
+    } else if (column === 'box') {
+      setSortOption((prev) => (prev === 'box-desc' ? 'box-asc' : 'box-desc'));
+    } else if (column === 'streak') {
+      setSortOption((prev) => (prev === 'streak-desc' ? 'streak-asc' : 'streak-desc'));
+    } else if (column === 'due') {
+      setSortOption((prev) => (prev === 'due-asc' ? 'due-desc' : 'due-asc'));
+    } else if (column === 'status') {
+      setSortOption((prev) => (prev === 'status-asc' ? 'status-desc' : 'status-asc'));
+    }
+  };
+
+  const renderSortIndicator = (column: 'title' | 'track' | 'difficulty' | 'box' | 'streak' | 'due' | 'status') => {
+    const isAsc =
+      (column === 'title' && sortOption === 'title-asc') ||
+      (column === 'track' && sortOption === 'track-asc') ||
+      (column === 'difficulty' && sortOption === 'difficulty-asc') ||
+      (column === 'box' && sortOption === 'box-asc') ||
+      (column === 'streak' && sortOption === 'streak-asc') ||
+      (column === 'due' && sortOption === 'due-asc') ||
+      (column === 'status' && sortOption === 'status-asc');
+
+    const isDesc =
+      (column === 'title' && sortOption === 'title-desc') ||
+      (column === 'track' && sortOption === 'track-desc') ||
+      (column === 'difficulty' && sortOption === 'difficulty-desc') ||
+      (column === 'box' && sortOption === 'box-desc') ||
+      (column === 'streak' && sortOption === 'streak-desc') ||
+      (column === 'due' && sortOption === 'due-desc') ||
+      (column === 'status' && sortOption === 'status-desc');
+
+    if (isAsc) {
+      return <ArrowUp size={12} style={{ color: isLight ? '#2B3A8C' : 'var(--accent-cyan)' }} />;
+    }
+    if (isDesc) {
+      return <ArrowDown size={12} style={{ color: isLight ? '#2B3A8C' : 'var(--accent-cyan)' }} />;
+    }
+    return <ArrowUpDown size={11} style={{ opacity: 0.35 }} />;
+  };
+
+  // Filtered and sorted topics
+  const filteredTopics = topics
+    .filter((t) => {
+      if (!isAllTracks && !selectedTracks.includes(t.track)) return false;
+      if (selectedBox !== 'all' && t.box !== selectedBox) return false;
+      if (selectedStatus === 'active' && t.status !== 'active') return false;
+      if (selectedStatus === 'locked' && t.status !== 'locked') return false;
+      if (selectedStatus === 'due' && (t.status !== 'active' || t.nextEligibleTrial > totalCompletedReviews)) return false;
+      if (selectedStatus === 'scheduled' && (t.status !== 'active' || t.nextEligibleTrial <= totalCompletedReviews)) return false;
+      if (selectedStatus === 'mastered') {
+        const isMastered = t.status === 'active' && (algorithm === 'graduated-interval' ? t.box >= 5 : t.box === 5);
+        if (!isMastered) return false;
+      }
+      if (selectedDifficulty !== 'all' && difficultyOf(t) !== selectedDifficulty) return false;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchTitle = t.title.toLowerCase().includes(q);
+        const matchTags = t.tags.some((tag) => tag.toLowerCase().includes(q));
+        const matchId = t.id.toLowerCase().includes(q);
+        const matchTrackLabel = getTrackMeta(t.track).label.toLowerCase().includes(q);
+        if (!matchTitle && !matchTags && !matchId && !matchTrackLabel) return false;
+      }
+      return true;
+    })
+    .sort(compareTopics);
 
   const handleExport = () => {
     exportDeckBackup(state);
@@ -334,93 +569,278 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           ))}
         </div>
       </div>
-
-      {/* Filter and Search Bar */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '12px',
-        }}
-      >
-        {/* Track Filters */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          {['all', ...Array.from(new Set(topics.map((t) => t.track)))].map((trk) => {
-            const isActive = selectedTrack === trk;
-            const label = trk === 'all' ? 'All Tracks' : getTrackMeta(trk).label;
-            return (
+        {/* Track Filters (Multi-Select with 'All Tracks') */}
+        <div
+          className="glass-panel"
+          style={{
+            padding: '16px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            width: '100%',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                Filter Tracks:
+              </span>
+              {!isAllTracks && (
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    backgroundColor: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)',
+                    color: isLight ? '#4455AA' : 'var(--accent-cyan)',
+                    border: isLight ? '1px solid #C4C3BA' : '1px solid rgba(56, 189, 248, 0.3)',
+                  }}
+                >
+                  {selectedTracks.length} of {allAvailableTracks.length} selected
+                </span>
+              )}
+            </div>
+            {!isAllTracks && (
               <button
-                key={trk}
-                className="btn"
-                onClick={() => setSelectedTrack(trk)}
-                style={{
-                  padding: '6px 12px',
-                  fontSize: '12.5px',
-                  backgroundColor: isActive ? (isLight ? '#4455AA' : 'var(--bg-elevated)') : (isLight ? '#FFFFFF' : 'transparent'),
-                  borderColor: isActive ? (isLight ? '#2B3A8C' : 'var(--border-medium)') : (isLight ? '#C4C3BA' : 'var(--border-subtle)'),
-                  color: isActive ? (isLight ? '#FFFFFF' : 'var(--text-primary)') : (isLight ? '#333333' : 'var(--text-muted)'),
-                  fontWeight: isActive ? 600 : 500,
-                }}
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setSelectedTracks(['all'])}
+                style={{ fontSize: '11.5px', padding: '2px 8px' }}
               >
-                {label}
+                Reset to All Tracks
               </button>
-            );
-          })}
-        </div>
-
-        {/* Search & Status Filters */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <div style={{ position: 'relative', minWidth: '220px' }}>
-            <Search
-              size={14}
-              style={{
-                position: 'absolute',
-                left: '10px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: isLight ? '#555555' : 'var(--text-muted)',
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Search topics or tags..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="code-buffer"
-              style={{
-                height: '34px',
-                paddingLeft: '32px',
-                paddingRight: '10px',
-                fontSize: '12.5px',
-                backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-editor)',
-                color: isLight ? '#1C1C1C' : '#e2e8f0',
-                border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
-              }}
-            />
+            )}
           </div>
 
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value as 'all' | 'active' | 'locked')}
-            className="code-buffer"
-            style={{
-              height: '34px',
-              padding: '4px 10px',
-              fontSize: '12.5px',
-              backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-elevated)',
-              color: isLight ? '#1C1C1C' : 'var(--text-primary)',
-              border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
-              width: 'auto',
-            }}
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active Only</option>
-            <option value="locked">Locked Only</option>
-          </select>
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            {/* 'All Tracks' Pill */}
+            <button
+              key="all"
+              type="button"
+              className="btn"
+              onClick={() => handleToggleTrack('all')}
+              style={{
+                padding: '6px 12px',
+                fontSize: '12px',
+                backgroundColor: isAllTracks ? (isLight ? '#4455AA' : 'var(--bg-elevated)') : (isLight ? '#FFFFFF' : 'transparent'),
+                borderColor: isAllTracks ? (isLight ? '#2B3A8C' : 'var(--accent-cyan)') : (isLight ? '#C4C3BA' : 'var(--border-subtle)'),
+                color: isAllTracks ? (isLight ? '#FFFFFF' : 'var(--text-primary)') : (isLight ? '#333333' : 'var(--text-muted)'),
+                fontWeight: isAllTracks ? 700 : 500,
+                boxShadow: isAllTracks && !isLight ? '0 0 10px rgba(56, 189, 248, 0.15)' : 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              {isAllTracks && <Check size={13} />}
+              All Tracks ({topics.length})
+            </button>
+
+            {/* Individual Tracks */}
+            {allAvailableTracks.map((trk) => {
+              const isSelected = !isAllTracks && selectedTracks.includes(trk);
+              const meta = getTrackMeta(trk);
+              const count = trackCounts[trk] || 0;
+              const lightTrk = LIGHT_TRACK_STYLES[trk] || { color: '#334155', bg: '#F1F5F9', border: '#CBD5E1' };
+
+              return (
+                <button
+                  key={trk}
+                  type="button"
+                  className="btn"
+                  onClick={() => handleToggleTrack(trk)}
+                  title={isSelected ? `Click to remove ${meta.label}` : `Click to add ${meta.label} to filter`}
+                  style={{
+                    padding: '6px 11px',
+                    fontSize: '12px',
+                    backgroundColor: isSelected
+                      ? (isLight ? lightTrk.bg : 'rgba(56, 189, 248, 0.15)')
+                      : (isLight ? '#FFFFFF' : 'transparent'),
+                    borderColor: isSelected
+                      ? (isLight ? lightTrk.border : 'var(--accent-cyan)')
+                      : (isLight ? '#C4C3BA' : 'var(--border-subtle)'),
+                    color: isSelected
+                      ? (isLight ? lightTrk.color : 'var(--text-primary)')
+                      : (isLight ? '#475569' : 'var(--text-secondary)'),
+                    fontWeight: isSelected ? 700 : 500,
+                    boxShadow: isSelected && !isLight ? '0 0 8px rgba(56, 189, 248, 0.2)' : 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {isSelected && <Check size={12} />}
+                  <span>{meta.label}</span>
+                  <span
+                    style={{
+                      fontSize: '10.5px',
+                      opacity: isSelected ? 0.9 : 0.6,
+                      padding: '1px 5px',
+                      borderRadius: '8px',
+                      backgroundColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+
+        {/* Search, Filter & Sort Controls Bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px',
+            width: '100%',
+          }}
+        >
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+            {/* Search Input */}
+            <div style={{ position: 'relative', minWidth: '220px', flex: '1 1 220px', maxWidth: '340px' }}>
+              <Search
+                size={14}
+                style={{
+                  position: 'absolute',
+                  left: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: isLight ? '#555555' : 'var(--text-muted)',
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Search topics, tags, or tracks..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="code-buffer"
+                style={{
+                  height: '34px',
+                  paddingLeft: '32px',
+                  paddingRight: '10px',
+                  fontSize: '12.5px',
+                  width: '100%',
+                  backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-editor)',
+                  color: isLight ? '#1C1C1C' : '#e2e8f0',
+                  border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
+                }}
+              />
+            </div>
+
+            {/* Status Filter */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value as CatalogStatusFilter)}
+                className="code-buffer"
+                style={{
+                  height: '34px',
+                  padding: '4px 10px',
+                  fontSize: '12.5px',
+                  backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-elevated)',
+                  color: isLight ? '#1C1C1C' : 'var(--text-primary)',
+                  border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
+                  width: 'auto',
+                }}
+                aria-label="Filter by Status"
+              >
+                <option value="all">Status: All</option>
+                <option value="active">Status: Active Only</option>
+                <option value="locked">Status: Locked (Reserve) Only</option>
+                <option value="due">Status: Due for Practice (Ready Now)</option>
+                <option value="scheduled">Status: In Interval Spacing</option>
+                <option value="mastered">Status: Mastered (Tier 5+)</option>
+              </select>
+            </div>
+
+            {/* Difficulty Filter */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <select
+                value={selectedDifficulty === 'all' ? 'all' : String(selectedDifficulty)}
+                onChange={(e) => setSelectedDifficulty(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                className="code-buffer"
+                style={{
+                  height: '34px',
+                  padding: '4px 10px',
+                  fontSize: '12.5px',
+                  backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-elevated)',
+                  color: isLight ? '#1C1C1C' : 'var(--text-primary)',
+                  border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
+                  width: 'auto',
+                }}
+                aria-label="Filter by Difficulty"
+              >
+                <option value="all">Difficulty: All</option>
+                <option value="1">Level 1: {DIFFICULTY_LABELS[1]}</option>
+                <option value="2">Level 2: {DIFFICULTY_LABELS[2]}</option>
+                <option value="3">Level 3: {DIFFICULTY_LABELS[3]}</option>
+                <option value="4">Level 4: {DIFFICULTY_LABELS[4]}</option>
+                <option value="5">Level 5: {DIFFICULTY_LABELS[5]}</option>
+              </select>
+            </div>
+
+            {/* Sort Options */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value as CatalogSortOption)}
+                className="code-buffer"
+                style={{
+                  height: '34px',
+                  padding: '4px 10px',
+                  fontSize: '12.5px',
+                  backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-elevated)',
+                  color: isLight ? '#1C1C1C' : 'var(--text-primary)',
+                  border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
+                  width: 'auto',
+                }}
+                aria-label="Sort Topics"
+              >
+                <option value="track-asc">Sort: Track (A-Z) → Difficulty (Default)</option>
+                <option value="track-desc">Sort: Track (Z-A)</option>
+                <option value="streak-desc">Sort: Streak (Highest First 🔥)</option>
+                <option value="streak-asc">Sort: Streak (Lowest First)</option>
+                <option value="difficulty-asc">Sort: Difficulty (Easiest First)</option>
+                <option value="difficulty-desc">Sort: Difficulty (Hardest First)</option>
+                <option value="box-desc">Sort: {tierName} (Highest First)</option>
+                <option value="box-asc">Sort: {tierName} (Lowest First)</option>
+                <option value="title-asc">Sort: Topic Name (A-Z)</option>
+                <option value="title-desc">Sort: Topic Name (Z-A)</option>
+                <option value="due-asc">Sort: Next Trial (Ready now first)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Results Count & Reset Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+              Showing <strong style={{ color: 'var(--text-primary)' }}>{filteredTopics.length}</strong> of {topics.length} topics
+            </span>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={handleResetFilters}
+                style={{
+                  padding: '4px 10px',
+                  fontSize: '12px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                }}
+                title="Reset all search queries, track selections, filters, and sort to default"
+              >
+                <RotateCcw size={12} /> Reset Filters
+              </button>
+            )}
+          </div>
+        </div>
 
       {/* Catalog Table */}
       <div
@@ -434,19 +854,76 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
           <thead>
             <tr style={{ backgroundColor: 'var(--bg-elevated)', borderBottom: '1px solid var(--border-medium)' }}>
-              <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Topic</th>
-              <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Track</th>
-              <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Box Level</th>
-              <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Streak</th>
-              <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Next Eligible Trial</th>
-              <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)' }}>Status</th>
+              <th
+                onClick={() => handleHeaderSort('title')}
+                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by topic name"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  Topic {renderSortIndicator('title')}
+                </div>
+              </th>
+              <th
+                onClick={() => handleHeaderSort('track')}
+                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by track name"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  Track {renderSortIndicator('track')}
+                </div>
+              </th>
+              <th
+                onClick={() => handleHeaderSort('difficulty')}
+                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by difficulty level"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  Difficulty {renderSortIndicator('difficulty')}
+                </div>
+              </th>
+              <th
+                onClick={() => handleHeaderSort('box')}
+                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                title={`Click to sort by ${tierName} level`}
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  {tierName} Level {renderSortIndicator('box')}
+                </div>
+              </th>
+              <th
+                onClick={() => handleHeaderSort('streak')}
+                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by streak"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  Streak {renderSortIndicator('streak')}
+                </div>
+              </th>
+              <th
+                onClick={() => handleHeaderSort('due')}
+                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by next eligible trial"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  Next Eligible Trial {renderSortIndicator('due')}
+                </div>
+              </th>
+              <th
+                onClick={() => handleHeaderSort('status')}
+                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by card status"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  Status {renderSortIndicator('status')}
+                </div>
+              </th>
               <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredTopics.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <td colSpan={8} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
                   No topics match your current filter criteria.
                 </td>
               </tr>
@@ -511,9 +988,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                       >
                         {trkMeta.label}
                       </span>
-                      <div style={{ marginTop: '4px' }}>
-                        <DifficultyBadge card={topic} showLabel={false} />
-                      </div>
+                    </td>
+
+                    {/* Difficulty */}
+                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                      <DifficultyBadge card={topic} showLabel={true} />
                     </td>
 
                     {/* Box */}
