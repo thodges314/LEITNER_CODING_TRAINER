@@ -21,74 +21,156 @@ import { intervalForBox } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { askCritiqueFollowUp, type EvaluationResult } from '../lib/ai';
 
-function splitIntoTerminalLines(text: string, maxCols = 72): string[] {
-  const rawLines = text.split('\n');
-  const result: string[] = [];
-  for (const raw of rawLines) {
-    if (!raw.trim()) {
-      result.push('');
-      continue;
-    }
-    const words = raw.split(' ');
-    let currentLine = '';
-    for (const w of words) {
-      if (!currentLine) {
-        currentLine = w;
-      } else if (currentLine.length + 1 + w.length <= maxCols) {
-        currentLine += ' ' + w;
-      } else {
-        result.push(currentLine);
-        currentLine = w;
-      }
-    }
-    if (currentLine) result.push(currentLine);
-  }
-  return result;
-}
+const renderInlineMarkdown = (text: string): React.ReactNode[] => {
+  const parts: React.ReactNode[] = [];
+  // Match `inline code`, **bold**, *italic*, _italic_
+  const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_)/g;
+  let lastIdx = 0;
+  let match: RegExpExecArray | null;
 
-const JoshuaLineReveal: React.FC<{
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIdx) {
+      parts.push(text.slice(lastIdx, match.index));
+    }
+    const token = match[0];
+    if (token.startsWith('`') && token.endsWith('`')) {
+      parts.push(
+        <code
+          key={match.index}
+          style={{
+            fontFamily: 'var(--font-mono, monospace)',
+            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+            border: '1px solid rgba(56, 189, 248, 0.25)',
+            color: '#38bdf8',
+            padding: '1.5px 5px',
+            borderRadius: '4px',
+            fontSize: '12px',
+          }}
+        >
+          {token.slice(1, -1)}
+        </code>
+      );
+    } else if (token.startsWith('**') && token.endsWith('**')) {
+      parts.push(
+        <strong key={match.index} style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+          {token.slice(2, -2)}
+        </strong>
+      );
+    } else if (
+      (token.startsWith('*') && token.endsWith('*')) ||
+      (token.startsWith('_') && token.endsWith('_'))
+    ) {
+      parts.push(
+        <em key={match.index} style={{ fontStyle: 'italic', opacity: 0.95 }}>
+          {token.slice(1, -1)}
+        </em>
+      );
+    }
+    lastIdx = regex.lastIndex;
+  }
+
+  if (lastIdx < text.length) {
+    parts.push(text.slice(lastIdx));
+  }
+
+  return parts;
+};
+
+const MarkdownContent: React.FC<{ text: string }> = ({ text }) => {
+  // Support code blocks ```lang ... ``` as well as markdown paragraphs
+  const blocks = text.split(/(```[\s\S]*?```)/g);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {blocks.map((block, bIdx) => {
+        if (block.startsWith('```') && block.endsWith('```')) {
+          const code = block.slice(3, -3).replace(/^[a-zA-Z0-9_-]+\n/, '');
+          return (
+            <pre
+              key={bIdx}
+              style={{
+                margin: '4px 0',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(0, 0, 0, 0.35)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                fontFamily: 'var(--font-mono, monospace)',
+                fontSize: '12.5px',
+                overflowX: 'auto',
+                color: '#e2e8f0',
+                lineHeight: 1.5,
+              }}
+            >
+              <code>{code}</code>
+            </pre>
+          );
+        }
+
+        const paragraphs = block.split('\n\n');
+        return (
+          <div key={bIdx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {paragraphs.map((p, pIdx) => {
+              if (!p.trim()) return null;
+              return (
+                <div key={pIdx} style={{ lineHeight: 1.55 }}>
+                  {renderInlineMarkdown(p)}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const StreamedMarkdownReply: React.FC<{
   text: string;
   isNew?: boolean;
   onScrollToBottom?: () => void;
 }> = ({ text, isNew = false, onScrollToBottom }) => {
-  const lines = useMemo(() => splitIntoTerminalLines(text), [text]);
-  const [lineCount, setLineCount] = useState(() => (isNew ? 0 : lines.length));
-  const [isDone, setIsDone] = useState(!isNew);
+  const paragraphs = useMemo(() => {
+    const raw = text.split('\n\n').filter((p) => p.trim());
+    return raw.length > 0 ? raw : [text];
+  }, [text]);
+
+  const [visibleCount, setVisibleCount] = useState(() => (isNew && paragraphs.length > 1 ? 1 : paragraphs.length));
+  const [isDone, setIsDone] = useState(!isNew || paragraphs.length <= 1);
 
   useEffect(() => {
-    if (!isNew) return;
+    if (!isNew || paragraphs.length <= 1) return;
 
-    let current = 0;
+    let count = 1;
     const interval = setInterval(() => {
-      current++;
-      setLineCount(current);
+      count++;
+      setVisibleCount(count);
       onScrollToBottom?.();
-      if (current >= lines.length) {
+      if (count >= paragraphs.length) {
         setIsDone(true);
         clearInterval(interval);
       }
-    }, 60);
+    }, 120);
 
     return () => clearInterval(interval);
-  }, [isNew, lines, onScrollToBottom]);
+  }, [isNew, paragraphs, onScrollToBottom]);
 
   return (
-    <div style={{ color: '#bae6fd', lineHeight: 1.55, fontFamily: 'monospace', fontSize: '13px' }}>
-      {lines.slice(0, lineCount).map((l, i) => (
-        <div key={i} style={{ minHeight: '1.2em' }}>
-          {l || '\u00A0'}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {paragraphs.slice(0, visibleCount).map((p, i) => (
+        <div key={i} style={{ lineHeight: 1.55 }}>
+          <MarkdownContent text={p} />
         </div>
       ))}
       {!isDone && (
         <span
-          className="joshua-blink"
+          className="followup-cursor"
           style={{
             display: 'inline-block',
-            width: '8px',
-            height: '13px',
+            width: '6px',
+            height: '14px',
             backgroundColor: '#38bdf8',
             verticalAlign: 'text-bottom',
-            marginLeft: '2px',
+            animation: 'joshuaBlink 0.75s infinite',
           }}
         />
       )}
@@ -563,7 +645,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         </div>
       </div>
 
-      {/* AI Critique & Interactive Follow-Up (Joshua / WarGames Terminal Dialog) */}
+      {/* AI Critique & Interactive Follow-Up */}
       <div
         onClick={() => {
           if (!isFollowUpOpen) setIsFollowUpOpen(true);
@@ -571,28 +653,17 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         style={{
           padding: '16px',
           borderRadius: '10px',
-          backgroundColor: '#070d18',
-          border: isFollowUpOpen ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid var(--border-subtle)',
-          boxShadow: isFollowUpOpen ? '0 0 20px rgba(56, 189, 248, 0.08)' : 'none',
+          backgroundColor: 'var(--bg-card)',
+          border: isFollowUpOpen ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid var(--border-subtle)',
           cursor: !isFollowUpOpen ? 'pointer' : 'default',
-          transition: 'all 0.2s ease',
+          transition: 'border-color 0.15s ease',
         }}
       >
-        <style>{`
-          @keyframes joshuaBlink {
-            0%, 49% { opacity: 1; }
-            50%, 100% { opacity: 0; }
-          }
-          .joshua-blink {
-            animation: joshuaBlink 0.75s infinite;
-          }
-        `}</style>
-
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '6px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)' }}>
             <Sparkles size={16} />
-            <h4 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'monospace' }}>
-              {isFollowUpOpen ? 'JOSHUA // EVALUATION DIALOG TERMINAL' : 'Evaluator Analysis & Critique'}
+            <h4 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Evaluator Analysis & Critique
             </h4>
           </div>
           {!isFollowUpOpen && (
@@ -600,7 +671,6 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               style={{
                 fontSize: '11px',
                 color: 'var(--accent-cyan)',
-                fontFamily: 'monospace',
                 backgroundColor: 'rgba(56, 189, 248, 0.08)',
                 padding: '2px 8px',
                 borderRadius: '4px',
@@ -610,16 +680,16 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 gap: '4px',
               }}
             >
-              <span>click to communicate with Joshua</span>
-              <span style={{ fontWeight: 700 }}>&gt;</span>
+              <span>click to ask follow-up</span>
+              <span style={{ fontWeight: 700, fontFamily: 'var(--font-mono, monospace)' }}>&gt;</span>
             </span>
           )}
         </div>
 
         {!isFollowUpOpen ? (
-          <p style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55, margin: 0, fontFamily: 'monospace' }}>
-            {result.critique}
-          </p>
+          <div style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55 }}>
+            <MarkdownContent text={result.critique} />
+          </div>
         ) : (
           <div onClick={(e) => e.stopPropagation()}>
             {/* Unified Scrolling Dialog Transcript */}
@@ -631,41 +701,36 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
-                fontFamily: 'monospace',
               }}
             >
-              {/* Joshua's Initial Critique */}
-              <div>
-                <div style={{ color: 'var(--accent-cyan)', fontSize: '10.5px', letterSpacing: '0.06em', marginBottom: '3px', textTransform: 'uppercase', opacity: 0.85, fontWeight: 600 }}>
-                  [ JOSHUA // EVALUATION LOG ]
-                </div>
-                <div style={{ color: '#e2e8f0', lineHeight: 1.55, fontSize: '13px' }}>
-                  {result.critique}
-                </div>
+              {/* Initial Critique - Identical Styling Before & After */}
+              <div style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55 }}>
+                <MarkdownContent text={result.critique} />
               </div>
 
               {/* Chat Thread */}
               {followUpMessages.map((msg, idx) => (
-                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {msg.role === 'user' ? (
                     <div
                       style={{
                         color: '#38bdf8',
-                        fontFamily: 'monospace',
                         fontWeight: 600,
-                        fontSize: '13px',
+                        fontSize: '13.5px',
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: '8px',
                         marginTop: '4px',
                       }}
                     >
-                      <span style={{ color: '#38bdf8', fontWeight: 700 }}>&gt;</span>
-                      <span style={{ color: '#bae6fd' }}>{msg.content}</span>
+                      <span style={{ fontFamily: 'var(--font-mono, monospace)', fontWeight: 700, color: '#38bdf8' }}>
+                        &gt;
+                      </span>
+                      <span>{msg.content}</span>
                     </div>
                   ) : (
-                    <div style={{ paddingLeft: '16px', marginTop: '2px' }}>
-                      <JoshuaLineReveal
+                    <div style={{ paddingLeft: '16px', color: 'var(--text-secondary)', fontSize: '13.5px', lineHeight: 1.55 }}>
+                      <StreamedMarkdownReply
                         text={msg.content}
                         isNew={idx === followUpMessages.length - 1}
                         onScrollToBottom={scrollToBottom}
@@ -676,9 +741,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               ))}
 
               {isSendingFollowUp && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontSize: '12px', fontFamily: 'monospace', paddingLeft: '16px' }}>
-                  <span className="joshua-blink">█</span>
-                  <span>JOSHUA IS COMPUTING RESPONSE...</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)', fontSize: '12.5px', paddingLeft: '16px' }}>
+                  <Loader2 size={13} className="animate-spin" />
+                  <span>Consulting evaluator...</span>
                 </div>
               )}
 
@@ -695,14 +760,15 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               style={{
                 marginTop: '12px',
                 paddingTop: '10px',
-                borderTop: '1px solid rgba(56, 189, 248, 0.25)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.12)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                fontFamily: 'monospace',
               }}
             >
-              <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: '14px' }}>&gt;</span>
+              <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: '14px', fontFamily: 'var(--font-mono, monospace)' }}>
+                &gt;
+              </span>
               <input
                 ref={inputRef}
                 type="text"
@@ -715,15 +781,14 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     handleSendFollowUp();
                   }
                 }}
-                placeholder="COMMUNICATE WITH JOSHUA... (ENTER TO TRANSMIT)"
+                placeholder="Ask a follow-up question... (Enter to send)"
                 style={{
                   flex: 1,
                   backgroundColor: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  color: '#f8fafc',
-                  fontFamily: 'monospace',
-                  fontSize: '12.5px',
+                  color: 'var(--text-primary)',
+                  fontSize: '13px',
                   caretColor: '#38bdf8',
                 }}
               />
@@ -741,14 +806,13 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   color: followUpInput.trim() && !isSendingFollowUp ? '#38bdf8' : 'var(--text-dim)',
                   cursor: followUpInput.trim() && !isSendingFollowUp ? 'pointer' : 'default',
                   padding: '2px 8px',
-                  fontSize: '11px',
-                  fontFamily: 'monospace',
+                  fontSize: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
                 }}
               >
-                {isSendingFollowUp ? <Loader2 size={12} className="animate-spin" /> : <span>TRANSMIT ↵</span>}
+                {isSendingFollowUp ? <Loader2 size={12} className="animate-spin" /> : <span>Send ↵</span>}
               </button>
             </form>
           </div>
