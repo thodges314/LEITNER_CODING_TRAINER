@@ -19,6 +19,7 @@ import { EvaluationPanel } from './EvaluationPanel';
 import {
   Timer,
   Clock,
+  Database,
   Play,
   Pause,
   RotateCcw,
@@ -740,17 +741,35 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   fontSize: '11.5px',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '5px',
+                  gap: '6px',
+                  cursor: 'help',
                 }}
-                title={currentCard.complexityExplanation ? `Target Complexity: ${currentCard.complexityExplanation}` : 'Target complexity goal'}
+                title={`Target Complexity:\n• Time: ${currentCard.targetTime || 'O(1)'}\n• Space: ${currentCard.targetSpace || 'O(1)'}${
+                  currentCard.complexityExplanation ? `\n\nExplanation: ${currentCard.complexityExplanation}` : ''
+                }`}
               >
-                <Clock size={12} color="#38bdf8" />
-                <span>
-                  Goal: <strong style={{ color: 'var(--accent-cyan)' }}>{currentCard.targetTime || 'O(1)'}</strong>
-                  {currentCard.targetSpace && (
-                    <> • <strong style={{ color: 'var(--accent-purple)' }}>{currentCard.targetSpace}</strong></>
-                  )}
+                <span
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                  title={`Target Time Complexity: ${currentCard.targetTime || 'O(1)'}`}
+                >
+                  <Clock size={11} color="#38bdf8" />
+                  <span>Time:</span>
+                  <strong style={{ color: 'var(--accent-cyan)' }}>{currentCard.targetTime || 'O(1)'}</strong>
                 </span>
+
+                {currentCard.targetSpace && (
+                  <>
+                    <span style={{ opacity: 0.4 }}>•</span>
+                    <span
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      title={`Target Space Complexity: ${currentCard.targetSpace}`}
+                    >
+                      <Database size={11} color="#c084fc" />
+                      <span>Space:</span>
+                      <strong style={{ color: 'var(--accent-purple)' }}>{currentCard.targetSpace}</strong>
+                    </span>
+                  </>
+                )}
               </div>
             )}
 

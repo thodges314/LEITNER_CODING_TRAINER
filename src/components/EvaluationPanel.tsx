@@ -187,8 +187,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 border: '1px solid rgba(56, 189, 248, 0.25)',
                 color: '#38bdf8',
                 padding: '6px 10px',
+                cursor: 'help',
               }}
-              title={topic.targetTime ? `Target Goal: ${topic.targetTime}${topic.complexityExplanation ? ` — ${topic.complexityExplanation}` : ''}` : undefined}
+              title={`Observed Time Complexity: ${result.timeComplexity || 'O(n)'}${
+                topic.targetTime ? `\nTarget Time Goal: ${topic.targetTime}` : ''
+              }${topic.complexityExplanation ? `\n\nExplanation: ${topic.complexityExplanation}` : ''}`}
             >
               <Clock size={13} />
               <span>
@@ -207,8 +210,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 border: '1px solid rgba(168, 85, 247, 0.25)',
                 color: '#c084fc',
                 padding: '6px 10px',
+                cursor: 'help',
               }}
-              title={topic.targetSpace ? `Target Goal: ${topic.targetSpace}${topic.complexityExplanation ? ` — ${topic.complexityExplanation}` : ''}` : undefined}
+              title={`Observed Space Complexity: ${result.spaceComplexity || 'O(1)'}${
+                topic.targetSpace ? `\nTarget Space Goal: ${topic.targetSpace}` : ''
+              }${topic.complexityExplanation ? `\n\nExplanation: ${topic.complexityExplanation}` : ''}`}
             >
               <Database size={13} />
               <span>
