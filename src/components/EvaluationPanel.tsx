@@ -170,7 +170,7 @@ const StreamedMarkdownReply: React.FC<{
             height: '14px',
             backgroundColor: '#38bdf8',
             verticalAlign: 'text-bottom',
-            animation: 'joshuaBlink 0.75s infinite',
+            animation: 'followupCursorBlink 0.75s infinite',
           }}
         />
       )}
@@ -659,6 +659,12 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
           transition: 'border-color 0.15s ease',
         }}
       >
+        <style>{`
+          @keyframes followupCursorBlink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+          }
+        `}</style>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '6px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)' }}>
             <Sparkles size={16} />
