@@ -155,11 +155,15 @@ import {
   DURATION_OPTIONS,
 } from '../lib/timedMode';
 
+import type { AppTheme } from '../lib/theme';
+
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentAlgorithm?: SpacedAlgorithm;
   onAlgorithmChange?: (algo: SpacedAlgorithm) => void;
+  currentTheme?: AppTheme;
+  onThemeChange?: (theme: AppTheme) => void;
   onSettingsSaved?: () => void;
   onResetDeckToDefaults?: () => void;
 }
@@ -169,6 +173,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   currentAlgorithm,
   onAlgorithmChange,
+  currentTheme = 'dark',
+  onThemeChange,
   onSettingsSaved,
   onResetDeckToDefaults,
 }) => {
@@ -582,6 +588,98 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Appearance & Theme Selection */}
+          <div
+            style={{
+              padding: '16px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}
+          >
+            <div>
+              <label style={{ display: 'block', fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Appearance & Theme
+              </label>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                Choose between Cyberpunk Synthwave and vintage Apple GS/OS desktop
+              </span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  onThemeChange?.('dark');
+                  showToast('Switched to Synthwave Dark Mode');
+                }}
+                className="btn"
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  backgroundColor: currentTheme === 'dark' ? 'rgba(56, 189, 248, 0.15)' : 'var(--bg-elevated)',
+                  borderColor: currentTheme === 'dark' ? 'var(--accent-cyan)' : 'var(--border-subtle)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  <span style={{ fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>🌙</span> Synthwave Dark
+                  </span>
+                  {currentTheme === 'dark' && (
+                    <span style={{ fontSize: '11px', color: 'var(--accent-cyan)', fontWeight: 600 }}>Active</span>
+                  )}
+                </div>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+                  Neon cyberpunk nightcore palette with dark editor canvas
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onThemeChange?.('apple-gsos');
+                  showToast('Switched to Apple GS/OS Light Mode');
+                }}
+                className="btn"
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  backgroundColor: currentTheme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.15)' : 'var(--bg-elevated)',
+                  borderColor: currentTheme === 'apple-gsos' ? 'var(--accent-primary)' : 'var(--border-subtle)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  <span style={{ fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>🖥️</span> Apple GS/OS Light
+                  </span>
+                  {currentTheme === 'apple-gsos' && (
+                    <span style={{ fontSize: '11px', color: 'var(--accent-primary)', fontWeight: 600 }}>Active</span>
+                  )}
+                </div>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+                  Classic 1980s platinum workstation with periwinkle and leaf green accents
+                </span>
+              </button>
+            </div>
           </div>
 
           {/* Provider Selection */}

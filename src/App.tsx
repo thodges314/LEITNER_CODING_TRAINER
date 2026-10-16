@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   loadDeckState,
   saveDeckState,
@@ -27,6 +27,8 @@ import type {
 } from './lib/leitner';
 import { getStoredApiKey, getStoredProvider } from './lib/ai';
 import { clearDraft, clearAllDrafts } from './lib/drafts';
+import { getStoredTheme, setStoredTheme, applyThemeToDocument } from './lib/theme';
+import type { AppTheme } from './lib/theme';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
 import { AddTopicModal } from './components/AddTopicModal';
@@ -40,12 +42,29 @@ import {
   Sparkles,
   Crosshair,
   ShieldCheck,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export function App() {
   const [deckState, setDeckState] = useState<LeitnerDeckState>(() => loadDeckState());
   const [activeView, setActiveView] = useState<'practice' | 'dashboard'>('practice');
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [theme, setThemeState] = useState<AppTheme>(() => getStoredTheme());
+
+  useEffect(() => {
+    applyThemeToDocument(theme);
+  }, [theme]);
+
+  const handleSetTheme = (newTheme: AppTheme) => {
+    setThemeState(newTheme);
+    setStoredTheme(newTheme);
+  };
+
+  const handleToggleTheme = () => {
+    const next = theme === 'apple-gsos' ? 'dark' : 'apple-gsos';
+    handleSetTheme(next);
+  };
 
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -229,9 +248,10 @@ export function App() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
       {/* Global Header */}
       <header
+        className="app-header"
         style={{
           borderBottom: '1px solid var(--border-subtle)',
-          backgroundColor: 'rgba(15, 20, 31, 0.85)',
+          backgroundColor: 'var(--bg-navigation)',
           backdropFilter: 'blur(12px)',
           position: 'sticky',
           top: 0,
@@ -257,18 +277,19 @@ export function App() {
                 width: '38px',
                 height: '38px',
                 borderRadius: '10px',
-                background: 'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)',
+                background: theme === 'apple-gsos' ? '#4455AA' : 'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)',
+                border: theme === 'apple-gsos' ? '1px solid #1C1C1C' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#ffffff',
-                boxShadow: '0 2px 10px rgba(56, 189, 248, 0.35)',
+                boxShadow: theme === 'apple-gsos' ? '1px 1px 0px #1C1C1C' : '0 2px 10px rgba(56, 189, 248, 0.35)',
               }}
             >
               <Zap size={22} fill="white" />
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff' }}>
+              <span style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
                 Leitner Coding Trainer
               </span>
             </div>
@@ -276,6 +297,7 @@ export function App() {
 
           {/* View Toggle Navigation */}
           <nav
+            className="nav-view-toggle"
             style={{
               display: 'flex',
               padding: '4px',
@@ -285,36 +307,36 @@ export function App() {
             }}
           >
             <button
-              className="btn"
+              className={`btn ${activeView === 'practice' ? 'nav-btn-active' : 'nav-btn-inactive'}`}
               onClick={() => setActiveView('practice')}
               style={{
                 padding: '6px 16px',
                 fontSize: '13px',
                 fontWeight: 600,
-                backgroundColor: activeView === 'practice' ? 'var(--bg-elevated)' : 'transparent',
-                borderColor: activeView === 'practice' ? 'var(--border-medium)' : 'transparent',
-                color: activeView === 'practice' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                backgroundColor: activeView === 'practice' ? (theme === 'apple-gsos' ? 'var(--accent-primary)' : 'var(--bg-elevated)') : 'transparent',
+                borderColor: activeView === 'practice' ? (theme === 'apple-gsos' ? 'var(--border-ui)' : 'var(--border-medium)') : 'transparent',
+                color: activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : 'var(--text-primary)') : 'var(--text-secondary)',
                 boxShadow: activeView === 'practice' ? 'var(--shadow-sm)' : 'none',
               }}
             >
-              <Terminal size={15} color={activeView === 'practice' ? '#38bdf8' : undefined} />
+              <Terminal size={15} color={activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : '#38bdf8') : undefined} />
               Practice Arena
             </button>
             <button
-              className="btn"
+              className={`btn ${activeView === 'dashboard' ? 'nav-btn-active' : 'nav-btn-inactive'}`}
               onClick={() => setActiveView('dashboard')}
               style={{
                 padding: '6px 16px',
                 fontSize: '13px',
                 fontWeight: 600,
-                backgroundColor: activeView === 'dashboard' ? 'var(--bg-elevated)' : 'transparent',
-                borderColor: activeView === 'dashboard' ? 'var(--border-medium)' : 'transparent',
-                color: activeView === 'dashboard' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                backgroundColor: activeView === 'dashboard' ? (theme === 'apple-gsos' ? 'var(--accent-primary)' : 'var(--bg-elevated)') : 'transparent',
+                borderColor: activeView === 'dashboard' ? (theme === 'apple-gsos' ? 'var(--border-ui)' : 'var(--border-medium)') : 'transparent',
+                color: activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : 'var(--text-primary)') : 'var(--text-secondary)',
                 boxShadow: activeView === 'dashboard' ? 'var(--shadow-sm)' : 'none',
               }}
               title={`${activeCount} active in rotation • ${deckState.topics.length - activeCount} locked in reserve`}
             >
-              <Layers size={15} color={activeView === 'dashboard' ? '#c084fc' : undefined} />
+              <Layers size={15} color={activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : '#c084fc') : undefined} />
               Deck Catalog ({deckState.topics.length})
             </button>
           </nav>
@@ -383,10 +405,37 @@ export function App() {
               className="btn btn-outline"
               style={{ padding: '7px 12px', fontSize: '12.5px', gap: '6px' }}
               onClick={() => setIsSettingsOpen(true)}
-              title="Configure Spaced Repetition method and AI engine"
+              title="Configure Spaced Repetition method, theme, and AI engine"
             >
               <Settings size={15} />
               <span>Settings</span>
+            </button>
+
+            {/* Header Theme Switcher Toggle Button */}
+            <button
+              className="btn btn-outline"
+              style={{
+                padding: '7px 12px',
+                fontSize: '12px',
+                gap: '6px',
+                fontWeight: 600,
+                borderColor: theme === 'apple-gsos' ? 'var(--accent-primary)' : undefined,
+              }}
+              onClick={handleToggleTheme}
+              title={theme === 'apple-gsos' ? 'Switch to Synthwave Dark Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
+              aria-label={theme === 'apple-gsos' ? 'Switch to Synthwave Dark Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
+            >
+              {theme === 'apple-gsos' ? (
+                <>
+                  <Moon size={14} color="#4455AA" />
+                  <span>Dark</span>
+                </>
+              ) : (
+                <>
+                  <Sun size={14} color="#fbbf24" />
+                  <span>GS/OS</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -419,11 +468,12 @@ export function App() {
       <main style={{ flex: 1, padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
         {activeView === 'practice' ? (
           <PracticeArena
-            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
+            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}-${theme}`}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
             activeDeckSize={deckState.topics.filter((t) => t.status === 'active').length}
             algorithm={algorithm}
+            theme={theme}
             onCommitReview={handleCommitReview}
             onSkipCard={handleSkipCard}
             onOpenDeckView={() => setActiveView('dashboard')}
@@ -523,6 +573,8 @@ export function App() {
           }}
           currentAlgorithm={algorithm}
           onAlgorithmChange={handleAlgorithmChange}
+          currentTheme={theme}
+          onThemeChange={handleSetTheme}
           onSettingsSaved={() => setAiSettingsVersion((v) => v + 1)}
           onResetDeckToDefaults={handleResetDeckToDefaults}
         />

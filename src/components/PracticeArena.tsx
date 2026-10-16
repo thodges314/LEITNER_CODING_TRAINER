@@ -84,6 +84,7 @@ interface PracticeArenaProps {
   onOpenDeckView: () => void;
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
+  theme?: 'dark' | 'apple-gsos';
 }
 
 export const PracticeArena: React.FC<PracticeArenaProps> = ({
@@ -96,6 +97,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   onOpenDeckView,
   isReinforcement,
   onFinishReinforcement,
+  theme = 'dark',
 }) => {
   const [code, setCode] = useState(() =>
     isReinforcement ? getStarterSnippet(currentCard) : (loadDraft(currentCard?.id) ?? getStarterSnippet(currentCard))
@@ -1085,7 +1087,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             {(currentCard.targetTime || currentCard.targetSpace) && (
               <div style={{ position: 'relative', display: 'inline-block' }}>
                 <div
-                  className="badge"
+                  className="badge complexity-badge-chip"
                   onClick={() => setActivePopover((prev) => (prev === 'complexity' ? null : 'complexity'))}
                   style={{
                     backgroundColor: activePopover === 'complexity'
@@ -1258,7 +1260,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             {/* 5. Streak Badge with Dropdown */}
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <div
-                className="badge"
+                className="badge streak-badge-chip"
                 onClick={() => setActivePopover((prev) => (prev === 'streak' ? null : 'streak'))}
                 role="button"
                 tabIndex={0}
@@ -1508,6 +1510,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
           return (
             <div
+              className="contract-table-container"
               style={{
                 borderRadius: '8px',
                 border: '1px solid rgba(56, 189, 248, 0.25)',
@@ -1516,19 +1519,20 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               }}
             >
               <div
+                className="contract-table-header"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '8px 14px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                  backgroundColor: 'var(--bg-table-header-bar)',
                   borderBottom: showHarness ? '1px solid rgba(56, 189, 248, 0.15)' : 'none',
                   userSelect: 'none',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <FlaskConical size={14} color="var(--accent-cyan)" />
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#f1f5f9', letterSpacing: '0.01em' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.01em' }}>
                     Target Contract: Input vs Expected Output
                   </span>
                   <span
@@ -1571,9 +1575,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
               {showHarness && (
                 <div
+                  className="contract-table-body"
                   style={{
                     overflowX: 'auto',
-                    backgroundColor: 'rgba(2, 6, 23, 0.6)',
+                    backgroundColor: 'var(--bg-table-body)',
                   }}
                 >
                   <table
@@ -1586,6 +1591,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   >
                     <thead>
                       <tr
+                        className="contract-table-th"
                         style={{
                           borderBottom: '1px solid var(--border-subtle)',
                           backgroundColor: 'rgba(255, 255, 255, 0.02)',
@@ -1614,6 +1620,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                             }}
                           >
                             <td
+                              className="contract-table-td"
                               style={{
                                 padding: '8px 12px',
                                 color: 'var(--text-secondary)',
@@ -1623,15 +1630,16 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <span
+                                  className="test-case-circle"
                                   style={{
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    width: '16px',
-                                    height: '16px',
+                                    width: '18px',
+                                    height: '18px',
                                     borderRadius: '50%',
-                                    backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                                    color: 'var(--accent-cyan)',
+                                    backgroundColor: 'var(--badge-test-case-bg)',
+                                    color: 'var(--badge-test-case-text)',
                                     fontSize: '10px',
                                     fontWeight: 700,
                                     flexShrink: 0,
@@ -1643,6 +1651,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                               </div>
                             </td>
                             <td
+                              className="contract-table-td"
                               style={{
                                 padding: '8px 12px',
                                 verticalAlign: 'top',
@@ -1889,7 +1898,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             ref={editorRef}
             value={code}
             height="380px"
-            theme="dark"
+            theme={theme === 'apple-gsos' ? 'light' : 'dark'}
             basicSetup={cmBasicSetup}
             extensions={extensions}
             onChange={(val) => setCode(val)}
@@ -2043,6 +2052,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         >
           {/* Dark Terminal / Console Output Container */}
           <div
+            className="console-runner-container"
             style={{
               borderRadius: '8px',
               border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -2053,6 +2063,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           >
             {/* Terminal Title Bar */}
             <div
+              className="console-runner-header"
               onClick={() => setIsOutputOpen(!isOutputOpen)}
               style={{
                 padding: '10px 14px',
@@ -2067,7 +2078,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                 <Terminal size={15} color="var(--accent-cyan)" />
-                <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#f1f5f9', letterSpacing: '0.01em' }}>
+                <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '0.01em' }}>
                   Console & Test Runner
                 </span>
 
