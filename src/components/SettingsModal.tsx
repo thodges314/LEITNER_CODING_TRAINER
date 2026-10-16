@@ -182,7 +182,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [timedMode, setTimedMode] = useState(() => getTimedModeEnabled());
   const [timedDuration, setTimedDuration] = useState(() => getTimedModeDuration());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<'clear' | 'replace' | 'reset-deck' | null>(null);
+  const [confirmAction, setConfirmAction] = useState<
+    'clear' | 'replace' | 'reset-deck' | 'reset-everything' | null
+  >(null);
   const [resetConfirmInput, setResetConfirmInput] = useState('');
 
   // Model & Provider Discovery State
@@ -1511,40 +1513,199 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
-          {/* Danger Zone: Reset Deck Progress */}
-          {onResetDeckToDefaults && (
-            <div
-              style={{
-                padding: '14px 16px',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(239, 68, 68, 0.05)',
-                border: '1px solid rgba(239, 68, 68, 0.25)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-              }}
-            >
+          {/* Offline & Keyless Ready Banner (Above Danger Zone) */}
+          <div
+            style={{
+              padding: '12px 14px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(56, 189, 248, 0.04)',
+              border: '1px solid rgba(56, 189, 248, 0.2)',
+              display: 'flex',
+              gap: '10px',
+              fontSize: '12px',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <Info size={18} style={{ color: '#38bdf8', flexShrink: 0, marginTop: '2px' }} />
+            <div>
+              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Offline & Keyless Ready: </span>
+              If no API key is specified, the trainer automatically uses our built-in structural invariant heuristic engine. You can practice without friction right away.
+            </div>
+          </div>
+
+          {/* Danger Zone: Last Item in the Panel */}
+          <div
+            style={{
+              padding: '14px 16px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(239, 68, 68, 0.05)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f87171', fontSize: '13px', fontWeight: 600 }}>
+              <AlertTriangle size={15} />
+              <span>Danger Zone</span>
+            </div>
+
+            {/* Action 1: Reset All Decks (Deck Progress) */}
+            {onResetDeckToDefaults && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', borderBottom: '1px solid rgba(239, 68, 68, 0.15)', paddingBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '220px' }}>
+                    <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      Reset All Deck Progress
+                    </div>
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                      Resets cards back to Tier/Box 1, clears streaks, review counts, and code drafts. Custom decks and API keys are preserved.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConfirmAction('reset-deck');
+                      setResetConfirmInput('');
+                    }}
+                    className="btn"
+                    style={{
+                      backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      color: '#f87171',
+                      fontSize: '12px',
+                      padding: '6px 12px',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <Trash2 size={13} />
+                    Reset Deck
+                  </button>
+                </div>
+
+                {/* In-App Confirmation: Reset All Decks */}
+                {confirmAction === 'reset-deck' && (
+                  <div
+                    style={{
+                      marginTop: '4px',
+                      padding: '14px',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontSize: '13px', fontWeight: 600 }}>
+                      <AlertTriangle size={16} />
+                      Permanently reset learning progress across all decks?
+                    </div>
+                    <p style={{ fontSize: '12px', color: '#e2e8f0', margin: 0, lineHeight: 1.45 }}>
+                      This will reset card review streaks, box tiers, completed review counters, and editor code drafts. Custom-built decks and stored API keys will NOT be deleted.
+                    </p>
+                    <div>
+                      <label
+                        style={{
+                          display: 'block',
+                          fontSize: '11.5px',
+                          color: 'var(--text-secondary)',
+                          marginBottom: '6px',
+                        }}
+                      >
+                        To confirm, type <strong translate="no" className="notranslate" style={{ color: '#f87171', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET ALL DECKS</strong> below:
+                      </label>
+                      <input
+                        type="text"
+                        translate="no"
+                        className="notranslate code-buffer"
+                        value={resetConfirmInput}
+                        onChange={(e) => setResetConfirmInput(e.target.value)}
+                        placeholder="RESET ALL DECKS"
+                        autoFocus
+                        style={{
+                          width: '100%',
+                          height: '36px',
+                          padding: '6px 12px',
+                          fontSize: '12.5px',
+                          fontFamily: 'monospace',
+                          borderColor: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS'
+                            ? '#ef4444'
+                            : 'rgba(239, 68, 68, 0.3)',
+                          outline: 'none',
+                          color: '#ffffff',
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        style={{ padding: '4px 12px', fontSize: '12px' }}
+                        onClick={() => {
+                          setConfirmAction(null);
+                          setResetConfirmInput('');
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="btn"
+                        disabled={resetConfirmInput.trim().toUpperCase() !== 'RESET ALL DECKS'}
+                        style={{
+                          padding: '4px 14px',
+                          fontSize: '12px',
+                          backgroundColor: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS' ? '#ef4444' : 'rgba(239, 68, 68, 0.25)',
+                          color: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS' ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
+                          border: 'none',
+                          fontWeight: 600,
+                          cursor: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS' ? 'pointer' : 'not-allowed',
+                          transition: 'all 0.15s ease',
+                        }}
+                        onClick={() => {
+                          if (resetConfirmInput.trim().toUpperCase() !== 'RESET ALL DECKS') return;
+                          setConfirmAction(null);
+                          setResetConfirmInput('');
+                          onResetDeckToDefaults();
+                          showToast('All deck progress reset to defaults');
+                        }}
+                      >
+                        Yes, Reset All Decks
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Action 2: Reset Everything (Factory Reset) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f87171', fontSize: '13px', fontWeight: 600 }}>
-                    <AlertTriangle size={15} />
-                    <span>Danger Zone: Reset All Deck Progress</span>
+                <div style={{ flex: 1, minWidth: '220px' }}>
+                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#f87171' }}>
+                    Reset Everything (Factory Reset)
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    Resets all cards back to Tier/Box 1, clears streaks, review counts, and code drafts.
+                    Completely clears all browser localStorage—including API keys, custom decks, preferences, and code drafts. Restores the app as if loaded for the very first time.
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => {
-                    setConfirmAction('reset-deck');
+                    setConfirmAction('reset-everything');
                     setResetConfirmInput('');
                   }}
                   className="btn"
                   style={{
-                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                    border: '1px solid rgba(239, 68, 68, 0.4)',
-                    color: '#f87171',
+                    backgroundColor: 'rgba(225, 29, 72, 0.2)',
+                    border: '1px solid rgba(225, 29, 72, 0.5)',
+                    color: '#fda4af',
                     fontSize: '12px',
                     padding: '6px 12px',
                     fontWeight: 600,
@@ -1552,33 +1713,34 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     alignItems: 'center',
                     gap: '6px',
                     cursor: 'pointer',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   <Trash2 size={13} />
-                  Reset Deck
+                  Reset Everything
                 </button>
               </div>
 
-              {/* In-App Confirmation: Reset Deck */}
-              {confirmAction === 'reset-deck' && (
+              {/* In-App Confirmation: Reset Everything */}
+              {confirmAction === 'reset-everything' && (
                 <div
                   style={{
                     marginTop: '4px',
                     padding: '14px',
                     borderRadius: '8px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    backgroundColor: 'rgba(225, 29, 72, 0.15)',
+                    border: '1px solid rgba(225, 29, 72, 0.5)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '10px',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontSize: '13px', fontWeight: 600 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fda4af', fontSize: '13px', fontWeight: 600 }}>
                     <AlertTriangle size={16} />
-                    Permanently reset all learning progress?
+                    Factory reset application and wipe all localStorage?
                   </div>
                   <p style={{ fontSize: '12px', color: '#e2e8f0', margin: 0, lineHeight: 1.45 }}>
-                    This will permanently erase your review streaks, box tiers, completed review counter, and all editor code drafts. The deck will return to its initial default state.
+                    This will permanently delete all saved API keys, custom decks you created, progress records, and editor drafts. The page will reload completely fresh.
                   </p>
                   <div>
                     <label
@@ -1589,7 +1751,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         marginBottom: '6px',
                       }}
                     >
-                      To confirm, type <strong translate="no" className="notranslate" style={{ color: '#f87171', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET EVERYTHING</strong> below:
+                      To confirm, type <strong translate="no" className="notranslate" style={{ color: '#fda4af', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET EVERYTHING</strong> below:
                     </label>
                     <input
                       type="text"
@@ -1606,8 +1768,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         fontSize: '12.5px',
                         fontFamily: 'monospace',
                         borderColor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING'
-                          ? '#ef4444'
-                          : 'rgba(239, 68, 68, 0.3)',
+                          ? '#e11d48'
+                          : 'rgba(225, 29, 72, 0.35)',
                         outline: 'none',
                         color: '#ffffff',
                       }}
@@ -1632,7 +1794,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       style={{
                         padding: '4px 14px',
                         fontSize: '12px',
-                        backgroundColor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? '#ef4444' : 'rgba(239, 68, 68, 0.25)',
+                        backgroundColor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? '#e11d48' : 'rgba(225, 29, 72, 0.25)',
                         color: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
                         border: 'none',
                         fontWeight: 600,
@@ -1641,37 +1803,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       }}
                       onClick={() => {
                         if (resetConfirmInput.trim().toUpperCase() !== 'RESET EVERYTHING') return;
-                        setConfirmAction(null);
-                        setResetConfirmInput('');
-                        onResetDeckToDefaults();
-                        showToast('Deck progress reset to defaults');
+                        try {
+                          localStorage.clear();
+                          sessionStorage.clear();
+                        } catch {
+                          /* ignore */
+                        }
+                        window.location.href = window.location.origin + window.location.pathname;
                       }}
                     >
-                      Yes, Reset Everything
+                      Yes, Wipe All Data
                     </button>
                   </div>
                 </div>
               )}
-            </div>
-          )}
-
-          {/* Offline fallback banner */}
-          <div
-            style={{
-              padding: '12px',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.03)',
-              border: '1px solid var(--border-subtle)',
-              display: 'flex',
-              gap: '10px',
-              fontSize: '12px',
-              color: 'var(--text-secondary)',
-            }}
-          >
-            <Info size={18} style={{ color: '#38bdf8', flexShrink: 0, marginTop: '2px' }} />
-            <div>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Offline & Keyless Ready: </span>
-              If no API key is specified, the trainer automatically uses our built-in structural invariant heuristic engine. You can practice without friction right away.
             </div>
           </div>
 
