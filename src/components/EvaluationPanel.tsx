@@ -39,12 +39,12 @@ const renderInlineMarkdown = (text: string): React.ReactNode[] => {
           key={match.index}
           style={{
             fontFamily: 'var(--font-mono, monospace)',
-            backgroundColor: 'rgba(56, 189, 248, 0.1)',
-            border: '1px solid rgba(56, 189, 248, 0.25)',
-            color: '#38bdf8',
-            padding: '1.5px 5px',
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: 'var(--text-primary)',
+            padding: '1px 5px',
             borderRadius: '4px',
-            fontSize: '12px',
+            fontSize: '12.5px',
           }}
         >
           {token.slice(1, -1)}
@@ -61,7 +61,7 @@ const renderInlineMarkdown = (text: string): React.ReactNode[] => {
       (token.startsWith('_') && token.endsWith('_'))
     ) {
       parts.push(
-        <em key={match.index} style={{ fontStyle: 'italic', opacity: 0.95 }}>
+        <em key={match.index} style={{ fontStyle: 'italic', color: 'var(--text-primary)' }}>
           {token.slice(1, -1)}
         </em>
       );
@@ -227,16 +227,18 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
     Array<{ role: 'user' | 'assistant'; content: string }>
   >([]);
   const [isSendingFollowUp, setIsSendingFollowUp] = useState(false);
-  const threadEndRef = useRef<HTMLDivElement>(null);
+  const transcriptRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
-    threadEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (transcriptRef.current) {
+      transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
     if (isFollowUpOpen) {
-      inputRef.current?.focus();
+      inputRef.current?.focus({ preventScroll: true });
     }
   }, [isFollowUpOpen]);
 
@@ -702,6 +704,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
           <div onClick={(e) => e.stopPropagation()}>
             {/* Unified Scrolling Dialog Transcript */}
             <div
+              ref={transcriptRef}
               style={{
                 maxHeight: '260px',
                 overflowY: 'auto',
@@ -737,7 +740,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                       <span>{msg.content}</span>
                     </div>
                   ) : (
-                    <div style={{ paddingLeft: '16px', color: 'var(--text-secondary)', fontSize: '13.5px', lineHeight: 1.55 }}>
+                    <div style={{ color: 'var(--text-primary)', fontSize: '13.5px', lineHeight: 1.55 }}>
                       <StreamedMarkdownReply
                         text={msg.content}
                         isNew={idx === followUpMessages.length - 1}
@@ -749,13 +752,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               ))}
 
               {isSendingFollowUp && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)', fontSize: '12.5px', paddingLeft: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)', fontSize: '12.5px' }}>
                   <Loader2 size={13} className="animate-spin" />
                   <span>Consulting evaluator...</span>
                 </div>
               )}
-
-              <div ref={threadEndRef} />
             </div>
 
             {/* Hairline Retro Prompt Form */}
