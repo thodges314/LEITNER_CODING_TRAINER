@@ -92,7 +92,7 @@ export type SpacedAlgorithm = 'leitner' | 'graduated-interval';
 
 export const STORAGE_KEY = 'leitner_coding_deck';
 export const ALGORITHM_STORAGE_KEY = 'spaced_repetition_algorithm';
-export const DEFAULT_ALGORITHM: SpacedAlgorithm = 'leitner';
+export const DEFAULT_ALGORITHM: SpacedAlgorithm = 'graduated-interval';
 
 /** Focused active working chain capacity before introducing new unseen topics in graduated-interval mode. */
 export const GRADUATED_ACTIVE_CHAIN_LIMIT = 4;

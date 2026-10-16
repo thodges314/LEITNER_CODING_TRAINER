@@ -35,7 +35,7 @@ function card(over: Partial<TopicItem> & { id: string }): TopicItem {
 }
 
 function deck(topics: TopicItem[], over: Partial<LeitnerDeckState> = {}): LeitnerDeckState {
-  return { topics, totalCompletedReviews: 0, unlockedStageCount: 0, ...over };
+  return { topics, totalCompletedReviews: 0, unlockedStageCount: 0, algorithm: 'leitner', ...over };
 }
 
 describe('commitCardReview', () => {

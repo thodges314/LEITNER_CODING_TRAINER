@@ -36,7 +36,6 @@ import {
   Terminal,
   Layers,
   Settings,
-  Plus,
   Zap,
   Sparkles,
   Crosshair,
@@ -268,23 +267,10 @@ export function App() {
             >
               <Zap size={22} fill="white" />
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff' }}>
-                  Leitner Coding Trainer
-                </span>
-                <span
-                  className="badge"
-                  style={{
-                    backgroundColor: algorithm === 'graduated-interval' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(168, 85, 247, 0.15)',
-                    color: algorithm === 'graduated-interval' ? '#38bdf8' : '#c084fc',
-                    fontSize: '10.5px',
-                    border: `1px solid ${algorithm === 'graduated-interval' ? 'rgba(56, 189, 248, 0.35)' : 'rgba(168, 85, 247, 0.35)'}`,
-                  }}
-                >
-                  {algorithm === 'graduated-interval' ? 'Graduated Recall' : 'Leitner Boxes'}
-                </span>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '-0.02em', color: '#ffffff' }}>
+                Leitner Coding Trainer
+              </span>
             </div>
           </div>
 
@@ -335,14 +321,6 @@ export function App() {
 
           {/* Quick Info & Action Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
-              className="btn btn-primary"
-              style={{ padding: '7px 12px', fontSize: '12.5px' }}
-              onClick={() => setIsAddModalOpen(true)}
-            >
-              <Plus size={15} /> Add Topic
-            </button>
-
             <button
               className="btn btn-outline"
               style={{
@@ -485,8 +463,6 @@ export function App() {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
           <span>© {new Date().getFullYear()} Thomas Hodges</span>
-          <span style={{ color: 'var(--border-medium)' }}>•</span>
-          <span style={{ color: 'var(--text-dim)' }}>Deliberate Cold-Start Practice</span>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '12px' }}>
           <a
