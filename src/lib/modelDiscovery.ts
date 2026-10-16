@@ -39,6 +39,27 @@ const RECOMMENDED_MODELS: Record<AIProvider, string[]> = {
     'qwen-2.5-coder-32b',
     'deepseek-r1-distill-llama-70b',
   ],
+  cerebras: [
+    'llama3.3-70b',
+    'llama3.1-8b',
+    'llama-3.3-70b',
+    'llama-3.1-70b',
+    'llama-3.1-8b',
+  ],
+  mistral: [
+    'codestral-latest',
+    'codestral-2501',
+    'mistral-small-latest',
+    'mistral-large-latest',
+    'open-mistral-nemo',
+  ],
+  anthropic: [
+    'claude-3-5-sonnet-20241022',
+    'claude-3-5-haiku-20241022',
+    'claude-3-opus-20240229',
+    'claude-3-sonnet-20240229',
+    'claude-3-haiku-20240307',
+  ],
   gemini: [
     'gemini-2.5-flash',
     'gemini-2.5-pro',
@@ -94,6 +115,12 @@ export async function fetchProviderModels(
     switch (provider) {
       case 'groq':
         return await fetchGroqModels(trimmedKey);
+      case 'cerebras':
+        return await fetchCerebrasModels(trimmedKey);
+      case 'mistral':
+        return await fetchMistralModels(trimmedKey);
+      case 'anthropic':
+        return await fetchAnthropicModels(trimmedKey);
       case 'gemini':
         return await fetchGeminiModels(trimmedKey);
       case 'openrouter':
@@ -427,6 +454,142 @@ async function fetchOpenAIModels(apiKey: string): Promise<ModelDiscoveryResult> 
       tier: 'OpenAI Account',
       creditsRemaining: 'Per-token standard billing',
       totalModelsFound: models.length,
+    },
+  };
+}
+
+async function fetchCerebrasModels(apiKey: string): Promise<ModelDiscoveryResult> {
+  const res = await fetch('https://api.cerebras.ai/v1/models', {
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    return { models: [], error: `Cerebras API error (${res.status}): ${errText.slice(0, 150)}` };
+  }
+
+  const json = await res.json();
+  const rawList: Array<{ id: string; context_window?: number }> = json.data || [];
+  const recommendedSet = new Set(RECOMMENDED_MODELS.cerebras);
+
+  const models: DiscoveredModel[] = sortModels(
+    rawList.map((m) => ({
+      id: m.id,
+      name: formatModelName(m.id),
+      contextWindow: m.context_window || 131072,
+      isFree: true,
+      ownedBy: 'Cerebras',
+      recommended: recommendedSet.has(m.id),
+    })),
+    'cerebras'
+  );
+
+  return {
+    models,
+    accountInfo: {
+      provider: 'cerebras',
+      tier: 'Wafer-Scale Inference (~1,800 T/s)',
+      totalModelsFound: models.length,
+      freeModelsCount: models.length,
+    },
+  };
+}
+
+async function fetchMistralModels(apiKey: string): Promise<ModelDiscoveryResult> {
+  const res = await fetch('https://api.mistral.ai/v1/models', {
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    return { models: [], error: `Mistral API error (${res.status}): ${errText.slice(0, 150)}` };
+  }
+
+  const json = await res.json();
+  const rawList: Array<{ id: string; context_window?: number }> = json.data || [];
+  const recommendedSet = new Set(RECOMMENDED_MODELS.mistral);
+
+  const models: DiscoveredModel[] = sortModels(
+    rawList.map((m) => ({
+      id: m.id,
+      name: formatModelName(m.id),
+      contextWindow: m.context_window || 32768,
+      isFree: m.id.includes('codestral') || m.id.includes('open-'),
+      ownedBy: 'Mistral AI',
+      recommended: recommendedSet.has(m.id),
+    })),
+    'mistral'
+  );
+
+  return {
+    models,
+    accountInfo: {
+      provider: 'mistral',
+      tier: 'Codestral & Mistral Developer Tier',
+      totalModelsFound: models.length,
+      freeModelsCount: models.filter((m) => m.isFree).length,
+    },
+  };
+}
+
+async function fetchAnthropicModels(apiKey: string): Promise<ModelDiscoveryResult> {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/models', {
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+    });
+
+    if (res.ok) {
+      const json = await res.json();
+      const rawList: Array<{ id: string; display_name?: string }> = json.data || [];
+      const recommendedSet = new Set(RECOMMENDED_MODELS.anthropic);
+      const models: DiscoveredModel[] = sortModels(
+        rawList.map((m) => ({
+          id: m.id,
+          name: m.display_name || formatModelName(m.id),
+          contextWindow: 200000,
+          ownedBy: 'Anthropic',
+          recommended: recommendedSet.has(m.id),
+        })),
+        'anthropic'
+      );
+      if (models.length > 0) {
+        return {
+          models,
+          accountInfo: {
+            provider: 'anthropic',
+            tier: 'Claude Benchmark Access',
+            totalModelsFound: models.length,
+          },
+        };
+      }
+    }
+  } catch {
+    // If /v1/models has CORS restrictions in browser, smoothly fallback to standard Claude catalog
+  }
+
+  const fallbackList: DiscoveredModel[] = RECOMMENDED_MODELS.anthropic.map((id) => ({
+    id,
+    name: formatModelName(id),
+    contextWindow: 200000,
+    ownedBy: 'Anthropic',
+    recommended: true,
+    description: id.includes('sonnet')
+      ? 'Claude 3.5 Sonnet: Gold standard for coding logic, AST refactoring & invariants.'
+      : id.includes('haiku')
+      ? 'Claude 3.5 Haiku: Ultra-fast coding model with high precision.'
+      : 'Claude model family for advanced coding evaluation.',
+  }));
+
+  return {
+    models: fallbackList,
+    accountInfo: {
+      provider: 'anthropic',
+      tier: 'Claude Benchmark Access',
+      totalModelsFound: fallbackList.length,
     },
   };
 }

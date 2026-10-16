@@ -39,6 +39,24 @@ const PROVIDER_KEY_PORTALS: Record<AIProvider, ProviderKeyPortal | null> = {
     label: 'Get Groq Key',
     description: 'Ultra-fast inference with free tier rate limits (TPM/RPM)',
   },
+  cerebras: {
+    name: 'Cerebras Cloud',
+    url: 'https://cloud.cerebras.ai/platform/',
+    label: 'Get Cerebras Key',
+    description: 'Blistering fast Wafer-Scale inference (~1,800 T/s) with free developer tier',
+  },
+  mistral: {
+    name: 'Mistral Console',
+    url: 'https://console.mistral.ai/api-keys',
+    label: 'Get Mistral Key',
+    description: 'Free developer tier for Codestral & Mistral models via Mistral Console',
+  },
+  anthropic: {
+    name: 'Anthropic Console',
+    url: 'https://console.anthropic.com/settings/keys',
+    label: 'Get Anthropic Key',
+    description: 'Claude 3.5 Sonnet & Haiku coding benchmark via Anthropic Console',
+  },
   openrouter: {
     name: 'OpenRouter',
     url: 'https://openrouter.ai/settings/keys',
@@ -261,8 +279,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     let defaultModel = model;
     if (p === 'gemini') defaultModel = 'gemini-2.5-flash';
     else if (p === 'groq') defaultModel = 'llama-3.3-70b-versatile';
+    else if (p === 'cerebras') defaultModel = 'llama3.3-70b';
+    else if (p === 'mistral') defaultModel = 'codestral-latest';
+    else if (p === 'anthropic') defaultModel = 'claude-3-5-sonnet-20241022';
     else if (p === 'openai') defaultModel = 'gpt-4o-mini';
-    else if (p === 'openrouter') defaultModel = 'google/gemini-2.5-flash';
+    else if (p === 'openrouter') defaultModel = 'nvidia/nemotron-3-super-120b-a12b:free';
     setModel(defaultModel);
     setStoredModel(defaultModel);
 
@@ -568,13 +589,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 Keys are stored per provider
               </span>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
               {(
                 [
-                  { id: 'gemini', label: 'Google Gemini' },
-                  { id: 'groq', label: 'Groq (Fast)' },
+                  { id: 'groq', label: 'Groq', badge: '⚡ Best Free Speed' },
+                  { id: 'gemini', label: 'Google Gemini', badge: '🌟 High Quota' },
+                  { id: 'cerebras', label: 'Cerebras', badge: '⚡ ~1,800 T/s' },
+                  { id: 'mistral', label: 'Mistral AI', badge: '💻 Codestral' },
+                  { id: 'anthropic', label: 'Anthropic', badge: '🎯 Benchmark' },
+                  { id: 'openrouter', label: 'OpenRouter', badge: '🌐 400+ Models' },
                   { id: 'openai', label: 'OpenAI' },
-                  { id: 'openrouter', label: 'OpenRouter' },
                   { id: 'custom', label: 'Custom URL' },
                 ] as const
               ).map((p) => {
@@ -596,23 +620,65 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
-                      gap: '2px',
+                      gap: '3px',
+                      position: 'relative',
                     }}
                   >
-                    <span style={{ fontWeight: isActive ? 600 : 400 }}>{p.label}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontWeight: isActive ? 600 : 500 }}>{p.label}</span>
+                    </div>
+
+                    {'badge' in p && p.badge && (
+                      <span
+                        style={{
+                          fontSize: '9.5px',
+                          padding: '1px 5px',
+                          borderRadius: '3px',
+                          backgroundColor: isActive ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                          color: isActive ? '#38bdf8' : 'var(--text-muted)',
+                          fontWeight: 500,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {p.badge}
+                      </span>
+                    )}
+
                     {hasKey ? (
-                      <span style={{ fontSize: '10px', color: '#34d399', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      <span style={{ fontSize: '10px', color: '#34d399', display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
                         <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#34d399' }} />
                         Key Saved
                       </span>
                     ) : (
-                      <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--text-dim)', marginTop: '2px' }}>
                         No Key
                       </span>
                     )}
                   </button>
                 );
               })}
+            </div>
+
+            {/* Recommendation Tip Note */}
+            <div
+              style={{
+                marginTop: '10px',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                backgroundColor: 'rgba(56, 189, 248, 0.05)',
+                border: '1px solid rgba(56, 189, 248, 0.16)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '11.5px',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.45,
+              }}
+            >
+              <Zap size={14} color="#38bdf8" style={{ flexShrink: 0 }} />
+              <span>
+                <strong style={{ color: 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong>Groq</strong> (llama-3.3-70b) or <strong>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
+              </span>
             </div>
           </div>
 
@@ -629,6 +695,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         ? 'Gemini API Key'
                         : provider === 'groq'
                         ? 'Groq API Key'
+                        : provider === 'cerebras'
+                        ? 'Cerebras API Key'
+                        : provider === 'mistral'
+                        ? 'Mistral API Key'
+                        : provider === 'anthropic'
+                        ? 'Anthropic API Key'
                         : provider === 'openrouter'
                         ? 'OpenRouter API Key'
                         : provider === 'openai'
@@ -721,6 +793,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     ? 'AIzaSy...'
                     : provider === 'groq'
                     ? 'gsk_...'
+                    : provider === 'cerebras'
+                    ? 'csk-...'
+                    : provider === 'anthropic'
+                    ? 'sk-ant-...'
+                    : provider === 'openrouter'
+                    ? 'sk-or-...'
                     : 'sk-...'
                 }
                 value={keyInput}
@@ -1244,6 +1322,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       ? 'gemini-2.5-flash'
                       : provider === 'groq'
                       ? 'llama-3.3-70b-versatile'
+                      : provider === 'cerebras'
+                      ? 'llama3.3-70b'
+                      : provider === 'mistral'
+                      ? 'codestral-latest'
+                      : provider === 'anthropic'
+                      ? 'claude-3-5-sonnet-20241022'
                       : provider === 'openrouter'
                       ? 'nvidia/nemotron-3-super-120b-a12b:free'
                       : 'gpt-4o-mini'

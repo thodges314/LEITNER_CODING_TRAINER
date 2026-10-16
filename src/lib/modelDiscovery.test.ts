@@ -167,4 +167,59 @@ describe('modelDiscovery service', () => {
     expect(res.error).toBeUndefined();
     expect(res.accountInfo?.creditsRemaining).toBe('$9.88 remaining of key limit (Key used: $0.12)');
   });
+
+  it('fetches Cerebras models with wafer-scale tier info', async () => {
+    const mockCerebrasResponse = {
+      data: [
+        { id: 'llama3.3-70b', context_window: 131072 },
+        { id: 'llama3.1-8b', context_window: 8192 },
+      ],
+    };
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers(),
+      json: async () => mockCerebrasResponse,
+    } as unknown as Response);
+
+    const res = await fetchProviderModels('cerebras', 'csk-test123');
+    expect(res.error).toBeUndefined();
+    expect(res.models).toHaveLength(2);
+    expect(res.models[0].isFree).toBe(true);
+    expect(res.models[0].recommended).toBe(true);
+    expect(res.accountInfo?.provider).toBe('cerebras');
+    expect(res.accountInfo?.tier).toContain('1,800 T/s');
+  });
+
+  it('fetches Mistral models and identifies Codestral', async () => {
+    const mockMistralResponse = {
+      data: [
+        { id: 'codestral-latest', context_window: 32768 },
+        { id: 'mistral-large-latest', context_window: 128000 },
+      ],
+    };
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      headers: new Headers(),
+      json: async () => mockMistralResponse,
+    } as unknown as Response);
+
+    const res = await fetchProviderModels('mistral', 'mistral-key-123');
+    expect(res.error).toBeUndefined();
+    expect(res.models).toHaveLength(2);
+    expect(res.models[0].id).toBe('codestral-latest');
+    expect(res.models[0].isFree).toBe(true);
+    expect(res.accountInfo?.provider).toBe('mistral');
+  });
+
+  it('returns Anthropic Claude benchmark catalog', async () => {
+    const res = await fetchProviderModels('anthropic', 'sk-ant-test');
+    expect(res.error).toBeUndefined();
+    expect(res.models.length).toBeGreaterThan(0);
+    expect(res.models[0].id).toBe('claude-3-5-sonnet-20241022');
+    expect(res.models[0].recommended).toBe(true);
+    expect(res.accountInfo?.provider).toBe('anthropic');
+  });
 });
+

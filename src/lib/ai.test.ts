@@ -16,6 +16,8 @@ describe('AI Multi-Key Vault and Provider Management', () => {
   it('detects provider from standard key prefixes', () => {
     expect(detectProviderFromKey('gsk_1234567890')).toBe('groq');
     expect(detectProviderFromKey('AIzaSyD-123456')).toBe('gemini');
+    expect(detectProviderFromKey('sk-ant-api03-12345678')).toBe('anthropic');
+    expect(detectProviderFromKey('csk-wafer-scale-12345')).toBe('cerebras');
     expect(detectProviderFromKey('sk-proj-12345678')).toBe('openai');
     expect(detectProviderFromKey('sk-or-v1-abcdef')).toBe('openrouter');
     expect(detectProviderFromKey('some_custom_key')).toBeNull();

@@ -36,12 +36,22 @@ export const API_PROVIDER_KEY = 'ai_evaluator_provider';
 export const API_MODEL_KEY = 'ai_evaluator_model';
 export const API_BASE_URL_KEY = 'ai_evaluator_base_url';
 
-export type AIProvider = 'gemini' | 'openai' | 'groq' | 'openrouter' | 'custom';
+export type AIProvider =
+  | 'gemini'
+  | 'groq'
+  | 'cerebras'
+  | 'mistral'
+  | 'anthropic'
+  | 'openrouter'
+  | 'openai'
+  | 'custom';
 
 export function detectProviderFromKey(key: string): AIProvider | null {
   const trimmed = key.trim();
   if (trimmed.startsWith('gsk_')) return 'groq';
   if (trimmed.startsWith('AIzaSy')) return 'gemini';
+  if (trimmed.startsWith('sk-ant-')) return 'anthropic';
+  if (trimmed.startsWith('csk-')) return 'cerebras';
   if (trimmed.startsWith('sk-or-')) return 'openrouter';
   if (trimmed.startsWith('sk-')) return 'openai';
   return null;
@@ -49,7 +59,16 @@ export function detectProviderFromKey(key: string): AIProvider | null {
 
 export function getAllStoredKeys(): Record<AIProvider, string> {
   if (typeof window === 'undefined') {
-    return { gemini: '', groq: '', openai: '', openrouter: '', custom: '' };
+    return {
+      gemini: '',
+      groq: '',
+      cerebras: '',
+      mistral: '',
+      anthropic: '',
+      openrouter: '',
+      openai: '',
+      custom: '',
+    };
   }
   let vault: Record<string, string> = {};
   try {
@@ -73,8 +92,11 @@ export function getAllStoredKeys(): Record<AIProvider, string> {
   return {
     gemini: vault.gemini || '',
     groq: vault.groq || '',
-    openai: vault.openai || '',
+    cerebras: vault.cerebras || '',
+    mistral: vault.mistral || '',
+    anthropic: vault.anthropic || '',
     openrouter: vault.openrouter || '',
+    openai: vault.openai || '',
     custom: vault.custom || '',
   };
 }
@@ -119,8 +141,11 @@ export function setStoredApiKey(key: string, targetProvider?: AIProvider): void 
     setStoredProvider(detected);
     if (detected === 'gemini') setStoredModel('gemini-2.5-flash');
     else if (detected === 'groq') setStoredModel('llama-3.3-70b-versatile');
+    else if (detected === 'cerebras') setStoredModel('llama3.3-70b');
+    else if (detected === 'mistral') setStoredModel('codestral-latest');
+    else if (detected === 'anthropic') setStoredModel('claude-3-5-sonnet-20241022');
     else if (detected === 'openai') setStoredModel('gpt-4o-mini');
-    else if (detected === 'openrouter') setStoredModel('google/gemini-2.5-flash');
+    else if (detected === 'openrouter') setStoredModel('nvidia/nemotron-3-super-120b-a12b:free');
   }
 }
 
@@ -177,13 +202,19 @@ export function getStoredModel(): string {
   if (val) {
     // If model conflicts with provider (e.g. model is gemini-2.5-flash but provider is groq)
     if (prov === 'groq' && val.includes('gemini')) return 'llama-3.3-70b-versatile';
-    if (prov === 'gemini' && (val.includes('llama') || val.includes('gpt'))) return 'gemini-2.5-flash';
-    if (prov === 'openai' && (val.includes('gemini') || val.includes('llama'))) return 'gpt-4o-mini';
+    if (prov === 'gemini' && (val.includes('llama') || val.includes('gpt') || val.includes('claude'))) return 'gemini-2.5-flash';
+    if (prov === 'openai' && (val.includes('gemini') || val.includes('llama') || val.includes('claude'))) return 'gpt-4o-mini';
+    if (prov === 'cerebras' && (val.includes('gemini') || val.includes('gpt') || val.includes('claude'))) return 'llama3.3-70b';
+    if (prov === 'mistral' && (val.includes('gemini') || val.includes('gpt') || val.includes('claude'))) return 'codestral-latest';
+    if (prov === 'anthropic' && !val.includes('claude')) return 'claude-3-5-sonnet-20241022';
     return val;
   }
   if (prov === 'gemini') return 'gemini-2.5-flash';
   if (prov === 'groq') return 'llama-3.3-70b-versatile';
-  if (prov === 'openrouter') return 'google/gemini-2.5-flash';
+  if (prov === 'cerebras') return 'llama3.3-70b';
+  if (prov === 'mistral') return 'codestral-latest';
+  if (prov === 'anthropic') return 'claude-3-5-sonnet-20241022';
+  if (prov === 'openrouter') return 'nvidia/nemotron-3-super-120b-a12b:free';
   return 'gpt-4o-mini';
 }
 
@@ -424,8 +455,35 @@ Evaluate functional correctness and invariants according to your system instruct
 
       const data = await response.json();
       rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } else if (provider === 'anthropic') {
+      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
+      const endpoint = 'https://api.anthropic.com/v1/messages';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 2048,
+          temperature: 0.1,
+          system: EVALUATION_SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: userPrompt }],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Anthropic API error (${response.status}): ${errorText}`);
+      }
+
+      const data = await response.json();
+      rawJson = data.content?.[0]?.text || '';
     } else {
-      // OpenAI-compatible endpoint (OpenAI, Groq, OpenRouter, Custom)
+      // OpenAI-compatible endpoint (OpenAI, Groq, Cerebras, Mistral, OpenRouter, Custom)
       let baseUrl = getStoredBaseUrl();
       let model = getStoredModel();
 
@@ -435,9 +493,15 @@ Evaluate functional correctness and invariants according to your system instruct
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
         model = model || 'llama-3.3-70b-versatile';
+      } else if (provider === 'cerebras') {
+        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
+        model = model || 'llama3.3-70b';
+      } else if (provider === 'mistral') {
+        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
+        model = model || 'codestral-latest';
       } else if (provider === 'openrouter') {
         baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'google/gemini-2.5-flash';
+        model = model || 'nvidia/nemotron-3-super-120b-a12b:free';
       }
 
       const endpoint = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
@@ -581,6 +645,33 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
 
       const data = await response.json();
       rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    } else if (provider === 'anthropic') {
+      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
+      const endpoint = 'https://api.anthropic.com/v1/messages';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 2048,
+          temperature: 0.2,
+          system: DRAFT_SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: userNote }],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Anthropic API draft error (${response.status}): ${errorText}`);
+      }
+
+      const data = await response.json();
+      rawJson = data.content?.[0]?.text || '';
     } else {
       let baseUrl = getStoredBaseUrl();
       let model = getStoredModel();
@@ -590,9 +681,15 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
         model = model || 'llama-3.3-70b-versatile';
+      } else if (provider === 'cerebras') {
+        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
+        model = model || 'llama3.3-70b';
+      } else if (provider === 'mistral') {
+        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
+        model = model || 'codestral-latest';
       } else if (provider === 'openrouter') {
         baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'google/gemini-2.5-flash';
+        model = model || 'nvidia/nemotron-3-super-120b-a12b:free';
       }
 
       const endpoint = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
