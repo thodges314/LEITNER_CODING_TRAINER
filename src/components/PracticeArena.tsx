@@ -52,6 +52,26 @@ import { getStarterSnippet } from './practice/starterSnippet';
 import { formatCode } from '../lib/formatter';
 import { getTimedModeEnabled, getTimedModeDuration } from '../lib/timedMode';
 
+const TIER_METADATA: Record<number, { level: string; desc: string }> = {
+  1: { level: 'Initial Encounter', desc: 'Immediate reinforcement (+1 review) to anchor core pattern.' },
+  2: { level: 'Early Expansion', desc: 'Short spacing interval (+3 reviews) to cement syntax and fundamentals.' },
+  3: { level: 'Active Consolidation', desc: 'Consolidates invariant retrieval (+7 reviews) into medium-term memory.' },
+  4: { level: 'Intermediate Retention', desc: 'Tests memory resilience (+16 reviews) against interference.' },
+  5: { level: 'Proficient Recall', desc: 'Established long-term recall (+35 reviews) of patterns and edge cases.' },
+  6: { level: 'Advanced Fluency', desc: 'Smooth, instinctive cold-start implementation (+75 reviews).' },
+  7: { level: 'Deep Automaticity', desc: 'Effortless retrieval under timed pressure (+165 reviews).' },
+  8: { level: 'Permanent Retention', desc: 'Durable long-term retention (+360 reviews).' },
+  9: { level: 'Muscle Memory', desc: 'Fully internalized muscle memory (+800 reviews).' },
+};
+
+const BOX_METADATA: Record<number, { level: string; desc: string }> = {
+  1: { level: 'Unlearned / Rotation', desc: 'Immediate rotation (+1 review) for newly encountered topics.' },
+  2: { level: 'Familiar', desc: 'Review every 4 cards (+4 reviews) to build familiarity.' },
+  3: { level: 'Practiced', desc: 'Review every 10 cards (+10 reviews) for retention.' },
+  4: { level: 'Competent', desc: 'Review every 22 cards (+22 reviews) for mastery confidence.' },
+  5: { level: 'Mastered', desc: 'Long-term mastery (+45 reviews) milestone.' },
+};
+
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
   totalCompletedReviews: number;
@@ -704,6 +724,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               ).map((b) => {
                 const isCurrent = currentCard.box === b;
                 const isPast = currentCard.box > b;
+                const interval = intervalForBox(b, algorithm, activeDeckSize);
+                const statusStr = isCurrent ? ' ← Current Level' : isPast ? ' (Passed)' : ' (Upcoming)';
+                const tooltip =
+                  algorithm === 'graduated-interval'
+                    ? `Tier ${b} • ${TIER_METADATA[Math.min(9, b)]?.level || 'Expanded Retention'}${statusStr}\n• Repeat Interval: +${interval} review${interval === 1 ? '' : 's'}\n• ${TIER_METADATA[Math.min(9, b)]?.desc || 'Extended geometric spacing.'}`
+                    : `Box ${b} • ${BOX_METADATA[b]?.level || 'Review'}${statusStr}\n• Repeat Interval: +${interval} review${interval === 1 ? '' : 's'}\n• ${BOX_METADATA[b]?.desc || 'Standard rotation.'}`;
+
                 return (
                   <div
                     key={b}
@@ -724,8 +751,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                       color: isCurrent ? '#090c12' : isPast ? '#f1f5f9' : 'var(--text-dim)',
                       border: isCurrent ? '1px solid white' : '1px solid transparent',
                       transition: 'all 0.2s',
+                      cursor: 'help',
                     }}
-                    title={`${algorithm === 'graduated-interval' ? 'Tier' : 'Box'} ${b} (+${intervalForBox(b, algorithm, activeDeckSize)} reviews)`}
+                    title={tooltip}
                   >
                     {algorithm === 'graduated-interval' ? `T${b}` : `B${b}`}
                   </div>
@@ -745,8 +773,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                     backgroundColor: 'var(--box-9)',
                     color: '#090c12',
                     border: '1px solid white',
+                    cursor: 'help',
                   }}
-                  title={`Tier ${currentCard.box} (+${intervalForBox(currentCard.box, algorithm, activeDeckSize)} reviews)`}
+                  title={`Tier ${currentCard.box} • Deep Retention ← Current Level\n• Repeat Interval: +${intervalForBox(currentCard.box, algorithm, activeDeckSize)} reviews\n• Continuous long-term maintenance.`}
                 >
                   T{currentCard.box}
                 </div>
@@ -955,16 +984,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 color: '#f97316',
                 border: '1px solid rgba(249, 115, 22, 0.3)',
                 padding: '4px 8px',
+                cursor: 'help',
               }}
+              title={`Streak: ${currentCard.streak} consecutive correct recall${currentCard.streak === 1 ? '' : 's'} on this challenge.\n• Passing increases your streak and advances this card to the next ${algorithm === 'graduated-interval' ? 'tier' : 'box'}.\n• Missing required invariants resets this streak to 0 and drops the card back for reinforcement.`}
             >
               <Flame size={13} />
               <span>Streak: {currentCard.streak}</span>
             </div>
-
-            {/* Global Trial Spacing Info */}
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              Eligible at trial: <strong>#{currentCard.nextEligibleTrial}</strong> (Current: #{totalCompletedReviews})
-            </span>
           </div>
 
           {/* 10-Minute Countdown Stopwatch */}

@@ -286,11 +286,6 @@ export function App() {
                   {algorithm === 'graduated-interval' ? 'Graduated Recall' : 'Leitner Boxes'}
                 </span>
               </div>
-              <p style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                {algorithm === 'graduated-interval'
-                  ? 'Graduated Interval Recall • Active Queue Chaining • Invariant Retrieval'
-                  : 'No Autocomplete • Trial Spacing • Invariant Retrieval'}
-              </p>
             </div>
           </div>
 
@@ -489,10 +484,8 @@ export function App() {
           width: '100%',
         }}
       >
-        <div>
-          {algorithm === 'graduated-interval'
-            ? 'Graduated Interval Recall: Tier 1 (+1) • Tier 2 (+3) • Tier 3 (+7) • Tier 4 (+16) • Tier 5 (+35) • Tier 6 (+75) • Tier 7 (+165) • Tier 8 (+360) • Tier 9 (+800)'
-            : 'Leitner Spaced Retrieval: Box 1 (+1) • Box 2 (+4) • Box 3 (+10) • Box 4 (+22) • Box 5 (+45)'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dim)' }}>
+          <span>Deliberate Cold-Start Practice</span>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <button
