@@ -14,6 +14,7 @@ import {
   Eye,
   EyeOff,
   Copy,
+  HelpCircle,
 } from 'lucide-react';
 import { intervalForBox } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
@@ -56,6 +57,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   const isSolutionVisible = showSolution !== undefined ? showSolution : internalShowSolution;
   const toggleSolution = onToggleShowSolution ?? (() => setInternalShowSolution((prev) => !prev));
   const [copied, setCopied] = useState(false);
+  const [showComplexityExplanation, setShowComplexityExplanation] = useState(false);
 
   const canonicalCode = topic.referenceSolution || topic.solution || topic.starterCode || '';
 
@@ -179,53 +181,110 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
           </div>
 
           {/* Complexity Badges */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div
-              className="badge"
-              style={{
-                backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                border: '1px solid rgba(56, 189, 248, 0.25)',
-                color: '#38bdf8',
-                padding: '6px 10px',
-                cursor: 'help',
-              }}
-              title={`Observed Time Complexity: ${result.timeComplexity || 'O(n)'}${
-                topic.targetTime ? `\nTarget Time Goal: ${topic.targetTime}` : ''
-              }${topic.complexityExplanation ? `\n\nExplanation: ${topic.complexityExplanation}` : ''}`}
-            >
-              <Clock size={13} />
-              <span>
-                Time: <strong>{result.timeComplexity || 'O(n)'}</strong>
-                {topic.targetTime && (
-                  <span style={{ fontSize: '11px', opacity: 0.85, marginLeft: '6px' }}>
-                    (Goal: {topic.targetTime})
-                  </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div
+                className="badge"
+                onClick={() => topic.complexityExplanation && setShowComplexityExplanation((prev) => !prev)}
+                style={{
+                  backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                  border: showComplexityExplanation
+                    ? '1px solid rgba(56, 189, 248, 0.5)'
+                    : '1px solid rgba(56, 189, 248, 0.25)',
+                  color: '#38bdf8',
+                  padding: '6px 10px',
+                  cursor: topic.complexityExplanation ? 'pointer' : 'default',
+                  userSelect: 'none',
+                }}
+                title={`Observed Time Complexity: ${result.timeComplexity || 'O(n)'}${
+                  topic.targetTime ? `\nTarget Time Goal: ${topic.targetTime}` : ''
+                }${topic.complexityExplanation ? `\n\nClick to view explanation: ${topic.complexityExplanation}` : ''}`}
+                role={topic.complexityExplanation ? 'button' : undefined}
+                tabIndex={topic.complexityExplanation ? 0 : undefined}
+                onKeyDown={(e) => {
+                  if (topic.complexityExplanation && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    setShowComplexityExplanation((prev) => !prev);
+                  }
+                }}
+              >
+                <Clock size={13} />
+                <span>
+                  Time: <strong>{result.timeComplexity || 'O(n)'}</strong>
+                  {topic.targetTime && (
+                    <span style={{ fontSize: '11px', opacity: 0.85, marginLeft: '6px' }}>
+                      (Goal: {topic.targetTime})
+                    </span>
+                  )}
+                </span>
+                {topic.complexityExplanation && (
+                  <HelpCircle size={11} style={{ opacity: 0.7, marginLeft: '2px' }} />
                 )}
-              </span>
-            </div>
-            <div
-              className="badge"
-              style={{
-                backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                border: '1px solid rgba(168, 85, 247, 0.25)',
-                color: '#c084fc',
-                padding: '6px 10px',
-                cursor: 'help',
-              }}
-              title={`Observed Space Complexity: ${result.spaceComplexity || 'O(1)'}${
-                topic.targetSpace ? `\nTarget Space Goal: ${topic.targetSpace}` : ''
-              }${topic.complexityExplanation ? `\n\nExplanation: ${topic.complexityExplanation}` : ''}`}
-            >
-              <Database size={13} />
-              <span>
-                Space: <strong>{result.spaceComplexity || 'O(1)'}</strong>
-                {topic.targetSpace && (
-                  <span style={{ fontSize: '11px', opacity: 0.85, marginLeft: '6px' }}>
-                    (Goal: {topic.targetSpace})
-                  </span>
+              </div>
+
+              <div
+                className="badge"
+                onClick={() => topic.complexityExplanation && setShowComplexityExplanation((prev) => !prev)}
+                style={{
+                  backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                  border: showComplexityExplanation
+                    ? '1px solid rgba(168, 85, 247, 0.5)'
+                    : '1px solid rgba(168, 85, 247, 0.25)',
+                  color: '#c084fc',
+                  padding: '6px 10px',
+                  cursor: topic.complexityExplanation ? 'pointer' : 'default',
+                  userSelect: 'none',
+                }}
+                title={`Observed Space Complexity: ${result.spaceComplexity || 'O(1)'}${
+                  topic.targetSpace ? `\nTarget Space Goal: ${topic.targetSpace}` : ''
+                }${topic.complexityExplanation ? `\n\nClick to view explanation: ${topic.complexityExplanation}` : ''}`}
+                role={topic.complexityExplanation ? 'button' : undefined}
+                tabIndex={topic.complexityExplanation ? 0 : undefined}
+                onKeyDown={(e) => {
+                  if (topic.complexityExplanation && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    setShowComplexityExplanation((prev) => !prev);
+                  }
+                }}
+              >
+                <Database size={13} />
+                <span>
+                  Space: <strong>{result.spaceComplexity || 'O(1)'}</strong>
+                  {topic.targetSpace && (
+                    <span style={{ fontSize: '11px', opacity: 0.85, marginLeft: '6px' }}>
+                      (Goal: {topic.targetSpace})
+                    </span>
+                  )}
+                </span>
+                {topic.complexityExplanation && (
+                  <HelpCircle size={11} style={{ opacity: 0.7, marginLeft: '2px' }} />
                 )}
-              </span>
+              </div>
             </div>
+
+            {/* Expandable Explanation Box */}
+            {showComplexityExplanation && topic.complexityExplanation && (
+              <div
+                style={{
+                  padding: '10px 12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  fontSize: '12px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: '1.45',
+                  maxWidth: '500px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '4px' }}>
+                  <Sparkles size={12} color="var(--accent-cyan)" />
+                  <span style={{ fontWeight: 600, color: 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Why this complexity target:
+                  </span>
+                </div>
+                {topic.complexityExplanation}
+              </div>
+            )}
           </div>
         </div>
 

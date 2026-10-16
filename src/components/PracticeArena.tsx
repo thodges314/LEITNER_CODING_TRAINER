@@ -40,6 +40,8 @@ import {
   ShieldCheck,
   FlaskConical,
   Sparkles,
+  HelpCircle,
+  X,
 } from 'lucide-react';
 import { transpileForExecution, runHarness, createSandboxScope } from '../lib/runner';
 import { extractHarnessContracts } from '../lib/harnessContracts';
@@ -111,7 +113,28 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   // Reveal canonical solution state
   const [showSolution, setShowSolution] = useState(false);
   const [showHarness, setShowHarness] = useState(true);
+  const [showComplexityDetails, setShowComplexityDetails] = useState(false);
+  const complexityBadgeRef = useRef<HTMLDivElement>(null);
   const [prevCardId, setPrevCardId] = useState(currentCard?.id);
+
+  // Close complexity popover on outside click or escape
+  useEffect(() => {
+    if (!showComplexityDetails) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (complexityBadgeRef.current && !complexityBadgeRef.current.contains(e.target as Node)) {
+        setShowComplexityDetails(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowComplexityDetails(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showComplexityDetails]);
 
   // Autosave the editor buffer (debounced) so a frozen tab or reload never loses work.
   // Never save drafts during an isolated reinforcement drill or when code is empty/matches starter.
@@ -133,6 +156,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setPrevCardId(currentCard?.id);
     setShowSolution(false);
     setShowHarness(true);
+    setShowComplexityDetails(false);
   }
 
   // Autofocus editor on mount and card switch
@@ -732,43 +756,193 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             {/* Target Complexity Goal Badge */}
             {(currentCard.targetTime || currentCard.targetSpace) && (
               <div
-                className="badge"
-                style={{
-                  backgroundColor: 'rgba(56, 189, 248, 0.08)',
-                  border: '1px solid rgba(56, 189, 248, 0.25)',
-                  color: 'var(--text-secondary)',
-                  padding: '4px 8px',
-                  fontSize: '11.5px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  cursor: 'help',
-                }}
-                title={`Target Complexity:\n• Time: ${currentCard.targetTime || 'O(1)'}\n• Space: ${currentCard.targetSpace || 'O(1)'}${
-                  currentCard.complexityExplanation ? `\n\nExplanation: ${currentCard.complexityExplanation}` : ''
-                }`}
+                ref={complexityBadgeRef}
+                style={{ position: 'relative', display: 'inline-block' }}
               >
-                <span
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                  title={`Target Time Complexity: ${currentCard.targetTime || 'O(1)'}`}
+                <div
+                  className="badge"
+                  onClick={() => setShowComplexityDetails((prev) => !prev)}
+                  style={{
+                    backgroundColor: showComplexityDetails
+                      ? 'rgba(56, 189, 248, 0.18)'
+                      : 'rgba(56, 189, 248, 0.08)',
+                    border: showComplexityDetails
+                      ? '1px solid rgba(56, 189, 248, 0.5)'
+                      : '1px solid rgba(56, 189, 248, 0.25)',
+                    color: 'var(--text-secondary)',
+                    padding: '4px 8px',
+                    fontSize: '11.5px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    transition: 'all 0.15s ease',
+                  }}
+                  title={
+                    showComplexityDetails
+                      ? 'Click to hide complexity details'
+                      : `Target Complexity (Click for details):\n• Time: ${currentCard.targetTime || 'O(1)'}\n• Space: ${currentCard.targetSpace || 'O(1)'}${
+                          currentCard.complexityExplanation ? `\n\nExplanation: ${currentCard.complexityExplanation}` : ''
+                        }`
+                  }
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setShowComplexityDetails((prev) => !prev);
+                    }
+                  }}
+                  aria-expanded={showComplexityDetails}
+                  aria-haspopup="dialog"
                 >
-                  <Clock size={11} color="#38bdf8" />
-                  <span>Time:</span>
-                  <strong style={{ color: 'var(--accent-cyan)' }}>{currentCard.targetTime || 'O(1)'}</strong>
-                </span>
+                  <span
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                  >
+                    <Clock size={11} color="#38bdf8" />
+                    <span>Time:</span>
+                    <strong style={{ color: 'var(--accent-cyan)' }}>{currentCard.targetTime || 'O(1)'}</strong>
+                  </span>
 
-                {currentCard.targetSpace && (
-                  <>
-                    <span style={{ opacity: 0.4 }}>•</span>
-                    <span
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                      title={`Target Space Complexity: ${currentCard.targetSpace}`}
+                  {currentCard.targetSpace && (
+                    <>
+                      <span style={{ opacity: 0.4 }}>•</span>
+                      <span
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                      >
+                        <Database size={11} color="#c084fc" />
+                        <span>Space:</span>
+                        <strong style={{ color: 'var(--accent-purple)' }}>{currentCard.targetSpace}</strong>
+                      </span>
+                    </>
+                  )}
+
+                  <HelpCircle
+                    size={11}
+                    color="var(--accent-cyan)"
+                    style={{ opacity: 0.7, marginLeft: '2px' }}
+                  />
+                </div>
+
+                {/* Floating Complexity Explanation Card */}
+                {showComplexityDetails && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 8px)',
+                      left: '0',
+                      zIndex: 100,
+                      width: '320px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.96)',
+                      backdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(56, 189, 248, 0.35)',
+                      borderRadius: '8px',
+                      padding: '12px 14px',
+                      boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
+                      fontSize: '12px',
+                      lineHeight: '1.5',
+                      color: 'var(--text-primary)',
+                      animation: 'fadeIn 0.15s ease-out',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: '8px',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                        paddingBottom: '6px',
+                      }}
                     >
-                      <Database size={11} color="#c084fc" />
-                      <span>Space:</span>
-                      <strong style={{ color: 'var(--accent-purple)' }}>{currentCard.targetSpace}</strong>
-                    </span>
-                  </>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Sparkles size={13} color="var(--accent-cyan)" />
+                        <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                          Target Complexity Goals
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowComplexityDetails(false);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-muted)',
+                          cursor: 'pointer',
+                          padding: '2px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          borderRadius: '4px',
+                        }}
+                        aria-label="Close complexity details"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        marginBottom: currentCard.complexityExplanation ? '10px' : '0',
+                        padding: '6px 8px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        borderRadius: '6px',
+                        border: '1px solid rgba(255, 255, 255, 0.04)',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Clock size={12} color="#38bdf8" />
+                        <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Time:</span>
+                        <strong style={{ color: 'var(--accent-cyan)', fontFamily: 'monospace' }}>
+                          {currentCard.targetTime || 'O(1)'}
+                        </strong>
+                      </div>
+                      {currentCard.targetSpace && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Database size={12} color="#c084fc" />
+                          <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Space:</span>
+                          <strong style={{ color: 'var(--accent-purple)', fontFamily: 'monospace' }}>
+                            {currentCard.targetSpace}
+                          </strong>
+                        </div>
+                      )}
+                    </div>
+
+                    {currentCard.complexityExplanation ? (
+                      <div
+                        style={{
+                          fontSize: '11.5px',
+                          color: 'var(--text-secondary)',
+                          lineHeight: '1.45',
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            color: 'var(--text-muted)',
+                            display: 'block',
+                            marginBottom: '4px',
+                            fontSize: '10px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.04em',
+                          }}
+                        >
+                          Why this complexity target:
+                        </span>
+                        {currentCard.complexityExplanation}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                        Aim for these asymptotic targets in your cold-start implementation.
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
