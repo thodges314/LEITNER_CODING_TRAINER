@@ -781,7 +781,6 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     handleSendFollowUp();
                   }
                 }}
-                placeholder="Ask a follow-up question... (Enter to send)"
                 style={{
                   flex: 1,
                   backgroundColor: 'transparent',
