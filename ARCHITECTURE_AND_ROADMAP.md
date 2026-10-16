@@ -22,9 +22,9 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 167 (71 active at first run) |
-| Documented test cases | 1080 (each shown as input → expected in the UI) |
-| Difficulty spread | d1: 30 · d2: 55 · d3: 55 · d4: 26 · d5: 1 |
+| Cards | 178 (74 active at first run) |
+| Documented test cases | 1150 (each shown as input → expected in the UI) |
+| Difficulty spread | d1: 31 · d2: 59 · d3: 59 · d4: 28 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms (29), js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser, react-components (16) |
 | Tracks defined but empty | `testing-tooling` |
 | Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
