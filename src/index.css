@@ -646,8 +646,10 @@ code {
   color: #FFFFFF !important;
 }
 
-[data-theme="apple-gsos"] .complexity-badge-chip * {
+[data-theme="apple-gsos"] .complexity-badge-chip *,
+[data-theme="apple-gsos"] .complexity-badge-chip svg {
   color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
 }
 
 [data-theme="apple-gsos"] .streak-badge-chip {
@@ -766,5 +768,40 @@ code {
 [data-theme="apple-gsos"] .console-runner-header * {
   color: #1C1C1C !important;
 }
+
+[data-theme="apple-gsos"] .console-runner-body {
+  background-color: #FAFAFA !important;
+  color: #1C1C1C !important;
+  border-top: 1px solid #1C1C1C !important;
+}
+
+[data-theme="apple-gsos"] .prompt-seed-box {
+  background-color: #FAFAFA !important;
+  border: 1px solid #1C1C1C !important;
+  color: #1C1C1C !important;
+}
+
+/* Crisp Input & Select Styles for GS/OS Light Mode */
+[data-theme="apple-gsos"] .code-buffer {
+  background-color: #FFFFFF !important;
+  color: #1C1C1C !important;
+  border-color: #8A887E !important;
+}
+
+[data-theme="apple-gsos"] .code-buffer::placeholder {
+  color: #777777 !important;
+}
+
+[data-theme="apple-gsos"] select,
+[data-theme="apple-gsos"] input[type="text"],
+[data-theme="apple-gsos"] textarea {
+  color: #1C1C1C !important;
+}
+
+[data-theme="apple-gsos"] select option {
+  background-color: #FFFFFF !important;
+  color: #1C1C1C !important;
+}
+
 
 

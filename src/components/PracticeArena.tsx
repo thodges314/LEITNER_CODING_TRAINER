@@ -39,7 +39,6 @@ import {
   Trash2,
   Code2,
   Layers,
-  ShieldCheck,
   FlaskConical,
   Sparkles,
   Zap,
@@ -614,8 +613,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   const isReactTrack = currentCard.track === 'react' || currentCard.track === 'react-patterns';
   const trackMeta = getTrackMeta(currentCard.track);
-  const linesCount = code.split('\n').length;
-  const charsCount = code.length;
   const errorCount = outputLogs.filter((l) => l.failure).length;
 
   return (
@@ -671,9 +668,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           style={{
             padding: '12px 18px',
             borderRadius: '10px',
-            backgroundColor: 'rgba(245, 158, 11, 0.15)',
-            border: '1px solid rgba(245, 158, 11, 0.4)',
-            color: '#fbbf24',
+            backgroundColor: theme === 'apple-gsos' ? '#FFFBEB' : 'rgba(245, 158, 11, 0.15)',
+            border: theme === 'apple-gsos' ? '1.5px solid #D97706' : '1px solid rgba(245, 158, 11, 0.4)',
+            boxShadow: theme === 'apple-gsos' ? '2px 2px 0px rgba(28, 28, 28, 0.15)' : 'none',
+            color: theme === 'apple-gsos' ? '#92400E' : '#fbbf24',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -688,7 +686,14 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             type="button"
             className="btn btn-outline"
             onClick={() => setTimeExpiredToast(null)}
-            style={{ padding: '3px 8px', fontSize: '11px', borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}
+            style={{
+              padding: '3px 8px',
+              fontSize: '11px',
+              fontWeight: 600,
+              borderColor: theme === 'apple-gsos' ? '#1C1C1C' : 'rgba(245, 158, 11, 0.4)',
+              color: theme === 'apple-gsos' ? '#1C1C1C' : '#fbbf24',
+              backgroundColor: theme === 'apple-gsos' ? '#FFFFFF' : 'transparent',
+            }}
           >
             Dismiss
           </button>
@@ -742,36 +747,36 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                     left: '0',
                     zIndex: 100,
                     width: '300px',
-                    backgroundColor: 'rgba(15, 23, 42, 0.96)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    backgroundColor: theme === 'apple-gsos' ? '#FFFFFF' : 'rgba(15, 23, 42, 0.96)',
+                    backdropFilter: theme === 'apple-gsos' ? 'none' : 'blur(12px)',
+                    border: theme === 'apple-gsos' ? '1.5px solid #1C1C1C' : '1px solid rgba(56, 189, 248, 0.35)',
                     borderRadius: '8px',
                     padding: '12px 14px',
-                    boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
+                    boxShadow: theme === 'apple-gsos' ? '3px 3px 0px rgba(28, 28, 28, 0.25)' : '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
                     fontSize: '12px',
                     lineHeight: '1.5',
                     color: 'var(--text-primary)',
                     animation: 'fadeIn 0.15s ease-out',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: theme === 'apple-gsos' ? '1px solid #DDDCD4' : '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <Layers size={13} color={trackMeta.color} />
-                      <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                      <span style={{ fontWeight: 600, color: theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9', fontSize: '12px' }}>
                         Track: {trackMeta.label}
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
-                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                      style={{ background: 'none', border: 'none', color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
                       aria-label="Close track info"
                     >
                       <X size={12} />
                     </button>
                   </div>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '11.5px', margin: 0 }}>
-                    Focus domain for this challenge. Drills in <strong>{trackMeta.label}</strong> test idiomatic implementations, core architectural patterns, and boundary invariants.
+                    Focus domain for this challenge. Drills in <strong style={{ color: 'var(--text-primary)' }}>{trackMeta.label}</strong> test idiomatic implementations, core architectural patterns, and boundary invariants.
                   </p>
                 </div>
               )}
@@ -794,8 +799,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   borderRadius: '6px',
                   cursor: 'pointer',
                   userSelect: 'none',
-                  border: activePopover === 'difficulty' ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid transparent',
-                  backgroundColor: activePopover === 'difficulty' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  border: activePopover === 'difficulty' ? (theme === 'apple-gsos' ? '1px solid #1C1C1C' : '1px solid rgba(56, 189, 248, 0.4)') : '1px solid transparent',
+                  backgroundColor: activePopover === 'difficulty' ? (theme === 'apple-gsos' ? '#E8E7DF' : 'rgba(56, 189, 248, 0.08)') : 'transparent',
                   display: 'inline-flex',
                   alignItems: 'center',
                 }}
@@ -811,26 +816,26 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                     left: '0',
                     zIndex: 100,
                     width: '280px',
-                    backgroundColor: 'rgba(15, 23, 42, 0.96)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    backgroundColor: theme === 'apple-gsos' ? '#FFFFFF' : 'rgba(15, 23, 42, 0.96)',
+                    backdropFilter: theme === 'apple-gsos' ? 'none' : 'blur(12px)',
+                    border: theme === 'apple-gsos' ? '1.5px solid #1C1C1C' : '1px solid rgba(56, 189, 248, 0.35)',
                     borderRadius: '8px',
                     padding: '12px 14px',
-                    boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
+                    boxShadow: theme === 'apple-gsos' ? '3px 3px 0px rgba(28, 28, 28, 0.25)' : '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
                     fontSize: '12px',
                     lineHeight: '1.5',
                     color: 'var(--text-primary)',
                     animation: 'fadeIn 0.15s ease-out',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
-                    <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: theme === 'apple-gsos' ? '1px solid #DDDCD4' : '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                    <span style={{ fontWeight: 600, color: theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9', fontSize: '12px' }}>
                       Difficulty: Level {difficultyOf(currentCard)} of 5 ({DIFFICULTY_LABELS[difficultyOf(currentCard)]})
                     </span>
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
-                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                      style={{ background: 'none', border: 'none', color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
                       aria-label="Close difficulty info"
                     >
                       <X size={12} />
@@ -854,7 +859,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                             justifyContent: 'space-between',
                             padding: '4px 8px',
                             borderRadius: '5px',
-                            backgroundColor: isCurrentLevel ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+                            backgroundColor: isCurrentLevel ? (theme === 'apple-gsos' ? '#F2F1EA' : 'rgba(255, 255, 255, 0.08)') : 'transparent',
                             border: isCurrentLevel ? `1px solid ${lvl.color}` : '1px solid transparent',
                           }}
                         >
@@ -862,7 +867,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                             <span style={{ color: lvl.color, fontSize: '10px', letterSpacing: '1px' }}>
                               {'●'.repeat(lvl.level)}
                             </span>
-                            <span style={{ color: isCurrentLevel ? '#f1f5f9' : 'var(--text-muted)', fontWeight: isCurrentLevel ? 600 : 400 }}>
+                            <span style={{ color: isCurrentLevel ? (theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9') : 'var(--text-muted)', fontWeight: isCurrentLevel ? 600 : 400 }}>
                               {lvl.label}
                             </span>
                           </div>
@@ -979,19 +984,19 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                       left: '0',
                       zIndex: 100,
                       width: '330px',
-                      backgroundColor: 'rgba(15, 23, 42, 0.96)',
-                      backdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(56, 189, 248, 0.35)',
+                      backgroundColor: theme === 'apple-gsos' ? '#FFFFFF' : 'rgba(15, 23, 42, 0.96)',
+                      backdropFilter: theme === 'apple-gsos' ? 'none' : 'blur(12px)',
+                      border: theme === 'apple-gsos' ? '1.5px solid #1C1C1C' : '1px solid rgba(56, 189, 248, 0.35)',
                       borderRadius: '8px',
                       padding: '12px 14px',
-                      boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
+                      boxShadow: theme === 'apple-gsos' ? '3px 3px 0px rgba(28, 28, 28, 0.25)' : '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
                       fontSize: '12px',
                       lineHeight: '1.5',
                       color: 'var(--text-primary)',
                       animation: 'fadeIn 0.15s ease-out',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: theme === 'apple-gsos' ? '1px solid #DDDCD4' : '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span
                           style={{
@@ -1005,14 +1010,14 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                         >
                           {algorithm === 'graduated-interval' ? `T${effectiveTier}` : `B${effectiveTier}`}
                         </span>
-                        <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12.5px' }}>
+                        <span style={{ fontWeight: 600, color: theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9', fontSize: '12.5px' }}>
                           {tierMeta?.level || 'Retention Spacing'}
                         </span>
                       </div>
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
-                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                        style={{ background: 'none', border: 'none', color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
                         aria-label="Close tier details"
                       >
                         <X size={12} />
@@ -1025,22 +1030,26 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                         style={{
                           fontSize: '11px',
                           backgroundColor: isCurrent
-                            ? 'rgba(56, 189, 248, 0.15)'
+                            ? (theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)')
                             : isPast
-                            ? 'rgba(52, 211, 153, 0.15)'
-                            : 'rgba(148, 163, 184, 0.12)',
-                          color: isCurrent ? '#38bdf8' : isPast ? '#34d399' : 'var(--text-muted)',
+                            ? (theme === 'apple-gsos' ? 'rgba(34, 153, 85, 0.14)' : 'rgba(52, 211, 153, 0.15)')
+                            : (theme === 'apple-gsos' ? '#F2F1EA' : 'rgba(148, 163, 184, 0.12)'),
+                          color: isCurrent
+                            ? (theme === 'apple-gsos' ? '#1D4ED8' : '#38bdf8')
+                            : isPast
+                            ? (theme === 'apple-gsos' ? '#15803D' : '#34d399')
+                            : 'var(--text-muted)',
                           border: isCurrent
-                            ? '1px solid rgba(56, 189, 248, 0.35)'
+                            ? (theme === 'apple-gsos' ? '1px solid rgba(68, 85, 170, 0.4)' : '1px solid rgba(56, 189, 248, 0.35)')
                             : isPast
-                            ? '1px solid rgba(52, 211, 153, 0.35)'
-                            : '1px solid rgba(148, 163, 184, 0.25)',
+                            ? (theme === 'apple-gsos' ? '1px solid rgba(34, 153, 85, 0.4)' : '1px solid rgba(52, 211, 153, 0.35)')
+                            : (theme === 'apple-gsos' ? '1px solid #B8B7AD' : '1px solid rgba(148, 163, 184, 0.25)'),
                         }}
                       >
                         {isCurrent ? 'Current Level' : isPast ? 'Mastered / Passed' : 'Upcoming Level'}
                       </span>
                       <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
-                        Interval: <strong style={{ color: '#f1f5f9' }}>+{interval} review{interval === 1 ? '' : 's'}</strong>
+                        Interval: <strong style={{ color: theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9' }}>+{interval} review{interval === 1 ? '' : 's'}</strong>
                       </span>
                     </div>
 
@@ -1049,7 +1058,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                     </p>
 
                     {/* Quick Tier Inspector Buttons */}
-                    <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '8px' }}>
+                    <div style={{ borderTop: theme === 'apple-gsos' ? '1px solid #DDDCD4' : '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '8px' }}>
                       <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginBottom: '5px' }}>
                         Inspect other {algorithm === 'graduated-interval' ? 'tiers' : 'boxes'}:
                       </div>
@@ -1065,9 +1074,15 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                             style={{
                               padding: '2px 6px',
                               borderRadius: '4px',
-                              border: effectiveTier === tierNum ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
-                              backgroundColor: effectiveTier === tierNum ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                              color: effectiveTier === tierNum ? '#38bdf8' : 'var(--text-muted)',
+                              border: effectiveTier === tierNum
+                                ? (theme === 'apple-gsos' ? '1.5px solid #1C1C1C' : '1px solid #38bdf8')
+                                : (theme === 'apple-gsos' ? '1px solid #B8B7AD' : '1px solid rgba(255, 255, 255, 0.1)'),
+                              backgroundColor: effectiveTier === tierNum
+                                ? (theme === 'apple-gsos' ? '#4455AA' : 'rgba(56, 189, 248, 0.2)')
+                                : (theme === 'apple-gsos' ? '#F2F1EA' : 'rgba(255, 255, 255, 0.04)'),
+                              color: effectiveTier === tierNum
+                                ? '#ffffff'
+                                : (theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)'),
                               fontSize: '11px',
                               cursor: 'pointer',
                               fontWeight: effectiveTier === tierNum ? 700 : 500,
@@ -1118,18 +1133,18 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   aria-haspopup="dialog"
                 >
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                    <Clock size={11} color="#38bdf8" />
+                    <Clock size={11} color={theme === 'apple-gsos' ? '#ffffff' : '#38bdf8'} />
                     <span>Time:</span>
-                    <strong style={{ color: 'var(--accent-cyan)' }}>{currentCard.targetTime || 'O(1)'}</strong>
+                    <strong style={{ color: theme === 'apple-gsos' ? '#ffffff' : 'var(--accent-cyan)' }}>{currentCard.targetTime || 'O(1)'}</strong>
                   </span>
 
                   {currentCard.targetSpace && (
                     <>
-                      <span style={{ opacity: 0.4 }}>•</span>
+                      <span style={{ opacity: theme === 'apple-gsos' ? 0.8 : 0.4, color: theme === 'apple-gsos' ? '#ffffff' : undefined }}>•</span>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                        <Database size={11} color="#c084fc" />
+                        <Database size={11} color={theme === 'apple-gsos' ? '#ffffff' : '#c084fc'} />
                         <span>Space:</span>
-                        <strong style={{ color: 'var(--accent-purple)' }}>{currentCard.targetSpace}</strong>
+                        <strong style={{ color: theme === 'apple-gsos' ? '#ffffff' : 'var(--accent-purple)' }}>{currentCard.targetSpace}</strong>
                       </span>
                     </>
                   )}
@@ -1144,12 +1159,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                       left: '0',
                       zIndex: 100,
                       width: '320px',
-                      backgroundColor: 'rgba(15, 23, 42, 0.96)',
-                      backdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(56, 189, 248, 0.35)',
+                      backgroundColor: theme === 'apple-gsos' ? '#FFFFFF' : 'rgba(15, 23, 42, 0.96)',
+                      backdropFilter: theme === 'apple-gsos' ? 'none' : 'blur(12px)',
+                      border: theme === 'apple-gsos' ? '1.5px solid #1C1C1C' : '1px solid rgba(56, 189, 248, 0.35)',
                       borderRadius: '8px',
                       padding: '12px 14px',
-                      boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
+                      boxShadow: theme === 'apple-gsos' ? '3px 3px 0px rgba(28, 28, 28, 0.25)' : '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
                       fontSize: '12px',
                       lineHeight: '1.5',
                       color: 'var(--text-primary)',
@@ -1162,13 +1177,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         marginBottom: '8px',
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderBottom: theme === 'apple-gsos' ? '1px solid #DDDCD4' : '1px solid rgba(255, 255, 255, 0.08)',
                         paddingBottom: '6px',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Sparkles size={13} color="var(--accent-cyan)" />
-                        <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                        <span style={{ fontWeight: 600, color: theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9', fontSize: '12px' }}>
                           Target Complexity Goals
                         </span>
                       </div>
@@ -1181,7 +1196,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                         style={{
                           background: 'none',
                           border: 'none',
-                          color: 'var(--text-muted)',
+                          color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)',
                           cursor: 'pointer',
                           padding: '2px',
                           display: 'flex',
@@ -1201,23 +1216,23 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                         gap: '12px',
                         marginBottom: currentCard.complexityExplanation ? '10px' : '0',
                         padding: '6px 8px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        backgroundColor: theme === 'apple-gsos' ? '#F2F1EA' : 'rgba(255, 255, 255, 0.03)',
                         borderRadius: '6px',
-                        border: '1px solid rgba(255, 255, 255, 0.04)',
+                        border: theme === 'apple-gsos' ? '1px solid #B8B7AD' : '1px solid rgba(255, 255, 255, 0.04)',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Clock size={12} color="#38bdf8" />
-                        <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Time:</span>
-                        <strong style={{ color: 'var(--accent-cyan)', fontFamily: 'monospace' }}>
+                        <Clock size={12} color={theme === 'apple-gsos' ? '#1D4ED8' : '#38bdf8'} />
+                        <span style={{ color: theme === 'apple-gsos' ? '#555555' : 'var(--text-muted)', fontSize: '11px' }}>Time:</span>
+                        <strong style={{ color: theme === 'apple-gsos' ? '#1D4ED8' : 'var(--accent-cyan)', fontFamily: 'monospace' }}>
                           {currentCard.targetTime || 'O(1)'}
                         </strong>
                       </div>
                       {currentCard.targetSpace && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Database size={12} color="#c084fc" />
-                          <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>Space:</span>
-                          <strong style={{ color: 'var(--accent-purple)', fontFamily: 'monospace' }}>
+                          <Database size={12} color={theme === 'apple-gsos' ? '#6D28D9' : '#c084fc'} />
+                          <span style={{ color: theme === 'apple-gsos' ? '#555555' : 'var(--text-muted)', fontSize: '11px' }}>Space:</span>
+                          <strong style={{ color: theme === 'apple-gsos' ? '#6D28D9' : 'var(--accent-purple)', fontFamily: 'monospace' }}>
                             {currentCard.targetSpace}
                           </strong>
                         </div>
@@ -1228,14 +1243,14 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                       <div
                         style={{
                           fontSize: '11.5px',
-                          color: 'var(--text-secondary)',
+                          color: 'var(--text-primary)',
                           lineHeight: '1.45',
                         }}
                       >
                         <span
                           style={{
                             fontWeight: 600,
-                            color: 'var(--text-muted)',
+                            color: theme === 'apple-gsos' ? '#555555' : 'var(--text-muted)',
                             display: 'block',
                             marginBottom: '4px',
                             fontSize: '10px',
@@ -1291,48 +1306,48 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                     left: '0',
                     zIndex: 100,
                     width: '300px',
-                    backgroundColor: 'rgba(15, 23, 42, 0.96)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1px solid rgba(249, 115, 22, 0.4)',
+                    backgroundColor: theme === 'apple-gsos' ? '#FFFFFF' : 'rgba(15, 23, 42, 0.96)',
+                    backdropFilter: theme === 'apple-gsos' ? 'none' : 'blur(12px)',
+                    border: theme === 'apple-gsos' ? '1.5px solid #1C1C1C' : '1px solid rgba(249, 115, 22, 0.4)',
                     borderRadius: '8px',
                     padding: '12px 14px',
-                    boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(249, 115, 22, 0.12)',
+                    boxShadow: theme === 'apple-gsos' ? '3px 3px 0px rgba(28, 28, 28, 0.25)' : '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(249, 115, 22, 0.12)',
                     fontSize: '12px',
                     lineHeight: '1.5',
                     color: 'var(--text-primary)',
                     animation: 'fadeIn 0.15s ease-out',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: theme === 'apple-gsos' ? '1px solid #DDDCD4' : '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <Flame size={14} color="#f97316" />
-                      <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                      <span style={{ fontWeight: 600, color: theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9', fontSize: '12px' }}>
                         Streak & Progression
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
-                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                      style={{ background: 'none', border: 'none', color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
                       aria-label="Close streak details"
                     >
                       <X size={12} />
                     </button>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
-                    <strong style={{ color: '#f97316', fontSize: '15px' }}>
+                    <strong style={{ color: theme === 'apple-gsos' ? '#C2410C' : '#f97316', fontSize: '15px' }}>
                       {currentCard.streak}
                     </strong>
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '11.5px' }}>
+                    <span style={{ color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-secondary)', fontSize: '11.5px' }}>
                       consecutive correct recall{currentCard.streak === 1 ? '' : 's'}
                     </span>
                   </div>
-                  <ul style={{ margin: 0, paddingLeft: '16px', color: 'var(--text-secondary)', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <ul style={{ margin: 0, paddingLeft: '16px', color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-secondary)', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <li>
-                      <strong style={{ color: '#34d399' }}>Pass:</strong> Increases streak (+1) and advances this card to {algorithm === 'graduated-interval' ? 'Tier' : 'Box'} {Math.min(algorithm === 'graduated-interval' ? 9 : 5, currentCard.box + 1)} with longer spacing.
+                      <strong style={{ color: theme === 'apple-gsos' ? '#15803D' : '#34d399' }}>Pass:</strong> Increases streak (+1) and advances this card to {algorithm === 'graduated-interval' ? 'Tier' : 'Box'} {Math.min(algorithm === 'graduated-interval' ? 9 : 5, currentCard.box + 1)} with longer spacing.
                     </li>
                     <li>
-                      <strong style={{ color: '#f87171' }}>Missing Invariants:</strong> Resets streak to 0 and drops this card to Tier 1 for immediate reinforcement.
+                      <strong style={{ color: theme === 'apple-gsos' ? '#B91C1C' : '#f87171' }}>Missing Invariants:</strong> Resets streak to 0 and drops this card to Tier 1 for immediate reinforcement.
                     </li>
                   </ul>
                 </div>
@@ -1391,9 +1406,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                     fontSize: '10px',
                     fontWeight: 600,
                     letterSpacing: '0.02em',
-                    color: '#fbbf24',
-                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                    border: '1px solid rgba(245, 158, 11, 0.35)',
+                    color: theme === 'apple-gsos' ? '#B45309' : '#fbbf24',
+                    backgroundColor: theme === 'apple-gsos' ? 'rgba(217, 119, 6, 0.14)' : 'rgba(245, 158, 11, 0.15)',
+                    border: theme === 'apple-gsos' ? '1px solid #D97706' : '1px solid rgba(245, 158, 11, 0.35)',
                     padding: '2px 6px',
                     borderRadius: '4px',
                     display: 'inline-flex',
@@ -1401,7 +1416,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                     gap: '4px',
                   }}
                 >
-                  <Zap size={10} color="#fbbf24" /> Auto-submits on 00:00
+                  <Zap size={10} color={theme === 'apple-gsos' ? '#B45309' : '#fbbf24'} /> Auto-submits on 00:00
                 </span>
               </div>
 
@@ -1437,40 +1452,40 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   left: 'auto',
                   zIndex: 100,
                   width: '310px',
-                  backgroundColor: 'rgba(15, 23, 42, 0.96)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  backgroundColor: theme === 'apple-gsos' ? '#FFFFFF' : 'rgba(15, 23, 42, 0.96)',
+                  backdropFilter: theme === 'apple-gsos' ? 'none' : 'blur(12px)',
+                  border: theme === 'apple-gsos' ? '1.5px solid #1C1C1C' : '1px solid rgba(245, 158, 11, 0.4)',
                   borderRadius: '8px',
                   padding: '12px 14px',
-                  boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(245, 158, 11, 0.12)',
+                  boxShadow: theme === 'apple-gsos' ? '3px 3px 0px rgba(28, 28, 28, 0.25)' : '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(245, 158, 11, 0.12)',
                   fontSize: '12px',
                   lineHeight: '1.5',
                   color: 'var(--text-primary)',
                   animation: 'fadeIn 0.15s ease-out',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: theme === 'apple-gsos' ? '1px solid #DDDCD4' : '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Timer size={14} color="#fbbf24" />
-                    <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                    <Timer size={14} color={theme === 'apple-gsos' ? '#B45309' : '#fbbf24'} />
+                    <span style={{ fontWeight: 600, color: theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9', fontSize: '12px' }}>
                       Stopwatch & Auto-Submit
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
-                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                    style={{ background: 'none', border: 'none', color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
                     aria-label="Close timer details"
                   >
                     <X size={12} />
                   </button>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--text-secondary)', fontSize: '11.5px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-secondary)', fontSize: '11.5px' }}>
                   <p style={{ margin: 0 }}>
-                    ⚡ <strong style={{ color: '#fbbf24' }}>Auto-Submission:</strong> When the countdown reaches <strong>00:00</strong>, your code buffer is automatically submitted for test execution and AI evaluation.
+                    ⚡ <strong style={{ color: theme === 'apple-gsos' ? '#B45309' : '#fbbf24' }}>Auto-Submission:</strong> When the countdown reaches <strong>00:00</strong>, your code buffer is automatically submitted for test execution and AI evaluation.
                   </p>
                   <p style={{ margin: 0 }}>
-                    ⏱️ <strong style={{ color: '#f1f5f9' }}>Duration:</strong> Configured for {Math.round(configuredDuration / 60)} minutes. You can adjust the default duration in Settings (⚙️).
+                    ⏱️ <strong style={{ color: theme === 'apple-gsos' ? '#1C1C1C' : '#f1f5f9' }}>Duration:</strong> Configured for {Math.round(configuredDuration / 60)} minutes. You can adjust the default duration in Settings (⚙️).
                   </p>
                 </div>
               </div>
@@ -1485,6 +1500,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
         {/* Prompt Seed Instructions */}
         <div
+          className="prompt-seed-box"
           style={{
             padding: '14px 16px',
             borderRadius: '8px',
@@ -1492,7 +1508,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             border: '1px solid var(--border-subtle)',
             fontSize: '13.5px',
             lineHeight: 1.6,
-            color: '#cbd5e1',
+            color: 'var(--text-primary)',
             whiteSpace: 'pre-wrap',
           }}
         >
@@ -1661,8 +1677,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                                 style={{
                                   fontFamily: '"Fira Code", "JetBrains Mono", Menlo, monospace',
                                   fontSize: '11.5px',
-                                  backgroundColor: 'rgba(0, 0, 0, 0.45)',
-                                  color: '#93c5fd',
+                                  backgroundColor: theme === 'apple-gsos' ? '#F2F1EA' : 'rgba(0, 0, 0, 0.45)',
+                                  color: theme === 'apple-gsos' ? '#1C1C1C' : '#93c5fd',
+                                  border: theme === 'apple-gsos' ? '1px solid #B8B7AD' : 'none',
                                   padding: '2px 6px',
                                   borderRadius: '4px',
                                   display: 'inline-block',
@@ -1686,12 +1703,14 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                                   fontFamily: '"Fira Code", "JetBrains Mono", Menlo, monospace',
                                   fontSize: '11.5px',
                                   backgroundColor: isError
-                                    ? 'rgba(239, 68, 68, 0.15)'
-                                    : 'rgba(16, 185, 129, 0.15)',
-                                  color: isError ? '#f87171' : '#34d399',
+                                    ? (theme === 'apple-gsos' ? 'rgba(221, 51, 34, 0.12)' : 'rgba(239, 68, 68, 0.15)')
+                                    : (theme === 'apple-gsos' ? 'rgba(34, 153, 85, 0.14)' : 'rgba(16, 185, 129, 0.15)'),
+                                  color: isError
+                                    ? (theme === 'apple-gsos' ? '#B91C1C' : '#f87171')
+                                    : (theme === 'apple-gsos' ? '#15803D' : '#34d399'),
                                   border: isError
-                                    ? '1px solid rgba(239, 68, 68, 0.3)'
-                                    : '1px solid rgba(16, 185, 129, 0.3)',
+                                    ? (theme === 'apple-gsos' ? '1px solid rgba(221, 51, 34, 0.4)' : '1px solid rgba(239, 68, 68, 0.3)')
+                                    : (theme === 'apple-gsos' ? '1px solid rgba(34, 153, 85, 0.4)' : '1px solid rgba(16, 185, 129, 0.3)'),
                                   padding: '2px 6px',
                                   borderRadius: '4px',
                                   display: 'inline-block',
@@ -1740,6 +1759,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       {/* Evaluation Results (if already evaluated) */}
       {evalResult && (
         <EvaluationPanel
+          theme={theme}
           topic={currentCard}
           submittedCode={code}
           result={evalResult}
@@ -1772,9 +1792,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
             <Terminal size={16} color="var(--accent-cyan)" />
             <span style={{ fontSize: '13px', fontWeight: 600 }}>Cold-Start Buffer</span>
-            <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-              (No autocomplete • No ghost text • Pure recall)
-            </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
@@ -1799,9 +1816,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 {formatToast.message}
               </span>
             )}
-
-            <span>{linesCount} lines</span>
-            <span>{charsCount} chars</span>
 
             {/* Quick Toggle Test Snippet Comments */}
             {code.includes('// Test runner example:') && (
@@ -1924,16 +1938,17 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
               Mode:
             </span>
             <div
+              className="mode-toggle-group"
               style={{
                 display: 'inline-flex',
                 borderRadius: '6px',
-                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                backgroundColor: theme === 'apple-gsos' ? '#DDDCD4' : 'rgba(0, 0, 0, 0.4)',
                 padding: '2px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                border: theme === 'apple-gsos' ? '1px solid #1C1C1C' : '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
               <button
@@ -1942,13 +1957,18 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 style={{
                   padding: '4px 10px',
                   borderRadius: '4px',
-                  border: 'none',
+                  border: theme === 'apple-gsos' && executionMode === 'js' ? '1px solid #1C1C1C' : '1px solid transparent',
                   fontSize: '11.5px',
-                  fontWeight: executionMode === 'js' ? 600 : 400,
-                  backgroundColor: executionMode === 'js' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
-                  color: executionMode === 'js' ? '#38bdf8' : 'var(--text-dim)',
+                  fontWeight: executionMode === 'js' ? 700 : 500,
+                  backgroundColor: executionMode === 'js'
+                    ? (theme === 'apple-gsos' ? '#4455AA' : 'rgba(56, 189, 248, 0.2)')
+                    : 'transparent',
+                  color: executionMode === 'js'
+                    ? (theme === 'apple-gsos' ? '#ffffff' : '#38bdf8')
+                    : (theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-dim)'),
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
+                  boxShadow: theme === 'apple-gsos' && executionMode === 'js' ? '1px 1px 0px #1C1C1C' : 'none',
                 }}
                 title="Fast transpilation (Sucrase) without strict compile-time type-checking"
               >
@@ -1960,13 +1980,18 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 style={{
                   padding: '4px 10px',
                   borderRadius: '4px',
-                  border: 'none',
+                  border: theme === 'apple-gsos' && executionMode === 'ts' ? '1px solid #1C1C1C' : '1px solid transparent',
                   fontSize: '11.5px',
-                  fontWeight: executionMode === 'ts' ? 600 : 400,
-                  backgroundColor: executionMode === 'ts' ? 'rgba(49, 120, 198, 0.25)' : 'transparent',
-                  color: executionMode === 'ts' ? '#60a5fa' : 'var(--text-dim)',
+                  fontWeight: executionMode === 'ts' ? 700 : 500,
+                  backgroundColor: executionMode === 'ts'
+                    ? (theme === 'apple-gsos' ? '#4455AA' : 'rgba(49, 120, 198, 0.25)')
+                    : 'transparent',
+                  color: executionMode === 'ts'
+                    ? (theme === 'apple-gsos' ? '#ffffff' : '#60a5fa')
+                    : (theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-dim)'),
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
+                  boxShadow: theme === 'apple-gsos' && executionMode === 'ts' ? '1px 1px 0px #1C1C1C' : 'none',
                 }}
                 title="Full TypeScript compiler type-checking (strict checks, interfaces, generics)"
               >
@@ -1974,16 +1999,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               </button>
             </div>
           </div>
-
-          {executionMode === 'ts' ? (
-            <span style={{ fontSize: '11.5px', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <ShieldCheck size={13} /> Strict TS compiler diagnostics active
-            </span>
-          ) : (
-            <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
-              Fast runtime evaluation
-            </span>
-          )}
         </div>
 
         {/* Action Controls Bar */}
@@ -2225,6 +2240,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             {/* Terminal Console Output Body */}
             {isOutputOpen && (
               <div
+                className="console-runner-body"
                 style={{
                   padding: '12px 14px',
                   fontFamily: 'var(--font-mono)',
@@ -2232,57 +2248,59 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   maxHeight: '260px',
                   overflowY: 'auto',
                   lineHeight: 1.6,
-                  backgroundColor: '#030712',
-                  color: '#cbd5e1',
+                  backgroundColor: theme === 'apple-gsos' ? '#FAFAFA' : '#030712',
+                  color: theme === 'apple-gsos' ? '#1C1C1C' : '#cbd5e1',
+                  borderTop: theme === 'apple-gsos' ? '1px solid #1C1C1C' : '1px solid rgba(255, 255, 255, 0.08)',
                   fontVariantLigatures: 'normal',
                   fontFeatureSettings: '"calt" 1, "liga" 1',
                 }}
               >
                 {outputLogs.length === 0 ? (
-                  <div style={{ color: '#64748b', fontStyle: 'italic', fontSize: '12px', padding: '6px 2px' }}>
+                  <div style={{ color: theme === 'apple-gsos' ? '#666666' : '#64748b', fontStyle: 'italic', fontSize: '12px', padding: '6px 2px' }}>
                     No output yet. Click 'Run Code / Test' (or Cmd+Enter) above to execute your solution and view test assertions or console.log outputs.
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                     {outputLogs.map((log, index) => {
-                      let textColor = '#e2e8f0';
-                      let badgeBg = 'rgba(56, 189, 248, 0.15)';
-                      let badgeColor = '#38bdf8';
+                      let textColor = theme === 'apple-gsos' ? '#1C1C1C' : '#e2e8f0';
+                      let badgeBg = theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)';
+                      let badgeColor = theme === 'apple-gsos' ? '#4455AA' : '#38bdf8';
                       let badgeLabel = 'LOG';
                       let rowBg = 'transparent';
                       let icon = null;
 
                       if (log.content.includes('FAIL')) {
-                        textColor = '#f87171';
-                        badgeBg = 'rgba(239, 68, 68, 0.25)';
-                        badgeColor = '#ef4444';
+                        textColor = '#DD3322';
+                        badgeBg = 'rgba(221, 51, 34, 0.18)';
+                        badgeColor = '#DD3322';
                         badgeLabel = 'FAIL';
-                        rowBg = 'rgba(239, 68, 68, 0.1)';
-                        icon = <XCircle size={13} color="#ef4444" style={{ flexShrink: 0, marginTop: '3px' }} />;
+                        rowBg = theme === 'apple-gsos' ? 'rgba(221, 51, 34, 0.08)' : 'rgba(239, 68, 68, 0.1)';
+                        icon = <XCircle size={13} color="#DD3322" style={{ flexShrink: 0, marginTop: '3px' }} />;
                       } else if (log.type === 'error') {
-                        textColor = '#f87171';
-                        badgeBg = 'rgba(239, 68, 68, 0.2)';
-                        badgeColor = '#ef4444';
+                        textColor = '#DD3322';
+                        badgeBg = 'rgba(221, 51, 34, 0.18)';
+                        badgeColor = '#DD3322';
                         badgeLabel = 'ERROR';
-                        rowBg = 'rgba(239, 68, 68, 0.08)';
-                        icon = <XCircle size={13} color="#ef4444" style={{ flexShrink: 0, marginTop: '3px' }} />;
+                        rowBg = theme === 'apple-gsos' ? 'rgba(221, 51, 34, 0.08)' : 'rgba(239, 68, 68, 0.08)';
+                        icon = <XCircle size={13} color="#DD3322" style={{ flexShrink: 0, marginTop: '3px' }} />;
                       } else if (log.type === 'warn') {
-                        textColor = '#fbbf24';
+                        textColor = theme === 'apple-gsos' ? '#B45309' : '#fbbf24';
                         badgeBg = 'rgba(245, 158, 11, 0.2)';
-                        badgeColor = '#f59e0b';
+                        badgeColor = '#D97706';
                         badgeLabel = 'WARN';
                         rowBg = 'rgba(245, 158, 11, 0.08)';
-                        icon = <AlertTriangle size={13} color="#f59e0b" style={{ flexShrink: 0, marginTop: '3px' }} />;
+                        icon = <AlertTriangle size={13} color="#D97706" style={{ flexShrink: 0, marginTop: '3px' }} />;
                       } else if (log.type === 'info') {
-                        textColor = '#38bdf8';
-                        badgeBg = 'rgba(56, 189, 248, 0.15)';
-                        badgeColor = '#38bdf8';
+                        textColor = theme === 'apple-gsos' ? '#4455AA' : '#38bdf8';
+                        badgeBg = theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)';
+                        badgeColor = theme === 'apple-gsos' ? '#4455AA' : '#38bdf8';
                         badgeLabel = 'INFO';
                       } else {
                         // Check if output includes test PASS indicator
                         if (log.content.includes('PASS')) {
-                          badgeBg = 'rgba(16, 185, 129, 0.2)';
-                          badgeColor = '#10b981';
+                          textColor = theme === 'apple-gsos' ? '#1B7A43' : '#34d399';
+                          badgeBg = 'rgba(34, 153, 85, 0.18)';
+                          badgeColor = '#229955';
                           badgeLabel = 'PASS';
                         }
                       }

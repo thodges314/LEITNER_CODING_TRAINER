@@ -7,7 +7,6 @@ import {
   CheckCircle2,
   Trash2,
   KeyRound,
-  Check,
   AlertTriangle,
   Timer,
   Loader2,
@@ -178,6 +177,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSettingsSaved,
   onResetDeckToDefaults,
 }) => {
+  const isLight = currentTheme === 'apple-gsos';
   const [algorithm, setAlgorithm] = useState<SpacedAlgorithm>(() => currentAlgorithm ?? getStoredAlgorithm());
   const [apiKey, setApiKey] = useState(() => getStoredApiKey());
   const [keyInput, setKeyInput] = useState(() => getStoredApiKey());
@@ -387,45 +387,96 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div
         className="modal-content"
-        style={{ maxWidth: '540px', padding: '24px' }}
+        style={{
+          maxWidth: '540px',
+          padding: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          maxHeight: '90vh',
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+        {/* Sticky Header */}
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            backgroundColor: 'var(--bg-card)',
+            borderBottom: '1px solid var(--border-medium)',
+            padding: '16px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div
               style={{
                 width: '36px',
                 height: '36px',
                 borderRadius: '8px',
-                background: 'rgba(56, 189, 248, 0.15)',
+                background: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#38bdf8',
+                color: isLight ? '#4455AA' : '#38bdf8',
+                border: isLight ? '1px solid rgba(68, 85, 170, 0.25)' : 'none',
+                flexShrink: 0,
               }}
             >
               <Sliders size={20} />
             </div>
             <div>
-              <h2 id="settings-title" style={{ fontSize: '18px', fontWeight: 600 }}>
+              <h2 id="settings-title" style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
                 Trainer Settings
               </h2>
-              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                Spaced repetition method & AI evaluation engine
-              </p>
             </div>
           </div>
-          <button
-            className="btn btn-outline"
-            style={{ padding: '6px', borderRadius: '50%' }}
-            onClick={onClose}
-            aria-label="Close settings"
-          >
-            <X size={18} />
-          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {toastMessage && (
+              <span
+                style={{
+                  fontSize: '11px',
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(52, 211, 153, 0.15)',
+                  color: isLight ? '#15803D' : '#34d399',
+                  border: isLight ? '1px solid #86EFAC' : '1px solid rgba(52, 211, 153, 0.3)',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <CheckCircle2 size={12} /> {toastMessage}
+              </span>
+            )}
+            <button
+              className="btn btn-outline"
+              style={{ padding: '6px', borderRadius: '50%', flexShrink: 0 }}
+              onClick={onClose}
+              aria-label="Close settings"
+            >
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        {/* Scrollable Body */}
+        <div
+          style={{
+            padding: '24px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '18px',
+            maxHeight: 'calc(90vh - 68px)',
+          }}
+        >
           {/* Spaced Repetition Algorithm Selection */}
           <div
             style={{
@@ -536,12 +587,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   width: '46px',
                   height: '24px',
                   borderRadius: '12px',
-                  backgroundColor: timedMode ? 'var(--accent-cyan)' : 'rgba(255, 255, 255, 0.1)',
+                  backgroundColor: timedMode
+                    ? (isLight ? '#4455AA' : 'var(--accent-cyan)')
+                    : (isLight ? '#D1D0C7' : 'rgba(255, 255, 255, 0.15)'),
                   position: 'relative',
-                  border: 'none',
+                  border: isLight
+                    ? (timedMode ? '1.5px solid #2B3A8C' : '1.5px solid #8A887E')
+                    : '1px solid rgba(255, 255, 255, 0.2)',
                   cursor: 'pointer',
-                  transition: 'background-color 0.2s',
+                  transition: 'all 0.2s ease',
                   flexShrink: 0,
+                  boxShadow: isLight && !timedMode ? 'inset 0 1px 2px rgba(0,0,0,0.1)' : 'none',
                 }}
                 aria-label="Toggle Timed Mode"
               >
@@ -550,12 +606,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     position: 'absolute',
                     top: '2px',
                     left: timedMode ? '24px' : '2px',
-                    width: '20px',
-                    height: '20px',
+                    width: '18px',
+                    height: '18px',
                     borderRadius: '50%',
                     backgroundColor: '#ffffff',
+                    border: isLight ? '1px solid #8A887E' : 'none',
                     transition: 'left 0.2s',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.35)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
                   }}
                 />
               </button>
@@ -576,10 +633,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       style={{
                         padding: '6px 8px',
                         fontSize: '11px',
-                        backgroundColor: timedDuration === opt.seconds ? 'rgba(245, 158, 11, 0.15)' : 'var(--bg-elevated)',
-                        borderColor: timedDuration === opt.seconds ? '#f59e0b' : 'var(--border-subtle)',
-                        color: timedDuration === opt.seconds ? '#fbbf24' : 'var(--text-secondary)',
-                        fontWeight: timedDuration === opt.seconds ? 600 : 400,
+                        backgroundColor: timedDuration === opt.seconds
+                          ? (currentTheme === 'apple-gsos' ? 'rgba(217, 119, 6, 0.16)' : 'rgba(245, 158, 11, 0.15)')
+                          : 'var(--bg-elevated)',
+                        borderColor: timedDuration === opt.seconds
+                          ? (currentTheme === 'apple-gsos' ? '#D97706' : '#f59e0b')
+                          : 'var(--border-subtle)',
+                        borderWidth: currentTheme === 'apple-gsos' && timedDuration === opt.seconds ? '1.5px' : '1px',
+                        color: timedDuration === opt.seconds
+                          ? (currentTheme === 'apple-gsos' ? '#B45309' : '#fbbf24')
+                          : 'var(--text-secondary)',
+                        fontWeight: timedDuration === opt.seconds ? 700 : 400,
+                        boxShadow: currentTheme === 'apple-gsos' && timedDuration === opt.seconds ? '2px 2px 0px rgba(28, 28, 28, 0.15)' : 'none',
                       }}
                     >
                       {opt.label}
@@ -616,7 +681,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="button"
                 onClick={() => {
                   onThemeChange?.('dark');
-                  showToast('Switched to Synthwave Dark Mode');
+                  showToast('Switched to Synthwave / Nightcore Mode');
                 }}
                 className="btn"
                 style={{
@@ -635,7 +700,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
                   <span style={{ fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>🌙</span> Synthwave Dark
+                    <span>🌙</span> Synthwave (Nightcore)
                   </span>
                   {currentTheme === 'dark' && (
                     <span style={{ fontSize: '11px', color: 'var(--accent-cyan)', fontWeight: 600 }}>Active</span>
@@ -716,9 +781,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     style={{
                       padding: '8px 10px',
                       fontSize: '12px',
-                      backgroundColor: isActive ? 'rgba(56, 189, 248, 0.2)' : 'var(--bg-elevated)',
-                      borderColor: isActive ? 'var(--accent-cyan)' : 'var(--border-subtle)',
-                      color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                      backgroundColor: isActive
+                        ? (currentTheme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.16)' : 'rgba(56, 189, 248, 0.2)')
+                        : 'var(--bg-elevated)',
+                      borderColor: isActive
+                        ? (currentTheme === 'apple-gsos' ? '#4455AA' : 'var(--accent-cyan)')
+                        : 'var(--border-subtle)',
+                      borderWidth: currentTheme === 'apple-gsos' && isActive ? '1.5px' : '1px',
+                      color: isActive
+                        ? (currentTheme === 'apple-gsos' ? '#1C1C1C' : '#ffffff')
+                        : 'var(--text-secondary)',
+                      boxShadow: currentTheme === 'apple-gsos' && isActive ? '2px 2px 0px rgba(28, 28, 28, 0.2)' : 'none',
                       transition: 'all 0.15s ease',
                       display: 'flex',
                       flexDirection: 'column',
@@ -728,7 +801,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ fontWeight: isActive ? 600 : 500 }}>{p.label}</span>
+                      <span style={{ fontWeight: isActive ? 700 : 500 }}>{p.label}</span>
                     </div>
 
                     {'badge' in p && p.badge && (
@@ -737,9 +810,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           fontSize: '9.5px',
                           padding: '1px 5px',
                           borderRadius: '3px',
-                          backgroundColor: isActive ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.08)',
-                          color: isActive ? '#38bdf8' : 'var(--text-muted)',
-                          fontWeight: 500,
+                          backgroundColor: isActive
+                            ? (currentTheme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.14)' : 'rgba(56, 189, 248, 0.25)')
+                            : (currentTheme === 'apple-gsos' ? '#DDDCD4' : 'rgba(255, 255, 255, 0.08)'),
+                          color: isActive
+                            ? (currentTheme === 'apple-gsos' ? '#2A3B8F' : '#38bdf8')
+                            : (currentTheme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)'),
+                          fontWeight: isActive ? 600 : 500,
                           whiteSpace: 'nowrap',
                         }}
                       >
@@ -748,12 +825,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     )}
 
                     {hasKey ? (
-                      <span style={{ fontSize: '10px', color: '#34d399', display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
-                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#34d399' }} />
+                      <span style={{ fontSize: '10px', color: currentTheme === 'apple-gsos' ? '#15803D' : '#34d399', display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px', fontWeight: 600 }}>
+                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: currentTheme === 'apple-gsos' ? '#15803D' : '#34d399' }} />
                         Key Saved
                       </span>
                     ) : (
-                      <span style={{ fontSize: '10px', color: 'var(--text-dim)', marginTop: '2px' }}>
+                      <span style={{ fontSize: '10px', color: currentTheme === 'apple-gsos' ? '#555555' : 'var(--text-dim)', marginTop: '2px' }}>
                         No Key
                       </span>
                     )}
@@ -766,21 +843,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div
               style={{
                 marginTop: '10px',
-                padding: '8px 12px',
-                borderRadius: '6px',
-                backgroundColor: 'rgba(56, 189, 248, 0.05)',
-                border: '1px solid rgba(56, 189, 248, 0.16)',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                backgroundColor: isLight ? '#EBF5FF' : 'rgba(56, 189, 248, 0.08)',
+                border: isLight ? '1.5px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.3)',
+                boxShadow: isLight ? '2px 2px 0px rgba(68, 85, 170, 0.15)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                fontSize: '11.5px',
-                color: 'var(--text-secondary)',
+                gap: '10px',
+                fontSize: '12px',
+                color: isLight ? '#1C1C1C' : 'var(--text-secondary)',
                 lineHeight: 1.45,
               }}
             >
-              <Zap size={14} color="#38bdf8" style={{ flexShrink: 0 }} />
+              <Zap size={15} color={isLight ? '#4455AA' : '#38bdf8'} style={{ flexShrink: 0 }} />
               <span>
-                <strong style={{ color: 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong>Groq</strong> (openai/gpt-oss-120b) or <strong>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
+                <strong style={{ color: isLight ? '#2B3A8C' : 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong style={{ color: isLight ? '#1C1C1C' : undefined }}>Groq</strong> (openai/gpt-oss-120b) or <strong style={{ color: isLight ? '#1C1C1C' : undefined }}>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
               </span>
             </div>
           </div>
@@ -1042,11 +1120,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             {portal && !apiKey && provider !== 'custom' && (
               <div
                 style={{
-                  marginTop: '8px',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(56, 189, 248, 0.05)',
-                  border: '1px solid rgba(56, 189, 248, 0.18)',
+                  marginTop: '10px',
+                  padding: '10px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: isLight ? '#EBF5FF' : 'rgba(56, 189, 248, 0.08)',
+                  border: isLight ? '1.5px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.3)',
+                  boxShadow: isLight ? '2px 2px 0px rgba(68, 85, 170, 0.15)' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -1055,10 +1134,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   fontSize: '12px',
                 }}
               >
-                <div style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Info size={13} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
+                <div style={{ color: isLight ? '#1C1C1C' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Info size={15} color={isLight ? '#4455AA' : 'var(--accent-cyan)'} style={{ flexShrink: 0 }} />
                   <span>
-                    <strong style={{ color: 'var(--text-primary)' }}>Need an API key?</strong> {portal.description}.
+                    <strong style={{ color: isLight ? '#1C1C1C' : 'var(--text-primary)' }}>Need an API key?</strong> {portal.description}.
                   </span>
                 </div>
                 <a
@@ -1066,16 +1145,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    color: 'var(--accent-cyan)',
+                    color: isLight ? '#FFFFFF' : 'var(--accent-cyan)',
                     fontWeight: 600,
                     textDecoration: 'none',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
                     whiteSpace: 'nowrap',
-                    padding: '3px 8px',
-                    borderRadius: '4px',
-                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    backgroundColor: isLight ? '#4455AA' : 'rgba(56, 189, 248, 0.1)',
+                    border: isLight ? '1px solid #2B3A8C' : '1px solid rgba(56, 189, 248, 0.25)',
                   }}
                 >
                   <span>{portal.label}</span>
@@ -1457,8 +1537,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   marginTop: '12px',
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  backgroundColor: 'rgba(56, 189, 248, 0.04)',
-                  border: '1px solid rgba(56, 189, 248, 0.18)',
+                  backgroundColor: isLight ? '#EBF5FF' : 'rgba(56, 189, 248, 0.08)',
+                  border: isLight ? '1.5px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.3)',
+                  boxShadow: isLight ? '2px 2px 0px rgba(68, 85, 170, 0.15)' : 'none',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '10px',
@@ -1616,17 +1697,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             style={{
               padding: '12px 14px',
               borderRadius: '8px',
-              backgroundColor: 'rgba(56, 189, 248, 0.04)',
-              border: '1px solid rgba(56, 189, 248, 0.2)',
+              backgroundColor: isLight ? '#EBF5FF' : 'rgba(56, 189, 248, 0.08)',
+              border: isLight ? '1.5px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.3)',
+              boxShadow: isLight ? '2px 2px 0px rgba(68, 85, 170, 0.15)' : 'none',
               display: 'flex',
               gap: '10px',
               fontSize: '12px',
-              color: 'var(--text-secondary)',
+              color: isLight ? '#1C1C1C' : 'var(--text-secondary)',
             }}
           >
-            <Info size={18} style={{ color: '#38bdf8', flexShrink: 0, marginTop: '2px' }} />
+            <Info size={18} style={{ color: isLight ? '#4455AA' : '#38bdf8', flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Offline & Keyless Ready: </span>
+              <span style={{ fontWeight: 600, color: isLight ? '#1C1C1C' : 'var(--text-primary)' }}>Offline & Keyless Ready: </span>
               If no API key is specified, the trainer automatically uses our built-in structural invariant heuristic engine. You can practice without friction right away.
             </div>
           </div>
@@ -1643,7 +1725,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               gap: '14px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f87171', fontSize: '13px', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-highlight, #f87171)', fontSize: '13px', fontWeight: 600 }}>
               <AlertTriangle size={15} />
               <span>Danger Zone</span>
             </div>
@@ -1666,11 +1748,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       setConfirmAction('reset-deck');
                       setResetConfirmInput('');
                     }}
-                    className="btn"
+                    className="btn btn-danger"
                     style={{
-                      backgroundColor: 'rgba(239, 68, 68, 0.15)',
-                      border: '1px solid rgba(239, 68, 68, 0.4)',
-                      color: '#f87171',
                       fontSize: '12px',
                       padding: '6px 12px',
                       fontWeight: 600,
@@ -1693,18 +1772,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       marginTop: '4px',
                       padding: '14px',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      backgroundColor: 'var(--bg-elevated)',
+                      border: '1.5px solid var(--accent-highlight, #ef4444)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '10px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontSize: '13px', fontWeight: 600 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-highlight, #f87171)', fontSize: '13px', fontWeight: 600 }}>
                       <AlertTriangle size={16} />
                       Permanently reset learning progress across all decks?
                     </div>
-                    <p style={{ fontSize: '12px', color: '#e2e8f0', margin: 0, lineHeight: 1.45 }}>
+                    <p style={{ fontSize: '12px', color: 'var(--text-primary)', margin: 0, lineHeight: 1.45 }}>
                       This will reset card review streaks, box tiers, completed review counters, and editor code drafts. Custom-built decks and stored API keys will NOT be deleted.
                     </p>
                     <div>
@@ -1716,7 +1795,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           marginBottom: '6px',
                         }}
                       >
-                        To confirm, type <strong translate="no" className="notranslate" style={{ color: '#f87171', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET ALL DECKS</strong> below:
+                        To confirm, type <strong translate="no" className="notranslate" style={{ color: 'var(--accent-highlight, #f87171)', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET ALL DECKS</strong> below:
                       </label>
                       <input
                         type="text"
@@ -1733,10 +1812,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           fontSize: '12.5px',
                           fontFamily: 'monospace',
                           borderColor: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS'
-                            ? '#ef4444'
-                            : 'rgba(239, 68, 68, 0.3)',
+                            ? 'var(--accent-highlight, #ef4444)'
+                            : 'var(--border-medium)',
                           outline: 'none',
-                          color: '#ffffff',
+                          color: 'var(--text-primary)',
+                          backgroundColor: 'var(--bg-editor, #FAFAFA)',
                         }}
                       />
                     </div>
@@ -1754,16 +1834,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </button>
                       <button
                         type="button"
-                        className="btn"
+                        className="btn btn-danger"
                         disabled={resetConfirmInput.trim().toUpperCase() !== 'RESET ALL DECKS'}
                         style={{
                           padding: '4px 14px',
                           fontSize: '12px',
-                          backgroundColor: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS' ? '#ef4444' : 'rgba(239, 68, 68, 0.25)',
-                          color: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS' ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
-                          border: 'none',
                           fontWeight: 600,
                           cursor: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS' ? 'pointer' : 'not-allowed',
+                          opacity: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS' ? 1 : 0.45,
                           transition: 'all 0.15s ease',
                         }}
                         onClick={() => {
@@ -1786,7 +1864,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: '220px' }}>
-                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#f87171' }}>
+                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--accent-highlight, #f87171)' }}>
                     Reset Everything (Factory Reset)
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
@@ -1799,11 +1877,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     setConfirmAction('reset-everything');
                     setResetConfirmInput('');
                   }}
-                  className="btn"
+                  className="btn btn-danger"
                   style={{
-                    backgroundColor: 'rgba(225, 29, 72, 0.2)',
-                    border: '1px solid rgba(225, 29, 72, 0.5)',
-                    color: '#fda4af',
                     fontSize: '12px',
                     padding: '6px 12px',
                     fontWeight: 600,
@@ -1826,18 +1901,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     marginTop: '4px',
                     padding: '14px',
                     borderRadius: '8px',
-                    backgroundColor: 'rgba(225, 29, 72, 0.15)',
-                    border: '1px solid rgba(225, 29, 72, 0.5)',
+                    backgroundColor: 'var(--bg-elevated)',
+                    border: '1.5px solid var(--accent-highlight, #ef4444)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '10px',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fda4af', fontSize: '13px', fontWeight: 600 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-highlight, #fda4af)', fontSize: '13px', fontWeight: 600 }}>
                     <AlertTriangle size={16} />
                     Factory reset application and wipe all localStorage?
                   </div>
-                  <p style={{ fontSize: '12px', color: '#e2e8f0', margin: 0, lineHeight: 1.45 }}>
+                  <p style={{ fontSize: '12px', color: 'var(--text-primary)', margin: 0, lineHeight: 1.45 }}>
                     This will permanently delete all saved API keys, custom decks you created, progress records, and editor drafts. The page will reload completely fresh.
                   </p>
                   <div>
@@ -1849,7 +1924,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         marginBottom: '6px',
                       }}
                     >
-                      To confirm, type <strong translate="no" className="notranslate" style={{ color: '#fda4af', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET EVERYTHING</strong> below:
+                      To confirm, type <strong translate="no" className="notranslate" style={{ color: 'var(--accent-highlight, #fda4af)', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET EVERYTHING</strong> below:
                     </label>
                     <input
                       type="text"
@@ -1866,10 +1941,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         fontSize: '12.5px',
                         fontFamily: 'monospace',
                         borderColor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING'
-                          ? '#e11d48'
-                          : 'rgba(225, 29, 72, 0.35)',
+                          ? 'var(--accent-highlight, #e11d48)'
+                          : 'var(--border-medium)',
                         outline: 'none',
-                        color: '#ffffff',
+                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--bg-editor, #FAFAFA)',
                       }}
                     />
                   </div>
@@ -1887,16 +1963,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </button>
                     <button
                       type="button"
-                      className="btn"
+                      className="btn btn-danger"
                       disabled={resetConfirmInput.trim().toUpperCase() !== 'RESET EVERYTHING'}
                       style={{
                         padding: '4px 14px',
                         fontSize: '12px',
-                        backgroundColor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? '#e11d48' : 'rgba(225, 29, 72, 0.25)',
-                        color: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
-                        border: 'none',
                         fontWeight: 600,
                         cursor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? 'pointer' : 'not-allowed',
+                        opacity: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? 1 : 0.45,
                         transition: 'all 0.15s ease',
                       }}
                       onClick={() => {
@@ -1916,30 +1990,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Footer Controls & Auto-save confirmation */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingTop: '8px',
-              borderTop: '1px solid var(--border-subtle)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#34d399' }}>
-              <CheckCircle2 size={15} />
-              <span>{toastMessage ?? 'All settings auto-saved to browser localStorage'}</span>
-            </div>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={onClose}
-              style={{ padding: '8px 24px', fontSize: '13px' }}
-            >
-              <Check size={14} /> Done
-            </button>
           </div>
         </div>
       </div>

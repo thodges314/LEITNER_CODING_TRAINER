@@ -38,8 +38,8 @@ const renderInlineMarkdown = (text: string): React.ReactNode[] => {
           key={match.index}
           style={{
             fontFamily: 'var(--font-mono, monospace)',
-            backgroundColor: 'rgba(255, 255, 255, 0.08)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backgroundColor: 'var(--bg-elevated)',
+            border: '1px solid var(--border-subtle)',
             color: 'var(--text-primary)',
             padding: '1px 5px',
             borderRadius: '4px',
@@ -91,12 +91,12 @@ const MarkdownContent: React.FC<{ text: string }> = ({ text }) => {
                 margin: '4px 0',
                 padding: '8px 12px',
                 borderRadius: '6px',
-                backgroundColor: 'rgba(0, 0, 0, 0.35)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                backgroundColor: 'var(--bg-editor)',
+                border: '1px solid var(--border-subtle)',
                 fontFamily: 'var(--font-mono, monospace)',
                 fontSize: '12.5px',
                 overflowX: 'auto',
-                color: '#e2e8f0',
+                color: 'var(--text-primary)',
                 lineHeight: 1.5,
               }}
             >
@@ -180,6 +180,7 @@ const StreamedMarkdownReply: React.FC<{
 };
 
 interface EvaluationPanelProps {
+  theme?: 'dark' | 'apple-gsos';
   topic: TopicItem;
   submittedCode: string;
   result: EvaluationResult;
@@ -195,6 +196,7 @@ interface EvaluationPanelProps {
 }
 
 export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
+  theme,
   topic,
   submittedCode = '',
   result,
@@ -208,6 +210,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   isReinforcement,
   onFinishReinforcement,
 }) => {
+  const isLight = theme === 'apple-gsos';
   // Human override state, initialized to AI verdict
   const [effectiveVerdict, setEffectiveVerdict] = useState<boolean>(result.passed);
   const isOverridden = effectiveVerdict !== result.passed;
@@ -312,8 +315,13 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         style={{
           padding: '20px',
           borderRadius: '12px',
-          backgroundColor: effectiveVerdict ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)',
-          border: `1px solid ${effectiveVerdict ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'}`,
+          backgroundColor: effectiveVerdict
+            ? (isLight ? '#F0FDF4' : 'rgba(16, 185, 129, 0.08)')
+            : (isLight ? '#FFF5F5' : 'rgba(239, 68, 68, 0.08)'),
+          border: isLight
+            ? `1.5px solid ${effectiveVerdict ? '#229955' : '#DD3322'}`
+            : `1px solid ${effectiveVerdict ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'}`,
+          boxShadow: isLight ? '3px 3px 0px rgba(28, 28, 28, 0.2)' : 'none',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
@@ -322,18 +330,20 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {effectiveVerdict ? (
-              <CheckCircle2 size={32} color="#34d399" />
+              <CheckCircle2 size={32} color={isLight ? '#229955' : '#34d399'} />
             ) : (
-              <XCircle size={32} color="#f87171" />
+              <XCircle size={32} color={isLight ? '#DD3322' : '#f87171'} />
             )}
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span
                   style={{
                     fontSize: '20px',
                     fontWeight: 700,
                     letterSpacing: '-0.02em',
-                    color: effectiveVerdict ? '#34d399' : '#f87171',
+                    color: effectiveVerdict
+                      ? (isLight ? '#15803D' : '#34d399')
+                      : (isLight ? '#B91C1C' : '#f87171'),
                   }}
                 >
                   {isReinforcement
@@ -344,9 +354,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   <span
                     className="badge"
                     style={{
-                      backgroundColor: 'rgba(168, 85, 247, 0.2)',
-                      border: '1px solid rgba(168, 85, 247, 0.4)',
-                      color: '#c084fc',
+                      backgroundColor: isLight ? 'rgba(107, 70, 193, 0.12)' : 'rgba(168, 85, 247, 0.2)',
+                      border: isLight ? '1px solid rgba(107, 70, 193, 0.4)' : '1px solid rgba(168, 85, 247, 0.4)',
+                      color: isLight ? '#6B46C1' : '#c084fc',
                       fontSize: '11px',
                     }}
                   >
@@ -357,9 +367,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   <span
                     className="badge"
                     style={{
-                      backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                      border: '1px solid rgba(245, 158, 11, 0.4)',
-                      color: '#fbbf24',
+                      backgroundColor: isLight ? 'rgba(217, 119, 6, 0.12)' : 'rgba(245, 158, 11, 0.2)',
+                      border: isLight ? '1px solid rgba(217, 119, 6, 0.4)' : '1px solid rgba(245, 158, 11, 0.4)',
+                      color: isLight ? '#B45309' : '#fbbf24',
                       fontSize: '11px',
                     }}
                   >
@@ -370,8 +380,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   <span
                     className="badge"
                     style={{
-                      backgroundColor: 'rgba(148, 163, 184, 0.1)',
-                      color: 'var(--text-muted)',
+                      backgroundColor: isLight ? '#F2F1EA' : 'rgba(148, 163, 184, 0.1)',
+                      color: isLight ? '#333333' : 'var(--text-muted)',
+                      border: isLight ? '1px solid #B8B7AD' : 'none',
                       fontSize: '11px',
                     }}
                   >
@@ -382,8 +393,15 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   <span
                     className="badge"
                     style={{
-                      backgroundColor: result.harness.passed ? 'rgba(52, 211, 153, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                      color: result.harness.passed ? '#34d399' : '#f87171',
+                      backgroundColor: result.harness.passed
+                        ? (isLight ? 'rgba(34, 153, 85, 0.14)' : 'rgba(52, 211, 153, 0.15)')
+                        : (isLight ? 'rgba(221, 51, 34, 0.12)' : 'rgba(239, 68, 68, 0.15)'),
+                      color: result.harness.passed
+                        ? (isLight ? '#15803D' : '#34d399')
+                        : (isLight ? '#B91C1C' : '#f87171'),
+                      border: result.harness.passed
+                        ? (isLight ? '1px solid rgba(34, 153, 85, 0.4)' : 'none')
+                        : (isLight ? '1px solid rgba(221, 51, 34, 0.4)' : 'none'),
                       fontSize: '11px',
                     }}
                   >
@@ -404,11 +422,13 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 className="badge"
                 onClick={() => topic.complexityExplanation && setShowComplexityExplanation((prev) => !prev)}
                 style={{
-                  backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                  border: showComplexityExplanation
-                    ? '1px solid rgba(56, 189, 248, 0.5)'
-                    : '1px solid rgba(56, 189, 248, 0.25)',
-                  color: '#38bdf8',
+                  backgroundColor: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.1)',
+                  border: isLight
+                    ? '1.5px solid #4455AA'
+                    : (showComplexityExplanation
+                      ? '1px solid rgba(56, 189, 248, 0.5)'
+                      : '1px solid rgba(56, 189, 248, 0.25)'),
+                  color: isLight ? '#1D4ED8' : '#38bdf8',
                   padding: '6px 10px',
                   cursor: topic.complexityExplanation ? 'pointer' : 'default',
                   userSelect: 'none',
@@ -422,11 +442,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   }
                 }}
               >
-                <Clock size={13} />
+                <Clock size={13} color={isLight ? '#1D4ED8' : '#38bdf8'} />
                 <span>
                   Time: <strong>{result.timeComplexity || 'O(n)'}</strong>
                   {topic.targetTime && (
-                    <span style={{ fontSize: '11px', opacity: 0.85, marginLeft: '6px' }}>
+                    <span style={{ fontSize: '11px', color: isLight ? '#1C1C1C' : undefined, opacity: isLight ? 0.9 : 0.85, marginLeft: '6px' }}>
                       (Goal: {topic.targetTime})
                     </span>
                   )}
@@ -437,11 +457,13 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 className="badge"
                 onClick={() => topic.complexityExplanation && setShowComplexityExplanation((prev) => !prev)}
                 style={{
-                  backgroundColor: 'rgba(168, 85, 247, 0.1)',
-                  border: showComplexityExplanation
-                    ? '1px solid rgba(168, 85, 247, 0.5)'
-                    : '1px solid rgba(168, 85, 247, 0.25)',
-                  color: '#c084fc',
+                  backgroundColor: isLight ? 'rgba(109, 40, 217, 0.12)' : 'rgba(168, 85, 247, 0.1)',
+                  border: isLight
+                    ? '1.5px solid #6D28D9'
+                    : (showComplexityExplanation
+                      ? '1px solid rgba(168, 85, 247, 0.5)'
+                      : '1px solid rgba(168, 85, 247, 0.25)'),
+                  color: isLight ? '#6D28D9' : '#c084fc',
                   padding: '6px 10px',
                   cursor: topic.complexityExplanation ? 'pointer' : 'default',
                   userSelect: 'none',
@@ -455,11 +477,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   }
                 }}
               >
-                <Database size={13} />
+                <Database size={13} color={isLight ? '#6D28D9' : '#c084fc'} />
                 <span>
                   Space: <strong>{result.spaceComplexity || 'O(1)'}</strong>
                   {topic.targetSpace && (
-                    <span style={{ fontSize: '11px', opacity: 0.85, marginLeft: '6px' }}>
+                    <span style={{ fontSize: '11px', color: isLight ? '#1C1C1C' : undefined, opacity: isLight ? 0.9 : 0.85, marginLeft: '6px' }}>
                       (Goal: {topic.targetSpace})
                     </span>
                   )}
@@ -473,17 +495,18 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 style={{
                   padding: '10px 12px',
                   borderRadius: '6px',
-                  backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                  border: '1px solid rgba(56, 189, 248, 0.3)',
+                  backgroundColor: isLight ? '#FFFFFF' : 'rgba(15, 23, 42, 0.95)',
+                  border: isLight ? '1.5px solid #1C1C1C' : '1px solid rgba(56, 189, 248, 0.3)',
+                  boxShadow: isLight ? '3px 3px 0px rgba(28, 28, 28, 0.2)' : 'none',
                   fontSize: '12px',
-                  color: 'var(--text-secondary)',
+                  color: isLight ? '#1C1C1C' : 'var(--text-secondary)',
                   lineHeight: '1.45',
                   maxWidth: '500px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '4px' }}>
                   <Sparkles size={12} color="var(--accent-cyan)" />
-                  <span style={{ fontWeight: 600, color: 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <span style={{ fontWeight: 600, color: isLight ? '#555555' : 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Why this complexity target:
                   </span>
                 </div>
@@ -515,7 +538,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               style={{
                 fontSize: '12.5px',
                 fontWeight: 600,
-                color: result.passed ? '#34d399' : '#f87171',
+                color: result.passed
+                  ? (isLight ? '#15803D' : '#34d399')
+                  : (isLight ? '#B91C1C' : '#f87171'),
               }}
             >
               {result.passed ? 'Pass' : 'Fail'}
@@ -756,7 +781,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               style={{
                 marginTop: '12px',
                 paddingTop: '10px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+                borderTop: '1px solid var(--border-medium)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -834,7 +859,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              backgroundColor: 'var(--bg-surface)',
               borderBottom: isSolutionVisible ? '1px solid var(--border-subtle)' : 'none',
               flexWrap: 'wrap',
               gap: '10px',
@@ -901,7 +926,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   fontFamily: 'var(--font-mono)',
                   fontSize: '13px',
                   lineHeight: 1.6,
-                  color: '#e2e8f0',
+                  color: 'var(--text-primary)',
                   overflowX: 'auto',
                   whiteSpace: 'pre',
                   fontVariantLigatures: 'normal',

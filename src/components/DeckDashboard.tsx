@@ -1,6 +1,7 @@
 import { DifficultyBadge } from './DifficultyBadge';
 import { useState, useRef } from 'react';
 import type { ChangeEvent } from 'react';
+import type { AppTheme } from '../lib/theme';
 import {
   getTrackMeta,
   intervalForBox,
@@ -22,8 +23,82 @@ import {
   Trash2,
 } from 'lucide-react';
 
+const LIGHT_TRACK_STYLES: Record<string, { color: string; bg: string; border: string }> = {
+  'async-js': {
+    color: '#0369A1',
+    bg: '#E0F2FE',
+    border: '#7DD3FC',
+  },
+  'data-structures': {
+    color: '#6D28D9',
+    bg: '#EDE9FE',
+    border: '#C4B5FD',
+  },
+  'react': {
+    color: '#0E7490',
+    bg: '#CFFAFE',
+    border: '#67E8F9',
+  },
+  'algorithms': {
+    color: '#B45309',
+    bg: '#FEF3C7',
+    border: '#FCD34D',
+  },
+  'js-runtime-fundamentals': {
+    color: '#BE185D',
+    bg: '#FCE7F3',
+    border: '#F472B6',
+  },
+  'async-web-plumbing': {
+    color: '#4338CA',
+    bg: '#E0E7FF',
+    border: '#A5B4FC',
+  },
+  'collections-transformations': {
+    color: '#047857',
+    bg: '#D1FAE5',
+    border: '#6EE7B7',
+  },
+  'react-patterns': {
+    color: '#0F766E',
+    bg: '#CCFBF1',
+    border: '#5EEAD4',
+  },
+  'algorithmic-screens': {
+    color: '#A16207',
+    bg: '#FEF9C3',
+    border: '#FDE047',
+  },
+  'typescript-patterns': {
+    color: '#1E40AF',
+    bg: '#DBEAFE',
+    border: '#93C5FD',
+  },
+  'js-language': {
+    color: '#C2410C',
+    bg: '#FFEDD5',
+    border: '#FDBA74',
+  },
+  'dom-browser': {
+    color: '#4D7C0F',
+    bg: '#ECFCCB',
+    border: '#BEF264',
+  },
+  'react-components': {
+    color: '#0284C7',
+    bg: '#E0F2FE',
+    border: '#7DD3FC',
+  },
+  'testing-tooling': {
+    color: '#BE123C',
+    bg: '#FFE4E6',
+    border: '#FDA4AF',
+  },
+};
+
 interface DeckDashboardProps {
   state: LeitnerDeckState;
+  theme?: AppTheme;
   onSelectCardToPractice: (card: TopicItem) => void;
   onToggleLock: (topicId: string, currentStatus: 'active' | 'locked') => void;
   onResetBox: (topicId: string) => void;
@@ -34,6 +109,7 @@ interface DeckDashboardProps {
 
 export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   state,
+  theme,
   onSelectCardToPractice,
   onToggleLock,
   onResetBox,
@@ -41,6 +117,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onStateUpdated,
   onOpenAddModal,
 }) => {
+  const isLight = theme === 'apple-gsos';
   const [selectedTrack, setSelectedTrack] = useState<string>('all');
   const [selectedBox, setSelectedBox] = useState<number | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'active' | 'locked'>('all');
@@ -281,9 +358,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 style={{
                   padding: '6px 12px',
                   fontSize: '12.5px',
-                  backgroundColor: isActive ? 'var(--bg-elevated)' : 'transparent',
-                  borderColor: isActive ? 'var(--border-medium)' : 'var(--border-subtle)',
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
+                  backgroundColor: isActive ? (isLight ? '#4455AA' : 'var(--bg-elevated)') : (isLight ? '#FFFFFF' : 'transparent'),
+                  borderColor: isActive ? (isLight ? '#2B3A8C' : 'var(--border-medium)') : (isLight ? '#C4C3BA' : 'var(--border-subtle)'),
+                  color: isActive ? (isLight ? '#FFFFFF' : 'var(--text-primary)') : (isLight ? '#333333' : 'var(--text-muted)'),
+                  fontWeight: isActive ? 600 : 500,
                 }}
               >
                 {label}
@@ -302,7 +380,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 left: '10px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: 'var(--text-muted)',
+                color: isLight ? '#555555' : 'var(--text-muted)',
               }}
             />
             <input
@@ -316,6 +394,9 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 paddingLeft: '32px',
                 paddingRight: '10px',
                 fontSize: '12.5px',
+                backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-editor)',
+                color: isLight ? '#1C1C1C' : '#e2e8f0',
+                border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
               }}
             />
           </div>
@@ -328,7 +409,9 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               height: '34px',
               padding: '4px 10px',
               fontSize: '12.5px',
-              backgroundColor: 'var(--bg-elevated)',
+              backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-elevated)',
+              color: isLight ? '#1C1C1C' : 'var(--text-primary)',
+              border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
               width: 'auto',
             }}
           >
@@ -372,18 +455,27 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 const trkMeta = getTrackMeta(topic.track);
                 const isEligible = topic.status === 'active' && topic.nextEligibleTrial <= totalCompletedReviews;
 
+                const lightTrk = LIGHT_TRACK_STYLES[topic.track] || {
+                  color: '#334155',
+                  bg: '#F1F5F9',
+                  border: '#CBD5E1',
+                };
+                const trkBg = isLight ? lightTrk.bg : trkMeta.bg;
+                const trkColor = isLight ? lightTrk.color : trkMeta.color;
+                const trkBorder = isLight ? lightTrk.border : trkMeta.border;
+
                 return (
                   <tr
                     key={topic.id}
                     style={{
                       borderBottom: '1px solid var(--border-subtle)',
                       transition: 'background-color 0.1s',
-                      backgroundColor: topic.status === 'locked' ? 'rgba(0,0,0,0.2)' : 'transparent',
+                      backgroundColor: topic.status === 'locked' ? (isLight ? 'rgba(0, 0, 0, 0.025)' : 'rgba(0,0,0,0.2)') : 'transparent',
                     }}
                   >
                     {/* Title & Tags */}
                     <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                      <div style={{ fontWeight: 600, color: topic.status === 'active' ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                      <div style={{ fontWeight: 600, color: topic.status === 'active' ? 'var(--text-primary)' : (isLight ? '#475569' : 'var(--text-muted)') }}>
                         {topic.title}
                       </div>
                       <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
@@ -392,8 +484,9 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                             key={tg}
                             style={{
                               fontSize: '10.5px',
-                              color: 'var(--text-dim)',
-                              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                              color: isLight ? '#334155' : 'var(--text-dim)',
+                              backgroundColor: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.03)',
+                              border: isLight ? '1px solid #CBD5E1' : 'none',
                               padding: '1px 6px',
                               borderRadius: '3px',
                             }}
@@ -409,10 +502,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                       <span
                         className="badge"
                         style={{
-                          backgroundColor: trkMeta.bg,
-                          color: trkMeta.color,
-                          border: `1px solid ${trkMeta.border}`,
+                          backgroundColor: trkBg,
+                          color: trkColor,
+                          border: `1px solid ${trkBorder}`,
                           fontSize: '11px',
+                          fontWeight: isLight ? 600 : 500,
                         }}
                       >
                         {trkMeta.label}
@@ -428,27 +522,27 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                         <span
                           className="badge"
                           style={{
-                            backgroundColor: `rgba(255, 255, 255, 0.05)`,
-                            border: `1px solid var(--box-${Math.min(9, topic.box)})`,
+                            backgroundColor: isLight ? 'rgba(0, 0, 0, 0.03)' : `rgba(255, 255, 255, 0.05)`,
+                            border: `1.5px solid var(--box-${Math.min(9, topic.box)})`,
                             color: `var(--box-${Math.min(9, topic.box)})`,
-                            fontWeight: 600,
+                            fontWeight: 700,
                           }}
                         >
                           {tierName} {topic.box}
                         </span>
                       ) : (
-                        <span style={{ color: 'var(--text-dim)', fontSize: '12px' }}>—</span>
+                        <span style={{ color: isLight ? '#64748B' : 'var(--text-dim)', fontSize: '12px' }}>—</span>
                       )}
                     </td>
 
                     {/* Streak */}
                     <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
                       {topic.status === 'active' ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#f97316', fontWeight: 500 }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#f97316', fontWeight: 600 }}>
                           <Flame size={13} /> {topic.streak}
                         </span>
                       ) : (
-                        <span style={{ color: 'var(--text-dim)' }}>0</span>
+                        <span style={{ color: isLight ? '#64748B' : 'var(--text-dim)' }}>0</span>
                       )}
                     </td>
 
@@ -460,8 +554,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                             style={{
                               fontFamily: 'var(--font-mono)',
                               fontSize: '12px',
-                              fontWeight: isEligible ? 600 : 400,
-                              color: isEligible ? '#34d399' : 'var(--text-secondary)',
+                              fontWeight: isEligible ? 700 : 500,
+                              color: isEligible ? (isLight ? '#15803D' : '#34d399') : (isLight ? '#334155' : 'var(--text-secondary)'),
                             }}
                           >
                             Trial #{topic.nextEligibleTrial}
@@ -470,9 +564,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                             <span
                               className="badge"
                               style={{
-                                backgroundColor: 'rgba(52, 211, 153, 0.15)',
-                                color: '#34d399',
+                                backgroundColor: isLight ? '#DCFCE7' : 'rgba(52, 211, 153, 0.15)',
+                                color: isLight ? '#15803D' : '#34d399',
+                                border: isLight ? '1px solid #86EFAC' : 'none',
                                 fontSize: '10px',
+                                fontWeight: 700,
                                 padding: '1px 5px',
                               }}
                             >
@@ -481,7 +577,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                           )}
                         </div>
                       ) : (
-                        <span style={{ color: 'var(--text-dim)', fontSize: '12px' }}>Locked</span>
+                        <span style={{ color: isLight ? '#64748B' : 'var(--text-dim)', fontSize: '12px', fontWeight: 500 }}>Locked</span>
                       )}
                     </td>
 
@@ -491,9 +587,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                         <span
                           className="badge"
                           style={{
-                            backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                            color: '#38bdf8',
+                            backgroundColor: isLight ? '#E0F2FE' : 'rgba(56, 189, 248, 0.1)',
+                            color: isLight ? '#0284C7' : '#38bdf8',
+                            border: isLight ? '1px solid #7DD3FC' : 'none',
                             fontSize: '11px',
+                            fontWeight: 600,
                           }}
                         >
                           <Unlock size={11} /> Active
@@ -502,9 +600,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                         <span
                           className="badge"
                           style={{
-                            backgroundColor: 'rgba(148, 163, 184, 0.08)',
-                            color: 'var(--text-muted)',
+                            backgroundColor: isLight ? '#F1F5F9' : 'rgba(148, 163, 184, 0.08)',
+                            color: isLight ? '#334155' : 'var(--text-muted)',
+                            border: isLight ? '1px solid #94A3B8' : 'none',
                             fontSize: '11px',
+                            fontWeight: 600,
                           }}
                         >
                           <Lock size={11} /> Locked

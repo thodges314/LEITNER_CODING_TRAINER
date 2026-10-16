@@ -422,8 +422,8 @@ export function App() {
                 borderColor: theme === 'apple-gsos' ? 'var(--accent-primary)' : undefined,
               }}
               onClick={handleToggleTheme}
-              title={theme === 'apple-gsos' ? 'Switch to Synthwave Dark Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
-              aria-label={theme === 'apple-gsos' ? 'Switch to Synthwave Dark Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
+              title={theme === 'apple-gsos' ? 'Switch to Synthwave / Nightcore Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
+              aria-label={theme === 'apple-gsos' ? 'Switch to Synthwave / Nightcore Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
             >
               {theme === 'apple-gsos' ? (
                 <>
@@ -433,7 +433,7 @@ export function App() {
               ) : (
                 <>
                   <Sun size={14} color="#fbbf24" />
-                  <span>GS/OS</span>
+                  <span>Light</span>
                 </>
               )}
             </button>
@@ -468,7 +468,7 @@ export function App() {
       <main style={{ flex: 1, padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
         {activeView === 'practice' ? (
           <PracticeArena
-            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}-${theme}`}
+            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
             activeDeckSize={deckState.topics.filter((t) => t.status === 'active').length}
@@ -482,6 +482,7 @@ export function App() {
           />
         ) : (
           <DeckDashboard
+            theme={theme}
             state={deckState}
             onSelectCardToPractice={handleSelectCardToPractice}
             onToggleLock={handleToggleLock}

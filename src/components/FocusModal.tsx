@@ -76,7 +76,8 @@ export const FocusModal: React.FC<FocusModalProps> = ({
         cursor: 'pointer',
         border: `1px solid ${mode === 'exclude' ? '#f87171' : mode === 'include' ? color : 'var(--border-medium)'}`,
         background: mode === 'exclude' ? 'rgba(248,113,113,0.15)' : mode === 'include' ? `${color}26` : 'transparent',
-        color: mode === 'exclude' ? '#f87171' : mode === 'include' ? color : 'var(--text-secondary)',
+        color: mode === 'exclude' ? '#f87171' : mode === 'include' ? color : 'var(--text-primary)',
+        fontWeight: mode !== 'off' ? 600 : 500,
         textDecoration: mode === 'exclude' ? 'line-through' : 'none',
       }}
     >
@@ -90,23 +91,56 @@ export const FocusModal: React.FC<FocusModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="focus-title">
-      <div className="modal-content" style={{ maxWidth: '720px', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+      <div
+        className="modal-content"
+        style={{
+          maxWidth: '720px',
+          padding: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Sticky Header */}
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            backgroundColor: 'var(--bg-card)',
+            borderBottom: '1px solid var(--border-medium)',
+            padding: '16px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Crosshair size={20} color="#38bdf8" />
+            <Crosshair size={20} color="var(--accent-cyan)" />
             <div>
-              <h2 id="focus-title" style={{ fontSize: '18px', fontWeight: 600 }}>
+              <h2 id="focus-title" style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>
                 Practice Focus
               </h2>
-              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
                 Click a chip to include it, again to exclude it, again to clear. Excluded cards keep their progress.
               </p>
             </div>
           </div>
-          <button className="btn btn-outline" style={{ padding: '6px', borderRadius: '50%' }} onClick={onClose} aria-label="Close">
+          <button
+            type="button"
+            className="btn btn-outline"
+            style={{ padding: '6px', borderRadius: '50%', flexShrink: 0 }}
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X size={16} />
           </button>
         </div>
+
+        {/* Scrollable Body */}
+        <div style={{ padding: '20px 24px 24px 24px', overflowY: 'auto', maxHeight: 'calc(90vh - 75px)' }}>
 
         <div
           style={{
@@ -140,9 +174,9 @@ export const FocusModal: React.FC<FocusModalProps> = ({
               value={filter.minDifficulty ?? ''}
               onChange={(e) => set({ minDifficulty: e.target.value ? Number(e.target.value) : undefined })}
               style={{
-                backgroundColor: 'var(--bg-elevated)',
-                color: '#f1f5f9',
-                border: '1px solid var(--border-medium)',
+                backgroundColor: 'var(--bg-editor)',
+                color: 'var(--text-primary)',
+                border: '1.5px solid var(--border-medium)',
                 borderRadius: '8px',
                 padding: '6px 12px',
                 fontSize: '13px',
@@ -150,9 +184,9 @@ export const FocusModal: React.FC<FocusModalProps> = ({
                 outline: 'none',
               }}
             >
-              <option value="" style={{ backgroundColor: '#141b29', color: '#f1f5f9' }}>Any Level</option>
+              <option value="">Any Level</option>
               {[1, 2, 3, 4, 5].map((d) => (
-                <option key={d} value={d} style={{ backgroundColor: '#141b29', color: '#f1f5f9' }}>
+                <option key={d} value={d}>
                   {d} · {DIFFICULTY_LABELS[d]}
                 </option>
               ))}
@@ -165,9 +199,9 @@ export const FocusModal: React.FC<FocusModalProps> = ({
               value={filter.maxDifficulty ?? ''}
               onChange={(e) => set({ maxDifficulty: e.target.value ? Number(e.target.value) : undefined })}
               style={{
-                backgroundColor: 'var(--bg-elevated)',
-                color: '#f1f5f9',
-                border: '1px solid var(--border-medium)',
+                backgroundColor: 'var(--bg-editor)',
+                color: 'var(--text-primary)',
+                border: '1.5px solid var(--border-medium)',
                 borderRadius: '8px',
                 padding: '6px 12px',
                 fontSize: '13px',
@@ -175,9 +209,9 @@ export const FocusModal: React.FC<FocusModalProps> = ({
                 outline: 'none',
               }}
             >
-              <option value="" style={{ backgroundColor: '#141b29', color: '#f1f5f9' }}>Any Level</option>
+              <option value="">Any Level</option>
               {[1, 2, 3, 4, 5].map((d) => (
-                <option key={d} value={d} style={{ backgroundColor: '#141b29', color: '#f1f5f9' }}>
+                <option key={d} value={d}>
                   {d} · {DIFFICULTY_LABELS[d]}
                 </option>
               ))}
@@ -219,9 +253,9 @@ export const FocusModal: React.FC<FocusModalProps> = ({
             height: '38px',
             padding: '8px 12px',
             fontSize: '13px',
-            backgroundColor: 'var(--bg-elevated)',
-            color: '#f1f5f9',
-            border: '1px solid var(--border-medium)',
+            backgroundColor: 'var(--bg-editor)',
+            color: 'var(--text-primary)',
+            border: '1.5px solid var(--border-medium)',
             borderRadius: '8px',
             outline: 'none',
             marginBottom: '10px',
@@ -279,9 +313,9 @@ export const FocusModal: React.FC<FocusModalProps> = ({
               height: '38px',
               padding: '8px 12px',
               fontSize: '13px',
-              backgroundColor: 'var(--bg-elevated)',
-              color: '#f1f5f9',
-              border: '1px solid var(--border-medium)',
+              backgroundColor: 'var(--bg-editor)',
+              color: 'var(--text-primary)',
+              border: '1.5px solid var(--border-medium)',
               borderRadius: '8px',
               outline: 'none',
             }}
@@ -306,13 +340,16 @@ export const FocusModal: React.FC<FocusModalProps> = ({
           </button>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <button type="button" className="btn btn-outline" onClick={() => onChange(EMPTY_FILTER)} disabled={!isFilterActive(filter)}>
-            Clear focus
-          </button>
-          <button type="button" className="btn btn-primary" onClick={onClose}>
-            Done
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'flex-start', paddingTop: '10px', borderTop: '1px solid var(--border-subtle)' }}>
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => onChange(EMPTY_FILTER)}
+              disabled={!isFilterActive(filter)}
+            >
+              Clear focus
+            </button>
+          </div>
         </div>
       </div>
     </div>
