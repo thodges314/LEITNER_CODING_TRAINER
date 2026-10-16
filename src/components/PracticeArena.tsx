@@ -11,6 +11,8 @@ import ReactDOM from 'react-dom/client';
 import {
   getTrackMeta,
   intervalForBox,
+  DIFFICULTY_LABELS,
+  difficultyOf,
 } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { evaluateCodeSubmission } from '../lib/ai';
@@ -40,7 +42,7 @@ import {
   ShieldCheck,
   FlaskConical,
   Sparkles,
-  HelpCircle,
+  Zap,
   X,
 } from 'lucide-react';
 import { transpileForExecution, runHarness, createSandboxScope } from '../lib/runner';
@@ -133,20 +135,22 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   // Reveal canonical solution state
   const [showSolution, setShowSolution] = useState(false);
   const [showHarness, setShowHarness] = useState(true);
-  const [showComplexityDetails, setShowComplexityDetails] = useState(false);
-  const complexityBadgeRef = useRef<HTMLDivElement>(null);
+  type PopoverType = 'track' | 'difficulty' | 'tier' | 'complexity' | 'streak' | 'timer' | null;
+  const [activePopover, setActivePopover] = useState<PopoverType>(null);
+  const [inspectedTier, setInspectedTier] = useState<number>(currentCard?.box || 1);
+  const indicatorsHeaderRef = useRef<HTMLDivElement>(null);
   const [prevCardId, setPrevCardId] = useState(currentCard?.id);
 
-  // Close complexity popover on outside click or escape
+  // Close active indicator popover on outside click or escape
   useEffect(() => {
-    if (!showComplexityDetails) return;
+    if (!activePopover) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (complexityBadgeRef.current && !complexityBadgeRef.current.contains(e.target as Node)) {
-        setShowComplexityDetails(false);
+      if (indicatorsHeaderRef.current && !indicatorsHeaderRef.current.contains(e.target as Node)) {
+        setActivePopover(null);
       }
     };
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowComplexityDetails(false);
+      if (e.key === 'Escape') setActivePopover(null);
     };
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
@@ -154,7 +158,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showComplexityDetails]);
+  }, [activePopover]);
 
   // Autosave the editor buffer (debounced) so a frozen tab or reload never loses work.
   // Never save drafts during an isolated reinforcement drill or when code is empty/matches starter.
@@ -176,7 +180,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setPrevCardId(currentCard?.id);
     setShowSolution(false);
     setShowHarness(true);
-    setShowComplexityDetails(false);
+    setActivePopover(null);
+    if (currentCard) setInspectedTier(currentCard.box);
   }
 
   // Autofocus editor on mount and card switch
@@ -511,7 +516,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         setTimeRemaining((prev) => {
           if (prev <= 1) {
             setIsTimerRunning(false);
-            if (timedMode && !evalResult && !isEvaluating) {
+            if (!evalResult && !isEvaluating) {
               setTimeExpiredToast('⏰ Time expired! Your buffer is being automatically submitted for evaluation...');
               setTimeout(() => {
                 void actionsRef.current.handleSubmit();
@@ -698,106 +703,395 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           gap: '14px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div ref={indicatorsHeaderRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            {/* Track Badge */}
-            <span
-              className="badge"
-              style={{
-                backgroundColor: trackMeta.bg,
-                border: `1px solid ${trackMeta.border}`,
-                color: trackMeta.color,
-                fontWeight: 600,
-                fontSize: '12px',
-                padding: '4px 10px',
-                cursor: 'help',
-              }}
-              title={`Subject Track: ${trackMeta.label} • Focus category for this coding challenge`}
-            >
-              {trackMeta.label}
-            </span>
-            <DifficultyBadge card={currentCard} />
+            {/* 1. Track Badge with Dropdown */}
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <span
+                className="badge"
+                onClick={() => setActivePopover((prev) => (prev === 'track' ? null : 'track'))}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActivePopover((prev) => (prev === 'track' ? null : 'track'));
+                  }
+                }}
+                style={{
+                  backgroundColor: trackMeta.bg,
+                  border: activePopover === 'track' ? `1px solid ${trackMeta.color}` : `1px solid ${trackMeta.border}`,
+                  color: trackMeta.color,
+                  fontWeight: 600,
+                  fontSize: '12px',
+                  padding: '4px 10px',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                }}
+              >
+                {trackMeta.label}
+              </span>
 
-            {/* Leitner Box / Tier Progression Badges */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {(algorithm === 'graduated-interval'
-                ? Array.from({ length: Math.max(5, Math.min(9, currentCard.box)) }, (_, i) => i + 1)
-                : [1, 2, 3, 4, 5]
-              ).map((b) => {
-                const isCurrent = currentCard.box === b;
-                const isPast = currentCard.box > b;
-                const interval = intervalForBox(b, algorithm, activeDeckSize);
-                const statusStr = isCurrent ? ' ← Current Level' : isPast ? ' (Passed)' : ' (Upcoming)';
-                const tooltip =
-                  algorithm === 'graduated-interval'
-                    ? `Tier ${b} • ${TIER_METADATA[Math.min(9, b)]?.level || 'Expanded Retention'}${statusStr}\n• Repeat Interval: +${interval} review${interval === 1 ? '' : 's'}\n• ${TIER_METADATA[Math.min(9, b)]?.desc || 'Extended geometric spacing.'}`
-                    : `Box ${b} • ${BOX_METADATA[b]?.level || 'Review'}${statusStr}\n• Repeat Interval: +${interval} review${interval === 1 ? '' : 's'}\n• ${BOX_METADATA[b]?.desc || 'Standard rotation.'}`;
+              {activePopover === 'track' && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    left: '0',
+                    zIndex: 100,
+                    width: '300px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.96)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
+                    fontSize: '12px',
+                    lineHeight: '1.5',
+                    color: 'var(--text-primary)',
+                    animation: 'fadeIn 0.15s ease-out',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Layers size={13} color={trackMeta.color} />
+                      <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                        Track: {trackMeta.label}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                      aria-label="Close track info"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '11.5px', margin: 0 }}>
+                    Focus domain for this challenge. Drills in <strong>{trackMeta.label}</strong> test idiomatic implementations, core architectural patterns, and boundary invariants.
+                  </p>
+                </div>
+              )}
+            </div>
 
-                return (
+            {/* 2. Difficulty Badge with Dropdown */}
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <div
+                onClick={() => setActivePopover((prev) => (prev === 'difficulty' ? null : 'difficulty'))}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActivePopover((prev) => (prev === 'difficulty' ? null : 'difficulty'));
+                  }
+                }}
+                style={{
+                  padding: '3px 6px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  border: activePopover === 'difficulty' ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid transparent',
+                  backgroundColor: activePopover === 'difficulty' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                }}
+              >
+                <DifficultyBadge card={currentCard} disableTooltip />
+              </div>
+
+              {activePopover === 'difficulty' && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    left: '0',
+                    zIndex: 100,
+                    width: '280px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.96)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(56, 189, 248, 0.35)',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
+                    fontSize: '12px',
+                    lineHeight: '1.5',
+                    color: 'var(--text-primary)',
+                    animation: 'fadeIn 0.15s ease-out',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                    <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                      Difficulty: Level {difficultyOf(currentCard)} of 5 ({DIFFICULTY_LABELS[difficultyOf(currentCard)]})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                      aria-label="Close difficulty info"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '8px' }}>
+                    {[
+                      { level: 1, label: DIFFICULTY_LABELS[1], color: '#34d399' },
+                      { level: 2, label: DIFFICULTY_LABELS[2], color: '#a3e635' },
+                      { level: 3, label: DIFFICULTY_LABELS[3], color: '#fbbf24' },
+                      { level: 4, label: DIFFICULTY_LABELS[4], color: '#fb923c' },
+                      { level: 5, label: DIFFICULTY_LABELS[5], color: '#f87171' },
+                    ].map((lvl) => {
+                      const isCurrentLevel = difficultyOf(currentCard) === lvl.level;
+                      return (
+                        <div
+                          key={lvl.level}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '4px 8px',
+                            borderRadius: '5px',
+                            backgroundColor: isCurrentLevel ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+                            border: isCurrentLevel ? `1px solid ${lvl.color}` : '1px solid transparent',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ color: lvl.color, fontSize: '10px', letterSpacing: '1px' }}>
+                              {'●'.repeat(lvl.level)}
+                            </span>
+                            <span style={{ color: isCurrentLevel ? '#f1f5f9' : 'var(--text-muted)', fontWeight: isCurrentLevel ? 600 : 400 }}>
+                              {lvl.label}
+                            </span>
+                          </div>
+                          {isCurrentLevel && (
+                            <span style={{ fontSize: '10px', fontWeight: 600, color: lvl.color }}>
+                              Current Card
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Leitner Box / Tier Progression Badges with Dropdown */}
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                onClick={() => setActivePopover((prev) => (prev === 'tier' ? null : 'tier'))}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActivePopover((prev) => (prev === 'tier' ? null : 'tier'));
+                  }
+                }}
+              >
+                {(algorithm === 'graduated-interval'
+                  ? Array.from({ length: Math.max(5, Math.min(9, currentCard.box)) }, (_, i) => i + 1)
+                  : [1, 2, 3, 4, 5]
+                ).map((b) => {
+                  const isCurrent = currentCard.box === b;
+                  const isPast = currentCard.box > b;
+
+                  return (
+                    <div
+                      key={b}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setInspectedTier(b);
+                        setActivePopover('tier');
+                      }}
+                      style={{
+                        width: '28px',
+                        height: '24px',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '11px',
+                        fontWeight: isCurrent ? 700 : 500,
+                        backgroundColor: isCurrent
+                          ? `var(--box-${Math.min(9, b)})`
+                          : isPast
+                          ? 'rgba(255, 255, 255, 0.12)'
+                          : 'rgba(255, 255, 255, 0.04)',
+                        color: isCurrent ? '#090c12' : isPast ? '#f1f5f9' : 'var(--text-dim)',
+                        border: isCurrent ? '1px solid white' : '1px solid transparent',
+                        transition: 'all 0.2s',
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                      }}
+                    >
+                      {algorithm === 'graduated-interval' ? `T${b}` : `B${b}`}
+                    </div>
+                  );
+                })}
+                {algorithm === 'graduated-interval' && currentCard.box > 9 && (
                   <div
-                    key={b}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setInspectedTier(currentCard.box);
+                      setActivePopover('tier');
+                    }}
                     style={{
-                      width: '28px',
+                      width: '32px',
                       height: '24px',
                       borderRadius: '4px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '11px',
-                      fontWeight: isCurrent ? 700 : 500,
-                      backgroundColor: isCurrent
-                        ? `var(--box-${Math.min(9, b)})`
-                        : isPast
-                        ? 'rgba(255, 255, 255, 0.12)'
-                        : 'rgba(255, 255, 255, 0.04)',
-                      color: isCurrent ? '#090c12' : isPast ? '#f1f5f9' : 'var(--text-dim)',
-                      border: isCurrent ? '1px solid white' : '1px solid transparent',
-                      transition: 'all 0.2s',
-                      cursor: 'help',
+                      fontWeight: 700,
+                      backgroundColor: 'var(--box-9)',
+                      color: '#090c12',
+                      border: '1px solid white',
+                      cursor: 'pointer',
+                      userSelect: 'none',
                     }}
-                    title={tooltip}
                   >
-                    {algorithm === 'graduated-interval' ? `T${b}` : `B${b}`}
+                    T{currentCard.box}
+                  </div>
+                )}
+              </div>
+
+              {activePopover === 'tier' && (() => {
+                const effectiveTier = inspectedTier || currentCard.box;
+                const isCurrent = currentCard.box === effectiveTier;
+                const isPast = currentCard.box > effectiveTier;
+                const interval = intervalForBox(effectiveTier, algorithm, activeDeckSize);
+                const tierMeta =
+                  algorithm === 'graduated-interval'
+                    ? TIER_METADATA[Math.min(9, effectiveTier)]
+                    : BOX_METADATA[Math.min(5, effectiveTier)];
+
+                return (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 8px)',
+                      left: '0',
+                      zIndex: 100,
+                      width: '330px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.96)',
+                      backdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(56, 189, 248, 0.35)',
+                      borderRadius: '8px',
+                      padding: '12px 14px',
+                      boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(56, 189, 248, 0.12)',
+                      fontSize: '12px',
+                      lineHeight: '1.5',
+                      color: 'var(--text-primary)',
+                      animation: 'fadeIn 0.15s ease-out',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span
+                          style={{
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            backgroundColor: `var(--box-${Math.min(9, effectiveTier)})`,
+                            color: '#090c12',
+                            fontWeight: 700,
+                            fontSize: '11px',
+                          }}
+                        >
+                          {algorithm === 'graduated-interval' ? `T${effectiveTier}` : `B${effectiveTier}`}
+                        </span>
+                        <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12.5px' }}>
+                          {tierMeta?.level || 'Retention Spacing'}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
+                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                        aria-label="Close tier details"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <span
+                        className="badge"
+                        style={{
+                          fontSize: '11px',
+                          backgroundColor: isCurrent
+                            ? 'rgba(56, 189, 248, 0.15)'
+                            : isPast
+                            ? 'rgba(52, 211, 153, 0.15)'
+                            : 'rgba(148, 163, 184, 0.12)',
+                          color: isCurrent ? '#38bdf8' : isPast ? '#34d399' : 'var(--text-muted)',
+                          border: isCurrent
+                            ? '1px solid rgba(56, 189, 248, 0.35)'
+                            : isPast
+                            ? '1px solid rgba(52, 211, 153, 0.35)'
+                            : '1px solid rgba(148, 163, 184, 0.25)',
+                        }}
+                      >
+                        {isCurrent ? 'Current Level' : isPast ? 'Mastered / Passed' : 'Upcoming Level'}
+                      </span>
+                      <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+                        Interval: <strong style={{ color: '#f1f5f9' }}>+{interval} review{interval === 1 ? '' : 's'}</strong>
+                      </span>
+                    </div>
+
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '11.5px', margin: '0 0 10px 0' }}>
+                      {tierMeta?.desc}
+                    </p>
+
+                    {/* Quick Tier Inspector Buttons */}
+                    <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '8px' }}>
+                      <div style={{ fontSize: '10.5px', color: 'var(--text-muted)', marginBottom: '5px' }}>
+                        Inspect other {algorithm === 'graduated-interval' ? 'tiers' : 'boxes'}:
+                      </div>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                        {(algorithm === 'graduated-interval' ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3, 4, 5]).map((tierNum) => (
+                          <button
+                            key={tierNum}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setInspectedTier(tierNum);
+                            }}
+                            style={{
+                              padding: '2px 6px',
+                              borderRadius: '4px',
+                              border: effectiveTier === tierNum ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)',
+                              backgroundColor: effectiveTier === tierNum ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                              color: effectiveTier === tierNum ? '#38bdf8' : 'var(--text-muted)',
+                              fontSize: '11px',
+                              cursor: 'pointer',
+                              fontWeight: effectiveTier === tierNum ? 700 : 500,
+                            }}
+                          >
+                            {algorithm === 'graduated-interval' ? `T${tierNum}` : `B${tierNum}`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 );
-              })}
-              {algorithm === 'graduated-interval' && currentCard.box > 9 && (
-                <div
-                  style={{
-                    width: '32px',
-                    height: '24px',
-                    borderRadius: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    backgroundColor: 'var(--box-9)',
-                    color: '#090c12',
-                    border: '1px solid white',
-                    cursor: 'help',
-                  }}
-                  title={`Tier ${currentCard.box} • Deep Retention ← Current Level\n• Repeat Interval: +${intervalForBox(currentCard.box, algorithm, activeDeckSize)} reviews\n• Continuous long-term maintenance.`}
-                >
-                  T{currentCard.box}
-                </div>
-              )}
+              })()}
             </div>
 
-            {/* Target Complexity Goal Badge */}
+            {/* 4. Target Complexity Goal Badge (No browser mouseover, click-only) */}
             {(currentCard.targetTime || currentCard.targetSpace) && (
-              <div
-                ref={complexityBadgeRef}
-                style={{ position: 'relative', display: 'inline-block' }}
-              >
+              <div style={{ position: 'relative', display: 'inline-block' }}>
                 <div
                   className="badge"
-                  onClick={() => setShowComplexityDetails((prev) => !prev)}
+                  onClick={() => setActivePopover((prev) => (prev === 'complexity' ? null : 'complexity'))}
                   style={{
-                    backgroundColor: showComplexityDetails
+                    backgroundColor: activePopover === 'complexity'
                       ? 'rgba(56, 189, 248, 0.18)'
                       : 'rgba(56, 189, 248, 0.08)',
-                    border: showComplexityDetails
+                    border: activePopover === 'complexity'
                       ? '1px solid rgba(56, 189, 248, 0.5)'
                       : '1px solid rgba(56, 189, 248, 0.25)',
                     color: 'var(--text-secondary)',
@@ -810,27 +1104,18 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                     userSelect: 'none',
                     transition: 'all 0.15s ease',
                   }}
-                  title={
-                    showComplexityDetails
-                      ? 'Click to hide complexity details'
-                      : `Target Complexity (Click for details):\n• Time: ${currentCard.targetTime || 'O(1)'}\n• Space: ${currentCard.targetSpace || 'O(1)'}${
-                          currentCard.complexityExplanation ? `\n\nExplanation: ${currentCard.complexityExplanation}` : ''
-                        }`
-                  }
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      setShowComplexityDetails((prev) => !prev);
+                      setActivePopover((prev) => (prev === 'complexity' ? null : 'complexity'));
                     }
                   }}
-                  aria-expanded={showComplexityDetails}
+                  aria-expanded={activePopover === 'complexity'}
                   aria-haspopup="dialog"
                 >
-                  <span
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                  >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                     <Clock size={11} color="#38bdf8" />
                     <span>Time:</span>
                     <strong style={{ color: 'var(--accent-cyan)' }}>{currentCard.targetTime || 'O(1)'}</strong>
@@ -839,25 +1124,17 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   {currentCard.targetSpace && (
                     <>
                       <span style={{ opacity: 0.4 }}>•</span>
-                      <span
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
-                      >
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                         <Database size={11} color="#c084fc" />
                         <span>Space:</span>
                         <strong style={{ color: 'var(--accent-purple)' }}>{currentCard.targetSpace}</strong>
                       </span>
                     </>
                   )}
-
-                  <HelpCircle
-                    size={11}
-                    color="var(--accent-cyan)"
-                    style={{ opacity: 0.7, marginLeft: '2px' }}
-                  />
                 </div>
 
                 {/* Floating Complexity Explanation Card */}
-                {showComplexityDetails && (
+                {activePopover === 'complexity' && (
                   <div
                     style={{
                       position: 'absolute',
@@ -897,7 +1174,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowComplexityDetails(false);
+                          setActivePopover(null);
                         }}
                         style={{
                           background: 'none',
@@ -978,89 +1255,224 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               </div>
             )}
 
-            {/* Streak Badge */}
-            <div
-              className="badge"
-              style={{
-                backgroundColor: 'rgba(249, 115, 22, 0.15)',
-                color: '#f97316',
-                border: '1px solid rgba(249, 115, 22, 0.3)',
-                padding: '4px 8px',
-                cursor: 'help',
-              }}
-              title={`Streak: ${currentCard.streak} consecutive correct recall${currentCard.streak === 1 ? '' : 's'} on this challenge.\n• Passing increases your streak and advances this card to the next ${algorithm === 'graduated-interval' ? 'tier' : 'box'}.\n• Missing required invariants resets this streak to 0 and drops the card back for reinforcement.`}
-            >
-              <Flame size={13} />
-              <span>Streak: {currentCard.streak}</span>
+            {/* 5. Streak Badge with Dropdown */}
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <div
+                className="badge"
+                onClick={() => setActivePopover((prev) => (prev === 'streak' ? null : 'streak'))}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActivePopover((prev) => (prev === 'streak' ? null : 'streak'));
+                  }
+                }}
+                style={{
+                  backgroundColor: 'rgba(249, 115, 22, 0.15)',
+                  color: '#f97316',
+                  border: activePopover === 'streak' ? '1px solid #f97316' : '1px solid rgba(249, 115, 22, 0.3)',
+                  padding: '4px 8px',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                }}
+              >
+                <Flame size={13} />
+                <span>Streak: {currentCard.streak}</span>
+              </div>
+
+              {activePopover === 'streak' && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    left: '0',
+                    zIndex: 100,
+                    width: '300px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.96)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(249, 115, 22, 0.4)',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(249, 115, 22, 0.12)',
+                    fontSize: '12px',
+                    lineHeight: '1.5',
+                    color: 'var(--text-primary)',
+                    animation: 'fadeIn 0.15s ease-out',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Flame size={14} color="#f97316" />
+                      <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                        Streak & Progression
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
+                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                      aria-label="Close streak details"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '8px' }}>
+                    <strong style={{ color: '#f97316', fontSize: '15px' }}>
+                      {currentCard.streak}
+                    </strong>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '11.5px' }}>
+                      consecutive correct recall{currentCard.streak === 1 ? '' : 's'}
+                    </span>
+                  </div>
+                  <ul style={{ margin: 0, paddingLeft: '16px', color: 'var(--text-secondary)', fontSize: '11.5px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <li>
+                      <strong style={{ color: '#34d399' }}>Pass:</strong> Increases streak (+1) and advances this card to {algorithm === 'graduated-interval' ? 'Tier' : 'Box'} {Math.min(algorithm === 'graduated-interval' ? 9 : 5, currentCard.box + 1)} with longer spacing.
+                    </li>
+                    <li>
+                      <strong style={{ color: '#f87171' }}>Missing Invariants:</strong> Resets streak to 0 and drops this card to Tier 1 for immediate reinforcement.
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* 10-Minute Countdown Stopwatch */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '4px 8px',
-              borderRadius: '8px',
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border-medium)',
-            }}
-          >
-            <Timer
-              size={16}
-              color={timeRemaining <= 120 ? '#fb7185' : 'var(--text-secondary)'}
-            />
-            <span
+          {/* 6. Stopwatch Timer with Auto-Submit Indicator & Dropdown */}
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div
               style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: timeRemaining <= 120 ? '#fb7185' : 'var(--text-primary)',
-                minWidth: '48px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 8px',
+                borderRadius: '8px',
+                backgroundColor: 'var(--bg-card)',
+                border: activePopover === 'timer' ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid var(--border-medium)',
               }}
             >
-              {formatTimer(timeRemaining)}
-            </span>
-            {timedMode && (
-              <span
-                style={{
-                  fontSize: '9.5px',
-                  fontWeight: 700,
-                  letterSpacing: '0.04em',
-                  color: '#fbbf24',
-                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
-                  border: '1px solid rgba(245, 158, 11, 0.35)',
-                  padding: '2px 5px',
-                  borderRadius: '4px',
+              <div
+                onClick={() => setActivePopover((prev) => (prev === 'timer' ? null : 'timer'))}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActivePopover((prev) => (prev === 'timer' ? null : 'timer'));
+                  }
                 }}
-                title="Timed Mode active: countdown auto-starts and buffer auto-submits when expired"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                }}
               >
-                TIMED
-              </span>
+                <Timer
+                  size={16}
+                  color={timeRemaining <= 120 ? '#fb7185' : 'var(--text-secondary)'}
+                />
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: timeRemaining <= 120 ? '#fb7185' : 'var(--text-primary)',
+                    minWidth: '48px',
+                  }}
+                >
+                  {formatTimer(timeRemaining)}
+                </span>
+                <span
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    letterSpacing: '0.02em',
+                    color: '#fbbf24',
+                    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                    border: '1px solid rgba(245, 158, 11, 0.35)',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <Zap size={10} color="#fbbf24" /> Auto-submits on 00:00
+                </span>
+              </div>
+
+              <button
+                className="btn btn-outline"
+                style={{ padding: '4px 6px', fontSize: '11px', height: '26px' }}
+                onClick={() => setIsTimerRunning(!isTimerRunning)}
+                aria-label={isTimerRunning ? 'Pause timer' : 'Start timer'}
+              >
+                {isTimerRunning ? <Pause size={12} /> : <Play size={12} />}
+              </button>
+              <button
+                className="btn btn-outline"
+                style={{ padding: '4px 6px', fontSize: '11px', height: '26px' }}
+                onClick={() => {
+                  setIsTimerRunning(timedMode);
+                  setTimeRemaining(configuredDuration);
+                  setTimeExpiredToast(null);
+                }}
+                aria-label="Reset timer"
+              >
+                <RotateCcw size={12} />
+              </button>
+            </div>
+
+            {/* Timer Popover */}
+            {activePopover === 'timer' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 8px)',
+                  right: '0',
+                  left: 'auto',
+                  zIndex: 100,
+                  width: '310px',
+                  backgroundColor: 'rgba(15, 23, 42, 0.96)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  borderRadius: '8px',
+                  padding: '12px 14px',
+                  boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 0 15px rgba(245, 158, 11, 0.12)',
+                  fontSize: '12px',
+                  lineHeight: '1.5',
+                  color: 'var(--text-primary)',
+                  animation: 'fadeIn 0.15s ease-out',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Timer size={14} color="#fbbf24" />
+                    <span style={{ fontWeight: 600, color: '#f1f5f9', fontSize: '12px' }}>
+                      Stopwatch & Auto-Submit
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setActivePopover(null); }}
+                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                    aria-label="Close timer details"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--text-secondary)', fontSize: '11.5px' }}>
+                  <p style={{ margin: 0 }}>
+                    ⚡ <strong style={{ color: '#fbbf24' }}>Auto-Submission:</strong> When the countdown reaches <strong>00:00</strong>, your code buffer is automatically submitted for test execution and AI evaluation.
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    ⏱️ <strong style={{ color: '#f1f5f9' }}>Duration:</strong> Configured for {Math.round(configuredDuration / 60)} minutes. You can adjust the default duration in Settings (⚙️).
+                  </p>
+                </div>
+              </div>
             )}
-            <button
-              className="btn btn-outline"
-              style={{ padding: '4px 6px', fontSize: '11px', height: '26px' }}
-              onClick={() => setIsTimerRunning(!isTimerRunning)}
-              title={isTimerRunning ? 'Pause timer' : `Start ${Math.round(configuredDuration / 60)}m timer`}
-              aria-label={isTimerRunning ? 'Pause timer' : 'Start timer'}
-            >
-              {isTimerRunning ? <Pause size={12} /> : <Play size={12} />}
-            </button>
-            <button
-              className="btn btn-outline"
-              style={{ padding: '4px 6px', fontSize: '11px', height: '26px' }}
-              onClick={() => {
-                setIsTimerRunning(timedMode);
-                setTimeRemaining(configuredDuration);
-                setTimeExpiredToast(null);
-              }}
-              title={`Reset timer to ${formatTimer(configuredDuration)}`}
-              aria-label="Reset timer"
-            >
-              <RotateCcw size={12} />
-            </button>
           </div>
         </div>
 
@@ -1817,7 +2229,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               >
                 {outputLogs.length === 0 ? (
                   <div style={{ color: '#64748b', fontStyle: 'italic', fontSize: '12px', padding: '6px 2px' }}>
-                    $ Terminal ready. Click 'Run Code / Test' above to execute your solution and capture console outputs.
+                    No output yet. Click 'Run Code / Test' (or Cmd+Enter) above to execute your solution and view test assertions or console.log outputs.
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>

@@ -14,7 +14,6 @@ import {
   Eye,
   EyeOff,
   Copy,
-  HelpCircle,
   Loader2,
 } from 'lucide-react';
 import { intervalForBox } from '../lib/leitner';
@@ -414,9 +413,6 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   cursor: topic.complexityExplanation ? 'pointer' : 'default',
                   userSelect: 'none',
                 }}
-                title={`Observed Time Complexity: ${result.timeComplexity || 'O(n)'}${
-                  topic.targetTime ? `\nTarget Time Goal: ${topic.targetTime}` : ''
-                }${topic.complexityExplanation ? `\n\nClick to view explanation: ${topic.complexityExplanation}` : ''}`}
                 role={topic.complexityExplanation ? 'button' : undefined}
                 tabIndex={topic.complexityExplanation ? 0 : undefined}
                 onKeyDown={(e) => {
@@ -435,9 +431,6 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     </span>
                   )}
                 </span>
-                {topic.complexityExplanation && (
-                  <HelpCircle size={11} style={{ opacity: 0.7, marginLeft: '2px' }} />
-                )}
               </div>
 
               <div
@@ -453,9 +446,6 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   cursor: topic.complexityExplanation ? 'pointer' : 'default',
                   userSelect: 'none',
                 }}
-                title={`Observed Space Complexity: ${result.spaceComplexity || 'O(1)'}${
-                  topic.targetSpace ? `\nTarget Space Goal: ${topic.targetSpace}` : ''
-                }${topic.complexityExplanation ? `\n\nClick to view explanation: ${topic.complexityExplanation}` : ''}`}
                 role={topic.complexityExplanation ? 'button' : undefined}
                 tabIndex={topic.complexityExplanation ? 0 : undefined}
                 onKeyDown={(e) => {
@@ -474,9 +464,6 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     </span>
                   )}
                 </span>
-                {topic.complexityExplanation && (
-                  <HelpCircle size={11} style={{ opacity: 0.7, marginLeft: '2px' }} />
-                )}
               </div>
             </div>
 
@@ -781,6 +768,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               <input
                 ref={inputRef}
                 type="text"
+                className="followup-chat-input"
                 value={followUpInput}
                 onChange={(e) => setFollowUpInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -795,6 +783,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   backgroundColor: 'transparent',
                   border: 'none',
                   outline: 'none',
+                  boxShadow: 'none',
+                  borderRadius: 0,
+                  padding: 0,
                   color: 'var(--text-primary)',
                   fontSize: '13px',
                   caretColor: '#38bdf8',

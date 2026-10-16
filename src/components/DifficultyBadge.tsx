@@ -8,10 +8,14 @@ export const DifficultyBadge: React.FC<{
   card: Pick<TopicItem, 'difficulty'>;
   showLabel?: boolean;
   showPrefix?: boolean;
+  onClick?: () => void;
+  disableTooltip?: boolean;
 }> = ({
   card,
   showLabel = true,
   showPrefix,
+  onClick,
+  disableTooltip = true,
 }) => {
   const d = difficultyOf(card);
   const color = COLORS[d - 1];
@@ -19,14 +23,18 @@ export const DifficultyBadge: React.FC<{
 
   return (
     <span
-      title={`Difficulty: Level ${d} of 5 (${DIFFICULTY_LABELS[d]})\n• 1: Warm-up\n• 2: Easy\n• 3: Medium\n• 4: Hard\n• 5: Expert`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      title={disableTooltip ? undefined : `Difficulty: Level ${d} of 5 (${DIFFICULTY_LABELS[d]})\n• 1: Warm-up\n• 2: Easy\n• 3: Medium\n• 4: Hard\n• 5: Expert`}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
         gap: '6px',
         fontSize: '11.5px',
         color,
-        cursor: 'help',
+        cursor: onClick ? 'pointer' : 'default',
+        userSelect: 'none',
       }}
     >
       {shouldShowPrefix && (
