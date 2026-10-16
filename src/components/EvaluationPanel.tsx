@@ -21,6 +21,88 @@ import { intervalForBox } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { askCritiqueFollowUp, type EvaluationResult } from '../lib/ai';
 
+function splitIntoTerminalLines(text: string, maxCols = 72): string[] {
+  const rawLines = text.split('\n');
+  const result: string[] = [];
+  for (const raw of rawLines) {
+    if (!raw.trim()) {
+      result.push('');
+      continue;
+    }
+    const words = raw.split(' ');
+    let currentLine = '';
+    for (const w of words) {
+      if (!currentLine) {
+        currentLine = w;
+      } else if (currentLine.length + 1 + w.length <= maxCols) {
+        currentLine += ' ' + w;
+      } else {
+        result.push(currentLine);
+        currentLine = w;
+      }
+    }
+    if (currentLine) result.push(currentLine);
+  }
+  return result;
+}
+
+const JoshuaLineReveal: React.FC<{
+  text: string;
+  isNew?: boolean;
+  onScrollToBottom?: () => void;
+}> = ({ text, isNew = false, onScrollToBottom }) => {
+  const lines = useRef<string[]>(splitIntoTerminalLines(text)).current;
+  const [lineCount, setLineCount] = useState(() => (isNew ? 0 : lines.length));
+  const [isDone, setIsDone] = useState(!isNew);
+
+  useEffect(() => {
+    if (!isNew) {
+      setLineCount(lines.length);
+      setIsDone(true);
+      return;
+    }
+
+    let current = 0;
+    setLineCount(0);
+    setIsDone(false);
+
+    const interval = setInterval(() => {
+      current++;
+      setLineCount(current);
+      onScrollToBottom?.();
+      if (current >= lines.length) {
+        setIsDone(true);
+        clearInterval(interval);
+      }
+    }, 60);
+
+    return () => clearInterval(interval);
+  }, [isNew, lines, onScrollToBottom]);
+
+  return (
+    <div style={{ color: '#bae6fd', lineHeight: 1.55, fontFamily: 'monospace', fontSize: '13px' }}>
+      {lines.slice(0, lineCount).map((l, i) => (
+        <div key={i} style={{ minHeight: '1.2em' }}>
+          {l || '\u00A0'}
+        </div>
+      ))}
+      {!isDone && (
+        <span
+          className="joshua-blink"
+          style={{
+            display: 'inline-block',
+            width: '8px',
+            height: '13px',
+            backgroundColor: '#38bdf8',
+            verticalAlign: 'text-bottom',
+            marginLeft: '2px',
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
 interface EvaluationPanelProps {
   topic: TopicItem;
   submittedCode: string;
@@ -71,6 +153,10 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   const threadEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const scrollToBottom = () => {
+    threadEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   useEffect(() => {
     if (isFollowUpOpen) {
       inputRef.current?.focus();
@@ -79,7 +165,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
 
   useEffect(() => {
     if (followUpMessages.length > 0) {
-      threadEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      scrollToBottom();
     }
   }, [followUpMessages, isSendingFollowUp]);
 
@@ -484,8 +570,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         </div>
       </div>
 
-      {/* AI Critique */}
-      {/* AI Critique & Interactive Follow-Up */}
+      {/* AI Critique & Interactive Follow-Up (Joshua / WarGames Terminal Dialog) */}
       <div
         onClick={() => {
           if (!isFollowUpOpen) setIsFollowUpOpen(true);
@@ -493,17 +578,28 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         style={{
           padding: '16px',
           borderRadius: '10px',
-          backgroundColor: 'var(--bg-card)',
-          border: isFollowUpOpen ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid var(--border-subtle)',
+          backgroundColor: '#070d18',
+          border: isFollowUpOpen ? '1px solid rgba(56, 189, 248, 0.4)' : '1px solid var(--border-subtle)',
+          boxShadow: isFollowUpOpen ? '0 0 20px rgba(56, 189, 248, 0.08)' : 'none',
           cursor: !isFollowUpOpen ? 'pointer' : 'default',
-          transition: 'border-color 0.15s ease',
+          transition: 'all 0.2s ease',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+        <style>{`
+          @keyframes joshuaBlink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+          }
+          .joshua-blink {
+            animation: joshuaBlink 0.75s infinite;
+          }
+        `}</style>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', gap: '6px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)' }}>
             <Sparkles size={16} />
-            <h4 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Evaluator Analysis & Critique
+            <h4 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: 'monospace' }}>
+              {isFollowUpOpen ? 'JOSHUA // EVALUATION DIALOG TERMINAL' : 'Evaluator Analysis & Critique'}
             </h4>
           </div>
           {!isFollowUpOpen && (
@@ -521,74 +617,99 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 gap: '4px',
               }}
             >
-              <span>click to ask follow-up</span>
+              <span>click to communicate with Joshua</span>
               <span style={{ fontWeight: 700 }}>&gt;</span>
             </span>
           )}
         </div>
 
-        <p style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55, margin: 0 }}>
-          {result.critique}
-        </p>
-
-        {/* Interactive Follow-Up Section */}
-        {isFollowUpOpen && (
-          <div
-            style={{ marginTop: '14px' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Scrollable Q&A Thread */}
-            {followUpMessages.length > 0 && (
-              <div
-                style={{
-                  maxHeight: '160px',
-                  overflowY: 'auto',
-                  padding: '10px 12px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '8px',
-                  marginBottom: '10px',
-                  fontSize: '12px',
-                }}
-              >
-                {followUpMessages.map((msg, idx) => (
-                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    {msg.role === 'user' ? (
-                      <div style={{ fontFamily: 'monospace', color: '#38bdf8', fontWeight: 600 }}>
-                        &gt; {msg.content}
-                      </div>
-                    ) : (
-                      <div style={{ color: 'var(--text-secondary)', lineHeight: 1.5, paddingLeft: '12px' }}>
-                        {msg.content}
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {isSendingFollowUp && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '11.5px', fontFamily: 'monospace', paddingLeft: '12px' }}>
-                    <Loader2 size={11} className="animate-spin" color="#38bdf8" />
-                    <span>consulting mentor...</span>
-                  </div>
-                )}
-                <div ref={threadEndRef} />
-              </div>
-            )}
-
-            {/* Retro Hairline Single-Line Input with '>' prompt */}
+        {!isFollowUpOpen ? (
+          <p style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55, margin: 0, fontFamily: 'monospace' }}>
+            {result.critique}
+          </p>
+        ) : (
+          <div onClick={(e) => e.stopPropagation()}>
+            {/* Unified Scrolling Dialog Transcript */}
             <div
               style={{
+                maxHeight: '260px',
+                overflowY: 'auto',
+                paddingRight: '6px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                fontFamily: 'monospace',
+              }}
+            >
+              {/* Joshua's Initial Critique */}
+              <div>
+                <div style={{ color: 'var(--accent-cyan)', fontSize: '10.5px', letterSpacing: '0.06em', marginBottom: '3px', textTransform: 'uppercase', opacity: 0.85, fontWeight: 600 }}>
+                  [ JOSHUA // EVALUATION LOG ]
+                </div>
+                <div style={{ color: '#e2e8f0', lineHeight: 1.55, fontSize: '13px' }}>
+                  {result.critique}
+                </div>
+              </div>
+
+              {/* Chat Thread */}
+              {followUpMessages.map((msg, idx) => (
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  {msg.role === 'user' ? (
+                    <div
+                      style={{
+                        color: '#38bdf8',
+                        fontFamily: 'monospace',
+                        fontWeight: 600,
+                        fontSize: '13px',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        marginTop: '4px',
+                      }}
+                    >
+                      <span style={{ color: '#38bdf8', fontWeight: 700 }}>&gt;</span>
+                      <span style={{ color: '#bae6fd' }}>{msg.content}</span>
+                    </div>
+                  ) : (
+                    <div style={{ paddingLeft: '16px', marginTop: '2px' }}>
+                      <JoshuaLineReveal
+                        text={msg.content}
+                        isNew={idx === followUpMessages.length - 1}
+                        onScrollToBottom={scrollToBottom}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {isSendingFollowUp && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontSize: '12px', fontFamily: 'monospace', paddingLeft: '16px' }}>
+                  <span className="joshua-blink">█</span>
+                  <span>JOSHUA IS COMPUTING RESPONSE...</span>
+                </div>
+              )}
+
+              <div ref={threadEndRef} />
+            </div>
+
+            {/* Hairline Retro Prompt Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSendFollowUp();
+              }}
+              style={{
+                marginTop: '12px',
                 paddingTop: '10px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+                borderTop: '1px solid rgba(56, 189, 248, 0.25)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
                 fontFamily: 'monospace',
               }}
             >
-              <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: '13px' }}>&gt;</span>
+              <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: '14px' }}>&gt;</span>
               <input
                 ref={inputRef}
                 type="text"
@@ -597,10 +718,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
+                    e.stopPropagation();
                     handleSendFollowUp();
                   }
                 }}
-                placeholder="ask a question about this critique... (Enter to send)"
+                placeholder="COMMUNICATE WITH JOSHUA... (ENTER TO TRANSMIT)"
                 style={{
                   flex: 1,
                   backgroundColor: 'transparent',
@@ -608,19 +730,24 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   outline: 'none',
                   color: '#f8fafc',
                   fontFamily: 'monospace',
-                  fontSize: '12px',
+                  fontSize: '12.5px',
+                  caretColor: '#38bdf8',
                 }}
               />
               <button
                 type="button"
-                onClick={handleSendFollowUp}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSendFollowUp();
+                }}
                 disabled={!followUpInput.trim() || isSendingFollowUp}
                 style={{
                   background: 'none',
                   border: 'none',
                   color: followUpInput.trim() && !isSendingFollowUp ? '#38bdf8' : 'var(--text-dim)',
                   cursor: followUpInput.trim() && !isSendingFollowUp ? 'pointer' : 'default',
-                  padding: '2px 6px',
+                  padding: '2px 8px',
                   fontSize: '11px',
                   fontFamily: 'monospace',
                   display: 'flex',
@@ -628,9 +755,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   gap: '4px',
                 }}
               >
-                {isSendingFollowUp ? <Loader2 size={12} className="animate-spin" /> : <span>Send ↵</span>}
+                {isSendingFollowUp ? <Loader2 size={12} className="animate-spin" /> : <span>TRANSMIT ↵</span>}
               </button>
-            </div>
+            </form>
           </div>
         )}
       </div>
