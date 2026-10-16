@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Proxy: Negative Array Indexing",
+  "tags": [
+    "proxy",
+    "array",
+    "get-trap",
+    "set-trap"
+  ]
+}

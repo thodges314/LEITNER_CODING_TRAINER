@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "WeakSet: Cycle Detection and Object Counting",
+  "tags": [
+    "weakset",
+    "graph",
+    "recursion",
+    "cycle"
+  ]
+}

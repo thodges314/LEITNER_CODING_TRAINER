@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Descriptors: Getter/Setter Pairs and Lazy Properties",
+  "tags": [
+    "defineProperty",
+    "getter",
+    "setter",
+    "lazy"
+  ]
+}

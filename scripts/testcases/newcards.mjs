@@ -9,4 +9,5 @@ import p11 from './part11.mjs';
 import p12 from './part12.mjs';
 import p13 from './part13.mjs';
 import p14 from './part14.mjs';
-export const newCards = { ...p5, ...p6, ...p7, ...p8, ...p9, ...p10, ...p11, ...p12, ...p13, ...p14 };
+import p15 from './part15.mjs';
+export const newCards = { ...p5, ...p6, ...p7, ...p8, ...p9, ...p10, ...p11, ...p12, ...p13, ...p14, ...p15 };

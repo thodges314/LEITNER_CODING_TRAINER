@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "WeakMap and WeakSet: Tagging and Seen-Marks",
+  "tags": [
+    "weakmap",
+    "weakset",
+    "metadata",
+    "basics"
+  ]
+}

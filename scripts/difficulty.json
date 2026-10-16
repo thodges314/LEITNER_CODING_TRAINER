@@ -610,5 +610,61 @@
  "ts-reimplement-utility-types": {
   "difficulty": 1,
   "concept": "ts-types"
+ },
+ "proxy-default-logging": {
+  "difficulty": 1,
+  "concept": "proxy"
+ },
+ "proxy-negative-index": {
+  "difficulty": 2,
+  "concept": "proxy"
+ },
+ "proxy-validation-traps": {
+  "difficulty": 3,
+  "concept": "proxy"
+ },
+ "proxy-revocable-readonly": {
+  "difficulty": 3,
+  "concept": "proxy"
+ },
+ "weak-tag-seen": {
+  "difficulty": 1,
+  "concept": "weak-collections"
+ },
+ "weakmap-private-state": {
+  "difficulty": 2,
+  "concept": "weak-collections"
+ },
+ "weakmap-memoize-object": {
+  "difficulty": 2,
+  "concept": "weak-collections"
+ },
+ "weakset-cycle-detection": {
+  "difficulty": 3,
+  "concept": "weak-collections"
+ },
+ "descriptor-basics": {
+  "difficulty": 1,
+  "concept": "descriptors"
+ },
+ "getter-setter-pairs": {
+  "difficulty": 2,
+  "concept": "descriptors"
+ },
+ "copy-descriptors-mixin": {
+  "difficulty": 3,
+  "concept": "descriptors"
+ },
+ "proto-object-create": {
+  "difficulty": 1,
+  "concept": "prototypes"
+ },
+ "manual-prototype-linking": {
+  "difficulty": 2,
+  "concept": "prototypes"
+ },
+ "proto-chain-hasinstance": {
+  "difficulty": 3,
+  "concept": "prototypes"
  }
 }

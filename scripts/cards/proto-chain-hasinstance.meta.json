@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Prototypes: Chain Walking and Custom instanceof",
+  "tags": [
+    "prototype",
+    "instanceof",
+    "Symbol.hasInstance",
+    "chain"
+  ]
+}

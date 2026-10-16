@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Proxy: Revocable Deep Read-Only View",
+  "tags": [
+    "proxy",
+    "revocable",
+    "immutability",
+    "traps"
+  ]
+}

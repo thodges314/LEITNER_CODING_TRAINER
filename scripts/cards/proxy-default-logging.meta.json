@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Proxy: Default Values and Access Counting",
+  "tags": [
+    "proxy",
+    "reflect",
+    "get-trap",
+    "basics"
+  ]
+}

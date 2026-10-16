@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "WeakMap: Private Instance State (Counter, Stack)",
+  "tags": [
+    "weakmap",
+    "privacy",
+    "class",
+    "encapsulation"
+  ]
+}

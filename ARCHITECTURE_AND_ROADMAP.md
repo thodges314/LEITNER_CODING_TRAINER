@@ -22,13 +22,13 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 153 (67 active at first run) |
-| Documented test cases | 973 (each shown as input → expected in the UI) |
-| Difficulty spread | d1: 26 · d2: 50 · d3: 50 · d4: 26 · d5: 1 |
+| Cards | 167 (71 active at first run) |
+| Documented test cases | 1080 (each shown as input → expected in the UI) |
+| Difficulty spread | d1: 30 · d2: 55 · d3: 55 · d4: 26 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms (29), js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser, react-components (16) |
 | Tracks defined but empty | `testing-tooling` |
 | Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
-| Automated tests | 528 (Vitest). Every card's harness must pass with its reference solution **and fail with an empty solution**, plus unit tests for scheduling algorithms and formatting |
+| Automated tests | ~600 (Vitest; 508 in the card-content suites alone). Every card's harness must pass with its reference solution **and fail with an empty solution**, plus unit tests for scheduling algorithms and formatting |
 | Manual verification | The 66 original cards and all React cards (31 cards incl. every `react-components` card) were run in the production build in a real browser. The other cards added later pass in jsdom only |
 
 ## 3. Repository map
@@ -185,7 +185,7 @@ algorithms, TS). This is a judgement from experience with those formats, not a l
 |---|---|---|---|
 | JS utilities (debounce, throttle, memoize, curry, bind, deep-clone, emitter, LRU) | **Strong** (some duplication) | ~35 | Full ladders for rate-limiting, currying, LRU, clone/equality. Duplicates are intentional variants (see 7.3) |
 | Async plumbing (pool, retry, queue, allSettled, abort, timeout) | **Strong** | ~20 | Plus `Promise` class from scratch and `promisify`. Missing: `Promise.any`/`AggregateError`, cancelable promise, polling, async generators |
-| Core language (closures, `this`, prototypes, iterators) | **Medium** | ~10 | closures, `new`/`instanceof`/`Object.create`, generators, `JSON.stringify`. Missing: output-prediction/hoisting/TDZ quizzes, `Symbol`/`Proxy`/`WeakMap`, getters/setters, class fields, tagged templates |
+| Core language (closures, `this`, prototypes, iterators) | **Medium-strong** (batch 15) | ~24 | closures, `new`/`instanceof`/`Object.create`, generators, `JSON.stringify`, plus batch 15: `Proxy` (defaults, negative index, validation, revocable read-only), `WeakMap`/`WeakSet` (tags, private state, memoize, cycles), property descriptors (hidden/constant, getter/setter, clone/mixin), prototype inheritance (Object.create, ES5 Animal/Dog, chain walking, `Symbol.hasInstance`). Missing: output-prediction/hoisting/TDZ quizzes, `Symbol` registry/well-knowns beyond `hasInstance`, class fields/static blocks, tagged templates, `Reflect` depth |
 | String/format utilities | **Medium** | 5 | classNames, query string, formatters, style parsing, CSS specificity. Missing: template engine, markdown-lite, slugify, diffing |
 | DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize/Intersection observers (outside React), `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame` loops, Web Workers |
 | React hooks and state | **Medium** | ~25 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer. Missing: undo/redo, form-state hook, `useLayoutEffect`, `useDeferredValue`/`useTransition`, optimistic updates, React 19 APIs |
@@ -266,7 +266,7 @@ Grading approaches available today: (a) **pure functions** graded from input/exp
 6. **DOM/browser**: drag-and-drop reorder (simulate `dragstart/dragover/drop`), `MutationObserver` wrapper, `ResizeObserver`/
    `IntersectionObserver` lazy loader (mock exists), keyboard-shortcut manager, `history.pushState` router bound to `window`, `postMessage`
    channel, `requestAnimationFrame` throttling, `Worker` message protocol (grade with a fake worker).
-7. **Language depth**: output-prediction drills expressed as functions that return the observed order/values (hoisting, TDZ, closures in loops,
+7. **Language depth** (**partly DONE in batch 15**, `scripts/cards-batch15.mjs` + `part15.mjs`, 14 cards: Proxy, WeakMap/WeakSet, descriptors, prototypes; still open: output-prediction, hoisting/TDZ, tagged templates, `Symbol.asyncIterator`): output-prediction drills expressed as functions that return the observed order/values (hoisting, TDZ, closures in loops,
    `this` in callbacks), `Proxy`/`Reflect` validators, `WeakMap` private data, getters/setters, tagged templates, `Symbol.asyncIterator`.
 8. **React 19**: `useOptimistic`, `useActionState`, `use(promise)`, `useTransition`. Needs these hooks injected into the sandbox (add to
    `runner.ts` names *carefully*, see §5) and an async-safe `act` path in `domTools.ts`.
@@ -308,7 +308,7 @@ Algorithms were filled in batch 13. Candidates, with the owner's goal in mind (r
 |---|---|---|---|---|
 | 1 | **Algorithms, round 2** | Still the most common interview content: 2D DP (LCS, edit distance, knapsack), Dijkstra, union-find, monotonic stack, bit tricks, greedy/intervals, LRU with a doubly linked list | pure input/expected | low |
 | 2 | **Ladder holes (§7.1)** — DONE for pure/TS concepts in batch 14; React/DOM holes remain | Every concept should start at d1/d2 | DOM harness | medium |
-| 3 | **Language depth (§7.2.7)** | Output-prediction, hoisting/TDZ, `Proxy`, `WeakMap`, getters/setters | pure input/expected | low |
+| 3 | **Language depth (§7.2.7)** — Proxy/Weak*/descriptors/prototypes DONE (batch 15); output-prediction, hoisting/TDZ, tagged templates open | Output-prediction, hoisting/TDZ, tagged templates | pure input/expected | low |
 | 4 | **TypeScript type-level (§7.2.3)** | Conditional/`infer`, template-literal types, overloads | `@ts-expect-error` extras | medium |
 | 5 | **Testing & libs, pure logic (§7.2.4)** | `mockFn`, fake timers, mini `expect`, D3 scales, Next route matcher | pure input/expected | low |
 | 6 | **DOM/browser extras (§7.2.6)** | drag-and-drop, observers, `pushState` router | DOM harness | medium |

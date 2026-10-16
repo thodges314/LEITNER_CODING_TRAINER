@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Prototypes: Object.create, hasOwn, Chain Length",
+  "tags": [
+    "prototype",
+    "Object.create",
+    "inheritance",
+    "basics"
+  ]
+}

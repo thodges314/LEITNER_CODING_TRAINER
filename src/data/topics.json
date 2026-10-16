@@ -8911,5 +8911,918 @@
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Pure compile-time mapped types; there is no runtime work."
+  },
+  {
+    "id": "copy-descriptors-mixin",
+    "track": "js-language",
+    "title": "Descriptors: Clone With Descriptors and Mixin",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "descriptors",
+      "mixin",
+      "clone",
+      "getOwnPropertyDescriptors"
+    ],
+    "promptSeed": "Write cloneWithDescriptors(obj) returning a new object with the SAME prototype as obj and copies of ALL own properties, preserving non-enumerable properties, getters/setters (as accessors, not their values) and symbol keys. Write mixin(target, ...sources) that copies every own property (string AND symbol keys, enumerable or not) from each source onto target by DESCRIPTOR, so getters stay getters and are never invoked during copying (unlike Object.assign); later sources override earlier ones; return target.",
+    "difficulty": 3,
+    "concept": "descriptors",
+    "referenceSolution": "function cloneWithDescriptors(obj) {\n  return Object.create(Object.getPrototypeOf(obj), Object.getOwnPropertyDescriptors(obj));\n}\n\nfunction mixin(target, ...sources) {\n  for (const source of sources) {\n    for (const key of Reflect.ownKeys(source)) {\n      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));\n    }\n  }\n  return target;\n}",
+    "solution": "function cloneWithDescriptors(obj) {\n  return Object.create(Object.getPrototypeOf(obj), Object.getOwnPropertyDescriptors(obj));\n}\n\nfunction mixin(target, ...sources) {\n  for (const source of sources) {\n    for (const key of Reflect.ownKeys(source)) {\n      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));\n    }\n  }\n  return target;\n}",
+    "starterCode": "function cloneWithDescriptors(obj) {\n  return Object.create(Object.getPrototypeOf(obj), Object.getOwnPropertyDescriptors(obj));\n}\n\nfunction mixin(target, ...sources) {\n  for (const source of sources) {\n    for (const key of Reflect.ownKeys(source)) {\n      Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));\n    }\n  }\n  return target;\n}",
+    "testCases": [
+      {
+        "description": "cloneWithDescriptors keeps the prototype",
+        "input": "const proto = { hello() { return 'hi'; } };\nconst src = Object.create(proto);\nsrc.a = 1;\nconst copy = cloneWithDescriptors(src);\n[Object.getPrototypeOf(copy) === proto, copy.hello(), copy.a, copy !== src]",
+        "expected": "[true, 'hi', 1, true]"
+      },
+      {
+        "description": "cloneWithDescriptors keeps non-enumerable properties non-enumerable",
+        "input": "const src = { a: 1 };\nObject.defineProperty(src, 'hidden', { value: 2, enumerable: false });\nconst copy = cloneWithDescriptors(src);\n[copy.hidden, Object.keys(copy)]",
+        "expected": "[2, ['a']]"
+      },
+      {
+        "description": "cloneWithDescriptors keeps getters as getters bound to the new object",
+        "input": "const src = { base: 2, get double() { return this.base * 2; } };\nconst copy = cloneWithDescriptors(src);\ncopy.base = 10;\n[copy.double, typeof Object.getOwnPropertyDescriptor(copy, 'double').get]",
+        "expected": "[20, 'function']"
+      },
+      {
+        "description": "cloneWithDescriptors copies symbol keys",
+        "input": "const s = Symbol('id');\nconst copy = cloneWithDescriptors({ [s]: 5 });\ncopy[s]",
+        "expected": "5"
+      },
+      {
+        "description": "mixin copies properties onto target and returns it",
+        "input": "const target = { a: 1 };\nconst r = mixin(target, { b: 2 }, { c: 3 });\n[r === target, target]",
+        "expected": "[true, { a: 1, b: 2, c: 3 }]"
+      },
+      {
+        "description": "Later sources override earlier ones",
+        "input": "mixin({}, { x: 1 }, { x: 2 })",
+        "expected": "{ x: 2 }"
+      },
+      {
+        "description": "mixin does not invoke getters while copying",
+        "input": "let calls = 0;\nconst src = { get x() { calls++; return 1; } };\nconst t = mixin({}, src);\n[calls, typeof Object.getOwnPropertyDescriptor(t, 'x').get]",
+        "expected": "[0, 'function']"
+      },
+      {
+        "description": "mixin copies non-enumerable and symbol properties",
+        "input": "const s = Symbol('s');\nconst src = { [s]: 1 };\nObject.defineProperty(src, 'h', { value: 2, enumerable: false });\nconst t = mixin({}, src);\n[t[s], t.h, Object.keys(t)]",
+        "expected": "[1, 2, []]"
+      }
+    ],
+    "testHarness": "await $test.run(\"cloneWithDescriptors keeps the prototype\", async () => {\n  const sleep = $test.sleep;\n  const proto = { hello() { return 'hi'; } };\n  const src = Object.create(proto);\n  src.a = 1;\n  const copy = cloneWithDescriptors(src);\n  return ([Object.getPrototypeOf(copy) === proto, copy.hello(), copy.a, copy !== src]);\n}, () => ([true, 'hi', 1, true]));\n\nawait $test.run(\"cloneWithDescriptors keeps non-enumerable properties non-enumerable\", async () => {\n  const sleep = $test.sleep;\n  const src = { a: 1 };\n  Object.defineProperty(src, 'hidden', { value: 2, enumerable: false });\n  const copy = cloneWithDescriptors(src);\n  return ([copy.hidden, Object.keys(copy)]);\n}, () => ([2, ['a']]));\n\nawait $test.run(\"cloneWithDescriptors keeps getters as getters bound to the new object\", async () => {\n  const sleep = $test.sleep;\n  const src = { base: 2, get double() { return this.base * 2; } };\n  const copy = cloneWithDescriptors(src);\n  copy.base = 10;\n  return ([copy.double, typeof Object.getOwnPropertyDescriptor(copy, 'double').get]);\n}, () => ([20, 'function']));\n\nawait $test.run(\"cloneWithDescriptors copies symbol keys\", async () => {\n  const sleep = $test.sleep;\n  const s = Symbol('id');\n  const copy = cloneWithDescriptors({ [s]: 5 });\n  return (copy[s]);\n}, () => (5));\n\nawait $test.run(\"mixin copies properties onto target and returns it\", async () => {\n  const sleep = $test.sleep;\n  const target = { a: 1 };\n  const r = mixin(target, { b: 2 }, { c: 3 });\n  return ([r === target, target]);\n}, () => ([true, { a: 1, b: 2, c: 3 }]));\n\nawait $test.run(\"Later sources override earlier ones\", async () => {\n  const sleep = $test.sleep;\n  return (mixin({}, { x: 1 }, { x: 2 }));\n}, () => ({ x: 2 }));\n\nawait $test.run(\"mixin does not invoke getters while copying\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const src = { get x() { calls++; return 1; } };\n  const t = mixin({}, src);\n  return ([calls, typeof Object.getOwnPropertyDescriptor(t, 'x').get]);\n}, () => ([0, 'function']));\n\nawait $test.run(\"mixin copies non-enumerable and symbol properties\", async () => {\n  const sleep = $test.sleep;\n  const s = Symbol('s');\n  const src = { [s]: 1 };\n  Object.defineProperty(src, 'h', { value: 2, enumerable: false });\n  const t = mixin({}, src);\n  return ([t[s], t.h, Object.keys(t)]);\n}, () => ([1, 2, []]));",
+    "targetTime": "O(p)",
+    "targetSpace": "O(p)",
+    "complexityExplanation": "Every own property key (p) is read and redefined once; accessors are copied without being invoked."
+  },
+  {
+    "id": "descriptor-basics",
+    "track": "js-language",
+    "title": "Property Descriptors: Hidden, Constant, Flags",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "defineProperty",
+      "descriptor",
+      "enumerable",
+      "basics"
+    ],
+    "promptSeed": "Use Object.defineProperty. Write defineHidden(obj, key, value): adds a property that is writable and configurable but NOT enumerable (it must not show up in Object.keys or JSON.stringify) and returns obj. Write defineConstant(obj, key, value): adds an enumerable property that cannot be changed or deleted (not writable, not configurable) and returns obj. Write describeFlags(obj, key): undefined if obj has no OWN property key; otherwise { writable, enumerable, configurable } for a data property, or { enumerable, configurable, accessor: true } for a getter/setter property.",
+    "difficulty": 1,
+    "concept": "descriptors",
+    "referenceSolution": "function defineHidden(obj, key, value) {\n  return Object.defineProperty(obj, key, {\n    value,\n    writable: true,\n    enumerable: false,\n    configurable: true,\n  });\n}\n\nfunction defineConstant(obj, key, value) {\n  return Object.defineProperty(obj, key, {\n    value,\n    writable: false,\n    enumerable: true,\n    configurable: false,\n  });\n}\n\nfunction describeFlags(obj, key) {\n  const d = Object.getOwnPropertyDescriptor(obj, key);\n  if (!d) return undefined;\n  if ('value' in d) {\n    return { writable: d.writable, enumerable: d.enumerable, configurable: d.configurable };\n  }\n  return { enumerable: d.enumerable, configurable: d.configurable, accessor: true };\n}",
+    "solution": "function defineHidden(obj, key, value) {\n  return Object.defineProperty(obj, key, {\n    value,\n    writable: true,\n    enumerable: false,\n    configurable: true,\n  });\n}\n\nfunction defineConstant(obj, key, value) {\n  return Object.defineProperty(obj, key, {\n    value,\n    writable: false,\n    enumerable: true,\n    configurable: false,\n  });\n}\n\nfunction describeFlags(obj, key) {\n  const d = Object.getOwnPropertyDescriptor(obj, key);\n  if (!d) return undefined;\n  if ('value' in d) {\n    return { writable: d.writable, enumerable: d.enumerable, configurable: d.configurable };\n  }\n  return { enumerable: d.enumerable, configurable: d.configurable, accessor: true };\n}",
+    "starterCode": "function defineHidden(obj, key, value) {\n  return Object.defineProperty(obj, key, {\n    value,\n    writable: true,\n    enumerable: false,\n    configurable: true,\n  });\n}\n\nfunction defineConstant(obj, key, value) {\n  return Object.defineProperty(obj, key, {\n    value,\n    writable: false,\n    enumerable: true,\n    configurable: false,\n  });\n}\n\nfunction describeFlags(obj, key) {\n  const d = Object.getOwnPropertyDescriptor(obj, key);\n  if (!d) return undefined;\n  if ('value' in d) {\n    return { writable: d.writable, enumerable: d.enumerable, configurable: d.configurable };\n  }\n  return { enumerable: d.enumerable, configurable: d.configurable, accessor: true };\n}",
+    "testCases": [
+      {
+        "description": "defineHidden is readable but not enumerable",
+        "input": "const o = { a: 1 };\ndefineHidden(o, 'secret', 42);\n[o.secret, Object.keys(o), JSON.stringify(o)]",
+        "expected": "[42, ['a'], '{\"a\":1}']"
+      },
+      {
+        "description": "defineHidden stays writable",
+        "input": "const o = {};\ndefineHidden(o, 'k', 1);\no.k = 2;\no.k",
+        "expected": "2"
+      },
+      {
+        "description": "defineHidden returns the object",
+        "input": "const o = {};\ndefineHidden(o, 'k', 1) === o",
+        "expected": "true"
+      },
+      {
+        "description": "defineConstant is enumerable",
+        "input": "const o = {};\ndefineConstant(o, 'PI', 3.14);\nObject.keys(o)",
+        "expected": "['PI']"
+      },
+      {
+        "description": "defineConstant cannot be reassigned",
+        "input": "const o = {};\ndefineConstant(o, 'PI', 3.14);\ntry { o.PI = 3; } catch (e) {}\no.PI",
+        "expected": "3.14"
+      },
+      {
+        "description": "defineConstant cannot be deleted",
+        "input": "const o = {};\ndefineConstant(o, 'PI', 3.14);\ntry { delete o.PI; } catch (e) {}\n'PI' in o",
+        "expected": "true"
+      },
+      {
+        "description": "describeFlags of data properties",
+        "input": "const o = { a: 1 };\ndefineHidden(o, 'h', 1);\ndefineConstant(o, 'c', 1);\n[describeFlags(o, 'a'), describeFlags(o, 'h'), describeFlags(o, 'c')]",
+        "expected": "[{ writable: true, enumerable: true, configurable: true }, { writable: true, enumerable: false, configurable: true }, { writable: false, enumerable: true, configurable: false }]"
+      },
+      {
+        "description": "describeFlags of an accessor and a missing key",
+        "input": "const o = { get g() { return 1; } };\n[describeFlags(o, 'g'), describeFlags(o, 'nope'), describeFlags(Object.create({ inherited: 1 }), 'inherited')]",
+        "expected": "[{ enumerable: true, configurable: true, accessor: true }, undefined, undefined]"
+      }
+    ],
+    "testHarness": "await $test.run(\"defineHidden is readable but not enumerable\", async () => {\n  const sleep = $test.sleep;\n  const o = { a: 1 };\n  defineHidden(o, 'secret', 42);\n  return ([o.secret, Object.keys(o), JSON.stringify(o)]);\n}, () => ([42, ['a'], '{\"a\":1}']));\n\nawait $test.run(\"defineHidden stays writable\", async () => {\n  const sleep = $test.sleep;\n  const o = {};\n  defineHidden(o, 'k', 1);\n  o.k = 2;\n  return (o.k);\n}, () => (2));\n\nawait $test.run(\"defineHidden returns the object\", async () => {\n  const sleep = $test.sleep;\n  const o = {};\n  return (defineHidden(o, 'k', 1) === o);\n}, () => (true));\n\nawait $test.run(\"defineConstant is enumerable\", async () => {\n  const sleep = $test.sleep;\n  const o = {};\n  defineConstant(o, 'PI', 3.14);\n  return (Object.keys(o));\n}, () => (['PI']));\n\nawait $test.run(\"defineConstant cannot be reassigned\", async () => {\n  const sleep = $test.sleep;\n  const o = {};\n  defineConstant(o, 'PI', 3.14);\n  try { o.PI = 3; } catch (e) {}\n  return (o.PI);\n}, () => (3.14));\n\nawait $test.run(\"defineConstant cannot be deleted\", async () => {\n  const sleep = $test.sleep;\n  const o = {};\n  defineConstant(o, 'PI', 3.14);\n  try { delete o.PI; } catch (e) {}\n  return ('PI' in o);\n}, () => (true));\n\nawait $test.run(\"describeFlags of data properties\", async () => {\n  const sleep = $test.sleep;\n  const o = { a: 1 };\n  defineHidden(o, 'h', 1);\n  defineConstant(o, 'c', 1);\n  return ([describeFlags(o, 'a'), describeFlags(o, 'h'), describeFlags(o, 'c')]);\n}, () => ([{ writable: true, enumerable: true, configurable: true }, { writable: true, enumerable: false, configurable: true }, { writable: false, enumerable: true, configurable: false }]));\n\nawait $test.run(\"describeFlags of an accessor and a missing key\", async () => {\n  const sleep = $test.sleep;\n  const o = { get g() { return 1; } };\n  return ([describeFlags(o, 'g'), describeFlags(o, 'nope'), describeFlags(Object.create({ inherited: 1 }), 'inherited')]);\n}, () => ([{ enumerable: true, configurable: true, accessor: true }, undefined, undefined]));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each helper makes a single defineProperty or getOwnPropertyDescriptor call."
+  },
+  {
+    "id": "getter-setter-pairs",
+    "track": "js-language",
+    "title": "Descriptors: Getter/Setter Pairs and Lazy Properties",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "defineProperty",
+      "getter",
+      "setter",
+      "lazy"
+    ],
+    "promptSeed": "Write createThermometer(celsius) returning an object with an enumerable data property `celsius` and a NON-enumerable accessor property `fahrenheit` defined with Object.defineProperty: its getter returns celsius * 9 / 5 + 32 and its setter takes a Fahrenheit number and updates celsius to (f - 32) * 5 / 9 (so JSON.stringify of the object only shows celsius). Write defineLazy(obj, key, compute): defines an enumerable, configurable getter that calls compute() on the first read, then REPLACES itself with a plain data property holding that value (writable, enumerable, configurable) so compute never runs again; returns obj.",
+    "difficulty": 2,
+    "concept": "descriptors",
+    "referenceSolution": "function createThermometer(celsius) {\n  const t = { celsius };\n  Object.defineProperty(t, 'fahrenheit', {\n    get() {\n      return (this.celsius * 9) / 5 + 32;\n    },\n    set(f) {\n      this.celsius = ((f - 32) * 5) / 9;\n    },\n    enumerable: false,\n    configurable: true,\n  });\n  return t;\n}\n\nfunction defineLazy(obj, key, compute) {\n  Object.defineProperty(obj, key, {\n    get() {\n      const value = compute();\n      Object.defineProperty(obj, key, {\n        value,\n        writable: true,\n        enumerable: true,\n        configurable: true,\n      });\n      return value;\n    },\n    enumerable: true,\n    configurable: true,\n  });\n  return obj;\n}",
+    "solution": "function createThermometer(celsius) {\n  const t = { celsius };\n  Object.defineProperty(t, 'fahrenheit', {\n    get() {\n      return (this.celsius * 9) / 5 + 32;\n    },\n    set(f) {\n      this.celsius = ((f - 32) * 5) / 9;\n    },\n    enumerable: false,\n    configurable: true,\n  });\n  return t;\n}\n\nfunction defineLazy(obj, key, compute) {\n  Object.defineProperty(obj, key, {\n    get() {\n      const value = compute();\n      Object.defineProperty(obj, key, {\n        value,\n        writable: true,\n        enumerable: true,\n        configurable: true,\n      });\n      return value;\n    },\n    enumerable: true,\n    configurable: true,\n  });\n  return obj;\n}",
+    "starterCode": "function createThermometer(celsius) {\n  const t = { celsius };\n  Object.defineProperty(t, 'fahrenheit', {\n    get() {\n      return (this.celsius * 9) / 5 + 32;\n    },\n    set(f) {\n      this.celsius = ((f - 32) * 5) / 9;\n    },\n    enumerable: false,\n    configurable: true,\n  });\n  return t;\n}\n\nfunction defineLazy(obj, key, compute) {\n  Object.defineProperty(obj, key, {\n    get() {\n      const value = compute();\n      Object.defineProperty(obj, key, {\n        value,\n        writable: true,\n        enumerable: true,\n        configurable: true,\n      });\n      return value;\n    },\n    enumerable: true,\n    configurable: true,\n  });\n  return obj;\n}",
+    "testCases": [
+      {
+        "description": "The fahrenheit getter converts from celsius",
+        "input": "const t = createThermometer(100);\n[t.fahrenheit, createThermometer(0).fahrenheit, createThermometer(-40).fahrenheit]",
+        "expected": "[212, 32, -40]"
+      },
+      {
+        "description": "The fahrenheit setter updates celsius",
+        "input": "const t = createThermometer(0);\nt.fahrenheit = 212;\nconst hot = t.celsius;\nt.fahrenheit = 32;\n[hot, t.celsius]",
+        "expected": "[100, 0]"
+      },
+      {
+        "description": "fahrenheit is hidden from keys and JSON",
+        "input": "const t = createThermometer(5);\n[Object.keys(t), JSON.stringify(t)]",
+        "expected": "[['celsius'], '{\"celsius\":5}']"
+      },
+      {
+        "description": "fahrenheit is an accessor and celsius a data property",
+        "input": "const t = createThermometer(5);\nconst f = Object.getOwnPropertyDescriptor(t, 'fahrenheit');\nconst c = Object.getOwnPropertyDescriptor(t, 'celsius');\n[typeof f.get, typeof f.set, 'value' in c]",
+        "expected": "['function', 'function', true]"
+      },
+      {
+        "description": "defineLazy computes on first read only",
+        "input": "let calls = 0;\nconst o = defineLazy({}, 'expensive', () => { calls++; return 42; });\n[calls, o.expensive, o.expensive, calls]",
+        "expected": "[0, 42, 42, 1]"
+      },
+      {
+        "description": "After the first read the property is a plain data property",
+        "input": "const o = defineLazy({}, 'x', () => 7);\no.x;\nconst d = Object.getOwnPropertyDescriptor(o, 'x');\n[d.value, 'get' in d, d.writable, d.enumerable]",
+        "expected": "[7, false, true, true]"
+      },
+      {
+        "description": "A lazy property is enumerable and defineLazy returns the object",
+        "input": "const base = {};\nconst o = defineLazy(base, 'x', () => 1);\n[o === base, Object.keys(o)]",
+        "expected": "[true, ['x']]"
+      }
+    ],
+    "testHarness": "await $test.run(\"The fahrenheit getter converts from celsius\", async () => {\n  const sleep = $test.sleep;\n  const t = createThermometer(100);\n  return ([t.fahrenheit, createThermometer(0).fahrenheit, createThermometer(-40).fahrenheit]);\n}, () => ([212, 32, -40]));\n\nawait $test.run(\"The fahrenheit setter updates celsius\", async () => {\n  const sleep = $test.sleep;\n  const t = createThermometer(0);\n  t.fahrenheit = 212;\n  const hot = t.celsius;\n  t.fahrenheit = 32;\n  return ([hot, t.celsius]);\n}, () => ([100, 0]));\n\nawait $test.run(\"fahrenheit is hidden from keys and JSON\", async () => {\n  const sleep = $test.sleep;\n  const t = createThermometer(5);\n  return ([Object.keys(t), JSON.stringify(t)]);\n}, () => ([['celsius'], '{\"celsius\":5}']));\n\nawait $test.run(\"fahrenheit is an accessor and celsius a data property\", async () => {\n  const sleep = $test.sleep;\n  const t = createThermometer(5);\n  const f = Object.getOwnPropertyDescriptor(t, 'fahrenheit');\n  const c = Object.getOwnPropertyDescriptor(t, 'celsius');\n  return ([typeof f.get, typeof f.set, 'value' in c]);\n}, () => (['function', 'function', true]));\n\nawait $test.run(\"defineLazy computes on first read only\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const o = defineLazy({}, 'expensive', () => { calls++; return 42; });\n  return ([calls, o.expensive, o.expensive, calls]);\n}, () => ([0, 42, 42, 1]));\n\nawait $test.run(\"After the first read the property is a plain data property\", async () => {\n  const sleep = $test.sleep;\n  const o = defineLazy({}, 'x', () => 7);\n  o.x;\n  const d = Object.getOwnPropertyDescriptor(o, 'x');\n  return ([d.value, 'get' in d, d.writable, d.enumerable]);\n}, () => ([7, false, true, true]));\n\nawait $test.run(\"A lazy property is enumerable and defineLazy returns the object\", async () => {\n  const sleep = $test.sleep;\n  const base = {};\n  const o = defineLazy(base, 'x', () => 1);\n  return ([o === base, Object.keys(o)]);\n}, () => ([true, ['x']]));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Accessors perform a constant arithmetic step; a lazy property computes once and then stores its value."
+  },
+  {
+    "id": "manual-prototype-linking",
+    "track": "js-language",
+    "title": "Prototypes: ES5 Constructor Inheritance (Animal, Dog)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "prototype",
+      "constructor",
+      "inheritance",
+      "es5"
+    ],
+    "promptSeed": "Without using `class`, write the constructor functions Animal(name) and Dog(name, breed). Animal.prototype.speak() returns name + ' makes a sound'. Dog calls the Animal constructor on its own `this`, then sets this.breed. Link Dog.prototype to Animal.prototype with Object.create (do not call new Animal), restore Dog.prototype.constructor to Dog as a NON-enumerable property, and override Dog.prototype.speak to return the Animal version (call Animal.prototype.speak.call(this)) + ' Woof!'. Animal.prototype must stay unchanged.",
+    "difficulty": 2,
+    "concept": "prototypes",
+    "referenceSolution": "function Animal(name) {\n  this.name = name;\n}\n\nAnimal.prototype.speak = function () {\n  return this.name + ' makes a sound';\n};\n\nfunction Dog(name, breed) {\n  Animal.call(this, name);\n  this.breed = breed;\n}\n\nDog.prototype = Object.create(Animal.prototype);\nObject.defineProperty(Dog.prototype, 'constructor', {\n  value: Dog,\n  writable: true,\n  enumerable: false,\n  configurable: true,\n});\n\nDog.prototype.speak = function () {\n  return Animal.prototype.speak.call(this) + ' Woof!';\n};",
+    "solution": "function Animal(name) {\n  this.name = name;\n}\n\nAnimal.prototype.speak = function () {\n  return this.name + ' makes a sound';\n};\n\nfunction Dog(name, breed) {\n  Animal.call(this, name);\n  this.breed = breed;\n}\n\nDog.prototype = Object.create(Animal.prototype);\nObject.defineProperty(Dog.prototype, 'constructor', {\n  value: Dog,\n  writable: true,\n  enumerable: false,\n  configurable: true,\n});\n\nDog.prototype.speak = function () {\n  return Animal.prototype.speak.call(this) + ' Woof!';\n};",
+    "starterCode": "function Animal(name) {\n  this.name = name;\n}\n\nAnimal.prototype.speak = function () {\n  return this.name + ' makes a sound';\n};\n\nfunction Dog(name, breed) {\n  Animal.call(this, name);\n  this.breed = breed;\n}\n\nDog.prototype = Object.create(Animal.prototype);\nObject.defineProperty(Dog.prototype, 'constructor', {\n  value: Dog,\n  writable: true,\n  enumerable: false,\n  configurable: true,\n});\n\nDog.prototype.speak = function () {\n  return Animal.prototype.speak.call(this) + ' Woof!';\n};",
+    "testCases": [
+      {
+        "description": "Animal speak uses the name",
+        "input": "new Animal('Generic').speak()",
+        "expected": "'Generic makes a sound'"
+      },
+      {
+        "description": "Dog overrides speak and calls the Animal version",
+        "input": "new Dog('Rex', 'Lab').speak()",
+        "expected": "'Rex makes a sound Woof!'"
+      },
+      {
+        "description": "A Dog has own name and breed",
+        "input": "const d = new Dog('Rex', 'Lab');\n[d.name, d.breed, Object.keys(d)]",
+        "expected": "['Rex', 'Lab', ['name', 'breed']]"
+      },
+      {
+        "description": "instanceof works for both constructors",
+        "input": "const d = new Dog('Rex', 'Lab');\n[d instanceof Dog, d instanceof Animal, new Animal('a') instanceof Dog]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "Dog.prototype.constructor is Dog and hidden from enumeration",
+        "input": "const keys = [];\nfor (const k in new Dog('a', 'b')) keys.push(k);\n[Dog.prototype.constructor === Dog, new Dog('a', 'b').constructor === Dog, keys.includes('constructor')]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "Dog.prototype is linked to Animal.prototype",
+        "input": "Object.getPrototypeOf(Dog.prototype) === Animal.prototype",
+        "expected": "true"
+      },
+      {
+        "description": "Animal.prototype is untouched by the override",
+        "input": "[Object.keys(Animal.prototype), new Animal('x').speak()]",
+        "expected": "[['speak'], 'x makes a sound']"
+      }
+    ],
+    "testHarness": "await $test.run(\"Animal speak uses the name\", async () => {\n  const sleep = $test.sleep;\n  return (new Animal('Generic').speak());\n}, () => ('Generic makes a sound'));\n\nawait $test.run(\"Dog overrides speak and calls the Animal version\", async () => {\n  const sleep = $test.sleep;\n  return (new Dog('Rex', 'Lab').speak());\n}, () => ('Rex makes a sound Woof!'));\n\nawait $test.run(\"A Dog has own name and breed\", async () => {\n  const sleep = $test.sleep;\n  const d = new Dog('Rex', 'Lab');\n  return ([d.name, d.breed, Object.keys(d)]);\n}, () => (['Rex', 'Lab', ['name', 'breed']]));\n\nawait $test.run(\"instanceof works for both constructors\", async () => {\n  const sleep = $test.sleep;\n  const d = new Dog('Rex', 'Lab');\n  return ([d instanceof Dog, d instanceof Animal, new Animal('a') instanceof Dog]);\n}, () => ([true, true, false]));\n\nawait $test.run(\"Dog.prototype.constructor is Dog and hidden from enumeration\", async () => {\n  const sleep = $test.sleep;\n  const keys = [];\n  for (const k in new Dog('a', 'b')) keys.push(k);\n  return ([Dog.prototype.constructor === Dog, new Dog('a', 'b').constructor === Dog, keys.includes('constructor')]);\n}, () => ([true, true, false]));\n\nawait $test.run(\"Dog.prototype is linked to Animal.prototype\", async () => {\n  const sleep = $test.sleep;\n  return (Object.getPrototypeOf(Dog.prototype) === Animal.prototype);\n}, () => (true));\n\nawait $test.run(\"Animal.prototype is untouched by the override\", async () => {\n  const sleep = $test.sleep;\n  return ([Object.keys(Animal.prototype), new Animal('x').speak()]);\n}, () => ([['speak'], 'x makes a sound']));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Linking prototypes and calling the parent constructor are constant-time steps per instance."
+  },
+  {
+    "id": "proto-chain-hasinstance",
+    "track": "js-language",
+    "title": "Prototypes: Chain Walking and Custom instanceof",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "prototype",
+      "instanceof",
+      "Symbol.hasInstance",
+      "chain"
+    ],
+    "promptSeed": "Write getProtoChain(obj): an array of the objects on obj's prototype chain, nearest first, ending with Object.prototype (empty for Object.create(null)). Write findOwner(obj, key): the first object on the chain starting at obj itself that has key as an OWN property, or null. Write myInstanceOf(value, Ctor) without using the instanceof operator: throw TypeError('Right-hand side is not callable') if Ctor is not a function; if Ctor has a custom [Symbol.hasInstance] (one that is not the default Function.prototype[Symbol.hasInstance]) return its boolean result; otherwise walk the chain of value and compare with Ctor.prototype (primitives and null are never instances).",
+    "difficulty": 3,
+    "concept": "prototypes",
+    "referenceSolution": "function getProtoChain(obj) {\n  const chain = [];\n  let proto = Object.getPrototypeOf(obj);\n  while (proto) {\n    chain.push(proto);\n    proto = Object.getPrototypeOf(proto);\n  }\n  return chain;\n}\n\nfunction findOwner(obj, key) {\n  let node = obj;\n  while (node) {\n    if (Object.prototype.hasOwnProperty.call(node, key)) return node;\n    node = Object.getPrototypeOf(node);\n  }\n  return null;\n}\n\nfunction myInstanceOf(value, Ctor) {\n  if (typeof Ctor !== 'function') throw new TypeError('Right-hand side is not callable');\n  const custom = Ctor[Symbol.hasInstance];\n  if (custom !== undefined && custom !== Function.prototype[Symbol.hasInstance]) {\n    return !!custom.call(Ctor, value);\n  }\n  if (value === null || (typeof value !== 'object' && typeof value !== 'function')) return false;\n  const target = Ctor.prototype;\n  let proto = Object.getPrototypeOf(value);\n  while (proto) {\n    if (proto === target) return true;\n    proto = Object.getPrototypeOf(proto);\n  }\n  return false;\n}",
+    "solution": "function getProtoChain(obj) {\n  const chain = [];\n  let proto = Object.getPrototypeOf(obj);\n  while (proto) {\n    chain.push(proto);\n    proto = Object.getPrototypeOf(proto);\n  }\n  return chain;\n}\n\nfunction findOwner(obj, key) {\n  let node = obj;\n  while (node) {\n    if (Object.prototype.hasOwnProperty.call(node, key)) return node;\n    node = Object.getPrototypeOf(node);\n  }\n  return null;\n}\n\nfunction myInstanceOf(value, Ctor) {\n  if (typeof Ctor !== 'function') throw new TypeError('Right-hand side is not callable');\n  const custom = Ctor[Symbol.hasInstance];\n  if (custom !== undefined && custom !== Function.prototype[Symbol.hasInstance]) {\n    return !!custom.call(Ctor, value);\n  }\n  if (value === null || (typeof value !== 'object' && typeof value !== 'function')) return false;\n  const target = Ctor.prototype;\n  let proto = Object.getPrototypeOf(value);\n  while (proto) {\n    if (proto === target) return true;\n    proto = Object.getPrototypeOf(proto);\n  }\n  return false;\n}",
+    "starterCode": "function getProtoChain(obj) {\n  const chain = [];\n  let proto = Object.getPrototypeOf(obj);\n  while (proto) {\n    chain.push(proto);\n    proto = Object.getPrototypeOf(proto);\n  }\n  return chain;\n}\n\nfunction findOwner(obj, key) {\n  let node = obj;\n  while (node) {\n    if (Object.prototype.hasOwnProperty.call(node, key)) return node;\n    node = Object.getPrototypeOf(node);\n  }\n  return null;\n}\n\nfunction myInstanceOf(value, Ctor) {\n  if (typeof Ctor !== 'function') throw new TypeError('Right-hand side is not callable');\n  const custom = Ctor[Symbol.hasInstance];\n  if (custom !== undefined && custom !== Function.prototype[Symbol.hasInstance]) {\n    return !!custom.call(Ctor, value);\n  }\n  if (value === null || (typeof value !== 'object' && typeof value !== 'function')) return false;\n  const target = Ctor.prototype;\n  let proto = Object.getPrototypeOf(value);\n  while (proto) {\n    if (proto === target) return true;\n    proto = Object.getPrototypeOf(proto);\n  }\n  return false;\n}",
+    "testCases": [
+      {
+        "description": "getProtoChain lists prototypes nearest first, ending at Object.prototype",
+        "input": "class Animal {}\nclass Dog extends Animal {}\nconst chain = getProtoChain(new Dog());\n[chain.length, chain[0] === Dog.prototype, chain[1] === Animal.prototype, chain[2] === Object.prototype]",
+        "expected": "[3, true, true, true]"
+      },
+      {
+        "description": "getProtoChain of a null-prototype object is empty",
+        "input": "getProtoChain(Object.create(null))",
+        "expected": "[]"
+      },
+      {
+        "description": "findOwner finds the object that owns the key",
+        "input": "const base = { shared: 1 };\nconst mid = Object.create(base);\nconst leaf = Object.create(mid);\nleaf.own = 2;\n[findOwner(leaf, 'own') === leaf, findOwner(leaf, 'shared') === base, findOwner(leaf, 'missing')]",
+        "expected": "[true, true, null]"
+      },
+      {
+        "description": "findOwner finds Object.prototype methods",
+        "input": "findOwner({}, 'toString') === Object.prototype",
+        "expected": "true"
+      },
+      {
+        "description": "myInstanceOf walks the chain",
+        "input": "class A {}\nclass B extends A {}\nconst b = new B();\n[myInstanceOf(b, B), myInstanceOf(b, A), myInstanceOf(b, Object), myInstanceOf(new A(), B)]",
+        "expected": "[true, true, true, false]"
+      },
+      {
+        "description": "myInstanceOf works with function constructors and arrays",
+        "input": "function F() {}\n[myInstanceOf(new F(), F), myInstanceOf([], Array), myInstanceOf([], Object), myInstanceOf({}, Array)]",
+        "expected": "[true, true, true, false]"
+      },
+      {
+        "description": "Primitives and null are never instances",
+        "input": "[myInstanceOf(1, Number), myInstanceOf('s', String), myInstanceOf(null, Object), myInstanceOf(undefined, Object)]",
+        "expected": "[false, false, false, false]"
+      },
+      {
+        "description": "A null-prototype object is not an Object instance",
+        "input": "myInstanceOf(Object.create(null), Object)",
+        "expected": "false"
+      },
+      {
+        "description": "A custom Symbol.hasInstance is honoured",
+        "input": "class Even { static [Symbol.hasInstance](n) { return n % 2 === 0; } }\n[myInstanceOf(4, Even), myInstanceOf(3, Even)]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "A non-callable right-hand side throws a TypeError",
+        "input": "myInstanceOf({}, {})",
+        "expected": "Throws TypeError — message contains \"not callable\""
+      }
+    ],
+    "testHarness": "await $test.run(\"getProtoChain lists prototypes nearest first, ending at Object.prototype\", async () => {\n  const sleep = $test.sleep;\n  class Animal {}\n  class Dog extends Animal {}\n  const chain = getProtoChain(new Dog());\n  return ([chain.length, chain[0] === Dog.prototype, chain[1] === Animal.prototype, chain[2] === Object.prototype]);\n}, () => ([3, true, true, true]));\n\nawait $test.run(\"getProtoChain of a null-prototype object is empty\", async () => {\n  const sleep = $test.sleep;\n  return (getProtoChain(Object.create(null)));\n}, () => ([]));\n\nawait $test.run(\"findOwner finds the object that owns the key\", async () => {\n  const sleep = $test.sleep;\n  const base = { shared: 1 };\n  const mid = Object.create(base);\n  const leaf = Object.create(mid);\n  leaf.own = 2;\n  return ([findOwner(leaf, 'own') === leaf, findOwner(leaf, 'shared') === base, findOwner(leaf, 'missing')]);\n}, () => ([true, true, null]));\n\nawait $test.run(\"findOwner finds Object.prototype methods\", async () => {\n  const sleep = $test.sleep;\n  return (findOwner({}, 'toString') === Object.prototype);\n}, () => (true));\n\nawait $test.run(\"myInstanceOf walks the chain\", async () => {\n  const sleep = $test.sleep;\n  class A {}\n  class B extends A {}\n  const b = new B();\n  return ([myInstanceOf(b, B), myInstanceOf(b, A), myInstanceOf(b, Object), myInstanceOf(new A(), B)]);\n}, () => ([true, true, true, false]));\n\nawait $test.run(\"myInstanceOf works with function constructors and arrays\", async () => {\n  const sleep = $test.sleep;\n  function F() {}\n  return ([myInstanceOf(new F(), F), myInstanceOf([], Array), myInstanceOf([], Object), myInstanceOf({}, Array)]);\n}, () => ([true, true, true, false]));\n\nawait $test.run(\"Primitives and null are never instances\", async () => {\n  const sleep = $test.sleep;\n  return ([myInstanceOf(1, Number), myInstanceOf('s', String), myInstanceOf(null, Object), myInstanceOf(undefined, Object)]);\n}, () => ([false, false, false, false]));\n\nawait $test.run(\"A null-prototype object is not an Object instance\", async () => {\n  const sleep = $test.sleep;\n  return (myInstanceOf(Object.create(null), Object));\n}, () => (false));\n\nawait $test.run(\"A custom Symbol.hasInstance is honoured\", async () => {\n  const sleep = $test.sleep;\n  class Even { static [Symbol.hasInstance](n) { return n % 2 === 0; } }\n  return ([myInstanceOf(4, Even), myInstanceOf(3, Even)]);\n}, () => ([true, false]));\n\nawait $test.rejects(\"A non-callable right-hand side throws a TypeError\", async () => {\n  const sleep = $test.sleep;\n  return (myInstanceOf({}, {}));\n}, \"not callable\");",
+    "targetTime": "O(d)",
+    "targetSpace": "O(d)",
+    "complexityExplanation": "Each function walks the prototype chain once (depth d); getProtoChain stores the chain in an array."
+  },
+  {
+    "id": "proto-object-create",
+    "track": "js-language",
+    "title": "Prototypes: Object.create, hasOwn, Chain Length",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "prototype",
+      "Object.create",
+      "inheritance",
+      "basics"
+    ],
+    "promptSeed": "Write inheritFrom(proto, props = {}) that returns a new object whose prototype is proto (use Object.create) and which has the properties of props copied onto it as OWN properties. Write hasOwn(obj, key) that is true only for own (not inherited) properties, using Object.prototype.hasOwnProperty.call. Write protoChainLength(obj): the number of objects on the prototype chain after obj itself (protoChainLength({}) is 1 because of Object.prototype; Object.create(null) gives 0).",
+    "difficulty": 1,
+    "concept": "prototypes",
+    "referenceSolution": "function inheritFrom(proto, props = {}) {\n  const obj = Object.create(proto);\n  Object.assign(obj, props);\n  return obj;\n}\n\nfunction hasOwn(obj, key) {\n  return Object.prototype.hasOwnProperty.call(obj, key);\n}\n\nfunction protoChainLength(obj) {\n  let count = 0;\n  let proto = Object.getPrototypeOf(obj);\n  while (proto) {\n    count++;\n    proto = Object.getPrototypeOf(proto);\n  }\n  return count;\n}",
+    "solution": "function inheritFrom(proto, props = {}) {\n  const obj = Object.create(proto);\n  Object.assign(obj, props);\n  return obj;\n}\n\nfunction hasOwn(obj, key) {\n  return Object.prototype.hasOwnProperty.call(obj, key);\n}\n\nfunction protoChainLength(obj) {\n  let count = 0;\n  let proto = Object.getPrototypeOf(obj);\n  while (proto) {\n    count++;\n    proto = Object.getPrototypeOf(proto);\n  }\n  return count;\n}",
+    "starterCode": "function inheritFrom(proto, props = {}) {\n  const obj = Object.create(proto);\n  Object.assign(obj, props);\n  return obj;\n}\n\nfunction hasOwn(obj, key) {\n  return Object.prototype.hasOwnProperty.call(obj, key);\n}\n\nfunction protoChainLength(obj) {\n  let count = 0;\n  let proto = Object.getPrototypeOf(obj);\n  while (proto) {\n    count++;\n    proto = Object.getPrototypeOf(proto);\n  }\n  return count;\n}",
+    "testCases": [
+      {
+        "description": "inheritFrom links the prototype",
+        "input": "const proto = { greet() { return 'hi'; } };\nconst o = inheritFrom(proto);\n[Object.getPrototypeOf(o) === proto, o.greet()]",
+        "expected": "[true, 'hi']"
+      },
+      {
+        "description": "inheritFrom copies props as own properties",
+        "input": "const proto = { shared: 1 };\nconst o = inheritFrom(proto, { a: 2 });\n[o.a, o.shared, Object.keys(o)]",
+        "expected": "[2, 1, ['a']]"
+      },
+      {
+        "description": "inheritFrom works with a null prototype",
+        "input": "const o = inheritFrom(null, { a: 1 });\n[Object.getPrototypeOf(o), o.a]",
+        "expected": "[null, 1]"
+      },
+      {
+        "description": "hasOwn separates own from inherited properties",
+        "input": "const o = inheritFrom({ inherited: 1 }, { own: 2 });\n[hasOwn(o, 'own'), hasOwn(o, 'inherited'), 'inherited' in o]",
+        "expected": "[true, false, true]"
+      },
+      {
+        "description": "hasOwn works on objects without hasOwnProperty",
+        "input": "const o = Object.create(null);\no.k = 1;\n[hasOwn(o, 'k'), hasOwn(o, 'x')]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "protoChainLength of plain and null-prototype objects",
+        "input": "[protoChainLength({}), protoChainLength(Object.create(null)), protoChainLength([])]",
+        "expected": "[1, 0, 2]"
+      },
+      {
+        "description": "protoChainLength grows with inheritance",
+        "input": "const a = {};\nconst b = inheritFrom(a);\nconst c2 = inheritFrom(b);\n[protoChainLength(b), protoChainLength(c2)]",
+        "expected": "[2, 3]"
+      }
+    ],
+    "testHarness": "await $test.run(\"inheritFrom links the prototype\", async () => {\n  const sleep = $test.sleep;\n  const proto = { greet() { return 'hi'; } };\n  const o = inheritFrom(proto);\n  return ([Object.getPrototypeOf(o) === proto, o.greet()]);\n}, () => ([true, 'hi']));\n\nawait $test.run(\"inheritFrom copies props as own properties\", async () => {\n  const sleep = $test.sleep;\n  const proto = { shared: 1 };\n  const o = inheritFrom(proto, { a: 2 });\n  return ([o.a, o.shared, Object.keys(o)]);\n}, () => ([2, 1, ['a']]));\n\nawait $test.run(\"inheritFrom works with a null prototype\", async () => {\n  const sleep = $test.sleep;\n  const o = inheritFrom(null, { a: 1 });\n  return ([Object.getPrototypeOf(o), o.a]);\n}, () => ([null, 1]));\n\nawait $test.run(\"hasOwn separates own from inherited properties\", async () => {\n  const sleep = $test.sleep;\n  const o = inheritFrom({ inherited: 1 }, { own: 2 });\n  return ([hasOwn(o, 'own'), hasOwn(o, 'inherited'), 'inherited' in o]);\n}, () => ([true, false, true]));\n\nawait $test.run(\"hasOwn works on objects without hasOwnProperty\", async () => {\n  const sleep = $test.sleep;\n  const o = Object.create(null);\n  o.k = 1;\n  return ([hasOwn(o, 'k'), hasOwn(o, 'x')]);\n}, () => ([true, false]));\n\nawait $test.run(\"protoChainLength of plain and null-prototype objects\", async () => {\n  const sleep = $test.sleep;\n  return ([protoChainLength({}), protoChainLength(Object.create(null)), protoChainLength([])]);\n}, () => ([1, 0, 2]));\n\nawait $test.run(\"protoChainLength grows with inheritance\", async () => {\n  const sleep = $test.sleep;\n  const a = {};\n  const b = inheritFrom(a);\n  const c2 = inheritFrom(b);\n  return ([protoChainLength(b), protoChainLength(c2)]);\n}, () => ([2, 3]));",
+    "targetTime": "O(d)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Creating an object is constant time; protoChainLength walks the chain once (depth d)."
+  },
+  {
+    "id": "proxy-default-logging",
+    "track": "js-language",
+    "title": "Proxy: Default Values and Access Counting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "proxy",
+      "reflect",
+      "get-trap",
+      "basics"
+    ],
+    "promptSeed": "Write withDefaults(target, defaults) returning a Proxy whose get trap returns target[key] when the key exists in target (use `key in target`), otherwise defaults[key] (undefined if neither has it). Write countAccesses(target) returning { proxy, counts }: proxy forwards reads to target (use Reflect.get) and records in the plain object counts how many times each STRING key was read (counts.a is 2 after two reads of proxy.a; symbol keys are not counted).",
+    "difficulty": 1,
+    "concept": "proxy",
+    "referenceSolution": "function withDefaults(target, defaults) {\n  return new Proxy(target, {\n    get(t, key, receiver) {\n      return key in t ? Reflect.get(t, key, receiver) : defaults[key];\n    },\n  });\n}\n\nfunction countAccesses(target) {\n  const counts = {};\n  const proxy = new Proxy(target, {\n    get(t, key, receiver) {\n      if (typeof key === 'string') counts[key] = (counts[key] || 0) + 1;\n      return Reflect.get(t, key, receiver);\n    },\n  });\n  return { proxy, counts };\n}",
+    "solution": "function withDefaults(target, defaults) {\n  return new Proxy(target, {\n    get(t, key, receiver) {\n      return key in t ? Reflect.get(t, key, receiver) : defaults[key];\n    },\n  });\n}\n\nfunction countAccesses(target) {\n  const counts = {};\n  const proxy = new Proxy(target, {\n    get(t, key, receiver) {\n      if (typeof key === 'string') counts[key] = (counts[key] || 0) + 1;\n      return Reflect.get(t, key, receiver);\n    },\n  });\n  return { proxy, counts };\n}",
+    "starterCode": "function withDefaults(target, defaults) {\n  return new Proxy(target, {\n    get(t, key, receiver) {\n      return key in t ? Reflect.get(t, key, receiver) : defaults[key];\n    },\n  });\n}\n\nfunction countAccesses(target) {\n  const counts = {};\n  const proxy = new Proxy(target, {\n    get(t, key, receiver) {\n      if (typeof key === 'string') counts[key] = (counts[key] || 0) + 1;\n      return Reflect.get(t, key, receiver);\n    },\n  });\n  return { proxy, counts };\n}",
+    "testCases": [
+      {
+        "description": "withDefaults returns the target value when the key exists",
+        "input": "const p = withDefaults({ a: 1 }, { a: 9, b: 2 });\np.a",
+        "expected": "1"
+      },
+      {
+        "description": "withDefaults falls back to defaults for missing keys",
+        "input": "const p = withDefaults({ a: 1 }, { a: 9, b: 2 });\n[p.b, p.c]",
+        "expected": "[2, undefined]"
+      },
+      {
+        "description": "A key present with value undefined is not replaced by the default",
+        "input": "const p = withDefaults({ a: undefined }, { a: 5 });\np.a",
+        "expected": "undefined"
+      },
+      {
+        "description": "withDefaults does not copy defaults onto the target",
+        "input": "const target = {};\nconst p = withDefaults(target, { x: 1 });\np.x;\nObject.keys(target)",
+        "expected": "[]"
+      },
+      {
+        "description": "countAccesses forwards reads",
+        "input": "const { proxy } = countAccesses({ a: 10, b: 20 });\n[proxy.a, proxy.b]",
+        "expected": "[10, 20]"
+      },
+      {
+        "description": "countAccesses counts each read per key",
+        "input": "const { proxy, counts } = countAccesses({ a: 1, b: 2 });\nproxy.a; proxy.a; proxy.b; proxy.zzz;\ncounts",
+        "expected": "{ a: 2, b: 1, zzz: 1 }"
+      },
+      {
+        "description": "countAccesses starts empty",
+        "input": "countAccesses({ a: 1 }).counts",
+        "expected": "{}"
+      }
+    ],
+    "testHarness": "await $test.run(\"withDefaults returns the target value when the key exists\", async () => {\n  const sleep = $test.sleep;\n  const p = withDefaults({ a: 1 }, { a: 9, b: 2 });\n  return (p.a);\n}, () => (1));\n\nawait $test.run(\"withDefaults falls back to defaults for missing keys\", async () => {\n  const sleep = $test.sleep;\n  const p = withDefaults({ a: 1 }, { a: 9, b: 2 });\n  return ([p.b, p.c]);\n}, () => ([2, undefined]));\n\nawait $test.run(\"A key present with value undefined is not replaced by the default\", async () => {\n  const sleep = $test.sleep;\n  const p = withDefaults({ a: undefined }, { a: 5 });\n  return (p.a);\n}, () => (undefined));\n\nawait $test.run(\"withDefaults does not copy defaults onto the target\", async () => {\n  const sleep = $test.sleep;\n  const target = {};\n  const p = withDefaults(target, { x: 1 });\n  p.x;\n  return (Object.keys(target));\n}, () => ([]));\n\nawait $test.run(\"countAccesses forwards reads\", async () => {\n  const sleep = $test.sleep;\n  const { proxy } = countAccesses({ a: 10, b: 20 });\n  return ([proxy.a, proxy.b]);\n}, () => ([10, 20]));\n\nawait $test.run(\"countAccesses counts each read per key\", async () => {\n  const sleep = $test.sleep;\n  const { proxy, counts } = countAccesses({ a: 1, b: 2 });\n  proxy.a; proxy.a; proxy.b; proxy.zzz;\n  return (counts);\n}, () => ({ a: 2, b: 1, zzz: 1 }));\n\nawait $test.run(\"countAccesses starts empty\", async () => {\n  const sleep = $test.sleep;\n  return (countAccesses({ a: 1 }).counts);\n}, () => ({}));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Each trap call does constant work; the access counter stores one number per distinct key read."
+  },
+  {
+    "id": "proxy-negative-index",
+    "track": "js-language",
+    "title": "Proxy: Negative Array Indexing",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "proxy",
+      "array",
+      "get-trap",
+      "set-trap"
+    ],
+    "promptSeed": "Write negativeIndex(arr) returning a Proxy around the array so that negative indices count from the end: p[-1] is the last element, p[-2] the one before. Reads beyond the start (p[-n] with n > length) give undefined. Assigning p[-1] = x overwrites the last element; assigning with a negative index beyond the start throws a RangeError whose message contains 'out of range'. Everything else (non-negative indices, length, push, map, Array.isArray) must keep working. Negative indices arrive in the traps as STRING keys like '-1'.",
+    "difficulty": 2,
+    "concept": "proxy",
+    "referenceSolution": "function negativeIndex(arr) {\n  const toIndex = (key, length) => {\n    if (typeof key === 'string' && /^-\\d+$/.test(key)) return length + Number(key);\n    return null;\n  };\n  return new Proxy(arr, {\n    get(target, key, receiver) {\n      const i = toIndex(key, target.length);\n      if (i !== null) return i >= 0 ? target[i] : undefined;\n      return Reflect.get(target, key, receiver);\n    },\n    set(target, key, value, receiver) {\n      const i = toIndex(key, target.length);\n      if (i !== null) {\n        if (i < 0) throw new RangeError('Index out of range: ' + key);\n        target[i] = value;\n        return true;\n      }\n      return Reflect.set(target, key, value, receiver);\n    },\n  });\n}",
+    "solution": "function negativeIndex(arr) {\n  const toIndex = (key, length) => {\n    if (typeof key === 'string' && /^-\\d+$/.test(key)) return length + Number(key);\n    return null;\n  };\n  return new Proxy(arr, {\n    get(target, key, receiver) {\n      const i = toIndex(key, target.length);\n      if (i !== null) return i >= 0 ? target[i] : undefined;\n      return Reflect.get(target, key, receiver);\n    },\n    set(target, key, value, receiver) {\n      const i = toIndex(key, target.length);\n      if (i !== null) {\n        if (i < 0) throw new RangeError('Index out of range: ' + key);\n        target[i] = value;\n        return true;\n      }\n      return Reflect.set(target, key, value, receiver);\n    },\n  });\n}",
+    "starterCode": "function negativeIndex(arr) {\n  const toIndex = (key, length) => {\n    if (typeof key === 'string' && /^-\\d+$/.test(key)) return length + Number(key);\n    return null;\n  };\n  return new Proxy(arr, {\n    get(target, key, receiver) {\n      const i = toIndex(key, target.length);\n      if (i !== null) return i >= 0 ? target[i] : undefined;\n      return Reflect.get(target, key, receiver);\n    },\n    set(target, key, value, receiver) {\n      const i = toIndex(key, target.length);\n      if (i !== null) {\n        if (i < 0) throw new RangeError('Index out of range: ' + key);\n        target[i] = value;\n        return true;\n      }\n      return Reflect.set(target, key, value, receiver);\n    },\n  });\n}",
+    "testCases": [
+      {
+        "description": "Negative indices count from the end",
+        "input": "const p = negativeIndex([10, 20, 30]);\n[p[-1], p[-2], p[-3]]",
+        "expected": "[30, 20, 10]"
+      },
+      {
+        "description": "Non-negative indices and length are unchanged",
+        "input": "const p = negativeIndex([10, 20, 30]);\n[p[0], p[2], p.length]",
+        "expected": "[10, 30, 3]"
+      },
+      {
+        "description": "Reading before the start gives undefined",
+        "input": "negativeIndex([1, 2])[-5]",
+        "expected": "undefined"
+      },
+      {
+        "description": "Assigning with a negative index overwrites from the end",
+        "input": "const arr = [1, 2, 3];\nconst p = negativeIndex(arr);\np[-1] = 99;\np[-3] = 7;\narr",
+        "expected": "[7, 2, 99]"
+      },
+      {
+        "description": "Assigning before the start throws a RangeError",
+        "input": "const p = negativeIndex([1, 2]);\np[-3] = 1",
+        "expected": "Throws RangeError — message contains \"out of range\""
+      },
+      {
+        "description": "push and the new last element",
+        "input": "const p = negativeIndex([1, 2]);\np.push(3);\n[p[-1], p.length]",
+        "expected": "[3, 3]"
+      },
+      {
+        "description": "Array methods and Array.isArray keep working",
+        "input": "const p = negativeIndex([1, 2, 3]);\n[p.map((x) => x * 2), Array.isArray(p), [...p]]",
+        "expected": "[[2, 4, 6], true, [1, 2, 3]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Negative indices count from the end\", async () => {\n  const sleep = $test.sleep;\n  const p = negativeIndex([10, 20, 30]);\n  return ([p[-1], p[-2], p[-3]]);\n}, () => ([30, 20, 10]));\n\nawait $test.run(\"Non-negative indices and length are unchanged\", async () => {\n  const sleep = $test.sleep;\n  const p = negativeIndex([10, 20, 30]);\n  return ([p[0], p[2], p.length]);\n}, () => ([10, 30, 3]));\n\nawait $test.run(\"Reading before the start gives undefined\", async () => {\n  const sleep = $test.sleep;\n  return (negativeIndex([1, 2])[-5]);\n}, () => (undefined));\n\nawait $test.run(\"Assigning with a negative index overwrites from the end\", async () => {\n  const sleep = $test.sleep;\n  const arr = [1, 2, 3];\n  const p = negativeIndex(arr);\n  p[-1] = 99;\n  p[-3] = 7;\n  return (arr);\n}, () => ([7, 2, 99]));\n\nawait $test.rejects(\"Assigning before the start throws a RangeError\", async () => {\n  const sleep = $test.sleep;\n  const p = negativeIndex([1, 2]);\n  return (p[-3] = 1);\n}, \"out of range\");\n\nawait $test.run(\"push and the new last element\", async () => {\n  const sleep = $test.sleep;\n  const p = negativeIndex([1, 2]);\n  p.push(3);\n  return ([p[-1], p.length]);\n}, () => ([3, 3]));\n\nawait $test.run(\"Array methods and Array.isArray keep working\", async () => {\n  const sleep = $test.sleep;\n  const p = negativeIndex([1, 2, 3]);\n  return ([p.map((x) => x * 2), Array.isArray(p), [...p]]);\n}, () => ([[2, 4, 6], true, [1, 2, 3]]));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each trap converts the key with a constant-time check and forwards to the target array."
+  },
+  {
+    "id": "proxy-revocable-readonly",
+    "track": "js-language",
+    "title": "Proxy: Revocable Deep Read-Only View",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "proxy",
+      "revocable",
+      "immutability",
+      "traps"
+    ],
+    "promptSeed": "Write createReadOnly(obj) returning { proxy, revoke } built with Proxy.revocable. Through proxy: reads work and always reflect the live source object; set, defineProperty and deleteProperty throw TypeError('Read-only'); any property whose value is an object is returned wrapped in its own read-only proxy (so nested writes throw too, deeply). Calling revoke() must revoke the top-level proxy AND every nested proxy created so far, after which any access throws a TypeError (message contains 'revoked').",
+    "difficulty": 3,
+    "concept": "proxy",
+    "referenceSolution": "function createReadOnly(obj) {\n  const revokers = [];\n  const wrap = (target) => {\n    const { proxy, revoke } = Proxy.revocable(target, {\n      get(t, key, receiver) {\n        const value = Reflect.get(t, key, receiver);\n        return value !== null && typeof value === 'object' ? wrap(value) : value;\n      },\n      set() {\n        throw new TypeError('Read-only');\n      },\n      defineProperty() {\n        throw new TypeError('Read-only');\n      },\n      deleteProperty() {\n        throw new TypeError('Read-only');\n      },\n    });\n    revokers.push(revoke);\n    return proxy;\n  };\n  const proxy = wrap(obj);\n  return {\n    proxy,\n    revoke() {\n      revokers.forEach((r) => r());\n    },\n  };\n}",
+    "solution": "function createReadOnly(obj) {\n  const revokers = [];\n  const wrap = (target) => {\n    const { proxy, revoke } = Proxy.revocable(target, {\n      get(t, key, receiver) {\n        const value = Reflect.get(t, key, receiver);\n        return value !== null && typeof value === 'object' ? wrap(value) : value;\n      },\n      set() {\n        throw new TypeError('Read-only');\n      },\n      defineProperty() {\n        throw new TypeError('Read-only');\n      },\n      deleteProperty() {\n        throw new TypeError('Read-only');\n      },\n    });\n    revokers.push(revoke);\n    return proxy;\n  };\n  const proxy = wrap(obj);\n  return {\n    proxy,\n    revoke() {\n      revokers.forEach((r) => r());\n    },\n  };\n}",
+    "starterCode": "function createReadOnly(obj) {\n  const revokers = [];\n  const wrap = (target) => {\n    const { proxy, revoke } = Proxy.revocable(target, {\n      get(t, key, receiver) {\n        const value = Reflect.get(t, key, receiver);\n        return value !== null && typeof value === 'object' ? wrap(value) : value;\n      },\n      set() {\n        throw new TypeError('Read-only');\n      },\n      defineProperty() {\n        throw new TypeError('Read-only');\n      },\n      deleteProperty() {\n        throw new TypeError('Read-only');\n      },\n    });\n    revokers.push(revoke);\n    return proxy;\n  };\n  const proxy = wrap(obj);\n  return {\n    proxy,\n    revoke() {\n      revokers.forEach((r) => r());\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "Reads work and reflect the live source object",
+        "input": "const src = { a: 1 };\nconst { proxy } = createReadOnly(src);\nconst before = proxy.a;\nsrc.a = 2;\n[before, proxy.a]",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "Writes throw TypeError(Read-only)",
+        "input": "const { proxy } = createReadOnly({ a: 1 });\nproxy.a = 5",
+        "expected": "Throws TypeError — message \"Read-only\""
+      },
+      {
+        "description": "Deleting throws",
+        "input": "const { proxy } = createReadOnly({ a: 1 });\ndelete proxy.a",
+        "expected": "Throws TypeError — message \"Read-only\""
+      },
+      {
+        "description": "Object.defineProperty throws",
+        "input": "const { proxy } = createReadOnly({ a: 1 });\nObject.defineProperty(proxy, 'b', { value: 2 })",
+        "expected": "Throws TypeError — message \"Read-only\""
+      },
+      {
+        "description": "Nested objects are read-only too",
+        "input": "const { proxy } = createReadOnly({ inner: { n: 1 } });\nproxy.inner.n = 2",
+        "expected": "Throws TypeError — message \"Read-only\""
+      },
+      {
+        "description": "Nested values can be read",
+        "input": "const { proxy } = createReadOnly({ inner: { list: [1, 2, 3] } });\n[proxy.inner.list[1], proxy.inner.list.length]",
+        "expected": "[2, 3]"
+      },
+      {
+        "description": "After revoke() access throws a TypeError mentioning revoked",
+        "input": "const { proxy, revoke } = createReadOnly({ a: 1 });\nrevoke();\nproxy.a",
+        "expected": "Throws TypeError — message contains \"revoked\""
+      },
+      {
+        "description": "revoke() also revokes nested proxies already handed out",
+        "input": "const { proxy, revoke } = createReadOnly({ inner: { n: 1 } });\nconst inner = proxy.inner;\nrevoke();\ninner.n",
+        "expected": "Throws TypeError — message contains \"revoked\""
+      }
+    ],
+    "testHarness": "await $test.run(\"Reads work and reflect the live source object\", async () => {\n  const sleep = $test.sleep;\n  const src = { a: 1 };\n  const { proxy } = createReadOnly(src);\n  const before = proxy.a;\n  src.a = 2;\n  return ([before, proxy.a]);\n}, () => ([1, 2]));\n\nawait $test.rejects(\"Writes throw TypeError(Read-only)\", async () => {\n  const sleep = $test.sleep;\n  const { proxy } = createReadOnly({ a: 1 });\n  return (proxy.a = 5);\n}, \"Read-only\");\n\nawait $test.rejects(\"Deleting throws\", async () => {\n  const sleep = $test.sleep;\n  const { proxy } = createReadOnly({ a: 1 });\n  return (delete proxy.a);\n}, \"Read-only\");\n\nawait $test.rejects(\"Object.defineProperty throws\", async () => {\n  const sleep = $test.sleep;\n  const { proxy } = createReadOnly({ a: 1 });\n  return (Object.defineProperty(proxy, 'b', { value: 2 }));\n}, \"Read-only\");\n\nawait $test.rejects(\"Nested objects are read-only too\", async () => {\n  const sleep = $test.sleep;\n  const { proxy } = createReadOnly({ inner: { n: 1 } });\n  return (proxy.inner.n = 2);\n}, \"Read-only\");\n\nawait $test.run(\"Nested values can be read\", async () => {\n  const sleep = $test.sleep;\n  const { proxy } = createReadOnly({ inner: { list: [1, 2, 3] } });\n  return ([proxy.inner.list[1], proxy.inner.list.length]);\n}, () => ([2, 3]));\n\nawait $test.rejects(\"After revoke() access throws a TypeError mentioning revoked\", async () => {\n  const sleep = $test.sleep;\n  const { proxy, revoke } = createReadOnly({ a: 1 });\n  revoke();\n  return (proxy.a);\n}, \"revoked\");\n\nawait $test.rejects(\"revoke() also revokes nested proxies already handed out\", async () => {\n  const sleep = $test.sleep;\n  const { proxy, revoke } = createReadOnly({ inner: { n: 1 } });\n  const inner = proxy.inner;\n  revoke();\n  return (inner.n);\n}, \"revoked\");",
+    "targetTime": "O(1) per access",
+    "targetSpace": "O(d)",
+    "complexityExplanation": "Each get wraps at most one nested object lazily; one proxy and revoker is kept per wrapped object."
+  },
+  {
+    "id": "proxy-validation-traps",
+    "track": "js-language",
+    "title": "Proxy: Validation, Delete and Has Traps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "proxy",
+      "validation",
+      "set-trap",
+      "traps"
+    ],
+    "promptSeed": "Write createValidated(target, schema) where schema maps property names to predicate functions. Return a Proxy with: a set trap that throws TypeError('Unknown property: <key>') for keys not in the schema, throws TypeError('Invalid value for <key>') when the predicate rejects the value, and otherwise stores the value and returns true; a deleteProperty trap that throws TypeError('Cannot delete <key>') for schema keys but allows other deletes; a has trap and an ownKeys trap that hide every key starting with '_' (so '_secret' in p is false and Object.keys(p) omits it).",
+    "difficulty": 3,
+    "concept": "proxy",
+    "referenceSolution": "function createValidated(target, schema) {\n  return new Proxy(target, {\n    set(t, key, value, receiver) {\n      if (!(key in schema)) throw new TypeError('Unknown property: ' + String(key));\n      if (!schema[key](value)) throw new TypeError('Invalid value for ' + String(key));\n      return Reflect.set(t, key, value, receiver);\n    },\n    deleteProperty(t, key) {\n      if (key in schema) throw new TypeError('Cannot delete ' + String(key));\n      return Reflect.deleteProperty(t, key);\n    },\n    has(t, key) {\n      if (typeof key === 'string' && key.startsWith('_')) return false;\n      return Reflect.has(t, key);\n    },\n    ownKeys(t) {\n      return Reflect.ownKeys(t).filter((k) => !(typeof k === 'string' && k.startsWith('_')));\n    },\n  });\n}",
+    "solution": "function createValidated(target, schema) {\n  return new Proxy(target, {\n    set(t, key, value, receiver) {\n      if (!(key in schema)) throw new TypeError('Unknown property: ' + String(key));\n      if (!schema[key](value)) throw new TypeError('Invalid value for ' + String(key));\n      return Reflect.set(t, key, value, receiver);\n    },\n    deleteProperty(t, key) {\n      if (key in schema) throw new TypeError('Cannot delete ' + String(key));\n      return Reflect.deleteProperty(t, key);\n    },\n    has(t, key) {\n      if (typeof key === 'string' && key.startsWith('_')) return false;\n      return Reflect.has(t, key);\n    },\n    ownKeys(t) {\n      return Reflect.ownKeys(t).filter((k) => !(typeof k === 'string' && k.startsWith('_')));\n    },\n  });\n}",
+    "starterCode": "function createValidated(target, schema) {\n  return new Proxy(target, {\n    set(t, key, value, receiver) {\n      if (!(key in schema)) throw new TypeError('Unknown property: ' + String(key));\n      if (!schema[key](value)) throw new TypeError('Invalid value for ' + String(key));\n      return Reflect.set(t, key, value, receiver);\n    },\n    deleteProperty(t, key) {\n      if (key in schema) throw new TypeError('Cannot delete ' + String(key));\n      return Reflect.deleteProperty(t, key);\n    },\n    has(t, key) {\n      if (typeof key === 'string' && key.startsWith('_')) return false;\n      return Reflect.has(t, key);\n    },\n    ownKeys(t) {\n      return Reflect.ownKeys(t).filter((k) => !(typeof k === 'string' && k.startsWith('_')));\n    },\n  });\n}",
+    "testCases": [
+      {
+        "description": "A valid assignment is stored",
+        "input": "const p = createValidated({}, { age: (v) => Number.isInteger(v), name: (v) => typeof v === 'string' });\np.age = 30;\np.name = 'Ada';\n[p.age, p.name]",
+        "expected": "[30, 'Ada']"
+      },
+      {
+        "description": "An invalid value throws a TypeError naming the key",
+        "input": "const p = createValidated({}, { age: (v) => Number.isInteger(v) });\np.age = 'x'",
+        "expected": "Throws TypeError — message \"Invalid value for age\""
+      },
+      {
+        "description": "An unknown key is rejected",
+        "input": "const p = createValidated({}, { age: (v) => Number.isInteger(v) });\np.nope = 1",
+        "expected": "Throws TypeError — message \"Unknown property: nope\""
+      },
+      {
+        "description": "Rejected writes leave the target unchanged",
+        "input": "const target = { age: 1 };\nconst p = createValidated(target, { age: (v) => Number.isInteger(v) });\ntry { p.age = 'bad'; } catch (e) {}\ntarget.age",
+        "expected": "1"
+      },
+      {
+        "description": "Deleting a schema key throws",
+        "input": "const p = createValidated({ name: 'a' }, { name: (v) => typeof v === 'string' });\ndelete p.name",
+        "expected": "Throws TypeError — message \"Cannot delete name\""
+      },
+      {
+        "description": "Deleting a non-schema key is allowed",
+        "input": "const target = { name: 'a', extra: 1 };\nconst p = createValidated(target, { name: (v) => typeof v === 'string' });\n[delete p.extra, 'extra' in target]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "Keys starting with _ are hidden from in and Object.keys",
+        "input": "const p = createValidated({ _secret: 1, name: 'a' }, { name: (v) => typeof v === 'string' });\n['_secret' in p, 'name' in p, Object.keys(p)]",
+        "expected": "[false, true, ['name']]"
+      }
+    ],
+    "testHarness": "await $test.run(\"A valid assignment is stored\", async () => {\n  const sleep = $test.sleep;\n  const p = createValidated({}, { age: (v) => Number.isInteger(v), name: (v) => typeof v === 'string' });\n  p.age = 30;\n  p.name = 'Ada';\n  return ([p.age, p.name]);\n}, () => ([30, 'Ada']));\n\nawait $test.rejects(\"An invalid value throws a TypeError naming the key\", async () => {\n  const sleep = $test.sleep;\n  const p = createValidated({}, { age: (v) => Number.isInteger(v) });\n  return (p.age = 'x');\n}, \"Invalid value for age\");\n\nawait $test.rejects(\"An unknown key is rejected\", async () => {\n  const sleep = $test.sleep;\n  const p = createValidated({}, { age: (v) => Number.isInteger(v) });\n  return (p.nope = 1);\n}, \"Unknown property: nope\");\n\nawait $test.run(\"Rejected writes leave the target unchanged\", async () => {\n  const sleep = $test.sleep;\n  const target = { age: 1 };\n  const p = createValidated(target, { age: (v) => Number.isInteger(v) });\n  try { p.age = 'bad'; } catch (e) {}\n  return (target.age);\n}, () => (1));\n\nawait $test.rejects(\"Deleting a schema key throws\", async () => {\n  const sleep = $test.sleep;\n  const p = createValidated({ name: 'a' }, { name: (v) => typeof v === 'string' });\n  return (delete p.name);\n}, \"Cannot delete name\");\n\nawait $test.run(\"Deleting a non-schema key is allowed\", async () => {\n  const sleep = $test.sleep;\n  const target = { name: 'a', extra: 1 };\n  const p = createValidated(target, { name: (v) => typeof v === 'string' });\n  return ([delete p.extra, 'extra' in target]);\n}, () => ([true, false]));\n\nawait $test.run(\"Keys starting with _ are hidden from in and Object.keys\", async () => {\n  const sleep = $test.sleep;\n  const p = createValidated({ _secret: 1, name: 'a' }, { name: (v) => typeof v === 'string' });\n  return (['_secret' in p, 'name' in p, Object.keys(p)]);\n}, () => ([false, true, ['name']]));",
+    "targetTime": "O(1) per trap (O(n) for ownKeys)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each trap does a constant number of lookups; ownKeys filters the key list once."
+  },
+  {
+    "id": "weak-tag-seen",
+    "track": "js-language",
+    "title": "WeakMap and WeakSet: Tagging and Seen-Marks",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "weakmap",
+      "weakset",
+      "metadata",
+      "basics"
+    ],
+    "promptSeed": "Use a module-level WeakMap and WeakSet (no properties may be added to the objects themselves). Write tag(obj, label) that stores a label for obj and returns obj, getTag(obj) returning the label (undefined if none), untag(obj) removing it and returning true if a tag was removed, and markSeen(obj) returning true the first time it is called for an object and false every later time for that same object.",
+    "difficulty": 1,
+    "concept": "weak-collections",
+    "referenceSolution": "const tags = new WeakMap();\nconst seen = new WeakSet();\n\nfunction tag(obj, label) {\n  tags.set(obj, label);\n  return obj;\n}\n\nfunction getTag(obj) {\n  return tags.get(obj);\n}\n\nfunction untag(obj) {\n  return tags.delete(obj);\n}\n\nfunction markSeen(obj) {\n  if (seen.has(obj)) return false;\n  seen.add(obj);\n  return true;\n}",
+    "solution": "const tags = new WeakMap();\nconst seen = new WeakSet();\n\nfunction tag(obj, label) {\n  tags.set(obj, label);\n  return obj;\n}\n\nfunction getTag(obj) {\n  return tags.get(obj);\n}\n\nfunction untag(obj) {\n  return tags.delete(obj);\n}\n\nfunction markSeen(obj) {\n  if (seen.has(obj)) return false;\n  seen.add(obj);\n  return true;\n}",
+    "starterCode": "const tags = new WeakMap();\nconst seen = new WeakSet();\n\nfunction tag(obj, label) {\n  tags.set(obj, label);\n  return obj;\n}\n\nfunction getTag(obj) {\n  return tags.get(obj);\n}\n\nfunction untag(obj) {\n  return tags.delete(obj);\n}\n\nfunction markSeen(obj) {\n  if (seen.has(obj)) return false;\n  seen.add(obj);\n  return true;\n}",
+    "testCases": [
+      {
+        "description": "getTag returns what tag stored, and tag returns the object",
+        "input": "const o = {};\nconst r = tag(o, 'user');\n[r === o, getTag(o)]",
+        "expected": "[true, 'user']"
+      },
+      {
+        "description": "An untagged object has no tag",
+        "input": "getTag({})",
+        "expected": "undefined"
+      },
+      {
+        "description": "Tags are per object (identity), not per shape",
+        "input": "const a = {};\nconst b = {};\ntag(a, 'A');\n[getTag(a), getTag(b)]",
+        "expected": "['A', undefined]"
+      },
+      {
+        "description": "No property is added to the tagged object",
+        "input": "const o = { x: 1 };\ntag(o, 'hidden');\n[Object.keys(o), Object.getOwnPropertySymbols(o).length]",
+        "expected": "[['x'], 0]"
+      },
+      {
+        "description": "untag removes the tag and reports it",
+        "input": "const o = {};\ntag(o, 't');\n[untag(o), getTag(o), untag(o)]",
+        "expected": "[true, undefined, false]"
+      },
+      {
+        "description": "markSeen is true once per object",
+        "input": "const a = {};\nconst b = {};\n[markSeen(a), markSeen(a), markSeen(b), markSeen(a)]",
+        "expected": "[true, false, true, false]"
+      },
+      {
+        "description": "Primitives are not valid weak keys",
+        "input": "let threw = false;\ntry { tag(1, 'x'); } catch (e) { threw = e instanceof TypeError; }\nthrew",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"getTag returns what tag stored, and tag returns the object\", async () => {\n  const sleep = $test.sleep;\n  const o = {};\n  const r = tag(o, 'user');\n  return ([r === o, getTag(o)]);\n}, () => ([true, 'user']));\n\nawait $test.run(\"An untagged object has no tag\", async () => {\n  const sleep = $test.sleep;\n  return (getTag({}));\n}, () => (undefined));\n\nawait $test.run(\"Tags are per object (identity), not per shape\", async () => {\n  const sleep = $test.sleep;\n  const a = {};\n  const b = {};\n  tag(a, 'A');\n  return ([getTag(a), getTag(b)]);\n}, () => (['A', undefined]));\n\nawait $test.run(\"No property is added to the tagged object\", async () => {\n  const sleep = $test.sleep;\n  const o = { x: 1 };\n  tag(o, 'hidden');\n  return ([Object.keys(o), Object.getOwnPropertySymbols(o).length]);\n}, () => ([['x'], 0]));\n\nawait $test.run(\"untag removes the tag and reports it\", async () => {\n  const sleep = $test.sleep;\n  const o = {};\n  tag(o, 't');\n  return ([untag(o), getTag(o), untag(o)]);\n}, () => ([true, undefined, false]));\n\nawait $test.run(\"markSeen is true once per object\", async () => {\n  const sleep = $test.sleep;\n  const a = {};\n  const b = {};\n  return ([markSeen(a), markSeen(a), markSeen(b), markSeen(a)]);\n}, () => ([true, false, true, false]));\n\nawait $test.run(\"Primitives are not valid weak keys\", async () => {\n  const sleep = $test.sleep;\n  let threw = false;\n  try { tag(1, 'x'); } catch (e) { threw = e instanceof TypeError; }\n  return (threw);\n}, () => (true));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "WeakMap and WeakSet operations are constant time; entries are held only while their key objects stay reachable."
+  },
+  {
+    "id": "weakmap-memoize-object",
+    "track": "js-language",
+    "title": "WeakMap: Memoize By Object and Stable IDs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "weakmap",
+      "memoize",
+      "cache",
+      "identity"
+    ],
+    "promptSeed": "Write memoizeByObject(fn) returning a function that caches fn's result in a WeakMap keyed by the FIRST argument's identity (the same object returns the cached result without calling fn again, even if the cached result is undefined). If the first argument is not an object or function (primitives, null), do not cache: call fn every time. Also write idOf(obj) returning a stable positive integer id for each object: the same object always gets the same id and each new object gets the next integer (ids increase by 1).",
+    "difficulty": 2,
+    "concept": "weak-collections",
+    "referenceSolution": "function memoizeByObject(fn) {\n  const cache = new WeakMap();\n  return function (arg, ...rest) {\n    const cacheable = arg !== null && (typeof arg === 'object' || typeof arg === 'function');\n    if (!cacheable) return fn.call(this, arg, ...rest);\n    if (cache.has(arg)) return cache.get(arg);\n    const result = fn.call(this, arg, ...rest);\n    cache.set(arg, result);\n    return result;\n  };\n}\n\nconst ids = new WeakMap();\nlet nextId = 1;\n\nfunction idOf(obj) {\n  if (!ids.has(obj)) ids.set(obj, nextId++);\n  return ids.get(obj);\n}",
+    "solution": "function memoizeByObject(fn) {\n  const cache = new WeakMap();\n  return function (arg, ...rest) {\n    const cacheable = arg !== null && (typeof arg === 'object' || typeof arg === 'function');\n    if (!cacheable) return fn.call(this, arg, ...rest);\n    if (cache.has(arg)) return cache.get(arg);\n    const result = fn.call(this, arg, ...rest);\n    cache.set(arg, result);\n    return result;\n  };\n}\n\nconst ids = new WeakMap();\nlet nextId = 1;\n\nfunction idOf(obj) {\n  if (!ids.has(obj)) ids.set(obj, nextId++);\n  return ids.get(obj);\n}",
+    "starterCode": "function memoizeByObject(fn) {\n  const cache = new WeakMap();\n  return function (arg, ...rest) {\n    const cacheable = arg !== null && (typeof arg === 'object' || typeof arg === 'function');\n    if (!cacheable) return fn.call(this, arg, ...rest);\n    if (cache.has(arg)) return cache.get(arg);\n    const result = fn.call(this, arg, ...rest);\n    cache.set(arg, result);\n    return result;\n  };\n}\n\nconst ids = new WeakMap();\nlet nextId = 1;\n\nfunction idOf(obj) {\n  if (!ids.has(obj)) ids.set(obj, nextId++);\n  return ids.get(obj);\n}",
+    "testCases": [
+      {
+        "description": "The same object argument is computed once",
+        "input": "let calls = 0;\nconst f = memoizeByObject((o) => { calls++; return o.n * 2; });\nconst a = { n: 4 };\n[f(a), f(a), f(a), calls]",
+        "expected": "[8, 8, 8, 1]"
+      },
+      {
+        "description": "Different objects with equal contents are computed separately",
+        "input": "let calls = 0;\nconst f = memoizeByObject((o) => { calls++; return o.n; });\nf({ n: 1 }); f({ n: 1 });\ncalls",
+        "expected": "2"
+      },
+      {
+        "description": "An undefined result is cached too",
+        "input": "let calls = 0;\nconst f = memoizeByObject(() => { calls++; });\nconst o = {};\nf(o); f(o);\ncalls",
+        "expected": "1"
+      },
+      {
+        "description": "Primitive and null arguments are never cached",
+        "input": "let calls = 0;\nconst f = memoizeByObject((x) => { calls++; return x; });\nf(1); f(1); f(null); f(null);\ncalls",
+        "expected": "4"
+      },
+      {
+        "description": "Extra arguments are passed through (cache keyed by the first only)",
+        "input": "const f = memoizeByObject((o, add) => o.n + add);\nconst o = { n: 1 };\n[f(o, 10), f(o, 99)]",
+        "expected": "[11, 11]"
+      },
+      {
+        "description": "Functions can be keys",
+        "input": "let calls = 0;\nconst f = memoizeByObject(() => ++calls);\nconst key = () => {};\n[f(key), f(key)]",
+        "expected": "[1, 1]"
+      },
+      {
+        "description": "idOf is stable per object and increases by one for new objects",
+        "input": "const a = {}; const b = {};\nconst ia = idOf(a);\nconst ib = idOf(b);\n[ib - ia, idOf(a) === ia, idOf(b) === ib, ia > 0]",
+        "expected": "[1, true, true, true]"
+      }
+    ],
+    "testHarness": "await $test.run(\"The same object argument is computed once\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeByObject((o) => { calls++; return o.n * 2; });\n  const a = { n: 4 };\n  return ([f(a), f(a), f(a), calls]);\n}, () => ([8, 8, 8, 1]));\n\nawait $test.run(\"Different objects with equal contents are computed separately\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeByObject((o) => { calls++; return o.n; });\n  f({ n: 1 }); f({ n: 1 });\n  return (calls);\n}, () => (2));\n\nawait $test.run(\"An undefined result is cached too\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeByObject(() => { calls++; });\n  const o = {};\n  f(o); f(o);\n  return (calls);\n}, () => (1));\n\nawait $test.run(\"Primitive and null arguments are never cached\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeByObject((x) => { calls++; return x; });\n  f(1); f(1); f(null); f(null);\n  return (calls);\n}, () => (4));\n\nawait $test.run(\"Extra arguments are passed through (cache keyed by the first only)\", async () => {\n  const sleep = $test.sleep;\n  const f = memoizeByObject((o, add) => o.n + add);\n  const o = { n: 1 };\n  return ([f(o, 10), f(o, 99)]);\n}, () => ([11, 11]));\n\nawait $test.run(\"Functions can be keys\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const f = memoizeByObject(() => ++calls);\n  const key = () => {};\n  return ([f(key), f(key)]);\n}, () => ([1, 1]));\n\nawait $test.run(\"idOf is stable per object and increases by one for new objects\", async () => {\n  const sleep = $test.sleep;\n  const a = {}; const b = {};\n  const ia = idOf(a);\n  const ib = idOf(b);\n  return ([ib - ia, idOf(a) === ia, idOf(b) === ib, ia > 0]);\n}, () => ([1, true, true, true]));",
+    "targetTime": "O(1) per call",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each call is one WeakMap lookup; the cache holds one result per distinct object argument."
+  },
+  {
+    "id": "weakmap-private-state",
+    "track": "js-language",
+    "title": "WeakMap: Private Instance State (Counter, Stack)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "weakmap",
+      "privacy",
+      "class",
+      "encapsulation"
+    ],
+    "promptSeed": "Without using # fields, closures-per-instance or properties on the instance, keep each instance's state in module-level WeakMaps. Write class Counter(start = 0) with increment(), decrement(), reset() (back to the start value) and a getter `value`; and class Stack with push(x), pop() (undefined when empty), peek() and a getter `size`. Object.keys(instance) must be [] and JSON.stringify(instance) must be '{}'.",
+    "difficulty": 2,
+    "concept": "weak-collections",
+    "referenceSolution": "const counterState = new WeakMap();\nconst stackState = new WeakMap();\n\nclass Counter {\n  constructor(start = 0) {\n    counterState.set(this, { start, count: start });\n  }\n  increment() {\n    counterState.get(this).count++;\n    return this;\n  }\n  decrement() {\n    counterState.get(this).count--;\n    return this;\n  }\n  reset() {\n    const state = counterState.get(this);\n    state.count = state.start;\n    return this;\n  }\n  get value() {\n    return counterState.get(this).count;\n  }\n}\n\nclass Stack {\n  constructor() {\n    stackState.set(this, []);\n  }\n  push(x) {\n    stackState.get(this).push(x);\n  }\n  pop() {\n    return stackState.get(this).pop();\n  }\n  peek() {\n    const items = stackState.get(this);\n    return items[items.length - 1];\n  }\n  get size() {\n    return stackState.get(this).length;\n  }\n}",
+    "solution": "const counterState = new WeakMap();\nconst stackState = new WeakMap();\n\nclass Counter {\n  constructor(start = 0) {\n    counterState.set(this, { start, count: start });\n  }\n  increment() {\n    counterState.get(this).count++;\n    return this;\n  }\n  decrement() {\n    counterState.get(this).count--;\n    return this;\n  }\n  reset() {\n    const state = counterState.get(this);\n    state.count = state.start;\n    return this;\n  }\n  get value() {\n    return counterState.get(this).count;\n  }\n}\n\nclass Stack {\n  constructor() {\n    stackState.set(this, []);\n  }\n  push(x) {\n    stackState.get(this).push(x);\n  }\n  pop() {\n    return stackState.get(this).pop();\n  }\n  peek() {\n    const items = stackState.get(this);\n    return items[items.length - 1];\n  }\n  get size() {\n    return stackState.get(this).length;\n  }\n}",
+    "starterCode": "const counterState = new WeakMap();\nconst stackState = new WeakMap();\n\nclass Counter {\n  constructor(start = 0) {\n    counterState.set(this, { start, count: start });\n  }\n  increment() {\n    counterState.get(this).count++;\n    return this;\n  }\n  decrement() {\n    counterState.get(this).count--;\n    return this;\n  }\n  reset() {\n    const state = counterState.get(this);\n    state.count = state.start;\n    return this;\n  }\n  get value() {\n    return counterState.get(this).count;\n  }\n}\n\nclass Stack {\n  constructor() {\n    stackState.set(this, []);\n  }\n  push(x) {\n    stackState.get(this).push(x);\n  }\n  pop() {\n    return stackState.get(this).pop();\n  }\n  peek() {\n    const items = stackState.get(this);\n    return items[items.length - 1];\n  }\n  get size() {\n    return stackState.get(this).length;\n  }\n}",
+    "testCases": [
+      {
+        "description": "Counter counts from its start value",
+        "input": "const c1 = new Counter(5);\nc1.increment(); c1.increment(); c1.decrement();\nc1.value",
+        "expected": "6"
+      },
+      {
+        "description": "Counter default start is 0 and reset returns to the start",
+        "input": "const c1 = new Counter();\nc1.increment().increment();\nconst before = c1.value;\nc1.reset();\n[before, c1.value]",
+        "expected": "[2, 0]"
+      },
+      {
+        "description": "Two Counters are independent",
+        "input": "const a = new Counter();\nconst b = new Counter(100);\na.increment();\n[a.value, b.value]",
+        "expected": "[1, 100]"
+      },
+      {
+        "description": "Counter has no visible state",
+        "input": "const c1 = new Counter(3);\n[Object.keys(c1), Object.getOwnPropertyNames(c1), JSON.stringify(c1)]",
+        "expected": "[[], [], '{}']"
+      },
+      {
+        "description": "Stack push, pop, peek and size",
+        "input": "const s = new Stack();\ns.push(1); s.push(2); s.push(3);\n[s.size, s.peek(), s.pop(), s.pop(), s.size]",
+        "expected": "[3, 3, 3, 2, 1]"
+      },
+      {
+        "description": "An empty Stack",
+        "input": "const s = new Stack();\n[s.pop(), s.peek(), s.size]",
+        "expected": "[undefined, undefined, 0]"
+      },
+      {
+        "description": "Stack has no visible state and instances are independent",
+        "input": "const a = new Stack();\nconst b = new Stack();\na.push('x');\n[Object.keys(a), a.size, b.size]",
+        "expected": "[[], 1, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Counter counts from its start value\", async () => {\n  const sleep = $test.sleep;\n  const c1 = new Counter(5);\n  c1.increment(); c1.increment(); c1.decrement();\n  return (c1.value);\n}, () => (6));\n\nawait $test.run(\"Counter default start is 0 and reset returns to the start\", async () => {\n  const sleep = $test.sleep;\n  const c1 = new Counter();\n  c1.increment().increment();\n  const before = c1.value;\n  c1.reset();\n  return ([before, c1.value]);\n}, () => ([2, 0]));\n\nawait $test.run(\"Two Counters are independent\", async () => {\n  const sleep = $test.sleep;\n  const a = new Counter();\n  const b = new Counter(100);\n  a.increment();\n  return ([a.value, b.value]);\n}, () => ([1, 100]));\n\nawait $test.run(\"Counter has no visible state\", async () => {\n  const sleep = $test.sleep;\n  const c1 = new Counter(3);\n  return ([Object.keys(c1), Object.getOwnPropertyNames(c1), JSON.stringify(c1)]);\n}, () => ([[], [], '{}']));\n\nawait $test.run(\"Stack push, pop, peek and size\", async () => {\n  const sleep = $test.sleep;\n  const s = new Stack();\n  s.push(1); s.push(2); s.push(3);\n  return ([s.size, s.peek(), s.pop(), s.pop(), s.size]);\n}, () => ([3, 3, 3, 2, 1]));\n\nawait $test.run(\"An empty Stack\", async () => {\n  const sleep = $test.sleep;\n  const s = new Stack();\n  return ([s.pop(), s.peek(), s.size]);\n}, () => ([undefined, undefined, 0]));\n\nawait $test.run(\"Stack has no visible state and instances are independent\", async () => {\n  const sleep = $test.sleep;\n  const a = new Stack();\n  const b = new Stack();\n  a.push('x');\n  return ([Object.keys(a), a.size, b.size]);\n}, () => ([[], 1, 0]));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each method does one WeakMap lookup plus a constant-time (or array push/pop) operation; the stack stores its n items."
+  },
+  {
+    "id": "weakset-cycle-detection",
+    "track": "js-language",
+    "title": "WeakSet: Cycle Detection and Object Counting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "weakset",
+      "graph",
+      "recursion",
+      "cycle"
+    ],
+    "promptSeed": "Write hasCycle(value): true when following object/array properties from value ever reaches an object that is currently being visited (a real cycle: a.self = a, a -> b -> a, an array containing itself). The same object referenced twice from different places (a diamond) is NOT a cycle. Primitives and null have no cycle. Use WeakSets (one for the current path, one for finished objects). Write countObjects(root): the number of distinct objects and arrays reachable from root, including root itself, counting each only once even with cycles or sharing (0 for primitives and null).",
+    "difficulty": 3,
+    "concept": "weak-collections",
+    "referenceSolution": "function hasCycle(value) {\n  const path = new WeakSet();\n  const done = new WeakSet();\n  const visit = (node) => {\n    if (node === null || typeof node !== 'object') return false;\n    if (path.has(node)) return true;\n    if (done.has(node)) return false;\n    path.add(node);\n    for (const key of Object.keys(node)) {\n      if (visit(node[key])) return true;\n    }\n    path.delete(node);\n    done.add(node);\n    return false;\n  };\n  return visit(value);\n}\n\nfunction countObjects(root) {\n  const seen = new WeakSet();\n  let count = 0;\n  const visit = (node) => {\n    if (node === null || typeof node !== 'object' || seen.has(node)) return;\n    seen.add(node);\n    count++;\n    for (const key of Object.keys(node)) visit(node[key]);\n  };\n  visit(root);\n  return count;\n}",
+    "solution": "function hasCycle(value) {\n  const path = new WeakSet();\n  const done = new WeakSet();\n  const visit = (node) => {\n    if (node === null || typeof node !== 'object') return false;\n    if (path.has(node)) return true;\n    if (done.has(node)) return false;\n    path.add(node);\n    for (const key of Object.keys(node)) {\n      if (visit(node[key])) return true;\n    }\n    path.delete(node);\n    done.add(node);\n    return false;\n  };\n  return visit(value);\n}\n\nfunction countObjects(root) {\n  const seen = new WeakSet();\n  let count = 0;\n  const visit = (node) => {\n    if (node === null || typeof node !== 'object' || seen.has(node)) return;\n    seen.add(node);\n    count++;\n    for (const key of Object.keys(node)) visit(node[key]);\n  };\n  visit(root);\n  return count;\n}",
+    "starterCode": "function hasCycle(value) {\n  const path = new WeakSet();\n  const done = new WeakSet();\n  const visit = (node) => {\n    if (node === null || typeof node !== 'object') return false;\n    if (path.has(node)) return true;\n    if (done.has(node)) return false;\n    path.add(node);\n    for (const key of Object.keys(node)) {\n      if (visit(node[key])) return true;\n    }\n    path.delete(node);\n    done.add(node);\n    return false;\n  };\n  return visit(value);\n}\n\nfunction countObjects(root) {\n  const seen = new WeakSet();\n  let count = 0;\n  const visit = (node) => {\n    if (node === null || typeof node !== 'object' || seen.has(node)) return;\n    seen.add(node);\n    count++;\n    for (const key of Object.keys(node)) visit(node[key]);\n  };\n  visit(root);\n  return count;\n}",
+    "testCases": [
+      {
+        "description": "A plain tree has no cycle",
+        "input": "hasCycle({ a: { b: [1, 2, { c: 3 }] }, d: 'x' })",
+        "expected": "false"
+      },
+      {
+        "description": "An object referencing itself is a cycle",
+        "input": "const a = {};\na.self = a;\nhasCycle(a)",
+        "expected": "true"
+      },
+      {
+        "description": "An indirect cycle a -> b -> a",
+        "input": "const a = { name: 'a' };\nconst b = { name: 'b', back: a };\na.next = b;\nhasCycle(a)",
+        "expected": "true"
+      },
+      {
+        "description": "An array containing itself",
+        "input": "const arr = [1];\narr.push(arr);\nhasCycle(arr)",
+        "expected": "true"
+      },
+      {
+        "description": "A shared reference (diamond) is not a cycle",
+        "input": "const shared = { v: 1 };\nhasCycle({ x: shared, y: shared, z: [shared] })",
+        "expected": "false"
+      },
+      {
+        "description": "A cycle deep inside a structure is found",
+        "input": "const leaf = {};\nleaf.up = leaf;\nhasCycle({ a: [{ b: leaf }] })",
+        "expected": "true"
+      },
+      {
+        "description": "Primitives and null have no cycle",
+        "input": "[hasCycle(1), hasCycle('s'), hasCycle(null), hasCycle(undefined)]",
+        "expected": "[false, false, false, false]"
+      },
+      {
+        "description": "countObjects counts distinct objects and arrays",
+        "input": "countObjects({ a: { b: {} }, c: [1, {}] })",
+        "expected": "5"
+      },
+      {
+        "description": "countObjects counts a cycle once",
+        "input": "const a = {};\na.me = a;\ncountObjects(a)",
+        "expected": "1"
+      },
+      {
+        "description": "countObjects counts shared objects once",
+        "input": "const shared = {};\n[countObjects({ x: shared, y: shared }), countObjects(null), countObjects(5)]",
+        "expected": "[2, 0, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"A plain tree has no cycle\", async () => {\n  const sleep = $test.sleep;\n  return (hasCycle({ a: { b: [1, 2, { c: 3 }] }, d: 'x' }));\n}, () => (false));\n\nawait $test.run(\"An object referencing itself is a cycle\", async () => {\n  const sleep = $test.sleep;\n  const a = {};\n  a.self = a;\n  return (hasCycle(a));\n}, () => (true));\n\nawait $test.run(\"An indirect cycle a -> b -> a\", async () => {\n  const sleep = $test.sleep;\n  const a = { name: 'a' };\n  const b = { name: 'b', back: a };\n  a.next = b;\n  return (hasCycle(a));\n}, () => (true));\n\nawait $test.run(\"An array containing itself\", async () => {\n  const sleep = $test.sleep;\n  const arr = [1];\n  arr.push(arr);\n  return (hasCycle(arr));\n}, () => (true));\n\nawait $test.run(\"A shared reference (diamond) is not a cycle\", async () => {\n  const sleep = $test.sleep;\n  const shared = { v: 1 };\n  return (hasCycle({ x: shared, y: shared, z: [shared] }));\n}, () => (false));\n\nawait $test.run(\"A cycle deep inside a structure is found\", async () => {\n  const sleep = $test.sleep;\n  const leaf = {};\n  leaf.up = leaf;\n  return (hasCycle({ a: [{ b: leaf }] }));\n}, () => (true));\n\nawait $test.run(\"Primitives and null have no cycle\", async () => {\n  const sleep = $test.sleep;\n  return ([hasCycle(1), hasCycle('s'), hasCycle(null), hasCycle(undefined)]);\n}, () => ([false, false, false, false]));\n\nawait $test.run(\"countObjects counts distinct objects and arrays\", async () => {\n  const sleep = $test.sleep;\n  return (countObjects({ a: { b: {} }, c: [1, {}] }));\n}, () => (5));\n\nawait $test.run(\"countObjects counts a cycle once\", async () => {\n  const sleep = $test.sleep;\n  const a = {};\n  a.me = a;\n  return (countObjects(a));\n}, () => (1));\n\nawait $test.run(\"countObjects counts shared objects once\", async () => {\n  const sleep = $test.sleep;\n  const shared = {};\n  return ([countObjects({ x: shared, y: shared }), countObjects(null), countObjects(5)]);\n}, () => ([2, 0, 0]));",
+    "targetTime": "O(n + e)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each reachable object is entered once and every property edge is followed once, with weak sets storing the visited and ancestor objects."
   }
 ]

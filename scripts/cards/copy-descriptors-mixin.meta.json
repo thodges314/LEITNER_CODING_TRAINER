@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Descriptors: Clone With Descriptors and Mixin",
+  "tags": [
+    "descriptors",
+    "mixin",
+    "clone",
+    "getOwnPropertyDescriptors"
+  ]
+}

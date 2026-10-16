@@ -763,5 +763,75 @@
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Pure compile-time mapped types; there is no runtime work."
+  },
+  "proxy-default-logging": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Each trap call does constant work; the access counter stores one number per distinct key read."
+  },
+  "proxy-negative-index": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each trap converts the key with a constant-time check and forwards to the target array."
+  },
+  "proxy-validation-traps": {
+    "targetTime": "O(1) per trap (O(n) for ownKeys)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each trap does a constant number of lookups; ownKeys filters the key list once."
+  },
+  "proxy-revocable-readonly": {
+    "targetTime": "O(1) per access",
+    "targetSpace": "O(d)",
+    "complexityExplanation": "Each get wraps at most one nested object lazily; one proxy and revoker is kept per wrapped object."
+  },
+  "weak-tag-seen": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "WeakMap and WeakSet operations are constant time; entries are held only while their key objects stay reachable."
+  },
+  "weakmap-private-state": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each method does one WeakMap lookup plus a constant-time (or array push/pop) operation; the stack stores its n items."
+  },
+  "weakmap-memoize-object": {
+    "targetTime": "O(1) per call",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each call is one WeakMap lookup; the cache holds one result per distinct object argument."
+  },
+  "weakset-cycle-detection": {
+    "targetTime": "O(n + e)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each reachable object is entered once and every property edge is followed once, with weak sets storing the visited and ancestor objects."
+  },
+  "descriptor-basics": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each helper makes a single defineProperty or getOwnPropertyDescriptor call."
+  },
+  "getter-setter-pairs": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Accessors perform a constant arithmetic step; a lazy property computes once and then stores its value."
+  },
+  "copy-descriptors-mixin": {
+    "targetTime": "O(p)",
+    "targetSpace": "O(p)",
+    "complexityExplanation": "Every own property key (p) is read and redefined once; accessors are copied without being invoked."
+  },
+  "proto-object-create": {
+    "targetTime": "O(d)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Creating an object is constant time; protoChainLength walks the chain once (depth d)."
+  },
+  "manual-prototype-linking": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Linking prototypes and calling the parent constructor are constant-time steps per instance."
+  },
+  "proto-chain-hasinstance": {
+    "targetTime": "O(d)",
+    "targetSpace": "O(d)",
+    "complexityExplanation": "Each function walks the prototype chain once (depth d); getProtoChain stores the chain in an array."
   }
 }
