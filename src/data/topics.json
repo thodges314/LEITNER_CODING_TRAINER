@@ -5476,7 +5476,7 @@
       "error-handling",
       "basics"
     ],
-    "promptSeed": "Write safeParse(text, fallback) returning the parsed JSON or `fallback` when text is not valid JSON (or not a string). Write safeGet(storage, key, fallback) that reads storage.getItem(key) (a localStorage-like object with getItem(key) and setItem(key, value)) and returns the parsed value or fallback when the key is missing or the stored text is corrupt, and safeSet(storage, key, value) that stores JSON and returns true, or false if storage.setItem throws.",
+    "promptSeed": "Write safeParse(text, fallback) returning the parsed JSON or `fallback` when text is not valid JSON (or not a string). Write safeGet(storage, key, fallback) that reads storage.getItem(key) (a localStorage-like object) and returns the parsed value or fallback when the key is missing or the stored text is corrupt, and safeSet(storage, key, value) that stores JSON and returns true, or false if storage.setItem throws.",
     "difficulty": 1,
     "concept": "storage",
     "referenceSolution": "function safeParse(text, fallback) {\n  if (typeof text !== 'string') return fallback;\n  try {\n    return JSON.parse(text);\n  } catch {\n    return fallback;\n  }\n}\n\nfunction safeGet(storage, key, fallback) {\n  return safeParse(storage.getItem(key), fallback);\n}\n\nfunction safeSet(storage, key, value) {\n  try {\n    storage.setItem(key, JSON.stringify(value));\n    return true;\n  } catch {\n    return false;\n  }\n}",
@@ -5485,41 +5485,36 @@
     "testCases": [
       {
         "description": "safeParse parses valid JSON",
-        "input": "safeParse('{\"a\": [1, 2]}', null)",
-        "expected": "{ a: [1, 2] }"
+        "input": "[safeParse('{\"a\":[1,2]}', null), safeParse('7', 0), safeParse('\"x\"', '')]",
+        "expected": "[{ a: [1, 2] }, 7, 'x']"
       },
       {
-        "description": "safeParse returns fallback on invalid JSON",
-        "input": "safeParse('{invalid json', 'fallback')",
-        "expected": "'fallback'"
+        "description": "safeParse returns the fallback on invalid JSON",
+        "input": "[safeParse('{oops', 'fb'), safeParse('', 'fb'), safeParse(undefined, 'fb'), safeParse(null, 'fb')]",
+        "expected": "['fb', 'fb', 'fb', 'fb']"
       },
       {
         "description": "safeSet stores JSON and returns true",
-        "input": "// storage initially: {}\nsafeSet(storage, 'k', { a: 1 })\n// storage now holds: { k: '{\"a\":1}' }",
-        "expected": "true"
+        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\n[safeSet(s, 'k', { a: 1 }), s.getItem('k')]",
+        "expected": "[true, '{\"a\":1}']"
       },
       {
-        "description": "safeGet reads and parses stored JSON value",
-        "input": "// storage holds: { k: '[1, 2]' }\n// storage.getItem('k') -> '[1, 2]'\nsafeGet(storage, 'k', null)",
-        "expected": "[1, 2]"
-      },
-      {
-        "description": "safeGet returns fallback when key is missing",
-        "input": "// storage holds: {} (key 'missing' does not exist)\n// storage.getItem('missing') -> null\nsafeGet(storage, 'missing', 'none')",
-        "expected": "'none'"
+        "description": "safeGet reads it back and falls back when missing",
+        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\nsafeSet(s, 'k', [1, 2]);\n[safeGet(s, 'k', null), safeGet(s, 'missing', 'none')]",
+        "expected": "[[1, 2], 'none']"
       },
       {
         "description": "safeGet falls back on corrupt stored text",
-        "input": "// storage holds: { bad: '{corrupt json' }\n// storage.getItem('bad') -> '{corrupt json'\nsafeGet(storage, 'bad', 'recovered')",
+        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\ns.setItem('bad', '{not json');\nsafeGet(s, 'bad', 'recovered')",
         "expected": "'recovered'"
       },
       {
-        "description": "safeSet returns false when storage throws",
-        "input": "// storage.setItem throws (e.g. QuotaExceededError)\nsafeSet(storage, 'k', 1)",
+        "description": "safeSet returns false when the storage throws",
+        "input": "safeSet({ setItem() { throw new Error('QuotaExceededError'); } }, 'k', 1)",
         "expected": "false"
       }
     ],
-    "testHarness": "const createStorage = (initial = {}) => {\n  const store = new Map(Object.entries(initial));\n  return {\n    getItem: (k) => (store.has(k) ? store.get(k) : null),\n    setItem: (k, v) => { store.set(k, String(v)); },\n  };\n};\n\nawait $test.run(\"safeParse parses valid JSON\", async () => {\n  return safeParse('{\"a\": [1, 2]}', null);\n}, () => ({ a: [1, 2] }));\n\nawait $test.run(\"safeParse returns fallback on invalid JSON\", async () => {\n  const a = safeParse('{invalid json', 'fallback');\n  const b = safeParse('', 'fallback');\n  const c = safeParse(undefined, 'fallback');\n  const d = safeParse(null, 'fallback');\n  return (a === 'fallback' && b === 'fallback' && c === 'fallback' && d === 'fallback') ? 'fallback' : 'failed';\n}, () => ('fallback'));\n\nawait $test.run(\"safeSet stores JSON and returns true\", async () => {\n  const storage = createStorage();\n  const ok = safeSet(storage, 'k', { a: 1 });\n  return (ok === true && storage.getItem('k') === '{\"a\":1}');\n}, () => (true));\n\nawait $test.run(\"safeGet reads and parses stored JSON value\", async () => {\n  const storage = createStorage({ k: '[1, 2]' });\n  return (safeGet(storage, 'k', null));\n}, () => ([1, 2]));\n\nawait $test.run(\"safeGet returns fallback when key is missing\", async () => {\n  const storage = createStorage();\n  return (safeGet(storage, 'missing', 'none'));\n}, () => ('none'));\n\nawait $test.run(\"safeGet falls back on corrupt stored text\", async () => {\n  const storage = createStorage({ bad: '{not json' });\n  return (safeGet(storage, 'bad', 'recovered'));\n}, () => ('recovered'));\n\nawait $test.run(\"safeSet returns false when storage throws\", async () => {\n  const storage = { getItem: () => null, setItem: () => { throw new Error('QuotaExceededError'); } };\n  return (safeSet(storage, 'k', 1));\n}, () => (false));",
+    "testHarness": "await $test.run(\"safeParse parses valid JSON\", async () => {\n  const sleep = $test.sleep;\n  return ([safeParse('{\"a\":[1,2]}', null), safeParse('7', 0), safeParse('\"x\"', '')]);\n}, () => ([{ a: [1, 2] }, 7, 'x']));\n\nawait $test.run(\"safeParse returns the fallback on invalid JSON\", async () => {\n  const sleep = $test.sleep;\n  return ([safeParse('{oops', 'fb'), safeParse('', 'fb'), safeParse(undefined, 'fb'), safeParse(null, 'fb')]);\n}, () => (['fb', 'fb', 'fb', 'fb']));\n\nawait $test.run(\"safeSet stores JSON and returns true\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  return ([safeSet(s, 'k', { a: 1 }), s.getItem('k')]);\n}, () => ([true, '{\"a\":1}']));\n\nawait $test.run(\"safeGet reads it back and falls back when missing\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  safeSet(s, 'k', [1, 2]);\n  return ([safeGet(s, 'k', null), safeGet(s, 'missing', 'none')]);\n}, () => ([[1, 2], 'none']));\n\nawait $test.run(\"safeGet falls back on corrupt stored text\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  s.setItem('bad', '{not json');\n  return (safeGet(s, 'bad', 'recovered'));\n}, () => ('recovered'));\n\nawait $test.run(\"safeSet returns false when the storage throws\", async () => {\n  const sleep = $test.sleep;\n  return (safeSet({ setItem() { throw new Error('QuotaExceededError'); } }, 'k', 1));\n}, () => (false));",
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Parsing/stringifying JSON dominates, requiring linear time and space in the size of the data processed."
@@ -6807,5 +6802,1189 @@
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
     "complexityExplanation": "All operations (show, dismiss, render) handle at most a fixed limit of toasts, so they run in constant time and use constant extra space."
+  },
+  {
+    "id": "anagram-palindrome",
+    "track": "algorithms",
+    "title": "Strings: Anagram, Palindrome, Common Prefix",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "string",
+      "hash-map",
+      "basics"
+    ],
+    "promptSeed": "Write isAnagram(a, b) (same letters with the same counts; case-sensitive, spaces count), isPalindrome(s) (ignore case and every non-alphanumeric character; an empty string is a palindrome) and longestCommonPrefix(words) (the longest string that starts every word; '' for an empty array).",
+    "difficulty": 1,
+    "concept": "strings",
+    "referenceSolution": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (!counts[ch]) return false;\n    counts[ch]--;\n  }\n  return true;\n}\n\nfunction isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let i = 0;\n  let j = clean.length - 1;\n  while (i < j) {\n    if (clean[i] !== clean[j]) return false;\n    i++;\n    j--;\n  }\n  return true;\n}\n\nfunction longestCommonPrefix(words) {\n  if (!words.length) return '';\n  let prefix = words[0];\n  for (const w of words) {\n    while (!w.startsWith(prefix)) prefix = prefix.slice(0, -1);\n  }\n  return prefix;\n}",
+    "solution": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (!counts[ch]) return false;\n    counts[ch]--;\n  }\n  return true;\n}\n\nfunction isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let i = 0;\n  let j = clean.length - 1;\n  while (i < j) {\n    if (clean[i] !== clean[j]) return false;\n    i++;\n    j--;\n  }\n  return true;\n}\n\nfunction longestCommonPrefix(words) {\n  if (!words.length) return '';\n  let prefix = words[0];\n  for (const w of words) {\n    while (!w.startsWith(prefix)) prefix = prefix.slice(0, -1);\n  }\n  return prefix;\n}",
+    "starterCode": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (!counts[ch]) return false;\n    counts[ch]--;\n  }\n  return true;\n}\n\nfunction isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let i = 0;\n  let j = clean.length - 1;\n  while (i < j) {\n    if (clean[i] !== clean[j]) return false;\n    i++;\n    j--;\n  }\n  return true;\n}\n\nfunction longestCommonPrefix(words) {\n  if (!words.length) return '';\n  let prefix = words[0];\n  for (const w of words) {\n    while (!w.startsWith(prefix)) prefix = prefix.slice(0, -1);\n  }\n  return prefix;\n}",
+    "testCases": [
+      {
+        "description": "isAnagram: matching letters",
+        "input": "[isAnagram('listen', 'silent'), isAnagram('abc', 'cab')]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "isAnagram: different counts or lengths",
+        "input": "[isAnagram('aab', 'abb'), isAnagram('a', 'ab'), isAnagram('rat', 'car')]",
+        "expected": "[false, false, false]"
+      },
+      {
+        "description": "isAnagram: empty strings and case sensitivity",
+        "input": "[isAnagram('', ''), isAnagram('Ab', 'ab')]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "isPalindrome ignores case and punctuation",
+        "input": "[isPalindrome('A man, a plan, a canal: Panama'), isPalindrome('racecar')]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "isPalindrome rejects non-palindromes",
+        "input": "[isPalindrome('race a car'), isPalindrome('ab')]",
+        "expected": "[false, false]"
+      },
+      {
+        "description": "isPalindrome: empty and punctuation-only strings",
+        "input": "[isPalindrome(''), isPalindrome(' .,! ')]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "longestCommonPrefix shared start",
+        "input": "longestCommonPrefix(['flower', 'flow', 'flight'])",
+        "expected": "'fl'"
+      },
+      {
+        "description": "longestCommonPrefix with no overlap or no words",
+        "input": "[longestCommonPrefix(['dog', 'car']), longestCommonPrefix([])]",
+        "expected": "['', '']"
+      },
+      {
+        "description": "longestCommonPrefix: one word and identical words",
+        "input": "[longestCommonPrefix(['solo']), longestCommonPrefix(['abc', 'abc'])]",
+        "expected": "['solo', 'abc']"
+      }
+    ],
+    "testHarness": "await $test.run(\"isAnagram: matching letters\", async () => {\n  const sleep = $test.sleep;\n  return ([isAnagram('listen', 'silent'), isAnagram('abc', 'cab')]);\n}, () => ([true, true]));\n\nawait $test.run(\"isAnagram: different counts or lengths\", async () => {\n  const sleep = $test.sleep;\n  return ([isAnagram('aab', 'abb'), isAnagram('a', 'ab'), isAnagram('rat', 'car')]);\n}, () => ([false, false, false]));\n\nawait $test.run(\"isAnagram: empty strings and case sensitivity\", async () => {\n  const sleep = $test.sleep;\n  return ([isAnagram('', ''), isAnagram('Ab', 'ab')]);\n}, () => ([true, false]));\n\nawait $test.run(\"isPalindrome ignores case and punctuation\", async () => {\n  const sleep = $test.sleep;\n  return ([isPalindrome('A man, a plan, a canal: Panama'), isPalindrome('racecar')]);\n}, () => ([true, true]));\n\nawait $test.run(\"isPalindrome rejects non-palindromes\", async () => {\n  const sleep = $test.sleep;\n  return ([isPalindrome('race a car'), isPalindrome('ab')]);\n}, () => ([false, false]));\n\nawait $test.run(\"isPalindrome: empty and punctuation-only strings\", async () => {\n  const sleep = $test.sleep;\n  return ([isPalindrome(''), isPalindrome(' .,! ')]);\n}, () => ([true, true]));\n\nawait $test.run(\"longestCommonPrefix shared start\", async () => {\n  const sleep = $test.sleep;\n  return (longestCommonPrefix(['flower', 'flow', 'flight']));\n}, () => ('fl'));\n\nawait $test.run(\"longestCommonPrefix with no overlap or no words\", async () => {\n  const sleep = $test.sleep;\n  return ([longestCommonPrefix(['dog', 'car']), longestCommonPrefix([])]);\n}, () => (['', '']));\n\nawait $test.run(\"longestCommonPrefix: one word and identical words\", async () => {\n  const sleep = $test.sleep;\n  return ([longestCommonPrefix(['solo']), longestCommonPrefix(['abc', 'abc'])]);\n}, () => (['solo', 'abc']));"
+  },
+  {
+    "id": "binary-search-variants",
+    "track": "algorithms",
+    "title": "Binary Search: Classic, Lower Bound, Integer Square Root",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "binary-search",
+      "array",
+      "basics"
+    ],
+    "promptSeed": "Write binarySearch(sorted, target) returning the index of target in an ascending array or -1; lowerBound(sorted, target) returning the first index whose value is >= target (sorted.length if none; works with duplicates); and mySqrt(x) returning the floor of the square root of a non-negative integer using binary search (no Math.sqrt).",
+    "difficulty": 2,
+    "concept": "binary-search",
+    "referenceSolution": "function binarySearch(sorted, target) {\n  let lo = 0;\n  let hi = sorted.length - 1;\n  while (lo <= hi) {\n    const mid = (lo + hi) >> 1;\n    if (sorted[mid] === target) return mid;\n    if (sorted[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}\n\nfunction lowerBound(sorted, target) {\n  let lo = 0;\n  let hi = sorted.length;\n  while (lo < hi) {\n    const mid = (lo + hi) >> 1;\n    if (sorted[mid] < target) lo = mid + 1;\n    else hi = mid;\n  }\n  return lo;\n}\n\nfunction mySqrt(x) {\n  let lo = 0;\n  let hi = x;\n  while (lo < hi) {\n    const mid = Math.ceil((lo + hi) / 2);\n    if (mid * mid <= x) lo = mid;\n    else hi = mid - 1;\n  }\n  return lo;\n}",
+    "solution": "function binarySearch(sorted, target) {\n  let lo = 0;\n  let hi = sorted.length - 1;\n  while (lo <= hi) {\n    const mid = (lo + hi) >> 1;\n    if (sorted[mid] === target) return mid;\n    if (sorted[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}\n\nfunction lowerBound(sorted, target) {\n  let lo = 0;\n  let hi = sorted.length;\n  while (lo < hi) {\n    const mid = (lo + hi) >> 1;\n    if (sorted[mid] < target) lo = mid + 1;\n    else hi = mid;\n  }\n  return lo;\n}\n\nfunction mySqrt(x) {\n  let lo = 0;\n  let hi = x;\n  while (lo < hi) {\n    const mid = Math.ceil((lo + hi) / 2);\n    if (mid * mid <= x) lo = mid;\n    else hi = mid - 1;\n  }\n  return lo;\n}",
+    "starterCode": "function binarySearch(sorted, target) {\n  let lo = 0;\n  let hi = sorted.length - 1;\n  while (lo <= hi) {\n    const mid = (lo + hi) >> 1;\n    if (sorted[mid] === target) return mid;\n    if (sorted[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}\n\nfunction lowerBound(sorted, target) {\n  let lo = 0;\n  let hi = sorted.length;\n  while (lo < hi) {\n    const mid = (lo + hi) >> 1;\n    if (sorted[mid] < target) lo = mid + 1;\n    else hi = mid;\n  }\n  return lo;\n}\n\nfunction mySqrt(x) {\n  let lo = 0;\n  let hi = x;\n  while (lo < hi) {\n    const mid = Math.ceil((lo + hi) / 2);\n    if (mid * mid <= x) lo = mid;\n    else hi = mid - 1;\n  }\n  return lo;\n}",
+    "testCases": [
+      {
+        "description": "binarySearch finds present values",
+        "input": "[binarySearch([1, 3, 5, 7, 9], 7), binarySearch([1, 3, 5, 7, 9], 1), binarySearch([1, 3, 5, 7, 9], 9)]",
+        "expected": "[3, 0, 4]"
+      },
+      {
+        "description": "binarySearch returns -1 for missing values and empty arrays",
+        "input": "[binarySearch([1, 3, 5], 4), binarySearch([], 1), binarySearch([2], 3)]",
+        "expected": "[-1, -1, -1]"
+      },
+      {
+        "description": "lowerBound is the first index >= target",
+        "input": "[lowerBound([1, 3, 3, 3, 7], 3), lowerBound([1, 3, 7], 4), lowerBound([1, 3, 7], 0)]",
+        "expected": "[1, 2, 0]"
+      },
+      {
+        "description": "lowerBound past the end and on an empty array",
+        "input": "[lowerBound([1, 3, 7], 100), lowerBound([], 5)]",
+        "expected": "[3, 0]"
+      },
+      {
+        "description": "mySqrt floors the square root",
+        "input": "[mySqrt(0), mySqrt(1), mySqrt(8), mySqrt(16), mySqrt(17)]",
+        "expected": "[0, 1, 2, 4, 4]"
+      },
+      {
+        "description": "mySqrt for large values",
+        "input": "[mySqrt(2147395600), mySqrt(2147483647)]",
+        "expected": "[46340, 46340]"
+      }
+    ],
+    "testHarness": "await $test.run(\"binarySearch finds present values\", async () => {\n  const sleep = $test.sleep;\n  return ([binarySearch([1, 3, 5, 7, 9], 7), binarySearch([1, 3, 5, 7, 9], 1), binarySearch([1, 3, 5, 7, 9], 9)]);\n}, () => ([3, 0, 4]));\n\nawait $test.run(\"binarySearch returns -1 for missing values and empty arrays\", async () => {\n  const sleep = $test.sleep;\n  return ([binarySearch([1, 3, 5], 4), binarySearch([], 1), binarySearch([2], 3)]);\n}, () => ([-1, -1, -1]));\n\nawait $test.run(\"lowerBound is the first index >= target\", async () => {\n  const sleep = $test.sleep;\n  return ([lowerBound([1, 3, 3, 3, 7], 3), lowerBound([1, 3, 7], 4), lowerBound([1, 3, 7], 0)]);\n}, () => ([1, 2, 0]));\n\nawait $test.run(\"lowerBound past the end and on an empty array\", async () => {\n  const sleep = $test.sleep;\n  return ([lowerBound([1, 3, 7], 100), lowerBound([], 5)]);\n}, () => ([3, 0]));\n\nawait $test.run(\"mySqrt floors the square root\", async () => {\n  const sleep = $test.sleep;\n  return ([mySqrt(0), mySqrt(1), mySqrt(8), mySqrt(16), mySqrt(17)]);\n}, () => ([0, 1, 2, 4, 4]));\n\nawait $test.run(\"mySqrt for large values\", async () => {\n  const sleep = $test.sleep;\n  return ([mySqrt(2147395600), mySqrt(2147483647)]);\n}, () => ([46340, 46340]));"
+  },
+  {
+    "id": "bst-search-insert",
+    "track": "algorithms",
+    "title": "Binary Search Tree: Search, Insert, Min/Max",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tree",
+      "bst",
+      "recursion",
+      "basics"
+    ],
+    "promptSeed": "Nodes look like { val, left, right }. For a binary search tree (left < node < right, no duplicates): write searchBST(root, val) returning the node holding val or null; insertBST(root, val) inserting val and returning the root (a new node when root is null; an existing value is left alone); findMin(root) and findMax(root) returning the smallest/largest value (undefined for an empty tree).",
+    "difficulty": 2,
+    "concept": "bst",
+    "referenceSolution": "function searchBST(root, val) {\n  while (root && root.val !== val) {\n    root = val < root.val ? root.left : root.right;\n  }\n  return root || null;\n}\n\nfunction insertBST(root, val) {\n  if (!root) return { val, left: null, right: null };\n  if (val < root.val) root.left = insertBST(root.left, val);\n  else if (val > root.val) root.right = insertBST(root.right, val);\n  return root;\n}\n\nfunction findMin(root) {\n  if (!root) return undefined;\n  while (root.left) root = root.left;\n  return root.val;\n}\n\nfunction findMax(root) {\n  if (!root) return undefined;\n  while (root.right) root = root.right;\n  return root.val;\n}",
+    "solution": "function searchBST(root, val) {\n  while (root && root.val !== val) {\n    root = val < root.val ? root.left : root.right;\n  }\n  return root || null;\n}\n\nfunction insertBST(root, val) {\n  if (!root) return { val, left: null, right: null };\n  if (val < root.val) root.left = insertBST(root.left, val);\n  else if (val > root.val) root.right = insertBST(root.right, val);\n  return root;\n}\n\nfunction findMin(root) {\n  if (!root) return undefined;\n  while (root.left) root = root.left;\n  return root.val;\n}\n\nfunction findMax(root) {\n  if (!root) return undefined;\n  while (root.right) root = root.right;\n  return root.val;\n}",
+    "starterCode": "function searchBST(root, val) {\n  while (root && root.val !== val) {\n    root = val < root.val ? root.left : root.right;\n  }\n  return root || null;\n}\n\nfunction insertBST(root, val) {\n  if (!root) return { val, left: null, right: null };\n  if (val < root.val) root.left = insertBST(root.left, val);\n  else if (val > root.val) root.right = insertBST(root.right, val);\n  return root;\n}\n\nfunction findMin(root) {\n  if (!root) return undefined;\n  while (root.left) root = root.left;\n  return root.val;\n}\n\nfunction findMax(root) {\n  if (!root) return undefined;\n  while (root.right) root = root.right;\n  return root.val;\n}",
+    "testCases": [
+      {
+        "description": "searchBST finds an existing node",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst root = n(4, n(2, n(1), n(3)), n(7));\n[searchBST(root, 2).val, searchBST(root, 7).val]",
+        "expected": "[2, 7]"
+      },
+      {
+        "description": "searchBST returns null when missing",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst root = n(4, n(2), n(7));\n[searchBST(root, 5), searchBST(null, 1)]",
+        "expected": "[null, null]"
+      },
+      {
+        "description": "insertBST into an empty tree creates a node",
+        "input": "insertBST(null, 5)",
+        "expected": "{ val: 5, left: null, right: null }"
+      },
+      {
+        "description": "insertBST places values left and right",
+        "input": "let root = null;\nfor (const v of [5, 3, 8, 1, 4]) root = insertBST(root, v);\n[root.val, root.left.val, root.right.val, root.left.left.val, root.left.right.val]",
+        "expected": "[5, 3, 8, 1, 4]"
+      },
+      {
+        "description": "insertBST ignores duplicates",
+        "input": "let root = null;\nfor (const v of [5, 5, 5]) root = insertBST(root, v);\n[root.left, root.right]",
+        "expected": "[null, null]"
+      },
+      {
+        "description": "findMin and findMax",
+        "input": "let root = null;\nfor (const v of [8, 3, 10, 1, 6, 14]) root = insertBST(root, v);\n[findMin(root), findMax(root)]",
+        "expected": "[1, 14]"
+      },
+      {
+        "description": "findMin and findMax on empty and single trees",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[findMin(null), findMax(null), findMin(n(2)), findMax(n(2))]",
+        "expected": "[undefined, undefined, 2, 2]"
+      }
+    ],
+    "testHarness": "await $test.run(\"searchBST finds an existing node\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const root = n(4, n(2, n(1), n(3)), n(7));\n  return ([searchBST(root, 2).val, searchBST(root, 7).val]);\n}, () => ([2, 7]));\n\nawait $test.run(\"searchBST returns null when missing\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const root = n(4, n(2), n(7));\n  return ([searchBST(root, 5), searchBST(null, 1)]);\n}, () => ([null, null]));\n\nawait $test.run(\"insertBST into an empty tree creates a node\", async () => {\n  const sleep = $test.sleep;\n  return (insertBST(null, 5));\n}, () => ({ val: 5, left: null, right: null }));\n\nawait $test.run(\"insertBST places values left and right\", async () => {\n  const sleep = $test.sleep;\n  let root = null;\n  for (const v of [5, 3, 8, 1, 4]) root = insertBST(root, v);\n  return ([root.val, root.left.val, root.right.val, root.left.left.val, root.left.right.val]);\n}, () => ([5, 3, 8, 1, 4]));\n\nawait $test.run(\"insertBST ignores duplicates\", async () => {\n  const sleep = $test.sleep;\n  let root = null;\n  for (const v of [5, 5, 5]) root = insertBST(root, v);\n  return ([root.left, root.right]);\n}, () => ([null, null]));\n\nawait $test.run(\"findMin and findMax\", async () => {\n  const sleep = $test.sleep;\n  let root = null;\n  for (const v of [8, 3, 10, 1, 6, 14]) root = insertBST(root, v);\n  return ([findMin(root), findMax(root)]);\n}, () => ([1, 14]));\n\nawait $test.run(\"findMin and findMax on empty and single trees\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([findMin(null), findMax(null), findMin(n(2)), findMax(n(2))]);\n}, () => ([undefined, undefined, 2, 2]));"
+  },
+  {
+    "id": "bst-validate-lca-invert",
+    "track": "algorithms",
+    "title": "Binary Tree: Validate BST, Invert, Lowest Common Ancestor",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "bst",
+      "recursion",
+      "lca"
+    ],
+    "promptSeed": "Nodes look like { val, left, right }. Write isValidBST(root) (strict: every left-subtree value < node < every right-subtree value, not just the direct children; an empty tree is valid), invertTree(root) that mirrors the tree in place and returns the root, and lowestCommonAncestor(root, p, q) for a BST where p and q are values present in the tree; return the value of their lowest common ancestor (a node may be its own ancestor).",
+    "difficulty": 3,
+    "concept": "bst",
+    "referenceSolution": "function isValidBST(root, lo = -Infinity, hi = Infinity) {\n  if (!root) return true;\n  if (root.val <= lo || root.val >= hi) return false;\n  return isValidBST(root.left, lo, root.val) && isValidBST(root.right, root.val, hi);\n}\n\nfunction invertTree(root) {\n  if (!root) return root;\n  const left = invertTree(root.left);\n  const right = invertTree(root.right);\n  root.left = right;\n  root.right = left;\n  return root;\n}\n\nfunction lowestCommonAncestor(root, p, q) {\n  let node = root;\n  while (node) {\n    if (p < node.val && q < node.val) node = node.left;\n    else if (p > node.val && q > node.val) node = node.right;\n    else return node.val;\n  }\n  return undefined;\n}",
+    "solution": "function isValidBST(root, lo = -Infinity, hi = Infinity) {\n  if (!root) return true;\n  if (root.val <= lo || root.val >= hi) return false;\n  return isValidBST(root.left, lo, root.val) && isValidBST(root.right, root.val, hi);\n}\n\nfunction invertTree(root) {\n  if (!root) return root;\n  const left = invertTree(root.left);\n  const right = invertTree(root.right);\n  root.left = right;\n  root.right = left;\n  return root;\n}\n\nfunction lowestCommonAncestor(root, p, q) {\n  let node = root;\n  while (node) {\n    if (p < node.val && q < node.val) node = node.left;\n    else if (p > node.val && q > node.val) node = node.right;\n    else return node.val;\n  }\n  return undefined;\n}",
+    "starterCode": "function isValidBST(root, lo = -Infinity, hi = Infinity) {\n  if (!root) return true;\n  if (root.val <= lo || root.val >= hi) return false;\n  return isValidBST(root.left, lo, root.val) && isValidBST(root.right, root.val, hi);\n}\n\nfunction invertTree(root) {\n  if (!root) return root;\n  const left = invertTree(root.left);\n  const right = invertTree(root.right);\n  root.left = right;\n  root.right = left;\n  return root;\n}\n\nfunction lowestCommonAncestor(root, p, q) {\n  let node = root;\n  while (node) {\n    if (p < node.val && q < node.val) node = node.left;\n    else if (p > node.val && q > node.val) node = node.right;\n    else return node.val;\n  }\n  return undefined;\n}",
+    "testCases": [
+      {
+        "description": "isValidBST accepts a valid tree",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nisValidBST(n(5, n(3, n(2), n(4)), n(8)))",
+        "expected": "true"
+      },
+      {
+        "description": "isValidBST rejects a deep violation (not just direct children)",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nisValidBST(n(5, n(3), n(8, n(4), n(9))))",
+        "expected": "false"
+      },
+      {
+        "description": "isValidBST rejects equal values",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nisValidBST(n(2, n(2), n(3)))",
+        "expected": "false"
+      },
+      {
+        "description": "isValidBST: empty and single node",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[isValidBST(null), isValidBST(n(1))]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "invertTree mirrors every level",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst t = invertTree(n(1, n(2, n(4), n(5)), n(3)));\n[t.left.val, t.right.val, t.right.left.val, t.right.right.val]",
+        "expected": "[3, 2, 5, 4]"
+      },
+      {
+        "description": "invertTree of null returns null",
+        "input": "invertTree(null)",
+        "expected": "null"
+      },
+      {
+        "description": "lowestCommonAncestor splits on different sides",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst t = n(6, n(2, n(0), n(4, n(3), n(5))), n(8, n(7), n(9)));\n[lowestCommonAncestor(t, 2, 8), lowestCommonAncestor(t, 3, 5)]",
+        "expected": "[6, 4]"
+      },
+      {
+        "description": "lowestCommonAncestor: a node can be its own ancestor",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst t = n(6, n(2, n(0), n(4)), n(8));\nlowestCommonAncestor(t, 2, 4)",
+        "expected": "2"
+      }
+    ],
+    "testHarness": "await $test.run(\"isValidBST accepts a valid tree\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (isValidBST(n(5, n(3, n(2), n(4)), n(8))));\n}, () => (true));\n\nawait $test.run(\"isValidBST rejects a deep violation (not just direct children)\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (isValidBST(n(5, n(3), n(8, n(4), n(9)))));\n}, () => (false));\n\nawait $test.run(\"isValidBST rejects equal values\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (isValidBST(n(2, n(2), n(3))));\n}, () => (false));\n\nawait $test.run(\"isValidBST: empty and single node\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([isValidBST(null), isValidBST(n(1))]);\n}, () => ([true, true]));\n\nawait $test.run(\"invertTree mirrors every level\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const t = invertTree(n(1, n(2, n(4), n(5)), n(3)));\n  return ([t.left.val, t.right.val, t.right.left.val, t.right.right.val]);\n}, () => ([3, 2, 5, 4]));\n\nawait $test.run(\"invertTree of null returns null\", async () => {\n  const sleep = $test.sleep;\n  return (invertTree(null));\n}, () => (null));\n\nawait $test.run(\"lowestCommonAncestor splits on different sides\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const t = n(6, n(2, n(0), n(4, n(3), n(5))), n(8, n(7), n(9)));\n  return ([lowestCommonAncestor(t, 2, 8), lowestCommonAncestor(t, 3, 5)]);\n}, () => ([6, 4]));\n\nawait $test.run(\"lowestCommonAncestor: a node can be its own ancestor\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const t = n(6, n(2, n(0), n(4)), n(8));\n  return (lowestCommonAncestor(t, 2, 4));\n}, () => (2));"
+  },
+  {
+    "id": "climb-stairs-fib-dp",
+    "track": "algorithms",
+    "title": "Dynamic Programming: Fibonacci and Climbing Stairs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "dp",
+      "memoization",
+      "recursion",
+      "basics"
+    ],
+    "promptSeed": "Write fib(n) (fib(0) = 0, fib(1) = 1) so that fib(50) returns instantly (memoize or iterate; never plain double recursion), and climbStairs(n): the number of distinct ways to climb n steps taking 1 or 2 steps at a time (climbStairs(0) = 1).",
+    "difficulty": 1,
+    "concept": "dp",
+    "referenceSolution": "function fib(n) {\n  let a = 0;\n  let b = 1;\n  for (let i = 0; i < n; i++) {\n    [a, b] = [b, a + b];\n  }\n  return a;\n}\n\nfunction climbStairs(n) {\n  let prev = 1;\n  let cur = 1;\n  for (let i = 2; i <= n; i++) {\n    [prev, cur] = [cur, prev + cur];\n  }\n  return cur;\n}",
+    "solution": "function fib(n) {\n  let a = 0;\n  let b = 1;\n  for (let i = 0; i < n; i++) {\n    [a, b] = [b, a + b];\n  }\n  return a;\n}\n\nfunction climbStairs(n) {\n  let prev = 1;\n  let cur = 1;\n  for (let i = 2; i <= n; i++) {\n    [prev, cur] = [cur, prev + cur];\n  }\n  return cur;\n}",
+    "starterCode": "function fib(n) {\n  let a = 0;\n  let b = 1;\n  for (let i = 0; i < n; i++) {\n    [a, b] = [b, a + b];\n  }\n  return a;\n}\n\nfunction climbStairs(n) {\n  let prev = 1;\n  let cur = 1;\n  for (let i = 2; i <= n; i++) {\n    [prev, cur] = [cur, prev + cur];\n  }\n  return cur;\n}",
+    "testCases": [
+      {
+        "description": "fib small values",
+        "input": "[fib(0), fib(1), fib(2), fib(10)]",
+        "expected": "[0, 1, 1, 55]"
+      },
+      {
+        "description": "fib(50) is fast and exact",
+        "input": "fib(50)",
+        "expected": "12586269025"
+      },
+      {
+        "description": "climbStairs small values",
+        "input": "[climbStairs(0), climbStairs(1), climbStairs(2), climbStairs(3), climbStairs(5)]",
+        "expected": "[1, 1, 2, 3, 8]"
+      },
+      {
+        "description": "climbStairs(40)",
+        "input": "climbStairs(40)",
+        "expected": "165580141"
+      }
+    ],
+    "testHarness": "await $test.run(\"fib small values\", async () => {\n  const sleep = $test.sleep;\n  return ([fib(0), fib(1), fib(2), fib(10)]);\n}, () => ([0, 1, 1, 55]));\n\nawait $test.run(\"fib(50) is fast and exact\", async () => {\n  const sleep = $test.sleep;\n  return (fib(50));\n}, () => (12586269025));\n\nawait $test.run(\"climbStairs small values\", async () => {\n  const sleep = $test.sleep;\n  return ([climbStairs(0), climbStairs(1), climbStairs(2), climbStairs(3), climbStairs(5)]);\n}, () => ([1, 1, 2, 3, 8]));\n\nawait $test.run(\"climbStairs(40)\", async () => {\n  const sleep = $test.sleep;\n  return (climbStairs(40));\n}, () => (165580141));"
+  },
+  {
+    "id": "coin-change-dp",
+    "track": "algorithms",
+    "title": "Dynamic Programming: Coin Change",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "bottom-up",
+      "array"
+    ],
+    "promptSeed": "Write coinChange(coins, amount): the fewest coins (unlimited supply of each denomination) needed to make amount, or -1 when it is impossible. amount 0 needs 0 coins. Also write countWays(coins, amount): the number of distinct combinations (order does not matter) that make amount; countWays(coins, 0) is 1.",
+    "difficulty": 3,
+    "concept": "dp",
+    "referenceSolution": "function coinChange(coins, amount) {\n  const dp = new Array(amount + 1).fill(Infinity);\n  dp[0] = 0;\n  for (let a = 1; a <= amount; a++) {\n    for (const coin of coins) {\n      if (coin <= a && dp[a - coin] + 1 < dp[a]) dp[a] = dp[a - coin] + 1;\n    }\n  }\n  return dp[amount] === Infinity ? -1 : dp[amount];\n}\n\nfunction countWays(coins, amount) {\n  const dp = new Array(amount + 1).fill(0);\n  dp[0] = 1;\n  for (const coin of coins) {\n    for (let a = coin; a <= amount; a++) dp[a] += dp[a - coin];\n  }\n  return dp[amount];\n}",
+    "solution": "function coinChange(coins, amount) {\n  const dp = new Array(amount + 1).fill(Infinity);\n  dp[0] = 0;\n  for (let a = 1; a <= amount; a++) {\n    for (const coin of coins) {\n      if (coin <= a && dp[a - coin] + 1 < dp[a]) dp[a] = dp[a - coin] + 1;\n    }\n  }\n  return dp[amount] === Infinity ? -1 : dp[amount];\n}\n\nfunction countWays(coins, amount) {\n  const dp = new Array(amount + 1).fill(0);\n  dp[0] = 1;\n  for (const coin of coins) {\n    for (let a = coin; a <= amount; a++) dp[a] += dp[a - coin];\n  }\n  return dp[amount];\n}",
+    "starterCode": "function coinChange(coins, amount) {\n  const dp = new Array(amount + 1).fill(Infinity);\n  dp[0] = 0;\n  for (let a = 1; a <= amount; a++) {\n    for (const coin of coins) {\n      if (coin <= a && dp[a - coin] + 1 < dp[a]) dp[a] = dp[a - coin] + 1;\n    }\n  }\n  return dp[amount] === Infinity ? -1 : dp[amount];\n}\n\nfunction countWays(coins, amount) {\n  const dp = new Array(amount + 1).fill(0);\n  dp[0] = 1;\n  for (const coin of coins) {\n    for (let a = coin; a <= amount; a++) dp[a] += dp[a - coin];\n  }\n  return dp[amount];\n}",
+    "testCases": [
+      {
+        "description": "coinChange: fewest coins",
+        "input": "coinChange([1, 2, 5], 11)",
+        "expected": "3"
+      },
+      {
+        "description": "coinChange: greedy is not enough",
+        "input": "coinChange([1, 3, 4], 6)",
+        "expected": "2"
+      },
+      {
+        "description": "coinChange: impossible amount",
+        "input": "coinChange([2], 3)",
+        "expected": "-1"
+      },
+      {
+        "description": "coinChange: amount 0 and exact single coin",
+        "input": "[coinChange([1], 0), coinChange([7], 7)]",
+        "expected": "[0, 1]"
+      },
+      {
+        "description": "countWays counts combinations, not orderings",
+        "input": "countWays([1, 2, 5], 5)",
+        "expected": "4"
+      },
+      {
+        "description": "countWays: impossible and zero amounts",
+        "input": "[countWays([2], 3), countWays([1, 2], 0)]",
+        "expected": "[0, 1]"
+      },
+      {
+        "description": "countWays: larger amount",
+        "input": "countWays([1, 5, 10, 25], 100)",
+        "expected": "242"
+      }
+    ],
+    "testHarness": "await $test.run(\"coinChange: fewest coins\", async () => {\n  const sleep = $test.sleep;\n  return (coinChange([1, 2, 5], 11));\n}, () => (3));\n\nawait $test.run(\"coinChange: greedy is not enough\", async () => {\n  const sleep = $test.sleep;\n  return (coinChange([1, 3, 4], 6));\n}, () => (2));\n\nawait $test.run(\"coinChange: impossible amount\", async () => {\n  const sleep = $test.sleep;\n  return (coinChange([2], 3));\n}, () => (-1));\n\nawait $test.run(\"coinChange: amount 0 and exact single coin\", async () => {\n  const sleep = $test.sleep;\n  return ([coinChange([1], 0), coinChange([7], 7)]);\n}, () => ([0, 1]));\n\nawait $test.run(\"countWays counts combinations, not orderings\", async () => {\n  const sleep = $test.sleep;\n  return (countWays([1, 2, 5], 5));\n}, () => (4));\n\nawait $test.run(\"countWays: impossible and zero amounts\", async () => {\n  const sleep = $test.sleep;\n  return ([countWays([2], 3), countWays([1, 2], 0)]);\n}, () => ([0, 1]));\n\nawait $test.run(\"countWays: larger amount\", async () => {\n  const sleep = $test.sleep;\n  return (countWays([1, 5, 10, 25], 100));\n}, () => (242));"
+  },
+  {
+    "id": "course-schedule-topo",
+    "track": "algorithms",
+    "title": "Graph: Course Schedule (Topological Sort)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "topological-sort",
+      "bfs",
+      "cycle"
+    ],
+    "promptSeed": "There are numCourses courses labelled 0..n-1. prerequisites is an array of [course, prereq] pairs meaning prereq must be taken first. Write canFinish(numCourses, prerequisites): true when every course can be finished (the graph has no cycle). Write findOrder(numCourses, prerequisites): an order in which to take all courses, or [] if impossible; use Kahn's algorithm (queue of zero in-degree nodes, taking the smallest label first when several are available so the answer is deterministic).",
+    "difficulty": 4,
+    "concept": "graphs",
+    "referenceSolution": "function buildGraph(n, prerequisites) {\n  const adj = Array.from({ length: n }, () => []);\n  const indegree = new Array(n).fill(0);\n  for (const [course, pre] of prerequisites) {\n    adj[pre].push(course);\n    indegree[course]++;\n  }\n  return { adj, indegree };\n}\n\nfunction findOrder(numCourses, prerequisites) {\n  const { adj, indegree } = buildGraph(numCourses, prerequisites);\n  const ready = [];\n  for (let i = 0; i < numCourses; i++) if (indegree[i] === 0) ready.push(i);\n  const order = [];\n  while (ready.length) {\n    ready.sort((a, b) => a - b);\n    const node = ready.shift();\n    order.push(node);\n    for (const next of adj[node]) {\n      if (--indegree[next] === 0) ready.push(next);\n    }\n  }\n  return order.length === numCourses ? order : [];\n}\n\nfunction canFinish(numCourses, prerequisites) {\n  return findOrder(numCourses, prerequisites).length === numCourses;\n}",
+    "solution": "function buildGraph(n, prerequisites) {\n  const adj = Array.from({ length: n }, () => []);\n  const indegree = new Array(n).fill(0);\n  for (const [course, pre] of prerequisites) {\n    adj[pre].push(course);\n    indegree[course]++;\n  }\n  return { adj, indegree };\n}\n\nfunction findOrder(numCourses, prerequisites) {\n  const { adj, indegree } = buildGraph(numCourses, prerequisites);\n  const ready = [];\n  for (let i = 0; i < numCourses; i++) if (indegree[i] === 0) ready.push(i);\n  const order = [];\n  while (ready.length) {\n    ready.sort((a, b) => a - b);\n    const node = ready.shift();\n    order.push(node);\n    for (const next of adj[node]) {\n      if (--indegree[next] === 0) ready.push(next);\n    }\n  }\n  return order.length === numCourses ? order : [];\n}\n\nfunction canFinish(numCourses, prerequisites) {\n  return findOrder(numCourses, prerequisites).length === numCourses;\n}",
+    "starterCode": "function buildGraph(n, prerequisites) {\n  const adj = Array.from({ length: n }, () => []);\n  const indegree = new Array(n).fill(0);\n  for (const [course, pre] of prerequisites) {\n    adj[pre].push(course);\n    indegree[course]++;\n  }\n  return { adj, indegree };\n}\n\nfunction findOrder(numCourses, prerequisites) {\n  const { adj, indegree } = buildGraph(numCourses, prerequisites);\n  const ready = [];\n  for (let i = 0; i < numCourses; i++) if (indegree[i] === 0) ready.push(i);\n  const order = [];\n  while (ready.length) {\n    ready.sort((a, b) => a - b);\n    const node = ready.shift();\n    order.push(node);\n    for (const next of adj[node]) {\n      if (--indegree[next] === 0) ready.push(next);\n    }\n  }\n  return order.length === numCourses ? order : [];\n}\n\nfunction canFinish(numCourses, prerequisites) {\n  return findOrder(numCourses, prerequisites).length === numCourses;\n}",
+    "testCases": [
+      {
+        "description": "canFinish: a simple chain",
+        "input": "canFinish(2, [[1, 0]])",
+        "expected": "true"
+      },
+      {
+        "description": "canFinish: a two-course cycle",
+        "input": "canFinish(2, [[1, 0], [0, 1]])",
+        "expected": "false"
+      },
+      {
+        "description": "canFinish: a longer cycle hidden in a bigger graph",
+        "input": "canFinish(4, [[1, 0], [2, 1], [3, 2], [1, 3]])",
+        "expected": "false"
+      },
+      {
+        "description": "canFinish: no prerequisites",
+        "input": "canFinish(3, [])",
+        "expected": "true"
+      },
+      {
+        "description": "findOrder gives a valid order, smallest label first",
+        "input": "findOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]])",
+        "expected": "[0, 1, 2, 3]"
+      },
+      {
+        "description": "findOrder with independent courses uses label order",
+        "input": "findOrder(3, [])",
+        "expected": "[0, 1, 2]"
+      },
+      {
+        "description": "findOrder respects dependencies against label order",
+        "input": "findOrder(3, [[0, 2], [1, 0]])",
+        "expected": "[2, 0, 1]"
+      },
+      {
+        "description": "findOrder returns [] when impossible",
+        "input": "findOrder(2, [[1, 0], [0, 1]])",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await $test.run(\"canFinish: a simple chain\", async () => {\n  const sleep = $test.sleep;\n  return (canFinish(2, [[1, 0]]));\n}, () => (true));\n\nawait $test.run(\"canFinish: a two-course cycle\", async () => {\n  const sleep = $test.sleep;\n  return (canFinish(2, [[1, 0], [0, 1]]));\n}, () => (false));\n\nawait $test.run(\"canFinish: a longer cycle hidden in a bigger graph\", async () => {\n  const sleep = $test.sleep;\n  return (canFinish(4, [[1, 0], [2, 1], [3, 2], [1, 3]]));\n}, () => (false));\n\nawait $test.run(\"canFinish: no prerequisites\", async () => {\n  const sleep = $test.sleep;\n  return (canFinish(3, []));\n}, () => (true));\n\nawait $test.run(\"findOrder gives a valid order, smallest label first\", async () => {\n  const sleep = $test.sleep;\n  return (findOrder(4, [[1, 0], [2, 0], [3, 1], [3, 2]]));\n}, () => ([0, 1, 2, 3]));\n\nawait $test.run(\"findOrder with independent courses uses label order\", async () => {\n  const sleep = $test.sleep;\n  return (findOrder(3, []));\n}, () => ([0, 1, 2]));\n\nawait $test.run(\"findOrder respects dependencies against label order\", async () => {\n  const sleep = $test.sleep;\n  return (findOrder(3, [[0, 2], [1, 0]]));\n}, () => ([2, 0, 1]));\n\nawait $test.run(\"findOrder returns [] when impossible\", async () => {\n  const sleep = $test.sleep;\n  return (findOrder(2, [[1, 0], [0, 1]]));\n}, () => ([]));"
+  },
+  {
+    "id": "flood-fill-islands",
+    "track": "algorithms",
+    "title": "Grid DFS: Flood Fill and Number of Islands",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "grid",
+      "dfs",
+      "bfs"
+    ],
+    "promptSeed": "Write floodFill(image, sr, sc, color): replace the 4-directionally connected region of equal values that contains (sr, sc) with color and return the image (if the start cell already has color, change nothing). Write numIslands(grid): the number of 4-directionally connected groups of '1' cells in a grid of '0'/'1' strings (an empty grid has 0). numIslands must not mutate the caller's grid.",
+    "difficulty": 3,
+    "concept": "graphs",
+    "referenceSolution": "function floodFill(image, sr, sc, color) {\n  const original = image[sr][sc];\n  if (original === color) return image;\n  const fill = (r, c) => {\n    if (r < 0 || c < 0 || r >= image.length || c >= image[0].length) return;\n    if (image[r][c] !== original) return;\n    image[r][c] = color;\n    fill(r + 1, c);\n    fill(r - 1, c);\n    fill(r, c + 1);\n    fill(r, c - 1);\n  };\n  fill(sr, sc);\n  return image;\n}\n\nfunction numIslands(grid) {\n  const seen = new Set();\n  let count = 0;\n  const visit = (r, c) => {\n    if (r < 0 || c < 0 || r >= grid.length || c >= grid[0].length) return;\n    if (grid[r][c] !== '1' || seen.has(r + ',' + c)) return;\n    seen.add(r + ',' + c);\n    visit(r + 1, c);\n    visit(r - 1, c);\n    visit(r, c + 1);\n    visit(r, c - 1);\n  };\n  for (let r = 0; r < grid.length; r++) {\n    for (let c = 0; c < grid[0].length; c++) {\n      if (grid[r][c] === '1' && !seen.has(r + ',' + c)) {\n        count++;\n        visit(r, c);\n      }\n    }\n  }\n  return count;\n}",
+    "solution": "function floodFill(image, sr, sc, color) {\n  const original = image[sr][sc];\n  if (original === color) return image;\n  const fill = (r, c) => {\n    if (r < 0 || c < 0 || r >= image.length || c >= image[0].length) return;\n    if (image[r][c] !== original) return;\n    image[r][c] = color;\n    fill(r + 1, c);\n    fill(r - 1, c);\n    fill(r, c + 1);\n    fill(r, c - 1);\n  };\n  fill(sr, sc);\n  return image;\n}\n\nfunction numIslands(grid) {\n  const seen = new Set();\n  let count = 0;\n  const visit = (r, c) => {\n    if (r < 0 || c < 0 || r >= grid.length || c >= grid[0].length) return;\n    if (grid[r][c] !== '1' || seen.has(r + ',' + c)) return;\n    seen.add(r + ',' + c);\n    visit(r + 1, c);\n    visit(r - 1, c);\n    visit(r, c + 1);\n    visit(r, c - 1);\n  };\n  for (let r = 0; r < grid.length; r++) {\n    for (let c = 0; c < grid[0].length; c++) {\n      if (grid[r][c] === '1' && !seen.has(r + ',' + c)) {\n        count++;\n        visit(r, c);\n      }\n    }\n  }\n  return count;\n}",
+    "starterCode": "function floodFill(image, sr, sc, color) {\n  const original = image[sr][sc];\n  if (original === color) return image;\n  const fill = (r, c) => {\n    if (r < 0 || c < 0 || r >= image.length || c >= image[0].length) return;\n    if (image[r][c] !== original) return;\n    image[r][c] = color;\n    fill(r + 1, c);\n    fill(r - 1, c);\n    fill(r, c + 1);\n    fill(r, c - 1);\n  };\n  fill(sr, sc);\n  return image;\n}\n\nfunction numIslands(grid) {\n  const seen = new Set();\n  let count = 0;\n  const visit = (r, c) => {\n    if (r < 0 || c < 0 || r >= grid.length || c >= grid[0].length) return;\n    if (grid[r][c] !== '1' || seen.has(r + ',' + c)) return;\n    seen.add(r + ',' + c);\n    visit(r + 1, c);\n    visit(r - 1, c);\n    visit(r, c + 1);\n    visit(r, c - 1);\n  };\n  for (let r = 0; r < grid.length; r++) {\n    for (let c = 0; c < grid[0].length; c++) {\n      if (grid[r][c] === '1' && !seen.has(r + ',' + c)) {\n        count++;\n        visit(r, c);\n      }\n    }\n  }\n  return count;\n}",
+    "testCases": [
+      {
+        "description": "floodFill recolors the connected region",
+        "input": "floodFill([[1, 1, 1], [1, 1, 0], [1, 0, 1]], 1, 1, 2)",
+        "expected": "[[2, 2, 2], [2, 2, 0], [2, 0, 1]]"
+      },
+      {
+        "description": "floodFill does not cross diagonals",
+        "input": "floodFill([[0, 0], [0, 1]], 0, 0, 5)",
+        "expected": "[[5, 5], [5, 1]]"
+      },
+      {
+        "description": "floodFill with the same color changes nothing",
+        "input": "floodFill([[0, 0], [0, 0]], 0, 0, 0)",
+        "expected": "[[0, 0], [0, 0]]"
+      },
+      {
+        "description": "floodFill on a single cell",
+        "input": "floodFill([[3]], 0, 0, 9)",
+        "expected": "[[9]]"
+      },
+      {
+        "description": "numIslands counts separate groups",
+        "input": "numIslands([['1', '1', '0', '0'], ['1', '0', '0', '1'], ['0', '0', '1', '1'], ['0', '0', '0', '0']])",
+        "expected": "2"
+      },
+      {
+        "description": "numIslands: diagonal cells are separate islands",
+        "input": "numIslands([['1', '0'], ['0', '1']])",
+        "expected": "2"
+      },
+      {
+        "description": "numIslands: empty grid and all water",
+        "input": "[numIslands([]), numIslands([['0', '0'], ['0', '0']])]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "numIslands does not mutate the grid",
+        "input": "const g = [['1', '1'], ['0', '1']];\nnumIslands(g);\ng",
+        "expected": "[['1', '1'], ['0', '1']]"
+      }
+    ],
+    "testHarness": "await $test.run(\"floodFill recolors the connected region\", async () => {\n  const sleep = $test.sleep;\n  return (floodFill([[1, 1, 1], [1, 1, 0], [1, 0, 1]], 1, 1, 2));\n}, () => ([[2, 2, 2], [2, 2, 0], [2, 0, 1]]));\n\nawait $test.run(\"floodFill does not cross diagonals\", async () => {\n  const sleep = $test.sleep;\n  return (floodFill([[0, 0], [0, 1]], 0, 0, 5));\n}, () => ([[5, 5], [5, 1]]));\n\nawait $test.run(\"floodFill with the same color changes nothing\", async () => {\n  const sleep = $test.sleep;\n  return (floodFill([[0, 0], [0, 0]], 0, 0, 0));\n}, () => ([[0, 0], [0, 0]]));\n\nawait $test.run(\"floodFill on a single cell\", async () => {\n  const sleep = $test.sleep;\n  return (floodFill([[3]], 0, 0, 9));\n}, () => ([[9]]));\n\nawait $test.run(\"numIslands counts separate groups\", async () => {\n  const sleep = $test.sleep;\n  return (numIslands([['1', '1', '0', '0'], ['1', '0', '0', '1'], ['0', '0', '1', '1'], ['0', '0', '0', '0']]));\n}, () => (2));\n\nawait $test.run(\"numIslands: diagonal cells are separate islands\", async () => {\n  const sleep = $test.sleep;\n  return (numIslands([['1', '0'], ['0', '1']]));\n}, () => (2));\n\nawait $test.run(\"numIslands: empty grid and all water\", async () => {\n  const sleep = $test.sleep;\n  return ([numIslands([]), numIslands([['0', '0'], ['0', '0']])]);\n}, () => ([0, 0]));\n\nawait $test.run(\"numIslands does not mutate the grid\", async () => {\n  const sleep = $test.sleep;\n  const g = [['1', '1'], ['0', '1']];\n  numIslands(g);\n  return (g);\n}, () => ([['1', '1'], ['0', '1']]));"
+  },
+  {
+    "id": "group-anagrams-top-k",
+    "track": "algorithms",
+    "title": "Hash Map: Group Anagrams and Top K Frequent",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hash-map",
+      "sorting",
+      "frequency"
+    ],
+    "promptSeed": "Write groupAnagrams(words) returning an array of groups (arrays) of words that are anagrams of each other; keep the first-seen order of groups and of the words inside each group. Write topKFrequent(nums, k) returning the k most frequent numbers, most frequent first; break ties by smaller number first.",
+    "difficulty": 2,
+    "concept": "hashing",
+    "referenceSolution": "function groupAnagrams(words) {\n  const groups = new Map();\n  for (const w of words) {\n    const key = w.split('').sort().join('');\n    if (!groups.has(key)) groups.set(key, []);\n    groups.get(key).push(w);\n  }\n  return [...groups.values()];\n}\n\nfunction topKFrequent(nums, k) {\n  const counts = new Map();\n  for (const n of nums) counts.set(n, (counts.get(n) || 0) + 1);\n  return [...counts.entries()]\n    .sort((a, b) => b[1] - a[1] || a[0] - b[0])\n    .slice(0, k)\n    .map(([n]) => n);\n}",
+    "solution": "function groupAnagrams(words) {\n  const groups = new Map();\n  for (const w of words) {\n    const key = w.split('').sort().join('');\n    if (!groups.has(key)) groups.set(key, []);\n    groups.get(key).push(w);\n  }\n  return [...groups.values()];\n}\n\nfunction topKFrequent(nums, k) {\n  const counts = new Map();\n  for (const n of nums) counts.set(n, (counts.get(n) || 0) + 1);\n  return [...counts.entries()]\n    .sort((a, b) => b[1] - a[1] || a[0] - b[0])\n    .slice(0, k)\n    .map(([n]) => n);\n}",
+    "starterCode": "function groupAnagrams(words) {\n  const groups = new Map();\n  for (const w of words) {\n    const key = w.split('').sort().join('');\n    if (!groups.has(key)) groups.set(key, []);\n    groups.get(key).push(w);\n  }\n  return [...groups.values()];\n}\n\nfunction topKFrequent(nums, k) {\n  const counts = new Map();\n  for (const n of nums) counts.set(n, (counts.get(n) || 0) + 1);\n  return [...counts.entries()]\n    .sort((a, b) => b[1] - a[1] || a[0] - b[0])\n    .slice(0, k)\n    .map(([n]) => n);\n}",
+    "testCases": [
+      {
+        "description": "groupAnagrams groups by letters, first-seen order",
+        "input": "groupAnagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat'])",
+        "expected": "[['eat', 'tea', 'ate'], ['tan', 'nat'], ['bat']]"
+      },
+      {
+        "description": "groupAnagrams: empty input and single word",
+        "input": "[groupAnagrams([]), groupAnagrams(['a'])]",
+        "expected": "[[], [['a']]]"
+      },
+      {
+        "description": "groupAnagrams: empty string forms its own group",
+        "input": "groupAnagrams(['', 'a', ''])",
+        "expected": "[['', ''], ['a']]"
+      },
+      {
+        "description": "topKFrequent returns the most frequent first",
+        "input": "topKFrequent([1, 1, 1, 2, 2, 3], 2)",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "topKFrequent breaks ties by smaller number",
+        "input": "topKFrequent([4, 4, 3, 3, 9], 2)",
+        "expected": "[3, 4]"
+      },
+      {
+        "description": "topKFrequent with k larger than distinct values",
+        "input": "topKFrequent([5, 5, 6], 5)",
+        "expected": "[5, 6]"
+      },
+      {
+        "description": "topKFrequent with a single value",
+        "input": "topKFrequent([7], 1)",
+        "expected": "[7]"
+      }
+    ],
+    "testHarness": "await $test.run(\"groupAnagrams groups by letters, first-seen order\", async () => {\n  const sleep = $test.sleep;\n  return (groupAnagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat']));\n}, () => ([['eat', 'tea', 'ate'], ['tan', 'nat'], ['bat']]));\n\nawait $test.run(\"groupAnagrams: empty input and single word\", async () => {\n  const sleep = $test.sleep;\n  return ([groupAnagrams([]), groupAnagrams(['a'])]);\n}, () => ([[], [['a']]]));\n\nawait $test.run(\"groupAnagrams: empty string forms its own group\", async () => {\n  const sleep = $test.sleep;\n  return (groupAnagrams(['', 'a', '']));\n}, () => ([['', ''], ['a']]));\n\nawait $test.run(\"topKFrequent returns the most frequent first\", async () => {\n  const sleep = $test.sleep;\n  return (topKFrequent([1, 1, 1, 2, 2, 3], 2));\n}, () => ([1, 2]));\n\nawait $test.run(\"topKFrequent breaks ties by smaller number\", async () => {\n  const sleep = $test.sleep;\n  return (topKFrequent([4, 4, 3, 3, 9], 2));\n}, () => ([3, 4]));\n\nawait $test.run(\"topKFrequent with k larger than distinct values\", async () => {\n  const sleep = $test.sleep;\n  return (topKFrequent([5, 5, 6], 5));\n}, () => ([5, 6]));\n\nawait $test.run(\"topKFrequent with a single value\", async () => {\n  const sleep = $test.sleep;\n  return (topKFrequent([7], 1));\n}, () => ([7]));"
+  },
+  {
+    "id": "kadane-prefix-sum",
+    "track": "algorithms",
+    "title": "Arrays: Maximum Subarray and Prefix Sums",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "array",
+      "dp",
+      "prefix-sum",
+      "kadane"
+    ],
+    "promptSeed": "Write maxSubarray(nums): the largest sum of any non-empty contiguous subarray (Kadane's algorithm; works when every number is negative; 0 for an empty array). Write productExceptSelf(nums): an array where element i is the product of all other elements, without using division. Write subarraySum(nums, k): the number of contiguous subarrays whose sum equals k (prefix sums + hash map).",
+    "difficulty": 2,
+    "concept": "arrays",
+    "referenceSolution": "function maxSubarray(nums) {\n  if (!nums.length) return 0;\n  let best = nums[0];\n  let cur = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    cur = Math.max(nums[i], cur + nums[i]);\n    best = Math.max(best, cur);\n  }\n  return best;\n}\n\nfunction productExceptSelf(nums) {\n  const out = new Array(nums.length).fill(1);\n  let left = 1;\n  for (let i = 0; i < nums.length; i++) {\n    out[i] = left;\n    left *= nums[i];\n  }\n  let right = 1;\n  for (let i = nums.length - 1; i >= 0; i--) {\n    out[i] *= right;\n    right *= nums[i];\n  }\n  return out;\n}\n\nfunction subarraySum(nums, k) {\n  const seen = new Map([[0, 1]]);\n  let sum = 0;\n  let count = 0;\n  for (const n of nums) {\n    sum += n;\n    count += seen.get(sum - k) || 0;\n    seen.set(sum, (seen.get(sum) || 0) + 1);\n  }\n  return count;\n}",
+    "solution": "function maxSubarray(nums) {\n  if (!nums.length) return 0;\n  let best = nums[0];\n  let cur = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    cur = Math.max(nums[i], cur + nums[i]);\n    best = Math.max(best, cur);\n  }\n  return best;\n}\n\nfunction productExceptSelf(nums) {\n  const out = new Array(nums.length).fill(1);\n  let left = 1;\n  for (let i = 0; i < nums.length; i++) {\n    out[i] = left;\n    left *= nums[i];\n  }\n  let right = 1;\n  for (let i = nums.length - 1; i >= 0; i--) {\n    out[i] *= right;\n    right *= nums[i];\n  }\n  return out;\n}\n\nfunction subarraySum(nums, k) {\n  const seen = new Map([[0, 1]]);\n  let sum = 0;\n  let count = 0;\n  for (const n of nums) {\n    sum += n;\n    count += seen.get(sum - k) || 0;\n    seen.set(sum, (seen.get(sum) || 0) + 1);\n  }\n  return count;\n}",
+    "starterCode": "function maxSubarray(nums) {\n  if (!nums.length) return 0;\n  let best = nums[0];\n  let cur = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    cur = Math.max(nums[i], cur + nums[i]);\n    best = Math.max(best, cur);\n  }\n  return best;\n}\n\nfunction productExceptSelf(nums) {\n  const out = new Array(nums.length).fill(1);\n  let left = 1;\n  for (let i = 0; i < nums.length; i++) {\n    out[i] = left;\n    left *= nums[i];\n  }\n  let right = 1;\n  for (let i = nums.length - 1; i >= 0; i--) {\n    out[i] *= right;\n    right *= nums[i];\n  }\n  return out;\n}\n\nfunction subarraySum(nums, k) {\n  const seen = new Map([[0, 1]]);\n  let sum = 0;\n  let count = 0;\n  for (const n of nums) {\n    sum += n;\n    count += seen.get(sum - k) || 0;\n    seen.set(sum, (seen.get(sum) || 0) + 1);\n  }\n  return count;\n}",
+    "testCases": [
+      {
+        "description": "maxSubarray classic example",
+        "input": "maxSubarray([-2, 1, -3, 4, -1, 2, 1, -5, 4])",
+        "expected": "6"
+      },
+      {
+        "description": "maxSubarray with all negatives picks the largest element",
+        "input": "maxSubarray([-5, -2, -9])",
+        "expected": "-2"
+      },
+      {
+        "description": "maxSubarray: single element and empty array",
+        "input": "[maxSubarray([7]), maxSubarray([])]",
+        "expected": "[7, 0]"
+      },
+      {
+        "description": "productExceptSelf without division",
+        "input": "productExceptSelf([1, 2, 3, 4])",
+        "expected": "[24, 12, 8, 6]"
+      },
+      {
+        "description": "productExceptSelf with a zero",
+        "input": "productExceptSelf([1, 0, 3, 4])",
+        "expected": "[0, 12, 0, 0]"
+      },
+      {
+        "description": "productExceptSelf with two elements",
+        "input": "productExceptSelf([5, 2])",
+        "expected": "[2, 5]"
+      },
+      {
+        "description": "subarraySum counts all matching subarrays",
+        "input": "[subarraySum([1, 1, 1], 2), subarraySum([1, 2, 3], 3)]",
+        "expected": "[2, 2]"
+      },
+      {
+        "description": "subarraySum with negatives and zeros",
+        "input": "[subarraySum([1, -1, 0], 0), subarraySum([0, 0, 0], 0)]",
+        "expected": "[3, 6]"
+      }
+    ],
+    "testHarness": "await $test.run(\"maxSubarray classic example\", async () => {\n  const sleep = $test.sleep;\n  return (maxSubarray([-2, 1, -3, 4, -1, 2, 1, -5, 4]));\n}, () => (6));\n\nawait $test.run(\"maxSubarray with all negatives picks the largest element\", async () => {\n  const sleep = $test.sleep;\n  return (maxSubarray([-5, -2, -9]));\n}, () => (-2));\n\nawait $test.run(\"maxSubarray: single element and empty array\", async () => {\n  const sleep = $test.sleep;\n  return ([maxSubarray([7]), maxSubarray([])]);\n}, () => ([7, 0]));\n\nawait $test.run(\"productExceptSelf without division\", async () => {\n  const sleep = $test.sleep;\n  return (productExceptSelf([1, 2, 3, 4]));\n}, () => ([24, 12, 8, 6]));\n\nawait $test.run(\"productExceptSelf with a zero\", async () => {\n  const sleep = $test.sleep;\n  return (productExceptSelf([1, 0, 3, 4]));\n}, () => ([0, 12, 0, 0]));\n\nawait $test.run(\"productExceptSelf with two elements\", async () => {\n  const sleep = $test.sleep;\n  return (productExceptSelf([5, 2]));\n}, () => ([2, 5]));\n\nawait $test.run(\"subarraySum counts all matching subarrays\", async () => {\n  const sleep = $test.sleep;\n  return ([subarraySum([1, 1, 1], 2), subarraySum([1, 2, 3], 3)]);\n}, () => ([2, 2]));\n\nawait $test.run(\"subarraySum with negatives and zeros\", async () => {\n  const sleep = $test.sleep;\n  return ([subarraySum([1, -1, 0], 0), subarraySum([0, 0, 0], 0)]);\n}, () => ([3, 6]));"
+  },
+  {
+    "id": "linked-list-cycle-merge",
+    "track": "algorithms",
+    "title": "Linked List: Cycle Detection and Merge Sorted Lists",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "linked-list",
+      "two-pointer",
+      "floyd"
+    ],
+    "promptSeed": "Nodes look like { val, next }. Write hasCycle(head) using Floyd's tortoise and hare (O(1) extra space; true when some node can be reached twice by following next), and mergeTwoLists(a, b) that merges two sorted lists into one sorted list by relinking nodes (no new nodes) and returns the head. Either input may be null; when values tie, take from a first.",
+    "difficulty": 2,
+    "concept": "linked-lists",
+    "referenceSolution": "function hasCycle(head) {\n  let slow = head;\n  let fast = head;\n  while (fast && fast.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n    if (slow === fast) return true;\n  }\n  return false;\n}\n\nfunction mergeTwoLists(a, b) {\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  while (a && b) {\n    if (a.val <= b.val) {\n      tail.next = a;\n      a = a.next;\n    } else {\n      tail.next = b;\n      b = b.next;\n    }\n    tail = tail.next;\n  }\n  tail.next = a || b;\n  return dummy.next;\n}",
+    "solution": "function hasCycle(head) {\n  let slow = head;\n  let fast = head;\n  while (fast && fast.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n    if (slow === fast) return true;\n  }\n  return false;\n}\n\nfunction mergeTwoLists(a, b) {\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  while (a && b) {\n    if (a.val <= b.val) {\n      tail.next = a;\n      a = a.next;\n    } else {\n      tail.next = b;\n      b = b.next;\n    }\n    tail = tail.next;\n  }\n  tail.next = a || b;\n  return dummy.next;\n}",
+    "starterCode": "function hasCycle(head) {\n  let slow = head;\n  let fast = head;\n  while (fast && fast.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n    if (slow === fast) return true;\n  }\n  return false;\n}\n\nfunction mergeTwoLists(a, b) {\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  while (a && b) {\n    if (a.val <= b.val) {\n      tail.next = a;\n      a = a.next;\n    } else {\n      tail.next = b;\n      b = b.next;\n    }\n    tail = tail.next;\n  }\n  tail.next = a || b;\n  return dummy.next;\n}",
+    "testCases": [
+      {
+        "description": "hasCycle: a list without a cycle",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nhasCycle(list(1, 2, 3, 4))",
+        "expected": "false"
+      },
+      {
+        "description": "hasCycle: the tail points back into the list",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst h = list(1, 2, 3, 4);\nh.next.next.next.next = h.next;\nhasCycle(h)",
+        "expected": "true"
+      },
+      {
+        "description": "hasCycle: a node pointing to itself",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst h = list(1);\nh.next = h;\nhasCycle(h)",
+        "expected": "true"
+      },
+      {
+        "description": "hasCycle: empty list and single node",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[hasCycle(null), hasCycle(list(1))]",
+        "expected": "[false, false]"
+      },
+      {
+        "description": "mergeTwoLists interleaves two sorted lists",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(mergeTwoLists(list(1, 3, 5), list(2, 4, 6)))",
+        "expected": "[1, 2, 3, 4, 5, 6]"
+      },
+      {
+        "description": "mergeTwoLists handles an empty side",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(mergeTwoLists(null, list(1, 2))), toArray(mergeTwoLists(list(3), null)), mergeTwoLists(null, null)]",
+        "expected": "[[1, 2], [3], null]"
+      },
+      {
+        "description": "mergeTwoLists keeps duplicates",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(mergeTwoLists(list(1, 1, 4), list(1, 2, 4)))",
+        "expected": "[1, 1, 1, 2, 4, 4]"
+      },
+      {
+        "description": "mergeTwoLists relinks existing nodes, a first on ties",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst a = list(1);\nconst b = list(1);\nconst m = mergeTwoLists(a, b);\n[m === a, m.next === b]",
+        "expected": "[true, true]"
+      }
+    ],
+    "testHarness": "await $test.run(\"hasCycle: a list without a cycle\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (hasCycle(list(1, 2, 3, 4)));\n}, () => (false));\n\nawait $test.run(\"hasCycle: the tail points back into the list\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const h = list(1, 2, 3, 4);\n  h.next.next.next.next = h.next;\n  return (hasCycle(h));\n}, () => (true));\n\nawait $test.run(\"hasCycle: a node pointing to itself\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const h = list(1);\n  h.next = h;\n  return (hasCycle(h));\n}, () => (true));\n\nawait $test.run(\"hasCycle: empty list and single node\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([hasCycle(null), hasCycle(list(1))]);\n}, () => ([false, false]));\n\nawait $test.run(\"mergeTwoLists interleaves two sorted lists\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(mergeTwoLists(list(1, 3, 5), list(2, 4, 6))));\n}, () => ([1, 2, 3, 4, 5, 6]));\n\nawait $test.run(\"mergeTwoLists handles an empty side\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(mergeTwoLists(null, list(1, 2))), toArray(mergeTwoLists(list(3), null)), mergeTwoLists(null, null)]);\n}, () => ([[1, 2], [3], null]));\n\nawait $test.run(\"mergeTwoLists keeps duplicates\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(mergeTwoLists(list(1, 1, 4), list(1, 2, 4))));\n}, () => ([1, 1, 1, 2, 4, 4]));\n\nawait $test.run(\"mergeTwoLists relinks existing nodes, a first on ties\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const a = list(1);\n  const b = list(1);\n  const m = mergeTwoLists(a, b);\n  return ([m === a, m.next === b]);\n}, () => ([true, true]));"
+  },
+  {
+    "id": "lis-house-robber-dp",
+    "track": "algorithms",
+    "title": "Dynamic Programming: House Robber and Longest Increasing Subsequence",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "subsequence",
+      "array"
+    ],
+    "promptSeed": "Write rob(nums): the maximum sum of values you can take from an array when no two chosen elements are adjacent (0 for an empty array). Write lengthOfLIS(nums): the length of the longest strictly increasing subsequence (not necessarily contiguous; 0 for an empty array). An O(n^2) lengthOfLIS is fine.",
+    "difficulty": 4,
+    "concept": "dp",
+    "referenceSolution": "function rob(nums) {\n  let take = 0;\n  let skip = 0;\n  for (const n of nums) {\n    [take, skip] = [skip + n, Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction lengthOfLIS(nums) {\n  const dp = new Array(nums.length).fill(1);\n  let best = 0;\n  for (let i = 0; i < nums.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);\n    }\n    best = Math.max(best, dp[i]);\n  }\n  return best;\n}",
+    "solution": "function rob(nums) {\n  let take = 0;\n  let skip = 0;\n  for (const n of nums) {\n    [take, skip] = [skip + n, Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction lengthOfLIS(nums) {\n  const dp = new Array(nums.length).fill(1);\n  let best = 0;\n  for (let i = 0; i < nums.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);\n    }\n    best = Math.max(best, dp[i]);\n  }\n  return best;\n}",
+    "starterCode": "function rob(nums) {\n  let take = 0;\n  let skip = 0;\n  for (const n of nums) {\n    [take, skip] = [skip + n, Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction lengthOfLIS(nums) {\n  const dp = new Array(nums.length).fill(1);\n  let best = 0;\n  for (let i = 0; i < nums.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);\n    }\n    best = Math.max(best, dp[i]);\n  }\n  return best;\n}",
+    "testCases": [
+      {
+        "description": "rob picks non-adjacent houses",
+        "input": "[rob([1, 2, 3, 1]), rob([2, 7, 9, 3, 1])]",
+        "expected": "[4, 12]"
+      },
+      {
+        "description": "rob: empty and single house",
+        "input": "[rob([]), rob([5])]",
+        "expected": "[0, 5]"
+      },
+      {
+        "description": "rob: two houses takes the larger",
+        "input": "rob([2, 9])",
+        "expected": "9"
+      },
+      {
+        "description": "rob: skipping two in a row can win",
+        "input": "rob([5, 1, 1, 5])",
+        "expected": "10"
+      },
+      {
+        "description": "lengthOfLIS finds the longest increasing subsequence",
+        "input": "lengthOfLIS([10, 9, 2, 5, 3, 7, 101, 18])",
+        "expected": "4"
+      },
+      {
+        "description": "lengthOfLIS is strictly increasing",
+        "input": "[lengthOfLIS([7, 7, 7, 7]), lengthOfLIS([0, 1, 0, 3, 2, 3])]",
+        "expected": "[1, 4]"
+      },
+      {
+        "description": "lengthOfLIS: empty and sorted input",
+        "input": "[lengthOfLIS([]), lengthOfLIS([1, 2, 3, 4, 5])]",
+        "expected": "[0, 5]"
+      }
+    ],
+    "testHarness": "await $test.run(\"rob picks non-adjacent houses\", async () => {\n  const sleep = $test.sleep;\n  return ([rob([1, 2, 3, 1]), rob([2, 7, 9, 3, 1])]);\n}, () => ([4, 12]));\n\nawait $test.run(\"rob: empty and single house\", async () => {\n  const sleep = $test.sleep;\n  return ([rob([]), rob([5])]);\n}, () => ([0, 5]));\n\nawait $test.run(\"rob: two houses takes the larger\", async () => {\n  const sleep = $test.sleep;\n  return (rob([2, 9]));\n}, () => (9));\n\nawait $test.run(\"rob: skipping two in a row can win\", async () => {\n  const sleep = $test.sleep;\n  return (rob([5, 1, 1, 5]));\n}, () => (10));\n\nawait $test.run(\"lengthOfLIS finds the longest increasing subsequence\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLIS([10, 9, 2, 5, 3, 7, 101, 18]));\n}, () => (4));\n\nawait $test.run(\"lengthOfLIS is strictly increasing\", async () => {\n  const sleep = $test.sleep;\n  return ([lengthOfLIS([7, 7, 7, 7]), lengthOfLIS([0, 1, 0, 3, 2, 3])]);\n}, () => ([1, 4]));\n\nawait $test.run(\"lengthOfLIS: empty and sorted input\", async () => {\n  const sleep = $test.sleep;\n  return ([lengthOfLIS([]), lengthOfLIS([1, 2, 3, 4, 5])]);\n}, () => ([0, 5]));"
+  },
+  {
+    "id": "matrix-rotate-spiral",
+    "track": "algorithms",
+    "title": "Matrix: Rotate 90 Degrees and Spiral Order",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "matrix",
+      "2d-array",
+      "simulation"
+    ],
+    "promptSeed": "Write rotate90(matrix) returning a NEW n x m matrix rotated 90 degrees clockwise (rows become columns; an empty matrix gives []), transpose(matrix) returning the transpose, and spiralOrder(matrix) returning the elements in clockwise spiral order starting at the top-left (works for non-square matrices; [] for an empty matrix).",
+    "difficulty": 3,
+    "concept": "matrix",
+    "referenceSolution": "function transpose(matrix) {\n  if (!matrix.length) return [];\n  return matrix[0].map((_, c) => matrix.map((row) => row[c]));\n}\n\nfunction rotate90(matrix) {\n  return transpose(matrix).map((row) => row.reverse());\n}\n\nfunction spiralOrder(matrix) {\n  if (!matrix.length) return [];\n  const out = [];\n  let top = 0;\n  let bottom = matrix.length - 1;\n  let left = 0;\n  let right = matrix[0].length - 1;\n  while (top <= bottom && left <= right) {\n    for (let c = left; c <= right; c++) out.push(matrix[top][c]);\n    top++;\n    for (let r = top; r <= bottom; r++) out.push(matrix[r][right]);\n    right--;\n    if (top <= bottom) {\n      for (let c = right; c >= left; c--) out.push(matrix[bottom][c]);\n      bottom--;\n    }\n    if (left <= right) {\n      for (let r = bottom; r >= top; r--) out.push(matrix[r][left]);\n      left++;\n    }\n  }\n  return out;\n}",
+    "solution": "function transpose(matrix) {\n  if (!matrix.length) return [];\n  return matrix[0].map((_, c) => matrix.map((row) => row[c]));\n}\n\nfunction rotate90(matrix) {\n  return transpose(matrix).map((row) => row.reverse());\n}\n\nfunction spiralOrder(matrix) {\n  if (!matrix.length) return [];\n  const out = [];\n  let top = 0;\n  let bottom = matrix.length - 1;\n  let left = 0;\n  let right = matrix[0].length - 1;\n  while (top <= bottom && left <= right) {\n    for (let c = left; c <= right; c++) out.push(matrix[top][c]);\n    top++;\n    for (let r = top; r <= bottom; r++) out.push(matrix[r][right]);\n    right--;\n    if (top <= bottom) {\n      for (let c = right; c >= left; c--) out.push(matrix[bottom][c]);\n      bottom--;\n    }\n    if (left <= right) {\n      for (let r = bottom; r >= top; r--) out.push(matrix[r][left]);\n      left++;\n    }\n  }\n  return out;\n}",
+    "starterCode": "function transpose(matrix) {\n  if (!matrix.length) return [];\n  return matrix[0].map((_, c) => matrix.map((row) => row[c]));\n}\n\nfunction rotate90(matrix) {\n  return transpose(matrix).map((row) => row.reverse());\n}\n\nfunction spiralOrder(matrix) {\n  if (!matrix.length) return [];\n  const out = [];\n  let top = 0;\n  let bottom = matrix.length - 1;\n  let left = 0;\n  let right = matrix[0].length - 1;\n  while (top <= bottom && left <= right) {\n    for (let c = left; c <= right; c++) out.push(matrix[top][c]);\n    top++;\n    for (let r = top; r <= bottom; r++) out.push(matrix[r][right]);\n    right--;\n    if (top <= bottom) {\n      for (let c = right; c >= left; c--) out.push(matrix[bottom][c]);\n      bottom--;\n    }\n    if (left <= right) {\n      for (let r = bottom; r >= top; r--) out.push(matrix[r][left]);\n      left++;\n    }\n  }\n  return out;\n}",
+    "testCases": [
+      {
+        "description": "rotate90 of a square matrix",
+        "input": "rotate90([[1, 2, 3], [4, 5, 6], [7, 8, 9]])",
+        "expected": "[[7, 4, 1], [8, 5, 2], [9, 6, 3]]"
+      },
+      {
+        "description": "rotate90 of a rectangular matrix",
+        "input": "rotate90([[1, 2, 3], [4, 5, 6]])",
+        "expected": "[[4, 1], [5, 2], [6, 3]]"
+      },
+      {
+        "description": "rotate90 does not mutate and handles empty",
+        "input": "const m = [[1, 2], [3, 4]];\nrotate90(m);\n[m, rotate90([])]",
+        "expected": "[[[1, 2], [3, 4]], []]"
+      },
+      {
+        "description": "transpose swaps rows and columns",
+        "input": "transpose([[1, 2, 3], [4, 5, 6]])",
+        "expected": "[[1, 4], [2, 5], [3, 6]]"
+      },
+      {
+        "description": "spiralOrder of a square matrix",
+        "input": "spiralOrder([[1, 2, 3], [4, 5, 6], [7, 8, 9]])",
+        "expected": "[1, 2, 3, 6, 9, 8, 7, 4, 5]"
+      },
+      {
+        "description": "spiralOrder of wide and tall matrices",
+        "input": "[spiralOrder([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]), spiralOrder([[1], [2], [3]])]",
+        "expected": "[[1, 2, 3, 4, 8, 12, 11, 10, 9, 5, 6, 7], [1, 2, 3]]"
+      },
+      {
+        "description": "spiralOrder of a single row and empty matrix",
+        "input": "[spiralOrder([[1, 2, 3]]), spiralOrder([])]",
+        "expected": "[[1, 2, 3], []]"
+      }
+    ],
+    "testHarness": "await $test.run(\"rotate90 of a square matrix\", async () => {\n  const sleep = $test.sleep;\n  return (rotate90([[1, 2, 3], [4, 5, 6], [7, 8, 9]]));\n}, () => ([[7, 4, 1], [8, 5, 2], [9, 6, 3]]));\n\nawait $test.run(\"rotate90 of a rectangular matrix\", async () => {\n  const sleep = $test.sleep;\n  return (rotate90([[1, 2, 3], [4, 5, 6]]));\n}, () => ([[4, 1], [5, 2], [6, 3]]));\n\nawait $test.run(\"rotate90 does not mutate and handles empty\", async () => {\n  const sleep = $test.sleep;\n  const m = [[1, 2], [3, 4]];\n  rotate90(m);\n  return ([m, rotate90([])]);\n}, () => ([[[1, 2], [3, 4]], []]));\n\nawait $test.run(\"transpose swaps rows and columns\", async () => {\n  const sleep = $test.sleep;\n  return (transpose([[1, 2, 3], [4, 5, 6]]));\n}, () => ([[1, 4], [2, 5], [3, 6]]));\n\nawait $test.run(\"spiralOrder of a square matrix\", async () => {\n  const sleep = $test.sleep;\n  return (spiralOrder([[1, 2, 3], [4, 5, 6], [7, 8, 9]]));\n}, () => ([1, 2, 3, 6, 9, 8, 7, 4, 5]));\n\nawait $test.run(\"spiralOrder of wide and tall matrices\", async () => {\n  const sleep = $test.sleep;\n  return ([spiralOrder([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]), spiralOrder([[1], [2], [3]])]);\n}, () => ([[1, 2, 3, 4, 8, 12, 11, 10, 9, 5, 6, 7], [1, 2, 3]]));\n\nawait $test.run(\"spiralOrder of a single row and empty matrix\", async () => {\n  const sleep = $test.sleep;\n  return ([spiralOrder([[1, 2, 3]]), spiralOrder([])]);\n}, () => ([[1, 2, 3], []]));"
+  },
+  {
+    "id": "merge-sort-quick-sort",
+    "track": "algorithms",
+    "title": "Sorting: Merge Sort and Quick Sort",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sorting",
+      "recursion",
+      "divide-and-conquer"
+    ],
+    "promptSeed": "Write mergeSort(arr) and quickSort(arr), each returning a NEW array sorted ascending by number and leaving the input untouched. mergeSort must be stable and use a merge helper over two sorted halves; quickSort picks a pivot and partitions into less / equal / greater parts. Do not use Array.prototype.sort. Both handle empty and one-element arrays and duplicates.",
+    "difficulty": 3,
+    "concept": "sorting",
+    "referenceSolution": "function merge(a, b) {\n  const out = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if (a[i] <= b[j]) out.push(a[i++]);\n    else out.push(b[j++]);\n  }\n  while (i < a.length) out.push(a[i++]);\n  while (j < b.length) out.push(b[j++]);\n  return out;\n}\n\nfunction mergeSort(arr) {\n  if (arr.length <= 1) return arr.slice();\n  const mid = arr.length >> 1;\n  return merge(mergeSort(arr.slice(0, mid)), mergeSort(arr.slice(mid)));\n}\n\nfunction quickSort(arr) {\n  if (arr.length <= 1) return arr.slice();\n  const pivot = arr[arr.length >> 1];\n  const less = arr.filter((x) => x < pivot);\n  const equal = arr.filter((x) => x === pivot);\n  const greater = arr.filter((x) => x > pivot);\n  return [...quickSort(less), ...equal, ...quickSort(greater)];\n}",
+    "solution": "function merge(a, b) {\n  const out = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if (a[i] <= b[j]) out.push(a[i++]);\n    else out.push(b[j++]);\n  }\n  while (i < a.length) out.push(a[i++]);\n  while (j < b.length) out.push(b[j++]);\n  return out;\n}\n\nfunction mergeSort(arr) {\n  if (arr.length <= 1) return arr.slice();\n  const mid = arr.length >> 1;\n  return merge(mergeSort(arr.slice(0, mid)), mergeSort(arr.slice(mid)));\n}\n\nfunction quickSort(arr) {\n  if (arr.length <= 1) return arr.slice();\n  const pivot = arr[arr.length >> 1];\n  const less = arr.filter((x) => x < pivot);\n  const equal = arr.filter((x) => x === pivot);\n  const greater = arr.filter((x) => x > pivot);\n  return [...quickSort(less), ...equal, ...quickSort(greater)];\n}",
+    "starterCode": "function merge(a, b) {\n  const out = [];\n  let i = 0;\n  let j = 0;\n  while (i < a.length && j < b.length) {\n    if (a[i] <= b[j]) out.push(a[i++]);\n    else out.push(b[j++]);\n  }\n  while (i < a.length) out.push(a[i++]);\n  while (j < b.length) out.push(b[j++]);\n  return out;\n}\n\nfunction mergeSort(arr) {\n  if (arr.length <= 1) return arr.slice();\n  const mid = arr.length >> 1;\n  return merge(mergeSort(arr.slice(0, mid)), mergeSort(arr.slice(mid)));\n}\n\nfunction quickSort(arr) {\n  if (arr.length <= 1) return arr.slice();\n  const pivot = arr[arr.length >> 1];\n  const less = arr.filter((x) => x < pivot);\n  const equal = arr.filter((x) => x === pivot);\n  const greater = arr.filter((x) => x > pivot);\n  return [...quickSort(less), ...equal, ...quickSort(greater)];\n}",
+    "testCases": [
+      {
+        "description": "mergeSort sorts numbers",
+        "input": "mergeSort([5, 2, 9, 1, 5, 6])",
+        "expected": "[1, 2, 5, 5, 6, 9]"
+      },
+      {
+        "description": "quickSort sorts numbers",
+        "input": "quickSort([5, 2, 9, 1, 5, 6])",
+        "expected": "[1, 2, 5, 5, 6, 9]"
+      },
+      {
+        "description": "Empty and single-element arrays",
+        "input": "[mergeSort([]), mergeSort([4]), quickSort([]), quickSort([4])]",
+        "expected": "[[], [4], [], [4]]"
+      },
+      {
+        "description": "Already sorted, reversed and all-equal input",
+        "input": "[mergeSort([1, 2, 3]), quickSort([3, 2, 1]), mergeSort([2, 2, 2]), quickSort([2, 2, 2])]",
+        "expected": "[[1, 2, 3], [1, 2, 3], [2, 2, 2], [2, 2, 2]]"
+      },
+      {
+        "description": "Negative numbers sort numerically, not as strings",
+        "input": "[mergeSort([10, -2, 3, -20]), quickSort([10, 9, 100, 1])]",
+        "expected": "[[-20, -2, 3, 10], [1, 9, 10, 100]]"
+      },
+      {
+        "description": "The input array is not mutated",
+        "input": "const a = [3, 1, 2];\nconst b = [3, 1, 2];\nmergeSort(a); quickSort(b);\n[a, b]",
+        "expected": "[[3, 1, 2], [3, 1, 2]]"
+      },
+      {
+        "description": "Matches the native sort on 300 pseudo-random numbers",
+        "input": "let seed = 7;\nconst rnd = () => (seed = (seed * 48271) % 2147483647) % 1000;\nconst arr = Array.from({ length: 300 }, rnd);\nconst want = [...arr].sort((a, b) => a - b).join();\n[mergeSort(arr).join() === want, quickSort(arr).join() === want]",
+        "expected": "[true, true]"
+      }
+    ],
+    "testHarness": "await $test.run(\"mergeSort sorts numbers\", async () => {\n  const sleep = $test.sleep;\n  return (mergeSort([5, 2, 9, 1, 5, 6]));\n}, () => ([1, 2, 5, 5, 6, 9]));\n\nawait $test.run(\"quickSort sorts numbers\", async () => {\n  const sleep = $test.sleep;\n  return (quickSort([5, 2, 9, 1, 5, 6]));\n}, () => ([1, 2, 5, 5, 6, 9]));\n\nawait $test.run(\"Empty and single-element arrays\", async () => {\n  const sleep = $test.sleep;\n  return ([mergeSort([]), mergeSort([4]), quickSort([]), quickSort([4])]);\n}, () => ([[], [4], [], [4]]));\n\nawait $test.run(\"Already sorted, reversed and all-equal input\", async () => {\n  const sleep = $test.sleep;\n  return ([mergeSort([1, 2, 3]), quickSort([3, 2, 1]), mergeSort([2, 2, 2]), quickSort([2, 2, 2])]);\n}, () => ([[1, 2, 3], [1, 2, 3], [2, 2, 2], [2, 2, 2]]));\n\nawait $test.run(\"Negative numbers sort numerically, not as strings\", async () => {\n  const sleep = $test.sleep;\n  return ([mergeSort([10, -2, 3, -20]), quickSort([10, 9, 100, 1])]);\n}, () => ([[-20, -2, 3, 10], [1, 9, 10, 100]]));\n\nawait $test.run(\"The input array is not mutated\", async () => {\n  const sleep = $test.sleep;\n  const a = [3, 1, 2];\n  const b = [3, 1, 2];\n  mergeSort(a); quickSort(b);\n  return ([a, b]);\n}, () => ([[3, 1, 2], [3, 1, 2]]));\n\nawait $test.run(\"Matches the native sort on 300 pseudo-random numbers\", async () => {\n  const sleep = $test.sleep;\n  let seed = 7;\n  const rnd = () => (seed = (seed * 48271) % 2147483647) % 1000;\n  const arr = Array.from({ length: 300 }, rnd);\n  const want = [...arr].sort((a, b) => a - b).join();\n  return ([mergeSort(arr).join() === want, quickSort(arr).join() === want]);\n}, () => ([true, true]));"
+  },
+  {
+    "id": "min-heap-class",
+    "track": "algorithms",
+    "title": "Heap: MinHeap From Scratch",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "heap",
+      "priority-queue",
+      "class",
+      "array"
+    ],
+    "promptSeed": "Implement class MinHeap backed by an array: push(x), pop() (removes and returns the smallest value, undefined when empty), peek() (smallest value without removing, undefined when empty) and size(). push/pop must be O(log n) using sift-up/sift-down on the array (do not sort on every push). Also write kSmallest(nums, k) returning the k smallest numbers in ascending order using your MinHeap.",
+    "difficulty": 3,
+    "concept": "heap",
+    "referenceSolution": "class MinHeap {\n  constructor() {\n    this.h = [];\n  }\n  size() {\n    return this.h.length;\n  }\n  peek() {\n    return this.h[0];\n  }\n  push(x) {\n    const h = this.h;\n    h.push(x);\n    let i = h.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (h[parent] <= h[i]) break;\n      [h[parent], h[i]] = [h[i], h[parent]];\n      i = parent;\n    }\n  }\n  pop() {\n    const h = this.h;\n    if (!h.length) return undefined;\n    const top = h[0];\n    const last = h.pop();\n    if (h.length) {\n      h[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let small = i;\n        if (l < h.length && h[l] < h[small]) small = l;\n        if (r < h.length && h[r] < h[small]) small = r;\n        if (small === i) break;\n        [h[small], h[i]] = [h[i], h[small]];\n        i = small;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kSmallest(nums, k) {\n  const heap = new MinHeap();\n  for (const n of nums) heap.push(n);\n  const out = [];\n  while (out.length < k && heap.size()) out.push(heap.pop());\n  return out;\n}",
+    "solution": "class MinHeap {\n  constructor() {\n    this.h = [];\n  }\n  size() {\n    return this.h.length;\n  }\n  peek() {\n    return this.h[0];\n  }\n  push(x) {\n    const h = this.h;\n    h.push(x);\n    let i = h.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (h[parent] <= h[i]) break;\n      [h[parent], h[i]] = [h[i], h[parent]];\n      i = parent;\n    }\n  }\n  pop() {\n    const h = this.h;\n    if (!h.length) return undefined;\n    const top = h[0];\n    const last = h.pop();\n    if (h.length) {\n      h[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let small = i;\n        if (l < h.length && h[l] < h[small]) small = l;\n        if (r < h.length && h[r] < h[small]) small = r;\n        if (small === i) break;\n        [h[small], h[i]] = [h[i], h[small]];\n        i = small;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kSmallest(nums, k) {\n  const heap = new MinHeap();\n  for (const n of nums) heap.push(n);\n  const out = [];\n  while (out.length < k && heap.size()) out.push(heap.pop());\n  return out;\n}",
+    "starterCode": "class MinHeap {\n  constructor() {\n    this.h = [];\n  }\n  size() {\n    return this.h.length;\n  }\n  peek() {\n    return this.h[0];\n  }\n  push(x) {\n    const h = this.h;\n    h.push(x);\n    let i = h.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (h[parent] <= h[i]) break;\n      [h[parent], h[i]] = [h[i], h[parent]];\n      i = parent;\n    }\n  }\n  pop() {\n    const h = this.h;\n    if (!h.length) return undefined;\n    const top = h[0];\n    const last = h.pop();\n    if (h.length) {\n      h[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let small = i;\n        if (l < h.length && h[l] < h[small]) small = l;\n        if (r < h.length && h[r] < h[small]) small = r;\n        if (small === i) break;\n        [h[small], h[i]] = [h[i], h[small]];\n        i = small;\n      }\n    }\n    return top;\n  }\n}\n\nfunction kSmallest(nums, k) {\n  const heap = new MinHeap();\n  for (const n of nums) heap.push(n);\n  const out = [];\n  while (out.length < k && heap.size()) out.push(heap.pop());\n  return out;\n}",
+    "testCases": [
+      {
+        "description": "pop returns values in ascending order",
+        "input": "const h = new MinHeap();\nfor (const x of [5, 3, 8, 1, 9, 2]) h.push(x);\nconst out = [];\nwhile (h.size()) out.push(h.pop());\nout",
+        "expected": "[1, 2, 3, 5, 8, 9]"
+      },
+      {
+        "description": "peek shows the smallest without removing",
+        "input": "const h = new MinHeap();\nh.push(4); h.push(2); h.push(6);\n[h.peek(), h.size()]",
+        "expected": "[2, 3]"
+      },
+      {
+        "description": "Empty heap returns undefined",
+        "input": "const h = new MinHeap();\n[h.pop(), h.peek(), h.size()]",
+        "expected": "[undefined, undefined, 0]"
+      },
+      {
+        "description": "Duplicates are kept",
+        "input": "const h = new MinHeap();\nfor (const x of [2, 2, 1, 1]) h.push(x);\n[h.pop(), h.pop(), h.pop(), h.pop(), h.pop()]",
+        "expected": "[1, 1, 2, 2, undefined]"
+      },
+      {
+        "description": "push and pop interleaved",
+        "input": "const h = new MinHeap();\nh.push(10); h.push(5);\nconst a = h.pop();\nh.push(1);\n[a, h.pop(), h.pop()]",
+        "expected": "[5, 1, 10]"
+      },
+      {
+        "description": "Handles a large reverse-sorted input",
+        "input": "const h = new MinHeap();\nfor (let i = 1000; i > 0; i--) h.push(i);\n[h.pop(), h.pop(), h.peek(), h.size()]",
+        "expected": "[1, 2, 3, 998]"
+      },
+      {
+        "description": "kSmallest returns the k smallest ascending",
+        "input": "kSmallest([7, 2, 9, 4, 1, 8], 3)",
+        "expected": "[1, 2, 4]"
+      },
+      {
+        "description": "kSmallest with k larger than the input",
+        "input": "kSmallest([3, 1], 5)",
+        "expected": "[1, 3]"
+      }
+    ],
+    "testHarness": "await $test.run(\"pop returns values in ascending order\", async () => {\n  const sleep = $test.sleep;\n  const h = new MinHeap();\n  for (const x of [5, 3, 8, 1, 9, 2]) h.push(x);\n  const out = [];\n  while (h.size()) out.push(h.pop());\n  return (out);\n}, () => ([1, 2, 3, 5, 8, 9]));\n\nawait $test.run(\"peek shows the smallest without removing\", async () => {\n  const sleep = $test.sleep;\n  const h = new MinHeap();\n  h.push(4); h.push(2); h.push(6);\n  return ([h.peek(), h.size()]);\n}, () => ([2, 3]));\n\nawait $test.run(\"Empty heap returns undefined\", async () => {\n  const sleep = $test.sleep;\n  const h = new MinHeap();\n  return ([h.pop(), h.peek(), h.size()]);\n}, () => ([undefined, undefined, 0]));\n\nawait $test.run(\"Duplicates are kept\", async () => {\n  const sleep = $test.sleep;\n  const h = new MinHeap();\n  for (const x of [2, 2, 1, 1]) h.push(x);\n  return ([h.pop(), h.pop(), h.pop(), h.pop(), h.pop()]);\n}, () => ([1, 1, 2, 2, undefined]));\n\nawait $test.run(\"push and pop interleaved\", async () => {\n  const sleep = $test.sleep;\n  const h = new MinHeap();\n  h.push(10); h.push(5);\n  const a = h.pop();\n  h.push(1);\n  return ([a, h.pop(), h.pop()]);\n}, () => ([5, 1, 10]));\n\nawait $test.run(\"Handles a large reverse-sorted input\", async () => {\n  const sleep = $test.sleep;\n  const h = new MinHeap();\n  for (let i = 1000; i > 0; i--) h.push(i);\n  return ([h.pop(), h.pop(), h.peek(), h.size()]);\n}, () => ([1, 2, 3, 998]));\n\nawait $test.run(\"kSmallest returns the k smallest ascending\", async () => {\n  const sleep = $test.sleep;\n  return (kSmallest([7, 2, 9, 4, 1, 8], 3));\n}, () => ([1, 2, 4]));\n\nawait $test.run(\"kSmallest with k larger than the input\", async () => {\n  const sleep = $test.sleep;\n  return (kSmallest([3, 1], 5));\n}, () => ([1, 3]));"
+  },
+  {
+    "id": "min-stack",
+    "track": "algorithms",
+    "title": "MinStack and Queue From Two Stacks",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "stack",
+      "queue",
+      "design",
+      "class"
+    ],
+    "promptSeed": "Implement class MinStack with push(x), pop() (returns the removed value, undefined when empty), top() (undefined when empty), size() and getMin() (smallest value currently in the stack, undefined when empty), all in O(1). Also implement class QueueFromStacks with enqueue(x), dequeue() (undefined when empty), peek() and size(), using only two arrays that you treat strictly as stacks (push/pop at the end only).",
+    "difficulty": 2,
+    "concept": "stack",
+    "referenceSolution": "class MinStack {\n  constructor() {\n    this.items = [];\n    this.mins = [];\n  }\n  push(x) {\n    this.items.push(x);\n    const min = this.mins.length ? Math.min(x, this.mins[this.mins.length - 1]) : x;\n    this.mins.push(min);\n  }\n  pop() {\n    this.mins.pop();\n    return this.items.pop();\n  }\n  top() {\n    return this.items[this.items.length - 1];\n  }\n  size() {\n    return this.items.length;\n  }\n  getMin() {\n    return this.mins[this.mins.length - 1];\n  }\n}\n\nclass QueueFromStacks {\n  constructor() {\n    this.inbox = [];\n    this.outbox = [];\n  }\n  _shift() {\n    if (!this.outbox.length) {\n      while (this.inbox.length) this.outbox.push(this.inbox.pop());\n    }\n  }\n  enqueue(x) {\n    this.inbox.push(x);\n  }\n  dequeue() {\n    this._shift();\n    return this.outbox.pop();\n  }\n  peek() {\n    this._shift();\n    return this.outbox[this.outbox.length - 1];\n  }\n  size() {\n    return this.inbox.length + this.outbox.length;\n  }\n}",
+    "solution": "class MinStack {\n  constructor() {\n    this.items = [];\n    this.mins = [];\n  }\n  push(x) {\n    this.items.push(x);\n    const min = this.mins.length ? Math.min(x, this.mins[this.mins.length - 1]) : x;\n    this.mins.push(min);\n  }\n  pop() {\n    this.mins.pop();\n    return this.items.pop();\n  }\n  top() {\n    return this.items[this.items.length - 1];\n  }\n  size() {\n    return this.items.length;\n  }\n  getMin() {\n    return this.mins[this.mins.length - 1];\n  }\n}\n\nclass QueueFromStacks {\n  constructor() {\n    this.inbox = [];\n    this.outbox = [];\n  }\n  _shift() {\n    if (!this.outbox.length) {\n      while (this.inbox.length) this.outbox.push(this.inbox.pop());\n    }\n  }\n  enqueue(x) {\n    this.inbox.push(x);\n  }\n  dequeue() {\n    this._shift();\n    return this.outbox.pop();\n  }\n  peek() {\n    this._shift();\n    return this.outbox[this.outbox.length - 1];\n  }\n  size() {\n    return this.inbox.length + this.outbox.length;\n  }\n}",
+    "starterCode": "class MinStack {\n  constructor() {\n    this.items = [];\n    this.mins = [];\n  }\n  push(x) {\n    this.items.push(x);\n    const min = this.mins.length ? Math.min(x, this.mins[this.mins.length - 1]) : x;\n    this.mins.push(min);\n  }\n  pop() {\n    this.mins.pop();\n    return this.items.pop();\n  }\n  top() {\n    return this.items[this.items.length - 1];\n  }\n  size() {\n    return this.items.length;\n  }\n  getMin() {\n    return this.mins[this.mins.length - 1];\n  }\n}\n\nclass QueueFromStacks {\n  constructor() {\n    this.inbox = [];\n    this.outbox = [];\n  }\n  _shift() {\n    if (!this.outbox.length) {\n      while (this.inbox.length) this.outbox.push(this.inbox.pop());\n    }\n  }\n  enqueue(x) {\n    this.inbox.push(x);\n  }\n  dequeue() {\n    this._shift();\n    return this.outbox.pop();\n  }\n  peek() {\n    this._shift();\n    return this.outbox[this.outbox.length - 1];\n  }\n  size() {\n    return this.inbox.length + this.outbox.length;\n  }\n}",
+    "testCases": [
+      {
+        "description": "MinStack tracks the minimum while pushing",
+        "input": "const s = new MinStack();\ns.push(5); s.push(3); s.push(7);\n[s.getMin(), s.top(), s.size()]",
+        "expected": "[3, 7, 3]"
+      },
+      {
+        "description": "MinStack minimum is restored after popping the smallest",
+        "input": "const s = new MinStack();\ns.push(5); s.push(3); s.push(7);\ns.pop(); const popped = s.pop();\n[popped, s.getMin(), s.top()]",
+        "expected": "[3, 5, 5]"
+      },
+      {
+        "description": "MinStack handles duplicate minimums",
+        "input": "const s = new MinStack();\ns.push(2); s.push(2);\ns.pop();\n[s.getMin(), s.size()]",
+        "expected": "[2, 1]"
+      },
+      {
+        "description": "MinStack on an empty stack returns undefined",
+        "input": "const s = new MinStack();\n[s.pop(), s.top(), s.getMin(), s.size()]",
+        "expected": "[undefined, undefined, undefined, 0]"
+      },
+      {
+        "description": "QueueFromStacks is first-in first-out",
+        "input": "const q = new QueueFromStacks();\nq.enqueue(1); q.enqueue(2); q.enqueue(3);\n[q.dequeue(), q.dequeue(), q.size()]",
+        "expected": "[1, 2, 1]"
+      },
+      {
+        "description": "QueueFromStacks interleaves enqueue and dequeue correctly",
+        "input": "const q = new QueueFromStacks();\nq.enqueue(1); q.enqueue(2);\nconst a = q.dequeue();\nq.enqueue(3);\n[a, q.peek(), q.dequeue(), q.dequeue(), q.dequeue()]",
+        "expected": "[1, 2, 2, 3, undefined]"
+      },
+      {
+        "description": "QueueFromStacks peek does not remove",
+        "input": "const q = new QueueFromStacks();\nq.enqueue('a'); q.enqueue('b');\n[q.peek(), q.peek(), q.size()]",
+        "expected": "['a', 'a', 2]"
+      }
+    ],
+    "testHarness": "await $test.run(\"MinStack tracks the minimum while pushing\", async () => {\n  const sleep = $test.sleep;\n  const s = new MinStack();\n  s.push(5); s.push(3); s.push(7);\n  return ([s.getMin(), s.top(), s.size()]);\n}, () => ([3, 7, 3]));\n\nawait $test.run(\"MinStack minimum is restored after popping the smallest\", async () => {\n  const sleep = $test.sleep;\n  const s = new MinStack();\n  s.push(5); s.push(3); s.push(7);\n  s.pop(); const popped = s.pop();\n  return ([popped, s.getMin(), s.top()]);\n}, () => ([3, 5, 5]));\n\nawait $test.run(\"MinStack handles duplicate minimums\", async () => {\n  const sleep = $test.sleep;\n  const s = new MinStack();\n  s.push(2); s.push(2);\n  s.pop();\n  return ([s.getMin(), s.size()]);\n}, () => ([2, 1]));\n\nawait $test.run(\"MinStack on an empty stack returns undefined\", async () => {\n  const sleep = $test.sleep;\n  const s = new MinStack();\n  return ([s.pop(), s.top(), s.getMin(), s.size()]);\n}, () => ([undefined, undefined, undefined, 0]));\n\nawait $test.run(\"QueueFromStacks is first-in first-out\", async () => {\n  const sleep = $test.sleep;\n  const q = new QueueFromStacks();\n  q.enqueue(1); q.enqueue(2); q.enqueue(3);\n  return ([q.dequeue(), q.dequeue(), q.size()]);\n}, () => ([1, 2, 1]));\n\nawait $test.run(\"QueueFromStacks interleaves enqueue and dequeue correctly\", async () => {\n  const sleep = $test.sleep;\n  const q = new QueueFromStacks();\n  q.enqueue(1); q.enqueue(2);\n  const a = q.dequeue();\n  q.enqueue(3);\n  return ([a, q.peek(), q.dequeue(), q.dequeue(), q.dequeue()]);\n}, () => ([1, 2, 2, 3, undefined]));\n\nawait $test.run(\"QueueFromStacks peek does not remove\", async () => {\n  const sleep = $test.sleep;\n  const q = new QueueFromStacks();\n  q.enqueue('a'); q.enqueue('b');\n  return ([q.peek(), q.peek(), q.size()]);\n}, () => (['a', 'a', 2]));"
+  },
+  {
+    "id": "permutations-subsets-backtracking",
+    "track": "algorithms",
+    "title": "Backtracking: Subsets, Permutations, Parentheses",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "backtracking",
+      "recursion",
+      "combinatorics"
+    ],
+    "promptSeed": "Write subsets(nums) returning all subsets (the power set) of an array of distinct numbers, permute(nums) returning all orderings of distinct numbers, and generateParenthesis(n) returning every well-formed string of n pairs of parentheses. Return [[]] for subsets([]), [[]] for permute([]) and [''] for generateParenthesis(0). Any order of results is accepted, but each result must appear exactly once.",
+    "difficulty": 3,
+    "concept": "backtracking",
+    "referenceSolution": "function subsets(nums) {\n  const out = [];\n  const path = [];\n  const go = (start) => {\n    out.push([...path]);\n    for (let i = start; i < nums.length; i++) {\n      path.push(nums[i]);\n      go(i + 1);\n      path.pop();\n    }\n  };\n  go(0);\n  return out;\n}\n\nfunction permute(nums) {\n  const out = [];\n  const used = new Array(nums.length).fill(false);\n  const path = [];\n  const go = () => {\n    if (path.length === nums.length) {\n      out.push([...path]);\n      return;\n    }\n    for (let i = 0; i < nums.length; i++) {\n      if (used[i]) continue;\n      used[i] = true;\n      path.push(nums[i]);\n      go();\n      path.pop();\n      used[i] = false;\n    }\n  };\n  go();\n  return out;\n}\n\nfunction generateParenthesis(n) {\n  const out = [];\n  const go = (s, open, close) => {\n    if (s.length === 2 * n) {\n      out.push(s);\n      return;\n    }\n    if (open < n) go(s + '(', open + 1, close);\n    if (close < open) go(s + ')', open, close + 1);\n  };\n  go('', 0, 0);\n  return out;\n}",
+    "solution": "function subsets(nums) {\n  const out = [];\n  const path = [];\n  const go = (start) => {\n    out.push([...path]);\n    for (let i = start; i < nums.length; i++) {\n      path.push(nums[i]);\n      go(i + 1);\n      path.pop();\n    }\n  };\n  go(0);\n  return out;\n}\n\nfunction permute(nums) {\n  const out = [];\n  const used = new Array(nums.length).fill(false);\n  const path = [];\n  const go = () => {\n    if (path.length === nums.length) {\n      out.push([...path]);\n      return;\n    }\n    for (let i = 0; i < nums.length; i++) {\n      if (used[i]) continue;\n      used[i] = true;\n      path.push(nums[i]);\n      go();\n      path.pop();\n      used[i] = false;\n    }\n  };\n  go();\n  return out;\n}\n\nfunction generateParenthesis(n) {\n  const out = [];\n  const go = (s, open, close) => {\n    if (s.length === 2 * n) {\n      out.push(s);\n      return;\n    }\n    if (open < n) go(s + '(', open + 1, close);\n    if (close < open) go(s + ')', open, close + 1);\n  };\n  go('', 0, 0);\n  return out;\n}",
+    "starterCode": "function subsets(nums) {\n  const out = [];\n  const path = [];\n  const go = (start) => {\n    out.push([...path]);\n    for (let i = start; i < nums.length; i++) {\n      path.push(nums[i]);\n      go(i + 1);\n      path.pop();\n    }\n  };\n  go(0);\n  return out;\n}\n\nfunction permute(nums) {\n  const out = [];\n  const used = new Array(nums.length).fill(false);\n  const path = [];\n  const go = () => {\n    if (path.length === nums.length) {\n      out.push([...path]);\n      return;\n    }\n    for (let i = 0; i < nums.length; i++) {\n      if (used[i]) continue;\n      used[i] = true;\n      path.push(nums[i]);\n      go();\n      path.pop();\n      used[i] = false;\n    }\n  };\n  go();\n  return out;\n}\n\nfunction generateParenthesis(n) {\n  const out = [];\n  const go = (s, open, close) => {\n    if (s.length === 2 * n) {\n      out.push(s);\n      return;\n    }\n    if (open < n) go(s + '(', open + 1, close);\n    if (close < open) go(s + ')', open, close + 1);\n  };\n  go('', 0, 0);\n  return out;\n}",
+    "testCases": [
+      {
+        "description": "subsets of three numbers (order of results does not matter)",
+        "input": "const norm = (groups) => groups.map((g) => [...g].sort()).sort((a, b) => (a.join() < b.join() ? -1 : 1));\nnorm(subsets([1, 2, 3]))",
+        "expected": "[[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]"
+      },
+      {
+        "description": "subsets of an empty array",
+        "input": "subsets([])",
+        "expected": "[[]]"
+      },
+      {
+        "description": "subsets count is 2^n",
+        "input": "subsets([1, 2, 3, 4, 5]).length",
+        "expected": "32"
+      },
+      {
+        "description": "permute of three numbers",
+        "input": "permute([1, 2, 3]).map((p) => p.join('')).sort()",
+        "expected": "['123', '132', '213', '231', '312', '321']"
+      },
+      {
+        "description": "permute of one and zero elements",
+        "input": "[permute([1]), permute([])]",
+        "expected": "[[[1]], [[]]]"
+      },
+      {
+        "description": "permute count is n!",
+        "input": "permute([1, 2, 3, 4, 5]).length",
+        "expected": "120"
+      },
+      {
+        "description": "generateParenthesis(3)",
+        "input": "generateParenthesis(3).sort()",
+        "expected": "['((()))', '(()())', '(())()', '()(())', '()()()']"
+      },
+      {
+        "description": "generateParenthesis: n = 0 and n = 1",
+        "input": "[generateParenthesis(0), generateParenthesis(1)]",
+        "expected": "[[''], ['()']]"
+      },
+      {
+        "description": "generateParenthesis counts are Catalan numbers",
+        "input": "generateParenthesis(5).length",
+        "expected": "42"
+      }
+    ],
+    "testHarness": "await $test.run(\"subsets of three numbers (order of results does not matter)\", async () => {\n  const sleep = $test.sleep;\n  const norm = (groups) => groups.map((g) => [...g].sort()).sort((a, b) => (a.join() < b.join() ? -1 : 1));\n  return (norm(subsets([1, 2, 3])));\n}, () => ([[], [1], [1, 2], [1, 2, 3], [1, 3], [2], [2, 3], [3]]));\n\nawait $test.run(\"subsets of an empty array\", async () => {\n  const sleep = $test.sleep;\n  return (subsets([]));\n}, () => ([[]]));\n\nawait $test.run(\"subsets count is 2^n\", async () => {\n  const sleep = $test.sleep;\n  return (subsets([1, 2, 3, 4, 5]).length);\n}, () => (32));\n\nawait $test.run(\"permute of three numbers\", async () => {\n  const sleep = $test.sleep;\n  return (permute([1, 2, 3]).map((p) => p.join('')).sort());\n}, () => (['123', '132', '213', '231', '312', '321']));\n\nawait $test.run(\"permute of one and zero elements\", async () => {\n  const sleep = $test.sleep;\n  return ([permute([1]), permute([])]);\n}, () => ([[[1]], [[]]]));\n\nawait $test.run(\"permute count is n!\", async () => {\n  const sleep = $test.sleep;\n  return (permute([1, 2, 3, 4, 5]).length);\n}, () => (120));\n\nawait $test.run(\"generateParenthesis(3)\", async () => {\n  const sleep = $test.sleep;\n  return (generateParenthesis(3).sort());\n}, () => (['((()))', '(()())', '(())()', '()(())', '()()()']));\n\nawait $test.run(\"generateParenthesis: n = 0 and n = 1\", async () => {\n  const sleep = $test.sleep;\n  return ([generateParenthesis(0), generateParenthesis(1)]);\n}, () => ([[''], ['()']]));\n\nawait $test.run(\"generateParenthesis counts are Catalan numbers\", async () => {\n  const sleep = $test.sleep;\n  return (generateParenthesis(5).length);\n}, () => (42));"
+  },
+  {
+    "id": "reverse-linked-list",
+    "track": "algorithms",
+    "title": "Linked List: Reverse and Middle",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "linked-list",
+      "pointers",
+      "basics"
+    ],
+    "promptSeed": "Nodes look like { val, next } (the last node has next: null). Write reverseList(head) that reverses the list in place and returns the new head (null for an empty list), and middleNode(head) that returns the middle node (the second of the two middles when the length is even; null for an empty list). Use the slow/fast pointer technique for middleNode.",
+    "difficulty": 1,
+    "concept": "linked-lists",
+    "referenceSolution": "function reverseList(head) {\n  let prev = null;\n  let cur = head;\n  while (cur) {\n    const next = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}\n\nfunction middleNode(head) {\n  let slow = head;\n  let fast = head;\n  while (fast && fast.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n  }\n  return slow;\n}",
+    "solution": "function reverseList(head) {\n  let prev = null;\n  let cur = head;\n  while (cur) {\n    const next = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}\n\nfunction middleNode(head) {\n  let slow = head;\n  let fast = head;\n  while (fast && fast.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n  }\n  return slow;\n}",
+    "starterCode": "function reverseList(head) {\n  let prev = null;\n  let cur = head;\n  while (cur) {\n    const next = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}\n\nfunction middleNode(head) {\n  let slow = head;\n  let fast = head;\n  while (fast && fast.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n  }\n  return slow;\n}",
+    "testCases": [
+      {
+        "description": "reverseList reverses a list",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(reverseList(list(1, 2, 3, 4)))",
+        "expected": "[4, 3, 2, 1]"
+      },
+      {
+        "description": "reverseList: empty and single-node lists",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[reverseList(null), toArray(reverseList(list(7)))]",
+        "expected": "[null, [7]]"
+      },
+      {
+        "description": "reverseList relinks the same nodes (in place)",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst a = list(1, 2);\nconst head = a;\nconst r = reverseList(a);\n[r.val, r.next === head, head.next]",
+        "expected": "[2, true, null]"
+      },
+      {
+        "description": "middleNode of an odd-length list",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nmiddleNode(list(1, 2, 3, 4, 5)).val",
+        "expected": "3"
+      },
+      {
+        "description": "middleNode of an even-length list is the second middle",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nmiddleNode(list(1, 2, 3, 4)).val",
+        "expected": "3"
+      },
+      {
+        "description": "middleNode of one node and of an empty list",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[middleNode(list(9)).val, middleNode(null)]",
+        "expected": "[9, null]"
+      }
+    ],
+    "testHarness": "await $test.run(\"reverseList reverses a list\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(reverseList(list(1, 2, 3, 4))));\n}, () => ([4, 3, 2, 1]));\n\nawait $test.run(\"reverseList: empty and single-node lists\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([reverseList(null), toArray(reverseList(list(7)))]);\n}, () => ([null, [7]]));\n\nawait $test.run(\"reverseList relinks the same nodes (in place)\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const a = list(1, 2);\n  const head = a;\n  const r = reverseList(a);\n  return ([r.val, r.next === head, head.next]);\n}, () => ([2, true, null]));\n\nawait $test.run(\"middleNode of an odd-length list\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (middleNode(list(1, 2, 3, 4, 5)).val);\n}, () => (3));\n\nawait $test.run(\"middleNode of an even-length list is the second middle\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (middleNode(list(1, 2, 3, 4)).val);\n}, () => (3));\n\nawait $test.run(\"middleNode of one node and of an empty list\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([middleNode(list(9)).val, middleNode(null)]);\n}, () => ([9, null]));"
+  },
+  {
+    "id": "search-rotated-array",
+    "track": "algorithms",
+    "title": "Binary Search: Rotated Sorted Array",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "binary-search",
+      "array",
+      "rotated"
+    ],
+    "promptSeed": "A sorted ascending array of distinct numbers was rotated at an unknown pivot (e.g. [4,5,6,7,0,1,2]). Write findMin(nums) returning the smallest value (undefined for an empty array) and searchRotated(nums, target) returning the index of target or -1, both in O(log n).",
+    "difficulty": 4,
+    "concept": "binary-search",
+    "referenceSolution": "function findMin(nums) {\n  if (!nums.length) return undefined;\n  let lo = 0;\n  let hi = nums.length - 1;\n  while (lo < hi) {\n    const mid = (lo + hi) >> 1;\n    if (nums[mid] > nums[hi]) lo = mid + 1;\n    else hi = mid;\n  }\n  return nums[lo];\n}\n\nfunction searchRotated(nums, target) {\n  let lo = 0;\n  let hi = nums.length - 1;\n  while (lo <= hi) {\n    const mid = (lo + hi) >> 1;\n    if (nums[mid] === target) return mid;\n    if (nums[lo] <= nums[mid]) {\n      if (nums[lo] <= target && target < nums[mid]) hi = mid - 1;\n      else lo = mid + 1;\n    } else {\n      if (nums[mid] < target && target <= nums[hi]) lo = mid + 1;\n      else hi = mid - 1;\n    }\n  }\n  return -1;\n}",
+    "solution": "function findMin(nums) {\n  if (!nums.length) return undefined;\n  let lo = 0;\n  let hi = nums.length - 1;\n  while (lo < hi) {\n    const mid = (lo + hi) >> 1;\n    if (nums[mid] > nums[hi]) lo = mid + 1;\n    else hi = mid;\n  }\n  return nums[lo];\n}\n\nfunction searchRotated(nums, target) {\n  let lo = 0;\n  let hi = nums.length - 1;\n  while (lo <= hi) {\n    const mid = (lo + hi) >> 1;\n    if (nums[mid] === target) return mid;\n    if (nums[lo] <= nums[mid]) {\n      if (nums[lo] <= target && target < nums[mid]) hi = mid - 1;\n      else lo = mid + 1;\n    } else {\n      if (nums[mid] < target && target <= nums[hi]) lo = mid + 1;\n      else hi = mid - 1;\n    }\n  }\n  return -1;\n}",
+    "starterCode": "function findMin(nums) {\n  if (!nums.length) return undefined;\n  let lo = 0;\n  let hi = nums.length - 1;\n  while (lo < hi) {\n    const mid = (lo + hi) >> 1;\n    if (nums[mid] > nums[hi]) lo = mid + 1;\n    else hi = mid;\n  }\n  return nums[lo];\n}\n\nfunction searchRotated(nums, target) {\n  let lo = 0;\n  let hi = nums.length - 1;\n  while (lo <= hi) {\n    const mid = (lo + hi) >> 1;\n    if (nums[mid] === target) return mid;\n    if (nums[lo] <= nums[mid]) {\n      if (nums[lo] <= target && target < nums[mid]) hi = mid - 1;\n      else lo = mid + 1;\n    } else {\n      if (nums[mid] < target && target <= nums[hi]) lo = mid + 1;\n      else hi = mid - 1;\n    }\n  }\n  return -1;\n}",
+    "testCases": [
+      {
+        "description": "findMin in a rotated array",
+        "input": "[findMin([4, 5, 6, 7, 0, 1, 2]), findMin([3, 4, 5, 1, 2])]",
+        "expected": "[0, 1]"
+      },
+      {
+        "description": "findMin when the array is not rotated or tiny",
+        "input": "[findMin([1, 2, 3]), findMin([5]), findMin([2, 1]), findMin([])]",
+        "expected": "[1, 5, 1, undefined]"
+      },
+      {
+        "description": "searchRotated finds values in both halves",
+        "input": "[searchRotated([4, 5, 6, 7, 0, 1, 2], 0), searchRotated([4, 5, 6, 7, 0, 1, 2], 5), searchRotated([4, 5, 6, 7, 0, 1, 2], 2)]",
+        "expected": "[4, 1, 6]"
+      },
+      {
+        "description": "searchRotated returns -1 when missing",
+        "input": "[searchRotated([4, 5, 6, 7, 0, 1, 2], 3), searchRotated([1], 0), searchRotated([], 1)]",
+        "expected": "[-1, -1, -1]"
+      },
+      {
+        "description": "searchRotated on an unrotated and two-element array",
+        "input": "[searchRotated([1, 2, 3, 4], 3), searchRotated([3, 1], 1), searchRotated([3, 1], 3)]",
+        "expected": "[2, 1, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"findMin in a rotated array\", async () => {\n  const sleep = $test.sleep;\n  return ([findMin([4, 5, 6, 7, 0, 1, 2]), findMin([3, 4, 5, 1, 2])]);\n}, () => ([0, 1]));\n\nawait $test.run(\"findMin when the array is not rotated or tiny\", async () => {\n  const sleep = $test.sleep;\n  return ([findMin([1, 2, 3]), findMin([5]), findMin([2, 1]), findMin([])]);\n}, () => ([1, 5, 1, undefined]));\n\nawait $test.run(\"searchRotated finds values in both halves\", async () => {\n  const sleep = $test.sleep;\n  return ([searchRotated([4, 5, 6, 7, 0, 1, 2], 0), searchRotated([4, 5, 6, 7, 0, 1, 2], 5), searchRotated([4, 5, 6, 7, 0, 1, 2], 2)]);\n}, () => ([4, 1, 6]));\n\nawait $test.run(\"searchRotated returns -1 when missing\", async () => {\n  const sleep = $test.sleep;\n  return ([searchRotated([4, 5, 6, 7, 0, 1, 2], 3), searchRotated([1], 0), searchRotated([], 1)]);\n}, () => ([-1, -1, -1]));\n\nawait $test.run(\"searchRotated on an unrotated and two-element array\", async () => {\n  const sleep = $test.sleep;\n  return ([searchRotated([1, 2, 3, 4], 3), searchRotated([3, 1], 1), searchRotated([3, 1], 3)]);\n}, () => ([2, 1, 0]));"
+  },
+  {
+    "id": "trie-prefix-tree",
+    "track": "algorithms",
+    "title": "Trie: Insert, Search, Prefix",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "trie",
+      "class",
+      "string",
+      "design"
+    ],
+    "promptSeed": "Implement class Trie with insert(word), search(word) (true only for a complete inserted word), startsWith(prefix) (true when any inserted word begins with prefix; the empty prefix is true once a word exists) and wordsWithPrefix(prefix) returning every inserted word that starts with prefix in alphabetical order (no duplicates, [] when none).",
+    "difficulty": 3,
+    "concept": "trie",
+    "referenceSolution": "class Trie {\n  constructor() {\n    this.root = { children: {}, end: false };\n  }\n  insert(word) {\n    let node = this.root;\n    for (const ch of word) {\n      if (!node.children[ch]) node.children[ch] = { children: {}, end: false };\n      node = node.children[ch];\n    }\n    node.end = true;\n  }\n  _find(prefix) {\n    let node = this.root;\n    for (const ch of prefix) {\n      node = node.children[ch];\n      if (!node) return null;\n    }\n    return node;\n  }\n  search(word) {\n    const node = this._find(word);\n    return !!node && node.end;\n  }\n  startsWith(prefix) {\n    const node = this._find(prefix);\n    if (!node) return false;\n    return node.end || Object.keys(node.children).length > 0;\n  }\n  wordsWithPrefix(prefix) {\n    const start = this._find(prefix);\n    const out = [];\n    const walk = (node, path) => {\n      if (node.end) out.push(path);\n      for (const ch of Object.keys(node.children).sort()) walk(node.children[ch], path + ch);\n    };\n    if (start) walk(start, prefix);\n    return out;\n  }\n}",
+    "solution": "class Trie {\n  constructor() {\n    this.root = { children: {}, end: false };\n  }\n  insert(word) {\n    let node = this.root;\n    for (const ch of word) {\n      if (!node.children[ch]) node.children[ch] = { children: {}, end: false };\n      node = node.children[ch];\n    }\n    node.end = true;\n  }\n  _find(prefix) {\n    let node = this.root;\n    for (const ch of prefix) {\n      node = node.children[ch];\n      if (!node) return null;\n    }\n    return node;\n  }\n  search(word) {\n    const node = this._find(word);\n    return !!node && node.end;\n  }\n  startsWith(prefix) {\n    const node = this._find(prefix);\n    if (!node) return false;\n    return node.end || Object.keys(node.children).length > 0;\n  }\n  wordsWithPrefix(prefix) {\n    const start = this._find(prefix);\n    const out = [];\n    const walk = (node, path) => {\n      if (node.end) out.push(path);\n      for (const ch of Object.keys(node.children).sort()) walk(node.children[ch], path + ch);\n    };\n    if (start) walk(start, prefix);\n    return out;\n  }\n}",
+    "starterCode": "class Trie {\n  constructor() {\n    this.root = { children: {}, end: false };\n  }\n  insert(word) {\n    let node = this.root;\n    for (const ch of word) {\n      if (!node.children[ch]) node.children[ch] = { children: {}, end: false };\n      node = node.children[ch];\n    }\n    node.end = true;\n  }\n  _find(prefix) {\n    let node = this.root;\n    for (const ch of prefix) {\n      node = node.children[ch];\n      if (!node) return null;\n    }\n    return node;\n  }\n  search(word) {\n    const node = this._find(word);\n    return !!node && node.end;\n  }\n  startsWith(prefix) {\n    const node = this._find(prefix);\n    if (!node) return false;\n    return node.end || Object.keys(node.children).length > 0;\n  }\n  wordsWithPrefix(prefix) {\n    const start = this._find(prefix);\n    const out = [];\n    const walk = (node, path) => {\n      if (node.end) out.push(path);\n      for (const ch of Object.keys(node.children).sort()) walk(node.children[ch], path + ch);\n    };\n    if (start) walk(start, prefix);\n    return out;\n  }\n}",
+    "testCases": [
+      {
+        "description": "search finds only complete words",
+        "input": "const t = new Trie();\nt.insert('apple');\n[t.search('apple'), t.search('app'), t.search('apples')]",
+        "expected": "[true, false, false]"
+      },
+      {
+        "description": "startsWith finds prefixes",
+        "input": "const t = new Trie();\nt.insert('apple');\n[t.startsWith('app'), t.startsWith('apple'), t.startsWith('b')]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "A word that is a prefix of another stays searchable",
+        "input": "const t = new Trie();\nt.insert('app'); t.insert('apple');\n[t.search('app'), t.search('apple')]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "Empty trie",
+        "input": "const t = new Trie();\n[t.search('a'), t.startsWith('a'), t.startsWith('')]",
+        "expected": "[false, false, false]"
+      },
+      {
+        "description": "wordsWithPrefix lists matches alphabetically",
+        "input": "const t = new Trie();\nfor (const w of ['car', 'cat', 'cart', 'dog', 'ca']) t.insert(w);\nt.wordsWithPrefix('ca')",
+        "expected": "['ca', 'car', 'cart', 'cat']"
+      },
+      {
+        "description": "wordsWithPrefix: no match and duplicate inserts",
+        "input": "const t = new Trie();\nt.insert('go'); t.insert('go');\n[t.wordsWithPrefix('x'), t.wordsWithPrefix('g')]",
+        "expected": "[[], ['go']]"
+      },
+      {
+        "description": "wordsWithPrefix with the empty prefix returns all words",
+        "input": "const t = new Trie();\nfor (const w of ['b', 'a', 'ab']) t.insert(w);\nt.wordsWithPrefix('')",
+        "expected": "['a', 'ab', 'b']"
+      }
+    ],
+    "testHarness": "await $test.run(\"search finds only complete words\", async () => {\n  const sleep = $test.sleep;\n  const t = new Trie();\n  t.insert('apple');\n  return ([t.search('apple'), t.search('app'), t.search('apples')]);\n}, () => ([true, false, false]));\n\nawait $test.run(\"startsWith finds prefixes\", async () => {\n  const sleep = $test.sleep;\n  const t = new Trie();\n  t.insert('apple');\n  return ([t.startsWith('app'), t.startsWith('apple'), t.startsWith('b')]);\n}, () => ([true, true, false]));\n\nawait $test.run(\"A word that is a prefix of another stays searchable\", async () => {\n  const sleep = $test.sleep;\n  const t = new Trie();\n  t.insert('app'); t.insert('apple');\n  return ([t.search('app'), t.search('apple')]);\n}, () => ([true, true]));\n\nawait $test.run(\"Empty trie\", async () => {\n  const sleep = $test.sleep;\n  const t = new Trie();\n  return ([t.search('a'), t.startsWith('a'), t.startsWith('')]);\n}, () => ([false, false, false]));\n\nawait $test.run(\"wordsWithPrefix lists matches alphabetically\", async () => {\n  const sleep = $test.sleep;\n  const t = new Trie();\n  for (const w of ['car', 'cat', 'cart', 'dog', 'ca']) t.insert(w);\n  return (t.wordsWithPrefix('ca'));\n}, () => (['ca', 'car', 'cart', 'cat']));\n\nawait $test.run(\"wordsWithPrefix: no match and duplicate inserts\", async () => {\n  const sleep = $test.sleep;\n  const t = new Trie();\n  t.insert('go'); t.insert('go');\n  return ([t.wordsWithPrefix('x'), t.wordsWithPrefix('g')]);\n}, () => ([[], ['go']]));\n\nawait $test.run(\"wordsWithPrefix with the empty prefix returns all words\", async () => {\n  const sleep = $test.sleep;\n  const t = new Trie();\n  for (const w of ['b', 'a', 'ab']) t.insert(w);\n  return (t.wordsWithPrefix(''));\n}, () => (['a', 'ab', 'b']));"
   }
 ]

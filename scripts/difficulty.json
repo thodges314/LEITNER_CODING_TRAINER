@@ -474,5 +474,85 @@
  "optimistic-like-button": {
   "difficulty": 3,
   "concept": "optimistic-ui"
+ },
+ "reverse-linked-list": {
+  "difficulty": 1,
+  "concept": "linked-lists"
+ },
+ "linked-list-cycle-merge": {
+  "difficulty": 2,
+  "concept": "linked-lists"
+ },
+ "min-stack": {
+  "difficulty": 2,
+  "concept": "stack"
+ },
+ "anagram-palindrome": {
+  "difficulty": 1,
+  "concept": "strings"
+ },
+ "group-anagrams-top-k": {
+  "difficulty": 2,
+  "concept": "hashing"
+ },
+ "climb-stairs-fib-dp": {
+  "difficulty": 1,
+  "concept": "dp"
+ },
+ "coin-change-dp": {
+  "difficulty": 3,
+  "concept": "dp"
+ },
+ "lis-house-robber-dp": {
+  "difficulty": 4,
+  "concept": "dp"
+ },
+ "bst-search-insert": {
+  "difficulty": 2,
+  "concept": "bst"
+ },
+ "bst-validate-lca-invert": {
+  "difficulty": 3,
+  "concept": "bst"
+ },
+ "flood-fill-islands": {
+  "difficulty": 3,
+  "concept": "graphs"
+ },
+ "course-schedule-topo": {
+  "difficulty": 4,
+  "concept": "graphs"
+ },
+ "trie-prefix-tree": {
+  "difficulty": 3,
+  "concept": "trie"
+ },
+ "min-heap-class": {
+  "difficulty": 3,
+  "concept": "heap"
+ },
+ "merge-sort-quick-sort": {
+  "difficulty": 3,
+  "concept": "sorting"
+ },
+ "permutations-subsets-backtracking": {
+  "difficulty": 3,
+  "concept": "backtracking"
+ },
+ "binary-search-variants": {
+  "difficulty": 2,
+  "concept": "binary-search"
+ },
+ "search-rotated-array": {
+  "difficulty": 4,
+  "concept": "binary-search"
+ },
+ "matrix-rotate-spiral": {
+  "difficulty": 3,
+  "concept": "matrix"
+ },
+ "kadane-prefix-sum": {
+  "difficulty": 2,
+  "concept": "arrays"
  }
 }
