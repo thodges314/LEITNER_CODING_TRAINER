@@ -20,6 +20,14 @@ export interface DraftedTopic {
   title: string;
   promptSeed: string;
   tags: string[];
+  targetTime?: string;
+  targetSpace?: string;
+  complexityExplanation?: string;
+  starterCode?: string;
+  referenceSolution?: string;
+  testHarness?: string;
+  difficulty?: number;
+  concept?: string;
 }
 
 export const API_KEY_KEY = 'ai_evaluator_key';
@@ -490,11 +498,17 @@ Evaluate functional correctness and invariants according to your system instruct
 const DRAFT_SYSTEM_PROMPT = `The user will describe a coding pattern or interview concept informally. 
 Extract and return ONLY a valid JSON object matching this schema:
 {
-  "id": string (kebab-case),
+  "id": string (kebab-case identifier),
   "track": one of ${TRACK_TYPES.map((t) => `'${t}'`).join(' | ')},
   "title": string (concise name),
-  "promptSeed": string (a clear, cold-start prompt describing what to write without giving away boilerplate),
-  "tags": string[]
+  "promptSeed": string (a clear, cold-start prompt describing what to write, requirements, and invariants to satisfy),
+  "tags": string[],
+  "targetTime": string (e.g. "O(1)", "O(n)", "O(n log n)"),
+  "targetSpace": string (e.g. "O(1)", "O(n)"),
+  "complexityExplanation": string (succinct 1-2 sentence explanation of the target time and space complexity),
+  "starterCode": string (minimal boilerplate function or component signature stub),
+  "referenceSolution": string (canonical, optimal, clean implementation),
+  "testHarness": string (executable test verification script using $test.check('description', condition))
 }`;
 
 export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> {
@@ -524,6 +538,13 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
       title: words.charAt(0).toUpperCase() + words.slice(1),
       promptSeed: `Implement a production-grade solution for: ${userNote.trim()}.\n\nInvariants to fulfill:\n1. Specify exact input types, outputs, and edge cases (e.g. empty inputs or boundary values).\n2. Adhere to optimal time and space complexity without auxiliary bloat.\n3. Include proper error boundaries or null-check guards.\n4. Write clean, self-documenting cold-start code from scratch.`,
       tags: [track, 'cold-start', 'custom'],
+      targetTime: 'O(n)',
+      targetSpace: 'O(1)',
+      complexityExplanation: 'Linear time scan with constant extra auxiliary memory.',
+      starterCode: `export function solution() {\n  // Write cold-start solution here\n}\n`,
+      referenceSolution: `export function solution() {\n  // Canonical implementation\n  return true;\n}\n`,
+      testHarness: `{\n  $test.check('Defined function exists', typeof solution === 'function');\n}\n`,
+      difficulty: 2,
     };
   }
 
@@ -611,6 +632,13 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
       title: String(parsed.title || 'Untitled Topic'),
       promptSeed: String(parsed.promptSeed || userNote),
       tags: Array.isArray(parsed.tags) ? parsed.tags.map(String) : [track],
+      targetTime: parsed.targetTime ? String(parsed.targetTime) : 'O(n)',
+      targetSpace: parsed.targetSpace ? String(parsed.targetSpace) : 'O(1)',
+      complexityExplanation: parsed.complexityExplanation ? String(parsed.complexityExplanation) : undefined,
+      starterCode: parsed.starterCode ? String(parsed.starterCode) : undefined,
+      referenceSolution: parsed.referenceSolution ? String(parsed.referenceSolution) : undefined,
+      testHarness: parsed.testHarness ? String(parsed.testHarness) : undefined,
+      difficulty: typeof parsed.difficulty === 'number' ? parsed.difficulty : 2,
     };
   } catch (err) {
     console.warn('API draft failed; falling back to heuristic drafter:', err);
@@ -620,6 +648,13 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
       title: userNote.slice(0, 40),
       promptSeed: `Implement: ${userNote}.\n\nInvariants:\n1. Functional correctness.\n2. Invariant verification.\n3. Clean cold-start code.`,
       tags: ['custom'],
+      targetTime: 'O(n)',
+      targetSpace: 'O(1)',
+      complexityExplanation: 'Linear time scan with constant extra memory.',
+      starterCode: `export function solution() {\n  // Write cold-start solution here\n}\n`,
+      referenceSolution: `export function solution() {\n  // Canonical implementation\n  return true;\n}\n`,
+      testHarness: `{\n  $test.check('Defined function exists', typeof solution === 'function');\n}\n`,
+      difficulty: 2,
     };
   }
 }

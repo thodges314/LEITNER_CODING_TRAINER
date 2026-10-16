@@ -196,6 +196,14 @@ export function App() {
     title: string;
     promptSeed: string;
     tags: string[];
+    targetTime?: string;
+    targetSpace?: string;
+    complexityExplanation?: string;
+    starterCode?: string;
+    referenceSolution?: string;
+    testHarness?: string;
+    difficulty?: number;
+    concept?: string;
   }) => {
     const next = addCustomTopicToDeck(deckState, newTopic);
     setDeckState(next);

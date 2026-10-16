@@ -846,6 +846,14 @@ export function addCustomTopicToDeck(
     title: string;
     promptSeed: string;
     tags: string[];
+    targetTime?: string;
+    targetSpace?: string;
+    complexityExplanation?: string;
+    starterCode?: string;
+    referenceSolution?: string;
+    testHarness?: string;
+    difficulty?: number;
+    concept?: string;
   }
 ): LeitnerDeckState {
   // Ensure id is unique
@@ -865,6 +873,15 @@ export function addCustomTopicToDeck(
     status: 'active',
     tags: newCard.tags.map((tg) => tg.trim()).filter(Boolean),
     promptSeed: newCard.promptSeed.trim(),
+    targetTime: newCard.targetTime?.trim() || 'O(n)',
+    targetSpace: newCard.targetSpace?.trim() || 'O(1)',
+    complexityExplanation: newCard.complexityExplanation?.trim(),
+    starterCode: newCard.starterCode?.trim(),
+    solution: newCard.referenceSolution?.trim(),
+    referenceSolution: newCard.referenceSolution?.trim(),
+    testHarness: newCard.testHarness?.trim(),
+    difficulty: newCard.difficulty ?? 2,
+    concept: newCard.concept?.trim(),
   };
 
   const nextState: LeitnerDeckState = {

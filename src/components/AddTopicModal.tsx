@@ -7,6 +7,10 @@ import {
   Check,
   Layers,
   Wand2,
+  Clock,
+  Code,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import { TRACK_TYPES, getTrackMeta } from '../lib/leitner';
 import type { TrackType } from '../lib/leitner';
@@ -22,6 +26,12 @@ interface AddTopicModalProps {
     title: string;
     promptSeed: string;
     tags: string[];
+    targetTime?: string;
+    targetSpace?: string;
+    complexityExplanation?: string;
+    starterCode?: string;
+    referenceSolution?: string;
+    testHarness?: string;
   }) => void;
 }
 
@@ -41,6 +51,15 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
   const [promptSeed, setPromptSeed] = useState('');
   const [tagsInput, setTagsInput] = useState('');
 
+  // Complexity & Solution states
+  const [targetTime, setTargetTime] = useState('O(n)');
+  const [targetSpace, setTargetSpace] = useState('O(1)');
+  const [complexityExplanation, setComplexityExplanation] = useState('');
+  const [referenceSolution, setReferenceSolution] = useState('');
+  const [starterCode, setStarterCode] = useState('');
+  const [testHarness, setTestHarness] = useState('');
+  const [showCodeDetails, setShowCodeDetails] = useState(false);
+
   if (!isOpen) return null;
 
   const handleDraft = async () => {
@@ -54,6 +73,12 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
       setTrack(res.track);
       setPromptSeed(res.promptSeed);
       setTagsInput(res.tags.join(', '));
+      setTargetTime(res.targetTime || 'O(n)');
+      setTargetSpace(res.targetSpace || 'O(1)');
+      setComplexityExplanation(res.complexityExplanation || '');
+      setReferenceSolution(res.referenceSolution || '');
+      setStarterCode(res.starterCode || '');
+      setTestHarness(res.testHarness || '');
     } catch (err) {
       console.error('Draft error:', err);
     } finally {
@@ -62,18 +87,32 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
   };
 
   const handleManualCreateInstead = () => {
+    const slug = `custom-${Date.now().toString(36)}`;
+    const cardTitle = userNote ? userNote.slice(0, 40) : 'Custom Coding Challenge';
     setDrafted({
-      id: `custom-${Date.now().toString(36)}`,
+      id: slug,
       track: 'algorithms',
-      title: userNote ? userNote.slice(0, 40) : 'Custom Coding Challenge',
+      title: cardTitle,
       promptSeed: 'Describe the cold-start problem, function signature, and invariants here.',
       tags: ['custom'],
+      targetTime: 'O(n)',
+      targetSpace: 'O(1)',
+      complexityExplanation: 'Linear time scan with constant extra space.',
+      referenceSolution: `export function solution() {\n  return true;\n}`,
+      starterCode: `export function solution() {\n  // Code here\n}`,
+      testHarness: `{\n  $test.check('Basic run check', typeof solution === 'function');\n}`,
     });
-    setId(`custom-${Date.now().toString(36)}`);
-    setTitle(userNote ? userNote.slice(0, 40) : 'Custom Coding Challenge');
+    setId(slug);
+    setTitle(cardTitle);
     setTrack('algorithms');
     setPromptSeed('Describe the cold-start problem, function signature, and invariants here.');
     setTagsInput('custom, interview');
+    setTargetTime('O(n)');
+    setTargetSpace('O(1)');
+    setComplexityExplanation('Linear time scan with constant extra space.');
+    setReferenceSolution(`export function solution() {\n  return true;\n}`);
+    setStarterCode(`export function solution() {\n  // Code here\n}`);
+    setTestHarness(`{\n  $test.check('Basic run check', typeof solution === 'function');\n}`);
   };
 
   const handleSaveToDeck = (e: FormEvent) => {
@@ -91,6 +130,12 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
       title: title.trim(),
       promptSeed: promptSeed.trim(),
       tags: parsedTags.length > 0 ? parsedTags : [track],
+      targetTime: targetTime.trim() || 'O(n)',
+      targetSpace: targetSpace.trim() || 'O(1)',
+      complexityExplanation: complexityExplanation.trim() || undefined,
+      referenceSolution: referenceSolution.trim() || undefined,
+      starterCode: starterCode.trim() || undefined,
+      testHarness: testHarness.trim() || undefined,
     });
 
     // Reset and close
@@ -292,8 +337,153 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
                 value={promptSeed}
                 onChange={(e) => setPromptSeed(e.target.value)}
                 className="code-buffer"
-                style={{ fontSize: '13px', height: '120px' }}
+                style={{ fontSize: '13px', height: '110px' }}
               />
+            </div>
+
+            {/* Target Complexity Goals */}
+            <div
+              style={{
+                padding: '12px',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(56, 189, 248, 0.05)',
+                border: '1px solid rgba(56, 189, 248, 0.15)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, color: 'var(--accent-cyan)' }}>
+                <Clock size={13} />
+                <span>Target Complexity Goals</span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                    Target Time Complexity
+                  </label>
+                  <input
+                    type="text"
+                    value={targetTime}
+                    onChange={(e) => setTargetTime(e.target.value)}
+                    placeholder="e.g. O(n) or O(1)"
+                    className="code-buffer"
+                    style={{ height: '34px', padding: '6px 8px', fontSize: '12px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                    Target Space Complexity
+                  </label>
+                  <input
+                    type="text"
+                    value={targetSpace}
+                    onChange={(e) => setTargetSpace(e.target.value)}
+                    placeholder="e.g. O(1) or O(n)"
+                    className="code-buffer"
+                    style={{ height: '34px', padding: '6px 8px', fontSize: '12px' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                  Complexity Explanation
+                </label>
+                <input
+                  type="text"
+                  value={complexityExplanation}
+                  onChange={(e) => setComplexityExplanation(e.target.value)}
+                  placeholder="e.g. Linear scan with hash map lookup"
+                  className="code-buffer"
+                  style={{ height: '34px', padding: '6px 8px', fontSize: '12px' }}
+                />
+              </div>
+            </div>
+
+            {/* Reference Solution & Test Harness Collapsible */}
+            <div
+              style={{
+                borderRadius: '8px',
+                border: '1px solid var(--border-subtle)',
+                overflow: 'hidden',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setShowCodeDetails(!showCodeDetails)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  backgroundColor: 'var(--bg-elevated)',
+                  border: 'none',
+                  color: 'var(--text-primary)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  cursor: 'pointer',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Code size={13} color="#a855f7" />
+                  <span>Reference Solution & Test Harness</span>
+                  {(referenceSolution || testHarness) && (
+                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(52, 211, 153, 0.15)', color: '#34d399', padding: '1px 6px', borderRadius: '4px' }}>
+                      Populated
+                    </span>
+                  )}
+                </div>
+                {showCodeDetails ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </button>
+
+              {showCodeDetails && (
+                <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px', backgroundColor: 'var(--bg-surface)' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      Canonical Reference Solution
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={referenceSolution}
+                      onChange={(e) => setReferenceSolution(e.target.value)}
+                      placeholder="// Canonical optimal implementation"
+                      className="code-buffer"
+                      style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      Starter Skeleton (Optional)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={starterCode}
+                      onChange={(e) => setStarterCode(e.target.value)}
+                      placeholder="// Starting function signature or stub"
+                      className="code-buffer"
+                      style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '3px' }}>
+                      Test Harness Assertions ($test.check) (Optional)
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={testHarness}
+                      onChange={(e) => setTestHarness(e.target.value)}
+                      placeholder="{\n  $test.check('Correct output', solve(input) === expected);\n}"
+                      className="code-buffer"
+                      style={{ fontSize: '12px', fontFamily: 'var(--font-mono)' }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div
