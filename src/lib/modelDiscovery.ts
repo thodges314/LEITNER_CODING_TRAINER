@@ -54,6 +54,10 @@ const RECOMMENDED_MODELS: Record<AIProvider, string[]> = {
     'gpt-4-turbo',
   ],
   openrouter: [
+    'nvidia/nemotron-3-super-120b-a12b:free',
+    'google/gemma-4-31b-it:free',
+    'cohere/north-mini-code:free',
+    'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
     'google/gemini-2.5-flash',
     'meta-llama/llama-3.3-70b-instruct:free',
     'qwen/qwen-2.5-coder-32b-instruct',

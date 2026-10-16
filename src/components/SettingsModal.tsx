@@ -58,6 +58,54 @@ const PROVIDER_KEY_PORTALS: Record<AIProvider, ProviderKeyPortal | null> = {
     description: 'Run local open-source models without an API key',
   },
 };
+
+interface CuratedOpenRouterPick {
+  id: string;
+  name: string;
+  providerBadge: string;
+  verdictBadge: string;
+  contextWindow: string;
+  whyItsSolid: string;
+}
+
+const TOP_OPENROUTER_FREE_PICKS: CuratedOpenRouterPick[] = [
+  {
+    id: 'nvidia/nemotron-3-super-120b-a12b:free',
+    name: 'NVIDIA Nemotron 3 Super (120B)',
+    providerBadge: '120B MoE • NVIDIA',
+    verdictBadge: 'Best for Algorithmic Logic & Big-O',
+    contextWindow: '128k',
+    whyItsSolid:
+      'With 120B total parameters and an architecture built for instruction following, it performs well at parsing algorithmic logic and evaluating time/space complexity bounds.',
+  },
+  {
+    id: 'google/gemma-4-31b-it:free',
+    name: 'Google Gemma 4 31B Instruct',
+    providerBadge: '31B Dense • Google',
+    verdictBadge: 'Best for Clean TS/JS Syntax',
+    contextWindow: '262k',
+    whyItsSolid:
+      'A 31B dense model with a 262k context window. It handles syntactic verification, TypeScript/JavaScript idioms, and edge-case detection reliably without hallucinating invalid syntax.',
+  },
+  {
+    id: 'cohere/north-mini-code:free',
+    name: 'Cohere North Mini Code',
+    providerBadge: 'Code-Tuned • Cohere',
+    verdictBadge: 'Best for Fast Grading',
+    contextWindow: '256k',
+    whyItsSolid:
+      'Specifically tuned for code syntax, completions, and code-critique workflows with a 256k context window. It delivers tight, deterministic answers when grading solutions.',
+  },
+  {
+    id: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+    name: 'NVIDIA Nemotron 3 Nano Omni (Reasoning)',
+    providerBadge: '30B Reasoning • NVIDIA',
+    verdictBadge: 'Best for Multi-Step Async Bugs',
+    contextWindow: '128k',
+    whyItsSolid:
+      'Designed with reasoning-focused weights, making it effective for breaking down multi-step logic errors or asynchronous patterns.',
+  },
+];
 import {
   getStoredApiKey,
   setStoredApiKey,
@@ -1033,6 +1081,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     cursor: 'pointer',
                   }}
                 >
+                  {/* Active Selected Model Fallback if not yet in discovered list */}
+                  {model && !discoveredModels.some((m) => m.id === model) && (
+                    <optgroup label="📌 Active Model Selection">
+                      <option value={model}>
+                        {model} • [SELECTED]
+                      </option>
+                    </optgroup>
+                  )}
+
                   {/* Recommended Models */}
                   {discoveredModels.some((m) => m.recommended) && (
                     <optgroup label="🌟 Recommended for Cold-Start Practice">
@@ -1075,7 +1132,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 {/* Selected Model Capability Preview Badge */}
                 {(() => {
-                  const activeModel = discoveredModels.find((m) => m.id === model);
+                  const curated = TOP_OPENROUTER_FREE_PICKS.find((p) => p.id === model);
+                  const activeModel =
+                    discoveredModels.find((m) => m.id === model) ||
+                    (curated && provider === 'openrouter'
+                      ? {
+                          id: curated.id,
+                          name: curated.name,
+                          description: curated.whyItsSolid,
+                          contextWindow: parseInt(curated.contextWindow) * 1024,
+                          isFree: true,
+                          ownedBy: curated.providerBadge,
+                          recommended: true,
+                        }
+                      : null);
                   if (!activeModel) return null;
                   return (
                     <div
@@ -1175,7 +1245,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       : provider === 'groq'
                       ? 'llama-3.3-70b-versatile'
                       : provider === 'openrouter'
-                      ? 'google/gemini-2.5-flash'
+                      ? 'nvidia/nemotron-3-super-120b-a12b:free'
                       : 'gpt-4o-mini'
                   }
                   value={model}
@@ -1190,6 +1260,149 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     ? 'Click "Refresh" above to discover models from this provider, or type manually.'
                     : 'Save an API key above to automatically query and populate available models.'}
                 </span>
+              </div>
+            )}
+
+            {/* Curated Top Free OpenRouter Picks */}
+            {provider === 'openrouter' && (
+              <div
+                style={{
+                  marginTop: '12px',
+                  padding: '12px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(56, 189, 248, 0.04)',
+                  border: '1px solid rgba(56, 189, 248, 0.18)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                    <Sparkles size={15} color="#38bdf8" />
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                      Top Free OpenRouter Picks for Code Evaluation
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '10.5px',
+                      padding: '2px 7px',
+                      borderRadius: '10px',
+                      backgroundColor: 'rgba(52, 211, 153, 0.15)',
+                      color: '#34d399',
+                      fontWeight: 600,
+                    }}
+                  >
+                    4 Curated Free Models
+                  </span>
+                </div>
+
+                {/* Comparative assessment / verdict summary */}
+                <div
+                  style={{
+                    fontSize: '11.5px',
+                    color: 'var(--text-secondary)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                    padding: '8px 10px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <strong style={{ color: 'var(--accent-cyan)' }}>Comparative Assessment: </strong>
+                  <strong>NVIDIA Nemotron 3 Super (120B)</strong> is the single strongest pick for calculating Big-O time/space complexity and verifying deep algorithmic invariants due to its 120B parameter scale. <strong>Google Gemma 4 (31B)</strong> is the premier dense choice for clean TypeScript/JS syntax and standard library edge-cases without router hallucinations.
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: '8px',
+                  }}
+                >
+                  {TOP_OPENROUTER_FREE_PICKS.map((pick) => {
+                    const isSelected = model === pick.id;
+                    return (
+                      <div
+                        key={pick.id}
+                        onClick={() => {
+                          handleModelChange(pick.id);
+                          setCustomModelMode(false);
+                        }}
+                        style={{
+                          padding: '10px 12px',
+                          borderRadius: '6px',
+                          backgroundColor: isSelected ? 'rgba(56, 189, 248, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                          border: isSelected ? '1px solid var(--accent-cyan)' : '1px solid rgba(255, 255, 255, 0.08)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px',
+                          transition: 'all 0.15s ease',
+                          boxShadow: isSelected ? '0 0 10px rgba(56, 189, 248, 0.15)' : 'none',
+                        }}
+                        title={`Click to select ${pick.name}`}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '6px' }}>
+                          <div>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: isSelected ? '#38bdf8' : 'var(--text-primary)' }}>
+                              {pick.name}
+                            </div>
+                            <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                              {pick.id}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+                            <span
+                              style={{
+                                fontSize: '9.5px',
+                                padding: '1px 5px',
+                                borderRadius: '3px',
+                                backgroundColor: isSelected ? 'rgba(56, 189, 248, 0.25)' : 'rgba(52, 211, 153, 0.18)',
+                                color: isSelected ? '#38bdf8' : '#34d399',
+                                fontWeight: 700,
+                              }}
+                            >
+                              {isSelected ? '✓ ACTIVE' : 'FREE'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                          <span
+                            style={{
+                              fontSize: '9.5px',
+                              padding: '1px 5px',
+                              borderRadius: '3px',
+                              backgroundColor: 'rgba(168, 85, 247, 0.15)',
+                              color: '#c084fc',
+                              fontWeight: 500,
+                            }}
+                          >
+                            {pick.verdictBadge}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '9.5px',
+                              padding: '1px 5px',
+                              borderRadius: '3px',
+                              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                              color: 'var(--text-muted)',
+                            }}
+                          >
+                            {pick.contextWindow} ctx
+                          </span>
+                        </div>
+
+                        <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                          <strong style={{ color: 'var(--text-primary)' }}>Why it's solid: </strong>
+                          {pick.whyItsSolid}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>
