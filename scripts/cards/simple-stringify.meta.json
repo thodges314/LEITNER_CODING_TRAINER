@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Serialization: simpleStringify (Primitives and Arrays)",
+  "tags": [
+    "json",
+    "serialization",
+    "recursion",
+    "basics"
+  ]
+}

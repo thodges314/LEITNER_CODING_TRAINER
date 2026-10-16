@@ -1,0 +1,10 @@
+{
+  "track": "async-js",
+  "title": "Event Loop: Sync, Microtask, Timeout Order",
+  "tags": [
+    "event-loop",
+    "microtask",
+    "promise",
+    "basics"
+  ]
+}

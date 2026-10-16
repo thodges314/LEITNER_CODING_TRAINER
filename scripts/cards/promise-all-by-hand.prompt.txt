@@ -1,0 +1,1 @@
+Without using Promise.all, write myAll(items) that takes an array of values and/or promises and returns a promise that resolves to an array of the results in the SAME ORDER as the input (not completion order). Use a counter of how many have finished. It rejects as soon as any input rejects (with that reason), and myAll([]) resolves to [].

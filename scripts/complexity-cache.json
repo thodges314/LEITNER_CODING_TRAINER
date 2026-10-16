@@ -693,5 +693,75 @@
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Each function is a single pass; productExceptSelf and subarraySum keep an O(n) output array or prefix-sum map (Kadane alone is O(1) space)."
+  },
+  "insertion-sort-basic": {
+    "targetTime": "O(n²)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Insertion sort shifts elements within nested loops over n items and selection sort scans the unsorted rest n times, both using constant extra space apart from the output copy."
+  },
+  "heap-array-basics": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Index helpers are O(1), isMinHeap checks each parent once and siftUp climbs at most the tree height (log n) using constant extra space."
+  },
+  "trie-nested-object": {
+    "targetTime": "O(total characters)",
+    "targetSpace": "O(total characters)",
+    "complexityExplanation": "Building visits every character of every word once and creates at most one nested object per character; lookups cost one step per character."
+  },
+  "binary-strings-combinations": {
+    "targetTime": "O(n · 2ⁿ) / O(k · C(n,k))",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Output size dominates (2ⁿ strings or C(n,k) combinations) while the recursion depth and current path stay at most n long."
+  },
+  "matrix-basics": {
+    "targetTime": "O(rows × cols)",
+    "targetSpace": "O(rows × cols)",
+    "complexityExplanation": "Creating or summing touches every cell once; diagonalSum is O(n) and createMatrix allocates the full grid."
+  },
+  "graph-adjacency-bfs": {
+    "targetTime": "O(V + E)",
+    "targetSpace": "O(V + E)",
+    "complexityExplanation": "Building the adjacency list and the breadth-first search each touch every vertex and edge once, storing the lists and a visited set."
+  },
+  "event-loop-order": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "A fixed number of scheduled callbacks and log entries regardless of input."
+  },
+  "promise-all-by-hand": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each input is subscribed to once and the results array holds one slot per input."
+  },
+  "iterable-range-class": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Iteration yields one value per step using only a counter; take() stops after n items."
+  },
+  "compose-middleware": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each middleware runs at most once per call and the chain of pending next() promises is as deep as the number of middleware."
+  },
+  "simple-stringify": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Every element and character is visited once, building an output string proportional to the input."
+  },
+  "ts-identity-first-generics": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each function does constant work; the generics only exist at compile time."
+  },
+  "ts-narrowing-typeof-in": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each function performs a constant number of type checks; narrowing is a compile-time feature."
+  },
+  "ts-reimplement-utility-types": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Pure compile-time mapped types; there is no runtime work."
   }
 }

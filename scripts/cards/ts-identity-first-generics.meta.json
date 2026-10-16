@@ -1,0 +1,9 @@
+{
+  "track": "typescript-patterns",
+  "title": "TS Generics: identity, first, Box<T>",
+  "tags": [
+    "typescript",
+    "generics",
+    "basics"
+  ]
+}

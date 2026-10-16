@@ -1,0 +1,1 @@
+Write insertionSort(arr) that sorts an array of numbers ascending IN PLACE and returns the same array object, selectionSort(arr) that returns a NEW sorted array and leaves the input untouched, and isSorted(arr) that returns true when the array is in ascending (non-decreasing) order (empty and one-element arrays are sorted). Do not use Array.prototype.sort.

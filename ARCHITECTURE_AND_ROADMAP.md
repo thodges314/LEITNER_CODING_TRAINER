@@ -22,9 +22,9 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 139 (53 active at first run) |
-| Documented test cases | 874 (each shown as input → expected in the UI) |
-| Difficulty spread | d1: 19 · d2: 43 · d3: 50 · d4: 26 · d5: 1 |
+| Cards | 153 (67 active at first run) |
+| Documented test cases | 973 (each shown as input → expected in the UI) |
+| Difficulty spread | d1: 26 · d2: 50 · d3: 50 · d4: 26 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms (29), js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser, react-components (16) |
 | Tracks defined but empty | `testing-tooling` |
 | Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
@@ -202,9 +202,12 @@ Bottom line: JS utilities and async are the strongest part of the deck. The weak
 **React component builds, algorithms (graph/DP/linked-list/heap/trie), accessibility, TypeScript type-level, CSS and testing**.
 
 ### 7.1 Difficulty ladder holes (the owner wants "simple first, then harder" on every concept)
-Concepts whose lowest rung is still ≥ 3 (computed from `scripts/difficulty.json`): `a11y-components`(4), `compound`(3), `event-loop`(3),
-`infinite-scroll`(3), `iterators`(3), `middleware`(4), `promise-combinators`(3), `react-perf`(3), `resilience`(3), `serialization`(4),
-`state-management`(4), `ts-generics`(3), `ts-types`(4), `ts-unions`(3), `typeahead`(4). Also only one d5 card exists.
+**Status after batch 14** (`scripts/testcases/part14.mjs`, authored via `scripts/cards-batch14.mjs`, deletable): 14 starter rungs were added for
+`sorting`, `heap`, `trie`, `backtracking`, `matrix`, `graphs`, `event-loop`, `promise-combinators`, `iterators`, `middleware`, `serialization`,
+`ts-generics`, `ts-unions`, `ts-types` (all pure-function or type-level cards, 570 tests passing). Concepts whose lowest rung is **still ≥ 3** (all React/DOM,
+need a hand-written DOM harness and a browser smoke test): `state-management`(4), `tree-ui`(3), `history-state`(3), `virtualization`(4),
+`carousel`(3), `optimistic-ui`(3), `notifications`(3). Also only one d5 card exists.
+The original table below is kept for the proposed rung designs (the React rows are still open).
 Add the rung(s) below; each must follow §4 (reference, cases, harness, empty-solution test, `difficulty.json` entry, same `concept`).
 
 | concept | proposed easy rung (d1/d2) | the ladder then continues with |
@@ -304,7 +307,7 @@ Algorithms were filled in batch 13. Candidates, with the owner's goal in mind (r
 | # | Category | Why | Grading | Effort |
 |---|---|---|---|---|
 | 1 | **Algorithms, round 2** | Still the most common interview content: 2D DP (LCS, edit distance, knapsack), Dijkstra, union-find, monotonic stack, bit tricks, greedy/intervals, LRU with a doubly linked list | pure input/expected | low |
-| 2 | **Ladder holes (§7.1)** | Every concept should start at d1/d2 | mixed | medium |
+| 2 | **Ladder holes (§7.1)** — DONE for pure/TS concepts in batch 14; React/DOM holes remain | Every concept should start at d1/d2 | DOM harness | medium |
 | 3 | **Language depth (§7.2.7)** | Output-prediction, hoisting/TDZ, `Proxy`, `WeakMap`, getters/setters | pure input/expected | low |
 | 4 | **TypeScript type-level (§7.2.3)** | Conditional/`infer`, template-literal types, overloads | `@ts-expect-error` extras | medium |
 | 5 | **Testing & libs, pure logic (§7.2.4)** | `mockFn`, fake timers, mini `expect`, D3 scales, Next route matcher | pure input/expected | low |

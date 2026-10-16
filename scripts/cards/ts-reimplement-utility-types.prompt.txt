@@ -1,0 +1,1 @@
+Without using the built-in utility types, define the mapped types MyPartial<T> (every property optional), MyReadonly<T> (every property readonly), MyPick<T, K extends keyof T> (only the keys K) and MyRecord<K extends keyof any, V> (an object with keys K, all of type V). Use `[P in ...]` mapped-type syntax and keyof.

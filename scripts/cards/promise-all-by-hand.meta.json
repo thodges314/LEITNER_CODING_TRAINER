@@ -1,0 +1,9 @@
+{
+  "track": "async-web-plumbing",
+  "title": "Promise.all By Hand (Counter)",
+  "tags": [
+    "promise",
+    "combinators",
+    "basics"
+  ]
+}

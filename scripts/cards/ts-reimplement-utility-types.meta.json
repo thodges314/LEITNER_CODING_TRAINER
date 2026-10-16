@@ -1,0 +1,10 @@
+{
+  "track": "typescript-patterns",
+  "title": "TS Types: Rebuild Partial, Readonly, Pick, Record",
+  "tags": [
+    "typescript",
+    "mapped-types",
+    "utility-types",
+    "basics"
+  ]
+}

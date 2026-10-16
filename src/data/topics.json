@@ -8046,5 +8046,870 @@
     "targetTime": "O(L)",
     "targetSpace": "O(total characters)",
     "complexityExplanation": "Insert, search and startsWith cost one step per character of the word (L); the trie stores a node per distinct prefix character."
+  },
+  {
+    "id": "binary-strings-combinations",
+    "track": "algorithms",
+    "title": "Backtracking: Binary Strings and Combinations",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "backtracking",
+      "recursion",
+      "basics"
+    ],
+    "promptSeed": "Write binaryStrings(n) returning every binary string of length n in ascending order (binaryStrings(2) is ['00', '01', '10', '11']; binaryStrings(0) is ['']) and combine(n, k) returning every combination of k numbers chosen from 1..n as arrays, each ascending, in lexicographic order (combine(4, 2) starts [1, 2], [1, 3]; combine(3, 0) is [[]]; combine(2, 3) is []).",
+    "difficulty": 2,
+    "concept": "backtracking",
+    "referenceSolution": "function binaryStrings(n) {\n  const out = [];\n  const go = (s) => {\n    if (s.length === n) {\n      out.push(s);\n      return;\n    }\n    go(s + '0');\n    go(s + '1');\n  };\n  go('');\n  return out;\n}\n\nfunction combine(n, k) {\n  const out = [];\n  const path = [];\n  const go = (start) => {\n    if (path.length === k) {\n      out.push([...path]);\n      return;\n    }\n    for (let i = start; i <= n; i++) {\n      path.push(i);\n      go(i + 1);\n      path.pop();\n    }\n  };\n  go(1);\n  return out;\n}",
+    "solution": "function binaryStrings(n) {\n  const out = [];\n  const go = (s) => {\n    if (s.length === n) {\n      out.push(s);\n      return;\n    }\n    go(s + '0');\n    go(s + '1');\n  };\n  go('');\n  return out;\n}\n\nfunction combine(n, k) {\n  const out = [];\n  const path = [];\n  const go = (start) => {\n    if (path.length === k) {\n      out.push([...path]);\n      return;\n    }\n    for (let i = start; i <= n; i++) {\n      path.push(i);\n      go(i + 1);\n      path.pop();\n    }\n  };\n  go(1);\n  return out;\n}",
+    "starterCode": "function binaryStrings(n) {\n  const out = [];\n  const go = (s) => {\n    if (s.length === n) {\n      out.push(s);\n      return;\n    }\n    go(s + '0');\n    go(s + '1');\n  };\n  go('');\n  return out;\n}\n\nfunction combine(n, k) {\n  const out = [];\n  const path = [];\n  const go = (start) => {\n    if (path.length === k) {\n      out.push([...path]);\n      return;\n    }\n    for (let i = start; i <= n; i++) {\n      path.push(i);\n      go(i + 1);\n      path.pop();\n    }\n  };\n  go(1);\n  return out;\n}",
+    "testCases": [
+      {
+        "description": "binaryStrings(2)",
+        "input": "binaryStrings(2)",
+        "expected": "['00', '01', '10', '11']"
+      },
+      {
+        "description": "binaryStrings(0) and (1)",
+        "input": "[binaryStrings(0), binaryStrings(1)]",
+        "expected": "[[''], ['0', '1']]"
+      },
+      {
+        "description": "binaryStrings(4) has 16 ascending entries",
+        "input": "const r = binaryStrings(4);\n[r.length, r[0], r[5], r[15]]",
+        "expected": "[16, '0000', '0101', '1111']"
+      },
+      {
+        "description": "combine(4, 2) in lexicographic order",
+        "input": "combine(4, 2)",
+        "expected": "[[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]"
+      },
+      {
+        "description": "combine(3, 0), (3, 3) and (2, 3)",
+        "input": "[combine(3, 0), combine(3, 3), combine(2, 3)]",
+        "expected": "[[[]], [[1, 2, 3]], []]"
+      },
+      {
+        "description": "combine(5, 3) has C(5,3) = 10 entries",
+        "input": "combine(5, 3).length",
+        "expected": "10"
+      }
+    ],
+    "testHarness": "await $test.run(\"binaryStrings(2)\", async () => {\n  const sleep = $test.sleep;\n  return (binaryStrings(2));\n}, () => (['00', '01', '10', '11']));\n\nawait $test.run(\"binaryStrings(0) and (1)\", async () => {\n  const sleep = $test.sleep;\n  return ([binaryStrings(0), binaryStrings(1)]);\n}, () => ([[''], ['0', '1']]));\n\nawait $test.run(\"binaryStrings(4) has 16 ascending entries\", async () => {\n  const sleep = $test.sleep;\n  const r = binaryStrings(4);\n  return ([r.length, r[0], r[5], r[15]]);\n}, () => ([16, '0000', '0101', '1111']));\n\nawait $test.run(\"combine(4, 2) in lexicographic order\", async () => {\n  const sleep = $test.sleep;\n  return (combine(4, 2));\n}, () => ([[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]));\n\nawait $test.run(\"combine(3, 0), (3, 3) and (2, 3)\", async () => {\n  const sleep = $test.sleep;\n  return ([combine(3, 0), combine(3, 3), combine(2, 3)]);\n}, () => ([[[]], [[1, 2, 3]], []]));\n\nawait $test.run(\"combine(5, 3) has C(5,3) = 10 entries\", async () => {\n  const sleep = $test.sleep;\n  return (combine(5, 3).length);\n}, () => (10));",
+    "targetTime": "O(n · 2ⁿ) / O(k · C(n,k))",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Output size dominates (2ⁿ strings or C(n,k) combinations) while the recursion depth and current path stay at most n long."
+  },
+  {
+    "id": "compose-middleware",
+    "track": "async-web-plumbing",
+    "title": "Middleware: compose(fns) With next()",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "middleware",
+      "compose",
+      "async",
+      "basics"
+    ],
+    "promptSeed": "Write compose(fns) where each element is a function (ctx, next) that may be async. compose returns a function run(ctx) that returns a promise: it calls fns[0](ctx, next) where next() runs the following function and returns its promise (after the last function next() resolves immediately). A function that does not call next() stops the chain. Code after `await next()` runs on the way back (onion model). A throw or rejection in any function rejects the promise returned by run. compose([]) resolves immediately.",
+    "difficulty": 2,
+    "concept": "middleware",
+    "referenceSolution": "function compose(fns) {\n  return function run(ctx) {\n    const dispatch = (i) => {\n      const fn = fns[i];\n      if (!fn) return Promise.resolve();\n      try {\n        return Promise.resolve(fn(ctx, () => dispatch(i + 1)));\n      } catch (err) {\n        return Promise.reject(err);\n      }\n    };\n    return dispatch(0);\n  };\n}",
+    "solution": "function compose(fns) {\n  return function run(ctx) {\n    const dispatch = (i) => {\n      const fn = fns[i];\n      if (!fn) return Promise.resolve();\n      try {\n        return Promise.resolve(fn(ctx, () => dispatch(i + 1)));\n      } catch (err) {\n        return Promise.reject(err);\n      }\n    };\n    return dispatch(0);\n  };\n}",
+    "starterCode": "function compose(fns) {\n  return function run(ctx) {\n    const dispatch = (i) => {\n      const fn = fns[i];\n      if (!fn) return Promise.resolve();\n      try {\n        return Promise.resolve(fn(ctx, () => dispatch(i + 1)));\n      } catch (err) {\n        return Promise.reject(err);\n      }\n    };\n    return dispatch(0);\n  };\n}",
+    "testCases": [
+      {
+        "description": "Middleware run in order, then unwind (onion model)",
+        "input": "const log = [];\nconst run = compose([\n  async (ctx, next) => { log.push('a1'); await next(); log.push('a2'); },\n  async (ctx, next) => { log.push('b1'); await next(); log.push('b2'); },\n]);\nawait run({});\nlog",
+        "expected": "['a1', 'b1', 'b2', 'a2']"
+      },
+      {
+        "description": "Middleware share and mutate ctx",
+        "input": "const run = compose([\n  (ctx, next) => { ctx.n = 1; return next(); },\n  (ctx, next) => { ctx.n += 10; return next(); },\n]);\nconst ctx = {};\nawait run(ctx);\nctx.n",
+        "expected": "11"
+      },
+      {
+        "description": "Not calling next stops the chain",
+        "input": "const log = [];\nconst run = compose([\n  () => { log.push('first'); },\n  () => { log.push('never'); },\n]);\nawait run({});\nlog",
+        "expected": "['first']"
+      },
+      {
+        "description": "compose([]) resolves",
+        "input": "await compose([])({})",
+        "expected": "undefined"
+      },
+      {
+        "description": "next after the last function resolves",
+        "input": "let reached = false;\nawait compose([async (ctx, next) => { await next(); reached = true; }])({});\nreached",
+        "expected": "true"
+      },
+      {
+        "description": "A thrown error rejects run()",
+        "input": "await compose([() => { throw new Error('bad'); }])({})",
+        "expected": "Rejects with Error — message matches /bad/"
+      },
+      {
+        "description": "A rejection from a later middleware reaches the caller",
+        "input": "await compose([(ctx, next) => next(), async () => { throw new Error('late'); }])({})",
+        "expected": "Rejects with Error — message matches /late/"
+      },
+      {
+        "description": "run returns a promise",
+        "input": "compose([])({}) instanceof Promise",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"Middleware run in order, then unwind (onion model)\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const run = compose([\n    async (ctx, next) => { log.push('a1'); await next(); log.push('a2'); },\n    async (ctx, next) => { log.push('b1'); await next(); log.push('b2'); },\n  ]);\n  await run({});\n  return (log);\n}, () => (['a1', 'b1', 'b2', 'a2']));\n\nawait $test.run(\"Middleware share and mutate ctx\", async () => {\n  const sleep = $test.sleep;\n  const run = compose([\n    (ctx, next) => { ctx.n = 1; return next(); },\n    (ctx, next) => { ctx.n += 10; return next(); },\n  ]);\n  const ctx = {};\n  await run(ctx);\n  return (ctx.n);\n}, () => (11));\n\nawait $test.run(\"Not calling next stops the chain\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const run = compose([\n    () => { log.push('first'); },\n    () => { log.push('never'); },\n  ]);\n  await run({});\n  return (log);\n}, () => (['first']));\n\nawait $test.run(\"compose([]) resolves\", async () => {\n  const sleep = $test.sleep;\n  return (await compose([])({}));\n}, () => (undefined));\n\nawait $test.run(\"next after the last function resolves\", async () => {\n  const sleep = $test.sleep;\n  let reached = false;\n  await compose([async (ctx, next) => { await next(); reached = true; }])({});\n  return (reached);\n}, () => (true));\n\nawait $test.rejects(\"A thrown error rejects run()\", async () => {\n  const sleep = $test.sleep;\n  return (await compose([() => { throw new Error('bad'); }])({}));\n}, \"bad\");\n\nawait $test.rejects(\"A rejection from a later middleware reaches the caller\", async () => {\n  const sleep = $test.sleep;\n  return (await compose([(ctx, next) => next(), async () => { throw new Error('late'); }])({}));\n}, \"late\");\n\nawait $test.run(\"run returns a promise\", async () => {\n  const sleep = $test.sleep;\n  return (compose([])({}) instanceof Promise);\n}, () => (true));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each middleware runs at most once per call and the chain of pending next() promises is as deep as the number of middleware."
+  },
+  {
+    "id": "event-loop-order",
+    "track": "async-js",
+    "title": "Event Loop: Sync, Microtask, Timeout Order",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "event-loop",
+      "microtask",
+      "promise",
+      "basics"
+    ],
+    "promptSeed": "Write orderOfEvents() that returns a Promise resolving to the array of labels in the order they happen. Do, in this order: push 'start' synchronously; schedule setTimeout(..., 0) pushing 'timeout'; schedule Promise.resolve().then(...) pushing 'promise'; push 'end' synchronously; resolve (with the array) once the timeout has fired. Also write asyncOrder(): an async function f(log) pushes 'f1', awaits null, then pushes 'f2'; asyncOrder pushes 'before', calls f, pushes 'after', waits for f to finish and returns the log array.",
+    "difficulty": 2,
+    "concept": "event-loop",
+    "referenceSolution": "function orderOfEvents() {\n  const log = [];\n  return new Promise((resolve) => {\n    log.push('start');\n    setTimeout(() => {\n      log.push('timeout');\n      resolve(log);\n    }, 0);\n    Promise.resolve().then(() => log.push('promise'));\n    log.push('end');\n  });\n}\n\nasync function asyncOrder() {\n  const log = [];\n  async function f(log) {\n    log.push('f1');\n    await null;\n    log.push('f2');\n  }\n  log.push('before');\n  const p = f(log);\n  log.push('after');\n  await p;\n  return log;\n}",
+    "solution": "function orderOfEvents() {\n  const log = [];\n  return new Promise((resolve) => {\n    log.push('start');\n    setTimeout(() => {\n      log.push('timeout');\n      resolve(log);\n    }, 0);\n    Promise.resolve().then(() => log.push('promise'));\n    log.push('end');\n  });\n}\n\nasync function asyncOrder() {\n  const log = [];\n  async function f(log) {\n    log.push('f1');\n    await null;\n    log.push('f2');\n  }\n  log.push('before');\n  const p = f(log);\n  log.push('after');\n  await p;\n  return log;\n}",
+    "starterCode": "function orderOfEvents() {\n  const log = [];\n  return new Promise((resolve) => {\n    log.push('start');\n    setTimeout(() => {\n      log.push('timeout');\n      resolve(log);\n    }, 0);\n    Promise.resolve().then(() => log.push('promise'));\n    log.push('end');\n  });\n}\n\nasync function asyncOrder() {\n  const log = [];\n  async function f(log) {\n    log.push('f1');\n    await null;\n    log.push('f2');\n  }\n  log.push('before');\n  const p = f(log);\n  log.push('after');\n  await p;\n  return log;\n}",
+    "testCases": [
+      {
+        "description": "orderOfEvents: sync first, then microtask, then timeout",
+        "input": "await orderOfEvents()",
+        "expected": "['start', 'end', 'promise', 'timeout']"
+      },
+      {
+        "description": "orderOfEvents returns a promise",
+        "input": "orderOfEvents() instanceof Promise",
+        "expected": "true"
+      },
+      {
+        "description": "asyncOrder: code after await runs after the caller continues",
+        "input": "await asyncOrder()",
+        "expected": "['before', 'f1', 'after', 'f2']"
+      },
+      {
+        "description": "asyncOrder returns a promise",
+        "input": "asyncOrder() instanceof Promise",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"orderOfEvents: sync first, then microtask, then timeout\", async () => {\n  const sleep = $test.sleep;\n  return (await orderOfEvents());\n}, () => (['start', 'end', 'promise', 'timeout']));\n\nawait $test.run(\"orderOfEvents returns a promise\", async () => {\n  const sleep = $test.sleep;\n  return (orderOfEvents() instanceof Promise);\n}, () => (true));\n\nawait $test.run(\"asyncOrder: code after await runs after the caller continues\", async () => {\n  const sleep = $test.sleep;\n  return (await asyncOrder());\n}, () => (['before', 'f1', 'after', 'f2']));\n\nawait $test.run(\"asyncOrder returns a promise\", async () => {\n  const sleep = $test.sleep;\n  return (asyncOrder() instanceof Promise);\n}, () => (true));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "A fixed number of scheduled callbacks and log entries regardless of input."
+  },
+  {
+    "id": "graph-adjacency-bfs",
+    "track": "algorithms",
+    "title": "Graph Basics: Adjacency List and BFS Path",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graph",
+      "bfs",
+      "basics"
+    ],
+    "promptSeed": "An undirected graph is given as an array of [a, b] edges. Write buildGraph(edges) returning an object that maps each node to an array of its neighbours in the order the edges appear (buildGraph([[1, 2], [1, 3]]) is { 1: [2, 3], 2: [1], 3: [1] }), hasPath(edges, start, end) returning true when end can be reached from start (a node always reaches itself), and shortestPathLength(edges, start, end) using breadth-first search that returns the minimum number of edges, or -1 when unreachable.",
+    "difficulty": 2,
+    "concept": "graphs",
+    "referenceSolution": "function buildGraph(edges) {\n  const graph = {};\n  for (const [a, b] of edges) {\n    if (!graph[a]) graph[a] = [];\n    if (!graph[b]) graph[b] = [];\n    graph[a].push(b);\n    graph[b].push(a);\n  }\n  return graph;\n}\n\nfunction shortestPathLength(edges, start, end) {\n  if (start === end) return 0;\n  const graph = buildGraph(edges);\n  const seen = new Set([start]);\n  const queue = [[start, 0]];\n  while (queue.length) {\n    const [node, dist] = queue.shift();\n    for (const next of graph[node] || []) {\n      if (next === end) return dist + 1;\n      if (!seen.has(next)) {\n        seen.add(next);\n        queue.push([next, dist + 1]);\n      }\n    }\n  }\n  return -1;\n}\n\nfunction hasPath(edges, start, end) {\n  return shortestPathLength(edges, start, end) !== -1;\n}",
+    "solution": "function buildGraph(edges) {\n  const graph = {};\n  for (const [a, b] of edges) {\n    if (!graph[a]) graph[a] = [];\n    if (!graph[b]) graph[b] = [];\n    graph[a].push(b);\n    graph[b].push(a);\n  }\n  return graph;\n}\n\nfunction shortestPathLength(edges, start, end) {\n  if (start === end) return 0;\n  const graph = buildGraph(edges);\n  const seen = new Set([start]);\n  const queue = [[start, 0]];\n  while (queue.length) {\n    const [node, dist] = queue.shift();\n    for (const next of graph[node] || []) {\n      if (next === end) return dist + 1;\n      if (!seen.has(next)) {\n        seen.add(next);\n        queue.push([next, dist + 1]);\n      }\n    }\n  }\n  return -1;\n}\n\nfunction hasPath(edges, start, end) {\n  return shortestPathLength(edges, start, end) !== -1;\n}",
+    "starterCode": "function buildGraph(edges) {\n  const graph = {};\n  for (const [a, b] of edges) {\n    if (!graph[a]) graph[a] = [];\n    if (!graph[b]) graph[b] = [];\n    graph[a].push(b);\n    graph[b].push(a);\n  }\n  return graph;\n}\n\nfunction shortestPathLength(edges, start, end) {\n  if (start === end) return 0;\n  const graph = buildGraph(edges);\n  const seen = new Set([start]);\n  const queue = [[start, 0]];\n  while (queue.length) {\n    const [node, dist] = queue.shift();\n    for (const next of graph[node] || []) {\n      if (next === end) return dist + 1;\n      if (!seen.has(next)) {\n        seen.add(next);\n        queue.push([next, dist + 1]);\n      }\n    }\n  }\n  return -1;\n}\n\nfunction hasPath(edges, start, end) {\n  return shortestPathLength(edges, start, end) !== -1;\n}",
+    "testCases": [
+      {
+        "description": "buildGraph makes an undirected adjacency list",
+        "input": "buildGraph([[1, 2], [1, 3], [2, 3]])",
+        "expected": "{ 1: [2, 3], 2: [1, 3], 3: [1, 2] }"
+      },
+      {
+        "description": "buildGraph of no edges is empty",
+        "input": "buildGraph([])",
+        "expected": "{}"
+      },
+      {
+        "description": "hasPath follows connected nodes",
+        "input": "hasPath([[1, 2], [2, 3], [4, 5]], 1, 3)",
+        "expected": "true"
+      },
+      {
+        "description": "hasPath is false across components",
+        "input": "hasPath([[1, 2], [2, 3], [4, 5]], 1, 5)",
+        "expected": "false"
+      },
+      {
+        "description": "hasPath: a node reaches itself even if unknown",
+        "input": "hasPath([], 'a', 'a')",
+        "expected": "true"
+      },
+      {
+        "description": "shortestPathLength finds the fewest edges",
+        "input": "shortestPathLength([[1, 2], [2, 3], [3, 4], [1, 4]], 1, 3)",
+        "expected": "2"
+      },
+      {
+        "description": "shortestPathLength is 0 for the same node and -1 when unreachable",
+        "input": "[shortestPathLength([[1, 2]], 1, 1), shortestPathLength([[1, 2], [3, 4]], 1, 4)]",
+        "expected": "[0, -1]"
+      },
+      {
+        "description": "shortestPathLength handles cycles",
+        "input": "shortestPathLength([[1, 2], [2, 3], [3, 1], [3, 4]], 1, 4)",
+        "expected": "2"
+      }
+    ],
+    "testHarness": "await $test.run(\"buildGraph makes an undirected adjacency list\", async () => {\n  const sleep = $test.sleep;\n  return (buildGraph([[1, 2], [1, 3], [2, 3]]));\n}, () => ({ 1: [2, 3], 2: [1, 3], 3: [1, 2] }));\n\nawait $test.run(\"buildGraph of no edges is empty\", async () => {\n  const sleep = $test.sleep;\n  return (buildGraph([]));\n}, () => ({}));\n\nawait $test.run(\"hasPath follows connected nodes\", async () => {\n  const sleep = $test.sleep;\n  return (hasPath([[1, 2], [2, 3], [4, 5]], 1, 3));\n}, () => (true));\n\nawait $test.run(\"hasPath is false across components\", async () => {\n  const sleep = $test.sleep;\n  return (hasPath([[1, 2], [2, 3], [4, 5]], 1, 5));\n}, () => (false));\n\nawait $test.run(\"hasPath: a node reaches itself even if unknown\", async () => {\n  const sleep = $test.sleep;\n  return (hasPath([], 'a', 'a'));\n}, () => (true));\n\nawait $test.run(\"shortestPathLength finds the fewest edges\", async () => {\n  const sleep = $test.sleep;\n  return (shortestPathLength([[1, 2], [2, 3], [3, 4], [1, 4]], 1, 3));\n}, () => (2));\n\nawait $test.run(\"shortestPathLength is 0 for the same node and -1 when unreachable\", async () => {\n  const sleep = $test.sleep;\n  return ([shortestPathLength([[1, 2]], 1, 1), shortestPathLength([[1, 2], [3, 4]], 1, 4)]);\n}, () => ([0, -1]));\n\nawait $test.run(\"shortestPathLength handles cycles\", async () => {\n  const sleep = $test.sleep;\n  return (shortestPathLength([[1, 2], [2, 3], [3, 1], [3, 4]], 1, 4));\n}, () => (2));",
+    "targetTime": "O(V + E)",
+    "targetSpace": "O(V + E)",
+    "complexityExplanation": "Building the adjacency list and the breadth-first search each touch every vertex and edge once, storing the lists and a visited set."
+  },
+  {
+    "id": "heap-array-basics",
+    "track": "algorithms",
+    "title": "Heap Basics: Index Math, isMinHeap, siftUp",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "heap",
+      "array",
+      "basics"
+    ],
+    "promptSeed": "A binary heap is stored in an array: the children of index i are 2i+1 and 2i+2. Write parentIndex(i), leftIndex(i), rightIndex(i), isMinHeap(arr) (true when every parent is <= both of its children; empty and one-element arrays are heaps) and siftUp(arr, i) which moves the element at index i up while it is smaller than its parent, in place, and returns the array.",
+    "difficulty": 2,
+    "concept": "heap",
+    "referenceSolution": "function parentIndex(i) {\n  return Math.floor((i - 1) / 2);\n}\n\nfunction leftIndex(i) {\n  return 2 * i + 1;\n}\n\nfunction rightIndex(i) {\n  return 2 * i + 2;\n}\n\nfunction isMinHeap(arr) {\n  for (let i = 0; i < arr.length; i++) {\n    const l = leftIndex(i);\n    const r = rightIndex(i);\n    if (l < arr.length && arr[i] > arr[l]) return false;\n    if (r < arr.length && arr[i] > arr[r]) return false;\n  }\n  return true;\n}\n\nfunction siftUp(arr, i) {\n  while (i > 0) {\n    const p = parentIndex(i);\n    if (arr[p] <= arr[i]) break;\n    [arr[p], arr[i]] = [arr[i], arr[p]];\n    i = p;\n  }\n  return arr;\n}",
+    "solution": "function parentIndex(i) {\n  return Math.floor((i - 1) / 2);\n}\n\nfunction leftIndex(i) {\n  return 2 * i + 1;\n}\n\nfunction rightIndex(i) {\n  return 2 * i + 2;\n}\n\nfunction isMinHeap(arr) {\n  for (let i = 0; i < arr.length; i++) {\n    const l = leftIndex(i);\n    const r = rightIndex(i);\n    if (l < arr.length && arr[i] > arr[l]) return false;\n    if (r < arr.length && arr[i] > arr[r]) return false;\n  }\n  return true;\n}\n\nfunction siftUp(arr, i) {\n  while (i > 0) {\n    const p = parentIndex(i);\n    if (arr[p] <= arr[i]) break;\n    [arr[p], arr[i]] = [arr[i], arr[p]];\n    i = p;\n  }\n  return arr;\n}",
+    "starterCode": "function parentIndex(i) {\n  return Math.floor((i - 1) / 2);\n}\n\nfunction leftIndex(i) {\n  return 2 * i + 1;\n}\n\nfunction rightIndex(i) {\n  return 2 * i + 2;\n}\n\nfunction isMinHeap(arr) {\n  for (let i = 0; i < arr.length; i++) {\n    const l = leftIndex(i);\n    const r = rightIndex(i);\n    if (l < arr.length && arr[i] > arr[l]) return false;\n    if (r < arr.length && arr[i] > arr[r]) return false;\n  }\n  return true;\n}\n\nfunction siftUp(arr, i) {\n  while (i > 0) {\n    const p = parentIndex(i);\n    if (arr[p] <= arr[i]) break;\n    [arr[p], arr[i]] = [arr[i], arr[p]];\n    i = p;\n  }\n  return arr;\n}",
+    "testCases": [
+      {
+        "description": "Index helpers",
+        "input": "[parentIndex(1), parentIndex(2), parentIndex(6), leftIndex(0), rightIndex(0), leftIndex(3), rightIndex(3)]",
+        "expected": "[0, 0, 2, 1, 2, 7, 8]"
+      },
+      {
+        "description": "isMinHeap accepts a valid heap",
+        "input": "isMinHeap([1, 3, 2, 7, 4, 5])",
+        "expected": "true"
+      },
+      {
+        "description": "isMinHeap rejects a parent larger than a child",
+        "input": "[isMinHeap([3, 1]), isMinHeap([1, 5, 2, 6, 3, 1])]",
+        "expected": "[false, false]"
+      },
+      {
+        "description": "isMinHeap: empty, single and equal values",
+        "input": "[isMinHeap([]), isMinHeap([9]), isMinHeap([2, 2, 2])]",
+        "expected": "[true, true, true]"
+      },
+      {
+        "description": "siftUp moves a small leaf to the top",
+        "input": "siftUp([2, 4, 6, 1], 3)",
+        "expected": "[1, 2, 6, 4]"
+      },
+      {
+        "description": "siftUp stops when the parent is not larger",
+        "input": "siftUp([1, 4, 6, 5], 3)",
+        "expected": "[1, 4, 6, 5]"
+      },
+      {
+        "description": "siftUp works in place and at the root",
+        "input": "const a = [5, 6, 3];\nconst r = siftUp(a, 2);\n[r === a, a, siftUp([7], 0)]",
+        "expected": "[true, [3, 6, 5], [7]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Index helpers\", async () => {\n  const sleep = $test.sleep;\n  return ([parentIndex(1), parentIndex(2), parentIndex(6), leftIndex(0), rightIndex(0), leftIndex(3), rightIndex(3)]);\n}, () => ([0, 0, 2, 1, 2, 7, 8]));\n\nawait $test.run(\"isMinHeap accepts a valid heap\", async () => {\n  const sleep = $test.sleep;\n  return (isMinHeap([1, 3, 2, 7, 4, 5]));\n}, () => (true));\n\nawait $test.run(\"isMinHeap rejects a parent larger than a child\", async () => {\n  const sleep = $test.sleep;\n  return ([isMinHeap([3, 1]), isMinHeap([1, 5, 2, 6, 3, 1])]);\n}, () => ([false, false]));\n\nawait $test.run(\"isMinHeap: empty, single and equal values\", async () => {\n  const sleep = $test.sleep;\n  return ([isMinHeap([]), isMinHeap([9]), isMinHeap([2, 2, 2])]);\n}, () => ([true, true, true]));\n\nawait $test.run(\"siftUp moves a small leaf to the top\", async () => {\n  const sleep = $test.sleep;\n  return (siftUp([2, 4, 6, 1], 3));\n}, () => ([1, 2, 6, 4]));\n\nawait $test.run(\"siftUp stops when the parent is not larger\", async () => {\n  const sleep = $test.sleep;\n  return (siftUp([1, 4, 6, 5], 3));\n}, () => ([1, 4, 6, 5]));\n\nawait $test.run(\"siftUp works in place and at the root\", async () => {\n  const sleep = $test.sleep;\n  const a = [5, 6, 3];\n  const r = siftUp(a, 2);\n  return ([r === a, a, siftUp([7], 0)]);\n}, () => ([true, [3, 6, 5], [7]]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Index helpers are O(1), isMinHeap checks each parent once and siftUp climbs at most the tree height (log n) using constant extra space."
+  },
+  {
+    "id": "insertion-sort-basic",
+    "track": "algorithms",
+    "title": "Sorting: Insertion Sort, Selection Sort, isSorted",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "sorting",
+      "array",
+      "basics"
+    ],
+    "promptSeed": "Write insertionSort(arr) that sorts an array of numbers ascending IN PLACE and returns the same array object, selectionSort(arr) that returns a NEW sorted array and leaves the input untouched, and isSorted(arr) that returns true when the array is in ascending (non-decreasing) order (empty and one-element arrays are sorted). Do not use Array.prototype.sort.",
+    "difficulty": 1,
+    "concept": "sorting",
+    "referenceSolution": "function insertionSort(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    const value = arr[i];\n    let j = i - 1;\n    while (j >= 0 && arr[j] > value) {\n      arr[j + 1] = arr[j];\n      j--;\n    }\n    arr[j + 1] = value;\n  }\n  return arr;\n}\n\nfunction selectionSort(arr) {\n  const out = arr.slice();\n  for (let i = 0; i < out.length - 1; i++) {\n    let min = i;\n    for (let j = i + 1; j < out.length; j++) {\n      if (out[j] < out[min]) min = j;\n    }\n    [out[i], out[min]] = [out[min], out[i]];\n  }\n  return out;\n}\n\nfunction isSorted(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    if (arr[i - 1] > arr[i]) return false;\n  }\n  return true;\n}",
+    "solution": "function insertionSort(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    const value = arr[i];\n    let j = i - 1;\n    while (j >= 0 && arr[j] > value) {\n      arr[j + 1] = arr[j];\n      j--;\n    }\n    arr[j + 1] = value;\n  }\n  return arr;\n}\n\nfunction selectionSort(arr) {\n  const out = arr.slice();\n  for (let i = 0; i < out.length - 1; i++) {\n    let min = i;\n    for (let j = i + 1; j < out.length; j++) {\n      if (out[j] < out[min]) min = j;\n    }\n    [out[i], out[min]] = [out[min], out[i]];\n  }\n  return out;\n}\n\nfunction isSorted(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    if (arr[i - 1] > arr[i]) return false;\n  }\n  return true;\n}",
+    "starterCode": "function insertionSort(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    const value = arr[i];\n    let j = i - 1;\n    while (j >= 0 && arr[j] > value) {\n      arr[j + 1] = arr[j];\n      j--;\n    }\n    arr[j + 1] = value;\n  }\n  return arr;\n}\n\nfunction selectionSort(arr) {\n  const out = arr.slice();\n  for (let i = 0; i < out.length - 1; i++) {\n    let min = i;\n    for (let j = i + 1; j < out.length; j++) {\n      if (out[j] < out[min]) min = j;\n    }\n    [out[i], out[min]] = [out[min], out[i]];\n  }\n  return out;\n}\n\nfunction isSorted(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    if (arr[i - 1] > arr[i]) return false;\n  }\n  return true;\n}",
+    "testCases": [
+      {
+        "description": "insertionSort sorts numbers",
+        "input": "insertionSort([5, 2, 9, 1, 5, 6])",
+        "expected": "[1, 2, 5, 5, 6, 9]"
+      },
+      {
+        "description": "insertionSort sorts in place and returns the same array",
+        "input": "const a = [3, 1, 2];\nconst r = insertionSort(a);\n[r === a, a]",
+        "expected": "[true, [1, 2, 3]]"
+      },
+      {
+        "description": "insertionSort: empty, single and already sorted",
+        "input": "[insertionSort([]), insertionSort([4]), insertionSort([1, 2, 3])]",
+        "expected": "[[], [4], [1, 2, 3]]"
+      },
+      {
+        "description": "insertionSort compares numbers, not strings",
+        "input": "insertionSort([10, 9, 100, -1])",
+        "expected": "[-1, 9, 10, 100]"
+      },
+      {
+        "description": "selectionSort returns a new sorted array",
+        "input": "const a = [4, 3, 8, 1];\nconst r = selectionSort(a);\n[r, a, r === a]",
+        "expected": "[[1, 3, 4, 8], [4, 3, 8, 1], false]"
+      },
+      {
+        "description": "selectionSort with duplicates and edge sizes",
+        "input": "[selectionSort([2, 1, 2, 1]), selectionSort([]), selectionSort([7])]",
+        "expected": "[[1, 1, 2, 2], [], [7]]"
+      },
+      {
+        "description": "isSorted allows equal neighbours",
+        "input": "[isSorted([1, 2, 2, 3]), isSorted([1, 3, 2]), isSorted([]), isSorted([5])]",
+        "expected": "[true, false, true, true]"
+      }
+    ],
+    "testHarness": "await $test.run(\"insertionSort sorts numbers\", async () => {\n  const sleep = $test.sleep;\n  return (insertionSort([5, 2, 9, 1, 5, 6]));\n}, () => ([1, 2, 5, 5, 6, 9]));\n\nawait $test.run(\"insertionSort sorts in place and returns the same array\", async () => {\n  const sleep = $test.sleep;\n  const a = [3, 1, 2];\n  const r = insertionSort(a);\n  return ([r === a, a]);\n}, () => ([true, [1, 2, 3]]));\n\nawait $test.run(\"insertionSort: empty, single and already sorted\", async () => {\n  const sleep = $test.sleep;\n  return ([insertionSort([]), insertionSort([4]), insertionSort([1, 2, 3])]);\n}, () => ([[], [4], [1, 2, 3]]));\n\nawait $test.run(\"insertionSort compares numbers, not strings\", async () => {\n  const sleep = $test.sleep;\n  return (insertionSort([10, 9, 100, -1]));\n}, () => ([-1, 9, 10, 100]));\n\nawait $test.run(\"selectionSort returns a new sorted array\", async () => {\n  const sleep = $test.sleep;\n  const a = [4, 3, 8, 1];\n  const r = selectionSort(a);\n  return ([r, a, r === a]);\n}, () => ([[1, 3, 4, 8], [4, 3, 8, 1], false]));\n\nawait $test.run(\"selectionSort with duplicates and edge sizes\", async () => {\n  const sleep = $test.sleep;\n  return ([selectionSort([2, 1, 2, 1]), selectionSort([]), selectionSort([7])]);\n}, () => ([[1, 1, 2, 2], [], [7]]));\n\nawait $test.run(\"isSorted allows equal neighbours\", async () => {\n  const sleep = $test.sleep;\n  return ([isSorted([1, 2, 2, 3]), isSorted([1, 3, 2]), isSorted([]), isSorted([5])]);\n}, () => ([true, false, true, true]));",
+    "targetTime": "O(n²)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Insertion sort shifts elements within nested loops over n items and selection sort scans the unsorted rest n times, both using constant extra space apart from the output copy."
+  },
+  {
+    "id": "iterable-range-class",
+    "track": "js-language",
+    "title": "Iterators: Iterable Range Class and take()",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "iterator",
+      "symbol",
+      "class",
+      "basics"
+    ],
+    "promptSeed": "Write class Range with constructor(start, end, step = 1) that is iterable through [Symbol.iterator]: it yields start, start + step, ... while the value is before end (end is exclusive; a negative step counts down while the value is greater than end). It must be re-iterable (a second loop starts over), and a step of 0 throws a RangeError whose message contains 'step'. Also write take(iterable, n) returning an array of the first n values of any iterable (fewer if it ends sooner) without consuming the rest — it must work on infinite generators.",
+    "difficulty": 1,
+    "concept": "iterators",
+    "referenceSolution": "class Range {\n  constructor(start, end, step = 1) {\n    if (step === 0) throw new RangeError('step must not be 0');\n    this.start = start;\n    this.end = end;\n    this.step = step;\n  }\n  [Symbol.iterator]() {\n    let current = this.start;\n    const { end, step } = this;\n    return {\n      next() {\n        const inRange = step > 0 ? current < end : current > end;\n        if (!inRange) return { value: undefined, done: true };\n        const value = current;\n        current += step;\n        return { value, done: false };\n      },\n    };\n  }\n}\n\nfunction take(iterable, n) {\n  const out = [];\n  if (n <= 0) return out;\n  for (const value of iterable) {\n    out.push(value);\n    if (out.length >= n) break;\n  }\n  return out;\n}",
+    "solution": "class Range {\n  constructor(start, end, step = 1) {\n    if (step === 0) throw new RangeError('step must not be 0');\n    this.start = start;\n    this.end = end;\n    this.step = step;\n  }\n  [Symbol.iterator]() {\n    let current = this.start;\n    const { end, step } = this;\n    return {\n      next() {\n        const inRange = step > 0 ? current < end : current > end;\n        if (!inRange) return { value: undefined, done: true };\n        const value = current;\n        current += step;\n        return { value, done: false };\n      },\n    };\n  }\n}\n\nfunction take(iterable, n) {\n  const out = [];\n  if (n <= 0) return out;\n  for (const value of iterable) {\n    out.push(value);\n    if (out.length >= n) break;\n  }\n  return out;\n}",
+    "starterCode": "class Range {\n  constructor(start, end, step = 1) {\n    if (step === 0) throw new RangeError('step must not be 0');\n    this.start = start;\n    this.end = end;\n    this.step = step;\n  }\n  [Symbol.iterator]() {\n    let current = this.start;\n    const { end, step } = this;\n    return {\n      next() {\n        const inRange = step > 0 ? current < end : current > end;\n        if (!inRange) return { value: undefined, done: true };\n        const value = current;\n        current += step;\n        return { value, done: false };\n      },\n    };\n  }\n}\n\nfunction take(iterable, n) {\n  const out = [];\n  if (n <= 0) return out;\n  for (const value of iterable) {\n    out.push(value);\n    if (out.length >= n) break;\n  }\n  return out;\n}",
+    "testCases": [
+      {
+        "description": "Range yields start up to (not including) end",
+        "input": "[...new Range(0, 5)]",
+        "expected": "[0, 1, 2, 3, 4]"
+      },
+      {
+        "description": "Range with a step",
+        "input": "[...new Range(1, 10, 3)]",
+        "expected": "[1, 4, 7]"
+      },
+      {
+        "description": "Range with a negative step counts down",
+        "input": "[...new Range(5, 0, -2)]",
+        "expected": "[5, 3, 1]"
+      },
+      {
+        "description": "Empty range",
+        "input": "[...new Range(3, 3), ...new Range(5, 1)]",
+        "expected": "[]"
+      },
+      {
+        "description": "A Range can be iterated more than once",
+        "input": "const r = new Range(0, 3);\n[[...r], [...r]]",
+        "expected": "[[0, 1, 2], [0, 1, 2]]"
+      },
+      {
+        "description": "Works with for...of",
+        "input": "let sum = 0;\nfor (const x of new Range(1, 5)) sum += x;\nsum",
+        "expected": "10"
+      },
+      {
+        "description": "A step of 0 throws a RangeError mentioning step",
+        "input": "new Range(0, 5, 0)",
+        "expected": "Throws RangeError — message contains \"step\""
+      },
+      {
+        "description": "take returns the first n values",
+        "input": "take(new Range(0, 100), 3)",
+        "expected": "[0, 1, 2]"
+      },
+      {
+        "description": "take stops early on short iterables",
+        "input": "take([1, 2], 5)",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "take works on an infinite generator",
+        "input": "function* nat() { let i = 0; while (true) yield i++; }\ntake(nat(), 4)",
+        "expected": "[0, 1, 2, 3]"
+      },
+      {
+        "description": "take with n = 0",
+        "input": "take([1, 2, 3], 0)",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Range yields start up to (not including) end\", async () => {\n  const sleep = $test.sleep;\n  return ([...new Range(0, 5)]);\n}, () => ([0, 1, 2, 3, 4]));\n\nawait $test.run(\"Range with a step\", async () => {\n  const sleep = $test.sleep;\n  return ([...new Range(1, 10, 3)]);\n}, () => ([1, 4, 7]));\n\nawait $test.run(\"Range with a negative step counts down\", async () => {\n  const sleep = $test.sleep;\n  return ([...new Range(5, 0, -2)]);\n}, () => ([5, 3, 1]));\n\nawait $test.run(\"Empty range\", async () => {\n  const sleep = $test.sleep;\n  return ([...new Range(3, 3), ...new Range(5, 1)]);\n}, () => ([]));\n\nawait $test.run(\"A Range can be iterated more than once\", async () => {\n  const sleep = $test.sleep;\n  const r = new Range(0, 3);\n  return ([[...r], [...r]]);\n}, () => ([[0, 1, 2], [0, 1, 2]]));\n\nawait $test.run(\"Works with for...of\", async () => {\n  const sleep = $test.sleep;\n  let sum = 0;\n  for (const x of new Range(1, 5)) sum += x;\n  return (sum);\n}, () => (10));\n\nawait $test.rejects(\"A step of 0 throws a RangeError mentioning step\", async () => {\n  const sleep = $test.sleep;\n  return (new Range(0, 5, 0));\n}, \"step\");\n\nawait $test.run(\"take returns the first n values\", async () => {\n  const sleep = $test.sleep;\n  return (take(new Range(0, 100), 3));\n}, () => ([0, 1, 2]));\n\nawait $test.run(\"take stops early on short iterables\", async () => {\n  const sleep = $test.sleep;\n  return (take([1, 2], 5));\n}, () => ([1, 2]));\n\nawait $test.run(\"take works on an infinite generator\", async () => {\n  const sleep = $test.sleep;\n  function* nat() { let i = 0; while (true) yield i++; }\n  return (take(nat(), 4));\n}, () => ([0, 1, 2, 3]));\n\nawait $test.run(\"take with n = 0\", async () => {\n  const sleep = $test.sleep;\n  return (take([1, 2, 3], 0));\n}, () => ([]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Iteration yields one value per step using only a counter; take() stops after n items."
+  },
+  {
+    "id": "matrix-basics",
+    "track": "algorithms",
+    "title": "Matrix Basics: Create, Sum, Diagonal",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "matrix",
+      "2d-array",
+      "basics"
+    ],
+    "promptSeed": "Write createMatrix(rows, cols, fill = 0) returning a rows x cols array of arrays where every row is its OWN array (changing one cell must not change others), matrixSum(matrix) returning the sum of every cell (0 for an empty matrix), and diagonalSum(matrix) for a square matrix returning the sum of both diagonals, counting the centre cell of an odd-sized matrix only once.",
+    "difficulty": 1,
+    "concept": "matrix",
+    "referenceSolution": "function createMatrix(rows, cols, fill = 0) {\n  return Array.from({ length: rows }, () => new Array(cols).fill(fill));\n}\n\nfunction matrixSum(matrix) {\n  let total = 0;\n  for (const row of matrix) {\n    for (const value of row) total += value;\n  }\n  return total;\n}\n\nfunction diagonalSum(matrix) {\n  const n = matrix.length;\n  let total = 0;\n  for (let i = 0; i < n; i++) {\n    total += matrix[i][i];\n    if (i !== n - 1 - i) total += matrix[i][n - 1 - i];\n  }\n  return total;\n}",
+    "solution": "function createMatrix(rows, cols, fill = 0) {\n  return Array.from({ length: rows }, () => new Array(cols).fill(fill));\n}\n\nfunction matrixSum(matrix) {\n  let total = 0;\n  for (const row of matrix) {\n    for (const value of row) total += value;\n  }\n  return total;\n}\n\nfunction diagonalSum(matrix) {\n  const n = matrix.length;\n  let total = 0;\n  for (let i = 0; i < n; i++) {\n    total += matrix[i][i];\n    if (i !== n - 1 - i) total += matrix[i][n - 1 - i];\n  }\n  return total;\n}",
+    "starterCode": "function createMatrix(rows, cols, fill = 0) {\n  return Array.from({ length: rows }, () => new Array(cols).fill(fill));\n}\n\nfunction matrixSum(matrix) {\n  let total = 0;\n  for (const row of matrix) {\n    for (const value of row) total += value;\n  }\n  return total;\n}\n\nfunction diagonalSum(matrix) {\n  const n = matrix.length;\n  let total = 0;\n  for (let i = 0; i < n; i++) {\n    total += matrix[i][i];\n    if (i !== n - 1 - i) total += matrix[i][n - 1 - i];\n  }\n  return total;\n}",
+    "testCases": [
+      {
+        "description": "createMatrix builds rows x cols filled with 0 by default",
+        "input": "createMatrix(2, 3)",
+        "expected": "[[0, 0, 0], [0, 0, 0]]"
+      },
+      {
+        "description": "createMatrix with a custom fill",
+        "input": "createMatrix(2, 2, 'x')",
+        "expected": "[['x', 'x'], ['x', 'x']]"
+      },
+      {
+        "description": "createMatrix rows are independent arrays",
+        "input": "const m = createMatrix(2, 2);\nm[0][0] = 9;\n[m[0][0], m[1][0]]",
+        "expected": "[9, 0]"
+      },
+      {
+        "description": "createMatrix with zero rows",
+        "input": "createMatrix(0, 5)",
+        "expected": "[]"
+      },
+      {
+        "description": "matrixSum adds every cell",
+        "input": "[matrixSum([[1, 2], [3, 4]]), matrixSum([[5]]), matrixSum([])]",
+        "expected": "[10, 5, 0]"
+      },
+      {
+        "description": "diagonalSum of an even matrix counts both diagonals",
+        "input": "diagonalSum([[1, 2], [3, 4]])",
+        "expected": "10"
+      },
+      {
+        "description": "diagonalSum of an odd matrix counts the centre once",
+        "input": "diagonalSum([[1, 2, 3], [4, 5, 6], [7, 8, 9]])",
+        "expected": "25"
+      },
+      {
+        "description": "diagonalSum of a 1x1 and empty matrix",
+        "input": "[diagonalSum([[7]]), diagonalSum([])]",
+        "expected": "[7, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"createMatrix builds rows x cols filled with 0 by default\", async () => {\n  const sleep = $test.sleep;\n  return (createMatrix(2, 3));\n}, () => ([[0, 0, 0], [0, 0, 0]]));\n\nawait $test.run(\"createMatrix with a custom fill\", async () => {\n  const sleep = $test.sleep;\n  return (createMatrix(2, 2, 'x'));\n}, () => ([['x', 'x'], ['x', 'x']]));\n\nawait $test.run(\"createMatrix rows are independent arrays\", async () => {\n  const sleep = $test.sleep;\n  const m = createMatrix(2, 2);\n  m[0][0] = 9;\n  return ([m[0][0], m[1][0]]);\n}, () => ([9, 0]));\n\nawait $test.run(\"createMatrix with zero rows\", async () => {\n  const sleep = $test.sleep;\n  return (createMatrix(0, 5));\n}, () => ([]));\n\nawait $test.run(\"matrixSum adds every cell\", async () => {\n  const sleep = $test.sleep;\n  return ([matrixSum([[1, 2], [3, 4]]), matrixSum([[5]]), matrixSum([])]);\n}, () => ([10, 5, 0]));\n\nawait $test.run(\"diagonalSum of an even matrix counts both diagonals\", async () => {\n  const sleep = $test.sleep;\n  return (diagonalSum([[1, 2], [3, 4]]));\n}, () => (10));\n\nawait $test.run(\"diagonalSum of an odd matrix counts the centre once\", async () => {\n  const sleep = $test.sleep;\n  return (diagonalSum([[1, 2, 3], [4, 5, 6], [7, 8, 9]]));\n}, () => (25));\n\nawait $test.run(\"diagonalSum of a 1x1 and empty matrix\", async () => {\n  const sleep = $test.sleep;\n  return ([diagonalSum([[7]]), diagonalSum([])]);\n}, () => ([7, 0]));",
+    "targetTime": "O(rows × cols)",
+    "targetSpace": "O(rows × cols)",
+    "complexityExplanation": "Creating or summing touches every cell once; diagonalSum is O(n) and createMatrix allocates the full grid."
+  },
+  {
+    "id": "promise-all-by-hand",
+    "track": "async-web-plumbing",
+    "title": "Promise.all By Hand (Counter)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "promise",
+      "combinators",
+      "basics"
+    ],
+    "promptSeed": "Without using Promise.all, write myAll(items) that takes an array of values and/or promises and returns a promise that resolves to an array of the results in the SAME ORDER as the input (not completion order). Use a counter of how many have finished. It rejects as soon as any input rejects (with that reason), and myAll([]) resolves to [].",
+    "difficulty": 2,
+    "concept": "promise-combinators",
+    "referenceSolution": "function myAll(items) {\n  return new Promise((resolve, reject) => {\n    const results = new Array(items.length);\n    let remaining = items.length;\n    if (remaining === 0) {\n      resolve(results);\n      return;\n    }\n    items.forEach((item, index) => {\n      Promise.resolve(item).then((value) => {\n        results[index] = value;\n        remaining--;\n        if (remaining === 0) resolve(results);\n      }, reject);\n    });\n  });\n}",
+    "solution": "function myAll(items) {\n  return new Promise((resolve, reject) => {\n    const results = new Array(items.length);\n    let remaining = items.length;\n    if (remaining === 0) {\n      resolve(results);\n      return;\n    }\n    items.forEach((item, index) => {\n      Promise.resolve(item).then((value) => {\n        results[index] = value;\n        remaining--;\n        if (remaining === 0) resolve(results);\n      }, reject);\n    });\n  });\n}",
+    "starterCode": "function myAll(items) {\n  return new Promise((resolve, reject) => {\n    const results = new Array(items.length);\n    let remaining = items.length;\n    if (remaining === 0) {\n      resolve(results);\n      return;\n    }\n    items.forEach((item, index) => {\n      Promise.resolve(item).then((value) => {\n        results[index] = value;\n        remaining--;\n        if (remaining === 0) resolve(results);\n      }, reject);\n    });\n  });\n}",
+    "testCases": [
+      {
+        "description": "myAll keeps input order for mixed values and promises",
+        "input": "await myAll([1, Promise.resolve(2), new Promise((r) => setTimeout(() => r(3), 20))])",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "Result order is the input order, not completion order",
+        "input": "await myAll([new Promise((r) => setTimeout(() => r('slow'), 30)), new Promise((r) => setTimeout(() => r('fast'), 5))])",
+        "expected": "['slow', 'fast']"
+      },
+      {
+        "description": "An empty array resolves to []",
+        "input": "await myAll([])",
+        "expected": "[]"
+      },
+      {
+        "description": "The first rejection rejects the result",
+        "input": "await myAll([Promise.resolve(1), Promise.reject(new Error('boom')), Promise.resolve(3)])",
+        "expected": "Rejects with Error — message matches /boom/"
+      },
+      {
+        "description": "Rejects even when an earlier promise is still pending",
+        "input": "await myAll([new Promise((r) => setTimeout(r, 40)), Promise.reject(new Error('early'))])",
+        "expected": "Rejects with Error — message matches /early/"
+      },
+      {
+        "description": "Plain values only",
+        "input": "await myAll(['a', 'b'])",
+        "expected": "['a', 'b']"
+      },
+      {
+        "description": "Returns a promise",
+        "input": "myAll([1]) instanceof Promise",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"myAll keeps input order for mixed values and promises\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([1, Promise.resolve(2), new Promise((r) => setTimeout(() => r(3), 20))]));\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"Result order is the input order, not completion order\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([new Promise((r) => setTimeout(() => r('slow'), 30)), new Promise((r) => setTimeout(() => r('fast'), 5))]));\n}, () => (['slow', 'fast']));\n\nawait $test.run(\"An empty array resolves to []\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([]));\n}, () => ([]));\n\nawait $test.rejects(\"The first rejection rejects the result\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([Promise.resolve(1), Promise.reject(new Error('boom')), Promise.resolve(3)]));\n}, \"boom\");\n\nawait $test.rejects(\"Rejects even when an earlier promise is still pending\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([new Promise((r) => setTimeout(r, 40)), Promise.reject(new Error('early'))]));\n}, \"early\");\n\nawait $test.run(\"Plain values only\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll(['a', 'b']));\n}, () => (['a', 'b']));\n\nawait $test.run(\"Returns a promise\", async () => {\n  const sleep = $test.sleep;\n  return (myAll([1]) instanceof Promise);\n}, () => (true));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each input is subscribed to once and the results array holds one slot per input."
+  },
+  {
+    "id": "simple-stringify",
+    "track": "js-language",
+    "title": "Serialization: simpleStringify (Primitives and Arrays)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "json",
+      "serialization",
+      "recursion",
+      "basics"
+    ],
+    "promptSeed": "Write simpleStringify(value) that mimics JSON.stringify for primitives and arrays only: null -> \"null\", booleans -> \"true\"/\"false\", finite numbers via String, NaN/Infinity -> \"null\", strings wrapped in double quotes with \\, \" and newline escaped as \\\\, \\\" and \\n, arrays as [a,b,c] with no spaces (nested arrays recurse; an undefined element becomes null). A top-level undefined returns undefined. You do not need to handle objects. Do not call JSON.stringify.",
+    "difficulty": 1,
+    "concept": "serialization",
+    "referenceSolution": "function simpleStringify(value) {\n  if (value === undefined) return undefined;\n  if (value === null) return 'null';\n  if (typeof value === 'boolean') return String(value);\n  if (typeof value === 'number') return Number.isFinite(value) ? String(value) : 'null';\n  if (typeof value === 'string') {\n    const escaped = value.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"').replace(/\\n/g, '\\\\n');\n    return '\"' + escaped + '\"';\n  }\n  if (Array.isArray(value)) {\n    const parts = value.map((item) => {\n      const s = simpleStringify(item);\n      return s === undefined ? 'null' : s;\n    });\n    return '[' + parts.join(',') + ']';\n  }\n  return undefined;\n}",
+    "solution": "function simpleStringify(value) {\n  if (value === undefined) return undefined;\n  if (value === null) return 'null';\n  if (typeof value === 'boolean') return String(value);\n  if (typeof value === 'number') return Number.isFinite(value) ? String(value) : 'null';\n  if (typeof value === 'string') {\n    const escaped = value.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"').replace(/\\n/g, '\\\\n');\n    return '\"' + escaped + '\"';\n  }\n  if (Array.isArray(value)) {\n    const parts = value.map((item) => {\n      const s = simpleStringify(item);\n      return s === undefined ? 'null' : s;\n    });\n    return '[' + parts.join(',') + ']';\n  }\n  return undefined;\n}",
+    "starterCode": "function simpleStringify(value) {\n  if (value === undefined) return undefined;\n  if (value === null) return 'null';\n  if (typeof value === 'boolean') return String(value);\n  if (typeof value === 'number') return Number.isFinite(value) ? String(value) : 'null';\n  if (typeof value === 'string') {\n    const escaped = value.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"').replace(/\\n/g, '\\\\n');\n    return '\"' + escaped + '\"';\n  }\n  if (Array.isArray(value)) {\n    const parts = value.map((item) => {\n      const s = simpleStringify(item);\n      return s === undefined ? 'null' : s;\n    });\n    return '[' + parts.join(',') + ']';\n  }\n  return undefined;\n}",
+    "testCases": [
+      {
+        "description": "Primitives",
+        "input": "[simpleStringify(null), simpleStringify(true), simpleStringify(42), simpleStringify(-1.5)]",
+        "expected": "['null', 'true', '42', '-1.5']"
+      },
+      {
+        "description": "Strings are quoted",
+        "input": "simpleStringify('hi')",
+        "expected": "'\"hi\"'"
+      },
+      {
+        "description": "Quotes and backslashes in strings are escaped",
+        "input": "simpleStringify('say \"hi\" \\\\ ok')",
+        "expected": "'\"say \\\\\"hi\\\\\" \\\\\\\\ ok\"'"
+      },
+      {
+        "description": "Newlines are escaped",
+        "input": "simpleStringify('a\\nb')",
+        "expected": "'\"a\\\\nb\"'"
+      },
+      {
+        "description": "NaN and Infinity become null",
+        "input": "[simpleStringify(NaN), simpleStringify(Infinity)]",
+        "expected": "['null', 'null']"
+      },
+      {
+        "description": "Arrays have no spaces",
+        "input": "simpleStringify([1, 'a', true, null])",
+        "expected": "'[1,\"a\",true,null]'"
+      },
+      {
+        "description": "Nested and empty arrays",
+        "input": "[simpleStringify([[1, 2], [], [3]]), simpleStringify([])]",
+        "expected": "['[[1,2],[],[3]]', '[]']"
+      },
+      {
+        "description": "undefined at the top level is undefined, inside arrays null",
+        "input": "[simpleStringify(undefined), simpleStringify([undefined, 1])]",
+        "expected": "[undefined, '[null,1]']"
+      },
+      {
+        "description": "Matches JSON.stringify on a mixed array",
+        "input": "const v = [1, 'x\"y', [false, null, 2.5], 'line\\nbreak'];\nsimpleStringify(v) === JSON.stringify(v)",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"Primitives\", async () => {\n  const sleep = $test.sleep;\n  return ([simpleStringify(null), simpleStringify(true), simpleStringify(42), simpleStringify(-1.5)]);\n}, () => (['null', 'true', '42', '-1.5']));\n\nawait $test.run(\"Strings are quoted\", async () => {\n  const sleep = $test.sleep;\n  return (simpleStringify('hi'));\n}, () => ('\"hi\"'));\n\nawait $test.run(\"Quotes and backslashes in strings are escaped\", async () => {\n  const sleep = $test.sleep;\n  return (simpleStringify('say \"hi\" \\\\ ok'));\n}, () => ('\"say \\\\\"hi\\\\\" \\\\\\\\ ok\"'));\n\nawait $test.run(\"Newlines are escaped\", async () => {\n  const sleep = $test.sleep;\n  return (simpleStringify('a\\nb'));\n}, () => ('\"a\\\\nb\"'));\n\nawait $test.run(\"NaN and Infinity become null\", async () => {\n  const sleep = $test.sleep;\n  return ([simpleStringify(NaN), simpleStringify(Infinity)]);\n}, () => (['null', 'null']));\n\nawait $test.run(\"Arrays have no spaces\", async () => {\n  const sleep = $test.sleep;\n  return (simpleStringify([1, 'a', true, null]));\n}, () => ('[1,\"a\",true,null]'));\n\nawait $test.run(\"Nested and empty arrays\", async () => {\n  const sleep = $test.sleep;\n  return ([simpleStringify([[1, 2], [], [3]]), simpleStringify([])]);\n}, () => (['[[1,2],[],[3]]', '[]']));\n\nawait $test.run(\"undefined at the top level is undefined, inside arrays null\", async () => {\n  const sleep = $test.sleep;\n  return ([simpleStringify(undefined), simpleStringify([undefined, 1])]);\n}, () => ([undefined, '[null,1]']));\n\nawait $test.run(\"Matches JSON.stringify on a mixed array\", async () => {\n  const sleep = $test.sleep;\n  const v = [1, 'x\"y', [false, null, 2.5], 'line\\nbreak'];\n  return (simpleStringify(v) === JSON.stringify(v));\n}, () => (true));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Every element and character is visited once, building an output string proportional to the input."
+  },
+  {
+    "id": "trie-nested-object",
+    "track": "algorithms",
+    "title": "Trie From Nested Objects",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "trie",
+      "string",
+      "basics"
+    ],
+    "promptSeed": "Write buildTrie(words) returning a trie made of plain nested objects: one key per character, and the key '$' set to true on the node where a word ends (buildTrie(['a', 'ab']) is { a: { $: true, b: { $: true } } }; no words gives {}). Write hasWord(trie, word) (true only for complete words) and hasPrefix(trie, prefix) (true when some word starts with prefix; the empty prefix is true for any non-empty trie).",
+    "difficulty": 2,
+    "concept": "trie",
+    "referenceSolution": "function buildTrie(words) {\n  const root = {};\n  for (const word of words) {\n    let node = root;\n    for (const ch of word) {\n      if (!node[ch]) node[ch] = {};\n      node = node[ch];\n    }\n    node.$ = true;\n  }\n  return root;\n}\n\nfunction walk(trie, text) {\n  let node = trie;\n  for (const ch of text) {\n    node = node[ch];\n    if (!node) return null;\n  }\n  return node;\n}\n\nfunction hasWord(trie, word) {\n  const node = walk(trie, word);\n  return !!node && node.$ === true;\n}\n\nfunction hasPrefix(trie, prefix) {\n  const node = walk(trie, prefix);\n  return !!node && Object.keys(node).length > 0;\n}",
+    "solution": "function buildTrie(words) {\n  const root = {};\n  for (const word of words) {\n    let node = root;\n    for (const ch of word) {\n      if (!node[ch]) node[ch] = {};\n      node = node[ch];\n    }\n    node.$ = true;\n  }\n  return root;\n}\n\nfunction walk(trie, text) {\n  let node = trie;\n  for (const ch of text) {\n    node = node[ch];\n    if (!node) return null;\n  }\n  return node;\n}\n\nfunction hasWord(trie, word) {\n  const node = walk(trie, word);\n  return !!node && node.$ === true;\n}\n\nfunction hasPrefix(trie, prefix) {\n  const node = walk(trie, prefix);\n  return !!node && Object.keys(node).length > 0;\n}",
+    "starterCode": "function buildTrie(words) {\n  const root = {};\n  for (const word of words) {\n    let node = root;\n    for (const ch of word) {\n      if (!node[ch]) node[ch] = {};\n      node = node[ch];\n    }\n    node.$ = true;\n  }\n  return root;\n}\n\nfunction walk(trie, text) {\n  let node = trie;\n  for (const ch of text) {\n    node = node[ch];\n    if (!node) return null;\n  }\n  return node;\n}\n\nfunction hasWord(trie, word) {\n  const node = walk(trie, word);\n  return !!node && node.$ === true;\n}\n\nfunction hasPrefix(trie, prefix) {\n  const node = walk(trie, prefix);\n  return !!node && Object.keys(node).length > 0;\n}",
+    "testCases": [
+      {
+        "description": "buildTrie builds nested objects with $ markers",
+        "input": "buildTrie(['a', 'ab'])",
+        "expected": "{ a: { $: true, b: { $: true } } }"
+      },
+      {
+        "description": "buildTrie shares prefixes",
+        "input": "buildTrie(['cat', 'car'])",
+        "expected": "{ c: { a: { t: { $: true }, r: { $: true } } } }"
+      },
+      {
+        "description": "buildTrie of no words is empty",
+        "input": "buildTrie([])",
+        "expected": "{}"
+      },
+      {
+        "description": "hasWord only matches complete words",
+        "input": "const t = buildTrie(['apple', 'app']);\n[hasWord(t, 'app'), hasWord(t, 'apple'), hasWord(t, 'ap'), hasWord(t, 'apples')]",
+        "expected": "[true, true, false, false]"
+      },
+      {
+        "description": "hasPrefix matches word starts",
+        "input": "const t = buildTrie(['apple']);\n[hasPrefix(t, 'app'), hasPrefix(t, 'apple'), hasPrefix(t, 'b')]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "hasPrefix with the empty prefix",
+        "input": "[hasPrefix(buildTrie(['a']), ''), hasPrefix(buildTrie([]), '')]",
+        "expected": "[true, false]"
+      }
+    ],
+    "testHarness": "await $test.run(\"buildTrie builds nested objects with $ markers\", async () => {\n  const sleep = $test.sleep;\n  return (buildTrie(['a', 'ab']));\n}, () => ({ a: { $: true, b: { $: true } } }));\n\nawait $test.run(\"buildTrie shares prefixes\", async () => {\n  const sleep = $test.sleep;\n  return (buildTrie(['cat', 'car']));\n}, () => ({ c: { a: { t: { $: true }, r: { $: true } } } }));\n\nawait $test.run(\"buildTrie of no words is empty\", async () => {\n  const sleep = $test.sleep;\n  return (buildTrie([]));\n}, () => ({}));\n\nawait $test.run(\"hasWord only matches complete words\", async () => {\n  const sleep = $test.sleep;\n  const t = buildTrie(['apple', 'app']);\n  return ([hasWord(t, 'app'), hasWord(t, 'apple'), hasWord(t, 'ap'), hasWord(t, 'apples')]);\n}, () => ([true, true, false, false]));\n\nawait $test.run(\"hasPrefix matches word starts\", async () => {\n  const sleep = $test.sleep;\n  const t = buildTrie(['apple']);\n  return ([hasPrefix(t, 'app'), hasPrefix(t, 'apple'), hasPrefix(t, 'b')]);\n}, () => ([true, true, false]));\n\nawait $test.run(\"hasPrefix with the empty prefix\", async () => {\n  const sleep = $test.sleep;\n  return ([hasPrefix(buildTrie(['a']), ''), hasPrefix(buildTrie([]), '')]);\n}, () => ([true, false]));",
+    "targetTime": "O(total characters)",
+    "targetSpace": "O(total characters)",
+    "complexityExplanation": "Building visits every character of every word once and creates at most one nested object per character; lookups cost one step per character."
+  },
+  {
+    "id": "ts-identity-first-generics",
+    "track": "typescript-patterns",
+    "title": "TS Generics: identity, first, Box<T>",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "typescript",
+      "generics",
+      "basics"
+    ],
+    "promptSeed": "Write the generic function identity<T>(value: T): T, first<T>(items: T[]): T | undefined (undefined for an empty array), the generic interface Box<T> { value: T }, makeBox<T>(value: T): Box<T> and mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U>. Use real type parameters (no any) so the compiler infers and checks the result types.",
+    "difficulty": 1,
+    "concept": "ts-generics",
+    "referenceSolution": "function identity<T>(value: T): T {\n  return value;\n}\n\nfunction first<T>(items: T[]): T | undefined {\n  return items[0];\n}\n\ninterface Box<T> {\n  value: T;\n}\n\nfunction makeBox<T>(value: T): Box<T> {\n  return { value };\n}\n\nfunction mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U> {\n  return { value: fn(box.value) };\n}",
+    "solution": "function identity<T>(value: T): T {\n  return value;\n}\n\nfunction first<T>(items: T[]): T | undefined {\n  return items[0];\n}\n\ninterface Box<T> {\n  value: T;\n}\n\nfunction makeBox<T>(value: T): Box<T> {\n  return { value };\n}\n\nfunction mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U> {\n  return { value: fn(box.value) };\n}",
+    "starterCode": "function identity<T>(value: T): T {\n  return value;\n}\n\nfunction first<T>(items: T[]): T | undefined {\n  return items[0];\n}\n\ninterface Box<T> {\n  value: T;\n}\n\nfunction makeBox<T>(value: T): Box<T> {\n  return { value };\n}\n\nfunction mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U> {\n  return { value: fn(box.value) };\n}",
+    "testCases": [
+      {
+        "description": "identity returns its argument",
+        "input": "[identity(5), identity('a'), identity(true)]",
+        "expected": "[5, 'a', true]"
+      },
+      {
+        "description": "first returns the first element or undefined",
+        "input": "[first([3, 4]), first(['x']), first([])]",
+        "expected": "[3, 'x', undefined]"
+      },
+      {
+        "description": "makeBox wraps a value",
+        "input": "makeBox(7)",
+        "expected": "{ value: 7 }"
+      },
+      {
+        "description": "mapBox maps the boxed value",
+        "input": "mapBox(makeBox(3), (v) => v * 2)",
+        "expected": "{ value: 6 }"
+      },
+      {
+        "description": "mapBox can change the type",
+        "input": "mapBox(makeBox(3), (v) => 'n' + v)",
+        "expected": "{ value: 'n3' }"
+      },
+      {
+        "description": "Compile time: generic results are inferred",
+        "input": "const x: number = identity('a');",
+        "expected": "TS2322 — Type 'string' is not assignable to type 'number'"
+      }
+    ],
+    "testHarness": "await $test.run(\"identity returns its argument\", async () => {\n  const sleep = $test.sleep;\n  return ([identity(5), identity('a'), identity(true)]);\n}, () => ([5, 'a', true]));\n\nawait $test.run(\"first returns the first element or undefined\", async () => {\n  const sleep = $test.sleep;\n  return ([first([3, 4]), first(['x']), first([])]);\n}, () => ([3, 'x', undefined]));\n\nawait $test.run(\"makeBox wraps a value\", async () => {\n  const sleep = $test.sleep;\n  return (makeBox(7));\n}, () => ({ value: 7 }));\n\nawait $test.run(\"mapBox maps the boxed value\", async () => {\n  const sleep = $test.sleep;\n  return (mapBox(makeBox(3), (v) => v * 2));\n}, () => ({ value: 6 }));\n\nawait $test.run(\"mapBox can change the type\", async () => {\n  const sleep = $test.sleep;\n  return (mapBox(makeBox(3), (v) => 'n' + v));\n}, () => ({ value: 'n3' }));\n\nconst compileChecksG1 = () => {\n  const n: number = identity(5);\n  const s: string = identity('a');\n  // @ts-expect-error — identity('a') is a string, not a number\n  const bad: number = identity('a');\n  // @ts-expect-error — first of a number[] is number | undefined, never a string\n  const bad2: string = first([1, 2]);\n  const box: Box<number> = makeBox(3);\n  const mapped: Box<string> = mapBox(box, (v) => String(v));\n  // @ts-expect-error — mapping to a string gives Box<string>, not Box<number>\n  const bad3: Box<number> = mapBox(box, (v) => String(v));\n  return [n, s, bad, bad2, mapped, bad3];\n};\n$test.check('Compile time: generic results are inferred and checked', typeof compileChecksG1 === 'function');",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each function does constant work; the generics only exist at compile time."
+  },
+  {
+    "id": "ts-narrowing-typeof-in",
+    "track": "typescript-patterns",
+    "title": "TS Unions: Narrowing With typeof and in",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "typescript",
+      "unions",
+      "narrowing",
+      "basics"
+    ],
+    "promptSeed": "Write describe(value: string | number | string[]): string returning 'string:<length>' for a string, 'number:<value with one decimal, via toFixed(1)>' for a number and 'list:<length>' for an array, narrowing with typeof / Array.isArray. Define type Shape = { radius: number } | { width: number; height: number } and write area(shape: Shape): number which uses the `in` operator to narrow: a circle returns Math.PI * radius ** 2 rounded to 2 decimals, a rectangle returns width * height.",
+    "difficulty": 1,
+    "concept": "ts-unions",
+    "referenceSolution": "function describe(value: string | number | string[]): string {\n  if (typeof value === 'string') return 'string:' + value.length;\n  if (typeof value === 'number') return 'number:' + value.toFixed(1);\n  return 'list:' + value.length;\n}\n\ntype Shape = { radius: number } | { width: number; height: number };\n\nfunction area(shape: Shape): number {\n  if ('radius' in shape) {\n    return Math.round(Math.PI * shape.radius ** 2 * 100) / 100;\n  }\n  return shape.width * shape.height;\n}",
+    "solution": "function describe(value: string | number | string[]): string {\n  if (typeof value === 'string') return 'string:' + value.length;\n  if (typeof value === 'number') return 'number:' + value.toFixed(1);\n  return 'list:' + value.length;\n}\n\ntype Shape = { radius: number } | { width: number; height: number };\n\nfunction area(shape: Shape): number {\n  if ('radius' in shape) {\n    return Math.round(Math.PI * shape.radius ** 2 * 100) / 100;\n  }\n  return shape.width * shape.height;\n}",
+    "starterCode": "function describe(value: string | number | string[]): string {\n  if (typeof value === 'string') return 'string:' + value.length;\n  if (typeof value === 'number') return 'number:' + value.toFixed(1);\n  return 'list:' + value.length;\n}\n\ntype Shape = { radius: number } | { width: number; height: number };\n\nfunction area(shape: Shape): number {\n  if ('radius' in shape) {\n    return Math.round(Math.PI * shape.radius ** 2 * 100) / 100;\n  }\n  return shape.width * shape.height;\n}",
+    "testCases": [
+      {
+        "description": "describe a string",
+        "input": "describe('hello')",
+        "expected": "'string:5'"
+      },
+      {
+        "description": "describe a number with one decimal",
+        "input": "[describe(3), describe(2.55)]",
+        "expected": "['number:3.0', 'number:2.5']"
+      },
+      {
+        "description": "describe an array",
+        "input": "describe(['a', 'b', 'c'])",
+        "expected": "'list:3'"
+      },
+      {
+        "description": "area of a rectangle",
+        "input": "area({ width: 3, height: 4 })",
+        "expected": "12"
+      },
+      {
+        "description": "area of a circle is rounded to 2 decimals",
+        "input": "area({ radius: 2 })",
+        "expected": "12.57"
+      },
+      {
+        "description": "Compile time: values outside the union are rejected",
+        "input": "describe(true)",
+        "expected": "TS2345 — Argument of type 'boolean' is not assignable to parameter of type 'string | number | string[]'"
+      }
+    ],
+    "testHarness": "await $test.run(\"describe a string\", async () => {\n  const sleep = $test.sleep;\n  return (describe('hello'));\n}, () => ('string:5'));\n\nawait $test.run(\"describe a number with one decimal\", async () => {\n  const sleep = $test.sleep;\n  return ([describe(3), describe(2.55)]);\n}, () => (['number:3.0', (2.55).toFixed(1) === '2.5' ? 'number:2.5' : 'number:2.6']));\n\nawait $test.run(\"describe an array\", async () => {\n  const sleep = $test.sleep;\n  return (describe(['a', 'b', 'c']));\n}, () => ('list:3'));\n\nawait $test.run(\"area of a rectangle\", async () => {\n  const sleep = $test.sleep;\n  return (area({ width: 3, height: 4 }));\n}, () => (12));\n\nawait $test.run(\"area of a circle is rounded to 2 decimals\", async () => {\n  const sleep = $test.sleep;\n  return (area({ radius: 2 }));\n}, () => (12.57));\n\nconst compileChecksU1 = () => {\n  // @ts-expect-error — a boolean is not part of the accepted union\n  describe(true);\n  // @ts-expect-error — a shape needs radius or width and height\n  area({ side: 2 });\n  // @ts-expect-error — the rectangle variant requires height too\n  area({ width: 2 });\n};\n$test.check('Compile time: values outside the union are rejected', typeof compileChecksU1 === 'function');",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each function performs a constant number of type checks; narrowing is a compile-time feature."
+  },
+  {
+    "id": "ts-reimplement-utility-types",
+    "track": "typescript-patterns",
+    "title": "TS Types: Rebuild Partial, Readonly, Pick, Record",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "typescript",
+      "mapped-types",
+      "utility-types",
+      "basics"
+    ],
+    "promptSeed": "Without using the built-in utility types, define the mapped types MyPartial<T> (every property optional), MyReadonly<T> (every property readonly), MyPick<T, K extends keyof T> (only the keys K) and MyRecord<K extends keyof any, V> (an object with keys K, all of type V). Use `[P in ...]` mapped-type syntax and keyof.",
+    "difficulty": 1,
+    "concept": "ts-types",
+    "referenceSolution": "type MyPartial<T> = { [P in keyof T]?: T[P] };\n\ntype MyReadonly<T> = { readonly [P in keyof T]: T[P] };\n\ntype MyPick<T, K extends keyof T> = { [P in K]: T[P] };\n\ntype MyRecord<K extends keyof any, V> = { [P in K]: V };",
+    "solution": "type MyPartial<T> = { [P in keyof T]?: T[P] };\n\ntype MyReadonly<T> = { readonly [P in keyof T]: T[P] };\n\ntype MyPick<T, K extends keyof T> = { [P in K]: T[P] };\n\ntype MyRecord<K extends keyof any, V> = { [P in K]: V };",
+    "starterCode": "type MyPartial<T> = { [P in keyof T]?: T[P] };\n\ntype MyReadonly<T> = { readonly [P in keyof T]: T[P] };\n\ntype MyPick<T, K extends keyof T> = { [P in K]: T[P] };\n\ntype MyRecord<K extends keyof any, V> = { [P in K]: V };",
+    "testCases": [
+      {
+        "description": "MyPartial allows missing properties",
+        "input": "const p: MyPartial<{ a: number; b: string }> = { a: 1 };\np",
+        "expected": "{ a: 1 }"
+      },
+      {
+        "description": "MyPick keeps only the chosen keys",
+        "input": "const p: MyPick<{ id: number; name: string }, 'id'> = { id: 1 };\np",
+        "expected": "{ id: 1 }"
+      },
+      {
+        "description": "MyRecord maps every key to the value type",
+        "input": "const r: MyRecord<'a' | 'b', number> = { a: 1, b: 2 };\nr",
+        "expected": "{ a: 1, b: 2 }"
+      },
+      {
+        "description": "MyReadonly values can be read",
+        "input": "const r: MyReadonly<{ id: number }> = { id: 5 };\nr.id",
+        "expected": "5"
+      },
+      {
+        "description": "Compile time: MyReadonly rejects assignment",
+        "input": "const r: MyReadonly<{ id: number }> = { id: 1 };\nr.id = 2;",
+        "expected": "TS2540 — Cannot assign to 'id' because it is a read-only property"
+      },
+      {
+        "description": "Compile time: MyPick rejects other keys",
+        "input": "const p: MyPick<{ id: number; name: string }, 'id'> = { id: 1, name: 'x' };",
+        "expected": "TS2353 — Object literal may only specify known properties; 'name' does not exist"
+      }
+    ],
+    "testHarness": "await $test.run(\"MyPartial allows missing properties\", async () => {\n  const sleep = $test.sleep;\n  const p: MyPartial<{ a: number; b: string }> = { a: 1 };\n  return (p);\n}, () => ({ a: 1 }));\n\nawait $test.run(\"MyPick keeps only the chosen keys\", async () => {\n  const sleep = $test.sleep;\n  const p: MyPick<{ id: number; name: string }, 'id'> = { id: 1 };\n  return (p);\n}, () => ({ id: 1 }));\n\nawait $test.run(\"MyRecord maps every key to the value type\", async () => {\n  const sleep = $test.sleep;\n  const r: MyRecord<'a' | 'b', number> = { a: 1, b: 2 };\n  return (r);\n}, () => ({ a: 1, b: 2 }));\n\nawait $test.run(\"MyReadonly values can be read\", async () => {\n  const sleep = $test.sleep;\n  const r: MyReadonly<{ id: number }> = { id: 5 };\n  return (r.id);\n}, () => (5));\n\ntype Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;\nconst assertType = <T extends true>(): void => {};\n\ntype User = { id: number; name: string };\nassertType<Equal<MyPartial<User>, { id?: number; name?: string }>>();\nassertType<Equal<MyReadonly<User>, { readonly id: number; readonly name: string }>>();\nassertType<Equal<MyPick<User, 'id'>, { id: number }>>();\nassertType<Equal<MyRecord<'a' | 'b', number>, { a: number; b: number }>>();\n\nconst compileChecksT1 = () => {\n  const ro: MyReadonly<User> = { id: 1, name: 'a' };\n  // @ts-expect-error — properties of MyReadonly cannot be assigned\n  ro.id = 2;\n  // @ts-expect-error — name is not part of MyPick<User, 'id'>\n  const picked: MyPick<User, 'id'> = { id: 1, name: 'x' };\n  return [ro, picked];\n};\n$test.check('Compile time: the rebuilt utility types have the right shapes', typeof compileChecksT1 === 'function');",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Pure compile-time mapped types; there is no runtime work."
   }
 ]

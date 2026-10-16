@@ -554,5 +554,61 @@
  "kadane-prefix-sum": {
   "difficulty": 2,
   "concept": "arrays"
+ },
+ "insertion-sort-basic": {
+  "difficulty": 1,
+  "concept": "sorting"
+ },
+ "heap-array-basics": {
+  "difficulty": 2,
+  "concept": "heap"
+ },
+ "trie-nested-object": {
+  "difficulty": 2,
+  "concept": "trie"
+ },
+ "binary-strings-combinations": {
+  "difficulty": 2,
+  "concept": "backtracking"
+ },
+ "matrix-basics": {
+  "difficulty": 1,
+  "concept": "matrix"
+ },
+ "graph-adjacency-bfs": {
+  "difficulty": 2,
+  "concept": "graphs"
+ },
+ "event-loop-order": {
+  "difficulty": 2,
+  "concept": "event-loop"
+ },
+ "promise-all-by-hand": {
+  "difficulty": 2,
+  "concept": "promise-combinators"
+ },
+ "iterable-range-class": {
+  "difficulty": 1,
+  "concept": "iterators"
+ },
+ "compose-middleware": {
+  "difficulty": 2,
+  "concept": "middleware"
+ },
+ "simple-stringify": {
+  "difficulty": 1,
+  "concept": "serialization"
+ },
+ "ts-identity-first-generics": {
+  "difficulty": 1,
+  "concept": "ts-generics"
+ },
+ "ts-narrowing-typeof-in": {
+  "difficulty": 1,
+  "concept": "ts-unions"
+ },
+ "ts-reimplement-utility-types": {
+  "difficulty": 1,
+  "concept": "ts-types"
  }
 }
