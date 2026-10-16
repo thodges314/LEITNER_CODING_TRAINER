@@ -16,7 +16,48 @@ import {
   Coins,
   Zap,
   Cpu,
+  ExternalLink,
 } from 'lucide-react';
+
+interface ProviderKeyPortal {
+  name: string;
+  url: string;
+  label: string;
+  description: string;
+}
+
+const PROVIDER_KEY_PORTALS: Record<AIProvider, ProviderKeyPortal | null> = {
+  gemini: {
+    name: 'Google AI Studio',
+    url: 'https://aistudio.google.com/app/apikey',
+    label: 'Get Google Gemini Key',
+    description: 'Free tier available (15 RPM on Flash) via Google AI Studio',
+  },
+  groq: {
+    name: 'Groq Console',
+    url: 'https://console.groq.com/keys',
+    label: 'Get Groq Key',
+    description: 'Ultra-fast inference with free tier rate limits (TPM/RPM)',
+  },
+  openrouter: {
+    name: 'OpenRouter',
+    url: 'https://openrouter.ai/settings/keys',
+    label: 'Get / Manage OpenRouter Keys',
+    description: 'Access 400+ models with unified credits & free models',
+  },
+  openai: {
+    name: 'OpenAI Platform',
+    url: 'https://platform.openai.com/api-keys',
+    label: 'Get OpenAI Key',
+    description: 'Create and manage secret keys on OpenAI Platform',
+  },
+  custom: {
+    name: 'Ollama Documentation',
+    url: 'https://ollama.com',
+    label: 'Ollama Setup',
+    description: 'Run local open-source models without an API key',
+  },
+};
 import {
   getStoredApiKey,
   setStoredApiKey,
@@ -528,18 +569,50 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* API Key */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <KeyRound size={14} color="var(--accent-cyan)" />
-                {provider === 'gemini'
-                  ? 'Gemini API Key'
-                  : provider === 'groq'
-                  ? 'Groq API Key'
-                  : provider === 'openai'
-                  ? 'OpenAI API Key'
-                  : 'API Key / Bearer Token'}
-              </label>
+          {(() => {
+            const portal = PROVIDER_KEY_PORTALS[provider];
+            return (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <label style={{ fontSize: '13px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <KeyRound size={14} color="var(--accent-cyan)" />
+                      {provider === 'gemini'
+                        ? 'Gemini API Key'
+                        : provider === 'groq'
+                        ? 'Groq API Key'
+                        : provider === 'openrouter'
+                        ? 'OpenRouter API Key'
+                        : provider === 'openai'
+                        ? 'OpenAI API Key'
+                        : 'API Key / Bearer Token'}
+                    </label>
+
+                    {portal && (
+                      <a
+                        href={portal.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: '11px',
+                          color: 'var(--accent-cyan)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          textDecoration: 'none',
+                          padding: '2px 7px',
+                          borderRadius: '4px',
+                          backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                          border: '1px solid rgba(56, 189, 248, 0.2)',
+                          transition: 'all 0.15s ease',
+                        }}
+                        title={`Open ${portal.name} to generate or renew your API key`}
+                      >
+                        <span>{apiKey ? 'Renew / Get Key' : 'Get Key'}</span>
+                        <ExternalLink size={10} />
+                      </a>
+                    )}
+                  </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 {detectProviderFromKey(keyInput) && (
@@ -736,11 +809,59 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             )}
 
+            {/* Direct portal link callout when no key is entered */}
+            {portal && !apiKey && provider !== 'custom' && (
+              <div
+                style={{
+                  marginTop: '8px',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(56, 189, 248, 0.05)',
+                  border: '1px solid rgba(56, 189, 248, 0.18)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  fontSize: '12px',
+                }}
+              >
+                <div style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Info size={13} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
+                  <span>
+                    <strong style={{ color: 'var(--text-primary)' }}>Need an API key?</strong> {portal.description}.
+                  </span>
+                </div>
+                <a
+                  href={portal.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: 'var(--accent-cyan)',
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    whiteSpace: 'nowrap',
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                  }}
+                >
+                  <span>{portal.label}</span>
+                  <ExternalLink size={11} />
+                </a>
+              </div>
+            )}
+
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', display: 'flex', gap: '4px' }}>
               <ShieldCheck size={14} color="#34d399" style={{ flexShrink: 0, marginTop: '1px' }} />
               Stored in plain text in this browser's localStorage and sent only to the provider you select with each evaluation request.
             </p>
           </div>
+        );
+      })()}
 
           {/* Provider Quota & Account Capabilities Banner */}
           {(accountInfo || isLoadingModels || modelDiscoveryError) && (
@@ -795,9 +916,32 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {modelDiscoveryError && (
-                <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
-                  {modelDiscoveryError} You can still enter your model identifier manually below.
-                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                    {modelDiscoveryError} You can still enter your model identifier manually below.
+                  </p>
+                  {PROVIDER_KEY_PORTALS[provider] && (
+                    <div>
+                      <a
+                        href={PROVIDER_KEY_PORTALS[provider]!.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: '11.5px',
+                          color: 'var(--accent-cyan)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          textDecoration: 'none',
+                          fontWeight: 500,
+                        }}
+                      >
+                        <span>Key expired or invalid? Renew key on {PROVIDER_KEY_PORTALS[provider]!.name}</span>
+                        <ExternalLink size={11} />
+                      </a>
+                    </div>
+                  )}
+                </div>
               )}
 
               {accountInfo && !isLoadingModels && (
