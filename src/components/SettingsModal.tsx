@@ -278,7 +278,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setStoredProvider(p);
     let defaultModel = model;
     if (p === 'gemini') defaultModel = 'gemini-2.5-flash';
-    else if (p === 'groq') defaultModel = 'llama-3.3-70b-versatile';
+    else if (p === 'groq') defaultModel = 'openai/gpt-oss-120b';
     else if (p === 'cerebras') defaultModel = 'llama3.3-70b';
     else if (p === 'mistral') defaultModel = 'codestral-latest';
     else if (p === 'anthropic') defaultModel = 'claude-3-5-sonnet-20241022';
@@ -593,7 +593,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {(
                 [
                   { id: 'groq', label: 'Groq', badge: '⚡ Best Free Speed' },
-                  { id: 'gemini', label: 'Google Gemini', badge: '🌟 High Quota' },
+                  { id: 'gemini', label: 'Google Gemini', badge: '🌟 Best Free Volume (1M TPM)' },
                   { id: 'cerebras', label: 'Cerebras', badge: '⚡ ~1,800 T/s' },
                   { id: 'mistral', label: 'Mistral AI', badge: '💻 Codestral' },
                   { id: 'anthropic', label: 'Anthropic', badge: '🎯 Benchmark' },
@@ -677,7 +677,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             >
               <Zap size={14} color="#38bdf8" style={{ flexShrink: 0 }} />
               <span>
-                <strong style={{ color: 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong>Groq</strong> (llama-3.3-70b) or <strong>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
+                <strong style={{ color: 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong>Groq</strong> (openai/gpt-oss-120b) or <strong>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
               </span>
             </div>
           </div>
@@ -1321,7 +1321,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     provider === 'gemini'
                       ? 'gemini-2.5-flash'
                       : provider === 'groq'
-                      ? 'llama-3.3-70b-versatile'
+                      ? 'openai/gpt-oss-120b'
                       : provider === 'cerebras'
                       ? 'llama3.3-70b'
                       : provider === 'mistral'

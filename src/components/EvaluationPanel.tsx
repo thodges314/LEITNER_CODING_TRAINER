@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   CheckCircle2,
   XCircle,
@@ -15,10 +15,11 @@ import {
   EyeOff,
   Copy,
   HelpCircle,
+  Loader2,
 } from 'lucide-react';
 import { intervalForBox } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
-import type { EvaluationResult } from '../lib/ai';
+import { askCritiqueFollowUp, type EvaluationResult } from '../lib/ai';
 
 interface EvaluationPanelProps {
   topic: TopicItem;
@@ -37,6 +38,7 @@ interface EvaluationPanelProps {
 
 export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   topic,
+  submittedCode = '',
   result,
   totalCompletedReviews,
   activeDeckSize,
@@ -58,6 +60,57 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   const toggleSolution = onToggleShowSolution ?? (() => setInternalShowSolution((prev) => !prev));
   const [copied, setCopied] = useState(false);
   const [showComplexityExplanation, setShowComplexityExplanation] = useState(false);
+
+  // Interactive critique follow-up state (scoped strictly to this challenge)
+  const [isFollowUpOpen, setIsFollowUpOpen] = useState(false);
+  const [followUpInput, setFollowUpInput] = useState('');
+  const [followUpMessages, setFollowUpMessages] = useState<
+    Array<{ role: 'user' | 'assistant'; content: string }>
+  >([]);
+  const [isSendingFollowUp, setIsSendingFollowUp] = useState(false);
+  const threadEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isFollowUpOpen) {
+      inputRef.current?.focus();
+    }
+  }, [isFollowUpOpen]);
+
+  useEffect(() => {
+    if (followUpMessages.length > 0) {
+      threadEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [followUpMessages, isSendingFollowUp]);
+
+  const handleSendFollowUp = async () => {
+    const question = followUpInput.trim();
+    if (!question || isSendingFollowUp) return;
+
+    setFollowUpInput('');
+    const updated = [...followUpMessages, { role: 'user' as const, content: question }];
+    setFollowUpMessages(updated);
+    setIsSendingFollowUp(true);
+
+    try {
+      const reply = await askCritiqueFollowUp(
+        topic,
+        submittedCode,
+        result.critique,
+        question,
+        followUpMessages
+      );
+      setFollowUpMessages([...updated, { role: 'assistant' as const, content: reply }]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setFollowUpMessages([
+        ...updated,
+        { role: 'assistant' as const, content: `Error: ${msg}` },
+      ]);
+    } finally {
+      setIsSendingFollowUp(false);
+    }
+  };
 
   const canonicalCode = topic.referenceSolution || topic.solution || topic.starterCode || '';
 
@@ -432,23 +485,154 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
       </div>
 
       {/* AI Critique */}
+      {/* AI Critique & Interactive Follow-Up */}
       <div
+        onClick={() => {
+          if (!isFollowUpOpen) setIsFollowUpOpen(true);
+        }}
         style={{
           padding: '16px',
           borderRadius: '10px',
           backgroundColor: 'var(--bg-card)',
-          border: '1px solid var(--border-subtle)',
+          border: isFollowUpOpen ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid var(--border-subtle)',
+          cursor: !isFollowUpOpen ? 'pointer' : 'default',
+          transition: 'border-color 0.15s ease',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--accent-cyan)' }}>
-          <Sparkles size={16} />
-          <h4 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Evaluator Analysis & Critique
-          </h4>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-cyan)' }}>
+            <Sparkles size={16} />
+            <h4 style={{ fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Evaluator Analysis & Critique
+            </h4>
+          </div>
+          {!isFollowUpOpen && (
+            <span
+              style={{
+                fontSize: '11px',
+                color: 'var(--accent-cyan)',
+                fontFamily: 'monospace',
+                backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                border: '1px solid rgba(56, 189, 248, 0.2)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <span>click to ask follow-up</span>
+              <span style={{ fontWeight: 700 }}>&gt;</span>
+            </span>
+          )}
         </div>
-        <p style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55 }}>
+
+        <p style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55, margin: 0 }}>
           {result.critique}
         </p>
+
+        {/* Interactive Follow-Up Section */}
+        {isFollowUpOpen && (
+          <div
+            style={{ marginTop: '14px' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Scrollable Q&A Thread */}
+            {followUpMessages.length > 0 && (
+              <div
+                style={{
+                  maxHeight: '160px',
+                  overflowY: 'auto',
+                  padding: '10px 12px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginBottom: '10px',
+                  fontSize: '12px',
+                }}
+              >
+                {followUpMessages.map((msg, idx) => (
+                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    {msg.role === 'user' ? (
+                      <div style={{ fontFamily: 'monospace', color: '#38bdf8', fontWeight: 600 }}>
+                        &gt; {msg.content}
+                      </div>
+                    ) : (
+                      <div style={{ color: 'var(--text-secondary)', lineHeight: 1.5, paddingLeft: '12px' }}>
+                        {msg.content}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {isSendingFollowUp && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '11.5px', fontFamily: 'monospace', paddingLeft: '12px' }}>
+                    <Loader2 size={11} className="animate-spin" color="#38bdf8" />
+                    <span>consulting mentor...</span>
+                  </div>
+                )}
+                <div ref={threadEndRef} />
+              </div>
+            )}
+
+            {/* Retro Hairline Single-Line Input with '>' prompt */}
+            <div
+              style={{
+                paddingTop: '10px',
+                borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontFamily: 'monospace',
+              }}
+            >
+              <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: '13px' }}>&gt;</span>
+              <input
+                ref={inputRef}
+                type="text"
+                value={followUpInput}
+                onChange={(e) => setFollowUpInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSendFollowUp();
+                  }
+                }}
+                placeholder="ask a question about this critique... (Enter to send)"
+                style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: '#f8fafc',
+                  fontFamily: 'monospace',
+                  fontSize: '12px',
+                }}
+              />
+              <button
+                type="button"
+                onClick={handleSendFollowUp}
+                disabled={!followUpInput.trim() || isSendingFollowUp}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: followUpInput.trim() && !isSendingFollowUp ? '#38bdf8' : 'var(--text-dim)',
+                  cursor: followUpInput.trim() && !isSendingFollowUp ? 'pointer' : 'default',
+                  padding: '2px 6px',
+                  fontSize: '11px',
+                  fontFamily: 'monospace',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                {isSendingFollowUp ? <Loader2 size={12} className="animate-spin" /> : <span>Send ↵</span>}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Reveal Canonical / Recommended Solution (available on both passed and failed attempts) */}

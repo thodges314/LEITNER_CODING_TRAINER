@@ -140,7 +140,7 @@ export function setStoredApiKey(key: string, targetProvider?: AIProvider): void 
   if (detected) {
     setStoredProvider(detected);
     if (detected === 'gemini') setStoredModel('gemini-2.5-flash');
-    else if (detected === 'groq') setStoredModel('llama-3.3-70b-versatile');
+    else if (detected === 'groq') setStoredModel('openai/gpt-oss-120b');
     else if (detected === 'cerebras') setStoredModel('llama3.3-70b');
     else if (detected === 'mistral') setStoredModel('codestral-latest');
     else if (detected === 'anthropic') setStoredModel('claude-3-5-sonnet-20241022');
@@ -201,7 +201,7 @@ export function getStoredModel(): string {
   const val = localStorage.getItem(API_MODEL_KEY);
   if (val) {
     // If model conflicts with provider (e.g. model is gemini-2.5-flash but provider is groq)
-    if (prov === 'groq' && val.includes('gemini')) return 'llama-3.3-70b-versatile';
+    if (prov === 'groq' && val.includes('gemini')) return 'openai/gpt-oss-120b';
     if (prov === 'gemini' && (val.includes('llama') || val.includes('gpt') || val.includes('claude'))) return 'gemini-2.5-flash';
     if (prov === 'openai' && (val.includes('gemini') || val.includes('llama') || val.includes('claude'))) return 'gpt-4o-mini';
     if (prov === 'cerebras' && (val.includes('gemini') || val.includes('gpt') || val.includes('claude'))) return 'llama3.3-70b';
@@ -210,7 +210,7 @@ export function getStoredModel(): string {
     return val;
   }
   if (prov === 'gemini') return 'gemini-2.5-flash';
-  if (prov === 'groq') return 'llama-3.3-70b-versatile';
+  if (prov === 'groq') return 'openai/gpt-oss-120b';
   if (prov === 'cerebras') return 'llama3.3-70b';
   if (prov === 'mistral') return 'codestral-latest';
   if (prov === 'anthropic') return 'claude-3-5-sonnet-20241022';
@@ -755,3 +755,151 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
     };
   }
 }
+
+export interface CritiqueFollowUpMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export async function askCritiqueFollowUp(
+  topic: TopicItem,
+  submittedCode: string,
+  critique: string,
+  question: string,
+  history: CritiqueFollowUpMessage[] = []
+): Promise<string> {
+  const apiKey = getStoredApiKey();
+  const provider = getStoredProvider();
+
+  // If no API key, provide a clear, helpful response explaining offline mode and key requirement
+  if (!apiKey) {
+    await new Promise((r) => setTimeout(r, 350));
+    return `[Offline Mode] To ask live follow-up questions to the AI mentor, please save an API key (such as free Groq or Google Gemini) in Settings.\n\nTip for "${topic.title}": Focus on satisfying the target complexity (${topic.targetTime || 'O(n)'} time, ${topic.targetSpace || 'O(1)'} space) and checking null/boundary inputs.`;
+  }
+
+  const systemPrompt = `You are an expert technical coding mentor in a deliberate practice trainer.
+Answer the user's follow-up question regarding their solution and the evaluator critique.
+Be concise (2-4 sentences max), technically exact, and directly answer their question.
+The context is strictly this single problem ("${topic.title}"), the user's submitted code, and the evaluation critique. Focus on algorithmic correctness, invariants, edge cases, or complexity bounds.`;
+
+  const contextPrompt = `Problem: ${topic.title} (${topic.track})
+Prompt & Invariants:
+${topic.promptSeed}
+
+Submitted Code:
+${submittedCode}
+
+Evaluator Critique:
+${critique}
+
+User Follow-Up Question:
+${question}`;
+
+  try {
+    if (provider === 'gemini') {
+      const model = getStoredModel() || 'gemini-2.5-flash';
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: [
+            ...history.map((h) => ({
+              role: h.role === 'assistant' ? 'model' : 'user',
+              parts: [{ text: h.content }],
+            })),
+            { role: 'user', parts: [{ text: contextPrompt }] },
+          ],
+          generationConfig: { temperature: 0.2 },
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Gemini error (${response.status}): ${await response.text()}`);
+      }
+      const data = await response.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'No response generated.';
+    } else if (provider === 'anthropic') {
+      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
+      const endpoint = 'https://api.anthropic.com/v1/messages';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 1024,
+          temperature: 0.2,
+          system: systemPrompt,
+          messages: [
+            ...history.map((h) => ({
+              role: h.role,
+              content: h.content,
+            })),
+            { role: 'user', content: contextPrompt },
+          ],
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Anthropic error (${response.status}): ${await response.text()}`);
+      }
+      const data = await response.json();
+      return data.content?.[0]?.text?.trim() || 'No response generated.';
+    } else {
+      let baseUrl = getStoredBaseUrl();
+      let model = getStoredModel();
+      if (provider === 'openai') {
+        baseUrl = baseUrl || 'https://api.openai.com/v1';
+        model = model || 'gpt-4o-mini';
+      } else if (provider === 'groq') {
+        baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
+        model = model || 'openai/gpt-oss-120b';
+      } else if (provider === 'cerebras') {
+        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
+        model = model || 'llama3.3-70b';
+      } else if (provider === 'mistral') {
+        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
+        model = model || 'codestral-latest';
+      } else if (provider === 'openrouter') {
+        baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
+        model = model || 'nvidia/nemotron-3-super-120b-a12b:free';
+      }
+
+      const endpoint = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...history.map((h) => ({
+              role: h.role,
+              content: h.content,
+            })),
+            { role: 'user', content: contextPrompt },
+          ],
+          temperature: 0.2,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error (${response.status}): ${await response.text()}`);
+      }
+
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content?.trim() || 'No response generated.';
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return `[Follow-up question failed (${msg})]. Please check your API key or network connection.`;
+  }
+}
+
