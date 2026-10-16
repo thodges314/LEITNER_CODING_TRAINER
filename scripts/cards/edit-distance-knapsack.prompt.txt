@@ -1,0 +1,1 @@
+Write editDistance(a, b): the minimum number of single-character insertions, deletions and substitutions needed to turn a into b (editDistance("horse", "ros") is 3). Write knapsack(weights, values, capacity): the maximum total value of items whose total weight is at most capacity, where each item can be taken at most once (0/1 knapsack; 0 when nothing fits).

@@ -9824,5 +9824,645 @@
     "targetTime": "O(n + e)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Each reachable object is entered once and every property edge is followed once, with weak sets storing the visited and ancestor objects."
+  },
+  {
+    "id": "bit-basics",
+    "track": "algorithms",
+    "title": "Bit Manipulation: Single Number, Count Bits, Power of Two",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "bit-manipulation",
+      "xor",
+      "basics"
+    ],
+    "promptSeed": "Write singleNumber(nums): every number appears twice except one; return that one using XOR (O(1) extra space). Write countOneBits(n): the number of 1 bits in the binary form of a non-negative integer up to 2^32 - 1 (use n & (n - 1) to clear the lowest set bit; countOneBits(0) is 0). Write isPowerOfTwo(n): true for 1, 2, 4, 8, ... and false for 0 and negative numbers, using a bitwise test (no loops, no Math.log).",
+    "difficulty": 1,
+    "concept": "bits",
+    "referenceSolution": "function singleNumber(nums) {\n  let result = 0;\n  for (const n of nums) result ^= n;\n  return result;\n}\n\nfunction countOneBits(n) {\n  n = n >>> 0;\n  let count = 0;\n  while (n) {\n    n = (n & (n - 1)) >>> 0;\n    count++;\n  }\n  return count;\n}\n\nfunction isPowerOfTwo(n) {\n  return n > 0 && (n & (n - 1)) === 0;\n}",
+    "solution": "function singleNumber(nums) {\n  let result = 0;\n  for (const n of nums) result ^= n;\n  return result;\n}\n\nfunction countOneBits(n) {\n  n = n >>> 0;\n  let count = 0;\n  while (n) {\n    n = (n & (n - 1)) >>> 0;\n    count++;\n  }\n  return count;\n}\n\nfunction isPowerOfTwo(n) {\n  return n > 0 && (n & (n - 1)) === 0;\n}",
+    "starterCode": "function singleNumber(nums) {\n  let result = 0;\n  for (const n of nums) result ^= n;\n  return result;\n}\n\nfunction countOneBits(n) {\n  n = n >>> 0;\n  let count = 0;\n  while (n) {\n    n = (n & (n - 1)) >>> 0;\n    count++;\n  }\n  return count;\n}\n\nfunction isPowerOfTwo(n) {\n  return n > 0 && (n & (n - 1)) === 0;\n}",
+    "testCases": [
+      {
+        "description": "singleNumber finds the unpaired value",
+        "input": "[singleNumber([2, 2, 1]), singleNumber([4, 1, 2, 1, 2]), singleNumber([7])]",
+        "expected": "[1, 4, 7]"
+      },
+      {
+        "description": "singleNumber with negatives",
+        "input": "singleNumber([-1, -1, -3])",
+        "expected": "-3"
+      },
+      {
+        "description": "countOneBits of small numbers",
+        "input": "[countOneBits(0), countOneBits(1), countOneBits(11), countOneBits(255)]",
+        "expected": "[0, 1, 3, 8]"
+      },
+      {
+        "description": "countOneBits of large 32-bit values",
+        "input": "[countOneBits(4294967295), countOneBits(2147483648), countOneBits(1024)]",
+        "expected": "[32, 1, 1]"
+      },
+      {
+        "description": "isPowerOfTwo accepts powers of two",
+        "input": "[isPowerOfTwo(1), isPowerOfTwo(2), isPowerOfTwo(16), isPowerOfTwo(1024)]",
+        "expected": "[true, true, true, true]"
+      },
+      {
+        "description": "isPowerOfTwo rejects everything else",
+        "input": "[isPowerOfTwo(0), isPowerOfTwo(-4), isPowerOfTwo(6), isPowerOfTwo(12)]",
+        "expected": "[false, false, false, false]"
+      }
+    ],
+    "testHarness": "await $test.run(\"singleNumber finds the unpaired value\", async () => {\n  const sleep = $test.sleep;\n  return ([singleNumber([2, 2, 1]), singleNumber([4, 1, 2, 1, 2]), singleNumber([7])]);\n}, () => ([1, 4, 7]));\n\nawait $test.run(\"singleNumber with negatives\", async () => {\n  const sleep = $test.sleep;\n  return (singleNumber([-1, -1, -3]));\n}, () => (-3));\n\nawait $test.run(\"countOneBits of small numbers\", async () => {\n  const sleep = $test.sleep;\n  return ([countOneBits(0), countOneBits(1), countOneBits(11), countOneBits(255)]);\n}, () => ([0, 1, 3, 8]));\n\nawait $test.run(\"countOneBits of large 32-bit values\", async () => {\n  const sleep = $test.sleep;\n  return ([countOneBits(4294967295), countOneBits(2147483648), countOneBits(1024)]);\n}, () => ([32, 1, 1]));\n\nawait $test.run(\"isPowerOfTwo accepts powers of two\", async () => {\n  const sleep = $test.sleep;\n  return ([isPowerOfTwo(1), isPowerOfTwo(2), isPowerOfTwo(16), isPowerOfTwo(1024)]);\n}, () => ([true, true, true, true]));\n\nawait $test.run(\"isPowerOfTwo rejects everything else\", async () => {\n  const sleep = $test.sleep;\n  return ([isPowerOfTwo(0), isPowerOfTwo(-4), isPowerOfTwo(6), isPowerOfTwo(12)]);\n}, () => ([false, false, false, false]));",
+    "targetTime": "O(n) / O(bits) / O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "singleNumber is one XOR pass, countOneBits loops once per set bit and isPowerOfTwo is a single bitwise test, all with constant extra space."
+  },
+  {
+    "id": "bit-tricks-more",
+    "track": "algorithms",
+    "title": "Bit Manipulation: Missing Number, Hamming, Counting Bits, Bit Flags",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "bit-manipulation",
+      "xor",
+      "dp"
+    ],
+    "promptSeed": "Write missingNumber(nums): the array holds n distinct numbers from 0..n, return the missing one using XOR of indices and values. Write hammingDistance(a, b): the number of bit positions where two non-negative integers differ. Write countBitsUpTo(n): an array where entry i is the number of 1 bits of i for i = 0..n (use bits[i] = bits[i >> 1] + (i & 1)). Write getBit(n, i) (0 or 1), setBit(n, i), clearBit(n, i) for bit position i (0 is the least significant).",
+    "difficulty": 2,
+    "concept": "bits",
+    "referenceSolution": "function missingNumber(nums) {\n  let x = nums.length;\n  for (let i = 0; i < nums.length; i++) x ^= i ^ nums[i];\n  return x;\n}\n\nfunction hammingDistance(a, b) {\n  let diff = a ^ b;\n  let count = 0;\n  while (diff) {\n    diff &= diff - 1;\n    count++;\n  }\n  return count;\n}\n\nfunction countBitsUpTo(n) {\n  const bits = new Array(n + 1).fill(0);\n  for (let i = 1; i <= n; i++) bits[i] = bits[i >> 1] + (i & 1);\n  return bits;\n}\n\nfunction getBit(n, i) {\n  return (n >> i) & 1;\n}\n\nfunction setBit(n, i) {\n  return n | (1 << i);\n}\n\nfunction clearBit(n, i) {\n  return n & ~(1 << i);\n}",
+    "solution": "function missingNumber(nums) {\n  let x = nums.length;\n  for (let i = 0; i < nums.length; i++) x ^= i ^ nums[i];\n  return x;\n}\n\nfunction hammingDistance(a, b) {\n  let diff = a ^ b;\n  let count = 0;\n  while (diff) {\n    diff &= diff - 1;\n    count++;\n  }\n  return count;\n}\n\nfunction countBitsUpTo(n) {\n  const bits = new Array(n + 1).fill(0);\n  for (let i = 1; i <= n; i++) bits[i] = bits[i >> 1] + (i & 1);\n  return bits;\n}\n\nfunction getBit(n, i) {\n  return (n >> i) & 1;\n}\n\nfunction setBit(n, i) {\n  return n | (1 << i);\n}\n\nfunction clearBit(n, i) {\n  return n & ~(1 << i);\n}",
+    "starterCode": "function missingNumber(nums) {\n  let x = nums.length;\n  for (let i = 0; i < nums.length; i++) x ^= i ^ nums[i];\n  return x;\n}\n\nfunction hammingDistance(a, b) {\n  let diff = a ^ b;\n  let count = 0;\n  while (diff) {\n    diff &= diff - 1;\n    count++;\n  }\n  return count;\n}\n\nfunction countBitsUpTo(n) {\n  const bits = new Array(n + 1).fill(0);\n  for (let i = 1; i <= n; i++) bits[i] = bits[i >> 1] + (i & 1);\n  return bits;\n}\n\nfunction getBit(n, i) {\n  return (n >> i) & 1;\n}\n\nfunction setBit(n, i) {\n  return n | (1 << i);\n}\n\nfunction clearBit(n, i) {\n  return n & ~(1 << i);\n}",
+    "testCases": [
+      {
+        "description": "missingNumber finds the gap in 0..n",
+        "input": "[missingNumber([3, 0, 1]), missingNumber([0, 1]), missingNumber([1]), missingNumber([])]",
+        "expected": "[2, 2, 0, 0]"
+      },
+      {
+        "description": "missingNumber in a longer shuffled list",
+        "input": "missingNumber([9, 6, 4, 2, 3, 5, 7, 0, 1])",
+        "expected": "8"
+      },
+      {
+        "description": "hammingDistance counts differing bits",
+        "input": "[hammingDistance(1, 4), hammingDistance(3, 1), hammingDistance(0, 0), hammingDistance(7, 0)]",
+        "expected": "[2, 1, 0, 3]"
+      },
+      {
+        "description": "countBitsUpTo lists bit counts",
+        "input": "countBitsUpTo(5)",
+        "expected": "[0, 1, 1, 2, 1, 2]"
+      },
+      {
+        "description": "countBitsUpTo(0) and a longer run",
+        "input": "[countBitsUpTo(0), countBitsUpTo(8)]",
+        "expected": "[[0], [0, 1, 1, 2, 1, 2, 2, 3, 1]]"
+      },
+      {
+        "description": "getBit reads a position",
+        "input": "[getBit(5, 0), getBit(5, 1), getBit(5, 2), getBit(5, 3)]",
+        "expected": "[1, 0, 1, 0]"
+      },
+      {
+        "description": "setBit and clearBit",
+        "input": "[setBit(8, 0), setBit(5, 0), clearBit(15, 1), clearBit(4, 0)]",
+        "expected": "[9, 5, 13, 4]"
+      }
+    ],
+    "testHarness": "await $test.run(\"missingNumber finds the gap in 0..n\", async () => {\n  const sleep = $test.sleep;\n  return ([missingNumber([3, 0, 1]), missingNumber([0, 1]), missingNumber([1]), missingNumber([])]);\n}, () => ([2, 2, 0, 0]));\n\nawait $test.run(\"missingNumber in a longer shuffled list\", async () => {\n  const sleep = $test.sleep;\n  return (missingNumber([9, 6, 4, 2, 3, 5, 7, 0, 1]));\n}, () => (8));\n\nawait $test.run(\"hammingDistance counts differing bits\", async () => {\n  const sleep = $test.sleep;\n  return ([hammingDistance(1, 4), hammingDistance(3, 1), hammingDistance(0, 0), hammingDistance(7, 0)]);\n}, () => ([2, 1, 0, 3]));\n\nawait $test.run(\"countBitsUpTo lists bit counts\", async () => {\n  const sleep = $test.sleep;\n  return (countBitsUpTo(5));\n}, () => ([0, 1, 1, 2, 1, 2]));\n\nawait $test.run(\"countBitsUpTo(0) and a longer run\", async () => {\n  const sleep = $test.sleep;\n  return ([countBitsUpTo(0), countBitsUpTo(8)]);\n}, () => ([[0], [0, 1, 1, 2, 1, 2, 2, 3, 1]]));\n\nawait $test.run(\"getBit reads a position\", async () => {\n  const sleep = $test.sleep;\n  return ([getBit(5, 0), getBit(5, 1), getBit(5, 2), getBit(5, 3)]);\n}, () => ([1, 0, 1, 0]));\n\nawait $test.run(\"setBit and clearBit\", async () => {\n  const sleep = $test.sleep;\n  return ([setBit(8, 0), setBit(5, 0), clearBit(15, 1), clearBit(4, 0)]);\n}, () => ([9, 5, 13, 4]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each function makes one pass over the input; countBitsUpTo stores an array of n + 1 counts built from earlier entries."
+  },
+  {
+    "id": "container-water-two-pointer",
+    "track": "algorithms",
+    "title": "Two Pointers: Container With Most Water and Trapping Rain Water",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "two-pointer",
+      "greedy",
+      "array"
+    ],
+    "promptSeed": "Write maxArea(heights): choose two vertical lines (index i < j) to form a container; its water area is min(heights[i], heights[j]) * (j - i). Return the maximum area (0 if fewer than two lines), in O(n) with two pointers moving inward from both ends. Write trap(height): given the heights of unit-width bars, the total units of rain water trapped between them (two pointers with leftMax/rightMax; 0 for fewer than three bars).",
+    "difficulty": 3,
+    "concept": "two-pointer",
+    "referenceSolution": "function maxArea(heights) {\n  let left = 0;\n  let right = heights.length - 1;\n  let best = 0;\n  while (left < right) {\n    const area = Math.min(heights[left], heights[right]) * (right - left);\n    best = Math.max(best, area);\n    if (heights[left] < heights[right]) left++;\n    else right--;\n  }\n  return best;\n}\n\nfunction trap(height) {\n  let left = 0;\n  let right = height.length - 1;\n  let leftMax = 0;\n  let rightMax = 0;\n  let water = 0;\n  while (left < right) {\n    if (height[left] < height[right]) {\n      leftMax = Math.max(leftMax, height[left]);\n      water += leftMax - height[left];\n      left++;\n    } else {\n      rightMax = Math.max(rightMax, height[right]);\n      water += rightMax - height[right];\n      right--;\n    }\n  }\n  return water;\n}",
+    "solution": "function maxArea(heights) {\n  let left = 0;\n  let right = heights.length - 1;\n  let best = 0;\n  while (left < right) {\n    const area = Math.min(heights[left], heights[right]) * (right - left);\n    best = Math.max(best, area);\n    if (heights[left] < heights[right]) left++;\n    else right--;\n  }\n  return best;\n}\n\nfunction trap(height) {\n  let left = 0;\n  let right = height.length - 1;\n  let leftMax = 0;\n  let rightMax = 0;\n  let water = 0;\n  while (left < right) {\n    if (height[left] < height[right]) {\n      leftMax = Math.max(leftMax, height[left]);\n      water += leftMax - height[left];\n      left++;\n    } else {\n      rightMax = Math.max(rightMax, height[right]);\n      water += rightMax - height[right];\n      right--;\n    }\n  }\n  return water;\n}",
+    "starterCode": "function maxArea(heights) {\n  let left = 0;\n  let right = heights.length - 1;\n  let best = 0;\n  while (left < right) {\n    const area = Math.min(heights[left], heights[right]) * (right - left);\n    best = Math.max(best, area);\n    if (heights[left] < heights[right]) left++;\n    else right--;\n  }\n  return best;\n}\n\nfunction trap(height) {\n  let left = 0;\n  let right = height.length - 1;\n  let leftMax = 0;\n  let rightMax = 0;\n  let water = 0;\n  while (left < right) {\n    if (height[left] < height[right]) {\n      leftMax = Math.max(leftMax, height[left]);\n      water += leftMax - height[left];\n      left++;\n    } else {\n      rightMax = Math.max(rightMax, height[right]);\n      water += rightMax - height[right];\n      right--;\n    }\n  }\n  return water;\n}",
+    "testCases": [
+      {
+        "description": "maxArea classic example",
+        "input": "maxArea([1, 8, 6, 2, 5, 4, 8, 3, 7])",
+        "expected": "49"
+      },
+      {
+        "description": "maxArea small inputs",
+        "input": "[maxArea([1, 1]), maxArea([4, 3, 2, 1, 4]), maxArea([1, 2, 1])]",
+        "expected": "[1, 16, 2]"
+      },
+      {
+        "description": "maxArea with fewer than two lines",
+        "input": "[maxArea([]), maxArea([5])]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "trap classic example",
+        "input": "trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1])",
+        "expected": "6"
+      },
+      {
+        "description": "trap with a deep bowl and a flat valley",
+        "input": "[trap([4, 2, 0, 3, 2, 5]), trap([3, 0, 3])]",
+        "expected": "[9, 3]"
+      },
+      {
+        "description": "trap with no pockets",
+        "input": "[trap([1, 2, 3]), trap([3, 2, 1]), trap([]), trap([5])]",
+        "expected": "[0, 0, 0, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"maxArea classic example\", async () => {\n  const sleep = $test.sleep;\n  return (maxArea([1, 8, 6, 2, 5, 4, 8, 3, 7]));\n}, () => (49));\n\nawait $test.run(\"maxArea small inputs\", async () => {\n  const sleep = $test.sleep;\n  return ([maxArea([1, 1]), maxArea([4, 3, 2, 1, 4]), maxArea([1, 2, 1])]);\n}, () => ([1, 16, 2]));\n\nawait $test.run(\"maxArea with fewer than two lines\", async () => {\n  const sleep = $test.sleep;\n  return ([maxArea([]), maxArea([5])]);\n}, () => ([0, 0]));\n\nawait $test.run(\"trap classic example\", async () => {\n  const sleep = $test.sleep;\n  return (trap([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]));\n}, () => (6));\n\nawait $test.run(\"trap with a deep bowl and a flat valley\", async () => {\n  const sleep = $test.sleep;\n  return ([trap([4, 2, 0, 3, 2, 5]), trap([3, 0, 3])]);\n}, () => ([9, 3]));\n\nawait $test.run(\"trap with no pockets\", async () => {\n  const sleep = $test.sleep;\n  return ([trap([1, 2, 3]), trap([3, 2, 1]), trap([]), trap([5])]);\n}, () => ([0, 0, 0, 0]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Two pointers walk inward once each, always moving the shorter side, with constant extra variables."
+  },
+  {
+    "id": "edit-distance-knapsack",
+    "track": "algorithms",
+    "title": "2D DP: Edit Distance and 0/1 Knapsack",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "2d-dp",
+      "string",
+      "knapsack"
+    ],
+    "promptSeed": "Write editDistance(a, b): the minimum number of single-character insertions, deletions and substitutions needed to turn a into b (editDistance(\"horse\", \"ros\") is 3). Write knapsack(weights, values, capacity): the maximum total value of items whose total weight is at most capacity, where each item can be taken at most once (0/1 knapsack; 0 when nothing fits).",
+    "difficulty": 4,
+    "concept": "dp2d",
+    "referenceSolution": "function editDistance(a, b) {\n  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 0; i <= a.length; i++) dp[i][0] = i;\n  for (let j = 0; j <= b.length; j++) dp[0][j] = j;\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];\n      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction knapsack(weights, values, capacity) {\n  const dp = new Array(capacity + 1).fill(0);\n  for (let i = 0; i < weights.length; i++) {\n    for (let w = capacity; w >= weights[i]; w--) {\n      dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);\n    }\n  }\n  return dp[capacity];\n}",
+    "solution": "function editDistance(a, b) {\n  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 0; i <= a.length; i++) dp[i][0] = i;\n  for (let j = 0; j <= b.length; j++) dp[0][j] = j;\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];\n      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction knapsack(weights, values, capacity) {\n  const dp = new Array(capacity + 1).fill(0);\n  for (let i = 0; i < weights.length; i++) {\n    for (let w = capacity; w >= weights[i]; w--) {\n      dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);\n    }\n  }\n  return dp[capacity];\n}",
+    "starterCode": "function editDistance(a, b) {\n  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 0; i <= a.length; i++) dp[i][0] = i;\n  for (let j = 0; j <= b.length; j++) dp[0][j] = j;\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];\n      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction knapsack(weights, values, capacity) {\n  const dp = new Array(capacity + 1).fill(0);\n  for (let i = 0; i < weights.length; i++) {\n    for (let w = capacity; w >= weights[i]; w--) {\n      dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);\n    }\n  }\n  return dp[capacity];\n}",
+    "testCases": [
+      {
+        "description": "editDistance classic examples",
+        "input": "[editDistance('horse', 'ros'), editDistance('intention', 'execution')]",
+        "expected": "[3, 5]"
+      },
+      {
+        "description": "editDistance with empty and equal strings",
+        "input": "[editDistance('', 'abc'), editDistance('abc', ''), editDistance('abc', 'abc'), editDistance('', '')]",
+        "expected": "[3, 3, 0, 0]"
+      },
+      {
+        "description": "editDistance of single substitution and insertion",
+        "input": "[editDistance('a', 'b'), editDistance('cat', 'cart')]",
+        "expected": "[1, 1]"
+      },
+      {
+        "description": "knapsack classic example",
+        "input": "knapsack([1, 3, 4, 5], [1, 4, 5, 7], 7)",
+        "expected": "9"
+      },
+      {
+        "description": "knapsack takes each item at most once",
+        "input": "knapsack([1, 2, 3], [6, 10, 12], 5)",
+        "expected": "22"
+      },
+      {
+        "description": "knapsack with nothing fitting or zero capacity",
+        "input": "[knapsack([5, 6], [10, 20], 4), knapsack([1, 2], [3, 4], 0), knapsack([], [], 10)]",
+        "expected": "[0, 0, 0]"
+      },
+      {
+        "description": "knapsack with a single fitting item",
+        "input": "knapsack([4], [9], 4)",
+        "expected": "9"
+      }
+    ],
+    "testHarness": "await $test.run(\"editDistance classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([editDistance('horse', 'ros'), editDistance('intention', 'execution')]);\n}, () => ([3, 5]));\n\nawait $test.run(\"editDistance with empty and equal strings\", async () => {\n  const sleep = $test.sleep;\n  return ([editDistance('', 'abc'), editDistance('abc', ''), editDistance('abc', 'abc'), editDistance('', '')]);\n}, () => ([3, 3, 0, 0]));\n\nawait $test.run(\"editDistance of single substitution and insertion\", async () => {\n  const sleep = $test.sleep;\n  return ([editDistance('a', 'b'), editDistance('cat', 'cart')]);\n}, () => ([1, 1]));\n\nawait $test.run(\"knapsack classic example\", async () => {\n  const sleep = $test.sleep;\n  return (knapsack([1, 3, 4, 5], [1, 4, 5, 7], 7));\n}, () => (9));\n\nawait $test.run(\"knapsack takes each item at most once\", async () => {\n  const sleep = $test.sleep;\n  return (knapsack([1, 2, 3], [6, 10, 12], 5));\n}, () => (22));\n\nawait $test.run(\"knapsack with nothing fitting or zero capacity\", async () => {\n  const sleep = $test.sleep;\n  return ([knapsack([5, 6], [10, 20], 4), knapsack([1, 2], [3, 4], 0), knapsack([], [], 10)]);\n}, () => ([0, 0, 0]));\n\nawait $test.run(\"knapsack with a single fitting item\", async () => {\n  const sleep = $test.sleep;\n  return (knapsack([4], [9], 4));\n}, () => (9));",
+    "targetTime": "O(m × n) / O(items × capacity)",
+    "targetSpace": "O(m × n) / O(capacity)",
+    "complexityExplanation": "Edit distance fills an (m + 1) x (n + 1) table; the knapsack tries each item against every capacity using a single capacity-sized array."
+  },
+  {
+    "id": "greedy-intervals-circuit",
+    "track": "algorithms",
+    "title": "Greedy: Non-Overlapping Intervals, Meetings, Gas Station",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "greedy",
+      "intervals",
+      "sorting"
+    ],
+    "promptSeed": "Intervals are [start, end] pairs where an interval that ends exactly when another starts does NOT overlap. Write eraseOverlapIntervals(intervals): the minimum number of intervals to remove so the rest do not overlap (greedy: sort by end, keep the earliest-ending; 0 for []). Write canAttendMeetings(intervals): true when no two intervals overlap ([] is true). Do not mutate the input. Write canCompleteCircuit(gas, cost): stations are in a circle, gas[i] is fuel gained at station i and cost[i] the fuel needed to reach the next one; return the index of the station to start at so you can complete the loop (the answer is unique when it exists), or -1.",
+    "difficulty": 3,
+    "concept": "greedy",
+    "referenceSolution": "function eraseOverlapIntervals(intervals) {\n  if (!intervals.length) return 0;\n  const sorted = intervals.slice().sort((a, b) => a[1] - b[1]);\n  let keep = 1;\n  let end = sorted[0][1];\n  for (let i = 1; i < sorted.length; i++) {\n    if (sorted[i][0] >= end) {\n      keep++;\n      end = sorted[i][1];\n    }\n  }\n  return intervals.length - keep;\n}\n\nfunction canAttendMeetings(intervals) {\n  const sorted = intervals.slice().sort((a, b) => a[0] - b[0]);\n  for (let i = 1; i < sorted.length; i++) {\n    if (sorted[i][0] < sorted[i - 1][1]) return false;\n  }\n  return true;\n}\n\nfunction canCompleteCircuit(gas, cost) {\n  let total = 0;\n  let tank = 0;\n  let start = 0;\n  for (let i = 0; i < gas.length; i++) {\n    const diff = gas[i] - cost[i];\n    total += diff;\n    tank += diff;\n    if (tank < 0) {\n      start = i + 1;\n      tank = 0;\n    }\n  }\n  return total >= 0 ? start : -1;\n}",
+    "solution": "function eraseOverlapIntervals(intervals) {\n  if (!intervals.length) return 0;\n  const sorted = intervals.slice().sort((a, b) => a[1] - b[1]);\n  let keep = 1;\n  let end = sorted[0][1];\n  for (let i = 1; i < sorted.length; i++) {\n    if (sorted[i][0] >= end) {\n      keep++;\n      end = sorted[i][1];\n    }\n  }\n  return intervals.length - keep;\n}\n\nfunction canAttendMeetings(intervals) {\n  const sorted = intervals.slice().sort((a, b) => a[0] - b[0]);\n  for (let i = 1; i < sorted.length; i++) {\n    if (sorted[i][0] < sorted[i - 1][1]) return false;\n  }\n  return true;\n}\n\nfunction canCompleteCircuit(gas, cost) {\n  let total = 0;\n  let tank = 0;\n  let start = 0;\n  for (let i = 0; i < gas.length; i++) {\n    const diff = gas[i] - cost[i];\n    total += diff;\n    tank += diff;\n    if (tank < 0) {\n      start = i + 1;\n      tank = 0;\n    }\n  }\n  return total >= 0 ? start : -1;\n}",
+    "starterCode": "function eraseOverlapIntervals(intervals) {\n  if (!intervals.length) return 0;\n  const sorted = intervals.slice().sort((a, b) => a[1] - b[1]);\n  let keep = 1;\n  let end = sorted[0][1];\n  for (let i = 1; i < sorted.length; i++) {\n    if (sorted[i][0] >= end) {\n      keep++;\n      end = sorted[i][1];\n    }\n  }\n  return intervals.length - keep;\n}\n\nfunction canAttendMeetings(intervals) {\n  const sorted = intervals.slice().sort((a, b) => a[0] - b[0]);\n  for (let i = 1; i < sorted.length; i++) {\n    if (sorted[i][0] < sorted[i - 1][1]) return false;\n  }\n  return true;\n}\n\nfunction canCompleteCircuit(gas, cost) {\n  let total = 0;\n  let tank = 0;\n  let start = 0;\n  for (let i = 0; i < gas.length; i++) {\n    const diff = gas[i] - cost[i];\n    total += diff;\n    tank += diff;\n    if (tank < 0) {\n      start = i + 1;\n      tank = 0;\n    }\n  }\n  return total >= 0 ? start : -1;\n}",
+    "testCases": [
+      {
+        "description": "eraseOverlapIntervals classic example",
+        "input": "eraseOverlapIntervals([[1, 2], [2, 3], [3, 4], [1, 3]])",
+        "expected": "1"
+      },
+      {
+        "description": "eraseOverlapIntervals with duplicates and touching intervals",
+        "input": "[eraseOverlapIntervals([[1, 2], [1, 2], [1, 2]]), eraseOverlapIntervals([[1, 2], [2, 3]]), eraseOverlapIntervals([])]",
+        "expected": "[2, 0, 0]"
+      },
+      {
+        "description": "eraseOverlapIntervals prefers the earliest end",
+        "input": "eraseOverlapIntervals([[1, 100], [11, 22], [1, 11], [2, 12]])",
+        "expected": "2"
+      },
+      {
+        "description": "canAttendMeetings detects overlap",
+        "input": "[canAttendMeetings([[0, 30], [5, 10], [15, 20]]), canAttendMeetings([[7, 10], [2, 4]])]",
+        "expected": "[false, true]"
+      },
+      {
+        "description": "canAttendMeetings: touching, empty and unsorted input",
+        "input": "[canAttendMeetings([[1, 2], [2, 3]]), canAttendMeetings([]), canAttendMeetings([[5, 8], [1, 6]])]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "Interval functions do not mutate the input",
+        "input": "const a = [[3, 4], [1, 2]];\neraseOverlapIntervals(a); canAttendMeetings(a);\na",
+        "expected": "[[3, 4], [1, 2]]"
+      },
+      {
+        "description": "canCompleteCircuit finds the start",
+        "input": "[canCompleteCircuit([1, 2, 3, 4, 5], [3, 4, 5, 1, 2]), canCompleteCircuit([5], [4]), canCompleteCircuit([2], [2])]",
+        "expected": "[3, 0, 0]"
+      },
+      {
+        "description": "canCompleteCircuit returns -1 when total fuel is short",
+        "input": "canCompleteCircuit([2, 3, 4], [3, 4, 3])",
+        "expected": "-1"
+      }
+    ],
+    "testHarness": "await $test.run(\"eraseOverlapIntervals classic example\", async () => {\n  const sleep = $test.sleep;\n  return (eraseOverlapIntervals([[1, 2], [2, 3], [3, 4], [1, 3]]));\n}, () => (1));\n\nawait $test.run(\"eraseOverlapIntervals with duplicates and touching intervals\", async () => {\n  const sleep = $test.sleep;\n  return ([eraseOverlapIntervals([[1, 2], [1, 2], [1, 2]]), eraseOverlapIntervals([[1, 2], [2, 3]]), eraseOverlapIntervals([])]);\n}, () => ([2, 0, 0]));\n\nawait $test.run(\"eraseOverlapIntervals prefers the earliest end\", async () => {\n  const sleep = $test.sleep;\n  return (eraseOverlapIntervals([[1, 100], [11, 22], [1, 11], [2, 12]]));\n}, () => (2));\n\nawait $test.run(\"canAttendMeetings detects overlap\", async () => {\n  const sleep = $test.sleep;\n  return ([canAttendMeetings([[0, 30], [5, 10], [15, 20]]), canAttendMeetings([[7, 10], [2, 4]])]);\n}, () => ([false, true]));\n\nawait $test.run(\"canAttendMeetings: touching, empty and unsorted input\", async () => {\n  const sleep = $test.sleep;\n  return ([canAttendMeetings([[1, 2], [2, 3]]), canAttendMeetings([]), canAttendMeetings([[5, 8], [1, 6]])]);\n}, () => ([true, true, false]));\n\nawait $test.run(\"Interval functions do not mutate the input\", async () => {\n  const sleep = $test.sleep;\n  const a = [[3, 4], [1, 2]];\n  eraseOverlapIntervals(a); canAttendMeetings(a);\n  return (a);\n}, () => ([[3, 4], [1, 2]]));\n\nawait $test.run(\"canCompleteCircuit finds the start\", async () => {\n  const sleep = $test.sleep;\n  return ([canCompleteCircuit([1, 2, 3, 4, 5], [3, 4, 5, 1, 2]), canCompleteCircuit([5], [4]), canCompleteCircuit([2], [2])]);\n}, () => ([3, 0, 0]));\n\nawait $test.run(\"canCompleteCircuit returns -1 when total fuel is short\", async () => {\n  const sleep = $test.sleep;\n  return (canCompleteCircuit([2, 3, 4], [3, 4, 3]));\n}, () => (-1));",
+    "targetTime": "O(n log n) / O(n)",
+    "targetSpace": "O(n) / O(1)",
+    "complexityExplanation": "The interval functions sort a copy and scan once; the gas station scan is a single pass with two running totals."
+  },
+  {
+    "id": "jump-game-greedy",
+    "track": "algorithms",
+    "title": "Greedy: Jump Game and Minimum Jumps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "greedy",
+      "array",
+      "reachability"
+    ],
+    "promptSeed": "Each number in nums is the maximum jump length from that index. Write canJump(nums): can you reach the last index starting from index 0? (Greedy: track the farthest reachable index; a single element is always reachable.) Write minJumps(nums): the minimum number of jumps to reach the last index, assuming it is reachable (0 for a single element).",
+    "difficulty": 2,
+    "concept": "greedy",
+    "referenceSolution": "function canJump(nums) {\n  let farthest = 0;\n  for (let i = 0; i < nums.length; i++) {\n    if (i > farthest) return false;\n    farthest = Math.max(farthest, i + nums[i]);\n  }\n  return true;\n}\n\nfunction minJumps(nums) {\n  let jumps = 0;\n  let end = 0;\n  let farthest = 0;\n  for (let i = 0; i < nums.length - 1; i++) {\n    farthest = Math.max(farthest, i + nums[i]);\n    if (i === end) {\n      jumps++;\n      end = farthest;\n    }\n  }\n  return jumps;\n}",
+    "solution": "function canJump(nums) {\n  let farthest = 0;\n  for (let i = 0; i < nums.length; i++) {\n    if (i > farthest) return false;\n    farthest = Math.max(farthest, i + nums[i]);\n  }\n  return true;\n}\n\nfunction minJumps(nums) {\n  let jumps = 0;\n  let end = 0;\n  let farthest = 0;\n  for (let i = 0; i < nums.length - 1; i++) {\n    farthest = Math.max(farthest, i + nums[i]);\n    if (i === end) {\n      jumps++;\n      end = farthest;\n    }\n  }\n  return jumps;\n}",
+    "starterCode": "function canJump(nums) {\n  let farthest = 0;\n  for (let i = 0; i < nums.length; i++) {\n    if (i > farthest) return false;\n    farthest = Math.max(farthest, i + nums[i]);\n  }\n  return true;\n}\n\nfunction minJumps(nums) {\n  let jumps = 0;\n  let end = 0;\n  let farthest = 0;\n  for (let i = 0; i < nums.length - 1; i++) {\n    farthest = Math.max(farthest, i + nums[i]);\n    if (i === end) {\n      jumps++;\n      end = farthest;\n    }\n  }\n  return jumps;\n}",
+    "testCases": [
+      {
+        "description": "canJump reachable arrays",
+        "input": "[canJump([2, 3, 1, 1, 4]), canJump([0]), canJump([2, 0, 0])]",
+        "expected": "[true, true, true]"
+      },
+      {
+        "description": "canJump unreachable arrays",
+        "input": "[canJump([3, 2, 1, 0, 4]), canJump([0, 1]), canJump([1, 0, 1, 0])]",
+        "expected": "[false, false, false]"
+      },
+      {
+        "description": "canJump with big first jump",
+        "input": "canJump([5, 0, 0, 0, 0, 0])",
+        "expected": "true"
+      },
+      {
+        "description": "minJumps classic examples",
+        "input": "[minJumps([2, 3, 1, 1, 4]), minJumps([2, 3, 0, 1, 4])]",
+        "expected": "[2, 2]"
+      },
+      {
+        "description": "minJumps trivial and long-chain cases",
+        "input": "[minJumps([1]), minJumps([1, 1, 1, 1]), minJumps([10, 1, 1, 1])]",
+        "expected": "[0, 3, 1]"
+      }
+    ],
+    "testHarness": "await $test.run(\"canJump reachable arrays\", async () => {\n  const sleep = $test.sleep;\n  return ([canJump([2, 3, 1, 1, 4]), canJump([0]), canJump([2, 0, 0])]);\n}, () => ([true, true, true]));\n\nawait $test.run(\"canJump unreachable arrays\", async () => {\n  const sleep = $test.sleep;\n  return ([canJump([3, 2, 1, 0, 4]), canJump([0, 1]), canJump([1, 0, 1, 0])]);\n}, () => ([false, false, false]));\n\nawait $test.run(\"canJump with big first jump\", async () => {\n  const sleep = $test.sleep;\n  return (canJump([5, 0, 0, 0, 0, 0]));\n}, () => (true));\n\nawait $test.run(\"minJumps classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([minJumps([2, 3, 1, 1, 4]), minJumps([2, 3, 0, 1, 4])]);\n}, () => ([2, 2]));\n\nawait $test.run(\"minJumps trivial and long-chain cases\", async () => {\n  const sleep = $test.sleep;\n  return ([minJumps([1]), minJumps([1, 1, 1, 1]), minJumps([10, 1, 1, 1])]);\n}, () => ([0, 3, 1]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "A single left-to-right pass tracks the farthest reachable index (and the current jump boundary) with constant extra state."
+  },
+  {
+    "id": "lcs-subsequence",
+    "track": "algorithms",
+    "title": "2D DP: Longest Common Subsequence and isSubsequence",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "2d-dp",
+      "string",
+      "subsequence"
+    ],
+    "promptSeed": "Write longestCommonSubsequence(a, b): the LENGTH of the longest subsequence (characters in order, not necessarily adjacent) that appears in both strings, using a 2D DP table (0 if either string is empty). Write isSubsequence(s, t): true when s can be formed by deleting characters from t without reordering (the empty string is a subsequence of everything), using two pointers.",
+    "difficulty": 3,
+    "concept": "dp2d",
+    "referenceSolution": "function longestCommonSubsequence(a, b) {\n  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction isSubsequence(s, t) {\n  let i = 0;\n  for (let j = 0; j < t.length && i < s.length; j++) {\n    if (s[i] === t[j]) i++;\n  }\n  return i === s.length;\n}",
+    "solution": "function longestCommonSubsequence(a, b) {\n  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction isSubsequence(s, t) {\n  let i = 0;\n  for (let j = 0; j < t.length && i < s.length; j++) {\n    if (s[i] === t[j]) i++;\n  }\n  return i === s.length;\n}",
+    "starterCode": "function longestCommonSubsequence(a, b) {\n  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction isSubsequence(s, t) {\n  let i = 0;\n  for (let j = 0; j < t.length && i < s.length; j++) {\n    if (s[i] === t[j]) i++;\n  }\n  return i === s.length;\n}",
+    "testCases": [
+      {
+        "description": "longestCommonSubsequence classic examples",
+        "input": "[longestCommonSubsequence('abcde', 'ace'), longestCommonSubsequence('AGGTAB', 'GXTXAYB')]",
+        "expected": "[3, 4]"
+      },
+      {
+        "description": "LCS of equal and disjoint strings",
+        "input": "[longestCommonSubsequence('abc', 'abc'), longestCommonSubsequence('abc', 'def')]",
+        "expected": "[3, 0]"
+      },
+      {
+        "description": "LCS with an empty string",
+        "input": "[longestCommonSubsequence('', 'abc'), longestCommonSubsequence('abc', ''), longestCommonSubsequence('', '')]",
+        "expected": "[0, 0, 0]"
+      },
+      {
+        "description": "LCS is not a substring: characters may be apart",
+        "input": "longestCommonSubsequence('axbycz', 'abc')",
+        "expected": "3"
+      },
+      {
+        "description": "isSubsequence true cases",
+        "input": "[isSubsequence('ace', 'abcde'), isSubsequence('', 'x'), isSubsequence('abc', 'abc')]",
+        "expected": "[true, true, true]"
+      },
+      {
+        "description": "isSubsequence false cases",
+        "input": "[isSubsequence('aec', 'abcde'), isSubsequence('a', ''), isSubsequence('abc', 'ab')]",
+        "expected": "[false, false, false]"
+      }
+    ],
+    "testHarness": "await $test.run(\"longestCommonSubsequence classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([longestCommonSubsequence('abcde', 'ace'), longestCommonSubsequence('AGGTAB', 'GXTXAYB')]);\n}, () => ([3, 4]));\n\nawait $test.run(\"LCS of equal and disjoint strings\", async () => {\n  const sleep = $test.sleep;\n  return ([longestCommonSubsequence('abc', 'abc'), longestCommonSubsequence('abc', 'def')]);\n}, () => ([3, 0]));\n\nawait $test.run(\"LCS with an empty string\", async () => {\n  const sleep = $test.sleep;\n  return ([longestCommonSubsequence('', 'abc'), longestCommonSubsequence('abc', ''), longestCommonSubsequence('', '')]);\n}, () => ([0, 0, 0]));\n\nawait $test.run(\"LCS is not a substring: characters may be apart\", async () => {\n  const sleep = $test.sleep;\n  return (longestCommonSubsequence('axbycz', 'abc'));\n}, () => (3));\n\nawait $test.run(\"isSubsequence true cases\", async () => {\n  const sleep = $test.sleep;\n  return ([isSubsequence('ace', 'abcde'), isSubsequence('', 'x'), isSubsequence('abc', 'abc')]);\n}, () => ([true, true, true]));\n\nawait $test.run(\"isSubsequence false cases\", async () => {\n  const sleep = $test.sleep;\n  return ([isSubsequence('aec', 'abcde'), isSubsequence('a', ''), isSubsequence('abc', 'ab')]);\n}, () => ([false, false, false]));",
+    "targetTime": "O(m × n)",
+    "targetSpace": "O(m × n)",
+    "complexityExplanation": "The LCS table has (m + 1) x (n + 1) cells each filled once; isSubsequence is a single linear two-pointer pass."
+  },
+  {
+    "id": "min-path-sum-grid",
+    "track": "algorithms",
+    "title": "2D DP: Minimum Path Sum and Triangle",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "2d-dp",
+      "grid",
+      "triangle"
+    ],
+    "promptSeed": "Write minPathSum(grid): the smallest sum of numbers along a path from the top-left to the bottom-right of a grid of non-negative numbers, moving only right or down. Write minimumTotal(triangle): for a triangle given as an array of rows (row i has i + 1 numbers), the smallest path sum from the top to the bottom where each step moves to an adjacent number on the row below (index j or j + 1).",
+    "difficulty": 3,
+    "concept": "dp2d",
+    "referenceSolution": "function minPathSum(grid) {\n  const rows = grid.length;\n  const cols = grid[0].length;\n  const dp = new Array(cols).fill(Infinity);\n  dp[0] = 0;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      const best = Math.min(dp[c], c > 0 ? dp[c - 1] : Infinity);\n      dp[c] = best + grid[r][c];\n    }\n  }\n  return dp[cols - 1];\n}\n\nfunction minimumTotal(triangle) {\n  const dp = triangle[triangle.length - 1].slice();\n  for (let r = triangle.length - 2; r >= 0; r--) {\n    for (let c = 0; c <= r; c++) {\n      dp[c] = triangle[r][c] + Math.min(dp[c], dp[c + 1]);\n    }\n  }\n  return dp[0];\n}",
+    "solution": "function minPathSum(grid) {\n  const rows = grid.length;\n  const cols = grid[0].length;\n  const dp = new Array(cols).fill(Infinity);\n  dp[0] = 0;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      const best = Math.min(dp[c], c > 0 ? dp[c - 1] : Infinity);\n      dp[c] = best + grid[r][c];\n    }\n  }\n  return dp[cols - 1];\n}\n\nfunction minimumTotal(triangle) {\n  const dp = triangle[triangle.length - 1].slice();\n  for (let r = triangle.length - 2; r >= 0; r--) {\n    for (let c = 0; c <= r; c++) {\n      dp[c] = triangle[r][c] + Math.min(dp[c], dp[c + 1]);\n    }\n  }\n  return dp[0];\n}",
+    "starterCode": "function minPathSum(grid) {\n  const rows = grid.length;\n  const cols = grid[0].length;\n  const dp = new Array(cols).fill(Infinity);\n  dp[0] = 0;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      const best = Math.min(dp[c], c > 0 ? dp[c - 1] : Infinity);\n      dp[c] = best + grid[r][c];\n    }\n  }\n  return dp[cols - 1];\n}\n\nfunction minimumTotal(triangle) {\n  const dp = triangle[triangle.length - 1].slice();\n  for (let r = triangle.length - 2; r >= 0; r--) {\n    for (let c = 0; c <= r; c++) {\n      dp[c] = triangle[r][c] + Math.min(dp[c], dp[c + 1]);\n    }\n  }\n  return dp[0];\n}",
+    "testCases": [
+      {
+        "description": "minPathSum classic example",
+        "input": "minPathSum([[1, 3, 1], [1, 5, 1], [4, 2, 1]])",
+        "expected": "7"
+      },
+      {
+        "description": "minPathSum on a rectangle and a single cell",
+        "input": "[minPathSum([[1, 2, 3], [4, 5, 6]]), minPathSum([[5]])]",
+        "expected": "[12, 5]"
+      },
+      {
+        "description": "minPathSum on a single row and a single column",
+        "input": "[minPathSum([[1, 2, 3]]), minPathSum([[1], [2], [3]])]",
+        "expected": "[6, 6]"
+      },
+      {
+        "description": "minimumTotal of a triangle",
+        "input": "minimumTotal([[2], [3, 4], [6, 5, 7], [4, 1, 8, 3]])",
+        "expected": "11"
+      },
+      {
+        "description": "minimumTotal with a single row and negatives",
+        "input": "[minimumTotal([[-10]]), minimumTotal([[1], [-2, -3]])]",
+        "expected": "[-10, -2]"
+      },
+      {
+        "description": "minimumTotal does not take the greedy minimum",
+        "input": "minimumTotal([[1], [2, 3], [100, 1, 1]])",
+        "expected": "4"
+      }
+    ],
+    "testHarness": "await $test.run(\"minPathSum classic example\", async () => {\n  const sleep = $test.sleep;\n  return (minPathSum([[1, 3, 1], [1, 5, 1], [4, 2, 1]]));\n}, () => (7));\n\nawait $test.run(\"minPathSum on a rectangle and a single cell\", async () => {\n  const sleep = $test.sleep;\n  return ([minPathSum([[1, 2, 3], [4, 5, 6]]), minPathSum([[5]])]);\n}, () => ([12, 5]));\n\nawait $test.run(\"minPathSum on a single row and a single column\", async () => {\n  const sleep = $test.sleep;\n  return ([minPathSum([[1, 2, 3]]), minPathSum([[1], [2], [3]])]);\n}, () => ([6, 6]));\n\nawait $test.run(\"minimumTotal of a triangle\", async () => {\n  const sleep = $test.sleep;\n  return (minimumTotal([[2], [3, 4], [6, 5, 7], [4, 1, 8, 3]]));\n}, () => (11));\n\nawait $test.run(\"minimumTotal with a single row and negatives\", async () => {\n  const sleep = $test.sleep;\n  return ([minimumTotal([[-10]]), minimumTotal([[1], [-2, -3]])]);\n}, () => ([-10, -2]));\n\nawait $test.run(\"minimumTotal does not take the greedy minimum\", async () => {\n  const sleep = $test.sleep;\n  return (minimumTotal([[1], [2, 3], [100, 1, 1]]));\n}, () => (4));",
+    "targetTime": "O(m × n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each grid or triangle cell is visited once and only a single row of best-so-far sums is stored."
+  },
+  {
+    "id": "monotonic-stack-basics",
+    "track": "algorithms",
+    "title": "Monotonic Stack: Next Greater Element and Daily Temperatures",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "stack",
+      "monotonic-stack",
+      "array"
+    ],
+    "promptSeed": "Write nextGreaterElement(nums): for each element the first STRICTLY greater value to its right, or -1 if none (nextGreaterElement([4, 5, 2, 10]) is [5, 10, 10, -1]). Write dailyTemperatures(temps): for each day the number of days until a warmer (strictly higher) temperature, or 0 if there is none. Use a stack of indices that stays in decreasing order of value; both must run in O(n).",
+    "difficulty": 2,
+    "concept": "monotonic-stack",
+    "referenceSolution": "function nextGreaterElement(nums) {\n  const result = new Array(nums.length).fill(-1);\n  const stack = [];\n  for (let i = 0; i < nums.length; i++) {\n    while (stack.length && nums[stack[stack.length - 1]] < nums[i]) {\n      result[stack.pop()] = nums[i];\n    }\n    stack.push(i);\n  }\n  return result;\n}\n\nfunction dailyTemperatures(temps) {\n  const result = new Array(temps.length).fill(0);\n  const stack = [];\n  for (let i = 0; i < temps.length; i++) {\n    while (stack.length && temps[stack[stack.length - 1]] < temps[i]) {\n      const j = stack.pop();\n      result[j] = i - j;\n    }\n    stack.push(i);\n  }\n  return result;\n}",
+    "solution": "function nextGreaterElement(nums) {\n  const result = new Array(nums.length).fill(-1);\n  const stack = [];\n  for (let i = 0; i < nums.length; i++) {\n    while (stack.length && nums[stack[stack.length - 1]] < nums[i]) {\n      result[stack.pop()] = nums[i];\n    }\n    stack.push(i);\n  }\n  return result;\n}\n\nfunction dailyTemperatures(temps) {\n  const result = new Array(temps.length).fill(0);\n  const stack = [];\n  for (let i = 0; i < temps.length; i++) {\n    while (stack.length && temps[stack[stack.length - 1]] < temps[i]) {\n      const j = stack.pop();\n      result[j] = i - j;\n    }\n    stack.push(i);\n  }\n  return result;\n}",
+    "starterCode": "function nextGreaterElement(nums) {\n  const result = new Array(nums.length).fill(-1);\n  const stack = [];\n  for (let i = 0; i < nums.length; i++) {\n    while (stack.length && nums[stack[stack.length - 1]] < nums[i]) {\n      result[stack.pop()] = nums[i];\n    }\n    stack.push(i);\n  }\n  return result;\n}\n\nfunction dailyTemperatures(temps) {\n  const result = new Array(temps.length).fill(0);\n  const stack = [];\n  for (let i = 0; i < temps.length; i++) {\n    while (stack.length && temps[stack[stack.length - 1]] < temps[i]) {\n      const j = stack.pop();\n      result[j] = i - j;\n    }\n    stack.push(i);\n  }\n  return result;\n}",
+    "testCases": [
+      {
+        "description": "nextGreaterElement",
+        "input": "nextGreaterElement([4, 5, 2, 10, 8])",
+        "expected": "[5, 10, 10, -1, -1]"
+      },
+      {
+        "description": "nextGreaterElement with descending, equal and empty input",
+        "input": "[nextGreaterElement([3, 2, 1]), nextGreaterElement([2, 2]), nextGreaterElement([])]",
+        "expected": "[[-1, -1, -1], [-1, -1], []]"
+      },
+      {
+        "description": "nextGreaterElement with an ascending run",
+        "input": "nextGreaterElement([1, 2, 3, 4])",
+        "expected": "[2, 3, 4, -1]"
+      },
+      {
+        "description": "dailyTemperatures classic example",
+        "input": "dailyTemperatures([73, 74, 75, 71, 69, 72, 76, 73])",
+        "expected": "[1, 1, 4, 2, 1, 1, 0, 0]"
+      },
+      {
+        "description": "dailyTemperatures with rising and falling runs",
+        "input": "[dailyTemperatures([30, 40, 50, 60]), dailyTemperatures([60, 50, 40])]",
+        "expected": "[[1, 1, 1, 0], [0, 0, 0]]"
+      },
+      {
+        "description": "dailyTemperatures: equal temperatures are not warmer",
+        "input": "[dailyTemperatures([70, 70, 71]), dailyTemperatures([])]",
+        "expected": "[[2, 1, 0], []]"
+      }
+    ],
+    "testHarness": "await $test.run(\"nextGreaterElement\", async () => {\n  const sleep = $test.sleep;\n  return (nextGreaterElement([4, 5, 2, 10, 8]));\n}, () => ([5, 10, 10, -1, -1]));\n\nawait $test.run(\"nextGreaterElement with descending, equal and empty input\", async () => {\n  const sleep = $test.sleep;\n  return ([nextGreaterElement([3, 2, 1]), nextGreaterElement([2, 2]), nextGreaterElement([])]);\n}, () => ([[-1, -1, -1], [-1, -1], []]));\n\nawait $test.run(\"nextGreaterElement with an ascending run\", async () => {\n  const sleep = $test.sleep;\n  return (nextGreaterElement([1, 2, 3, 4]));\n}, () => ([2, 3, 4, -1]));\n\nawait $test.run(\"dailyTemperatures classic example\", async () => {\n  const sleep = $test.sleep;\n  return (dailyTemperatures([73, 74, 75, 71, 69, 72, 76, 73]));\n}, () => ([1, 1, 4, 2, 1, 1, 0, 0]));\n\nawait $test.run(\"dailyTemperatures with rising and falling runs\", async () => {\n  const sleep = $test.sleep;\n  return ([dailyTemperatures([30, 40, 50, 60]), dailyTemperatures([60, 50, 40])]);\n}, () => ([[1, 1, 1, 0], [0, 0, 0]]));\n\nawait $test.run(\"dailyTemperatures: equal temperatures are not warmer\", async () => {\n  const sleep = $test.sleep;\n  return ([dailyTemperatures([70, 70, 71]), dailyTemperatures([])]);\n}, () => ([[2, 1, 0], []]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each index is pushed and popped at most once, and the stack plus result arrays hold up to n entries."
+  },
+  {
+    "id": "monotonic-stack-histogram",
+    "track": "algorithms",
+    "title": "Monotonic Stack: Stock Span and Largest Rectangle in Histogram",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "stack",
+      "monotonic-stack",
+      "histogram"
+    ],
+    "promptSeed": "Write stockSpan(prices): for each day the number of consecutive days ending today (including today) whose price is <= today's price (stockSpan([100, 80, 60, 70]) is [1, 1, 1, 2]). Write largestRectangleArea(heights): the area of the largest rectangle that fits inside a histogram of bars with width 1 (0 for an empty histogram). Use a monotonic stack so that both run in O(n).",
+    "difficulty": 4,
+    "concept": "monotonic-stack",
+    "referenceSolution": "function stockSpan(prices) {\n  const spans = [];\n  const stack = [];\n  for (let i = 0; i < prices.length; i++) {\n    while (stack.length && prices[stack[stack.length - 1]] <= prices[i]) stack.pop();\n    spans.push(stack.length ? i - stack[stack.length - 1] : i + 1);\n    stack.push(i);\n  }\n  return spans;\n}\n\nfunction largestRectangleArea(heights) {\n  const stack = [];\n  let best = 0;\n  for (let i = 0; i <= heights.length; i++) {\n    const h = i === heights.length ? 0 : heights[i];\n    while (stack.length && heights[stack[stack.length - 1]] >= h) {\n      const height = heights[stack.pop()];\n      const left = stack.length ? stack[stack.length - 1] : -1;\n      best = Math.max(best, height * (i - left - 1));\n    }\n    stack.push(i);\n  }\n  return best;\n}",
+    "solution": "function stockSpan(prices) {\n  const spans = [];\n  const stack = [];\n  for (let i = 0; i < prices.length; i++) {\n    while (stack.length && prices[stack[stack.length - 1]] <= prices[i]) stack.pop();\n    spans.push(stack.length ? i - stack[stack.length - 1] : i + 1);\n    stack.push(i);\n  }\n  return spans;\n}\n\nfunction largestRectangleArea(heights) {\n  const stack = [];\n  let best = 0;\n  for (let i = 0; i <= heights.length; i++) {\n    const h = i === heights.length ? 0 : heights[i];\n    while (stack.length && heights[stack[stack.length - 1]] >= h) {\n      const height = heights[stack.pop()];\n      const left = stack.length ? stack[stack.length - 1] : -1;\n      best = Math.max(best, height * (i - left - 1));\n    }\n    stack.push(i);\n  }\n  return best;\n}",
+    "starterCode": "function stockSpan(prices) {\n  const spans = [];\n  const stack = [];\n  for (let i = 0; i < prices.length; i++) {\n    while (stack.length && prices[stack[stack.length - 1]] <= prices[i]) stack.pop();\n    spans.push(stack.length ? i - stack[stack.length - 1] : i + 1);\n    stack.push(i);\n  }\n  return spans;\n}\n\nfunction largestRectangleArea(heights) {\n  const stack = [];\n  let best = 0;\n  for (let i = 0; i <= heights.length; i++) {\n    const h = i === heights.length ? 0 : heights[i];\n    while (stack.length && heights[stack[stack.length - 1]] >= h) {\n      const height = heights[stack.pop()];\n      const left = stack.length ? stack[stack.length - 1] : -1;\n      best = Math.max(best, height * (i - left - 1));\n    }\n    stack.push(i);\n  }\n  return best;\n}",
+    "testCases": [
+      {
+        "description": "stockSpan classic example",
+        "input": "stockSpan([100, 80, 60, 70, 60, 75, 85])",
+        "expected": "[1, 1, 1, 2, 1, 4, 6]"
+      },
+      {
+        "description": "stockSpan with equal prices counts them",
+        "input": "[stockSpan([5, 5, 5]), stockSpan([]), stockSpan([3])]",
+        "expected": "[[1, 2, 3], [], [1]]"
+      },
+      {
+        "description": "largestRectangleArea classic example",
+        "input": "largestRectangleArea([2, 1, 5, 6, 2, 3])",
+        "expected": "10"
+      },
+      {
+        "description": "largestRectangleArea of small histograms",
+        "input": "[largestRectangleArea([2, 4]), largestRectangleArea([1, 1, 1, 1]), largestRectangleArea([5])]",
+        "expected": "[4, 4, 5]"
+      },
+      {
+        "description": "largestRectangleArea: empty and a valley",
+        "input": "[largestRectangleArea([]), largestRectangleArea([6, 2, 5, 4, 5, 1, 6])]",
+        "expected": "[0, 12]"
+      },
+      {
+        "description": "largestRectangleArea: ascending and descending bars",
+        "input": "[largestRectangleArea([1, 2, 3, 4, 5]), largestRectangleArea([5, 4, 3, 2, 1])]",
+        "expected": "[9, 9]"
+      }
+    ],
+    "testHarness": "await $test.run(\"stockSpan classic example\", async () => {\n  const sleep = $test.sleep;\n  return (stockSpan([100, 80, 60, 70, 60, 75, 85]));\n}, () => ([1, 1, 1, 2, 1, 4, 6]));\n\nawait $test.run(\"stockSpan with equal prices counts them\", async () => {\n  const sleep = $test.sleep;\n  return ([stockSpan([5, 5, 5]), stockSpan([]), stockSpan([3])]);\n}, () => ([[1, 2, 3], [], [1]]));\n\nawait $test.run(\"largestRectangleArea classic example\", async () => {\n  const sleep = $test.sleep;\n  return (largestRectangleArea([2, 1, 5, 6, 2, 3]));\n}, () => (10));\n\nawait $test.run(\"largestRectangleArea of small histograms\", async () => {\n  const sleep = $test.sleep;\n  return ([largestRectangleArea([2, 4]), largestRectangleArea([1, 1, 1, 1]), largestRectangleArea([5])]);\n}, () => ([4, 4, 5]));\n\nawait $test.run(\"largestRectangleArea: empty and a valley\", async () => {\n  const sleep = $test.sleep;\n  return ([largestRectangleArea([]), largestRectangleArea([6, 2, 5, 4, 5, 1, 6])]);\n}, () => ([0, 12]));\n\nawait $test.run(\"largestRectangleArea: ascending and descending bars\", async () => {\n  const sleep = $test.sleep;\n  return ([largestRectangleArea([1, 2, 3, 4, 5]), largestRectangleArea([5, 4, 3, 2, 1])]);\n}, () => ([9, 9]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Every bar is pushed and popped at most once, so both functions are linear with a stack of up to n indices."
+  },
+  {
+    "id": "unique-paths-grid",
+    "track": "algorithms",
+    "title": "2D DP: Unique Paths and Unique Paths With Obstacles",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "dp",
+      "2d-dp",
+      "grid",
+      "combinatorics"
+    ],
+    "promptSeed": "A robot starts at the top-left of an m x n grid and can only move right or down. Write uniquePaths(m, n): the number of different paths to the bottom-right corner. Write uniquePathsWithObstacles(grid): the same count when grid is an array of rows where 1 is an obstacle and 0 is free (obstacles cannot be entered; if the start or end is blocked the answer is 0).",
+    "difficulty": 2,
+    "concept": "dp2d",
+    "referenceSolution": "function uniquePaths(m, n) {\n  const row = new Array(n).fill(1);\n  for (let r = 1; r < m; r++) {\n    for (let c = 1; c < n; c++) row[c] += row[c - 1];\n  }\n  return row[n - 1];\n}\n\nfunction uniquePathsWithObstacles(grid) {\n  const rows = grid.length;\n  const cols = grid[0].length;\n  const row = new Array(cols).fill(0);\n  row[0] = grid[0][0] === 1 ? 0 : 1;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      if (grid[r][c] === 1) row[c] = 0;\n      else if (c > 0) row[c] += row[c - 1];\n    }\n  }\n  return row[cols - 1];\n}",
+    "solution": "function uniquePaths(m, n) {\n  const row = new Array(n).fill(1);\n  for (let r = 1; r < m; r++) {\n    for (let c = 1; c < n; c++) row[c] += row[c - 1];\n  }\n  return row[n - 1];\n}\n\nfunction uniquePathsWithObstacles(grid) {\n  const rows = grid.length;\n  const cols = grid[0].length;\n  const row = new Array(cols).fill(0);\n  row[0] = grid[0][0] === 1 ? 0 : 1;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      if (grid[r][c] === 1) row[c] = 0;\n      else if (c > 0) row[c] += row[c - 1];\n    }\n  }\n  return row[cols - 1];\n}",
+    "starterCode": "function uniquePaths(m, n) {\n  const row = new Array(n).fill(1);\n  for (let r = 1; r < m; r++) {\n    for (let c = 1; c < n; c++) row[c] += row[c - 1];\n  }\n  return row[n - 1];\n}\n\nfunction uniquePathsWithObstacles(grid) {\n  const rows = grid.length;\n  const cols = grid[0].length;\n  const row = new Array(cols).fill(0);\n  row[0] = grid[0][0] === 1 ? 0 : 1;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      if (grid[r][c] === 1) row[c] = 0;\n      else if (c > 0) row[c] += row[c - 1];\n    }\n  }\n  return row[cols - 1];\n}",
+    "testCases": [
+      {
+        "description": "uniquePaths counts routes",
+        "input": "[uniquePaths(3, 7), uniquePaths(3, 2), uniquePaths(7, 3)]",
+        "expected": "[28, 3, 28]"
+      },
+      {
+        "description": "uniquePaths in a single row, column or cell",
+        "input": "[uniquePaths(1, 1), uniquePaths(1, 5), uniquePaths(5, 1)]",
+        "expected": "[1, 1, 1]"
+      },
+      {
+        "description": "uniquePaths(10, 10)",
+        "input": "uniquePaths(10, 10)",
+        "expected": "48620"
+      },
+      {
+        "description": "uniquePathsWithObstacles routes around a block",
+        "input": "uniquePathsWithObstacles([[0, 0, 0], [0, 1, 0], [0, 0, 0]])",
+        "expected": "2"
+      },
+      {
+        "description": "uniquePathsWithObstacles with a single detour",
+        "input": "uniquePathsWithObstacles([[0, 1], [0, 0]])",
+        "expected": "1"
+      },
+      {
+        "description": "uniquePathsWithObstacles: blocked start, end or wall",
+        "input": "[uniquePathsWithObstacles([[1, 0]]), uniquePathsWithObstacles([[0, 1]]), uniquePathsWithObstacles([[0, 0], [1, 1]])]",
+        "expected": "[0, 0, 0]"
+      },
+      {
+        "description": "uniquePathsWithObstacles: free single cell",
+        "input": "uniquePathsWithObstacles([[0]])",
+        "expected": "1"
+      }
+    ],
+    "testHarness": "await $test.run(\"uniquePaths counts routes\", async () => {\n  const sleep = $test.sleep;\n  return ([uniquePaths(3, 7), uniquePaths(3, 2), uniquePaths(7, 3)]);\n}, () => ([28, 3, 28]));\n\nawait $test.run(\"uniquePaths in a single row, column or cell\", async () => {\n  const sleep = $test.sleep;\n  return ([uniquePaths(1, 1), uniquePaths(1, 5), uniquePaths(5, 1)]);\n}, () => ([1, 1, 1]));\n\nawait $test.run(\"uniquePaths(10, 10)\", async () => {\n  const sleep = $test.sleep;\n  return (uniquePaths(10, 10));\n}, () => (48620));\n\nawait $test.run(\"uniquePathsWithObstacles routes around a block\", async () => {\n  const sleep = $test.sleep;\n  return (uniquePathsWithObstacles([[0, 0, 0], [0, 1, 0], [0, 0, 0]]));\n}, () => (2));\n\nawait $test.run(\"uniquePathsWithObstacles with a single detour\", async () => {\n  const sleep = $test.sleep;\n  return (uniquePathsWithObstacles([[0, 1], [0, 0]]));\n}, () => (1));\n\nawait $test.run(\"uniquePathsWithObstacles: blocked start, end or wall\", async () => {\n  const sleep = $test.sleep;\n  return ([uniquePathsWithObstacles([[1, 0]]), uniquePathsWithObstacles([[0, 1]]), uniquePathsWithObstacles([[0, 0], [1, 1]])]);\n}, () => ([0, 0, 0]));\n\nawait $test.run(\"uniquePathsWithObstacles: free single cell\", async () => {\n  const sleep = $test.sleep;\n  return (uniquePathsWithObstacles([[0]]));\n}, () => (1));",
+    "targetTime": "O(m × n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Every cell is computed once from its top and left neighbours, keeping only one row of counts."
   }
 ]

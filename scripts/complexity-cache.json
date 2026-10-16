@@ -833,5 +833,60 @@
     "targetTime": "O(d)",
     "targetSpace": "O(d)",
     "complexityExplanation": "Each function walks the prototype chain once (depth d); getProtoChain stores the chain in an array."
+  },
+  "bit-basics": {
+    "targetTime": "O(n) / O(bits) / O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "singleNumber is one XOR pass, countOneBits loops once per set bit and isPowerOfTwo is a single bitwise test, all with constant extra space."
+  },
+  "bit-tricks-more": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each function makes one pass over the input; countBitsUpTo stores an array of n + 1 counts built from earlier entries."
+  },
+  "monotonic-stack-basics": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each index is pushed and popped at most once, and the stack plus result arrays hold up to n entries."
+  },
+  "monotonic-stack-histogram": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Every bar is pushed and popped at most once, so both functions are linear with a stack of up to n indices."
+  },
+  "unique-paths-grid": {
+    "targetTime": "O(m × n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Every cell is computed once from its top and left neighbours, keeping only one row of counts."
+  },
+  "min-path-sum-grid": {
+    "targetTime": "O(m × n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each grid or triangle cell is visited once and only a single row of best-so-far sums is stored."
+  },
+  "lcs-subsequence": {
+    "targetTime": "O(m × n)",
+    "targetSpace": "O(m × n)",
+    "complexityExplanation": "The LCS table has (m + 1) x (n + 1) cells each filled once; isSubsequence is a single linear two-pointer pass."
+  },
+  "edit-distance-knapsack": {
+    "targetTime": "O(m × n) / O(items × capacity)",
+    "targetSpace": "O(m × n) / O(capacity)",
+    "complexityExplanation": "Edit distance fills an (m + 1) x (n + 1) table; the knapsack tries each item against every capacity using a single capacity-sized array."
+  },
+  "jump-game-greedy": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "A single left-to-right pass tracks the farthest reachable index (and the current jump boundary) with constant extra state."
+  },
+  "container-water-two-pointer": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Two pointers walk inward once each, always moving the shorter side, with constant extra variables."
+  },
+  "greedy-intervals-circuit": {
+    "targetTime": "O(n log n) / O(n)",
+    "targetSpace": "O(n) / O(1)",
+    "complexityExplanation": "The interval functions sort a copy and scan once; the gas station scan is a single pass with two running totals."
   }
 }

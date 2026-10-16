@@ -1,0 +1,10 @@
+{
+  "track": "algorithms",
+  "title": "2D DP: Longest Common Subsequence and isSubsequence",
+  "tags": [
+    "dp",
+    "2d-dp",
+    "string",
+    "subsequence"
+  ]
+}

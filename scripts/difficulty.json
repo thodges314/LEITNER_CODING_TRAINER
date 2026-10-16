@@ -666,5 +666,49 @@
  "proto-chain-hasinstance": {
   "difficulty": 3,
   "concept": "prototypes"
+ },
+ "bit-basics": {
+  "difficulty": 1,
+  "concept": "bits"
+ },
+ "bit-tricks-more": {
+  "difficulty": 2,
+  "concept": "bits"
+ },
+ "monotonic-stack-basics": {
+  "difficulty": 2,
+  "concept": "monotonic-stack"
+ },
+ "monotonic-stack-histogram": {
+  "difficulty": 4,
+  "concept": "monotonic-stack"
+ },
+ "unique-paths-grid": {
+  "difficulty": 2,
+  "concept": "dp2d"
+ },
+ "min-path-sum-grid": {
+  "difficulty": 3,
+  "concept": "dp2d"
+ },
+ "lcs-subsequence": {
+  "difficulty": 3,
+  "concept": "dp2d"
+ },
+ "edit-distance-knapsack": {
+  "difficulty": 4,
+  "concept": "dp2d"
+ },
+ "jump-game-greedy": {
+  "difficulty": 2,
+  "concept": "greedy"
+ },
+ "container-water-two-pointer": {
+  "difficulty": 3,
+  "concept": "two-pointer"
+ },
+ "greedy-intervals-circuit": {
+  "difficulty": 3,
+  "concept": "greedy"
  }
 }
