@@ -231,14 +231,23 @@ async function fetchGeminiModels(apiKey: string): Promise<ModelDiscoveryResult> 
   };
 }
 
+function formatOpenRouterAmount(amount: number): string {
+  if (amount === 0) return '$0.00';
+  if (amount < 0.01) return `$${amount.toFixed(4)}`;
+  return `$${amount.toFixed(2)}`;
+}
+
 async function fetchOpenRouterModels(apiKey: string): Promise<ModelDiscoveryResult> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-  const [modelsRes, authRes] = await Promise.all([
+  const [modelsRes, authRes, creditsRes] = await Promise.all([
     fetch('https://openrouter.ai/api/v1/models', { headers }),
     apiKey
       ? fetch('https://openrouter.ai/api/v1/auth/key', { headers }).catch(() => null)
+      : Promise.resolve(null),
+    apiKey
+      ? fetch('https://openrouter.ai/api/v1/credits', { headers }).catch(() => null)
       : Promise.resolve(null),
   ]);
 
@@ -286,24 +295,73 @@ async function fetchOpenRouterModels(apiKey: string): Promise<ModelDiscoveryResu
   let tier = 'API Access';
   let rateLimitSummary: string | undefined;
 
+  let accountCredits: { totalCredits: number; totalUsage: number; remaining: number } | null = null;
+  if (creditsRes && creditsRes.ok) {
+    try {
+      const creditsData = await creditsRes.json();
+      if (
+        creditsData?.data &&
+        typeof creditsData.data.total_credits === 'number' &&
+        typeof creditsData.data.total_usage === 'number'
+      ) {
+        const remaining = Math.max(0, creditsData.data.total_credits - creditsData.data.total_usage);
+        accountCredits = {
+          totalCredits: creditsData.data.total_credits,
+          totalUsage: creditsData.data.total_usage,
+          remaining,
+        };
+      }
+    } catch {
+      // Credits endpoint optional / ignore parse errors
+    }
+  }
+
+  let keyInfo: {
+    isFreeTier?: boolean;
+    limit?: number | null;
+    usage?: number;
+    rateLimit?: { requests: number; interval: string };
+  } | null = null;
+
   if (authRes && authRes.ok) {
     try {
       const authData = await authRes.json();
-      const info = authData.data;
+      const info = authData?.data;
       if (info) {
-        tier = info.is_free_tier ? 'Free Tier Account' : 'Paid Account';
-        if (info.limit != null && info.usage != null) {
-          const rem = Math.max(0, info.limit - info.usage);
-          creditsRemaining = `$${rem.toFixed(4)} credits remaining (Used: $${Number(info.usage).toFixed(4)})`;
-        } else if (info.usage != null) {
-          creditsRemaining = `Pay-as-you-go (Total used: $${Number(info.usage).toFixed(4)})`;
-        }
-        if (info.rate_limit) {
-          rateLimitSummary = `${info.rate_limit.requests} req / ${info.rate_limit.interval}`;
-        }
+        keyInfo = {
+          isFreeTier: info.is_free_tier,
+          limit: info.limit,
+          usage: info.usage,
+          rateLimit: info.rate_limit,
+        };
       }
     } catch {
       // Auth endpoint optional, ignore if failed
+    }
+  }
+
+  if (keyInfo) {
+    tier = keyInfo.isFreeTier ? 'Free Tier Account' : 'Paid Account';
+    if (keyInfo.rateLimit) {
+      rateLimitSummary = `${keyInfo.rateLimit.requests} req / ${keyInfo.rateLimit.interval}`;
+    }
+  }
+
+  if (accountCredits) {
+    const remStr = formatOpenRouterAmount(accountCredits.remaining);
+    const spentStr = formatOpenRouterAmount(accountCredits.totalUsage);
+    if (keyInfo?.limit != null) {
+      const keyLimitStr = formatOpenRouterAmount(keyInfo.limit);
+      creditsRemaining = `${remStr} balance (Spent: ${spentStr} • Key cap: ${keyLimitStr})`;
+    } else {
+      creditsRemaining = `${remStr} balance (Total spent: ${spentStr})`;
+    }
+  } else if (keyInfo) {
+    if (keyInfo.limit != null && keyInfo.usage != null) {
+      const rem = Math.max(0, keyInfo.limit - keyInfo.usage);
+      creditsRemaining = `${formatOpenRouterAmount(rem)} remaining of key limit (Key used: ${formatOpenRouterAmount(keyInfo.usage)})`;
+    } else if (keyInfo.usage != null) {
+      creditsRemaining = `Pay-as-you-go (Key used: ${formatOpenRouterAmount(keyInfo.usage)})`;
     }
   }
 

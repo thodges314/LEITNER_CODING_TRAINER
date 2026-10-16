@@ -100,6 +100,13 @@ describe('modelDiscovery service', () => {
       },
     };
 
+    const mockCreditsResponse = {
+      data: {
+        total_credits: 10.0,
+        total_usage: 9.12,
+      },
+    };
+
     vi.spyOn(globalThis, 'fetch')
       .mockResolvedValueOnce({
         ok: true,
@@ -110,6 +117,11 @@ describe('modelDiscovery service', () => {
         ok: true,
         headers: new Headers(),
         json: async () => mockAuthResponse,
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers(),
+        json: async () => mockCreditsResponse,
       } as unknown as Response);
 
     const res = await fetchProviderModels('openrouter', 'sk-or-v1-test');
@@ -117,6 +129,42 @@ describe('modelDiscovery service', () => {
     expect(res.models).toHaveLength(2);
     expect(res.models[0].isFree).toBe(true);
     expect(res.accountInfo?.tier).toBe('Paid Account');
-    expect(res.accountInfo?.creditsRemaining).toContain('$9.8800 credits remaining');
+    expect(res.accountInfo?.creditsRemaining).toBe('$0.88 balance (Spent: $9.12 • Key cap: $10.00)');
+  });
+
+  it('falls back to key limit when OpenRouter credits endpoint is unavailable', async () => {
+    const mockOpenRouterModels = {
+      data: [
+        { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B' },
+      ],
+    };
+
+    const mockAuthResponse = {
+      data: {
+        is_free_tier: false,
+        usage: 0.12,
+        limit: 10.0,
+      },
+    };
+
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers(),
+        json: async () => mockOpenRouterModels,
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        headers: new Headers(),
+        json: async () => mockAuthResponse,
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+      } as unknown as Response);
+
+    const res = await fetchProviderModels('openrouter', 'sk-or-v1-test');
+    expect(res.error).toBeUndefined();
+    expect(res.accountInfo?.creditsRemaining).toBe('$9.88 remaining of key limit (Key used: $0.12)');
   });
 });
