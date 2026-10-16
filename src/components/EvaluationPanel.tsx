@@ -129,38 +129,39 @@ const StreamedMarkdownReply: React.FC<{
   isNew?: boolean;
   onScrollToBottom?: () => void;
 }> = ({ text, isNew = false, onScrollToBottom }) => {
-  const paragraphs = useMemo(() => {
-    const raw = text.split('\n\n').filter((p) => p.trim());
-    return raw.length > 0 ? raw : [text];
+  // Tokenize text into words and whitespace for natural ChatGPT-style streaming
+  const tokens = useMemo(() => {
+    return text.split(/(\s+)/);
   }, [text]);
 
-  const [visibleCount, setVisibleCount] = useState(() => (isNew && paragraphs.length > 1 ? 1 : paragraphs.length));
-  const [isDone, setIsDone] = useState(!isNew || paragraphs.length <= 1);
+  const [tokenCount, setTokenCount] = useState(() => (isNew ? 1 : tokens.length));
+  const [isDone, setIsDone] = useState(!isNew);
 
   useEffect(() => {
-    if (!isNew || paragraphs.length <= 1) return;
+    if (!isNew) return;
 
-    let count = 1;
+    let idx = 1;
     const interval = setInterval(() => {
-      count++;
-      setVisibleCount(count);
+      idx = Math.min(tokens.length, idx + 2);
+      setTokenCount(idx);
       onScrollToBottom?.();
-      if (count >= paragraphs.length) {
+      if (idx >= tokens.length) {
         setIsDone(true);
         clearInterval(interval);
       }
-    }, 120);
+    }, 22);
 
     return () => clearInterval(interval);
-  }, [isNew, paragraphs, onScrollToBottom]);
+  }, [isNew, tokens, onScrollToBottom]);
+
+  const currentText = useMemo(() => {
+    if (isDone || !isNew) return text;
+    return tokens.slice(0, tokenCount).join('');
+  }, [isDone, isNew, text, tokens, tokenCount]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-      {paragraphs.slice(0, visibleCount).map((p, i) => (
-        <div key={i} style={{ lineHeight: 1.55 }}>
-          <MarkdownContent text={p} />
-        </div>
-      ))}
+    <div style={{ lineHeight: 1.55 }}>
+      <MarkdownContent text={currentText} />
       {!isDone && (
         <span
           className="followup-cursor"
@@ -170,6 +171,7 @@ const StreamedMarkdownReply: React.FC<{
             height: '14px',
             backgroundColor: '#38bdf8',
             verticalAlign: 'text-bottom',
+            marginLeft: '4px',
             animation: 'followupCursorBlink 0.75s infinite',
           }}
         />
