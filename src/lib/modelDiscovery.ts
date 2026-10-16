@@ -468,6 +468,10 @@ async function fetchCerebrasModels(apiKey: string): Promise<ModelDiscoveryResult
     return { models: [], error: `Cerebras API error (${res.status}): ${errText.slice(0, 150)}` };
   }
 
+  // Inspect rate limit headers if returned by Cerebras
+  const remDay = res.headers.get('x-ratelimit-remaining-requests-day');
+  const remTok = res.headers.get('x-ratelimit-remaining-tokens-minute') || res.headers.get('x-ratelimit-remaining-tokens');
+
   const json = await res.json();
   const rawList: Array<{ id: string; context_window?: number }> = json.data || [];
   const recommendedSet = new Set(RECOMMENDED_MODELS.cerebras);
@@ -484,11 +488,24 @@ async function fetchCerebrasModels(apiKey: string): Promise<ModelDiscoveryResult
     'cerebras'
   );
 
+  let tokensRemaining: string | undefined;
+  if (remTok) {
+    tokensRemaining = `${Number(remTok).toLocaleString()} TPM`;
+  }
+
+  let rateLimitSummary = '30 RPM • Ultra-low latency (~1,800 T/s)';
+  if (remDay) {
+    rateLimitSummary = `${remDay} requests left today • 30 RPM`;
+  }
+
   return {
     models,
     accountInfo: {
       provider: 'cerebras',
       tier: 'Wafer-Scale Inference (~1,800 T/s)',
+      creditsRemaining: 'Free Developer Tier (14.4M Tokens/day)',
+      tokensRemaining,
+      rateLimitSummary,
       totalModelsFound: models.length,
       freeModelsCount: models.length,
     },
@@ -504,6 +521,9 @@ async function fetchMistralModels(apiKey: string): Promise<ModelDiscoveryResult>
     const errText = await res.text();
     return { models: [], error: `Mistral API error (${res.status}): ${errText.slice(0, 150)}` };
   }
+
+  const remReq = res.headers.get('x-ratelimit-remaining-requests-minute') || res.headers.get('x-ratelimit-remaining-requests');
+  const remTok = res.headers.get('x-ratelimit-remaining-tokens-minute') || res.headers.get('x-ratelimit-remaining-tokens');
 
   const json = await res.json();
   const rawList: Array<{ id: string; context_window?: number }> = json.data || [];
@@ -526,6 +546,9 @@ async function fetchMistralModels(apiKey: string): Promise<ModelDiscoveryResult>
     accountInfo: {
       provider: 'mistral',
       tier: 'Codestral & Mistral Developer Tier',
+      creditsRemaining: 'Free Developer Tier (Codestral)',
+      tokensRemaining: remTok ? `${Number(remTok).toLocaleString()} TPM` : undefined,
+      rateLimitSummary: remReq ? `${remReq} req left • 1 RPS free limit` : '1 RPS • 2M TPM on free tier',
       totalModelsFound: models.length,
       freeModelsCount: models.filter((m) => m.isFree).length,
     },
@@ -533,6 +556,9 @@ async function fetchMistralModels(apiKey: string): Promise<ModelDiscoveryResult>
 }
 
 async function fetchAnthropicModels(apiKey: string): Promise<ModelDiscoveryResult> {
+  let rateLimitSummary = 'Billed per token via console.anthropic.com';
+  let tokensRemaining: string | undefined;
+
   try {
     const res = await fetch('https://api.anthropic.com/v1/models', {
       headers: {
@@ -541,6 +567,15 @@ async function fetchAnthropicModels(apiKey: string): Promise<ModelDiscoveryResul
         'anthropic-dangerous-direct-browser-access': 'true',
       },
     });
+
+    const remReq = res.headers.get('anthropic-ratelimit-requests-remaining');
+    const remTok = res.headers.get('anthropic-ratelimit-tokens-remaining');
+    if (remTok) {
+      tokensRemaining = `${Number(remTok).toLocaleString()} tokens remaining`;
+    }
+    if (remReq) {
+      rateLimitSummary = `${remReq} requests remaining • console.anthropic.com`;
+    }
 
     if (res.ok) {
       const json = await res.json();
@@ -562,6 +597,9 @@ async function fetchAnthropicModels(apiKey: string): Promise<ModelDiscoveryResul
           accountInfo: {
             provider: 'anthropic',
             tier: 'Claude Benchmark Access',
+            creditsRemaining: 'Prepaid Credits / Pay-as-you-go',
+            tokensRemaining,
+            rateLimitSummary,
             totalModelsFound: models.length,
           },
         };
@@ -589,6 +627,9 @@ async function fetchAnthropicModels(apiKey: string): Promise<ModelDiscoveryResul
     accountInfo: {
       provider: 'anthropic',
       tier: 'Claude Benchmark Access',
+      creditsRemaining: 'Prepaid Credits / Pay-as-you-go',
+      tokensRemaining,
+      rateLimitSummary,
       totalModelsFound: fallbackList.length,
     },
   };
@@ -623,6 +664,8 @@ async function fetchCustomModels(apiKey: string, baseUrl: string): Promise<Model
     accountInfo: {
       provider: 'custom',
       tier: 'Self-Hosted / Custom Gateway',
+      creditsRemaining: 'Free / Local Server',
+      rateLimitSummary: `Connected to ${cleanBase}`,
       totalModelsFound: models.length,
     },
   };
