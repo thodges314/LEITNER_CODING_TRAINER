@@ -161,6 +161,7 @@ interface SettingsModalProps {
   currentAlgorithm?: SpacedAlgorithm;
   onAlgorithmChange?: (algo: SpacedAlgorithm) => void;
   onSettingsSaved?: () => void;
+  onResetDeckToDefaults?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -169,6 +170,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   currentAlgorithm,
   onAlgorithmChange,
   onSettingsSaved,
+  onResetDeckToDefaults,
 }) => {
   const [algorithm, setAlgorithm] = useState<SpacedAlgorithm>(() => currentAlgorithm ?? getStoredAlgorithm());
   const [apiKey, setApiKey] = useState(() => getStoredApiKey());
@@ -180,7 +182,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [timedMode, setTimedMode] = useState(() => getTimedModeEnabled());
   const [timedDuration, setTimedDuration] = useState(() => getTimedModeDuration());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [confirmAction, setConfirmAction] = useState<'clear' | 'replace' | null>(null);
+  const [confirmAction, setConfirmAction] = useState<'clear' | 'replace' | 'reset-deck' | null>(null);
+  const [resetConfirmInput, setResetConfirmInput] = useState('');
 
   // Model & Provider Discovery State
   const [discoveredModels, setDiscoveredModels] = useState<DiscoveredModel[]>([]);
@@ -1505,6 +1508,150 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 className="code-buffer"
                 style={{ height: '40px', padding: '10px 12px', fontSize: '13px' }}
               />
+            </div>
+          )}
+
+          {/* Danger Zone: Reset Deck Progress */}
+          {onResetDeckToDefaults && (
+            <div
+              style={{
+                padding: '14px 16px',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#f87171', fontSize: '13px', fontWeight: 600 }}>
+                    <AlertTriangle size={15} />
+                    <span>Danger Zone: Reset All Deck Progress</span>
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                    Resets all cards back to Tier/Box 1, clears streaks, review counts, and code drafts.
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmAction('reset-deck');
+                    setResetConfirmInput('');
+                  }}
+                  className="btn"
+                  style={{
+                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    color: '#f87171',
+                    fontSize: '12px',
+                    padding: '6px 12px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Trash2 size={13} />
+                  Reset Deck
+                </button>
+              </div>
+
+              {/* In-App Confirmation: Reset Deck */}
+              {confirmAction === 'reset-deck' && (
+                <div
+                  style={{
+                    marginTop: '4px',
+                    padding: '14px',
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f87171', fontSize: '13px', fontWeight: 600 }}>
+                    <AlertTriangle size={16} />
+                    Permanently reset all learning progress?
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#e2e8f0', margin: 0, lineHeight: 1.45 }}>
+                    This will permanently erase your review streaks, box tiers, completed review counter, and all editor code drafts. The deck will return to its initial default state.
+                  </p>
+                  <div>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '11.5px',
+                        color: 'var(--text-secondary)',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      To confirm, type <strong translate="no" className="notranslate" style={{ color: '#f87171', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET EVERYTHING</strong> below:
+                    </label>
+                    <input
+                      type="text"
+                      translate="no"
+                      className="notranslate code-buffer"
+                      value={resetConfirmInput}
+                      onChange={(e) => setResetConfirmInput(e.target.value)}
+                      placeholder="RESET EVERYTHING"
+                      autoFocus
+                      style={{
+                        width: '100%',
+                        height: '36px',
+                        padding: '6px 12px',
+                        fontSize: '12.5px',
+                        fontFamily: 'monospace',
+                        borderColor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING'
+                          ? '#ef4444'
+                          : 'rgba(239, 68, 68, 0.3)',
+                        outline: 'none',
+                        color: '#ffffff',
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      style={{ padding: '4px 12px', fontSize: '12px' }}
+                      onClick={() => {
+                        setConfirmAction(null);
+                        setResetConfirmInput('');
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="btn"
+                      disabled={resetConfirmInput.trim().toUpperCase() !== 'RESET EVERYTHING'}
+                      style={{
+                        padding: '4px 14px',
+                        fontSize: '12px',
+                        backgroundColor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? '#ef4444' : 'rgba(239, 68, 68, 0.25)',
+                        color: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
+                        border: 'none',
+                        fontWeight: 600,
+                        cursor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING' ? 'pointer' : 'not-allowed',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onClick={() => {
+                        if (resetConfirmInput.trim().toUpperCase() !== 'RESET EVERYTHING') return;
+                        setConfirmAction(null);
+                        setResetConfirmInput('');
+                        onResetDeckToDefaults();
+                        showToast('Deck progress reset to defaults');
+                      }}
+                    >
+                      Yes, Reset Everything
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

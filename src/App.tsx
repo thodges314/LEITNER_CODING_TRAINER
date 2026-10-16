@@ -39,7 +39,6 @@ import {
   Plus,
   Zap,
   Sparkles,
-  RotateCcw,
   Crosshair,
   ShieldCheck,
 } from 'lucide-react';
@@ -484,26 +483,41 @@ export function App() {
           width: '100%',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-dim)' }}>
-          <span>Deliberate Cold-Start Practice</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
+          <span>© {new Date().getFullYear()} Thomas Hodges</span>
+          <span style={{ color: 'var(--border-medium)' }}>•</span>
+          <span style={{ color: 'var(--text-dim)' }}>Deliberate Cold-Start Practice</span>
         </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <button
-            onClick={handleResetDeckToDefaults}
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '12px' }}>
+          <a
+            href="https://www.linkedin.com/in/thodges314"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-dim)',
-              fontSize: '12px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+              transition: 'color 0.15s ease',
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
           >
-            <RotateCcw size={12} /> Reset to Defaults
-          </button>
-          <span>Offline-Capable SPA</span>
+            LinkedIn
+          </a>
+          <span style={{ color: 'var(--border-medium)' }}>•</span>
+          <a
+            href="https://github.com/thodges314"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'var(--text-secondary)',
+              textDecoration: 'none',
+              transition: 'color 0.15s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+          >
+            GitHub
+          </a>
         </div>
       </footer>
 
@@ -534,6 +548,7 @@ export function App() {
           currentAlgorithm={algorithm}
           onAlgorithmChange={handleAlgorithmChange}
           onSettingsSaved={() => setAiSettingsVersion((v) => v + 1)}
+          onResetDeckToDefaults={handleResetDeckToDefaults}
         />
       )}
     </div>

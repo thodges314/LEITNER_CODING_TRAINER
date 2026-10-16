@@ -710,7 +710,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 fontWeight: 600,
                 fontSize: '12px',
                 padding: '4px 10px',
+                cursor: 'help',
               }}
+              title={`Subject Track: ${trackMeta.label} • Focus category for this coding challenge`}
             >
               {trackMeta.label}
             </span>

@@ -168,7 +168,7 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     border: 'rgba(99, 102, 241, 0.35)',
   },
   'collections-transformations': {
-    label: 'Collections',
+    label: 'Collections & Transforms',
     color: '#10b981',
     bg: 'rgba(16, 185, 129, 0.12)',
     border: 'rgba(16, 185, 129, 0.35)',
