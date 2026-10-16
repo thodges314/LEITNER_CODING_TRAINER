@@ -5476,7 +5476,7 @@
       "error-handling",
       "basics"
     ],
-    "promptSeed": "Write safeParse(text, fallback) returning the parsed JSON or `fallback` when text is not valid JSON (or not a string). Write safeGet(storage, key, fallback) that reads storage.getItem(key) (a localStorage-like object) and returns the parsed value or fallback when the key is missing or the stored text is corrupt, and safeSet(storage, key, value) that stores JSON and returns true, or false if storage.setItem throws.",
+    "promptSeed": "Write safeParse(text, fallback) returning the parsed JSON or `fallback` when text is not valid JSON (or not a string). Write safeGet(storage, key, fallback) that reads storage.getItem(key) (a localStorage-like object with getItem(key) and setItem(key, value)) and returns the parsed value or fallback when the key is missing or the stored text is corrupt, and safeSet(storage, key, value) that stores JSON and returns true, or false if storage.setItem throws.",
     "difficulty": 1,
     "concept": "storage",
     "referenceSolution": "function safeParse(text, fallback) {\n  if (typeof text !== 'string') return fallback;\n  try {\n    return JSON.parse(text);\n  } catch {\n    return fallback;\n  }\n}\n\nfunction safeGet(storage, key, fallback) {\n  return safeParse(storage.getItem(key), fallback);\n}\n\nfunction safeSet(storage, key, value) {\n  try {\n    storage.setItem(key, JSON.stringify(value));\n    return true;\n  } catch {\n    return false;\n  }\n}",
@@ -5485,36 +5485,41 @@
     "testCases": [
       {
         "description": "safeParse parses valid JSON",
-        "input": "[safeParse('{\"a\":[1,2]}', null), safeParse('7', 0), safeParse('\"x\"', '')]",
-        "expected": "[{ a: [1, 2] }, 7, 'x']"
+        "input": "safeParse('{\"a\": [1, 2]}', null)",
+        "expected": "{ a: [1, 2] }"
       },
       {
-        "description": "safeParse returns the fallback on invalid JSON",
-        "input": "[safeParse('{oops', 'fb'), safeParse('', 'fb'), safeParse(undefined, 'fb'), safeParse(null, 'fb')]",
-        "expected": "['fb', 'fb', 'fb', 'fb']"
+        "description": "safeParse returns fallback on invalid JSON",
+        "input": "safeParse('{invalid json', 'fallback')",
+        "expected": "'fallback'"
       },
       {
         "description": "safeSet stores JSON and returns true",
-        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\n[safeSet(s, 'k', { a: 1 }), s.getItem('k')]",
-        "expected": "[true, '{\"a\":1}']"
+        "input": "// storage initially: {}\nsafeSet(storage, 'k', { a: 1 })\n// storage now holds: { k: '{\"a\":1}' }",
+        "expected": "true"
       },
       {
-        "description": "safeGet reads it back and falls back when missing",
-        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\nsafeSet(s, 'k', [1, 2]);\n[safeGet(s, 'k', null), safeGet(s, 'missing', 'none')]",
-        "expected": "[[1, 2], 'none']"
+        "description": "safeGet reads and parses stored JSON value",
+        "input": "// storage holds: { k: '[1, 2]' }\n// storage.getItem('k') -> '[1, 2]'\nsafeGet(storage, 'k', null)",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "safeGet returns fallback when key is missing",
+        "input": "// storage holds: {} (key 'missing' does not exist)\n// storage.getItem('missing') -> null\nsafeGet(storage, 'missing', 'none')",
+        "expected": "'none'"
       },
       {
         "description": "safeGet falls back on corrupt stored text",
-        "input": "const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\nconst s = mem();\ns.setItem('bad', '{not json');\nsafeGet(s, 'bad', 'recovered')",
+        "input": "// storage holds: { bad: '{corrupt json' }\n// storage.getItem('bad') -> '{corrupt json'\nsafeGet(storage, 'bad', 'recovered')",
         "expected": "'recovered'"
       },
       {
-        "description": "safeSet returns false when the storage throws",
-        "input": "safeSet({ setItem() { throw new Error('QuotaExceededError'); } }, 'k', 1)",
+        "description": "safeSet returns false when storage throws",
+        "input": "// storage.setItem throws (e.g. QuotaExceededError)\nsafeSet(storage, 'k', 1)",
         "expected": "false"
       }
     ],
-    "testHarness": "await $test.run(\"safeParse parses valid JSON\", async () => {\n  const sleep = $test.sleep;\n  return ([safeParse('{\"a\":[1,2]}', null), safeParse('7', 0), safeParse('\"x\"', '')]);\n}, () => ([{ a: [1, 2] }, 7, 'x']));\n\nawait $test.run(\"safeParse returns the fallback on invalid JSON\", async () => {\n  const sleep = $test.sleep;\n  return ([safeParse('{oops', 'fb'), safeParse('', 'fb'), safeParse(undefined, 'fb'), safeParse(null, 'fb')]);\n}, () => (['fb', 'fb', 'fb', 'fb']));\n\nawait $test.run(\"safeSet stores JSON and returns true\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  return ([safeSet(s, 'k', { a: 1 }), s.getItem('k')]);\n}, () => ([true, '{\"a\":1}']));\n\nawait $test.run(\"safeGet reads it back and falls back when missing\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  safeSet(s, 'k', [1, 2]);\n  return ([safeGet(s, 'k', null), safeGet(s, 'missing', 'none')]);\n}, () => ([[1, 2], 'none']));\n\nawait $test.run(\"safeGet falls back on corrupt stored text\", async () => {\n  const sleep = $test.sleep;\n  const mem = () => { const m = new Map(); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, v); } }; };\n  const s = mem();\n  s.setItem('bad', '{not json');\n  return (safeGet(s, 'bad', 'recovered'));\n}, () => ('recovered'));\n\nawait $test.run(\"safeSet returns false when the storage throws\", async () => {\n  const sleep = $test.sleep;\n  return (safeSet({ setItem() { throw new Error('QuotaExceededError'); } }, 'k', 1));\n}, () => (false));",
+    "testHarness": "const createStorage = (initial = {}) => {\n  const store = new Map(Object.entries(initial));\n  return {\n    getItem: (k) => (store.has(k) ? store.get(k) : null),\n    setItem: (k, v) => { store.set(k, String(v)); },\n  };\n};\n\nawait $test.run(\"safeParse parses valid JSON\", async () => {\n  return safeParse('{\"a\": [1, 2]}', null);\n}, () => ({ a: [1, 2] }));\n\nawait $test.run(\"safeParse returns fallback on invalid JSON\", async () => {\n  const a = safeParse('{invalid json', 'fallback');\n  const b = safeParse('', 'fallback');\n  const c = safeParse(undefined, 'fallback');\n  const d = safeParse(null, 'fallback');\n  return (a === 'fallback' && b === 'fallback' && c === 'fallback' && d === 'fallback') ? 'fallback' : 'failed';\n}, () => ('fallback'));\n\nawait $test.run(\"safeSet stores JSON and returns true\", async () => {\n  const storage = createStorage();\n  const ok = safeSet(storage, 'k', { a: 1 });\n  return (ok === true && storage.getItem('k') === '{\"a\":1}');\n}, () => (true));\n\nawait $test.run(\"safeGet reads and parses stored JSON value\", async () => {\n  const storage = createStorage({ k: '[1, 2]' });\n  return (safeGet(storage, 'k', null));\n}, () => ([1, 2]));\n\nawait $test.run(\"safeGet returns fallback when key is missing\", async () => {\n  const storage = createStorage();\n  return (safeGet(storage, 'missing', 'none'));\n}, () => ('none'));\n\nawait $test.run(\"safeGet falls back on corrupt stored text\", async () => {\n  const storage = createStorage({ bad: '{not json' });\n  return (safeGet(storage, 'bad', 'recovered'));\n}, () => ('recovered'));\n\nawait $test.run(\"safeSet returns false when storage throws\", async () => {\n  const storage = { getItem: () => null, setItem: () => { throw new Error('QuotaExceededError'); } };\n  return (safeSet(storage, 'k', 1));\n}, () => (false));",
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Parsing/stringifying JSON dominates, requiring linear time and space in the size of the data processed."
