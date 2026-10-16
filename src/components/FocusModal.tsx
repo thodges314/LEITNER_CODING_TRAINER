@@ -14,23 +14,6 @@ interface FocusModalProps {
   onDeletePreset: (name: string) => void;
 }
 
-type Mode = 'include' | 'exclude' | 'off';
-
-/** Click cycles: neutral -> include -> exclude -> neutral. */
-const nextMode = (m: Mode): Mode => (m === 'off' ? 'include' : m === 'include' ? 'exclude' : 'off');
-
-function modeOf(value: string, include: string[], exclude: string[]): Mode {
-  return include.includes(value) ? 'include' : exclude.includes(value) ? 'exclude' : 'off';
-}
-
-function applyMode(value: string, mode: Mode, include: string[], exclude: string[]): [string[], string[]] {
-  const inc = include.filter((v) => v !== value);
-  const exc = exclude.filter((v) => v !== value);
-  if (mode === 'include') inc.push(value);
-  if (mode === 'exclude') exc.push(value);
-  return [inc, exc];
-}
-
 export const FocusModal: React.FC<FocusModalProps> = ({
   isOpen,
   onClose,
@@ -55,39 +38,58 @@ export const FocusModal: React.FC<FocusModalProps> = ({
 
   const active = topics.filter((t) => t.status === 'active');
   const matching = active.filter((t) => cardMatchesFilter(t, filter)).length;
-  const selectedTags = [...filter.includeTags, ...filter.excludeTags];
+  const selectedTags = filter.includeTags;
   const query = tagQuery.trim().toLowerCase();
   const visibleTags = Array.from(tagCounts.keys())
     .filter((tag) => selectedTags.includes(tag) || (query !== '' && tag.toLowerCase().includes(query)))
     .sort()
     .slice(0, 60);
 
-  const chip = (label: string, mode: Mode, onClick: () => void, color = '#38bdf8', count?: number) => (
+  const set = (patch: Partial<PracticeFilter>) => onChange({ ...filter, ...patch });
+
+  const toggleTrack = (track: string) => {
+    const isIncluded = filter.includeTracks.includes(track);
+    const inc = isIncluded
+      ? filter.includeTracks.filter((t) => t !== track)
+      : [...filter.includeTracks, track];
+    set({ includeTracks: inc, excludeTracks: [] });
+  };
+
+  const toggleTag = (tag: string) => {
+    const isIncluded = filter.includeTags.includes(tag);
+    const inc = isIncluded
+      ? filter.includeTags.filter((t) => t !== tag)
+      : [...filter.includeTags, tag];
+    set({ includeTags: inc, excludeTags: [] });
+  };
+
+  const chip = (label: string, isSelected: boolean, onClick: () => void, color = '#38bdf8', count?: number) => (
     <button
       key={label}
       type="button"
       onClick={onClick}
-      aria-pressed={mode !== 'off'}
-      title={mode === 'include' ? 'Included — click to exclude' : mode === 'exclude' ? 'Excluded — click to clear' : 'Click to include'}
+      aria-pressed={isSelected}
+      title={isSelected ? 'Included — click to remove from focus' : 'Click to include in focus'}
       style={{
         padding: '4px 10px',
         borderRadius: '999px',
         fontSize: '12px',
         cursor: 'pointer',
-        border: `1px solid ${mode === 'exclude' ? '#f87171' : mode === 'include' ? color : 'var(--border-medium)'}`,
-        background: mode === 'exclude' ? 'rgba(248,113,113,0.15)' : mode === 'include' ? `${color}26` : 'transparent',
-        color: mode === 'exclude' ? '#f87171' : mode === 'include' ? color : 'var(--text-primary)',
-        fontWeight: mode !== 'off' ? 600 : 500,
-        textDecoration: mode === 'exclude' ? 'line-through' : 'none',
+        border: `1px solid ${isSelected ? color : 'var(--border-medium)'}`,
+        background: isSelected ? `${color}26` : 'transparent',
+        color: isSelected ? color : 'var(--text-primary)',
+        fontWeight: isSelected ? 600 : 500,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '4px',
+        transition: 'all 0.15s ease',
       }}
     >
-      {mode === 'include' ? '✓ ' : mode === 'exclude' ? '✕ ' : ''}
-      {label}
-      {count !== undefined ? ` (${count})` : ''}
+      {isSelected && <span>✓</span>}
+      <span>{label}</span>
+      {count !== undefined ? <span style={{ opacity: isSelected ? 0.9 : 0.65 }}>({count})</span> : null}
     </button>
   );
-
-  const set = (patch: Partial<PracticeFilter>) => onChange({ ...filter, ...patch });
 
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="focus-title">
@@ -124,7 +126,7 @@ export const FocusModal: React.FC<FocusModalProps> = ({
                 Practice Focus
               </h2>
               <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                Click a chip to include it, again to exclude it, again to clear. Excluded cards keep their progress.
+                Select tracks, tags, or difficulty levels to focus your practice session.
               </p>
             </div>
           </div>
@@ -225,14 +227,11 @@ export const FocusModal: React.FC<FocusModalProps> = ({
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '18px' }}>
           {tracks.map((track) => {
             const meta = getTrackMeta(track);
-            const mode = modeOf(track, filter.includeTracks, filter.excludeTracks);
+            const isIncluded = filter.includeTracks.includes(track);
             return chip(
               meta.label,
-              mode,
-              () => {
-                const [inc, exc] = applyMode(track, nextMode(mode), filter.includeTracks, filter.excludeTracks);
-                set({ includeTracks: inc, excludeTracks: exc });
-              },
+              isIncluded,
+              () => toggleTrack(track),
               meta.color,
               topics.filter((t) => t.track === track).length
             );
@@ -266,14 +265,11 @@ export const FocusModal: React.FC<FocusModalProps> = ({
             <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Type to find tags; chosen tags stay listed here.</span>
           )}
           {visibleTags.map((tag) => {
-            const mode = modeOf(tag, filter.includeTags, filter.excludeTags);
+            const isIncluded = filter.includeTags.includes(tag);
             return chip(
               tag,
-              mode,
-              () => {
-                const [inc, exc] = applyMode(tag, nextMode(mode), filter.includeTags, filter.excludeTags);
-                set({ includeTags: inc, excludeTags: exc });
-              },
+              isIncluded,
+              () => toggleTag(tag),
               '#c084fc',
               tagCounts.get(tag)
             );
