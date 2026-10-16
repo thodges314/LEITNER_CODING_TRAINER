@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   X,
   Sliders,
@@ -10,6 +10,12 @@ import {
   Check,
   AlertTriangle,
   Timer,
+  Loader2,
+  RefreshCw,
+  Sparkles,
+  Coins,
+  Zap,
+  Cpu,
 } from 'lucide-react';
 import {
   getStoredApiKey,
@@ -25,6 +31,10 @@ import {
   clearStoredApiKey,
 } from '../lib/ai';
 import type { AIProvider } from '../lib/ai';
+import {
+  fetchProviderModels,
+} from '../lib/modelDiscovery';
+import type { DiscoveredModel, ProviderAccountInfo } from '../lib/modelDiscovery';
 import {
   getStoredAlgorithm,
   setStoredAlgorithm,
@@ -65,13 +75,75 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<'clear' | 'replace' | null>(null);
 
-  if (!isOpen) return null;
+  // Model & Provider Discovery State
+  const [discoveredModels, setDiscoveredModels] = useState<DiscoveredModel[]>([]);
+  const [accountInfo, setAccountInfo] = useState<ProviderAccountInfo | null>(null);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [modelDiscoveryError, setModelDiscoveryError] = useState<string | null>(null);
+  const [customModelMode, setCustomModelMode] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     onSettingsSaved?.();
     setTimeout(() => setToastMessage(null), 2500);
   };
+
+  const queryModels = useCallback(async (prov: AIProvider, keyToUse: string, customUrl?: string) => {
+    setIsLoadingModels(true);
+    setModelDiscoveryError(null);
+    try {
+      const res = await fetchProviderModels(prov, keyToUse, customUrl || baseUrl);
+      if (res.error) {
+        setModelDiscoveryError(res.error);
+        setDiscoveredModels([]);
+        setAccountInfo(null);
+      } else {
+        setDiscoveredModels(res.models);
+        setAccountInfo(res.accountInfo || null);
+        setModelDiscoveryError(null);
+        // If current model is empty, select top recommended model
+        if (res.models.length > 0 && !customModelMode) {
+          const currentMatches = res.models.some((m) => m.id === model);
+          if (!currentMatches) {
+            const topModel = res.models[0].id;
+            setModel(topModel);
+            setStoredModel(topModel);
+            onSettingsSaved?.();
+          }
+        }
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setModelDiscoveryError(msg);
+    } finally {
+      setIsLoadingModels(false);
+    }
+  }, [baseUrl, customModelMode, model, onSettingsSaved]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let active = true;
+    const currentKey = getStoredApiKey(provider);
+
+    if (!currentKey && provider !== 'openrouter' && !(provider === 'custom' && baseUrl)) {
+      queueMicrotask(() => {
+        if (!active) return;
+        setDiscoveredModels([]);
+        setAccountInfo(null);
+        setModelDiscoveryError(null);
+      });
+      return;
+    }
+
+    queueMicrotask(() => {
+      if (!active) return;
+      queryModels(provider, currentKey, baseUrl);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [isOpen, provider, baseUrl, queryModels]);
 
   const handleSelectAlgorithm = (algo: SpacedAlgorithm) => {
     setAlgorithm(algo);
@@ -112,6 +184,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setStoredKeys(getAllStoredKeys());
     setConfirmAction(null);
     showToast(`Provider switched to ${p.toUpperCase()}`);
+
+    if (provKey || p === 'openrouter' || (p === 'custom' && baseUrl)) {
+      queryModels(p, provKey, baseUrl);
+    } else {
+      setDiscoveredModels([]);
+      setAccountInfo(null);
+      setModelDiscoveryError(null);
+    }
   };
 
   const handleModelChange = (val: string) => {
@@ -124,6 +204,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setBaseUrl(val);
     setStoredBaseUrl(val);
     onSettingsSaved?.();
+    if (provider === 'custom') {
+      queryModels('custom', apiKey, val);
+    }
   };
 
   const handleSaveKeyClick = () => {
@@ -149,12 +232,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setConfirmAction(null);
 
     const detected = detectProviderFromKey(trimmed);
+    const activeProv = detected || provider;
     if (detected && detected !== provider) {
       handleSelectProvider(detected);
       return;
     }
 
     showToast(apiKey ? `${provider.toUpperCase()} key replaced` : `${provider.toUpperCase()} key saved`);
+    queryModels(activeProv, trimmed, baseUrl);
   };
 
   const handleClearKeyClick = () => {
@@ -167,10 +252,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setKeyInput('');
     setStoredKeys(getAllStoredKeys());
     setConfirmAction(null);
+    setDiscoveredModels([]);
+    setAccountInfo(null);
+    setModelDiscoveryError(null);
     showToast(`${provider.toUpperCase()} key cleared`);
   };
 
   const isKeyModified = keyInput.trim() !== apiKey;
+
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="settings-title">
@@ -652,19 +742,312 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </p>
           </div>
 
-          {/* Model name */}
+          {/* Provider Quota & Account Capabilities Banner */}
+          {(accountInfo || isLoadingModels || modelDiscoveryError) && (
+            <div
+              style={{
+                padding: '12px 14px',
+                borderRadius: '8px',
+                backgroundColor: modelDiscoveryError ? 'rgba(244, 63, 94, 0.08)' : 'rgba(56, 189, 248, 0.06)',
+                border: modelDiscoveryError ? '1px solid rgba(244, 63, 94, 0.25)' : '1px solid rgba(56, 189, 248, 0.2)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                  {isLoadingModels ? (
+                    <Loader2 size={14} className="animate-spin" color="#38bdf8" />
+                  ) : modelDiscoveryError ? (
+                    <AlertTriangle size={14} color="#f43f5e" />
+                  ) : (
+                    <Cpu size={14} color="#38bdf8" />
+                  )}
+                  <span style={{ fontSize: '12.5px', fontWeight: 600, color: modelDiscoveryError ? '#f43f5e' : 'var(--text-primary)' }}>
+                    {isLoadingModels
+                      ? `Querying ${provider.toUpperCase()} for available models...`
+                      : modelDiscoveryError
+                      ? 'Model Discovery Notice'
+                      : accountInfo?.tier || `${provider.toUpperCase()} Capabilities`}
+                  </span>
+                </div>
+
+                {accountInfo && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    {accountInfo.totalModelsFound !== undefined && (
+                      <span
+                        style={{
+                          fontSize: '11px',
+                          padding: '2px 7px',
+                          borderRadius: '12px',
+                          backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                          color: '#38bdf8',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {accountInfo.totalModelsFound} models
+                        {accountInfo.freeModelsCount ? ` (${accountInfo.freeModelsCount} free)` : ''}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {modelDiscoveryError && (
+                <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.45 }}>
+                  {modelDiscoveryError} You can still enter your model identifier manually below.
+                </p>
+              )}
+
+              {accountInfo && !isLoadingModels && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+                  {accountInfo.creditsRemaining && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <Coins size={12} color="#34d399" />
+                      <strong style={{ color: '#34d399' }}>{accountInfo.creditsRemaining}</strong>
+                    </span>
+                  )}
+                  {accountInfo.tokensRemaining && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <Zap size={12} color="#f59e0b" />
+                      <span>{accountInfo.tokensRemaining}</span>
+                    </span>
+                  )}
+                  {accountInfo.rateLimitSummary && (
+                    <span style={{ color: 'var(--text-muted)' }}>
+                      • {accountInfo.rateLimitSummary}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Model Selection & Capabilities */}
           <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, marginBottom: '6px' }}>
-              Model Identifier
-            </label>
-            <input
-              type="text"
-              placeholder={provider === 'gemini' ? 'gemini-2.5-flash' : 'gpt-4o-mini'}
-              value={model}
-              onChange={(e) => handleModelChange(e.target.value)}
-              className="code-buffer"
-              style={{ height: '40px', padding: '10px 12px', fontSize: '13px' }}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Sparkles size={14} color="var(--accent-purple)" />
+                Model Selection
+              </label>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {discoveredModels.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomModelMode(!customModelMode)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--accent-cyan)',
+                      fontSize: '11.5px',
+                      cursor: 'pointer',
+                      padding: '2px 4px',
+                    }}
+                  >
+                    {customModelMode ? 'Choose from list' : 'Custom model ID'}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => queryModels(provider, apiKey, baseUrl)}
+                  disabled={isLoadingModels || (!apiKey && provider !== 'openrouter' && provider !== 'custom')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-secondary)',
+                    fontSize: '11.5px',
+                    cursor: (isLoadingModels || (!apiKey && provider !== 'openrouter' && provider !== 'custom')) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    opacity: (isLoadingModels || (!apiKey && provider !== 'openrouter' && provider !== 'custom')) ? 0.5 : 1,
+                  }}
+                  title="Refresh model list from provider"
+                >
+                  <RefreshCw size={11} className={isLoadingModels ? 'animate-spin' : ''} />
+                  Refresh
+                </button>
+              </div>
+            </div>
+
+            {discoveredModels.length > 0 && !customModelMode ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <select
+                  value={model}
+                  onChange={(e) => handleModelChange(e.target.value)}
+                  className="code-buffer"
+                  style={{
+                    height: '42px',
+                    padding: '8px 12px',
+                    fontSize: '13px',
+                    backgroundColor: 'var(--bg-surface)',
+                    color: 'var(--text-primary)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-subtle)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {/* Recommended Models */}
+                  {discoveredModels.some((m) => m.recommended) && (
+                    <optgroup label="🌟 Recommended for Cold-Start Practice">
+                      {discoveredModels
+                        .filter((m) => m.recommended)
+                        .map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.name} ({m.id}) {m.isFree ? '• [FREE]' : ''} {m.contextWindow ? `• ${Math.round(m.contextWindow / 1000)}k ctx` : ''}
+                          </option>
+                        ))}
+                    </optgroup>
+                  )}
+
+                  {/* Free Models not in recommended */}
+                  {discoveredModels.some((m) => m.isFree && !m.recommended) && (
+                    <optgroup label="🆓 Free Tier Models">
+                      {discoveredModels
+                        .filter((m) => m.isFree && !m.recommended)
+                        .map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.name} ({m.id}) • [FREE] {m.contextWindow ? `• ${Math.round(m.contextWindow / 1000)}k ctx` : ''}
+                          </option>
+                        ))}
+                    </optgroup>
+                  )}
+
+                  {/* All Other Models */}
+                  {discoveredModels.some((m) => !m.recommended && !m.isFree) && (
+                    <optgroup label="📚 All Available Models">
+                      {discoveredModels
+                        .filter((m) => !m.recommended && !m.isFree)
+                        .map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.name} ({m.id}) {m.contextWindow ? `• ${Math.round(m.contextWindow / 1000)}k ctx` : ''}
+                          </option>
+                        ))}
+                    </optgroup>
+                  )}
+                </select>
+
+                {/* Selected Model Capability Preview Badge */}
+                {(() => {
+                  const activeModel = discoveredModels.find((m) => m.id === model);
+                  if (!activeModel) return null;
+                  return (
+                    <div
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: '6px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                        border: '1px solid rgba(255, 255, 255, 0.06)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '6px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 600, color: '#f1f5f9' }}>
+                            {activeModel.name}
+                          </span>
+                          <span style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>
+                            by {activeModel.ownedBy}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          {activeModel.recommended && (
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                padding: '1px 6px',
+                                borderRadius: '4px',
+                                backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                                color: '#c084fc',
+                                fontWeight: 600,
+                              }}
+                            >
+                              Recommended
+                            </span>
+                          )}
+                          {activeModel.isFree ? (
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                padding: '1px 6px',
+                                borderRadius: '4px',
+                                backgroundColor: 'rgba(52, 211, 153, 0.2)',
+                                color: '#34d399',
+                                fontWeight: 700,
+                              }}
+                            >
+                              FREE
+                            </span>
+                          ) : (
+                            activeModel.pricing && (
+                              <span
+                                style={{
+                                  fontSize: '10px',
+                                  padding: '1px 6px',
+                                  borderRadius: '4px',
+                                  backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                                  color: 'var(--text-secondary)',
+                                }}
+                              >
+                                Paid
+                              </span>
+                            )
+                          )}
+                          {activeModel.contextWindow && (
+                            <span
+                              style={{
+                                fontSize: '10px',
+                                padding: '1px 6px',
+                                borderRadius: '4px',
+                                backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                                color: '#38bdf8',
+                              }}
+                            >
+                              {Math.round(activeModel.contextWindow / 1000)}k context
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {activeModel.description && (
+                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                          {activeModel.description.length > 160 ? `${activeModel.description.slice(0, 160)}...` : activeModel.description}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            ) : (
+              <div>
+                <input
+                  type="text"
+                  placeholder={
+                    provider === 'gemini'
+                      ? 'gemini-2.5-flash'
+                      : provider === 'groq'
+                      ? 'llama-3.3-70b-versatile'
+                      : provider === 'openrouter'
+                      ? 'google/gemini-2.5-flash'
+                      : 'gpt-4o-mini'
+                  }
+                  value={model}
+                  onChange={(e) => handleModelChange(e.target.value)}
+                  className="code-buffer"
+                  style={{ height: '40px', padding: '10px 12px', fontSize: '13px' }}
+                />
+                <span style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '4px', display: 'block' }}>
+                  {discoveredModels.length > 0
+                    ? 'Custom mode enabled. Type any model identifier supported by your endpoint.'
+                    : apiKey
+                    ? 'Click "Refresh" above to discover models from this provider, or type manually.'
+                    : 'Save an API key above to automatically query and populate available models.'}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Custom base URL if needed */}
