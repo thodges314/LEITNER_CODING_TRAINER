@@ -43,6 +43,9 @@ export interface TopicItem {
   solution?: string;
   referenceSolution?: string;
   testCases?: TestCaseItem[];
+  targetTime?: string;
+  targetSpace?: string;
+  complexityExplanation?: string;
 }
 
 /**
@@ -392,6 +395,9 @@ const SEED_CONTENT_FIELDS = [
   'solution',
   'referenceSolution',
   'testCases',
+  'targetTime',
+  'targetSpace',
+  'complexityExplanation',
 ] as const;
 
 /**
@@ -942,6 +948,9 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     solution: optionalString(item.solution),
     referenceSolution: optionalString(item.referenceSolution),
     testCases: parseTestCases(item.testCases),
+    targetTime: optionalString(item.targetTime),
+    targetSpace: optionalString(item.targetSpace),
+    complexityExplanation: optionalString(item.complexityExplanation),
     };
   });
 

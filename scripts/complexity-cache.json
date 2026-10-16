@@ -1,0 +1,597 @@
+{
+  "async-fetch-error-handling": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Parsing response JSON dominates, requiring linear time and space."
+  },
+  "fetch-abort-controller": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Constant-time setup and cleanup around an async fetch."
+  },
+  "promise-chaining-syntax": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Parsing fetched JSON dominates time and memory."
+  },
+  "promise-all-vs-settled": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each URL is processed once, requiring linear work and storage."
+  },
+  "debounce-implementation": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Constant-time timer operations and state storage."
+  },
+  "event-loop-microtasks": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Fixed number of constant-time queue scheduling operations."
+  },
+  "map-frequency-counter": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each element processed once with constant-time Map operations."
+  },
+  "throttle-implementation": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Constant-time flag checks and timer management."
+  },
+  "set-unique-operations": {
+    "targetTime": "O(n + m)",
+    "targetSpace": "O(n + m)",
+    "complexityExplanation": "Scans both input collections once and stores unique elements."
+  },
+  "custom-array-reduce": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Iterates each element once with constant extra memory."
+  },
+  "array-flatten-recursive": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Visits each element once and produces a flat array."
+  },
+  "object-deep-clone": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Visits each property once to clone, linear in total elements."
+  },
+  "lru-cache-implementation": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(capacity)",
+    "complexityExplanation": "Hash map lookups with doubly linked list updates yield O(1) ops."
+  },
+  "hook-use-debounce": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each render schedules a single timeout and clears the previous one."
+  },
+  "hook-use-previous": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Effect and ref updates run in constant time."
+  },
+  "use-reducer-todo-list": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Reducer actions scan and copy the todo list of size n."
+  },
+  "infinite-scroll-observer": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "IntersectionObserver setup and callback perform constant work."
+  },
+  "context-provider-consumer": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Constant-time React Context state access and update."
+  },
+  "currying-function": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "The curried function aggregates at most fn.length arguments and invokes fn once, requiring linear time and linear auxiliary space in the number of parameters."
+  },
+  "hook-fetch-cleanup": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "The hook’s own operations are constant‑time, while storing the fetched payload requires space proportional to the response size"
+  },
+  "controlled-vs-uncontrolled-input": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each render and event handling performs constant‑time work and stores only a single query string in state."
+  },
+  "two-pointer-sorted-sum": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Two pointers traverse the array at most once, giving linear time and constant extra space."
+  },
+  "sliding-window-dynamic": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "A sliding window with a hash map updates start index in constant time per character, scanning the string once."
+  },
+  "sliding-window-fixed": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Uses a sliding window to maintain the sum of k elements, updating it in O(1) per step"
+  },
+  "valid-parentheses-stack": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Iterates once over the string, pushing and popping each character at most once, using a stack up to the string length."
+  },
+  "binary-search-exact": {
+    "targetTime": "O(log n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Binary search halves the search interval each iteration, yielding logarithmic time while using only a few scalar variables for constant space."
+  },
+  "tree-level-order-bfs": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each node is enqueued, processed, and dequeued once, and the queue plus result storage can hold up to all nodes in the worst case."
+  },
+  "merge-intervals": {
+    "targetTime": "O(n log n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Sorting the intervals dominates with O(n log n) time, then a single linear pass merges them using only O(1) extra space beyond the output list."
+  },
+  "debounce": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each call only updates a few variables and (re)sets a timer, using constant extra memory regardless of input size."
+  },
+  "throttle": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each call performs a constant amount of arithmetic and at most one timer operation, using only a fixed set of stored variables."
+  },
+  "memoize": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each call performs constant‑time map lookups/inserts, while the cache grows linearly with the number of distinct keys stored."
+  },
+  "bind-call-apply": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "All polyfills perform a constant amount of work (property definition, Symbol creation, and a single function invocation) and use only constant extra space beyond the supplied arguments."
+  },
+  "deep-clone": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each reachable element is visited once, and a WeakMap of size proportional to the number of objects stores the cloned references."
+  },
+  "event-emitter": {
+    "targetTime": "O(1) average for on/off/once, O(N) for emit",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Listeners are kept in per‑event collections enabling constant‑time registration/removal, while emitting must iterate over all listeners of the event."
+  },
+  "curry-compose": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "curry gathers up to fn.length arguments in linear time/space, while pipe/compose each traverse their function list once, adding only O(1) extra space."
+  },
+  "promise-all-polyfill": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each function iterates the iterable once, storing at most one result per element (or none for race), yielding linear time and linear auxiliary space."
+  },
+  "promise-pool": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each task is started once and its result stored, yielding linear time and linear space proportional to the number of tasks."
+  },
+  "retry-with-backoff": {
+    "targetTime": "O(retries)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Performs at most retries+1 sequential attempts, each constant‑time, giving linear time in the retry count and constant auxiliary space."
+  },
+  "fetch-timeout-dedupe": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Map lookup/insertion and timeout setup are constant‑time, and only one promise per key is stored, yielding O(1) time and O(1) extra space per call."
+  },
+  "async-queue-scheduler": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each add attaches a constant‑size closure to the promise chain in constant time, storing one promise per queued task, yielding O(1) per operation and O(N) total space."
+  },
+  "express-middleware-chain": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each middleware is invoked at most once in order, giving linear time, and the stored stack of N handlers dominates the linear space usage."
+  },
+  "rate-limiter-middleware": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each request updates only its client’s bucket and lazily evicts stale entries in O(1) amortized time, while storing one bucket per active client."
+  },
+  "lru-cache-ttl": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Uses a hash map for key lookup and a linked ordering structure to move entries, giving constant‑time get/set while storing at most the cache capacity."
+  },
+  "flatten-array-object": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Both functions visit each element/property once and build a new structure of the same size, using recursion depth proportional to nesting."
+  },
+  "group-by-count-by": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each function scans the input once, building a result object whose size grows proportionally to the number of items."
+  },
+  "array-method-polyfills": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each polyfill scans the array once (linear time); map and filter allocate a new array up to the input length (linear space), while reduce uses only constant extra space."
+  },
+  "get-set-path": {
+    "targetTime": "O(p)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both get and set traverse the path once, performing constant‑time work per segment and using only a few scalar variables."
+  },
+  "deep-equal": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each value is visited once, with recursion depth and WeakMap size proportional to the total number of elements compared."
+  },
+  "unique-sort-dedupe": {
+    "targetTime": "O(N log N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Deduplication uses a single pass Map (O(N) time, O(N) space) and the final stable sort dominates with O(N log N) time while retaining linear extra space."
+  },
+  "use-debounce-hook": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both hooks perform constant‑time updates and keep only a few scalar state/ref values, resulting in O(1) time per render/effect and O(1) additional space."
+  },
+  "use-fetch-hook": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each fetch triggers one network request and constant‑time state updates, with only constant‑size bookkeeping aside from the returned data."
+  },
+  "typeahead-autocomplete": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Debounced input handling is O(1) per keystroke, while rendering and storing the suggestion list scales linearly with the number of returned suggestions."
+  },
+  "use-previous-latest-ref": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "All hooks perform constant‑time operations and store only a single ref, yielding O(1) time and O(1) space."
+  },
+  "infinite-scroll-list": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Rendering the list scales linearly with the number of items, while the IntersectionObserver and state use constant additional space"
+  },
+  "modal-portal-focus": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Operations scale linearly with the number of focusable elements in the dialog, while extra memory usage remains constant."
+  },
+  "todo-list-reducer": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Using an immutable map keyed by id lets each reducer action (add, toggle, edit, delete, set filter) run in constant time, while the overall state size grows linearly with the number of todos."
+  },
+  "tabs-accordion-compound": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Selecting/focusing a tab and rendering the active panel are constant‑time operations, while storing the list of tabs/panels requires linear space in the number of tabs."
+  },
+  "two-sum-hashmap": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "A single linear scan with a hash map provides constant‑time complement lookups, yielding linear time and linear extra space."
+  },
+  "tree-traversal-dom": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each operation visits every node at most once, using linear time and linear extra space for recursion/stack or result storage."
+  },
+  "interval-merge-sliding-window": {
+    "targetTime": "O(n log n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Sorting intervals dominates with O(n log n) time and linear extra space, while the sliding‑window runs in O(m) time and O(m) space, both bounded by O(n) overall."
+  },
+  "ts-discriminated-unions-exhaustiveness": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "The function performs a constant-time switch and string interpolation, with no allocation beyond fixed-size values."
+  },
+  "ts-generic-api-client": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Parsing the JSON response and constructing the typed object scales linearly with the size of the payload."
+  },
+  "ts-custom-utility-types": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Type-level recursion processes each property once, yielding linear time and space in the total number of properties."
+  },
+  "ts-generic-component-props": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Linear time to map each item to its label and join, with linear auxiliary space for the intermediate label array."
+  },
+  "ts-custom-type-guards": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both functions perform a fixed number of constant‑time operations and use only constant extra space."
+  },
+  "ts-typed-event-emitter": {
+    "targetTime": "O(1) average for registration, O(L) for emission",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Listeners are stored in a hash map allowing constant‑time registration and linear‑time dispatch over the listeners of the emitted event."
+  },
+  "classnames-utility": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Processes each element (including nested array items and object keys) once, building the output list, yielding linear time and space proportional to the total number of class names."
+  },
+  "closures-private-state": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Creating n adder functions requires linear time and space, while the other closures run in constant time and space."
+  },
+  "css-specificity": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "A single linear scan of the selector string with constant‑size counters yields the specificity, giving linear time and constant auxiliary space."
+  },
+  "format-utilities": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each formatter processes its input in a single pass (digits for numbers/bytes, characters for truncate), giving linear time in input size and only constant extra space."
+  },
+  "infinite-currying-sum": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each number is processed once across the chain, giving linear time, and a new closure is created per call, leading to linear space in the chain length."
+  },
+  "iterators-generators": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each lazy iterator yields each element in constant time and uses only constant auxiliary space, so producing n items costs O(n) time and O(1) extra space."
+  },
+  "json-stringify-polyfill": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Linear traversal of all values with a recursion stack/seen set proportional to the input size"
+  },
+  "new-instanceof-create": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "All operations are constant‑time except myInstanceOf, which may traverse the prototype chain linearly."
+  },
+  "promise-class-scratch": {
+    "targetTime": "O(1) amortized per method (settling callbacks O(k))",
+    "targetSpace": "O(1) per promise plus O(k) for stored callbacks",
+    "complexityExplanation": "Core methods run in constant time and space, only the list of registered then handlers grows linearly with the number of handlers"
+  },
+  "promisify-callback": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "The wrapper adds constant‑time overhead (creating a Promise and invoking the callback) independent of the original function's work."
+  },
+  "query-string-url": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Both functions scan each character of the input once (or each key/value once) and build output proportional to the total input size."
+  },
+  "client-side-router": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Both matching and routing scan the path segments linearly, using proportional auxiliary arrays and a params map."
+  },
+  "event-delegation": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each event traverses up the DOM tree with closest, taking time proportional to the tree depth (worst‑case linear in element count) while using only constant extra space."
+  },
+  "storage-ttl-wrapper": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Core operations (set, get, remove) run in constant time and use constant extra space; only namespace enumeration (keys/clear) requires linear time and space proportional to the number of stored entries."
+  },
+  "vnode-to-dom": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Traverses each virtual node once with constant work per node, using recursion depth up to the tree height."
+  },
+  "error-boundary-reset": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Time is linear in the length of resetKeys because the component compares each element on updates; space usage remains constant."
+  },
+  "external-store-hook": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "setState performs a shallow merge and change detection over all state keys, requiring linear time and linear auxiliary space proportional to the number of stored properties."
+  },
+  "forward-ref-imperative-handle": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "All operations (rendering, ref methods) run in constant time and use constant additional space regardless of input size"
+  },
+  "memo-stable-callbacks": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Rendering the list iterates over each item once, giving linear time and linear space proportional to the number of items, while memoization prevents extra renders."
+  },
+  "on-click-outside-hook": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each event handler runs in constant time checking the ref and invoking the latest handler, and the hook maintains only constant‑size references."
+  },
+  "use-local-storage-hook": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each hook operation reads or writes a single localStorage key and parses/stringifies its value, which are constant‑time and constant‑space actions independent of input size."
+  },
+  "bind-method-partial": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both functions create a constant‑size closure and invoke the underlying function with a simple argument spread, yielding constant time and space per operation."
+  },
+  "callback-emitter": {
+    "targetTime": "O(k)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "on registers in O(1) time and emit iterates over the k listeners of the event, using O(k) time, while storing all listeners requires O(N) space overall."
+  },
+  "fifo-cache": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "All operations run in constant time using a hash map with insertion‑order tracking, while storing at most the fixed capacity of entries."
+  },
+  "focus-on-mount": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both mounting/rendering and the useRef hook allocate constant time and space regardless of input size."
+  },
+  "interval-overlap": {
+    "targetTime": "O(N log N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Sorting the intervals dominates, yielding O(N log N) time and O(N) auxiliary space."
+  },
+  "memoize-basics": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each call runs in O(1) time via Map lookup/insertion, using O(N) space for distinct arguments (memoizeLast only needs O(1) space)."
+  },
+  "parse-path-params": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "The function splits both strings and then scans the segment arrays once, giving linear time and space proportional to the number of characters/segments."
+  },
+  "parse-style-string": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Both functions traverse the input strings once and construct output structures whose size grows linearly with the number of characters/declarations."
+  },
+  "run-in-sequence": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Both functions handle n tasks, needing O(n) time to start/await them and O(n) space to store the ordered results."
+  },
+  "safe-json-storage": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Parsing/stringifying JSON dominates, requiring linear time and space in the size of the data processed."
+  },
+  "shallow-copy-equal": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both shallowCopy and shallowEqual require linear time in the number of items/properties, while shallowEqual can be done with only constant extra space."
+  },
+  "sleep-and-delay": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "All functions perform only constant‑time operations (creating a Promise, setting a timer, and reading timestamps) and use only constant extra space."
+  },
+  "tree-depth-sum": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(H)",
+    "complexityExplanation": "Each function traverses every node exactly once, with recursion depth proportional to the tree height."
+  },
+  "countdown-component": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each tick updates state in constant time, and the component stores only a few scalar values, yielding linear time over the number of ticks and constant auxiliary space."
+  },
+  "file-explorer-tree": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each node is visited once during rendering and each folder stores a constant‑size open flag, yielding linear time and space in the total number of nodes."
+  },
+  "star-rating-component": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Rendering and handling N stars requires linear time and space proportional to the max prop"
+  },
+  "a11y-form-field": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both components perform a constant amount of work independent of input size."
+  },
+  "accordion-component": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Both rendering and state updates scan at most all items, requiring linear time and storing up to N open identifiers, thus linear space."
+  },
+  "filter-list": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each render filters the full items array once, scanning all N elements and allocating a new array of matching items."
+  },
+  "load-more-list": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each fetched item is processed and stored exactly once, giving linear total time and linear memory for the accumulated list."
+  },
+  "simple-error-boundary": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Rendering traverses the child tree once, using constant extra state for error tracking"
+  },
+  "use-toggle-counter": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both hooks perform constant‑time state updates and maintain only a few scalar values, requiring O(1) time per operation and O(1) auxiliary space."
+  },
+  "data-table": {
+    "targetTime": "O(N log N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Filtering scans all rows (O(N M)) and sorting the filtered rows dominates with O(N log N) time, using O(N) extra space for the filtered/sorted list."
+  },
+  "dropdown-menu": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Scanning or caching enabled items needs linear time/space in the number of items, while each interaction (focus move, select, close) operates in O(1)"
+  },
+  "form-state-hook": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Each handler creates a shallow copy of the values/touched objects, costing linear time and space in the number of form fields."
+  },
+  "memo-derived-list": {
+    "targetTime": "O(n log n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Sorting a copy of the items array costs O(n log n) time and O(n) extra space, and useMemo avoids recomputation on unrelated state changes."
+  },
+  "simple-table": {
+    "targetTime": "O(R × C)",
+    "targetSpace": "O(R × C)",
+    "complexityExplanation": "The table renders each column header once and each cell once, requiring R*C cell operations plus O(C) header work."
+  },
+  "undo-redo-hook": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "All operations (set, undo, redo) manipulate only the ends of bounded past/future buffers, giving constant‑time work while storing at most limit states, i.e., linear space in the limit."
+  },
+  "virtual-list": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Computes visible range in constant time and renders only a constant‑size window of items regardless of total list length"
+  },
+  "image-carousel": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(N)",
+    "complexityExplanation": "Slide navigation and autoplay update state in constant time, while rendering requires linear space for the N dot buttons."
+  },
+  "optimistic-like-button": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each click performs a constant‑time state update and a single async call, with only constant‑size state stored in the component."
+  },
+  "toast-queue": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "All operations (show, dismiss, render) handle at most a fixed limit of toasts, so they run in constant time and use constant extra space."
+  }
+}

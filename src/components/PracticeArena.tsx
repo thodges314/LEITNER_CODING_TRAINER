@@ -18,6 +18,7 @@ import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
 import {
   Timer,
+  Clock,
   Play,
   Pause,
   RotateCcw,
@@ -726,6 +727,32 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Target Complexity Goal Badge */}
+            {(currentCard.targetTime || currentCard.targetSpace) && (
+              <div
+                className="badge"
+                style={{
+                  backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                  border: '1px solid rgba(56, 189, 248, 0.25)',
+                  color: 'var(--text-secondary)',
+                  padding: '4px 8px',
+                  fontSize: '11.5px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                }}
+                title={currentCard.complexityExplanation ? `Target Complexity: ${currentCard.complexityExplanation}` : 'Target complexity goal'}
+              >
+                <Clock size={12} color="#38bdf8" />
+                <span>
+                  Goal: <strong style={{ color: 'var(--accent-cyan)' }}>{currentCard.targetTime || 'O(1)'}</strong>
+                  {currentCard.targetSpace && (
+                    <> • <strong style={{ color: 'var(--accent-purple)' }}>{currentCard.targetSpace}</strong></>
+                  )}
+                </span>
+              </div>
+            )}
 
             {/* Streak Badge */}
             <div

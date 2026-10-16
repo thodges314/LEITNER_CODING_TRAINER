@@ -307,16 +307,18 @@ function heuristicEvaluateCode(topic: TopicItem, code: string, harness?: Harness
     }
   }
 
-  let timeComplexity = 'O(n)';
-  let spaceComplexity = 'O(1)';
-  if (topic.id.includes('binary-search')) {
-    timeComplexity = 'O(log n)';
-  } else if (topic.id.includes('matrix') || topic.id.includes('lru')) {
-    timeComplexity = 'O(1) operations';
-    spaceComplexity = 'O(capacity)';
-  } else if (topic.id.includes('flatten') || topic.id.includes('tree') || topic.id.includes('bfs') || topic.id.includes('dfs')) {
-    timeComplexity = 'O(n)';
-    spaceComplexity = 'O(h) recursion/queue';
+  let timeComplexity = topic.targetTime || 'O(n)';
+  let spaceComplexity = topic.targetSpace || 'O(1)';
+  if (!topic.targetTime) {
+    if (topic.id.includes('binary-search')) {
+      timeComplexity = 'O(log n)';
+    } else if (topic.id.includes('matrix') || topic.id.includes('lru')) {
+      timeComplexity = 'O(1) operations';
+      spaceComplexity = 'O(capacity)';
+    } else if (topic.id.includes('flatten') || topic.id.includes('tree') || topic.id.includes('bfs') || topic.id.includes('dfs')) {
+      timeComplexity = 'O(n)';
+      spaceComplexity = 'O(h) recursion/queue';
+    }
   }
 
   return {
@@ -365,6 +367,7 @@ export async function evaluateCodeSubmission(
     const userPrompt = `Topic: ${topic.title} (Track: ${topic.track})
 ID: ${topic.id}
 Language: ${languageLabel}
+${topic.targetTime || topic.targetSpace ? `Target Complexity Goals: Time: ${topic.targetTime || 'O(n)'}, Space: ${topic.targetSpace || 'O(1)'}` : ''}
 Instructions & Invariants:
 ${topic.promptSeed}
 

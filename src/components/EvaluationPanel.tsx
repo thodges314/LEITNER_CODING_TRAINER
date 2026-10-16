@@ -179,7 +179,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
           </div>
 
           {/* Complexity Badges */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             <div
               className="badge"
               style={{
@@ -188,9 +188,17 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 color: '#38bdf8',
                 padding: '6px 10px',
               }}
+              title={topic.targetTime ? `Target Goal: ${topic.targetTime}${topic.complexityExplanation ? ` — ${topic.complexityExplanation}` : ''}` : undefined}
             >
               <Clock size={13} />
-              <span>Time: <strong>{result.timeComplexity || 'O(n)'}</strong></span>
+              <span>
+                Time: <strong>{result.timeComplexity || 'O(n)'}</strong>
+                {topic.targetTime && (
+                  <span style={{ fontSize: '11px', opacity: 0.85, marginLeft: '6px' }}>
+                    (Goal: {topic.targetTime})
+                  </span>
+                )}
+              </span>
             </div>
             <div
               className="badge"
@@ -200,9 +208,17 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 color: '#c084fc',
                 padding: '6px 10px',
               }}
+              title={topic.targetSpace ? `Target Goal: ${topic.targetSpace}${topic.complexityExplanation ? ` — ${topic.complexityExplanation}` : ''}` : undefined}
             >
               <Database size={13} />
-              <span>Space: <strong>{result.spaceComplexity || 'O(1)'}</strong></span>
+              <span>
+                Space: <strong>{result.spaceComplexity || 'O(1)'}</strong>
+                {topic.targetSpace && (
+                  <span style={{ fontSize: '11px', opacity: 0.85, marginLeft: '6px' }}>
+                    (Goal: {topic.targetSpace})
+                  </span>
+                )}
+              </span>
             </div>
           </div>
         </div>
