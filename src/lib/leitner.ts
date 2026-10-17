@@ -371,9 +371,11 @@ export function setSchedulingAlgorithm(state: LeitnerDeckState, algo: SpacedAlgo
   return nextState;
 }
 
-export function getDefaultDeckState(): LeitnerDeckState {
+export function getDefaultDeckState(
+  seedTopics: TopicItem[] = seedTopicsData as unknown as TopicItem[]
+): LeitnerDeckState {
   return {
-    topics: (seedTopicsData as unknown as TopicItem[]).map((t) => ({ ...t })),
+    topics: seedTopics.map((t) => ({ ...t })),
     totalCompletedReviews: 0,
     lastReviewedTrack: undefined,
     unlockedStageCount: 0,
@@ -383,7 +385,7 @@ export function getDefaultDeckState(): LeitnerDeckState {
 }
 
 /** Fields describing the card itself (owned by the seed file), as opposed to review progress. */
-const SEED_CONTENT_FIELDS = [
+export const SEED_CONTENT_FIELDS = [
   'track',
   'title',
   'tags',
@@ -404,38 +406,74 @@ const SEED_CONTENT_FIELDS = [
  * Merges a stored deck with the current seed topics.
  * - Progress (box, streak, schedule, status) always comes from the stored card.
  * - Content of seed-backed cards is refreshed from the seed so edits to topics.json take effect.
- * - Seed topics that are new and were not deleted by the user are appended.
- * - Custom (non-seed) cards are left untouched.
+ * - Seed topics that are new and were not deleted by the user are appended in their default state.
+ * - Custom (non-seed) cards are left untouched with preserved progress.
  */
-export function mergeStoredWithSeed(parsed: LeitnerDeckState, seedTopics: TopicItem[]): LeitnerDeckState {
+export function mergeStoredWithSeed(
+  parsed: LeitnerDeckState,
+  seedTopics: TopicItem[] = seedTopicsData as unknown as TopicItem[]
+): LeitnerDeckState {
   const seedMap = new Map(seedTopics.map((t) => [t.id, t]));
   const deleted = new Set(parsed.deletedSeedIds ?? []);
 
   const hydratedTopics = parsed.topics.map((t) => {
     const seed = seedMap.get(t.id);
-    if (!seed) return t;
+    if (!seed) {
+      // Custom (non-seed) card: keep untouched, ensuring progress invariants are numbers
+      const rawBox = Math.max(1, Math.floor(Number(t.box)) || 1);
+      const isGraduated = (parsed.algorithm ?? getStoredAlgorithm()) === 'graduated-interval';
+      return {
+        ...t,
+        box: isGraduated ? rawBox : Math.min(5, rawBox),
+        streak: Math.max(0, Math.floor(Number(t.streak)) || 0),
+        nextEligibleTrial: Math.max(0, Math.floor(Number(t.nextEligibleTrial)) || 0),
+        status: t.status === 'locked' ? ('locked' as const) : ('active' as const),
+      };
+    }
+
+    // Seed-backed card: refresh content fields from seed
     const merged: TopicItem = { ...t };
     for (const field of SEED_CONTENT_FIELDS) {
       if (seed[field] !== undefined) {
-        (merged as unknown as Record<string, unknown>)[field] = seed[field];
+        const val = seed[field];
+        (merged as unknown as Record<string, unknown>)[field] = Array.isArray(val) ? [...val] : val;
       }
     }
     const fallbackSol = merged.referenceSolution ?? merged.solution ?? merged.starterCode;
     merged.solution = merged.solution ?? fallbackSol;
     merged.referenceSolution = merged.referenceSolution ?? fallbackSol;
+
+    // Strictly preserve user review progress fields
+    const isGraduated = (parsed.algorithm ?? getStoredAlgorithm()) === 'graduated-interval';
+    const rawBox = Math.max(1, Math.floor(Number(t.box)) || (seed.box ?? 1));
+    merged.box = isGraduated ? rawBox : Math.min(5, rawBox);
+    merged.streak = Math.max(0, Math.floor(Number(t.streak)) || 0);
+    merged.nextEligibleTrial = Math.max(0, Math.floor(Number(t.nextEligibleTrial)) || 0);
+    merged.status = t.status === 'locked' || t.status === 'active' ? t.status : (seed.status === 'active' ? 'active' : 'locked');
+
     return merged;
   });
 
-  const existingIds = new Set(parsed.topics.map((t) => t.id));
+  // Append new seed topics that are not in stored deck and not deleted by user
+  const seenIds = new Set(hydratedTopics.map((t) => t.id));
   const newSeedTopics = seedTopics
-    .filter((t) => !existingIds.has(t.id) && !deleted.has(t.id))
-    .map((t) => ({ ...t }));
+    .filter((t) => !seenIds.has(t.id) && !deleted.has(t.id))
+    .map((t) => {
+      seenIds.add(t.id);
+      return {
+        ...t,
+        box: Math.max(1, Math.floor(Number(t.box)) || 1),
+        streak: Math.max(0, Math.floor(Number(t.streak)) || 0),
+        nextEligibleTrial: Math.max(0, Math.floor(Number(t.nextEligibleTrial)) || 0),
+        status: t.status === 'active' ? ('active' as const) : ('locked' as const),
+      };
+    });
 
   return {
     topics: [...hydratedTopics, ...newSeedTopics],
-    totalCompletedReviews: Number.isInteger(parsed.totalCompletedReviews) ? parsed.totalCompletedReviews : 0,
+    totalCompletedReviews: typeof parsed.totalCompletedReviews === 'number' && Number.isInteger(parsed.totalCompletedReviews) && parsed.totalCompletedReviews >= 0 ? parsed.totalCompletedReviews : 0,
     lastReviewedTrack: parsed.lastReviewedTrack,
-    unlockedStageCount: parsed.unlockedStageCount ?? 0,
+    unlockedStageCount: typeof parsed.unlockedStageCount === 'number' && Number.isInteger(parsed.unlockedStageCount) && parsed.unlockedStageCount >= 0 ? parsed.unlockedStageCount : 0,
     deletedSeedIds: [...deleted],
     practiceFilter: parsed.practiceFilter ? normalizeFilter(parsed.practiceFilter) : undefined,
     filterPresets: normalizePresets(parsed.filterPresets),
@@ -443,26 +481,28 @@ export function mergeStoredWithSeed(parsed: LeitnerDeckState, seedTopics: TopicI
   };
 }
 
-export function loadDeckState(): LeitnerDeckState {
-  if (typeof window === 'undefined') return getDefaultDeckState();
+export function loadDeckState(
+  seedTopics: TopicItem[] = seedTopicsData as unknown as TopicItem[]
+): LeitnerDeckState {
+  if (typeof window === 'undefined') return getDefaultDeckState(seedTopics);
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const defaultState = getDefaultDeckState();
+      const defaultState = getDefaultDeckState(seedTopics);
       saveDeckState(defaultState);
       return defaultState;
     }
     const parsed = JSON.parse(raw) as LeitnerDeckState;
-    if (!Array.isArray(parsed.topics)) {
+    if (!parsed || !Array.isArray(parsed.topics)) {
       throw new Error('Invalid deck structure');
     }
-    const loadedState = mergeStoredWithSeed(parsed, seedTopicsData as unknown as TopicItem[]);
+    const loadedState = mergeStoredWithSeed(parsed, seedTopics);
     saveDeckState(loadedState);
     return loadedState;
   } catch (err) {
     console.error('Failed to load deck from localStorage, resetting to seed:', err);
-    const defaultState = getDefaultDeckState();
+    const defaultState = getDefaultDeckState(seedTopics);
     saveDeckState(defaultState);
     return defaultState;
   }
@@ -983,8 +1023,12 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
   };
 }
 
-export function importDeckBackup(jsonText: string): LeitnerDeckState {
-  const newState = parseDeckBackup(jsonText);
-  saveDeckState(newState);
-  return newState;
+export function importDeckBackup(
+  jsonText: string,
+  seedTopics: TopicItem[] = seedTopicsData as unknown as TopicItem[]
+): LeitnerDeckState {
+  const parsedBackup = parseDeckBackup(jsonText);
+  const reconciled = mergeStoredWithSeed(parsedBackup, seedTopics);
+  saveDeckState(reconciled);
+  return reconciled;
 }

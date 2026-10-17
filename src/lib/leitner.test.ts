@@ -13,6 +13,9 @@ import {
   isTrackType,
   mergeStoredWithSeed,
   parseDeckBackup,
+  importDeckBackup,
+  loadDeckState,
+  STORAGE_KEY,
   getSchedulingAlgorithm,
   setSchedulingAlgorithm,
   resetCardBox,
@@ -141,9 +144,80 @@ describe('mergeStoredWithSeed', () => {
     expect(s1.nextEligibleTrial).toBe(30);
   });
 
-  it('appends new seed topics', () => {
-    const merged = mergeStoredWithSeed(deck([card({ id: 's1' })]), seed);
-    expect(merged.topics.map((t) => t.id)).toEqual(['s1', 's2']);
+  it('strictly preserves user progress fields (box, streak, nextEligibleTrial, status) while updating content fields', () => {
+    const seedWithContent = [
+      card({
+        id: 's1',
+        title: 'Seed Updated Title',
+        promptSeed: 'New Prompt v2',
+        testHarness: 'newHarness()',
+        starterCode: 'function starter() {}',
+        targetTime: 'O(log n)',
+        targetSpace: 'O(1)',
+        complexityExplanation: 'Binary search complexity',
+        testCases: [{ input: 'test(1)', expected: '2' }],
+        box: 1,
+        streak: 0,
+        nextEligibleTrial: 0,
+        status: 'locked',
+      }),
+    ];
+
+    const storedWithProgress = deck([
+      card({
+        id: 's1',
+        title: 'Old Title',
+        promptSeed: 'Old Prompt',
+        testHarness: 'oldHarness()',
+        box: 4,
+        streak: 9,
+        nextEligibleTrial: 45,
+        status: 'active',
+      }),
+    ]);
+
+    const merged = mergeStoredWithSeed(storedWithProgress, seedWithContent);
+    const cardResult = merged.topics.find((t) => t.id === 's1')!;
+
+    // Content updated
+    expect(cardResult.title).toBe('Seed Updated Title');
+    expect(cardResult.promptSeed).toBe('New Prompt v2');
+    expect(cardResult.testHarness).toBe('newHarness()');
+    expect(cardResult.starterCode).toBe('function starter() {}');
+    expect(cardResult.targetTime).toBe('O(log n)');
+    expect(cardResult.targetSpace).toBe('O(1)');
+    expect(cardResult.complexityExplanation).toBe('Binary search complexity');
+    expect(cardResult.testCases).toEqual([{ input: 'test(1)', expected: '2' }]);
+
+    // User progress strictly preserved
+    expect(cardResult.box).toBe(4);
+    expect(cardResult.streak).toBe(9);
+    expect(cardResult.nextEligibleTrial).toBe(45);
+    expect(cardResult.status).toBe('active');
+  });
+
+  it('appends new seed topics in default state', () => {
+    const seedCatalog = [
+      card({ id: 's1', status: 'active' }),
+      card({ id: 's2', status: 'locked' }),
+      card({ id: 's3', status: 'active' }),
+    ];
+    const stored = deck([card({ id: 's1', box: 3, streak: 5, nextEligibleTrial: 12 })]);
+    const merged = mergeStoredWithSeed(stored, seedCatalog);
+
+    expect(merged.topics.map((t) => t.id)).toEqual(['s1', 's2', 's3']);
+
+    const s2 = merged.topics.find((t) => t.id === 's2')!;
+    expect(s2.box).toBe(1);
+    expect(s2.streak).toBe(0);
+    expect(s2.nextEligibleTrial).toBe(0);
+    expect(s2.status).toBe('locked');
+
+    const s3 = merged.topics.find((t) => t.id === 's3')!;
+    expect(s3.box).toBe(1);
+    expect(s3.streak).toBe(0);
+    expect(s3.nextEligibleTrial).toBe(0);
+    expect(s3.status).toBe('active');
   });
 
   it('does not resurrect seed topics the user deleted', () => {
@@ -151,10 +225,150 @@ describe('mergeStoredWithSeed', () => {
     expect(merged.topics.map((t) => t.id)).toEqual(['s1']);
   });
 
-  it('leaves custom cards untouched', () => {
-    const custom = card({ id: 'mine', title: 'Mine', box: 3 });
+  it('leaves custom cards untouched and preserves their progress', () => {
+    const custom = card({ id: 'mine', title: 'Mine', box: 3, streak: 4, nextEligibleTrial: 10, status: 'active' });
     const merged = mergeStoredWithSeed(deck([custom]), seed);
-    expect(merged.topics.find((t) => t.id === 'mine')).toEqual(custom);
+    const result = merged.topics.find((t) => t.id === 'mine')!;
+    expect(result.id).toBe('mine');
+    expect(result.box).toBe(3);
+    expect(result.streak).toBe(4);
+    expect(result.nextEligibleTrial).toBe(10);
+    expect(result.status).toBe('active');
+  });
+});
+
+describe('loadDeckState', () => {
+  it('reconciles stored localStorage snapshot with new seed topics on initialization', () => {
+    const seedCatalog = [
+      card({ id: 's1', title: 'Seed 1 v2', promptSeed: 'Updated Seed 1', status: 'active' }),
+      card({ id: 's2', title: 'Seed 2', status: 'locked' }),
+      card({ id: 's3', title: 'Seed 3 New Batch', status: 'locked' }),
+    ];
+
+    // Older localStorage with only s1
+    const olderState: LeitnerDeckState = {
+      topics: [card({ id: 's1', title: 'Seed 1 v1', promptSeed: 'Old Seed 1', box: 4, streak: 6, nextEligibleTrial: 20, status: 'active' })],
+      totalCompletedReviews: 15,
+      unlockedStageCount: 1,
+      deletedSeedIds: [],
+      algorithm: 'leitner',
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(olderState));
+
+    const loaded = loadDeckState(seedCatalog);
+
+    // All 3 cards present
+    expect(loaded.topics.map((t) => t.id)).toEqual(['s1', 's2', 's3']);
+
+    // Existing card progress preserved, content refreshed
+    const s1 = loaded.topics.find((t) => t.id === 's1')!;
+    expect(s1.promptSeed).toBe('Updated Seed 1');
+    expect(s1.box).toBe(4);
+    expect(s1.streak).toBe(6);
+    expect(s1.nextEligibleTrial).toBe(20);
+    expect(s1.status).toBe('active');
+
+    // Newly added seed cards initialized in default state
+    const s3 = loaded.topics.find((t) => t.id === 's3')!;
+    expect(s3.box).toBe(1);
+    expect(s3.streak).toBe(0);
+    expect(s3.nextEligibleTrial).toBe(0);
+    expect(s3.status).toBe('locked');
+
+    // Deck stats preserved
+    expect(loaded.totalCompletedReviews).toBe(15);
+    expect(loaded.unlockedStageCount).toBe(1);
+
+    // LocalStorage was updated with the reconciled deck
+    const storedAfter = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+    expect(storedAfter.topics).toHaveLength(3);
+  });
+
+  it('initializes from seed if localStorage is empty', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    const seedCatalog = [card({ id: 'seed-a' }), card({ id: 'seed-b' })];
+    const loaded = loadDeckState(seedCatalog);
+    expect(loaded.topics.map((t) => t.id)).toEqual(['seed-a', 'seed-b']);
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).topics).toHaveLength(2);
+  });
+});
+
+describe('importDeckBackup', () => {
+  it('reconciles an older backup with the full seed catalog rather than shrinking it', () => {
+    const seedCatalog = [
+      card({ id: 'seed-1', promptSeed: 'Updated Seed 1', testHarness: 'newHarness()', status: 'active' }),
+      card({ id: 'seed-2', status: 'locked' }),
+      card({ id: 'seed-3-new-batch', status: 'locked' }),
+    ];
+
+    // Older backup file that only contains seed-1
+    const backupJson = JSON.stringify({
+      topics: [
+        {
+          id: 'seed-1',
+          track: 'algorithms',
+          title: 'Seed 1',
+          box: 3,
+          streak: 5,
+          nextEligibleTrial: 18,
+          status: 'active',
+          promptSeed: 'Old Backup Prompt',
+          testHarness: 'oldHarness()',
+        },
+      ],
+      totalCompletedReviews: 32,
+      unlockedStageCount: 2,
+      algorithm: 'leitner',
+    });
+
+    const imported = importDeckBackup(backupJson, seedCatalog);
+
+    // Does not shrink: all 3 cards from seedCatalog are present
+    expect(imported.topics.map((t) => t.id)).toEqual(['seed-1', 'seed-2', 'seed-3-new-batch']);
+
+    // Progress metadata from the backup file is preserved
+    const seed1 = imported.topics.find((t) => t.id === 'seed-1')!;
+    expect(seed1.box).toBe(3);
+    expect(seed1.streak).toBe(5);
+    expect(seed1.nextEligibleTrial).toBe(18);
+    expect(seed1.status).toBe('active');
+
+    // Seed content was refreshed
+    expect(seed1.promptSeed).toBe('Updated Seed 1');
+    expect(seed1.testHarness).toBe('newHarness()');
+
+    // New seed cards were appended in default state
+    const newCard = imported.topics.find((t) => t.id === 'seed-3-new-batch')!;
+    expect(newCard.box).toBe(1);
+    expect(newCard.streak).toBe(0);
+    expect(newCard.nextEligibleTrial).toBe(0);
+    expect(newCard.status).toBe('locked');
+
+    // Deck-level stats from the backup file are preserved
+    expect(imported.totalCompletedReviews).toBe(32);
+    expect(imported.unlockedStageCount).toBe(2);
+
+    // Saved to localStorage
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+    expect(stored.topics).toHaveLength(3);
+  });
+
+  it('preserves custom cards created by the user when importing a backup', () => {
+    const seedCatalog = [card({ id: 'seed-1' })];
+    const backupJson = JSON.stringify({
+      topics: [
+        card({ id: 'seed-1', box: 2 }),
+        card({ id: 'my-custom-card', title: 'Custom Algorithm', box: 4, streak: 3 }),
+      ],
+      totalCompletedReviews: 10,
+    });
+
+    const imported = importDeckBackup(backupJson, seedCatalog);
+    expect(imported.topics.map((t) => t.id)).toEqual(['seed-1', 'my-custom-card']);
+    const custom = imported.topics.find((t) => t.id === 'my-custom-card')!;
+    expect(custom.title).toBe('Custom Algorithm');
+    expect(custom.box).toBe(4);
+    expect(custom.streak).toBe(3);
   });
 });
 
