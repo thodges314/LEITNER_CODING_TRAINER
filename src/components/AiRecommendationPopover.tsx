@@ -303,7 +303,7 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
                 lineHeight: 1.5,
               }}
             >
-              Our top recommendation is <strong style={{ color: 'var(--text-primary)' }}>Groq</strong> with <code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>openai/gpt-oss-120b</code> for blistering-fast free evaluations, followed by <strong style={{ color: 'var(--text-primary)' }}>Google Gemini 2.5 Flash</strong> (free tier via Google AI Studio). You can also run locally via <strong>Ollama</strong> (100% free & offline), or connect <strong>Claude</strong> / <strong>OpenAI</strong>.
+              Our top recommendation is <strong style={{ color: 'var(--text-primary)' }}>Groq</strong> with <code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>openai/gpt-oss-120b</code> for blistering-fast free evaluations, followed by <strong style={{ color: 'var(--text-primary)' }}>Google Gemini 2.5 Flash</strong> (free tier via Google AI Studio). You can also run locally via <strong>Ollama</strong> (100% free & offline), with many more providers available in Settings.
             </p>
           </div>
         </div>
