@@ -35,6 +35,7 @@ import { AddTopicModal } from './components/AddTopicModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FocusModal } from './components/FocusModal';
 import { AboutModal } from './components/AboutModal';
+import { AiRecommendationPopover } from './components/AiRecommendationPopover';
 import {
   Terminal,
   Layers,
@@ -72,6 +73,7 @@ export function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isAiRecommendOpen, setIsAiRecommendOpen] = useState(false);
   const [aiSettingsVersion, setAiSettingsVersion] = useState(0);
   const [reinforcingCardId, setReinforcingCardId] = useState<string | null>(null);
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
@@ -362,45 +364,98 @@ export function App() {
             </button>
 
             {/* AI Engine Status Indicator */}
-            {apiKey ? (
-              <div
-                className="badge"
-                style={{
-                  backgroundColor: 'rgba(56, 189, 248, 0.12)',
-                  color: '#38bdf8',
-                  border: '1px solid rgba(56, 189, 248, 0.3)',
-                  padding: '6px 11px',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  borderRadius: '7px',
+            <div style={{ position: 'relative' }}>
+              {apiKey ? (
+                <button
+                  type="button"
+                  className="badge"
+                  style={{
+                    backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                    color: '#38bdf8',
+                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    padding: '6px 11px',
+                    fontSize: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    borderRadius: '7px',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onClick={() => setIsSettingsOpen(true)}
+                  title={`AI Evaluator active: ${provider.toUpperCase()} • Click to configure in Settings`}
+                  aria-label={`AI Evaluator active: ${provider.toUpperCase()}`}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.2)';
+                    e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.5)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.12)';
+                    e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+                  }}
+                >
+                  <Sparkles size={13} color="#38bdf8" />
+                  <span>AI: {provider.toUpperCase()}</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="badge"
+                  style={{
+                    backgroundColor: isAiRecommendOpen
+                      ? (theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.15)' : 'rgba(56, 189, 248, 0.12)')
+                      : (theme === 'apple-gsos' ? '#EBEAE3' : 'rgba(255, 255, 255, 0.04)'),
+                    color: isAiRecommendOpen
+                      ? (theme === 'apple-gsos' ? '#4455AA' : 'var(--accent-primary)')
+                      : 'var(--text-muted)',
+                    border: isAiRecommendOpen
+                      ? (theme === 'apple-gsos' ? '1px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.4)')
+                      : '1px solid var(--border-subtle)',
+                    padding: '6px 11px',
+                    fontSize: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    borderRadius: '7px',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    transition: 'all 0.18s ease',
+                  }}
+                  onClick={() => setIsAiRecommendOpen((prev) => !prev)}
+                  title="Operating in Keyless mode • Click to learn how adding an AI key in Settings unlocks live mentoring & deeper features"
+                  aria-label="Operating in Keyless mode. Click to see AI recommendation"
+                  aria-haspopup="dialog"
+                  aria-expanded={isAiRecommendOpen}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = theme === 'apple-gsos' ? '#E0DFD7' : 'rgba(56, 189, 248, 0.1)';
+                    e.currentTarget.style.borderColor = theme === 'apple-gsos' ? 'var(--accent-primary)' : 'rgba(56, 189, 248, 0.4)';
+                    e.currentTarget.style.color = theme === 'apple-gsos' ? 'var(--accent-primary)' : 'var(--text-primary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isAiRecommendOpen) {
+                      e.currentTarget.style.backgroundColor = theme === 'apple-gsos' ? '#EBEAE3' : 'rgba(255, 255, 255, 0.04)';
+                      e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                      e.currentTarget.style.color = 'var(--text-muted)';
+                    }
+                  }}
+                >
+                  <ShieldCheck size={13} color="var(--text-dim)" />
+                  <span>Keyless Engine</span>
+                  <Sparkles size={11} color="var(--accent-primary)" style={{ opacity: 0.7 }} />
+                </button>
+              )}
+
+              {/* Recommendation Popover for Keyless Mode */}
+              <AiRecommendationPopover
+                isOpen={isAiRecommendOpen && !apiKey}
+                onClose={() => setIsAiRecommendOpen(false)}
+                onOpenSettings={() => {
+                  setIsAiRecommendOpen(false);
+                  setIsSettingsOpen(true);
                 }}
-                title={`AI Evaluator active: ${provider.toUpperCase()}`}
-              >
-                <Sparkles size={13} color="#38bdf8" />
-                <span>AI: {provider.toUpperCase()}</span>
-              </div>
-            ) : (
-              <div
-                className="badge"
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                  color: 'var(--text-muted)',
-                  border: '1px solid var(--border-subtle)',
-                  padding: '6px 11px',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  borderRadius: '7px',
-                }}
-                title="Operating in Keyless mode (deterministic harness & structural invariant analysis)"
-              >
-                <ShieldCheck size={13} color="var(--text-dim)" />
-                <span>Keyless Engine</span>
-              </div>
-            )}
+              />
+            </div>
 
             {/* Dedicated Settings Button */}
             <button
