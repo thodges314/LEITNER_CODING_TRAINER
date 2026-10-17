@@ -275,7 +275,7 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
           {/* Free Providers Callout */}
           <div
             style={{
-              padding: '10px 12px',
+              padding: '11px 13px',
               borderRadius: '8px',
               backgroundColor: 'var(--bg-elevated)',
               border: '1px solid var(--border-medium)',
@@ -286,24 +286,24 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
                 fontSize: '11px',
                 fontWeight: 600,
                 color: 'var(--accent-primary)',
-                marginBottom: '5px',
+                marginBottom: '6px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
               }}
             >
               <CheckCircle2 size={13} />
-              <span>Free tiers available in Settings:</span>
+              <span>Free & zero-cost models in Settings:</span>
             </div>
             <p
               style={{
                 margin: 0,
                 fontSize: '11.5px',
                 color: 'var(--text-secondary)',
-                lineHeight: 1.45,
+                lineHeight: 1.5,
               }}
             >
-              Get a free API key for <strong>Google Gemini 2.5 Flash</strong> or <strong>Groq</strong> (Llama 3.3), run locally via <strong>Ollama</strong> (zero key/cost), or connect <strong>Claude</strong> / <strong>OpenAI</strong>.
+              Our top recommendation is <strong style={{ color: 'var(--text-primary)' }}>Groq</strong> with <code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>openai/gpt-oss-120b</code> for blistering-fast free evaluations, followed by <strong style={{ color: 'var(--text-primary)' }}>Google Gemini 2.5 Flash</strong> (free tier via Google AI Studio). You can also run locally via <strong>Ollama</strong> (100% free & offline), or connect <strong>Claude</strong> / <strong>OpenAI</strong>.
             </p>
           </div>
         </div>
