@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Scope: Hoisting, Temporal Dead Zone, Loop Closure Capture",
+  "tags": [
+    "scope",
+    "hoisting",
+    "tdz",
+    "closures"
+  ]
+}

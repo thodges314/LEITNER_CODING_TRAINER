@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Context: this Resolution, Detached Methods, Explicit Context Invocation",
+  "tags": [
+    "this",
+    "context",
+    "arrow-functions",
+    "oop"
+  ]
+}

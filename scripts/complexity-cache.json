@@ -1043,5 +1043,30 @@
     "targetTime": "O(n * 2^n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Sorting plus a same-depth skip rule prunes duplicate branches; every output costs O(n) to copy."
+  },
+  "hoisting-tdz-scope": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Direct variable initialization and scope capture checks."
+  },
+  "this-context-binding": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Method dispatch and invocation with target context."
+  },
+  "tagged-template-literals": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Iterating over template segments and escaping values proportional to output size."
+  },
+  "symbol-async-iterator": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Yielding items sequentially via async next() promises."
+  },
+  "generators-coroutines": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Stepping through yielded promises, resuming on resolution or throwing on rejection."
   }
 }

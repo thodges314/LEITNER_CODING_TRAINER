@@ -1,0 +1,10 @@
+{
+  "track": "js-language",
+  "title": "Tagged Templates: Safe HTML Escaping, Raw Strings, Highlighting",
+  "tags": [
+    "template-literals",
+    "tagged-templates",
+    "security",
+    "strings"
+  ]
+}

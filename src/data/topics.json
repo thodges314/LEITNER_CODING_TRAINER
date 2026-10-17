@@ -12372,5 +12372,270 @@
     "targetTime": "O(r * c * 4^L)",
     "targetSpace": "O(L)",
     "complexityExplanation": "Each start cell explores up to four directions per letter of a word of length L; the recursion depth is L."
+  },
+  {
+    "id": "generators-coroutines",
+    "track": "js-language",
+    "title": "Generators: Coroutines, Bidirectional Communication, Mini-Co Runner",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "generators",
+      "coroutines",
+      "async",
+      "co"
+    ],
+    "promptSeed": "Write function* createEchoGenerator(): a generator function that first yields 'ready'. On subsequent iterations, it receives an input via it.next(val) and yields [val, typeof val]. Write runCoroutine(generatorFn, ...args): a runner (mini 'co') that calls generatorFn(...args) to get an iterator. Each yielded value can be a Promise or plain value; the runner awaits it, passes the result back via it.next(resolvedValue). If a yielded promise rejects, it passes the error into the generator via it.throw(err). Returns a Promise resolving to the generator's final return value.",
+    "difficulty": 4,
+    "concept": "iterators",
+    "referenceSolution": "function* createEchoGenerator() {\n  let val = yield 'ready';\n  while (true) {\n    val = yield [val, typeof val];\n  }\n}\n\nfunction runCoroutine(generatorFn, ...args) {\n  const it = generatorFn(...args);\n  return new Promise((resolve, reject) => {\n    function step(method, arg) {\n      let res;\n      try {\n        res = it[method](arg);\n      } catch (err) {\n        return reject(err);\n      }\n      if (res.done) {\n        return resolve(res.value);\n      }\n      Promise.resolve(res.value).then(\n        (val) => step('next', val),\n        (err) => step('throw', err)\n      );\n    }\n    step('next');\n  });\n}",
+    "solution": "function* createEchoGenerator() {\n  let val = yield 'ready';\n  while (true) {\n    val = yield [val, typeof val];\n  }\n}\n\nfunction runCoroutine(generatorFn, ...args) {\n  const it = generatorFn(...args);\n  return new Promise((resolve, reject) => {\n    function step(method, arg) {\n      let res;\n      try {\n        res = it[method](arg);\n      } catch (err) {\n        return reject(err);\n      }\n      if (res.done) {\n        return resolve(res.value);\n      }\n      Promise.resolve(res.value).then(\n        (val) => step('next', val),\n        (err) => step('throw', err)\n      );\n    }\n    step('next');\n  });\n}",
+    "starterCode": "function* createEchoGenerator() {\n  let val = yield 'ready';\n  while (true) {\n    val = yield [val, typeof val];\n  }\n}\n\nfunction runCoroutine(generatorFn, ...args) {\n  const it = generatorFn(...args);\n  return new Promise((resolve, reject) => {\n    function step(method, arg) {\n      let res;\n      try {\n        res = it[method](arg);\n      } catch (err) {\n        return reject(err);\n      }\n      if (res.done) {\n        return resolve(res.value);\n      }\n      Promise.resolve(res.value).then(\n        (val) => step('next', val),\n        (err) => step('throw', err)\n      );\n    }\n    step('next');\n  });\n}",
+    "testCases": [
+      {
+        "description": "createEchoGenerator yields ready then pairs input with its type",
+        "input": "const g = createEchoGenerator();\nconst r0 = g.next().value;\nconst r1 = g.next(42).value;\nconst r2 = g.next('hello').value;\nconst r3 = g.next(true).value;\n[r0, r1, r2, r3]",
+        "expected": "['ready', [42, 'number'], ['hello', 'string'], [true, 'boolean']]"
+      },
+      {
+        "description": "runCoroutine executes generator yielding resolved promises",
+        "input": "const g = function* () { const a = yield Promise.resolve(10); const b = yield Promise.resolve(20); return a + b; };\nawait runCoroutine(g)",
+        "expected": "30"
+      },
+      {
+        "description": "runCoroutine handles plain non-promise values",
+        "input": "const g = function* () { const x = yield 5; const y = yield 7; return x * y; };\nawait runCoroutine(g)",
+        "expected": "35"
+      },
+      {
+        "description": "runCoroutine catches rejection inside generator with try/catch",
+        "input": "const g = function* () { let caught = null; try { yield Promise.reject(new Error('fail')); } catch (err) { caught = err.message; } return caught; };\nawait runCoroutine(g)",
+        "expected": "'fail'"
+      },
+      {
+        "description": "runCoroutine propagates unhandled rejection",
+        "input": "const g = function* () { yield Promise.reject(new Error('unhandled')); };\nawait runCoroutine(g)",
+        "expected": "Rejection with Error: unhandled"
+      }
+    ],
+    "testHarness": "await $test.run(\"createEchoGenerator yields ready then pairs input with its type\", async () => {\n  const sleep = $test.sleep;\n  const g = createEchoGenerator();\n  const r0 = g.next().value;\n  const r1 = g.next(42).value;\n  const r2 = g.next('hello').value;\n  const r3 = g.next(true).value;\n  return ([r0, r1, r2, r3]);\n}, () => (['ready', [42, 'number'], ['hello', 'string'], [true, 'boolean']]));\n\nawait $test.run(\"runCoroutine executes generator yielding resolved promises\", async () => {\n  const sleep = $test.sleep;\n  const g = function* () { const a = yield Promise.resolve(10); const b = yield Promise.resolve(20); return a + b; };\n  return (await runCoroutine(g));\n}, () => (30));\n\nawait $test.run(\"runCoroutine handles plain non-promise values\", async () => {\n  const sleep = $test.sleep;\n  const g = function* () { const x = yield 5; const y = yield 7; return x * y; };\n  return (await runCoroutine(g));\n}, () => (35));\n\nawait $test.run(\"runCoroutine catches rejection inside generator with try/catch\", async () => {\n  const sleep = $test.sleep;\n  const g = function* () { let caught = null; try { yield Promise.reject(new Error('fail')); } catch (err) { caught = err.message; } return caught; };\n  return (await runCoroutine(g));\n}, () => ('fail'));\n\nawait $test.rejects(\"runCoroutine propagates unhandled rejection\", async () => {\n  const sleep = $test.sleep;\n  const g = function* () { yield Promise.reject(new Error('unhandled')); };\n  return (await runCoroutine(g));\n}, \"unhandled\");",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Stepping through yielded promises, resuming on resolution or throwing on rejection."
+  },
+  {
+    "id": "hoisting-tdz-scope",
+    "track": "js-language",
+    "title": "Scope: Hoisting, Temporal Dead Zone, Loop Closure Capture",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "scope",
+      "hoisting",
+      "tdz",
+      "closures"
+    ],
+    "promptSeed": "Write hoistingBehavior(): returns an object { varBefore: undefined, fnResult: 'hoisted' } demonstrating that var declarations are hoisted and initialized to undefined, and function declarations are hoisted with their body. Write checkTDZ(fn): runs fn(); if accessing a variable before initialization throws a ReferenceError, returns 'ReferenceError'; if it runs cleanly, returns 'ok'; for any other error, returns 'error'. Write makeLoopCallbacksVar(n): returns an array of n zero-argument functions created in a var loop for (var i = 0; i < n; i++) { ... }, where calling any function returns the final shared value n. Write makeLoopCallbacksLet(n): returns an array of n functions created in a let loop for (let i = 0; i < n; i++) { ... }, where calling fn[k]() returns k.",
+    "difficulty": 2,
+    "concept": "closures",
+    "referenceSolution": "function hoistingBehavior() {\n  var varBefore = typeof x === 'undefined' ? x : null;\n  var x = 42;\n  function f() {\n    return 'hoisted';\n  }\n  return { varBefore: varBefore, fnResult: f() };\n}\n\nfunction checkTDZ(fn) {\n  try {\n    fn();\n    return 'ok';\n  } catch (err) {\n    if (err instanceof ReferenceError) return 'ReferenceError';\n    return 'error';\n  }\n}\n\nfunction makeLoopCallbacksVar(n) {\n  var fns = [];\n  for (var i = 0; i < n; i++) {\n    fns.push(function () {\n      return i;\n    });\n  }\n  return fns;\n}\n\nfunction makeLoopCallbacksLet(n) {\n  const fns = [];\n  for (let i = 0; i < n; i++) {\n    fns.push(function () {\n      return i;\n    });\n  }\n  return fns;\n}",
+    "solution": "function hoistingBehavior() {\n  var varBefore = typeof x === 'undefined' ? x : null;\n  var x = 42;\n  function f() {\n    return 'hoisted';\n  }\n  return { varBefore: varBefore, fnResult: f() };\n}\n\nfunction checkTDZ(fn) {\n  try {\n    fn();\n    return 'ok';\n  } catch (err) {\n    if (err instanceof ReferenceError) return 'ReferenceError';\n    return 'error';\n  }\n}\n\nfunction makeLoopCallbacksVar(n) {\n  var fns = [];\n  for (var i = 0; i < n; i++) {\n    fns.push(function () {\n      return i;\n    });\n  }\n  return fns;\n}\n\nfunction makeLoopCallbacksLet(n) {\n  const fns = [];\n  for (let i = 0; i < n; i++) {\n    fns.push(function () {\n      return i;\n    });\n  }\n  return fns;\n}",
+    "starterCode": "function hoistingBehavior() {\n  var varBefore = typeof x === 'undefined' ? x : null;\n  var x = 42;\n  function f() {\n    return 'hoisted';\n  }\n  return { varBefore: varBefore, fnResult: f() };\n}\n\nfunction checkTDZ(fn) {\n  try {\n    fn();\n    return 'ok';\n  } catch (err) {\n    if (err instanceof ReferenceError) return 'ReferenceError';\n    return 'error';\n  }\n}\n\nfunction makeLoopCallbacksVar(n) {\n  var fns = [];\n  for (var i = 0; i < n; i++) {\n    fns.push(function () {\n      return i;\n    });\n  }\n  return fns;\n}\n\nfunction makeLoopCallbacksLet(n) {\n  const fns = [];\n  for (let i = 0; i < n; i++) {\n    fns.push(function () {\n      return i;\n    });\n  }\n  return fns;\n}",
+    "testCases": [
+      {
+        "description": "hoistingBehavior shows hoisted var and hoisted function declaration",
+        "input": "hoistingBehavior()",
+        "expected": "{ varBefore: undefined, fnResult: \"hoisted\" }"
+      },
+      {
+        "description": "checkTDZ catches ReferenceError when accessing let before initialization",
+        "input": "checkTDZ(() => { let a = b; let b = 1; return a; })",
+        "expected": "'ReferenceError'"
+      },
+      {
+        "description": "checkTDZ returns ok when access is valid",
+        "input": "checkTDZ(() => { let a = 1; let b = a; return b; })",
+        "expected": "'ok'"
+      },
+      {
+        "description": "makeLoopCallbacksVar captures the shared final i",
+        "input": "const fns = makeLoopCallbacksVar(3);\n[fns[0](), fns[1](), fns[2]()]",
+        "expected": "[3, 3, 3]"
+      },
+      {
+        "description": "makeLoopCallbacksLet captures each iteration binding",
+        "input": "const fns = makeLoopCallbacksLet(3);\n[fns[0](), fns[1](), fns[2]()]",
+        "expected": "[0, 1, 2]"
+      },
+      {
+        "description": "makeLoopCallbacks with 0 callbacks",
+        "input": "[makeLoopCallbacksVar(0).length, makeLoopCallbacksLet(0).length]",
+        "expected": "[0, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"hoistingBehavior shows hoisted var and hoisted function declaration\", async () => {\n  const sleep = $test.sleep;\n  return (hoistingBehavior());\n}, () => ({ varBefore: undefined, fnResult: \"hoisted\" }));\n\nawait $test.run(\"checkTDZ catches ReferenceError when accessing let before initialization\", async () => {\n  const sleep = $test.sleep;\n  return (checkTDZ(() => { let a = b; let b = 1; return a; }));\n}, () => ('ReferenceError'));\n\nawait $test.run(\"checkTDZ returns ok when access is valid\", async () => {\n  const sleep = $test.sleep;\n  return (checkTDZ(() => { let a = 1; let b = a; return b; }));\n}, () => ('ok'));\n\nawait $test.run(\"makeLoopCallbacksVar captures the shared final i\", async () => {\n  const sleep = $test.sleep;\n  const fns = makeLoopCallbacksVar(3);\n  return ([fns[0](), fns[1](), fns[2]()]);\n}, () => ([3, 3, 3]));\n\nawait $test.run(\"makeLoopCallbacksLet captures each iteration binding\", async () => {\n  const sleep = $test.sleep;\n  const fns = makeLoopCallbacksLet(3);\n  return ([fns[0](), fns[1](), fns[2]()]);\n}, () => ([0, 1, 2]));\n\nawait $test.run(\"makeLoopCallbacks with 0 callbacks\", async () => {\n  const sleep = $test.sleep;\n  return ([makeLoopCallbacksVar(0).length, makeLoopCallbacksLet(0).length]);\n}, () => ([0, 0]));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Direct variable initialization and scope capture checks."
+  },
+  {
+    "id": "symbol-async-iterator",
+    "track": "js-language",
+    "title": "Async Iterators: Symbol.asyncIterator, For-Await-Of, Async Range",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "iterators",
+      "async",
+      "symbol",
+      "stream"
+    ],
+    "promptSeed": "Write createAsyncRange(start, end, delayMs = 0): returns an object with a [Symbol.asyncIterator]() method that yields numbers from start up to (but not including) end. Each call to next() returns a Promise resolving to { value, done } after an optional delay of delayMs milliseconds. Write collectAsync(asyncIterable): consumes an async iterable using for await (const item of asyncIterable) and returns a Promise resolving to an array of all collected items. Write mapAsyncIterable(asyncIterable, fn): returns an async iterable object whose [Symbol.asyncIterator]() yields await fn(item) for each item.",
+    "difficulty": 3,
+    "concept": "iterators",
+    "referenceSolution": "function createAsyncRange(start, end, delayMs = 0) {\n  return {\n    [Symbol.asyncIterator]() {\n      let cur = start;\n      return {\n        next() {\n          if (cur >= end) {\n            return Promise.resolve({ value: undefined, done: true });\n          }\n          const val = cur++;\n          if (delayMs > 0) {\n            return new Promise((resolve) =>\n              setTimeout(() => resolve({ value: val, done: false }), delayMs)\n            );\n          }\n          return Promise.resolve({ value: val, done: false });\n        }\n      };\n    }\n  };\n}\n\nasync function collectAsync(asyncIterable) {\n  const items = [];\n  for await (const x of asyncIterable) {\n    items.push(x);\n  }\n  return items;\n}\n\nfunction mapAsyncIterable(asyncIterable, fn) {\n  return {\n    [Symbol.asyncIterator]() {\n      const iter = asyncIterable[Symbol.asyncIterator]();\n      return {\n        async next() {\n          const res = await iter.next();\n          if (res.done) return res;\n          return { value: await fn(res.value), done: false };\n        }\n      };\n    }\n  };\n}",
+    "solution": "function createAsyncRange(start, end, delayMs = 0) {\n  return {\n    [Symbol.asyncIterator]() {\n      let cur = start;\n      return {\n        next() {\n          if (cur >= end) {\n            return Promise.resolve({ value: undefined, done: true });\n          }\n          const val = cur++;\n          if (delayMs > 0) {\n            return new Promise((resolve) =>\n              setTimeout(() => resolve({ value: val, done: false }), delayMs)\n            );\n          }\n          return Promise.resolve({ value: val, done: false });\n        }\n      };\n    }\n  };\n}\n\nasync function collectAsync(asyncIterable) {\n  const items = [];\n  for await (const x of asyncIterable) {\n    items.push(x);\n  }\n  return items;\n}\n\nfunction mapAsyncIterable(asyncIterable, fn) {\n  return {\n    [Symbol.asyncIterator]() {\n      const iter = asyncIterable[Symbol.asyncIterator]();\n      return {\n        async next() {\n          const res = await iter.next();\n          if (res.done) return res;\n          return { value: await fn(res.value), done: false };\n        }\n      };\n    }\n  };\n}",
+    "starterCode": "function createAsyncRange(start, end, delayMs = 0) {\n  return {\n    [Symbol.asyncIterator]() {\n      let cur = start;\n      return {\n        next() {\n          if (cur >= end) {\n            return Promise.resolve({ value: undefined, done: true });\n          }\n          const val = cur++;\n          if (delayMs > 0) {\n            return new Promise((resolve) =>\n              setTimeout(() => resolve({ value: val, done: false }), delayMs)\n            );\n          }\n          return Promise.resolve({ value: val, done: false });\n        }\n      };\n    }\n  };\n}\n\nasync function collectAsync(asyncIterable) {\n  const items = [];\n  for await (const x of asyncIterable) {\n    items.push(x);\n  }\n  return items;\n}\n\nfunction mapAsyncIterable(asyncIterable, fn) {\n  return {\n    [Symbol.asyncIterator]() {\n      const iter = asyncIterable[Symbol.asyncIterator]();\n      return {\n        async next() {\n          const res = await iter.next();\n          if (res.done) return res;\n          return { value: await fn(res.value), done: false };\n        }\n      };\n    }\n  };\n}",
+    "testCases": [
+      {
+        "description": "createAsyncRange yields numbers sequentially with for-await-of",
+        "input": "const range = createAsyncRange(1, 4);\nawait collectAsync(range)",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "createAsyncRange with start >= end returns empty",
+        "input": "const range = createAsyncRange(5, 5);\nawait collectAsync(range)",
+        "expected": "[]"
+      },
+      {
+        "description": "collectAsync consumes an async iterable into an array",
+        "input": "const range = createAsyncRange(10, 13);\nawait collectAsync(range)",
+        "expected": "[10, 11, 12]"
+      },
+      {
+        "description": "mapAsyncIterable transforms yielded values asynchronously",
+        "input": "const range = createAsyncRange(1, 4);\nconst doubled = mapAsyncIterable(range, async (x) => x * 2);\nawait collectAsync(doubled)",
+        "expected": "[2, 4, 6]"
+      }
+    ],
+    "testHarness": "await $test.run(\"createAsyncRange yields numbers sequentially with for-await-of\", async () => {\n  const sleep = $test.sleep;\n  const range = createAsyncRange(1, 4);\n  return (await collectAsync(range));\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"createAsyncRange with start >= end returns empty\", async () => {\n  const sleep = $test.sleep;\n  const range = createAsyncRange(5, 5);\n  return (await collectAsync(range));\n}, () => ([]));\n\nawait $test.run(\"collectAsync consumes an async iterable into an array\", async () => {\n  const sleep = $test.sleep;\n  const range = createAsyncRange(10, 13);\n  return (await collectAsync(range));\n}, () => ([10, 11, 12]));\n\nawait $test.run(\"mapAsyncIterable transforms yielded values asynchronously\", async () => {\n  const sleep = $test.sleep;\n  const range = createAsyncRange(1, 4);\n  const doubled = mapAsyncIterable(range, async (x) => x * 2);\n  return (await collectAsync(doubled));\n}, () => ([2, 4, 6]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Yielding items sequentially via async next() promises."
+  },
+  {
+    "id": "tagged-template-literals",
+    "track": "js-language",
+    "title": "Tagged Templates: Safe HTML Escaping, Raw Strings, Highlighting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "template-literals",
+      "tagged-templates",
+      "security",
+      "strings"
+    ],
+    "promptSeed": "Write safeHtml(strings, ...values): a tagged template function that escapes characters & < > \" ' in interpolated values (&amp; &lt; &gt; &quot; &#39;), converting null/undefined to empty strings, and joining literal segments with escaped values. Write highlight(strings, ...values): a tagged template function that wraps every interpolated value in <mark>...</mark>. Write getRawString(strings, ...values): a tagged template function that uses strings.raw to assemble the string without interpreting escape sequences (e.g. \\n stays a literal backslash followed by n).",
+    "difficulty": 2,
+    "concept": "tagged-templates",
+    "referenceSolution": "function escapeHtml(str) {\n  if (str === null || str === undefined) return '';\n  return String(str)\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;')\n    .replace(/'/g, '&#39;');\n}\n\nfunction safeHtml(strings, ...values) {\n  let result = strings[0];\n  for (let i = 0; i < values.length; i++) {\n    result += escapeHtml(values[i]) + strings[i + 1];\n  }\n  return result;\n}\n\nfunction highlight(strings, ...values) {\n  let result = strings[0];\n  for (let i = 0; i < values.length; i++) {\n    result += '<mark>' + String(values[i]) + '</mark>' + strings[i + 1];\n  }\n  return result;\n}\n\nfunction getRawString(strings, ...values) {\n  let result = strings.raw[0];\n  for (let i = 0; i < values.length; i++) {\n    result += String(values[i]) + strings.raw[i + 1];\n  }\n  return result;\n}",
+    "solution": "function escapeHtml(str) {\n  if (str === null || str === undefined) return '';\n  return String(str)\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;')\n    .replace(/'/g, '&#39;');\n}\n\nfunction safeHtml(strings, ...values) {\n  let result = strings[0];\n  for (let i = 0; i < values.length; i++) {\n    result += escapeHtml(values[i]) + strings[i + 1];\n  }\n  return result;\n}\n\nfunction highlight(strings, ...values) {\n  let result = strings[0];\n  for (let i = 0; i < values.length; i++) {\n    result += '<mark>' + String(values[i]) + '</mark>' + strings[i + 1];\n  }\n  return result;\n}\n\nfunction getRawString(strings, ...values) {\n  let result = strings.raw[0];\n  for (let i = 0; i < values.length; i++) {\n    result += String(values[i]) + strings.raw[i + 1];\n  }\n  return result;\n}",
+    "starterCode": "function escapeHtml(str) {\n  if (str === null || str === undefined) return '';\n  return String(str)\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;')\n    .replace(/\"/g, '&quot;')\n    .replace(/'/g, '&#39;');\n}\n\nfunction safeHtml(strings, ...values) {\n  let result = strings[0];\n  for (let i = 0; i < values.length; i++) {\n    result += escapeHtml(values[i]) + strings[i + 1];\n  }\n  return result;\n}\n\nfunction highlight(strings, ...values) {\n  let result = strings[0];\n  for (let i = 0; i < values.length; i++) {\n    result += '<mark>' + String(values[i]) + '</mark>' + strings[i + 1];\n  }\n  return result;\n}\n\nfunction getRawString(strings, ...values) {\n  let result = strings.raw[0];\n  for (let i = 0; i < values.length; i++) {\n    result += String(values[i]) + strings.raw[i + 1];\n  }\n  return result;\n}",
+    "testCases": [
+      {
+        "description": "safeHtml escapes special characters in interpolated values",
+        "input": "safeHtml`<div>Hello, ${'<script>alert(1)</script> & \"user\"'}</div>`",
+        "expected": "'<div>Hello, &lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;user&quot;</div>'"
+      },
+      {
+        "description": "safeHtml handles null and undefined values as empty strings",
+        "input": "safeHtml`Val: ${null}, Name: ${undefined}!`",
+        "expected": "'Val: , Name: !'"
+      },
+      {
+        "description": "safeHtml leaves numbers and safe strings unaltered",
+        "input": "safeHtml`Score: ${100} for ${'Alice'}`",
+        "expected": "'Score: 100 for Alice'"
+      },
+      {
+        "description": "highlight wraps values in mark tags",
+        "input": "highlight`Welcome ${'Alice'}, you have ${3} messages.`",
+        "expected": "'Welcome <mark>Alice</mark>, you have <mark>3</mark> messages.'"
+      },
+      {
+        "description": "getRawString preserves escape sequences without interpreting them",
+        "input": "getRawString`hello\\tworld`",
+        "expected": "String.raw`hello\\tworld`"
+      }
+    ],
+    "testHarness": "await $test.run(\"safeHtml escapes special characters in interpolated values\", async () => {\n  const sleep = $test.sleep;\n  return (safeHtml`<div>Hello, ${'<script>alert(1)</script> & \"user\"'}</div>`);\n}, () => ('<div>Hello, &lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;user&quot;</div>'));\n\nawait $test.run(\"safeHtml handles null and undefined values as empty strings\", async () => {\n  const sleep = $test.sleep;\n  return (safeHtml`Val: ${null}, Name: ${undefined}!`);\n}, () => ('Val: , Name: !'));\n\nawait $test.run(\"safeHtml leaves numbers and safe strings unaltered\", async () => {\n  const sleep = $test.sleep;\n  return (safeHtml`Score: ${100} for ${'Alice'}`);\n}, () => ('Score: 100 for Alice'));\n\nawait $test.run(\"highlight wraps values in mark tags\", async () => {\n  const sleep = $test.sleep;\n  return (highlight`Welcome ${'Alice'}, you have ${3} messages.`);\n}, () => ('Welcome <mark>Alice</mark>, you have <mark>3</mark> messages.'));\n\nawait $test.run(\"getRawString preserves escape sequences without interpreting them\", async () => {\n  const sleep = $test.sleep;\n  return (getRawString`hello\\tworld`);\n}, () => (String.raw`hello\\tworld`));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Iterating over template segments and escaping values proportional to output size."
+  },
+  {
+    "id": "this-context-binding",
+    "track": "js-language",
+    "title": "Context: this Resolution, Detached Methods, Explicit Context Invocation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "this",
+      "context",
+      "arrow-functions",
+      "oop"
+    ],
+    "promptSeed": "Write createGreeter(name): returns an object with property name, method greet() returning 'Hello, ' + this.name, and method getBoundGreet() returning greet permanently bound to that instance (so even when detached and called without a receiver, it returns 'Hello, ' + this.name). Write invokeWithContext(fn, context, ...args): invokes fn with context as its this value and passes args, without using Function.prototype.call or Function.prototype.apply (e.g. using Reflect.apply or assigning fn to a unique Symbol on context). Write isConstructorCall(TargetClass, ...args): returns true if new TargetClass(...args) constructs an instance of TargetClass; returns false if calling TargetClass without new would throw or if TargetClass is not a valid constructor.",
+    "difficulty": 3,
+    "concept": "this-binding",
+    "referenceSolution": "function createGreeter(name) {\n  const obj = {\n    name,\n    greet() {\n      return 'Hello, ' + this.name;\n    },\n    getBoundGreet() {\n      return obj.greet.bind(obj);\n    }\n  };\n  return obj;\n}\n\nfunction invokeWithContext(fn, context, ...args) {\n  return Reflect.apply(fn, context, args);\n}\n\nfunction isConstructorCall(TargetClass, ...args) {\n  try {\n    const inst = Reflect.construct(TargetClass, args);\n    return inst instanceof TargetClass;\n  } catch {\n    return false;\n  }\n}",
+    "solution": "function createGreeter(name) {\n  const obj = {\n    name,\n    greet() {\n      return 'Hello, ' + this.name;\n    },\n    getBoundGreet() {\n      return obj.greet.bind(obj);\n    }\n  };\n  return obj;\n}\n\nfunction invokeWithContext(fn, context, ...args) {\n  return Reflect.apply(fn, context, args);\n}\n\nfunction isConstructorCall(TargetClass, ...args) {\n  try {\n    const inst = Reflect.construct(TargetClass, args);\n    return inst instanceof TargetClass;\n  } catch {\n    return false;\n  }\n}",
+    "starterCode": "function createGreeter(name) {\n  const obj = {\n    name,\n    greet() {\n      return 'Hello, ' + this.name;\n    },\n    getBoundGreet() {\n      return obj.greet.bind(obj);\n    }\n  };\n  return obj;\n}\n\nfunction invokeWithContext(fn, context, ...args) {\n  return Reflect.apply(fn, context, args);\n}\n\nfunction isConstructorCall(TargetClass, ...args) {\n  try {\n    const inst = Reflect.construct(TargetClass, args);\n    return inst instanceof TargetClass;\n  } catch {\n    return false;\n  }\n}",
+    "testCases": [
+      {
+        "description": "createGreeter: method call uses receiver",
+        "input": "const g = createGreeter('Alice');\ng.greet()",
+        "expected": "'Hello, Alice'"
+      },
+      {
+        "description": "createGreeter: getBoundGreet stays bound when detached",
+        "input": "const g = createGreeter('Bob');\nconst f = g.getBoundGreet();\nf()",
+        "expected": "'Hello, Bob'"
+      },
+      {
+        "description": "invokeWithContext calls target function with specified receiver",
+        "input": "const ctx = { multiplier: 3 };\nfunction calc(a, b) { return (a + b) * this.multiplier; }\ninvokeWithContext(calc, ctx, 2, 4)",
+        "expected": "18"
+      },
+      {
+        "description": "invokeWithContext works with methods and multiple arguments",
+        "input": "const user = { first: 'John', last: 'Doe' };\nfunction full(prefix) { return prefix + ' ' + this.first + ' ' + this.last; }\ninvokeWithContext(full, user, 'Mr.')",
+        "expected": "'Mr. John Doe'"
+      },
+      {
+        "description": "isConstructorCall returns true for classes and constructors",
+        "input": "class Foo {}\nfunction Bar() {}\n[isConstructorCall(Foo), isConstructorCall(Bar)]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "isConstructorCall returns false for arrow functions and non-constructors",
+        "input": "const arrow = () => {};\n[isConstructorCall(arrow), isConstructorCall(Math.max)]",
+        "expected": "[false, false]"
+      }
+    ],
+    "testHarness": "await $test.run(\"createGreeter: method call uses receiver\", async () => {\n  const sleep = $test.sleep;\n  const g = createGreeter('Alice');\n  return (g.greet());\n}, () => ('Hello, Alice'));\n\nawait $test.run(\"createGreeter: getBoundGreet stays bound when detached\", async () => {\n  const sleep = $test.sleep;\n  const g = createGreeter('Bob');\n  const f = g.getBoundGreet();\n  return (f());\n}, () => ('Hello, Bob'));\n\nawait $test.run(\"invokeWithContext calls target function with specified receiver\", async () => {\n  const sleep = $test.sleep;\n  const ctx = { multiplier: 3 };\n  function calc(a, b) { return (a + b) * this.multiplier; }\n  return (invokeWithContext(calc, ctx, 2, 4));\n}, () => (18));\n\nawait $test.run(\"invokeWithContext works with methods and multiple arguments\", async () => {\n  const sleep = $test.sleep;\n  const user = { first: 'John', last: 'Doe' };\n  function full(prefix) { return prefix + ' ' + this.first + ' ' + this.last; }\n  return (invokeWithContext(full, user, 'Mr.'));\n}, () => ('Mr. John Doe'));\n\nawait $test.run(\"isConstructorCall returns true for classes and constructors\", async () => {\n  const sleep = $test.sleep;\n  class Foo {}\n  function Bar() {}\n  return ([isConstructorCall(Foo), isConstructorCall(Bar)]);\n}, () => ([true, true]));\n\nawait $test.run(\"isConstructorCall returns false for arrow functions and non-constructors\", async () => {\n  const sleep = $test.sleep;\n  const arrow = () => {};\n  return ([isConstructorCall(arrow), isConstructorCall(Math.max)]);\n}, () => ([false, false]));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Method dispatch and invocation with target context."
   }
 ]

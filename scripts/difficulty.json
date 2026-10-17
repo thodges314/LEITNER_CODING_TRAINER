@@ -834,5 +834,25 @@
  "backtrack-subsets-permute-unique": {
   "difficulty": 3,
   "concept": "backtracking"
+ },
+ "hoisting-tdz-scope": {
+  "difficulty": 2,
+  "concept": "closures"
+ },
+ "this-context-binding": {
+  "difficulty": 3,
+  "concept": "this-binding"
+ },
+ "tagged-template-literals": {
+  "difficulty": 2,
+  "concept": "tagged-templates"
+ },
+ "symbol-async-iterator": {
+  "difficulty": 3,
+  "concept": "iterators"
+ },
+ "generators-coroutines": {
+  "difficulty": 4,
+  "concept": "iterators"
  }
 }
