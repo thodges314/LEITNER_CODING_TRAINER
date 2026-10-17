@@ -202,7 +202,7 @@ Bottom line: JS utilities and async are the strongest part of the deck. The weak
 **React component builds, algorithms (graph/DP/linked-list/heap/trie), accessibility, TypeScript type-level, CSS and testing**.
 
 ### 7.1 Difficulty ladder holes (the owner wants "simple first, then harder" on every concept)
-**Status after batch 14** (`scripts/testcases/part14.mjs`, authored via `scripts/cards-batch14.mjs`, deletable): 14 starter rungs were added for
+**Status after batch 14** (`scripts/testcases/part14.mjs`): 14 starter rungs were added for
 `sorting`, `heap`, `trie`, `backtracking`, `matrix`, `graphs`, `event-loop`, `promise-combinators`, `iterators`, `middleware`, `serialization`,
 `ts-generics`, `ts-unions`, `ts-types` (all pure-function or type-level cards, 570 tests passing). Concepts whose lowest rung is **still ≥ 3** (all React/DOM,
 need a hand-written DOM harness and a browser smoke test): `state-management`(4), `tree-ui`(3), `history-state`(3), `virtualization`(4),
@@ -248,7 +248,7 @@ Grading approaches available today: (a) **pure functions** graded from input/exp
    - Further: toast queue, multi-step form, optimistic like button (rollback on rejection), drag-sortable list (keyboard fallback),
      image carousel, star/like counters, accordion, pagination, progress bar, tooltip/popover positioning, theme switcher.
    - Each component card should state its **exact DOM contract** (roles, labels, button texts) in the prompt, because the harness queries by those.
-2. **Algorithms** (pure functions, approach a; track `algorithms`). **DONE in batch 13** (20 cards, `scripts/testcases/part13.mjs`, authored via `scripts/cards-batch13.mjs`, which can be deleted): linked list (`reverseList`, `hasCycle`, `mergeTwoLists`; nodes `{val,next}`
+2. **Algorithms** (pure functions, approach a; track `algorithms`). **DONE in batch 13** (20 cards, `scripts/testcases/part13.mjs`): linked list (`reverseList`, `hasCycle`, `mergeTwoLists`; nodes `{val,next}`
    built with a one-line helper in each case), `MinStack` + queue from two stacks, BST (`isValidBST`, `invertTree`, `lowestCommonAncestor`),
    `numIslands` (grid DFS/BFS) + `floodFill`, `Trie` (+ `wordsWithPrefix`), `MinHeap` + `topKFrequent`, DP (`climbStairs`, `coinChange`, LIS),
    backtracking (`permute`, `subsets`, `generateParenthesis` — normalise ordering in the case input), sorting (`mergeSort`, `quickSort`
@@ -266,7 +266,7 @@ Grading approaches available today: (a) **pure functions** graded from input/exp
 6. **DOM/browser**: drag-and-drop reorder (simulate `dragstart/dragover/drop`), `MutationObserver` wrapper, `ResizeObserver`/
    `IntersectionObserver` lazy loader (mock exists), keyboard-shortcut manager, `history.pushState` router bound to `window`, `postMessage`
    channel, `requestAnimationFrame` throttling, `Worker` message protocol (grade with a fake worker).
-7. **Language depth** (**partly DONE in batch 15**, `scripts/cards-batch15.mjs` + `part15.mjs`, 14 cards: Proxy, WeakMap/WeakSet, descriptors, prototypes; still open: output-prediction, hoisting/TDZ, tagged templates, `Symbol.asyncIterator`): output-prediction drills expressed as functions that return the observed order/values (hoisting, TDZ, closures in loops,
+7. **Language depth** (**partly DONE in batch 15**, `part15.mjs`, 14 cards: Proxy, WeakMap/WeakSet, descriptors, prototypes; still open: output-prediction, hoisting/TDZ, tagged templates, `Symbol.asyncIterator`): output-prediction drills expressed as functions that return the observed order/values (hoisting, TDZ, closures in loops,
    `this` in callbacks), `Proxy`/`Reflect` validators, `WeakMap` private data, getters/setters, tagged templates, `Symbol.asyncIterator`.
 8. **React 19**: `useOptimistic`, `useActionState`, `use(promise)`, `useTransition`. Needs these hooks injected into the sandbox (add to
    `runner.ts` names *carefully*, see §5) and an async-safe `act` path in `domTools.ts`.
