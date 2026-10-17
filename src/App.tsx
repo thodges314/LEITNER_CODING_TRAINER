@@ -25,7 +25,7 @@ import type {
   TrackType,
   SpacedAlgorithm,
 } from './lib/leitner';
-import { getStoredApiKey, getStoredProvider } from './lib/ai';
+import { getStoredApiKey, getStoredProvider, getStoredModel } from './lib/ai';
 import { clearDraft, clearAllDrafts } from './lib/drafts';
 import { getStoredTheme, setStoredTheme, applyThemeToDocument } from './lib/theme';
 import type { AppTheme } from './lib/theme';
@@ -36,6 +36,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { FocusModal } from './components/FocusModal';
 import { AboutModal } from './components/AboutModal';
 import { AiRecommendationPopover } from './components/AiRecommendationPopover';
+import { ActiveModelStatusPopover } from './components/ActiveModelStatusPopover';
 import {
   Terminal,
   Layers,
@@ -74,6 +75,7 @@ export function App() {
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isAiRecommendOpen, setIsAiRecommendOpen] = useState(false);
+  const [isAiStatusOpen, setIsAiStatusOpen] = useState(false);
   const [aiSettingsVersion, setAiSettingsVersion] = useState(0);
   const [reinforcingCardId, setReinforcingCardId] = useState<string | null>(null);
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
@@ -245,6 +247,7 @@ export function App() {
   // Read AI settings with aiSettingsVersion dependency for live updates
   const apiKey = getStoredApiKey();
   const provider = getStoredProvider();
+  const model = getStoredModel();
   void aiSettingsVersion;
   const activeCount = deckState.topics.filter((t) => t.status === 'active').length;
 
@@ -370,9 +373,13 @@ export function App() {
                   type="button"
                   className="badge"
                   style={{
-                    backgroundColor: 'rgba(56, 189, 248, 0.12)',
-                    color: '#38bdf8',
-                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    backgroundColor: isAiStatusOpen
+                      ? (theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.18)' : 'rgba(56, 189, 248, 0.22)')
+                      : (theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.1)' : 'rgba(56, 189, 248, 0.12)'),
+                    color: theme === 'apple-gsos' ? '#4455AA' : '#38bdf8',
+                    border: isAiStatusOpen
+                      ? (theme === 'apple-gsos' ? '1px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.55)')
+                      : (theme === 'apple-gsos' ? '1px solid rgba(68, 85, 170, 0.3)' : '1px solid rgba(56, 189, 248, 0.3)'),
                     padding: '6px 11px',
                     fontSize: '12px',
                     display: 'flex',
@@ -383,19 +390,23 @@ export function App() {
                     fontFamily: 'inherit',
                     transition: 'all 0.15s ease',
                   }}
-                  onClick={() => setIsSettingsOpen(true)}
-                  title={`AI Evaluator active: ${provider.toUpperCase()} • Click to configure in Settings`}
-                  aria-label={`AI Evaluator active: ${provider.toUpperCase()}`}
+                  onClick={() => setIsAiStatusOpen((prev) => !prev)}
+                  title={`AI Engine: ${provider.toUpperCase()} (${model}) • Click to view live rate limits & quota`}
+                  aria-label={`AI Engine: ${provider.toUpperCase()}`}
+                  aria-haspopup="dialog"
+                  aria-expanded={isAiStatusOpen}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.2)';
-                    e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.5)';
+                    e.currentTarget.style.backgroundColor = theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.2)' : 'rgba(56, 189, 248, 0.2)';
+                    e.currentTarget.style.borderColor = theme === 'apple-gsos' ? '#4455AA' : 'rgba(56, 189, 248, 0.5)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.12)';
-                    e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.3)';
+                    if (!isAiStatusOpen) {
+                      e.currentTarget.style.backgroundColor = theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.1)' : 'rgba(56, 189, 248, 0.12)';
+                      e.currentTarget.style.borderColor = theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.3)' : 'rgba(56, 189, 248, 0.3)';
+                    }
                   }}
                 >
-                  <Sparkles size={13} color="#38bdf8" />
+                  <Sparkles size={13} color={theme === 'apple-gsos' ? '#4455AA' : '#38bdf8'} />
                   <span>AI: {provider.toUpperCase()}</span>
                 </button>
               ) : (
@@ -454,6 +465,19 @@ export function App() {
                   setIsAiRecommendOpen(false);
                   setIsSettingsOpen(true);
                 }}
+              />
+
+              {/* Status Popover for Keyed Active Mode */}
+              <ActiveModelStatusPopover
+                isOpen={isAiStatusOpen && !!apiKey}
+                onClose={() => setIsAiStatusOpen(false)}
+                onOpenSettings={() => {
+                  setIsAiStatusOpen(false);
+                  setIsSettingsOpen(true);
+                }}
+                provider={provider}
+                model={model}
+                apiKey={apiKey}
               />
             </div>
 
