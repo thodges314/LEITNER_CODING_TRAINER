@@ -1,0 +1,6 @@
+Implement a custom React hook `useIsMounted()` that returns a stable function `() => boolean`.
+
+Requirements:
+- The returned function returns `true` while the component is mounted, and `false` once it unmounts.
+- The returned callback must retain a stable function identity across re-renders (`useCallback`).
+- Uses a ref initialized to `true` and an effect cleanup function to set it to `false` on unmount.

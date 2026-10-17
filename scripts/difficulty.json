@@ -914,5 +914,25 @@
   "test-runner-lifecycle": {
     "difficulty": 5,
     "concept": "architecture"
+  },
+  "use-is-mounted": {
+    "difficulty": 1,
+    "concept": "react-hooks-utility"
+  },
+  "use-media-query": {
+    "difficulty": 2,
+    "concept": "react-hooks-utility"
+  },
+  "breadcrumbs-router": {
+    "difficulty": 2,
+    "concept": "routing"
+  },
+  "transfer-list": {
+    "difficulty": 3,
+    "concept": "dual-list"
+  },
+  "nested-checkbox-tree": {
+    "difficulty": 3,
+    "concept": "tree-ui"
   }
 }

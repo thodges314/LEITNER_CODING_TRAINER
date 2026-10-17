@@ -20,5 +20,7 @@ import p22 from './part22.mjs';
 import p23 from './part23.mjs';
 import p24 from './part24.mjs';
 import p25 from './part25.mjs';
-export const newCards = { ...p5, ...p6, ...p7, ...p8, ...p9, ...p10, ...p11, ...p12, ...p13, ...p14, ...p15, ...p16, ...p17, ...p18, ...p19, ...p20, ...p21, ...p22, ...p23, ...p24, ...p25 };
+import p26 from './part26.mjs';
+export const newCards = { ...p5, ...p6, ...p7, ...p8, ...p9, ...p10, ...p11, ...p12, ...p13, ...p14, ...p15, ...p16, ...p17, ...p18, ...p19, ...p20, ...p21, ...p22, ...p23, ...p24, ...p25, ...p26 };
+
 

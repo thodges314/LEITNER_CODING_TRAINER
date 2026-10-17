@@ -1,0 +1,10 @@
+{
+  "track": "react-patterns",
+  "title": "useMediaQuery Hook: Responsive MatchMedia Listener",
+  "tags": [
+    "react",
+    "hooks",
+    "responsive",
+    "media-query"
+  ]
+}

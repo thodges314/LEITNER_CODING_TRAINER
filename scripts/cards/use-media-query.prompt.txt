@@ -1,0 +1,8 @@
+Implement a custom React hook `useMediaQuery(query)` that listens for responsive viewport changes.
+
+Requirements:
+- Accepts a CSS media query string (e.g. `'(min-width: 768px)'`).
+- Initializes matches state using `window.matchMedia(query).matches` (defaulting to `false` if `window.matchMedia` is undefined).
+- Registers a change listener on the media query list (`addEventListener` with fallback to `addListener`).
+- Updates `matches` boolean state when the media query status changes.
+- Cleans up event listeners when the component unmounts or when the `query` string changes.

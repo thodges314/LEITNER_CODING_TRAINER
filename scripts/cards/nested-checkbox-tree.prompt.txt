@@ -1,0 +1,23 @@
+Implement `useCheckboxTree(treeData, initialChecked = [])` to manage hierarchical checkbox states with indeterminate status propagation.
+
+Tree Node structure:
+```ts
+interface TreeNode {
+  id: string;
+  label: string;
+  children?: TreeNode[];
+}
+```
+
+Requirements:
+- Status for any node is:
+  - `'checked'`: if a leaf is in `checkedIds`, or if all children of a parent node are `'checked'`.
+  - `'unchecked'`: if a leaf is not in `checkedIds`, or if all children of a parent node are `'unchecked'`.
+  - `'indeterminate'`: if some children are checked and some unchecked, or if any child is `'indeterminate'`.
+- `toggle(id)`:
+  - If node is currently `'checked'`, toggling unchecks `id` and all of its descendants.
+  - If node is currently `'unchecked'` or `'indeterminate'`, toggling checks `id` and all of its descendants.
+- Returns:
+  - `checkedIds`: array of currently checked IDs.
+  - `getStatus(id)`: returns `'checked' | 'unchecked' | 'indeterminate'`.
+  - `toggle(id)`: updates checked state according to hierarchical rules.

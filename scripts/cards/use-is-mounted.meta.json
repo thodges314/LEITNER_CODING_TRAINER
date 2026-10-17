@@ -1,0 +1,10 @@
+{
+  "track": "react-patterns",
+  "title": "useIsMounted Hook: Component Mount Status Guard",
+  "tags": [
+    "react",
+    "hooks",
+    "lifecycle",
+    "ref"
+  ]
+}

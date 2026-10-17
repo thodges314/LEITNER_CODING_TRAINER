@@ -1143,5 +1143,30 @@
     "targetTime": "O(t * h)",
     "targetSpace": "O(t + s)",
     "complexityExplanation": "Running t tests across nested suite tree with hook depth h executes in O(t * h) time and O(t + s) tree storage."
+  },
+  "use-is-mounted": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Ref and callback operations execute in constant time and memory."
+  },
+  "use-media-query": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Event listener registration and state updates perform constant-time operations."
+  },
+  "breadcrumbs-router": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Segmenting path of depth n generates linear breadcrumb records and DOM elements."
+  },
+  "transfer-list": {
+    "targetTime": "O(n + m)",
+    "targetSpace": "O(n + m)",
+    "complexityExplanation": "Filtering and transferring selected subsets scales linearly with list sizes."
+  },
+  "nested-checkbox-tree": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Computing and updating tri-state status traverses tree nodes in linear time."
   }
 }
