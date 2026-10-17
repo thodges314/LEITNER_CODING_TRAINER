@@ -61,9 +61,6 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
               <h2 id="about-title" style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
                 About Leitner Coding Trainer
               </h2>
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                Deliberate Cold-Start Retrieval Practice
-              </p>
             </div>
           </div>
           <button
