@@ -13133,5 +13133,301 @@
     "targetTime": "O(depth)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Recursive template literal pattern matching at compile time; runtime split traversal."
+  },
+  {
+    "id": "fake-timers",
+    "track": "testing-tooling",
+    "title": "Fake Timers: Virtual Micro-Clock Harness",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "timers",
+      "fake-timers",
+      "event-loop"
+    ],
+    "promptSeed": "Implement a virtual timer controller `FakeTimers` (or factory `createFakeTimers()`) that manages synchronous time progression for testing async code without real wall-clock delays:\n\n- `now()`: returns the current virtual time in milliseconds (starts at 0).\n- `setTimeout(callback, delay = 0, ...args)`: schedules `callback(...args)` to run after `delay` ms (at `now() + Math.max(0, delay)`). Returns a unique numeric timer ID.\n- `clearTimeout(id)`: cancels the pending timer associated with `id`.\n- `advanceTimersByTime(ms)`: advances the virtual clock by `ms` (ms >= 0). Executes all timers scheduled at or before the new target time in chronological order. If two timers are scheduled for the exact same millisecond, execute them in order of creation (smaller timer ID first).\n\nImportant: If an executing timer schedules new timers that also fall within the target advance window (cascading timers), those new timers must also run in chronological order during the same call.",
+    "difficulty": 4,
+    "concept": "testing-tools",
+    "referenceSolution": "class FakeTimers {\n  constructor() {\n    this._time = 0;\n    this._nextId = 1;\n    this._timers = new Map();\n  }\n\n  now() {\n    return this._time;\n  }\n\n  setTimeout(cb, delay = 0, ...args) {\n    const id = this._nextId++;\n    const scheduledTime = this._time + Math.max(0, delay);\n    this._timers.set(id, { id, time: scheduledTime, cb, args });\n    return id;\n  }\n\n  clearTimeout(id) {\n    this._timers.delete(id);\n  }\n\n  advanceTimersByTime(ms) {\n    if (ms <= 0) return;\n    const targetTime = this._time + ms;\n\n    while (true) {\n      let earliest = null;\n      for (const timer of this._timers.values()) {\n        if (timer.time <= targetTime) {\n          if (\n            !earliest ||\n            timer.time < earliest.time ||\n            (timer.time === earliest.time && timer.id < earliest.id)\n          ) {\n            earliest = timer;\n          }\n        }\n      }\n\n      if (!earliest) break;\n\n      this._time = earliest.time;\n      this._timers.delete(earliest.id);\n      earliest.cb(...earliest.args);\n    }\n\n    this._time = targetTime;\n  }\n}\n\nfunction createFakeTimers() {\n  return new FakeTimers();\n}",
+    "solution": "class FakeTimers {\n  constructor() {\n    this._time = 0;\n    this._nextId = 1;\n    this._timers = new Map();\n  }\n\n  now() {\n    return this._time;\n  }\n\n  setTimeout(cb, delay = 0, ...args) {\n    const id = this._nextId++;\n    const scheduledTime = this._time + Math.max(0, delay);\n    this._timers.set(id, { id, time: scheduledTime, cb, args });\n    return id;\n  }\n\n  clearTimeout(id) {\n    this._timers.delete(id);\n  }\n\n  advanceTimersByTime(ms) {\n    if (ms <= 0) return;\n    const targetTime = this._time + ms;\n\n    while (true) {\n      let earliest = null;\n      for (const timer of this._timers.values()) {\n        if (timer.time <= targetTime) {\n          if (\n            !earliest ||\n            timer.time < earliest.time ||\n            (timer.time === earliest.time && timer.id < earliest.id)\n          ) {\n            earliest = timer;\n          }\n        }\n      }\n\n      if (!earliest) break;\n\n      this._time = earliest.time;\n      this._timers.delete(earliest.id);\n      earliest.cb(...earliest.args);\n    }\n\n    this._time = targetTime;\n  }\n}\n\nfunction createFakeTimers() {\n  return new FakeTimers();\n}",
+    "starterCode": "class FakeTimers {\n  constructor() {\n    this._time = 0;\n    this._nextId = 1;\n    this._timers = new Map();\n  }\n\n  now() {\n    return this._time;\n  }\n\n  setTimeout(cb, delay = 0, ...args) {\n    const id = this._nextId++;\n    const scheduledTime = this._time + Math.max(0, delay);\n    this._timers.set(id, { id, time: scheduledTime, cb, args });\n    return id;\n  }\n\n  clearTimeout(id) {\n    this._timers.delete(id);\n  }\n\n  advanceTimersByTime(ms) {\n    if (ms <= 0) return;\n    const targetTime = this._time + ms;\n\n    while (true) {\n      let earliest = null;\n      for (const timer of this._timers.values()) {\n        if (timer.time <= targetTime) {\n          if (\n            !earliest ||\n            timer.time < earliest.time ||\n            (timer.time === earliest.time && timer.id < earliest.id)\n          ) {\n            earliest = timer;\n          }\n        }\n      }\n\n      if (!earliest) break;\n\n      this._time = earliest.time;\n      this._timers.delete(earliest.id);\n      earliest.cb(...earliest.args);\n    }\n\n    this._time = targetTime;\n  }\n}\n\nfunction createFakeTimers() {\n  return new FakeTimers();\n}",
+    "testCases": [
+      {
+        "description": "now returns initial 0 and advances with advanceTimersByTime",
+        "input": "const clock = new FakeTimers();\nconst start = clock.now();\nclock.advanceTimersByTime(250);\n[start, clock.now()]",
+        "expected": "[0, 250]"
+      },
+      {
+        "description": "delays callback execution until virtual time has elapsed",
+        "input": "const clock = new FakeTimers();\nlet called = false;\nclock.setTimeout(() => { called = true; }, 100);\nclock.advanceTimersByTime(50);\nconst before = called;\nclock.advanceTimersByTime(50);\n[before, called]",
+        "expected": "[false, true]"
+      },
+      {
+        "description": "passes additional arguments to scheduled callback",
+        "input": "const clock = new FakeTimers();\nlet received = null;\nclock.setTimeout((a, b) => { received = a + b; }, 50, 10, 20);\nclock.advanceTimersByTime(50);\nreceived",
+        "expected": "30"
+      },
+      {
+        "description": "clearTimeout cancels pending timer before it runs",
+        "input": "const clock = new FakeTimers();\nlet called = false;\nconst id = clock.setTimeout(() => { called = true; }, 100);\nclock.advanceTimersByTime(50);\nclock.clearTimeout(id);\nclock.advanceTimersByTime(100);\ncalled",
+        "expected": "false"
+      },
+      {
+        "description": "executes multiple timers in strict chronological order",
+        "input": "const clock = new FakeTimers();\nconst order = [];\nclock.setTimeout(() => order.push('C'), 300);\nclock.setTimeout(() => order.push('A'), 100);\nclock.setTimeout(() => order.push('B'), 200);\nclock.advanceTimersByTime(350);\norder",
+        "expected": "['A', 'B', 'C']"
+      },
+      {
+        "description": "executes cascading timers scheduled within current advance window",
+        "input": "const clock = new FakeTimers();\nconst log = [];\nclock.setTimeout(() => {\n  log.push('step1');\n  clock.setTimeout(() => log.push('step2'), 50);\n}, 50);\nclock.advanceTimersByTime(120);\nlog",
+        "expected": "['step1', 'step2']"
+      }
+    ],
+    "testHarness": "await $test.run(\"now returns initial 0 and advances with advanceTimersByTime\", async () => {\n  const sleep = $test.sleep;\n  const clock = new FakeTimers();\n  const start = clock.now();\n  clock.advanceTimersByTime(250);\n  return ([start, clock.now()]);\n}, () => ([0, 250]));\n\nawait $test.run(\"delays callback execution until virtual time has elapsed\", async () => {\n  const sleep = $test.sleep;\n  const clock = new FakeTimers();\n  let called = false;\n  clock.setTimeout(() => { called = true; }, 100);\n  clock.advanceTimersByTime(50);\n  const before = called;\n  clock.advanceTimersByTime(50);\n  return ([before, called]);\n}, () => ([false, true]));\n\nawait $test.run(\"passes additional arguments to scheduled callback\", async () => {\n  const sleep = $test.sleep;\n  const clock = new FakeTimers();\n  let received = null;\n  clock.setTimeout((a, b) => { received = a + b; }, 50, 10, 20);\n  clock.advanceTimersByTime(50);\n  return (received);\n}, () => (30));\n\nawait $test.run(\"clearTimeout cancels pending timer before it runs\", async () => {\n  const sleep = $test.sleep;\n  const clock = new FakeTimers();\n  let called = false;\n  const id = clock.setTimeout(() => { called = true; }, 100);\n  clock.advanceTimersByTime(50);\n  clock.clearTimeout(id);\n  clock.advanceTimersByTime(100);\n  return (called);\n}, () => (false));\n\nawait $test.run(\"executes multiple timers in strict chronological order\", async () => {\n  const sleep = $test.sleep;\n  const clock = new FakeTimers();\n  const order = [];\n  clock.setTimeout(() => order.push('C'), 300);\n  clock.setTimeout(() => order.push('A'), 100);\n  clock.setTimeout(() => order.push('B'), 200);\n  clock.advanceTimersByTime(350);\n  return (order);\n}, () => (['A', 'B', 'C']));\n\nawait $test.run(\"executes cascading timers scheduled within current advance window\", async () => {\n  const sleep = $test.sleep;\n  const clock = new FakeTimers();\n  const log = [];\n  clock.setTimeout(() => {\n    log.push('step1');\n    clock.setTimeout(() => log.push('step2'), 50);\n  }, 50);\n  clock.advanceTimersByTime(120);\n  return (log);\n}, () => (['step1', 'step2']));",
+    "targetTime": "O(k log k)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Ordering and advancing through k scheduled virtual timers requires linear or heap-ordered lookup per timer step."
+  },
+  {
+    "id": "mini-expect",
+    "track": "testing-tooling",
+    "title": "Mini Expect: Assertion Runner with Deep Equality & Not Chaining",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "assertions",
+      "expect",
+      "deep-equality"
+    ],
+    "promptSeed": "Implement a standalone `expect(actual)` assertion runner supporting core matchers and `.not` negation chaining:\n\n- `.toBe(expected)`: asserts identity comparison via `Object.is(actual, expected)`. Throws an `Error` if the check fails.\n- `.toEqual(expected)`: asserts deep structural equality for primitives, objects, arrays, Dates, and RegExps. Throws an `Error` if the check fails.\n- `.toThrow(expectedError?)`: asserts that `actual` is a function that throws when invoked. If `expectedError` is provided as a string or RegExp, asserts that the thrown error message contains the string or matches the RegExp. Throws an `Error` if `actual` fails to throw or if the message does not match.\n- `.not`: inverts the assertion outcome for any matcher (`.not.toBe()`, `.not.toEqual()`, `.not.toThrow()`).\n- Each successful assertion returns `{ pass: true }`.",
+    "difficulty": 3,
+    "concept": "testing-tools",
+    "referenceSolution": "function deepEqual(a, b) {\n  if (Object.is(a, b)) return true;\n  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;\n  if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();\n  if (a instanceof RegExp && b instanceof RegExp) return a.source === b.source && a.flags === b.flags;\n  if (Array.isArray(a) !== Array.isArray(b)) return false;\n\n  const keysA = Object.keys(a);\n  const keysB = Object.keys(b);\n  if (keysA.length !== keysB.length) return false;\n\n  for (const k of keysA) {\n    if (!Object.prototype.hasOwnProperty.call(b, k)) return false;\n    if (!deepEqual(a[k], b[k])) return false;\n  }\n  return true;\n}\n\nfunction expect(actual) {\n  function createMatchers(isNot = false) {\n    return {\n      get not() {\n        return createMatchers(!isNot);\n      },\n      toBe(expected) {\n        const pass = Object.is(actual, expected);\n        if (isNot ? pass : !pass) {\n          throw new Error(`Assertion failed: expected ${actual} ${isNot ? 'not to be' : 'to be'} ${expected}`);\n        }\n        return { pass: true };\n      },\n      toEqual(expected) {\n        const pass = deepEqual(actual, expected);\n        if (isNot ? pass : !pass) {\n          throw new Error(`Assertion failed: expected deep equality ${isNot ? 'not to match' : 'to match'}`);\n        }\n        return { pass: true };\n      },\n      toThrow(expectedError) {\n        if (typeof actual !== 'function') {\n          throw new Error('actual must be a function to assert toThrow');\n        }\n        let threw = false;\n        let errVal = null;\n        try {\n          actual();\n        } catch (e) {\n          threw = true;\n          errVal = e;\n        }\n\n        let match = threw;\n        if (threw && expectedError !== undefined) {\n          const msg = errVal instanceof Error ? errVal.message : String(errVal);\n          if (expectedError instanceof RegExp) {\n            match = expectedError.test(msg);\n          } else if (typeof expectedError === 'string') {\n            match = msg.includes(expectedError);\n          }\n        }\n\n        if (isNot ? match : !match) {\n          throw new Error(`Assertion failed: expected function ${isNot ? 'not to throw' : 'to throw'}`);\n        }\n        return { pass: true };\n      }\n    };\n  }\n\n  return createMatchers(false);\n}",
+    "solution": "function deepEqual(a, b) {\n  if (Object.is(a, b)) return true;\n  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;\n  if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();\n  if (a instanceof RegExp && b instanceof RegExp) return a.source === b.source && a.flags === b.flags;\n  if (Array.isArray(a) !== Array.isArray(b)) return false;\n\n  const keysA = Object.keys(a);\n  const keysB = Object.keys(b);\n  if (keysA.length !== keysB.length) return false;\n\n  for (const k of keysA) {\n    if (!Object.prototype.hasOwnProperty.call(b, k)) return false;\n    if (!deepEqual(a[k], b[k])) return false;\n  }\n  return true;\n}\n\nfunction expect(actual) {\n  function createMatchers(isNot = false) {\n    return {\n      get not() {\n        return createMatchers(!isNot);\n      },\n      toBe(expected) {\n        const pass = Object.is(actual, expected);\n        if (isNot ? pass : !pass) {\n          throw new Error(`Assertion failed: expected ${actual} ${isNot ? 'not to be' : 'to be'} ${expected}`);\n        }\n        return { pass: true };\n      },\n      toEqual(expected) {\n        const pass = deepEqual(actual, expected);\n        if (isNot ? pass : !pass) {\n          throw new Error(`Assertion failed: expected deep equality ${isNot ? 'not to match' : 'to match'}`);\n        }\n        return { pass: true };\n      },\n      toThrow(expectedError) {\n        if (typeof actual !== 'function') {\n          throw new Error('actual must be a function to assert toThrow');\n        }\n        let threw = false;\n        let errVal = null;\n        try {\n          actual();\n        } catch (e) {\n          threw = true;\n          errVal = e;\n        }\n\n        let match = threw;\n        if (threw && expectedError !== undefined) {\n          const msg = errVal instanceof Error ? errVal.message : String(errVal);\n          if (expectedError instanceof RegExp) {\n            match = expectedError.test(msg);\n          } else if (typeof expectedError === 'string') {\n            match = msg.includes(expectedError);\n          }\n        }\n\n        if (isNot ? match : !match) {\n          throw new Error(`Assertion failed: expected function ${isNot ? 'not to throw' : 'to throw'}`);\n        }\n        return { pass: true };\n      }\n    };\n  }\n\n  return createMatchers(false);\n}",
+    "starterCode": "function deepEqual(a, b) {\n  if (Object.is(a, b)) return true;\n  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;\n  if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();\n  if (a instanceof RegExp && b instanceof RegExp) return a.source === b.source && a.flags === b.flags;\n  if (Array.isArray(a) !== Array.isArray(b)) return false;\n\n  const keysA = Object.keys(a);\n  const keysB = Object.keys(b);\n  if (keysA.length !== keysB.length) return false;\n\n  for (const k of keysA) {\n    if (!Object.prototype.hasOwnProperty.call(b, k)) return false;\n    if (!deepEqual(a[k], b[k])) return false;\n  }\n  return true;\n}\n\nfunction expect(actual) {\n  function createMatchers(isNot = false) {\n    return {\n      get not() {\n        return createMatchers(!isNot);\n      },\n      toBe(expected) {\n        const pass = Object.is(actual, expected);\n        if (isNot ? pass : !pass) {\n          throw new Error(`Assertion failed: expected ${actual} ${isNot ? 'not to be' : 'to be'} ${expected}`);\n        }\n        return { pass: true };\n      },\n      toEqual(expected) {\n        const pass = deepEqual(actual, expected);\n        if (isNot ? pass : !pass) {\n          throw new Error(`Assertion failed: expected deep equality ${isNot ? 'not to match' : 'to match'}`);\n        }\n        return { pass: true };\n      },\n      toThrow(expectedError) {\n        if (typeof actual !== 'function') {\n          throw new Error('actual must be a function to assert toThrow');\n        }\n        let threw = false;\n        let errVal = null;\n        try {\n          actual();\n        } catch (e) {\n          threw = true;\n          errVal = e;\n        }\n\n        let match = threw;\n        if (threw && expectedError !== undefined) {\n          const msg = errVal instanceof Error ? errVal.message : String(errVal);\n          if (expectedError instanceof RegExp) {\n            match = expectedError.test(msg);\n          } else if (typeof expectedError === 'string') {\n            match = msg.includes(expectedError);\n          }\n        }\n\n        if (isNot ? match : !match) {\n          throw new Error(`Assertion failed: expected function ${isNot ? 'not to throw' : 'to throw'}`);\n        }\n        return { pass: true };\n      }\n    };\n  }\n\n  return createMatchers(false);\n}",
+    "testCases": [
+      {
+        "description": "toBe asserts identity equality and not.toBe asserts inequality",
+        "input": "[expect(5).toBe(5).pass, expect(5).not.toBe(10).pass]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "toBe throws an Error when assertion fails",
+        "input": "let caught = false;\ntry {\n  expect('foo').toBe('bar');\n} catch (e) {\n  caught = true;\n}\ncaught",
+        "expected": "true"
+      },
+      {
+        "description": "toEqual matches deep objects and array structures",
+        "input": "const a = { x: 1, y: [2, 3] };\nconst b = { x: 1, y: [2, 3] };\nexpect(a).toEqual(b).pass",
+        "expected": "true"
+      },
+      {
+        "description": "not.toEqual passes when object contents differ",
+        "input": "expect({ a: 1 }).not.toEqual({ a: 2 }).pass",
+        "expected": "true"
+      },
+      {
+        "description": "toThrow checks that function throws and matches error message",
+        "input": "const boom = () => { throw new Error('invalid state'); };\n[expect(boom).toThrow('invalid').pass, expect(() => {}).not.toThrow().pass]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "toThrow throws an Error if target function does not throw",
+        "input": "let caught = false;\ntry {\n  expect(() => 42).toThrow();\n} catch (e) {\n  caught = true;\n}\ncaught",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"toBe asserts identity equality and not.toBe asserts inequality\", async () => {\n  const sleep = $test.sleep;\n  return ([expect(5).toBe(5).pass, expect(5).not.toBe(10).pass]);\n}, () => ([true, true]));\n\nawait $test.run(\"toBe throws an Error when assertion fails\", async () => {\n  const sleep = $test.sleep;\n  let caught = false;\n  try {\n    expect('foo').toBe('bar');\n  } catch (e) {\n    caught = true;\n  }\n  return (caught);\n}, () => (true));\n\nawait $test.run(\"toEqual matches deep objects and array structures\", async () => {\n  const sleep = $test.sleep;\n  const a = { x: 1, y: [2, 3] };\n  const b = { x: 1, y: [2, 3] };\n  return (expect(a).toEqual(b).pass);\n}, () => (true));\n\nawait $test.run(\"not.toEqual passes when object contents differ\", async () => {\n  const sleep = $test.sleep;\n  return (expect({ a: 1 }).not.toEqual({ a: 2 }).pass);\n}, () => (true));\n\nawait $test.run(\"toThrow checks that function throws and matches error message\", async () => {\n  const sleep = $test.sleep;\n  const boom = () => { throw new Error('invalid state'); };\n  return ([expect(boom).toThrow('invalid').pass, expect(() => {}).not.toThrow().pass]);\n}, () => ([true, true]));\n\nawait $test.run(\"toThrow throws an Error if target function does not throw\", async () => {\n  const sleep = $test.sleep;\n  let caught = false;\n  try {\n    expect(() => 42).toThrow();\n  } catch (e) {\n    caught = true;\n  }\n  return (caught);\n}, () => (true));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(d)",
+    "complexityExplanation": "Deep comparison traverses n properties with recursion depth d bounded by object nesting."
+  },
+  {
+    "id": "mock-fn",
+    "track": "testing-tooling",
+    "title": "Mock Function: Call & Argument Tracker (Jest-Style fn)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "mock",
+      "spy",
+      "jest"
+    ],
+    "promptSeed": "Implement a Jest-style mock function `mockFn(impl?)`.\n\nWhen invoked, the returned mock function calls `impl(...args)` (if provided) and returns its result (or throws if `impl` throws). If `impl` is omitted, the invocation returns `undefined`.\n\nThe mock function must expose a `.mock` property containing:\n- `calls`: an array of argument arrays for each invocation (e.g. `[[arg1, arg2], [arg3]]`).\n- `results`: an array of result objects for each invocation:\n  - `{ type: 'return', value: returnValue }` if the call completed successfully.\n  - `{ type: 'throw', value: thrownError }` if the call threw an exception.\n\nThe mock function must also provide chainable helper methods (each returning the mock function):\n- `.mockReturnValue(val)`: replaces the implementation with one that returns `val`.\n- `.mockImplementation(fn)`: replaces the implementation with `fn`.\n- `.mockClear()`: resets `calls` and `results` arrays back to empty arrays.",
+    "difficulty": 3,
+    "concept": "testing-tools",
+    "referenceSolution": "function mockFn(impl) {\n  let currentImpl = impl;\n\n  function mock(...args) {\n    mock.mock.calls.push(args);\n    try {\n      const res = currentImpl ? currentImpl(...args) : undefined;\n      mock.mock.results.push({ type: 'return', value: res });\n      return res;\n    } catch (err) {\n      mock.mock.results.push({ type: 'throw', value: err });\n      throw err;\n    }\n  }\n\n  mock.mock = {\n    calls: [],\n    results: []\n  };\n\n  mock.mockReturnValue = (val) => {\n    currentImpl = () => val;\n    return mock;\n  };\n\n  mock.mockImplementation = (fn) => {\n    currentImpl = fn;\n    return mock;\n  };\n\n  mock.mockClear = () => {\n    mock.mock.calls = [];\n    mock.mock.results = [];\n    return mock;\n  };\n\n  return mock;\n}",
+    "solution": "function mockFn(impl) {\n  let currentImpl = impl;\n\n  function mock(...args) {\n    mock.mock.calls.push(args);\n    try {\n      const res = currentImpl ? currentImpl(...args) : undefined;\n      mock.mock.results.push({ type: 'return', value: res });\n      return res;\n    } catch (err) {\n      mock.mock.results.push({ type: 'throw', value: err });\n      throw err;\n    }\n  }\n\n  mock.mock = {\n    calls: [],\n    results: []\n  };\n\n  mock.mockReturnValue = (val) => {\n    currentImpl = () => val;\n    return mock;\n  };\n\n  mock.mockImplementation = (fn) => {\n    currentImpl = fn;\n    return mock;\n  };\n\n  mock.mockClear = () => {\n    mock.mock.calls = [];\n    mock.mock.results = [];\n    return mock;\n  };\n\n  return mock;\n}",
+    "starterCode": "function mockFn(impl) {\n  let currentImpl = impl;\n\n  function mock(...args) {\n    mock.mock.calls.push(args);\n    try {\n      const res = currentImpl ? currentImpl(...args) : undefined;\n      mock.mock.results.push({ type: 'return', value: res });\n      return res;\n    } catch (err) {\n      mock.mock.results.push({ type: 'throw', value: err });\n      throw err;\n    }\n  }\n\n  mock.mock = {\n    calls: [],\n    results: []\n  };\n\n  mock.mockReturnValue = (val) => {\n    currentImpl = () => val;\n    return mock;\n  };\n\n  mock.mockImplementation = (fn) => {\n    currentImpl = fn;\n    return mock;\n  };\n\n  mock.mockClear = () => {\n    mock.mock.calls = [];\n    mock.mock.results = [];\n    return mock;\n  };\n\n  return mock;\n}",
+    "testCases": [
+      {
+        "description": "tracks calls and arguments across multiple invocations",
+        "input": "const fn = mockFn();\nfn(1, 2);\nfn('hello');\nfn.mock.calls",
+        "expected": "[[1, 2], ['hello']]"
+      },
+      {
+        "description": "tracks return values in results array",
+        "input": "const fn = mockFn((x) => x * 2);\nfn(5);\nfn(10);\nfn.mock.results",
+        "expected": "[{ type: 'return', value: 10 }, { type: 'return', value: 20 }]"
+      },
+      {
+        "description": "records thrown error objects in results array",
+        "input": "const fn = mockFn(() => { throw new Error('boom'); });\nlet caught = null;\ntry { fn(); } catch (e) { caught = e.message; }\n[caught, fn.mock.results[0].type, fn.mock.results[0].value.message]",
+        "expected": "['boom', 'throw', 'boom']"
+      },
+      {
+        "description": "mockReturnValue updates return value and chains",
+        "input": "const fn = mockFn().mockReturnValue(42);\n[fn(), fn('ignored')]",
+        "expected": "[42, 42]"
+      },
+      {
+        "description": "mockImplementation updates active implementation function",
+        "input": "const fn = mockFn();\nfn.mockImplementation((a, b) => a + b);\nfn(3, 4)",
+        "expected": "7"
+      },
+      {
+        "description": "mockClear resets recorded calls and results",
+        "input": "const fn = mockFn((x) => x);\nfn(1);\nfn.mockClear();\n[fn.mock.calls.length, fn.mock.results.length]",
+        "expected": "[0, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"tracks calls and arguments across multiple invocations\", async () => {\n  const sleep = $test.sleep;\n  const fn = mockFn();\n  fn(1, 2);\n  fn('hello');\n  return (fn.mock.calls);\n}, () => ([[1, 2], ['hello']]));\n\nawait $test.run(\"tracks return values in results array\", async () => {\n  const sleep = $test.sleep;\n  const fn = mockFn((x) => x * 2);\n  fn(5);\n  fn(10);\n  return (fn.mock.results);\n}, () => ([{ type: 'return', value: 10 }, { type: 'return', value: 20 }]));\n\nawait $test.run(\"records thrown error objects in results array\", async () => {\n  const sleep = $test.sleep;\n  const fn = mockFn(() => { throw new Error('boom'); });\n  let caught = null;\n  try { fn(); } catch (e) { caught = e.message; }\n  return ([caught, fn.mock.results[0].type, fn.mock.results[0].value.message]);\n}, () => (['boom', 'throw', 'boom']));\n\nawait $test.run(\"mockReturnValue updates return value and chains\", async () => {\n  const sleep = $test.sleep;\n  const fn = mockFn().mockReturnValue(42);\n  return ([fn(), fn('ignored')]);\n}, () => ([42, 42]));\n\nawait $test.run(\"mockImplementation updates active implementation function\", async () => {\n  const sleep = $test.sleep;\n  const fn = mockFn();\n  fn.mockImplementation((a, b) => a + b);\n  return (fn(3, 4));\n}, () => (7));\n\nawait $test.run(\"mockClear resets recorded calls and results\", async () => {\n  const sleep = $test.sleep;\n  const fn = mockFn((x) => x);\n  fn(1);\n  fn.mockClear();\n  return ([fn.mock.calls.length, fn.mock.results.length]);\n}, () => ([0, 0]));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Recording call arguments and results performs O(1) work per invocation with O(k) memory for k calls."
+  },
+  {
+    "id": "next-route-matcher",
+    "track": "testing-tooling",
+    "title": "Next.js Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "routing",
+      "nextjs",
+      "pattern-matching",
+      "regex"
+    ],
+    "promptSeed": "Implement `matchRoute(pattern, pathname)` to match URL pathnames against Next.js-style file-system route patterns and extract parameter mappings.\n\nSegment rules:\n1. Static segments: exact string match (e.g. `/posts/latest`).\n2. Single dynamic parameter: `[param]` matches exactly one non-empty path segment. Returns `{ [param]: segmentString }`.\n3. Catch-all parameter: `[...slug]` matches one or more path segments. Returns `{ [slug]: [segment1, segment2, ...] }`. Fails (returns `null`) if zero segments are provided.\n4. Optional catch-all parameter: `[[...slug]]` matches zero or more path segments. Returns `{ [slug]: [segment1, ...] }` or `{ [slug]: [] }` if no segments match.\n\nReturn value:\n- Returns `{ params: Record<string, string | string[]> }` if `pathname` matches `pattern`.\n- Returns `null` if `pathname` does not match the pattern.\n- Leading and trailing slashes should be normalized.",
+    "difficulty": 3,
+    "concept": "routing",
+    "referenceSolution": "function matchRoute(pattern, pathname) {\n  const pSegs = pattern.split('/').filter(Boolean);\n  const uSegs = pathname.split('/').filter(Boolean);\n  const params = {};\n\n  let uIdx = 0;\n  for (let pIdx = 0; pIdx < pSegs.length; pIdx++) {\n    const p = pSegs[pIdx];\n\n    // Optional catch-all: [[...param]]\n    const optMatch = p.match(/^\\[\\[\\.\\.\\.([^\\]]+)\\]\\]$/);\n    if (optMatch) {\n      const key = optMatch[1];\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Catch-all: [...param]\n    const catchMatch = p.match(/^\\[\\.\\.\\.([^\\]]+)\\]$/);\n    if (catchMatch) {\n      const key = catchMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Dynamic param: [param]\n    const paramMatch = p.match(/^\\[([^\\]]+)\\]$/);\n    if (paramMatch) {\n      const key = paramMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs[uIdx];\n      uIdx++;\n      continue;\n    }\n\n    // Static segment\n    if (uIdx >= uSegs.length || p !== uSegs[uIdx]) {\n      return null;\n    }\n    uIdx++;\n  }\n\n  if (uIdx !== uSegs.length) {\n    return null;\n  }\n\n  return { params };\n}",
+    "solution": "function matchRoute(pattern, pathname) {\n  const pSegs = pattern.split('/').filter(Boolean);\n  const uSegs = pathname.split('/').filter(Boolean);\n  const params = {};\n\n  let uIdx = 0;\n  for (let pIdx = 0; pIdx < pSegs.length; pIdx++) {\n    const p = pSegs[pIdx];\n\n    // Optional catch-all: [[...param]]\n    const optMatch = p.match(/^\\[\\[\\.\\.\\.([^\\]]+)\\]\\]$/);\n    if (optMatch) {\n      const key = optMatch[1];\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Catch-all: [...param]\n    const catchMatch = p.match(/^\\[\\.\\.\\.([^\\]]+)\\]$/);\n    if (catchMatch) {\n      const key = catchMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Dynamic param: [param]\n    const paramMatch = p.match(/^\\[([^\\]]+)\\]$/);\n    if (paramMatch) {\n      const key = paramMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs[uIdx];\n      uIdx++;\n      continue;\n    }\n\n    // Static segment\n    if (uIdx >= uSegs.length || p !== uSegs[uIdx]) {\n      return null;\n    }\n    uIdx++;\n  }\n\n  if (uIdx !== uSegs.length) {\n    return null;\n  }\n\n  return { params };\n}",
+    "starterCode": "function matchRoute(pattern, pathname) {\n  const pSegs = pattern.split('/').filter(Boolean);\n  const uSegs = pathname.split('/').filter(Boolean);\n  const params = {};\n\n  let uIdx = 0;\n  for (let pIdx = 0; pIdx < pSegs.length; pIdx++) {\n    const p = pSegs[pIdx];\n\n    // Optional catch-all: [[...param]]\n    const optMatch = p.match(/^\\[\\[\\.\\.\\.([^\\]]+)\\]\\]$/);\n    if (optMatch) {\n      const key = optMatch[1];\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Catch-all: [...param]\n    const catchMatch = p.match(/^\\[\\.\\.\\.([^\\]]+)\\]$/);\n    if (catchMatch) {\n      const key = catchMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Dynamic param: [param]\n    const paramMatch = p.match(/^\\[([^\\]]+)\\]$/);\n    if (paramMatch) {\n      const key = paramMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs[uIdx];\n      uIdx++;\n      continue;\n    }\n\n    // Static segment\n    if (uIdx >= uSegs.length || p !== uSegs[uIdx]) {\n      return null;\n    }\n    uIdx++;\n  }\n\n  if (uIdx !== uSegs.length) {\n    return null;\n  }\n\n  return { params };\n}",
+    "testCases": [
+      {
+        "description": "matches static routes and rejects non-matching paths",
+        "input": "[matchRoute('/about', '/about'), matchRoute('/about', '/contact')]",
+        "expected": "[{ params: {} }, null]"
+      },
+      {
+        "description": "extracts single dynamic parameter [id]",
+        "input": "matchRoute('/posts/[id]', '/posts/hello-world')",
+        "expected": "{ params: { id: 'hello-world' } }"
+      },
+      {
+        "description": "matches dynamic parameter in the middle of a route",
+        "input": "matchRoute('/users/[id]/settings', '/users/usr_99/settings')",
+        "expected": "{ params: { id: 'usr_99' } }"
+      },
+      {
+        "description": "matches catch-all [...slug] with multiple segments",
+        "input": "matchRoute('/docs/[...slug]', '/docs/api/v1/endpoints')",
+        "expected": "{ params: { slug: ['api', 'v1', 'endpoints'] } }"
+      },
+      {
+        "description": "catch-all [...slug] requires at least one segment",
+        "input": "matchRoute('/docs/[...slug]', '/docs')",
+        "expected": "null"
+      },
+      {
+        "description": "optional catch-all [[...slug]] matches empty path",
+        "input": "matchRoute('/shop/[[...slug]]', '/shop')",
+        "expected": "{ params: { slug: [] } }"
+      },
+      {
+        "description": "optional catch-all [[...slug]] matches multiple segments",
+        "input": "matchRoute('/shop/[[...slug]]', '/shop/clothing/shoes')",
+        "expected": "{ params: { slug: ['clothing', 'shoes'] } }"
+      },
+      {
+        "description": "returns null on route length mismatch or prefix mismatch",
+        "input": "[matchRoute('/posts/[id]', '/posts/1/extra'), matchRoute('/a/b', '/a')]",
+        "expected": "[null, null]"
+      }
+    ],
+    "testHarness": "await $test.run(\"matches static routes and rejects non-matching paths\", async () => {\n  const sleep = $test.sleep;\n  return ([matchRoute('/about', '/about'), matchRoute('/about', '/contact')]);\n}, () => ([{ params: {} }, null]));\n\nawait $test.run(\"extracts single dynamic parameter [id]\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/posts/[id]', '/posts/hello-world'));\n}, () => ({ params: { id: 'hello-world' } }));\n\nawait $test.run(\"matches dynamic parameter in the middle of a route\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/users/[id]/settings', '/users/usr_99/settings'));\n}, () => ({ params: { id: 'usr_99' } }));\n\nawait $test.run(\"matches catch-all [...slug] with multiple segments\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/docs/[...slug]', '/docs/api/v1/endpoints'));\n}, () => ({ params: { slug: ['api', 'v1', 'endpoints'] } }));\n\nawait $test.run(\"catch-all [...slug] requires at least one segment\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/docs/[...slug]', '/docs'));\n}, () => (null));\n\nawait $test.run(\"optional catch-all [[...slug]] matches empty path\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/shop/[[...slug]]', '/shop'));\n}, () => ({ params: { slug: [] } }));\n\nawait $test.run(\"optional catch-all [[...slug]] matches multiple segments\", async () => {\n  const sleep = $test.sleep;\n  return (matchRoute('/shop/[[...slug]]', '/shop/clothing/shoes'));\n}, () => ({ params: { slug: ['clothing', 'shoes'] } }));\n\nawait $test.run(\"returns null on route length mismatch or prefix mismatch\", async () => {\n  const sleep = $test.sleep;\n  return ([matchRoute('/posts/[id]', '/posts/1/extra'), matchRoute('/a/b', '/a')]);\n}, () => ([null, null]));",
+    "targetTime": "O(k)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Splitting and matching k route segments operates in linear time and memory with respect to route depth."
+  },
+  {
+    "id": "test-runner-lifecycle",
+    "track": "testing-tooling",
+    "title": "Test Runner Lifecycle: Nested Describe, Hooks & Hierarchical Reporter",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "framework",
+      "lifecycle",
+      "architecture",
+      "expert"
+    ],
+    "promptSeed": "Implement an asynchronous, in-memory test runner engine `createTestRunner()` (or `class TestRunner`) supporting nested suites, lifecycle hooks, and hierarchical reporting:\n\n- `describe(title, fn)`: registers a suite. Executes `fn` synchronously to declare nested `it`, `describe`, and lifecycle hooks.\n- `it(title, fn)`: registers a test case. `fn` may be synchronous or return a Promise.\n- Lifecycle hooks:\n  - `beforeAll(fn)`: runs once before any tests or child suites in the declaring suite.\n  - `afterAll(fn)`: runs once after all tests and child suites in the declaring suite finish.\n  - `beforeEach(fn)`: runs before each test in the declaring suite. Inherited by child suites: outer `beforeEach` runs first, followed by inner `beforeEach`.\n  - `afterEach(fn)`: runs after each test in the declaring suite. Inherited by child suites: inner `afterEach` runs first, followed by outer `afterEach` (reverse unwinding).\n- `async run()`: executes the entire hierarchy in registration order and returns a structured report:\n  ```ts\n  {\n    passed: number,\n    failed: number,\n    total: number,\n    suites: SuiteResult[]\n  }\n  ```\n  Where each `SuiteResult` has:\n  ```ts\n  {\n    title: string,\n    tests: Array<{ title: string, status: 'pass' | 'fail', error?: string }>,\n    suites: SuiteResult[]\n  }\n  ```\n- Error isolation:\n  - If a test throws or rejects, mark status `'fail'` with `error: err.message || String(err)`. Subsequent tests continue executing.\n  - If `beforeEach` throws, the test fails, and remaining hooks unwind.\n  - If `beforeAll` throws, all tests in that suite mark `'fail'` with error details.",
+    "difficulty": 5,
+    "concept": "architecture",
+    "referenceSolution": "class TestRunner {\n  constructor() {\n    this._rootSuite = this._createSuite('');\n    this._suiteStack = [this._rootSuite];\n    this.describe = this.describe.bind(this);\n    this.it = this.it.bind(this);\n    this.beforeAll = this.beforeAll.bind(this);\n    this.afterAll = this.afterAll.bind(this);\n    this.beforeEach = this.beforeEach.bind(this);\n    this.afterEach = this.afterEach.bind(this);\n    this.run = this.run.bind(this);\n  }\n\n  _createSuite(title) {\n    return {\n      title,\n      tests: [],\n      suites: [],\n      beforeAll: [],\n      afterAll: [],\n      beforeEach: [],\n      afterEach: []\n    };\n  }\n\n  describe(title, fn) {\n    const suite = this._createSuite(title);\n    this._suiteStack[this._suiteStack.length - 1].suites.push(suite);\n    this._suiteStack.push(suite);\n    try {\n      fn();\n    } finally {\n      this._suiteStack.pop();\n    }\n  }\n\n  it(title, fn) {\n    this._suiteStack[this._suiteStack.length - 1].tests.push({ title, fn });\n  }\n\n  beforeAll(fn) {\n    this._suiteStack[this._suiteStack.length - 1].beforeAll.push(fn);\n  }\n\n  afterAll(fn) {\n    this._suiteStack[this._suiteStack.length - 1].afterAll.push(fn);\n  }\n\n  beforeEach(fn) {\n    this._suiteStack[this._suiteStack.length - 1].beforeEach.push(fn);\n  }\n\n  afterEach(fn) {\n    this._suiteStack[this._suiteStack.length - 1].afterEach.push(fn);\n  }\n\n  async run() {\n    const runSuite = async (suite, inheritedBeforeEach = [], inheritedAfterEach = []) => {\n      const allBeforeEach = [...inheritedBeforeEach, ...suite.beforeEach];\n      const allAfterEach = [...suite.afterEach, ...inheritedAfterEach];\n\n      const suiteResult = {\n        title: suite.title,\n        tests: [],\n        suites: []\n      };\n\n      let beforeAllError = null;\n      for (const hook of suite.beforeAll) {\n        try {\n          await hook();\n        } catch (err) {\n          beforeAllError = err;\n          break;\n        }\n      }\n\n      for (const test of suite.tests) {\n        if (beforeAllError) {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'fail',\n            error: `beforeAll failed: ${beforeAllError.message || String(beforeAllError)}`\n          });\n          continue;\n        }\n\n        let testError = null;\n        for (const hook of allBeforeEach) {\n          try {\n            await hook();\n          } catch (err) {\n            testError = err;\n            break;\n          }\n        }\n\n        if (!testError) {\n          try {\n            await test.fn();\n          } catch (err) {\n            testError = err;\n          }\n        }\n\n        for (const hook of allAfterEach) {\n          try {\n            await hook();\n          } catch (err) {\n            if (!testError) testError = err;\n          }\n        }\n\n        if (testError) {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'fail',\n            error: testError.message || String(testError)\n          });\n        } else {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'pass'\n          });\n        }\n      }\n\n      for (const childSuite of suite.suites) {\n        const childResult = await runSuite(childSuite, allBeforeEach, allAfterEach);\n        suiteResult.suites.push(childResult);\n      }\n\n      for (const hook of suite.afterAll) {\n        try {\n          await hook();\n        } catch {\n          // ignore\n        }\n      }\n\n      return suiteResult;\n    };\n\n    const topSuites = [];\n    if (this._rootSuite.tests.length > 0) {\n      topSuites.push(await runSuite(this._rootSuite));\n    } else {\n      for (const s of this._rootSuite.suites) {\n        topSuites.push(await runSuite(s));\n      }\n    }\n\n    let passed = 0;\n    let failed = 0;\n    const count = (res) => {\n      for (const t of res.tests) {\n        if (t.status === 'pass') passed++;\n        else failed++;\n      }\n      for (const sub of res.suites) {\n        count(sub);\n      }\n    };\n    for (const r of topSuites) count(r);\n\n    return {\n      passed,\n      failed,\n      total: passed + failed,\n      suites: topSuites\n    };\n  }\n}\n\nfunction createTestRunner() {\n  return new TestRunner();\n}",
+    "solution": "class TestRunner {\n  constructor() {\n    this._rootSuite = this._createSuite('');\n    this._suiteStack = [this._rootSuite];\n    this.describe = this.describe.bind(this);\n    this.it = this.it.bind(this);\n    this.beforeAll = this.beforeAll.bind(this);\n    this.afterAll = this.afterAll.bind(this);\n    this.beforeEach = this.beforeEach.bind(this);\n    this.afterEach = this.afterEach.bind(this);\n    this.run = this.run.bind(this);\n  }\n\n  _createSuite(title) {\n    return {\n      title,\n      tests: [],\n      suites: [],\n      beforeAll: [],\n      afterAll: [],\n      beforeEach: [],\n      afterEach: []\n    };\n  }\n\n  describe(title, fn) {\n    const suite = this._createSuite(title);\n    this._suiteStack[this._suiteStack.length - 1].suites.push(suite);\n    this._suiteStack.push(suite);\n    try {\n      fn();\n    } finally {\n      this._suiteStack.pop();\n    }\n  }\n\n  it(title, fn) {\n    this._suiteStack[this._suiteStack.length - 1].tests.push({ title, fn });\n  }\n\n  beforeAll(fn) {\n    this._suiteStack[this._suiteStack.length - 1].beforeAll.push(fn);\n  }\n\n  afterAll(fn) {\n    this._suiteStack[this._suiteStack.length - 1].afterAll.push(fn);\n  }\n\n  beforeEach(fn) {\n    this._suiteStack[this._suiteStack.length - 1].beforeEach.push(fn);\n  }\n\n  afterEach(fn) {\n    this._suiteStack[this._suiteStack.length - 1].afterEach.push(fn);\n  }\n\n  async run() {\n    const runSuite = async (suite, inheritedBeforeEach = [], inheritedAfterEach = []) => {\n      const allBeforeEach = [...inheritedBeforeEach, ...suite.beforeEach];\n      const allAfterEach = [...suite.afterEach, ...inheritedAfterEach];\n\n      const suiteResult = {\n        title: suite.title,\n        tests: [],\n        suites: []\n      };\n\n      let beforeAllError = null;\n      for (const hook of suite.beforeAll) {\n        try {\n          await hook();\n        } catch (err) {\n          beforeAllError = err;\n          break;\n        }\n      }\n\n      for (const test of suite.tests) {\n        if (beforeAllError) {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'fail',\n            error: `beforeAll failed: ${beforeAllError.message || String(beforeAllError)}`\n          });\n          continue;\n        }\n\n        let testError = null;\n        for (const hook of allBeforeEach) {\n          try {\n            await hook();\n          } catch (err) {\n            testError = err;\n            break;\n          }\n        }\n\n        if (!testError) {\n          try {\n            await test.fn();\n          } catch (err) {\n            testError = err;\n          }\n        }\n\n        for (const hook of allAfterEach) {\n          try {\n            await hook();\n          } catch (err) {\n            if (!testError) testError = err;\n          }\n        }\n\n        if (testError) {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'fail',\n            error: testError.message || String(testError)\n          });\n        } else {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'pass'\n          });\n        }\n      }\n\n      for (const childSuite of suite.suites) {\n        const childResult = await runSuite(childSuite, allBeforeEach, allAfterEach);\n        suiteResult.suites.push(childResult);\n      }\n\n      for (const hook of suite.afterAll) {\n        try {\n          await hook();\n        } catch {\n          // ignore\n        }\n      }\n\n      return suiteResult;\n    };\n\n    const topSuites = [];\n    if (this._rootSuite.tests.length > 0) {\n      topSuites.push(await runSuite(this._rootSuite));\n    } else {\n      for (const s of this._rootSuite.suites) {\n        topSuites.push(await runSuite(s));\n      }\n    }\n\n    let passed = 0;\n    let failed = 0;\n    const count = (res) => {\n      for (const t of res.tests) {\n        if (t.status === 'pass') passed++;\n        else failed++;\n      }\n      for (const sub of res.suites) {\n        count(sub);\n      }\n    };\n    for (const r of topSuites) count(r);\n\n    return {\n      passed,\n      failed,\n      total: passed + failed,\n      suites: topSuites\n    };\n  }\n}\n\nfunction createTestRunner() {\n  return new TestRunner();\n}",
+    "starterCode": "class TestRunner {\n  constructor() {\n    this._rootSuite = this._createSuite('');\n    this._suiteStack = [this._rootSuite];\n    this.describe = this.describe.bind(this);\n    this.it = this.it.bind(this);\n    this.beforeAll = this.beforeAll.bind(this);\n    this.afterAll = this.afterAll.bind(this);\n    this.beforeEach = this.beforeEach.bind(this);\n    this.afterEach = this.afterEach.bind(this);\n    this.run = this.run.bind(this);\n  }\n\n  _createSuite(title) {\n    return {\n      title,\n      tests: [],\n      suites: [],\n      beforeAll: [],\n      afterAll: [],\n      beforeEach: [],\n      afterEach: []\n    };\n  }\n\n  describe(title, fn) {\n    const suite = this._createSuite(title);\n    this._suiteStack[this._suiteStack.length - 1].suites.push(suite);\n    this._suiteStack.push(suite);\n    try {\n      fn();\n    } finally {\n      this._suiteStack.pop();\n    }\n  }\n\n  it(title, fn) {\n    this._suiteStack[this._suiteStack.length - 1].tests.push({ title, fn });\n  }\n\n  beforeAll(fn) {\n    this._suiteStack[this._suiteStack.length - 1].beforeAll.push(fn);\n  }\n\n  afterAll(fn) {\n    this._suiteStack[this._suiteStack.length - 1].afterAll.push(fn);\n  }\n\n  beforeEach(fn) {\n    this._suiteStack[this._suiteStack.length - 1].beforeEach.push(fn);\n  }\n\n  afterEach(fn) {\n    this._suiteStack[this._suiteStack.length - 1].afterEach.push(fn);\n  }\n\n  async run() {\n    const runSuite = async (suite, inheritedBeforeEach = [], inheritedAfterEach = []) => {\n      const allBeforeEach = [...inheritedBeforeEach, ...suite.beforeEach];\n      const allAfterEach = [...suite.afterEach, ...inheritedAfterEach];\n\n      const suiteResult = {\n        title: suite.title,\n        tests: [],\n        suites: []\n      };\n\n      let beforeAllError = null;\n      for (const hook of suite.beforeAll) {\n        try {\n          await hook();\n        } catch (err) {\n          beforeAllError = err;\n          break;\n        }\n      }\n\n      for (const test of suite.tests) {\n        if (beforeAllError) {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'fail',\n            error: `beforeAll failed: ${beforeAllError.message || String(beforeAllError)}`\n          });\n          continue;\n        }\n\n        let testError = null;\n        for (const hook of allBeforeEach) {\n          try {\n            await hook();\n          } catch (err) {\n            testError = err;\n            break;\n          }\n        }\n\n        if (!testError) {\n          try {\n            await test.fn();\n          } catch (err) {\n            testError = err;\n          }\n        }\n\n        for (const hook of allAfterEach) {\n          try {\n            await hook();\n          } catch (err) {\n            if (!testError) testError = err;\n          }\n        }\n\n        if (testError) {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'fail',\n            error: testError.message || String(testError)\n          });\n        } else {\n          suiteResult.tests.push({\n            title: test.title,\n            status: 'pass'\n          });\n        }\n      }\n\n      for (const childSuite of suite.suites) {\n        const childResult = await runSuite(childSuite, allBeforeEach, allAfterEach);\n        suiteResult.suites.push(childResult);\n      }\n\n      for (const hook of suite.afterAll) {\n        try {\n          await hook();\n        } catch {\n          // ignore\n        }\n      }\n\n      return suiteResult;\n    };\n\n    const topSuites = [];\n    if (this._rootSuite.tests.length > 0) {\n      topSuites.push(await runSuite(this._rootSuite));\n    } else {\n      for (const s of this._rootSuite.suites) {\n        topSuites.push(await runSuite(s));\n      }\n    }\n\n    let passed = 0;\n    let failed = 0;\n    const count = (res) => {\n      for (const t of res.tests) {\n        if (t.status === 'pass') passed++;\n        else failed++;\n      }\n      for (const sub of res.suites) {\n        count(sub);\n      }\n    };\n    for (const r of topSuites) count(r);\n\n    return {\n      passed,\n      failed,\n      total: passed + failed,\n      suites: topSuites\n    };\n  }\n}\n\nfunction createTestRunner() {\n  return new TestRunner();\n}",
+    "testCases": [
+      {
+        "description": "executes simple test suite and reports pass count",
+        "input": "const runner = createTestRunner();\nrunner.describe('Math', () => {\n  runner.it('adds', () => {});\n  runner.it('multiplies', () => {});\n});\nconst res = await runner.run();\n[res.passed, res.failed, res.total]",
+        "expected": "[2, 0, 2]"
+      },
+      {
+        "description": "failing test records error and allows next test to proceed",
+        "input": "const runner = createTestRunner();\nrunner.describe('Validation', () => {\n  runner.it('fails test', () => { throw new Error('Bad input'); });\n  runner.it('passes test', () => {});\n});\nconst res = await runner.run();\n[res.passed, res.failed, res.suites[0].tests[0].error]",
+        "expected": "[1, 1, 'Bad input']"
+      },
+      {
+        "description": "beforeAll and afterAll execute once per suite",
+        "input": "const runner = createTestRunner();\nconst order = [];\nrunner.describe('Lifecycle', () => {\n  runner.beforeAll(() => order.push('beforeAll'));\n  runner.afterAll(() => order.push('afterAll'));\n  runner.it('test1', () => order.push('test1'));\n  runner.it('test2', () => order.push('test2'));\n});\nawait runner.run();\norder",
+        "expected": "['beforeAll', 'test1', 'test2', 'afterAll']"
+      },
+      {
+        "description": "beforeEach and afterEach execute per test",
+        "input": "const runner = createTestRunner();\nconst log = [];\nrunner.describe('EachHooks', () => {\n  runner.beforeEach(() => log.push('before'));\n  runner.afterEach(() => log.push('after'));\n  runner.it('t1', () => log.push('run1'));\n  runner.it('t2', () => log.push('run2'));\n});\nawait runner.run();\nlog",
+        "expected": "['before', 'run1', 'after', 'before', 'run2', 'after']"
+      },
+      {
+        "description": "nested describe inherits outer beforeEach and unwinds afterEach in reverse order",
+        "input": "const runner = createTestRunner();\nconst trace = [];\nrunner.describe('Outer', () => {\n  runner.beforeEach(() => trace.push('outer-before'));\n  runner.afterEach(() => trace.push('outer-after'));\n  runner.describe('Inner', () => {\n    runner.beforeEach(() => trace.push('inner-before'));\n    runner.afterEach(() => trace.push('inner-after'));\n    runner.it('leaf', () => trace.push('test-run'));\n  });\n});\nawait runner.run();\ntrace",
+        "expected": "['outer-before', 'inner-before', 'test-run', 'inner-after', 'outer-after']"
+      },
+      {
+        "description": "supports async tests returning promises",
+        "input": "const runner = createTestRunner();\nlet asyncValue = 0;\nrunner.describe('AsyncSuite', () => {\n  runner.it('resolves async', async () => {\n    await new Promise((r) => setTimeout(r, 10));\n    asyncValue = 42;\n  });\n});\nconst res = await runner.run();\n[res.passed, asyncValue]",
+        "expected": "[1, 42]"
+      }
+    ],
+    "testHarness": "await $test.run(\"executes simple test suite and reports pass count\", async () => {\n  const sleep = $test.sleep;\n  const runner = createTestRunner();\n  runner.describe('Math', () => {\n    runner.it('adds', () => {});\n    runner.it('multiplies', () => {});\n  });\n  const res = await runner.run();\n  return ([res.passed, res.failed, res.total]);\n}, () => ([2, 0, 2]));\n\nawait $test.run(\"failing test records error and allows next test to proceed\", async () => {\n  const sleep = $test.sleep;\n  const runner = createTestRunner();\n  runner.describe('Validation', () => {\n    runner.it('fails test', () => { throw new Error('Bad input'); });\n    runner.it('passes test', () => {});\n  });\n  const res = await runner.run();\n  return ([res.passed, res.failed, res.suites[0].tests[0].error]);\n}, () => ([1, 1, 'Bad input']));\n\nawait $test.run(\"beforeAll and afterAll execute once per suite\", async () => {\n  const sleep = $test.sleep;\n  const runner = createTestRunner();\n  const order = [];\n  runner.describe('Lifecycle', () => {\n    runner.beforeAll(() => order.push('beforeAll'));\n    runner.afterAll(() => order.push('afterAll'));\n    runner.it('test1', () => order.push('test1'));\n    runner.it('test2', () => order.push('test2'));\n  });\n  await runner.run();\n  return (order);\n}, () => (['beforeAll', 'test1', 'test2', 'afterAll']));\n\nawait $test.run(\"beforeEach and afterEach execute per test\", async () => {\n  const sleep = $test.sleep;\n  const runner = createTestRunner();\n  const log = [];\n  runner.describe('EachHooks', () => {\n    runner.beforeEach(() => log.push('before'));\n    runner.afterEach(() => log.push('after'));\n    runner.it('t1', () => log.push('run1'));\n    runner.it('t2', () => log.push('run2'));\n  });\n  await runner.run();\n  return (log);\n}, () => (['before', 'run1', 'after', 'before', 'run2', 'after']));\n\nawait $test.run(\"nested describe inherits outer beforeEach and unwinds afterEach in reverse order\", async () => {\n  const sleep = $test.sleep;\n  const runner = createTestRunner();\n  const trace = [];\n  runner.describe('Outer', () => {\n    runner.beforeEach(() => trace.push('outer-before'));\n    runner.afterEach(() => trace.push('outer-after'));\n    runner.describe('Inner', () => {\n      runner.beforeEach(() => trace.push('inner-before'));\n      runner.afterEach(() => trace.push('inner-after'));\n      runner.it('leaf', () => trace.push('test-run'));\n    });\n  });\n  await runner.run();\n  return (trace);\n}, () => (['outer-before', 'inner-before', 'test-run', 'inner-after', 'outer-after']));\n\nawait $test.run(\"supports async tests returning promises\", async () => {\n  const sleep = $test.sleep;\n  const runner = createTestRunner();\n  let asyncValue = 0;\n  runner.describe('AsyncSuite', () => {\n    runner.it('resolves async', async () => {\n      await new Promise((r) => setTimeout(r, 10));\n      asyncValue = 42;\n    });\n  });\n  const res = await runner.run();\n  return ([res.passed, asyncValue]);\n}, () => ([1, 42]));",
+    "targetTime": "O(t * h)",
+    "targetSpace": "O(t + s)",
+    "complexityExplanation": "Running t tests across nested suite tree with hook depth h executes in O(t * h) time and O(t + s) tree storage."
   }
 ]

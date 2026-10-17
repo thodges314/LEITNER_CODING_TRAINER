@@ -1,0 +1,10 @@
+{
+  "track": "testing-tooling",
+  "title": "Next.js Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
+  "tags": [
+    "routing",
+    "nextjs",
+    "pattern-matching",
+    "regex"
+  ]
+}

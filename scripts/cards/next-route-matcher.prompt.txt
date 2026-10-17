@@ -1,0 +1,12 @@
+Implement `matchRoute(pattern, pathname)` to match URL pathnames against Next.js-style file-system route patterns and extract parameter mappings.
+
+Segment rules:
+1. Static segments: exact string match (e.g. `/posts/latest`).
+2. Single dynamic parameter: `[param]` matches exactly one non-empty path segment. Returns `{ [param]: segmentString }`.
+3. Catch-all parameter: `[...slug]` matches one or more path segments. Returns `{ [slug]: [segment1, segment2, ...] }`. Fails (returns `null`) if zero segments are provided.
+4. Optional catch-all parameter: `[[...slug]]` matches zero or more path segments. Returns `{ [slug]: [segment1, ...] }` or `{ [slug]: [] }` if no segments match.
+
+Return value:
+- Returns `{ params: Record<string, string | string[]> }` if `pathname` matches `pattern`.
+- Returns `null` if `pathname` does not match the pattern.
+- Leading and trailing slashes should be normalized.

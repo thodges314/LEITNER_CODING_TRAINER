@@ -142,7 +142,13 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onOpenAddModal,
 }) => {
   const isLight = theme === 'apple-gsos';
-  const allAvailableTracks = useMemo(() => Array.from(new Set(state.topics.map((t) => t.track))), [state.topics]);
+  const allAvailableTracks = useMemo(
+    () =>
+      Array.from(new Set(state.topics.map((t) => t.track))).sort((a, b) =>
+        getTrackMeta(a).label.localeCompare(getTrackMeta(b).label)
+      ),
+    [state.topics]
+  );
   const [selectedTracks, setSelectedTracks] = useState<string[]>(['all']);
   const [selectedBox, setSelectedBox] = useState<number | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<CatalogStatusFilter>('all');

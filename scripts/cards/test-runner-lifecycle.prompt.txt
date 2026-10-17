@@ -1,0 +1,30 @@
+Implement an asynchronous, in-memory test runner engine `createTestRunner()` (or `class TestRunner`) supporting nested suites, lifecycle hooks, and hierarchical reporting:
+
+- `describe(title, fn)`: registers a suite. Executes `fn` synchronously to declare nested `it`, `describe`, and lifecycle hooks.
+- `it(title, fn)`: registers a test case. `fn` may be synchronous or return a Promise.
+- Lifecycle hooks:
+  - `beforeAll(fn)`: runs once before any tests or child suites in the declaring suite.
+  - `afterAll(fn)`: runs once after all tests and child suites in the declaring suite finish.
+  - `beforeEach(fn)`: runs before each test in the declaring suite. Inherited by child suites: outer `beforeEach` runs first, followed by inner `beforeEach`.
+  - `afterEach(fn)`: runs after each test in the declaring suite. Inherited by child suites: inner `afterEach` runs first, followed by outer `afterEach` (reverse unwinding).
+- `async run()`: executes the entire hierarchy in registration order and returns a structured report:
+  ```ts
+  {
+    passed: number,
+    failed: number,
+    total: number,
+    suites: SuiteResult[]
+  }
+  ```
+  Where each `SuiteResult` has:
+  ```ts
+  {
+    title: string,
+    tests: Array<{ title: string, status: 'pass' | 'fail', error?: string }>,
+    suites: SuiteResult[]
+  }
+  ```
+- Error isolation:
+  - If a test throws or rejects, mark status `'fail'` with `error: err.message || String(err)`. Subsequent tests continue executing.
+  - If `beforeEach` throws, the test fails, and remaining hooks unwind.
+  - If `beforeAll` throws, all tests in that suite mark `'fail'` with error details.

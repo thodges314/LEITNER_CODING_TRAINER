@@ -1118,5 +1118,30 @@
     "targetTime": "Type-level",
     "targetSpace": "O(props)",
     "complexityExplanation": "Compile-time recursive mapped modifiers and key remapping with runtime factory."
+  },
+  "mock-fn": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Recording call arguments and results performs O(1) work per invocation with O(k) memory for k calls."
+  },
+  "fake-timers": {
+    "targetTime": "O(k log k)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Ordering and advancing through k scheduled virtual timers requires linear or heap-ordered lookup per timer step."
+  },
+  "mini-expect": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(d)",
+    "complexityExplanation": "Deep comparison traverses n properties with recursion depth d bounded by object nesting."
+  },
+  "next-route-matcher": {
+    "targetTime": "O(k)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Splitting and matching k route segments operates in linear time and memory with respect to route depth."
+  },
+  "test-runner-lifecycle": {
+    "targetTime": "O(t * h)",
+    "targetSpace": "O(t + s)",
+    "complexityExplanation": "Running t tests across nested suite tree with hook depth h executes in O(t * h) time and O(t + s) tree storage."
   }
 }

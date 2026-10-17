@@ -1,0 +1,14 @@
+Implement a Jest-style mock function `mockFn(impl?)`.
+
+When invoked, the returned mock function calls `impl(...args)` (if provided) and returns its result (or throws if `impl` throws). If `impl` is omitted, the invocation returns `undefined`.
+
+The mock function must expose a `.mock` property containing:
+- `calls`: an array of argument arrays for each invocation (e.g. `[[arg1, arg2], [arg3]]`).
+- `results`: an array of result objects for each invocation:
+  - `{ type: 'return', value: returnValue }` if the call completed successfully.
+  - `{ type: 'throw', value: thrownError }` if the call threw an exception.
+
+The mock function must also provide chainable helper methods (each returning the mock function):
+- `.mockReturnValue(val)`: replaces the implementation with one that returns `val`.
+- `.mockImplementation(fn)`: replaces the implementation with `fn`.
+- `.mockClear()`: resets `calls` and `results` arrays back to empty arrays.

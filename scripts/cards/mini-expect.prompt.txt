@@ -1,0 +1,7 @@
+Implement a standalone `expect(actual)` assertion runner supporting core matchers and `.not` negation chaining:
+
+- `.toBe(expected)`: asserts identity comparison via `Object.is(actual, expected)`. Throws an `Error` if the check fails.
+- `.toEqual(expected)`: asserts deep structural equality for primitives, objects, arrays, Dates, and RegExps. Throws an `Error` if the check fails.
+- `.toThrow(expectedError?)`: asserts that `actual` is a function that throws when invoked. If `expectedError` is provided as a string or RegExp, asserts that the thrown error message contains the string or matches the RegExp. Throws an `Error` if `actual` fails to throw or if the message does not match.
+- `.not`: inverts the assertion outcome for any matcher (`.not.toBe()`, `.not.toEqual()`, `.not.toThrow()`).
+- Each successful assertion returns `{ pass: true }`.

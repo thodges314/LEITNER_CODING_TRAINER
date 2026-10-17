@@ -1,0 +1,11 @@
+{
+  "track": "testing-tooling",
+  "title": "Test Runner Lifecycle: Nested Describe, Hooks & Hierarchical Reporter",
+  "tags": [
+    "testing",
+    "framework",
+    "lifecycle",
+    "architecture",
+    "expert"
+  ]
+}
