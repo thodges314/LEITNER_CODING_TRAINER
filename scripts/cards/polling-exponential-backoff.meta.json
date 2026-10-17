@@ -1,0 +1,10 @@
+{
+  "track": "async-js",
+  "title": "Async Control: Polling with Exponential Backoff and Jitter Limit",
+  "tags": [
+    "async",
+    "polling",
+    "backoff",
+    "retry"
+  ]
+}

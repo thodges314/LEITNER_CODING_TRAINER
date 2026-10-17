@@ -144,7 +144,7 @@ Located in [timedMode.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER
 ## 7. Verification & Testing
 
 - **Vitest Suite**: Tests verifying:
-  - Reference solutions pass for all 214 topic cards.
+  - Reference solutions pass for all 219 topic cards.
   - Empty submissions fail for all cards.
   - Leitner and Graduated Interval algorithms, intervals, promotions, and setbacks.
   - Prettier standalone formatter for JS, JSX, TS, and syntax errors.

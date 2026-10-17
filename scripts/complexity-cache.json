@@ -1068,5 +1068,30 @@
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Stepping through yielded promises, resuming on resolution or throwing on rejection."
+  },
+  "promise-any-aggregate": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Races n promises, resolving on first fulfillment or collecting all n errors."
+  },
+  "cancelable-promise-abort": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Wraps target promise with a cancellation flag or timer cleanup."
+  },
+  "polling-exponential-backoff": {
+    "targetTime": "O(attempts)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Performs up to maxAttempts polls with exponentially increasing delays."
+  },
+  "async-generator-pagination": {
+    "targetTime": "O(N)",
+    "targetSpace": "O(pageSize)",
+    "complexityExplanation": "Yields items from multiple pages one by one as they are needed."
+  },
+  "pub-sub-wildcard-emitter": {
+    "targetTime": "O(listeners)",
+    "targetSpace": "O(topics)",
+    "complexityExplanation": "Pattern matching against subscribed exact topics and wildcards."
   }
 }

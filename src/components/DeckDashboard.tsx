@@ -433,11 +433,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           <h1 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em' }}>
             Catalog & Deck Performance
           </h1>
-          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>
-            {algorithm === 'graduated-interval'
-              ? 'Graduated-interval chained retrieval with expanding recall intervals'
-              : 'Trial-spaced Leitner retrieval queue with staged progression unlocking'}
-          </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

@@ -1,0 +1,10 @@
+{
+  "track": "async-js",
+  "title": "Event Architecture: PubSub with Wildcard Topics and Once Listeners",
+  "tags": [
+    "pub-sub",
+    "event-emitter",
+    "wildcard",
+    "observer"
+  ]
+}

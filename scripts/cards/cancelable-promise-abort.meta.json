@@ -1,0 +1,10 @@
+{
+  "track": "async-js",
+  "title": "Async Control: Cancelable Promises and withTimeout Wrapper",
+  "tags": [
+    "async",
+    "promise",
+    "cancellation",
+    "timeout"
+  ]
+}

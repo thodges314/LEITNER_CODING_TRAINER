@@ -854,5 +854,25 @@
  "generators-coroutines": {
   "difficulty": 4,
   "concept": "iterators"
+ },
+ "promise-any-aggregate": {
+  "difficulty": 3,
+  "concept": "promise-combinators"
+ },
+ "cancelable-promise-abort": {
+  "difficulty": 3,
+  "concept": "async-control"
+ },
+ "polling-exponential-backoff": {
+  "difficulty": 3,
+  "concept": "async-control"
+ },
+ "async-generator-pagination": {
+  "difficulty": 4,
+  "concept": "async-control"
+ },
+ "pub-sub-wildcard-emitter": {
+  "difficulty": 3,
+  "concept": "emitter"
  }
 }
