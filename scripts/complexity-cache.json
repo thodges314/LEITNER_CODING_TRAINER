@@ -888,5 +888,55 @@
     "targetTime": "O(n log n) / O(n)",
     "targetSpace": "O(n) / O(1)",
     "complexityExplanation": "The interval functions sort a copy and scan once; the gas station scan is a single pass with two running totals."
+  },
+  "longest-substring-window": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Each index enters and leaves the window at most once, with a map bounded by the alphabet or k."
+  },
+  "min-window-permutation": {
+    "targetTime": "O(n + m)",
+    "targetSpace": "O(m)",
+    "complexityExplanation": "The window moves across s once while a frequency map of the target characters tracks what is still missing."
+  },
+  "window-replacement-ones": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both window edges only move forward, and the state is a few counters (or a small frequency table)."
+  },
+  "strings-basics": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each function scans the string once and builds an output proportional to its length."
+  },
+  "longest-palindrome-substring": {
+    "targetTime": "O(n²)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Expanding around each of the 2n - 1 centers costs up to n steps each, with only index variables stored."
+  },
+  "string-arithmetic": {
+    "targetTime": "O(n + m) / O(n × m)",
+    "targetSpace": "O(n + m)",
+    "complexityExplanation": "Addition walks both strings once with a carry; schoolbook multiplication fills an n + m digit array."
+  },
+  "word-break-decode": {
+    "targetTime": "O(n²) / O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Word break checks each prefix against each earlier split point; decode ways does one pass with a table of n + 1 counts."
+  },
+  "partition-subset-sum": {
+    "targetTime": "O(n × S)",
+    "targetSpace": "O(S)",
+    "complexityExplanation": "Each number updates a one-dimensional table indexed by the subset sum S being searched."
+  },
+  "stock-profit-dp": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each price updates a handful of running profit states, so one pass and constant space suffice."
+  },
+  "dp-array-variants": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each function sweeps the array once keeping only the previous one or two states."
   }
 }

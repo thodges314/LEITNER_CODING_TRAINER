@@ -10464,5 +10464,547 @@
     "targetTime": "O(m × n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Every cell is computed once from its top and left neighbours, keeping only one row of counts."
+  },
+  {
+    "id": "dp-array-variants",
+    "track": "algorithms",
+    "title": "DP: Circular House Robber, Max Product Subarray, Min Cost Stairs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "array",
+      "1d-dp"
+    ],
+    "promptSeed": "Write robCircular(nums): houses are in a circle (the first and last are adjacent), you cannot rob two adjacent houses; return the maximum loot (0 for an empty array, nums[0] for one house). Write maxProduct(nums): the largest product of a non-empty contiguous subarray (track both the running max and min because negatives flip them). Write minCostClimbingStairs(cost): you may start on step 0 or 1, pay cost[i] to leave step i and climb 1 or 2 steps; return the minimum cost to reach the top (just past the last index).",
+    "difficulty": 3,
+    "concept": "dp",
+    "referenceSolution": "function robLine(nums, from, to) {\n  let take = 0;\n  let skip = 0;\n  for (let i = from; i <= to; i++) {\n    [take, skip] = [skip + nums[i], Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction robCircular(nums) {\n  if (!nums.length) return 0;\n  if (nums.length === 1) return nums[0];\n  return Math.max(robLine(nums, 0, nums.length - 2), robLine(nums, 1, nums.length - 1));\n}\n\nfunction maxProduct(nums) {\n  let max = nums[0];\n  let min = nums[0];\n  let best = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    const n = nums[i];\n    const candidates = [n, max * n, min * n];\n    max = Math.max(...candidates);\n    min = Math.min(...candidates);\n    best = Math.max(best, max);\n  }\n  return best;\n}\n\nfunction minCostClimbingStairs(cost) {\n  let a = 0;\n  let b = 0;\n  for (let i = 2; i <= cost.length; i++) {\n    [a, b] = [b, Math.min(b + cost[i - 1], a + cost[i - 2])];\n  }\n  return b;\n}",
+    "solution": "function robLine(nums, from, to) {\n  let take = 0;\n  let skip = 0;\n  for (let i = from; i <= to; i++) {\n    [take, skip] = [skip + nums[i], Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction robCircular(nums) {\n  if (!nums.length) return 0;\n  if (nums.length === 1) return nums[0];\n  return Math.max(robLine(nums, 0, nums.length - 2), robLine(nums, 1, nums.length - 1));\n}\n\nfunction maxProduct(nums) {\n  let max = nums[0];\n  let min = nums[0];\n  let best = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    const n = nums[i];\n    const candidates = [n, max * n, min * n];\n    max = Math.max(...candidates);\n    min = Math.min(...candidates);\n    best = Math.max(best, max);\n  }\n  return best;\n}\n\nfunction minCostClimbingStairs(cost) {\n  let a = 0;\n  let b = 0;\n  for (let i = 2; i <= cost.length; i++) {\n    [a, b] = [b, Math.min(b + cost[i - 1], a + cost[i - 2])];\n  }\n  return b;\n}",
+    "starterCode": "function robLine(nums, from, to) {\n  let take = 0;\n  let skip = 0;\n  for (let i = from; i <= to; i++) {\n    [take, skip] = [skip + nums[i], Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction robCircular(nums) {\n  if (!nums.length) return 0;\n  if (nums.length === 1) return nums[0];\n  return Math.max(robLine(nums, 0, nums.length - 2), robLine(nums, 1, nums.length - 1));\n}\n\nfunction maxProduct(nums) {\n  let max = nums[0];\n  let min = nums[0];\n  let best = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    const n = nums[i];\n    const candidates = [n, max * n, min * n];\n    max = Math.max(...candidates);\n    min = Math.min(...candidates);\n    best = Math.max(best, max);\n  }\n  return best;\n}\n\nfunction minCostClimbingStairs(cost) {\n  let a = 0;\n  let b = 0;\n  for (let i = 2; i <= cost.length; i++) {\n    [a, b] = [b, Math.min(b + cost[i - 1], a + cost[i - 2])];\n  }\n  return b;\n}",
+    "testCases": [
+      {
+        "description": "robCircular classic examples",
+        "input": "[robCircular([2, 3, 2]), robCircular([1, 2, 3, 1]), robCircular([200, 3, 140, 20, 10])]",
+        "expected": "[3, 4, 340]"
+      },
+      {
+        "description": "robCircular tiny inputs",
+        "input": "[robCircular([]), robCircular([1]), robCircular([2, 7])]",
+        "expected": "[0, 1, 7]"
+      },
+      {
+        "description": "maxProduct classic examples",
+        "input": "[maxProduct([2, 3, -2, 4]), maxProduct([-2, 0, -1]), maxProduct([-2, 3, -4])]",
+        "expected": "[6, 0, 24]"
+      },
+      {
+        "description": "maxProduct of one element and with zero",
+        "input": "[maxProduct([-3]), maxProduct([0, 2])]",
+        "expected": "[-3, 2]"
+      },
+      {
+        "description": "minCostClimbingStairs",
+        "input": "[minCostClimbingStairs([10, 15, 20]), minCostClimbingStairs([1, 100, 1, 1, 1, 100, 1, 1, 100, 1]), minCostClimbingStairs([0, 0])]",
+        "expected": "[15, 6, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"robCircular classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([robCircular([2, 3, 2]), robCircular([1, 2, 3, 1]), robCircular([200, 3, 140, 20, 10])]);\n}, () => ([3, 4, 340]));\n\nawait $test.run(\"robCircular tiny inputs\", async () => {\n  const sleep = $test.sleep;\n  return ([robCircular([]), robCircular([1]), robCircular([2, 7])]);\n}, () => ([0, 1, 7]));\n\nawait $test.run(\"maxProduct classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([maxProduct([2, 3, -2, 4]), maxProduct([-2, 0, -1]), maxProduct([-2, 3, -4])]);\n}, () => ([6, 0, 24]));\n\nawait $test.run(\"maxProduct of one element and with zero\", async () => {\n  const sleep = $test.sleep;\n  return ([maxProduct([-3]), maxProduct([0, 2])]);\n}, () => ([-3, 2]));\n\nawait $test.run(\"minCostClimbingStairs\", async () => {\n  const sleep = $test.sleep;\n  return ([minCostClimbingStairs([10, 15, 20]), minCostClimbingStairs([1, 100, 1, 1, 1, 100, 1, 1, 100, 1]), minCostClimbingStairs([0, 0])]);\n}, () => ([15, 6, 0]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each function sweeps the array once keeping only the previous one or two states."
+  },
+  {
+    "id": "longest-palindrome-substring",
+    "track": "algorithms",
+    "title": "Strings: Longest Palindromic Substring and Count",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "string",
+      "palindrome",
+      "expand-around-center"
+    ],
+    "promptSeed": "Write longestPalindrome(s): the longest palindromic substring (the leftmost one when several have the same length; '' for an empty string) using expand-around-center. Write countPalindromicSubstrings(s): the number of palindromic substrings, counting each position range separately ('aaa' has 6; '' has 0).",
+    "difficulty": 3,
+    "concept": "strings",
+    "referenceSolution": "function expand(s, left, right) {\n  while (left >= 0 && right < s.length && s[left] === s[right]) {\n    left--;\n    right++;\n  }\n  return [left + 1, right];\n}\n\nfunction longestPalindrome(s) {\n  let bestStart = 0;\n  let bestEnd = 0;\n  for (let i = 0; i < s.length; i++) {\n    for (const [a, b] of [expand(s, i, i), expand(s, i, i + 1)]) {\n      if (b - a > bestEnd - bestStart) {\n        bestStart = a;\n        bestEnd = b;\n      }\n    }\n  }\n  return s.slice(bestStart, bestEnd);\n}\n\nfunction countPalindromicSubstrings(s) {\n  let count = 0;\n  for (let i = 0; i < s.length; i++) {\n    for (const [a, b] of [expand(s, i, i), expand(s, i, i + 1)]) {\n      count += b - a > 0 ? Math.ceil((b - a) / 2) : 0;\n    }\n  }\n  return count;\n}",
+    "solution": "function expand(s, left, right) {\n  while (left >= 0 && right < s.length && s[left] === s[right]) {\n    left--;\n    right++;\n  }\n  return [left + 1, right];\n}\n\nfunction longestPalindrome(s) {\n  let bestStart = 0;\n  let bestEnd = 0;\n  for (let i = 0; i < s.length; i++) {\n    for (const [a, b] of [expand(s, i, i), expand(s, i, i + 1)]) {\n      if (b - a > bestEnd - bestStart) {\n        bestStart = a;\n        bestEnd = b;\n      }\n    }\n  }\n  return s.slice(bestStart, bestEnd);\n}\n\nfunction countPalindromicSubstrings(s) {\n  let count = 0;\n  for (let i = 0; i < s.length; i++) {\n    for (const [a, b] of [expand(s, i, i), expand(s, i, i + 1)]) {\n      count += b - a > 0 ? Math.ceil((b - a) / 2) : 0;\n    }\n  }\n  return count;\n}",
+    "starterCode": "function expand(s, left, right) {\n  while (left >= 0 && right < s.length && s[left] === s[right]) {\n    left--;\n    right++;\n  }\n  return [left + 1, right];\n}\n\nfunction longestPalindrome(s) {\n  let bestStart = 0;\n  let bestEnd = 0;\n  for (let i = 0; i < s.length; i++) {\n    for (const [a, b] of [expand(s, i, i), expand(s, i, i + 1)]) {\n      if (b - a > bestEnd - bestStart) {\n        bestStart = a;\n        bestEnd = b;\n      }\n    }\n  }\n  return s.slice(bestStart, bestEnd);\n}\n\nfunction countPalindromicSubstrings(s) {\n  let count = 0;\n  for (let i = 0; i < s.length; i++) {\n    for (const [a, b] of [expand(s, i, i), expand(s, i, i + 1)]) {\n      count += b - a > 0 ? Math.ceil((b - a) / 2) : 0;\n    }\n  }\n  return count;\n}",
+    "testCases": [
+      {
+        "description": "longestPalindrome returns the leftmost longest",
+        "input": "[longestPalindrome('babad'), longestPalindrome('cbbd')]",
+        "expected": "['bab', 'bb']"
+      },
+      {
+        "description": "longestPalindrome of tiny strings",
+        "input": "[longestPalindrome('a'), longestPalindrome(''), longestPalindrome('abc')]",
+        "expected": "['a', '', 'a']"
+      },
+      {
+        "description": "longestPalindrome of a long palindrome inside noise",
+        "input": "longestPalindrome('forgeeksskeegfor')",
+        "expected": "'geeksskeeg'"
+      },
+      {
+        "description": "countPalindromicSubstrings",
+        "input": "[countPalindromicSubstrings('abc'), countPalindromicSubstrings('aaa'), countPalindromicSubstrings('abba'), countPalindromicSubstrings('')]",
+        "expected": "[3, 6, 6, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"longestPalindrome returns the leftmost longest\", async () => {\n  const sleep = $test.sleep;\n  return ([longestPalindrome('babad'), longestPalindrome('cbbd')]);\n}, () => (['bab', 'bb']));\n\nawait $test.run(\"longestPalindrome of tiny strings\", async () => {\n  const sleep = $test.sleep;\n  return ([longestPalindrome('a'), longestPalindrome(''), longestPalindrome('abc')]);\n}, () => (['a', '', 'a']));\n\nawait $test.run(\"longestPalindrome of a long palindrome inside noise\", async () => {\n  const sleep = $test.sleep;\n  return (longestPalindrome('forgeeksskeegfor'));\n}, () => ('geeksskeeg'));\n\nawait $test.run(\"countPalindromicSubstrings\", async () => {\n  const sleep = $test.sleep;\n  return ([countPalindromicSubstrings('abc'), countPalindromicSubstrings('aaa'), countPalindromicSubstrings('abba'), countPalindromicSubstrings('')]);\n}, () => ([3, 6, 6, 0]));",
+    "targetTime": "O(n²)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Expanding around each of the 2n - 1 centers costs up to n steps each, with only index variables stored."
+  },
+  {
+    "id": "longest-substring-window",
+    "track": "algorithms",
+    "title": "Sliding Window: Longest Substring Without Repeats and K Distinct",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "sliding-window",
+      "string",
+      "hash-map"
+    ],
+    "promptSeed": "Write lengthOfLongestSubstring(s): the length of the longest substring with no repeated character (0 for an empty string), using a sliding window and a map of last-seen indices. Write longestKDistinct(s, k): the length of the longest substring containing at most k distinct characters (0 when k is 0 or s is empty).",
+    "difficulty": 2,
+    "concept": "sliding-window",
+    "referenceSolution": "function lengthOfLongestSubstring(s) {\n  const last = new Map();\n  let start = 0;\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    const ch = s[i];\n    if (last.has(ch) && last.get(ch) >= start) start = last.get(ch) + 1;\n    last.set(ch, i);\n    best = Math.max(best, i - start + 1);\n  }\n  return best;\n}\n\nfunction longestKDistinct(s, k) {\n  if (k === 0) return 0;\n  const counts = new Map();\n  let left = 0;\n  let best = 0;\n  for (let right = 0; right < s.length; right++) {\n    counts.set(s[right], (counts.get(s[right]) || 0) + 1);\n    while (counts.size > k) {\n      const remaining = counts.get(s[left]) - 1;\n      if (remaining === 0) counts.delete(s[left]);\n      else counts.set(s[left], remaining);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
+    "solution": "function lengthOfLongestSubstring(s) {\n  const last = new Map();\n  let start = 0;\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    const ch = s[i];\n    if (last.has(ch) && last.get(ch) >= start) start = last.get(ch) + 1;\n    last.set(ch, i);\n    best = Math.max(best, i - start + 1);\n  }\n  return best;\n}\n\nfunction longestKDistinct(s, k) {\n  if (k === 0) return 0;\n  const counts = new Map();\n  let left = 0;\n  let best = 0;\n  for (let right = 0; right < s.length; right++) {\n    counts.set(s[right], (counts.get(s[right]) || 0) + 1);\n    while (counts.size > k) {\n      const remaining = counts.get(s[left]) - 1;\n      if (remaining === 0) counts.delete(s[left]);\n      else counts.set(s[left], remaining);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
+    "starterCode": "function lengthOfLongestSubstring(s) {\n  const last = new Map();\n  let start = 0;\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    const ch = s[i];\n    if (last.has(ch) && last.get(ch) >= start) start = last.get(ch) + 1;\n    last.set(ch, i);\n    best = Math.max(best, i - start + 1);\n  }\n  return best;\n}\n\nfunction longestKDistinct(s, k) {\n  if (k === 0) return 0;\n  const counts = new Map();\n  let left = 0;\n  let best = 0;\n  for (let right = 0; right < s.length; right++) {\n    counts.set(s[right], (counts.get(s[right]) || 0) + 1);\n    while (counts.size > k) {\n      const remaining = counts.get(s[left]) - 1;\n      if (remaining === 0) counts.delete(s[left]);\n      else counts.set(s[left], remaining);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
+    "testCases": [
+      {
+        "description": "lengthOfLongestSubstring classic examples",
+        "input": "[lengthOfLongestSubstring('abcabcbb'), lengthOfLongestSubstring('bbbbb'), lengthOfLongestSubstring('pwwkew')]",
+        "expected": "[3, 1, 3]"
+      },
+      {
+        "description": "lengthOfLongestSubstring: empty string and a single space",
+        "input": "[lengthOfLongestSubstring(''), lengthOfLongestSubstring(' ')]",
+        "expected": "[0, 1]"
+      },
+      {
+        "description": "lengthOfLongestSubstring ignores stale last-seen indices",
+        "input": "[lengthOfLongestSubstring('abba'), lengthOfLongestSubstring('dvdf')]",
+        "expected": "[2, 3]"
+      },
+      {
+        "description": "longestKDistinct classic examples",
+        "input": "[longestKDistinct('eceba', 2), longestKDistinct('aa', 1), longestKDistinct('abaccc', 2)]",
+        "expected": "[3, 2, 4]"
+      },
+      {
+        "description": "longestKDistinct with k = 0 or empty input",
+        "input": "[longestKDistinct('abc', 0), longestKDistinct('', 3)]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "longestKDistinct with k larger than the alphabet",
+        "input": "longestKDistinct('abc', 5)",
+        "expected": "3"
+      }
+    ],
+    "testHarness": "await $test.run(\"lengthOfLongestSubstring classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([lengthOfLongestSubstring('abcabcbb'), lengthOfLongestSubstring('bbbbb'), lengthOfLongestSubstring('pwwkew')]);\n}, () => ([3, 1, 3]));\n\nawait $test.run(\"lengthOfLongestSubstring: empty string and a single space\", async () => {\n  const sleep = $test.sleep;\n  return ([lengthOfLongestSubstring(''), lengthOfLongestSubstring(' ')]);\n}, () => ([0, 1]));\n\nawait $test.run(\"lengthOfLongestSubstring ignores stale last-seen indices\", async () => {\n  const sleep = $test.sleep;\n  return ([lengthOfLongestSubstring('abba'), lengthOfLongestSubstring('dvdf')]);\n}, () => ([2, 3]));\n\nawait $test.run(\"longestKDistinct classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([longestKDistinct('eceba', 2), longestKDistinct('aa', 1), longestKDistinct('abaccc', 2)]);\n}, () => ([3, 2, 4]));\n\nawait $test.run(\"longestKDistinct with k = 0 or empty input\", async () => {\n  const sleep = $test.sleep;\n  return ([longestKDistinct('abc', 0), longestKDistinct('', 3)]);\n}, () => ([0, 0]));\n\nawait $test.run(\"longestKDistinct with k larger than the alphabet\", async () => {\n  const sleep = $test.sleep;\n  return (longestKDistinct('abc', 5));\n}, () => (3));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "Each index enters and leaves the window at most once, with a map bounded by the alphabet or k."
+  },
+  {
+    "id": "min-window-permutation",
+    "track": "algorithms",
+    "title": "Sliding Window: Minimum Window Substring, Permutation, Anagram Indices",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sliding-window",
+      "string",
+      "frequency"
+    ],
+    "promptSeed": "Write minWindow(s, t): the smallest substring of s that contains every character of t with at least its multiplicity (the leftmost one on ties); '' if none exists or t is empty. Write checkInclusion(s1, s2): true when s2 contains some permutation of s1 as a contiguous substring. Write findAnagrams(s, p): the array of start indices (ascending) of every substring of s that is an anagram of p ([] when p is longer than s).",
+    "difficulty": 3,
+    "concept": "sliding-window",
+    "referenceSolution": "function minWindow(s, t) {\n  if (!t.length || t.length > s.length) return '';\n  const need = new Map();\n  for (const ch of t) need.set(ch, (need.get(ch) || 0) + 1);\n  let missing = t.length;\n  let left = 0;\n  let bestStart = 0;\n  let bestLen = Infinity;\n  for (let right = 0; right < s.length; right++) {\n    const ch = s[right];\n    if (need.has(ch)) {\n      if (need.get(ch) > 0) missing--;\n      need.set(ch, need.get(ch) - 1);\n    }\n    while (missing === 0) {\n      if (right - left + 1 < bestLen) {\n        bestLen = right - left + 1;\n        bestStart = left;\n      }\n      const lc = s[left];\n      if (need.has(lc)) {\n        need.set(lc, need.get(lc) + 1);\n        if (need.get(lc) > 0) missing++;\n      }\n      left++;\n    }\n  }\n  return bestLen === Infinity ? '' : s.slice(bestStart, bestStart + bestLen);\n}\n\nfunction findAnagrams(s, p) {\n  const out = [];\n  if (p.length > s.length) return out;\n  const need = {};\n  for (const ch of p) need[ch] = (need[ch] || 0) + 1;\n  let missing = p.length;\n  for (let i = 0; i < s.length; i++) {\n    if (need[s[i]] !== undefined) {\n      if (need[s[i]] > 0) missing--;\n      need[s[i]]--;\n    }\n    if (i >= p.length) {\n      const gone = s[i - p.length];\n      if (need[gone] !== undefined) {\n        need[gone]++;\n        if (need[gone] > 0) missing++;\n      }\n    }\n    if (missing === 0) out.push(i - p.length + 1);\n  }\n  return out;\n}\n\nfunction checkInclusion(s1, s2) {\n  return findAnagrams(s2, s1).length > 0;\n}",
+    "solution": "function minWindow(s, t) {\n  if (!t.length || t.length > s.length) return '';\n  const need = new Map();\n  for (const ch of t) need.set(ch, (need.get(ch) || 0) + 1);\n  let missing = t.length;\n  let left = 0;\n  let bestStart = 0;\n  let bestLen = Infinity;\n  for (let right = 0; right < s.length; right++) {\n    const ch = s[right];\n    if (need.has(ch)) {\n      if (need.get(ch) > 0) missing--;\n      need.set(ch, need.get(ch) - 1);\n    }\n    while (missing === 0) {\n      if (right - left + 1 < bestLen) {\n        bestLen = right - left + 1;\n        bestStart = left;\n      }\n      const lc = s[left];\n      if (need.has(lc)) {\n        need.set(lc, need.get(lc) + 1);\n        if (need.get(lc) > 0) missing++;\n      }\n      left++;\n    }\n  }\n  return bestLen === Infinity ? '' : s.slice(bestStart, bestStart + bestLen);\n}\n\nfunction findAnagrams(s, p) {\n  const out = [];\n  if (p.length > s.length) return out;\n  const need = {};\n  for (const ch of p) need[ch] = (need[ch] || 0) + 1;\n  let missing = p.length;\n  for (let i = 0; i < s.length; i++) {\n    if (need[s[i]] !== undefined) {\n      if (need[s[i]] > 0) missing--;\n      need[s[i]]--;\n    }\n    if (i >= p.length) {\n      const gone = s[i - p.length];\n      if (need[gone] !== undefined) {\n        need[gone]++;\n        if (need[gone] > 0) missing++;\n      }\n    }\n    if (missing === 0) out.push(i - p.length + 1);\n  }\n  return out;\n}\n\nfunction checkInclusion(s1, s2) {\n  return findAnagrams(s2, s1).length > 0;\n}",
+    "starterCode": "function minWindow(s, t) {\n  if (!t.length || t.length > s.length) return '';\n  const need = new Map();\n  for (const ch of t) need.set(ch, (need.get(ch) || 0) + 1);\n  let missing = t.length;\n  let left = 0;\n  let bestStart = 0;\n  let bestLen = Infinity;\n  for (let right = 0; right < s.length; right++) {\n    const ch = s[right];\n    if (need.has(ch)) {\n      if (need.get(ch) > 0) missing--;\n      need.set(ch, need.get(ch) - 1);\n    }\n    while (missing === 0) {\n      if (right - left + 1 < bestLen) {\n        bestLen = right - left + 1;\n        bestStart = left;\n      }\n      const lc = s[left];\n      if (need.has(lc)) {\n        need.set(lc, need.get(lc) + 1);\n        if (need.get(lc) > 0) missing++;\n      }\n      left++;\n    }\n  }\n  return bestLen === Infinity ? '' : s.slice(bestStart, bestStart + bestLen);\n}\n\nfunction findAnagrams(s, p) {\n  const out = [];\n  if (p.length > s.length) return out;\n  const need = {};\n  for (const ch of p) need[ch] = (need[ch] || 0) + 1;\n  let missing = p.length;\n  for (let i = 0; i < s.length; i++) {\n    if (need[s[i]] !== undefined) {\n      if (need[s[i]] > 0) missing--;\n      need[s[i]]--;\n    }\n    if (i >= p.length) {\n      const gone = s[i - p.length];\n      if (need[gone] !== undefined) {\n        need[gone]++;\n        if (need[gone] > 0) missing++;\n      }\n    }\n    if (missing === 0) out.push(i - p.length + 1);\n  }\n  return out;\n}\n\nfunction checkInclusion(s1, s2) {\n  return findAnagrams(s2, s1).length > 0;\n}",
+    "testCases": [
+      {
+        "description": "minWindow classic example",
+        "input": "minWindow('ADOBECODEBANC', 'ABC')",
+        "expected": "'BANC'"
+      },
+      {
+        "description": "minWindow with exact and impossible matches",
+        "input": "[minWindow('a', 'a'), minWindow('a', 'aa'), minWindow('aa', 'aa')]",
+        "expected": "['a', '', 'aa']"
+      },
+      {
+        "description": "minWindow respects multiplicity and returns the leftmost on ties",
+        "input": "[minWindow('ab', 'b'), minWindow('abcdba', 'ab')]",
+        "expected": "['b', 'ab']"
+      },
+      {
+        "description": "minWindow with an empty target",
+        "input": "minWindow('abc', '')",
+        "expected": "''"
+      },
+      {
+        "description": "checkInclusion finds a permutation",
+        "input": "[checkInclusion('ab', 'eidbaooo'), checkInclusion('ab', 'eidboaoo')]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "checkInclusion with short or empty haystacks",
+        "input": "[checkInclusion('abc', 'ab'), checkInclusion('a', '')]",
+        "expected": "[false, false]"
+      },
+      {
+        "description": "findAnagrams lists all start indices",
+        "input": "[findAnagrams('cbaebabacd', 'abc'), findAnagrams('abab', 'ab')]",
+        "expected": "[[0, 6], [0, 1, 2]]"
+      },
+      {
+        "description": "findAnagrams with no match or pattern too long",
+        "input": "[findAnagrams('abc', 'd'), findAnagrams('a', 'ab')]",
+        "expected": "[[], []]"
+      }
+    ],
+    "testHarness": "await $test.run(\"minWindow classic example\", async () => {\n  const sleep = $test.sleep;\n  return (minWindow('ADOBECODEBANC', 'ABC'));\n}, () => ('BANC'));\n\nawait $test.run(\"minWindow with exact and impossible matches\", async () => {\n  const sleep = $test.sleep;\n  return ([minWindow('a', 'a'), minWindow('a', 'aa'), minWindow('aa', 'aa')]);\n}, () => (['a', '', 'aa']));\n\nawait $test.run(\"minWindow respects multiplicity and returns the leftmost on ties\", async () => {\n  const sleep = $test.sleep;\n  return ([minWindow('ab', 'b'), minWindow('abcdba', 'ab')]);\n}, () => (['b', 'ab']));\n\nawait $test.run(\"minWindow with an empty target\", async () => {\n  const sleep = $test.sleep;\n  return (minWindow('abc', ''));\n}, () => (''));\n\nawait $test.run(\"checkInclusion finds a permutation\", async () => {\n  const sleep = $test.sleep;\n  return ([checkInclusion('ab', 'eidbaooo'), checkInclusion('ab', 'eidboaoo')]);\n}, () => ([true, false]));\n\nawait $test.run(\"checkInclusion with short or empty haystacks\", async () => {\n  const sleep = $test.sleep;\n  return ([checkInclusion('abc', 'ab'), checkInclusion('a', '')]);\n}, () => ([false, false]));\n\nawait $test.run(\"findAnagrams lists all start indices\", async () => {\n  const sleep = $test.sleep;\n  return ([findAnagrams('cbaebabacd', 'abc'), findAnagrams('abab', 'ab')]);\n}, () => ([[0, 6], [0, 1, 2]]));\n\nawait $test.run(\"findAnagrams with no match or pattern too long\", async () => {\n  const sleep = $test.sleep;\n  return ([findAnagrams('abc', 'd'), findAnagrams('a', 'ab')]);\n}, () => ([[], []]));",
+    "targetTime": "O(n + m)",
+    "targetSpace": "O(m)",
+    "complexityExplanation": "The window moves across s once while a frequency map of the target characters tracks what is still missing."
+  },
+  {
+    "id": "partition-subset-sum",
+    "track": "algorithms",
+    "title": "DP: Partition Equal Subset Sum and Target Sum Ways",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "subset-sum",
+      "knapsack"
+    ],
+    "promptSeed": "Write canPartition(nums): true when the positive integers can be split into two subsets with equal sum (an empty array is true). Write findTargetSumWays(nums, target): the number of ways to put a + or - sign in front of every number so the total equals target (reduce it to a subset-sum count; [0, 0, 0] with target 0 has 8 ways; 0 when impossible).",
+    "difficulty": 4,
+    "concept": "dp",
+    "referenceSolution": "function canPartition(nums) {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (total % 2 !== 0) return false;\n  const half = total / 2;\n  const dp = new Array(half + 1).fill(false);\n  dp[0] = true;\n  for (const n of nums) {\n    for (let s = half; s >= n; s--) {\n      if (dp[s - n]) dp[s] = true;\n    }\n  }\n  return dp[half];\n}\n\nfunction findTargetSumWays(nums, target) {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (Math.abs(target) > total || (total + target) % 2 !== 0) return 0;\n  const want = (total + target) / 2;\n  const dp = new Array(want + 1).fill(0);\n  dp[0] = 1;\n  for (const n of nums) {\n    for (let s = want; s >= n; s--) dp[s] += dp[s - n];\n  }\n  return dp[want];\n}",
+    "solution": "function canPartition(nums) {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (total % 2 !== 0) return false;\n  const half = total / 2;\n  const dp = new Array(half + 1).fill(false);\n  dp[0] = true;\n  for (const n of nums) {\n    for (let s = half; s >= n; s--) {\n      if (dp[s - n]) dp[s] = true;\n    }\n  }\n  return dp[half];\n}\n\nfunction findTargetSumWays(nums, target) {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (Math.abs(target) > total || (total + target) % 2 !== 0) return 0;\n  const want = (total + target) / 2;\n  const dp = new Array(want + 1).fill(0);\n  dp[0] = 1;\n  for (const n of nums) {\n    for (let s = want; s >= n; s--) dp[s] += dp[s - n];\n  }\n  return dp[want];\n}",
+    "starterCode": "function canPartition(nums) {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (total % 2 !== 0) return false;\n  const half = total / 2;\n  const dp = new Array(half + 1).fill(false);\n  dp[0] = true;\n  for (const n of nums) {\n    for (let s = half; s >= n; s--) {\n      if (dp[s - n]) dp[s] = true;\n    }\n  }\n  return dp[half];\n}\n\nfunction findTargetSumWays(nums, target) {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (Math.abs(target) > total || (total + target) % 2 !== 0) return 0;\n  const want = (total + target) / 2;\n  const dp = new Array(want + 1).fill(0);\n  dp[0] = 1;\n  for (const n of nums) {\n    for (let s = want; s >= n; s--) dp[s] += dp[s - n];\n  }\n  return dp[want];\n}",
+    "testCases": [
+      {
+        "description": "canPartition classic examples",
+        "input": "[canPartition([1, 5, 11, 5]), canPartition([1, 2, 3, 5])]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "canPartition edge cases",
+        "input": "[canPartition([]), canPartition([2, 2]), canPartition([1])]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "findTargetSumWays classic examples",
+        "input": "[findTargetSumWays([1, 1, 1, 1, 1], 3), findTargetSumWays([1], 1)]",
+        "expected": "[5, 1]"
+      },
+      {
+        "description": "findTargetSumWays impossible targets",
+        "input": "[findTargetSumWays([1], 2), findTargetSumWays([1, 2], 0)]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "findTargetSumWays with zeros doubles the ways",
+        "input": "[findTargetSumWays([0, 0, 0], 0), findTargetSumWays([1, 0], 1)]",
+        "expected": "[8, 2]"
+      }
+    ],
+    "testHarness": "await $test.run(\"canPartition classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([canPartition([1, 5, 11, 5]), canPartition([1, 2, 3, 5])]);\n}, () => ([true, false]));\n\nawait $test.run(\"canPartition edge cases\", async () => {\n  const sleep = $test.sleep;\n  return ([canPartition([]), canPartition([2, 2]), canPartition([1])]);\n}, () => ([true, true, false]));\n\nawait $test.run(\"findTargetSumWays classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([findTargetSumWays([1, 1, 1, 1, 1], 3), findTargetSumWays([1], 1)]);\n}, () => ([5, 1]));\n\nawait $test.run(\"findTargetSumWays impossible targets\", async () => {\n  const sleep = $test.sleep;\n  return ([findTargetSumWays([1], 2), findTargetSumWays([1, 2], 0)]);\n}, () => ([0, 0]));\n\nawait $test.run(\"findTargetSumWays with zeros doubles the ways\", async () => {\n  const sleep = $test.sleep;\n  return ([findTargetSumWays([0, 0, 0], 0), findTargetSumWays([1, 0], 1)]);\n}, () => ([8, 2]));",
+    "targetTime": "O(n × S)",
+    "targetSpace": "O(S)",
+    "complexityExplanation": "Each number updates a one-dimensional table indexed by the subset sum S being searched."
+  },
+  {
+    "id": "stock-profit-dp",
+    "track": "algorithms",
+    "title": "DP: Best Time to Buy and Sell Stock (One, Many, Cooldown)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "array",
+      "state-machine",
+      "greedy"
+    ],
+    "promptSeed": "Write maxProfit(prices): the best profit from one buy followed by one later sell (0 if no profit is possible or prices is empty). Write maxProfitMany(prices): the best total profit with unlimited transactions (you hold at most one share). Write maxProfitCooldown(prices): unlimited transactions, but after selling you must wait one day before buying again.",
+    "difficulty": 3,
+    "concept": "dp",
+    "referenceSolution": "function maxProfit(prices) {\n  let min = Infinity;\n  let best = 0;\n  for (const p of prices) {\n    min = Math.min(min, p);\n    best = Math.max(best, p - min);\n  }\n  return best;\n}\n\nfunction maxProfitMany(prices) {\n  let total = 0;\n  for (let i = 1; i < prices.length; i++) {\n    if (prices[i] > prices[i - 1]) total += prices[i] - prices[i - 1];\n  }\n  return total;\n}\n\nfunction maxProfitCooldown(prices) {\n  let hold = -Infinity;\n  let sold = 0;\n  let rest = 0;\n  for (const p of prices) {\n    const prevSold = sold;\n    sold = hold + p;\n    hold = Math.max(hold, rest - p);\n    rest = Math.max(rest, prevSold);\n  }\n  return Math.max(sold, rest);\n}",
+    "solution": "function maxProfit(prices) {\n  let min = Infinity;\n  let best = 0;\n  for (const p of prices) {\n    min = Math.min(min, p);\n    best = Math.max(best, p - min);\n  }\n  return best;\n}\n\nfunction maxProfitMany(prices) {\n  let total = 0;\n  for (let i = 1; i < prices.length; i++) {\n    if (prices[i] > prices[i - 1]) total += prices[i] - prices[i - 1];\n  }\n  return total;\n}\n\nfunction maxProfitCooldown(prices) {\n  let hold = -Infinity;\n  let sold = 0;\n  let rest = 0;\n  for (const p of prices) {\n    const prevSold = sold;\n    sold = hold + p;\n    hold = Math.max(hold, rest - p);\n    rest = Math.max(rest, prevSold);\n  }\n  return Math.max(sold, rest);\n}",
+    "starterCode": "function maxProfit(prices) {\n  let min = Infinity;\n  let best = 0;\n  for (const p of prices) {\n    min = Math.min(min, p);\n    best = Math.max(best, p - min);\n  }\n  return best;\n}\n\nfunction maxProfitMany(prices) {\n  let total = 0;\n  for (let i = 1; i < prices.length; i++) {\n    if (prices[i] > prices[i - 1]) total += prices[i] - prices[i - 1];\n  }\n  return total;\n}\n\nfunction maxProfitCooldown(prices) {\n  let hold = -Infinity;\n  let sold = 0;\n  let rest = 0;\n  for (const p of prices) {\n    const prevSold = sold;\n    sold = hold + p;\n    hold = Math.max(hold, rest - p);\n    rest = Math.max(rest, prevSold);\n  }\n  return Math.max(sold, rest);\n}",
+    "testCases": [
+      {
+        "description": "maxProfit one transaction",
+        "input": "[maxProfit([7, 1, 5, 3, 6, 4]), maxProfit([7, 6, 4, 3, 1]), maxProfit([])]",
+        "expected": "[5, 0, 0]"
+      },
+      {
+        "description": "maxProfitMany unlimited transactions",
+        "input": "[maxProfitMany([7, 1, 5, 3, 6, 4]), maxProfitMany([1, 2, 3, 4, 5]), maxProfitMany([5, 4])]",
+        "expected": "[7, 4, 0]"
+      },
+      {
+        "description": "maxProfitCooldown classic example",
+        "input": "maxProfitCooldown([1, 2, 3, 0, 2])",
+        "expected": "3"
+      },
+      {
+        "description": "maxProfitCooldown edge cases",
+        "input": "[maxProfitCooldown([1]), maxProfitCooldown([2, 1]), maxProfitCooldown([1, 2, 4]), maxProfitCooldown([])]",
+        "expected": "[0, 0, 3, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"maxProfit one transaction\", async () => {\n  const sleep = $test.sleep;\n  return ([maxProfit([7, 1, 5, 3, 6, 4]), maxProfit([7, 6, 4, 3, 1]), maxProfit([])]);\n}, () => ([5, 0, 0]));\n\nawait $test.run(\"maxProfitMany unlimited transactions\", async () => {\n  const sleep = $test.sleep;\n  return ([maxProfitMany([7, 1, 5, 3, 6, 4]), maxProfitMany([1, 2, 3, 4, 5]), maxProfitMany([5, 4])]);\n}, () => ([7, 4, 0]));\n\nawait $test.run(\"maxProfitCooldown classic example\", async () => {\n  const sleep = $test.sleep;\n  return (maxProfitCooldown([1, 2, 3, 0, 2]));\n}, () => (3));\n\nawait $test.run(\"maxProfitCooldown edge cases\", async () => {\n  const sleep = $test.sleep;\n  return ([maxProfitCooldown([1]), maxProfitCooldown([2, 1]), maxProfitCooldown([1, 2, 4]), maxProfitCooldown([])]);\n}, () => ([0, 0, 3, 0]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each price updates a handful of running profit states, so one pass and constant space suffice."
+  },
+  {
+    "id": "string-arithmetic",
+    "track": "algorithms",
+    "title": "Strings: Add Binary, Add Big Numbers, Multiply Strings",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "string",
+      "math",
+      "carry",
+      "big-number"
+    ],
+    "promptSeed": "Do not use BigInt or Number() on the whole strings. Write addBinary(a, b) for two binary strings ('11' + '1' is '100'), addStrings(a, b) for two non-negative decimal strings of any length ('999' + '1' is '1000'), and multiplyStrings(a, b) for two non-negative decimal strings ('123' * '456' is '56088'; any factor '0' gives '0'). Results have no leading zeros except for '0' itself.",
+    "difficulty": 3,
+    "concept": "strings",
+    "referenceSolution": "function addInBase(a, b, base) {\n  let i = a.length - 1;\n  let j = b.length - 1;\n  let carry = 0;\n  let out = '';\n  while (i >= 0 || j >= 0 || carry) {\n    const sum = (i >= 0 ? Number(a[i--]) : 0) + (j >= 0 ? Number(b[j--]) : 0) + carry;\n    out = (sum % base) + out;\n    carry = Math.floor(sum / base);\n  }\n  return out || '0';\n}\n\nfunction addBinary(a, b) {\n  return addInBase(a, b, 2);\n}\n\nfunction addStrings(a, b) {\n  return addInBase(a, b, 10);\n}\n\nfunction multiplyStrings(a, b) {\n  if (a === '0' || b === '0') return '0';\n  const digits = new Array(a.length + b.length).fill(0);\n  for (let i = a.length - 1; i >= 0; i--) {\n    for (let j = b.length - 1; j >= 0; j--) {\n      const sum = Number(a[i]) * Number(b[j]) + digits[i + j + 1];\n      digits[i + j + 1] = sum % 10;\n      digits[i + j] += Math.floor(sum / 10);\n    }\n  }\n  return digits.join('').replace(/^0+/, '');\n}",
+    "solution": "function addInBase(a, b, base) {\n  let i = a.length - 1;\n  let j = b.length - 1;\n  let carry = 0;\n  let out = '';\n  while (i >= 0 || j >= 0 || carry) {\n    const sum = (i >= 0 ? Number(a[i--]) : 0) + (j >= 0 ? Number(b[j--]) : 0) + carry;\n    out = (sum % base) + out;\n    carry = Math.floor(sum / base);\n  }\n  return out || '0';\n}\n\nfunction addBinary(a, b) {\n  return addInBase(a, b, 2);\n}\n\nfunction addStrings(a, b) {\n  return addInBase(a, b, 10);\n}\n\nfunction multiplyStrings(a, b) {\n  if (a === '0' || b === '0') return '0';\n  const digits = new Array(a.length + b.length).fill(0);\n  for (let i = a.length - 1; i >= 0; i--) {\n    for (let j = b.length - 1; j >= 0; j--) {\n      const sum = Number(a[i]) * Number(b[j]) + digits[i + j + 1];\n      digits[i + j + 1] = sum % 10;\n      digits[i + j] += Math.floor(sum / 10);\n    }\n  }\n  return digits.join('').replace(/^0+/, '');\n}",
+    "starterCode": "function addInBase(a, b, base) {\n  let i = a.length - 1;\n  let j = b.length - 1;\n  let carry = 0;\n  let out = '';\n  while (i >= 0 || j >= 0 || carry) {\n    const sum = (i >= 0 ? Number(a[i--]) : 0) + (j >= 0 ? Number(b[j--]) : 0) + carry;\n    out = (sum % base) + out;\n    carry = Math.floor(sum / base);\n  }\n  return out || '0';\n}\n\nfunction addBinary(a, b) {\n  return addInBase(a, b, 2);\n}\n\nfunction addStrings(a, b) {\n  return addInBase(a, b, 10);\n}\n\nfunction multiplyStrings(a, b) {\n  if (a === '0' || b === '0') return '0';\n  const digits = new Array(a.length + b.length).fill(0);\n  for (let i = a.length - 1; i >= 0; i--) {\n    for (let j = b.length - 1; j >= 0; j--) {\n      const sum = Number(a[i]) * Number(b[j]) + digits[i + j + 1];\n      digits[i + j + 1] = sum % 10;\n      digits[i + j] += Math.floor(sum / 10);\n    }\n  }\n  return digits.join('').replace(/^0+/, '');\n}",
+    "testCases": [
+      {
+        "description": "addBinary",
+        "input": "[addBinary('11', '1'), addBinary('1010', '1011'), addBinary('0', '0')]",
+        "expected": "['100', '10101', '0']"
+      },
+      {
+        "description": "addStrings",
+        "input": "[addStrings('456', '77'), addStrings('999', '1'), addStrings('0', '0')]",
+        "expected": "['533', '1000', '0']"
+      },
+      {
+        "description": "addStrings beyond Number precision",
+        "input": "addStrings('123456789012345678901234567890', '1')",
+        "expected": "'123456789012345678901234567891'"
+      },
+      {
+        "description": "multiplyStrings small products",
+        "input": "[multiplyStrings('2', '3'), multiplyStrings('123', '456'), multiplyStrings('99', '99')]",
+        "expected": "['6', '56088', '9801']"
+      },
+      {
+        "description": "multiplyStrings with zero",
+        "input": "[multiplyStrings('0', '999'), multiplyStrings('12', '0')]",
+        "expected": "['0', '0']"
+      },
+      {
+        "description": "multiplyStrings beyond Number precision",
+        "input": "multiplyStrings('123456789', '987654321')",
+        "expected": "'121932631112635269'"
+      }
+    ],
+    "testHarness": "await $test.run(\"addBinary\", async () => {\n  const sleep = $test.sleep;\n  return ([addBinary('11', '1'), addBinary('1010', '1011'), addBinary('0', '0')]);\n}, () => (['100', '10101', '0']));\n\nawait $test.run(\"addStrings\", async () => {\n  const sleep = $test.sleep;\n  return ([addStrings('456', '77'), addStrings('999', '1'), addStrings('0', '0')]);\n}, () => (['533', '1000', '0']));\n\nawait $test.run(\"addStrings beyond Number precision\", async () => {\n  const sleep = $test.sleep;\n  return (addStrings('123456789012345678901234567890', '1'));\n}, () => ('123456789012345678901234567891'));\n\nawait $test.run(\"multiplyStrings small products\", async () => {\n  const sleep = $test.sleep;\n  return ([multiplyStrings('2', '3'), multiplyStrings('123', '456'), multiplyStrings('99', '99')]);\n}, () => (['6', '56088', '9801']));\n\nawait $test.run(\"multiplyStrings with zero\", async () => {\n  const sleep = $test.sleep;\n  return ([multiplyStrings('0', '999'), multiplyStrings('12', '0')]);\n}, () => (['0', '0']));\n\nawait $test.run(\"multiplyStrings beyond Number precision\", async () => {\n  const sleep = $test.sleep;\n  return (multiplyStrings('123456789', '987654321'));\n}, () => ('121932631112635269'));",
+    "targetTime": "O(n + m) / O(n × m)",
+    "targetSpace": "O(n + m)",
+    "complexityExplanation": "Addition walks both strings once with a carry; schoolbook multiplication fills an n + m digit array."
+  },
+  {
+    "id": "strings-basics",
+    "track": "algorithms",
+    "title": "Strings: Reverse Words, Run-Length Encoding, Rotation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "string",
+      "basics",
+      "encoding"
+    ],
+    "promptSeed": "Write reverseWords(s): the words of s in reverse order joined by single spaces, ignoring leading, trailing and repeated spaces ('  hello   world ' becomes 'world hello'; '' stays ''). Write runLengthEncode(s) ('aabccc' becomes 'a2b1c3', every run gets its count, '' stays '') and runLengthDecode(s) (the inverse; counts can have several digits, 'x12' is twelve x's). Write isRotation(a, b): true when b is a rotation of a (same length and b appears in a + a; two empty strings are rotations).",
+    "difficulty": 1,
+    "concept": "strings",
+    "referenceSolution": "function reverseWords(s) {\n  return s.split(' ').filter(Boolean).reverse().join(' ');\n}\n\nfunction runLengthEncode(s) {\n  let out = '';\n  let i = 0;\n  while (i < s.length) {\n    let j = i;\n    while (j < s.length && s[j] === s[i]) j++;\n    out += s[i] + (j - i);\n    i = j;\n  }\n  return out;\n}\n\nfunction runLengthDecode(s) {\n  return s.replace(/(\\D)(\\d+)/g, (_, ch, n) => ch.repeat(Number(n)));\n}\n\nfunction isRotation(a, b) {\n  return a.length === b.length && (a + a).includes(b);\n}",
+    "solution": "function reverseWords(s) {\n  return s.split(' ').filter(Boolean).reverse().join(' ');\n}\n\nfunction runLengthEncode(s) {\n  let out = '';\n  let i = 0;\n  while (i < s.length) {\n    let j = i;\n    while (j < s.length && s[j] === s[i]) j++;\n    out += s[i] + (j - i);\n    i = j;\n  }\n  return out;\n}\n\nfunction runLengthDecode(s) {\n  return s.replace(/(\\D)(\\d+)/g, (_, ch, n) => ch.repeat(Number(n)));\n}\n\nfunction isRotation(a, b) {\n  return a.length === b.length && (a + a).includes(b);\n}",
+    "starterCode": "function reverseWords(s) {\n  return s.split(' ').filter(Boolean).reverse().join(' ');\n}\n\nfunction runLengthEncode(s) {\n  let out = '';\n  let i = 0;\n  while (i < s.length) {\n    let j = i;\n    while (j < s.length && s[j] === s[i]) j++;\n    out += s[i] + (j - i);\n    i = j;\n  }\n  return out;\n}\n\nfunction runLengthDecode(s) {\n  return s.replace(/(\\D)(\\d+)/g, (_, ch, n) => ch.repeat(Number(n)));\n}\n\nfunction isRotation(a, b) {\n  return a.length === b.length && (a + a).includes(b);\n}",
+    "testCases": [
+      {
+        "description": "reverseWords reverses word order",
+        "input": "reverseWords('the sky is blue')",
+        "expected": "'blue is sky the'"
+      },
+      {
+        "description": "reverseWords trims and collapses spaces",
+        "input": "[reverseWords('  hello   world '), reverseWords('a'), reverseWords('')]",
+        "expected": "['world hello', 'a', '']"
+      },
+      {
+        "description": "runLengthEncode",
+        "input": "[runLengthEncode('aabccc'), runLengthEncode('abc'), runLengthEncode('')]",
+        "expected": "['a2b1c3', 'a1b1c1', '']"
+      },
+      {
+        "description": "runLengthEncode with a long run",
+        "input": "runLengthEncode('aaaaaaaaaaaa')",
+        "expected": "'a12'"
+      },
+      {
+        "description": "runLengthDecode",
+        "input": "[runLengthDecode('a2b1c3'), runLengthDecode(''), runLengthDecode('x12')]",
+        "expected": "['aabccc', '', 'xxxxxxxxxxxx']"
+      },
+      {
+        "description": "Encode then decode round-trips",
+        "input": "const s = 'wwwwaaadexxxxxx';\nrunLengthDecode(runLengthEncode(s)) === s",
+        "expected": "true"
+      },
+      {
+        "description": "isRotation",
+        "input": "[isRotation('waterbottle', 'erbottlewat'), isRotation('abc', 'acb'), isRotation('abc', 'ab'), isRotation('', '')]",
+        "expected": "[true, false, false, true]"
+      }
+    ],
+    "testHarness": "await $test.run(\"reverseWords reverses word order\", async () => {\n  const sleep = $test.sleep;\n  return (reverseWords('the sky is blue'));\n}, () => ('blue is sky the'));\n\nawait $test.run(\"reverseWords trims and collapses spaces\", async () => {\n  const sleep = $test.sleep;\n  return ([reverseWords('  hello   world '), reverseWords('a'), reverseWords('')]);\n}, () => (['world hello', 'a', '']));\n\nawait $test.run(\"runLengthEncode\", async () => {\n  const sleep = $test.sleep;\n  return ([runLengthEncode('aabccc'), runLengthEncode('abc'), runLengthEncode('')]);\n}, () => (['a2b1c3', 'a1b1c1', '']));\n\nawait $test.run(\"runLengthEncode with a long run\", async () => {\n  const sleep = $test.sleep;\n  return (runLengthEncode('aaaaaaaaaaaa'));\n}, () => ('a12'));\n\nawait $test.run(\"runLengthDecode\", async () => {\n  const sleep = $test.sleep;\n  return ([runLengthDecode('a2b1c3'), runLengthDecode(''), runLengthDecode('x12')]);\n}, () => (['aabccc', '', 'xxxxxxxxxxxx']));\n\nawait $test.run(\"Encode then decode round-trips\", async () => {\n  const sleep = $test.sleep;\n  const s = 'wwwwaaadexxxxxx';\n  return (runLengthDecode(runLengthEncode(s)) === s);\n}, () => (true));\n\nawait $test.run(\"isRotation\", async () => {\n  const sleep = $test.sleep;\n  return ([isRotation('waterbottle', 'erbottlewat'), isRotation('abc', 'acb'), isRotation('abc', 'ab'), isRotation('', '')]);\n}, () => ([true, false, false, true]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each function scans the string once and builds an output proportional to its length."
+  },
+  {
+    "id": "window-replacement-ones",
+    "track": "algorithms",
+    "title": "Sliding Window: Character Replacement, Longest Ones, Shortest Subarray",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sliding-window",
+      "array",
+      "two-pointer"
+    ],
+    "promptSeed": "Write characterReplacement(s, k): the length of the longest substring that can be turned into one repeated letter by replacing at most k characters (0 for an empty string). Write longestOnes(nums, k): the longest run of 1s in a 0/1 array if you may flip at most k zeros. Write minSubArrayLen(target, nums): the smallest length of a contiguous subarray of positive numbers whose sum is >= target, or 0 if none.",
+    "difficulty": 3,
+    "concept": "sliding-window",
+    "referenceSolution": "function characterReplacement(s, k) {\n  const counts = {};\n  let left = 0;\n  let maxCount = 0;\n  let best = 0;\n  for (let right = 0; right < s.length; right++) {\n    counts[s[right]] = (counts[s[right]] || 0) + 1;\n    maxCount = Math.max(maxCount, counts[s[right]]);\n    while (right - left + 1 - maxCount > k) {\n      counts[s[left]]--;\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}\n\nfunction longestOnes(nums, k) {\n  let left = 0;\n  let zeros = 0;\n  let best = 0;\n  for (let right = 0; right < nums.length; right++) {\n    if (nums[right] === 0) zeros++;\n    while (zeros > k) {\n      if (nums[left] === 0) zeros--;\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}\n\nfunction minSubArrayLen(target, nums) {\n  let left = 0;\n  let sum = 0;\n  let best = Infinity;\n  for (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    while (sum >= target) {\n      best = Math.min(best, right - left + 1);\n      sum -= nums[left++];\n    }\n  }\n  return best === Infinity ? 0 : best;\n}",
+    "solution": "function characterReplacement(s, k) {\n  const counts = {};\n  let left = 0;\n  let maxCount = 0;\n  let best = 0;\n  for (let right = 0; right < s.length; right++) {\n    counts[s[right]] = (counts[s[right]] || 0) + 1;\n    maxCount = Math.max(maxCount, counts[s[right]]);\n    while (right - left + 1 - maxCount > k) {\n      counts[s[left]]--;\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}\n\nfunction longestOnes(nums, k) {\n  let left = 0;\n  let zeros = 0;\n  let best = 0;\n  for (let right = 0; right < nums.length; right++) {\n    if (nums[right] === 0) zeros++;\n    while (zeros > k) {\n      if (nums[left] === 0) zeros--;\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}\n\nfunction minSubArrayLen(target, nums) {\n  let left = 0;\n  let sum = 0;\n  let best = Infinity;\n  for (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    while (sum >= target) {\n      best = Math.min(best, right - left + 1);\n      sum -= nums[left++];\n    }\n  }\n  return best === Infinity ? 0 : best;\n}",
+    "starterCode": "function characterReplacement(s, k) {\n  const counts = {};\n  let left = 0;\n  let maxCount = 0;\n  let best = 0;\n  for (let right = 0; right < s.length; right++) {\n    counts[s[right]] = (counts[s[right]] || 0) + 1;\n    maxCount = Math.max(maxCount, counts[s[right]]);\n    while (right - left + 1 - maxCount > k) {\n      counts[s[left]]--;\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}\n\nfunction longestOnes(nums, k) {\n  let left = 0;\n  let zeros = 0;\n  let best = 0;\n  for (let right = 0; right < nums.length; right++) {\n    if (nums[right] === 0) zeros++;\n    while (zeros > k) {\n      if (nums[left] === 0) zeros--;\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}\n\nfunction minSubArrayLen(target, nums) {\n  let left = 0;\n  let sum = 0;\n  let best = Infinity;\n  for (let right = 0; right < nums.length; right++) {\n    sum += nums[right];\n    while (sum >= target) {\n      best = Math.min(best, right - left + 1);\n      sum -= nums[left++];\n    }\n  }\n  return best === Infinity ? 0 : best;\n}",
+    "testCases": [
+      {
+        "description": "characterReplacement classic examples",
+        "input": "[characterReplacement('ABAB', 2), characterReplacement('AABABBA', 1)]",
+        "expected": "[4, 4]"
+      },
+      {
+        "description": "characterReplacement edge cases",
+        "input": "[characterReplacement('', 2), characterReplacement('AAAA', 0), characterReplacement('ABC', 0)]",
+        "expected": "[0, 4, 1]"
+      },
+      {
+        "description": "longestOnes classic examples",
+        "input": "[longestOnes([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], 2), longestOnes([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3)]",
+        "expected": "[6, 10]"
+      },
+      {
+        "description": "longestOnes with k = 0",
+        "input": "[longestOnes([0, 0], 0), longestOnes([1, 1], 0), longestOnes([1, 0, 1, 1], 0)]",
+        "expected": "[0, 2, 2]"
+      },
+      {
+        "description": "minSubArrayLen classic examples",
+        "input": "[minSubArrayLen(7, [2, 3, 1, 2, 4, 3]), minSubArrayLen(4, [1, 4, 4])]",
+        "expected": "[2, 1]"
+      },
+      {
+        "description": "minSubArrayLen with no valid subarray",
+        "input": "[minSubArrayLen(11, [1, 1, 1, 1, 1, 1, 1, 1]), minSubArrayLen(3, [])]",
+        "expected": "[0, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"characterReplacement classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([characterReplacement('ABAB', 2), characterReplacement('AABABBA', 1)]);\n}, () => ([4, 4]));\n\nawait $test.run(\"characterReplacement edge cases\", async () => {\n  const sleep = $test.sleep;\n  return ([characterReplacement('', 2), characterReplacement('AAAA', 0), characterReplacement('ABC', 0)]);\n}, () => ([0, 4, 1]));\n\nawait $test.run(\"longestOnes classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([longestOnes([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], 2), longestOnes([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3)]);\n}, () => ([6, 10]));\n\nawait $test.run(\"longestOnes with k = 0\", async () => {\n  const sleep = $test.sleep;\n  return ([longestOnes([0, 0], 0), longestOnes([1, 1], 0), longestOnes([1, 0, 1, 1], 0)]);\n}, () => ([0, 2, 2]));\n\nawait $test.run(\"minSubArrayLen classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([minSubArrayLen(7, [2, 3, 1, 2, 4, 3]), minSubArrayLen(4, [1, 4, 4])]);\n}, () => ([2, 1]));\n\nawait $test.run(\"minSubArrayLen with no valid subarray\", async () => {\n  const sleep = $test.sleep;\n  return ([minSubArrayLen(11, [1, 1, 1, 1, 1, 1, 1, 1]), minSubArrayLen(3, [])]);\n}, () => ([0, 0]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Both window edges only move forward, and the state is a few counters (or a small frequency table)."
+  },
+  {
+    "id": "word-break-decode",
+    "track": "algorithms",
+    "title": "DP: Word Break and Decode Ways",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "1d-dp",
+      "string"
+    ],
+    "promptSeed": "Write wordBreak(s, wordDict): true when s can be split into a sequence of words from the array wordDict (words can be reused; the empty string is true). Write numDecodings(s): the number of ways to decode a digit string where 'A' = 1 ... 'Z' = 26 ('12' has 2 ways, '226' has 3, '06' has 0, '10' has 1; a leading or unmatched '0' makes it impossible).",
+    "difficulty": 3,
+    "concept": "dp",
+    "referenceSolution": "function wordBreak(s, wordDict) {\n  const words = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && words.has(s.slice(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}\n\nfunction numDecodings(s) {\n  const dp = new Array(s.length + 1).fill(0);\n  dp[0] = 1;\n  for (let i = 1; i <= s.length; i++) {\n    if (s[i - 1] !== '0') dp[i] += dp[i - 1];\n    if (i >= 2) {\n      const two = Number(s.slice(i - 2, i));\n      if (two >= 10 && two <= 26) dp[i] += dp[i - 2];\n    }\n  }\n  return dp[s.length];\n}",
+    "solution": "function wordBreak(s, wordDict) {\n  const words = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && words.has(s.slice(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}\n\nfunction numDecodings(s) {\n  const dp = new Array(s.length + 1).fill(0);\n  dp[0] = 1;\n  for (let i = 1; i <= s.length; i++) {\n    if (s[i - 1] !== '0') dp[i] += dp[i - 1];\n    if (i >= 2) {\n      const two = Number(s.slice(i - 2, i));\n      if (two >= 10 && two <= 26) dp[i] += dp[i - 2];\n    }\n  }\n  return dp[s.length];\n}",
+    "starterCode": "function wordBreak(s, wordDict) {\n  const words = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && words.has(s.slice(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}\n\nfunction numDecodings(s) {\n  const dp = new Array(s.length + 1).fill(0);\n  dp[0] = 1;\n  for (let i = 1; i <= s.length; i++) {\n    if (s[i - 1] !== '0') dp[i] += dp[i - 1];\n    if (i >= 2) {\n      const two = Number(s.slice(i - 2, i));\n      if (two >= 10 && two <= 26) dp[i] += dp[i - 2];\n    }\n  }\n  return dp[s.length];\n}",
+    "testCases": [
+      {
+        "description": "wordBreak classic examples",
+        "input": "[wordBreak('leetcode', ['leet', 'code']), wordBreak('applepenapple', ['apple', 'pen'])]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "wordBreak impossible split",
+        "input": "wordBreak('catsandog', ['cats', 'dog', 'sand', 'and', 'cat'])",
+        "expected": "false"
+      },
+      {
+        "description": "wordBreak: empty string and repeated words",
+        "input": "[wordBreak('', ['a']), wordBreak('aaaaaaa', ['aaaa', 'aaa'])]",
+        "expected": "[true, true]"
+      },
+      {
+        "description": "numDecodings classic examples",
+        "input": "[numDecodings('12'), numDecodings('226'), numDecodings('11106')]",
+        "expected": "[2, 3, 2]"
+      },
+      {
+        "description": "numDecodings with zeros",
+        "input": "[numDecodings('06'), numDecodings('0'), numDecodings('10'), numDecodings('2101')]",
+        "expected": "[0, 0, 1, 1]"
+      }
+    ],
+    "testHarness": "await $test.run(\"wordBreak classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([wordBreak('leetcode', ['leet', 'code']), wordBreak('applepenapple', ['apple', 'pen'])]);\n}, () => ([true, true]));\n\nawait $test.run(\"wordBreak impossible split\", async () => {\n  const sleep = $test.sleep;\n  return (wordBreak('catsandog', ['cats', 'dog', 'sand', 'and', 'cat']));\n}, () => (false));\n\nawait $test.run(\"wordBreak: empty string and repeated words\", async () => {\n  const sleep = $test.sleep;\n  return ([wordBreak('', ['a']), wordBreak('aaaaaaa', ['aaaa', 'aaa'])]);\n}, () => ([true, true]));\n\nawait $test.run(\"numDecodings classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([numDecodings('12'), numDecodings('226'), numDecodings('11106')]);\n}, () => ([2, 3, 2]));\n\nawait $test.run(\"numDecodings with zeros\", async () => {\n  const sleep = $test.sleep;\n  return ([numDecodings('06'), numDecodings('0'), numDecodings('10'), numDecodings('2101')]);\n}, () => ([0, 0, 1, 1]));",
+    "targetTime": "O(n²) / O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Word break checks each prefix against each earlier split point; decode ways does one pass with a table of n + 1 counts."
   }
 ]

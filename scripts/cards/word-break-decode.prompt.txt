@@ -1,0 +1,1 @@
+Write wordBreak(s, wordDict): true when s can be split into a sequence of words from the array wordDict (words can be reused; the empty string is true). Write numDecodings(s): the number of ways to decode a digit string where 'A' = 1 ... 'Z' = 26 ('12' has 2 ways, '226' has 3, '06' has 0, '10' has 1; a leading or unmatched '0' makes it impossible).

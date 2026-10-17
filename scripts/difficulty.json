@@ -710,5 +710,45 @@
  "greedy-intervals-circuit": {
   "difficulty": 3,
   "concept": "greedy"
+ },
+ "longest-substring-window": {
+  "difficulty": 2,
+  "concept": "sliding-window"
+ },
+ "min-window-permutation": {
+  "difficulty": 3,
+  "concept": "sliding-window"
+ },
+ "window-replacement-ones": {
+  "difficulty": 3,
+  "concept": "sliding-window"
+ },
+ "strings-basics": {
+  "difficulty": 1,
+  "concept": "strings"
+ },
+ "longest-palindrome-substring": {
+  "difficulty": 3,
+  "concept": "strings"
+ },
+ "string-arithmetic": {
+  "difficulty": 3,
+  "concept": "strings"
+ },
+ "word-break-decode": {
+  "difficulty": 3,
+  "concept": "dp"
+ },
+ "partition-subset-sum": {
+  "difficulty": 4,
+  "concept": "dp"
+ },
+ "stock-profit-dp": {
+  "difficulty": 3,
+  "concept": "dp"
+ },
+ "dp-array-variants": {
+  "difficulty": 3,
+  "concept": "dp"
  }
 }

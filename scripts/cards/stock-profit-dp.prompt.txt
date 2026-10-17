@@ -1,0 +1,1 @@
+Write maxProfit(prices): the best profit from one buy followed by one later sell (0 if no profit is possible or prices is empty). Write maxProfitMany(prices): the best total profit with unlimited transactions (you hold at most one share). Write maxProfitCooldown(prices): unlimited transactions, but after selling you must wait one day before buying again.

@@ -1,0 +1,81 @@
+import { c } from './part1.mjs';
+
+// Hand-written cases for batch 18: algorithms round 3 (sliding window, strings, 1D DP).
+export default {
+  'longest-substring-window': [
+    c('lengthOfLongestSubstring classic examples', `[lengthOfLongestSubstring('abcabcbb'), lengthOfLongestSubstring('bbbbb'), lengthOfLongestSubstring('pwwkew')]`, '[3, 1, 3]'),
+    c('lengthOfLongestSubstring: empty string and a single space', `[lengthOfLongestSubstring(''), lengthOfLongestSubstring(' ')]`, '[0, 1]'),
+    c('lengthOfLongestSubstring ignores stale last-seen indices', `[lengthOfLongestSubstring('abba'), lengthOfLongestSubstring('dvdf')]`, '[2, 3]'),
+    c('longestKDistinct classic examples', `[longestKDistinct('eceba', 2), longestKDistinct('aa', 1), longestKDistinct('abaccc', 2)]`, '[3, 2, 4]'),
+    c('longestKDistinct with k = 0 or empty input', `[longestKDistinct('abc', 0), longestKDistinct('', 3)]`, '[0, 0]'),
+    c('longestKDistinct with k larger than the alphabet', `longestKDistinct('abc', 5)`, '3'),
+  ],
+  'min-window-permutation': [
+    c('minWindow classic example', `minWindow('ADOBECODEBANC', 'ABC')`, "'BANC'"),
+    c('minWindow with exact and impossible matches', `[minWindow('a', 'a'), minWindow('a', 'aa'), minWindow('aa', 'aa')]`, "['a', '', 'aa']"),
+    c('minWindow respects multiplicity and returns the leftmost on ties', `[minWindow('ab', 'b'), minWindow('abcdba', 'ab')]`, "['b', 'ab']"),
+    c('minWindow with an empty target', `minWindow('abc', '')`, "''"),
+    c('checkInclusion finds a permutation', `[checkInclusion('ab', 'eidbaooo'), checkInclusion('ab', 'eidboaoo')]`, '[true, false]'),
+    c('checkInclusion with short or empty haystacks', `[checkInclusion('abc', 'ab'), checkInclusion('a', '')]`, '[false, false]'),
+    c('findAnagrams lists all start indices', `[findAnagrams('cbaebabacd', 'abc'), findAnagrams('abab', 'ab')]`, '[[0, 6], [0, 1, 2]]'),
+    c('findAnagrams with no match or pattern too long', `[findAnagrams('abc', 'd'), findAnagrams('a', 'ab')]`, '[[], []]'),
+  ],
+  'window-replacement-ones': [
+    c('characterReplacement classic examples', `[characterReplacement('ABAB', 2), characterReplacement('AABABBA', 1)]`, '[4, 4]'),
+    c('characterReplacement edge cases', `[characterReplacement('', 2), characterReplacement('AAAA', 0), characterReplacement('ABC', 0)]`, '[0, 4, 1]'),
+    c('longestOnes classic examples', `[longestOnes([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], 2), longestOnes([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3)]`, '[6, 10]'),
+    c('longestOnes with k = 0', `[longestOnes([0, 0], 0), longestOnes([1, 1], 0), longestOnes([1, 0, 1, 1], 0)]`, '[0, 2, 2]'),
+    c('minSubArrayLen classic examples', `[minSubArrayLen(7, [2, 3, 1, 2, 4, 3]), minSubArrayLen(4, [1, 4, 4])]`, '[2, 1]'),
+    c('minSubArrayLen with no valid subarray', `[minSubArrayLen(11, [1, 1, 1, 1, 1, 1, 1, 1]), minSubArrayLen(3, [])]`, '[0, 0]'),
+  ],
+  'strings-basics': [
+    c('reverseWords reverses word order', `reverseWords('the sky is blue')`, "'blue is sky the'"),
+    c('reverseWords trims and collapses spaces', `[reverseWords('  hello   world '), reverseWords('a'), reverseWords('')]`, "['world hello', 'a', '']"),
+    c('runLengthEncode', `[runLengthEncode('aabccc'), runLengthEncode('abc'), runLengthEncode('')]`, "['a2b1c3', 'a1b1c1', '']"),
+    c('runLengthEncode with a long run', `runLengthEncode('aaaaaaaaaaaa')`, "'a12'"),
+    c('runLengthDecode', `[runLengthDecode('a2b1c3'), runLengthDecode(''), runLengthDecode('x12')]`, "['aabccc', '', 'xxxxxxxxxxxx']"),
+    c('Encode then decode round-trips', `const s = 'wwwwaaadexxxxxx';\nrunLengthDecode(runLengthEncode(s)) === s`, 'true'),
+    c('isRotation', `[isRotation('waterbottle', 'erbottlewat'), isRotation('abc', 'acb'), isRotation('abc', 'ab'), isRotation('', '')]`, '[true, false, false, true]'),
+  ],
+  'longest-palindrome-substring': [
+    c('longestPalindrome returns the leftmost longest', `[longestPalindrome('babad'), longestPalindrome('cbbd')]`, "['bab', 'bb']"),
+    c('longestPalindrome of tiny strings', `[longestPalindrome('a'), longestPalindrome(''), longestPalindrome('abc')]`, "['a', '', 'a']"),
+    c('longestPalindrome of a long palindrome inside noise', `longestPalindrome('forgeeksskeegfor')`, "'geeksskeeg'"),
+    c('countPalindromicSubstrings', `[countPalindromicSubstrings('abc'), countPalindromicSubstrings('aaa'), countPalindromicSubstrings('abba'), countPalindromicSubstrings('')]`, '[3, 6, 6, 0]'),
+  ],
+  'string-arithmetic': [
+    c('addBinary', `[addBinary('11', '1'), addBinary('1010', '1011'), addBinary('0', '0')]`, "['100', '10101', '0']"),
+    c('addStrings', `[addStrings('456', '77'), addStrings('999', '1'), addStrings('0', '0')]`, "['533', '1000', '0']"),
+    c('addStrings beyond Number precision', `addStrings('123456789012345678901234567890', '1')`, "'123456789012345678901234567891'"),
+    c('multiplyStrings small products', `[multiplyStrings('2', '3'), multiplyStrings('123', '456'), multiplyStrings('99', '99')]`, "['6', '56088', '9801']"),
+    c('multiplyStrings with zero', `[multiplyStrings('0', '999'), multiplyStrings('12', '0')]`, "['0', '0']"),
+    c('multiplyStrings beyond Number precision', `multiplyStrings('123456789', '987654321')`, "'121932631112635269'"),
+  ],
+  'word-break-decode': [
+    c('wordBreak classic examples', `[wordBreak('leetcode', ['leet', 'code']), wordBreak('applepenapple', ['apple', 'pen'])]`, '[true, true]'),
+    c('wordBreak impossible split', `wordBreak('catsandog', ['cats', 'dog', 'sand', 'and', 'cat'])`, 'false'),
+    c('wordBreak: empty string and repeated words', `[wordBreak('', ['a']), wordBreak('aaaaaaa', ['aaaa', 'aaa'])]`, '[true, true]'),
+    c('numDecodings classic examples', `[numDecodings('12'), numDecodings('226'), numDecodings('11106')]`, '[2, 3, 2]'),
+    c('numDecodings with zeros', `[numDecodings('06'), numDecodings('0'), numDecodings('10'), numDecodings('2101')]`, '[0, 0, 1, 1]'),
+  ],
+  'partition-subset-sum': [
+    c('canPartition classic examples', `[canPartition([1, 5, 11, 5]), canPartition([1, 2, 3, 5])]`, '[true, false]'),
+    c('canPartition edge cases', `[canPartition([]), canPartition([2, 2]), canPartition([1])]`, '[true, true, false]'),
+    c('findTargetSumWays classic examples', `[findTargetSumWays([1, 1, 1, 1, 1], 3), findTargetSumWays([1], 1)]`, '[5, 1]'),
+    c('findTargetSumWays impossible targets', `[findTargetSumWays([1], 2), findTargetSumWays([1, 2], 0)]`, '[0, 0]'),
+    c('findTargetSumWays with zeros doubles the ways', `[findTargetSumWays([0, 0, 0], 0), findTargetSumWays([1, 0], 1)]`, '[8, 2]'),
+  ],
+  'stock-profit-dp': [
+    c('maxProfit one transaction', `[maxProfit([7, 1, 5, 3, 6, 4]), maxProfit([7, 6, 4, 3, 1]), maxProfit([])]`, '[5, 0, 0]'),
+    c('maxProfitMany unlimited transactions', `[maxProfitMany([7, 1, 5, 3, 6, 4]), maxProfitMany([1, 2, 3, 4, 5]), maxProfitMany([5, 4])]`, '[7, 4, 0]'),
+    c('maxProfitCooldown classic example', `maxProfitCooldown([1, 2, 3, 0, 2])`, '3'),
+    c('maxProfitCooldown edge cases', `[maxProfitCooldown([1]), maxProfitCooldown([2, 1]), maxProfitCooldown([1, 2, 4]), maxProfitCooldown([])]`, '[0, 0, 3, 0]'),
+  ],
+  'dp-array-variants': [
+    c('robCircular classic examples', `[robCircular([2, 3, 2]), robCircular([1, 2, 3, 1]), robCircular([200, 3, 140, 20, 10])]`, '[3, 4, 340]'),
+    c('robCircular tiny inputs', `[robCircular([]), robCircular([1]), robCircular([2, 7])]`, '[0, 1, 7]'),
+    c('maxProduct classic examples', `[maxProduct([2, 3, -2, 4]), maxProduct([-2, 0, -1]), maxProduct([-2, 3, -4])]`, '[6, 0, 24]'),
+    c('maxProduct of one element and with zero', `[maxProduct([-3]), maxProduct([0, 2])]`, '[-3, 2]'),
+    c('minCostClimbingStairs', `[minCostClimbingStairs([10, 15, 20]), minCostClimbingStairs([1, 100, 1, 1, 1, 100, 1, 1, 100, 1]), minCostClimbingStairs([0, 0])]`, '[15, 6, 0]'),
+  ],
+};

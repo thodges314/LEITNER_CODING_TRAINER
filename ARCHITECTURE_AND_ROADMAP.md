@@ -22,9 +22,9 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 178 (74 active at first run) |
-| Documented test cases | 1150 (each shown as input → expected in the UI) |
-| Difficulty spread | d1: 31 · d2: 59 · d3: 59 · d4: 28 · d5: 1 |
+| Cards | 188 (74 active at first run) |
+| Documented test cases | 1206 (each shown as input → expected in the UI) |
+| Difficulty spread | d1: 32 · d2: 60 · d3: 66 · d4: 29 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms (29), js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser, react-components (16) |
 | Tracks defined but empty | `testing-tooling` |
 | Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
@@ -313,6 +313,8 @@ Algorithms were filled in batch 13. Candidates, with the owner's goal in mind (r
 | 5 | **Testing & libs, pure logic (§7.2.4)** | `mockFn`, fake timers, mini `expect`, D3 scales, Next route matcher | pure input/expected | low |
 | 6 | **DOM/browser extras (§7.2.6)** | drag-and-drop, observers, `pushState` router | DOM harness | medium |
 | 7 | **React 19 / a11y** | `useOptimistic`, `useTransition`, roving focus, `aria-live` | needs sandbox changes (§7.2.8) | high |
+
+**Round 3 progress (batches 18+):** sliding window, strings, 1D DP DONE (batch 18, `part18.mjs`). Open: trees/linked lists r2, heaps/graph search r2, backtracking r2.
 
 Pick the order; each batch follows the §4 checklist including the complexity step.
 

@@ -1,0 +1,10 @@
+{
+  "track": "algorithms",
+  "title": "DP: Best Time to Buy and Sell Stock (One, Many, Cooldown)",
+  "tags": [
+    "dp",
+    "array",
+    "state-machine",
+    "greedy"
+  ]
+}

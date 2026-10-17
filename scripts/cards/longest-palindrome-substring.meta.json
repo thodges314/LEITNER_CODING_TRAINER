@@ -1,0 +1,9 @@
+{
+  "track": "algorithms",
+  "title": "Strings: Longest Palindromic Substring and Count",
+  "tags": [
+    "string",
+    "palindrome",
+    "expand-around-center"
+  ]
+}
