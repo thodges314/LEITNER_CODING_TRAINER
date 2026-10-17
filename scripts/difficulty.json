@@ -814,5 +814,25 @@
  "graph-word-ladder": {
   "difficulty": 4,
   "concept": "graphs"
+ },
+ "backtrack-combination-sum": {
+  "difficulty": 3,
+  "concept": "backtracking"
+ },
+ "backtrack-n-queens": {
+  "difficulty": 4,
+  "concept": "backtracking"
+ },
+ "backtrack-word-search": {
+  "difficulty": 3,
+  "concept": "backtracking"
+ },
+ "backtrack-palindrome-partition": {
+  "difficulty": 3,
+  "concept": "backtracking"
+ },
+ "backtrack-subsets-permute-unique": {
+  "difficulty": 3,
+  "concept": "backtracking"
  }
 }

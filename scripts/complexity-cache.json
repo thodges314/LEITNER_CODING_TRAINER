@@ -1018,5 +1018,30 @@
     "targetTime": "O(N * L * 26)",
     "targetSpace": "O(N * L)",
     "complexityExplanation": "BFS over implicit graphs: each of N states tries L positions times the alphabet to find its neighbors."
+  },
+  "backtrack-combination-sum": {
+    "targetTime": "O(2^n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "The search tree branches on take/skip; depth is bounded by the target or the candidate count."
+  },
+  "backtrack-n-queens": {
+    "targetTime": "O(n!)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "One queen per row with O(1) column and diagonal conflict checks prunes the search; the path and sets use O(n)."
+  },
+  "backtrack-word-search": {
+    "targetTime": "O(r * c * 4^L)",
+    "targetSpace": "O(L)",
+    "complexityExplanation": "Each start cell explores up to four directions per letter of a word of length L; the recursion depth is L."
+  },
+  "backtrack-palindrome-partition": {
+    "targetTime": "O(n * 2^n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each gap between characters is cut or not, and each candidate piece costs O(n) to check or copy."
+  },
+  "backtrack-subsets-permute-unique": {
+    "targetTime": "O(n * 2^n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Sorting plus a same-depth skip rule prunes duplicate branches; every output costs O(n) to copy."
   }
 }
