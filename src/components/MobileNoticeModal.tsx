@@ -111,7 +111,7 @@ export const MobileNoticeModal: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
             <Keyboard size={15} color="var(--accent-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
             <span style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: 1.45 }}>
-              Writing solutions from muscle memory, indenting code, and running tests (<code style={{ fontSize: '11px', padding: '1px 4px', borderRadius: '4px', backgroundColor: 'var(--bg-card)' }}>⌘+Enter</code>) requires a full keyboard.
+              Writing solutions from muscle memory, indenting code, running tests, and using keyboard shortcuts requires a full keyboard.
             </span>
           </div>
 
