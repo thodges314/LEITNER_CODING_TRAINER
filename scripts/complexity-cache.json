@@ -983,5 +983,40 @@
     "targetTime": "O(n)",
     "targetSpace": "O(n / k)",
     "complexityExplanation": "Every node is relinked once; the recursive k-group version keeps one frame per group."
+  },
+  "heap-kth-largest": {
+    "targetTime": "O(n log k)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "A min-heap capped at size k costs O(log k) per element; last stone weight uses a max-heap of all n stones."
+  },
+  "heap-merge-k-lists": {
+    "targetTime": "O(N log k)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "The heap holds one candidate per input (k), and each of the N output items costs one push and pop."
+  },
+  "heap-median-stream": {
+    "targetTime": "O(log n) per add, O(1) median",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Two balanced heaps keep the lower and upper halves; the median is read from their tops."
+  },
+  "graph-components-paths": {
+    "targetTime": "O(V + E)",
+    "targetSpace": "O(V + E)",
+    "complexityExplanation": "Building the adjacency list and visiting every vertex and edge once."
+  },
+  "graph-clone-bipartite": {
+    "targetTime": "O(V + E)",
+    "targetSpace": "O(V)",
+    "complexityExplanation": "Each vertex is mapped, colored or unioned once and every edge is examined a constant number of times."
+  },
+  "graph-grid-bfs": {
+    "targetTime": "O(r * c)",
+    "targetSpace": "O(r * c)",
+    "complexityExplanation": "Each cell is enqueued at most once, and each visit checks a constant number of neighbors."
+  },
+  "graph-word-ladder": {
+    "targetTime": "O(N * L * 26)",
+    "targetSpace": "O(N * L)",
+    "complexityExplanation": "BFS over implicit graphs: each of N states tries L positions times the alphabet to find its neighbors."
   }
 }

@@ -1,0 +1,10 @@
+{
+  "track": "algorithms",
+  "title": "Graphs: Connected Components, Valid Path, Star Center",
+  "tags": [
+    "graph",
+    "bfs",
+    "dfs",
+    "adjacency-list"
+  ]
+}

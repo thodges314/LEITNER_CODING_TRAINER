@@ -1,0 +1,10 @@
+{
+  "track": "algorithms",
+  "title": "Graphs: Word Ladder, Minimum Gene Mutation, Open the Lock",
+  "tags": [
+    "graph",
+    "bfs",
+    "implicit-graph",
+    "strings"
+  ]
+}

@@ -22,9 +22,9 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 197 (74 active at first run) |
-| Documented test cases | 1279 (each shown as input → expected in the UI) |
-| Difficulty spread | d1: 32 · d2: 63 · d3: 69 · d4: 32 · d5: 1 |
+| Cards | 204 (74 active at first run) |
+| Documented test cases | 1331 (each shown as input → expected in the UI) |
+| Difficulty spread | d1: 32 · d2: 65 · d3: 72 · d4: 34 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms (29), js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser, react-components (16) |
 | Tracks defined but empty | `testing-tooling` |
 | Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
@@ -314,7 +314,7 @@ Algorithms were filled in batch 13. Candidates, with the owner's goal in mind (r
 | 6 | **DOM/browser extras (§7.2.6)** | drag-and-drop, observers, `pushState` router | DOM harness | medium |
 | 7 | **React 19 / a11y** | `useOptimistic`, `useTransition`, roving focus, `aria-live` | needs sandbox changes (§7.2.8) | high |
 
-**Round 3 progress (batches 18+):** sliding window, strings, 1D DP DONE (batch 18, `part18.mjs`). Trees + linked lists r2 DONE (batch 19, `part19.mjs`, 9 cards: level order, path sum, diameter/balanced, BST kth/insert/build, build+serialize, max path sum, remove-nth/reorder, add numbers, reverse k-group). Open: heaps/graph search r2, backtracking r2.
+**Round 3 progress (batches 18+):** sliding window, strings, 1D DP DONE (batch 18, `part18.mjs`). Trees + linked lists r2 DONE (batch 19, `part19.mjs`, 9 cards: level order, path sum, diameter/balanced, BST kth/insert/build, build+serialize, max path sum, remove-nth/reorder, add numbers, reverse k-group). Heaps + graph search r2 DONE (batch 20, `part20.mjs`, 7 cards: kth largest, merge k lists, median stream, components/paths, clone/bipartite/valid tree, grid BFS, word ladder). Open: backtracking r2.
 
 Pick the order; each batch follows the §4 checklist including the complexity step.
 

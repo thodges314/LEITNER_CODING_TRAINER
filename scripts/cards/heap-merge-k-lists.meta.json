@@ -1,0 +1,9 @@
+{
+  "track": "algorithms",
+  "title": "Heaps: Merge K Sorted Lists and Arrays, K Closest Points",
+  "tags": [
+    "heap",
+    "merge",
+    "k-way"
+  ]
+}

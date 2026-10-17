@@ -786,5 +786,33 @@
  "list-reverse-k-group": {
   "difficulty": 4,
   "concept": "linked-lists"
+ },
+ "heap-kth-largest": {
+  "difficulty": 2,
+  "concept": "heap"
+ },
+ "heap-merge-k-lists": {
+  "difficulty": 3,
+  "concept": "heap"
+ },
+ "heap-median-stream": {
+  "difficulty": 4,
+  "concept": "heap"
+ },
+ "graph-components-paths": {
+  "difficulty": 2,
+  "concept": "graphs"
+ },
+ "graph-clone-bipartite": {
+  "difficulty": 3,
+  "concept": "graphs"
+ },
+ "graph-grid-bfs": {
+  "difficulty": 3,
+  "concept": "graphs"
+ },
+ "graph-word-ladder": {
+  "difficulty": 4,
+  "concept": "graphs"
  }
 }

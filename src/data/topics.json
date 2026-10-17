@@ -11605,5 +11605,452 @@
     "targetTime": "O(n)",
     "targetSpace": "O(h)",
     "complexityExplanation": "DFS visits every node once; the recursion stack is as deep as the tree height h."
+  },
+  {
+    "id": "graph-clone-bipartite",
+    "track": "algorithms",
+    "title": "Graphs: Clone Graph, Bipartite Check, Valid Tree",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "bfs",
+      "union-find",
+      "coloring"
+    ],
+    "promptSeed": "Write cloneGraph(node): deep-copy a connected undirected graph whose nodes are { val, neighbors: [] } (neighbors reference other nodes, so cycles exist) and return the clone of the given node (null stays null); no clone may share a node with the original, neighbor order is preserved. Write isBipartite(graph): graph is an adjacency list (graph[i] lists the neighbors of i, possibly several components); true when the vertices can be 2-colored so every edge joins different colors. Write validTree(n, edges): true when the n vertices (0..n-1) and undirected edges form one tree (connected, no cycles).",
+    "difficulty": 3,
+    "concept": "graphs",
+    "referenceSolution": "function cloneGraph(node) {\n  if (!node) return null;\n  const copies = new Map();\n  function copy(original) {\n    if (copies.has(original)) return copies.get(original);\n    const clone = { val: original.val, neighbors: [] };\n    copies.set(original, clone);\n    for (const next of original.neighbors) clone.neighbors.push(copy(next));\n    return clone;\n  }\n  return copy(node);\n}\n\nfunction isBipartite(graph) {\n  const color = new Array(graph.length).fill(-1);\n  for (let start = 0; start < graph.length; start++) {\n    if (color[start] !== -1) continue;\n    color[start] = 0;\n    const queue = [start];\n    while (queue.length) {\n      const v = queue.shift();\n      for (const w of graph[v]) {\n        if (color[w] === -1) {\n          color[w] = 1 - color[v];\n          queue.push(w);\n        } else if (color[w] === color[v]) {\n          return false;\n        }\n      }\n    }\n  }\n  return true;\n}\n\nfunction validTree(n, edges) {\n  if (edges.length !== n - 1) return false;\n  const parent = Array.from({ length: n }, (_, i) => i);\n  const find = (x) => {\n    while (parent[x] !== x) {\n      parent[x] = parent[parent[x]];\n      x = parent[x];\n    }\n    return x;\n  };\n  for (const [a, b] of edges) {\n    const ra = find(a);\n    const rb = find(b);\n    if (ra === rb) return false;\n    parent[ra] = rb;\n  }\n  return true;\n}",
+    "solution": "function cloneGraph(node) {\n  if (!node) return null;\n  const copies = new Map();\n  function copy(original) {\n    if (copies.has(original)) return copies.get(original);\n    const clone = { val: original.val, neighbors: [] };\n    copies.set(original, clone);\n    for (const next of original.neighbors) clone.neighbors.push(copy(next));\n    return clone;\n  }\n  return copy(node);\n}\n\nfunction isBipartite(graph) {\n  const color = new Array(graph.length).fill(-1);\n  for (let start = 0; start < graph.length; start++) {\n    if (color[start] !== -1) continue;\n    color[start] = 0;\n    const queue = [start];\n    while (queue.length) {\n      const v = queue.shift();\n      for (const w of graph[v]) {\n        if (color[w] === -1) {\n          color[w] = 1 - color[v];\n          queue.push(w);\n        } else if (color[w] === color[v]) {\n          return false;\n        }\n      }\n    }\n  }\n  return true;\n}\n\nfunction validTree(n, edges) {\n  if (edges.length !== n - 1) return false;\n  const parent = Array.from({ length: n }, (_, i) => i);\n  const find = (x) => {\n    while (parent[x] !== x) {\n      parent[x] = parent[parent[x]];\n      x = parent[x];\n    }\n    return x;\n  };\n  for (const [a, b] of edges) {\n    const ra = find(a);\n    const rb = find(b);\n    if (ra === rb) return false;\n    parent[ra] = rb;\n  }\n  return true;\n}",
+    "starterCode": "function cloneGraph(node) {\n  if (!node) return null;\n  const copies = new Map();\n  function copy(original) {\n    if (copies.has(original)) return copies.get(original);\n    const clone = { val: original.val, neighbors: [] };\n    copies.set(original, clone);\n    for (const next of original.neighbors) clone.neighbors.push(copy(next));\n    return clone;\n  }\n  return copy(node);\n}\n\nfunction isBipartite(graph) {\n  const color = new Array(graph.length).fill(-1);\n  for (let start = 0; start < graph.length; start++) {\n    if (color[start] !== -1) continue;\n    color[start] = 0;\n    const queue = [start];\n    while (queue.length) {\n      const v = queue.shift();\n      for (const w of graph[v]) {\n        if (color[w] === -1) {\n          color[w] = 1 - color[v];\n          queue.push(w);\n        } else if (color[w] === color[v]) {\n          return false;\n        }\n      }\n    }\n  }\n  return true;\n}\n\nfunction validTree(n, edges) {\n  if (edges.length !== n - 1) return false;\n  const parent = Array.from({ length: n }, (_, i) => i);\n  const find = (x) => {\n    while (parent[x] !== x) {\n      parent[x] = parent[parent[x]];\n      x = parent[x];\n    }\n    return x;\n  };\n  for (const [a, b] of edges) {\n    const ra = find(a);\n    const rb = find(b);\n    if (ra === rb) return false;\n    parent[ra] = rb;\n  }\n  return true;\n}",
+    "testCases": [
+      {
+        "description": "cloneGraph copies values and neighbor order",
+        "input": "const mk = (adj) => { const nodes = adj.map((_, i) => ({ val: i + 1, neighbors: [] })); adj.forEach((ns, i) => { nodes[i].neighbors = ns.map((j) => nodes[j]); }); return nodes[0]; };\nconst dump = (start) => { const seen = new Set([start]); const queue = [start]; const out = []; while (queue.length) { const x = queue.shift(); out.push([x.val, x.neighbors.map((y) => y.val)]); for (const y of x.neighbors) if (!seen.has(y)) { seen.add(y); queue.push(y); } } return out.sort((a, b) => a[0] - b[0]); };\ndump(cloneGraph(mk([[1, 3], [0, 2], [1, 3], [0, 2]])))",
+        "expected": "[[1, [2, 4]], [2, [1, 3]], [3, [2, 4]], [4, [1, 3]]]"
+      },
+      {
+        "description": "cloneGraph returns fresh nodes that point at each other",
+        "input": "const mk = (adj) => { const nodes = adj.map((_, i) => ({ val: i + 1, neighbors: [] })); adj.forEach((ns, i) => { nodes[i].neighbors = ns.map((j) => nodes[j]); }); return nodes[0]; };\nconst dump = (start) => { const seen = new Set([start]); const queue = [start]; const out = []; while (queue.length) { const x = queue.shift(); out.push([x.val, x.neighbors.map((y) => y.val)]); for (const y of x.neighbors) if (!seen.has(y)) { seen.add(y); queue.push(y); } } return out.sort((a, b) => a[0] - b[0]); };\nconst g = mk([[1, 3], [0, 2], [1, 3], [0, 2]]);\nconst copy = cloneGraph(g);\n[copy !== g, copy.neighbors[0].neighbors.includes(copy), copy.neighbors[0].neighbors.includes(g)]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "cloneGraph: no node of the clone is shared with the original",
+        "input": "const mk = (adj) => { const nodes = adj.map((_, i) => ({ val: i + 1, neighbors: [] })); adj.forEach((ns, i) => { nodes[i].neighbors = ns.map((j) => nodes[j]); }); return nodes[0]; };\nconst dump = (start) => { const seen = new Set([start]); const queue = [start]; const out = []; while (queue.length) { const x = queue.shift(); out.push([x.val, x.neighbors.map((y) => y.val)]); for (const y of x.neighbors) if (!seen.has(y)) { seen.add(y); queue.push(y); } } return out.sort((a, b) => a[0] - b[0]); };\nconst g = mk([[1], [0, 2], [1]]);\nconst originals = new Set([g, g.neighbors[0], g.neighbors[0].neighbors[1]]);\nconst copy = cloneGraph(g);\n[copy, copy.neighbors[0], copy.neighbors[0].neighbors[1]].some((x) => originals.has(x))",
+        "expected": "false"
+      },
+      {
+        "description": "cloneGraph: null and a lone node",
+        "input": "const mk = (adj) => { const nodes = adj.map((_, i) => ({ val: i + 1, neighbors: [] })); adj.forEach((ns, i) => { nodes[i].neighbors = ns.map((j) => nodes[j]); }); return nodes[0]; };\nconst dump = (start) => { const seen = new Set([start]); const queue = [start]; const out = []; while (queue.length) { const x = queue.shift(); out.push([x.val, x.neighbors.map((y) => y.val)]); for (const y of x.neighbors) if (!seen.has(y)) { seen.add(y); queue.push(y); } } return out.sort((a, b) => a[0] - b[0]); };\n[cloneGraph(null), dump(cloneGraph(mk([[]])))]",
+        "expected": "[null, [[1, []]]]"
+      },
+      {
+        "description": "isBipartite accepts an even cycle and rejects an odd-ish dense graph",
+        "input": "[isBipartite([[1, 3], [0, 2], [1, 3], [0, 2]]), isBipartite([[1, 2, 3], [0, 2], [0, 1, 3], [0, 2]])]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "isBipartite checks every component",
+        "input": "[isBipartite([[1], [0], [3, 4], [2, 4], [2, 3]]), isBipartite([[], []]), isBipartite([])]",
+        "expected": "[false, true, true]"
+      },
+      {
+        "description": "validTree accepts a tree",
+        "input": "validTree(5, [[0, 1], [0, 2], [0, 3], [1, 4]])",
+        "expected": "true"
+      },
+      {
+        "description": "validTree rejects cycles and disconnected graphs",
+        "input": "[validTree(5, [[0, 1], [1, 2], [2, 3], [1, 3], [1, 4]]), validTree(4, [[0, 1], [2, 3]])]",
+        "expected": "[false, false]"
+      },
+      {
+        "description": "validTree: a single vertex",
+        "input": "validTree(1, [])",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"cloneGraph copies values and neighbor order\", async () => {\n  const sleep = $test.sleep;\n  const mk = (adj) => { const nodes = adj.map((_, i) => ({ val: i + 1, neighbors: [] })); adj.forEach((ns, i) => { nodes[i].neighbors = ns.map((j) => nodes[j]); }); return nodes[0]; };\n  const dump = (start) => { const seen = new Set([start]); const queue = [start]; const out = []; while (queue.length) { const x = queue.shift(); out.push([x.val, x.neighbors.map((y) => y.val)]); for (const y of x.neighbors) if (!seen.has(y)) { seen.add(y); queue.push(y); } } return out.sort((a, b) => a[0] - b[0]); };\n  return (dump(cloneGraph(mk([[1, 3], [0, 2], [1, 3], [0, 2]]))));\n}, () => ([[1, [2, 4]], [2, [1, 3]], [3, [2, 4]], [4, [1, 3]]]));\n\nawait $test.run(\"cloneGraph returns fresh nodes that point at each other\", async () => {\n  const sleep = $test.sleep;\n  const mk = (adj) => { const nodes = adj.map((_, i) => ({ val: i + 1, neighbors: [] })); adj.forEach((ns, i) => { nodes[i].neighbors = ns.map((j) => nodes[j]); }); return nodes[0]; };\n  const dump = (start) => { const seen = new Set([start]); const queue = [start]; const out = []; while (queue.length) { const x = queue.shift(); out.push([x.val, x.neighbors.map((y) => y.val)]); for (const y of x.neighbors) if (!seen.has(y)) { seen.add(y); queue.push(y); } } return out.sort((a, b) => a[0] - b[0]); };\n  const g = mk([[1, 3], [0, 2], [1, 3], [0, 2]]);\n  const copy = cloneGraph(g);\n  return ([copy !== g, copy.neighbors[0].neighbors.includes(copy), copy.neighbors[0].neighbors.includes(g)]);\n}, () => ([true, true, false]));\n\nawait $test.run(\"cloneGraph: no node of the clone is shared with the original\", async () => {\n  const sleep = $test.sleep;\n  const mk = (adj) => { const nodes = adj.map((_, i) => ({ val: i + 1, neighbors: [] })); adj.forEach((ns, i) => { nodes[i].neighbors = ns.map((j) => nodes[j]); }); return nodes[0]; };\n  const dump = (start) => { const seen = new Set([start]); const queue = [start]; const out = []; while (queue.length) { const x = queue.shift(); out.push([x.val, x.neighbors.map((y) => y.val)]); for (const y of x.neighbors) if (!seen.has(y)) { seen.add(y); queue.push(y); } } return out.sort((a, b) => a[0] - b[0]); };\n  const g = mk([[1], [0, 2], [1]]);\n  const originals = new Set([g, g.neighbors[0], g.neighbors[0].neighbors[1]]);\n  const copy = cloneGraph(g);\n  return ([copy, copy.neighbors[0], copy.neighbors[0].neighbors[1]].some((x) => originals.has(x)));\n}, () => (false));\n\nawait $test.run(\"cloneGraph: null and a lone node\", async () => {\n  const sleep = $test.sleep;\n  const mk = (adj) => { const nodes = adj.map((_, i) => ({ val: i + 1, neighbors: [] })); adj.forEach((ns, i) => { nodes[i].neighbors = ns.map((j) => nodes[j]); }); return nodes[0]; };\n  const dump = (start) => { const seen = new Set([start]); const queue = [start]; const out = []; while (queue.length) { const x = queue.shift(); out.push([x.val, x.neighbors.map((y) => y.val)]); for (const y of x.neighbors) if (!seen.has(y)) { seen.add(y); queue.push(y); } } return out.sort((a, b) => a[0] - b[0]); };\n  return ([cloneGraph(null), dump(cloneGraph(mk([[]])))]);\n}, () => ([null, [[1, []]]]));\n\nawait $test.run(\"isBipartite accepts an even cycle and rejects an odd-ish dense graph\", async () => {\n  const sleep = $test.sleep;\n  return ([isBipartite([[1, 3], [0, 2], [1, 3], [0, 2]]), isBipartite([[1, 2, 3], [0, 2], [0, 1, 3], [0, 2]])]);\n}, () => ([true, false]));\n\nawait $test.run(\"isBipartite checks every component\", async () => {\n  const sleep = $test.sleep;\n  return ([isBipartite([[1], [0], [3, 4], [2, 4], [2, 3]]), isBipartite([[], []]), isBipartite([])]);\n}, () => ([false, true, true]));\n\nawait $test.run(\"validTree accepts a tree\", async () => {\n  const sleep = $test.sleep;\n  return (validTree(5, [[0, 1], [0, 2], [0, 3], [1, 4]]));\n}, () => (true));\n\nawait $test.run(\"validTree rejects cycles and disconnected graphs\", async () => {\n  const sleep = $test.sleep;\n  return ([validTree(5, [[0, 1], [1, 2], [2, 3], [1, 3], [1, 4]]), validTree(4, [[0, 1], [2, 3]])]);\n}, () => ([false, false]));\n\nawait $test.run(\"validTree: a single vertex\", async () => {\n  const sleep = $test.sleep;\n  return (validTree(1, []));\n}, () => (true));",
+    "targetTime": "O(V + E)",
+    "targetSpace": "O(V)",
+    "complexityExplanation": "Each vertex is mapped, colored or unioned once and every edge is examined a constant number of times."
+  },
+  {
+    "id": "graph-components-paths",
+    "track": "algorithms",
+    "title": "Graphs: Connected Components, Valid Path, Star Center",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graph",
+      "bfs",
+      "dfs",
+      "adjacency-list"
+    ],
+    "promptSeed": "Graphs here are undirected and given as n vertices (0 to n - 1) plus an edge list like [[0, 1], [1, 2]]. Write countComponents(n, edges): the number of connected components (isolated vertices count). Write validPath(n, edges, source, destination): true when a path exists (a vertex always reaches itself). Write findCenter(edges): the edges form a star graph; return the center vertex (the one in every edge) in O(1).",
+    "difficulty": 2,
+    "concept": "graphs",
+    "referenceSolution": "function buildAdjacency(n, edges) {\n  const adj = Array.from({ length: n }, () => []);\n  for (const [a, b] of edges) {\n    adj[a].push(b);\n    adj[b].push(a);\n  }\n  return adj;\n}\n\nfunction countComponents(n, edges) {\n  const adj = buildAdjacency(n, edges);\n  const seen = new Array(n).fill(false);\n  let components = 0;\n  for (let start = 0; start < n; start++) {\n    if (seen[start]) continue;\n    components++;\n    const stack = [start];\n    seen[start] = true;\n    while (stack.length) {\n      const v = stack.pop();\n      for (const w of adj[v]) {\n        if (!seen[w]) {\n          seen[w] = true;\n          stack.push(w);\n        }\n      }\n    }\n  }\n  return components;\n}\n\nfunction validPath(n, edges, source, destination) {\n  const adj = buildAdjacency(n, edges);\n  const seen = new Set([source]);\n  const queue = [source];\n  while (queue.length) {\n    const v = queue.shift();\n    if (v === destination) return true;\n    for (const w of adj[v]) {\n      if (!seen.has(w)) {\n        seen.add(w);\n        queue.push(w);\n      }\n    }\n  }\n  return false;\n}\n\nfunction findCenter(edges) {\n  const [a, b] = edges[0];\n  return edges[1].includes(a) ? a : b;\n}",
+    "solution": "function buildAdjacency(n, edges) {\n  const adj = Array.from({ length: n }, () => []);\n  for (const [a, b] of edges) {\n    adj[a].push(b);\n    adj[b].push(a);\n  }\n  return adj;\n}\n\nfunction countComponents(n, edges) {\n  const adj = buildAdjacency(n, edges);\n  const seen = new Array(n).fill(false);\n  let components = 0;\n  for (let start = 0; start < n; start++) {\n    if (seen[start]) continue;\n    components++;\n    const stack = [start];\n    seen[start] = true;\n    while (stack.length) {\n      const v = stack.pop();\n      for (const w of adj[v]) {\n        if (!seen[w]) {\n          seen[w] = true;\n          stack.push(w);\n        }\n      }\n    }\n  }\n  return components;\n}\n\nfunction validPath(n, edges, source, destination) {\n  const adj = buildAdjacency(n, edges);\n  const seen = new Set([source]);\n  const queue = [source];\n  while (queue.length) {\n    const v = queue.shift();\n    if (v === destination) return true;\n    for (const w of adj[v]) {\n      if (!seen.has(w)) {\n        seen.add(w);\n        queue.push(w);\n      }\n    }\n  }\n  return false;\n}\n\nfunction findCenter(edges) {\n  const [a, b] = edges[0];\n  return edges[1].includes(a) ? a : b;\n}",
+    "starterCode": "function buildAdjacency(n, edges) {\n  const adj = Array.from({ length: n }, () => []);\n  for (const [a, b] of edges) {\n    adj[a].push(b);\n    adj[b].push(a);\n  }\n  return adj;\n}\n\nfunction countComponents(n, edges) {\n  const adj = buildAdjacency(n, edges);\n  const seen = new Array(n).fill(false);\n  let components = 0;\n  for (let start = 0; start < n; start++) {\n    if (seen[start]) continue;\n    components++;\n    const stack = [start];\n    seen[start] = true;\n    while (stack.length) {\n      const v = stack.pop();\n      for (const w of adj[v]) {\n        if (!seen[w]) {\n          seen[w] = true;\n          stack.push(w);\n        }\n      }\n    }\n  }\n  return components;\n}\n\nfunction validPath(n, edges, source, destination) {\n  const adj = buildAdjacency(n, edges);\n  const seen = new Set([source]);\n  const queue = [source];\n  while (queue.length) {\n    const v = queue.shift();\n    if (v === destination) return true;\n    for (const w of adj[v]) {\n      if (!seen.has(w)) {\n        seen.add(w);\n        queue.push(w);\n      }\n    }\n  }\n  return false;\n}\n\nfunction findCenter(edges) {\n  const [a, b] = edges[0];\n  return edges[1].includes(a) ? a : b;\n}",
+    "testCases": [
+      {
+        "description": "countComponents counts connected groups",
+        "input": "[countComponents(5, [[0, 1], [1, 2], [3, 4]]), countComponents(5, [[0, 1], [1, 2], [2, 3], [3, 4]])]",
+        "expected": "[2, 1]"
+      },
+      {
+        "description": "countComponents: isolated vertices and an empty graph",
+        "input": "[countComponents(4, []), countComponents(0, [])]",
+        "expected": "[4, 0]"
+      },
+      {
+        "description": "validPath finds a route through a cycle",
+        "input": "validPath(3, [[0, 1], [1, 2], [2, 0]], 0, 2)",
+        "expected": "true"
+      },
+      {
+        "description": "validPath is false across components",
+        "input": "validPath(6, [[0, 1], [0, 2], [3, 5], [5, 4], [4, 3]], 0, 5)",
+        "expected": "false"
+      },
+      {
+        "description": "validPath from a vertex to itself",
+        "input": "validPath(1, [], 0, 0)",
+        "expected": "true"
+      },
+      {
+        "description": "findCenter returns the shared vertex",
+        "input": "[findCenter([[1, 2], [2, 3], [4, 2]]), findCenter([[1, 2], [5, 1], [1, 3], [1, 4]])]",
+        "expected": "[2, 1]"
+      }
+    ],
+    "testHarness": "await $test.run(\"countComponents counts connected groups\", async () => {\n  const sleep = $test.sleep;\n  return ([countComponents(5, [[0, 1], [1, 2], [3, 4]]), countComponents(5, [[0, 1], [1, 2], [2, 3], [3, 4]])]);\n}, () => ([2, 1]));\n\nawait $test.run(\"countComponents: isolated vertices and an empty graph\", async () => {\n  const sleep = $test.sleep;\n  return ([countComponents(4, []), countComponents(0, [])]);\n}, () => ([4, 0]));\n\nawait $test.run(\"validPath finds a route through a cycle\", async () => {\n  const sleep = $test.sleep;\n  return (validPath(3, [[0, 1], [1, 2], [2, 0]], 0, 2));\n}, () => (true));\n\nawait $test.run(\"validPath is false across components\", async () => {\n  const sleep = $test.sleep;\n  return (validPath(6, [[0, 1], [0, 2], [3, 5], [5, 4], [4, 3]], 0, 5));\n}, () => (false));\n\nawait $test.run(\"validPath from a vertex to itself\", async () => {\n  const sleep = $test.sleep;\n  return (validPath(1, [], 0, 0));\n}, () => (true));\n\nawait $test.run(\"findCenter returns the shared vertex\", async () => {\n  const sleep = $test.sleep;\n  return ([findCenter([[1, 2], [2, 3], [4, 2]]), findCenter([[1, 2], [5, 1], [1, 3], [1, 4]])]);\n}, () => ([2, 1]));",
+    "targetTime": "O(V + E)",
+    "targetSpace": "O(V + E)",
+    "complexityExplanation": "Building the adjacency list and visiting every vertex and edge once."
+  },
+  {
+    "id": "graph-grid-bfs",
+    "track": "algorithms",
+    "title": "Graphs: Rotting Oranges, Binary Matrix Path, 01 Matrix (Multi-Source BFS)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "bfs",
+      "grid",
+      "multi-source"
+    ],
+    "promptSeed": "Grids are arrays of rows. Write orangesRotting(grid): cells are 0 empty, 1 fresh, 2 rotten; every minute fresh oranges next to a rotten one (4 directions) rot; return the minutes until none are fresh, 0 if there were none, or -1 if some can never rot (start BFS from all rotten oranges at once). Write shortestPathBinaryMatrix(grid): 0 is open, 1 blocked; moving in 8 directions from the top-left to the bottom-right, return the number of cells on the shortest path or -1 (also -1 if either end is blocked). Write updateMatrix(mat): a 0/1 matrix; return a new matrix where each cell is the distance (4 directions) to the nearest 0.",
+    "difficulty": 3,
+    "concept": "graphs",
+    "referenceSolution": "function orangesRotting(grid) {\n  const rows = grid.length;\n  const cols = rows ? grid[0].length : 0;\n  const cells = grid.map((row) => [...row]);\n  let queue = [];\n  let fresh = 0;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      if (cells[r][c] === 2) queue.push([r, c]);\n      else if (cells[r][c] === 1) fresh++;\n    }\n  }\n  let minutes = 0;\n  while (queue.length && fresh > 0) {\n    const next = [];\n    for (const [r, c] of queue) {\n      for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {\n        const nr = r + dr;\n        const nc = c + dc;\n        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && cells[nr][nc] === 1) {\n          cells[nr][nc] = 2;\n          fresh--;\n          next.push([nr, nc]);\n        }\n      }\n    }\n    queue = next;\n    minutes++;\n  }\n  return fresh === 0 ? minutes : -1;\n}\n\nfunction shortestPathBinaryMatrix(grid) {\n  const n = grid.length;\n  if (!n || grid[0][0] === 1 || grid[n - 1][n - 1] === 1) return -1;\n  const seen = grid.map((row) => row.map(() => false));\n  let queue = [[0, 0]];\n  seen[0][0] = true;\n  let length = 1;\n  while (queue.length) {\n    const next = [];\n    for (const [r, c] of queue) {\n      if (r === n - 1 && c === n - 1) return length;\n      for (let dr = -1; dr <= 1; dr++) {\n        for (let dc = -1; dc <= 1; dc++) {\n          const nr = r + dr;\n          const nc = c + dc;\n          if (nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] === 0 && !seen[nr][nc]) {\n            seen[nr][nc] = true;\n            next.push([nr, nc]);\n          }\n        }\n      }\n    }\n    queue = next;\n    length++;\n  }\n  return -1;\n}\n\nfunction updateMatrix(mat) {\n  const rows = mat.length;\n  const cols = rows ? mat[0].length : 0;\n  const dist = mat.map((row) => row.map((v) => (v === 0 ? 0 : Infinity)));\n  const queue = [];\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) if (mat[r][c] === 0) queue.push([r, c]);\n  }\n  for (let head = 0; head < queue.length; head++) {\n    const [r, c] = queue[head];\n    for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {\n      const nr = r + dr;\n      const nc = c + dc;\n      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && dist[nr][nc] > dist[r][c] + 1) {\n        dist[nr][nc] = dist[r][c] + 1;\n        queue.push([nr, nc]);\n      }\n    }\n  }\n  return dist;\n}",
+    "solution": "function orangesRotting(grid) {\n  const rows = grid.length;\n  const cols = rows ? grid[0].length : 0;\n  const cells = grid.map((row) => [...row]);\n  let queue = [];\n  let fresh = 0;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      if (cells[r][c] === 2) queue.push([r, c]);\n      else if (cells[r][c] === 1) fresh++;\n    }\n  }\n  let minutes = 0;\n  while (queue.length && fresh > 0) {\n    const next = [];\n    for (const [r, c] of queue) {\n      for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {\n        const nr = r + dr;\n        const nc = c + dc;\n        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && cells[nr][nc] === 1) {\n          cells[nr][nc] = 2;\n          fresh--;\n          next.push([nr, nc]);\n        }\n      }\n    }\n    queue = next;\n    minutes++;\n  }\n  return fresh === 0 ? minutes : -1;\n}\n\nfunction shortestPathBinaryMatrix(grid) {\n  const n = grid.length;\n  if (!n || grid[0][0] === 1 || grid[n - 1][n - 1] === 1) return -1;\n  const seen = grid.map((row) => row.map(() => false));\n  let queue = [[0, 0]];\n  seen[0][0] = true;\n  let length = 1;\n  while (queue.length) {\n    const next = [];\n    for (const [r, c] of queue) {\n      if (r === n - 1 && c === n - 1) return length;\n      for (let dr = -1; dr <= 1; dr++) {\n        for (let dc = -1; dc <= 1; dc++) {\n          const nr = r + dr;\n          const nc = c + dc;\n          if (nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] === 0 && !seen[nr][nc]) {\n            seen[nr][nc] = true;\n            next.push([nr, nc]);\n          }\n        }\n      }\n    }\n    queue = next;\n    length++;\n  }\n  return -1;\n}\n\nfunction updateMatrix(mat) {\n  const rows = mat.length;\n  const cols = rows ? mat[0].length : 0;\n  const dist = mat.map((row) => row.map((v) => (v === 0 ? 0 : Infinity)));\n  const queue = [];\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) if (mat[r][c] === 0) queue.push([r, c]);\n  }\n  for (let head = 0; head < queue.length; head++) {\n    const [r, c] = queue[head];\n    for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {\n      const nr = r + dr;\n      const nc = c + dc;\n      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && dist[nr][nc] > dist[r][c] + 1) {\n        dist[nr][nc] = dist[r][c] + 1;\n        queue.push([nr, nc]);\n      }\n    }\n  }\n  return dist;\n}",
+    "starterCode": "function orangesRotting(grid) {\n  const rows = grid.length;\n  const cols = rows ? grid[0].length : 0;\n  const cells = grid.map((row) => [...row]);\n  let queue = [];\n  let fresh = 0;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      if (cells[r][c] === 2) queue.push([r, c]);\n      else if (cells[r][c] === 1) fresh++;\n    }\n  }\n  let minutes = 0;\n  while (queue.length && fresh > 0) {\n    const next = [];\n    for (const [r, c] of queue) {\n      for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {\n        const nr = r + dr;\n        const nc = c + dc;\n        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && cells[nr][nc] === 1) {\n          cells[nr][nc] = 2;\n          fresh--;\n          next.push([nr, nc]);\n        }\n      }\n    }\n    queue = next;\n    minutes++;\n  }\n  return fresh === 0 ? minutes : -1;\n}\n\nfunction shortestPathBinaryMatrix(grid) {\n  const n = grid.length;\n  if (!n || grid[0][0] === 1 || grid[n - 1][n - 1] === 1) return -1;\n  const seen = grid.map((row) => row.map(() => false));\n  let queue = [[0, 0]];\n  seen[0][0] = true;\n  let length = 1;\n  while (queue.length) {\n    const next = [];\n    for (const [r, c] of queue) {\n      if (r === n - 1 && c === n - 1) return length;\n      for (let dr = -1; dr <= 1; dr++) {\n        for (let dc = -1; dc <= 1; dc++) {\n          const nr = r + dr;\n          const nc = c + dc;\n          if (nr >= 0 && nr < n && nc >= 0 && nc < n && grid[nr][nc] === 0 && !seen[nr][nc]) {\n            seen[nr][nc] = true;\n            next.push([nr, nc]);\n          }\n        }\n      }\n    }\n    queue = next;\n    length++;\n  }\n  return -1;\n}\n\nfunction updateMatrix(mat) {\n  const rows = mat.length;\n  const cols = rows ? mat[0].length : 0;\n  const dist = mat.map((row) => row.map((v) => (v === 0 ? 0 : Infinity)));\n  const queue = [];\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) if (mat[r][c] === 0) queue.push([r, c]);\n  }\n  for (let head = 0; head < queue.length; head++) {\n    const [r, c] = queue[head];\n    for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {\n      const nr = r + dr;\n      const nc = c + dc;\n      if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && dist[nr][nc] > dist[r][c] + 1) {\n        dist[nr][nc] = dist[r][c] + 1;\n        queue.push([nr, nc]);\n      }\n    }\n  }\n  return dist;\n}",
+    "testCases": [
+      {
+        "description": "orangesRotting classic grids",
+        "input": "[orangesRotting([[2, 1, 1], [1, 1, 0], [0, 1, 1]]), orangesRotting([[2, 1, 1], [0, 1, 1], [1, 0, 1]])]",
+        "expected": "[4, -1]"
+      },
+      {
+        "description": "orangesRotting with nothing fresh",
+        "input": "[orangesRotting([[0, 2]]), orangesRotting([[0]]), orangesRotting([[1]])]",
+        "expected": "[0, 0, -1]"
+      },
+      {
+        "description": "orangesRotting does not change the input grid",
+        "input": "const g = [[2, 1]];\norangesRotting(g);\ng",
+        "expected": "[[2, 1]]"
+      },
+      {
+        "description": "shortestPathBinaryMatrix counts cells on the path",
+        "input": "[shortestPathBinaryMatrix([[0, 1], [1, 0]]), shortestPathBinaryMatrix([[0, 0, 0], [1, 1, 0], [1, 1, 0]])]",
+        "expected": "[2, 4]"
+      },
+      {
+        "description": "shortestPathBinaryMatrix with blocked ends and one cell",
+        "input": "[shortestPathBinaryMatrix([[1, 0, 0], [1, 1, 0], [1, 1, 0]]), shortestPathBinaryMatrix([[0, 0], [1, 1]]), shortestPathBinaryMatrix([[0]])]",
+        "expected": "[-1, -1, 1]"
+      },
+      {
+        "description": "shortestPathBinaryMatrix routes around a wall",
+        "input": "shortestPathBinaryMatrix([[0, 0, 0], [0, 1, 0], [0, 0, 0]])",
+        "expected": "4"
+      },
+      {
+        "description": "updateMatrix finds distance to the nearest zero",
+        "input": "updateMatrix([[0, 0, 0], [0, 1, 0], [1, 1, 1]])",
+        "expected": "[[0, 0, 0], [0, 1, 0], [1, 2, 1]]"
+      },
+      {
+        "description": "updateMatrix: all zeros and a single row",
+        "input": "[updateMatrix([[0]]), updateMatrix([[1, 0]]), updateMatrix([[1, 1, 0]])]",
+        "expected": "[[[0]], [[1, 0]], [[2, 1, 0]]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"orangesRotting classic grids\", async () => {\n  const sleep = $test.sleep;\n  return ([orangesRotting([[2, 1, 1], [1, 1, 0], [0, 1, 1]]), orangesRotting([[2, 1, 1], [0, 1, 1], [1, 0, 1]])]);\n}, () => ([4, -1]));\n\nawait $test.run(\"orangesRotting with nothing fresh\", async () => {\n  const sleep = $test.sleep;\n  return ([orangesRotting([[0, 2]]), orangesRotting([[0]]), orangesRotting([[1]])]);\n}, () => ([0, 0, -1]));\n\nawait $test.run(\"orangesRotting does not change the input grid\", async () => {\n  const sleep = $test.sleep;\n  const g = [[2, 1]];\n  orangesRotting(g);\n  return (g);\n}, () => ([[2, 1]]));\n\nawait $test.run(\"shortestPathBinaryMatrix counts cells on the path\", async () => {\n  const sleep = $test.sleep;\n  return ([shortestPathBinaryMatrix([[0, 1], [1, 0]]), shortestPathBinaryMatrix([[0, 0, 0], [1, 1, 0], [1, 1, 0]])]);\n}, () => ([2, 4]));\n\nawait $test.run(\"shortestPathBinaryMatrix with blocked ends and one cell\", async () => {\n  const sleep = $test.sleep;\n  return ([shortestPathBinaryMatrix([[1, 0, 0], [1, 1, 0], [1, 1, 0]]), shortestPathBinaryMatrix([[0, 0], [1, 1]]), shortestPathBinaryMatrix([[0]])]);\n}, () => ([-1, -1, 1]));\n\nawait $test.run(\"shortestPathBinaryMatrix routes around a wall\", async () => {\n  const sleep = $test.sleep;\n  return (shortestPathBinaryMatrix([[0, 0, 0], [0, 1, 0], [0, 0, 0]]));\n}, () => (4));\n\nawait $test.run(\"updateMatrix finds distance to the nearest zero\", async () => {\n  const sleep = $test.sleep;\n  return (updateMatrix([[0, 0, 0], [0, 1, 0], [1, 1, 1]]));\n}, () => ([[0, 0, 0], [0, 1, 0], [1, 2, 1]]));\n\nawait $test.run(\"updateMatrix: all zeros and a single row\", async () => {\n  const sleep = $test.sleep;\n  return ([updateMatrix([[0]]), updateMatrix([[1, 0]]), updateMatrix([[1, 1, 0]])]);\n}, () => ([[[0]], [[1, 0]], [[2, 1, 0]]]));",
+    "targetTime": "O(r * c)",
+    "targetSpace": "O(r * c)",
+    "complexityExplanation": "Each cell is enqueued at most once, and each visit checks a constant number of neighbors."
+  },
+  {
+    "id": "graph-word-ladder",
+    "track": "algorithms",
+    "title": "Graphs: Word Ladder, Minimum Gene Mutation, Open the Lock",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "bfs",
+      "implicit-graph",
+      "strings"
+    ],
+    "promptSeed": "These are shortest-path problems on implicit graphs: states are strings and edges change one character. Write ladderLength(beginWord, endWord, wordList): the number of words on the shortest sequence from beginWord to endWord where each step changes one letter (lowercase) and every word after the first must be in wordList; beginWord need not be in the list; return 0 if endWord is not in the list or is unreachable. Write minMutation(start, end, bank): genes are strings over A, C, G, T; each step changes one character and must land in bank; return the fewest steps or -1 (0 when start equals end). Write openLock(deadends, target): a 4-wheel lock starts at '0000'; each move turns one wheel one step (9 wraps to 0 and 0 to 9); states in deadends are forbidden; return the fewest moves to reach target or -1 (-1 also when '0000' is a dead end).",
+    "difficulty": 4,
+    "concept": "graphs",
+    "referenceSolution": "function ladderLength(beginWord, endWord, wordList) {\n  const words = new Set(wordList);\n  if (!words.has(endWord)) return 0;\n  let queue = [beginWord];\n  const seen = new Set([beginWord]);\n  let steps = 1;\n  while (queue.length) {\n    const next = [];\n    for (const word of queue) {\n      if (word === endWord) return steps;\n      for (let i = 0; i < word.length; i++) {\n        for (let code = 97; code <= 122; code++) {\n          const candidate = word.slice(0, i) + String.fromCharCode(code) + word.slice(i + 1);\n          if (words.has(candidate) && !seen.has(candidate)) {\n            seen.add(candidate);\n            next.push(candidate);\n          }\n        }\n      }\n    }\n    queue = next;\n    steps++;\n  }\n  return 0;\n}\n\nfunction minMutation(start, end, bank) {\n  const valid = new Set(bank);\n  if (start === end) return 0;\n  if (!valid.has(end)) return -1;\n  let queue = [start];\n  const seen = new Set([start]);\n  let steps = 0;\n  while (queue.length) {\n    const next = [];\n    steps++;\n    for (const gene of queue) {\n      for (let i = 0; i < gene.length; i++) {\n        for (const ch of 'ACGT') {\n          const candidate = gene.slice(0, i) + ch + gene.slice(i + 1);\n          if (!valid.has(candidate) || seen.has(candidate)) continue;\n          if (candidate === end) return steps;\n          seen.add(candidate);\n          next.push(candidate);\n        }\n      }\n    }\n    queue = next;\n  }\n  return -1;\n}\n\nfunction openLock(deadends, target) {\n  const dead = new Set(deadends);\n  if (dead.has('0000')) return -1;\n  if (target === '0000') return 0;\n  let queue = ['0000'];\n  const seen = new Set(['0000']);\n  let moves = 0;\n  while (queue.length) {\n    const next = [];\n    moves++;\n    for (const state of queue) {\n      for (let i = 0; i < 4; i++) {\n        const digit = Number(state[i]);\n        for (const delta of [1, 9]) {\n          const candidate = state.slice(0, i) + ((digit + delta) % 10) + state.slice(i + 1);\n          if (dead.has(candidate) || seen.has(candidate)) continue;\n          if (candidate === target) return moves;\n          seen.add(candidate);\n          next.push(candidate);\n        }\n      }\n    }\n    queue = next;\n  }\n  return -1;\n}",
+    "solution": "function ladderLength(beginWord, endWord, wordList) {\n  const words = new Set(wordList);\n  if (!words.has(endWord)) return 0;\n  let queue = [beginWord];\n  const seen = new Set([beginWord]);\n  let steps = 1;\n  while (queue.length) {\n    const next = [];\n    for (const word of queue) {\n      if (word === endWord) return steps;\n      for (let i = 0; i < word.length; i++) {\n        for (let code = 97; code <= 122; code++) {\n          const candidate = word.slice(0, i) + String.fromCharCode(code) + word.slice(i + 1);\n          if (words.has(candidate) && !seen.has(candidate)) {\n            seen.add(candidate);\n            next.push(candidate);\n          }\n        }\n      }\n    }\n    queue = next;\n    steps++;\n  }\n  return 0;\n}\n\nfunction minMutation(start, end, bank) {\n  const valid = new Set(bank);\n  if (start === end) return 0;\n  if (!valid.has(end)) return -1;\n  let queue = [start];\n  const seen = new Set([start]);\n  let steps = 0;\n  while (queue.length) {\n    const next = [];\n    steps++;\n    for (const gene of queue) {\n      for (let i = 0; i < gene.length; i++) {\n        for (const ch of 'ACGT') {\n          const candidate = gene.slice(0, i) + ch + gene.slice(i + 1);\n          if (!valid.has(candidate) || seen.has(candidate)) continue;\n          if (candidate === end) return steps;\n          seen.add(candidate);\n          next.push(candidate);\n        }\n      }\n    }\n    queue = next;\n  }\n  return -1;\n}\n\nfunction openLock(deadends, target) {\n  const dead = new Set(deadends);\n  if (dead.has('0000')) return -1;\n  if (target === '0000') return 0;\n  let queue = ['0000'];\n  const seen = new Set(['0000']);\n  let moves = 0;\n  while (queue.length) {\n    const next = [];\n    moves++;\n    for (const state of queue) {\n      for (let i = 0; i < 4; i++) {\n        const digit = Number(state[i]);\n        for (const delta of [1, 9]) {\n          const candidate = state.slice(0, i) + ((digit + delta) % 10) + state.slice(i + 1);\n          if (dead.has(candidate) || seen.has(candidate)) continue;\n          if (candidate === target) return moves;\n          seen.add(candidate);\n          next.push(candidate);\n        }\n      }\n    }\n    queue = next;\n  }\n  return -1;\n}",
+    "starterCode": "function ladderLength(beginWord, endWord, wordList) {\n  const words = new Set(wordList);\n  if (!words.has(endWord)) return 0;\n  let queue = [beginWord];\n  const seen = new Set([beginWord]);\n  let steps = 1;\n  while (queue.length) {\n    const next = [];\n    for (const word of queue) {\n      if (word === endWord) return steps;\n      for (let i = 0; i < word.length; i++) {\n        for (let code = 97; code <= 122; code++) {\n          const candidate = word.slice(0, i) + String.fromCharCode(code) + word.slice(i + 1);\n          if (words.has(candidate) && !seen.has(candidate)) {\n            seen.add(candidate);\n            next.push(candidate);\n          }\n        }\n      }\n    }\n    queue = next;\n    steps++;\n  }\n  return 0;\n}\n\nfunction minMutation(start, end, bank) {\n  const valid = new Set(bank);\n  if (start === end) return 0;\n  if (!valid.has(end)) return -1;\n  let queue = [start];\n  const seen = new Set([start]);\n  let steps = 0;\n  while (queue.length) {\n    const next = [];\n    steps++;\n    for (const gene of queue) {\n      for (let i = 0; i < gene.length; i++) {\n        for (const ch of 'ACGT') {\n          const candidate = gene.slice(0, i) + ch + gene.slice(i + 1);\n          if (!valid.has(candidate) || seen.has(candidate)) continue;\n          if (candidate === end) return steps;\n          seen.add(candidate);\n          next.push(candidate);\n        }\n      }\n    }\n    queue = next;\n  }\n  return -1;\n}\n\nfunction openLock(deadends, target) {\n  const dead = new Set(deadends);\n  if (dead.has('0000')) return -1;\n  if (target === '0000') return 0;\n  let queue = ['0000'];\n  const seen = new Set(['0000']);\n  let moves = 0;\n  while (queue.length) {\n    const next = [];\n    moves++;\n    for (const state of queue) {\n      for (let i = 0; i < 4; i++) {\n        const digit = Number(state[i]);\n        for (const delta of [1, 9]) {\n          const candidate = state.slice(0, i) + ((digit + delta) % 10) + state.slice(i + 1);\n          if (dead.has(candidate) || seen.has(candidate)) continue;\n          if (candidate === target) return moves;\n          seen.add(candidate);\n          next.push(candidate);\n        }\n      }\n    }\n    queue = next;\n  }\n  return -1;\n}",
+    "testCases": [
+      {
+        "description": "ladderLength counts words including both ends",
+        "input": "ladderLength('hit', 'cog', ['hot', 'dot', 'dog', 'lot', 'log', 'cog'])",
+        "expected": "5"
+      },
+      {
+        "description": "ladderLength is 0 when the end word is missing or unreachable",
+        "input": "[ladderLength('hit', 'cog', ['hot', 'dot', 'dog', 'lot', 'log']), ladderLength('hit', 'cog', ['hot', 'dot', 'tog', 'cog'])]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "ladderLength with a one-letter hop",
+        "input": "[ladderLength('a', 'c', ['a', 'b', 'c']), ladderLength('hot', 'dot', ['dot'])]",
+        "expected": "[2, 2]"
+      },
+      {
+        "description": "minMutation single and double steps",
+        "input": "[minMutation('AACCGGTT', 'AACCGGTA', ['AACCGGTA']), minMutation('AACCGGTT', 'AAACGGTA', ['AACCGGTA', 'AACCGCTA', 'AAACGGTA'])]",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "minMutation: end not in bank and identical genes",
+        "input": "[minMutation('AACCGGTT', 'AACCGGTA', []), minMutation('AACCGGTT', 'AACCGGTT', [])]",
+        "expected": "[-1, 0]"
+      },
+      {
+        "description": "openLock avoids dead ends",
+        "input": "openLock(['0201', '0101', '0102', '1212', '2002'], '0202')",
+        "expected": "6"
+      },
+      {
+        "description": "openLock: one wheel wrap-around and impossible cases",
+        "input": "[openLock(['8888'], '0009'), openLock(['8887', '8889', '8878', '8898', '8788', '8988', '7888', '9888'], '8888'), openLock(['0000'], '8888'), openLock([], '0000')]",
+        "expected": "[1, -1, -1, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"ladderLength counts words including both ends\", async () => {\n  const sleep = $test.sleep;\n  return (ladderLength('hit', 'cog', ['hot', 'dot', 'dog', 'lot', 'log', 'cog']));\n}, () => (5));\n\nawait $test.run(\"ladderLength is 0 when the end word is missing or unreachable\", async () => {\n  const sleep = $test.sleep;\n  return ([ladderLength('hit', 'cog', ['hot', 'dot', 'dog', 'lot', 'log']), ladderLength('hit', 'cog', ['hot', 'dot', 'tog', 'cog'])]);\n}, () => ([0, 0]));\n\nawait $test.run(\"ladderLength with a one-letter hop\", async () => {\n  const sleep = $test.sleep;\n  return ([ladderLength('a', 'c', ['a', 'b', 'c']), ladderLength('hot', 'dot', ['dot'])]);\n}, () => ([2, 2]));\n\nawait $test.run(\"minMutation single and double steps\", async () => {\n  const sleep = $test.sleep;\n  return ([minMutation('AACCGGTT', 'AACCGGTA', ['AACCGGTA']), minMutation('AACCGGTT', 'AAACGGTA', ['AACCGGTA', 'AACCGCTA', 'AAACGGTA'])]);\n}, () => ([1, 2]));\n\nawait $test.run(\"minMutation: end not in bank and identical genes\", async () => {\n  const sleep = $test.sleep;\n  return ([minMutation('AACCGGTT', 'AACCGGTA', []), minMutation('AACCGGTT', 'AACCGGTT', [])]);\n}, () => ([-1, 0]));\n\nawait $test.run(\"openLock avoids dead ends\", async () => {\n  const sleep = $test.sleep;\n  return (openLock(['0201', '0101', '0102', '1212', '2002'], '0202'));\n}, () => (6));\n\nawait $test.run(\"openLock: one wheel wrap-around and impossible cases\", async () => {\n  const sleep = $test.sleep;\n  return ([openLock(['8888'], '0009'), openLock(['8887', '8889', '8878', '8898', '8788', '8988', '7888', '9888'], '8888'), openLock(['0000'], '8888'), openLock([], '0000')]);\n}, () => ([1, -1, -1, 0]));",
+    "targetTime": "O(N * L * 26)",
+    "targetSpace": "O(N * L)",
+    "complexityExplanation": "BFS over implicit graphs: each of N states tries L positions times the alphabet to find its neighbors."
+  },
+  {
+    "id": "heap-kth-largest",
+    "track": "algorithms",
+    "title": "Heaps: Kth Largest, Streaming Kth Largest, Last Stone Weight",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "heap",
+      "priority-queue",
+      "top-k"
+    ],
+    "promptSeed": "There is no built-in heap, so write your own binary heap inside your solution (array-backed, sift up and down, any helper name you like). Write findKthLargest(nums, k): the k-th largest value (duplicates count separately) using a min-heap of size k. Write class KthLargest with constructor(k, nums) and add(val), which inserts a value and returns the current k-th largest. Write lastStoneWeight(stones): repeatedly take the two heaviest stones; equal stones both vanish, otherwise the difference goes back; return the final weight or 0 when none remain.",
+    "difficulty": 2,
+    "concept": "heap",
+    "referenceSolution": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction findKthLargest(nums, k) {\n  const heap = new Heap();\n  for (const n of nums) {\n    heap.push(n);\n    if (heap.size() > k) heap.pop();\n  }\n  return heap.peek();\n}\n\nclass KthLargest {\n  constructor(k, nums) {\n    this.k = k;\n    this.heap = new Heap();\n    for (const n of nums) this.add(n);\n  }\n  add(val) {\n    this.heap.push(val);\n    if (this.heap.size() > this.k) this.heap.pop();\n    return this.heap.peek();\n  }\n}\n\nfunction lastStoneWeight(stones) {\n  const heap = new Heap((a, b) => b - a);\n  for (const s of stones) heap.push(s);\n  while (heap.size() > 1) {\n    const a = heap.pop();\n    const b = heap.pop();\n    if (a !== b) heap.push(a - b);\n  }\n  return heap.size() ? heap.peek() : 0;\n}",
+    "solution": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction findKthLargest(nums, k) {\n  const heap = new Heap();\n  for (const n of nums) {\n    heap.push(n);\n    if (heap.size() > k) heap.pop();\n  }\n  return heap.peek();\n}\n\nclass KthLargest {\n  constructor(k, nums) {\n    this.k = k;\n    this.heap = new Heap();\n    for (const n of nums) this.add(n);\n  }\n  add(val) {\n    this.heap.push(val);\n    if (this.heap.size() > this.k) this.heap.pop();\n    return this.heap.peek();\n  }\n}\n\nfunction lastStoneWeight(stones) {\n  const heap = new Heap((a, b) => b - a);\n  for (const s of stones) heap.push(s);\n  while (heap.size() > 1) {\n    const a = heap.pop();\n    const b = heap.pop();\n    if (a !== b) heap.push(a - b);\n  }\n  return heap.size() ? heap.peek() : 0;\n}",
+    "starterCode": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction findKthLargest(nums, k) {\n  const heap = new Heap();\n  for (const n of nums) {\n    heap.push(n);\n    if (heap.size() > k) heap.pop();\n  }\n  return heap.peek();\n}\n\nclass KthLargest {\n  constructor(k, nums) {\n    this.k = k;\n    this.heap = new Heap();\n    for (const n of nums) this.add(n);\n  }\n  add(val) {\n    this.heap.push(val);\n    if (this.heap.size() > this.k) this.heap.pop();\n    return this.heap.peek();\n  }\n}\n\nfunction lastStoneWeight(stones) {\n  const heap = new Heap((a, b) => b - a);\n  for (const s of stones) heap.push(s);\n  while (heap.size() > 1) {\n    const a = heap.pop();\n    const b = heap.pop();\n    if (a !== b) heap.push(a - b);\n  }\n  return heap.size() ? heap.peek() : 0;\n}",
+    "testCases": [
+      {
+        "description": "findKthLargest classic examples",
+        "input": "[findKthLargest([3, 2, 1, 5, 6, 4], 2), findKthLargest([3, 2, 3, 1, 2, 4, 5, 5, 6], 4)]",
+        "expected": "[5, 4]"
+      },
+      {
+        "description": "findKthLargest with one element, duplicates and negatives",
+        "input": "[findKthLargest([1], 1), findKthLargest([2, 2, 2], 2), findKthLargest([-1, -5, -3], 3)]",
+        "expected": "[1, 2, -5]"
+      },
+      {
+        "description": "findKthLargest does not reorder the input",
+        "input": "const a = [3, 1, 2];\nfindKthLargest(a, 2);\na",
+        "expected": "[3, 1, 2]"
+      },
+      {
+        "description": "KthLargest tracks the third largest as values arrive",
+        "input": "const k = new KthLargest(3, [4, 5, 8, 2]);\n[k.add(3), k.add(5), k.add(10), k.add(9), k.add(4)]",
+        "expected": "[4, 5, 5, 8, 8]"
+      },
+      {
+        "description": "KthLargest with k = 1 and an empty start",
+        "input": "const k = new KthLargest(1, []);\n[k.add(-3), k.add(-2), k.add(-4)]",
+        "expected": "[-3, -2, -2]"
+      },
+      {
+        "description": "lastStoneWeight smashes the two heaviest",
+        "input": "[lastStoneWeight([2, 7, 4, 1, 8, 1]), lastStoneWeight([3, 3, 3])]",
+        "expected": "[1, 3]"
+      },
+      {
+        "description": "lastStoneWeight: single stone, equal pair, no stones",
+        "input": "[lastStoneWeight([1]), lastStoneWeight([2, 2]), lastStoneWeight([])]",
+        "expected": "[1, 0, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"findKthLargest classic examples\", async () => {\n  const sleep = $test.sleep;\n  return ([findKthLargest([3, 2, 1, 5, 6, 4], 2), findKthLargest([3, 2, 3, 1, 2, 4, 5, 5, 6], 4)]);\n}, () => ([5, 4]));\n\nawait $test.run(\"findKthLargest with one element, duplicates and negatives\", async () => {\n  const sleep = $test.sleep;\n  return ([findKthLargest([1], 1), findKthLargest([2, 2, 2], 2), findKthLargest([-1, -5, -3], 3)]);\n}, () => ([1, 2, -5]));\n\nawait $test.run(\"findKthLargest does not reorder the input\", async () => {\n  const sleep = $test.sleep;\n  const a = [3, 1, 2];\n  findKthLargest(a, 2);\n  return (a);\n}, () => ([3, 1, 2]));\n\nawait $test.run(\"KthLargest tracks the third largest as values arrive\", async () => {\n  const sleep = $test.sleep;\n  const k = new KthLargest(3, [4, 5, 8, 2]);\n  return ([k.add(3), k.add(5), k.add(10), k.add(9), k.add(4)]);\n}, () => ([4, 5, 5, 8, 8]));\n\nawait $test.run(\"KthLargest with k = 1 and an empty start\", async () => {\n  const sleep = $test.sleep;\n  const k = new KthLargest(1, []);\n  return ([k.add(-3), k.add(-2), k.add(-4)]);\n}, () => ([-3, -2, -2]));\n\nawait $test.run(\"lastStoneWeight smashes the two heaviest\", async () => {\n  const sleep = $test.sleep;\n  return ([lastStoneWeight([2, 7, 4, 1, 8, 1]), lastStoneWeight([3, 3, 3])]);\n}, () => ([1, 3]));\n\nawait $test.run(\"lastStoneWeight: single stone, equal pair, no stones\", async () => {\n  const sleep = $test.sleep;\n  return ([lastStoneWeight([1]), lastStoneWeight([2, 2]), lastStoneWeight([])]);\n}, () => ([1, 0, 0]));",
+    "targetTime": "O(n log k)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "A min-heap capped at size k costs O(log k) per element; last stone weight uses a max-heap of all n stones."
+  },
+  {
+    "id": "heap-median-stream",
+    "track": "algorithms",
+    "title": "Heaps: Median from a Data Stream and Task Scheduler",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "heap",
+      "two-heaps",
+      "median",
+      "greedy"
+    ],
+    "promptSeed": "Write your own binary heap inside your solution. Write class MedianFinder with addNum(num) and findMedian(): the median of all numbers added so far (the mean of the two middle values when the count is even; undefined when empty). Use a max-heap for the lower half and a min-heap for the upper half, keeping their sizes within one. Write leastInterval(tasks, n): given an array of task letters and a cooldown n (the same task needs n other slots between runs), return the minimum number of time slots to finish all tasks, idling when needed.",
+    "difficulty": 4,
+    "concept": "heap",
+    "referenceSolution": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nclass MedianFinder {\n  constructor() {\n    this.low = new Heap((a, b) => b - a);\n    this.high = new Heap();\n  }\n  addNum(num) {\n    this.low.push(num);\n    this.high.push(this.low.pop());\n    if (this.high.size() > this.low.size()) this.low.push(this.high.pop());\n  }\n  findMedian() {\n    if (!this.low.size()) return undefined;\n    if (this.low.size() > this.high.size()) return this.low.peek();\n    return (this.low.peek() + this.high.peek()) / 2;\n  }\n}\n\nfunction leastInterval(tasks, n) {\n  const counts = {};\n  for (const t of tasks) counts[t] = (counts[t] || 0) + 1;\n  const max = Math.max(0, ...Object.values(counts));\n  const withMax = Object.values(counts).filter((c) => c === max).length;\n  return Math.max(tasks.length, (max - 1) * (n + 1) + withMax);\n}",
+    "solution": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nclass MedianFinder {\n  constructor() {\n    this.low = new Heap((a, b) => b - a);\n    this.high = new Heap();\n  }\n  addNum(num) {\n    this.low.push(num);\n    this.high.push(this.low.pop());\n    if (this.high.size() > this.low.size()) this.low.push(this.high.pop());\n  }\n  findMedian() {\n    if (!this.low.size()) return undefined;\n    if (this.low.size() > this.high.size()) return this.low.peek();\n    return (this.low.peek() + this.high.peek()) / 2;\n  }\n}\n\nfunction leastInterval(tasks, n) {\n  const counts = {};\n  for (const t of tasks) counts[t] = (counts[t] || 0) + 1;\n  const max = Math.max(0, ...Object.values(counts));\n  const withMax = Object.values(counts).filter((c) => c === max).length;\n  return Math.max(tasks.length, (max - 1) * (n + 1) + withMax);\n}",
+    "starterCode": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nclass MedianFinder {\n  constructor() {\n    this.low = new Heap((a, b) => b - a);\n    this.high = new Heap();\n  }\n  addNum(num) {\n    this.low.push(num);\n    this.high.push(this.low.pop());\n    if (this.high.size() > this.low.size()) this.low.push(this.high.pop());\n  }\n  findMedian() {\n    if (!this.low.size()) return undefined;\n    if (this.low.size() > this.high.size()) return this.low.peek();\n    return (this.low.peek() + this.high.peek()) / 2;\n  }\n}\n\nfunction leastInterval(tasks, n) {\n  const counts = {};\n  for (const t of tasks) counts[t] = (counts[t] || 0) + 1;\n  const max = Math.max(0, ...Object.values(counts));\n  const withMax = Object.values(counts).filter((c) => c === max).length;\n  return Math.max(tasks.length, (max - 1) * (n + 1) + withMax);\n}",
+    "testCases": [
+      {
+        "description": "MedianFinder after 1, 2, 3",
+        "input": "const m = new MedianFinder();\nm.addNum(1);\nconst a = m.findMedian();\nm.addNum(2);\nconst b = m.findMedian();\nm.addNum(3);\n[a, b, m.findMedian()]",
+        "expected": "[1, 1.5, 2]"
+      },
+      {
+        "description": "MedianFinder with an unsorted stream",
+        "input": "const m = new MedianFinder();\nconst out = [];\nfor (const x of [5, 15, 1, 3]) { m.addNum(x); out.push(m.findMedian()); }\nout",
+        "expected": "[5, 10, 5, 4]"
+      },
+      {
+        "description": "MedianFinder with descending negatives",
+        "input": "const m = new MedianFinder();\nconst out = [];\nfor (const x of [-1, -2, -3, -4, -5]) { m.addNum(x); out.push(m.findMedian()); }\nout",
+        "expected": "[-1, -1.5, -2, -2.5, -3]"
+      },
+      {
+        "description": "MedianFinder is undefined when empty and handles duplicates",
+        "input": "const m = new MedianFinder();\nconst empty = m.findMedian();\nm.addNum(2); m.addNum(2); m.addNum(2);\n[empty, m.findMedian()]",
+        "expected": "[undefined, 2]"
+      },
+      {
+        "description": "leastInterval with cooldown idle slots",
+        "input": "[leastInterval(['A', 'A', 'A', 'B', 'B', 'B'], 2), leastInterval(['A', 'A', 'A', 'A', 'A', 'A', 'B', 'C', 'D', 'E', 'F', 'G'], 2)]",
+        "expected": "[8, 16]"
+      },
+      {
+        "description": "leastInterval without cooldown or repeats",
+        "input": "[leastInterval(['A', 'A', 'A', 'B', 'B', 'B'], 0), leastInterval(['A', 'B', 'C'], 5), leastInterval([], 3)]",
+        "expected": "[6, 3, 0]"
+      }
+    ],
+    "testHarness": "await $test.run(\"MedianFinder after 1, 2, 3\", async () => {\n  const sleep = $test.sleep;\n  const m = new MedianFinder();\n  m.addNum(1);\n  const a = m.findMedian();\n  m.addNum(2);\n  const b = m.findMedian();\n  m.addNum(3);\n  return ([a, b, m.findMedian()]);\n}, () => ([1, 1.5, 2]));\n\nawait $test.run(\"MedianFinder with an unsorted stream\", async () => {\n  const sleep = $test.sleep;\n  const m = new MedianFinder();\n  const out = [];\n  for (const x of [5, 15, 1, 3]) { m.addNum(x); out.push(m.findMedian()); }\n  return (out);\n}, () => ([5, 10, 5, 4]));\n\nawait $test.run(\"MedianFinder with descending negatives\", async () => {\n  const sleep = $test.sleep;\n  const m = new MedianFinder();\n  const out = [];\n  for (const x of [-1, -2, -3, -4, -5]) { m.addNum(x); out.push(m.findMedian()); }\n  return (out);\n}, () => ([-1, -1.5, -2, -2.5, -3]));\n\nawait $test.run(\"MedianFinder is undefined when empty and handles duplicates\", async () => {\n  const sleep = $test.sleep;\n  const m = new MedianFinder();\n  const empty = m.findMedian();\n  m.addNum(2); m.addNum(2); m.addNum(2);\n  return ([empty, m.findMedian()]);\n}, () => ([undefined, 2]));\n\nawait $test.run(\"leastInterval with cooldown idle slots\", async () => {\n  const sleep = $test.sleep;\n  return ([leastInterval(['A', 'A', 'A', 'B', 'B', 'B'], 2), leastInterval(['A', 'A', 'A', 'A', 'A', 'A', 'B', 'C', 'D', 'E', 'F', 'G'], 2)]);\n}, () => ([8, 16]));\n\nawait $test.run(\"leastInterval without cooldown or repeats\", async () => {\n  const sleep = $test.sleep;\n  return ([leastInterval(['A', 'A', 'A', 'B', 'B', 'B'], 0), leastInterval(['A', 'B', 'C'], 5), leastInterval([], 3)]);\n}, () => ([6, 3, 0]));",
+    "targetTime": "O(log n) per add, O(1) median",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Two balanced heaps keep the lower and upper halves; the median is read from their tops."
+  },
+  {
+    "id": "heap-merge-k-lists",
+    "track": "algorithms",
+    "title": "Heaps: Merge K Sorted Lists and Arrays, K Closest Points",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "heap",
+      "merge",
+      "k-way"
+    ],
+    "promptSeed": "Write your own binary heap inside your solution. List nodes are { val, next } (null ends the list). Write mergeKLists(lists): merge k sorted linked lists (entries may be null) into one sorted list using a heap of the current heads; return null when everything is empty. Write mergeKSortedArrays(arrays): the same idea for sorted arrays, returning one sorted array (empty arrays allowed). Write kClosest(points, k): the k points [x, y] closest to the origin as a list sorted by distance ascending (equal distances keep input order), using a max-heap capped at size k ([] when k is 0).",
+    "difficulty": 3,
+    "concept": "heap",
+    "referenceSolution": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction mergeKLists(lists) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  for (const node of lists) if (node) heap.push(node);\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  while (heap.size()) {\n    const node = heap.pop();\n    tail.next = node;\n    tail = node;\n    if (node.next) heap.push(node.next);\n  }\n  return dummy.next;\n}\n\nfunction mergeKSortedArrays(arrays) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  arrays.forEach((arr, row) => {\n    if (arr.length) heap.push({ val: arr[0], row, col: 0 });\n  });\n  const out = [];\n  while (heap.size()) {\n    const { val, row, col } = heap.pop();\n    out.push(val);\n    if (col + 1 < arrays[row].length) heap.push({ val: arrays[row][col + 1], row, col: col + 1 });\n  }\n  return out;\n}\n\nfunction kClosest(points, k) {\n  const heap = new Heap((a, b) => b.d - a.d || b.i - a.i);\n  points.forEach((p, i) => {\n    heap.push({ d: p[0] * p[0] + p[1] * p[1], i, p });\n    if (heap.size() > k) heap.pop();\n  });\n  const kept = [];\n  while (heap.size()) kept.push(heap.pop());\n  return kept.sort((a, b) => a.d - b.d || a.i - b.i).map((item) => item.p);\n}",
+    "solution": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction mergeKLists(lists) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  for (const node of lists) if (node) heap.push(node);\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  while (heap.size()) {\n    const node = heap.pop();\n    tail.next = node;\n    tail = node;\n    if (node.next) heap.push(node.next);\n  }\n  return dummy.next;\n}\n\nfunction mergeKSortedArrays(arrays) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  arrays.forEach((arr, row) => {\n    if (arr.length) heap.push({ val: arr[0], row, col: 0 });\n  });\n  const out = [];\n  while (heap.size()) {\n    const { val, row, col } = heap.pop();\n    out.push(val);\n    if (col + 1 < arrays[row].length) heap.push({ val: arrays[row][col + 1], row, col: col + 1 });\n  }\n  return out;\n}\n\nfunction kClosest(points, k) {\n  const heap = new Heap((a, b) => b.d - a.d || b.i - a.i);\n  points.forEach((p, i) => {\n    heap.push({ d: p[0] * p[0] + p[1] * p[1], i, p });\n    if (heap.size() > k) heap.pop();\n  });\n  const kept = [];\n  while (heap.size()) kept.push(heap.pop());\n  return kept.sort((a, b) => a.d - b.d || a.i - b.i).map((item) => item.p);\n}",
+    "starterCode": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction mergeKLists(lists) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  for (const node of lists) if (node) heap.push(node);\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  while (heap.size()) {\n    const node = heap.pop();\n    tail.next = node;\n    tail = node;\n    if (node.next) heap.push(node.next);\n  }\n  return dummy.next;\n}\n\nfunction mergeKSortedArrays(arrays) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  arrays.forEach((arr, row) => {\n    if (arr.length) heap.push({ val: arr[0], row, col: 0 });\n  });\n  const out = [];\n  while (heap.size()) {\n    const { val, row, col } = heap.pop();\n    out.push(val);\n    if (col + 1 < arrays[row].length) heap.push({ val: arrays[row][col + 1], row, col: col + 1 });\n  }\n  return out;\n}\n\nfunction kClosest(points, k) {\n  const heap = new Heap((a, b) => b.d - a.d || b.i - a.i);\n  points.forEach((p, i) => {\n    heap.push({ d: p[0] * p[0] + p[1] * p[1], i, p });\n    if (heap.size() > k) heap.pop();\n  });\n  const kept = [];\n  while (heap.size()) kept.push(heap.pop());\n  return kept.sort((a, b) => a.d - b.d || a.i - b.i).map((item) => item.p);\n}",
+    "testCases": [
+      {
+        "description": "mergeKLists merges three sorted lists",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(mergeKLists([list(1, 4, 5), list(1, 3, 4), list(2, 6)]))",
+        "expected": "[1, 1, 2, 3, 4, 4, 5, 6]"
+      },
+      {
+        "description": "mergeKLists with empty inputs",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[mergeKLists([]), mergeKLists([null, null])]",
+        "expected": "[null, null]"
+      },
+      {
+        "description": "mergeKLists skips null lists among real ones",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(mergeKLists([list(1), null, list(0)]))",
+        "expected": "[0, 1]"
+      },
+      {
+        "description": "mergeKLists of a single list keeps it",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(mergeKLists([list(1, 2, 3)]))",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "mergeKSortedArrays merges and skips empty arrays",
+        "input": "mergeKSortedArrays([[1, 4, 7], [2, 5], [], [3, 6, 8]])",
+        "expected": "[1, 2, 3, 4, 5, 6, 7, 8]"
+      },
+      {
+        "description": "mergeKSortedArrays: nothing to merge and duplicates",
+        "input": "[mergeKSortedArrays([]), mergeKSortedArrays([[], []]), mergeKSortedArrays([[2, 2], [2]])]",
+        "expected": "[[], [], [2, 2, 2]]"
+      },
+      {
+        "description": "kClosest returns the closest points sorted by distance",
+        "input": "[kClosest([[1, 3], [-2, 2]], 1), kClosest([[3, 3], [5, -1], [-2, 4]], 2)]",
+        "expected": "[[[-2, 2]], [[3, 3], [-2, 4]]]"
+      },
+      {
+        "description": "kClosest with k = 0 and k = n",
+        "input": "[kClosest([[1, 1]], 0), kClosest([[2, 0], [1, 0]], 2)]",
+        "expected": "[[], [[1, 0], [2, 0]]]"
+      },
+      {
+        "description": "kClosest keeps input order on equal distances",
+        "input": "kClosest([[1, 0], [0, 1], [0, -1]], 2)",
+        "expected": "[[1, 0], [0, 1]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"mergeKLists merges three sorted lists\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(mergeKLists([list(1, 4, 5), list(1, 3, 4), list(2, 6)])));\n}, () => ([1, 1, 2, 3, 4, 4, 5, 6]));\n\nawait $test.run(\"mergeKLists with empty inputs\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([mergeKLists([]), mergeKLists([null, null])]);\n}, () => ([null, null]));\n\nawait $test.run(\"mergeKLists skips null lists among real ones\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(mergeKLists([list(1), null, list(0)])));\n}, () => ([0, 1]));\n\nawait $test.run(\"mergeKLists of a single list keeps it\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(mergeKLists([list(1, 2, 3)])));\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"mergeKSortedArrays merges and skips empty arrays\", async () => {\n  const sleep = $test.sleep;\n  return (mergeKSortedArrays([[1, 4, 7], [2, 5], [], [3, 6, 8]]));\n}, () => ([1, 2, 3, 4, 5, 6, 7, 8]));\n\nawait $test.run(\"mergeKSortedArrays: nothing to merge and duplicates\", async () => {\n  const sleep = $test.sleep;\n  return ([mergeKSortedArrays([]), mergeKSortedArrays([[], []]), mergeKSortedArrays([[2, 2], [2]])]);\n}, () => ([[], [], [2, 2, 2]]));\n\nawait $test.run(\"kClosest returns the closest points sorted by distance\", async () => {\n  const sleep = $test.sleep;\n  return ([kClosest([[1, 3], [-2, 2]], 1), kClosest([[3, 3], [5, -1], [-2, 4]], 2)]);\n}, () => ([[[-2, 2]], [[3, 3], [-2, 4]]]));\n\nawait $test.run(\"kClosest with k = 0 and k = n\", async () => {\n  const sleep = $test.sleep;\n  return ([kClosest([[1, 1]], 0), kClosest([[2, 0], [1, 0]], 2)]);\n}, () => ([[], [[1, 0], [2, 0]]]));\n\nawait $test.run(\"kClosest keeps input order on equal distances\", async () => {\n  const sleep = $test.sleep;\n  return (kClosest([[1, 0], [0, 1], [0, -1]], 2));\n}, () => ([[1, 0], [0, 1]]));",
+    "targetTime": "O(N log k)",
+    "targetSpace": "O(k)",
+    "complexityExplanation": "The heap holds one candidate per input (k), and each of the N output items costs one push and pop."
   }
 ]
