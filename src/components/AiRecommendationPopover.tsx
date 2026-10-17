@@ -272,7 +272,7 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
             </div>
           </div>
 
-          {/* Free Providers Callout */}
+          {/* Recommended AI Providers */}
           <div
             style={{
               padding: '11px 13px',
@@ -293,7 +293,7 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
               }}
             >
               <CheckCircle2 size={13} />
-              <span>Free & zero-cost models in Settings:</span>
+              <span>Recommended Free AI Keys in Settings:</span>
             </div>
             <p
               style={{
@@ -303,7 +303,7 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
                 lineHeight: 1.5,
               }}
             >
-              Our top recommendation is <strong style={{ color: 'var(--text-primary)' }}>Groq</strong> with <code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>openai/gpt-oss-120b</code> for blistering-fast free evaluations, followed by <strong style={{ color: 'var(--text-primary)' }}>Google Gemini 2.5 Flash</strong> (free tier via Google AI Studio). You can also run locally via <strong>Ollama</strong> (100% free & offline), with many more providers available in Settings.
+              Add an API key in Settings to activate AI evaluation. We recommend <strong style={{ color: 'var(--text-primary)' }}>Groq</strong> (<code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>openai/gpt-oss-120b</code>) for the fastest zero-cost evaluations, or <strong style={{ color: 'var(--text-primary)' }}>Google Gemini</strong> (<code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>gemini-2.5-flash</code>). Both offer generous free developer tiers with no credit card required.
             </p>
           </div>
         </div>
