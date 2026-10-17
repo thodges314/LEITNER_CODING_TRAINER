@@ -72,9 +72,15 @@ export const ActiveModelStatusPopover: React.FC<ActiveModelStatusPopoverProps> =
   }, [apiKey, provider]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+    let active = true;
+    queueMicrotask(() => {
+      if (!active) return;
       fetchStatus();
-    }
+    });
+    return () => {
+      active = false;
+    };
   }, [isOpen, fetchStatus]);
 
   // Close on Escape key press
