@@ -1,0 +1,10 @@
+{
+  "track": "typescript-patterns",
+  "title": "TS Function Overloads: Type-Safe Event Map, assertNever",
+  "tags": [
+    "typescript",
+    "narrowing",
+    "overloads",
+    "exhaustiveness"
+  ]
+}

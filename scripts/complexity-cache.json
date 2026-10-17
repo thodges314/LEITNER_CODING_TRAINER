@@ -1093,5 +1093,30 @@
     "targetTime": "O(listeners)",
     "targetSpace": "O(topics)",
     "complexityExplanation": "Pattern matching against subscribed exact topics and wildcards."
+  },
+  "ts-infer-conditional-unpack": {
+    "targetTime": "Type-level",
+    "targetSpace": "Type-level",
+    "complexityExplanation": "Compile-time pattern matching with infer in conditional types."
+  },
+  "ts-template-literal-strings": {
+    "targetTime": "O(depth)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Recursive template literal pattern matching at compile time; runtime split traversal."
+  },
+  "ts-branded-nominal-types": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Zero runtime overhead branding with type assertions."
+  },
+  "ts-overloads-exhaustive-narrowing": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Compile-time overload resolution and exhaustive default branch guard."
+  },
+  "ts-mapped-modifiers-deep-readonly": {
+    "targetTime": "Type-level",
+    "targetSpace": "O(props)",
+    "complexityExplanation": "Compile-time recursive mapped modifiers and key remapping with runtime factory."
   }
 }

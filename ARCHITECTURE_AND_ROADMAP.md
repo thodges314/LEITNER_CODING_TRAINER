@@ -22,9 +22,9 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 219 (81 active at first run) |
-| Documented test cases | 1414 (each shown as input → expected in the UI) |
-| Difficulty spread | d1: 32 · d2: 67 · d3: 82 · d4: 37 · d5: 1 |
+| Cards | 224 (81 active at first run) |
+| Documented test cases | 1440 (each shown as input → expected in the UI) |
+| Difficulty spread | d1: 32 · d2: 68 · d3: 85 · d4: 38 · d5: 1 |
 | Tracks with cards | async-js, data-structures, react, algorithms (29), js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns, algorithmic-screens, typescript-patterns, js-language, dom-browser, react-components (16) |
 | Tracks defined but empty | `testing-tooling` |
 | Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
@@ -309,12 +309,12 @@ Algorithms were filled in batch 13. Candidates, with the owner's goal in mind (r
 | 1 | **Algorithms, round 2** | Still the most common interview content: 2D DP (LCS, edit distance, knapsack), Dijkstra, union-find, monotonic stack, bit tricks, greedy/intervals, LRU with a doubly linked list | pure input/expected | low |
 | 2 | **Ladder holes (§7.1)** — DONE for pure/TS concepts in batch 14; React/DOM holes remain | Every concept should start at d1/d2 | DOM harness | medium |
 | 3 | **Language depth (§7.2.7)** — ALL DONE (batch 15 & 22): Proxy/Weak*/descriptors/prototypes, hoisting/TDZ, this resolution, tagged templates, Symbol.asyncIterator, coroutines | pure input/expected | low |
-| 4 | **TypeScript type-level (§7.2.3)** | Conditional/`infer`, template-literal types, overloads | `@ts-expect-error` extras | medium |
+| 4 | **TypeScript type-level (§7.2.3)** — DONE (batch 24): conditional `infer`, template literals, branded types, overloads, mapped modifiers | type-level + runtime | low |
 | 5 | **Testing & libs, pure logic (§7.2.4)** | `mockFn`, fake timers, mini `expect`, D3 scales, Next route matcher | pure input/expected | low |
 | 6 | **DOM/browser extras (§7.2.6)** | drag-and-drop, observers, `pushState` router | DOM harness | medium |
 | 7 | **React 19 / a11y** | `useOptimistic`, `useTransition`, roving focus, `aria-live` | needs sandbox changes (§7.2.8) | high |
 
-**Round 3 progress (batches 18+):** sliding window, strings, 1D DP DONE (batch 18, `part18.mjs`). Trees + linked lists r2 DONE (batch 19, `part19.mjs`, 9 cards: level order, path sum, diameter/balanced, BST kth/insert/build, build+serialize, max path sum, remove-nth/reorder, add numbers, reverse k-group). Heaps + graph search r2 DONE (batch 20, `part20.mjs`, 7 cards: kth largest, merge k lists, median stream, components/paths, clone/bipartite/valid tree, grid BFS, word ladder). Backtracking r2 DONE (batch 21, `part21.mjs`). Language depth remaining DONE (batch 22, `part22.mjs`: hoisting/TDZ scope, this context, tagged templates, Symbol.asyncIterator, coroutines/mini-co). Async depth DONE (batch 23, `part23.mjs`: Promise.any with AggregateError, cancelable promise + withTimeout, polling with backoff, async generator pagination/stream, pub/sub with wildcards).
+**Round 3 progress (batches 18+):** sliding window, strings, 1D DP DONE (batch 18, `part18.mjs`). Trees + linked lists r2 DONE (batch 19, `part19.mjs`, 9 cards: level order, path sum, diameter/balanced, BST kth/insert/build, build+serialize, max path sum, remove-nth/reorder, add numbers, reverse k-group). Heaps + graph search r2 DONE (batch 20, `part20.mjs`, 7 cards: kth largest, merge k lists, median stream, components/paths, clone/bipartite/valid tree, grid BFS, word ladder). Backtracking r2 DONE (batch 21, `part21.mjs`). Language depth remaining DONE (batch 22, `part22.mjs`: hoisting/TDZ scope, this context, tagged templates, Symbol.asyncIterator, coroutines/mini-co). Async depth DONE (batch 23, `part23.mjs`: Promise.any with AggregateError, cancelable promise + withTimeout, polling with backoff, async generator pagination/stream, pub/sub with wildcards). TypeScript type-level DONE (batch 24, `part24.mjs`: infer conditional unpack, template literal strings/dot paths, branded nominal types, overloads/exhaustive narrowing, mapped modifiers/deep readonly).
 
 Pick the order; each batch follows the §4 checklist including the complexity step.
 

@@ -1,0 +1,6 @@
+Define the following conditional types using infer:
+- MyReturnType<T>: extracts the return type of a function type T, or never if T is not a function.
+- MyParameters<T>: extracts the parameters tuple of a function type T, or never.
+- DeepAwaited<T>: unwraps nested Promise/PromiseLike types recursively (e.g. Promise<Promise<number>> becomes number).
+- TupleToUnion<T>: extracts a union of all element types from a tuple/array type T.
+- Flatten<T>: unwraps one layer of array from T if T is an array, otherwise leaves T as is.

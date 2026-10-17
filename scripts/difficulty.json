@@ -874,5 +874,25 @@
  "pub-sub-wildcard-emitter": {
   "difficulty": 3,
   "concept": "emitter"
+ },
+ "ts-infer-conditional-unpack": {
+  "difficulty": 3,
+  "concept": "ts-types"
+ },
+ "ts-template-literal-strings": {
+  "difficulty": 3,
+  "concept": "ts-types"
+ },
+ "ts-branded-nominal-types": {
+  "difficulty": 2,
+  "concept": "ts-types"
+ },
+ "ts-overloads-exhaustive-narrowing": {
+  "difficulty": 3,
+  "concept": "ts-narrowing"
+ },
+ "ts-mapped-modifiers-deep-readonly": {
+  "difficulty": 4,
+  "concept": "ts-types"
  }
 }

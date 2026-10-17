@@ -1,0 +1,5 @@
+Define the following template literal and recursive string types:
+- CamelToKebab<S extends string>: converts camelCase string literal to kebab-case (e.g. 'userName' -> 'user-name', 'isReady' -> 'is-ready').
+- Split<S extends string, Delim extends string>: splits string S by delimiter Delim into a tuple of string segments.
+- DeepDotPath<T>: recursively constructs union of all dot-separated property paths for nested object T (e.g. { user: { name: string } } produces 'user' | 'user.name').
+Also write function getByPath(obj: any, path: string): retrieves the value at dot-separated path in nested object obj, or undefined if not found.

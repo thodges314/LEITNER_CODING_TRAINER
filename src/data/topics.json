@@ -12867,5 +12867,271 @@
     "targetTime": "O(listeners)",
     "targetSpace": "O(topics)",
     "complexityExplanation": "Pattern matching against subscribed exact topics and wildcards."
+  },
+  {
+    "id": "ts-branded-nominal-types",
+    "track": "typescript-patterns",
+    "title": "TS Branded Types: Nominal IDs, Validated Email, Brand Helpers",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "types",
+      "branded-types",
+      "nominal-typing"
+    ],
+    "promptSeed": "Define a generic Brand helper and nominal ID types:\n- type Brand<K, T>: intersects primitive K with { readonly __brand: T } so identical primitives with different brands cannot be assigned to each other.\n- type UserId = Brand<string, 'UserId'>\n- type OrderId = Brand<string, 'OrderId'>\n- type PositiveNumber = Brand<number, 'PositiveNumber'>\n- function toUserId(id: string): UserId: casts a string to UserId.\n- function toOrderId(id: string): OrderId: casts a string to OrderId.\n- function toPositiveNumber(n: number): PositiveNumber: throws an Error('Number must be positive') if n <= 0, otherwise returns n as PositiveNumber.",
+    "difficulty": 2,
+    "concept": "ts-types",
+    "referenceSolution": "type Brand<K, T> = K & { readonly __brand: T };\n\ntype UserId = Brand<string, 'UserId'>;\ntype OrderId = Brand<string, 'OrderId'>;\ntype PositiveNumber = Brand<number, 'PositiveNumber'>;\n\nfunction toUserId(id: string): UserId {\n  return id as UserId;\n}\n\nfunction toOrderId(id: string): OrderId {\n  return id as OrderId;\n}\n\nfunction toPositiveNumber(n: number): PositiveNumber {\n  if (n <= 0) throw new Error('Number must be positive');\n  return n as PositiveNumber;\n}",
+    "solution": "type Brand<K, T> = K & { readonly __brand: T };\n\ntype UserId = Brand<string, 'UserId'>;\ntype OrderId = Brand<string, 'OrderId'>;\ntype PositiveNumber = Brand<number, 'PositiveNumber'>;\n\nfunction toUserId(id: string): UserId {\n  return id as UserId;\n}\n\nfunction toOrderId(id: string): OrderId {\n  return id as OrderId;\n}\n\nfunction toPositiveNumber(n: number): PositiveNumber {\n  if (n <= 0) throw new Error('Number must be positive');\n  return n as PositiveNumber;\n}",
+    "starterCode": "type Brand<K, T> = K & { readonly __brand: T };\n\ntype UserId = Brand<string, 'UserId'>;\ntype OrderId = Brand<string, 'OrderId'>;\ntype PositiveNumber = Brand<number, 'PositiveNumber'>;\n\nfunction toUserId(id: string): UserId {\n  return id as UserId;\n}\n\nfunction toOrderId(id: string): OrderId {\n  return id as OrderId;\n}\n\nfunction toPositiveNumber(n: number): PositiveNumber {\n  if (n <= 0) throw new Error('Number must be positive');\n  return n as PositiveNumber;\n}",
+    "testCases": [
+      {
+        "description": "toUserId and toOrderId return branded values",
+        "input": "const u = toUserId('u-123');\nconst o = toOrderId('o-456');\n[u, o]",
+        "expected": "['u-123', 'o-456']"
+      },
+      {
+        "description": "toPositiveNumber returns positive numbers",
+        "input": "const pos = toPositiveNumber(42);\npos",
+        "expected": "42"
+      },
+      {
+        "description": "toPositiveNumber throws on non-positive input",
+        "input": "let caught = null;\ntry {\n  toPositiveNumber(-5);\n} catch (e: any) {\n  caught = e.message;\n}\ncaught",
+        "expected": "'Number must be positive'"
+      },
+      {
+        "description": "Branded value is assignable to base primitive type",
+        "input": "const u: UserId = toUserId('id-1');\nconst s: string = u;\ns",
+        "expected": "'id-1'"
+      }
+    ],
+    "testHarness": "await $test.run(\"toUserId and toOrderId return branded values\", async () => {\n  const sleep = $test.sleep;\n  const u = toUserId('u-123');\n  const o = toOrderId('o-456');\n  return ([u, o]);\n}, () => (['u-123', 'o-456']));\n\nawait $test.run(\"toPositiveNumber returns positive numbers\", async () => {\n  const sleep = $test.sleep;\n  const pos = toPositiveNumber(42);\n  return (pos);\n}, () => (42));\n\nawait $test.run(\"toPositiveNumber throws on non-positive input\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    toPositiveNumber(-5);\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return (caught);\n}, () => ('Number must be positive'));\n\nawait $test.run(\"Branded value is assignable to base primitive type\", async () => {\n  const sleep = $test.sleep;\n  const u: UserId = toUserId('id-1');\n  const s: string = u;\n  return (s);\n}, () => ('id-1'));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Zero runtime overhead branding with type assertions."
+  },
+  {
+    "id": "ts-infer-conditional-unpack",
+    "track": "typescript-patterns",
+    "title": "TS Conditional Types: infer, Function Unwrappers, DeepAwaited",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "types",
+      "conditional-types",
+      "infer"
+    ],
+    "promptSeed": "Define the following conditional types using infer:\n- MyReturnType<T>: extracts the return type of a function type T, or never if T is not a function.\n- MyParameters<T>: extracts the parameters tuple of a function type T, or never.\n- DeepAwaited<T>: unwraps nested Promise/PromiseLike types recursively (e.g. Promise<Promise<number>> becomes number).\n- TupleToUnion<T>: extracts a union of all element types from a tuple/array type T.\n- Flatten<T>: unwraps one layer of array from T if T is an array, otherwise leaves T as is.",
+    "difficulty": 3,
+    "concept": "ts-types",
+    "referenceSolution": "type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;\n\ntype MyParameters<T> = T extends (...args: infer P) => any ? P : never;\n\ntype DeepAwaited<T> = T extends PromiseLike<infer U> ? DeepAwaited<U> : T;\n\ntype TupleToUnion<T> = T extends readonly (infer U)[] ? U : never;\n\ntype Flatten<T> = T extends (infer U)[] ? U : T;",
+    "solution": "type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;\n\ntype MyParameters<T> = T extends (...args: infer P) => any ? P : never;\n\ntype DeepAwaited<T> = T extends PromiseLike<infer U> ? DeepAwaited<U> : T;\n\ntype TupleToUnion<T> = T extends readonly (infer U)[] ? U : never;\n\ntype Flatten<T> = T extends (infer U)[] ? U : T;",
+    "starterCode": "type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;\n\ntype MyParameters<T> = T extends (...args: infer P) => any ? P : never;\n\ntype DeepAwaited<T> = T extends PromiseLike<infer U> ? DeepAwaited<U> : T;\n\ntype TupleToUnion<T> = T extends readonly (infer U)[] ? U : never;\n\ntype Flatten<T> = T extends (infer U)[] ? U : T;",
+    "testCases": [
+      {
+        "description": "MyReturnType extracts function return type",
+        "input": "const a: MyReturnType<() => number> = 42;\na",
+        "expected": "42"
+      },
+      {
+        "description": "MyReturnType handles boolean return and parameters",
+        "input": "const b: MyReturnType<(x: string) => boolean> = true;\nb",
+        "expected": "true"
+      },
+      {
+        "description": "MyParameters extracts parameter tuple",
+        "input": "const p: MyParameters<(x: string, y: number) => void> = ['hello', 10];\np",
+        "expected": "['hello', 10]"
+      },
+      {
+        "description": "DeepAwaited unwraps nested Promise types",
+        "input": "const d: DeepAwaited<Promise<Promise<string>>> = 'unwrapped';\nd",
+        "expected": "'unwrapped'"
+      },
+      {
+        "description": "TupleToUnion creates union from array",
+        "input": "const u: TupleToUnion<['red', 'green', 'blue']> = 'green';\nu",
+        "expected": "'green'"
+      },
+      {
+        "description": "Flatten unwraps array element type",
+        "input": "const f: Flatten<number[][]> = [1, 2, 3];\nf",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "Flatten leaves non-array primitive type untouched",
+        "input": "const f2: Flatten<string> = 'plain';\nf2",
+        "expected": "'plain'"
+      }
+    ],
+    "testHarness": "await $test.run(\"MyReturnType extracts function return type\", async () => {\n  const sleep = $test.sleep;\n  const a: MyReturnType<() => number> = 42;\n  return (a);\n}, () => (42));\n\nawait $test.run(\"MyReturnType handles boolean return and parameters\", async () => {\n  const sleep = $test.sleep;\n  const b: MyReturnType<(x: string) => boolean> = true;\n  return (b);\n}, () => (true));\n\nawait $test.run(\"MyParameters extracts parameter tuple\", async () => {\n  const sleep = $test.sleep;\n  const p: MyParameters<(x: string, y: number) => void> = ['hello', 10];\n  return (p);\n}, () => (['hello', 10]));\n\nawait $test.run(\"DeepAwaited unwraps nested Promise types\", async () => {\n  const sleep = $test.sleep;\n  const d: DeepAwaited<Promise<Promise<string>>> = 'unwrapped';\n  return (d);\n}, () => ('unwrapped'));\n\nawait $test.run(\"TupleToUnion creates union from array\", async () => {\n  const sleep = $test.sleep;\n  const u: TupleToUnion<['red', 'green', 'blue']> = 'green';\n  return (u);\n}, () => ('green'));\n\nawait $test.run(\"Flatten unwraps array element type\", async () => {\n  const sleep = $test.sleep;\n  const f: Flatten<number[][]> = [1, 2, 3];\n  return (f);\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"Flatten leaves non-array primitive type untouched\", async () => {\n  const sleep = $test.sleep;\n  const f2: Flatten<string> = 'plain';\n  return (f2);\n}, () => ('plain'));",
+    "targetTime": "Type-level",
+    "targetSpace": "Type-level",
+    "complexityExplanation": "Compile-time pattern matching with infer in conditional types."
+  },
+  {
+    "id": "ts-mapped-modifiers-deep-readonly",
+    "track": "typescript-patterns",
+    "title": "TS Mapped Modifiers: DeepReadonly, Mutable, Concrete, KeyRemap",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "types",
+      "mapped-types",
+      "modifiers",
+      "key-remapping"
+    ],
+    "promptSeed": "Define advanced mapped types using modifier removal (-readonly, -?) and key remapping (as):\n- DeepReadonly<T>: recursively marks all properties of object or array T as readonly.\n- Mutable<T>: removes readonly from all direct properties of T ({-readonly [P in keyof T]: T[P]}).\n- Concrete<T>: removes optional modifier from all direct properties of T ({[P in keyof T]-?: T[P]}).\n- Getters<T>: remaps keys using as to produce getter method signatures, e.g. { name: string } becomes { getName: () => string }.\n- function makeGetters<T extends Record<string, any>>(obj: T): Getters<T>: returns an object where each property of obj has a corresponding get<Prop>() method returning its value.",
+    "difficulty": 4,
+    "concept": "ts-types",
+    "referenceSolution": "type DeepReadonly<T> = T extends Function\n  ? T\n  : T extends Array<infer U>\n    ? ReadonlyArray<DeepReadonly<U>>\n    : T extends object\n      ? { readonly [P in keyof T]: DeepReadonly<T[P]> }\n      : T;\n\ntype Mutable<T> = {\n  -readonly [P in keyof T]: T[P];\n};\n\ntype Concrete<T> = {\n  [P in keyof T]-?: T[P];\n};\n\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends Record<string, any>>(obj: T): Getters<T> {\n  const result: Record<string, any> = {};\n  for (const key of Object.keys(obj)) {\n    const capitalized = key.charAt(0).toUpperCase() + key.slice(1);\n    result[`get${capitalized}`] = () => obj[key];\n  }\n  return result as Getters<T>;\n}",
+    "solution": "type DeepReadonly<T> = T extends Function\n  ? T\n  : T extends Array<infer U>\n    ? ReadonlyArray<DeepReadonly<U>>\n    : T extends object\n      ? { readonly [P in keyof T]: DeepReadonly<T[P]> }\n      : T;\n\ntype Mutable<T> = {\n  -readonly [P in keyof T]: T[P];\n};\n\ntype Concrete<T> = {\n  [P in keyof T]-?: T[P];\n};\n\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends Record<string, any>>(obj: T): Getters<T> {\n  const result: Record<string, any> = {};\n  for (const key of Object.keys(obj)) {\n    const capitalized = key.charAt(0).toUpperCase() + key.slice(1);\n    result[`get${capitalized}`] = () => obj[key];\n  }\n  return result as Getters<T>;\n}",
+    "starterCode": "type DeepReadonly<T> = T extends Function\n  ? T\n  : T extends Array<infer U>\n    ? ReadonlyArray<DeepReadonly<U>>\n    : T extends object\n      ? { readonly [P in keyof T]: DeepReadonly<T[P]> }\n      : T;\n\ntype Mutable<T> = {\n  -readonly [P in keyof T]: T[P];\n};\n\ntype Concrete<T> = {\n  [P in keyof T]-?: T[P];\n};\n\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends Record<string, any>>(obj: T): Getters<T> {\n  const result: Record<string, any> = {};\n  for (const key of Object.keys(obj)) {\n    const capitalized = key.charAt(0).toUpperCase() + key.slice(1);\n    result[`get${capitalized}`] = () => obj[key];\n  }\n  return result as Getters<T>;\n}",
+    "testCases": [
+      {
+        "description": "DeepReadonly allows nested property read access",
+        "input": "const obj = { a: 1, b: { c: 'nested' } };\nconst r: DeepReadonly<typeof obj> = obj;\nr.b.c",
+        "expected": "'nested'"
+      },
+      {
+        "description": "Mutable removes readonly modifiers allowing property mutation",
+        "input": "type ReadonlyUser = { readonly id: number; readonly name: string };\nconst u: Mutable<ReadonlyUser> = { id: 1, name: 'Alice' };\nu.name = 'Bob';\nu.name",
+        "expected": "'Bob'"
+      },
+      {
+        "description": "Concrete removes optional modifier requiring all properties",
+        "input": "type PartialConfig = { host?: string; port?: number };\nconst c: Concrete<PartialConfig> = { host: 'localhost', port: 8080 };\n[c.host, c.port]",
+        "expected": "['localhost', 8080]"
+      },
+      {
+        "description": "makeGetters generates get<Prop> methods for object properties",
+        "input": "const g = makeGetters({ name: 'Alice', age: 30 });\n[g.getName(), g.getAge()]",
+        "expected": "['Alice', 30]"
+      }
+    ],
+    "testHarness": "await $test.run(\"DeepReadonly allows nested property read access\", async () => {\n  const sleep = $test.sleep;\n  const obj = { a: 1, b: { c: 'nested' } };\n  const r: DeepReadonly<typeof obj> = obj;\n  return (r.b.c);\n}, () => ('nested'));\n\nawait $test.run(\"Mutable removes readonly modifiers allowing property mutation\", async () => {\n  const sleep = $test.sleep;\n  type ReadonlyUser = { readonly id: number; readonly name: string };\n  const u: Mutable<ReadonlyUser> = { id: 1, name: 'Alice' };\n  u.name = 'Bob';\n  return (u.name);\n}, () => ('Bob'));\n\nawait $test.run(\"Concrete removes optional modifier requiring all properties\", async () => {\n  const sleep = $test.sleep;\n  type PartialConfig = { host?: string; port?: number };\n  const c: Concrete<PartialConfig> = { host: 'localhost', port: 8080 };\n  return ([c.host, c.port]);\n}, () => (['localhost', 8080]));\n\nawait $test.run(\"makeGetters generates get<Prop> methods for object properties\", async () => {\n  const sleep = $test.sleep;\n  const g = makeGetters({ name: 'Alice', age: 30 });\n  return ([g.getName(), g.getAge()]);\n}, () => (['Alice', 30]));",
+    "targetTime": "Type-level",
+    "targetSpace": "O(props)",
+    "complexityExplanation": "Compile-time recursive mapped modifiers and key remapping with runtime factory."
+  },
+  {
+    "id": "ts-overloads-exhaustive-narrowing",
+    "track": "typescript-patterns",
+    "title": "TS Function Overloads: Type-Safe Event Map, assertNever",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "narrowing",
+      "overloads",
+      "exhaustiveness"
+    ],
+    "promptSeed": "Write function overloads and exhaustive checking utilities:\n- Function formatInput:\n  overload 1: formatInput(value: string, toUpper: boolean): string\n  overload 2: formatInput(value: number, precision: number): string\n  implementation: formats a string to uppercase if toUpper is true (lowercase if false); formats a number with toFixed(precision).\n- function assertNever(x: never, message?: string): never: throws an Error(message || `Unexpected value: ${x}`). In switch statements, assigning an unhandled branch to assertNever ensures exhaustiveness at compile time.\n- function isTagged<T extends { tag: string }, K extends string>(item: T, tag: K): item is Extract<T, { tag: K }>: type guard narrowing a discriminated union item by tag.",
+    "difficulty": 3,
+    "concept": "ts-narrowing",
+    "referenceSolution": "function formatInput(value: string, toUpper: boolean): string;\nfunction formatInput(value: number, precision: number): string;\nfunction formatInput(value: string | number, option: boolean | number): string {\n  if (typeof value === 'string') {\n    return option ? value.toUpperCase() : value.toLowerCase();\n  }\n  return value.toFixed(option as number);\n}\n\nfunction assertNever(x: never, message?: string): never {\n  throw new Error(message || `Unexpected value: ${x}`);\n}\n\nfunction isTagged<T extends { tag: string }, K extends string>(\n  item: T,\n  tag: K\n): item is Extract<T, { tag: K }> {\n  return item.tag === tag;\n}",
+    "solution": "function formatInput(value: string, toUpper: boolean): string;\nfunction formatInput(value: number, precision: number): string;\nfunction formatInput(value: string | number, option: boolean | number): string {\n  if (typeof value === 'string') {\n    return option ? value.toUpperCase() : value.toLowerCase();\n  }\n  return value.toFixed(option as number);\n}\n\nfunction assertNever(x: never, message?: string): never {\n  throw new Error(message || `Unexpected value: ${x}`);\n}\n\nfunction isTagged<T extends { tag: string }, K extends string>(\n  item: T,\n  tag: K\n): item is Extract<T, { tag: K }> {\n  return item.tag === tag;\n}",
+    "starterCode": "function formatInput(value: string, toUpper: boolean): string;\nfunction formatInput(value: number, precision: number): string;\nfunction formatInput(value: string | number, option: boolean | number): string {\n  if (typeof value === 'string') {\n    return option ? value.toUpperCase() : value.toLowerCase();\n  }\n  return value.toFixed(option as number);\n}\n\nfunction assertNever(x: never, message?: string): never {\n  throw new Error(message || `Unexpected value: ${x}`);\n}\n\nfunction isTagged<T extends { tag: string }, K extends string>(\n  item: T,\n  tag: K\n): item is Extract<T, { tag: K }> {\n  return item.tag === tag;\n}",
+    "testCases": [
+      {
+        "description": "formatInput formats strings with boolean flag",
+        "input": "[formatInput('hello', true), formatInput('WORLD', false)]",
+        "expected": "['HELLO', 'world']"
+      },
+      {
+        "description": "formatInput formats numbers with decimal precision",
+        "input": "[formatInput(3.14159, 2), formatInput(42, 0)]",
+        "expected": "['3.14', '42']"
+      },
+      {
+        "description": "assertNever throws with provided or default message",
+        "input": "let caught = null;\ntry {\n  assertNever('invalid' as never);\n} catch (e: any) {\n  caught = e.message;\n}\ncaught",
+        "expected": "'Unexpected value: invalid'"
+      },
+      {
+        "description": "isTagged narrows union item by tag",
+        "input": "type Action = { tag: 'add'; val: number } | { tag: 'reset' };\nconst a: Action = { tag: 'add', val: 5 };\nisTagged(a, 'add') ? a.val : 0",
+        "expected": "5"
+      },
+      {
+        "description": "isTagged returns false when tag does not match",
+        "input": "type Action = { tag: 'add'; val: number } | { tag: 'reset' };\nconst a: Action = { tag: 'reset' };\nisTagged(a, 'add')",
+        "expected": "false"
+      }
+    ],
+    "testHarness": "await $test.run(\"formatInput formats strings with boolean flag\", async () => {\n  const sleep = $test.sleep;\n  return ([formatInput('hello', true), formatInput('WORLD', false)]);\n}, () => (['HELLO', 'world']));\n\nawait $test.run(\"formatInput formats numbers with decimal precision\", async () => {\n  const sleep = $test.sleep;\n  return ([formatInput(3.14159, 2), formatInput(42, 0)]);\n}, () => (['3.14', '42']));\n\nawait $test.run(\"assertNever throws with provided or default message\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertNever('invalid' as never);\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return (caught);\n}, () => ('Unexpected value: invalid'));\n\nawait $test.run(\"isTagged narrows union item by tag\", async () => {\n  const sleep = $test.sleep;\n  type Action = { tag: 'add'; val: number } | { tag: 'reset' };\n  const a: Action = { tag: 'add', val: 5 };\n  return (isTagged(a, 'add') ? a.val : 0);\n}, () => (5));\n\nawait $test.run(\"isTagged returns false when tag does not match\", async () => {\n  const sleep = $test.sleep;\n  type Action = { tag: 'add'; val: number } | { tag: 'reset' };\n  const a: Action = { tag: 'reset' };\n  return (isTagged(a, 'add'));\n}, () => (false));",
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Compile-time overload resolution and exhaustive default branch guard."
+  },
+  {
+    "id": "ts-template-literal-strings",
+    "track": "typescript-patterns",
+    "title": "TS Template Literals: KebabCase, Split, and DotPaths",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "types",
+      "template-literals",
+      "string-manipulation"
+    ],
+    "promptSeed": "Define the following template literal and recursive string types:\n- CamelToKebab<S extends string>: converts camelCase string literal to kebab-case (e.g. 'userName' -> 'user-name', 'isReady' -> 'is-ready').\n- Split<S extends string, Delim extends string>: splits string S by delimiter Delim into a tuple of string segments.\n- DeepDotPath<T>: recursively constructs union of all dot-separated property paths for nested object T (e.g. { user: { name: string } } produces 'user' | 'user.name').\nAlso write function getByPath(obj: any, path: string): retrieves the value at dot-separated path in nested object obj, or undefined if not found.",
+    "difficulty": 3,
+    "concept": "ts-types",
+    "referenceSolution": "type CamelToKebab<S extends string> = S extends `${infer Head}${infer Tail}`\n  ? Tail extends Uncapitalize<Tail>\n    ? `${Lowercase<Head>}${CamelToKebab<Tail>}`\n    : `${Lowercase<Head>}-${CamelToKebab<Uncapitalize<Tail>>}`\n  : S;\n\ntype Split<S extends string, Delim extends string> = string extends S\n  ? string[]\n  : S extends ''\n    ? []\n    : S extends `${infer Head}${Delim}${infer Tail}`\n      ? [Head, ...Split<Tail, Delim>]\n      : [S];\n\ntype DeepDotPath<T> = T extends object\n  ? {\n      [K in keyof T & string]: K | `${K}.${DeepDotPath<T[K]>}`;\n    }[keyof T & string]\n  : never;\n\nfunction getByPath(obj: any, path: string): any {\n  if (!obj || !path) return undefined;\n  return path.split('.').reduce((acc, part) => (acc != null ? acc[part] : undefined), obj);\n}",
+    "solution": "type CamelToKebab<S extends string> = S extends `${infer Head}${infer Tail}`\n  ? Tail extends Uncapitalize<Tail>\n    ? `${Lowercase<Head>}${CamelToKebab<Tail>}`\n    : `${Lowercase<Head>}-${CamelToKebab<Uncapitalize<Tail>>}`\n  : S;\n\ntype Split<S extends string, Delim extends string> = string extends S\n  ? string[]\n  : S extends ''\n    ? []\n    : S extends `${infer Head}${Delim}${infer Tail}`\n      ? [Head, ...Split<Tail, Delim>]\n      : [S];\n\ntype DeepDotPath<T> = T extends object\n  ? {\n      [K in keyof T & string]: K | `${K}.${DeepDotPath<T[K]>}`;\n    }[keyof T & string]\n  : never;\n\nfunction getByPath(obj: any, path: string): any {\n  if (!obj || !path) return undefined;\n  return path.split('.').reduce((acc, part) => (acc != null ? acc[part] : undefined), obj);\n}",
+    "starterCode": "type CamelToKebab<S extends string> = S extends `${infer Head}${infer Tail}`\n  ? Tail extends Uncapitalize<Tail>\n    ? `${Lowercase<Head>}${CamelToKebab<Tail>}`\n    : `${Lowercase<Head>}-${CamelToKebab<Uncapitalize<Tail>>}`\n  : S;\n\ntype Split<S extends string, Delim extends string> = string extends S\n  ? string[]\n  : S extends ''\n    ? []\n    : S extends `${infer Head}${Delim}${infer Tail}`\n      ? [Head, ...Split<Tail, Delim>]\n      : [S];\n\ntype DeepDotPath<T> = T extends object\n  ? {\n      [K in keyof T & string]: K | `${K}.${DeepDotPath<T[K]>}`;\n    }[keyof T & string]\n  : never;\n\nfunction getByPath(obj: any, path: string): any {\n  if (!obj || !path) return undefined;\n  return path.split('.').reduce((acc, part) => (acc != null ? acc[part] : undefined), obj);\n}",
+    "testCases": [
+      {
+        "description": "CamelToKebab converts single camel hump to kebab-case",
+        "input": "const k: CamelToKebab<'userName'> = 'user-name';\nk",
+        "expected": "'user-name'"
+      },
+      {
+        "description": "CamelToKebab converts multiple camel humps",
+        "input": "const k2: CamelToKebab<'isReadyNow'> = 'is-ready-now';\nk2",
+        "expected": "'is-ready-now'"
+      },
+      {
+        "description": "Split splits string by delimiter into tuple",
+        "input": "const s: Split<'a.b.c', '.'> = ['a', 'b', 'c'];\ns",
+        "expected": "['a', 'b', 'c']"
+      },
+      {
+        "description": "DeepDotPath allows valid nested property path string",
+        "input": "const p: DeepDotPath<{ user: { name: string; profile: { avatar: string } } }> = 'user.profile.avatar';\np",
+        "expected": "'user.profile.avatar'"
+      },
+      {
+        "description": "getByPath retrieves nested object value along path",
+        "input": "const obj = { a: { b: { c: 99 } } };\ngetByPath(obj, 'a.b.c')",
+        "expected": "99"
+      },
+      {
+        "description": "getByPath returns undefined on non-existent path",
+        "input": "const obj = { x: 10 };\ngetByPath(obj, 'x.missing.deep')",
+        "expected": "undefined"
+      }
+    ],
+    "testHarness": "await $test.run(\"CamelToKebab converts single camel hump to kebab-case\", async () => {\n  const sleep = $test.sleep;\n  const k: CamelToKebab<'userName'> = 'user-name';\n  return (k);\n}, () => ('user-name'));\n\nawait $test.run(\"CamelToKebab converts multiple camel humps\", async () => {\n  const sleep = $test.sleep;\n  const k2: CamelToKebab<'isReadyNow'> = 'is-ready-now';\n  return (k2);\n}, () => ('is-ready-now'));\n\nawait $test.run(\"Split splits string by delimiter into tuple\", async () => {\n  const sleep = $test.sleep;\n  const s: Split<'a.b.c', '.'> = ['a', 'b', 'c'];\n  return (s);\n}, () => (['a', 'b', 'c']));\n\nawait $test.run(\"DeepDotPath allows valid nested property path string\", async () => {\n  const sleep = $test.sleep;\n  const p: DeepDotPath<{ user: { name: string; profile: { avatar: string } } }> = 'user.profile.avatar';\n  return (p);\n}, () => ('user.profile.avatar'));\n\nawait $test.run(\"getByPath retrieves nested object value along path\", async () => {\n  const sleep = $test.sleep;\n  const obj = { a: { b: { c: 99 } } };\n  return (getByPath(obj, 'a.b.c'));\n}, () => (99));\n\nawait $test.run(\"getByPath returns undefined on non-existent path\", async () => {\n  const sleep = $test.sleep;\n  const obj = { x: 10 };\n  return (getByPath(obj, 'x.missing.deep'));\n}, () => (undefined));",
+    "targetTime": "O(depth)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Recursive template literal pattern matching at compile time; runtime split traversal."
   }
 ]

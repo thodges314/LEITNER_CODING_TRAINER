@@ -1,0 +1,10 @@
+{
+  "track": "typescript-patterns",
+  "title": "TS Conditional Types: infer, Function Unwrappers, DeepAwaited",
+  "tags": [
+    "typescript",
+    "types",
+    "conditional-types",
+    "infer"
+  ]
+}

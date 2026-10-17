@@ -1,0 +1,10 @@
+{
+  "track": "typescript-patterns",
+  "title": "TS Template Literals: KebabCase, Split, and DotPaths",
+  "tags": [
+    "typescript",
+    "types",
+    "template-literals",
+    "string-manipulation"
+  ]
+}

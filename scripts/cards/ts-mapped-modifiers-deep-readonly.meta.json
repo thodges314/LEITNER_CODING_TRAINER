@@ -1,0 +1,11 @@
+{
+  "track": "typescript-patterns",
+  "title": "TS Mapped Modifiers: DeepReadonly, Mutable, Concrete, KeyRemap",
+  "tags": [
+    "typescript",
+    "types",
+    "mapped-types",
+    "modifiers",
+    "key-remapping"
+  ]
+}
