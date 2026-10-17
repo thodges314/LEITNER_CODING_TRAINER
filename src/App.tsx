@@ -637,7 +637,7 @@ export function App() {
           </a>
           <span style={{ color: 'var(--border-medium)' }}>•</span>
           <a
-            href="https://www.linkedin.com/in/thodges314"
+            href="https://www.linkedin.com/in/thomas-hodges/"
             target="_blank"
             rel="noopener noreferrer"
             style={{
