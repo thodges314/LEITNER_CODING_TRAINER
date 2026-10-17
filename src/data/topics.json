@@ -11006,5 +11006,604 @@
     "targetTime": "O(n²) / O(n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Word break checks each prefix against each earlier split point; decode ways does one pass with a table of n + 1 counts."
+  },
+  {
+    "id": "bst-kth-insert-build",
+    "track": "algorithms",
+    "title": "BST: Kth Smallest/Largest, Insert, Sorted Array to BST",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "bst",
+      "inorder",
+      "recursion"
+    ],
+    "promptSeed": "Tree nodes are { val, left, right } (null for a missing child). All trees here are binary search trees. Write kthSmallest(root, k) (1-indexed, in-order, stop as soon as you reach it) and kthLargest(root, k). Write insertIntoBST(root, val): insert a new leaf (values are distinct) and return the root; a null root returns a new node. Write sortedArrayToBST(nums): build a height-balanced BST from a sorted array by always choosing the middle index Math.floor((lo + hi) / 2) as the root of each range (null for []).",
+    "difficulty": 3,
+    "concept": "bst",
+    "referenceSolution": "function kthSmallest(root, k) {\n  const stack = [];\n  let node = root;\n  while (node || stack.length) {\n    while (node) {\n      stack.push(node);\n      node = node.left;\n    }\n    node = stack.pop();\n    if (--k === 0) return node.val;\n    node = node.right;\n  }\n  return undefined;\n}\n\nfunction kthLargest(root, k) {\n  const stack = [];\n  let node = root;\n  while (node || stack.length) {\n    while (node) {\n      stack.push(node);\n      node = node.right;\n    }\n    node = stack.pop();\n    if (--k === 0) return node.val;\n    node = node.left;\n  }\n  return undefined;\n}\n\nfunction insertIntoBST(root, val) {\n  if (!root) return { val, left: null, right: null };\n  if (val < root.val) root.left = insertIntoBST(root.left, val);\n  else root.right = insertIntoBST(root.right, val);\n  return root;\n}\n\nfunction sortedArrayToBST(nums) {\n  function build(lo, hi) {\n    if (lo > hi) return null;\n    const mid = Math.floor((lo + hi) / 2);\n    return { val: nums[mid], left: build(lo, mid - 1), right: build(mid + 1, hi) };\n  }\n  return build(0, nums.length - 1);\n}",
+    "solution": "function kthSmallest(root, k) {\n  const stack = [];\n  let node = root;\n  while (node || stack.length) {\n    while (node) {\n      stack.push(node);\n      node = node.left;\n    }\n    node = stack.pop();\n    if (--k === 0) return node.val;\n    node = node.right;\n  }\n  return undefined;\n}\n\nfunction kthLargest(root, k) {\n  const stack = [];\n  let node = root;\n  while (node || stack.length) {\n    while (node) {\n      stack.push(node);\n      node = node.right;\n    }\n    node = stack.pop();\n    if (--k === 0) return node.val;\n    node = node.left;\n  }\n  return undefined;\n}\n\nfunction insertIntoBST(root, val) {\n  if (!root) return { val, left: null, right: null };\n  if (val < root.val) root.left = insertIntoBST(root.left, val);\n  else root.right = insertIntoBST(root.right, val);\n  return root;\n}\n\nfunction sortedArrayToBST(nums) {\n  function build(lo, hi) {\n    if (lo > hi) return null;\n    const mid = Math.floor((lo + hi) / 2);\n    return { val: nums[mid], left: build(lo, mid - 1), right: build(mid + 1, hi) };\n  }\n  return build(0, nums.length - 1);\n}",
+    "starterCode": "function kthSmallest(root, k) {\n  const stack = [];\n  let node = root;\n  while (node || stack.length) {\n    while (node) {\n      stack.push(node);\n      node = node.left;\n    }\n    node = stack.pop();\n    if (--k === 0) return node.val;\n    node = node.right;\n  }\n  return undefined;\n}\n\nfunction kthLargest(root, k) {\n  const stack = [];\n  let node = root;\n  while (node || stack.length) {\n    while (node) {\n      stack.push(node);\n      node = node.right;\n    }\n    node = stack.pop();\n    if (--k === 0) return node.val;\n    node = node.left;\n  }\n  return undefined;\n}\n\nfunction insertIntoBST(root, val) {\n  if (!root) return { val, left: null, right: null };\n  if (val < root.val) root.left = insertIntoBST(root.left, val);\n  else root.right = insertIntoBST(root.right, val);\n  return root;\n}\n\nfunction sortedArrayToBST(nums) {\n  function build(lo, hi) {\n    if (lo > hi) return null;\n    const mid = Math.floor((lo + hi) / 2);\n    return { val: nums[mid], left: build(lo, mid - 1), right: build(mid + 1, hi) };\n  }\n  return build(0, nums.length - 1);\n}",
+    "testCases": [
+      {
+        "description": "kthSmallest walks the in-order sequence",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst t = n(5, n(3, n(2, n(1)), n(4)), n(6));\n[kthSmallest(t, 1), kthSmallest(t, 3), kthSmallest(t, 6)]",
+        "expected": "[1, 3, 6]"
+      },
+      {
+        "description": "kthLargest walks the reverse in-order sequence",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst t = n(5, n(3, n(2, n(1)), n(4)), n(6));\n[kthLargest(t, 1), kthLargest(t, 2), kthLargest(t, 6)]",
+        "expected": "[6, 5, 1]"
+      },
+      {
+        "description": "kth on a single node",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[kthSmallest(n(7), 1), kthLargest(n(7), 1)]",
+        "expected": "[7, 7]"
+      },
+      {
+        "description": "insertIntoBST adds a leaf on the correct side",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\nser(insertIntoBST(n(4, n(2), n(7)), 5))",
+        "expected": "[4, [2, null, null], [7, [5, null, null], null]]"
+      },
+      {
+        "description": "insertIntoBST into a null tree and a smaller value",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n[ser(insertIntoBST(null, 5)), ser(insertIntoBST(n(4), 1))]",
+        "expected": "[[5, null, null], [4, [1, null, null], null]]"
+      },
+      {
+        "description": "insertIntoBST returns the same root object",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst root = n(4);\ninsertIntoBST(root, 9) === root",
+        "expected": "true"
+      },
+      {
+        "description": "sortedArrayToBST uses the lower middle index",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\nser(sortedArrayToBST([1, 2, 3, 4, 5]))",
+        "expected": "[3, [1, null, [2, null, null]], [4, null, [5, null, null]]]"
+      },
+      {
+        "description": "sortedArrayToBST: empty, single and two elements",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n[sortedArrayToBST([]), ser(sortedArrayToBST([9])), ser(sortedArrayToBST([1, 2]))]",
+        "expected": "[null, [9, null, null], [1, null, [2, null, null]]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"kthSmallest walks the in-order sequence\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const t = n(5, n(3, n(2, n(1)), n(4)), n(6));\n  return ([kthSmallest(t, 1), kthSmallest(t, 3), kthSmallest(t, 6)]);\n}, () => ([1, 3, 6]));\n\nawait $test.run(\"kthLargest walks the reverse in-order sequence\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const t = n(5, n(3, n(2, n(1)), n(4)), n(6));\n  return ([kthLargest(t, 1), kthLargest(t, 2), kthLargest(t, 6)]);\n}, () => ([6, 5, 1]));\n\nawait $test.run(\"kth on a single node\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([kthSmallest(n(7), 1), kthLargest(n(7), 1)]);\n}, () => ([7, 7]));\n\nawait $test.run(\"insertIntoBST adds a leaf on the correct side\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  return (ser(insertIntoBST(n(4, n(2), n(7)), 5)));\n}, () => ([4, [2, null, null], [7, [5, null, null], null]]));\n\nawait $test.run(\"insertIntoBST into a null tree and a smaller value\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  return ([ser(insertIntoBST(null, 5)), ser(insertIntoBST(n(4), 1))]);\n}, () => ([[5, null, null], [4, [1, null, null], null]]));\n\nawait $test.run(\"insertIntoBST returns the same root object\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const root = n(4);\n  return (insertIntoBST(root, 9) === root);\n}, () => (true));\n\nawait $test.run(\"sortedArrayToBST uses the lower middle index\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  return (ser(sortedArrayToBST([1, 2, 3, 4, 5])));\n}, () => ([3, [1, null, [2, null, null]], [4, null, [5, null, null]]]));\n\nawait $test.run(\"sortedArrayToBST: empty, single and two elements\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  return ([sortedArrayToBST([]), ser(sortedArrayToBST([9])), ser(sortedArrayToBST([1, 2]))]);\n}, () => ([null, [9, null, null], [1, null, [2, null, null]]]));",
+    "targetTime": "O(h + k)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "In-order traversal stops after k nodes; inserting walks one root-to-leaf path; building splits the array in halves."
+  },
+  {
+    "id": "list-add-numbers",
+    "track": "algorithms",
+    "title": "Linked Lists: Add Two Numbers, Odd-Even, Intersection",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "linked-list",
+      "carry",
+      "two-pointer"
+    ],
+    "promptSeed": "List nodes are { val, next } (null ends the list). Write addTwoNumbers(l1, l2): the digits are stored in REVERSE order (2 -> 4 -> 3 is 342); return the sum as a new list in the same format, handling different lengths and a final carry. Write oddEvenList(head): group all nodes at odd positions (1st, 3rd, ...) first, then the even positions, keeping relative order, in place and O(1) space. Write getIntersectionNode(a, b): the first NODE (by identity) shared by two lists that merge into one tail, or null if they never meet, without extra memory.",
+    "difficulty": 3,
+    "concept": "linked-lists",
+    "referenceSolution": "function addTwoNumbers(l1, l2) {\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  let carry = 0;\n  while (l1 || l2 || carry) {\n    const sum = (l1 ? l1.val : 0) + (l2 ? l2.val : 0) + carry;\n    carry = Math.floor(sum / 10);\n    tail.next = { val: sum % 10, next: null };\n    tail = tail.next;\n    l1 = l1 ? l1.next : null;\n    l2 = l2 ? l2.next : null;\n  }\n  return dummy.next;\n}\n\nfunction oddEvenList(head) {\n  if (!head || !head.next) return head;\n  let odd = head;\n  let even = head.next;\n  const evenHead = even;\n  while (even && even.next) {\n    odd.next = even.next;\n    odd = odd.next;\n    even.next = odd.next;\n    even = even.next;\n  }\n  odd.next = evenHead;\n  return head;\n}\n\nfunction getIntersectionNode(a, b) {\n  let p = a;\n  let q = b;\n  while (p !== q) {\n    p = p ? p.next : b;\n    q = q ? q.next : a;\n  }\n  return p;\n}",
+    "solution": "function addTwoNumbers(l1, l2) {\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  let carry = 0;\n  while (l1 || l2 || carry) {\n    const sum = (l1 ? l1.val : 0) + (l2 ? l2.val : 0) + carry;\n    carry = Math.floor(sum / 10);\n    tail.next = { val: sum % 10, next: null };\n    tail = tail.next;\n    l1 = l1 ? l1.next : null;\n    l2 = l2 ? l2.next : null;\n  }\n  return dummy.next;\n}\n\nfunction oddEvenList(head) {\n  if (!head || !head.next) return head;\n  let odd = head;\n  let even = head.next;\n  const evenHead = even;\n  while (even && even.next) {\n    odd.next = even.next;\n    odd = odd.next;\n    even.next = odd.next;\n    even = even.next;\n  }\n  odd.next = evenHead;\n  return head;\n}\n\nfunction getIntersectionNode(a, b) {\n  let p = a;\n  let q = b;\n  while (p !== q) {\n    p = p ? p.next : b;\n    q = q ? q.next : a;\n  }\n  return p;\n}",
+    "starterCode": "function addTwoNumbers(l1, l2) {\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  let carry = 0;\n  while (l1 || l2 || carry) {\n    const sum = (l1 ? l1.val : 0) + (l2 ? l2.val : 0) + carry;\n    carry = Math.floor(sum / 10);\n    tail.next = { val: sum % 10, next: null };\n    tail = tail.next;\n    l1 = l1 ? l1.next : null;\n    l2 = l2 ? l2.next : null;\n  }\n  return dummy.next;\n}\n\nfunction oddEvenList(head) {\n  if (!head || !head.next) return head;\n  let odd = head;\n  let even = head.next;\n  const evenHead = even;\n  while (even && even.next) {\n    odd.next = even.next;\n    odd = odd.next;\n    even.next = odd.next;\n    even = even.next;\n  }\n  odd.next = evenHead;\n  return head;\n}\n\nfunction getIntersectionNode(a, b) {\n  let p = a;\n  let q = b;\n  while (p !== q) {\n    p = p ? p.next : b;\n    q = q ? q.next : a;\n  }\n  return p;\n}",
+    "testCases": [
+      {
+        "description": "addTwoNumbers adds reversed-digit lists",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(addTwoNumbers(list(2, 4, 3), list(5, 6, 4)))",
+        "expected": "[7, 0, 8]"
+      },
+      {
+        "description": "addTwoNumbers handles different lengths and a final carry",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(addTwoNumbers(list(9, 9, 9, 9), list(1))), toArray(addTwoNumbers(list(5), list(5)))]",
+        "expected": "[[0, 0, 0, 0, 1], [0, 1]]"
+      },
+      {
+        "description": "addTwoNumbers with zeros",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(addTwoNumbers(list(0), list(0)))",
+        "expected": "[0]"
+      },
+      {
+        "description": "addTwoNumbers builds a new list (inputs untouched)",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst a = list(1, 2);\nconst b = list(3);\naddTwoNumbers(a, b);\n[toArray(a), toArray(b)]",
+        "expected": "[[1, 2], [3]]"
+      },
+      {
+        "description": "oddEvenList groups odd positions first",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(oddEvenList(list(1, 2, 3, 4, 5))), toArray(oddEvenList(list(2, 1, 3, 5, 6, 4, 7)))]",
+        "expected": "[[1, 3, 5, 2, 4], [2, 3, 6, 7, 1, 5, 4]]"
+      },
+      {
+        "description": "oddEvenList: null, one and two nodes",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[oddEvenList(null), toArray(oddEvenList(list(1))), toArray(oddEvenList(list(1, 2)))]",
+        "expected": "[null, [1], [1, 2]]"
+      },
+      {
+        "description": "getIntersectionNode returns the shared node",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst shared = list(8, 4, 5);\nconst a = list(4, 1); a.next.next = shared;\nconst b = list(5, 6, 1); b.next.next.next = shared;\ngetIntersectionNode(a, b) === shared",
+        "expected": "true"
+      },
+      {
+        "description": "getIntersectionNode returns null when lists never meet",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ngetIntersectionNode(list(1, 2), list(1, 2, 3))",
+        "expected": "null"
+      },
+      {
+        "description": "getIntersectionNode with identical heads and empty input",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst a = list(1, 2);\n[getIntersectionNode(a, a) === a, getIntersectionNode(null, a)]",
+        "expected": "[true, null]"
+      }
+    ],
+    "testHarness": "await $test.run(\"addTwoNumbers adds reversed-digit lists\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(addTwoNumbers(list(2, 4, 3), list(5, 6, 4))));\n}, () => ([7, 0, 8]));\n\nawait $test.run(\"addTwoNumbers handles different lengths and a final carry\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(addTwoNumbers(list(9, 9, 9, 9), list(1))), toArray(addTwoNumbers(list(5), list(5)))]);\n}, () => ([[0, 0, 0, 0, 1], [0, 1]]));\n\nawait $test.run(\"addTwoNumbers with zeros\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(addTwoNumbers(list(0), list(0))));\n}, () => ([0]));\n\nawait $test.run(\"addTwoNumbers builds a new list (inputs untouched)\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const a = list(1, 2);\n  const b = list(3);\n  addTwoNumbers(a, b);\n  return ([toArray(a), toArray(b)]);\n}, () => ([[1, 2], [3]]));\n\nawait $test.run(\"oddEvenList groups odd positions first\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(oddEvenList(list(1, 2, 3, 4, 5))), toArray(oddEvenList(list(2, 1, 3, 5, 6, 4, 7)))]);\n}, () => ([[1, 3, 5, 2, 4], [2, 3, 6, 7, 1, 5, 4]]));\n\nawait $test.run(\"oddEvenList: null, one and two nodes\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([oddEvenList(null), toArray(oddEvenList(list(1))), toArray(oddEvenList(list(1, 2)))]);\n}, () => ([null, [1], [1, 2]]));\n\nawait $test.run(\"getIntersectionNode returns the shared node\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const shared = list(8, 4, 5);\n  const a = list(4, 1); a.next.next = shared;\n  const b = list(5, 6, 1); b.next.next.next = shared;\n  return (getIntersectionNode(a, b) === shared);\n}, () => (true));\n\nawait $test.run(\"getIntersectionNode returns null when lists never meet\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (getIntersectionNode(list(1, 2), list(1, 2, 3)));\n}, () => (null));\n\nawait $test.run(\"getIntersectionNode with identical heads and empty input\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const a = list(1, 2);\n  return ([getIntersectionNode(a, a) === a, getIntersectionNode(null, a)]);\n}, () => ([true, null]));",
+    "targetTime": "O(n + m)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each pass visits every node once; only the carry or a few pointers are kept (the sum list itself is output)."
+  },
+  {
+    "id": "list-remove-reorder",
+    "track": "algorithms",
+    "title": "Linked Lists: Remove Nth From End, Reorder, Remove Duplicates",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "linked-list",
+      "two-pointer",
+      "in-place"
+    ],
+    "promptSeed": "List nodes are { val, next } (null ends the list). Write removeNthFromEnd(head, n): remove the n-th node from the end in one pass (two pointers n apart; n is valid) and return the head. Write reorderList(head): rearrange in place to L0 -> Ln -> L1 -> Ln-1 -> ... (find the middle, reverse the second half, interleave); it returns nothing. Write deleteDuplicates(head): in a SORTED list keep one copy of each value and return the head.",
+    "difficulty": 2,
+    "concept": "linked-lists",
+    "referenceSolution": "function removeNthFromEnd(head, n) {\n  const dummy = { val: 0, next: head };\n  let fast = dummy;\n  let slow = dummy;\n  for (let i = 0; i < n; i++) fast = fast.next;\n  while (fast.next) {\n    fast = fast.next;\n    slow = slow.next;\n  }\n  slow.next = slow.next.next;\n  return dummy.next;\n}\n\nfunction reorderList(head) {\n  if (!head || !head.next) return;\n  let slow = head;\n  let fast = head;\n  while (fast.next && fast.next.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n  }\n  let second = slow.next;\n  slow.next = null;\n  let prev = null;\n  while (second) {\n    const next = second.next;\n    second.next = prev;\n    prev = second;\n    second = next;\n  }\n  let first = head;\n  second = prev;\n  while (second) {\n    const a = first.next;\n    const b = second.next;\n    first.next = second;\n    second.next = a;\n    first = a;\n    second = b;\n  }\n}\n\nfunction deleteDuplicates(head) {\n  let node = head;\n  while (node && node.next) {\n    if (node.next.val === node.val) node.next = node.next.next;\n    else node = node.next;\n  }\n  return head;\n}",
+    "solution": "function removeNthFromEnd(head, n) {\n  const dummy = { val: 0, next: head };\n  let fast = dummy;\n  let slow = dummy;\n  for (let i = 0; i < n; i++) fast = fast.next;\n  while (fast.next) {\n    fast = fast.next;\n    slow = slow.next;\n  }\n  slow.next = slow.next.next;\n  return dummy.next;\n}\n\nfunction reorderList(head) {\n  if (!head || !head.next) return;\n  let slow = head;\n  let fast = head;\n  while (fast.next && fast.next.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n  }\n  let second = slow.next;\n  slow.next = null;\n  let prev = null;\n  while (second) {\n    const next = second.next;\n    second.next = prev;\n    prev = second;\n    second = next;\n  }\n  let first = head;\n  second = prev;\n  while (second) {\n    const a = first.next;\n    const b = second.next;\n    first.next = second;\n    second.next = a;\n    first = a;\n    second = b;\n  }\n}\n\nfunction deleteDuplicates(head) {\n  let node = head;\n  while (node && node.next) {\n    if (node.next.val === node.val) node.next = node.next.next;\n    else node = node.next;\n  }\n  return head;\n}",
+    "starterCode": "function removeNthFromEnd(head, n) {\n  const dummy = { val: 0, next: head };\n  let fast = dummy;\n  let slow = dummy;\n  for (let i = 0; i < n; i++) fast = fast.next;\n  while (fast.next) {\n    fast = fast.next;\n    slow = slow.next;\n  }\n  slow.next = slow.next.next;\n  return dummy.next;\n}\n\nfunction reorderList(head) {\n  if (!head || !head.next) return;\n  let slow = head;\n  let fast = head;\n  while (fast.next && fast.next.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n  }\n  let second = slow.next;\n  slow.next = null;\n  let prev = null;\n  while (second) {\n    const next = second.next;\n    second.next = prev;\n    prev = second;\n    second = next;\n  }\n  let first = head;\n  second = prev;\n  while (second) {\n    const a = first.next;\n    const b = second.next;\n    first.next = second;\n    second.next = a;\n    first = a;\n    second = b;\n  }\n}\n\nfunction deleteDuplicates(head) {\n  let node = head;\n  while (node && node.next) {\n    if (node.next.val === node.val) node.next = node.next.next;\n    else node = node.next;\n  }\n  return head;\n}",
+    "testCases": [
+      {
+        "description": "removeNthFromEnd removes from the middle",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(removeNthFromEnd(list(1, 2, 3, 4, 5), 2))",
+        "expected": "[1, 2, 3, 5]"
+      },
+      {
+        "description": "removeNthFromEnd can remove the head or the tail",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(removeNthFromEnd(list(1, 2), 2)), toArray(removeNthFromEnd(list(1, 2), 1))]",
+        "expected": "[[2], [1]]"
+      },
+      {
+        "description": "removeNthFromEnd of a single node leaves an empty list",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nremoveNthFromEnd(list(1), 1)",
+        "expected": "null"
+      },
+      {
+        "description": "reorderList interleaves ends (even length)",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst h = list(1, 2, 3, 4);\nconst r = reorderList(h);\n[r, toArray(h)]",
+        "expected": "[undefined, [1, 4, 2, 3]]"
+      },
+      {
+        "description": "reorderList (odd length)",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst h = list(1, 2, 3, 4, 5);\nreorderList(h);\ntoArray(h)",
+        "expected": "[1, 5, 2, 4, 3]"
+      },
+      {
+        "description": "reorderList leaves tiny lists alone",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst a = list(1);\nconst b = list(1, 2);\nreorderList(a); reorderList(b);\n[toArray(a), toArray(b)]",
+        "expected": "[[1], [1, 2]]"
+      },
+      {
+        "description": "deleteDuplicates keeps one of each value",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(deleteDuplicates(list(1, 1, 2, 3, 3))), toArray(deleteDuplicates(list(2, 2, 2)))]",
+        "expected": "[[1, 2, 3], [2]]"
+      },
+      {
+        "description": "deleteDuplicates: empty and already unique",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[deleteDuplicates(null), toArray(deleteDuplicates(list(1, 2, 3)))]",
+        "expected": "[null, [1, 2, 3]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"removeNthFromEnd removes from the middle\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(removeNthFromEnd(list(1, 2, 3, 4, 5), 2)));\n}, () => ([1, 2, 3, 5]));\n\nawait $test.run(\"removeNthFromEnd can remove the head or the tail\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(removeNthFromEnd(list(1, 2), 2)), toArray(removeNthFromEnd(list(1, 2), 1))]);\n}, () => ([[2], [1]]));\n\nawait $test.run(\"removeNthFromEnd of a single node leaves an empty list\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (removeNthFromEnd(list(1), 1));\n}, () => (null));\n\nawait $test.run(\"reorderList interleaves ends (even length)\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const h = list(1, 2, 3, 4);\n  const r = reorderList(h);\n  return ([r, toArray(h)]);\n}, () => ([undefined, [1, 4, 2, 3]]));\n\nawait $test.run(\"reorderList (odd length)\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const h = list(1, 2, 3, 4, 5);\n  reorderList(h);\n  return (toArray(h));\n}, () => ([1, 5, 2, 4, 3]));\n\nawait $test.run(\"reorderList leaves tiny lists alone\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const a = list(1);\n  const b = list(1, 2);\n  reorderList(a); reorderList(b);\n  return ([toArray(a), toArray(b)]);\n}, () => ([[1], [1, 2]]));\n\nawait $test.run(\"deleteDuplicates keeps one of each value\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(deleteDuplicates(list(1, 1, 2, 3, 3))), toArray(deleteDuplicates(list(2, 2, 2)))]);\n}, () => ([[1, 2, 3], [2]]));\n\nawait $test.run(\"deleteDuplicates: empty and already unique\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([deleteDuplicates(null), toArray(deleteDuplicates(list(1, 2, 3)))]);\n}, () => ([null, [1, 2, 3]]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each function walks the list a constant number of times, relinking nodes in place."
+  },
+  {
+    "id": "list-reverse-k-group",
+    "track": "algorithms",
+    "title": "Linked Lists: Reverse in K-Groups, Reverse Between, Swap Pairs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "linked-list",
+      "reversal",
+      "pointers"
+    ],
+    "promptSeed": "List nodes are { val, next } (null ends the list). Write reverseKGroup(head, k): reverse the nodes k at a time and return the new head; a final group shorter than k stays as it is (k >= 1). Write reverseBetween(head, left, right): reverse only the nodes from position left to position right (1-indexed, inclusive) in one pass. Write swapPairs(head): swap every two adjacent nodes by relinking nodes (not by changing values).",
+    "difficulty": 4,
+    "concept": "linked-lists",
+    "referenceSolution": "function reverseKGroup(head, k) {\n  let probe = head;\n  for (let i = 0; i < k; i++) {\n    if (!probe) return head;\n    probe = probe.next;\n  }\n  let prev = reverseKGroup(probe, k);\n  let cur = head;\n  for (let i = 0; i < k; i++) {\n    const next = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}\n\nfunction reverseBetween(head, left, right) {\n  const dummy = { val: 0, next: head };\n  let prev = dummy;\n  for (let i = 0; i < left - 1; i++) prev = prev.next;\n  const cur = prev.next;\n  for (let i = 0; i < right - left; i++) {\n    const move = cur.next;\n    cur.next = move.next;\n    move.next = prev.next;\n    prev.next = move;\n  }\n  return dummy.next;\n}\n\nfunction swapPairs(head) {\n  const dummy = { val: 0, next: head };\n  let prev = dummy;\n  while (prev.next && prev.next.next) {\n    const a = prev.next;\n    const b = a.next;\n    a.next = b.next;\n    b.next = a;\n    prev.next = b;\n    prev = a;\n  }\n  return dummy.next;\n}",
+    "solution": "function reverseKGroup(head, k) {\n  let probe = head;\n  for (let i = 0; i < k; i++) {\n    if (!probe) return head;\n    probe = probe.next;\n  }\n  let prev = reverseKGroup(probe, k);\n  let cur = head;\n  for (let i = 0; i < k; i++) {\n    const next = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}\n\nfunction reverseBetween(head, left, right) {\n  const dummy = { val: 0, next: head };\n  let prev = dummy;\n  for (let i = 0; i < left - 1; i++) prev = prev.next;\n  const cur = prev.next;\n  for (let i = 0; i < right - left; i++) {\n    const move = cur.next;\n    cur.next = move.next;\n    move.next = prev.next;\n    prev.next = move;\n  }\n  return dummy.next;\n}\n\nfunction swapPairs(head) {\n  const dummy = { val: 0, next: head };\n  let prev = dummy;\n  while (prev.next && prev.next.next) {\n    const a = prev.next;\n    const b = a.next;\n    a.next = b.next;\n    b.next = a;\n    prev.next = b;\n    prev = a;\n  }\n  return dummy.next;\n}",
+    "starterCode": "function reverseKGroup(head, k) {\n  let probe = head;\n  for (let i = 0; i < k; i++) {\n    if (!probe) return head;\n    probe = probe.next;\n  }\n  let prev = reverseKGroup(probe, k);\n  let cur = head;\n  for (let i = 0; i < k; i++) {\n    const next = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}\n\nfunction reverseBetween(head, left, right) {\n  const dummy = { val: 0, next: head };\n  let prev = dummy;\n  for (let i = 0; i < left - 1; i++) prev = prev.next;\n  const cur = prev.next;\n  for (let i = 0; i < right - left; i++) {\n    const move = cur.next;\n    cur.next = move.next;\n    move.next = prev.next;\n    prev.next = move;\n  }\n  return dummy.next;\n}\n\nfunction swapPairs(head) {\n  const dummy = { val: 0, next: head };\n  let prev = dummy;\n  while (prev.next && prev.next.next) {\n    const a = prev.next;\n    const b = a.next;\n    a.next = b.next;\n    b.next = a;\n    prev.next = b;\n    prev = a;\n  }\n  return dummy.next;\n}",
+    "testCases": [
+      {
+        "description": "reverseKGroup reverses full groups only",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(reverseKGroup(list(1, 2, 3, 4, 5), 2)), toArray(reverseKGroup(list(1, 2, 3, 4, 5), 3))]",
+        "expected": "[[2, 1, 4, 3, 5], [3, 2, 1, 4, 5]]"
+      },
+      {
+        "description": "reverseKGroup with k equal to the length and with k = 1",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(reverseKGroup(list(1, 2, 3, 4), 4)), toArray(reverseKGroup(list(1, 2, 3), 1))]",
+        "expected": "[[4, 3, 2, 1], [1, 2, 3]]"
+      },
+      {
+        "description": "reverseKGroup with k larger than the list",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(reverseKGroup(list(1, 2), 5)), reverseKGroup(null, 2)]",
+        "expected": "[[1, 2], null]"
+      },
+      {
+        "description": "reverseBetween reverses a middle segment",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(reverseBetween(list(1, 2, 3, 4, 5), 2, 4))",
+        "expected": "[1, 4, 3, 2, 5]"
+      },
+      {
+        "description": "reverseBetween can cover the whole list or a single node",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(reverseBetween(list(1, 2, 3, 4, 5), 1, 5)), toArray(reverseBetween(list(5), 1, 1)), toArray(reverseBetween(list(1, 2, 3), 2, 2))]",
+        "expected": "[[5, 4, 3, 2, 1], [5], [1, 2, 3]]"
+      },
+      {
+        "description": "reverseBetween ending at the tail",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(reverseBetween(list(1, 2, 3, 4), 3, 4))",
+        "expected": "[1, 2, 4, 3]"
+      },
+      {
+        "description": "swapPairs swaps neighbours",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[toArray(swapPairs(list(1, 2, 3, 4))), toArray(swapPairs(list(1, 2, 3)))]",
+        "expected": "[[2, 1, 4, 3], [2, 1, 3]]"
+      },
+      {
+        "description": "swapPairs: empty and single node",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n[swapPairs(null), toArray(swapPairs(list(1)))]",
+        "expected": "[null, [1]]"
+      },
+      {
+        "description": "swapPairs relinks nodes rather than copying values",
+        "input": "const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\nconst a = list(1, 2);\nconst second = a.next;\nswapPairs(a) === second",
+        "expected": "true"
+      }
+    ],
+    "testHarness": "await $test.run(\"reverseKGroup reverses full groups only\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(reverseKGroup(list(1, 2, 3, 4, 5), 2)), toArray(reverseKGroup(list(1, 2, 3, 4, 5), 3))]);\n}, () => ([[2, 1, 4, 3, 5], [3, 2, 1, 4, 5]]));\n\nawait $test.run(\"reverseKGroup with k equal to the length and with k = 1\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(reverseKGroup(list(1, 2, 3, 4), 4)), toArray(reverseKGroup(list(1, 2, 3), 1))]);\n}, () => ([[4, 3, 2, 1], [1, 2, 3]]));\n\nawait $test.run(\"reverseKGroup with k larger than the list\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(reverseKGroup(list(1, 2), 5)), reverseKGroup(null, 2)]);\n}, () => ([[1, 2], null]));\n\nawait $test.run(\"reverseBetween reverses a middle segment\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(reverseBetween(list(1, 2, 3, 4, 5), 2, 4)));\n}, () => ([1, 4, 3, 2, 5]));\n\nawait $test.run(\"reverseBetween can cover the whole list or a single node\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(reverseBetween(list(1, 2, 3, 4, 5), 1, 5)), toArray(reverseBetween(list(5), 1, 1)), toArray(reverseBetween(list(1, 2, 3), 2, 2))]);\n}, () => ([[5, 4, 3, 2, 1], [5], [1, 2, 3]]));\n\nawait $test.run(\"reverseBetween ending at the tail\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return (toArray(reverseBetween(list(1, 2, 3, 4), 3, 4)));\n}, () => ([1, 2, 4, 3]));\n\nawait $test.run(\"swapPairs swaps neighbours\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([toArray(swapPairs(list(1, 2, 3, 4))), toArray(swapPairs(list(1, 2, 3)))]);\n}, () => ([[2, 1, 4, 3], [2, 1, 3]]));\n\nawait $test.run(\"swapPairs: empty and single node\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  return ([swapPairs(null), toArray(swapPairs(list(1)))]);\n}, () => ([null, [1]]));\n\nawait $test.run(\"swapPairs relinks nodes rather than copying values\", async () => {\n  const sleep = $test.sleep;\n  const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\n  const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\n  const a = list(1, 2);\n  const second = a.next;\n  return (swapPairs(a) === second);\n}, () => (true));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n / k)",
+    "complexityExplanation": "Every node is relinked once; the recursive k-group version keeps one frame per group."
+  },
+  {
+    "id": "tree-build-serialize",
+    "track": "algorithms",
+    "title": "Trees: Build from Preorder + Inorder, Serialize / Deserialize",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "recursion",
+      "serialization"
+    ],
+    "promptSeed": "Tree nodes are { val, left, right } (null for a missing child). Write buildTree(preorder, inorder): rebuild the tree from its preorder and inorder arrays (all values distinct; [] gives null) in O(n) using a value-to-index map. Write serialize(root): any string encoding of the tree (it must handle null, negative and multi-digit values), and deserialize(str): the exact inverse, so deserialize(serialize(t)) rebuilds a tree structurally equal to t and deserialize(serialize(null)) is null.",
+    "difficulty": 4,
+    "concept": "trees",
+    "referenceSolution": "function buildTree(preorder, inorder) {\n  const index = new Map(inorder.map((v, i) => [v, i]));\n  let p = 0;\n  function build(lo, hi) {\n    if (lo > hi) return null;\n    const val = preorder[p++];\n    const mid = index.get(val);\n    const left = build(lo, mid - 1);\n    const right = build(mid + 1, hi);\n    return { val, left, right };\n  }\n  return build(0, inorder.length - 1);\n}\n\nfunction serialize(root) {\n  const out = [];\n  (function walk(node) {\n    if (!node) {\n      out.push('#');\n      return;\n    }\n    out.push(String(node.val));\n    walk(node.left);\n    walk(node.right);\n  })(root);\n  return out.join(',');\n}\n\nfunction deserialize(str) {\n  const parts = str.split(',');\n  let i = 0;\n  function build() {\n    const token = parts[i++];\n    if (token === '#') return null;\n    const left = build();\n    const right = build();\n    return { val: Number(token), left, right };\n  }\n  return build();\n}",
+    "solution": "function buildTree(preorder, inorder) {\n  const index = new Map(inorder.map((v, i) => [v, i]));\n  let p = 0;\n  function build(lo, hi) {\n    if (lo > hi) return null;\n    const val = preorder[p++];\n    const mid = index.get(val);\n    const left = build(lo, mid - 1);\n    const right = build(mid + 1, hi);\n    return { val, left, right };\n  }\n  return build(0, inorder.length - 1);\n}\n\nfunction serialize(root) {\n  const out = [];\n  (function walk(node) {\n    if (!node) {\n      out.push('#');\n      return;\n    }\n    out.push(String(node.val));\n    walk(node.left);\n    walk(node.right);\n  })(root);\n  return out.join(',');\n}\n\nfunction deserialize(str) {\n  const parts = str.split(',');\n  let i = 0;\n  function build() {\n    const token = parts[i++];\n    if (token === '#') return null;\n    const left = build();\n    const right = build();\n    return { val: Number(token), left, right };\n  }\n  return build();\n}",
+    "starterCode": "function buildTree(preorder, inorder) {\n  const index = new Map(inorder.map((v, i) => [v, i]));\n  let p = 0;\n  function build(lo, hi) {\n    if (lo > hi) return null;\n    const val = preorder[p++];\n    const mid = index.get(val);\n    const left = build(lo, mid - 1);\n    const right = build(mid + 1, hi);\n    return { val, left, right };\n  }\n  return build(0, inorder.length - 1);\n}\n\nfunction serialize(root) {\n  const out = [];\n  (function walk(node) {\n    if (!node) {\n      out.push('#');\n      return;\n    }\n    out.push(String(node.val));\n    walk(node.left);\n    walk(node.right);\n  })(root);\n  return out.join(',');\n}\n\nfunction deserialize(str) {\n  const parts = str.split(',');\n  let i = 0;\n  function build() {\n    const token = parts[i++];\n    if (token === '#') return null;\n    const left = build();\n    const right = build();\n    return { val: Number(token), left, right };\n  }\n  return build();\n}",
+    "testCases": [
+      {
+        "description": "buildTree from preorder and inorder",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\nser(buildTree([3, 9, 20, 15, 7], [9, 3, 15, 20, 7]))",
+        "expected": "[3, [9, null, null], [20, [15, null, null], [7, null, null]]]"
+      },
+      {
+        "description": "buildTree: empty and single value",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n[buildTree([], []), ser(buildTree([-1], [-1]))]",
+        "expected": "[null, [-1, null, null]]"
+      },
+      {
+        "description": "buildTree with a left-leaning chain",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\nser(buildTree([1, 2, 3], [3, 2, 1]))",
+        "expected": "[1, [2, [3, null, null], null], null]"
+      },
+      {
+        "description": "buildTree with a right-leaning chain",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\nser(buildTree([1, 2, 3], [1, 2, 3]))",
+        "expected": "[1, null, [2, null, [3, null, null]]]"
+      },
+      {
+        "description": "serialize returns a string and handles null",
+        "input": "[typeof serialize(null), deserialize(serialize(null))]",
+        "expected": "['string', null]"
+      },
+      {
+        "description": "round trip rebuilds a balanced tree",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\nconst t = n(1, n(2, n(4), n(5)), n(3));\nJSON.stringify(ser(deserialize(serialize(t)))) === JSON.stringify(ser(t))",
+        "expected": "true"
+      },
+      {
+        "description": "round trip keeps negative and multi-digit values",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\nconst t = n(-10, n(20, null, n(-3)), n(300, n(15)));\nJSON.stringify(ser(deserialize(serialize(t)))) === JSON.stringify(ser(t))",
+        "expected": "true"
+      },
+      {
+        "description": "round trip preserves left versus right children",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\nconst l = n(1, n(2));\nconst r = n(1, null, n(2));\n[JSON.stringify(ser(deserialize(serialize(l)))) === JSON.stringify(ser(l)), JSON.stringify(ser(deserialize(serialize(r)))) === JSON.stringify(ser(r)), serialize(l) !== serialize(r)]",
+        "expected": "[true, true, true]"
+      }
+    ],
+    "testHarness": "await $test.run(\"buildTree from preorder and inorder\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  return (ser(buildTree([3, 9, 20, 15, 7], [9, 3, 15, 20, 7])));\n}, () => ([3, [9, null, null], [20, [15, null, null], [7, null, null]]]));\n\nawait $test.run(\"buildTree: empty and single value\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  return ([buildTree([], []), ser(buildTree([-1], [-1]))]);\n}, () => ([null, [-1, null, null]]));\n\nawait $test.run(\"buildTree with a left-leaning chain\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  return (ser(buildTree([1, 2, 3], [3, 2, 1])));\n}, () => ([1, [2, [3, null, null], null], null]));\n\nawait $test.run(\"buildTree with a right-leaning chain\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  return (ser(buildTree([1, 2, 3], [1, 2, 3])));\n}, () => ([1, null, [2, null, [3, null, null]]]));\n\nawait $test.run(\"serialize returns a string and handles null\", async () => {\n  const sleep = $test.sleep;\n  return ([typeof serialize(null), deserialize(serialize(null))]);\n}, () => (['string', null]));\n\nawait $test.run(\"round trip rebuilds a balanced tree\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  const t = n(1, n(2, n(4), n(5)), n(3));\n  return (JSON.stringify(ser(deserialize(serialize(t)))) === JSON.stringify(ser(t)));\n}, () => (true));\n\nawait $test.run(\"round trip keeps negative and multi-digit values\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  const t = n(-10, n(20, null, n(-3)), n(300, n(15)));\n  return (JSON.stringify(ser(deserialize(serialize(t)))) === JSON.stringify(ser(t)));\n}, () => (true));\n\nawait $test.run(\"round trip preserves left versus right children\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const ser = (t) => (t ? [t.val, ser(t.left), ser(t.right)] : null);\n  const l = n(1, n(2));\n  const r = n(1, null, n(2));\n  return ([JSON.stringify(ser(deserialize(serialize(l)))) === JSON.stringify(ser(l)), JSON.stringify(ser(deserialize(serialize(r)))) === JSON.stringify(ser(r)), serialize(l) !== serialize(r)]);\n}, () => ([true, true, true]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "An index map of the inorder array gives O(1) root lookup; serialization visits every node once."
+  },
+  {
+    "id": "tree-diameter-balanced",
+    "track": "algorithms",
+    "title": "Trees: Diameter, Balanced, Symmetric",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "dfs",
+      "height"
+    ],
+    "promptSeed": "Tree nodes are { val, left, right } (null for a missing child). Write diameterOfBinaryTree(root): the number of EDGES on the longest path between any two nodes (the path need not pass through the root; 0 for null or one node). Write isBalanced(root): true when at every node the left and right heights differ by at most 1, in a single O(n) pass. Write isSymmetric(root): true when the tree is a mirror image of itself (null is symmetric).",
+    "difficulty": 3,
+    "concept": "trees",
+    "referenceSolution": "function diameterOfBinaryTree(root) {\n  let best = 0;\n  function height(node) {\n    if (!node) return 0;\n    const left = height(node.left);\n    const right = height(node.right);\n    best = Math.max(best, left + right);\n    return 1 + Math.max(left, right);\n  }\n  height(root);\n  return best;\n}\n\nfunction isBalanced(root) {\n  function height(node) {\n    if (!node) return 0;\n    const left = height(node.left);\n    if (left === -1) return -1;\n    const right = height(node.right);\n    if (right === -1) return -1;\n    return Math.abs(left - right) > 1 ? -1 : 1 + Math.max(left, right);\n  }\n  return height(root) !== -1;\n}\n\nfunction isSymmetric(root) {\n  function mirror(a, b) {\n    if (!a && !b) return true;\n    if (!a || !b) return false;\n    return a.val === b.val && mirror(a.left, b.right) && mirror(a.right, b.left);\n  }\n  return !root || mirror(root.left, root.right);\n}",
+    "solution": "function diameterOfBinaryTree(root) {\n  let best = 0;\n  function height(node) {\n    if (!node) return 0;\n    const left = height(node.left);\n    const right = height(node.right);\n    best = Math.max(best, left + right);\n    return 1 + Math.max(left, right);\n  }\n  height(root);\n  return best;\n}\n\nfunction isBalanced(root) {\n  function height(node) {\n    if (!node) return 0;\n    const left = height(node.left);\n    if (left === -1) return -1;\n    const right = height(node.right);\n    if (right === -1) return -1;\n    return Math.abs(left - right) > 1 ? -1 : 1 + Math.max(left, right);\n  }\n  return height(root) !== -1;\n}\n\nfunction isSymmetric(root) {\n  function mirror(a, b) {\n    if (!a && !b) return true;\n    if (!a || !b) return false;\n    return a.val === b.val && mirror(a.left, b.right) && mirror(a.right, b.left);\n  }\n  return !root || mirror(root.left, root.right);\n}",
+    "starterCode": "function diameterOfBinaryTree(root) {\n  let best = 0;\n  function height(node) {\n    if (!node) return 0;\n    const left = height(node.left);\n    const right = height(node.right);\n    best = Math.max(best, left + right);\n    return 1 + Math.max(left, right);\n  }\n  height(root);\n  return best;\n}\n\nfunction isBalanced(root) {\n  function height(node) {\n    if (!node) return 0;\n    const left = height(node.left);\n    if (left === -1) return -1;\n    const right = height(node.right);\n    if (right === -1) return -1;\n    return Math.abs(left - right) > 1 ? -1 : 1 + Math.max(left, right);\n  }\n  return height(root) !== -1;\n}\n\nfunction isSymmetric(root) {\n  function mirror(a, b) {\n    if (!a && !b) return true;\n    if (!a || !b) return false;\n    return a.val === b.val && mirror(a.left, b.right) && mirror(a.right, b.left);\n  }\n  return !root || mirror(root.left, root.right);\n}",
+    "testCases": [
+      {
+        "description": "diameterOfBinaryTree counts edges on the longest path",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\ndiameterOfBinaryTree(n(1, n(2, n(4), n(5)), n(3)))",
+        "expected": "3"
+      },
+      {
+        "description": "diameterOfBinaryTree: null, single node and a chain",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[diameterOfBinaryTree(null), diameterOfBinaryTree(n(1)), diameterOfBinaryTree(n(1, n(2, n(3))))]",
+        "expected": "[0, 0, 2]"
+      },
+      {
+        "description": "diameterOfBinaryTree need not pass through the root",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst deep = n(2, n(3, n(4, n(5)), n(6, null, n(7))));\ndiameterOfBinaryTree(n(1, deep))",
+        "expected": "4"
+      },
+      {
+        "description": "isBalanced accepts balanced trees",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[isBalanced(n(1, n(2, n(4), n(5)), n(3))), isBalanced(null), isBalanced(n(1))]",
+        "expected": "[true, true, true]"
+      },
+      {
+        "description": "isBalanced rejects a chain of three",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nisBalanced(n(1, n(2, n(3))))",
+        "expected": "false"
+      },
+      {
+        "description": "isBalanced checks every node, not just the root",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nisBalanced(n(1, n(2, n(3, n(4, n(8))), n(5)), n(6, n(7, n(9)))))",
+        "expected": "false"
+      },
+      {
+        "description": "isSymmetric accepts a mirror image",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[isSymmetric(n(1, n(2, n(3), n(4)), n(2, n(4), n(3)))), isSymmetric(null), isSymmetric(n(1))]",
+        "expected": "[true, true, true]"
+      },
+      {
+        "description": "isSymmetric rejects a shifted subtree and unequal values",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[isSymmetric(n(1, n(2, null, n(3)), n(2, null, n(3)))), isSymmetric(n(1, n(2), n(3))), isSymmetric(n(1, n(2)))]",
+        "expected": "[false, false, false]"
+      }
+    ],
+    "testHarness": "await $test.run(\"diameterOfBinaryTree counts edges on the longest path\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (diameterOfBinaryTree(n(1, n(2, n(4), n(5)), n(3))));\n}, () => (3));\n\nawait $test.run(\"diameterOfBinaryTree: null, single node and a chain\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([diameterOfBinaryTree(null), diameterOfBinaryTree(n(1)), diameterOfBinaryTree(n(1, n(2, n(3))))]);\n}, () => ([0, 0, 2]));\n\nawait $test.run(\"diameterOfBinaryTree need not pass through the root\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const deep = n(2, n(3, n(4, n(5)), n(6, null, n(7))));\n  return (diameterOfBinaryTree(n(1, deep)));\n}, () => (4));\n\nawait $test.run(\"isBalanced accepts balanced trees\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([isBalanced(n(1, n(2, n(4), n(5)), n(3))), isBalanced(null), isBalanced(n(1))]);\n}, () => ([true, true, true]));\n\nawait $test.run(\"isBalanced rejects a chain of three\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (isBalanced(n(1, n(2, n(3)))));\n}, () => (false));\n\nawait $test.run(\"isBalanced checks every node, not just the root\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (isBalanced(n(1, n(2, n(3, n(4, n(8))), n(5)), n(6, n(7, n(9))))));\n}, () => (false));\n\nawait $test.run(\"isSymmetric accepts a mirror image\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([isSymmetric(n(1, n(2, n(3), n(4)), n(2, n(4), n(3)))), isSymmetric(null), isSymmetric(n(1))]);\n}, () => ([true, true, true]));\n\nawait $test.run(\"isSymmetric rejects a shifted subtree and unequal values\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([isSymmetric(n(1, n(2, null, n(3)), n(2, null, n(3)))), isSymmetric(n(1, n(2), n(3))), isSymmetric(n(1, n(2)))]);\n}, () => ([false, false, false]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "One post-order pass computes heights bottom-up, updating the answer at each node."
+  },
+  {
+    "id": "tree-level-order",
+    "track": "algorithms",
+    "title": "Trees: Level Order, Right Side View, Zigzag",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "bfs",
+      "queue"
+    ],
+    "promptSeed": "Tree nodes are { val, left, right } (null for a missing child). Write levelOrder(root): an array of arrays, one per depth, left to right ([] for a null root). Write rightSideView(root): the last value of each level (what you see from the right). Write zigzagLevelOrder(root): like levelOrder but every odd depth (1, 3, ...) is reversed.",
+    "difficulty": 2,
+    "concept": "trees",
+    "referenceSolution": "function levelOrder(root) {\n  const out = [];\n  if (!root) return out;\n  let level = [root];\n  while (level.length) {\n    out.push(level.map((node) => node.val));\n    const next = [];\n    for (const node of level) {\n      if (node.left) next.push(node.left);\n      if (node.right) next.push(node.right);\n    }\n    level = next;\n  }\n  return out;\n}\n\nfunction rightSideView(root) {\n  return levelOrder(root).map((level) => level[level.length - 1]);\n}\n\nfunction zigzagLevelOrder(root) {\n  return levelOrder(root).map((level, depth) => (depth % 2 ? level.reverse() : level));\n}",
+    "solution": "function levelOrder(root) {\n  const out = [];\n  if (!root) return out;\n  let level = [root];\n  while (level.length) {\n    out.push(level.map((node) => node.val));\n    const next = [];\n    for (const node of level) {\n      if (node.left) next.push(node.left);\n      if (node.right) next.push(node.right);\n    }\n    level = next;\n  }\n  return out;\n}\n\nfunction rightSideView(root) {\n  return levelOrder(root).map((level) => level[level.length - 1]);\n}\n\nfunction zigzagLevelOrder(root) {\n  return levelOrder(root).map((level, depth) => (depth % 2 ? level.reverse() : level));\n}",
+    "starterCode": "function levelOrder(root) {\n  const out = [];\n  if (!root) return out;\n  let level = [root];\n  while (level.length) {\n    out.push(level.map((node) => node.val));\n    const next = [];\n    for (const node of level) {\n      if (node.left) next.push(node.left);\n      if (node.right) next.push(node.right);\n    }\n    level = next;\n  }\n  return out;\n}\n\nfunction rightSideView(root) {\n  return levelOrder(root).map((level) => level[level.length - 1]);\n}\n\nfunction zigzagLevelOrder(root) {\n  return levelOrder(root).map((level, depth) => (depth % 2 ? level.reverse() : level));\n}",
+    "testCases": [
+      {
+        "description": "levelOrder groups values by depth",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nlevelOrder(n(3, n(9), n(20, n(15), n(7))))",
+        "expected": "[[3], [9, 20], [15, 7]]"
+      },
+      {
+        "description": "levelOrder: null and single node",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[levelOrder(null), levelOrder(n(1))]",
+        "expected": "[[], [[1]]]"
+      },
+      {
+        "description": "levelOrder with a lopsided tree",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nlevelOrder(n(1, n(2, null, n(5)), n(3)))",
+        "expected": "[[1], [2, 3], [5]]"
+      },
+      {
+        "description": "rightSideView sees the last node of every level",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[rightSideView(n(3, n(9), n(20, n(15), n(7)))), rightSideView(n(1, n(2, null, n(5)), n(3)))]",
+        "expected": "[[3, 20, 7], [1, 3, 5]]"
+      },
+      {
+        "description": "rightSideView of a left-only chain and of null",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[rightSideView(n(1, n(2, n(3)))), rightSideView(null)]",
+        "expected": "[[1, 2, 3], []]"
+      },
+      {
+        "description": "zigzagLevelOrder reverses every odd depth",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[zigzagLevelOrder(n(3, n(9), n(20, n(15), n(7)))), zigzagLevelOrder(n(1, n(2, null, n(5)), n(3)))]",
+        "expected": "[[[3], [20, 9], [15, 7]], [[1], [3, 2], [5]]]"
+      },
+      {
+        "description": "zigzagLevelOrder of null",
+        "input": "zigzagLevelOrder(null)",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await $test.run(\"levelOrder groups values by depth\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (levelOrder(n(3, n(9), n(20, n(15), n(7)))));\n}, () => ([[3], [9, 20], [15, 7]]));\n\nawait $test.run(\"levelOrder: null and single node\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([levelOrder(null), levelOrder(n(1))]);\n}, () => ([[], [[1]]]));\n\nawait $test.run(\"levelOrder with a lopsided tree\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (levelOrder(n(1, n(2, null, n(5)), n(3))));\n}, () => ([[1], [2, 3], [5]]));\n\nawait $test.run(\"rightSideView sees the last node of every level\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([rightSideView(n(3, n(9), n(20, n(15), n(7)))), rightSideView(n(1, n(2, null, n(5)), n(3)))]);\n}, () => ([[3, 20, 7], [1, 3, 5]]));\n\nawait $test.run(\"rightSideView of a left-only chain and of null\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([rightSideView(n(1, n(2, n(3)))), rightSideView(null)]);\n}, () => ([[1, 2, 3], []]));\n\nawait $test.run(\"zigzagLevelOrder reverses every odd depth\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([zigzagLevelOrder(n(3, n(9), n(20, n(15), n(7)))), zigzagLevelOrder(n(1, n(2, null, n(5)), n(3)))]);\n}, () => ([[[3], [20, 9], [15, 7]], [[1], [3, 2], [5]]]));\n\nawait $test.run(\"zigzagLevelOrder of null\", async () => {\n  const sleep = $test.sleep;\n  return (zigzagLevelOrder(null));\n}, () => ([]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(w)",
+    "complexityExplanation": "Each node is dequeued once; the queue holds at most one level (width w)."
+  },
+  {
+    "id": "tree-max-path-sum",
+    "track": "algorithms",
+    "title": "Trees: Max Path Sum, Root-to-Leaf Numbers, Good Nodes",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "dfs",
+      "post-order"
+    ],
+    "promptSeed": "Tree nodes are { val, left, right } (null for a missing child). Write maxPathSum(root): the maximum sum over any non-empty path (it may start and end at any node, and values can be negative). Write sumNumbers(root): every root-to-leaf path read as a decimal number (digits 0-9, e.g. 1 -> 2 -> 3 is 123); return their sum (0 for null). Write goodNodes(root): how many nodes have a value >= every value on the path from the root to them (the root always counts; null gives 0).",
+    "difficulty": 4,
+    "concept": "trees",
+    "referenceSolution": "function maxPathSum(root) {\n  let best = -Infinity;\n  function gain(node) {\n    if (!node) return 0;\n    const left = Math.max(0, gain(node.left));\n    const right = Math.max(0, gain(node.right));\n    best = Math.max(best, node.val + left + right);\n    return node.val + Math.max(left, right);\n  }\n  gain(root);\n  return best;\n}\n\nfunction sumNumbers(root) {\n  function dfs(node, acc) {\n    if (!node) return 0;\n    const value = acc * 10 + node.val;\n    if (!node.left && !node.right) return value;\n    return dfs(node.left, value) + dfs(node.right, value);\n  }\n  return dfs(root, 0);\n}\n\nfunction goodNodes(root) {\n  function dfs(node, max) {\n    if (!node) return 0;\n    const good = node.val >= max ? 1 : 0;\n    const next = Math.max(max, node.val);\n    return good + dfs(node.left, next) + dfs(node.right, next);\n  }\n  return root ? dfs(root, -Infinity) : 0;\n}",
+    "solution": "function maxPathSum(root) {\n  let best = -Infinity;\n  function gain(node) {\n    if (!node) return 0;\n    const left = Math.max(0, gain(node.left));\n    const right = Math.max(0, gain(node.right));\n    best = Math.max(best, node.val + left + right);\n    return node.val + Math.max(left, right);\n  }\n  gain(root);\n  return best;\n}\n\nfunction sumNumbers(root) {\n  function dfs(node, acc) {\n    if (!node) return 0;\n    const value = acc * 10 + node.val;\n    if (!node.left && !node.right) return value;\n    return dfs(node.left, value) + dfs(node.right, value);\n  }\n  return dfs(root, 0);\n}\n\nfunction goodNodes(root) {\n  function dfs(node, max) {\n    if (!node) return 0;\n    const good = node.val >= max ? 1 : 0;\n    const next = Math.max(max, node.val);\n    return good + dfs(node.left, next) + dfs(node.right, next);\n  }\n  return root ? dfs(root, -Infinity) : 0;\n}",
+    "starterCode": "function maxPathSum(root) {\n  let best = -Infinity;\n  function gain(node) {\n    if (!node) return 0;\n    const left = Math.max(0, gain(node.left));\n    const right = Math.max(0, gain(node.right));\n    best = Math.max(best, node.val + left + right);\n    return node.val + Math.max(left, right);\n  }\n  gain(root);\n  return best;\n}\n\nfunction sumNumbers(root) {\n  function dfs(node, acc) {\n    if (!node) return 0;\n    const value = acc * 10 + node.val;\n    if (!node.left && !node.right) return value;\n    return dfs(node.left, value) + dfs(node.right, value);\n  }\n  return dfs(root, 0);\n}\n\nfunction goodNodes(root) {\n  function dfs(node, max) {\n    if (!node) return 0;\n    const good = node.val >= max ? 1 : 0;\n    const next = Math.max(max, node.val);\n    return good + dfs(node.left, next) + dfs(node.right, next);\n  }\n  return root ? dfs(root, -Infinity) : 0;\n}",
+    "testCases": [
+      {
+        "description": "maxPathSum can bend at a node",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[maxPathSum(n(1, n(2), n(3))), maxPathSum(n(-10, n(9), n(20, n(15), n(7))))]",
+        "expected": "[6, 42]"
+      },
+      {
+        "description": "maxPathSum with all-negative values takes the largest single node",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[maxPathSum(n(-3)), maxPathSum(n(-1, n(-2), n(-3)))]",
+        "expected": "[-3, -1]"
+      },
+      {
+        "description": "maxPathSum drops a negative child",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nmaxPathSum(n(2, n(-1)))",
+        "expected": "2"
+      },
+      {
+        "description": "sumNumbers adds every root-to-leaf number",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[sumNumbers(n(1, n(2), n(3))), sumNumbers(n(4, n(9, n(5), n(1)), n(0)))]",
+        "expected": "[25, 1026]"
+      },
+      {
+        "description": "sumNumbers: null and a single digit",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[sumNumbers(null), sumNumbers(n(7))]",
+        "expected": "[0, 7]"
+      },
+      {
+        "description": "goodNodes counts nodes not smaller than any ancestor",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\ngoodNodes(n(3, n(1, n(3)), n(4, n(1), n(5))))",
+        "expected": "4"
+      },
+      {
+        "description": "goodNodes: null, single node and decreasing chain",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[goodNodes(null), goodNodes(n(1)), goodNodes(n(5, n(4, n(3))))]",
+        "expected": "[0, 1, 1]"
+      },
+      {
+        "description": "goodNodes with negative values",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\ngoodNodes(n(-1, n(-2), n(0)))",
+        "expected": "2"
+      }
+    ],
+    "testHarness": "await $test.run(\"maxPathSum can bend at a node\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([maxPathSum(n(1, n(2), n(3))), maxPathSum(n(-10, n(9), n(20, n(15), n(7))))]);\n}, () => ([6, 42]));\n\nawait $test.run(\"maxPathSum with all-negative values takes the largest single node\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([maxPathSum(n(-3)), maxPathSum(n(-1, n(-2), n(-3)))]);\n}, () => ([-3, -1]));\n\nawait $test.run(\"maxPathSum drops a negative child\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (maxPathSum(n(2, n(-1))));\n}, () => (2));\n\nawait $test.run(\"sumNumbers adds every root-to-leaf number\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([sumNumbers(n(1, n(2), n(3))), sumNumbers(n(4, n(9, n(5), n(1)), n(0)))]);\n}, () => ([25, 1026]));\n\nawait $test.run(\"sumNumbers: null and a single digit\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([sumNumbers(null), sumNumbers(n(7))]);\n}, () => ([0, 7]));\n\nawait $test.run(\"goodNodes counts nodes not smaller than any ancestor\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (goodNodes(n(3, n(1, n(3)), n(4, n(1), n(5)))));\n}, () => (4));\n\nawait $test.run(\"goodNodes: null, single node and decreasing chain\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([goodNodes(null), goodNodes(n(1)), goodNodes(n(5, n(4, n(3))))]);\n}, () => ([0, 1, 1]));\n\nawait $test.run(\"goodNodes with negative values\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return (goodNodes(n(-1, n(-2), n(0))));\n}, () => (2));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "A single DFS: each node combines the best downward gains from its children."
+  },
+  {
+    "id": "tree-path-sum",
+    "track": "algorithms",
+    "title": "Trees: Path Sum, All Root-to-Leaf Paths, Min Depth",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "dfs",
+      "recursion"
+    ],
+    "promptSeed": "Tree nodes are { val, left, right } (null for a missing child). Write hasPathSum(root, target): true when some root-to-LEAF path sums to target (a null tree is false; a node with one child is not a leaf). Write pathSum(root, target): every root-to-leaf path summing to target, as arrays of values, in left-to-right order. Write minDepth(root): the number of nodes on the shortest root-to-leaf path (0 for null; a node with one child must continue down that child).",
+    "difficulty": 2,
+    "concept": "trees",
+    "referenceSolution": "function hasPathSum(root, target) {\n  if (!root) return false;\n  if (!root.left && !root.right) return root.val === target;\n  return hasPathSum(root.left, target - root.val) || hasPathSum(root.right, target - root.val);\n}\n\nfunction pathSum(root, target) {\n  const out = [];\n  const path = [];\n  function dfs(node, remaining) {\n    if (!node) return;\n    path.push(node.val);\n    if (!node.left && !node.right && node.val === remaining) out.push([...path]);\n    dfs(node.left, remaining - node.val);\n    dfs(node.right, remaining - node.val);\n    path.pop();\n  }\n  dfs(root, target);\n  return out;\n}\n\nfunction minDepth(root) {\n  if (!root) return 0;\n  if (!root.left) return 1 + minDepth(root.right);\n  if (!root.right) return 1 + minDepth(root.left);\n  return 1 + Math.min(minDepth(root.left), minDepth(root.right));\n}",
+    "solution": "function hasPathSum(root, target) {\n  if (!root) return false;\n  if (!root.left && !root.right) return root.val === target;\n  return hasPathSum(root.left, target - root.val) || hasPathSum(root.right, target - root.val);\n}\n\nfunction pathSum(root, target) {\n  const out = [];\n  const path = [];\n  function dfs(node, remaining) {\n    if (!node) return;\n    path.push(node.val);\n    if (!node.left && !node.right && node.val === remaining) out.push([...path]);\n    dfs(node.left, remaining - node.val);\n    dfs(node.right, remaining - node.val);\n    path.pop();\n  }\n  dfs(root, target);\n  return out;\n}\n\nfunction minDepth(root) {\n  if (!root) return 0;\n  if (!root.left) return 1 + minDepth(root.right);\n  if (!root.right) return 1 + minDepth(root.left);\n  return 1 + Math.min(minDepth(root.left), minDepth(root.right));\n}",
+    "starterCode": "function hasPathSum(root, target) {\n  if (!root) return false;\n  if (!root.left && !root.right) return root.val === target;\n  return hasPathSum(root.left, target - root.val) || hasPathSum(root.right, target - root.val);\n}\n\nfunction pathSum(root, target) {\n  const out = [];\n  const path = [];\n  function dfs(node, remaining) {\n    if (!node) return;\n    path.push(node.val);\n    if (!node.left && !node.right && node.val === remaining) out.push([...path]);\n    dfs(node.left, remaining - node.val);\n    dfs(node.right, remaining - node.val);\n    path.pop();\n  }\n  dfs(root, target);\n  return out;\n}\n\nfunction minDepth(root) {\n  if (!root) return 0;\n  if (!root.left) return 1 + minDepth(root.right);\n  if (!root.right) return 1 + minDepth(root.left);\n  return 1 + Math.min(minDepth(root.left), minDepth(root.right));\n}",
+    "testCases": [
+      {
+        "description": "hasPathSum finds a root-to-leaf sum",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\n[hasPathSum(big, 22), hasPathSum(big, 26), hasPathSum(big, 18)]",
+        "expected": "[true, true, true]"
+      },
+      {
+        "description": "hasPathSum rejects sums that are not leaf paths",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\n[hasPathSum(big, 5), hasPathSum(big, 9), hasPathSum(big, 100)]",
+        "expected": "[false, false, false]"
+      },
+      {
+        "description": "hasPathSum: a non-leaf root does not count, null is false",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[hasPathSum(n(1, n(2)), 1), hasPathSum(n(1, n(2)), 3), hasPathSum(null, 0), hasPathSum(n(4), 4)]",
+        "expected": "[false, true, false, true]"
+      },
+      {
+        "description": "pathSum returns every matching path left to right",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\npathSum(big, 22)",
+        "expected": "[[5, 4, 11, 2], [5, 8, 4, 5]]"
+      },
+      {
+        "description": "pathSum with one match and with none",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\n[pathSum(big, 26), pathSum(big, 3)]",
+        "expected": "[[[5, 8, 13]], []]"
+      },
+      {
+        "description": "pathSum copies paths (later mutation must not leak in)",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst r = pathSum(n(1, n(2), n(2)), 3);\n[r.length, r[0] !== r[1], r[0], r[1]]",
+        "expected": "[2, true, [1, 2], [1, 2]]"
+      },
+      {
+        "description": "minDepth counts nodes down to the nearest leaf",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\nconst big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\nminDepth(big)",
+        "expected": "3"
+      },
+      {
+        "description": "minDepth: one-child nodes continue, null is 0",
+        "input": "const n = (val, left = null, right = null) => ({ val, left, right });\n[minDepth(n(1, n(2))), minDepth(null), minDepth(n(1)), minDepth(n(1, null, n(2, null, n(3))))]",
+        "expected": "[2, 0, 1, 3]"
+      }
+    ],
+    "testHarness": "await $test.run(\"hasPathSum finds a root-to-leaf sum\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\n  return ([hasPathSum(big, 22), hasPathSum(big, 26), hasPathSum(big, 18)]);\n}, () => ([true, true, true]));\n\nawait $test.run(\"hasPathSum rejects sums that are not leaf paths\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\n  return ([hasPathSum(big, 5), hasPathSum(big, 9), hasPathSum(big, 100)]);\n}, () => ([false, false, false]));\n\nawait $test.run(\"hasPathSum: a non-leaf root does not count, null is false\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([hasPathSum(n(1, n(2)), 1), hasPathSum(n(1, n(2)), 3), hasPathSum(null, 0), hasPathSum(n(4), 4)]);\n}, () => ([false, true, false, true]));\n\nawait $test.run(\"pathSum returns every matching path left to right\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\n  return (pathSum(big, 22));\n}, () => ([[5, 4, 11, 2], [5, 8, 4, 5]]));\n\nawait $test.run(\"pathSum with one match and with none\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\n  return ([pathSum(big, 26), pathSum(big, 3)]);\n}, () => ([[[5, 8, 13]], []]));\n\nawait $test.run(\"pathSum copies paths (later mutation must not leak in)\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const r = pathSum(n(1, n(2), n(2)), 3);\n  return ([r.length, r[0] !== r[1], r[0], r[1]]);\n}, () => ([2, true, [1, 2], [1, 2]]));\n\nawait $test.run(\"minDepth counts nodes down to the nearest leaf\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  const big = n(5, n(4, n(11, n(7), n(2))), n(8, n(13), n(4, n(5), n(1))));\n  return (minDepth(big));\n}, () => (3));\n\nawait $test.run(\"minDepth: one-child nodes continue, null is 0\", async () => {\n  const sleep = $test.sleep;\n  const n = (val, left = null, right = null) => ({ val, left, right });\n  return ([minDepth(n(1, n(2))), minDepth(null), minDepth(n(1)), minDepth(n(1, null, n(2, null, n(3))))]);\n}, () => ([2, 0, 1, 3]));",
+    "targetTime": "O(n)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "DFS visits every node once; the recursion stack is as deep as the tree height h."
   }
 ]

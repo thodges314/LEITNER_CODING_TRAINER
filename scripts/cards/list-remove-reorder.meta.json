@@ -1,0 +1,9 @@
+{
+  "track": "algorithms",
+  "title": "Linked Lists: Remove Nth From End, Reorder, Remove Duplicates",
+  "tags": [
+    "linked-list",
+    "two-pointer",
+    "in-place"
+  ]
+}

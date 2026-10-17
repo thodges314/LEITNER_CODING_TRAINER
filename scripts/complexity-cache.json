@@ -938,5 +938,50 @@
     "targetTime": "O(n)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Each function sweeps the array once keeping only the previous one or two states."
+  },
+  "tree-level-order": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(w)",
+    "complexityExplanation": "Each node is dequeued once; the queue holds at most one level (width w)."
+  },
+  "tree-path-sum": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "DFS visits every node once; the recursion stack is as deep as the tree height h."
+  },
+  "tree-diameter-balanced": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "One post-order pass computes heights bottom-up, updating the answer at each node."
+  },
+  "bst-kth-insert-build": {
+    "targetTime": "O(h + k)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "In-order traversal stops after k nodes; inserting walks one root-to-leaf path; building splits the array in halves."
+  },
+  "tree-build-serialize": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "An index map of the inorder array gives O(1) root lookup; serialization visits every node once."
+  },
+  "tree-max-path-sum": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "A single DFS: each node combines the best downward gains from its children."
+  },
+  "list-remove-reorder": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each function walks the list a constant number of times, relinking nodes in place."
+  },
+  "list-add-numbers": {
+    "targetTime": "O(n + m)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Each pass visits every node once; only the carry or a few pointers are kept (the sum list itself is output)."
+  },
+  "list-reverse-k-group": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n / k)",
+    "complexityExplanation": "Every node is relinked once; the recursive k-group version keeps one frame per group."
   }
 }

@@ -1,0 +1,9 @@
+{
+  "track": "algorithms",
+  "title": "Trees: Path Sum, All Root-to-Leaf Paths, Min Depth",
+  "tags": [
+    "tree",
+    "dfs",
+    "recursion"
+  ]
+}

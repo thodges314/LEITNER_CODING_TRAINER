@@ -1,0 +1,1 @@
+Tree nodes are { val, left, right } (null for a missing child). Write levelOrder(root): an array of arrays, one per depth, left to right ([] for a null root). Write rightSideView(root): the last value of each level (what you see from the right). Write zigzagLevelOrder(root): like levelOrder but every odd depth (1, 3, ...) is reversed.

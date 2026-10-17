@@ -750,5 +750,41 @@
  "dp-array-variants": {
   "difficulty": 3,
   "concept": "dp"
+ },
+ "tree-level-order": {
+  "difficulty": 2,
+  "concept": "trees"
+ },
+ "tree-path-sum": {
+  "difficulty": 2,
+  "concept": "trees"
+ },
+ "tree-diameter-balanced": {
+  "difficulty": 3,
+  "concept": "trees"
+ },
+ "bst-kth-insert-build": {
+  "difficulty": 3,
+  "concept": "bst"
+ },
+ "tree-build-serialize": {
+  "difficulty": 4,
+  "concept": "trees"
+ },
+ "tree-max-path-sum": {
+  "difficulty": 4,
+  "concept": "trees"
+ },
+ "list-remove-reorder": {
+  "difficulty": 2,
+  "concept": "linked-lists"
+ },
+ "list-add-numbers": {
+  "difficulty": 3,
+  "concept": "linked-lists"
+ },
+ "list-reverse-k-group": {
+  "difficulty": 4,
+  "concept": "linked-lists"
  }
 }
