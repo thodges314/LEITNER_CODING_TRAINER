@@ -37,7 +37,7 @@ import { FocusModal } from './components/FocusModal';
 import { AboutModal } from './components/AboutModal';
 import { AiRecommendationPopover } from './components/AiRecommendationPopover';
 import { ActiveModelStatusPopover } from './components/ActiveModelStatusPopover';
-import { MobileDeviceBanner } from './components/MobileDeviceBanner';
+import { MobileNoticeModal } from './components/MobileNoticeModal';
 import {
   Terminal,
   Layers,
@@ -254,8 +254,8 @@ export function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
-      {/* Mobile Experience Recommendation Banner */}
-      <MobileDeviceBanner />
+      {/* Mobile Experience Notice Modal */}
+      <MobileNoticeModal />
 
       {/* Global Header */}
       <header
