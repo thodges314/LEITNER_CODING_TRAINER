@@ -11,6 +11,16 @@ export function getStoredTheme(): AppTheme {
   } catch {
     // ignore
   }
+
+  // Start up in dark mode by default unless the user's browser is explicitly set to light mode
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: light)').matches
+  ) {
+    return 'apple-gsos';
+  }
+
   return 'dark'; // default to synthwave dark
 }
 
