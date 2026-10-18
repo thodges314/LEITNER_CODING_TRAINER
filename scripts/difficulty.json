@@ -1022,5 +1022,17 @@
   "action-state-form": {
     "difficulty": 3,
     "concept": "react-forms"
+  },
+  "keyboard-shortcut-matcher": {
+    "difficulty": 2,
+    "concept": "keyboard"
+  },
+  "cookie-parse-serialize": {
+    "difficulty": 2,
+    "concept": "storage"
+  },
+  "copy-to-clipboard": {
+    "difficulty": 2,
+    "concept": "clipboard"
   }
 }

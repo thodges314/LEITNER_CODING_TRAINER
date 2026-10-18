@@ -14975,5 +14975,222 @@
       }
     ],
     "testHarness": "const { render, q, qa, act, wait } = $dom;\n// Text that is actually on screen: React hides suspended content with display:none.\nconst visibleText = (el) => {\n  let out = '';\n  for (const node of el.childNodes) {\n    if (node.nodeType === 3) out += node.textContent;\n    else if (node.nodeType === 1 && node.style.display !== 'none') out += visibleText(node);\n  }\n  return out;\n};\nconst mountAsync = async (ui) => {\n  let r;\n  await act(async () => { r = render(ui); });\n  return {\n    container: r.container,\n    rerender: async (next) => { await act(async () => { r.rerender(next); }); },\n    unmount: async () => { await act(async () => { r.unmount(); }); },\n  };\n};\nconst click = async (el) => {\n  await act(async () => { el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); });\n};\n// Poll until the condition holds (React retries suspended renders on its own schedule).\nconst waitFor = async (cond, ms = 2000) => {\n  const end = Date.now() + ms;\n  while (!cond() && Date.now() < end) {\n    await act(async () => { await new Promise((res) => setTimeout(res, 15)); });\n  }\n  return cond();\n};\nconst deferred = () => {\n  let resolve;\n  let reject;\n  const promise = new Promise((res, rej) => {\n    resolve = res;\n    reject = rej;\n  });\n  return { promise, resolve, reject };\n};\nconst setup = async () => {\n  const cache = new Map();\n  const entry = (tab) => {\n    if (!cache.has(tab)) cache.set(tab, deferred());\n    return cache.get(tab);\n  };\n  const load = (tab) => entry(tab).promise;\n  const r = await mountAsync(<TabbedViewer load={load} />);\n  const tab = (label) => qa('[role=\"tab\"]', r.container).find((b) => b.textContent === label);\n  const panel = () => q('[role=\"tabpanel\"]', r.container);\n  const finish = async (id, text) => {\n    await act(async () => { entry(id).resolve(text); });\n    await waitFor(() => visibleText(panel()) === text);\n  };\n  return { r, finish, tab, panel };\n};\n{\n  const { r, finish, panel } = await setup();\n  const first = visibleText(panel());\n  await finish('home', 'Welcome home');\n  $test.check('The first load shows the fallback, then the home content', first === 'Loading…' && visibleText(panel()) === 'Welcome home', [first, visibleText(panel())]);\n  await r.unmount();\n}\n{\n  const { r, finish, tab, panel } = await setup();\n  await finish('home', 'Welcome home');\n  await click(tab('Posts'));\n  await wait(20);\n  $test.check('Switching tabs keeps the old panel on screen (no fallback) while the new one loads', visibleText(panel()) === 'Welcome home', visibleText(panel()));\n  await r.unmount();\n}\n{\n  const { r, finish, tab, panel } = await setup();\n  await finish('home', 'Welcome home');\n  const before = panel().getAttribute('aria-busy');\n  await click(tab('Posts'));\n  await wait(20);\n  const during = panel().getAttribute('aria-busy');\n  await finish('posts', 'Latest posts');\n  const after = panel().getAttribute('aria-busy');\n  $test.check('The tab panel is aria-busy=\"true\" while the transition is pending and \"false\" otherwise', before === 'false' && during === 'true' && after === 'false', { before, during, after });\n  await r.unmount();\n}\n{\n  const { r, finish, tab, panel } = await setup();\n  await finish('home', 'Welcome home');\n  await click(tab('Posts'));\n  await wait(20);\n  const selectedWhilePending = tab('Home').getAttribute('aria-selected') + ',' + tab('Posts').getAttribute('aria-selected');\n  await finish('posts', 'Latest posts');\n  const selectedAfter = tab('Home').getAttribute('aria-selected') + ',' + tab('Posts').getAttribute('aria-selected');\n  $test.check('When the new content arrives the panel and the selected tab switch together', selectedWhilePending === 'true,false' && visibleText(panel()) === 'Latest posts' && selectedAfter === 'false,true', { selectedWhilePending, selectedAfter, text: visibleText(panel()) });\n  await r.unmount();\n}\n{\n  const { r, finish, tab, panel } = await setup();\n  await finish('home', 'Welcome home');\n  await click(tab('Posts'));\n  await wait(20);\n  await finish('posts', 'Latest posts');\n  await click(tab('Home'));\n  await wait(20);\n  $test.check('Going back to an already loaded tab shows its content straight away', visibleText(panel()) === 'Welcome home' && tab('Home').getAttribute('aria-selected') === 'true', visibleText(panel()));\n  await r.unmount();\n}"
+  },
+  {
+    "id": "cookie-parse-serialize",
+    "track": "dom-browser",
+    "title": "Cookie Parse and Serialize",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "cookies",
+      "parsing",
+      "encoding",
+      "http"
+    ],
+    "promptSeed": "Write parseCookies(header) and serializeCookie(name, value, options = {}). parseCookies reads a Cookie header or document.cookie string such as 'a=1; b=hello%20world' and returns an object: split on ';', skip empty segments, split each segment at the FIRST '=' (values may contain '='), trim the name and the value, decode the value with decodeURIComponent (if it is malformed, keep the raw text), and keep the first value when a name repeats. serializeCookie returns the Set-Cookie text: name=encodeURIComponent(value), followed by the attributes that were provided, always in this order: '; Max-Age=<n>' (maxAge, a number: 0 must still be written), '; Expires=<utc string>' (expires, a Date, via toUTCString), '; Domain=<d>' (domain), '; Path=<p>' (path), '; Secure' (secure: true), '; HttpOnly' (httpOnly: true), '; SameSite=<Strict|Lax|None>' (sameSite, case-insensitive input). It throws TypeError('Invalid cookie name') for an empty name or a name containing '=', ';', ',' or whitespace, and TypeError('Invalid SameSite value') for any other SameSite value.",
+    "difficulty": 2,
+    "concept": "storage",
+    "referenceSolution": "function parseCookies(header) {\n  const out = {};\n  for (const segment of String(header ?? '').split(';')) {\n    const eq = segment.indexOf('=');\n    if (eq === -1) continue;\n    const name = segment.slice(0, eq).trim();\n    if (!name || Object.prototype.hasOwnProperty.call(out, name)) continue;\n    const raw = segment.slice(eq + 1).trim();\n    try {\n      out[name] = decodeURIComponent(raw);\n    } catch {\n      out[name] = raw;\n    }\n  }\n  return out;\n}\n\nfunction serializeCookie(name, value, options = {}) {\n  if (!name || /[=;,\\s]/.test(name)) throw new TypeError('Invalid cookie name');\n  let text = name + '=' + encodeURIComponent(value);\n  if (options.maxAge !== undefined) text += '; Max-Age=' + Math.floor(options.maxAge);\n  if (options.expires) text += '; Expires=' + options.expires.toUTCString();\n  if (options.domain) text += '; Domain=' + options.domain;\n  if (options.path) text += '; Path=' + options.path;\n  if (options.secure) text += '; Secure';\n  if (options.httpOnly) text += '; HttpOnly';\n  if (options.sameSite !== undefined) {\n    const same = String(options.sameSite).toLowerCase();\n    if (same !== 'strict' && same !== 'lax' && same !== 'none') throw new TypeError('Invalid SameSite value');\n    text += '; SameSite=' + same.charAt(0).toUpperCase() + same.slice(1);\n  }\n  return text;\n}",
+    "solution": "function parseCookies(header) {\n  const out = {};\n  for (const segment of String(header ?? '').split(';')) {\n    const eq = segment.indexOf('=');\n    if (eq === -1) continue;\n    const name = segment.slice(0, eq).trim();\n    if (!name || Object.prototype.hasOwnProperty.call(out, name)) continue;\n    const raw = segment.slice(eq + 1).trim();\n    try {\n      out[name] = decodeURIComponent(raw);\n    } catch {\n      out[name] = raw;\n    }\n  }\n  return out;\n}\n\nfunction serializeCookie(name, value, options = {}) {\n  if (!name || /[=;,\\s]/.test(name)) throw new TypeError('Invalid cookie name');\n  let text = name + '=' + encodeURIComponent(value);\n  if (options.maxAge !== undefined) text += '; Max-Age=' + Math.floor(options.maxAge);\n  if (options.expires) text += '; Expires=' + options.expires.toUTCString();\n  if (options.domain) text += '; Domain=' + options.domain;\n  if (options.path) text += '; Path=' + options.path;\n  if (options.secure) text += '; Secure';\n  if (options.httpOnly) text += '; HttpOnly';\n  if (options.sameSite !== undefined) {\n    const same = String(options.sameSite).toLowerCase();\n    if (same !== 'strict' && same !== 'lax' && same !== 'none') throw new TypeError('Invalid SameSite value');\n    text += '; SameSite=' + same.charAt(0).toUpperCase() + same.slice(1);\n  }\n  return text;\n}",
+    "starterCode": "function parseCookies(header) {\n  const out = {};\n  for (const segment of String(header ?? '').split(';')) {\n    const eq = segment.indexOf('=');\n    if (eq === -1) continue;\n    const name = segment.slice(0, eq).trim();\n    if (!name || Object.prototype.hasOwnProperty.call(out, name)) continue;\n    const raw = segment.slice(eq + 1).trim();\n    try {\n      out[name] = decodeURIComponent(raw);\n    } catch {\n      out[name] = raw;\n    }\n  }\n  return out;\n}\n\nfunction serializeCookie(name, value, options = {}) {\n  if (!name || /[=;,\\s]/.test(name)) throw new TypeError('Invalid cookie name');\n  let text = name + '=' + encodeURIComponent(value);\n  if (options.maxAge !== undefined) text += '; Max-Age=' + Math.floor(options.maxAge);\n  if (options.expires) text += '; Expires=' + options.expires.toUTCString();\n  if (options.domain) text += '; Domain=' + options.domain;\n  if (options.path) text += '; Path=' + options.path;\n  if (options.secure) text += '; Secure';\n  if (options.httpOnly) text += '; HttpOnly';\n  if (options.sameSite !== undefined) {\n    const same = String(options.sameSite).toLowerCase();\n    if (same !== 'strict' && same !== 'lax' && same !== 'none') throw new TypeError('Invalid SameSite value');\n    text += '; SameSite=' + same.charAt(0).toUpperCase() + same.slice(1);\n  }\n  return text;\n}",
+    "testCases": [
+      {
+        "description": "parseCookies reads name=value pairs separated by semicolons",
+        "input": "parseCookies('a=1; b=two; c=')",
+        "expected": "{ a: '1', b: 'two', c: '' }"
+      },
+      {
+        "description": "Names and values are trimmed, empty segments are skipped and the value keeps any \"=\" after the first one",
+        "input": "parseCookies(' theme = dark ;; token=abc=def== ;')",
+        "expected": "{ theme: 'dark', token: 'abc=def==' }"
+      },
+      {
+        "description": "Values are decoded with decodeURIComponent",
+        "input": "parseCookies('q=hello%20world%21; name=Ren%C3%A9')",
+        "expected": "{ q: 'hello world!', name: 'René' }"
+      },
+      {
+        "description": "A malformed escape keeps the raw text instead of throwing",
+        "input": "parseCookies('bad=%E0%A4%A; ok=1')",
+        "expected": "{ bad: '%E0%A4%A', ok: '1' }"
+      },
+      {
+        "description": "When a name repeats the first value wins; segments without \"=\" are ignored",
+        "input": "parseCookies('a=1; a=2; flag; b=3')",
+        "expected": "{ a: '1', b: '3' }"
+      },
+      {
+        "description": "An empty header gives an empty object",
+        "input": "[parseCookies(''), parseCookies(undefined)]",
+        "expected": "[{}, {}]"
+      },
+      {
+        "description": "serializeCookie encodes the value and writes no attributes by default",
+        "input": "serializeCookie('theme', 'dark mode&more')",
+        "expected": "'theme=dark%20mode%26more'"
+      },
+      {
+        "description": "Attributes are written in a fixed order: Max-Age, Domain, Path, Secure, HttpOnly, SameSite",
+        "input": "serializeCookie('id', '42', { sameSite: 'lax', httpOnly: true, secure: true, path: '/app', domain: 'example.com', maxAge: 3600 })",
+        "expected": "'id=42; Max-Age=3600; Domain=example.com; Path=/app; Secure; HttpOnly; SameSite=Lax'"
+      },
+      {
+        "description": "Max-Age of 0 is still written (it deletes the cookie), and Expires uses the UTC string of the Date",
+        "input": "[serializeCookie('x', '1', { maxAge: 0 }), serializeCookie('y', '2', { expires: new Date(Date.UTC(2030, 0, 2, 3, 4, 5)) })]",
+        "expected": "['x=1; Max-Age=0', 'y=2; Expires=Wed, 02 Jan 2030 03:04:05 GMT']"
+      },
+      {
+        "description": "SameSite accepts any case and is normalised; secure:false and httpOnly:false write nothing",
+        "input": "[serializeCookie('a', '1', { sameSite: 'STRICT' }), serializeCookie('b', '2', { sameSite: 'none', secure: false, httpOnly: false })]",
+        "expected": "['a=1; SameSite=Strict', 'b=2; SameSite=None']"
+      },
+      {
+        "description": "An invalid cookie name throws a TypeError",
+        "input": "serializeCookie('bad name', 'x')",
+        "expected": "Throws TypeError — message contains \"Invalid cookie name\""
+      },
+      {
+        "description": "An unknown SameSite value throws a TypeError",
+        "input": "serializeCookie('a', '1', { sameSite: 'sometimes' })",
+        "expected": "Throws TypeError — message contains \"Invalid SameSite value\""
+      }
+    ],
+    "testHarness": "await $test.run(\"parseCookies reads name=value pairs separated by semicolons\", async () => {\n  const sleep = $test.sleep;\n  return (parseCookies('a=1; b=two; c='));\n}, () => ({ a: '1', b: 'two', c: '' }));\n\nawait $test.run(\"Names and values are trimmed, empty segments are skipped and the value keeps any \\\"=\\\" after the first one\", async () => {\n  const sleep = $test.sleep;\n  return (parseCookies(' theme = dark ;; token=abc=def== ;'));\n}, () => ({ theme: 'dark', token: 'abc=def==' }));\n\nawait $test.run(\"Values are decoded with decodeURIComponent\", async () => {\n  const sleep = $test.sleep;\n  return (parseCookies('q=hello%20world%21; name=Ren%C3%A9'));\n}, () => ({ q: 'hello world!', name: 'René' }));\n\nawait $test.run(\"A malformed escape keeps the raw text instead of throwing\", async () => {\n  const sleep = $test.sleep;\n  return (parseCookies('bad=%E0%A4%A; ok=1'));\n}, () => ({ bad: '%E0%A4%A', ok: '1' }));\n\nawait $test.run(\"When a name repeats the first value wins; segments without \\\"=\\\" are ignored\", async () => {\n  const sleep = $test.sleep;\n  return (parseCookies('a=1; a=2; flag; b=3'));\n}, () => ({ a: '1', b: '3' }));\n\nawait $test.run(\"An empty header gives an empty object\", async () => {\n  const sleep = $test.sleep;\n  return ([parseCookies(''), parseCookies(undefined)]);\n}, () => ([{}, {}]));\n\nawait $test.run(\"serializeCookie encodes the value and writes no attributes by default\", async () => {\n  const sleep = $test.sleep;\n  return (serializeCookie('theme', 'dark mode&more'));\n}, () => ('theme=dark%20mode%26more'));\n\nawait $test.run(\"Attributes are written in a fixed order: Max-Age, Domain, Path, Secure, HttpOnly, SameSite\", async () => {\n  const sleep = $test.sleep;\n  return (serializeCookie('id', '42', { sameSite: 'lax', httpOnly: true, secure: true, path: '/app', domain: 'example.com', maxAge: 3600 }));\n}, () => ('id=42; Max-Age=3600; Domain=example.com; Path=/app; Secure; HttpOnly; SameSite=Lax'));\n\nawait $test.run(\"Max-Age of 0 is still written (it deletes the cookie), and Expires uses the UTC string of the Date\", async () => {\n  const sleep = $test.sleep;\n  return ([serializeCookie('x', '1', { maxAge: 0 }), serializeCookie('y', '2', { expires: new Date(Date.UTC(2030, 0, 2, 3, 4, 5)) })]);\n}, () => (['x=1; Max-Age=0', 'y=2; Expires=Wed, 02 Jan 2030 03:04:05 GMT']));\n\nawait $test.run(\"SameSite accepts any case and is normalised; secure:false and httpOnly:false write nothing\", async () => {\n  const sleep = $test.sleep;\n  return ([serializeCookie('a', '1', { sameSite: 'STRICT' }), serializeCookie('b', '2', { sameSite: 'none', secure: false, httpOnly: false })]);\n}, () => (['a=1; SameSite=Strict', 'b=2; SameSite=None']));\n\nawait $test.rejects(\"An invalid cookie name throws a TypeError\", async () => {\n  const sleep = $test.sleep;\n  return (serializeCookie('bad name', 'x'));\n}, \"Invalid cookie name\");\n\nawait $test.rejects(\"An unknown SameSite value throws a TypeError\", async () => {\n  const sleep = $test.sleep;\n  return (serializeCookie('a', '1', { sameSite: 'sometimes' }));\n}, \"Invalid SameSite value\");"
+  },
+  {
+    "id": "copy-to-clipboard",
+    "track": "dom-browser",
+    "title": "Copy to Clipboard with Fallback",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "clipboard",
+      "async",
+      "fallback",
+      "dom"
+    ],
+    "promptSeed": "Write async copyToClipboard(text, env = {}) that resolves true when the text was copied and false otherwise. env holds the browser objects to use ({ navigator, document }) so they can be replaced in tests: use the browser global only when that key is missing from env, and treat an explicit null or undefined value as \"not available\". First use the Async Clipboard API: if env.navigator.clipboard.writeText exists, await it and resolve true; if it is missing or its promise rejects, fall back. Fallback: create a <textarea> with document.createElement, set its value to the text, mark it readonly and move it off screen (style.position 'fixed', style.left '-9999px'), append it to document.body, call select() on it, then run document.execCommand('copy') and resolve with its boolean result. Always remove the textarea from document.body afterwards, even when execCommand throws (a throw resolves false). If there is no document, resolve false.",
+    "difficulty": 2,
+    "concept": "clipboard",
+    "referenceSolution": "async function copyToClipboard(text, env = {}) {\n  const nav = 'navigator' in env ? env.navigator : typeof navigator !== 'undefined' ? navigator : undefined;\n  const doc = 'document' in env ? env.document : typeof document !== 'undefined' ? document : undefined;\n\n  if (nav && nav.clipboard && typeof nav.clipboard.writeText === 'function') {\n    try {\n      await nav.clipboard.writeText(text);\n      return true;\n    } catch {\n      // permission denied or insecure context: use the fallback below\n    }\n  }\n\n  if (!doc) return false;\n  const area = doc.createElement('textarea');\n  area.value = text;\n  area.setAttribute('readonly', '');\n  area.style.position = 'fixed';\n  area.style.left = '-9999px';\n  doc.body.appendChild(area);\n  try {\n    area.select();\n    return Boolean(doc.execCommand('copy'));\n  } catch {\n    return false;\n  } finally {\n    doc.body.removeChild(area);\n  }\n}",
+    "solution": "async function copyToClipboard(text, env = {}) {\n  const nav = 'navigator' in env ? env.navigator : typeof navigator !== 'undefined' ? navigator : undefined;\n  const doc = 'document' in env ? env.document : typeof document !== 'undefined' ? document : undefined;\n\n  if (nav && nav.clipboard && typeof nav.clipboard.writeText === 'function') {\n    try {\n      await nav.clipboard.writeText(text);\n      return true;\n    } catch {\n      // permission denied or insecure context: use the fallback below\n    }\n  }\n\n  if (!doc) return false;\n  const area = doc.createElement('textarea');\n  area.value = text;\n  area.setAttribute('readonly', '');\n  area.style.position = 'fixed';\n  area.style.left = '-9999px';\n  doc.body.appendChild(area);\n  try {\n    area.select();\n    return Boolean(doc.execCommand('copy'));\n  } catch {\n    return false;\n  } finally {\n    doc.body.removeChild(area);\n  }\n}",
+    "starterCode": "async function copyToClipboard(text, env = {}) {\n  const nav = 'navigator' in env ? env.navigator : typeof navigator !== 'undefined' ? navigator : undefined;\n  const doc = 'document' in env ? env.document : typeof document !== 'undefined' ? document : undefined;\n\n  if (nav && nav.clipboard && typeof nav.clipboard.writeText === 'function') {\n    try {\n      await nav.clipboard.writeText(text);\n      return true;\n    } catch {\n      // permission denied or insecure context: use the fallback below\n    }\n  }\n\n  if (!doc) return false;\n  const area = doc.createElement('textarea');\n  area.value = text;\n  area.setAttribute('readonly', '');\n  area.style.position = 'fixed';\n  area.style.left = '-9999px';\n  doc.body.appendChild(area);\n  try {\n    area.select();\n    return Boolean(doc.execCommand('copy'));\n  } catch {\n    return false;\n  } finally {\n    doc.body.removeChild(area);\n  }\n}",
+    "testCases": [
+      {
+        "description": "Uses navigator.clipboard.writeText when it exists and never touches the DOM",
+        "input": "const log = [];\nconst doc = { body: { appendChild() { log.push('append'); }, removeChild() {} }, createElement() { log.push('create'); } };\nconst nav = { clipboard: { writeText: async (t) => { log.push('write:' + t); } } };\n(async () => [await copyToClipboard('hello', { navigator: nav, document: doc }), log])()",
+        "expected": "[true, ['write:hello']]"
+      },
+      {
+        "description": "Without the Clipboard API it falls back to a hidden textarea and execCommand(\"copy\")",
+        "input": "const log = [];\nconst doc = {\n  body: { appendChild(el) { log.push('append'); }, removeChild(el) { log.push('remove'); } },\n  createElement(tag) { log.push('create:' + tag); return { value: '', style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, select() { log.push('select'); } }; },\n  execCommand(cmd) { log.push('exec:' + cmd); return true; },\n};\n(async () => [await copyToClipboard('hi', { navigator: {}, document: doc }), log])()",
+        "expected": "[true, ['create:textarea', 'append', 'select', 'exec:copy', 'remove']]"
+      },
+      {
+        "description": "The textarea holds the text, is readonly and is positioned off screen",
+        "input": "let area;\nconst doc = {\n  body: { appendChild() {}, removeChild() {} },\n  createElement() { area = { value: '', style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, select() {} }; return area; },\n  execCommand() { return true; },\n};\n(async () => { await copyToClipboard('some text', { navigator: {}, document: doc }); return [area.value, 'readonly' in area.attrs, area.style.position, area.style.left]; })()",
+        "expected": "['some text', true, 'fixed', '-9999px']"
+      },
+      {
+        "description": "If writeText rejects (permission denied) the fallback is used",
+        "input": "const log = [];\nconst doc = {\n  body: { appendChild() {}, removeChild() { log.push('remove'); } },\n  createElement() { return { value: '', style: {}, setAttribute() {}, select() {} }; },\n  execCommand() { log.push('exec'); return true; },\n};\nconst nav = { clipboard: { writeText: () => Promise.reject(new Error('denied')) } };\n(async () => [await copyToClipboard('x', { navigator: nav, document: doc }), log])()",
+        "expected": "[true, ['exec', 'remove']]"
+      },
+      {
+        "description": "Resolves false when execCommand reports failure, and still removes the textarea",
+        "input": "const log = [];\nconst doc = {\n  body: { appendChild() {}, removeChild() { log.push('remove'); } },\n  createElement() { return { value: '', style: {}, setAttribute() {}, select() {} }; },\n  execCommand() { return false; },\n};\n(async () => [await copyToClipboard('x', { navigator: {}, document: doc }), log])()",
+        "expected": "[false, ['remove']]"
+      },
+      {
+        "description": "Resolves false (and cleans up) when execCommand throws",
+        "input": "const log = [];\nconst doc = {\n  body: { appendChild() {}, removeChild() { log.push('remove'); } },\n  createElement() { return { value: '', style: {}, setAttribute() {}, select() {} }; },\n  execCommand() { throw new Error('not allowed'); },\n};\n(async () => [await copyToClipboard('x', { navigator: {}, document: doc }), log])()",
+        "expected": "[false, ['remove']]"
+      },
+      {
+        "description": "Resolves false when there is no clipboard and no document",
+        "input": "copyToClipboard('x', { navigator: {}, document: null })",
+        "expected": "false"
+      }
+    ],
+    "testHarness": "await $test.run(\"Uses navigator.clipboard.writeText when it exists and never touches the DOM\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const doc = { body: { appendChild() { log.push('append'); }, removeChild() {} }, createElement() { log.push('create'); } };\n  const nav = { clipboard: { writeText: async (t) => { log.push('write:' + t); } } };\n  return ((async () => [await copyToClipboard('hello', { navigator: nav, document: doc }), log])());\n}, () => ([true, ['write:hello']]));\n\nawait $test.run(\"Without the Clipboard API it falls back to a hidden textarea and execCommand(\\\"copy\\\")\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const doc = {\n    body: { appendChild(el) { log.push('append'); }, removeChild(el) { log.push('remove'); } },\n    createElement(tag) { log.push('create:' + tag); return { value: '', style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, select() { log.push('select'); } }; },\n    execCommand(cmd) { log.push('exec:' + cmd); return true; },\n  };\n  return ((async () => [await copyToClipboard('hi', { navigator: {}, document: doc }), log])());\n}, () => ([true, ['create:textarea', 'append', 'select', 'exec:copy', 'remove']]));\n\nawait $test.run(\"The textarea holds the text, is readonly and is positioned off screen\", async () => {\n  const sleep = $test.sleep;\n  let area;\n  const doc = {\n    body: { appendChild() {}, removeChild() {} },\n    createElement() { area = { value: '', style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, select() {} }; return area; },\n    execCommand() { return true; },\n  };\n  return ((async () => { await copyToClipboard('some text', { navigator: {}, document: doc }); return [area.value, 'readonly' in area.attrs, area.style.position, area.style.left]; })());\n}, () => (['some text', true, 'fixed', '-9999px']));\n\nawait $test.run(\"If writeText rejects (permission denied) the fallback is used\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const doc = {\n    body: { appendChild() {}, removeChild() { log.push('remove'); } },\n    createElement() { return { value: '', style: {}, setAttribute() {}, select() {} }; },\n    execCommand() { log.push('exec'); return true; },\n  };\n  const nav = { clipboard: { writeText: () => Promise.reject(new Error('denied')) } };\n  return ((async () => [await copyToClipboard('x', { navigator: nav, document: doc }), log])());\n}, () => ([true, ['exec', 'remove']]));\n\nawait $test.run(\"Resolves false when execCommand reports failure, and still removes the textarea\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const doc = {\n    body: { appendChild() {}, removeChild() { log.push('remove'); } },\n    createElement() { return { value: '', style: {}, setAttribute() {}, select() {} }; },\n    execCommand() { return false; },\n  };\n  return ((async () => [await copyToClipboard('x', { navigator: {}, document: doc }), log])());\n}, () => ([false, ['remove']]));\n\nawait $test.run(\"Resolves false (and cleans up) when execCommand throws\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const doc = {\n    body: { appendChild() {}, removeChild() { log.push('remove'); } },\n    createElement() { return { value: '', style: {}, setAttribute() {}, select() {} }; },\n    execCommand() { throw new Error('not allowed'); },\n  };\n  return ((async () => [await copyToClipboard('x', { navigator: {}, document: doc }), log])());\n}, () => ([false, ['remove']]));\n\nawait $test.run(\"Resolves false when there is no clipboard and no document\", async () => {\n  const sleep = $test.sleep;\n  return (copyToClipboard('x', { navigator: {}, document: null }));\n}, () => (false));"
+  },
+  {
+    "id": "keyboard-shortcut-matcher",
+    "track": "dom-browser",
+    "title": "Keyboard Shortcut Matcher",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "keyboard",
+      "events",
+      "shortcuts",
+      "modifiers"
+    ],
+    "promptSeed": "Write three functions for keyboard shortcuts. parseShortcut(text) turns a string like 'Ctrl+Shift+K' into { key, ctrl, meta, alt, shift, mod }: split on '+', ignore spaces and case, lowercase the key, and map the aliases control -> ctrl, cmd and command -> meta, option -> alt, esc -> escape, return -> enter, space -> ' ' ('mod' is its own flag). matchesShortcut(event, shortcut, isMac = false) takes a keyboard-event-like object { key, ctrlKey, metaKey, altKey, shiftKey } and returns true only when the key matches (case-insensitive) AND the modifiers match exactly: a missing or an extra modifier means no match. 'mod' means Cmd on a Mac (isMac true) and Ctrl everywhere else. findShortcut(event, bindings, isMac = false) takes an object of { name: shortcut } and returns the name of the first binding that matches, or null.",
+    "difficulty": 2,
+    "concept": "keyboard",
+    "referenceSolution": "const ALIASES = { control: 'ctrl', cmd: 'meta', command: 'meta', option: 'alt', esc: 'escape', return: 'enter', space: ' ' };\n\nfunction parseShortcut(text) {\n  const out = { key: '', ctrl: false, meta: false, alt: false, shift: false, mod: false };\n  for (const raw of String(text).split('+')) {\n    const lower = raw.trim().toLowerCase();\n    if (!lower) continue;\n    const part = ALIASES[lower] ?? lower;\n    if (part === 'ctrl' || part === 'meta' || part === 'alt' || part === 'shift' || part === 'mod') {\n      out[part] = true;\n    } else if (part) {\n      out.key = part;\n    }\n  }\n  return out;\n}\n\nfunction matchesShortcut(event, shortcut, isMac = false) {\n  const s = parseShortcut(shortcut);\n  const wantCtrl = s.ctrl || (s.mod && !isMac);\n  const wantMeta = s.meta || (s.mod && isMac);\n  return (\n    String(event.key).toLowerCase() === s.key &&\n    Boolean(event.ctrlKey) === wantCtrl &&\n    Boolean(event.metaKey) === wantMeta &&\n    Boolean(event.altKey) === s.alt &&\n    Boolean(event.shiftKey) === s.shift\n  );\n}\n\nfunction findShortcut(event, bindings, isMac = false) {\n  for (const [name, shortcut] of Object.entries(bindings)) {\n    if (matchesShortcut(event, shortcut, isMac)) return name;\n  }\n  return null;\n}",
+    "solution": "const ALIASES = { control: 'ctrl', cmd: 'meta', command: 'meta', option: 'alt', esc: 'escape', return: 'enter', space: ' ' };\n\nfunction parseShortcut(text) {\n  const out = { key: '', ctrl: false, meta: false, alt: false, shift: false, mod: false };\n  for (const raw of String(text).split('+')) {\n    const lower = raw.trim().toLowerCase();\n    if (!lower) continue;\n    const part = ALIASES[lower] ?? lower;\n    if (part === 'ctrl' || part === 'meta' || part === 'alt' || part === 'shift' || part === 'mod') {\n      out[part] = true;\n    } else if (part) {\n      out.key = part;\n    }\n  }\n  return out;\n}\n\nfunction matchesShortcut(event, shortcut, isMac = false) {\n  const s = parseShortcut(shortcut);\n  const wantCtrl = s.ctrl || (s.mod && !isMac);\n  const wantMeta = s.meta || (s.mod && isMac);\n  return (\n    String(event.key).toLowerCase() === s.key &&\n    Boolean(event.ctrlKey) === wantCtrl &&\n    Boolean(event.metaKey) === wantMeta &&\n    Boolean(event.altKey) === s.alt &&\n    Boolean(event.shiftKey) === s.shift\n  );\n}\n\nfunction findShortcut(event, bindings, isMac = false) {\n  for (const [name, shortcut] of Object.entries(bindings)) {\n    if (matchesShortcut(event, shortcut, isMac)) return name;\n  }\n  return null;\n}",
+    "starterCode": "const ALIASES = { control: 'ctrl', cmd: 'meta', command: 'meta', option: 'alt', esc: 'escape', return: 'enter', space: ' ' };\n\nfunction parseShortcut(text) {\n  const out = { key: '', ctrl: false, meta: false, alt: false, shift: false, mod: false };\n  for (const raw of String(text).split('+')) {\n    const lower = raw.trim().toLowerCase();\n    if (!lower) continue;\n    const part = ALIASES[lower] ?? lower;\n    if (part === 'ctrl' || part === 'meta' || part === 'alt' || part === 'shift' || part === 'mod') {\n      out[part] = true;\n    } else if (part) {\n      out.key = part;\n    }\n  }\n  return out;\n}\n\nfunction matchesShortcut(event, shortcut, isMac = false) {\n  const s = parseShortcut(shortcut);\n  const wantCtrl = s.ctrl || (s.mod && !isMac);\n  const wantMeta = s.meta || (s.mod && isMac);\n  return (\n    String(event.key).toLowerCase() === s.key &&\n    Boolean(event.ctrlKey) === wantCtrl &&\n    Boolean(event.metaKey) === wantMeta &&\n    Boolean(event.altKey) === s.alt &&\n    Boolean(event.shiftKey) === s.shift\n  );\n}\n\nfunction findShortcut(event, bindings, isMac = false) {\n  for (const [name, shortcut] of Object.entries(bindings)) {\n    if (matchesShortcut(event, shortcut, isMac)) return name;\n  }\n  return null;\n}",
+    "testCases": [
+      {
+        "description": "parseShortcut splits the modifiers from the key and lowercases everything",
+        "input": "parseShortcut('Ctrl+Shift+K')",
+        "expected": "{ key: 'k', ctrl: true, meta: false, alt: false, shift: true, mod: false }"
+      },
+      {
+        "description": "Spaces around the parts are ignored and \"mod\" is its own flag",
+        "input": "parseShortcut(' mod + s ')",
+        "expected": "{ key: 's', ctrl: false, meta: false, alt: false, shift: false, mod: true }"
+      },
+      {
+        "description": "Aliases: cmd/command = meta, option = alt, control = ctrl, esc = escape, return = enter, space = a space character",
+        "input": "[parseShortcut('Cmd+Option+Esc'), parseShortcut('control+return'), parseShortcut('Space')]",
+        "expected": "[{ key: 'escape', ctrl: false, meta: true, alt: true, shift: false, mod: false }, { key: 'enter', ctrl: true, meta: false, alt: false, shift: false, mod: false }, { key: ' ', ctrl: false, meta: false, alt: false, shift: false, mod: false }]"
+      },
+      {
+        "description": "Modifiers must match exactly: a missing modifier and an extra modifier both fail",
+        "input": "const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n[matchesShortcut(ev('k', { ctrlKey: true }), 'Ctrl+K'), matchesShortcut(ev('k'), 'Ctrl+K'), matchesShortcut(ev('k', { ctrlKey: true, shiftKey: true }), 'Ctrl+K')]",
+        "expected": "[true, false, false]"
+      },
+      {
+        "description": "The key is compared case-insensitively (Shift makes event.key uppercase)",
+        "input": "const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n[matchesShortcut(ev('K', { shiftKey: true }), 'Shift+k'), matchesShortcut(ev('Enter', { metaKey: true }), 'Cmd+Enter'), matchesShortcut(ev('j', { ctrlKey: true }), 'Ctrl+K')]",
+        "expected": "[true, true, false]"
+      },
+      {
+        "description": "A shortcut without modifiers only matches when no modifier is held",
+        "input": "const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n[matchesShortcut(ev('Escape'), 'Escape'), matchesShortcut(ev('Escape', { altKey: true }), 'Escape'), matchesShortcut(ev('Escape', { shiftKey: true }), 'Esc')]",
+        "expected": "[true, false, false]"
+      },
+      {
+        "description": "\"mod\" is Cmd on a Mac and Ctrl everywhere else",
+        "input": "const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n[matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S', false), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S', true), matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S', true), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S', false)]",
+        "expected": "[true, true, false, false]"
+      },
+      {
+        "description": "isMac defaults to false: without it, Mod means Ctrl",
+        "input": "const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n[matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S'), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S')]",
+        "expected": "[true, false]"
+      },
+      {
+        "description": "findShortcut returns the name of the binding that matches, or null",
+        "input": "const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\nconst bindings = { save: 'Mod+S', saveAll: 'Mod+Shift+S', help: 'Alt+H' };\n[findShortcut(ev('S', { ctrlKey: true, shiftKey: true }), bindings), findShortcut(ev('s', { ctrlKey: true }), bindings), findShortcut(ev('h', { altKey: true }), bindings), findShortcut(ev('x'), bindings)]",
+        "expected": "['saveAll', 'save', 'help', null]"
+      },
+      {
+        "description": "findShortcut passes isMac on to the matching",
+        "input": "const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\nconst bindings = { save: 'Mod+S' };\n[findShortcut(ev('s', { metaKey: true }), bindings, true), findShortcut(ev('s', { metaKey: true }), bindings)]",
+        "expected": "['save', null]"
+      }
+    ],
+    "testHarness": "await $test.run(\"parseShortcut splits the modifiers from the key and lowercases everything\", async () => {\n  const sleep = $test.sleep;\n  return (parseShortcut('Ctrl+Shift+K'));\n}, () => ({ key: 'k', ctrl: true, meta: false, alt: false, shift: true, mod: false }));\n\nawait $test.run(\"Spaces around the parts are ignored and \\\"mod\\\" is its own flag\", async () => {\n  const sleep = $test.sleep;\n  return (parseShortcut(' mod + s '));\n}, () => ({ key: 's', ctrl: false, meta: false, alt: false, shift: false, mod: true }));\n\nawait $test.run(\"Aliases: cmd/command = meta, option = alt, control = ctrl, esc = escape, return = enter, space = a space character\", async () => {\n  const sleep = $test.sleep;\n  return ([parseShortcut('Cmd+Option+Esc'), parseShortcut('control+return'), parseShortcut('Space')]);\n}, () => ([{ key: 'escape', ctrl: false, meta: true, alt: true, shift: false, mod: false }, { key: 'enter', ctrl: true, meta: false, alt: false, shift: false, mod: false }, { key: ' ', ctrl: false, meta: false, alt: false, shift: false, mod: false }]));\n\nawait $test.run(\"Modifiers must match exactly: a missing modifier and an extra modifier both fail\", async () => {\n  const sleep = $test.sleep;\n  const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n  return ([matchesShortcut(ev('k', { ctrlKey: true }), 'Ctrl+K'), matchesShortcut(ev('k'), 'Ctrl+K'), matchesShortcut(ev('k', { ctrlKey: true, shiftKey: true }), 'Ctrl+K')]);\n}, () => ([true, false, false]));\n\nawait $test.run(\"The key is compared case-insensitively (Shift makes event.key uppercase)\", async () => {\n  const sleep = $test.sleep;\n  const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n  return ([matchesShortcut(ev('K', { shiftKey: true }), 'Shift+k'), matchesShortcut(ev('Enter', { metaKey: true }), 'Cmd+Enter'), matchesShortcut(ev('j', { ctrlKey: true }), 'Ctrl+K')]);\n}, () => ([true, true, false]));\n\nawait $test.run(\"A shortcut without modifiers only matches when no modifier is held\", async () => {\n  const sleep = $test.sleep;\n  const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n  return ([matchesShortcut(ev('Escape'), 'Escape'), matchesShortcut(ev('Escape', { altKey: true }), 'Escape'), matchesShortcut(ev('Escape', { shiftKey: true }), 'Esc')]);\n}, () => ([true, false, false]));\n\nawait $test.run(\"\\\"mod\\\" is Cmd on a Mac and Ctrl everywhere else\", async () => {\n  const sleep = $test.sleep;\n  const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n  return ([matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S', false), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S', true), matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S', true), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S', false)]);\n}, () => ([true, true, false, false]));\n\nawait $test.run(\"isMac defaults to false: without it, Mod means Ctrl\", async () => {\n  const sleep = $test.sleep;\n  const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n  return ([matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S'), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S')]);\n}, () => ([true, false]));\n\nawait $test.run(\"findShortcut returns the name of the binding that matches, or null\", async () => {\n  const sleep = $test.sleep;\n  const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n  const bindings = { save: 'Mod+S', saveAll: 'Mod+Shift+S', help: 'Alt+H' };\n  return ([findShortcut(ev('S', { ctrlKey: true, shiftKey: true }), bindings), findShortcut(ev('s', { ctrlKey: true }), bindings), findShortcut(ev('h', { altKey: true }), bindings), findShortcut(ev('x'), bindings)]);\n}, () => (['saveAll', 'save', 'help', null]));\n\nawait $test.run(\"findShortcut passes isMac on to the matching\", async () => {\n  const sleep = $test.sleep;\n  const ev = (key, mods = {}) => ({ key, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods });\n  const bindings = { save: 'Mod+S' };\n  return ([findShortcut(ev('s', { metaKey: true }), bindings, true), findShortcut(ev('s', { metaKey: true }), bindings)]);\n}, () => (['save', null]));"
   }
 ]

@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Copy to Clipboard with Fallback",
+  "tags": [
+    "clipboard",
+    "async",
+    "fallback",
+    "dom"
+  ]
+}
