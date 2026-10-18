@@ -884,6 +884,55 @@ code {
   }
 }
 
+/* Shortcut hints: a button with data-shortcut shows its keyboard shortcut on hover and on keyboard focus. */
+[data-shortcut] {
+  position: relative;
+}
+[data-shortcut]::after {
+  content: attr(data-shortcut);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-medium);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 60;
+}
+[data-shortcut]:hover::after,
+[data-shortcut]:focus-visible::after {
+  opacity: 1;
+}
+@media (hover: none) {
+  [data-shortcut]::after {
+    display: none;
+  }
+}
+
+kbd.kbd {
+  display: inline-block;
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid var(--border-medium);
+  border-bottom-width: 2px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
 
 
 

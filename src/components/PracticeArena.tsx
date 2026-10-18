@@ -16,6 +16,7 @@ import {
   isReactTrack as isReactTrackId,
 } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
+import { shortcutAttrs } from '../lib/shortcuts';
 import { evaluateCodeSubmission } from '../lib/ai';
 import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
@@ -1845,6 +1846,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               type="button"
               onClick={handleFormatCode}
               disabled={isFormatting || !code.trim()}
+              {...shortcutAttrs('format')}
               style={{
                 background: 'none',
                 border: 'none',
@@ -1856,7 +1858,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 fontSize: '11.5px',
                 transition: 'color 0.15s ease',
               }}
-              title="Auto-format code with Prettier (Shift+Alt+F / Cmd+Shift+F)"
             >
               <Sparkles size={12} color={isFormatting ? 'var(--accent-cyan)' : '#a78bfa'} />
               {isFormatting ? 'Formatting...' : 'Format'}
@@ -2022,7 +2023,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               onClick={handleRunCode}
               disabled={!code.trim() || isEvaluating || isRunning}
               style={{ fontSize: '14px', padding: '10px 18px', gap: '6px' }}
-              title="Execute code in browser and inspect console outputs"
+              {...shortcutAttrs('run')}
             >
               {isRunning ? (
                 <>
@@ -2042,6 +2043,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               onClick={handleSubmit}
               disabled={isEvaluating || isRunning || !code.trim()}
               style={{ fontSize: '14px', padding: '10px 22px' }}
+              {...shortcutAttrs('submit')}
             >
               {isEvaluating ? (
                 <>

@@ -146,6 +146,7 @@ import {
   setStoredAlgorithm,
 } from '../lib/leitner';
 import type { SpacedAlgorithm } from '../lib/leitner';
+import { SHORTCUTS, SHORTCUT_ORDER, currentPlatform, shortcutKeys } from '../lib/shortcuts';
 import {
   getTimedModeEnabled,
   setTimedModeEnabled,
@@ -1742,6 +1743,49 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               />
             </div>
           )}
+
+          {/* Keyboard shortcuts: a collapsible reference for power users */}
+          <details
+            data-testid="shortcuts-section"
+            style={{
+              padding: '10px 14px',
+              borderRadius: '8px',
+              border: isLight ? '1.5px solid #4455AA' : '1px solid var(--border-subtle)',
+              fontSize: '13px',
+            }}
+          >
+            <summary style={{ cursor: 'pointer', fontWeight: 700, fontSize: '14px' }}>Keyboard shortcuts</summary>
+            <ul data-testid="shortcuts-list" style={{ listStyle: 'none', margin: '12px 0 4px', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {SHORTCUT_ORDER.map((id) => {
+                const platform = currentPlatform();
+                const def = SHORTCUTS[id];
+                const renderKeys = (keys: string[]) => (
+                  <span style={{ display: 'inline-flex', gap: '4px' }}>
+                    {keys.map((k) => (
+                      <kbd key={k} className="kbd">{k}</kbd>
+                    ))}
+                  </span>
+                );
+                return (
+                  <li key={id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    <span>{def.label}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      {renderKeys(shortcutKeys(id, platform))}
+                      {def.alt && (
+                        <>
+                          <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>or</span>
+                          {renderKeys(def.alt[platform])}
+                        </>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+            <p style={{ margin: '8px 0 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+              Showing {currentPlatform() === 'mac' ? 'Mac' : 'Windows/Linux'} keys. Hover or focus a button in the practice view to see its shortcut.
+            </p>
+          </details>
 
           {/* Offline & Keyless Ready Banner (Above Danger Zone) */}
           <div

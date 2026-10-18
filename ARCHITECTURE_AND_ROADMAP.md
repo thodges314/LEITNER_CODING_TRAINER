@@ -29,7 +29,7 @@ in the browser; state lives in `localStorage`.
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 854 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 506 card tests + 8 navigation tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/react19-cards`): 520 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 256 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 512 card tests + 12 navigation/shortcut tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/react19-cards`): 520 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -278,7 +278,7 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 ### 7.3 Product features
 1. **Stats view**: per-track/concept accuracy, weak spots, streaks, time-to-solve (needs a review-history log: add
    `history: {cardId, ts, passed, ms}[]` to deck state, capped).
-2. **Staged unlocks that respect the practice focus** (and a "session mode": N cards drawn only from the focus).
+2. **Staged unlocks that respect the practice focus**: DONE (`checkStagedUnlocks` gets the Focus + pack filter; unlock credit is only spent on cards that really unlock). Still open: a "session mode" (N cards drawn only from the focus).
 3. **Sandboxed execution**: run harnesses in a sandboxed iframe or Worker with a watchdog timeout so `while(true)` cannot freeze the
    tab. DOM harnesses need a document, so use an iframe (`srcdoc`, `sandbox="allow-scripts"`) and `postMessage` the logs back.
 **React preview window (spec, not built; owner suggests Gemini implements it; React problems only, not general JavaScript).**
@@ -376,7 +376,7 @@ Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates r
 2. Wrong-answer ("mutation") checks per card, starting with the cards authored by other assistants.
 3. ~~Recover batch 2~~ DONE (multi-step form, tag input, pagination; cases in `part27.mjs`). **Every new `partN.mjs` must be imported and spread in `scripts/testcases/newcards.mjs`**, otherwise `build-cards` fails with "No cases authored".
 4. Content gaps: accessibility, CSS (needs real-browser checks), DOM/browser extras, remaining ladder holes (§7.1), then React 19 APIs.
-5. Product: "Front-end screen" Focus preset + an interview-importance weight, make staged unlocks respect the user's Focus exclusions, stats/history view.
+5. Product: "Front-end screen" Focus preset + an interview-importance weight, stats/history view (staged unlocks now respect Focus).
 6. Complexity fields: keep them on algorithm cards only, normalise notation, human spot-check.
 7. Sandboxed execution (iframe) so no runaway code can freeze the tab.
 
@@ -401,6 +401,10 @@ Pick the order; each batch follows the §4 checklist including the complexity st
 ### 7.7 Parked features
 - **Quick Add Topic with AI** (`AddTopicModal`, switch `FEATURES.quickAdd` in `src/lib/features.ts`, currently `false`). Parked because the AI writes both the reference solution and the tests and nothing checks that they agree, so a draft can silently mark correct answers wrong, and cheap models (Groq `gpt-oss-120b`, `gemini-2.5-flash`) are the ones users are encouraged to pick. The code is still in the app, just hidden.
   To bring it back: (1) merge the work saved on branch `feature/quick-add-verified` (`caseHarness.ts`: build the test script from input -> expected pairs; `draftVerify.ts`: the reference must pass the drafted tests and an empty solution must fail), (2) change `draftTopicWithAI` in `ai.ts` to ask the model for input/expected pairs instead of a test script, verify the draft, and show the model its own failure and ask for a fix (max 2 rounds), (3) never mark a template or unverified draft as verified, (4) label AI-drafted cards, stop adding default Big-O to non-algorithm cards, (5) tell the user in the dialog to use a stronger model for drafting (Claude 3.5 Sonnet, Gemini 2.5 Pro, GPT-4o, Mistral Large) and keep cheap models for critiques.
+
+### 7.8 Keyboard shortcut hints (DONE)
+`src/lib/shortcuts.ts` is the single table of shortcuts (run = Ctrl/Cmd+Enter, submit = Ctrl/Cmd+Shift+Enter, format = Shift+Alt+F or Ctrl/Cmd+Shift+F) with Mac and non-Mac labels (`detectPlatform`: `userAgentData.platform`, then `navigator.platform`, then the user agent).
+Buttons get `{...shortcutAttrs(id)}` (`data-shortcut` shows a CSS tooltip on hover and keyboard focus, hidden on touch-only devices; plus `aria-keyshortcuts`), and Settings has a collapsible "Keyboard shortcuts" list. If you change a handler in `PracticeArena`, change `SHORTCUTS` too. Tests: `shortcuts.test.ts`, `e2e/shortcuts.spec.ts`.
 
 ## 8. Conventions and pitfalls for assistants
 
