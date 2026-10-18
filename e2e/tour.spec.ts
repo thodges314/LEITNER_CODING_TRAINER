@@ -79,6 +79,20 @@ test.describe('guided tour', () => {
     await expect(page.getByRole('dialog')).toHaveCount(0); // no welcome, no tour
   });
 
+  test('the tour is the default on the welcome screen: first, focused, and Enter starts it', async ({ page }) => {
+    await page.goto('/');
+    const welcome = page.getByRole('dialog', { name: /Welcome to Leitner Coding Trainer/ });
+    const tourBtn = welcome.getByRole('button', { name: 'Take a 1-minute tour' });
+    const startBtn = welcome.getByRole('button', { name: 'Start practicing' });
+    await expect(tourBtn).toBeFocused();
+    const [t, s] = [await tourBtn.boundingBox(), await startBtn.boundingBox()];
+    expect(t!.x).toBeLessThan(s!.x); // the tour comes first
+    await expect(tourBtn).toHaveClass(/btn-primary/);
+    await expect(startBtn).toHaveClass(/btn-outline/);
+    await page.keyboard.press('Enter');
+    await expect(tourDialog(page)).toBeVisible();
+  });
+
   test('Back goes to the previous step, and each step stays inside the screen', async ({ page }) => {
     await startWithTour(page);
     const tour = tourDialog(page);

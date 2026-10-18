@@ -1,16 +1,32 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { X, Brain, BookOpen, Layers, Zap, ExternalLink } from 'lucide-react';
 
 interface AboutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** First-run variant: a "how a session works" intro and a primary "Start practicing" button. */
+  /** First-run variant: a "how a session works" intro and a "Take a 1-minute tour" button (the default) next to "Start practicing". */
   welcome?: boolean;
   /** Starts the guided tour (offered on the welcome screen, and as a replay from About). */
   onStartTour?: () => void;
 }
 
 export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome = false, onStartTour }) => {
+  const tourButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // First-time visitors: the tour is the default action, so Enter starts it. The code editor behind the dialog grabs
+  // focus when it mounts, so while the welcome dialog is open, focus that lands outside it is pulled back.
+  useEffect(() => {
+    if (!isOpen || !welcome) return;
+    const button = tourButtonRef.current;
+    button?.focus();
+    const dialog = button?.closest('[role="dialog"]');
+    const pullBack = (e: FocusEvent) => {
+      if (dialog && e.target instanceof Node && !dialog.contains(e.target)) button?.focus();
+    };
+    document.addEventListener('focusin', pullBack);
+    return () => document.removeEventListener('focusin', pullBack);
+  }, [isOpen, welcome]);
+
   if (!isOpen) return null;
 
   const isLight = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'apple-gsos';
@@ -110,14 +126,15 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome
                 <li>Preparing for something specific? Use Focus to include or exclude topics. Everything stays in this browser.</li>
               </ol>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '14px' }}>
-                <button type="button" className="btn btn-primary" onClick={onClose}>
-                  Start practicing
-                </button>
+                {/* The tour is the default for a first-time visitor: first, highlighted and focused (Enter starts it). */}
                 {onStartTour && (
-                  <button type="button" className="btn btn-outline" onClick={onStartTour}>
+                  <button ref={tourButtonRef} type="button" className="btn btn-primary" onClick={onStartTour}>
                     Take a 1-minute tour
                   </button>
                 )}
+                <button type="button" className={onStartTour ? 'btn btn-outline' : 'btn btn-primary'} onClick={onClose}>
+                  Start practicing
+                </button>
               </div>
             </div>
           )}
