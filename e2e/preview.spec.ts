@@ -196,4 +196,63 @@ test.describe('React preview window', () => {
     await expect.poll(() => popup.isClosed()).toBe(true);
     await expect(page.locator('[data-testid="preview-popout-btn"]')).toBeVisible();
   });
+
+  test('progress-bar: mounts in sandboxed iframe, updates progress, and logs events', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'progress-bar');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'progress-bar', solution);
+
+    const toggleBtn = page.locator('#preview-toggle-btn');
+    await expect(toggleBtn).toBeVisible();
+    await toggleBtn.click();
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const bar = frame.locator('[role="progressbar"]');
+    await expect(bar).toBeVisible({ timeout: 5000 });
+    await expect(bar).toHaveAttribute('aria-valuenow', '45');
+
+    // Click '+10%' button inside iframe demo
+    const plusBtn = frame.getByRole('button', { name: '+10%' });
+    await plusBtn.click();
+    await expect(bar).toHaveAttribute('aria-valuenow', '55');
+
+    // Event log should record the change
+    const eventLog = previewWindow.getByText(/progress/);
+    await expect(eventLog.first()).toBeVisible();
+  });
+
+  test('legacy component preview: pop-out and dock-back work on cards without previewCode', async ({ page }) => {
+    // countdown-component is a React card without previewCode
+    await openCard(page, 'countdown-component');
+
+    // Does not have preview-toggle-btn
+    await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);
+
+    // Has legacy preview container with pop-out button
+    const popOutBtn = page.locator('[data-testid="legacy-preview-popout-btn"]');
+    await expect(popOutBtn).toBeVisible();
+
+    const [popup] = await Promise.all([
+      page.waitForEvent('popup'),
+      popOutBtn.click(),
+    ]);
+
+    expect(popup).toBeDefined();
+
+    // Main window shows docked state with dock-back button
+    const mainDockBtn = page.locator('[data-testid="legacy-preview-main-dock-btn"]');
+    await expect(mainDockBtn).toBeVisible();
+    await expect(page.getByText('Component Preview (Pop-out Active)')).toBeVisible();
+
+    // Dock back from main window
+    await mainDockBtn.click();
+    await expect.poll(() => popup.isClosed()).toBe(true);
+    await expect(page.locator('[data-testid="legacy-preview-popout-btn"]')).toBeVisible();
+  });
 });
+

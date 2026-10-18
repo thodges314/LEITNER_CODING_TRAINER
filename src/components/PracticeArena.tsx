@@ -1,5 +1,6 @@
 import { DifficultyBadge } from './DifficultyBadge';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import CodeMirror from '@uiw/react-codemirror';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -46,6 +47,8 @@ import {
   Zap,
   X,
   Eye,
+  ExternalLink,
+  Minimize2,
 } from 'lucide-react';
 import { transpileForExecution, runHarness, createSandboxScope } from '../lib/runner';
 import { extractHarnessContracts } from '../lib/harnessContracts';
@@ -116,8 +119,117 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     key: number;
   } | null>(null);
 
-  // Opt-in React preview window state (closed by default)
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  // Opt-in React preview window state (closed by default, remembers preference)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(() => {
+    try {
+      return localStorage.getItem('leitner_preview_open') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const handleTogglePreview = useCallback(() => {
+    setIsPreviewOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('leitner_preview_open', String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  const handleClosePreview = useCallback(() => {
+    setIsPreviewOpen(false);
+    try {
+      localStorage.setItem('leitner_preview_open', 'false');
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Pop-out state for legacy Component Preview / Hook Test box
+  const [legacyPopupWindow, setLegacyPopupWindow] = useState<Window | null>(null);
+  const isLegacyPoppedOut = Boolean(legacyPopupWindow && !legacyPopupWindow.closed);
+
+  const handleLegacyPopOut = useCallback(() => {
+    if (legacyPopupWindow && !legacyPopupWindow.closed) {
+      legacyPopupWindow.focus();
+      return;
+    }
+
+    const w = 640;
+    const h = 540;
+    const left = typeof window.screenX === 'number' ? window.screenX + Math.max(0, (window.outerWidth - w) / 2) : 100;
+    const top = typeof window.screenY === 'number' ? window.screenY + Math.max(0, (window.outerHeight - h) / 2) : 100;
+
+    const popup = (() => {
+      try {
+        return window.open(
+          'about:blank',
+          'leitner_legacy_component_preview',
+          `width=${w},height=${h},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
+        );
+      } catch {
+        return null;
+      }
+    })();
+
+    if (!popup) return;
+
+    try {
+      popup.document.title = `Component Preview: ${currentCard?.title || 'Hook Test'} — Leitner`;
+      popup.document.head.innerHTML = '';
+      for (const el of Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))) {
+        popup.document.head.appendChild(el.cloneNode(true));
+      }
+      popup.document.body.style.margin = '0';
+      popup.document.body.style.padding = '16px';
+      popup.document.body.style.backgroundColor = theme === 'apple-gsos' ? '#ffffff' : '#030712';
+      popup.document.body.style.color = theme === 'apple-gsos' ? '#0f172a' : '#cbd5e1';
+      popup.document.body.style.fontFamily = getComputedStyle(document.body).fontFamily;
+      popup.document.body.style.boxSizing = 'border-box';
+      popup.document.body.style.height = '100vh';
+      popup.document.body.style.display = 'flex';
+      popup.document.body.style.flexDirection = 'column';
+
+      popup.addEventListener('beforeunload', () => {
+        setLegacyPopupWindow(null);
+      });
+    } catch {
+      // Ignore
+    }
+
+    setLegacyPopupWindow(popup);
+  }, [currentCard, theme, legacyPopupWindow]);
+
+  const handleLegacyDockBack = useCallback(() => {
+    if (legacyPopupWindow && !legacyPopupWindow.closed) {
+      legacyPopupWindow.close();
+    }
+    setLegacyPopupWindow(null);
+  }, [legacyPopupWindow]);
+
+  // Clean up legacy popup window on unmount
+  useEffect(() => {
+    return () => {
+      if (legacyPopupWindow && !legacyPopupWindow.closed) {
+        legacyPopupWindow.close();
+      }
+    };
+  }, [legacyPopupWindow]);
+
+  // Heartbeat to detect popup closure via OS close button
+  useEffect(() => {
+    if (!legacyPopupWindow) return;
+    const timer = setInterval(() => {
+      if (legacyPopupWindow.closed) {
+        setLegacyPopupWindow(null);
+      }
+    }, 500);
+    return () => clearInterval(timer);
+  }, [legacyPopupWindow]);
 
   // Execution mode: JS (Fast) vs TS (Strict Type Check)
   const [executionMode, setExecutionMode] = useState<'js' | 'ts'>(() =>
@@ -189,7 +301,14 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setShowSolution(false);
     setShowHarness(true);
     setActivePopover(null);
-    setIsPreviewOpen(false);
+    const savedPreview = (() => {
+      try {
+        return localStorage.getItem('leitner_preview_open') === 'true';
+      } catch {
+        return false;
+      }
+    })();
+    setIsPreviewOpen(savedPreview);
     if (currentCard) setInspectedTier(currentCard.box);
   }
 
@@ -2029,7 +2148,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 id="preview-toggle-btn"
                 data-testid="preview-toggle-btn"
                 className={`btn ${isPreviewOpen ? 'btn-secondary' : 'btn-outline'}`}
-                onClick={() => setIsPreviewOpen((prev) => !prev)}
+                onClick={handleTogglePreview}
                 style={{ fontSize: '13.5px', padding: '10px 16px', gap: '6px' }}
                 title="Toggle live React preview window"
               >
@@ -2079,25 +2198,15 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </div>
         </div>
 
-        {/* Live React Preview Window (Opt-in, sandboxed iframe) */}
-        {isPreviewOpen && currentCard?.previewCode && (
-          <div style={{ marginTop: '14px' }}>
-            <ReactPreview
-              card={currentCard}
-              code={code}
-              executionMode={executionMode}
-              theme={theme}
-              onClose={() => setIsPreviewOpen(false)}
-            />
-          </div>
-        )}
-
         {/* Test Runner & Live Preview Container */}
         <div
           style={{
             marginTop: '12px',
             display: 'grid',
-            gridTemplateColumns: isReactTrack && !currentCard?.previewCode ? 'repeat(auto-fit, minmax(420px, 1fr))' : '1fr',
+            gridTemplateColumns:
+              (isPreviewOpen && currentCard?.previewCode) || (isReactTrack && !currentCard?.previewCode)
+                ? 'repeat(auto-fit, minmax(420px, 1fr))'
+                : '1fr',
             gap: '14px',
             alignItems: 'start',
           }}
@@ -2404,9 +2513,18 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             )}
           </div>
 
-          {/* Component Preview / Hook Test Container (React Track Only) */}
-          {isReactTrack && !currentCard?.previewCode && (
+          {/* Right-Side Preview Column: ReactPreview (when previewCode exists & open) OR Component Preview / Hook Test (React track legacy) */}
+          {isPreviewOpen && currentCard?.previewCode ? (
+            <ReactPreview
+              card={currentCard}
+              code={code}
+              executionMode={executionMode}
+              theme={theme}
+              onClose={handleClosePreview}
+            />
+          ) : isReactTrack && !currentCard?.previewCode ? (
             <div
+              className="legacy-component-preview-container"
               style={{
                 borderRadius: '8px',
                 border: '1px solid rgba(6, 182, 212, 0.3)',
@@ -2432,7 +2550,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Layers size={15} color="#06b6d4" />
                   <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#f1f5f9' }}>
-                    Component Preview / Hook Test
+                    Component Preview / Hook Test {isLegacyPoppedOut ? '(Pop-out)' : ''}
                   </span>
                   {mountedComponent ? (
                     <span
@@ -2483,26 +2601,70 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   )}
                 </div>
 
-                {mountedComponent && (
-                  <button
-                    type="button"
-                    onClick={() => setMountedComponent(null)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--text-dim)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '11px',
-                      padding: '2px 6px',
-                    }}
-                    title="Unmount and reset preview"
-                  >
-                    <RotateCcw size={12} /> Reset Mount
-                  </button>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {mountedComponent && (
+                    <button
+                      type="button"
+                      onClick={() => setMountedComponent(null)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-dim)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '11px',
+                        padding: '2px 6px',
+                      }}
+                      title="Unmount and reset preview"
+                    >
+                      <RotateCcw size={12} /> Reset Mount
+                    </button>
+                  )}
+
+                  {isLegacyPoppedOut ? (
+                    <button
+                      type="button"
+                      onClick={handleLegacyDockBack}
+                      data-testid="legacy-preview-title-dock-btn"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-dim)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '11px',
+                        padding: '2px 6px',
+                      }}
+                      title="Dock preview back"
+                    >
+                      <Minimize2 size={12} /> Dock back
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleLegacyPopOut}
+                      data-testid="legacy-preview-popout-btn"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-dim)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '11px',
+                        padding: '2px 6px',
+                      }}
+                      title="Pop out component preview into separate window"
+                    >
+                      <ExternalLink size={12} /> Pop out
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Preview Content Area */}
@@ -2517,44 +2679,141 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   fontSize: '13px',
                 }}
               >
-                <ReactTestErrorBoundary
-                  resetKey={mountedComponent?.key}
-                  onError={(err) => {
-                    appendConsoleLog('error', `React Render Exception: ${err.name}: ${err.message}`);
-                    setIsOutputOpen(true);
-                  }}
-                >
-                  {mountedComponent ? (
-                    <div key={mountedComponent.key} style={{ width: '100%' }}>
-                      {mountedComponent.element}
+                {isLegacyPoppedOut && legacyPopupWindow ? (
+                  <div
+                    style={{
+                      minHeight: '160px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      textAlign: 'center',
+                      gap: '8px',
+                      color: 'var(--text-dim)',
+                    }}
+                  >
+                    <Layers size={24} color="#06b6d4" />
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: '#f1f5f9' }}>
+                      Component Preview (Pop-out Active)
                     </div>
-                  ) : (
-                    <div
-                      style={{
-                        height: '100%',
-                        minHeight: '160px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center',
-                        padding: '20px 12px',
-                        color: '#64748b',
-                      }}
+                    <div style={{ fontSize: '11.5px', maxWidth: '300px', lineHeight: 1.5 }}>
+                      Component preview is currently rendering in an external window.
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleLegacyDockBack}
+                      data-testid="legacy-preview-main-dock-btn"
+                      className="btn btn-secondary"
+                      style={{ fontSize: '11.5px', padding: '4px 10px', marginTop: '4px', gap: '4px' }}
                     >
-                      <Layers size={28} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
-                        No Component Mounted
+                      <Minimize2 size={12} /> Dock back
+                    </button>
+                    {createPortal(
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
+                        <div
+                          style={{
+                            padding: '8px 12px',
+                            backgroundColor: theme === 'apple-gsos' ? '#f1f5f9' : '#061320',
+                            borderBottom: '1px solid rgba(6, 182, 212, 0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: '12px',
+                            borderRadius: '6px',
+                          }}
+                        >
+                          <span style={{ fontSize: '12.5px', fontWeight: 600, color: theme === 'apple-gsos' ? '#0f172a' : '#f1f5f9' }}>
+                            Component Preview / Hook Test (Pop-out)
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleLegacyDockBack}
+                            data-testid="legacy-preview-popup-dock-btn"
+                            className="btn btn-secondary"
+                            style={{ fontSize: '11px', padding: '3px 8px', gap: '4px' }}
+                          >
+                            <Minimize2 size={11} /> Dock back
+                          </button>
+                        </div>
+                        <ReactTestErrorBoundary
+                          resetKey={mountedComponent?.key}
+                          onError={(err) => {
+                            appendConsoleLog('error', `React Render Exception: ${err.name}: ${err.message}`);
+                            setIsOutputOpen(true);
+                          }}
+                        >
+                          {mountedComponent ? (
+                            <div key={mountedComponent.key} style={{ width: '100%' }}>
+                              {mountedComponent.element}
+                            </div>
+                          ) : (
+                            <div
+                              style={{
+                                height: '100%',
+                                minHeight: '160px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                textAlign: 'center',
+                                padding: '20px 12px',
+                                color: '#64748b',
+                              }}
+                            >
+                              <Layers size={28} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
+                              <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+                                No Component Mounted
+                              </div>
+                              <div style={{ fontSize: '11.5px', maxWidth: '340px', lineHeight: 1.5 }}>
+                                Call <code>mount(Harness)</code> or <code>mount(Component)</code> in your code or test runner to preview live hook state and UI updates.
+                              </div>
+                            </div>
+                          )}
+                        </ReactTestErrorBoundary>
+                      </div>,
+                      legacyPopupWindow.document.body
+                    )}
+                  </div>
+                ) : (
+                  <ReactTestErrorBoundary
+                    resetKey={mountedComponent?.key}
+                    onError={(err) => {
+                      appendConsoleLog('error', `React Render Exception: ${err.name}: ${err.message}`);
+                      setIsOutputOpen(true);
+                    }}
+                  >
+                    {mountedComponent ? (
+                      <div key={mountedComponent.key} style={{ width: '100%' }}>
+                        {mountedComponent.element}
                       </div>
-                      <div style={{ fontSize: '11.5px', maxWidth: '340px', lineHeight: 1.5 }}>
-                        Call <code>mount(Harness)</code> or <code>mount(Component)</code> in your code or test runner to preview live hook state and UI updates.
+                    ) : (
+                      <div
+                        style={{
+                          height: '100%',
+                          minHeight: '160px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          textAlign: 'center',
+                          padding: '20px 12px',
+                          color: '#64748b',
+                        }}
+                      >
+                        <Layers size={28} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+                          No Component Mounted
+                        </div>
+                        <div style={{ fontSize: '11.5px', maxWidth: '340px', lineHeight: 1.5 }}>
+                          Call <code>mount(Harness)</code> or <code>mount(Component)</code> in your code or test runner to preview live hook state and UI updates.
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </ReactTestErrorBoundary>
+                    )}
+                  </ReactTestErrorBoundary>
+                )}
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

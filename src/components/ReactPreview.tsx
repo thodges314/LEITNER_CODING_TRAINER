@@ -298,14 +298,14 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       className="react-preview-window"
       data-testid={isPoppedOut ? 'react-preview-popout-window' : 'react-preview-window'}
       style={{
-        borderRadius: isPoppedOut ? '0px' : '10px',
+        borderRadius: isPoppedOut ? '0px' : '8px',
         border: isPoppedOut ? 'none' : '1px solid rgba(6, 182, 212, 0.35)',
         backgroundColor: isLight ? '#ffffff' : '#030712',
         overflow: 'hidden',
-        boxShadow: isPoppedOut ? 'none' : '0 8px 30px rgba(0, 0, 0, 0.45)',
+        boxShadow: isPoppedOut ? 'none' : '0 4px 20px rgba(0, 0, 0, 0.5)',
         display: 'flex',
         flexDirection: 'column',
-        marginBottom: isPoppedOut ? '0px' : '14px',
+        marginBottom: '0px',
         flex: isPoppedOut ? 1 : undefined,
         height: isPoppedOut ? '100%' : undefined,
       }}
@@ -677,14 +677,14 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           className="react-preview-window react-preview-docked"
           data-testid="react-preview-window"
           style={{
-            borderRadius: '10px',
+            borderRadius: '8px',
             border: '1px solid rgba(6, 182, 212, 0.35)',
             backgroundColor: isLight ? '#ffffff' : '#030712',
             padding: '12px 16px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: '14px',
+            marginBottom: '0px',
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
           }}
         >
