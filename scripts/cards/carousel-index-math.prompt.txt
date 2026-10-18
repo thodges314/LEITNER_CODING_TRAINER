@@ -1,0 +1,7 @@
+A carousel keeps the index of the slide on screen (0 to length - 1). Write the pure helpers behind its Next, Previous and dot controls.
+
+nextIndex(index, length, { loop = true } = {}): the index after pressing Next. Past the last slide it wraps to 0 when loop is true and stays on the last slide when loop is false.
+prevIndex(index, length, { loop = true } = {}): the index after pressing Previous. Before the first slide it wraps to the last slide when loop is true and stays on 0 when loop is false.
+dotStates(index, length): an array of length booleans where only the dot at index is true.
+
+With length 0 (no slides) nextIndex and prevIndex return 0 and dotStates returns [].

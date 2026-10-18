@@ -1,0 +1,5 @@
+A transfer list shows two lists (left and right) and buttons that move items between them. Write the logic with plain arrays of strings.
+
+moveSelected(left, right, selected, direction): direction is 'right' (move from left to right) or 'left' (move from right to left). Every item of the SOURCE list that is in selected is removed from it and appended to the end of the other list, keeping the order it had in the source list (not the order of selected). Items in selected that are not in the source list are ignored. Return { left, right } as new arrays; the inputs are not changed.
+
+moveAll(left, right, direction): moves every item of the source list.

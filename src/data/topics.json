@@ -14016,5 +14016,217 @@
       }
     ],
     "testHarness": "await $test.run(\"At the top: rows that fit the viewport\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 0, itemHeight: 20, viewportHeight: 100, itemCount: 1000 }));\n}, () => ({ start: 0, end: 5, offsetTop: 0, totalHeight: 20000 }));\n\nawait $test.run(\"Partly visible rows at both edges count as visible\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 250, itemHeight: 20, viewportHeight: 100, itemCount: 1000 }));\n}, () => ({ start: 12, end: 18, offsetTop: 240, totalHeight: 20000 }));\n\nawait $test.run(\"Exactly aligned rows: no extra row at the bottom\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 240, itemHeight: 20, viewportHeight: 100, itemCount: 1000 }));\n}, () => ({ start: 12, end: 17, offsetTop: 240, totalHeight: 20000 }));\n\nawait $test.run(\"overscan adds rows above and below\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 250, itemHeight: 20, viewportHeight: 100, itemCount: 1000, overscan: 3 }));\n}, () => ({ start: 9, end: 21, offsetTop: 180, totalHeight: 20000 }));\n\nawait $test.run(\"overscan never goes above row 0\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 20, itemHeight: 20, viewportHeight: 100, itemCount: 1000, overscan: 5 }));\n}, () => ({ start: 0, end: 11, offsetTop: 0, totalHeight: 20000 }));\n\nawait $test.run(\"At the bottom the range ends at itemCount, with and without overscan\", async () => {\n  const sleep = $test.sleep;\n  const base = { scrollTop: 19900, itemHeight: 20, viewportHeight: 100, itemCount: 1000 };\n  return ([getVisibleRange(base), getVisibleRange({ ...base, overscan: 5 })]);\n}, () => ([{ start: 995, end: 1000, offsetTop: 19900, totalHeight: 20000 }, { start: 990, end: 1000, offsetTop: 19800, totalHeight: 20000 }]));\n\nawait $test.run(\"scrollTop is limited to the scroll range (below 0 and past the end)\", async () => {\n  const sleep = $test.sleep;\n  const base = { itemHeight: 20, viewportHeight: 100, itemCount: 1000 };\n  return ([getVisibleRange({ ...base, scrollTop: -50 }).start, getVisibleRange({ ...base, scrollTop: 99999 }).start]);\n}, () => ([0, 995]));\n\nawait $test.run(\"Fewer rows than the viewport: all of them, and no scrolling\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 500, itemHeight: 20, viewportHeight: 100, itemCount: 3 }));\n}, () => ({ start: 0, end: 3, offsetTop: 0, totalHeight: 60 }));\n\nawait $test.run(\"Content shorter than the viewport never scrolls, whatever the row height\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 5, itemHeight: 1, viewportHeight: 10, itemCount: 3 }));\n}, () => ({ start: 0, end: 3, offsetTop: 0, totalHeight: 3 }));\n\nawait $test.run(\"No items\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 0, itemHeight: 20, viewportHeight: 100, itemCount: 0, overscan: 2 }));\n}, () => ({ start: 0, end: 0, offsetTop: 0, totalHeight: 0 }));"
+  },
+  {
+    "id": "carousel-index-math",
+    "track": "react-components",
+    "title": "Carousel Index Math",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "carousel",
+      "modulo",
+      "component-logic",
+      "basics"
+    ],
+    "promptSeed": "A carousel keeps the index of the slide on screen (0 to length - 1). Write the pure helpers behind its Next, Previous and dot controls.\n\nnextIndex(index, length, { loop = true } = {}): the index after pressing Next. Past the last slide it wraps to 0 when loop is true and stays on the last slide when loop is false.\nprevIndex(index, length, { loop = true } = {}): the index after pressing Previous. Before the first slide it wraps to the last slide when loop is true and stays on 0 when loop is false.\ndotStates(index, length): an array of length booleans where only the dot at index is true.\n\nWith length 0 (no slides) nextIndex and prevIndex return 0 and dotStates returns [].",
+    "difficulty": 1,
+    "concept": "carousel",
+    "referenceSolution": "function nextIndex(index, length, { loop = true } = {}) {\n  if (length <= 0) return 0;\n  if (index >= length - 1) return loop ? 0 : length - 1;\n  return index + 1;\n}\n\nfunction prevIndex(index, length, { loop = true } = {}) {\n  if (length <= 0) return 0;\n  if (index <= 0) return loop ? length - 1 : 0;\n  return index - 1;\n}\n\nfunction dotStates(index, length) {\n  return Array.from({ length: Math.max(0, length) }, (_, i) => i === index);\n}",
+    "solution": "function nextIndex(index, length, { loop = true } = {}) {\n  if (length <= 0) return 0;\n  if (index >= length - 1) return loop ? 0 : length - 1;\n  return index + 1;\n}\n\nfunction prevIndex(index, length, { loop = true } = {}) {\n  if (length <= 0) return 0;\n  if (index <= 0) return loop ? length - 1 : 0;\n  return index - 1;\n}\n\nfunction dotStates(index, length) {\n  return Array.from({ length: Math.max(0, length) }, (_, i) => i === index);\n}",
+    "starterCode": "function nextIndex(index, length, { loop = true } = {}) {\n  if (length <= 0) return 0;\n  if (index >= length - 1) return loop ? 0 : length - 1;\n  return index + 1;\n}\n\nfunction prevIndex(index, length, { loop = true } = {}) {\n  if (length <= 0) return 0;\n  if (index <= 0) return loop ? length - 1 : 0;\n  return index - 1;\n}\n\nfunction dotStates(index, length) {\n  return Array.from({ length: Math.max(0, length) }, (_, i) => i === index);\n}",
+    "testCases": [
+      {
+        "description": "Next and Previous move by one in the middle",
+        "input": "[nextIndex(1, 5), prevIndex(3, 5)]",
+        "expected": "[2, 2]"
+      },
+      {
+        "description": "Next wraps from the last slide to the first",
+        "input": "[nextIndex(4, 5), nextIndex(4, 5, { loop: true })]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "Previous wraps from the first slide to the last",
+        "input": "[prevIndex(0, 5), prevIndex(0, 5, { loop: true })]",
+        "expected": "[4, 4]"
+      },
+      {
+        "description": "With loop: false the ends stay put",
+        "input": "[nextIndex(4, 5, { loop: false }), prevIndex(0, 5, { loop: false })]",
+        "expected": "[4, 0]"
+      },
+      {
+        "description": "loop: false still moves normally in the middle",
+        "input": "[nextIndex(2, 5, { loop: false }), prevIndex(2, 5, { loop: false })]",
+        "expected": "[3, 1]"
+      },
+      {
+        "description": "A single slide always stays on slide 0",
+        "input": "[nextIndex(0, 1), prevIndex(0, 1), nextIndex(0, 1, { loop: false }), prevIndex(0, 1, { loop: false })]",
+        "expected": "[0, 0, 0, 0]"
+      },
+      {
+        "description": "No slides: index 0 and no dots",
+        "input": "[nextIndex(0, 0), prevIndex(0, 0), dotStates(0, 0)]",
+        "expected": "[0, 0, []]"
+      },
+      {
+        "description": "The slides next to the ends do not wrap",
+        "input": "[nextIndex(3, 5), nextIndex(3, 5, { loop: false }), prevIndex(1, 5), prevIndex(1, 5, { loop: false })]",
+        "expected": "[4, 4, 0, 0]"
+      },
+      {
+        "description": "No slides with loop: false still gives index 0",
+        "input": "[nextIndex(0, 0, { loop: false }), prevIndex(0, 0, { loop: false })]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "dotStates marks only the current slide",
+        "input": "[dotStates(0, 3), dotStates(2, 4)]",
+        "expected": "[[true, false, false], [false, false, true, false]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Next and Previous move by one in the middle\", async () => {\n  const sleep = $test.sleep;\n  return ([nextIndex(1, 5), prevIndex(3, 5)]);\n}, () => ([2, 2]));\n\nawait $test.run(\"Next wraps from the last slide to the first\", async () => {\n  const sleep = $test.sleep;\n  return ([nextIndex(4, 5), nextIndex(4, 5, { loop: true })]);\n}, () => ([0, 0]));\n\nawait $test.run(\"Previous wraps from the first slide to the last\", async () => {\n  const sleep = $test.sleep;\n  return ([prevIndex(0, 5), prevIndex(0, 5, { loop: true })]);\n}, () => ([4, 4]));\n\nawait $test.run(\"With loop: false the ends stay put\", async () => {\n  const sleep = $test.sleep;\n  return ([nextIndex(4, 5, { loop: false }), prevIndex(0, 5, { loop: false })]);\n}, () => ([4, 0]));\n\nawait $test.run(\"loop: false still moves normally in the middle\", async () => {\n  const sleep = $test.sleep;\n  return ([nextIndex(2, 5, { loop: false }), prevIndex(2, 5, { loop: false })]);\n}, () => ([3, 1]));\n\nawait $test.run(\"A single slide always stays on slide 0\", async () => {\n  const sleep = $test.sleep;\n  return ([nextIndex(0, 1), prevIndex(0, 1), nextIndex(0, 1, { loop: false }), prevIndex(0, 1, { loop: false })]);\n}, () => ([0, 0, 0, 0]));\n\nawait $test.run(\"No slides: index 0 and no dots\", async () => {\n  const sleep = $test.sleep;\n  return ([nextIndex(0, 0), prevIndex(0, 0), dotStates(0, 0)]);\n}, () => ([0, 0, []]));\n\nawait $test.run(\"The slides next to the ends do not wrap\", async () => {\n  const sleep = $test.sleep;\n  return ([nextIndex(3, 5), nextIndex(3, 5, { loop: false }), prevIndex(1, 5), prevIndex(1, 5, { loop: false })]);\n}, () => ([4, 4, 0, 0]));\n\nawait $test.run(\"No slides with loop: false still gives index 0\", async () => {\n  const sleep = $test.sleep;\n  return ([nextIndex(0, 0, { loop: false }), prevIndex(0, 0, { loop: false })]);\n}, () => ([0, 0]));\n\nawait $test.run(\"dotStates marks only the current slide\", async () => {\n  const sleep = $test.sleep;\n  return ([dotStates(0, 3), dotStates(2, 4)]);\n}, () => ([[true, false, false], [false, false, true, false]]));"
+  },
+  {
+    "id": "history-stack-basic",
+    "track": "react",
+    "title": "Undo / Redo History Stack",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "history",
+      "undo-redo",
+      "state",
+      "basics"
+    ],
+    "promptSeed": "Write createHistory(initial) for an undo/redo feature. It returns an object with these methods:\n\ngetPresent(): the current value.\npush(value): make value the new present and remember the old present so it can be undone. Pushing a new value also throws away everything that could have been redone. Pushing a value equal to the present (Object.is) does nothing and creates no history entry. Returns the present.\nundo(): go back to the previous present; does nothing when there is nothing to undo. Returns the present.\nredo(): go forward again after an undo; does nothing when there is nothing to redo. Returns the present.\ncanUndo() and canRedo(): booleans.",
+    "difficulty": 2,
+    "concept": "history-state",
+    "referenceSolution": "function createHistory(initial) {\n  const past = [];\n  let present = initial;\n  let future = [];\n\n  return {\n    getPresent() {\n      return present;\n    },\n    canUndo() {\n      return past.length > 0;\n    },\n    canRedo() {\n      return future.length > 0;\n    },\n    push(value) {\n      if (Object.is(value, present)) return present;\n      past.push(present);\n      present = value;\n      future = [];\n      return present;\n    },\n    undo() {\n      if (past.length > 0) {\n        future.push(present);\n        present = past.pop();\n      }\n      return present;\n    },\n    redo() {\n      if (future.length > 0) {\n        past.push(present);\n        present = future.pop();\n      }\n      return present;\n    },\n  };\n}",
+    "solution": "function createHistory(initial) {\n  const past = [];\n  let present = initial;\n  let future = [];\n\n  return {\n    getPresent() {\n      return present;\n    },\n    canUndo() {\n      return past.length > 0;\n    },\n    canRedo() {\n      return future.length > 0;\n    },\n    push(value) {\n      if (Object.is(value, present)) return present;\n      past.push(present);\n      present = value;\n      future = [];\n      return present;\n    },\n    undo() {\n      if (past.length > 0) {\n        future.push(present);\n        present = past.pop();\n      }\n      return present;\n    },\n    redo() {\n      if (future.length > 0) {\n        past.push(present);\n        present = future.pop();\n      }\n      return present;\n    },\n  };\n}",
+    "starterCode": "function createHistory(initial) {\n  const past = [];\n  let present = initial;\n  let future = [];\n\n  return {\n    getPresent() {\n      return present;\n    },\n    canUndo() {\n      return past.length > 0;\n    },\n    canRedo() {\n      return future.length > 0;\n    },\n    push(value) {\n      if (Object.is(value, present)) return present;\n      past.push(present);\n      present = value;\n      future = [];\n      return present;\n    },\n    undo() {\n      if (past.length > 0) {\n        future.push(present);\n        present = past.pop();\n      }\n      return present;\n    },\n    redo() {\n      if (future.length > 0) {\n        past.push(present);\n        present = future.pop();\n      }\n      return present;\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "Starts with the initial value and nothing to undo or redo",
+        "input": "const h = createHistory('a');\n[h.getPresent(), h.canUndo(), h.canRedo()]",
+        "expected": "['a', false, false]"
+      },
+      {
+        "description": "push changes the present and enables undo",
+        "input": "const h = createHistory(0);\nh.push(1);\nh.push(2);\n[h.getPresent(), h.canUndo(), h.canRedo()]",
+        "expected": "[2, true, false]"
+      },
+      {
+        "description": "undo steps back one value at a time and returns the new present",
+        "input": "const h = createHistory(0);\nh.push(1);\nh.push(2);\n[h.undo(), h.undo(), h.getPresent()]",
+        "expected": "[1, 0, 0]"
+      },
+      {
+        "description": "redo re-applies undone values in the original order",
+        "input": "const h = createHistory(0);\nh.push(1);\nh.push(2);\nh.undo();\nh.undo();\n[h.redo(), h.redo(), h.canRedo()]",
+        "expected": "[1, 2, false]"
+      },
+      {
+        "description": "Pushing after an undo throws away the redo branch",
+        "input": "const h = createHistory(0);\nh.push(1);\nh.push(2);\nh.undo();\nh.push(9);\n[h.getPresent(), h.canRedo(), h.undo(), h.undo()]",
+        "expected": "[9, false, 1, 0]"
+      },
+      {
+        "description": "undo and redo do nothing at the ends",
+        "input": "const h = createHistory('x');\nconst a = h.undo();\nconst b = h.redo();\nh.push('y');\nconst c2 = h.redo();\n[a, b, c2, h.canUndo()]",
+        "expected": "['x', 'x', 'y', true]"
+      },
+      {
+        "description": "Pushing the present value again creates no history entry",
+        "input": "const h = createHistory(1);\nh.push(1);\n[h.canUndo(), h.getPresent()]",
+        "expected": "[false, 1]"
+      },
+      {
+        "description": "push returns the present, also when the value is ignored",
+        "input": "const h = createHistory(1);\n[h.push(2), h.push(2)]",
+        "expected": "[2, 2]"
+      },
+      {
+        "description": "One step of history is enough for the undo and redo flags",
+        "input": "const h = createHistory(0);\nh.push(1);\nconst afterPush = [h.canUndo(), h.canRedo()];\nh.undo();\n[afterPush, [h.canUndo(), h.canRedo()]]",
+        "expected": "[[true, false], [false, true]]"
+      },
+      {
+        "description": "Undo works again after a redo, in the right order",
+        "input": "const h = createHistory(0);\nh.push(1);\nh.push(2);\nh.undo();\nh.undo();\nh.redo();\nh.redo();\n[h.undo(), h.undo(), h.getPresent()]",
+        "expected": "[1, 0, 0]"
+      },
+      {
+        "description": "Two histories are independent",
+        "input": "const a = createHistory(0);\nconst b = createHistory(0);\na.push(5);\n[a.getPresent(), b.getPresent(), b.canUndo()]",
+        "expected": "[5, 0, false]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Starts with the initial value and nothing to undo or redo\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory('a');\n  return ([h.getPresent(), h.canUndo(), h.canRedo()]);\n}, () => (['a', false, false]));\n\nawait $test.run(\"push changes the present and enables undo\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory(0);\n  h.push(1);\n  h.push(2);\n  return ([h.getPresent(), h.canUndo(), h.canRedo()]);\n}, () => ([2, true, false]));\n\nawait $test.run(\"undo steps back one value at a time and returns the new present\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory(0);\n  h.push(1);\n  h.push(2);\n  return ([h.undo(), h.undo(), h.getPresent()]);\n}, () => ([1, 0, 0]));\n\nawait $test.run(\"redo re-applies undone values in the original order\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory(0);\n  h.push(1);\n  h.push(2);\n  h.undo();\n  h.undo();\n  return ([h.redo(), h.redo(), h.canRedo()]);\n}, () => ([1, 2, false]));\n\nawait $test.run(\"Pushing after an undo throws away the redo branch\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory(0);\n  h.push(1);\n  h.push(2);\n  h.undo();\n  h.push(9);\n  return ([h.getPresent(), h.canRedo(), h.undo(), h.undo()]);\n}, () => ([9, false, 1, 0]));\n\nawait $test.run(\"undo and redo do nothing at the ends\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory('x');\n  const a = h.undo();\n  const b = h.redo();\n  h.push('y');\n  const c2 = h.redo();\n  return ([a, b, c2, h.canUndo()]);\n}, () => (['x', 'x', 'y', true]));\n\nawait $test.run(\"Pushing the present value again creates no history entry\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory(1);\n  h.push(1);\n  return ([h.canUndo(), h.getPresent()]);\n}, () => ([false, 1]));\n\nawait $test.run(\"push returns the present, also when the value is ignored\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory(1);\n  return ([h.push(2), h.push(2)]);\n}, () => ([2, 2]));\n\nawait $test.run(\"One step of history is enough for the undo and redo flags\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory(0);\n  h.push(1);\n  const afterPush = [h.canUndo(), h.canRedo()];\n  h.undo();\n  return ([afterPush, [h.canUndo(), h.canRedo()]]);\n}, () => ([[true, false], [false, true]]));\n\nawait $test.run(\"Undo works again after a redo, in the right order\", async () => {\n  const sleep = $test.sleep;\n  const h = createHistory(0);\n  h.push(1);\n  h.push(2);\n  h.undo();\n  h.undo();\n  h.redo();\n  h.redo();\n  return ([h.undo(), h.undo(), h.getPresent()]);\n}, () => ([1, 0, 0]));\n\nawait $test.run(\"Two histories are independent\", async () => {\n  const sleep = $test.sleep;\n  const a = createHistory(0);\n  const b = createHistory(0);\n  a.push(5);\n  return ([a.getPresent(), b.getPresent(), b.canUndo()]);\n}, () => ([5, 0, false]));"
+  },
+  {
+    "id": "move-between-lists",
+    "track": "react-components",
+    "title": "Move Items Between Two Lists",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "transfer-list",
+      "arrays",
+      "component-logic",
+      "basics"
+    ],
+    "promptSeed": "A transfer list shows two lists (left and right) and buttons that move items between them. Write the logic with plain arrays of strings.\n\nmoveSelected(left, right, selected, direction): direction is 'right' (move from left to right) or 'left' (move from right to left). Every item of the SOURCE list that is in selected is removed from it and appended to the end of the other list, keeping the order it had in the source list (not the order of selected). Items in selected that are not in the source list are ignored. Return { left, right } as new arrays; the inputs are not changed.\n\nmoveAll(left, right, direction): moves every item of the source list.",
+    "difficulty": 2,
+    "concept": "dual-list",
+    "referenceSolution": "function moveSelected(left, right, selected, direction) {\n  const toRight = direction === 'right';\n  const from = toRight ? left : right;\n  const to = toRight ? right : left;\n  const chosen = new Set(selected);\n  const moving = from.filter((item) => chosen.has(item));\n  const nextFrom = from.filter((item) => !chosen.has(item));\n  const nextTo = [...to, ...moving];\n  return toRight ? { left: nextFrom, right: nextTo } : { left: nextTo, right: nextFrom };\n}\n\nfunction moveAll(left, right, direction) {\n  return moveSelected(left, right, direction === 'right' ? left : right, direction);\n}",
+    "solution": "function moveSelected(left, right, selected, direction) {\n  const toRight = direction === 'right';\n  const from = toRight ? left : right;\n  const to = toRight ? right : left;\n  const chosen = new Set(selected);\n  const moving = from.filter((item) => chosen.has(item));\n  const nextFrom = from.filter((item) => !chosen.has(item));\n  const nextTo = [...to, ...moving];\n  return toRight ? { left: nextFrom, right: nextTo } : { left: nextTo, right: nextFrom };\n}\n\nfunction moveAll(left, right, direction) {\n  return moveSelected(left, right, direction === 'right' ? left : right, direction);\n}",
+    "starterCode": "function moveSelected(left, right, selected, direction) {\n  const toRight = direction === 'right';\n  const from = toRight ? left : right;\n  const to = toRight ? right : left;\n  const chosen = new Set(selected);\n  const moving = from.filter((item) => chosen.has(item));\n  const nextFrom = from.filter((item) => !chosen.has(item));\n  const nextTo = [...to, ...moving];\n  return toRight ? { left: nextFrom, right: nextTo } : { left: nextTo, right: nextFrom };\n}\n\nfunction moveAll(left, right, direction) {\n  return moveSelected(left, right, direction === 'right' ? left : right, direction);\n}",
+    "testCases": [
+      {
+        "description": "Selected items move from left to right and are appended",
+        "input": "moveSelected(['a', 'b', 'c'], ['x'], ['b'], 'right')",
+        "expected": "{ left: ['a', 'c'], right: ['x', 'b'] }"
+      },
+      {
+        "description": "Moved items keep their order from the source list, not the order of selected",
+        "input": "moveSelected(['a', 'b', 'c', 'd'], [], ['d', 'a'], 'right')",
+        "expected": "{ left: ['b', 'c'], right: ['a', 'd'] }"
+      },
+      {
+        "description": "Direction left moves from the right list to the left list",
+        "input": "moveSelected(['a'], ['x', 'y', 'z'], ['z', 'x'], 'left')",
+        "expected": "{ left: ['a', 'x', 'z'], right: ['y'] }"
+      },
+      {
+        "description": "Selected items that are not in the source list are ignored",
+        "input": "moveSelected(['a', 'b'], ['x'], ['x', 'q'], 'right')",
+        "expected": "{ left: ['a', 'b'], right: ['x'] }"
+      },
+      {
+        "description": "An empty selection changes nothing",
+        "input": "moveSelected(['a'], ['b'], [], 'right')",
+        "expected": "{ left: ['a'], right: ['b'] }"
+      },
+      {
+        "description": "The input arrays are not changed",
+        "input": "const left = ['a', 'b'];\nconst right = ['x'];\nmoveSelected(left, right, ['a'], 'right');\n[left, right]",
+        "expected": "[['a', 'b'], ['x']]"
+      },
+      {
+        "description": "moveAll moves everything in the chosen direction",
+        "input": "[moveAll(['a', 'b'], ['x'], 'right'), moveAll(['a'], ['x', 'y'], 'left')]",
+        "expected": "[{ left: [], right: ['x', 'a', 'b'] }, { left: ['a', 'x', 'y'], right: [] }]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Selected items move from left to right and are appended\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a', 'b', 'c'], ['x'], ['b'], 'right'));\n}, () => ({ left: ['a', 'c'], right: ['x', 'b'] }));\n\nawait $test.run(\"Moved items keep their order from the source list, not the order of selected\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a', 'b', 'c', 'd'], [], ['d', 'a'], 'right'));\n}, () => ({ left: ['b', 'c'], right: ['a', 'd'] }));\n\nawait $test.run(\"Direction left moves from the right list to the left list\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a'], ['x', 'y', 'z'], ['z', 'x'], 'left'));\n}, () => ({ left: ['a', 'x', 'z'], right: ['y'] }));\n\nawait $test.run(\"Selected items that are not in the source list are ignored\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a', 'b'], ['x'], ['x', 'q'], 'right'));\n}, () => ({ left: ['a', 'b'], right: ['x'] }));\n\nawait $test.run(\"An empty selection changes nothing\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a'], ['b'], [], 'right'));\n}, () => ({ left: ['a'], right: ['b'] }));\n\nawait $test.run(\"The input arrays are not changed\", async () => {\n  const sleep = $test.sleep;\n  const left = ['a', 'b'];\n  const right = ['x'];\n  moveSelected(left, right, ['a'], 'right');\n  return ([left, right]);\n}, () => ([['a', 'b'], ['x']]));\n\nawait $test.run(\"moveAll moves everything in the chosen direction\", async () => {\n  const sleep = $test.sleep;\n  return ([moveAll(['a', 'b'], ['x'], 'right'), moveAll(['a'], ['x', 'y'], 'left')]);\n}, () => ([{ left: [], right: ['x', 'a', 'b'] }, { left: ['a', 'x', 'y'], right: [] }]));"
   }
 ]

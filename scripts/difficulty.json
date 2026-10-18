@@ -958,5 +958,17 @@
   "visible-window-range": {
     "difficulty": 2,
     "concept": "virtualization"
+  },
+  "history-stack-basic": {
+    "difficulty": 2,
+    "concept": "history-state"
+  },
+  "carousel-index-math": {
+    "difficulty": 1,
+    "concept": "carousel"
+  },
+  "move-between-lists": {
+    "difficulty": 2,
+    "concept": "dual-list"
   }
 }
