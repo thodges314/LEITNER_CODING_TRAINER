@@ -22,14 +22,14 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 243 total = **211 default + 32 in the optional `algorithms-advanced` pack** (87 default cards active at first run) |
-| Documented test cases | 1638 (each shown as input → expected in the UI) |
+| Cards | 246 total = **214 default + 32 in the optional `algorithms-advanced` pack** (90 default cards active at first run) |
+| Documented test cases | 1664 (each shown as input → expected in the UI) |
 | Difficulty spread | all 234: d1 33 · d2 70 · d3 90 · d4 39 · d5 2; default 201: d1 33 · d2 66 · d3 72 · d4 28 · d5 2 |
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 854 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 486 card tests + 8 navigation tests, ~6 min on an idle machine with 4 workers). **Last full run (branch `cleanup/difficulty-audit`): 476 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 492 card tests + 8 navigation tests, ~6 min on an idle machine with 4 workers). **Last full run (branch `cleanup/difficulty-audit`): 476 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -204,7 +204,7 @@ bulk of the default deck (core 47 of 201); the heavier ones are opt-in (§7.4b).
 
 ### 7.1 Difficulty ladder holes (the owner wants "simple first, then harder" on every concept)
 **Status (current):** the starter rungs for the pure-function and TypeScript concepts exist. Concepts in the default deck whose lowest rung is **still ≥ 3**
-(all React/DOM or tooling; each needs a hand-written DOM or pure harness and a `npm run e2e` run): `architecture`(1 card, lowest d5), `notifications`(1 card, lowest d3), `optimistic-ui`(1 card, lowest d3), `react-fetch`(1 card, lowest d3), `testing-tools`(3 cards, lowest d3), `wizard`(1 card, lowest d4). `react-fetch` lost its d2 entry card when its near-duplicate was removed; a plain fetch-hook warm-up (no abort/race) would be the natural new first rung. Intro rungs done so far (branch `feature/intro-cards`): `calculate-winner` (game-board, d1), `paginate-items` (pagination, d1), `create-store-basic` (state-management, d2); batch 2: `flatten-visible-tree` (tree-ui, d2), `add-tag-rules` (tag-input, d1), `visible-window-range` (virtualization, d2); batch 3: `history-stack-basic` (history-state, d2), `carousel-index-math` (carousel, d1), `move-between-lists` (dual-list, d2).
+(all React/DOM or tooling; each needs a hand-written DOM or pure harness and a `npm run e2e` run): `architecture`(1 card, lowest d5), `react-fetch`(1 card, lowest d3), `testing-tools`(3 cards, lowest d3), `wizard`(1 card, lowest d4). `react-fetch` lost its d2 entry card when its near-duplicate was removed; a plain fetch-hook warm-up (no abort/race) would be the natural new first rung. Intro rungs done so far (branch `feature/intro-cards`): `calculate-winner` (game-board, d1), `paginate-items` (pagination, d1), `create-store-basic` (state-management, d2); batch 2: `flatten-visible-tree` (tree-ui, d2), `add-tag-rules` (tag-input, d1), `visible-window-range` (virtualization, d2); batch 3: `history-stack-basic` (history-state, d2), `carousel-index-math` (carousel, d1), `move-between-lists` (dual-list, d2); batch 4: `toast-queue-logic` (notifications, d2), `wizard-step-logic` (wizard, d2), `optimistic-list-update` (optimistic-ui, d2).
 Only two d5 cards exist.
 The original table below is kept for the proposed rung designs (the React rows are still open).
 Add the rung(s) below; each must follow §4 (reference, cases, harness, empty-solution test, `difficulty.json` entry, same `concept`).

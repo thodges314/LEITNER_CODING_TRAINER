@@ -1,0 +1,6 @@
+A multi-step form (wizard) tracks the current step as an index from 0 to total - 1. Write the pure helpers behind its buttons and progress display.
+
+nextStep(step, total) and prevStep(step): the step after pressing Next or Back; they never go past the first or last step.
+stepStatuses(current, total): an array of total strings, 'done' for steps before current, 'current' for current, 'upcoming' after it.
+missingFields(values, required): the names in required (keeping their order) whose value in the values object is missing: undefined, null, or a string that is empty after trimming. Other values count as filled in, including 0 and false.
+progressPercent(current, total): the percentage of steps already finished (current out of total), rounded to a whole number; 0 when total is 0.

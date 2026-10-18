@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Optimistic Update: Apply, Confirm, Roll Back",
+  "tags": [
+    "optimistic-ui",
+    "state",
+    "component-logic",
+    "basics"
+  ]
+}

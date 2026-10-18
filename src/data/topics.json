@@ -14228,5 +14228,207 @@
       }
     ],
     "testHarness": "await $test.run(\"Selected items move from left to right and are appended\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a', 'b', 'c'], ['x'], ['b'], 'right'));\n}, () => ({ left: ['a', 'c'], right: ['x', 'b'] }));\n\nawait $test.run(\"Moved items keep their order from the source list, not the order of selected\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a', 'b', 'c', 'd'], [], ['d', 'a'], 'right'));\n}, () => ({ left: ['b', 'c'], right: ['a', 'd'] }));\n\nawait $test.run(\"Direction left moves from the right list to the left list\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a'], ['x', 'y', 'z'], ['z', 'x'], 'left'));\n}, () => ({ left: ['a', 'x', 'z'], right: ['y'] }));\n\nawait $test.run(\"Selected items that are not in the source list are ignored\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a', 'b'], ['x'], ['x', 'q'], 'right'));\n}, () => ({ left: ['a', 'b'], right: ['x'] }));\n\nawait $test.run(\"An empty selection changes nothing\", async () => {\n  const sleep = $test.sleep;\n  return (moveSelected(['a'], ['b'], [], 'right'));\n}, () => ({ left: ['a'], right: ['b'] }));\n\nawait $test.run(\"The input arrays are not changed\", async () => {\n  const sleep = $test.sleep;\n  const left = ['a', 'b'];\n  const right = ['x'];\n  moveSelected(left, right, ['a'], 'right');\n  return ([left, right]);\n}, () => ([['a', 'b'], ['x']]));\n\nawait $test.run(\"moveAll moves everything in the chosen direction\", async () => {\n  const sleep = $test.sleep;\n  return ([moveAll(['a', 'b'], ['x'], 'right'), moveAll(['a'], ['x', 'y'], 'left')]);\n}, () => ([{ left: [], right: ['x', 'a', 'b'] }, { left: ['a', 'x', 'y'], right: [] }]));"
+  },
+  {
+    "id": "optimistic-list-update",
+    "track": "react-components",
+    "title": "Optimistic Update: Apply, Confirm, Roll Back",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "optimistic-ui",
+      "state",
+      "component-logic",
+      "basics"
+    ],
+    "promptSeed": "An optimistic UI shows the result of an action immediately and fixes it when the server answers. Write the pure state helpers (none of them changes its inputs). Items are objects with an id.\n\ntoggleLike(post): for a post { id, liked, likes } return a new post with liked flipped and likes one higher (when it was not liked) or one lower (when it was).\napplyOptimistic(items, id, patch): a new array where the item with that id is replaced by a copy with patch merged in and pending: true. All other items stay the very same objects.\nconfirmOptimistic(items, id, serverItem): replace the item with that id by a copy of serverItem with pending: false.\nrollbackOptimistic(items, id, original): put original back in place of the item with that id, exactly as it was (no pending flag).\n\nAn id that is not in the list changes nothing.",
+    "difficulty": 2,
+    "concept": "optimistic-ui",
+    "referenceSolution": "function toggleLike(post) {\n  return { ...post, liked: !post.liked, likes: post.likes + (post.liked ? -1 : 1) };\n}\n\nfunction applyOptimistic(items, id, patch) {\n  return items.map((item) => (item.id === id ? { ...item, ...patch, pending: true } : item));\n}\n\nfunction confirmOptimistic(items, id, serverItem) {\n  return items.map((item) => (item.id === id ? { ...serverItem, pending: false } : item));\n}\n\nfunction rollbackOptimistic(items, id, original) {\n  return items.map((item) => (item.id === id ? original : item));\n}",
+    "solution": "function toggleLike(post) {\n  return { ...post, liked: !post.liked, likes: post.likes + (post.liked ? -1 : 1) };\n}\n\nfunction applyOptimistic(items, id, patch) {\n  return items.map((item) => (item.id === id ? { ...item, ...patch, pending: true } : item));\n}\n\nfunction confirmOptimistic(items, id, serverItem) {\n  return items.map((item) => (item.id === id ? { ...serverItem, pending: false } : item));\n}\n\nfunction rollbackOptimistic(items, id, original) {\n  return items.map((item) => (item.id === id ? original : item));\n}",
+    "starterCode": "function toggleLike(post) {\n  return { ...post, liked: !post.liked, likes: post.likes + (post.liked ? -1 : 1) };\n}\n\nfunction applyOptimistic(items, id, patch) {\n  return items.map((item) => (item.id === id ? { ...item, ...patch, pending: true } : item));\n}\n\nfunction confirmOptimistic(items, id, serverItem) {\n  return items.map((item) => (item.id === id ? { ...serverItem, pending: false } : item));\n}\n\nfunction rollbackOptimistic(items, id, original) {\n  return items.map((item) => (item.id === id ? original : item));\n}",
+    "testCases": [
+      {
+        "description": "toggleLike likes a post: liked flips on and the count goes up",
+        "input": "toggleLike({ id: 7, liked: false, likes: 10 })",
+        "expected": "{ id: 7, liked: true, likes: 11 }"
+      },
+      {
+        "description": "toggleLike unlikes a post: liked flips off and the count goes down",
+        "input": "toggleLike({ id: 7, liked: true, likes: 11 })",
+        "expected": "{ id: 7, liked: false, likes: 10 }"
+      },
+      {
+        "description": "toggleLike returns a new object and leaves the old post alone",
+        "input": "const post = { id: 7, liked: false, likes: 10 };\nconst next = toggleLike(post);\n[next !== post, post]",
+        "expected": "[true, { id: 7, liked: false, likes: 10 }]"
+      },
+      {
+        "description": "applyOptimistic patches the item and marks it pending",
+        "input": "applyOptimistic([{ id: 1, title: 'a' }, { id: 2, title: 'b' }], 2, { title: 'B' })",
+        "expected": "[{ id: 1, title: 'a' }, { id: 2, title: 'B', pending: true }]"
+      },
+      {
+        "description": "applyOptimistic keeps other items as the same objects and does not change the original",
+        "input": "const items = [{ id: 1, title: 'a' }, { id: 2, title: 'b' }];\nconst next = applyOptimistic(items, 2, { title: 'B' });\n[next[0] === items[0], next[1] === items[1], items[1]]",
+        "expected": "[true, false, { id: 2, title: 'b' }]"
+      },
+      {
+        "description": "confirmOptimistic swaps in the server version with pending: false",
+        "input": "confirmOptimistic([{ id: 1, title: 'a' }, { id: 2, title: 'B', pending: true }], 2, { id: 2, title: 'B (server)' })",
+        "expected": "[{ id: 1, title: 'a' }, { id: 2, title: 'B (server)', pending: false }]"
+      },
+      {
+        "description": "rollbackOptimistic puts the original back exactly, without a pending flag",
+        "input": "rollbackOptimistic([{ id: 1, title: 'a' }, { id: 2, title: 'B', pending: true }], 2, { id: 2, title: 'b' })",
+        "expected": "[{ id: 1, title: 'a' }, { id: 2, title: 'b' }]"
+      },
+      {
+        "description": "An id that is not in the list changes nothing",
+        "input": "const items = [{ id: 1, title: 'a' }];\n[applyOptimistic(items, 9, { title: 'x' }), confirmOptimistic(items, 9, { id: 9 }), rollbackOptimistic(items, 9, { id: 9 })]",
+        "expected": "[[{ id: 1, title: 'a' }], [{ id: 1, title: 'a' }], [{ id: 1, title: 'a' }]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"toggleLike likes a post: liked flips on and the count goes up\", async () => {\n  const sleep = $test.sleep;\n  return (toggleLike({ id: 7, liked: false, likes: 10 }));\n}, () => ({ id: 7, liked: true, likes: 11 }));\n\nawait $test.run(\"toggleLike unlikes a post: liked flips off and the count goes down\", async () => {\n  const sleep = $test.sleep;\n  return (toggleLike({ id: 7, liked: true, likes: 11 }));\n}, () => ({ id: 7, liked: false, likes: 10 }));\n\nawait $test.run(\"toggleLike returns a new object and leaves the old post alone\", async () => {\n  const sleep = $test.sleep;\n  const post = { id: 7, liked: false, likes: 10 };\n  const next = toggleLike(post);\n  return ([next !== post, post]);\n}, () => ([true, { id: 7, liked: false, likes: 10 }]));\n\nawait $test.run(\"applyOptimistic patches the item and marks it pending\", async () => {\n  const sleep = $test.sleep;\n  return (applyOptimistic([{ id: 1, title: 'a' }, { id: 2, title: 'b' }], 2, { title: 'B' }));\n}, () => ([{ id: 1, title: 'a' }, { id: 2, title: 'B', pending: true }]));\n\nawait $test.run(\"applyOptimistic keeps other items as the same objects and does not change the original\", async () => {\n  const sleep = $test.sleep;\n  const items = [{ id: 1, title: 'a' }, { id: 2, title: 'b' }];\n  const next = applyOptimistic(items, 2, { title: 'B' });\n  return ([next[0] === items[0], next[1] === items[1], items[1]]);\n}, () => ([true, false, { id: 2, title: 'b' }]));\n\nawait $test.run(\"confirmOptimistic swaps in the server version with pending: false\", async () => {\n  const sleep = $test.sleep;\n  return (confirmOptimistic([{ id: 1, title: 'a' }, { id: 2, title: 'B', pending: true }], 2, { id: 2, title: 'B (server)' }));\n}, () => ([{ id: 1, title: 'a' }, { id: 2, title: 'B (server)', pending: false }]));\n\nawait $test.run(\"rollbackOptimistic puts the original back exactly, without a pending flag\", async () => {\n  const sleep = $test.sleep;\n  return (rollbackOptimistic([{ id: 1, title: 'a' }, { id: 2, title: 'B', pending: true }], 2, { id: 2, title: 'b' }));\n}, () => ([{ id: 1, title: 'a' }, { id: 2, title: 'b' }]));\n\nawait $test.run(\"An id that is not in the list changes nothing\", async () => {\n  const sleep = $test.sleep;\n  const items = [{ id: 1, title: 'a' }];\n  return ([applyOptimistic(items, 9, { title: 'x' }), confirmOptimistic(items, 9, { id: 9 }), rollbackOptimistic(items, 9, { id: 9 })]);\n}, () => ([[{ id: 1, title: 'a' }], [{ id: 1, title: 'a' }], [{ id: 1, title: 'a' }]]));"
+  },
+  {
+    "id": "toast-queue-logic",
+    "track": "react-components",
+    "title": "Toast Queue Logic",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "notifications",
+      "toast",
+      "component-logic",
+      "basics"
+    ],
+    "promptSeed": "A toast (notification) system keeps an array of toasts like { id, message, expiresAt? }. Write the pure functions that update it; none of them changes the array it is given.\n\naddToast(toasts, toast, max = 3): add toast at the end. When a toast with the same id is already in the list, update that toast in place (merge the new fields, keep its position) and add nothing. When the list would end up with more than max toasts, drop the oldest ones (from the start) so that max remain.\ndismissToast(toasts, id): the list without the toast that has that id (an unknown id changes nothing).\nexpireToasts(toasts, now): remove every toast whose expiresAt is at or before now. A toast without expiresAt never expires.",
+    "difficulty": 2,
+    "concept": "notifications",
+    "referenceSolution": "function addToast(toasts, toast, max = 3) {\n  if (toasts.some((t) => t.id === toast.id)) {\n    return toasts.map((t) => (t.id === toast.id ? { ...t, ...toast } : t));\n  }\n  const next = [...toasts, toast];\n  return next.length > max ? next.slice(next.length - max) : next;\n}\n\nfunction dismissToast(toasts, id) {\n  return toasts.filter((t) => t.id !== id);\n}\n\nfunction expireToasts(toasts, now) {\n  return toasts.filter((t) => t.expiresAt === undefined || t.expiresAt > now);\n}",
+    "solution": "function addToast(toasts, toast, max = 3) {\n  if (toasts.some((t) => t.id === toast.id)) {\n    return toasts.map((t) => (t.id === toast.id ? { ...t, ...toast } : t));\n  }\n  const next = [...toasts, toast];\n  return next.length > max ? next.slice(next.length - max) : next;\n}\n\nfunction dismissToast(toasts, id) {\n  return toasts.filter((t) => t.id !== id);\n}\n\nfunction expireToasts(toasts, now) {\n  return toasts.filter((t) => t.expiresAt === undefined || t.expiresAt > now);\n}",
+    "starterCode": "function addToast(toasts, toast, max = 3) {\n  if (toasts.some((t) => t.id === toast.id)) {\n    return toasts.map((t) => (t.id === toast.id ? { ...t, ...toast } : t));\n  }\n  const next = [...toasts, toast];\n  return next.length > max ? next.slice(next.length - max) : next;\n}\n\nfunction dismissToast(toasts, id) {\n  return toasts.filter((t) => t.id !== id);\n}\n\nfunction expireToasts(toasts, now) {\n  return toasts.filter((t) => t.expiresAt === undefined || t.expiresAt > now);\n}",
+    "testCases": [
+      {
+        "description": "addToast appends a toast",
+        "input": "addToast([], { id: 1, message: 'Saved' })",
+        "expected": "[{ id: 1, message: 'Saved' }]"
+      },
+      {
+        "description": "Toasts stay in the order they were added",
+        "input": "addToast([{ id: 1, message: 'a' }], { id: 2, message: 'b' }).map((t) => t.id)",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "The default max is 3: the oldest toast is dropped",
+        "input": "addToast([{ id: 1, message: 'a' }, { id: 2, message: 'b' }, { id: 3, message: 'c' }], { id: 4, message: 'd' }).map((t) => t.id)",
+        "expected": "[2, 3, 4]"
+      },
+      {
+        "description": "A custom max is respected",
+        "input": "[addToast([{ id: 1, message: 'a' }, { id: 2, message: 'b' }], { id: 3, message: 'c' }, 2).map((t) => t.id), addToast([{ id: 1, message: 'a' }], { id: 2, message: 'b' }, 1).map((t) => t.id)]",
+        "expected": "[[2, 3], [2]]"
+      },
+      {
+        "description": "A toast with an existing id is updated in place and nothing is dropped",
+        "input": "addToast([{ id: 1, message: 'a' }, { id: 2, message: 'b' }], { id: 1, message: 'A!' }, 2)",
+        "expected": "[{ id: 1, message: 'A!' }, { id: 2, message: 'b' }]"
+      },
+      {
+        "description": "addToast does not change the list it is given",
+        "input": "const list = [{ id: 1, message: 'a' }];\naddToast(list, { id: 2, message: 'b' });\nlist",
+        "expected": "[{ id: 1, message: 'a' }]"
+      },
+      {
+        "description": "dismissToast removes by id; an unknown id changes nothing",
+        "input": "[dismissToast([{ id: 1, message: 'a' }, { id: 2, message: 'b' }], 1), dismissToast([{ id: 1, message: 'a' }], 9)]",
+        "expected": "[[{ id: 2, message: 'b' }], [{ id: 1, message: 'a' }]]"
+      },
+      {
+        "description": "expireToasts removes toasts at or before now; toasts without expiresAt stay",
+        "input": "const toasts = [{ id: 1, message: 'a', expiresAt: 100 }, { id: 2, message: 'b', expiresAt: 200 }, { id: 3, message: 'c' }];\n[99, 100, 500].map((now) => expireToasts(toasts, now).map((t) => t.id))",
+        "expected": "[[1, 2, 3], [2, 3], [3]]"
+      }
+    ],
+    "testHarness": "await $test.run(\"addToast appends a toast\", async () => {\n  const sleep = $test.sleep;\n  return (addToast([], { id: 1, message: 'Saved' }));\n}, () => ([{ id: 1, message: 'Saved' }]));\n\nawait $test.run(\"Toasts stay in the order they were added\", async () => {\n  const sleep = $test.sleep;\n  return (addToast([{ id: 1, message: 'a' }], { id: 2, message: 'b' }).map((t) => t.id));\n}, () => ([1, 2]));\n\nawait $test.run(\"The default max is 3: the oldest toast is dropped\", async () => {\n  const sleep = $test.sleep;\n  return (addToast([{ id: 1, message: 'a' }, { id: 2, message: 'b' }, { id: 3, message: 'c' }], { id: 4, message: 'd' }).map((t) => t.id));\n}, () => ([2, 3, 4]));\n\nawait $test.run(\"A custom max is respected\", async () => {\n  const sleep = $test.sleep;\n  return ([addToast([{ id: 1, message: 'a' }, { id: 2, message: 'b' }], { id: 3, message: 'c' }, 2).map((t) => t.id), addToast([{ id: 1, message: 'a' }], { id: 2, message: 'b' }, 1).map((t) => t.id)]);\n}, () => ([[2, 3], [2]]));\n\nawait $test.run(\"A toast with an existing id is updated in place and nothing is dropped\", async () => {\n  const sleep = $test.sleep;\n  return (addToast([{ id: 1, message: 'a' }, { id: 2, message: 'b' }], { id: 1, message: 'A!' }, 2));\n}, () => ([{ id: 1, message: 'A!' }, { id: 2, message: 'b' }]));\n\nawait $test.run(\"addToast does not change the list it is given\", async () => {\n  const sleep = $test.sleep;\n  const list = [{ id: 1, message: 'a' }];\n  addToast(list, { id: 2, message: 'b' });\n  return (list);\n}, () => ([{ id: 1, message: 'a' }]));\n\nawait $test.run(\"dismissToast removes by id; an unknown id changes nothing\", async () => {\n  const sleep = $test.sleep;\n  return ([dismissToast([{ id: 1, message: 'a' }, { id: 2, message: 'b' }], 1), dismissToast([{ id: 1, message: 'a' }], 9)]);\n}, () => ([[{ id: 2, message: 'b' }], [{ id: 1, message: 'a' }]]));\n\nawait $test.run(\"expireToasts removes toasts at or before now; toasts without expiresAt stay\", async () => {\n  const sleep = $test.sleep;\n  const toasts = [{ id: 1, message: 'a', expiresAt: 100 }, { id: 2, message: 'b', expiresAt: 200 }, { id: 3, message: 'c' }];\n  return ([99, 100, 500].map((now) => expireToasts(toasts, now).map((t) => t.id)));\n}, () => ([[1, 2, 3], [2, 3], [3]]));"
+  },
+  {
+    "id": "wizard-step-logic",
+    "track": "react-components",
+    "title": "Wizard Step Logic",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "wizard",
+      "forms",
+      "component-logic",
+      "basics"
+    ],
+    "promptSeed": "A multi-step form (wizard) tracks the current step as an index from 0 to total - 1. Write the pure helpers behind its buttons and progress display.\n\nnextStep(step, total) and prevStep(step): the step after pressing Next or Back; they never go past the first or last step.\nstepStatuses(current, total): an array of total strings, 'done' for steps before current, 'current' for current, 'upcoming' after it.\nmissingFields(values, required): the names in required (keeping their order) whose value in the values object is missing: undefined, null, or a string that is empty after trimming. Other values count as filled in, including 0 and false.\nprogressPercent(current, total): the percentage of steps already finished (current out of total), rounded to a whole number; 0 when total is 0.",
+    "difficulty": 2,
+    "concept": "wizard",
+    "referenceSolution": "function nextStep(step, total) {\n  return Math.min(step + 1, Math.max(0, total - 1));\n}\n\nfunction prevStep(step) {\n  return Math.max(step - 1, 0);\n}\n\nfunction stepStatuses(current, total) {\n  return Array.from({ length: Math.max(0, total) }, (_, i) => (i < current ? 'done' : i === current ? 'current' : 'upcoming'));\n}\n\nfunction missingFields(values, required) {\n  return required.filter((name) => {\n    const value = values[name];\n    return value === undefined || value === null || (typeof value === 'string' && value.trim() === '');\n  });\n}\n\nfunction progressPercent(current, total) {\n  if (total <= 0) return 0;\n  return Math.round((current / total) * 100);\n}",
+    "solution": "function nextStep(step, total) {\n  return Math.min(step + 1, Math.max(0, total - 1));\n}\n\nfunction prevStep(step) {\n  return Math.max(step - 1, 0);\n}\n\nfunction stepStatuses(current, total) {\n  return Array.from({ length: Math.max(0, total) }, (_, i) => (i < current ? 'done' : i === current ? 'current' : 'upcoming'));\n}\n\nfunction missingFields(values, required) {\n  return required.filter((name) => {\n    const value = values[name];\n    return value === undefined || value === null || (typeof value === 'string' && value.trim() === '');\n  });\n}\n\nfunction progressPercent(current, total) {\n  if (total <= 0) return 0;\n  return Math.round((current / total) * 100);\n}",
+    "starterCode": "function nextStep(step, total) {\n  return Math.min(step + 1, Math.max(0, total - 1));\n}\n\nfunction prevStep(step) {\n  return Math.max(step - 1, 0);\n}\n\nfunction stepStatuses(current, total) {\n  return Array.from({ length: Math.max(0, total) }, (_, i) => (i < current ? 'done' : i === current ? 'current' : 'upcoming'));\n}\n\nfunction missingFields(values, required) {\n  return required.filter((name) => {\n    const value = values[name];\n    return value === undefined || value === null || (typeof value === 'string' && value.trim() === '');\n  });\n}\n\nfunction progressPercent(current, total) {\n  if (total <= 0) return 0;\n  return Math.round((current / total) * 100);\n}",
+    "testCases": [
+      {
+        "description": "Next and Back move by one",
+        "input": "[nextStep(0, 3), nextStep(1, 3), prevStep(2), prevStep(1)]",
+        "expected": "[1, 2, 1, 0]"
+      },
+      {
+        "description": "Next stops on the last step and Back stops on the first",
+        "input": "[nextStep(2, 3), nextStep(0, 1), prevStep(0)]",
+        "expected": "[2, 0, 0]"
+      },
+      {
+        "description": "stepStatuses marks done, current and upcoming steps",
+        "input": "[stepStatuses(1, 4), stepStatuses(0, 2), stepStatuses(3, 4)]",
+        "expected": "[['done', 'current', 'upcoming', 'upcoming'], ['current', 'upcoming'], ['done', 'done', 'done', 'current']]"
+      },
+      {
+        "description": "stepStatuses with no steps is an empty list",
+        "input": "stepStatuses(0, 0)",
+        "expected": "[]"
+      },
+      {
+        "description": "missingFields lists blank, null and undefined values in the order of required",
+        "input": "missingFields({ email: 'a@b.c', name: '   ', phone: null }, ['name', 'email', 'phone', 'city'])",
+        "expected": "['name', 'phone', 'city']"
+      },
+      {
+        "description": "0 and false are real values, not missing",
+        "input": "missingFields({ age: 0, agreed: false, note: ' x ' }, ['age', 'agreed', 'note'])",
+        "expected": "[]"
+      },
+      {
+        "description": "Nothing required means nothing missing",
+        "input": "missingFields({}, [])",
+        "expected": "[]"
+      },
+      {
+        "description": "progressPercent is the share of finished steps, rounded",
+        "input": "[progressPercent(0, 4), progressPercent(1, 4), progressPercent(2, 3), progressPercent(3, 4)]",
+        "expected": "[0, 25, 67, 75]"
+      },
+      {
+        "description": "progressPercent counts a single finished step as 100",
+        "input": "[progressPercent(1, 1), progressPercent(0, 1)]",
+        "expected": "[100, 0]"
+      },
+      {
+        "description": "progressPercent with no steps is 0",
+        "input": "progressPercent(0, 0)",
+        "expected": "0"
+      }
+    ],
+    "testHarness": "await $test.run(\"Next and Back move by one\", async () => {\n  const sleep = $test.sleep;\n  return ([nextStep(0, 3), nextStep(1, 3), prevStep(2), prevStep(1)]);\n}, () => ([1, 2, 1, 0]));\n\nawait $test.run(\"Next stops on the last step and Back stops on the first\", async () => {\n  const sleep = $test.sleep;\n  return ([nextStep(2, 3), nextStep(0, 1), prevStep(0)]);\n}, () => ([2, 0, 0]));\n\nawait $test.run(\"stepStatuses marks done, current and upcoming steps\", async () => {\n  const sleep = $test.sleep;\n  return ([stepStatuses(1, 4), stepStatuses(0, 2), stepStatuses(3, 4)]);\n}, () => ([['done', 'current', 'upcoming', 'upcoming'], ['current', 'upcoming'], ['done', 'done', 'done', 'current']]));\n\nawait $test.run(\"stepStatuses with no steps is an empty list\", async () => {\n  const sleep = $test.sleep;\n  return (stepStatuses(0, 0));\n}, () => ([]));\n\nawait $test.run(\"missingFields lists blank, null and undefined values in the order of required\", async () => {\n  const sleep = $test.sleep;\n  return (missingFields({ email: 'a@b.c', name: '   ', phone: null }, ['name', 'email', 'phone', 'city']));\n}, () => (['name', 'phone', 'city']));\n\nawait $test.run(\"0 and false are real values, not missing\", async () => {\n  const sleep = $test.sleep;\n  return (missingFields({ age: 0, agreed: false, note: ' x ' }, ['age', 'agreed', 'note']));\n}, () => ([]));\n\nawait $test.run(\"Nothing required means nothing missing\", async () => {\n  const sleep = $test.sleep;\n  return (missingFields({}, []));\n}, () => ([]));\n\nawait $test.run(\"progressPercent is the share of finished steps, rounded\", async () => {\n  const sleep = $test.sleep;\n  return ([progressPercent(0, 4), progressPercent(1, 4), progressPercent(2, 3), progressPercent(3, 4)]);\n}, () => ([0, 25, 67, 75]));\n\nawait $test.run(\"progressPercent counts a single finished step as 100\", async () => {\n  const sleep = $test.sleep;\n  return ([progressPercent(1, 1), progressPercent(0, 1)]);\n}, () => ([100, 0]));\n\nawait $test.run(\"progressPercent with no steps is 0\", async () => {\n  const sleep = $test.sleep;\n  return (progressPercent(0, 0));\n}, () => (0));"
   }
 ]

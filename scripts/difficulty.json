@@ -970,5 +970,17 @@
   "move-between-lists": {
     "difficulty": 2,
     "concept": "dual-list"
+  },
+  "toast-queue-logic": {
+    "difficulty": 2,
+    "concept": "notifications"
+  },
+  "wizard-step-logic": {
+    "difficulty": 2,
+    "concept": "wizard"
+  },
+  "optimistic-list-update": {
+    "difficulty": 2,
+    "concept": "optimistic-ui"
   }
 }
