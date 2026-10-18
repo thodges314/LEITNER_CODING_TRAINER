@@ -408,4 +408,11 @@ Pick the order; each batch follows the §4 checklist including the complexity st
 - Test files that need `localStorage`/DOM start with `// @vitest-environment jsdom` (default environment is `node`).
 - `scripts/cards/**` is excluded from ESLint (the files are sandbox snippets, not modules).
 - Keep titles, prompts, and reference solutions consistent (a past audit found cards whose titles promised functions the prompt never asked for).
+- **Suspense / transitions / `use()` harnesses (learned the hard way, see `suspense-use-promise` and `tabs-transition-suspense`):**
+  (1) mount with `await act(async () => { r = render(ui); })` and click with `await act(async () => el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })))`;
+  a plain `render()` / `fire.click()` (sync `act`) leaves a suspended render or transition stuck in jsdom. (2) `ReactDOM.createRoot` is stubbed during grading, so never create your own root.
+  (3) Never use fixed sleeps for retries: poll with a `waitFor(cond)` that runs `await act(async () => sleep(15))` until the condition holds (production React uses `fallbackAct`, whose timing differs).
+  (4) React hides suspended content with `display: none` instead of removing it, so read only visible text. (5) Run the card in real Chromium with `--repeat-each=5` before committing.
+- The sandbox exposes a fixed list of React names (`SANDBOX_NAMES` in `runner.ts` + declarations in `typeChecker.ts`): hooks incl. `use`, `useTransition`, `useDeferredValue`, `useOptimistic`, `useActionState`, `startTransition`, and `Suspense`.
+  A new name becomes a function parameter, so any card that declares `const <name> = …` at top level breaks: add names sparingly and run the whole suite.
 - Work on a branch; do not merge or push `master` unless asked.

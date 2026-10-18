@@ -20,6 +20,14 @@ const mountAsync = async (ui) => {
 const click = async (el) => {
   await act(async () => { el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); });
 };
+// Poll until the condition holds (React retries suspended renders on its own schedule).
+const waitFor = async (cond, ms = 2000) => {
+  const end = Date.now() + ms;
+  while (!cond() && Date.now() < end) {
+    await act(async () => { await new Promise((res) => setTimeout(res, 15)); });
+  }
+  return cond();
+};
 const deferred = () => {
   let resolve;
   let reject;
@@ -36,13 +44,13 @@ const setup = async () => {
     return cache.get(tab);
   };
   const load = (tab) => entry(tab).promise;
-  const finish = async (tab, text) => {
-    await act(async () => { entry(tab).resolve(text); });
-    await wait(20);
-  };
   const r = await mountAsync(<TabbedViewer load={load} />);
   const tab = (label) => qa('[role="tab"]', r.container).find((b) => b.textContent === label);
   const panel = () => q('[role="tabpanel"]', r.container);
+  const finish = async (id, text) => {
+    await act(async () => { entry(id).resolve(text); });
+    await waitFor(() => visibleText(panel()) === text);
+  };
   return { r, finish, tab, panel };
 };
 {
