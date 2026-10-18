@@ -1,4 +1,5 @@
 import { DifficultyBadge } from './DifficultyBadge';
+import { DeckStatsWidget } from './DeckStatsWidget';
 import { useState, useRef, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
 import type { AppTheme } from '../lib/theme';
@@ -140,7 +141,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
 
   const { totalCompletedReviews, unlockedStageCount = 0 } = state;
   const topics = visibleTopics(state); // cards of disabled optional packs are hidden
-  const hiddenCount = state.topics.length - topics.length;
 
   const isAllTracks =
     selectedTracks.includes('all') ||
@@ -442,64 +442,79 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         </div>
       </div>
 
-      {hiddenCount > 0 && (
+      {/* Top Section: 2x2 KPI Cards + Circular Stats Widget */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gap: '16px',
+          alignItems: 'stretch',
+        }}
+      >
+        {/* Left: 2x2 KPI Grid */}
         <div
-          role="note"
-          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontSize: '13px', color: 'var(--text-secondary)' }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '12px',
+          }}
         >
-          {hiddenCount} cards from optional packs (e.g. Advanced algorithms) are hidden. Enable them in Settings → Optional card packs.
-        </div>
-      )}
+          {/* Total Reviews */}
+          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Completed Reviews</div>
+            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--accent-cyan)' }}>
+              #{totalCompletedReviews}
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              Global trial progression
+            </div>
+          </div>
 
-      {/* Summary KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-        {/* Total Reviews */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Completed Reviews</div>
-          <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--accent-cyan)' }}>
-            #{totalCompletedReviews}
+          {/* Active vs Locked */}
+          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Deck Distribution</div>
+            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--text-primary)' }}>
+              {activeCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {topics.length}</span>
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              {lockedCount} cards locked in reserve
+            </div>
           </div>
-          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            Global trial progression
+
+          {/* Mastered */}
+          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
+              {algorithm === 'graduated-interval' ? 'Mastered / Long-term (Tier 5+)' : 'Mastered (Box 5)'}
+            </div>
+            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#34d399' }}>
+              {masteredCount}
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              {algorithm === 'graduated-interval' ? '+35 to +800+ review intervals' : '+45 review interval reached'}
+            </div>
+          </div>
+
+          {/* Staged Unlock Progress */}
+          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Staged Unlock Progress</div>
+            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#fbbf24' }}>
+              {box3PlusCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {nextUnlockTarget} in B3+</span>
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              {lockedCount > 0
+                ? `${cardsNeededForNextUnlock} more Box 3+ cards unlocks 4 new topics`
+                : 'All topics unlocked!'}
+            </div>
           </div>
         </div>
 
-        {/* Active vs Locked */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Deck Distribution</div>
-          <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--text-primary)' }}>
-            {activeCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {topics.length}</span>
-          </div>
-          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            {lockedCount} cards locked in reserve
-          </div>
-        </div>
-
-        {/* Mastered */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
-            {algorithm === 'graduated-interval' ? 'Mastered / Long-term (Tier 5+)' : 'Mastered (Box 5)'}
-          </div>
-          <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#34d399' }}>
-            {masteredCount}
-          </div>
-          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            {algorithm === 'graduated-interval' ? '+35 to +800+ review intervals' : '+45 review interval reached'}
-          </div>
-        </div>
-
-        {/* Staged Unlock Progress */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Staged Unlock Progress</div>
-          <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#fbbf24' }}>
-            {box3PlusCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {nextUnlockTarget} in B3+</span>
-          </div>
-          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            {lockedCount > 0
-              ? `${cardsNeededForNextUnlock} more Box 3+ cards unlocks 4 new topics`
-              : 'All topics unlocked!'}
-          </div>
-        </div>
+        {/* Right: Rounded Stats & Visual Chart Widget */}
+        <DeckStatsWidget
+          state={state}
+          topics={topics}
+          theme={theme}
+          onSelectTrack={handleToggleTrack}
+        />
       </div>
 
       {/* Leitner Box Breakdown Strip */}

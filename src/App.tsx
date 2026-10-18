@@ -533,6 +533,7 @@ export function App() {
             {/* Header Theme Switcher Toggle Button */}
             <button
               className="btn btn-outline"
+              data-testid="theme-toggle-btn"
               style={{
                 padding: '7px 12px',
                 fontSize: '12px',
