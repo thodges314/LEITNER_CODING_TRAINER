@@ -39,6 +39,8 @@ import { AddTopicModal } from './components/AddTopicModal';
 import { SettingsModal } from './components/SettingsModal';
 import { FocusModal } from './components/FocusModal';
 import { AboutModal } from './components/AboutModal';
+import { DOUBLE_BACK_WINDOW_MS, useBackNavigation } from './lib/backNavigation';
+import { isFirstVisit, markWelcomed } from './lib/welcome';
 import { AiRecommendationPopover } from './components/AiRecommendationPopover';
 import { ActiveModelStatusPopover } from './components/ActiveModelStatusPopover';
 import { MobileNoticeModal } from './components/MobileNoticeModal';
@@ -53,6 +55,9 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
+
+// Evaluated once at module load, before the app creates and saves its default deck.
+const FIRST_VISIT = isFirstVisit();
 
 export function App() {
   const [deckState, setDeckState] = useState<LeitnerDeckState>(() => loadDeckState());
@@ -78,7 +83,9 @@ export function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFocusOpen, setIsFocusOpen] = useState(false);
-  const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(FIRST_VISIT);
+  const [welcomeMode, setWelcomeMode] = useState(FIRST_VISIT);
+  const [backHint, setBackHint] = useState(false);
   const [isAiRecommendOpen, setIsAiRecommendOpen] = useState(false);
   const [isAiStatusOpen, setIsAiStatusOpen] = useState(false);
   const [aiSettingsVersion, setAiSettingsVersion] = useState(0);
@@ -90,6 +97,14 @@ export function App() {
 
   // Unlocked notification toast
   const [unlockToast, setUnlockToast] = useState<string | null>(null);
+
+  // Back = to the deck and stay; a quick second Back leaves the app.
+  useBackNavigation({ view: activeView, onShowDeck: () => setActiveView('dashboard'), onHint: () => setBackHint(true) });
+  useEffect(() => {
+    if (!backHint) return undefined;
+    const id = setTimeout(() => setBackHint(false), DOUBLE_BACK_WINDOW_MS);
+    return () => clearTimeout(id);
+  }, [backHint]);
 
   // Derive currently active card
   const currentCard: TopicItem | null = (() => {
@@ -689,8 +704,38 @@ export function App() {
       {/* Modals */}
       <AboutModal
         isOpen={isAboutOpen}
-        onClose={() => setIsAboutOpen(false)}
+        welcome={welcomeMode}
+        onClose={() => {
+          setIsAboutOpen(false);
+          if (welcomeMode) {
+            markWelcomed();
+            setWelcomeMode(false);
+          }
+        }}
       />
+
+      {backHint && (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            padding: '10px 18px',
+            borderRadius: '999px',
+            backgroundColor: 'var(--bg-elevated)',
+            border: '1px solid var(--border-medium)',
+            color: 'var(--text-primary)',
+            fontSize: '13.5px',
+            fontWeight: 600,
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 2000,
+          }}
+        >
+          Press Back again to leave the app
+        </div>
+      )}
 
       <AddTopicModal
         isOpen={isAddModalOpen}

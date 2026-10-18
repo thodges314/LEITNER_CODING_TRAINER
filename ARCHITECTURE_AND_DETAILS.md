@@ -156,3 +156,14 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
   - Timed Recall Mode configuration and persistence.
 - **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION. jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
 - **Production Build**: Verified via `npm run build` (`tsc -b && vite build`) with zero lint or type errors.
+
+## 8. Navigation and first-run welcome
+
+- **Back button** (`src/lib/backNavigation.ts`, used by `App.tsx`): the history is `[guard entry, app entry]`. Back from a problem shows the deck and stays in the app
+  (a fresh app entry is pushed straight away); a second Back within 2 s (`DOUBLE_BACK_WINDOW_MS`) leaves the app. On the deck, the first Back stays and shows
+  "Press Back again to leave the app". View switches inside the app never touch the history. The decision logic is the pure function `decideBack`.
+- **Opening screen**: the app always opens on the practice view (the next card); the deck is "one Back away".
+- **First-run welcome** (`src/lib/welcome.ts`): a brand-new visitor (no saved deck, flag `leitner_welcomed` unset, not a narrow screen) sees `AboutModal` in
+  `welcome` mode: a "How a session works" block and a "Start practicing" button on top of the usual About content. Dismissing it sets `leitner_welcomed`.
+  Existing users (a saved deck) never see it. `isFirstVisit()` is evaluated once at module load, before the default deck is created and saved.
+- Tests: `src/lib/backNavigation.test.ts`, `src/lib/welcome.test.ts`, and the real-browser `e2e/navigation.spec.ts`.
