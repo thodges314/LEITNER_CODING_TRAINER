@@ -22,14 +22,14 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 234 total = **201 default + 33 in the optional `algorithms-advanced` pack** (80 default cards active at first run) |
-| Documented test cases | 1494 (each shown as input → expected in the UI) |
+| Cards | 237 total = **204 default + 33 in the optional `algorithms-advanced` pack** (80 default cards active at first run) |
+| Documented test cases | 1515 (each shown as input → expected in the UI) |
 | Difficulty spread | all 234: d1 33 · d2 70 · d3 90 · d4 39 · d5 2; default 201: d1 33 · d2 66 · d3 72 · d4 28 · d5 2 |
-| Tracks (default deck / total) | algorithms 45/77, js-language 34, react-components 19, react 17, async-js 15, typescript-patterns 14, async-web-plumbing 12, react-patterns 10, data-structures 8, js-runtime-fundamentals 7, collections-transformations 7, dom-browser 6, testing-tooling 5, algorithmic-screens 2/3 (some tracks overlap in topic; consolidation is on the roadmap) |
+| Tracks (default deck / total) | algorithms 45/77, js-language 34, react-components 22, react 17, async-js 15, typescript-patterns 14, async-web-plumbing 12, react-patterns 10, data-structures 8, js-runtime-fundamentals 7, collections-transformations 7, dom-browser 6, testing-tooling 5, algorithmic-screens 2/3 (some tracks overlap in topic; consolidation is on the roadmap) |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
-| Automated tests | 830 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 468 tests, ~6 min on an idle machine with 4 workers). **Last full run on `master`: 465 passed, 3 flaky (passed on retry), 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Automated tests | 839 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 474 tests, ~6 min on an idle machine with 4 workers). **Last full run on `master`: 465 passed, 3 flaky (passed on retry), 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -189,7 +189,7 @@ algorithms, TS). This is a judgement from experience with those formats, not a l
 | String/format utilities | **Medium** | ~8 | classNames, query string, formatters, style parsing, CSS specificity, anagram/palindrome. Missing: template engine, markdown-lite, slugify, diffing |
 | DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize observers, `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame`, workers |
 | React hooks and state (`react`, `react-patterns`) | **Medium-strong** | 27 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer, undo/redo, form state, `useIsMounted`, `useMediaQuery`. Missing: `useLayoutEffect`, `useDeferredValue`/`useTransition`, React 19 APIs |
-| React components ("build this") | **Medium** | 19 | typeahead, modal, tabs, infinite list, star rating, countdown, file tree, accordion, data table, dropdown menu, virtual list, toast queue, carousel, optimistic like, breadcrumbs, transfer list, nested checkbox tree. **Preserved but not yet merged** (branch `feature/react-batch-2`): multi-step form, tag input, pagination. Still missing: tooltip/popover, drag-sortable list, stepper, lazy image, copy button, theme switcher, kanban, nested comments |
+| React components ("build this") | **Medium** | 22 | typeahead, modal, tabs, infinite list, star rating, countdown, file tree, accordion, data table, dropdown menu, virtual list, toast queue, carousel, optimistic like, breadcrumbs, transfer list, nested checkbox tree. multi-step form wizard, tag input, pagination controls (recovered and browser-verified). Still missing: tooltip/popover, drag-sortable list, stepper, lazy image, copy button, theme switcher, kanban, nested comments |
 | Algorithms | **Medium (core) + opt-in pack** | 47 core (+33 pack) | Core: arrays, hashing, two pointers, sliding window, stack, binary search, linked lists, trees/BST, **basic graph theory (BFS adjacency, components, grid BFS/islands, clone/bipartite, topological sort)**, intro DP, sorting, trie, matrix, bits. Pack: 2D DP, heaps beyond basics, monotonic stack, hard backtracking, k-group reversal, serialization. Missing in both: Dijkstra, union-find |
 | TypeScript | **Medium** | 14 | unions, generics, utility types, guards, typed emitter, conditional `infer`, template literals, branded types, overloads, mapped modifiers. Missing: `satisfies`, assertion functions |
 | Accessibility | **Weak-medium** | ~10 tagged `a11y` | modal focus, tabs ARIA, typeahead, accessible field, dropdown roving focus, pagination (pending). Missing: `aria-live` regions, skip links, focus-trap utility, combobox |
@@ -320,7 +320,7 @@ run `npm run build:cards`. The Playwright smoke test enables the pack so it stil
 ### 7.5 Suggested next steps (in order)
 1. Keep `npm run e2e` green on `master` (run it after any card/runner change; re-run flaky timing cards).
 2. Wrong-answer ("mutation") checks per card, starting with the cards authored by other assistants.
-3. Recover and finish `feature/react-batch-2` (multi-step form, tag input, pagination: files exist, cases are in `scripts/testcases/part27.mjs`, difficulty entries added, `build-cards` still erroring when last tried).
+3. ~~Recover batch 2~~ DONE (multi-step form, tag input, pagination; cases in `part27.mjs`). **Every new `partN.mjs` must be imported and spread in `scripts/testcases/newcards.mjs`**, otherwise `build-cards` fails with "No cases authored".
 4. Content gaps: accessibility, CSS (needs real-browser checks), DOM/browser extras, remaining ladder holes (§7.1), then React 19 APIs.
 5. Product: "Front-end screen" Focus preset + an interview-importance weight, make staged unlocks respect the user's Focus exclusions, stats/history view, track consolidation.
 6. Complexity fields: keep them on algorithm cards only, normalise notation, human spot-check.
