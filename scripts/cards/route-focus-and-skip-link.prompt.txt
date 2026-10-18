@@ -1,0 +1,5 @@
+In a single-page app the browser does not announce page changes, so the layout has to do it. Build Layout({ path, title, children }).
+
+Render, in this order: a skip link <a href="#main-content"> with the text "Skip to main content", then <main id="main-content" tabIndex={-1}> that contains <h1 tabIndex={-1}>{title}</h1> followed by the children. Clicking the skip link prevents the default navigation and moves focus to the <main> element.
+
+Keep document.title equal to `${title} | My App`. When path changes (not on the first render, and not when only the children or title change), move focus to the <h1> so keyboard and screen-reader users start at the top of the new page.

@@ -1002,5 +1002,13 @@
   "roving-tabindex-toolbar": {
     "difficulty": 3,
     "concept": "a11y-components"
+  },
+  "route-focus-and-skip-link": {
+    "difficulty": 3,
+    "concept": "a11y-components"
+  },
+  "form-error-summary": {
+    "difficulty": 3,
+    "concept": "a11y-components"
   }
 }

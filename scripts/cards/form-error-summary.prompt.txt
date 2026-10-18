@@ -1,0 +1,6 @@
+Build SignupForm({ onSubmit }) with two labelled text inputs: Name (id="name") and Email (id="email"), and a submit button. Use <form noValidate> and validate only on submit.
+
+Rules: the name must not be blank (message 'Enter your name'); the email must look like text@text.text (message 'Enter a valid email address'; trim it first). When everything is valid call onSubmit({ name, email }) with the trimmed values.
+
+When something is invalid, do NOT call onSubmit and show an error summary above the fields: <div role="alert"> with <h2 tabIndex={-1}>There is a problem</h2> and a list with one link <a href="#name"> / <a href="#email"> per error, in field order, whose text is the message. Move focus to that heading on every invalid submit. Clicking a link prevents the default jump and focuses the matching input.
+Also mark each invalid input aria-invalid="true" and aria-describedby="<id>-error", and render the message in <p id="<id>-error"> under it. Valid inputs get neither attribute. A later valid submit removes the summary.

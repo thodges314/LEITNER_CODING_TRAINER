@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "SPA Route Change: Skip Link and Focus",
+  "tags": [
+    "component",
+    "a11y",
+    "focus-management",
+    "routing"
+  ]
+}

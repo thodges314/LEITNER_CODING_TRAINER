@@ -30,6 +30,7 @@ import p32 from './part32.mjs';
 import p33 from './part33.mjs';
 import p34 from './part34.mjs';
 import p35 from './part35.mjs';
-export const newCards = { ...p5, ...p6, ...p7, ...p8, ...p9, ...p10, ...p11, ...p12, ...p13, ...p14, ...p15, ...p16, ...p17, ...p18, ...p19, ...p20, ...p21, ...p22, ...p23, ...p24, ...p25, ...p26, ...p27, ...p28, ...p29, ...p30, ...p31, ...p32, ...p33, ...p34, ...p35 };
+import p36 from './part36.mjs';
+export const newCards = { ...p5, ...p6, ...p7, ...p8, ...p9, ...p10, ...p11, ...p12, ...p13, ...p14, ...p15, ...p16, ...p17, ...p18, ...p19, ...p20, ...p21, ...p22, ...p23, ...p24, ...p25, ...p26, ...p27, ...p28, ...p29, ...p30, ...p31, ...p32, ...p33, ...p34, ...p35, ...p36 };
 
 
