@@ -1,6 +1,6 @@
 # AI-generated tracks: evaluation and implementation plan
 
-Status: **proposal, nothing built yet.** Written 2026-10 for the owner and for any assistant who picks this up.
+Status: **proposal, nothing built yet. Owner has pushed this way back on the list (low priority); do not start it unless asked.** Written 2026-10 for the owner and for any assistant who picks this up.
 Related: roadmap §7.7 "Parked features" (Quick Add Topic), branch `feature/quick-add-verified`, `DELEGATION.md` task M.
 
 ## 1. The idea
