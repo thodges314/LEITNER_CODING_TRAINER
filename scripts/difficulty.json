@@ -934,5 +934,17 @@
   "nested-checkbox-tree": {
     "difficulty": 3,
     "concept": "tree-ui"
+  },
+  "tag-input": {
+    "difficulty": 3,
+    "concept": "tag-input"
+  },
+  "pagination-controls": {
+    "difficulty": 3,
+    "concept": "pagination"
+  },
+  "multi-step-form": {
+    "difficulty": 4,
+    "concept": "wizard"
   }
 }
