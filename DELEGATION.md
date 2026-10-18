@@ -42,7 +42,6 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Good to delegate (well-specified, verifiable by the gates above)
 | # | Task | Notes / acceptance |
 |---|---|---|
-| A2 | **Write `<id>.preview.js` for every existing React card** (72: all of `react` and `react-components`, including the a11y and React 19 cards) | Do after A exists. Per card: the props, callback stubs (`log('onChange')`), async props, provider wrappers or a small `Demo` component, exactly as described in roadmap section 7.3. Done when the guard test passes for all of them. Batches of ~10 cards per commit. |
 | B | **Accessibility cards** (batches of 2-3) | Done so far: `switch-toggle-a11y`, `live-announcer`, `roving-tabindex-toolbar`, `route-focus-and-skip-link`, `form-error-summary`. Remaining: focus-trap utility, accessible combobox (d5). DOM harness style like `tooltip` / `dropdown-menu`. |
 | C | **DOM/browser API cards** (batches of 3) | **Batches 1 and 2 are being written by Hermes** (see the claim table): `keyboard-shortcut-matcher`, `cookie-parse-serialize`, `copy-to-clipboard` (batch 1, merged), then `lazy-load-observer` (IntersectionObserver), `drop-index-from-pointer`, `raf-throttle` (batch 2, merged). Still open afterwards: `history.pushState` router (small version), `MutationObserver` / `ResizeObserver` wrappers, key-chord manager ("g then i"), a DOM-level keyboard-accessible drag-sortable list (the pure logic is already covered by `drop-index-from-pointer`). Mock browser APIs inside the harness and restore them. |
 | D | **Remaining "build this" screens** | popover with positioning logic, stepper/progress steps, kanban board, nested comments. (Copy button and lazy image are covered by C.) |
@@ -53,6 +52,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 
 ## Done (kept for reference, do not redo)
 - **A, React preview window**: the feature (spec in roadmap section 7.3). Sandboxed iframe window (`sandbox="allow-scripts"`), pop-out window with live syncing and dock-back, `previewCode` plumbing in `build-cards.mjs`, guard unit test (`reactPreviewGuard.test.ts`), Playwright tests (`e2e/preview.spec.ts`), and 2 sample preview files (`switch-toggle-a11y.preview.js`, `star-rating-component.preview.js`).
+- **A2, React preview files for all component cards**: 42 preview files created in `scripts/cards/*.preview.js` covering every component-rendering card in `react-components` and `react`, bundled via `build-cards.mjs`, validated by `reactPreviewGuard.test.ts` and Playwright `e2e/preview.spec.ts`.
 - **E, ladder-hole starter cards**: 15 intro cards shipped; only `architecture` (the single d5 card) has no starter and stays a capstone.
 - **H, staged unlocks respect the user's Focus**: `checkStagedUnlocks` receives the Focus + pack filter; unlock credit is only spent on cards that really unlock (`src/lib/unlockFocus.test.ts`).
 - **L, run `e2e` before deploy**: required `e2e` job in `.github/workflows/deploy.yml`.
