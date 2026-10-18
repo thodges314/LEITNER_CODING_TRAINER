@@ -57,6 +57,21 @@ for (const t of topics) {
   t.status = t.difficulty === lowest && t.difficulty <= 2 ? 'active' : 'locked';
 }
 
+// Optional card packs: scripts/packs.json maps pack name -> card ids. Cards in a pack are hidden from scheduling,
+// unlocks and the catalog unless the pack is enabled in Settings (deck state `enabledPacks`).
+const packs = JSON.parse(fs.readFileSync(path.join(here, 'packs.json'), 'utf8'));
+const packOf = new Map();
+for (const [pack, packIds] of Object.entries(packs)) {
+  for (const id of packIds) {
+    if (!topics.some((t) => t.id === id)) throw new Error(`scripts/packs.json: unknown card id "${id}" in pack "${pack}"`);
+    packOf.set(id, pack);
+  }
+}
+for (const t of topics) {
+  if (packOf.has(t.id)) t.pack = packOf.get(t.id);
+  else delete t.pack;
+}
+
 let n = 0;
 for (const t of topics) {
   if (!cases[t.id]) throw new Error(`No cases authored for ${t.id}`);

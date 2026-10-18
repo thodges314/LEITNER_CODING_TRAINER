@@ -26,6 +26,7 @@ async function submitCard(page: Page, id: string, code: string): Promise<{ verdi
   await page.evaluate(
     ({ id, code, DECK_KEY, DRAFT_PREFIX }) => {
       const deck = JSON.parse(localStorage.getItem(DECK_KEY) as string);
+      deck.enabledPacks = ['algorithms-advanced']; // optional packs are hidden by default; the smoke test covers every card
       for (const t of deck.topics) t.status = t.id === id ? 'active' : 'locked';
       localStorage.setItem(DECK_KEY, JSON.stringify(deck));
       localStorage.setItem(DRAFT_PREFIX + id, code);

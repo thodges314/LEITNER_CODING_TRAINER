@@ -306,6 +306,17 @@ CodeMirror editor is never driven; the deck is rewritten so exactly one card is 
 First run found a real bug: `MobileNoticeModal` stayed in the DOM (CSS-hidden, `role="dialog"`, `body{overflow:hidden}`) on desktop and broke
 `modal-portal-focus`; it now mounts only on narrow viewports. TS cards show no "Tests:" badge when compilation fails, so the spec never waits for it.
 
+
+### 7.4b Optional card packs (DONE): `algorithms-advanced`
+Why: this is a **front-end interview** trainer; LeetCode-heavy material should not dominate the deck. `scripts/packs.json` lists 33 heavier algorithm cards
+(2D/advanced DP, heap beyond basics, monotonic stack, hard backtracking, k-group reversal, tree serialization, ...). Build sets `pack` on them; deck state
+`enabledPacks` (default `[]`) turns packs on in **Settings → Optional card packs**. A card of a disabled pack is excluded from scheduling
+(`scheduleFilter` → `cardMatchesFilter`), staged unlocks (`checkStagedUnlocks(..., isAllowed)`), the catalog, the Focus match counts and the header
+counts; its progress is untouched, so re-enabling restores it. The ~47 **core** algorithm cards stay in the main deck on purpose
+(arrays, hashing, two pointers, sliding window, stack, binary search, linked lists, trees/BST, **basic graph theory: adjacency BFS, components/paths,
+flood fill/islands, grid BFS, clone/bipartite, topological sort**, intro DP, sorting, tries). To move a card between core and pack, edit `packs.json` and
+run `npm run build:cards`. The Playwright smoke test enables the pack so it still covers every card.
+
 ### 7.5 Suggested next steps (in order)
 1. Fill ladder holes (§7.1) so every concept starts at d1/d2. 2. Playwright smoke test + wider timing margins (batch 13 and later cards are jsdom-only).
 3. Stats/history. 4. Next card category (see below). 5. Sandboxed execution.

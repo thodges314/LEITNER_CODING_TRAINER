@@ -35,6 +35,8 @@ export interface TopicItem {
   tags: string[];
   /** 1 (warm-up) to 5 (expert). Easier rungs of a concept are mastered before harder ones unlock. */
   difficulty?: number;
+  /** Optional card pack (e.g. 'algorithms-advanced'). Cards in a disabled pack are never scheduled, unlocked or listed. */
+  pack?: string;
   /** Cards sharing a concept form a ladder ordered by difficulty (e.g. 'rate-limiting', 'promise'). */
   concept?: string;
   promptSeed: string;
@@ -53,6 +55,8 @@ export interface TopicItem {
  * Cards outside the filter keep their Leitner state untouched.
  */
 export interface PracticeFilter {
+  /** Set by the app from `enabledPacks`; not user-editable and never persisted. */
+  excludePacks?: string[];
   /** Inclusive difficulty range (1-5). Unset = no limit. */
   minDifficulty?: number;
   maxDifficulty?: number;
@@ -76,6 +80,8 @@ export const EMPTY_FILTER: PracticeFilter = { includeTracks: [], excludeTracks: 
 export interface LeitnerDeckState {
   /** Practice focus: only matching cards are scheduled. */
   practiceFilter?: PracticeFilter;
+  /** Enabled optional card packs (see CARD_PACKS). Default: none, i.e. optional packs are hidden. */
+  enabledPacks?: string[];
   /** Named focus presets, e.g. "React screen". */
   filterPresets?: Record<string, PracticeFilter>;
   topics: TopicItem[];
@@ -274,7 +280,45 @@ export function isFilterActive(filter: PracticeFilter | undefined): boolean {
   );
 }
 
-export function cardMatchesFilter(card: Pick<TopicItem, 'track' | 'tags' | 'difficulty'>, filter: PracticeFilter | undefined): boolean {
+/** Optional card packs. A pack is OFF unless listed in deck state `enabledPacks`. */
+export const CARD_PACKS: Record<string, { label: string; description: string }> = {
+  'algorithms-advanced': {
+    label: 'Advanced algorithms',
+    description:
+      'Heavier LeetCode-style material: 2D/advanced DP, heaps beyond the basics, monotonic stacks, hard backtracking (N-Queens, word search), ' +
+      'k-group list reversal, tree serialization and similar. The core algorithm set (arrays, hashing, two pointers, sliding window, stacks, ' +
+      'binary search, linked lists, trees/BST, basic graph theory, intro DP, sorting) stays in the main deck.',
+  },
+};
+
+export function disabledPacks(state: Pick<LeitnerDeckState, 'enabledPacks'>): string[] {
+  const enabled = new Set(state.enabledPacks ?? []);
+  return Object.keys(CARD_PACKS).filter((pack) => !enabled.has(pack));
+}
+
+export function isPackEnabled(card: Pick<TopicItem, 'pack'>, state: Pick<LeitnerDeckState, 'enabledPacks'>): boolean {
+  return !card.pack || !disabledPacks(state).includes(card.pack);
+}
+
+/** Cards that take part in the app (catalog, scheduling, unlocks) for this deck state. */
+export function visibleTopics(state: Pick<LeitnerDeckState, 'topics' | 'enabledPacks'>): TopicItem[] {
+  return state.topics.filter((t) => isPackEnabled(t, state));
+}
+
+/** The user's Focus filter plus the pack exclusions; this is what the schedulers receive. */
+export function scheduleFilter(state: LeitnerDeckState): PracticeFilter {
+  return { ...(state.practiceFilter ?? EMPTY_FILTER), excludePacks: disabledPacks(state) };
+}
+
+export function setEnabledPacks(state: LeitnerDeckState, packs: string[]): LeitnerDeckState {
+  const known = packs.filter((p) => p in CARD_PACKS);
+  const nextState: LeitnerDeckState = { ...state, enabledPacks: Array.from(new Set(known)) };
+  saveDeckState(nextState);
+  return nextState;
+}
+
+export function cardMatchesFilter(card: Pick<TopicItem, 'track' | 'tags' | 'difficulty' | 'pack'>, filter: PracticeFilter | undefined): boolean {
+  if (card.pack && filter?.excludePacks?.includes(card.pack)) return false;
   if (!isFilterActive(filter)) return true;
   const f = filter as PracticeFilter;
   const d = difficultyOf(card);
@@ -391,6 +435,7 @@ export const SEED_CONTENT_FIELDS = [
   'tags',
   'difficulty',
   'concept',
+  'pack',
   'promptSeed',
   'starterCode',
   'testHarness',
@@ -476,6 +521,7 @@ export function mergeStoredWithSeed(
     unlockedStageCount: typeof parsed.unlockedStageCount === 'number' && Number.isInteger(parsed.unlockedStageCount) && parsed.unlockedStageCount >= 0 ? parsed.unlockedStageCount : 0,
     deletedSeedIds: [...deleted],
     practiceFilter: parsed.practiceFilter ? normalizeFilter(parsed.practiceFilter) : undefined,
+    enabledPacks: Array.isArray(parsed.enabledPacks) ? parsed.enabledPacks.map(String).filter((p: string) => p in CARD_PACKS) : undefined,
     filterPresets: normalizePresets(parsed.filterPresets),
     algorithm: parsed.algorithm === 'graduated-interval' ? 'graduated-interval' : parsed.algorithm === 'leitner' ? 'leitner' : getStoredAlgorithm(),
   };
@@ -566,7 +612,7 @@ export function isLadderOpen(card: TopicItem, topics: TopicItem[]): boolean {
  * Checks staged unlock condition:
  * For every 4 active cards in Box 3 or higher (cumulative), unlock 4 more locked cards.
  */
-export function checkStagedUnlocks(topics: TopicItem[], currentStageCount: number): { updatedTopics: TopicItem[]; newStageCount: number; newlyUnlocked: number } {
+export function checkStagedUnlocks(topics: TopicItem[], currentStageCount: number, isAllowed: (card: TopicItem) => boolean = () => true): { updatedTopics: TopicItem[]; newStageCount: number; newlyUnlocked: number } {
   const activeBox3Plus = topics.filter((t) => t.status === 'active' && t.box >= 3).length;
   const targetStages = Math.floor(activeBox3Plus / 4);
 
@@ -577,7 +623,7 @@ export function checkStagedUnlocks(topics: TopicItem[], currentStageCount: numbe
     const toUnlock = new Set(
       topics
         .map((t, index) => ({ t, index }))
-        .filter(({ t }) => t.status === 'locked' && isLadderOpen(t, topics))
+        .filter(({ t }) => t.status === 'locked' && isAllowed(t) && isLadderOpen(t, topics))
         .sort((a, b) => difficultyOf(a.t) - difficultyOf(b.t) || a.index - b.index)
         .slice(0, cardsToUnlock)
         .map(({ t }) => t.id)
@@ -661,7 +707,8 @@ export function commitCardReview(
   // Check staged unlocks
   const { updatedTopics: finalTopics, newStageCount, newlyUnlocked } = checkStagedUnlocks(
     updatedTopics,
-    state.unlockedStageCount ?? 0
+    state.unlockedStageCount ?? 0,
+    (card) => isPackEnabled(card, state)
   );
 
   const nextState: LeitnerDeckState = {
@@ -999,6 +1046,7 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
     difficulty: Number.isInteger(Number(item.difficulty)) && Number(item.difficulty) >= 1 && Number(item.difficulty) <= 5 ? Number(item.difficulty) : undefined,
     concept: optionalString(item.concept),
+    pack: optionalString(item.pack),
     promptSeed: String(item.promptSeed || ''),
     starterCode: optionalString(item.starterCode),
     testHarness: optionalString(item.testHarness),
@@ -1018,6 +1066,7 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     unlockedStageCount: Number.isInteger(parsed.unlockedStageCount) ? parsed.unlockedStageCount : 0,
     deletedSeedIds: Array.isArray(parsed.deletedSeedIds) ? parsed.deletedSeedIds.map(String) : [],
     practiceFilter: parsed.practiceFilter ? normalizeFilter(parsed.practiceFilter) : undefined,
+    enabledPacks: Array.isArray(parsed.enabledPacks) ? parsed.enabledPacks.map(String).filter((p: string) => p in CARD_PACKS) : undefined,
     filterPresets: normalizePresets(parsed.filterPresets),
     algorithm: parsed.algorithm === 'graduated-interval' ? 'graduated-interval' : 'leitner',
   };

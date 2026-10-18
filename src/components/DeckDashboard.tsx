@@ -4,6 +4,7 @@ import type { ChangeEvent } from 'react';
 import type { AppTheme } from '../lib/theme';
 import {
   getTrackMeta,
+  visibleTopics,
   intervalForBox,
   getSchedulingAlgorithm,
   exportDeckBackup,
@@ -144,10 +145,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const isLight = theme === 'apple-gsos';
   const allAvailableTracks = useMemo(
     () =>
-      Array.from(new Set(state.topics.map((t) => t.track))).sort((a, b) =>
+      Array.from(new Set(visibleTopics(state).map((t) => t.track))).sort((a, b) =>
         getTrackMeta(a).label.localeCompare(getTrackMeta(b).label)
       ),
-    [state.topics]
+    [state]
   );
   const [selectedTracks, setSelectedTracks] = useState<string[]>(['all']);
   const [selectedBox, setSelectedBox] = useState<number | 'all'>('all');
@@ -161,7 +162,9 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const algorithm = getSchedulingAlgorithm(state);
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
-  const { topics, totalCompletedReviews, unlockedStageCount = 0 } = state;
+  const { totalCompletedReviews, unlockedStageCount = 0 } = state;
+  const topics = visibleTopics(state); // cards of disabled optional packs are hidden
+  const hiddenCount = state.topics.length - topics.length;
 
   const isAllTracks =
     selectedTracks.includes('all') ||
@@ -460,6 +463,15 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           />
         </div>
       </div>
+
+      {hiddenCount > 0 && (
+        <div
+          role="note"
+          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontSize: '13px', color: 'var(--text-secondary)' }}
+        >
+          {hiddenCount} cards from optional packs (e.g. Advanced algorithms) are hidden. Enable them in Settings → Optional card packs.
+        </div>
+      )}
 
       {/* Summary KPI Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>

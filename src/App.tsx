@@ -12,6 +12,10 @@ import {
   getDefaultDeckState,
   EMPTY_FILTER,
   isFilterActive,
+  scheduleFilter,
+  CARD_PACKS,
+  visibleTopics,
+  setEnabledPacks,
   setPracticeFilter,
   savePreset,
   deletePreset,
@@ -82,6 +86,7 @@ export function App() {
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
   const filterActive = isFilterActive(filter);
   const algorithm = getSchedulingAlgorithm(deckState);
+  const shownTopics = visibleTopics(deckState); // cards of disabled optional packs are hidden everywhere
 
   // Unlocked notification toast
   const [unlockToast, setUnlockToast] = useState<string | null>(null);
@@ -89,7 +94,7 @@ export function App() {
   // Derive currently active card
   const currentCard: TopicItem | null = (() => {
     if (selectedCardId) {
-      const found = deckState.topics.find((t) => t.id === selectedCardId && t.status === 'active');
+      const found = shownTopics.find((t) => t.id === selectedCardId && t.status === 'active');
       if (found) return found;
     }
     return getNextCard(
@@ -97,7 +102,7 @@ export function App() {
       deckState.totalCompletedReviews,
       deckState.lastReviewedTrack,
       undefined,
-      filter,
+      scheduleFilter(deckState),
       algorithm
     );
   })();
@@ -134,7 +139,7 @@ export function App() {
       nextState.totalCompletedReviews,
       updatedCard.track,
       currentCard.id,
-      filter,
+      scheduleFilter(deckState),
       algorithm
     );
     if (next) clearDraft(next.id);
@@ -150,7 +155,7 @@ export function App() {
       deckState.totalCompletedReviews,
       currentCard.track,
       currentCard.id,
-      filter,
+      scheduleFilter(deckState),
       algorithm
     );
     if (next) clearDraft(next.id);
@@ -166,12 +171,25 @@ export function App() {
       deckState.totalCompletedReviews,
       currentCard.track,
       currentCard.id,
-      filter,
+      scheduleFilter(deckState),
       algorithm
     );
     if (next) clearDraft(next.id);
     setSelectedCardId(next?.id ?? null);
   };
+
+  const handlePacksChange = (packs: string[]) => {
+    setDeckState(setEnabledPacks(deckState, packs));
+    setSelectedCardId(null);
+  };
+
+  const packSummary = Object.entries(CARD_PACKS).map(([id, meta]) => ({
+    id,
+    label: meta.label,
+    description: meta.description,
+    count: deckState.topics.filter((t) => t.pack === id).length,
+    enabled: (deckState.enabledPacks ?? []).includes(id),
+  }));
 
   const handleAlgorithmChange = (nextAlgo: SpacedAlgorithm) => {
     const next = setSchedulingAlgorithm(deckState, nextAlgo);
@@ -250,7 +268,7 @@ export function App() {
   const provider = getStoredProvider();
   const model = getStoredModel();
   void aiSettingsVersion;
-  const activeCount = deckState.topics.filter((t) => t.status === 'active').length;
+  const activeCount = shownTopics.filter((t) => t.status === 'active').length;
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
@@ -345,10 +363,10 @@ export function App() {
                 color: activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : 'var(--text-primary)') : 'var(--text-secondary)',
                 boxShadow: activeView === 'dashboard' ? 'var(--shadow-sm)' : 'none',
               }}
-              title={`${activeCount} active in rotation • ${deckState.topics.length - activeCount} locked in reserve`}
+              title={`${activeCount} active in rotation • ${shownTopics.length - activeCount} locked in reserve`}
             >
               <Layers size={15} color={activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : '#c084fc') : undefined} />
-              Deck Catalog ({deckState.topics.length})
+              Deck Catalog ({shownTopics.length})
             </button>
           </nav>
 
@@ -556,7 +574,7 @@ export function App() {
             key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
-            activeDeckSize={deckState.topics.filter((t) => t.status === 'active').length}
+            activeDeckSize={activeCount}
             algorithm={algorithm}
             theme={theme}
             onCommitReview={handleCommitReview}
@@ -683,7 +701,7 @@ export function App() {
       <FocusModal
           isOpen={isFocusOpen}
           onClose={() => setIsFocusOpen(false)}
-          topics={deckState.topics}
+          topics={shownTopics}
           filter={filter}
           presets={deckState.filterPresets ?? {}}
           onChange={handleFilterChange}
@@ -703,6 +721,8 @@ export function App() {
           onThemeChange={handleSetTheme}
           onSettingsSaved={() => setAiSettingsVersion((v) => v + 1)}
           onResetDeckToDefaults={handleResetDeckToDefaults}
+          packs={packSummary}
+          onPacksChange={handlePacksChange}
         />
       )}
     </div>
