@@ -946,5 +946,17 @@
   "multi-step-form": {
     "difficulty": 4,
     "concept": "wizard"
+  },
+  "tic-tac-toe": {
+    "difficulty": 3,
+    "concept": "game-board"
+  },
+  "stopwatch": {
+    "difficulty": 3,
+    "concept": "react-timers"
+  },
+  "progress-bar": {
+    "difficulty": 1,
+    "concept": "progress"
   }
 }

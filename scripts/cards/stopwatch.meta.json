@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Stopwatch with Laps",
+  "tags": [
+    "component",
+    "timers",
+    "effects",
+    "cleanup"
+  ]
+}

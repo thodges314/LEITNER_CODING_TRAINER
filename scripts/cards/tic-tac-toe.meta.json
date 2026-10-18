@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Tic-Tac-Toe Board",
+  "tags": [
+    "component",
+    "state",
+    "game",
+    "derived-state"
+  ]
+}

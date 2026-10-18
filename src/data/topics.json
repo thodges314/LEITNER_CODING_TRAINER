@@ -13886,5 +13886,187 @@
       }
     ],
     "testHarness": "const { render, fire, q, qa } = $dom;\nconst tagsOf = (c) => qa('li', c).map((li) => li.firstChild.textContent).join();\n// Controlled wrapper: keeps `value` in sync so typing flows like in a real page.\nfunction Host({ initial = [], max, log }) {\n  const [value, setValue] = useState(initial);\n  return <TagInput value={value} max={max} onChange={(next) => { log && log.push(next); setValue(next); }} />;\n}\nconst type = (c, text, key = 'Enter') => {\n  const input = q('input', c);\n  fire.change(input, text);\n  fire.keyDown(input, key);\n};\n{\n  const r = render(<Host initial={['react', 'css']} />);\n  const removeLabels = qa('button', r.container).map((b) => b.getAttribute('aria-label')).join();\n  $test.check('Renders the tags in a labelled list with a Remove button each', q('ul', r.container).getAttribute('aria-label') === 'Tags' && tagsOf(r.container) === 'react,css' && removeLabels === 'Remove react,Remove css' && q('input', r.container).getAttribute('aria-label') === 'Add tag', { removeLabels });\n  r.unmount();\n}\n{\n  const r = render(<Host />);\n  type(r.container, '  vue  ');\n  $test.check('Enter adds the trimmed text as a tag and clears the input', tagsOf(r.container) === 'vue' && q('input', r.container).value === '', { tags: tagsOf(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Host />);\n  type(r.container, 'svelte', ',');\n  const event = fire.keyDown(q('input', r.container), ',');\n  $test.check('A comma also adds the tag, and the key default is prevented', tagsOf(r.container) === 'svelte' && event.defaultPrevented === true, { tags: tagsOf(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Host initial={['React']} />);\n  type(r.container, 'react');\n  type(r.container, '   ');\n  const kept = tagsOf(r.container) === 'React' && q('input', r.container).value === '';\n  $test.check('Duplicates (case-insensitive) and empty text are ignored', kept, { tags: tagsOf(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Host initial={['a', 'b']} />);\n  fire.keyDown(q('input', r.container), 'Backspace');\n  const afterOne = tagsOf(r.container);\n  fire.change(q('input', r.container), 'x');\n  fire.keyDown(q('input', r.container), 'Backspace');\n  $test.check('Backspace in an empty input removes the last tag (not while typing)', afterOne === 'a' && tagsOf(r.container) === 'a', { afterOne, now: tagsOf(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Host initial={['a', 'b']} />);\n  fire.click(qa('button', r.container).find((b) => b.getAttribute('aria-label') === 'Remove a'));\n  $test.check('The Remove button removes that tag', tagsOf(r.container) === 'b', tagsOf(r.container));\n  r.unmount();\n}\n{\n  const log = [];\n  const r = render(<Host initial={['a']} max={2} log={log} />);\n  type(r.container, 'b');\n  type(r.container, 'c');\n  $test.check('No more tags are added once max is reached', tagsOf(r.container) === 'a,b' && log.length === 1, { tags: tagsOf(r.container), calls: log.length });\n  r.unmount();\n}"
+  },
+  {
+    "id": "progress-bar",
+    "track": "react-components",
+    "title": "Accessible Progress Bar",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "a11y",
+      "progressbar",
+      "props"
+    ],
+    "promptSeed": "Build ProgressBar({ value, max = 100, label = \"Progress\" }). Render <div role=\"progressbar\"> with aria-label={label}, aria-valuemin=\"0\", aria-valuemax={max} and aria-valuenow set to value clamped into [0, max]. Inside it render a fill element <div data-fill> whose style width is the exact percentage clamped/max*100 (e.g. \"50%\", \"75%\") and a <span> showing that percentage rounded to a whole number followed by \"%\". When value is undefined the bar is indeterminate: omit aria-valuenow, set data-indeterminate=\"true\" and render no percentage text.",
+    "difficulty": 1,
+    "concept": "progress",
+    "referenceSolution": "function ProgressBar({ value, max = 100, label = 'Progress' }) {\n  const indeterminate = value === undefined || value === null;\n  const clamped = indeterminate ? 0 : Math.min(max, Math.max(0, value));\n  const pct = (clamped / max) * 100;\n\n  return (\n    <div\n      role=\"progressbar\"\n      aria-label={label}\n      aria-valuemin={0}\n      aria-valuemax={max}\n      aria-valuenow={indeterminate ? undefined : clamped}\n      data-indeterminate={indeterminate ? 'true' : undefined}\n    >\n      <div data-fill style={indeterminate ? undefined : { width: `${pct}%` }} />\n      {!indeterminate && <span>{Math.round(pct)}%</span>}\n    </div>\n  );\n}",
+    "solution": "function ProgressBar({ value, max = 100, label = 'Progress' }) {\n  const indeterminate = value === undefined || value === null;\n  const clamped = indeterminate ? 0 : Math.min(max, Math.max(0, value));\n  const pct = (clamped / max) * 100;\n\n  return (\n    <div\n      role=\"progressbar\"\n      aria-label={label}\n      aria-valuemin={0}\n      aria-valuemax={max}\n      aria-valuenow={indeterminate ? undefined : clamped}\n      data-indeterminate={indeterminate ? 'true' : undefined}\n    >\n      <div data-fill style={indeterminate ? undefined : { width: `${pct}%` }} />\n      {!indeterminate && <span>{Math.round(pct)}%</span>}\n    </div>\n  );\n}",
+    "starterCode": "function ProgressBar({ value, max = 100, label = 'Progress' }) {\n  const indeterminate = value === undefined || value === null;\n  const clamped = indeterminate ? 0 : Math.min(max, Math.max(0, value));\n  const pct = (clamped / max) * 100;\n\n  return (\n    <div\n      role=\"progressbar\"\n      aria-label={label}\n      aria-valuemin={0}\n      aria-valuemax={max}\n      aria-valuenow={indeterminate ? undefined : clamped}\n      data-indeterminate={indeterminate ? 'true' : undefined}\n    >\n      <div data-fill style={indeterminate ? undefined : { width: `${pct}%` }} />\n      {!indeterminate && <span>{Math.round(pct)}%</span>}\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "50 of 100 exposes the ARIA values, a 50% fill and the text \"50%\"",
+        "input": "<ProgressBar value={50} />",
+        "expected": "aria-valuenow='50', aria-valuemin='0', aria-valuemax='100'; [data-fill] width '50%'; text '50%'"
+      },
+      {
+        "description": "A custom max is honoured: 3 of 4 is 75%",
+        "input": "<ProgressBar value={3} max={4} />",
+        "expected": "aria-valuemax='4', aria-valuenow='3'; width '75%'; text '75%'"
+      },
+      {
+        "description": "Values are clamped into [0, max]: -10 -> 0%, 150 -> 100%",
+        "input": "value=-10; value=150",
+        "expected": "aria-valuenow '0' / width '0%' / '0%'; aria-valuenow '100' / width '100%' / '100%'"
+      },
+      {
+        "description": "The fill width is exact while the text is rounded: 1 of 3 -> width ~33.33%, text \"33%\"",
+        "input": "<ProgressBar value={1} max={3} />",
+        "expected": "width = 33.333...%; text \"33%\""
+      },
+      {
+        "description": "aria-label defaults to \"Progress\" and can be overridden",
+        "input": "<ProgressBar value={10} /> and label=\"Upload\"",
+        "expected": "aria-label 'Progress'; then 'Upload'"
+      },
+      {
+        "description": "No value means indeterminate: no aria-valuenow, data-indeterminate=\"true\", no percentage text",
+        "input": "<ProgressBar />",
+        "expected": "no aria-valuenow attribute; data-indeterminate='true'; no text"
+      },
+      {
+        "description": "Re-rendering with a new value updates the fill and the text",
+        "input": "value 50, then re-render with 80",
+        "expected": "width '80%'; text '80%'"
+      }
+    ],
+    "testHarness": "const { render, q } = $dom;\nconst bar = (c) => q('[role=\"progressbar\"]', c);\nconst fill = (c) => q('[data-fill]', c);\nconst text = (c) => (q('span', c) ? q('span', c).textContent.trim() : '');\n{\n  const r = render(<ProgressBar value={50} />);\n  const b = bar(r.container);\n  $test.check(\n    '50 of 100 exposes the ARIA values, a 50% fill and the text \"50%\"',\n    b.getAttribute('aria-valuenow') === '50' && b.getAttribute('aria-valuemin') === '0' && b.getAttribute('aria-valuemax') === '100' && fill(r.container).style.width === '50%' && text(r.container) === '50%',\n    { now: b.getAttribute('aria-valuenow'), width: fill(r.container).style.width, text: text(r.container) }\n  );\n  r.unmount();\n}\n{\n  const r = render(<ProgressBar value={3} max={4} />);\n  const b = bar(r.container);\n  $test.check('A custom max is honoured: 3 of 4 is 75%', b.getAttribute('aria-valuemax') === '4' && b.getAttribute('aria-valuenow') === '3' && fill(r.container).style.width === '75%' && text(r.container) === '75%', { width: fill(r.container).style.width, text: text(r.container) });\n  r.unmount();\n}\n{\n  const low = render(<ProgressBar value={-10} />);\n  const lowOk = bar(low.container).getAttribute('aria-valuenow') === '0' && fill(low.container).style.width === '0%' && text(low.container) === '0%';\n  low.unmount();\n  const high = render(<ProgressBar value={150} />);\n  const highOk = bar(high.container).getAttribute('aria-valuenow') === '100' && fill(high.container).style.width === '100%' && text(high.container) === '100%';\n  high.unmount();\n  $test.check('Values are clamped into [0, max]: -10 -> 0%, 150 -> 100%', lowOk && highOk, { lowOk, highOk });\n}\n{\n  const r = render(<ProgressBar value={1} max={3} />);\n  const width = parseFloat(fill(r.container).style.width);\n  $test.check('The fill width is exact while the text is rounded: 1 of 3 -> width ~33.33%, text \"33%\"', Math.abs(width - 33.3333) < 0.01 && text(r.container) === '33%', { width, text: text(r.container) });\n  r.unmount();\n}\n{\n  const a = render(<ProgressBar value={10} />);\n  const defaultLabel = bar(a.container).getAttribute('aria-label');\n  a.unmount();\n  const b = render(<ProgressBar value={10} label=\"Upload\" />);\n  const custom = bar(b.container).getAttribute('aria-label');\n  b.unmount();\n  $test.check('aria-label defaults to \"Progress\" and can be overridden', defaultLabel === 'Progress' && custom === 'Upload', { defaultLabel, custom });\n}\n{\n  const r = render(<ProgressBar />);\n  const b = bar(r.container);\n  $test.check('No value means indeterminate: no aria-valuenow, data-indeterminate=\"true\", no percentage text', !b.hasAttribute('aria-valuenow') && b.getAttribute('data-indeterminate') === 'true' && text(r.container) === '', { attrs: b.getAttributeNames(), text: text(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<ProgressBar value={50} />);\n  r.rerender(<ProgressBar value={80} />);\n  $test.check('Re-rendering with a new value updates the fill and the text', fill(r.container).style.width === '80%' && text(r.container) === '80%', { width: fill(r.container).style.width });\n  r.unmount();\n}"
+  },
+  {
+    "id": "stopwatch",
+    "track": "react-components",
+    "title": "Stopwatch with Laps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "timers",
+      "effects",
+      "cleanup"
+    ],
+    "promptSeed": "Build Stopwatch(). Show the elapsed time in <div role=\"timer\" aria-label=\"Elapsed time\"> formatted MM:SS.cc (minutes, seconds, hundredths, each zero-padded to two digits, e.g. 1234 ms -> \"00:01.23\", 61050 ms -> \"01:01.05\"). Compute the elapsed time from Date.now() (not by counting ticks) and re-render about every 10 ms while running. Buttons (all type=\"button\"): a toggle labelled \"Start\" while stopped and \"Pause\" while running (pausing freezes the time; starting again resumes without counting the paused interval), \"Lap\" (disabled while not running) which appends the current time to <ol aria-label=\"Laps\"> as <li>Lap 1 00:01.23</li>, <li>Lap 2 ...</li>, and \"Reset\" which stops, sets the time to 00:00.00 and clears the laps. Clear the interval whenever the watch is paused, reset or unmounted.",
+    "difficulty": 3,
+    "concept": "react-timers",
+    "referenceSolution": "function formatTime(ms) {\n  const pad = (n) => String(n).padStart(2, '0');\n  const cs = Math.floor(ms / 10) % 100;\n  const s = Math.floor(ms / 1000) % 60;\n  const m = Math.floor(ms / 60000);\n  return `${pad(m)}:${pad(s)}.${pad(cs)}`;\n}\n\nfunction Stopwatch() {\n  const [base, setBase] = useState(0); // ms accumulated before the current run\n  const [startedAt, setStartedAt] = useState(null); // Date.now() when the current run began\n  const [laps, setLaps] = useState([]);\n  const [, setTick] = useState(0);\n  const running = startedAt !== null;\n\n  useEffect(() => {\n    if (!running) return undefined;\n    const id = setInterval(() => setTick((t) => t + 1), 10);\n    return () => clearInterval(id);\n  }, [running]);\n\n  const total = base + (running ? Date.now() - startedAt : 0);\n\n  const toggle = () => {\n    if (running) {\n      setBase(total);\n      setStartedAt(null);\n    } else {\n      setStartedAt(Date.now());\n    }\n  };\n  const lap = () => setLaps((l) => [...l, formatTime(total)]);\n  const reset = () => {\n    setBase(0);\n    setStartedAt(null);\n    setLaps([]);\n  };\n\n  return (\n    <div>\n      <div role=\"timer\" aria-label=\"Elapsed time\">{formatTime(total)}</div>\n      <button type=\"button\" onClick={toggle}>{running ? 'Pause' : 'Start'}</button>\n      <button type=\"button\" onClick={lap} disabled={!running}>Lap</button>\n      <button type=\"button\" onClick={reset}>Reset</button>\n      <ol aria-label=\"Laps\">\n        {laps.map((t, i) => (\n          <li key={i}>Lap {i + 1} {t}</li>\n        ))}\n      </ol>\n    </div>\n  );\n}",
+    "solution": "function formatTime(ms) {\n  const pad = (n) => String(n).padStart(2, '0');\n  const cs = Math.floor(ms / 10) % 100;\n  const s = Math.floor(ms / 1000) % 60;\n  const m = Math.floor(ms / 60000);\n  return `${pad(m)}:${pad(s)}.${pad(cs)}`;\n}\n\nfunction Stopwatch() {\n  const [base, setBase] = useState(0); // ms accumulated before the current run\n  const [startedAt, setStartedAt] = useState(null); // Date.now() when the current run began\n  const [laps, setLaps] = useState([]);\n  const [, setTick] = useState(0);\n  const running = startedAt !== null;\n\n  useEffect(() => {\n    if (!running) return undefined;\n    const id = setInterval(() => setTick((t) => t + 1), 10);\n    return () => clearInterval(id);\n  }, [running]);\n\n  const total = base + (running ? Date.now() - startedAt : 0);\n\n  const toggle = () => {\n    if (running) {\n      setBase(total);\n      setStartedAt(null);\n    } else {\n      setStartedAt(Date.now());\n    }\n  };\n  const lap = () => setLaps((l) => [...l, formatTime(total)]);\n  const reset = () => {\n    setBase(0);\n    setStartedAt(null);\n    setLaps([]);\n  };\n\n  return (\n    <div>\n      <div role=\"timer\" aria-label=\"Elapsed time\">{formatTime(total)}</div>\n      <button type=\"button\" onClick={toggle}>{running ? 'Pause' : 'Start'}</button>\n      <button type=\"button\" onClick={lap} disabled={!running}>Lap</button>\n      <button type=\"button\" onClick={reset}>Reset</button>\n      <ol aria-label=\"Laps\">\n        {laps.map((t, i) => (\n          <li key={i}>Lap {i + 1} {t}</li>\n        ))}\n      </ol>\n    </div>\n  );\n}",
+    "starterCode": "function formatTime(ms) {\n  const pad = (n) => String(n).padStart(2, '0');\n  const cs = Math.floor(ms / 10) % 100;\n  const s = Math.floor(ms / 1000) % 60;\n  const m = Math.floor(ms / 60000);\n  return `${pad(m)}:${pad(s)}.${pad(cs)}`;\n}\n\nfunction Stopwatch() {\n  const [base, setBase] = useState(0); // ms accumulated before the current run\n  const [startedAt, setStartedAt] = useState(null); // Date.now() when the current run began\n  const [laps, setLaps] = useState([]);\n  const [, setTick] = useState(0);\n  const running = startedAt !== null;\n\n  useEffect(() => {\n    if (!running) return undefined;\n    const id = setInterval(() => setTick((t) => t + 1), 10);\n    return () => clearInterval(id);\n  }, [running]);\n\n  const total = base + (running ? Date.now() - startedAt : 0);\n\n  const toggle = () => {\n    if (running) {\n      setBase(total);\n      setStartedAt(null);\n    } else {\n      setStartedAt(Date.now());\n    }\n  };\n  const lap = () => setLaps((l) => [...l, formatTime(total)]);\n  const reset = () => {\n    setBase(0);\n    setStartedAt(null);\n    setLaps([]);\n  };\n\n  return (\n    <div>\n      <div role=\"timer\" aria-label=\"Elapsed time\">{formatTime(total)}</div>\n      <button type=\"button\" onClick={toggle}>{running ? 'Pause' : 'Start'}</button>\n      <button type=\"button\" onClick={lap} disabled={!running}>Lap</button>\n      <button type=\"button\" onClick={reset}>Reset</button>\n      <ol aria-label=\"Laps\">\n        {laps.map((t, i) => (\n          <li key={i}>Lap {i + 1} {t}</li>\n        ))}\n      </ol>\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Starts stopped at 00:00.00 with Start enabled and Lap disabled",
+        "input": "<Stopwatch />",
+        "expected": "timer 'Elapsed time' = '00:00.00'; buttons Start (enabled), Lap (disabled), Reset"
+      },
+      {
+        "description": "Start begins counting: the button becomes Pause and 1234 ms reads 00:01.23",
+        "input": "click Start; Date.now advances by 1234",
+        "expected": "button 'Pause'; timer '00:01.23'"
+      },
+      {
+        "description": "Pause freezes the time and resuming does not count the paused interval",
+        "input": "Start; +1234 ms; Pause; +5000 ms; Start; +1000 ms",
+        "expected": "frozen at '00:01.23' while paused; then '00:02.23'"
+      },
+      {
+        "description": "Minutes roll over: 61050 ms reads 01:01.05",
+        "input": "Start; +61050 ms",
+        "expected": "'01:01.05'"
+      },
+      {
+        "description": "Lap appends the current time to an ordered list",
+        "input": "Start; +1234; Lap; +1766; Lap",
+        "expected": "<li>Lap 1 00:01.23</li>, <li>Lap 2 00:03.00</li>"
+      },
+      {
+        "description": "Reset stops the watch, zeroes the time and clears the laps",
+        "input": "Start; +1234; Lap; Reset; +500",
+        "expected": "'00:00.00'; no laps; button 'Start'"
+      },
+      {
+        "description": "The interval is cleared on Pause and on unmount (no leaked timers)",
+        "input": "count live setInterval ids: Start, Pause, Start, unmount",
+        "expected": "live intervals: 1 while running, 0 after Pause, 0 after unmount"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa, wait } = $dom;\n// A controllable clock: the component must read Date.now(), so we can move time without waiting.\nconst clock = { t: 1000000 };\nconst realNow = Date.now;\nconst realSet = globalThis.setInterval;\nconst realClear = globalThis.clearInterval;\nconst live = new Set();\nDate.now = () => clock.t;\nglobalThis.setInterval = (...a) => { const id = realSet(...a); live.add(id); return id; };\nglobalThis.clearInterval = (id) => { live.delete(id); return realClear(id); };\nconst btn = (c, name) => qa('button', c).find((b) => b.textContent.trim() === name);\nconst shown = (c) => q('[role=\"timer\"]', c).textContent.trim();\nconst laps = (c) => qa('ol li', c).map((li) => li.textContent.trim());\nconst advance = async (ms) => { clock.t += ms; await wait(80); };\ntry {\n  {\n    const r = render(<Stopwatch />);\n    $test.check('Starts stopped at 00:00.00 with Start enabled and Lap disabled', shown(r.container) === '00:00.00' && btn(r.container, 'Start') !== undefined && btn(r.container, 'Lap').disabled === true && q('[aria-label=\"Elapsed time\"]', r.container) !== null, { shown: shown(r.container) });\n    r.unmount();\n  }\n  {\n    const r = render(<Stopwatch />);\n    fire.click(btn(r.container, 'Start'));\n    await advance(1234);\n    $test.check('Start begins counting: the button becomes Pause and 1234 ms reads 00:01.23', btn(r.container, 'Pause') !== undefined && shown(r.container) === '00:01.23', shown(r.container));\n    r.unmount();\n  }\n  {\n    const r = render(<Stopwatch />);\n    fire.click(btn(r.container, 'Start'));\n    await advance(1234);\n    fire.click(btn(r.container, 'Pause'));\n    await advance(5000);\n    const frozen = shown(r.container);\n    fire.click(btn(r.container, 'Start'));\n    await advance(1000);\n    $test.check('Pause freezes the time and resuming does not count the paused interval', frozen === '00:01.23' && shown(r.container) === '00:02.23', { frozen, resumed: shown(r.container) });\n    r.unmount();\n  }\n  {\n    const r = render(<Stopwatch />);\n    fire.click(btn(r.container, 'Start'));\n    await advance(61050);\n    $test.check('Minutes roll over: 61050 ms reads 01:01.05', shown(r.container) === '01:01.05', shown(r.container));\n    r.unmount();\n  }\n  {\n    const r = render(<Stopwatch />);\n    fire.click(btn(r.container, 'Start'));\n    await advance(1234);\n    fire.click(btn(r.container, 'Lap'));\n    await advance(1766);\n    fire.click(btn(r.container, 'Lap'));\n    $test.check('Lap appends the current time to an ordered list', laps(r.container).join('|') === 'Lap 1 00:01.23|Lap 2 00:03.00', laps(r.container));\n    r.unmount();\n  }\n  {\n    const r = render(<Stopwatch />);\n    fire.click(btn(r.container, 'Start'));\n    await advance(1234);\n    fire.click(btn(r.container, 'Lap'));\n    fire.click(btn(r.container, 'Reset'));\n    await advance(500);\n    $test.check('Reset stops the watch, zeroes the time and clears the laps', shown(r.container) === '00:00.00' && laps(r.container).length === 0 && btn(r.container, 'Start') !== undefined, { shown: shown(r.container), laps: laps(r.container) });\n    r.unmount();\n  }\n  {\n    const before = live.size;\n    const r = render(<Stopwatch />);\n    fire.click(btn(r.container, 'Start'));\n    const whileRunning = live.size - before;\n    fire.click(btn(r.container, 'Pause'));\n    const afterPause = live.size - before;\n    fire.click(btn(r.container, 'Start'));\n    r.unmount();\n    const afterUnmount = live.size - before;\n    $test.check('The interval is cleared on Pause and on unmount (no leaked timers)', whileRunning === 1 && afterPause === 0 && afterUnmount === 0, { whileRunning, afterPause, afterUnmount });\n  }\n} finally {\n  Date.now = realNow;\n  globalThis.setInterval = realSet;\n  globalThis.clearInterval = realClear;\n}"
+  },
+  {
+    "id": "tic-tac-toe",
+    "track": "react-components",
+    "title": "Tic-Tac-Toe Board",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "state",
+      "game",
+      "derived-state"
+    ],
+    "promptSeed": "Build TicTacToe({ onGameEnd }). Render <p role=\"status\"> with \"Next player: X\" (X always starts, then O, alternating), \"Winner: X\" / \"Winner: O\" once a line of three is complete, or \"Draw\" when the board is full without a winner. Below it render <div role=\"group\" aria-label=\"Tic-tac-toe board\"> holding nine <button type=\"button\"> cells with aria-label \"Cell 1\" ... \"Cell 9\" (row by row, left to right) whose text is the mark (\"X\", \"O\" or empty). Clicking an empty cell places the current player's mark; clicking an occupied cell, or any cell after the game has ended, does nothing. When the game ends call onGameEnd exactly once with \"X\", \"O\" or \"draw\". A <button type=\"button\"> with the text \"Restart\" clears the board and gives X the first move again. Derive the winner from the board instead of storing it.",
+    "difficulty": 3,
+    "concept": "game-board",
+    "referenceSolution": "const LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];\n\nfunction calcWinner(cells) {\n  for (const [a, b, c] of LINES) {\n    if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];\n  }\n  return null;\n}\n\nfunction TicTacToe({ onGameEnd }) {\n  const [cells, setCells] = useState(Array(9).fill(null));\n  const [turn, setTurn] = useState('X');\n  const winner = calcWinner(cells);\n  const draw = !winner && cells.every(Boolean);\n\n  const play = (i) => {\n    if (cells[i] || winner) return;\n    const next = cells.slice();\n    next[i] = turn;\n    setCells(next);\n    setTurn(turn === 'X' ? 'O' : 'X');\n    const w = calcWinner(next);\n    if (w) onGameEnd && onGameEnd(w);\n    else if (next.every(Boolean)) onGameEnd && onGameEnd('draw');\n  };\n\n  const restart = () => {\n    setCells(Array(9).fill(null));\n    setTurn('X');\n  };\n\n  const status = winner ? `Winner: ${winner}` : draw ? 'Draw' : `Next player: ${turn}`;\n\n  return (\n    <div>\n      <p role=\"status\">{status}</p>\n      <div role=\"group\" aria-label=\"Tic-tac-toe board\">\n        {cells.map((value, i) => (\n          <button key={i} type=\"button\" aria-label={`Cell ${i + 1}`} onClick={() => play(i)}>\n            {value}\n          </button>\n        ))}\n      </div>\n      <button type=\"button\" onClick={restart}>Restart</button>\n    </div>\n  );\n}",
+    "solution": "const LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];\n\nfunction calcWinner(cells) {\n  for (const [a, b, c] of LINES) {\n    if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];\n  }\n  return null;\n}\n\nfunction TicTacToe({ onGameEnd }) {\n  const [cells, setCells] = useState(Array(9).fill(null));\n  const [turn, setTurn] = useState('X');\n  const winner = calcWinner(cells);\n  const draw = !winner && cells.every(Boolean);\n\n  const play = (i) => {\n    if (cells[i] || winner) return;\n    const next = cells.slice();\n    next[i] = turn;\n    setCells(next);\n    setTurn(turn === 'X' ? 'O' : 'X');\n    const w = calcWinner(next);\n    if (w) onGameEnd && onGameEnd(w);\n    else if (next.every(Boolean)) onGameEnd && onGameEnd('draw');\n  };\n\n  const restart = () => {\n    setCells(Array(9).fill(null));\n    setTurn('X');\n  };\n\n  const status = winner ? `Winner: ${winner}` : draw ? 'Draw' : `Next player: ${turn}`;\n\n  return (\n    <div>\n      <p role=\"status\">{status}</p>\n      <div role=\"group\" aria-label=\"Tic-tac-toe board\">\n        {cells.map((value, i) => (\n          <button key={i} type=\"button\" aria-label={`Cell ${i + 1}`} onClick={() => play(i)}>\n            {value}\n          </button>\n        ))}\n      </div>\n      <button type=\"button\" onClick={restart}>Restart</button>\n    </div>\n  );\n}",
+    "starterCode": "const LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];\n\nfunction calcWinner(cells) {\n  for (const [a, b, c] of LINES) {\n    if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];\n  }\n  return null;\n}\n\nfunction TicTacToe({ onGameEnd }) {\n  const [cells, setCells] = useState(Array(9).fill(null));\n  const [turn, setTurn] = useState('X');\n  const winner = calcWinner(cells);\n  const draw = !winner && cells.every(Boolean);\n\n  const play = (i) => {\n    if (cells[i] || winner) return;\n    const next = cells.slice();\n    next[i] = turn;\n    setCells(next);\n    setTurn(turn === 'X' ? 'O' : 'X');\n    const w = calcWinner(next);\n    if (w) onGameEnd && onGameEnd(w);\n    else if (next.every(Boolean)) onGameEnd && onGameEnd('draw');\n  };\n\n  const restart = () => {\n    setCells(Array(9).fill(null));\n    setTurn('X');\n  };\n\n  const status = winner ? `Winner: ${winner}` : draw ? 'Draw' : `Next player: ${turn}`;\n\n  return (\n    <div>\n      <p role=\"status\">{status}</p>\n      <div role=\"group\" aria-label=\"Tic-tac-toe board\">\n        {cells.map((value, i) => (\n          <button key={i} type=\"button\" aria-label={`Cell ${i + 1}`} onClick={() => play(i)}>\n            {value}\n          </button>\n        ))}\n      </div>\n      <button type=\"button\" onClick={restart}>Restart</button>\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders an empty labelled board with 9 cells and \"Next player: X\"",
+        "input": "<TicTacToe />",
+        "expected": "group 'Tic-tac-toe board'; cells Cell 1..9 all empty; status 'Next player: X'"
+      },
+      {
+        "description": "Players alternate: X then O",
+        "input": "click Cell 1, then Cell 5",
+        "expected": "Cell 1 = X, Cell 5 = O; status 'Next player: X'"
+      },
+      {
+        "description": "Clicking an occupied cell does nothing",
+        "input": "click Cell 1 twice",
+        "expected": "Cell 1 stays X; status 'Next player: O'"
+      },
+      {
+        "description": "X completing the top row wins and onGameEnd(\"X\") fires once",
+        "input": "clicks: 1, 4, 2, 5, 3",
+        "expected": "status 'Winner: X'; board XXX/OO-/---; onGameEnd called once with 'X'"
+      },
+      {
+        "description": "O completing the middle column wins",
+        "input": "clicks: 1, 2, 3, 5, 4, 8",
+        "expected": "status 'Winner: O'; onGameEnd('O')"
+      },
+      {
+        "description": "No more moves are accepted after the game is won",
+        "input": "clicks: 1, 4, 2, 5, 3, then Cell 9",
+        "expected": "Cell 9 stays empty; status 'Winner: X'; onGameEnd called once"
+      },
+      {
+        "description": "A full board with no line is a draw and calls onGameEnd(\"draw\")",
+        "input": "clicks: 1, 2, 3, 5, 4, 6, 8, 7, 9",
+        "expected": "board XOX/XOO/OXX; status 'Draw'; onGameEnd('draw')"
+      },
+      {
+        "description": "Restart clears the board, X starts again, and onGameEnd is not called again",
+        "input": "win the top row, click Restart, click Cell 9",
+        "expected": "board empty and 'Next player: X' after Restart; Cell 9 = X; onGameEnd called once in total"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst cell = (c, n) => q('[aria-label=\"Cell ' + n + '\"]', c);\nconst status = (c) => q('[role=\"status\"]', c).textContent.trim();\nconst play = (c, ...ns) => ns.forEach((n) => fire.click(cell(c, n)));\nconst marks = (c) => Array.from({ length: 9 }, (_, i) => cell(c, i + 1).textContent.trim() || '-').join('');\nconst restartBtn = (c) => qa('button', c).find((b) => b.textContent.trim() === 'Restart');\n{\n  const r = render(<TicTacToe />);\n  $test.check(\n    'Renders an empty labelled board with 9 cells and \"Next player: X\"',\n    q('[role=\"group\"][aria-label=\"Tic-tac-toe board\"]', r.container) !== null && marks(r.container) === '---------' && status(r.container) === 'Next player: X',\n    { marks: marks(r.container), status: status(r.container) }\n  );\n  r.unmount();\n}\n{\n  const r = render(<TicTacToe />);\n  play(r.container, 1, 5);\n  $test.check('Players alternate: X then O', marks(r.container) === 'X---O----' && status(r.container) === 'Next player: X', { marks: marks(r.container), status: status(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<TicTacToe />);\n  play(r.container, 1, 1);\n  $test.check('Clicking an occupied cell does nothing', marks(r.container) === 'X--------' && status(r.container) === 'Next player: O', { marks: marks(r.container), status: status(r.container) });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 4, 2, 5, 3);\n  $test.check('X completing the top row wins and onGameEnd(\"X\") fires once', status(r.container) === 'Winner: X' && marks(r.container) === 'XXXOO----' && calls.join() === 'X', { status: status(r.container), marks: marks(r.container), calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 2, 3, 5, 4, 8);\n  $test.check('O completing the middle column wins', status(r.container) === 'Winner: O' && calls.join() === 'O', { status: status(r.container), calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 4, 2, 5, 3, 9);\n  $test.check('No more moves are accepted after the game is won', cell(r.container, 9).textContent.trim() === '' && status(r.container) === 'Winner: X' && calls.length === 1, { cell9: cell(r.container, 9).textContent, calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 2, 3, 5, 4, 6, 8, 7, 9);\n  $test.check('A full board with no line is a draw and calls onGameEnd(\"draw\")', status(r.container) === 'Draw' && marks(r.container) === 'XOXXOOOXX' && calls.join() === 'draw', { status: status(r.container), marks: marks(r.container), calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 4, 2, 5, 3);\n  fire.click(restartBtn(r.container));\n  const cleared = marks(r.container) === '---------' && status(r.container) === 'Next player: X';\n  play(r.container, 9);\n  $test.check('Restart clears the board, X starts again, and onGameEnd is not called again', cleared && cell(r.container, 9).textContent.trim() === 'X' && calls.length === 1, { cleared, calls });\n  r.unmount();\n}"
   }
 ]
