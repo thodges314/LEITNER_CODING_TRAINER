@@ -22,14 +22,14 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 234 (83 active at first run) |
+| Cards | 234 total = **201 default + 33 in the optional `algorithms-advanced` pack** (80 default cards active at first run) |
 | Documented test cases | 1494 (each shown as input → expected in the UI) |
-| Difficulty spread | d1: 33 · d2: 70 · d3: 90 · d4: 39 · d5: 2 |
-| Tracks with cards | async-js, data-structures, react (17), algorithms (29), js-runtime-fundamentals, async-web-plumbing, collections-transformations, react-patterns (10), algorithmic-screens, typescript-patterns, js-language, dom-browser, react-components (19), testing-tooling (5) |
+| Difficulty spread | all 234: d1 33 · d2 70 · d3 90 · d4 39 · d5 2; default 201: d1 33 · d2 66 · d3 72 · d4 28 · d5 2 |
+| Tracks (default deck / total) | algorithms 45/77, js-language 34, react-components 19, react 17, async-js 15, typescript-patterns 14, async-web-plumbing 12, react-patterns 10, data-structures 8, js-runtime-fundamentals 7, collections-transformations 7, dom-browser 6, testing-tooling 5, algorithmic-screens 2/3 (some tracks overlap in topic; consolidation is on the roadmap) |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | every card has `targetTime`, `targetSpace`, `complexityExplanation` (see §4) |
-| Automated tests | ~600 (Vitest; 508 in the card-content suites alone). Every card's harness must pass with its reference solution **and fail with an empty solution**, plus unit tests for scheduling algorithms and formatting |
-| Manual verification | The 66 original cards and all React cards (31 cards incl. every `react-components` card) were run in the production build in a real browser. The other cards added later pass in jsdom only |
+| Automated tests | 830 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 468 tests, ~6 min on an idle machine with 4 workers). **Last full run on `master`: 465 passed, 3 flaky (passed on retry), 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -136,7 +136,7 @@ Gotchas learned the hard way:
 - **jsdom passes ≠ browser passes.** In the production build `act` is the `flushSync` fallback: sync updates and discrete events flush at once, but
   state set from an *effect* and *continuous* events (`mouseover`, `scroll`) render on the next tick. Harnesses that check such results must
   `await wait(30)` first (5 cards needed this when first smoke-tested). Always run new React cards through "Run Code" in `vite preview`.
-- A synchronous infinite loop freezes the tab (no timeout is possible in-page). Drafts are autosaved so nothing is lost.
+- Runaway code: `loopGuards.ts` instruments `while/for/do/for-of/for-in` loops and throws after 3 s, which covers the common case. Code is still executed in the page (not a worker/iframe), so other kinds of runaway (endless `await` chains, work outside instrumented loops) can still hang the tab; `runWithTimeout` (Worker) exists in `runner.ts` but is not used by the app. Drafts are autosaved so nothing is lost.
 
 ## 6. Scheduling models (all in `src/lib/leitner.ts`)
 
@@ -181,32 +181,32 @@ The trainer supports two user-selectable algorithms via the Settings modal (`alg
 Basis: what typical front-end loops ask (JS-utility rounds, "build this component" rounds, React/hooks questions, a11y, light
 algorithms, TS). This is a judgement from experience with those formats, not a live survey. Re-assess when the deck changes.
 
-| Area | Status | Cards now | What is there / what is missing |
+| Area | Status | Default deck | What is there / what is missing |
 |---|---|---|---|
-| JS utilities (debounce, throttle, memoize, curry, bind, deep-clone, emitter, LRU) | **Strong** (some duplication) | ~35 | Full ladders for rate-limiting, currying, LRU, clone/equality. Duplicates are intentional variants (see 7.3) |
-| Async plumbing (pool, retry, queue, allSettled, abort, timeout) | **Strong** | ~20 | Plus `Promise` class from scratch and `promisify`. Missing: `Promise.any`/`AggregateError`, cancelable promise, polling, async generators |
-| Core language (closures, `this`, prototypes, iterators) | **Medium-strong** (batch 15) | ~24 | closures, `new`/`instanceof`/`Object.create`, generators, `JSON.stringify`, plus batch 15: `Proxy` (defaults, negative index, validation, revocable read-only), `WeakMap`/`WeakSet` (tags, private state, memoize, cycles), property descriptors (hidden/constant, getter/setter, clone/mixin), prototype inheritance (Object.create, ES5 Animal/Dog, chain walking, `Symbol.hasInstance`). Missing: output-prediction/hoisting/TDZ quizzes, `Symbol` registry/well-knowns beyond `hasInstance`, class fields/static blocks, tagged templates, `Reflect` depth |
-| String/format utilities | **Medium** | 5 | classNames, query string, formatters, style parsing, CSS specificity. Missing: template engine, markdown-lite, slugify, diffing |
-| DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize/Intersection observers (outside React), `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame` loops, Web Workers |
-| React hooks and state | **Medium** | ~25 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer. Missing: undo/redo, form-state hook, `useLayoutEffect`, `useDeferredValue`/`useTransition`, optimistic updates, React 19 APIs |
-| React components ("build this") | **Weak** | ~11 | Typeahead, modal, tabs, infinite list, star rating, countdown, file tree, filter list, accordion, error boundary, a11y field, load-more list, memo list, simple + full data table, dropdown menu, virtual list; hooks: useToggle/useCounter, useHistory, useForm. Still missing: multi-step form wizard, tooltip/popover, drag-sortable list (keyboard fallback), pagination controls, tag/chip input, stepper/progress bar, lazy image (IntersectionObserver), copy-to-clipboard button, theme switcher (context + localStorage), kanban board, nested comments, React 19 APIs |
-| Algorithms | **Medium-strong** (batch 13) | ~39 | arrays/hash/two-pointer/window/stack/BFS/intervals/trees, plus batch 13: linked lists, MinStack/queue, strings, anagrams, DP (fib, coin change, LIS, robber), BST/LCA, grid DFS, topo sort, trie, heap, sorting, backtracking, binary-search variants, matrix, Kadane/prefix sums. Missing: graph shortest path (Dijkstra, union-find), bit tricks, monotonic stack/deque, 2D DP (LCS, edit distance, knapsack), intervals/greedy variants, LRU-style design with linked lists |
-| TypeScript | **Weak-medium** | 6 | unions, generics, utility types, guards, typed emitter. Missing: conditional/`infer`, template-literal types, overloads, branded types, `satisfies`, assertion functions |
-| Accessibility | **Weak** | 3 | modal focus, tabs ARIA, typeahead. Missing: menu/dropdown roving focus, `aria-live`, accessible forms/errors, skip links, focus trap utilities |
-| CSS/layout | **None** (specificity only) | 1 | Needs a different grading approach (see below) |
-| Testing (Jest/RTL) | **None** | 0 | `testing-tooling` track empty |
-| Frameworks/libs (Next.js, D3) | **None** | 0 | listed in the owner's stack; see pure-logic approach below |
+| JS utilities (debounce, throttle, memoize, curry, bind, deep-clone, emitter, LRU) | **Strong** (some duplication) | ~35 | Full ladders for rate-limiting, currying, LRU, clone/equality. Duplicates are intentional variants (§7.3) |
+| Async plumbing (pool, retry, queue, allSettled, abort, timeout) | **Strong** | ~27 | Promise class, promisify, `Promise.any`/`AggregateError`, cancelable promise, polling with backoff, async generators, pub/sub. Missing: little |
+| Core language (closures, `this`, prototypes, iterators, Proxy, WeakMap, descriptors, TDZ, tagged templates) | **Strong** | 34 (`js-language`) | Missing: class fields/static blocks, `Reflect` depth, `Symbol` well-knowns beyond a few |
+| String/format utilities | **Medium** | ~8 | classNames, query string, formatters, style parsing, CSS specificity, anagram/palindrome. Missing: template engine, markdown-lite, slugify, diffing |
+| DOM and browser APIs | **Weak-medium** | 6 | event delegation, vnode→DOM, router, storage TTL, path params, safe JSON. Missing: drag and drop, Mutation/Resize observers, `history.pushState`, clipboard, keyboard shortcuts, `requestAnimationFrame`, workers |
+| React hooks and state (`react`, `react-patterns`) | **Medium-strong** | 27 | fetch/debounce/throttle/previous/latest/interval/local-storage/click-outside/store/forwardRef/memo/error-boundary/reducer, undo/redo, form state, `useIsMounted`, `useMediaQuery`. Missing: `useLayoutEffect`, `useDeferredValue`/`useTransition`, React 19 APIs |
+| React components ("build this") | **Medium** | 19 | typeahead, modal, tabs, infinite list, star rating, countdown, file tree, accordion, data table, dropdown menu, virtual list, toast queue, carousel, optimistic like, breadcrumbs, transfer list, nested checkbox tree. **Preserved but not yet merged** (branch `feature/react-batch-2`): multi-step form, tag input, pagination. Still missing: tooltip/popover, drag-sortable list, stepper, lazy image, copy button, theme switcher, kanban, nested comments |
+| Algorithms | **Medium (core) + opt-in pack** | 47 core (+33 pack) | Core: arrays, hashing, two pointers, sliding window, stack, binary search, linked lists, trees/BST, **basic graph theory (BFS adjacency, components, grid BFS/islands, clone/bipartite, topological sort)**, intro DP, sorting, trie, matrix, bits. Pack: 2D DP, heaps beyond basics, monotonic stack, hard backtracking, k-group reversal, serialization. Missing in both: Dijkstra, union-find |
+| TypeScript | **Medium** | 14 | unions, generics, utility types, guards, typed emitter, conditional `infer`, template literals, branded types, overloads, mapped modifiers. Missing: `satisfies`, assertion functions |
+| Accessibility | **Weak-medium** | ~10 tagged `a11y` | modal focus, tabs ARIA, typeahead, accessible field, dropdown roving focus, pagination (pending). Missing: `aria-live` regions, skip links, focus-trap utility, combobox |
+| CSS/layout | **Weak** | 3 tagged `css` | specificity and style parsing only. Needs a different grading approach: real-browser (Playwright) layout checks |
+| Testing (Jest/RTL) | **Pure-logic stand-ins only** | 5 (`testing-tooling`) | `mockFn`, `fakeTimers`, `miniExpect`, a test-runner lifecycle, `nextRouteMatcher`. Missing: RTL-style queries/user-event, snapshot basics |
+| Frameworks/libs (Next.js, D3) | **Minimal** | 1 | only `nextRouteMatcher`; no D3 cards |
 | System-design style prompts | **None** | 0 | Out of scope for auto-graded cards; see "complete projects" note |
 
-Bottom line: JS utilities and async are the strongest part of the deck. The weakest relative to interview frequency are
-**React component builds, algorithms (graph/DP/linked-list/heap/trie), accessibility, TypeScript type-level, CSS and testing**.
+Bottom line: JS utilities, async and core language are the strongest parts. Relative to interview frequency the thinnest are
+**CSS/layout, accessibility, DOM/browser extras, the remaining React component builds, testing-library-style tests, and any framework content**. Algorithms are no longer the
+bulk of the default deck (core 47 of 201); the heavier ones are opt-in (§7.4b).
 
 ### 7.1 Difficulty ladder holes (the owner wants "simple first, then harder" on every concept)
-**Status after batch 14** (`scripts/testcases/part14.mjs`): 14 starter rungs were added for
-`sorting`, `heap`, `trie`, `backtracking`, `matrix`, `graphs`, `event-loop`, `promise-combinators`, `iterators`, `middleware`, `serialization`,
-`ts-generics`, `ts-unions`, `ts-types` (all pure-function or type-level cards, 570 tests passing). Concepts whose lowest rung is **still ≥ 3** (all React/DOM,
-need a hand-written DOM harness and a browser smoke test): `state-management`(4), `tree-ui`(3), `history-state`(3), `virtualization`(4),
-`carousel`(3), `optimistic-ui`(3), `notifications`(3). Also only one d5 card exists.
+**Status (current):** the starter rungs for the pure-function and TypeScript concepts exist. Concepts in the default deck whose lowest rung is **still ≥ 3**
+(all React/DOM or tooling; each needs a hand-written DOM or pure harness and a `npm run e2e` run): `architecture`(5), `carousel`(3), `dual-list`(3),
+`history-state`(3), `notifications`(3), `optimistic-ui`(3), `state-management`(4), `testing-tools`(3,3,4), `tree-ui`(3,3), `virtualization`(4).
+13 concepts have a single card (no ladder yet). Only two d5 cards exist.
 The original table below is kept for the proposed rung designs (the React rows are still open).
 Add the rung(s) below; each must follow §4 (reference, cases, harness, empty-solution test, `difficulty.json` entry, same `concept`).
 
@@ -288,8 +288,8 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 6. Optional: per-card hints that reveal the reference solution progressively; export/import of drafts.
 
 ### 7.4 Engineering / quality
-- **Browser smoke test in CI** (Playwright against `vite preview`): for each card run reference + harness via "Run Code" and assert pass;
-  also assert an empty buffer fails. This is the repeatable version of the manual loop used before.
+- **Browser smoke test**: DONE, see §7.4a (`npm run e2e`; CI workflow `e2e.yml` runs on PRs and non-master pushes, not on `master`).
+- **Not yet done**: wrong-answer checks (a few deliberately wrong solutions per card that the harness must reject), 14 cards have fewer than 4 test cases, and the `targetTime`/`targetSpace`/`complexityExplanation` fields were bulk-generated by a small model (`scripts/enrich-complexities.mjs`) with no human review; they are noise on non-algorithm cards and use inconsistent `n`/`N`.
 - **Timing tests**: hook/typeahead harnesses use real timers. Their delays and waits were scaled ×3 (e.g. debounce 180 ms with margins of 30-90 ms)
   and passed 3 consecutive runs; the countdown card polls with `until()` instead of fixed waits. Still possible: one retry on failure, or fake timers.
 - Bundle: main chunk ≈ 0.65 MB; lazy TypeScript chunk ≈ 4.1 MB (acceptable for personal use; `chunkSizeWarningLimit` raised).
@@ -300,10 +300,10 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 
 ### 7.4a Browser smoke test (DONE): `npm run e2e`
 `e2e/cards.spec.ts` + `playwright.config.ts` run EVERY seed card in the production build (`vite preview`) in real Chromium: the reference solution
-must show **PASSED**, an empty buffer must show **NEEDS REVISION** (2 tests per card, ~16 min for 234 cards with 4 workers; CI workflow
+must show **PASSED**, an empty buffer must show **NEEDS REVISION** (2 tests per card, ~6 min for 234 cards with 4 workers on an idle machine, ~16 min if the machine is busy; CI workflow
 `.github/workflows/e2e.yml` runs it on PRs and non-master pushes). The code is injected through the draft autosave key (`leitner_draft:<id>`) so the
 CodeMirror editor is never driven; the deck is rewritten so exactly one card is active. Filter with `npx playwright test -g "<card id>"`.
-First run found a real bug: `MobileNoticeModal` stayed in the DOM (CSS-hidden, `role="dialog"`, `body{overflow:hidden}`) on desktop and broke
+Flaky-on-first-try cards in the last full run (all passed on retry): the fetch/promise-timing cards (`async-fetch-error-handling`, `fetch-abort-controller`, `promise-all-vs-settled`, `promise-chaining-syntax`) and `breadcrumbs-router`; `retries: 1` absorbs them but they are candidates for wider margins. First run found a real bug: `MobileNoticeModal` stayed in the DOM (CSS-hidden, `role="dialog"`, `body{overflow:hidden}`) on desktop and broke
 `modal-portal-focus`; it now mounts only on narrow viewports. TS cards show no "Tests:" badge when compilation fails, so the spec never waits for it.
 
 
@@ -318,10 +318,16 @@ flood fill/islands, grid BFS, clone/bipartite, topological sort**, intro DP, sor
 run `npm run build:cards`. The Playwright smoke test enables the pack so it still covers every card.
 
 ### 7.5 Suggested next steps (in order)
-1. Fill ladder holes (§7.1) so every concept starts at d1/d2. 2. Playwright smoke test + wider timing margins (batch 13 and later cards are jsdom-only).
-3. Stats/history. 4. Next card category (see below). 5. Sandboxed execution.
+1. Keep `npm run e2e` green on `master` (run it after any card/runner change; re-run flaky timing cards).
+2. Wrong-answer ("mutation") checks per card, starting with the cards authored by other assistants.
+3. Recover and finish `feature/react-batch-2` (multi-step form, tag input, pagination: files exist, cases are in `scripts/testcases/part27.mjs`, difficulty entries added, `build-cards` still erroring when last tried).
+4. Content gaps: accessibility, CSS (needs real-browser checks), DOM/browser extras, remaining ladder holes (§7.1), then React 19 APIs.
+5. Product: "Front-end screen" Focus preset + an interview-importance weight, make staged unlocks respect the user's Focus exclusions, stats/history view, track consolidation.
+6. Complexity fields: keep them on algorithm cards only, normalise notation, human spot-check.
+7. Sandboxed execution (iframe) so no runaway code can freeze the tab.
 
-### 7.6 DECISION NEEDED: next card categories
+### 7.6 History of card categories (batches 13-26; kept for context)
+> Most rows below are DONE. For what is still open, use §7.0 and §7.5 above, which are the current sources of truth.
 Algorithms were filled in batch 13. Candidates, with the owner's goal in mind (re-typing interview algorithms by hand), in recommended order:
 
 | # | Category | Why | Grading | Effort |

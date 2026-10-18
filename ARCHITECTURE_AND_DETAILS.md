@@ -1,6 +1,6 @@
 # Leitner Coding Trainer — Architecture and Technical Details
 
-> **Notice:** This document provides the architecture, data flow, execution sandbox, spaced retrieval models, and editor engine details for the Leitner Coding Trainer. See also [ARCHITECTURE_AND_ROADMAP.md](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/ARCHITECTURE_AND_ROADMAP.md) and [README.md](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/README.md).
+> **Notice:** This document provides the architecture, data flow, execution sandbox, spaced retrieval models, and editor engine details for the Leitner Coding Trainer. See also [ARCHITECTURE_AND_ROADMAP.md](ARCHITECTURE_AND_ROADMAP.md) and [README.md](README.md).
 
 ---
 
@@ -18,12 +18,12 @@ Learners write solutions from scratch without autocomplete or hints, execute the
 
 ## 2. Editor & Aesthetics Engine
 
-Located in [PracticeArena.tsx](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/components/PracticeArena.tsx):
+Located in [PracticeArena.tsx](src/components/PracticeArena.tsx):
 
 ### 2.1 CodeMirror 6 Integration
 - Replaced basic HTML `<textarea>` with `@uiw/react-codemirror` and `@codemirror/lang-javascript`.
 - Supports JavaScript (JSX) and TypeScript modes (`executionMode === 'ts'`).
-- Line numbers, active line highlight, and custom dark-mode styling in [index.css](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/index.css).
+- Line numbers, active line highlight, and custom dark-mode styling in [index.css](src/index.css).
 
 ### 2.2 Cold-Start Interview Integrity
 - **Autocompletion & IntelliSense are strictly disabled**:
@@ -55,7 +55,7 @@ Located in [PracticeArena.tsx](file:///Volumes/Claudet/thomashodges/Workspace/LE
 - Jumping over closing tokens on typing and balanced deletion on Backspace.
 
 ### 2.5 In-Browser Code Formatter (Prettier Standalone)
-- Located in [formatter.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/formatter.ts).
+- Located in [formatter.ts](src/lib/formatter.ts).
 - Dynamically imports `prettier/standalone`, `@prettier/plugins/babel`, `estree`, and `typescript` as lazy chunks.
 - Shortcuts:
   - `Shift + Alt + F` / `Cmd + Shift + F`: Auto-format code
@@ -67,7 +67,7 @@ Located in [PracticeArena.tsx](file:///Volumes/Claudet/thomashodges/Workspace/LE
 
 ## 3. Spaced Retrieval Algorithms
 
-Located in [leitner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/leitner.ts). Users can toggle their preferred algorithm in the Settings Modal:
+Located in [leitner.ts](src/lib/leitner.ts). Users can toggle their preferred algorithm in the Settings Modal:
 
 ### 3.1 Classic Leitner Boxes (`leitner`)
 - **Boxes 1–5**: Review intervals in trial counts: `[1, 4, 10, 22, 45]`.
@@ -98,16 +98,17 @@ Located in [leitner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_C
 
 ## 4. Execution Sandbox & Grading Engine
 
-Located in [runner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/runner.ts):
+Located in [runner.ts](src/lib/runner.ts):
 
 1. **Transpilation & Loop Protection**:
    - JS Mode: Fast in-browser transformation via Sucrase.
    - TS Mode: Strict compile-time type diagnostics via lazy-loaded TypeScript compiler with ES2022 lib files.
-   - **Loop Guard Protection** ([loopGuards.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/loopGuards.ts)): Automatically instruments all loops (`while`, `for`, `do..while`, `for..of`, `for..in`) with lightweight bitwise-checked iteration timers (`(++iter & 1023) === 0 && Date.now() - start > timeoutMs`). If code gets trapped in a synchronous infinite loop, it throws an informative timeout error after 3000ms, completely preventing browser freezing.
-2. **Web Worker Thread Isolation (`runWithTimeout`)**:
-   - Located in [runner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/runner.ts).
-   - Executes code in a dedicated Web Worker on an isolated OS background thread.
-   - If execution exceeds `timeoutMs`, the main thread triggers `worker.terminate()`, instantly killing the runaway thread.
+   - **Loop Guard Protection** ([loopGuards.ts](src/lib/loopGuards.ts)): Automatically instruments all loops (`while`, `for`, `do..while`, `for..of`, `for..in`) with lightweight bitwise-checked iteration timers (`(++iter & 1023) === 0 && Date.now() - start > timeoutMs`). If code gets trapped in a synchronous infinite loop, it throws an informative timeout error after 3000ms, completely preventing browser freezing.
+2. **Web Worker helper (`runWithTimeout`) — NOT used by the app yet**:
+   - Located in [runner.ts](src/lib/runner.ts). It can run plain code in a dedicated Web Worker and `terminate()` it after `timeoutMs`.
+   - Only its unit tests call it. Card grading (`runHarness`) runs in the **page itself**, so the only runaway protection today is the loop guard above:
+     it stops synchronous `while/for` loops, but not runaway recursion (stack overflow is caught as an error), a loop that never reaches an instrumented
+     statement, or an endless `await` chain. DOM harnesses need a `document`, so a real fix is a sandboxed iframe (see the roadmap, §7.3).
 3. **Sandbox Scope**:
    - User code and harness concatenated in an `AsyncFunction`.
    - Injected globals: React, ReactDOM, native hooks, `$dom` (render, query, fire events, act, wait), `$test` (check, run, equal, rejects, sleep), mock `fetch`, mock `IntersectionObserver`.
@@ -119,7 +120,7 @@ Located in [runner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CO
 
 ## 5. AI Evaluator & Multi-Key Vault
 
-Located in [ai.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/ai.ts) and [SettingsModal.tsx](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/components/SettingsModal.tsx):
+Located in [ai.ts](src/lib/ai.ts) and [SettingsModal.tsx](src/components/SettingsModal.tsx):
 
 - **Independent Multi-Key Storage**: Stores API keys per provider in an isolated vault in `localStorage` (`ai_evaluator_keys_vault`).
 - **Instant 1-Click Provider Switching**: Users can switch between Gemini, Groq, OpenAI, OpenRouter, and Custom endpoints with a single click. The active provider's key is automatically loaded and activated.
@@ -134,7 +135,7 @@ Located in [ai.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING
 
 ## 6. Timed Recall Mode
 
-Located in [timedMode.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/lib/timedMode.ts) and [PracticeArena.tsx](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_CODING_TRAINER/src/components/PracticeArena.tsx):
+Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/components/PracticeArena.tsx):
 
 - **Configurable Durations**: 5m, 10m (default), 15m, and 20m options with persistent toggle in Settings.
 - **Automatic Countdown**: When enabled, the countdown timer initiates automatically upon card mount.
@@ -146,10 +147,12 @@ Located in [timedMode.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER
 ## 7. Verification & Testing
 
 - **Vitest Suite**: Tests verifying:
-  - Reference solutions pass for all 234 topic cards.
+  - Reference solutions pass for all 234 topic cards (201 default + 33 in the optional `algorithms-advanced` pack).
   - Empty submissions fail for all cards.
+  - Optional card packs (`src/lib/packs.test.ts`): off by default, excluded from scheduling and staged unlocks, persisted, core algorithms keep fair coverage.
   - Leitner and Graduated Interval algorithms, intervals, promotions, and setbacks.
   - Prettier standalone formatter for JS, JSX, TS, and syntax errors.
   - Multi-key vault persistence, prefix detection, and provider switching.
   - Timed Recall Mode configuration and persistence.
+- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION. jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
 - **Production Build**: Verified via `npm run build` (`tsc -b && vite build`) with zero lint or type errors.
