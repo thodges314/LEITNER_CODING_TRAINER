@@ -177,5 +177,6 @@ const out = await runInParallel([task('slow', 30), task('fast', 5)]);
     r('Renders a labelled input with the placeholder', "<FocusInput label='Name' placeholder='Ada' />", "<label> text 'Name' wrapping an <input placeholder='Ada'>"),
     r('The input is focused after mount', 'mount <FocusInput />', 'document.activeElement is the input'),
     r('Re-rendering does not steal focus again', 'focus another button, then rerender FocusInput with new props', 'the other button keeps focus'),
+    r("Focuses the input again when the component is mounted anew", "unmount FocusInput, mount a new one", "the new input is document.activeElement"),
   ],
 };

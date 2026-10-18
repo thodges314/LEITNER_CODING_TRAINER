@@ -43,11 +43,14 @@ export const overrides = {
       `const realClear = globalThis.clearTimeout;\nlet cleared = 0;\nglobalThis.clearTimeout = (id) => { cleared++; return realClear(id); };\ntry { await fetchWithTimeout('${U}/todos/1', 5000); } finally { globalThis.clearTimeout = realClear; }\ncleared >= 1`,
       'true',
     ),
+    c(`A network failure rejects with the original error instead of hanging`, `fetchWithTimeout('https://invalid-non-existent-url-domain.org', 5000)`, ``, { t: `TypeError: Failed to fetch`, x: `Rejects with the network error (TypeError: Failed to fetch)` }),
   ],
   'event-loop-microtasks': [
     c('Order of sync code, promise.then, queueMicrotask and setTimeout(0)', 'await getExecutionOrder()', "['sync', 'promise', 'microtask', 'timeout']"),
     c('Each label appears exactly once', '(await getExecutionOrder()).slice().sort()', "['microtask', 'promise', 'sync', 'timeout']"),
     c('Every call returns a fresh array', 'const a = await getExecutionOrder();\nconst b = await getExecutionOrder();\na !== b', 'true'),
+    c(`The result has four entries and the timeout callback is last`, `const o = await getExecutionOrder();
+[o.length, o[3]]`, `[4, 'timeout']`),
   ],
   'use-reducer-todo-list': [
     c('ADD_TODO appends an unchecked todo with the next id', "todoReducer([], { type: 'ADD_TODO', payload: 'Practice' })", "[{ id: 1, text: 'Practice', done: false }]"),
@@ -83,6 +86,13 @@ export const overrides = {
     c('Delay between attempts grows by `factor` (30 ms, then 60 ms)', "const stamps = [];\nawait retry(async () => { stamps.push(Date.now()); throw new Error('x'); }, { retries: 2, baseDelay: 30, factor: 2 }).catch(() => {});\nconst gaps = [stamps[1] - stamps[0], stamps[2] - stamps[1]];\ngaps[0] >= 25 && gaps[0] < 60 && gaps[1] >= 55 && gaps[1] < 120", 'true  (gaps ≈ 30 ms then ≈ 60 ms)', { ev: 'true' }),
     c('Aborting during a backoff wait rejects promptly with the abort reason', "const ac = new AbortController();\nconst p = retry(async () => { throw new Error('fail'); }, { retries: 5, baseDelay: 1000, signal: ac.signal });\nsetTimeout(() => ac.abort(), 20);\nconst t0 = Date.now();\nconst err = await p.catch((e) => e);\n[err.name, Date.now() - t0 < 200]", "['AbortError', true]"),
     c('Already-aborted signal rejects without calling fn', "const ac = new AbortController();\nac.abort();\nlet called = false;\nawait retry(async () => { called = true; }, { signal: ac.signal }).catch(() => {});\ncalled", 'false'),
+    c(`Defaults to 3 retries (4 calls in total)`, `let calls = 0;
+await retry(async () => { calls++; throw new Error('x'); }).catch(() => {});
+calls`, `4`),
+    c(`The default delays (20, 40, 80 ms) really are waited`, `const t0 = Date.now();
+await retry(async () => { throw new Error('x'); }).catch(() => {});
+const elapsed = Date.now() - t0;
+elapsed >= 130 && elapsed < 450`, `true  (about 140 ms of waiting in total)`, { ev: `true` }),
   ],
   'tree-traversal-dom': [
     c('dfsRecursive visits in pre-order', `${TREE}\ndfsRecursive(root).map((n) => n.id)`, "['root', 'A', 'A1', 'A2', 'B']"),
@@ -150,6 +160,8 @@ export const overrides = {
     r('Default theme is light inside the provider', 'const { ThemeProvider, useTheme } = createThemeContext();\nuseTheme() inside <ThemeProvider>', "theme === 'light'"),
     r('toggle switches light and dark', 'toggle(), then toggle() again', "'dark', then 'light'"),
     r('Outside the provider useTheme throws a helpful error', 'useTheme() with no <ThemeProvider> above', "throws Error('useTheme must be used within a ThemeProvider')"),
+    c("defaultTheme sets the initial theme", "<ThemeProvider defaultTheme=\"dark\">", "theme === 'dark'", { v: false, note: 'covered by the DOM harness' }),
+    c("The context value keeps its identity while the theme does not change", "re-render a parent so ThemeProvider re-renders with the same state", "consumers receive the identical value object (memoized)", { v: false, note: 'covered by the DOM harness' }),
   ],
   'typeahead-autocomplete': [
     r('Debounces input into a single fetch', "<Typeahead delay={30} />: type 'r', 're', 'rea' back to back; wait 100 ms", "fetchSuggestions called once, with 'rea'"),

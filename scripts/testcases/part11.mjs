@@ -9,6 +9,7 @@ export default {
     r('Renders the items sorted ascending without mutating the prop', '<SortedList items={[30, 4, 100, 12]} />', "<li> 4, 12, 30, 100; the items prop is still [30, 4, 100, 12]"),
     r('Clicking the counter does not recompute the sorted list', "click 'Count: 0' twice", "button 'Count: 2'; onCompute called 1 time in total"),
     r('A new items array does recompute it', 'rerender with items [9, 8]', 'onCompute called 2 times; list 8, 9'),
+    r("An empty list renders no items but keeps the counter", "<SortedList items={[]} />", "no <li>; button 'Count: 0'"),
   ],
   'undo-redo-hook': [
     r('Starts with the initial state and nothing to undo or redo', "useHistory('a')", "state 'a'; canUndo false; canRedo false"),

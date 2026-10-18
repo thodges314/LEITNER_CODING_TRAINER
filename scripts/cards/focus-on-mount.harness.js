@@ -17,3 +17,10 @@ const { render, q, act } = $dom;
   $test.check('Re-rendering does not steal focus again', kept, document.activeElement && document.activeElement.tagName);
   r.unmount();
 }
+{
+  const first = render(<FocusInput label="Name" placeholder="Ada" />);
+  first.unmount();
+  const second = render(<FocusInput label="Name" placeholder="Ada" />);
+  $test.check('Focuses the input again when the component is mounted anew', document.activeElement === q('input', second.container), document.activeElement && document.activeElement.tagName);
+  second.unmount();
+}

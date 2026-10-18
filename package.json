@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "build:cards": "node scripts/build-cards.mjs",
     "e2e": "vite build && playwright test",
-    "e2e:ui": "vite build && playwright test --ui"
+    "e2e:ui": "vite build && playwright test --ui",
+    "mutation": "vitest run --config vitest.mutation.config.ts"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",

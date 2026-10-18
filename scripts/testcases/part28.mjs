@@ -12,6 +12,8 @@ export default {
     r('No more moves are accepted after the game is won', 'clicks: 1, 4, 2, 5, 3, then Cell 9', "Cell 9 stays empty; status 'Winner: X'; onGameEnd called once"),
     r('A full board with no line is a draw and calls onGameEnd("draw")', 'clicks: 1, 2, 3, 5, 4, 6, 8, 7, 9', "board XOX/XOO/OXX; status 'Draw'; onGameEnd('draw')"),
     r('Restart clears the board, X starts again, and onGameEnd is not called again', 'win the top row, click Restart, click Cell 9', "board empty and 'Next player: X' after Restart; Cell 9 = X; onGameEnd called once in total"),
+    r('All eight winning lines are detected (3 rows, 3 columns, 2 diagonals)', 'X completes each of the 8 lines in turn while O plays elsewhere', "every game ends with status 'Winner: X'"),
+    r('Two in a row is not a win', 'X clicks Cell 2, O clicks Cell 1, X clicks Cell 3', "board OXX/---/---; status 'Next player: O'"),
   ],
   'stopwatch': [
     r('Starts stopped at 00:00.00 with Start enabled and Lap disabled', '<Stopwatch />', "timer 'Elapsed time' = '00:00.00'; buttons Start (enabled), Lap (disabled), Reset"),

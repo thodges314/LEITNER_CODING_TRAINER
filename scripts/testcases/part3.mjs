@@ -24,6 +24,10 @@ export default {
     c('myFilter keeps matching items', '[1, 2, 3, 4].myFilter((x) => x % 2 === 0)', '[2, 4]', { v: false, note: 'reference solution only implements myMap' }),
     c('myReduce sums', '[1, 2, 3].myReduce((a, b) => a + b)', '6', { v: false, note: 'reference solution only implements myMap' }),
     c('myReduce on an empty array with no initial value throws', '[].myReduce((a, b) => a + b)', '', { t: 'TypeError: .*(empty|initial)', x: 'Throws TypeError: Reduce of empty array with no initial value' }),
+    c(`myFilter checks the first element too`, `[2, 3, 4].myFilter((x) => x % 2 === 0)`, `[2, 4]`),
+    c(`myFilter passes (value, index, array) to the callback`, `[10, 20, 30].myFilter((v, i, arr) => i > 0 && arr.length === 3)`, `[20, 30]`),
+    c(`myReduce starts from the initial value when one is given`, `[1, 2, 3].myReduce((a, b) => a + b, 10)`, `16`),
+    c(`myReduce skips holes in sparse arrays`, `[1, , 3].myReduce((a, b) => a + b)`, `4`),
   ],
   'get-set-path': [
     c('Dot + bracket path', "const o = { a: [{ b: { c: 99 } }] };\nget(o, 'a[0].b.c')", '99'),
@@ -52,6 +56,11 @@ export default {
     c('Equal keys keep their original relative order (stable)', "dedupeAndSort([{ id: 1, g: 'x' }, { id: 2, g: 'x' }, { id: 3, g: 'x' }], 'g').map((r) => r.id)", '[1, 2, 3]'),
     c('null sorts last', "dedupeAndSort([{ id: 1, v: null }, { id: 2, v: 'b' }, { id: 3, v: 'a' }], 'v').map((r) => r.id)", '[3, 2, 1]'),
     c('Multiple sort keys (array of keys, first wins)', "dedupeAndSort([{ id: 1, team: 'b', n: 1 }, { id: 2, team: 'a', n: 2 }, { id: 3, team: 'a', n: 1 }], ['team', 'n']).map((r) => r.id)", '[3, 2, 1]', { v: false, note: 'reference solution accepts a single key only' }),
+    c(`Numbers sort numerically, not as text`, `dedupeAndSort([{ id: 10 }, { id: 9 }, { id: 100 }]).map((r) => r.id)`, `[9, 10, 100]`),
+    c(`Equal numeric keys keep their original order (stable)`, `dedupeAndSort([{ id: 1, g: 2 }, { id: 2, g: 2 }, { id: 3, g: 1 }], 'g').map((r) => r.id)`, `[3, 1, 2]`),
+    c(`null and undefined both sort last and tie with each other`, `dedupeAndSort([{ id: 1, v: undefined }, { id: 2, v: 'b' }, { id: 3, v: null }, { id: 4, v: 'a' }], 'v').map((r) => r.id)`, `[4, 2, 1, 3]`),
+    c(`A null that is compared as the second value still sorts last`, `dedupeAndSort([{ id: 1, v: 'a' }, { id: 2, v: null }, { id: 3, v: 'b' }], 'v').map((r) => r.id)`, `[1, 3, 2]`),
+    c(`Strings are compared with localeCompare (lowercase before uppercase of the same letter, a < B)`, `dedupeAndSort([{ id: 1, n: 'b' }, { id: 2, n: 'A' }, { id: 3, n: 'a' }], 'n').map((r) => r.id)`, `[3, 2, 1]`),
   ],
   'use-debounce-hook': [
     c('Initial render returns the value immediately', "useDebounce('a', 300)", "'a'", { v: false, note: 'needs a React renderer + fake timers' }),

@@ -183,5 +183,10 @@ timeAgo(now + 3 * 3600000, now)`, "'in 3 hours'"),
     c('timeAgo: years', `const now = 1000000000000;
 timeAgo(now - 400 * 86400000, now)`, "'1 year ago'"),
     c('truncate: adds an ellipsis within the limit', `[truncate('Hello world', 8), truncate('short', 8)]`, "['Hello w…', 'short']"),
+    c(`timeAgo: 59 seconds is still "just now", 60 seconds is a minute`, `[timeAgo(0, 59000), timeAgo(0, 60000)]`, `['just now', '1 minute ago']`),
+    c(`timeAgo: exactly 30 days is a month, 45 days rounds to 2 months`, `const now = 1000000000000;
+[timeAgo(now - 30 * 86400000, now), timeAgo(now - 45 * 86400000, now)]`, `['1 month ago', '2 months ago']`),
+    c(`formatBytes: TB is the largest unit`, `[formatBytes(1024 ** 4), formatBytes(1024 ** 5)]`, `['1 TB', '1024 TB']`),
+    c(`truncate: a string exactly at the limit is untouched; a limit of 0 leaves only the ellipsis`, `[truncate('abcd', 4), truncate('abc', 0)]`, `['abcd', '…']`),
   ],
 };

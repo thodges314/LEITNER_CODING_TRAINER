@@ -62,6 +62,18 @@ export default {
       `let caught = null;\nconst fn = async () => 'always-pending';\ntry {\n  await pollUntil(fn, (x) => x === 'done', { initialInterval: 5, backoffFactor: 1, maxAttempts: 3 });\n} catch (err) {\n  caught = err.message;\n}\ncaught`,
       "'Polling timed out'",
     ),
+    c(`Defaults to 5 attempts`, `let calls = 0;
+await pollUntil(async () => ++calls, () => false, { initialInterval: 1 }).catch(() => {});
+calls`, `5`),
+    c(`The delay is waited between attempts but not after the last one`, `const t0 = Date.now();
+await pollUntil(async () => 0, () => false, { initialInterval: 100, backoffFactor: 2, maxAttempts: 2 }).catch(() => {});
+const elapsed = Date.now() - t0;
+elapsed >= 95 && elapsed < 250`, `true  (one 100 ms wait, none after attempt 2)`, { ev: `true` }),
+    c(`The default backoff factor doubles the wait`, `const stamps = [];
+await pollUntil(async () => stamps.push(Date.now()), () => false, { initialInterval: 100, maxAttempts: 3 }).catch(() => {});
+const g1 = stamps[1] - stamps[0];
+const g2 = stamps[2] - stamps[1];
+g2 / g1 > 1.6 && g2 / g1 < 2.6`, `true  (gaps of about 100 ms, then 200 ms)`, { ev: `true` }),
   ],
   "async-generator-pagination": [
     c(
@@ -79,6 +91,15 @@ export default {
       `async function* numbers() {\n  yield 1; yield 2; yield 3; yield 4; yield 5;\n}\nawait collectGenerator(filterAsyncGenerator(numbers(), async (n) => n % 2 === 1))`,
       "[1, 3, 5]",
     ),
+    c(`An empty first page yields nothing and stops`, `const api = async () => ({ items: [], nextCursor: null });
+await collectGenerator(paginateAll(api))`, `[]`),
+    c(`Each request receives the nextCursor of the previous page`, `const seen = [];
+const api = async (cursor) => {
+  seen.push(cursor);
+  return cursor === null ? { items: [1], nextCursor: 'b' } : { items: [2], nextCursor: null };
+};
+await collectGenerator(paginateAll(api));
+seen`, `[null, 'b']`),
   ],
   "pub-sub-wildcard-emitter": [
     c(

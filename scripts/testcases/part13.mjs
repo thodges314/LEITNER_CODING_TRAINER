@@ -56,6 +56,7 @@ export default {
     c('topKFrequent breaks ties by smaller number', `topKFrequent([4, 4, 3, 3, 9], 2)`, '[3, 4]'),
     c('topKFrequent with k larger than distinct values', `topKFrequent([5, 5, 6], 5)`, '[5, 6]'),
     c('topKFrequent with a single value', `topKFrequent([7], 1)`, '[7]'),
+    c(`topKFrequent ranks by frequency, not by numeric value`, `topKFrequent([5, 5, 5, 1, 1, 2], 2)`, `[5, 1]`),
   ],
   'climb-stairs-fib-dp': [
     c('fib small values', `[fib(0), fib(1), fib(2), fib(10)]`, '[0, 1, 1, 55]'),
@@ -173,6 +174,8 @@ export default {
     c('searchRotated finds values in both halves', `[searchRotated([4, 5, 6, 7, 0, 1, 2], 0), searchRotated([4, 5, 6, 7, 0, 1, 2], 5), searchRotated([4, 5, 6, 7, 0, 1, 2], 2)]`, '[4, 1, 6]'),
     c('searchRotated returns -1 when missing', `[searchRotated([4, 5, 6, 7, 0, 1, 2], 3), searchRotated([1], 0), searchRotated([], 1)]`, '[-1, -1, -1]'),
     c('searchRotated on an unrotated and two-element array', `[searchRotated([1, 2, 3, 4], 3), searchRotated([3, 1], 1), searchRotated([3, 1], 3)]`, '[2, 1, 0]'),
+    c(`searchRotated when the midpoint falls inside the rotated segment`, `const A = [5, 6, 7, 0, 1, 2, 3, 4];
+[searchRotated(A, 3), searchRotated(A, 6), searchRotated(A, 7), searchRotated(A, 4)]`, `[6, 1, 2, 7]`),
   ],
   'matrix-rotate-spiral': [
     c('rotate90 of a square matrix', `rotate90([[1, 2, 3], [4, 5, 6], [7, 8, 9]])`, '[[7, 4, 1], [8, 5, 2], [9, 6, 3]]'),

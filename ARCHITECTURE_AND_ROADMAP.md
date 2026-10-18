@@ -23,7 +23,7 @@ in the browser; state lives in `localStorage`.
 | Item | Value |
 |---|---|
 | Cards | 242 total = **209 default + 33 in the optional `algorithms-advanced` pack** (80 default cards active at first run) |
-| Documented test cases | 1551 (each shown as input → expected in the UI) |
+| Documented test cases | 1598 (each shown as input → expected in the UI) |
 | Difficulty spread | all 234: d1 33 · d2 70 · d3 90 · d4 39 · d5 2; default 201: d1 33 · d2 66 · d3 72 · d4 28 · d5 2 |
 | Tracks (default deck / total) | algorithms 45/77, js-language 34, react-components 26, react 17, async-js 15, typescript-patterns 14, async-web-plumbing 12, react-patterns 11, data-structures 8, js-runtime-fundamentals 7, collections-transformations 7, dom-browser 6, testing-tooling 5, algorithmic-screens 2/3 (some tracks overlap in topic; consolidation is on the roadmap) |
 | Tracks defined but empty | *(none)* |
@@ -193,9 +193,9 @@ algorithms, TS). This is a judgement from experience with those formats, not a l
 | Algorithms | **Medium (core) + opt-in pack** | 47 core (+33 pack) | Core: arrays, hashing, two pointers, sliding window, stack, binary search, linked lists, trees/BST, **basic graph theory (BFS adjacency, components, grid BFS/islands, clone/bipartite, topological sort)**, intro DP, sorting, trie, matrix, bits. Pack: 2D DP, heaps beyond basics, monotonic stack, hard backtracking, k-group reversal, serialization. Missing in both: Dijkstra, union-find |
 | TypeScript | **Medium** | 14 | unions, generics, utility types, guards, typed emitter, conditional `infer`, template literals, branded types, overloads, mapped modifiers. Missing: `satisfies`, assertion functions |
 | Accessibility | **Weak-medium** | ~10 tagged `a11y` | modal focus, tabs ARIA, typeahead, accessible field, dropdown roving focus, pagination (pending). Missing: `aria-live` regions, skip links, focus-trap utility, combobox |
-| CSS/layout | **Weak** | 3 tagged `css` | specificity and style parsing only. Needs a different grading approach: real-browser (Playwright) layout checks |
+| CSS/layout | **Deliberately thin** | 3 tagged `css` | specificity and style parsing only. Owner decision: layout practice is better done with Flexbox Froggy / Grid Garden; auto-grading layout would need real-browser checks. Tailwind is a possible later addition (hard to grade automatically) |
 | Testing (Jest/RTL) | **Pure-logic stand-ins only** | 5 (`testing-tooling`) | `mockFn`, `fakeTimers`, `miniExpect`, a test-runner lifecycle, `nextRouteMatcher`. Missing: RTL-style queries/user-event, snapshot basics |
-| Frameworks/libs (Next.js, D3) | **Minimal** | 1 | only `nextRouteMatcher`; no D3 cards |
+| Frameworks/libs (Next.js, D3) | **Minimal, by choice** | 1 | only `nextRouteMatcher`. Owner decision: **D3 is on hold** (not standard enough interview material); Next.js stays pure-logic only |
 | System-design style prompts | **None** | 0 | Out of scope for auto-graded cards; see "complete projects" note |
 
 Bottom line: JS utilities, async and core language are the strongest parts. Relative to interview frequency the thinnest are
@@ -282,6 +282,16 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 2. **Staged unlocks that respect the practice focus** (and a "session mode": N cards drawn only from the focus).
 3. **Sandboxed execution**: run harnesses in a sandboxed iframe or Worker with a watchdog timeout so `while(true)` cannot freeze the
    tab. DOM harnesses need a document, so use an iframe (`srcdoc`, `sandbox="allow-scripts"`) and `postMessage` the logs back.
+**React preview window (spec, not built; owner suggests Gemini implements it; React problems only, not general JavaScript).**
+Goal: while solving a React card (tracks `react`, `react-components`, `react-patterns`, cards whose answer is a component), show the component the user is writing in a small separate
+pane or pop-out window, without disturbing the editor, Run Code or Submit.
+- Opt-in and non-blocking: a "Preview" toggle on React cards only (hidden for plain-JS cards); closed by default; the editor stays fully usable.
+- Run the user's code in a **sandboxed iframe** (`sandbox="allow-scripts"`, `srcdoc`) that loads React/ReactDOM, transpiles with the same pipeline as `runner.ts` and renders the
+  component the card asks for with default/no props (for cards that need props, render the first `render(<X .../>)` call found in the card's harness, or let the card carry an optional
+  `previewProps` field). Send code to the iframe with `postMessage`; send console output and errors back and show them under the preview.
+- Re-render on a debounce (about 500 ms) as the user types; a render error shows a small error box, never breaks the main app.
+- Bonus: because it runs in an iframe it also gives the app real isolation for runaway code (kill/replace the iframe on a timeout), which §7.3 item 3 wants anyway.
+- Acceptance: a Playwright test that opens a React card, types a trivial component, toggles Preview, and sees it rendered; a test that an infinite loop in the preview does not freeze the page.
 4. **Duplicate cards**: ~12 near-duplicates (debounce ×3, throttle ×2, deep-clone ×2, LRU ×2, useFetch ×2, useDebounce ×2, infinite scroll ×2,
    merge-intervals ×2). Decision pending: keep as spaced-repetition variants but tag them (`variant-of`), or merge.
 5. **Difficulty in the catalog**: sort/filter by difficulty and concept; show the ladder (which rung unlocks next and why a card is locked).
@@ -289,7 +299,7 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 
 ### 7.4 Engineering / quality
 - **Browser smoke test**: DONE, see §7.4a (`npm run e2e`; CI workflow `e2e.yml` runs on PRs and non-master pushes, not on `master`).
-- **Not yet done**: wrong-answer checks (a few deliberately wrong solutions per card that the harness must reject), 14 cards have fewer than 4 test cases, and the complexity fields on algorithm cards were bulk-generated by a small model (`scripts/enrich-complexities.mjs`) with no human review (scoped to algorithm-style tracks and normalised to lowercase `n` in the metadata cleanup; a human spot-check is still open).
+- **Not yet done**: wrong-answer checks (a few deliberately wrong solutions per card that the harness must reject), every card now has at least 4 documented cases (enforced by `seedCards.test.ts`), and the complexity fields on algorithm cards were bulk-generated by a small model (`scripts/enrich-complexities.mjs`) with no human review (scoped to algorithm-style tracks and normalised to lowercase `n` in the metadata cleanup; a human spot-check is still open).
 - **Timing tests**: hook/typeahead harnesses use real timers. Their delays and waits were scaled ×3 (e.g. debounce 180 ms with margins of 30-90 ms)
   and passed 3 consecutive runs; the countdown card polls with `until()` instead of fixed waits. Still possible: one retry on failure, or fake timers.
 - Bundle: main chunk ≈ 0.65 MB; lazy TypeScript chunk ≈ 4.1 MB (acceptable for personal use; `chunkSizeWarningLimit` raised).
@@ -316,6 +326,24 @@ counts; its progress is untouched, so re-enabling restores it. The ~47 **core** 
 (arrays, hashing, two pointers, sliding window, stack, binary search, linked lists, trees/BST, **basic graph theory: adjacency BFS, components/paths,
 flood fill/islands, grid BFS, clone/bipartite, topological sort**, intro DP, sorting, tries). To move a card between core and pack, edit `packs.json` and
 run `npm run build:cards`. The Playwright smoke test enables the pack so it still covers every card.
+
+
+### 7.4d Mutation check (`npm run mutation`): are the harnesses strict enough?
+`src/lib/mutate.ts` makes small single-site mistakes in a card's reference solution (`===`/`!==`, `<`/`<=`, `&&`/`||`, `+`/`-`, off-by-one integers, dropped `await`,
+`push`/`unshift`, negated `if`, `return undefined && ...`, ...). `scripts/mutation.test.ts` (own config, `vitest.mutation.config.ts`; not part of `npm test`) runs every mutant
+through the card's harness; a good harness FAILS every mutant. A **survivor** is either an *equivalent* mutant (same behaviour, e.g. the `<` after an early `===` return,
+`shift` vs `pop` when order does not matter, `Date.now() - startedAt : 0` at centisecond precision) or a **missing hand-written case**. This tool never writes cases.
+- Run: `npm run mutation` (all, slow), or `VITE_MUT_ONLY='^(card-a|card-b)$' npm run mutation`; env: `VITE_MUT_MAX` (mutants per card, default 25), `VITE_MUT_OUT` (JSONL
+  results, default `/tmp/mutation-report.jsonl`, finished cards are skipped on re-run). TypeScript cards are skipped (type-level code is not covered by these operators).
+  Run it in small isolated batches (a runaway mutant can kill a worker); the first full run used batches of 6 cards, 4 in parallel (~15 min).
+- Result of the first full run: 3,693 valid mutants over 223 cards, 87.9% killed; 12 cards were strengthened (tic-tac-toe, polling, binary search, two-pointer, rotated search,
+  top-k, retry, unique-sort, format-utilities, polyfills, throttle, use-media-query ...) and 13 thin cards got more cases. `scripts/mutation-baseline.jsonl` holds the per-card
+  results (survivors with operator and line) to triage the rest; most remaining survivors are equivalent mutants. Five cards produced no result because their mutants crashed the
+  worker (`iterable-range-class`, `matrix-basics`, `promise-all-by-hand`, `simple-stringify`, `trie-nested-object`).
+- Worst remaining (by survivor count): typeahead-autocomplete, fake-timers, mini-expect, test-runner-lifecycle, graph-word-ladder, tabs-accordion-compound. Check each survivor
+  by hand before adding a case: ask "can a correct solution behave differently here?".
+- Harness hygiene learned from this: harnesses must not assume a clean page (other dialogs, body scroll lock, `window.matchMedia`, `localStorage` keys). `modal-portal-focus` now
+  measures the ambient state first; `use-media-query` restores `window.matchMedia`; `stopwatch`/`theme-switcher` restore what they patch in a `finally`.
 
 ### 7.5 Suggested next steps (in order)
 1. Keep `npm run e2e` green on `master` (run it after any card/runner change; re-run flaky timing cards).

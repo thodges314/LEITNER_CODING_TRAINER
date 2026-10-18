@@ -22,6 +22,7 @@ export default {
       t: 'TypeError: Failed to fetch',
       x: 'Rejects with the network error (TypeError: Failed to fetch)',
     }),
+    c(`Another 200 endpoint resolves with its own JSON body`, `fetchData('https://jsonplaceholder.typicode.com/todos/2')`, `{ userId: 1, id: 2, title: 'quis ut nam facilis et officia qui', completed: false }`),
   ],
   'promise-chaining-syntax': [
     c('Resolves with parsed JSON (no async/await)', `(await getUserData('${U}/users/1')).name`, "'Leanne Graham'"),
@@ -44,6 +45,7 @@ export default {
     ),
     c('Empty input', 'fetchAllUsers([])', '[]'),
     c('All requests fail', `fetchAllUsers(['https://invalid-non-existent-url-domain.org'])`, '[]'),
+    c(`The surviving results keep the order of the URLs`, `(await fetchAllUsers(['https://jsonplaceholder.typicode.com/todos/2', 'https://invalid-non-existent-url-domain.org', 'https://jsonplaceholder.typicode.com/todos/1'])).map((t) => t.id)`, `[2, 1]`),
   ],
   'fetch-abort-controller': [
     c(
@@ -86,6 +88,19 @@ export default {
       '2'
     ),
     c('Forwards arguments of the call that ran', "const got = [];\nconst t = throttle((x) => got.push(x), 50);\nt('a'); t('b');\ngot", "['a']"),
+    c(`Each window allows one run: three spaced-out calls run three times`, `let runs = 0;
+const t = throttle(() => runs++, 50);
+t();
+await sleep(90);
+t();
+await sleep(90);
+t();
+runs`, `3`),
+    c(`Calls inside the window are dropped, not queued for later`, `const got = [];
+const t = throttle((x) => got.push(x), 50);
+t('a'); t('b');
+await sleep(100);
+got`, `['a']`),
   ],
   'event-loop-microtasks': [
     c(
@@ -105,6 +120,9 @@ export default {
     ),
     c('Empty array', 'countFrequencies([])', 'Map(0) {}', { ev: 'new Map()' }),
     c('1 and "1" are different keys', "countFrequencies([1, '1', 1])", "Map(2) { 1 => 2, '1' => 1 }", { ev: "new Map([[1, 2], ['1', 1]])" }),
+    c(`The result is a Map that keeps first-seen order and has no entry for unseen items`, `const m = countFrequencies(['x', 'y', 'x']);
+[m instanceof Map, [...m.keys()], m.get('x'), m.get('z')]`, `[true, ['x', 'y'], 2, undefined]`),
+    c(`NaN is counted as a single key (Map uses SameValueZero)`, `countFrequencies([NaN, NaN, 1]).get(NaN)`, `2`),
   ],
   'set-unique-operations': [
     c('Duplicates collapse to a single value', 'arrayIntersection([1, 2, 2, 1], [2, 2])', '[2]'),
@@ -161,6 +179,11 @@ export default {
     c('One argument at a time', 'const mult = (a, b, c) => a * b * c;\ncurry(mult)(2)(3)(4)', '24'),
     c('Arguments may be grouped any way', 'const mult = (a, b, c) => a * b * c;\nconst f = curry(mult);\n[f(2, 3)(4), f(2)(3, 4), f(2, 3, 4)]', '[24, 24, 24]'),
     c('Two-argument function', 'curry((a, b) => a + b)(1)(2)', '3'),
+    c(`The original \`this\` is preserved across the curried calls`, `const obj = { k: 10, add: curry(function (a, b) { return this.k + a + b; }) };
+obj.add(1)(2)`, `13`),
+    c(`A partially applied function can be reused without interfering with itself`, `const add3 = curry((a, b, c) => a + b + c);
+const add1 = add3(1);
+[add1(2)(3), add1(10)(20)]`, `[6, 31]`),
   ],
   'hook-fetch-cleanup': [
     c('Initial render', "useFetch('https://jsonplaceholder.typicode.com/todos/1')  // render, before fetch resolves", '{ data: null, loading: true, error: null }', { v: false, note: 'needs a React renderer' }),
@@ -226,5 +249,7 @@ export default {
     c('Negative numbers', 'twoSumSorted([-1, 0], -1)', '[1, 2]'),
     c('Duplicate values', 'twoSumSorted([3, 3], 6)', '[1, 2]'),
     c('No pair sums to target (empty array)', 'twoSumSorted([1, 2, 3], 7)', '[]'),
+    c(`The same element cannot be used twice`, `twoSumSorted([1, 2, 4], 4)`, `[]`),
+    c(`Both pointers move inward until they meet the pair`, `twoSumSorted([1, 3, 4, 6, 9], 15)`, `[4, 5]`),
   ],
 };

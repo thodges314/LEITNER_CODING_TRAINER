@@ -1,4 +1,8 @@
 const { render, fire, q } = $dom;
+// Do not assume a clean page: remember any dialog and body scroll lock that were already there.
+const ambientDialogs = Array.from(document.querySelectorAll('[role="dialog"]'));
+const ownDialog = () => Array.from(document.querySelectorAll('[role="dialog"]')).find((el) => !ambientDialogs.includes(el)) ?? null;
+const overflowBefore = document.body.style.overflow;
 function Demo() {
   const [open, setOpen] = useState(false);
   return (
@@ -13,7 +17,7 @@ function Demo() {
 }
 {
   const r = render(<div><Modal isOpen={false} onClose={() => {}}><p id="msg">Hi</p></Modal></div>);
-  $test.check('Closed modal renders nothing', q('[role="dialog"]') === null && q('#msg') === null);
+  $test.check('Closed modal renders nothing', ownDialog() === null && q('#msg') === null);
   r.unmount();
 }
 {
@@ -25,7 +29,7 @@ function Demo() {
 {
   const calls = [];
   const r = render(<Modal isOpen onClose={() => calls.push('close')}><button id="b">B</button></Modal>);
-  const dialog = q('[role="dialog"]');
+  const dialog = ownDialog();
   fire.keyDown(dialog, 'Escape');
   const afterEscape = calls.length;
   $test.check('Escape calls onClose', afterEscape === 1, calls);
@@ -51,8 +55,8 @@ function Demo() {
   const wrappedBack = document.activeElement === last && back.defaultPrevented;
   $test.check('Tab wraps focus inside the dialog', focusedIn && wrappedForward && wrappedBack, { focusedIn, wrappedForward, wrappedBack });
   $test.check('Body scroll is locked while open', locked, document.body.style.overflow);
-  fire.keyDown(q('[role="dialog"]'), 'Escape');
-  $test.check('Focus returns to the trigger on close', q('[role="dialog"]') === null && document.activeElement === trigger);
-  $test.check('Body scroll is restored after close', document.body.style.overflow !== 'hidden', document.body.style.overflow);
+  fire.keyDown(ownDialog(), 'Escape');
+  $test.check('Focus returns to the trigger on close', ownDialog() === null && document.activeElement === trigger);
+  $test.check('Body scroll is restored after close', document.body.style.overflow === overflowBefore, { before: overflowBefore, after: document.body.style.overflow });
   r.unmount();
 }

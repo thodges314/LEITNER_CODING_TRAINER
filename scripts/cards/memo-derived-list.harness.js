@@ -24,3 +24,8 @@ const ITEMS = [30, 4, 100, 12];
   $test.check('A new items array does recompute it', computes === 2 && qa('li', r.container).map((li) => li.textContent).join() === '8,9', { computes });
   r.unmount();
 }
+{
+  const r = render(<SortedList items={[]} />);
+  $test.check('An empty list renders no items but keeps the counter', qa('li', r.container).length === 0 && q('button', r.container).textContent === 'Count: 0', r.container.innerHTML);
+  r.unmount();
+}

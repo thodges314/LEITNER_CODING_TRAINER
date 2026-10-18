@@ -31,6 +31,8 @@ export default {
     c('First element', 'binarySearch([-1, 0, 3, 5, 9, 12], -1)', '0'),
     c('Empty array', 'binarySearch([], 5)', '-1'),
     c('Single element hit', 'binarySearch([5], 5)', '0'),
+    c(`Target just left of the first midpoint`, `binarySearch([1, 3, 5, 7, 9], 3)`, `1`),
+    c(`Target just right of the first midpoint`, `binarySearch([1, 3, 5, 7, 9], 7)`, `3`),
   ],
   'tree-level-order-bfs': [
     c(
@@ -64,6 +66,13 @@ export default {
     c('trailing: false drops the in-window calls', "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: true, trailing: false });\nt('a'); t('b');\nawait sleep(90);\ngot", "['a']"),
     c('leading: false does not fire immediately', "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: false, trailing: true });\nt('a');\ngot", '[]'),
     c('leading: false fires at the end of the window', "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: false, trailing: true });\nt('a');\nawait sleep(90);\ngot", "['a']"),
+    c(`After the trailing call fires, a new window starts (the next call is throttled again)`, `let c = 0;
+const t = throttle(() => c++, 100);
+t(); t();
+await sleep(160);
+const before = c;
+t();
+c - before`, `0  (the call is deferred, not run immediately)`, { ev: `0` }),
   ],
   memoize: [
     c('Duplicate call is served from cache', 'let calls = 0;\nconst sq = memoize((x) => { calls++; return x * x; });\nsq(4); sq(4);\n[calls, sq(4)]', '[1, 16]'),

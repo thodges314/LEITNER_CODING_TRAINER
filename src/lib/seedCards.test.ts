@@ -12,7 +12,7 @@ describe('seed cards', () => {
     for (const t of topics) {
       expect(t.testHarness?.trim(), t.id).toBeTruthy();
       expect(t.referenceSolution?.trim(), t.id).toBeTruthy();
-      expect(t.testCases?.length ?? 0, t.id).toBeGreaterThanOrEqual(2);
+      expect(t.testCases?.length ?? 0, `${t.id}: every card needs at least 4 documented cases`).toBeGreaterThanOrEqual(4);
     }
   });
 

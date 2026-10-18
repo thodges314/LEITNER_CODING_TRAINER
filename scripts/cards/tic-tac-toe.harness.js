@@ -63,3 +63,31 @@ const restartBtn = (c) => qa('button', c).find((b) => b.textContent.trim() === '
   $test.check('Restart clears the board, X starts again, and onGameEnd is not called again', cleared && cell(r.container, 9).textContent.trim() === 'X' && calls.length === 1, { cleared, calls });
   r.unmount();
 }
+{
+  // click orders: X, O, X, O, X (O only ever has two marks, so only X can win)
+  const lines = {
+    'top row': [1, 4, 2, 5, 3],
+    'middle row': [4, 1, 5, 2, 6],
+    'bottom row': [7, 1, 8, 2, 9],
+    'left column': [1, 2, 4, 3, 7],
+    'middle column': [2, 1, 5, 3, 8],
+    'right column': [3, 1, 6, 2, 9],
+    'main diagonal': [1, 2, 5, 3, 9],
+    'anti-diagonal': [3, 1, 5, 2, 7],
+  };
+  const results = {};
+  for (const [name, clicks] of Object.entries(lines)) {
+    const r = render(<TicTacToe />);
+    play(r.container, ...clicks);
+    results[name] = status(r.container);
+    r.unmount();
+  }
+  const notWon = Object.entries(results).filter(([, s]) => s !== 'Winner: X').map(([n]) => n);
+  $test.check('All eight winning lines are detected (3 rows, 3 columns, 2 diagonals)', notWon.length === 0, { notWon, results });
+}
+{
+  const r = render(<TicTacToe />);
+  play(r.container, 2, 1, 3);
+  $test.check('Two in a row is not a win', status(r.container) === 'Next player: O' && marks(r.container) === 'OXX------', { status: status(r.container), marks: marks(r.container) });
+  r.unmount();
+}

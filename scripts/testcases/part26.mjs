@@ -18,24 +18,63 @@ export default {
       `const { renderHook } = $dom;\nconst h = renderHook(() => useIsMounted());\nconst isMounted = h.result.current;\nh.unmount();\nisMounted()`,
       `false`
     ),
+    c(`Still true after a re-render, not only right after the first mount`, `const { renderHook } = $dom;
+const h = renderHook(() => useIsMounted());
+h.rerender();
+h.rerender();
+h.result.current()`, `true`),
+    c(`Each hook instance tracks its own component`, `const { renderHook } = $dom;
+const a = renderHook(() => useIsMounted());
+const b = renderHook(() => useIsMounted());
+const isA = a.result.current;
+const isB = b.result.current;
+a.unmount();
+const out = [isA(), isB()];
+b.unmount();
+out`, `[false, true]`),
   ],
 
   'use-media-query': [
     c(
       'initializes with matching media query status',
-      `let cur = true;\nwindow.matchMedia = (q) => ({ matches: cur, media: q, addEventListener() {}, removeEventListener() {} });\nconst { renderHook } = $dom;\nconst h = renderHook(() => useMediaQuery('(min-width: 768px)'));\nh.result.current`,
+      `const realMatchMedia = window.matchMedia;\nlet cur = true;\nwindow.matchMedia = (q) => ({ matches: cur, media: q, addEventListener() {}, removeEventListener() {} });\nconst { renderHook } = $dom;\nconst h = renderHook(() => useMediaQuery('(min-width: 768px)'));\nconst out = h.result.current;\nwindow.matchMedia = realMatchMedia;\nout`,
       `true`
     ),
     c(
       'updates matches state when media query change listener triggers',
-      `let cur = false;\nlet listener = null;\nwindow.matchMedia = (q) => ({\n  matches: cur,\n  media: q,\n  addEventListener(type, cb) { listener = cb; },\n  removeEventListener() {}\n});\nconst { renderHook, act } = $dom;\nconst h = renderHook(() => useMediaQuery('(prefers-color-scheme: dark)'));\nconst before = h.result.current;\nact(() => { listener({ matches: true }); });\n[before, h.result.current]`,
+      `const realMatchMedia = window.matchMedia;\nlet cur = false;\nlet listener = null;\nwindow.matchMedia = (q) => ({\n  matches: cur,\n  media: q,\n  addEventListener(type, cb) { listener = cb; },\n  removeEventListener() {}\n});\nconst { renderHook, act } = $dom;\nconst h = renderHook(() => useMediaQuery('(prefers-color-scheme: dark)'));\nconst before = h.result.current;\nact(() => { listener({ matches: true }); });\nconst out = [before, h.result.current];\nwindow.matchMedia = realMatchMedia;\nout`,
       `[false, true]`
     ),
     c(
       'cleans up change listener on component unmount',
-      `let removed = false;\nwindow.matchMedia = (q) => ({\n  matches: false,\n  media: q,\n  addEventListener() {},\n  removeEventListener() { removed = true; }\n});\nconst { renderHook } = $dom;\nconst h = renderHook(() => useMediaQuery('(max-width: 600px)'));\nh.unmount();\nremoved`,
+      `const realMatchMedia = window.matchMedia;\nlet removed = false;\nwindow.matchMedia = (q) => ({\n  matches: false,\n  media: q,\n  addEventListener() {},\n  removeEventListener() { removed = true; }\n});\nconst { renderHook } = $dom;\nconst h = renderHook(() => useMediaQuery('(max-width: 600px)'));\nh.unmount();\nwindow.matchMedia = realMatchMedia;\nremoved`,
       `true`
     ),
+    c(`Returns false when matchMedia is not available`, `const realMatchMedia = window.matchMedia;
+window.matchMedia = undefined;
+const { renderHook } = $dom;
+const h = renderHook(() => useMediaQuery('(min-width: 768px)'));
+const out = h.result.current;
+h.unmount();
+window.matchMedia = realMatchMedia;
+out`, `false`),
+    c(`Falls back to addListener/removeListener on legacy browsers`, `const realMatchMedia = window.matchMedia;
+let listener = null;
+let removed = false;
+window.matchMedia = (q) => ({
+  matches: false,
+  media: q,
+  addListener(cb) { listener = cb; },
+  removeListener() { removed = true; }
+});
+const { renderHook, act } = $dom;
+const h = renderHook(() => useMediaQuery('(max-width: 600px)'));
+const before = h.result.current;
+act(() => { listener({ matches: true }); });
+const after = h.result.current;
+h.unmount();
+window.matchMedia = realMatchMedia;
+[before, after, removed]`, `[false, true, true]`),
   ],
 
   'breadcrumbs-router': [
