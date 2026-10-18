@@ -416,6 +416,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
           </div>
 
           {/* Complexity Badges */}
+          {(topic.targetTime || topic.targetSpace) && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
               <div
@@ -514,6 +515,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
               </div>
             )}
           </div>
+          )}
         </div>
 
         {/* Human Override Toggle Controls */}

@@ -15,6 +15,13 @@ if (!apiKey) {
 const model = 'openai/gpt-oss-120b';
 
 const topics = JSON.parse(fs.readFileSync(topicsPath, 'utf8'));
+
+// Big-O only means something for algorithmic / data-structure style cards. UI components, hooks, TS types and
+// plain language features get NO complexity fields (the UI hides the complexity badges for them).
+const COMPLEXITY_TRACKS = new Set(['algorithms', 'algorithmic-screens', 'data-structures', 'collections-transformations']);
+const wantsComplexity = (card) => COMPLEXITY_TRACKS.has(card.track);
+// One notation everywhere: lowercase variables (O(n), O(n log n)), so the card UI is consistent.
+const normalizeBigO = (text) => (typeof text === 'string' ? text.replace(/\bN\b/g, 'n') : text);
 console.log(`Loaded ${topics.length} topics`);
 
 let cache = {};
@@ -122,6 +129,7 @@ Respond with strictly valid JSON in this exact structure:
 console.log(`Starting sequential analysis with rate-pacing (${Object.keys(cache).length} cached)...`);
 for (let i = 0; i < topics.length; i++) {
   const card = topics[i];
+  if (!wantsComplexity(card)) continue;
   const isCached = Boolean(cache[card.id]);
   const res = await analyzeCard(card);
   console.log(`[${i + 1}/${topics.length}] ${card.id} -> Time: ${res.targetTime} | Space: ${res.targetSpace}${isCached ? ' [cached]' : ''}`);
@@ -132,16 +140,17 @@ for (let i = 0; i < topics.length; i++) {
 }
 
 const updatedTopics = topics.map((t) => {
+  const { targetTime, targetSpace, complexityExplanation, ...rest } = t;
   const info = cache[t.id];
-  if (info) {
+  if (info && wantsComplexity(t)) {
     return {
-      ...t,
-      targetTime: info.targetTime,
-      targetSpace: info.targetSpace,
-      complexityExplanation: info.complexityExplanation,
+      ...rest,
+      targetTime: normalizeBigO(info.targetTime),
+      targetSpace: normalizeBigO(info.targetSpace),
+      complexityExplanation: normalizeBigO(info.complexityExplanation),
     };
   }
-  return t;
+  return rest;
 });
 
 fs.writeFileSync(topicsPath, JSON.stringify(updatedTopics, null, 2) + '\n', 'utf8');
