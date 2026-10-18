@@ -44,6 +44,8 @@ export interface TopicItem {
   targetSpace?: string;
   complexityExplanation?: string;
   previewCode?: string;
+  /** Annotated by build-cards.mjs for cards that author and render a React component UI */
+  rendersComponent?: boolean;
 }
 
 /**
@@ -244,43 +246,12 @@ export const RETIRED_SEED_IDS: ReadonlySet<string> = new Set([
 export const isReactTrack = (track: string): boolean => track === 'react' || track === 'react-components';
 
 /**
- * Distinguishes cards where the user actually writes and renders a React component
- * from pure React logic (reducers, math, algorithms) or custom hooks.
+ * Specifies whether a card authors and renders a React component UI
+ * (backed by explicit build annotation card.rendersComponent and/or card.previewCode).
  */
 export function isReactComponentCard(card?: TopicItem | null): boolean {
   if (!card) return false;
-  if (card.previewCode) return true;
-  if (card.track !== 'react' && card.track !== 'react-components') return false;
-
-  // Custom hooks (they return state/values/effects, not UI elements)
-  if (
-    card.tags.includes('hooks') ||
-    card.tags.includes('custom-hooks') ||
-    card.id.startsWith('use-') ||
-    card.id.includes('-hook') ||
-    card.id.startsWith('hook-')
-  ) {
-    return false;
-  }
-
-  // Pure logic, stores, reducers, or math without JSX/DOM rendering
-  if (
-    card.tags.includes('component-logic') ||
-    card.tags.includes('logic') ||
-    card.tags.includes('store') ||
-    card.id.endsWith('-logic') ||
-    card.id.endsWith('-math') ||
-    card.id.endsWith('-rules') ||
-    card.id.endsWith('-reducer') ||
-    card.id.includes('history-stack') ||
-    card.id === 'calculate-winner' ||
-    card.id === 'paginate-items' ||
-    card.id === 'create-store-basic'
-  ) {
-    return false;
-  }
-
-  return true;
+  return Boolean(card.rendersComponent || card.previewCode);
 }
 
 export function getTrackMeta(track: string): { label: string; color: string; bg: string; border: string } {

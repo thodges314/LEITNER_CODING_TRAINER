@@ -552,6 +552,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   };
 
   const handleSubmit = async () => {
+    setIsPreviewLive(true);
     if (!currentCard || !code.trim() || isEvaluating) return;
     setIsEvaluating(true);
     setShowSolution(false);
@@ -2479,7 +2480,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 executionMode={executionMode}
                 theme={theme}
                 isLive={isPreviewLive}
-                onStartLive={handleRunCode}
               />
             ) : (
               <div
@@ -2719,35 +2719,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                                 color: '#64748b',
                               }}
                             >
-                              <div
-                                style={{
-                                  width: '44px',
-                                  height: '44px',
-                                  borderRadius: '12px',
-                                  background: 'rgba(6, 182, 212, 0.1)',
-                                  border: '1px solid rgba(6, 182, 212, 0.25)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  marginBottom: '10px',
-                                }}
-                              >
-                                <Layers size={22} color="#06b6d4" />
+                              <Layers size={26} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
+                              <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+                                Ready to Preview
                               </div>
-                              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f1f5f9', marginBottom: '4px' }}>
-                                No Component Mounted
+                              <div style={{ fontSize: '12px', maxWidth: '320px', lineHeight: 1.5, color: '#64748b' }}>
+                                Run code or test to start live component preview.
                               </div>
-                              <div style={{ fontSize: '12px', maxWidth: '340px', lineHeight: 1.55, color: '#94a3b8', marginBottom: '12px' }}>
-                                Click <strong>Run Code / Test</strong> (or press <kbd style={{ padding: '2px 5px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Cmd</kbd>+<kbd style={{ padding: '2px 5px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Enter</kbd>) to mount your component in the live preview.
-                              </div>
-                              <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={handleRunCode}
-                                style={{ fontSize: '12px', padding: '5px 12px', gap: '5px' }}
-                              >
-                                <Play size={12} /> Run Code to Mount
-                              </button>
                             </div>
                           )}
                         </ReactTestErrorBoundary>
@@ -2781,35 +2759,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                           color: '#64748b',
                         }}
                       >
-                        <div
-                          style={{
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: '12px',
-                            background: 'rgba(6, 182, 212, 0.1)',
-                            border: '1px solid rgba(6, 182, 212, 0.25)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginBottom: '10px',
-                          }}
-                        >
-                          <Layers size={22} color="#06b6d4" />
+                        <Layers size={26} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+                          Ready to Preview
                         </div>
-                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f1f5f9', marginBottom: '4px' }}>
-                          No Component Mounted
+                        <div style={{ fontSize: '12px', maxWidth: '320px', lineHeight: 1.5, color: '#64748b' }}>
+                          Run code or test to start live component preview.
                         </div>
-                        <div style={{ fontSize: '12px', maxWidth: '340px', lineHeight: 1.55, color: '#94a3b8', marginBottom: '12px' }}>
-                          Click <strong>Run Code / Test</strong> (or press <kbd style={{ padding: '2px 5px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Cmd</kbd>+<kbd style={{ padding: '2px 5px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Enter</kbd>) to mount your component in the live preview.
-                        </div>
-                        <button
-                          type="button"
-                          className="btn btn-primary"
-                          onClick={handleRunCode}
-                          style={{ fontSize: '12px', padding: '5px 12px', gap: '5px' }}
-                        >
-                          <Play size={12} /> Run Code to Mount
-                        </button>
                       </div>
                     )}
                   </ReactTestErrorBoundary>

@@ -72,6 +72,14 @@ for (const t of topics) {
   else delete t.pack;
 }
 
+// Component cards: scripts/component-cards.json lists React problem IDs that render a component UI
+// (distinguishing them from custom hooks and pure React logic).
+const componentCards = JSON.parse(fs.readFileSync(path.join(here, 'component-cards.json'), 'utf8'));
+const componentCardSet = new Set(componentCards);
+for (const id of componentCards) {
+  if (!topics.some((t) => t.id === id)) throw new Error(`scripts/component-cards.json: unknown card id "${id}"`);
+}
+
 let n = 0;
 for (const t of topics) {
   if (!cases[t.id]) throw new Error(`No cases authored for ${t.id}`);
@@ -100,6 +108,19 @@ for (const t of topics) {
     t.previewCode = preview;
   } else {
     delete t.previewCode;
+  }
+
+  // Card authors declare component rendering either via "rendersComponent: true"
+  // in <id>.meta.json, by listing in scripts/component-cards.json, or by providing <id>.preview.js.
+  const hasExplicitMeta = typeof t.rendersComponent === 'boolean';
+  if (hasExplicitMeta) {
+    if (!t.rendersComponent) {
+      delete t.rendersComponent;
+    }
+  } else if (componentCardSet.has(t.id) || Boolean(t.previewCode)) {
+    t.rendersComponent = true;
+  } else {
+    delete t.rendersComponent;
   }
 }
 fs.writeFileSync(file, JSON.stringify(topics, null, 2) + '\n');

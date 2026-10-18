@@ -281,10 +281,16 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 2. **Staged unlocks that respect the practice focus**: DONE (`checkStagedUnlocks` gets the Focus + pack filter; unlock credit is only spent on cards that really unlock). Still open: a "session mode" (N cards drawn only from the focus).
 3. **Sandboxed execution**: run harnesses in a sandboxed iframe or Worker with a watchdog timeout so `while(true)` cannot freeze the
    tab. DOM harnesses need a document, so use an iframe (`srcdoc`, `sandbox="allow-scripts"`) and `postMessage` the logs back.
-**React preview window (DONE, built on branch feature/react-preview; spec below; React problems only, not general JavaScript).**
-Goal: while solving a React card (tracks `react` and `react-components`), show the component the user is writing in a small separate
+**React preview window (DONE, built on branch feature/react-preview; spec below; React component problems only).**
+Goal: while solving a React problem that renders a component UI, show the component the user is writing in a live separate
 pane or pop-out window, without disturbing the editor, Run Code or Submit.
-- Opt-in and non-blocking: a "Preview" toggle on React cards that have a preview (hidden otherwise); closed by default; the editor stays fully usable.
+- **Explicit Component Rendering Declaration**: Whether a card displays a component rendering box is determined explicitly at build time:
+  - Author annotation: `"rendersComponent": true` in `scripts/cards/<id>.meta.json`.
+  - Component card list: inclusion in `scripts/component-cards.json`.
+  - Dedicated preview script: presence of `scripts/cards/<id>.preview.js` (automatically stamps `rendersComponent: true`).
+  Heuristic or tag-based guessing is never used; custom hooks and pure logic cards omit `rendersComponent` and show no preview box.
+- Clean, respectable interface: opens with a clean, quiet "Ready to Preview" placeholder without premature errors. Once the user clicks "Run Code / Test" (or Cmd+Enter) or submits, the live sandbox activates, mounts the preview, updates automatically as they edit (debounced ~500 ms), and reveals callback/console logs.
+- Pop-out window support: a "Pop out" button opens the preview in an external browser window with live two-way synchronization and seamless dock-back.
 - **Every previewable card defines what to render in `scripts/cards/<id>.preview.js`** (props, callbacks, providers: nothing is guessed from the harness).
   `build-cards.mjs` copies it into the generated card as `previewCode`. The file contains plain JSX that may use the names the card asks the user to write, plus a
   `log(name, returnValue?)` helper. Examples:
@@ -295,13 +301,13 @@ pane or pop-out window, without disturbing the editor, Run Code or Submit.
   - controlled components that need state: define a small `function Demo() { const [on, setOn] = useState(false); return <Switch checked={on} onChange={setOn}>Wi-Fi</Switch>; }` and end the file with `<Demo />`.
   - hooks: a demo component that calls the hook and shows its result and a couple of buttons that use it (`function Demo() { const [n, inc] = useCounter(); return <button onClick={inc}>{n}</button>; }`).
   - providers/context: wrap in the provider the card asks for (`<AnnouncerProvider><Demo /></AnnouncerProvider>`).
-  The last expression of the file is the element to render. Pure-function cards and cards with no UI have no preview file (so no toggle).
+  The last expression of the file is the element to render. Pure-function cards and cards with no UI have no preview file.
 - Run the user's code + the preview file in a **sandboxed iframe** (`sandbox="allow-scripts"`, `srcdoc`) that loads React/ReactDOM and transpiles with the same pipeline as `runner.ts`.
   Send code to the iframe with `postMessage`; send console output, thrown errors and `log(...)` events back and show them under the preview.
 - Re-render on a debounce (about 500 ms) as the user types; a render error shows a small error box, never breaks the main app.
-- Bonus: because it runs in an iframe it also gives the app real isolation for runaway code (kill/replace the iframe on a timeout), which §7.3 item 3 wants anyway.
+- Watchdog timeout protects against infinite loops and freezes in the preview sandbox without affecting the main app.
 - **Automated check (the guard that keeps preview files honest):** a unit test mounts every card's `previewCode` together with that card's **reference solution** in jsdom: it must render without throwing and
-  produce non-empty DOM (and any `log` callback must not throw). Plus a Playwright test that opens a React card, toggles Preview, sees it rendered, and a test that an infinite loop in the preview does not freeze the page.
+  produce non-empty DOM (and any `log` callback must not throw). Plus Playwright tests (`e2e/preview.spec.ts`) that test live rendering, events, pop-out windows, and infinite loop protection.
 - Work split: (1) the iframe window + `previewCode` plumbing + guard test (DONE, branch `feature/react-preview`); (2) writing `<id>.preview.js` for the remaining React cards (task A2);
   (3) from then on every new React card ships its preview file (rule 10 in `DELEGATION.md`).
 4. **Duplicate cards**: RESOLVED by the 2026-10 audit (8 near-duplicates removed, the rest are deliberate progressions; see §7.4e).

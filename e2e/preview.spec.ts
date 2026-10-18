@@ -108,7 +108,7 @@ test.describe('React preview window', () => {
     await expect(eventLog.first()).toBeVisible();
   });
 
-  test('star-rating-component: activates live view via placeholder button and logs rating interaction', async ({ page }) => {
+  test('star-rating-component: activates live view and logs rating interaction', async ({ page }) => {
     const card = topics.find((t) => t.id === 'star-rating-component');
     expect(card).toBeDefined();
     const solution = card?.referenceSolution || card?.solution || '';
@@ -117,11 +117,10 @@ test.describe('React preview window', () => {
 
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="preview-ready-placeholder"]')).toBeVisible();
 
-    // Click 'Run Code to Start Preview' inside the welcoming placeholder
-    const startBtn = previewWindow.locator('[data-testid="start-preview-btn"]');
-    await expect(startBtn).toBeVisible();
-    await startBtn.click();
+    // Click 'Run Code / Test' button to activate live preview
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
 
     // Transitions to live
     await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');

@@ -11,7 +11,6 @@ import {
   Loader2,
   ExternalLink,
   Minimize2,
-  Play,
 } from 'lucide-react';
 import type { TopicItem } from '../lib/leitner';
 import { transpileForExecution } from '../lib/runner';
@@ -24,7 +23,6 @@ export interface ReactPreviewProps {
   executionMode: ExecutionMode;
   theme?: 'dark' | 'apple-gsos';
   isLive?: boolean;
-  onStartLive?: () => void;
   onClose?: () => void;
 }
 
@@ -43,7 +41,6 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   executionMode,
   theme = 'dark',
   isLive = false,
-  onStartLive,
   onClose,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -578,7 +575,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         </div>
       )}
 
-      {/* When not live yet, show friendly welcoming placeholder with Run Code action */}
+      {/* When not live yet, show clean, quiet ready state */}
       {!isLive && (
         <div
           data-testid="preview-ready-placeholder"
@@ -591,83 +588,18 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             textAlign: 'center',
-            padding: '24px 16px',
+            padding: '20px 12px',
+            color: '#64748b',
             backgroundColor: isLight ? '#f8fafc' : '#030712',
           }}
         >
-          <div
-            style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: '12px',
-              background: 'rgba(6, 182, 212, 0.12)',
-              border: '1px solid rgba(6, 182, 212, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '12px',
-            }}
-          >
-            <Layers size={24} color="#06b6d4" />
+          <Layers size={28} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
+          <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+            Ready to Preview
           </div>
-          <div
-            style={{
-              fontSize: '13.5px',
-              fontWeight: 600,
-              color: isLight ? '#1e293b' : '#f1f5f9',
-              marginBottom: '6px',
-            }}
-          >
-            Interactive Component Preview
+          <div style={{ fontSize: '11.5px', maxWidth: '320px', lineHeight: 1.5, color: '#64748b' }}>
+            Run code or test to start live component preview.
           </div>
-          <div
-            style={{
-              fontSize: '12px',
-              maxWidth: '340px',
-              lineHeight: 1.55,
-              color: 'var(--text-dim)',
-              marginBottom: '14px',
-            }}
-          >
-            Click <strong style={{ color: isLight ? '#0f172a' : '#f1f5f9' }}>Run Code / Test</strong> (or press{' '}
-            <kbd
-              style={{
-                padding: '2px 5px',
-                borderRadius: '4px',
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                fontSize: '11px',
-                fontFamily: 'var(--font-mono)',
-              }}
-            >
-              Cmd
-            </kbd>
-            +
-            <kbd
-              style={{
-                padding: '2px 5px',
-                borderRadius: '4px',
-                background: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                fontSize: '11px',
-                fontFamily: 'var(--font-mono)',
-              }}
-            >
-              Enter
-            </kbd>
-            ) to initialize the live preview. Once started, the preview stays live and updates automatically as you type.
-          </div>
-          {onStartLive && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={onStartLive}
-              data-testid="start-preview-btn"
-              style={{ fontSize: '12px', padding: '6px 14px', gap: '6px' }}
-            >
-              <Play size={13} /> Run Code to Start Preview
-            </button>
-          )}
         </div>
       )}
 
@@ -697,122 +629,124 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         />
       </div>
 
-      {/* Event Log & Console Panel */}
-      <div
-        style={{
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          backgroundColor: isLight ? '#f8fafc' : 'rgba(0, 0, 0, 0.4)',
-          padding: '8px 12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '6px',
-          maxHeight: isPoppedOut ? '220px' : '160px',
-        }}
-      >
+      {/* Event Log & Console Panel (rendered once live) */}
+      {isLive && (
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '11.5px',
-            color: 'var(--text-dim)',
-            userSelect: 'none',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Terminal size={12} color="#94a3b8" />
-            <span style={{ fontWeight: 600 }}>Event Log & Output</span>
-            {logs.length > 0 && (
-              <span
-                style={{
-                  fontSize: '10.5px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  padding: '1px 6px',
-                  borderRadius: '10px',
-                }}
-              >
-                {logs.length}
-              </span>
-            )}
-          </div>
-          {logs.length > 0 && (
-            <button
-              type="button"
-              onClick={handleClearLogs}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-dim)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '3px',
-                fontSize: '11px',
-                padding: '2px 4px',
-              }}
-              title="Clear log"
-            >
-              <Trash2 size={11} /> Clear
-            </button>
-          )}
-        </div>
-
-        <div
-          style={{
-            overflowY: 'auto',
-            maxHeight: isPoppedOut ? '180px' : '120px',
-            fontSize: '11.5px',
-            fontFamily: 'monospace',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            backgroundColor: isLight ? '#f8fafc' : 'rgba(0, 0, 0, 0.4)',
+            padding: '8px 12px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px',
+            gap: '6px',
+            maxHeight: isPoppedOut ? '220px' : '160px',
           }}
         >
-          {logs.length === 0 ? (
-            <div style={{ color: '#64748b', fontStyle: 'italic', padding: '4px 0' }}>
-              No callback events or logs captured yet. Interact with the preview to test callbacks.
-            </div>
-          ) : (
-            logs.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: '8px',
-                  lineHeight: 1.4,
-                }}
-              >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '11.5px',
+              color: 'var(--text-dim)',
+              userSelect: 'none',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Terminal size={12} color="#94a3b8" />
+              <span style={{ fontWeight: 600 }}>Event Log & Output</span>
+              {logs.length > 0 && (
                 <span
                   style={{
-                    fontSize: '10px',
-                    color: item.type === 'event' ? '#38bdf8' : '#a855f7',
-                    backgroundColor:
-                      item.type === 'event'
-                        ? 'rgba(56, 189, 248, 0.12)'
-                        : 'rgba(168, 85, 247, 0.12)',
-                    padding: '1px 5px',
-                    borderRadius: '3px',
-                    flexShrink: 0,
+                    fontSize: '10.5px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    padding: '1px 6px',
+                    borderRadius: '10px',
                   }}
                 >
-                  {item.type === 'event' ? 'event' : item.method}
+                  {logs.length}
                 </span>
-                <span style={{ color: isLight ? '#0f172a' : '#cbd5e1' }}>
-                  {item.type === 'event' ? (
-                    <>
-                      <strong style={{ color: '#38bdf8' }}>{item.name}</strong>(
-                      {item.args.join(', ')})
-                    </>
-                  ) : (
-                    item.args.join(' ')
-                  )}
-                </span>
+              )}
+            </div>
+            {logs.length > 0 && (
+              <button
+                type="button"
+                onClick={handleClearLogs}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-dim)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  fontSize: '11px',
+                  padding: '2px 4px',
+                }}
+                title="Clear log"
+              >
+                <Trash2 size={11} /> Clear
+              </button>
+            )}
+          </div>
+
+          <div
+            style={{
+              overflowY: 'auto',
+              maxHeight: isPoppedOut ? '180px' : '120px',
+              fontSize: '11.5px',
+              fontFamily: 'monospace',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+            }}
+          >
+            {logs.length === 0 ? (
+              <div style={{ color: '#64748b', fontStyle: 'italic', padding: '4px 0' }}>
+                No callback events or logs captured yet. Interact with the preview to test callbacks.
               </div>
-            ))
-          )}
+            ) : (
+              logs.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '8px',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      color: item.type === 'event' ? '#38bdf8' : '#a855f7',
+                      backgroundColor:
+                        item.type === 'event'
+                          ? 'rgba(56, 189, 248, 0.12)'
+                          : 'rgba(168, 85, 247, 0.12)',
+                      padding: '1px 5px',
+                      borderRadius: '3px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {item.type === 'event' ? 'event' : item.method}
+                  </span>
+                  <span style={{ color: isLight ? '#0f172a' : '#cbd5e1' }}>
+                    {item.type === 'event' ? (
+                      <>
+                        <strong style={{ color: '#38bdf8' }}>{item.name}</strong>(
+                        {item.args.join(', ')})
+                      </>
+                    ) : (
+                      item.args.join(' ')
+                    )}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 

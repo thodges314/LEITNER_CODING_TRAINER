@@ -35,7 +35,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 7. Update the counts and the relevant roadmap rows in `ARCHITECTURE_AND_ROADMAP.md` in the same commit. No absolute `file:///` links in docs.
 8. Do not edit `src/data/topics.json` by hand (it is generated). To DELETE a card follow the checklist in roadmap section 7.4e (and add its id to `RETIRED_SEED_IDS`).
 9. Rate difficulty with the rubric in roadmap section 7.4e and check the card is not a duplicate/subset of an existing one (same concept) before adding it. New cards go into one of the 9 tracks and reuse that track's existing concept.
-10. Every NEW React card (tracks `react`, `react-components`) should also ship `scripts/cards/<id>.preview.js` once task A exists; see roadmap section 7.3 for the format. Cards added before task A are covered by A2.
+10. **React component preview rendering**: For cards that author and render a React component UI (distinguishing them from custom hooks and pure logic), declare that it has a rendering box either by annotating `"rendersComponent": true` in `scripts/cards/<id>.meta.json`, adding its ID to `scripts/component-cards.json`, or providing a preview script `scripts/cards/<id>.preview.js`. Never use heuristic guessing. Pure-function, algorithm, and custom hook cards must NOT render a component box. See roadmap section 7.3 for preview file guidelines.
 11. Keyboard shortcuts live in one table, `src/lib/shortcuts.ts`; change it together with the handlers in `PracticeArena.tsx` (roadmap section 7.8).
 
 ## Good to delegate (well-specified, verifiable by the gates above)
