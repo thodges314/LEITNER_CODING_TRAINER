@@ -643,6 +643,10 @@ export function checkStagedUnlocks(topics: TopicItem[], currentStageCount: numbe
         .map(({ t }) => t.id)
     );
     const unlockedCount = toUnlock.size;
+    // Unlock credit is only spent on cards that really unlock. If the user's Focus (or a disabled pack) held cards
+    // back, the unspent credit stays, so loosening the Focus later releases those unlocks on the next review.
+    const heldBack = topics.some((t) => t.status === 'locked' && !isAllowed(t));
+    const consumedStages = unlockedCount < cardsToUnlock && heldBack ? Math.ceil(unlockedCount / 4) : stagesToUnlock;
 
     const updatedTopics = topics.map((t) =>
       toUnlock.has(t.id) ? { ...t, status: 'active' as const, box: 1, streak: 0, nextEligibleTrial: 0 } : t
@@ -650,7 +654,7 @@ export function checkStagedUnlocks(topics: TopicItem[], currentStageCount: numbe
 
     return {
       updatedTopics,
-      newStageCount: targetStages,
+      newStageCount: currentStageCount + consumedStages,
       newlyUnlocked: unlockedCount,
     };
   }
@@ -722,7 +726,7 @@ export function commitCardReview(
   const { updatedTopics: finalTopics, newStageCount, newlyUnlocked } = checkStagedUnlocks(
     updatedTopics,
     state.unlockedStageCount ?? 0,
-    (card) => isPackEnabled(card, state)
+    (card) => cardMatchesFilter(card, scheduleFilter(state))
   );
 
   const nextState: LeitnerDeckState = {
