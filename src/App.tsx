@@ -40,6 +40,8 @@ import { FEATURES } from './lib/features';
 import { SettingsModal } from './components/SettingsModal';
 import { FocusModal } from './components/FocusModal';
 import { AboutModal } from './components/AboutModal';
+import { BackupAdvisoryModal } from './components/BackupAdvisoryModal';
+import { recordProblemCompletion, markBackupAdvisorySeen } from './lib/backupAdvisory';
 import { DOUBLE_BACK_WINDOW_MS, useBackNavigation } from './lib/backNavigation';
 import { isFirstVisit, markWelcomed } from './lib/welcome';
 import { AiRecommendationPopover } from './components/AiRecommendationPopover';
@@ -89,6 +91,8 @@ export function App() {
   const [backHint, setBackHint] = useState(false);
   const [isAiRecommendOpen, setIsAiRecommendOpen] = useState(false);
   const [isAiStatusOpen, setIsAiStatusOpen] = useState(false);
+  const [isBackupAdvisoryOpen, setIsBackupAdvisoryOpen] = useState(false);
+  const [highlightExport, setHighlightExport] = useState(false);
   const [aiSettingsVersion, setAiSettingsVersion] = useState(0);
   const [reinforcingCardId, setReinforcingCardId] = useState<string | null>(null);
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
@@ -126,6 +130,11 @@ export function App() {
   const handleCommitReview = (passed: boolean) => {
     if (!currentCard) return;
     clearDraft(currentCard.id);
+
+    const { shouldShowAdvisory } = recordProblemCompletion();
+    if (shouldShowAdvisory) {
+      setIsBackupAdvisoryOpen(true);
+    }
 
     const { nextState, newlyUnlockedCount, updatedCard } = commitCardReview(
       deckState,
@@ -165,6 +174,7 @@ export function App() {
   const handleFinishReinforcement = () => {
     if (!currentCard) return;
     clearDraft(currentCard.id);
+
     setReinforcingCardId(null);
     const next = getNextCard(
       deckState.topics,
@@ -610,6 +620,8 @@ export function App() {
             onDeleteTopic={handleDeleteTopic}
             onStateUpdated={(newState) => setDeckState(newState)}
             onOpenAddModal={() => setIsAddModalOpen(true)}
+            highlightExport={highlightExport}
+            onDismissHighlightExport={() => setHighlightExport(false)}
           />
         )}
       </main>
@@ -746,6 +758,20 @@ export function App() {
           onAddTopic={handleAddTopic}
         />
       )}
+
+      <BackupAdvisoryModal
+        isOpen={isBackupAdvisoryOpen}
+        onAgree={() => {
+          markBackupAdvisorySeen();
+          setIsBackupAdvisoryOpen(false);
+          setHighlightExport(true);
+          setActiveView('dashboard');
+        }}
+        onDismiss={() => {
+          markBackupAdvisorySeen();
+          setIsBackupAdvisoryOpen(false);
+        }}
+      />
 
       <FocusModal
           isOpen={isFocusOpen}

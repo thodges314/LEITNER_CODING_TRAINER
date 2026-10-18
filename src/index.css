@@ -933,6 +933,52 @@ kbd.kbd {
   text-align: center;
 }
 
+/* Export Progress Highlight & Callout */
+.btn-export-highlight {
+  border-color: #f59e0b !important;
+  color: #fbbf24 !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 0 16px rgba(245, 158, 11, 0.25) !important;
+  animation: exportButtonPulse 1.8s infinite ease-in-out;
+  position: relative;
+  z-index: 2;
+}
+
+[data-theme='apple-gsos'] .btn-export-highlight {
+  border-color: #b45309 !important;
+  color: #b45309 !important;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.3), 0 0 12px rgba(217, 119, 6, 0.2) !important;
+}
+
+@keyframes exportButtonPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 0 12px rgba(245, 158, 11, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.55), 0 0 20px rgba(245, 158, 11, 0.35);
+  }
+}
+
+.export-callout-bubble {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-lg), 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  animation: slideUp 0.2s ease-out;
+}
+
+[data-theme='apple-gsos'] .export-callout-bubble {
+  background: #ffffff;
+  border-color: #b45309;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+
 
 
 

@@ -30,6 +30,8 @@ import {
   ArrowUp,
   ArrowDown,
   Check,
+  Sparkles,
+  X,
 } from 'lucide-react';
 
 export type CatalogSortOption =
@@ -107,6 +109,8 @@ interface DeckDashboardProps {
   onDeleteTopic: (topicId: string) => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
   onOpenAddModal: () => void;
+  highlightExport?: boolean;
+  onDismissHighlightExport?: () => void;
 }
 
 export const DeckDashboard: React.FC<DeckDashboardProps> = ({
@@ -118,6 +122,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onDeleteTopic,
   onStateUpdated,
   onOpenAddModal,
+  highlightExport = false,
+  onDismissHighlightExport,
 }) => {
   const isLight = theme === 'apple-gsos';
   const allAvailableTracks = useMemo(
@@ -473,15 +479,62 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           </h1>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           {FEATURES.quickAdd && (
             <button className="btn btn-primary" onClick={onOpenAddModal}>
               <Plus size={16} /> Quick Add Topic
             </button>
           )}
-          <button className="btn btn-secondary" onClick={handleExport} title="Download timestamped JSON backup">
-            <Download size={15} /> Export Progress
-          </button>
+          <div style={{ position: 'relative' }}>
+            <button
+              className={`btn btn-secondary ${highlightExport ? 'btn-export-highlight' : ''}`}
+              onClick={() => {
+                handleExport();
+                onDismissHighlightExport?.();
+              }}
+              title="Download timestamped JSON backup"
+              data-testid="export-progress-btn"
+            >
+              <Download size={15} /> Export Progress
+            </button>
+
+            {highlightExport && (
+              <div
+                className="export-callout-bubble"
+                data-testid="export-callout-bubble"
+                role="status"
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <Sparkles size={16} style={{ color: isLight ? '#b45309' : '#fbbf24', flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ flex: 1, fontSize: '12px', lineHeight: '1.45' }}>
+                    <div style={{ fontWeight: 700, marginBottom: '2px', color: 'var(--text-primary)' }}>
+                      Download Backup Here
+                    </div>
+                    <div style={{ color: 'var(--text-secondary)' }}>
+                      Click <strong>Export Progress</strong> to save your current deck as a <code>.json</code> file you can restore anytime.
+                    </div>
+                  </div>
+                  <button
+                    onClick={onDismissHighlightExport}
+                    aria-label="Dismiss export alert"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      padding: '2px',
+                      borderRadius: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           <button className="btn btn-secondary" onClick={handleImportClick} title="Import saved JSON backup">
             <Upload size={15} /> Import Progress
           </button>
