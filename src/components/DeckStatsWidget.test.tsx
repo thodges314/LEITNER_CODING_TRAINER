@@ -118,7 +118,7 @@ describe('DeckStatsWidget', () => {
     expect(svg).toBeTruthy();
   });
 
-  it('can switch between all 4 visual modes including Velocity Diagnostic', async () => {
+  it('can switch between all 3 visual modes with chevron wrapping', async () => {
     await act(async () => {
       root?.render(
         <DeckStatsWidget
@@ -150,19 +150,6 @@ describe('DeckStatsWidget', () => {
 
     expect(container?.textContent).toContain('Mastery Tiers');
 
-    // Switch to Velocity Diagnostic
-    const velocityBtn = container?.querySelector('button[data-testid="stats-mode-velocity"]') as HTMLButtonElement;
-    expect(velocityBtn).toBeTruthy();
-
-    await act(async () => {
-      velocityBtn.click();
-    });
-
-    expect(container?.textContent).toContain('Velocity');
-    expect(container?.textContent).toContain('Drag');
-    expect(container?.textContent).toContain('Accel');
-    expect(container?.textContent).toContain('Hyper');
-
     // Test next chevron wraps back to Skill Matrix
     const nextBtn = container?.querySelector('button[aria-label="Next chart"]') as HTMLButtonElement;
     expect(nextBtn).toBeTruthy();
@@ -172,6 +159,16 @@ describe('DeckStatsWidget', () => {
     });
 
     expect(container?.textContent).toContain('Skill Matrix');
+
+    // Test prev chevron wraps to Mastery Tiers
+    const prevBtn = container?.querySelector('button[aria-label="Previous chart"]') as HTMLButtonElement;
+    expect(prevBtn).toBeTruthy();
+
+    await act(async () => {
+      prevBtn.click();
+    });
+
+    expect(container?.textContent).toContain('Mastery Tiers');
   });
 
   it('adapts styling cleanly for apple-gsos (day) theme with higher contrast guidelines', async () => {
@@ -245,7 +242,7 @@ describe('DeckStatsWidget', () => {
     expect(handleSelectExclusiveTracks).toHaveBeenCalledWith(['algorithms']);
   });
 
-  it('invokes onSelectExclusiveBox when velocity tier buttons are clicked', async () => {
+  it('invokes onSelectExclusiveBox when a tier ring in Mastery Tiers is clicked', async () => {
     const handleSelectExclusiveBox = vi.fn();
 
     await act(async () => {
@@ -259,19 +256,17 @@ describe('DeckStatsWidget', () => {
       );
     });
 
-    // Switch to velocity
-    const velocityBtn = container?.querySelector('button[data-testid="stats-mode-velocity"]') as HTMLButtonElement;
+    // Switch to tiers
+    const tiersBtn = container?.querySelector('button[data-testid="stats-mode-tiers"]') as HTMLButtonElement;
     await act(async () => {
-      velocityBtn.click();
+      tiersBtn.click();
     });
 
-    const dragBtn = Array.from(container?.querySelectorAll('button') || []).find((b) =>
-      b.textContent?.includes('Drag')
-    );
-    expect(dragBtn).toBeTruthy();
+    const box1Group = container?.querySelector('g[data-box="1"]') as SVGGElement;
+    expect(box1Group).toBeTruthy();
 
     await act(async () => {
-      dragBtn?.click();
+      box1Group.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
     expect(handleSelectExclusiveBox).toHaveBeenCalledWith(1);
@@ -289,46 +284,5 @@ describe('DeckStatsWidget', () => {
     });
 
     expect(container?.textContent).toContain('No active cards in rotation yet');
-  });
-
-  it('renders Actionable Diagnostics Matrix in Velocity mode and supports practice shortcut', async () => {
-    const handlePractice = vi.fn();
-
-    await act(async () => {
-      root?.render(
-        <DeckStatsWidget
-          state={{
-            ...mockState,
-            totalCompletedReviews: 12,
-            recentReviews: [
-              { topicId: 'algo-1', passed: true, box: 2, trial: 1 },
-              { topicId: 'react-1', passed: false, box: 1, trial: 2 },
-            ],
-          }}
-          topics={mockTopics}
-          theme="dark"
-          onSelectCardToPractice={handlePractice}
-        />
-      );
-    });
-
-    // Switch to velocity
-    const velocityBtn = container?.querySelector('button[data-testid="stats-mode-velocity"]') as HTMLButtonElement;
-    await act(async () => {
-      velocityBtn.click();
-    });
-
-    expect(container?.textContent).toContain('At-Risk / Demoted');
-    expect(container?.textContent).toContain('Retention Velocity');
-    expect(container?.textContent).toContain('Recent Session Sparkline');
-
-    const atRiskCard = container?.querySelector('[data-testid="diagnostic-at-risk"]') as HTMLDivElement;
-    expect(atRiskCard).toBeTruthy();
-
-    await act(async () => {
-      atRiskCard.click();
-    });
-
-    expect(handlePractice).toHaveBeenCalled();
   });
 });

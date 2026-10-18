@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 const ARTIFACTS_DIR = '/Volumes/Claudet/thomashodges/.gemini/antigravity-ide/brain/0e16ae8f-66e7-4fff-be68-0f9c24e756fd';
 
 test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
-  test('renders 2x2 KPI layout alongside DeckStatsWidget in Dark and Day themes with 4 interactive view modes', async ({ page }) => {
+  test('renders 2x2 KPI layout alongside DeckStatsWidget in Dark and Day themes with 3 circular view modes', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.addInitScript(() => {
@@ -87,39 +87,11 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     // Toggle off
     await box1Arc.dispatchEvent('click');
 
-    // 4. Switch to Velocity Diagnostic mode
-    await page.getByTestId('stats-mode-velocity').click();
-    await expect(statsWidget.getByText('Velocity Diagnostic')).toBeVisible();
-    await expect(statsWidget.getByTestId('velocity-score-text')).toBeVisible();
-    await expect(statsWidget.getByTestId('velocity-status-text')).toBeVisible();
-    await expect(statsWidget.getByTestId('actionable-diagnostics-matrix')).toBeVisible();
-    await expect(statsWidget.getByText('At-Risk / Demoted')).toBeVisible();
-    await expect(statsWidget.getByText('Retention Velocity')).toBeVisible();
-    await expect(statsWidget.getByText('Recent Session Sparkline')).toBeVisible();
-
-    // Screenshot Velocity Diagnostic mode (dark)
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/stats-widget-velocity-dark.png`,
-      fullPage: false,
-    });
-
-    // Test exclusive velocity filter button
-    const dragBtn = statsWidget.getByTestId('velocity-tier-drag');
-    await dragBtn.click();
-    await dragBtn.click(); // toggle off
-
-    // 5. Switch theme to Apple IIGS (Day theme) via header toggle button
+    // 4. Switch theme to Apple IIGS (Day theme) via header toggle button
     await page.getByTestId('theme-toggle-btn').click();
 
     // Verify in apple-gsos day theme
     await expect(statsWidget).toBeVisible();
-    await expect(statsWidget.getByText('Velocity Diagnostic')).toBeVisible();
-
-    // Screenshot Velocity Diagnostic in Day theme
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/stats-widget-velocity-day.png`,
-      fullPage: false,
-    });
 
     // Switch to Skill Matrix in Day theme (verify dark guidelines and text)
     await page.getByTestId('stats-mode-radar').click();

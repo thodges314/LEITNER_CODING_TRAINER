@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import * as d3 from 'd3';
-import { Activity, PieChart, Layers, Gauge, ChevronLeft, ChevronRight, AlertTriangle, Flame } from 'lucide-react';
+import { Activity, PieChart, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
 import { getTrackMeta } from '../lib/leitner';
 import type { AppTheme } from '../lib/theme';
 
-export type StatsViewMode = 'radar' | 'orbit' | 'tiers' | 'velocity';
+export type StatsViewMode = 'radar' | 'orbit' | 'tiers';
 
 interface DeckStatsWidgetProps {
   state: LeitnerDeckState;
@@ -55,7 +55,6 @@ const RADAR_DOMAINS: { id: string; label: string; tracks: TrackType[] }[] = [
 ];
 
 export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
-  state,
   topics,
   theme,
   selectedTracks,
@@ -63,7 +62,6 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   onSelectExclusiveTrack,
   onSelectExclusiveTracks,
   onSelectExclusiveBox,
-  onSelectCardToPractice,
   onSelectTrack,
 }) => {
   const isLight = theme === 'apple-gsos';
@@ -155,65 +153,23 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
     }));
   }, [activeTopics, isLight]);
 
-  // Velocity Diagnostic metrics
-  const velocityData = useMemo(() => {
-    const total = activeTopics.length;
-    const box1 = activeTopics.filter((t) => t.box === 1).length;
-    const box23 = activeTopics.filter((t) => t.box === 2 || t.box === 3).length;
-    const box4Plus = activeTopics.filter((t) => t.box >= 4).length;
-
-    // Velocity score: 0% when all cards are in Box 1, up to 100% as cards progress to Box 5+
-    const velocityScore =
-      total > 0
-        ? Math.round(
-            ((activeTopics.reduce((acc, t) => acc + Math.min(5, t.box), 0) - total) / (total * 4)) * 100
-          )
-        : 0;
-
-    let velocityStatus = 'Priming';
-    let statusColor = isLight ? '#c2410c' : '#f97316';
-    if (velocityScore >= 70) {
-      velocityStatus = 'Hyper-Velocity';
-      statusColor = isLight ? '#047857' : '#34d399';
-    } else if (velocityScore >= 40) {
-      velocityStatus = 'Cruising Speed';
-      statusColor = isLight ? '#0284c7' : '#38bdf8';
-    } else if (velocityScore >= 15) {
-      velocityStatus = 'Accelerating';
-      statusColor = isLight ? '#b45309' : '#fbbf24';
-    }
-
-    return {
-      total,
-      box1,
-      box23,
-      box4Plus,
-      velocityScore: Math.min(100, Math.max(0, velocityScore)),
-      velocityStatus,
-      statusColor,
-    };
-  }, [activeTopics, isLight]);
-
   const modes: { id: StatsViewMode; label: string; icon: React.ReactNode }[] = [
     { id: 'radar', label: 'Skill Matrix', icon: <Activity size={13} /> },
     { id: 'orbit', label: 'Track Orbit', icon: <PieChart size={13} /> },
     { id: 'tiers', label: 'Mastery Tiers', icon: <Layers size={13} /> },
-    { id: 'velocity', label: 'Velocity', icon: <Gauge size={13} /> },
   ];
 
   const handleNextMode = () => {
     setMode((prev) => {
       if (prev === 'radar') return 'orbit';
       if (prev === 'orbit') return 'tiers';
-      if (prev === 'tiers') return 'velocity';
       return 'radar';
     });
   };
 
   const handlePrevMode = () => {
     setMode((prev) => {
-      if (prev === 'radar') return 'velocity';
-      if (prev === 'velocity') return 'tiers';
+      if (prev === 'radar') return 'tiers';
       if (prev === 'tiers') return 'orbit';
       return 'radar';
     });
@@ -307,65 +263,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   const activeDomainObj = radarData.find((d) => d.id === hoveredDomain);
   const activeBoxObj = boxStats.find((b) => b.box === hoveredBox);
 
-  // Velocity Speedometer Arc & Diagnostics
-  const velocityCenterX = 85;
-  const velocityCenterY = 65;
-  const velocityGaugeRadius = 54;
-  const velocityStartAngle = -Math.PI * 0.75; // -135 deg
-  const velocityTotalAngle = Math.PI * 1.5;   // 270 deg
-  const velocityNeedleAngle =
-    velocityStartAngle + (velocityData.velocityScore / 100) * velocityTotalAngle;
 
-  const needleLen = velocityGaugeRadius - 10;
-  const needleX = velocityCenterX + needleLen * Math.cos(velocityNeedleAngle);
-  const needleY = velocityCenterY + needleLen * Math.sin(velocityNeedleAngle);
-
-  // Velocity arc segments for background gauge
-  const velocityArcs = useMemo(() => {
-    const arcGen = d3
-      .arc<void>()
-      .innerRadius(velocityGaugeRadius - 7)
-      .outerRadius(velocityGaugeRadius + 3)
-      .cornerRadius(2);
-
-    const segmentSpan = velocityTotalAngle / 3;
-    const a1Start = velocityStartAngle;
-    const a1End = a1Start + segmentSpan - 0.04;
-    const a2Start = a1End + 0.04;
-    const a2End = a2Start + segmentSpan - 0.04;
-    const a3Start = a2End + 0.04;
-    const a3End = velocityStartAngle + velocityTotalAngle;
-
-    return {
-      dragArc: arcGen.startAngle(a1Start).endAngle(a1End)(),
-      accelArc: arcGen.startAngle(a2Start).endAngle(a2End)(),
-      hyperArc: arcGen.startAngle(a3Start).endAngle(a3End)(),
-    };
-  }, [velocityGaugeRadius, velocityStartAngle, velocityTotalAngle]);
-
-  const totalCompletedReviews = state?.totalCompletedReviews ?? 0;
-  const rawReviews = state?.recentReviews;
-  const recentReviews = useMemo(() => rawReviews ?? [], [rawReviews]);
-
-  // Actionable Diagnostics Calculations
-  const atRiskCards = useMemo(() => {
-    const box1Cards = activeTopics.filter((t) => t.box === 1);
-    if (totalCompletedReviews > 0) {
-      return box1Cards.filter((t) => t.streak === 0);
-    }
-    return box1Cards;
-  }, [activeTopics, totalCompletedReviews]);
-
-  const championCards = useMemo(() => {
-    return activeTopics
-      .filter((t) => t.box >= 3 || t.streak >= 2)
-      .sort((a, b) => b.streak - a.streak || b.box - a.box)
-      .slice(0, 5);
-  }, [activeTopics]);
-
-  const recent10 = useMemo(() => recentReviews.slice(-10), [recentReviews]);
-  const passedCount = useMemo(() => recent10.filter((r) => r.passed).length, [recent10]);
-  const passRate = recent10.length > 0 ? Math.round((passedCount / recent10.length) * 100) : 0;
 
   return (
     <div
@@ -487,6 +385,8 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           flex: 1,
+          minHeight: '236px',
+          height: '236px',
           position: 'relative',
         }}
       >
@@ -723,7 +623,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
               )}
             </div>
           </div>
-        ) : mode === 'tiers' ? (
+        ) : (
           /* Mode 3: Mastery Tiers Concentric Rings */
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <svg data-testid="stats-chart-svg" width={width} height={height} style={{ overflow: 'visible' }}>
@@ -835,418 +735,6 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                   Outer rings = Mastered tiers; inner rings = Learning tiers
                 </span>
               )}
-            </div>
-          </div>
-        ) : (
-          /* Mode 4: Velocity Diagnostic (Speedometer Gauge + Actionable Diagnostics Matrix) */
-          <div
-            style={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%',
-              gap: '12px',
-              flexWrap: 'wrap',
-            }}
-          >
-            {/* Left: Speedometer Gauge */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                flex: '0 0 auto',
-                margin: '0 auto',
-              }}
-            >
-              <svg data-testid="stats-chart-svg" width={170} height={120} style={{ overflow: 'visible' }}>
-                <g transform={`translate(${velocityCenterX}, ${velocityCenterY + 10})`}>
-                  {/* Drag Zone (Box 1) */}
-                  <path
-                    data-velocity-zone="drag"
-                    d={velocityArcs.dragArc || ''}
-                    fill={isLight ? '#dc2626' : '#f43f5e'}
-                    style={{ cursor: 'pointer', opacity: 0.85 }}
-                    onClick={() => handleBoxClick(1)}
-                  >
-                    <title>Box 1 (High Friction / 1-Trial Recall)</title>
-                  </path>
-
-                  {/* Accelerating Zone (Box 2-3) */}
-                  <path
-                    data-velocity-zone="accel"
-                    d={velocityArcs.accelArc || ''}
-                    fill={isLight ? '#b45309' : '#f59e0b'}
-                    style={{ cursor: 'pointer', opacity: 0.85 }}
-                    onClick={() => handleBoxClick([2, 3])}
-                  >
-                    <title>Box 2 & 3 (Accelerating Interval)</title>
-                  </path>
-
-                  {/* Hyper Zone (Box 4+) */}
-                  <path
-                    data-velocity-zone="hyper"
-                    d={velocityArcs.hyperArc || ''}
-                    fill={isLight ? '#0284c7' : '#06b6d4'}
-                    style={{ cursor: 'pointer', opacity: 0.85 }}
-                    onClick={() => handleBoxClick([4, 5, 6, 7, 8, 9])}
-                  >
-                    <title>Box 4+ (Hyper-Velocity / Deep Retention)</title>
-                  </path>
-
-                  {/* Velocity Needle */}
-                  <line
-                    x1={0}
-                    y1={0}
-                    x2={needleX - velocityCenterX}
-                    y2={needleY - (velocityCenterY + 10)}
-                    stroke={velocityData.statusColor}
-                    strokeWidth={2.5}
-                    strokeLinecap="round"
-                    style={{ transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', pointerEvents: 'none' }}
-                  />
-
-                  {/* Center Hub */}
-                  <circle
-                    cx={0}
-                    cy={0}
-                    r={5}
-                    fill={velocityData.statusColor}
-                    stroke={isLight ? '#ffffff' : '#0f172a'}
-                    strokeWidth={2}
-                    style={{ pointerEvents: 'none' }}
-                  />
-
-                  {/* Score & Rating text */}
-                  <text
-                    data-testid="velocity-score-text"
-                    textAnchor="middle"
-                    dy="24"
-                    style={{
-                      fontSize: '17px',
-                      fontWeight: 700,
-                      fill: isLight ? '#0f172a' : '#f1f5f9',
-                      pointerEvents: 'none',
-                    }}
-                  >
-                    {velocityData.velocityScore}%
-                  </text>
-                  <text
-                    data-testid="velocity-status-text"
-                    textAnchor="middle"
-                    dy="37"
-                    style={{
-                      fontSize: '9.5px',
-                      fontWeight: 600,
-                      fill: velocityData.statusColor,
-                      pointerEvents: 'none',
-                    }}
-                  >
-                    {velocityData.velocityStatus}
-                  </text>
-                </g>
-              </svg>
-
-              {/* Interactive Velocity Tier Badges */}
-              <div
-                style={{
-                  marginTop: '-2px',
-                  display: 'flex',
-                  gap: '6px',
-                  fontSize: '10.5px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                <button
-                  type="button"
-                  data-testid="velocity-tier-drag"
-                  onClick={() => handleBoxClick(1)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: isLight ? '#dc2626' : '#f43f5e',
-                    fontWeight: 600,
-                    fontSize: '10px',
-                    padding: '2px 3px',
-                    borderRadius: '4px',
-                  }}
-                  title="Filter exclusively to Box 1 cards"
-                >
-                  🔄 Drag: {velocityData.box1}
-                </button>
-                <span style={{ color: 'var(--text-muted)' }}>•</span>
-                <button
-                  type="button"
-                  data-testid="velocity-tier-accel"
-                  onClick={() => handleBoxClick([2, 3])}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: isLight ? '#b45309' : '#f59e0b',
-                    fontWeight: 600,
-                    fontSize: '10px',
-                    padding: '2px 3px',
-                    borderRadius: '4px',
-                  }}
-                  title="Filter exclusively to Box 2 & 3 cards"
-                >
-                  ⚡ Accel: {velocityData.box23}
-                </button>
-                <span style={{ color: 'var(--text-muted)' }}>•</span>
-                <button
-                  type="button"
-                  data-testid="velocity-tier-hyper"
-                  onClick={() => handleBoxClick([4, 5, 6, 7, 8, 9])}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: isLight ? '#0284c7' : '#06b6d4',
-                    fontWeight: 600,
-                    fontSize: '10px',
-                    padding: '2px 3px',
-                    borderRadius: '4px',
-                  }}
-                  title="Filter exclusively to Box 4+ cards"
-                >
-                  🚀 Hyper: {velocityData.box4Plus}
-                </button>
-              </div>
-
-              {/* Caption */}
-              <div
-                style={{
-                  marginTop: '3px',
-                  fontSize: '9.5px',
-                  color: 'var(--text-muted)',
-                  textAlign: 'center',
-                }}
-              >
-                Velocity Diagnostic
-              </div>
-            </div>
-
-            {/* Right: Actionable Diagnostics Matrix */}
-            <div
-              data-testid="actionable-diagnostics-matrix"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
-                flex: '1 1 240px',
-                minWidth: '220px',
-                maxWidth: '340px',
-                margin: '0 auto',
-              }}
-            >
-              {/* Diagnostic 1: At-Risk / Demoted */}
-              <div
-                data-testid="diagnostic-at-risk"
-                style={{
-                  padding: '6px 9px',
-                  borderRadius: '6px',
-                  backgroundColor: isLight ? 'rgba(220, 38, 38, 0.06)' : 'rgba(244, 63, 94, 0.08)',
-                  border: isLight ? '1px solid rgba(220, 38, 38, 0.18)' : '1px solid rgba(244, 63, 94, 0.2)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '3px',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.15s ease',
-                }}
-                onClick={() => {
-                  if (atRiskCards.length > 0 && onSelectCardToPractice) {
-                    onSelectCardToPractice(atRiskCards[0]);
-                  } else {
-                    handleBoxClick(1);
-                  }
-                }}
-                title="Click to practice or filter catalog to Box 1 reinforcement cards"
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '10.5px',
-                      fontWeight: 600,
-                      color: isLight ? '#b91c1c' : '#fb7185',
-                    }}
-                  >
-                    <AlertTriangle size={11} />
-                    <span>At-Risk / Demoted</span>
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      color: isLight ? '#b91c1c' : '#fb7185',
-                      padding: '1px 5px',
-                      borderRadius: '10px',
-                      backgroundColor: isLight ? 'rgba(220, 38, 38, 0.12)' : 'rgba(244, 63, 94, 0.18)',
-                    }}
-                  >
-                    {totalCompletedReviews > 0
-                      ? `${atRiskCards.length} cards`
-                      : `${activeTopics.filter((t) => t.box === 1).length} in B1`}
-                  </span>
-                </div>
-                <div style={{ fontSize: '10px', color: isLight ? '#7f1d1d' : 'var(--text-secondary)' }}>
-                  {totalCompletedReviews > 0
-                    ? atRiskCards.length > 0
-                      ? `${atRiskCards[0].title}${atRiskCards.length > 1 ? ` +${atRiskCards.length - 1} more` : ''} needs reinforcement`
-                      : 'Zero demotions! All active cards holding streaks.'
-                    : 'Initial queue primed in Box 1 awaiting first practice trials.'}
-                </div>
-              </div>
-
-              {/* Diagnostic 2: Retention Velocity / Mastery Champions */}
-              <div
-                data-testid="diagnostic-retention-velocity"
-                style={{
-                  padding: '6px 9px',
-                  borderRadius: '6px',
-                  backgroundColor: isLight ? 'rgba(16, 185, 129, 0.06)' : 'rgba(16, 185, 129, 0.08)',
-                  border: isLight ? '1px solid rgba(16, 185, 129, 0.18)' : '1px solid rgba(16, 185, 129, 0.2)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '3px',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.15s ease',
-                }}
-                onClick={() => {
-                  if (championCards.length > 0 && onSelectCardToPractice) {
-                    onSelectCardToPractice(championCards[0]);
-                  } else {
-                    handleBoxClick([3, 4, 5, 6, 7, 8, 9]);
-                  }
-                }}
-                title="Click to practice or filter catalog to high-streak / advancing cards"
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '10.5px',
-                      fontWeight: 600,
-                      color: isLight ? '#047857' : '#34d399',
-                    }}
-                  >
-                    <Flame size={11} />
-                    <span>Retention Velocity</span>
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      color: isLight ? '#047857' : '#34d399',
-                      padding: '1px 5px',
-                      borderRadius: '10px',
-                      backgroundColor: isLight ? 'rgba(16, 185, 129, 0.12)' : 'rgba(16, 185, 129, 0.18)',
-                    }}
-                  >
-                    {championCards.length > 0 ? `${championCards.length} advancing` : '0 in B3+'}
-                  </span>
-                </div>
-                <div style={{ fontSize: '10px', color: isLight ? '#065f46' : 'var(--text-secondary)' }}>
-                  {championCards.length > 0
-                    ? `Top streak: ${championCards[0].title} (★${championCards[0].streak})`
-                    : 'Cards graduate into multi-week intervals as streaks climb.'}
-                </div>
-              </div>
-
-              {/* Diagnostic 3: Recent Session Sparkline */}
-              <div
-                data-testid="diagnostic-sparkline"
-                style={{
-                  padding: '6px 9px',
-                  borderRadius: '6px',
-                  backgroundColor: isLight ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.04)',
-                  border: isLight ? '1px solid rgba(0, 0, 0, 0.08)' : '1px solid rgba(255, 255, 255, 0.08)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '3px',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '10.5px',
-                      fontWeight: 600,
-                      color: isLight ? '#1e293b' : 'var(--text-primary)',
-                    }}
-                  >
-                    <Activity size={11} />
-                    <span>Recent Session Sparkline</span>
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '10px',
-                      fontWeight: 600,
-                      color: isLight ? '#475569' : 'var(--text-muted)',
-                    }}
-                  >
-                    {recent10.length > 0 ? `${passRate}% pass` : '0 trials'}
-                  </span>
-                </div>
-                {/* Dot Matrix Sparkline */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
-                  {recent10.length > 0 ? (
-                    recent10.map((r, idx) => (
-                      <span
-                        key={idx}
-                        title={`Trial #${r.trial}: ${r.passed ? 'Passed (+1 tier)' : 'Reinforcement needed (demoted to B1)'}`}
-                        style={{
-                          width: '7px',
-                          height: '7px',
-                          borderRadius: '50%',
-                          backgroundColor: r.passed
-                            ? isLight
-                              ? '#059669'
-                              : '#10b981'
-                            : isLight
-                              ? '#dc2626'
-                              : '#f43f5e',
-                          boxShadow: r.passed
-                            ? isLight
-                              ? 'none'
-                              : '0 0 4px rgba(16, 185, 129, 0.6)'
-                            : isLight
-                              ? 'none'
-                              : '0 0 4px rgba(244, 63, 94, 0.6)',
-                          display: 'inline-block',
-                        }}
-                      />
-                    ))
-                  ) : (
-                    [0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-                      <span
-                        key={i}
-                        title="Awaiting practice trial"
-                        style={{
-                          width: '7px',
-                          height: '7px',
-                          borderRadius: '50%',
-                          border: isLight ? '1px dashed rgba(0,0,0,0.25)' : '1px dashed rgba(255,255,255,0.25)',
-                          display: 'inline-block',
-                        }}
-                      />
-                    ))
-                  )}
-                  <span style={{ fontSize: '9px', color: 'var(--text-muted)', marginLeft: '4px' }}>
-                    {recent10.length > 0 ? `Latest ${recent10.length} reviews` : 'Awaiting trial reviews'}
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         )}
