@@ -239,8 +239,8 @@ test.describe('React preview window', () => {
   });
 
   test('legacy component preview: pop-out and dock-back work on cards without previewCode', async ({ page }) => {
-    // countdown-component is a React card without previewCode
-    await openCard(page, 'countdown-component');
+    // simple-table is a React card without previewCode
+    await openCard(page, 'simple-table');
 
     // Does not have preview-toggle-btn
     await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);

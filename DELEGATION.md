@@ -13,7 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Task | Who | Branch | Status |
 |---|---|---|---|
 | A (React preview window) | Antigravity | feature/react-preview | Done |
-| A2 (React preview files) | Antigravity | feature/react-preview | In progress (Batch 1/4 done) |
+| A2 (React preview files) | Antigravity | feature/react-preview | In progress (Batch 2/4 done) |
 
 ## How to pick up a task
 1. `git fetch && git checkout master && git pull`, then read the roadmap, this file and the claim table above. Pick a task nobody has claimed.
