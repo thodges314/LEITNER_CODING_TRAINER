@@ -36,6 +36,7 @@ import type { AppTheme } from './lib/theme';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
 import { AddTopicModal } from './components/AddTopicModal';
+import { FEATURES } from './lib/features';
 import { SettingsModal } from './components/SettingsModal';
 import { FocusModal } from './components/FocusModal';
 import { AboutModal } from './components/AboutModal';
@@ -737,11 +738,13 @@ export function App() {
         </div>
       )}
 
-      <AddTopicModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAddTopic={handleAddTopic}
-      />
+      {FEATURES.quickAdd && (
+        <AddTopicModal
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onAddTopic={handleAddTopic}
+        />
+      )}
 
       <FocusModal
           isOpen={isFocusOpen}

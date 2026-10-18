@@ -398,6 +398,10 @@ Algorithms were filled in batch 13. Candidates, with the owner's goal in mind (r
 
 Pick the order; each batch follows the §4 checklist including the complexity step.
 
+### 7.7 Parked features
+- **Quick Add Topic with AI** (`AddTopicModal`, switch `FEATURES.quickAdd` in `src/lib/features.ts`, currently `false`). Parked because the AI writes both the reference solution and the tests and nothing checks that they agree, so a draft can silently mark correct answers wrong, and cheap models (Groq `gpt-oss-120b`, `gemini-2.5-flash`) are the ones users are encouraged to pick. The code is still in the app, just hidden.
+  To bring it back: (1) merge the work saved on branch `feature/quick-add-verified` (`caseHarness.ts`: build the test script from input -> expected pairs; `draftVerify.ts`: the reference must pass the drafted tests and an empty solution must fail), (2) change `draftTopicWithAI` in `ai.ts` to ask the model for input/expected pairs instead of a test script, verify the draft, and show the model its own failure and ask for a fix (max 2 rounds), (3) never mark a template or unverified draft as verified, (4) label AI-drafted cards, stop adding default Big-O to non-algorithm cards, (5) tell the user in the dialog to use a stronger model for drafting (Claude 3.5 Sonnet, Gemini 2.5 Pro, GPT-4o, Mistral Large) and keep cheap models for critiques.
+
 ## 8. Conventions and pitfalls for assistants
 
 > Delegable tasks with acceptance criteria, and the rules every contributor follows: see [DELEGATION.md](DELEGATION.md).

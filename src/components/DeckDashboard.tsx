@@ -13,6 +13,7 @@ import {
   DIFFICULTY_LABELS,
 } from '../lib/leitner';
 import type { TopicItem, LeitnerDeckState } from '../lib/leitner';
+import { FEATURES } from '../lib/features';
 import {
   Unlock,
   Lock,
@@ -420,9 +421,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         </div>
 
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-          <button className="btn btn-primary" onClick={onOpenAddModal}>
-            <Plus size={16} /> Quick Add Topic
-          </button>
+          {FEATURES.quickAdd && (
+            <button className="btn btn-primary" onClick={onOpenAddModal}>
+              <Plus size={16} /> Quick Add Topic
+            </button>
+          )}
           <button className="btn btn-secondary" onClick={handleExport} title="Download timestamped JSON backup">
             <Download size={15} /> Export Progress
           </button>
