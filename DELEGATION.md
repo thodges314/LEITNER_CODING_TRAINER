@@ -16,8 +16,8 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
    React harnesses that read effect- or hover-driven state need `await wait(30)` (production React has no `act`).
 7. Update the counts and the relevant roadmap rows in `ARCHITECTURE_AND_ROADMAP.md` in the same commit. No absolute `file:///` links in docs.
 8. Do not edit `src/data/topics.json` by hand (it is generated). To DELETE a card follow the checklist in roadmap §7.4e (and add its id to `RETIRED_SEED_IDS`).
-10. Every NEW React card (tracks `react`, `react-components`) also ships `scripts/cards/<id>.preview.js` (once task A exists); see roadmap §7.3 for the format.
 9. Rate difficulty with the rubric in roadmap §7.4e and check the card is not a duplicate/subset of an existing one (same concept) before adding it.
+10. Every NEW React card (tracks `react`, `react-components`) also ships `scripts/cards/<id>.preview.js` (once task A exists); see roadmap §7.3 for the format.
 
 ## Good to delegate (well-specified, verifiable by the gates above)
 | # | Task | Notes / acceptance |
