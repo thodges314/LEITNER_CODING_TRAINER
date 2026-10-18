@@ -1034,5 +1034,17 @@
   "copy-to-clipboard": {
     "difficulty": 2,
     "concept": "clipboard"
+  },
+  "lazy-load-observer": {
+    "difficulty": 3,
+    "concept": "observers"
+  },
+  "drop-index-from-pointer": {
+    "difficulty": 2,
+    "concept": "drag-drop"
+  },
+  "raf-throttle": {
+    "difficulty": 2,
+    "concept": "animation-frame"
   }
 }

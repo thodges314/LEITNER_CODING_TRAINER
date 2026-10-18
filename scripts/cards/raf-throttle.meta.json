@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "requestAnimationFrame Throttle",
+  "tags": [
+    "requestanimationframe",
+    "throttle",
+    "performance",
+    "events"
+  ]
+}
