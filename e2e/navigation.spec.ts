@@ -50,7 +50,7 @@ test.describe('back button', () => {
     await openApp(page);
     await page.goBack();
     await expect(page.getByText(DECK_HEADING)).toBeVisible();
-    expect(page.url()).toContain('localhost:4173');
+    expect(page.url()).toMatch(/^http:\/\/localhost:\d+\//);
   });
 
   test('Back on the deck stays there and hints that another Back leaves', async ({ page }) => {
@@ -61,7 +61,7 @@ test.describe('back button', () => {
     await page.goBack();
     await expect(page.getByText(/Press Back again to leave the app/)).toBeVisible();
     await expect(page.getByText(DECK_HEADING)).toBeVisible();
-    expect(page.url()).toContain('localhost:4173');
+    expect(page.url()).toMatch(/^http:\/\/localhost:\d+\//);
   });
 
   test('two quick Backs leave the app', async ({ page }) => {
@@ -77,6 +77,6 @@ test.describe('back button', () => {
     await page.waitForTimeout(2300);
     await page.goBack();
     await page.waitForTimeout(300);
-    expect(page.url()).toContain('localhost:4173');
+    expect(page.url()).toMatch(/^http:\/\/localhost:\d+\//);
   });
 });

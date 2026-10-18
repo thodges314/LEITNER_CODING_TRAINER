@@ -497,7 +497,11 @@ export function mergeStoredWithSeed(
   const seedMap = new Map(seedTopics.map((t) => [t.id, t]));
   const deleted = new Set(parsed.deletedSeedIds ?? []);
 
-  const hydratedTopics = parsed.topics.filter((t) => !RETIRED_SEED_IDS.has(t.id)).map((t) => {
+  const hydratedTopics = parsed.topics
+    // A stored card that is no longer in the bundled deck and has no content of its own (it was saved without its
+    // content) cannot be played: drop it instead of keeping an empty card.
+    .filter((t) => !RETIRED_SEED_IDS.has(t.id) && (seedMap.has(t.id) || typeof t.promptSeed === 'string'))
+    .map((t) => {
     const seed = seedMap.get(t.id);
     if (!seed) {
       // Custom (non-seed) card: keep untouched, ensuring progress invariants are numbers
@@ -594,10 +598,45 @@ export function loadDeckState(
   }
 }
 
+/**
+ * Large content fields of built-in cards. They are never written to localStorage: `mergeStoredWithSeed` refills them
+ * from the bundled deck on every load, so storing them only wasted space (about 1.4 MB per save, against a ~5 MB
+ * browser quota) and slowed every review. Custom (non-seed) cards are stored in full.
+ */
+export const HEAVY_SEED_FIELDS = [
+  'promptSeed',
+  'starterCode',
+  'testHarness',
+  'solution',
+  'referenceSolution',
+  'testCases',
+  'targetTime',
+  'targetSpace',
+  'complexityExplanation',
+  'previewCode',
+] as const;
+
+let seedIdSet: Set<string> | null = null;
+
+/** The state as it is persisted: built-in cards keep their progress and small metadata, not their heavy content. */
+export function slimForStorage(state: LeitnerDeckState): LeitnerDeckState {
+  seedIdSet ??= new Set((seedTopicsData as unknown as TopicItem[]).map((t) => t.id));
+  const seedIds = seedIdSet;
+  return {
+    ...state,
+    topics: state.topics.map((t) => {
+      if (!seedIds.has(t.id)) return t;
+      const slim: Record<string, unknown> = { ...t };
+      for (const field of HEAVY_SEED_FIELDS) delete slim[field];
+      return slim as unknown as TopicItem;
+    }),
+  };
+}
+
 export function saveDeckState(state: LeitnerDeckState): void {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(slimForStorage(state)));
   } catch (err) {
     console.error('Failed to save deck to localStorage:', err);
   }

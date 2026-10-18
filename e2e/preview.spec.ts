@@ -323,15 +323,19 @@ test.describe('React preview window', () => {
     }
 
     await page.evaluate(
-      ({ DECK_KEY }) => {
+      ({ DECK_KEY, base }) => {
         const stored = localStorage.getItem(DECK_KEY);
         if (stored) {
           const deck = JSON.parse(stored);
           for (const t of deck.topics) {
             t.status = 'locked';
           }
+          // Built from the bundled card data: saved decks only keep progress for built-in cards, not their content.
           const legacyCard = {
-            ...deck.topics[0],
+            ...base,
+            box: 1,
+            streak: 0,
+            nextEligibleTrial: 0,
             id: 'custom-unannotated-card',
             title: 'Custom Unannotated Card',
             track: 'react-components',
@@ -344,7 +348,7 @@ test.describe('React preview window', () => {
         }
         localStorage.setItem('leitner_welcomed', '1');
       },
-      { DECK_KEY }
+      { DECK_KEY, base: topics[0] }
     );
 
     await page.reload();

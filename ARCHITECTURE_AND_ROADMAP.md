@@ -29,7 +29,7 @@ in the browser; state lives in `localStorage`.
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 955 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 262 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 524 card tests + 12 navigation/shortcut tests + 5 preview tests = 541 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/react19-cards`): 520 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 262 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 524 card tests + 12 navigation/shortcut tests + 6 preview tests + 4 backup advisory tests = 550 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/polish-and-perf`): 550 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -64,7 +64,7 @@ scripts/
   testcases/part1-8.mjs, index.mjs   hand-written input/expected pairs
 ```
 
-State keys in `localStorage`: `leitner_coding_deck` (deck + filter + presets + algorithm preference), `leitner_draft:<cardId>`, AI settings keys
+State keys in `localStorage`: `leitner_coding_deck` (deck + filter + presets + algorithm preference; **stored slim**: built-in cards keep only their progress and small metadata, because `slimForStorage` in `leitner.ts` strips `HEAVY_SEED_FIELDS` and `mergeStoredWithSeed` refills them from the bundled deck on load; custom cards are stored in full; a stored card that is gone from the bundled deck and has no content is dropped), `leitner_draft:<cardId>`, AI settings keys
 (see `ai.ts`). The API key is stored in plaintext in `localStorage` (acceptable for personal use, documented in Settings).
 
 ## 4. Card authoring pipeline
@@ -292,6 +292,9 @@ pane or pop-out window, without disturbing the editor, Run Code or Submit.
   Heuristic or tag-based guessing is never used; custom hooks and pure logic cards omit `rendersComponent` and show no preview box.
 - Clean, respectable interface: opens with a clean, quiet "Ready to Preview" placeholder without premature errors. Once the user clicks "Run Code / Test" (or Cmd+Enter) or submits, the live sandbox activates, mounts the preview, updates automatically as they edit (debounced ~500 ms), and reveals callback/console logs.
 - Pop-out window support: a "Pop out" button opens the preview in an external browser window with live two-way synchronization and seamless dock-back.
+- **Safety (tested in `e2e/preview.spec.ts`)**: preview code runs in a sandboxed iframe, never on the main page. A `while(true)` is stopped by the loop guard / timeout; an effect that sets state on every render is stopped by a render-loop watchdog in `reactPreviewFrame.ts` (React `Profiler`, more than 100 commits in one second means unmount and show an error). The Profiler callback is skipped by React production builds, so `scripts/build-preview-bundle.mjs` bundles `react-dom/profiling`; do not switch it back to `react-dom/client`.
+- **Loaded on demand**: the 235 KB React runtime for the iframe (`reactPreviewBundle.ts`) is a separate chunk, fetched only when a card with a preview opens (`ReactPreview.tsx` uses a dynamic import).
+- **Planned (not built)**: a separate Props panel driven by an optional `controls` export in `<id>.preview.js` (type, range, options per prop) plus named presets, so props can be changed without editing code and the controls sit apart from the rendered component. Today a few previews render prop-combination buttons next to the component.
 - **Every previewable card defines what to render in `scripts/cards/<id>.preview.js`** (props, callbacks, providers: nothing is guessed from the harness).
   `build-cards.mjs` copies it into the generated card as `previewCode`. The file contains plain JSX that may use the names the card asks the user to write, plus a
   `log(name, returnValue?)` helper. Examples:
