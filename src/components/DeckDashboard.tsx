@@ -15,6 +15,7 @@ import {
 } from '../lib/leitner';
 import type { TopicItem, LeitnerDeckState } from '../lib/leitner';
 import { FEATURES } from '../lib/features';
+import { isHintSeen, markHintSeen, TRACK_FILTER_HINT_KEY } from '../lib/hints';
 import {
   Unlock,
   Lock,
@@ -109,6 +110,8 @@ interface DeckDashboardProps {
   onDeleteTopic: (topicId: string) => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
   onOpenAddModal: () => void;
+  /** Opens the Focus dialog (used by the one-time hint under the track filter). */
+  onOpenFocus?: () => void;
   highlightExport?: boolean;
   onDismissHighlightExport?: () => void;
 }
@@ -122,6 +125,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onDeleteTopic,
   onStateUpdated,
   onOpenAddModal,
+  onOpenFocus,
   highlightExport = false,
   onDismissHighlightExport,
 }) => {
@@ -161,7 +165,13 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
     return counts;
   }, [topics]);
 
+  const [showTrackHint, setShowTrackHint] = useState(false);
+
   const handleToggleTrack = (trk: string) => {
+    if (!isHintSeen(TRACK_FILTER_HINT_KEY)) {
+      markHintSeen(TRACK_FILTER_HINT_KEY); // once ever, whether or not it is dismissed
+      setShowTrackHint(true);
+    }
     if (trk === 'all') {
       setSelectedTracks(['all']);
       return;
@@ -704,6 +714,49 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             width: '100%',
           }}
         >
+          {showTrackHint && (
+            <div
+              role="status"
+              data-testid="track-filter-hint"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '10px',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                lineHeight: 1.5,
+                color: 'var(--text-primary)',
+                backgroundColor: 'rgba(56, 189, 248, 0.10)',
+                border: '1px solid rgba(56, 189, 248, 0.45)',
+              }}
+            >
+              <span style={{ flex: '1 1 320px' }}>
+                <strong>This filter is for inspecting cards.</strong> It only changes what you see in the catalog. To choose what you
+                actually practice, use the <strong>Focus</strong> button in the top bar.
+              </span>
+              <span style={{ display: 'flex', gap: '8px' }}>
+                {onOpenFocus && (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ fontSize: '12.5px' }}
+                    onClick={() => {
+                      setShowTrackHint(false);
+                      onOpenFocus();
+                    }}
+                  >
+                    Open Focus
+                  </button>
+                )}
+                <button type="button" className="btn btn-outline" style={{ fontSize: '12.5px' }} onClick={() => setShowTrackHint(false)}>
+                  Got it
+                </button>
+              </span>
+            </div>
+          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>

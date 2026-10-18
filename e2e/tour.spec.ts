@@ -3,6 +3,21 @@ import type { Page } from '@playwright/test';
 
 const tourDialog = (page: Page) => page.getByRole('dialog', { name: 'Guided tour' });
 
+/** The spotlight box must fully surround the element carrying data-tour="<anchor>". */
+async function expectSpotlightAround(page: Page, anchor: string) {
+  const spot = page.getByTestId('tour-spotlight');
+  await expect(spot).toBeVisible();
+  await expect
+    .poll(async () => {
+      const t = await page.locator(`[data-tour="${anchor}"]`).boundingBox();
+      const s = await spot.boundingBox();
+      if (!t || !s) return false;
+      const tol = 2;
+      return s.x <= t.x + tol && s.y <= t.y + tol && s.x + s.width >= t.x + t.width - tol && s.y + s.height >= t.y + t.height - tol;
+    }, { message: `spotlight should surround [data-tour="${anchor}"]` })
+    .toBe(true);
+}
+
 async function startWithTour(page: Page) {
   await page.goto('/');
   const welcome = page.getByRole('dialog', { name: /Welcome to Leitner Coding Trainer/ });
@@ -12,32 +27,49 @@ async function startWithTour(page: Page) {
 }
 
 test.describe('guided tour', () => {
-  test('the welcome screen offers it; all 5 steps work; the app is usable afterwards and the welcome never returns', async ({ page }) => {
+  test('the welcome screen offers it; all 7 steps work; the app is usable afterwards and the welcome never returns', async ({ page }) => {
     await startWithTour(page);
     const tour = tourDialog(page);
     const spotlight = page.getByTestId('tour-spotlight');
+    const next = () => tour.getByRole('button', { name: 'Next' }).click();
 
-    await expect(tour).toContainText('Step 1 of 5');
-    await expect(tour).toContainText('Read the contract');
-    await expect(spotlight).toBeVisible();
+    // Step 1 lights up the problem description AND the contract table under it.
+    await expect(tour).toContainText('Step 1 of 7');
+    await expect(tour).toContainText('Read the problem and its contract');
+    await expectSpotlightAround(page, 'problem');
+    await expectSpotlightAround(page, 'contract');
 
-    await tour.getByRole('button', { name: 'Next' }).click();
-    await expect(tour).toContainText('Step 2 of 5');
+    await next();
+    await expect(tour).toContainText('Step 2 of 7');
     await expect(tour).toContainText('Solve it yourself');
-    await expect(spotlight).toBeVisible();
+    await expectSpotlightAround(page, 'editor');
 
-    await tour.getByRole('button', { name: 'Next' }).click();
-    await expect(tour).toContainText('Step 3 of 5');
+    await next();
+    await expect(tour).toContainText('Step 3 of 7');
     await expect(tour).toContainText('Submit Final Answer');
+    await expectSpotlightAround(page, 'actions');
 
-    await tour.getByRole('button', { name: 'Next' }).click();
-    await expect(tour).toContainText('Step 4 of 5');
+    await next();
+    await expect(tour).toContainText('Step 4 of 7');
     await expect(tour).toContainText('One next step');
     await expect(spotlight).toHaveCount(0); // a centered note, nothing to point at
 
-    await tour.getByRole('button', { name: 'Next' }).click();
-    await expect(tour).toContainText('Step 5 of 5');
-    await expect(spotlight).toBeVisible();
+    // The top bar, one control at a time.
+    await next();
+    await expect(tour).toContainText('Step 5 of 7');
+    await expect(tour).toContainText('Deck Catalog');
+    await expectSpotlightAround(page, 'deck-nav');
+
+    await next();
+    await expect(tour).toContainText('Step 6 of 7');
+    await expect(tour).toContainText('Focus: choose what you practice');
+    await expect(tour).toContainText('only change what you see');
+    await expectSpotlightAround(page, 'focus');
+
+    await next();
+    await expect(tour).toContainText('Step 7 of 7');
+    await expect(tour).toContainText('Settings');
+    await expectSpotlightAround(page, 'settings');
 
     await tour.getByRole('button', { name: 'Finish' }).click();
     await expect(tourDialog(page)).toHaveCount(0);
@@ -51,9 +83,9 @@ test.describe('guided tour', () => {
     await startWithTour(page);
     const tour = tourDialog(page);
     await tour.getByRole('button', { name: 'Next' }).click();
-    await expect(tour).toContainText('Step 2 of 5');
+    await expect(tour).toContainText('Step 2 of 7');
     await tour.getByRole('button', { name: 'Back' }).click();
-    await expect(tour).toContainText('Step 1 of 5');
+    await expect(tour).toContainText('Step 1 of 7');
     for (let i = 0; i < 4; i++) {
       const box = await tour.boundingBox();
       expect(box).not.toBeNull();
@@ -70,9 +102,9 @@ test.describe('guided tour', () => {
     await startWithTour(page);
     const tour = tourDialog(page);
     await page.keyboard.press('ArrowRight');
-    await expect(tour).toContainText('Step 2 of 5');
+    await expect(tour).toContainText('Step 2 of 7');
     await page.keyboard.press('ArrowLeft');
-    await expect(tour).toContainText('Step 1 of 5');
+    await expect(tour).toContainText('Step 1 of 7');
     await page.keyboard.press('Escape');
     await expect(tourDialog(page)).toHaveCount(0);
 
@@ -95,7 +127,7 @@ test.describe('guided tour', () => {
 
     const tour = tourDialog(page);
     await expect(tour).toBeVisible();
-    await expect(tour).toContainText('Step 1 of 5'); // the practice screen is showing again, so every anchor exists
+    await expect(tour).toContainText('Step 1 of 7'); // the practice screen is showing again, so every anchor exists
     await expect(page.getByText(/Catalog & Deck Performance/)).toHaveCount(0);
   });
 

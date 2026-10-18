@@ -1601,7 +1601,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         </h1>
 
         {/* Prompt Seed Instructions */}
-        <div
+        <div data-tour="problem"
           className="prompt-seed-box"
           style={{
             padding: '14px 16px',

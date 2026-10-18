@@ -306,7 +306,6 @@ export function App() {
       {/* Global Header */}
       <header
         className="app-header"
-        data-tour="header"
         style={{
           borderBottom: '1px solid var(--border-subtle)',
           backgroundColor: 'var(--bg-navigation)',
@@ -356,6 +355,7 @@ export function App() {
           {/* View Toggle Navigation */}
           <nav
             className="nav-view-toggle"
+            data-tour="deck-nav"
             style={{
               display: 'flex',
               padding: '4px',
@@ -401,7 +401,7 @@ export function App() {
 
           {/* Quick Info & Action Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
+            <button data-tour="focus"
               className="btn btn-outline"
               style={{
                 padding: '7px 12px',
@@ -533,7 +533,7 @@ export function App() {
             </div>
 
             {/* Dedicated Settings Button */}
-            <button
+            <button data-tour="settings"
               className="btn btn-outline"
               style={{ padding: '7px 12px', fontSize: '12.5px', gap: '6px' }}
               onClick={() => setIsSettingsOpen(true)}
@@ -616,6 +616,7 @@ export function App() {
         ) : (
           <DeckDashboard
             theme={theme}
+            onOpenFocus={() => setIsFocusOpen(true)}
             state={deckState}
             onSelectCardToPractice={handleSelectCardToPractice}
             onToggleLock={handleToggleLock}

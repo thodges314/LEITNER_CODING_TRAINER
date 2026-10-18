@@ -11,13 +11,26 @@ const PAD = 6;
 const TOOLTIP_WIDTH = 340;
 const TOOLTIP_HEIGHT_ESTIMATE = 240; // generous, so the tooltip is always placed fully inside the viewport
 
-/** The spotlight rectangle of an anchor as a short string (a stable value for useSyncExternalStore), or '' if absent. */
-function readBox(anchor: string | null): string {
-  if (anchor === null) return '';
-  const el = document.querySelector(tourAnchorSelector(anchor));
-  if (!el) return '';
-  const r = el.getBoundingClientRect();
-  return [r.top - PAD, r.left - PAD, r.width + PAD * 2, r.height + PAD * 2].map(Math.round).join('|');
+/**
+ * The spotlight rectangle covering all the anchors of a step that are on the page, as a short string (a stable value
+ * for useSyncExternalStore), or '' if there is nothing to point at.
+ */
+function readBox(anchors: string[]): string {
+  let top = Infinity;
+  let left = Infinity;
+  let right = -Infinity;
+  let bottom = -Infinity;
+  for (const anchor of anchors) {
+    const el = document.querySelector(tourAnchorSelector(anchor));
+    if (!el) continue;
+    const r = el.getBoundingClientRect();
+    top = Math.min(top, r.top);
+    left = Math.min(left, r.left);
+    right = Math.max(right, r.right);
+    bottom = Math.max(bottom, r.bottom);
+  }
+  if (!Number.isFinite(top)) return '';
+  return [top - PAD, left - PAD, right - left + PAD * 2, bottom - top + PAD * 2].map(Math.round).join('|');
 }
 
 function subscribe(onChange: () => void): () => void {
@@ -49,15 +62,16 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
 
   const boxValue = useSyncExternalStore(
     subscribe,
-    () => readBox(step ? step.anchor : null),
+    () => readBox(step ? step.anchors : []),
     () => ''
   );
   const box = parseBox(boxValue);
 
   // Bring the target into view when the step changes.
   useLayoutEffect(() => {
-    if (step && step.anchor !== null) {
-      document.querySelector(tourAnchorSelector(step.anchor))?.scrollIntoView({ block: 'center', behavior: 'auto' });
+    if (step) {
+      const first = step.anchors.map((a) => document.querySelector(tourAnchorSelector(a))).find((el) => el !== null);
+      first?.scrollIntoView({ block: 'center', behavior: 'auto' });
     }
   }, [step]);
 
