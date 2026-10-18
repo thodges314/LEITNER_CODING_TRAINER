@@ -149,4 +149,51 @@ test.describe('React preview window', () => {
     await expect(skipBtn).toBeEnabled();
     await skipBtn.click();
   });
+
+  test('pop-out button opens a separate window and can be docked back', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'switch-toggle-a11y');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'switch-toggle-a11y', solution);
+
+    const toggleBtn = page.locator('#preview-toggle-btn');
+    await expect(toggleBtn).toBeVisible();
+    await toggleBtn.click();
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    const popOutBtn = page.locator('[data-testid="preview-popout-btn"]');
+    await expect(popOutBtn).toBeVisible();
+
+    // Click pop out and wait for popup window
+    const [popup] = await Promise.all([
+      page.waitForEvent('popup'),
+      popOutBtn.click(),
+    ]);
+
+    expect(popup).toBeDefined();
+
+    // Verify main window shows docked placeholder with 'Dock back' button
+    const mainDockBtn = page.locator('[data-testid="preview-main-dock-btn"]');
+    await expect(mainDockBtn).toBeVisible();
+
+    // Verify popup contains the rendered preview component
+    const frame = popup.frameLocator('iframe');
+    const switchBtn = frame.locator('button[role="switch"]').first();
+    await expect(switchBtn).toBeVisible({ timeout: 5000 });
+
+    // Click switch inside the pop-out window
+    await switchBtn.click();
+
+    // Verify dock back button in popup closes popup and restores inline preview
+    const popupDockBtn = popup.locator('[data-testid="preview-dock-btn"]');
+    await expect(popupDockBtn).toBeVisible();
+    await popupDockBtn.click();
+
+    // The popup is closed and the main window has restored the normal preview window
+    await expect.poll(() => popup.isClosed()).toBe(true);
+    await expect(page.locator('[data-testid="preview-popout-btn"]')).toBeVisible();
+  });
 });

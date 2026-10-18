@@ -4,9 +4,9 @@ Read `ARCHITECTURE_AND_ROADMAP.md` first (system map, card pipeline, gotchas). T
 criteria**, plus the rules every contributor follows. Tasks marked **[owner decision]** need the owner's approval before coding.
 
 ## Current state (keep this block up to date in the same commit as any change it describes)
-- `master` = the deployed app. **262 cards** (230 in the default deck + 32 in the optional "algorithms-advanced" pack), **1,779 documented cases**, 955 unit tests, 540 browser tests (2 per card + 12 navigation/shortcut tests + 4 preview tests). A push to `master` deploys, and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
+- `master` = the deployed app. **262 cards** (230 in the default deck + 32 in the optional "algorithms-advanced" pack), **1,779 documented cases**, 955 unit tests, 541 browser tests (2 per card + 12 navigation/shortcut tests + 5 preview tests). A push to `master` deploys, and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
 - Quick Add Topic (AI card creation) is **parked and hidden** (`FEATURES.quickAdd` in `src/lib/features.ts`). See task M. Do not re-enable it without the verification work.
-- The React preview window is **built** on `feature/react-preview` (task A: sandboxed iframe, `previewCode` plumbing, guard unit test, e2e tests, 2 sample previews). Remaining: task A2 (writing previews for the other React cards).
+- The React preview window is **built** on `feature/react-preview` (task A: sandboxed iframe, pop-out window with live sync, `previewCode` plumbing, guard unit test, e2e tests, 2 sample previews). Remaining: task A2 (writing previews for the other React cards).
 - Authoring pitfalls for Suspense / transitions / `use()` harnesses are in the roadmap, section 8. Read them before writing React 19 cards.
 
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
@@ -51,7 +51,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | K | **README refresh** | Commands (`e2e`, `mutation`, `build:cards`), features (Focus, packs, Back button, welcome, keyboard shortcut hints, staged unlocks respect Focus), note that Quick Add is parked. Screenshots optional. |
 
 ## Done (kept for reference, do not redo)
-- **A, React preview window**: the feature (spec in roadmap section 7.3). Sandboxed iframe window (`sandbox="allow-scripts"`), `previewCode` plumbing in `build-cards.mjs`, guard unit test (`reactPreviewGuard.test.ts`), Playwright tests (`e2e/preview.spec.ts`), and 2 sample preview files (`switch-toggle-a11y.preview.js`, `star-rating-component.preview.js`).
+- **A, React preview window**: the feature (spec in roadmap section 7.3). Sandboxed iframe window (`sandbox="allow-scripts"`), pop-out window with live syncing and dock-back, `previewCode` plumbing in `build-cards.mjs`, guard unit test (`reactPreviewGuard.test.ts`), Playwright tests (`e2e/preview.spec.ts`), and 2 sample preview files (`switch-toggle-a11y.preview.js`, `star-rating-component.preview.js`).
 - **E, ladder-hole starter cards**: 15 intro cards shipped; only `architecture` (the single d5 card) has no starter and stays a capstone.
 - **H, staged unlocks respect the user's Focus**: `checkStagedUnlocks` receives the Focus + pack filter; unlock credit is only spent on cards that really unlock (`src/lib/unlockFocus.test.ts`).
 - **L, run `e2e` before deploy**: required `e2e` job in `.github/workflows/deploy.yml`.

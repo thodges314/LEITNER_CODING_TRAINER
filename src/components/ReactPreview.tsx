@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Layers,
   RotateCcw,
@@ -8,6 +9,8 @@ import {
   Terminal,
   CheckCircle2,
   Loader2,
+  ExternalLink,
+  Minimize2,
 } from 'lucide-react';
 import type { TopicItem } from '../lib/leitner';
 import { transpileForExecution } from '../lib/runner';
@@ -44,6 +47,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   const [status, setStatus] = useState<'idle' | 'compiling' | 'rendering' | 'live' | 'error' | 'timeout'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [logs, setLogs] = useState<PreviewLogItem[]>([]);
+  const [popupWindow, setPopupWindow] = useState<Window | null>(null);
 
   const currentRenderIdRef = useRef<string>('');
   const watchdogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -57,60 +61,68 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   }, []);
 
   // PostMessage listener
+  const handleMessage = useCallback((event: MessageEvent) => {
+    if (iframeRef.current && event.source !== iframeRef.current.contentWindow) {
+      return;
+    }
+    const data = event.data;
+    if (!data || typeof data !== 'object') return;
+    if (typeof data.type !== 'string' || !data.type.startsWith('leitner-preview:')) return;
+
+    if (data.type === 'leitner-preview:ready') {
+      setIsIframeReady(true);
+    } else if (data.type === 'leitner-preview:rendered') {
+      if (data.renderId === currentRenderIdRef.current) {
+        clearWatchdog();
+        setStatus('live');
+        setErrorMessage(null);
+      }
+    } else if (data.type === 'leitner-preview:error') {
+      if (!data.renderId || data.renderId === currentRenderIdRef.current) {
+        clearWatchdog();
+        setStatus('error');
+        setErrorMessage(data.message || 'Execution error');
+      }
+    } else if (data.type === 'leitner-preview:event') {
+      setLogs((prev) => [
+        {
+          id: `${Date.now()}-${Math.random()}`,
+          type: 'event',
+          name: data.name,
+          args: data.args || [],
+          timestamp: data.timestamp || Date.now(),
+        },
+        ...prev.slice(0, 49),
+      ]);
+    } else if (data.type === 'leitner-preview:console') {
+      setLogs((prev) => [
+        {
+          id: `${Date.now()}-${Math.random()}`,
+          type: 'console',
+          method: data.method,
+          args: data.args || [],
+          timestamp: data.timestamp || Date.now(),
+        },
+        ...prev.slice(0, 49),
+      ]);
+    }
+  }, [clearWatchdog]);
+
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (iframeRef.current && event.source !== iframeRef.current.contentWindow) {
-        return;
-      }
-      const data = event.data;
-      if (!data || typeof data !== 'object') return;
-      if (typeof data.type !== 'string' || !data.type.startsWith('leitner-preview:')) return;
-
-      if (data.type === 'leitner-preview:ready') {
-        setIsIframeReady(true);
-      } else if (data.type === 'leitner-preview:rendered') {
-        if (data.renderId === currentRenderIdRef.current) {
-          clearWatchdog();
-          setStatus('live');
-          setErrorMessage(null);
-        }
-      } else if (data.type === 'leitner-preview:error') {
-        if (!data.renderId || data.renderId === currentRenderIdRef.current) {
-          clearWatchdog();
-          setStatus('error');
-          setErrorMessage(data.message || 'Execution error');
-        }
-      } else if (data.type === 'leitner-preview:event') {
-        setLogs((prev) => [
-          {
-            id: `${Date.now()}-${Math.random()}`,
-            type: 'event',
-            name: data.name,
-            args: data.args || [],
-            timestamp: data.timestamp || Date.now(),
-          },
-          ...prev.slice(0, 49),
-        ]);
-      } else if (data.type === 'leitner-preview:console') {
-        setLogs((prev) => [
-          {
-            id: `${Date.now()}-${Math.random()}`,
-            type: 'console',
-            method: data.method,
-            args: data.args || [],
-            timestamp: data.timestamp || Date.now(),
-          },
-          ...prev.slice(0, 49),
-        ]);
-      }
-    };
-
     window.addEventListener('message', handleMessage);
     return () => {
       window.removeEventListener('message', handleMessage);
       clearWatchdog();
     };
-  }, [clearWatchdog]);
+  }, [handleMessage, clearWatchdog]);
+
+  useEffect(() => {
+    if (!popupWindow) return;
+    popupWindow.addEventListener('message', handleMessage);
+    return () => {
+      popupWindow.removeEventListener('message', handleMessage);
+    };
+  }, [popupWindow, handleMessage]);
 
   // Transpile and send code to iframe
   const sendToIframe = useCallback(async () => {
@@ -191,20 +203,111 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   };
 
   const isLight = theme === 'apple-gsos';
+  const isPoppedOut = Boolean(popupWindow && !popupWindow.closed);
 
-  return (
+  const handlePopOut = useCallback(() => {
+    if (popupWindow && !popupWindow.closed) {
+      popupWindow.focus();
+      return;
+    }
+
+    const w = 640;
+    const h = 760;
+    const left = typeof window.screenX === 'number' ? window.screenX + Math.max(0, (window.outerWidth - w) / 2) : 100;
+    const top = typeof window.screenY === 'number' ? window.screenY + Math.max(0, (window.outerHeight - h) / 2) : 100;
+
+    const popup = (() => {
+      try {
+        return window.open(
+          'about:blank',
+          'leitner_react_preview',
+          `width=${w},height=${h},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
+        );
+      } catch {
+        return null;
+      }
+    })();
+
+    if (!popup) {
+      return;
+    }
+
+    try {
+      popup.document.title = `Preview: ${card.title} — Leitner Coding Trainer`;
+      popup.document.head.innerHTML = '';
+      for (const el of Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))) {
+        popup.document.head.appendChild(el.cloneNode(true));
+      }
+      popup.document.body.style.margin = '0';
+      popup.document.body.style.padding = '12px';
+      popup.document.body.style.backgroundColor = isLight ? '#f8fafc' : '#030712';
+      popup.document.body.style.color = isLight ? '#0f172a' : '#f1f5f9';
+      popup.document.body.style.fontFamily = getComputedStyle(document.body).fontFamily;
+      popup.document.body.style.boxSizing = 'border-box';
+      popup.document.body.style.height = '100vh';
+      popup.document.body.style.display = 'flex';
+      popup.document.body.style.flexDirection = 'column';
+
+      popup.addEventListener('beforeunload', () => {
+        setPopupWindow(null);
+        setIsIframeReady(false);
+        setIframeKey((k) => k + 1);
+      });
+    } catch {
+      // Ignore cross-window document configuration failures
+    }
+
+    setIsIframeReady(false);
+    setIframeKey((k) => k + 1);
+    setPopupWindow(popup);
+  }, [card.title, isLight, popupWindow]);
+
+  const handleDockBack = useCallback(() => {
+    if (popupWindow && !popupWindow.closed) {
+      popupWindow.close();
+    }
+    setPopupWindow(null);
+    setIsIframeReady(false);
+    setIframeKey((k) => k + 1);
+  }, [popupWindow]);
+
+  // Clean up popup window on unmount
+  useEffect(() => {
+    return () => {
+      if (popupWindow && !popupWindow.closed) {
+        popupWindow.close();
+      }
+    };
+  }, [popupWindow]);
+
+  // Heartbeat to detect popup closure via OS close button
+  useEffect(() => {
+    if (!popupWindow) return;
+    const timer = setInterval(() => {
+      if (popupWindow.closed) {
+        setPopupWindow(null);
+        setIsIframeReady(false);
+        setIframeKey((k) => k + 1);
+      }
+    }, 500);
+    return () => clearInterval(timer);
+  }, [popupWindow]);
+
+  const previewPane = (
     <div
       className="react-preview-window"
-      data-testid="react-preview-window"
+      data-testid={isPoppedOut ? 'react-preview-popout-window' : 'react-preview-window'}
       style={{
-        borderRadius: '10px',
-        border: '1px solid rgba(6, 182, 212, 0.35)',
+        borderRadius: isPoppedOut ? '0px' : '10px',
+        border: isPoppedOut ? 'none' : '1px solid rgba(6, 182, 212, 0.35)',
         backgroundColor: isLight ? '#ffffff' : '#030712',
         overflow: 'hidden',
-        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45)',
+        boxShadow: isPoppedOut ? 'none' : '0 8px 30px rgba(0, 0, 0, 0.45)',
         display: 'flex',
         flexDirection: 'column',
-        marginBottom: '14px',
+        marginBottom: isPoppedOut ? '0px' : '14px',
+        flex: isPoppedOut ? 1 : undefined,
+        height: isPoppedOut ? '100%' : undefined,
       }}
     >
       {/* Title Bar */}
@@ -222,7 +325,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Layers size={16} color="#06b6d4" />
           <span style={{ fontSize: '13px', fontWeight: 600, color: isLight ? '#0f172a' : '#f1f5f9' }}>
-            React Preview Window
+            React Preview Window {isPoppedOut ? '(Pop-out)' : ''}
           </span>
 
           {/* Status Badge */}
@@ -334,9 +437,57 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           >
             <RotateCcw size={12} /> Restart
           </button>
+
+          {isPoppedOut ? (
+            <button
+              type="button"
+              onClick={handleDockBack}
+              data-testid="preview-dock-btn"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '11.5px',
+                padding: '3px 8px',
+                borderRadius: '4px',
+              }}
+              title="Dock preview back into main window"
+            >
+              <Minimize2 size={12} /> Dock back
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handlePopOut}
+              data-testid="preview-popout-btn"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '11.5px',
+                padding: '3px 8px',
+                borderRadius: '4px',
+              }}
+              title="Open preview in a pop-out window"
+            >
+              <ExternalLink size={12} /> Pop out
+            </button>
+          )}
+
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => {
+              if (isPoppedOut) handleDockBack();
+              onClose();
+            }}
             style={{
               background: 'none',
               border: 'none',
@@ -379,7 +530,8 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       <div
         style={{
           width: '100%',
-          height: '240px',
+          height: isPoppedOut ? '380px' : '240px',
+          flex: isPoppedOut ? '1 1 auto' : undefined,
           backgroundColor: isLight ? '#f8fafc' : '#030712',
           position: 'relative',
         }}
@@ -408,7 +560,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: '6px',
-          maxHeight: '160px',
+          maxHeight: isPoppedOut ? '220px' : '160px',
         }}
       >
         <div
@@ -428,7 +580,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
               <span
                 style={{
                   fontSize: '10.5px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   padding: '1px 6px',
                   borderRadius: '10px',
                 }}
@@ -462,7 +614,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         <div
           style={{
             overflowY: 'auto',
-            maxHeight: '120px',
+            maxHeight: isPoppedOut ? '180px' : '120px',
             fontSize: '11.5px',
             fontFamily: 'monospace',
             display: 'flex',
@@ -517,4 +669,73 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       </div>
     </div>
   );
+
+  if (isPoppedOut && popupWindow) {
+    return (
+      <>
+        <div
+          className="react-preview-window react-preview-docked"
+          data-testid="react-preview-window"
+          style={{
+            borderRadius: '10px',
+            border: '1px solid rgba(6, 182, 212, 0.35)',
+            backgroundColor: isLight ? '#ffffff' : '#030712',
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '14px',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Layers size={18} color="#06b6d4" />
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: isLight ? '#0f172a' : '#f1f5f9' }}>
+                React Preview Window (Pop-out Active)
+              </div>
+              <div style={{ fontSize: '11.5px', color: 'var(--text-dim)' }}>
+                Preview is running in a separate window. Code edits sync live.
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={handleDockBack}
+              data-testid="preview-main-dock-btn"
+              className="btn btn-secondary"
+              style={{ fontSize: '12px', padding: '6px 12px', gap: '5px' }}
+            >
+              <Minimize2 size={13} /> Dock back
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleDockBack();
+                onClose();
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '3px 6px',
+                borderRadius: '4px',
+              }}
+              title="Close preview"
+              aria-label="Close preview"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        </div>
+        {createPortal(previewPane, popupWindow.document.body)}
+      </>
+    );
+  }
+
+  return previewPane;
 };
