@@ -5421,7 +5421,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "a11y",
       "aria",
@@ -14558,5 +14558,157 @@
       }
     ],
     "testHarness": "const { renderHook, act } = $dom;\nconst calls = [];\n// Controllable fetch: the test answers (or fails) each request.\nfetch = (url) =>\n  new Promise((resolve, reject) => {\n    calls.push({\n      url,\n      respond: (status, body) => resolve({ ok: status >= 200 && status < 300, status, json: async () => body }),\n      fail: (err) => reject(err),\n    });\n  });\nconst answer = (call, status, body) => act(async () => { call.respond(status, body); });\n\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  const s = h.result.current;\n  $test.check('Initial render shows loading and fetches the url once', s.loading === true && s.data === null && s.error === null && calls.length === 1 && calls[0].url === '/api/a', { state: s, fetchCalls: calls.length });\n  h.unmount();\n}\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  await answer(calls[0], 200, { id: 1 });\n  const s = h.result.current;\n  $test.check('Resolves with data on 200', s.loading === false && s.error === null && s.data && s.data.id === 1, s);\n  h.unmount();\n}\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  await answer(calls[0], 404, {});\n  const s = h.result.current;\n  $test.check('A non-2xx status gives an Error that mentions the status', s.loading === false && s.data === null && s.error instanceof Error && /404/.test(s.error.message), s);\n  h.unmount();\n}\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  await act(async () => { calls[0].fail(new Error('offline')); });\n  const s = h.result.current;\n  $test.check('A network failure gives that Error', s.loading === false && s.data === null && s.error instanceof Error && s.error.message === 'offline', s);\n  h.unmount();\n}\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  await answer(calls[0], 200, { id: 1 });\n  h.rerender({ url: '/api/b' });\n  await act(async () => {});\n  const during = h.result.current;\n  const fetchedB = calls.length === 2 && calls[1].url === '/api/b';\n  await answer(calls[1], 200, { id: 2 });\n  const after = h.result.current;\n  $test.check('Changing the url fetches again and shows loading while it runs', fetchedB && during.loading === true && during.data === null && after.loading === false && after.data && after.data.id === 2, { during, after, fetchCalls: calls.length });\n  h.unmount();\n}\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  h.rerender({ url: '/api/a' });\n  await act(async () => {});\n  $test.check('Re-rendering with the same url does not fetch again', calls.length === 1, calls.length);\n  h.unmount();\n}"
+  },
+  {
+    "id": "live-announcer",
+    "track": "react-components",
+    "title": "Screen-Reader Announcer (aria-live)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "aria-live",
+      "context"
+    ],
+    "promptSeed": "Build an announcer for screen readers: AnnouncerProvider({ children }) and the hook useAnnounce(), which returns announce(message, { politeness = 'polite' } = {}).\n\nThe provider renders its children followed by two live regions: <div role=\"status\" aria-live=\"polite\" aria-atomic=\"true\"> and <div role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\">. announce(message) puts the message in the polite region; announce(message, { politeness: 'assertive' }) puts it in the assertive region. Each announcement also empties the other region.\n\nScreen readers only speak text that CHANGES, so announcing the same message twice in a row must still change the region's text: on a repeat, add a trailing non-breaking space ('\\u00a0'), and take it off again on the next repeat ('Saved', 'Saved\\u00a0', 'Saved', ...).\n\nHide both regions visually but keep them available to assistive tech: position: absolute; width: 1px; height: 1px; overflow: hidden (plus clip) are fine, but never display: none, visibility: hidden or the hidden attribute, which would silence them. announce must keep the same function identity across renders (useCallback).",
+    "difficulty": 3,
+    "concept": "a11y-components",
+    "referenceSolution": "const AnnouncerContext = createContext(null);\n\nconst hiddenStyle = {\n  position: 'absolute',\n  width: '1px',\n  height: '1px',\n  margin: '-1px',\n  padding: 0,\n  border: 0,\n  overflow: 'hidden',\n  clip: 'rect(0 0 0 0)',\n  whiteSpace: 'nowrap',\n};\n\nfunction AnnouncerProvider({ children }) {\n  const [polite, setPolite] = useState('');\n  const [assertive, setAssertive] = useState('');\n\n  const announce = useCallback((message, { politeness = 'polite' } = {}) => {\n    // Same message again: toggle a trailing non-breaking space so the text really changes.\n    const next = (prev) => (prev.trim() === message && !prev.endsWith('\\u00a0') ? message + '\\u00a0' : message);\n    if (politeness === 'assertive') {\n      setAssertive(next);\n      setPolite('');\n    } else {\n      setPolite(next);\n      setAssertive('');\n    }\n  }, []);\n\n  return (\n    <AnnouncerContext.Provider value={announce}>\n      {children}\n      <div role=\"status\" aria-live=\"polite\" aria-atomic=\"true\" style={hiddenStyle}>\n        {polite}\n      </div>\n      <div role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\" style={hiddenStyle}>\n        {assertive}\n      </div>\n    </AnnouncerContext.Provider>\n  );\n}\n\nfunction useAnnounce() {\n  return useContext(AnnouncerContext);\n}",
+    "solution": "const AnnouncerContext = createContext(null);\n\nconst hiddenStyle = {\n  position: 'absolute',\n  width: '1px',\n  height: '1px',\n  margin: '-1px',\n  padding: 0,\n  border: 0,\n  overflow: 'hidden',\n  clip: 'rect(0 0 0 0)',\n  whiteSpace: 'nowrap',\n};\n\nfunction AnnouncerProvider({ children }) {\n  const [polite, setPolite] = useState('');\n  const [assertive, setAssertive] = useState('');\n\n  const announce = useCallback((message, { politeness = 'polite' } = {}) => {\n    // Same message again: toggle a trailing non-breaking space so the text really changes.\n    const next = (prev) => (prev.trim() === message && !prev.endsWith('\\u00a0') ? message + '\\u00a0' : message);\n    if (politeness === 'assertive') {\n      setAssertive(next);\n      setPolite('');\n    } else {\n      setPolite(next);\n      setAssertive('');\n    }\n  }, []);\n\n  return (\n    <AnnouncerContext.Provider value={announce}>\n      {children}\n      <div role=\"status\" aria-live=\"polite\" aria-atomic=\"true\" style={hiddenStyle}>\n        {polite}\n      </div>\n      <div role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\" style={hiddenStyle}>\n        {assertive}\n      </div>\n    </AnnouncerContext.Provider>\n  );\n}\n\nfunction useAnnounce() {\n  return useContext(AnnouncerContext);\n}",
+    "starterCode": "const AnnouncerContext = createContext(null);\n\nconst hiddenStyle = {\n  position: 'absolute',\n  width: '1px',\n  height: '1px',\n  margin: '-1px',\n  padding: 0,\n  border: 0,\n  overflow: 'hidden',\n  clip: 'rect(0 0 0 0)',\n  whiteSpace: 'nowrap',\n};\n\nfunction AnnouncerProvider({ children }) {\n  const [polite, setPolite] = useState('');\n  const [assertive, setAssertive] = useState('');\n\n  const announce = useCallback((message, { politeness = 'polite' } = {}) => {\n    // Same message again: toggle a trailing non-breaking space so the text really changes.\n    const next = (prev) => (prev.trim() === message && !prev.endsWith('\\u00a0') ? message + '\\u00a0' : message);\n    if (politeness === 'assertive') {\n      setAssertive(next);\n      setPolite('');\n    } else {\n      setPolite(next);\n      setAssertive('');\n    }\n  }, []);\n\n  return (\n    <AnnouncerContext.Provider value={announce}>\n      {children}\n      <div role=\"status\" aria-live=\"polite\" aria-atomic=\"true\" style={hiddenStyle}>\n        {polite}\n      </div>\n      <div role=\"alert\" aria-live=\"assertive\" aria-atomic=\"true\" style={hiddenStyle}>\n        {assertive}\n      </div>\n    </AnnouncerContext.Provider>\n  );\n}\n\nfunction useAnnounce() {\n  return useContext(AnnouncerContext);\n}",
+    "testCases": [
+      {
+        "description": "Renders a polite status region and an assertive alert region, both atomic",
+        "input": "render <AnnouncerProvider>…</AnnouncerProvider>",
+        "expected": "role=status aria-live=polite aria-atomic=true; role=alert aria-live=assertive aria-atomic=true"
+      },
+      {
+        "description": "announce(message) writes to the polite region",
+        "input": "announce('Saved')",
+        "expected": "polite region text 'Saved'"
+      },
+      {
+        "description": "announce(message, { politeness: 'assertive' }) writes to the alert region and clears the polite one",
+        "input": "announce('Failed', { politeness: 'assertive' })",
+        "expected": "alert region 'Failed'; polite region ''"
+      },
+      {
+        "description": "Announcing the same message twice changes the raw text so it is read again",
+        "input": "announce('Saved') three times in a row",
+        "expected": "'Saved', 'Saved\\u00a0', 'Saved'"
+      },
+      {
+        "description": "The regions are visually hidden but never display:none or hidden",
+        "input": "inspect both regions",
+        "expected": "position absolute, overflow hidden; no display:none, visibility:hidden or hidden attribute"
+      },
+      {
+        "description": "children render, and announce keeps the same identity across renders",
+        "input": "announce twice and re-render",
+        "expected": "children still rendered; announce is the same function every render"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst seen = [];\nfunction Speaker({ message, options }) {\n  const announce = useAnnounce();\n  seen.push(announce);\n  return <button onClick={() => announce(message, options)}>{'say ' + message}</button>;\n}\nconst setup = (message = 'Saved', options) => {\n  seen.length = 0;\n  const r = render(<AnnouncerProvider><p id=\"child\">page</p><Speaker message={message} options={options} /></AnnouncerProvider>);\n  return { r, polite: () => q('[role=\"status\"]', r.container), alert: () => q('[role=\"alert\"]', r.container), button: () => q('button', r.container) };\n};\n{\n  const { r, polite, alert } = setup();\n  const p = polite();\n  const a = alert();\n  $test.check('Renders a polite status region and an assertive alert region, both atomic', !!p && !!a && p.getAttribute('aria-live') === 'polite' && p.getAttribute('aria-atomic') === 'true' && a.getAttribute('aria-live') === 'assertive' && a.getAttribute('aria-atomic') === 'true', [p && p.outerHTML, a && a.outerHTML]);\n  r.unmount();\n}\n{\n  const { r, polite, alert, button } = setup('Saved');\n  fire.click(button());\n  $test.check('announce(message) writes to the polite region', polite().textContent === 'Saved' && alert().textContent === '', { polite: polite().textContent, alert: alert().textContent });\n  r.unmount();\n}\n{\n  const { r, polite, alert, button } = setup('Failed', { politeness: 'assertive' });\n  fire.click(button());\n  $test.check(\"announce(message, { politeness: 'assertive' }) writes to the alert region and clears the polite one\", alert().textContent === 'Failed' && polite().textContent === '', { polite: polite().textContent, alert: alert().textContent });\n  r.unmount();\n}\n{\n  const { r, polite, button } = setup('Saved');\n  fire.click(button());\n  const first = polite().textContent;\n  fire.click(button());\n  const second = polite().textContent;\n  fire.click(button());\n  const third = polite().textContent;\n  $test.check('Announcing the same message twice changes the raw text so it is read again', first === 'Saved' && second !== first && second.trim() === 'Saved' && third !== second && third.trim() === 'Saved', [first, second, third].map((t) => JSON.stringify(t)));\n  r.unmount();\n}\n{\n  const { r, polite, alert } = setup();\n  const bad = (el) => {\n    const s = el.style;\n    return el.hidden || s.display === 'none' || s.visibility === 'hidden' || el.getAttribute('hidden') !== null;\n  };\n  const p = polite();\n  const a = alert();\n  $test.check('The regions are visually hidden but never display:none or hidden', !bad(p) && !bad(a) && p.style.position === 'absolute' && a.style.position === 'absolute' && p.style.overflow === 'hidden' && a.style.overflow === 'hidden', [p.getAttribute('style'), a.getAttribute('style')]);\n  r.unmount();\n}\n{\n  seen.length = 0;\n  function App() {\n    const [n, setN] = useState(0);\n    return (\n      <AnnouncerProvider>\n        <p id=\"child\">page</p>\n        <Speaker message=\"Saved\" options={{ n }} />\n        <button id=\"bump\" onClick={() => setN(n + 1)}>bump</button>\n      </AnnouncerProvider>\n    );\n  }\n  const r = render(<App />);\n  const speak = () => qa('button', r.container).find((b) => b.textContent === 'say Saved');\n  fire.click(speak());\n  fire.click(q('#bump', r.container));\n  fire.click(speak());\n  fire.click(q('#bump', r.container));\n  $test.check('children render, and announce keeps the same identity across renders', !!q('#child', r.container) && seen.length >= 3 && seen.every((fn) => fn === seen[0]) && typeof seen[0] === 'function', { renders: seen.length });\n  r.unmount();\n}"
+  },
+  {
+    "id": "roving-tabindex-toolbar",
+    "track": "react-components",
+    "title": "Toolbar with Roving tabindex",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "keyboard",
+      "focus-management"
+    ],
+    "promptSeed": "Build Toolbar({ label, items }) where items is [{ id, label }]. Render <div role=\"toolbar\" aria-label={label} aria-orientation=\"horizontal\"> containing one <button type=\"button\"> per item showing its label.\n\nIt uses a roving tabindex: only ONE button is in the page's Tab order at a time. The active button has tabIndex={0} and all the others tabIndex={-1}. The first button is active at the start. Tab therefore enters the toolbar on the active button and leaves it on the next Tab press.\n\nArrowRight / ArrowLeft move focus to the next / previous button and make it the active one, wrapping around at the ends. Home and End jump to the first and last button (call preventDefault on the keys you handle). Clicking a button, or focusing it any other way, makes it the active one.",
+    "difficulty": 3,
+    "concept": "a11y-components",
+    "referenceSolution": "function Toolbar({ label, items }) {\n  const [active, setActive] = useState(0);\n  const refs = useRef([]);\n\n  const move = (index) => {\n    setActive(index);\n    const el = refs.current[index];\n    if (el) el.focus();\n  };\n\n  const onKeyDown = (event, index) => {\n    const last = items.length - 1;\n    if (event.key === 'ArrowRight') {\n      event.preventDefault();\n      move(index === last ? 0 : index + 1);\n    } else if (event.key === 'ArrowLeft') {\n      event.preventDefault();\n      move(index === 0 ? last : index - 1);\n    } else if (event.key === 'Home') {\n      event.preventDefault();\n      move(0);\n    } else if (event.key === 'End') {\n      event.preventDefault();\n      move(last);\n    }\n  };\n\n  return (\n    <div role=\"toolbar\" aria-label={label} aria-orientation=\"horizontal\">\n      {items.map((item, i) => (\n        <button\n          key={item.id}\n          type=\"button\"\n          ref={(el) => {\n            refs.current[i] = el;\n          }}\n          tabIndex={i === active ? 0 : -1}\n          onFocus={() => setActive(i)}\n          onClick={() => setActive(i)}\n          onKeyDown={(event) => onKeyDown(event, i)}\n        >\n          {item.label}\n        </button>\n      ))}\n    </div>\n  );\n}",
+    "solution": "function Toolbar({ label, items }) {\n  const [active, setActive] = useState(0);\n  const refs = useRef([]);\n\n  const move = (index) => {\n    setActive(index);\n    const el = refs.current[index];\n    if (el) el.focus();\n  };\n\n  const onKeyDown = (event, index) => {\n    const last = items.length - 1;\n    if (event.key === 'ArrowRight') {\n      event.preventDefault();\n      move(index === last ? 0 : index + 1);\n    } else if (event.key === 'ArrowLeft') {\n      event.preventDefault();\n      move(index === 0 ? last : index - 1);\n    } else if (event.key === 'Home') {\n      event.preventDefault();\n      move(0);\n    } else if (event.key === 'End') {\n      event.preventDefault();\n      move(last);\n    }\n  };\n\n  return (\n    <div role=\"toolbar\" aria-label={label} aria-orientation=\"horizontal\">\n      {items.map((item, i) => (\n        <button\n          key={item.id}\n          type=\"button\"\n          ref={(el) => {\n            refs.current[i] = el;\n          }}\n          tabIndex={i === active ? 0 : -1}\n          onFocus={() => setActive(i)}\n          onClick={() => setActive(i)}\n          onKeyDown={(event) => onKeyDown(event, i)}\n        >\n          {item.label}\n        </button>\n      ))}\n    </div>\n  );\n}",
+    "starterCode": "function Toolbar({ label, items }) {\n  const [active, setActive] = useState(0);\n  const refs = useRef([]);\n\n  const move = (index) => {\n    setActive(index);\n    const el = refs.current[index];\n    if (el) el.focus();\n  };\n\n  const onKeyDown = (event, index) => {\n    const last = items.length - 1;\n    if (event.key === 'ArrowRight') {\n      event.preventDefault();\n      move(index === last ? 0 : index + 1);\n    } else if (event.key === 'ArrowLeft') {\n      event.preventDefault();\n      move(index === 0 ? last : index - 1);\n    } else if (event.key === 'Home') {\n      event.preventDefault();\n      move(0);\n    } else if (event.key === 'End') {\n      event.preventDefault();\n      move(last);\n    }\n  };\n\n  return (\n    <div role=\"toolbar\" aria-label={label} aria-orientation=\"horizontal\">\n      {items.map((item, i) => (\n        <button\n          key={item.id}\n          type=\"button\"\n          ref={(el) => {\n            refs.current[i] = el;\n          }}\n          tabIndex={i === active ? 0 : -1}\n          onFocus={() => setActive(i)}\n          onClick={() => setActive(i)}\n          onKeyDown={(event) => onKeyDown(event, i)}\n        >\n          {item.label}\n        </button>\n      ))}\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "The container is a toolbar with an accessible label",
+        "input": "render <Toolbar label=\"Text formatting\" items={4 items}>",
+        "expected": "role=toolbar aria-label='Text formatting' with 4 buttons"
+      },
+      {
+        "description": "Only the active button is in the tab order: tabIndex 0 for the first by default, -1 for the others",
+        "input": "initial render",
+        "expected": "tabIndex values 0,-1,-1,-1"
+      },
+      {
+        "description": "ArrowRight and ArrowLeft move focus and the tab stop to the next and previous button",
+        "input": "focus Bold; ArrowRight; then ArrowRight, ArrowLeft",
+        "expected": "focus on Italic; tabIndex values -1,0,-1,-1"
+      },
+      {
+        "description": "Arrow keys wrap around at both ends",
+        "input": "focus Bold; ArrowLeft; then ArrowRight",
+        "expected": "focus wraps to Link (…,0), then back to Bold (0,…)"
+      },
+      {
+        "description": "Home and End jump to the first and last button",
+        "input": "focus Italic; End; Home",
+        "expected": "focus on Link (-1,-1,-1,0), then Bold (0,-1,-1,-1)"
+      },
+      {
+        "description": "Clicking or focusing a button makes it the tab stop",
+        "input": "click Underline; focus Link",
+        "expected": "tabIndex values -1,-1,0,-1 then -1,-1,-1,0"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst ITEMS = [{ id: 'b', label: 'Bold' }, { id: 'i', label: 'Italic' }, { id: 'u', label: 'Underline' }, { id: 'l', label: 'Link' }];\nconst setup = () => render(<Toolbar label=\"Text formatting\" items={ITEMS} />);\nconst buttons = (r) => qa('button', r.container);\nconst stops = (r) => buttons(r).map((b) => b.tabIndex).join();\nconst focused = () => (document.activeElement ? document.activeElement.textContent : null);\nconst key = (k) => fire.keyDown(document.activeElement, k);\n{\n  const r = setup();\n  const t = q('[role=\"toolbar\"]', r.container);\n  $test.check('The container is a toolbar with an accessible label', !!t && t.getAttribute('aria-label') === 'Text formatting' && buttons(r).length === 4, t && t.outerHTML);\n  r.unmount();\n}\n{\n  const r = setup();\n  $test.check('Only the active button is in the tab order: tabIndex 0 for the first by default, -1 for the others', stops(r) === '0,-1,-1,-1', stops(r));\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.focus(buttons(r)[0]);\n  key('ArrowRight');\n  const afterRight = [focused(), stops(r)];\n  key('ArrowRight');\n  key('ArrowLeft');\n  const afterLeft = [focused(), stops(r)];\n  $test.check('ArrowRight and ArrowLeft move focus and the tab stop to the next and previous button', afterRight.join('|') === 'Italic|-1,0,-1,-1' && afterLeft.join('|') === 'Italic|-1,0,-1,-1', { afterRight, afterLeft });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.focus(buttons(r)[0]);\n  key('ArrowLeft');\n  const wrappedBack = [focused(), stops(r)];\n  key('ArrowRight');\n  const wrappedForward = [focused(), stops(r)];\n  $test.check('Arrow keys wrap around at both ends', wrappedBack.join('|') === 'Link|-1,-1,-1,0' && wrappedForward.join('|') === 'Bold|0,-1,-1,-1', { wrappedBack, wrappedForward });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.focus(buttons(r)[1]);\n  key('End');\n  const end = [focused(), stops(r)];\n  key('Home');\n  const home = [focused(), stops(r)];\n  $test.check('Home and End jump to the first and last button', end.join('|') === 'Link|-1,-1,-1,0' && home.join('|') === 'Bold|0,-1,-1,-1', { end, home });\n  r.unmount();\n}\n{\n  const r = setup();\n  fire.click(buttons(r)[2]);\n  const afterClick = stops(r);\n  fire.focus(buttons(r)[3]);\n  const afterFocus = stops(r);\n  $test.check('Clicking or focusing a button makes it the tab stop', afterClick === '-1,-1,0,-1' && afterFocus === '-1,-1,-1,0', { afterClick, afterFocus });\n  r.unmount();\n}"
+  },
+  {
+    "id": "switch-toggle-a11y",
+    "track": "react-components",
+    "title": "Accessible Switch (role=switch)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "a11y",
+      "aria",
+      "keyboard"
+    ],
+    "promptSeed": "Build Switch({ checked, onChange, disabled = false, children }), a controlled on/off switch such as \"Wi-Fi: on/off\".\n\nRender a real <button type=\"button\"> (so Space and Enter work and it never submits a form) with role=\"switch\" and aria-checked set to the string \"true\" or \"false\" to match the checked prop. The children are the visible label and become the accessible name. Clicking it calls onChange with the opposite value (onChange(!checked)). When disabled is true the button is disabled and clicking does nothing.",
+    "difficulty": 1,
+    "concept": "a11y-components",
+    "referenceSolution": "function Switch({ checked, onChange, disabled = false, children }) {\n  return (\n    <button\n      type=\"button\"\n      role=\"switch\"\n      aria-checked={checked ? 'true' : 'false'}\n      disabled={disabled}\n      onClick={() => onChange(!checked)}\n    >\n      {children}\n    </button>\n  );\n}",
+    "solution": "function Switch({ checked, onChange, disabled = false, children }) {\n  return (\n    <button\n      type=\"button\"\n      role=\"switch\"\n      aria-checked={checked ? 'true' : 'false'}\n      disabled={disabled}\n      onClick={() => onChange(!checked)}\n    >\n      {children}\n    </button>\n  );\n}",
+    "starterCode": "function Switch({ checked, onChange, disabled = false, children }) {\n  return (\n    <button\n      type=\"button\"\n      role=\"switch\"\n      aria-checked={checked ? 'true' : 'false'}\n      disabled={disabled}\n      onClick={() => onChange(!checked)}\n    >\n      {children}\n    </button>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders a <button type=\"button\"> with role=\"switch\" and the label as its content",
+        "input": "render <Switch checked={false}>Wi-Fi</Switch>",
+        "expected": "<button type=\"button\" role=\"switch\">Wi-Fi</button>"
+      },
+      {
+        "description": "aria-checked mirrors the checked prop as the strings \"true\" and \"false\"",
+        "input": "checked={false} and checked={true}",
+        "expected": "aria-checked=\"false\" and aria-checked=\"true\""
+      },
+      {
+        "description": "Clicking calls onChange with the opposite value",
+        "input": "click when checked={false}; click when checked={true}",
+        "expected": "onChange(true); onChange(false)"
+      },
+      {
+        "description": "A disabled switch is disabled and ignores clicks",
+        "input": "disabled, then click",
+        "expected": "button disabled; onChange not called"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst setup = (props = {}) => {\n  const calls = [];\n  const r = render(<Switch checked={false} onChange={(v) => calls.push(v)} {...props}>Wi-Fi</Switch>);\n  return { r, calls, el: q('[role=\"switch\"]', r.container) };\n};\n{\n  const { r, el } = setup();\n  $test.check('Renders a <button type=\"button\"> with role=\"switch\" and the label as its content', !!el && el.tagName === 'BUTTON' && el.getAttribute('type') === 'button' && el.textContent === 'Wi-Fi', el && el.outerHTML);\n  r.unmount();\n}\n{\n  const off = setup({ checked: false });\n  const on = setup({ checked: true });\n  $test.check('aria-checked mirrors the checked prop as the strings \"true\" and \"false\"', off.el.getAttribute('aria-checked') === 'false' && on.el.getAttribute('aria-checked') === 'true', [off.el.getAttribute('aria-checked'), on.el.getAttribute('aria-checked')]);\n  off.r.unmount();\n  on.r.unmount();\n}\n{\n  const off = setup({ checked: false });\n  const on = setup({ checked: true });\n  fire.click(off.el);\n  fire.click(on.el);\n  $test.check('Clicking calls onChange with the opposite value', off.calls.join() === 'true' && on.calls.join() === 'false', { off: off.calls, on: on.calls });\n  off.r.unmount();\n  on.r.unmount();\n}\n{\n  const { r, el, calls } = setup({ disabled: true });\n  fire.click(el);\n  $test.check('A disabled switch is disabled and ignores clicks', el.disabled === true && calls.length === 0, { disabled: el.disabled, calls });\n  r.unmount();\n}"
   }
 ]

@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Toolbar with Roving tabindex",
+  "tags": [
+    "component",
+    "a11y",
+    "keyboard",
+    "focus-management"
+  ]
+}

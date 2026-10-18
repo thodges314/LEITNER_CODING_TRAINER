@@ -1,0 +1,7 @@
+Build an announcer for screen readers: AnnouncerProvider({ children }) and the hook useAnnounce(), which returns announce(message, { politeness = 'polite' } = {}).
+
+The provider renders its children followed by two live regions: <div role="status" aria-live="polite" aria-atomic="true"> and <div role="alert" aria-live="assertive" aria-atomic="true">. announce(message) puts the message in the polite region; announce(message, { politeness: 'assertive' }) puts it in the assertive region. Each announcement also empties the other region.
+
+Screen readers only speak text that CHANGES, so announcing the same message twice in a row must still change the region's text: on a repeat, add a trailing non-breaking space ('\u00a0'), and take it off again on the next repeat ('Saved', 'Saved\u00a0', 'Saved', ...).
+
+Hide both regions visually but keep them available to assistive tech: position: absolute; width: 1px; height: 1px; overflow: hidden (plus clip) are fine, but never display: none, visibility: hidden or the hidden attribute, which would silence them. announce must keep the same function identity across renders (useCallback).

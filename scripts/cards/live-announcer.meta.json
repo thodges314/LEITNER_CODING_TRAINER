@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Screen-Reader Announcer (aria-live)",
+  "tags": [
+    "component",
+    "a11y",
+    "aria-live",
+    "context"
+  ]
+}

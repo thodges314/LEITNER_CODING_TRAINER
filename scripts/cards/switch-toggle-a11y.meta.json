@@ -1,0 +1,10 @@
+{
+  "track": "react-components",
+  "title": "Accessible Switch (role=switch)",
+  "tags": [
+    "component",
+    "a11y",
+    "aria",
+    "keyboard"
+  ]
+}

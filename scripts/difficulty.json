@@ -990,5 +990,17 @@
   "use-fetch-basic": {
     "difficulty": 2,
     "concept": "react-fetch"
+  },
+  "switch-toggle-a11y": {
+    "difficulty": 1,
+    "concept": "a11y-components"
+  },
+  "live-announcer": {
+    "difficulty": 3,
+    "concept": "a11y-components"
+  },
+  "roving-tabindex-toolbar": {
+    "difficulty": 3,
+    "concept": "a11y-components"
   }
 }

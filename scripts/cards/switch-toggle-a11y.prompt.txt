@@ -1,0 +1,3 @@
+Build Switch({ checked, onChange, disabled = false, children }), a controlled on/off switch such as "Wi-Fi: on/off".
+
+Render a real <button type="button"> (so Space and Enter work and it never submits a form) with role="switch" and aria-checked set to the string "true" or "false" to match the checked prop. The children are the visible label and become the accessible name. Clicking it calls onChange with the opposite value (onChange(!checked)). When disabled is true the button is disabled and clicking does nothing.

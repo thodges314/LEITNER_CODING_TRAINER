@@ -1,0 +1,5 @@
+Build Toolbar({ label, items }) where items is [{ id, label }]. Render <div role="toolbar" aria-label={label} aria-orientation="horizontal"> containing one <button type="button"> per item showing its label.
+
+It uses a roving tabindex: only ONE button is in the page's Tab order at a time. The active button has tabIndex={0} and all the others tabIndex={-1}. The first button is active at the start. Tab therefore enters the toolbar on the active button and leaves it on the next Tab press.
+
+ArrowRight / ArrowLeft move focus to the next / previous button and make it the active one, wrapping around at the ends. Home and End jump to the first and last button (call preventDefault on the keys you handle). Clicking a button, or focusing it any other way, makes it the active one.
