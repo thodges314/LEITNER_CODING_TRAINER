@@ -325,7 +325,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Layers size={16} color="#06b6d4" />
           <span style={{ fontSize: '13px', fontWeight: 600, color: isLight ? '#0f172a' : '#f1f5f9' }}>
-            React Preview Window {isPoppedOut ? '(Pop-out)' : ''}
+            Live React Preview Window {isPoppedOut ? '(Pop-out)' : ''}
           </span>
 
           {/* Status Badge */}
@@ -376,7 +376,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
                 border: '1px solid rgba(52, 211, 153, 0.35)',
               }}
             >
-              <CheckCircle2 size={11} color="#10b981" /> Rendered
+              <CheckCircle2 size={11} color="#10b981" /> Live
             </span>
           )}
           {status === 'error' && (
@@ -692,7 +692,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             <Layers size={18} color="#06b6d4" />
             <div>
               <div style={{ fontSize: '13px', fontWeight: 600, color: isLight ? '#0f172a' : '#f1f5f9' }}>
-                React Preview Window (Pop-out Active)
+                Live React Preview Window (Pop-out Active)
               </div>
               <div style={{ fontSize: '11.5px', color: 'var(--text-dim)' }}>
                 Preview is running in a separate window. Code edits sync live.

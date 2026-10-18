@@ -119,12 +119,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     key: number;
   } | null>(null);
 
-  // Opt-in React preview window state (closed by default, remembers preference)
+  // React preview window state (open by default, remembers preference if explicitly toggled)
   const [isPreviewOpen, setIsPreviewOpen] = useState(() => {
     try {
-      return localStorage.getItem('leitner_preview_open') === 'true';
+      const saved = localStorage.getItem('leitner_preview_open');
+      return saved !== null ? saved === 'true' : true;
     } catch {
-      return false;
+      return true;
     }
   });
 
@@ -303,9 +304,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setActivePopover(null);
     const savedPreview = (() => {
       try {
-        return localStorage.getItem('leitner_preview_open') === 'true';
+        const saved = localStorage.getItem('leitner_preview_open');
+        return saved !== null ? saved === 'true' : true;
       } catch {
-        return false;
+        return true;
       }
     })();
     setIsPreviewOpen(savedPreview);
@@ -2576,7 +2578,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                           boxShadow: '0 0 6px #10b981',
                         }}
                       />
-                      Mounted
+                      Live Mounted
                     </span>
                   ) : (
                     <span
@@ -2694,7 +2696,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   >
                     <Layers size={24} color="#06b6d4" />
                     <div style={{ fontSize: '13px', fontWeight: 600, color: '#f1f5f9' }}>
-                      Component Preview (Pop-out Active)
+                      Live Component Preview (Pop-out Active)
                     </div>
                     <div style={{ fontSize: '11.5px', maxWidth: '300px', lineHeight: 1.5 }}>
                       Component preview is currently rendering in an external window.
@@ -2723,7 +2725,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                           }}
                         >
                           <span style={{ fontSize: '12.5px', fontWeight: 600, color: theme === 'apple-gsos' ? '#0f172a' : '#f1f5f9' }}>
-                            Component Preview / Hook Test (Pop-out)
+                            Live Component Preview / Hook Test (Pop-out)
                           </span>
                           <button
                             type="button"

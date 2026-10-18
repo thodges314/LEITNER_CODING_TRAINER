@@ -54,7 +54,7 @@ test.describe('React preview window', () => {
     await expect(page.locator('[data-testid="react-preview-window"]')).toHaveCount(0);
   });
 
-  test('switch-toggle-a11y: toggles preview, mounts in sandboxed iframe, and logs click events', async ({ page }) => {
+  test('switch-toggle-a11y: open by default, can be hidden and reopened via toggle button', async ({ page }) => {
     const card = topics.find((t) => t.id === 'switch-toggle-a11y');
     expect(card).toBeDefined();
     const solution = card?.referenceSolution || card?.solution || '';
@@ -63,15 +63,9 @@ test.describe('React preview window', () => {
 
     const toggleBtn = page.locator('#preview-toggle-btn');
     await expect(toggleBtn).toBeVisible();
-    await expect(toggleBtn).toContainText('Preview');
-
-    // Closed by default
-    await expect(page.locator('[data-testid="react-preview-window"]')).toHaveCount(0);
-
-    // Click toggle to open preview
-    await toggleBtn.click();
     await expect(toggleBtn).toContainText('Hide Preview');
 
+    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
 
@@ -94,6 +88,11 @@ test.describe('React preview window', () => {
     // Close preview via toggle button
     await toggleBtn.click();
     await expect(page.locator('[data-testid="react-preview-window"]')).toHaveCount(0);
+    await expect(toggleBtn).toContainText('Preview');
+
+    // Reopen preview via toggle button
+    await toggleBtn.click();
+    await expect(page.locator('[data-testid="react-preview-window"]')).toBeVisible();
   });
 
   test('star-rating-component: mounts in sandboxed iframe and logs rating change on interaction', async ({ page }) => {
@@ -103,10 +102,7 @@ test.describe('React preview window', () => {
 
     await openCard(page, 'star-rating-component', solution);
 
-    const toggleBtn = page.locator('#preview-toggle-btn');
-    await expect(toggleBtn).toBeVisible();
-    await toggleBtn.click();
-
+    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
 
@@ -132,10 +128,7 @@ test.describe('React preview window', () => {
     }`;
     await openCard(page, 'switch-toggle-a11y', badCode);
 
-    const toggleBtn = page.locator('#preview-toggle-btn');
-    await expect(toggleBtn).toBeVisible();
-    await toggleBtn.click();
-
+    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
 
@@ -157,10 +150,7 @@ test.describe('React preview window', () => {
 
     await openCard(page, 'switch-toggle-a11y', solution);
 
-    const toggleBtn = page.locator('#preview-toggle-btn');
-    await expect(toggleBtn).toBeVisible();
-    await toggleBtn.click();
-
+    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
 
@@ -204,10 +194,7 @@ test.describe('React preview window', () => {
 
     await openCard(page, 'progress-bar', solution);
 
-    const toggleBtn = page.locator('#preview-toggle-btn');
-    await expect(toggleBtn).toBeVisible();
-    await toggleBtn.click();
-
+    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
 
