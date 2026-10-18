@@ -35,7 +35,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 
 ## Keep for the owner / a reasoning-heavy session
 - **Difficulty audit**: judging whether a card's 1-5 label is right (needs to read prompt + reference; propose changes, owner approves).
-- **Track / concept consolidation [owner decision]**: 29 concepts span several tracks; the Focus modal filters by track. Needs a proposed mapping before any code.
+- **Track / concept consolidation**: done (9 tracks, one track per concept; see roadmap §2 and `src/lib/tracks.test.ts`). New cards must go into one of the 9 tracks and reuse the concept already living there.
 - **Reviewing delegated work**: read each branch diff against the rules above (case quality, "can a correct solution behave differently here?", harness assumptions), then merge.
 - **Scheduler / unlock design changes**, and anything that changes how existing users' saved decks are interpreted (`mergeStoredWithSeed`, backup format).
 
