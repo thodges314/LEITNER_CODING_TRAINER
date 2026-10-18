@@ -1,1 +1,0 @@
-Write useInfiniteScroll(onLoadMore) returning a ref to attach to a bottom sentinel element. It creates an IntersectionObserver that observes the sentinel and calls the latest onLoadMore whenever the sentinel is intersecting, and disconnects the observer on unmount.

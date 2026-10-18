@@ -17,7 +17,6 @@ const NOW_VERIFIED = new Set([
   'deep-equal',
   'unique-sort-dedupe',
   'express-middleware-chain',
-  'interval-merge-sliding-window',
 ]);
 
 /** All hand-written cases keyed by card id. */

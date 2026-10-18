@@ -141,16 +141,6 @@ export default {
     c('DFS (pre-order) visits depth first', "tree: root → [A → [A1, A2], B]\ndfs(root)", "['root', 'A', 'A1', 'A2', 'B']", { v: false, note: 'reference solution only implements getElementsByClassName' }),
     c('BFS visits level by level', "tree: root → [A → [A1, A2], B]\nbfs(root)", "['root', 'A', 'B', 'A1', 'A2']", { v: false }),
   ],
-  'interval-merge-sliding-window': [
-    c('Touching intervals merge', 'mergeIntervals([[1, 4], [4, 5]])', '[[1, 5]]'),
-    c('Unsorted input', 'mergeIntervals([[8, 10], [1, 3], [2, 6]])', '[[1, 6], [8, 10]]'),
-    c('Disjoint intervals stay separate', 'mergeIntervals([[1, 2], [3, 4]])', '[[1, 2], [3, 4]]'),
-    c('Contained interval', 'mergeIntervals([[1, 4], [2, 3]])', '[[1, 4]]'),
-    c('Empty input', 'mergeIntervals([])', '[]'),
-    c('Longest substring without repeating characters', "lengthOfLongestSubstring('abcabcbb')", '3', { v: false, note: 'reference solution has no lengthOfLongestSubstring' }),
-    c('…all identical', "lengthOfLongestSubstring('bbbbb')", '1', { v: false }),
-    c('…repeat inside the window', "lengthOfLongestSubstring('pwwkew')", '3', { v: false }),
-  ],
   'ts-discriminated-unions-exhaustiveness': [
     c('idle', "formatState({ status: 'idle' })", "'Idle'"),
     c('loading', "formatState({ status: 'loading' })", "'Loading...'"),

@@ -1,1 +1,0 @@
-Write getExecutionOrder() that returns a Promise resolving to an array of labels in the order the callbacks actually run. Schedule, in this order: setTimeout(..., 0) pushing 'timeout'; Promise.resolve().then(...) pushing 'promise'; queueMicrotask(...) pushing 'microtask'; then push 'sync' synchronously. Resolve once the timeout has fired.

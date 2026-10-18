@@ -262,49 +262,6 @@
     "concept": "rate-limiting"
   },
   {
-    "id": "event-loop-microtasks",
-    "track": "async-js",
-    "title": "Event Loop & Task Scheduling Trace",
-    "box": 1,
-    "streak": 0,
-    "nextEligibleTrial": 0,
-    "status": "locked",
-    "tags": [
-      "event-loop",
-      "microtasks",
-      "macrotasks"
-    ],
-    "promptSeed": "Write getExecutionOrder() that returns a Promise resolving to an array of labels in the order the callbacks actually run. Schedule, in this order: setTimeout(..., 0) pushing 'timeout'; Promise.resolve().then(...) pushing 'promise'; queueMicrotask(...) pushing 'microtask'; then push 'sync' synchronously. Resolve once the timeout has fired.",
-    "starterCode": "function getExecutionOrder() {\n  const order = [];\n  return new Promise((resolve) => {\n    setTimeout(() => {\n      order.push('timeout');\n      resolve(order);\n    }, 0);\n    Promise.resolve().then(() => order.push('promise'));\n    queueMicrotask(() => order.push('microtask'));\n    order.push('sync');\n  });\n}",
-    "testHarness": "await $test.run(\"Order of sync code, promise.then, queueMicrotask and setTimeout(0)\", async () => {\n  const sleep = $test.sleep;\n  return (await getExecutionOrder());\n}, () => (['sync', 'promise', 'microtask', 'timeout']));\n\nawait $test.run(\"Each label appears exactly once\", async () => {\n  const sleep = $test.sleep;\n  return ((await getExecutionOrder()).slice().sort());\n}, () => (['microtask', 'promise', 'sync', 'timeout']));\n\nawait $test.run(\"Every call returns a fresh array\", async () => {\n  const sleep = $test.sleep;\n  const a = await getExecutionOrder();\n  const b = await getExecutionOrder();\n  return (a !== b);\n}, () => (true));\n\nawait $test.run(\"The result has four entries and the timeout callback is last\", async () => {\n  const sleep = $test.sleep;\n  const o = await getExecutionOrder();\n  return ([o.length, o[3]]);\n}, () => ([4, 'timeout']));",
-    "solution": "function getExecutionOrder() {\n  const order = [];\n  return new Promise((resolve) => {\n    setTimeout(() => {\n      order.push('timeout');\n      resolve(order);\n    }, 0);\n    Promise.resolve().then(() => order.push('promise'));\n    queueMicrotask(() => order.push('microtask'));\n    order.push('sync');\n  });\n}",
-    "referenceSolution": "function getExecutionOrder() {\n  const order = [];\n  return new Promise((resolve) => {\n    setTimeout(() => {\n      order.push('timeout');\n      resolve(order);\n    }, 0);\n    Promise.resolve().then(() => order.push('promise'));\n    queueMicrotask(() => order.push('microtask'));\n    order.push('sync');\n  });\n}",
-    "testCases": [
-      {
-        "description": "Order of sync code, promise.then, queueMicrotask and setTimeout(0)",
-        "input": "await getExecutionOrder()",
-        "expected": "['sync', 'promise', 'microtask', 'timeout']"
-      },
-      {
-        "description": "Each label appears exactly once",
-        "input": "(await getExecutionOrder()).slice().sort()",
-        "expected": "['microtask', 'promise', 'sync', 'timeout']"
-      },
-      {
-        "description": "Every call returns a fresh array",
-        "input": "const a = await getExecutionOrder();\nconst b = await getExecutionOrder();\na !== b",
-        "expected": "true"
-      },
-      {
-        "description": "The result has four entries and the timeout callback is last",
-        "input": "const o = await getExecutionOrder();\n[o.length, o[3]]",
-        "expected": "[4, 'timeout']"
-      }
-    ],
-    "difficulty": 3,
-    "concept": "event-loop"
-  },
-  {
     "id": "map-frequency-counter",
     "track": "js-utilities",
     "title": "Frequency Counter via Native Map",
@@ -614,149 +571,6 @@
     "complexityExplanation": "Hash map lookups with doubly linked list updates yield O(1) ops."
   },
   {
-    "id": "currying-function",
-    "track": "js-utilities",
-    "title": "Function Currying",
-    "box": 1,
-    "streak": 0,
-    "nextEligibleTrial": 0,
-    "status": "active",
-    "tags": [
-      "currying",
-      "closures"
-    ],
-    "promptSeed": "Implement curry(fn) returning a function that collects arguments across calls, in any grouping (f(1)(2)(3), f(1, 2)(3), f(1)(2, 3) and f(1, 2, 3) all work), and calls fn once at least fn.length arguments have been supplied, returning fn's result.",
-    "starterCode": "function curry(fn) {\n  return function curried(...args) {\n    if (args.length >= fn.length) return fn.apply(this, args);\n    return (...next) => curried.apply(this, [...args, ...next]);\n  };\n}",
-    "testHarness": "await $test.run(\"One argument at a time\", async () => {\n  const sleep = $test.sleep;\n  const mult = (a, b, c) => a * b * c;\n  return (curry(mult)(2)(3)(4));\n}, () => (24));\n\nawait $test.run(\"Arguments may be grouped any way\", async () => {\n  const sleep = $test.sleep;\n  const mult = (a, b, c) => a * b * c;\n  const f = curry(mult);\n  return ([f(2, 3)(4), f(2)(3, 4), f(2, 3, 4)]);\n}, () => ([24, 24, 24]));\n\nawait $test.run(\"Two-argument function\", async () => {\n  const sleep = $test.sleep;\n  return (curry((a, b) => a + b)(1)(2));\n}, () => (3));\n\nawait $test.run(\"The original `this` is preserved across the curried calls\", async () => {\n  const sleep = $test.sleep;\n  const obj = { k: 10, add: curry(function (a, b) { return this.k + a + b; }) };\n  return (obj.add(1)(2));\n}, () => (13));\n\nawait $test.run(\"A partially applied function can be reused without interfering with itself\", async () => {\n  const sleep = $test.sleep;\n  const add3 = curry((a, b, c) => a + b + c);\n  const add1 = add3(1);\n  return ([add1(2)(3), add1(10)(20)]);\n}, () => ([6, 31]));",
-    "solution": "function curry(fn) {\n  return function curried(...args) {\n    if (args.length >= fn.length) return fn.apply(this, args);\n    return (...next) => curried.apply(this, [...args, ...next]);\n  };\n}",
-    "referenceSolution": "function curry(fn) {\n  return function curried(...args) {\n    if (args.length >= fn.length) return fn.apply(this, args);\n    return (...next) => curried.apply(this, [...args, ...next]);\n  };\n}",
-    "testCases": [
-      {
-        "description": "One argument at a time",
-        "input": "const mult = (a, b, c) => a * b * c;\ncurry(mult)(2)(3)(4)",
-        "expected": "24"
-      },
-      {
-        "description": "Arguments may be grouped any way",
-        "input": "const mult = (a, b, c) => a * b * c;\nconst f = curry(mult);\n[f(2, 3)(4), f(2)(3, 4), f(2, 3, 4)]",
-        "expected": "[24, 24, 24]"
-      },
-      {
-        "description": "Two-argument function",
-        "input": "curry((a, b) => a + b)(1)(2)",
-        "expected": "3"
-      },
-      {
-        "description": "The original `this` is preserved across the curried calls",
-        "input": "const obj = { k: 10, add: curry(function (a, b) { return this.k + a + b; }) };\nobj.add(1)(2)",
-        "expected": "13"
-      },
-      {
-        "description": "A partially applied function can be reused without interfering with itself",
-        "input": "const add3 = curry((a, b, c) => a + b + c);\nconst add1 = add3(1);\n[add1(2)(3), add1(10)(20)]",
-        "expected": "[6, 31]"
-      }
-    ],
-    "difficulty": 2,
-    "concept": "currying"
-  },
-  {
-    "id": "hook-fetch-cleanup",
-    "track": "react",
-    "title": "useFetch with Abort Cleanup",
-    "box": 1,
-    "streak": 0,
-    "nextEligibleTrial": 0,
-    "status": "active",
-    "tags": [
-      "react",
-      "custom-hooks",
-      "abort-controller"
-    ],
-    "promptSeed": "Implement a custom hook useFetch(url) returning { data, loading, error } — initially { data: null, loading: true, error: null }; on success { data, loading: false, error: null }; on a non-2xx status or network failure { data: null, loading: false, error } where error is an Error (mentioning the status for HTTP errors). Use an AbortController inside useEffect to cancel the request if the url changes or the component unmounts, and never set state from an aborted/stale request.",
-    "starterCode": "function useFetch(url) {\n  const [state, setState] = useState({ data: null, loading: true, error: null });\n\n  useEffect(() => {\n    const controller = new AbortController();\n    let cancelled = false;\n    setState({ data: null, loading: true, error: null });\n\n    fetch(url, { signal: controller.signal })\n      .then((res) => {\n        if (!res.ok) throw new Error(`HTTP ${res.status}`);\n        return res.json();\n      })\n      .then((data) => {\n        if (!cancelled) setState({ data, loading: false, error: null });\n      })\n      .catch((error) => {\n        if (cancelled || error.name === 'AbortError') return;\n        setState({ data: null, loading: false, error });\n      });\n\n    return () => {\n      cancelled = true; // never set state from a stale response\n      controller.abort();\n    };\n  }, [url]);\n\n  return state;\n}",
-    "testHarness": "const { renderHook, act } = $dom;\nconst calls = [];\n// Controllable fetch: each call can be answered (or failed) by the test, and honors abort.\nfetch = (url, init) =>\n  new Promise((resolve, reject) => {\n    const signal = init && init.signal;\n    calls.push({\n      url,\n      signal,\n      respond: (status, body) => resolve({ ok: status >= 200 && status < 300, status, json: async () => body }),\n      fail: (err) => reject(err),\n    });\n    if (signal) signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')));\n  });\nconst answer = (call, status, body) => act(async () => { call.respond(status, body); });\n\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  $test.check('Initial render shows loading', h.result.current.loading === true && h.result.current.data === null && h.result.current.error === null, h.result.current);\n  await answer(calls[0], 200, { id: 1 });\n  $test.check('Resolves with data on 200', h.result.current.loading === false && h.result.current.data && h.result.current.data.id === 1 && h.result.current.error === null, h.result.current);\n  h.unmount();\n}\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/missing' } });\n  await answer(calls[0], 404, {});\n  const { data, loading, error } = h.result.current;\n  $test.check('Reports an Error on a 404', loading === false && data === null && error instanceof Error && /404/.test(error.message), h.result.current);\n  h.unmount();\n}\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  h.rerender({ url: '/api/b' });\n  const aborted = calls[0].signal.aborted === true;\n  await answer(calls[1], 200, { id: 2 });\n  $test.check('Changing url aborts the previous request and shows the new data', aborted && calls.length === 2 && h.result.current.data && h.result.current.data.id === 2, { aborted, calls: calls.length, state: h.result.current });\n  h.unmount();\n}\n{\n  calls.length = 0;\n  const h = renderHook(({ url }) => useFetch(url), { initialProps: { url: '/api/a' } });\n  h.unmount();\n  $test.check('Unmounting aborts the in-flight request', calls[0].signal.aborted === true);\n}",
-    "solution": "function useFetch(url) {\n  const [state, setState] = useState({ data: null, loading: true, error: null });\n\n  useEffect(() => {\n    const controller = new AbortController();\n    let cancelled = false;\n    setState({ data: null, loading: true, error: null });\n\n    fetch(url, { signal: controller.signal })\n      .then((res) => {\n        if (!res.ok) throw new Error(`HTTP ${res.status}`);\n        return res.json();\n      })\n      .then((data) => {\n        if (!cancelled) setState({ data, loading: false, error: null });\n      })\n      .catch((error) => {\n        if (cancelled || error.name === 'AbortError') return;\n        setState({ data: null, loading: false, error });\n      });\n\n    return () => {\n      cancelled = true; // never set state from a stale response\n      controller.abort();\n    };\n  }, [url]);\n\n  return state;\n}",
-    "referenceSolution": "function useFetch(url) {\n  const [state, setState] = useState({ data: null, loading: true, error: null });\n\n  useEffect(() => {\n    const controller = new AbortController();\n    let cancelled = false;\n    setState({ data: null, loading: true, error: null });\n\n    fetch(url, { signal: controller.signal })\n      .then((res) => {\n        if (!res.ok) throw new Error(`HTTP ${res.status}`);\n        return res.json();\n      })\n      .then((data) => {\n        if (!cancelled) setState({ data, loading: false, error: null });\n      })\n      .catch((error) => {\n        if (cancelled || error.name === 'AbortError') return;\n        setState({ data: null, loading: false, error });\n      });\n\n    return () => {\n      cancelled = true; // never set state from a stale response\n      controller.abort();\n    };\n  }, [url]);\n\n  return state;\n}",
-    "testCases": [
-      {
-        "description": "Initial render shows loading",
-        "input": "useFetch('/api/a')  // before the request resolves",
-        "expected": "{ data: null, loading: true, error: null }"
-      },
-      {
-        "description": "Resolves with data on 200",
-        "input": "useFetch('/api/a')  // server answers 200 with { id: 1 }",
-        "expected": "{ data: { id: 1 }, loading: false, error: null }"
-      },
-      {
-        "description": "Reports an Error on a 404",
-        "input": "useFetch('/api/missing')  // server answers 404",
-        "expected": "{ data: null, loading: false, error: Error('HTTP 404') }"
-      },
-      {
-        "description": "Changing url aborts the previous request and shows the new data",
-        "input": "rerender url '/api/a' → '/api/b'; server answers /api/b with { id: 2 }",
-        "expected": "'/api/a' signal.aborted === true; state { data: { id: 2 }, loading: false, error: null }"
-      },
-      {
-        "description": "Unmounting aborts the in-flight request",
-        "input": "unmount() while '/api/a' is still pending",
-        "expected": "signal.aborted === true"
-      }
-    ],
-    "difficulty": 2,
-    "concept": "react-fetch"
-  },
-  {
-    "id": "hook-use-debounce",
-    "track": "react",
-    "title": "useDebounce Hook",
-    "box": 1,
-    "streak": 0,
-    "nextEligibleTrial": 0,
-    "status": "locked",
-    "tags": [
-      "react",
-      "custom-hooks",
-      "debounce"
-    ],
-    "promptSeed": "Implement a custom hook useDebounce(value, delay) in React that returns the debounced value: the initial value immediately, and afterwards the latest value only once it has been stable for delay ms.",
-    "starterCode": "function useDebounce(value, delay) {\n  const [debounced, setDebounced] = useState(value);\n\n  useEffect(() => {\n    const timer = setTimeout(() => setDebounced(value), delay);\n    return () => clearTimeout(timer); // each change (or unmount) cancels the previous timer\n  }, [value, delay]);\n\n  return debounced;\n}",
-    "testHarness": "const { renderHook, wait } = $dom;\n{\n  const h = renderHook(({ v }) => useDebounce(v, 180), { initialProps: { v: 'a' } });\n  $test.check('Returns the initial value immediately', h.result.current === 'a', h.result.current);\n  h.rerender({ v: 'ab' });\n  await wait(75);\n  const early = h.result.current;\n  $test.check('Keeps the old value until the delay has elapsed', early === 'a', early);\n  await wait(210);\n  $test.check('Updates after the delay has elapsed', h.result.current === 'ab', h.result.current);\n  h.unmount();\n}\n{\n  const h = renderHook(({ v }) => useDebounce(v, 180), { initialProps: { v: 'a' } });\n  h.rerender({ v: 'b' });\n  await wait(90);\n  h.rerender({ v: 'c' });\n  await wait(120); // 210 ms after 'b' (its timer would have fired at 180 ms if it had not been cleared)\n  const mid = h.result.current;\n  await wait(150);\n  $test.check('Rapid changes only surface the last value', mid === 'a' && h.result.current === 'c', { mid, end: h.result.current });\n  h.unmount();\n}\n{\n  const h = renderHook(({ v }) => useDebounce(v, 120), { initialProps: { v: 'a' } });\n  h.rerender({ v: 'x' });\n  h.unmount();\n  await wait(240);\n  $test.check('Unmounting with a pending update is safe', h.result.current === 'a', h.result.current);\n}",
-    "solution": "function useDebounce(value, delay) {\n  const [debounced, setDebounced] = useState(value);\n\n  useEffect(() => {\n    const timer = setTimeout(() => setDebounced(value), delay);\n    return () => clearTimeout(timer); // each change (or unmount) cancels the previous timer\n  }, [value, delay]);\n\n  return debounced;\n}",
-    "referenceSolution": "function useDebounce(value, delay) {\n  const [debounced, setDebounced] = useState(value);\n\n  useEffect(() => {\n    const timer = setTimeout(() => setDebounced(value), delay);\n    return () => clearTimeout(timer); // each change (or unmount) cancels the previous timer\n  }, [value, delay]);\n\n  return debounced;\n}",
-    "testCases": [
-      {
-        "description": "Returns the initial value immediately",
-        "input": "useDebounce('a', 60)",
-        "expected": "'a'"
-      },
-      {
-        "description": "Keeps the old value until the delay has elapsed",
-        "input": "rerender 'a' → 'ab', read at t = 25 ms",
-        "expected": "'a'"
-      },
-      {
-        "description": "Updates after the delay has elapsed",
-        "input": "rerender 'a' → 'ab', read at t = 95 ms",
-        "expected": "'ab'"
-      },
-      {
-        "description": "Rapid changes only surface the last value",
-        "input": "'a' → 'b' (t = 0) → 'c' (t = 30); read at t = 70 ms and t = 120 ms",
-        "expected": "'a' at 70 ms (the 'b' timer was cleared), 'c' at 120 ms"
-      },
-      {
-        "description": "Unmounting with a pending update is safe",
-        "input": "rerender 'a' → 'x', then unmount(); wait 80 ms",
-        "expected": "no error; last returned value stays 'a'"
-      }
-    ],
-    "difficulty": 2,
-    "concept": "react-hooks-utility"
-  },
-  {
     "id": "controlled-vs-uncontrolled-input",
     "track": "react",
     "title": "Controlled Search Form",
@@ -901,54 +715,6 @@
     "concept": "reducer"
   },
   {
-    "id": "infinite-scroll-observer",
-    "track": "react-components",
-    "title": "Infinite Scroll Sentinel with IntersectionObserver",
-    "box": 1,
-    "streak": 0,
-    "nextEligibleTrial": 0,
-    "status": "locked",
-    "tags": [
-      "react",
-      "intersection-observer",
-      "performance"
-    ],
-    "promptSeed": "Write useInfiniteScroll(onLoadMore) returning a ref to attach to a bottom sentinel element. It creates an IntersectionObserver that observes the sentinel and calls the latest onLoadMore whenever the sentinel is intersecting, and disconnects the observer on unmount.",
-    "starterCode": "function useInfiniteScroll(onLoadMore) {\n  const sentinelRef = useRef(null);\n  const latest = useRef(onLoadMore);\n  latest.current = onLoadMore; // always call the newest callback without re-creating the observer\n\n  useEffect(() => {\n    const el = sentinelRef.current;\n    if (!el) return;\n    const observer = new IntersectionObserver((entries) => {\n      if (entries.some((entry) => entry.isIntersecting)) latest.current();\n    });\n    observer.observe(el);\n    return () => observer.disconnect();\n  }, []);\n\n  return sentinelRef;\n}",
-    "testHarness": "const { render, q, observers, intersect } = $dom;\nfunction Probe({ onLoadMore }) {\n  const ref = useInfiniteScroll(onLoadMore);\n  return (\n    <div>\n      <p>content</p>\n      <div ref={ref} id=\"sentinel\" />\n    </div>\n  );\n}\n{\n  const calls = [];\n  const { container, rerender, unmount } = render(<Probe onLoadMore={() => calls.push('a')} />);\n  const obs = observers();\n  $test.check('Observes the sentinel element', obs.length === 1 && obs[0].elements.has(q('#sentinel', container)), obs.length);\n  intersect(false);\n  $test.check('Does nothing while the sentinel is out of view', calls.length === 0, calls);\n  intersect(true);\n  $test.check('Calls onLoadMore when the sentinel enters the viewport', calls.length === 1, calls);\n  rerender(<Probe onLoadMore={() => calls.push('b')} />);\n  intersect(true);\n  $test.check('Uses the latest onLoadMore callback', calls.join() === 'a,b' && observers().length === 1, calls);\n  unmount();\n  $test.check('Disconnects the observer on unmount', obs[0].disconnected === true);\n}",
-    "solution": "function useInfiniteScroll(onLoadMore) {\n  const sentinelRef = useRef(null);\n  const latest = useRef(onLoadMore);\n  latest.current = onLoadMore; // always call the newest callback without re-creating the observer\n\n  useEffect(() => {\n    const el = sentinelRef.current;\n    if (!el) return;\n    const observer = new IntersectionObserver((entries) => {\n      if (entries.some((entry) => entry.isIntersecting)) latest.current();\n    });\n    observer.observe(el);\n    return () => observer.disconnect();\n  }, []);\n\n  return sentinelRef;\n}",
-    "referenceSolution": "function useInfiniteScroll(onLoadMore) {\n  const sentinelRef = useRef(null);\n  const latest = useRef(onLoadMore);\n  latest.current = onLoadMore; // always call the newest callback without re-creating the observer\n\n  useEffect(() => {\n    const el = sentinelRef.current;\n    if (!el) return;\n    const observer = new IntersectionObserver((entries) => {\n      if (entries.some((entry) => entry.isIntersecting)) latest.current();\n    });\n    observer.observe(el);\n    return () => observer.disconnect();\n  }, []);\n\n  return sentinelRef;\n}",
-    "testCases": [
-      {
-        "description": "Observes the sentinel element",
-        "input": "<Probe onLoadMore={fn} />  // <div ref={useInfiniteScroll(fn)} />",
-        "expected": "one IntersectionObserver; observe(sentinel) called"
-      },
-      {
-        "description": "Does nothing while the sentinel is out of view",
-        "input": "observer callback([{ isIntersecting: false }])",
-        "expected": "onLoadMore called 0 times"
-      },
-      {
-        "description": "Calls onLoadMore when the sentinel enters the viewport",
-        "input": "observer callback([{ isIntersecting: true }])",
-        "expected": "onLoadMore called 1 time"
-      },
-      {
-        "description": "Uses the latest onLoadMore callback",
-        "input": "rerender with a new onLoadMore, then intersect",
-        "expected": "the new callback runs; still exactly one observer"
-      },
-      {
-        "description": "Disconnects the observer on unmount",
-        "input": "unmount()",
-        "expected": "observer.disconnect() called"
-      }
-    ],
-    "difficulty": 3,
-    "concept": "infinite-scroll"
-  },
-  {
     "id": "context-provider-consumer",
     "track": "react",
     "title": "React Context Provider with Custom Hook",
@@ -1054,57 +820,6 @@
     "targetTime": "O(n)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Two pointers traverse the array at most once, giving linear time and constant extra space."
-  },
-  {
-    "id": "sliding-window-dynamic",
-    "track": "algorithms",
-    "title": "Longest Substring Without Repeating Characters",
-    "box": 1,
-    "streak": 0,
-    "nextEligibleTrial": 0,
-    "status": "active",
-    "tags": [
-      "algorithms",
-      "sliding-window",
-      "strings"
-    ],
-    "promptSeed": "Write lengthOfLongestSubstring(s) finding the length of the longest substring with unique characters using a dynamic sliding window in O(n) time.",
-    "starterCode": "function lengthOfLongestSubstring(s) {\n  const map = new Map();\n  let maxLen = 0, start = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (map.has(s[i]) && map.get(s[i]) >= start) start = map.get(s[i]) + 1;\n    map.set(s[i], i);\n    maxLen = Math.max(maxLen, i - start + 1);\n  }\n  return maxLen;\n}",
-    "testHarness": "await $test.run(\"Repeats are skipped (\\\"abc\\\" is the longest unique run)\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLongestSubstring('abcabcbb'));\n}, () => (3));\n\nawait $test.run(\"All identical\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLongestSubstring('bbbbb'));\n}, () => (1));\n\nawait $test.run(\"Window must restart after the repeat (\\\"wke\\\")\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLongestSubstring('pwwkew'));\n}, () => (3));\n\nawait $test.run(\"Empty string\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLongestSubstring(''));\n}, () => (0));\n\nawait $test.run(\"Repeat that lies before the window start must not shrink it\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLongestSubstring('abba'));\n}, () => (2));",
-    "solution": "function lengthOfLongestSubstring(s) {\n  const map = new Map();\n  let maxLen = 0, start = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (map.has(s[i]) && map.get(s[i]) >= start) start = map.get(s[i]) + 1;\n    map.set(s[i], i);\n    maxLen = Math.max(maxLen, i - start + 1);\n  }\n  return maxLen;\n}",
-    "referenceSolution": "function lengthOfLongestSubstring(s) {\n  const map = new Map();\n  let maxLen = 0, start = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (map.has(s[i]) && map.get(s[i]) >= start) start = map.get(s[i]) + 1;\n    map.set(s[i], i);\n    maxLen = Math.max(maxLen, i - start + 1);\n  }\n  return maxLen;\n}",
-    "testCases": [
-      {
-        "description": "Repeats are skipped (\"abc\" is the longest unique run)",
-        "input": "lengthOfLongestSubstring('abcabcbb')",
-        "expected": "3"
-      },
-      {
-        "description": "All identical",
-        "input": "lengthOfLongestSubstring('bbbbb')",
-        "expected": "1"
-      },
-      {
-        "description": "Window must restart after the repeat (\"wke\")",
-        "input": "lengthOfLongestSubstring('pwwkew')",
-        "expected": "3"
-      },
-      {
-        "description": "Empty string",
-        "input": "lengthOfLongestSubstring('')",
-        "expected": "0"
-      },
-      {
-        "description": "Repeat that lies before the window start must not shrink it",
-        "input": "lengthOfLongestSubstring('abba')",
-        "expected": "2"
-      }
-    ],
-    "difficulty": 2,
-    "concept": "sliding-window",
-    "targetTime": "O(n)",
-    "targetSpace": "O(n)",
-    "complexityExplanation": "A sliding window with a hash map updates start index in constant time per character, scanning the string once."
   },
   {
     "id": "sliding-window-fixed",
@@ -1280,52 +995,6 @@
     "targetTime": "O(log n)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Binary search halves the search interval each iteration, yielding logarithmic time while using only a few scalar variables for constant space."
-  },
-  {
-    "id": "tree-level-order-bfs",
-    "track": "algorithms",
-    "title": "Binary Tree Level-Order Traversal",
-    "box": 1,
-    "streak": 0,
-    "nextEligibleTrial": 0,
-    "status": "locked",
-    "tags": [
-      "algorithms",
-      "bfs",
-      "trees"
-    ],
-    "promptSeed": "Implement levelOrder(root) using a queue. Nodes look like { val, left, right } where a missing child is null or undefined. Return an array of arrays with the node values of each level, from top to bottom and left to right. An empty tree (root null) returns [].",
-    "starterCode": "function levelOrder(root) {\n  if (!root) return [];\n  const res = [];\n  const q = [root];\n  while (q.length) {\n    const size = q.length;\n    const level = [];\n    for (let i = 0; i < size; i++) {\n      const node = q.shift();\n      level.push(node.val);\n      if (node.left) q.push(node.left);\n      if (node.right) q.push(node.right);\n    }\n    res.push(level);\n  }\n  return res;\n}",
-    "testHarness": "await $test.run(\"Three levels\", async () => {\n  const sleep = $test.sleep;\n  const tree = { val: 3, left: { val: 9 }, right: { val: 20, left: { val: 15 }, right: { val: 7 } } };\n  return (levelOrder(tree));\n}, () => ([[3], [9, 20], [15, 7]]));\n\nawait $test.run(\"Empty tree\", async () => {\n  const sleep = $test.sleep;\n  return (levelOrder(null));\n}, () => ([]));\n\nawait $test.run(\"Single node\", async () => {\n  const sleep = $test.sleep;\n  return (levelOrder({ val: 1 }));\n}, () => ([[1]]));\n\nawait $test.run(\"Left-only chain\", async () => {\n  const sleep = $test.sleep;\n  return (levelOrder({ val: 1, left: { val: 2, left: { val: 3 } } }));\n}, () => ([[1], [2], [3]]));",
-    "solution": "function levelOrder(root) {\n  if (!root) return [];\n  const res = [];\n  const q = [root];\n  while (q.length) {\n    const size = q.length;\n    const level = [];\n    for (let i = 0; i < size; i++) {\n      const node = q.shift();\n      level.push(node.val);\n      if (node.left) q.push(node.left);\n      if (node.right) q.push(node.right);\n    }\n    res.push(level);\n  }\n  return res;\n}",
-    "referenceSolution": "function levelOrder(root) {\n  if (!root) return [];\n  const res = [];\n  const q = [root];\n  while (q.length) {\n    const size = q.length;\n    const level = [];\n    for (let i = 0; i < size; i++) {\n      const node = q.shift();\n      level.push(node.val);\n      if (node.left) q.push(node.left);\n      if (node.right) q.push(node.right);\n    }\n    res.push(level);\n  }\n  return res;\n}",
-    "testCases": [
-      {
-        "description": "Three levels",
-        "input": "const tree = { val: 3, left: { val: 9 }, right: { val: 20, left: { val: 15 }, right: { val: 7 } } };\nlevelOrder(tree)",
-        "expected": "[[3], [9, 20], [15, 7]]"
-      },
-      {
-        "description": "Empty tree",
-        "input": "levelOrder(null)",
-        "expected": "[]"
-      },
-      {
-        "description": "Single node",
-        "input": "levelOrder({ val: 1 })",
-        "expected": "[[1]]"
-      },
-      {
-        "description": "Left-only chain",
-        "input": "levelOrder({ val: 1, left: { val: 2, left: { val: 3 } } })",
-        "expected": "[[1], [2], [3]]"
-      }
-    ],
-    "difficulty": 2,
-    "concept": "trees",
-    "targetTime": "O(n)",
-    "targetSpace": "O(n)",
-    "complexityExplanation": "Each node is enqueued, processed, and dequeued once, and the queue plus result storage can hold up to all nodes in the worst case."
   },
   {
     "id": "merge-intervals",
@@ -1726,7 +1395,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "functional",
       "closures",
@@ -1764,7 +1433,7 @@
         "expected": "5"
       }
     ],
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "currying"
   },
   {
@@ -3192,73 +2861,6 @@
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Each operation visits every node at most once, using linear time and linear extra space for recursion/stack or result storage."
-  },
-  {
-    "id": "interval-merge-sliding-window",
-    "track": "algorithms",
-    "title": "Merge Intervals and Sliding Window",
-    "box": 1,
-    "streak": 0,
-    "nextEligibleTrial": 0,
-    "status": "locked",
-    "tags": [
-      "sorting",
-      "intervals",
-      "sliding-window"
-    ],
-    "promptSeed": "Write mergeIntervals(intervals): sort by start (without mutating the input), merge overlapping and touching intervals, and handle an empty list. Then write lengthOfLongestSubstring(s) returning the length of the longest substring without repeating characters using a sliding window in O(n).",
-    "starterCode": "function mergeIntervals(intervals) {\n  if (!intervals.length) return [];\n  const sorted = intervals.map(([s, e]) => [s, e]).sort((a, b) => a[0] - b[0]);\n  const res = [sorted[0]];\n  for (let i = 1; i < sorted.length; i++) {\n    const [s, e] = sorted[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}\n\nfunction lengthOfLongestSubstring(s) {\n  const lastSeen = new Map();\n  let start = 0;\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (lastSeen.has(s[i]) && lastSeen.get(s[i]) >= start) start = lastSeen.get(s[i]) + 1;\n    lastSeen.set(s[i], i);\n    best = Math.max(best, i - start + 1);\n  }\n  return best;\n}",
-    "testHarness": "await $test.run(\"Touching intervals merge\", async () => {\n  const sleep = $test.sleep;\n  return (mergeIntervals([[1, 4], [4, 5]]));\n}, () => ([[1, 5]]));\n\nawait $test.run(\"Unsorted input\", async () => {\n  const sleep = $test.sleep;\n  return (mergeIntervals([[8, 10], [1, 3], [2, 6]]));\n}, () => ([[1, 6], [8, 10]]));\n\nawait $test.run(\"Disjoint intervals stay separate\", async () => {\n  const sleep = $test.sleep;\n  return (mergeIntervals([[1, 2], [3, 4]]));\n}, () => ([[1, 2], [3, 4]]));\n\nawait $test.run(\"Contained interval\", async () => {\n  const sleep = $test.sleep;\n  return (mergeIntervals([[1, 4], [2, 3]]));\n}, () => ([[1, 4]]));\n\nawait $test.run(\"Empty input\", async () => {\n  const sleep = $test.sleep;\n  return (mergeIntervals([]));\n}, () => ([]));\n\nawait $test.run(\"Longest substring without repeating characters\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLongestSubstring('abcabcbb'));\n}, () => (3));\n\nawait $test.run(\"…all identical\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLongestSubstring('bbbbb'));\n}, () => (1));\n\nawait $test.run(\"…repeat inside the window\", async () => {\n  const sleep = $test.sleep;\n  return (lengthOfLongestSubstring('pwwkew'));\n}, () => (3));",
-    "solution": "function mergeIntervals(intervals) {\n  if (!intervals.length) return [];\n  const sorted = intervals.map(([s, e]) => [s, e]).sort((a, b) => a[0] - b[0]);\n  const res = [sorted[0]];\n  for (let i = 1; i < sorted.length; i++) {\n    const [s, e] = sorted[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}\n\nfunction lengthOfLongestSubstring(s) {\n  const lastSeen = new Map();\n  let start = 0;\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (lastSeen.has(s[i]) && lastSeen.get(s[i]) >= start) start = lastSeen.get(s[i]) + 1;\n    lastSeen.set(s[i], i);\n    best = Math.max(best, i - start + 1);\n  }\n  return best;\n}",
-    "referenceSolution": "function mergeIntervals(intervals) {\n  if (!intervals.length) return [];\n  const sorted = intervals.map(([s, e]) => [s, e]).sort((a, b) => a[0] - b[0]);\n  const res = [sorted[0]];\n  for (let i = 1; i < sorted.length; i++) {\n    const [s, e] = sorted[i];\n    const last = res[res.length - 1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s, e]);\n  }\n  return res;\n}\n\nfunction lengthOfLongestSubstring(s) {\n  const lastSeen = new Map();\n  let start = 0;\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    if (lastSeen.has(s[i]) && lastSeen.get(s[i]) >= start) start = lastSeen.get(s[i]) + 1;\n    lastSeen.set(s[i], i);\n    best = Math.max(best, i - start + 1);\n  }\n  return best;\n}",
-    "testCases": [
-      {
-        "description": "Touching intervals merge",
-        "input": "mergeIntervals([[1, 4], [4, 5]])",
-        "expected": "[[1, 5]]"
-      },
-      {
-        "description": "Unsorted input",
-        "input": "mergeIntervals([[8, 10], [1, 3], [2, 6]])",
-        "expected": "[[1, 6], [8, 10]]"
-      },
-      {
-        "description": "Disjoint intervals stay separate",
-        "input": "mergeIntervals([[1, 2], [3, 4]])",
-        "expected": "[[1, 2], [3, 4]]"
-      },
-      {
-        "description": "Contained interval",
-        "input": "mergeIntervals([[1, 4], [2, 3]])",
-        "expected": "[[1, 4]]"
-      },
-      {
-        "description": "Empty input",
-        "input": "mergeIntervals([])",
-        "expected": "[]"
-      },
-      {
-        "description": "Longest substring without repeating characters",
-        "input": "lengthOfLongestSubstring('abcabcbb')",
-        "expected": "3"
-      },
-      {
-        "description": "…all identical",
-        "input": "lengthOfLongestSubstring('bbbbb')",
-        "expected": "1"
-      },
-      {
-        "description": "…repeat inside the window",
-        "input": "lengthOfLongestSubstring('pwwkew')",
-        "expected": "3"
-      }
-    ],
-    "difficulty": 4,
-    "concept": "intervals",
-    "pack": "algorithms-advanced",
-    "targetTime": "O(n log n)",
-    "targetSpace": "O(n)",
-    "complexityExplanation": "Sorting intervals dominates with O(n log n) time and linear extra space, while the sliding‑window runs in O(m) time and O(m) space, both bounded by O(n) overall."
   },
   {
     "id": "ts-discriminated-unions-exhaustiveness",
@@ -11292,7 +10894,7 @@
       "queue"
     ],
     "promptSeed": "Tree nodes are { val, left, right } (null for a missing child). Write levelOrder(root): an array of arrays, one per depth, left to right ([] for a null root). Write rightSideView(root): the last value of each level (what you see from the right). Write zigzagLevelOrder(root): like levelOrder but every odd depth (1, 3, ...) is reversed.",
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "trees",
     "referenceSolution": "function levelOrder(root) {\n  const out = [];\n  if (!root) return out;\n  let level = [root];\n  while (level.length) {\n    out.push(level.map((node) => node.val));\n    const next = [];\n    for (const node of level) {\n      if (node.left) next.push(node.left);\n      if (node.right) next.push(node.right);\n    }\n    level = next;\n  }\n  return out;\n}\n\nfunction rightSideView(root) {\n  return levelOrder(root).map((level) => level[level.length - 1]);\n}\n\nfunction zigzagLevelOrder(root) {\n  return levelOrder(root).map((level, depth) => (depth % 2 ? level.reverse() : level));\n}",
     "solution": "function levelOrder(root) {\n  const out = [];\n  if (!root) return out;\n  let level = [root];\n  while (level.length) {\n    out.push(level.map((node) => node.val));\n    const next = [];\n    for (const node of level) {\n      if (node.left) next.push(node.left);\n      if (node.right) next.push(node.right);\n    }\n    level = next;\n  }\n  return out;\n}\n\nfunction rightSideView(root) {\n  return levelOrder(root).map((level) => level[level.length - 1]);\n}\n\nfunction zigzagLevelOrder(root) {\n  return levelOrder(root).map((level, depth) => (depth % 2 ? level.reverse() : level));\n}",

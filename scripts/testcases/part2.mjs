@@ -1,13 +1,6 @@
 import { c } from './part1.mjs';
 
 export default {
-  'sliding-window-dynamic': [
-    c('Repeats are skipped ("abc" is the longest unique run)', "lengthOfLongestSubstring('abcabcbb')", '3'),
-    c('All identical', "lengthOfLongestSubstring('bbbbb')", '1'),
-    c('Window must restart after the repeat ("wke")', "lengthOfLongestSubstring('pwwkew')", '3'),
-    c('Empty string', "lengthOfLongestSubstring('')", '0'),
-    c('Repeat that lies before the window start must not shrink it', "lengthOfLongestSubstring('abba')", '2'),
-  ],
   'sliding-window-fixed': [
     c('Best window of 3 is [5, 1, 3]', 'maxSubarraySum([2, 1, 5, 1, 3, 2], 3)', '9'),
     c('Best window of 2 is [3, 4]', 'maxSubarraySum([2, 3, 4, 1, 5], 2)', '7'),
@@ -33,16 +26,6 @@ export default {
     c('Single element hit', 'binarySearch([5], 5)', '0'),
     c(`Target just left of the first midpoint`, `binarySearch([1, 3, 5, 7, 9], 3)`, `1`),
     c(`Target just right of the first midpoint`, `binarySearch([1, 3, 5, 7, 9], 7)`, `3`),
-  ],
-  'tree-level-order-bfs': [
-    c(
-      'Three levels',
-      'const tree = { val: 3, left: { val: 9 }, right: { val: 20, left: { val: 15 }, right: { val: 7 } } };\nlevelOrder(tree)',
-      '[[3], [9, 20], [15, 7]]'
-    ),
-    c('Empty tree', 'levelOrder(null)', '[]'),
-    c('Single node', 'levelOrder({ val: 1 })', '[[1]]'),
-    c('Left-only chain', 'levelOrder({ val: 1, left: { val: 2, left: { val: 3 } } })', '[[1], [2], [3]]'),
   ],
   'merge-intervals': [
     c('Overlaps merge, gaps stay', 'mergeIntervals([[1, 3], [2, 6], [8, 10], [15, 18]])', '[[1, 6], [8, 10], [15, 18]]'),

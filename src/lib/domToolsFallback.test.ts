@@ -8,8 +8,8 @@ import type { TopicItem } from './leitner';
 const topics = seed as unknown as TopicItem[];
 const ids = [
   'hook-use-previous',
-  'hook-fetch-cleanup',
-  'hook-use-debounce',
+  'use-fetch-hook',
+  'use-debounce-hook',
   'controlled-vs-uncontrolled-input',
   'context-provider-consumer',
   'modal-portal-focus',

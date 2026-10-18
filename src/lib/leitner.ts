@@ -224,6 +224,21 @@ export function migrateTrackList(list: string[], mode: 'include' | 'exclude'): s
   return out;
 }
 
+/**
+ * Seed cards that were removed as duplicates of a better card. Saved decks drop them on load so they do not linger as
+ * orphan "custom" cards (their content lives only in the old save). Never reuse one of these ids.
+ */
+export const RETIRED_SEED_IDS: ReadonlySet<string> = new Set([
+  'hook-fetch-cleanup',
+  'infinite-scroll-observer',
+  'sliding-window-dynamic',
+  'tree-level-order-bfs',
+  'hook-use-debounce',
+  'event-loop-microtasks',
+  'currying-function',
+  'interval-merge-sliding-window',
+]);
+
 /** React cards (hooks and components) share the React starter/test-harness hints. */
 export const isReactTrack = (track: string): boolean => track === 'react' || track === 'react-components';
 
@@ -459,7 +474,7 @@ export function mergeStoredWithSeed(
   const seedMap = new Map(seedTopics.map((t) => [t.id, t]));
   const deleted = new Set(parsed.deletedSeedIds ?? []);
 
-  const hydratedTopics = parsed.topics.map((t) => {
+  const hydratedTopics = parsed.topics.filter((t) => !RETIRED_SEED_IDS.has(t.id)).map((t) => {
     const seed = seedMap.get(t.id);
     if (!seed) {
       // Custom (non-seed) card: keep untouched, ensuring progress invariants are numbers

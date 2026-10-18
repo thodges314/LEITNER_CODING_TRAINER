@@ -45,13 +45,6 @@ export const overrides = {
     ),
     c(`A network failure rejects with the original error instead of hanging`, `fetchWithTimeout('https://invalid-non-existent-url-domain.org', 5000)`, ``, { t: `TypeError: Failed to fetch`, x: `Rejects with the network error (TypeError: Failed to fetch)` }),
   ],
-  'event-loop-microtasks': [
-    c('Order of sync code, promise.then, queueMicrotask and setTimeout(0)', 'await getExecutionOrder()', "['sync', 'promise', 'microtask', 'timeout']"),
-    c('Each label appears exactly once', '(await getExecutionOrder()).slice().sort()', "['microtask', 'promise', 'sync', 'timeout']"),
-    c('Every call returns a fresh array', 'const a = await getExecutionOrder();\nconst b = await getExecutionOrder();\na !== b', 'true'),
-    c(`The result has four entries and the timeout callback is last`, `const o = await getExecutionOrder();
-[o.length, o[3]]`, `[4, 'timeout']`),
-  ],
   'use-reducer-todo-list': [
     c('ADD_TODO appends an unchecked todo with the next id', "todoReducer([], { type: 'ADD_TODO', payload: 'Practice' })", "[{ id: 1, text: 'Practice', done: false }]"),
     c('ADD_TODO uses max id + 1, even after removals', "todoReducer([{ id: 1, text: 'A', done: false }, { id: 3, text: 'C', done: false }], { type: 'ADD_TODO', payload: 'D' })", "[{ id: 1, text: 'A', done: false }, { id: 3, text: 'C', done: false }, { id: 4, text: 'D', done: false }]"),
@@ -107,13 +100,6 @@ elapsed >= 130 && elapsed < 450`, `true  (about 140 ms of waiting in total)`, { 
   ],
 
   // ---- React / DOM cards: descriptions match the harness labels exactly ----
-  'hook-fetch-cleanup': [
-    r('Initial render shows loading', "useFetch('/api/a')  // before the request resolves", '{ data: null, loading: true, error: null }'),
-    r('Resolves with data on 200', "useFetch('/api/a')  // server answers 200 with { id: 1 }", '{ data: { id: 1 }, loading: false, error: null }'),
-    r('Reports an Error on a 404', "useFetch('/api/missing')  // server answers 404", "{ data: null, loading: false, error: Error('HTTP 404') }"),
-    r('Changing url aborts the previous request and shows the new data', "rerender url '/api/a' → '/api/b'; server answers /api/b with { id: 2 }", "'/api/a' signal.aborted === true; state { data: { id: 2 }, loading: false, error: null }"),
-    r('Unmounting aborts the in-flight request', "unmount() while '/api/a' is still pending", 'signal.aborted === true'),
-  ],
   'use-fetch-hook': [
     r('Initial render shows loading', "useFetch('/api/a')  // before the request resolves", '{ data: null, error: null, loading: true }'),
     r('Resolves with data on 200', "useFetch('/api/a')  // server answers 200 with { id: 1 }", '{ data: { id: 1 }, error: null, loading: false }'),
@@ -121,13 +107,6 @@ elapsed >= 130 && elapsed < 450`, `true  (about 140 ms of waiting in total)`, { 
     r('Changing url aborts the previous request', "rerender url '/api/a' → '/api/b'", "request 1 signal.aborted === true; request 2 signal.aborted === false"),
     r('A stale response never overwrites newer data', "url '/api/a' → '/api/b'; /api/b answers { id: 'b' }, THEN /api/a answers { id: 'a' } (server ignores abort)", "data stays { id: 'b' }"),
     r('Unmounting aborts the in-flight request', 'unmount() while the request is pending', 'signal.aborted === true'),
-  ],
-  'hook-use-debounce': [
-    r('Returns the initial value immediately', "useDebounce('a', 60)", "'a'"),
-    r('Keeps the old value until the delay has elapsed', "rerender 'a' → 'ab', read at t = 25 ms", "'a'"),
-    r('Updates after the delay has elapsed', "rerender 'a' → 'ab', read at t = 95 ms", "'ab'"),
-    r('Rapid changes only surface the last value', "'a' → 'b' (t = 0) → 'c' (t = 30); read at t = 70 ms and t = 120 ms", "'a' at 70 ms (the 'b' timer was cleared), 'c' at 120 ms"),
-    r('Unmounting with a pending update is safe', "rerender 'a' → 'x', then unmount(); wait 80 ms", "no error; last returned value stays 'a'"),
   ],
   'use-debounce-hook': [
     r('Returns the initial value immediately', "useDebounce('a', 60)", "'a'"),
@@ -148,13 +127,6 @@ elapsed >= 130 && elapsed < 450`, `true  (about 140 ms of waiting in total)`, { 
     r('Returns the value from the previous render', 'values 1 → 2 → 3, read after each render', '[undefined, 1, 2]'),
     r('Re-rendering with the same value returns it', 'values 3 → 3', '3'),
     r('Works with objects (same reference)', 'values a = { id: 1 } → b = { id: 2 }', 'second render returns exactly a (=== a)'),
-  ],
-  'infinite-scroll-observer': [
-    r('Observes the sentinel element', '<Probe onLoadMore={fn} />  // <div ref={useInfiniteScroll(fn)} />', 'one IntersectionObserver; observe(sentinel) called'),
-    r('Does nothing while the sentinel is out of view', 'observer callback([{ isIntersecting: false }])', 'onLoadMore called 0 times'),
-    r('Calls onLoadMore when the sentinel enters the viewport', 'observer callback([{ isIntersecting: true }])', 'onLoadMore called 1 time'),
-    r('Uses the latest onLoadMore callback', 'rerender with a new onLoadMore, then intersect', 'the new callback runs; still exactly one observer'),
-    r('Disconnects the observer on unmount', 'unmount()', 'observer.disconnect() called'),
   ],
   'context-provider-consumer': [
     r('Default theme is light inside the provider', 'const { ThemeProvider, useTheme } = createThemeContext();\nuseTheme() inside <ThemeProvider>', "theme === 'light'"),

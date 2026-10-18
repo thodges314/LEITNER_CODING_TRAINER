@@ -102,15 +102,6 @@ t('a'); t('b');
 await sleep(100);
 got`, `['a']`),
   ],
-  'event-loop-microtasks': [
-    c(
-      'Order of sync code, promise.then, queueMicrotask and setTimeout(0)',
-      "console.log('A: sync');\nsetTimeout(() => console.log('D: setTimeout'), 0);\nPromise.resolve().then(() => console.log('B: promise.then'));\nqueueMicrotask(() => console.log('C: queueMicrotask'));\nconsole.log('E: sync end');",
-      "['A: sync', 'E: sync end', 'B: promise.then', 'C: queueMicrotask', 'D: setTimeout']",
-      { logs: true }
-    ),
-    c('Order summary returned by getExecutionOrder()', 'getExecutionOrder()', "['sync', 'microtask', 'macrotask']"),
-  ],
   'map-frequency-counter': [
     c(
       'Counts repeated items',
@@ -175,30 +166,6 @@ got`, `['a']`),
     ),
     c('Missing key', 'new LRUCache(1).get(9)', '-1'),
   ],
-  'currying-function': [
-    c('One argument at a time', 'const mult = (a, b, c) => a * b * c;\ncurry(mult)(2)(3)(4)', '24'),
-    c('Arguments may be grouped any way', 'const mult = (a, b, c) => a * b * c;\nconst f = curry(mult);\n[f(2, 3)(4), f(2)(3, 4), f(2, 3, 4)]', '[24, 24, 24]'),
-    c('Two-argument function', 'curry((a, b) => a + b)(1)(2)', '3'),
-    c(`The original \`this\` is preserved across the curried calls`, `const obj = { k: 10, add: curry(function (a, b) { return this.k + a + b; }) };
-obj.add(1)(2)`, `13`),
-    c(`A partially applied function can be reused without interfering with itself`, `const add3 = curry((a, b, c) => a + b + c);
-const add1 = add3(1);
-[add1(2)(3), add1(10)(20)]`, `[6, 31]`),
-  ],
-  'hook-fetch-cleanup': [
-    c('Initial render', "useFetch('https://jsonplaceholder.typicode.com/todos/1')  // render, before fetch resolves", '{ data: null, loading: true, error: null }', { v: false, note: 'needs a React renderer' }),
-    c('After the fetch resolves with 200', "useFetch('https://jsonplaceholder.typicode.com/todos/1')  // after resolve", `{ data: ${TODO1}, loading: false, error: null }`, { v: false }),
-    c('After a 404 response', "useFetch('https://jsonplaceholder.typicode.com/invalid-path-404')  // after resolve", '{ data: null, loading: false, error: Error (mentions 404) }', { v: false }),
-    c('url changes while the first request is pending', "rerender url: '.../todos/1' → '.../todos/2'", 'First request: controller.abort() called. Final state holds todos/2 data only: { id: 2, ... }', { v: false }),
-    c('Unmount while pending', 'unmount()', 'controller.abort() called; no state update happens afterwards', { v: false }),
-  ],
-  'hook-use-debounce': [
-    c('First render returns the initial value immediately', "useDebounce('a', 300)", "'a'", { v: false, note: 'needs a React renderer + fake timers' }),
-    c('Value changes, delay not yet elapsed', "rerender 'a' → 'ab', read at t = 299 ms", "'a'", { v: false }),
-    c('Value changes, delay elapsed', "rerender 'a' → 'ab', read at t = 300 ms", "'ab'", { v: false }),
-    c('Rapid changes only surface the last value', "'a' → 'ab' (t=0) → 'abc' (t=100), read at t = 399 ms and t = 400 ms", "'a' at 399 ms, 'abc' at 400 ms (never 'ab')", { v: false }),
-    c('Unmount with a pending timer', "rerender 'a' → 'ab', then unmount()", 'clearTimeout called; no state update after unmount', { v: false }),
-  ],
   'controlled-vs-uncontrolled-input': [
     c('Input mirrors state (controlled)', "type 'react' into the input", "input.value === 'react' after each keystroke (value + onChange, never defaultValue)", { v: false, note: 'needs a React renderer' }),
     c('Submit trims whitespace', "type '  react hooks  ', submit the form", "onSearch called once with 'react hooks'", { v: false }),
@@ -231,12 +198,6 @@ const add1 = add3(1);
       "const s = [{ id: 1, text: 'A', done: false }];\ntodoReducer(s, { type: 'NOOP' }) === s",
       'true'
     ),
-  ],
-  'infinite-scroll-observer': [
-    c('Sentinel enters the viewport', 'IntersectionObserver callback([{ isIntersecting: true }])', 'onLoadMore called 1 time', { v: false, note: 'needs a DOM + IntersectionObserver mock' }),
-    c('Sentinel not visible', 'callback([{ isIntersecting: false }])', 'onLoadMore called 0 times', { v: false }),
-    c('Becomes visible twice', 'callback([{ isIntersecting: true }]) twice', 'onLoadMore called 2 times', { v: false }),
-    c('Unmount', 'unmount()', 'observer.disconnect() called', { v: false }),
   ],
   'context-provider-consumer': [
     c('Default theme inside the provider', 'useTheme() inside <ThemeProvider>', "theme === 'light'", { v: false, note: 'needs a React renderer' }),

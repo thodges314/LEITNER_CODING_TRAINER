@@ -23,10 +23,6 @@
     "difficulty": 2,
     "concept": "rate-limiting"
   },
-  "event-loop-microtasks": {
-    "difficulty": 3,
-    "concept": "event-loop"
-  },
   "map-frequency-counter": {
     "difficulty": 1,
     "concept": "collections"
@@ -51,18 +47,6 @@
     "difficulty": 3,
     "concept": "lru"
   },
-  "currying-function": {
-    "difficulty": 2,
-    "concept": "currying"
-  },
-  "hook-fetch-cleanup": {
-    "difficulty": 2,
-    "concept": "react-fetch"
-  },
-  "hook-use-debounce": {
-    "difficulty": 2,
-    "concept": "react-hooks-utility"
-  },
   "controlled-vs-uncontrolled-input": {
     "difficulty": 1,
     "concept": "react-forms"
@@ -75,10 +59,6 @@
     "difficulty": 2,
     "concept": "reducer"
   },
-  "infinite-scroll-observer": {
-    "difficulty": 3,
-    "concept": "infinite-scroll"
-  },
   "context-provider-consumer": {
     "difficulty": 2,
     "concept": "context"
@@ -86,10 +66,6 @@
   "two-pointer-sorted-sum": {
     "difficulty": 2,
     "concept": "two-pointer"
-  },
-  "sliding-window-dynamic": {
-    "difficulty": 2,
-    "concept": "sliding-window"
   },
   "sliding-window-fixed": {
     "difficulty": 2,
@@ -102,10 +78,6 @@
   "binary-search-exact": {
     "difficulty": 2,
     "concept": "binary-search"
-  },
-  "tree-level-order-bfs": {
-    "difficulty": 2,
-    "concept": "trees"
   },
   "merge-intervals": {
     "difficulty": 3,
@@ -136,7 +108,7 @@
     "concept": "emitter"
   },
   "curry-compose": {
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "currying"
   },
   "promise-all-polyfill": {
@@ -234,10 +206,6 @@
   "tree-traversal-dom": {
     "difficulty": 4,
     "concept": "trees"
-  },
-  "interval-merge-sliding-window": {
-    "difficulty": 4,
-    "concept": "intervals"
   },
   "ts-discriminated-unions-exhaustiveness": {
     "difficulty": 3,
@@ -752,7 +720,7 @@
     "concept": "dp"
   },
   "tree-level-order": {
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "trees"
   },
   "tree-path-sum": {
