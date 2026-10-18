@@ -1629,6 +1629,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           return (
             <div
               className="contract-table-container"
+              data-tour="contract"
               style={{
                 borderRadius: '8px',
                 border: '1px solid rgba(56, 189, 248, 0.25)',
@@ -2011,7 +2012,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         </div>
 
         {/* CodeMirror 6 Editor with Rainbow Brackets & Cold-Start Mode */}
-        <div className="cm-theme-container" onKeyDown={handleEditorKeyDown}>
+        <div className="cm-theme-container" data-tour="editor" onKeyDown={handleEditorKeyDown}>
           <CodeMirror
             ref={editorRef}
             value={code}
@@ -2111,7 +2112,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         {!evalResult && (
           <>
         {/* Action Controls Bar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', flexWrap: 'wrap', gap: '10px' }}>
+        <div data-tour="actions" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', flexWrap: 'wrap', gap: '10px' }}>
           <button
             type="button"
             className="btn btn-outline"

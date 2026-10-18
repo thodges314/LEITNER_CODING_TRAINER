@@ -6,9 +6,11 @@ interface AboutModalProps {
   onClose: () => void;
   /** First-run variant: a "how a session works" intro and a primary "Start practicing" button. */
   welcome?: boolean;
+  /** Starts the guided tour (offered on the welcome screen, and as a replay from About). */
+  onStartTour?: () => void;
 }
 
-export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome = false }) => {
+export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome = false, onStartTour }) => {
   if (!isOpen) return null;
 
   const isLight = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'apple-gsos';
@@ -107,8 +109,23 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome
                 <li>Cards come back on a graduated schedule, and harder cards unlock as you pass easier ones.</li>
                 <li>Preparing for something specific? Use Focus to include or exclude topics. Everything stays in this browser.</li>
               </ol>
-              <button type="button" className="btn btn-primary" style={{ marginTop: '14px' }} onClick={onClose}>
-                Start practicing
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '14px' }}>
+                <button type="button" className="btn btn-primary" onClick={onClose}>
+                  Start practicing
+                </button>
+                {onStartTour && (
+                  <button type="button" className="btn btn-outline" onClick={onStartTour}>
+                    Take a 1-minute tour
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!welcome && onStartTour && (
+            <div>
+              <button type="button" className="btn btn-outline" onClick={onStartTour}>
+                Replay the quick tour
               </button>
             </div>
           )}

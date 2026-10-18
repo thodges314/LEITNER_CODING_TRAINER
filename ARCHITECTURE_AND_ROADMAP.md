@@ -29,7 +29,7 @@ in the browser; state lives in `localStorage`.
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 955 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 262 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 524 card tests + 12 navigation/shortcut tests + 6 preview tests + 4 answer-flow tests + 4 backup advisory tests = 554 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/flow-and-perf`): 554 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 262 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 524 card tests + 12 navigation/shortcut tests + 6 preview tests + 4 answer-flow tests + 5 guided-tour tests + 4 backup advisory tests = 559 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/guided-tour`): 559 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -423,6 +423,12 @@ The flow is designed so the user always knows what to press. `e2e/flow.spec.ts` 
 2. **After a result** (`EvaluationPanel`): the answering controls disappear and the editor is locked ("Your Submitted Answer (locked)"). There is exactly one next step: pass -> **Continue to Next Card**; fail -> **Practice the Pattern** (records the attempt and starts the unscored drill). There is no "retest" of a submitted answer; use Run Code / Test before submitting. The "Override verdict" checkbox stays on the result panel.
 3. **Failed attempt**: the critique names the failed checks ("Failed checks: ..."), and the reference solution appears once, in the Reveal panel, which opens automatically after a failure (it is no longer pasted into the critique, and the offline structural checks ignore comments, so the commented-out starter examples are never credited).
 4. **Inside the drill**: pass -> **Continue to Next Card**; miss -> **Try Again** or **Skip Drill & Continue** (the banner also has Skip Drill).
+
+### 7.10 Guided tour (DONE)
+A dismissable 5-step spotlight walkthrough of the practice screen. It is **offered, never forced**: the welcome screen has a "Take a 1-minute tour" button next to "Start practicing", and About has "Replay the quick tour". Nothing starts automatically, so existing tests and flows are unaffected.
+- Steps and copy live in `src/lib/tour.ts` (`TOUR_STEPS`: contract, editor, actions, a centered "one next step" note, header). Each step points at an element by `data-tour="<anchor>"` (set in `PracticeArena.tsx` and `App.tsx`). `tour.test.ts` fails if a step names an anchor that is not in the source, so renaming or removing one of those attributes is caught.
+- `GuidedTour.tsx` mounts to start and unmounts to end. It skips steps whose anchor is not on the page, follows scroll/resize, keeps the tooltip inside the viewport (`placeTooltip`), and supports Skip, Back/Next, arrow keys and Escape. Starting it from About switches back to the practice screen first.
+- To add or change a step: edit `TOUR_STEPS`, add the `data-tour` anchor, and update the step count in `e2e/tour.spec.ts`.
 
 ## 8. Conventions and pitfalls for assistants
 

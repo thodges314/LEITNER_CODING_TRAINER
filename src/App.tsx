@@ -44,6 +44,7 @@ import { BackupAdvisoryModal } from './components/BackupAdvisoryModal';
 import { recordProblemCompletion, markBackupAdvisorySeen } from './lib/backupAdvisory';
 import { DOUBLE_BACK_WINDOW_MS, useBackNavigation } from './lib/backNavigation';
 import { isFirstVisit, markWelcomed } from './lib/welcome';
+import { GuidedTour } from './components/GuidedTour';
 import { AiRecommendationPopover } from './components/AiRecommendationPopover';
 import { ActiveModelStatusPopover } from './components/ActiveModelStatusPopover';
 import { MobileNoticeModal } from './components/MobileNoticeModal';
@@ -88,6 +89,7 @@ export function App() {
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(FIRST_VISIT);
   const [welcomeMode, setWelcomeMode] = useState(FIRST_VISIT);
+  const [isTourOpen, setIsTourOpen] = useState(false);
   const [backHint, setBackHint] = useState(false);
   const [isAiRecommendOpen, setIsAiRecommendOpen] = useState(false);
   const [isAiStatusOpen, setIsAiStatusOpen] = useState(false);
@@ -304,6 +306,7 @@ export function App() {
       {/* Global Header */}
       <header
         className="app-header"
+        data-tour="header"
         style={{
           borderBottom: '1px solid var(--border-subtle)',
           backgroundColor: 'var(--bg-navigation)',
@@ -716,9 +719,21 @@ export function App() {
       </footer>
 
       {/* Modals */}
+      {isTourOpen && <GuidedTour onClose={() => setIsTourOpen(false)} />}
+
       <AboutModal
         isOpen={isAboutOpen}
         welcome={welcomeMode}
+        onStartTour={() => {
+          // Close About/Welcome, show the practice screen, then start once its anchors are on the page.
+          setIsAboutOpen(false);
+          if (welcomeMode) {
+            markWelcomed();
+            setWelcomeMode(false);
+          }
+          setActiveView('practice');
+          window.setTimeout(() => setIsTourOpen(true), 150);
+        }}
         onClose={() => {
           setIsAboutOpen(false);
           if (welcomeMode) {
