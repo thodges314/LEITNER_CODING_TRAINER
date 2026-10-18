@@ -89,9 +89,13 @@ for (const t of topics) {
 
   const ref = read(t.id, 'ref.js');
   if (ref) {
+    // One copy only: the app reads referenceSolution (readers fall back to solution/starterCode for old saved decks).
     t.referenceSolution = ref;
-    t.solution = ref;
-    t.starterCode = ref;
+  }
+  // Legacy duplicates: older data stored the same text three times. Keep a field only if it differs from referenceSolution.
+  if (t.referenceSolution) {
+    if (t.solution === t.referenceSolution) delete t.solution;
+    if (t.starterCode === t.referenceSolution) delete t.starterCode;
   }
 
   t.testCases = toTestCaseItems(cases[t.id]);

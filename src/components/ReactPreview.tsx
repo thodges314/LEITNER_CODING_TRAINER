@@ -15,7 +15,8 @@ import {
 import type { TopicItem } from '../lib/leitner';
 import { transpileForExecution } from '../lib/runner';
 import type { ExecutionMode } from '../lib/runner';
-import { createPreviewSrcDoc } from '../lib/reactPreviewFrame';
+// The preview runtime (about 220 KB of bundled React) is loaded on demand, only for cards that show a preview.
+type PreviewFrameModule = typeof import('../lib/reactPreviewFrame');
 
 export interface ReactPreviewProps {
   card: TopicItem;
@@ -56,6 +57,16 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
 
   const isLight = theme === 'apple-gsos';
   const currentEnvKey = `${iframeKey}-${theme}-${isPoppedOut ? 'popup' : 'inline'}`;
+  const [frameModule, setFrameModule] = useState<PreviewFrameModule | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void import('../lib/reactPreviewFrame').then((m) => {
+      if (alive) setFrameModule(m);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
   const [readyEnvKey, setReadyEnvKey] = useState<string | null>(null);
   const isIframeReady = readyEnvKey === currentEnvKey;
 
@@ -679,12 +690,13 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           display: isLive ? 'block' : 'none',
         }}
       >
+        {frameModule && (
         <iframe
           key={currentEnvKey}
           ref={iframeRef}
           title="React Component Preview"
           sandbox="allow-scripts"
-          srcDoc={createPreviewSrcDoc(theme, currentEnvKey)}
+          srcDoc={frameModule.createPreviewSrcDoc(theme, currentEnvKey)}
           onLoad={handleIframeLoad}
           style={{
             width: '100%',
@@ -693,6 +705,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             display: 'block',
           }}
         />
+        )}
       </div>
 
       {/* Event Log & Console Panel (rendered once live) */}

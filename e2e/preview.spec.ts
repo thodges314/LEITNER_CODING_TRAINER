@@ -164,6 +164,27 @@ test.describe('React preview window', () => {
     await skipBtn.click();
   });
 
+  test('a state-update loop in an effect is stopped with a visible error and does not freeze the main page', async ({ page }) => {
+    const badCode = `function Switch(props) {
+      const [n, setN] = useState(0);
+      useEffect(() => { setN((v) => v + 1); });
+      return <button>{n}</button>;
+    }`;
+    await openCard(page, 'switch-toggle-a11y', badCode);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    const alertBox = previewWindow.getByRole('alert');
+    await expect(alertBox).toBeVisible({ timeout: 20000 });
+    await expect(alertBox).toContainText(/maximum update|too many|infinite|loop|timed out/i);
+
+    const skipBtn = page.getByRole('button', { name: /Skip Card/ });
+    await expect(skipBtn).toBeEnabled();
+    await skipBtn.click();
+  });
+
   test('pop-out button opens a separate window and can be docked back', async ({ page }) => {
     const card = topics.find((t) => t.id === 'switch-toggle-a11y');
     expect(card).toBeDefined();

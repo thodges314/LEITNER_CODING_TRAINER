@@ -1,5 +1,6 @@
-// Bundles React and ReactDOM client into a self-contained IIFE string
-// for the sandboxed preview iframe (srcdoc, sandbox="allow-scripts").
+// Bundles React and ReactDOM (the PROFILING build of react-dom, because the render-loop watchdog in
+// reactPreviewFrame.ts relies on <Profiler onRender>, which production builds silently skip) into a
+// self-contained IIFE string for the sandboxed preview iframe (srcdoc, sandbox="allow-scripts").
 // Run: node scripts/build-preview-bundle.mjs
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,7 +12,7 @@ const tmp = path.join(here, '.tmp-preview-entry.js');
 fs.writeFileSync(
   tmp,
   `import * as React from 'react';
-import * as ReactDOM from 'react-dom/client';
+import * as ReactDOM from 'react-dom/profiling';
 window.React = React;
 window.ReactDOM = ReactDOM;
 `

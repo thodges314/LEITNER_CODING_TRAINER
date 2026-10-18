@@ -522,8 +522,10 @@ export function mergeStoredWithSeed(
       }
     }
     const fallbackSol = merged.referenceSolution ?? merged.solution ?? merged.starterCode;
-    merged.solution = merged.solution ?? fallbackSol;
     merged.referenceSolution = merged.referenceSolution ?? fallbackSol;
+    // Older saved decks carry full duplicate copies of the reference solution; the seed no longer has them.
+    if (seed.solution === undefined) delete merged.solution;
+    if (seed.starterCode === undefined) delete merged.starterCode;
 
     // Strictly preserve user review progress fields
     const isGraduated = (parsed.algorithm ?? getStoredAlgorithm()) === 'graduated-interval';

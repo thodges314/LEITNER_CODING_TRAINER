@@ -181,12 +181,36 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
     let root = null;
     const container = document.getElementById('preview-root');
 
+    // Render-loop watchdog: React never stops an effect that sets state on every render, so count commits.
+    // More than 100 commits in one second means a loop (normal UI, even 60fps animation, stays below that).
+    let commitTimes = [];
+    let loopTripped = false;
+    function onProfilerRender() {
+      const now = Date.now();
+      commitTimes.push(now);
+      while (commitTimes.length && now - commitTimes[0] > 1000) commitTimes.shift();
+      if (commitTimes.length > 100 && !loopTripped) {
+        loopTripped = true;
+        setTimeout(function() {
+          if (root) { root.unmount(); root = null; }
+          window.parent.postMessage({
+            type: 'leitner-preview:error',
+            renderId: activeRenderId,
+            message: 'Possible infinite render loop: the component re-rendered more than 100 times in one second, so it was stopped. Check for an effect that sets state on every render.',
+            timestamp: Date.now()
+          }, '*');
+        }, 0);
+      }
+    }
+
     window.addEventListener('message', function(event) {
       const data = event.data;
       if (!data || data.type !== 'leitner-preview:render') return;
       const code = data.code;
       const renderId = data.renderId;
       activeRenderId = renderId;
+      commitTimes = [];
+      loopTripped = false;
 
       try {
         if (!root) {
@@ -205,10 +229,12 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
 
         if (React.isValidElement(element)) {
           root.render(
-            React.createElement(PreviewErrorBoundary, { key: renderId, renderId: renderId },
-              React.createElement(React.Fragment, null,
-                element,
-                React.createElement(RenderNotifier, { renderId: renderId })
+            React.createElement(React.Profiler, { id: 'preview', onRender: onProfilerRender },
+              React.createElement(PreviewErrorBoundary, { key: renderId, renderId: renderId },
+                React.createElement(React.Fragment, null,
+                  element,
+                  React.createElement(RenderNotifier, { renderId: renderId })
+                )
               )
             )
           );
