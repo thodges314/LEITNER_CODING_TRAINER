@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Focus Trap for a Dialog (Tab handling)",
+  "tags": [
+    "a11y",
+    "focus-management",
+    "keyboard",
+    "dialog"
+  ]
+}

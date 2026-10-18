@@ -1058,5 +1058,13 @@
   "resize-breakpoints": {
     "difficulty": 2,
     "concept": "resize-observer"
+  },
+  "focus-trap-keydown": {
+    "difficulty": 3,
+    "concept": "focus-management"
+  },
+  "mini-history-router": {
+    "difficulty": 3,
+    "concept": "history-api"
   }
 }
