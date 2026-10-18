@@ -75,7 +75,8 @@ Located in [leitner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_C
 - **Fail Rule**: Resets card to **Box 1** with streak 0, scheduled at setback interval `nextTotal + intervalForBox(1)`.
 - **Immediate Reinforcement Drill**: Triggers an immediate practice drill on the failed card (see Section 3.3).
 
-### 3.2 Graduated Interval Recall & Chaining (`graduated-interval`)
+### 3.2 Graduated Interval Recall & Chaining (`graduated-interval`) — the default
+- **Design intent (owner):** this is modelled on Pimsleur-style graduated-interval recall (expanding gaps, a small working chain of new items), which the owner has used successfully for languages; the original Leitner boxes were a misreading of what was wanted and are kept only as an alternative.
 - **Tiers 1–9**: Geometric spaced review intervals: `Tier 1 (+1) • Tier 2 (+3) • Tier 3 (+7) • Tier 4 (+16) • Tier 5 (+35) • Tier 6 (+75) • Tier 7 (+165) • Tier 8 (+360) • Tier 9 (+800)`.
 - **Dynamic Tier 10+ Scaling**: Dynamically continues geometric growth factor (~2.2x per tier, `Math.round(800 * Math.pow(2.2, tier - 9))`) so mastered cards continuously cycle on long maintenance intervals rather than stalling or hard-capping.
 - **Active Deck Ceiling Guard**: If a calculated tier offset exceeds the active deck size $N$, the scheduled offset is safely capped to $N$ trials out so cards don't disappear past a full rotation through the deck.
@@ -85,6 +86,7 @@ Located in [leitner.ts](file:///Volumes/Claudet/thomashodges/Workspace/LEITNER_C
 - **Active Working Memory Chaining**: Cards below Tier 5 form an active working chain (capacity 4). Once cards consolidate to Tier 5+, new unseen rungs enter the rotation.
 
 ### 3.3 Immediate Reinforcement Drill (Zero Stat Impact)
+- **Why it exists (owner):** after a miss the learner sees the better answer and gets ONE immediate shot at reproducing it from memory to anchor it. It is deliberately outside scoring, so it must never change tier/box, streak or schedule. Do not "simplify" it into a normal retry.
 - When a user commits a failed card review, the cold-start failure is recorded into deck statistics (applying the appropriate setback tier and scheduling its future recall trial).
 - The trainer immediately launches into an isolated **Immediate Reinforcement Drill** for that card:
   - Editor reloads with a clean starter template and a distinct purple drill banner.

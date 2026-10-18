@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build:cards": "node scripts/build-cards.mjs"
+    "build:cards": "node scripts/build-cards.mjs",
+    "e2e": "vite build && playwright test",
+    "e2e:ui": "vite build && playwright test --ui"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
@@ -24,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",

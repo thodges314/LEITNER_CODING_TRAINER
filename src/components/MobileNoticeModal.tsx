@@ -3,7 +3,25 @@ import { Monitor, Keyboard, X, Smartphone, ArrowRight } from 'lucide-react';
 
 const STORAGE_KEY = 'leitner_mobile_modal_dismissed';
 
+const MOBILE_QUERY = '(max-width: 820px)';
+
+/** True only on narrow viewports; tracks resizes. The notice must not exist in the DOM on desktop. */
+function useIsNarrowViewport(): boolean {
+  const [narrow, setNarrow] = useState<boolean>(() =>
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function' ? window.matchMedia(MOBILE_QUERY).matches : false
+  );
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const query = window.matchMedia(MOBILE_QUERY);
+    const onChange = (e: MediaQueryListEvent) => setNarrow(e.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+  return narrow;
+}
+
 export const MobileNoticeModal: React.FC = () => {
+  const narrow = useIsNarrowViewport();
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     try {
@@ -13,15 +31,16 @@ export const MobileNoticeModal: React.FC = () => {
     }
   });
 
-  // Lock body scroll while modal is active to prevent horizontal/vertical background shift on mobile
+  // Lock body scroll only while the notice is actually visible (narrow viewport, not dismissed).
+  const visible = narrow && !isDismissed;
   useEffect(() => {
-    if (isDismissed) return;
+    if (!visible) return;
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = originalOverflow;
     };
-  }, [isDismissed]);
+  }, [visible]);
 
   const handleDismiss = () => {
     setIsDismissed(true);
@@ -32,7 +51,7 @@ export const MobileNoticeModal: React.FC = () => {
     }
   };
 
-  if (isDismissed) return null;
+  if (!visible) return null;
 
   return (
     <div

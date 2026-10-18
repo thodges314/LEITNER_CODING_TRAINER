@@ -1,7 +1,7 @@
 # Leitner Coding Trainer — Architecture and Roadmap
 
 Audience: a future human or AI assistant picking this project up cold. Read this first, then `README.md`.
-Last updated on branch `improvements/audit-fixes` (not yet merged to `master`; pushing `master` deploys GitHub Pages).
+Pushing `master` deploys GitHub Pages. Work happens on branches; `npm run e2e` (real Chromium) is the pre-merge gate in addition to `npm test`.
 
 ## 1. What this is
 
@@ -296,6 +296,15 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 - AI evaluator (`ai.ts`) was only exercised offline (heuristic, harness-aware). The live Gemini/OpenAI call path (key sent in a header) is
   untested against real APIs; default model names may be stale.
 - Consider moving seed-deck merge/migration into a versioned schema (`deckVersion`) before the next breaking change.
+
+
+### 7.4a Browser smoke test (DONE): `npm run e2e`
+`e2e/cards.spec.ts` + `playwright.config.ts` run EVERY seed card in the production build (`vite preview`) in real Chromium: the reference solution
+must show **PASSED**, an empty buffer must show **NEEDS REVISION** (2 tests per card, ~16 min for 234 cards with 4 workers; CI workflow
+`.github/workflows/e2e.yml` runs it on PRs and non-master pushes). The code is injected through the draft autosave key (`leitner_draft:<id>`) so the
+CodeMirror editor is never driven; the deck is rewritten so exactly one card is active. Filter with `npx playwright test -g "<card id>"`.
+First run found a real bug: `MobileNoticeModal` stayed in the DOM (CSS-hidden, `role="dialog"`, `body{overflow:hidden}`) on desktop and broke
+`modal-portal-focus`; it now mounts only on narrow viewports. TS cards show no "Tests:" badge when compilation fails, so the spec never waits for it.
 
 ### 7.5 Suggested next steps (in order)
 1. Fill ladder holes (§7.1) so every concept starts at d1/d2. 2. Playwright smoke test + wider timing margins (batch 13 and later cards are jsdom-only).
