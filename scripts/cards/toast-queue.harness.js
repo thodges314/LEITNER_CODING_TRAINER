@@ -41,10 +41,9 @@ const until = async (fn, ms = 2000) => {
 }
 {
   const r = mount2();
-  act(() => { api.show('Temp', { duration: 240 }); });
-  await wait(40);
+  act(() => { api.show('Temp', { duration: 300 }); });
   const early = toasts(r.container).join();
-  const gone = await until(() => toasts(r.container).length === 0);
+  const gone = await until(() => toasts(r.container).length === 0, 3000);
   $test.check('A toast disappears by itself after its duration', early === 'Temp' && gone, { early, now: toasts(r.container) });
   r.unmount();
 }

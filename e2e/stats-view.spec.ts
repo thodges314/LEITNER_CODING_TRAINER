@@ -1,6 +1,17 @@
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { existsSync } from 'node:fs';
 
 const ARTIFACTS_DIR = '/Volumes/Claudet/thomashodges/.gemini/antigravity-ide/brain/0e16ae8f-66e7-4fff-be68-0f9c24e756fd';
+
+async function saveScreenshot(page: Page, filename: string) {
+  if (existsSync(ARTIFACTS_DIR)) {
+    await page.screenshot({
+      path: `${ARTIFACTS_DIR}/${filename}`,
+      fullPage: false,
+    });
+  }
+}
 
 test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
   test('renders 2x2 KPI layout alongside DeckStatsWidget in Dark and Day themes with 3 circular view modes', async ({ page }) => {
@@ -40,10 +51,7 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     await expect(statsWidget.getByTestId('stats-chart-svg')).toBeVisible();
 
     // Screenshot in dark theme (Skill Matrix)
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/stats-widget-radar-dark.png`,
-      fullPage: false,
-    });
+    await saveScreenshot(page, 'stats-widget-radar-dark.png');
 
     // Test exclusive domain filter on Skill Matrix
     const algoDomain = statsWidget.locator('g[data-domain="algorithms"]');
@@ -58,10 +66,7 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     await expect(statsWidget.getByText('Track Orbit')).toBeVisible();
 
     // Screenshot Track Orbit mode (dark)
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/stats-widget-dark.png`,
-      fullPage: false,
-    });
+    await saveScreenshot(page, 'stats-widget-dark.png');
 
     // Test exclusive track filter on Track Orbit
     const algoSlice = statsWidget.locator('path[data-track="algorithms"]');
@@ -76,10 +81,7 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     await expect(statsWidget.getByText('Mastery Tiers')).toBeVisible();
 
     // Screenshot Mastery Tiers mode (dark)
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/stats-widget-tiers-dark.png`,
-      fullPage: false,
-    });
+    await saveScreenshot(page, 'stats-widget-tiers-dark.png');
 
     // Test exclusive tier filter on Mastery Tiers
     const box1Arc = statsWidget.locator('g[data-box="1"] path').last();
@@ -98,29 +100,20 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     await expect(statsWidget.getByText('Skill Matrix')).toBeVisible();
 
     // Screenshot Skill Matrix in Day theme
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/stats-widget-radar-day.png`,
-      fullPage: false,
-    });
+    await saveScreenshot(page, 'stats-widget-radar-day.png');
 
     // Switch to Track Orbit in Day theme
     await page.getByTestId('stats-mode-orbit').click();
     await expect(statsWidget.getByText('Track Orbit')).toBeVisible();
 
     // Screenshot Track Orbit in Day theme
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/stats-widget-day.png`,
-      fullPage: false,
-    });
+    await saveScreenshot(page, 'stats-widget-day.png');
 
     // Switch to Mastery Tiers in Day theme
     await page.getByTestId('stats-mode-tiers').click();
     await expect(statsWidget.getByText('Mastery Tiers')).toBeVisible();
 
     // Screenshot Mastery Tiers in Day theme
-    await page.screenshot({
-      path: `${ARTIFACTS_DIR}/stats-widget-tiers-day.png`,
-      fullPage: false,
-    });
+    await saveScreenshot(page, 'stats-widget-tiers-day.png');
   });
 });
