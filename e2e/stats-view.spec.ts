@@ -92,6 +92,10 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     await expect(statsWidget.getByText('Velocity Diagnostic')).toBeVisible();
     await expect(statsWidget.getByTestId('velocity-score-text')).toBeVisible();
     await expect(statsWidget.getByTestId('velocity-status-text')).toBeVisible();
+    await expect(statsWidget.getByTestId('actionable-diagnostics-matrix')).toBeVisible();
+    await expect(statsWidget.getByText('At-Risk / Demoted')).toBeVisible();
+    await expect(statsWidget.getByText('Retention Velocity')).toBeVisible();
+    await expect(statsWidget.getByText('Recent Session Sparkline')).toBeVisible();
 
     // Screenshot Velocity Diagnostic mode (dark)
     await page.screenshot({

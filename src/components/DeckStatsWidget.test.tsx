@@ -290,4 +290,45 @@ describe('DeckStatsWidget', () => {
 
     expect(container?.textContent).toContain('No active cards in rotation yet');
   });
+
+  it('renders Actionable Diagnostics Matrix in Velocity mode and supports practice shortcut', async () => {
+    const handlePractice = vi.fn();
+
+    await act(async () => {
+      root?.render(
+        <DeckStatsWidget
+          state={{
+            ...mockState,
+            totalCompletedReviews: 12,
+            recentReviews: [
+              { topicId: 'algo-1', passed: true, box: 2, trial: 1 },
+              { topicId: 'react-1', passed: false, box: 1, trial: 2 },
+            ],
+          }}
+          topics={mockTopics}
+          theme="dark"
+          onSelectCardToPractice={handlePractice}
+        />
+      );
+    });
+
+    // Switch to velocity
+    const velocityBtn = container?.querySelector('button[data-testid="stats-mode-velocity"]') as HTMLButtonElement;
+    await act(async () => {
+      velocityBtn.click();
+    });
+
+    expect(container?.textContent).toContain('At-Risk / Demoted');
+    expect(container?.textContent).toContain('Retention Velocity');
+    expect(container?.textContent).toContain('Recent Session Sparkline');
+
+    const atRiskCard = container?.querySelector('[data-testid="diagnostic-at-risk"]') as HTMLDivElement;
+    expect(atRiskCard).toBeTruthy();
+
+    await act(async () => {
+      atRiskCard.click();
+    });
+
+    expect(handlePractice).toHaveBeenCalled();
+  });
 });

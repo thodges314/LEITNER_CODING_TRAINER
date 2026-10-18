@@ -572,6 +572,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           onSelectExclusiveTracks={handleExclusiveMultiTrackSelect}
           onSelectExclusiveBox={handleExclusiveBoxSelect}
           onSelectTrack={handleExclusiveTrackSelect}
+          onSelectCardToPractice={onSelectCardToPractice}
         />
       </div>
 
