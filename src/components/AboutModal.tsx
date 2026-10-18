@@ -100,10 +100,10 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome
             >
               <h3 style={{ fontSize: '15px', fontWeight: 600, margin: '0 0 8px 0', color: 'var(--text-primary)' }}>How a session works</h3>
               <ol style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <li>You get one card at a time. Work the problem out in the editor: no autocomplete, no hints. The goal is to reason your way to a solution, not to recite one.</li>
-                <li>Submit: your code runs against the card&apos;s tests in your browser, and the tests decide pass or fail.</li>
-                <li>Add an AI provider key in Settings and an AI reviewer will critique your solution after you submit. You can then talk it through with follow-up questions. The tests still decide pass or fail; the AI is there to teach.</li>
-                <li>Missed it? You see a better answer, then get one immediate retry. The retry never affects your score.</li>
+                <li>You get one card at a time. Work the problem out in the editor: no autocomplete, no hints.</li>
+                <li>Submit: your code runs against the card&apos;s tests in your browser, and the tests decide pass or fail. You always have the final say and can override the result if you disagree or if a nuanced edge case wasn't caught.</li>
+                <li>Add an AI provider key in Settings and an AI reviewer will critique your solution after you submit. You can then talk it through with follow-up questions. The tests evaluate correctness, but the AI is there to coach and explain.</li>
+                <li>Missed it? Instead of just reading the reference solution, you get an immediate chance to reproduce a correct answer yourself. Real retention comes from actively generating the code, not looking at it. The retry never affects your score.</li>
                 <li>Cards come back on a graduated schedule, and harder cards unlock as you pass easier ones.</li>
                 <li>Preparing for something specific? Use Focus to include or exclude topics. Everything stays in this browser.</li>
               </ol>
