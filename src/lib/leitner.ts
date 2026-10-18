@@ -3,19 +3,14 @@ import { extractHarnessContracts } from './harnessContracts';
 import { clearDraft } from './drafts';
 
 export type TrackType =
-  | 'async-js'
-  | 'data-structures'
-  | 'react'
   | 'algorithms'
-  | 'js-runtime-fundamentals'
-  | 'async-web-plumbing'
-  | 'collections-transformations'
-  | 'react-patterns'
-  | 'algorithmic-screens'
-  | 'typescript-patterns'
+  | 'async-js'
   | 'js-language'
+  | 'js-utilities'
   | 'dom-browser'
+  | 'react'
   | 'react-components'
+  | 'typescript-patterns'
   | 'testing-tooling';
 
 export interface TestCaseItem {
@@ -143,14 +138,8 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     bg: 'rgba(56, 189, 248, 0.12)',
     border: 'rgba(56, 189, 248, 0.35)',
   },
-  'data-structures': {
-    label: 'Data Structures',
-    color: '#a855f7',
-    bg: 'rgba(168, 85, 247, 0.12)',
-    border: 'rgba(168, 85, 247, 0.35)',
-  },
   'react': {
-    label: 'React Invariants',
+    label: 'React Hooks & Patterns',
     color: '#06b6d4',
     bg: 'rgba(6, 182, 212, 0.12)',
     border: 'rgba(6, 182, 212, 0.35)',
@@ -161,36 +150,6 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     bg: 'rgba(245, 158, 11, 0.12)',
     border: 'rgba(245, 158, 11, 0.35)',
   },
-  'js-runtime-fundamentals': {
-    label: 'JS Runtime',
-    color: '#ec4899',
-    bg: 'rgba(236, 72, 153, 0.12)',
-    border: 'rgba(236, 72, 153, 0.35)',
-  },
-  'async-web-plumbing': {
-    label: 'Async Plumbing',
-    color: '#6366f1',
-    bg: 'rgba(99, 102, 241, 0.12)',
-    border: 'rgba(99, 102, 241, 0.35)',
-  },
-  'collections-transformations': {
-    label: 'Collections & Transforms',
-    color: '#10b981',
-    bg: 'rgba(16, 185, 129, 0.12)',
-    border: 'rgba(16, 185, 129, 0.35)',
-  },
-  'react-patterns': {
-    label: 'React Patterns',
-    color: '#14b8a6',
-    bg: 'rgba(20, 184, 166, 0.12)',
-    border: 'rgba(20, 184, 166, 0.35)',
-  },
-  'algorithmic-screens': {
-    label: 'Algorithms Screen',
-    color: '#eab308',
-    bg: 'rgba(234, 179, 8, 0.12)',
-    border: 'rgba(234, 179, 8, 0.35)',
-  },
   'typescript-patterns': {
     label: 'TypeScript Patterns',
     color: '#3178c6',
@@ -198,7 +157,7 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     border: 'rgba(49, 120, 198, 0.35)',
   },
   'js-language': {
-    label: 'JS Language & Utils',
+    label: 'JS Language',
     color: '#f97316',
     bg: 'rgba(249, 115, 22, 0.12)',
     border: 'rgba(249, 115, 22, 0.35)',
@@ -221,6 +180,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     bg: 'rgba(244, 63, 94, 0.12)',
     border: 'rgba(244, 63, 94, 0.35)',
   },
+  'js-utilities': {
+    label: 'JS Utilities',
+    color: '#10b981',
+    bg: 'rgba(16, 185, 129, 0.12)',
+    border: 'rgba(16, 185, 129, 0.35)',
+  },
 };
 
 export const TRACK_TYPES = Object.keys(TRACK_METADATA) as TrackType[];
@@ -228,6 +193,39 @@ export const TRACK_TYPES = Object.keys(TRACK_METADATA) as TrackType[];
 export function isTrackType(value: unknown): value is TrackType {
   return typeof value === 'string' && Object.prototype.hasOwnProperty.call(TRACK_METADATA, value);
 }
+
+/**
+ * Tracks that were merged into others (track consolidation). Saved Focus filters and custom cards may still name them.
+ * The first successor is the "primary" one: includes expand to every successor, excludes use the primary only
+ * (so a saved exclude never hides more than it used to).
+ */
+export const TRACK_ALIASES: Record<string, TrackType[]> = {
+  'react-patterns': ['react', 'react-components'],
+  'async-web-plumbing': ['async-js'],
+  'js-runtime-fundamentals': ['js-utilities', 'js-language'],
+  'collections-transformations': ['js-utilities'],
+  'data-structures': ['js-utilities'],
+  'algorithmic-screens': ['algorithms'],
+};
+
+/** Maps a (possibly retired) track id to a current one; anything else is returned unchanged. */
+export function migrateTrackId<T>(track: T): T | TrackType {
+  if (typeof track === 'string' && Object.prototype.hasOwnProperty.call(TRACK_ALIASES, track)) return TRACK_ALIASES[track][0];
+  return track;
+}
+
+export function migrateTrackList(list: string[], mode: 'include' | 'exclude'): string[] {
+  const out: string[] = [];
+  for (const id of list) {
+    const successors = Object.prototype.hasOwnProperty.call(TRACK_ALIASES, id) ? TRACK_ALIASES[id] : null;
+    const mapped = successors ? (mode === 'include' ? successors : [successors[0]]) : [id];
+    for (const m of mapped) if (!out.includes(m)) out.push(m);
+  }
+  return out;
+}
+
+/** React cards (hooks and components) share the React starter/test-harness hints. */
+export const isReactTrack = (track: string): boolean => track === 'react' || track === 'react-components';
 
 export function getTrackMeta(track: string): { label: string; color: string; bg: string; border: string } {
   return (
@@ -251,8 +249,8 @@ export function normalizeFilter(value: unknown): PracticeFilter {
     return Number.isInteger(n) && n >= 1 && n <= 5 ? n : undefined;
   };
   const out: PracticeFilter = {
-    includeTracks: stringList(v.includeTracks),
-    excludeTracks: stringList(v.excludeTracks),
+    includeTracks: migrateTrackList(stringList(v.includeTracks), 'include'),
+    excludeTracks: migrateTrackList(stringList(v.excludeTracks), 'exclude'),
     includeTags: stringList(v.includeTags),
     excludeTags: stringList(v.excludeTags),
   };
@@ -469,6 +467,7 @@ export function mergeStoredWithSeed(
       const isGraduated = (parsed.algorithm ?? getStoredAlgorithm()) === 'graduated-interval';
       return {
         ...t,
+        track: migrateTrackId(t.track) as TrackType,
         box: isGraduated ? rawBox : Math.min(5, rawBox),
         streak: Math.max(0, Math.floor(Number(t.streak)) || 0),
         nextEligibleTrial: Math.max(0, Math.floor(Number(t.nextEligibleTrial)) || 0),
@@ -1037,7 +1036,7 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     const box = isGraduated ? rawBox : Math.min(5, rawBox);
     return {
       id: String(item.id || `topic-${Math.random().toString(36).slice(2)}`),
-      track: isTrackType(item.track) ? item.track : 'algorithms',
+      track: isTrackType(migrateTrackId(item.track)) ? (migrateTrackId(item.track) as TrackType) : 'algorithms',
       title: String(item.title || 'Untitled Topic'),
       box,
       streak: Math.max(0, Number(item.streak) || 0),
@@ -1062,7 +1061,7 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
   return {
     topics: validTopics,
     totalCompletedReviews: Number.isInteger(parsed.totalCompletedReviews) ? parsed.totalCompletedReviews : 0,
-    lastReviewedTrack: isTrackType(parsed.lastReviewedTrack) ? parsed.lastReviewedTrack : undefined,
+    lastReviewedTrack: isTrackType(migrateTrackId(parsed.lastReviewedTrack)) ? (migrateTrackId(parsed.lastReviewedTrack) as TrackType) : undefined,
     unlockedStageCount: Number.isInteger(parsed.unlockedStageCount) ? parsed.unlockedStageCount : 0,
     deletedSeedIds: Array.isArray(parsed.deletedSeedIds) ? parsed.deletedSeedIds.map(String) : [],
     practiceFilter: parsed.practiceFilter ? normalizeFilter(parsed.practiceFilter) : undefined,

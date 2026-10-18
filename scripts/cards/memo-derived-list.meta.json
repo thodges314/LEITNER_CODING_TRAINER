@@ -1,5 +1,5 @@
 {
-  "track": "react-components",
+  "track": "react",
   "title": "useMemo for a Derived List",
   "tags": [
     "performance",

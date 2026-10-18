@@ -172,7 +172,7 @@
   },
   {
     "id": "debounce-implementation",
-    "track": "async-js",
+    "track": "js-utilities",
     "title": "Debounce Function Implementation",
     "box": 1,
     "streak": 0,
@@ -215,7 +215,7 @@
   },
   {
     "id": "throttle-implementation",
-    "track": "async-js",
+    "track": "js-utilities",
     "title": "Throttle Function Implementation",
     "box": 1,
     "streak": 0,
@@ -306,7 +306,7 @@
   },
   {
     "id": "map-frequency-counter",
-    "track": "data-structures",
+    "track": "js-utilities",
     "title": "Frequency Counter via Native Map",
     "box": 1,
     "streak": 0,
@@ -356,7 +356,7 @@
   },
   {
     "id": "set-unique-operations",
-    "track": "data-structures",
+    "track": "js-utilities",
     "title": "Set Operations & Array Deduplication",
     "box": 1,
     "streak": 0,
@@ -422,7 +422,7 @@
   },
   {
     "id": "array-flatten-recursive",
-    "track": "data-structures",
+    "track": "js-utilities",
     "title": "Recursive Array Flattening",
     "box": 1,
     "streak": 0,
@@ -467,7 +467,7 @@
   },
   {
     "id": "custom-array-reduce",
-    "track": "data-structures",
+    "track": "js-utilities",
     "title": "Custom Array.prototype.reduce",
     "box": 1,
     "streak": 0,
@@ -518,7 +518,7 @@
   },
   {
     "id": "object-deep-clone",
-    "track": "data-structures",
+    "track": "js-utilities",
     "title": "Deep Clone of Plain Objects",
     "box": 1,
     "streak": 0,
@@ -564,7 +564,7 @@
   },
   {
     "id": "lru-cache-implementation",
-    "track": "data-structures",
+    "track": "js-utilities",
     "title": "LRU Cache Implementation",
     "box": 1,
     "streak": 0,
@@ -615,7 +615,7 @@
   },
   {
     "id": "currying-function",
-    "track": "data-structures",
+    "track": "js-utilities",
     "title": "Function Currying",
     "box": 1,
     "streak": 0,
@@ -658,10 +658,7 @@
       }
     ],
     "difficulty": 2,
-    "concept": "currying",
-    "targetTime": "O(n)",
-    "targetSpace": "O(n)",
-    "complexityExplanation": "The curried function aggregates at most fn.length arguments and invokes fn once, requiring linear time and linear auxiliary space in the number of parameters."
+    "concept": "currying"
   },
   {
     "id": "hook-fetch-cleanup",
@@ -718,7 +715,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "react",
       "custom-hooks",
@@ -757,7 +754,7 @@
       }
     ],
     "difficulty": 2,
-    "concept": "react-timers"
+    "concept": "react-hooks-utility"
   },
   {
     "id": "controlled-vs-uncontrolled-input",
@@ -905,7 +902,7 @@
   },
   {
     "id": "infinite-scroll-observer",
-    "track": "react",
+    "track": "react-components",
     "title": "Infinite Scroll Sentinel with IntersectionObserver",
     "box": 1,
     "streak": 0,
@@ -1388,7 +1385,7 @@
   },
   {
     "id": "debounce",
-    "track": "js-runtime-fundamentals",
+    "track": "js-utilities",
     "title": "Debounce with Cancel and Flush",
     "box": 1,
     "streak": 0,
@@ -1436,7 +1433,7 @@
   },
   {
     "id": "throttle",
-    "track": "js-runtime-fundamentals",
+    "track": "js-utilities",
     "title": "Throttle with Leading/Trailing Options",
     "box": 1,
     "streak": 0,
@@ -1494,7 +1491,7 @@
   },
   {
     "id": "memoize",
-    "track": "js-runtime-fundamentals",
+    "track": "js-utilities",
     "title": "Memoize with Custom Key Resolver",
     "box": 1,
     "streak": 0,
@@ -1542,7 +1539,7 @@
   },
   {
     "id": "bind-call-apply",
-    "track": "js-runtime-fundamentals",
+    "track": "js-language",
     "title": "Function.prototype bind / call / apply Polyfills",
     "box": 1,
     "streak": 0,
@@ -1605,7 +1602,7 @@
   },
   {
     "id": "deep-clone",
-    "track": "js-runtime-fundamentals",
+    "track": "js-utilities",
     "title": "Deep Clone with Cycles",
     "box": 1,
     "streak": 0,
@@ -1654,11 +1651,14 @@
       }
     ],
     "difficulty": 4,
-    "concept": "equality-clone"
+    "concept": "equality-clone",
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Each reachable element is visited once, and a WeakMap of size proportional to the number of objects stores the cloned references."
   },
   {
     "id": "event-emitter",
-    "track": "js-runtime-fundamentals",
+    "track": "js-utilities",
     "title": "Event Emitter (on / off / once / emit)",
     "box": 1,
     "streak": 0,
@@ -1721,7 +1721,7 @@
   },
   {
     "id": "curry-compose",
-    "track": "js-runtime-fundamentals",
+    "track": "js-utilities",
     "title": "Curry and Compose/Pipe",
     "box": 1,
     "streak": 0,
@@ -1769,7 +1769,7 @@
   },
   {
     "id": "promise-all-polyfill",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Promise.all / allSettled / race Polyfills",
     "box": 1,
     "streak": 0,
@@ -1822,7 +1822,7 @@
   },
   {
     "id": "promise-pool",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Concurrency-Limited Promise Pool",
     "box": 1,
     "streak": 0,
@@ -1870,7 +1870,7 @@
   },
   {
     "id": "retry-with-backoff",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Retry with Exponential Backoff and Abort",
     "box": 1,
     "streak": 0,
@@ -1938,7 +1938,7 @@
   },
   {
     "id": "fetch-timeout-dedupe",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Fetch with Timeout and In-Flight Deduplication",
     "box": 1,
     "streak": 0,
@@ -1981,7 +1981,7 @@
   },
   {
     "id": "async-queue-scheduler",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Sequential Async Task Queue",
     "box": 1,
     "streak": 0,
@@ -2024,7 +2024,7 @@
   },
   {
     "id": "express-middleware-chain",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Express-Style Middleware Pipeline",
     "box": 1,
     "streak": 0,
@@ -2092,7 +2092,7 @@
   },
   {
     "id": "rate-limiter-middleware",
-    "track": "async-web-plumbing",
+    "track": "js-utilities",
     "title": "In-Memory Rate Limiter Middleware",
     "box": 1,
     "streak": 0,
@@ -2140,7 +2140,7 @@
   },
   {
     "id": "lru-cache-ttl",
-    "track": "async-web-plumbing",
+    "track": "js-utilities",
     "title": "LRU Cache with TTL",
     "box": 1,
     "streak": 0,
@@ -2180,11 +2180,14 @@
       }
     ],
     "difficulty": 4,
-    "concept": "lru"
+    "concept": "lru",
+    "targetTime": "O(1)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Uses a hash map for key lookup and a linked ordering structure to move entries, giving constant‑time get/set while storing at most the cache capacity."
   },
   {
     "id": "flatten-array-object",
-    "track": "collections-transformations",
+    "track": "js-utilities",
     "title": "Flatten Nested Arrays and Objects",
     "box": 1,
     "streak": 0,
@@ -2250,7 +2253,7 @@
   },
   {
     "id": "group-by-count-by",
-    "track": "collections-transformations",
+    "track": "js-utilities",
     "title": "groupBy / countBy / keyBy with reduce",
     "box": 1,
     "streak": 0,
@@ -2306,7 +2309,7 @@
   },
   {
     "id": "array-method-polyfills",
-    "track": "collections-transformations",
+    "track": "js-utilities",
     "title": "Array map / filter / reduce Polyfills",
     "box": 1,
     "streak": 0,
@@ -2387,7 +2390,7 @@
   },
   {
     "id": "get-set-path",
-    "track": "collections-transformations",
+    "track": "js-utilities",
     "title": "Safe get / set by Path",
     "box": 1,
     "streak": 0,
@@ -2448,7 +2451,7 @@
   },
   {
     "id": "deep-equal",
-    "track": "collections-transformations",
+    "track": "js-utilities",
     "title": "Deep Equality Comparison",
     "box": 1,
     "streak": 0,
@@ -2529,7 +2532,7 @@
   },
   {
     "id": "unique-sort-dedupe",
-    "track": "collections-transformations",
+    "track": "js-utilities",
     "title": "Immutable Dedupe and Multi-Key Sort",
     "box": 1,
     "streak": 0,
@@ -2610,7 +2613,7 @@
   },
   {
     "id": "use-debounce-hook",
-    "track": "react-patterns",
+    "track": "react",
     "title": "useDebounce and useThrottle Hooks",
     "box": 1,
     "streak": 0,
@@ -2669,11 +2672,11 @@
       }
     ],
     "difficulty": 3,
-    "concept": "react-timers"
+    "concept": "react-hooks-utility"
   },
   {
     "id": "use-fetch-hook",
-    "track": "react-patterns",
+    "track": "react",
     "title": "useFetch with Race-Condition Safety",
     "box": 1,
     "streak": 0,
@@ -2727,7 +2730,7 @@
   },
   {
     "id": "typeahead-autocomplete",
-    "track": "react-patterns",
+    "track": "react-components",
     "title": "Typeahead / Autocomplete Component",
     "box": 1,
     "streak": 0,
@@ -2781,7 +2784,7 @@
   },
   {
     "id": "use-previous-latest-ref",
-    "track": "react-patterns",
+    "track": "react",
     "title": "usePrevious, useLatest, and useInterval",
     "box": 1,
     "streak": 0,
@@ -2834,7 +2837,7 @@
   },
   {
     "id": "infinite-scroll-list",
-    "track": "react-patterns",
+    "track": "react-components",
     "title": "Infinite Scroll with IntersectionObserver",
     "box": 1,
     "streak": 0,
@@ -2882,7 +2885,7 @@
   },
   {
     "id": "modal-portal-focus",
-    "track": "react-patterns",
+    "track": "react-components",
     "title": "Accessible Modal with Portal and Focus Trap",
     "box": 1,
     "streak": 0,
@@ -2946,7 +2949,7 @@
   },
   {
     "id": "todo-list-reducer",
-    "track": "react-patterns",
+    "track": "react",
     "title": "Todo List State: Reducer + Selectors",
     "box": 1,
     "streak": 0,
@@ -3015,7 +3018,7 @@
   },
   {
     "id": "tabs-accordion-compound",
-    "track": "react-patterns",
+    "track": "react-components",
     "title": "Compound Components (Tabs)",
     "box": 1,
     "streak": 0,
@@ -3064,7 +3067,7 @@
   },
   {
     "id": "two-sum-hashmap",
-    "track": "algorithmic-screens",
+    "track": "algorithms",
     "title": "Two Sum and Hash-Map Lookups",
     "box": 1,
     "streak": 0,
@@ -3120,7 +3123,7 @@
   },
   {
     "id": "tree-traversal-dom",
-    "track": "algorithmic-screens",
+    "track": "algorithms",
     "title": "DOM / Tree Traversal (BFS, DFS, getElementsByClassName)",
     "box": 1,
     "streak": 0,
@@ -3192,7 +3195,7 @@
   },
   {
     "id": "interval-merge-sliding-window",
-    "track": "algorithmic-screens",
+    "track": "algorithms",
     "title": "Merge Intervals and Sliding Window",
     "box": 1,
     "streak": 0,
@@ -3578,11 +3581,11 @@
       }
     ],
     "difficulty": 4,
-    "concept": "emitter"
+    "concept": "ts-generics"
   },
   {
     "id": "classnames-utility",
-    "track": "js-language",
+    "track": "js-utilities",
     "title": "classNames / clsx Utility",
     "box": 1,
     "streak": 0,
@@ -3700,7 +3703,7 @@
   },
   {
     "id": "css-specificity",
-    "track": "js-language",
+    "track": "dom-browser",
     "title": "CSS Selector Specificity Calculator",
     "box": 1,
     "streak": 0,
@@ -3784,7 +3787,7 @@
   },
   {
     "id": "format-utilities",
-    "track": "js-language",
+    "track": "js-utilities",
     "title": "Formatting: Numbers, Bytes, Relative Time, Truncate",
     "box": 1,
     "streak": 0,
@@ -3873,7 +3876,7 @@
   },
   {
     "id": "infinite-currying-sum",
-    "track": "js-language",
+    "track": "js-utilities",
     "title": "Infinite Currying: sum(1)(2)(3)()",
     "box": 1,
     "streak": 0,
@@ -4006,7 +4009,7 @@
   },
   {
     "id": "json-stringify-polyfill",
-    "track": "js-language",
+    "track": "js-utilities",
     "title": "JSON.stringify Polyfill",
     "box": 1,
     "streak": 0,
@@ -4154,7 +4157,7 @@
   },
   {
     "id": "promise-class-scratch",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Promise Class from Scratch",
     "box": 1,
     "streak": 0,
@@ -4292,7 +4295,7 @@
   },
   {
     "id": "query-string-url",
-    "track": "js-language",
+    "track": "js-utilities",
     "title": "Query String Parse / Stringify",
     "box": 1,
     "streak": 0,
@@ -4637,7 +4640,7 @@
   },
   {
     "id": "error-boundary-reset",
-    "track": "react",
+    "track": "react-components",
     "title": "Error Boundary with Reset",
     "box": 1,
     "streak": 0,
@@ -5005,7 +5008,7 @@
   },
   {
     "id": "callback-emitter",
-    "track": "js-language",
+    "track": "js-utilities",
     "title": "Tiny Event Emitter (on / emit)",
     "box": 1,
     "streak": 0,
@@ -5054,7 +5057,7 @@
   },
   {
     "id": "fifo-cache",
-    "track": "data-structures",
+    "track": "js-utilities",
     "title": "Fixed-Size Cache (evict oldest)",
     "box": 1,
     "streak": 0,
@@ -5211,7 +5214,7 @@
   },
   {
     "id": "memoize-basics",
-    "track": "js-language",
+    "track": "js-utilities",
     "title": "Memoize a Single-Argument Function",
     "box": 1,
     "streak": 0,
@@ -5309,7 +5312,7 @@
   },
   {
     "id": "parse-style-string",
-    "track": "js-language",
+    "track": "dom-browser",
     "title": "Parse and Build Inline Style Strings",
     "box": 1,
     "streak": 0,
@@ -5471,7 +5474,7 @@
   },
   {
     "id": "shallow-copy-equal",
-    "track": "collections-transformations",
+    "track": "js-utilities",
     "title": "Shallow Copy and Shallow Equal",
     "box": 1,
     "streak": 0,
@@ -6322,7 +6325,7 @@
   },
   {
     "id": "memo-derived-list",
-    "track": "react-components",
+    "track": "react",
     "title": "useMemo for a Derived List",
     "box": 1,
     "streak": 0,
@@ -8012,7 +8015,7 @@
   },
   {
     "id": "compose-middleware",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Middleware: compose(fns) With next()",
     "box": 1,
     "streak": 0,
@@ -8453,7 +8456,7 @@
   },
   {
     "id": "promise-all-by-hand",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Promise.all By Hand (Counter)",
     "box": 1,
     "streak": 0,
@@ -8511,7 +8514,7 @@
   },
   {
     "id": "simple-stringify",
-    "track": "js-language",
+    "track": "js-utilities",
     "title": "Serialization: simpleStringify (Primitives and Arrays)",
     "box": 1,
     "streak": 0,
@@ -12643,7 +12646,7 @@
   },
   {
     "id": "promise-any-aggregate",
-    "track": "async-web-plumbing",
+    "track": "async-js",
     "title": "Promises: Promise.any and AggregateError Polyfill",
     "box": 1,
     "streak": 0,
@@ -12687,7 +12690,7 @@
   },
   {
     "id": "pub-sub-wildcard-emitter",
-    "track": "async-js",
+    "track": "js-utilities",
     "title": "Event Architecture: PubSub with Wildcard Topics and Once Listeners",
     "box": 1,
     "streak": 0,
@@ -13149,7 +13152,7 @@
   },
   {
     "id": "next-route-matcher",
-    "track": "testing-tooling",
+    "track": "dom-browser",
     "title": "Next.js Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
     "box": 1,
     "streak": 0,
@@ -13163,7 +13166,7 @@
     ],
     "promptSeed": "Implement `matchRoute(pattern, pathname)` to match URL pathnames against Next.js-style file-system route patterns and extract parameter mappings.\n\nSegment rules:\n1. Static segments: exact string match (e.g. `/posts/latest`).\n2. Single dynamic parameter: `[param]` matches exactly one non-empty path segment. Returns `{ [param]: segmentString }`.\n3. Catch-all parameter: `[...slug]` matches one or more path segments. Returns `{ [slug]: [segment1, segment2, ...] }`. Fails (returns `null`) if zero segments are provided.\n4. Optional catch-all parameter: `[[...slug]]` matches zero or more path segments. Returns `{ [slug]: [segment1, ...] }` or `{ [slug]: [] }` if no segments match.\n\nReturn value:\n- Returns `{ params: Record<string, string | string[]> }` if `pathname` matches `pattern`.\n- Returns `null` if `pathname` does not match the pattern.\n- Leading and trailing slashes should be normalized.",
     "difficulty": 3,
-    "concept": "routing",
+    "concept": "router",
     "referenceSolution": "function matchRoute(pattern, pathname) {\n  const pSegs = pattern.split('/').filter(Boolean);\n  const uSegs = pathname.split('/').filter(Boolean);\n  const params = {};\n\n  let uIdx = 0;\n  for (let pIdx = 0; pIdx < pSegs.length; pIdx++) {\n    const p = pSegs[pIdx];\n\n    // Optional catch-all: [[...param]]\n    const optMatch = p.match(/^\\[\\[\\.\\.\\.([^\\]]+)\\]\\]$/);\n    if (optMatch) {\n      const key = optMatch[1];\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Catch-all: [...param]\n    const catchMatch = p.match(/^\\[\\.\\.\\.([^\\]]+)\\]$/);\n    if (catchMatch) {\n      const key = catchMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Dynamic param: [param]\n    const paramMatch = p.match(/^\\[([^\\]]+)\\]$/);\n    if (paramMatch) {\n      const key = paramMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs[uIdx];\n      uIdx++;\n      continue;\n    }\n\n    // Static segment\n    if (uIdx >= uSegs.length || p !== uSegs[uIdx]) {\n      return null;\n    }\n    uIdx++;\n  }\n\n  if (uIdx !== uSegs.length) {\n    return null;\n  }\n\n  return { params };\n}",
     "solution": "function matchRoute(pattern, pathname) {\n  const pSegs = pattern.split('/').filter(Boolean);\n  const uSegs = pathname.split('/').filter(Boolean);\n  const params = {};\n\n  let uIdx = 0;\n  for (let pIdx = 0; pIdx < pSegs.length; pIdx++) {\n    const p = pSegs[pIdx];\n\n    // Optional catch-all: [[...param]]\n    const optMatch = p.match(/^\\[\\[\\.\\.\\.([^\\]]+)\\]\\]$/);\n    if (optMatch) {\n      const key = optMatch[1];\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Catch-all: [...param]\n    const catchMatch = p.match(/^\\[\\.\\.\\.([^\\]]+)\\]$/);\n    if (catchMatch) {\n      const key = catchMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Dynamic param: [param]\n    const paramMatch = p.match(/^\\[([^\\]]+)\\]$/);\n    if (paramMatch) {\n      const key = paramMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs[uIdx];\n      uIdx++;\n      continue;\n    }\n\n    // Static segment\n    if (uIdx >= uSegs.length || p !== uSegs[uIdx]) {\n      return null;\n    }\n    uIdx++;\n  }\n\n  if (uIdx !== uSegs.length) {\n    return null;\n  }\n\n  return { params };\n}",
     "starterCode": "function matchRoute(pattern, pathname) {\n  const pSegs = pattern.split('/').filter(Boolean);\n  const uSegs = pathname.split('/').filter(Boolean);\n  const params = {};\n\n  let uIdx = 0;\n  for (let pIdx = 0; pIdx < pSegs.length; pIdx++) {\n    const p = pSegs[pIdx];\n\n    // Optional catch-all: [[...param]]\n    const optMatch = p.match(/^\\[\\[\\.\\.\\.([^\\]]+)\\]\\]$/);\n    if (optMatch) {\n      const key = optMatch[1];\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Catch-all: [...param]\n    const catchMatch = p.match(/^\\[\\.\\.\\.([^\\]]+)\\]$/);\n    if (catchMatch) {\n      const key = catchMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs.slice(uIdx);\n      uIdx = uSegs.length;\n      break;\n    }\n\n    // Dynamic param: [param]\n    const paramMatch = p.match(/^\\[([^\\]]+)\\]$/);\n    if (paramMatch) {\n      const key = paramMatch[1];\n      if (uIdx >= uSegs.length) return null;\n      params[key] = uSegs[uIdx];\n      uIdx++;\n      continue;\n    }\n\n    // Static segment\n    if (uIdx >= uSegs.length || p !== uSegs[uIdx]) {\n      return null;\n    }\n    uIdx++;\n  }\n\n  if (uIdx !== uSegs.length) {\n    return null;\n  }\n\n  return { params };\n}",
@@ -13283,7 +13286,7 @@
     ],
     "promptSeed": "Implement `generateBreadcrumbs(pathname, customLabels = {})` and an accessible React component `Breadcrumbs({ pathname, labels })`.\n\nRequirements for `generateBreadcrumbs(pathname, customLabels)`:\n- Normalizes consecutive or trailing slashes (e.g. `'/products/123/'` -> segments `['products', '123']`).\n- Always includes the root breadcrumb `{ path: '/', label: customLabels['/'] || 'Home', isCurrent: false }`.\n- For each subpath, constructs cumulative path (`'/products'`, `'/products/123'`).\n- Resolves label from `customLabels[path]` if present; otherwise capitalizes the segment string (e.g. `'products'` -> `'Products'`).\n- The final item in the array has `isCurrent: true`; all preceding items have `isCurrent: false`.\n- If pathname is `'/'` or empty, returns `[{ path: '/', label: customLabels['/'] || 'Home', isCurrent: true }]`.\n\nRequirements for `Breadcrumbs({ pathname, labels })`:\n- Renders a `<nav aria-label=\"Breadcrumb\">` wrapping an `<ol className=\"breadcrumbs\">`.\n- For non-current crumbs, renders `<a href={crumb.path}>{crumb.label}</a>`.\n- For current crumb, renders `<span aria-current=\"page\">{crumb.label}</span>`.",
     "difficulty": 2,
-    "concept": "routing",
+    "concept": "routing-ui",
     "referenceSolution": "function generateBreadcrumbs(pathname, customLabels = {}) {\n  const clean = pathname ? pathname.replace(/\\/+/g, '/').replace(/\\/$/, '') : '';\n  const segments = clean.split('/').filter(Boolean);\n\n  const crumbs = [\n    {\n      path: '/',\n      label: customLabels['/'] || 'Home',\n      isCurrent: segments.length === 0\n    }\n  ];\n\n  let currentPath = '';\n  for (let i = 0; i < segments.length; i++) {\n    const seg = segments[i];\n    currentPath += `/${seg}`;\n    const isCurrent = i === segments.length - 1;\n    const defaultLabel = seg.charAt(0).toUpperCase() + seg.slice(1);\n    crumbs.push({\n      path: currentPath,\n      label: customLabels[currentPath] || defaultLabel,\n      isCurrent\n    });\n  }\n\n  return crumbs;\n}\n\nfunction Breadcrumbs({ pathname, labels = {} }) {\n  const crumbs = generateBreadcrumbs(pathname, labels);\n\n  return React.createElement(\n    'nav',\n    { 'aria-label': 'Breadcrumb' },\n    React.createElement(\n      'ol',\n      { className: 'breadcrumbs' },\n      crumbs.map((c) =>\n        React.createElement(\n          'li',\n          { key: c.path, className: c.isCurrent ? 'breadcrumb-item active' : 'breadcrumb-item' },\n          c.isCurrent\n            ? React.createElement('span', { 'aria-current': 'page' }, c.label)\n            : React.createElement('a', { href: c.path }, c.label)\n        )\n      )\n    )\n  );\n}",
     "solution": "function generateBreadcrumbs(pathname, customLabels = {}) {\n  const clean = pathname ? pathname.replace(/\\/+/g, '/').replace(/\\/$/, '') : '';\n  const segments = clean.split('/').filter(Boolean);\n\n  const crumbs = [\n    {\n      path: '/',\n      label: customLabels['/'] || 'Home',\n      isCurrent: segments.length === 0\n    }\n  ];\n\n  let currentPath = '';\n  for (let i = 0; i < segments.length; i++) {\n    const seg = segments[i];\n    currentPath += `/${seg}`;\n    const isCurrent = i === segments.length - 1;\n    const defaultLabel = seg.charAt(0).toUpperCase() + seg.slice(1);\n    crumbs.push({\n      path: currentPath,\n      label: customLabels[currentPath] || defaultLabel,\n      isCurrent\n    });\n  }\n\n  return crumbs;\n}\n\nfunction Breadcrumbs({ pathname, labels = {} }) {\n  const crumbs = generateBreadcrumbs(pathname, labels);\n\n  return React.createElement(\n    'nav',\n    { 'aria-label': 'Breadcrumb' },\n    React.createElement(\n      'ol',\n      { className: 'breadcrumbs' },\n      crumbs.map((c) =>\n        React.createElement(\n          'li',\n          { key: c.path, className: c.isCurrent ? 'breadcrumb-item active' : 'breadcrumb-item' },\n          c.isCurrent\n            ? React.createElement('span', { 'aria-current': 'page' }, c.label)\n            : React.createElement('a', { href: c.path }, c.label)\n        )\n      )\n    )\n  );\n}",
     "starterCode": "function generateBreadcrumbs(pathname, customLabels = {}) {\n  const clean = pathname ? pathname.replace(/\\/+/g, '/').replace(/\\/$/, '') : '';\n  const segments = clean.split('/').filter(Boolean);\n\n  const crumbs = [\n    {\n      path: '/',\n      label: customLabels['/'] || 'Home',\n      isCurrent: segments.length === 0\n    }\n  ];\n\n  let currentPath = '';\n  for (let i = 0; i < segments.length; i++) {\n    const seg = segments[i];\n    currentPath += `/${seg}`;\n    const isCurrent = i === segments.length - 1;\n    const defaultLabel = seg.charAt(0).toUpperCase() + seg.slice(1);\n    crumbs.push({\n      path: currentPath,\n      label: customLabels[currentPath] || defaultLabel,\n      isCurrent\n    });\n  }\n\n  return crumbs;\n}\n\nfunction Breadcrumbs({ pathname, labels = {} }) {\n  const crumbs = generateBreadcrumbs(pathname, labels);\n\n  return React.createElement(\n    'nav',\n    { 'aria-label': 'Breadcrumb' },\n    React.createElement(\n      'ol',\n      { className: 'breadcrumbs' },\n      crumbs.map((c) =>\n        React.createElement(\n          'li',\n          { key: c.path, className: c.isCurrent ? 'breadcrumb-item active' : 'breadcrumb-item' },\n          c.isCurrent\n            ? React.createElement('span', { 'aria-current': 'page' }, c.label)\n            : React.createElement('a', { href: c.path }, c.label)\n        )\n      )\n    )\n  );\n}",
@@ -13422,7 +13425,7 @@
   },
   {
     "id": "use-is-mounted",
-    "track": "react-patterns",
+    "track": "react",
     "title": "useIsMounted Hook: Component Mount Status Guard",
     "box": 1,
     "streak": 0,
@@ -13471,7 +13474,7 @@
   },
   {
     "id": "use-media-query",
-    "track": "react-patterns",
+    "track": "react",
     "title": "useMediaQuery Hook: Responsive MatchMedia Listener",
     "box": 1,
     "streak": 0,
@@ -13888,7 +13891,7 @@
   },
   {
     "id": "theme-switcher",
-    "track": "react-patterns",
+    "track": "react",
     "title": "Theme Switcher (Context + localStorage)",
     "box": 1,
     "streak": 0,

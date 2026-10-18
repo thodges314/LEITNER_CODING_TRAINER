@@ -291,7 +291,7 @@ function heuristicEvaluateCode(topic: TopicItem, code: string, harness?: Harness
     if (trimmed.includes('setTimeout') || trimmed.includes('clearTimeout') || trimmed.includes('AbortController') || trimmed.includes('signal')) {
       invariantsMet.push('Timing/cancellation lifecycle lifecycle awareness');
     }
-  } else if (topic.track === 'data-structures') {
+  } else if (topic.track === 'js-utilities') {
     if (trimmed.includes('new Map') || trimmed.includes('new Set') || trimmed.includes('WeakMap') || trimmed.includes('reduce')) {
       invariantsMet.push('Core data structure primitive instantiated properly');
     } else {
@@ -590,7 +590,7 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
     } else if (lower.includes('async') || lower.includes('promise') || lower.includes('fetch') || lower.includes('timeout') || lower.includes('await')) {
       track = 'async-js';
     } else if (lower.includes('map') || lower.includes('set') || lower.includes('tree') || lower.includes('lru') || lower.includes('cache') || lower.includes('heap') || lower.includes('queue')) {
-      track = 'data-structures';
+      track = 'js-utilities';
     }
 
     const words = userNote.trim().split(/\s+/).slice(0, 5).join(' ');

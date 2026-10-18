@@ -1,3 +1,4 @@
+import { isReactTrack as isReactTrackId } from '../../lib/leitner';
 import type { TopicItem } from '../../lib/leitner';
 
 /**
@@ -7,7 +8,7 @@ import type { TopicItem } from '../../lib/leitner';
 export function getStarterSnippet(card: TopicItem | null): string {
   if (!card) return '';
 
-  const isReactTrack = card.track === 'react' || card.track === 'react-patterns';
+  const isReactTrack = isReactTrackId(card.track);
 
   let commentedSnippet: string;
   if (card.testHarness?.trim()) {
@@ -49,14 +50,12 @@ export function getStarterSnippet(card: TopicItem | null): string {
     const idLower = card.id.toLowerCase();
     if (
       card.track === 'async-js' ||
-      card.track === 'async-web-plumbing' ||
       titleLower.includes('fetch') ||
       idLower.includes('fetch')
     ) {
       commentedSnippet = `// fetchData('https://jsonplaceholder.typicode.com/todos/1').then(console.log).catch(console.error);`;
     } else if (
       card.track === 'algorithms' ||
-      card.track === 'algorithmic-screens' ||
       titleLower.includes('two sum') ||
       idLower.includes('two-sum') ||
       titleLower.includes('sorted')

@@ -65,7 +65,7 @@ describe('seed deck packs', () => {
     for (const c of cards) if (c.pack) expect(Object.keys(CARD_PACKS), c.id).toContain(c.pack);
   });
   it('the core algorithm set keeps a fair, varied representation (incl. basic graph theory)', () => {
-    const core = cards.filter((c) => (c.track === 'algorithms' || c.track === 'algorithmic-screens') && !c.pack);
+    const core = cards.filter((c) => c.track === 'algorithms' && !c.pack);
     expect(core.length).toBeGreaterThanOrEqual(40);
     const concepts = new Set(core.map((c) => c.concept));
     for (const must of ['graphs', 'trees', 'linked-lists', 'sliding-window', 'two-pointer', 'binary-search', 'hashing', 'stack', 'dp', 'sorting']) {

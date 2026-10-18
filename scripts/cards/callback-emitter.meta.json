@@ -1,5 +1,5 @@
 {
-  "track": "js-language",
+  "track": "js-utilities",
   "title": "Tiny Event Emitter (on / emit)",
   "tags": [
     "events",

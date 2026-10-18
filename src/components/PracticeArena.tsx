@@ -13,6 +13,7 @@ import {
   intervalForBox,
   DIFFICULTY_LABELS,
   difficultyOf,
+  isReactTrack as isReactTrackId,
 } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { evaluateCodeSubmission } from '../lib/ai';
@@ -611,7 +612,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     );
   }
 
-  const isReactTrack = currentCard.track === 'react' || currentCard.track === 'react-patterns';
+  const isReactTrack = isReactTrackId(currentCard.track);
   const trackMeta = getTrackMeta(currentCard.track);
   const errorCount = outputLogs.filter((l) => l.failure).length;
 

@@ -18,8 +18,9 @@ const topics = JSON.parse(fs.readFileSync(topicsPath, 'utf8'));
 
 // Big-O only means something for algorithmic / data-structure style cards. UI components, hooks, TS types and
 // plain language features get NO complexity fields (the UI hides the complexity badges for them).
-const COMPLEXITY_TRACKS = new Set(['algorithms', 'algorithmic-screens', 'data-structures', 'collections-transformations']);
-const wantsComplexity = (card) => COMPLEXITY_TRACKS.has(card.track);
+// Algorithms, plus the data-structure style concepts of the JS Utilities track.
+const COMPLEXITY_CONCEPTS = new Set(['collections', 'flatten', 'array-polyfills', 'equality-clone', 'lru']);
+const wantsComplexity = (card) => card.track === 'algorithms' || (card.track === 'js-utilities' && COMPLEXITY_CONCEPTS.has(card.concept));
 // One notation everywhere: lowercase variables (O(n), O(n log n)), so the card UI is consistent.
 const normalizeBigO = (text) => (typeof text === 'string' ? text.replace(/\bN\b/g, 'n') : text);
 console.log(`Loaded ${topics.length} topics`);

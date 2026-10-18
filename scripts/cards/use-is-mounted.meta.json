@@ -1,5 +1,5 @@
 {
-  "track": "react-patterns",
+  "track": "react",
   "title": "useIsMounted Hook: Component Mount Status Guard",
   "tags": [
     "react",

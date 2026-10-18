@@ -430,7 +430,8 @@ describe('getTopicTestCases', () => {
 
 describe('isTrackType', () => {
   it('accepts known tracks only', () => {
-    expect(isTrackType('react-patterns')).toBe(true);
+    expect(isTrackType('react-components')).toBe(true);
+    expect(isTrackType('react-patterns')).toBe(false); // retired by the track consolidation (see TRACK_ALIASES)
     expect(isTrackType('toString')).toBe(false);
     expect(isTrackType(5)).toBe(false);
   });

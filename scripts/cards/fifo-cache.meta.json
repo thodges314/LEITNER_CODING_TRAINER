@@ -1,5 +1,5 @@
 {
-  "track": "data-structures",
+  "track": "js-utilities",
   "title": "Fixed-Size Cache (evict oldest)",
   "tags": [
     "cache",

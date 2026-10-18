@@ -61,7 +61,7 @@
   },
   "hook-use-debounce": {
     "difficulty": 2,
-    "concept": "react-timers"
+    "concept": "react-hooks-utility"
   },
   "controlled-vs-uncontrolled-input": {
     "difficulty": 1,
@@ -197,7 +197,7 @@
   },
   "use-debounce-hook": {
     "difficulty": 3,
-    "concept": "react-timers"
+    "concept": "react-hooks-utility"
   },
   "use-fetch-hook": {
     "difficulty": 3,
@@ -261,7 +261,7 @@
   },
   "ts-typed-event-emitter": {
     "difficulty": 4,
-    "concept": "emitter"
+    "concept": "ts-generics"
   },
   "classnames-utility": {
     "difficulty": 1,
@@ -909,7 +909,7 @@
   },
   "next-route-matcher": {
     "difficulty": 3,
-    "concept": "routing"
+    "concept": "router"
   },
   "test-runner-lifecycle": {
     "difficulty": 5,
@@ -925,7 +925,7 @@
   },
   "breadcrumbs-router": {
     "difficulty": 2,
-    "concept": "routing"
+    "concept": "routing-ui"
   },
   "transfer-list": {
     "difficulty": 3,

@@ -54,11 +54,6 @@ const LIGHT_TRACK_STYLES: Record<string, { color: string; bg: string; border: st
     bg: '#E0F2FE',
     border: '#7DD3FC',
   },
-  'data-structures': {
-    color: '#6D28D9',
-    bg: '#EDE9FE',
-    border: '#C4B5FD',
-  },
   'react': {
     color: '#0E7490',
     bg: '#CFFAFE',
@@ -68,31 +63,6 @@ const LIGHT_TRACK_STYLES: Record<string, { color: string; bg: string; border: st
     color: '#B45309',
     bg: '#FEF3C7',
     border: '#FCD34D',
-  },
-  'js-runtime-fundamentals': {
-    color: '#BE185D',
-    bg: '#FCE7F3',
-    border: '#F472B6',
-  },
-  'async-web-plumbing': {
-    color: '#4338CA',
-    bg: '#E0E7FF',
-    border: '#A5B4FC',
-  },
-  'collections-transformations': {
-    color: '#047857',
-    bg: '#D1FAE5',
-    border: '#6EE7B7',
-  },
-  'react-patterns': {
-    color: '#0F766E',
-    bg: '#CCFBF1',
-    border: '#5EEAD4',
-  },
-  'algorithmic-screens': {
-    color: '#A16207',
-    bg: '#FEF9C3',
-    border: '#FDE047',
   },
   'typescript-patterns': {
     color: '#1E40AF',
@@ -118,6 +88,11 @@ const LIGHT_TRACK_STYLES: Record<string, { color: string; bg: string; border: st
     color: '#BE123C',
     bg: '#FFE4E6',
     border: '#FDA4AF',
+  },
+  'js-utilities': {
+    color: '#047857',
+    bg: '#D1FAE5',
+    border: '#6EE7B7',
   },
 };
 

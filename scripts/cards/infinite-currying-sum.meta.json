@@ -1,5 +1,5 @@
 {
-  "track": "js-language",
+  "track": "js-utilities",
   "title": "Infinite Currying: sum(1)(2)(3)()",
   "tags": [
     "currying",
