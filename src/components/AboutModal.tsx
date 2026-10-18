@@ -4,9 +4,11 @@ import { X, Brain, BookOpen, Layers, Zap, ExternalLink } from 'lucide-react';
 interface AboutModalProps {
   isOpen: boolean;
   onClose: () => void;
+  /** First-run variant: a "how a session works" intro and a primary "Start practicing" button. */
+  welcome?: boolean;
 }
 
-export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
+export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome = false }) => {
   if (!isOpen) return null;
 
   const isLight = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'apple-gsos';
@@ -59,7 +61,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h2 id="about-title" style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
-                About Leitner Coding Trainer
+                {welcome ? 'Welcome to Leitner Coding Trainer' : 'About Leitner Coding Trainer'}
               </h2>
             </div>
           </div>
@@ -87,6 +89,29 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
             color: 'var(--text-secondary)',
           }}
         >
+          {welcome && (
+            <div
+              style={{
+                padding: '18px 20px',
+                borderRadius: '12px',
+                backgroundColor: isLight ? '#F0F9FF' : 'rgba(56, 189, 248, 0.07)',
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              <h3 style={{ fontSize: '15px', fontWeight: 600, margin: '0 0 8px 0', color: 'var(--text-primary)' }}>How a session works</h3>
+              <ol style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <li>You get one card at a time. Write the solution from memory in the editor: no autocomplete, no hints.</li>
+                <li>Submit: your code runs against the card&apos;s tests in your browser, and the tests decide pass or fail.</li>
+                <li>Missed it? You see a better answer, then get one immediate retry. The retry never affects your score.</li>
+                <li>Cards come back on a graduated schedule, and harder cards unlock as you pass easier ones.</li>
+                <li>Preparing for something specific? Use Focus to include or exclude topics. Everything stays in this browser.</li>
+              </ol>
+              <button type="button" className="btn btn-primary" style={{ marginTop: '14px' }} onClick={onClose}>
+                Start practicing
+              </button>
+            </div>
+          )}
+
           {/* Why I Built This */}
           <div
             style={{
