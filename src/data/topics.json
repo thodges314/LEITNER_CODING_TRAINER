@@ -13709,5 +13709,182 @@
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Event listener registration and state updates perform constant-time operations."
+  },
+  {
+    "id": "multi-step-form",
+    "track": "react-components",
+    "title": "Multi-Step Form Wizard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "forms",
+      "state",
+      "validation"
+    ],
+    "promptSeed": "Build Wizard({ steps, onSubmit }) with steps [{ title, fields: [{ name, label }] }]. Render one <form> showing <p>Step X of N</p>, <h2> with the step title, and for each field a <label> wrapping a controlled <input name>. Provide <button type=\"button\">Back</button> (disabled on the first step) and <button type=\"submit\"> labelled 'Next' (or 'Submit' on the last step). Submitting the form (Enter or the button) validates the CURRENT step only: if any of its fields is empty after trimming, show <p role=\"alert\">All fields are required</p> and stay; otherwise go to the next step, or on the last step call onSubmit(values) with ALL values entered across the steps. Values typed earlier must still be there after Back/Next. Moving between steps clears the alert.",
+    "difficulty": 4,
+    "concept": "wizard",
+    "referenceSolution": "function Wizard({ steps, onSubmit }) {\n  const [index, setIndex] = useState(0);\n  const [values, setValues] = useState({});\n  const [error, setError] = useState(null);\n\n  const step = steps[index];\n  const isLast = index === steps.length - 1;\n\n  const handleSubmit = (e) => {\n    e.preventDefault();\n    const missing = step.fields.some((field) => !(values[field.name] ?? '').trim());\n    if (missing) {\n      setError('All fields are required');\n      return;\n    }\n    setError(null);\n    if (isLast) onSubmit(values);\n    else setIndex(index + 1);\n  };\n\n  return (\n    <form onSubmit={handleSubmit}>\n      <p>\n        Step {index + 1} of {steps.length}\n      </p>\n      <h2>{step.title}</h2>\n      {step.fields.map((field) => (\n        <label key={field.name}>\n          {field.label}\n          <input\n            name={field.name}\n            value={values[field.name] ?? ''}\n            onChange={(e) => setValues((v) => ({ ...v, [field.name]: e.target.value }))}\n          />\n        </label>\n      ))}\n      {error && <p role=\"alert\">{error}</p>}\n      <button\n        type=\"button\"\n        disabled={index === 0}\n        onClick={() => {\n          setError(null);\n          setIndex(index - 1);\n        }}\n      >\n        Back\n      </button>\n      <button type=\"submit\">{isLast ? 'Submit' : 'Next'}</button>\n    </form>\n  );\n}",
+    "solution": "function Wizard({ steps, onSubmit }) {\n  const [index, setIndex] = useState(0);\n  const [values, setValues] = useState({});\n  const [error, setError] = useState(null);\n\n  const step = steps[index];\n  const isLast = index === steps.length - 1;\n\n  const handleSubmit = (e) => {\n    e.preventDefault();\n    const missing = step.fields.some((field) => !(values[field.name] ?? '').trim());\n    if (missing) {\n      setError('All fields are required');\n      return;\n    }\n    setError(null);\n    if (isLast) onSubmit(values);\n    else setIndex(index + 1);\n  };\n\n  return (\n    <form onSubmit={handleSubmit}>\n      <p>\n        Step {index + 1} of {steps.length}\n      </p>\n      <h2>{step.title}</h2>\n      {step.fields.map((field) => (\n        <label key={field.name}>\n          {field.label}\n          <input\n            name={field.name}\n            value={values[field.name] ?? ''}\n            onChange={(e) => setValues((v) => ({ ...v, [field.name]: e.target.value }))}\n          />\n        </label>\n      ))}\n      {error && <p role=\"alert\">{error}</p>}\n      <button\n        type=\"button\"\n        disabled={index === 0}\n        onClick={() => {\n          setError(null);\n          setIndex(index - 1);\n        }}\n      >\n        Back\n      </button>\n      <button type=\"submit\">{isLast ? 'Submit' : 'Next'}</button>\n    </form>\n  );\n}",
+    "starterCode": "function Wizard({ steps, onSubmit }) {\n  const [index, setIndex] = useState(0);\n  const [values, setValues] = useState({});\n  const [error, setError] = useState(null);\n\n  const step = steps[index];\n  const isLast = index === steps.length - 1;\n\n  const handleSubmit = (e) => {\n    e.preventDefault();\n    const missing = step.fields.some((field) => !(values[field.name] ?? '').trim());\n    if (missing) {\n      setError('All fields are required');\n      return;\n    }\n    setError(null);\n    if (isLast) onSubmit(values);\n    else setIndex(index + 1);\n  };\n\n  return (\n    <form onSubmit={handleSubmit}>\n      <p>\n        Step {index + 1} of {steps.length}\n      </p>\n      <h2>{step.title}</h2>\n      {step.fields.map((field) => (\n        <label key={field.name}>\n          {field.label}\n          <input\n            name={field.name}\n            value={values[field.name] ?? ''}\n            onChange={(e) => setValues((v) => ({ ...v, [field.name]: e.target.value }))}\n          />\n        </label>\n      ))}\n      {error && <p role=\"alert\">{error}</p>}\n      <button\n        type=\"button\"\n        disabled={index === 0}\n        onClick={() => {\n          setError(null);\n          setIndex(index - 1);\n        }}\n      >\n        Back\n      </button>\n      <button type=\"submit\">{isLast ? 'Submit' : 'Next'}</button>\n    </form>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Shows step 1 of N with its title and fields",
+        "input": "steps: Account (email), Profile (first, last), Plan (plan)",
+        "expected": "'Step 1 of 3'; <h2>Account</h2>; one input; a 'Next' button"
+      },
+      {
+        "description": "Back is disabled on the first step",
+        "input": "first step",
+        "expected": "Back button disabled"
+      },
+      {
+        "description": "Next is blocked with an alert until every field of the step is filled (blank counts as empty)",
+        "input": "click Next with an empty (or '   ') email",
+        "expected": "stays on Account; <p role='alert'>All fields are required</p>"
+      },
+      {
+        "description": "Next moves forward, Back returns and keeps typed values, and the alert clears when the step changes",
+        "input": "type an email, Next → 'Profile'; Next again (empty) shows the alert; Back",
+        "expected": "'Profile', 'Step 2 of 3', 2 inputs; after Back: Account with the email still typed and no alert"
+      },
+      {
+        "description": "The last step shows Submit and submits the values of all steps",
+        "input": "fill email; Next; fill first/last; Next; fill plan; Submit",
+        "expected": "onSubmit({ email, first, last, plan }) once; the last step has 'Submit' and no 'Next'"
+      },
+      {
+        "description": "The last step does not submit while a field is empty",
+        "input": "a single-step wizard; Submit with an empty field",
+        "expected": "onSubmit not called; alert shown"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst STEPS = [\n  { title: 'Account', fields: [{ name: 'email', label: 'Email' }] },\n  { title: 'Profile', fields: [{ name: 'first', label: 'First name' }, { name: 'last', label: 'Last name' }] },\n  { title: 'Plan', fields: [{ name: 'plan', label: 'Plan' }] },\n];\nconst field = (c, label) => qa('label', c).find((l) => l.textContent.startsWith(label)).querySelector('input');\nconst btn = (c, text) => qa('button', c).find((b) => b.textContent === text);\nconst stepText = (c) => q('p', c).textContent;\nconst title = (c) => q('h2', c).textContent;\n{\n  const r = render(<Wizard steps={STEPS} onSubmit={() => {}} />);\n  $test.check('Shows step 1 of N with its title and fields', stepText(r.container) === 'Step 1 of 3' && title(r.container) === 'Account' && qa('input', r.container).length === 1 && btn(r.container, 'Next') !== undefined, r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Wizard steps={STEPS} onSubmit={() => {}} />);\n  $test.check('Back is disabled on the first step', btn(r.container, 'Back').disabled === true, 'enabled');\n  r.unmount();\n}\n{\n  const r = render(<Wizard steps={STEPS} onSubmit={() => {}} />);\n  fire.click(btn(r.container, 'Next'));\n  const blocked = title(r.container) === 'Account' && q('[role=\"alert\"]', r.container) !== null && q('[role=\"alert\"]', r.container).textContent === 'All fields are required';\n  fire.change(field(r.container, 'Email'), '   ');\n  fire.click(btn(r.container, 'Next'));\n  $test.check('Next is blocked with an alert until every field of the step is filled (blank counts as empty)', blocked && title(r.container) === 'Account' && q('[role=\"alert\"]', r.container) !== null, { title: title(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Wizard steps={STEPS} onSubmit={() => {}} />);\n  fire.change(field(r.container, 'Email'), 'ada@example.com');\n  fire.click(btn(r.container, 'Next'));\n  const second = title(r.container) + '|' + stepText(r.container) + '|' + qa('input', r.container).length;\n  fire.click(btn(r.container, 'Next')); // blocked: both fields empty\n  const alertShown = q('[role=\"alert\"]', r.container) !== null;\n  fire.click(btn(r.container, 'Back'));\n  $test.check('Next moves forward, Back returns and keeps typed values, and the alert clears when the step changes', second === 'Profile|Step 2 of 3|2' && alertShown && title(r.container) === 'Account' && field(r.container, 'Email').value === 'ada@example.com' && q('[role=\"alert\"]', r.container) === null, { second });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<Wizard steps={STEPS} onSubmit={(v) => calls.push(v)} />);\n  fire.change(field(r.container, 'Email'), 'ada@example.com');\n  fire.click(btn(r.container, 'Next'));\n  fire.change(field(r.container, 'First name'), 'Ada');\n  fire.change(field(r.container, 'Last name'), 'Lovelace');\n  fire.click(btn(r.container, 'Next'));\n  const last = btn(r.container, 'Submit') !== undefined && btn(r.container, 'Next') === undefined;\n  fire.change(field(r.container, 'Plan'), 'pro');\n  fire.click(btn(r.container, 'Submit'));\n  $test.check('The last step shows Submit and submits the values of all steps', last && calls.length === 1 && JSON.stringify(calls[0]) === JSON.stringify({ email: 'ada@example.com', first: 'Ada', last: 'Lovelace', plan: 'pro' }), { last, calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<Wizard steps={[STEPS[2]]} onSubmit={(v) => calls.push(v)} />);\n  fire.click(btn(r.container, 'Submit'));\n  $test.check('The last step does not submit while a field is empty', calls.length === 0 && q('[role=\"alert\"]', r.container) !== null, calls);\n  r.unmount();\n}"
+  },
+  {
+    "id": "pagination-controls",
+    "track": "react-components",
+    "title": "Pagination Controls with Ellipsis",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "pagination",
+      "a11y",
+      "algorithm"
+    ],
+    "promptSeed": "Build Pagination({ page, totalPages, onPageChange, siblings = 1 }) as a controlled component. Render <nav aria-label=\"Pagination\"> with <button>Previous</button>, a <ul> of <li> items and <button>Next</button>. The list always shows page 1, the last page and the pages within `siblings` of the current page; between two shown pages: if exactly ONE page is missing show that page, if more are missing show an <li><span>…</span></li> (not clickable). Each page is <li><button>N</button></li>; the current page's button has aria-current=\"page\". Clicking a page calls onPageChange(n); Previous/Next call it with page-1 / page+1 and are disabled on the first/last page.",
+    "difficulty": 3,
+    "concept": "pagination",
+    "referenceSolution": "function Pagination({ page, totalPages, onPageChange, siblings = 1 }) {\n  const shown = new Set([1, totalPages]);\n  for (let p = page - siblings; p <= page + siblings; p++) {\n    if (p >= 1 && p <= totalPages) shown.add(p);\n  }\n  const sorted = [...shown].sort((a, b) => a - b);\n\n  const items = [];\n  sorted.forEach((p, i) => {\n    const previous = sorted[i - 1];\n    if (previous !== undefined && p - previous === 2) items.push(previous + 1); // one missing page: show it\n    else if (previous !== undefined && p - previous > 2) items.push('ellipsis-' + p);\n    items.push(p);\n  });\n\n  return (\n    <nav aria-label=\"Pagination\">\n      <button disabled={page <= 1} onClick={() => onPageChange(page - 1)}>\n        Previous\n      </button>\n      <ul>\n        {items.map((item) =>\n          typeof item === 'string' ? (\n            <li key={item}>\n              <span>…</span>\n            </li>\n          ) : (\n            <li key={item}>\n              <button aria-current={item === page ? 'page' : undefined} onClick={() => onPageChange(item)}>\n                {item}\n              </button>\n            </li>\n          )\n        )}\n      </ul>\n      <button disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>\n        Next\n      </button>\n    </nav>\n  );\n}",
+    "solution": "function Pagination({ page, totalPages, onPageChange, siblings = 1 }) {\n  const shown = new Set([1, totalPages]);\n  for (let p = page - siblings; p <= page + siblings; p++) {\n    if (p >= 1 && p <= totalPages) shown.add(p);\n  }\n  const sorted = [...shown].sort((a, b) => a - b);\n\n  const items = [];\n  sorted.forEach((p, i) => {\n    const previous = sorted[i - 1];\n    if (previous !== undefined && p - previous === 2) items.push(previous + 1); // one missing page: show it\n    else if (previous !== undefined && p - previous > 2) items.push('ellipsis-' + p);\n    items.push(p);\n  });\n\n  return (\n    <nav aria-label=\"Pagination\">\n      <button disabled={page <= 1} onClick={() => onPageChange(page - 1)}>\n        Previous\n      </button>\n      <ul>\n        {items.map((item) =>\n          typeof item === 'string' ? (\n            <li key={item}>\n              <span>…</span>\n            </li>\n          ) : (\n            <li key={item}>\n              <button aria-current={item === page ? 'page' : undefined} onClick={() => onPageChange(item)}>\n                {item}\n              </button>\n            </li>\n          )\n        )}\n      </ul>\n      <button disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>\n        Next\n      </button>\n    </nav>\n  );\n}",
+    "starterCode": "function Pagination({ page, totalPages, onPageChange, siblings = 1 }) {\n  const shown = new Set([1, totalPages]);\n  for (let p = page - siblings; p <= page + siblings; p++) {\n    if (p >= 1 && p <= totalPages) shown.add(p);\n  }\n  const sorted = [...shown].sort((a, b) => a - b);\n\n  const items = [];\n  sorted.forEach((p, i) => {\n    const previous = sorted[i - 1];\n    if (previous !== undefined && p - previous === 2) items.push(previous + 1); // one missing page: show it\n    else if (previous !== undefined && p - previous > 2) items.push('ellipsis-' + p);\n    items.push(p);\n  });\n\n  return (\n    <nav aria-label=\"Pagination\">\n      <button disabled={page <= 1} onClick={() => onPageChange(page - 1)}>\n        Previous\n      </button>\n      <ul>\n        {items.map((item) =>\n          typeof item === 'string' ? (\n            <li key={item}>\n              <span>…</span>\n            </li>\n          ) : (\n            <li key={item}>\n              <button aria-current={item === page ? 'page' : undefined} onClick={() => onPageChange(item)}>\n                {item}\n              </button>\n            </li>\n          )\n        )}\n      </ul>\n      <button disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>\n        Next\n      </button>\n    </nav>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders Previous, the numbered pages and Next in a labelled nav",
+        "input": "<Pagination page={1} totalPages={4} />",
+        "expected": "nav aria-label='Pagination'; items 1,2,3,4 (page 3 is the single gap, so it is shown); Previous and Next buttons"
+      },
+      {
+        "description": "The current page has aria-current=\"page\" (and only it)",
+        "input": "page 3 of 5",
+        "expected": "only the '3' button has aria-current='page'"
+      },
+      {
+        "description": "Long ranges collapse with ellipses around the current page",
+        "input": "10 pages: current 5, 1, 10",
+        "expected": "'1,…,4,5,6,…,10'; '1,2,…,10'; '1,…,9,10'"
+      },
+      {
+        "description": "A single missing page is shown instead of an ellipsis",
+        "input": "7 pages, current 4; then 9 pages, current 5",
+        "expected": "'1,2,3,4,5,6,7'; then '1,…,4,5,6,…,9'"
+      },
+      {
+        "description": "siblings widens the window around the current page",
+        "input": "page 5 of 12, siblings=2",
+        "expected": "'1,2,3,4,5,6,7,…,12'"
+      },
+      {
+        "description": "Previous, Next and the page buttons call onPageChange with the target page",
+        "input": "page 3 of 6: Previous, Next, click '6'",
+        "expected": "onPageChange called with 2, 4, 6"
+      },
+      {
+        "description": "Previous is disabled on the first page and Next on the last",
+        "input": "page 1 of 4, then page 4 of 4",
+        "expected": "Previous disabled / Next disabled respectively"
+      },
+      {
+        "description": "The ellipsis is plain text, not a button",
+        "input": "click the '…' item",
+        "expected": "it contains no <button>; onPageChange not called"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst items = (c) => qa('li', c).map((li) => li.textContent).join();\nconst nav = (c, text) => qa('nav > button', c).find((b) => b.textContent === text);\nconst mount3 = (props) => render(<Pagination onPageChange={() => {}} {...props} />);\n{\n  const r = mount3({ page: 1, totalPages: 4 });\n  $test.check('Renders Previous, the numbered pages and Next in a labelled nav', q('nav', r.container).getAttribute('aria-label') === 'Pagination' && items(r.container) === '1,2,3,4' && nav(r.container, 'Previous') && nav(r.container, 'Next'), items(r.container));\n  r.unmount();\n}\n{\n  const r = mount3({ page: 3, totalPages: 5 });\n  const current = qa('[aria-current]', r.container).map((b) => b.textContent).join();\n  $test.check('The current page has aria-current=\"page\" (and only it)', current === '3' && q('[aria-current]', r.container).getAttribute('aria-current') === 'page', current);\n  r.unmount();\n}\n{\n  const r = mount3({ page: 5, totalPages: 10 });\n  const mid = items(r.container);\n  r.rerender(<Pagination page={1} totalPages={10} onPageChange={() => {}} />);\n  const start = items(r.container);\n  r.rerender(<Pagination page={10} totalPages={10} onPageChange={() => {}} />);\n  $test.check('Long ranges collapse with ellipses around the current page', mid === '1,…,4,5,6,…,10' && start === '1,2,…,10' && items(r.container) === '1,…,9,10', { mid, start, end: items(r.container) });\n  r.unmount();\n}\n{\n  const r = mount3({ page: 4, totalPages: 7 });\n  const all = items(r.container);\n  r.rerender(<Pagination page={5} totalPages={9} onPageChange={() => {}} />);\n  $test.check('A single missing page is shown instead of an ellipsis', all === '1,2,3,4,5,6,7' && items(r.container) === '1,…,4,5,6,…,9', { all, other: items(r.container) });\n  r.unmount();\n}\n{\n  const r = mount3({ page: 5, totalPages: 12, siblings: 2 });\n  $test.check('siblings widens the window around the current page', items(r.container) === '1,2,3,4,5,6,7,…,12', items(r.container));\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = mount3({ page: 3, totalPages: 6, onPageChange: (n) => calls.push(n) });\n  fire.click(nav(r.container, 'Previous'));\n  fire.click(nav(r.container, 'Next'));\n  fire.click(qa('li button', r.container).find((b) => b.textContent === '6'));\n  $test.check('Previous, Next and the page buttons call onPageChange with the target page', calls.join() === '2,4,6', calls);\n  r.unmount();\n}\n{\n  const r = mount3({ page: 1, totalPages: 4 });\n  const first = nav(r.container, 'Previous').disabled && !nav(r.container, 'Next').disabled;\n  r.rerender(<Pagination page={4} totalPages={4} onPageChange={() => {}} />);\n  $test.check('Previous is disabled on the first page and Next on the last', first && nav(r.container, 'Next').disabled && !nav(r.container, 'Previous').disabled, 'disabled flags wrong');\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = mount3({ page: 5, totalPages: 10, onPageChange: (n) => calls.push(n) });\n  const gap = qa('li', r.container).find((li) => li.textContent === '…');\n  fire.click(gap);\n  $test.check('The ellipsis is plain text, not a button', gap.querySelector('button') === null && calls.length === 0, calls);\n  r.unmount();\n}"
+  },
+  {
+    "id": "tag-input",
+    "track": "react-components",
+    "title": "Tag / Chip Input",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "controlled",
+      "keyboard",
+      "a11y"
+    ],
+    "promptSeed": "Build TagInput({ value, onChange, max = Infinity }) as a controlled component where value is an array of strings. Render <ul aria-label=\"Tags\"> with one <li> per tag containing the tag text and <button type=\"button\" aria-label=\"Remove <tag>\">, followed by <input aria-label=\"Add tag\"> (its text is local state). Pressing Enter or ',' adds the trimmed text as a new tag via onChange([...value, tag]) and clears the input (and prevents the key's default). Empty text and duplicates (case-insensitive) are ignored (the input is cleared for a duplicate), and nothing is added once value.length >= max. Backspace in an EMPTY input removes the last tag. The Remove button removes that tag.",
+    "difficulty": 3,
+    "concept": "tag-input",
+    "referenceSolution": "function TagInput({ value, onChange, max = Infinity }) {\n  const [text, setText] = useState('');\n\n  const addTag = () => {\n    const tag = text.trim();\n    setText('');\n    if (!tag) return;\n    if (value.length >= max) return;\n    if (value.some((existing) => existing.toLowerCase() === tag.toLowerCase())) return;\n    onChange([...value, tag]);\n  };\n\n  const onKeyDown = (e) => {\n    if (e.key === 'Enter' || e.key === ',') {\n      e.preventDefault();\n      addTag();\n    } else if (e.key === 'Backspace' && text === '' && value.length > 0) {\n      onChange(value.slice(0, -1));\n    }\n  };\n\n  return (\n    <div>\n      <ul aria-label=\"Tags\">\n        {value.map((tag) => (\n          <li key={tag}>\n            {tag}\n            <button type=\"button\" aria-label={`Remove ${tag}`} onClick={() => onChange(value.filter((t) => t !== tag))}>\n              ×\n            </button>\n          </li>\n        ))}\n      </ul>\n      <input aria-label=\"Add tag\" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={onKeyDown} />\n    </div>\n  );\n}",
+    "solution": "function TagInput({ value, onChange, max = Infinity }) {\n  const [text, setText] = useState('');\n\n  const addTag = () => {\n    const tag = text.trim();\n    setText('');\n    if (!tag) return;\n    if (value.length >= max) return;\n    if (value.some((existing) => existing.toLowerCase() === tag.toLowerCase())) return;\n    onChange([...value, tag]);\n  };\n\n  const onKeyDown = (e) => {\n    if (e.key === 'Enter' || e.key === ',') {\n      e.preventDefault();\n      addTag();\n    } else if (e.key === 'Backspace' && text === '' && value.length > 0) {\n      onChange(value.slice(0, -1));\n    }\n  };\n\n  return (\n    <div>\n      <ul aria-label=\"Tags\">\n        {value.map((tag) => (\n          <li key={tag}>\n            {tag}\n            <button type=\"button\" aria-label={`Remove ${tag}`} onClick={() => onChange(value.filter((t) => t !== tag))}>\n              ×\n            </button>\n          </li>\n        ))}\n      </ul>\n      <input aria-label=\"Add tag\" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={onKeyDown} />\n    </div>\n  );\n}",
+    "starterCode": "function TagInput({ value, onChange, max = Infinity }) {\n  const [text, setText] = useState('');\n\n  const addTag = () => {\n    const tag = text.trim();\n    setText('');\n    if (!tag) return;\n    if (value.length >= max) return;\n    if (value.some((existing) => existing.toLowerCase() === tag.toLowerCase())) return;\n    onChange([...value, tag]);\n  };\n\n  const onKeyDown = (e) => {\n    if (e.key === 'Enter' || e.key === ',') {\n      e.preventDefault();\n      addTag();\n    } else if (e.key === 'Backspace' && text === '' && value.length > 0) {\n      onChange(value.slice(0, -1));\n    }\n  };\n\n  return (\n    <div>\n      <ul aria-label=\"Tags\">\n        {value.map((tag) => (\n          <li key={tag}>\n            {tag}\n            <button type=\"button\" aria-label={`Remove ${tag}`} onClick={() => onChange(value.filter((t) => t !== tag))}>\n              ×\n            </button>\n          </li>\n        ))}\n      </ul>\n      <input aria-label=\"Add tag\" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={onKeyDown} />\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders the tags in a labelled list with a Remove button each",
+        "input": "value={['react', 'css']}",
+        "expected": "<ul aria-label='Tags'> react, css; buttons 'Remove react', 'Remove css'; input aria-label='Add tag'"
+      },
+      {
+        "description": "Enter adds the trimmed text as a tag and clears the input",
+        "input": "type '  vue  ', Enter",
+        "expected": "tags: vue; input empty"
+      },
+      {
+        "description": "A comma also adds the tag, and the key default is prevented",
+        "input": "type 'svelte', ','",
+        "expected": "tags: svelte; keydown ',' defaultPrevented === true"
+      },
+      {
+        "description": "Duplicates (case-insensitive) and empty text are ignored",
+        "input": "value ['React']; add 'react', then '   '",
+        "expected": "tags stay ['React']; input cleared"
+      },
+      {
+        "description": "Backspace in an empty input removes the last tag (not while typing)",
+        "input": "['a','b']: Backspace; then type 'x' and Backspace",
+        "expected": "['a'] after the first; unchanged after the second"
+      },
+      {
+        "description": "The Remove button removes that tag",
+        "input": "click 'Remove a' on ['a','b']",
+        "expected": "['b']"
+      },
+      {
+        "description": "No more tags are added once max is reached",
+        "input": "value ['a'], max=2: add 'b' then 'c'",
+        "expected": "['a','b']; onChange called once"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa } = $dom;\nconst tagsOf = (c) => qa('li', c).map((li) => li.firstChild.textContent).join();\n// Controlled wrapper: keeps `value` in sync so typing flows like in a real page.\nfunction Host({ initial = [], max, log }) {\n  const [value, setValue] = useState(initial);\n  return <TagInput value={value} max={max} onChange={(next) => { log && log.push(next); setValue(next); }} />;\n}\nconst type = (c, text, key = 'Enter') => {\n  const input = q('input', c);\n  fire.change(input, text);\n  fire.keyDown(input, key);\n};\n{\n  const r = render(<Host initial={['react', 'css']} />);\n  const removeLabels = qa('button', r.container).map((b) => b.getAttribute('aria-label')).join();\n  $test.check('Renders the tags in a labelled list with a Remove button each', q('ul', r.container).getAttribute('aria-label') === 'Tags' && tagsOf(r.container) === 'react,css' && removeLabels === 'Remove react,Remove css' && q('input', r.container).getAttribute('aria-label') === 'Add tag', { removeLabels });\n  r.unmount();\n}\n{\n  const r = render(<Host />);\n  type(r.container, '  vue  ');\n  $test.check('Enter adds the trimmed text as a tag and clears the input', tagsOf(r.container) === 'vue' && q('input', r.container).value === '', { tags: tagsOf(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Host />);\n  type(r.container, 'svelte', ',');\n  const event = fire.keyDown(q('input', r.container), ',');\n  $test.check('A comma also adds the tag, and the key default is prevented', tagsOf(r.container) === 'svelte' && event.defaultPrevented === true, { tags: tagsOf(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Host initial={['React']} />);\n  type(r.container, 'react');\n  type(r.container, '   ');\n  const kept = tagsOf(r.container) === 'React' && q('input', r.container).value === '';\n  $test.check('Duplicates (case-insensitive) and empty text are ignored', kept, { tags: tagsOf(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Host initial={['a', 'b']} />);\n  fire.keyDown(q('input', r.container), 'Backspace');\n  const afterOne = tagsOf(r.container);\n  fire.change(q('input', r.container), 'x');\n  fire.keyDown(q('input', r.container), 'Backspace');\n  $test.check('Backspace in an empty input removes the last tag (not while typing)', afterOne === 'a' && tagsOf(r.container) === 'a', { afterOne, now: tagsOf(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<Host initial={['a', 'b']} />);\n  fire.click(qa('button', r.container).find((b) => b.getAttribute('aria-label') === 'Remove a'));\n  $test.check('The Remove button removes that tag', tagsOf(r.container) === 'b', tagsOf(r.container));\n  r.unmount();\n}\n{\n  const log = [];\n  const r = render(<Host initial={['a']} max={2} log={log} />);\n  type(r.container, 'b');\n  type(r.container, 'c');\n  $test.check('No more tags are added once max is reached', tagsOf(r.container) === 'a,b' && log.length === 1, { tags: tagsOf(r.container), calls: log.length });\n  r.unmount();\n}"
   }
 ]
