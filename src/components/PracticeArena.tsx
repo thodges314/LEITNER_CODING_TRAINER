@@ -2458,7 +2458,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                           boxShadow: '0 0 6px #10b981',
                         }}
                       />
-                      Live Mounted
+                      Mounted
                     </span>
                   ) : (
                     <span

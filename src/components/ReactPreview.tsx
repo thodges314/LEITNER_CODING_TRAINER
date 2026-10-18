@@ -376,7 +376,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
                 border: '1px solid rgba(52, 211, 153, 0.35)',
               }}
             >
-              <CheckCircle2 size={11} color="#10b981" /> Live
+              <CheckCircle2 size={11} color="#10b981" /> Rendered
             </span>
           )}
           {status === 'error' && (
