@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Watch for Added Elements (MutationObserver)",
+  "tags": [
+    "mutationobserver",
+    "dom",
+    "observers",
+    "cleanup"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Key Sequence Matcher (g then i)",
+  "tags": [
+    "keyboard",
+    "events",
+    "shortcuts",
+    "state-machine"
+  ]
+}

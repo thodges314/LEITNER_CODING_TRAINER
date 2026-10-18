@@ -1,0 +1,10 @@
+{
+  "track": "dom-browser",
+  "title": "Element Breakpoints (ResizeObserver)",
+  "tags": [
+    "resizeobserver",
+    "responsive",
+    "observers",
+    "cleanup"
+  ]
+}

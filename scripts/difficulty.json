@@ -1046,5 +1046,17 @@
   "raf-throttle": {
     "difficulty": 2,
     "concept": "animation-frame"
+  },
+  "key-sequence-matcher": {
+    "difficulty": 3,
+    "concept": "keyboard"
+  },
+  "watch-added-elements": {
+    "difficulty": 3,
+    "concept": "mutation-observer"
+  },
+  "resize-breakpoints": {
+    "difficulty": 2,
+    "concept": "resize-observer"
   }
 }
