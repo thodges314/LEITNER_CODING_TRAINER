@@ -958,5 +958,13 @@
   "progress-bar": {
     "difficulty": 1,
     "concept": "progress"
+  },
+  "tooltip": {
+    "difficulty": 3,
+    "concept": "a11y-components"
+  },
+  "theme-switcher": {
+    "difficulty": 3,
+    "concept": "context"
   }
 }

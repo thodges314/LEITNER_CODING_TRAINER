@@ -1,0 +1,10 @@
+{
+  "track": "react-patterns",
+  "title": "Theme Switcher (Context + localStorage)",
+  "tags": [
+    "context",
+    "hooks",
+    "localStorage",
+    "dom"
+  ]
+}

@@ -14068,5 +14068,123 @@
       }
     ],
     "testHarness": "const { render, fire, q, qa } = $dom;\nconst cell = (c, n) => q('[aria-label=\"Cell ' + n + '\"]', c);\nconst status = (c) => q('[role=\"status\"]', c).textContent.trim();\nconst play = (c, ...ns) => ns.forEach((n) => fire.click(cell(c, n)));\nconst marks = (c) => Array.from({ length: 9 }, (_, i) => cell(c, i + 1).textContent.trim() || '-').join('');\nconst restartBtn = (c) => qa('button', c).find((b) => b.textContent.trim() === 'Restart');\n{\n  const r = render(<TicTacToe />);\n  $test.check(\n    'Renders an empty labelled board with 9 cells and \"Next player: X\"',\n    q('[role=\"group\"][aria-label=\"Tic-tac-toe board\"]', r.container) !== null && marks(r.container) === '---------' && status(r.container) === 'Next player: X',\n    { marks: marks(r.container), status: status(r.container) }\n  );\n  r.unmount();\n}\n{\n  const r = render(<TicTacToe />);\n  play(r.container, 1, 5);\n  $test.check('Players alternate: X then O', marks(r.container) === 'X---O----' && status(r.container) === 'Next player: X', { marks: marks(r.container), status: status(r.container) });\n  r.unmount();\n}\n{\n  const r = render(<TicTacToe />);\n  play(r.container, 1, 1);\n  $test.check('Clicking an occupied cell does nothing', marks(r.container) === 'X--------' && status(r.container) === 'Next player: O', { marks: marks(r.container), status: status(r.container) });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 4, 2, 5, 3);\n  $test.check('X completing the top row wins and onGameEnd(\"X\") fires once', status(r.container) === 'Winner: X' && marks(r.container) === 'XXXOO----' && calls.join() === 'X', { status: status(r.container), marks: marks(r.container), calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 2, 3, 5, 4, 8);\n  $test.check('O completing the middle column wins', status(r.container) === 'Winner: O' && calls.join() === 'O', { status: status(r.container), calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 4, 2, 5, 3, 9);\n  $test.check('No more moves are accepted after the game is won', cell(r.container, 9).textContent.trim() === '' && status(r.container) === 'Winner: X' && calls.length === 1, { cell9: cell(r.container, 9).textContent, calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 2, 3, 5, 4, 6, 8, 7, 9);\n  $test.check('A full board with no line is a draw and calls onGameEnd(\"draw\")', status(r.container) === 'Draw' && marks(r.container) === 'XOXXOOOXX' && calls.join() === 'draw', { status: status(r.container), marks: marks(r.container), calls });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(<TicTacToe onGameEnd={(w) => calls.push(w)} />);\n  play(r.container, 1, 4, 2, 5, 3);\n  fire.click(restartBtn(r.container));\n  const cleared = marks(r.container) === '---------' && status(r.container) === 'Next player: X';\n  play(r.container, 9);\n  $test.check('Restart clears the board, X starts again, and onGameEnd is not called again', cleared && cell(r.container, 9).textContent.trim() === 'X' && calls.length === 1, { cleared, calls });\n  r.unmount();\n}"
+  },
+  {
+    "id": "theme-switcher",
+    "track": "react-patterns",
+    "title": "Theme Switcher (Context + localStorage)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "context",
+      "hooks",
+      "localStorage",
+      "dom"
+    ],
+    "promptSeed": "Build ThemeProvider({ children, storageKey = \"demo-color-scheme\", defaultTheme = \"light\" }) and the hook useTheme() returning { theme, setTheme, toggle }. The only valid themes are \"light\" and \"dark\". The initial theme is the value saved in localStorage under storageKey when it is valid, otherwise defaultTheme (an invalid saved value such as \"blue\" is ignored). Whenever the theme changes, set the data-color-scheme attribute on document.documentElement and save the theme to localStorage[storageKey] (use an effect). toggle() flips light <-> dark; setTheme(next) switches to next but ignores anything that is not \"light\" or \"dark\". useTheme() called outside a ThemeProvider must throw an Error whose message mentions \"ThemeProvider\". (The attribute is data-color-scheme and the default key is \"demo-color-scheme\" on purpose, so this exercise never touches the app's own theme.)",
+    "difficulty": 3,
+    "concept": "context",
+    "referenceSolution": "const ThemeContext = createContext(null);\nconst THEMES = ['light', 'dark'];\n\nfunction ThemeProvider({ children, storageKey = 'demo-color-scheme', defaultTheme = 'light' }) {\n  const [theme, setThemeState] = useState(() => {\n    const saved = localStorage.getItem(storageKey);\n    return THEMES.includes(saved) ? saved : defaultTheme;\n  });\n\n  useEffect(() => {\n    document.documentElement.setAttribute('data-color-scheme', theme);\n    localStorage.setItem(storageKey, theme);\n  }, [theme, storageKey]);\n\n  const setTheme = (next) => {\n    if (THEMES.includes(next)) setThemeState(next);\n  };\n  const toggle = () => setThemeState((t) => (t === 'light' ? 'dark' : 'light'));\n\n  return <ThemeContext.Provider value={{ theme, setTheme, toggle }}>{children}</ThemeContext.Provider>;\n}\n\nfunction useTheme() {\n  const ctx = useContext(ThemeContext);\n  if (!ctx) throw new Error('useTheme must be used inside a ThemeProvider');\n  return ctx;\n}",
+    "solution": "const ThemeContext = createContext(null);\nconst THEMES = ['light', 'dark'];\n\nfunction ThemeProvider({ children, storageKey = 'demo-color-scheme', defaultTheme = 'light' }) {\n  const [theme, setThemeState] = useState(() => {\n    const saved = localStorage.getItem(storageKey);\n    return THEMES.includes(saved) ? saved : defaultTheme;\n  });\n\n  useEffect(() => {\n    document.documentElement.setAttribute('data-color-scheme', theme);\n    localStorage.setItem(storageKey, theme);\n  }, [theme, storageKey]);\n\n  const setTheme = (next) => {\n    if (THEMES.includes(next)) setThemeState(next);\n  };\n  const toggle = () => setThemeState((t) => (t === 'light' ? 'dark' : 'light'));\n\n  return <ThemeContext.Provider value={{ theme, setTheme, toggle }}>{children}</ThemeContext.Provider>;\n}\n\nfunction useTheme() {\n  const ctx = useContext(ThemeContext);\n  if (!ctx) throw new Error('useTheme must be used inside a ThemeProvider');\n  return ctx;\n}",
+    "starterCode": "const ThemeContext = createContext(null);\nconst THEMES = ['light', 'dark'];\n\nfunction ThemeProvider({ children, storageKey = 'demo-color-scheme', defaultTheme = 'light' }) {\n  const [theme, setThemeState] = useState(() => {\n    const saved = localStorage.getItem(storageKey);\n    return THEMES.includes(saved) ? saved : defaultTheme;\n  });\n\n  useEffect(() => {\n    document.documentElement.setAttribute('data-color-scheme', theme);\n    localStorage.setItem(storageKey, theme);\n  }, [theme, storageKey]);\n\n  const setTheme = (next) => {\n    if (THEMES.includes(next)) setThemeState(next);\n  };\n  const toggle = () => setThemeState((t) => (t === 'light' ? 'dark' : 'light'));\n\n  return <ThemeContext.Provider value={{ theme, setTheme, toggle }}>{children}</ThemeContext.Provider>;\n}\n\nfunction useTheme() {\n  const ctx = useContext(ThemeContext);\n  if (!ctx) throw new Error('useTheme must be used inside a ThemeProvider');\n  return ctx;\n}",
+    "testCases": [
+      {
+        "description": "Defaults to light, sets data-color-scheme and saves it",
+        "input": "<ThemeProvider><Probe /></ThemeProvider> with empty storage",
+        "expected": "theme 'light'; <html data-color-scheme='light'>; localStorage['demo-color-scheme'] = 'light'"
+      },
+      {
+        "description": "Starts from the saved theme when it is valid",
+        "input": "localStorage['demo-color-scheme'] = 'dark'",
+        "expected": "theme 'dark'; data-color-scheme 'dark'"
+      },
+      {
+        "description": "An invalid saved value (\"blue\") is ignored in favour of the default",
+        "input": "localStorage['demo-color-scheme'] = 'blue'",
+        "expected": "theme 'light'; data-color-scheme 'light'"
+      },
+      {
+        "description": "toggle() flips light -> dark -> light and keeps the attribute and storage in sync",
+        "input": "call toggle() twice",
+        "expected": "after 1st: 'dark' / attribute 'dark' / saved 'dark'; after 2nd: 'light' / 'light' / 'light'"
+      },
+      {
+        "description": "setTheme(\"dark\") switches; setTheme(\"purple\") is ignored",
+        "input": "setTheme('dark'); setTheme('purple')",
+        "expected": "theme stays 'dark'; attribute 'dark'"
+      },
+      {
+        "description": "storageKey and defaultTheme props are honoured (and the default key is left alone)",
+        "input": "<ThemeProvider storageKey=\"t-key\" defaultTheme=\"dark\">",
+        "expected": "theme 'dark'; localStorage['t-key'] = 'dark'; localStorage['demo-color-scheme'] = null"
+      },
+      {
+        "description": "useTheme outside a ThemeProvider throws an error that mentions ThemeProvider",
+        "input": "<Probe /> rendered without a provider",
+        "expected": "Error whose message matches /ThemeProvider/"
+      }
+    ],
+    "testHarness": "const { render, renderError, wait } = $dom;\nconst KEYS = ['demo-color-scheme', 't-key'];\nconst reset = () => {\n  KEYS.forEach((k) => localStorage.removeItem(k));\n  document.documentElement.removeAttribute('data-color-scheme');\n};\nconst attr = () => document.documentElement.getAttribute('data-color-scheme');\nlet api = null;\nfunction Probe() {\n  api = useTheme();\n  return <span>{api.theme}</span>;\n}\ntry {\n  reset();\n  {\n    const r = render(<ThemeProvider><Probe /></ThemeProvider>);\n    await wait(30);\n    $test.check('Defaults to light, sets data-color-scheme and saves it', api.theme === 'light' && attr() === 'light' && localStorage.getItem('demo-color-scheme') === 'light', { theme: api.theme, attr: attr(), saved: localStorage.getItem('demo-color-scheme') });\n    r.unmount();\n  }\n  reset();\n  {\n    localStorage.setItem('demo-color-scheme', 'dark');\n    const r = render(<ThemeProvider><Probe /></ThemeProvider>);\n    await wait(30);\n    $test.check('Starts from the saved theme when it is valid', api.theme === 'dark' && attr() === 'dark', { theme: api.theme, attr: attr() });\n    r.unmount();\n  }\n  reset();\n  {\n    localStorage.setItem('demo-color-scheme', 'blue');\n    const r = render(<ThemeProvider><Probe /></ThemeProvider>);\n    await wait(30);\n    $test.check('An invalid saved value (\"blue\") is ignored in favour of the default', api.theme === 'light' && attr() === 'light', { theme: api.theme, attr: attr() });\n    r.unmount();\n  }\n  reset();\n  {\n    const r = render(<ThemeProvider><Probe /></ThemeProvider>);\n    await wait(30);\n    api.toggle();\n    await wait(30);\n    const dark = { theme: api.theme, attr: attr(), saved: localStorage.getItem('demo-color-scheme') };\n    api.toggle();\n    await wait(30);\n    $test.check('toggle() flips light -> dark -> light and keeps the attribute and storage in sync', dark.theme === 'dark' && dark.attr === 'dark' && dark.saved === 'dark' && api.theme === 'light' && attr() === 'light' && localStorage.getItem('demo-color-scheme') === 'light', { dark, theme: api.theme, attr: attr() });\n    r.unmount();\n  }\n  reset();\n  {\n    const r = render(<ThemeProvider><Probe /></ThemeProvider>);\n    await wait(30);\n    api.setTheme('dark');\n    await wait(30);\n    api.setTheme('purple');\n    await wait(30);\n    $test.check('setTheme(\"dark\") switches; setTheme(\"purple\") is ignored', api.theme === 'dark' && attr() === 'dark', { theme: api.theme, attr: attr() });\n    r.unmount();\n  }\n  reset();\n  {\n    const r = render(<ThemeProvider storageKey=\"t-key\" defaultTheme=\"dark\"><Probe /></ThemeProvider>);\n    await wait(30);\n    $test.check('storageKey and defaultTheme props are honoured (and the default key is left alone)', api.theme === 'dark' && localStorage.getItem('t-key') === 'dark' && localStorage.getItem('demo-color-scheme') === null, { theme: api.theme, custom: localStorage.getItem('t-key'), other: localStorage.getItem('demo-color-scheme') });\n    r.unmount();\n  }\n  reset();\n  {\n    const err = renderError(<Probe />);\n    $test.check('useTheme outside a ThemeProvider throws an error that mentions ThemeProvider', err instanceof Error && /ThemeProvider/.test(err.message), err && err.message);\n  }\n} finally {\n  reset();\n}"
+  },
+  {
+    "id": "tooltip",
+    "track": "react-components",
+    "title": "Accessible Tooltip",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "overlay",
+      "cloneElement"
+    ],
+    "promptSeed": "Build Tooltip({ content, children }) where children is a single element (usually a button). Clone the child so it keeps its own props and handlers but also: shows the tooltip on mouse enter and on focus, hides it on mouse leave, on blur and when Escape is pressed. While visible render <span role=\"tooltip\" id={id}>{content}</span> next to the trigger (content may be any node) and give the trigger aria-describedby={id}; while hidden render no tooltip and no aria-describedby. Use useId() for the id. The child's own onMouseEnter, onMouseLeave, onFocus, onBlur and onKeyDown handlers must still be called.",
+    "difficulty": 3,
+    "concept": "a11y-components",
+    "referenceSolution": "function Tooltip({ content, children }) {\n  const [open, setOpen] = useState(false);\n  const id = useId();\n  const child = React.Children.only(children);\n  const show = () => setOpen(true);\n  const hide = () => setOpen(false);\n  const chain = (name, handler) => (e) => {\n    if (typeof child.props[name] === 'function') child.props[name](e);\n    handler(e);\n  };\n\n  const trigger = React.cloneElement(child, {\n    'aria-describedby': open ? id : undefined,\n    onMouseEnter: chain('onMouseEnter', show),\n    onMouseLeave: chain('onMouseLeave', hide),\n    onFocus: chain('onFocus', show),\n    onBlur: chain('onBlur', hide),\n    onKeyDown: chain('onKeyDown', (e) => {\n      if (e.key === 'Escape') hide();\n    }),\n  });\n\n  return (\n    <span style={{ position: 'relative', display: 'inline-block' }}>\n      {trigger}\n      {open && (\n        <span role=\"tooltip\" id={id}>\n          {content}\n        </span>\n      )}\n    </span>\n  );\n}",
+    "solution": "function Tooltip({ content, children }) {\n  const [open, setOpen] = useState(false);\n  const id = useId();\n  const child = React.Children.only(children);\n  const show = () => setOpen(true);\n  const hide = () => setOpen(false);\n  const chain = (name, handler) => (e) => {\n    if (typeof child.props[name] === 'function') child.props[name](e);\n    handler(e);\n  };\n\n  const trigger = React.cloneElement(child, {\n    'aria-describedby': open ? id : undefined,\n    onMouseEnter: chain('onMouseEnter', show),\n    onMouseLeave: chain('onMouseLeave', hide),\n    onFocus: chain('onFocus', show),\n    onBlur: chain('onBlur', hide),\n    onKeyDown: chain('onKeyDown', (e) => {\n      if (e.key === 'Escape') hide();\n    }),\n  });\n\n  return (\n    <span style={{ position: 'relative', display: 'inline-block' }}>\n      {trigger}\n      {open && (\n        <span role=\"tooltip\" id={id}>\n          {content}\n        </span>\n      )}\n    </span>\n  );\n}",
+    "starterCode": "function Tooltip({ content, children }) {\n  const [open, setOpen] = useState(false);\n  const id = useId();\n  const child = React.Children.only(children);\n  const show = () => setOpen(true);\n  const hide = () => setOpen(false);\n  const chain = (name, handler) => (e) => {\n    if (typeof child.props[name] === 'function') child.props[name](e);\n    handler(e);\n  };\n\n  const trigger = React.cloneElement(child, {\n    'aria-describedby': open ? id : undefined,\n    onMouseEnter: chain('onMouseEnter', show),\n    onMouseLeave: chain('onMouseLeave', hide),\n    onFocus: chain('onFocus', show),\n    onBlur: chain('onBlur', hide),\n    onKeyDown: chain('onKeyDown', (e) => {\n      if (e.key === 'Escape') hide();\n    }),\n  });\n\n  return (\n    <span style={{ position: 'relative', display: 'inline-block' }}>\n      {trigger}\n      {open && (\n        <span role=\"tooltip\" id={id}>\n          {content}\n        </span>\n      )}\n    </span>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Hidden by default: the child renders, no tooltip, no aria-describedby",
+        "input": "<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>",
+        "expected": "button 'Save' only; no role='tooltip'; no aria-describedby"
+      },
+      {
+        "description": "Hovering shows role=\"tooltip\" with the content and links it via aria-describedby",
+        "input": "mouseover the button",
+        "expected": "role='tooltip' text 'Saves the file' with an id; button aria-describedby equals that id"
+      },
+      {
+        "description": "Leaving the trigger hides the tooltip and removes aria-describedby",
+        "input": "mouseover, then mouseout",
+        "expected": "no tooltip; no aria-describedby"
+      },
+      {
+        "description": "Keyboard users get it too: focus shows the tooltip, blur hides it",
+        "input": "focus the button, then blur it",
+        "expected": "tooltip visible after focus; gone after blur"
+      },
+      {
+        "description": "Escape dismisses the tooltip; other keys do not",
+        "input": "focus; press Enter; press Escape",
+        "expected": "still visible after Enter; hidden after Escape"
+      },
+      {
+        "description": "The child's own handlers and props are preserved",
+        "input": "child has onFocus, onMouseEnter, onKeyDown and className=\"primary\"; hover, focus, press \"a\"",
+        "expected": "calls: enter, focus, key; className still 'primary'"
+      },
+      {
+        "description": "The content can be any React node",
+        "input": "content={<b>Bold tip</b>}",
+        "expected": "tooltip contains a <b> with text 'Bold tip'"
+      }
+    ],
+    "testHarness": "const { render, fire, q, wait } = $dom;\nconst trigger = (c) => q('button', c);\nconst tip = (c) => q('[role=\"tooltip\"]', c);\nconst hover = async (el) => { fire.event(el, new MouseEvent('mouseover', { bubbles: true })); await wait(30); };\nconst unhover = async (el) => { fire.event(el, new MouseEvent('mouseout', { bubbles: true })); await wait(30); };\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  $test.check('Hidden by default: the child renders, no tooltip, no aria-describedby', trigger(r.container).textContent === 'Save' && tip(r.container) === null && !trigger(r.container).hasAttribute('aria-describedby'), r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  await hover(trigger(r.container));\n  const t = tip(r.container);\n  $test.check('Hovering shows role=\"tooltip\" with the content and links it via aria-describedby', t !== null && t.textContent === 'Saves the file' && t.id !== '' && trigger(r.container).getAttribute('aria-describedby') === t.id, r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  await hover(trigger(r.container));\n  await unhover(trigger(r.container));\n  $test.check('Leaving the trigger hides the tooltip and removes aria-describedby', tip(r.container) === null && !trigger(r.container).hasAttribute('aria-describedby'), r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  fire.focus(trigger(r.container));\n  await wait(30);\n  const shownOnFocus = tip(r.container) !== null;\n  trigger(r.container).blur();\n  await wait(30);\n  $test.check('Keyboard users get it too: focus shows the tooltip, blur hides it', shownOnFocus && tip(r.container) === null, { shownOnFocus, afterBlur: tip(r.container) !== null });\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  fire.focus(trigger(r.container));\n  await wait(30);\n  fire.keyDown(trigger(r.container), 'Enter');\n  await wait(30);\n  const stillOpen = tip(r.container) !== null;\n  fire.keyDown(trigger(r.container), 'Escape');\n  await wait(30);\n  $test.check('Escape dismisses the tooltip; other keys do not', stillOpen && tip(r.container) === null, { stillOpen, afterEscape: tip(r.container) !== null });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(\n    <Tooltip content=\"Tip\">\n      <button onFocus={() => calls.push('focus')} onMouseEnter={() => calls.push('enter')} onKeyDown={() => calls.push('key')} className=\"primary\">Go</button>\n    </Tooltip>\n  );\n  await hover(trigger(r.container));\n  fire.focus(trigger(r.container));\n  fire.keyDown(trigger(r.container), 'a');\n  await wait(30);\n  $test.check(\"The child's own handlers and props are preserved\", calls.join() === 'enter,focus,key' && trigger(r.container).className === 'primary', { calls, className: trigger(r.container).className });\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content={<b>Bold tip</b>}><button>?</button></Tooltip>);\n  await hover(trigger(r.container));\n  $test.check('The content can be any React node', tip(r.container) !== null && tip(r.container).querySelector('b') !== null && tip(r.container).textContent === 'Bold tip', r.container.innerHTML);\n  r.unmount();\n}"
   }
 ]
