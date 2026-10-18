@@ -617,7 +617,8 @@
     ],
     "difficulty": 1,
     "concept": "react-forms",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "function Demo() {\n  return (\n    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>\n      <div style={{ fontSize: '13px', color: '#94a3b8' }}>Controlled Search Form:</div>\n      <SearchForm onSearch={log('onSearch')} />\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "hook-use-previous",
@@ -761,7 +762,8 @@
     ],
     "difficulty": 2,
     "concept": "context",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "const { ThemeProvider, useTheme } = createThemeContext();\n\nfunction ConsumerDemo() {\n  const { theme, toggle } = useTheme();\n  return (\n    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>\n      <div style={{ fontSize: '13px', color: '#94a3b8' }}>\n        Current Theme: <strong style={{ color: '#38bdf8' }}>{theme}</strong>\n      </div>\n      <button\n        type=\"button\"\n        onClick={() => {\n          toggle();\n          log('toggleTheme')(theme === 'light' ? 'dark' : 'light');\n        }}\n        style={{ padding: '6px 12px', width: 'fit-content', borderRadius: '4px', cursor: 'pointer' }}\n      >\n        Toggle Theme\n      </button>\n    </div>\n  );\n}\n\n<ThemeProvider defaultTheme=\"light\">\n  <ConsumerDemo />\n</ThemeProvider>"
   },
   {
     "id": "two-pointer-sorted-sum",
@@ -2452,7 +2454,8 @@
     ],
     "difficulty": 4,
     "concept": "typeahead",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "const sampleFruits = ['Apple', 'Apricot', 'Avocado', 'Banana', 'Blueberry', 'Cherry', 'Cranberry', 'Date', 'Elderberry', 'Fig', 'Grape'];\n\nasync function searchFruits(q) {\n  const lower = q.toLowerCase();\n  return sampleFruits.filter((f) => f.toLowerCase().includes(lower));\n}\n\nfunction Demo() {\n  return (\n    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>\n      <label style={{ fontSize: '12.5px', color: '#94a3b8' }}>Search fruit:</label>\n      <Typeahead\n        fetchSuggestions={searchFruits}\n        onSelect={log('onSelect')}\n        delay={50}\n      />\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "use-previous-latest-ref",
@@ -2554,7 +2557,8 @@
     ],
     "difficulty": 3,
     "concept": "infinite-scroll",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "function Demo() {\n  const [items, setItems] = useState(['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5']);\n  const [hasMore, setHasMore] = useState(true);\n\n  const loadMore = () => {\n    log('onLoadMore')();\n    if (items.length >= 15) {\n      setHasMore(false);\n      return;\n    }\n    setItems((prev) => [\n      ...prev,\n      `Item ${prev.length + 1}`,\n      `Item ${prev.length + 2}`,\n    ]);\n  };\n\n  return (\n    <div style={{ padding: '16px', maxHeight: '200px', overflowY: 'auto' }}>\n      <InfiniteList items={items} hasMore={hasMore} loading={false} onLoadMore={loadMore} />\n      {!hasMore && <div style={{ fontSize: '11px', color: '#64748b', marginTop: '8px' }}>Reached the end</div>}\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "modal-portal-focus",
@@ -2619,7 +2623,8 @@
     ],
     "difficulty": 4,
     "concept": "a11y-components",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "function Demo() {\n  const [open, setOpen] = useState(false);\n  return (\n    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>\n      <div style={{ fontSize: '13px', color: '#94a3b8' }}>Accessible modal with portal & focus trap:</div>\n      <button\n        type=\"button\"\n        onClick={() => {\n          setOpen(true);\n          log('openModal')(true);\n        }}\n        style={{ padding: '6px 12px', width: 'fit-content', borderRadius: '4px', cursor: 'pointer' }}\n      >\n        Open Modal\n      </button>\n      <Modal isOpen={open} onClose={() => { setOpen(false); log('onClose')(); }}>\n        <div style={{ background: '#1e293b', padding: '20px', borderRadius: '8px', color: '#f8fafc', maxWidth: '300px' }}>\n          <h3 style={{ margin: '0 0 8px 0', fontSize: '15px' }}>Modal Dialog</h3>\n          <p style={{ margin: '0 0 14px 0', fontSize: '12.5px', color: '#94a3b8' }}>Focus is trapped inside this modal while open.</p>\n          <button\n            type=\"button\"\n            onClick={() => { setOpen(false); log('onClose')(); }}\n            style={{ padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}\n          >\n            Close Modal\n          </button>\n        </div>\n      </Modal>\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "todo-list-reducer",
@@ -2738,7 +2743,8 @@
     ],
     "difficulty": 3,
     "concept": "compound",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "function Demo() {\n  return (\n    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>\n      <Tabs defaultValue=\"account\" onChange={log('onChange')}>\n        <TabList>\n          <Tab value=\"account\">Account</Tab>\n          <Tab value=\"password\">Password</Tab>\n          <Tab value=\"settings\">Settings</Tab>\n        </TabList>\n        <TabPanel value=\"account\">\n          <div style={{ padding: '12px 0', fontSize: '13px', color: '#94a3b8' }}>Account settings and profile preferences.</div>\n        </TabPanel>\n        <TabPanel value=\"password\">\n          <div style={{ padding: '12px 0', fontSize: '13px', color: '#94a3b8' }}>Manage login credentials and two-factor auth.</div>\n        </TabPanel>\n        <TabPanel value=\"settings\">\n          <div style={{ padding: '12px 0', fontSize: '13px', color: '#94a3b8' }}>Notification alerts and theme configuration.</div>\n        </TabPanel>\n      </Tabs>\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "two-sum-hashmap",
@@ -4299,7 +4305,8 @@
     "testHarness": "const { render, fire, q } = $dom;\nlet shouldThrow = true;\nfunction Bomb() {\n  if (shouldThrow) throw new Error('boom');\n  return <p id=\"ok\">all good</p>;\n}\n{\n  shouldThrow = false;\n  const r = render(<ErrorBoundary fallback={<p>oops</p>}><Bomb /></ErrorBoundary>);\n  $test.check('Renders its children when nothing throws', q('#ok', r.container) !== null && q('#ok', r.container).textContent === 'all good', r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={(error) => <p id=\"fb\">failed: {error.message}</p>}><Bomb /></ErrorBoundary>);\n  $test.check('Shows the fallback (called with the error) when a child throws', q('#fb', r.container) !== null && q('#fb', r.container).textContent === 'failed: boom' && q('#ok', r.container) === null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const seen = [];\n  const r = render(<ErrorBoundary fallback={<p>oops</p>} onError={(error, info) => seen.push([error.message, typeof info.componentStack])}><Bomb /></ErrorBoundary>);\n  $test.check('onError receives the error and React error info, once', seen.length === 1 && seen[0][0] === 'boom' && seen[0][1] === 'string', seen);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={(error, reset) => <button id=\"retry\" onClick={reset}>retry</button>}><Bomb /></ErrorBoundary>);\n  shouldThrow = false;\n  fire.click(q('#retry', r.container));\n  $test.check('reset() from the fallback retries the children', q('#ok', r.container) !== null && q('#retry', r.container) === null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const make = (key) => <ErrorBoundary resetKeys={[key]} fallback={<p id=\"fb\">oops</p>}><Bomb /></ErrorBoundary>;\n  const r = render(make(1));\n  const showing = q('#fb', r.container) !== null;\n  shouldThrow = false;\n  r.rerender(make(1));\n  const stillShowing = q('#fb', r.container) !== null;\n  r.rerender(make(2));\n  $test.check('Changing resetKeys resets the boundary automatically', showing && stillShowing && q('#ok', r.container) !== null, r.container.innerHTML);\n  r.unmount();\n}\n{\n  shouldThrow = true;\n  const r = render(<ErrorBoundary fallback={<p id=\"fb\">static fallback</p>}><Bomb /></ErrorBoundary>);\n  $test.check('A plain element works as the fallback', q('#fb', r.container) !== null && q('#fb', r.container).textContent === 'static fallback', r.container.innerHTML);\n  r.unmount();\n}",
     "difficulty": 3,
     "concept": "resilience",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "function BuggyWidget({ shouldExplode }) {\n  if (shouldExplode) throw new Error('Crashed in BuggyWidget');\n  return <div style={{ color: '#34d399', fontSize: '13px' }}>Widget running normally.</div>;\n}\n\nfunction Demo() {\n  const [explode, setExplode] = useState(false);\n  const [key, setKey] = useState(0);\n\n  return (\n    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>\n      <div style={{ display: 'flex', gap: '8px' }}>\n        <button\n          type=\"button\"\n          onClick={() => {\n            setExplode(true);\n            log('triggerError')(true);\n          }}\n          style={{ padding: '4px 8px', fontSize: '12px' }}\n        >\n          Trigger Error\n        </button>\n        <button\n          type=\"button\"\n          onClick={() => {\n            setExplode(false);\n            setKey((k) => k + 1);\n            log('resetKeys')(key + 1);\n          }}\n          style={{ padding: '4px 8px', fontSize: '12px' }}\n        >\n          Reset Key\n        </button>\n      </div>\n      <ErrorBoundary\n        resetKeys={[key]}\n        onError={log('onError')}\n        fallback={(err, reset) => (\n          <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px' }}>\n            <div style={{ color: '#f87171', fontWeight: 600, fontSize: '12.5px' }}>Error Caught: {err.message}</div>\n            <button\n              type=\"button\"\n              onClick={() => {\n                setExplode(false);\n                reset();\n              }}\n              style={{ marginTop: '8px', padding: '4px 8px', fontSize: '11.5px' }}\n            >\n              Try Again\n            </button>\n          </div>\n        )}\n      >\n        <BuggyWidget shouldExplode={explode} />\n      </ErrorBoundary>\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "external-store-hook",
@@ -4403,7 +4410,8 @@
     "testHarness": "const { render, fire, q } = $dom;\n{\n  const r = render(<FancyInput placeholder=\"Your name\" type=\"search\" />);\n  const input = q('input', r.container);\n  $test.check('Other props reach the input', input !== null && input.placeholder === 'Your name' && input.type === 'search', input && input.outerHTML);\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  $dom.act(() => ref.current.focus());\n  $test.check('ref.current.focus() focuses the input', document.activeElement === q('input', r.container), document.activeElement && document.activeElement.tagName);\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  fire.change(q('input', r.container), 'hello');\n  $test.check('ref.current.getValue() returns the typed text', ref.current.getValue() === 'hello', ref.current.getValue());\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  const input = q('input', r.container);\n  fire.change(input, 'hello');\n  $dom.act(() => ref.current.clear());\n  $test.check('ref.current.clear() empties the input and focuses it', input.value === '' && document.activeElement === input, { value: input.value });\n  r.unmount();\n}\n{\n  const ref = React.createRef();\n  const r = render(<FancyInput ref={ref} />);\n  const keys = Object.keys(ref.current).sort().join();\n  $test.check('The ref exposes only focus, clear and getValue (not the DOM node)', keys === 'clear,focus,getValue' && !(ref.current instanceof HTMLElement), keys);\n  r.unmount();\n}",
     "difficulty": 3,
     "concept": "refs",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "function Demo() {\n  const fancyRef = useRef(null);\n\n  return (\n    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>\n      <label style={{ fontSize: '13px', color: '#94a3b8' }}>Fancy input with imperative handle:</label>\n      <FancyInput ref={fancyRef} placeholder=\"Type here...\" defaultValue=\"Hello World\" />\n      <div style={{ display: 'flex', gap: '8px' }}>\n        <button\n          type=\"button\"\n          onClick={() => {\n            fancyRef.current?.focus();\n            log('focus')();\n          }}\n          style={{ padding: '4px 8px', fontSize: '12px' }}\n        >\n          Focus\n        </button>\n        <button\n          type=\"button\"\n          onClick={() => {\n            const val = fancyRef.current?.getValue();\n            log('getValue')(val);\n          }}\n          style={{ padding: '4px 8px', fontSize: '12px' }}\n        >\n          Get Value\n        </button>\n        <button\n          type=\"button\"\n          onClick={() => {\n            fancyRef.current?.clear();\n            log('clear')();\n          }}\n          style={{ padding: '4px 8px', fontSize: '12px' }}\n        >\n          Clear\n        </button>\n      </div>\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "memo-stable-callbacks",
@@ -4453,7 +4461,8 @@
     "testHarness": "const { render, fire, q, qa } = $dom;\nconst ITEMS = ['apple', 'banana', 'cherry'];\n{\n  const r = render(<Parent items={ITEMS} onListRender={() => {}} />);\n  $test.check('Renders one list item per item', qa('li', r.container).map((li) => li.textContent).join() === 'apple,banana,cherry', qa('li', r.container).length);\n  r.unmount();\n}\n{\n  const r = render(<Parent items={ITEMS} onListRender={() => {}} />);\n  fire.click(qa('li', r.container)[1]);\n  $test.check('Clicking an item shows it as selected', q('p', r.container).textContent === 'Selected: banana', q('p', r.container).textContent);\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  const initial = renders;\n  const button = q('button', r.container);\n  fire.click(button);\n  fire.click(button);\n  $test.check('Incrementing the counter does not re-render the memoized List', initial === 1 && renders === 1 && button.textContent === 'Count: 2', { initial, renders, label: button.textContent });\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  fire.click(qa('li', r.container)[0]);\n  fire.click(qa('li', r.container)[2]);\n  $test.check('Selecting an item re-renders Parent but not the List', renders === 1 && q('p', r.container).textContent === 'Selected: cherry', { renders });\n  r.unmount();\n}\n{\n  let renders = 0;\n  const onListRender = () => renders++;\n  const r = render(<Parent items={ITEMS} onListRender={onListRender} />);\n  r.rerender(<Parent items={['x', 'y']} onListRender={onListRender} />);\n  $test.check('A new items array does re-render the List', renders === 2 && qa('li', r.container).length === 2, { renders });\n  r.unmount();\n}",
     "difficulty": 3,
     "concept": "react-perf",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "function Demo() {\n  const sampleItems = ['Alpha', 'Beta', 'Gamma', 'Delta'];\n  return (\n    <div style={{ padding: '16px' }}>\n      <Parent items={sampleItems} onListRender={log('onListRender')} />\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "on-click-outside-hook",
@@ -4761,7 +4770,8 @@
       }
     ],
     "testHarness": "const { render, q, act } = $dom;\n{\n  const r = render(<FocusInput label=\"Name\" placeholder=\"Ada\" />);\n  const input = q('input', r.container);\n  $test.check('Renders a labelled input with the placeholder', input !== null && input.placeholder === 'Ada' && r.container.querySelector('label').textContent === 'Name', r.container.innerHTML);\n  $test.check('The input is focused after mount', document.activeElement === input, document.activeElement && document.activeElement.tagName);\n  r.unmount();\n}\n{\n  const r = render(<FocusInput label=\"Name\" placeholder=\"Ada\" />);\n  const other = document.createElement('button');\n  document.body.appendChild(other);\n  act(() => other.focus());\n  r.rerender(<FocusInput label=\"Name\" placeholder=\"Grace\" />);\n  const kept = document.activeElement === other;\n  other.remove();\n  $test.check('Re-rendering does not steal focus again', kept, document.activeElement && document.activeElement.tagName);\n  r.unmount();\n}\n{\n  const first = render(<FocusInput label=\"Name\" placeholder=\"Ada\" />);\n  first.unmount();\n  const second = render(<FocusInput label=\"Name\" placeholder=\"Ada\" />);\n  $test.check('Focuses the input again when the component is mounted anew', document.activeElement === q('input', second.container), document.activeElement && document.activeElement.tagName);\n  second.unmount();\n}",
-    "rendersComponent": true
+    "rendersComponent": true,
+    "previewCode": "function Demo() {\n  return (\n    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>\n      <FocusInput label=\"Username:\" placeholder=\"Focuses automatically on mount\" />\n    </div>\n  );\n}\n\n<Demo />"
   },
   {
     "id": "interval-overlap",

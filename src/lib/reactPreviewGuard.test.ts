@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import React, { act } from 'react';
+import * as ReactDOM from 'react-dom';
 import * as ReactDOMClient from 'react-dom/client';
 import seedTopics from '../data/topics.json';
 import { transpileForExecution } from './runner';
@@ -9,6 +10,15 @@ import type { TopicItem } from './leitner';
 // Configure React act environment for jsdom
 // @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+
+if (typeof globalThis.IntersectionObserver === 'undefined') {
+  // @ts-expect-error mock IntersectionObserver for jsdom test runner
+  globalThis.IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
 
 describe('React preview guard: every previewCode mounts with the reference solution', () => {
   const topics = seedTopics as unknown as TopicItem[];
@@ -70,7 +80,7 @@ describe('React preview guard: every previewCode mounts with the reference solut
 
       const scope = {
         React,
-        ReactDOM: ReactDOMClient,
+        ReactDOM: { ...ReactDOM, ...ReactDOMClient },
         useState: React.useState,
         useEffect: React.useEffect,
         useLayoutEffect: React.useLayoutEffect,
@@ -87,6 +97,7 @@ describe('React preview guard: every previewCode mounts with the reference solut
         createContext: React.createContext,
         forwardRef: React.forwardRef,
         Suspense: React.Suspense,
+        IntersectionObserver: globalThis.IntersectionObserver,
         log: mockLog,
         exports: {},
         require: (mod: string) => {
