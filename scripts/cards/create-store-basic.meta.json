@@ -1,0 +1,10 @@
+{
+  "track": "react",
+  "title": "A Tiny Store: getState, setState, subscribe",
+  "tags": [
+    "state",
+    "store",
+    "subscribe",
+    "basics"
+  ]
+}

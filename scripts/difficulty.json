@@ -934,5 +934,17 @@
   "theme-switcher": {
     "difficulty": 3,
     "concept": "context"
+  },
+  "calculate-winner": {
+    "difficulty": 1,
+    "concept": "game-board"
+  },
+  "paginate-items": {
+    "difficulty": 1,
+    "concept": "pagination"
+  },
+  "create-store-basic": {
+    "difficulty": 2,
+    "concept": "state-management"
   }
 }

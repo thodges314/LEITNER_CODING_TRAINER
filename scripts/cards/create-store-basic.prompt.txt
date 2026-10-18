@@ -1,0 +1,5 @@
+Build the smallest useful state container. createStore(initialState) returns { getState, setState, subscribe }.
+
+getState() returns the current state object.
+setState(partial) replaces the state with a NEW object made of the current state shallow-merged with partial (the old state object is never mutated), then calls every subscribed listener with the new state, in the order they subscribed.
+subscribe(listener) registers the listener and returns an unsubscribe function; after unsubscribing, that listener is not called again. Listeners are not called when they subscribe, only on later setState calls.

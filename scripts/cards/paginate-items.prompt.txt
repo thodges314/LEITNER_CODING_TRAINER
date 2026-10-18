@@ -1,0 +1,6 @@
+Write paginate(items, page, pageSize) for a paged list. Pages are numbered from 1 and page is an integer. It returns a new object:
+{ items, page, pageSize, totalItems, totalPages, hasPrev, hasNext }
+
+items is the slice of the input that belongs on the page (the input array is not changed). totalPages is how many pages the input needs (0 for an empty list). A page below 1 is treated as 1, and a page past the end is treated as the last page, so the returned `page` is always the page actually shown (1 when there are no items). hasPrev and hasNext say whether a page exists before or after that page.
+
+pageSize must be a positive integer; otherwise throw a RangeError whose message contains 'pageSize'.

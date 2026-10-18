@@ -13608,5 +13608,201 @@
       }
     ],
     "testHarness": "const { render, fire, q, wait } = $dom;\nconst trigger = (c) => q('button', c);\nconst tip = (c) => q('[role=\"tooltip\"]', c);\nconst hover = async (el) => { fire.event(el, new MouseEvent('mouseover', { bubbles: true })); await wait(30); };\nconst unhover = async (el) => { fire.event(el, new MouseEvent('mouseout', { bubbles: true })); await wait(30); };\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  $test.check('Hidden by default: the child renders, no tooltip, no aria-describedby', trigger(r.container).textContent === 'Save' && tip(r.container) === null && !trigger(r.container).hasAttribute('aria-describedby'), r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  await hover(trigger(r.container));\n  const t = tip(r.container);\n  $test.check('Hovering shows role=\"tooltip\" with the content and links it via aria-describedby', t !== null && t.textContent === 'Saves the file' && t.id !== '' && trigger(r.container).getAttribute('aria-describedby') === t.id, r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  await hover(trigger(r.container));\n  await unhover(trigger(r.container));\n  $test.check('Leaving the trigger hides the tooltip and removes aria-describedby', tip(r.container) === null && !trigger(r.container).hasAttribute('aria-describedby'), r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  fire.focus(trigger(r.container));\n  await wait(30);\n  const shownOnFocus = tip(r.container) !== null;\n  trigger(r.container).blur();\n  await wait(30);\n  $test.check('Keyboard users get it too: focus shows the tooltip, blur hides it', shownOnFocus && tip(r.container) === null, { shownOnFocus, afterBlur: tip(r.container) !== null });\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  fire.focus(trigger(r.container));\n  await wait(30);\n  fire.keyDown(trigger(r.container), 'Enter');\n  await wait(30);\n  const stillOpen = tip(r.container) !== null;\n  fire.keyDown(trigger(r.container), 'Escape');\n  await wait(30);\n  $test.check('Escape dismisses the tooltip; other keys do not', stillOpen && tip(r.container) === null, { stillOpen, afterEscape: tip(r.container) !== null });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(\n    <Tooltip content=\"Tip\">\n      <button onFocus={() => calls.push('focus')} onMouseEnter={() => calls.push('enter')} onKeyDown={() => calls.push('key')} className=\"primary\">Go</button>\n    </Tooltip>\n  );\n  await hover(trigger(r.container));\n  fire.focus(trigger(r.container));\n  fire.keyDown(trigger(r.container), 'a');\n  await wait(30);\n  $test.check(\"The child's own handlers and props are preserved\", calls.join() === 'enter,focus,key' && trigger(r.container).className === 'primary', { calls, className: trigger(r.container).className });\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content={<b>Bold tip</b>}><button>?</button></Tooltip>);\n  await hover(trigger(r.container));\n  $test.check('The content can be any React node', tip(r.container) !== null && tip(r.container).querySelector('b') !== null && tip(r.container).textContent === 'Bold tip', r.container.innerHTML);\n  r.unmount();\n}"
+  },
+  {
+    "id": "calculate-winner",
+    "track": "react-components",
+    "title": "Tic-Tac-Toe: Who Won?",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "game",
+      "board",
+      "logic",
+      "basics"
+    ],
+    "promptSeed": "Tic-tac-toe is stored as an array of 9 squares read left to right, top to bottom; each square is 'X', 'O' or null. Write three small functions that a game component would use.\n\ncalculateWinner(squares): return 'X' or 'O' when that player owns all three squares of a row, a column or a diagonal; otherwise return null (three empty squares are not a win).\n\nisBoardFull(squares): true when no square is null.\n\ngetStatus(squares, xIsNext): return 'Winner: X' (or 'Winner: O') when someone has won, otherwise 'Draw' when the board is full, otherwise 'Next player: X' or 'Next player: O' depending on xIsNext. A win always beats a draw, even on a full board.",
+    "difficulty": 1,
+    "concept": "game-board",
+    "referenceSolution": "const LINES = [\n  [0, 1, 2], [3, 4, 5], [6, 7, 8],\n  [0, 3, 6], [1, 4, 7], [2, 5, 8],\n  [0, 4, 8], [2, 4, 6],\n];\n\nfunction calculateWinner(squares) {\n  for (const [a, b, c] of LINES) {\n    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) return squares[a];\n  }\n  return null;\n}\n\nfunction isBoardFull(squares) {\n  return squares.every((square) => square !== null);\n}\n\nfunction getStatus(squares, xIsNext) {\n  const winner = calculateWinner(squares);\n  if (winner) return 'Winner: ' + winner;\n  if (isBoardFull(squares)) return 'Draw';\n  return 'Next player: ' + (xIsNext ? 'X' : 'O');\n}",
+    "solution": "const LINES = [\n  [0, 1, 2], [3, 4, 5], [6, 7, 8],\n  [0, 3, 6], [1, 4, 7], [2, 5, 8],\n  [0, 4, 8], [2, 4, 6],\n];\n\nfunction calculateWinner(squares) {\n  for (const [a, b, c] of LINES) {\n    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) return squares[a];\n  }\n  return null;\n}\n\nfunction isBoardFull(squares) {\n  return squares.every((square) => square !== null);\n}\n\nfunction getStatus(squares, xIsNext) {\n  const winner = calculateWinner(squares);\n  if (winner) return 'Winner: ' + winner;\n  if (isBoardFull(squares)) return 'Draw';\n  return 'Next player: ' + (xIsNext ? 'X' : 'O');\n}",
+    "starterCode": "const LINES = [\n  [0, 1, 2], [3, 4, 5], [6, 7, 8],\n  [0, 3, 6], [1, 4, 7], [2, 5, 8],\n  [0, 4, 8], [2, 4, 6],\n];\n\nfunction calculateWinner(squares) {\n  for (const [a, b, c] of LINES) {\n    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) return squares[a];\n  }\n  return null;\n}\n\nfunction isBoardFull(squares) {\n  return squares.every((square) => square !== null);\n}\n\nfunction getStatus(squares, xIsNext) {\n  const winner = calculateWinner(squares);\n  if (winner) return 'Winner: ' + winner;\n  if (isBoardFull(squares)) return 'Draw';\n  return 'Next player: ' + (xIsNext ? 'X' : 'O');\n}",
+    "testCases": [
+      {
+        "description": "Each of the three rows wins",
+        "input": "const win = (i) => {\n  const b = Array(9).fill(null);\n  [i, i + 1, i + 2].forEach((k) => { b[k] = 'X'; });\n  return calculateWinner(b);\n};\n[win(0), win(3), win(6)]",
+        "expected": "['X', 'X', 'X']"
+      },
+      {
+        "description": "Each of the three columns wins",
+        "input": "const win = (i) => {\n  const b = Array(9).fill(null);\n  [i, i + 3, i + 6].forEach((k) => { b[k] = 'O'; });\n  return calculateWinner(b);\n};\n[win(0), win(1), win(2)]",
+        "expected": "['O', 'O', 'O']"
+      },
+      {
+        "description": "Both diagonals win",
+        "input": "const a = Array(9).fill(null);\n[0, 4, 8].forEach((k) => { a[k] = 'X'; });\nconst b = Array(9).fill(null);\n[2, 4, 6].forEach((k) => { b[k] = 'O'; });\n[calculateWinner(a), calculateWinner(b)]",
+        "expected": "['X', 'O']"
+      },
+      {
+        "description": "Empty squares are not a win, and neither is a pair",
+        "input": "[calculateWinner(Array(9).fill(null)), calculateWinner(['X', 'X', null, null, 'O', null, null, null, 'O'])]",
+        "expected": "[null, null]"
+      },
+      {
+        "description": "Three squares in a line must belong to the same player",
+        "input": "calculateWinner(['X', 'X', 'O', 'O', 'O', 'X', 'X', 'O', 'X'])",
+        "expected": "null"
+      },
+      {
+        "description": "isBoardFull is true only when no square is null",
+        "input": "[isBoardFull(Array(9).fill('X')), isBoardFull(['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', null]), isBoardFull(Array(9).fill(null))]",
+        "expected": "[true, false, false]"
+      },
+      {
+        "description": "getStatus reports the winner, a draw, or whose turn it is",
+        "input": "const won = ['X', 'X', 'X', 'O', 'O', null, null, null, null];\nconst draw = ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'];\nconst open = ['X', null, null, null, 'O', null, null, null, null];\n[getStatus(won, false), getStatus(draw, true), getStatus(open, true), getStatus(open, false)]",
+        "expected": "['Winner: X', 'Draw', 'Next player: X', 'Next player: O']"
+      },
+      {
+        "description": "A win on a full board is a win, not a draw",
+        "input": "getStatus(['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', 'X'], false)",
+        "expected": "'Winner: X'"
+      }
+    ],
+    "testHarness": "await $test.run(\"Each of the three rows wins\", async () => {\n  const sleep = $test.sleep;\n  const win = (i) => {\n    const b = Array(9).fill(null);\n    [i, i + 1, i + 2].forEach((k) => { b[k] = 'X'; });\n    return calculateWinner(b);\n  };\n  return ([win(0), win(3), win(6)]);\n}, () => (['X', 'X', 'X']));\n\nawait $test.run(\"Each of the three columns wins\", async () => {\n  const sleep = $test.sleep;\n  const win = (i) => {\n    const b = Array(9).fill(null);\n    [i, i + 3, i + 6].forEach((k) => { b[k] = 'O'; });\n    return calculateWinner(b);\n  };\n  return ([win(0), win(1), win(2)]);\n}, () => (['O', 'O', 'O']));\n\nawait $test.run(\"Both diagonals win\", async () => {\n  const sleep = $test.sleep;\n  const a = Array(9).fill(null);\n  [0, 4, 8].forEach((k) => { a[k] = 'X'; });\n  const b = Array(9).fill(null);\n  [2, 4, 6].forEach((k) => { b[k] = 'O'; });\n  return ([calculateWinner(a), calculateWinner(b)]);\n}, () => (['X', 'O']));\n\nawait $test.run(\"Empty squares are not a win, and neither is a pair\", async () => {\n  const sleep = $test.sleep;\n  return ([calculateWinner(Array(9).fill(null)), calculateWinner(['X', 'X', null, null, 'O', null, null, null, 'O'])]);\n}, () => ([null, null]));\n\nawait $test.run(\"Three squares in a line must belong to the same player\", async () => {\n  const sleep = $test.sleep;\n  return (calculateWinner(['X', 'X', 'O', 'O', 'O', 'X', 'X', 'O', 'X']));\n}, () => (null));\n\nawait $test.run(\"isBoardFull is true only when no square is null\", async () => {\n  const sleep = $test.sleep;\n  return ([isBoardFull(Array(9).fill('X')), isBoardFull(['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', null]), isBoardFull(Array(9).fill(null))]);\n}, () => ([true, false, false]));\n\nawait $test.run(\"getStatus reports the winner, a draw, or whose turn it is\", async () => {\n  const sleep = $test.sleep;\n  const won = ['X', 'X', 'X', 'O', 'O', null, null, null, null];\n  const draw = ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'];\n  const open = ['X', null, null, null, 'O', null, null, null, null];\n  return ([getStatus(won, false), getStatus(draw, true), getStatus(open, true), getStatus(open, false)]);\n}, () => (['Winner: X', 'Draw', 'Next player: X', 'Next player: O']));\n\nawait $test.run(\"A win on a full board is a win, not a draw\", async () => {\n  const sleep = $test.sleep;\n  return (getStatus(['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', 'X'], false));\n}, () => ('Winner: X'));"
+  },
+  {
+    "id": "create-store-basic",
+    "track": "react",
+    "title": "A Tiny Store: getState, setState, subscribe",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "state",
+      "store",
+      "subscribe",
+      "basics"
+    ],
+    "promptSeed": "Build the smallest useful state container. createStore(initialState) returns { getState, setState, subscribe }.\n\ngetState() returns the current state object.\nsetState(partial) replaces the state with a NEW object made of the current state shallow-merged with partial (the old state object is never mutated), then calls every subscribed listener with the new state, in the order they subscribed.\nsubscribe(listener) registers the listener and returns an unsubscribe function; after unsubscribing, that listener is not called again. Listeners are not called when they subscribe, only on later setState calls.",
+    "difficulty": 2,
+    "concept": "state-management",
+    "referenceSolution": "function createStore(initialState) {\n  let state = initialState;\n  const listeners = new Set();\n\n  return {\n    getState() {\n      return state;\n    },\n    setState(partial) {\n      state = { ...state, ...partial };\n      for (const listener of [...listeners]) listener(state);\n    },\n    subscribe(listener) {\n      listeners.add(listener);\n      return () => {\n        listeners.delete(listener);\n      };\n    },\n  };\n}",
+    "solution": "function createStore(initialState) {\n  let state = initialState;\n  const listeners = new Set();\n\n  return {\n    getState() {\n      return state;\n    },\n    setState(partial) {\n      state = { ...state, ...partial };\n      for (const listener of [...listeners]) listener(state);\n    },\n    subscribe(listener) {\n      listeners.add(listener);\n      return () => {\n        listeners.delete(listener);\n      };\n    },\n  };\n}",
+    "starterCode": "function createStore(initialState) {\n  let state = initialState;\n  const listeners = new Set();\n\n  return {\n    getState() {\n      return state;\n    },\n    setState(partial) {\n      state = { ...state, ...partial };\n      for (const listener of [...listeners]) listener(state);\n    },\n    subscribe(listener) {\n      listeners.add(listener);\n      return () => {\n        listeners.delete(listener);\n      };\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "getState returns the initial state",
+        "input": "createStore({ count: 0 }).getState()",
+        "expected": "{ count: 0 }"
+      },
+      {
+        "description": "setState shallow-merges and keeps the other keys",
+        "input": "const s = createStore({ a: 1, b: 2 });\ns.setState({ b: 3 });\ns.getState()",
+        "expected": "{ a: 1, b: 3 }"
+      },
+      {
+        "description": "setState creates a new state object and never mutates the old one",
+        "input": "const s = createStore({ n: 1 });\nconst before = s.getState();\ns.setState({ n: 2 });\n[before.n, s.getState().n, s.getState() !== before]",
+        "expected": "[1, 2, true]"
+      },
+      {
+        "description": "Listeners get the NEW state after every setState",
+        "input": "const s = createStore({ n: 0 });\nconst seen = [];\ns.subscribe((state) => seen.push(state.n));\ns.setState({ n: 1 });\ns.setState({ n: 2 });\nseen",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "Subscribing does not call the listener",
+        "input": "const s = createStore({ n: 0 });\nlet calls = 0;\ns.subscribe(() => { calls += 1; });\ncalls",
+        "expected": "0"
+      },
+      {
+        "description": "Listeners run in subscription order",
+        "input": "const s = createStore({});\nconst order = [];\ns.subscribe(() => order.push('first'));\ns.subscribe(() => order.push('second'));\ns.setState({ x: 1 });\norder",
+        "expected": "['first', 'second']"
+      },
+      {
+        "description": "Unsubscribe stops only that listener",
+        "input": "const s = createStore({ n: 0 });\nconst log = [];\nconst off = s.subscribe(() => log.push('a'));\ns.subscribe(() => log.push('b'));\ns.setState({ n: 1 });\noff();\ns.setState({ n: 2 });\nlog",
+        "expected": "['a', 'b', 'b']"
+      }
+    ],
+    "testHarness": "await $test.run(\"getState returns the initial state\", async () => {\n  const sleep = $test.sleep;\n  return (createStore({ count: 0 }).getState());\n}, () => ({ count: 0 }));\n\nawait $test.run(\"setState shallow-merges and keeps the other keys\", async () => {\n  const sleep = $test.sleep;\n  const s = createStore({ a: 1, b: 2 });\n  s.setState({ b: 3 });\n  return (s.getState());\n}, () => ({ a: 1, b: 3 }));\n\nawait $test.run(\"setState creates a new state object and never mutates the old one\", async () => {\n  const sleep = $test.sleep;\n  const s = createStore({ n: 1 });\n  const before = s.getState();\n  s.setState({ n: 2 });\n  return ([before.n, s.getState().n, s.getState() !== before]);\n}, () => ([1, 2, true]));\n\nawait $test.run(\"Listeners get the NEW state after every setState\", async () => {\n  const sleep = $test.sleep;\n  const s = createStore({ n: 0 });\n  const seen = [];\n  s.subscribe((state) => seen.push(state.n));\n  s.setState({ n: 1 });\n  s.setState({ n: 2 });\n  return (seen);\n}, () => ([1, 2]));\n\nawait $test.run(\"Subscribing does not call the listener\", async () => {\n  const sleep = $test.sleep;\n  const s = createStore({ n: 0 });\n  let calls = 0;\n  s.subscribe(() => { calls += 1; });\n  return (calls);\n}, () => (0));\n\nawait $test.run(\"Listeners run in subscription order\", async () => {\n  const sleep = $test.sleep;\n  const s = createStore({});\n  const order = [];\n  s.subscribe(() => order.push('first'));\n  s.subscribe(() => order.push('second'));\n  s.setState({ x: 1 });\n  return (order);\n}, () => (['first', 'second']));\n\nawait $test.run(\"Unsubscribe stops only that listener\", async () => {\n  const sleep = $test.sleep;\n  const s = createStore({ n: 0 });\n  const log = [];\n  const off = s.subscribe(() => log.push('a'));\n  s.subscribe(() => log.push('b'));\n  s.setState({ n: 1 });\n  off();\n  s.setState({ n: 2 });\n  return (log);\n}, () => (['a', 'b', 'b']));"
+  },
+  {
+    "id": "paginate-items",
+    "track": "react-components",
+    "title": "Paginate a List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "pagination",
+      "arrays",
+      "basics"
+    ],
+    "promptSeed": "Write paginate(items, page, pageSize) for a paged list. Pages are numbered from 1 and page is an integer. It returns a new object:\n{ items, page, pageSize, totalItems, totalPages, hasPrev, hasNext }\n\nitems is the slice of the input that belongs on the page (the input array is not changed). totalPages is how many pages the input needs (0 for an empty list). A page below 1 is treated as 1, and a page past the end is treated as the last page, so the returned `page` is always the page actually shown (1 when there are no items). hasPrev and hasNext say whether a page exists before or after that page.\n\npageSize must be a positive integer; otherwise throw a RangeError whose message contains 'pageSize'.",
+    "difficulty": 1,
+    "concept": "pagination",
+    "referenceSolution": "function paginate(items, page, pageSize) {\n  if (!Number.isInteger(pageSize) || pageSize < 1) {\n    throw new RangeError('pageSize must be a positive integer');\n  }\n  const totalItems = items.length;\n  const totalPages = Math.ceil(totalItems / pageSize);\n  const current = Math.min(Math.max(1, page), Math.max(1, totalPages));\n  const start = (current - 1) * pageSize;\n  return {\n    items: items.slice(start, start + pageSize),\n    page: current,\n    pageSize,\n    totalItems,\n    totalPages,\n    hasPrev: current > 1,\n    hasNext: current < totalPages,\n  };\n}",
+    "solution": "function paginate(items, page, pageSize) {\n  if (!Number.isInteger(pageSize) || pageSize < 1) {\n    throw new RangeError('pageSize must be a positive integer');\n  }\n  const totalItems = items.length;\n  const totalPages = Math.ceil(totalItems / pageSize);\n  const current = Math.min(Math.max(1, page), Math.max(1, totalPages));\n  const start = (current - 1) * pageSize;\n  return {\n    items: items.slice(start, start + pageSize),\n    page: current,\n    pageSize,\n    totalItems,\n    totalPages,\n    hasPrev: current > 1,\n    hasNext: current < totalPages,\n  };\n}",
+    "starterCode": "function paginate(items, page, pageSize) {\n  if (!Number.isInteger(pageSize) || pageSize < 1) {\n    throw new RangeError('pageSize must be a positive integer');\n  }\n  const totalItems = items.length;\n  const totalPages = Math.ceil(totalItems / pageSize);\n  const current = Math.min(Math.max(1, page), Math.max(1, totalPages));\n  const start = (current - 1) * pageSize;\n  return {\n    items: items.slice(start, start + pageSize),\n    page: current,\n    pageSize,\n    totalItems,\n    totalPages,\n    hasPrev: current > 1,\n    hasNext: current < totalPages,\n  };\n}",
+    "testCases": [
+      {
+        "description": "First page of 10 items, 3 per page",
+        "input": "paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 1, 3)",
+        "expected": "{ items: [1, 2, 3], page: 1, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: false, hasNext: true }"
+      },
+      {
+        "description": "A middle page has both neighbours",
+        "input": "paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 2, 3)",
+        "expected": "{ items: [4, 5, 6], page: 2, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: true, hasNext: true }"
+      },
+      {
+        "description": "The last page can be partial",
+        "input": "paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 4, 3)",
+        "expected": "{ items: [10], page: 4, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: true, hasNext: false }"
+      },
+      {
+        "description": "An exact multiple has no extra empty page",
+        "input": "paginate([1, 2, 3, 4, 5, 6], 2, 3)",
+        "expected": "{ items: [4, 5, 6], page: 2, pageSize: 3, totalItems: 6, totalPages: 2, hasPrev: true, hasNext: false }"
+      },
+      {
+        "description": "A page past the end shows the last page",
+        "input": "paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 99, 3).page",
+        "expected": "4"
+      },
+      {
+        "description": "A page below 1 shows the first page",
+        "input": "[paginate([1, 2, 3, 4], 0, 2).items, paginate([1, 2, 3, 4], -5, 2).page]",
+        "expected": "[[1, 2], 1]"
+      },
+      {
+        "description": "An empty list has 0 pages and stays on page 1",
+        "input": "paginate([], 3, 5)",
+        "expected": "{ items: [], page: 1, pageSize: 5, totalItems: 0, totalPages: 0, hasPrev: false, hasNext: false }"
+      },
+      {
+        "description": "A page size of 1 is valid",
+        "input": "paginate([1, 2, 3], 2, 1)",
+        "expected": "{ items: [2], page: 2, pageSize: 1, totalItems: 3, totalPages: 3, hasPrev: true, hasNext: true }"
+      },
+      {
+        "description": "The input array is not changed",
+        "input": "const input = [1, 2, 3];\npaginate(input, 1, 2);\ninput",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "pageSize must be a positive integer",
+        "input": "paginate([1, 2, 3], 1, 0)",
+        "expected": "Throws RangeError: pageSize must be a positive integer"
+      }
+    ],
+    "testHarness": "await $test.run(\"First page of 10 items, 3 per page\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 1, 3));\n}, () => ({ items: [1, 2, 3], page: 1, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: false, hasNext: true }));\n\nawait $test.run(\"A middle page has both neighbours\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 2, 3));\n}, () => ({ items: [4, 5, 6], page: 2, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: true, hasNext: true }));\n\nawait $test.run(\"The last page can be partial\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 4, 3));\n}, () => ({ items: [10], page: 4, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: true, hasNext: false }));\n\nawait $test.run(\"An exact multiple has no extra empty page\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6], 2, 3));\n}, () => ({ items: [4, 5, 6], page: 2, pageSize: 3, totalItems: 6, totalPages: 2, hasPrev: true, hasNext: false }));\n\nawait $test.run(\"A page past the end shows the last page\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 99, 3).page);\n}, () => (4));\n\nawait $test.run(\"A page below 1 shows the first page\", async () => {\n  const sleep = $test.sleep;\n  return ([paginate([1, 2, 3, 4], 0, 2).items, paginate([1, 2, 3, 4], -5, 2).page]);\n}, () => ([[1, 2], 1]));\n\nawait $test.run(\"An empty list has 0 pages and stays on page 1\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([], 3, 5));\n}, () => ({ items: [], page: 1, pageSize: 5, totalItems: 0, totalPages: 0, hasPrev: false, hasNext: false }));\n\nawait $test.run(\"A page size of 1 is valid\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3], 2, 1));\n}, () => ({ items: [2], page: 2, pageSize: 1, totalItems: 3, totalPages: 3, hasPrev: true, hasNext: true }));\n\nawait $test.run(\"The input array is not changed\", async () => {\n  const sleep = $test.sleep;\n  const input = [1, 2, 3];\n  paginate(input, 1, 2);\n  return (input);\n}, () => ([1, 2, 3]));\n\nawait $test.rejects(\"pageSize must be a positive integer\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3], 1, 0));\n}, \"pageSize\");"
   }
 ]

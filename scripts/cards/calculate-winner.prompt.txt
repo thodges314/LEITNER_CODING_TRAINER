@@ -1,0 +1,7 @@
+Tic-tac-toe is stored as an array of 9 squares read left to right, top to bottom; each square is 'X', 'O' or null. Write three small functions that a game component would use.
+
+calculateWinner(squares): return 'X' or 'O' when that player owns all three squares of a row, a column or a diagonal; otherwise return null (three empty squares are not a win).
+
+isBoardFull(squares): true when no square is null.
+
+getStatus(squares, xIsNext): return 'Winner: X' (or 'Winner: O') when someone has won, otherwise 'Draw' when the board is full, otherwise 'Next player: X' or 'Next player: O' depending on xIsNext. A win always beats a draw, even on a full board.
