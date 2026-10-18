@@ -1,16 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import * as d3 from 'd3';
-import { PieChart, Activity, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Activity, PieChart, Layers, Gauge, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
 import { getTrackMeta } from '../lib/leitner';
 import type { AppTheme } from '../lib/theme';
 
-export type StatsViewMode = 'orbit' | 'radar' | 'tiers';
+export type StatsViewMode = 'radar' | 'orbit' | 'tiers' | 'velocity';
 
 interface DeckStatsWidgetProps {
   state: LeitnerDeckState;
   topics: TopicItem[];
   theme?: AppTheme;
+  selectedTracks?: string[];
+  selectedBox?: number | number[] | 'all';
+  onSelectExclusiveTrack?: (track: string) => void;
+  onSelectExclusiveTracks?: (tracks: string[]) => void;
+  onSelectExclusiveBox?: (box: number | number[] | 'all') => void;
+  /** Backwards compatibility alias */
   onSelectTrack?: (track: string) => void;
 }
 
@@ -50,10 +56,16 @@ const RADAR_DOMAINS: { id: string; label: string; tracks: TrackType[] }[] = [
 export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   topics,
   theme,
+  selectedTracks,
+  selectedBox,
+  onSelectExclusiveTrack,
+  onSelectExclusiveTracks,
+  onSelectExclusiveBox,
   onSelectTrack,
 }) => {
   const isLight = theme === 'apple-gsos';
-  const [mode, setMode] = useState<StatsViewMode>('orbit');
+  // Default view is now Skill Matrix ('radar') per user requirement
+  const [mode, setMode] = useState<StatsViewMode>('radar');
   const [hoveredTrack, setHoveredTrack] = useState<string | null>(null);
   const [hoveredDomain, setHoveredDomain] = useState<string | null>(null);
   const [hoveredBox, setHoveredBox] = useState<number | null>(null);
@@ -79,22 +91,28 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
       .sort((a, b) => b.count - a.count);
   }, [activeTopics, trackColors]);
 
-  // Radar data
+  // Radar data: Both depth (average tier) and coverage (active cards / total cards)
   const radarData = useMemo(() => {
     return RADAR_DOMAINS.map((domain) => {
-      const domainCards = activeTopics.filter((t) => domain.tracks.includes(t.track));
-      const count = domainCards.length;
+      const allDomainCards = topics.filter((t) => domain.tracks.includes(t.track));
+      const activeDomainCards = activeTopics.filter((t) => domain.tracks.includes(t.track));
+      const totalCount = allDomainCards.length;
+      const activeCount = activeDomainCards.length;
       const avgBox =
-        count > 0 ? domainCards.reduce((acc, c) => acc + (c.box || 1), 0) / count : 0;
-      const score = Math.min(5, Math.max(0.5, avgBox)); // scale 1-5
+        activeCount > 0 ? activeDomainCards.reduce((acc, c) => acc + (c.box || 1), 0) / activeCount : 0;
+      // Score on 1-5 scale for the radar polygon depth
+      const score = Math.min(5, Math.max(0.8, avgBox));
+      const coveragePercent = totalCount > 0 ? (activeCount / totalCount) * 100 : 0;
       return {
         ...domain,
-        count,
+        totalCount,
+        activeCount,
         avgBox,
         score,
+        coveragePercent,
       };
     });
-  }, [activeTopics]);
+  }, [topics, activeTopics]);
 
   // Box Tier Breakdown
   const boxStats = useMemo(() => {
@@ -134,26 +152,93 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
     }));
   }, [activeTopics, isLight]);
 
+  // Velocity Diagnostic metrics
+  const velocityData = useMemo(() => {
+    const total = activeTopics.length;
+    const box1 = activeTopics.filter((t) => t.box === 1).length;
+    const box23 = activeTopics.filter((t) => t.box === 2 || t.box === 3).length;
+    const box4Plus = activeTopics.filter((t) => t.box >= 4).length;
+
+    // Velocity score: 0% when all cards are in Box 1, up to 100% as cards progress to Box 5+
+    const velocityScore =
+      total > 0
+        ? Math.round(
+            ((activeTopics.reduce((acc, t) => acc + Math.min(5, t.box), 0) - total) / (total * 4)) * 100
+          )
+        : 0;
+
+    let velocityStatus = 'Priming';
+    let statusColor = isLight ? '#c2410c' : '#f97316';
+    if (velocityScore >= 70) {
+      velocityStatus = 'Hyper-Velocity';
+      statusColor = isLight ? '#047857' : '#34d399';
+    } else if (velocityScore >= 40) {
+      velocityStatus = 'Cruising Speed';
+      statusColor = isLight ? '#0284c7' : '#38bdf8';
+    } else if (velocityScore >= 15) {
+      velocityStatus = 'Accelerating';
+      statusColor = isLight ? '#b45309' : '#fbbf24';
+    }
+
+    return {
+      total,
+      box1,
+      box23,
+      box4Plus,
+      velocityScore: Math.min(100, Math.max(0, velocityScore)),
+      velocityStatus,
+      statusColor,
+    };
+  }, [activeTopics, isLight]);
+
   const modes: { id: StatsViewMode; label: string; icon: React.ReactNode }[] = [
-    { id: 'orbit', label: 'Track Orbit', icon: <PieChart size={13} /> },
     { id: 'radar', label: 'Skill Matrix', icon: <Activity size={13} /> },
+    { id: 'orbit', label: 'Track Orbit', icon: <PieChart size={13} /> },
     { id: 'tiers', label: 'Mastery Tiers', icon: <Layers size={13} /> },
+    { id: 'velocity', label: 'Velocity', icon: <Gauge size={13} /> },
   ];
 
   const handleNextMode = () => {
     setMode((prev) => {
-      if (prev === 'orbit') return 'radar';
-      if (prev === 'radar') return 'tiers';
-      return 'orbit';
+      if (prev === 'radar') return 'orbit';
+      if (prev === 'orbit') return 'tiers';
+      if (prev === 'tiers') return 'velocity';
+      return 'radar';
     });
   };
 
   const handlePrevMode = () => {
     setMode((prev) => {
-      if (prev === 'orbit') return 'tiers';
-      if (prev === 'tiers') return 'radar';
-      return 'orbit';
+      if (prev === 'radar') return 'velocity';
+      if (prev === 'velocity') return 'tiers';
+      if (prev === 'tiers') return 'orbit';
+      return 'radar';
     });
+  };
+
+  // Exclusive selection dispatchers
+  const handleTrackClick = (track: string) => {
+    if (onSelectExclusiveTrack) {
+      onSelectExclusiveTrack(track);
+    } else if (onSelectTrack) {
+      onSelectTrack(track);
+    }
+  };
+
+  const handleDomainClick = (domainTracks: TrackType[]) => {
+    if (onSelectExclusiveTracks) {
+      onSelectExclusiveTracks(domainTracks);
+    } else if (onSelectExclusiveTrack && domainTracks.length > 0) {
+      onSelectExclusiveTrack(domainTracks[0]);
+    } else if (onSelectTrack && domainTracks.length > 0) {
+      onSelectTrack(domainTracks[0]);
+    }
+  };
+
+  const handleBoxClick = (box: number | number[]) => {
+    if (onSelectExclusiveBox) {
+      onSelectExclusiveBox(box);
+    }
   };
 
   // SVG dimensions
@@ -172,17 +257,19 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   }, []);
 
   const arcGenerator = useMemo(() => {
-    return d3.arc<d3.PieArcDatum<{ track: TrackType; count: number; label: string; color: string; percentage: number }>>()
+    return d3
+      .arc<d3.PieArcDatum<{ track: TrackType; count: number; label: string; color: string; percentage: number }>>()
       .innerRadius(54)
       .outerRadius(82)
       .cornerRadius(3);
   }, []);
 
   const hoveredArcGenerator = useMemo(() => {
-    return d3.arc<d3.PieArcDatum<{ track: TrackType; count: number; label: string; color: string; percentage: number }>>()
-      .innerRadius(52)
-      .outerRadius(88)
-      .cornerRadius(4);
+    return d3
+      .arc<d3.PieArcDatum<{ track: TrackType; count: number; label: string; color: string; percentage: number }>>()
+      .innerRadius(51)
+      .outerRadius(87)
+      .cornerRadius(3);
   }, []);
 
   const pieSlices = useMemo(() => {
@@ -190,7 +277,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   }, [pieGenerator, trackStats]);
 
   // D3 Radar Generator
-  const radarRadius = 78;
+  const radarRadius = 76;
   const angleSlice = (Math.PI * 2) / RADAR_DOMAINS.length;
 
   const radarPoints = useMemo(() => {
@@ -204,7 +291,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
         y: centerY + r * Math.sin(angle),
         axisX: centerX + radarRadius * Math.cos(angle),
         axisY: centerY + radarRadius * Math.sin(angle),
-        labelX: centerX + (radarRadius + 16) * Math.cos(angle),
+        labelX: centerX + (radarRadius + 18) * Math.cos(angle),
         labelY: centerY + (radarRadius + 14) * Math.sin(angle),
       };
     });
@@ -216,6 +303,40 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   const activeTrackObj = trackStats.find((t) => t.track === hoveredTrack);
   const activeDomainObj = radarData.find((d) => d.id === hoveredDomain);
   const activeBoxObj = boxStats.find((b) => b.box === hoveredBox);
+
+  // Velocity Speedometer Arc
+  const velocityGaugeRadius = 78;
+  const velocityStartAngle = -Math.PI * 0.75; // -135 deg
+  const velocityTotalAngle = Math.PI * 1.5;   // 270 deg
+  const velocityNeedleAngle =
+    velocityStartAngle + (velocityData.velocityScore / 100) * velocityTotalAngle;
+
+  const needleLen = velocityGaugeRadius - 14;
+  const needleX = centerX + needleLen * Math.cos(velocityNeedleAngle);
+  const needleY = centerY + needleLen * Math.sin(velocityNeedleAngle);
+
+  // Velocity arc segments for background gauge
+  const velocityArcs = useMemo(() => {
+    const arcGen = d3
+      .arc<void>()
+      .innerRadius(velocityGaugeRadius - 8)
+      .outerRadius(velocityGaugeRadius + 4)
+      .cornerRadius(2);
+
+    const segmentSpan = velocityTotalAngle / 3;
+    const a1Start = velocityStartAngle;
+    const a1End = a1Start + segmentSpan - 0.04;
+    const a2Start = a1End + 0.04;
+    const a2End = a2Start + segmentSpan - 0.04;
+    const a3Start = a2End + 0.04;
+    const a3End = velocityStartAngle + velocityTotalAngle;
+
+    return {
+      dragArc: arcGen.startAngle(a1Start).endAngle(a1End)(),
+      accelArc: arcGen.startAngle(a2Start).endAngle(a2End)(),
+      hyperArc: arcGen.startAngle(a3Start).endAngle(a3End)(),
+    };
+  }, [velocityGaugeRadius, velocityStartAngle, velocityTotalAngle]);
 
   return (
     <div
@@ -241,7 +362,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '8px',
-          marginBottom: '8px',
+          marginBottom: '6px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -266,7 +387,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
           <div
             style={{
               display: 'inline-flex',
-              backgroundColor: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.06)',
+              backgroundColor: isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
               borderRadius: '6px',
               padding: '2px',
               gap: '2px',
@@ -284,7 +405,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                   alignItems: 'center',
                   gap: '4px',
                   fontSize: '11px',
-                  padding: '3px 8px',
+                  padding: '3px 7px',
                   borderRadius: '4px',
                   border: 'none',
                   cursor: 'pointer',
@@ -345,97 +466,12 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
           >
             No active cards in rotation yet. Unlock topics to see live proportion analytics.
           </div>
-        ) : mode === 'orbit' ? (
-          /* Mode 1: Track Orbit Donut */
-          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <svg data-testid="stats-chart-svg" width={width} height={height} style={{ overflow: 'visible' }}>
-              <g transform={`translate(${centerX}, ${centerY})`}>
-                {pieSlices.map((slice) => {
-                  const isHovered = hoveredTrack === slice.data.track;
-                  const path = (isHovered ? hoveredArcGenerator(slice) : arcGenerator(slice)) || '';
-                  return (
-                    <path
-                      key={slice.data.track}
-                      data-track={slice.data.track}
-                      d={path}
-                      fill={slice.data.color}
-                      stroke={isLight ? '#ffffff' : '#030712'}
-                      strokeWidth={1.5}
-                      style={{
-                        cursor: 'pointer',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        opacity: hoveredTrack && !isHovered ? 0.45 : 1,
-                        filter: isHovered && !isLight ? `drop-shadow(0 0 6px ${slice.data.color})` : 'none',
-                      }}
-                      onMouseEnter={() => setHoveredTrack(slice.data.track)}
-                      onMouseLeave={() => setHoveredTrack(null)}
-                      onClick={() => onSelectTrack && onSelectTrack(slice.data.track)}
-                    />
-                  );
-                })}
-
-                {/* Center Readout */}
-                <circle
-                  r={50}
-                  fill={isLight ? '#f8fafc' : '#061320'}
-                  stroke={isLight ? '#e2e8f0' : 'rgba(56, 189, 248, 0.15)'}
-                  strokeWidth={1}
-                />
-                <text
-                  textAnchor="middle"
-                  dy="-4"
-                  style={{
-                    fontSize: activeTrackObj ? '13px' : '17px',
-                    fontWeight: 700,
-                    fill: isLight ? '#0f172a' : '#f1f5f9',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  {activeTrackObj ? `${activeTrackObj.count} cards` : `${activeTopics.length}`}
-                </text>
-                <text
-                  textAnchor="middle"
-                  dy="14"
-                  style={{
-                    fontSize: '10.5px',
-                    fontWeight: 500,
-                    fill: activeTrackObj ? activeTrackObj.color : 'var(--text-muted)',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  {activeTrackObj ? `${activeTrackObj.percentage.toFixed(0)}% of deck` : 'Active Cards'}
-                </text>
-              </g>
-            </svg>
-
-            {/* Current Hover Track Badge / Caption */}
-            <div
-              style={{
-                marginTop: '-4px',
-                fontSize: '11px',
-                fontWeight: 600,
-                color: activeTrackObj ? activeTrackObj.color : 'var(--text-secondary)',
-                minHeight: '16px',
-                textAlign: 'center',
-              }}
-            >
-              {activeTrackObj ? (
-                <span>
-                  {activeTrackObj.label} (click to focus)
-                </span>
-              ) : (
-                <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
-                  Hover over slices to inspect track distributions
-                </span>
-              )}
-            </div>
-          </div>
         ) : mode === 'radar' ? (
-          /* Mode 2: Skill Matrix Radar */
+          /* Mode 1 (Default): Skill Matrix Radar */
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <svg data-testid="stats-chart-svg" width={width} height={height} style={{ overflow: 'visible' }}>
               <g>
-                {/* Background Concentric Grid Rings */}
+                {/* Background Concentric Grid Rings (Darker in Day View) */}
                 {[1, 2, 3, 4, 5].map((lvl) => {
                   const r = (radarRadius / 5) * lvl;
                   return (
@@ -445,24 +481,36 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                       cy={centerY}
                       r={r}
                       fill="none"
-                      stroke={isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.07)'}
-                      strokeDasharray={lvl < 5 ? '2,2' : undefined}
-                      strokeWidth={1}
+                      stroke={isLight ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.08)'}
+                      strokeDasharray={lvl < 5 ? '3,3' : undefined}
+                      strokeWidth={isLight ? 1.3 : 1}
                     />
                   );
                 })}
 
-                {/* Axis lines and domain labels */}
+                {/* Axis lines and domain labels (Darker in Day View) */}
                 {radarPoints.points.map((p) => {
+                  const isDomainSelected =
+                    selectedTracks &&
+                    p.tracks.length > 0 &&
+                    p.tracks.every((trk) => selectedTracks.includes(trk));
+
                   return (
-                    <g key={p.id}>
+                    <g
+                      key={p.id}
+                      data-domain={p.id}
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => handleDomainClick(p.tracks)}
+                      onMouseEnter={() => setHoveredDomain(p.id)}
+                      onMouseLeave={() => setHoveredDomain(null)}
+                    >
                       <line
                         x1={centerX}
                         y1={centerY}
                         x2={p.axisX}
                         y2={p.axisY}
-                        stroke={isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.08)'}
-                        strokeWidth={1}
+                        stroke={isLight ? 'rgba(0, 0, 0, 0.40)' : 'rgba(255, 255, 255, 0.12)'}
+                        strokeWidth={isLight ? 1.3 : 1}
                       />
                       <text
                         x={p.labelX}
@@ -471,13 +519,16 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                         dominantBaseline="middle"
                         style={{
                           fontSize: '9.5px',
-                          fontWeight: hoveredDomain === p.id ? 700 : 500,
+                          fontWeight: hoveredDomain === p.id || isDomainSelected ? 700 : isLight ? 600 : 500,
                           fill:
-                            hoveredDomain === p.id
+                            hoveredDomain === p.id || isDomainSelected
                               ? isLight
                                 ? '#2B3A8C'
                                 : 'var(--accent-cyan)'
-                              : 'var(--text-muted)',
+                              : isLight
+                                ? '#0F172A'
+                                : 'var(--text-muted)',
+                          transition: 'all 0.15s ease',
                         }}
                       >
                         {p.label}
@@ -490,12 +541,12 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                 {radarPoints.pathString && (
                   <path
                     d={radarPoints.pathString}
-                    fill={isLight ? 'rgba(68, 85, 170, 0.22)' : 'rgba(56, 189, 248, 0.2)'}
+                    fill={isLight ? 'rgba(68, 85, 170, 0.28)' : 'rgba(56, 189, 248, 0.22)'}
                     stroke={isLight ? '#4455AA' : '#38bdf8'}
                     strokeWidth={2}
                     style={{
                       transition: 'all 0.2s ease',
-                      filter: !isLight ? 'drop-shadow(0 0 6px rgba(56, 189, 248, 0.35))' : 'none',
+                      filter: !isLight ? 'drop-shadow(0 0 6px rgba(56, 189, 248, 0.4))' : 'none',
                     }}
                   />
                 )}
@@ -514,6 +565,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                     }}
+                    onClick={() => handleDomainClick(p.tracks)}
                     onMouseEnter={() => setHoveredDomain(p.id)}
                     onMouseLeave={() => setHoveredDomain(null)}
                   />
@@ -538,17 +590,105 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
             >
               {activeDomainObj ? (
                 <span>
-                  {activeDomainObj.label}: {activeDomainObj.count} cards • Avg Tier{' '}
-                  {activeDomainObj.avgBox.toFixed(1)}
+                  {activeDomainObj.label}: Tier {activeDomainObj.avgBox.toFixed(1)}/5.0 depth • {activeDomainObj.activeCount}/{activeDomainObj.totalCount} cards active ({activeDomainObj.coveragePercent.toFixed(0)}% unlocked)
                 </span>
               ) : (
                 <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
-                  Outer rings represent higher Leitner tier mastery
+                  Domain Mastery Depth (Tier 1–5+) • Click domain to filter exclusively
                 </span>
               )}
             </div>
           </div>
-        ) : (
+        ) : mode === 'orbit' ? (
+          /* Mode 2: Track Orbit Donut */
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <svg data-testid="stats-chart-svg" width={width} height={height} style={{ overflow: 'visible' }}>
+              <g transform={`translate(${centerX}, ${centerY})`}>
+                {pieSlices.map((slice) => {
+                  const isHovered = hoveredTrack === slice.data.track;
+                  const isTrackSelected = selectedTracks && selectedTracks.includes(slice.data.track);
+                  const path = (isHovered ? hoveredArcGenerator(slice) : arcGenerator(slice)) || '';
+                  return (
+                    <path
+                      key={slice.data.track}
+                      data-track={slice.data.track}
+                      d={path}
+                      fill={slice.data.color}
+                      stroke={isTrackSelected ? (isLight ? '#2B3A8C' : '#38bdf8') : isLight ? '#ffffff' : '#030712'}
+                      strokeWidth={isTrackSelected ? 3 : 1.5}
+                      style={{
+                        cursor: 'pointer',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        opacity: hoveredTrack && !isHovered ? 0.45 : 1,
+                        filter: isHovered && !isLight ? `drop-shadow(0 0 6px ${slice.data.color})` : 'none',
+                      }}
+                      onMouseEnter={() => setHoveredTrack(slice.data.track)}
+                      onMouseLeave={() => setHoveredTrack(null)}
+                      onClick={() => handleTrackClick(slice.data.track)}
+                    />
+                  );
+                })}
+
+                {/* Center Readout */}
+                <circle
+                  r={50}
+                  fill={isLight ? '#f8fafc' : '#061320'}
+                  stroke={isLight ? '#cbd5e1' : 'rgba(56, 189, 248, 0.15)'}
+                  strokeWidth={1}
+                  style={{ pointerEvents: 'none' }}
+                />
+                <text
+                  textAnchor="middle"
+                  dy="-4"
+                  style={{
+                    fontSize: activeTrackObj ? '13px' : '17px',
+                    fontWeight: 700,
+                    fill: isLight ? '#0f172a' : '#f1f5f9',
+                    fontFamily: 'inherit',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {activeTrackObj ? `${activeTrackObj.count} cards` : `${activeTopics.length}`}
+                </text>
+                <text
+                  textAnchor="middle"
+                  dy="14"
+                  style={{
+                    fontSize: '10.5px',
+                    fontWeight: 500,
+                    fill: activeTrackObj ? activeTrackObj.color : 'var(--text-muted)',
+                    fontFamily: 'inherit',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {activeTrackObj ? `${activeTrackObj.percentage.toFixed(0)}% of deck` : 'Active Cards'}
+                </text>
+              </g>
+            </svg>
+
+            {/* Current Hover Track Badge / Caption */}
+            <div
+              style={{
+                marginTop: '-4px',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: activeTrackObj ? activeTrackObj.color : 'var(--text-secondary)',
+                minHeight: '16px',
+                textAlign: 'center',
+              }}
+            >
+              {activeTrackObj ? (
+                <span>
+                  {activeTrackObj.label} (click to focus exclusively)
+                </span>
+              ) : (
+                <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
+                  Hover over slices to inspect • Click to select exclusively
+                </span>
+              )}
+            </div>
+          </div>
+        ) : mode === 'tiers' ? (
           /* Mode 3: Mastery Tiers Concentric Rings */
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <svg data-testid="stats-chart-svg" width={width} height={height} style={{ overflow: 'visible' }}>
@@ -556,6 +696,10 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                 {boxStats.map((item, idx) => {
                   const r = 32 + idx * 13;
                   const isHovered = hoveredBox === item.box;
+                  const isBoxSelected =
+                    selectedBox !== 'all' &&
+                    (Array.isArray(selectedBox) ? selectedBox.includes(item.box) : selectedBox === item.box);
+
                   const maxArcAngle = Math.PI * 1.7; // 306 degrees arc
                   const fraction = activeTopics.length > 0 ? item.count / activeTopics.length : 0;
                   const arcAngle = Math.max(0.04, fraction * maxArcAngle);
@@ -579,19 +723,25 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                   return (
                     <g
                       key={item.box}
+                      data-box={item.box}
                       style={{ cursor: 'pointer' }}
                       onMouseEnter={() => setHoveredBox(item.box)}
                       onMouseLeave={() => setHoveredBox(null)}
+                      onClick={() => handleBoxClick(item.box)}
                     >
                       {/* Track background */}
                       <path
                         d={bgArc || ''}
-                        fill={isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.07)'}
+                        fill={isLight ? 'rgba(0,0,0,0.12)' : 'rgba(255,255,255,0.07)'}
+                        stroke={isLight ? 'rgba(0,0,0,0.22)' : 'none'}
+                        strokeWidth={isLight ? 0.8 : 0}
                       />
                       {/* Progress arc */}
                       <path
                         d={fgArc || ''}
                         fill={item.color}
+                        stroke={isBoxSelected ? (isLight ? '#2B3A8C' : '#38bdf8') : 'none'}
+                        strokeWidth={isBoxSelected ? 2 : 0}
                         style={{
                           opacity: hoveredBox && !isHovered ? 0.35 : 1,
                           transition: 'all 0.2s ease',
@@ -610,6 +760,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                     fontSize: activeBoxObj ? '14px' : '16px',
                     fontWeight: 700,
                     fill: isLight ? '#0f172a' : '#f1f5f9',
+                    pointerEvents: 'none',
                   }}
                 >
                   {activeBoxObj ? `${activeBoxObj.count} cards` : `${activeTopics.length}`}
@@ -621,6 +772,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                     fontSize: '10px',
                     fontWeight: 500,
                     fill: activeBoxObj ? activeBoxObj.color : 'var(--text-muted)',
+                    pointerEvents: 'none',
                   }}
                 >
                   {activeBoxObj ? activeBoxObj.interval : 'Active Cards'}
@@ -641,13 +793,185 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
             >
               {activeBoxObj ? (
                 <span>
-                  {activeBoxObj.name}: {activeBoxObj.percentage.toFixed(0)}% of rotation
+                  {activeBoxObj.name}: {activeBoxObj.percentage.toFixed(0)}% of rotation (click to filter)
                 </span>
               ) : (
                 <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>
                   Outer rings = Mastered tiers; inner rings = Learning tiers
                 </span>
               )}
+            </div>
+          </div>
+        ) : (
+          /* Mode 4: Velocity Diagnostic (Speedometer Gauge) */
+          <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <svg data-testid="stats-chart-svg" width={width} height={height} style={{ overflow: 'visible' }}>
+              <g transform={`translate(${centerX}, ${centerY + 10})`}>
+                {/* Drag Zone (Box 1) */}
+                <path
+                  data-velocity-zone="drag"
+                  d={velocityArcs.dragArc || ''}
+                  fill={isLight ? '#dc2626' : '#f43f5e'}
+                  style={{ cursor: 'pointer', opacity: 0.85 }}
+                  onClick={() => handleBoxClick(1)}
+                >
+                  <title>Box 1 (High Friction / 1-Trial Recall)</title>
+                </path>
+
+                {/* Accelerating Zone (Box 2-3) */}
+                <path
+                  data-velocity-zone="accel"
+                  d={velocityArcs.accelArc || ''}
+                  fill={isLight ? '#b45309' : '#f59e0b'}
+                  style={{ cursor: 'pointer', opacity: 0.85 }}
+                  onClick={() => handleBoxClick([2, 3])}
+                >
+                  <title>Box 2 & 3 (Accelerating Interval)</title>
+                </path>
+
+                {/* Hyper Zone (Box 4+) */}
+                <path
+                  data-velocity-zone="hyper"
+                  d={velocityArcs.hyperArc || ''}
+                  fill={isLight ? '#0284c7' : '#06b6d4'}
+                  style={{ cursor: 'pointer', opacity: 0.85 }}
+                  onClick={() => handleBoxClick([4, 5, 6, 7, 8, 9])}
+                >
+                  <title>Box 4+ (Hyper-Velocity / Deep Retention)</title>
+                </path>
+
+                {/* Velocity Needle */}
+                <line
+                  x1={0}
+                  y1={0}
+                  x2={needleX - centerX}
+                  y2={needleY - (centerY + 10)}
+                  stroke={velocityData.statusColor}
+                  strokeWidth={2.5}
+                  strokeLinecap="round"
+                  style={{ transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)', pointerEvents: 'none' }}
+                />
+
+                {/* Center Hub */}
+                <circle
+                  cx={0}
+                  cy={0}
+                  r={6}
+                  fill={velocityData.statusColor}
+                  stroke={isLight ? '#ffffff' : '#0f172a'}
+                  strokeWidth={2}
+                  style={{ pointerEvents: 'none' }}
+                />
+
+                {/* Score & Rating text */}
+                <text
+                  data-testid="velocity-score-text"
+                  textAnchor="middle"
+                  dy="28"
+                  style={{
+                    fontSize: '18px',
+                    fontWeight: 700,
+                    fill: isLight ? '#0f172a' : '#f1f5f9',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {velocityData.velocityScore}%
+                </text>
+                <text
+                  data-testid="velocity-status-text"
+                  textAnchor="middle"
+                  dy="42"
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    fill: velocityData.statusColor,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {velocityData.velocityStatus}
+                </text>
+              </g>
+            </svg>
+
+            {/* Interactive Velocity Tier Badges */}
+            <div
+              style={{
+                marginTop: '-4px',
+                display: 'flex',
+                gap: '8px',
+                fontSize: '11px',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <button
+                type="button"
+                data-testid="velocity-tier-drag"
+                onClick={() => handleBoxClick(1)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: isLight ? '#dc2626' : '#f43f5e',
+                  fontWeight: 600,
+                  fontSize: '10.5px',
+                  padding: '2px 4px',
+                  borderRadius: '4px',
+                }}
+                title="Filter exclusively to Box 1 cards"
+              >
+                🔄 Drag: {velocityData.box1}
+              </button>
+              <span style={{ color: 'var(--text-muted)' }}>•</span>
+              <button
+                type="button"
+                data-testid="velocity-tier-accel"
+                onClick={() => handleBoxClick([2, 3])}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: isLight ? '#b45309' : '#f59e0b',
+                  fontWeight: 600,
+                  fontSize: '10.5px',
+                  padding: '2px 4px',
+                  borderRadius: '4px',
+                }}
+                title="Filter exclusively to Box 2 & 3 cards"
+              >
+                ⚡ Accel: {velocityData.box23}
+              </button>
+              <span style={{ color: 'var(--text-muted)' }}>•</span>
+              <button
+                type="button"
+                data-testid="velocity-tier-hyper"
+                onClick={() => handleBoxClick([4, 5, 6, 7, 8, 9])}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: isLight ? '#0284c7' : '#06b6d4',
+                  fontWeight: 600,
+                  fontSize: '10.5px',
+                  padding: '2px 4px',
+                  borderRadius: '4px',
+                }}
+                title="Filter exclusively to Box 4+ cards"
+              >
+                🚀 Hyper: {velocityData.box4Plus}
+              </button>
+            </div>
+
+            {/* Velocity Diagnostic Caption */}
+            <div
+              style={{
+                marginTop: '4px',
+                fontSize: '11px',
+                color: 'var(--text-muted)',
+                textAlign: 'center',
+              }}
+            >
+              Velocity Diagnostic • Speed = (Accel×1.5 + Hyper×3) / Total Active
             </div>
           </div>
         )}

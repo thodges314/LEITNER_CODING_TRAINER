@@ -96,33 +96,29 @@ describe('DeckStatsWidget', () => {
     }
   });
 
-  it('renders default Track Orbit mode with donut chart and track slices', async () => {
-    const handleSelectTrack = vi.fn();
-
+  it('renders default Skill Matrix mode with 6 domain axes and mastery polygon', async () => {
     await act(async () => {
       root?.render(
         <DeckStatsWidget
           state={mockState}
           topics={mockTopics}
           theme="dark"
-          onSelectTrack={handleSelectTrack}
         />
       );
     });
 
     expect(container?.textContent).toContain('Analytics & Proportions');
-    expect(container?.textContent).toContain('Track Orbit');
-    expect(container?.textContent).toContain('4'); // 4 active cards in center
-    expect(container?.textContent).toContain('Active Cards');
+    expect(container?.textContent).toContain('Skill Matrix');
+    expect(container?.textContent).toContain('Algorithms');
+    expect(container?.textContent).toContain('React & UI');
+    expect(container?.textContent).toContain('TypeScript');
 
     // Check SVG exists and has paths
-    const svg = container?.querySelector('svg');
+    const svg = container?.querySelector('svg[data-testid="stats-chart-svg"]');
     expect(svg).toBeTruthy();
-    const paths = svg?.querySelectorAll('path');
-    expect(paths && paths.length).toBeGreaterThan(0);
   });
 
-  it('can switch between all 3 visual modes using pill buttons and chevrons', async () => {
+  it('can switch between all 4 visual modes including Velocity Diagnostic', async () => {
     await act(async () => {
       root?.render(
         <DeckStatsWidget
@@ -133,16 +129,16 @@ describe('DeckStatsWidget', () => {
       );
     });
 
-    // Switch to Radar / Skill Matrix
-    const radarBtn = container?.querySelector('button[data-testid="stats-mode-radar"]') as HTMLButtonElement;
-    expect(radarBtn).toBeTruthy();
+    // Switch to Track Orbit
+    const orbitBtn = container?.querySelector('button[data-testid="stats-mode-orbit"]') as HTMLButtonElement;
+    expect(orbitBtn).toBeTruthy();
 
     await act(async () => {
-      radarBtn.click();
+      orbitBtn.click();
     });
 
-    expect(container?.textContent).toContain('Skill Matrix');
-    expect(container?.textContent).toContain('Outer rings represent higher Leitner tier mastery');
+    expect(container?.textContent).toContain('Track Orbit');
+    expect(container?.textContent).toContain('Active Cards');
 
     // Switch to Concentric Rings / Mastery Tiers
     const tiersBtn = container?.querySelector('button[data-testid="stats-mode-tiers"]') as HTMLButtonElement;
@@ -153,9 +149,21 @@ describe('DeckStatsWidget', () => {
     });
 
     expect(container?.textContent).toContain('Mastery Tiers');
-    expect(container?.textContent).toContain('Outer rings = Mastered tiers; inner rings = Learning tiers');
 
-    // Test next chevron button
+    // Switch to Velocity Diagnostic
+    const velocityBtn = container?.querySelector('button[data-testid="stats-mode-velocity"]') as HTMLButtonElement;
+    expect(velocityBtn).toBeTruthy();
+
+    await act(async () => {
+      velocityBtn.click();
+    });
+
+    expect(container?.textContent).toContain('Velocity');
+    expect(container?.textContent).toContain('Drag');
+    expect(container?.textContent).toContain('Accel');
+    expect(container?.textContent).toContain('Hyper');
+
+    // Test next chevron wraps back to Skill Matrix
     const nextBtn = container?.querySelector('button[aria-label="Next chart"]') as HTMLButtonElement;
     expect(nextBtn).toBeTruthy();
 
@@ -163,11 +171,10 @@ describe('DeckStatsWidget', () => {
       nextBtn.click();
     });
 
-    // Wraps back to Orbit
-    expect(container?.textContent).toContain('Track Orbit');
+    expect(container?.textContent).toContain('Skill Matrix');
   });
 
-  it('adapts styling cleanly for apple-gsos (day) theme', async () => {
+  it('adapts styling cleanly for apple-gsos (day) theme with higher contrast guidelines', async () => {
     await act(async () => {
       root?.render(
         <DeckStatsWidget
@@ -180,11 +187,11 @@ describe('DeckStatsWidget', () => {
 
     const widget = container?.querySelector('[data-testid="deck-stats-widget"]');
     expect(widget).toBeTruthy();
-    expect(container?.textContent).toContain('Analytics & Proportions');
+    expect(container?.textContent).toContain('Skill Matrix');
   });
 
-  it('invokes onSelectTrack when an orbit slice is clicked', async () => {
-    const handleSelectTrack = vi.fn();
+  it('invokes onSelectExclusiveTrack when an orbit slice is clicked', async () => {
+    const handleSelectExclusiveTrack = vi.fn();
 
     await act(async () => {
       root?.render(
@@ -192,9 +199,15 @@ describe('DeckStatsWidget', () => {
           state={mockState}
           topics={mockTopics}
           theme="dark"
-          onSelectTrack={handleSelectTrack}
+          onSelectExclusiveTrack={handleSelectExclusiveTrack}
         />
       );
+    });
+
+    // Switch to orbit
+    const orbitBtn = container?.querySelector('button[data-testid="stats-mode-orbit"]') as HTMLButtonElement;
+    await act(async () => {
+      orbitBtn.click();
     });
 
     const algoSlice = container?.querySelector('path[data-track="algorithms"]') as SVGPathElement;
@@ -204,7 +217,64 @@ describe('DeckStatsWidget', () => {
       algoSlice.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
 
-    expect(handleSelectTrack).toHaveBeenCalledWith('algorithms');
+    expect(handleSelectExclusiveTrack).toHaveBeenCalledWith('algorithms');
+  });
+
+  it('invokes onSelectExclusiveTracks when a domain in skill matrix is clicked', async () => {
+    const handleSelectExclusiveTracks = vi.fn();
+
+    await act(async () => {
+      root?.render(
+        <DeckStatsWidget
+          state={mockState}
+          topics={mockTopics}
+          theme="dark"
+          onSelectExclusiveTracks={handleSelectExclusiveTracks}
+        />
+      );
+    });
+
+    // Find domain text/axis for Algorithms
+    const algoNode = container?.querySelector('g[data-domain="algorithms"]');
+    expect(algoNode).toBeTruthy();
+
+    await act(async () => {
+      algoNode?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(handleSelectExclusiveTracks).toHaveBeenCalledWith(['algorithms']);
+  });
+
+  it('invokes onSelectExclusiveBox when velocity tier buttons are clicked', async () => {
+    const handleSelectExclusiveBox = vi.fn();
+
+    await act(async () => {
+      root?.render(
+        <DeckStatsWidget
+          state={mockState}
+          topics={mockTopics}
+          theme="dark"
+          onSelectExclusiveBox={handleSelectExclusiveBox}
+        />
+      );
+    });
+
+    // Switch to velocity
+    const velocityBtn = container?.querySelector('button[data-testid="stats-mode-velocity"]') as HTMLButtonElement;
+    await act(async () => {
+      velocityBtn.click();
+    });
+
+    const dragBtn = Array.from(container?.querySelectorAll('button') || []).find((b) =>
+      b.textContent?.includes('Drag')
+    );
+    expect(dragBtn).toBeTruthy();
+
+    await act(async () => {
+      dragBtn?.click();
+    });
+
+    expect(handleSelectExclusiveBox).toHaveBeenCalledWith(1);
   });
 
   it('shows empty state when no active cards exist', async () => {
