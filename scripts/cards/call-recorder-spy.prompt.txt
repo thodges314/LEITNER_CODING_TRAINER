@@ -1,0 +1,7 @@
+Write createSpy(impl) like a tiny jest.fn(). It returns a function (the spy) that:
+
+- calls impl with the same arguments and the same `this`, and returns what impl returns. When impl is omitted it returns undefined.
+- records every call: spy.calls is an array of argument arrays, in call order.
+- records every outcome: spy.results is an array of { type: 'return', value } or, when impl throws, { type: 'throw', value: theError }; a thrown error is still rethrown to the caller.
+
+Also give the spy two helpers: spy.calledWith(...args), true when some call had exactly these arguments (same number of them, each equal with Object.is, so objects match by reference), and spy.reset(), which clears calls and results.

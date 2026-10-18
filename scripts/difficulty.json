@@ -982,5 +982,13 @@
   "optimistic-list-update": {
     "difficulty": 2,
     "concept": "optimistic-ui"
+  },
+  "call-recorder-spy": {
+    "difficulty": 2,
+    "concept": "testing-tools"
+  },
+  "use-fetch-basic": {
+    "difficulty": 2,
+    "concept": "react-fetch"
   }
 }
