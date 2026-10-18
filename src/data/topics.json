@@ -13804,5 +13804,217 @@
       }
     ],
     "testHarness": "await $test.run(\"First page of 10 items, 3 per page\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 1, 3));\n}, () => ({ items: [1, 2, 3], page: 1, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: false, hasNext: true }));\n\nawait $test.run(\"A middle page has both neighbours\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 2, 3));\n}, () => ({ items: [4, 5, 6], page: 2, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: true, hasNext: true }));\n\nawait $test.run(\"The last page can be partial\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 4, 3));\n}, () => ({ items: [10], page: 4, pageSize: 3, totalItems: 10, totalPages: 4, hasPrev: true, hasNext: false }));\n\nawait $test.run(\"An exact multiple has no extra empty page\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6], 2, 3));\n}, () => ({ items: [4, 5, 6], page: 2, pageSize: 3, totalItems: 6, totalPages: 2, hasPrev: true, hasNext: false }));\n\nawait $test.run(\"A page past the end shows the last page\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 99, 3).page);\n}, () => (4));\n\nawait $test.run(\"A page below 1 shows the first page\", async () => {\n  const sleep = $test.sleep;\n  return ([paginate([1, 2, 3, 4], 0, 2).items, paginate([1, 2, 3, 4], -5, 2).page]);\n}, () => ([[1, 2], 1]));\n\nawait $test.run(\"An empty list has 0 pages and stays on page 1\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([], 3, 5));\n}, () => ({ items: [], page: 1, pageSize: 5, totalItems: 0, totalPages: 0, hasPrev: false, hasNext: false }));\n\nawait $test.run(\"A page size of 1 is valid\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3], 2, 1));\n}, () => ({ items: [2], page: 2, pageSize: 1, totalItems: 3, totalPages: 3, hasPrev: true, hasNext: true }));\n\nawait $test.run(\"The input array is not changed\", async () => {\n  const sleep = $test.sleep;\n  const input = [1, 2, 3];\n  paginate(input, 1, 2);\n  return (input);\n}, () => ([1, 2, 3]));\n\nawait $test.rejects(\"pageSize must be a positive integer\", async () => {\n  const sleep = $test.sleep;\n  return (paginate([1, 2, 3], 1, 0));\n}, \"pageSize\");"
+  },
+  {
+    "id": "add-tag-rules",
+    "track": "react-components",
+    "title": "Tag Input Rules: Add, Remove, Paste",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tag-input",
+      "strings",
+      "component-logic",
+      "basics"
+    ],
+    "promptSeed": "These are the rules behind a tag (chip) input. None of the functions changes the array it is given; each returns a new array.\n\naddTag(tags, input, { max = Infinity } = {}): trim the input. Add it at the end only when it is not empty, is not already in the list (compare ignoring upper/lower case; the first spelling stays), and the list does not already hold max tags. Otherwise return a copy of the list unchanged.\n\nremoveTag(tags, index): the list without the tag at index (an index that does not exist changes nothing).\n\nparseTags(text): for pasted text, split on commas and line breaks, then apply the same rules as addTag to every part (so blanks and repeats are dropped): parseTags('a, b,\\n A ,,C') is ['a', 'b', 'C'].",
+    "difficulty": 1,
+    "concept": "tag-input",
+    "referenceSolution": "function addTag(tags, input, { max = Infinity } = {}) {\n  const tag = input.trim();\n  const exists = tags.some((t) => t.toLowerCase() === tag.toLowerCase());\n  if (!tag || exists || tags.length >= max) return [...tags];\n  return [...tags, tag];\n}\n\nfunction removeTag(tags, index) {\n  return tags.filter((_, i) => i !== index);\n}\n\nfunction parseTags(text) {\n  return text.split(/[,\\n]/).reduce((list, part) => addTag(list, part), []);\n}",
+    "solution": "function addTag(tags, input, { max = Infinity } = {}) {\n  const tag = input.trim();\n  const exists = tags.some((t) => t.toLowerCase() === tag.toLowerCase());\n  if (!tag || exists || tags.length >= max) return [...tags];\n  return [...tags, tag];\n}\n\nfunction removeTag(tags, index) {\n  return tags.filter((_, i) => i !== index);\n}\n\nfunction parseTags(text) {\n  return text.split(/[,\\n]/).reduce((list, part) => addTag(list, part), []);\n}",
+    "starterCode": "function addTag(tags, input, { max = Infinity } = {}) {\n  const tag = input.trim();\n  const exists = tags.some((t) => t.toLowerCase() === tag.toLowerCase());\n  if (!tag || exists || tags.length >= max) return [...tags];\n  return [...tags, tag];\n}\n\nfunction removeTag(tags, index) {\n  return tags.filter((_, i) => i !== index);\n}\n\nfunction parseTags(text) {\n  return text.split(/[,\\n]/).reduce((list, part) => addTag(list, part), []);\n}",
+    "testCases": [
+      {
+        "description": "A tag is trimmed and added at the end",
+        "input": "addTag(['a'], '  b  ')",
+        "expected": "['a', 'b']"
+      },
+      {
+        "description": "Empty and whitespace-only input are ignored",
+        "input": "[addTag(['a'], ''), addTag(['a'], '   ')]",
+        "expected": "[['a'], ['a']]"
+      },
+      {
+        "description": "Duplicates are ignored regardless of case, and the first spelling stays",
+        "input": "[addTag(['React'], 'react'), addTag(['React'], ' REACT ')]",
+        "expected": "[['React'], ['React']]"
+      },
+      {
+        "description": "A different tag is still added when others exist",
+        "input": "addTag(['react'], 'redux')",
+        "expected": "['react', 'redux']"
+      },
+      {
+        "description": "max: nothing is added once the list is full, but the last free slot works",
+        "input": "[addTag(['a'], 'b', { max: 2 }), addTag(['a', 'b'], 'c', { max: 2 })]",
+        "expected": "[['a', 'b'], ['a', 'b']]"
+      },
+      {
+        "description": "addTag always returns a new array, even when nothing is added",
+        "input": "const tags = ['a'];\nconst same = addTag(tags, '');\nconst more = addTag(tags, 'b');\n[same === tags, more === tags, tags]",
+        "expected": "[false, false, ['a']]"
+      },
+      {
+        "description": "removeTag removes by index and leaves the original alone",
+        "input": "const tags = ['a', 'b', 'c'];\n[removeTag(tags, 1), tags]",
+        "expected": "[['a', 'c'], ['a', 'b', 'c']]"
+      },
+      {
+        "description": "removeTag with an index that does not exist changes nothing",
+        "input": "[removeTag(['a', 'b'], 5), removeTag(['a', 'b'], -1)]",
+        "expected": "[['a', 'b'], ['a', 'b']]"
+      },
+      {
+        "description": "parseTags splits on commas and line breaks, trims, and drops blanks and repeats",
+        "input": "parseTags('a, b,\\n A ,,C')",
+        "expected": "['a', 'b', 'C']"
+      },
+      {
+        "description": "parseTags of empty or separator-only text is an empty list",
+        "input": "[parseTags(''), parseTags(' , \\n ,')]",
+        "expected": "[[], []]"
+      }
+    ],
+    "testHarness": "await $test.run(\"A tag is trimmed and added at the end\", async () => {\n  const sleep = $test.sleep;\n  return (addTag(['a'], '  b  '));\n}, () => (['a', 'b']));\n\nawait $test.run(\"Empty and whitespace-only input are ignored\", async () => {\n  const sleep = $test.sleep;\n  return ([addTag(['a'], ''), addTag(['a'], '   ')]);\n}, () => ([['a'], ['a']]));\n\nawait $test.run(\"Duplicates are ignored regardless of case, and the first spelling stays\", async () => {\n  const sleep = $test.sleep;\n  return ([addTag(['React'], 'react'), addTag(['React'], ' REACT ')]);\n}, () => ([['React'], ['React']]));\n\nawait $test.run(\"A different tag is still added when others exist\", async () => {\n  const sleep = $test.sleep;\n  return (addTag(['react'], 'redux'));\n}, () => (['react', 'redux']));\n\nawait $test.run(\"max: nothing is added once the list is full, but the last free slot works\", async () => {\n  const sleep = $test.sleep;\n  return ([addTag(['a'], 'b', { max: 2 }), addTag(['a', 'b'], 'c', { max: 2 })]);\n}, () => ([['a', 'b'], ['a', 'b']]));\n\nawait $test.run(\"addTag always returns a new array, even when nothing is added\", async () => {\n  const sleep = $test.sleep;\n  const tags = ['a'];\n  const same = addTag(tags, '');\n  const more = addTag(tags, 'b');\n  return ([same === tags, more === tags, tags]);\n}, () => ([false, false, ['a']]));\n\nawait $test.run(\"removeTag removes by index and leaves the original alone\", async () => {\n  const sleep = $test.sleep;\n  const tags = ['a', 'b', 'c'];\n  return ([removeTag(tags, 1), tags]);\n}, () => ([['a', 'c'], ['a', 'b', 'c']]));\n\nawait $test.run(\"removeTag with an index that does not exist changes nothing\", async () => {\n  const sleep = $test.sleep;\n  return ([removeTag(['a', 'b'], 5), removeTag(['a', 'b'], -1)]);\n}, () => ([['a', 'b'], ['a', 'b']]));\n\nawait $test.run(\"parseTags splits on commas and line breaks, trims, and drops blanks and repeats\", async () => {\n  const sleep = $test.sleep;\n  return (parseTags('a, b,\\n A ,,C'));\n}, () => (['a', 'b', 'C']));\n\nawait $test.run(\"parseTags of empty or separator-only text is an empty list\", async () => {\n  const sleep = $test.sleep;\n  return ([parseTags(''), parseTags(' , \\n ,')]);\n}, () => ([[], []]));"
+  },
+  {
+    "id": "flatten-visible-tree",
+    "track": "react-components",
+    "title": "Flatten a Tree into Visible Rows",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tree",
+      "recursion",
+      "component-logic",
+      "basics"
+    ],
+    "promptSeed": "A file-tree component renders a flat list of rows. Tree nodes look like { id, label, children? } (children is an optional array).\n\nflattenVisible(nodes, expandedIds) returns the rows to render, top to bottom: depth-first, a parent before its children, siblings in their original order. Each row is { id, label, depth, hasChildren, expanded } where depth is 0 for the top level, hasChildren is true only when the node has at least one child, and expanded is true only when the node has children AND its id is in expandedIds (a Set). The children of a node appear only when that node is expanded; a collapsed parent hides its whole subtree, even if a descendant's id is in the Set.\n\ntoggleExpanded(expandedIds, id) returns a NEW Set with id added when it was missing and removed when it was present. The Set that was passed in is not changed.",
+    "difficulty": 2,
+    "concept": "tree-ui",
+    "referenceSolution": "function flattenVisible(nodes, expandedIds) {\n  const rows = [];\n  const walk = (list, depth) => {\n    for (const node of list) {\n      const hasChildren = Array.isArray(node.children) && node.children.length > 0;\n      const expanded = hasChildren && expandedIds.has(node.id);\n      rows.push({ id: node.id, label: node.label, depth, hasChildren, expanded });\n      if (expanded) walk(node.children, depth + 1);\n    }\n  };\n  walk(nodes, 0);\n  return rows;\n}\n\nfunction toggleExpanded(expandedIds, id) {\n  const next = new Set(expandedIds);\n  if (next.has(id)) next.delete(id);\n  else next.add(id);\n  return next;\n}",
+    "solution": "function flattenVisible(nodes, expandedIds) {\n  const rows = [];\n  const walk = (list, depth) => {\n    for (const node of list) {\n      const hasChildren = Array.isArray(node.children) && node.children.length > 0;\n      const expanded = hasChildren && expandedIds.has(node.id);\n      rows.push({ id: node.id, label: node.label, depth, hasChildren, expanded });\n      if (expanded) walk(node.children, depth + 1);\n    }\n  };\n  walk(nodes, 0);\n  return rows;\n}\n\nfunction toggleExpanded(expandedIds, id) {\n  const next = new Set(expandedIds);\n  if (next.has(id)) next.delete(id);\n  else next.add(id);\n  return next;\n}",
+    "starterCode": "function flattenVisible(nodes, expandedIds) {\n  const rows = [];\n  const walk = (list, depth) => {\n    for (const node of list) {\n      const hasChildren = Array.isArray(node.children) && node.children.length > 0;\n      const expanded = hasChildren && expandedIds.has(node.id);\n      rows.push({ id: node.id, label: node.label, depth, hasChildren, expanded });\n      if (expanded) walk(node.children, depth + 1);\n    }\n  };\n  walk(nodes, 0);\n  return rows;\n}\n\nfunction toggleExpanded(expandedIds, id) {\n  const next = new Set(expandedIds);\n  if (next.has(id)) next.delete(id);\n  else next.add(id);\n  return next;\n}",
+    "testCases": [
+      {
+        "description": "Everything collapsed: only the top level, with its flags",
+        "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nflattenVisible(tree, new Set())",
+        "expected": "[{ id: 'src', label: 'src', depth: 0, hasChildren: true, expanded: false }, { id: 'readme', label: 'README.md', depth: 0, hasChildren: false, expanded: false }]"
+      },
+      {
+        "description": "Expanding a folder shows its children one level deeper, in order",
+        "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nconst brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\nbrief(flattenVisible(tree, new Set(['src'])))",
+        "expected": "['0:src', '1:app', '1:lib', '0:readme']"
+      },
+      {
+        "description": "Nested expansion shows grandchildren at depth 2",
+        "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nconst brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\nbrief(flattenVisible(tree, new Set(['src', 'lib'])))",
+        "expected": "['0:src', '1:app', '1:lib', '2:util', '0:readme']"
+      },
+      {
+        "description": "A collapsed parent hides its whole subtree, even if a descendant is in the Set",
+        "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nconst brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\nbrief(flattenVisible(tree, new Set(['lib'])))",
+        "expected": "['0:src', '0:readme']"
+      },
+      {
+        "description": "expanded is true only for folders that are open; a leaf id in the Set is not expanded",
+        "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nflattenVisible(tree, new Set(['src', 'app'])).slice(0, 3).map((r) => [r.id, r.hasChildren, r.expanded])",
+        "expected": "[['src', true, true], ['app', false, false], ['lib', true, false]]"
+      },
+      {
+        "description": "An empty tree has no rows",
+        "input": "flattenVisible([], new Set(['x']))",
+        "expected": "[]"
+      },
+      {
+        "description": "A node with an empty children array is a leaf",
+        "input": "flattenVisible([{ id: 'a', label: 'A', children: [] }], new Set(['a']))",
+        "expected": "[{ id: 'a', label: 'A', depth: 0, hasChildren: false, expanded: false }]"
+      },
+      {
+        "description": "toggleExpanded adds, then removes, and returns a new Set each time",
+        "input": "const a = new Set(['x']);\nconst b = toggleExpanded(a, 'y');\nconst c2 = toggleExpanded(b, 'x');\n[[...a], [...b], [...c2], a === b]",
+        "expected": "[['x'], ['x', 'y'], ['y'], false]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Everything collapsed: only the top level, with its flags\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  return (flattenVisible(tree, new Set()));\n}, () => ([{ id: 'src', label: 'src', depth: 0, hasChildren: true, expanded: false }, { id: 'readme', label: 'README.md', depth: 0, hasChildren: false, expanded: false }]));\n\nawait $test.run(\"Expanding a folder shows its children one level deeper, in order\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  const brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\n  return (brief(flattenVisible(tree, new Set(['src']))));\n}, () => (['0:src', '1:app', '1:lib', '0:readme']));\n\nawait $test.run(\"Nested expansion shows grandchildren at depth 2\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  const brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\n  return (brief(flattenVisible(tree, new Set(['src', 'lib']))));\n}, () => (['0:src', '1:app', '1:lib', '2:util', '0:readme']));\n\nawait $test.run(\"A collapsed parent hides its whole subtree, even if a descendant is in the Set\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  const brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\n  return (brief(flattenVisible(tree, new Set(['lib']))));\n}, () => (['0:src', '0:readme']));\n\nawait $test.run(\"expanded is true only for folders that are open; a leaf id in the Set is not expanded\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  return (flattenVisible(tree, new Set(['src', 'app'])).slice(0, 3).map((r) => [r.id, r.hasChildren, r.expanded]));\n}, () => ([['src', true, true], ['app', false, false], ['lib', true, false]]));\n\nawait $test.run(\"An empty tree has no rows\", async () => {\n  const sleep = $test.sleep;\n  return (flattenVisible([], new Set(['x'])));\n}, () => ([]));\n\nawait $test.run(\"A node with an empty children array is a leaf\", async () => {\n  const sleep = $test.sleep;\n  return (flattenVisible([{ id: 'a', label: 'A', children: [] }], new Set(['a'])));\n}, () => ([{ id: 'a', label: 'A', depth: 0, hasChildren: false, expanded: false }]));\n\nawait $test.run(\"toggleExpanded adds, then removes, and returns a new Set each time\", async () => {\n  const sleep = $test.sleep;\n  const a = new Set(['x']);\n  const b = toggleExpanded(a, 'y');\n  const c2 = toggleExpanded(b, 'x');\n  return ([[...a], [...b], [...c2], a === b]);\n}, () => ([['x'], ['x', 'y'], ['y'], false]));"
+  },
+  {
+    "id": "visible-window-range",
+    "track": "react-components",
+    "title": "Windowing Math for a Virtual List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "virtualization",
+      "math",
+      "component-logic",
+      "basics"
+    ],
+    "promptSeed": "A virtual list only renders the items that are on screen. Write getVisibleRange({ scrollTop, itemHeight, viewportHeight, itemCount, overscan = 0 }) for rows that all have the same height. It returns { start, end, offsetTop, totalHeight }:\n\nstart: index of the first row to render. end: one past the last row to render (so rows start..end-1 are rendered). The rendered rows are those that touch the visible area from scrollTop to scrollTop + viewportHeight, plus overscan extra rows above and below, never going outside 0..itemCount. A row that is only partly visible counts as visible.\noffsetTop: where the rendered rows start, start * itemHeight. totalHeight: itemCount * itemHeight (the full scroll height).\n\nscrollTop is first limited to the real scroll range: never below 0 and never past totalHeight - viewportHeight (0 when the content is shorter than the viewport). itemCount 0 gives { start: 0, end: 0, offsetTop: 0, totalHeight: 0 }.",
+    "difficulty": 2,
+    "concept": "virtualization",
+    "referenceSolution": "function getVisibleRange({ scrollTop, itemHeight, viewportHeight, itemCount, overscan = 0 }) {\n  const totalHeight = itemCount * itemHeight;\n  const maxScroll = Math.max(0, totalHeight - viewportHeight);\n  const top = Math.min(Math.max(0, scrollTop), maxScroll);\n  const first = Math.floor(top / itemHeight);\n  const last = Math.ceil((top + viewportHeight) / itemHeight);\n  const start = Math.max(0, first - overscan);\n  const end = Math.min(itemCount, last + overscan);\n  return { start, end, offsetTop: start * itemHeight, totalHeight };\n}",
+    "solution": "function getVisibleRange({ scrollTop, itemHeight, viewportHeight, itemCount, overscan = 0 }) {\n  const totalHeight = itemCount * itemHeight;\n  const maxScroll = Math.max(0, totalHeight - viewportHeight);\n  const top = Math.min(Math.max(0, scrollTop), maxScroll);\n  const first = Math.floor(top / itemHeight);\n  const last = Math.ceil((top + viewportHeight) / itemHeight);\n  const start = Math.max(0, first - overscan);\n  const end = Math.min(itemCount, last + overscan);\n  return { start, end, offsetTop: start * itemHeight, totalHeight };\n}",
+    "starterCode": "function getVisibleRange({ scrollTop, itemHeight, viewportHeight, itemCount, overscan = 0 }) {\n  const totalHeight = itemCount * itemHeight;\n  const maxScroll = Math.max(0, totalHeight - viewportHeight);\n  const top = Math.min(Math.max(0, scrollTop), maxScroll);\n  const first = Math.floor(top / itemHeight);\n  const last = Math.ceil((top + viewportHeight) / itemHeight);\n  const start = Math.max(0, first - overscan);\n  const end = Math.min(itemCount, last + overscan);\n  return { start, end, offsetTop: start * itemHeight, totalHeight };\n}",
+    "testCases": [
+      {
+        "description": "At the top: rows that fit the viewport",
+        "input": "getVisibleRange({ scrollTop: 0, itemHeight: 20, viewportHeight: 100, itemCount: 1000 })",
+        "expected": "{ start: 0, end: 5, offsetTop: 0, totalHeight: 20000 }"
+      },
+      {
+        "description": "Partly visible rows at both edges count as visible",
+        "input": "getVisibleRange({ scrollTop: 250, itemHeight: 20, viewportHeight: 100, itemCount: 1000 })",
+        "expected": "{ start: 12, end: 18, offsetTop: 240, totalHeight: 20000 }"
+      },
+      {
+        "description": "Exactly aligned rows: no extra row at the bottom",
+        "input": "getVisibleRange({ scrollTop: 240, itemHeight: 20, viewportHeight: 100, itemCount: 1000 })",
+        "expected": "{ start: 12, end: 17, offsetTop: 240, totalHeight: 20000 }"
+      },
+      {
+        "description": "overscan adds rows above and below",
+        "input": "getVisibleRange({ scrollTop: 250, itemHeight: 20, viewportHeight: 100, itemCount: 1000, overscan: 3 })",
+        "expected": "{ start: 9, end: 21, offsetTop: 180, totalHeight: 20000 }"
+      },
+      {
+        "description": "overscan never goes above row 0",
+        "input": "getVisibleRange({ scrollTop: 20, itemHeight: 20, viewportHeight: 100, itemCount: 1000, overscan: 5 })",
+        "expected": "{ start: 0, end: 11, offsetTop: 0, totalHeight: 20000 }"
+      },
+      {
+        "description": "At the bottom the range ends at itemCount, with and without overscan",
+        "input": "const base = { scrollTop: 19900, itemHeight: 20, viewportHeight: 100, itemCount: 1000 };\n[getVisibleRange(base), getVisibleRange({ ...base, overscan: 5 })]",
+        "expected": "[{ start: 995, end: 1000, offsetTop: 19900, totalHeight: 20000 }, { start: 990, end: 1000, offsetTop: 19800, totalHeight: 20000 }]"
+      },
+      {
+        "description": "scrollTop is limited to the scroll range (below 0 and past the end)",
+        "input": "const base = { itemHeight: 20, viewportHeight: 100, itemCount: 1000 };\n[getVisibleRange({ ...base, scrollTop: -50 }).start, getVisibleRange({ ...base, scrollTop: 99999 }).start]",
+        "expected": "[0, 995]"
+      },
+      {
+        "description": "Fewer rows than the viewport: all of them, and no scrolling",
+        "input": "getVisibleRange({ scrollTop: 500, itemHeight: 20, viewportHeight: 100, itemCount: 3 })",
+        "expected": "{ start: 0, end: 3, offsetTop: 0, totalHeight: 60 }"
+      },
+      {
+        "description": "Content shorter than the viewport never scrolls, whatever the row height",
+        "input": "getVisibleRange({ scrollTop: 5, itemHeight: 1, viewportHeight: 10, itemCount: 3 })",
+        "expected": "{ start: 0, end: 3, offsetTop: 0, totalHeight: 3 }"
+      },
+      {
+        "description": "No items",
+        "input": "getVisibleRange({ scrollTop: 0, itemHeight: 20, viewportHeight: 100, itemCount: 0, overscan: 2 })",
+        "expected": "{ start: 0, end: 0, offsetTop: 0, totalHeight: 0 }"
+      }
+    ],
+    "testHarness": "await $test.run(\"At the top: rows that fit the viewport\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 0, itemHeight: 20, viewportHeight: 100, itemCount: 1000 }));\n}, () => ({ start: 0, end: 5, offsetTop: 0, totalHeight: 20000 }));\n\nawait $test.run(\"Partly visible rows at both edges count as visible\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 250, itemHeight: 20, viewportHeight: 100, itemCount: 1000 }));\n}, () => ({ start: 12, end: 18, offsetTop: 240, totalHeight: 20000 }));\n\nawait $test.run(\"Exactly aligned rows: no extra row at the bottom\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 240, itemHeight: 20, viewportHeight: 100, itemCount: 1000 }));\n}, () => ({ start: 12, end: 17, offsetTop: 240, totalHeight: 20000 }));\n\nawait $test.run(\"overscan adds rows above and below\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 250, itemHeight: 20, viewportHeight: 100, itemCount: 1000, overscan: 3 }));\n}, () => ({ start: 9, end: 21, offsetTop: 180, totalHeight: 20000 }));\n\nawait $test.run(\"overscan never goes above row 0\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 20, itemHeight: 20, viewportHeight: 100, itemCount: 1000, overscan: 5 }));\n}, () => ({ start: 0, end: 11, offsetTop: 0, totalHeight: 20000 }));\n\nawait $test.run(\"At the bottom the range ends at itemCount, with and without overscan\", async () => {\n  const sleep = $test.sleep;\n  const base = { scrollTop: 19900, itemHeight: 20, viewportHeight: 100, itemCount: 1000 };\n  return ([getVisibleRange(base), getVisibleRange({ ...base, overscan: 5 })]);\n}, () => ([{ start: 995, end: 1000, offsetTop: 19900, totalHeight: 20000 }, { start: 990, end: 1000, offsetTop: 19800, totalHeight: 20000 }]));\n\nawait $test.run(\"scrollTop is limited to the scroll range (below 0 and past the end)\", async () => {\n  const sleep = $test.sleep;\n  const base = { itemHeight: 20, viewportHeight: 100, itemCount: 1000 };\n  return ([getVisibleRange({ ...base, scrollTop: -50 }).start, getVisibleRange({ ...base, scrollTop: 99999 }).start]);\n}, () => ([0, 995]));\n\nawait $test.run(\"Fewer rows than the viewport: all of them, and no scrolling\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 500, itemHeight: 20, viewportHeight: 100, itemCount: 3 }));\n}, () => ({ start: 0, end: 3, offsetTop: 0, totalHeight: 60 }));\n\nawait $test.run(\"Content shorter than the viewport never scrolls, whatever the row height\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 5, itemHeight: 1, viewportHeight: 10, itemCount: 3 }));\n}, () => ({ start: 0, end: 3, offsetTop: 0, totalHeight: 3 }));\n\nawait $test.run(\"No items\", async () => {\n  const sleep = $test.sleep;\n  return (getVisibleRange({ scrollTop: 0, itemHeight: 20, viewportHeight: 100, itemCount: 0, overscan: 2 }));\n}, () => ({ start: 0, end: 0, offsetTop: 0, totalHeight: 0 }));"
   }
 ]

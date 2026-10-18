@@ -1,0 +1,5 @@
+A file-tree component renders a flat list of rows. Tree nodes look like { id, label, children? } (children is an optional array).
+
+flattenVisible(nodes, expandedIds) returns the rows to render, top to bottom: depth-first, a parent before its children, siblings in their original order. Each row is { id, label, depth, hasChildren, expanded } where depth is 0 for the top level, hasChildren is true only when the node has at least one child, and expanded is true only when the node has children AND its id is in expandedIds (a Set). The children of a node appear only when that node is expanded; a collapsed parent hides its whole subtree, even if a descendant's id is in the Set.
+
+toggleExpanded(expandedIds, id) returns a NEW Set with id added when it was missing and removed when it was present. The Set that was passed in is not changed.

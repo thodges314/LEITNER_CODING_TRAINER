@@ -946,5 +946,17 @@
   "create-store-basic": {
     "difficulty": 2,
     "concept": "state-management"
+  },
+  "flatten-visible-tree": {
+    "difficulty": 2,
+    "concept": "tree-ui"
+  },
+  "add-tag-rules": {
+    "difficulty": 1,
+    "concept": "tag-input"
+  },
+  "visible-window-range": {
+    "difficulty": 2,
+    "concept": "virtualization"
   }
 }
