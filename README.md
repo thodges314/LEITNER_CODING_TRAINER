@@ -51,7 +51,7 @@ npm run build      # type-check + production build into dist/
   kept, content updates flow in, new seed cards are added, and seed cards you delete stay deleted.
   Algorithm preference, timed mode settings, multi-key vault, and draft code are persisted in `localStorage`.
   Use the Deck Catalog dashboard to export and import JSON backups.
-  - **First-4-Problems Backup Advisory**: After completing your first 4 problems (whether passed, failed, or unscored reinforcement repeats), the app displays a gentle backup advisory reminding you that progress is stored locally in the browser, offering a 1-click navigation to spotlight the Deck Catalog export button.
+  - **First-4-Problems Backup Advisory**: After completing your first 4 problems (scored reviews, excluding unscored reinforcement repeats), the app displays a gentle backup advisory reminding you that progress is stored locally in the browser, offering a 1-click navigation to spotlight the Deck Catalog export button.
 
 ## AI evaluator & Multi-Key Vault (optional)
 

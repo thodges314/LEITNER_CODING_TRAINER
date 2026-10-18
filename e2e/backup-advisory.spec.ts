@@ -41,7 +41,6 @@ test.describe('First 4 Problems Backup Advisory and Export Highlighting', () => 
     // Now submit current card to reach 4th completion
     await submitAndCommit(page);
 
-    // 4th completion should trigger the advisory modal!
     const modal = page.getByTestId('backup-advisory-modal');
     await expect(modal).toBeVisible();
 
@@ -50,7 +49,10 @@ test.describe('First 4 Problems Backup Advisory and Export Highlighting', () => 
     await expect(modal.getByText(/4 Problems Completed/i)).toBeVisible();
     await expect(modal.getByText(/at least at the end of every session/i)).toBeVisible();
     await expect(modal.getByText(/All your active cards, Leitner spacing tiers/i)).toBeVisible();
+    await expect(modal.getByText(/Risk of Reset:/i)).toBeVisible();
     await expect(modal.getByText(/progress data will be permanently wiped/i)).toBeVisible();
+    // Warning triangle next to Risk of Reset should be removed
+    await expect(modal.locator('svg.lucide-alert-triangle')).toHaveCount(0);
 
     // Dismiss the modal
     const dismissBtn = modal.getByTestId('backup-advisory-dismiss-btn');
@@ -134,30 +136,36 @@ test.describe('First 4 Problems Backup Advisory and Export Highlighting', () => 
     await expect(exportBtn).not.toHaveClass(/btn-export-highlight/);
   });
 
-  test('completing an unscored reinforcement drill also increments problem count toward threshold', async ({ page }) => {
-    // Set completed count to 2, so fail -> 3, then finish reinforcement drill -> 4!
+  test('unscored reinforcement repeats do not increment problem count toward threshold', async ({ page }) => {
+    // Set completed count to 2, so fail -> 3, then repeat should NOT increment to 4
     await page.evaluate(() => {
       localStorage.setItem('leitner_completed_problems_count', '2');
       localStorage.setItem('leitner_draft:binary-search-exact', '// intentionally broken');
     });
     await page.reload();
 
-    // Submit broken code and enter reinforcement drill
+    // Submit broken code and enter reinforcement drill (failed review counts as problem #3)
     await submitAndCommit(page);
 
-    // Now in reinforcement drill. Submit and finish drill to complete problem #4!
-    await page.getByRole('button', { name: /Submit for Evaluation/i }).click();
-    const finishBtn = page.getByRole('button', { name: /Skip Drill & Continue|Continue to Next Card/i });
+    const countAfterFail = await page.evaluate(() => localStorage.getItem('leitner_completed_problems_count'));
+    expect(countAfterFail).toBe('3');
+
+    // Now in unscored reinforcement drill. Skip/finish drill.
+    const finishBtn = page.getByRole('button', { name: /Skip Drill/i });
     await expect(finishBtn).toBeVisible({ timeout: 10000 });
     await finishBtn.click();
 
-    // The unscored repeat was problem completion #4, which triggers advisory modal!
+    // Repeat drill must NOT increment count to 4, so modal must not be visible
+    await expect(page.getByTestId('backup-advisory-modal')).toHaveCount(0);
+    const countAfterDrill = await page.evaluate(() => localStorage.getItem('leitner_completed_problems_count'));
+    expect(countAfterDrill).toBe('3');
+
+    // Next scored problem submission reaches #4 and triggers modal
+    await submitAndCommit(page);
     const modal = page.getByTestId('backup-advisory-modal');
     await expect(modal).toBeVisible();
-    await modal.getByTestId('backup-advisory-dismiss-btn').click();
 
-    // Count is now 4
-    const countAfterDrill = await page.evaluate(() => localStorage.getItem('leitner_completed_problems_count'));
-    expect(countAfterDrill).toBe('4');
+    const countAfterFourth = await page.evaluate(() => localStorage.getItem('leitner_completed_problems_count'));
+    expect(countAfterFourth).toBe('4');
   });
 });

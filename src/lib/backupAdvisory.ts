@@ -1,6 +1,6 @@
 /**
  * Tracks completed problem sessions and triggers a one-time advisory modal
- * after completing 4 problems (whether passed, failed, or unscored reinforcement repeats)
+ * after completing 4 problems (scored reviews, excluding unscored reinforcement repeats)
  * reminding users that progress is saved in localStorage and recommending regular JSON exports.
  */
 

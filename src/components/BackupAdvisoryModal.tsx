@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { X, HardDrive, Download, AlertTriangle, ShieldCheck, ArrowRight } from 'lucide-react';
+import { X, HardDrive, Download, ArrowRight } from 'lucide-react';
 
 export interface BackupAdvisoryModalProps {
   isOpen: boolean;
@@ -139,31 +139,25 @@ export const BackupAdvisoryModal: React.FC<BackupAdvisoryModalProps> = ({
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px',
+              gap: '12px',
               padding: '16px',
               borderRadius: '10px',
               background: isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)',
               border: '1px solid var(--border-medium)',
             }}
           >
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <ShieldCheck size={18} color="var(--accent-color)" style={{ marginTop: '2px', flexShrink: 0 }} />
-              <div style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                <strong style={{ color: 'var(--text-primary)' }}>100% Private in Browser Storage:</strong>{' '}
-                <span style={{ color: 'var(--text-secondary)' }}>
-                  All your active cards, Leitner spacing tiers, mastery stats, and review history are stored exclusively inside your browser's local storage.
-                </span>
-              </div>
+            <div style={{ fontSize: '13px', lineHeight: '1.5' }}>
+              <strong style={{ color: 'var(--text-primary)' }}>100% Private in Browser Storage:</strong>{' '}
+              <span style={{ color: 'var(--text-secondary)' }}>
+                All your active cards, Leitner spacing tiers, mastery stats, and review history are stored exclusively inside your browser's local storage.
+              </span>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <AlertTriangle size={18} color={isLight ? '#b45309' : '#f59e0b'} style={{ marginTop: '2px', flexShrink: 0 }} />
-              <div style={{ fontSize: '13px', lineHeight: '1.5' }}>
-                <strong style={{ color: 'var(--text-primary)' }}>Risk of Reset:</strong>{' '}
-                <span style={{ color: 'var(--text-secondary)' }}>
-                  Should browser storage get cleared, site cookies reset, or if you use an incognito window, your progress data will be permanently wiped, requiring you to start again from the beginning.
-                </span>
-              </div>
+            <div style={{ fontSize: '13px', lineHeight: '1.5' }}>
+              <strong style={{ color: 'var(--text-primary)' }}>Risk of Reset:</strong>{' '}
+              <span style={{ color: 'var(--text-secondary)' }}>
+                Should browser storage get cleared, site cookies reset, or if you use an incognito window, your progress data will be permanently wiped, requiring you to start again from the beginning.
+              </span>
             </div>
           </div>
 

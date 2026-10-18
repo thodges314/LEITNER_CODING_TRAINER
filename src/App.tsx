@@ -175,11 +175,6 @@ export function App() {
     if (!currentCard) return;
     clearDraft(currentCard.id);
 
-    const { shouldShowAdvisory } = recordProblemCompletion();
-    if (shouldShowAdvisory) {
-      setIsBackupAdvisoryOpen(true);
-    }
-
     setReinforcingCardId(null);
     const next = getNextCard(
       deckState.topics,
