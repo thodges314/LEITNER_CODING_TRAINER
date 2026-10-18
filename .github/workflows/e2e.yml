@@ -1,8 +1,8 @@
 name: Browser smoke test
 
 # Runs every seed card (reference solution must PASS, empty solution must FAIL) in real Chromium against the
-# production build. Separate from the Pages deploy so a slow/flaky browser run never blocks a deploy; run it on PRs
-# and on any branch push except master.
+# production build. Runs on PRs and on any branch push except master; deploy.yml runs the same suite as a required
+# job before every Pages deploy, so a master push is gated too.
 on:
   pull_request:
   push:
