@@ -8,7 +8,7 @@
     "concept": "promise"
   },
   "promise-all-vs-settled": {
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "promise-combinators"
   },
   "fetch-abort-controller": {
@@ -44,7 +44,7 @@
     "concept": "array-polyfills"
   },
   "object-deep-clone": {
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "equality-clone"
   },
   "lru-cache-implementation": {
@@ -88,7 +88,7 @@
     "concept": "two-pointer"
   },
   "sliding-window-dynamic": {
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "sliding-window"
   },
   "sliding-window-fixed": {
@@ -104,7 +104,7 @@
     "concept": "binary-search"
   },
   "tree-level-order-bfs": {
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "trees"
   },
   "merge-intervals": {
@@ -120,7 +120,7 @@
     "concept": "rate-limiting"
   },
   "memoize": {
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "memoize"
   },
   "bind-call-apply": {
@@ -156,7 +156,7 @@
     "concept": "fetch"
   },
   "async-queue-scheduler": {
-    "difficulty": 4,
+    "difficulty": 3,
     "concept": "async-control"
   },
   "express-middleware-chain": {
@@ -212,7 +212,7 @@
     "concept": "react-hooks-utility"
   },
   "infinite-scroll-list": {
-    "difficulty": 4,
+    "difficulty": 3,
     "concept": "infinite-scroll"
   },
   "modal-portal-focus": {
@@ -252,7 +252,7 @@
     "concept": "ts-types"
   },
   "ts-generic-component-props": {
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "ts-generics"
   },
   "ts-custom-type-guards": {
@@ -260,7 +260,7 @@
     "concept": "ts-narrowing"
   },
   "ts-typed-event-emitter": {
-    "difficulty": 4,
+    "difficulty": 3,
     "concept": "ts-generics"
   },
   "classnames-utility": {
@@ -344,7 +344,7 @@
     "concept": "react-hooks-utility"
   },
   "use-local-storage-hook": {
-    "difficulty": 2,
+    "difficulty": 3,
     "concept": "react-hooks-utility"
   },
   "sleep-and-delay": {
@@ -488,7 +488,7 @@
     "concept": "stack"
   },
   "anagram-palindrome": {
-    "difficulty": 1,
+    "difficulty": 2,
     "concept": "strings"
   },
   "group-anagrams-top-k": {
@@ -504,7 +504,7 @@
     "concept": "dp"
   },
   "lis-house-robber-dp": {
-    "difficulty": 4,
+    "difficulty": 3,
     "concept": "dp"
   },
   "bst-search-insert": {
@@ -556,7 +556,7 @@
     "concept": "arrays"
   },
   "insertion-sort-basic": {
-    "difficulty": 1,
+    "difficulty": 2,
     "concept": "sorting"
   },
   "heap-array-basics": {
@@ -588,7 +588,7 @@
     "concept": "promise-combinators"
   },
   "iterable-range-class": {
-    "difficulty": 1,
+    "difficulty": 2,
     "concept": "iterators"
   },
   "compose-middleware": {
@@ -712,7 +712,7 @@
     "concept": "greedy"
   },
   "longest-substring-window": {
-    "difficulty": 2,
+    "difficulty": 3,
     "concept": "sliding-window"
   },
   "min-window-permutation": {
@@ -752,7 +752,7 @@
     "concept": "dp"
   },
   "tree-level-order": {
-    "difficulty": 2,
+    "difficulty": 3,
     "concept": "trees"
   },
   "tree-path-sum": {
@@ -792,7 +792,7 @@
     "concept": "heap"
   },
   "heap-merge-k-lists": {
-    "difficulty": 3,
+    "difficulty": 4,
     "concept": "heap"
   },
   "heap-median-stream": {

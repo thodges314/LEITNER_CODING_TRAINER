@@ -92,7 +92,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "promises",
       "concurrency"
@@ -124,7 +124,7 @@
         "expected": "[2, 1]"
       }
     ],
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "promise-combinators"
   },
   {
@@ -556,7 +556,7 @@
         "expected": "[5, null, 's']"
       }
     ],
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "equality-clone",
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
@@ -1062,7 +1062,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "locked",
+    "status": "active",
     "tags": [
       "algorithms",
       "sliding-window",
@@ -1100,7 +1100,7 @@
         "expected": "2"
       }
     ],
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "sliding-window",
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
@@ -1321,7 +1321,7 @@
         "expected": "[[1], [2], [3]]"
       }
     ],
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "trees",
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
@@ -1534,7 +1534,7 @@
         "expected": "11"
       }
     ],
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "memoize"
   },
   {
@@ -2019,7 +2019,7 @@
         "expected": "['boom', 'ok']"
       }
     ],
-    "difficulty": 4,
+    "difficulty": 3,
     "concept": "async-control"
   },
   {
@@ -2880,7 +2880,7 @@
         "expected": "observer.disconnect() called"
       }
     ],
-    "difficulty": 4,
+    "difficulty": 3,
     "concept": "infinite-scroll"
   },
   {
@@ -3458,7 +3458,7 @@
         "expected": "TS2322 — Type 'number' is not assignable to type 'string'"
       }
     ],
-    "difficulty": 3,
+    "difficulty": 2,
     "concept": "ts-generics"
   },
   {
@@ -3580,7 +3580,7 @@
         "expected": "TS2345 — Argument of type '\"nope\"' is not assignable to parameter of type 'keyof AppEvents'"
       }
     ],
-    "difficulty": 4,
+    "difficulty": 3,
     "concept": "ts-generics"
   },
   {
@@ -4954,7 +4954,7 @@
       }
     ],
     "testHarness": "const { renderHook, fire, act, wait } = $dom;\nconst KEY = 'lc-test-key';\nconst cleanup = () => localStorage.removeItem(KEY);\ncleanup();\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  $test.check('Uses the initial value when nothing is stored', h.result.current[0] === 'init', h.result.current[0]);\n  h.unmount();\n}\n{\n  localStorage.setItem(KEY, JSON.stringify({ a: 1 }));\n  const h = renderHook(() => useLocalStorage(KEY, null));\n  $test.check('Reads an existing JSON value on mount', JSON.stringify(h.result.current[0]) === '{\"a\":1}', h.result.current[0]);\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 0));\n  act(() => h.result.current[1](5));\n  $test.check('setValue updates state and stores JSON', h.result.current[0] === 5 && localStorage.getItem(KEY) === '5', { state: h.result.current[0], stored: localStorage.getItem(KEY) });\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 0));\n  act(() => {\n    h.result.current[1]((n) => n + 1);\n    h.result.current[1]((n) => n + 1);\n  });\n  $test.check('setValue accepts an updater function (two calls in one batch)', h.result.current[0] === 2 && localStorage.getItem(KEY) === '2', { state: h.result.current[0], stored: localStorage.getItem(KEY) });\n  h.unmount();\n  cleanup();\n}\n{\n  localStorage.setItem(KEY, '{not valid json');\n  const h = renderHook(() => useLocalStorage(KEY, 'safe'));\n  $test.check('Falls back to the initial value when the stored JSON is corrupt', h.result.current[0] === 'safe', h.result.current[0]);\n  h.unmount();\n  cleanup();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  fire.event(window, new StorageEvent('storage', { key: KEY, newValue: JSON.stringify('from another tab') }));\n  const updated = h.result.current[0];\n  fire.event(window, new StorageEvent('storage', { key: KEY, newValue: null }));\n  $test.check(\n    'A storage event for the same key updates the value (removal restores the initial value)',\n    updated === 'from another tab' && h.result.current[0] === 'init',\n    { updated, afterRemoval: h.result.current[0] }\n  );\n  h.unmount();\n}\n{\n  const h = renderHook(() => useLocalStorage(KEY, 'init'));\n  fire.event(window, new StorageEvent('storage', { key: 'some-other-key', newValue: JSON.stringify('nope') }));\n  $test.check('Storage events for other keys are ignored', h.result.current[0] === 'init', h.result.current[0]);\n  h.unmount();\n}\n{\n  localStorage.setItem(KEY + '-b', JSON.stringify('B'));\n  const h = renderHook(({ k }) => useLocalStorage(k, 'init'), { initialProps: { k: KEY } });\n  h.rerender({ k: KEY + '-b' });\n  await wait(30); // a re-read triggered from an effect renders on the next tick in production builds\n  $test.check('Changing the key reads the new key', h.result.current[0] === 'B', h.result.current[0]);\n  h.unmount();\n  localStorage.removeItem(KEY + '-b');\n}",
-    "difficulty": 2,
+    "difficulty": 3,
     "concept": "react-hooks-utility"
   },
   {
@@ -6708,14 +6708,14 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "string",
       "hash-map",
       "basics"
     ],
     "promptSeed": "Write isAnagram(a, b) (same letters with the same counts; case-sensitive, spaces count), isPalindrome(s) (ignore case and every non-alphanumeric character; an empty string is a palindrome) and longestCommonPrefix(words) (the longest string that starts every word; '' for an empty array).",
-    "difficulty": 1,
+    "difficulty": 2,
     "concept": "strings",
     "referenceSolution": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (!counts[ch]) return false;\n    counts[ch]--;\n  }\n  return true;\n}\n\nfunction isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let i = 0;\n  let j = clean.length - 1;\n  while (i < j) {\n    if (clean[i] !== clean[j]) return false;\n    i++;\n    j--;\n  }\n  return true;\n}\n\nfunction longestCommonPrefix(words) {\n  if (!words.length) return '';\n  let prefix = words[0];\n  for (const w of words) {\n    while (!w.startsWith(prefix)) prefix = prefix.slice(0, -1);\n  }\n  return prefix;\n}",
     "solution": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (!counts[ch]) return false;\n    counts[ch]--;\n  }\n  return true;\n}\n\nfunction isPalindrome(s) {\n  const clean = s.toLowerCase().replace(/[^a-z0-9]/g, '');\n  let i = 0;\n  let j = clean.length - 1;\n  while (i < j) {\n    if (clean[i] !== clean[j]) return false;\n    i++;\n    j--;\n  }\n  return true;\n}\n\nfunction longestCommonPrefix(words) {\n  if (!words.length) return '';\n  let prefix = words[0];\n  for (const w of words) {\n    while (!w.startsWith(prefix)) prefix = prefix.slice(0, -1);\n  }\n  return prefix;\n}",
@@ -7412,7 +7412,7 @@
       "array"
     ],
     "promptSeed": "Write rob(nums): the maximum sum of values you can take from an array when no two chosen elements are adjacent (0 for an empty array). Write lengthOfLIS(nums): the length of the longest strictly increasing subsequence (not necessarily contiguous; 0 for an empty array). An O(n^2) lengthOfLIS is fine.",
-    "difficulty": 4,
+    "difficulty": 3,
     "concept": "dp",
     "referenceSolution": "function rob(nums) {\n  let take = 0;\n  let skip = 0;\n  for (const n of nums) {\n    [take, skip] = [skip + n, Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction lengthOfLIS(nums) {\n  const dp = new Array(nums.length).fill(1);\n  let best = 0;\n  for (let i = 0; i < nums.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);\n    }\n    best = Math.max(best, dp[i]);\n  }\n  return best;\n}",
     "solution": "function rob(nums) {\n  let take = 0;\n  let skip = 0;\n  for (const n of nums) {\n    [take, skip] = [skip + n, Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction lengthOfLIS(nums) {\n  const dp = new Array(nums.length).fill(1);\n  let best = 0;\n  for (let i = 0; i < nums.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);\n    }\n    best = Math.max(best, dp[i]);\n  }\n  return best;\n}",
@@ -8262,7 +8262,7 @@
       "basics"
     ],
     "promptSeed": "Write insertionSort(arr) that sorts an array of numbers ascending IN PLACE and returns the same array object, selectionSort(arr) that returns a NEW sorted array and leaves the input untouched, and isSorted(arr) that returns true when the array is in ascending (non-decreasing) order (empty and one-element arrays are sorted). Do not use Array.prototype.sort.",
-    "difficulty": 1,
+    "difficulty": 2,
     "concept": "sorting",
     "referenceSolution": "function insertionSort(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    const value = arr[i];\n    let j = i - 1;\n    while (j >= 0 && arr[j] > value) {\n      arr[j + 1] = arr[j];\n      j--;\n    }\n    arr[j + 1] = value;\n  }\n  return arr;\n}\n\nfunction selectionSort(arr) {\n  const out = arr.slice();\n  for (let i = 0; i < out.length - 1; i++) {\n    let min = i;\n    for (let j = i + 1; j < out.length; j++) {\n      if (out[j] < out[min]) min = j;\n    }\n    [out[i], out[min]] = [out[min], out[i]];\n  }\n  return out;\n}\n\nfunction isSorted(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    if (arr[i - 1] > arr[i]) return false;\n  }\n  return true;\n}",
     "solution": "function insertionSort(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    const value = arr[i];\n    let j = i - 1;\n    while (j >= 0 && arr[j] > value) {\n      arr[j + 1] = arr[j];\n      j--;\n    }\n    arr[j + 1] = value;\n  }\n  return arr;\n}\n\nfunction selectionSort(arr) {\n  const out = arr.slice();\n  for (let i = 0; i < out.length - 1; i++) {\n    let min = i;\n    for (let j = i + 1; j < out.length; j++) {\n      if (out[j] < out[min]) min = j;\n    }\n    [out[i], out[min]] = [out[min], out[i]];\n  }\n  return out;\n}\n\nfunction isSorted(arr) {\n  for (let i = 1; i < arr.length; i++) {\n    if (arr[i - 1] > arr[i]) return false;\n  }\n  return true;\n}",
@@ -8324,7 +8324,7 @@
       "basics"
     ],
     "promptSeed": "Write class Range with constructor(start, end, step = 1) that is iterable through [Symbol.iterator]: it yields start, start + step, ... while the value is before end (end is exclusive; a negative step counts down while the value is greater than end). It must be re-iterable (a second loop starts over), and a step of 0 throws a RangeError whose message contains 'step'. Also write take(iterable, n) returning an array of the first n values of any iterable (fewer if it ends sooner) without consuming the rest — it must work on infinite generators.",
-    "difficulty": 1,
+    "difficulty": 2,
     "concept": "iterators",
     "referenceSolution": "class Range {\n  constructor(start, end, step = 1) {\n    if (step === 0) throw new RangeError('step must not be 0');\n    this.start = start;\n    this.end = end;\n    this.step = step;\n  }\n  [Symbol.iterator]() {\n    let current = this.start;\n    const { end, step } = this;\n    return {\n      next() {\n        const inRange = step > 0 ? current < end : current > end;\n        if (!inRange) return { value: undefined, done: true };\n        const value = current;\n        current += step;\n        return { value, done: false };\n      },\n    };\n  }\n}\n\nfunction take(iterable, n) {\n  const out = [];\n  if (n <= 0) return out;\n  for (const value of iterable) {\n    out.push(value);\n    if (out.length >= n) break;\n  }\n  return out;\n}",
     "solution": "class Range {\n  constructor(start, end, step = 1) {\n    if (step === 0) throw new RangeError('step must not be 0');\n    this.start = start;\n    this.end = end;\n    this.step = step;\n  }\n  [Symbol.iterator]() {\n    let current = this.start;\n    const { end, step } = this;\n    return {\n      next() {\n        const inRange = step > 0 ? current < end : current > end;\n        if (!inRange) return { value: undefined, done: true };\n        const value = current;\n        current += step;\n        return { value, done: false };\n      },\n    };\n  }\n}\n\nfunction take(iterable, n) {\n  const out = [];\n  if (n <= 0) return out;\n  for (const value of iterable) {\n    out.push(value);\n    if (out.length >= n) break;\n  }\n  return out;\n}",
@@ -10424,14 +10424,14 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "sliding-window",
       "string",
       "hash-map"
     ],
     "promptSeed": "Write lengthOfLongestSubstring(s): the length of the longest substring with no repeated character (0 for an empty string), using a sliding window and a map of last-seen indices. Write longestKDistinct(s, k): the length of the longest substring containing at most k distinct characters (0 when k is 0 or s is empty).",
-    "difficulty": 2,
+    "difficulty": 3,
     "concept": "sliding-window",
     "referenceSolution": "function lengthOfLongestSubstring(s) {\n  const last = new Map();\n  let start = 0;\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    const ch = s[i];\n    if (last.has(ch) && last.get(ch) >= start) start = last.get(ch) + 1;\n    last.set(ch, i);\n    best = Math.max(best, i - start + 1);\n  }\n  return best;\n}\n\nfunction longestKDistinct(s, k) {\n  if (k === 0) return 0;\n  const counts = new Map();\n  let left = 0;\n  let best = 0;\n  for (let right = 0; right < s.length; right++) {\n    counts.set(s[right], (counts.get(s[right]) || 0) + 1);\n    while (counts.size > k) {\n      const remaining = counts.get(s[left]) - 1;\n      if (remaining === 0) counts.delete(s[left]);\n      else counts.set(s[left], remaining);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
     "solution": "function lengthOfLongestSubstring(s) {\n  const last = new Map();\n  let start = 0;\n  let best = 0;\n  for (let i = 0; i < s.length; i++) {\n    const ch = s[i];\n    if (last.has(ch) && last.get(ch) >= start) start = last.get(ch) + 1;\n    last.set(ch, i);\n    best = Math.max(best, i - start + 1);\n  }\n  return best;\n}\n\nfunction longestKDistinct(s, k) {\n  if (k === 0) return 0;\n  const counts = new Map();\n  let left = 0;\n  let best = 0;\n  for (let right = 0; right < s.length; right++) {\n    counts.set(s[right], (counts.get(s[right]) || 0) + 1);\n    while (counts.size > k) {\n      const remaining = counts.get(s[left]) - 1;\n      if (remaining === 0) counts.delete(s[left]);\n      else counts.set(s[left], remaining);\n      left++;\n    }\n    best = Math.max(best, right - left + 1);\n  }\n  return best;\n}",
@@ -11292,7 +11292,7 @@
       "queue"
     ],
     "promptSeed": "Tree nodes are { val, left, right } (null for a missing child). Write levelOrder(root): an array of arrays, one per depth, left to right ([] for a null root). Write rightSideView(root): the last value of each level (what you see from the right). Write zigzagLevelOrder(root): like levelOrder but every odd depth (1, 3, ...) is reversed.",
-    "difficulty": 2,
+    "difficulty": 3,
     "concept": "trees",
     "referenceSolution": "function levelOrder(root) {\n  const out = [];\n  if (!root) return out;\n  let level = [root];\n  while (level.length) {\n    out.push(level.map((node) => node.val));\n    const next = [];\n    for (const node of level) {\n      if (node.left) next.push(node.left);\n      if (node.right) next.push(node.right);\n    }\n    level = next;\n  }\n  return out;\n}\n\nfunction rightSideView(root) {\n  return levelOrder(root).map((level) => level[level.length - 1]);\n}\n\nfunction zigzagLevelOrder(root) {\n  return levelOrder(root).map((level, depth) => (depth % 2 ? level.reverse() : level));\n}",
     "solution": "function levelOrder(root) {\n  const out = [];\n  if (!root) return out;\n  let level = [root];\n  while (level.length) {\n    out.push(level.map((node) => node.val));\n    const next = [];\n    for (const node of level) {\n      if (node.left) next.push(node.left);\n      if (node.right) next.push(node.right);\n    }\n    level = next;\n  }\n  return out;\n}\n\nfunction rightSideView(root) {\n  return levelOrder(root).map((level) => level[level.length - 1]);\n}\n\nfunction zigzagLevelOrder(root) {\n  return levelOrder(root).map((level, depth) => (depth % 2 ? level.reverse() : level));\n}",
@@ -11864,7 +11864,7 @@
       "k-way"
     ],
     "promptSeed": "Write your own binary heap inside your solution. List nodes are { val, next } (null ends the list). Write mergeKLists(lists): merge k sorted linked lists (entries may be null) into one sorted list using a heap of the current heads; return null when everything is empty. Write mergeKSortedArrays(arrays): the same idea for sorted arrays, returning one sorted array (empty arrays allowed). Write kClosest(points, k): the k points [x, y] closest to the origin as a list sorted by distance ascending (equal distances keep input order), using a max-heap capped at size k ([] when k is 0).",
-    "difficulty": 3,
+    "difficulty": 4,
     "concept": "heap",
     "referenceSolution": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction mergeKLists(lists) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  for (const node of lists) if (node) heap.push(node);\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  while (heap.size()) {\n    const node = heap.pop();\n    tail.next = node;\n    tail = node;\n    if (node.next) heap.push(node.next);\n  }\n  return dummy.next;\n}\n\nfunction mergeKSortedArrays(arrays) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  arrays.forEach((arr, row) => {\n    if (arr.length) heap.push({ val: arr[0], row, col: 0 });\n  });\n  const out = [];\n  while (heap.size()) {\n    const { val, row, col } = heap.pop();\n    out.push(val);\n    if (col + 1 < arrays[row].length) heap.push({ val: arrays[row][col + 1], row, col: col + 1 });\n  }\n  return out;\n}\n\nfunction kClosest(points, k) {\n  const heap = new Heap((a, b) => b.d - a.d || b.i - a.i);\n  points.forEach((p, i) => {\n    heap.push({ d: p[0] * p[0] + p[1] * p[1], i, p });\n    if (heap.size() > k) heap.pop();\n  });\n  const kept = [];\n  while (heap.size()) kept.push(heap.pop());\n  return kept.sort((a, b) => a.d - b.d || a.i - b.i).map((item) => item.p);\n}",
     "solution": "class Heap {\n  constructor(compare = (a, b) => a - b) {\n    this.items = [];\n    this.compare = compare;\n  }\n  size() {\n    return this.items.length;\n  }\n  peek() {\n    return this.items[0];\n  }\n  push(value) {\n    const a = this.items;\n    a.push(value);\n    let i = a.length - 1;\n    while (i > 0) {\n      const parent = (i - 1) >> 1;\n      if (this.compare(a[i], a[parent]) >= 0) break;\n      [a[i], a[parent]] = [a[parent], a[i]];\n      i = parent;\n    }\n  }\n  pop() {\n    const a = this.items;\n    if (!a.length) return undefined;\n    const top = a[0];\n    const last = a.pop();\n    if (a.length) {\n      a[0] = last;\n      let i = 0;\n      for (;;) {\n        const l = 2 * i + 1;\n        const r = l + 1;\n        let m = i;\n        if (l < a.length && this.compare(a[l], a[m]) < 0) m = l;\n        if (r < a.length && this.compare(a[r], a[m]) < 0) m = r;\n        if (m === i) break;\n        [a[i], a[m]] = [a[m], a[i]];\n        i = m;\n      }\n    }\n    return top;\n  }\n}\n\nfunction mergeKLists(lists) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  for (const node of lists) if (node) heap.push(node);\n  const dummy = { val: 0, next: null };\n  let tail = dummy;\n  while (heap.size()) {\n    const node = heap.pop();\n    tail.next = node;\n    tail = node;\n    if (node.next) heap.push(node.next);\n  }\n  return dummy.next;\n}\n\nfunction mergeKSortedArrays(arrays) {\n  const heap = new Heap((a, b) => a.val - b.val);\n  arrays.forEach((arr, row) => {\n    if (arr.length) heap.push({ val: arr[0], row, col: 0 });\n  });\n  const out = [];\n  while (heap.size()) {\n    const { val, row, col } = heap.pop();\n    out.push(val);\n    if (col + 1 < arrays[row].length) heap.push({ val: arrays[row][col + 1], row, col: col + 1 });\n  }\n  return out;\n}\n\nfunction kClosest(points, k) {\n  const heap = new Heap((a, b) => b.d - a.d || b.i - a.i);\n  points.forEach((p, i) => {\n    heap.push({ d: p[0] * p[0] + p[1] * p[1], i, p });\n    if (heap.size() > k) heap.pop();\n  });\n  const kept = [];\n  while (heap.size()) kept.push(heap.pop());\n  return kept.sort((a, b) => a.d - b.d || a.i - b.i).map((item) => item.p);\n}",
