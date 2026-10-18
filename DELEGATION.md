@@ -6,14 +6,14 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Current state (keep this block up to date in the same commit as any change it describes)
 - `master` = the deployed app. **262 cards** (230 in the default deck + 32 in the optional "algorithms-advanced" pack), **1,779 documented cases**, 955 unit tests, 541 browser tests (2 per card + 12 navigation/shortcut tests + 5 preview tests). A push to `master` deploys, and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
 - Quick Add Topic (AI card creation) is **parked and hidden** (`FEATURES.quickAdd` in `src/lib/features.ts`). See task M. Do not re-enable it without the verification work.
-- The React preview window is **built** on `feature/react-preview` (task A: sandboxed iframe, pop-out window with live sync, `previewCode` plumbing, guard unit test, e2e tests, 2 sample previews). Remaining: task A2 (writing previews for the other React cards).
+- The React preview window and preview files are **built** on `feature/react-preview` (task A: sandboxed iframe, pop-out window with live sync, `previewCode` plumbing, guard unit test, e2e tests; task A2: all 44 React component cards have authored `.preview.js` files, passing all guard tests).
 - Authoring pitfalls for Suspense / transitions / `use()` harnesses are in the roadmap, section 8. Read them before writing React 19 cards.
 
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
 | A (React preview window) | Antigravity | feature/react-preview | Done |
-| A2 (React preview files) | Antigravity | feature/react-preview | In progress (Batch 3/4 done) |
+| A2 (React preview files) | Antigravity | feature/react-preview | Done |
 
 ## How to pick up a task
 1. `git fetch && git checkout master && git pull`, then read the roadmap, this file and the claim table above. Pick a task nobody has claimed.

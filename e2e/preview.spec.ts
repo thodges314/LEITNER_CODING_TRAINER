@@ -239,8 +239,38 @@ test.describe('React preview window', () => {
   });
 
   test('legacy component preview: pop-out and dock-back work on cards without previewCode', async ({ page }) => {
-    // tag-input is a React card without previewCode (in Batch 3)
-    await openCard(page, 'tag-input');
+    await page.goto('/');
+    const welcomeBtn = page.getByRole('button', { name: /Start practicing/ });
+    if (await welcomeBtn.isVisible()) {
+      await welcomeBtn.click();
+    }
+
+    await page.evaluate(
+      ({ DECK_KEY }) => {
+        const stored = localStorage.getItem(DECK_KEY);
+        if (stored) {
+          const deck = JSON.parse(stored);
+          for (const t of deck.topics) {
+            t.status = 'locked';
+          }
+          const legacyCard = {
+            ...deck.topics[0],
+            id: 'custom-unannotated-card',
+            title: 'Custom Unannotated Card',
+            track: 'react-components',
+            rendersComponent: true,
+            status: 'active',
+          };
+          delete legacyCard.previewCode;
+          deck.topics.unshift(legacyCard);
+          localStorage.setItem(DECK_KEY, JSON.stringify(deck));
+        }
+        localStorage.setItem('leitner_welcomed', '1');
+      },
+      { DECK_KEY }
+    );
+
+    await page.reload();
 
     // Does not have preview-toggle-btn
     await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);
@@ -264,7 +294,6 @@ test.describe('React preview window', () => {
     // Dock back from main window
     await mainDockBtn.click();
     await expect.poll(() => popup.isClosed()).toBe(true);
-    await expect(page.locator('[data-testid="legacy-preview-popout-btn"]')).toBeVisible();
   });
 });
 

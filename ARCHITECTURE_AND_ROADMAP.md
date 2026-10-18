@@ -308,7 +308,7 @@ pane or pop-out window, without disturbing the editor, Run Code or Submit.
 - Watchdog timeout protects against infinite loops and freezes in the preview sandbox without affecting the main app.
 - **Automated check (the guard that keeps preview files honest):** a unit test mounts every card's `previewCode` together with that card's **reference solution** in jsdom: it must render without throwing and
   produce non-empty DOM (and any `log` callback must not throw). Plus Playwright tests (`e2e/preview.spec.ts`) that test live rendering, events, pop-out windows, and infinite loop protection.
-- Work split: (1) the iframe window + `previewCode` plumbing + guard test (DONE, branch `feature/react-preview`); (2) writing `<id>.preview.js` for the remaining React cards (task A2);
+- Work split: (1) the iframe window + `previewCode` plumbing + guard test (DONE, branch `feature/react-preview`); (2) writing `<id>.preview.js` for the remaining React cards (DONE, task A2: all 44 React component cards have authored `.preview.js` files, passing all guard tests);
   (3) from then on every new React card ships its preview file (rule 10 in `DELEGATION.md`).
 4. **Duplicate cards**: RESOLVED by the 2026-10 audit (8 near-duplicates removed, the rest are deliberate progressions; see §7.4e).
 5. **Difficulty in the catalog**: sort/filter by difficulty and concept; show the ladder (which rung unlocks next and why a card is locked).
