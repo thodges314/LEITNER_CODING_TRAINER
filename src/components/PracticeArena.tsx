@@ -120,6 +120,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   // Track whether the live preview has been initialized via Run Code / Test
   const [isPreviewLive, setIsPreviewLive] = useState<boolean>(false);
+  const [previewRunTrigger, setPreviewRunTrigger] = useState<number>(0);
 
   // Pop-out state for legacy Component Preview / Hook Test box
   const [legacyPopupWindow, setLegacyPopupWindow] = useState<Window | null>(null);
@@ -416,6 +417,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   // Async Execution Handler with AsyncFunction and captured console
   const handleRunCode = async () => {
     setIsPreviewLive(true);
+    setPreviewRunTrigger((c) => c + 1);
     if (!code.trim() || isRunning) return;
     setIsOutputOpen(true);
     setIsRunning(true);
@@ -553,6 +555,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   const handleSubmit = async () => {
     setIsPreviewLive(true);
+    setPreviewRunTrigger((c) => c + 1);
     if (!currentCard || !code.trim() || isEvaluating) return;
     setIsEvaluating(true);
     setShowSolution(false);
@@ -2480,6 +2483,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 executionMode={executionMode}
                 theme={theme}
                 isLive={isPreviewLive}
+                runTrigger={previewRunTrigger}
               />
             ) : (
               <div
@@ -2724,7 +2728,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                                 Ready to Preview
                               </div>
                               <div style={{ fontSize: '12px', maxWidth: '320px', lineHeight: 1.5, color: '#64748b' }}>
-                                Run code or test to start live component preview.
+                                Run code to start live component preview.
                               </div>
                             </div>
                           )}
@@ -2764,7 +2768,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                           Ready to Preview
                         </div>
                         <div style={{ fontSize: '12px', maxWidth: '320px', lineHeight: 1.5, color: '#64748b' }}>
-                          Run code or test to start live component preview.
+                          Run code to start live component preview.
                         </div>
                       </div>
                     )}

@@ -12,9 +12,6 @@ function Demo() {
       >
         Wi-Fi {on ? 'Connected' : 'Disconnected'}
       </Switch>
-      <Switch checked={false} disabled onChange={log('disabledSwitch')}>
-        Bluetooth (Disabled)
-      </Switch>
     </div>
   );
 }

@@ -23,6 +23,7 @@ export interface ReactPreviewProps {
   executionMode: ExecutionMode;
   theme?: 'dark' | 'apple-gsos';
   isLive?: boolean;
+  runTrigger?: number;
   onClose?: () => void;
 }
 
@@ -41,15 +42,22 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   executionMode,
   theme = 'dark',
   isLive = false,
+  runTrigger = 0,
   onClose,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [iframeKey, setIframeKey] = useState(0);
-  const [isIframeReady, setIsIframeReady] = useState(false);
   const [status, setStatus] = useState<'idle' | 'compiling' | 'rendering' | 'live' | 'error' | 'timeout'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [logs, setLogs] = useState<PreviewLogItem[]>([]);
-  const [popupWindow, setPopupWindow] = useState<Window | null>(null);
+  const popupWindowRef = useRef<Window | null>(null);
+  const [isPoppedOut, setIsPoppedOut] = useState(false);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+
+  const isLight = theme === 'apple-gsos';
+  const currentEnvKey = `${iframeKey}-${theme}-${isPoppedOut ? 'popup' : 'inline'}`;
+  const [readyEnvKey, setReadyEnvKey] = useState<string | null>(null);
+  const isIframeReady = readyEnvKey === currentEnvKey;
 
   const currentRenderIdRef = useRef<string>('');
   const watchdogTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -64,15 +72,12 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
 
   // PostMessage listener
   const handleMessage = useCallback((event: MessageEvent) => {
-    if (iframeRef.current && event.source !== iframeRef.current.contentWindow) {
-      return;
-    }
     const data = event.data;
     if (!data || typeof data !== 'object') return;
     if (typeof data.type !== 'string' || !data.type.startsWith('leitner-preview:')) return;
 
     if (data.type === 'leitner-preview:ready') {
-      setIsIframeReady(true);
+      setReadyEnvKey(data.envKey ?? currentEnvKey);
     } else if (data.type === 'leitner-preview:rendered') {
       if (data.renderId === currentRenderIdRef.current) {
         clearWatchdog();
@@ -108,7 +113,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         ...prev.slice(0, 49),
       ]);
     }
-  }, [clearWatchdog]);
+  }, [clearWatchdog, currentEnvKey]);
 
   useEffect(() => {
     window.addEventListener('message', handleMessage);
@@ -118,17 +123,25 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     };
   }, [handleMessage, clearWatchdog]);
 
-  useEffect(() => {
-    if (!popupWindow) return;
-    popupWindow.addEventListener('message', handleMessage);
-    return () => {
-      popupWindow.removeEventListener('message', handleMessage);
-    };
-  }, [popupWindow, handleMessage]);
-
   // Transpile and send code to iframe
   const sendToIframe = useCallback(async () => {
-    if (!card.previewCode || !iframeRef.current?.contentWindow) return;
+    const popup = popupWindowRef.current;
+    let targetWindow =
+      iframeRef.current?.contentWindow ||
+      (popup && !popup.closed ? (popup.document.querySelector('iframe')?.contentWindow as Window | null) : null) ||
+      (document.querySelector('.react-preview-window iframe') as HTMLIFrameElement | null)?.contentWindow ||
+      null;
+
+    if (!targetWindow) {
+      await new Promise((r) => setTimeout(r, 50));
+      targetWindow =
+        iframeRef.current?.contentWindow ||
+        (popup && !popup.closed ? (popup.document.querySelector('iframe')?.contentWindow as Window | null) : null) ||
+        (document.querySelector('.react-preview-window iframe') as HTMLIFrameElement | null)?.contentWindow ||
+        null;
+    }
+
+    if (!card.previewCode || !targetWindow) return;
 
     setStatus('compiling');
     const combined = `${code}\n\n${card.previewCode}`;
@@ -154,13 +167,11 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       hasTimedOutRef.current = true;
       setStatus('timeout');
       setErrorMessage('Preview timed out (infinite loop or runaway code). Sandboxed iframe was reset.');
-      // Increment iframe key to destroy and recreate the sandboxed iframe
-      setIsIframeReady(false);
       setIframeKey((k) => k + 1);
     }, 2000);
 
     try {
-      iframeRef.current.contentWindow.postMessage(
+      targetWindow.postMessage(
         {
           type: 'leitner-preview:render',
           code: transpiled.code,
@@ -180,6 +191,25 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     hasTimedOutRef.current = false;
   }, [code]);
 
+  // Whenever the iframe becomes ready while live, or when isLive becomes true while ready, immediately render!
+  useEffect(() => {
+    if (isLive && isIframeReady && !hasTimedOutRef.current) {
+      void sendToIframe();
+    }
+  }, [isLive, isIframeReady, sendToIframe]);
+
+  // When runTrigger fires (e.g. user clicks "Run Code / Test" button), re-compile immediately!
+  const prevRunTriggerRef = useRef(runTrigger);
+  useEffect(() => {
+    if (runTrigger !== prevRunTriggerRef.current) {
+      prevRunTriggerRef.current = runTrigger;
+      if (isLive && !hasTimedOutRef.current) {
+        setReadyEnvKey(currentEnvKey);
+        void sendToIframe();
+      }
+    }
+  }, [runTrigger, isLive, currentEnvKey, sendToIframe]);
+
   // Re-render debounced (500ms) on typing when live
   const prevCodeRef = useRef(code);
   useEffect(() => {
@@ -197,20 +227,36 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     return () => clearTimeout(timer);
   }, [code, isIframeReady, isLive, sendToIframe]);
 
-  // When going live, immediately trigger preview compile without waiting 500ms
-  const prevIsLiveRef = useRef(isLive);
+  // Sync popup window styling when theme changes
   useEffect(() => {
-    if (isLive && !prevIsLiveRef.current && isIframeReady) {
-      void sendToIframe();
+    const popup = popupWindowRef.current;
+    if (!popup || popup.closed) return;
+    try {
+      popup.document.body.style.backgroundColor = isLight ? '#f8fafc' : '#030712';
+      popup.document.body.style.color = isLight ? '#0f172a' : '#f1f5f9';
+    } catch {
+      // Ignore cross-window errors
     }
-    prevIsLiveRef.current = isLive;
-  }, [isLive, isIframeReady, sendToIframe]);
+  }, [isLight, isPoppedOut]);
+
+  // Listen to message events from popup window if active
+  useEffect(() => {
+    const popup = popupWindowRef.current;
+    if (!popup || popup.closed) return;
+    popup.addEventListener('message', handleMessage);
+    return () => {
+      try {
+        popup.removeEventListener('message', handleMessage);
+      } catch {
+        // Ignore
+      }
+    };
+  }, [isPoppedOut, handleMessage]);
 
   const handleRestart = () => {
     hasTimedOutRef.current = false;
     clearWatchdog();
-    setIsIframeReady(false);
-    setStatus('idle');
+    setStatus('compiling');
     setErrorMessage(null);
     setIframeKey((k) => k + 1);
   };
@@ -219,12 +265,14 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     setLogs([]);
   };
 
-  const isLight = theme === 'apple-gsos';
-  const isPoppedOut = Boolean(popupWindow && !popupWindow.closed);
+  const handleIframeLoad = useCallback(() => {
+    setReadyEnvKey(currentEnvKey);
+  }, [currentEnvKey]);
 
   const handlePopOut = useCallback(() => {
-    if (popupWindow && !popupWindow.closed) {
-      popupWindow.focus();
+    const existing = popupWindowRef.current;
+    if (existing && !existing.closed) {
+      existing.focus();
       return;
     }
 
@@ -265,50 +313,66 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       popup.document.body.style.display = 'flex';
       popup.document.body.style.flexDirection = 'column';
 
-      popup.addEventListener('beforeunload', () => {
-        setPopupWindow(null);
-        setIsIframeReady(false);
-        setIframeKey((k) => k + 1);
+      popup.addEventListener('pagehide', () => {
+        popupWindowRef.current = null;
+        setPortalContainer(null);
+        setIsPoppedOut(false);
+      });
+
+      popup.addEventListener('message', (ev) => {
+        handleMessage(ev);
       });
     } catch {
       // Ignore cross-window document configuration failures
     }
 
-    setIsIframeReady(false);
-    setIframeKey((k) => k + 1);
-    setPopupWindow(popup);
-  }, [card.title, isLight, popupWindow]);
+    popupWindowRef.current = popup;
+    setPortalContainer(popup.document.body);
+    setIsPoppedOut(true);
+  }, [card.title, isLight, handleMessage]);
 
   const handleDockBack = useCallback(() => {
-    if (popupWindow && !popupWindow.closed) {
-      popupWindow.close();
+    const popup = popupWindowRef.current;
+    if (popup && !popup.closed) {
+      try {
+        popup.close();
+      } catch {
+        // Ignore
+      }
     }
-    setPopupWindow(null);
-    setIsIframeReady(false);
-    setIframeKey((k) => k + 1);
-  }, [popupWindow]);
+    popupWindowRef.current = null;
+    setPortalContainer(null);
+    setIsPoppedOut(false);
+  }, []);
 
   // Clean up popup window on unmount
   useEffect(() => {
     return () => {
-      if (popupWindow && !popupWindow.closed) {
-        popupWindow.close();
+      const popup = popupWindowRef.current;
+      if (popup && !popup.closed) {
+        try {
+          popup.close();
+        } catch {
+          // Ignore
+        }
       }
+      popupWindowRef.current = null;
     };
-  }, [popupWindow]);
+  }, []);
 
   // Heartbeat to detect popup closure via OS close button
   useEffect(() => {
-    if (!popupWindow) return;
+    if (!isPoppedOut) return;
     const timer = setInterval(() => {
-      if (popupWindow.closed) {
-        setPopupWindow(null);
-        setIsIframeReady(false);
-        setIframeKey((k) => k + 1);
+      const popup = popupWindowRef.current;
+      if (!popup || popup.closed) {
+        popupWindowRef.current = null;
+        setPortalContainer(null);
+        setIsPoppedOut(false);
       }
     }, 500);
     return () => clearInterval(timer);
-  }, [popupWindow]);
+  }, [isPoppedOut]);
 
   const previewPane = (
     <div
@@ -373,7 +437,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
               Ready
             </span>
           )}
-          {isLive && status === 'compiling' && (
+          {isLive && (status === 'compiling' || status === 'idle') && (
             <span
               style={{
                 display: 'inline-flex',
@@ -468,6 +532,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           <button
             type="button"
             onClick={handleRestart}
+            data-testid="preview-restart-btn"
             style={{
               background: 'none',
               border: 'none',
@@ -598,7 +663,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             Ready to Preview
           </div>
           <div style={{ fontSize: '11.5px', maxWidth: '320px', lineHeight: 1.5, color: '#64748b' }}>
-            Run code or test to start live component preview.
+            Run code to start live component preview.
           </div>
         </div>
       )}
@@ -615,11 +680,12 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         }}
       >
         <iframe
-          key={iframeKey}
+          key={currentEnvKey}
           ref={iframeRef}
           title="React Component Preview"
           sandbox="allow-scripts"
-          srcDoc={createPreviewSrcDoc(theme)}
+          srcDoc={createPreviewSrcDoc(theme, currentEnvKey)}
+          onLoad={handleIframeLoad}
           style={{
             width: '100%',
             height: '100%',
@@ -750,7 +816,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     </div>
   );
 
-  if (isPoppedOut && popupWindow) {
+  if (isPoppedOut && portalContainer) {
     return (
       <>
         <div
@@ -814,7 +880,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             )}
           </div>
         </div>
-        {createPortal(previewPane, popupWindow.document.body)}
+        {createPortal(previewPane, portalContainer)}
       </>
     );
   }

@@ -238,6 +238,62 @@ test.describe('React preview window', () => {
     await expect(eventLog.first()).toBeVisible();
   });
 
+  test('progress-bar: pop-out, dock-back, and theme toggle do not vanish the live preview', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'progress-bar');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'progress-bar', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    // Activate live preview
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    let frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    await expect(frame.locator('[role="progressbar"]')).toBeVisible({ timeout: 5000 });
+
+    // 1. Pop out
+    const popoutBtn = previewWindow.locator('[data-testid="preview-popout-btn"]');
+    await expect(popoutBtn).toBeVisible();
+
+    const [popup] = await Promise.all([
+      page.waitForEvent('popup'),
+      popoutBtn.click(),
+    ]);
+
+    expect(popup).toBeDefined();
+
+    // Inside popup, the preview iframe should render the component
+    const popupFrame = popup.frameLocator('iframe');
+    await expect(popupFrame.locator('[role="progressbar"]')).toBeVisible({ timeout: 5000 });
+
+    // 2. Dock back
+    const mainDockBtn = page.locator('[data-testid="preview-main-dock-btn"]');
+    await expect(mainDockBtn).toBeVisible();
+    await mainDockBtn.click();
+    await expect.poll(() => popup.isClosed()).toBe(true);
+
+    // After dock back, preview in main window is still live and visible!
+    frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    await expect(frame.locator('[role="progressbar"]')).toBeVisible({ timeout: 5000 });
+
+    // 3. Toggle theme (night/day mode)
+    const themeBtn = page.getByRole('button', { name: /Switch to Apple IIGS|Switch to Synthwave/ });
+    if (await themeBtn.isVisible()) {
+      await themeBtn.click();
+      // Verify preview is still rendered after theme switch
+      await expect(frame.locator('[role="progressbar"]')).toBeVisible({ timeout: 5000 });
+    }
+
+    // 4. Restart button
+    const restartBtn = page.locator('[data-testid="preview-restart-btn"]');
+    await expect(restartBtn).toBeVisible();
+    await restartBtn.click();
+    await expect(frame.locator('[role="progressbar"]')).toBeVisible({ timeout: 5000 });
+  });
+
   test('legacy component preview: pop-out and dock-back work on cards without previewCode', async ({ page }) => {
     await page.goto('/');
     const welcomeBtn = page.getByRole('button', { name: /Start practicing/ });

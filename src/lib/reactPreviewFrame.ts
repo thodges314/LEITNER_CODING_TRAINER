@@ -1,6 +1,6 @@
 import { REACT_PREVIEW_BUNDLE } from './reactPreviewBundle';
 
-export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark'): string {
+export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKey = ''): string {
   const isLight = theme === 'apple-gsos';
   const bg = isLight ? '#f8fafc' : '#030712';
   const text = isLight ? '#0f172a' : '#f1f5f9';
@@ -230,7 +230,7 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark'): stri
       }
     });
 
-    window.parent.postMessage({ type: 'leitner-preview:ready' }, '*');
+    window.parent.postMessage({ type: 'leitner-preview:ready', envKey: ${JSON.stringify(envKey)} }, '*');
   })();
   </script>
 </body>
