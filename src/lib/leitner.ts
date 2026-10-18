@@ -90,6 +90,16 @@ export interface LeitnerDeckState {
   deletedSeedIds?: string[];
   /** Spaced repetition algorithm mode: 'leitner' (discrete boxes) or 'graduated-interval' (graduated-interval recall & chaining). */
   algorithm?: SpacedAlgorithm;
+  /** Log of recent review outcomes for sparkline and velocity diagnostics (capped at last 20) */
+  recentReviews?: ReviewHistoryEntry[];
+}
+
+export interface ReviewHistoryEntry {
+  topicId: string;
+  passed: boolean;
+  box: number;
+  trial: number;
+  timestamp?: number;
 }
 
 export type SpacedAlgorithm = 'leitner' | 'graduated-interval';
@@ -551,6 +561,7 @@ export function mergeStoredWithSeed(
     enabledPacks: Array.isArray(parsed.enabledPacks) ? parsed.enabledPacks.map(String).filter((p: string) => p in CARD_PACKS) : undefined,
     filterPresets: normalizePresets(parsed.filterPresets),
     algorithm: parsed.algorithm === 'graduated-interval' ? 'graduated-interval' : parsed.algorithm === 'leitner' ? 'leitner' : getStoredAlgorithm(),
+    recentReviews: Array.isArray(parsed.recentReviews) ? parsed.recentReviews : undefined,
   };
 }
 
@@ -742,6 +753,15 @@ export function commitCardReview(
     (card) => cardMatchesFilter(card, scheduleFilter(state))
   );
 
+  const reviewEntry: ReviewHistoryEntry = {
+    topicId,
+    passed,
+    box: updatedCard ? (updatedCard as TopicItem).box : 1,
+    trial: nextTotal,
+    timestamp: Date.now(),
+  };
+  const updatedRecent = [...(state.recentReviews ?? []).slice(-19), reviewEntry];
+
   const nextState: LeitnerDeckState = {
     ...state,
     topics: finalTopics,
@@ -749,6 +769,7 @@ export function commitCardReview(
     lastReviewedTrack: reviewedTrack,
     unlockedStageCount: newStageCount,
     algorithm: algo,
+    recentReviews: updatedRecent,
   };
 
   saveDeckState(nextState);
@@ -1100,6 +1121,7 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     enabledPacks: Array.isArray(parsed.enabledPacks) ? parsed.enabledPacks.map(String).filter((p: string) => p in CARD_PACKS) : undefined,
     filterPresets: normalizePresets(parsed.filterPresets),
     algorithm: parsed.algorithm === 'graduated-interval' ? 'graduated-interval' : 'leitner',
+    recentReviews: Array.isArray(parsed.recentReviews) ? parsed.recentReviews : undefined,
   };
 }
 

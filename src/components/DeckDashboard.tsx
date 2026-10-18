@@ -1,4 +1,5 @@
 import { DifficultyBadge } from './DifficultyBadge';
+import { DeckStatsWidget } from './DeckStatsWidget';
 import { useState, useRef, useMemo } from 'react';
 import type { ChangeEvent } from 'react';
 import type { AppTheme } from '../lib/theme';
@@ -127,7 +128,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
     [state]
   );
   const [selectedTracks, setSelectedTracks] = useState<string[]>(['all']);
-  const [selectedBox, setSelectedBox] = useState<number | 'all'>('all');
+  const [selectedBox, setSelectedBox] = useState<number | number[] | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<CatalogStatusFilter>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<number | 'all'>('all');
   const [sortOption, setSortOption] = useState<CatalogSortOption>('track-asc');
@@ -140,7 +141,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
 
   const { totalCompletedReviews, unlockedStageCount = 0 } = state;
   const topics = visibleTopics(state); // cards of disabled optional packs are hidden
-  const hiddenCount = state.topics.length - topics.length;
 
   const isAllTracks =
     selectedTracks.includes('all') ||
@@ -178,6 +178,51 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       } else {
         setSelectedTracks(next);
       }
+    }
+  };
+
+  const handleExclusiveTrackSelect = (trk: string) => {
+    if (selectedTracks.length === 1 && selectedTracks[0] === trk) {
+      setSelectedTracks(['all']);
+    } else {
+      setSelectedTracks([trk]);
+    }
+  };
+
+  const handleExclusiveMultiTrackSelect = (tracks: string[]) => {
+    const isAlreadyExact =
+      !isAllTracks &&
+      selectedTracks.length === tracks.length &&
+      tracks.every((t) => selectedTracks.includes(t));
+
+    if (isAlreadyExact) {
+      setSelectedTracks(['all']);
+    } else {
+      setSelectedTracks(tracks);
+    }
+  };
+
+  const handleExclusiveBoxSelect = (box: number | number[] | 'all') => {
+    if (box === 'all') {
+      setSelectedBox('all');
+      return;
+    }
+    if (Array.isArray(box)) {
+      if (
+        Array.isArray(selectedBox) &&
+        selectedBox.length === box.length &&
+        box.every((b) => selectedBox.includes(b))
+      ) {
+        setSelectedBox('all');
+      } else {
+        setSelectedBox(box);
+      }
+      return;
+    }
+    if (selectedBox === box) {
+      setSelectedBox('all');
+    } else {
+      setSelectedBox(box);
     }
   };
 
@@ -361,7 +406,15 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const filteredTopics = topics
     .filter((t) => {
       if (!isAllTracks && !selectedTracks.includes(t.track)) return false;
-      if (selectedBox !== 'all' && t.box !== selectedBox) return false;
+      if (selectedBox !== 'all') {
+        if (Array.isArray(selectedBox)) {
+          if (!selectedBox.includes(t.box)) return false;
+        } else if (algorithm === 'graduated-interval' && selectedBox === 5) {
+          if (t.box < 5) return false;
+        } else {
+          if (t.box !== selectedBox) return false;
+        }
+      }
       if (selectedStatus === 'active' && t.status !== 'active') return false;
       if (selectedStatus === 'locked' && t.status !== 'locked') return false;
       if (selectedStatus === 'due' && (t.status !== 'active' || t.nextEligibleTrial > totalCompletedReviews)) return false;
@@ -442,64 +495,85 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         </div>
       </div>
 
-      {hiddenCount > 0 && (
+      {/* Top Section: 2x2 KPI Cards + Circular Stats Widget */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gap: '16px',
+          alignItems: 'stretch',
+        }}
+      >
+        {/* Left: 2x2 KPI Grid */}
         <div
-          role="note"
-          style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontSize: '13px', color: 'var(--text-secondary)' }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '12px',
+          }}
         >
-          {hiddenCount} cards from optional packs (e.g. Advanced algorithms) are hidden. Enable them in Settings → Optional card packs.
-        </div>
-      )}
+          {/* Total Reviews */}
+          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Completed Reviews</div>
+            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--accent-cyan)' }}>
+              #{totalCompletedReviews}
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              Global trial progression
+            </div>
+          </div>
 
-      {/* Summary KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
-        {/* Total Reviews */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Completed Reviews</div>
-          <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--accent-cyan)' }}>
-            #{totalCompletedReviews}
+          {/* Active vs Locked */}
+          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Deck Distribution</div>
+            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--text-primary)' }}>
+              {activeCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {topics.length}</span>
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              {lockedCount} cards locked in reserve
+            </div>
           </div>
-          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            Global trial progression
+
+          {/* Mastered */}
+          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
+              {algorithm === 'graduated-interval' ? 'Mastered / Long-term (Tier 5+)' : 'Mastered (Box 5)'}
+            </div>
+            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#34d399' }}>
+              {masteredCount}
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              {algorithm === 'graduated-interval' ? '+35 to +800+ review intervals' : '+45 review interval reached'}
+            </div>
+          </div>
+
+          {/* Staged Unlock Progress */}
+          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Staged Unlock Progress</div>
+            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#fbbf24' }}>
+              {box3PlusCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {nextUnlockTarget} in B3+</span>
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+              {lockedCount > 0
+                ? `${cardsNeededForNextUnlock} more Box 3+ cards unlocks 4 new topics`
+                : 'All topics unlocked!'}
+            </div>
           </div>
         </div>
 
-        {/* Active vs Locked */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Deck Distribution</div>
-          <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--text-primary)' }}>
-            {activeCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {topics.length}</span>
-          </div>
-          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            {lockedCount} cards locked in reserve
-          </div>
-        </div>
-
-        {/* Mastered */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
-            {algorithm === 'graduated-interval' ? 'Mastered / Long-term (Tier 5+)' : 'Mastered (Box 5)'}
-          </div>
-          <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#34d399' }}>
-            {masteredCount}
-          </div>
-          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            {algorithm === 'graduated-interval' ? '+35 to +800+ review intervals' : '+45 review interval reached'}
-          </div>
-        </div>
-
-        {/* Staged Unlock Progress */}
-        <div className="glass-panel" style={{ padding: '16px' }}>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Staged Unlock Progress</div>
-          <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#fbbf24' }}>
-            {box3PlusCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {nextUnlockTarget} in B3+</span>
-          </div>
-          <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-            {lockedCount > 0
-              ? `${cardsNeededForNextUnlock} more Box 3+ cards unlocks 4 new topics`
-              : 'All topics unlocked!'}
-          </div>
-        </div>
+        {/* Right: Rounded Stats & Visual Chart Widget */}
+        <DeckStatsWidget
+          state={state}
+          topics={topics}
+          theme={theme}
+          selectedTracks={selectedTracks}
+          selectedBox={selectedBox}
+          onSelectExclusiveTrack={handleExclusiveTrackSelect}
+          onSelectExclusiveTracks={handleExclusiveMultiTrackSelect}
+          onSelectExclusiveBox={handleExclusiveBoxSelect}
+          onSelectTrack={handleExclusiveTrackSelect}
+          onSelectCardToPractice={onSelectCardToPractice}
+        />
       </div>
 
       {/* Leitner Box Breakdown Strip */}
@@ -518,46 +592,52 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           Active Spacing Tiers:
         </div>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          {displayedBoxes.map((b, idx) => (
-            <div
-              key={b}
-              onClick={() => setSelectedBox(selectedBox === b ? 'all' : b)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                backgroundColor: selectedBox === b ? 'var(--bg-elevated)' : 'rgba(255, 255, 255, 0.03)',
-                border: selectedBox === b ? `1px solid var(--box-${Math.min(9, b)})` : '1px solid var(--border-subtle)',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-            >
+          {displayedBoxes.map((b, idx) => {
+            const isBoxSelected =
+              selectedBox !== 'all' &&
+              (Array.isArray(selectedBox) ? selectedBox.includes(b) : selectedBox === b);
+
+            return (
               <div
+                key={b}
+                onClick={() => setSelectedBox(isBoxSelected ? 'all' : b)}
                 style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  backgroundColor: `var(--box-${Math.min(9, b)})`,
-                }}
-              />
-              <span style={{ fontSize: '12.5px', fontWeight: 600 }}>
-                {tierName} {b} (+{intervalForBox(b, algorithm)})
-              </span>
-              <span
-                style={{
-                  fontSize: '11.5px',
-                  padding: '1px 6px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  color: 'var(--text-primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: isBoxSelected ? 'var(--bg-elevated)' : 'rgba(255, 255, 255, 0.03)',
+                  border: isBoxSelected ? `1px solid var(--box-${Math.min(9, b)})` : '1px solid var(--border-subtle)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
                 }}
               >
-                {boxCounts[idx]}
-              </span>
-            </div>
-          ))}
+                <div
+                  style={{
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: `var(--box-${Math.min(9, b)})`,
+                  }}
+                />
+                <span style={{ fontSize: '12.5px', fontWeight: 600 }}>
+                  {tierName} {b} (+{intervalForBox(b, algorithm)})
+                </span>
+                <span
+                  style={{
+                    fontSize: '11.5px',
+                    padding: '1px 6px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  {boxCounts[idx]}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
         {/* Track Filters (Multi-Select with 'All Tracks') */}
