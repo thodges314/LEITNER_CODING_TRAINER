@@ -29,7 +29,7 @@ in the browser; state lives in `localStorage`.
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 854 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 468 card tests + 8 navigation tests, ~6 min on an idle machine with 4 workers). **Last full run on `master`: 465 passed, 3 flaky (passed on retry), 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 468 card tests + 8 navigation tests, ~6 min on an idle machine with 4 workers). **Last full run (branch `cleanup/difficulty-audit`): 476 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
