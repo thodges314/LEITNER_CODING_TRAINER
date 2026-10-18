@@ -46,7 +46,6 @@ import {
   Sparkles,
   Zap,
   X,
-  Eye,
   ExternalLink,
   Minimize2,
 } from 'lucide-react';
@@ -118,37 +117,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     element: React.ReactElement;
     key: number;
   } | null>(null);
-
-  // React preview window state (open by default, remembers preference if explicitly toggled)
-  const [isPreviewOpen, setIsPreviewOpen] = useState(() => {
-    try {
-      const saved = localStorage.getItem('leitner_preview_open');
-      return saved !== null ? saved === 'true' : true;
-    } catch {
-      return true;
-    }
-  });
-
-  const handleTogglePreview = useCallback(() => {
-    setIsPreviewOpen((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem('leitner_preview_open', String(next));
-      } catch {
-        // ignore
-      }
-      return next;
-    });
-  }, []);
-
-  const handleClosePreview = useCallback(() => {
-    setIsPreviewOpen(false);
-    try {
-      localStorage.setItem('leitner_preview_open', 'false');
-    } catch {
-      // ignore
-    }
-  }, []);
 
   // Pop-out state for legacy Component Preview / Hook Test box
   const [legacyPopupWindow, setLegacyPopupWindow] = useState<Window | null>(null);
@@ -302,15 +270,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setShowSolution(false);
     setShowHarness(true);
     setActivePopover(null);
-    const savedPreview = (() => {
-      try {
-        const saved = localStorage.getItem('leitner_preview_open');
-        return saved !== null ? saved === 'true' : true;
-      } catch {
-        return true;
-      }
-    })();
-    setIsPreviewOpen(savedPreview);
     if (currentCard) setInspectedTier(currentCard.box);
   }
 
@@ -2143,20 +2102,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </button>
 
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            {/* Opt-in React Preview Toggle (React cards with preview only) */}
-            {currentCard?.previewCode && (
-              <button
-                type="button"
-                id="preview-toggle-btn"
-                data-testid="preview-toggle-btn"
-                className={`btn ${isPreviewOpen ? 'btn-secondary' : 'btn-outline'}`}
-                onClick={handleTogglePreview}
-                style={{ fontSize: '13.5px', padding: '10px 16px', gap: '6px' }}
-                title="Toggle live React preview window"
-              >
-                <Eye size={15} color="#06b6d4" /> {isPreviewOpen ? 'Hide Preview' : 'Preview'}
-              </button>
-            )}
 
             {/* Secondary Button: Run Code / Test */}
             <button
@@ -2205,10 +2150,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           style={{
             marginTop: '12px',
             display: 'grid',
-            gridTemplateColumns:
-              (isPreviewOpen && currentCard?.previewCode) || (isReactTrack && !currentCard?.previewCode)
-                ? 'repeat(auto-fit, minmax(420px, 1fr))'
-                : '1fr',
+            gridTemplateColumns: isReactTrack
+              ? 'repeat(auto-fit, minmax(420px, 1fr))'
+              : '1fr',
             gap: '14px',
             alignItems: 'start',
           }}
@@ -2515,17 +2459,17 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             )}
           </div>
 
-          {/* Right-Side Preview Column: ReactPreview (when previewCode exists & open) OR Component Preview / Hook Test (React track legacy) */}
-          {isPreviewOpen && currentCard?.previewCode ? (
-            <ReactPreview
-              card={currentCard}
-              code={code}
-              executionMode={executionMode}
-              theme={theme}
-              onClose={handleClosePreview}
-            />
-          ) : isReactTrack && !currentCard?.previewCode ? (
-            <div
+          {/* Right-Side Box on React Problems: Live React Preview (if card has previewCode) or Legacy Component Preview */}
+          {isReactTrack && (
+            currentCard?.previewCode ? (
+              <ReactPreview
+                card={currentCard}
+                code={code}
+                executionMode={executionMode}
+                theme={theme}
+              />
+            ) : (
+              <div
               className="legacy-component-preview-container"
               style={{
                 borderRadius: '8px',
@@ -2815,7 +2759,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 )}
               </div>
             </div>
-          ) : null}
+          ))}
         </div>
       </div>
     </div>

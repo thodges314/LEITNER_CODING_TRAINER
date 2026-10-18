@@ -22,7 +22,7 @@ export interface ReactPreviewProps {
   code: string;
   executionMode: ExecutionMode;
   theme?: 'dark' | 'apple-gsos';
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export interface PreviewLogItem {
@@ -482,27 +482,29 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             </button>
           )}
 
-          <button
-            type="button"
-            onClick={() => {
-              if (isPoppedOut) handleDockBack();
-              onClose();
-            }}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-dim)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '3px 6px',
-              borderRadius: '4px',
-            }}
-            title="Close preview"
-            aria-label="Close preview"
-          >
-            <X size={15} />
-          </button>
+          {onClose && (
+            <button
+              type="button"
+              onClick={() => {
+                if (isPoppedOut) handleDockBack();
+                onClose();
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-dim)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '3px 6px',
+                borderRadius: '4px',
+              }}
+              title="Close preview"
+              aria-label="Close preview"
+            >
+              <X size={15} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -709,27 +711,29 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             >
               <Minimize2 size={13} /> Dock back
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                handleDockBack();
-                onClose();
-              }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-dim)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                padding: '3px 6px',
-                borderRadius: '4px',
-              }}
-              title="Close preview"
-              aria-label="Close preview"
-            >
-              <X size={15} />
-            </button>
+            {onClose && (
+              <button
+                type="button"
+                onClick={() => {
+                  handleDockBack();
+                  onClose();
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-dim)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '3px 6px',
+                  borderRadius: '4px',
+                }}
+                title="Close preview"
+                aria-label="Close preview"
+              >
+                <X size={15} />
+              </button>
+            )}
           </div>
         </div>
         {createPortal(previewPane, popupWindow.document.body)}

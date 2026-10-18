@@ -47,25 +47,24 @@ async function openCard(page: Page, id: string, code?: string) {
 }
 
 test.describe('React preview window', () => {
-  test('cards without a preview do not show the Preview toggle', async ({ page }) => {
+  test('non-React cards do not show the React preview window or toggle button', async ({ page }) => {
     // binary-search-exact is an algorithm card without previewCode
     await openCard(page, 'binary-search-exact');
     await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);
     await expect(page.locator('[data-testid="react-preview-window"]')).toHaveCount(0);
   });
 
-  test('switch-toggle-a11y: open by default, can be hidden and reopened via toggle button', async ({ page }) => {
+  test('switch-toggle-a11y: is part of the interface by default, mounts in sandboxed iframe, and logs click events', async ({ page }) => {
     const card = topics.find((t) => t.id === 'switch-toggle-a11y');
     expect(card).toBeDefined();
     const solution = card?.referenceSolution || card?.solution || '';
 
     await openCard(page, 'switch-toggle-a11y', solution);
 
-    const toggleBtn = page.locator('#preview-toggle-btn');
-    await expect(toggleBtn).toBeVisible();
-    await expect(toggleBtn).toContainText('Hide Preview');
+    // No eyeball/toggle button (preview is permanent part of interface)
+    await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);
 
-    // Open by default
+    // Live preview window is visible immediately
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
 
@@ -84,15 +83,6 @@ test.describe('React preview window', () => {
     // The Event Log & Output panel under the preview should record the onChange event
     const eventLog = previewWindow.getByText(/onChange/);
     await expect(eventLog.first()).toBeVisible();
-
-    // Close preview via toggle button
-    await toggleBtn.click();
-    await expect(page.locator('[data-testid="react-preview-window"]')).toHaveCount(0);
-    await expect(toggleBtn).toContainText('Preview');
-
-    // Reopen preview via toggle button
-    await toggleBtn.click();
-    await expect(page.locator('[data-testid="react-preview-window"]')).toBeVisible();
   });
 
   test('star-rating-component: mounts in sandboxed iframe and logs rating change on interaction', async ({ page }) => {
