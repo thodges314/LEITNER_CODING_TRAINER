@@ -284,15 +284,27 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 **React preview window (spec, not built; owner suggests Gemini implements it; React problems only, not general JavaScript).**
 Goal: while solving a React card (tracks `react` and `react-components`), show the component the user is writing in a small separate
 pane or pop-out window, without disturbing the editor, Run Code or Submit.
-- Opt-in and non-blocking: a "Preview" toggle on React cards only (hidden for plain-JS cards); closed by default; the editor stays fully usable.
-- Run the user's code in a **sandboxed iframe** (`sandbox="allow-scripts"`, `srcdoc`) that loads React/ReactDOM, transpiles with the same pipeline as `runner.ts` and renders the
-  component the card asks for with default/no props (for cards that need props, render the first `render(<X .../>)` call found in the card's harness, or let the card carry an optional
-  `previewProps` field). Send code to the iframe with `postMessage`; send console output and errors back and show them under the preview.
+- Opt-in and non-blocking: a "Preview" toggle on React cards that have a preview (hidden otherwise); closed by default; the editor stays fully usable.
+- **Every previewable card defines what to render in `scripts/cards/<id>.preview.js`** (props, callbacks, providers: nothing is guessed from the harness).
+  `build-cards.mjs` copies it into the generated card as `previewCode`. The file contains plain JSX that may use the names the card asks the user to write, plus a
+  `log(name, returnValue?)` helper. Examples:
+  - component: `<Toolbar label="Text formatting" items={[{ id: 'b', label: 'Bold' }, { id: 'i', label: 'Italic' }]} />`
+  - callback props: `<Switch checked={on} onChange={log('onChange')}>Wi-Fi</Switch>`. `log('onChange')` returns a function that appends `onChange(true)` (name + arguments) to an
+    event-log panel under the preview and returns `undefined`. Pass a second argument for callbacks that must return something: `log('fetchPage', Promise.resolve({ items: [], hasMore: false }))`.
+    Async props are written inline: `fetchPage={async (page) => ({ items: ['a', 'b'], hasMore: page < 3 })}`.
+  - controlled components that need state: define a small `function Demo() { const [on, setOn] = useState(false); return <Switch checked={on} onChange={setOn}>Wi-Fi</Switch>; }` and end the file with `<Demo />`.
+  - hooks: a demo component that calls the hook and shows its result and a couple of buttons that use it (`function Demo() { const [n, inc] = useCounter(); return <button onClick={inc}>{n}</button>; }`).
+  - providers/context: wrap in the provider the card asks for (`<AnnouncerProvider><Demo /></AnnouncerProvider>`).
+  The last expression of the file is the element to render. Pure-function cards and cards with no UI have no preview file (so no toggle).
+- Run the user's code + the preview file in a **sandboxed iframe** (`sandbox="allow-scripts"`, `srcdoc`) that loads React/ReactDOM and transpiles with the same pipeline as `runner.ts`.
+  Send code to the iframe with `postMessage`; send console output, thrown errors and `log(...)` events back and show them under the preview.
 - Re-render on a debounce (about 500 ms) as the user types; a render error shows a small error box, never breaks the main app.
 - Bonus: because it runs in an iframe it also gives the app real isolation for runaway code (kill/replace the iframe on a timeout), which §7.3 item 3 wants anyway.
-- Acceptance: a Playwright test that opens a React card, types a trivial component, toggles Preview, and sees it rendered; a test that an infinite loop in the preview does not freeze the page.
-4. **Duplicate cards**: ~12 near-duplicates (debounce ×3, throttle ×2, deep-clone ×2, LRU ×2, useFetch ×2, useDebounce ×2, infinite scroll ×2,
-   merge-intervals ×2). Decision pending: keep as spaced-repetition variants but tag them (`variant-of`), or merge.
+- **Automated check (the guard that keeps preview files honest):** a unit test mounts every card's `previewCode` together with that card's **reference solution** in jsdom: it must render without throwing and
+  produce non-empty DOM (and any `log` callback must not throw). Plus a Playwright test that opens a React card, toggles Preview, sees it rendered, and a test that an infinite loop in the preview does not freeze the page.
+- Work split: (1) the iframe window + `previewCode` plumbing + guard test (one Gemini task); (2) writing `<id>.preview.js` for the ~65 existing React cards (mechanical, checked by the guard test);
+  (3) from then on every new React card ships its preview file (rule 10 in `DELEGATION.md`).
+4. **Duplicate cards**: RESOLVED by the 2026-10 audit (8 near-duplicates removed, the rest are deliberate progressions; see §7.4e).
 5. **Difficulty in the catalog**: sort/filter by difficulty and concept; show the ladder (which rung unlocks next and why a card is locked).
 6. Optional: per-card hints that reveal the reference solution progressively; export/import of drafts.
 

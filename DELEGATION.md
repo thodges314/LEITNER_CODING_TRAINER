@@ -16,12 +16,14 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
    React harnesses that read effect- or hover-driven state need `await wait(30)` (production React has no `act`).
 7. Update the counts and the relevant roadmap rows in `ARCHITECTURE_AND_ROADMAP.md` in the same commit. No absolute `file:///` links in docs.
 8. Do not edit `src/data/topics.json` by hand (it is generated). To DELETE a card follow the checklist in roadmap §7.4e (and add its id to `RETIRED_SEED_IDS`).
+10. Every NEW React card (tracks `react`, `react-components`) also ships `scripts/cards/<id>.preview.js` (once task A exists); see roadmap §7.3 for the format.
 9. Rate difficulty with the rubric in roadmap §7.4e and check the card is not a duplicate/subset of an existing one (same concept) before adding it.
 
 ## Good to delegate (well-specified, verifiable by the gates above)
 | # | Task | Notes / acceptance |
 |---|---|---|
-| A | **React preview window** (spec in roadmap §7.3) | Opt-in, React cards only, sandboxed iframe, debounced re-render, console/errors panel, never blocks the editor. Acceptance: Playwright test renders a trivial component; an infinite loop inside the preview does not freeze the page. Largest task; best for a long Gemini session. |
+| A | **React preview window**: the feature (spec in roadmap §7.3) | Iframe window + `previewCode` plumbing in `build-cards.mjs` + the guard unit test (mounts every `previewCode` with the card's reference solution) + Playwright tests. Opt-in, React cards that have a preview only, never blocks the editor. Largest task; best for a long Gemini session. |
+| A2 | **Write `<id>.preview.js` for every existing React card** (~65: all of `react` and `react-components`) | Mechanical once A exists. Per card: the props, callback stubs (`log('onChange')`), async props, provider wrappers or a small `Demo` component, exactly as described in roadmap §7.3. Done when the guard test passes for all of them. Do in batches of ~10 cards per commit. |
 | B | **Accessibility cards** (batches of 3) | `aria-live` announcer, focus-trap utility, roving-tabindex hook, skip link / focus after route change, accessible combobox (d5). DOM harness style like `tooltip` / `dropdown-menu`. |
 | C | **DOM/browser API cards** (batches of 3) | keyboard-accessible drag-sortable list, `history.pushState` router, clipboard copy button, keyboard shortcut manager (chords), `MutationObserver`/`ResizeObserver` wrappers, `requestAnimationFrame` loop. Mock browser APIs inside the harness and restore them. |
 | D | **Remaining "build this" screens** | popover with positioning logic, stepper/progress steps, lazy image (IntersectionObserver), copy button, kanban board, nested comments. |
