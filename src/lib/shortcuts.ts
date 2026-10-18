@@ -31,7 +31,7 @@ interface ShortcutDef {
 export const SHORTCUTS: Record<ShortcutId, ShortcutDef> = {
   run: { label: 'Run tests', mac: ['⌘', '↵'], other: ['Ctrl', 'Enter'], aria: 'Control+Enter Meta+Enter' },
   submit: {
-    label: 'Submit for evaluation',
+    label: 'Submit final answer',
     mac: ['⌘', '⇧', '↵'],
     other: ['Ctrl', 'Shift', 'Enter'],
     aria: 'Control+Shift+Enter Meta+Shift+Enter',

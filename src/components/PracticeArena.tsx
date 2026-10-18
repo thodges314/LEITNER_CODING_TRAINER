@@ -564,6 +564,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       const harness = await runHarness(currentCard, code, executionMode);
       const res = await evaluateCodeSubmission(currentCard, code, harness, executionMode);
       setEvalResult(res);
+      setShowSolution(!res.passed);
       setIsTimerRunning(false);
     } catch (err) {
       console.error('Evaluation error:', err);
@@ -1892,10 +1893,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
             <Terminal size={16} color="var(--accent-cyan)" />
-            <span style={{ fontSize: '13px', fontWeight: 600 }}>Cold-Start Buffer</span>
+            <span style={{ fontSize: '13px', fontWeight: 600 }}>{evalResult ? 'Your Submitted Answer (locked)' : 'Cold-Start Buffer'}</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '12px', color: 'var(--text-muted)', flexWrap: 'wrap', ...(evalResult ? { pointerEvents: 'none' as const, opacity: 0.4 } : {}) }}>
             {formatToast && (
               <span
                 style={{
@@ -2019,6 +2020,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             basicSetup={cmBasicSetup}
             extensions={extensions}
             onChange={(val) => setCode(val)}
+            editable={!evalResult}
+            readOnly={Boolean(evalResult)}
             placeholder="// Type your solution from scratch without autocomplete or hints...
 // Press [Tab] for 2-space indentation.
 // Bracket pair colorization and autoclosing brackets/quotes are enabled."
@@ -2029,6 +2032,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         {/* Mode Selector Bar: JS (Fast) vs TS (Strict Type Check) */}
         <div
           style={{
+            ...(evalResult ? { pointerEvents: 'none' as const, opacity: 0.4 } : {}),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -2104,6 +2108,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </div>
         </div>
 
+        {!evalResult && (
+          <>
         {/* Action Controls Bar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', flexWrap: 'wrap', gap: '10px' }}>
           <button
@@ -2138,7 +2144,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               )}
             </button>
 
-            {/* Primary Button: Submit for Evaluation */}
+            {/* Primary Button: Submit Final Answer (the scored attempt) / Check My Practice (drill, no score) */}
             <button
               type="button"
               className="btn btn-primary"
@@ -2149,16 +2155,26 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             >
               {isEvaluating ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" /> Evaluating Code with AI...
+                  <Loader2 size={16} className="animate-spin" /> Checking your answer...
                 </>
               ) : (
                 <>
-                  <Send size={16} /> Submit for Evaluation
+                  <Send size={16} /> {isReinforcement ? 'Check My Practice' : 'Submit Final Answer'}
                 </>
               )}
             </button>
           </div>
         </div>
+          </>
+        )}
+
+        {!evalResult && (
+          <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-muted)', textAlign: 'right' }} data-testid="submit-help">
+            {isReinforcement
+              ? 'Practice drill: nothing here changes your score. Retype the solution, then check it.'
+              : 'Run Code / Test checks your code without scoring it. Submit Final Answer is your scored attempt.'}
+          </p>
+        )}
 
         {/* Test Runner & Live Preview Container */}
         <div

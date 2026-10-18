@@ -2,11 +2,11 @@ import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 async function submitAndCommit(page: Page) {
-  const submitBtn = page.getByRole('button', { name: /Submit for Evaluation/i });
+  const submitBtn = page.getByRole('button', { name: /Submit Final Answer|Check My Practice/i });
   await expect(submitBtn).toBeEnabled({ timeout: 10000 });
   await submitBtn.click();
   const commitBtn = page.getByRole('button', {
-    name: /Commit Result & Continue|Commit & Practice Pattern|Skip Drill & Continue|Continue to Next Card/i,
+    name: /Practice the Pattern|Skip Drill & Continue|Continue to Next Card/i,
   });
   await expect(commitBtn).toBeVisible({ timeout: 10000 });
   await commitBtn.click();

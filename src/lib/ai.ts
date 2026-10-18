@@ -246,12 +246,27 @@ Return pure JSON:
   "critique": string
 }`;
 
+/** Removes // and block comments, so the starter buffer's commented-out examples are never mistaken for the user's code. */
+export function stripComments(code: string): string {
+  return code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/.*$/gm, '$1');
+}
+
+/** Names of the failed checks in a harness report (lines look like `label: FAIL details`). */
+export function failedCheckNames(harness?: HarnessReport): string[] {
+  const names: string[] = [];
+  for (const line of harness?.lines ?? []) {
+    const match = /^\s*(.*?):\s+FAIL\b/.exec(line);
+    if (match && match[1].trim()) names.push(match[1].trim());
+  }
+  return names;
+}
+
 /**
  * Intelligent client-side heuristic evaluator used when no API key is provided
  * or when the user desires instant offline evaluation.
  */
 function heuristicEvaluateCode(topic: TopicItem, code: string, harness?: HarnessReport): EvaluationResult {
-  const trimmed = code.trim();
+  const trimmed = stripComments(code).trim();
   const lines = trimmed.split('\n').filter((l) => l.trim().length > 0);
 
   if (!harness?.ran && (trimmed.length < 20 || lines.length <= 2)) {
@@ -373,10 +388,12 @@ function heuristicEvaluateCode(topic: TopicItem, code: string, harness?: Harness
           harnessRan
             ? `Test harness did not pass (${harness?.summary}).`
             : `Could not verify automatically (${harness?.summary ?? 'no harness result'}); structural checks are advisory only. Use the override if you judge the solution correct.`
-        } Review the problem constraints, especially boundary condition handling and error branches.${
-          (topic.referenceSolution || topic.solution || topic.starterCode)
-            ? `\n\n### Canonical Reference Pattern\n\`\`\`typescript\n${topic.referenceSolution || topic.solution || topic.starterCode}\n\`\`\``
-            : ''
+        }${
+          failedCheckNames(harness).length ? ` Failed checks: ${failedCheckNames(harness).slice(0, 6).join('; ')}.` : ''
+        }${
+          topic.referenceSolution || topic.solution || topic.starterCode
+            ? ' The reference solution is shown below: study it, then practice the pattern.'
+            : ' Review the problem constraints, especially boundary conditions and error branches.'
         }`,
     evaluationSource: 'heuristic-mock',
   };

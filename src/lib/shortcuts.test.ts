@@ -38,7 +38,7 @@ describe('shortcut labels', () => {
   it('builds tooltip text and button attributes', () => {
     expect(shortcutTooltip('run', 'other')).toBe('Run tests (Ctrl+Enter)');
     expect(shortcutAttrs('submit', 'mac')).toEqual({
-      'data-shortcut': 'Submit for evaluation (⌘⇧↵)',
+      'data-shortcut': 'Submit final answer (⌘⇧↵)',
       'aria-keyshortcuts': 'Control+Shift+Enter Meta+Shift+Enter',
     });
   });

@@ -32,7 +32,7 @@ npm run build      # type-check + production build into dist/
 - **Keyboard Shortcuts**:
   - `Shift + Alt + F` / `Cmd + Shift + F`: Format code with Prettier
   - `Cmd + Enter` / `Ctrl + Enter`: Run Code against test harness in sandbox
-  - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit for evaluation
+  - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit final answer
   - `Tab`: Indent with 2 spaces
   - `Cmd + /` / `Ctrl + /`: Toggle line comments
 - **Grading** (`src/lib/runner.ts`): on submit the card's test harness is run headlessly against your code.

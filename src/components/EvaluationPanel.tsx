@@ -974,14 +974,16 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
           </div>
 
           <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={onRetry}
-              style={{ fontSize: '13px' }}
-            >
-              <RotateCcw size={15} /> {effectiveVerdict ? 'Practice Again' : 'Edit & Try Again'}
-            </button>
+            {!effectiveVerdict && (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onRetry}
+                style={{ fontSize: '13.5px', padding: '10px 20px', fontWeight: 600 }}
+              >
+                <RotateCcw size={15} /> Try Again
+              </button>
+            )}
             <button
               type="button"
               className={effectiveVerdict ? 'btn btn-success' : 'btn btn-outline'}
@@ -1062,15 +1064,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              type="button"
-              className="btn btn-outline"
-              onClick={onRetry}
-              style={{ fontSize: '13px' }}
-            >
-              <RotateCcw size={15} /> Edit & Retest
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
             <button
               type="button"
               className={effectiveVerdict ? 'btn btn-success' : 'btn btn-primary'}
@@ -1079,14 +1073,19 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             >
               {effectiveVerdict ? (
                 <>
-                  <Check size={16} /> Commit Result & Continue
+                  <Check size={16} /> Continue to Next Card
                 </>
               ) : (
                 <>
-                  <RotateCcw size={16} /> Commit & Practice Pattern
+                  <ArrowRight size={16} /> Practice the Pattern
                 </>
               )}
             </button>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)', maxWidth: '300px', textAlign: 'right' }}>
+              {effectiveVerdict
+                ? 'Your result is recorded when you continue.'
+                : 'Your attempt is recorded. Next you retype the solution as a short drill (no score impact).'}
+            </span>
           </div>
         </div>
       )}

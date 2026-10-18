@@ -34,7 +34,7 @@ async function submitCard(page: Page, id: string, code: string): Promise<{ verdi
     { id, code, DECK_KEY, DRAFT_PREFIX }
   );
   await page.reload();
-  await page.getByRole('button', { name: /Submit for Evaluation/ }).click();
+  await page.getByRole('button', { name: /Submit Final Answer/ }).click();
   const verdict = page.getByText(VERDICT);
   await expect(verdict.first()).toBeVisible();
   // Compile failures (TS cards) have no harness summary, so don't wait for one.

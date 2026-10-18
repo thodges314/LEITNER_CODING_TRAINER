@@ -43,7 +43,7 @@ test.describe('back button', () => {
   test('the app opens on the practice view', async ({ page }) => {
     await openApp(page);
     await expect(page.getByText(DECK_HEADING)).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /Submit for Evaluation/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Submit Final Answer/ })).toBeVisible();
   });
 
   test('Back from a problem shows the deck and stays in the app', async ({ page }) => {

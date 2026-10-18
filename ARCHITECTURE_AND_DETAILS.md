@@ -60,7 +60,7 @@ Located in [PracticeArena.tsx](src/components/PracticeArena.tsx):
 - Shortcuts:
   - `Shift + Alt + F` / `Cmd + Shift + F`: Auto-format code
   - `Cmd + Enter` / `Ctrl + Enter`: Run Code / Test
-  - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit for Evaluation
+  - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit final answer
   - `Tab`: Indent with 2 spaces
 
 ---

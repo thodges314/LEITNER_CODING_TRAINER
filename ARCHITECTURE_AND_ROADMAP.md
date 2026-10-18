@@ -29,7 +29,7 @@ in the browser; state lives in `localStorage`.
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 955 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 262 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 524 card tests + 12 navigation/shortcut tests + 6 preview tests + 4 backup advisory tests = 550 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/polish-and-perf`): 550 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 262 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 524 card tests + 12 navigation/shortcut tests + 6 preview tests + 4 answer-flow tests + 4 backup advisory tests = 554 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/flow-and-perf`): 554 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -110,7 +110,7 @@ expression to produce the expected value instead of the display text `x`.
 - **In-browser code formatting (`src/lib/formatter.ts`)**: Prettier standalone (`prettier/standalone` with `@prettier/plugins/babel`, `estree`, and `typescript`) runs 100% in-browser with zero backend dependencies. Format triggered via UI button or shortcuts:
   - `Shift + Alt + F` or `Cmd + Shift + F` (`Ctrl + Shift + F` on Win/Linux): Format code
   - `Cmd + Enter` / `Ctrl + Enter`: Run Code / Test
-  - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit for Evaluation
+  - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit final answer
   - `Tab`: Indent 2 spaces (`indentWithTab`, `indentUnit.of('  ')`)
   - `Cmd + /` / `Ctrl + /`: Toggle line comments (`defaultKeymap`)
 
@@ -416,6 +416,13 @@ Pick the order; each batch follows the §4 checklist including the complexity st
 ### 7.8 Keyboard shortcut hints (DONE)
 `src/lib/shortcuts.ts` is the single table of shortcuts (run = Ctrl/Cmd+Enter, submit = Ctrl/Cmd+Shift+Enter, format = Shift+Alt+F or Ctrl/Cmd+Shift+F) with Mac and non-Mac labels (`detectPlatform`: `userAgentData.platform`, then `navigator.platform`, then the user agent).
 Buttons get `{...shortcutAttrs(id)}` (`data-shortcut` shows a CSS tooltip on hover and keyboard focus, hidden on touch-only devices; plus `aria-keyshortcuts`), and Settings has a collapsible "Keyboard shortcuts" list. If you change a handler in `PracticeArena`, change `SHORTCUTS` too. Tests: `shortcuts.test.ts`, `e2e/shortcuts.spec.ts`.
+
+### 7.9 Answer flow (DONE): one obvious next step
+The flow is designed so the user always knows what to press. `e2e/flow.spec.ts` locks it in.
+1. **Answering** (`PracticeArena`): `Skip Card`, `Run Code / Test` (free, unscored, the console shows the checks) and **`Submit Final Answer`** (the one scored attempt; a line under the buttons says so). Inside a practice drill the same button reads **`Check My Practice`** and the line says nothing changes the score.
+2. **After a result** (`EvaluationPanel`): the answering controls disappear and the editor is locked ("Your Submitted Answer (locked)"). There is exactly one next step: pass -> **Continue to Next Card**; fail -> **Practice the Pattern** (records the attempt and starts the unscored drill). There is no "retest" of a submitted answer; use Run Code / Test before submitting. The "Override verdict" checkbox stays on the result panel.
+3. **Failed attempt**: the critique names the failed checks ("Failed checks: ..."), and the reference solution appears once, in the Reveal panel, which opens automatically after a failure (it is no longer pasted into the critique, and the offline structural checks ignore comments, so the commented-out starter examples are never credited).
+4. **Inside the drill**: pass -> **Continue to Next Card**; miss -> **Try Again** or **Skip Drill & Continue** (the banner also has Skip Drill).
 
 ## 8. Conventions and pitfalls for assistants
 

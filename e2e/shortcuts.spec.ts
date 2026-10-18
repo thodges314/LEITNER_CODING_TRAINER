@@ -20,7 +20,7 @@ test.describe('keyboard shortcut hints', () => {
     const mac = await isMac(page);
     const expected = {
       run: mac ? 'Run tests (⌘↵)' : 'Run tests (Ctrl+Enter)',
-      submit: mac ? 'Submit for evaluation (⌘⇧↵)' : 'Submit for evaluation (Ctrl+Shift+Enter)',
+      submit: mac ? 'Submit final answer (⌘⇧↵)' : 'Submit final answer (Ctrl+Shift+Enter)',
       format: mac ? 'Format code (⇧⌥F)' : 'Format code (Shift+Alt+F)',
     };
     for (const [id, text] of Object.entries(expected)) {
@@ -52,7 +52,7 @@ test.describe('keyboard shortcut hints', () => {
     });
     await openApp(page);
     await expect(page.locator('[data-shortcut^="Run tests"]')).toHaveAttribute('data-shortcut', 'Run tests (⌘↵)');
-    await expect(page.locator('[data-shortcut^="Submit"]')).toHaveAttribute('data-shortcut', 'Submit for evaluation (⌘⇧↵)');
+    await expect(page.locator('[data-shortcut^="Submit"]')).toHaveAttribute('data-shortcut', 'Submit final answer (⌘⇧↵)');
     await expect(page.locator('[data-shortcut^="Format"]')).toHaveAttribute('data-shortcut', 'Format code (⇧⌥F)');
     await page.getByRole('button', { name: /Settings/ }).first().click();
     await page.getByTestId('shortcuts-section').getByText('Keyboard shortcuts').click();
@@ -68,7 +68,7 @@ test.describe('keyboard shortcut hints', () => {
     const list = page.getByTestId('shortcuts-list');
     await expect(list.getByRole('listitem')).toHaveCount(3);
     await expect(list).toContainText('Run tests');
-    await expect(list).toContainText('Submit for evaluation');
+    await expect(list).toContainText('Submit final answer');
     await expect(list).toContainText('Format code');
     await expect(list.locator('kbd').first()).toHaveText(mac ? '⌘' : 'Ctrl');
   });
