@@ -1010,5 +1010,17 @@
   "form-error-summary": {
     "difficulty": 3,
     "concept": "a11y-components"
+  },
+  "suspense-use-promise": {
+    "difficulty": 2,
+    "concept": "suspense-transitions"
+  },
+  "tabs-transition-suspense": {
+    "difficulty": 4,
+    "concept": "suspense-transitions"
+  },
+  "action-state-form": {
+    "difficulty": 3,
+    "concept": "react-forms"
   }
 }

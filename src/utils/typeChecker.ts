@@ -70,6 +70,13 @@ const SANDBOX_GLOBALS = `
   declare var useImperativeHandle: any;
   declare var forwardRef: any;
   declare var createContext: any;
+  declare var use: any;
+  declare var Suspense: any;
+  declare var startTransition: any;
+  declare var useTransition: any;
+  declare var useDeferredValue: any;
+  declare var useOptimistic: any;
+  declare var useActionState: any;
   declare var IntersectionObserver: any;
   declare var $test: any;
   declare var $dom: any;

@@ -14823,5 +14823,157 @@
       }
     ],
     "testHarness": "const { render, fire, q, qa } = $dom;\nconst originalTitle = document.title;\nconst page = (path, title, body = 'content') => (\n  <Layout path={path} title={title}>\n    <button id=\"inside\">{body}</button>\n  </Layout>\n);\nconst active = () => document.activeElement;\n{\n  const r = render(page('/', 'Home'));\n  const first = q('a, button, [tabindex]:not([tabindex=\"-1\"])', r.container);\n  const main = q('main', r.container);\n  $test.check('The skip link is the first focusable element and points at the main landmark', !!first && first.tagName === 'A' && first.getAttribute('href') === '#main-content' && first.textContent === 'Skip to main content' && !!main && main.id === 'main-content', first && first.outerHTML);\n  r.unmount();\n}\n{\n  const r = render(page('/', 'Home'));\n  fire.click(q('a', r.container));\n  const main = q('main', r.container);\n  $test.check('Clicking the skip link moves focus to <main id=\"main-content\" tabindex=\"-1\">', active() === main && main.getAttribute('tabindex') === '-1', active() && active().tagName);\n  r.unmount();\n}\n{\n  const r = render(page('/', 'Home'));\n  const first = document.title;\n  r.rerender(page('/about', 'About'));\n  const second = document.title;\n  $test.check('The document title follows the page title as \"<title> | My App\"', first === 'Home | My App' && second === 'About | My App', [first, second]);\n  r.unmount();\n}\n{\n  const r = render(page('/', 'Home'));\n  $test.check('The first render does not steal focus', active() === document.body || active() === null, active() && active().tagName);\n  r.unmount();\n}\n{\n  const r = render(page('/', 'Home'));\n  r.rerender(page('/about', 'About'));\n  const h1 = q('h1', r.container);\n  $test.check('Changing the path moves focus to the new page heading (h1)', active() === h1 && h1.textContent === 'About' && h1.getAttribute('tabindex') === '-1', active() && active().tagName);\n  r.unmount();\n}\n{\n  const r = render(page('/', 'Home'));\n  r.rerender(page('/about', 'About'));\n  q('#inside', r.container).focus();\n  r.rerender(page('/about', 'About', 'changed'));\n  $test.check('Re-rendering with the same path does not move focus again', active() === q('#inside', r.container), active() && active().tagName);\n  r.unmount();\n}\ndocument.title = originalTitle;\nif (document.activeElement && document.activeElement.blur) document.activeElement.blur();"
+  },
+  {
+    "id": "action-state-form",
+    "track": "react",
+    "title": "React 19 Form Action with useActionState",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react19",
+      "forms",
+      "useActionState",
+      "actions"
+    ],
+    "promptSeed": "Build SubscribeForm({ subscribe }) using a React 19 form action. subscribe(email) is async and resolves to { ok: true } or { ok: false, error: string }.\n\nUse useActionState(action, { status: 'idle', message: '' }); it returns [state, formAction, isPending]. Render <form action={formAction}> with <input name=\"email\" aria-label=\"Email\">, a submit button, and <p role=\"status\">{state.message}</p>.\n\nThe action is async and receives (previousState, formData). Read the email with formData.get('email') and trim it. A blank email returns { status: 'error', message: 'Enter an email' } without calling subscribe. Otherwise await subscribe(email): on ok return { status: 'success', message: `Subscribed ${email}` }, on failure return { status: 'error', message: result.error }.\n\nThe button is disabled and reads \"Subscribing…\" while isPending, and reads \"Subscribe\" otherwise. `useActionState` is available as a plain name.",
+    "difficulty": 3,
+    "concept": "react-forms",
+    "referenceSolution": "function SubscribeForm({ subscribe }) {\n  const [state, formAction, isPending] = useActionState(\n    async (previous, formData) => {\n      const email = String(formData.get('email') || '').trim();\n      if (!email) return { status: 'error', message: 'Enter an email' };\n      const result = await subscribe(email);\n      return result.ok\n        ? { status: 'success', message: `Subscribed ${email}` }\n        : { status: 'error', message: result.error };\n    },\n    { status: 'idle', message: '' }\n  );\n\n  return (\n    <form action={formAction}>\n      <input name=\"email\" aria-label=\"Email\" />\n      <button type=\"submit\" disabled={isPending}>\n        {isPending ? 'Subscribing…' : 'Subscribe'}\n      </button>\n      <p role=\"status\">{state.message}</p>\n    </form>\n  );\n}",
+    "solution": "function SubscribeForm({ subscribe }) {\n  const [state, formAction, isPending] = useActionState(\n    async (previous, formData) => {\n      const email = String(formData.get('email') || '').trim();\n      if (!email) return { status: 'error', message: 'Enter an email' };\n      const result = await subscribe(email);\n      return result.ok\n        ? { status: 'success', message: `Subscribed ${email}` }\n        : { status: 'error', message: result.error };\n    },\n    { status: 'idle', message: '' }\n  );\n\n  return (\n    <form action={formAction}>\n      <input name=\"email\" aria-label=\"Email\" />\n      <button type=\"submit\" disabled={isPending}>\n        {isPending ? 'Subscribing…' : 'Subscribe'}\n      </button>\n      <p role=\"status\">{state.message}</p>\n    </form>\n  );\n}",
+    "starterCode": "function SubscribeForm({ subscribe }) {\n  const [state, formAction, isPending] = useActionState(\n    async (previous, formData) => {\n      const email = String(formData.get('email') || '').trim();\n      if (!email) return { status: 'error', message: 'Enter an email' };\n      const result = await subscribe(email);\n      return result.ok\n        ? { status: 'success', message: `Subscribed ${email}` }\n        : { status: 'error', message: result.error };\n    },\n    { status: 'idle', message: '' }\n  );\n\n  return (\n    <form action={formAction}>\n      <input name=\"email\" aria-label=\"Email\" />\n      <button type=\"submit\" disabled={isPending}>\n        {isPending ? 'Subscribing…' : 'Subscribe'}\n      </button>\n      <p role=\"status\">{state.message}</p>\n    </form>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Starts idle: no message and an enabled Subscribe button",
+        "input": "render <SubscribeForm subscribe={…}>",
+        "expected": "status text ''; button 'Subscribe', enabled"
+      },
+      {
+        "description": "A blank email shows an error and never calls subscribe",
+        "input": "type '   ' and submit",
+        "expected": "status 'Enter an email'; subscribe not called"
+      },
+      {
+        "description": "While the action runs the button is disabled and reads \"Subscribing…\"",
+        "input": "submit while subscribe() is still pending, then resolve it",
+        "expected": "button disabled and 'Subscribing…', then enabled again"
+      },
+      {
+        "description": "A successful subscribe shows \"Subscribed <email>\" and enables the button again",
+        "input": "submit 'ada@example.com', subscribe resolves { ok: true }",
+        "expected": "status 'Subscribed ada@example.com'; button 'Subscribe', enabled"
+      },
+      {
+        "description": "A failed subscribe shows the error message from the server",
+        "input": "subscribe resolves { ok: false, error: 'Already subscribed' }",
+        "expected": "status 'Already subscribed'"
+      },
+      {
+        "description": "The email is trimmed before it is sent",
+        "input": "type '  ada@example.com  ' and submit",
+        "expected": "subscribe called once with 'ada@example.com'"
+      }
+    ],
+    "testHarness": "const { render, fire, q, qa, act, wait } = $dom;\nconst deferred = () => {\n  let resolve;\n  const promise = new Promise((res) => { resolve = res; });\n  return { promise, resolve };\n};\nconst setup = (subscribe) => {\n  const r = render(<SubscribeForm subscribe={subscribe} />);\n  return {\n    r,\n    form: () => q('form', r.container),\n    input: () => q('input[name=\"email\"]', r.container),\n    button: () => q('button', r.container),\n    status: () => q('[role=\"status\"]', r.container),\n  };\n};\nconst send = async (ui, email) => {\n  fire.change(ui.input(), email);\n  await act(async () => { fire.submit(ui.form()); });\n  await wait(10);\n};\n{\n  const ui = setup(async () => ({ ok: true }));\n  $test.check('Starts idle: no message and an enabled Subscribe button', ui.status().textContent === '' && ui.button().disabled === false && ui.button().textContent === 'Subscribe', [ui.status().textContent, ui.button().textContent]);\n  ui.r.unmount();\n}\n{\n  const calls = [];\n  const ui = setup(async (e) => { calls.push(e); return { ok: true }; });\n  await send(ui, '   ');\n  $test.check('A blank email shows an error and never calls subscribe', ui.status().textContent === 'Enter an email' && calls.length === 0, { status: ui.status().textContent, calls });\n  ui.r.unmount();\n}\n{\n  const d = deferred();\n  const ui = setup(() => d.promise);\n  fire.change(ui.input(), 'ada@example.com');\n  await act(async () => { fire.submit(ui.form()); });\n  await wait(10);\n  const during = [ui.button().disabled, ui.button().textContent];\n  await act(async () => { d.resolve({ ok: true }); });\n  await wait(10);\n  $test.check('While the action runs the button is disabled and reads \"Subscribing…\"', during[0] === true && during[1] === 'Subscribing…' && ui.button().disabled === false, { during, after: ui.button().textContent });\n  ui.r.unmount();\n}\n{\n  const ui = setup(async () => ({ ok: true }));\n  await send(ui, 'ada@example.com');\n  $test.check('A successful subscribe shows \"Subscribed <email>\" and enables the button again', ui.status().textContent === 'Subscribed ada@example.com' && ui.button().disabled === false && ui.button().textContent === 'Subscribe', [ui.status().textContent, ui.button().textContent]);\n  ui.r.unmount();\n}\n{\n  const ui = setup(async () => ({ ok: false, error: 'Already subscribed' }));\n  await send(ui, 'ada@example.com');\n  $test.check('A failed subscribe shows the error message from the server', ui.status().textContent === 'Already subscribed', ui.status().textContent);\n  ui.r.unmount();\n}\n{\n  const calls = [];\n  const ui = setup(async (e) => { calls.push(e); return { ok: true }; });\n  await send(ui, '  ada@example.com  ');\n  $test.check('The email is trimmed before it is sent', calls.length === 1 && calls[0] === 'ada@example.com', calls);\n  ui.r.unmount();\n}"
+  },
+  {
+    "id": "suspense-use-promise",
+    "track": "react",
+    "title": "React 19 use(promise) with Suspense",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react19",
+      "suspense",
+      "use",
+      "data-fetching"
+    ],
+    "promptSeed": "React 19 can read a promise during render with the use() API. Build UserBadge({ userPromise }), where userPromise resolves to { name, role }.\n\nUserBadge renders a <Suspense fallback={<p>Loading…</p>}> (the text is exactly \"Loading…\") around a child component that calls use(userPromise) and renders <p>{name} ({role})</p>, for example \"Ada (admin)\".\n\nThe parent creates the promise and keeps it the same across re-renders, so never create a promise inside the component. Do not catch errors: when the promise rejects, the error must reach the nearest error boundary. `use` and `Suspense` are available as plain names.",
+    "difficulty": 2,
+    "concept": "suspense-transitions",
+    "referenceSolution": "function UserDetails({ userPromise }) {\n  const user = use(userPromise);\n  return (\n    <p>\n      {user.name} ({user.role})\n    </p>\n  );\n}\n\nfunction UserBadge({ userPromise }) {\n  return (\n    <Suspense fallback={<p>Loading…</p>}>\n      <UserDetails userPromise={userPromise} />\n    </Suspense>\n  );\n}",
+    "solution": "function UserDetails({ userPromise }) {\n  const user = use(userPromise);\n  return (\n    <p>\n      {user.name} ({user.role})\n    </p>\n  );\n}\n\nfunction UserBadge({ userPromise }) {\n  return (\n    <Suspense fallback={<p>Loading…</p>}>\n      <UserDetails userPromise={userPromise} />\n    </Suspense>\n  );\n}",
+    "starterCode": "function UserDetails({ userPromise }) {\n  const user = use(userPromise);\n  return (\n    <p>\n      {user.name} ({user.role})\n    </p>\n  );\n}\n\nfunction UserBadge({ userPromise }) {\n  return (\n    <Suspense fallback={<p>Loading…</p>}>\n      <UserDetails userPromise={userPromise} />\n    </Suspense>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Shows the fallback while the promise is pending",
+        "input": "promise still pending",
+        "expected": "only 'Loading…' is visible"
+      },
+      {
+        "description": "Shows the resolved user once the promise resolves",
+        "input": "promise resolves with { name: 'Ada', role: 'admin' }",
+        "expected": "'Ada (admin)'"
+      },
+      {
+        "description": "Re-rendering with the same promise does not show the fallback again",
+        "input": "resolved, then re-render with the same promise",
+        "expected": "still 'Ada (admin)', no fallback"
+      },
+      {
+        "description": "A new promise shows the fallback again, then the new user",
+        "input": "pass a second, pending promise; then resolve it with { name: 'Grace', role: 'dev' }",
+        "expected": "'Loading…' first, then 'Grace (dev)'"
+      },
+      {
+        "description": "A rejected promise reaches the nearest error boundary instead of being swallowed",
+        "input": "promise rejects with Error('nope') inside an error boundary",
+        "expected": "the boundary shows 'boundary: nope'"
+      }
+    ],
+    "testHarness": "const { render, q, qa, act, wait } = $dom;\n// Text that is actually on screen: React hides suspended content with display:none.\nconst visibleText = (el) => {\n  let out = '';\n  for (const node of el.childNodes) {\n    if (node.nodeType === 3) out += node.textContent;\n    else if (node.nodeType === 1 && node.style.display !== 'none') out += visibleText(node);\n  }\n  return out;\n};\nconst mountAsync = async (ui) => {\n  let r;\n  await act(async () => { r = render(ui); });\n  return {\n    container: r.container,\n    rerender: async (next) => { await act(async () => { r.rerender(next); }); },\n    unmount: async () => { await act(async () => { r.unmount(); }); },\n  };\n};\nconst click = async (el) => {\n  await act(async () => { el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); });\n};\nconst deferred = () => {\n  let resolve;\n  let reject;\n  const promise = new Promise((res, rej) => {\n    resolve = res;\n    reject = rej;\n  });\n  return { promise, resolve, reject };\n};\nclass Boundary extends React.Component {\n  constructor(props) {\n    super(props);\n    this.state = { error: null };\n  }\n  static getDerivedStateFromError(error) {\n    return { error };\n  }\n  render() {\n    return this.state.error ? <p id=\"boundary\">{'boundary: ' + this.state.error.message}</p> : this.props.children;\n  }\n}\n{\n  const d = deferred();\n  const r = await mountAsync(<UserBadge userPromise={d.promise} />);\n  $test.check('Shows the fallback while the promise is pending', visibleText(r.container) === 'Loading…', visibleText(r.container));\n  await r.unmount();\n}\n{\n  const d = deferred();\n  const r = await mountAsync(<UserBadge userPromise={d.promise} />);\n  await act(async () => { d.resolve({ name: 'Ada', role: 'admin' }); });\n  await wait(20);\n  $test.check('Shows the resolved user once the promise resolves', visibleText(r.container) === 'Ada (admin)', visibleText(r.container));\n  await r.unmount();\n}\n{\n  const d = deferred();\n  const r = await mountAsync(<UserBadge userPromise={d.promise} />);\n  await act(async () => { d.resolve({ name: 'Ada', role: 'admin' }); });\n  await wait(20);\n  await r.rerender(<UserBadge userPromise={d.promise} />);\n  $test.check('Re-rendering with the same promise does not show the fallback again', visibleText(r.container) === 'Ada (admin)', visibleText(r.container));\n  await r.unmount();\n}\n{\n  const a = deferred();\n  const b = deferred();\n  const r = await mountAsync(<UserBadge userPromise={a.promise} />);\n  await act(async () => { a.resolve({ name: 'Ada', role: 'admin' }); });\n  await wait(20);\n  await r.rerender(<UserBadge userPromise={b.promise} />);\n  const during = visibleText(r.container);\n  await act(async () => { b.resolve({ name: 'Grace', role: 'dev' }); });\n  await wait(20);\n  $test.check('A new promise shows the fallback again, then the new user', during === 'Loading…' && visibleText(r.container) === 'Grace (dev)', [during, visibleText(r.container)]);\n  await r.unmount();\n}\n{\n  const d = deferred();\n  d.promise.catch(() => {});\n  const realError = console.error;\n  console.error = () => {};\n  try {\n    const r = await mountAsync(<Boundary><UserBadge userPromise={d.promise} /></Boundary>);\n    await act(async () => { d.reject(new Error('nope')); });\n    await wait(20);\n    const b = q('#boundary', r.container);\n    $test.check('A rejected promise reaches the nearest error boundary instead of being swallowed', !!b && b.textContent === 'boundary: nope', visibleText(r.container));\n    await r.unmount();\n  } finally {\n    console.error = realError;\n  }\n}"
+  },
+  {
+    "id": "tabs-transition-suspense",
+    "track": "react",
+    "title": "Tabs with useTransition + Suspense",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react19",
+      "suspense",
+      "transition",
+      "use"
+    ],
+    "promptSeed": "Build TabbedViewer({ load }) with three tabs: Home (id 'home'), Posts ('posts') and About ('about'). load(tabId) returns a promise of the tab's text; for the same tab it returns the SAME promise every time (the caller caches it), so you can pass it straight to use().\n\nRender <div role=\"tablist\"> with a <button role=\"tab\" aria-selected> per tab (aria-selected is true for the active tab only; Home is active first) and a <div role=\"tabpanel\"> below it that wraps <Suspense fallback={<p>Loading…</p>}> around a child that does const text = use(load(tab)) and renders <p>{text}</p>.\n\nClicking a tab must switch with startTransition (useTransition), not a plain state update, so that the current panel stays visible while the next tab's content loads instead of being replaced by \"Loading…\". While the transition is pending the tabpanel has aria-busy=\"true\" (otherwise \"false\"). The very first load of Home may show the fallback. `use`, `Suspense` and `useTransition` are available as plain names.",
+    "difficulty": 4,
+    "concept": "suspense-transitions",
+    "referenceSolution": "const TABS = [\n  { id: 'home', label: 'Home' },\n  { id: 'posts', label: 'Posts' },\n  { id: 'about', label: 'About' },\n];\n\nfunction Panel({ load, tab }) {\n  const text = use(load(tab));\n  return <p>{text}</p>;\n}\n\nfunction TabbedViewer({ load }) {\n  const [tab, setTab] = useState('home');\n  const [isPending, startTransition] = useTransition();\n\n  return (\n    <div>\n      <div role=\"tablist\">\n        {TABS.map((t) => (\n          <button\n            key={t.id}\n            role=\"tab\"\n            aria-selected={tab === t.id}\n            onClick={() => startTransition(() => setTab(t.id))}\n          >\n            {t.label}\n          </button>\n        ))}\n      </div>\n      <div role=\"tabpanel\" aria-busy={isPending ? 'true' : 'false'}>\n        <Suspense fallback={<p>Loading…</p>}>\n          <Panel load={load} tab={tab} />\n        </Suspense>\n      </div>\n    </div>\n  );\n}",
+    "solution": "const TABS = [\n  { id: 'home', label: 'Home' },\n  { id: 'posts', label: 'Posts' },\n  { id: 'about', label: 'About' },\n];\n\nfunction Panel({ load, tab }) {\n  const text = use(load(tab));\n  return <p>{text}</p>;\n}\n\nfunction TabbedViewer({ load }) {\n  const [tab, setTab] = useState('home');\n  const [isPending, startTransition] = useTransition();\n\n  return (\n    <div>\n      <div role=\"tablist\">\n        {TABS.map((t) => (\n          <button\n            key={t.id}\n            role=\"tab\"\n            aria-selected={tab === t.id}\n            onClick={() => startTransition(() => setTab(t.id))}\n          >\n            {t.label}\n          </button>\n        ))}\n      </div>\n      <div role=\"tabpanel\" aria-busy={isPending ? 'true' : 'false'}>\n        <Suspense fallback={<p>Loading…</p>}>\n          <Panel load={load} tab={tab} />\n        </Suspense>\n      </div>\n    </div>\n  );\n}",
+    "starterCode": "const TABS = [\n  { id: 'home', label: 'Home' },\n  { id: 'posts', label: 'Posts' },\n  { id: 'about', label: 'About' },\n];\n\nfunction Panel({ load, tab }) {\n  const text = use(load(tab));\n  return <p>{text}</p>;\n}\n\nfunction TabbedViewer({ load }) {\n  const [tab, setTab] = useState('home');\n  const [isPending, startTransition] = useTransition();\n\n  return (\n    <div>\n      <div role=\"tablist\">\n        {TABS.map((t) => (\n          <button\n            key={t.id}\n            role=\"tab\"\n            aria-selected={tab === t.id}\n            onClick={() => startTransition(() => setTab(t.id))}\n          >\n            {t.label}\n          </button>\n        ))}\n      </div>\n      <div role=\"tabpanel\" aria-busy={isPending ? 'true' : 'false'}>\n        <Suspense fallback={<p>Loading…</p>}>\n          <Panel load={load} tab={tab} />\n        </Suspense>\n      </div>\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "The first load shows the fallback, then the home content",
+        "input": "mount; then resolve the home promise",
+        "expected": "'Loading…' first, then 'Welcome home'"
+      },
+      {
+        "description": "Switching tabs keeps the old panel on screen (no fallback) while the new one loads",
+        "input": "home loaded; click Posts while its promise is pending",
+        "expected": "the panel still shows 'Welcome home', not 'Loading…'"
+      },
+      {
+        "description": "The tab panel is aria-busy=\"true\" while the transition is pending and \"false\" otherwise",
+        "input": "click Posts, wait, then resolve posts",
+        "expected": "aria-busy 'false' before, 'true' while pending, 'false' after"
+      },
+      {
+        "description": "When the new content arrives the panel and the selected tab switch together",
+        "input": "click Posts; resolve posts",
+        "expected": "Home stays selected while pending; then panel 'Latest posts' and Posts selected together"
+      },
+      {
+        "description": "Going back to an already loaded tab shows its content straight away",
+        "input": "go to Posts, then back to Home",
+        "expected": "'Welcome home' immediately, Home selected"
+      }
+    ],
+    "testHarness": "const { render, q, qa, act, wait } = $dom;\n// Text that is actually on screen: React hides suspended content with display:none.\nconst visibleText = (el) => {\n  let out = '';\n  for (const node of el.childNodes) {\n    if (node.nodeType === 3) out += node.textContent;\n    else if (node.nodeType === 1 && node.style.display !== 'none') out += visibleText(node);\n  }\n  return out;\n};\nconst mountAsync = async (ui) => {\n  let r;\n  await act(async () => { r = render(ui); });\n  return {\n    container: r.container,\n    rerender: async (next) => { await act(async () => { r.rerender(next); }); },\n    unmount: async () => { await act(async () => { r.unmount(); }); },\n  };\n};\nconst click = async (el) => {\n  await act(async () => { el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); });\n};\nconst deferred = () => {\n  let resolve;\n  let reject;\n  const promise = new Promise((res, rej) => {\n    resolve = res;\n    reject = rej;\n  });\n  return { promise, resolve, reject };\n};\nconst setup = async () => {\n  const cache = new Map();\n  const entry = (tab) => {\n    if (!cache.has(tab)) cache.set(tab, deferred());\n    return cache.get(tab);\n  };\n  const load = (tab) => entry(tab).promise;\n  const finish = async (tab, text) => {\n    await act(async () => { entry(tab).resolve(text); });\n    await wait(20);\n  };\n  const r = await mountAsync(<TabbedViewer load={load} />);\n  const tab = (label) => qa('[role=\"tab\"]', r.container).find((b) => b.textContent === label);\n  const panel = () => q('[role=\"tabpanel\"]', r.container);\n  return { r, finish, tab, panel };\n};\n{\n  const { r, finish, panel } = await setup();\n  const first = visibleText(panel());\n  await finish('home', 'Welcome home');\n  $test.check('The first load shows the fallback, then the home content', first === 'Loading…' && visibleText(panel()) === 'Welcome home', [first, visibleText(panel())]);\n  await r.unmount();\n}\n{\n  const { r, finish, tab, panel } = await setup();\n  await finish('home', 'Welcome home');\n  await click(tab('Posts'));\n  await wait(20);\n  $test.check('Switching tabs keeps the old panel on screen (no fallback) while the new one loads', visibleText(panel()) === 'Welcome home', visibleText(panel()));\n  await r.unmount();\n}\n{\n  const { r, finish, tab, panel } = await setup();\n  await finish('home', 'Welcome home');\n  const before = panel().getAttribute('aria-busy');\n  await click(tab('Posts'));\n  await wait(20);\n  const during = panel().getAttribute('aria-busy');\n  await finish('posts', 'Latest posts');\n  const after = panel().getAttribute('aria-busy');\n  $test.check('The tab panel is aria-busy=\"true\" while the transition is pending and \"false\" otherwise', before === 'false' && during === 'true' && after === 'false', { before, during, after });\n  await r.unmount();\n}\n{\n  const { r, finish, tab, panel } = await setup();\n  await finish('home', 'Welcome home');\n  await click(tab('Posts'));\n  await wait(20);\n  const selectedWhilePending = tab('Home').getAttribute('aria-selected') + ',' + tab('Posts').getAttribute('aria-selected');\n  await finish('posts', 'Latest posts');\n  const selectedAfter = tab('Home').getAttribute('aria-selected') + ',' + tab('Posts').getAttribute('aria-selected');\n  $test.check('When the new content arrives the panel and the selected tab switch together', selectedWhilePending === 'true,false' && visibleText(panel()) === 'Latest posts' && selectedAfter === 'false,true', { selectedWhilePending, selectedAfter, text: visibleText(panel()) });\n  await r.unmount();\n}\n{\n  const { r, finish, tab, panel } = await setup();\n  await finish('home', 'Welcome home');\n  await click(tab('Posts'));\n  await wait(20);\n  await finish('posts', 'Latest posts');\n  await click(tab('Home'));\n  await wait(20);\n  $test.check('Going back to an already loaded tab shows its content straight away', visibleText(panel()) === 'Welcome home' && tab('Home').getAttribute('aria-selected') === 'true', visibleText(panel()));\n  await r.unmount();\n}"
   }
 ]

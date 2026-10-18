@@ -1,0 +1,5 @@
+Build TabbedViewer({ load }) with three tabs: Home (id 'home'), Posts ('posts') and About ('about'). load(tabId) returns a promise of the tab's text; for the same tab it returns the SAME promise every time (the caller caches it), so you can pass it straight to use().
+
+Render <div role="tablist"> with a <button role="tab" aria-selected> per tab (aria-selected is true for the active tab only; Home is active first) and a <div role="tabpanel"> below it that wraps <Suspense fallback={<p>Loading…</p>}> around a child that does const text = use(load(tab)) and renders <p>{text}</p>.
+
+Clicking a tab must switch with startTransition (useTransition), not a plain state update, so that the current panel stays visible while the next tab's content loads instead of being replaced by "Loading…". While the transition is pending the tabpanel has aria-busy="true" (otherwise "false"). The very first load of Home may show the fallback. `use`, `Suspense` and `useTransition` are available as plain names.

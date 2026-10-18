@@ -1,0 +1,10 @@
+{
+  "track": "react",
+  "title": "Tabs with useTransition + Suspense",
+  "tags": [
+    "react19",
+    "suspense",
+    "transition",
+    "use"
+  ]
+}
