@@ -374,6 +374,8 @@ Pick the order; each batch follows the §4 checklist including the complexity st
 
 ## 8. Conventions and pitfalls for assistants
 
+> Delegable tasks with acceptance criteria, and the rules every contributor follows: see [DELEGATION.md](DELEGATION.md).
+
 - Never run or recreate a bulk fixture generator. Write cases by hand: concrete input and concrete expected value.
 - After touching cards: `npm run build:cards && npm test && npm run lint && npx tsc -b`. Then (ideally) smoke-test in the browser.
 - Do not edit `src/data/topics.json` directly; it is overwritten by `build:cards`.
