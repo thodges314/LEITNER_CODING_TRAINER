@@ -28,8 +28,8 @@ in the browser; state lives in `localStorage`.
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 854 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 262 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 524 card tests + 12 navigation/shortcut tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/react19-cards`): 520 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Automated tests | 955 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Browser verification | `npm run e2e` runs ALL 262 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 524 card tests + 12 navigation/shortcut tests + 4 preview tests = 540 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/react19-cards`): 520 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -281,7 +281,7 @@ DOM/browser extras → language depth → React 19 → CSS (needs Playwright).
 2. **Staged unlocks that respect the practice focus**: DONE (`checkStagedUnlocks` gets the Focus + pack filter; unlock credit is only spent on cards that really unlock). Still open: a "session mode" (N cards drawn only from the focus).
 3. **Sandboxed execution**: run harnesses in a sandboxed iframe or Worker with a watchdog timeout so `while(true)` cannot freeze the
    tab. DOM harnesses need a document, so use an iframe (`srcdoc`, `sandbox="allow-scripts"`) and `postMessage` the logs back.
-**React preview window (spec, not built; owner suggests Gemini implements it; React problems only, not general JavaScript).**
+**React preview window (DONE, built on branch feature/react-preview; spec below; React problems only, not general JavaScript).**
 Goal: while solving a React card (tracks `react` and `react-components`), show the component the user is writing in a small separate
 pane or pop-out window, without disturbing the editor, Run Code or Submit.
 - Opt-in and non-blocking: a "Preview" toggle on React cards that have a preview (hidden otherwise); closed by default; the editor stays fully usable.
@@ -302,7 +302,7 @@ pane or pop-out window, without disturbing the editor, Run Code or Submit.
 - Bonus: because it runs in an iframe it also gives the app real isolation for runaway code (kill/replace the iframe on a timeout), which §7.3 item 3 wants anyway.
 - **Automated check (the guard that keeps preview files honest):** a unit test mounts every card's `previewCode` together with that card's **reference solution** in jsdom: it must render without throwing and
   produce non-empty DOM (and any `log` callback must not throw). Plus a Playwright test that opens a React card, toggles Preview, sees it rendered, and a test that an infinite loop in the preview does not freeze the page.
-- Work split: (1) the iframe window + `previewCode` plumbing + guard test (one Gemini task); (2) writing `<id>.preview.js` for the ~65 existing React cards (mechanical, checked by the guard test);
+- Work split: (1) the iframe window + `previewCode` plumbing + guard test (DONE, branch `feature/react-preview`); (2) writing `<id>.preview.js` for the remaining React cards (task A2);
   (3) from then on every new React card ships its preview file (rule 10 in `DELEGATION.md`).
 4. **Duplicate cards**: RESOLVED by the 2026-10 audit (8 near-duplicates removed, the rest are deliberate progressions; see §7.4e).
 5. **Difficulty in the catalog**: sort/filter by difficulty and concept; show the ladder (which rung unlocks next and why a card is locked).

@@ -94,6 +94,13 @@ for (const t of topics) {
   const generated = generateHarness(cases[t.id]);
   t.testHarness = manual ?? [generated, extra].filter(Boolean).join('\n\n');
   if (!t.testHarness.trim()) throw new Error(`Empty harness for ${t.id}`);
+
+  const preview = read(t.id, 'preview.js');
+  if (preview) {
+    t.previewCode = preview;
+  } else {
+    delete t.previewCode;
+  }
 }
 fs.writeFileSync(file, JSON.stringify(topics, null, 2) + '\n');
 console.log(`built ${topics.length} cards, ${n} test cases`);

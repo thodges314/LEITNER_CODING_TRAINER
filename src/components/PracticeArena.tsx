@@ -45,6 +45,7 @@ import {
   Sparkles,
   Zap,
   X,
+  Eye,
 } from 'lucide-react';
 import { transpileForExecution, runHarness, createSandboxScope } from '../lib/runner';
 import { extractHarnessContracts } from '../lib/harnessContracts';
@@ -54,6 +55,7 @@ import { ReactTestErrorBoundary } from './practice/ReactTestErrorBoundary';
 import { getStarterSnippet } from './practice/starterSnippet';
 import { formatCode } from '../lib/formatter';
 import { getTimedModeEnabled, getTimedModeDuration } from '../lib/timedMode';
+import { ReactPreview } from './ReactPreview';
 
 const TIER_METADATA: Record<number, { level: string; desc: string }> = {
   1: { level: 'Initial Encounter', desc: 'Immediate reinforcement (+1 review) to anchor core pattern.' },
@@ -113,6 +115,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     element: React.ReactElement;
     key: number;
   } | null>(null);
+
+  // Opt-in React preview window state (closed by default)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Execution mode: JS (Fast) vs TS (Strict Type Check)
   const [executionMode, setExecutionMode] = useState<'js' | 'ts'>(() =>
@@ -184,6 +189,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setShowSolution(false);
     setShowHarness(true);
     setActivePopover(null);
+    setIsPreviewOpen(false);
     if (currentCard) setInspectedTier(currentCard.box);
   }
 
@@ -2016,6 +2022,21 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </button>
 
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            {/* Opt-in React Preview Toggle (React cards with preview only) */}
+            {currentCard?.previewCode && (
+              <button
+                type="button"
+                id="preview-toggle-btn"
+                data-testid="preview-toggle-btn"
+                className={`btn ${isPreviewOpen ? 'btn-secondary' : 'btn-outline'}`}
+                onClick={() => setIsPreviewOpen((prev) => !prev)}
+                style={{ fontSize: '13.5px', padding: '10px 16px', gap: '6px' }}
+                title="Toggle live React preview window"
+              >
+                <Eye size={15} color="#06b6d4" /> {isPreviewOpen ? 'Hide Preview' : 'Preview'}
+              </button>
+            )}
+
             {/* Secondary Button: Run Code / Test */}
             <button
               type="button"
@@ -2058,12 +2079,25 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </div>
         </div>
 
+        {/* Live React Preview Window (Opt-in, sandboxed iframe) */}
+        {isPreviewOpen && currentCard?.previewCode && (
+          <div style={{ marginTop: '14px' }}>
+            <ReactPreview
+              card={currentCard}
+              code={code}
+              executionMode={executionMode}
+              theme={theme}
+              onClose={() => setIsPreviewOpen(false)}
+            />
+          </div>
+        )}
+
         {/* Test Runner & Live Preview Container */}
         <div
           style={{
             marginTop: '12px',
             display: 'grid',
-            gridTemplateColumns: isReactTrack ? 'repeat(auto-fit, minmax(420px, 1fr))' : '1fr',
+            gridTemplateColumns: isReactTrack && !currentCard?.previewCode ? 'repeat(auto-fit, minmax(420px, 1fr))' : '1fr',
             gap: '14px',
             alignItems: 'start',
           }}
@@ -2371,7 +2405,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           </div>
 
           {/* Component Preview / Hook Test Container (React Track Only) */}
-          {isReactTrack && (
+          {isReactTrack && !currentCard?.previewCode && (
             <div
               style={{
                 borderRadius: '8px',

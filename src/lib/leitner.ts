@@ -43,6 +43,7 @@ export interface TopicItem {
   targetTime?: string;
   targetSpace?: string;
   complexityExplanation?: string;
+  previewCode?: string;
 }
 
 /**
@@ -458,6 +459,7 @@ export const SEED_CONTENT_FIELDS = [
   'targetTime',
   'targetSpace',
   'complexityExplanation',
+  'previewCode',
 ] as const;
 
 /**
