@@ -22,14 +22,14 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 242 total = **209 default + 33 in the optional `algorithms-advanced` pack** (80 default cards active at first run) |
-| Documented test cases | 1598 (each shown as input → expected in the UI) |
+| Cards | 234 total = **202 default + 32 in the optional `algorithms-advanced` pack** (78 default cards active at first run) |
+| Documented test cases | 1557 (each shown as input → expected in the UI) |
 | Difficulty spread | all 234: d1 33 · d2 70 · d3 90 · d4 39 · d5 2; default 201: d1 33 · d2 66 · d3 72 · d4 28 · d5 2 |
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 854 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 484 tests, ~6 min on an idle machine with 4 workers). **Last full run on `master`: 465 passed, 3 flaky (passed on retry), 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 234 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 468 card tests + 8 navigation tests, ~6 min on an idle machine with 4 workers). **Last full run on `master`: 465 passed, 3 flaky (passed on retry), 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -204,9 +204,8 @@ bulk of the default deck (core 47 of 201); the heavier ones are opt-in (§7.4b).
 
 ### 7.1 Difficulty ladder holes (the owner wants "simple first, then harder" on every concept)
 **Status (current):** the starter rungs for the pure-function and TypeScript concepts exist. Concepts in the default deck whose lowest rung is **still ≥ 3**
-(all React/DOM or tooling; each needs a hand-written DOM or pure harness and a `npm run e2e` run): `architecture`(5), `carousel`(3), `dual-list`(3), `game-board`(3, tic-tac-toe: needs a d1/d2 rung),
-`history-state`(3), `notifications`(3), `optimistic-ui`(3), `state-management`(4), `testing-tools`(3,3,4), `tree-ui`(3,3), `virtualization`(4).
-13 concepts have a single card (no ladder yet). Only two d5 cards exist.
+(all React/DOM or tooling; each needs a hand-written DOM or pure harness and a `npm run e2e` run): `architecture`(1 card, lowest d5), `carousel`(1 card, lowest d3), `dual-list`(1 card, lowest d3), `game-board`(1 card, lowest d3), `history-state`(1 card, lowest d3), `notifications`(1 card, lowest d3), `optimistic-ui`(1 card, lowest d3), `pagination`(1 card, lowest d3), `react-fetch`(1 card, lowest d3), `state-management`(1 card, lowest d4), `tag-input`(1 card, lowest d3), `testing-tools`(3 cards, lowest d3), `tree-ui`(2 cards, lowest d3), `virtualization`(1 card, lowest d4), `wizard`(1 card, lowest d4). `react-fetch` lost its d2 entry card when its near-duplicate was removed; a plain fetch-hook warm-up (no abort/race) would be the natural new first rung.
+Only two d5 cards exist.
 The original table below is kept for the proposed rung designs (the React rows are still open).
 Add the rung(s) below; each must follow §4 (reference, cases, harness, empty-solution test, `difficulty.json` entry, same `concept`).
 
@@ -344,6 +343,21 @@ through the card's harness; a good harness FAILS every mutant. A **survivor** is
   by hand before adding a case: ask "can a correct solution behave differently here?".
 - Harness hygiene learned from this: harnesses must not assume a clean page (other dialogs, body scroll lock, `window.matchMedia`, `localStorage` keys). `modal-portal-focus` now
   measures the ambient state first; `use-media-query` restores `window.matchMedia`; `stopwatch`/`theme-switcher` restore what they patch in a `finally`.
+
+### 7.4e Difficulty rubric and the near-duplicate rule (used by the 2026-10 audit)
+Rate by the **task a user actually does**, not by solution length (many cards bundle 2-3 small functions, so length misleads; TypeScript type cards are short but not easy).
+| d | Meaning | Typical examples |
+|---|---|---|
+| 1 | warm-up, one idea, under ~10 min | `memoizeOne`, `shallowCopy`, `usePrevious`, depth sum |
+| 2 | easy interview question, a couple of ideas or a small component | basic debounce/throttle, custom `reduce`, accordion, linked-list cycle + merge, LC-easy BFS |
+| 3 | medium: edge cases or an API-shaped spec | `curry`, cancel/flush debounce, `useLocalStorage` with cross-tab sync, level-order variants, LC-medium graph/DP |
+| 4 | hard: several interacting parts or a known "hard" pattern | virtual list, external store hook, `promise-pool`, word ladder, merge-k-lists with your own heap |
+| 5 | rare, multi-part systems | (2 cards today) |
+Rules the audit applied: (1) a card that is a strict subset of another card must not sit above it on the ladder, (2) two cards with the same task in different packaging are duplicates: keep the richer one, delete the other,
+(3) progressions are NOT duplicates and stay: basic -> production variant (`debounce-implementation` -> `debounce`, `throttle-implementation` -> `throttle`), `object-deep-clone` -> `deep-clone` (circular refs, Map/Set/Date),
+`custom-array-reduce` -> `array-method-polyfills`, `use-reducer-todo-list` -> `todo-list-reducer`. Deleting a seed card: remove `scripts/cards/<id>.*`, its entries in `scripts/testcases/part*.mjs` (including `part4` overrides/appends),
+`scripts/difficulty.json`, `scripts/packs.json`, `scripts/complexity-cache.json`, `scripts/mutation-baseline.jsonl`, the card in `src/data/topics.json`, and **add its id to `RETIRED_SEED_IDS` in `src/lib/leitner.ts`** so saved decks drop it.
+Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates removed: `hook-fetch-cleanup`, `infinite-scroll-observer`, `sliding-window-dynamic`, `tree-level-order-bfs`, `hook-use-debounce`, `event-loop-microtasks`, `currying-function`, `interval-merge-sliding-window`.
 
 ### 7.5 Suggested next steps (in order)
 1. Keep `npm run e2e` green on `master` (run it after any card/runner change; re-run flaky timing cards).

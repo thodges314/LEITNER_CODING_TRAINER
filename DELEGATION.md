@@ -15,7 +15,8 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 6. Harnesses must not assume a clean page (other dialogs, `body` scroll lock, `window.matchMedia`, `localStorage`): measure ambient state first, restore what you patch (`try/finally`).
    React harnesses that read effect- or hover-driven state need `await wait(30)` (production React has no `act`).
 7. Update the counts and the relevant roadmap rows in `ARCHITECTURE_AND_ROADMAP.md` in the same commit. No absolute `file:///` links in docs.
-8. Do not edit `src/data/topics.json` by hand (it is generated).
+8. Do not edit `src/data/topics.json` by hand (it is generated). To DELETE a card follow the checklist in roadmap §7.4e (and add its id to `RETIRED_SEED_IDS`).
+9. Rate difficulty with the rubric in roadmap §7.4e and check the card is not a duplicate/subset of an existing one (same concept) before adding it.
 
 ## Good to delegate (well-specified, verifiable by the gates above)
 | # | Task | Notes / acceptance |
@@ -34,7 +35,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | L | **Run `e2e` on `master` before deploy** | Add the Playwright job as a `needs:` of the Pages deploy workflow (`.github/workflows/`), keep it ~5 min; upload the report on failure. |
 
 ## Keep for the owner / a reasoning-heavy session
-- **Difficulty audit**: judging whether a card's 1-5 label is right (needs to read prompt + reference; propose changes, owner approves).
+- **Difficulty audit**: done once (2026-10, roadmap §7.4e); repeat it per batch of new cards.
 - **Track / concept consolidation**: done (9 tracks, one track per concept; see roadmap §2 and `src/lib/tracks.test.ts`). New cards must go into one of the 9 tracks and reuse the concept already living there.
 - **Reviewing delegated work**: read each branch diff against the rules above (case quality, "can a correct solution behave differently here?", harness assumptions), then merge.
 - **Scheduler / unlock design changes**, and anything that changes how existing users' saved decks are interpreted (`mergeStoredWithSeed`, backup format).
