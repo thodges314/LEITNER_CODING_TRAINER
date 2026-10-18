@@ -14,7 +14,7 @@ import {
   intervalForBox,
   DIFFICULTY_LABELS,
   difficultyOf,
-  isReactTrack as isReactTrackId,
+  isReactComponentCard,
 } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { shortcutAttrs } from '../lib/shortcuts';
@@ -117,6 +117,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     element: React.ReactElement;
     key: number;
   } | null>(null);
+
+  // Track whether the live preview has been initialized via Run Code / Test
+  const [isPreviewLive, setIsPreviewLive] = useState<boolean>(false);
 
   // Pop-out state for legacy Component Preview / Hook Test box
   const [legacyPopupWindow, setLegacyPopupWindow] = useState<Window | null>(null);
@@ -270,6 +273,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setShowSolution(false);
     setShowHarness(true);
     setActivePopover(null);
+    setIsPreviewLive(false);
+    setMountedComponent(null);
     if (currentCard) setInspectedTier(currentCard.box);
   }
 
@@ -410,6 +415,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   // Async Execution Handler with AsyncFunction and captured console
   const handleRunCode = async () => {
+    setIsPreviewLive(true);
     if (!code.trim() || isRunning) return;
     setIsOutputOpen(true);
     setIsRunning(true);
@@ -648,6 +654,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setCode('');
     setOutputLogs([]);
     setExecutionStatus('idle');
+    setIsPreviewLive(false);
     setMountedComponent(null);
     onFinishReinforcement?.();
   };
@@ -664,11 +671,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setCode('');
     setOutputLogs([]);
     setExecutionStatus('idle');
+    setIsPreviewLive(false);
     setMountedComponent(null);
   };
 
   const handleSkip = () => {
     clearDraft(currentCard?.id);
+    setIsPreviewLive(false);
     setMountedComponent(null);
     setShowSolution(false);
     onSkipCard();
@@ -699,7 +708,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     );
   }
 
-  const isReactTrack = isReactTrackId(currentCard.track);
+  const isComponentProblem = isReactComponentCard(currentCard);
   const trackMeta = getTrackMeta(currentCard.track);
   const errorCount = outputLogs.filter((l) => l.failure).length;
 
@@ -1955,6 +1964,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               onClick={() => {
                 clearDraft(currentCard?.id);
                 setCode(getStarterSnippet(currentCard));
+                setIsPreviewLive(false);
+                setMountedComponent(null);
               }}
               style={{
                 background: 'none',
@@ -2150,7 +2161,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           style={{
             marginTop: '12px',
             display: 'grid',
-            gridTemplateColumns: isReactTrack
+            gridTemplateColumns: isComponentProblem
               ? 'repeat(auto-fit, minmax(420px, 1fr))'
               : '1fr',
             gap: '14px',
@@ -2459,14 +2470,16 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             )}
           </div>
 
-          {/* Right-Side Box on React Problems: Live React Preview (if card has previewCode) or Legacy Component Preview */}
-          {isReactTrack && (
+          {/* Right-Side Box on React Component Problems: Live React Preview (if card has previewCode) or Legacy Component Preview */}
+          {isComponentProblem && (
             currentCard?.previewCode ? (
               <ReactPreview
                 card={currentCard}
                 code={code}
                 executionMode={executionMode}
                 theme={theme}
+                isLive={isPreviewLive}
+                onStartLive={handleRunCode}
               />
             ) : (
               <div
@@ -2702,17 +2715,39 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 textAlign: 'center',
-                                padding: '20px 12px',
+                                padding: '24px 16px',
                                 color: '#64748b',
                               }}
                             >
-                              <Layers size={28} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
-                              <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+                              <div
+                                style={{
+                                  width: '44px',
+                                  height: '44px',
+                                  borderRadius: '12px',
+                                  background: 'rgba(6, 182, 212, 0.1)',
+                                  border: '1px solid rgba(6, 182, 212, 0.25)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  marginBottom: '10px',
+                                }}
+                              >
+                                <Layers size={22} color="#06b6d4" />
+                              </div>
+                              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f1f5f9', marginBottom: '4px' }}>
                                 No Component Mounted
                               </div>
-                              <div style={{ fontSize: '11.5px', maxWidth: '340px', lineHeight: 1.5 }}>
-                                Call <code>mount(Harness)</code> or <code>mount(Component)</code> in your code or test runner to preview live hook state and UI updates.
+                              <div style={{ fontSize: '12px', maxWidth: '340px', lineHeight: 1.55, color: '#94a3b8', marginBottom: '12px' }}>
+                                Click <strong>Run Code / Test</strong> (or press <kbd style={{ padding: '2px 5px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Cmd</kbd>+<kbd style={{ padding: '2px 5px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Enter</kbd>) to mount your component in the live preview.
                               </div>
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handleRunCode}
+                                style={{ fontSize: '12px', padding: '5px 12px', gap: '5px' }}
+                              >
+                                <Play size={12} /> Run Code to Mount
+                              </button>
                             </div>
                           )}
                         </ReactTestErrorBoundary>
@@ -2742,17 +2777,39 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                           alignItems: 'center',
                           justifyContent: 'center',
                           textAlign: 'center',
-                          padding: '20px 12px',
+                          padding: '24px 16px',
                           color: '#64748b',
                         }}
                       >
-                        <Layers size={28} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+                        <div
+                          style={{
+                            width: '44px',
+                            height: '44px',
+                            borderRadius: '12px',
+                            background: 'rgba(6, 182, 212, 0.1)',
+                            border: '1px solid rgba(6, 182, 212, 0.25)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: '10px',
+                          }}
+                        >
+                          <Layers size={22} color="#06b6d4" />
+                        </div>
+                        <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f1f5f9', marginBottom: '4px' }}>
                           No Component Mounted
                         </div>
-                        <div style={{ fontSize: '11.5px', maxWidth: '340px', lineHeight: 1.5 }}>
-                          Call <code>mount(Harness)</code> or <code>mount(Component)</code> in your code or test runner to preview live hook state and UI updates.
+                        <div style={{ fontSize: '12px', maxWidth: '340px', lineHeight: 1.55, color: '#94a3b8', marginBottom: '12px' }}>
+                          Click <strong>Run Code / Test</strong> (or press <kbd style={{ padding: '2px 5px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Cmd</kbd>+<kbd style={{ padding: '2px 5px', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Enter</kbd>) to mount your component in the live preview.
                         </div>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={handleRunCode}
+                          style={{ fontSize: '12px', padding: '5px 12px', gap: '5px' }}
+                        >
+                          <Play size={12} /> Run Code to Mount
+                        </button>
                       </div>
                     )}
                   </ReactTestErrorBoundary>

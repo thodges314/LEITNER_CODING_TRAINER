@@ -47,14 +47,27 @@ async function openCard(page: Page, id: string, code?: string) {
 }
 
 test.describe('React preview window', () => {
-  test('non-React cards do not show the React preview window or toggle button', async ({ page }) => {
-    // binary-search-exact is an algorithm card without previewCode
+  test('non-component cards (algorithms, custom hooks, pure logic) do not show the preview window', async ({ page }) => {
+    // binary-search-exact is an algorithm card without preview
     await openCard(page, 'binary-search-exact');
     await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);
     await expect(page.locator('[data-testid="react-preview-window"]')).toHaveCount(0);
+    await expect(page.locator('.legacy-component-preview-container')).toHaveCount(0);
+
+    // use-debounce-hook is a custom hook card without UI rendering
+    await openCard(page, 'use-debounce-hook');
+    await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);
+    await expect(page.locator('[data-testid="react-preview-window"]')).toHaveCount(0);
+    await expect(page.locator('.legacy-component-preview-container')).toHaveCount(0);
+
+    // calculate-winner is a pure logic card without UI rendering
+    await openCard(page, 'calculate-winner');
+    await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);
+    await expect(page.locator('[data-testid="react-preview-window"]')).toHaveCount(0);
+    await expect(page.locator('.legacy-component-preview-container')).toHaveCount(0);
   });
 
-  test('switch-toggle-a11y: is part of the interface by default, mounts in sandboxed iframe, and logs click events', async ({ page }) => {
+  test('switch-toggle-a11y: opens to ready placeholder without errors, goes live on Run Code, and logs events', async ({ page }) => {
     const card = topics.find((t) => t.id === 'switch-toggle-a11y');
     expect(card).toBeDefined();
     const solution = card?.referenceSolution || card?.solution || '';
@@ -64,13 +77,23 @@ test.describe('React preview window', () => {
     // No eyeball/toggle button (preview is permanent part of interface)
     await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);
 
-    // Live preview window is visible immediately
+    // Live preview window is visible immediately in Ready state (no premature errors)
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="preview-ready-placeholder"]')).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Ready');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
 
-    // Verify sandboxed iframe attribute
+    // Verify sandboxed iframe attribute is preset
     const iframeElement = previewWindow.locator('iframe');
     await expect(iframeElement).toHaveAttribute('sandbox', 'allow-scripts');
+
+    // Click 'Run Code / Test' button to activate live preview
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    // Status transitions to Live
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.locator('[data-testid="preview-ready-placeholder"]')).toHaveCount(0);
 
     // Frame locator to inspect inside the sandboxed iframe
     const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
@@ -85,16 +108,23 @@ test.describe('React preview window', () => {
     await expect(eventLog.first()).toBeVisible();
   });
 
-  test('star-rating-component: mounts in sandboxed iframe and logs rating change on interaction', async ({ page }) => {
+  test('star-rating-component: activates live view via placeholder button and logs rating interaction', async ({ page }) => {
     const card = topics.find((t) => t.id === 'star-rating-component');
     expect(card).toBeDefined();
     const solution = card?.referenceSolution || card?.solution || '';
 
     await openCard(page, 'star-rating-component', solution);
 
-    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
+
+    // Click 'Run Code to Start Preview' inside the welcoming placeholder
+    const startBtn = previewWindow.locator('[data-testid="start-preview-btn"]');
+    await expect(startBtn).toBeVisible();
+    await startBtn.click();
+
+    // Transitions to live
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
 
     const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
     const radiogroup = frame.locator('div[role="radiogroup"]');
@@ -118,9 +148,11 @@ test.describe('React preview window', () => {
     }`;
     await openCard(page, 'switch-toggle-a11y', badCode);
 
-    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
+
+    // Run Code to activate live view with infinite loop
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
 
     // The timeout or infinite loop error notice is displayed
     const alertBox = previewWindow.getByRole('alert');
@@ -140,9 +172,11 @@ test.describe('React preview window', () => {
 
     await openCard(page, 'switch-toggle-a11y', solution);
 
-    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
+
+    // Start live preview
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
 
     const popOutBtn = page.locator('[data-testid="preview-popout-btn"]');
     await expect(popOutBtn).toBeVisible();
@@ -184,9 +218,11 @@ test.describe('React preview window', () => {
 
     await openCard(page, 'progress-bar', solution);
 
-    // Open by default
     const previewWindow = page.locator('[data-testid="react-preview-window"]');
     await expect(previewWindow).toBeVisible();
+
+    // Activate live preview
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
 
     const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
     const bar = frame.locator('[role="progressbar"]');

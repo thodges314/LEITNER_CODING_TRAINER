@@ -11,6 +11,7 @@ import {
   Loader2,
   ExternalLink,
   Minimize2,
+  Play,
 } from 'lucide-react';
 import type { TopicItem } from '../lib/leitner';
 import { transpileForExecution } from '../lib/runner';
@@ -22,6 +23,8 @@ export interface ReactPreviewProps {
   code: string;
   executionMode: ExecutionMode;
   theme?: 'dark' | 'apple-gsos';
+  isLive?: boolean;
+  onStartLive?: () => void;
   onClose?: () => void;
 }
 
@@ -39,6 +42,8 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   code,
   executionMode,
   theme = 'dark',
+  isLive = false,
+  onStartLive,
   onClose,
 }) => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -178,16 +183,31 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     hasTimedOutRef.current = false;
   }, [code]);
 
-  // Re-render debounced (500ms) on typing, or immediately when iframe ready
+  // Re-render debounced (500ms) on typing when live
+  const prevCodeRef = useRef(code);
   useEffect(() => {
-    if (!isIframeReady) return;
-    if (hasTimedOutRef.current) return;
+    if (!isLive || !isIframeReady || hasTimedOutRef.current) {
+      prevCodeRef.current = code;
+      return;
+    }
+    if (prevCodeRef.current === code) return;
+    prevCodeRef.current = code;
+
     const timer = setTimeout(() => {
       void sendToIframe();
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [code, isIframeReady, sendToIframe]);
+  }, [code, isIframeReady, isLive, sendToIframe]);
+
+  // When going live, immediately trigger preview compile without waiting 500ms
+  const prevIsLiveRef = useRef(isLive);
+  useEffect(() => {
+    if (isLive && !prevIsLiveRef.current && isIframeReady) {
+      void sendToIframe();
+    }
+    prevIsLiveRef.current = isLive;
+  }, [isLive, isIframeReady, sendToIframe]);
 
   const handleRestart = () => {
     hasTimedOutRef.current = false;
@@ -329,7 +349,34 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           </span>
 
           {/* Status Badge */}
-          {status === 'compiling' && (
+          {!isLive && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#94a3b8',
+                backgroundColor: 'rgba(148, 163, 184, 0.1)',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                border: '1px solid rgba(148, 163, 184, 0.25)',
+              }}
+              data-testid="preview-status-badge"
+            >
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: '#94a3b8',
+                }}
+              />
+              Ready
+            </span>
+          )}
+          {isLive && status === 'compiling' && (
             <span
               style={{
                 display: 'inline-flex',
@@ -345,7 +392,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
               <Loader2 size={11} className="animate-spin" /> Compiling...
             </span>
           )}
-          {status === 'rendering' && (
+          {isLive && status === 'rendering' && (
             <span
               style={{
                 display: 'inline-flex',
@@ -361,7 +408,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
               <Loader2 size={11} className="animate-spin" /> Rendering...
             </span>
           )}
-          {status === 'live' && (
+          {isLive && status === 'live' && (
             <span
               style={{
                 display: 'inline-flex',
@@ -375,11 +422,12 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
                 borderRadius: '12px',
                 border: '1px solid rgba(52, 211, 153, 0.35)',
               }}
+              data-testid="preview-status-badge"
             >
               <CheckCircle2 size={11} color="#10b981" /> Live
             </span>
           )}
-          {status === 'error' && (
+          {isLive && status === 'error' && (
             <span
               style={{
                 display: 'inline-flex',
@@ -393,11 +441,12 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
                 borderRadius: '12px',
                 border: '1px solid rgba(248, 113, 113, 0.35)',
               }}
+              data-testid="preview-status-badge"
             >
               <AlertTriangle size={11} color="#f87171" /> Error
             </span>
           )}
-          {status === 'timeout' && (
+          {isLive && status === 'timeout' && (
             <span
               style={{
                 display: 'inline-flex',
@@ -411,6 +460,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
                 borderRadius: '12px',
                 border: '1px solid rgba(251, 146, 60, 0.35)',
               }}
+              data-testid="preview-status-badge"
             >
               <AlertTriangle size={11} color="#fb923c" /> Timed Out
             </span>
@@ -508,8 +558,8 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         </div>
       </div>
 
-      {/* Error Notice Box (if any) */}
-      {errorMessage && (
+      {/* Error Notice Box (if any and live) */}
+      {isLive && errorMessage && (
         <div
           role="alert"
           style={{
@@ -528,7 +578,100 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         </div>
       )}
 
-      {/* Sandboxed Iframe Window */}
+      {/* When not live yet, show friendly welcoming placeholder with Run Code action */}
+      {!isLive && (
+        <div
+          data-testid="preview-ready-placeholder"
+          style={{
+            width: '100%',
+            height: isPoppedOut ? '380px' : '240px',
+            flex: isPoppedOut ? '1 1 auto' : undefined,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            padding: '24px 16px',
+            backgroundColor: isLight ? '#f8fafc' : '#030712',
+          }}
+        >
+          <div
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '12px',
+              background: 'rgba(6, 182, 212, 0.12)',
+              border: '1px solid rgba(6, 182, 212, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '12px',
+            }}
+          >
+            <Layers size={24} color="#06b6d4" />
+          </div>
+          <div
+            style={{
+              fontSize: '13.5px',
+              fontWeight: 600,
+              color: isLight ? '#1e293b' : '#f1f5f9',
+              marginBottom: '6px',
+            }}
+          >
+            Interactive Component Preview
+          </div>
+          <div
+            style={{
+              fontSize: '12px',
+              maxWidth: '340px',
+              lineHeight: 1.55,
+              color: 'var(--text-dim)',
+              marginBottom: '14px',
+            }}
+          >
+            Click <strong style={{ color: isLight ? '#0f172a' : '#f1f5f9' }}>Run Code / Test</strong> (or press{' '}
+            <kbd
+              style={{
+                padding: '2px 5px',
+                borderRadius: '4px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono)',
+              }}
+            >
+              Cmd
+            </kbd>
+            +
+            <kbd
+              style={{
+                padding: '2px 5px',
+                borderRadius: '4px',
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                fontSize: '11px',
+                fontFamily: 'var(--font-mono)',
+              }}
+            >
+              Enter
+            </kbd>
+            ) to initialize the live preview. Once started, the preview stays live and updates automatically as you type.
+          </div>
+          {onStartLive && (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={onStartLive}
+              data-testid="start-preview-btn"
+              style={{ fontSize: '12px', padding: '6px 14px', gap: '6px' }}
+            >
+              <Play size={13} /> Run Code to Start Preview
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Sandboxed Iframe Window (initialized in background, visible once live) */}
       <div
         style={{
           width: '100%',
@@ -536,6 +679,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           flex: isPoppedOut ? '1 1 auto' : undefined,
           backgroundColor: isLight ? '#f8fafc' : '#030712',
           position: 'relative',
+          display: isLive ? 'block' : 'none',
         }}
       >
         <iframe
