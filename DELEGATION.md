@@ -13,6 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
+| Instructions typography & readability (#ede8dc, 15px, 1.68 line-height) | Antigravity | feature/instructions-typography | Ready for owner review |
 
 ## How to pick up a task
 1. `git fetch && git checkout master && git pull`, then read the roadmap, this file and the claim table above. Pick a task nobody has claimed.

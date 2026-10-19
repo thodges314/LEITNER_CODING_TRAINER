@@ -1601,19 +1601,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         </h1>
 
         {/* Prompt Seed Instructions */}
-        <div data-tour="problem"
-          className="prompt-seed-box"
-          style={{
-            padding: '14px 16px',
-            borderRadius: '8px',
-            backgroundColor: 'var(--bg-editor)',
-            border: '1px solid var(--border-subtle)',
-            fontSize: '13.5px',
-            lineHeight: 1.6,
-            color: 'var(--text-primary)',
-            whiteSpace: 'pre-wrap',
-          }}
-        >
+        <div data-tour="problem" className="prompt-seed-box">
           {currentCard.promptSeed}
         </div>
 

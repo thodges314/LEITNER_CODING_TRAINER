@@ -18,10 +18,14 @@
   --border-ui: rgba(255, 255, 255, 0.16);
 
   --text-primary: #f1f5f9;
+  --text-instruction: #ede8dc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --text-dim: #475569;
   --text-on-accent: #ffffff;
+
+  --bg-instruction: #0c1018;
+  --border-instruction: rgba(255, 255, 255, 0.08);
 
   --accent-primary: #38bdf8;
   --accent-secondary: #34d399;
@@ -245,6 +249,19 @@ code {
 .code-buffer:focus {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+/* Prompt Seed Problem Instructions */
+.prompt-seed-box {
+  padding: 16px 20px;
+  border-radius: 8px;
+  background-color: var(--bg-instruction, var(--bg-editor));
+  border: 1px solid var(--border-instruction, var(--border-subtle));
+  font-size: 15px;
+  line-height: 1.68;
+  letter-spacing: -0.005em;
+  color: var(--text-instruction, #ede8dc);
+  white-space: pre-wrap;
 }
 
 /* Utility Badges */
