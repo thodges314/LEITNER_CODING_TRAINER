@@ -1,9 +1,12 @@
 import { isReactTrack as isReactTrackId } from '../../lib/leitner';
 import type { TopicItem } from '../../lib/leitner';
 
+/** Blank lines between the "Write your implementation below" comment and the example checks. */
+export const IMPLEMENTATION_GAP_LINES = 14;
+
 /**
- * Constructs the default starter code template and commented test harness snippet
- * tailored to the card and its track.
+ * Constructs the default starter code template: an empty implementation area followed by the card's own example
+ * checks as live (uncommented) code, tailored to the card and its track. Cards without a harness get a commented hint.
  */
 export function getStarterSnippet(card: TopicItem | null): string {
   if (!card) return '';
@@ -11,16 +14,14 @@ export function getStarterSnippet(card: TopicItem | null): string {
   const isReactTrack = isReactTrackId(card.track);
 
   let commentedSnippet: string;
+  let liveSnippet = '';
   if (card.testHarness?.trim()) {
-    const lines = card.testHarness.trim().split('\n');
-    const commentedLines = lines
-      .map((l) => (l.trim().length > 0 ? `// ${l}` : '//'))
-      .join('\n');
+    // The card's own example checks are real code from the start: running the buffer shows each check as PASS/FAIL.
+    // (runHarness recognises a buffer that already contains them and does not append them a second time.)
+    liveSnippet = card.testHarness.trim();
 
     if (isReactTrack) {
-      commentedSnippet = `${commentedLines}
-//
-// // Inline Component / Hook Test Harness:
+      commentedSnippet = `// // Inline Component / Hook Test Harness (template, uncomment and adapt):
 // function Harness() {
 //   // Call your hook or component here
 //   const [status, setStatus] = React.useState('Mounted');
@@ -36,7 +37,7 @@ export function getStarterSnippet(card: TopicItem | null): string {
 // }
 // mount(Harness);`;
     } else {
-      commentedSnippet = commentedLines;
+      commentedSnippet = '';
     }
   } else if (isReactTrack) {
     commentedSnippet = `// // Inline Component / Hook Test Harness:
@@ -66,5 +67,8 @@ export function getStarterSnippet(card: TopicItem | null): string {
     }
   }
 
-  return `// Write your implementation below\n\n\n// Test runner example:\n${commentedSnippet}`;
+  const body = [liveSnippet, commentedSnippet].filter((part) => part.length > 0).join('\n\n');
+  // A large, obviously empty gap for the answer, then the checks.
+  const gap = '\n'.repeat(IMPLEMENTATION_GAP_LINES + 1);
+  return `// Write your implementation below${gap}// Test runner example:\n${body}`;
 }

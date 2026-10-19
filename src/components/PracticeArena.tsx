@@ -40,7 +40,6 @@ import {
   AlertTriangle,
   XCircle,
   Trash2,
-  Code2,
   Layers,
   FlaskConical,
   Sparkles,
@@ -374,25 +373,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     handleSubmit: () => Promise.resolve(),
     handleFormatCode: () => Promise.resolve(),
   });
-
-  // Toggle comments on the bottom test runner block
-  const handleToggleTestComments = () => {
-    if (!code.includes('// Test runner example:')) return;
-    const parts = code.split('// Test runner example:\n');
-    if (parts.length < 2) return;
-    const header = parts[0] + '// Test runner example:\n';
-    const testPart = parts[1];
-    const lines = testPart.split('\n');
-    const allCommented = lines.every((l) => l.trim() === '' || l.startsWith('//'));
-    const toggledLines = lines.map((l) => {
-      if (allCommented) {
-        return l.replace(/^\/\/\s?/, '');
-      } else {
-        return l.trim().length > 0 ? `// ${l}` : '//';
-      }
-    });
-    setCode(header + toggledLines.join('\n'));
-  };
 
   const appendConsoleLog = (type: 'log' | 'warn' | 'error' | 'info', content: string) => {
     const now = new Date().toLocaleTimeString([], {
@@ -1908,27 +1888,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               </span>
             )}
 
-            {/* Quick Toggle Test Snippet Comments */}
-            {code.includes('// Test runner example:') && (
-              <button
-                type="button"
-                onClick={handleToggleTestComments}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--accent-cyan)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  fontSize: '11.5px',
-                  padding: '2px 4px',
-                }}
-                title="Toggle commented / uncommented status of test runner lines"
-              >
-                <Code2 size={12} /> Toggle Test Comments
-              </button>
-            )}
 
             {/* Auto-format code button */}
             <button
