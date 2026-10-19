@@ -1,6 +1,8 @@
 import seedTopicsData from '../data/topics.json';
 import { extractHarnessContracts } from './harnessContracts';
 import { clearDraft } from './drafts';
+import { recordDailyStat, sanitizeDailyStats } from './dailyStats';
+import type { DailyStats } from './dailyStats';
 
 export type TrackType =
   | 'algorithms'
@@ -92,6 +94,8 @@ export interface LeitnerDeckState {
   algorithm?: SpacedAlgorithm;
   /** Log of recent review outcomes for sparkline and velocity diagnostics (capped at last 20) */
   recentReviews?: ReviewHistoryEntry[];
+  /** Scored reviews and passes per local calendar day (see dailyStats.ts), for the activity graph. */
+  dailyStats?: DailyStats;
 }
 
 export interface ReviewHistoryEntry {
@@ -568,6 +572,7 @@ export function mergeStoredWithSeed(
     filterPresets: normalizePresets(parsed.filterPresets),
     algorithm: parsed.algorithm === 'graduated-interval' ? 'graduated-interval' : parsed.algorithm === 'leitner' ? 'leitner' : getStoredAlgorithm(),
     recentReviews: Array.isArray(parsed.recentReviews) ? parsed.recentReviews : undefined,
+    dailyStats: sanitizeDailyStats(parsed.dailyStats),
   };
 }
 
@@ -811,6 +816,7 @@ export function commitCardReview(
     unlockedStageCount: newStageCount,
     algorithm: algo,
     recentReviews: updatedRecent,
+    dailyStats: recordDailyStat(state.dailyStats, reviewEntry.timestamp ?? Date.now(), passed),
   };
 
   saveDeckState(nextState);
@@ -1163,6 +1169,7 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
     filterPresets: normalizePresets(parsed.filterPresets),
     algorithm: parsed.algorithm === 'graduated-interval' ? 'graduated-interval' : 'leitner',
     recentReviews: Array.isArray(parsed.recentReviews) ? parsed.recentReviews : undefined,
+    dailyStats: sanitizeDailyStats(parsed.dailyStats),
   };
 }
 
