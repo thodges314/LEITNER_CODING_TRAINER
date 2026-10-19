@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   X,
   Sliders,
-  ShieldCheck,
+  ShieldAlert,
   Info,
   CheckCircle2,
   Trash2,
@@ -1216,9 +1216,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             )}
 
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', display: 'flex', gap: '4px' }}>
-              <ShieldCheck size={14} color="#34d399" style={{ flexShrink: 0, marginTop: '1px' }} />
-              Stored in plain text in this browser's localStorage and sent only to the provider you select with each evaluation request.
+            <p
+              data-testid="api-key-warning"
+              style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', display: 'flex', gap: '6px', lineHeight: 1.5 }}
+            >
+              <ShieldAlert size={14} color="#f59e0b" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span>
+                <strong style={{ color: 'var(--text-secondary)' }}>Your key is stored in plain text</strong> in this browser&apos;s localStorage, so
+                anyone who can use this browser profile, or any script running on this page, can read it. It is sent only to the provider you
+                select, and it is not included in backup exports. Use a key with a low spending limit, and remove it (or use Factory reset) on a
+                shared computer.
+              </span>
             </p>
           </div>
         );
