@@ -23,13 +23,13 @@ in the browser; state lives in `localStorage`.
 | Item | Value |
 |---|---|
 | Cards | 267 total = **235 default + 32 in the optional `algorithms-advanced` pack** (92 default cards active at first run) |
-| Documented test cases | 1835 (each shown as input → expected in the UI) |
+| Documented test cases | 1879 (each shown as input → expected in the UI) |
 | Difficulty spread | all 234: d1 33 · d2 70 · d3 90 · d4 39 · d5 2; default 201: d1 33 · d2 66 · d3 72 · d4 28 · d5 2 |
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 955 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 267 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 534 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests = 577 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/ai-wording`): 577 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 267 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 534 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test = 578 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/harden-harnesses`): 578 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -362,8 +362,14 @@ through the card's harness; a good harness FAILS every mutant. A **survivor** is
   top-k, retry, unique-sort, format-utilities, polyfills, throttle, use-media-query ...) and 13 thin cards got more cases. `scripts/mutation-baseline.jsonl` holds the per-card
   results (survivors with operator and line) to triage the rest; most remaining survivors are equivalent mutants. Five cards produced no result because their mutants crashed the
   worker (`iterable-range-class`, `matrix-basics`, `promise-all-by-hand`, `simple-stringify`, `trie-nested-object`).
-- Worst remaining (by survivor count): typeahead-autocomplete, fake-timers, mini-expect, test-runner-lifecycle, graph-word-ladder, tabs-accordion-compound. Check each survivor
-  by hand before adding a case: ask "can a correct solution behave differently here?".
+- **Hardened (second pass):** `typeahead-autocomplete` (21 -> 6 survivors, all equivalent: default delay +/-1 ms, initial state values the mount effect resets), `fake-timers` (11 -> 4, equivalent: the tie-break
+  clause duplicates Map insertion order, an unused factory), `mini-expect` (25 -> 11, equivalent after the type check made some guards redundant) and `test-runner-lifecycle` (20 -> 1, a single `push`
+  into a one-element list). Two real **reference bugs** surfaced and were fixed: `fake-timers` ignored `advanceTimersByTime(0)` (the prompt says `ms >= 0` runs timers that are already due) and
+  `mini-expect` called a Date or RegExp "equal" to `{}`. `test-runner-lifecycle`'s prompt now states the rules the new cases pin down (same-kind hook order, afterEach/afterAll errors, beforeAll failures,
+  the unnamed top-level suite). Still the weakest by survivor count: graph-word-ladder, tabs-accordion-compound. Check each survivor by hand before adding a case: ask "can a correct solution behave
+  differently here?"; if the answer needs an unstated rule, put the rule in the prompt first.
+- **The mutation run does not prove your new cases are right.** A wrong case makes every mutant "die" and the reference fail, which looks like a perfect score. After adding cases always run the real gates
+  (`npm test` -> `seedCards.test.ts` runs the reference against the harness, and the Chromium card tests), and use `--repeat-each=5` for cards that use real timers (typeahead, fake-timers, test-runner-lifecycle).
 - Harness hygiene learned from this: harnesses must not assume a clean page (other dialogs, body scroll lock, `window.matchMedia`, `localStorage` keys). `modal-portal-focus` now
   measures the ambient state first; `use-media-query` restores `window.matchMedia`; `stopwatch`/`theme-switcher` restore what they patch in a `finally`.
 
