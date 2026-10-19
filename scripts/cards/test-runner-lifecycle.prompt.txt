@@ -28,3 +28,7 @@ Implement an asynchronous, in-memory test runner engine `createTestRunner()` (or
   - If a test throws or rejects, mark status `'fail'` with `error: err.message || String(err)`. Subsequent tests continue executing.
   - If `beforeEach` throws, the test fails, and remaining hooks unwind.
   - If `beforeAll` throws, all tests in that suite mark `'fail'` with error details.
+- Several hooks of the same kind in one suite run in the order they were registered.
+- If an `afterEach` hook throws and the test itself did not fail, the test fails with that error; if the test already failed, its own error is kept. Errors thrown by `afterAll` hooks are ignored.
+- A `beforeAll` failure marks every test of that suite as failed, with an error text that contains the original message (a thrown non-Error value is reported through `String(value)`).
+- Tests declared outside any `describe` are reported in one unnamed top-level suite (title `''`) with the `describe` suites nested inside it; when every test is inside a `describe`, the top-level suites are those describes.

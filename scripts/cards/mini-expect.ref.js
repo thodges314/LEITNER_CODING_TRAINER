@@ -3,7 +3,8 @@ function deepEqual(a, b) {
   if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) return false;
   if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();
   if (a instanceof RegExp && b instanceof RegExp) return a.source === b.source && a.flags === b.flags;
-  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  // different kinds never match: an array vs an object, a Date or RegExp vs a plain object, ...
+  if (Object.prototype.toString.call(a) !== Object.prototype.toString.call(b)) return false;
 
   const keysA = Object.keys(a);
   const keysB = Object.keys(b);

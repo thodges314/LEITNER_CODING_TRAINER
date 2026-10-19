@@ -326,6 +326,12 @@ const negated = e.not;
 [expect(1).not.not.toBe(1).pass, fails(() => expect(1).not.not.toBe(2)), e.toBe(1).pass, negated.toBe(2).pass]`,
       `[true, true, true, true]`
     ),
+    c(
+      'toThrow(message) fails when the function does not throw at all, whatever the message pattern',
+      `${FAILS}
+[fails(() => expect(() => {}).toThrow('null')), fails(() => expect(() => {}).toThrow(/null|undefined/)), expect(() => {}).not.toThrow('null').pass]`,
+      `[true, true, true]`
+    ),
   ],
 
   'next-route-matcher': [
@@ -401,6 +407,173 @@ const negated = e.not;
       'supports async tests returning promises',
       `const runner = createTestRunner();\nlet asyncValue = 0;\nrunner.describe('AsyncSuite', () => {\n  runner.it('resolves async', async () => {\n    await new Promise((r) => setTimeout(r, 10));\n    asyncValue = 42;\n  });\n});\nconst res = await runner.run();\n[res.passed, asyncValue]`,
       `[1, 42]`
+    ),
+    c(
+      'several hooks of the same kind run in the order they were registered',
+      `const r = new TestRunner();
+const log = [];
+r.describe('s', () => {
+  r.beforeAll(() => log.push('beforeAll 1'));
+  r.beforeAll(() => log.push('beforeAll 2'));
+  r.beforeEach(() => log.push('beforeEach 1'));
+  r.beforeEach(() => log.push('beforeEach 2'));
+  r.afterEach(() => log.push('afterEach 1'));
+  r.afterEach(() => log.push('afterEach 2'));
+  r.afterAll(() => log.push('afterAll 1'));
+  r.afterAll(() => log.push('afterAll 2'));
+  r.it('t', () => log.push('test'));
+});
+await r.run();
+log`,
+      `['beforeAll 1', 'beforeAll 2', 'beforeEach 1', 'beforeEach 2', 'test', 'afterEach 1', 'afterEach 2', 'afterAll 1', 'afterAll 2']`
+    ),
+    c(
+      'the full nested lifecycle: outer beforeEach first, inner afterEach first, afterAll after the child suites',
+      `const r = new TestRunner();
+const log = [];
+r.describe('outer', () => {
+  r.beforeAll(() => log.push('outer:beforeAll'));
+  r.afterAll(() => log.push('outer:afterAll'));
+  r.beforeEach(() => log.push('outer:beforeEach'));
+  r.afterEach(() => log.push('outer:afterEach'));
+  r.it('t1', () => log.push('t1'));
+  r.describe('inner', () => {
+    r.beforeEach(() => log.push('inner:beforeEach'));
+    r.afterEach(() => log.push('inner:afterEach'));
+    r.it('t2', () => log.push('t2'));
+  });
+});
+await r.run();
+log`,
+      `['outer:beforeAll', 'outer:beforeEach', 't1', 'outer:afterEach', 'outer:beforeEach', 'inner:beforeEach', 't2', 'inner:afterEach', 'outer:afterEach', 'outer:afterAll']`
+    ),
+    c(
+      'the report lists tests and suites in registration order, with counts for mixed passes and failures',
+      `const r = new TestRunner();
+r.describe('A', () => {
+  r.it('a1', () => {});
+  r.it('a2', () => { throw new Error('bad'); });
+  r.it('a3', () => {});
+  r.describe('A.1', () => { r.it('x', () => {}); });
+  r.describe('A.2', () => { r.it('y', () => { throw new Error('no'); }); });
+});
+r.describe('B', () => { r.it('b1', () => {}); });
+const rep = await r.run();
+[rep.passed, rep.failed, rep.total, rep.suites.map((s) => s.title), rep.suites[0].tests.map((t) => t.title + ':' + t.status), rep.suites[0].suites.map((s) => s.title)]`,
+      `[4, 2, 6, ['A', 'B'], ['a1:pass', 'a2:fail', 'a3:pass'], ['A.1', 'A.2']]`
+    ),
+    c(
+      'a failing test reports its message (or String(value) for a non-Error), and a passing test has no error',
+      `const r = new TestRunner();
+r.describe('s', () => {
+  r.it('throws error', () => { throw new Error('boom'); });
+  r.it('throws string', () => { throw 'plain'; });
+  r.it('rejects', async () => { await sleep(5); throw new Error('late'); });
+  r.it('ok', () => {});
+});
+const t = (await r.run()).suites[0].tests;
+[t.map((x) => [x.status, x.error]), 'error' in t[3]]`,
+      `[[['fail', 'boom'], ['fail', 'plain'], ['fail', 'late'], ['pass', undefined]], false]`
+    ),
+    c(
+      'async hooks and tests are awaited, so everything finishes in order before run() resolves',
+      `const r = new TestRunner();
+const log = [];
+r.describe('s', () => {
+  // the first hook of each pair is the slow one: if it were not awaited, the next step would log before it
+  r.beforeAll(async () => { await sleep(40); log.push('beforeAll'); });
+  r.beforeEach(async () => { await sleep(5); log.push('beforeEach'); });
+  r.afterEach(async () => { await sleep(40); log.push('afterEach'); });
+  r.afterAll(async () => { await sleep(5); log.push('afterAll'); });
+  r.it('t', async () => { await sleep(5); log.push('test'); });
+});
+await r.run();
+log`,
+      `['beforeAll', 'beforeEach', 'test', 'afterEach', 'afterAll']`
+    ),
+    c(
+      'when beforeEach throws (even asynchronously) the test fails with that error, its body does not run, and afterEach still runs',
+      `const r = new TestRunner();
+const log = [];
+r.describe('s', () => {
+  r.beforeEach(async () => { await sleep(5); throw new Error('setup'); });
+  r.afterEach(() => log.push('afterEach'));
+  r.it('t', () => log.push('test'));
+});
+const t = (await r.run()).suites[0].tests[0];
+[t.status, t.error, log]`,
+      `['fail', 'setup', ['afterEach']]`
+    ),
+    c(
+      'an afterEach error fails a passing test but never replaces the test\'s own error',
+      `const r = new TestRunner();
+r.describe('s', () => {
+  r.afterEach(() => { throw new Error('cleanup'); });
+  r.it('passes', () => {});
+  r.it('fails', () => { throw new Error('own'); });
+});
+(await r.run()).suites[0].tests.map((t) => [t.status, t.error])`,
+      `[['fail', 'cleanup'], ['fail', 'own']]`
+    ),
+    c(
+      'a failing beforeAll fails every test of that suite, in order, without running them',
+      `const r = new TestRunner();
+const log = [];
+r.describe('s', () => {
+  r.beforeAll(() => { throw new Error('setup broke'); });
+  r.it('one', () => log.push('one'));
+  r.it('two', () => log.push('two'));
+});
+const rep = await r.run();
+const ts = rep.suites[0].tests;
+[ts.map((t) => t.title + ':' + t.status), ts.every((t) => t.error.includes('setup broke')), log, rep.failed]`,
+      `[['one:fail', 'two:fail'], true, [], 2]`
+    ),
+    c(
+      'a beforeAll that throws a non-Error value still reports its text',
+      `const r = new TestRunner();
+r.describe('s', () => {
+  r.beforeAll(() => { throw 'plain failure'; });
+  r.it('one', () => {});
+});
+const t = (await r.run()).suites[0].tests[0];
+[t.status, t.error.includes('plain failure')]`,
+      `['fail', true]`
+    ),
+    c(
+      'errors thrown by afterAll are ignored and later suites still run',
+      `const r = new TestRunner();
+r.describe('A', () => {
+  r.afterAll(() => { throw new Error('ignored'); });
+  r.afterAll(async () => { await sleep(5); throw new Error('also ignored'); });
+  r.it('a', () => {});
+});
+r.describe('B', () => { r.it('b', () => {}); });
+const rep = await r.run();
+[rep.passed, rep.failed, rep.suites.map((s) => s.title)]`,
+      `[2, 0, ['A', 'B']]`
+    ),
+    c(
+      'tests declared outside any describe are reported in one unnamed suite with the describes nested inside it',
+      `const r = new TestRunner();
+r.it('top', () => {});
+r.describe('inner', () => { r.it('deep', () => { throw new Error('x'); }); });
+const rep = await r.run();
+[rep.suites.length, rep.suites[0].title, rep.suites[0].tests.map((t) => t.title), rep.suites[0].suites.map((s) => s.title), rep.passed, rep.failed]`,
+      `[1, '', ['top'], ['inner'], 1, 1]`
+    ),
+    c(
+      'a beforeEach is inherited by child suites but not by sibling suites',
+      `const r = new TestRunner();
+const log = [];
+r.describe('A', () => {
+  r.beforeEach(() => log.push('A.beforeEach'));
+  r.describe('A1', () => { r.it('x', () => log.push('x')); });
+});
+r.describe('B', () => { r.it('y', () => log.push('y')); });
+await r.run();
+log`,
+      `['A.beforeEach', 'x', 'y']`
     ),
   ],
 };
