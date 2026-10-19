@@ -66,3 +66,23 @@ export function lastDays(stats: DailyStats | undefined, endTimestamp: number, da
   }
   return points;
 }
+
+export interface DaysSummary {
+  reviews: number;
+  passes: number;
+  /** Share of reviews that passed (0..1), or null when there were no reviews. */
+  accuracy: number | null;
+  activeDays: number;
+}
+
+export function summarizeDays(points: DayPoint[]): DaysSummary {
+  let reviews = 0;
+  let passes = 0;
+  let activeDays = 0;
+  for (const p of points) {
+    reviews += p.reviews;
+    passes += p.passes;
+    if (p.reviews > 0) activeDays++;
+  }
+  return { reviews, passes, accuracy: reviews > 0 ? passes / reviews : null, activeDays };
+}

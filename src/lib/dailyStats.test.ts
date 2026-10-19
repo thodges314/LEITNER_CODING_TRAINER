@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DAILY_STATS_KEEP_DAYS, lastDays, localDateKey, recordDailyStat, sanitizeDailyStats } from './dailyStats';
+import { DAILY_STATS_KEEP_DAYS, lastDays, localDateKey, recordDailyStat, sanitizeDailyStats, summarizeDays } from './dailyStats';
 
 const at = (y: number, m: number, d: number, h = 12) => new Date(y, m - 1, d, h).getTime();
 
@@ -75,5 +75,20 @@ describe('lastDays', () => {
     expect(new Set(dates).size).toBe(10);
     expect(dates[0]).toBe('2026-10-25');
     expect(dates[9]).toBe('2026-11-03');
+  });
+});
+
+describe('summarizeDays', () => {
+  it('totals the window and computes accuracy and active days', () => {
+    const s = summarizeDays([
+      { date: 'a', reviews: 4, passes: 3 },
+      { date: 'b', reviews: 0, passes: 0 },
+      { date: 'c', reviews: 6, passes: 3 },
+    ]);
+    expect(s).toEqual({ reviews: 10, passes: 6, accuracy: 0.6, activeDays: 2 });
+  });
+  it('has no accuracy when there were no reviews', () => {
+    expect(summarizeDays([{ date: 'a', reviews: 0, passes: 0 }])).toEqual({ reviews: 0, passes: 0, accuracy: null, activeDays: 0 });
+    expect(summarizeDays([])).toEqual({ reviews: 0, passes: 0, accuracy: null, activeDays: 0 });
   });
 });
