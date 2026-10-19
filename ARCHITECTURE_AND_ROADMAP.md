@@ -29,7 +29,7 @@ in the browser; state lives in `localStorage`.
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 955 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 267 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 534 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests = 577 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/uncommented-tests`): 577 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 267 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 534 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests = 577 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/ai-wording`): 577 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -51,7 +51,7 @@ src/
     runner.ts                  sandbox + harness execution (see §5)
     domTools.ts, mockFetch.ts  headless DOM test tools ($dom) and deterministic fetch mock
     harnessContracts.ts        extracts the "Target Contract" table shown for a card
-    ai.ts                      optional AI evaluator (Gemini/OpenAI-compatible); advisory only
+    ai.ts                      optional AI evaluator (Gemini/OpenAI-compatible): the tests decide whether code works; the AI can fail a passing run (shown as a note, overridable) but never rescue a failing one
     drafts.ts                  per-card editor autosave (localStorage `leitner_draft:<id>`)
   types/
     rainbowbrackets.d.ts       type declarations for rainbowbrackets extension
@@ -434,6 +434,9 @@ A dismissable 7-step spotlight walkthrough. It is **offered, never forced**: the
 
 ### 7.11 One-time hints (DONE: first one)
 `src/lib/hints.ts` (`isHintSeen` / `markHintSeen`, keys in localStorage, never nags if storage fails). The first hint: the first time someone uses the **Filter Tracks** chips in the Deck Catalog, a callout explains that this filter is for inspecting cards and that choosing what to practice is done with the **Focus** button (with an "Open Focus" button). Shown once ever (`leitner_hint_track_filter`), covered by `e2e/catalog-hint.spec.ts`. Reuse `hints.ts` for any further first-use hint.
+
+### 7.12 Who decides the verdict (DONE: wording and panel)
+Rule in code (`ai.ts`): with an AI key, `passed = AI says passed && the harness did not fail`; offline, `passed = harness passed`. So **the tests are the objective check, a failing test run is never a pass, and the AI reviewer can additionally fail a passing run** (it checks things tests cannot, such as using the construct the card asks for) **but it can be wrong** (for example about newer JavaScript such as `Set.prototype.intersection`; the evaluation prompt now states ES2024+ is supported). The result panel (`EvaluationPanel`, `lib/verdict.ts`) therefore shows `Result`, `Tests passed/failed (summary)` and `AI reviewer: pass / needs revision` separately, and when the tests passed but the AI failed the answer it shows an amber note saying so; the human override is always available. Keep About, README and this section in step with that rule.
 
 ## 8. Conventions and pitfalls for assistants
 

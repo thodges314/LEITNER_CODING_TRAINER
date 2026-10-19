@@ -19,6 +19,7 @@ import {
 import { intervalForBox } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { askCritiqueFollowUp, type EvaluationResult } from '../lib/ai';
+import { summarizeVerdict } from '../lib/verdict';
 
 const renderInlineMarkdown = (text: string): React.ReactNode[] => {
   const parts: React.ReactNode[] = [];
@@ -213,6 +214,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   const isLight = theme === 'apple-gsos';
   // Human override state, initialized to AI verdict
   const [effectiveVerdict, setEffectiveVerdict] = useState<boolean>(result.passed);
+  const verdict = summarizeVerdict(result);
   const isOverridden = effectiveVerdict !== result.passed;
 
   // Canonical solution reveal state
@@ -518,6 +520,26 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
           )}
         </div>
 
+        {verdict.aiOverruledTests && (
+          <div
+            role="note"
+            data-testid="ai-disagrees-note"
+            style={{
+              padding: '10px 14px',
+              borderRadius: '8px',
+              fontSize: '13px',
+              lineHeight: 1.5,
+              color: 'var(--text-primary)',
+              backgroundColor: 'rgba(245, 158, 11, 0.10)',
+              border: '1px solid rgba(245, 158, 11, 0.5)',
+            }}
+          >
+            <strong>Your code passed all of the card&apos;s tests, but the AI reviewer marked it as needing revision.</strong> The
+            tests are the objective check and the reviewer can be wrong (for example about newer JavaScript features). Read its
+            critique, and if you disagree, use the override below.
+          </div>
+        )}
+
         {/* Human Override Toggle Controls */}
         <div
           style={{
@@ -532,20 +554,26 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             gap: '10px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }} data-testid="verdict-summary">
             <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>
-              AI Verdict:
+              Result:{' '}
+              <span
+                style={{
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  color: result.passed
+                    ? (isLight ? '#15803D' : '#34d399')
+                    : (isLight ? '#B91C1C' : '#f87171'),
+                }}
+              >
+                {result.passed ? 'Pass' : 'Fail'}
+              </span>
             </span>
-            <span
-              style={{
-                fontSize: '12.5px',
-                fontWeight: 600,
-                color: result.passed
-                  ? (isLight ? '#15803D' : '#34d399')
-                  : (isLight ? '#B91C1C' : '#f87171'),
-              }}
-            >
-              {result.passed ? 'Pass' : 'Fail'}
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+              {verdict.tests === 'not-run'
+                ? 'Tests could not run'
+                : `Tests ${verdict.tests}${result.harness?.summary ? ` (${result.harness.summary})` : ''}`}
+              {verdict.reviewer ? ` · AI reviewer: ${verdict.reviewer === 'pass' ? 'pass' : 'needs revision'}` : ''}
             </span>
           </div>
 
@@ -575,8 +603,8 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             />
             <span style={{ color: 'var(--text-primary)' }}>
               {result.passed
-                ? 'Override AI verdict (Mark as Failed)'
-                : 'Override AI verdict (Mark as Passed)'}
+                ? 'Override this verdict (Mark as Failed)'
+                : 'Override this verdict (Mark as Passed)'}
             </span>
           </label>
         </div>

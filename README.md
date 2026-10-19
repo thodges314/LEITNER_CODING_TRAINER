@@ -37,9 +37,10 @@ npm run build      # type-check + production build into dist/
   - `Cmd + /` / `Ctrl + /`: Toggle line comments
 - **Grading** (`src/lib/runner.ts`): on submit the card's test harness is run headlessly against your code.
   A card passes only if the harness logs at least one `PASS` and no `FAIL`/errors. An AI model (optional) adds
-  critique but cannot override a failing harness. You can always override the verdict by hand
-  (useful for harnesses that need the network).
-- **Offline mode**: with no API key, grading is harness-only plus advisory structural notes.
+  reviews the approach and can mark a passing run as needing revision (the result panel then says so), but it can
+  never turn a failing harness into a pass. You can always override the verdict by hand (for example when the AI
+  is wrong, or for harnesses that need the network).
+- **Offline mode**: with no API key, the result is harness-only plus advisory structural notes.
 - **TypeScript mode**: strict type-checking with the TypeScript compiler, loaded lazily on first use.
 - **Persistence**: seed content from `src/data/topics.json` is merged into your stored deck on load. Progress is
   kept, content updates flow in, new seed cards are added, and seed cards you delete stay deleted.

@@ -50,6 +50,8 @@ test.describe('answer flow', () => {
     await openCardWithDraft(page, reference);
     await submit(page).click();
     await expect(page.getByText('PASSED', { exact: false }).first()).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('verdict-summary')).toContainText('Tests passed');
+    await expect(page.getByTestId('ai-disagrees-note')).toHaveCount(0);
     await expect(page.getByRole('button', { name: /Continue to Next Card/ })).toBeVisible();
     // the answering controls are gone and the editor is locked
     await expect(page.getByRole('button', { name: /Submit Final Answer|Check My Practice|Run Code \/ Test|Skip Card/ })).toHaveCount(0);
@@ -64,6 +66,7 @@ test.describe('answer flow', () => {
     await expect(page.getByRole('button', { name: /Practice the Pattern/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /Edit & Retest|Commit|Submit Final Answer|Run Code \/ Test|Skip Card/ })).toHaveCount(0);
     await expect(page.getByText(/Failed checks:/)).toBeVisible();
+    await expect(page.getByTestId('verdict-summary')).toContainText('Tests failed');
     // the critique does not contain the pasted solution or raw markdown
     await expect(page.getByText('### Canonical Reference Pattern')).toHaveCount(0);
     // the solution is available in the one Reveal panel (open after a failure)
