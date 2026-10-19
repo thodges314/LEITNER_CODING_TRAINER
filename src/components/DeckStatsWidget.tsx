@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import * as d3 from 'd3';
-import { Activity, PieChart, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Activity, BarChart3, PieChart, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ActivityView } from './ActivityView';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
 import { getTrackMeta } from '../lib/leitner';
 import type { AppTheme } from '../lib/theme';
 
-export type StatsViewMode = 'radar' | 'orbit' | 'tiers';
+export type StatsViewMode = 'radar' | 'orbit' | 'tiers' | 'activity';
 
 interface DeckStatsWidgetProps {
   state: LeitnerDeckState;
@@ -55,6 +56,7 @@ const RADAR_DOMAINS: { id: string; label: string; tracks: TrackType[] }[] = [
 ];
 
 export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
+  state,
   topics,
   theme,
   selectedTracks,
@@ -157,22 +159,15 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
     { id: 'radar', label: 'Skill Matrix', icon: <Activity size={13} /> },
     { id: 'orbit', label: 'Track Orbit', icon: <PieChart size={13} /> },
     { id: 'tiers', label: 'Mastery Tiers', icon: <Layers size={13} /> },
+    { id: 'activity', label: 'Activity', icon: <BarChart3 size={13} /> },
   ];
 
   const handleNextMode = () => {
-    setMode((prev) => {
-      if (prev === 'radar') return 'orbit';
-      if (prev === 'orbit') return 'tiers';
-      return 'radar';
-    });
+    setMode((prev) => modes[(modes.findIndex((m) => m.id === prev) + 1) % modes.length].id);
   };
 
   const handlePrevMode = () => {
-    setMode((prev) => {
-      if (prev === 'radar') return 'tiers';
-      if (prev === 'tiers') return 'orbit';
-      return 'radar';
-    });
+    setMode((prev) => modes[(modes.findIndex((m) => m.id === prev) + modes.length - 1) % modes.length].id);
   };
 
   // Exclusive selection dispatchers
@@ -390,7 +385,10 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
           position: 'relative',
         }}
       >
-        {activeTopics.length === 0 ? (
+        {mode === 'activity' ? (
+          /* Mode 4: reviews per day and share passed. Needs no active cards: the history is kept regardless. */
+          <ActivityView stats={state.dailyStats} theme={theme} />
+        ) : activeTopics.length === 0 ? (
           <div
             style={{
               padding: '24px',
