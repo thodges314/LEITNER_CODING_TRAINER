@@ -49,6 +49,16 @@ const text = (c) => (q('span', c) ? q('span', c).textContent.trim() : '');
   r.unmount();
 }
 {
+  const r = render(<ProgressBar />);
+  const f = fill(r.container);
+  $test.check(
+    'Indeterminate: the data-fill element is still rendered, but without any inline style (no width)',
+    f !== null && f.style.width === '' && !f.hasAttribute('style') && q('span', r.container) === null,
+    { fill: f ? f.outerHTML : null }
+  );
+  r.unmount();
+}
+{
   const r = render(<ProgressBar value={50} />);
   r.rerender(<ProgressBar value={80} />);
   $test.check('Re-rendering with a new value updates the fill and the text', fill(r.container).style.width === '80%' && text(r.container) === '80%', { width: fill(r.container).style.width });

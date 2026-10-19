@@ -1,1 +1,12 @@
-Build ProgressBar({ value, max = 100, label = "Progress" }). Render <div role="progressbar"> with aria-label={label}, aria-valuemin="0", aria-valuemax={max} and aria-valuenow set to value clamped into [0, max]. Inside it render a fill element <div data-fill> whose style width is the exact percentage clamped/max*100 (e.g. "50%", "75%") and a <span> showing that percentage rounded to a whole number followed by "%". When value is undefined the bar is indeterminate: omit aria-valuenow, set data-indeterminate="true" and render no percentage text.
+Build ProgressBar({ value, max = 100, label = "Progress" }). Render a root <div role="progressbar"> with aria-label={label}, aria-valuemin="0" and aria-valuemax={max}. Let clamped be value limited to the range [0, max].
+
+When value is defined:
+- set aria-valuenow to clamped on the root;
+- render <div data-fill style={{ width: `${(clamped / max) * 100}%` }} /> inside it (the exact percentage, for example "50%" or "75%");
+- render <span>{Math.round((clamped / max) * 100)}%</span> inside it (a whole number followed by "%").
+
+When value is undefined (indeterminate):
+- set data-indeterminate="true" on the root element;
+- omit aria-valuenow;
+- render <div data-fill /> with no inline style at all;
+- do not render the <span>: there is no percentage text.
