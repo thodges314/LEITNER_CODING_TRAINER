@@ -1,5 +1,8 @@
 import { c } from './part1.mjs';
 
+// helper for the mini-expect cases: does calling fn throw an Error?
+const FAILS = `const fails = (fn) => { try { fn(); return false; } catch (e) { return e instanceof Error; } };`;
+
 // Hand-written cases for batch 25: Testing & Libs (Pure Logic) track.
 export default {
   'mock-fn': [
@@ -66,6 +69,121 @@ export default {
       `const clock = new FakeTimers();\nconst log = [];\nclock.setTimeout(() => {\n  log.push('step1');\n  clock.setTimeout(() => log.push('step2'), 50);\n}, 50);\nclock.advanceTimersByTime(120);\nlog`,
       `['step1', 'step2']`
     ),
+    c(
+      'a timer due exactly at the target time runs, and now() is the target',
+      `const clock = new FakeTimers();
+const ran = [];
+clock.setTimeout(() => ran.push(clock.now()), 100);
+clock.advanceTimersByTime(100);
+[ran, clock.now()]`,
+      `[[100], 100]`
+    ),
+    c(
+      'advanceTimersByTime(1) runs a timer that is due in 1 ms',
+      `const clock = new FakeTimers();
+let ran = false;
+clock.setTimeout(() => { ran = true; }, 1);
+clock.advanceTimersByTime(1);
+[ran, clock.now()]`,
+      `[true, 1]`
+    ),
+    c(
+      'timers due at the same time run in the order they were created',
+      `const clock = new FakeTimers();
+const order = [];
+clock.setTimeout(() => order.push('A'), 100);
+clock.setTimeout(() => order.push('B'), 100);
+clock.setTimeout(() => order.push('C'), 100);
+clock.advanceTimersByTime(100);
+order`,
+      `['A', 'B', 'C']`
+    ),
+    c(
+      'ties are broken by creation order, but an earlier time always goes first',
+      `const clock = new FakeTimers();
+const order = [];
+clock.setTimeout(() => order.push('X'), 200);
+clock.setTimeout(() => order.push('Y'), 100);
+clock.setTimeout(() => order.push('Z'), 100);
+clock.advanceTimersByTime(200);
+order`,
+      `['Y', 'Z', 'X']`
+    ),
+    c(
+      'advanceTimersByTime(0) runs timers that are already due (no delay given, or delay 0) without moving the clock',
+      `const clock = new FakeTimers();
+const order = [];
+clock.setTimeout(() => order.push('default'));
+clock.setTimeout(() => order.push('zero'), 0);
+clock.setTimeout(() => order.push('later'), 10);
+clock.advanceTimersByTime(0);
+[order, clock.now()]`,
+      `[['default', 'zero'], 0]`
+    ),
+    c(
+      'a negative delay counts as 0',
+      `const clock = new FakeTimers();
+let ran = false;
+clock.setTimeout(() => { ran = true; }, -50);
+clock.advanceTimersByTime(0);
+[ran, clock.now()]`,
+      `[true, 0]`
+    ),
+    c(
+      'a timer scheduled with no delay inside a callback runs in the same call',
+      `const clock = new FakeTimers();
+const log = [];
+clock.setTimeout(() => {
+  log.push('first');
+  clock.setTimeout(() => log.push('second'));
+}, 10);
+clock.advanceTimersByTime(10);
+log`,
+      `['first', 'second']`
+    ),
+    c(
+      'now() inside a callback is that timer\'s own scheduled time, and the clock ends at the target',
+      `const clock = new FakeTimers();
+const seen = [];
+clock.setTimeout(() => seen.push(clock.now()), 30);
+clock.setTimeout(() => seen.push(clock.now()), 70);
+clock.advanceTimersByTime(100);
+[seen, clock.now()]`,
+      `[[30, 70], 100]`
+    ),
+    c(
+      'a timer scheduled from a callback is relative to that callback\'s time',
+      `const clock = new FakeTimers();
+const seen = [];
+clock.setTimeout(() => {
+  clock.setTimeout(() => seen.push(clock.now()), 25);
+}, 40);
+clock.advanceTimersByTime(64);
+const before = seen.slice();
+clock.advanceTimersByTime(1);
+[before, seen]`,
+      `[[], [65]]`
+    ),
+    c(
+      'every setTimeout returns a different number',
+      `const clock = new FakeTimers();
+const ids = [clock.setTimeout(() => {}, 1), clock.setTimeout(() => {}, 1), clock.setTimeout(() => {}, 1)];
+[ids.every((id) => typeof id === 'number'), new Set(ids).size]`,
+      `[true, 3]`
+    ),
+    c(
+      'clearTimeout of an unknown or already-run id does nothing, and other timers still run',
+      `const clock = new FakeTimers();
+const ran = [];
+const first = clock.setTimeout(() => ran.push('first'), 10);
+clock.setTimeout(() => ran.push('second'), 20);
+clock.advanceTimersByTime(10);
+clock.clearTimeout(first);
+clock.clearTimeout(99999);
+clock.advanceTimersByTime(10);
+ran`,
+      `['first', 'second']`
+    ),
   ],
 
   'mini-expect': [
@@ -98,6 +216,115 @@ export default {
       'toThrow throws an Error if target function does not throw',
       `let caught = false;\ntry {\n  expect(() => 42).toThrow();\n} catch (e) {\n  caught = true;\n}\ncaught`,
       `true`
+    ),
+    c(
+      'toBe uses Object.is: NaN is NaN, and +0 is not -0',
+      `${FAILS}
+[expect(NaN).toBe(NaN).pass, fails(() => expect(0).toBe(-0)), expect(0).not.toBe(-0).pass]`,
+      `[true, true, true]`
+    ),
+    c(
+      'toBe compares objects by identity, not by content',
+      `${FAILS}
+const o = {};
+[expect(o).toBe(o).pass, fails(() => expect({}).toBe({})), expect({}).not.toBe({}).pass]`,
+      `[true, true, true]`
+    ),
+    c(
+      'not.toBe throws when the values are the same',
+      `${FAILS}
+[fails(() => expect(5).not.toBe(5)), fails(() => expect('a').not.toBe('a'))]`,
+      `[true, true]`
+    ),
+    c(
+      'toEqual: different primitives, null and undefined are not equal',
+      `${FAILS}
+[fails(() => expect(1).toEqual(2)), fails(() => expect(null).toEqual({})), fails(() => expect({}).toEqual(null)), fails(() => expect(undefined).toEqual(null)), fails(() => expect('1').toEqual({})), fails(() => expect({}).toEqual(1)), expect(null).toEqual(null).pass]`,
+      `[true, true, true, true, true, true, true]`
+    ),
+    c(
+      'toEqual compares Dates by time',
+      `${FAILS}
+[expect(new Date(1000)).toEqual(new Date(1000)).pass, fails(() => expect(new Date(1000)).toEqual(new Date(2000))), fails(() => expect(new Date(1000)).toEqual({}))]`,
+      `[true, true, true]`
+    ),
+    c(
+      'toEqual compares RegExps by source and flags',
+      `${FAILS}
+[expect(/a+/g).toEqual(/a+/g).pass, fails(() => expect(/a+/g).toEqual(/a+/i)), fails(() => expect(/a+/).toEqual(/b+/)), fails(() => expect(/a/).toEqual({}))]`,
+      `[true, true, true, true]`
+    ),
+    c(
+      'toEqual: an array is not equal to an object with the same keys',
+      `${FAILS}
+[fails(() => expect([]).toEqual({})), fails(() => expect({}).toEqual([])), fails(() => expect([1]).toEqual({ 0: 1 }))]`,
+      `[true, true, true]`
+    ),
+    c(
+      'toEqual: a different number of keys, or different keys, are not equal',
+      `${FAILS}
+[fails(() => expect({ a: 1 }).toEqual({ a: 1, b: 2 })), fails(() => expect({ a: 1, b: 2 }).toEqual({ a: 1 })), fails(() => expect({ a: 1 }).toEqual({ b: 1 })), fails(() => expect({ a: undefined }).toEqual({ b: undefined }))]`,
+      `[true, true, true, true]`
+    ),
+    c(
+      'toEqual finds differences deep inside nested objects and arrays',
+      `${FAILS}
+[fails(() => expect({ a: { b: [1, 2, { c: 3 }] } }).toEqual({ a: { b: [1, 2, { c: 4 }] } })), expect({ a: { b: [1, 2, { c: 3 }] } }).toEqual({ a: { b: [1, 2, { c: 3 }] } }).pass, fails(() => expect([1, 2, 3]).toEqual([1, 2]))]`,
+      `[true, true, true]`
+    ),
+    c(
+      'toEqual treats NaN as equal to NaN, also inside objects',
+      `expect({ n: NaN }).toEqual({ n: NaN }).pass`,
+      `true`
+    ),
+    c(
+      'not.toEqual throws when the values are deeply equal',
+      `${FAILS}
+[fails(() => expect({ a: [1, { b: 2 }] }).not.toEqual({ a: [1, { b: 2 }] })), expect({ a: 1 }).not.toEqual({ a: 2 }).pass]`,
+      `[true, true]`
+    ),
+    c(
+      'toThrow fails for a function that does not throw, and not.toThrow() is the reverse',
+      `${FAILS}
+[fails(() => expect(() => {}).toThrow()), expect(() => {}).not.toThrow().pass, fails(() => expect(() => { throw new Error('x'); }).not.toThrow())]`,
+      `[true, true, true]`
+    ),
+    c(
+      'toThrow(string) matches a part of the message and toThrow(RegExp) tests it',
+      `${FAILS}
+[expect(() => { throw new Error('Boom happened'); }).toThrow('Boom').pass, fails(() => expect(() => { throw new Error('Boom'); }).toThrow('Bang')), expect(() => { throw new Error('code 42'); }).toThrow(/[0-9]+/).pass, fails(() => expect(() => { throw new Error('no digits'); }).toThrow(/[0-9]+/))]`,
+      `[true, true, true, true]`
+    ),
+    c(
+      'a thrown value that is not an Error is matched through String(value)',
+      `${FAILS}
+[expect(() => { throw 'plain text'; }).toThrow('plain').pass, fails(() => expect(() => { throw 'plain text'; }).toThrow('other'))]`,
+      `[true, true]`
+    ),
+    c(
+      'toThrow on something that is not a function throws an Error, also with .not',
+      `${FAILS}
+[fails(() => expect(5).toThrow()), fails(() => expect(5).not.toThrow())]`,
+      `[true, true]`
+    ),
+    c(
+      'not.toThrow(expected) passes when the message is different and fails when it matches',
+      `${FAILS}
+[expect(() => { throw new Error('a'); }).not.toThrow('b').pass, fails(() => expect(() => { throw new Error('abc'); }).not.toThrow('b'))]`,
+      `[true, true]`
+    ),
+    c(
+      'every passing matcher returns exactly { pass: true }',
+      `[expect(1).toBe(1), expect({}).toEqual({}), expect(() => { throw 1; }).toThrow(), expect(1).not.toBe(2)]`,
+      `[{ pass: true }, { pass: true }, { pass: true }, { pass: true }]`
+    ),
+    c(
+      '.not can be chained twice, and does not change the original expectation',
+      `${FAILS}
+const e = expect(1);
+const negated = e.not;
+[expect(1).not.not.toBe(1).pass, fails(() => expect(1).not.not.toBe(2)), e.toBe(1).pass, negated.toBe(2).pass]`,
+      `[true, true, true, true]`
     ),
   ],
 

@@ -21,7 +21,7 @@ class FakeTimers {
   }
 
   advanceTimersByTime(ms) {
-    if (ms <= 0) return;
+    if (ms < 0) return; // 0 is allowed: it still runs timers that are already due
     const targetTime = this._time + ms;
 
     while (true) {
