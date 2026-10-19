@@ -120,6 +120,7 @@ got`, `['a']`),
     c('No common elements', 'arrayIntersection([1, 2], [3, 4])', '[]'),
     c('Either side empty', 'arrayIntersection([], [1, 2])', '[]'),
     c('Order of first appearance in the second array', 'arrayIntersection([4, 9, 5], [9, 4, 9, 8, 4])', '[9, 4]'),
+    c('Order in b preserved when b has more unique elements than a', 'arrayIntersection([4, 9], [9, 4, 8])', '[9, 4]'),
   ],
   'array-flatten-recursive': [
     c('Mixed nesting', 'flatten([1, [2, [3, 4], 5]])', '[1, 2, 3, 4, 5]'),
