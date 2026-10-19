@@ -15,6 +15,7 @@ import {
 import type { TopicItem } from '../lib/leitner';
 import { transpileForExecution } from '../lib/runner';
 import type { ExecutionMode } from '../lib/runner';
+import { stripTestRunnerBlock } from '../lib/stripTestRunner';
 // The preview runtime (about 220 KB of bundled React) is loaded on demand, only for cards that show a preview.
 type PreviewFrameModule = typeof import('../lib/reactPreviewFrame');
 
@@ -155,7 +156,8 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     if (!card.previewCode || !targetWindow) return;
 
     setStatus('compiling');
-    const combined = `${code}\n\n${card.previewCode}`;
+    const userComponentCode = stripTestRunnerBlock(code);
+    const combined = `${userComponentCode}\n\n${card.previewCode}`;
     const mode = card.track === 'typescript-patterns' ? 'ts' : executionMode;
     const transpiled = await transpileForExecution(combined, mode, 800);
 

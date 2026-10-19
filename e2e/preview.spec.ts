@@ -376,5 +376,38 @@ test.describe('React preview window', () => {
     await mainDockBtn.click();
     await expect.poll(() => popup.isClosed()).toBe(true);
   });
+
+  test('controlled-vs-uncontrolled-input: renders live preview cleanly even when test runner snippet with $dom is uncommented in the editor', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'controlled-vs-uncontrolled-input');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    // Simulate user having the test runner example uncommented in the editor
+    const codeWithUncommentedTest = `${solution}\n\n// Test runner example:\nconst { render, fire, q } = $dom;\n{\n  const calls = [];\n  const { container } = render(<SearchForm onSearch={(s) => calls.push(s)} />);\n  const input = q('input', container);\n  const form = q('form', container);\n  fire.change(input, 'react');\n  $test.check('Input mirrors typed text', input.value === 'react');\n}`;
+
+    await openCard(page, 'controlled-vs-uncontrolled-input', codeWithUncommentedTest);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    // Click 'Run Code / Test' button to trigger run & live preview
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    // Preview should transition to Live without crashing on $dom
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    // Frame locator to inspect inside the sandboxed iframe
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const input = frame.locator('input').first();
+    await expect(input).toBeVisible({ timeout: 5000 });
+    const submitBtn = frame.getByRole('button', { name: /Search/i });
+    await expect(submitBtn).toBeVisible();
+
+    // Verify typing into input updates controlled state value without any errors
+    await input.pressSequentially('hello search');
+    await expect(input).toHaveValue('hello search');
+  });
 });
+
 

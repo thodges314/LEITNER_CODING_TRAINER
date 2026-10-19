@@ -314,6 +314,7 @@ pane or pop-out window, without disturbing the editor, Run Code or Submit.
   produce non-empty DOM (and any `log` callback must not throw). Plus Playwright tests (`e2e/preview.spec.ts`) that test live rendering, events, pop-out windows, and infinite loop protection.
 - Work split: (1) the iframe window + `previewCode` plumbing + guard test (DONE, branch `feature/react-preview`); (2) writing `<id>.preview.js` for the remaining React cards (DONE, task A2: all 44 React component cards have authored `.preview.js` files, passing all guard tests);
   (3) from then on every new React card ships its preview file (rule 10 in `DELEGATION.md`).
+- **Test Runner Isolation**: Starter snippets may append console test harness examples (`// Test runner example:` calling `$dom`, `$test`, or `mount`). When users uncomment this test code in the editor, `ReactPreview.tsx` isolates it via `stripTestRunnerBlock` so only component implementation code is combined with `previewCode`. The preview iframe sandbox also provides no-op shims for `$dom`, `$test`, and `mount`, preventing `ReferenceError: $dom is not defined` from halting preview evaluation.
 4. **Duplicate cards**: RESOLVED by the 2026-10 audit (8 near-duplicates removed, the rest are deliberate progressions; see §7.4e).
 5. **Difficulty in the catalog**: sort/filter by difficulty and concept; show the ladder (which rung unlocks next and why a card is locked).
 6. Optional: per-card hints that reveal the reference solution progressively; export/import of drafts.

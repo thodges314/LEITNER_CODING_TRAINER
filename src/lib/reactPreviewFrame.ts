@@ -71,6 +71,60 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
     window.Suspense = React.Suspense;
     window.createPortal = ReactDOM.createPortal;
 
+    // Safe mock shims for $dom, $test, and mount so that any test harness code
+    // evaluated inside the preview frame runs safely without throwing ReferenceErrors.
+    window.mount = function() {};
+
+    window.$dom = {
+      render: function() {
+        return {
+          container: document.createElement('div'),
+          unmount: function() {},
+          rerender: function() {}
+        };
+      },
+      renderHook: function(hook) {
+        let result = { current: undefined };
+        try { result.current = typeof hook === 'function' ? hook() : undefined; } catch (_) {}
+        return { result: result, unmount: function() {}, rerender: function() {} };
+      },
+      renderError: function() { return { error: null }; },
+      fire: {
+        click: function(el) { try { el?.click?.(); } catch (_) {} return { defaultPrevented: false }; },
+        change: function(el, val) {
+          if (el) {
+            el.value = typeof val === 'object' && val && 'target' in val ? val.target.value : (val !== undefined ? val : '');
+            try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (_) {}
+            try { el.dispatchEvent(new Event('change', { bubbles: true })); } catch (_) {}
+          }
+          return { defaultPrevented: false };
+        },
+        keyDown: function() { return { defaultPrevented: false }; },
+        submit: function(el) {
+          try { el?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); } catch (_) {}
+          return { defaultPrevented: true };
+        },
+        focus: function(el) { try { el?.focus?.(); } catch (_) {} },
+        event: function() { return { defaultPrevented: false }; },
+      },
+      q: function(sel, root) { return (root || document).querySelector(sel) || document.createElement('div'); },
+      qa: function(sel, root) { return Array.from((root || document).querySelectorAll(sel)); },
+      wait: function() { return Promise.resolve(); },
+      flush: function() { return Promise.resolve(); },
+      act: function(fn) { return fn ? fn() : undefined; },
+      intersect: function() {},
+      cleanup: function() {},
+    };
+
+    window.$test = {
+      check: function() {},
+      equal: function() {},
+      run: function() {},
+      rejects: function() { return Promise.resolve(); },
+      logs: function() {},
+      sleep: function() { return Promise.resolve(); },
+    };
+
     let activeRenderId = null;
 
     function stringify(arg) {
