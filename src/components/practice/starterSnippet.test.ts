@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import seed from '../../data/topics.json';
 import type { TopicItem } from '../../lib/leitner';
 import { getStarterSnippet, IMPLEMENTATION_GAP_LINES } from './starterSnippet';
@@ -22,24 +22,24 @@ describe('starter snippet: the card checks are live code', () => {
   it('contains the card harness exactly, uncommented', () => {
     const c = card('binary-search-exact');
     const body = afterMarker(getStarterSnippet(c));
-    expect(body).toBe(c.testHarness!.trim());
+    expect(body.trim()).toBe(c.testHarness!.trim());
     expect(body.split('\n').filter((l) => l.trim().startsWith('//'))).toEqual([]);
     expect(body).toContain('await $test.run("Target in the right half"');
   });
 
-  it('for a React card, the checks are live and only the generic Harness template stays commented', () => {
+  it('for a React card, the checks are live and no generic harness template is appended', () => {
     const c = card('progress-bar');
     const body = afterMarker(getStarterSnippet(c));
-    expect(body.startsWith(c.testHarness!.trim())).toBe(true);
-    const generic = body.slice(c.testHarness!.trim().length);
-    expect(generic).toContain('// mount(Harness);');
-    expect(generic.split('\n').filter((l) => l.trim().length > 0 && !l.trim().startsWith('//'))).toEqual([]);
+    expect(body.trim()).toBe(c.testHarness!.trim());
+    expect(body).not.toContain('// mount(Harness);');
+    expect(body).not.toContain('Inline Component / Hook Test Harness');
   });
 
-  it('a card without a harness still gets only a commented hint', () => {
-    const body = afterMarker(getStarterSnippet({ ...card('binary-search-exact'), testHarness: '' }));
-    expect(body.trim().length).toBeGreaterThan(0);
-    expect(body.split('\n').filter((l) => l.trim().length > 0 && !l.trim().startsWith('//'))).toEqual([]);
+  it('a card without a harness gets only the clean implementation buffer', () => {
+    const c = { ...card('binary-search-exact'), testHarness: '' };
+    const snippet = getStarterSnippet(c);
+    expect(snippet).toContain('// Write your implementation below');
+    expect(snippet).not.toContain('// Test runner example:');
   });
 
   it('is empty for no card', () => {
