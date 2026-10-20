@@ -324,9 +324,10 @@ export const CARD_PACKS: Record<string, { label: string; description: string }> 
   'algorithms-advanced': {
     label: 'Advanced algorithms',
     description:
-      'Heavier LeetCode-style material: 2D/advanced DP, heaps beyond the basics, monotonic stacks, hard backtracking (N-Queens, word search), ' +
-      'k-group list reversal, tree serialization and similar. The core algorithm set (arrays, hashing, two pointers, sliding window, stacks, ' +
-      'binary search, linked lists, trees/BST, basic graph theory, intro DP, sorting) stays in the main deck.',
+      'Academic, whiteboard-style computer-science material: binary trees and BSTs (depth, validation, traversals, serialization), graph algorithms ' +
+      '(BFS/DFS, topological sort, grid flood fill), heaps, tries, dynamic programming, backtracking, bit manipulation, monotonic stacks and similar. ' +
+      'The practical set stays in the main deck: arrays and strings, hashing, two pointers, sliding window, stacks, binary search, linked lists, ' +
+      'intervals, matrices, sorting and DOM / tree traversal.',
   },
 };
 

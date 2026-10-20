@@ -31,6 +31,27 @@
     "backtrack-n-queens",
     "backtrack-palindrome-partition",
     "backtrack-subsets-permute-unique",
-    "backtrack-word-search"
+    "backtrack-word-search",
+    "tree-depth-sum",
+    "bst-search-insert",
+    "bst-validate-lca-invert",
+    "tree-level-order",
+    "tree-path-sum",
+    "tree-diameter-balanced",
+    "graph-adjacency-bfs",
+    "graph-components-paths",
+    "graph-clone-bipartite",
+    "graph-grid-bfs",
+    "course-schedule-topo",
+    "flood-fill-islands",
+    "heap-array-basics",
+    "heap-kth-largest",
+    "climb-stairs-fib-dp",
+    "coin-change-dp",
+    "binary-strings-combinations",
+    "permutations-subsets-backtracking",
+    "bit-basics",
+    "trie-nested-object",
+    "trie-prefix-tree"
   ]
 }

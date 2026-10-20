@@ -22,9 +22,9 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 271 total = **239 default + 32 in the optional `algorithms-advanced` pack** (92 default cards active at first run) |
+| Cards | 271 total = **218 default + 53 in the optional `algorithms-advanced` pack** (89 default cards active at first run) |
 | Documented test cases | 1934 (each shown as input → expected in the UI) |
-| Difficulty spread | all 234: d1 33 · d2 70 · d3 90 · d4 39 · d5 2; default 201: d1 33 · d2 66 · d3 72 · d4 28 · d5 2 |
+| Difficulty spread | all 271: d1 36 · d2 91 · d3 105 · d4 37 · d5 2; default 218: d1 33 · d2 78 · d3 79 · d4 26 · d5 2 |
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
@@ -340,15 +340,16 @@ Flaky-on-first-try cards in the last full run (all passed on retry): the fetch/p
 
 
 ### 7.4b Optional card packs (DONE): `algorithms-advanced`
-Why: this is a **front-end interview** trainer; LeetCode-heavy material should not dominate the deck. `scripts/packs.json` lists 33 heavier algorithm cards
-(2D/advanced DP, heap beyond basics, monotonic stack, hard backtracking, k-group reversal, tree serialization, ...). Build sets `pack` on them; deck state
+Why: this is a **front-end interview** trainer; LeetCode-style and academic CS material should not dominate the deck. `scripts/packs.json` lists the **53** cards of the pack; the build sets `pack` on them and deck state
 `enabledPacks` (default `[]`) turns packs on in **Settings → Optional card packs**. A card of a disabled pack is excluded from scheduling
 (`scheduleFilter` → `cardMatchesFilter`), staged unlocks (`checkStagedUnlocks(..., isAllowed)`), the catalog, the Focus match counts and the header
-counts; its progress is untouched, so re-enabling restores it. The ~47 **core** algorithm cards stay in the main deck on purpose
-(arrays, hashing, two pointers, sliding window, stack, binary search, linked lists, trees/BST, **basic graph theory: adjacency BFS, components/paths,
-flood fill/islands, grid BFS, clone/bipartite, topological sort**, intro DP, sorting, tries). To move a card between core and pack, edit `packs.json` and
-run `npm run build:cards`. The Playwright smoke test enables the pack so it still covers every card.
+counts; its progress is untouched, so re-enabling restores it. To move a card between core and pack, edit `packs.json` and run `npm run build:cards`
+(never edit `topics.json` by hand: only the `pack` field changes). The Playwright smoke test enables the pack so it still covers every card.
 
+**Classification rubric (decided by the maintainer; apply it to every new algorithm card):**
+- **Core / practical (24 cards):** linear stream and string/array processing (sliding window, two pointers, binary search, prefix sums, intervals, matrices), practical collection utilities (hashing, grouping, anagrams, dedupe), linked lists, stack utilities (valid parentheses, MinStack), basic sorting, and realistic object/DOM hierarchy traversal (n-ary `{ id, children }` trees, `tree-traversal-dom`).
+- **Advanced pack (53 cards):** pointer-based academic structures (binary trees and BSTs with `{ val, left, right }`: depth/sum/count, validation, level order, path sum, diameter, serialization), graph algorithms (adjacency list/BFS, components, bipartite, topological sort, grid BFS/DFS, word ladder), heaps, tries, dynamic programming (1D and 2D), backtracking, bit manipulation, monotonic stacks, greedy puzzles and similar whiteboard material.
+- The second pass moved 21 cards (`tree-depth-sum`, `bst-search-insert`, `bst-validate-lca-invert`, `tree-level-order`, `tree-path-sum`, `tree-diameter-balanced`, `graph-adjacency-bfs`, `graph-components-paths`, `graph-clone-bipartite`, `graph-grid-bfs`, `course-schedule-topo`, `flood-fill-islands`, `heap-array-basics`, `heap-kth-largest`, `climb-stairs-fib-dp`, `coin-change-dp`, `binary-strings-combinations`, `permutations-subsets-backtracking`, `bit-basics`, `trie-nested-object`, `trie-prefix-tree`) from the default deck into the pack. Side effect: the first-run active set went from 99 to 89 cards (algorithm cards among them from 23 to 13).
 
 ### 7.4d Mutation check (`npm run mutation`): are the harnesses strict enough?
 `src/lib/mutate.ts` makes small single-site mistakes in a card's reference solution (`===`/`!==`, `<`/`<=`, `&&`/`||`, `+`/`-`, off-by-one integers, dropped `await`,
