@@ -1224,8 +1224,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <span>
                 <strong style={{ color: 'var(--text-secondary)' }}>Your key is stored in plain text</strong> in this browser&apos;s localStorage, so
                 anyone who can use this browser profile, or any script running on this page, can read it. It is sent only to the provider you
-                select, and it is not included in backup exports. Use a key with a low spending limit, and remove it (or use Factory reset) on a
-                shared computer.
+                select, and it is not included in backup exports. On a shared computer, use a key with a low spending limit and ensure remove it,
+                or use Factory Reset, before leaving.
               </span>
             </p>
           </div>
