@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import { Activity, BarChart3, PieChart, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ActivityView } from './ActivityView';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
-import { getTrackMeta } from '../lib/leitner';
+import { getTrackMeta, getSchedulingAlgorithm } from '../lib/leitner';
 import type { AppTheme } from '../lib/theme';
 
 export type StatsViewMode = 'radar' | 'orbit' | 'tiers' | 'activity';
@@ -14,6 +14,7 @@ interface DeckStatsWidgetProps {
   theme?: AppTheme;
   selectedTracks?: string[];
   selectedBox?: number | number[] | 'all';
+  displayedBoxes?: number[];
   onSelectExclusiveTrack?: (track: string) => void;
   onSelectExclusiveTracks?: (tracks: string[]) => void;
   onSelectExclusiveBox?: (box: number | number[] | 'all') => void;
@@ -61,12 +62,30 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   theme,
   selectedTracks,
   selectedBox,
+  displayedBoxes,
   onSelectExclusiveTrack,
   onSelectExclusiveTracks,
   onSelectExclusiveBox,
   onSelectTrack,
 }) => {
   const isLight = theme === 'apple-gsos';
+  const algorithm = getSchedulingAlgorithm(state);
+  const isGraduated = algorithm === 'graduated-interval';
+  const tierName = isGraduated ? 'Tier' : 'Box';
+
+  const effectiveDisplayedBoxes = useMemo(() => {
+    if (displayedBoxes && displayedBoxes.length > 0) return displayedBoxes;
+    if (isGraduated) {
+      const maxBox = topics.reduce((max, t) => Math.max(max, t.box || 1), 5);
+      return Array.from({ length: Math.max(9, maxBox) }, (_, i) => i + 1);
+    }
+    return [1, 2, 3, 4, 5];
+  }, [displayedBoxes, isGraduated, topics]);
+
+  const tiers5Plus = useMemo(() => {
+    return effectiveDisplayedBoxes.filter((b) => b >= 5);
+  }, [effectiveDisplayedBoxes]);
+
   // Default view is now Skill Matrix ('radar') per user requirement
   const [mode, setMode] = useState<StatsViewMode>('radar');
   const [hoveredTrack, setHoveredTrack] = useState<string | null>(null);
@@ -139,11 +158,11 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
       5: '+35/45 trial interval (Mastered)',
     };
     const names: Record<number, string> = {
-      1: 'Box 1: Learning',
-      2: 'Box 2: Emerging',
-      3: 'Box 3: Consolidating',
-      4: 'Box 4: Retention',
-      5: 'Box 5+: Mastered',
+      1: `${tierName} 1: Learning`,
+      2: `${tierName} 2: Emerging`,
+      3: `${tierName} 3: Consolidating`,
+      4: `${tierName} 4: Retention`,
+      5: `${tierName} 5+: Mastered`,
     };
     return [5, 4, 3, 2, 1].map((box) => ({
       box,
@@ -153,7 +172,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
       interval: intervals[box],
       percentage: activeTopics.length > 0 ? ((counts[box] || 0) / activeTopics.length) * 100 : 0,
     }));
-  }, [activeTopics, isLight]);
+  }, [activeTopics, isLight, tierName]);
 
   const modes: { id: StatsViewMode; label: string; icon: React.ReactNode }[] = [
     { id: 'radar', label: 'Skill Matrix', icon: <Activity size={13} /> },
@@ -191,7 +210,11 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
 
   const handleBoxClick = (box: number | number[]) => {
     if (onSelectExclusiveBox) {
-      onSelectExclusiveBox(box);
+      if (box === 5 && isGraduated) {
+        onSelectExclusiveBox(tiers5Plus);
+      } else {
+        onSelectExclusiveBox(box);
+      }
     }
   };
 
@@ -631,7 +654,11 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                   const isHovered = hoveredBox === item.box;
                   const isBoxSelected =
                     selectedBox !== 'all' &&
-                    (Array.isArray(selectedBox) ? selectedBox.includes(item.box) : selectedBox === item.box);
+                    (Array.isArray(selectedBox)
+                      ? (item.box === 5 && isGraduated
+                          ? (tiers5Plus.length > 0 && tiers5Plus.every((b) => selectedBox.includes(b)))
+                          : selectedBox.includes(item.box))
+                      : selectedBox === item.box);
 
                   const maxArcAngle = Math.PI * 1.7; // 306 degrees arc
                   const fraction = activeTopics.length > 0 ? item.count / activeTopics.length : 0;

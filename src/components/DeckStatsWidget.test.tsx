@@ -272,6 +272,74 @@ describe('DeckStatsWidget', () => {
     expect(handleSelectExclusiveBox).toHaveBeenCalledWith(1);
   });
 
+  it('invokes onSelectExclusiveBox with all tiers >= 5 when the Tier 5+ ring is clicked in graduated-interval mode', async () => {
+    const handleSelectExclusiveBox = vi.fn();
+
+    await act(async () => {
+      root?.render(
+        <DeckStatsWidget
+          state={{ ...mockState, algorithm: 'graduated-interval' }}
+          topics={mockTopics}
+          theme="dark"
+          displayedBoxes={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          onSelectExclusiveBox={handleSelectExclusiveBox}
+        />
+      );
+    });
+
+    const tiersBtn = container?.querySelector('button[data-testid="stats-mode-tiers"]') as HTMLButtonElement;
+    await act(async () => {
+      tiersBtn.click();
+    });
+
+    const box5Group = container?.querySelector('g[data-box="5"]') as SVGGElement;
+    expect(box5Group).toBeTruthy();
+
+    await act(async () => {
+      box5Group.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(handleSelectExclusiveBox).toHaveBeenCalledWith([5, 6, 7, 8, 9]);
+  });
+
+  it('shows Tier 5+ ring as selected only when all tiers >= 5 are in selectedBox', async () => {
+    await act(async () => {
+      root?.render(
+        <DeckStatsWidget
+          state={{ ...mockState, algorithm: 'graduated-interval' }}
+          topics={mockTopics}
+          theme="dark"
+          displayedBoxes={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          selectedBox={[5]}
+        />
+      );
+    });
+
+    const tiersBtn = container?.querySelector('button[data-testid="stats-mode-tiers"]') as HTMLButtonElement;
+    await act(async () => {
+      tiersBtn.click();
+    });
+
+    const box5Group = container?.querySelector('g[data-box="5"] path:last-child') as SVGPathElement;
+    expect(box5Group.getAttribute('stroke')).toBe('none');
+
+    // Now re-render with [5, 6, 7, 8, 9]
+    await act(async () => {
+      root?.render(
+        <DeckStatsWidget
+          state={{ ...mockState, algorithm: 'graduated-interval' }}
+          topics={mockTopics}
+          theme="dark"
+          displayedBoxes={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+          selectedBox={[5, 6, 7, 8, 9]}
+        />
+      );
+    });
+
+    const box5GroupSelected = container?.querySelector('g[data-box="5"] path:last-child') as SVGPathElement;
+    expect(box5GroupSelected.getAttribute('stroke')).not.toBe('none');
+  });
+
   it('shows empty state when no active cards exist', async () => {
     await act(async () => {
       root?.render(
