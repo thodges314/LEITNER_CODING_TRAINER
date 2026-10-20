@@ -19,6 +19,7 @@ export interface TestCaseItem {
   input: string;
   expected: string;
   description?: string;
+  callSignature?: string;
 }
 
 export interface TopicItem {

@@ -199,3 +199,37 @@ export function extractHarnessContracts(harness?: string): TestCaseItem[] {
   }
   return unique;
 }
+
+
+
+/**
+ * Strips out known test-harness preambles (such as factory helpers for linked lists, trees,
+ * or result normalization) from displayed call signatures while keeping multiline test setups
+ * and assertions intact.
+ */
+export function sanitizeCallSignature(input?: string): string {
+  if (!input || typeof input !== 'string') return '';
+
+  // Normalize escaped newlines if coming from serialized JSON
+  const raw = input.replace(/\\n/g, '\n');
+
+  const lines = raw.split('\n');
+  const cleanLines = lines.filter((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+    // Strip known harness declarations (single-line or multiline headers)
+    if (
+      /^(?:(?:const|let|var)\s+(?:list|toArray|norm|ser|mk|dump|fails|n|brief)\s*=|function\s+(?:list|toArray|norm|ser|mk|dump|fails|n|brief)\b)/.test(
+        trimmed
+      )
+    ) {
+      return false;
+    }
+    // Strip trailing helper close lines if any
+    if (trimmed === '};' || trimmed === '}') return false;
+    return true;
+  });
+
+  return cleanLines.length > 0 ? cleanLines.join('\n') : input;
+}
+
