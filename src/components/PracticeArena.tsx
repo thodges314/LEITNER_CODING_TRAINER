@@ -49,7 +49,7 @@ import {
   Minimize2,
 } from 'lucide-react';
 import { transpileForExecution, runHarness, createSandboxScope } from '../lib/runner';
-import { extractHarnessContracts } from '../lib/harnessContracts';
+import { extractHarnessContracts, sanitizeCallSignature, TOPIC_CONTRACT_OVERRIDES } from '../lib/harnessContracts';
 import { formatConsoleArg, formatAssertionFailure } from './practice/consoleFormat';
 import type { ConsoleLogEntry } from './practice/consoleFormat';
 import { ReactTestErrorBoundary } from './practice/ReactTestErrorBoundary';
@@ -1588,9 +1588,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         {/* Target Contract (Input vs Expected Output) */}
         {(() => {
           const contractCases =
-            currentCard.testCases && currentCard.testCases.length > 0
+            (currentCard.id && TOPIC_CONTRACT_OVERRIDES[currentCard.id]) ||
+            (currentCard.testCases && currentCard.testCases.length > 0
               ? currentCard.testCases
-              : extractHarnessContracts(currentCard.testHarness);
+              : extractHarnessContracts(currentCard.testHarness));
 
           if (!contractCases || contractCases.length === 0) return null;
 
@@ -1760,7 +1761,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                                   fontFeatureSettings: '"calt" 1, "liga" 1',
                                 }}
                               >
-                                {tc.input}
+                                {sanitizeCallSignature(tc.callSignature || tc.input)}
                               </code>
                             </td>
                             <td

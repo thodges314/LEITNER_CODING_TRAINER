@@ -199,3 +199,127 @@ export function extractHarnessContracts(harness?: string): TestCaseItem[] {
   }
   return unique;
 }
+
+/**
+ * Optional topic-specific contract overrides for cards where automated harness parsing
+ * or raw test case strings benefit from curated presentation contracts.
+ */
+export const TOPIC_CONTRACT_OVERRIDES: Record<string, TestCaseItem[]> = {
+  'reverse-linked-list': [
+    {
+      description: 'reverseList reverses a list',
+      input: 'toArray(reverseList(list(1, 2, 3, 4)))',
+      expected: '[4, 3, 2, 1]',
+    },
+    {
+      description: 'reverseList: empty and single-node lists',
+      input: '[reverseList(null), toArray(reverseList(list(7)))]',
+      expected: '[null, [7]]',
+    },
+    {
+      description: 'reverseList relinks the same nodes (in place)',
+      input: 'const a = list(1, 2);\nconst head = a;\nconst r = reverseList(a);\n[r.val, r.next === head, head.next]',
+      expected: '[2, true, null]',
+    },
+    {
+      description: 'middleNode of an odd-length list',
+      input: 'middleNode(list(1, 2, 3, 4, 5)).val',
+      expected: '3',
+    },
+    {
+      description: 'middleNode of an even-length list is the second middle',
+      input: 'middleNode(list(1, 2, 3, 4)).val',
+      expected: '3',
+    },
+    {
+      description: 'middleNode of one node and of an empty list',
+      input: '[middleNode(list(9)).val, middleNode(null)]',
+      expected: '[9, null]',
+    },
+  ],
+};
+
+const KNOWN_PREAMBLE_IDENTIFIERS = new Set([
+  'list',
+  'toArray',
+  'norm',
+  'n',
+  'ser',
+  'big',
+  'mk',
+  'dump',
+  'fails',
+  'board',
+  'mem',
+  'memory',
+  'ev',
+  'el',
+  'brief',
+]);
+
+function isHarnessPreambleStart(line: string): boolean {
+  const trimmed = line.trim();
+  const declMatch =
+    trimmed.match(/^(?:const|let|var)\s+([A-Za-z0-9_$]+)\s*=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z0-9_$]+)?\s*=>/) ||
+    trimmed.match(/^(?:const|let|var)\s+([A-Za-z0-9_$]+)\s*=\s*(?:async\s*)?function\b/) ||
+    trimmed.match(/^function\s+([A-Za-z0-9_$]+)\s*\(/);
+
+  if (!declMatch) return false;
+  return KNOWN_PREAMBLE_IDENTIFIERS.has(declMatch[1]);
+}
+
+/**
+ * Strips out known test-harness preambles (such as factory helpers for linked lists, trees,
+ * or result normalization) from displayed call signatures while keeping multiline test setups
+ * and assertions intact.
+ */
+export function sanitizeCallSignature(input?: string): string {
+  if (!input || typeof input !== 'string') return '';
+  const lines = input.split('\n');
+  let hasPreamble = false;
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    if (!line) {
+      i++;
+      continue;
+    }
+    if (isHarnessPreambleStart(line)) {
+      hasPreamble = true;
+      let openBraces = (line.match(/{/g) || []).length;
+      let closeBraces = (line.match(/}/g) || []).length;
+      let openParens = (line.match(/\(/g) || []).length;
+      let closeParens = (line.match(/\)/g) || []).length;
+      const trimmed = line.trim();
+      let isComplete =
+        openBraces <= closeBraces &&
+        openParens <= closeParens &&
+        (trimmed.endsWith(';') || trimmed.endsWith('}'));
+
+      i++;
+      while (
+        i < lines.length &&
+        (!isComplete || openBraces > closeBraces || openParens > closeParens)
+      ) {
+        const cur = lines[i].trim();
+        openBraces += (cur.match(/{/g) || []).length;
+        closeBraces += (cur.match(/}/g) || []).length;
+        openParens += (cur.match(/\(/g) || []).length;
+        closeParens += (cur.match(/\)/g) || []).length;
+        isComplete =
+          openBraces <= closeBraces &&
+          openParens <= closeParens &&
+          (cur.endsWith(';') || cur.endsWith('}'));
+        i++;
+      }
+    } else {
+      break;
+    }
+  }
+
+  if (!hasPreamble) return input;
+  const remaining = lines.slice(i).join('\n').trim();
+  return remaining || input;
+}
+

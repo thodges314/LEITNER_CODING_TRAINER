@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractHarnessContracts } from './harnessContracts';
+import { extractHarnessContracts, sanitizeCallSignature, TOPIC_CONTRACT_OVERRIDES } from './harnessContracts';
 
 describe('extractHarnessContracts', () => {
   it('returns nothing for an empty harness', () => {
@@ -40,3 +40,77 @@ describe('extractHarnessContracts', () => {
     expect(extractHarnessContracts("console.log('says ? PASS : nothing');")).toEqual([]);
   });
 });
+
+describe('sanitizeCallSignature', () => {
+  it('returns empty string for null, undefined, or empty inputs', () => {
+    expect(sanitizeCallSignature('')).toBe('');
+    expect(sanitizeCallSignature(undefined)).toBe('');
+  });
+
+  it('strips list and toArray helper factory preambles from linked list tests', () => {
+    const raw = `const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);
+const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };
+toArray(reverseList(list(1, 2, 3, 4)))`;
+
+    expect(sanitizeCallSignature(raw)).toBe('toArray(reverseList(list(1, 2, 3, 4)))');
+  });
+
+  it('preserves multiline test setup and assertions after stripping preambles', () => {
+    const raw = `const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);
+const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };
+const a = list(1, 2);
+const head = a;
+const r = reverseList(a);
+[r.val, r.next === head, head.next]`;
+
+    expect(sanitizeCallSignature(raw)).toBe(
+      `const a = list(1, 2);\nconst head = a;\nconst r = reverseList(a);\n[r.val, r.next === head, head.next]`
+    );
+  });
+
+  it('strips norm helper from sorting/grouping test cases', () => {
+    const raw = `const norm = (groups) => groups.map((g) => [...g].sort()).sort((a, b) => (a.join() < b.join() ? -1 : 1));
+norm(subsets([1, 2, 3]))`;
+
+    expect(sanitizeCallSignature(raw)).toBe('norm(subsets([1, 2, 3]))');
+  });
+
+  it('strips multiline function declarations matching known helpers', () => {
+    const raw = `function toArray(node) {
+  const out = [];
+  while (node) {
+    out.push(node.val);
+    node = node.next;
+  }
+  return out;
+}
+hasCycle(list(1, 2, 3))`;
+
+    expect(sanitizeCallSignature(raw)).toBe('hasCycle(list(1, 2, 3))');
+  });
+
+  it('does not strip data array declarations named list that are not helper functions', () => {
+    const raw = `const list = [{ id: 1, text: 'hello' }];\nrenderQueue(list)`;
+    expect(sanitizeCallSignature(raw)).toBe(raw);
+  });
+
+  it('falls back to the original string when no known preambles are present', () => {
+    const simple = 'add(1, 2)';
+    expect(sanitizeCallSignature(simple)).toBe(simple);
+
+    const multiline = `const a = [1, 2, 3];\nconst b = a.slice();\n[a, b]`;
+    expect(sanitizeCallSignature(multiline)).toBe(multiline);
+  });
+});
+
+describe('TOPIC_CONTRACT_OVERRIDES', () => {
+  it('provides clean contracts for reverse-linked-list aligned with expectations', () => {
+    const cases = TOPIC_CONTRACT_OVERRIDES['reverse-linked-list'];
+    expect(cases).toBeDefined();
+    expect(cases.length).toBe(6);
+    expect(cases[0].input).toBe('toArray(reverseList(list(1, 2, 3, 4)))');
+    expect(cases[0].expected).toBe('[4, 3, 2, 1]');
+    expect(cases[2].expected).toBe('[2, true, null]');
+  });
+});
+
