@@ -64,14 +64,41 @@ describe('seed deck packs', () => {
   it('every pack name used by a seed card is a known pack', () => {
     for (const c of cards) if (c.pack) expect(Object.keys(CARD_PACKS), c.id).toContain(c.pack);
   });
-  it('the core algorithm set keeps a fair, varied representation (incl. basic graph theory)', () => {
+  // The maintainer's rubric: core = practical data processing; pack = academic / whiteboard computer science.
+  it('the core algorithm set is the practical one: linear array/string processing, hashing, intervals, lists, stacks, sorting, DOM trees', () => {
     const core = cards.filter((c) => c.track === 'algorithms' && !c.pack);
-    expect(core.length).toBeGreaterThanOrEqual(40);
+    expect(core.length).toBeGreaterThanOrEqual(20);
     const concepts = new Set(core.map((c) => c.concept));
-    for (const must of ['graphs', 'trees', 'linked-lists', 'sliding-window', 'two-pointer', 'binary-search', 'hashing', 'stack', 'dp', 'sorting']) {
-      expect(concepts.has(must), must).toBe(true);
+    for (const must of ['arrays', 'strings', 'sliding-window', 'two-pointer', 'binary-search', 'hashing', 'intervals', 'linked-lists', 'stack', 'sorting', 'matrix']) {
+      expect(concepts.has(must), `core should keep ${must}`).toBe(true);
     }
-    expect(core.filter((c) => c.concept === 'graphs').length).toBeGreaterThanOrEqual(5);
+    for (const academic of ['graphs', 'heap', 'dp', 'dp2d', 'backtracking', 'bits', 'bst', 'trie']) {
+      expect(concepts.has(academic), `${academic} belongs in the advanced pack`).toBe(false);
+    }
+    // the only tree left in the core deck is the realistic n-ary DOM hierarchy, not { val, left, right } pointer trees
+    expect(core.filter((c) => c.concept === 'trees').map((c) => c.id)).toEqual(['tree-traversal-dom']);
+  });
+  it('the academic cards moved on purpose (binary trees/BSTs, graphs, heaps, tries, DP, backtracking, bits) are in the pack', () => {
+    const moved = [
+      'tree-depth-sum', 'bst-search-insert', 'bst-validate-lca-invert', 'tree-level-order', 'tree-path-sum', 'tree-diameter-balanced',
+      'graph-adjacency-bfs', 'graph-components-paths', 'graph-clone-bipartite', 'graph-grid-bfs', 'course-schedule-topo', 'flood-fill-islands',
+      'heap-array-basics', 'heap-kth-largest', 'climb-stairs-fib-dp', 'coin-change-dp', 'binary-strings-combinations',
+      'permutations-subsets-backtracking', 'bit-basics', 'trie-nested-object', 'trie-prefix-tree',
+    ];
+    for (const id of moved) expect(cards.find((c) => c.id === id)?.pack, id).toBe('algorithms-advanced');
+  });
+  it('the practical algorithm cards the maintainer keeps stay in the core deck', () => {
+    const kept = [
+      'two-pointer-sorted-sum', 'container-water-two-pointer', 'sliding-window-fixed', 'longest-substring-window', 'valid-parentheses-stack', 'min-stack',
+      'linked-list-cycle-merge', 'reverse-linked-list', 'list-remove-reorder', 'strings-basics', 'anagram-palindrome', 'group-anagrams-top-k',
+      'two-sum-hashmap', 'kadane-prefix-sum', 'merge-intervals', 'interval-overlap', 'binary-search-exact', 'binary-search-variants',
+      'search-rotated-array', 'matrix-basics', 'matrix-rotate-spiral', 'insertion-sort-basic', 'merge-sort-quick-sort', 'tree-traversal-dom',
+    ];
+    for (const id of kept) {
+      const card = cards.find((c) => c.id === id);
+      expect(card, id).toBeDefined();
+      expect(card?.pack, id).toBeUndefined();
+    }
   });
   it('a default (packs-off) deck still starts with an easy, varied rotation', () => {
     const visible = cards.filter((c) => !c.pack);
