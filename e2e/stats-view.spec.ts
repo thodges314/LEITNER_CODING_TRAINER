@@ -86,8 +86,36 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     // Test exclusive tier filter on Mastery Tiers
     const box1Arc = statsWidget.locator('g[data-box="1"] path').last();
     await box1Arc.dispatchEvent('click');
+    await expect(page.getByTestId('tier-pill-1')).toHaveAttribute('aria-pressed', 'true');
     // Toggle off
     await box1Arc.dispatchEvent('click');
+    await expect(page.getByTestId('tier-pill-1')).toHaveAttribute('aria-pressed', 'false');
+
+    // Test tier (5+) classification click selects all pills for tier 5 and above
+    const box5Arc = statsWidget.locator('g[data-box="5"] path').last();
+    await box5Arc.dispatchEvent('click');
+    await expect(page.getByTestId('tier-pill-5')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('tier-pill-6')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('tier-pill-7')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('tier-pill-8')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('tier-pill-9')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('tier-pill-1')).toHaveAttribute('aria-pressed', 'false');
+    // Toggle off by clicking again
+    await box5Arc.dispatchEvent('click');
+    await expect(page.getByTestId('tier-pill-5')).toHaveAttribute('aria-pressed', 'false');
+
+    // Test tier pill multiselect directly
+    await page.getByTestId('tier-pill-5').click();
+    await expect(page.getByTestId('tier-pill-5')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('tier-pill-6')).toHaveAttribute('aria-pressed', 'false');
+    // Multiselect tier 6
+    await page.getByTestId('tier-pill-6').click();
+    await expect(page.getByTestId('tier-pill-5')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('tier-pill-6')).toHaveAttribute('aria-pressed', 'true');
+    // Reset to all tiers
+    await page.getByRole('button', { name: /Reset to All Tiers/i }).click();
+    await expect(page.getByTestId('tier-pill-5')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByTestId('tier-pill-6')).toHaveAttribute('aria-pressed', 'false');
 
     // 4. Switch theme to Apple IIGS (Day theme) via header toggle button
     await page.getByTestId('theme-toggle-btn').click();

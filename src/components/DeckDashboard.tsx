@@ -223,22 +223,23 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       setSelectedBox('all');
       return;
     }
+    const current = selectedBox === 'all' ? [] : (Array.isArray(selectedBox) ? selectedBox : [selectedBox]);
     if (Array.isArray(box)) {
-      if (
-        Array.isArray(selectedBox) &&
-        selectedBox.length === box.length &&
-        box.every((b) => selectedBox.includes(b))
-      ) {
+      const isAlreadyExact =
+        current.length === box.length &&
+        box.every((b) => current.includes(b));
+
+      if (isAlreadyExact) {
         setSelectedBox('all');
       } else {
         setSelectedBox(box);
       }
       return;
     }
-    if (selectedBox === box) {
+    if (current.length === 1 && current[0] === box) {
       setSelectedBox('all');
     } else {
-      setSelectedBox(box);
+      setSelectedBox([box]);
     }
   };
 
@@ -272,6 +273,29 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const boxCounts = displayedBoxes.map(
     (b) => topics.filter((t) => t.status === 'active' && t.box === b).length
   );
+
+  const handleToggleBox = (b: number) => {
+    if (selectedBox === 'all') {
+      setSelectedBox([b]);
+      return;
+    }
+    const current = Array.isArray(selectedBox) ? selectedBox : [selectedBox];
+    if (current.includes(b)) {
+      const next = current.filter((x) => x !== b);
+      if (next.length === 0 || next.length >= displayedBoxes.length) {
+        setSelectedBox('all');
+      } else {
+        setSelectedBox(next);
+      }
+    } else {
+      const next = [...current, b];
+      if (next.length >= displayedBoxes.length) {
+        setSelectedBox('all');
+      } else {
+        setSelectedBox(next);
+      }
+    }
+  };
 
   // Staged unlock calculation: next unlock milestone
   const nextUnlockTarget = (unlockedStageCount + 1) * 4;
@@ -423,13 +447,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
     .filter((t) => {
       if (!isAllTracks && !selectedTracks.includes(t.track)) return false;
       if (selectedBox !== 'all') {
-        if (Array.isArray(selectedBox)) {
-          if (!selectedBox.includes(t.box)) return false;
-        } else if (algorithm === 'graduated-interval' && selectedBox === 5) {
-          if (t.box < 5) return false;
-        } else {
-          if (t.box !== selectedBox) return false;
-        }
+        const activeBoxes = Array.isArray(selectedBox) ? selectedBox : [selectedBox];
+        if (!activeBoxes.includes(t.box)) return false;
       }
       if (selectedStatus === 'active' && t.status !== 'active') return false;
       if (selectedStatus === 'locked' && t.status !== 'locked') return false;
@@ -631,6 +650,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           theme={theme}
           selectedTracks={selectedTracks}
           selectedBox={selectedBox}
+          displayedBoxes={displayedBoxes}
           onSelectExclusiveTrack={handleExclusiveTrackSelect}
           onSelectExclusiveTracks={handleExclusiveMultiTrackSelect}
           onSelectExclusiveBox={handleExclusiveBoxSelect}
@@ -645,14 +665,41 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         style={{
           padding: '16px 20px',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
+          flexDirection: 'column',
           gap: '12px',
         }}
       >
-        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-          Active Spacing Tiers:
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+              Active Spacing {tierName}s:
+            </span>
+            {selectedBox !== 'all' && (
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  backgroundColor: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)',
+                  color: isLight ? '#4455AA' : 'var(--accent-cyan)',
+                  border: isLight ? '1px solid #C4C3BA' : '1px solid rgba(56, 189, 248, 0.3)',
+                }}
+              >
+                {(Array.isArray(selectedBox) ? selectedBox.length : 1)} of {displayedBoxes.length} selected
+              </span>
+            )}
+          </div>
+          {selectedBox !== 'all' && (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => setSelectedBox('all')}
+              style={{ fontSize: '11.5px', padding: '2px 8px' }}
+            >
+              Reset to All {tierName}s
+            </button>
+          )}
         </div>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           {displayedBoxes.map((b, idx) => {
@@ -663,7 +710,17 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             return (
               <div
                 key={b}
-                onClick={() => setSelectedBox(isBoxSelected ? 'all' : b)}
+                role="button"
+                tabIndex={0}
+                aria-pressed={isBoxSelected}
+                data-testid={`tier-pill-${b}`}
+                onClick={() => handleToggleBox(b)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleToggleBox(b);
+                  }
+                }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -674,6 +731,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                   border: isBoxSelected ? `1px solid var(--box-${Math.min(9, b)})` : '1px solid var(--border-subtle)',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
+                  userSelect: 'none',
                 }}
               >
                 <div
