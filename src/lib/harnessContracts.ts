@@ -200,44 +200,7 @@ export function extractHarnessContracts(harness?: string): TestCaseItem[] {
   return unique;
 }
 
-/**
- * Optional topic-specific contract overrides for cards where automated harness parsing
- * or raw test case strings benefit from curated presentation contracts.
- */
-export const TOPIC_CONTRACT_OVERRIDES: Record<string, TestCaseItem[]> = {
-  'reverse-linked-list': [
-    {
-      description: 'reverseList reverses a list',
-      input: 'toArray(reverseList(list(1, 2, 3, 4)))',
-      expected: '[4, 3, 2, 1]',
-    },
-    {
-      description: 'reverseList: empty and single-node lists',
-      input: '[reverseList(null), toArray(reverseList(list(7)))]',
-      expected: '[null, [7]]',
-    },
-    {
-      description: 'reverseList relinks the same nodes (in place)',
-      input: 'const a = list(1, 2);\nconst head = a;\nconst r = reverseList(a);\n[r.val, r.next === head, head.next]',
-      expected: '[2, true, null]',
-    },
-    {
-      description: 'middleNode of an odd-length list',
-      input: 'middleNode(list(1, 2, 3, 4, 5)).val',
-      expected: '3',
-    },
-    {
-      description: 'middleNode of an even-length list is the second middle',
-      input: 'middleNode(list(1, 2, 3, 4)).val',
-      expected: '3',
-    },
-    {
-      description: 'middleNode of one node and of an empty list',
-      input: '[middleNode(list(9)).val, middleNode(null)]',
-      expected: '[9, null]',
-    },
-  ],
-};
+
 
 /**
  * Strips out known test-harness preambles (such as factory helpers for linked lists, trees,

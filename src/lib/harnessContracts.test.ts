@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractHarnessContracts, sanitizeCallSignature, TOPIC_CONTRACT_OVERRIDES } from './harnessContracts';
+import { extractHarnessContracts, sanitizeCallSignature } from './harnessContracts';
 
 describe('extractHarnessContracts', () => {
   it('returns nothing for an empty harness', () => {
@@ -99,17 +99,6 @@ hasCycle(h)`;
 
     const multiline = `const a = [1, 2, 3];\nconst b = a.slice();\n[a, b]`;
     expect(sanitizeCallSignature(multiline)).toBe(multiline);
-  });
-});
-
-describe('TOPIC_CONTRACT_OVERRIDES', () => {
-  it('provides clean contracts for reverse-linked-list aligned with expectations', () => {
-    const cases = TOPIC_CONTRACT_OVERRIDES['reverse-linked-list'];
-    expect(cases).toBeDefined();
-    expect(cases.length).toBe(6);
-    expect(cases[0].input).toBe('toArray(reverseList(list(1, 2, 3, 4)))');
-    expect(cases[0].expected).toBe('[4, 3, 2, 1]');
-    expect(cases[2].expected).toBe('[2, true, null]');
   });
 });
 
