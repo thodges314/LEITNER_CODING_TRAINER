@@ -239,35 +239,6 @@ export const TOPIC_CONTRACT_OVERRIDES: Record<string, TestCaseItem[]> = {
   ],
 };
 
-const KNOWN_PREAMBLE_IDENTIFIERS = new Set([
-  'list',
-  'toArray',
-  'norm',
-  'n',
-  'ser',
-  'big',
-  'mk',
-  'dump',
-  'fails',
-  'board',
-  'mem',
-  'memory',
-  'ev',
-  'el',
-  'brief',
-]);
-
-function isHarnessPreambleStart(line: string): boolean {
-  const trimmed = line.trim();
-  const declMatch =
-    trimmed.match(/^(?:const|let|var)\s+([A-Za-z0-9_$]+)\s*=\s*(?:async\s*)?(?:\([^)]*\)|[A-Za-z0-9_$]+)?\s*=>/) ||
-    trimmed.match(/^(?:const|let|var)\s+([A-Za-z0-9_$]+)\s*=\s*(?:async\s*)?function\b/) ||
-    trimmed.match(/^function\s+([A-Za-z0-9_$]+)\s*\(/);
-
-  if (!declMatch) return false;
-  return KNOWN_PREAMBLE_IDENTIFIERS.has(declMatch[1]);
-}
-
 /**
  * Strips out known test-harness preambles (such as factory helpers for linked lists, trees,
  * or result normalization) from displayed call signatures while keeping multiline test setups
@@ -275,51 +246,27 @@ function isHarnessPreambleStart(line: string): boolean {
  */
 export function sanitizeCallSignature(input?: string): string {
   if (!input || typeof input !== 'string') return '';
-  const lines = input.split('\n');
-  let hasPreamble = false;
-  let i = 0;
 
-  while (i < lines.length) {
-    const line = lines[i].trim();
-    if (!line) {
-      i++;
-      continue;
+  // Normalize escaped newlines if coming from serialized JSON
+  const raw = input.replace(/\\n/g, '\n');
+
+  const lines = raw.split('\n');
+  const cleanLines = lines.filter((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+    // Strip known harness declarations (single-line or multiline headers)
+    if (
+      /^(?:(?:const|let|var)\s+(?:list|toArray|norm|ser|mk|dump|fails|n|brief)\s*=|function\s+(?:list|toArray|norm|ser|mk|dump|fails|n|brief)\b)/.test(
+        trimmed
+      )
+    ) {
+      return false;
     }
-    if (isHarnessPreambleStart(line)) {
-      hasPreamble = true;
-      let openBraces = (line.match(/{/g) || []).length;
-      let closeBraces = (line.match(/}/g) || []).length;
-      let openParens = (line.match(/\(/g) || []).length;
-      let closeParens = (line.match(/\)/g) || []).length;
-      const trimmed = line.trim();
-      let isComplete =
-        openBraces <= closeBraces &&
-        openParens <= closeParens &&
-        (trimmed.endsWith(';') || trimmed.endsWith('}'));
+    // Strip trailing helper close lines if any
+    if (trimmed === '};' || trimmed === '}') return false;
+    return true;
+  });
 
-      i++;
-      while (
-        i < lines.length &&
-        (!isComplete || openBraces > closeBraces || openParens > closeParens)
-      ) {
-        const cur = lines[i].trim();
-        openBraces += (cur.match(/{/g) || []).length;
-        closeBraces += (cur.match(/}/g) || []).length;
-        openParens += (cur.match(/\(/g) || []).length;
-        closeParens += (cur.match(/\)/g) || []).length;
-        isComplete =
-          openBraces <= closeBraces &&
-          openParens <= closeParens &&
-          (cur.endsWith(';') || cur.endsWith('}'));
-        i++;
-      }
-    } else {
-      break;
-    }
-  }
-
-  if (!hasPreamble) return input;
-  const remaining = lines.slice(i).join('\n').trim();
-  return remaining || input;
+  return cleanLines.length > 0 ? cleanLines.join('\n') : input;
 }
 

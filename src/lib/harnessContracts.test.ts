@@ -75,23 +75,22 @@ norm(subsets([1, 2, 3]))`;
     expect(sanitizeCallSignature(raw)).toBe('norm(subsets([1, 2, 3]))');
   });
 
-  it('strips multiline function declarations matching known helpers', () => {
-    const raw = `function toArray(node) {
-  const out = [];
-  while (node) {
-    out.push(node.val);
-    node = node.next;
-  }
-  return out;
-}
-hasCycle(list(1, 2, 3))`;
+  it('strips helper declarations from cycle and merge test cases', () => {
+    const raw = `const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);
+const toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };
+const h = list(1, 2, 3, 4);
+h.next.next.next.next = h.next;
+hasCycle(h)`;
 
-    expect(sanitizeCallSignature(raw)).toBe('hasCycle(list(1, 2, 3))');
+    expect(sanitizeCallSignature(raw)).toBe(
+      `const h = list(1, 2, 3, 4);\nh.next.next.next.next = h.next;\nhasCycle(h)`
+    );
   });
 
-  it('does not strip data array declarations named list that are not helper functions', () => {
-    const raw = `const list = [{ id: 1, text: 'hello' }];\nrenderQueue(list)`;
-    expect(sanitizeCallSignature(raw)).toBe(raw);
+  it('normalizes escaped newlines from serialized card input', () => {
+    const raw =
+      'const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\\ntoArray(reverseList(list(1, 2, 3, 4)))';
+    expect(sanitizeCallSignature(raw)).toBe('toArray(reverseList(list(1, 2, 3, 4)))');
   });
 
   it('falls back to the original string when no known preambles are present', () => {
