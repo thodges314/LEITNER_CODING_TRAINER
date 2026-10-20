@@ -1842,7 +1842,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       Reset All Deck Progress
                     </div>
                     <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                      Resets cards back to Tier/Box 1, clears streaks, review counts, and code drafts. Custom decks and API keys are preserved.
+                      Resets cards back to Tier/Box 1, and clears streaks, review counts and code drafts. Custom decks and API keys are preserved.
                     </div>
                   </div>
                   <button
@@ -1887,7 +1887,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       Permanently reset learning progress across all decks?
                     </div>
                     <p style={{ fontSize: '12px', color: 'var(--text-primary)', margin: 0, lineHeight: 1.45 }}>
-                      This will reset card review streaks, box tiers, completed review counters, and editor code drafts. Custom-built decks and stored API keys will NOT be deleted.
+                      This will reset card review streaks, box tiers, completed review counters and editor code drafts. Custom-built decks and stored API keys will NOT be deleted.
                     </p>
                     <div>
                       <label
@@ -1971,7 +1971,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     Reset Everything (Factory Reset)
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                    Completely clears all browser localStorage—including API keys, custom decks, preferences, and code drafts. Restores the app as if loaded for the very first time.
+                    Completely clears all browser localStorage—including API keys, custom decks, preferences and code drafts. Restores the app as if loaded for the very first time.
                   </div>
                 </div>
                 <button
