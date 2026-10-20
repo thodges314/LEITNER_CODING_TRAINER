@@ -1066,5 +1066,13 @@
   "mini-history-router": {
     "difficulty": 3,
     "concept": "history-api"
+  },
+  "calendar-month-grid": {
+    "difficulty": 3,
+    "concept": "dates"
+  },
+  "deep-merge-objects": {
+    "difficulty": 3,
+    "concept": "object-merge"
   }
 }
