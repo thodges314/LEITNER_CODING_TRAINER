@@ -22,14 +22,14 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 267 total = **235 default + 32 in the optional `algorithms-advanced` pack** (92 default cards active at first run) |
-| Documented test cases | 1879 (each shown as input → expected in the UI) |
+| Cards | 269 total = **237 default + 32 in the optional `algorithms-advanced` pack** (92 default cards active at first run) |
+| Documented test cases | 1903 (each shown as input → expected in the UI) |
 | Difficulty spread | all 234: d1 33 · d2 70 · d3 90 · d4 39 · d5 2; default 201: d1 33 · d2 66 · d3 72 · d4 28 · d5 2 |
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
 | Automated tests | 955 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 267 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 534 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 581 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/activity-view`): 581 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Browser verification | `npm run e2e` runs ALL 269 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 538 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 585 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/cards-batch5`): 585 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
