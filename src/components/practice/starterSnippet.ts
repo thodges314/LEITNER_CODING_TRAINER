@@ -1,4 +1,3 @@
-// import { isReactTrack as isReactTrackId } from '../../lib/leitner';
 import type { TopicItem } from '../../lib/leitner';
 
 /** Blank lines between the "Write your implementation below" comment and the example checks. */
