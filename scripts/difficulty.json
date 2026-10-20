@@ -1074,5 +1074,13 @@
   "deep-merge-objects": {
     "difficulty": 3,
     "concept": "object-merge"
+  },
+  "highlight-matches": {
+    "difficulty": 2,
+    "concept": "string-search"
+  },
+  "object-diff": {
+    "difficulty": 3,
+    "concept": "object-diff"
   }
 }
