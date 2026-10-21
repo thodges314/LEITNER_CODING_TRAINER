@@ -5833,22 +5833,22 @@
     "testCases": [
       {
         "description": "Renders one header cell per column label",
-        "input": "columns [{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]",
+        "input": "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }]} />",
         "expected": "<th> texts: 'Name', 'Age'"
       },
       {
         "description": "Renders one row per item with cells in column order",
-        "input": "rows [{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]",
+        "input": "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />",
         "expected": "2 <tr>; <td> texts: Ada, 36, Grace, 45"
       },
       {
         "description": "Missing, undefined and null values render as empty cells",
-        "input": "rows [{ name: 'Ada' }, { age: null, name: 'Bob' }]",
+        "input": "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />",
         "expected": "<td> texts: 'Ada', '', 'Bob', ''"
       },
       {
         "description": "An empty table shows a single \"No rows\" cell spanning all columns",
-        "input": "rows = []",
+        "input": "<SimpleTable columns={COLUMNS} rows={[]} />",
         "expected": "one <tr> with <td colSpan=2>No rows</td>"
       }
     ],
