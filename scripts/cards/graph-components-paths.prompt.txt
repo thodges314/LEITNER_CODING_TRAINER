@@ -1,7 +1,14 @@
-Graphs here are undirected and given as n vertices (0 to n - 1) plus an edge list like [[0, 1], [1, 2]].
+Implement connectivity and topological properties on undirected graphs with `n` vertices (`0` to `n - 1`):
 
-Write countComponents(n, edges): the number of connected components (isolated vertices count).
+### `countComponents(n, edges)`
+- Counts the number of connected components in an undirected graph.
+- Isolated vertices (nodes with no incident edges) count as individual components.
+- Returns `0` if `n === 0`.
 
-Write validPath(n, edges, source, destination): true when a path exists (a vertex always reaches itself).
+### `validPath(n, edges, source, destination)`
+- Determines if there exists a valid path between `source` and `destination`.
+- Returns `true` if connected; `false` otherwise (a vertex always reaches itself).
 
-Write findCenter(edges): the edges form a star graph; return the center vertex (the one in every edge) in O(1).
+### `findCenter(edges)`
+- Given an array of edges representing a star graph with `n` vertices and `n - 1` edges, finds the center vertex in O(1) time.
+- The center vertex is connected to every other vertex and appears in every edge.

@@ -1,3 +1,15 @@
-Write rotate90(matrix) returning a NEW n x m matrix rotated 90 degrees clockwise (rows become columns; an empty matrix gives []), transpose(matrix) returning the transpose.
+Implement geometric matrix transformations and traversals:
 
-Write spiralOrder(matrix) returning the elements in clockwise spiral order starting at the top-left (works for non-square matrices; [] for an empty matrix).
+### `transpose(matrix)`
+- Returns a new matrix representing the transpose of `matrix` (rows become columns: `matrix[r][c]` becomes `result[c][r]`).
+- Returns `[]` if `matrix` is empty (`[]`).
+
+### `rotate90(matrix)`
+- Returns a new matrix representing `matrix` rotated 90 degrees clockwise.
+- Does not mutate the original matrix.
+- Returns `[]` if `matrix` is empty (`[]`).
+
+### `spiralOrder(matrix)`
+- Traverses a 2D matrix in clockwise spiral order starting from top-left `(0, 0)` and returns the elements as a flat array.
+- Works correctly for both square and rectangular matrices.
+- Returns `[]` if `matrix` is empty (`[]`).
