@@ -1,1 +1,3 @@
-Nodes look like { val, left, right }. For a binary search tree (left < node < right, no duplicates): write searchBST(root, val) returning the node holding val or null; insertBST(root, val) inserting val and returning the root (a new node when root is null; an existing value is left alone); findMin(root) and findMax(root) returning the smallest/largest value (undefined for an empty tree).
+Nodes look like { val, left, right }. For a binary search tree (left < node < right, no duplicates): write searchBST(root, val) returning the node holding val or null; insertBST(root, val) inserting val and returning the root (a new node when root is null; an existing value is left alone); findMin(root).
+
+Write findMax(root) returning the smallest/largest value (undefined for an empty tree).

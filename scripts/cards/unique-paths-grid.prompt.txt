@@ -1,1 +1,5 @@
-A robot starts at the top-left of an m x n grid and can only move right or down. Write uniquePaths(m, n): the number of different paths to the bottom-right corner. Write uniquePathsWithObstacles(grid): the same count when grid is an array of rows where 1 is an obstacle and 0 is free (obstacles cannot be entered; if the start or end is blocked the answer is 0).
+A robot starts at the top-left of an m x n grid and can only move right or down.
+
+Write uniquePaths(m, n): the number of different paths to the bottom-right corner.
+
+Write uniquePathsWithObstacles(grid): the same count when grid is an array of rows where 1 is an obstacle and 0 is free (obstacles cannot be entered; if the start or end is blocked the answer is 0).

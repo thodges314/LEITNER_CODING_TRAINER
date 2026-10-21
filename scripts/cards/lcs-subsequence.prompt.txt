@@ -1,1 +1,3 @@
-Write longestCommonSubsequence(a, b): the LENGTH of the longest subsequence (characters in order, not necessarily adjacent) that appears in both strings, using a 2D DP table (0 if either string is empty). Write isSubsequence(s, t): true when s can be formed by deleting characters from t without reordering (the empty string is a subsequence of everything), using two pointers.
+Write longestCommonSubsequence(a, b): the LENGTH of the longest subsequence (characters in order, not necessarily adjacent) that appears in both strings, using a 2D DP table (0 if either string is empty).
+
+Write isSubsequence(s, t): true when s can be formed by deleting characters from t without reordering (the empty string is a subsequence of everything), using two pointers.

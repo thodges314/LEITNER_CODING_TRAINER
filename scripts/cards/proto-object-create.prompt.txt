@@ -1,1 +1,5 @@
-Write inheritFrom(proto, props = {}) that returns a new object whose prototype is proto (use Object.create) and which has the properties of props copied onto it as OWN properties. Write hasOwn(obj, key) that is true only for own (not inherited) properties, using Object.prototype.hasOwnProperty.call. Write protoChainLength(obj): the number of objects on the prototype chain after obj itself (protoChainLength({}) is 1 because of Object.prototype; Object.create(null) gives 0).
+Write inheritFrom(proto, props = {}) that returns a new object whose prototype is proto (use Object.create) and which has the properties of props copied onto it as OWN properties.
+
+Write hasOwn(obj, key) that is true only for own (not inherited) properties, using Object.prototype.hasOwnProperty.call.
+
+Write protoChainLength(obj): the number of objects on the prototype chain after obj itself (protoChainLength({}) is 1 because of Object.prototype; Object.create(null) gives 0).

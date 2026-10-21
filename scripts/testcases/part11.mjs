@@ -38,7 +38,7 @@ export default {
     r('An empty table shows a single "No rows" cell spanning all columns', '<SimpleTable columns={COLUMNS} rows={[]} />', "one <tr> with <td colSpan=2>No rows</td>"),
   ],
   'data-table': [
-    r('Renders a header per column and the first page of rows', ROWS, "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"),
+    r('Renders a header per column and the first page of rows', '<DataTable rows={ROWS} columns={COLUMNS} pageSize={3} />', "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"),
     r('Clicking a header sorts ascending, then descending, then restores the original order', "click 'Name' three times", "Ada,Alan,Barbara (ascending) → Margaret,Linus,Grace (descending) → Ada,Grace,Linus (none)"),
     r('Numbers sort numerically (9 before 10) and other columns reset to none', "click 'Age'", "Margaret (9), Linus (10), Barbara (33); Name aria-sort='none', Age 'ascending'"),
     r('Filter matches any column, case-insensitively', "type 'ALAN', then '4'", "'Alan'; then 'Grace, Alan' (ages 45 and 41)"),

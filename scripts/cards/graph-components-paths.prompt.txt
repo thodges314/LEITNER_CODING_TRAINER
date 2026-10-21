@@ -1,1 +1,7 @@
-Graphs here are undirected and given as n vertices (0 to n - 1) plus an edge list like [[0, 1], [1, 2]]. Write countComponents(n, edges): the number of connected components (isolated vertices count). Write validPath(n, edges, source, destination): true when a path exists (a vertex always reaches itself). Write findCenter(edges): the edges form a star graph; return the center vertex (the one in every edge) in O(1).
+Graphs here are undirected and given as n vertices (0 to n - 1) plus an edge list like [[0, 1], [1, 2]].
+
+Write countComponents(n, edges): the number of connected components (isolated vertices count).
+
+Write validPath(n, edges, source, destination): true when a path exists (a vertex always reaches itself).
+
+Write findCenter(edges): the edges form a star graph; return the center vertex (the one in every edge) in O(1).

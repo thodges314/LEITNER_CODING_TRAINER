@@ -1,1 +1,3 @@
-Implement class Trie with insert(word), search(word) (true only for a complete inserted word), startsWith(prefix) (true when any inserted word begins with prefix; the empty prefix is true once a word exists) and wordsWithPrefix(prefix) returning every inserted word that starts with prefix in alphabetical order (no duplicates, [] when none).
+Implement class Trie with insert(word), search(word) (true only for a complete inserted word), startsWith(prefix) (true when any inserted word begins with prefix; the empty prefix is true once a word exists).
+
+Write wordsWithPrefix(prefix) returning every inserted word that starts with prefix in alphabetical order (no duplicates, [] when none).

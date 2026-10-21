@@ -1,1 +1,5 @@
-Nodes look like { val, next }. Write hasCycle(head) using Floyd's tortoise and hare (O(1) extra space; true when some node can be reached twice by following next), and mergeTwoLists(a, b) that merges two sorted lists into one sorted list by relinking nodes (no new nodes) and returns the head. Either input may be null; when values tie, take from a first.
+Nodes look like { val, next }.
+
+Write hasCycle(head) using Floyd's tortoise and hare (O(1) extra space; true when some node can be reached twice by following next).
+
+Write mergeTwoLists(a, b) that merges two sorted lists into one sorted list by relinking nodes (no new nodes) and returns the head. Either input may be null; when values tie, take from a first.

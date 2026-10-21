@@ -1,1 +1,3 @@
-Write shallowCopy(value) (arrays and plain objects get a new container with the same items; anything else is returned as is) and shallowEqual(a, b): true when both are the same value (Object.is), or both are plain objects (or both arrays) with the same keys whose values are equal by Object.is. Nested objects are compared by reference, not deeply.
+Write shallowCopy(value) (arrays and plain objects get a new container with the same items; anything else is returned as is).
+
+Write shallowEqual(a, b): true when both are the same value (Object.is), or both are plain objects (or both arrays) with the same keys whose values are equal by Object.is. Nested objects are compared by reference, not deeply.

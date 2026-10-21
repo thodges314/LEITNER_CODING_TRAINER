@@ -1,1 +1,5 @@
-Nodes look like { val, left, right }. Write isValidBST(root) (strict: every left-subtree value < node < every right-subtree value, not just the direct children; an empty tree is valid), invertTree(root) that mirrors the tree in place and returns the root, and lowestCommonAncestor(root, p, q) for a BST where p and q are values present in the tree; return the value of their lowest common ancestor (a node may be its own ancestor).
+Nodes look like { val, left, right }.
+
+Write isValidBST(root) (strict: every left-subtree value < node < every right-subtree value, not just the direct children; an empty tree is valid), invertTree(root) that mirrors the tree in place and returns the root.
+
+Write lowestCommonAncestor(root, p, q) for a BST where p and q are values present in the tree; return the value of their lowest common ancestor (a node may be its own ancestor).

@@ -1,1 +1,3 @@
-Write sleep(ms) returning a Promise that resolves (with undefined) after ms milliseconds, and delay(value, ms) that resolves with `value` after ms milliseconds. Then write measure(fn) (async) that awaits fn() and returns the elapsed milliseconds as a number.
+Write sleep(ms) returning a Promise that resolves (with undefined) after ms milliseconds.
+
+Write delay(value, ms) that resolves with `value` after ms milliseconds. Then write measure(fn) (async) that awaits fn() and returns the elapsed milliseconds as a number.

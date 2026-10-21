@@ -1,1 +1,3 @@
-Write solveNQueens(n): every way to place n queens on an n x n board so none attack each other, each solution as an array of n strings using 'Q' and '.' (one string per row); return [] when there is none. Use sets (or boolean arrays) for columns and both diagonals so conflict checks are O(1). Write totalNQueens(n): just the number of solutions. Solution order does not matter.
+Write solveNQueens(n): every way to place n queens on an n x n board so none attack each other, each solution as an array of n strings using 'Q' and '.' (one string per row); return [] when there is none. Use sets (or boolean arrays) for columns and both diagonals so conflict checks are O(1).
+
+Write totalNQueens(n): just the number of solutions. Solution order does not matter.

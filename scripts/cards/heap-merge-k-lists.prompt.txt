@@ -1,1 +1,7 @@
-Write your own binary heap inside your solution. List nodes are { val, next } (null ends the list). Write mergeKLists(lists): merge k sorted linked lists (entries may be null) into one sorted list using a heap of the current heads; return null when everything is empty. Write mergeKSortedArrays(arrays): the same idea for sorted arrays, returning one sorted array (empty arrays allowed). Write kClosest(points, k): the k points [x, y] closest to the origin as a list sorted by distance ascending (equal distances keep input order), using a max-heap capped at size k ([] when k is 0).
+Write your own binary heap inside your solution. List nodes are { val, next } (null ends the list).
+
+Write mergeKLists(lists): merge k sorted linked lists (entries may be null) into one sorted list using a heap of the current heads; return null when everything is empty.
+
+Write mergeKSortedArrays(arrays): the same idea for sorted arrays, returning one sorted array (empty arrays allowed).
+
+Write kClosest(points, k): the k points [x, y] closest to the origin as a list sorted by distance ascending (equal distances keep input order), using a max-heap capped at size k ([] when k is 0).

@@ -1,1 +1,5 @@
-A binary heap is stored in an array: the children of index i are 2i+1 and 2i+2. Write parentIndex(i), leftIndex(i), rightIndex(i), isMinHeap(arr) (true when every parent is <= both of its children; empty and one-element arrays are heaps) and siftUp(arr, i) which moves the element at index i up while it is smaller than its parent, in place, and returns the array.
+A binary heap is stored in an array: the children of index i are 2i+1 and 2i+2.
+
+Write parentIndex(i), leftIndex(i), rightIndex(i), isMinHeap(arr) (true when every parent is <= both of its children; empty and one-element arrays are heaps).
+
+Write siftUp(arr, i) which moves the element at index i up while it is smaller than its parent, in place, and returns the array.

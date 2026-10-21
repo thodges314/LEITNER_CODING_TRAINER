@@ -1,1 +1,7 @@
-Tree nodes are { val, left, right } (null for a missing child). All trees here are binary search trees. Write kthSmallest(root, k) (1-indexed, in-order, stop as soon as you reach it) and kthLargest(root, k). Write insertIntoBST(root, val): insert a new leaf (values are distinct) and return the root; a null root returns a new node. Write sortedArrayToBST(nums): build a height-balanced BST from a sorted array by always choosing the middle index Math.floor((lo + hi) / 2) as the root of each range (null for []).
+Tree nodes are { val, left, right } (null for a missing child). All trees here are binary search trees.
+
+Write kthSmallest(root, k) (1-indexed, in-order, stop as soon as you reach it) and kthLargest(root, k).
+
+Write insertIntoBST(root, val): insert a new leaf (values are distinct) and return the root; a null root returns a new node.
+
+Write sortedArrayToBST(nums): build a height-balanced BST from a sorted array by always choosing the middle index Math.floor((lo + hi) / 2) as the root of each range (null for []).

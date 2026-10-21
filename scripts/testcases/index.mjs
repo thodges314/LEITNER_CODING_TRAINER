@@ -48,6 +48,7 @@ export function toTestCaseItems(list) {
     description: tc.d,
     input: tc.i,
     expected: tc.x ?? (tc.t ? `Rejects with Error — message matches /${tc.t}/` : tc.e),
+    ...(tc.callSignature ? { callSignature: tc.callSignature } : {}),
   }));
 }
 

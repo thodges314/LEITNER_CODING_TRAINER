@@ -1,1 +1,3 @@
-Each number in nums is the maximum jump length from that index. Write canJump(nums): can you reach the last index starting from index 0? (Greedy: track the farthest reachable index; a single element is always reachable.) Write minJumps(nums): the minimum number of jumps to reach the last index, assuming it is reachable (0 for a single element).
+Each number in nums is the maximum jump length from that index.
+
+Write canJump(nums): can you reach the last index starting from index 0? (Greedy: track the farthest reachable index; a single element is always reachable.) Write minJumps(nums): the minimum number of jumps to reach the last index, assuming it is reachable (0 for a single element).

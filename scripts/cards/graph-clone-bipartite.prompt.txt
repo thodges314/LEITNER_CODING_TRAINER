@@ -1,1 +1,5 @@
-Write cloneGraph(node): deep-copy a connected undirected graph whose nodes are { val, neighbors: [] } (neighbors reference other nodes, so cycles exist) and return the clone of the given node (null stays null); no clone may share a node with the original, neighbor order is preserved. Write isBipartite(graph): graph is an adjacency list (graph[i] lists the neighbors of i, possibly several components); true when the vertices can be 2-colored so every edge joins different colors. Write validTree(n, edges): true when the n vertices (0..n-1) and undirected edges form one tree (connected, no cycles).
+Write cloneGraph(node): deep-copy a connected undirected graph whose nodes are { val, neighbors: [] } (neighbors reference other nodes, so cycles exist) and return the clone of the given node (null stays null); no clone may share a node with the original, neighbor order is preserved.
+
+Write isBipartite(graph): graph is an adjacency list (graph[i] lists the neighbors of i, possibly several components); true when the vertices can be 2-colored so every edge joins different colors.
+
+Write validTree(n, edges): true when the n vertices (0...n-1) and undirected edges form one tree (connected, no cycles).

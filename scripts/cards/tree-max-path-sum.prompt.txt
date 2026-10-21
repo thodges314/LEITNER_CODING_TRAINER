@@ -1,1 +1,7 @@
-Tree nodes are { val, left, right } (null for a missing child). Write maxPathSum(root): the maximum sum over any non-empty path (it may start and end at any node, and values can be negative). Write sumNumbers(root): every root-to-leaf path read as a decimal number (digits 0-9, e.g. 1 -> 2 -> 3 is 123); return their sum (0 for null). Write goodNodes(root): how many nodes have a value >= every value on the path from the root to them (the root always counts; null gives 0).
+Tree nodes are { val, left, right } (null for a missing child).
+
+Write maxPathSum(root): the maximum sum over any non-empty path (it may start and end at any node, and values can be negative).
+
+Write sumNumbers(root): every root-to-leaf path read as a decimal number (digits 0-9, e.g. 1 -> 2 -> 3 is 123); return their sum (0 for null).
+
+Write goodNodes(root): how many nodes have a value >= every value on the path from the root to them (the root always counts; null gives 0).

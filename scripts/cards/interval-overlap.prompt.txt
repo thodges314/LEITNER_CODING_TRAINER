@@ -1,1 +1,3 @@
-Intervals are [start, end] with start <= end and are CLOSED (touching endpoints overlap). Write overlaps(a, b) -> boolean, intersection(a, b) -> the overlapping [start, end] or null, and totalLength(intervals) -> the sum of the lengths (end - start) of the intervals, counting overlapping parts only once (the input may be unsorted).
+Intervals are [start, end] with start <= end and are CLOSED (touching endpoints overlap).
+
+Write overlaps(a, b) -> boolean, intersection(a, b) -> the overlapping [start, end] or null, and totalLength(intervals) -> the sum of the lengths (end - start) of the intervals, counting overlapping parts only once (the input may be unsorted).
