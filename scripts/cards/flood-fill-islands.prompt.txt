@@ -1,3 +1,13 @@
-Write floodFill(image, sr, sc, color): replace the 4-directionally connected region of equal values that contains (sr, sc) with color and return the image (if the start cell already has color, change nothing).
+Implement grid graph exploration algorithms using depth-first search:
 
-Write numIslands(grid): the number of 4-directionally connected groups of '1' cells in a grid of '0'/'1' strings (an empty grid has 0). numIslands must not mutate the caller's grid.
+### `floodFill(image, sr, sc, color)`
+- Performs a flood fill starting at coordinate `(sr, sc)` on 2D matrix `image`.
+- Replaces all 4-directionally connected cells sharing the starting cell's original value with `color`.
+- If the starting cell already has `color`, returns `image` unmodified.
+- Returns the updated `image`.
+
+### `numIslands(grid)`
+- Counts the number of distinct 4-directionally connected islands of `'1'`s in a 2D grid of `'0'` and `'1'` characters.
+- Diagonal connections do not connect islands.
+- Returns `0` if `grid` is empty (`[]`).
+- Must not mutate the caller's input `grid`.

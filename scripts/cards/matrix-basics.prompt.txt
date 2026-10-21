@@ -1,3 +1,15 @@
-Write createMatrix(rows, cols, fill = 0) returning a rows x cols array of arrays where every row is its OWN array (changing one cell must not change others), matrixSum(matrix) returning the sum of every cell (0 for an empty matrix).
+Implement fundamental 2D matrix utilities:
 
-Write diagonalSum(matrix) for a square matrix returning the sum of both diagonals, counting the centre cell of an odd-sized matrix only once.
+### `createMatrix(rows, cols, fill = 0)`
+- Creates a 2D array of dimensions `rows x cols` populated with value `fill` (defaults to 0).
+- Every row must be a distinct, independent array instance so mutating one row does not affect others.
+- Returns `[]` when `rows === 0`.
+
+### `matrixSum(matrix)`
+- Calculates the sum of all cell values in `matrix`.
+- Returns `0` for an empty matrix (`[]`).
+
+### `diagonalSum(matrix)`
+- Computes the sum of elements along both the primary diagonal and secondary diagonal in a square matrix.
+- If the matrix has an odd dimension, the intersecting center element is included only once.
+- Returns `0` for an empty matrix (`[]`).

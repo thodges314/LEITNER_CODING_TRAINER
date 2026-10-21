@@ -1,3 +1,15 @@
-An undirected graph is given as an array of [a, b] edges.
+Implement fundamental undirected graph representation and search algorithms from an edge list of `[a, b]` pairs:
 
-Write buildGraph(edges) returning an object that maps each node to an array of its neighbours in the order the edges appear (buildGraph([[1, 2], [1, 3]]) is { 1: [2, 3], 2: [1], 3: [1] }), hasPath(edges, start, end) returning true when end can be reached from start (a node always reaches itself), and shortestPathLength(edges, start, end) using breadth-first search that returns the minimum number of edges, or -1 when unreachable.
+### `buildGraph(edges)`
+- Constructs an undirected adjacency list object mapping each node to an array of its neighbors.
+- Neighbors are ordered as the edges appear in `edges`.
+- For example, `buildGraph([[1, 2], [1, 3]])` returns `{ 1: [2, 3], 2: [1], 3: [1] }`.
+- Returns `{}` when `edges` is empty (`[]`).
+
+### `hasPath(edges, start, end)`
+- Returns `true` if a path exists from node `start` to `end`; `false` otherwise.
+- A node is always considered to reach itself (`start === end` returns `true`).
+
+### `shortestPathLength(edges, start, end)`
+- Uses Breadth-First Search (BFS) to find the minimum number of edges on a path connecting `start` and `end`.
+- Returns `0` if `start === end`, and `-1` if `end` is unreachable from `start`.

@@ -1,7 +1,17 @@
-These are shortest-path problems on implicit graphs: states are strings and edges change one character.
+Implement shortest path searches over implicit state graphs using BFS:
 
-Write ladderLength(beginWord, endWord, wordList): the number of words on the shortest sequence from beginWord to endWord where each step changes one letter (lowercase) and every word after the first must be in wordList; beginWord need not be in the list; return 0 if endWord is not in the list or is unreachable.
+### `ladderLength(beginWord, endWord, wordList)`
+- Finds the number of words on the shortest transformation sequence from `beginWord` to `endWord`.
+- Each step changes exactly one lowercase letter, and every intermediate word must exist in `wordList`.
+- `beginWord` does not need to be in `wordList`.
+- Returns `0` if `endWord` is not in `wordList` or if no valid transformation sequence exists.
 
-Write minMutation(start, end, bank): genes are strings over A, C, G, T; each step changes one character and must land in bank; return the fewest steps or -1 (0 when start equals end).
+### `minMutation(start, end, bank)`
+- Finds the minimum number of single-character mutations ('A', 'C', 'G', 'T') to convert gene string `start` to `end`.
+- Every mutated gene must exist in `bank`.
+- Returns `0` if `start === end`, or `-1` if impossible.
 
-Write openLock(deadends, target): a 4-wheel lock starts at '0000'; each move turns one wheel one step (9 wraps to 0 and 0 to 9); states in deadends are forbidden; return the fewest moves to reach target or -1 (-1 also when '0000' is a dead end).
+### `openLock(deadends, target)`
+- Computes the minimum number of circular dial turns (`0` through `9`, wrapping around) to reach `target` starting from `'0000'`.
+- Any combination in array `deadends` is blocked and cannot be visited.
+- Returns `-1` if unreachable or if `'0000'` is in `deadends`; returns `0` if `target === '0000'`.

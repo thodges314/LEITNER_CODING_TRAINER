@@ -1,7 +1,15 @@
-Grids are arrays of rows.
+Implement multi-source and shortest-path Breadth-First Search on 2D grids:
 
-Write orangesRotting(grid): cells are 0 empty, 1 fresh, 2 rotten; every minute fresh oranges next to a rotten one (4 directions) rot; return the minutes until none are fresh, 0 if there were none, or -1 if some can never rot (start BFS from all rotten oranges at once).
+### `orangesRotting(grid)`
+- Simulates the rotting of oranges on a grid containing `0` (empty), `1` (fresh), and `2` (rotten).
+- In each minute, every fresh orange 4-directionally adjacent to a rotten orange rots.
+- Returns the minimum minutes elapsed until no fresh oranges remain.
+- Returns `0` if there are initially no fresh oranges; returns `-1` if any fresh orange can never rot.
 
-Write shortestPathBinaryMatrix(grid): 0 is open, 1 blocked; moving in 8 directions from the top-left to the bottom-right, return the number of cells on the shortest path or -1 (also -1 if either end is blocked).
+### `shortestPathBinaryMatrix(grid)`
+- Finds the length of the shortest clear path from top-left `(0, 0)` to bottom-right `(n - 1, n - 1)` in an `n x n` binary grid.
+- Moves may be made in 8 directions (horizontal, vertical, diagonal) through clear cells (`0`).
+- Returns the number of visited cells along the path, or `-1` if blocked or unreachable.
 
-Write updateMatrix(mat): a 0/1 matrix; return a new matrix where each cell is the distance (4 directions) to the nearest 0.
+### `updateMatrix(mat)`
+- Given an `m x n` binary matrix `mat` of `0`s and `1`s, returns a new matrix where each cell contains the Manhattan distance (4 directions) to the nearest `0`.

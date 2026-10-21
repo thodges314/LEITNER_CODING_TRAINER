@@ -1,5 +1,11 @@
-There are numCourses courses labelled 0...n-1. prerequisites is an array of [course, prereq] pairs meaning prereq must be taken first.
+Implement topological sort dependency algorithms for course scheduling with courses labeled `0` through `numCourses - 1`:
 
-Write canFinish(numCourses, prerequisites): true when every course can be finished (the graph has no cycle).
+### `canFinish(numCourses, prerequisites)`
+- Determines if it is possible to finish all courses without cyclic dependencies.
+- `prerequisites` is an array of `[course, prereq]` pairs indicating `prereq` must be completed before `course`.
+- Returns `true` if the directed dependency graph is acyclic; `false` otherwise.
 
-Write findOrder(numCourses, prerequisites): an order in which to take all courses, or [] if impossible; use Kahn's algorithm (queue of zero in-degree nodes, taking the smallest label first when several are available so the answer is deterministic).
+### `findOrder(numCourses, prerequisites)`
+- Computes a valid topological ordering to complete all courses.
+- Returns `[]` if completing all courses is impossible due to a cycle.
+- Uses Kahn's algorithm (zero in-degree BFS queue), choosing the smallest course label first when multiple courses are ready to ensure deterministic output.
