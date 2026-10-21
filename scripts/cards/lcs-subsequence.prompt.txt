@@ -1,3 +1,10 @@
-Write longestCommonSubsequence(a, b): the LENGTH of the longest subsequence (characters in order, not necessarily adjacent) that appears in both strings, using a 2D DP table (0 if either string is empty).
+Implement subsequence comparison algorithms:
 
-Write isSubsequence(s, t): true when s can be formed by deleting characters from t without reordering (the empty string is a subsequence of everything), using two pointers.
+### `longestCommonSubsequence(a, b)`
+- Computes the length of the longest common subsequence present in both strings `a` and `b` using a 2D dynamic programming table.
+- Subsequence characters must appear in the same relative order, but need not be contiguous.
+- Returns `0` if either string is empty.
+
+### `isSubsequence(s, t)`
+- Determines whether string `s` is a subsequence of string `t` using a two-pointer approach in O(length of t) time.
+- Returns `true` if `s` is the empty string `""`.

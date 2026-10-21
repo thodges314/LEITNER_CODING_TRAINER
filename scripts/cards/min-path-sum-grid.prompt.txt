@@ -1,3 +1,10 @@
-Write minPathSum(grid): the smallest sum of numbers along a path from the top-left to the bottom-right of a grid of non-negative numbers, moving only right or down.
+Implement minimum path sum dynamic programming algorithms on 2D structures:
 
-Write minimumTotal(triangle): for a triangle given as an array of rows (row i has i + 1 numbers), the smallest path sum from the top to the bottom where each step moves to an adjacent number on the row below (index j or j + 1).
+### `minPathSum(grid)`
+- Finds a path from the top-left `(0, 0)` to the bottom-right corner of an `m x n` grid of non-negative integers that minimizes the sum of all numbers along its path.
+- Movement is restricted to only moving right or down at each step.
+
+### `minimumTotal(triangle)`
+- Calculates the minimum path sum from the top to the bottom of a numeric triangle array (where row `i` contains `i + 1` elements).
+- Each step moves to adjacent numbers on the row below (from column `j` to either `j` or `j + 1`).
+- Solvable bottom-up in O(n) auxiliary space.

@@ -1,3 +1,12 @@
-Write canPartition(nums): true when the positive integers can be split into two subsets with equal sum (an empty array is true).
+Implement subset-sum dynamic programming reductions:
 
-Write findTargetSumWays(nums, target): the number of ways to put a + or - sign in front of every number so the total equals target (reduce it to a subset-sum count; [0, 0, 0] with target 0 has 8 ways; 0 when impossible).
+### `canPartition(nums)`
+- Determines whether a non-empty array of positive integers `nums` can be partitioned into two subsets with equal sum.
+- Returns `true` for an empty array.
+- Returns `false` immediately if the total sum is odd.
+
+### `findTargetSumWays(nums, target)`
+- Computes the number of different ways to assign `+` or `-` signs to each integer in `nums` such that their evaluated sum equals `target`.
+- Reduces the problem to finding subsets summing to `(sum + target) / 2`.
+- Correctly handles zeros (e.g. `[0, 0, 0]` with `target = 0` yields `8` ways).
+- Returns `0` if `Math.abs(target) > sum` or `(sum + target)` is odd.

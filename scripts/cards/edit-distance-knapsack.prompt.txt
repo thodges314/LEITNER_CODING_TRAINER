@@ -1,3 +1,10 @@
-Write editDistance(a, b): the minimum number of single-character insertions, deletions and substitutions needed to turn a into b (editDistance("horse", "ros") is 3).
+Implement classical 2D dynamic programming algorithms:
 
-Write knapsack(weights, values, capacity): the maximum total value of items whose total weight is at most capacity, where each item can be taken at most once (0/1 knapsack; 0 when nothing fits).
+### `editDistance(a, b)`
+- Computes the Levenshtein distance: the minimum number of single-character operations (insertions, deletions, substitutions) required to transform string `a` into string `b`.
+- Example: `editDistance("horse", "ros")` returns `3`.
+
+### `knapsack(weights, values, capacity)`
+- Solves the 0/1 knapsack problem: determines the maximum total value achievable by selecting a subset of items such that their combined weight does not exceed `capacity`.
+- Each item can be included at most once.
+- Returns `0` when `capacity` is `0` or no items fit.

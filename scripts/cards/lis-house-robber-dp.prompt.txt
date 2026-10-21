@@ -1,3 +1,11 @@
-Write rob(nums): the maximum sum of values you can take from an array when no two chosen elements are adjacent (0 for an empty array).
+Implement classic 1D dynamic programming optimization algorithms:
 
-Write lengthOfLIS(nums): the length of the longest strictly increasing subsequence (not necessarily contiguous; 0 for an empty array). An O(n^2) lengthOfLIS is fine.
+### `rob(nums)`
+- Computes the maximum sum of money you can rob from an array of non-negative integers `nums` without robbing two adjacent houses.
+- Returns `0` for an empty array.
+- Solvable in O(n) time and O(1) auxiliary space.
+
+### `lengthOfLIS(nums)`
+- Finds the length of the longest strictly increasing subsequence in an integer array `nums` (elements need not be contiguous).
+- Returns `0` for an empty array.
+- Solvable in O(n^2) time or O(n log n) time.

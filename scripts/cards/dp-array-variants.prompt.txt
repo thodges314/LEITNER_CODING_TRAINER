@@ -1,5 +1,13 @@
-Write robCircular(nums): houses are in a circle (the first and last are adjacent), you cannot rob two adjacent houses; return the maximum loot (0 for an empty array, nums[0] for one house).
+Implement dynamic programming variants on 1D arrays:
 
-Write maxProduct(nums): the largest product of a non-empty contiguous subarray (track both the running max and min because negatives flip them).
+### `robCircular(nums)`
+- Calculates the maximum loot from houses arranged in a circle (where the first and last houses are adjacent) such that no two adjacent houses are robbed.
+- Returns `0` for an empty array, and `nums[0]` for a single-element array.
 
-Write minCostClimbingStairs(cost): you may start on step 0 or 1, pay cost[i] to leave step i and climb 1 or 2 steps; return the minimum cost to reach the top (just past the last index).
+### `maxProduct(nums)`
+- Finds the largest product of a non-empty contiguous subarray in integer array `nums`.
+- Handles negative numbers and zeros by tracking running minimum and maximum products.
+
+### `minCostClimbingStairs(cost)`
+- Calculates the minimum cost to reach the top of a floor staircase (just past the last step).
+- You can start at either step index `0` or `1`, and paying `cost[i]` allows climbing 1 or 2 steps forward.

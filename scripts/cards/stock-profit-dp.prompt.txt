@@ -1,5 +1,13 @@
-Write maxProfit(prices): the best profit from one buy followed by one later sell (0 if no profit is possible or prices is empty).
+Implement state-machine and greedy dynamic programming for stock trading:
 
-Write maxProfitMany(prices): the best total profit with unlimited transactions (you hold at most one share).
+### `maxProfit(prices)`
+- Calculates the maximum profit achievable from at most one transaction (one buy followed by one later sell).
+- Returns `0` if no profit is possible or if `prices` is empty.
 
-Write maxProfitCooldown(prices): unlimited transactions, but after selling you must wait one day before buying again.
+### `maxProfitMany(prices)`
+- Calculates the maximum total profit with unlimited buy and sell transactions (holding at most one share at any time).
+- Accumulates profits from every upward price movement.
+
+### `maxProfitCooldown(prices)`
+- Calculates the maximum profit with unlimited transactions subject to a one-day cooldown period (cannot buy the day immediately following a sell).
+- Models state transitions between `hold`, `sold`, and `rest`.
