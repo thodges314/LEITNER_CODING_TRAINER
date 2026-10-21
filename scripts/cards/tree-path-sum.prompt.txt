@@ -1,7 +1,16 @@
-Tree nodes are { val, left, right } (null for a missing child).
+Implement root-to-leaf path algorithms on binary tree nodes shaped `{ val, left, right }`:
 
-Write hasPathSum(root, target): true when some root-to-LEAF path sums to target (a null tree is false; a node with one child is not a leaf).
+### `hasPathSum(root, target)`
+- Determines if there exists a root-to-leaf path such that summing all node values along the path equals `target`.
+- A leaf is a node with no children (`!node.left && !node.right`); a node with only one child is not a leaf.
+- Returns `false` if `root` is `null`.
 
-Write pathSum(root, target): every root-to-leaf path summing to target, as arrays of values, in left-to-right order.
+### `pathSum(root, target)`
+- Finds all root-to-leaf paths where the sum of node values equals `target`.
+- Returns matching paths as an array of value arrays in left-to-right order (e.g. `[[5, 4, 11, 2], [5, 8, 4, 5]]`).
+- Returns fresh array copies so subsequent mutations do not leak. Returns `[]` if no paths match or `root` is `null`.
 
-Write minDepth(root): the number of nodes on the shortest root-to-leaf path (0 for null; a node with one child must continue down that child).
+### `minDepth(root)`
+- Computes the minimum depth of the tree (number of nodes along the shortest root-to-leaf path).
+- Returns `0` if `root` is `null`.
+- If a node has only one child, the path must continue down to that child's leaf.

@@ -1,7 +1,14 @@
-Tree nodes are { val, left, right } (null for a missing child).
+Implement tree reconstruction and serialization algorithms on nodes shaped `{ val, left, right }`:
 
-Write buildTree(preorder, inorder): rebuild the tree from its preorder and inorder arrays (all values distinct; [] gives null) in O(n) using a value-to-index map.
+### `buildTree(preorder, inorder)`
+- Reconstructs a binary tree from its `preorder` and `inorder` traversal arrays (where all node values are distinct).
+- Operates in O(n) time complexity using a value-to-index map for `inorder` lookups.
+- Returns `null` if the arrays are empty (`[]`).
 
-Write serialize(root): any string encoding of the tree (it must handle null, negative and multi-digit values).
+### `serialize(root)`
+- Encodes a binary tree into a single string representation.
+- Must reliably encode `null` children, negative values, and multi-digit integers.
 
-Write deserialize(str): the exact inverse, so deserialize(serialize(t)) rebuilds a tree structurally equal to t and deserialize(serialize(null)) is null.
+### `deserialize(str)`
+- Reconstructs the exact binary tree from the serialized string `str`.
+- Guaranteed inverse: `deserialize(serialize(t))` produces a tree structurally equal to `t`, and `deserialize(serialize(null))` returns `null`.

@@ -1,7 +1,14 @@
-Tree nodes are { val, left, right } (null for a missing child).
+Implement breadth-first level-order traversals on binary tree nodes shaped `{ val, left, right }`:
 
-Write levelOrder(root): an array of arrays, one per depth, left to right ([] for a null root).
+### `levelOrder(root)`
+- Returns the level order traversal of node values as an array of arrays, grouped by depth level from left to right.
+- Returns `[]` if `root` is `null`.
 
-Write rightSideView(root): the last value of each level (what you see from the right).
+### `rightSideView(root)`
+- Returns an array of values visible when looking at the tree from the right side (the last node value at each level).
+- Returns `[]` if `root` is `null`.
 
-Write zigzagLevelOrder(root): like levelOrder but every odd depth (1, 3, ...) is reversed.
+### `zigzagLevelOrder(root)`
+- Returns the zigzag level order traversal as an array of arrays, alternating traversal direction between depths.
+- Even depths (0, 2, ...) traverse left-to-right; odd depths (1, 3, ...) traverse right-to-left.
+- Returns `[]` if `root` is `null`.
