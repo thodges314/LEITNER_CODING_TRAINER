@@ -261,7 +261,6 @@ code {
   line-height: 1.68;
   letter-spacing: -0.005em;
   color: var(--text-instruction, #ede8dc);
-  white-space: pre-wrap;
 }
 
 /* Utility Badges */
@@ -801,6 +800,18 @@ code {
 
 [data-theme="apple-gsos"] .prompt-seed-box {
   background-color: #FAFAFA !important;
+  border: 1px solid #1C1C1C !important;
+  color: #1C1C1C !important;
+}
+
+[data-theme="apple-gsos"] .prompt-seed-box .markdown-inline-code {
+  background-color: #EAEAEA !important;
+  border: 1px solid #1C1C1C !important;
+  color: #1C1C1C !important;
+}
+
+[data-theme="apple-gsos"] .prompt-seed-box .markdown-code-block {
+  background-color: #FFFFFF !important;
   border: 1px solid #1C1C1C !important;
   color: #1C1C1C !important;
 }

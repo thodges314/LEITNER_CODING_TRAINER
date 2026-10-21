@@ -1,5 +1,5 @@
 import { c } from './part1.mjs';
-const r = (d, i, e) => c(d, i, e, { v: false, note: 'covered by the DOM harness' });
+const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by the DOM harness', ...o });
 
 const ROWS = 'rows: Ada 36, Grace 45, Linus 10, Alan 41, Margaret 9, Dennis 70, Barbara 33; pageSize 3';
 
@@ -32,13 +32,13 @@ export default {
     r('reset restores the initial values and clears touched', "change + blur email, then reset()", "values.email ''; touched {}"),
   ],
   'simple-table': [
-    r('Renders one header cell per column label', "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }]} />", "<th> texts: 'Name', 'Age'"),
-    r('Renders one row per item with cells in column order', "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />", "2 <tr>; <td> texts: Ada, 36, Grace, 45"),
-    r('Missing, undefined and null values render as empty cells', "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />", "<td> texts: 'Ada', '', 'Bob', ''"),
-    r('An empty table shows a single "No rows" cell spanning all columns', '<SimpleTable columns={COLUMNS} rows={[]} />', "one <tr> with <td colSpan=2>No rows</td>"),
+    r('Renders one header cell per column label', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }]} />", "<th> texts: 'Name', 'Age'"),
+    r('Renders one row per item with cells in column order', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />", "2 <tr>; <td> texts: Ada, 36, Grace, 45"),
+    r('Missing, undefined and null values render as empty cells', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />", "<td> texts: 'Ada', '', 'Bob', ''"),
+    r('An empty table shows a single "No rows" cell spanning all columns', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[]} />", "one <tr> with <td colSpan=2>No rows</td>"),
   ],
   'data-table': [
-    r('Renders a header per column and the first page of rows', '<DataTable rows={ROWS} columns={COLUMNS} pageSize={3} />', "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"),
+    r('Renders a header per column and the first page of rows', "<DataTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }, ...]} pageSize={3} />", "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"),
     r('Clicking a header sorts ascending, then descending, then restores the original order', "click 'Name' three times", "Ada,Alan,Barbara (ascending) → Margaret,Linus,Grace (descending) → Ada,Grace,Linus (none)"),
     r('Numbers sort numerically (9 before 10) and other columns reset to none', "click 'Age'", "Margaret (9), Linus (10), Barbara (33); Name aria-sort='none', Age 'ascending'"),
     r('Filter matches any column, case-insensitively', "type 'ALAN', then '4'", "'Alan'; then 'Grace, Alan' (ages 45 and 41)"),
@@ -60,11 +60,23 @@ export default {
     r('Disabled items cannot be selected (the menu stays open)', "open, click 'Delete'", "onSelect not called; menu still open; aria-disabled='true'"),
   ],
   'virtual-list': [
-    r('Renders only the visible window plus overscan', "1000 items, itemHeight 20, height 100, overscan 2", "7 listitems: 'Item 0' … 'Item 6'"),
-    r('The scroll area has the full virtual height', 'same props', "an inner element with style.height '20000px'"),
-    r('Scrolling moves the rendered window', 'scrollTop = 2000 (+ scroll event)', "9 listitems from 'Item 98'; includes 'Item 100'; no 'Item 0'"),
-    r('Items are absolutely positioned at index * itemHeight', 'scrollTop = 2000', "'Item 100' has position absolute, top '2000px', height '20px'"),
-    r('The window is clamped at the end of the list', 'scrollTop = 19900', "last rendered is 'Item 999'; at most 10 items"),
-    r('Short lists render everything', "items ['a', 'b', 'c']", "listitems a, b, c"),
+    r('Renders only the visible window plus overscan', "1000 items, itemHeight 20, height 100, overscan 2", "7 listitems: 'Item 0' … 'Item 6'", {
+      callSignature: "<VirtualList items={/* 1000 items: 'Item 0'...'Item 999' */} itemHeight={20} height={100} overscan={2} />",
+    }),
+    r('The scroll area has the full virtual height', 'same props', "an inner element with style.height '20000px'", {
+      callSignature: "<VirtualList items={/* 1000 items: 'Item 0'...'Item 999' */} itemHeight={20} height={100} overscan={2} />",
+    }),
+    r('Scrolling moves the rendered window', 'scrollTop = 2000 (+ scroll event)', "9 listitems from 'Item 98'; includes 'Item 100'; no 'Item 0'", {
+      callSignature: "fireEvent.scroll(container, { target: { scrollTop: 2000 } })",
+    }),
+    r('Items are absolutely positioned at index * itemHeight', 'scrollTop = 2000', "'Item 100' has position absolute, top '2000px', height '20px'", {
+      callSignature: "scrollTop = 2000",
+    }),
+    r('The window is clamped at the end of the list', 'scrollTop = 19900', "last rendered is 'Item 999'; at most 10 items", {
+      callSignature: "scrollTop = 19900",
+    }),
+    r('Short lists render everything', "items ['a', 'b', 'c']", "listitems a, b, c", {
+      callSignature: "<VirtualList items={['a', 'b', 'c']} itemHeight={20} height={100} />",
+    }),
   ],
 };

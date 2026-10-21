@@ -36,19 +36,25 @@ const handle = createFocusTrap(() => [a, b, c3], doc);
 doc.activeElement = c3;
 const e = key('Tab');
 handle(e);
-[e.prevented, log]`, "[true, ['focus:a']]"),
+[e.prevented, log]`, "[true, ['focus:a']]", {
+      callSignature: "const handle = createFocusTrap(() => [a, b, c], doc);\ndoc.activeElement = c;\nhandle(keyEvent('Tab'))",
+    }),
     c('Shift+Tab on the first element wraps to the last and cancels the default', `${TRAP}
 const handle = createFocusTrap(() => [a, b, c3], doc);
 doc.activeElement = a;
 const e = key('Tab', true);
 handle(e);
-[e.prevented, log]`, "[true, ['focus:c']]"),
+[e.prevented, log]`, "[true, ['focus:c']]", {
+      callSignature: "const handle = createFocusTrap(() => [a, b, c], doc);\ndoc.activeElement = a;\nhandle(keyEvent('Tab', { shiftKey: true }))",
+    }),
     c('Tab in the middle is left to the browser', `${TRAP}
 const handle = createFocusTrap(() => [a, b, c3], doc);
 doc.activeElement = b;
 const e = key('Tab');
 handle(e);
-[e.prevented, log]`, '[false, []]'),
+[e.prevented, log]`, '[false, []]', {
+      callSignature: "const handle = createFocusTrap(() => [a, b, c], doc);\ndoc.activeElement = b;\nhandle(keyEvent('Tab'))",
+    }),
     c('Tab on the first and Shift+Tab on the last are left to the browser', `${TRAP}
 const handle = createFocusTrap(() => [a, b, c3], doc);
 doc.activeElement = a;
@@ -57,30 +63,40 @@ handle(forward);
 doc.activeElement = c3;
 const backward = key('Tab', true);
 handle(backward);
-[forward.prevented, backward.prevented, log]`, '[false, false, []]'),
+[forward.prevented, backward.prevented, log]`, '[false, false, []]', {
+      callSignature: "const handle = createFocusTrap(() => [a, b, c], doc);\ndoc.activeElement = a; handle(keyEvent('Tab'));\ndoc.activeElement = c; handle(keyEvent('Tab', { shiftKey: true }))",
+    }),
     c('Other keys are ignored, even on the last element', `${TRAP}
 const handle = createFocusTrap(() => [a, b, c3], doc);
 doc.activeElement = c3;
 const e = key('Enter');
 handle(e);
-[e.prevented, log]`, '[false, []]'),
+[e.prevented, log]`, '[false, []]', {
+      callSignature: "const handle = createFocusTrap(() => [a, b, c], doc);\ndoc.activeElement = c;\nhandle(keyEvent('Enter'))",
+    }),
     c('Focus outside the dialog: Tab goes to the first element', `${TRAP}
 const handle = createFocusTrap(() => [a, b, c3], doc);
 doc.activeElement = { id: 'outside' };
 const e = key('Tab');
 handle(e);
-[e.prevented, log]`, "[true, ['focus:a']]"),
+[e.prevented, log]`, "[true, ['focus:a']]", {
+      callSignature: "const handle = createFocusTrap(() => [a, b, c], doc);\ndoc.activeElement = outsideElement;\nhandle(keyEvent('Tab'))",
+    }),
     c('Focus outside the dialog: Shift+Tab goes to the last element', `${TRAP}
 const handle = createFocusTrap(() => [a, b, c3], doc);
 doc.activeElement = null;
 const e = key('Tab', true);
 handle(e);
-[e.prevented, log]`, "[true, ['focus:c']]"),
+[e.prevented, log]`, "[true, ['focus:c']]", {
+      callSignature: "const handle = createFocusTrap(() => [a, b, c], doc);\ndoc.activeElement = null;\nhandle(keyEvent('Tab', { shiftKey: true }))",
+    }),
     c('With nothing focusable inside, Tab is cancelled and nothing is focused', `${TRAP}
 const handle = createFocusTrap(() => [], doc);
 const e = key('Tab');
 handle(e);
-[e.prevented, log]`, '[true, []]'),
+[e.prevented, log]`, '[true, []]', {
+      callSignature: "const handle = createFocusTrap(() => [], doc);\nhandle(keyEvent('Tab'))",
+    }),
     c('A single element keeps focus in both directions', `${TRAP}
 const handle = createFocusTrap(() => [b], doc);
 doc.activeElement = b;
@@ -88,7 +104,9 @@ const forward = key('Tab');
 const backward = key('Tab', true);
 handle(forward);
 handle(backward);
-[forward.prevented, backward.prevented, log]`, "[true, true, ['focus:b', 'focus:b']]"),
+[forward.prevented, backward.prevented, log]`, "[true, true, ['focus:b', 'focus:b']]", {
+      callSignature: "const handle = createFocusTrap(() => [b], doc);\ndoc.activeElement = b;\nhandle(forwardTab); handle(backwardTab)",
+    }),
     c('The list of focusable elements is read on every keydown', `${TRAP}
 let items = [a, b];
 const handle = createFocusTrap(() => items, doc);
@@ -98,69 +116,99 @@ items = [a, b, c3];
 doc.activeElement = b;
 const e = key('Tab');
 handle(e);
-[e.prevented, log]`, "[false, ['focus:a']]"),
+[e.prevented, log]`, "[false, ['focus:a']]", {
+      callSignature: "let items = [a, b];\nconst handle = createFocusTrap(() => items, doc);\ndoc.activeElement = b; handle(keyEvent('Tab'));\nitems = [a, b, c];\nhandle(keyEvent('Tab'))",
+    }),
   ],
   'mini-history-router': [
     c('The first route comes from the current location, with its decoded params', `${WIN}
 win.location.pathname = '/users/42';
 const router = createRouter(ROUTES, win);
-router.current()`, "{ name: 'user', params: { id: '42' }, path: '/users/42' }"),
+router.current()`, "{ name: 'user', params: { id: '42' }, path: '/users/42' }", {
+      callSignature: "win.location.pathname = '/users/42';\nconst router = createRouter(ROUTES, win);\nrouter.current()",
+    }),
     c('The root path matches the "/" route', `${WIN}
-createRouter(ROUTES, win).current()`, "{ name: 'home', params: {}, path: '/' }"),
+createRouter(ROUTES, win).current()`, "{ name: 'home', params: {}, path: '/' }", {
+      callSignature: "win.location.pathname = '/';\ncreateRouter(ROUTES, win).current()",
+    }),
     c('Several parameters are captured', `${WIN}
 win.location.pathname = '/users/7/posts/99';
-createRouter(ROUTES, win).current()`, "{ name: 'post', params: { id: '7', postId: '99' }, path: '/users/7/posts/99' }"),
+createRouter(ROUTES, win).current()`, "{ name: 'post', params: { id: '7', postId: '99' }, path: '/users/7/posts/99' }", {
+      callSignature: "win.location.pathname = '/users/7/posts/99';\ncreateRouter(ROUTES, win).current()",
+    }),
     c('A path with no match resolves to name null', `${WIN}
 win.location.pathname = '/nope';
-createRouter(ROUTES, win).current()`, "{ name: null, params: {}, path: '/nope' }"),
+createRouter(ROUTES, win).current()`, "{ name: null, params: {}, path: '/nope' }", {
+      callSignature: "win.location.pathname = '/nope';\ncreateRouter(ROUTES, win).current()",
+    }),
     c('The number of segments must match, and static segments must match exactly', `${WIN}
 const router = createRouter(ROUTES, win);
 const names = [];
 ['/users/42/extra', '/user/42', '/users/42/posts'].forEach((p) => { win.location.pathname = p; back(p); names.push(router.current().name); });
-names`, '[null, null, null]'),
+names`, '[null, null, null]', {
+      callSignature: "const router = createRouter(ROUTES, win);\n['/users/42/extra', '/user/42', '/users/42/posts'].map(p => router.resolve(p))",
+    }),
     c('Parameters are decoded', `${WIN}
 win.location.pathname = '/users/a%20b';
-createRouter(ROUTES, win).current().params`, "{ id: 'a b' }"),
+createRouter(ROUTES, win).current().params`, "{ id: 'a b' }", {
+      callSignature: "win.location.pathname = '/users/a%20b';\ncreateRouter(ROUTES, win).current().params",
+    }),
     c('A trailing slash is ignored when matching', `${WIN}
 win.location.pathname = '/users/';
-createRouter(ROUTES, win).current().name`, "'users'"),
+createRouter(ROUTES, win).current().name`, "'users'", {
+      callSignature: "win.location.pathname = '/users/';\ncreateRouter(ROUTES, win).current().name",
+    }),
     c('The first matching route wins', `${WIN}
 win.location.pathname = '/x/new';
-createRouter([{ name: 'a', path: '/x/:id' }, { name: 'b', path: '/x/new' }], win).current().name`, "'a'"),
+createRouter([{ name: 'a', path: '/x/:id' }, { name: 'b', path: '/x/new' }], win).current().name`, "'a'", {
+      callSignature: "win.location.pathname = '/x/new';\ncreateRouter([{ name: 'a', path: '/x/:id' }, { name: 'b', path: '/x/new' }], win).current().name",
+    }),
     c('navigate pushes a history entry, updates the route and notifies once', `${WIN}
 const router = createRouter(ROUTES, win);
 router.subscribe((r) => seen.push(r.name));
 router.navigate('/users/5');
-[pushes, router.current(), seen]`, "[['/users/5'], { name: 'user', params: { id: '5' }, path: '/users/5' }, ['user']]"),
+[pushes, router.current(), seen]`, "[['/users/5'], { name: 'user', params: { id: '5' }, path: '/users/5' }, ['user']]", {
+      callSignature: "const router = createRouter(ROUTES, win);\nrouter.subscribe(fn);\nrouter.navigate('/users/5')",
+    }),
     c('navigate to the current path does nothing (no entry, no notification)', `${WIN}
 const router = createRouter(ROUTES, win);
 router.subscribe((r) => seen.push(r.name));
 router.navigate('/');
-[pushes, seen]`, '[[], []]'),
+[pushes, seen]`, '[[], []]', {
+      callSignature: "const router = createRouter(ROUTES, win);\nrouter.subscribe(fn);\nrouter.navigate('/')",
+    }),
     c('replace uses replaceState, not pushState, and notifies', `${WIN}
 const router = createRouter(ROUTES, win);
 router.subscribe((r) => seen.push(r.name));
 router.replace('/users');
-[pushes, replaces, router.current().name, seen]`, "[[], ['/users'], 'users', ['users']]"),
+[pushes, replaces, router.current().name, seen]`, "[[], ['/users'], 'users', ['users']]", {
+      callSignature: "const router = createRouter(ROUTES, win);\nrouter.subscribe(fn);\nrouter.replace('/users')",
+    }),
     c('The back button (popstate) re-resolves from the location and notifies, without pushing', `${WIN}
 const router = createRouter(ROUTES, win);
 router.subscribe((r) => seen.push(r.name));
 router.navigate('/users');
 back('/');
-[pushes, router.current().name, seen]`, "[['/users'], 'home', ['users', 'home']]"),
+[pushes, router.current().name, seen]`, "[['/users'], 'home', ['users', 'home']]", {
+      callSignature: "const router = createRouter(ROUTES, win);\nrouter.subscribe(fn);\nrouter.navigate('/users');\nback('/')",
+    }),
     c('Unsubscribing stops the notifications', `${WIN}
 const router = createRouter(ROUTES, win);
 const off = router.subscribe((r) => seen.push(r.name));
 router.navigate('/users');
 off();
 router.navigate('/users/1');
-seen`, "['users']"),
+seen`, "['users']", {
+      callSignature: "const router = createRouter(ROUTES, win);\nconst off = router.subscribe(fn);\nrouter.navigate('/users');\noff();\nrouter.navigate('/users/1')",
+    }),
     c('destroy removes the popstate listener and the subscribers', `${WIN}
 const router = createRouter(ROUTES, win);
 router.subscribe((r) => seen.push(r.name));
 const before = listeners.popstate.length;
 router.destroy();
 back('/users');
-[before, listeners.popstate.length, seen]`, '[1, 0, []]'),
+[before, listeners.popstate.length, seen]`, '[1, 0, []]', {
+      callSignature: "const router = createRouter(ROUTES, win);\nrouter.subscribe(fn);\nrouter.destroy();\nback('/users')",
+    }),
   ],
 };

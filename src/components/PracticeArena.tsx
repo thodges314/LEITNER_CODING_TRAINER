@@ -57,6 +57,7 @@ import { getStarterSnippet } from './practice/starterSnippet';
 import { formatCode } from '../lib/formatter';
 import { getTimedModeEnabled, getTimedModeDuration } from '../lib/timedMode';
 import { ReactPreview } from './ReactPreview';
+import { MarkdownContent } from './MarkdownContent';
 
 const TIER_METADATA: Record<number, { level: string; desc: string }> = {
   1: { level: 'Initial Encounter', desc: 'Immediate reinforcement (+1 review) to anchor core pattern.' },
@@ -1582,7 +1583,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
         {/* Prompt Seed Instructions */}
         <div data-tour="problem" className="prompt-seed-box">
-          {currentCard.promptSeed}
+          <MarkdownContent text={currentCard.promptSeed} />
         </div>
 
         {/* Target Contract (Input vs Expected Output) */}
