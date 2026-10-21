@@ -69,15 +69,23 @@ export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
   return parts;
 };
 
+export interface MarkdownListItem {
+  text: string;
+  children?: MarkdownListItem[];
+}
+
 export type LineGroup =
   | { type: 'heading'; level: number; text: string }
-  | { type: 'ul'; items: string[] }
-  | { type: 'ol'; items: string[] }
+  | { type: 'ul'; items: MarkdownListItem[] }
+  | { type: 'ol'; items: MarkdownListItem[] }
   | { type: 'text'; lines: string[] };
 
 export const parseParagraphLines = (para: string): LineGroup[] => {
   const lines = para.split('\n');
   const groups: LineGroup[] = [];
+
+  let ulStack: { indent: number; item: MarkdownListItem }[] = [];
+  let olStack: { indent: number; item: MarkdownListItem }[] = [];
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -86,6 +94,8 @@ export const parseParagraphLines = (para: string): LineGroup[] => {
     // Heading (#, ##, ###)
     const headingMatch = trimmed.match(/^(#{1,3})\s+(.*)$/);
     if (headingMatch) {
+      ulStack = [];
+      olStack = [];
       groups.push({
         type: 'heading',
         level: headingMatch[1].length,
@@ -95,30 +105,92 @@ export const parseParagraphLines = (para: string): LineGroup[] => {
     }
 
     // Bullet item (- or *)
-    const bulletMatch = trimmed.match(/^[-*]\s+(.*)$/);
+    const bulletMatch = line.match(/^([ \t]*)[-*]\s+(.*)$/);
     if (bulletMatch) {
+      const indent = bulletMatch[1].replace(/\t/g, '  ').length;
+      const text = bulletMatch[2];
+      const newItem: MarkdownListItem = { text };
+
       const lastGroup = groups[groups.length - 1];
-      if (lastGroup && lastGroup.type === 'ul') {
-        lastGroup.items.push(bulletMatch[1]);
+
+      // Check if this bullet is a child of an active ordered list item
+      if (lastGroup && lastGroup.type === 'ol' && olStack.length > 0 && indent > olStack[olStack.length - 1].indent) {
+        while (ulStack.length > 0 && ulStack[ulStack.length - 1].indent >= indent) {
+          ulStack.pop();
+        }
+        if (ulStack.length === 0) {
+          const parent = olStack[olStack.length - 1].item;
+          if (!parent.children) parent.children = [];
+          parent.children.push(newItem);
+        } else {
+          const parent = ulStack[ulStack.length - 1].item;
+          if (!parent.children) parent.children = [];
+          parent.children.push(newItem);
+        }
+        ulStack.push({ indent, item: newItem });
+        continue;
+      }
+
+      olStack = [];
+
+      if (!lastGroup || lastGroup.type !== 'ul') {
+        groups.push({ type: 'ul', items: [newItem] });
+        ulStack = [{ indent, item: newItem }];
       } else {
-        groups.push({ type: 'ul', items: [bulletMatch[1]] });
+        while (ulStack.length > 0 && ulStack[ulStack.length - 1].indent >= indent) {
+          ulStack.pop();
+        }
+
+        if (ulStack.length === 0) {
+          lastGroup.items.push(newItem);
+          ulStack = [{ indent, item: newItem }];
+        } else {
+          const parent = ulStack[ulStack.length - 1].item;
+          if (!parent.children) {
+            parent.children = [];
+          }
+          parent.children.push(newItem);
+          ulStack.push({ indent, item: newItem });
+        }
       }
       continue;
     }
 
     // Numbered item (1. 2. etc.)
-    const numberMatch = trimmed.match(/^\d+\.\s+(.*)$/);
+    const numberMatch = line.match(/^([ \t]*)\d+\.\s+(.*)$/);
     if (numberMatch) {
+      ulStack = [];
+      const indent = numberMatch[1].replace(/\t/g, '  ').length;
+      const text = numberMatch[2];
+      const newItem: MarkdownListItem = { text };
+
       const lastGroup = groups[groups.length - 1];
-      if (lastGroup && lastGroup.type === 'ol') {
-        lastGroup.items.push(numberMatch[1]);
+      if (!lastGroup || lastGroup.type !== 'ol') {
+        groups.push({ type: 'ol', items: [newItem] });
+        olStack = [{ indent, item: newItem }];
       } else {
-        groups.push({ type: 'ol', items: [numberMatch[1]] });
+        while (olStack.length > 0 && olStack[olStack.length - 1].indent >= indent) {
+          olStack.pop();
+        }
+
+        if (olStack.length === 0) {
+          lastGroup.items.push(newItem);
+          olStack = [{ indent, item: newItem }];
+        } else {
+          const parent = olStack[olStack.length - 1].item;
+          if (!parent.children) {
+            parent.children = [];
+          }
+          parent.children.push(newItem);
+          olStack.push({ indent, item: newItem });
+        }
       }
       continue;
     }
 
     // Normal text line
+    ulStack = [];
+    olStack = [];
     const lastGroup = groups[groups.length - 1];
     if (lastGroup && lastGroup.type === 'text') {
       lastGroup.lines.push(line);
