@@ -23,7 +23,9 @@ export default {
   return [grid.every((week) => week.length === 7), days.length, days.every((d, i) => d === i + 1)];
 });
 rows`,
-      `[[true, 31, true], [true, 28, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true]]`),
+      `[[true, 31, true], [true, 28, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true]]`, {
+        callSignature: "buildMonthGrid(2026, monthIndex)",
+      }),
     c('The Gregorian leap rule: 1900 is not a leap year, 2000 is', `[buildMonthGrid(1900, 1).flat().filter((d) => d !== null).length, buildMonthGrid(2000, 1).flat().filter((d) => d !== null).length]`,
       `[28, 29]`),
     c('weekStartsOn defaults to Sunday (0)', `JSON.stringify(buildMonthGrid(2026, 9)) === JSON.stringify(buildMonthGrid(2026, 9, 0))`, `true`),
@@ -32,7 +34,9 @@ rows`,
   return [grid[0].some((d) => d !== null), grid[grid.length - 1].some((d) => d !== null)];
 });
 rows`,
-      `[[true, true], [true, true], [true, true], [true, true], [true, true], [true, true]]`),
+      `[[true, true], [true, true], [true, true], [true, true], [true, true], [true, true]]`, {
+        callSignature: "buildMonthGrid(year, monthIndex, weekStartsOn)",
+      }),
   ],
   'deep-merge-objects': [
     c('Nested plain objects are merged key by key', `deepMerge({ a: 1, b: { c: 2, d: 3 } }, { b: { d: 4, e: 5 }, f: 6 })`,

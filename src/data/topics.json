@@ -2338,7 +2338,7 @@
     "testCases": [
       {
         "description": "Debounces input into a single fetch",
-        "input": "<Typeahead delay={30} />: type 'r', 're', 'rea' back to back; wait 100 ms",
+        "input": "<Typeahead onSelect={handleSelect} fetchSuggestions={fetchSuggestions} delay={30} />",
         "expected": "fetchSuggestions called once, with 'rea'"
       },
       {
@@ -2442,7 +2442,7 @@
     "testCases": [
       {
         "description": "Renders the items",
-        "input": "<InfiniteList items={['a', 'b']} ... />",
+        "input": "<InfiniteList items={['a', 'b']} onLoadMore={handleLoadMore} hasMore={true} loading={false} />",
         "expected": "list items ['a', 'b'] (plus the sentinel)"
       },
       {
@@ -2622,7 +2622,7 @@
     "testCases": [
       {
         "description": "defaultValue shows only its panel",
-        "input": "<Tabs defaultValue='one'> with tabs one, two, three",
+        "input": "<Tabs defaultValue='one'><TabList><Tab value='one'>One</Tab><Tab value='two'>Two</Tab></TabList><TabPanel value='one'>Panel one</TabPanel><TabPanel value='two'>Panel two</TabPanel></Tabs>",
         "expected": "only 'Panel one' is rendered"
       },
       {
@@ -2642,7 +2642,7 @@
       },
       {
         "description": "Controlled mode calls onChange and waits for the value prop",
-        "input": "<Tabs value='one' onChange={fn}>, click 'two'; then rerender value='two'",
+        "input": "<Tabs value='one' onChange={handleChange}>...</Tabs>",
         "expected": "fn('two') called; 'Panel one' stays until the prop changes, then 'Panel two'"
       }
     ],
@@ -13089,32 +13089,32 @@
       },
       {
         "description": "The current page has aria-current=\"page\" (and only it)",
-        "input": "page 3 of 5",
+        "input": "<Pagination page={3} totalPages={5} />",
         "expected": "only the '3' button has aria-current='page'"
       },
       {
         "description": "Long ranges collapse with ellipses around the current page",
-        "input": "10 pages: current 5, 1, 10",
+        "input": "<Pagination page={5} totalPages={10} />",
         "expected": "'1,…,4,5,6,…,10'; '1,2,…,10'; '1,…,9,10'"
       },
       {
         "description": "A single missing page is shown instead of an ellipsis",
-        "input": "7 pages, current 4; then 9 pages, current 5",
+        "input": "<Pagination page={4} totalPages={7} />",
         "expected": "'1,2,3,4,5,6,7'; then '1,…,4,5,6,…,9'"
       },
       {
         "description": "siblings widens the window around the current page",
-        "input": "page 5 of 12, siblings=2",
+        "input": "<Pagination page={5} totalPages={12} siblings={2} />",
         "expected": "'1,2,3,4,5,6,7,…,12'"
       },
       {
         "description": "Previous, Next and the page buttons call onPageChange with the target page",
-        "input": "page 3 of 6: Previous, Next, click '6'",
+        "input": "<Pagination page={3} totalPages={6} onPageChange={handlePageChange} />",
         "expected": "onPageChange called with 2, 4, 6"
       },
       {
         "description": "Previous is disabled on the first page and Next on the last",
-        "input": "page 1 of 4, then page 4 of 4",
+        "input": "<Pagination page={1} totalPages={4} />",
         "expected": "Previous disabled / Next disabled respectively"
       },
       {
@@ -14456,7 +14456,7 @@
     "testCases": [
       {
         "description": "Renders a polite status region and an assertive alert region, both atomic",
-        "input": "render <AnnouncerProvider>…</AnnouncerProvider>",
+        "input": "<AnnouncerProvider><App /></AnnouncerProvider>",
         "expected": "role=status aria-live=polite aria-atomic=true; role=alert aria-live=assertive aria-atomic=true"
       },
       {
@@ -14564,7 +14564,7 @@
     "testCases": [
       {
         "description": "Renders a <button type=\"button\"> with role=\"switch\" and the label as its content",
-        "input": "render <Switch checked={false}>Wi-Fi</Switch>",
+        "input": "<Switch checked={false}>Wi-Fi</Switch>",
         "expected": "<button type=\"button\" role=\"switch\">Wi-Fi</button>"
       },
       {
@@ -15644,7 +15644,7 @@
         "description": "The first route comes from the current location, with its decoded params",
         "input": "const pushes = [];\nconst replaces = [];\nconst listeners = {};\nconst win = {\n  location: { pathname: '/' },\n  history: {\n    pushState(state, title, url) { pushes.push(url); win.location.pathname = url; },\n    replaceState(state, title, url) { replaces.push(url); win.location.pathname = url; },\n  },\n  addEventListener(type, fn) { listeners[type] = (listeners[type] || []).concat(fn); },\n  removeEventListener(type, fn) { listeners[type] = (listeners[type] || []).filter((f) => f !== fn); },\n};\n// the browser's back/forward button: the location changes, then popstate fires\nconst back = (path) => { win.location.pathname = path; (listeners.popstate || []).forEach((fn) => fn({})); };\nconst ROUTES = [\n  { name: 'home', path: '/' },\n  { name: 'users', path: '/users' },\n  { name: 'user', path: '/users/:id' },\n  { name: 'post', path: '/users/:id/posts/:postId' },\n];\nconst seen = [];\nwin.location.pathname = '/users/42';\nconst router = createRouter(ROUTES, win);\nrouter.current()",
         "expected": "{ name: 'user', params: { id: '42' }, path: '/users/42' }",
-        "callSignature": "win.location.pathname = '/users/42';\nconst router = createRouter(ROUTES, win);\nrouter.current()"
+        "callSignature": "const routes = [{ name: 'user', path: '/users/:id' }];\nwin.location.pathname = '/users/42';\nconst router = createRouter(routes, win);\nrouter.current()"
       },
       {
         "description": "The root path matches the \"/\" route",
@@ -15784,7 +15784,8 @@
       {
         "description": "Every week has 7 cells, and the days 1..N appear in order, for all 12 months of 2026",
         "input": "const rows = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((m) => {\n  const grid = buildMonthGrid(2026, m);\n  const days = grid.flat().filter((d) => d !== null);\n  return [grid.every((week) => week.length === 7), days.length, days.every((d, i) => d === i + 1)];\n});\nrows",
-        "expected": "[[true, 31, true], [true, 28, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true]]"
+        "expected": "[[true, 31, true], [true, 28, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true]]",
+        "callSignature": "buildMonthGrid(2026, monthIndex)"
       },
       {
         "description": "The Gregorian leap rule: 1900 is not a leap year, 2000 is",
@@ -15799,7 +15800,8 @@
       {
         "description": "No empty week is ever returned: the first and the last week each contain a day",
         "input": "const rows = [[2026, 9, 0], [2026, 9, 1], [2026, 1, 0], [2026, 7, 0], [2026, 7, 6], [2024, 1, 0]].map(([y, m, w]) => {\n  const grid = buildMonthGrid(y, m, w);\n  return [grid[0].some((d) => d !== null), grid[grid.length - 1].some((d) => d !== null)];\n});\nrows",
-        "expected": "[[true, true], [true, true], [true, true], [true, true], [true, true], [true, true]]"
+        "expected": "[[true, true], [true, true], [true, true], [true, true], [true, true], [true, true]]",
+        "callSignature": "buildMonthGrid(year, monthIndex, weekStartsOn)"
       }
     ],
     "testHarness": "await $test.run(\"October 2026 (starts on a Thursday), weeks starting on Sunday\", async () => {\n  const sleep = $test.sleep;\n  return (buildMonthGrid(2026, 9));\n}, () => ([[null, null, null, null, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17], [18, 19, 20, 21, 22, 23, 24], [25, 26, 27, 28, 29, 30, 31]]));\n\nawait $test.run(\"The same month with weeks starting on Monday\", async () => {\n  const sleep = $test.sleep;\n  return (buildMonthGrid(2026, 9, 1));\n}, () => ([[null, null, null, 1, 2, 3, 4], [5, 6, 7, 8, 9, 10, 11], [12, 13, 14, 15, 16, 17, 18], [19, 20, 21, 22, 23, 24, 25], [26, 27, 28, 29, 30, 31, null]]));\n\nawait $test.run(\"A month that starts on the first weekday has no leading padding: February 2026 is exactly 4 full weeks\", async () => {\n  const sleep = $test.sleep;\n  return (buildMonthGrid(2026, 1));\n}, () => ([[1, 2, 3, 4, 5, 6, 7], [8, 9, 10, 11, 12, 13, 14], [15, 16, 17, 18, 19, 20, 21], [22, 23, 24, 25, 26, 27, 28]]));\n\nawait $test.run(\"A leap February (2024) has 29 days and pads the end of the last week\", async () => {\n  const sleep = $test.sleep;\n  return (buildMonthGrid(2024, 1));\n}, () => ([[null, null, null, null, 1, 2, 3], [4, 5, 6, 7, 8, 9, 10], [11, 12, 13, 14, 15, 16, 17], [18, 19, 20, 21, 22, 23, 24], [25, 26, 27, 28, 29, null, null]]));\n\nawait $test.run(\"A non-leap February (2023) has 28 days\", async () => {\n  const sleep = $test.sleep;\n  return (buildMonthGrid(2023, 1));\n}, () => ([[null, null, null, 1, 2, 3, 4], [5, 6, 7, 8, 9, 10, 11], [12, 13, 14, 15, 16, 17, 18], [19, 20, 21, 22, 23, 24, 25], [26, 27, 28, null, null, null, null]]));\n\nawait $test.run(\"Some months need 6 weeks: August 2026 starts on a Saturday\", async () => {\n  const sleep = $test.sleep;\n  return (buildMonthGrid(2026, 7));\n}, () => ([[null, null, null, null, null, null, 1], [2, 3, 4, 5, 6, 7, 8], [9, 10, 11, 12, 13, 14, 15], [16, 17, 18, 19, 20, 21, 22], [23, 24, 25, 26, 27, 28, 29], [30, 31, null, null, null, null, null]]));\n\nawait $test.run(\"The same August with weeks starting on Saturday needs only 5 weeks and no leading padding\", async () => {\n  const sleep = $test.sleep;\n  return (buildMonthGrid(2026, 7, 6));\n}, () => ([[1, 2, 3, 4, 5, 6, 7], [8, 9, 10, 11, 12, 13, 14], [15, 16, 17, 18, 19, 20, 21], [22, 23, 24, 25, 26, 27, 28], [29, 30, 31, null, null, null, null]]));\n\nawait $test.run(\"Every week has 7 cells, and the days 1..N appear in order, for all 12 months of 2026\", async () => {\n  const sleep = $test.sleep;\n  const rows = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((m) => {\n    const grid = buildMonthGrid(2026, m);\n    const days = grid.flat().filter((d) => d !== null);\n    return [grid.every((week) => week.length === 7), days.length, days.every((d, i) => d === i + 1)];\n  });\n  return (rows);\n}, () => ([[true, 31, true], [true, 28, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 31, true], [true, 30, true], [true, 31, true], [true, 30, true], [true, 31, true]]));\n\nawait $test.run(\"The Gregorian leap rule: 1900 is not a leap year, 2000 is\", async () => {\n  const sleep = $test.sleep;\n  return ([buildMonthGrid(1900, 1).flat().filter((d) => d !== null).length, buildMonthGrid(2000, 1).flat().filter((d) => d !== null).length]);\n}, () => ([28, 29]));\n\nawait $test.run(\"weekStartsOn defaults to Sunday (0)\", async () => {\n  const sleep = $test.sleep;\n  return (JSON.stringify(buildMonthGrid(2026, 9)) === JSON.stringify(buildMonthGrid(2026, 9, 0)));\n}, () => (true));\n\nawait $test.run(\"No empty week is ever returned: the first and the last week each contain a day\", async () => {\n  const sleep = $test.sleep;\n  const rows = [[2026, 9, 0], [2026, 9, 1], [2026, 1, 0], [2026, 7, 0], [2026, 7, 6], [2024, 1, 0]].map(([y, m, w]) => {\n    const grid = buildMonthGrid(y, m, w);\n    return [grid[0].some((d) => d !== null), grid[grid.length - 1].some((d) => d !== null)];\n  });\n  return (rows);\n}, () => ([[true, true], [true, true], [true, true], [true, true], [true, true], [true, true]]));"
@@ -15948,7 +15950,8 @@
       {
         "description": "Special characters are matched literally: ( ) + * ? [ ] $ ^ |",
         "input": "[highlightMatches('f(x) = 1+1', '(x)'), highlightMatches('a+b', '+'), highlightMatches('what?', '?'), highlightMatches('a[0]', '[0]'), highlightMatches('cost $5 | tax', '$5 |')].map((segments) => segments.filter((s) => s.match).map((s) => s.text))",
-        "expected": "[['(x)'], ['+'], ['?'], ['[0]'], ['$5 |']]"
+        "expected": "[['(x)'], ['+'], ['?'], ['[0]'], ['$5 |']]",
+        "callSignature": "highlightMatches('f(x) = 1+1', '(x)')"
       },
       {
         "description": "A query that is only a special character does not throw",
@@ -15978,7 +15981,8 @@
       {
         "description": "Joining the segment texts gives back the original text, and no segment is empty",
         "input": "const text = 'The Quick brown fox, the lazy dog. THE end';\nconst segments = highlightMatches(text, 'the');\n[segments.map((s) => s.text).join('') === text, segments.every((s) => s.text !== ''), segments.filter((s) => s.match).length]",
-        "expected": "[true, true, 3]"
+        "expected": "[true, true, 3]",
+        "callSignature": "highlightMatches('The Quick brown fox, the lazy dog. THE end', 'the')"
       }
     ],
     "testHarness": "await $test.run(\"Every occurrence is highlighted, the text in between is not\", async () => {\n  const sleep = $test.sleep;\n  return (highlightMatches('Hello World', 'o'));\n}, () => ([{ text: 'Hell', match: false }, { text: 'o', match: true }, { text: ' W', match: false }, { text: 'o', match: true }, { text: 'rld', match: false }]));\n\nawait $test.run(\"The search ignores case but every segment keeps the original casing\", async () => {\n  const sleep = $test.sleep;\n  return (highlightMatches('Hello HELLO hello', 'LLo'));\n}, () => ([{ text: 'He', match: false }, { text: 'llo', match: true }, { text: ' HE', match: false }, { text: 'LLO', match: true }, { text: ' he', match: false }, { text: 'llo', match: true }]));\n\nawait $test.run(\"A match at the very start and at the very end\", async () => {\n  const sleep = $test.sleep;\n  return ([highlightMatches('abc', 'a'), highlightMatches('abc', 'c')]);\n}, () => ([[{ text: 'a', match: true }, { text: 'bc', match: false }], [{ text: 'ab', match: false }, { text: 'c', match: true }]]));\n\nawait $test.run(\"The whole text can be one match\", async () => {\n  const sleep = $test.sleep;\n  return (highlightMatches('abc', 'ABC'));\n}, () => ([{ text: 'abc', match: true }]));\n\nawait $test.run(\"Matches right next to each other stay separate segments\", async () => {\n  const sleep = $test.sleep;\n  return (highlightMatches('Banana', 'AN'));\n}, () => ([{ text: 'B', match: false }, { text: 'an', match: true }, { text: 'an', match: true }, { text: 'a', match: false }]));\n\nawait $test.run(\"Matches are found left to right and never overlap\", async () => {\n  const sleep = $test.sleep;\n  return (highlightMatches('aaa', 'aa'));\n}, () => ([{ text: 'aa', match: true }, { text: 'a', match: false }]));\n\nawait $test.run(\"The query is plain text: \\\".\\\" does not match any character\", async () => {\n  const sleep = $test.sleep;\n  return ([highlightMatches('abc', '.'), highlightMatches('a.b', '.')]);\n}, () => ([[{ text: 'abc', match: false }], [{ text: 'a', match: false }, { text: '.', match: true }, { text: 'b', match: false }]]));\n\nawait $test.run(\"Special characters are matched literally: ( ) + * ? [ ] $ ^ |\", async () => {\n  const sleep = $test.sleep;\n  return ([highlightMatches('f(x) = 1+1', '(x)'), highlightMatches('a+b', '+'), highlightMatches('what?', '?'), highlightMatches('a[0]', '[0]'), highlightMatches('cost $5 | tax', '$5 |')].map((segments) => segments.filter((s) => s.match).map((s) => s.text)));\n}, () => ([['(x)'], ['+'], ['?'], ['[0]'], ['$5 |']]));\n\nawait $test.run(\"A query that is only a special character does not throw\", async () => {\n  const sleep = $test.sleep;\n  return ([highlightMatches('a*b', '*'), highlightMatches('^start', '^'), highlightMatches('a|b', '|')].map((segments) => segments.length));\n}, () => ([3, 2, 3]));\n\nawait $test.run(\"An empty query returns the whole text as one non-matching segment\", async () => {\n  const sleep = $test.sleep;\n  return (highlightMatches('abc', ''));\n}, () => ([{ text: 'abc', match: false }]));\n\nawait $test.run(\"An empty text returns an empty list\", async () => {\n  const sleep = $test.sleep;\n  return ([highlightMatches('', 'a'), highlightMatches('', '')]);\n}, () => ([[], []]));\n\nawait $test.run(\"A query that does not occur returns the whole text as one non-matching segment\", async () => {\n  const sleep = $test.sleep;\n  return (highlightMatches('abc', 'xyz'));\n}, () => ([{ text: 'abc', match: false }]));\n\nawait $test.run(\"Spaces in the query are matched as typed (not trimmed)\", async () => {\n  const sleep = $test.sleep;\n  return (highlightMatches('a b  c', ' '));\n}, () => ([{ text: 'a', match: false }, { text: ' ', match: true }, { text: 'b', match: false }, { text: ' ', match: true }, { text: ' ', match: true }, { text: 'c', match: false }]));\n\nawait $test.run(\"Joining the segment texts gives back the original text, and no segment is empty\", async () => {\n  const sleep = $test.sleep;\n  const text = 'The Quick brown fox, the lazy dog. THE end';\n  const segments = highlightMatches(text, 'the');\n  return ([segments.map((s) => s.text).join('') === text, segments.every((s) => s.text !== ''), segments.filter((s) => s.match).length]);\n}, () => ([true, true, 3]));"

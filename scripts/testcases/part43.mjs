@@ -16,7 +16,9 @@ export default {
     c('The query is plain text: "." does not match any character', `[highlightMatches('abc', '.'), highlightMatches('a.b', '.')]`,
       `[[{ text: 'abc', match: false }], [{ text: 'a', match: false }, { text: '.', match: true }, { text: 'b', match: false }]]`),
     c('Special characters are matched literally: ( ) + * ? [ ] $ ^ |', `[highlightMatches('f(x) = 1+1', '(x)'), highlightMatches('a+b', '+'), highlightMatches('what?', '?'), highlightMatches('a[0]', '[0]'), highlightMatches('cost $5 | tax', '$5 |')].map((segments) => segments.filter((s) => s.match).map((s) => s.text))`,
-      `[['(x)'], ['+'], ['?'], ['[0]'], ['$5 |']]`),
+      `[['(x)'], ['+'], ['?'], ['[0]'], ['$5 |']]`, {
+        callSignature: "highlightMatches('f(x) = 1+1', '(x)')",
+      }),
     c('A query that is only a special character does not throw', `[highlightMatches('a*b', '*'), highlightMatches('^start', '^'), highlightMatches('a|b', '|')].map((segments) => segments.length)`,
       `[3, 2, 3]`),
     c('An empty query returns the whole text as one non-matching segment', `highlightMatches('abc', '')`, `[{ text: 'abc', match: false }]`),
@@ -27,7 +29,9 @@ export default {
     c('Joining the segment texts gives back the original text, and no segment is empty', `const text = 'The Quick brown fox, the lazy dog. THE end';
 const segments = highlightMatches(text, 'the');
 [segments.map((s) => s.text).join('') === text, segments.every((s) => s.text !== ''), segments.filter((s) => s.match).length]`,
-      `[true, true, 3]`),
+      `[true, true, 3]`, {
+        callSignature: "highlightMatches('The Quick brown fox, the lazy dog. THE end', 'the')",
+      }),
   ],
   'object-diff': [
     c('Equal objects give no changes', `[diff({}, {}), diff({ a: 1, b: { c: [1, 2] } }, { a: 1, b: { c: [1, 2] } })]`, `[[], []]`),

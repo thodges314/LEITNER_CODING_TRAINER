@@ -6,7 +6,7 @@ import { c } from './part1.mjs';
 const U = 'https://jsonplaceholder.typicode.com';
 
 /** Scenario documented as input -> expected; asserted by the card's DOM harness under the same label. */
-const r = (d, i, e) => c(d, i, e, { v: false, note: 'covered by the DOM harness' });
+const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by the DOM harness', ...o });
 
 const MK = "const mk = (id, children = [], cls = []) => ({ id, children, classList: { contains: (c) => cls.includes(c) } });";
 const TREE = `${MK}\nconst root = mk('root', [mk('A', [mk('A1'), mk('A2')]), mk('B')]);`;
@@ -136,7 +136,7 @@ elapsed >= 130 && elapsed < 450`, `true  (about 140 ms of waiting in total)`, { 
     c("The context value keeps its identity while the theme does not change", "re-render a parent so ThemeProvider re-renders with the same state", "consumers receive the identical value object (memoized)", { v: false, note: 'covered by the DOM harness' }),
   ],
   'typeahead-autocomplete': [
-    r('Debounces input into a single fetch', "<Typeahead delay={30} />: type 'r', 're', 'rea' back to back; wait 100 ms", "fetchSuggestions called once, with 'rea'"),
+    r('Debounces input into a single fetch', "<Typeahead onSelect={handleSelect} fetchSuggestions={fetchSuggestions} delay={30} />", "fetchSuggestions called once, with 'rea'"),
     r('Renders suggestions with combobox ARIA roles', "fetchSuggestions → ['react', 'read', 'real']", "input role='combobox' aria-expanded='true'; role='listbox' containing 3 role='option' items"),
     r('ArrowDown moves the active option', 'ArrowDown, ArrowDown on the input', "aria-selected of the options: ['false', 'true', 'false']"),
     r('Enter selects the active option', 'ArrowDown, ArrowDown, Enter', "onSelect('read') called once; listbox removed"),
@@ -151,7 +151,7 @@ elapsed >= 130 && elapsed < 450`, `true  (about 140 ms of waiting in total)`, { 
     r('Switching from null to a delay resumes', 'rerender delay null → 30; wait 100 ms', 'cb called at least 2 times'),
   ],
   'infinite-scroll-list': [
-    r('Renders the items', "<InfiniteList items={['a', 'b']} ... />", "list items ['a', 'b'] (plus the sentinel)"),
+    r('Renders the items', "<InfiniteList items={['a', 'b']} onLoadMore={handleLoadMore} hasMore={true} loading={false} />", "list items ['a', 'b'] (plus the sentinel)"),
     r('Loads the next page when the sentinel becomes visible', 'observer callback([{ isIntersecting: true }])', 'onLoadMore called 1 time'),
     r('Does not load again while a page is loading', 'rerender loading = true; intersect again', 'onLoadMore still called 1 time'),
     r('Stops loading and disconnects at the last page', 'rerender hasMore = false; intersect again', 'onLoadMore still 1 time; observer.disconnect() called'),
@@ -168,11 +168,11 @@ elapsed >= 130 && elapsed < 450`, `true  (about 140 ms of waiting in total)`, { 
     r('Body scroll is restored after close', 'close the modal', "document.body.style.overflow is no longer 'hidden'"),
   ],
   'tabs-accordion-compound': [
-    r('defaultValue shows only its panel', "<Tabs defaultValue='one'> with tabs one, two, three", "only 'Panel one' is rendered"),
+    r('defaultValue shows only its panel', "<Tabs defaultValue='one'><TabList><Tab value='one'>One</Tab><Tab value='two'>Two</Tab></TabList><TabPanel value='one'>Panel one</TabPanel><TabPanel value='two'>Panel two</TabPanel></Tabs>", "only 'Panel one' is rendered"),
     r('Clicking a tab switches the panel', "click tab 'two'", "only 'Panel two' rendered; tab two aria-selected='true', tab one 'false'"),
     r('Tabs and panels are wired with ARIA', 'inspect the selected tab and its panel', "role='tablist'; tab aria-controls === panel.id; panel aria-labelledby === tab.id"),
     r('Arrow keys move focus between tabs (wrapping)', "focus tab one, ArrowRight → tab two; ArrowRight ×2 more → wraps to tab one", 'document.activeElement follows: two, then one'),
-    r('Controlled mode calls onChange and waits for the value prop', "<Tabs value='one' onChange={fn}>, click 'two'; then rerender value='two'", "fn('two') called; 'Panel one' stays until the prop changes, then 'Panel two'"),
+    r('Controlled mode calls onChange and waits for the value prop', "<Tabs value='one' onChange={handleChange}>...</Tabs>", "fn('two') called; 'Panel one' stays until the prop changes, then 'Panel two'"),
   ],
 };
 
