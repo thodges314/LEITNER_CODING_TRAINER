@@ -1,14 +1,14 @@
 Implement functional programming composition and currying utilities:
 
-### `curry(fn)`
+### `curry(fn: (...args: any[]) => any): (...args: any[]) => any`
 - Returns a curried function that accumulates arguments across multiple calls until reaching `fn.length` parameters.
 - Supports any grouping of arguments (e.g., `f(a)(b)(c)`, `f(a, b)(c)`, or `f(a)(b, c)`).
 - Once the accumulated arguments meet or exceed `fn.length`, executes `fn` with the collected arguments and preserves `this`.
 
-### `pipe(...fns)`
+### `pipe(...fns: Array<(arg: any) => any>): (x?: any) => any`
 - Performs left-to-right function composition: the output of each function is passed as input to the next.
 - Calling `pipe()` with no arguments returns an identity function (`(x) => x`).
 
-### `compose(...fns)`
+### `compose(...fns: Array<(arg: any) => any>): (x?: any) => any`
 - Performs right-to-left function composition: functions execute from right to left.
 - Calling `compose()` with no arguments returns an identity function (`(x) => x`).

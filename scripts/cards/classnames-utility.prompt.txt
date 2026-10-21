@@ -1,6 +1,18 @@
+### `classNames(...args: ClassValue[]): string`
+
+```ts
+type ClassValue =
+  | string
+  | number
+  | boolean
+  | undefined
+  | null
+  | Record<string, any>
+  | ClassValue[];
+```
+
 Implement a conditional CSS class name joining utility (similar to `clsx` or `classnames`):
 
-### `classNames(...args)`
 - Joins valid class name tokens with a single space `' '` in the order received.
 - **Strings and Numbers**:
   - Non-empty strings and numbers are converted to strings and included.

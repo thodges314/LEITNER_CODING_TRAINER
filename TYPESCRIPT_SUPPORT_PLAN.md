@@ -43,9 +43,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **142 / 271 (52.4%)**
-- **Cards Remaining:** **129 / 271 (47.6%)**
-- **Total Batches:** 48 batches (24 completed, 24 remaining)
+- **Fully Typed Cards Completed:** **147 / 271 (54.2%)**
+- **Cards Remaining:** **124 / 271 (45.8%)**
+- **Total Batches:** 48 batches (25 completed, 23 remaining)
 
 ### Track Completion Status
 
@@ -55,18 +55,18 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`async-js`** | 21 | 21 | 100.0% | **COMPLETE** (Batches 12–15) |
 | **`js-language`** | 25 | 25 | 100.0% | **COMPLETE** (Batches 16–20) |
 | **`typescript-patterns`** | 14 | 14 | 100.0% | **COMPLETE** (Batches 21–23) |
-| **`js-utilities`** | 37 | 5 | 13.5% | In Progress (Batch 24 done, Batches 25–30 remaining) |
+| **`js-utilities`** | 37 | 10 | 27.0% | In Progress (Batches 24–25 done, Batches 26–30 remaining) |
 | **`dom-browser`** | 20 | 0 | 0.0% | Planned (Batches 31–34) |
 | **`react`** | 27 | 0 | 0.0% | Planned (Batches 35–39) |
 | **`react-components`** | 45 | 0 | 0.0% | Planned (Batches 40–47) |
 | **`testing-tooling`** | 5 | 0 | 0.0% | Planned (Batch 48) |
-| **TOTAL** | **271** | **142** | **52.4%** | **48 Batches Total** |
+| **TOTAL** | **271** | **147** | **54.2%** | **48 Batches Total** |
 
 ---
 
-## 4. Completed Batches (Batches 1–24: 142 Cards)
+## 4. Completed Batches (Batches 1–25: 147 Cards)
 
-All 142 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 147 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 - **Batch 1 (DSA Foundations — 8 cards):** `binary-search-exact`, `two-pointer-sorted-sum`, `sliding-window-fixed`, `valid-parentheses-stack`, `merge-intervals`, `two-sum-hashmap`, `interval-overlap`, `anagram-palindrome`.
@@ -99,24 +99,18 @@ All 142 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 22 (Utility Types & Conditional Types — 5 cards):** `ts-reimplement-utility-types`, `ts-custom-utility-types`, `ts-infer-conditional-unpack`, `ts-mapped-modifiers-deep-readonly`, `ts-template-literal-strings`.
 - **Batch 23 (Advanced Overloads & Generic Components — 4 cards):** `ts-overloads-exhaustive-narrowing`, `ts-generic-api-client`, `ts-generic-component-props`, `ts-typed-event-emitter`.
 
-### JavaScript Utilities Track (5 of 37 Cards)
+### JavaScript Utilities Track (10 of 37 Cards)
 - **Batch 24 (Function Timing & Throttling — 5 cards):** `debounce-implementation`, `throttle-implementation`, `debounce`, `throttle`, `rate-limiter-middleware`.
+- **Batch 25 (Memoization & Functional Patterns — 5 cards):** `memoize-basics`, `memoize`, `curry-compose`, `infinite-currying-sum`, `classnames-utility`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 25–48: 129 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 26–48: 124 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
-### Track: `js-utilities` (32 cards remaining — Batches 25 to 30)
+### Track: `js-utilities` (27 cards remaining — Batches 26 to 30)
 *Focus: Generic parameters `<T, R>`, function types, and mapped object constraints.*
-
-- **Batch 25: Memoization & Functional Patterns (5 cards)**
-  - `memoize-basics`: Memoize a Single-Argument Function
-  - `memoize`: Memoize with Custom Key Resolver
-  - `curry-compose`: Curry and Compose/Pipe
-  - `infinite-currying-sum`: Infinite Currying: sum(1)(2)(3)()
-  - `classnames-utility`: classNames / clsx Utility
 
 - **Batch 26: Collections, Maps & Sets (5 cards)**
   - `map-frequency-counter`: Frequency Counter via Native Map

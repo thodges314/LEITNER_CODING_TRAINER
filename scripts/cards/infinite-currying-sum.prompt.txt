@@ -1,6 +1,16 @@
+### `sum(...numbers: number[]): CurriedSum`
+
+```ts
+interface CurriedSum {
+  (): number;
+  (...more: number[]): CurriedSum;
+  valueOf(): number;
+  toString(): string;
+}
+```
+
 Implement an infinitely chainable, immutable summation currying function:
 
-### `sum(...numbers)`
 - Supports arbitrary chained invocations with any grouping of arguments (e.g., `sum(1)(2)(3)()`, `sum(1, 2)(3, 4)()`).
 - **Termination & Evaluation**:
   - Calling with no arguments (e.g., `...()`) returns the accumulated numerical sum.
