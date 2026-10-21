@@ -1,1 +1,26 @@
-Build Stopwatch(). Show the elapsed time in <div role="timer" aria-label="Elapsed time"> formatted MM:SS.cc (minutes, seconds, hundredths, each zero-padded to two digits, e.g. 1234 ms -> "00:01.23", 61050 ms -> "01:01.05"). Compute the elapsed time from Date.now() (not by counting ticks) and re-render about every 10 ms while running. Buttons (all type="button"): a toggle labelled "Start" while stopped and "Pause" while running (pausing freezes the time; starting again resumes without counting the paused interval), "Lap" (disabled while not running) which appends the current time to <ol aria-label="Laps"> as <li>Lap 1 00:01.23</li>, <li>Lap 2 ...</li>, and "Reset" which stops, sets the time to 00:00.00 and clears the laps. Clear the interval whenever the watch is paused, reset or unmounted.
+Build an accurate, drift-free Stopwatch component in React:
+
+### `Stopwatch()`
+- Tracks elapsed time calculated from timestamps via `Date.now()` (not by accumulating tick counts).
+- Updates rendering via a `setInterval(~10ms)` timer while running.
+
+#### Timer Display
+- Renders `<div role="timer" aria-label="Elapsed time">` formatted as `MM:SS.cc`:
+  - Minutes (`MM`), seconds (`SS`), and hundredths/centiseconds (`cc`) are zero-padded to 2 digits.
+  - Examples: `1234ms` -> `"00:01.23"`, `61050ms` -> `"01:01.05"`.
+
+#### Controls
+All control buttons must have `type="button"`:
+- **Toggle Button**:
+  - Displays `"Start"` when stopped/paused, and `"Pause"` when running.
+  - Pausing freezes the elapsed time and stops the interval timer.
+  - Starting resumes without counting elapsed time during the paused interval.
+- **Lap Button**:
+  - Labelled `"Lap"`, disabled while not running (`disabled={!running}`).
+  - Appends the current formatted time to `<ol aria-label="Laps">` as `<li>Lap {n} {formattedTime}</li>`.
+- **Reset Button**:
+  - Labelled `"Reset"`.
+  - Stops the stopwatch, resets elapsed time to `"00:00.00"`, and clears all recorded laps.
+
+#### Resource Cleanup
+- Clears the interval timer whenever the watch is paused, reset, or unmounted (no leaked background intervals).

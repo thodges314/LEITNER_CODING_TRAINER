@@ -1,1 +1,19 @@
-Build LikeButton({ initialLiked = false, initialCount = 0, onToggle }) where onToggle(nextLiked) returns a Promise. Render <button aria-pressed={liked}>{liked ? 'Unlike' : 'Like'} ({count})</button>. Clicking updates the UI IMMEDIATELY (flip liked, count +1 or -1) and calls onToggle(nextLiked). If the promise rejects, roll back to the previous liked/count and show <p role="alert">Could not update</p>; the alert disappears on the next click. While a request is pending, further clicks are ignored.
+Build an optimistic like button component with automatic error rollback:
+
+### `LikeButton({ initialLiked = false, initialCount = 0, onToggle })`
+- `onToggle(nextLiked)` is an asynchronous function returning a `Promise`.
+
+#### Button Rendering
+- Renders `<button aria-pressed={liked}>{liked ? 'Unlike' : 'Like'} ({count})</button>`.
+
+#### Optimistic Interaction
+- **Immediate Update**:
+  - Clicking immediately flips `liked` and updates `count` (`+1` when liking, `-1` when unliking).
+  - Clears any existing error alert.
+  - Calls `onToggle(nextLiked)`.
+- **In-Flight Guard**:
+  - While an asynchronous request is in flight, further clicks are ignored.
+- **Rollback on Error**:
+  - If `onToggle` rejects, reverts `liked` and `count` back to their values prior to the click.
+  - Displays an error alert: `<p role="alert">Could not update</p>`.
+  - The alert remains until the next click.

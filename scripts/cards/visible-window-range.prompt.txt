@@ -1,8 +1,20 @@
-A virtual list only renders the items that are on screen.
+Calculate visible row ranges and offsets for a fixed-height virtualized list:
 
-Write getVisibleRange({ scrollTop, itemHeight, viewportHeight, itemCount, overscan = 0 }) for rows that all have the same height. It returns { start, end, offsetTop, totalHeight }:
+### `getVisibleRange({ scrollTop, itemHeight, viewportHeight, itemCount, overscan = 0 })`
+- Returns `{ start, end, offsetTop, totalHeight }`.
 
-start: index of the first row to render. end: one past the last row to render (so rows start...end-1 are rendered). The rendered rows are those that touch the visible area from scrollTop to scrollTop + viewportHeight, plus overscan extra rows above and below, never going outside 0...itemCount. A row that is only partly visible counts as visible.
-offsetTop: where the rendered rows start, start * itemHeight. totalHeight: itemCount * itemHeight (the full scroll height).
+#### Boundary & Scroll Clamping
+- Computes `totalHeight = itemCount * itemHeight`.
+- Computes `maxScroll = Math.max(0, totalHeight - viewportHeight)`.
+- Clamps `scrollTop` between `0` and `maxScroll`.
+- Edge case: if `itemCount === 0`, returns `{ start: 0, end: 0, offsetTop: 0, totalHeight: 0 }`.
 
-scrollTop is first limited to the real scroll range: never below 0 and never past totalHeight - viewportHeight (0 when the content is shorter than the viewport). itemCount 0 gives { start: 0, end: 0, offsetTop: 0, totalHeight: 0 }.
+#### Range Windowing Calculations
+- **Visible Slice**:
+  - `first = Math.floor(clampedScrollTop / itemHeight)`.
+  - `last = Math.ceil((clampedScrollTop + viewportHeight) / itemHeight)` (partially visible rows count as visible).
+- **Overscan Buffering**:
+  - `start = Math.max(0, first - overscan)`.
+  - `end = Math.min(itemCount, last + overscan)`.
+- **Vertical Offset**:
+  - `offsetTop = start * itemHeight`.

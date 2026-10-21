@@ -1,1 +1,16 @@
-Build two small accessible components. ToggleButton({ pressed, onPressedChange, children }) renders <button type="button" aria-pressed={pressed}> and calls onPressedChange(!pressed) when clicked. FormField({ label, hint, error, children }) renders a <label htmlFor> with the label text, then calls children(props) — a render function — where props = { id, 'aria-describedby', 'aria-invalid' }, then the optional hint <p id> and error <p id role="alert">. Generate ids with useId; 'aria-describedby' lists the ids of the hint and/or error that are present (space-separated) and is undefined when neither exists; 'aria-invalid' is true only when there is an error (otherwise undefined).
+Build accessible form field and toggle components:
+
+### `ToggleButton({ pressed, onPressedChange, children })`
+- Renders `<button type="button" aria-pressed={pressed}>`.
+- On click, invokes `onPressedChange(!pressed)`.
+- Renders `children` inside the button.
+
+### `FormField({ label, hint, error, children })`
+- Generates a unique base id via `useId()`.
+- Generates sub-ids: `hintId = id + '-hint'` and `errorId = id + '-error'`.
+- Computes `describedBy`: joins active IDs (`hintId`, `errorId`) separated by a space (or `undefined` if neither exists).
+- **DOM Structure**:
+  - `<label htmlFor={id}>{label}</label>`.
+  - Child render prop: invokes `children({ id, 'aria-describedby': describedBy, 'aria-invalid': error ? true : undefined })`.
+  - If `hint` is provided: renders `<p id={hintId}>{hint}</p>`.
+  - If `error` is provided: renders `<p id={errorId} role="alert">{error}</p>`.
