@@ -1,7 +1,15 @@
-Write your own binary heap inside your solution. List nodes are { val, next } (null ends the list).
+Implement multi-way merge and spatial selection algorithms (include an internal binary heap helper; list nodes are shaped `{ val, next }`):
 
-Write mergeKLists(lists): merge k sorted linked lists (entries may be null) into one sorted list using a heap of the current heads; return null when everything is empty.
+### `mergeKLists(lists)`
+- Merges `k` sorted linked lists into a single sorted linked list using a min-heap of current node heads.
+- Individual list entries may be `null`.
+- Returns `null` if all lists are empty or `lists` is empty.
 
-Write mergeKSortedArrays(arrays): the same idea for sorted arrays, returning one sorted array (empty arrays allowed).
+### `mergeKSortedArrays(arrays)`
+- Merges `k` sorted number arrays into one flat sorted array using a min-heap.
+- Handles empty subarrays properly.
 
-Write kClosest(points, k): the k points [x, y] closest to the origin as a list sorted by distance ascending (equal distances keep input order), using a max-heap capped at size k ([] when k is 0).
+### `kClosest(points, k)`
+- Finds the `k` closest points `[x, y]` to the origin `(0, 0)` based on Euclidean distance `x^2 + y^2`.
+- Uses a max-heap capped at size `k`.
+- Returns the points sorted by distance ascending (ties preserve input order). Returns `[]` when `k === 0`.

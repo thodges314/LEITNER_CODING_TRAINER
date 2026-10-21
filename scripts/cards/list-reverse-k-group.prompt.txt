@@ -1,7 +1,14 @@
-List nodes are { val, next } (null ends the list).
+Implement linked list reversal algorithms on nodes shaped `{ val, next }` (`null` ends the list):
 
-Write reverseKGroup(head, k): reverse the nodes k at a time and return the new head; a final group shorter than k stays as it is (k >= 1).
+### `reverseKGroup(head, k)`
+- Reverses nodes of the list `k` at a time and returns the new `head`.
+- If the remaining nodes at the end number fewer than `k`, leaves them in their original order.
+- Assumes `k >= 1`.
 
-Write reverseBetween(head, left, right): reverse only the nodes from position left to position right (1-indexed, inclusive) in one pass.
+### `reverseBetween(head, left, right)`
+- Reverses nodes strictly from position `left` to position `right` (1-indexed, inclusive) in a single pass.
+- Returns the modified `head` of the list.
 
-Write swapPairs(head): swap every two adjacent nodes by relinking nodes (not by changing values).
+### `swapPairs(head)`
+- Swaps every two adjacent nodes (`1st <-> 2nd`, `3rd <-> 4th`, etc.) by relinking pointers.
+- Does not modify node values; returns the new `head`.

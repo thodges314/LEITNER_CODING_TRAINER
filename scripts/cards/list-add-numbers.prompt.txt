@@ -1,7 +1,16 @@
-List nodes are { val, next } (null ends the list).
+Implement linked list algorithms on nodes shaped `{ val, next }` (`null` ends the list):
 
-Write addTwoNumbers(l1, l2): the digits are stored in REVERSE order (2 -> 4 -> 3 is 342); return the sum as a new list in the same format, handling different lengths and a final carry.
+### `addTwoNumbers(l1, l2)`
+- Adds two numbers represented by linked lists whose digits are stored in reverse order (e.g. `2 -> 4 -> 3` represents 342).
+- Returns the sum as a new linked list in the same reversed format.
+- Handles differing list lengths and trailing carries; does not mutate input lists.
 
-Write oddEvenList(head): group all nodes at odd positions (1st, 3rd, ...) first, then the even positions, keeping relative order, in place and O(1) space.
+### `oddEvenList(head)`
+- Reorders nodes in place so that odd-indexed positions (1st, 3rd, ...) appear first, followed by even-indexed positions (2nd, 4th, ...).
+- Preserves the relative internal order among odd and even groups.
+- Operates in O(n) time and O(1) auxiliary space, returning the modified `head`.
 
-Write getIntersectionNode(a, b): the first NODE (by identity) shared by two lists that merge into one tail, or null if they never meet, without extra memory.
+### `getIntersectionNode(a, b)`
+- Finds the first common node (by reference identity `===`) where two singly linked lists intersect.
+- Returns `null` if the two lists do not meet.
+- Operates in O(n + m) time and O(1) extra memory.

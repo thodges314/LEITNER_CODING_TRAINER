@@ -1,3 +1,11 @@
-Write stockSpan(prices): for each day the number of consecutive days ending today (including today) whose price is <= today's price (stockSpan([100, 80, 60, 70]) is [1, 1, 1, 2]).
+Implement classic monotonic stack algorithms in O(n) time:
 
-Write largestRectangleArea(heights): the area of the largest rectangle that fits inside a histogram of bars with width 1 (0 for an empty histogram). Use a monotonic stack so that both run in O(n).
+### `stockSpan(prices)`
+- Calculates the span of stock prices for each day: the number of consecutive days ending today (including today) where the price was `<= today's price`.
+- For example, `stockSpan([100, 80, 60, 70])` returns `[1, 1, 1, 2]`.
+- Runs in O(n) time complexity using a monotonic stack.
+
+### `largestRectangleArea(heights)`
+- Calculates the maximum area of a rectangle that fits inside a histogram of bars with width 1.
+- Returns `0` if `heights` is empty (`[]`).
+- Runs in O(n) time complexity using an increasing monotonic stack of indices.

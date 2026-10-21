@@ -1,1 +1,13 @@
-Implement class MinHeap backed by an array: push(x), pop() (removes and returns the smallest value, undefined when empty), peek() (smallest value without removing, undefined when empty) and size(). push/pop must be O(log n) using sift-up/sift-down on the array (do not sort on every push). Also write kSmallest(nums, k) returning the k smallest numbers in ascending order using your MinHeap.
+Implement an array-backed binary min-heap and sorting utility:
+
+### `MinHeap`
+- Backed by an internal array where child indices for node `i` are `2i + 1` and `2i + 2`.
+- **`push(x)`**: Inserts `x` into the heap using sift-up in O(log n) time.
+- **`pop()`**: Removes and returns the minimum element using sift-down in O(log n) time; returns `undefined` if empty.
+- **`peek()`**: Returns the minimum element without removing it; returns `undefined` if empty.
+- **`size()`**: Returns the number of elements currently stored.
+
+### `kSmallest(nums, k)`
+- Returns the `k` smallest numbers from array `nums` in ascending order.
+- Leverages `MinHeap` to extract elements.
+- If `k >= nums.length`, returns all elements in ascending order.

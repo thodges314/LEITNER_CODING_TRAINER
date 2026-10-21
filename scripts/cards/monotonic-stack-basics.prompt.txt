@@ -1,3 +1,11 @@
-Write nextGreaterElement(nums): for each element the first STRICTLY greater value to its right, or -1 if none (nextGreaterElement([4, 5, 2, 10]) is [5, 10, 10, -1]).
+Implement linear-time monotonic stack algorithms in O(n) time:
 
-Write dailyTemperatures(temps): for each day the number of days until a warmer (strictly higher) temperature, or 0 if there is none. Use a stack of indices that stays in decreasing order of value; both must run in O(n).
+### `nextGreaterElement(nums)`
+- Finds the first strictly greater value to the right of each element in `nums`.
+- Returns `-1` for any element that has no strictly greater value to its right (e.g. `nextGreaterElement([4, 5, 2, 10])` -> `[5, 10, 10, -1]`).
+- Runs in O(n) time complexity using a monotonic stack.
+
+### `dailyTemperatures(temps)`
+- For each day in `temps`, calculates the number of days until a strictly warmer temperature.
+- Puts `0` if no future day is warmer (e.g. `dailyTemperatures([73, 74, 75, 71, 69, 72, 76, 73])` -> `[1, 1, 4, 2, 1, 1, 0, 0]`).
+- Runs in O(n) time complexity using a decreasing monotonic stack of indices.
