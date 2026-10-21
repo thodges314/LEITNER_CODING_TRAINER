@@ -1,5 +1,15 @@
-Write createGreeter(name): returns an object with property name, method greet() returning 'Hello, ' + this.name, and method getBoundGreet() returning greet permanently bound to that instance (so even when detached and called without a receiver, it returns 'Hello, ' + this.name).
+Implement utilities demonstrating JavaScript context binding, dynamic dispatch, and constructor invocation:
 
-Write invokeWithContext(fn, context, ...args): invokes fn with context as its this value and passes args, without using Function.prototype.call or Function.prototype.apply (e.g. using Reflect.apply or assigning fn to a unique Symbol on context).
+### `createGreeter(name)`
+- Returns an object with:
+  - `name`: stored property.
+  - `greet()`: returns `'Hello, ' + this.name`.
+  - `getBoundGreet()`: returns `greet` permanently bound to this instance, maintaining its receiver context even when detached.
 
-Write isConstructorCall(TargetClass, ...args): returns true if new TargetClass(...args) constructs an instance of TargetClass; returns false if calling TargetClass without new would throw or if TargetClass is not a valid constructor.
+### `invokeWithContext(fn, context, ...args)`
+- Invokes `fn` with `context` as its `this` value, passing `args`.
+- Must not use `Function.prototype.call` or `Function.prototype.apply` (e.g., use `Reflect.apply(fn, context, args)`).
+
+### `isConstructorCall(TargetClass, ...args)`
+- Returns `true` if `new TargetClass(...args)` successfully constructs an instance of `TargetClass` (e.g., via `Reflect.construct`).
+- Returns `false` if `TargetClass` is not constructible or throws when invoked.

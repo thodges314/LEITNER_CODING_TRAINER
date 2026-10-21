@@ -1,3 +1,13 @@
-Write function* createEchoGenerator(): a generator function that first yields 'ready'. On subsequent iterations, it receives an input via it.next(val) and yields [val, typeof val].
+Implement generator workflows and an asynchronous coroutine runner:
 
-Write runCoroutine(generatorFn, ...args): a runner (mini 'co') that calls generatorFn(...args) to get an iterator. Each yielded value can be a Promise or plain value; the runner awaits it, passes the result back via it.next(resolvedValue). If a yielded promise rejects, it passes the error into the generator via it.throw(err). Returns a Promise resolving to the generator's final return value.
+### `function* createEchoGenerator()`
+- Generator function that initially yields `'ready'`.
+- On subsequent steps, receives an input passed via `it.next(val)` and yields `[val, typeof val]`.
+
+### `runCoroutine(generatorFn, ...args)`
+- Coroutine runner (mini `co`) executing `generatorFn(...args)`.
+- For each yielded value:
+  - Can be a `Promise` or plain value; awaits its resolution.
+  - Passes the resolved value back into the generator via `it.next(resolvedValue)`.
+  - If a promise rejects, passes the error into the generator via `it.throw(err)`.
+- Returns a `Promise` that resolves to the generator's final return value (when `done: true`), or rejects if an unhandled error is thrown.
