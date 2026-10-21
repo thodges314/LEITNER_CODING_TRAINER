@@ -13,6 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
+| Fix ProgressBar JSX layout & optimize Batch 7 instructions with Markdown (Async JS) | Antigravity | `feature/fix-progressbar-and-batch7` | in progress |
 
 
 
