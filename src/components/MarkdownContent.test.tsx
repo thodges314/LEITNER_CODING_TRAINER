@@ -117,4 +117,11 @@ const x = 42;
     expect(nodes[0]).toBe('Hello ');
     expect(nodes[2]).toBe(' world');
   });
+
+  it('preserves JSX/HTML tags as visible text', () => {
+    act(() => {
+      root.render(<MarkdownContent text="Render a <table> with a <thead> row and <button>." />);
+    });
+    expect(container.textContent).toContain('Render a <table> with a <thead> row and <button>.');
+  });
 });
