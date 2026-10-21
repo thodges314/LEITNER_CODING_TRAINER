@@ -1,1 +1,13 @@
-Write a controlled SearchForm({ onSearch }) component: it renders a <form> containing an <input> whose value comes from React state (value + onChange), and on submit it calls event.preventDefault() and onSearch(query.trim()). A blank (whitespace-only) query must not call onSearch.
+Build a controlled search form component in React:
+
+### `SearchForm({ onSearch })`
+- Renders a `<form>` containing a controlled `<input>` and a `<button type="submit">Search</button>`.
+- **Controlled State**:
+  - Maintains `query` state via `useState('')`.
+  - Links `<input value={query} onChange={(e) => setQuery(e.target.value)} />`.
+- **Form Submission**:
+  - Handles `<form onSubmit={handleSubmit}>`.
+  - Calls `event.preventDefault()`.
+  - Trims the input value: `const trimmed = query.trim()`.
+  - Calls `onSearch(trimmed)` only if `trimmed` is not empty.
+  - A blank or whitespace-only query must **not** invoke `onSearch`.

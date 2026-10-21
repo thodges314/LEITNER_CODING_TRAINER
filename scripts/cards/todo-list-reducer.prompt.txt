@@ -1,1 +1,22 @@
-Write the state logic for a todo list: todoReducer(state, action) where state is { todos: [{ id, text, done }], filter: 'all' | 'active' | 'done' } and actions are ADD { id, text }, TOGGLE { id }, EDIT { id, text }, DELETE { id } and SET_FILTER { filter } (an unknown action returns the same state object). Never mutate state. Keep derived data computed, not stored: selectVisibleTodos(state) and selectCounts(state) -> { total, active, done }.
+Implement immutable state logic and selectors for a todo list:
+
+### `todoReducer(state, action)`
+- State shape: `{ todos: [{ id, text, done }], filter: 'all' | 'active' | 'done' }`.
+- Never mutates state directly.
+- Handles action types:
+  - `'ADD'`: adds `{ id: action.id, text: action.text, done: false }` to `todos`.
+  - `'TOGGLE'`: inverts the `done` boolean on the todo matching `action.id`.
+  - `'EDIT'`: updates `text` of the todo matching `action.id` to `action.text`.
+  - `'DELETE'`: removes the todo with `id === action.id`.
+  - `'SET_FILTER'`: updates `filter` to `action.filter`.
+  - Default: returns the exact same `state` reference for unknown action types.
+
+### `selectVisibleTodos(state)`
+- Computes visible todos based on `state.filter`:
+  - `'active'`: returns todos where `!t.done`.
+  - `'done'`: returns todos where `t.done`.
+  - `'all'` (or default): returns all `state.todos`.
+
+### `selectCounts(state)`
+- Computes summary counts across `state.todos`:
+- Returns `{ total, active, done }`.

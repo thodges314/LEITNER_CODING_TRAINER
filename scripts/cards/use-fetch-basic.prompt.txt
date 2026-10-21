@@ -1,8 +1,17 @@
-Write a custom hook useFetch(url) that loads JSON for a url. It returns { data, loading, error }.
+Write a custom hook for fetching JSON data from a URL:
 
-- On the first render it is { data: null, loading: true, error: null } and a request for url has been started (call fetch(url) once).
-- When the request succeeds it becomes { data, loading: false, error: null } with the parsed JSON.
-- A non-2xx response, or a network failure, gives { data: null, loading: false, error } where error is an Error (for an HTTP error its message mentions the status, e.g. 'HTTP 404').
-- When url changes the hook fetches the new url, goes back to loading (data and error cleared) while it runs, and then shows the new result. Re-rendering with the same url must not fetch again.
+### `useFetch(url)`
+- Returns `{ data, loading, error }`.
 
-You do not need to cancel old requests here; the harder useFetch card covers aborting and stale responses.
+#### Lifecycle & State Progression
+- **Initial Render**:
+  - Starts as `{ data: null, loading: true, error: null }`.
+  - Initiates a network request via `fetch(url)` in a `useEffect`.
+- **Successful Fetch**:
+  - Updates state to `{ data, loading: false, error: null }` with the parsed JSON body.
+- **Error Handling**:
+  - On non-2xx HTTP responses (`!res.ok`), throws an `Error` whose message mentions the HTTP status code (e.g. `HTTP ${res.status}`).
+  - On HTTP or network errors, updates state to `{ data: null, loading: false, error }`.
+- **URL Dependency**:
+  - When `url` changes, resets state to `{ data: null, loading: true, error: null }` and fetches the new URL.
+  - Re-rendering with the same `url` must **not** re-trigger the fetch.
