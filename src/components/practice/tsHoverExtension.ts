@@ -1,10 +1,13 @@
 import { hoverTooltip } from '@codemirror/view';
 import type { Tooltip, EditorView } from '@codemirror/view';
+import { getTsHoverEnabled } from '../../lib/editorSettings';
 
 /**
  * Computes TypeScript QuickInfo hover tooltip for CodeMirror at the given position.
  */
 export async function tsHoverTooltipSource(view: EditorView, pos: number): Promise<Tooltip | null> {
+  if (!getTsHoverEnabled()) return null;
+
   const code = view.state.doc.toString();
   if (!code.trim() || pos < 0 || pos > code.length) return null;
 

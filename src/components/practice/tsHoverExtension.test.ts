@@ -73,4 +73,25 @@ describe('createTsHoverExtension', () => {
 
     view.destroy();
   });
+
+  it('returns null when TS hover is disabled in settings', async () => {
+    const { setTsHoverEnabled } = await import('../../lib/editorSettings');
+    setTsHoverEnabled(false);
+
+    const doc = 'function reverseList(head: ListNode<number> | null) { return head; }';
+    const state = EditorState.create({ doc });
+    const container = document.createElement('div');
+    const view = new EditorView({ state, parent: container });
+
+    const pos = doc.indexOf('head');
+    const tooltip = await tsHoverTooltipSource(view, pos);
+    expect(tooltip).toBeNull();
+
+    // Re-enable for subsequent tests
+    setTsHoverEnabled(true);
+    const tooltipAfterReenable = await tsHoverTooltipSource(view, pos);
+    expect(tooltipAfterReenable).not.toBeNull();
+
+    view.destroy();
+  });
 });

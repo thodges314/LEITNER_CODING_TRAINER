@@ -16,6 +16,7 @@ import {
   Zap,
   Cpu,
   ExternalLink,
+  Code2,
 } from 'lucide-react';
 
 interface ProviderKeyPortal {
@@ -154,6 +155,10 @@ import {
   setTimedModeDuration,
   DURATION_OPTIONS,
 } from '../lib/timedMode';
+import {
+  getTsHoverEnabled,
+  setTsHoverEnabled,
+} from '../lib/editorSettings';
 
 import type { AppTheme } from '../lib/theme';
 
@@ -193,6 +198,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [storedKeys, setStoredKeys] = useState(() => getAllStoredKeys());
   const [timedMode, setTimedMode] = useState(() => getTimedModeEnabled());
   const [timedDuration, setTimedDuration] = useState(() => getTimedModeDuration());
+  const [tsHover, setTsHover] = useState(() => getTsHoverEnabled());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<
     'clear' | 'replace' | 'reset-deck' | 'reset-everything' | null
@@ -281,6 +287,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setTimedModeEnabled(enabled);
     onSettingsSaved?.();
     showToast(enabled ? 'Timed Mode enabled (countdown auto-submits)' : 'Timed Mode disabled');
+  };
+
+  const handleToggleTsHover = (enabled: boolean) => {
+    setTsHover(enabled);
+    setTsHoverEnabled(enabled);
+    onSettingsSaved?.();
+    showToast(enabled ? 'TypeScript hover tooltips enabled' : 'TypeScript hover tooltips disabled');
   };
 
   const handleSelectDuration = (seconds: number) => {
@@ -705,6 +718,57 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Editor Preferences: TypeScript Hover Tooltips */}
+          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+            <label
+              htmlFor="ts-hover-tooltips-checkbox"
+              style={{
+                display: 'flex',
+                gap: '12px',
+                alignItems: 'flex-start',
+                cursor: 'pointer',
+                padding: '12px 14px',
+                borderRadius: '8px',
+                border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-subtle)',
+                backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-surface)',
+                boxShadow: isLight ? '2px 2px 0px rgba(28, 28, 28, 0.15)' : 'none',
+              }}
+            >
+              <input
+                type="checkbox"
+                id="ts-hover-tooltips-checkbox"
+                checked={tsHover}
+                onChange={(e) => handleToggleTsHover(e.target.checked)}
+                style={{
+                  marginTop: '2px',
+                  width: '16px',
+                  height: '16px',
+                  cursor: 'pointer',
+                  accentColor: isLight ? '#4455AA' : 'var(--accent-cyan)',
+                  flexShrink: 0,
+                }}
+              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                <span
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: 'var(--text-primary)',
+                  }}
+                >
+                  <Code2 size={15} color={isLight ? '#4455AA' : 'var(--accent-cyan)'} />
+                  TypeScript Hover Tooltips (QuickInfo)
+                </span>
+                <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                  When practicing in TypeScript mode, hovering over functions, parameters, or ambient data structures (such as <code>ListNode</code> and <code>TreeNode</code>) displays rich type signatures and JSDoc annotations. Uncheck this box to disable hover tooltips in the editor.
+                </span>
+              </div>
+            </label>
           </div>
 
           {/* Appearance & Theme Selection */}
