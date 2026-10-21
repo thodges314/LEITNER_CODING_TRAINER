@@ -1,3 +1,11 @@
-Write cloneWithDescriptors(obj) returning a new object with the SAME prototype as obj and copies of ALL own properties, preserving non-enumerable properties, getters/setters (as accessors, not their values) and symbol keys.
+Write object cloning and composition utilities that operate at the property descriptor level:
 
-Write mixin(target, ...sources) that copies every own property (string AND symbol keys, enumerable or not) from each source onto target by DESCRIPTOR, so getters stay getters and are never invoked during copying (unlike Object.assign); later sources override earlier ones; return target.
+### `cloneWithDescriptors(obj)`
+- Returns a new object with the same prototype as `obj` and copies of all own properties.
+- Preserves non-enumerable properties, symbol keys, and getters/setters as accessors (without invoking them during copying).
+
+### `mixin(target, ...sources)`
+- Copies every own property (both string and `Symbol` keys, enumerable and non-enumerable) from each source object onto `target` by descriptor.
+- Getters remain accessors and are never evaluated during copying (unlike `Object.assign`).
+- Later sources override earlier ones.
+- Returns `target`.

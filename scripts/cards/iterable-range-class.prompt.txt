@@ -1,1 +1,12 @@
-Write class Range with constructor(start, end, step = 1) that is iterable through [Symbol.iterator]: it yields start, start + step, ... while the value is before end (end is exclusive; a negative step counts down while the value is greater than end). It must be re-iterable (a second loop starts over), and a step of 0 throws a RangeError whose message contains 'step'. Also write take(iterable, n) returning an array of the first n values of any iterable (fewer if it ends sooner) without consuming the rest — it must work on infinite generators.
+Write a custom iterable class and an array extraction utility:
+
+### `class Range`
+- `constructor(start, end, step = 1)`
+  - Throws a `RangeError` with message containing `'step'` if `step === 0`.
+- Implements `[Symbol.iterator]()`:
+  - Yields `start`, `start + step`, ... while the value is before `end` (exclusive; for negative steps, counts down while value is greater than `end`).
+  - Must be re-iterable (each loop creates a fresh iterator).
+
+### `take(iterable, n)`
+- Returns an array containing the first `n` values of any iterable (or fewer if the iterable terminates sooner).
+- Must break early without consuming remainder of the iterable, functioning properly on infinite generators.

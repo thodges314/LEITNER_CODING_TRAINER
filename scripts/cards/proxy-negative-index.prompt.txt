@@ -1,1 +1,15 @@
-Write negativeIndex(arr) returning a Proxy around the array so that negative indices count from the end: p[-1] is the last element, p[-2] the one before. Reads beyond the start (p[-n] with n > length) give undefined. Assigning p[-1] = x overwrites the last element; assigning with a negative index beyond the start throws a RangeError whose message contains 'out of range'. Everything else (non-negative indices, length, push, map, Array.isArray) must keep working. Negative indices arrive in the traps as STRING keys like '-1'.
+Implement an array wrapper that supports negative indexing via JavaScript `Proxy`:
+
+### `negativeIndex(arr)`
+- Returns a `Proxy` wrapping the array `arr` allowing negative indices to count backwards from the end (`p[-1]` is the last element, `p[-2]` is second to last).
+- Note that property accesses arrive at the proxy traps as string keys (e.g. `'-1'`).
+
+#### Get Behavior
+- Translates negative string keys `-k` to `length - k`.
+- Negative indices before the start of the array (`k > length`) evaluate to `undefined`.
+- Standard non-negative indices, methods (`push`, `map`), `.length`, and `Array.isArray` continue functioning normally.
+
+#### Set Behavior
+- Assigning `p[-k] = value` overwrites the corresponding element at `length - k`.
+- Assigning to a negative index beyond the start of the array throws a `RangeError` whose message contains `'out of range'`.
+- Normal non-negative property assignments continue to work as usual.
