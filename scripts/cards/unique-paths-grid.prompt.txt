@@ -1,10 +1,10 @@
 A robot is located at the top-left corner of a grid and can only move either down or right at any point:
 
-### `uniquePaths(m, n)`
+### `uniquePaths(m: number, n: number): number`
 - Calculates the total number of unique paths to reach the bottom-right corner of an `m x n` grid.
 - Solvable using dynamic programming or 1D rolling array tabulation in O(m * n) time.
 
-### `uniquePathsWithObstacles(grid)`
+### `uniquePathsWithObstacles(grid: number[][]): number`
 - Calculates the number of unique paths to the bottom-right corner when obstacles are present.
 - In `grid`, `0` represents empty space and `1` represents an obstacle that cannot be traversed.
 - Returns `0` if either the start `(0, 0)` or destination corner is blocked.

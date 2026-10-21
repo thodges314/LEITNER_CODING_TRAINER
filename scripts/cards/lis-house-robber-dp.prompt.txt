@@ -1,11 +1,11 @@
 Implement classic 1D dynamic programming optimization algorithms:
 
-### `rob(nums)`
+### `rob(nums: number[]): number`
 - Computes the maximum sum of money you can rob from an array of non-negative integers `nums` without robbing two adjacent houses.
 - Returns `0` for an empty array.
 - Solvable in O(n) time and O(1) auxiliary space.
 
-### `lengthOfLIS(nums)`
+### `lengthOfLIS(nums: number[]): number`
 - Finds the length of the longest strictly increasing subsequence in an integer array `nums` (elements need not be contiguous).
 - Returns `0` for an empty array.
 - Solvable in O(n^2) time or O(n log n) time.

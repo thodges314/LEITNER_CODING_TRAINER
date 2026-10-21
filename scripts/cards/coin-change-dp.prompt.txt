@@ -1,11 +1,11 @@
 Implement classical unbounded knapsack dynamic programming solutions for coin change:
 
-### `coinChange(coins, amount)`
+### `coinChange(coins: number[], amount: number): number`
 - Computes the minimum number of coins needed to make up `amount` given an array of coin denominations `coins` (assuming an unlimited supply of each coin).
 - Returns `-1` if that amount of money cannot be made up by any combination of the coins.
 - Returns `0` when `amount` is `0`.
 
-### `countWays(coins, amount)`
+### `countWays(coins: number[], amount: number): number`
 - Computes the number of distinct combinations of coins that sum up to `amount` (where order of coins does not matter).
 - Returns `1` when `amount` is `0` (`countWays(coins, 0) === 1`).
 - Uses dynamic programming to avoid counting duplicate permutations.

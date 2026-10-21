@@ -6432,7 +6432,7 @@
       "recursion",
       "basics"
     ],
-    "promptSeed": "Implement dynamic programming fundamentals for sequence and counting problems:\n\n### `fib(n)`\n- Computes the n-th Fibonacci number where `fib(0) = 0` and `fib(1) = 1`.\n- Must return in O(n) time and O(1) space (e.g. iterative tabulation or memoization) so that large values like `fib(50)` return instantly without recursion stack overflow or timeout.\n\n### `climbStairs(n)`\n- Calculates the number of distinct ways to climb a staircase of `n` steps when taking either 1 or 2 steps at a time.\n- Returns `1` for `climbStairs(0)` and `climbStairs(1)`.\n- Runs in O(n) time and O(1) space.",
+    "promptSeed": "Implement dynamic programming fundamentals for sequence and counting problems:\n\n### `fib(n: number): number`\n- Computes the n-th Fibonacci number where `fib(0) = 0` and `fib(1) = 1`.\n- Must return in O(n) time and O(1) space (e.g. iterative tabulation or memoization) so that large values like `fib(50)` return instantly without recursion stack overflow or timeout.\n\n### `climbStairs(n: number): number`\n- Calculates the number of distinct ways to climb a staircase of `n` steps when taking either 1 or 2 steps at a time.\n- Returns `1` for `climbStairs(0)` and `climbStairs(1)`.\n- Runs in O(n) time and O(1) space.",
     "difficulty": 1,
     "concept": "dp",
     "referenceSolution": "function fib(n) {\n  let a = 0;\n  let b = 1;\n  for (let i = 0; i < n; i++) {\n    [a, b] = [b, a + b];\n  }\n  return a;\n}\n\nfunction climbStairs(n) {\n  let prev = 1;\n  let cur = 1;\n  for (let i = 2; i <= n; i++) {\n    [prev, cur] = [cur, prev + cur];\n  }\n  return cur;\n}",
@@ -6462,7 +6462,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(n)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Iterating with two rolling values computes each Fibonacci step once without storing the whole table."
+    "complexityExplanation": "Iterating with two rolling values computes each Fibonacci step once without storing the whole table.",
+    "referenceSolutionTs": "function fib(n: number): number {\n  let a = 0;\n  let b = 1;\n  for (let i = 0; i < n; i++) {\n    [a, b] = [b, a + b];\n  }\n  return a;\n}\n\nfunction climbStairs(n: number): number {\n  let prev = 1;\n  let cur = 1;\n  for (let i = 2; i <= n; i++) {\n    [prev, cur] = [cur, prev + cur];\n  }\n  return cur;\n}"
   },
   {
     "id": "coin-change-dp",
@@ -6477,7 +6478,7 @@
       "bottom-up",
       "array"
     ],
-    "promptSeed": "Implement classical unbounded knapsack dynamic programming solutions for coin change:\n\n### `coinChange(coins, amount)`\n- Computes the minimum number of coins needed to make up `amount` given an array of coin denominations `coins` (assuming an unlimited supply of each coin).\n- Returns `-1` if that amount of money cannot be made up by any combination of the coins.\n- Returns `0` when `amount` is `0`.\n\n### `countWays(coins, amount)`\n- Computes the number of distinct combinations of coins that sum up to `amount` (where order of coins does not matter).\n- Returns `1` when `amount` is `0` (`countWays(coins, 0) === 1`).\n- Uses dynamic programming to avoid counting duplicate permutations.",
+    "promptSeed": "Implement classical unbounded knapsack dynamic programming solutions for coin change:\n\n### `coinChange(coins: number[], amount: number): number`\n- Computes the minimum number of coins needed to make up `amount` given an array of coin denominations `coins` (assuming an unlimited supply of each coin).\n- Returns `-1` if that amount of money cannot be made up by any combination of the coins.\n- Returns `0` when `amount` is `0`.\n\n### `countWays(coins: number[], amount: number): number`\n- Computes the number of distinct combinations of coins that sum up to `amount` (where order of coins does not matter).\n- Returns `1` when `amount` is `0` (`countWays(coins, 0) === 1`).\n- Uses dynamic programming to avoid counting duplicate permutations.",
     "difficulty": 3,
     "concept": "dp",
     "referenceSolution": "function coinChange(coins, amount) {\n  const dp = new Array(amount + 1).fill(Infinity);\n  dp[0] = 0;\n  for (let a = 1; a <= amount; a++) {\n    for (const coin of coins) {\n      if (coin <= a && dp[a - coin] + 1 < dp[a]) dp[a] = dp[a - coin] + 1;\n    }\n  }\n  return dp[amount] === Infinity ? -1 : dp[amount];\n}\n\nfunction countWays(coins, amount) {\n  const dp = new Array(amount + 1).fill(0);\n  dp[0] = 1;\n  for (const coin of coins) {\n    for (let a = coin; a <= amount; a++) dp[a] += dp[a - coin];\n  }\n  return dp[amount];\n}",
@@ -6522,7 +6523,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(amount × coins)",
     "targetSpace": "O(amount)",
-    "complexityExplanation": "The DP table has amount+1 entries and each entry tries every coin denomination."
+    "complexityExplanation": "The DP table has amount+1 entries and each entry tries every coin denomination.",
+    "referenceSolutionTs": "function coinChange(coins: number[], amount: number): number {\n  const dp: number[] = new Array(amount + 1).fill(Infinity);\n  dp[0] = 0;\n  for (let a = 1; a <= amount; a++) {\n    for (const coin of coins) {\n      if (coin <= a && dp[a - coin] + 1 < dp[a]) dp[a] = dp[a - coin] + 1;\n    }\n  }\n  return dp[amount] === Infinity ? -1 : dp[amount];\n}\n\nfunction countWays(coins: number[], amount: number): number {\n  const dp: number[] = new Array(amount + 1).fill(0);\n  dp[0] = 1;\n  for (const coin of coins) {\n    for (let a = coin; a <= amount; a++) dp[a] += dp[a - coin];\n  }\n  return dp[amount];\n}"
   },
   {
     "id": "course-schedule-topo",
@@ -6736,7 +6738,7 @@
       "prefix-sum",
       "kadane"
     ],
-    "promptSeed": "Implement array prefix sum, product, and dynamic programming algorithms:\n\n### `maxSubarray(nums)`\n- Finds the maximum sum of any non-empty contiguous subarray using Kadane's algorithm in O(n) time.\n- Correctly handles arrays where all numbers are negative.\n- Returns `0` if `nums` is empty.\n\n### `productExceptSelf(nums)`\n- Returns an array `output` where `output[i]` equals the product of all elements in `nums` except `nums[i]`.\n- Must operate in O(n) time without using the division operator `/`.\n\n### `subarraySum(nums, k)`\n- Computes the total count of contiguous subarrays whose elements sum to `k`.\n- Uses running prefix sums with a hash map of prefix frequencies in O(n) time.",
+    "promptSeed": "Implement array prefix sum, product, and dynamic programming algorithms:\n\n### `maxSubarray(nums: number[]): number`\n- Finds the maximum sum of any non-empty contiguous subarray using Kadane's algorithm in O(n) time.\n- Correctly handles arrays where all numbers are negative.\n- Returns `0` if `nums` is empty.\n\n### `productExceptSelf(nums: number[]): number[]`\n- Returns an array `output` where `output[i]` equals the product of all elements in `nums` except `nums[i]`.\n- Must operate in O(n) time without using the division operator `/`.\n\n### `subarraySum(nums: number[], k: number): number`\n- Computes the total count of contiguous subarrays whose elements sum to `k`.\n- Uses running prefix sums with a hash map of prefix frequencies in O(n) time.",
     "difficulty": 2,
     "concept": "arrays",
     "referenceSolution": "function maxSubarray(nums) {\n  if (!nums.length) return 0;\n  let best = nums[0];\n  let cur = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    cur = Math.max(nums[i], cur + nums[i]);\n    best = Math.max(best, cur);\n  }\n  return best;\n}\n\nfunction productExceptSelf(nums) {\n  const out = new Array(nums.length).fill(1);\n  let left = 1;\n  for (let i = 0; i < nums.length; i++) {\n    out[i] = left;\n    left *= nums[i];\n  }\n  let right = 1;\n  for (let i = nums.length - 1; i >= 0; i--) {\n    out[i] *= right;\n    right *= nums[i];\n  }\n  return out;\n}\n\nfunction subarraySum(nums, k) {\n  const seen = new Map([[0, 1]]);\n  let sum = 0;\n  let count = 0;\n  for (const n of nums) {\n    sum += n;\n    count += seen.get(sum - k) || 0;\n    seen.set(sum, (seen.get(sum) || 0) + 1);\n  }\n  return count;\n}",
@@ -6785,7 +6787,8 @@
     "testHarness": "await $test.run(\"maxSubarray classic example\", async () => {\n  const sleep = $test.sleep;\n  return (maxSubarray([-2, 1, -3, 4, -1, 2, 1, -5, 4]));\n}, () => (6));\n\nawait $test.run(\"maxSubarray with all negatives picks the largest element\", async () => {\n  const sleep = $test.sleep;\n  return (maxSubarray([-5, -2, -9]));\n}, () => (-2));\n\nawait $test.run(\"maxSubarray: single element and empty array\", async () => {\n  const sleep = $test.sleep;\n  return ([maxSubarray([7]), maxSubarray([])]);\n}, () => ([7, 0]));\n\nawait $test.run(\"productExceptSelf without division\", async () => {\n  const sleep = $test.sleep;\n  return (productExceptSelf([1, 2, 3, 4]));\n}, () => ([24, 12, 8, 6]));\n\nawait $test.run(\"productExceptSelf with a zero\", async () => {\n  const sleep = $test.sleep;\n  return (productExceptSelf([1, 0, 3, 4]));\n}, () => ([0, 12, 0, 0]));\n\nawait $test.run(\"productExceptSelf with two elements\", async () => {\n  const sleep = $test.sleep;\n  return (productExceptSelf([5, 2]));\n}, () => ([2, 5]));\n\nawait $test.run(\"subarraySum counts all matching subarrays\", async () => {\n  const sleep = $test.sleep;\n  return ([subarraySum([1, 1, 1], 2), subarraySum([1, 2, 3], 3)]);\n}, () => ([2, 2]));\n\nawait $test.run(\"subarraySum with negatives and zeros\", async () => {\n  const sleep = $test.sleep;\n  return ([subarraySum([1, -1, 0], 0), subarraySum([0, 0, 0], 0)]);\n}, () => ([3, 6]));",
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
-    "complexityExplanation": "Each function is a single pass; productExceptSelf and subarraySum keep an O(n) output array or prefix-sum map (Kadane alone is O(1) space)."
+    "complexityExplanation": "Each function is a single pass; productExceptSelf and subarraySum keep an O(n) output array or prefix-sum map (Kadane alone is O(1) space).",
+    "referenceSolutionTs": "function maxSubarray(nums: number[]): number {\n  if (!nums.length) return 0;\n  let best = nums[0];\n  let cur = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    cur = Math.max(nums[i], cur + nums[i]);\n    best = Math.max(best, cur);\n  }\n  return best;\n}\n\nfunction productExceptSelf(nums: number[]): number[] {\n  const out: number[] = new Array(nums.length).fill(1);\n  let left = 1;\n  for (let i = 0; i < nums.length; i++) {\n    out[i] = left;\n    left *= nums[i];\n  }\n  let right = 1;\n  for (let i = nums.length - 1; i >= 0; i--) {\n    out[i] *= right;\n    right *= nums[i];\n  }\n  return out;\n}\n\nfunction subarraySum(nums: number[], k: number): number {\n  const seen = new Map<number, number>([[0, 1]]);\n  let sum = 0;\n  let count = 0;\n  for (const n of nums) {\n    sum += n;\n    count += seen.get(sum - k) || 0;\n    seen.set(sum, (seen.get(sum) || 0) + 1);\n  }\n  return count;\n}"
   },
   {
     "id": "linked-list-cycle-merge",
@@ -6865,7 +6868,7 @@
       "subsequence",
       "array"
     ],
-    "promptSeed": "Implement classic 1D dynamic programming optimization algorithms:\n\n### `rob(nums)`\n- Computes the maximum sum of money you can rob from an array of non-negative integers `nums` without robbing two adjacent houses.\n- Returns `0` for an empty array.\n- Solvable in O(n) time and O(1) auxiliary space.\n\n### `lengthOfLIS(nums)`\n- Finds the length of the longest strictly increasing subsequence in an integer array `nums` (elements need not be contiguous).\n- Returns `0` for an empty array.\n- Solvable in O(n^2) time or O(n log n) time.",
+    "promptSeed": "Implement classic 1D dynamic programming optimization algorithms:\n\n### `rob(nums: number[]): number`\n- Computes the maximum sum of money you can rob from an array of non-negative integers `nums` without robbing two adjacent houses.\n- Returns `0` for an empty array.\n- Solvable in O(n) time and O(1) auxiliary space.\n\n### `lengthOfLIS(nums: number[]): number`\n- Finds the length of the longest strictly increasing subsequence in an integer array `nums` (elements need not be contiguous).\n- Returns `0` for an empty array.\n- Solvable in O(n^2) time or O(n log n) time.",
     "difficulty": 3,
     "concept": "dp",
     "referenceSolution": "function rob(nums) {\n  let take = 0;\n  let skip = 0;\n  for (const n of nums) {\n    [take, skip] = [skip + n, Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction lengthOfLIS(nums) {\n  const dp = new Array(nums.length).fill(1);\n  let best = 0;\n  for (let i = 0; i < nums.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);\n    }\n    best = Math.max(best, dp[i]);\n  }\n  return best;\n}",
@@ -6910,7 +6913,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(n²)",
     "targetSpace": "O(n)",
-    "complexityExplanation": "House robber is O(n) with two rolling values; the quadratic LIS compares each element with all earlier ones using an O(n) table."
+    "complexityExplanation": "House robber is O(n) with two rolling values; the quadratic LIS compares each element with all earlier ones using an O(n) table.",
+    "referenceSolutionTs": "function rob(nums: number[]): number {\n  let take = 0;\n  let skip = 0;\n  for (const n of nums) {\n    [take, skip] = [skip + n, Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction lengthOfLIS(nums: number[]): number {\n  const dp: number[] = new Array(nums.length).fill(1);\n  let best = 0;\n  for (let i = 0; i < nums.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);\n    }\n    best = Math.max(best, dp[i]);\n  }\n  return best;\n}"
   },
   {
     "id": "matrix-rotate-spiral",
@@ -9476,7 +9480,7 @@
       "grid",
       "triangle"
     ],
-    "promptSeed": "Implement minimum path sum dynamic programming algorithms on 2D structures:\n\n### `minPathSum(grid)`\n- Finds a path from the top-left `(0, 0)` to the bottom-right corner of an `m x n` grid of non-negative integers that minimizes the sum of all numbers along its path.\n- Movement is restricted to only moving right or down at each step.\n\n### `minimumTotal(triangle)`\n- Calculates the minimum path sum from the top to the bottom of a numeric triangle array (where row `i` contains `i + 1` elements).\n- Each step moves to adjacent numbers on the row below (from column `j` to either `j` or `j + 1`).\n- Solvable bottom-up in O(n) auxiliary space.",
+    "promptSeed": "Implement minimum path sum dynamic programming algorithms on 2D structures:\n\n### `minPathSum(grid: number[][]): number`\n- Finds a path from the top-left `(0, 0)` to the bottom-right corner of an `m x n` grid of non-negative integers that minimizes the sum of all numbers along its path.\n- Movement is restricted to only moving right or down at each step.\n\n### `minimumTotal(triangle: number[][]): number`\n- Calculates the minimum path sum from the top to the bottom of a numeric triangle array (where row `i` contains `i + 1` elements).\n- Each step moves to adjacent numbers on the row below (from column `j` to either `j` or `j + 1`).\n- Solvable bottom-up in O(n) auxiliary space.",
     "difficulty": 3,
     "concept": "dp2d",
     "referenceSolution": "function minPathSum(grid) {\n  const rows = grid.length;\n  const cols = grid[0].length;\n  const dp = new Array(cols).fill(Infinity);\n  dp[0] = 0;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      const best = Math.min(dp[c], c > 0 ? dp[c - 1] : Infinity);\n      dp[c] = best + grid[r][c];\n    }\n  }\n  return dp[cols - 1];\n}\n\nfunction minimumTotal(triangle) {\n  const dp = triangle[triangle.length - 1].slice();\n  for (let r = triangle.length - 2; r >= 0; r--) {\n    for (let c = 0; c <= r; c++) {\n      dp[c] = triangle[r][c] + Math.min(dp[c], dp[c + 1]);\n    }\n  }\n  return dp[0];\n}",
@@ -9516,7 +9520,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(m × n)",
     "targetSpace": "O(n)",
-    "complexityExplanation": "Each grid or triangle cell is visited once and only a single row of best-so-far sums is stored."
+    "complexityExplanation": "Each grid or triangle cell is visited once and only a single row of best-so-far sums is stored.",
+    "referenceSolutionTs": "function minPathSum(grid: number[][]): number {\n  const rows = grid.length;\n  const cols = rows ? grid[0].length : 0;\n  const dp: number[] = new Array(cols).fill(Infinity);\n  dp[0] = 0;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      const best = Math.min(dp[c], c > 0 ? dp[c - 1] : Infinity);\n      dp[c] = best + grid[r][c];\n    }\n  }\n  return dp[cols - 1];\n}\n\nfunction minimumTotal(triangle: number[][]): number {\n  const dp: number[] = triangle[triangle.length - 1].slice();\n  for (let r = triangle.length - 2; r >= 0; r--) {\n    for (let c = 0; c <= r; c++) {\n      dp[c] = triangle[r][c] + Math.min(dp[c], dp[c + 1]);\n    }\n  }\n  return dp[0];\n}"
   },
   {
     "id": "monotonic-stack-basics",
@@ -9644,7 +9649,7 @@
       "grid",
       "combinatorics"
     ],
-    "promptSeed": "A robot is located at the top-left corner of a grid and can only move either down or right at any point:\n\n### `uniquePaths(m, n)`\n- Calculates the total number of unique paths to reach the bottom-right corner of an `m x n` grid.\n- Solvable using dynamic programming or 1D rolling array tabulation in O(m * n) time.\n\n### `uniquePathsWithObstacles(grid)`\n- Calculates the number of unique paths to the bottom-right corner when obstacles are present.\n- In `grid`, `0` represents empty space and `1` represents an obstacle that cannot be traversed.\n- Returns `0` if either the start `(0, 0)` or destination corner is blocked.",
+    "promptSeed": "A robot is located at the top-left corner of a grid and can only move either down or right at any point:\n\n### `uniquePaths(m: number, n: number): number`\n- Calculates the total number of unique paths to reach the bottom-right corner of an `m x n` grid.\n- Solvable using dynamic programming or 1D rolling array tabulation in O(m * n) time.\n\n### `uniquePathsWithObstacles(grid: number[][]): number`\n- Calculates the number of unique paths to the bottom-right corner when obstacles are present.\n- In `grid`, `0` represents empty space and `1` represents an obstacle that cannot be traversed.\n- Returns `0` if either the start `(0, 0)` or destination corner is blocked.",
     "difficulty": 2,
     "concept": "dp2d",
     "referenceSolution": "function uniquePaths(m, n) {\n  const row = new Array(n).fill(1);\n  for (let r = 1; r < m; r++) {\n    for (let c = 1; c < n; c++) row[c] += row[c - 1];\n  }\n  return row[n - 1];\n}\n\nfunction uniquePathsWithObstacles(grid) {\n  const rows = grid.length;\n  const cols = grid[0].length;\n  const row = new Array(cols).fill(0);\n  row[0] = grid[0][0] === 1 ? 0 : 1;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      if (grid[r][c] === 1) row[c] = 0;\n      else if (c > 0) row[c] += row[c - 1];\n    }\n  }\n  return row[cols - 1];\n}",
@@ -9689,7 +9694,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(m × n)",
     "targetSpace": "O(n)",
-    "complexityExplanation": "Every cell is computed once from its top and left neighbours, keeping only one row of counts."
+    "complexityExplanation": "Every cell is computed once from its top and left neighbours, keeping only one row of counts.",
+    "referenceSolutionTs": "function uniquePaths(m: number, n: number): number {\n  const row: number[] = new Array(n).fill(1);\n  for (let r = 1; r < m; r++) {\n    for (let c = 1; c < n; c++) row[c] += row[c - 1];\n  }\n  return row[n - 1];\n}\n\nfunction uniquePathsWithObstacles(grid: number[][]): number {\n  const rows = grid.length;\n  const cols = rows ? grid[0].length : 0;\n  const row: number[] = new Array(cols).fill(0);\n  row[0] = grid[0][0] === 1 ? 0 : 1;\n  for (let r = 0; r < rows; r++) {\n    for (let c = 0; c < cols; c++) {\n      if (grid[r][c] === 1) row[c] = 0;\n      else if (c > 0) row[c] += row[c - 1];\n    }\n  }\n  return row[cols - 1];\n}"
   },
   {
     "id": "dp-array-variants",
@@ -9969,7 +9975,7 @@
       "state-machine",
       "greedy"
     ],
-    "promptSeed": "Implement state-machine and greedy dynamic programming for stock trading:\n\n### `maxProfit(prices)`\n- Calculates the maximum profit achievable from at most one transaction (one buy followed by one later sell).\n- Returns `0` if no profit is possible or if `prices` is empty.\n\n### `maxProfitMany(prices)`\n- Calculates the maximum total profit with unlimited buy and sell transactions (holding at most one share at any time).\n- Accumulates profits from every upward price movement.\n\n### `maxProfitCooldown(prices)`\n- Calculates the maximum profit with unlimited transactions subject to a one-day cooldown period (cannot buy the day immediately following a sell).\n- Models state transitions between `hold`, `sold`, and `rest`.",
+    "promptSeed": "Implement state-machine and greedy dynamic programming for stock trading:\n\n### `maxProfit(prices: number[]): number`\n- Calculates the maximum profit achievable from at most one transaction (one buy followed by one later sell).\n- Returns `0` if no profit is possible or if `prices` is empty.\n\n### `maxProfitMany(prices: number[]): number`\n- Calculates the maximum total profit with unlimited buy and sell transactions (holding at most one share at any time).\n- Accumulates profits from every upward price movement.\n\n### `maxProfitCooldown(prices: number[]): number`\n- Calculates the maximum profit with unlimited transactions subject to a one-day cooldown period (cannot buy the day immediately following a sell).\n- Models state transitions between `hold`, `sold`, and `rest`.",
     "difficulty": 3,
     "concept": "dp",
     "referenceSolution": "function maxProfit(prices) {\n  let min = Infinity;\n  let best = 0;\n  for (const p of prices) {\n    min = Math.min(min, p);\n    best = Math.max(best, p - min);\n  }\n  return best;\n}\n\nfunction maxProfitMany(prices) {\n  let total = 0;\n  for (let i = 1; i < prices.length; i++) {\n    if (prices[i] > prices[i - 1]) total += prices[i] - prices[i - 1];\n  }\n  return total;\n}\n\nfunction maxProfitCooldown(prices) {\n  let hold = -Infinity;\n  let sold = 0;\n  let rest = 0;\n  for (const p of prices) {\n    const prevSold = sold;\n    sold = hold + p;\n    hold = Math.max(hold, rest - p);\n    rest = Math.max(rest, prevSold);\n  }\n  return Math.max(sold, rest);\n}",
@@ -9999,7 +10005,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(n)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Each price updates a handful of running profit states, so one pass and constant space suffice."
+    "complexityExplanation": "Each price updates a handful of running profit states, so one pass and constant space suffice.",
+    "referenceSolutionTs": "function maxProfit(prices: number[]): number {\n  let min = Infinity;\n  let best = 0;\n  for (const p of prices) {\n    min = Math.min(min, p);\n    best = Math.max(best, p - min);\n  }\n  return best;\n}\n\nfunction maxProfitMany(prices: number[]): number {\n  let total = 0;\n  for (let i = 1; i < prices.length; i++) {\n    if (prices[i] > prices[i - 1]) total += prices[i] - prices[i - 1];\n  }\n  return total;\n}\n\nfunction maxProfitCooldown(prices: number[]): number {\n  let hold = -Infinity;\n  let sold = 0;\n  let rest = 0;\n  for (const p of prices) {\n    const prevSold = sold;\n    sold = hold + p;\n    hold = Math.max(hold, rest - p);\n    rest = Math.max(rest, prevSold);\n  }\n  return Math.max(sold, rest);\n}"
   },
   {
     "id": "string-arithmetic",

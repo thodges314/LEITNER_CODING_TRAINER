@@ -1,10 +1,10 @@
 Implement dynamic programming fundamentals for sequence and counting problems:
 
-### `fib(n)`
+### `fib(n: number): number`
 - Computes the n-th Fibonacci number where `fib(0) = 0` and `fib(1) = 1`.
 - Must return in O(n) time and O(1) space (e.g. iterative tabulation or memoization) so that large values like `fib(50)` return instantly without recursion stack overflow or timeout.
 
-### `climbStairs(n)`
+### `climbStairs(n: number): number`
 - Calculates the number of distinct ways to climb a staircase of `n` steps when taking either 1 or 2 steps at a time.
 - Returns `1` for `climbStairs(0)` and `climbStairs(1)`.
 - Runs in O(n) time and O(1) space.

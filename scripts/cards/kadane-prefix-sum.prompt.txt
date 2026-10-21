@@ -1,14 +1,14 @@
 Implement array prefix sum, product, and dynamic programming algorithms:
 
-### `maxSubarray(nums)`
+### `maxSubarray(nums: number[]): number`
 - Finds the maximum sum of any non-empty contiguous subarray using Kadane's algorithm in O(n) time.
 - Correctly handles arrays where all numbers are negative.
 - Returns `0` if `nums` is empty.
 
-### `productExceptSelf(nums)`
+### `productExceptSelf(nums: number[]): number[]`
 - Returns an array `output` where `output[i]` equals the product of all elements in `nums` except `nums[i]`.
 - Must operate in O(n) time without using the division operator `/`.
 
-### `subarraySum(nums, k)`
+### `subarraySum(nums: number[], k: number): number`
 - Computes the total count of contiguous subarrays whose elements sum to `k`.
 - Uses running prefix sums with a hash map of prefix frequencies in O(n) time.
