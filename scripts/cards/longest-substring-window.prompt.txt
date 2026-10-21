@@ -1,3 +1,11 @@
-Write lengthOfLongestSubstring(s): the length of the longest substring with no repeated character (0 for an empty string), using a sliding window and a map of last-seen indices.
+Implement variable-size sliding window algorithms for substring character frequency constraints:
 
-Write longestKDistinct(s, k): the length of the longest substring containing at most k distinct characters (0 when k is 0 or s is empty).
+### `lengthOfLongestSubstring(s)`
+- Returns the length of the longest substring containing no duplicate characters.
+- Uses a sliding window and a hash map of last-seen character indices in O(n) time.
+- Returns `0` if `s` is empty `''`.
+
+### `longestKDistinct(s, k)`
+- Returns the maximum length of a substring containing at most `k` distinct characters.
+- Uses a sliding window and character frequency count tracking.
+- Returns `0` if `k === 0` or if `s` is empty `''`.

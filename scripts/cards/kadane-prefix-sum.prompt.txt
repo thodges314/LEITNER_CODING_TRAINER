@@ -1,5 +1,14 @@
-Write maxSubarray(nums): the largest sum of any non-empty contiguous subarray (Kadane's algorithm; works when every number is negative; 0 for an empty array).
+Implement array prefix sum, product, and dynamic programming algorithms:
 
-Write productExceptSelf(nums): an array where element i is the product of all other elements, without using division.
+### `maxSubarray(nums)`
+- Finds the maximum sum of any non-empty contiguous subarray using Kadane's algorithm in O(n) time.
+- Correctly handles arrays where all numbers are negative.
+- Returns `0` if `nums` is empty.
 
-Write subarraySum(nums, k): the number of contiguous subarrays whose sum equals k (prefix sums + hash map).
+### `productExceptSelf(nums)`
+- Returns an array `output` where `output[i]` equals the product of all elements in `nums` except `nums[i]`.
+- Must operate in O(n) time without using the division operator `/`.
+
+### `subarraySum(nums, k)`
+- Computes the total count of contiguous subarrays whose elements sum to `k`.
+- Uses running prefix sums with a hash map of prefix frequencies in O(n) time.

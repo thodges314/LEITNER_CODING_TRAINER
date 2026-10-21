@@ -1,5 +1,12 @@
-Write characterReplacement(s, k): the length of the longest substring that can be turned into one repeated letter by replacing at most k characters (0 for an empty string).
+Implement dynamic sliding window optimization algorithms:
 
-Write longestOnes(nums, k): the longest run of 1s in a 0/1 array if you may flip at most k zeros.
+### `characterReplacement(s, k)`
+- Finds the length of the longest substring that can be converted to contain only a single repeated character by replacing at most `k` characters.
+- Returns `0` if `s` is empty `''`.
 
-Write minSubArrayLen(target, nums): the smallest length of a contiguous subarray of positive numbers whose sum is >= target, or 0 if none.
+### `longestOnes(nums, k)`
+- Given a binary array `nums` of `0`s and `1`s, returns the maximum consecutive `1`s achievable by flipping at most `k` `0`s to `1`s.
+
+### `minSubArrayLen(target, nums)`
+- Finds the minimal length of a contiguous subarray of positive numbers whose sum is greater than or equal to `target` (>= target).
+- Returns `0` if no such subarray exists.

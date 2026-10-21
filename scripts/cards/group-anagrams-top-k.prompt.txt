@@ -1,3 +1,10 @@
-Write groupAnagrams(words) returning an array of groups (arrays) of words that are anagrams of each other; keep the first-seen order of groups and of the words inside each group.
+Implement grouping and frequency ranking algorithms using hash maps:
 
-Write topKFrequent(nums, k) returning the k most frequent numbers, most frequent first; break ties by smaller number first.
+### `groupAnagrams(words)`
+- Groups an array of strings into an array of anagram clusters (arrays of words that contain the same characters with identical frequencies).
+- Preserves the order in which groups first appear and the original relative order of words within each group.
+- Returns `[]` for an empty input.
+
+### `topKFrequent(nums, k)`
+- Returns the `k` most frequent elements in `nums`, ordered from most frequent to least frequent.
+- Breaks frequency ties by choosing the smaller numeric value first (`a < b`).
