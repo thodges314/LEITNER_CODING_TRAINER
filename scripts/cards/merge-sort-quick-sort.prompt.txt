@@ -1,1 +1,12 @@
-Write mergeSort(arr) and quickSort(arr), each returning a NEW array sorted ascending by number and leaving the input untouched. mergeSort must be stable and use a merge helper over two sorted halves; quickSort picks a pivot and partitions into less / equal / greater parts. Do not use Array.prototype.sort. Both handle empty and one-element arrays and duplicates.
+Implement divide-and-conquer sorting algorithms from scratch without calling `Array.prototype.sort`:
+
+### `mergeSort(arr)`
+- Returns a new array sorted in ascending numerical order without mutating the input `arr`.
+- Must be a stable sort that divides the array into halves, sorts them recursively, and combines them using a `merge` helper.
+- Correctly handles empty arrays, single-element arrays, and duplicate values.
+
+### `quickSort(arr)`
+- Returns a new array sorted in ascending numerical order without mutating the input `arr`.
+- Selects a pivot element and partitions the array into three subsets: elements less than the pivot, equal to the pivot, and greater than the pivot.
+- Recursively sorts sub-arrays and concatenates the partitions.
+- Correctly handles empty arrays, single-element arrays, and duplicate values.

@@ -1,3 +1,11 @@
-Write longestPalindrome(s): the longest palindromic substring (the leftmost one when several have the same length; '' for an empty string) using expand-around-center.
+Implement palindromic substring algorithms using the expand-around-center technique:
 
-Write countPalindromicSubstrings(s): the number of palindromic substrings, counting each position range separately ('aaa' has 6; '' has 0).
+### `longestPalindrome(s)`
+- Finds and returns the longest palindromic substring in `s`.
+- When multiple palindromes tie for maximum length, returns the leftmost occurrence.
+- Returns an empty string `''` if `s` is empty.
+
+### `countPalindromicSubstrings(s)`
+- Counts the total number of palindromic substrings in `s`.
+- Each start and end position range is counted separately (e.g., `'aaa'` has 6 palindromes: `'a'`, `'a'`, `'a'`, `'aa'`, `'aa'`, `'aaa'`).
+- Returns `0` if `s` is empty `''`.

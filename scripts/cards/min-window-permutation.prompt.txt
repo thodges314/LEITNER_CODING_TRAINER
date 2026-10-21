@@ -1,5 +1,13 @@
-Write minWindow(s, t): the smallest substring of s that contains every character of t with at least its multiplicity (the leftmost one on ties); '' if none exists or t is empty.
+Implement substring pattern matching and sliding window algorithms:
 
-Write checkInclusion(s1, s2): true when s2 contains some permutation of s1 as a contiguous substring.
+### `minWindow(s, t)`
+- Finds the smallest substring of `s` containing all characters of `t` with at least their required multiplicities.
+- If multiple valid substrings tie for minimal length, returns the leftmost occurrence.
+- Returns an empty string `''` if no such substring exists or if `t` is empty.
 
-Write findAnagrams(s, p): the array of start indices (ascending) of every substring of s that is an anagram of p ([] when p is longer than s).
+### `checkInclusion(s1, s2)`
+- Returns `true` if `s2` contains any permutation of `s1` as a contiguous substring; otherwise `false`.
+
+### `findAnagrams(s, p)`
+- Returns an array of ascending starting indices for every substring of `s` that is an anagram of `p`.
+- Returns `[]` if `p.length > s.length`.
