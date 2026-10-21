@@ -1,3 +1,12 @@
-Each number in nums is the maximum jump length from that index.
+Implement greedy reachability and jump minimization algorithms:
 
-Write canJump(nums): can you reach the last index starting from index 0? (Greedy: track the farthest reachable index; a single element is always reachable.) Write minJumps(nums): the minimum number of jumps to reach the last index, assuming it is reachable (0 for a single element).
+### `canJump(nums)`
+- Determines if you can reach the last index of `nums` starting from index `0`.
+- Each element `nums[i]` represents your maximum jump length forward from that position.
+- Uses a greedy pass tracking the farthest reachable index.
+- A single-element array (`[x]`) is always reachable (`true`).
+
+### `minJumps(nums)`
+- Calculates the minimum number of jumps required to reach the last index from index `0`.
+- Assumes the last index is always reachable.
+- Returns `0` for a single-element array (`[x]`).
