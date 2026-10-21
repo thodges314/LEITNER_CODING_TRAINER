@@ -1,19 +1,19 @@
 Implement essential string manipulation, encoding, and rotation algorithms:
 
-### `reverseWords(s)`
+### `reverseWords(s: string): string`
 - Returns the words in string `s` in reverse order joined by a single space.
 - Trims leading, trailing, and multiple consecutive whitespace characters (e.g. `'  hello   world '` -> `'world hello'`).
 - Returns `''` if `s` is empty or only whitespace.
 
-### `runLengthEncode(s)`
+### `runLengthEncode(s: string): string`
 - Compresses string `s` using run-length encoding, appending the consecutive occurrence count after each character (e.g. `'aabccc'` -> `'a2b1c3'`).
 - Returns `''` if `s` is empty.
 
-### `runLengthDecode(s)`
+### `runLengthDecode(s: string): string`
 - Decompresses a run-length encoded string back to its original characters.
 - Correctly handles multi-digit counts (e.g. `'x12'` expands to twelve `'x'` characters).
 
-### `isRotation(a, b)`
+### `isRotation(a: string, b: string): boolean`
 - Determines if string `b` is a circular rotation of string `a`.
 - Requires `a.length === b.length` and `(a + a).includes(b)`.
 - Two empty strings are considered valid rotations of each other (`true`).

@@ -1,10 +1,10 @@
 Implement grouping and frequency ranking algorithms using hash maps:
 
-### `groupAnagrams(words)`
+### `groupAnagrams(words: string[]): string[][]`
 - Groups an array of strings into an array of anagram clusters (arrays of words that contain the same characters with identical frequencies).
 - Preserves the order in which groups first appear and the original relative order of words within each group.
 - Returns `[]` for an empty input.
 
-### `topKFrequent(nums, k)`
+### `topKFrequent(nums: number[], k: number): number[]`
 - Returns the `k` most frequent elements in `nums`, ordered from most frequent to least frequent.
 - Breaks frequency ties by choosing the smaller numeric value first (`a < b`).

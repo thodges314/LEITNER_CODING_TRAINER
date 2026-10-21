@@ -1,11 +1,11 @@
 Implement variable-size sliding window algorithms for substring character frequency constraints:
 
-### `lengthOfLongestSubstring(s)`
+### `lengthOfLongestSubstring(s: string): number`
 - Returns the length of the longest substring containing no duplicate characters.
 - Uses a sliding window and a hash map of last-seen character indices in O(n) time.
 - Returns `0` if `s` is empty `''`.
 
-### `longestKDistinct(s, k)`
+### `longestKDistinct(s: string, k: number): number`
 - Returns the maximum length of a substring containing at most `k` distinct characters.
 - Uses a sliding window and character frequency count tracking.
 - Returns `0` if `k === 0` or if `s` is empty `''`.

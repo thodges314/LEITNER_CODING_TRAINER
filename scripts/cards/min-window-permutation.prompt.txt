@@ -1,13 +1,13 @@
 Implement substring pattern matching and sliding window algorithms:
 
-### `minWindow(s, t)`
+### `minWindow(s: string, t: string): string`
 - Finds the smallest substring of `s` containing all characters of `t` with at least their required multiplicities.
 - If multiple valid substrings tie for minimal length, returns the leftmost occurrence.
 - Returns an empty string `''` if no such substring exists or if `t` is empty.
 
-### `checkInclusion(s1, s2)`
+### `checkInclusion(s1: string, s2: string): boolean`
 - Returns `true` if `s2` contains any permutation of `s1` as a contiguous substring; otherwise `false`.
 
-### `findAnagrams(s, p)`
+### `findAnagrams(s: string, p: string): number[]`
 - Returns an array of ascending starting indices for every substring of `s` that is an anagram of `p`.
 - Returns `[]` if `p.length > s.length`.
