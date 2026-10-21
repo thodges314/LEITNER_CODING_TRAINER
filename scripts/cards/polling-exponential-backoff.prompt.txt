@@ -1,5 +1,6 @@
 Write `pollUntil(fn, predicate, options = {})`:
 
+### `pollUntil<T>(fn: () => Promise<T>, predicate: (result: T) => boolean, options?: PollOptions): Promise<T>`
 - Repeatedly calls `async` function `fn()` until `predicate(result)` returns `true`.
 - **Options & Defaults**: `{ initialInterval = 50, backoffFactor = 2, maxAttempts = 5 }`.
 - **Polling Loop**:

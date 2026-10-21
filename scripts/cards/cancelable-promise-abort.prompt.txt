@@ -1,11 +1,11 @@
 Implement two asynchronous control-flow utilities: `makeCancelable` and `withTimeout`.
 
-### `makeCancelable(promise)`
+### `makeCancelable<T>(promise: Promise<T>): { promise: Promise<T>; cancel: () => void }`
 - Wraps an input promise and returns an object `{ promise, cancel }`.
 - If `cancel()` is invoked while the promise is still pending, the wrapped promise rejects with `{ isCanceled: true }`.
 - If the promise has already fulfilled or rejected prior to calling `cancel()`, its final settlement is preserved unchanged.
 
-### `withTimeout(promise, ms, timeoutError = new Error('Timeout'))`
+### `withTimeout<T>(promise: Promise<T>, ms: number, timeoutError?: Error): Promise<T>`
 - Returns a Promise that settles with the outcome of `promise` if it settles within `ms` milliseconds.
-- If `ms` elapses before the promise settles, rejects with `timeoutError`.
+- If `ms` elapses before the promise settles, rejects with `timeoutError` (defaults to `new Error('Timeout')`).
 - If `promise` settles first, clears the timer handle to prevent resource leaks.

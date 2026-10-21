@@ -1,6 +1,6 @@
 Implement request deduplication with timeout abortion:
 
-### `dedupeFetch(key, fn, timeoutMs = 5000)`
+### `dedupeFetch<T>(key: string, fn: (signal: AbortSignal) => Promise<T>, timeoutMs?: number): Promise<T>`
 - `fn(signal)` is a factory function that returns a Promise for the asynchronous request.
 
 #### Deduplication Behavior
@@ -8,7 +8,7 @@ Implement request deduplication with timeout abortion:
 - The entry is removed from the cache in a `.finally()` handler once the request settles (on success, rejection, or timeout) so subsequent calls trigger a fresh fetch.
 
 #### Timeout & Cancellation
-- If the operation does not settle within `timeoutMs`:
+- If the operation does not settle within `timeoutMs` (defaults to 5000):
   - Triggers abortion via the `AbortSignal` passed to `fn(signal)`.
   - Rejects the returned promise with an `Error` (e.g. `Timed out after ${timeoutMs}ms`).
 - Clears the pending timeout timer when the request finishes before the deadline.

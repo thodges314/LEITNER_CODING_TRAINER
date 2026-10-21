@@ -1,6 +1,6 @@
 Write an async HTTP request utility using native `fetch`:
 
-### `fetchData(url)`
+### `fetchData(url: string): Promise<any>`
 - Fetches `url` asynchronously using `fetch(url)`.
 - **Response Validation**:
   - Checks `response.ok`. If false, throws an `Error` whose message includes the HTTP status code (e.g. `404`).

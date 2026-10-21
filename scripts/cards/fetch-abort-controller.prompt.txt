@@ -1,6 +1,6 @@
 Write an HTTP fetch utility that enforces request timeouts using `AbortController`:
 
-### `fetchWithTimeout(url, timeoutMs)`
+### `fetchWithTimeout(url: string, timeoutMs: number): Promise<any>`
 - Creates an `AbortController` and links its signal to `fetch(url, { signal: controller.signal })`.
 - Sets a timer via `setTimeout(() => controller.abort(), timeoutMs)`:
   - If the request does not settle within `timeoutMs`, the controller aborts and the returned promise rejects with an `AbortError` (`err.name === 'AbortError'`).
