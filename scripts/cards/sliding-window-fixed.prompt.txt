@@ -1,1 +1,7 @@
-Write maxSubarraySum(arr, k) returning the maximum sum of any contiguous subarray of exactly k elements, in O(n) time using a sliding window. Negative numbers are allowed. If k is larger than arr.length, return null.
+Implement fixed-size sliding window summation in O(n) time:
+
+### `maxSubarraySum(arr, k)`
+- Computes the maximum sum among all contiguous subarrays of length `k`.
+- Operates in O(n) time complexity using a sliding window.
+- Correctly handles negative numbers.
+- If `k > arr.length` or `arr.length === 0`, returns `null`.

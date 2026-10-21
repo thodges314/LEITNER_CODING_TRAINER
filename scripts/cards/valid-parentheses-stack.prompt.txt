@@ -1,1 +1,9 @@
-Write isValidParentheses(s) that uses a stack to check a string made only of '(', ')', '{', '}', '[' and ']'. It is valid when every opener is closed by the matching bracket type in the correct order (nesting, not interleaving). Return false for unclosed openers or a closer with nothing open; an empty string is valid (true).
+Implement bracket validation using a stack:
+
+### `isValidParentheses(s)`
+- Determines whether a string consisting of `(`, `)`, `{`, `}`, `[`, and `]` has valid bracket nesting.
+- **Rules**:
+  - Open brackets must be closed by the matching bracket type (`()` `{}` `[]`).
+  - Open brackets must close in the correct order (properly nested, not interleaved).
+  - Returns `false` for unclosed openers or a closing bracket without an opener.
+  - An empty string `''` is valid (`true`).

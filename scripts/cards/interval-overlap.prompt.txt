@@ -1,3 +1,13 @@
-Intervals are [start, end] with start <= end and are CLOSED (touching endpoints overlap).
+Implement interval overlap detection and total span calculations for closed intervals `[start, end]` (where `start <= end` and touching endpoints overlap):
 
-Write overlaps(a, b) -> boolean, intersection(a, b) -> the overlapping [start, end] or null, and totalLength(intervals) -> the sum of the lengths (end - start) of the intervals, counting overlapping parts only once (the input may be unsorted).
+### `overlaps(a, b)`
+- Returns `true` if closed intervals `a` and `b` overlap or touch at their boundaries; otherwise `false`.
+
+### `intersection(a, b)`
+- Returns the overlapping closed interval `[start, end]` shared by `a` and `b`.
+- Returns `null` if they do not overlap.
+
+### `totalLength(intervals)`
+- Computes the combined length (`end - start`) of all intervals in `intervals`, counting overlapping spans only once.
+- Safely handles unsorted inputs.
+- Returns `0` for empty intervals.

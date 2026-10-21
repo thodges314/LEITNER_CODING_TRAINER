@@ -1,1 +1,10 @@
-Write twoSum(nums, target) returning the indices [i, j] (with i < j) of two different elements whose values add up to target, in O(n) time with a single pass using a hash map. Duplicate values are fine when they sit at different indices (twoSum([3, 3], 6) -> [0, 1]); the same element cannot be used twice (twoSum([5], 10) -> []); if no pair exists, return []. Assume at most one valid answer.
+Implement the classic two sum lookup algorithm in O(n) time using a hash map:
+
+### `twoSum(nums, target)`
+- Returns indices `[i, j]` (with `i < j`) of two distinct elements in `nums` whose sum equals `target`.
+- Must operate in O(n) time complexity using a single pass with a hash map (`Map`).
+- **Rules**:
+  - The same element index cannot be used twice (e.g., `twoSum([5], 10)` -> `[]`).
+  - Duplicate values with distinct indices are valid (e.g., `twoSum([3, 3], 6)` -> `[0, 1]`).
+  - Returns `[]` if no valid pair sums to `target`.
+  - Assume at most one valid solution exists.

@@ -1,5 +1,11 @@
-Nodes look like { val, next }.
+Implement cycle detection and sorted list merging on singly linked list nodes (`{ val, next }`):
 
-Write hasCycle(head) using Floyd's tortoise and hare (O(1) extra space; true when some node can be reached twice by following next).
+### `hasCycle(head)`
+- Detects whether a linked list contains a cycle using Floyd's Tortoise and Hare algorithm in O(1) auxiliary space.
+- Returns `true` if any node can be reached more than once by following `next` pointers; otherwise `false`.
 
-Write mergeTwoLists(a, b) that merges two sorted lists into one sorted list by relinking nodes (no new nodes) and returns the head. Either input may be null; when values tie, take from a first.
+### `mergeTwoLists(a, b)`
+- Merges two sorted linked lists into a single sorted list by relinking existing nodes (without allocating new node objects).
+- Either list `a` or `b` may be `null` or empty.
+- When values tie (`a.val === b.val`), takes from list `a` first.
+- Returns the head of the merged sorted list.
