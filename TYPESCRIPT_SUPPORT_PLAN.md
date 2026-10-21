@@ -43,9 +43,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **112 / 271 (41.3%)**
-- **Cards Remaining:** **159 / 271 (58.7%)**
-- **Total Batches:** 48 batches (18 completed, 30 remaining)
+- **Fully Typed Cards Completed:** **116 / 271 (42.8%)**
+- **Cards Remaining:** **155 / 271 (57.2%)**
+- **Total Batches:** 48 batches (19 completed, 29 remaining)
 
 ### Track Completion Status
 
@@ -53,20 +53,20 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | :--- | :---: | :---: | :---: | :--- |
 | **`algorithms`** | 77 | 77 | 100.0% | **COMPLETE** (Batches 1–11) |
 | **`async-js`** | 21 | 21 | 100.0% | **COMPLETE** (Batches 12–15) |
-| **`js-language`** | 25 | 14 | 56.0% | **IN PROGRESS** (Batches 16–18 done, 19–20 remaining) |
+| **`js-language`** | 25 | 18 | 72.0% | **IN PROGRESS** (Batches 16–19 done, 20 remaining) |
 | **`typescript-patterns`** | 14 | 0 | 0.0% | Planned (Batches 21–23) |
 | **`js-utilities`** | 37 | 0 | 0.0% | Planned (Batches 24–30) |
 | **`dom-browser`** | 20 | 0 | 0.0% | Planned (Batches 31–34) |
 | **`react`** | 27 | 0 | 0.0% | Planned (Batches 35–39) |
 | **`react-components`** | 45 | 0 | 0.0% | Planned (Batches 40–47) |
 | **`testing-tooling`** | 5 | 0 | 0.0% | Planned (Batch 48) |
-| **TOTAL** | **271** | **112** | **41.3%** | **48 Batches Total** |
+| **TOTAL** | **271** | **116** | **42.8%** | **48 Batches Total** |
 
 ---
 
-## 4. Completed Batches (Batches 1–18: 112 Cards)
+## 4. Completed Batches (Batches 1–19: 116 Cards)
 
-All 112 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 116 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 - **Batch 1 (DSA Foundations — 8 cards):** `binary-search-exact`, `two-pointer-sorted-sum`, `sliding-window-fixed`, `valid-parentheses-stack`, `merge-intervals`, `two-sum-hashmap`, `interval-overlap`, `anagram-palindrome`.
@@ -87,25 +87,20 @@ All 112 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 14 (Networking & Cancellation — 5 cards):** `async-fetch-error-handling`, `fetch-abort-controller`, `cancelable-promise-abort`, `fetch-timeout-dedupe`, `polling-exponential-backoff`.
 - **Batch 15 (Concurrency, Queues & Middleware — 6 cards):** `promise-pool`, `retry-with-backoff`, `async-queue-scheduler`, `express-middleware-chain`, `compose-middleware`, `async-generator-pagination`.
 
-### JavaScript Language Mechanics Track (14 of 25 Complete)
+### JavaScript Language Mechanics Track (18 of 25 Complete)
 - **Batch 16 (`this`, Scope & Function Polyfills — 5 cards):** `bind-call-apply`, `closures-private-state`, `bind-method-partial`, `this-context-binding`, `hoisting-tdz-scope`.
 - **Batch 17 (Object Prototypes & Constructor Inheritance — 5 cards):** `new-instanceof-create`, `manual-prototype-linking`, `proto-chain-hasinstance`, `proto-object-create`, `copy-descriptors-mixin`.
 - **Batch 18 (Property Descriptors & Templates — 4 cards):** `descriptor-basics`, `getter-setter-pairs`, `tagged-template-literals`, `weak-tag-seen`.
+- **Batch 19 (Weak Collections & Iterators — 4 cards):** `weakmap-memoize-object`, `weakmap-private-state`, `weakset-cycle-detection`, `iterators-generators`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 19–48: 159 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 20–48: 155 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
-### Track: `js-language` (11 cards remaining — Batches 19 to 20)
+### Track: `js-language` (7 cards remaining — Batch 20)
 *Focus: Clean typing for prototype methods, descriptor definitions, symbol iterators, and proxies.*
-
-- **Batch 19: Weak Collections & Iterators (4 cards)**
-  - `weakmap-memoize-object`: WeakMap: Memoize By Object and Stable IDs
-  - `weakmap-private-state`: WeakMap: Private Instance State (Counter, Stack)
-  - `weakset-cycle-detection`: WeakSet: Cycle Detection and Object Counting
-  - `iterators-generators`: Iterators and Generators
 
 - **Batch 20: Iterators, Coroutines & Proxies (7 cards)**
   - `iterable-range-class`: Iterators: Iterable Range Class and take()

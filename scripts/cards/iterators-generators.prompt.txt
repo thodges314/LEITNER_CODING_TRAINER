@@ -1,21 +1,21 @@
 Write lazy iterator utilities and a custom iterable class using generators:
 
-### `range(start, end, step = 1)`
-- Generator that yields numbers from `start` up to (exclusive) `end` stepping by `step`.
+### `range(start: number, end: number, step?: number): Generator<number, void, unknown>`
+- Generator that yields numbers from `start` up to (exclusive) `end` stepping by `step` (default: `1`).
 - Works with positive steps (`i < end`), negative steps (`i > end`), and infinite upper bounds (`end = Infinity`).
 
-### `take(iterable, n)`
+### `take<T>(iterable: Iterable<T>, n: number): Generator<T, void, unknown>`
 - Generator that yields the first `n` items from `iterable`.
 - Must not consume more than `n` items and must close the source iterator when leaving early.
 
-### `mapIter(iterable, fn)`
+### `mapIter<T, U>(iterable: Iterable<T>, fn: (item: T) => U): Generator<U, void, unknown>`
 - Generator that lazily transforms each item by yielding `fn(item)`.
 
-### `zip(...iterables)`
+### `zip(...iterables: Iterable<any>[]): Generator<any[], void, unknown>`
 - Generator that pairs corresponding elements from multiple iterables into tuples `[a, b, ...]`.
 - Stops as soon as the shortest iterable is exhausted, properly closing iterators in a `finally` block.
 
-### `Countdown`
-- Class with `constructor(n)` whose instances are iterable via `[Symbol.iterator]()`.
+### `class Countdown(n: number)`
+- Class with `constructor(n: number)` whose instances are iterable via `[Symbol.iterator](): Generator<number, void, unknown>`.
 - Yields `n, n - 1, ..., 1`.
 - Must be re-iterable (can be iterated multiple times independently).

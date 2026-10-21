@@ -52,7 +52,7 @@ export const MASTER_MERGE_SAFE = true;
 export const TRACK_STATS: TrackStats[] = [
   { track: 'algorithms', total: 77, completed: 77, status: 'COMPLETE' },
   { track: 'async-js', total: 21, completed: 21, status: 'COMPLETE' },
-  { track: 'js-language', total: 25, completed: 14, status: 'IN_PROGRESS' },
+  { track: 'js-language', total: 25, completed: 18, status: 'IN_PROGRESS' },
   { track: 'typescript-patterns', total: 14, completed: 0, status: 'PLANNED' },
   { track: 'js-utilities', total: 37, completed: 0, status: 'PLANNED' },
   { track: 'dom-browser', total: 20, completed: 0, status: 'PLANNED' },
@@ -62,7 +62,7 @@ export const TRACK_STATS: TrackStats[] = [
 ];
 
 /**
- * 3. COMPLETED BATCHES (Batches 1–18: 112 cards total)
+ * 3. COMPLETED BATCHES (Batches 1–19: 116 cards total)
  */
 export const COMPLETED_BATCHES: BatchDefinition[] = [
   {
@@ -339,18 +339,11 @@ export const COMPLETED_BATCHES: BatchDefinition[] = [
       'weak-tag-seen',
     ],
   },
-];
-
-/**
- * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 19–48: 159 cards total)
- */
-export const REMAINING_BATCHES: BatchDefinition[] = [
-  // --- js-language track (11 cards remaining, Batches 19–20) ---
   {
     batchNumber: 19,
     title: 'Weak Collections & Iterators',
     track: 'js-language',
-    status: 'planned',
+    status: 'completed',
     cardCount: 4,
     cardIds: [
       'weakmap-memoize-object',
@@ -359,6 +352,13 @@ export const REMAINING_BATCHES: BatchDefinition[] = [
       'iterators-generators',
     ],
   },
+];
+
+/**
+ * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 20–48: 155 cards total)
+ */
+export const REMAINING_BATCHES: BatchDefinition[] = [
+  // --- js-language track (7 cards remaining, Batch 20) ---
   {
     batchNumber: 20,
     title: 'Iterators, Coroutines & Proxies',

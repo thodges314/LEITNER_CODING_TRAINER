@@ -1,13 +1,13 @@
 Implement cycle detection and object graph traversal using `WeakSet`:
 
-### `hasCycle(value)`
+### `hasCycle(value: unknown): boolean`
 - Traverses properties of `value` to determine if an active reference cycle exists (e.g., `a.self = a`, `a -> b -> a`, or an array containing itself).
 - Returns `true` if an ancestor on the current traversal path is encountered again.
 - Diamond dependencies (the same object reachable through multiple distinct branches) are **not** cycles and must return `false`.
 - Primitives and `null` return `false`.
 - Uses `WeakSet` instances to track the active traversal path and fully explored nodes.
 
-### `countObjects(root)`
+### `countObjects(root: unknown): number`
 - Counts the number of distinct objects and arrays reachable from `root` (including `root` itself).
 - Each unique object reference is counted exactly once, safely handling cycles and shared subtrees.
 - Returns `0` if `root` is a primitive or `null`.

@@ -1,3 +1,17 @@
-Without using # fields, closures-per-instance or properties on the instance, keep each instance's state in module-level WeakMaps.
+Without using # fields, closures-per-instance or properties on the instance, keep each instance's state in module-level `WeakMap`s.
 
-Write class Counter(start = 0) with increment(), decrement(), reset() (back to the start value) and a getter `value`; and class Stack with push(x), pop() (undefined when empty), peek() and a getter `size`. Object.keys(instance) must be [] and JSON.stringify(instance) must be '{}'.
+### `class Counter(start?: number)`
+- Methods:
+  - `increment(): this`
+  - `decrement(): this`
+  - `reset(): this` (resets back to the constructor's `start` value)
+  - `get value(): number`
+
+### `class Stack<T = unknown>()`
+- Methods:
+  - `push(x: T): void`
+  - `pop(): T | undefined`
+  - `peek(): T | undefined`
+  - `get size(): number`
+
+`Object.keys(instance)` must be `[]` and `JSON.stringify(instance)` must be `'{}'`.

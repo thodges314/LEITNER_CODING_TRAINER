@@ -1,11 +1,11 @@
 Implement object-keyed caching and stable identity tracking using `WeakMap`:
 
-### `memoizeByObject(fn)`
+### `memoizeByObject<A extends unknown[], R>(fn: (...args: A) => R): (...args: A) => R`
 - Returns a wrapper function that caches `fn`'s return value in a `WeakMap` keyed by the reference identity of the **first argument**.
 - Passing the same object returns the cached result without re-invoking `fn` (even if the cached value is `undefined`).
 - If the first argument is not an object or function (e.g., primitives or `null`), bypasses caching and calls `fn` on every invocation.
 
-### `idOf(obj)`
+### `idOf(obj: object): number`
 - Returns a stable, positive integer ID for each object reference.
 - Passing the same object reference always yields the identical ID.
 - Each newly encountered object receives the next integer in sequence (`1, 2, 3, ...`).
