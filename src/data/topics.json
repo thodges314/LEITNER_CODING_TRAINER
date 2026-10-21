@@ -5947,13 +5947,13 @@
         "description": "Renders only the visible window plus overscan",
         "input": "1000 items, itemHeight 20, height 100, overscan 2",
         "expected": "7 listitems: 'Item 0' … 'Item 6'",
-        "callSignature": "<VirtualList items={Array.from({ length: 1000 }, (_, i) => `Item ${i}`)} itemHeight={20} height={100} overscan={2} />"
+        "callSignature": "<VirtualList items={/* 1000 items: 'Item 0'...'Item 999' */} itemHeight={20} height={100} overscan={2} />"
       },
       {
         "description": "The scroll area has the full virtual height",
         "input": "same props",
         "expected": "an inner element with style.height '20000px'",
-        "callSignature": "<VirtualList items={Array.from({ length: 1000 }, (_, i) => `Item ${i}`)} itemHeight={20} height={100} overscan={2} /> (scroll container height: 20000px)"
+        "callSignature": "<VirtualList items={/* 1000 items: 'Item 0'...'Item 999' */} itemHeight={20} height={100} overscan={2} />"
       },
       {
         "description": "Scrolling moves the rendered window",
@@ -5965,13 +5965,13 @@
         "description": "Items are absolutely positioned at index * itemHeight",
         "input": "scrollTop = 2000",
         "expected": "'Item 100' has position absolute, top '2000px', height '20px'",
-        "callSignature": "scrollTop = 2000 (absolute item positions)"
+        "callSignature": "scrollTop = 2000"
       },
       {
         "description": "The window is clamped at the end of the list",
         "input": "scrollTop = 19900",
         "expected": "last rendered is 'Item 999'; at most 10 items",
-        "callSignature": "scrollTop = 19900 (clamped at end)"
+        "callSignature": "scrollTop = 19900"
       },
       {
         "description": "Short lists render everything",
