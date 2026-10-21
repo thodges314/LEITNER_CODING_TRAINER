@@ -1,14 +1,14 @@
 Implement connectivity and topological properties on undirected graphs with `n` vertices (`0` to `n - 1`):
 
-### `countComponents(n, edges)`
+### `countComponents(n: number, edges: [number, number][]): number`
 - Counts the number of connected components in an undirected graph.
 - Isolated vertices (nodes with no incident edges) count as individual components.
 - Returns `0` if `n === 0`.
 
-### `validPath(n, edges, source, destination)`
+### `validPath(n: number, edges: [number, number][], source: number, destination: number): boolean`
 - Determines if there exists a valid path between `source` and `destination`.
 - Returns `true` if connected; `false` otherwise (a vertex always reaches itself).
 
-### `findCenter(edges)`
+### `findCenter(edges: [number, number][]): number`
 - Given an array of edges representing a star graph with `n` vertices and `n - 1` edges, finds the center vertex in O(1) time.
 - The center vertex is connected to every other vertex and appears in every edge.

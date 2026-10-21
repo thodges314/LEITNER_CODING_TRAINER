@@ -1,11 +1,11 @@
 Implement topological sort dependency algorithms for course scheduling with courses labeled `0` through `numCourses - 1`:
 
-### `canFinish(numCourses, prerequisites)`
+### `canFinish(numCourses: number, prerequisites: [number, number][]): boolean`
 - Determines if it is possible to finish all courses without cyclic dependencies.
 - `prerequisites` is an array of `[course, prereq]` pairs indicating `prereq` must be completed before `course`.
 - Returns `true` if the directed dependency graph is acyclic; `false` otherwise.
 
-### `findOrder(numCourses, prerequisites)`
+### `findOrder(numCourses: number, prerequisites: [number, number][]): number[]`
 - Computes a valid topological ordering to complete all courses.
 - Returns `[]` if completing all courses is impossible due to a cycle.
 - Uses Kahn's algorithm (zero in-degree BFS queue), choosing the smallest course label first when multiple courses are ready to ensure deterministic output.

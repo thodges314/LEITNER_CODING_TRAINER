@@ -1,12 +1,12 @@
 Implement grid graph exploration algorithms using depth-first search:
 
-### `floodFill(image, sr, sc, color)`
+### `floodFill(image: number[][], sr: number, sc: number, color: number): number[][]`
 - Performs a flood fill starting at coordinate `(sr, sc)` on 2D matrix `image`.
 - Replaces all 4-directionally connected cells sharing the starting cell's original value with `color`.
 - If the starting cell already has `color`, returns `image` unmodified.
 - Returns the updated `image`.
 
-### `numIslands(grid)`
+### `numIslands(grid: string[][]): number`
 - Counts the number of distinct 4-directionally connected islands of `'1'`s in a 2D grid of `'0'` and `'1'` characters.
 - Diagonal connections do not connect islands.
 - Returns `0` if `grid` is empty (`[]`).

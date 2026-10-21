@@ -91,6 +91,11 @@ const SANDBOX_GLOBALS = `
     right: TreeNode<T> | null;
     constructor(val?: T, left?: TreeNode<T> | null, right?: TreeNode<T> | null);
   }
+  declare class GraphNode<T = any> {
+    val: T;
+    neighbors: GraphNode<T>[];
+    constructor(val?: T, neighbors?: GraphNode<T>[]);
+  }
   declare module 'react' {
     const React: any;
     export = React;

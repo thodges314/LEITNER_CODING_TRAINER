@@ -1,16 +1,16 @@
 Implement deep graph cloning, coloring, and tree-validation algorithms:
 
-### `cloneGraph(node)`
-- Deep copies a connected undirected graph where each node is `{ val, neighbors: [] }`.
+### `cloneGraph(node: GraphNode | null): GraphNode | null`
+- Deep copies a connected undirected graph where each node is `{ val: number, neighbors: GraphNode[] }`.
 - Preserves neighbor ordering; cycles must be handled safely without infinite loops.
 - No cloned node may share reference identity with any original node.
 - Returns the cloned node corresponding to `node` (or `null` if `node` is `null`).
 
-### `isBipartite(graph)`
+### `isBipartite(graph: number[][]): boolean`
 - Determines whether an undirected graph given as an adjacency list `graph[i]` is bipartite.
 - A graph is bipartite if its vertices can be partitioned into two independent sets such that every edge joins different sets (2-colorable).
 - Properly checks all components; returns `true` for empty or disconnected bipartite graphs.
 
-### `validTree(n, edges)`
+### `validTree(n: number, edges: [number, number][]): boolean`
 - Checks whether `n` vertices (`0` through `n - 1`) and undirected `edges` form a single valid tree.
 - A graph is a valid tree if it is fully connected and contains no cycles (exactly `n - 1` edges).
