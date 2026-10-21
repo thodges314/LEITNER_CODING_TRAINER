@@ -1,1 +1,10 @@
-Implement retry(fn, { retries = 3, baseDelay = 20, factor = 2, signal }) for an async fn. It calls fn at most retries + 1 times (1 initial attempt + `retries` retries). Wait baseDelay * factor^n ms before retry n+1 (baseDelay, then baseDelay * factor, ...). Resolve with the first successful result; if every attempt fails, reject with the last error. If the AbortSignal is already aborted, reject without calling fn; if it aborts during a backoff wait, stop waiting immediately and reject with the abort reason (an AbortError).
+Implement `retry(fn, { retries = 3, baseDelay = 20, factor = 2, signal } = {})` for an async function `fn`:
+
+- **Execution Limits**: Invokes `fn` at most `retries + 1` times (1 initial attempt + `retries` retry attempts).
+- **Exponential Backoff**: Waits `baseDelay * (factor ** n)` ms before attempt `n + 1` (e.g. `baseDelay`, then `baseDelay * factor`, etc.).
+- **Resolution & Rejection**:
+  - Resolves immediately with the first successful result.
+  - If all attempts fail, rejects with the error thrown on the final attempt.
+- **`AbortSignal` Support**:
+  - If `signal` is already aborted on entry, rejects immediately without calling `fn`.
+  - If `signal` aborts during a backoff delay, terminates waiting immediately and rejects with the signal's abort reason (`AbortError`).
