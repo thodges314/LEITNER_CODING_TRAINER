@@ -1,3 +1,13 @@
-Nodes look like { val, left, right } (missing children are null or undefined).
+Implement recursive binary tree calculations on nodes shaped `{ val, left, right }`:
 
-Write maxDepth(root) (number of nodes on the longest root-to-leaf path; 0 for an empty tree), sumTree(root) (sum of all values) and countLeaves(root).
+### `maxDepth(root)`
+- Computes the maximum depth of the binary tree (number of nodes along the longest root-to-leaf path).
+- Returns `0` if `root` is `null` or `undefined`.
+
+### `sumTree(root)`
+- Calculates the sum of all node values (`val`) across the entire tree.
+- Returns `0` if `root` is `null` or `undefined`.
+
+### `countLeaves(root)`
+- Counts the number of leaf nodes in the tree (nodes having neither left nor right children).
+- Returns `0` for an empty tree.

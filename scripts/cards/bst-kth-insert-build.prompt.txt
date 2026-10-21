@@ -1,7 +1,19 @@
-Tree nodes are { val, left, right } (null for a missing child). All trees here are binary search trees.
+Implement operations for Binary Search Trees whose nodes are `{ val, left, right }`:
 
-Write kthSmallest(root, k) (1-indexed, in-order, stop as soon as you reach it) and kthLargest(root, k).
+### `kthSmallest(root, k)`
+- Returns the `k`-th smallest value (1-indexed) in the BST.
+- Performs an in-order traversal (left, current, right) and stops immediately once the `k`-th node is reached.
 
-Write insertIntoBST(root, val): insert a new leaf (values are distinct) and return the root; a null root returns a new node.
+### `kthLargest(root, k)`
+- Returns the `k`-th largest value (1-indexed) in the BST.
+- Performs a reverse in-order traversal (right, current, left) and stops immediately once the `k`-th node is reached.
 
-Write sortedArrayToBST(nums): build a height-balanced BST from a sorted array by always choosing the middle index Math.floor((lo + hi) / 2) as the root of each range (null for []).
+### `insertIntoBST(root, val)`
+- Inserts `val` as a new leaf into the BST and returns the `root`.
+- If `root` is `null`, returns a new node `{ val, left: null, right: null }`.
+- Assumes all values are distinct.
+
+### `sortedArrayToBST(nums)`
+- Converts a sorted array of numbers into a height-balanced BST.
+- Recursively selects the middle index `Math.floor((lo + hi) / 2)` as the subtree root for range `[lo, hi]`.
+- Returns `null` if `nums` is empty (`[]`).

@@ -1,3 +1,19 @@
-Nodes look like { val, left, right }. For a binary search tree (left < node < right, no duplicates): write searchBST(root, val) returning the node holding val or null; insertBST(root, val) inserting val and returning the root (a new node when root is null; an existing value is left alone); findMin(root).
+Implement core Binary Search Tree (BST) operations on nodes shaped `{ val, left, right }` (where `left.val < node.val < right.val`, with no duplicates):
 
-Write findMax(root) returning the smallest/largest value (undefined for an empty tree).
+### `searchBST(root, val)`
+- Searches for a node with value `val` in the BST.
+- Returns the matching node object, or `null` if not found or if `root` is null.
+- Operates in O(h) time complexity.
+
+### `insertBST(root, val)`
+- Inserts `val` into the BST at the appropriate position and returns the tree `root`.
+- If `root` is `null`, returns a new node `{ val, left: null, right: null }`.
+- If `val` already exists in the BST, leaves the tree unchanged and returns `root`.
+
+### `findMin(root)`
+- Traverses to the leftmost node and returns the minimum value (`val`) in the BST.
+- Returns `undefined` if `root` is null (empty tree).
+
+### `findMax(root)`
+- Traverses to the rightmost node and returns the maximum value (`val`) in the BST.
+- Returns `undefined` if `root` is null (empty tree).
