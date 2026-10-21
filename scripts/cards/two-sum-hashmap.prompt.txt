@@ -1,6 +1,6 @@
 Implement the classic two sum lookup algorithm in O(n) time using a hash map:
 
-### `twoSum(nums, target)`
+### `twoSum(nums: number[], target: number): [number, number] | []`
 - Returns indices `[i, j]` (with `i < j`) of two distinct elements in `nums` whose sum equals `target`.
 - Must operate in O(n) time complexity using a single pass with a hash map (`Map`).
 - **Rules**:

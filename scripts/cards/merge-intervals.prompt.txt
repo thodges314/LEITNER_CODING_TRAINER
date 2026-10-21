@@ -1,6 +1,6 @@
 Implement interval merging on an array of `[start, end]` pairs:
 
-### `mergeIntervals(intervals)`
+### `mergeIntervals(intervals: [number, number][]): [number, number][]`
 - Merges all overlapping, contained, or touching intervals:
   - Input may be unsorted: sorts intervals by start position in O(n log n) time.
   - Merges intervals that overlap or touch at an endpoint (e.g., `[1, 4]` and `[4, 5]` merge into `[1, 5]`).

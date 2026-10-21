@@ -1,6 +1,6 @@
 Implement two sum on a pre-sorted array using two pointers in O(n) time and O(1) space:
 
-### `twoSumSorted(numbers, target)`
+### `twoSumSorted(numbers: number[], target: number): [number, number] | []`
 - Given an array `numbers` pre-sorted in ascending order, returns `[index1, index2]` with `index1 < index2` representing the 1-based indices of two elements that sum to `target`.
 - **Constraints & Edge Cases**:
   - Must run in O(n) time and O(1) auxiliary space using opposing pointers.

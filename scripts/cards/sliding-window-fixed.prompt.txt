@@ -1,6 +1,6 @@
 Implement fixed-size sliding window summation in O(n) time:
 
-### `maxSubarraySum(arr, k)`
+### `maxSubarraySum(arr: number[], k: number): number | null`
 - Computes the maximum sum among all contiguous subarrays of length `k`.
 - Operates in O(n) time complexity using a sliding window.
 - Correctly handles negative numbers.

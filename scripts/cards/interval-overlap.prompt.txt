@@ -1,13 +1,13 @@
 Implement interval overlap detection and total span calculations for closed intervals `[start, end]` (where `start <= end` and touching endpoints overlap):
 
-### `overlaps(a, b)`
+### `overlaps(a: [number, number], b: [number, number]): boolean`
 - Returns `true` if closed intervals `a` and `b` overlap or touch at their boundaries; otherwise `false`.
 
-### `intersection(a, b)`
+### `intersection(a: [number, number], b: [number, number]): [number, number] | null`
 - Returns the overlapping closed interval `[start, end]` shared by `a` and `b`.
 - Returns `null` if they do not overlap.
 
-### `totalLength(intervals)`
+### `totalLength(intervals: [number, number][]): number`
 - Computes the combined length (`end - start`) of all intervals in `intervals`, counting overlapping spans only once.
 - Safely handles unsorted inputs.
 - Returns `0` for empty intervals.

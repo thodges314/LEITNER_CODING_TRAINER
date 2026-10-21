@@ -1,13 +1,13 @@
 Implement classic string inspection algorithms:
 
-### `isAnagram(a, b)`
+### `isAnagram(a: string, b: string): boolean`
 - Returns `true` if `a` and `b` contain identical character counts (case-sensitive; spaces and symbols count).
 - Returns `false` if their lengths or character counts differ.
 
-### `isPalindrome(s)`
+### `isPalindrome(s: string): boolean`
 - Returns `true` if string `s` reads the same forwards and backwards after stripping all non-alphanumeric characters and ignoring letter casing.
 - An empty string `''` is considered a valid palindrome (`true`).
 
-### `longestCommonPrefix(words)`
+### `longestCommonPrefix(words: string[]): string`
 - Finds the longest string prefix common to all strings in the `words` array.
 - Returns an empty string `''` if `words` is empty or if there is no common prefix.

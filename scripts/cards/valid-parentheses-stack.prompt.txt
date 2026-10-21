@@ -1,6 +1,6 @@
 Implement bracket validation using a stack:
 
-### `isValidParentheses(s)`
+### `isValidParentheses(s: string): boolean`
 - Determines whether a string consisting of `(`, `)`, `{`, `}`, `[`, and `]` has valid bracket nesting.
 - **Rules**:
   - Open brackets must be closed by the matching bracket type (`()` `{}` `[]`).
