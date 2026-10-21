@@ -41,7 +41,7 @@ npm run build      # type-check + production build into dist/
   never turn a failing harness into a pass. You can always override the verdict by hand (for example when the AI
   is wrong, or for harnesses that need the network).
 - **Offline mode**: with no API key, the result is harness-only plus advisory structural notes.
-- **TypeScript mode**: strict type-checking with the TypeScript compiler, loaded lazily on first use.
+- **TypeScript mode**: strict type-checking with the TypeScript compiler (loaded lazily on first use), ambient data structures (`ListNode`, `TreeNode`), and support for dedicated `.ref.ts` solutions with context-aware language reveal alongside the universal JavaScript foundation.
 - **Persistence**: seed content from `src/data/topics.json` is merged into your stored deck on load. Progress is
   kept, content updates flow in, new seed cards are added, and seed cards you delete stay deleted.
 - **Timed Recall Mode** (`src/lib/timedMode.ts`): Toggle in Settings to simulate realistic time-pressured interview rounds.
@@ -62,26 +62,23 @@ Settings accepts Gemini, OpenAI, Groq, OpenRouter, or any OpenAI-compatible endp
 - **Key Prefix Detection**: Pasting or loading a key with recognizable prefixes (`gsk_` for Groq, `AIzaSy` for Gemini, `sk-or-` for OpenRouter, `sk-` for OpenAI) automatically configures the appropriate provider and model.
 - Keys are kept locally in your browser's `localStorage` and sent only to the provider you select. Use restricted keys.
 
-## Content
+## Content & Authoring Pipeline
 
-Cards live in `src/data/topics.json` (`promptSeed`, `starterCode`, `testHarness`, `referenceSolution`, `testCases`).
-Harnesses report with `console.log('label:', cond ? 'PASS' : 'FAIL')`.
-
-Helper scripts are in `scripts/`:
-
-- `scripts/testcases/*.mjs` holds the hand-written input/output pairs for every card (the "Target Contract" table).
-  `scripts/cards/<id>.{prompt.txt,ref.js,harness.js,extra.js}` hold prompts, reference solutions and hand-written harnesses.
-  `npm run build:cards` regenerates `promptSeed`, the reference solution, `testCases` and `testHarness` in `topics.json`.
+The deck includes **271 cards** across 9 tracks (218 default + 53 in the optional `algorithms-advanced` pack) with **1,934 test cases**:
+- **100% Structured Markdown Instructions**: Every card features clean GitHub-flavored Markdown instructions detailing the problem description, target signature, parameters, return value, constraints, and edge cases.
+- **Authoring Model**: Cards are primarily AI-written through structured batch pipelines into `scripts/cards/` and `scripts/testcases/`. Rather than relying on unverified generators, every card is gated by automated test runners, contract extraction, reference validation, empty-solution rejection, and mutation test verification.
+- **Dual-Solution Architecture**: Reference solutions are authored in `scripts/cards/<id>.ref.js` and optionally `<id>.ref.ts`.
+- `scripts/testcases/*.mjs` holds the input/output pairs for every card (the "Target Contract" table).
+  `scripts/cards/<id>.{prompt.txt,ref.js,ref.ts,harness.js,extra.js}` hold prompts, reference solutions and specialized harnesses.
+  `npm run build:cards` regenerates `promptSeed`, the reference solutions, `testCases` and `testHarness` in `topics.json`.
   Harnesses are generated from the cases (each case becomes one `$test.run(...)` assertion) unless a card has a
   hand-written `harness.js` (React/DOM cards), and `extra.js` appends type-level (`@ts-expect-error`) checks for TS cards.
 - Harness globals: `$test` (`run`, `rejects`, `logs`, `check`, `equal`, `sleep`) and `$dom` (`render`, `renderHook`,
   `renderError`, `fire.click/change/keyDown/submit/focus`, `wait`, `q`, `qa`, `intersect`, `observers`). They render with
   the page's real DOM in the browser and jsdom in tests, with a mock `IntersectionObserver` and a deterministic `fetch`.
   Built-in prototypes patched by a solution (polyfill cards) are restored after each run.
-- The old `generate_all_fixtures.cjs` generator was removed (it corrupted cards); cards are authored in `scripts/cards` and built with `npm run build:cards`.
 
-`src/lib/seedCards.test.ts` runs every card's harness against its reference solution (must pass), checks that every documented
-case is asserted under the same label, and checks that an empty solution does NOT pass.
+The test suite (`1,126+ Vitest tests` + `589 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
 
 ## Deploy
 
