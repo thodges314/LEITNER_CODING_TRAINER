@@ -5,8 +5,9 @@
 The Leitner Coding Trainer provides first-class support for both **JavaScript runtime mastery** (closures, prototypes, event loop, dynamic DOM) and **TypeScript engineering excellence** (strict typing, generics, interfaces, discriminated unions).
 
 ### Core Principles
+
 1. **JavaScript is a Permanent First-Class Citizen:** JavaScript solutions are never deprecated or obscured with ugly `as any` type workarounds. Pure prototype and dynamic metaprogramming cards remain JS-first.
-2. **Context-Aware Solution Reveal:** When a user clicks *"Reveal Suggested Solution"*, they see the solution in the language mode they practiced in:
+2. **Context-Aware Solution Reveal:** When a user clicks _"Reveal Suggested Solution"_, they see the solution in the language mode they practiced in:
    - **JS Mode (`executionMode === 'js'`)** $\rightarrow$ Clean, idiomatic JavaScript (`referenceSolution`).
    - **TS Mode (`executionMode === 'ts'`)** $\rightarrow$ Strongly typed TypeScript (`referenceSolutionTs`), with graceful fallback to JS if a card does not have a dedicated TS implementation.
 3. **No Implicit `any` Friction:** Users in TS mode are never greeted with empty buffers that trigger `TS7006: Parameter implicitly has an 'any' type` on their first line of code.
@@ -22,6 +23,7 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 > **YES. Absolutely, safely, and cleanly at any time.**
 
 ### Why It Is 100% Safe to Merge to Master:
+
 1. **Zero Half-Migrated State:**  
    The execution engine checks `card.referenceSolutionTs`. If present, the UI enables the dual JS/TS toggle and validates TypeScript compilation against strict rules. If absent, the card seamlessly executes in standard JavaScript mode with no errors or missing types.
 2. **Backwards Compatibility:**  
@@ -49,18 +51,18 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 
 ### Track Completion Status
 
-| Track | Cards Total | TS Completed | % Complete | Status |
-| :--- | :---: | :---: | :---: | :--- |
-| **`algorithms`** | 77 | 77 | 100.0% | **COMPLETE** (Batches 1–11) |
-| **`async-js`** | 21 | 21 | 100.0% | **COMPLETE** (Batches 12–15) |
-| **`js-language`** | 25 | 25 | 100.0% | **COMPLETE** (Batches 16–20) |
-| **`typescript-patterns`** | 14 | 14 | 100.0% | **COMPLETE** (Batches 21–23) |
-| **`js-utilities`** | 37 | 10 | 27.0% | In Progress (Batches 24–25 done, Batches 26–30 remaining) |
-| **`dom-browser`** | 20 | 0 | 0.0% | Planned (Batches 31–34) |
-| **`react`** | 27 | 0 | 0.0% | Planned (Batches 35–39) |
-| **`react-components`** | 45 | 0 | 0.0% | Planned (Batches 40–47) |
-| **`testing-tooling`** | 5 | 0 | 0.0% | Planned (Batch 48) |
-| **TOTAL** | **271** | **147** | **54.2%** | **48 Batches Total** |
+| Track                     | Cards Total | TS Completed | % Complete | Status                                                    |
+| :------------------------ | :---------: | :----------: | :--------: | :-------------------------------------------------------- |
+| **`algorithms`**          |     77      |      77      |   100.0%   | **COMPLETE** (Batches 1–11)                               |
+| **`async-js`**            |     21      |      21      |   100.0%   | **COMPLETE** (Batches 12–15)                              |
+| **`js-language`**         |     25      |      25      |   100.0%   | **COMPLETE** (Batches 16–20)                              |
+| **`typescript-patterns`** |     14      |      14      |   100.0%   | **COMPLETE** (Batches 21–23)                              |
+| **`js-utilities`**        |     37      |      10      |   27.0%    | In Progress (Batches 24–25 done, Batches 26–30 remaining) |
+| **`dom-browser`**         |     20      |      0       |    0.0%    | Planned (Batches 31–34)                                   |
+| **`react`**               |     27      |      0       |    0.0%    | Planned (Batches 35–39)                                   |
+| **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                                   |
+| **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                        |
+| **TOTAL**                 |   **271**   |   **147**    | **54.2%**  | **48 Batches Total**                                      |
 
 ---
 
@@ -69,6 +71,7 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 All 147 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
+
 - **Batch 1 (DSA Foundations — 8 cards):** `binary-search-exact`, `two-pointer-sorted-sum`, `sliding-window-fixed`, `valid-parentheses-stack`, `merge-intervals`, `two-sum-hashmap`, `interval-overlap`, `anagram-palindrome`.
 - **Batch 2 (Trees & BSTs — 9 cards):** `bst-search-insert`, `bst-validate-lca-invert`, `tree-depth-sum`, `tree-diameter-balanced`, `tree-level-order`, `tree-max-path-sum`, `tree-path-sum`, `tree-build-serialize`, `tree-traversal-dom`.
 - **Batch 3 (Linked Lists, Stacks & Heaps — 13 cards):** `reverse-linked-list`, `linked-list-cycle-merge`, `list-add-numbers`, `list-remove-reorder`, `list-reverse-k-group`, `min-stack`, `monotonic-stack-basics`, `monotonic-stack-histogram`, `heap-array-basics`, `min-heap-class`, `heap-kth-largest`, `heap-median-stream`, `heap-merge-k-lists`.
@@ -82,12 +85,14 @@ All 147 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 11 (Tries, Greedy & Two Pointers — 5 cards):** `trie-prefix-tree`, `trie-nested-object`, `greedy-intervals-circuit`, `jump-game-greedy`, `container-water-two-pointer`.
 
 ### Async JavaScript Track (21 Cards — 100% Complete)
+
 - **Batch 12 (Core Promises & Delays — 5 cards):** `sleep-and-delay`, `promise-chaining-syntax`, `event-loop-order`, `promisify-callback`, `promise-all-by-hand`.
 - **Batch 13 (Combinators & Polyfills — 5 cards):** `promise-all-polyfill`, `promise-all-vs-settled`, `promise-any-aggregate`, `run-in-sequence`, `promise-class-scratch`.
 - **Batch 14 (Networking & Cancellation — 5 cards):** `async-fetch-error-handling`, `fetch-abort-controller`, `cancelable-promise-abort`, `fetch-timeout-dedupe`, `polling-exponential-backoff`.
 - **Batch 15 (Concurrency, Queues & Middleware — 6 cards):** `promise-pool`, `retry-with-backoff`, `async-queue-scheduler`, `express-middleware-chain`, `compose-middleware`, `async-generator-pagination`.
 
 ### JavaScript Language Mechanics Track (25 Cards — 100% Complete)
+
 - **Batch 16 (`this`, Scope & Function Polyfills — 5 cards):** `bind-call-apply`, `closures-private-state`, `bind-method-partial`, `this-context-binding`, `hoisting-tdz-scope`.
 - **Batch 17 (Object Prototypes & Constructor Inheritance — 5 cards):** `new-instanceof-create`, `manual-prototype-linking`, `proto-chain-hasinstance`, `proto-object-create`, `copy-descriptors-mixin`.
 - **Batch 18 (Property Descriptors & Templates — 4 cards):** `descriptor-basics`, `getter-setter-pairs`, `tagged-template-literals`, `weak-tag-seen`.
@@ -95,11 +100,13 @@ All 147 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 20 (Iterators, Coroutines & Proxies — 7 cards):** `iterable-range-class`, `generators-coroutines`, `symbol-async-iterator`, `proxy-default-logging`, `proxy-negative-index`, `proxy-revocable-readonly`, `proxy-validation-traps`.
 
 ### TypeScript Patterns Track (14 Cards — 100% Complete)
+
 - **Batch 21 (Generics & Narrowing — 5 cards):** `ts-identity-first-generics`, `ts-narrowing-typeof-in`, `ts-custom-type-guards`, `ts-branded-nominal-types`, `ts-discriminated-unions-exhaustiveness`.
 - **Batch 22 (Utility Types & Conditional Types — 5 cards):** `ts-reimplement-utility-types`, `ts-custom-utility-types`, `ts-infer-conditional-unpack`, `ts-mapped-modifiers-deep-readonly`, `ts-template-literal-strings`.
 - **Batch 23 (Advanced Overloads & Generic Components — 4 cards):** `ts-overloads-exhaustive-narrowing`, `ts-generic-api-client`, `ts-generic-component-props`, `ts-typed-event-emitter`.
 
 ### JavaScript Utilities Track (10 of 37 Cards)
+
 - **Batch 24 (Function Timing & Throttling — 5 cards):** `debounce-implementation`, `throttle-implementation`, `debounce`, `throttle`, `rate-limiter-middleware`.
 - **Batch 25 (Memoization & Functional Patterns — 5 cards):** `memoize-basics`, `memoize`, `curry-compose`, `infinite-currying-sum`, `classnames-utility`.
 
@@ -110,7 +117,8 @@ All 147 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
 ### Track: `js-utilities` (27 cards remaining — Batches 26 to 30)
-*Focus: Generic parameters `<T, R>`, function types, and mapped object constraints.*
+
+_Focus: Generic parameters `<T, R>`, function types, and mapped object constraints._
 
 - **Batch 26: Collections, Maps & Sets (5 cards)**
   - `map-frequency-counter`: Frequency Counter via Native Map
@@ -152,7 +160,8 @@ Every remaining card in the deck is cataloged below into deterministic, conceptu
 ---
 
 ### Track: `dom-browser` (20 cards — Batches 31 to 34)
-*Focus: DOM event types (`KeyboardEvent`, `MouseEvent`), element interfaces, and browser storage models.*
+
+_Focus: DOM event types (`KeyboardEvent`, `MouseEvent`), element interfaces, and browser storage models._
 
 - **Batch 31: Routing & URL Patterns (5 cards)**
   - `parse-path-params`: Parse Path Params from a URL Pattern
@@ -185,7 +194,8 @@ Every remaining card in the deck is cataloged below into deterministic, conceptu
 ---
 
 ### Track: `react` (27 cards — Batches 35 to 39)
-*Focus: Hook signatures (`usePrevious<T>`, `useLocalStorage<T>`), reducer actions, and React 19 types.*
+
+_Focus: Hook signatures (`usePrevious<T>`, `useLocalStorage<T>`), reducer actions, and React 19 types._
 
 - **Batch 35: Core State & Input Hooks (5 cards)**
   - `controlled-vs-uncontrolled-input`: Controlled Search Form
@@ -227,7 +237,8 @@ Every remaining card in the deck is cataloged below into deterministic, conceptu
 ---
 
 ### Track: `react-components` (45 cards — Batches 40 to 47)
-*Focus: React props interfaces (`interface ButtonProps`, `SelectProps<T>`), compound components, and accessibility.*
+
+_Focus: React props interfaces (`interface ButtonProps`, `SelectProps<T>`), compound components, and accessibility._
 
 - **Batch 40: Essential UI Widgets (6 cards)**
   - `star-rating-component`: Star Rating Component
@@ -293,7 +304,8 @@ Every remaining card in the deck is cataloged below into deterministic, conceptu
 ---
 
 ### Track: `testing-tooling` (5 cards — Batch 48)
-*Focus: Typed assertion chains, spy functions, and mock lifecycle hooks.*
+
+_Focus: Typed assertion chains, spy functions, and mock lifecycle hooks._
 
 - **Batch 48: Testing Utilities & Spies (5 cards)**
   - `call-recorder-spy`: A Call-Recording Spy
@@ -307,9 +319,18 @@ Every remaining card in the deck is cataloged below into deterministic, conceptu
 ## 6. Execution Workflow per Batch
 
 Every single batch follows this strict automated loop:
+
 1. **Prompt Typing:** Add explicit TypeScript markdown signature headers (`### fn(arg: Type): ReturnType`) to `scripts/cards/<id>.prompt.txt`.
 2. **Canonical TS Reference:** Implement strict `.ref.ts` solution in `scripts/cards/<id>.ref.ts`.
 3. **Build Cards Pipeline:** Execute `node scripts/build-cards.mjs` to ingest solutions into `src/data/topics.json`.
 4. **Automated Seed Tests:** Execute `npx vitest run src/lib/seedCards.test.ts -t "TypeScript reference solution"` to guarantee 100% passing tests under the dual-mode runtime harness.
 5. **Full Production Verification:** Execute `npm run build` (`eslint .`, `tsc -b`, and `vite build`).
 6. **Git Checkpoint:** Commit with explicit batch description and push directly to `feature/typescript-support`.
+
+> [!NOTE]
+>
+> ### Checkpoint & Quota Pause (21 October 2026)
+>
+> - **State:** Batches 1–25 (147 cards) complete and passing on `feature/typescript-support`.
+> - **WIP Branch:** `wip/batch-26-map-frequency-counter` (contains partial prompt and ref files for `map-frequency-counter`).
+> - **Immediate Resume Step:** Merge `wip/batch-26-map-frequency-counter` back into `feature/typescript-support` and complete the remaining 4 cards of Batch 26 (`set-unique-operations`, `group-by-count-by`, `unique-sort-dedupe`, `custom-array-reduce`).
