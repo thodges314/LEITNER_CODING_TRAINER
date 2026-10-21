@@ -4,4 +4,6 @@ getPresent(): the current value.
 push(value): make value the new present and remember the old present so it can be undone. Pushing a new value also throws away everything that could have been redone. Pushing a value equal to the present (Object.is) does nothing and creates no history entry. Returns the present.
 undo(): go back to the previous present; does nothing when there is nothing to undo. Returns the present.
 redo(): go forward again after an undo; does nothing when there is nothing to redo. Returns the present.
-canUndo() and canRedo(): booleans.
+canUndo().
+
+Write canRedo(): booleans.

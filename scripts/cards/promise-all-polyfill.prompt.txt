@@ -1,1 +1,3 @@
-Implement promiseAll(iterable) so results preserve input order, non-promise values are accepted, an empty iterable resolves to [], and the first rejection rejects the result. Then implement promiseAllSettled(iterable) (resolves to { status, value | reason } objects, never rejects) and promiseRace(iterable) (settles like the first input to settle; an empty iterable stays pending forever).
+Implement promiseAll(iterable) so results preserve input order, non-promise values are accepted, an empty iterable resolves to [], and the first rejection rejects the result. Then implement promiseAllSettled(iterable) (resolves to { status, value | reason } objects, never rejects).
+
+Write promiseRace(iterable) (settles like the first input to settle; an empty iterable stays pending forever).

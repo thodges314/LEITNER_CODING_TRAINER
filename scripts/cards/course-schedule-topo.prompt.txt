@@ -1,1 +1,5 @@
-There are numCourses courses labelled 0..n-1. prerequisites is an array of [course, prereq] pairs meaning prereq must be taken first. Write canFinish(numCourses, prerequisites): true when every course can be finished (the graph has no cycle). Write findOrder(numCourses, prerequisites): an order in which to take all courses, or [] if impossible; use Kahn's algorithm (queue of zero in-degree nodes, taking the smallest label first when several are available so the answer is deterministic).
+There are numCourses courses labelled 0...n-1. prerequisites is an array of [course, prereq] pairs meaning prereq must be taken first.
+
+Write canFinish(numCourses, prerequisites): true when every course can be finished (the graph has no cycle).
+
+Write findOrder(numCourses, prerequisites): an order in which to take all courses, or [] if impossible; use Kahn's algorithm (queue of zero in-degree nodes, taking the smallest label first when several are available so the answer is deterministic).

@@ -1,1 +1,5 @@
-Write partition(s): every way to split a non-empty string into pieces that are all palindromes, as arrays of strings. Write letterCombinations(digits): all strings a phone keypad could spell for a digit string of 2-9 (2 abc, 3 def, 4 ghi, 5 jkl, 6 mno, 7 pqrs, 8 tuv, 9 wxyz); [] for ''. Write restoreIpAddresses(s): every valid IPv4 address obtainable by inserting three dots into the digit string s (four parts, each 0-255, no leading zeros except the single digit 0), as strings. Result order does not matter.
+Write partition(s): every way to split a non-empty string into pieces that are all palindromes, as arrays of strings.
+
+Write letterCombinations(digits): all strings a phone keypad could spell for a digit string of 2-9 (2 abc, 3 def, 4 ghi, 5 jkl, 6 mno, 7 pqrs, 8 tuv, 9 wxyz); [] for ''.
+
+Write restoreIpAddresses(s): every valid IPv4 address obtainable by inserting three dots into the digit string s (four parts, each 0-255, no leading zeros except the single digit 0), as strings. Result order does not matter.

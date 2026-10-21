@@ -100,5 +100,12 @@ hasCycle(h)`;
     const multiline = `const a = [1, 2, 3];\nconst b = a.slice();\n[a, b]`;
     expect(sanitizeCallSignature(multiline)).toBe(multiline);
   });
+
+  it('strips $dom destructuring declarations from test harness inputs', () => {
+    const raw = `const { renderHook, act } = $dom;\nconst h = renderHook(() => useHook());\nh.result.current`;
+    expect(sanitizeCallSignature(raw)).toBe(
+      `const h = renderHook(() => useHook());\nh.result.current`
+    );
+  });
 });
 

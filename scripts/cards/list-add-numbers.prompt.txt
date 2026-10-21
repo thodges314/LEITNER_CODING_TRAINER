@@ -1,1 +1,7 @@
-List nodes are { val, next } (null ends the list). Write addTwoNumbers(l1, l2): the digits are stored in REVERSE order (2 -> 4 -> 3 is 342); return the sum as a new list in the same format, handling different lengths and a final carry. Write oddEvenList(head): group all nodes at odd positions (1st, 3rd, ...) first, then the even positions, keeping relative order, in place and O(1) space. Write getIntersectionNode(a, b): the first NODE (by identity) shared by two lists that merge into one tail, or null if they never meet, without extra memory.
+List nodes are { val, next } (null ends the list).
+
+Write addTwoNumbers(l1, l2): the digits are stored in REVERSE order (2 -> 4 -> 3 is 342); return the sum as a new list in the same format, handling different lengths and a final carry.
+
+Write oddEvenList(head): group all nodes at odd positions (1st, 3rd, ...) first, then the even positions, keeping relative order, in place and O(1) space.
+
+Write getIntersectionNode(a, b): the first NODE (by identity) shared by two lists that merge into one tail, or null if they never meet, without extra memory.

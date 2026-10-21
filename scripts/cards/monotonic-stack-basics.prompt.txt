@@ -1,1 +1,3 @@
-Write nextGreaterElement(nums): for each element the first STRICTLY greater value to its right, or -1 if none (nextGreaterElement([4, 5, 2, 10]) is [5, 10, 10, -1]). Write dailyTemperatures(temps): for each day the number of days until a warmer (strictly higher) temperature, or 0 if there is none. Use a stack of indices that stays in decreasing order of value; both must run in O(n).
+Write nextGreaterElement(nums): for each element the first STRICTLY greater value to its right, or -1 if none (nextGreaterElement([4, 5, 2, 10]) is [5, 10, 10, -1]).
+
+Write dailyTemperatures(temps): for each day the number of days until a warmer (strictly higher) temperature, or 0 if there is none. Use a stack of indices that stays in decreasing order of value; both must run in O(n).

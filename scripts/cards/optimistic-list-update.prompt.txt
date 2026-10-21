@@ -1,4 +1,6 @@
-An optimistic UI shows the result of an action immediately and fixes it when the server answers. Write the pure state helpers (none of them changes its inputs). Items are objects with an id.
+An optimistic UI shows the result of an action immediately and fixes it when the server answers.
+
+Write the pure state helpers (none of them changes its inputs). Items are objects with an id.
 
 toggleLike(post): for a post { id, liked, likes } return a new post with liked flipped and likes one higher (when it was not liked) or one lower (when it was).
 applyOptimistic(items, id, patch): a new array where the item with that id is replaced by a copy with patch merged in and pending: true. All other items stay the very same objects.

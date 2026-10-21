@@ -34,11 +34,11 @@ export default {
     r('onError is called once with the error', "child throws Error('kaput'); onError={fn}", "fn called once with the 'kaput' error"),
   ],
   'a11y-form-field': [
-    r('ToggleButton exposes aria-pressed and reports the toggled value', 'pressed=false, click; then pressed=true, click', "aria-pressed 'false' then 'true'; onPressedChange called with true, then false"),
+    r('ToggleButton exposes aria-pressed and reports the toggled value', "<ToggleButton pressed={false} onPressedChange={fn}>Bold</ToggleButton>", "aria-pressed 'false' then 'true'; onPressedChange called with true, then false"),
     r('FormField links the label to the control', "<FormField label='Email'>{(p) => <input {...p} />}</FormField>", 'label.htmlFor === input.id (non-empty)'),
-    r('Hint and error are referenced by aria-describedby', "hint='We never share it', error='Required'", "aria-describedby = '<hintId> <errorId>' pointing at both paragraphs"),
-    r('An error marks the control aria-invalid and is announced with role="alert"', "error='Required'", "input aria-invalid='true'; <p role='alert'>Required</p> referenced by aria-describedby"),
-    r('Without hint or error there is no aria-describedby or aria-invalid', 'no hint, no error', 'neither attribute on the input; no role=alert'),
+    r('Hint and error are referenced by aria-describedby', "<FormField label='Email' hint='We never share it' error='Required'>{(p) => <input {...p} />}</FormField>", "aria-describedby = '<hintId> <errorId>' pointing at both paragraphs"),
+    r('An error marks the control aria-invalid and is announced with role="alert"', "<FormField label='Email' error='Required'>{(p) => <input {...p} />}</FormField>", "input aria-invalid='true'; <p role='alert'>Required</p> referenced by aria-describedby"),
+    r('Without hint or error there is no aria-describedby or aria-invalid', "<FormField label='Email'>{(p) => <input {...p} />}</FormField>", 'neither attribute on the input; no role=alert'),
   ],
   'load-more-list': [
     r('Loads the first page on mount and shows a loading state', 'mount <LoadMoreList fetchPage={fn} />', "fetchPage(1) called once; <p role='status'> shown; no 'Load more' button"),

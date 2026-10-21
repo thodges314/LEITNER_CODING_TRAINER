@@ -1,1 +1,7 @@
-Write missingNumber(nums): the array holds n distinct numbers from 0..n, return the missing one using XOR of indices and values. Write hammingDistance(a, b): the number of bit positions where two non-negative integers differ. Write countBitsUpTo(n): an array where entry i is the number of 1 bits of i for i = 0..n (use bits[i] = bits[i >> 1] + (i & 1)). Write getBit(n, i) (0 or 1), setBit(n, i), clearBit(n, i) for bit position i (0 is the least significant).
+Write missingNumber(nums): the array holds n distinct numbers from 0...n, return the missing one using XOR of indices and values.
+
+Write hammingDistance(a, b): the number of bit positions where two non-negative integers differ.
+
+Write countBitsUpTo(n): an array where entry i is the number of 1 bits of i for i = 0...n (use bits[i] = bits[i >> 1] + (i & 1)).
+
+Write getBit(n, i) (0 or 1), setBit(n, i), clearBit(n, i) for bit position i (0 is the least significant).

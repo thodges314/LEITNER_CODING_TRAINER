@@ -1,1 +1,7 @@
-There is no built-in heap, so write your own binary heap inside your solution (array-backed, sift up and down, any helper name you like). Write findKthLargest(nums, k): the k-th largest value (duplicates count separately) using a min-heap of size k. Write class KthLargest with constructor(k, nums) and add(val), which inserts a value and returns the current k-th largest. Write lastStoneWeight(stones): repeatedly take the two heaviest stones; equal stones both vanish, otherwise the difference goes back; return the final weight or 0 when none remain.
+There is no built-in heap, so write your own binary heap inside your solution (array-backed, sift up and down, any helper name you like).
+
+Write findKthLargest(nums, k): the k-th largest value (duplicates count separately) using a min-heap of size k.
+
+Write class KthLargest with constructor(k, nums) and add(val), which inserts a value and returns the current k-th largest.
+
+Write lastStoneWeight(stones): repeatedly take the two heaviest stones; equal stones both vanish, otherwise the difference goes back; return the final weight or 0 when none remain.

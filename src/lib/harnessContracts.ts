@@ -221,7 +221,8 @@ export function sanitizeCallSignature(input?: string): string {
     if (
       /^(?:(?:const|let|var)\s+(?:list|toArray|norm|ser|mk|dump|fails|n|brief)\s*=|function\s+(?:list|toArray|norm|ser|mk|dump|fails|n|brief)\b)/.test(
         trimmed
-      )
+      ) ||
+      /^(?:const|let|var)\s*\{[^}]*\}\s*=\s*\$dom;?$/.test(trimmed)
     ) {
       return false;
     }

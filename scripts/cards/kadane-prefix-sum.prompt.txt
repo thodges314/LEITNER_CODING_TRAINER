@@ -1,1 +1,5 @@
-Write maxSubarray(nums): the largest sum of any non-empty contiguous subarray (Kadane's algorithm; works when every number is negative; 0 for an empty array). Write productExceptSelf(nums): an array where element i is the product of all other elements, without using division. Write subarraySum(nums, k): the number of contiguous subarrays whose sum equals k (prefix sums + hash map).
+Write maxSubarray(nums): the largest sum of any non-empty contiguous subarray (Kadane's algorithm; works when every number is negative; 0 for an empty array).
+
+Write productExceptSelf(nums): an array where element i is the product of all other elements, without using division.
+
+Write subarraySum(nums, k): the number of contiguous subarrays whose sum equals k (prefix sums + hash map).

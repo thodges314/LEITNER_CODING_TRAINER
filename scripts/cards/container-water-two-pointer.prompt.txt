@@ -1,1 +1,3 @@
-Write maxArea(heights): choose two vertical lines (index i < j) to form a container; its water area is min(heights[i], heights[j]) * (j - i). Return the maximum area (0 if fewer than two lines), in O(n) with two pointers moving inward from both ends. Write trap(height): given the heights of unit-width bars, the total units of rain water trapped between them (two pointers with leftMax/rightMax; 0 for fewer than three bars).
+Write maxArea(heights): choose two vertical lines (index i < j) to form a container; its water area is min(heights[i], heights[j]) * (j - i). Return the maximum area (0 if fewer than two lines), in O(n) with two pointers moving inward from both ends.
+
+Write trap(height): given the heights of unit-width bars, the total units of rain water trapped between them (two pointers with leftMax/rightMax; 0 for fewer than three bars).

@@ -1,1 +1,5 @@
-Write characterReplacement(s, k): the length of the longest substring that can be turned into one repeated letter by replacing at most k characters (0 for an empty string). Write longestOnes(nums, k): the longest run of 1s in a 0/1 array if you may flip at most k zeros. Write minSubArrayLen(target, nums): the smallest length of a contiguous subarray of positive numbers whose sum is >= target, or 0 if none.
+Write characterReplacement(s, k): the length of the longest substring that can be turned into one repeated letter by replacing at most k characters (0 for an empty string).
+
+Write longestOnes(nums, k): the longest run of 1s in a 0/1 array if you may flip at most k zeros.
+
+Write minSubArrayLen(target, nums): the smallest length of a contiguous subarray of positive numbers whose sum is >= target, or 0 if none.

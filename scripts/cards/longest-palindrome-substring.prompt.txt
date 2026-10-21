@@ -1,1 +1,3 @@
-Write longestPalindrome(s): the longest palindromic substring (the leftmost one when several have the same length; '' for an empty string) using expand-around-center. Write countPalindromicSubstrings(s): the number of palindromic substrings, counting each position range separately ('aaa' has 6; '' has 0).
+Write longestPalindrome(s): the longest palindromic substring (the leftmost one when several have the same length; '' for an empty string) using expand-around-center.
+
+Write countPalindromicSubstrings(s): the number of palindromic substrings, counting each position range separately ('aaa' has 6; '' has 0).

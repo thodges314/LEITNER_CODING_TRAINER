@@ -1,1 +1,7 @@
-Tree nodes are { val, left, right } (null for a missing child). Write hasPathSum(root, target): true when some root-to-LEAF path sums to target (a null tree is false; a node with one child is not a leaf). Write pathSum(root, target): every root-to-leaf path summing to target, as arrays of values, in left-to-right order. Write minDepth(root): the number of nodes on the shortest root-to-leaf path (0 for null; a node with one child must continue down that child).
+Tree nodes are { val, left, right } (null for a missing child).
+
+Write hasPathSum(root, target): true when some root-to-LEAF path sums to target (a null tree is false; a node with one child is not a leaf).
+
+Write pathSum(root, target): every root-to-leaf path summing to target, as arrays of values, in left-to-right order.
+
+Write minDepth(root): the number of nodes on the shortest root-to-leaf path (0 for null; a node with one child must continue down that child).

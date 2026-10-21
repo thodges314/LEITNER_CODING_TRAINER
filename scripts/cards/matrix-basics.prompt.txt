@@ -1,1 +1,3 @@
-Write createMatrix(rows, cols, fill = 0) returning a rows x cols array of arrays where every row is its OWN array (changing one cell must not change others), matrixSum(matrix) returning the sum of every cell (0 for an empty matrix), and diagonalSum(matrix) for a square matrix returning the sum of both diagonals, counting the centre cell of an odd-sized matrix only once.
+Write createMatrix(rows, cols, fill = 0) returning a rows x cols array of arrays where every row is its OWN array (changing one cell must not change others), matrixSum(matrix) returning the sum of every cell (0 for an empty matrix).
+
+Write diagonalSum(matrix) for a square matrix returning the sum of both diagonals, counting the centre cell of an odd-sized matrix only once.

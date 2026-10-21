@@ -1,1 +1,7 @@
-Write reverseWords(s): the words of s in reverse order joined by single spaces, ignoring leading, trailing and repeated spaces ('  hello   world ' becomes 'world hello'; '' stays ''). Write runLengthEncode(s) ('aabccc' becomes 'a2b1c3', every run gets its count, '' stays '') and runLengthDecode(s) (the inverse; counts can have several digits, 'x12' is twelve x's). Write isRotation(a, b): true when b is a rotation of a (same length and b appears in a + a; two empty strings are rotations).
+Write reverseWords(s): the words of s in reverse order joined by single spaces, ignoring leading, trailing and repeated spaces ('  hello   world ' becomes 'world hello'; '' stays '').
+
+Write runLengthEncode(s) ('aabccc' becomes 'a2b1c3', every run gets its count, '' stays '').
+
+Write runLengthDecode(s) (the inverse; counts can have several digits, 'x12' is twelve x's).
+
+Write isRotation(a, b): true when b is a rotation of a (same length and b appears in a + a; two empty strings are rotations).

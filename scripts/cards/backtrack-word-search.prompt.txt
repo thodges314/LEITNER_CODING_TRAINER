@@ -1,1 +1,5 @@
-The board is an array of rows of single-character strings. Write exist(board, word): true when word can be traced through horizontally or vertically adjacent cells without reusing a cell within the same path (mark cells while exploring and restore them when backtracking; do not leave the board changed). Write findWords(board, words): the words from the list that exist on the board, each listed once, in any order.
+The board is an array of rows of single-character strings.
+
+Write exist(board, word): true when word can be traced through horizontally or vertically adjacent cells without reusing a cell within the same path (mark cells while exploring and restore them when backtracking; do not leave the board changed).
+
+Write findWords(board, words): the words from the list that exist on the board, each listed once, in any order.

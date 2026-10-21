@@ -1,1 +1,5 @@
-Implement tree utilities over nodes shaped { id, children?, classList? }: dfsRecursive(root) and dfsIterative(root) (both pre-order, returning the nodes), bfs(root) (level order), getElementsByClassName(root, className) (document order, uses node.classList.contains) and findPath(root, id) returning the array of ids from the root to that node, or null. Be ready to discuss recursion depth limits vs an explicit stack.
+Implement tree utilities over nodes shaped { id, children?, classList? }: dfsRecursive(root).
+
+Write dfsIterative(root) (both pre-order, returning the nodes), bfs(root) (level order), getElementsByClassName(root, className) (document order, uses node.classList.contains).
+
+Write findPath(root, id) returning the array of ids from the root to that node, or null. Be ready to discuss recursion depth limits vs an explicit stack.

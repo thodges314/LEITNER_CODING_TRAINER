@@ -1,1 +1,5 @@
-Do not use BigInt or Number() on the whole strings. Write addBinary(a, b) for two binary strings ('11' + '1' is '100'), addStrings(a, b) for two non-negative decimal strings of any length ('999' + '1' is '1000'), and multiplyStrings(a, b) for two non-negative decimal strings ('123' * '456' is '56088'; any factor '0' gives '0'). Results have no leading zeros except for '0' itself.
+Do not use BigInt or Number() on the whole strings.
+
+Write addBinary(a, b) for two binary strings ('11' + '1' is '100'), addStrings(a, b) for two non-negative decimal strings of any length ('999' + '1' is '1000').
+
+Write multiplyStrings(a, b) for two non-negative decimal strings ('123' * '456' is '56088'; any factor '0' gives '0'). Results have no leading zeros except for '0' itself.

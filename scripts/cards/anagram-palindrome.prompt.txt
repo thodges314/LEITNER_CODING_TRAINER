@@ -1,1 +1,3 @@
-Write isAnagram(a, b) (same letters with the same counts; case-sensitive, spaces count), isPalindrome(s) (ignore case and every non-alphanumeric character; an empty string is a palindrome) and longestCommonPrefix(words) (the longest string that starts every word; '' for an empty array).
+Write isAnagram(a, b) (same letters with the same counts; case-sensitive, spaces count), isPalindrome(s) (ignore case and every non-alphanumeric character; an empty string is a palindrome).
+
+Write longestCommonPrefix(words) (the longest string that starts every word; '' for an empty array).

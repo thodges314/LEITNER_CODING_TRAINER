@@ -5282,7 +5282,7 @@
     "testCases": [
       {
         "description": "ToggleButton exposes aria-pressed and reports the toggled value",
-        "input": "pressed=false, click; then pressed=true, click",
+        "input": "<ToggleButton pressed={false} onPressedChange={fn}>Bold</ToggleButton>",
         "expected": "aria-pressed 'false' then 'true'; onPressedChange called with true, then false"
       },
       {
@@ -5292,17 +5292,17 @@
       },
       {
         "description": "Hint and error are referenced by aria-describedby",
-        "input": "hint='We never share it', error='Required'",
+        "input": "<FormField label='Email' hint='We never share it' error='Required'>{(p) => <input {...p} />}</FormField>",
         "expected": "aria-describedby = '<hintId> <errorId>' pointing at both paragraphs"
       },
       {
         "description": "An error marks the control aria-invalid and is announced with role=\"alert\"",
-        "input": "error='Required'",
+        "input": "<FormField label='Email' error='Required'>{(p) => <input {...p} />}</FormField>",
         "expected": "input aria-invalid='true'; <p role='alert'>Required</p> referenced by aria-describedby"
       },
       {
         "description": "Without hint or error there is no aria-describedby or aria-invalid",
-        "input": "no hint, no error",
+        "input": "<FormField label='Email'>{(p) => <input {...p} />}</FormField>",
         "expected": "neither attribute on the input; no role=alert"
       }
     ],
@@ -5589,7 +5589,7 @@
     "testCases": [
       {
         "description": "Renders a header per column and the first page of rows",
-        "input": "rows: Ada 36, Grace 45, Linus 10, Alan 41, Margaret 9, Dennis 70, Barbara 33; pageSize 3",
+        "input": "<DataTable rows={ROWS} columns={COLUMNS} pageSize={3} />",
         "expected": "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"
       },
       {
@@ -12765,7 +12765,8 @@
       {
         "description": "Breadcrumbs component renders accessible navigation with active label",
         "input": "const { render } = $dom;\nconst r = render(React.createElement(Breadcrumbs, { pathname: '/account' }));\n[r.container.querySelector('nav').getAttribute('aria-label'), r.container.querySelector('span').textContent]",
-        "expected": "['Breadcrumb', 'Account']"
+        "expected": "['Breadcrumb', 'Account']",
+        "callSignature": "<Breadcrumbs pathname='/account' />"
       }
     ],
     "testHarness": "await $test.run(\"generates root breadcrumb with isCurrent true for home path\", async () => {\n  const sleep = $test.sleep;\n  return (generateBreadcrumbs('/'));\n}, () => ([{ path: '/', label: 'Home', isCurrent: true }]));\n\nawait $test.run(\"generates hierarchical breadcrumbs with capitalized default labels\", async () => {\n  const sleep = $test.sleep;\n  return (generateBreadcrumbs('/products/shoes/sneakers'));\n}, () => ([{ path: '/', label: 'Home', isCurrent: false }, { path: '/products', label: 'Products', isCurrent: false }, { path: '/products/shoes', label: 'Shoes', isCurrent: false }, { path: '/products/shoes/sneakers', label: 'Sneakers', isCurrent: true }]));\n\nawait $test.run(\"applies custom label overrides for matching subpaths\", async () => {\n  const sleep = $test.sleep;\n  return (generateBreadcrumbs('/users/123/edit', { '/users/123': 'Alice', '/users/123/edit': 'Profile Settings' }));\n}, () => ([{ path: '/', label: 'Home', isCurrent: false }, { path: '/users', label: 'Users', isCurrent: false }, { path: '/users/123', label: 'Alice', isCurrent: false }, { path: '/users/123/edit', label: 'Profile Settings', isCurrent: true }]));\n\nawait $test.run(\"normalizes multiple and trailing slashes in route paths\", async () => {\n  const sleep = $test.sleep;\n  return (generateBreadcrumbs('//dashboard//analytics/'));\n}, () => ([{ path: '/', label: 'Home', isCurrent: false }, { path: '/dashboard', label: 'Dashboard', isCurrent: false }, { path: '/dashboard/analytics', label: 'Analytics', isCurrent: true }]));\n\nawait $test.run(\"Breadcrumbs component renders accessible navigation with active label\", async () => {\n  const sleep = $test.sleep;\n  const { render } = $dom;\n  const r = render(React.createElement(Breadcrumbs, { pathname: '/account' }));\n  return ([r.container.querySelector('nav').getAttribute('aria-label'), r.container.querySelector('span').textContent]);\n}, () => (['Breadcrumb', 'Account']));",
@@ -12795,27 +12796,32 @@
       {
         "description": "defaults all nodes to unchecked when initial checked list is empty",
         "input": "const { renderHook } = $dom;\nconst tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\nconst h = renderHook(() => useCheckboxTree(tree, []));\n[h.result.current.getStatus('parent'), h.result.current.getStatus('c1')]",
-        "expected": "['unchecked', 'unchecked']"
+        "expected": "['unchecked', 'unchecked']",
+        "callSignature": "const tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\nconst { getStatus } = useCheckboxTree(tree, []);\n[getStatus('parent'), getStatus('c1')]"
       },
       {
         "description": "evaluates parent as indeterminate when only some children are checked",
         "input": "const { renderHook } = $dom;\nconst tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\nconst h = renderHook(() => useCheckboxTree(tree, ['c1']));\n[h.result.current.getStatus('parent'), h.result.current.getStatus('c1'), h.result.current.getStatus('c2')]",
-        "expected": "['indeterminate', 'checked', 'unchecked']"
+        "expected": "['indeterminate', 'checked', 'unchecked']",
+        "callSignature": "const { getStatus } = useCheckboxTree(tree, ['c1']);\n[getStatus('parent'), getStatus('c1'), getStatus('c2')]"
       },
       {
         "description": "evaluates parent as checked when all children are checked",
         "input": "const { renderHook } = $dom;\nconst tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\nconst h = renderHook(() => useCheckboxTree(tree, ['c1', 'c2']));\nh.result.current.getStatus('parent')",
-        "expected": "'checked'"
+        "expected": "'checked'",
+        "callSignature": "useCheckboxTree(tree, ['c1', 'c2']).getStatus('parent')"
       },
       {
         "description": "toggling an unchecked parent checks all of its descendants",
         "input": "const { renderHook, act } = $dom;\nconst tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\nconst h = renderHook(() => useCheckboxTree(tree, []));\nact(() => h.result.current.toggle('parent'));\n[h.result.current.getStatus('parent'), h.result.current.getStatus('c1'), h.result.current.getStatus('c2')]",
-        "expected": "['checked', 'checked', 'checked']"
+        "expected": "['checked', 'checked', 'checked']",
+        "callSignature": "const { toggle, getStatus } = useCheckboxTree(tree, []);\ntoggle('parent');\n[getStatus('parent'), getStatus('c1'), getStatus('c2')]"
       },
       {
         "description": "toggling a checked parent unchecks all of its descendants",
         "input": "const { renderHook, act } = $dom;\nconst tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\nconst h = renderHook(() => useCheckboxTree(tree, ['c1', 'c2']));\nact(() => h.result.current.toggle('parent'));\n[h.result.current.getStatus('parent'), h.result.current.getStatus('c1'), h.result.current.getStatus('c2')]",
-        "expected": "['unchecked', 'unchecked', 'unchecked']"
+        "expected": "['unchecked', 'unchecked', 'unchecked']",
+        "callSignature": "const { toggle, getStatus } = useCheckboxTree(tree, ['c1', 'c2']);\ntoggle('parent');\n[getStatus('parent'), getStatus('c1'), getStatus('c2')]"
       }
     ],
     "testHarness": "await $test.run(\"defaults all nodes to unchecked when initial checked list is empty\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\n  const h = renderHook(() => useCheckboxTree(tree, []));\n  return ([h.result.current.getStatus('parent'), h.result.current.getStatus('c1')]);\n}, () => (['unchecked', 'unchecked']));\n\nawait $test.run(\"evaluates parent as indeterminate when only some children are checked\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\n  const h = renderHook(() => useCheckboxTree(tree, ['c1']));\n  return ([h.result.current.getStatus('parent'), h.result.current.getStatus('c1'), h.result.current.getStatus('c2')]);\n}, () => (['indeterminate', 'checked', 'unchecked']));\n\nawait $test.run(\"evaluates parent as checked when all children are checked\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\n  const h = renderHook(() => useCheckboxTree(tree, ['c1', 'c2']));\n  return (h.result.current.getStatus('parent'));\n}, () => ('checked'));\n\nawait $test.run(\"toggling an unchecked parent checks all of its descendants\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook, act } = $dom;\n  const tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\n  const h = renderHook(() => useCheckboxTree(tree, []));\n  act(() => h.result.current.toggle('parent'));\n  return ([h.result.current.getStatus('parent'), h.result.current.getStatus('c1'), h.result.current.getStatus('c2')]);\n}, () => (['checked', 'checked', 'checked']));\n\nawait $test.run(\"toggling a checked parent unchecks all of its descendants\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook, act } = $dom;\n  const tree = [{ id: 'parent', label: 'P', children: [{ id: 'c1', label: 'C1' }, { id: 'c2', label: 'C2' }] }];\n  const h = renderHook(() => useCheckboxTree(tree, ['c1', 'c2']));\n  act(() => h.result.current.toggle('parent'));\n  return ([h.result.current.getStatus('parent'), h.result.current.getStatus('c1'), h.result.current.getStatus('c2')]);\n}, () => (['unchecked', 'unchecked', 'unchecked']));",
@@ -12844,32 +12850,38 @@
       {
         "description": "initializes left and right lists with initial items",
         "input": "const { renderHook } = $dom;\nconst h = renderHook(() => useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }));\n[h.result.current.left, h.result.current.right]",
-        "expected": "[['A', 'B'], ['C']]"
+        "expected": "[['A', 'B'], ['C']]",
+        "callSignature": "const { left, right } = useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }); [left, right]"
       },
       {
         "description": "toggles selection of items in left column",
         "input": "const { renderHook, act } = $dom;\nconst h = renderHook(() => useTransferList({ initialLeft: ['A', 'B'] }));\nact(() => h.result.current.toggleLeft('A'));\nh.result.current.leftSelected",
-        "expected": "['A']"
+        "expected": "['A']",
+        "callSignature": "const { toggleLeft, leftSelected } = useTransferList({ initialLeft: ['A', 'B'] }); toggleLeft('A'); leftSelected"
       },
       {
         "description": "moves selected items from left to right and clears selection",
         "input": "const { renderHook, act } = $dom;\nconst h = renderHook(() => useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }));\nact(() => h.result.current.toggleLeft('A'));\nact(() => h.result.current.moveRight());\n[h.result.current.left, h.result.current.right, h.result.current.leftSelected]",
-        "expected": "[['B'], ['C', 'A'], []]"
+        "expected": "[['B'], ['C', 'A'], []]",
+        "callSignature": "const { toggleLeft, moveRight, left, right, leftSelected } = useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }); toggleLeft('A'); moveRight(); [left, right, leftSelected]"
       },
       {
         "description": "moves selected items from right to left and clears selection",
         "input": "const { renderHook, act } = $dom;\nconst h = renderHook(() => useTransferList({ initialLeft: ['A'], initialRight: ['B', 'C'] }));\nact(() => h.result.current.toggleRight('B'));\nact(() => h.result.current.moveLeft());\n[h.result.current.left, h.result.current.right]",
-        "expected": "[['A', 'B'], ['C']]"
+        "expected": "[['A', 'B'], ['C']]",
+        "callSignature": "const { toggleRight, moveLeft, left, right } = useTransferList({ initialLeft: ['A'], initialRight: ['B', 'C'] }); toggleRight('B'); moveLeft(); [left, right]"
       },
       {
         "description": "moves all items from left to right",
         "input": "const { renderHook, act } = $dom;\nconst h = renderHook(() => useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }));\nact(() => h.result.current.moveAllRight());\n[h.result.current.left, h.result.current.right]",
-        "expected": "[[], ['C', 'A', 'B']]"
+        "expected": "[[], ['C', 'A', 'B']]",
+        "callSignature": "const { moveAllRight, left, right } = useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }); moveAllRight(); [left, right]"
       },
       {
         "description": "moves all items from right to left",
         "input": "const { renderHook, act } = $dom;\nconst h = renderHook(() => useTransferList({ initialLeft: ['A'], initialRight: ['B', 'C'] }));\nact(() => h.result.current.moveAllLeft());\n[h.result.current.left, h.result.current.right]",
-        "expected": "[['A', 'B', 'C'], []]"
+        "expected": "[['A', 'B', 'C'], []]",
+        "callSignature": "const { moveAllLeft, left, right } = useTransferList({ initialLeft: ['A'], initialRight: ['B', 'C'] }); moveAllLeft(); [left, right]"
       }
     ],
     "testHarness": "await $test.run(\"initializes left and right lists with initial items\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const h = renderHook(() => useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }));\n  return ([h.result.current.left, h.result.current.right]);\n}, () => ([['A', 'B'], ['C']]));\n\nawait $test.run(\"toggles selection of items in left column\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook, act } = $dom;\n  const h = renderHook(() => useTransferList({ initialLeft: ['A', 'B'] }));\n  act(() => h.result.current.toggleLeft('A'));\n  return (h.result.current.leftSelected);\n}, () => (['A']));\n\nawait $test.run(\"moves selected items from left to right and clears selection\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook, act } = $dom;\n  const h = renderHook(() => useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }));\n  act(() => h.result.current.toggleLeft('A'));\n  act(() => h.result.current.moveRight());\n  return ([h.result.current.left, h.result.current.right, h.result.current.leftSelected]);\n}, () => ([['B'], ['C', 'A'], []]));\n\nawait $test.run(\"moves selected items from right to left and clears selection\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook, act } = $dom;\n  const h = renderHook(() => useTransferList({ initialLeft: ['A'], initialRight: ['B', 'C'] }));\n  act(() => h.result.current.toggleRight('B'));\n  act(() => h.result.current.moveLeft());\n  return ([h.result.current.left, h.result.current.right]);\n}, () => ([['A', 'B'], ['C']]));\n\nawait $test.run(\"moves all items from left to right\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook, act } = $dom;\n  const h = renderHook(() => useTransferList({ initialLeft: ['A', 'B'], initialRight: ['C'] }));\n  act(() => h.result.current.moveAllRight());\n  return ([h.result.current.left, h.result.current.right]);\n}, () => ([[], ['C', 'A', 'B']]));\n\nawait $test.run(\"moves all items from right to left\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook, act } = $dom;\n  const h = renderHook(() => useTransferList({ initialLeft: ['A'], initialRight: ['B', 'C'] }));\n  act(() => h.result.current.moveAllLeft());\n  return ([h.result.current.left, h.result.current.right]);\n}, () => ([['A', 'B', 'C'], []]));",
@@ -12898,27 +12910,32 @@
       {
         "description": "returns true while the component is mounted",
         "input": "const { renderHook } = $dom;\nconst h = renderHook(() => useIsMounted());\nh.result.current()",
-        "expected": "true"
+        "expected": "true",
+        "callSignature": "const isMounted = useIsMounted(); isMounted()"
       },
       {
         "description": "maintains stable callback reference identity across rerenders",
         "input": "const { renderHook } = $dom;\nconst h = renderHook(() => useIsMounted());\nconst first = h.result.current;\nh.rerender();\nfirst === h.result.current",
-        "expected": "true"
+        "expected": "true",
+        "callSignature": "const isMounted = useIsMounted(); rerender(); isMounted() === initialRef"
       },
       {
         "description": "returns false after component unmounts",
         "input": "const { renderHook } = $dom;\nconst h = renderHook(() => useIsMounted());\nconst isMounted = h.result.current;\nh.unmount();\nisMounted()",
-        "expected": "false"
+        "expected": "false",
+        "callSignature": "const isMounted = useIsMounted(); unmount(); isMounted()"
       },
       {
         "description": "Still true after a re-render, not only right after the first mount",
         "input": "const { renderHook } = $dom;\nconst h = renderHook(() => useIsMounted());\nh.rerender();\nh.rerender();\nh.result.current()",
-        "expected": "true"
+        "expected": "true",
+        "callSignature": "useIsMounted() across multiple re-renders"
       },
       {
         "description": "Each hook instance tracks its own component",
         "input": "const { renderHook } = $dom;\nconst a = renderHook(() => useIsMounted());\nconst b = renderHook(() => useIsMounted());\nconst isA = a.result.current;\nconst isB = b.result.current;\na.unmount();\nconst out = [isA(), isB()];\nb.unmount();\nout",
-        "expected": "[false, true]"
+        "expected": "[false, true]",
+        "callSignature": "useIsMounted() tracking independent component instances"
       }
     ],
     "testHarness": "await $test.run(\"returns true while the component is mounted\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const h = renderHook(() => useIsMounted());\n  return (h.result.current());\n}, () => (true));\n\nawait $test.run(\"maintains stable callback reference identity across rerenders\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const h = renderHook(() => useIsMounted());\n  const first = h.result.current;\n  h.rerender();\n  return (first === h.result.current);\n}, () => (true));\n\nawait $test.run(\"returns false after component unmounts\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const h = renderHook(() => useIsMounted());\n  const isMounted = h.result.current;\n  h.unmount();\n  return (isMounted());\n}, () => (false));\n\nawait $test.run(\"Still true after a re-render, not only right after the first mount\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const h = renderHook(() => useIsMounted());\n  h.rerender();\n  h.rerender();\n  return (h.result.current());\n}, () => (true));\n\nawait $test.run(\"Each hook instance tracks its own component\", async () => {\n  const sleep = $test.sleep;\n  const { renderHook } = $dom;\n  const a = renderHook(() => useIsMounted());\n  const b = renderHook(() => useIsMounted());\n  const isA = a.result.current;\n  const isB = b.result.current;\n  a.unmount();\n  const out = [isA(), isB()];\n  b.unmount();\n  return (out);\n}, () => ([false, true]));"
@@ -12945,27 +12962,32 @@
       {
         "description": "initializes with matching media query status",
         "input": "const realMatchMedia = window.matchMedia;\nlet cur = true;\nwindow.matchMedia = (q) => ({ matches: cur, media: q, addEventListener() {}, removeEventListener() {} });\nconst { renderHook } = $dom;\nconst h = renderHook(() => useMediaQuery('(min-width: 768px)'));\nconst out = h.result.current;\nwindow.matchMedia = realMatchMedia;\nout",
-        "expected": "true"
+        "expected": "true",
+        "callSignature": "useMediaQuery('(min-width: 768px)')"
       },
       {
         "description": "updates matches state when media query change listener triggers",
         "input": "const realMatchMedia = window.matchMedia;\nlet cur = false;\nlet listener = null;\nwindow.matchMedia = (q) => ({\n  matches: cur,\n  media: q,\n  addEventListener(type, cb) { listener = cb; },\n  removeEventListener() {}\n});\nconst { renderHook, act } = $dom;\nconst h = renderHook(() => useMediaQuery('(prefers-color-scheme: dark)'));\nconst before = h.result.current;\nact(() => { listener({ matches: true }); });\nconst out = [before, h.result.current];\nwindow.matchMedia = realMatchMedia;\nout",
-        "expected": "[false, true]"
+        "expected": "[false, true]",
+        "callSignature": "useMediaQuery('(prefers-color-scheme: dark)') on match change"
       },
       {
         "description": "cleans up change listener on component unmount",
         "input": "const realMatchMedia = window.matchMedia;\nlet removed = false;\nwindow.matchMedia = (q) => ({\n  matches: false,\n  media: q,\n  addEventListener() {},\n  removeEventListener() { removed = true; }\n});\nconst { renderHook } = $dom;\nconst h = renderHook(() => useMediaQuery('(max-width: 600px)'));\nh.unmount();\nwindow.matchMedia = realMatchMedia;\nremoved",
-        "expected": "true"
+        "expected": "true",
+        "callSignature": "useMediaQuery('(max-width: 600px)') on unmount"
       },
       {
         "description": "Returns false when matchMedia is not available",
         "input": "const realMatchMedia = window.matchMedia;\nwindow.matchMedia = undefined;\nconst { renderHook } = $dom;\nconst h = renderHook(() => useMediaQuery('(min-width: 768px)'));\nconst out = h.result.current;\nh.unmount();\nwindow.matchMedia = realMatchMedia;\nout",
-        "expected": "false"
+        "expected": "false",
+        "callSignature": "useMediaQuery('(min-width: 768px)') (when matchMedia is unavailable)"
       },
       {
         "description": "Falls back to addListener/removeListener on legacy browsers",
         "input": "const realMatchMedia = window.matchMedia;\nlet listener = null;\nlet removed = false;\nwindow.matchMedia = (q) => ({\n  matches: false,\n  media: q,\n  addListener(cb) { listener = cb; },\n  removeListener() { removed = true; }\n});\nconst { renderHook, act } = $dom;\nconst h = renderHook(() => useMediaQuery('(max-width: 600px)'));\nconst before = h.result.current;\nact(() => { listener({ matches: true }); });\nconst after = h.result.current;\nh.unmount();\nwindow.matchMedia = realMatchMedia;\n[before, after, removed]",
-        "expected": "[false, true, true]"
+        "expected": "[false, true, true]",
+        "callSignature": "useMediaQuery('(max-width: 600px)') (legacy addListener fallback)"
       }
     ],
     "testHarness": "await $test.run(\"initializes with matching media query status\", async () => {\n  const sleep = $test.sleep;\n  const realMatchMedia = window.matchMedia;\n  let cur = true;\n  window.matchMedia = (q) => ({ matches: cur, media: q, addEventListener() {}, removeEventListener() {} });\n  const { renderHook } = $dom;\n  const h = renderHook(() => useMediaQuery('(min-width: 768px)'));\n  const out = h.result.current;\n  window.matchMedia = realMatchMedia;\n  return (out);\n}, () => (true));\n\nawait $test.run(\"updates matches state when media query change listener triggers\", async () => {\n  const sleep = $test.sleep;\n  const realMatchMedia = window.matchMedia;\n  let cur = false;\n  let listener = null;\n  window.matchMedia = (q) => ({\n    matches: cur,\n    media: q,\n    addEventListener(type, cb) { listener = cb; },\n    removeEventListener() {}\n  });\n  const { renderHook, act } = $dom;\n  const h = renderHook(() => useMediaQuery('(prefers-color-scheme: dark)'));\n  const before = h.result.current;\n  act(() => { listener({ matches: true }); });\n  const out = [before, h.result.current];\n  window.matchMedia = realMatchMedia;\n  return (out);\n}, () => ([false, true]));\n\nawait $test.run(\"cleans up change listener on component unmount\", async () => {\n  const sleep = $test.sleep;\n  const realMatchMedia = window.matchMedia;\n  let removed = false;\n  window.matchMedia = (q) => ({\n    matches: false,\n    media: q,\n    addEventListener() {},\n    removeEventListener() { removed = true; }\n  });\n  const { renderHook } = $dom;\n  const h = renderHook(() => useMediaQuery('(max-width: 600px)'));\n  h.unmount();\n  window.matchMedia = realMatchMedia;\n  return (removed);\n}, () => (true));\n\nawait $test.run(\"Returns false when matchMedia is not available\", async () => {\n  const sleep = $test.sleep;\n  const realMatchMedia = window.matchMedia;\n  window.matchMedia = undefined;\n  const { renderHook } = $dom;\n  const h = renderHook(() => useMediaQuery('(min-width: 768px)'));\n  const out = h.result.current;\n  h.unmount();\n  window.matchMedia = realMatchMedia;\n  return (out);\n}, () => (false));\n\nawait $test.run(\"Falls back to addListener/removeListener on legacy browsers\", async () => {\n  const sleep = $test.sleep;\n  const realMatchMedia = window.matchMedia;\n  let listener = null;\n  let removed = false;\n  window.matchMedia = (q) => ({\n    matches: false,\n    media: q,\n    addListener(cb) { listener = cb; },\n    removeListener() { removed = true; }\n  });\n  const { renderHook, act } = $dom;\n  const h = renderHook(() => useMediaQuery('(max-width: 600px)'));\n  const before = h.result.current;\n  act(() => { listener({ matches: true }); });\n  const after = h.result.current;\n  h.unmount();\n  window.matchMedia = realMatchMedia;\n  return ([before, after, removed]);\n}, () => ([false, true, true]));"
