@@ -1,1 +1,10 @@
-Build class AsyncQueue with add(task), where task is a function returning a promise. add(task) returns a promise for that task's own result, and tasks run strictly one at a time in FIFO order (the next starts only after the previous one finishes). A failing task rejects only its own promise and must not block the tasks queued after it.
+Build a sequential asynchronous task queue:
+
+### `class AsyncQueue`
+- Manages strict serial execution of asynchronous tasks in FIFO order.
+
+### `add(task)`
+- Enqueues `task` (a zero-argument function returning a promise).
+- Returns a `Promise` that settles with the result of that specific task.
+- Tasks execute one at a time: the next task starts only after the previous task has settled.
+- **Fault Tolerance**: If a task fails, only its own returned promise rejects; queued tasks behind it continue executing normally without being blocked or dropped.

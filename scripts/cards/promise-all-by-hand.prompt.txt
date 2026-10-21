@@ -1,1 +1,12 @@
-Without using Promise.all, write myAll(items) that takes an array of values and/or promises and returns a promise that resolves to an array of the results in the SAME ORDER as the input (not completion order). Use a counter of how many have finished. It rejects as soon as any input rejects (with that reason), and myAll([]) resolves to [].
+Without using native `Promise.all`, implement an array concurrency combinator:
+
+### `myAll(items)`
+- Takes an array `items` of values and/or promises.
+- Returns a `Promise` resolving to an array of results in the **exact same index order** as `items` (not order of completion).
+- **Completion Tracking**:
+  - Uses a remaining counter to track how many items have resolved.
+  - Resolves when all items have finished.
+- **Immediate Rejection**:
+  - Rejects as soon as any item's promise rejects (with that rejection reason).
+- **Edge Case**:
+  - `myAll([])` resolves immediately to `[]`.
