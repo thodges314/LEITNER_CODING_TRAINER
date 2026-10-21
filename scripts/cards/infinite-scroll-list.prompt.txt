@@ -1,1 +1,7 @@
-Build InfiniteList({ items, onLoadMore, hasMore, loading }): render the items in a list followed by a sentinel element observed with an IntersectionObserver. When the sentinel is visible, call onLoadMore() — but not while `loading` is true, and not at all once hasMore is false (disconnect the observer then). Disconnect the observer on unmount.
+Build `InfiniteList({ items, onLoadMore, hasMore, loading })`.
+
+- Render `items` in a list followed by a sentinel element observed with an `IntersectionObserver`.
+- When the sentinel intersects (becomes visible), call `onLoadMore()`.
+- Do not call `onLoadMore()` while `loading` is `true`.
+- When `hasMore` is `false`, stop loading and disconnect the observer.
+- Always disconnect the observer on unmount.

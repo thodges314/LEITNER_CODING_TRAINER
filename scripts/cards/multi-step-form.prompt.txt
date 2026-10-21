@@ -1,1 +1,8 @@
-Build Wizard({ steps, onSubmit }) with steps [{ title, fields: [{ name, label }] }]. Render one <form> showing <p>Step X of N</p>, <h2> with the step title, and for each field a <label> wrapping a controlled <input name>. Provide <button type="button">Back</button> (disabled on the first step) and <button type="submit"> labelled 'Next' (or 'Submit' on the last step). Submitting the form (Enter or the button) validates the CURRENT step only: if any of its fields is empty after trimming, show <p role="alert">All fields are required</p> and stay; otherwise go to the next step, or on the last step call onSubmit(values) with ALL values entered across the steps. Values typed earlier must still be there after Back/Next. Moving between steps clears the alert.
+Build `Wizard({ steps, onSubmit })` where `steps` is `[{ title, fields: [{ name, label }] }]`.
+
+- Render one `<form>` displaying `<p>Step X of N</p>`, an `<h2>` with the step title, and for each field a `<label>` wrapping a controlled `<input name>`.
+- Controls: Provide `<button type="button">Back</button>` (disabled on the first step) and `<button type="submit">` labelled `'Next'` (or `'Submit'` on the last step).
+- **Validation**: Submitting the form (via `Enter` or the submit button) validates the **CURRENT** step only:
+  - If any of its fields is empty after trimming, show `<p role="alert">All fields are required</p>` and stay on the current step.
+  - Otherwise, advance to the next step, or on the final step call `onSubmit(values)` with **ALL** values entered across all steps.
+- **Persistence**: Values entered in earlier steps must be preserved when navigating `Back` and `Next`. Moving between steps clears the alert message.

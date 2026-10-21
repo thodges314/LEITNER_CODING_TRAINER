@@ -1,1 +1,7 @@
-Build Accordion({ items, allowMultiple = false }) where items is [{ id, title, content }]. Each item renders a heading <h3> containing a <button aria-expanded aria-controls="<panelId>" id="<buttonId>"> with the title, followed by its panel <div role="region" id="<panelId>" aria-labelledby="<buttonId>"> that is rendered ONLY while open (use useId so ids are unique per instance). All panels start closed. Clicking a title opens its panel; by default opening one closes the others; clicking an open title closes it; with allowMultiple several panels may be open.
+Build `Accordion({ items, allowMultiple = false })` where `items` is `[{ id, title, content }]`.
+
+- Each item renders a heading `<h3>` containing a `<button id="<buttonId>" aria-expanded aria-controls="<panelId>">` with the title.
+- Followed by its panel `<div role="region" id="<panelId>" aria-labelledby="<buttonId>">` that is rendered **ONLY** while open. Use `useId` so IDs are unique per component instance.
+- All panels start closed.
+- Clicking a title opens its panel; by default opening one closes the others; clicking an open title closes it.
+- With `allowMultiple={true}`, several panels may remain open simultaneously.

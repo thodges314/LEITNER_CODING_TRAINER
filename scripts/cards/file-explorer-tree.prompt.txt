@@ -1,1 +1,5 @@
-Build FileTree({ nodes, onSelect }). nodes is [{ name, children? }]; an item with a `children` array is a folder. Render <ul role="tree"> with one <li role="treeitem"> per node, each containing a <button> showing the name. Folders start collapsed, carry aria-expanded (false/true) and toggle when their button is clicked; their children render (inside a nested <ul role="group">) ONLY while expanded, and each folder keeps its own state. Files have no aria-expanded; clicking a file calls onSelect with its full path joined by '/', e.g. 'src/components/Button.jsx'.
+Build `FileTree({ nodes, onSelect })` where `nodes` is `[{ name, children? }]`. An item with a `children` array is a folder.
+
+- Render `<ul role="tree">` with one `<li role="treeitem">` per node, each containing a `<button>` showing the name.
+- **Folders**: Start collapsed, carry `aria-expanded` (`false` / `true`), and toggle when their button is clicked. Their children render inside a nested `<ul role="group">` **ONLY** while expanded, with each folder maintaining its own state.
+- **Files**: Have no `aria-expanded`. Clicking a file calls `onSelect` with its full path joined by `'/'`, e.g. `'src/components/Button.jsx'`.

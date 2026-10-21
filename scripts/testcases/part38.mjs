@@ -57,21 +57,27 @@ const bindings = { save: 'Mod+S' };
     c('Uses navigator.clipboard.writeText when it exists and never touches the DOM', `${'const log = [];'}
 const doc = { body: { appendChild() { log.push('append'); }, removeChild() {} }, createElement() { log.push('create'); } };
 const nav = { clipboard: { writeText: async (t) => { log.push('write:' + t); } } };
-(async () => [await copyToClipboard('hello', { navigator: nav, document: doc }), log])()`, "[true, ['write:hello']]"),
+(async () => [await copyToClipboard('hello', { navigator: nav, document: doc }), log])()`, "[true, ['write:hello']]", {
+      callSignature: "await copyToClipboard('hello')",
+    }),
     c('Without the Clipboard API it falls back to a hidden textarea and execCommand("copy")', `const log = [];
 const doc = {
   body: { appendChild(el) { log.push('append'); }, removeChild(el) { log.push('remove'); } },
   createElement(tag) { log.push('create:' + tag); return { value: '', style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, select() { log.push('select'); } }; },
   execCommand(cmd) { log.push('exec:' + cmd); return true; },
 };
-(async () => [await copyToClipboard('hi', { navigator: {}, document: doc }), log])()`, "[true, ['create:textarea', 'append', 'select', 'exec:copy', 'remove']]"),
+(async () => [await copyToClipboard('hi', { navigator: {}, document: doc }), log])()`, "[true, ['create:textarea', 'append', 'select', 'exec:copy', 'remove']]", {
+      callSignature: "await copyToClipboard('hi') // fallback via <textarea> + execCommand('copy')",
+    }),
     c('The textarea holds the text, is readonly and is positioned off screen', `let area;
 const doc = {
   body: { appendChild() {}, removeChild() {} },
   createElement() { area = { value: '', style: {}, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, select() {} }; return area; },
   execCommand() { return true; },
 };
-(async () => { await copyToClipboard('some text', { navigator: {}, document: doc }); return [area.value, 'readonly' in area.attrs, area.style.position, area.style.left]; })()`, "['some text', true, 'fixed', '-9999px']"),
+(async () => { await copyToClipboard('some text', { navigator: {}, document: doc }); return [area.value, 'readonly' in area.attrs, area.style.position, area.style.left]; })()`, "['some text', true, 'fixed', '-9999px']", {
+      callSignature: "await copyToClipboard('some text') // inspect fallback textarea attributes",
+    }),
     c('If writeText rejects (permission denied) the fallback is used', `const log = [];
 const doc = {
   body: { appendChild() {}, removeChild() { log.push('remove'); } },
@@ -79,21 +85,29 @@ const doc = {
   execCommand() { log.push('exec'); return true; },
 };
 const nav = { clipboard: { writeText: () => Promise.reject(new Error('denied')) } };
-(async () => [await copyToClipboard('x', { navigator: nav, document: doc }), log])()`, "[true, ['exec', 'remove']]"),
+(async () => [await copyToClipboard('x', { navigator: nav, document: doc }), log])()`, "[true, ['exec', 'remove']]", {
+      callSignature: "await copyToClipboard('x') // writeText rejects -> falls back to textarea",
+    }),
     c('Resolves false when execCommand reports failure, and still removes the textarea', `const log = [];
 const doc = {
   body: { appendChild() {}, removeChild() { log.push('remove'); } },
   createElement() { return { value: '', style: {}, setAttribute() {}, select() {} }; },
   execCommand() { return false; },
 };
-(async () => [await copyToClipboard('x', { navigator: {}, document: doc }), log])()`, "[false, ['remove']]"),
+(async () => [await copyToClipboard('x', { navigator: {}, document: doc }), log])()`, "[false, ['remove']]", {
+      callSignature: "await copyToClipboard('x') // execCommand returns false",
+    }),
     c('Resolves false (and cleans up) when execCommand throws', `const log = [];
 const doc = {
   body: { appendChild() {}, removeChild() { log.push('remove'); } },
   createElement() { return { value: '', style: {}, setAttribute() {}, select() {} }; },
   execCommand() { throw new Error('not allowed'); },
 };
-(async () => [await copyToClipboard('x', { navigator: {}, document: doc }), log])()`, "[false, ['remove']]"),
-    c('Resolves false when there is no clipboard and no document', `copyToClipboard('x', { navigator: {}, document: null })`, 'false'),
+(async () => [await copyToClipboard('x', { navigator: {}, document: doc }), log])()`, "[false, ['remove']]", {
+      callSignature: "await copyToClipboard('x') // execCommand throws Error",
+    }),
+    c('Resolves false when there is no clipboard and no document', `copyToClipboard('x', { navigator: {}, document: null })`, 'false', {
+      callSignature: "await copyToClipboard('x', { navigator: {}, document: null })",
+    }),
   ],
 };
