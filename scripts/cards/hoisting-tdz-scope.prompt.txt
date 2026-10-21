@@ -1,19 +1,19 @@
 Implement functions demonstrating variable hoisting, Temporal Dead Zone (TDZ), and closure scope in loops:
 
-### `hoistingBehavior()`
+### `hoistingBehavior(): { varBefore: any; fnResult: string }`
 - Returns `{ varBefore: undefined, fnResult: 'hoisted' }`.
 - Demonstrates that `var` declarations are hoisted with `undefined` initialization while function declarations are hoisted with their complete implementation.
 
-### `checkTDZ(fn)`
+### `checkTDZ(fn: () => any): 'ReferenceError' | 'ok' | 'error'`
 - Invokes `fn()` inside a `try...catch` block.
 - Returns `'ReferenceError'` if accessing a variable before initialization throws a `ReferenceError`.
 - Returns `'ok'` if `fn()` executes without error.
 - Returns `'error'` for any other caught error.
 
-### `makeLoopCallbacksVar(n)`
+### `makeLoopCallbacksVar(n: number): (() => number)[]`
 - Creates and returns an array of `n` zero-argument functions inside a `for (var i = 0; i < n; i++)` loop.
 - Calling any function returns the final shared loop value `n`.
 
-### `makeLoopCallbacksLet(n)`
+### `makeLoopCallbacksLet(n: number): (() => number)[]`
 - Creates and returns an array of `n` zero-argument functions inside a `for (let i = 0; i < n; i++)` loop.
 - Calling `fn[k]()` captures its block scope and returns `k`.

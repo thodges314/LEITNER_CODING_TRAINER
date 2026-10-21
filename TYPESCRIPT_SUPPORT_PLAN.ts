@@ -52,7 +52,7 @@ export const MASTER_MERGE_SAFE = true;
 export const TRACK_STATS: TrackStats[] = [
   { track: 'algorithms', total: 77, completed: 77, status: 'COMPLETE' },
   { track: 'async-js', total: 21, completed: 21, status: 'COMPLETE' },
-  { track: 'js-language', total: 25, completed: 0, status: 'PLANNED' },
+  { track: 'js-language', total: 25, completed: 5, status: 'IN_PROGRESS' },
   { track: 'typescript-patterns', total: 14, completed: 0, status: 'PLANNED' },
   { track: 'js-utilities', total: 37, completed: 0, status: 'PLANNED' },
   { track: 'dom-browser', total: 20, completed: 0, status: 'PLANNED' },
@@ -62,7 +62,7 @@ export const TRACK_STATS: TrackStats[] = [
 ];
 
 /**
- * 3. COMPLETED BATCHES (Batches 1–15: 98 cards total)
+ * 3. COMPLETED BATCHES (Batches 1–16: 103 cards total)
  */
 export const COMPLETED_BATCHES: BatchDefinition[] = [
   {
@@ -298,18 +298,11 @@ export const COMPLETED_BATCHES: BatchDefinition[] = [
       'async-generator-pagination',
     ],
   },
-];
-
-/**
- * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 16–48: 173 cards total)
- */
-export const REMAINING_BATCHES: BatchDefinition[] = [
-  // --- js-language track (25 cards, Batches 16–20) ---
   {
     batchNumber: 16,
     title: 'this, Scope & Function Polyfills',
     track: 'js-language',
-    status: 'planned',
+    status: 'completed',
     cardCount: 5,
     cardIds: [
       'bind-call-apply',
@@ -319,6 +312,13 @@ export const REMAINING_BATCHES: BatchDefinition[] = [
       'hoisting-tdz-scope',
     ],
   },
+];
+
+/**
+ * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 17–48: 168 cards total)
+ */
+export const REMAINING_BATCHES: BatchDefinition[] = [
+  // --- js-language track (20 cards remaining, Batches 17–20) ---
   {
     batchNumber: 17,
     title: 'Object Prototypes & Constructor Inheritance',

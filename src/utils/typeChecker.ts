@@ -54,6 +54,11 @@ const SANDBOX_GLOBALS = `
   declare function setInterval(cb: (...args: any[]) => void, ms?: number, ...args: any[]): any;
   declare function clearInterval(id: any): void;
   declare function queueMicrotask(cb: () => void): void;
+  interface Function {
+    myBind(context: any, ...boundArgs: any[]): (...args: any[]) => any;
+    myCall(context: any, ...args: any[]): any;
+    myApply(context: any, args?: any[]): any;
+  }
   declare var React: any;
   declare var ReactDOM: any;
   declare var mount: (componentOrElement: any, props?: any) => void;

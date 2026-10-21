@@ -1,1 +1,8 @@
-Use closures (no classes, no `this`, no module-level state): createCounter({ start = 0, step = 1 } = {}) returns { increment, decrement, reset, value } where the count is private (value() reads it, reset() returns to start) and every counter is independent; once(fn) returns a function that calls fn only the first time and then keeps returning that first result (forwarding arguments); makeAdders(n) returns an array of n functions where the function at index i adds i to its argument (a classic `var`-in-a-loop trap).
+### `createCounter(options?: { start?: number; step?: number }): { increment(): void; decrement(): void; reset(): void; value(): number }`
+### `once<T extends (...args: any[]) => any>(fn: T): (...args: Parameters<T>) => ReturnType<T>`
+### `makeAdders(n: number): ((x: number) => number)[]`
+
+Use closures (no classes, no `this`, no module-level state):
+- `createCounter({ start = 0, step = 1 } = {})` returns `{ increment, decrement, reset, value }` where the count is private (`value()` reads it, `reset()` returns to start) and every counter is independent.
+- `once(fn)` returns a function that calls `fn` only the first time and then keeps returning that first result (forwarding arguments).
+- `makeAdders(n)` returns an array of `n` functions where the function at index `i` adds `i` to its argument (a classic `var`-in-a-loop trap).

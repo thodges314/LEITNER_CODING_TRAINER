@@ -1,15 +1,15 @@
 Implement utilities demonstrating JavaScript context binding, dynamic dispatch, and constructor invocation:
 
-### `createGreeter(name)`
+### `createGreeter(name: string): { name: string; greet(): string; getBoundGreet(): () => string }`
 - Returns an object with:
   - `name`: stored property.
   - `greet()`: returns `'Hello, ' + this.name`.
   - `getBoundGreet()`: returns `greet` permanently bound to this instance, maintaining its receiver context even when detached.
 
-### `invokeWithContext(fn, context, ...args)`
+### `invokeWithContext(fn: (...args: any[]) => any, context: any, ...args: any[]): any`
 - Invokes `fn` with `context` as its `this` value, passing `args`.
 - Must not use `Function.prototype.call` or `Function.prototype.apply` (e.g., use `Reflect.apply(fn, context, args)`).
 
-### `isConstructorCall(TargetClass, ...args)`
+### `isConstructorCall(TargetClass: any, ...args: any[]): boolean`
 - Returns `true` if `new TargetClass(...args)` successfully constructs an instance of `TargetClass` (e.g., via `Reflect.construct`).
 - Returns `false` if `TargetClass` is not constructible or throws when invoked.

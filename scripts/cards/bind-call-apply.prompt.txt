@@ -1,1 +1,5 @@
-Implement Function.prototype.myBind (partial application; a bound function invoked with `new` must ignore the bound `this` and keep the prototype chain intact), Function.prototype.myCall(context, ...args) and Function.prototype.myApply(context, argsArray) WITHOUT using the native bind/call/apply. myCall/myApply must not leave stray properties on the context object.
+### `Function.prototype.myBind(context: any, ...boundArgs: any[]): (...args: any[]) => any`
+### `Function.prototype.myCall(context: any, ...args: any[]): any`
+### `Function.prototype.myApply(context: any, argsArray?: any[]): any`
+
+Implement `Function.prototype.myBind` (partial application; a bound function invoked with `new` must ignore the bound `this` and keep the prototype chain intact), `Function.prototype.myCall(context, ...args)` and `Function.prototype.myApply(context, argsArray)` WITHOUT using the native bind/call/apply. `myCall`/`myApply` must not leave stray properties on the context object.

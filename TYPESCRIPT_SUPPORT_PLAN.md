@@ -43,9 +43,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **98 / 271 (36.2%)**
-- **Cards Remaining:** **173 / 271 (63.8%)**
-- **Total Batches:** 48 batches (15 completed, 33 remaining)
+- **Fully Typed Cards Completed:** **103 / 271 (38.0%)**
+- **Cards Remaining:** **168 / 271 (62.0%)**
+- **Total Batches:** 48 batches (16 completed, 32 remaining)
 
 ### Track Completion Status
 
@@ -53,20 +53,20 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | :--- | :---: | :---: | :---: | :--- |
 | **`algorithms`** | 77 | 77 | 100.0% | **COMPLETE** (Batches 1–11) |
 | **`async-js`** | 21 | 21 | 100.0% | **COMPLETE** (Batches 12–15) |
-| **`js-language`** | 25 | 0 | 0.0% | Next up (Batches 16–20) |
+| **`js-language`** | 25 | 5 | 20.0% | **IN PROGRESS** (Batch 16 done, 17–20 remaining) |
 | **`typescript-patterns`** | 14 | 0 | 0.0% | Planned (Batches 21–23) |
 | **`js-utilities`** | 37 | 0 | 0.0% | Planned (Batches 24–30) |
 | **`dom-browser`** | 20 | 0 | 0.0% | Planned (Batches 31–34) |
 | **`react`** | 27 | 0 | 0.0% | Planned (Batches 35–39) |
 | **`react-components`** | 45 | 0 | 0.0% | Planned (Batches 40–47) |
 | **`testing-tooling`** | 5 | 0 | 0.0% | Planned (Batch 48) |
-| **TOTAL** | **271** | **98** | **36.2%** | **48 Batches Planned** |
+| **TOTAL** | **271** | **103** | **38.0%** | **48 Batches Total** |
 
 ---
 
-## 4. Completed Batches (Batches 1–15: 98 Cards)
+## 4. Completed Batches (Batches 1–16: 103 Cards)
 
-All 98 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 103 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 - **Batch 1 (DSA Foundations — 8 cards):** `binary-search-exact`, `two-pointer-sorted-sum`, `sliding-window-fixed`, `valid-parentheses-stack`, `merge-intervals`, `two-sum-hashmap`, `interval-overlap`, `anagram-palindrome`.
@@ -87,21 +87,17 @@ All 98 cards below have typed prompt headers (`### fn(args): ReturnType`), canon
 - **Batch 14 (Networking & Cancellation — 5 cards):** `async-fetch-error-handling`, `fetch-abort-controller`, `cancelable-promise-abort`, `fetch-timeout-dedupe`, `polling-exponential-backoff`.
 - **Batch 15 (Concurrency, Queues & Middleware — 6 cards):** `promise-pool`, `retry-with-backoff`, `async-queue-scheduler`, `express-middleware-chain`, `compose-middleware`, `async-generator-pagination`.
 
+### JavaScript Language Mechanics Track (5 of 25 Complete)
+- **Batch 16 (`this`, Scope & Function Polyfills — 5 cards):** `bind-call-apply`, `closures-private-state`, `bind-method-partial`, `this-context-binding`, `hoisting-tdz-scope`.
+
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 16–48: 173 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 17–48: 168 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
-### Track: `js-language` (25 cards — Batches 16 to 20)
+### Track: `js-language` (20 cards remaining — Batches 17 to 20)
 *Focus: Clean typing for prototype methods, descriptor definitions, symbol iterators, and proxies.*
-
-- **Batch 16: `this`, Scope & Function Polyfills (5 cards)**
-  - `bind-call-apply`: Function.prototype bind / call / apply Polyfills
-  - `closures-private-state`: Closures: Private State, once, and Loop Capture
-  - `bind-method-partial`: Losing and Keeping this: bindMethod and partial
-  - `this-context-binding`: Context: this Resolution, Detached Methods, Explicit Context Invocation
-  - `hoisting-tdz-scope`: Scope: Hoisting, Temporal Dead Zone, Loop Closure Capture
 
 - **Batch 17: Object Prototypes & Constructor Inheritance (5 cards)**
   - `new-instanceof-create`: Implement new, instanceof and Object.create
