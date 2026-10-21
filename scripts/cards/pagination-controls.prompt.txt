@@ -1,1 +1,13 @@
-Build Pagination({ page, totalPages, onPageChange, siblings = 1 }) as a controlled component. Render <nav aria-label="Pagination"> with <button>Previous</button>, a <ul> of <li> items and <button>Next</button>. The list always shows page 1, the last page and the pages within `siblings` of the current page; between two shown pages: if exactly ONE page is missing show that page, if more are missing show an <li><span>…</span></li> (not clickable). Each page is <li><button>N</button></li>; the current page's button has aria-current="page". Clicking a page calls onPageChange(n); Previous/Next call it with page-1 / page+1 and are disabled on the first/last page.
+Build `Pagination({ page, totalPages, onPageChange, siblings = 1 })` as a controlled component.
+
+- **DOM Structure**: Render `<nav aria-label="Pagination">` containing `<button>Previous</button>`, a `<ul>` of `<li>` items, and `<button>Next</button>`.
+- **Page Display Rules**:
+  - The list always shows page `1`, the last page (`totalPages`), and the pages within `siblings` distance of the current `page`.
+  - Between shown pages: if exactly **ONE** page is missing, render that page number; if more than one page is missing, render an `<li><span>…</span></li>` ellipsis (not clickable).
+- **Page Buttons & ARIA**:
+  - Each page item is `<li><button>N</button></li>`.
+  - The current page's button has `aria-current="page"`.
+- **Navigation Actions**:
+  - Clicking a page button calls `onPageChange(n)`.
+  - `Previous` and `Next` buttons call `onPageChange(page - 1)` / `onPageChange(page + 1)`.
+  - `Previous` is disabled on the first page; `Next` is disabled on the last page.

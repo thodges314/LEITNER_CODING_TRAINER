@@ -1,1 +1,12 @@
-Build Typeahead({ onSelect, fetchSuggestions, delay = 300 }): a text input that debounces typing by `delay` ms, then calls fetchSuggestions(query) (async, returns string[]) and shows the results. Ignore out-of-order responses (only the latest query's results are shown). Keyboard: ArrowDown/ArrowUp move the active option, Enter selects it (onSelect(item), list closes), Escape closes the list. ARIA: the input has role='combobox' with aria-expanded, the list has role='listbox', each item role='option' with aria-selected.
+Build `Typeahead({ onSelect, fetchSuggestions, delay = 300 })`:
+
+- **Input & Search**: A text input that debounces typing by `delay` ms, then calls `fetchSuggestions(query)` (`async`, returns `string[]`) and displays results.
+- **Race Condition Handling**: Ignore out-of-order responses (only the latest query's results are shown).
+- **Keyboard Navigation**:
+  - `ArrowDown` / `ArrowUp` move the active option.
+  - `Enter` selects the active item (`onSelect(item)` and closes list).
+  - `Escape` closes the list.
+- **ARIA**:
+  - The input has `role="combobox"` with `aria-expanded`.
+  - The list has `role="listbox"`.
+  - Each item has `role="option"` with `aria-selected`.

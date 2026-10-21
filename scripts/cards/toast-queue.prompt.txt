@@ -1,1 +1,10 @@
-Build ToastProvider({ children, limit = 3 }) and useToast(). useToast() returns { show, dismiss }: show(message, { duration = 3000 } = {}) adds a toast and returns its numeric id; dismiss(id) removes it. The provider renders its children plus <div role="region" aria-label="Notifications"> containing one <div role="status"> per toast with the message text and a <button aria-label="Dismiss"> that removes only that toast. Toasts appear in creation order; only the newest `limit` are kept; a toast removes itself after `duration` ms (a duration of 0 or Infinity keeps it until dismissed). Clear pending timers when the provider unmounts.
+Build `ToastProvider({ children, limit = 3 })` and `useToast()`:
+
+- **Hook API**: `useToast()` returns `{ show, dismiss }`:
+  - `show(message, { duration = 3000 } = {})`: adds a toast and returns its numeric `id`.
+  - `dismiss(id)`: removes that toast.
+- **DOM Structure**: The provider renders its `children` plus `<div role="region" aria-label="Notifications">` containing one `<div role="status">` per toast with the message text and a `<button aria-label="Dismiss">` that removes only that toast.
+- **Queue & Timing Rules**:
+  - Toasts appear in creation order; only the newest `limit` are kept.
+  - A toast removes itself after `duration` ms (a duration of `0` or `Infinity` keeps it until manually dismissed).
+  - Clear pending timers when the provider unmounts.

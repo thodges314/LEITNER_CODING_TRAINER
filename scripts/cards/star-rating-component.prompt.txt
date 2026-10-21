@@ -1,1 +1,10 @@
-Build StarRating({ value = 0, onChange, max = 5 }) as a controlled component. Render <div role="radiogroup" aria-label="Rating"> containing `max` <button type="button" role="radio"> stars, each with aria-label "1 star", "2 stars", ... and aria-checked true only for the star equal to `value`. Stars up to the displayed rating carry data-filled="true" (others "false"); hovering a star previews that rating until the pointer leaves the group. Clicking star n calls onChange(n); clicking the CURRENT rating calls onChange(0). ArrowRight/ArrowUp call onChange(min(max, value + 1)) and ArrowLeft/ArrowDown call onChange(max(1, value - 1)). Only the selected star (or the first, when value is 0) has tabIndex 0; the others -1.
+Build `StarRating({ value = 0, onChange, max = 5 })` as a controlled component.
+
+- **DOM Structure**: Render `<div role="radiogroup" aria-label="Rating">` containing `max` `<button type="button" role="radio">` stars.
+- **ARIA & Labels**: Each button has `aria-label="1 star"`, `"2 stars"`, ..., and `aria-checked={true}` only for the star matching `value`.
+- **Roving `tabIndex`**: Only the selected star (or the first star when `value` is 0) has `tabIndex={0}`; all others have `tabIndex={-1}`.
+- **Visual State**: Stars up to the displayed rating carry `data-filled="true"` (others `"false"`). Hovering over a star previews that rating until the pointer leaves the group.
+- **Selection**: Clicking star `n` calls `onChange(n)`. Clicking the **CURRENT** rating calls `onChange(0)`.
+- **Keyboard Navigation**:
+  - `ArrowRight` / `ArrowUp` call `onChange(min(max, value + 1))`.
+  - `ArrowLeft` / `ArrowDown` call `onChange(max(1, value - 1))`.
