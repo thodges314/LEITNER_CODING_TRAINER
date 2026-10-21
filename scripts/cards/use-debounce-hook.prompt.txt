@@ -1,1 +1,12 @@
-Write two hooks. useDebounce(value, delay): returns the initial value immediately, then the latest value only after it has been stable for delay ms; clear the timer on change and unmount, and always use the latest delay. useThrottle(value, interval): the returned value changes at most once per interval — a change arriving after the interval has elapsed since the last update is applied immediately, otherwise it is delivered at the end of the interval carrying the LATEST value (intermediate values are skipped).
+Implement two timing utility hooks: `useDebounce` and `useThrottle`.
+
+### `useDebounce(value, delay)`
+- **Behavior**: Returns `initialValue` immediately on mount, then updates to the latest `value` only after it has remained unchanged for `delay` ms.
+- **Cleanup**: Clears pending timers whenever `value` or `delay` changes and on component unmount.
+- Always respects the latest `delay` value.
+
+### `useThrottle(value, interval)`
+- **Behavior**: The returned value updates at most once per `interval` ms.
+- **Leading & Trailing Updates**:
+  - An update arriving after `interval` ms has elapsed since the last update is applied immediately.
+  - Subsequent updates within the interval window are delivered at the end of the interval, carrying the **LATEST** value (intermediate values are skipped).

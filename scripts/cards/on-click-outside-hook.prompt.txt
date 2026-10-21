@@ -1,1 +1,9 @@
-Write useOnClickOutside(ref, handler): call handler(event) when a mousedown or touchstart happens anywhere outside ref.current (ignore events inside it, and do nothing while ref.current is null). Attach the listeners to document, remove them on unmount, and always call the LATEST handler without re-subscribing every render.
+Write `useOnClickOutside(ref, handler)`:
+
+- **Trigger**: Calls `handler(event)` when a `mousedown` or `touchstart` event occurs anywhere outside `ref.current`.
+- **Target Filtering**:
+  - Ignores events originated inside `ref.current`.
+  - Does nothing while `ref.current` is `null`.
+- **Event Listeners**:
+  - Attaches listeners to `document` and removes them on unmount.
+  - Always calls the **LATEST** `handler` without re-subscribing on every render.

@@ -1,3 +1,16 @@
-Write useToggle(initial = false) returning [value, toggle, setValue]: toggle() flips the value (it must ignore any arguments, e.g. a click event) and has a stable identity across renders.
+Implement two custom utility hooks: `useToggle` and `useCounter`.
 
-Write useCounter({ initial = 0, min = -Infinity, max = Infinity, step = 1 } = {}) returning { count, increment, decrement, reset, set }: increment/decrement move by `step`, everything is clamped to [min, max] (including the initial value and set(n)), reset returns to the (clamped) initial value, and the functions keep a stable identity while their options do not change.
+### `useToggle(initial = false)`
+- **Returns**: `[value, toggle, setValue]`.
+- `toggle()`: Flips `value`. It must ignore any passed arguments (e.g. an `onClick` event) and maintain a stable function identity across renders.
+- `setValue(next)`: Directly sets `value` to `next` (boolean).
+
+### `useCounter({ initial = 0, min = -Infinity, max = Infinity, step = 1 } = {})`
+- **Returns**: `{ count, increment, decrement, reset, set }`.
+- **Clamping**: All operations clamp `count` to `[min, max]`, including the initial value, `increment()`, `decrement()`, and `set(n)`.
+- **Operations**:
+  - `increment()`: Moves `count` up by `step` (clamped to `max`).
+  - `decrement()`: Moves `count` down by `step` (clamped to `min`).
+  - `reset()`: Restores `count` to the (clamped) initial value.
+  - `set(n)`: Sets `count` to `n` (clamped to `[min, max]`).
+- **Identity**: Returned helper functions maintain stable identities across renders while their options do not change.
