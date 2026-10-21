@@ -1,1 +1,9 @@
-Write twoSumSorted(numbers, target) for an array already sorted in ascending order. Return [index1, index2] with index1 < index2, using 1-based indices, for the two numbers that add up to target, in O(n) time and O(1) space (two pointers). Duplicate values and negative numbers are allowed. If no pair sums to target, return [].
+Implement two sum on a pre-sorted array using two pointers in O(n) time and O(1) space:
+
+### `twoSumSorted(numbers, target)`
+- Given an array `numbers` pre-sorted in ascending order, returns `[index1, index2]` with `index1 < index2` representing the 1-based indices of two elements that sum to `target`.
+- **Constraints & Edge Cases**:
+  - Must run in O(n) time and O(1) auxiliary space using opposing pointers.
+  - Returns **1-based indices** (e.g., first element is index `1`).
+  - Duplicate and negative values are permitted.
+  - If no two numbers sum to `target`, returns `[]`.

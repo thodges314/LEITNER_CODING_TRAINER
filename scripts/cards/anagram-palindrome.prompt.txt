@@ -1,3 +1,13 @@
-Write isAnagram(a, b) (same letters with the same counts; case-sensitive, spaces count), isPalindrome(s) (ignore case and every non-alphanumeric character; an empty string is a palindrome).
+Implement classic string inspection algorithms:
 
-Write longestCommonPrefix(words) (the longest string that starts every word; '' for an empty array).
+### `isAnagram(a, b)`
+- Returns `true` if `a` and `b` contain identical character counts (case-sensitive; spaces and symbols count).
+- Returns `false` if their lengths or character counts differ.
+
+### `isPalindrome(s)`
+- Returns `true` if string `s` reads the same forwards and backwards after stripping all non-alphanumeric characters and ignoring letter casing.
+- An empty string `''` is considered a valid palindrome (`true`).
+
+### `longestCommonPrefix(words)`
+- Finds the longest string prefix common to all strings in the `words` array.
+- Returns an empty string `''` if `words` is empty or if there is no common prefix.

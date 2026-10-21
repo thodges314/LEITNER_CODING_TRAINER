@@ -1,5 +1,11 @@
-Nodes look like { val, next } (the last node has next: null).
+Implement singly linked list utilities on nodes shaped as `{ val, next }` (terminal node has `next: null`):
 
-Write reverseList(head) that reverses the list in place and returns the new head (null for an empty list).
+### `reverseList(head)`
+- Reverses the linked list in-place by updating pointer references.
+- Returns the new head of the reversed list.
+- Returns `null` if given an empty list (`head === null`).
 
-Write middleNode(head) that returns the middle node (the second of the two middles when the length is even; null for an empty list). Use the slow/fast pointer technique for middleNode.
+### `middleNode(head)`
+- Finds and returns the middle node of the list using the two-pointer (slow/fast) technique.
+- For even-length lists with two middle nodes, returns the second middle node.
+- Returns `null` if given an empty list (`head === null`).
