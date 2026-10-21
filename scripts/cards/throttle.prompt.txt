@@ -1,8 +1,16 @@
+### `throttle<T extends (...args: any[]) => any>(fn: T, wait: number, options?: ThrottleOptions): (...args: Parameters<T>) => void`
+
+```ts
+interface ThrottleOptions {
+  leading?: boolean;
+  trailing?: boolean;
+}
+```
+
 Implement a rate-limiting `throttle` function with configurable leading and trailing edge triggers:
 
-### `throttle(fn, wait, { leading = true, trailing = true } = {})`
 - Restricts invocation of `fn` to at most once per `wait` millisecond window.
-- **Options**:
+- **Options** (`{ leading = true, trailing = true } = {}`):
   - `leading: true` (default): invokes `fn` immediately on the first call of the cycle.
   - `leading: false`: delays the first execution until the end of the initial `wait` window.
   - `trailing: true` (default): if called during an active window, executes `fn` at the end of the window with the most recent arguments and context.

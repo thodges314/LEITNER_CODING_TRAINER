@@ -1,1 +1,11 @@
-Implement debounce(fn, wait) returning a function that delays invoking fn until wait ms after the LAST call, using the latest arguments and preserving `this`. Add .cancel() to drop the pending call and .flush() to invoke the pending call immediately. flush() with nothing pending does nothing, and a flushed call must not run a second time when its timer would have fired.
+### `debounce<T extends (...args: any[]) => any>(fn: T, wait: number): DebouncedFunction<T>`
+
+```ts
+interface DebouncedFunction<T extends (...args: any[]) => any> {
+  (this: any, ...args: Parameters<T>): void;
+  cancel(): void;
+  flush(): void;
+}
+```
+
+Implement `debounce(fn, wait)` returning a function that delays invoking `fn` until `wait` ms after the LAST call, using the latest arguments and preserving `this`. Add `.cancel()` to drop the pending call and `.flush()` to invoke the pending call immediately. `flush()` with nothing pending does nothing, and a flushed call must not run a second time when its timer would have fired.

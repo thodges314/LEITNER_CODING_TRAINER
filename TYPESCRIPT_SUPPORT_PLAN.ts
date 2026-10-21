@@ -54,7 +54,7 @@ export const TRACK_STATS: TrackStats[] = [
   { track: 'async-js', total: 21, completed: 21, status: 'COMPLETE' },
   { track: 'js-language', total: 25, completed: 25, status: 'COMPLETE' },
   { track: 'typescript-patterns', total: 14, completed: 14, status: 'COMPLETE' },
-  { track: 'js-utilities', total: 37, completed: 0, status: 'PLANNED' },
+  { track: 'js-utilities', total: 37, completed: 5, status: 'IN_PROGRESS' },
   { track: 'dom-browser', total: 20, completed: 0, status: 'PLANNED' },
   { track: 'react', total: 27, completed: 0, status: 'PLANNED' },
   { track: 'react-components', total: 45, completed: 0, status: 'PLANNED' },
@@ -62,7 +62,7 @@ export const TRACK_STATS: TrackStats[] = [
 ];
 
 /**
- * 3. COMPLETED BATCHES (Batches 1–23: 137 cards total)
+ * 3. COMPLETED BATCHES (Batches 1–24: 142 cards total)
  */
 export const COMPLETED_BATCHES: BatchDefinition[] = [
   {
@@ -409,18 +409,11 @@ export const COMPLETED_BATCHES: BatchDefinition[] = [
       'ts-typed-event-emitter',
     ],
   },
-];
-
-/**
- * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 24–48: 134 cards total)
- */
-export const REMAINING_BATCHES: BatchDefinition[] = [
-  // --- js-utilities track (37 cards, Batches 24–30) ---
   {
     batchNumber: 24,
     title: 'Function Timing & Throttling',
     track: 'js-utilities',
-    status: 'planned',
+    status: 'completed',
     cardCount: 5,
     cardIds: [
       'debounce-implementation',
@@ -430,6 +423,13 @@ export const REMAINING_BATCHES: BatchDefinition[] = [
       'rate-limiter-middleware',
     ],
   },
+];
+
+/**
+ * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 25–48: 129 cards total)
+ */
+export const REMAINING_BATCHES: BatchDefinition[] = [
+  // --- js-utilities track (37 cards, Batches 24–30) ---
   {
     batchNumber: 25,
     title: 'Memoization & Functional Patterns',

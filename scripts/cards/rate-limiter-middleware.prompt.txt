@@ -1,3 +1,18 @@
+### `rateLimiter(options: RateLimiterOptions): RateLimiterMiddleware`
+
+```ts
+interface RateLimiterOptions {
+  limit: number;
+  windowMs: number;
+  now?: () => number;
+}
+
+interface RateLimiterMiddleware {
+  (req: { ip: string; [key: string]: any }, res: any, next: () => void): void;
+  size: () => number;
+}
+```
+
 Write `rateLimiter({ limit, windowMs, now = Date.now })` returning an Express-style middleware `(req, res, next)`:
 
 - **Token Bucket per Client**: Allows each client (`req.ip`) up to `limit` requests per `windowMs` using a token bucket.
