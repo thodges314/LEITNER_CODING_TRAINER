@@ -5863,22 +5863,22 @@
       {
         "description": "Renders one header cell per column label",
         "input": "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }]} />",
-        "expected": "<thead><tr><th>Name</th><th>Age</th></tr></thead>"
+        "expected": "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Ada</td><td>36</td></tr></tbody></table>"
       },
       {
         "description": "Renders one row per item with cells in column order",
         "input": "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />",
-        "expected": "<tbody><tr><td>Ada</td><td>36</td></tr><tr><td>Grace</td><td>45</td></tr></tbody>"
+        "expected": "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Ada</td><td>36</td></tr><tr><td>Grace</td><td>45</td></tr></tbody></table>"
       },
       {
         "description": "Missing, undefined and null values render as empty cells",
         "input": "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />",
-        "expected": "<tbody><tr><td>Ada</td><td></td></tr><tr><td>Bob</td><td></td></tr></tbody>"
+        "expected": "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Ada</td><td></td></tr><tr><td>Bob</td><td></td></tr></tbody></table>"
       },
       {
         "description": "An empty table shows a single \"No rows\" cell spanning all columns",
         "input": "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[]} />",
-        "expected": "<tbody><tr><td colSpan={2}>No rows</td></tr></tbody>"
+        "expected": "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td colSpan={2}>No rows</td></tr></tbody></table>"
       }
     ],
     "testHarness": "const { render, q, qa } = $dom;\nconst COLUMNS = [{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }];\nconst cells = (c, sel) => qa(sel, c).map((x) => x.textContent).join();\n{\n  const r = render(<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }]} />);\n  $test.check('Renders one header cell per column label', cells(r.container, 'thead th') === 'Name,Age', cells(r.container, 'thead th'));\n  r.unmount();\n}\n{\n  const r = render(<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />);\n  $test.check('Renders one row per item with cells in column order', qa('tbody tr', r.container).length === 2 && cells(r.container, 'tbody td') === 'Ada,36,Grace,45', cells(r.container, 'tbody td'));\n  r.unmount();\n}\n{\n  const r = render(<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />);\n  $test.check('Missing, undefined and null values render as empty cells', cells(r.container, 'tbody td') === 'Ada,,Bob,', cells(r.container, 'tbody td'));\n  r.unmount();\n}\n{\n  const r = render(<SimpleTable columns={COLUMNS} rows={[]} />);\n  const td = q('tbody td', r.container);\n  $test.check('An empty table shows a single \"No rows\" cell spanning all columns', qa('tbody tr', r.container).length === 1 && td.textContent === 'No rows' && td.colSpan === 2, td && td.outerHTML);\n  r.unmount();\n}",
