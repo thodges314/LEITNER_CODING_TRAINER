@@ -158,7 +158,10 @@ import {
 import {
   getTsHoverEnabled,
   setTsHoverEnabled,
+  getPreferredExecutionMode,
+  setPreferredExecutionMode,
 } from '../lib/editorSettings';
+import type { PreferredExecutionMode } from '../lib/editorSettings';
 
 import type { AppTheme } from '../lib/theme';
 
@@ -199,6 +202,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [timedMode, setTimedMode] = useState(() => getTimedModeEnabled());
   const [timedDuration, setTimedDuration] = useState(() => getTimedModeDuration());
   const [tsHover, setTsHover] = useState(() => getTsHoverEnabled());
+  const [preferredExecutionMode, setPreferredExecutionModeState] = useState<PreferredExecutionMode>(() => getPreferredExecutionMode());
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<
     'clear' | 'replace' | 'reset-deck' | 'reset-everything' | null
@@ -294,6 +298,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setTsHoverEnabled(enabled);
     onSettingsSaved?.();
     showToast(enabled ? 'TypeScript hover tooltips enabled' : 'TypeScript hover tooltips disabled');
+  };
+
+  const handleSelectPreferredExecutionMode = (mode: PreferredExecutionMode) => {
+    setPreferredExecutionModeState(mode);
+    setPreferredExecutionMode(mode);
+    onSettingsSaved?.();
+    showToast(mode === 'ts' ? 'Default execution mode set to TypeScript' : 'Default execution mode set to JavaScript');
   };
 
   const handleSelectDuration = (seconds: number) => {
@@ -720,8 +731,108 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             )}
           </div>
 
-          {/* Editor Preferences: TypeScript Hover Tooltips */}
-          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+          {/* Editor Preferences: Default Execution Mode & TypeScript Hover Tooltips */}
+          <div
+            style={{
+              padding: '16px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border-subtle)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+            }}
+          >
+            <div>
+              <label style={{ display: 'block', fontSize: '13.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                Code Editor & Execution Preferences
+              </label>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                Configure your default language mode and TypeScript editor tools
+              </span>
+            </div>
+
+            <div>
+              <label style={{ fontSize: '12.5px', fontWeight: 600, display: 'block', marginBottom: '6px', color: 'var(--text-primary)' }}>
+                Default Execution Mode
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <button
+                  type="button"
+                  id="preferred-mode-js-btn"
+                  onClick={() => handleSelectPreferredExecutionMode('js')}
+                  className="btn"
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    backgroundColor: preferredExecutionMode === 'js'
+                      ? (isLight ? 'rgba(68, 85, 170, 0.15)' : 'rgba(56, 189, 248, 0.15)')
+                      : 'var(--bg-elevated)',
+                    borderColor: preferredExecutionMode === 'js'
+                      ? (isLight ? '#4455AA' : 'var(--accent-cyan)')
+                      : 'var(--border-subtle)',
+                    borderWidth: isLight && preferredExecutionMode === 'js' ? '1.5px' : '1px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span style={{ fontWeight: 600, fontSize: '12.5px', color: 'var(--text-primary)' }}>
+                      JS (Fast)
+                    </span>
+                    {preferredExecutionMode === 'js' && (
+                      <span style={{ fontSize: '10.5px', color: isLight ? '#4455AA' : 'var(--accent-cyan)', fontWeight: 700 }}>Default</span>
+                    )}
+                  </div>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                    Fast transpilation for JS and algorithmic problem tracks
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  id="preferred-mode-ts-btn"
+                  onClick={() => handleSelectPreferredExecutionMode('ts')}
+                  className="btn"
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    textAlign: 'left',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '2px',
+                    backgroundColor: preferredExecutionMode === 'ts'
+                      ? (isLight ? 'rgba(68, 85, 170, 0.15)' : 'rgba(49, 120, 198, 0.2)')
+                      : 'var(--bg-elevated)',
+                    borderColor: preferredExecutionMode === 'ts'
+                      ? (isLight ? '#4455AA' : 'var(--accent-primary)')
+                      : 'var(--border-subtle)',
+                    borderWidth: isLight && preferredExecutionMode === 'ts' ? '1.5px' : '1px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span style={{ fontWeight: 600, fontSize: '12.5px', color: 'var(--text-primary)' }}>
+                      TS (Strict Type Check)
+                    </span>
+                    {preferredExecutionMode === 'ts' && (
+                      <span style={{ fontSize: '10.5px', color: isLight ? '#4455AA' : 'var(--accent-primary)', fontWeight: 700 }}>Default</span>
+                    )}
+                  </div>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                    Strict compiler type-checking across all problems
+                  </span>
+                </button>
+              </div>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '6px 0 0 0', lineHeight: 1.4 }}>
+                Cards in the dedicated TypeScript track always temporarily run in TS mode, and automatically return to your default preference on subsequent cards.
+              </p>
+            </div>
+
+            {/* TypeScript Hover Tooltip Checkbox */}
             <label
               htmlFor="ts-hover-tooltips-checkbox"
               style={{
@@ -729,8 +840,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 gap: '12px',
                 alignItems: 'flex-start',
                 cursor: 'pointer',
-                padding: '12px 14px',
-                borderRadius: '8px',
+                padding: '10px 12px',
+                borderRadius: '6px',
                 border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-subtle)',
                 backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-surface)',
                 boxShadow: isLight ? '2px 2px 0px rgba(28, 28, 28, 0.15)' : 'none',

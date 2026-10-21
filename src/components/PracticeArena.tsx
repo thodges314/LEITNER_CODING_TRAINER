@@ -8,6 +8,7 @@ import rainbowBrackets from 'rainbowbrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
 import { createTsHoverExtension } from './practice/tsHoverExtension';
+import { resolveExecutionModeForCard, setPreferredExecutionMode } from '../lib/editorSettings';
 import { loadDraft, saveDraft, clearDraft } from '../lib/drafts';
 import ReactDOM from 'react-dom/client';
 import {
@@ -206,9 +207,20 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   }, [legacyPopupWindow]);
 
   // Execution mode: JS (Fast) vs TS (Strict Type Check)
+  // Non-TS tracks follow the user's default preference; 'typescript-patterns' temporarily overrides to 'ts'.
   const [executionMode, setExecutionMode] = useState<'js' | 'ts'>(() =>
-    currentCard?.track === 'typescript-patterns' ? 'ts' : 'js'
+    resolveExecutionModeForCard(currentCard)
   );
+
+  const isTsTrack = currentCard?.track === 'typescript-patterns';
+
+  const handleSwitchExecutionMode = (mode: 'js' | 'ts') => {
+    if (isTsTrack && mode === 'js') return;
+    setExecutionMode(mode);
+    if (!isTsTrack) {
+      setPreferredExecutionMode(mode);
+    }
+  };
 
   // Countdown stopwatch (supports Timed Recall Mode with auto-start and auto-submit)
   const timedMode = getTimedModeEnabled();
@@ -278,6 +290,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setIsPreviewLive(false);
     setMountedComponent(null);
     if (currentCard) setInspectedTier(currentCard.box);
+    setExecutionMode(resolveExecutionModeForCard(currentCard));
   }
 
   // Autofocus editor on mount and card switch
@@ -2015,7 +2028,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             >
               <button
                 type="button"
-                onClick={() => setExecutionMode('js')}
+                disabled={isTsTrack}
+                onClick={() => handleSwitchExecutionMode('js')}
                 style={{
                   padding: '4px 10px',
                   borderRadius: '4px',
@@ -2028,17 +2042,18 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   color: executionMode === 'js'
                     ? (theme === 'apple-gsos' ? '#ffffff' : '#38bdf8')
                     : (theme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-dim)'),
-                  cursor: 'pointer',
+                  cursor: isTsTrack ? 'not-allowed' : 'pointer',
+                  opacity: isTsTrack ? 0.45 : 1,
                   transition: 'all 0.15s ease',
                   boxShadow: theme === 'apple-gsos' && executionMode === 'js' ? '1px 1px 0px #1C1C1C' : 'none',
                 }}
-                title="Fast transpilation (Sucrase) without strict compile-time type-checking"
+                title={isTsTrack ? "TypeScript Patterns track cards require TS mode" : "Fast transpilation (Sucrase) without strict compile-time type-checking"}
               >
                 JS (Fast)
               </button>
               <button
                 type="button"
-                onClick={() => setExecutionMode('ts')}
+                onClick={() => handleSwitchExecutionMode('ts')}
                 style={{
                   padding: '4px 10px',
                   borderRadius: '4px',
@@ -2055,9 +2070,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                   transition: 'all 0.15s ease',
                   boxShadow: theme === 'apple-gsos' && executionMode === 'ts' ? '1px 1px 0px #1C1C1C' : 'none',
                 }}
-                title="Full TypeScript compiler type-checking (strict checks, interfaces, generics)"
+                title={isTsTrack ? "TypeScript mode is required for TypeScript Patterns cards" : "Full TypeScript compiler type-checking (strict checks, interfaces, generics)"}
               >
-                TS (Strict Type Check)
+                {isTsTrack ? 'TS (Strict • Required)' : 'TS (Strict Type Check)'}
               </button>
             </div>
           </div>

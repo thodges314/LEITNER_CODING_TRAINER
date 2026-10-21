@@ -95,4 +95,54 @@ describe('SettingsModal TypeScript Hover Toggle', () => {
     expect(checkbox).not.toBeNull();
     expect(checkbox?.checked).toBe(false);
   });
+
+  it('renders default execution mode selector with JS active by default', async () => {
+    const { getPreferredExecutionMode } = await import('../lib/editorSettings');
+
+    await act(async () => {
+      root?.render(
+        <SettingsModal
+          isOpen={true}
+          onClose={vi.fn()}
+        />
+      );
+    });
+
+    const jsBtn = container?.querySelector('#preferred-mode-js-btn') as HTMLButtonElement | null;
+    const tsBtn = container?.querySelector('#preferred-mode-ts-btn') as HTMLButtonElement | null;
+    expect(jsBtn).not.toBeNull();
+    expect(tsBtn).not.toBeNull();
+    expect(getPreferredExecutionMode()).toBe('js');
+    expect(jsBtn?.textContent).toContain('Default');
+  });
+
+  it('switches preferred execution mode to TypeScript and updates localStorage', async () => {
+    const { getPreferredExecutionMode } = await import('../lib/editorSettings');
+    const onSettingsSaved = vi.fn();
+
+    await act(async () => {
+      root?.render(
+        <SettingsModal
+          isOpen={true}
+          onClose={vi.fn()}
+          onSettingsSaved={onSettingsSaved}
+        />
+      );
+    });
+
+    const tsBtn = container?.querySelector('#preferred-mode-ts-btn') as HTMLButtonElement | null;
+    await act(async () => {
+      tsBtn?.click();
+    });
+
+    expect(getPreferredExecutionMode()).toBe('ts');
+    expect(onSettingsSaved).toHaveBeenCalled();
+
+    const jsBtn = container?.querySelector('#preferred-mode-js-btn') as HTMLButtonElement | null;
+    await act(async () => {
+      jsBtn?.click();
+    });
+
+    expect(getPreferredExecutionMode()).toBe('js');
+  });
 });
