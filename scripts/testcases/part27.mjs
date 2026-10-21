@@ -48,12 +48,12 @@ export default {
   ],
   'pagination-controls': [
     r('Renders Previous, the numbered pages and Next in a labelled nav', '<Pagination page={1} totalPages={4} />', "nav aria-label='Pagination'; items 1,2,3,4 (page 3 is the single gap, so it is shown); Previous and Next buttons"),
-    r('The current page has aria-current="page" (and only it)', 'page 3 of 5', "only the '3' button has aria-current='page'"),
-    r('Long ranges collapse with ellipses around the current page', '10 pages: current 5, 1, 10', "'1,…,4,5,6,…,10'; '1,2,…,10'; '1,…,9,10'"),
-    r('A single missing page is shown instead of an ellipsis', '7 pages, current 4; then 9 pages, current 5', "'1,2,3,4,5,6,7'; then '1,…,4,5,6,…,9'"),
-    r('siblings widens the window around the current page', 'page 5 of 12, siblings=2', "'1,2,3,4,5,6,7,…,12'"),
-    r('Previous, Next and the page buttons call onPageChange with the target page', "page 3 of 6: Previous, Next, click '6'", 'onPageChange called with 2, 4, 6'),
-    r('Previous is disabled on the first page and Next on the last', 'page 1 of 4, then page 4 of 4', 'Previous disabled / Next disabled respectively'),
+    r('The current page has aria-current="page" (and only it)', '<Pagination page={3} totalPages={5} />', "only the '3' button has aria-current='page'"),
+    r('Long ranges collapse with ellipses around the current page', '<Pagination page={5} totalPages={10} />', "'1,…,4,5,6,…,10'; '1,2,…,10'; '1,…,9,10'"),
+    r('A single missing page is shown instead of an ellipsis', '<Pagination page={4} totalPages={7} />', "'1,2,3,4,5,6,7'; then '1,…,4,5,6,…,9'"),
+    r('siblings widens the window around the current page', '<Pagination page={5} totalPages={12} siblings={2} />', "'1,2,3,4,5,6,7,…,12'"),
+    r('Previous, Next and the page buttons call onPageChange with the target page', "<Pagination page={3} totalPages={6} onPageChange={handlePageChange} />", 'onPageChange called with 2, 4, 6'),
+    r('Previous is disabled on the first page and Next on the last', '<Pagination page={1} totalPages={4} />', 'Previous disabled / Next disabled respectively'),
     r('The ellipsis is plain text, not a button', "click the '…' item", 'it contains no <button>; onPageChange not called'),
   ],
 };

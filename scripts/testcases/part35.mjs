@@ -4,13 +4,13 @@ const r = (d, i, e) => c(d, i, e, { v: false, note: 'covered by the DOM harness'
 // Accessibility, batch A1: switch, live announcer, roving tabindex toolbar.
 export default {
   'switch-toggle-a11y': [
-    r("Renders a <button type=\"button\"> with role=\"switch\" and the label as its content", "render <Switch checked={false}>Wi-Fi</Switch>", "<button type=\"button\" role=\"switch\">Wi-Fi</button>"),
+    r("Renders a <button type=\"button\"> with role=\"switch\" and the label as its content", "<Switch checked={false}>Wi-Fi</Switch>", "<button type=\"button\" role=\"switch\">Wi-Fi</button>"),
     r("aria-checked mirrors the checked prop as the strings \"true\" and \"false\"", "checked={false} and checked={true}", "aria-checked=\"false\" and aria-checked=\"true\""),
     r("Clicking calls onChange with the opposite value", "click when checked={false}; click when checked={true}", "onChange(true); onChange(false)"),
     r("A disabled switch is disabled and ignores clicks", "disabled, then click", "button disabled; onChange not called"),
   ],
   'live-announcer': [
-    r("Renders a polite status region and an assertive alert region, both atomic", "render <AnnouncerProvider>\u2026</AnnouncerProvider>", "role=status aria-live=polite aria-atomic=true; role=alert aria-live=assertive aria-atomic=true"),
+    r("Renders a polite status region and an assertive alert region, both atomic", "<AnnouncerProvider><App /></AnnouncerProvider>", "role=status aria-live=polite aria-atomic=true; role=alert aria-live=assertive aria-atomic=true"),
     r("announce(message) writes to the polite region", "announce('Saved')", "polite region text 'Saved'"),
     r("announce(message, { politeness: 'assertive' }) writes to the alert region and clears the polite one", "announce('Failed', { politeness: 'assertive' })", "alert region 'Failed'; polite region ''"),
     r("Announcing the same message twice changes the raw text so it is read again", "announce('Saved') three times in a row", "'Saved', 'Saved\\u00a0', 'Saved'"),

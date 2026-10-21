@@ -125,7 +125,7 @@ handle(e);
 win.location.pathname = '/users/42';
 const router = createRouter(ROUTES, win);
 router.current()`, "{ name: 'user', params: { id: '42' }, path: '/users/42' }", {
-      callSignature: "win.location.pathname = '/users/42';\nconst router = createRouter(ROUTES, win);\nrouter.current()",
+      callSignature: "const routes = [{ name: 'user', path: '/users/:id' }];\nwin.location.pathname = '/users/42';\nconst router = createRouter(routes, win);\nrouter.current()",
     }),
     c('The root path matches the "/" route', `${WIN}
 createRouter(ROUTES, win).current()`, "{ name: 'home', params: {}, path: '/' }", {
