@@ -1,1 +1,12 @@
-Write memoizeOne(fn) for functions of ONE argument: return a function that caches results in a Map keyed by the argument, so fn runs once per distinct argument (cache hits must work for results that are undefined or falsy too). Also write memoizeLast(fn) that remembers only the most recent argument and result.
+Implement function memoization helpers for single-argument functions:
+
+### `memoizeOne(fn)`
+- Returns a wrapped function that caches results in a `Map` keyed by the single argument.
+- `fn` executes at most once per distinct argument value.
+- Cache hits correctly return cached values even if the result is `undefined`, `null`, or other falsy values.
+- Preserves `this` context when calling `fn`.
+
+### `memoizeLast(fn)`
+- Returns a wrapped function that caches only the single most recent argument and its result.
+- If invoked with the same argument as the previous call (compared via `Object.is`), returns the cached result without invoking `fn`.
+- When called with a new argument, re-executes `fn`, updates the cache, and returns the new result.

@@ -1,1 +1,13 @@
-Write dedupeAndSort(records, sortBy = 'id') returning a NEW array deduped by id (the latest record wins) and sorted by one key or an array of keys (earlier keys take priority). The sort must be stable, must not mutate the input, and the comparator must handle strings, numbers and null/undefined (nulls sort last).
+Implement record deduplication and multi-key stable sorting:
+
+### `dedupeAndSort(records, sortBy = 'id')`
+- **Deduplication**:
+  - Deduplicates records by `id`. When duplicate IDs occur, the latest record in `records` wins.
+- **Sorting**:
+  - Sorts records by one property key or an array of keys (`sortBy`).
+  - Earlier keys take priority over later keys when comparing elements.
+  - Sorting is stable: elements with equal keys maintain their relative order.
+- **Comparator Handling**:
+  - Handles strings (lexicographical comparison via `localeCompare`) and numbers.
+  - `null` and `undefined` values sort last.
+- Returns a new array without mutating the input `records`.

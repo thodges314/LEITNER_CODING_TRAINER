@@ -1,1 +1,16 @@
-Write parseQuery(query) and stringifyQuery(params). parseQuery accepts a string with or without a leading '?', splits on & and =, decodes percent-escapes and '+' as a space, treats a key without '=' as '' and repeated keys as an array of values (in order); '' parses to {}. stringifyQuery takes a flat object and returns key=value pairs joined by '&' in key order, percent-encoding keys and values with encodeURIComponent, emitting one pair per array item and skipping undefined and null values.
+Implement URL query string serialization and deserialization helpers:
+
+### `parseQuery(query)`
+- Parses a query string (with or without a leading `'?'`) into an object:
+  - Splits pairs on `'&'` and key/value on `'='`.
+  - Decodes percent-encoded characters and converts `'+'` into a space `' '`.
+  - Keys without an `'='` delimiter map to an empty string `''`.
+  - Repeated keys are collected into an array of string values in order of appearance.
+  - An empty string `''` parses to `{}`.
+
+### `stringifyQuery(params)`
+- Converts an object of parameters into a serialized query string:
+  - Generates `'key=value'` pairs joined by `'&'`.
+  - Encodes both keys and values using `encodeURIComponent()`.
+  - If a value is an array, emits one `'key=value'` pair per element.
+  - Skips properties whose values are `undefined` or `null`.

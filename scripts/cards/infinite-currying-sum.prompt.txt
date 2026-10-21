@@ -1,1 +1,12 @@
-Write sum(...numbers) that supports unlimited chained calls: sum(1)(2)(3)() returns 6 (calling with no arguments returns the total), arguments can be grouped any way (sum(1, 2)(3, 4)()), the chain also coerces to a number/string (+sum(1)(2) is 3, String(sum(1)(2)) is '3'), sum()() is 0, and chains are immutable: branching from an intermediate result must not affect the original.
+Implement an infinitely chainable, immutable summation currying function:
+
+### `sum(...numbers)`
+- Supports arbitrary chained invocations with any grouping of arguments (e.g., `sum(1)(2)(3)()`, `sum(1, 2)(3, 4)()`).
+- **Termination & Evaluation**:
+  - Calling with no arguments (e.g., `...()`) returns the accumulated numerical sum.
+  - Calling `sum()()` returns `0`.
+- **Type Coercion**:
+  - Implements `.valueOf()` returning the accumulated numeric sum (e.g., `+sum(1)(2) === 3`).
+  - Implements `.toString()` returning the accumulated sum as a string (e.g., `String(sum(1)(2)) === '3'`).
+- **Immutability**:
+  - Each invocation returns a new chain; branching from an intermediate curried function does not mutate or affect the original branch.

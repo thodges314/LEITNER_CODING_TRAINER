@@ -1,1 +1,16 @@
-Implement stringify(value) matching JSON.stringify(value) (no replacer or indentation) WITHOUT calling JSON.stringify: strings are quoted with the escapes \" \\ \b \f \n \r \t and \u00XX for other control characters; non-finite numbers become null; objects skip undefined/function/symbol values while arrays turn them into null; a top-level undefined/function/symbol returns undefined; toJSON() (e.g. Date) is honored; nested structures work; circular references throw TypeError.
+Implement a recursive `JSON.stringify` polyfill from scratch without delegating to `JSON.stringify`:
+
+### `stringify(value)`
+- Converts JavaScript values into JSON strings matching standard `JSON.stringify` serialization.
+- **Primitives**:
+  - Strings are enclosed in double quotes with escape sequences (`\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t`, and `\u00XX` for control characters).
+  - Numbers: finite numbers are converted via `String(value)`; non-finite numbers (`NaN`, `Infinity`, `-Infinity`) serialize as `'null'`.
+  - Booleans serialize as `'true'` or `'false'`.
+  - Top-level `undefined`, `function`, or `symbol` returns `undefined`.
+- **Objects & Arrays**:
+  - If `value` defines a `.toJSON()` method (e.g., `Date`), invokes it before serialization.
+  - In objects: properties whose values are `undefined`, `function`, or `symbol` are omitted entirely.
+  - In arrays: elements that are `undefined`, `function`, or `symbol` are serialized as `'null'`.
+  - BigInt values throw a `TypeError`.
+- **Circular References**:
+  - Throws a `TypeError` when a circular reference structure is detected.
