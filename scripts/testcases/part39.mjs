@@ -27,40 +27,56 @@ export default {
   'lazy-load-observer': [
     c('Observes only the images that have a data-src attribute', `${IO_SETUP}
 lazyLoadImages(root, FakeIO);
-[created.length, created[0].observed.map((el) => el.getAttribute('data-src'))]`, "[1, ['a.png', 'c.png']]"),
+[created.length, created[0].observed.map((el) => el.getAttribute('data-src'))]`, "[1, ['a.png', 'c.png']]", {
+      callSignature: "const stop = lazyLoadImages(root, IntersectionObserver);",
+    }),
     c('The observer is created with rootMargin "200px"', `${IO_SETUP}
 lazyLoadImages(root, FakeIO);
-created[0].options`, "{ rootMargin: '200px' }"),
+created[0].options`, "{ rootMargin: '200px' }", {
+      callSignature: "lazyLoadImages(root, IntersectionObserver); // options.rootMargin === '200px'",
+    }),
     c('Nothing loads before an image intersects, and non-intersecting entries are ignored', `${IO_SETUP}
 lazyLoadImages(root, FakeIO);
 const before = [a.getAttribute('src'), c.getAttribute('src')];
 created[0].callback([{ target: a, isIntersecting: false }], created[0]);
-[before, a.getAttribute('src'), a.getAttribute('data-src')]`, "[[null, null], null, 'a.png']"),
+[before, a.getAttribute('src'), a.getAttribute('data-src')]`, "[[null, null], null, 'a.png']", {
+      callSignature: "lazyLoadImages(root, IntersectionObserver); // non-intersecting entry",
+    }),
     c('An intersecting image gets its src, loses data-src and is unobserved', `${IO_SETUP}
 lazyLoadImages(root, FakeIO);
 const io = created[0];
 io.callback([{ target: a, isIntersecting: true }], io);
-[a.getAttribute('src'), a.hasAttribute('data-src'), io.observed.map((el) => el.getAttribute('data-src'))]`, "['a.png', false, ['c.png']]"),
+[a.getAttribute('src'), a.hasAttribute('data-src'), io.observed.map((el) => el.getAttribute('data-src'))]`, "['a.png', false, ['c.png']]", {
+      callSignature: "lazyLoadImages(root, IntersectionObserver); // intersecting entry loads src and unobserves",
+    }),
     c('Only the intersecting entries of a batch load; other images are left alone', `${IO_SETUP}
 lazyLoadImages(root, FakeIO);
 const io = created[0];
 io.callback([{ target: a, isIntersecting: true }, { target: c, isIntersecting: false }], io);
-[a.getAttribute('src'), c.getAttribute('src'), b.getAttribute('src')]`, "['a.png', null, 'b.png']"),
+[a.getAttribute('src'), c.getAttribute('src'), b.getAttribute('src')]`, "['a.png', null, 'b.png']", {
+      callSignature: "lazyLoadImages(root, IntersectionObserver); // batch with intersecting and non-intersecting entries",
+    }),
     c('A stray second entry for an already loaded image does nothing', `${IO_SETUP}
 lazyLoadImages(root, FakeIO);
 const io = created[0];
 io.callback([{ target: a, isIntersecting: true }], io);
 io.callback([{ target: a, isIntersecting: true }], io);
-a.getAttribute('src')`, "'a.png'"),
+a.getAttribute('src')`, "'a.png'", {
+      callSignature: "lazyLoadImages(root, IntersectionObserver); // stray duplicate entry ignored",
+    }),
     c('The returned function disconnects the observer', `${IO_SETUP}
 const stop = lazyLoadImages(root, FakeIO);
 const io = created[0];
 stop();
-[typeof stop, io.disconnected]`, "['function', true]"),
+[typeof stop, io.disconnected]`, "['function', true]", {
+      callSignature: "const stop = lazyLoadImages(root, IntersectionObserver);\nstop();",
+    }),
     c('Without IntersectionObserver every image loads immediately and the returned function is harmless', `${IO_SETUP}
 const stop = lazyLoadImages(root, null);
 stop();
-[a.getAttribute('src'), c.getAttribute('src'), a.hasAttribute('data-src'), b.getAttribute('src')]`, "['a.png', 'c.png', false, 'b.png']"),
+[a.getAttribute('src'), c.getAttribute('src'), a.hasAttribute('data-src'), b.getAttribute('src')]`, "['a.png', 'c.png', false, 'b.png']", {
+      callSignature: "const stop = lazyLoadImages(root, null); // fallback when IO unavailable",
+    }),
   ],
   'drop-index-from-pointer': [
     c('A pointer above the first midpoint gives index 0', `${RECTS}
@@ -89,23 +105,31 @@ const L = ['a', 'b', 'c'];
     c('Nothing runs until the animation frame', `${RAF}
 const t = rafThrottle(fn, raf, caf);
 t(1);
-[calls.length, queue.length]`, '[0, 1]'),
+[calls.length, queue.length]`, '[0, 1]', {
+      callSignature: "const t = rafThrottle(fn);\nt(1);",
+    }),
     c('Many calls in one frame schedule a single frame and run fn once with the latest arguments', `${RAF}
 const t = rafThrottle(fn, raf, caf);
 t(1); t(2); t(3);
 const scheduled = queue.length;
 flush();
-[scheduled, calls]`, '[1, [[3]]]'),
+[scheduled, calls]`, '[1, [[3]]]', {
+      callSignature: "const t = rafThrottle(fn);\nt(1); t(2); t(3);\nflush();",
+    }),
     c('After a frame has run, the next call schedules a new frame', `${RAF}
 const t = rafThrottle(fn, raf, caf);
 t('a'); flush();
 t('b'); t('c'); flush();
-calls`, "[['a'], ['c']]"),
+calls`, "[['a'], ['c']]", {
+      callSignature: "const t = rafThrottle(fn);\nt('a'); flush();\nt('b'); t('c'); flush();",
+    }),
     c('All arguments are passed through', `${RAF}
 const t = rafThrottle(fn, raf, caf);
 t('x', 2, { y: 3 });
 flush();
-calls`, "[['x', 2, { y: 3 }]]"),
+calls`, "[['x', 2, { y: 3 }]]", {
+      callSignature: "const t = rafThrottle(fn);\nt('x', 2, { y: 3 });\nflush();",
+    }),
     c('cancel() cancels the pending frame so fn never runs, and later calls work again', `${RAF}
 const t = rafThrottle(fn, raf, caf);
 t(1);
@@ -114,14 +138,18 @@ flush();
 const afterCancel = [calls.length, cancelled];
 t(2);
 flush();
-[afterCancel, calls]`, '[[0, [1]], [[2]]]'),
+[afterCancel, calls]`, '[[0, [1]], [[2]]]', {
+      callSignature: "const t = rafThrottle(fn);\nt(1);\nt.cancel();\nflush();",
+    }),
     c('cancel() with nothing pending does nothing and does not call caf', `${RAF}
 const t = rafThrottle(fn, raf, caf);
 t.cancel();
 t(1);
 flush();
 t.cancel();
-[cancelled, calls]`, '[[], [[1]]]'),
+[cancelled, calls]`, '[[], [[1]]]', {
+      callSignature: "const t = rafThrottle(fn);\nt.cancel();",
+    }),
     c('A call made inside fn schedules the next frame', `${RAF}
 const log = [];
 let t;
@@ -129,7 +157,9 @@ const handler = (n) => { log.push(n); if (n < 3) t(n + 1); };
 t = rafThrottle(handler, raf, caf);
 t(1);
 flush(); flush(); flush(); flush();
-[log, queue.length]`, '[[1, 2, 3], 0]'),
+[log, queue.length]`, '[[1, 2, 3], 0]', {
+      callSignature: "const t = rafThrottle(handler);\nt(1);",
+    }),
     c('raf and caf default to the global requestAnimationFrame and cancelAnimationFrame', `const run = () => {
   const saved = [globalThis.requestAnimationFrame, globalThis.cancelAnimationFrame];
   const seen = [];
@@ -144,6 +174,8 @@ flush(); flush(); flush(); flush();
     [globalThis.requestAnimationFrame, globalThis.cancelAnimationFrame] = saved;
   }
 };
-run()`, "[['go'], ['raf']]"),
+run()`, "[['go'], ['raf']]", {
+      callSignature: "const t = rafThrottle(fn); // uses global requestAnimationFrame",
+    }),
   ],
 };

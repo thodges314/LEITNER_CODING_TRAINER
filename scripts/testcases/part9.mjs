@@ -1,5 +1,5 @@
 import { c } from './part1.mjs';
-const r = (d, i, e) => c(d, i, e, { v: false, note: 'covered by the DOM harness' });
+const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by the DOM harness', ...o });
 
 // react-components track.
 export default {
@@ -21,11 +21,23 @@ export default {
     r('Unmounting stops the timer (no onDone afterwards)', 'seconds=1; Start; unmount immediately', 'onDone is never called'),
   ],
   'file-explorer-tree': [
-    r('Renders the top level collapsed', "nodes: src/{components/{Button.jsx}, index.js}, README.md", "buttons: 'src', 'README.md' inside role='tree'"),
-    r('Clicking a folder expands it and sets aria-expanded', "click 'src'", "buttons: src, components, index.js, README.md; aria-expanded='true'"),
-    r('Clicking it again collapses it', "click 'src' again", "buttons: src, README.md; aria-expanded='false'"),
-    r('Nested folders keep their own state', "expand 'src' and 'components', then collapse 'components'", "Button.jsx appears, then disappears; 'src' stays open"),
-    r('Clicking a file calls onSelect with its full path', "click Button.jsx (inside src/components) and README.md", "onSelect('src/components/Button.jsx'), onSelect('README.md')"),
-    r('Files are not expandable (no aria-expanded) and clicking a folder does not call onSelect', "inspect the README.md treeitem", 'no aria-expanded attribute'),
+    r('Renders the top level collapsed', "nodes: src/{components/{Button.jsx}, index.js}, README.md", "buttons: 'src', 'README.md' inside role='tree'", {
+      callSignature: "<FileTree nodes={NODES} onSelect={handleSelect} />",
+    }),
+    r('Clicking a folder expands it and sets aria-expanded', "click 'src'", "buttons: src, components, index.js, README.md; aria-expanded='true'", {
+      callSignature: "click folder 'src'",
+    }),
+    r('Clicking it again collapses it', "click 'src' again", "buttons: src, README.md; aria-expanded='false'", {
+      callSignature: "click folder 'src' again",
+    }),
+    r('Nested folders keep their own state', "expand 'src' and 'components', then collapse 'components'", "Button.jsx appears, then disappears; 'src' stays open", {
+      callSignature: "expand 'src' and 'components', then collapse 'components'",
+    }),
+    r('Clicking a file calls onSelect with its full path', "click Button.jsx (inside src/components) and README.md", "onSelect('src/components/Button.jsx'), onSelect('README.md')", {
+      callSignature: "click file 'Button.jsx'",
+    }),
+    r('Files are not expandable (no aria-expanded) and clicking a folder does not call onSelect', "inspect the README.md treeitem", 'no aria-expanded attribute', {
+      callSignature: "inspect file 'README.md'",
+    }),
   ],
 };

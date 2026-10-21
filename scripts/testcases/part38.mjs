@@ -9,21 +9,35 @@ export default {
     c('Spaces around the parts are ignored and "mod" is its own flag', `parseShortcut(' mod + s ')`, "{ key: 's', ctrl: false, meta: false, alt: false, shift: false, mod: true }"),
     c('Aliases: cmd/command = meta, option = alt, control = ctrl, esc = escape, return = enter, space = a space character', `[parseShortcut('Cmd+Option+Esc'), parseShortcut('control+return'), parseShortcut('Space')]`, "[{ key: 'escape', ctrl: false, meta: true, alt: true, shift: false, mod: false }, { key: 'enter', ctrl: true, meta: false, alt: false, shift: false, mod: false }, { key: ' ', ctrl: false, meta: false, alt: false, shift: false, mod: false }]"),
     c('Modifiers must match exactly: a missing modifier and an extra modifier both fail', `${EV}
-[matchesShortcut(ev('k', { ctrlKey: true }), 'Ctrl+K'), matchesShortcut(ev('k'), 'Ctrl+K'), matchesShortcut(ev('k', { ctrlKey: true, shiftKey: true }), 'Ctrl+K')]`, '[true, false, false]'),
+[matchesShortcut(ev('k', { ctrlKey: true }), 'Ctrl+K'), matchesShortcut(ev('k'), 'Ctrl+K'), matchesShortcut(ev('k', { ctrlKey: true, shiftKey: true }), 'Ctrl+K')]`, '[true, false, false]', {
+      callSignature: "matchesShortcut(event, 'Ctrl+K')",
+    }),
     c('The key is compared case-insensitively (Shift makes event.key uppercase)', `${EV}
-[matchesShortcut(ev('K', { shiftKey: true }), 'Shift+k'), matchesShortcut(ev('Enter', { metaKey: true }), 'Cmd+Enter'), matchesShortcut(ev('j', { ctrlKey: true }), 'Ctrl+K')]`, '[true, true, false]'),
+[matchesShortcut(ev('K', { shiftKey: true }), 'Shift+k'), matchesShortcut(ev('Enter', { metaKey: true }), 'Cmd+Enter'), matchesShortcut(ev('j', { ctrlKey: true }), 'Ctrl+K')]`, '[true, true, false]', {
+      callSignature: "matchesShortcut(event, 'Shift+k')",
+    }),
     c('A shortcut without modifiers only matches when no modifier is held', `${EV}
-[matchesShortcut(ev('Escape'), 'Escape'), matchesShortcut(ev('Escape', { altKey: true }), 'Escape'), matchesShortcut(ev('Escape', { shiftKey: true }), 'Esc')]`, '[true, false, false]'),
+[matchesShortcut(ev('Escape'), 'Escape'), matchesShortcut(ev('Escape', { altKey: true }), 'Escape'), matchesShortcut(ev('Escape', { shiftKey: true }), 'Esc')]`, '[true, false, false]', {
+      callSignature: "matchesShortcut(event, 'Escape')",
+    }),
     c('"mod" is Cmd on a Mac and Ctrl everywhere else', `${EV}
-[matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S', false), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S', true), matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S', true), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S', false)]`, '[true, true, false, false]'),
+[matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S', false), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S', true), matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S', true), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S', false)]`, '[true, true, false, false]', {
+      callSignature: "matchesShortcut(event, 'Mod+S', isMac)",
+    }),
     c('isMac defaults to false: without it, Mod means Ctrl', `${EV}
-[matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S'), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S')]`, '[true, false]'),
+[matchesShortcut(ev('s', { ctrlKey: true }), 'Mod+S'), matchesShortcut(ev('s', { metaKey: true }), 'Mod+S')]`, '[true, false]', {
+      callSignature: "matchesShortcut(event, 'Mod+S')",
+    }),
     c('findShortcut returns the name of the binding that matches, or null', `${EV}
 const bindings = { save: 'Mod+S', saveAll: 'Mod+Shift+S', help: 'Alt+H' };
-[findShortcut(ev('S', { ctrlKey: true, shiftKey: true }), bindings), findShortcut(ev('s', { ctrlKey: true }), bindings), findShortcut(ev('h', { altKey: true }), bindings), findShortcut(ev('x'), bindings)]`, "['saveAll', 'save', 'help', null]"),
+[findShortcut(ev('S', { ctrlKey: true, shiftKey: true }), bindings), findShortcut(ev('s', { ctrlKey: true }), bindings), findShortcut(ev('h', { altKey: true }), bindings), findShortcut(ev('x'), bindings)]`, "['saveAll', 'save', 'help', null]", {
+      callSignature: "findShortcut(event, { save: 'Mod+S', saveAll: 'Mod+Shift+S', help: 'Alt+H' })",
+    }),
     c('findShortcut passes isMac on to the matching', `${EV}
 const bindings = { save: 'Mod+S' };
-[findShortcut(ev('s', { metaKey: true }), bindings, true), findShortcut(ev('s', { metaKey: true }), bindings)]`, "['save', null]"),
+[findShortcut(ev('s', { metaKey: true }), bindings, true), findShortcut(ev('s', { metaKey: true }), bindings)]`, "['save', null]", {
+      callSignature: "findShortcut(event, { save: 'Mod+S' }, isMac)",
+    }),
   ],
   'cookie-parse-serialize': [
     c('parseCookies reads name=value pairs separated by semicolons', `parseCookies('a=1; b=two; c=')`, "{ a: '1', b: 'two', c: '' }"),

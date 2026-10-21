@@ -78,51 +78,71 @@ fast('g', 0);
     c('Elements already inside root are reported immediately, in document order', `${MO_SETUP}
 const root = el('div', [el('button', [], 'b1'), el('p', [el('button', [], 'b2')]), el('span', [], 's1')]);
 watchForElements(root, 'button', onFound, FakeMO);
-found`, "['b1', 'b2']"),
+found`, "['b1', 'b2']", {
+      callSignature: "watchForElements(root, 'button', onFound)",
+    }),
     c('One observer watches root and its whole subtree for added children', `${MO_SETUP}
 const root = el('div');
 watchForElements(root, 'button', onFound, FakeMO);
-[observers.length, observers[0].target === root, observers[0].options]`, '[1, true, { childList: true, subtree: true }]'),
+[observers.length, observers[0].target === root, observers[0].options]`, '[1, true, { childList: true, subtree: true }]', {
+      callSignature: "watchForElements(root, 'button', onFound)",
+    }),
     c('An element added later is reported', `${MO_SETUP}
 watchForElements(el('div'), 'button', onFound, FakeMO);
 deliver(el('button', [], 'late'));
-found`, "['late']"),
+found`, "['late']", {
+      callSignature: "watchForElements(root, 'button', onFound); // later: root.appendChild(button)",
+    }),
     c('An added matching container is reported before its matching descendants', `${MO_SETUP}
 watchForElements(el('div'), 'button', onFound, FakeMO);
 deliver(el('button', [el('button', [], 'inner')], 'outer'));
-found`, "['outer', 'inner']"),
+found`, "['outer', 'inner']", {
+      callSignature: "watchForElements(root, 'button', onFound); // later: append container with nested buttons",
+    }),
     c('A non-matching container still has its matching descendants reported', `${MO_SETUP}
 watchForElements(el('div'), 'button', onFound, FakeMO);
 deliver(el('section', [el('button', [], 'deep')]));
-found`, "['deep']"),
+found`, "['deep']", {
+      callSignature: "watchForElements(root, 'button', onFound); // later: append section with button child",
+    }),
     c('Non-matching elements and text nodes are ignored', `${MO_SETUP}
 watchForElements(el('div'), 'button', onFound, FakeMO);
 deliver(el('p', [], 'p1'), text());
-found`, '[]'),
+found`, '[]', {
+      callSignature: "watchForElements(root, 'button', onFound); // later: append <p> and text node",
+    }),
     c('An element is reported only once, even if it is delivered again', `${MO_SETUP}
 watchForElements(el('div'), 'button', onFound, FakeMO);
 const b = el('button', [], 'x');
 deliver(b);
 deliver(b);
-found`, "['x']"),
+found`, "['x']", {
+      callSignature: "watchForElements(root, 'button', onFound); // duplicate deliveries of same node",
+    }),
     c('An element that was already there is not reported again when a mutation delivers it', `${MO_SETUP}
 const b1 = el('button', [], 'b1');
 watchForElements(el('div', [b1]), 'button', onFound, FakeMO);
 deliver(b1);
-found`, "['b1']"),
+found`, "['b1']", {
+      callSignature: "watchForElements(root, 'button', onFound); // already existing node re-delivered",
+    }),
     c('Every mutation of a batch is handled, in order', `${MO_SETUP}
 watchForElements(el('div'), 'button', onFound, FakeMO);
 observers[0].callback([
   { addedNodes: [el('button', [], 'one')] },
   { addedNodes: [el('i', [], 'skip'), el('button', [], 'two')] },
 ]);
-found`, "['one', 'two']"),
+found`, "['one', 'two']", {
+      callSignature: "watchForElements(root, 'button', onFound); // multi-mutation batch",
+    }),
     c('stop() disconnects the observer, so nothing more is reported', `${MO_SETUP}
 const stop = watchForElements(el('div'), 'button', onFound, FakeMO);
 deliver(el('button', [], 'before'));
 stop();
 deliver(el('button', [], 'after'));
-[observers[0].disconnected, found]`, "[true, ['before']]"),
+[observers[0].disconnected, found]`, "[true, ['before']]", {
+      callSignature: "const stop = watchForElements(root, 'button', onFound);\nstop();",
+    }),
     c('MO defaults to the global MutationObserver', `${MO_SETUP}
 const run = () => {
   const saved = globalThis.MutationObserver;
@@ -135,42 +155,60 @@ const run = () => {
     globalThis.MutationObserver = saved;
   }
 };
-run()`, '[1, true]'),
+run()`, '[1, true]', {
+      callSignature: "watchForElements(root, 'button', onFound)",
+    }),
   ],
   'resize-breakpoints': [
     c('The first measurement is reported', `${RO_SETUP}
 observeBreakpoint(box, BP, onChange, FakeRO);
 resize(700);
-names`, "['md']"),
+names`, "['md']", {
+      callSignature: "observeBreakpoint(element, { sm: 0, md: 600, lg: 1000 }, onChange); // resize to 700px",
+    }),
     c('onChange fires only when the breakpoint changes', `${RO_SETUP}
 observeBreakpoint(box, BP, onChange, FakeRO);
 resize(700); resize(800); resize(1000);
-names`, "['md', 'lg']"),
+names`, "['md', 'lg']", {
+      callSignature: "observeBreakpoint(element, { sm: 0, md: 600, lg: 1000 }, onChange); // resize 700 -> 800 -> 1000px",
+    }),
     c('The largest minimum not above the width wins; a width equal to a minimum belongs to it', `${RO_SETUP}
 observeBreakpoint(box, BP, onChange, FakeRO);
 [0, 599, 600, 999, 1000].forEach(resize);
-names`, "['sm', 'md', 'lg']"),
+names`, "['sm', 'md', 'lg']", {
+      callSignature: "observeBreakpoint(element, { sm: 0, md: 600, lg: 1000 }, onChange); // resize across boundary widths",
+    }),
     c('The order of the keys in the breakpoints object does not matter', `${RO_SETUP}
 observeBreakpoint(box, { lg: 1000, sm: 0, md: 600 }, onChange, FakeRO);
 resize(650); resize(1200); resize(100);
-names`, "['md', 'lg', 'sm']"),
+names`, "['md', 'lg', 'sm']", {
+      callSignature: "observeBreakpoint(element, { lg: 1000, sm: 0, md: 600 }, onChange); // arbitrary key order",
+    }),
     c('Below every minimum there is no breakpoint (null), and null is reported as the first value', `${RO_SETUP}
 observeBreakpoint(box, { md: 600, lg: 1000 }, onChange, FakeRO);
 resize(300); resize(400); resize(700);
-names`, "[null, 'md']"),
+names`, "[null, 'md']", {
+      callSignature: "observeBreakpoint(element, { md: 600, lg: 1000 }, onChange); // width below lowest breakpoint",
+    }),
     c('Shrinking reports the smaller breakpoints in turn, including a change to null', `${RO_SETUP}
 observeBreakpoint(box, { md: 600, lg: 1000 }, onChange, FakeRO);
 resize(1200); resize(700); resize(300);
-names`, "['lg', 'md', null]"),
+names`, "['lg', 'md', null]", {
+      callSignature: "observeBreakpoint(element, { md: 600, lg: 1000 }, onChange); // shrinking width back down",
+    }),
     c('One observer is created and it observes the element', `${RO_SETUP}
 observeBreakpoint(box, BP, onChange, FakeRO);
-[observers.length, observers[0].observed.length, observers[0].observed[0] === box]`, '[1, 1, true]'),
+[observers.length, observers[0].observed.length, observers[0].observed[0] === box]`, '[1, 1, true]', {
+      callSignature: "observeBreakpoint(element, { sm: 0, md: 600, lg: 1000 }, onChange)",
+    }),
     c('stop() disconnects the observer, so nothing more is reported', `${RO_SETUP}
 const stop = observeBreakpoint(box, BP, onChange, FakeRO);
 resize(700);
 stop();
 resize(1200);
-[observers[0].disconnected, names]`, "[true, ['md']]"),
+[observers[0].disconnected, names]`, "[true, ['md']]", {
+      callSignature: "const stop = observeBreakpoint(element, BP, onChange);\nstop();",
+    }),
     c('RO defaults to the global ResizeObserver', `${RO_SETUP}
 const run = () => {
   const saved = globalThis.ResizeObserver;
@@ -183,6 +221,8 @@ const run = () => {
     globalThis.ResizeObserver = saved;
   }
 };
-run()`, "[1, ['lg']]"),
+run()`, "[1, ['lg']]", {
+      callSignature: "observeBreakpoint(element, BP, onChange)",
+    }),
   ],
 };
