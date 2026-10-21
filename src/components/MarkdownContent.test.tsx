@@ -124,4 +124,51 @@ const x = 42;
     });
     expect(container.textContent).toContain('Render a <table> with a <thead> row and <button>.');
   });
+
+  it('renders nested bullet lists with secondary indentation and circle style', () => {
+    const nestedText = `Requirements:
+- Parent requirement:
+  - First sub-requirement
+  - Second sub-requirement
+- Sibling requirement`;
+
+    act(() => {
+      root.render(<MarkdownContent text={nestedText} />);
+    });
+
+    const uls = container.querySelectorAll('ul');
+    expect(uls.length).toBe(2);
+    expect(uls[0].style.listStyleType).toBe('disc');
+    expect(uls[1].style.listStyleType).toBe('circle');
+
+    const topLis = uls[0].children;
+    expect(topLis.length).toBe(2);
+
+    const subLis = uls[1].children;
+    expect(subLis.length).toBe(2);
+    expect(subLis[0].textContent).toBe('First sub-requirement');
+    expect(subLis[1].textContent).toBe('Second sub-requirement');
+  });
+
+  it('renders nested sub-bullets under ordered list steps', () => {
+    const mixedText = `Steps:
+1. First step
+  - Detail A
+  - Detail B
+2. Second step`;
+
+    act(() => {
+      root.render(<MarkdownContent text={mixedText} />);
+    });
+
+    const ol = container.querySelector('ol');
+    expect(ol).not.toBeNull();
+    const nestedUl = container.querySelector('ul');
+    expect(nestedUl).not.toBeNull();
+    expect(nestedUl?.style.listStyleType).toBe('circle');
+
+    const subLis = nestedUl?.querySelectorAll('li');
+    expect(subLis?.length).toBe(2);
+    expect(subLis?.[0].textContent).toBe('Detail A');
+  });
 });

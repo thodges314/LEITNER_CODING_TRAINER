@@ -1,11 +1,73 @@
 import React from 'react';
-import { renderInlineMarkdown, parseParagraphLines } from '../lib/markdown';
+import { renderInlineMarkdown, parseParagraphLines, type MarkdownListItem } from '../lib/markdown';
 
 export interface MarkdownContentProps {
   text: string;
   className?: string;
   style?: React.CSSProperties;
 }
+
+const renderUnorderedList = (
+  items: MarkdownListItem[],
+  depth = 0,
+  key?: React.Key
+): React.ReactElement => {
+  const listStyleType = depth === 0 ? 'disc' : depth === 1 ? 'circle' : 'square';
+  return (
+    <ul
+      key={key}
+      style={{
+        margin: depth === 0 ? '2px 0' : '4px 0 2px 0',
+        paddingLeft: depth === 0 ? '22px' : '20px',
+        listStyleType,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+      }}
+    >
+      {items.map((rawItem, iIdx) => {
+        const item = typeof rawItem === 'string' ? { text: rawItem } : rawItem;
+        return (
+          <li key={iIdx} style={{ lineHeight: 1.55 }}>
+            {renderInlineMarkdown(item.text)}
+            {item.children && item.children.length > 0 && renderUnorderedList(item.children, depth + 1)}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+const renderOrderedList = (
+  items: MarkdownListItem[],
+  depth = 0,
+  key?: React.Key
+): React.ReactElement => {
+  const listStyleType = depth === 0 ? 'decimal' : depth === 1 ? 'lower-alpha' : 'lower-roman';
+  return (
+    <ol
+      key={key}
+      style={{
+        margin: depth === 0 ? '2px 0' : '4px 0 2px 0',
+        paddingLeft: depth === 0 ? '22px' : '20px',
+        listStyleType,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+      }}
+    >
+      {items.map((rawItem, iIdx) => {
+        const item = typeof rawItem === 'string' ? { text: rawItem } : rawItem;
+        return (
+          <li key={iIdx} style={{ lineHeight: 1.55 }}>
+            {renderInlineMarkdown(item.text)}
+            {item.children && item.children.length > 0 && renderUnorderedList(item.children, depth + 1)}
+          </li>
+        );
+      })}
+    </ol>
+  );
+};
 
 export const MarkdownContent: React.FC<MarkdownContentProps> = ({
   text,
@@ -106,47 +168,11 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
                     }
 
                     if (group.type === 'ul') {
-                      return (
-                        <ul
-                          key={gIdx}
-                          style={{
-                            margin: '2px 0',
-                            paddingLeft: '22px',
-                            listStyleType: 'disc',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                          }}
-                        >
-                          {group.items.map((item, iIdx) => (
-                            <li key={iIdx} style={{ lineHeight: 1.55 }}>
-                              {renderInlineMarkdown(item)}
-                            </li>
-                          ))}
-                        </ul>
-                      );
+                      return renderUnorderedList(group.items, 0, gIdx);
                     }
 
                     if (group.type === 'ol') {
-                      return (
-                        <ol
-                          key={gIdx}
-                          style={{
-                            margin: '2px 0',
-                            paddingLeft: '22px',
-                            listStyleType: 'decimal',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                          }}
-                        >
-                          {group.items.map((item, iIdx) => (
-                            <li key={iIdx} style={{ lineHeight: 1.55 }}>
-                              {renderInlineMarkdown(item)}
-                            </li>
-                          ))}
-                        </ol>
-                      );
+                      return renderOrderedList(group.items, 0, gIdx);
                     }
 
                     return (
