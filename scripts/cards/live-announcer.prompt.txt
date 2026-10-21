@@ -1,7 +1,15 @@
-Build an announcer for screen readers: AnnouncerProvider({ children }) and the hook useAnnounce(), which returns announce(message, { politeness = 'polite' } = {}).
+Build a screen reader announcer system consisting of `AnnouncerProvider` and `useAnnounce()`.
 
-The provider renders its children followed by two live regions: <div role="status" aria-live="polite" aria-atomic="true"> and <div role="alert" aria-live="assertive" aria-atomic="true">. announce(message) puts the message in the polite region; announce(message, { politeness: 'assertive' }) puts it in the assertive region. Each announcement also empties the other region.
+### `AnnouncerProvider({ children })`
+- **DOM Structure**: Renders `children` followed by two live regions:
+  - Polite region: `<div role="status" aria-live="polite" aria-atomic="true">`
+  - Assertive region: `<div role="alert" aria-live="assertive" aria-atomic="true">`
+- **Visual Hiding**: Hide both regions visually while keeping them accessible to screen readers (e.g. `position: absolute`, `width: 1px`, `height: 1px`, `overflow: hidden`, `clip`). Never use `display: none`, `visibility: hidden`, or the `hidden` attribute, which would silence assistive technology.
 
-Screen readers only speak text that CHANGES, so announcing the same message twice in a row must still change the region's text: on a repeat, add a trailing non-breaking space ('\u00a0'), and take it off again on the next repeat ('Saved', 'Saved\u00a0', 'Saved', ...).
-
-Hide both regions visually but keep them available to assistive tech: position: absolute; width: 1px; height: 1px; overflow: hidden (plus clip) are fine, but never display: none, visibility: hidden or the hidden attribute, which would silence them. announce must keep the same function identity across renders (useCallback).
+### `useAnnounce()`
+- **Returns**: `announce(message, { politeness = 'polite' } = {})`.
+- **Targeting**:
+  - `announce(message)` (or `{ politeness: 'polite' }`): Sets `message` in the polite region and empties the assertive region.
+  - `announce(message, { politeness: 'assertive' })`: Sets `message` in the assertive region and empties the polite region.
+- **Repeat Handling**: Screen readers only speak text that **changes**. To ensure repeating the same message speaks every time, toggle a trailing non-breaking space (`'\u00a0'`): e.g. `'Saved'`, `'Saved\u00a0'`, `'Saved'`.
+- **Identity**: `announce` must maintain a stable function identity across renders (`useCallback`).

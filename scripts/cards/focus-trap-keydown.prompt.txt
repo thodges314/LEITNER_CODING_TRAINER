@@ -1,1 +1,14 @@
-Write createFocusTrap(getFocusable, doc) that keeps Tab inside a dialog, and returns a keydown handler handleKeydown(event). getFocusable() returns the array of focusable elements currently inside the dialog, in tab order (call it on every keydown, because the dialog's content can change); doc.activeElement is the element that has focus now. Only the Tab key is handled; every other key is ignored. With an empty list, call event.preventDefault() and do nothing else. On Tab (no Shift): if focus is on the last element, or is not one of the dialog's elements, call event.preventDefault() and focus the first element. On Shift+Tab: if focus is on the first element, or is not one of the dialog's elements, call event.preventDefault() and focus the last element. In every other case do nothing, so the browser moves focus normally.
+Write `createFocusTrap(getFocusable, doc)` returning a keydown handler `handleKeydown(event)` that traps `Tab` focus within a dialog:
+
+- **Context**:
+  - `getFocusable()`: Returns an array of currently focusable elements in DOM tab order. Call it dynamically on each `keydown` as dialog contents can change.
+  - `doc.activeElement`: The element that currently holds focus.
+- **Key Handling**:
+  - Only the `Tab` key is intercepted; all other keys are ignored.
+  - If `getFocusable()` returns an empty list, call `event.preventDefault()` and do nothing else.
+- **Forward `Tab` (without `Shift`)**:
+  - If focus is on the last focusable element, or outside the dialog elements: call `event.preventDefault()` and move focus to the first element.
+  - Otherwise, do nothing (allow normal browser tab movement).
+- **Reverse `Tab` (`Shift + Tab`)**:
+  - If focus is on the first focusable element, or outside the dialog elements: call `event.preventDefault()` and move focus to the last element.
+  - Otherwise, do nothing (allow normal browser tab movement).

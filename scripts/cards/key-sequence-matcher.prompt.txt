@@ -1,1 +1,11 @@
-Write createSequenceMatcher(bindings, timeoutMs = 1000) for GitHub/vim-style key sequences such as "g i". bindings maps a space-separated sequence to an action name, for example { 'g i': 'goIssues', 'g p': 'goPulls', '?': 'help' }; no sequence is a prefix of another. It returns press(key, now), where now is a timestamp in milliseconds. press returns the action name when the key completes a sequence, and null otherwise. Rules: (1) if more than timeoutMs have passed since the previous key (exactly timeoutMs is still in time), the partial sequence is forgotten first; (2) a key that continues the partial sequence advances it; (3) a key that does not continue it starts over, and may itself be the first key of a new sequence ('g', 'g', 'i' still completes 'g i'); (4) after a match the matcher starts fresh. The timeout is measured from the previous key, not from the first key of the sequence.
+Write `createSequenceMatcher(bindings, timeoutMs = 1000)` for GitHub / Vim-style multi-key sequences (e.g. `'g i'`):
+
+- **Parameters**:
+  - `bindings`: Maps space-separated key sequences to action names (e.g. `{ 'g i': 'goIssues', 'g p': 'goPulls', '?': 'help' }`). No sequence is a prefix of another.
+  - `timeoutMs`: Maximum duration allowed between consecutive key presses (defaults to `1000` ms).
+- **Returned Function**: Returns `press(key, now)` where `now` is a timestamp in milliseconds. Returns the matched action name when the key completes a sequence, and `null` otherwise.
+- **Sequence Rules**:
+  1. **Timeout**: If more than `timeoutMs` has elapsed since the previous key press (exactly `timeoutMs` is still valid), the pending sequence is reset first. The timeout is measured from the previous key press, not from sequence start.
+  2. **Advance**: A key that matches the expected next token in the sequence advances the pending buffer.
+  3. **Mismatch & Restart**: A key that breaks the current sequence resets the buffer, but can immediately act as the first key of a new sequence (e.g. `'g'`, `'g'`, `'i'` successfully completes `'g i'`).
+  4. **Post-Match**: Upon completing a match, the buffer resets fresh.
