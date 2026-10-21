@@ -1,0 +1,6 @@
+Flatten arbitrarily nested arrays without built-in methods:
+
+### `flatten(arr)`
+- Recursively flattens an arbitrarily nested array of numbers into a single 1D flat array.
+- Must not use `Array.prototype.flat()` or `Array.prototype.flatMap()`.
+- Preserves the original element order.

@@ -1,0 +1,7 @@
+Implement TypeScript custom type guards for runtime validation:
+
+### `isRecord(val: unknown): val is Record<string, unknown>`
+- Returns `true` if `val` is a non-null object that is not an array; `false` for primitives, arrays, and `null`/`undefined`.
+
+### `isError(val: unknown): val is Error`
+- Returns `true` if `val` is an instance of `Error` or a record object containing a string `message` property.

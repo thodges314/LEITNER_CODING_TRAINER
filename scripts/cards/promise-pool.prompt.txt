@@ -1,0 +1,7 @@
+Implement concurrent asynchronous task throttling:
+
+### `pool(tasks, limit)`
+- Executes an array of async functions `tasks` with a maximum concurrency of `limit` tasks running simultaneously.
+- Starts a new task immediately as soon as any running task settles.
+- Resolves with an array of all completed results in their original input order.
+- Rejects immediately on the first task error, preventing new tasks from starting.
