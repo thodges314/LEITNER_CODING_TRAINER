@@ -32,10 +32,10 @@ export default {
     r('reset restores the initial values and clears touched', "change + blur email, then reset()", "values.email ''; touched {}"),
   ],
   'simple-table': [
-    r('Renders one header cell per column label', "columns [{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]", "<th> texts: 'Name', 'Age'"),
-    r('Renders one row per item with cells in column order', "rows [{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]", "2 <tr>; <td> texts: Ada, 36, Grace, 45"),
-    r('Missing, undefined and null values render as empty cells', "rows [{ name: 'Ada' }, { age: null, name: 'Bob' }]", "<td> texts: 'Ada', '', 'Bob', ''"),
-    r('An empty table shows a single "No rows" cell spanning all columns', 'rows = []', "one <tr> with <td colSpan=2>No rows</td>"),
+    r('Renders one header cell per column label', "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }]} />", "<th> texts: 'Name', 'Age'"),
+    r('Renders one row per item with cells in column order', "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />", "2 <tr>; <td> texts: Ada, 36, Grace, 45"),
+    r('Missing, undefined and null values render as empty cells', "<SimpleTable columns={COLUMNS} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />", "<td> texts: 'Ada', '', 'Bob', ''"),
+    r('An empty table shows a single "No rows" cell spanning all columns', '<SimpleTable columns={COLUMNS} rows={[]} />', "one <tr> with <td colSpan=2>No rows</td>"),
   ],
   'data-table': [
     r('Renders a header per column and the first page of rows', ROWS, "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"),
