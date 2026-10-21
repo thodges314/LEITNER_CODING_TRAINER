@@ -1,5 +1,11 @@
-The board is an array of rows of single-character strings.
+Implement grid word-search backtracking on a 2D board of single-character strings:
 
-Write exist(board, word): true when word can be traced through horizontally or vertically adjacent cells without reusing a cell within the same path (mark cells while exploring and restore them when backtracking; do not leave the board changed).
+### `exist(board, word)`
+- Checks whether `word` exists in the grid.
+- The word can be constructed from letters of sequentially adjacent cells (horizontally or vertically neighboring).
+- The same letter cell cannot be used more than once within the same path.
+- Modifies board cells temporarily during exploration and restores them upon backtracking, leaving `board` unchanged.
 
-Write findWords(board, words): the words from the list that exist on the board, each listed once, in any order.
+### `findWords(board, words)`
+- Finds all distinct words from list `words` that exist on `board`.
+- Each matching word should appear in the returned array once, in any order.

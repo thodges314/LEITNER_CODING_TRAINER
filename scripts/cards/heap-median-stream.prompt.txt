@@ -1,7 +1,11 @@
-Write your own binary heap inside your solution.
+Implement streaming median finding and CPU task scheduling (include an internal binary heap helper):
 
-Write class MedianFinder with addNum(num).
+### `MedianFinder`
+- Maintains a continuous data stream of numbers to compute running medians in O(log n) time per insertion.
+- Uses a max-heap for the lower half and a min-heap for the upper half, keeping sizes balanced within a difference of at most 1.
+- **`addNum(num)`**: Adds integer `num` from the data stream into the structure.
+- **`findMedian()`**: Returns the median of all numbers added so far. When the count is even, returns the mean of the two middle values; returns `undefined` if no numbers have been added.
 
-Write findMedian(): the median of all numbers added so far (the mean of the two middle values when the count is even; undefined when empty). Use a max-heap for the lower half and a min-heap for the upper half, keeping their sizes within one.
-
-Write leastInterval(tasks, n): given an array of task letters and a cooldown n (the same task needs n other slots between runs), return the minimum number of time slots to finish all tasks, idling when needed.
+### `leastInterval(tasks, n)`
+- Calculates the minimum number of CPU time intervals needed to complete all tasks in array `tasks`.
+- Tasks are represented by letters, and identical tasks must be separated by at least `n` cooldown intervals (during which the CPU may idle or perform other tasks).

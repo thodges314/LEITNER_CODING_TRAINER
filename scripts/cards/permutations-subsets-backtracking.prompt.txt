@@ -1,3 +1,15 @@
-Write subsets(nums) returning all subsets (the power set) of an array of distinct numbers, permute(nums) returning all orderings of distinct numbers.
+Implement classic backtracking search algorithms:
 
-Write generateParenthesis(n) returning every well-formed string of n pairs of parentheses. Return [[]] for subsets([]), [[]] for permute([]) and [''] for generateParenthesis(0). Any order of results is accepted, but each result must appear exactly once.
+### `subsets(nums)`
+- Generates the power set (all unique subsets) of an array of distinct integers `nums`.
+- Returns `[[]]` if `nums` is empty (`[]`).
+- Subsets may appear in any order, but each subset must be unique.
+
+### `permute(nums)`
+- Generates all permutations (orderings) of an array of distinct integers `nums`.
+- Returns `[[]]` if `nums` is empty (`[]`).
+- Permutations may appear in any order.
+
+### `generateParenthesis(n)`
+- Generates all combinations of well-formed parentheses strings using `n` pairs of parentheses.
+- Returns `['']` when `n === 0`.

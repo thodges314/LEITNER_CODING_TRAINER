@@ -1,3 +1,12 @@
-Write binaryStrings(n) returning every binary string of length n in ascending order (binaryStrings(2) is ['00', '01', '10', '11']; binaryStrings(0) is ['']).
+Implement combinatorial generation utilities:
 
-Write combine(n, k) returning every combination of k numbers chosen from 1...n as arrays, each ascending, in lexicographic order (combine(4, 2) starts [1, 2], [1, 3]; combine(3, 0) is [[]]; combine(2, 3) is []).
+### `binaryStrings(n)`
+- Generates every binary string of length `n` in lexicographically ascending order.
+- For example, `binaryStrings(2)` returns `['00', '01', '10', '11']`.
+- Returns `['']` when `n === 0`.
+
+### `combine(n, k)`
+- Generates every combination of `k` numbers chosen from range `1...n`.
+- Each individual combination must be an array sorted in ascending order.
+- Combinations must be returned in lexicographical order (e.g. `combine(4, 2)` starts with `[1, 2]`, `[1, 3]`).
+- Returns `[[]]` for `k === 0`; returns `[]` when `k > n`.
