@@ -1,1 +1,14 @@
-Write describe(value: string | number | string[]): string returning 'string:<length>' for a string, 'number:<value with one decimal, via toFixed(1)>' for a number and 'list:<length>' for an array, narrowing with typeof / Array.isArray. Define type Shape = { radius: number } | { width: number; height: number } and write area(shape: Shape): number which uses the `in` operator to narrow: a circle returns Math.PI * radius ** 2 rounded to 2 decimals, a rectangle returns width * height.
+Implement TypeScript narrowing using `typeof`, `Array.isArray`, and `in`:
+
+### `describe(value: string | number | string[]): string`
+- Returns `'string:<length>'` for a string.
+- Returns `'number:<value with one decimal, via toFixed(1)>'` for a number.
+- Returns `'list:<length>'` for an array.
+- Narrows using `typeof` and `Array.isArray`.
+
+### `type Shape = { radius: number } | { width: number; height: number }`
+
+### `area(shape: Shape): number`
+- Narrows `shape` using the `in` operator.
+- Circle: returns `Math.PI * radius ** 2` rounded to 2 decimals (`Math.round(Math.PI * shape.radius ** 2 * 100) / 100`).
+- Rectangle: returns `width * height`.

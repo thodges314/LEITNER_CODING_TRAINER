@@ -53,7 +53,7 @@ export const TRACK_STATS: TrackStats[] = [
   { track: 'algorithms', total: 77, completed: 77, status: 'COMPLETE' },
   { track: 'async-js', total: 21, completed: 21, status: 'COMPLETE' },
   { track: 'js-language', total: 25, completed: 25, status: 'COMPLETE' },
-  { track: 'typescript-patterns', total: 14, completed: 0, status: 'PLANNED' },
+  { track: 'typescript-patterns', total: 14, completed: 5, status: 'IN_PROGRESS' },
   { track: 'js-utilities', total: 37, completed: 0, status: 'PLANNED' },
   { track: 'dom-browser', total: 20, completed: 0, status: 'PLANNED' },
   { track: 'react', total: 27, completed: 0, status: 'PLANNED' },
@@ -62,7 +62,7 @@ export const TRACK_STATS: TrackStats[] = [
 ];
 
 /**
- * 3. COMPLETED BATCHES (Batches 1–20: 123 cards total)
+ * 3. COMPLETED BATCHES (Batches 1–21: 128 cards total)
  */
 export const COMPLETED_BATCHES: BatchDefinition[] = [
   {
@@ -368,18 +368,11 @@ export const COMPLETED_BATCHES: BatchDefinition[] = [
       'proxy-validation-traps',
     ],
   },
-];
-
-/**
- * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 21–48: 148 cards total)
- */
-export const REMAINING_BATCHES: BatchDefinition[] = [
-  // --- typescript-patterns track (14 cards, Batches 21–23) ---
   {
     batchNumber: 21,
     title: 'Generics & Narrowing',
     track: 'typescript-patterns',
-    status: 'planned',
+    status: 'completed',
     cardCount: 5,
     cardIds: [
       'ts-identity-first-generics',
@@ -389,6 +382,13 @@ export const REMAINING_BATCHES: BatchDefinition[] = [
       'ts-discriminated-unions-exhaustiveness',
     ],
   },
+];
+
+/**
+ * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 22–48: 143 cards total)
+ */
+export const REMAINING_BATCHES: BatchDefinition[] = [
+  // --- typescript-patterns track (9 cards remaining, Batches 22–23) ---
   {
     batchNumber: 22,
     title: 'Utility Types & Conditional Types',

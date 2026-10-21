@@ -1,3 +1,16 @@
-Define a generic union AsyncState<T> discriminated by `status`: { status: 'idle' }, { status: 'loading' }, { status: 'success'; data: T } and { status: 'error'; error: Error }.
+Define a generic discriminated union and exhaustive state formatter:
 
-Write formatState<T>(state: AsyncState<T>): string using a switch that returns 'Idle', 'Loading...', `Loaded: ${JSON.stringify(data)}` and `Failed: ${error.message}`. In the default branch assign the state to a variable of type never, so adding a new status without handling it is a compile-time error.
+### `type AsyncState<T>`
+- Discriminated by `status`:
+  - `{ status: 'idle' }`
+  - `{ status: 'loading' }`
+  - `{ status: 'success'; data: T }`
+  - `{ status: 'error'; error: Error }`
+
+### `formatState<T>(state: AsyncState<T>): string`
+- Uses a `switch` statement that returns:
+  - `'Idle'` for `'idle'`
+  - `'Loading...'` for `'loading'`
+  - `'Loaded: ' + JSON.stringify(state.data)` for `'success'`
+  - `'Failed: ' + state.error.message` for `'error'`
+- In the `default` branch, assigns `state` to a variable of type `never` (`const _exhaustiveCheck: never = state; throw new Error(...)`), ensuring unhandled statuses fail compilation.

@@ -43,9 +43,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **123 / 271 (45.4%)**
-- **Cards Remaining:** **148 / 271 (54.6%)**
-- **Total Batches:** 48 batches (20 completed, 28 remaining)
+- **Fully Typed Cards Completed:** **128 / 271 (47.2%)**
+- **Cards Remaining:** **143 / 271 (52.8%)**
+- **Total Batches:** 48 batches (21 completed, 27 remaining)
 
 ### Track Completion Status
 
@@ -54,19 +54,19 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`algorithms`** | 77 | 77 | 100.0% | **COMPLETE** (Batches 1–11) |
 | **`async-js`** | 21 | 21 | 100.0% | **COMPLETE** (Batches 12–15) |
 | **`js-language`** | 25 | 25 | 100.0% | **COMPLETE** (Batches 16–20) |
-| **`typescript-patterns`** | 14 | 0 | 0.0% | Planned (Batches 21–23) |
+| **`typescript-patterns`** | 14 | 5 | 35.7% | **IN PROGRESS** (Batch 21 done, 22–23 remaining) |
 | **`js-utilities`** | 37 | 0 | 0.0% | Planned (Batches 24–30) |
 | **`dom-browser`** | 20 | 0 | 0.0% | Planned (Batches 31–34) |
 | **`react`** | 27 | 0 | 0.0% | Planned (Batches 35–39) |
 | **`react-components`** | 45 | 0 | 0.0% | Planned (Batches 40–47) |
 | **`testing-tooling`** | 5 | 0 | 0.0% | Planned (Batch 48) |
-| **TOTAL** | **271** | **123** | **45.4%** | **48 Batches Total** |
+| **TOTAL** | **271** | **128** | **47.2%** | **48 Batches Total** |
 
 ---
 
-## 4. Completed Batches (Batches 1–20: 123 Cards)
+## 4. Completed Batches (Batches 1–21: 128 Cards)
 
-All 123 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 128 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 - **Batch 1 (DSA Foundations — 8 cards):** `binary-search-exact`, `two-pointer-sorted-sum`, `sliding-window-fixed`, `valid-parentheses-stack`, `merge-intervals`, `two-sum-hashmap`, `interval-overlap`, `anagram-palindrome`.
@@ -94,21 +94,17 @@ All 123 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 19 (Weak Collections & Iterators — 4 cards):** `weakmap-memoize-object`, `weakmap-private-state`, `weakset-cycle-detection`, `iterators-generators`.
 - **Batch 20 (Iterators, Coroutines & Proxies — 7 cards):** `iterable-range-class`, `generators-coroutines`, `symbol-async-iterator`, `proxy-default-logging`, `proxy-negative-index`, `proxy-revocable-readonly`, `proxy-validation-traps`.
 
+### TypeScript Patterns Track (5 of 14 Complete)
+- **Batch 21 (Generics & Narrowing — 5 cards):** `ts-identity-first-generics`, `ts-narrowing-typeof-in`, `ts-custom-type-guards`, `ts-branded-nominal-types`, `ts-discriminated-unions-exhaustiveness`.
+
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 21–48: 148 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 22–48: 143 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
-### Track: `typescript-patterns` (14 cards — Batches 21 to 23)
+### Track: `typescript-patterns` (9 cards remaining — Batches 22 to 23)
 *Focus: Ingesting dedicated `.ref.ts` solutions and prompt type signatures for existing TypeScript cards.*
-
-- **Batch 21: Generics & Narrowing (5 cards)**
-  - `ts-identity-first-generics`: TS Generics: identity, first, Box<T>
-  - `ts-narrowing-typeof-in`: TS Unions: Narrowing With typeof and in
-  - `ts-custom-type-guards`: Custom User-Defined Type Guards (isRecord, isError)
-  - `ts-branded-nominal-types`: TS Branded Types: Nominal IDs, Validated Email, Brand Helpers
-  - `ts-discriminated-unions-exhaustiveness`: Discriminated Unions & Exhaustiveness Checking
 
 - **Batch 22: Utility Types & Conditional Types (5 cards)**
   - `ts-reimplement-utility-types`: TS Types: Rebuild Partial, Readonly, Pick, Record
