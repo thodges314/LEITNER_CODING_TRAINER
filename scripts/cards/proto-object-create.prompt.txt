@@ -1,13 +1,13 @@
 Implement prototype creation and inspection helper functions:
 
-### `inheritFrom(proto, props = {})`
+### `inheritFrom(proto: any, props?: any): any`
 - Returns a new object whose prototype is set to `proto` via `Object.create`.
 - Copies all properties of `props` onto the new object as own properties (e.g. via `Object.assign`).
 
-### `hasOwn(obj, key)`
+### `hasOwn(obj: any, key: string | symbol): boolean`
 - Returns `true` only for own (not inherited) properties.
 - Safely delegates using `Object.prototype.hasOwnProperty.call(obj, key)`.
 
-### `protoChainLength(obj)`
+### `protoChainLength(obj: any): number`
 - Returns the number of prototype links on the chain after `obj` itself.
 - For example, `protoChainLength({}) === 1` (`Object.prototype`), while `protoChainLength(Object.create(null)) === 0`.

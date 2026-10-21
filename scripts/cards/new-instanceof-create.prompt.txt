@@ -1,1 +1,8 @@
-Without using the `new` operator, Reflect.construct or Object.create, implement: objectCreate(proto, propertiesObject?) (proto must be an object, function or null, otherwise throw TypeError); myNew(Constructor, ...args) for function constructors (create an object linked to Constructor.prototype, call the constructor with it as `this`, and return the constructor's return value only if it is an object); and myInstanceOf(value, Constructor) (walk the prototype chain; primitives and null are never instances).
+### `objectCreate(proto: object | null, propertiesObject?: PropertyDescriptorMap & ThisType<any>): any`
+### `myNew(Constructor: any, ...args: any[]): any`
+### `myInstanceOf(value: any, Constructor: any): boolean`
+
+Without using the `new` operator, `Reflect.construct` or `Object.create`, implement:
+- `objectCreate(proto, propertiesObject?)`: `proto` must be an object, function or null, otherwise throw `TypeError`.
+- `myNew(Constructor, ...args)` for function constructors: create an object linked to `Constructor.prototype`, call the constructor with it as `this`, and return the constructor's return value only if it is an object.
+- `myInstanceOf(value, Constructor)`: walk the prototype chain; primitives and null are never instances.

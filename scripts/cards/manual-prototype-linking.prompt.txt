@@ -1,1 +1,10 @@
-Without using `class`, write the constructor functions Animal(name) and Dog(name, breed). Animal.prototype.speak() returns name + ' makes a sound'. Dog calls the Animal constructor on its own `this`, then sets this.breed. Link Dog.prototype to Animal.prototype with Object.create (do not call new Animal), restore Dog.prototype.constructor to Dog as a NON-enumerable property, and override Dog.prototype.speak to return the Animal version (call Animal.prototype.speak.call(this)) + ' Woof!'. Animal.prototype must stay unchanged.
+### `Animal(this: any, name: string): void`
+### `Animal.prototype.speak(this: any): string`
+### `Dog(this: any, name: string, breed: string): void`
+### `Dog.prototype.speak(this: any): string`
+
+Without using `class`, write the constructor functions `Animal(name)` and `Dog(name, breed)`:
+- `Animal.prototype.speak()` returns `name + ' makes a sound'`.
+- `Dog` calls the `Animal` constructor on its own `this`, then sets `this.breed`.
+- Link `Dog.prototype` to `Animal.prototype` with `Object.create` (do not call `new Animal`), restore `Dog.prototype.constructor` to `Dog` as a **non-enumerable** property, and override `Dog.prototype.speak` to return the `Animal` version (`Animal.prototype.speak.call(this)`) + `' Woof!'`.
+- `Animal.prototype` must stay unchanged.

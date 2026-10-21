@@ -1,10 +1,10 @@
 Write object cloning and composition utilities that operate at the property descriptor level:
 
-### `cloneWithDescriptors(obj)`
+### `cloneWithDescriptors<T extends object>(obj: T): T`
 - Returns a new object with the same prototype as `obj` and copies of all own properties.
 - Preserves non-enumerable properties, symbol keys, and getters/setters as accessors (without invoking them during copying).
 
-### `mixin(target, ...sources)`
+### `mixin<T extends object>(target: T, ...sources: any[]): T`
 - Copies every own property (both string and `Symbol` keys, enumerable and non-enumerable) from each source object onto `target` by descriptor.
 - Getters remain accessors and are never evaluated during copying (unlike `Object.assign`).
 - Later sources override earlier ones.

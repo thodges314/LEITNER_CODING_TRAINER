@@ -1,14 +1,14 @@
 Implement prototype chain inspection and custom instance resolution utilities:
 
-### `getProtoChain(obj)`
+### `getProtoChain(obj: any): object[]`
 - Returns an array of prototype objects on `obj`'s prototype chain, nearest first, ending with `Object.prototype`.
 - Returns an empty array `[]` for objects with no prototype (`Object.create(null)`).
 
-### `findOwner(obj, key)`
+### `findOwner(obj: any, key: string | symbol): object | null`
 - Returns the first object on the prototype chain (starting at `obj` itself) that possesses `key` as an own property (`hasOwnProperty`).
 - Returns `null` if the property is not found on the chain.
 
-### `myInstanceOf(value, Ctor)`
+### `myInstanceOf(value: any, Ctor: any): boolean`
 - Implements `instanceof` without using the native `instanceof` operator.
 - Throws `TypeError('Right-hand side is not callable')` if `Ctor` is not a function.
 - If `Ctor` defines a custom `[Symbol.hasInstance]` (other than `Function.prototype[Symbol.hasInstance]`), invokes it and returns the boolean result.
