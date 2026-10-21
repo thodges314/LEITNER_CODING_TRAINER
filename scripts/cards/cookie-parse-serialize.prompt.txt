@@ -1,1 +1,24 @@
-Write parseCookies(header) and serializeCookie(name, value, options = {}). parseCookies reads a Cookie header or document.cookie string such as 'a=1; b=hello%20world' and returns an object: split on ';', skip empty segments, split each segment at the FIRST '=' (values may contain '='), trim the name and the value, decode the value with decodeURIComponent (if it is malformed, keep the raw text), and keep the first value when a name repeats. serializeCookie returns the Set-Cookie text: name=encodeURIComponent(value), followed by the attributes that were provided, always in this order: '; Max-Age=<n>' (maxAge, a number: 0 must still be written), '; Expires=<utc string>' (expires, a Date, via toUTCString), '; Domain=<d>' (domain), '; Path=<p>' (path), '; Secure' (secure: true), '; HttpOnly' (httpOnly: true), '; SameSite=<Strict|Lax|None>' (sameSite, case-insensitive input). It throws TypeError('Invalid cookie name') for an empty name or a name containing '=', ';', ',' or whitespace, and TypeError('Invalid SameSite value') for any other SameSite value.
+Implement HTTP cookie parsing and serialization utilities:
+
+### `parseCookies(header)`
+- Parses a `Cookie` request header or `document.cookie` string (e.g. `'a=1; b=hello%20world'`).
+- Returns an object mapping cookie names to decoded values:
+  - Splits segments on `';'` and skips empty segments.
+  - Splits each segment at the **first `'='` only** (cookie values may contain equal signs).
+  - Trims both name and value.
+  - Decodes values with `decodeURIComponent` (if decoding throws, preserves the raw text).
+  - Preserves the **first** occurrence if a cookie name is duplicated.
+
+### `serializeCookie(name, value, options = {})`
+- Generates a `Set-Cookie` header string: `name=encodeURIComponent(value)`.
+- **Validation**:
+  - Throws `TypeError('Invalid cookie name')` if `name` is empty or contains `'='`, `';'`, `','`, or whitespace.
+  - If `options.sameSite` is provided, accepts case-insensitive `'strict'`, `'lax'`, or `'none'`. Throws `TypeError('Invalid SameSite value')` for any other value.
+- **Attributes Ordering** (appends provided attributes in this exact order):
+  1. `; Max-Age=<n>` (integer from `options.maxAge`; note: `0` must be emitted).
+  2. `; Expires=<utc string>` (`options.expires.toUTCString()`).
+  3. `; Domain=<domain>`.
+  4. `; Path=<path>`.
+  5. `; Secure` (if `options.secure === true`).
+  6. `; HttpOnly` (if `options.httpOnly === true`).
+  7. `; SameSite=<Strict|Lax|None>` (capitalized: `'Strict'`, `'Lax'`, or `'None'`).

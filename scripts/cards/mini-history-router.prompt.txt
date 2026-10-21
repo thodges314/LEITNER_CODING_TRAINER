@@ -1,1 +1,25 @@
-Write createRouter(routes, win = window), a tiny client-side router built on the History API. routes is an ordered list like [{ name: 'user', path: '/users/:id' }]; a segment starting with ':' captures a parameter (decoded with decodeURIComponent), every other segment must match exactly, the number of segments must be equal, empty segments (leading, trailing and double slashes) are ignored, and the first matching route wins. A path with no match resolves to name: null. A route object is { name, params, path } where path is the path as given. The router starts from win.location.pathname and listens for 'popstate' on win (browser back/forward) by resolving win.location.pathname again. It returns { current(), navigate(path), replace(path), subscribe(fn), destroy() }. navigate(path) does nothing when path equals the current route's path; otherwise it calls win.history.pushState(null, '', path), updates the route and notifies subscribers. replace(path) is the same with win.history.replaceState and always applies. subscribe(fn) calls fn(route) on every change (not immediately) and returns an unsubscribe function. destroy() removes the popstate listener and all subscribers.
+Build a lightweight browser client-side router integrated with the HTML5 History API:
+
+### `createRouter(routes, win = window)`
+- `routes` is an ordered list of route definitions: `[{ name: 'user', path: '/users/:id' }, ...]`.
+- Starts at `win.location.pathname` and listens to `win` for `'popstate'` events.
+
+#### Pattern Matching & Resolution
+- Segments starting with `':'` capture named parameters (decoded via `decodeURIComponent`).
+- Static segments must match identically.
+- Empty segments (leading, trailing, and double slashes) are ignored.
+- The segment count must match, and the first matching route in the list wins.
+- A path with no match resolves to `{ name: null, params: {}, path }`.
+
+#### Router Methods
+- **`current()`**: Returns the current resolved route `{ name, params, path }`.
+- **`navigate(path)`**:
+  - Does nothing if `path` equals `current().path`.
+  - Otherwise calls `win.history.pushState(null, '', path)`, resolves the new route, and notifies subscribers.
+- **`replace(path)`**:
+  - Calls `win.history.replaceState(null, '', path)`, updates the route, and notifies subscribers.
+- **`subscribe(fn)`**:
+  - Subscribes `fn(route)` to change events (not called immediately upon subscription).
+  - Returns an unsubscribe function.
+- **`destroy()`**:
+  - Cleans up by removing the `'popstate'` listener from `win` and clearing all subscribers.

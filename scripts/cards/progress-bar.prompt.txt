@@ -1,36 +1,12 @@
 Build `ProgressBar({ value, max = 100, label = "Progress" })`:
 
-- Clamp `value` into the range `[0, max]`: `const clamped = Math.min(max, Math.max(0, value))`.
-- Percentage calculation:
-  - Exact width percentage for fill: `(clamped / max) * 100%` (e.g. `"33.333333333333336%"`, `"50%"`).
-  - Rounded integer percentage for text: `Math.round((clamped / max) * 100)%` (e.g. `"33%"`, `"50%"`).
-
-### Determinate State (`value` is provided)
-```jsx
-<div
-  role="progressbar"
-  aria-label={label}
-  aria-valuemin="0"
-  aria-valuemax={max}
-  aria-valuenow={clamped}
->
-  <div data-fill style={{ width: `${(clamped / max) * 100}%` }} />
-  <span>{Math.round((clamped / max) * 100)}%</span>
-</div>
-```
-
-### Indeterminate State (`value` is `undefined` or `null`)
-```jsx
-<div
-  role="progressbar"
-  aria-label={label}
-  aria-valuemin="0"
-  aria-valuemax={max}
-  data-indeterminate="true"
->
-  <div data-fill />
-</div>
-```
-- Omit `aria-valuenow`.
-- `<div data-fill />` must have **no inline style** attribute at all.
-- Do **not** render the `<span>` element.
+- **Root Element**: Render `<div role="progressbar">` with `aria-label={label}`, `aria-valuemin="0"`, and `aria-valuemax={max}`. Let `clamped` be `value` limited to the range `[0, max]`.
+- **Determinate State** (when `value` is defined):
+  - Set `aria-valuenow` to `clamped` on the root.
+  - Render `<div data-fill style={{ width: ((clamped / max) * 100) + '%' }} />` inside it (the exact percentage, e.g. `"50%"` or `"75%"`).
+  - Render `<span>{Math.round((clamped / max) * 100)}%</span>` inside it (a whole number followed by `"%"`).
+- **Indeterminate State** (when `value` is `undefined`):
+  - Set `data-indeterminate="true"` on the root element.
+  - Omit `aria-valuenow`.
+  - Render `<div data-fill />` with no inline style at all.
+  - Do **NOT** render the `<span>` (no percentage text).

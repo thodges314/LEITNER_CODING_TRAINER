@@ -1,1 +1,22 @@
-Write createStorage(backend, { prefix = 'app:', now = Date.now } = {}) wrapping a localStorage-like backend (getItem, setItem, removeItem, key(i), length). set(key, value, { ttlMs }) stores JSON (returns true, or false if the backend throws, e.g. quota exceeded); get(key, fallback = null) returns the stored value, or the fallback when the key is missing, expired (also remove it) or the stored text is corrupt JSON (also remove it); remove(key); keys() lists this namespace's keys without the prefix; clear() removes only keys with this prefix.
+Wrap a `localStorage`-like backend with namespacing and TTL (Time-To-Live) expiration:
+
+### `createStorage(backend, options = {})`
+- Wraps `backend` supporting `getItem`, `setItem`, `removeItem`, `key(i)`, and `length`.
+- Options:
+  - `prefix`: string namespace prepended to all backend keys (defaults to `'app:'`).
+  - `now`: timestamp generator function (defaults to `Date.now`).
+
+#### Storage Methods
+- **`set(key, value, { ttlMs } = {})`**:
+  - Stores value as JSON with expiration timestamp: `{ v: value, e: ttlMs ? now() + ttlMs : null }`.
+  - Returns `true` on success, or `false` if `backend.setItem` throws (e.g. storage quota exceeded).
+- **`get(key, fallback = null)`**:
+  - Reads stored entry. Returns `fallback` if the key is missing.
+  - If the item has expired (`now() >= entry.e`) or contains corrupt JSON, removes it from storage and returns `fallback`.
+  - Otherwise returns the stored value `entry.v`.
+- **`remove(key)`**:
+  - Removes the namespaced key from `backend`.
+- **`keys()`**:
+  - Returns an array of keys belonging to this namespace, stripping the prefix.
+- **`clear()`**:
+  - Removes all keys belonging to this namespace without touching other keys in `backend`.
