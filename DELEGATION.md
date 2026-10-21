@@ -13,6 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
+| Polish copy-to-clipboard contracts and optimize card instructions with Markdown (Batch 1) | Antigravity | `feature/polish-clipboard-and-markdown-instructions-batch1` | in progress |
 
 ## How to pick up a task
 1. `git fetch && git checkout master && git pull`, then read the roadmap, this file and the claim table above. Pick a task nobody has claimed.
