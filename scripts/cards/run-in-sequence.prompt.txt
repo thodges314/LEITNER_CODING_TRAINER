@@ -1,12 +1,12 @@
 Tasks are zero-argument functions returning a `Promise` (or a value).
 
-### `runSequentially(tasks)`
+### `runSequentially<T>(tasks: (() => T | Promise<T>)[]): Promise<T[]>`
 - Executes each task strictly one after another in order.
 - Each subsequent task is invoked only after the previous task's promise resolves.
 - Resolves to an array containing each task's result in corresponding order.
 - **Fail-Fast**: If any task rejects, immediately stops execution and rejects with that error without initiating any remaining tasks.
 
-### `runInParallel(tasks)`
+### `runInParallel<T>(tasks: (() => T | Promise<T>)[]): Promise<T[]>`
 - Invokes all task functions concurrently at the same time.
 - Resolves to an array containing each task's resolved result in the original input order.
 - Rejects immediately if any task's promise rejects.

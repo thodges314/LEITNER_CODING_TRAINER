@@ -1,5 +1,6 @@
 Write `promiseAny(promises)`:
 
+### `promiseAny<T>(promises: Iterable<T | Promise<T>>): Promise<T>`
 - **Input**: Takes an iterable of promises (or plain values).
 - **Fulfillment**: Returns a Promise that fulfills as soon as **any** input promise fulfills, resolving with that first fulfillment value.
 - **Rejection & `AggregateError`**:

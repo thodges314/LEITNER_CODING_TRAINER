@@ -1,18 +1,18 @@
 Implement three core Promise concurrency combinators: `promiseAll`, `promiseAllSettled`, and `promiseRace`.
 
-### `promiseAll(iterable)`
+### `promiseAll<T>(iterable: Iterable<T | Promise<T>>): Promise<T[]>`
 - Resolves with an array of values preserving input order.
 - Accepts non-promise values (wraps them).
 - An empty iterable resolves immediately to `[]`.
 - Rejects immediately with the first rejection reason encountered.
 
-### `promiseAllSettled(iterable)`
+### `promiseAllSettled<T>(iterable: Iterable<T | Promise<T>>): Promise<PromiseSettledResult<T>[]>`
 - Resolves only after all inputs have settled (never rejects).
 - Resolves to an array of result objects:
   - `{ status: 'fulfilled', value }` for resolved items.
   - `{ status: 'rejected', reason }` for rejected items.
 - An empty iterable resolves immediately to `[]`.
 
-### `promiseRace(iterable)`
+### `promiseRace<T>(iterable: Iterable<T | Promise<T>>): Promise<T>`
 - Settles (fulfills or rejects) with the eventual state of the first input promise to settle.
 - An empty iterable remains pending forever.

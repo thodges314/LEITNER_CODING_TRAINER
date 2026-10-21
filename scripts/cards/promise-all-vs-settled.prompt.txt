@@ -1,6 +1,7 @@
 Write an async function `fetchAllUsers(urls)` that requests all URLs in parallel using `Promise.allSettled`:
 
-- **Parallel Execution**: Requests all URLs concurrently.
+### `fetchAllUsers(urls: string[]): Promise<any[]>`
+- **Parallel Execution**: Requests all URLs concurrently via `fetch(url).then(r => r.json())`.
 - **Filtering & Order**: Returns an array containing the parsed JSON payloads of the requests that succeeded (`status === 'fulfilled'`), preserving their original input order.
 - **Failures**: Silently drops any request that failed (`status === 'rejected'`).
 - **Edge Cases**: An empty `urls` array or an invocation where every request fails resolves to `[]`.

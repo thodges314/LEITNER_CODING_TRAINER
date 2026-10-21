@@ -1,16 +1,17 @@
-Implement `class MyPromise(executor)` from scratch without using native Promises for internal state:
+Implement `class MyPromise<T>(executor)` from scratch without using native Promises for internal state:
 
+### `MyPromise<T>`
 - **Settlement & State**:
   - Settles at most once: subsequent calls to `resolve` or `reject` are ignored.
   - If the `executor` throws synchronously, reject the promise with the thrown exception.
   - Resolving a promise with itself must reject with a `TypeError`.
-- **`.then(onFulfilled, onRejected)`**:
+- **`.then<TResult1 = T, TResult2 = never>(onFulfilled?, onRejected?): MyPromise<TResult1 | TResult2>`**:
   - Returns a **NEW** `MyPromise` instance.
   - Callbacks always execute asynchronously as microtasks (`queueMicrotask`), even when the promise is already settled.
   - Handler return value resolves the derived promise; returned thenables/promises are adopted; thrown errors reject it.
   - Omitted handlers pass values or rejection reasons through to the derived promise.
-- **`.catch(onRejected)`**: Equivalent to `.then(null, onRejected)`.
-- **`.finally(callback)`**: Runs `callback` on both fulfillment and rejection, preserving and passing the original fulfillment value or rejection reason through.
+- **`.catch<TResult = never>(onRejected?): MyPromise<T | TResult>`**: Equivalent to `.then(null, onRejected)`.
+- **`.finally(callback: () => void): MyPromise<T>`**: Runs `callback` on both fulfillment and rejection, preserving and passing the original fulfillment value or rejection reason through.
 - **Static Methods**:
-  - `MyPromise.resolve(value)`: Returns a resolved promise (or adopts a `MyPromise` input).
-  - `MyPromise.reject(reason)`: Returns a rejected promise with `reason`.
+  - `MyPromise.resolve<U>(value: U | MyPromise<U>): MyPromise<U>`: Returns a resolved promise (or adopts a `MyPromise` input).
+  - `MyPromise.reject<U = never>(reason?: any): MyPromise<U>`: Returns a rejected promise with `reason`.
