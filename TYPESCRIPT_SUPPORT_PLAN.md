@@ -101,25 +101,36 @@ declare class TreeNode<T = number> {
 
 ## 4. Phased Implementation Roadmap
 
-### Phase 1: Infrastructure & Plumbing (Zero Risk to Existing Cards)
-- [ ] Add `referenceSolutionTs` to `TopicItem` in `src/lib/leitner.ts`.
-- [ ] Update `scripts/build-cards.mjs` to ingest `<id>.ref.ts` when present.
-- [ ] Add ambient types (`ListNode`, `TreeNode`) to `src/utils/typeChecker.ts`.
-- [ ] Pass `executionMode` to `EvaluationPanel.tsx` and display `referenceSolutionTs` when `executionMode === 'ts'` (with graceful fallback to `referenceSolution`).
-- [ ] Add a clean language badge (`TypeScript` or `JavaScript`) in the solution reveal modal.
+### Phase 1: Infrastructure & Plumbing (COMPLETED in `1aa7e91`)
+- [x] Add `referenceSolutionTs?: string` to `TopicItem` in `src/lib/leitner.ts`.
+- [x] Update `scripts/build-cards.mjs` to ingest `<id>.ref.ts` into `topic.referenceSolutionTs`.
+- [x] Add ambient types (`ListNode<T>`, `TreeNode<T>`) to `SANDBOX_GLOBALS` in `src/utils/typeChecker.ts`.
+- [x] Pass `executionMode` to `EvaluationPanel.tsx` and dynamically display `referenceSolutionTs` when `executionMode === 'ts'` (with graceful fallback to `referenceSolution`).
+- [x] Add language indicator badge (`TypeScript` blue badge vs `JavaScript` amber badge) in `EvaluationPanel.tsx`.
+- [x] Add automated unit tests for mode-aware solution rendering in `src/components/EvaluationPanel.test.tsx`.
 
-### Phase 2: Typed Starter Stubs & Contract Signatures
-- [ ] Update `src/components/practice/starterSnippet.ts` to accept `mode: 'js' | 'ts'`.
-- [ ] In TS mode, extract the top-level function/component signature from `referenceSolutionTs` to seed the editor with an initial typed stub.
-- [ ] Enhance prompt instruction headings with typed signatures where appropriate (e.g. `### fn(arg: Type): ReturnType`).
+### Phase 2: Typed Signatures & Editor Buffer Architecture (COMPLETED & CLARIFIED)
+- [x] **Cold-Start Buffer Decision (Preserved):** Editor buffer is intentionally NOT overwritten or injected with starter stubs upon toggling between JS and TS modes. Overwriting the buffer harms cold-start recall and risks destroying work in progress.
+- [x] **Typed Prompt Headings:** Problem statements provide explicit TypeScript signatures in headings (e.g. `### twoSum(nums: number[], target: number): [number, number]`), giving learners exact parameter and return contracts without needing editor stubs.
 
-### Phase 3: Phased Content Rollout (Batching by Track)
-Author and verify `.ref.ts` solutions incrementally:
-1. **Batch 1: Algorithms (53 cards)**
-   - High value; clean, unambiguous type signatures for arrays, two-pointer, trees, heaps, dynamic programming, and graphs.
-2. **Batch 2: React Components & Custom Hooks (62 cards)**
-   - Props interfaces (`interface ButtonProps`), state hooks (`usePrevious<T>`, `useLocalStorage<T>`).
-3. **Batch 3: JS Utilities & Async Functions (64 cards)**
-   - Typed utility functions with generic constraints (`debounce<F>`, `deepClone<T>`, `pool<T>`).
-4. **Batch 4: JS Language Mechanics (25 cards)**
+### Phase 3: Content Rollout & Dual Solutions
+Author and verify `.ref.ts` solutions and typed prompt headings incrementally across batches:
+1. **Batch 1: Foundational Algorithms (8 cards — COMPLETED in `6cefd46`)**
+   - `binary-search-exact`: `binarySearch(nums: number[], target: number): number`
+   - `two-pointer-sorted-sum`: `twoSumSorted(numbers: number[], target: number): [number, number]`
+   - `sliding-window-fixed`: `maxSubarraySum(nums: number[], k: number): number`
+   - `valid-parentheses-stack`: `isValidParentheses(s: string): boolean`
+   - `merge-intervals`: `mergeIntervals(intervals: [number, number][]): [number, number][]`
+   - `two-sum-hashmap`: `twoSum(nums: number[], target: number): [number, number]`
+   - `interval-overlap`: `hasOverlap(intervals: [number, number][]): boolean`
+   - `anagram-palindrome`: `isAnagram(s: string, t: string): boolean` and `isPalindrome(s: string): boolean`
+2. **Batch 2: Tree & Graph Algorithms (Upcoming next)**
+   - Tree navigation & manipulation using ambient `TreeNode<T>`: `bst-search-insert`, `bst-validate-lca-invert`, `tree-depth-sum`, `tree-diameter-balanced`, `tree-level-order`, `tree-max-path-sum`, `tree-path-sum`, `tree-build-serialize`, `tree-traversal-dom`.
+3. **Batch 3: Linked Lists, Stacks & Heaps**
+   - Linked lists using ambient `ListNode<T>`: `linked-list-cycle-merge`, `reverse-linked-list`, `list-add-numbers`, `list-remove-reorder`, `min-stack`, `min-heap-class`, `heap-kth-largest`.
+4. **Batch 4: React Components & Custom Hooks**
+   - Props interfaces (`interface ButtonProps`), typed generics (`usePrevious<T>`, `useLocalStorage<T>`, `useIsMounted`).
+5. **Batch 5: JS Utilities & Async Plumbing**
+   - Generic utility constraints (`debounce<F>`, `deepClone<T>`, `pool<T>`, `promise-all-by-hand`).
+6. **Batch 6: Language Mechanics Evaluation**
    - Targeted evaluation: provide TypeScript solutions only where idiomatic, preserving pure JavaScript for prototype and dynamic proxy mechanics.
