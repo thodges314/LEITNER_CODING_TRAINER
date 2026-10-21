@@ -52,7 +52,7 @@ export const MASTER_MERGE_SAFE = true;
 export const TRACK_STATS: TrackStats[] = [
   { track: 'algorithms', total: 77, completed: 77, status: 'COMPLETE' },
   { track: 'async-js', total: 21, completed: 21, status: 'COMPLETE' },
-  { track: 'js-language', total: 25, completed: 18, status: 'IN_PROGRESS' },
+  { track: 'js-language', total: 25, completed: 25, status: 'COMPLETE' },
   { track: 'typescript-patterns', total: 14, completed: 0, status: 'PLANNED' },
   { track: 'js-utilities', total: 37, completed: 0, status: 'PLANNED' },
   { track: 'dom-browser', total: 20, completed: 0, status: 'PLANNED' },
@@ -62,7 +62,7 @@ export const TRACK_STATS: TrackStats[] = [
 ];
 
 /**
- * 3. COMPLETED BATCHES (Batches 1–19: 116 cards total)
+ * 3. COMPLETED BATCHES (Batches 1–20: 123 cards total)
  */
 export const COMPLETED_BATCHES: BatchDefinition[] = [
   {
@@ -352,18 +352,11 @@ export const COMPLETED_BATCHES: BatchDefinition[] = [
       'iterators-generators',
     ],
   },
-];
-
-/**
- * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 20–48: 155 cards total)
- */
-export const REMAINING_BATCHES: BatchDefinition[] = [
-  // --- js-language track (7 cards remaining, Batch 20) ---
   {
     batchNumber: 20,
     title: 'Iterators, Coroutines & Proxies',
     track: 'js-language',
-    status: 'planned',
+    status: 'completed',
     cardCount: 7,
     cardIds: [
       'iterable-range-class',
@@ -375,7 +368,12 @@ export const REMAINING_BATCHES: BatchDefinition[] = [
       'proxy-validation-traps',
     ],
   },
+];
 
+/**
+ * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 21–48: 148 cards total)
+ */
+export const REMAINING_BATCHES: BatchDefinition[] = [
   // --- typescript-patterns track (14 cards, Batches 21–23) ---
   {
     batchNumber: 21,

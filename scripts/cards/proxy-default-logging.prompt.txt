@@ -1,3 +1,9 @@
-Write withDefaults(target, defaults) returning a Proxy whose get trap returns target[key] when the key exists in target (use `key in target`), otherwise defaults[key] (undefined if neither has it).
+Implement fallback defaulting and read counting via JavaScript `Proxy`:
 
-Write countAccesses(target) returning { proxy, counts }: proxy forwards reads to target (use Reflect.get) and records in the plain object counts how many times each STRING key was read (counts.a is 2 after two reads of proxy.a; symbol keys are not counted).
+### `withDefaults<T extends object, D extends object>(target: T, defaults: D): T & D`
+- Returns a `Proxy` whose `get` trap returns `target[key]` when the key exists in target (use `key in target`), otherwise `defaults[key]` (`undefined` if neither has it).
+
+### `countAccesses<T extends object>(target: T): { proxy: T; counts: Record<string, number> }`
+- Returns `{ proxy, counts }`:
+  - `proxy` forwards reads to `target` (use `Reflect.get`).
+  - Records in the plain object `counts` how many times each **string** key was read (`counts.a` is 2 after two reads of `proxy.a`; symbol keys are not counted).

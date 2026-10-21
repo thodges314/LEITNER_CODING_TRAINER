@@ -1,12 +1,12 @@
 Write a custom iterable class and an array extraction utility:
 
-### `class Range`
-- `constructor(start, end, step = 1)`
+### `class Range implements Iterable<number>`
+- `constructor(start: number, end: number, step?: number)`
   - Throws a `RangeError` with message containing `'step'` if `step === 0`.
-- Implements `[Symbol.iterator]()`:
+- Implements `[Symbol.iterator](): Iterator<number>`:
   - Yields `start`, `start + step`, ... while the value is before `end` (exclusive; for negative steps, counts down while value is greater than `end`).
   - Must be re-iterable (each loop creates a fresh iterator).
 
-### `take(iterable, n)`
+### `take<T>(iterable: Iterable<T>, n: number): T[]`
 - Returns an array containing the first `n` values of any iterable (or fewer if the iterable terminates sooner).
 - Must break early without consuming remainder of the iterable, functioning properly on infinite generators.

@@ -1,10 +1,10 @@
 Implement generator workflows and an asynchronous coroutine runner:
 
-### `function* createEchoGenerator()`
+### `function* createEchoGenerator(): Generator<'ready' | [unknown, string], void, unknown>`
 - Generator function that initially yields `'ready'`.
 - On subsequent steps, receives an input passed via `it.next(val)` and yields `[val, typeof val]`.
 
-### `runCoroutine(generatorFn, ...args)`
+### `runCoroutine<T = unknown>(generatorFn: (...args: any[]) => Generator<any, T, any>, ...args: any[]): Promise<T>`
 - Coroutine runner (mini `co`) executing `generatorFn(...args)`.
 - For each yielded value:
   - Can be a `Promise` or plain value; awaits its resolution.

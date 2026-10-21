@@ -1,14 +1,14 @@
 Implement asynchronous iteration utilities using `Symbol.asyncIterator`:
 
-### `createAsyncRange(start, end, delayMs = 0)`
+### `createAsyncRange(start: number, end: number, delayMs?: number): AsyncIterable<number>`
 - Returns an object implementing `[Symbol.asyncIterator]()` that yields integers from `start` up to (exclusive) `end`.
 - Each call to `next()` returns a `Promise` resolving to `{ value, done }`.
 - If `delayMs > 0`, delays resolution by `delayMs` milliseconds.
 
-### `collectAsync(asyncIterable)`
+### `collectAsync<T>(asyncIterable: AsyncIterable<T>): Promise<T[]>`
 - Consumes an async iterable using `for await (const item of asyncIterable)`.
 - Returns a `Promise` resolving to an array containing all collected items.
 
-### `mapAsyncIterable(asyncIterable, fn)`
+### `mapAsyncIterable<T, U>(asyncIterable: AsyncIterable<T>, fn: (item: T) => U | Promise<U>): AsyncIterable<U>`
 - Returns an async iterable object implementing `[Symbol.asyncIterator]()`.
 - Yields `await fn(item)` for each element produced by `asyncIterable`.

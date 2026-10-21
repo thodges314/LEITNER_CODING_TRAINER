@@ -1,6 +1,6 @@
 Implement schema-validated and private-field proxy traps:
 
-### `createValidated(target, schema)`
+### `createValidated<T extends object>(target: T, schema: Record<string, (val: unknown) => boolean>): T`
 - Wraps `target` in a `Proxy` enforcing schema rules and property privacy.
 - `schema` is an object mapping allowed property names to validator predicates (`(value) => boolean`).
 

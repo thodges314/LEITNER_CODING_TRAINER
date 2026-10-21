@@ -1,6 +1,6 @@
 Implement a deeply immutable and revocable object view using `Proxy.revocable`:
 
-### `createReadOnly(obj)`
+### `createReadOnly<T extends object>(obj: T): { proxy: T; revoke: () => void }`
 - Returns an object `{ proxy, revoke }`.
 
 #### Proxy Behavior

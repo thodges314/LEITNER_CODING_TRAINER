@@ -1,6 +1,6 @@
 Implement an array wrapper that supports negative indexing via JavaScript `Proxy`:
 
-### `negativeIndex(arr)`
+### `negativeIndex<T>(arr: T[]): T[]`
 - Returns a `Proxy` wrapping the array `arr` allowing negative indices to count backwards from the end (`p[-1]` is the last element, `p[-2]` is second to last).
 - Note that property accesses arrive at the proxy traps as string keys (e.g. `'-1'`).
 
