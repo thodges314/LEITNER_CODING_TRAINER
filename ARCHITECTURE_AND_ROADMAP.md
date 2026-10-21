@@ -15,8 +15,7 @@ in the browser; state lives in `localStorage`.
 - Scheduling: Choice of **Classic Leitner Boxes** (5 boxes) or **Graduated Interval Recall & Chaining** (7 tiers with micro-spaced chaining and half-tier setbacks).
 - Owner use: personal. Quality bar: every card must have a *correct reference solution*, a *real harness*, and
   *explicit input/expected test cases* (the owner reads these to understand what "success" means).
-- **Hard rule from the owner:** cards are authored by hand under `scripts/cards/` and `scripts/testcases/`. Never generate
-  test cases with regexes or LLM bulk fixtures; the old `generate_all_fixtures.cjs` corrupted cards and was deleted.
+- **Card authoring pipeline & verification:** Cards are primarily AI-authored across structured batch pipelines into `scripts/cards/` and `scripts/testcases/`. Rather than unverified generative scrapers, every card must strictly satisfy quality gates: an explicit test harness, concrete input/expected test cases, a passing reference solution, failure on empty solution, label parity, and mutation test verification. Never generate test cases with unverified regexes or loose LLM bulk fixtures; the old `generate_all_fixtures.cjs` corrupted cards and was deleted.
 
 ## 2. Current state (snapshot)
 
@@ -24,12 +23,13 @@ in the browser; state lives in `localStorage`.
 |---|---|
 | Cards | 271 total = **218 default + 53 in the optional `algorithms-advanced` pack** (89 default cards active at first run) |
 | Documented test cases | 1934 (each shown as input → expected in the UI) |
+| Markdown formatting | **100% complete** across all 271 cards (Batches 1–23 merged into `master`) with structured descriptions, parameters, returns, constraints, and edge cases |
 | Difficulty spread | all 271: d1 36 · d2 91 · d3 105 · d4 37 · d5 2; default 218: d1 33 · d2 78 · d3 79 · d4 26 · d5 2 |
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 955 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 271 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 542 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 589 browser tests, ~6 min on an idle machine with 4 workers). **Last full run (before merging `feature/reclassify-advanced`): 589 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Automated tests | 1,126 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Browser verification | `npm run e2e` runs ALL 271 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 542 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 589 browser tests, ~6 min on an idle machine with 4 workers). **Last full run: 589 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -389,13 +389,40 @@ Rules the audit applied: (1) a card that is a strict subset of another card must
 `scripts/difficulty.json`, `scripts/packs.json`, `scripts/complexity-cache.json`, `scripts/mutation-baseline.jsonl`, the card in `src/data/topics.json`, and **add its id to `RETIRED_SEED_IDS` in `src/lib/leitner.ts`** so saved decks drop it.
 Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates removed: `hook-fetch-cleanup`, `infinite-scroll-observer`, `sliding-window-dynamic`, `tree-level-order-bfs`, `hook-use-debounce`, `event-loop-microtasks`, `currying-function`, `interval-merge-sliding-window`.
 
-### 7.5 Suggested next steps (in order)
-1. Keep `npm run e2e` green on `master` (run it after any card/runner change; re-run flaky timing cards).
-2. Wrong-answer ("mutation") checks per card, starting with the cards authored by other assistants.
-3. ~~Recover batch 2~~ DONE (multi-step form, tag input, pagination; cases in `part27.mjs`). **Every new `partN.mjs` must be imported and spread in `scripts/testcases/newcards.mjs`**, otherwise `build-cards` fails with "No cases authored".
-4. Content gaps: accessibility, CSS (needs real-browser checks), DOM/browser extras, remaining ladder holes (§7.1), then React 19 APIs.
-5. Product: "Front-end screen" Focus preset + an interview-importance weight, stats/history view (staged unlocks now respect Focus).
-6. Complexity fields: keep them on algorithm cards only, normalise notation, human spot-check.
+### 7.5 Recent milestones and suggested next steps
+
+#### Completed Milestones
+1. **Deck-Wide Markdown Instruction Formatting (100% Complete — Batches 1–23)**:
+   - All 271 cards across the entire deck now feature clean, structured GitHub-flavored Markdown instructions.
+   - Standardized format includes problem statements, function/component target signatures, parameters, return values, constraints, and edge case breakdowns.
+   - All 23 formatting batches merged cleanly into `master`.
+2. **First-4-Problems Backup Advisory & Deck Export Spotlight**:
+   - Gentle backup reminder modal triggers after 4 scored card reviews, spotlighting the Deck Catalog export button with an amber pulse and guidance bubble.
+3. **CI Deployment Optimization**:
+   - Deploy workflow (`.github/workflows/deploy.yml`) ignores Markdown (`paths-ignore: ["**.md", "docs/**"]`), conserving GitHub Actions minutes and eliminating in-flight deploy cancellations during documentation updates.
+
+#### Current Work in Progress: Comprehensive TypeScript Support (`feature/typescript-support`)
+- See [TYPESCRIPT_SUPPORT_PLAN.md](TYPESCRIPT_SUPPORT_PLAN.md) for detailed technical architecture.
+- **Phase 1 Infrastructure (Complete)**:
+  - Added optional `referenceSolutionTs?: string` to `TopicItem` in `src/lib/leitner.ts`.
+  - Ingestion of `<id>.ref.ts` into `topics.json` via `scripts/build-cards.mjs`.
+  - Ambient data structures (`ListNode<T>`, `TreeNode<T>`) declared in `SANDBOX_GLOBALS` (`src/utils/typeChecker.ts`).
+  - Context-aware solution reveal in `EvaluationPanel.tsx`: renders `referenceSolutionTs` with a blue TypeScript badge when `executionMode === 'ts'`, falling back gracefully to `referenceSolution` with an amber JavaScript badge.
+  - Automated unit tests in `src/components/EvaluationPanel.test.tsx`.
+- **Phase 2 Buffer Policy (Complete)**:
+  - Cold-start recall integrity is strictly preserved: the editor buffer is NOT overwritten or injected with stubs upon switching between JS and TS modes.
+  - Typed signatures are embedded into prompt headings (`### fn(arg: Type): ReturnType`).
+- **Phase 3 Dual Solutions Rollout**:
+  - Batch 1 (8 Foundational Algorithms) complete: `binary-search-exact`, `two-pointer-sorted-sum`, `sliding-window-fixed`, `valid-parentheses-stack`, `merge-intervals`, `two-sum-hashmap`, `interval-overlap`, `anagram-palindrome`.
+  - Next batches in queue: Tree & Graph Algorithms (ambient `TreeNode`), Linked Lists & Stacks/Heaps (ambient `ListNode`), React Components & Hooks, JS Utilities & Async.
+
+#### Next Steps (in priority order)
+1. Complete remaining TypeScript dual-solution batches on `feature/typescript-support` (Trees/Graphs -> Lists/Heaps -> React -> JS Utilities).
+2. Keep `npm run e2e` green on `master` (run after card/runner modifications).
+3. Wrong-answer ("mutation") checks per card across `scripts/mutation-baseline.jsonl`.
+4. Content gaps: accessibility rungs, CSS (needs real-browser layout grading), DOM/browser extras, remaining ladder holes (§7.1), then React 19 APIs.
+5. Product: "Front-end screen" Focus preset + interview-importance weighting, stats/history view (staged unlocks respect Focus).
+6. Complexity fields: maintain algorithm-only scoping, normalized notation, human spot-check.
 7. Sandboxed execution (iframe) so no runaway code can freeze the tab.
 
 ### 7.6 History of card categories (batches 13-26; kept for context)

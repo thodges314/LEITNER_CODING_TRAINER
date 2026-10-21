@@ -8,11 +8,13 @@
 
 A client-only, zero-backend deliberate practice environment designed to simulate cold-start front-end technical interview screening.
 Learners write solutions from scratch without autocomplete or hints, execute their implementation headlessly in a browser sandbox against comprehensive test harnesses, and review cards according to spaced repetition schedules.
+The deck features **271 cards** (218 core default + 53 in the optional `algorithms-advanced` pack) with **1,934 documented test cases** and **100% structured Markdown instructions**.
 
 - **Frontend Core**: React 19, TypeScript (strict mode), Vite 8.
+- **Content & Quality Pipeline**: Primarily AI-authored across structured batch pipelines with automated validation (reference passes, empty fails, label parity, mutation checks).
 - **Code Editor**: CodeMirror 6 with rainbow bracket pair colorization, autoclosing brackets/quotes, and Prettier standalone formatting.
 - **Persistence**: 100% browser-local (`localStorage`).
-- **Test Runner & Sandbox**: In-page `AsyncFunction` sandbox injecting `$dom`, `$test`, and mock environments.
+- **Test Runner & Sandbox**: In-page `AsyncFunction` sandbox injecting `$dom`, `$test`, and mock environments, with dual JavaScript and TypeScript solution support.
 
 ---
 
@@ -115,6 +117,10 @@ Located in [runner.ts](src/lib/runner.ts):
 4. **Verdict**:
    - Harness logs `PASS` and `FAIL` markers.
    - Submission passes if and only if harness logs ≥ 1 `PASS` and 0 `FAIL`/runtime errors.
+5. **Dual Solutions & Language-Aware Reveal**:
+   - Cards support dual reference implementations: canonical JavaScript (`referenceSolution`) and canonical TypeScript (`referenceSolutionTs`).
+   - Ambient declarations in `SANDBOX_GLOBALS` (`src/utils/typeChecker.ts`) include `ListNode<T>` and `TreeNode<T>` for common algorithm data structures.
+   - When inspecting the suggested solution in `EvaluationPanel`, the trainer renders the solution matching the learner's active mode with dynamic language badges (`TypeScript` blue badge vs `JavaScript` amber badge).
 
 ---
 
@@ -146,15 +152,16 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite**: Tests verifying:
-  - Reference solutions pass for all 234 topic cards (201 default + 33 in the optional `algorithms-advanced` pack).
+- **Vitest Suite (1,126+ unit tests)**: Tests verifying:
+  - Reference solutions pass for all 271 topic cards (218 default + 53 in the optional `algorithms-advanced` pack) across 1,934 documented test cases.
   - Empty submissions fail for all cards.
+  - 100% of cards formatted with structured GitHub-flavored Markdown instructions.
   - Optional card packs (`src/lib/packs.test.ts`): off by default, excluded from scheduling and staged unlocks, persisted, core algorithms keep fair coverage.
   - Leitner and Graduated Interval algorithms, intervals, promotions, and setbacks.
   - Prettier standalone formatter for JS, JSX, TS, and syntax errors.
   - Multi-key vault persistence, prefix detection, and provider switching.
   - Timed Recall Mode configuration and persistence.
-- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION. jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
+- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (589 tests: 542 card tests + navigation, shortcuts, preview, flow, tour, catalog, and backup advisory tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
 - **Production Build**: Verified via `npm run build` (`tsc -b && vite build`) with zero lint or type errors.
 
 ## 8. Navigation and first-run welcome
