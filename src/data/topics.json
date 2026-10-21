@@ -4883,7 +4883,7 @@
       "error-handling",
       "basics"
     ],
-    "promptSeed": "Write safeParse(text, fallback) returning the parsed JSON or `fallback` when text is not valid JSON (or not a string).\n\nWrite safeGet(storage, key, fallback) that reads storage.getItem(key) (a localStorage-like object with getItem and setItem) and returns the parsed value or fallback when the key is missing or the stored text is corrupt.\n\nWrite safeSet(storage, key, value) that stringifies `value` with JSON.stringify and stores the JSON string with storage.setItem(key, jsonString), returning true, or false if storage.setItem throws.",
+    "promptSeed": "Write `safeParse(text, fallback)` returning the parsed JSON or `fallback` when text is not valid JSON (or not a string).\n\nWrite `safeGet(storage, key, fallback)` that reads `storage.getItem(key)` (a localStorage-like object with `getItem` and `setItem`) and returns the parsed value or `fallback` when the key is missing or the stored text is corrupt.\n\nWrite `safeSet(storage, key, value)` that stringifies `value` with `JSON.stringify` and stores the JSON string with `storage.setItem(key, jsonString)`, returning `true`, or `false` if `storage.setItem` throws.",
     "difficulty": 1,
     "concept": "storage",
     "referenceSolution": "function safeParse(text, fallback) {\n  if (typeof text !== 'string') return fallback;\n  try {\n    return JSON.parse(text);\n  } catch {\n    return fallback;\n  }\n}\n\nfunction safeGet(storage, key, fallback) {\n  return safeParse(storage.getItem(key), fallback);\n}\n\nfunction safeSet(storage, key, value) {\n  try {\n    storage.setItem(key, JSON.stringify(value));\n    return true;\n  } catch {\n    return false;\n  }\n}",

@@ -1,5 +1,5 @@
-Write safeParse(text, fallback) returning the parsed JSON or `fallback` when text is not valid JSON (or not a string).
+Write `safeParse(text, fallback)` returning the parsed JSON or `fallback` when text is not valid JSON (or not a string).
 
-Write safeGet(storage, key, fallback) that reads storage.getItem(key) (a localStorage-like object with getItem and setItem) and returns the parsed value or fallback when the key is missing or the stored text is corrupt.
+Write `safeGet(storage, key, fallback)` that reads `storage.getItem(key)` (a localStorage-like object with `getItem` and `setItem`) and returns the parsed value or `fallback` when the key is missing or the stored text is corrupt.
 
-Write safeSet(storage, key, value) that stringifies `value` with JSON.stringify and stores the JSON string with storage.setItem(key, jsonString), returning true, or false if storage.setItem throws.
+Write `safeSet(storage, key, value)` that stringifies `value` with `JSON.stringify` and stores the JSON string with `storage.setItem(key, jsonString)`, returning `true`, or `false` if `storage.setItem` throws.
