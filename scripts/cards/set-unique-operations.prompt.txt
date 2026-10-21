@@ -1,3 +1,13 @@
-Write three functions using a Set, each in O(n + m): arrayIntersection(a, b) (unique elements present in both, in order of first appearance in b), arrayUnion(a, b) (unique elements of either, a's elements first).
+Implement set operations on arrays using JavaScript `Set` in O(n + m) time:
 
-Write arrayDifference(a, b) (unique elements of a that are not in b, in a's order).
+### `arrayIntersection(a, b)`
+- Returns an array of unique elements present in both `a` and `b`.
+- Preserves the order of elements as they first appear in `b`.
+
+### `arrayUnion(a, b)`
+- Returns an array of all unique elements present in either `a` or `b`.
+- Elements from `a` appear first, followed by unique elements from `b`.
+
+### `arrayDifference(a, b)`
+- Returns an array of unique elements present in `a` but absent from `b`.
+- Preserves the relative order of elements in `a`.

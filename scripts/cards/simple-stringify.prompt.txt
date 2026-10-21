@@ -1,1 +1,14 @@
-Write simpleStringify(value) that mimics JSON.stringify for primitives and arrays only: null -> "null", booleans -> "true"/"false", finite numbers via String, NaN/Infinity -> "null", strings wrapped in double quotes with \, " and newline escaped as \\, \" and \n, arrays as [a,b,c] with no spaces (nested arrays recurse; an undefined element becomes null). A top-level undefined returns undefined. You do not need to handle objects. Do not call JSON.stringify.
+Implement a lightweight stringifier for primitive types and arrays without calling `JSON.stringify`:
+
+### `simpleStringify(value)`
+- **Primitives**:
+  - `null` -> `'null'`
+  - Booleans -> `'true'` / `'false'`
+  - Finite numbers -> `String(value)`
+  - `NaN`, `Infinity`, `-Infinity` -> `'null'`
+  - Strings -> wrapped in double quotes with `\`, `"`, and newline characters escaped as `\\`, `\"`, and `\n`.
+  - Top-level `undefined` returns `undefined`.
+- **Arrays**:
+  - Serialized as `'[a,b,c]'` with no spaces.
+  - Recursively serializes nested arrays.
+  - Elements evaluating to `undefined` are serialized as `'null'`.

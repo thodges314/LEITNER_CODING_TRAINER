@@ -1,1 +1,10 @@
-Implement throttle(fn, wait, { leading = true, trailing = true } = {}) so fn runs at most once per wait window. leading: true runs the first call immediately; leading: false waits for the end of the window. trailing: true fires the last call made during a window at the window's end with its latest arguments; trailing: false drops calls made during the window. With leading: false the first call is delivered at the end of its window.
+Implement a rate-limiting `throttle` function with configurable leading and trailing edge triggers:
+
+### `throttle(fn, wait, { leading = true, trailing = true } = {})`
+- Restricts invocation of `fn` to at most once per `wait` millisecond window.
+- **Options**:
+  - `leading: true` (default): invokes `fn` immediately on the first call of the cycle.
+  - `leading: false`: delays the first execution until the end of the initial `wait` window.
+  - `trailing: true` (default): if called during an active window, executes `fn` at the end of the window with the most recent arguments and context.
+  - `trailing: false`: drops any intermediate calls made during the active cooldown window.
+- Preserves the `this` receiver context and latest arguments passed to the throttled function.

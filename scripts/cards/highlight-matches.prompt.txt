@@ -1,1 +1,14 @@
-Write highlightMatches(text, query) for search-result highlighting. It splits text into consecutive segments { text, match }: match is true for the parts that equal query and false for everything in between. Rules: the search is case-insensitive but every segment keeps the original casing of text; query is plain text, never a regular expression, so characters such as . * + ? ( ) [ ] are matched literally; matches are found left to right and do not overlap ('aaa' with 'aa' gives a match 'aa' and then 'a'); two matches right next to each other stay two separate segments; no segment has an empty text; an empty text returns []; an empty query returns the whole text as one segment with match false. Joining the segment texts always gives back the original text. Example: highlightMatches('Hello World', 'o') is [{ text: 'Hell', match: false }, { text: 'o', match: true }, { text: ' W', match: false }, { text: 'o', match: true }, { text: 'rld', match: false }].
+Implement text segmentation for search-result highlighting:
+
+### `highlightMatches(text, query)`
+- Splits `text` into an array of consecutive segments `{ text, match }`.
+- `match` is `true` for substrings matching `query` and `false` for non-matching text in between.
+- **Matching Rules**:
+  - **Case-Insensitive**: matching ignores case, but each segment preserves the exact original casing in `text`.
+  - **Literal Text**: `query` is treated as literal plain text; regex characters (`.`, `*`, `+`, `?`, `^`, `$`, `(`, `)`, `[`, `]`, `{`, `}`, `|`, `\`) are matched literally.
+  - **Non-Overlapping**: matches are consumed greedily from left to right without overlapping (e.g., `'aaa'` with query `'aa'` yields match `'aa'` followed by non-match `'a'`).
+- **Edge Cases**:
+  - No segment may have an empty `text: ''`.
+  - If `text` is empty `''`, returns `[]`.
+  - If `query` is empty `''`, returns `[{ text, match: false }]`.
+  - Concatenating all segment `text` properties reconstructs the original `text`.

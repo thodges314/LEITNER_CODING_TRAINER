@@ -1,3 +1,14 @@
-Write shallowCopy(value) (arrays and plain objects get a new container with the same items; anything else is returned as is).
+Implement shallow copy and shallow equality utilities:
 
-Write shallowEqual(a, b): true when both are the same value (Object.is), or both are plain objects (or both arrays) with the same keys whose values are equal by Object.is. Nested objects are compared by reference, not deeply.
+### `shallowCopy(value)`
+- Creates a shallow clone of `value`:
+  - Arrays return a new array with identical elements (`[...value]`).
+  - Plain objects return a new object with identical properties (`{ ...value }`).
+  - All other types (primitives, functions, `null`, non-plain objects) are returned as-is.
+
+### `shallowEqual(a, b)`
+- Compares `a` and `b` for shallow equality:
+  - Returns `true` if `Object.is(a, b)` is true.
+  - Returns `true` if both are plain objects (or both are arrays) with the identical set of keys, and every key's value is equal by `Object.is`.
+  - Compares nested objects and arrays strictly by reference identity (not deeply).
+  - Returns `false` if types or key sets differ.
