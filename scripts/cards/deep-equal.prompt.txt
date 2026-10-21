@@ -1,1 +1,14 @@
-Implement deepEqual(a, b) for primitives, arrays, plain objects, Dates, and NaN (NaN equals NaN). Compare key sets rather than just values, treat an array and an object as different, and handle circular references.
+Implement deep equality comparison supporting primitives, structural objects, and edge cases:
+
+### `deepEqual(a, b)`
+- **Primitives & NaN**:
+  - Compares primitives by value (`a === b`).
+  - Treats `NaN` as equal to `NaN`.
+- **Structural Integrity**:
+  - Treats arrays and plain objects with matching contents as different (checks prototype / constructor equality).
+  - For `Date` instances, compares their underlying timestamps (`.getTime()`).
+- **Objects & Arrays**:
+  - Compares key counts and key sets; returns `false` if keys differ.
+  - Recursively compares all property values.
+- **Circular References**:
+  - Safely handles circular references (e.g., via `WeakMap` or tracking sets) without infinite recursion.

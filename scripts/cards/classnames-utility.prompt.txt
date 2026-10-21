@@ -1,1 +1,12 @@
-Write classNames(...args) (like clsx): strings and numbers are included (falsy values such as '', 0, null, undefined and false are skipped), arrays are flattened recursively, and for an object each key is included when its value is truthy. Return the class names joined by single spaces in argument order; classNames() returns ''.
+Implement a conditional CSS class name joining utility (similar to `clsx` or `classnames`):
+
+### `classNames(...args)`
+- Joins valid class name tokens with a single space `' '` in the order received.
+- **Strings and Numbers**:
+  - Non-empty strings and numbers are converted to strings and included.
+  - Falsy values (`''`, `0`, `null`, `undefined`, `false`) are omitted.
+- **Arrays**:
+  - Flattened recursively; each nested element is evaluated using the same rules.
+- **Objects**:
+  - For each key in the object, includes the key name if its associated value is truthy.
+- Calling `classNames()` with no arguments returns an empty string `''`.

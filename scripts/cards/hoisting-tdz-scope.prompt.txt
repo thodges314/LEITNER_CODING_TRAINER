@@ -1,7 +1,19 @@
-Write hoistingBehavior(): returns an object { varBefore: undefined, fnResult: 'hoisted' } demonstrating that var declarations are hoisted and initialized to undefined, and function declarations are hoisted with their body.
+Implement functions demonstrating variable hoisting, Temporal Dead Zone (TDZ), and closure scope in loops:
 
-Write checkTDZ(fn): runs fn(); if accessing a variable before initialization throws a ReferenceError, returns 'ReferenceError'; if it runs cleanly, returns 'ok'; for any other error, returns 'error'.
+### `hoistingBehavior()`
+- Returns `{ varBefore: undefined, fnResult: 'hoisted' }`.
+- Demonstrates that `var` declarations are hoisted with `undefined` initialization while function declarations are hoisted with their complete implementation.
 
-Write makeLoopCallbacksVar(n): returns an array of n zero-argument functions created in a var loop for (var i = 0; i < n; i++) { ... }, where calling any function returns the final shared value n.
+### `checkTDZ(fn)`
+- Invokes `fn()` inside a `try...catch` block.
+- Returns `'ReferenceError'` if accessing a variable before initialization throws a `ReferenceError`.
+- Returns `'ok'` if `fn()` executes without error.
+- Returns `'error'` for any other caught error.
 
-Write makeLoopCallbacksLet(n): returns an array of n functions created in a let loop for (let i = 0; i < n; i++) { ... }, where calling fn[k]() returns k.
+### `makeLoopCallbacksVar(n)`
+- Creates and returns an array of `n` zero-argument functions inside a `for (var i = 0; i < n; i++)` loop.
+- Calling any function returns the final shared loop value `n`.
+
+### `makeLoopCallbacksLet(n)`
+- Creates and returns an array of `n` zero-argument functions inside a `for (let i = 0; i < n; i++)` loop.
+- Calling `fn[k]()` captures its block scope and returns `k`.
