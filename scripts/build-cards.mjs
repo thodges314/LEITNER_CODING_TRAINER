@@ -92,6 +92,10 @@ for (const t of topics) {
     // One copy only: the app reads referenceSolution (readers fall back to solution/starterCode for old saved decks).
     t.referenceSolution = ref;
   }
+  const refTs = read(t.id, 'ref.ts');
+  if (refTs) {
+    t.referenceSolutionTs = refTs;
+  }
   // Legacy duplicates: older data stored the same text three times. Keep a field only if it differs from referenceSolution.
   if (t.referenceSolution) {
     if (t.solution === t.referenceSolution) delete t.solution;

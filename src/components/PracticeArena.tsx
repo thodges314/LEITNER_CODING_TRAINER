@@ -1847,6 +1847,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           onToggleShowSolution={() => setShowSolution((prev) => !prev)}
           isReinforcement={isReinforcement}
           onFinishReinforcement={handleFinishDrill}
+          executionMode={executionMode}
         />
       )}
 

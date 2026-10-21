@@ -42,6 +42,7 @@ export interface TopicItem {
   testHarness?: string;
   solution?: string;
   referenceSolution?: string;
+  referenceSolutionTs?: string;
   testCases?: TestCaseItem[];
   targetTime?: string;
   targetSpace?: string;

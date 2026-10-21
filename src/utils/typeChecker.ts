@@ -80,6 +80,17 @@ const SANDBOX_GLOBALS = `
   declare var IntersectionObserver: any;
   declare var $test: any;
   declare var $dom: any;
+  declare class ListNode<T = any> {
+    val: T;
+    next: ListNode<T> | null;
+    constructor(val?: T, next?: ListNode<T> | null);
+  }
+  declare class TreeNode<T = any> {
+    val: T;
+    left: TreeNode<T> | null;
+    right: TreeNode<T> | null;
+    constructor(val?: T, left?: TreeNode<T> | null, right?: TreeNode<T> | null);
+  }
   declare module 'react' {
     const React: any;
     export = React;

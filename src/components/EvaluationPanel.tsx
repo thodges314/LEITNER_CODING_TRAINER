@@ -93,6 +93,7 @@ interface EvaluationPanelProps {
   onToggleShowSolution?: () => void;
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
+  executionMode?: 'js' | 'ts';
 }
 
 export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
@@ -109,6 +110,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   onToggleShowSolution,
   isReinforcement,
   onFinishReinforcement,
+  executionMode = 'js',
 }) => {
   const isLight = theme === 'apple-gsos';
   // Human override state, initialized to AI verdict
@@ -180,7 +182,10 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
     }
   };
 
-  const canonicalCode = topic.referenceSolution || topic.solution || topic.starterCode || '';
+  const isTsMode = executionMode === 'ts' && Boolean(topic.referenceSolutionTs);
+  const canonicalCode = isTsMode
+    ? (topic.referenceSolutionTs as string)
+    : topic.referenceSolution || topic.solution || topic.starterCode || '';
 
   const handleCopySolution = async () => {
     if (!canonicalCode) return;
@@ -821,23 +826,39 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             </button>
 
             {isSolutionVisible && (
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={handleCopySolution}
-                style={{
-                  padding: '4px 10px',
-                  fontSize: '11.5px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  height: 'auto',
-                }}
-                title="Copy reference code to clipboard"
-              >
-                {copied ? <Check size={13} color="#34d399" /> : <Copy size={13} />}
-                <span>{copied ? 'Copied!' : 'Copy Solution'}</span>
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    backgroundColor: isTsMode ? 'rgba(56, 189, 248, 0.12)' : 'rgba(234, 179, 8, 0.12)',
+                    color: isTsMode ? '#38bdf8' : '#eab308',
+                    border: isTsMode ? '1px solid rgba(56, 189, 248, 0.25)' : '1px solid rgba(234, 179, 8, 0.25)',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  {isTsMode ? 'TypeScript' : 'JavaScript'}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={handleCopySolution}
+                  style={{
+                    padding: '4px 10px',
+                    fontSize: '11.5px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    height: 'auto',
+                  }}
+                  title="Copy reference code to clipboard"
+                >
+                  {copied ? <Check size={13} color="#34d399" /> : <Copy size={13} />}
+                  <span>{copied ? 'Copied!' : 'Copy Solution'}</span>
+                </button>
+              </div>
             )}
           </div>
 
