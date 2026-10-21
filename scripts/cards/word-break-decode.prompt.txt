@@ -1,3 +1,11 @@
-Write wordBreak(s, wordDict): true when s can be split into a sequence of words from the array wordDict (words can be reused; the empty string is true).
+Implement string segmentation and decoding algorithms using dynamic programming:
 
-Write numDecodings(s): the number of ways to decode a digit string where 'A' = 1 ... 'Z' = 26 ('12' has 2 ways, '226' has 3, '06' has 0, '10' has 1; a leading or unmatched '0' makes it impossible).
+### `wordBreak(s, wordDict)`
+- Determines whether string `s` can be segmented into a space-separated sequence of one or more dictionary words from `wordDict`.
+- Dictionary words may be reused multiple times.
+- Returns `true` for an empty string `""`.
+
+### `numDecodings(s)`
+- Calculates the total number of ways to decode a string of digits `s`, where `'A' = "1"`, ..., `'Z' = "26"`.
+- Valid single digits range from `'1'` to `'9'`; valid two-digit pairings range from `'10'` to `'26'`.
+- A leading or invalid `'0'` (such as in `"06"`) cannot be decoded and yields `0`.
