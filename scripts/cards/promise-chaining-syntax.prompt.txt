@@ -1,6 +1,6 @@
 Write a promise pipeline using explicit chaining syntax (`.then()`, `.catch()`, `.finally()`) without `async`/`await`:
 
-### `getUserData(url)`
+### `getUserData(url: string): Promise<any>`
 - Fetches `url` via `fetch(url)`.
 - **`.then(res => ...)`**:
   - Treats non-2xx responses (`!res.ok`) as an error by throwing an `Error` whose message includes the status code (e.g. `HTTP ${res.status}`).

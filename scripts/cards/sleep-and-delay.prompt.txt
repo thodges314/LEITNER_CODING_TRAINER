@@ -1,3 +1,10 @@
-Write sleep(ms) returning a Promise that resolves (with undefined) after ms milliseconds.
+Implement asynchronous timing helpers using Promises:
 
-Write delay(value, ms) that resolves with `value` after ms milliseconds. Then write measure(fn) (async) that awaits fn() and returns the elapsed milliseconds as a number.
+### `sleep(ms: number): Promise<void>`
+- Returns a Promise that resolves (with `undefined`) after `ms` milliseconds via `setTimeout`.
+
+### `delay<T>(value: T, ms: number): Promise<T>`
+- Resolves with `value` after `ms` milliseconds.
+
+### `measure(fn: () => any | Promise<any>): Promise<number>`
+- Awaits `fn()` and returns the elapsed time in milliseconds as a number.

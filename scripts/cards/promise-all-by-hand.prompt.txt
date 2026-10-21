@@ -1,6 +1,6 @@
 Without using native `Promise.all`, implement an array concurrency combinator:
 
-### `myAll(items)`
+### `myAll<T>(items: (T | Promise<T>)[]): Promise<T[]>`
 - Takes an array `items` of values and/or promises.
 - Returns a `Promise` resolving to an array of results in the **exact same index order** as `items` (not order of completion).
 - **Completion Tracking**:

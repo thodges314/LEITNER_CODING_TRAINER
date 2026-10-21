@@ -1,6 +1,6 @@
 Demonstrate JavaScript event loop execution order, microtasks, macrotasks, and async/await mechanics:
 
-### `orderOfEvents()`
+### `orderOfEvents(): Promise<string[]>`
 - Returns a `Promise` that resolves to an array of string labels recorded in actual execution order.
 - In the constructor/executor body, perform these actions in exact code order:
   1. Synchronously push `'start'`.
@@ -9,7 +9,7 @@ Demonstrate JavaScript event loop execution order, microtasks, macrotasks, and a
   4. Synchronously push `'end'`.
 - Resolves with `['start', 'end', 'promise', 'timeout']`.
 
-### `asyncOrder()`
+### `asyncOrder(): Promise<string[]>`
 - Asynchronous function that tests microtask interleaving with `await null`.
 - Defines an internal async function `f(log)`:
   - Pushes `'f1'`.
