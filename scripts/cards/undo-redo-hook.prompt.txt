@@ -1,1 +1,12 @@
-Write useHistory(initial, limit = 100) returning { state, set, undo, redo, canUndo, canRedo }. set(valueOrUpdater) pushes a new present state (an updater function receives the current state); setting a value that is Object.is-equal to the current one does nothing. undo() moves to the previous state and redo() back; both do nothing at the ends. Calling set() after undo discards the redo branch. At most `limit` past states are kept (the oldest are dropped). set/undo/redo keep a stable identity.
+Write `useHistory(initial, limit = 100)`:
+
+- **Returns**: `{ state, set, undo, redo, canUndo, canRedo }`.
+- **`set(valueOrUpdater)`**:
+  - Pushes a new present state (an updater function receives the current `state`).
+  - Setting a value that is `Object.is`-equal to the current state is a no-op.
+  - Calling `set()` after `undo()` discards the redo branch.
+- **`undo()` & `redo()`**:
+  - `undo()` moves to the previous state; `redo()` moves forward to the next state.
+  - Both are no-ops when already at the boundaries (`canUndo: false` or `canRedo: false`).
+- **History Capping**: At most `limit` past states are retained (the oldest are dropped once the limit is exceeded).
+- **Identity**: `set`, `undo`, and `redo` keep stable function identities across renders.

@@ -1,1 +1,7 @@
-Build useFetch(url) returning { data, error, loading } (initially { data: null, error: null, loading: true }), aborting the previous request when url changes or the component unmounts. Never set state from a stale response — even if the server ignores the abort and answers late.
+Build `useFetch(url)`:
+
+- **Returns**: `{ data, error, loading }`.
+- **Initial State**: `{ data: null, error: null, loading: true }`.
+- **Abort & Race Condition Handling**:
+  - Aborts the in-flight request via `AbortController` when `url` changes or the component unmounts.
+  - Never set state from a stale response — even if the server ignores the abort and answers late.

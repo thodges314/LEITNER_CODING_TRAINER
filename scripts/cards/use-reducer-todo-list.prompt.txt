@@ -1,1 +1,8 @@
-Implement todoReducer(state, action) for a todo list held in useReducer. State is an array of { id, text, done }. Support 'ADD_TODO' (payload: text; assign the next id as max existing id + 1, starting at 1), 'TOGGLE_TODO' (payload: id) and 'REMOVE_TODO' (payload: id); unknown actions return the same state. Use it with useReducer(todoReducer, []).
+Implement `todoReducer(state, action)` for a todo list held in `useReducer(todoReducer, [])`:
+
+- **State Shape**: An array of `{ id, text, done }` objects.
+- **Actions**:
+  - `'ADD_TODO'`: Adds a new todo item with `text: action.payload`, `done: false`, assigning `id` as `max existing id + 1` (starting at `1` for the first item).
+  - `'TOGGLE_TODO'`: Toggles the `done` boolean of the item matching `action.payload` (`id`).
+  - `'REMOVE_TODO'`: Removes the item matching `action.payload` (`id`).
+  - Unknown action types return the current `state` unmodified.

@@ -1,1 +1,11 @@
-Write useLocalStorage(key, initialValue) returning [value, setValue]. It reads and JSON-parses the stored value on first render (falling back to initialValue when nothing is stored or the stored text is corrupt), setValue accepts a value or an updater function (even when called twice in one batch) and writes JSON to localStorage, a 'storage' event for the same key (another tab) updates the value (a removal restores initialValue; other keys are ignored), and changing `key` reads the new key.
+Write `useLocalStorage(key, initialValue)` returning `[value, setValue]`.
+
+- **Initialization**: Reads and JSON-parses the stored value in `localStorage` on initial render. Falls back to `initialValue` if nothing is stored or the stored text is corrupt JSON.
+- **`setValue(valueOrUpdater)`**:
+  - Accepts a value or an updater function `(prev) => next`.
+  - Supports multiple sequential updater calls within the same render batch.
+  - Persists serialized JSON to `localStorage`.
+- **Multi-Tab Sync**:
+  - Listens to the `window` `'storage'` event for cross-tab updates.
+  - An event for `key` updates `value` in state. If the key was removed, restores `initialValue`. Ignores events for other keys.
+- **Dynamic Key**: Changing the `key` argument reads from the new storage key.
