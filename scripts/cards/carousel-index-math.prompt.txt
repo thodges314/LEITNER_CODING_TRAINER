@@ -1,9 +1,19 @@
-A carousel keeps the index of the slide on screen (0 to length - 1).
+Implement pure helper functions to manage index calculations and indicator states for a carousel (indexes `0` to `length - 1`):
 
-Write the pure helpers behind its Next, Previous and dot controls.
+### `nextIndex(index, length, { loop = true } = {})`
+- Computes the index after pressing Next.
+- When reaching past the last slide (`index >= length - 1`):
+  - Wraps to `0` if `loop` is `true`.
+  - Stays on the last slide (`length - 1`) if `loop` is `false`.
+- If `length <= 0`, returns `0`.
 
-nextIndex(index, length, { loop = true } = {}): the index after pressing Next. Past the last slide it wraps to 0 when loop is true and stays on the last slide when loop is false.
-prevIndex(index, length, { loop = true } = {}): the index after pressing Previous. Before the first slide it wraps to the last slide when loop is true and stays on 0 when loop is false.
-dotStates(index, length): an array of length booleans where only the dot at index is true.
+### `prevIndex(index, length, { loop = true } = {})`
+- Computes the index after pressing Previous.
+- When at or before the first slide (`index <= 0`):
+  - Wraps to the last slide (`length - 1`) if `loop` is `true`.
+  - Stays at `0` if `loop` is `false`.
+- If `length <= 0`, returns `0`.
 
-With length 0 (no slides) nextIndex and prevIndex return 0 and dotStates returns [].
+### `dotStates(index, length)`
+- Returns an array of `length` booleans where only the element at `index` is `true`, and all other elements are `false`.
+- If `length <= 0`, returns `[]`.
