@@ -1,15 +1,15 @@
 Implement property descriptor helper utilities using `Object.defineProperty` and `Object.getOwnPropertyDescriptor`:
 
-### `defineHidden(obj, key, value)`
+### `defineHidden<T extends object>(obj: T, key: string | symbol, value: any): T`
 - Adds a property with `writable: true`, `configurable: true`, and `enumerable: false`.
 - Must not appear in `Object.keys()` or `JSON.stringify()`.
 - Returns `obj`.
 
-### `defineConstant(obj, key, value)`
+### `defineConstant<T extends object>(obj: T, key: string | symbol, value: any): T`
 - Adds an enumerable property that cannot be mutated or deleted (`enumerable: true`, `writable: false`, `configurable: false`).
 - Returns `obj`.
 
-### `describeFlags(obj, key)`
+### `describeFlags(obj: any, key: string | symbol): { writable?: boolean; enumerable?: boolean; configurable?: boolean; accessor?: boolean } | undefined`
 - Returns `undefined` if `obj` has no own property `key`.
 - If `key` is a data property, returns `{ writable, enumerable, configurable }`.
 - If `key` is an accessor property (getter/setter), returns `{ enumerable, configurable, accessor: true }`.

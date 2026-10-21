@@ -1,6 +1,6 @@
 Implement tagged template literal functions for HTML escaping, markup wrapping, and raw string extraction:
 
-### `safeHtml(strings, ...values)`
+### `safeHtml(strings: TemplateStringsArray, ...values: any[]): string`
 - Tagged template function that escapes characters `&`, `<`, `>`, `"`, and `'` in interpolated values:
   - `&` -> `&amp;`
   - `<` -> `&lt;`
@@ -10,8 +10,8 @@ Implement tagged template literal functions for HTML escaping, markup wrapping, 
 - Converts `null` and `undefined` to empty strings `''`.
 - Interleaves literal string segments with escaped values.
 
-### `highlight(strings, ...values)`
+### `highlight(strings: TemplateStringsArray, ...values: any[]): string`
 - Tagged template function that wraps every interpolated value inside `<mark>...</mark>`.
 
-### `getRawString(strings, ...values)`
+### `getRawString(strings: TemplateStringsArray, ...values: any[]): string`
 - Tagged template function that uses `strings.raw` to assemble the string without interpreting escape sequences (e.g., `\n` remains a literal backslash followed by `n`).

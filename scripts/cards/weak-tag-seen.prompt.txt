@@ -1,17 +1,17 @@
 Implement side-channel metadata and visited-tracking utilities using module-level `WeakMap` and `WeakSet` (without modifying or adding properties to the target objects themselves):
 
-### `tag(obj, label)`
+### `tag<T extends object>(obj: T, label: any): T`
 - Associates a metadata `label` with `obj` using a `WeakMap`.
 - Returns `obj`.
 
-### `getTag(obj)`
+### `getTag(obj: object): any`
 - Returns the stored `label` associated with `obj`, or `undefined` if untagged.
 
-### `untag(obj)`
+### `untag(obj: object): boolean`
 - Removes the tag association from the `WeakMap`.
 - Returns `true` if a tag was removed, or `false` otherwise.
 
-### `markSeen(obj)`
+### `markSeen(obj: object): boolean`
 - Uses a `WeakSet` to track visited objects.
 - Returns `true` the very first time an object is encountered.
 - Returns `false` for any subsequent call with the same object.
