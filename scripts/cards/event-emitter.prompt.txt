@@ -1,1 +1,15 @@
-Build an EventEmitter with on(event, fn), off(event, fn), once(event, fn) and emit(event, ...args). Listeners fire in registration order and receive all emitted arguments; emitting an event with no listeners does nothing. once() listeners run a single time, and off() can remove a once() listener before it fires. Removing a listener during emit must not skip the others, and the TypeScript version types payloads by event name.
+Build a robust, object-oriented event emitter class:
+
+### `EventEmitter`
+
+- **`on(event, fn)`**:
+  - Registers `fn` as a listener for `event`. Listeners execute in registration order.
+- **`off(event, fn)`**:
+  - Removes the specific listener `fn` from `event`.
+  - Can remove a listener registered via `once(event, fn)` prior to it firing.
+- **`once(event, fn)`**:
+  - Registers a one-time listener that automatically unregisters itself upon its first execution.
+- **`emit(event, ...args)`**:
+  - Invokes all listeners currently registered for `event` with `...args`.
+  - Emitting an event with no listeners does nothing.
+  - Safe against listener mutation: removing or unsubscribing a listener during an active `emit` snapshot must not skip other listeners.

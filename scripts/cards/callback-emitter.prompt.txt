@@ -1,1 +1,12 @@
-Write createEmitter() returning { on(event, fn), emit(event, ...args) }. on registers a listener (several per event are allowed, called in registration order); emit calls every listener of that event with the given arguments and returns the number of listeners called (0 if none). Emitting an event nobody listens to must not throw.
+Implement a lightweight publish-subscribe callback emitter:
+
+### `createEmitter()`
+Returns an emitter object with the following methods:
+
+- **`on(event, fn)`**:
+  - Registers a listener function `fn` for the string `event`.
+  - Multiple listeners for the same event are preserved and invoked in registration order.
+- **`emit(event, ...args)`**:
+  - Invokes all registered listeners for `event` with `...args`.
+  - Returns the total count of listeners called (returns `0` if none).
+  - Emitting an event without listeners does not throw.

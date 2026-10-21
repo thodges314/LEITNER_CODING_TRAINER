@@ -1,3 +1,15 @@
-Implement groupBy(items, keyFnOrProp), where keyFnOrProp is a property name or a function (item, index) => key. It returns an object mapping each key to the array of its items, in insertion order. Then derive countBy(items, keyFnOrProp) (an object of key -> number of items).
+Implement data collection and transformation grouping utilities:
 
-Write keyBy(items, keyFnOrProp) (key -> a single item; the last item wins on duplicate keys). Empty input returns {}.
+### `groupBy(items, keyFnOrProp)`
+- Groups elements of `items` by a key derived via property name string or function `(item, index) => key`.
+- Returns an object mapping each key to an array of its corresponding items in insertion order.
+- Returns `{}` for an empty collection.
+
+### `countBy(items, keyFnOrProp)`
+- Computes the frequency count of elements grouped by the derived key.
+- Returns an object mapping each key to the number of items associated with it.
+
+### `keyBy(items, keyFnOrProp)`
+- Indexes each item by its derived key.
+- If multiple items produce the same key, the last item in `items` wins.
+- Returns `{}` for an empty collection.

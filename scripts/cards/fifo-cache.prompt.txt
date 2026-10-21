@@ -1,1 +1,14 @@
-Write class FifoCache(capacity) with get(key) (undefined when missing), set(key, value) and size. When a NEW key is added beyond the capacity, evict the oldest inserted key (first-in, first-out). Updating an existing key changes its value but not its age, and get() never changes the order. (A later card adds LRU ordering on top of this.)
+Implement a First-In-First-Out (FIFO) in-memory cache class:
+
+### `FifoCache(capacity)`
+
+- **`get size`**:
+  - Getter returning the current number of cached entries.
+- **`get(key)`**:
+  - Returns the cached value for `key`, or `undefined` if not found.
+  - Does not modify insertion order.
+- **`set(key, value)`**:
+  - If `key` already exists, updates its value without resetting its insertion order/age.
+  - If `key` is new:
+    - If `size >= capacity`, evicts the oldest inserted key before storing the new entry.
+    - Stores the new `key` and `value`.

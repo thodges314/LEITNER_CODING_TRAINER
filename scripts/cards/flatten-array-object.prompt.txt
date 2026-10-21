@@ -1,1 +1,11 @@
-Implement flatten(arr, depth) for nested arrays (no depth flattens fully; a depth limit flattens that many levels) and flattenObject(obj) producing dot-path keys ({ a: { b: 1 } } -> { 'a.b': 1 }). In flattenObject only plain nested objects are expanded: arrays, null, empty objects ({}) and empty arrays are kept as leaf values. Do not mutate the input.
+Implement recursive flattening utilities for arrays and nested objects without mutating inputs:
+
+### `flatten(arr, depth = Infinity)`
+- Recursively flattens nested arrays up to the specified `depth`.
+- If `depth` is omitted or `Infinity`, flattens nested arrays completely.
+- Preserves non-array elements as-is.
+
+### `flattenObject(obj, prefix = '')`
+- Recursively flattens nested plain objects into dot-separated paths (e.g., `{ a: { b: 1 } }` -> `{ 'a.b': 1 }`).
+- Only expands non-empty plain objects.
+- Leaves arrays, `Date` instances, `null`, empty objects `{}` and primitives as leaf values.
