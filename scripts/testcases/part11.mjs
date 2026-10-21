@@ -32,10 +32,10 @@ export default {
     r('reset restores the initial values and clears touched', "change + blur email, then reset()", "values.email ''; touched {}"),
   ],
   'simple-table': [
-    r('Renders one header cell per column label', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }]} />", "<thead><tr><th>Name</th><th>Age</th></tr></thead>"),
-    r('Renders one row per item with cells in column order', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />", "<tbody><tr><td>Ada</td><td>36</td></tr><tr><td>Grace</td><td>45</td></tr></tbody>"),
-    r('Missing, undefined and null values render as empty cells', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />", "<tbody><tr><td>Ada</td><td></td></tr><tr><td>Bob</td><td></td></tr></tbody>"),
-    r('An empty table shows a single "No rows" cell spanning all columns', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[]} />", "<tbody><tr><td colSpan={2}>No rows</td></tr></tbody>"),
+    r('Renders one header cell per column label', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }]} />", "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Ada</td><td>36</td></tr></tbody></table>"),
+    r('Renders one row per item with cells in column order', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }]} />", "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Ada</td><td>36</td></tr><tr><td>Grace</td><td>45</td></tr></tbody></table>"),
+    r('Missing, undefined and null values render as empty cells', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada' }, { age: null, name: 'Bob' }]} />", "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td>Ada</td><td></td></tr><tr><td>Bob</td><td></td></tr></tbody></table>"),
+    r('An empty table shows a single "No rows" cell spanning all columns', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[]} />", "<table><thead><tr><th>Name</th><th>Age</th></tr></thead><tbody><tr><td colSpan={2}>No rows</td></tr></tbody></table>"),
   ],
   'data-table': [
     r('Renders a header per column and the first page of rows', "<DataTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }, ...]} pageSize={3} />", "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"),
