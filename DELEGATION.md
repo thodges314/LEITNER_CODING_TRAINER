@@ -13,6 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
+| Optimize card instructions with Markdown & multi-function sections (Batch 6: Objects, Prototypes & Proxies) | Antigravity | `feature/format-markdown-instructions-batch6` | in progress |
 
 
 ## How to pick up a task

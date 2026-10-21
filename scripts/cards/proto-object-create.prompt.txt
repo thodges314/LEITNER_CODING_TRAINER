@@ -1,5 +1,13 @@
-Write inheritFrom(proto, props = {}) that returns a new object whose prototype is proto (use Object.create) and which has the properties of props copied onto it as OWN properties.
+Implement prototype creation and inspection helper functions:
 
-Write hasOwn(obj, key) that is true only for own (not inherited) properties, using Object.prototype.hasOwnProperty.call.
+### `inheritFrom(proto, props = {})`
+- Returns a new object whose prototype is set to `proto` via `Object.create`.
+- Copies all properties of `props` onto the new object as own properties (e.g. via `Object.assign`).
 
-Write protoChainLength(obj): the number of objects on the prototype chain after obj itself (protoChainLength({}) is 1 because of Object.prototype; Object.create(null) gives 0).
+### `hasOwn(obj, key)`
+- Returns `true` only for own (not inherited) properties.
+- Safely delegates using `Object.prototype.hasOwnProperty.call(obj, key)`.
+
+### `protoChainLength(obj)`
+- Returns the number of prototype links on the chain after `obj` itself.
+- For example, `protoChainLength({}) === 1` (`Object.prototype`), while `protoChainLength(Object.create(null)) === 0`.

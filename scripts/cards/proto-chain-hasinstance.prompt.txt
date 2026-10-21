@@ -1,5 +1,16 @@
-Write getProtoChain(obj): an array of the objects on obj's prototype chain, nearest first, ending with Object.prototype (empty for Object.create(null)).
+Implement prototype chain inspection and custom instance resolution utilities:
 
-Write findOwner(obj, key): the first object on the chain starting at obj itself that has key as an OWN property, or null.
+### `getProtoChain(obj)`
+- Returns an array of prototype objects on `obj`'s prototype chain, nearest first, ending with `Object.prototype`.
+- Returns an empty array `[]` for objects with no prototype (`Object.create(null)`).
 
-Write myInstanceOf(value, Ctor) without using the instanceof operator: throw TypeError('Right-hand side is not callable') if Ctor is not a function; if Ctor has a custom [Symbol.hasInstance] (one that is not the default Function.prototype[Symbol.hasInstance]) return its boolean result; otherwise walk the chain of value and compare with Ctor.prototype (primitives and null are never instances).
+### `findOwner(obj, key)`
+- Returns the first object on the prototype chain (starting at `obj` itself) that possesses `key` as an own property (`hasOwnProperty`).
+- Returns `null` if the property is not found on the chain.
+
+### `myInstanceOf(value, Ctor)`
+- Implements `instanceof` without using the native `instanceof` operator.
+- Throws `TypeError('Right-hand side is not callable')` if `Ctor` is not a function.
+- If `Ctor` defines a custom `[Symbol.hasInstance]` (other than `Function.prototype[Symbol.hasInstance]`), invokes it and returns the boolean result.
+- Returns `false` if `value` is `null` or a primitive.
+- Otherwise, walks the prototype chain of `value` comparing each prototype against `Ctor.prototype`.

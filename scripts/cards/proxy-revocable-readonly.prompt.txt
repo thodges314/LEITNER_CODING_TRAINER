@@ -1,1 +1,13 @@
-Write createReadOnly(obj) returning { proxy, revoke } built with Proxy.revocable. Through proxy: reads work and always reflect the live source object; set, defineProperty and deleteProperty throw TypeError('Read-only'); any property whose value is an object is returned wrapped in its own read-only proxy (so nested writes throw too, deeply). Calling revoke() must revoke the top-level proxy AND every nested proxy created so far, after which any access throws a TypeError (message contains 'revoked').
+Implement a deeply immutable and revocable object view using `Proxy.revocable`:
+
+### `createReadOnly(obj)`
+- Returns an object `{ proxy, revoke }`.
+
+#### Proxy Behavior
+- **Live Reads**: Property reads succeed and reflect live property values on the underlying target.
+- **Deep Immutability**: Any property whose value is an object (or function/array, not null) is recursively wrapped in a revocable read-only proxy on access.
+- **Forbidden Mutations**: Traps for `set`, `defineProperty`, and `deleteProperty` unconditionally throw `TypeError('Read-only')`.
+
+#### Revocation
+- Calling `revoke()` immediately revokes the root proxy and every nested proxy spawned so far.
+- Any subsequent operation on any revoked proxy throws a native `TypeError` (message contains `'revoked'`).

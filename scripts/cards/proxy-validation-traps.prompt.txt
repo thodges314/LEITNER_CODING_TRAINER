@@ -1,1 +1,18 @@
-Write createValidated(target, schema) where schema maps property names to predicate functions. Return a Proxy with: a set trap that throws TypeError('Unknown property: <key>') for keys not in the schema, throws TypeError('Invalid value for <key>') when the predicate rejects the value, and otherwise stores the value and returns true; a deleteProperty trap that throws TypeError('Cannot delete <key>') for schema keys but allows other deletes; a has trap and an ownKeys trap that hide every key starting with '_' (so '_secret' in p is false and Object.keys(p) omits it).
+Implement schema-validated and private-field proxy traps:
+
+### `createValidated(target, schema)`
+- Wraps `target` in a `Proxy` enforcing schema rules and property privacy.
+- `schema` is an object mapping allowed property names to validator predicates (`(value) => boolean`).
+
+#### Traps & Behaviors
+- **`set` Trap**:
+  - Throws `TypeError('Unknown property: <key>')` if `key` is not defined in `schema`.
+  - Throws `TypeError('Invalid value for <key>')` if `schema[key](value)` returns false.
+  - Otherwise assigns the value via `Reflect.set(target, key, value, receiver)`.
+- **`deleteProperty` Trap**:
+  - Throws `TypeError('Cannot delete <key>')` if attempting to delete a key present in `schema`.
+  - Permits deletion of non-schema properties via `Reflect.deleteProperty`.
+- **`has` & `ownKeys` Traps (Privacy)**:
+  - Any key starting with an underscore `'_'` is considered private.
+  - The `has` trap returns `false` for keys starting with `'_'`.
+  - The `ownKeys` trap filters out keys starting with `'_'` so they never appear in `Object.keys()` or enumeration.

@@ -1,5 +1,17 @@
-Use a module-level WeakMap and WeakSet (no properties may be added to the objects themselves).
+Implement side-channel metadata and visited-tracking utilities using module-level `WeakMap` and `WeakSet` (without modifying or adding properties to the target objects themselves):
 
-Write tag(obj, label) that stores a label for obj and returns obj, getTag(obj) returning the label (undefined if none), untag(obj) removing it and returning true if a tag was removed.
+### `tag(obj, label)`
+- Associates a metadata `label` with `obj` using a `WeakMap`.
+- Returns `obj`.
 
-Write markSeen(obj) returning true the first time it is called for an object and false every later time for that same object.
+### `getTag(obj)`
+- Returns the stored `label` associated with `obj`, or `undefined` if untagged.
+
+### `untag(obj)`
+- Removes the tag association from the `WeakMap`.
+- Returns `true` if a tag was removed, or `false` otherwise.
+
+### `markSeen(obj)`
+- Uses a `WeakSet` to track visited objects.
+- Returns `true` the very first time an object is encountered.
+- Returns `false` for any subsequent call with the same object.
