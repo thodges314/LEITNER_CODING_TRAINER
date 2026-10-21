@@ -1,7 +1,13 @@
-A transfer list shows two lists (left and right) and buttons that move items between them.
+Implement transfer list logic using plain arrays of strings without mutating input arrays:
 
-Write the logic with plain arrays of strings.
+### `moveSelected(left, right, selected, direction)`
+- `direction` is `'right'` (move from left to right) or `'left'` (move from right to left).
+- Identifies the source list and target list based on `direction`.
+- Every item in the source list present in `selected` is removed from the source list and appended to the end of the target list.
+- Preserves the original order items had in the source list (not the ordering in `selected`).
+- Ignores items in `selected` that do not exist in the source list.
+- Returns `{ left, right }` containing new arrays.
 
-moveSelected(left, right, selected, direction): direction is 'right' (move from left to right) or 'left' (move from right to left). Every item of the SOURCE list that is in selected is removed from it and appended to the end of the other list, keeping the order it had in the source list (not the order of selected). Items in selected that are not in the source list are ignored. Return { left, right } as new arrays; the inputs are not changed.
-
-moveAll(left, right, direction): moves every item of the source list.
+### `moveAll(left, right, direction)`
+- Moves all items from the source list to the end of the target list, leaving the source list empty.
+- Returns `{ left, right }` containing new arrays.

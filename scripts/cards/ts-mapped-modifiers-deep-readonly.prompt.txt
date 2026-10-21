@@ -1,6 +1,16 @@
-Define advanced mapped types using modifier removal (-readonly, -?) and key remapping (as):
-- DeepReadonly<T>: recursively marks all properties of object or array T as readonly.
-- Mutable<T>: removes readonly from all direct properties of T ({-readonly [P in keyof T]: T[P]}).
-- Concrete<T>: removes optional modifier from all direct properties of T ({[P in keyof T]-?: T[P]}).
-- Getters<T>: remaps keys using as to produce getter method signatures, e.g. { name: string } becomes { getName: () => string }.
-- function makeGetters<T extends Record<string, any>>(obj: T): Getters<T>: returns an object where each property of obj has a corresponding get<Prop>() method returning its value.
+Define advanced TypeScript mapped types using modifier removal (`-readonly`, `-?`), key remapping (`as`), and a runtime helper:
+
+### `DeepReadonly<T>`
+- Recursively marks all properties of object or array `T` as `readonly` (preserving functions as-is).
+
+### `Mutable<T>`
+- Removes `readonly` from all direct properties of `T`: `{-readonly [P in keyof T]: T[P]}`.
+
+### `Concrete<T>`
+- Removes the optional modifier (`?`) from all direct properties of `T`: `{[P in keyof T]-?: T[P]}`.
+
+### `Getters<T>`
+- Remaps property keys using `as` to produce getter method signatures (e.g. `{ name: string }` becomes `{ getName: () => string }`).
+
+### `makeGetters<T extends Record<string, any>>(obj: T): Getters<T>`
+- Runtime function that returns an object where each key in `obj` has a corresponding `get<Prop>()` method returning its current value.

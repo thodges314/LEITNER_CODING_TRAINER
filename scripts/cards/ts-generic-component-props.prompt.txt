@@ -1,1 +1,13 @@
-Define interface SelectProps<T> { items: T[]; value: T; onChange: (item: T) => void; getLabel: (item: T) => string } and a generic function renderSelect<T>(props: SelectProps<T>): string that returns the label of every item (via getLabel) joined with ', ' ('' when there are no items). TypeScript must enforce that items and value share the exact same type T.
+Define a generic component prop interface and rendering function where TypeScript enforces type parity across items and value:
+
+### `SelectProps<T>`
+Interface with the following properties:
+- `items: T[]` — array of options.
+- `value: T` — currently selected option of the same type `T`.
+- `onChange: (item: T) => void` — callback invoked with an item of type `T`.
+- `getLabel: (item: T) => string` — returns the display string for an item.
+
+### `renderSelect<T>(props: SelectProps<T>): string`
+- Maps each element in `props.items` through `props.getLabel(item)`.
+- Joins the labels with `', '` (returns `''` when `items` is empty).
+- Enforces at compile-time that `items` and `value` share the exact same type `T`.

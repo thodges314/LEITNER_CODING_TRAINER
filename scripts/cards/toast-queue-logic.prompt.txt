@@ -1,7 +1,17 @@
-A toast (notification) system keeps an array of toasts like { id, message, expiresAt? }.
+Implement pure state helper functions to manage a toast notification queue (`{ id, message, expiresAt? }`) without mutating input arrays:
 
-Write the pure functions that update it; none of them changes the array it is given.
+### `addToast(toasts, toast, max = 3)`
+- If a toast with the same `id` already exists:
+  - Updates that toast in-place by merging new fields while preserving its queue position.
+- Otherwise:
+  - Appends `toast` to the end of the queue.
+  - If the resulting length exceeds `max`, drops the oldest toasts from the front so at most `max` items remain.
+- Returns the new queue array.
 
-addToast(toasts, toast, max = 3): add toast at the end. When a toast with the same id is already in the list, update that toast in place (merge the new fields, keep its position) and add nothing. When the list would end up with more than max toasts, drop the oldest ones (from the start) so that max remain.
-dismissToast(toasts, id): the list without the toast that has that id (an unknown id changes nothing).
-expireToasts(toasts, now): remove every toast whose expiresAt is at or before now. A toast without expiresAt never expires.
+### `dismissToast(toasts, id)`
+- Returns a new array excluding the toast with the given `id`.
+- If `id` is not found, returns the queue unchanged.
+
+### `expireToasts(toasts, now)`
+- Returns a new array removing every toast whose `expiresAt <= now`.
+- Toasts without an `expiresAt` property never expire.

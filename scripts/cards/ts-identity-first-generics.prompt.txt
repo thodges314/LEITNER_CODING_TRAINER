@@ -1,1 +1,12 @@
-Write the generic function identity<T>(value: T): T, first<T>(items: T[]): T | undefined (undefined for an empty array), the generic interface Box<T> { value: T }, makeBox<T>(value: T): Box<T> and mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U>. Use real type parameters (no any) so the compiler infers and checks the result types.
+Implement generic TypeScript helper functions and container types without using `any`:
+
+### `identity<T>(value: T): T`
+- Returns the provided value unchanged with its exact type preserved.
+
+### `first<T>(items: T[]): T | undefined`
+- Returns the first element of `items`, or `undefined` if the array is empty.
+
+### `Box<T>` & Box Helpers
+- **`interface Box<T>`**: `{ value: T }`
+- **`makeBox<T>(value: T): Box<T>`**: wraps `value` inside a `{ value }` container.
+- **`mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U>`**: transforms `box.value` using `fn` and returns a new `Box<U>`.
