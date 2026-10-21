@@ -13,7 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
-| Restore ProgressBar prompt with clean md & update expected output with JSX divs; format Batch 9 (DOM Browser) | Antigravity | `feature/progressbar-expected-output-and-batch9` | in progress |
+
 
 
 
