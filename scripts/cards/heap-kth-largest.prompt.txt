@@ -1,14 +1,14 @@
 Implement heap-based selection and simulation algorithms (include an internal binary heap helper):
 
-### `findKthLargest(nums, k)`
+### `findKthLargest(nums: number[], k: number): number`
 - Finds the `k`-th largest element in an unsorted array `nums` (duplicate values count as separate ranks).
 - Solved in O(n log k) time by maintaining a min-heap capped at size `k`.
 
 ### `KthLargest`
-- **`constructor(k, nums)`**: Initializes the data structure to track the `k`-th largest element given an initial array `nums`.
-- **`add(val)`**: Appends `val` to the stream and returns the updated `k`-th largest element.
+- **`constructor(k: number, nums: number[])`**: Initializes the data structure to track the `k`-th largest element given an initial array `nums`.
+- **`add(val: number): number`**: Appends `val` to the stream and returns the updated `k`-th largest element.
 
-### `lastStoneWeight(stones)`
+### `lastStoneWeight(stones: number[]): number`
 - Simulates smashing the two heaviest stones on each turn using a max-heap.
 - If both stones have equal weight, both are destroyed; if different, the difference `x - y` is returned to the heap.
 - Returns the weight of the last remaining stone, or `0` if all stones are destroyed.

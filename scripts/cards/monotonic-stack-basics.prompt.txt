@@ -1,11 +1,11 @@
 Implement linear-time monotonic stack algorithms in O(n) time:
 
-### `nextGreaterElement(nums)`
+### `nextGreaterElement(nums: number[]): number[]`
 - Finds the first strictly greater value to the right of each element in `nums`.
 - Returns `-1` for any element that has no strictly greater value to its right (e.g. `nextGreaterElement([4, 5, 2, 10])` -> `[5, 10, 10, -1]`).
 - Runs in O(n) time complexity using a monotonic stack.
 
-### `dailyTemperatures(temps)`
+### `dailyTemperatures(temps: number[]): number[]`
 - For each day in `temps`, calculates the number of days until a strictly warmer temperature.
 - Puts `0` if no future day is warmer (e.g. `dailyTemperatures([73, 74, 75, 71, 69, 72, 76, 73])` -> `[1, 1, 4, 2, 1, 1, 0, 0]`).
 - Runs in O(n) time complexity using a decreasing monotonic stack of indices.

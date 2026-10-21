@@ -1,15 +1,15 @@
 Implement in-place linked list manipulations on nodes shaped `{ val, next }` (`null` ends the list):
 
-### `removeNthFromEnd(head, n)`
+### `removeNthFromEnd<T>(head: ListNode<T> | null, n: number): ListNode<T> | null`
 - Removes the `n`-th node from the end of the list in a single pass using two pointers spaced `n` nodes apart.
 - Returns the `head` of the modified list (which may differ if the original head was removed).
 - Assumes `1 <= n <= length`.
 
-### `reorderList(head)`
+### `reorderList<T>(head: ListNode<T> | null): void`
 - Rearranges the list in place into alternating order: `L0 -> Ln -> L1 -> Ln-1 -> L2 -> Ln-2 -> ...`.
 - Typically implemented by finding the midpoint, reversing the second half, and interleaving nodes.
 - Mutates the list in place and returns nothing (`undefined`).
 
-### `deleteDuplicates(head)`
+### `deleteDuplicates<T>(head: ListNode<T> | null): ListNode<T> | null`
 - Removes duplicate values in place from an already sorted singly linked list such that each distinct value appears only once.
 - Returns the `head` of the modified list.

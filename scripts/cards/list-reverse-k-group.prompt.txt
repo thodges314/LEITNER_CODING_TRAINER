@@ -1,14 +1,14 @@
 Implement linked list reversal algorithms on nodes shaped `{ val, next }` (`null` ends the list):
 
-### `reverseKGroup(head, k)`
+### `reverseKGroup<T>(head: ListNode<T> | null, k: number): ListNode<T> | null`
 - Reverses nodes of the list `k` at a time and returns the new `head`.
 - If the remaining nodes at the end number fewer than `k`, leaves them in their original order.
 - Assumes `k >= 1`.
 
-### `reverseBetween(head, left, right)`
+### `reverseBetween<T>(head: ListNode<T> | null, left: number, right: number): ListNode<T> | null`
 - Reverses nodes strictly from position `left` to position `right` (1-indexed, inclusive) in a single pass.
 - Returns the modified `head` of the list.
 
-### `swapPairs(head)`
+### `swapPairs<T>(head: ListNode<T> | null): ListNode<T> | null`
 - Swaps every two adjacent nodes (`1st <-> 2nd`, `3rd <-> 4th`, etc.) by relinking pointers.
 - Does not modify node values; returns the new `head`.

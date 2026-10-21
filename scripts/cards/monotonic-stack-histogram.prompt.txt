@@ -1,11 +1,11 @@
 Implement classic monotonic stack algorithms in O(n) time:
 
-### `stockSpan(prices)`
+### `stockSpan(prices: number[]): number[]`
 - Calculates the span of stock prices for each day: the number of consecutive days ending today (including today) where the price was `<= today's price`.
 - For example, `stockSpan([100, 80, 60, 70])` returns `[1, 1, 1, 2]`.
 - Runs in O(n) time complexity using a monotonic stack.
 
-### `largestRectangleArea(heights)`
+### `largestRectangleArea(heights: number[]): number`
 - Calculates the maximum area of a rectangle that fits inside a histogram of bars with width 1.
 - Returns `0` if `heights` is empty (`[]`).
 - Runs in O(n) time complexity using an increasing monotonic stack of indices.

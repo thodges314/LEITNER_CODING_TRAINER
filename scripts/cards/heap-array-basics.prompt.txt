@@ -1,18 +1,18 @@
 Implement foundational array-based binary heap indexing and invariants:
 
-### `parentIndex(i)`
+### `parentIndex(i: number): number`
 - Returns the parent index for child index `i` (`Math.floor((i - 1) / 2)`).
 
-### `leftIndex(i)`
+### `leftIndex(i: number): number`
 - Returns the left child index for parent index `i` (`2 * i + 1`).
 
-### `rightIndex(i)`
+### `rightIndex(i: number): number`
 - Returns the right child index for parent index `i` (`2 * i + 2`).
 
-### `isMinHeap(arr)`
+### `isMinHeap(arr: number[]): boolean`
 - Checks whether array `arr` satisfies the binary min-heap invariant (`arr[parent] <= arr[child]` for all children).
 - Returns `true` if valid (empty arrays and single-element arrays are valid min-heaps); returns `false` otherwise.
 
-### `siftUp(arr, i)`
+### `siftUp(arr: number[], i: number): number[]`
 - Restores min-heap order by moving the element at index `i` upward while it is smaller than its parent.
 - Operates in place and returns the mutated array `arr`.

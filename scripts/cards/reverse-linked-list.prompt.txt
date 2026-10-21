@@ -1,11 +1,11 @@
 Implement singly linked list utilities on nodes shaped as `{ val, next }` (terminal node has `next: null`):
 
-### `reverseList(head)`
+### `reverseList<T>(head: ListNode<T> | null): ListNode<T> | null`
 - Reverses the linked list in-place by updating pointer references.
 - Returns the new head of the reversed list.
 - Returns `null` if given an empty list (`head === null`).
 
-### `middleNode(head)`
+### `middleNode<T>(head: ListNode<T> | null): ListNode<T> | null`
 - Finds and returns the middle node of the list using the two-pointer (slow/fast) technique.
 - For even-length lists with two middle nodes, returns the second middle node.
 - Returns `null` if given an empty list (`head === null`).

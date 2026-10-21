@@ -1,15 +1,15 @@
 Implement multi-way merge and spatial selection algorithms (include an internal binary heap helper; list nodes are shaped `{ val, next }`):
 
-### `mergeKLists(lists)`
+### `mergeKLists(lists: (ListNode<number> | null)[]): ListNode<number> | null`
 - Merges `k` sorted linked lists into a single sorted linked list using a min-heap of current node heads.
 - Individual list entries may be `null`.
 - Returns `null` if all lists are empty or `lists` is empty.
 
-### `mergeKSortedArrays(arrays)`
+### `mergeKSortedArrays(arrays: number[][]): number[]`
 - Merges `k` sorted number arrays into one flat sorted array using a min-heap.
 - Handles empty subarrays properly.
 
-### `kClosest(points, k)`
+### `kClosest(points: [number, number][], k: number): [number, number][]`
 - Finds the `k` closest points `[x, y]` to the origin `(0, 0)` based on Euclidean distance `x^2 + y^2`.
 - Uses a max-heap capped at size `k`.
 - Returns the points sorted by distance ascending (ties preserve input order). Returns `[]` when `k === 0`.

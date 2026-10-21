@@ -3,9 +3,9 @@ Implement streaming median finding and CPU task scheduling (include an internal 
 ### `MedianFinder`
 - Maintains a continuous data stream of numbers to compute running medians in O(log n) time per insertion.
 - Uses a max-heap for the lower half and a min-heap for the upper half, keeping sizes balanced within a difference of at most 1.
-- **`addNum(num)`**: Adds integer `num` from the data stream into the structure.
-- **`findMedian()`**: Returns the median of all numbers added so far. When the count is even, returns the mean of the two middle values; returns `undefined` if no numbers have been added.
+- **`addNum(num: number): void`**: Adds integer `num` from the data stream into the structure.
+- **`findMedian(): number | undefined`**: Returns the median of all numbers added so far. When the count is even, returns the mean of the two middle values; returns `undefined` if no numbers have been added.
 
-### `leastInterval(tasks, n)`
+### `leastInterval(tasks: string[], n: number): number`
 - Calculates the minimum number of CPU time intervals needed to complete all tasks in array `tasks`.
 - Tasks are represented by letters, and identical tasks must be separated by at least `n` cooldown intervals (during which the CPU may idle or perform other tasks).

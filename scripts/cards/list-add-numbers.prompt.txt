@@ -1,16 +1,16 @@
 Implement linked list algorithms on nodes shaped `{ val, next }` (`null` ends the list):
 
-### `addTwoNumbers(l1, l2)`
+### `addTwoNumbers(l1: ListNode<number> | null, l2: ListNode<number> | null): ListNode<number> | null`
 - Adds two numbers represented by linked lists whose digits are stored in reverse order (e.g. `2 -> 4 -> 3` represents 342).
 - Returns the sum as a new linked list in the same reversed format.
 - Handles differing list lengths and trailing carries; does not mutate input lists.
 
-### `oddEvenList(head)`
+### `oddEvenList<T>(head: ListNode<T> | null): ListNode<T> | null`
 - Reorders nodes in place so that odd-indexed positions (1st, 3rd, ...) appear first, followed by even-indexed positions (2nd, 4th, ...).
 - Preserves the relative internal order among odd and even groups.
 - Operates in O(n) time and O(1) auxiliary space, returning the modified `head`.
 
-### `getIntersectionNode(a, b)`
+### `getIntersectionNode<T>(a: ListNode<T> | null, b: ListNode<T> | null): ListNode<T> | null`
 - Finds the first common node (by reference identity `===`) where two singly linked lists intersect.
 - Returns `null` if the two lists do not meet.
 - Operates in O(n + m) time and O(1) extra memory.
