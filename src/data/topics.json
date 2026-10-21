@@ -5953,7 +5953,7 @@
         "description": "The scroll area has the full virtual height",
         "input": "same props",
         "expected": "an inner element with style.height '20000px'",
-        "callSignature": "<VirtualList items={/* 1000 items: 'Item 0'...'Item 999' */ items} itemHeight={20} height={100} overscan={2} /> (scroll container height: 20000px)"
+        "callSignature": "<VirtualList items={Array.from({ length: 1000 }, (_, i) => `Item ${i}`)} itemHeight={20} height={100} overscan={2} /> (scroll container height: 20000px)"
       },
       {
         "description": "Scrolling moves the rendered window",

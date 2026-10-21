@@ -64,7 +64,7 @@ export default {
       callSignature: "<VirtualList items={Array.from({ length: 1000 }, (_, i) => `Item ${i}`)} itemHeight={20} height={100} overscan={2} />",
     }),
     r('The scroll area has the full virtual height', 'same props', "an inner element with style.height '20000px'", {
-      callSignature: "<VirtualList items={/* 1000 items: 'Item 0'...'Item 999' */ items} itemHeight={20} height={100} overscan={2} /> (scroll container height: 20000px)",
+      callSignature: "<VirtualList items={Array.from({ length: 1000 }, (_, i) => `Item ${i}`)} itemHeight={20} height={100} overscan={2} /> (scroll container height: 20000px)",
     }),
     r('Scrolling moves the rendered window', 'scrollTop = 2000 (+ scroll event)', "9 listitems from 'Item 98'; includes 'Item 100'; no 'Item 0'", {
       callSignature: "fireEvent.scroll(container, { target: { scrollTop: 2000 } })",
