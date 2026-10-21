@@ -1,5 +1,18 @@
-A binary heap is stored in an array: the children of index i are 2i+1 and 2i+2.
+Implement foundational array-based binary heap indexing and invariants:
 
-Write parentIndex(i), leftIndex(i), rightIndex(i), isMinHeap(arr) (true when every parent is <= both of its children; empty and one-element arrays are heaps).
+### `parentIndex(i)`
+- Returns the parent index for child index `i` (`Math.floor((i - 1) / 2)`).
 
-Write siftUp(arr, i) which moves the element at index i up while it is smaller than its parent, in place, and returns the array.
+### `leftIndex(i)`
+- Returns the left child index for parent index `i` (`2 * i + 1`).
+
+### `rightIndex(i)`
+- Returns the right child index for parent index `i` (`2 * i + 2`).
+
+### `isMinHeap(arr)`
+- Checks whether array `arr` satisfies the binary min-heap invariant (`arr[parent] <= arr[child]` for all children).
+- Returns `true` if valid (empty arrays and single-element arrays are valid min-heaps); returns `false` otherwise.
+
+### `siftUp(arr, i)`
+- Restores min-heap order by moving the element at index `i` upward while it is smaller than its parent.
+- Operates in place and returns the mutated array `arr`.

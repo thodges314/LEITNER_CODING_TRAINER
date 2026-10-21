@@ -1,7 +1,14 @@
-There is no built-in heap, so write your own binary heap inside your solution (array-backed, sift up and down, any helper name you like).
+Implement heap-based selection and simulation algorithms (include an internal binary heap helper):
 
-Write findKthLargest(nums, k): the k-th largest value (duplicates count separately) using a min-heap of size k.
+### `findKthLargest(nums, k)`
+- Finds the `k`-th largest element in an unsorted array `nums` (duplicate values count as separate ranks).
+- Solved in O(n log k) time by maintaining a min-heap capped at size `k`.
 
-Write class KthLargest with constructor(k, nums) and add(val), which inserts a value and returns the current k-th largest.
+### `KthLargest`
+- **`constructor(k, nums)`**: Initializes the data structure to track the `k`-th largest element given an initial array `nums`.
+- **`add(val)`**: Appends `val` to the stream and returns the updated `k`-th largest element.
 
-Write lastStoneWeight(stones): repeatedly take the two heaviest stones; equal stones both vanish, otherwise the difference goes back; return the final weight or 0 when none remain.
+### `lastStoneWeight(stones)`
+- Simulates smashing the two heaviest stones on each turn using a max-heap.
+- If both stones have equal weight, both are destroyed; if different, the difference `x - y` is returned to the heap.
+- Returns the weight of the last remaining stone, or `0` if all stones are destroyed.

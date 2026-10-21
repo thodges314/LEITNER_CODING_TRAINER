@@ -1,1 +1,15 @@
-Implement class MinStack with push(x), pop() (returns the removed value, undefined when empty), top() (undefined when empty), size() and getMin() (smallest value currently in the stack, undefined when empty), all in O(1). Also implement class QueueFromStacks with enqueue(x), dequeue() (undefined when empty), peek() and size(), using only two arrays that you treat strictly as stacks (push/pop at the end only).
+Implement stack and queue data structures with O(1) performance:
+
+### `MinStack`
+- **`push(x)`**: Pushes element `x` onto the stack in O(1) time.
+- **`pop()`**: Removes and returns the top value from the stack; returns `undefined` if empty.
+- **`top()`**: Returns the top value without removing it; returns `undefined` if empty.
+- **`size()`**: Returns the total number of elements currently stored.
+- **`getMin()`**: Retrieves the minimum value currently in the stack in O(1) time; returns `undefined` if empty.
+
+### `QueueFromStacks`
+- Implements a FIFO queue using exactly two internal arrays treated strictly as stacks (only using `push` and `pop` at array ends).
+- **`enqueue(x)`**: Adds element `x` to the back of the queue.
+- **`dequeue()`**: Removes and returns the front element; returns `undefined` if empty.
+- **`peek()`**: Returns the front element without removing it; returns `undefined` if empty.
+- **`size()`**: Returns the total count of elements across both stacks.

@@ -1,7 +1,15 @@
-List nodes are { val, next } (null ends the list).
+Implement in-place linked list manipulations on nodes shaped `{ val, next }` (`null` ends the list):
 
-Write removeNthFromEnd(head, n): remove the n-th node from the end in one pass (two pointers n apart; n is valid) and return the head.
+### `removeNthFromEnd(head, n)`
+- Removes the `n`-th node from the end of the list in a single pass using two pointers spaced `n` nodes apart.
+- Returns the `head` of the modified list (which may differ if the original head was removed).
+- Assumes `1 <= n <= length`.
 
-Write reorderList(head): rearrange in place to L0 -> Ln -> L1 -> Ln-1 -> ... (find the middle, reverse the second half, interleave); it returns nothing.
+### `reorderList(head)`
+- Rearranges the list in place into alternating order: `L0 -> Ln -> L1 -> Ln-1 -> L2 -> Ln-2 -> ...`.
+- Typically implemented by finding the midpoint, reversing the second half, and interleaving nodes.
+- Mutates the list in place and returns nothing (`undefined`).
 
-Write deleteDuplicates(head): in a SORTED list keep one copy of each value and return the head.
+### `deleteDuplicates(head)`
+- Removes duplicate values in place from an already sorted singly linked list such that each distinct value appears only once.
+- Returns the `head` of the modified list.
