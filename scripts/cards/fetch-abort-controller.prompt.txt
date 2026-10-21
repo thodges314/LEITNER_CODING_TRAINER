@@ -1,1 +1,10 @@
-Write fetchWithTimeout(url, timeoutMs) that uses an AbortController to abort the fetch if it has not settled within timeoutMs; in that case the returned promise rejects with the AbortError (err.name === 'AbortError'). If the request finishes first, resolve with the parsed JSON and clear the timer with clearTimeout so it never fires later.
+Write an HTTP fetch utility that enforces request timeouts using `AbortController`:
+
+### `fetchWithTimeout(url, timeoutMs)`
+- Creates an `AbortController` and links its signal to `fetch(url, { signal: controller.signal })`.
+- Sets a timer via `setTimeout(() => controller.abort(), timeoutMs)`:
+  - If the request does not settle within `timeoutMs`, the controller aborts and the returned promise rejects with an `AbortError` (`err.name === 'AbortError'`).
+- If the fetch completes successfully before the timeout:
+  - Clears the pending timer with `clearTimeout(timer)` so it never fires later.
+  - Resolves with the parsed JSON (`await res.json()`).
+- On any failure or abort, ensures the timer is cleared before re-throwing or rejecting.

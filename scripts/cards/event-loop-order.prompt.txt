@@ -1,1 +1,23 @@
-Write orderOfEvents() that returns a Promise resolving to the array of labels in the order they happen. Do, in this order: push 'start' synchronously; schedule setTimeout(..., 0) pushing 'timeout'; schedule Promise.resolve().then(...) pushing 'promise'; push 'end' synchronously; resolve (with the array) once the timeout has fired. Also write asyncOrder(): an async function f(log) pushes 'f1', awaits null, then pushes 'f2'; asyncOrder pushes 'before', calls f, pushes 'after', waits for f to finish and returns the log array.
+Demonstrate JavaScript event loop execution order, microtasks, macrotasks, and async/await mechanics:
+
+### `orderOfEvents()`
+- Returns a `Promise` that resolves to an array of string labels recorded in actual execution order.
+- In the constructor/executor body, perform these actions in exact code order:
+  1. Synchronously push `'start'`.
+  2. Schedule a macrotask timer `setTimeout(..., 0)` that pushes `'timeout'` and then resolves the promise with the log array.
+  3. Schedule a microtask `Promise.resolve().then(...)` that pushes `'promise'`.
+  4. Synchronously push `'end'`.
+- Resolves with `['start', 'end', 'promise', 'timeout']`.
+
+### `asyncOrder()`
+- Asynchronous function that tests microtask interleaving with `await null`.
+- Defines an internal async function `f(log)`:
+  - Pushes `'f1'`.
+  - Executes `await null` (yielding to the microtask queue).
+  - Pushes `'f2'`.
+- In `asyncOrder`:
+  1. Pushes `'before'`.
+  2. Calls `f(log)`.
+  3. Pushes `'after'`.
+  4. Awaits completion of `f(log)`.
+  5. Returns `log` (resolving with `['before', 'f1', 'after', 'f2']`).

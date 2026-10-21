@@ -1,1 +1,9 @@
-Write an async function fetchData(url) using native fetch. Check response.ok: if the response is not OK, throw an Error whose message includes the HTTP status code (e.g. 404); otherwise return the body parsed with await response.json(). Network failures (fetch itself rejecting) must NOT be swallowed: the returned promise must reject with the original network error (if you use try/catch, rethrow).
+Write an async HTTP request utility using native `fetch`:
+
+### `fetchData(url)`
+- Fetches `url` asynchronously using `fetch(url)`.
+- **Response Validation**:
+  - Checks `response.ok`. If false, throws an `Error` whose message includes the HTTP status code (e.g. `404`).
+  - If `response.ok` is true, returns the parsed JSON body via `await response.json()`.
+- **Error Propagation**:
+  - Network failures (where `fetch` itself rejects) must **not** be swallowed; the returned promise must reject with the original network error (if using `try`/`catch`, rethrow it).

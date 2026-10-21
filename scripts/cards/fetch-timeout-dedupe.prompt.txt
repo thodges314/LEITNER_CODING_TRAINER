@@ -1,1 +1,14 @@
-Write dedupeFetch(key, fn, timeoutMs = 5000) where fn(signal) starts a request. Concurrent calls with the same key must share one in-flight promise. Each shared request is aborted (via the AbortSignal passed to fn) and rejected with an Error if it takes longer than timeoutMs. The entry must be removed when the request settles (success, failure or timeout) so later calls refetch.
+Implement request deduplication with timeout abortion:
+
+### `dedupeFetch(key, fn, timeoutMs = 5000)`
+- `fn(signal)` is a factory function that returns a Promise for the asynchronous request.
+
+#### Deduplication Behavior
+- Concurrent invocations sharing the same `key` return the identical in-flight `Promise`.
+- The entry is removed from the cache in a `.finally()` handler once the request settles (on success, rejection, or timeout) so subsequent calls trigger a fresh fetch.
+
+#### Timeout & Cancellation
+- If the operation does not settle within `timeoutMs`:
+  - Triggers abortion via the `AbortSignal` passed to `fn(signal)`.
+  - Rejects the returned promise with an `Error` (e.g. `Timed out after ${timeoutMs}ms`).
+- Clears the pending timeout timer when the request finishes before the deadline.

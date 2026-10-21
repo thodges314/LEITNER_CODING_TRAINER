@@ -1,1 +1,16 @@
-Implement a minimal MiddlewarePipeline with use(fn) and handle(req, res). Layers run in order via next(); async handlers are supported. A thrown error or rejected promise skips normal layers and goes to the next error-handling layer (a 4-argument function (err, req, res, next)). An error nobody handles sets res.statusCode = 500. Calling next() more than once from the same layer must be ignored.
+Implement a minimal Express-style middleware execution pipeline:
+
+### `class MiddlewarePipeline`
+- Maintains an ordered stack of middleware functions.
+
+### `use(fn)`
+- Appends middleware function `fn` to the pipeline stack.
+- Returns `this` for chaining.
+
+### `handle(req, res)`
+- Executes layers sequentially using `next(err)`:
+  - **Standard Middleware (`fn.length < 4`)**: Called with `(req, res, next)`. Skipped when an error is currently active.
+  - **Error Middleware (`fn.length === 4`)**: Called with `(err, req, res, next)`. Executed only when an error has been passed or thrown.
+  - **Async Support**: Catches thrown synchronous errors and rejected promises from middleware handlers.
+  - **Unhandled Errors**: If an error reaches the end of the stack without being handled, sets `res.statusCode = 500` (and calls `res.end('Internal Server Error')` if available).
+  - **Re-entrance Protection**: Calling `next()` more than once from the same middleware layer must be ignored.
