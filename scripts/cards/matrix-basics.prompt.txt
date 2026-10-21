@@ -1,15 +1,15 @@
 Implement fundamental 2D matrix utilities:
 
-### `createMatrix(rows, cols, fill = 0)`
+### `createMatrix<T = number>(rows: number, cols: number, fill?: T): T[][]`
 - Creates a 2D array of dimensions `rows x cols` populated with value `fill` (defaults to 0).
 - Every row must be a distinct, independent array instance so mutating one row does not affect others.
 - Returns `[]` when `rows === 0`.
 
-### `matrixSum(matrix)`
+### `matrixSum(matrix: number[][]): number`
 - Calculates the sum of all cell values in `matrix`.
 - Returns `0` for an empty matrix (`[]`).
 
-### `diagonalSum(matrix)`
+### `diagonalSum(matrix: number[][]): number`
 - Computes the sum of elements along both the primary diagonal and secondary diagonal in a square matrix.
 - If the matrix has an odd dimension, the intersecting center element is included only once.
 - Returns `0` for an empty matrix (`[]`).

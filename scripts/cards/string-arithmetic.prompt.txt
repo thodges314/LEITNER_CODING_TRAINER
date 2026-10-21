@@ -2,13 +2,13 @@ Implement arbitrary-precision string arithmetic without converting whole strings
 
 > **Important**: Do not use `BigInt` or `Number()` on whole strings; process digit by digit.
 
-### `addBinary(a, b)`
+### `addBinary(a: string, b: string): string`
 - Adds two binary number strings `a` and `b` and returns their sum as a binary string (e.g. `'11'` + `'1'` -> `'100'`).
 
-### `addStrings(a, b)`
+### `addStrings(a: string, b: string): string`
 - Adds two non-negative decimal number strings `a` and `b` of arbitrary length and returns their sum as a string (e.g. `'999'` + `'1'` -> `'1000'`).
 
-### `multiplyStrings(a, b)`
+### `multiplyStrings(a: string, b: string): string`
 - Multiplies two non-negative decimal strings `a` and `b` and returns the product as a string (e.g. `'123'` * `'456'` -> `'56088'`).
 - If either factor is `'0'`, returns `'0'`.
 - Resulting strings must contain no leading zeros except for `'0'` itself.

@@ -1,15 +1,15 @@
 Implement geometric matrix transformations and traversals:
 
-### `transpose(matrix)`
+### `transpose(matrix: number[][]): number[][]`
 - Returns a new matrix representing the transpose of `matrix` (rows become columns: `matrix[r][c]` becomes `result[c][r]`).
 - Returns `[]` if `matrix` is empty (`[]`).
 
-### `rotate90(matrix)`
+### `rotate90(matrix: number[][]): number[][]`
 - Returns a new matrix representing `matrix` rotated 90 degrees clockwise.
 - Does not mutate the original matrix.
 - Returns `[]` if `matrix` is empty (`[]`).
 
-### `spiralOrder(matrix)`
+### `spiralOrder(matrix: number[][]): number[]`
 - Traverses a 2D matrix in clockwise spiral order starting from top-left `(0, 0)` and returns the elements as a flat array.
 - Works correctly for both square and rectangular matrices.
 - Returns `[]` if `matrix` is empty (`[]`).

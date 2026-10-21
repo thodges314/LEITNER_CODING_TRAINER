@@ -1,17 +1,21 @@
 Implement bitwise tricks, Hamming distances, and bit-level flags:
 
-### `missingNumber(nums)`
+### `missingNumber(nums: number[]): number`
 - Finds the single missing number from an array containing `n` distinct numbers in the range `0...n`.
 - Uses XOR of array indices and values in O(n) time and O(1) space.
 
-### `hammingDistance(a, b)`
+### `hammingDistance(a: number, b: number): number`
 - Returns the number of bit positions in which the binary representations of two non-negative integers `a` and `b` differ.
 
-### `countBitsUpTo(n)`
+### `countBitsUpTo(n: number): number[]`
 - Returns an array of size `n + 1` where each index `i` contains the number of 1-bits in `i` for all `0 <= i <= n`.
 - Uses the recurrence `bits[i] = bits[i >> 1] + (i & 1)` to run in O(n) time.
 
-### Bit Flags
-- **`getBit(n, i)`**: Returns `0` or `1` representing the bit at 0-indexed position `i` from the least significant bit.
-- **`setBit(n, i)`**: Sets the bit at position `i` to `1` and returns the resulting number.
-- **`clearBit(n, i)`**: Clears the bit at position `i` to `0` and returns the resulting number.
+### `getBit(n: number, i: number): number`
+- Returns `0` or `1` representing the bit at 0-indexed position `i` from the least significant bit.
+
+### `setBit(n: number, i: number): number`
+- Sets the bit at position `i` to `1` and returns the resulting number.
+
+### `clearBit(n: number, i: number): number`
+- Clears the bit at position `i` to `0` and returns the resulting number.

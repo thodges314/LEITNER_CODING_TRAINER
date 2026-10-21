@@ -1,11 +1,11 @@
 Implement combinatorial generation utilities:
 
-### `binaryStrings(n)`
+### `binaryStrings(n: number): string[]`
 - Generates every binary string of length `n` in lexicographically ascending order.
 - For example, `binaryStrings(2)` returns `['00', '01', '10', '11']`.
 - Returns `['']` when `n === 0`.
 
-### `combine(n, k)`
+### `combine(n: number, k: number): number[][]`
 - Generates every combination of `k` numbers chosen from range `1...n`.
 - Each individual combination must be an array sorted in ascending order.
 - Combinations must be returned in lexicographical order (e.g. `combine(4, 2)` starts with `[1, 2]`, `[1, 3]`).
