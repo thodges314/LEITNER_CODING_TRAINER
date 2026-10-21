@@ -1,1 +1,18 @@
-Implement Array.prototype.myMap, myFilter and myReduce. Each callback receives (value, index, array) and honors thisArg (myReduce's callback receives (accumulator, value, index, array)). Sparse holes are skipped. myReduce without an initial value uses the first present element, and on an empty array it throws TypeError.
+Implement polyfills on `Array.prototype` for core iteration methods:
+
+### `Array.prototype.myMap(callback, thisArg)`
+- Invokes `callback.call(thisArg, value, index, array)` for each present element in the array.
+- Skips sparse holes (unassigned indices).
+- Returns a new array containing the callback return values.
+
+### `Array.prototype.myFilter(callback, thisArg)`
+- Invokes `callback.call(thisArg, value, index, array)` for each present element.
+- Skips sparse holes.
+- Returns a new array containing elements for which `callback` returned a truthy value.
+
+### `Array.prototype.myReduce(callback, initialValue)`
+- Executes `callback(accumulator, value, index, array)` across present array elements:
+  - If `initialValue` is provided (check `arguments.length >= 2`), uses it as the initial accumulator and begins from the first present element.
+  - If `initialValue` is omitted, uses the first present element as the accumulator and begins iteration at the next present element.
+- Skips sparse holes.
+- Throws a `TypeError` if called on an empty array with no `initialValue`.

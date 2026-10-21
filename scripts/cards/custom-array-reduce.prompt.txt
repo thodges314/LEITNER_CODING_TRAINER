@@ -1,1 +1,15 @@
-Implement myReduce(array, callback, initialValue) from scratch. The callback receives (accumulator, value, index, array). If initialValue is provided, start with it and iterate from index 0; if it is omitted, use the first element as the initial accumulator and start at index 1. An empty array returns initialValue when provided, and throws a TypeError ('Reduce of empty array with no initial value') when it is omitted.
+Implement a standalone reducer function from scratch:
+
+### `myReduce(array, callback, initialValue)`
+- Iterates over `array`, invoking `callback(accumulator, value, index, array)`.
+- **Initial Value Handling**:
+  - If `initialValue` is provided (`arguments.length >= 3`):
+    - Starts with `accumulator = initialValue`.
+    - Begins processing from index `0`.
+    - If `array` is empty, returns `initialValue`.
+  - If `initialValue` is omitted:
+    - Sets `accumulator = array[0]`.
+    - Begins processing from index `1`.
+    - Throws a `TypeError('Reduce of empty array with no initial value')` if `array` is empty.
+- Skips sparse holes (checks `i in array`).
+- Returns the final accumulated value.
