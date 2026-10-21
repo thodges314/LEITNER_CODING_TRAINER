@@ -1,10 +1,10 @@
 Implement classical 2D dynamic programming algorithms:
 
-### `editDistance(a, b)`
+### `editDistance(a: string, b: string): number`
 - Computes the Levenshtein distance: the minimum number of single-character operations (insertions, deletions, substitutions) required to transform string `a` into string `b`.
 - Example: `editDistance("horse", "ros")` returns `3`.
 
-### `knapsack(weights, values, capacity)`
+### `knapsack(weights: number[], values: number[], capacity: number): number`
 - Solves the 0/1 knapsack problem: determines the maximum total value achievable by selecting a subset of items such that their combined weight does not exceed `capacity`.
 - Each item can be included at most once.
 - Returns `0` when `capacity` is `0` or no items fit.

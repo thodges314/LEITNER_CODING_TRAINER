@@ -1,13 +1,13 @@
 Implement dynamic programming variants on 1D arrays:
 
-### `robCircular(nums)`
+### `robCircular(nums: number[]): number`
 - Calculates the maximum loot from houses arranged in a circle (where the first and last houses are adjacent) such that no two adjacent houses are robbed.
 - Returns `0` for an empty array, and `nums[0]` for a single-element array.
 
-### `maxProduct(nums)`
+### `maxProduct(nums: number[]): number`
 - Finds the largest product of a non-empty contiguous subarray in integer array `nums`.
 - Handles negative numbers and zeros by tracking running minimum and maximum products.
 
-### `minCostClimbingStairs(cost)`
+### `minCostClimbingStairs(cost: number[]): number`
 - Calculates the minimum cost to reach the top of a floor staircase (just past the last step).
 - You can start at either step index `0` or `1`, and paying `cost[i]` allows climbing 1 or 2 steps forward.

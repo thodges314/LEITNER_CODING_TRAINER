@@ -1,11 +1,11 @@
 Implement subset-sum dynamic programming reductions:
 
-### `canPartition(nums)`
+### `canPartition(nums: number[]): boolean`
 - Determines whether a non-empty array of positive integers `nums` can be partitioned into two subsets with equal sum.
 - Returns `true` for an empty array.
 - Returns `false` immediately if the total sum is odd.
 
-### `findTargetSumWays(nums, target)`
+### `findTargetSumWays(nums: number[], target: number): number`
 - Computes the number of different ways to assign `+` or `-` signs to each integer in `nums` such that their evaluated sum equals `target`.
 - Reduces the problem to finding subsets summing to `(sum + target) / 2`.
 - Correctly handles zeros (e.g. `[0, 0, 0]` with `target = 0` yields `8` ways).

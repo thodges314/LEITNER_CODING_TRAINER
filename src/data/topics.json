@@ -9248,7 +9248,7 @@
       "string",
       "knapsack"
     ],
-    "promptSeed": "Implement classical 2D dynamic programming algorithms:\n\n### `editDistance(a, b)`\n- Computes the Levenshtein distance: the minimum number of single-character operations (insertions, deletions, substitutions) required to transform string `a` into string `b`.\n- Example: `editDistance(\"horse\", \"ros\")` returns `3`.\n\n### `knapsack(weights, values, capacity)`\n- Solves the 0/1 knapsack problem: determines the maximum total value achievable by selecting a subset of items such that their combined weight does not exceed `capacity`.\n- Each item can be included at most once.\n- Returns `0` when `capacity` is `0` or no items fit.",
+    "promptSeed": "Implement classical 2D dynamic programming algorithms:\n\n### `editDistance(a: string, b: string): number`\n- Computes the Levenshtein distance: the minimum number of single-character operations (insertions, deletions, substitutions) required to transform string `a` into string `b`.\n- Example: `editDistance(\"horse\", \"ros\")` returns `3`.\n\n### `knapsack(weights: number[], values: number[], capacity: number): number`\n- Solves the 0/1 knapsack problem: determines the maximum total value achievable by selecting a subset of items such that their combined weight does not exceed `capacity`.\n- Each item can be included at most once.\n- Returns `0` when `capacity` is `0` or no items fit.",
     "difficulty": 4,
     "concept": "dp2d",
     "referenceSolution": "function editDistance(a, b) {\n  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 0; i <= a.length; i++) dp[i][0] = i;\n  for (let j = 0; j <= b.length; j++) dp[0][j] = j;\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];\n      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction knapsack(weights, values, capacity) {\n  const dp = new Array(capacity + 1).fill(0);\n  for (let i = 0; i < weights.length; i++) {\n    for (let w = capacity; w >= weights[i]; w--) {\n      dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);\n    }\n  }\n  return dp[capacity];\n}",
@@ -9293,7 +9293,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(m × n) / O(items × capacity)",
     "targetSpace": "O(m × n) / O(capacity)",
-    "complexityExplanation": "Edit distance fills an (m + 1) x (n + 1) table; the knapsack tries each item against every capacity using a single capacity-sized array."
+    "complexityExplanation": "Edit distance fills an (m + 1) x (n + 1) table; the knapsack tries each item against every capacity using a single capacity-sized array.",
+    "referenceSolutionTs": "function editDistance(a: string, b: string): number {\n  const dp: number[][] = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 0; i <= a.length; i++) dp[i][0] = i;\n  for (let j = 0; j <= b.length; j++) dp[0][j] = j;\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1];\n      else dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction knapsack(weights: number[], values: number[], capacity: number): number {\n  const dp: number[] = new Array(capacity + 1).fill(0);\n  for (let i = 0; i < weights.length; i++) {\n    for (let w = capacity; w >= weights[i]; w--) {\n      dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);\n    }\n  }\n  return dp[capacity];\n}"
   },
   {
     "id": "greedy-intervals-circuit",
@@ -9424,7 +9425,7 @@
       "string",
       "subsequence"
     ],
-    "promptSeed": "Implement subsequence comparison algorithms:\n\n### `longestCommonSubsequence(a, b)`\n- Computes the length of the longest common subsequence present in both strings `a` and `b` using a 2D dynamic programming table.\n- Subsequence characters must appear in the same relative order, but need not be contiguous.\n- Returns `0` if either string is empty.\n\n### `isSubsequence(s, t)`\n- Determines whether string `s` is a subsequence of string `t` using a two-pointer approach in O(length of t) time.\n- Returns `true` if `s` is the empty string `\"\"`.",
+    "promptSeed": "Implement subsequence comparison algorithms:\n\n### `longestCommonSubsequence(a: string, b: string): number`\n- Computes the length of the longest common subsequence present in both strings `a` and `b` using a 2D dynamic programming table.\n- Subsequence characters must appear in the same relative order, but need not be contiguous.\n- Returns `0` if either string is empty.\n\n### `isSubsequence(s: string, t: string): boolean`\n- Determines whether string `s` is a subsequence of string `t` using a two-pointer approach in O(length of t) time.\n- Returns `true` if `s` is the empty string `\"\"`.",
     "difficulty": 3,
     "concept": "dp2d",
     "referenceSolution": "function longestCommonSubsequence(a, b) {\n  const dp = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction isSubsequence(s, t) {\n  let i = 0;\n  for (let j = 0; j < t.length && i < s.length; j++) {\n    if (s[i] === t[j]) i++;\n  }\n  return i === s.length;\n}",
@@ -9464,7 +9465,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(m × n)",
     "targetSpace": "O(m × n)",
-    "complexityExplanation": "The LCS table has (m + 1) x (n + 1) cells each filled once; isSubsequence is a single linear two-pointer pass."
+    "complexityExplanation": "The LCS table has (m + 1) x (n + 1) cells each filled once; isSubsequence is a single linear two-pointer pass.",
+    "referenceSolutionTs": "function longestCommonSubsequence(a: string, b: string): number {\n  const dp: number[][] = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));\n  for (let i = 1; i <= a.length; i++) {\n    for (let j = 1; j <= b.length; j++) {\n      if (a[i - 1] === b[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;\n      else dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);\n    }\n  }\n  return dp[a.length][b.length];\n}\n\nfunction isSubsequence(s: string, t: string): boolean {\n  let i = 0;\n  for (let j = 0; j < t.length && i < s.length; j++) {\n    if (s[i] === t[j]) i++;\n  }\n  return i === s.length;\n}"
   },
   {
     "id": "min-path-sum-grid",
@@ -9710,7 +9712,7 @@
       "array",
       "1d-dp"
     ],
-    "promptSeed": "Implement dynamic programming variants on 1D arrays:\n\n### `robCircular(nums)`\n- Calculates the maximum loot from houses arranged in a circle (where the first and last houses are adjacent) such that no two adjacent houses are robbed.\n- Returns `0` for an empty array, and `nums[0]` for a single-element array.\n\n### `maxProduct(nums)`\n- Finds the largest product of a non-empty contiguous subarray in integer array `nums`.\n- Handles negative numbers and zeros by tracking running minimum and maximum products.\n\n### `minCostClimbingStairs(cost)`\n- Calculates the minimum cost to reach the top of a floor staircase (just past the last step).\n- You can start at either step index `0` or `1`, and paying `cost[i]` allows climbing 1 or 2 steps forward.",
+    "promptSeed": "Implement dynamic programming variants on 1D arrays:\n\n### `robCircular(nums: number[]): number`\n- Calculates the maximum loot from houses arranged in a circle (where the first and last houses are adjacent) such that no two adjacent houses are robbed.\n- Returns `0` for an empty array, and `nums[0]` for a single-element array.\n\n### `maxProduct(nums: number[]): number`\n- Finds the largest product of a non-empty contiguous subarray in integer array `nums`.\n- Handles negative numbers and zeros by tracking running minimum and maximum products.\n\n### `minCostClimbingStairs(cost: number[]): number`\n- Calculates the minimum cost to reach the top of a floor staircase (just past the last step).\n- You can start at either step index `0` or `1`, and paying `cost[i]` allows climbing 1 or 2 steps forward.",
     "difficulty": 3,
     "concept": "dp",
     "referenceSolution": "function robLine(nums, from, to) {\n  let take = 0;\n  let skip = 0;\n  for (let i = from; i <= to; i++) {\n    [take, skip] = [skip + nums[i], Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction robCircular(nums) {\n  if (!nums.length) return 0;\n  if (nums.length === 1) return nums[0];\n  return Math.max(robLine(nums, 0, nums.length - 2), robLine(nums, 1, nums.length - 1));\n}\n\nfunction maxProduct(nums) {\n  let max = nums[0];\n  let min = nums[0];\n  let best = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    const n = nums[i];\n    const candidates = [n, max * n, min * n];\n    max = Math.max(...candidates);\n    min = Math.min(...candidates);\n    best = Math.max(best, max);\n  }\n  return best;\n}\n\nfunction minCostClimbingStairs(cost) {\n  let a = 0;\n  let b = 0;\n  for (let i = 2; i <= cost.length; i++) {\n    [a, b] = [b, Math.min(b + cost[i - 1], a + cost[i - 2])];\n  }\n  return b;\n}",
@@ -9745,7 +9747,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(n)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Each function sweeps the array once keeping only the previous one or two states."
+    "complexityExplanation": "Each function sweeps the array once keeping only the previous one or two states.",
+    "referenceSolutionTs": "function robLine(nums: number[], from: number, to: number): number {\n  let take = 0;\n  let skip = 0;\n  for (let i = from; i <= to; i++) {\n    [take, skip] = [skip + nums[i], Math.max(take, skip)];\n  }\n  return Math.max(take, skip);\n}\n\nfunction robCircular(nums: number[]): number {\n  if (!nums.length) return 0;\n  if (nums.length === 1) return nums[0];\n  return Math.max(robLine(nums, 0, nums.length - 2), robLine(nums, 1, nums.length - 1));\n}\n\nfunction maxProduct(nums: number[]): number {\n  let max = nums[0];\n  let min = nums[0];\n  let best = nums[0];\n  for (let i = 1; i < nums.length; i++) {\n    const n = nums[i];\n    const candidates = [n, max * n, min * n];\n    max = Math.max(...candidates);\n    min = Math.min(...candidates);\n    best = Math.max(best, max);\n  }\n  return best;\n}\n\nfunction minCostClimbingStairs(cost: number[]): number {\n  let a = 0;\n  let b = 0;\n  for (let i = 2; i <= cost.length; i++) {\n    [a, b] = [b, Math.min(b + cost[i - 1], a + cost[i - 2])];\n  }\n  return b;\n}"
   },
   {
     "id": "longest-palindrome-substring",
@@ -9924,7 +9927,7 @@
       "subset-sum",
       "knapsack"
     ],
-    "promptSeed": "Implement subset-sum dynamic programming reductions:\n\n### `canPartition(nums)`\n- Determines whether a non-empty array of positive integers `nums` can be partitioned into two subsets with equal sum.\n- Returns `true` for an empty array.\n- Returns `false` immediately if the total sum is odd.\n\n### `findTargetSumWays(nums, target)`\n- Computes the number of different ways to assign `+` or `-` signs to each integer in `nums` such that their evaluated sum equals `target`.\n- Reduces the problem to finding subsets summing to `(sum + target) / 2`.\n- Correctly handles zeros (e.g. `[0, 0, 0]` with `target = 0` yields `8` ways).\n- Returns `0` if `Math.abs(target) > sum` or `(sum + target)` is odd.",
+    "promptSeed": "Implement subset-sum dynamic programming reductions:\n\n### `canPartition(nums: number[]): boolean`\n- Determines whether a non-empty array of positive integers `nums` can be partitioned into two subsets with equal sum.\n- Returns `true` for an empty array.\n- Returns `false` immediately if the total sum is odd.\n\n### `findTargetSumWays(nums: number[], target: number): number`\n- Computes the number of different ways to assign `+` or `-` signs to each integer in `nums` such that their evaluated sum equals `target`.\n- Reduces the problem to finding subsets summing to `(sum + target) / 2`.\n- Correctly handles zeros (e.g. `[0, 0, 0]` with `target = 0` yields `8` ways).\n- Returns `0` if `Math.abs(target) > sum` or `(sum + target)` is odd.",
     "difficulty": 4,
     "concept": "dp",
     "referenceSolution": "function canPartition(nums) {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (total % 2 !== 0) return false;\n  const half = total / 2;\n  const dp = new Array(half + 1).fill(false);\n  dp[0] = true;\n  for (const n of nums) {\n    for (let s = half; s >= n; s--) {\n      if (dp[s - n]) dp[s] = true;\n    }\n  }\n  return dp[half];\n}\n\nfunction findTargetSumWays(nums, target) {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (Math.abs(target) > total || (total + target) % 2 !== 0) return 0;\n  const want = (total + target) / 2;\n  const dp = new Array(want + 1).fill(0);\n  dp[0] = 1;\n  for (const n of nums) {\n    for (let s = want; s >= n; s--) dp[s] += dp[s - n];\n  }\n  return dp[want];\n}",
@@ -9959,7 +9962,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(n × S)",
     "targetSpace": "O(S)",
-    "complexityExplanation": "Each number updates a one-dimensional table indexed by the subset sum S being searched."
+    "complexityExplanation": "Each number updates a one-dimensional table indexed by the subset sum S being searched.",
+    "referenceSolutionTs": "function canPartition(nums: number[]): boolean {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (total % 2 !== 0) return false;\n  const half = total / 2;\n  const dp: boolean[] = new Array(half + 1).fill(false);\n  dp[0] = true;\n  for (const n of nums) {\n    for (let s = half; s >= n; s--) {\n      if (dp[s - n]) dp[s] = true;\n    }\n  }\n  return dp[half];\n}\n\nfunction findTargetSumWays(nums: number[], target: number): number {\n  const total = nums.reduce((a, b) => a + b, 0);\n  if (Math.abs(target) > total || (total + target) % 2 !== 0) return 0;\n  const want = (total + target) / 2;\n  const dp: number[] = new Array(want + 1).fill(0);\n  dp[0] = 1;\n  for (const n of nums) {\n    for (let s = want; s >= n; s--) dp[s] += dp[s - n];\n  }\n  return dp[want];\n}"
   },
   {
     "id": "stock-profit-dp",
@@ -10191,7 +10195,7 @@
       "1d-dp",
       "string"
     ],
-    "promptSeed": "Implement string segmentation and decoding algorithms using dynamic programming:\n\n### `wordBreak(s, wordDict)`\n- Determines whether string `s` can be segmented into a space-separated sequence of one or more dictionary words from `wordDict`.\n- Dictionary words may be reused multiple times.\n- Returns `true` for an empty string `\"\"`.\n\n### `numDecodings(s)`\n- Calculates the total number of ways to decode a string of digits `s`, where `'A' = \"1\"`, ..., `'Z' = \"26\"`.\n- Valid single digits range from `'1'` to `'9'`; valid two-digit pairings range from `'10'` to `'26'`.\n- A leading or invalid `'0'` (such as in `\"06\"`) cannot be decoded and yields `0`.",
+    "promptSeed": "Implement string segmentation and decoding algorithms using dynamic programming:\n\n### `wordBreak(s: string, wordDict: string[]): boolean`\n- Determines whether string `s` can be segmented into a space-separated sequence of one or more dictionary words from `wordDict`.\n- Dictionary words may be reused multiple times.\n- Returns `true` for an empty string `\"\"`.\n\n### `numDecodings(s: string): number`\n- Calculates the total number of ways to decode a string of digits `s`, where `'A' = \"1\"`, ..., `'Z' = \"26\"`.\n- Valid single digits range from `'1'` to `'9'`; valid two-digit pairings range from `'10'` to `'26'`.\n- A leading or invalid `'0'` (such as in `\"06\"`) cannot be decoded and yields `0`.",
     "difficulty": 3,
     "concept": "dp",
     "referenceSolution": "function wordBreak(s, wordDict) {\n  const words = new Set(wordDict);\n  const dp = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && words.has(s.slice(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}\n\nfunction numDecodings(s) {\n  const dp = new Array(s.length + 1).fill(0);\n  dp[0] = 1;\n  for (let i = 1; i <= s.length; i++) {\n    if (s[i - 1] !== '0') dp[i] += dp[i - 1];\n    if (i >= 2) {\n      const two = Number(s.slice(i - 2, i));\n      if (two >= 10 && two <= 26) dp[i] += dp[i - 2];\n    }\n  }\n  return dp[s.length];\n}",
@@ -10226,7 +10230,8 @@
     "pack": "algorithms-advanced",
     "targetTime": "O(n²) / O(n)",
     "targetSpace": "O(n)",
-    "complexityExplanation": "Word break checks each prefix against each earlier split point; decode ways does one pass with a table of n + 1 counts."
+    "complexityExplanation": "Word break checks each prefix against each earlier split point; decode ways does one pass with a table of n + 1 counts.",
+    "referenceSolutionTs": "function wordBreak(s: string, wordDict: string[]): boolean {\n  const words = new Set<string>(wordDict);\n  const dp: boolean[] = new Array(s.length + 1).fill(false);\n  dp[0] = true;\n  for (let i = 1; i <= s.length; i++) {\n    for (let j = 0; j < i; j++) {\n      if (dp[j] && words.has(s.slice(j, i))) {\n        dp[i] = true;\n        break;\n      }\n    }\n  }\n  return dp[s.length];\n}\n\nfunction numDecodings(s: string): number {\n  const dp: number[] = new Array(s.length + 1).fill(0);\n  dp[0] = 1;\n  for (let i = 1; i <= s.length; i++) {\n    if (s[i - 1] !== '0') dp[i] += dp[i - 1];\n    if (i >= 2) {\n      const two = Number(s.slice(i - 2, i));\n      if (two >= 10 && two <= 26) dp[i] += dp[i - 2];\n    }\n  }\n  return dp[s.length];\n}"
   },
   {
     "id": "bst-kth-insert-build",
