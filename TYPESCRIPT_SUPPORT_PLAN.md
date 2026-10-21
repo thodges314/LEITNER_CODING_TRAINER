@@ -43,9 +43,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **128 / 271 (47.2%)**
-- **Cards Remaining:** **143 / 271 (52.8%)**
-- **Total Batches:** 48 batches (21 completed, 27 remaining)
+- **Fully Typed Cards Completed:** **133 / 271 (49.1%)**
+- **Cards Remaining:** **138 / 271 (50.9%)**
+- **Total Batches:** 48 batches (22 completed, 26 remaining)
 
 ### Track Completion Status
 
@@ -54,19 +54,19 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`algorithms`** | 77 | 77 | 100.0% | **COMPLETE** (Batches 1–11) |
 | **`async-js`** | 21 | 21 | 100.0% | **COMPLETE** (Batches 12–15) |
 | **`js-language`** | 25 | 25 | 100.0% | **COMPLETE** (Batches 16–20) |
-| **`typescript-patterns`** | 14 | 5 | 35.7% | **IN PROGRESS** (Batch 21 done, 22–23 remaining) |
+| **`typescript-patterns`** | 14 | 10 | 71.4% | **IN PROGRESS** (Batches 21–22 done, 23 remaining) |
 | **`js-utilities`** | 37 | 0 | 0.0% | Planned (Batches 24–30) |
 | **`dom-browser`** | 20 | 0 | 0.0% | Planned (Batches 31–34) |
 | **`react`** | 27 | 0 | 0.0% | Planned (Batches 35–39) |
 | **`react-components`** | 45 | 0 | 0.0% | Planned (Batches 40–47) |
 | **`testing-tooling`** | 5 | 0 | 0.0% | Planned (Batch 48) |
-| **TOTAL** | **271** | **128** | **47.2%** | **48 Batches Total** |
+| **TOTAL** | **271** | **133** | **49.1%** | **48 Batches Total** |
 
 ---
 
-## 4. Completed Batches (Batches 1–21: 128 Cards)
+## 4. Completed Batches (Batches 1–22: 133 Cards)
 
-All 128 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 133 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 - **Batch 1 (DSA Foundations — 8 cards):** `binary-search-exact`, `two-pointer-sorted-sum`, `sliding-window-fixed`, `valid-parentheses-stack`, `merge-intervals`, `two-sum-hashmap`, `interval-overlap`, `anagram-palindrome`.
@@ -94,24 +94,18 @@ All 128 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 19 (Weak Collections & Iterators — 4 cards):** `weakmap-memoize-object`, `weakmap-private-state`, `weakset-cycle-detection`, `iterators-generators`.
 - **Batch 20 (Iterators, Coroutines & Proxies — 7 cards):** `iterable-range-class`, `generators-coroutines`, `symbol-async-iterator`, `proxy-default-logging`, `proxy-negative-index`, `proxy-revocable-readonly`, `proxy-validation-traps`.
 
-### TypeScript Patterns Track (5 of 14 Complete)
+### TypeScript Patterns Track (10 of 14 Complete)
 - **Batch 21 (Generics & Narrowing — 5 cards):** `ts-identity-first-generics`, `ts-narrowing-typeof-in`, `ts-custom-type-guards`, `ts-branded-nominal-types`, `ts-discriminated-unions-exhaustiveness`.
+- **Batch 22 (Utility Types & Conditional Types — 5 cards):** `ts-reimplement-utility-types`, `ts-custom-utility-types`, `ts-infer-conditional-unpack`, `ts-mapped-modifiers-deep-readonly`, `ts-template-literal-strings`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 22–48: 143 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 23–48: 138 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
-### Track: `typescript-patterns` (9 cards remaining — Batches 22 to 23)
+### Track: `typescript-patterns` (4 cards remaining — Batch 23)
 *Focus: Ingesting dedicated `.ref.ts` solutions and prompt type signatures for existing TypeScript cards.*
-
-- **Batch 22: Utility Types & Conditional Types (5 cards)**
-  - `ts-reimplement-utility-types`: TS Types: Rebuild Partial, Readonly, Pick, Record
-  - `ts-custom-utility-types`: Custom Utility Types (DeepPartial & PickByType)
-  - `ts-infer-conditional-unpack`: TS Conditional Types: infer, Function Unwrappers, DeepAwaited
-  - `ts-mapped-modifiers-deep-readonly`: TS Mapped Modifiers: DeepReadonly, Mutable, Concrete, KeyRemap
-  - `ts-template-literal-strings`: TS Template Literals: KebabCase, Split, and DotPaths
 
 - **Batch 23: Advanced Overloads & Generic Components (4 cards)**
   - `ts-overloads-exhaustive-narrowing`: TS Function Overloads: Type-Safe Event Map, assertNever

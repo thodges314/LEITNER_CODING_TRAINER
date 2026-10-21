@@ -53,7 +53,7 @@ export const TRACK_STATS: TrackStats[] = [
   { track: 'algorithms', total: 77, completed: 77, status: 'COMPLETE' },
   { track: 'async-js', total: 21, completed: 21, status: 'COMPLETE' },
   { track: 'js-language', total: 25, completed: 25, status: 'COMPLETE' },
-  { track: 'typescript-patterns', total: 14, completed: 5, status: 'IN_PROGRESS' },
+  { track: 'typescript-patterns', total: 14, completed: 10, status: 'IN_PROGRESS' },
   { track: 'js-utilities', total: 37, completed: 0, status: 'PLANNED' },
   { track: 'dom-browser', total: 20, completed: 0, status: 'PLANNED' },
   { track: 'react', total: 27, completed: 0, status: 'PLANNED' },
@@ -62,7 +62,7 @@ export const TRACK_STATS: TrackStats[] = [
 ];
 
 /**
- * 3. COMPLETED BATCHES (Batches 1–21: 128 cards total)
+ * 3. COMPLETED BATCHES (Batches 1–22: 133 cards total)
  */
 export const COMPLETED_BATCHES: BatchDefinition[] = [
   {
@@ -382,18 +382,11 @@ export const COMPLETED_BATCHES: BatchDefinition[] = [
       'ts-discriminated-unions-exhaustiveness',
     ],
   },
-];
-
-/**
- * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 22–48: 143 cards total)
- */
-export const REMAINING_BATCHES: BatchDefinition[] = [
-  // --- typescript-patterns track (9 cards remaining, Batches 22–23) ---
   {
     batchNumber: 22,
     title: 'Utility Types & Conditional Types',
     track: 'typescript-patterns',
-    status: 'planned',
+    status: 'completed',
     cardCount: 5,
     cardIds: [
       'ts-reimplement-utility-types',
@@ -403,6 +396,13 @@ export const REMAINING_BATCHES: BatchDefinition[] = [
       'ts-template-literal-strings',
     ],
   },
+];
+
+/**
+ * 4. MASTER ROADMAP FOR REMAINING WORK (Batches 23–48: 138 cards total)
+ */
+export const REMAINING_BATCHES: BatchDefinition[] = [
+  // --- typescript-patterns track (4 cards remaining, Batch 23) ---
   {
     batchNumber: 23,
     title: 'Advanced Overloads & Generic Components',
