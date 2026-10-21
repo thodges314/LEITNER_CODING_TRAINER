@@ -5337,7 +5337,7 @@
     "testCases": [
       {
         "description": "All panels start closed",
-        "input": "<Accordion items={[First, Second, Third]} />",
+        "input": "<Accordion items={[{ id: 'a', title: 'First', content: 'Alpha text' }, { id: 'b', title: 'Second', content: 'Beta text' }, { id: 'c', title: 'Third', content: 'Gamma text' }]} />",
         "expected": "no role='region'; every button aria-expanded='false'; 3 <h3>"
       },
       {
@@ -5357,7 +5357,7 @@
       },
       {
         "description": "allowMultiple keeps several panels open",
-        "input": "allowMultiple; click 'First', then 'Third'",
+        "input": "<Accordion items={items} allowMultiple={true} />",
         "expected": "'Alpha text' and 'Gamma text' both rendered"
       },
       {
@@ -5440,7 +5440,7 @@
     "testCases": [
       {
         "description": "Loads the first page on mount and shows a loading state",
-        "input": "mount <LoadMoreList fetchPage={fn} />",
+        "input": "<LoadMoreList fetchPage={fetchPage} />",
         "expected": "fetchPage(1) called once; <p role='status'> shown; no 'Load more' button"
       },
       {
@@ -5659,7 +5659,7 @@
     "testCases": [
       {
         "description": "Closed by default: the trigger has aria-haspopup and aria-expanded=false",
-        "input": "<DropdownMenu label='Actions' items={[Edit, Copy, Delete (disabled), Share]} />",
+        "input": "<DropdownMenu label='Actions' items={[{ id: 'edit', label: 'Edit' }, { id: 'copy', label: 'Copy' }, { id: 'del', label: 'Delete', disabled: true }, { id: 'share', label: 'Share' }]} onSelect={handleSelect} />",
         "expected": "no role='menu'; aria-haspopup='menu'; aria-expanded='false'"
       },
       {
@@ -13523,22 +13523,26 @@
       {
         "description": "Each of the three rows wins",
         "input": "const win = (i) => {\n  const b = Array(9).fill(null);\n  [i, i + 1, i + 2].forEach((k) => { b[k] = 'X'; });\n  return calculateWinner(b);\n};\n[win(0), win(3), win(6)]",
-        "expected": "['X', 'X', 'X']"
+        "expected": "['X', 'X', 'X']",
+        "callSignature": "calculateWinner(['X', 'X', 'X', null, null, null, null, null, null])"
       },
       {
         "description": "Each of the three columns wins",
         "input": "const win = (i) => {\n  const b = Array(9).fill(null);\n  [i, i + 3, i + 6].forEach((k) => { b[k] = 'O'; });\n  return calculateWinner(b);\n};\n[win(0), win(1), win(2)]",
-        "expected": "['O', 'O', 'O']"
+        "expected": "['O', 'O', 'O']",
+        "callSignature": "calculateWinner(['O', null, null, 'O', null, null, 'O', null, null])"
       },
       {
         "description": "Both diagonals win",
         "input": "const a = Array(9).fill(null);\n[0, 4, 8].forEach((k) => { a[k] = 'X'; });\nconst b = Array(9).fill(null);\n[2, 4, 6].forEach((k) => { b[k] = 'O'; });\n[calculateWinner(a), calculateWinner(b)]",
-        "expected": "['X', 'O']"
+        "expected": "['X', 'O']",
+        "callSignature": "calculateWinner(['X', null, null, null, 'X', null, null, null, 'X'])"
       },
       {
         "description": "Empty squares are not a win, and neither is a pair",
         "input": "[calculateWinner(Array(9).fill(null)), calculateWinner(['X', 'X', null, null, 'O', null, null, null, 'O'])]",
-        "expected": "[null, null]"
+        "expected": "[null, null]",
+        "callSignature": "calculateWinner(Array(9).fill(null))"
       },
       {
         "description": "Three squares in a line must belong to the same player",
@@ -13548,12 +13552,14 @@
       {
         "description": "isBoardFull is true only when no square is null",
         "input": "[isBoardFull(Array(9).fill('X')), isBoardFull(['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', null]), isBoardFull(Array(9).fill(null))]",
-        "expected": "[true, false, false]"
+        "expected": "[true, false, false]",
+        "callSignature": "isBoardFull(board)"
       },
       {
         "description": "getStatus reports the winner, a draw, or whose turn it is",
         "input": "const won = ['X', 'X', 'X', 'O', 'O', null, null, null, null];\nconst draw = ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'];\nconst open = ['X', null, null, null, 'O', null, null, null, null];\n[getStatus(won, false), getStatus(draw, true), getStatus(open, true), getStatus(open, false)]",
-        "expected": "['Winner: X', 'Draw', 'Next player: X', 'Next player: O']"
+        "expected": "['Winner: X', 'Draw', 'Next player: X', 'Next player: O']",
+        "callSignature": "getStatus(board, xIsNext)"
       },
       {
         "description": "A win on a full board is a win, not a draw",
@@ -13785,27 +13791,32 @@
       {
         "description": "Everything collapsed: only the top level, with its flags",
         "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nflattenVisible(tree, new Set())",
-        "expected": "[{ id: 'src', label: 'src', depth: 0, hasChildren: true, expanded: false }, { id: 'readme', label: 'README.md', depth: 0, hasChildren: false, expanded: false }]"
+        "expected": "[{ id: 'src', label: 'src', depth: 0, hasChildren: true, expanded: false }, { id: 'readme', label: 'README.md', depth: 0, hasChildren: false, expanded: false }]",
+        "callSignature": "flattenVisible(tree, new Set())"
       },
       {
         "description": "Expanding a folder shows its children one level deeper, in order",
         "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nconst brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\nbrief(flattenVisible(tree, new Set(['src'])))",
-        "expected": "['0:src', '1:app', '1:lib', '0:readme']"
+        "expected": "['0:src', '1:app', '1:lib', '0:readme']",
+        "callSignature": "flattenVisible(tree, new Set(['src']))"
       },
       {
         "description": "Nested expansion shows grandchildren at depth 2",
         "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nconst brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\nbrief(flattenVisible(tree, new Set(['src', 'lib'])))",
-        "expected": "['0:src', '1:app', '1:lib', '2:util', '0:readme']"
+        "expected": "['0:src', '1:app', '1:lib', '2:util', '0:readme']",
+        "callSignature": "flattenVisible(tree, new Set(['src', 'lib']))"
       },
       {
         "description": "A collapsed parent hides its whole subtree, even if a descendant is in the Set",
         "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nconst brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\nbrief(flattenVisible(tree, new Set(['lib'])))",
-        "expected": "['0:src', '0:readme']"
+        "expected": "['0:src', '0:readme']",
+        "callSignature": "flattenVisible(tree, new Set(['lib']))"
       },
       {
         "description": "expanded is true only for folders that are open; a leaf id in the Set is not expanded",
         "input": "const tree = [\n  { id: 'src', label: 'src', children: [\n    { id: 'app', label: 'app.js' },\n    { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n  ] },\n  { id: 'readme', label: 'README.md' },\n];\nflattenVisible(tree, new Set(['src', 'app'])).slice(0, 3).map((r) => [r.id, r.hasChildren, r.expanded])",
-        "expected": "[['src', true, true], ['app', false, false], ['lib', true, false]]"
+        "expected": "[['src', true, true], ['app', false, false], ['lib', true, false]]",
+        "callSignature": "flattenVisible(tree, new Set(['src', 'app']))"
       },
       {
         "description": "An empty tree has no rows",
@@ -13820,7 +13831,8 @@
       {
         "description": "toggleExpanded adds, then removes, and returns a new Set each time",
         "input": "const a = new Set(['x']);\nconst b = toggleExpanded(a, 'y');\nconst c2 = toggleExpanded(b, 'x');\n[[...a], [...b], [...c2], a === b]",
-        "expected": "[['x'], ['x', 'y'], ['y'], false]"
+        "expected": "[['x'], ['x', 'y'], ['y'], false]",
+        "callSignature": "toggleExpanded(set, id)"
       }
     ],
     "testHarness": "await $test.run(\"Everything collapsed: only the top level, with its flags\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  return (flattenVisible(tree, new Set()));\n}, () => ([{ id: 'src', label: 'src', depth: 0, hasChildren: true, expanded: false }, { id: 'readme', label: 'README.md', depth: 0, hasChildren: false, expanded: false }]));\n\nawait $test.run(\"Expanding a folder shows its children one level deeper, in order\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  const brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\n  return (brief(flattenVisible(tree, new Set(['src']))));\n}, () => (['0:src', '1:app', '1:lib', '0:readme']));\n\nawait $test.run(\"Nested expansion shows grandchildren at depth 2\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  const brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\n  return (brief(flattenVisible(tree, new Set(['src', 'lib']))));\n}, () => (['0:src', '1:app', '1:lib', '2:util', '0:readme']));\n\nawait $test.run(\"A collapsed parent hides its whole subtree, even if a descendant is in the Set\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  const brief = (rows) => rows.map((r) => r.depth + ':' + r.id);\n  return (brief(flattenVisible(tree, new Set(['lib']))));\n}, () => (['0:src', '0:readme']));\n\nawait $test.run(\"expanded is true only for folders that are open; a leaf id in the Set is not expanded\", async () => {\n  const sleep = $test.sleep;\n  const tree = [\n    { id: 'src', label: 'src', children: [\n      { id: 'app', label: 'app.js' },\n      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },\n    ] },\n    { id: 'readme', label: 'README.md' },\n  ];\n  return (flattenVisible(tree, new Set(['src', 'app'])).slice(0, 3).map((r) => [r.id, r.hasChildren, r.expanded]));\n}, () => ([['src', true, true], ['app', false, false], ['lib', true, false]]));\n\nawait $test.run(\"An empty tree has no rows\", async () => {\n  const sleep = $test.sleep;\n  return (flattenVisible([], new Set(['x'])));\n}, () => ([]));\n\nawait $test.run(\"A node with an empty children array is a leaf\", async () => {\n  const sleep = $test.sleep;\n  return (flattenVisible([{ id: 'a', label: 'A', children: [] }], new Set(['a'])));\n}, () => ([{ id: 'a', label: 'A', depth: 0, hasChildren: false, expanded: false }]));\n\nawait $test.run(\"toggleExpanded adds, then removes, and returns a new Set each time\", async () => {\n  const sleep = $test.sleep;\n  const a = new Set(['x']);\n  const b = toggleExpanded(a, 'y');\n  const c2 = toggleExpanded(b, 'x');\n  return ([[...a], [...b], [...c2], a === b]);\n}, () => ([['x'], ['x', 'y'], ['y'], false]));"
@@ -14498,12 +14510,12 @@
     "testCases": [
       {
         "description": "The container is a toolbar with an accessible label",
-        "input": "render <Toolbar label=\"Text formatting\" items={4 items}>",
+        "input": "<Toolbar label=\"Text formatting\" items={[{ id: 'b', label: 'Bold' }, { id: 'i', label: 'Italic' }, { id: 'u', label: 'Underline' }, { id: 'l', label: 'Link' }]} />",
         "expected": "role=toolbar aria-label='Text formatting' with 4 buttons"
       },
       {
         "description": "Only the active button is in the tab order: tabIndex 0 for the first by default, -1 for the others",
-        "input": "initial render",
+        "input": "<Toolbar label=\"Text formatting\" items={items} />",
         "expected": "tabIndex values 0,-1,-1,-1"
       },
       {
@@ -14596,7 +14608,7 @@
     "testCases": [
       {
         "description": "A valid form calls onSubmit with trimmed values and shows no error summary",
-        "input": "type '  Ada  ' and ' ada@example.com ', submit",
+        "input": "<SignupForm onSubmit={handleSubmit} />",
         "expected": "onSubmit({ name: 'Ada', email: 'ada@example.com' }); no [role=alert]"
       },
       {
@@ -14616,7 +14628,7 @@
       },
       {
         "description": "Each summary link points at its field and focuses it",
-        "input": "click each summary link",
+        "input": "click error link <a href=\"#name\">",
         "expected": "hrefs '#name', '#email'; the matching input gets focus"
       },
       {
@@ -14655,7 +14667,7 @@
     "testCases": [
       {
         "description": "The skip link is the first focusable element and points at the main landmark",
-        "input": "render <Layout path=\"/\" title=\"Home\">",
+        "input": "<Layout path=\"/\" title=\"Home\" />",
         "expected": "first focusable element: <a href=\"#main-content\">Skip to main content</a>; <main id=\"main-content\"> exists"
       },
       {
@@ -14665,7 +14677,7 @@
       },
       {
         "description": "The document title follows the page title as \"<title> | My App\"",
-        "input": "title 'Home' then rerender with title 'About'",
+        "input": "<Layout path=\"/\" title=\"About\" />",
         "expected": "document.title 'Home | My App' then 'About | My App'"
       },
       {
@@ -14675,7 +14687,7 @@
       },
       {
         "description": "Changing the path moves focus to the new page heading (h1)",
-        "input": "rerender with path '/about' and title 'About'",
+        "input": "<Layout path=\"/about\" title=\"About\" />",
         "expected": "focus is on <h1 tabindex=\"-1\">About</h1>"
       },
       {

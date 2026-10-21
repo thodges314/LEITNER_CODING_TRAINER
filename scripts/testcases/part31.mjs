@@ -13,17 +13,29 @@ const brief = `const brief = (rows) => rows.map((r) => r.depth + ':' + r.id);
 `;
 export default {
   'flatten-visible-tree': [
-    c('Everything collapsed: only the top level, with its flags', TREE + `flattenVisible(tree, new Set())`, "[{ id: 'src', label: 'src', depth: 0, hasChildren: true, expanded: false }, { id: 'readme', label: 'README.md', depth: 0, hasChildren: false, expanded: false }]"),
-    c('Expanding a folder shows its children one level deeper, in order', TREE + brief + `brief(flattenVisible(tree, new Set(['src'])))`, "['0:src', '1:app', '1:lib', '0:readme']"),
-    c('Nested expansion shows grandchildren at depth 2', TREE + brief + `brief(flattenVisible(tree, new Set(['src', 'lib'])))`, "['0:src', '1:app', '1:lib', '2:util', '0:readme']"),
-    c('A collapsed parent hides its whole subtree, even if a descendant is in the Set', TREE + brief + `brief(flattenVisible(tree, new Set(['lib'])))`, "['0:src', '0:readme']"),
-    c('expanded is true only for folders that are open; a leaf id in the Set is not expanded', TREE + `flattenVisible(tree, new Set(['src', 'app'])).slice(0, 3).map((r) => [r.id, r.hasChildren, r.expanded])`, "[['src', true, true], ['app', false, false], ['lib', true, false]]"),
+    c('Everything collapsed: only the top level, with its flags', TREE + `flattenVisible(tree, new Set())`, "[{ id: 'src', label: 'src', depth: 0, hasChildren: true, expanded: false }, { id: 'readme', label: 'README.md', depth: 0, hasChildren: false, expanded: false }]", {
+      callSignature: "flattenVisible(tree, new Set())",
+    }),
+    c('Expanding a folder shows its children one level deeper, in order', TREE + brief + `brief(flattenVisible(tree, new Set(['src'])))`, "['0:src', '1:app', '1:lib', '0:readme']", {
+      callSignature: "flattenVisible(tree, new Set(['src']))",
+    }),
+    c('Nested expansion shows grandchildren at depth 2', TREE + brief + `brief(flattenVisible(tree, new Set(['src', 'lib'])))`, "['0:src', '1:app', '1:lib', '2:util', '0:readme']", {
+      callSignature: "flattenVisible(tree, new Set(['src', 'lib']))",
+    }),
+    c('A collapsed parent hides its whole subtree, even if a descendant is in the Set', TREE + brief + `brief(flattenVisible(tree, new Set(['lib'])))`, "['0:src', '0:readme']", {
+      callSignature: "flattenVisible(tree, new Set(['lib']))",
+    }),
+    c('expanded is true only for folders that are open; a leaf id in the Set is not expanded', TREE + `flattenVisible(tree, new Set(['src', 'app'])).slice(0, 3).map((r) => [r.id, r.hasChildren, r.expanded])`, "[['src', true, true], ['app', false, false], ['lib', true, false]]", {
+      callSignature: "flattenVisible(tree, new Set(['src', 'app']))",
+    }),
     c('An empty tree has no rows', `flattenVisible([], new Set(['x']))`, '[]'),
     c('A node with an empty children array is a leaf', `flattenVisible([{ id: 'a', label: 'A', children: [] }], new Set(['a']))`, "[{ id: 'a', label: 'A', depth: 0, hasChildren: false, expanded: false }]"),
     c('toggleExpanded adds, then removes, and returns a new Set each time', `const a = new Set(['x']);
 const b = toggleExpanded(a, 'y');
 const c2 = toggleExpanded(b, 'x');
-[[...a], [...b], [...c2], a === b]`, "[['x'], ['x', 'y'], ['y'], false]"),
+[[...a], [...b], [...c2], a === b]`, "[['x'], ['x', 'y'], ['y'], false]", {
+      callSignature: "toggleExpanded(set, id)",
+    }),
   ],
   'add-tag-rules': [
     c('A tag is trimmed and added at the end', `addTag(['a'], '  b  ')`, "['a', 'b']"),
