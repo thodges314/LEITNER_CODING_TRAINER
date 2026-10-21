@@ -1,1 +1,13 @@
-Build DropdownMenu({ label, items, onSelect }) with items [{ id, label, disabled? }]. A trigger <button aria-haspopup="menu" aria-expanded> shows `label` and toggles the menu. While open render <ul role="menu"> with <li role="menuitem" tabIndex={-1}> items (disabled ones get aria-disabled="true"). Opening focuses the first ENABLED item. ArrowDown/ArrowUp move focus between enabled items and wrap; Home/End jump to the first/last enabled item; Enter or Space on an item selects it. Selecting (by click or key) calls onSelect(id), closes the menu and returns focus to the trigger; disabled items cannot be selected. Escape closes the menu and returns focus to the trigger; a mousedown outside the component closes it; Tab closes it.
+Build `DropdownMenu({ label, items, onSelect })` where `items` is `[{ id, label, disabled? }]`.
+
+- **Trigger**: A trigger `<button aria-haspopup="menu" aria-expanded>` shows `label` and toggles the menu.
+- **Menu**: While open, render `<ul role="menu">` with `<li role="menuitem" tabIndex={-1}>` items (disabled ones get `aria-disabled="true"`).
+- **Keyboard Navigation**:
+  - Opening focuses the first **enabled** item.
+  - `ArrowDown` / `ArrowUp` move focus between enabled items (wrapping around ends; disabled items are skipped).
+  - `Home` / `End` jump to the first / last enabled item.
+  - `Enter` or `Space` selects the focused item.
+- **Selection & Dismissal**:
+  - Selecting (by click or key) calls `onSelect(id)`, closes the menu, and returns focus to the trigger (disabled items cannot be selected).
+  - `Escape` closes the menu and returns focus to the trigger.
+  - A `mousedown` outside the component or pressing `Tab` closes the menu.
