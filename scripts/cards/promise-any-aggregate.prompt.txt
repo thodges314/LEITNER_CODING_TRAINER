@@ -1,1 +1,8 @@
-Write promiseAny(promises): takes an iterable of promises (or plain values). Returns a Promise that fulfills as soon as any input promise fulfills, with the first fulfillment value. If all input promises reject (or the iterable is empty), the returned Promise rejects with an AggregateError whose errors property contains all rejection reasons in their original input order, and whose message is 'All promises were rejected'.
+Write `promiseAny(promises)`:
+
+- **Input**: Takes an iterable of promises (or plain values).
+- **Fulfillment**: Returns a Promise that fulfills as soon as **any** input promise fulfills, resolving with that first fulfillment value.
+- **Rejection & `AggregateError`**:
+  - If **ALL** input promises reject (or if the iterable is empty), the returned Promise rejects with an `AggregateError`.
+  - The `AggregateError` must have `message: 'All promises were rejected'`.
+  - Its `.errors` property contains all rejection reasons in their original input order.

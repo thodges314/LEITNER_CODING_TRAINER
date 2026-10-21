@@ -1,8 +1,12 @@
-Implement a virtual timer controller `FakeTimers` (or factory `createFakeTimers()`) that manages synchronous time progression for testing async code without real wall-clock delays:
+Implement a virtual timer controller `FakeTimers` (or factory `createFakeTimers()`) to control synchronous time progression for testing async code:
 
-- `now()`: returns the current virtual time in milliseconds (starts at 0).
-- `setTimeout(callback, delay = 0, ...args)`: schedules `callback(...args)` to run after `delay` ms (at `now() + Math.max(0, delay)`). Returns a unique numeric timer ID.
-- `clearTimeout(id)`: cancels the pending timer associated with `id`.
-- `advanceTimersByTime(ms)`: advances the virtual clock by `ms` (ms >= 0). Executes all timers scheduled at or before the new target time in chronological order. If two timers are scheduled for the exact same millisecond, execute them in order of creation (smaller timer ID first).
-
-Important: If an executing timer schedules new timers that also fall within the target advance window (cascading timers), those new timers must also run in chronological order during the same call.
+- **`now()`**: Returns the current virtual time in milliseconds (starts at `0`).
+- **`setTimeout(callback, delay = 0, ...args)`**:
+  - Schedules `callback(...args)` to execute after `delay` ms (at `now() + Math.max(0, delay)`).
+  - Returns a unique numeric timer ID.
+- **`clearTimeout(id)`**: Cancels the pending timer associated with `id`.
+- **`advanceTimersByTime(ms)`**:
+  - Advances the virtual clock by `ms` (`ms >= 0`).
+  - Executes all timers scheduled at or before the target time in chronological order.
+  - If two timers are scheduled for the exact same millisecond, execute them in order of creation (smaller timer ID first).
+  - **Cascading Timers**: If an executing timer schedules new timers that fall within the current advance window, those new timers must also run in chronological order during the same call.

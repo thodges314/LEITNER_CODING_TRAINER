@@ -1,1 +1,16 @@
-Implement class MyPromise(executor) without using the native Promise for its own state. Requirements: it settles once (extra resolve/reject calls are ignored); an executor that throws rejects it; then(onFulfilled, onRejected) returns a NEW MyPromise and its callbacks always run asynchronously (as microtasks), even if already settled; a handler's return value resolves the derived promise, a returned promise/thenable is adopted, and a throw rejects it; a missing handler passes the value/reason through; resolving a promise with itself rejects with a TypeError. Also implement catch(onRejected), finally(fn) (runs on both outcomes and passes the original result/reason through) and static resolve(value) / reject(reason).
+Implement `class MyPromise(executor)` from scratch without using native Promises for internal state:
+
+- **Settlement & State**:
+  - Settles at most once: subsequent calls to `resolve` or `reject` are ignored.
+  - If the `executor` throws synchronously, reject the promise with the thrown exception.
+  - Resolving a promise with itself must reject with a `TypeError`.
+- **`.then(onFulfilled, onRejected)`**:
+  - Returns a **NEW** `MyPromise` instance.
+  - Callbacks always execute asynchronously as microtasks (`queueMicrotask`), even when the promise is already settled.
+  - Handler return value resolves the derived promise; returned thenables/promises are adopted; thrown errors reject it.
+  - Omitted handlers pass values or rejection reasons through to the derived promise.
+- **`.catch(onRejected)`**: Equivalent to `.then(null, onRejected)`.
+- **`.finally(callback)`**: Runs `callback` on both fulfillment and rejection, preserving and passing the original fulfillment value or rejection reason through.
+- **Static Methods**:
+  - `MyPromise.resolve(value)`: Returns a resolved promise (or adopts a `MyPromise` input).
+  - `MyPromise.reject(reason)`: Returns a rejected promise with `reason`.

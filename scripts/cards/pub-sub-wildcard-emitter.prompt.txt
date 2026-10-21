@@ -1,1 +1,12 @@
-Write class PubSub with methods: subscribe(pattern, handler) registers a callback and returns an unsubscribe function () => void. Patterns can be exact (e.g. 'user.login') or wildcard (e.g. 'user.*' matches any 'user.<word>', or '*' matches everything). publish(topic, data) calls matching listeners with (data, topic) and returns the count of listeners invoked. once(pattern, handler) registers a handler that runs only the first time a matching event is published, then automatically unsubscribes. clear() removes all subscriptions.
+Write `class PubSub` supporting pattern-based event emission:
+
+- **`subscribe(pattern, handler)`**:
+  - Registers `handler` for `pattern` and returns an unsubscribe function `() => void`.
+  - Patterns support exact names (e.g. `'user.login'`) or wildcards:
+    - `'user.*'` matches any `'user.<word>'`.
+    - `'*'` matches every topic.
+- **`publish(topic, data)`**:
+  - Calls all matching subscriber handlers with arguments `(data, topic)`.
+  - Returns the total count of listeners invoked.
+- **`once(pattern, handler)`**: Registers a listener that executes only once for the first matching publication and automatically unsubscribes.
+- **`clear()`**: Removes all active subscriptions across all topics.

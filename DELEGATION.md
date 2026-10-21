@@ -13,6 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
+| Optimize card instructions with Markdown & multi-function sections (Batch 5: Async & Timers) | Antigravity | `feature/format-markdown-instructions-batch5` | in progress |
 
 ## How to pick up a task
 1. `git fetch && git checkout master && git pull`, then read the roadmap, this file and the claim table above. Pick a task nobody has claimed.
