@@ -1,12 +1,12 @@
 Implement greedy reachability and jump minimization algorithms:
 
-### `canJump(nums)`
+### `canJump(nums: number[]): boolean`
 - Determines if you can reach the last index of `nums` starting from index `0`.
 - Each element `nums[i]` represents your maximum jump length forward from that position.
 - Uses a greedy pass tracking the farthest reachable index.
 - A single-element array (`[x]`) is always reachable (`true`).
 
-### `minJumps(nums)`
+### `minJumps(nums: number[]): number`
 - Calculates the minimum number of jumps required to reach the last index from index `0`.
 - Assumes the last index is always reachable.
 - Returns `0` for a single-element array (`[x]`).

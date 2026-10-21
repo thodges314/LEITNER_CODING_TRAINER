@@ -1,14 +1,14 @@
 Implement a lightweight Trie using plain nested JavaScript objects:
 
-### `buildTrie(words)`
+### `buildTrie(words: string[]): Record<string, any>`
 - Constructs a trie represented by plain nested objects from array `words`.
 - Each character key maps to a nested child object. Terminal nodes mark the completion of a word with the property `$: true`.
 - For example, `buildTrie(['a', 'ab'])` returns `{ a: { $: true, b: { $: true } } }`.
 - Returns `{}` when `words` is empty (`[]`).
 
-### `hasWord(trie, word)`
+### `hasWord(trie: Record<string, any>, word: string): boolean`
 - Returns `true` only if `word` exists as a complete word in `trie` (the traversal reaches a node where `node.$ === true`); returns `false` otherwise.
 
-### `hasPrefix(trie, prefix)`
+### `hasPrefix(trie: Record<string, any>, prefix: string): boolean`
 - Returns `true` if any word in `trie` begins with `prefix`.
 - An empty prefix `""` returns `true` for any non-empty trie (`Object.keys(trie).length > 0`); `false` otherwise.

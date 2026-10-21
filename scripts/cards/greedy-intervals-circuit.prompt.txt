@@ -1,17 +1,17 @@
 Implement greedy interval scheduling and circular circuit traversal algorithms:
 
-### `eraseOverlapIntervals(intervals)`
+### `eraseOverlapIntervals(intervals: [number, number][]): number`
 - Finds the minimum number of intervals to remove so that the remaining intervals do not overlap.
 - Intervals are `[start, end]` pairs; intervals touching at boundaries (e.g. `[1, 2]` and `[2, 3]`) do NOT overlap.
 - Uses a greedy strategy by sorting by end times and retaining the earliest-finishing intervals.
 - Returns `0` if `intervals` is empty (`[]`).
 
-### `canAttendMeetings(intervals)`
+### `canAttendMeetings(intervals: [number, number][]): boolean`
 - Checks whether a person could attend all scheduled meetings without any overlap.
 - Returns `true` if all intervals are mutually non-overlapping (including `[]`); `false` otherwise.
 - Does not mutate the input array.
 
-### `canCompleteCircuit(gas, cost)`
+### `canCompleteCircuit(gas: number[], cost: number[]): number`
 - Solves the circular gas station circuit problem.
 - `gas[i]` is the fuel available at station `i`, and `cost[i]` is the fuel cost to travel to station `i + 1`.
 - Returns the starting station index from which a full clockwise loop can be completed; returns `-1` if impossible.

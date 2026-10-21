@@ -1,7 +1,7 @@
 Implement an object-based Prefix Tree (Trie) data structure:
 
-### `Trie`
-- **`insert(word)`**: Inserts a string `word` into the trie.
-- **`search(word)`**: Returns `true` if `word` exists in the trie as a complete inserted word; `false` otherwise.
-- **`startsWith(prefix)`**: Returns `true` if there is any previously inserted word that starts with `prefix`; `false` otherwise (an empty prefix `""` returns `true` once any word is present).
-- **`wordsWithPrefix(prefix)`**: Returns an array of all distinct inserted words that start with `prefix`, sorted in alphabetical order. Returns `[]` if no words match.
+### `Trie` class methods:
+- **`insert(word: string): void`**: Inserts a string `word` into the trie.
+- **`search(word: string): boolean`**: Returns `true` if `word` exists in the trie as a complete inserted word; `false` otherwise.
+- **`startsWith(prefix: string): boolean`**: Returns `true` if there is any previously inserted word that starts with `prefix`; `false` otherwise (an empty prefix `""` returns `true` once any word is present).
+- **`wordsWithPrefix(prefix: string): string[]`**: Returns an array of all distinct inserted words that start with `prefix`, sorted in alphabetical order. Returns `[]` if no words match.

@@ -1,11 +1,11 @@
 Implement geometric two-pointer algorithms in O(n) time:
 
-### `maxArea(heights)`
+### `maxArea(heights: number[]): number`
 - Calculates the maximum area of water a container formed by two vertical lines at indices `i < j` can hold: min(heights[i], heights[j]) * (j - i).
 - Operates in O(n) time using two pointers moving inward from both ends.
 - Returns `0` if `heights.length < 2`.
 
-### `trap(height)`
+### `trap(height: number[]): number`
 - Computes the total volume of rainwater trapped between unit-width elevation bars.
 - Uses two pointers with `leftMax` and `rightMax` tracking in O(n) time and O(1) space.
 - Returns `0` if `height.length < 3`.
