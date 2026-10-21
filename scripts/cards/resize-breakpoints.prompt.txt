@@ -1,1 +1,15 @@
-Write observeBreakpoint(element, breakpoints, onChange, RO = ResizeObserver) that reports which named width breakpoint an element is in, like a container query done in JavaScript. breakpoints maps a name to its minimum width, for example { sm: 0, md: 600, lg: 1000 }, in any key order. Create one observer with new RO(callback) and observe the element. For each entry the callback receives, read entry.contentRect.width; the active breakpoint is the one with the largest minimum that is not above the width (a width equal to a minimum belongs to that breakpoint), or null when the width is below every minimum. Call onChange(name) for the first measurement and afterwards only when the active breakpoint changes (including a change to null). Return a stop function that disconnects the observer.
+Implement element container queries using `ResizeObserver`:
+
+### `observeBreakpoint(element, breakpoints, onChange, RO = ResizeObserver)`
+- Observes the content width of `element` and triggers `onChange(name)` when its matching container breakpoint changes.
+- `breakpoints` maps breakpoint names to minimum width thresholds in any key order (e.g. `{ sm: 0, md: 600, lg: 1000 }`).
+
+#### Breakpoint Matching
+- Reads `entry.contentRect.width` from the observer entries.
+- The active breakpoint is the one with the **largest minimum threshold** that is less than or equal to the element's width (boundary values belong to that breakpoint).
+- If the width is below all thresholds, the active breakpoint is `null`.
+
+#### Notification & Lifecycle
+- Calls `onChange(name)` on the initial measurement.
+- Afterwards, calls `onChange(name)` **only** when the resolved breakpoint changes (including transitions to or from `null`).
+- Returns a cleanup function `() => void` that disconnects the observer.

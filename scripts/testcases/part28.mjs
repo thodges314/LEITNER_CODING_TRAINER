@@ -25,12 +25,40 @@ export default {
     r('The interval is cleared on Pause and on unmount (no leaked timers)', 'count live setInterval ids: Start, Pause, Start, unmount', 'live intervals: 1 while running, 0 after Pause, 0 after unmount'),
   ],
   'progress-bar': [
-    r('50 of 100 exposes the ARIA values, a 50% fill and the text "50%"', '<ProgressBar value={50} />', "aria-valuenow='50', aria-valuemin='0', aria-valuemax='100'; [data-fill] width '50%'; text '50%'"),
-    r('A custom max is honoured: 3 of 4 is 75%', '<ProgressBar value={3} max={4} />', "aria-valuemax='4', aria-valuenow='3'; width '75%'; text '75%'"),
-    r('Values are clamped into [0, max]: -10 -> 0%, 150 -> 100%', 'value=-10; value=150', "aria-valuenow '0' / width '0%' / '0%'; aria-valuenow '100' / width '100%' / '100%'"),
-    r('The fill width is exact while the text is rounded: 1 of 3 -> width ~33.33%, text "33%"', '<ProgressBar value={1} max={3} />', 'width = 33.333...%; text "33%"'),
-    r('aria-label defaults to "Progress" and can be overridden', '<ProgressBar value={10} /> and label="Upload"', "aria-label 'Progress'; then 'Upload'"),
-    r('No value means indeterminate: no aria-valuenow, data-indeterminate="true", no percentage text', '<ProgressBar />', "no aria-valuenow attribute; data-indeterminate='true'; no text"),
-    r('Re-rendering with a new value updates the fill and the text', 'value 50, then re-render with 80', "width '80%'; text '80%'"),
+    r(
+      '50 of 100 exposes the ARIA values, a 50% fill and the text "50%"',
+      '<ProgressBar value={50} />',
+      '<div role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><div data-fill style="width: 50%" /><span>50%</span></div>'
+    ),
+    r(
+      'A custom max is honoured: 3 of 4 is 75%',
+      '<ProgressBar value={3} max={4} />',
+      '<div role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="4" aria-valuenow="3"><div data-fill style="width: 75%" /><span>75%</span></div>'
+    ),
+    r(
+      'Values are clamped into [0, max]: -10 -> 0%, 150 -> 100%',
+      'value=-10; value=150',
+      '-10: <div role="progressbar" aria-valuenow="0"><div data-fill style="width: 0%" /><span>0%</span></div> | 150: <div role="progressbar" aria-valuenow="100"><div data-fill style="width: 100%" /><span>100%</span></div>'
+    ),
+    r(
+      'The fill width is exact while the text is rounded: 1 of 3 -> width ~33.33%, text "33%"',
+      '<ProgressBar value={1} max={3} />',
+      '<div role="progressbar" aria-valuenow="1"><div data-fill style="width: 33.333...%" /><span>33%</span></div>'
+    ),
+    r(
+      'aria-label defaults to "Progress" and can be overridden',
+      '<ProgressBar value={10} /> and label="Upload"',
+      'default: <div role="progressbar" aria-label="Progress" ... /> | custom: <div role="progressbar" aria-label="Upload" ... />'
+    ),
+    r(
+      'No value means indeterminate: no aria-valuenow, data-indeterminate="true", no percentage text',
+      '<ProgressBar />',
+      '<div role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" data-indeterminate="true"><div data-fill /></div>'
+    ),
+    r(
+      'Re-rendering with a new value updates the fill and the text',
+      'value 50, then re-render with 80',
+      'after 80: <div role="progressbar" aria-valuenow="80"><div data-fill style="width: 80%" /><span>80%</span></div>'
+    ),
   ],
 };

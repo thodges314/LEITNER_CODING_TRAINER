@@ -1,3 +1,21 @@
-Write createDom(vnode) turning a tree of { type, props, children } objects into real DOM nodes.
+Implement a lightweight virtual DOM to real DOM compiler and renderer:
 
-Write render(vnode, container) that replaces the container's content with the result. Strings and numbers become text nodes (never parsed as HTML); null, undefined and booleans render nothing; children may be nested arrays. Props: className -> the class attribute, style (object) -> element.style, onClick-style functions -> addEventListener('click', ...), true -> an empty attribute, false/null/undefined -> skipped, everything else -> setAttribute.
+### `createDom(vnode)`
+- Converts a virtual node tree into real DOM nodes.
+- **Primitives**:
+  - `string` or `number`: creates a safe text node via `document.createTextNode(String(vnode))` (never parsed as HTML).
+  - `null`, `undefined`, or `boolean`: returns an empty text node (`document.createTextNode('')`).
+- **Elements**:
+  - Creates the element with `document.createElement(vnode.type)`.
+  - **Props Handling**:
+    - `className`: sets the `'class'` attribute.
+    - `style`: copies style properties onto `el.style` (`Object.assign(el.style, value)`).
+    - Event handlers (e.g. `onClick`, `onInput`): attaches listener via `el.addEventListener(event, fn)`.
+    - `true`: sets attribute to empty string `''`.
+    - `false`, `null`, or `undefined`: attribute is omitted.
+    - Other values: calls `el.setAttribute(key, String(value))`.
+  - **Children**:
+    - Recursively flattens and renders `vnode.children || []` (handles arbitrarily nested arrays).
+
+### `render(vnode, container)`
+- Compiles `vnode` via `createDom(vnode)` and replaces the container's contents using `container.replaceChildren(...)`.

@@ -1,1 +1,17 @@
-Write rafThrottle(fn, raf, caf) that limits fn to one call per animation frame, as used for scroll and pointermove handlers. raf and caf default to the browser's requestAnimationFrame and cancelAnimationFrame and can be replaced in tests. The returned function remembers its latest arguments; the first call in a frame schedules one frame with raf, further calls before that frame only replace the arguments. When the frame runs, call fn once with the latest arguments, and allow a new frame to be scheduled afterwards (also from inside fn). The returned function has a cancel() method that cancels a pending frame with caf (and does nothing, without calling caf, when nothing is pending).
+Implement requestAnimationFrame-based throttling for high-frequency events:
+
+### `rafThrottle(fn, raf = requestAnimationFrame, caf = cancelAnimationFrame)`
+- Returns a throttled function that invokes `fn` at most once per animation frame.
+- Defaults to window `requestAnimationFrame` and `cancelAnimationFrame` (can be dependency-injected in tests).
+
+#### Throttling Mechanics
+- Remembers the latest arguments passed across invocations.
+- The first invocation schedules a frame via `raf(...)`. Subsequent calls before that frame fires simply replace the arguments.
+- When the frame executes:
+  - Invokes `fn` once with the latest arguments.
+  - Clears the active frame ID so subsequent calls (including calls inside `fn`) can schedule a new frame.
+
+#### Cancellation
+- The returned throttled function exposes a `.cancel()` method:
+  - If a frame is pending, cancels it via `caf(frameId)` and clears the pending state.
+  - Does nothing (and does not call `caf`) if no frame is currently pending.

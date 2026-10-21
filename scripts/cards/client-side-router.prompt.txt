@@ -1,1 +1,19 @@
-Write matchRoute(pattern, pathname) and createRouter(routes, initialPath = '/'). matchRoute returns an object of params or null: ':id' segments capture a decoded value, a trailing '*' captures the rest of the path as params['*'], extra/missing segments or different static segments return null, and a trailing slash is ignored. createRouter(routes) takes [{ pattern, name }] and returns { current(), navigate(path), back(), forward(), subscribe(listener) }. current() is { path, name, params, query } for the first matching route (name null and params {} when nothing matches; query parsed from '?a=1&b=2'). navigate pushes onto an in-memory history (discarding any forward entries), back/forward move along it (and do nothing at the ends), and subscribers are called with the new state after each change; subscribe returns an unsubscribe function.
+Implement an in-memory client-side router with path parameters and query string parsing:
+
+### `createRouter(routes, initialPath = '/')`
+- `routes` is an array of route definitions: `[{ path: '/users/:id', name: 'user' }, ...]`.
+- Initialized with `initialPath` (defaults to `'/'`).
+
+#### Route Resolution
+- Matches paths against route patterns:
+  - Segments starting with `':name'` capture dynamic parameters into `params: { name: value }`.
+  - Empty segments (leading, trailing, and duplicate slashes) are ignored.
+  - Query parameters (e.g. `'?q=hi&page=2'`) are parsed into `query: { q: 'hi', page: '2' }`.
+  - If no route matches, resolves to `{ path, name: null, params: {}, query }`.
+
+#### Router API
+- **`current()`**: Returns the currently active resolved route object `{ path, name, params, query }`.
+- **`navigate(path)`**: Pushes `path` onto history, drops forward history, updates the current route, and notifies listeners.
+- **`back()`**: Moves one step back in history (if possible) and notifies listeners.
+- **`forward()`**: Moves one step forward in history (if possible) and notifies listeners.
+- **`subscribe(listener)`**: Subscribes `listener(route)` to navigation events and returns an unsubscribe function.
