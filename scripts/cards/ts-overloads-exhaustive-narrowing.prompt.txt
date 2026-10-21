@@ -1,7 +1,14 @@
 Write function overloads and exhaustive checking utilities:
-- Function formatInput:
-  overload 1: formatInput(value: string, toUpper: boolean): string
-  overload 2: formatInput(value: number, precision: number): string
-  implementation: formats a string to uppercase if toUpper is true (lowercase if false); formats a number with toFixed(precision).
-- function assertNever(x: never, message?: string): never: throws an Error(message || `Unexpected value: ${x}`). In switch statements, assigning an unhandled branch to assertNever ensures exhaustiveness at compile time.
-- function isTagged<T extends { tag: string }, K extends string>(item: T, tag: K): item is Extract<T, { tag: K }>: type guard narrowing a discriminated union item by tag.
+
+### `formatInput` (Overloaded)
+- `formatInput(value: string, toUpper: boolean): string`
+  - Formats string to uppercase if `toUpper` is `true`, lowercase if `false`.
+- `formatInput(value: number, precision: number): string`
+  - Formats number with `toFixed(precision)`.
+
+### `assertNever(x: never, message?: string): never`
+- Throws an `Error(message || \`Unexpected value: \${x}\`)`.
+- In `switch` statements, assigning an unhandled branch to `assertNever` ensures exhaustiveness at compile time.
+
+### `isTagged<T extends { tag: string }, K extends string>(item: T, tag: K): item is Extract<T, { tag: K }>`
+- Custom type guard narrowing a discriminated union `item` by its `tag` property.

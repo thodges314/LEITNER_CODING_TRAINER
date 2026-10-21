@@ -1,7 +1,8 @@
 Create a type-safe event emitter class `TypedEmitter<Events extends Record<string, any>>`:
 
-### `on(event, listener)`
-- Registers a `listener` callback for event `event`, strictly typed to accept `Events[K]`.
+### `on<K extends keyof Events>(event: K, listener: (payload: Events[K]) => void): void`
+- Registers a `listener` callback for event `event`, strictly typed to accept payload `Events[K]`.
 
-### `emit(event, payload)`
+### `emit<K extends keyof Events>(event: K, payload: Events[K]): void`
 - Triggers all listeners registered for `event`, passing `payload` matching `Events[K]`.
+- Emitting an event with no registered listeners is a safe no-op.

@@ -1,1 +1,11 @@
-Write a generic async wrapper apiGet<T>(url: string): Promise<T> that resolves to the parsed JSON typed as T. For a non-2xx response throw an ApiError (a class extending Error with a numeric `status` property and a message that includes the status). Network failures propagate unchanged.
+Implement a type-safe HTTP client wrapper and custom error class:
+
+### `class ApiError extends Error`
+- Has numeric property `status: number`.
+- `constructor(status: number)` calls `super(\`Request failed with status \${status}\`)`, sets `this.name = 'ApiError'` and `this.status = status`.
+
+### `apiGet<T>(url: string): Promise<T>`
+- Fetches `url`.
+- For non-2xx responses (`!res.ok`), throws an `ApiError(res.status)`.
+- On success, returns the parsed JSON cast to `T` (`(await res.json()) as T`).
+- Network failures propagate unchanged.
