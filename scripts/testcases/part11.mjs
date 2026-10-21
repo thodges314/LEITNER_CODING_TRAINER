@@ -38,7 +38,7 @@ export default {
     r('An empty table shows a single "No rows" cell spanning all columns', "<SimpleTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[]} />", "one <tr> with <td colSpan=2>No rows</td>"),
   ],
   'data-table': [
-    r('Renders a header per column and the first page of rows', '<DataTable rows={ROWS} columns={COLUMNS} pageSize={3} />', "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"),
+    r('Renders a header per column and the first page of rows', "<DataTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }, ...]} pageSize={3} />", "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"),
     r('Clicking a header sorts ascending, then descending, then restores the original order', "click 'Name' three times", "Ada,Alan,Barbara (ascending) → Margaret,Linus,Grace (descending) → Ada,Grace,Linus (none)"),
     r('Numbers sort numerically (9 before 10) and other columns reset to none', "click 'Age'", "Margaret (9), Linus (10), Barbara (33); Name aria-sort='none', Age 'ascending'"),
     r('Filter matches any column, case-insensitively', "type 'ALAN', then '4'", "'Alan'; then 'Grace, Alan' (ages 45 and 41)"),
@@ -61,10 +61,10 @@ export default {
   ],
   'virtual-list': [
     r('Renders only the visible window plus overscan', "1000 items, itemHeight 20, height 100, overscan 2", "7 listitems: 'Item 0' … 'Item 6'", {
-      callSignature: "<VirtualList items={ITEMS} itemHeight={20} height={100} overscan={2} />",
+      callSignature: "<VirtualList items={Array.from({ length: 1000 }, (_, i) => `Item ${i}`)} itemHeight={20} height={100} overscan={2} />",
     }),
     r('The scroll area has the full virtual height', 'same props', "an inner element with style.height '20000px'", {
-      callSignature: "<VirtualList items={ITEMS} itemHeight={20} height={100} overscan={2} /> (scroll container height)",
+      callSignature: "<VirtualList items={/* 1000 items: 'Item 0'...'Item 999' */ items} itemHeight={20} height={100} overscan={2} /> (scroll container height: 20000px)",
     }),
     r('Scrolling moves the rendered window', 'scrollTop = 2000 (+ scroll event)', "9 listitems from 'Item 98'; includes 'Item 100'; no 'Item 0'", {
       callSignature: "fireEvent.scroll(container, { target: { scrollTop: 2000 } })",

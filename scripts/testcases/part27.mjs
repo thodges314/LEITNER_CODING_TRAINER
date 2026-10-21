@@ -5,10 +5,10 @@ const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by the DOM 
 export default {
   'multi-step-form': [
     r('Shows step 1 of N with its title and fields', 'steps: Account (email), Profile (first, last), Plan (plan)', "'Step 1 of 3'; <h2>Account</h2>; one input; a 'Next' button", {
-      callSignature: "<Wizard steps={STEPS} onSubmit={handleSubmit} />",
+      callSignature: "<Wizard steps={[{ title: 'Account', fields: [{ name: 'email', label: 'Email' }] }, { title: 'Profile', fields: [{ name: 'first', label: 'First name' }, { name: 'last', label: 'Last name' }] }, { title: 'Plan', fields: [{ name: 'plan', label: 'Plan' }] }]} onSubmit={handleSubmit} />",
     }),
     r('Back is disabled on the first step', 'first step', 'Back button disabled', {
-      callSignature: "<Wizard steps={STEPS} onSubmit={handleSubmit} /> (step 1 Back button)",
+      callSignature: "<Wizard steps={steps} onSubmit={handleSubmit} /> (Back button disabled on step 1)",
     }),
     r('Next is blocked with an alert until every field of the step is filled (blank counts as empty)', "click Next with an empty (or '   ') email", "stays on Account; <p role='alert'>All fields are required</p>", {
       callSignature: "click Next with empty email",

@@ -5166,7 +5166,7 @@
         "description": "Renders the top level collapsed",
         "input": "nodes: src/{components/{Button.jsx}, index.js}, README.md",
         "expected": "buttons: 'src', 'README.md' inside role='tree'",
-        "callSignature": "<FileTree nodes={NODES} onSelect={handleSelect} />"
+        "callSignature": "<FileTree nodes={[{ name: 'src', children: [{ name: 'components', children: [{ name: 'Button.jsx' }] }, { name: 'index.js' }] }, { name: 'README.md' }]} onSelect={handleSelect} />"
       },
       {
         "description": "Clicking a folder expands it and sets aria-expanded",
@@ -5595,7 +5595,7 @@
     "testCases": [
       {
         "description": "Renders a header per column and the first page of rows",
-        "input": "<DataTable rows={ROWS} columns={COLUMNS} pageSize={3} />",
+        "input": "<DataTable columns={[{ key: 'name', label: 'Name' }, { key: 'age', label: 'Age' }]} rows={[{ name: 'Ada', age: 36 }, { name: 'Grace', age: 45 }, ...]} pageSize={3} />",
         "expected": "headers Name, Age; rows Ada, Grace, Linus; 'Page 1 of 3'"
       },
       {
@@ -5947,13 +5947,13 @@
         "description": "Renders only the visible window plus overscan",
         "input": "1000 items, itemHeight 20, height 100, overscan 2",
         "expected": "7 listitems: 'Item 0' … 'Item 6'",
-        "callSignature": "<VirtualList items={ITEMS} itemHeight={20} height={100} overscan={2} />"
+        "callSignature": "<VirtualList items={Array.from({ length: 1000 }, (_, i) => `Item ${i}`)} itemHeight={20} height={100} overscan={2} />"
       },
       {
         "description": "The scroll area has the full virtual height",
         "input": "same props",
         "expected": "an inner element with style.height '20000px'",
-        "callSignature": "<VirtualList items={ITEMS} itemHeight={20} height={100} overscan={2} /> (scroll container height)"
+        "callSignature": "<VirtualList items={/* 1000 items: 'Item 0'...'Item 999' */ items} itemHeight={20} height={100} overscan={2} /> (scroll container height: 20000px)"
       },
       {
         "description": "Scrolling moves the rendered window",
@@ -13027,13 +13027,13 @@
         "description": "Shows step 1 of N with its title and fields",
         "input": "steps: Account (email), Profile (first, last), Plan (plan)",
         "expected": "'Step 1 of 3'; <h2>Account</h2>; one input; a 'Next' button",
-        "callSignature": "<Wizard steps={STEPS} onSubmit={handleSubmit} />"
+        "callSignature": "<Wizard steps={[{ title: 'Account', fields: [{ name: 'email', label: 'Email' }] }, { title: 'Profile', fields: [{ name: 'first', label: 'First name' }, { name: 'last', label: 'Last name' }] }, { title: 'Plan', fields: [{ name: 'plan', label: 'Plan' }] }]} onSubmit={handleSubmit} />"
       },
       {
         "description": "Back is disabled on the first step",
         "input": "first step",
         "expected": "Back button disabled",
-        "callSignature": "<Wizard steps={STEPS} onSubmit={handleSubmit} /> (step 1 Back button)"
+        "callSignature": "<Wizard steps={steps} onSubmit={handleSubmit} /> (Back button disabled on step 1)"
       },
       {
         "description": "Next is blocked with an alert until every field of the step is filled (blank counts as empty)",

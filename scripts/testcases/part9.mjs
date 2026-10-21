@@ -22,7 +22,7 @@ export default {
   ],
   'file-explorer-tree': [
     r('Renders the top level collapsed', "nodes: src/{components/{Button.jsx}, index.js}, README.md", "buttons: 'src', 'README.md' inside role='tree'", {
-      callSignature: "<FileTree nodes={NODES} onSelect={handleSelect} />",
+      callSignature: "<FileTree nodes={[{ name: 'src', children: [{ name: 'components', children: [{ name: 'Button.jsx' }] }, { name: 'index.js' }] }, { name: 'README.md' }]} onSelect={handleSelect} />",
     }),
     r('Clicking a folder expands it and sets aria-expanded', "click 'src'", "buttons: src, components, index.js, README.md; aria-expanded='true'", {
       callSignature: "click folder 'src'",
