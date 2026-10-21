@@ -8,25 +8,37 @@ export default {
   [i, i + 1, i + 2].forEach((k) => { b[k] = 'X'; });
   return calculateWinner(b);
 };
-[win(0), win(3), win(6)]`, "['X', 'X', 'X']"),
+[win(0), win(3), win(6)]`, "['X', 'X', 'X']", {
+      callSignature: "calculateWinner(['X', 'X', 'X', null, null, null, null, null, null])",
+    }),
     c('Each of the three columns wins', `const win = (i) => {
   const b = Array(9).fill(null);
   [i, i + 3, i + 6].forEach((k) => { b[k] = 'O'; });
   return calculateWinner(b);
 };
-[win(0), win(1), win(2)]`, "['O', 'O', 'O']"),
+[win(0), win(1), win(2)]`, "['O', 'O', 'O']", {
+      callSignature: "calculateWinner(['O', null, null, 'O', null, null, 'O', null, null])",
+    }),
     c('Both diagonals win', `const a = Array(9).fill(null);
 [0, 4, 8].forEach((k) => { a[k] = 'X'; });
 const b = Array(9).fill(null);
 [2, 4, 6].forEach((k) => { b[k] = 'O'; });
-[calculateWinner(a), calculateWinner(b)]`, "['X', 'O']"),
-    c('Empty squares are not a win, and neither is a pair', `[calculateWinner(Array(9).fill(null)), calculateWinner(['X', 'X', null, null, 'O', null, null, null, 'O'])]`, '[null, null]'),
+[calculateWinner(a), calculateWinner(b)]`, "['X', 'O']", {
+      callSignature: "calculateWinner(['X', null, null, null, 'X', null, null, null, 'X'])",
+    }),
+    c('Empty squares are not a win, and neither is a pair', `[calculateWinner(Array(9).fill(null)), calculateWinner(['X', 'X', null, null, 'O', null, null, null, 'O'])]`, '[null, null]', {
+      callSignature: "calculateWinner(Array(9).fill(null))",
+    }),
     c('Three squares in a line must belong to the same player', `calculateWinner(['X', 'X', 'O', 'O', 'O', 'X', 'X', 'O', 'X'])`, 'null'),
-    c('isBoardFull is true only when no square is null', `[isBoardFull(Array(9).fill('X')), isBoardFull(['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', null]), isBoardFull(Array(9).fill(null))]`, '[true, false, false]'),
+    c('isBoardFull is true only when no square is null', `[isBoardFull(Array(9).fill('X')), isBoardFull(['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', null]), isBoardFull(Array(9).fill(null))]`, '[true, false, false]', {
+      callSignature: "isBoardFull(board)",
+    }),
     c('getStatus reports the winner, a draw, or whose turn it is', `const won = ['X', 'X', 'X', 'O', 'O', null, null, null, null];
 const draw = ['X', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'X'];
 const open = ['X', null, null, null, 'O', null, null, null, null];
-[getStatus(won, false), getStatus(draw, true), getStatus(open, true), getStatus(open, false)]`, "['Winner: X', 'Draw', 'Next player: X', 'Next player: O']"),
+[getStatus(won, false), getStatus(draw, true), getStatus(open, true), getStatus(open, false)]`, "['Winner: X', 'Draw', 'Next player: X', 'Next player: O']", {
+      callSignature: "getStatus(board, xIsNext)",
+    }),
     c('A win on a full board is a win, not a draw', `getStatus(['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', 'X'], false)`, "'Winner: X'"),
   ],
   'paginate-items': [

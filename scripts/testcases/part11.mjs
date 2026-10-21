@@ -48,7 +48,7 @@ export default {
     r('Sorting applies across all pages, not just the visible one', "click 'Age' twice (descending), then 'Next'", 'page 2 shows Ada, Barbara, Linus (36, 33, 10)'),
   ],
   'dropdown-menu': [
-    r('Closed by default: the trigger has aria-haspopup and aria-expanded=false', "<DropdownMenu label='Actions' items={[Edit, Copy, Delete (disabled), Share]} />", "no role='menu'; aria-haspopup='menu'; aria-expanded='false'"),
+    r('Closed by default: the trigger has aria-haspopup and aria-expanded=false', "<DropdownMenu label='Actions' items={[{ id: 'edit', label: 'Edit' }, { id: 'copy', label: 'Copy' }, { id: 'del', label: 'Delete', disabled: true }, { id: 'share', label: 'Share' }]} onSelect={handleSelect} />", "no role='menu'; aria-haspopup='menu'; aria-expanded='false'"),
     r('Clicking the trigger opens the menu (aria-expanded=true, four items)', "click 'Actions'", "role='menu' with 4 menuitems; aria-expanded='true'"),
     r('Opening focuses the first enabled item', "click 'Actions'", "document.activeElement is 'Edit'"),
     r('ArrowDown/ArrowUp move between enabled items, skip disabled ones and wrap', 'open, then ArrowDown ×3, ArrowUp', 'focus: Edit → Copy → Share → Edit → Share (Delete is skipped)'),

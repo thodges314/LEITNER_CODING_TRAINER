@@ -18,8 +18,8 @@ export default {
     r("children render, and announce keeps the same identity across renders", "announce twice and re-render", "children still rendered; announce is the same function every render"),
   ],
   'roving-tabindex-toolbar': [
-    r("The container is a toolbar with an accessible label", "render <Toolbar label=\"Text formatting\" items={4 items}>", "role=toolbar aria-label='Text formatting' with 4 buttons"),
-    r("Only the active button is in the tab order: tabIndex 0 for the first by default, -1 for the others", "initial render", "tabIndex values 0,-1,-1,-1"),
+    r("The container is a toolbar with an accessible label", "<Toolbar label=\"Text formatting\" items={[{ id: 'b', label: 'Bold' }, { id: 'i', label: 'Italic' }, { id: 'u', label: 'Underline' }, { id: 'l', label: 'Link' }]} />", "role=toolbar aria-label='Text formatting' with 4 buttons"),
+    r("Only the active button is in the tab order: tabIndex 0 for the first by default, -1 for the others", "<Toolbar label=\"Text formatting\" items={items} />", "tabIndex values 0,-1,-1,-1"),
     r("ArrowRight and ArrowLeft move focus and the tab stop to the next and previous button", "focus Bold; ArrowRight; then ArrowRight, ArrowLeft", "focus on Italic; tabIndex values -1,0,-1,-1"),
     r("Arrow keys wrap around at both ends", "focus Bold; ArrowLeft; then ArrowRight", "focus wraps to Link (\u2026,0), then back to Bold (0,\u2026)"),
     r("Home and End jump to the first and last button", "focus Italic; End; Home", "focus on Link (-1,-1,-1,0), then Bold (0,-1,-1,-1)"),

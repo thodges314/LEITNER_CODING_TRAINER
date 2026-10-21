@@ -20,11 +20,11 @@ export default {
     r('Uses the singular "1 result" and an empty query shows everything again', "type 'cher', then clear", "'1 result', then '5 results'"),
   ],
   'accordion-component': [
-    r('All panels start closed', '<Accordion items={[First, Second, Third]} />', "no role='region'; every button aria-expanded='false'; 3 <h3>"),
+    r('All panels start closed', "<Accordion items={[{ id: 'a', title: 'First', content: 'Alpha text' }, { id: 'b', title: 'Second', content: 'Beta text' }, { id: 'c', title: 'Third', content: 'Gamma text' }]} />", "no role='region'; every button aria-expanded='false'; 3 <h3>"),
     r('Clicking a title opens its panel (aria-expanded=true)', "click 'Second'", "panel 'Beta text'; aria-expanded='true'"),
     r('Opening another panel closes the first by default', "click 'First', then 'Third'", "only 'Gamma text'; First aria-expanded='false'"),
     r('Clicking an open title closes it', "click 'First' twice", 'no panel rendered'),
-    r('allowMultiple keeps several panels open', "allowMultiple; click 'First', then 'Third'", "'Alpha text' and 'Gamma text' both rendered"),
+    r('allowMultiple keeps several panels open', "<Accordion items={items} allowMultiple={true} />", "'Alpha text' and 'Gamma text' both rendered"),
     r('Buttons are wired to their panels with aria-controls and aria-labelledby', "open 'Second'", 'button.aria-controls === panel.id; panel.aria-labelledby === button.id'),
   ],
   'simple-error-boundary': [
@@ -41,7 +41,7 @@ export default {
     r('Without hint or error there is no aria-describedby or aria-invalid', "<FormField label='Email'>{(p) => <input {...p} />}</FormField>", 'neither attribute on the input; no role=alert'),
   ],
   'load-more-list': [
-    r('Loads the first page on mount and shows a loading state', 'mount <LoadMoreList fetchPage={fn} />', "fetchPage(1) called once; <p role='status'> shown; no 'Load more' button"),
+    r('Loads the first page on mount and shows a loading state', '<LoadMoreList fetchPage={fetchPage} />', "fetchPage(1) called once; <p role='status'> shown; no 'Load more' button"),
     r('Shows the items and a Load more button while hasMore is true', "page 1 resolves { items: ['a','b'], hasMore: true }", "<li> a, b; 'Load more' button; no loading status"),
     r('Load more appends the next page', "click 'Load more'; page 2 resolves ['c']", 'requested pages 1, 2; list a, b, c'),
     r('The button disappears after the last page', "page 2 resolves { items: ['b'], hasMore: false }", "no 'Load more'; list a, b"),
