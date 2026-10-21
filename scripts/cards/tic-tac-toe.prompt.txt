@@ -1,1 +1,22 @@
-Build TicTacToe({ onGameEnd }). Render <p role="status"> with "Next player: X" (X always starts, then O, alternating), "Winner: X" / "Winner: O" once a line of three is complete, or "Draw" when the board is full without a winner. Below it render <div role="group" aria-label="Tic-tac-toe board"> holding nine <button type="button"> cells with aria-label "Cell 1" ... "Cell 9" (row by row, left to right) whose text is the mark ("X", "O" or empty). Clicking an empty cell places the current player's mark; clicking an occupied cell, or any cell after the game has ended, does nothing. When the game ends call onGameEnd exactly once with "X", "O" or "draw". A <button type="button"> with the text "Restart" clears the board and gives X the first move again. Derive the winner from the board instead of storing it.
+Build an accessible, interactive Tic-Tac-Toe game component:
+
+### `TicTacToe({ onGameEnd })`
+- `onGameEnd` is an optional callback: `onGameEnd(result)` where result is `'X'`, `'O'`, or `'draw'`.
+- Derives the winner dynamically from board state rather than storing it in state.
+
+#### Game Status Display
+- Renders `<p role="status">` showing:
+  - `"Next player: X"` or `"Next player: O"` (`X` always starts first, then alternating).
+  - `"Winner: X"` or `"Winner: O"` once 3 matching marks align in a row, column, or diagonal.
+  - `"Draw"` when all 9 squares are filled without a winner.
+
+#### Board Layout
+- Renders `<div role="group" aria-label="Tic-tac-toe board">` containing 9 square buttons:
+  - `<button type="button" aria-label="Cell 1">` through `"Cell 9"` (row-by-row, left-to-right).
+  - Displays the square's mark: `"X"`, `"O"`, or empty string `""`.
+
+#### Gameplay & Interaction
+- Clicking an empty square places the current player's mark and advances the turn.
+- Clicking an occupied square or any square after the game has ended does nothing.
+- When the game ends, invokes `onGameEnd` **exactly once** with `"X"`, `"O"`, or `"draw"`.
+- Renders a `<button type="button">Restart</button>`: resets the board to empty and gives `X` the first move again.

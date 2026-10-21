@@ -1,1 +1,21 @@
-Build LoadMoreList({ fetchPage }) where fetchPage(page) returns a Promise of { items: string[], hasMore: boolean } and pages start at 1. On mount load page 1. Render <ul> with one <li> per loaded item; while a request is in flight render <p role="status">Loading…</p>. When more pages exist and nothing is loading, show a <button>Load more</button> that loads the next page and APPENDS its items; ignore clicks while a request is in flight; hide the button after the last page. If a request fails render <p role="alert">Failed to load</p> and a <button>Retry</button> that re-requests the SAME page (no items are lost).
+Build a paginated list with append-loading and retry handling:
+
+### `LoadMoreList({ fetchPage })`
+- `fetchPage(page)` returns a `Promise` resolving to `{ items: string[], hasMore: boolean }` (page indices start at `1`).
+- On initial mount, fetches page `1`.
+
+#### List Rendering
+- Renders `<ul>` containing one `<li>` per loaded item.
+- Appends newly fetched items to the end of the existing list.
+
+#### State & Controls
+- **Loading**:
+  - While a network request is in flight, renders `<p role="status">Loading…</p>`.
+  - While loading, additional clicks on buttons are ignored.
+- **Load More**:
+  - When `hasMore` is true, not currently loading, and without error, renders `<button>Load more</button>`.
+  - Clicking fetches the next page (`page + 1`) and appends its items.
+  - Hides the button once `hasMore` is false.
+- **Error & Retry**:
+  - If a page request fails, renders `<p role="alert">Failed to load</p>` and a `<button>Retry</button>`.
+  - Clicking **Retry** re-requests the exact same failed page number without losing previously loaded items.

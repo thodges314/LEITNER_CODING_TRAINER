@@ -1,7 +1,18 @@
-These are the rules behind a tag (chip) input. None of the functions changes the array it is given; each returns a new array.
+Implement immutable tag (chip) input list processing rules. Each function returns a new array without mutating the input:
 
-addTag(tags, input, { max = Infinity } = {}): trim the input. Add it at the end only when it is not empty, is not already in the list (compare ignoring upper/lower case; the first spelling stays), and the list does not already hold max tags. Otherwise return a copy of the list unchanged.
+### `addTag(tags, input, { max = Infinity } = {})`
+- Trims the input string: `const tag = input.trim()`.
+- Appends `tag` to the end of `tags` only if:
+  1. `tag` is not empty.
+  2. `tag` does not already exist in `tags` (case-insensitive comparison; preserves the original casing of the first instance).
+  3. The current `tags` count is strictly less than `max`.
+- Otherwise returns an unchanged copy of the array `[...tags]`.
 
-removeTag(tags, index): the list without the tag at index (an index that does not exist changes nothing).
+### `removeTag(tags, index)`
+- Returns a new array with the item at `index` removed.
+- If `index` is out of bounds, returns a copy of `tags` without changes.
 
-parseTags(text): for pasted text, split on commas and line breaks, then apply the same rules as addTag to every part (so blanks and repeats are dropped): parseTags('a, b,\n A ,,C') is ['a', 'b', 'C'].
+### `parseTags(text)`
+- Handles pasted text by splitting on commas and newlines (`/[,\n]/`).
+- Progressively applies `addTag` rules to each trimmed segment (ignoring empty segments and case-insensitive duplicates).
+- Example: `parseTags('a, b,\n A ,,C')` returns `['a', 'b', 'C']`.

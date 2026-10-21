@@ -1,5 +1,17 @@
-A file-tree component renders a flat list of rows. Tree nodes look like { id, label, children? } (children is an optional array).
+Tree nodes have the structure `{ id: string, label: string, children?: TreeNode[] }`.
 
-flattenVisible(nodes, expandedIds) returns the rows to render, top to bottom: depth-first, a parent before its children, siblings in their original order. Each row is { id, label, depth, hasChildren, expanded } where depth is 0 for the top level, hasChildren is true only when the node has at least one child, and expanded is true only when the node has children AND its id is in expandedIds (a Set). The children of a node appear only when that node is expanded; a collapsed parent hides its whole subtree, even if a descendant's id is in the Set.
+Write tree flattening and expansion utilities for virtualized tree rendering:
 
-toggleExpanded(expandedIds, id) returns a NEW Set with id added when it was missing and removed when it was present. The Set that was passed in is not changed.
+### `flattenVisible(nodes, expandedIds)`
+- Flattens hierarchical tree nodes into an ordered array of visible row objects (depth-first traversal, parent before children, siblings in order).
+- `expandedIds` is a `Set` containing IDs of currently expanded nodes.
+- Each row is `{ id, label, depth, hasChildren, expanded }`:
+  - `depth`: integer starting at `0` for root nodes and incrementing with each nesting level.
+  - `hasChildren`: `true` only if `Array.isArray(node.children) && node.children.length > 0`.
+  - `expanded`: `true` only if `hasChildren` is true and `expandedIds.has(node.id)`.
+- Children are visited and included only when their immediate parent is `expanded`. A collapsed parent hides its entire subtree (even if a nested descendant's ID is in `expandedIds`).
+
+### `toggleExpanded(expandedIds, id)`
+- Immutably toggles membership of `id` in `expandedIds`.
+- Returns a **new `Set`** with `id` added if previously missing, or deleted if previously present.
+- Does not mutate the input `expandedIds` set.

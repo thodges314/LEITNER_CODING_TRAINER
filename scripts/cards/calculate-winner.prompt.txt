@@ -1,9 +1,17 @@
-Tic-tac-toe is stored as an array of 9 squares read left to right, top to bottom; each square is 'X', 'O' or null.
+Tic-tac-toe boards are represented as a 9-element array (read left-to-right, row-by-row) where each square is `'X'`, `'O'`, or `null`.
 
-Write three small functions that a game component would use.
+Write helper functions for evaluating game state:
 
-calculateWinner(squares): return 'X' or 'O' when that player owns all three squares of a row, a column or a diagonal; otherwise return null (three empty squares are not a win).
+### `calculateWinner(squares)`
+- Checks all 8 possible winning lines (3 horizontal rows, 3 vertical columns, and 2 diagonals).
+- Returns `'X'` or `'O'` if that player owns all 3 squares of a line.
+- Otherwise returns `null` (three `null` squares do not count as a win).
 
-isBoardFull(squares): true when no square is null.
+### `isBoardFull(squares)`
+- Returns `true` if every square is occupied (no `null` elements exist), `false` otherwise.
 
-getStatus(squares, xIsNext): return 'Winner: X' (or 'Winner: O') when someone has won, otherwise 'Draw' when the board is full, otherwise 'Next player: X' or 'Next player: O' depending on xIsNext. A win always beats a draw, even on a full board.
+### `getStatus(squares, xIsNext)`
+- Computes game status:
+  - If a player has won: returns `'Winner: X'` or `'Winner: O'`. Note: a win always takes precedence over a draw, even if the board is completely full.
+  - Otherwise, if the board is full: returns `'Draw'`.
+  - Otherwise: returns `'Next player: X'` or `'Next player: O'` based on boolean `xIsNext`.
