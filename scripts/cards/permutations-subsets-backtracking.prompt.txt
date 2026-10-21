@@ -1,15 +1,15 @@
 Implement classic backtracking search algorithms:
 
-### `subsets(nums)`
+### `subsets<T>(nums: T[]): T[][]`
 - Generates the power set (all unique subsets) of an array of distinct integers `nums`.
 - Returns `[[]]` if `nums` is empty (`[]`).
 - Subsets may appear in any order, but each subset must be unique.
 
-### `permute(nums)`
+### `permute<T>(nums: T[]): T[][]`
 - Generates all permutations (orderings) of an array of distinct integers `nums`.
 - Returns `[[]]` if `nums` is empty (`[]`).
 - Permutations may appear in any order.
 
-### `generateParenthesis(n)`
+### `generateParenthesis(n: number): string[]`
 - Generates all combinations of well-formed parentheses strings using `n` pairs of parentheses.
 - Returns `['']` when `n === 0`.

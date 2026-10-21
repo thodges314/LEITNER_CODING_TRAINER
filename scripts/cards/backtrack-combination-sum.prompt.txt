@@ -1,16 +1,16 @@
 Implement target-sum combination search algorithms using backtracking:
 
-### `combinationSum(candidates, target)`
+### `combinationSum(candidates: number[], target: number): number[][]`
 - Finds all unique combinations of distinct positive integers from `candidates` that sum to `target`.
 - The same candidate number may be chosen an unlimited number of times.
 - Elements within each combination should be in ascending order.
 
-### `combinationSum2(candidates, target)`
+### `combinationSum2(candidates: number[], target: number): number[][]`
 - Finds all unique combinations that sum to `target` where `candidates` may contain duplicate values.
 - Each candidate number may only be used at most once per combination.
 - The result must not contain duplicate combinations (sort `candidates` first and skip identical values at the same recursion depth).
 
-### `combinationSum3(k, n)`
+### `combinationSum3(k: number, n: number): number[][]`
 - Finds all valid combinations of exactly `k` distinct digits from `1` through `9` that sum to `n`.
 - Each digit can be used at most once.
 - Elements within each combination should be in ascending order.

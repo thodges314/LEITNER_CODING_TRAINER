@@ -1,14 +1,14 @@
 Implement duplicate-handling backtracking algorithms:
 
-### `subsetsWithDup(nums)`
+### `subsetsWithDup(nums: number[]): number[][]`
 - Generates all unique subsets (power set) of array `nums`, which may contain duplicate numbers.
 - The solution set must not contain duplicate subsets.
 - Sort `nums` first and skip identical adjacent values at the same recursion depth.
 
-### `permuteUnique(nums)`
+### `permuteUnique(nums: number[]): number[][]`
 - Generates all distinct permutations of array `nums`, which may contain duplicate numbers.
 - Must not produce duplicate permutations in the output.
 
-### `combine(n, k)`
+### `combine(n: number, k: number): number[][]`
 - Generates every combination of `k` numbers chosen from `1...n`.
 - Each combination must be sorted in ascending order.

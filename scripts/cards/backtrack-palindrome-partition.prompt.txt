@@ -1,14 +1,14 @@
 Implement string partitioning and generation algorithms using backtracking:
 
-### `partition(s)`
+### `partition(s: string): string[][]`
 - Splits non-empty string `s` into all possible partitions where every substring is a palindrome.
 - Returns matching partitions as an array of string arrays in any order.
 
-### `letterCombinations(digits)`
+### `letterCombinations(digits: string): string[]`
 - Generates all possible letter combinations that the number could represent on a standard telephone keypad.
 - Mapping: `2: 'abc'`, `3: 'def'`, `4: 'ghi'`, `5: 'jkl'`, `6: 'mno'`, `7: 'pqrs'`, `8: 'tuv'`, `9: 'wxyz'`.
 - Returns `[]` if `digits` is empty (`""`).
 
-### `restoreIpAddresses(s)`
+### `restoreIpAddresses(s: string): string[]`
 - Restores all possible valid IPv4 addresses obtainable by inserting three dots into digit string `s`.
 - Each address must consist of exactly four integer octets (0-255) with no leading zeros (except the single digit `0`).

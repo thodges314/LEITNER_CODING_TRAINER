@@ -1,10 +1,10 @@
 Implement the classic N-Queens puzzle algorithms:
 
-### `solveNQueens(n)`
+### `solveNQueens(n: number): string[][]`
 - Finds all distinct board configurations for placing `n` queens on an `n x n` chessboard such that no two queens attack each other.
 - Each solution is represented as an array of `n` strings, where `'Q'` represents a queen and `'.'` represents an empty cell.
 - Returns `[]` if no valid placements exist.
 - Conflict checks for columns, main diagonals (`row - col`), and anti-diagonals (`row + col`) must operate in O(1) time using Sets or boolean lookup arrays.
 
-### `totalNQueens(n)`
+### `totalNQueens(n: number): number`
 - Calculates the total number of distinct solutions for placing `n` non-attacking queens on an `n x n` chessboard.
