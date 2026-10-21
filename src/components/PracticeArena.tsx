@@ -7,6 +7,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import rainbowBrackets from 'rainbowbrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
+import { createTsHoverExtension } from './practice/tsHoverExtension';
 import { loadDraft, saveDraft, clearDraft } from '../lib/drafts';
 import ReactDOM from 'react-dom/client';
 import {
@@ -342,9 +343,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     []
   );
 
-  // CodeMirror extensions: JS/TS language support, Rainbow Brackets (Path B), tab indentation, and Fira Code ligatures
+  // CodeMirror extensions: JS/TS language support, Rainbow Brackets (Path B), tab indentation, Fira Code ligatures, and TS Hover
   const extensions = useMemo(() => {
-    return [
+    const list = [
       javascript({ jsx: true, typescript: executionMode === 'ts' }),
       rainbowBrackets(),
       EditorView.lineWrapping,
@@ -362,6 +363,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         },
       }),
     ];
+    if (executionMode === 'ts') {
+      list.push(createTsHoverExtension());
+    }
+    return list;
   }, [executionMode]);
 
   // Keep a ref to the latest action handlers updated in an effect (not during render)

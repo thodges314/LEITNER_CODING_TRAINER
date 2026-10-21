@@ -467,6 +467,62 @@ code {
 .cm-editor .rainbow-bracket-indigo { color: #818cf8 !important; font-weight: 600; }
 .cm-editor .rainbow-bracket-violet { color: #c084fc !important; font-weight: 600; }
 
+/* CodeMirror TypeScript Hover Tooltip Styling */
+.cm-tooltip.cm-tooltip-hover {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  z-index: 1000 !important;
+}
+
+.cm-ts-hover-card {
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  max-width: 520px;
+  min-width: 140px;
+  color: #e4e4e7;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: auto;
+}
+
+.cm-ts-hover-sig {
+  color: #38bdf8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-weight: 500;
+}
+
+.cm-ts-hover-doc {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 11.5px;
+  white-space: pre-wrap;
+}
+
+[data-theme="apple-gsos"] .cm-ts-hover-card {
+  background: #FFFFFF;
+  border: 1px solid #1C1C1C;
+  color: #1C1C1C;
+  box-shadow: 2px 2px 0px #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .cm-ts-hover-sig {
+  color: #000080;
+}
+
+[data-theme="apple-gsos"] .cm-ts-hover-doc {
+  border-top: 1px solid #CCCCCC;
+  color: #555555;
+}
+
 /* ==========================================================================
    Apple IIGS / GS/OS Light Mode Styles & Component Overrides
    ========================================================================== */

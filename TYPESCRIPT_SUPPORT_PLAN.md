@@ -112,6 +112,7 @@ declare class TreeNode<T = number> {
 ### Phase 2: Typed Signatures & Editor Buffer Architecture (COMPLETED & CLARIFIED)
 - [x] **Cold-Start Buffer Decision (Preserved):** Editor buffer is intentionally NOT overwritten or injected with starter stubs upon toggling between JS and TS modes. Overwriting the buffer harms cold-start recall and risks destroying work in progress.
 - [x] **Typed Prompt Headings:** Problem statements provide explicit TypeScript signatures in headings (e.g. `### twoSum(nums: number[], target: number): [number, number]`), giving learners exact parameter and return contracts without needing editor stubs.
+- [x] **Full TypeScript Hover Tooltips (QuickInfo):** Built via `@codemirror/view`'s `hoverTooltip` and TypeScript's `ts.createLanguageService(host).getQuickInfoAtPosition`. Provides full type signatures, parameter inspection, and ambient class declarations (`ListNode`, `TreeNode`) on mouse hover. Lazily loaded and active strictly in `executionMode === 'ts'` to maintain zero overhead in JS mode. Styled with high-contrast dark card aesthetics.
 
 ### Phase 3: Content Rollout & Dual Solutions
 Author and verify `.ref.ts` solutions and typed prompt headings incrementally across batches:

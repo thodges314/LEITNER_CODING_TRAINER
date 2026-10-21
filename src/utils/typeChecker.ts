@@ -237,3 +237,96 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
     diagnostics: formattedDiagnostics,
   };
 }
+
+export interface TSQuickInfo {
+  start: number;
+  length: number;
+  signature: string;
+  documentation?: string;
+}
+
+let tsLanguageService: ts.LanguageService | null = null;
+let activeSourceCode = '';
+let activeSourceVersion = 0;
+
+function getOrCreateLanguageService(): ts.LanguageService {
+  if (tsLanguageService) return tsLanguageService;
+
+  const compilerOptions: ts.CompilerOptions = {
+    strict: true,
+    noImplicitAny: true,
+    strictNullChecks: true,
+    strictFunctionTypes: true,
+    strictPropertyInitialization: true,
+    noImplicitThis: true,
+    target: ts.ScriptTarget.ES2022,
+    module: ts.ModuleKind.ESNext,
+    jsx: ts.JsxEmit.React,
+    noLib: false,
+  };
+
+  const fileName = 'solution.tsx';
+
+  const host: ts.LanguageServiceHost = {
+    getScriptFileNames: () => [fileName, GLOBALS_FILE],
+    getScriptVersion: (name) => (name === fileName ? String(activeSourceVersion) : '1'),
+    getScriptSnapshot: (name) => {
+      if (name === fileName) return ts.ScriptSnapshot.fromString(activeSourceCode);
+      if (name === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(SANDBOX_GLOBALS);
+      const text = LIBS[name.split('/').pop() as string];
+      if (text !== undefined) return ts.ScriptSnapshot.fromString(text);
+      return undefined;
+    },
+    getCurrentDirectory: () => '',
+    getCompilationSettings: () => compilerOptions,
+    getDefaultLibFileName: () => DEFAULT_LIB,
+    fileExists: (name) => {
+      if (name === fileName || name === GLOBALS_FILE) return true;
+      return LIBS[name.split('/').pop() as string] !== undefined;
+    },
+    readFile: (name) => {
+      if (name === fileName) return activeSourceCode;
+      if (name === GLOBALS_FILE) return SANDBOX_GLOBALS;
+      return LIBS[name.split('/').pop() as string];
+    },
+    readDirectory: () => [],
+    directoryExists: () => true,
+    getDirectories: () => [],
+  };
+
+  tsLanguageService = ts.createLanguageService(host);
+  return tsLanguageService;
+}
+
+/**
+ * Returns TypeScript QuickInfo (signature, type, documentation) for the token at position.
+ */
+export function getTSQuickInfo(rawCode: string, position: number): TSQuickInfo | null {
+  if (position < 0 || position > rawCode.length) return null;
+
+  if (rawCode !== activeSourceCode) {
+    activeSourceCode = rawCode;
+    activeSourceVersion++;
+  }
+
+  try {
+    const service = getOrCreateLanguageService();
+    const info = service.getQuickInfoAtPosition('solution.tsx', position);
+    if (!info || !info.displayParts) return null;
+
+    const signature = ts.displayPartsToString(info.displayParts);
+    if (!signature || signature.trim() === '') return null;
+
+    const docParts = info.documentation ? ts.displayPartsToString(info.documentation) : undefined;
+
+    return {
+      start: info.textSpan.start,
+      length: info.textSpan.length,
+      signature,
+      documentation: docParts?.trim() ? docParts : undefined,
+    };
+  } catch (err) {
+    console.warn('getTSQuickInfo error:', err);
+    return null;
+  }
+}
