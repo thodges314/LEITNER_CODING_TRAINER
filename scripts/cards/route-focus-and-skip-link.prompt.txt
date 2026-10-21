@@ -1,5 +1,9 @@
-In a single-page app the browser does not announce page changes, so the layout has to do it. Build Layout({ path, title, children }).
+Build `Layout({ path, title, children })` for accessible client-side routing:
 
-Render, in this order: a skip link <a href="#main-content"> with the text "Skip to main content", then <main id="main-content" tabIndex={-1}> that contains <h1 tabIndex={-1}>{title}</h1> followed by the children. Clicking the skip link prevents the default navigation and moves focus to the <main> element.
-
-Keep document.title equal to `${title} | My App`. When path changes (not on the first render, and not when only the children or title change), move focus to the <h1> so keyboard and screen-reader users start at the top of the new page.
+- **DOM Structure (in exact order)**:
+  1. Skip link: `<a href="#main-content">Skip to main content</a>`.
+  2. Main landmark: `<main id="main-content" tabIndex={-1}>`.
+  3. Heading: `<h1 tabIndex={-1}>{title}</h1>` inside `<main>`, followed by `children`.
+- **Skip Link Interaction**: Clicking the skip link prevents default browser hash scrolling and programmatically moves focus to `<main>`.
+- **Document Title**: Keep `document.title` synchronized to `${title} | My App`.
+- **Route Change Focus**: When `path` changes (excluding initial mount, and not when only `title` or `children` change), move focus to `<h1>` so keyboard and screen-reader users land at the top of the new page.

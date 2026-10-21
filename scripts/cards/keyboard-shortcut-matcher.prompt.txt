@@ -1,1 +1,23 @@
-Write three functions for keyboard shortcuts. parseShortcut(text) turns a string like 'Ctrl+Shift+K' into { key, ctrl, meta, alt, shift, mod }: split on '+', ignore spaces and case, lowercase the key, and map the aliases control -> ctrl, cmd and command -> meta, option -> alt, esc -> escape, return -> enter, space -> ' ' ('mod' is its own flag). matchesShortcut(event, shortcut, isMac = false) takes a keyboard-event-like object { key, ctrlKey, metaKey, altKey, shiftKey } and returns true only when the key matches (case-insensitive) AND the modifiers match exactly: a missing or an extra modifier means no match. 'mod' means Cmd on a Mac (isMac true) and Ctrl everywhere else. findShortcut(event, bindings, isMac = false) takes an object of { name: shortcut } and returns the name of the first binding that matches, or null.
+Write three utility functions for managing and matching keyboard shortcuts: `parseShortcut`, `matchesShortcut`, and `findShortcut`.
+
+### `parseShortcut(text)`
+- Parses a shortcut string (e.g. `'Ctrl+Shift+K'`) into `{ key, ctrl, meta, alt, shift, mod }`.
+- Split tokens on `'+'`, trim whitespace, and normalize case-insensitively.
+- The returned non-modifier `key` is lowercased.
+- Maps modifier and key aliases:
+  - `control` $\rightarrow$ `ctrl`
+  - `cmd` and `command` $\rightarrow$ `meta`
+  - `option` $\rightarrow$ `alt`
+  - `esc` $\rightarrow$ `escape`
+  - `return` $\rightarrow$ `enter`
+  - `space` $\rightarrow$ `' '`
+  - `'mod'` is recorded in its own boolean flag.
+
+### `matchesShortcut(event, shortcut, isMac = false)`
+- Takes an event-like object `{ key, ctrlKey, metaKey, altKey, shiftKey }` and a parsed shortcut (or string).
+- Returns `true` only when the primary `key` matches (case-insensitive) **AND** all modifier flags match exactly (any missing or extra modifier fails the match).
+- When `shortcut.mod` is set: evaluates as `metaKey` on Mac (`isMac: true`) and `ctrlKey` on non-Mac platforms (`isMac: false`).
+
+### `findShortcut(event, bindings, isMac = false)`
+- Takes an event object and a dictionary `bindings` of `{ [actionName]: shortcutStringOrObject }`.
+- Returns the action name of the first matching binding, or `null` if none match.
