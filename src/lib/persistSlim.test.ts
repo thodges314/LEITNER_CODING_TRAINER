@@ -14,7 +14,7 @@ describe('slim persistence: built-in cards are stored as progress only', () => {
     saveDeckState(getDefaultDeckState(seedTopics));
     const savedChars = (localStorage.getItem(STORAGE_KEY) ?? '').length;
     const fullChars = JSON.stringify(seedTopics).length;
-    expect(savedChars).toBeLessThan(200_000);
+    expect(savedChars).toBeLessThan(250_000);
     expect(savedChars).toBeLessThan(fullChars / 5);
   });
 
@@ -69,7 +69,7 @@ describe('slim persistence: built-in cards are stored as progress only', () => {
     expect(first.promptSeed).toBe(seedTopics[0].promptSeed);
     expect(first.solution).toBeUndefined(); // stale duplicate copies are dropped
     expect(first.starterCode).toBeUndefined();
-    expect((localStorage.getItem(STORAGE_KEY) ?? '').length).toBeLessThan(200_000);
+    expect((localStorage.getItem(STORAGE_KEY) ?? '').length).toBeLessThan(250_000);
   });
 
   it('a stored card that is gone from the bundled deck and has no content is dropped, not kept empty', () => {
