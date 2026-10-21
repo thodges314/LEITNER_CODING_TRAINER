@@ -1,5 +1,14 @@
-Write subsetsWithDup(nums): all distinct subsets (the power set without duplicate subsets) of an array that may contain repeated values; sort first and skip a value equal to the previous one at the same depth.
+Implement duplicate-handling backtracking algorithms:
 
-Write permuteUnique(nums): all distinct permutations of an array that may contain repeats.
+### `subsetsWithDup(nums)`
+- Generates all unique subsets (power set) of array `nums`, which may contain duplicate numbers.
+- The solution set must not contain duplicate subsets.
+- Sort `nums` first and skip identical adjacent values at the same recursion depth.
 
-Write combine(n, k): every combination of k numbers chosen from 1...n, each ascending. Result order does not matter.
+### `permuteUnique(nums)`
+- Generates all distinct permutations of array `nums`, which may contain duplicate numbers.
+- Must not produce duplicate permutations in the output.
+
+### `combine(n, k)`
+- Generates every combination of `k` numbers chosen from `1...n`.
+- Each combination must be sorted in ascending order.

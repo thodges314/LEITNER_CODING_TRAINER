@@ -1,5 +1,16 @@
-Write combinationSum(candidates, target): all unique combinations of distinct positive numbers summing to target, where each number may be reused any number of times.
+Implement target-sum combination search algorithms using backtracking:
 
-Write combinationSum2(candidates, target): candidates may contain duplicates and each element may be used at most once; the result must contain no duplicate combinations (sort first and skip repeated values at the same depth).
+### `combinationSum(candidates, target)`
+- Finds all unique combinations of distinct positive integers from `candidates` that sum to `target`.
+- The same candidate number may be chosen an unlimited number of times.
+- Elements within each combination should be in ascending order.
 
-Write combinationSum3(k, n): all combinations of exactly k distinct digits from 1 to 9 that sum to n. Result order does not matter, and numbers inside each combination should be ascending.
+### `combinationSum2(candidates, target)`
+- Finds all unique combinations that sum to `target` where `candidates` may contain duplicate values.
+- Each candidate number may only be used at most once per combination.
+- The result must not contain duplicate combinations (sort `candidates` first and skip identical values at the same recursion depth).
+
+### `combinationSum3(k, n)`
+- Finds all valid combinations of exactly `k` distinct digits from `1` through `9` that sum to `n`.
+- Each digit can be used at most once.
+- Elements within each combination should be in ascending order.
