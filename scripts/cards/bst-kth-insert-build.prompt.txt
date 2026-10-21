@@ -1,19 +1,19 @@
 Implement operations for Binary Search Trees whose nodes are `{ val, left, right }`:
 
-### `kthSmallest(root, k)`
+### `kthSmallest(root: TreeNode<number> | null, k: number): number | undefined`
 - Returns the `k`-th smallest value (1-indexed) in the BST.
 - Performs an in-order traversal (left, current, right) and stops immediately once the `k`-th node is reached.
 
-### `kthLargest(root, k)`
+### `kthLargest(root: TreeNode<number> | null, k: number): number | undefined`
 - Returns the `k`-th largest value (1-indexed) in the BST.
 - Performs a reverse in-order traversal (right, current, left) and stops immediately once the `k`-th node is reached.
 
-### `insertIntoBST(root, val)`
+### `insertIntoBST(root: TreeNode<number> | null, val: number): TreeNode<number>`
 - Inserts `val` as a new leaf into the BST and returns the `root`.
 - If `root` is `null`, returns a new node `{ val, left: null, right: null }`.
 - Assumes all values are distinct.
 
-### `sortedArrayToBST(nums)`
+### `sortedArrayToBST(nums: number[]): TreeNode<number> | null`
 - Converts a sorted array of numbers into a height-balanced BST.
 - Recursively selects the middle index `Math.floor((lo + hi) / 2)` as the subtree root for range `[lo, hi]`.
 - Returns `null` if `nums` is empty (`[]`).

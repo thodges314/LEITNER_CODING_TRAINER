@@ -1,14 +1,14 @@
 Implement binary search algorithms in O(log n) time on sorted arrays:
 
-### `binarySearch(sorted, target)`
+### `binarySearch(sorted: number[], target: number): number`
 - Searches for `target` in an ascending sorted array.
 - Returns the 0-based index if `target` is present; otherwise returns `-1`.
 
-### `lowerBound(sorted, target)`
+### `lowerBound(sorted: number[], target: number): number`
 - Returns the first index `i` such that `sorted[i] >= target`.
 - Returns `sorted.length` if no such element exists.
 - Correctly handles duplicate elements.
 
-### `mySqrt(x)`
+### `mySqrt(x: number): number`
 - Computes and returns the floor of the square root ($\lfloor\sqrt{x}\rfloor$) for a non-negative integer `x`.
 - Must use binary search without calling `Math.sqrt`.

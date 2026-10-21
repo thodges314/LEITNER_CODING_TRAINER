@@ -1,14 +1,14 @@
 Implement elementary comparison sorting and validation algorithms without using `Array.prototype.sort`:
 
-### `insertionSort(arr)`
+### `insertionSort(arr: number[]): number[]`
 - Sorts an array of numbers in ascending order **in place**.
 - Returns the same mutated array reference (`arr`).
 
-### `selectionSort(arr)`
+### `selectionSort(arr: number[]): number[]`
 - Sorts an array of numbers in ascending order and returns a **new array**.
 - Leaves the original input array `arr` untouched.
 
-### `isSorted(arr)`
+### `isSorted(arr: number[]): boolean`
 - Returns `true` if `arr` is sorted in ascending (non-decreasing) order.
 - Returns `true` for empty arrays and single-element arrays.
 - Returns `false` as soon as an inversion (`arr[i - 1] > arr[i]`) is found.

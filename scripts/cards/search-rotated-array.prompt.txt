@@ -1,9 +1,9 @@
 Implement binary search algorithms in O(log n) time on a sorted, rotated array of distinct numbers (e.g. `[4, 5, 6, 7, 0, 1, 2]`):
 
-### `findMin(nums)`
+### `findMin(nums: number[]): number | undefined`
 - Finds and returns the minimum value in the rotated sorted array in O(log n) time.
 - Returns `undefined` if `nums` is empty (`nums.length === 0`).
 
-### `searchRotated(nums, target)`
+### `searchRotated(nums: number[], target: number): number`
 - Searches for `target` in the rotated sorted array in O(log n) time.
 - Returns the 0-based index of `target` if found; otherwise returns `-1`.

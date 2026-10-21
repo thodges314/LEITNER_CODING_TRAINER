@@ -1,11 +1,11 @@
 Implement divide-and-conquer sorting algorithms from scratch without calling `Array.prototype.sort`:
 
-### `mergeSort(arr)`
+### `mergeSort(arr: number[]): number[]`
 - Returns a new array sorted in ascending numerical order without mutating the input `arr`.
 - Must be a stable sort that divides the array into halves, sorts them recursively, and combines them using a `merge` helper.
 - Correctly handles empty arrays, single-element arrays, and duplicate values.
 
-### `quickSort(arr)`
+### `quickSort(arr: number[]): number[]`
 - Returns a new array sorted in ascending numerical order without mutating the input `arr`.
 - Selects a pivot element and partitions the array into three subsets: elements less than the pivot, equal to the pivot, and greater than the pivot.
 - Recursively sorts sub-arrays and concatenates the partitions.
