@@ -1,1 +1,11 @@
-Write compose(fns) where each element is a function (ctx, next) that may be async. compose returns a function run(ctx) that returns a promise: it calls fns[0](ctx, next) where next() runs the following function and returns its promise (after the last function next() resolves immediately). A function that does not call next() stops the chain. Code after `await next()` runs on the way back (onion model). A throw or rejection in any function rejects the promise returned by run. compose([]) resolves immediately.
+Implement Koa-style middleware composition:
+
+### `compose<T = any>(fns: MiddlewareFn<T>[]): (ctx: T) => Promise<any>`
+- Each element of `fns` is a function `(ctx, next)` that may be async.
+- Returns a function `run(ctx)` that returns a `Promise`.
+- Calls `fns[0](ctx, next)` where `next()` runs the following function and returns its promise.
+- After the last function in the chain, `next()` resolves immediately.
+- A function that does not call `next()` stops the chain.
+- Code after `await next()` runs on the way back (onion model).
+- A throw or rejection in any middleware rejects the promise returned by `run`.
+- `compose([])` resolves immediately.

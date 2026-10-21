@@ -1,5 +1,7 @@
-Implement `retry(fn, { retries = 3, baseDelay = 20, factor = 2, signal } = {})` for an async function `fn`:
+Implement `retry(fn, options)` for an async function `fn`:
 
+### `retry<T>(fn: (attempt: number) => Promise<T>, options?: RetryOptions): Promise<T>`
+- **Options**: `{ retries = 3, baseDelay = 20, factor = 2, signal?: AbortSignal }`.
 - **Execution Limits**: Invokes `fn` at most `retries + 1` times (1 initial attempt + `retries` retry attempts).
 - **Exponential Backoff**: Waits `baseDelay * (factor ** n)` ms before attempt `n + 1` (e.g. `baseDelay`, then `baseDelay * factor`, etc.).
 - **Resolution & Rejection**:

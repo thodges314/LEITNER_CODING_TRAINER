@@ -1,15 +1,15 @@
 Build streaming utilities using asynchronous generators and `for await...of`:
 
-### `async function* paginateAll(fetchPage)`
+### `async function* paginateAll<T>(fetchPage: (cursor: any | null) => Promise<{ items?: T[]; nextCursor?: any | null }>): AsyncGenerator<T>`
 - Takes `fetchPage(cursor)`, which returns a `Promise` resolving to `{ items: Array, nextCursor: any | null }`.
 - Repeatedly invokes `fetchPage` starting with cursor `null`.
 - Yields each item from `items` one by one.
 - Continues fetching subsequent pages passing the returned `nextCursor` until `nextCursor === null` or `nextCursor === undefined`.
 
-### `async function* filterAsyncGenerator(asyncGen, predicate)`
+### `async function* filterAsyncGenerator<T>(asyncGen: AsyncIterable<T>, predicate: (item: T) => boolean | Promise<boolean>): AsyncGenerator<T>`
 - Iterates over `asyncGen` via `for await (const item of asyncGen)`.
 - Yields only items for which `await predicate(item)` evaluates to truthy.
 
-### `async function collectGenerator(asyncGen, limit = Infinity)`
+### `async function collectGenerator<T>(asyncGen: AsyncIterable<T>, limit?: number): Promise<T[]>`
 - Consumes values from `asyncGen` via `for await...of`.
-- Returns an array containing up to `limit` collected items (breaking early once `limit` is reached).
+- Returns an array containing up to `limit` collected items (defaults to `Infinity`, breaking early once `limit` is reached).

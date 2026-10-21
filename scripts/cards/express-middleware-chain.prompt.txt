@@ -3,11 +3,11 @@ Implement a minimal Express-style middleware execution pipeline:
 ### `class MiddlewarePipeline`
 - Maintains an ordered stack of middleware functions.
 
-### `use(fn)`
+### `use(fn: Function): this`
 - Appends middleware function `fn` to the pipeline stack.
 - Returns `this` for chaining.
 
-### `handle(req, res)`
+### `handle(req: any, res: any): void`
 - Executes layers sequentially using `next(err)`:
   - **Standard Middleware (`fn.length < 4`)**: Called with `(req, res, next)`. Skipped when an error is currently active.
   - **Error Middleware (`fn.length === 4`)**: Called with `(err, req, res, next)`. Executed only when an error has been passed or thrown.

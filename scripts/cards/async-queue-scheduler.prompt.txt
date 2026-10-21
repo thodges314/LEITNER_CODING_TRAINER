@@ -3,7 +3,7 @@ Build a sequential asynchronous task queue:
 ### `class AsyncQueue`
 - Manages strict serial execution of asynchronous tasks in FIFO order.
 
-### `add(task)`
+### `add<T>(task: () => Promise<T> | T): Promise<T>`
 - Enqueues `task` (a zero-argument function returning a promise).
 - Returns a `Promise` that settles with the result of that specific task.
 - Tasks execute one at a time: the next task starts only after the previous task has settled.
