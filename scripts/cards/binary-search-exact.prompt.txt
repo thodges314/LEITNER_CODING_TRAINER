@@ -1,0 +1,6 @@
+Implement classical exact binary search on sorted sequences:
+
+### `binarySearch(nums, target)`
+- Finds the exact index of `target` in a sorted ascending array of numbers `nums`.
+- Returns the 0-based index if `target` is found, or `-1` if `target` is not present.
+- Must run in O(log n) time and O(1) auxiliary space.

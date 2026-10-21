@@ -1,0 +1,7 @@
+Create a type-safe event emitter class `TypedEmitter<Events extends Record<string, any>>`:
+
+### `on(event, listener)`
+- Registers a `listener` callback for event `event`, strictly typed to accept `Events[K]`.
+
+### `emit(event, payload)`
+- Triggers all listeners registered for `event`, passing `payload` matching `Events[K]`.

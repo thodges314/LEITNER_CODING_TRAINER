@@ -1,0 +1,8 @@
+Implement advanced TypeScript generic utility types:
+
+### `DeepPartial<T>`
+- Recursively traverses type `T`, making all nested object properties optional (`?`) while preserving primitive types as-is.
+
+### `PickByType<T, ValueType>`
+- Constructs a type by picking only the properties of `T` whose value types extend `ValueType`.
+- Uses mapped types and key remapping (`as`) with conditional types.

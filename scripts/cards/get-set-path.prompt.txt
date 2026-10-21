@@ -1,0 +1,11 @@
+Implement path-based object property accessors:
+
+### `get(obj, path, defaultValue)`
+- Retrieves the nested value at `path` (e.g. `'a.b[0].c'`).
+- Returns `defaultValue` if the resolved property is `undefined` or if traversal encounters `null`/`undefined`.
+
+### `set(obj, path, value)`
+- Sets the property at `path` to `value`, creating intermediate structures as needed.
+- Creates arrays for numeric segments (e.g. `'[0]'`) and plain objects for string keys.
+- Guards against prototype pollution: throws an `Error` if any path segment is `'__proto__'`, `'constructor'`, or `'prototype'`.
+- Returns the modified object.

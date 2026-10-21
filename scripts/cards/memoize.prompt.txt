@@ -1,0 +1,7 @@
+Implement a robust function memoizer:
+
+### `memoize(fn, resolver?)`
+- Wraps function `fn` to cache return values in a `Map`.
+- Uses `resolver(...args)` to compute the cache key if provided; otherwise defaults to the first argument (`args[0]`).
+- Correctly caches falsy return values (e.g. `0`, `false`, `null`, `""`) using `cache.has()`, never truthiness checks.
+- Preserves the `this` context across invocations.
