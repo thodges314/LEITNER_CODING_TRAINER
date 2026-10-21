@@ -1,9 +1,24 @@
-Write createHistory(initial) for an undo/redo feature. It returns an object with these methods:
+Implement an undo/redo history manager:
 
-getPresent(): the current value.
-push(value): make value the new present and remember the old present so it can be undone. Pushing a new value also throws away everything that could have been redone. Pushing a value equal to the present (Object.is) does nothing and creates no history entry. Returns the present.
-undo(): go back to the previous present; does nothing when there is nothing to undo. Returns the present.
-redo(): go forward again after an undo; does nothing when there is nothing to redo. Returns the present.
-canUndo().
+### `createHistory(initial)`
+- Tracks `past` entries, the current `present` value (starts as `initial`), and `future` entries.
+- Returns an object providing the following methods:
 
-Write canRedo(): booleans.
+#### Inspection Methods
+- **`getPresent()`**: Returns the current present value.
+- **`canUndo()`**: Returns `true` if there are entries in the past history to undo, `false` otherwise.
+- **`canRedo()`**: Returns `true` if there are undone entries in the future history to redo, `false` otherwise.
+
+#### Mutation Methods
+- **`push(value)`**:
+  - If `Object.is(value, present)`, does nothing and returns `present` without creating a history entry.
+  - Otherwise, pushes `present` onto the `past` stack, sets `present = value`, and clears all `future` history.
+  - Returns `present`.
+- **`undo()`**:
+  - If `canUndo()`, moves `present` onto `future` and pops the previous state from `past` to become `present`.
+  - Does nothing if there is nothing to undo.
+  - Returns `present`.
+- **`redo()`**:
+  - If `canRedo()`, moves `present` onto `past` and pops the next state from `future` to become `present`.
+  - Does nothing if there is nothing to redo.
+  - Returns `present`.

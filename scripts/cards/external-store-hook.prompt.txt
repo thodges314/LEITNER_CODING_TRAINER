@@ -1,1 +1,16 @@
-Build a tiny Zustand-style store. createStore(initialState) returns { getState, setState, subscribe }: setState(partialOrUpdater) shallow-merges a partial object (or the result of an updater function receiving the current state) and notifies subscribers ONLY if some value actually changed (Object.is); subscribe(listener) returns an unsubscribe function. useStore(store, selector = (s) => s) is a hook built on useSyncExternalStore that returns the selected slice, so a component re-renders only when its slice changes, and unsubscribes on unmount.
+Build a Zustand-style external store and subscription hook:
+
+### `createStore(initialState)`
+- Returns `{ getState, setState, subscribe }`.
+- **`getState()`**: Returns the current state object.
+- **`setState(partialOrUpdater)`**:
+  - Accepts a partial object or updater function `(state) => patch`.
+  - Merges into the next state: `{ ...state, ...patch }`.
+  - Notifies subscribers **only** if at least one property changed (`!Object.is(next[k], state[k])`).
+- **`subscribe(listener)`**:
+  - Registers `listener` and returns an unsubscribe cleanup function.
+
+### `useStore(store, selector = (s) => s)`
+- Custom React hook built using `useSyncExternalStore`.
+- Subscribes via `store.subscribe` and reads state slice via `() => selector(store.getState())`.
+- Component re-renders only when its selected slice changes, and automatically unsubscribes on unmount.

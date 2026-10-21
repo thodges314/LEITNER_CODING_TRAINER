@@ -1,5 +1,16 @@
-Build the smallest useful state container. createStore(initialState) returns { getState, setState, subscribe }.
+Build a lightweight observable state store:
 
-getState() returns the current state object.
-setState(partial) replaces the state with a NEW object made of the current state shallow-merged with partial (the old state object is never mutated), then calls every subscribed listener with the new state, in the order they subscribed.
-subscribe(listener) registers the listener and returns an unsubscribe function; after unsubscribing, that listener is not called again. Listeners are not called when they subscribe, only on later setState calls.
+### `createStore(initialState)`
+- Returns `{ getState, setState, subscribe }`.
+
+#### Store Methods
+- **`getState()`**:
+  - Returns the current state object.
+- **`setState(partial)`**:
+  - Replaces state with a **new object** shallow-merging the current state with `partial` (`{ ...state, ...partial }`).
+  - Never mutates the existing state object directly.
+  - Calls every registered listener passing the new state, in the exact order they subscribed.
+- **`subscribe(listener)`**:
+  - Registers `listener` and returns an `unsubscribe` function.
+  - Listeners are **not** invoked upon subscription, only on subsequent `setState` calls.
+  - Once unsubscribed, that listener is never invoked again.

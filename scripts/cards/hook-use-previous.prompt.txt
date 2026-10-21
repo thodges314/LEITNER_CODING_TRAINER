@@ -1,1 +1,8 @@
-Write a custom usePrevious(value) hook using useRef and useEffect that returns the value from the previous render (undefined on the first render).
+Write a custom hook to track a value from the previous render:
+
+### `usePrevious(value)`
+- Uses `useRef()` and `useEffect()` to store and track `value`.
+- **Render Order**:
+  - `ref.current` is returned during the render phase.
+  - `useEffect` updates `ref.current = value` after paint, ensuring subsequent renders observe this value.
+- Returns `undefined` on the initial mount render.

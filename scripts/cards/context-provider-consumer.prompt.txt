@@ -1,1 +1,16 @@
-Write createThemeContext() returning { ThemeProvider, useTheme }. ThemeProvider manages 'light' | 'dark' state (starts as 'light', or the optional defaultTheme prop) and provides { theme, setTheme, toggle }. useTheme() returns that value and throws an Error mentioning ThemeProvider when called outside the provider.
+Implement a factory function for a React Theme Context:
+
+### `createThemeContext()`
+- Creates an internal React context via `createContext(null)`.
+- Returns an object containing `{ ThemeProvider, useTheme }`.
+
+### `ThemeProvider({ children, defaultTheme = 'light' })`
+- Manages theme state (`'light' | 'dark'`) initialized to `defaultTheme` (defaults to `'light'`).
+- Provides a context value object: `{ theme, setTheme, toggle }`.
+  - `toggle()` flips between `'light'` and `'dark'`.
+  - Memoizes callbacks and the context value object where appropriate.
+
+### `useTheme()`
+- Custom hook that consumes the theme context via `useContext`.
+- Returns `{ theme, setTheme, toggle }`.
+- Throws an `Error` whose message mentions `'ThemeProvider'` when invoked outside of a `<ThemeProvider>`.
