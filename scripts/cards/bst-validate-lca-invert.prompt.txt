@@ -1,13 +1,13 @@
 Implement classic binary tree and BST algorithms on nodes shaped `{ val, left, right }`:
 
-### `isValidBST(root)`
+### `isValidBST(root: TreeNode<number> | null, lo?: number, hi?: number): boolean`
 - Validates whether the binary tree satisfies strict BST properties: every node value in the left subtree must be `< node.val`, and every node value in the right subtree must be `> node.val` (not just direct children).
 - Returns `true` if valid (including an empty tree `null` or single node); returns `false` otherwise.
 
-### `invertTree(root)`
+### `invertTree(root: TreeNode<number> | null): TreeNode<number> | null`
 - Inverts (mirrors) the binary tree in place by recursively swapping left and right subtrees.
 - Returns the modified tree `root` (or `null` if `root` is null).
 
-### `lowestCommonAncestor(root, p, q)`
+### `lowestCommonAncestor(root: TreeNode<number> | null, p: number, q: number): number | undefined`
 - Finds the Lowest Common Ancestor (LCA) of two distinct node values `p` and `q` present in the BST.
 - Returns the `val` of their lowest common ancestor node (a node can be an ancestor of itself).

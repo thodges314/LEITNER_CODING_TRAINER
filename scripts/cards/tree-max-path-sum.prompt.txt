@@ -1,16 +1,16 @@
 Implement advanced tree path and valuation algorithms on binary tree nodes `{ val, left, right }`:
 
-### `maxPathSum(root)`
+### `maxPathSum(root: TreeNode<number> | null): number`
 - Calculates the maximum path sum across any non-empty path connecting adjacent nodes.
 - The path may start and end at any node and does not need to pass through the root.
 - Node values can be negative.
 
-### `sumNumbers(root)`
+### `sumNumbers(root: TreeNode<number> | null): number`
 - Calculates the total sum of all root-to-leaf paths, where each path represents a decimal number formed by concatenating node digits (0-9).
 - For example, path `1 -> 2 -> 3` represents `123`.
 - Returns `0` if `root` is `null`.
 
-### `goodNodes(root)`
+### `goodNodes(root: TreeNode<number> | null): number`
 - Counts the number of "good" nodes in the tree.
 - A node `X` is good if on the path from the root to `X` there are no nodes with a value greater than `X.val` (`val >= maxAncestor`).
 - The root node is always good. Returns `0` if `root` is `null`.

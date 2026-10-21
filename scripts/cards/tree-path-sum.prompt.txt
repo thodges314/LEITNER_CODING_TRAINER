@@ -1,16 +1,16 @@
 Implement root-to-leaf path algorithms on binary tree nodes shaped `{ val, left, right }`:
 
-### `hasPathSum(root, target)`
+### `hasPathSum(root: TreeNode<number> | null, target: number): boolean`
 - Determines if there exists a root-to-leaf path such that summing all node values along the path equals `target`.
 - A leaf is a node with no children (`!node.left && !node.right`); a node with only one child is not a leaf.
 - Returns `false` if `root` is `null`.
 
-### `pathSum(root, target)`
+### `pathSum(root: TreeNode<number> | null, target: number): number[][]`
 - Finds all root-to-leaf paths where the sum of node values equals `target`.
 - Returns matching paths as an array of value arrays in left-to-right order (e.g. `[[5, 4, 11, 2], [5, 8, 4, 5]]`).
 - Returns fresh array copies so subsequent mutations do not leak. Returns `[]` if no paths match or `root` is `null`.
 
-### `minDepth(root)`
+### `minDepth(root: TreeNode<number> | null): number`
 - Computes the minimum depth of the tree (number of nodes along the shortest root-to-leaf path).
 - Returns `0` if `root` is `null`.
 - If a node has only one child, the path must continue down to that child's leaf.

@@ -1,13 +1,13 @@
 Implement recursive binary tree calculations on nodes shaped `{ val, left, right }`:
 
-### `maxDepth(root)`
+### `maxDepth(root: TreeNode<number> | null): number`
 - Computes the maximum depth of the binary tree (number of nodes along the longest root-to-leaf path).
 - Returns `0` if `root` is `null` or `undefined`.
 
-### `sumTree(root)`
+### `sumTree(root: TreeNode<number> | null): number`
 - Calculates the sum of all node values (`val`) across the entire tree.
 - Returns `0` if `root` is `null` or `undefined`.
 
-### `countLeaves(root)`
+### `countLeaves(root: TreeNode<number> | null): number`
 - Counts the number of leaf nodes in the tree (nodes having neither left nor right children).
 - Returns `0` for an empty tree.

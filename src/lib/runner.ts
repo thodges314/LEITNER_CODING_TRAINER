@@ -379,7 +379,18 @@ export async function runHarness(
   if (card.track === 'typescript-patterns') mode = 'ts';
 
   const combined = bufferContainsHarness(code, harness) ? code : `${code}\n\n${harness}\n`;
-  const transpiled = await transpileForExecution(combined, mode, Math.min(timeoutMs, 3000));
+
+  // In TS mode, strictly type-check the user's solution (or combined buffer for typescript-patterns puzzles).
+  if (mode === 'ts') {
+    const codeToCheck = card.track === 'typescript-patterns' ? combined : code;
+    const { checkAndTranspileTS } = await import('../utils/typeChecker');
+    const tsCheck = checkAndTranspileTS(codeToCheck);
+    if (!tsCheck.success) {
+      return notRun(`Code did not compile: ${tsCheck.diagnostics.map((d) => d.formatted).join('; ')}`, 1);
+    }
+  }
+
+  const transpiled = await transpileForExecution(combined, 'js', Math.min(timeoutMs, 3000));
   if (!transpiled.ok) {
     return notRun(`Code did not compile: ${transpiled.diagnostics.map((d) => d.formatted).join('; ')}`, 1);
   }

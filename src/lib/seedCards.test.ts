@@ -41,4 +41,13 @@ describe('seed cards', () => {
     const r = await runHarness(t, '// intentionally empty', mode, 20000);
     expect(r.passed, `${t.id}: harness passed with no solution (${r.summary})`).toBe(false);
   }, 30000);
+
+  const tsTopics = topics.filter((t) => Boolean(t.referenceSolutionTs));
+  it.each(tsTopics.map((t) => [t.id, t] as const))('%s: TypeScript reference solution passes its harness in TS mode', async (_id, t) => {
+    const r = await runHarness(t, t.referenceSolutionTs!, 'ts', 20000);
+    expect({ id: t.id, summary: r.summary, lines: r.lines.filter((l) => /FAIL|error/i.test(l)) }).toMatchObject({
+      summary: expect.stringMatching(/^[1-9]\d* passed, 0 failed$/),
+    });
+  }, 30000);
 });
+

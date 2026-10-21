@@ -1,22 +1,22 @@
 Implement general tree and DOM-like node traversal utilities on nodes shaped `{ id, children?, classList? }`:
 
-### `dfsRecursive(root)`
+### `dfsRecursive(root: DOMNode): DOMNode[]`
 - Traverses the tree in pre-order depth-first search using recursion.
 - Returns an array of node references in visit order.
 
-### `dfsIterative(root)`
+### `dfsIterative(root: DOMNode): DOMNode[]`
 - Traverses the tree in pre-order depth-first search using an explicit stack (pushing children in reverse order so first child pops first).
 - Returns an array of node references in visit order.
 - Must handle deep linear chains (e.g., 20,000 nodes) without exceeding call-stack limits.
 
-### `bfs(root)`
+### `bfs(root: DOMNode): DOMNode[]`
 - Traverses the tree in breadth-first level order.
 - Returns an array of node references in visit order.
 
-### `getElementsByClassName(root, className)`
+### `getElementsByClassName(root: DOMNode, className: string): DOMNode[]`
 - Traverses the tree in document order (pre-order DFS).
 - Returns all nodes where `node.classList && node.classList.contains(className)`.
 
-### `findPath(root, id)`
+### `findPath(root: DOMNode, id: string): string[] | null`
 - Searches for a node with the specified `id`.
 - Returns an array of `id` strings representing the path from `root.id` to the target `id` (inclusive), or `null` if the node is not found.
