@@ -6,7 +6,8 @@ Implement TypeScript narrowing using `typeof`, `Array.isArray`, and `in`:
 - Returns `'list:<length>'` for an array.
 - Narrows using `typeof` and `Array.isArray`.
 
-### `type Shape = { radius: number } | { width: number; height: number }`
+### `type Shape`
+- Defined as `{ radius: number } | { width: number; height: number }`.
 
 ### `area(shape: Shape): number`
 - Narrows `shape` using the `in` operator.
