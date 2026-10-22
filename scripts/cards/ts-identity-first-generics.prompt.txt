@@ -6,7 +6,11 @@ Implement generic TypeScript helper functions and container types without using 
 ### `first<T>(items: T[]): T | undefined`
 - Returns the first element of `items`, or `undefined` if the array is empty.
 
-### `Box<T>` & Box Helpers
-- **`interface Box<T>`**: `{ value: T }`
-- **`makeBox<T>(value: T): Box<T>`**: wraps `value` inside a `{ value }` container.
-- **`mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U>`**: transforms `box.value` using `fn` and returns a new `Box<U>`.
+### `interface Box<T>`
+- Container type with property `{ value: T }`.
+
+### `makeBox<T>(value: T): Box<T>`
+- Wraps `value` inside a `{ value }` container.
+
+### `mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U>`
+- Transforms `box.value` using `fn` and returns a new `Box<U>`.

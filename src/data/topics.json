@@ -8129,7 +8129,7 @@
       "generics",
       "basics"
     ],
-    "promptSeed": "Implement generic TypeScript helper functions and container types without using `any`:\n\n### `identity<T>(value: T): T`\n- Returns the provided value unchanged with its exact type preserved.\n\n### `first<T>(items: T[]): T | undefined`\n- Returns the first element of `items`, or `undefined` if the array is empty.\n\n### `Box<T>` & Box Helpers\n- **`interface Box<T>`**: `{ value: T }`\n- **`makeBox<T>(value: T): Box<T>`**: wraps `value` inside a `{ value }` container.\n- **`mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U>`**: transforms `box.value` using `fn` and returns a new `Box<U>`.",
+    "promptSeed": "Implement generic TypeScript helper functions and container types without using `any`:\n\n### `identity<T>(value: T): T`\n- Returns the provided value unchanged with its exact type preserved.\n\n### `first<T>(items: T[]): T | undefined`\n- Returns the first element of `items`, or `undefined` if the array is empty.\n\n### `interface Box<T>`\n- Container type with property `{ value: T }`.\n\n### `makeBox<T>(value: T): Box<T>`\n- Wraps `value` inside a `{ value }` container.\n\n### `mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U>`\n- Transforms `box.value` using `fn` and returns a new `Box<U>`.",
     "difficulty": 1,
     "concept": "ts-generics",
     "referenceSolution": "function identity<T>(value: T): T {\n  return value;\n}\n\nfunction first<T>(items: T[]): T | undefined {\n  return items[0];\n}\n\ninterface Box<T> {\n  value: T;\n}\n\nfunction makeBox<T>(value: T): Box<T> {\n  return { value };\n}\n\nfunction mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U> {\n  return { value: fn(box.value) };\n}",
