@@ -1,13 +1,14 @@
 function reverseList<T>(head: ListNode<T> | null): ListNode<T> | null {
+  if (head === null) return head;
   let prev: ListNode<T> | null = null;
-  let cur: ListNode<T> | null = head;
-  while (cur) {
-    const next: ListNode<T> | null = cur.next;
-    cur.next = prev;
-    prev = cur;
-    cur = next;
+  while (head.next != null) {
+    const next: ListNode<T> | null = head.next;
+    head.next = prev;
+    prev = head;
+    head = next;
   }
-  return prev;
+  head.next = prev;
+  return head;
 }
 
 function middleNode<T>(head: ListNode<T> | null): ListNode<T> | null {

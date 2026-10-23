@@ -7288,7 +7288,7 @@
     "promptSeed": "Implement singly linked list utilities on nodes shaped as `{ val, next }` (terminal node has `next: null`):\n\n### `reverseList<T>(head: ListNode<T> | null): ListNode<T> | null`\n- Reverses the linked list in-place by updating pointer references.\n- Returns the new head of the reversed list.\n- Returns `null` if given an empty list (`head === null`).\n\n### `middleNode<T>(head: ListNode<T> | null): ListNode<T> | null`\n- Finds and returns the middle node of the list using the two-pointer (slow/fast) technique.\n- For even-length lists with two middle nodes, returns the second middle node.\n- Returns `null` if given an empty list (`head === null`).",
     "difficulty": 1,
     "concept": "linked-lists",
-    "referenceSolution": "function reverseList(head) {\n  let prev = null;\n  let cur = head;\n  while (cur) {\n    const next = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}\n\nfunction middleNode(head) {\n  let slow = head;\n  let fast = head;\n  while (fast && fast.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n  }\n  return slow;\n}",
+    "referenceSolution": "function reverseList(head) {\n  if (head === null) return head;\n  let prev = null;\n  while (head.next !== null) {\n    const next = head.next;\n    head.next = prev;\n    prev = head;\n    head = next;\n  }\n  head.next = prev;\n  return head;\n}\n\nfunction middleNode(head) {\n  let slow = head;\n  let fast = head;\n  while (fast && fast.next) {\n    slow = slow.next;\n    fast = fast.next.next;\n  }\n  return slow;\n}",
     "testCases": [
       {
         "description": "reverseList reverses a list",
@@ -7325,7 +7325,7 @@
     "targetTime": "O(n)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Each node is visited once by both reverseList and middleNode, relinking or advancing pointers in place.",
-    "referenceSolutionTs": "function reverseList<T>(head: ListNode<T> | null): ListNode<T> | null {\n  let prev: ListNode<T> | null = null;\n  let cur: ListNode<T> | null = head;\n  while (cur) {\n    const next: ListNode<T> | null = cur.next;\n    cur.next = prev;\n    prev = cur;\n    cur = next;\n  }\n  return prev;\n}\n\nfunction middleNode<T>(head: ListNode<T> | null): ListNode<T> | null {\n  let slow: ListNode<T> | null = head;\n  let fast: ListNode<T> | null = head;\n  while (fast && fast.next) {\n    slow = slow!.next;\n    fast = fast.next.next;\n  }\n  return slow;\n}"
+    "referenceSolutionTs": "function reverseList<T>(head: ListNode<T> | null): ListNode<T> | null {\n  if (head === null) return head;\n  let prev: ListNode<T> | null = null;\n  while (head.next != null) {\n    const next: ListNode<T> | null = head.next;\n    head.next = prev;\n    prev = head;\n    head = next;\n  }\n  head.next = prev;\n  return head;\n}\n\nfunction middleNode<T>(head: ListNode<T> | null): ListNode<T> | null {\n  let slow: ListNode<T> | null = head;\n  let fast: ListNode<T> | null = head;\n  while (fast && fast.next) {\n    slow = slow!.next;\n    fast = fast.next.next;\n  }\n  return slow;\n}"
   },
   {
     "id": "search-rotated-array",

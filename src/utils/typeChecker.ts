@@ -85,6 +85,8 @@ const SANDBOX_GLOBALS = `
   declare var IntersectionObserver: any;
   declare var $test: any;
   declare var $dom: any;
+  declare function list<T = any>(...vals: T[]): ListNode<T> | null;
+  declare function toArray<T = any>(node: ListNode<T> | null): T[];
   declare class ListNode<T = any> {
     val: T;
     next: ListNode<T> | null;
@@ -189,8 +191,12 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
 
   const formattedDiagnostics: FormattedDiagnostic[] = [];
 
-  if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0) {
+if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0) {
+    const harnessStartIndex = rawCode.indexOf('// Test runner example:');
     for (const diag of transpileResult.diagnostics) {
+      if (harnessStartIndex !== -1 && diag.start !== undefined && diag.start >= harnessStartIndex) {
+        continue;
+      }
       formattedDiagnostics.push(formatDiagnostic(diag, rawCode));
     }
   }
@@ -231,8 +237,16 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
     const program = ts.createProgram([fileName, GLOBALS_FILE], { ...compilerOptions, noLib: false, types: [] }, host);
     const semanticDiags = program.getSemanticDiagnostics();
 
+    const harnessStartIndex = rawCode.indexOf('// Test runner example:');
+
     for (const diag of semanticDiags) {
-      if (diag.file && diag.file.fileName !== fileName) continue; // only report problems in the user's code
+      if (diag.file && diag.file.fileName !== fileName) continue;
+
+      // Ignore any errors originating inside the test harness
+      if (harnessStartIndex !== -1 && diag.start !== undefined && diag.start >= harnessStartIndex) {
+        continue;
+      }
+
       formattedDiagnostics.push(formatDiagnostic(diag, rawCode));
     }
   } catch (err) {
