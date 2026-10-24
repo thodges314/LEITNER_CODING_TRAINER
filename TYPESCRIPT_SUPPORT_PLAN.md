@@ -45,8 +45,8 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **152 / 271 (56.1%)**
-- **Cards Remaining:** **119 / 271 (43.9%)**
+- **Fully Typed Cards Completed:** **157 / 271 (57.9%)**
+- **Cards Remaining:** **114 / 271 (42.1%)**
 - **Total Batches:** 48 batches (25 completed, 23 remaining)
 
 ### Track Completion Status
@@ -57,18 +57,18 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`async-js`**            |     21      |      21      |   100.0%   | **COMPLETE** (Batches 12–15)                              |
 | **`js-language`**         |     25      |      25      |   100.0%   | **COMPLETE** (Batches 16–20)                              |
 | **`typescript-patterns`** |     14      |      14      |   100.0%   | **COMPLETE** (Batches 21–23)                              |
-| **`js-utilities`**        |     37      |      15      |   40.5%    | In Progress (Batches 24–26 done, Batches 27–30 remaining) |
+| **`js-utilities`**        |     37      |      20      |   54.1%    | In Progress (Batches 24–27 done, Batches 28–30 remaining) |
 | **`dom-browser`**         |     20      |      0       |    0.0%    | Planned (Batches 31–34)                                   |
 | **`react`**               |     27      |      0       |    0.0%    | Planned (Batches 35–39)                                   |
 | **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                                   |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                        |
-| **TOTAL**                 |   **271**   |   **152**    | **56.1%**  | **48 Batches Total**                                      |
+| **TOTAL**                 |   **271**   |   **157**    | **57.9%**  | **48 Batches Total**                                      |
 
 ---
 
-## 4. Completed Batches (Batches 1–25 plus Batch 26: 152 Cards)
+## 4. Completed Batches (Batches 1–25 plus Batches 26-27: 157 Cards)
 
-All 152 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 157 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -112,11 +112,11 @@ All 152 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 27–48: 119 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 28–48: 114 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
-### Track: `js-utilities` (22 cards remaining — Batches 27 to 30)
+### Track: `js-utilities` (17 cards remaining — Batches 28 to 30)
 
 _Focus: Generic parameters `<T, R>`, function types, and mapped object constraints._
 
@@ -331,9 +331,9 @@ Every single batch follows this strict automated loop:
 >
 > ### Checkpoint & Quota Pause (21 October 2026)
 >
-> - **State (23 October 2026):** Batches 1–26 (152 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
+> - **State (23 October 2026):** Batches 1–27 (157 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
 > - **WIP branch:** `wip/batch-26-map-frequency-counter` was merged into `feature/ts-coverage`. It can be deleted.
-> - **Next step:** Batch 27 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
+> - **Next step:** Batch 28 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
 > - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.
 >
 > ### Handoff procedure (for any assistant resuming card work)

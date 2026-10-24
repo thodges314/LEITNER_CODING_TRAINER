@@ -1,16 +1,16 @@
 Implement polyfills on `Array.prototype` for core iteration methods:
 
-### `Array.prototype.myMap(callback, thisArg)`
+### `Array.prototype.myMap<T, U>(callback: (value: T, index: number, array: T[]) => U, thisArg?: unknown): U[]`
 - Invokes `callback.call(thisArg, value, index, array)` for each present element in the array.
 - Skips sparse holes (unassigned indices).
 - Returns a new array containing the callback return values.
 
-### `Array.prototype.myFilter(callback, thisArg)`
+### `Array.prototype.myFilter<T>(callback: (value: T, index: number, array: T[]) => unknown, thisArg?: unknown): T[]`
 - Invokes `callback.call(thisArg, value, index, array)` for each present element.
 - Skips sparse holes.
 - Returns a new array containing elements for which `callback` returned a truthy value.
 
-### `Array.prototype.myReduce(callback, initialValue)`
+### `Array.prototype.myReduce<T, U = T>(callback: (accumulator: U, value: T, index: number, array: T[]) => U, initialValue?: U): U`
 - Executes `callback(accumulator, value, index, array)` across present array elements:
   - If `initialValue` is provided (check `arguments.length >= 2`), uses it as the initial accumulator and begins from the first present element.
   - If `initialValue` is omitted, uses the first present element as the accumulator and begins iteration at the next present element.

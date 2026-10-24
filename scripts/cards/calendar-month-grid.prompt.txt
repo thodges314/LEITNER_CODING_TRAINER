@@ -1,6 +1,6 @@
 Implement the calendar grid generation logic for date pickers and monthly calendars:
 
-### `buildMonthGrid(year, month, weekStartsOn = 0)`
+### `buildMonthGrid(year: number, month: number, weekStartsOn: number = 0): (number | null)[][]`
 - Generates a 2D array of weeks representing the month grid.
 - **Parameters**:
   - `year`: 4-digit calendar year (leap years follow Gregorian rules: 2000 and 2024 are leap years, 1900 and 2023 are not).
