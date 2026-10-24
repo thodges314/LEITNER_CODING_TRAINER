@@ -45,9 +45,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **209 / 271 (77.1%)**
-- **Cards Remaining:** **62 / 271 (22.9%)**
-- **Total Batches:** 48 batches (37 completed, 11 remaining)
+- **Fully Typed Cards Completed:** **215 / 271 (79.3%)**
+- **Cards Remaining:** **56 / 271 (20.7%)**
+- **Total Batches:** 48 batches (38 completed, 10 remaining)
 
 ### Track Completion Status
 
@@ -59,16 +59,16 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`typescript-patterns`** |     14      |      14      |   100.0%   | **COMPLETE** (Batches 21–23)                          |
 | **`js-utilities`**        |     37      |      37      |   100.0%   | **COMPLETE** (Batches 24–30)                          |
 | **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
-| **`react`**               |     27      |      15      |   55.6%    | In Progress (Batches 35–37 done, Batches 38–39 remaining) |
+| **`react`**               |     27      |      21      |   77.8%    | In Progress (Batches 35–38 done, Batch 39 remaining)  |
 | **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                               |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
-| **TOTAL**                 |   **271**   |   **209**    | **77.1%**  | **48 Batches Total**                                  |
+| **TOTAL**                 |   **271**   |   **215**    | **79.3%**  | **48 Batches Total**                                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–37: 209 Cards)
+## 4. Completed Batches (Batches 1–38: 215 Cards)
 
-All 209 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 215 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -122,31 +122,24 @@ All 209 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 33 (Events & User Interaction — 5 cards):** `event-delegation`, `keyboard-shortcut-matcher`, `key-sequence-matcher`, `focus-trap-keydown`, `drop-index-from-pointer`.
 - **Batch 34 (DOM Observers & Animation — 5 cards):** `vnode-to-dom`, `raf-throttle`, `lazy-load-observer`, `resize-breakpoints`, `watch-added-elements`.
 
-### React Track (15 of 27 Cards)
+### React Track (21 of 27 Cards)
 
 - **Batch 35 (Core State & Input Hooks — 5 cards):** `controlled-vs-uncontrolled-input`, `use-toggle-counter`, `focus-on-mount`, `form-state-hook`, `hook-use-previous`.
 - **Batch 36 (Advanced Refs & Lifecycle Hooks — 5 cards):** `use-previous-latest-ref`, `use-is-mounted`, `on-click-outside-hook`, `use-media-query`, `use-local-storage-hook`.
 - **Batch 37 (Reducers, History & Stores — 5 cards):** `todo-list-reducer`, `use-reducer-todo-list`, `undo-redo-hook`, `history-stack-basic`, `create-store-basic`.
+- **Batch 38 (Context, External Stores & Performance — 6 cards):** `context-provider-consumer`, `theme-switcher`, `external-store-hook`, `forward-ref-imperative-handle`, `memo-derived-list`, `memo-stable-callbacks`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 38–48: 62 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 39–48: 56 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
 ---
 
-### Track: `react` (12 cards remaining — Batches 38 to 39)
+### Track: `react` (6 cards remaining — Batch 39)
 
 _Focus: Hook signatures (`usePrevious<T>`, `useLocalStorage<T>`), reducer actions, and React 19 types._
-
-- **Batch 38: Context, External Stores & Performance (6 cards)**
-  - `context-provider-consumer`: React Context Provider with Custom Hook
-  - `theme-switcher`: Theme Switcher (Context + localStorage)
-  - `external-store-hook`: External Store with useSyncExternalStore
-  - `forward-ref-imperative-handle`: forwardRef and useImperativeHandle
-  - `memo-derived-list`: useMemo for a Derived List
-  - `memo-stable-callbacks`: React.memo and Stable Callbacks
 
 - **Batch 39: Async, Debouncing & React 19 Concurrent (6 cards)**
   - `use-debounce-hook`: useDebounce and useThrottle Hooks
@@ -253,8 +246,8 @@ Every single batch follows this strict automated loop:
 >
 > ### Checkpoint & Quota Pause (21 October 2026)
 >
-> - **State (24 October 2026):** Batches 1–37 (209 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
-> - **Next step:** Batch 38 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
+> - **State (24 October 2026):** Batches 1–38 (215 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
+> - **Next step:** Batch 39 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
 > - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.
 >
 > ### Handoff procedure (for any assistant resuming card work)

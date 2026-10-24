@@ -1,6 +1,6 @@
 Build a Zustand-style external store and subscription hook:
 
-### `createStore(initialState)`
+### createStore<T extends Record<string, unknown>>(initialState: T): ExternalStore<T>
 - Returns `{ getState, setState, subscribe }`.
 - **`getState()`**: Returns the current state object.
 - **`setState(partialOrUpdater)`**:
@@ -10,7 +10,7 @@ Build a Zustand-style external store and subscription hook:
 - **`subscribe(listener)`**:
   - Registers `listener` and returns an unsubscribe cleanup function.
 
-### `useStore(store, selector = (s) => s)`
+### useStore<T extends Record<string, unknown>, S = T>(store: ExternalStore<T>, selector?: (state: T) => S): S
 - Custom React hook built using `useSyncExternalStore`.
 - Subscribes via `store.subscribe` and reads state slice via `() => selector(store.getState())`.
 - Component re-renders only when its selected slice changes, and automatically unsubscribes on unmount.

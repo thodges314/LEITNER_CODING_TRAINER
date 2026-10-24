@@ -71,6 +71,7 @@ const SANDBOX_GLOBALS = `
   declare function useId(): string;
   declare function useSyncExternalStore<Snapshot>(subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => Snapshot, getServerSnapshot?: () => Snapshot): Snapshot;
   declare function useImperativeHandle<T, R extends T>(ref: any, init: () => R, deps?: any[]): void;
+  declare function memo<T = any>(component: T): T;
   declare function forwardRef<T = any, P = any>(render: (props: P, ref: any) => any): any;
   declare function createContext<T = any>(defaultValue?: T): any;
   declare function use<T = any>(usable: any): T;
@@ -94,6 +95,7 @@ const SANDBOX_GLOBALS = `
     useSyncExternalStore: typeof useSyncExternalStore;
     useImperativeHandle: typeof useImperativeHandle;
     forwardRef: typeof forwardRef;
+    memo: typeof memo;
     createContext: typeof createContext;
     use: typeof use;
     Suspense: any;
@@ -105,6 +107,11 @@ const SANDBOX_GLOBALS = `
     [key: string]: any;
   }
   declare var React: ReactNamespace;
+  declare namespace React {
+    type ReactNode = JSX.Element | string | number | boolean | null | undefined | Iterable<ReactNode>;
+    type FC<P = {}> = (props: P) => any;
+    type PropsWithChildren<P = {}> = P & { children?: ReactNode };
+  }
   declare namespace JSX {
     interface Element {
       [key: string]: any;
@@ -145,6 +152,8 @@ const SANDBOX_GLOBALS = `
   interface Element extends Node { [key: string]: any; }
   declare var HTMLElement: any;
   interface HTMLElement extends Element { [key: string]: any; }
+  declare var HTMLInputElement: any;
+  interface HTMLInputElement extends HTMLElement { value: string; [key: string]: any; }
   declare var Text: any;
   interface Text extends Node { [key: string]: any; }
   declare var requestAnimationFrame: (callback: (time: number) => void) => number;

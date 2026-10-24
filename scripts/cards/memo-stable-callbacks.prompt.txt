@@ -1,3 +1,4 @@
+### Parent({ items, onListRender }: ParentProps): JSX.Element
 Prevent needless re-renders.
 
 Write List({ items, onSelect, onRender }) wrapped in React.memo: it renders a <ul> with one <li> per item string (clicking an <li> calls onSelect(item)) and calls onRender() every time it renders.
