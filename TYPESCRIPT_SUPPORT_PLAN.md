@@ -45,8 +45,8 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **147 / 271 (54.2%)**
-- **Cards Remaining:** **124 / 271 (45.8%)**
+- **Fully Typed Cards Completed:** **148 / 271 (54.6%)**
+- **Cards Remaining:** **123 / 271 (45.4%)**
 - **Total Batches:** 48 batches (25 completed, 23 remaining)
 
 ### Track Completion Status
@@ -62,13 +62,13 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`react`**               |     27      |      0       |    0.0%    | Planned (Batches 35–39)                                   |
 | **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                                   |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                        |
-| **TOTAL**                 |   **271**   |   **147**    | **54.2%**  | **48 Batches Total**                                      |
+| **TOTAL**                 |   **271**   |   **148**    | **54.6%**  | **48 Batches Total**                                      |
 
 ---
 
-## 4. Completed Batches (Batches 1–25: 147 Cards)
+## 4. Completed Batches (Batches 1–25 plus map-frequency-counter: 148 Cards)
 
-All 147 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 148 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -112,7 +112,7 @@ All 147 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 26–48: 124 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 26–48: 123 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
@@ -331,6 +331,7 @@ Every single batch follows this strict automated loop:
 >
 > ### Checkpoint & Quota Pause (21 October 2026)
 >
-> - **State:** Batches 1–25 (147 cards) complete and passing on `feature/typescript-support`.
-> - **WIP Branch:** `wip/batch-26-map-frequency-counter` (contains partial prompt and ref files for `map-frequency-counter`).
-> - **Immediate Resume Step:** Merge `wip/batch-26-map-frequency-counter` back into `feature/typescript-support` and complete the remaining 4 cards of Batch 26 (`set-unique-operations`, `group-by-count-by`, `unique-sort-dedupe`, `custom-array-reduce`).
+> - **State (23 October 2026):** Batches 1–25 plus `map-frequency-counter` (148 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
+> - **WIP branch:** `wip/batch-26-map-frequency-counter` was merged into `feature/ts-coverage`. It can be deleted.
+> - **Next step:** finish the remaining 4 cards of Batch 26 (`set-unique-operations`, `group-by-count-by`, `unique-sort-dedupe`, `custom-array-reduce`), then continue the roadmap below.
+> - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.

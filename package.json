@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "build:cards": "node scripts/build-cards.mjs",
     "check:cards": "node scripts/build-cards.mjs --check",
+    "report:ts": "node scripts/report-ts.mjs",
     "e2e": "vite build && playwright test",
     "e2e:ui": "vite build && playwright test --ui",
     "mutation": "vitest run --config vitest.mutation.config.ts"
