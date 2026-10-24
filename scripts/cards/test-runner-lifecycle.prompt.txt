@@ -1,3 +1,27 @@
+```ts
+interface TestResult {
+  title: string;
+  status: 'pass' | 'fail';
+  error?: string;
+}
+
+interface SuiteResult {
+  title: string;
+  tests: TestResult[];
+  suites: SuiteResult[];
+}
+
+interface RunnerReport {
+  passed: number;
+  failed: number;
+  total: number;
+  suites: SuiteResult[];
+}
+```
+
+### createTestRunner(): TestRunner:
+### new TestRunner(): TestRunner:
+
 Implement an asynchronous, in-memory test runner engine `createTestRunner()` (or `class TestRunner`) supporting nested suites, lifecycle hooks, and hierarchical reporting:
 
 - `describe(title, fn)`: registers a suite. Executes `fn` synchronously to declare nested `it`, `describe`, and lifecycle hooks.

@@ -1,3 +1,24 @@
+```ts
+type MockResult<T> =
+  | { type: 'return'; value: T }
+  | { type: 'throw'; value: unknown };
+
+interface MockState<TArgs extends unknown[] = any[], TReturn = any> {
+  calls: TArgs[];
+  results: MockResult<TReturn>[];
+}
+
+interface MockFunction<TArgs extends unknown[] = any[], TReturn = any> {
+  (...args: TArgs): TReturn;
+  mock: MockState<TArgs, TReturn>;
+  mockReturnValue(val: TReturn): MockFunction<TArgs, TReturn>;
+  mockImplementation(fn: (...args: TArgs) => TReturn): MockFunction<TArgs, TReturn>;
+  mockClear(): MockFunction<TArgs, TReturn>;
+}
+```
+
+### mockFn<TArgs extends unknown[] = any[], TReturn = any>(impl?: (...args: TArgs) => TReturn): MockFunction<TArgs, TReturn>:
+
 Implement a Jest-style mock function `mockFn(impl?)`.
 
 When invoked, the returned mock function calls `impl(...args)` (if provided) and returns its result (or throws if `impl` throws). If `impl` is omitted, the invocation returns `undefined`.

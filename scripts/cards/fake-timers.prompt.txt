@@ -1,3 +1,6 @@
+### createFakeTimers(): FakeTimers:
+### new FakeTimers(): FakeTimers:
+
 Implement a virtual timer controller `FakeTimers` (or factory `createFakeTimers()`) to control synchronous time progression for testing async code:
 
 - **`now()`**: Returns the current virtual time in milliseconds (starts at `0`).

@@ -1,3 +1,18 @@
+```ts
+interface AssertionResult {
+  pass: boolean;
+}
+
+interface Matchers<T = unknown> {
+  not: Matchers<T>;
+  toBe(expected: unknown): AssertionResult;
+  toEqual(expected: unknown): AssertionResult;
+  toThrow(expectedError?: string | RegExp): AssertionResult;
+}
+```
+
+### expect<T>(actual: T): Matchers<T>:
+
 Implement a standalone `expect(actual)` assertion runner supporting core matchers and `.not` negation chaining:
 
 - `.toBe(expected)`: asserts identity comparison via `Object.is(actual, expected)`. Throws an `Error` if the check fails.

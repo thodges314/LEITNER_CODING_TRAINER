@@ -1,4 +1,20 @@
-Write createSpy(impl) like a tiny jest.fn(). It returns a function (the spy) that:
+```ts
+type SpyResult<T> =
+  | { type: 'return'; value: T }
+  | { type: 'throw'; value: unknown };
+
+interface Spy<TArgs extends unknown[] = any[], TReturn = any> {
+  (...args: TArgs): TReturn;
+  calls: TArgs[];
+  results: SpyResult<TReturn>[];
+  calledWith(...args: unknown[]): boolean;
+  reset(): void;
+}
+```
+
+### createSpy<TArgs extends unknown[] = any[], TReturn = any>(impl?: (...args: TArgs) => TReturn): Spy<TArgs, TReturn>:
+
+Write `createSpy(impl)` like a tiny jest.fn(). It returns a function (the spy) that:
 
 - calls impl with the same arguments and the same `this`, and returns what impl returns. When impl is omitted it returns undefined.
 - records every call: spy.calls is an array of argument arrays, in call order.

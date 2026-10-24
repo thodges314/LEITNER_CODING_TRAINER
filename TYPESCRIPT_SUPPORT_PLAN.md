@@ -45,9 +45,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **266 / 271 (98.2%)**
-- **Cards Remaining:** **5 / 271 (1.8%)**
-- **Total Batches:** 48 batches (47 completed, 1 remaining)
+- **Fully Typed Cards Completed:** **271 / 271 (100.0%)**
+- **Cards Remaining:** **0 / 271 (0.0%)**
+- **Total Batches:** 48 batches (48 completed, 0 remaining)
 
 ### Track Completion Status
 
@@ -61,14 +61,14 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
 | **`react`**               |     27      |      27      |   100.0%   | **COMPLETE** (Batches 35–39)                          |
 | **`react-components`**    |     45      |      45      |   100.0%   | **COMPLETE** (Batches 40–47)                          |
-| **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
-| **TOTAL**                 |   **271**   |   **266**    | **98.2%**  | **48 Batches Total**                                  |
+| **`testing-tooling`**     |      5      |      5       |   100.0%   | **COMPLETE** (Batch 48)                               |
+| **TOTAL**                 |   **271**   |   **271**    | **100.0%** | **48 Batches Total (100% COMPLETE)**                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–47: 266 Cards)
+## 4. Completed Batches (Batches 1–48: 271 Cards — 100% Complete)
 
-All 266 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 271 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -141,24 +141,19 @@ All 266 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 46 (Trees & Multi-Lists — 5 cards):** `file-explorer-tree`, `flatten-visible-tree`, `nested-checkbox-tree`, `transfer-list`, `move-between-lists`.
 - **Batch 47 (Accessibility & Routing — 7 cards):** `a11y-form-field`, `live-announcer`, `roving-tabindex-toolbar`, `switch-toggle-a11y`, `form-error-summary`, `breadcrumbs-router`, `route-focus-and-skip-link`.
 
----
+### Testing & Tooling Track (5 Cards — 100% Complete)
 
-## 5. Master Roadmap for Remaining Work (Batch 48: 5 Cards)
-
-Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
+- **Batch 48 (Testing Utilities & Spies — 5 cards):** `call-recorder-spy`, `mock-fn`, `fake-timers`, `mini-expect`, `test-runner-lifecycle`.
 
 ---
 
-### Track: `testing-tooling` (5 cards — Batch 48)
+## 5. Master Roadmap Status (100% Complete — 0 Cards Remaining)
 
-_Focus: Typed assertion chains, spy functions, and mock lifecycle hooks._
-
-- **Batch 48: Testing Utilities & Spies (5 cards)**
-  - `call-recorder-spy`: A Call-Recording Spy
-  - `mock-fn`: Mock Function: Call & Argument Tracker (Jest-Style fn)
-  - `fake-timers`: Fake Timers: Virtual Micro-Clock Harness
-  - `mini-expect`: Mini Expect: Assertion Runner with Deep Equality & Not Chaining
-  - `test-runner-lifecycle`: Test Runner Lifecycle: Nested Describe, Hooks & Hierarchical Reporter
+All 271 cards across all 9 tracks in the deck have received:
+- Explicit typed Markdown signatures in their prompt headings (`### fn(args): ReturnType` / `### Component({ props }: { ... }): JSX.Element`).
+- Strict TypeScript reference solutions (`.ref.ts`) with zero compilation errors, zero `any`, and zero `@ts-ignore` pragmas.
+- Ingestion into `src/data/topics.json` via `build-cards.mjs`.
+- 100% passing automated test coverage under the dual-mode test harness (`seedCards.test.ts`).
 
 ---
 

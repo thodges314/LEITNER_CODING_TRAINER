@@ -412,14 +412,14 @@ Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates r
 - **Phase 2 Buffer Policy (Complete)**:
   - Cold-start recall integrity is strictly preserved: the editor buffer is NOT overwritten or injected with stubs upon switching between JS and TS modes.
   - Typed signatures are embedded into prompt headings (`### fn(arg: Type): ReturnType`).
-- **Phase 3 Dual Solutions Rollout** (in progress; 266 of 271 cards have a `.ref.ts`; `npm run report:ts` prints the live numbers; `TYPESCRIPT_SUPPORT_PLAN.md` is the authoritative batch-by-batch status):
-  - Complete: Algorithms, Async JS, JS Language, TypeScript Patterns, JS Utilities, DOM/Browser, React, and React Components tracks (8 tracks, 100% complete).
-  - Remaining: Testing/Tooling (5 cards).
+- **Phase 3 Dual Solutions Rollout (Complete)**:
+  - 271 of 271 cards (100.0%) across all 9 tracks now have canonical `.ref.ts` solutions and explicit typed signatures in prompt headers.
+  - Complete: Algorithms (77/77), Async JS (21/21), JS Language (25/25), TypeScript Patterns (14/14), JS Utilities (37/37), DOM/Browser (20/20), React (27/27), React Components (45/45), and Testing/Tooling (5/5).
+  - All 48 batches verified with dual-mode seed tests (`seedCards.test.ts`), `npx tsc -b`, `npm run lint`, and `npm test`.
 
 #### Next Steps (in priority order)
-1. Complete remaining TypeScript dual-solution batches on `feature/typescript-support` (Trees/Graphs -> Lists/Heaps -> React -> JS Utilities).
-2. Keep `npm run e2e` green on `master` (run after card/runner modifications).
-3. Wrong-answer ("mutation") checks per card across `scripts/mutation-baseline.jsonl`.
+1. Keep `npm run e2e` green on `master` (run after card/runner modifications).
+2. Wrong-answer ("mutation") checks per card across `scripts/mutation-baseline.jsonl`.
 4. Content gaps: accessibility rungs, CSS (needs real-browser layout grading), DOM/browser extras, remaining ladder holes (§7.1), then React 19 APIs.
 5. Product: "Front-end screen" Focus preset + interview-importance weighting, stats/history view (staged unlocks respect Focus).
 6. Complexity fields: maintain algorithm-only scoping, normalized notation, human spot-check.
