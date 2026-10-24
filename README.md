@@ -64,7 +64,7 @@ Settings accepts Gemini, OpenAI, Groq, OpenRouter, or any OpenAI-compatible endp
 
 ## Content & Authoring Pipeline
 
-The deck includes **271 cards** across 9 tracks (218 default + 53 in the optional `algorithms-advanced` pack) with **1,934 test cases**:
+The deck includes **277 cards** across 9 tracks (224 default + 53 in the optional `algorithms-advanced` pack) with **1,964 test cases**:
 - **100% Structured Markdown Instructions**: Every card features clean GitHub-flavored Markdown instructions detailing the problem description, target signature, parameters, return value, constraints, and edge cases.
 - **Authoring Model**: Cards are primarily AI-written through structured batch pipelines into `scripts/cards/` and `scripts/testcases/`. Rather than relying on unverified generators, every card is gated by automated test runners, contract extraction, reference validation, empty-solution rejection, and mutation test verification.
 - **Dual-Solution Architecture**: Reference solutions are authored in `scripts/cards/<id>.ref.js` and optionally `<id>.ref.ts`.
@@ -79,7 +79,7 @@ The deck includes **271 cards** across 9 tracks (218 default + 53 in the optiona
   the page's real DOM in the browser and jsdom in tests, with a mock `IntersectionObserver` and a deterministic `fetch`.
   Built-in prototypes patched by a solution (polyfill cards) are restored after each run.
 
-The test suite (`1,693 Vitest tests` + `590 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
+The test suite (`1,729 Vitest tests` + `602 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
 
 ## Deploy
 

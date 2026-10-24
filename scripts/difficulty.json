@@ -1082,5 +1082,30 @@
   "object-diff": {
     "difficulty": 3,
     "concept": "object-diff"
+  },
+  "stepper": {
+    "difficulty": 3,
+    "concept": "wizard"
+  },
+  "popover": {
+    "difficulty": 3,
+    "concept": "popover"
+  },
+  "nested-comments": {
+    "difficulty": 3,
+    "concept": "comments"
+  },
+  "kanban-board": {
+    "difficulty": 4,
+    "concept": "kanban"
+  },
+  "drag-sortable-list": {
+    "difficulty": 3,
+    "concept": "reorder"
+  },
+  "combobox-autocomplete-a11y": {
+    "difficulty": 5,
+    "concept": "a11y-components"
   }
 }
+

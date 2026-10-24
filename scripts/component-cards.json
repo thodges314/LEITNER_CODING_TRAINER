@@ -42,5 +42,11 @@
   "route-focus-and-skip-link",
   "action-state-form",
   "suspense-use-promise",
-  "tabs-transition-suspense"
+  "tabs-transition-suspense",
+  "stepper",
+  "popover",
+  "nested-comments",
+  "kanban-board",
+  "drag-sortable-list",
+  "combobox-autocomplete-a11y"
 ]
