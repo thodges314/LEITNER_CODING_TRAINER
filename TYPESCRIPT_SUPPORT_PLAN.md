@@ -45,30 +45,30 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **162 / 271 (59.8%)**
-- **Cards Remaining:** **109 / 271 (40.2%)**
-- **Total Batches:** 48 batches (25 completed, 23 remaining)
+- **Fully Typed Cards Completed:** **168 / 271 (62.0%)**
+- **Cards Remaining:** **103 / 271 (38.0%)**
+- **Total Batches:** 48 batches (29 completed, 19 remaining)
 
 ### Track Completion Status
 
-| Track                     | Cards Total | TS Completed | % Complete | Status                                                    |
-| :------------------------ | :---------: | :----------: | :--------: | :-------------------------------------------------------- |
-| **`algorithms`**          |     77      |      77      |   100.0%   | **COMPLETE** (Batches 1–11)                               |
-| **`async-js`**            |     21      |      21      |   100.0%   | **COMPLETE** (Batches 12–15)                              |
-| **`js-language`**         |     25      |      25      |   100.0%   | **COMPLETE** (Batches 16–20)                              |
-| **`typescript-patterns`** |     14      |      14      |   100.0%   | **COMPLETE** (Batches 21–23)                              |
-| **`js-utilities`**        |     37      |      25      |   67.6%    | In Progress (Batches 24–28 done, Batches 29–30 remaining) |
-| **`dom-browser`**         |     20      |      0       |    0.0%    | Planned (Batches 31–34)                                   |
-| **`react`**               |     27      |      0       |    0.0%    | Planned (Batches 35–39)                                   |
-| **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                                   |
-| **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                        |
-| **TOTAL**                 |   **271**   |   **162**    | **59.8%**  | **48 Batches Total**                                      |
+| Track                     | Cards Total | TS Completed | % Complete | Status                                                |
+| :------------------------ | :---------: | :----------: | :--------: | :---------------------------------------------------- |
+| **`algorithms`**          |     77      |      77      |   100.0%   | **COMPLETE** (Batches 1–11)                           |
+| **`async-js`**            |     21      |      21      |   100.0%   | **COMPLETE** (Batches 12–15)                          |
+| **`js-language`**         |     25      |      25      |   100.0%   | **COMPLETE** (Batches 16–20)                          |
+| **`typescript-patterns`** |     14      |      14      |   100.0%   | **COMPLETE** (Batches 21–23)                          |
+| **`js-utilities`**        |     37      |      31      |   83.8%    | In Progress (Batches 24–29 done, Batch 30 remaining)  |
+| **`dom-browser`**         |     20      |      0       |    0.0%    | Planned (Batches 31–34)                               |
+| **`react`**               |     27      |      0       |    0.0%    | Planned (Batches 35–39)                               |
+| **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                               |
+| **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
+| **TOTAL**                 |   **271**   |   **168**    | **62.0%**  | **48 Batches Total**                                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–25 plus Batches 26-28: 162 Cards)
+## 4. Completed Batches (Batches 1–29: 168 Cards)
 
-All 162 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 168 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -105,49 +105,24 @@ All 162 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 22 (Utility Types & Conditional Types — 5 cards):** `ts-reimplement-utility-types`, `ts-custom-utility-types`, `ts-infer-conditional-unpack`, `ts-mapped-modifiers-deep-readonly`, `ts-template-literal-strings`.
 - **Batch 23 (Advanced Overloads & Generic Components — 4 cards):** `ts-overloads-exhaustive-narrowing`, `ts-generic-api-client`, `ts-generic-component-props`, `ts-typed-event-emitter`.
 
-### JavaScript Utilities Track (10 of 37 Cards)
+### JavaScript Utilities Track (31 of 37 Cards)
 
 - **Batch 24 (Function Timing & Throttling — 5 cards):** `debounce-implementation`, `throttle-implementation`, `debounce`, `throttle`, `rate-limiter-middleware`.
 - **Batch 25 (Memoization & Functional Patterns — 5 cards):** `memoize-basics`, `memoize`, `curry-compose`, `infinite-currying-sum`, `classnames-utility`.
+- **Batch 26 (Collections, Maps & Sets — 5 cards):** `map-frequency-counter`, `set-unique-operations`, `group-by-count-by`, `unique-sort-dedupe`, `custom-array-reduce`.
+- **Batch 27 (Array Manipulation & Polyfills — 5 cards):** `array-method-polyfills`, `array-flatten-recursive`, `flatten-array-object`, `format-utilities`, `calendar-month-grid`.
+- **Batch 28 (Object Cloning, Equality & Diffing — 5 cards):** `shallow-copy-equal`, `object-deep-clone`, `deep-clone`, `deep-equal`, `object-diff`.
+- **Batch 29 (Object Path Access & Merging — 6 cards):** `get-set-path`, `deep-merge-objects`, `highlight-matches`, `simple-stringify`, `json-stringify-polyfill`, `query-string-url`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 29–48: 109 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 30–48: 103 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
-### Track: `js-utilities` (12 cards remaining — Batches 29 to 30)
+### Track: `js-utilities` (6 cards remaining — Batch 30)
 
 _Focus: Generic parameters `<T, R>`, function types, and mapped object constraints._
-
-- **Batch 26: Collections, Maps & Sets (5 cards)**
-  - `map-frequency-counter`: Frequency Counter via Native Map
-  - `set-unique-operations`: Set Operations & Array Deduplication
-  - `group-by-count-by`: groupBy / countBy / keyBy with reduce
-  - `unique-sort-dedupe`: Immutable Dedupe and Multi-Key Sort
-  - `custom-array-reduce`: Custom Array.prototype.reduce
-
-- **Batch 27: Array Manipulation & Polyfills (5 cards)**
-  - `array-method-polyfills`: Array map / filter / reduce Polyfills
-  - `array-flatten-recursive`: Recursive Array Flattening
-  - `flatten-array-object`: Flatten Nested Arrays and Objects
-  - `format-utilities`: Formatting: Numbers, Bytes, Relative Time, Truncate
-  - `calendar-month-grid`: Calendar Month Grid
-
-- **Batch 28: Object Cloning, Equality & Diffing (5 cards)**
-  - `shallow-copy-equal`: Shallow Copy and Shallow Equal
-  - `object-deep-clone`: Deep Clone of Plain Objects
-  - `deep-clone`: Deep Clone with Cycles
-  - `deep-equal`: Deep Equality Comparison
-  - `object-diff`: Object Diff (changed, added, removed)
-
-- **Batch 29: Object Path Access & Merging (6 cards)**
-  - `get-set-path`: Safe get / set by Path
-  - `deep-merge-objects`: Deep Merge Objects
-  - `highlight-matches`: Highlight Search Matches
-  - `simple-stringify`: Serialization: simpleStringify (Primitives and Arrays)
-  - `json-stringify-polyfill`: JSON.stringify Polyfill
-  - `query-string-url`: Query String Parse / Stringify
 
 - **Batch 30: Caching & Event Architectures (6 cards)**
   - `fifo-cache`: Fixed-Size Cache (evict oldest)
@@ -331,9 +306,8 @@ Every single batch follows this strict automated loop:
 >
 > ### Checkpoint & Quota Pause (21 October 2026)
 >
-> - **State (23 October 2026):** Batches 1–28 (162 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
-> - **WIP branch:** `wip/batch-26-map-frequency-counter` was merged into `feature/ts-coverage`. It can be deleted.
-> - **Next step:** Batch 29 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
+> - **State (24 October 2026):** Batches 1–29 (168 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
+> - **Next step:** Batch 30 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
 > - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.
 >
 > ### Handoff procedure (for any assistant resuming card work)

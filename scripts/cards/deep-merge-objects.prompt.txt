@@ -1,6 +1,6 @@
 Implement recursive object merging with prototype pollution defenses:
 
-### `deepMerge(target, ...sources)`
+### `deepMerge<T extends Record<string, unknown> = Record<string, unknown>>(target: unknown, ...sources: unknown[]): T`
 - Recursively merges all `sources` into `target` (or a fresh target object) without mutating any source.
 - **Value Semantics**:
   - Plain objects are merged recursively by key.

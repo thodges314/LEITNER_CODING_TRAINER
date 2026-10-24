@@ -1,6 +1,6 @@
 Implement a lightweight stringifier for primitive values and arrays, **without calling `JSON.stringify`**. It should return the same text `JSON.stringify` would, except that `NaN` and `±Infinity` become `'null'`.
 
-### `simpleStringify(value)`
+### `simpleStringify(value: unknown): string | undefined`
 
 Returns a **string** (or `undefined`). Everything below is written as JavaScript literals, so `\n` and `\\` inside quotes are escape sequences.
 

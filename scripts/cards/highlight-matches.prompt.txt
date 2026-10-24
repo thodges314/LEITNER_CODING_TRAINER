@@ -1,6 +1,6 @@
 Implement text segmentation for search-result highlighting:
 
-### `highlightMatches(text, query)`
+### `highlightMatches(text: string, query: string): Array<{ text: string; match: boolean }>`
 - Splits `text` into an array of consecutive segments `{ text, match }`.
 - `match` is `true` for substrings matching `query` and `false` for non-matching text in between.
 - **Matching Rules**:

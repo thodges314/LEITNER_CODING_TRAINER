@@ -1,6 +1,6 @@
 Implement a recursive `JSON.stringify` polyfill from scratch without delegating to `JSON.stringify`:
 
-### `stringify(value)`
+### `stringify(value: unknown): string | undefined`
 - Converts JavaScript values into JSON strings matching standard `JSON.stringify` serialization.
 - **Primitives**:
   - Strings are enclosed in double quotes with escape sequences (`\"`, `\\`, `\b`, `\f`, `\n`, `\r`, `\t`, and `\u00XX` for control characters).
