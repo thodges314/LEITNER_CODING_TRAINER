@@ -45,9 +45,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **244 / 271 (90.0%)**
-- **Cards Remaining:** **27 / 271 (10.0%)**
-- **Total Batches:** 48 batches (43 completed, 5 remaining)
+- **Fully Typed Cards Completed:** **249 / 271 (91.9%)**
+- **Cards Remaining:** **22 / 271 (8.1%)**
+- **Total Batches:** 48 batches (44 completed, 4 remaining)
 
 ### Track Completion Status
 
@@ -60,15 +60,15 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`js-utilities`**        |     37      |      37      |   100.0%   | **COMPLETE** (Batches 24–30)                          |
 | **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
 | **`react`**               |     27      |      27      |   100.0%   | **COMPLETE** (Batches 35–39)                          |
-| **`react-components`**    |     45      |      23      |   51.1%    | In Progress (Batches 40–43 done, Batches 44–47 remaining) |
+| **`react-components`**    |     45      |      28      |   62.2%    | In Progress (Batches 40–44 done, Batches 45–47 remaining) |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
-| **TOTAL**                 |   **271**   |   **244**    | **90.0%**  | **48 Batches Total**                                  |
+| **TOTAL**                 |   **271**   |   **249**    | **91.9%**  | **48 Batches Total**                                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–43: 244 Cards)
+## 4. Completed Batches (Batches 1–44: 249 Cards)
 
-All 244 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 249 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -130,31 +130,25 @@ All 244 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 38 (Context, External Stores & Performance — 6 cards):** `context-provider-consumer`, `theme-switcher`, `external-store-hook`, `forward-ref-imperative-handle`, `memo-derived-list`, `memo-stable-callbacks`.
 - **Batch 39 (Async, Debouncing & React 19 Concurrent — 6 cards):** `use-debounce-hook`, `use-fetch-basic`, `use-fetch-hook`, `action-state-form`, `suspense-use-promise`, `tabs-transition-suspense`.
 
-### React Components Track (23 of 45 Cards)
+### React Components Track (28 of 45 Cards)
 
 - **Batch 40 (Timers, Ratings & Tic-Tac-Toe — 6 cards):** `star-rating-component`, `countdown-component`, `progress-bar`, `stopwatch`, `tic-tac-toe`, `calculate-winner`.
 - **Batch 41 (Tooltips, Menus & Notifications — 6 cards):** `tooltip`, `dropdown-menu`, `optimistic-like-button`, `optimistic-list-update`, `toast-queue`, `toast-queue-logic`.
 - **Batch 42 (Accordions, Tabs & Modals — 5 cards):** `accordion-component`, `tabs-accordion-compound`, `modal-portal-focus`, `error-boundary-reset`, `simple-error-boundary`.
 - **Batch 43 (Lists, Filtering & Pagination — 6 cards):** `filter-list`, `paginate-items`, `load-more-list`, `pagination-controls`, `simple-table`, `data-table`.
+- **Batch 44 (Virtualization & Carousels — 5 cards):** `infinite-scroll-list`, `virtual-list`, `visible-window-range`, `image-carousel`, `carousel-index-math`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 44–48: 27 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 45–48: 22 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
 ---
 
-### Track: `react-components` (22 cards remaining — Batches 44 to 47)
+### Track: `react-components` (17 cards remaining — Batches 45 to 47)
 
 _Focus: React props interfaces (`interface ButtonProps`, `SelectProps<T>`), compound components, and accessibility._
-
-- **Batch 44: Virtualization & Carousels (5 cards)**
-  - `infinite-scroll-list`: Infinite Scroll List with IntersectionObserver
-  - `virtual-list`: Virtual Windowed List (Basic Windowing)
-  - `visible-window-range`: Virtual List Window Range Math
-  - `image-carousel`: Image Carousel / Slider
-  - `carousel-index-math`: Carousel Index Math: Next, Prev & Direct Index
 
 - **Batch 45: Complex Form Inputs & Chips (5 cards)**
   - `typeahead-autocomplete`: Typeahead / Autocomplete Component

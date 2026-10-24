@@ -1,6 +1,6 @@
 Calculate visible row ranges and offsets for a fixed-height virtualized list:
 
-### `getVisibleRange({ scrollTop, itemHeight, viewportHeight, itemCount, overscan = 0 })`
+### getVisibleRange({ scrollTop, itemHeight, viewportHeight, itemCount, overscan = 0 }: { scrollTop: number; itemHeight: number; viewportHeight: number; itemCount: number; overscan?: number }): { start: number; end: number; offsetTop: number; totalHeight: number }:
 - Returns `{ start, end, offsetTop, totalHeight }`.
 
 #### Boundary & Scroll Clamping

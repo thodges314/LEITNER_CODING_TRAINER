@@ -1,5 +1,6 @@
-Build `VirtualList({ items, itemHeight, height, overscan = 3 })` for long lists of strings.
+Build a virtualized list component for long lists of strings:
 
+### VirtualList({ items, itemHeight, height, overscan = 3 }: { items: string[]; itemHeight: number; height: number; overscan?: number }): JSX.Element:
 - Render `<div role="list" style={{ height, overflowY: 'auto', position: 'relative' }} onScroll>` containing **ONE** inner `<div>` whose `style.height` is `items.length * itemHeight` (the full scroll height, `position: 'relative'`).
 - Inside the scroll container, render only the visible window:
   - Items from `max(0, floor(scrollTop / itemHeight) - overscan)` up to `min(items.length, ceil((scrollTop + height) / itemHeight) + overscan)`.

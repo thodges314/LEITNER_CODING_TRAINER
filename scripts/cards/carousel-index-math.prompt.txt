@@ -1,19 +1,19 @@
 Implement pure helper functions to manage index calculations and indicator states for a carousel (indexes `0` to `length - 1`):
 
-### `nextIndex(index, length, { loop = true } = {})`
+### nextIndex(index: number, length: number, { loop = true }: { loop?: boolean } = {}): number:
 - Computes the index after pressing Next.
 - When reaching past the last slide (`index >= length - 1`):
   - Wraps to `0` if `loop` is `true`.
   - Stays on the last slide (`length - 1`) if `loop` is `false`.
 - If `length <= 0`, returns `0`.
 
-### `prevIndex(index, length, { loop = true } = {})`
+### prevIndex(index: number, length: number, { loop = true }: { loop?: boolean } = {}): number:
 - Computes the index after pressing Previous.
 - When at or before the first slide (`index <= 0`):
   - Wraps to the last slide (`length - 1`) if `loop` is `true`.
   - Stays at `0` if `loop` is `false`.
 - If `length <= 0`, returns `0`.
 
-### `dotStates(index, length)`
+### dotStates(index: number, length: number): boolean[]:
 - Returns an array of `length` booleans where only the element at `index` is `true`, and all other elements are `false`.
 - If `length <= 0`, returns `[]`.

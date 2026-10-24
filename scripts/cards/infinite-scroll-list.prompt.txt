@@ -1,6 +1,8 @@
-Build `InfiniteList({ items, onLoadMore, hasMore, loading })`.
+Build an infinite scroll list with an intersection sentinel:
 
-- Render `items` in a list followed by a sentinel element observed with an `IntersectionObserver`.
+### InfiniteList({ items = [], onLoadMore, hasMore, loading }: { items?: string[]; onLoadMore: () => void; hasMore: boolean; loading: boolean }): JSX.Element:
+- Render `items` in a list (`<ul>` with one `<li>` per item) followed by a sentinel element observed with an `IntersectionObserver`.
+- The sentinel is `<li ref={sentinelRef} data-sentinel aria-hidden="true" />`.
 - When the sentinel intersects (becomes visible), call `onLoadMore()`.
 - Do not call `onLoadMore()` while `loading` is `true`.
 - When `hasMore` is `false`, stop loading and disconnect the observer.

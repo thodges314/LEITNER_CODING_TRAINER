@@ -1,6 +1,7 @@
-Build `Carousel({ slides, loop = true, autoPlayMs })` for an array of slide strings.
+Build an accessible image carousel component for an array of slide strings:
 
-- **DOM Structure**: Render `<section aria-roledescription="carousel" aria-label="Gallery" tabIndex={0}>` showing **ONLY** the current slide inside `<div role="group" aria-roledescription="slide" aria-label="N of Total">` (1-based).
+### Carousel({ slides, loop = true, autoPlayMs }: { slides: string[]; loop?: boolean; autoPlayMs?: number }): JSX.Element:
+- **DOM Structure**: Render `<section aria-roledescription="carousel" aria-label="Gallery" tabIndex={0}>` showing **ONLY** the current slide inside `<div role="group" aria-roledescription="slide" aria-label="N of Total">` (1-based, e.g. `"1 of 3"`).
 - **Navigation Controls**:
   - Provide `<button>Previous</button>` and `<button>Next</button>`. With `loop`, they wrap around; without `loop`, they are disabled at the ends.
   - Provide one dot button per slide with `aria-label="Go to slide N"` and `aria-current="true"` on the active dot only.
