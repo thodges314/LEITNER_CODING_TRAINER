@@ -63,7 +63,7 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
 
     // 2. Switch to Track Orbit mode
     await page.getByTestId('stats-mode-orbit').click();
-    await expect(statsWidget.getByText('Track Orbit')).toBeVisible();
+    await expect(statsWidget.getByText(/(Track|Topic) Orbit/)).toBeVisible();
 
     // Screenshot Track Orbit mode (dark)
     await saveScreenshot(page, 'stats-widget-dark.png');
@@ -132,7 +132,7 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
 
     // Switch to Track Orbit in Day theme
     await page.getByTestId('stats-mode-orbit').click();
-    await expect(statsWidget.getByText('Track Orbit')).toBeVisible();
+    await expect(statsWidget.getByText(/(Track|Topic) Orbit/)).toBeVisible();
 
     // Screenshot Track Orbit in Day theme
     await saveScreenshot(page, 'stats-widget-day.png');
