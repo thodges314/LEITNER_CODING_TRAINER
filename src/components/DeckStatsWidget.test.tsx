@@ -6,7 +6,6 @@ import { DeckStatsWidget } from './DeckStatsWidget';
 import type { TopicItem, LeitnerDeckState } from '../lib/leitner';
 
 // Configure React act environment for jsdom
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const mockTopics: TopicItem[] = [

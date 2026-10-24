@@ -6,7 +6,6 @@ import { PracticeArena } from './PracticeArena';
 import type { TopicItem } from '../lib/leitner';
 import { getPreferredExecutionMode, setPreferredExecutionMode } from '../lib/editorSettings';
 
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const algorithmCard: TopicItem = {

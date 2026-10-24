@@ -4,7 +4,6 @@ import { act } from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 import { CatalogControls } from './CatalogControls';
 
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('CatalogControls', () => {

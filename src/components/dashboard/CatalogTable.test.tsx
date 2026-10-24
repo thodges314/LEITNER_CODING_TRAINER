@@ -5,7 +5,6 @@ import * as ReactDOMClient from 'react-dom/client';
 import { CatalogTable } from './CatalogTable';
 import type { TopicItem } from '../../lib/leitner';
 
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const testCards: TopicItem[] = [
