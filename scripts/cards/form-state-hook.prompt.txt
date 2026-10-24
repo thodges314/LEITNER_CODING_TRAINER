@@ -1,6 +1,7 @@
-### useForm<T extends Record<string, unknown>>(options: UseFormOptions<T>): UseFormReturn<T>
-Write `useForm({ initialValues, validate = () => ({}), onSubmit })` returning `{ values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset }`:
+Implement a form state management hook:
 
+### useForm<T extends Record<string, unknown>>({ initialValues, validate = () => ({}), onSubmit }: UseFormOptions<T>): UseFormReturn<T>:
+- Returns `{ values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset }`.
 - `handleChange(e)` reads `e.target.{name, type, value, checked}` and updates that field (checkboxes use `checked`).
 - `handleBlur(e)` marks `e.target.name` touched.
 - `errors` is `validate(values)` for the CURRENT values.

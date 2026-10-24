@@ -1,6 +1,6 @@
-### addToast(toasts: Toast[], toast: Toast, max?: number): Toast[]:
 Implement pure state helper functions to manage a toast notification queue (`{ id, message, expiresAt? }`) without mutating input arrays:
 
+### addToast(toasts: Toast[], toast: Toast, max: number = 3): Toast[]:
 - If a toast with the same `id` already exists:
   - Updates that toast in-place by merging new fields while preserving its queue position.
 - Otherwise:

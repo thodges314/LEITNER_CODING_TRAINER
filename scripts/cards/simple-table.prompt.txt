@@ -1,6 +1,7 @@
-### SimpleTable<T extends Record<string, unknown>>(props: SimpleTableProps<T>): JSX.Element:
-Build `SimpleTable({ columns, rows })` where `columns` is `[{ key, label }]` and `rows` is an array of objects.
+Build a simple table component:
 
+### SimpleTable<T extends Record<string, unknown>>({ columns, rows }: SimpleTableProps<T>): JSX.Element:
+- `columns` is an array of `[{ key, label }]` and `rows` is an array of objects.
 - Render a `<table>` with a `<thead>` row of `<th>` cells showing each `label`.
 - Render a `<tbody>` with one `<tr>` per row and one `<td>` per column in `columns` order showing `String(row[column.key])` (or an empty string `''` for missing, `undefined`, or `null` values).
 - When `rows` is empty, render a single `<tr>` with one `<td colSpan={columns.length}>` reading `'No rows'`.

@@ -1,6 +1,6 @@
-### SearchForm(props: { onSearch: (query: string) => void }): JSX.Element
 Build a controlled search form component in React:
 
+### SearchForm({ onSearch }: SearchFormProps): JSX.Element:
 - Renders a `<form>` containing a controlled `<input>` and a `<button type="submit">Search</button>`.
 - **Controlled State**:
   - Maintains `query` state via `useState('')`.

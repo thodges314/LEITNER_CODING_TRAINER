@@ -1,6 +1,6 @@
-### useHistory<T>(initial: T, limit?: number): UseHistoryReturn<T>
-Write `useHistory(initial, limit = 100)`:
+Implement an undo/redo state history hook:
 
+### useHistory<T>(initial: T, limit: number = 100): UseHistoryReturn<T>:
 - **Returns**: `{ state, set, undo, redo, canUndo, canRedo }`.
 - **`set(valueOrUpdater)`**:
   - Pushes a new present state (an updater function receives the current `state`).

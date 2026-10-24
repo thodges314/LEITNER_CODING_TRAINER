@@ -1,2 +1,7 @@
-### ErrorBoundary(props: ErrorBoundaryProps): JSX.Element:
-Write an ErrorBoundary class component with props { fallback, onError, resetKeys, children }. It renders children normally; when a descendant throws while rendering it shows the fallback instead — `fallback` is either a React node or a function (error, reset) => node — and calls onError(error, info) once. Calling reset() retries the children. When the `resetKeys` array changes (compare item by item with Object.is) while an error is showing, the boundary resets itself.
+Write an ErrorBoundary class component:
+
+### ErrorBoundary({ fallback, onError, resetKeys, children }: ErrorBoundaryProps): JSX.Element:
+- It renders `children` normally.
+- When a descendant throws while rendering it shows the fallback instead — `fallback` is either a React node or a function `(error, reset) => node` — and calls `onError(error, info)` once.
+- Calling `reset()` retries the children.
+- When the `resetKeys` array changes (compare item by item with `Object.is`) while an error is showing, the boundary resets itself.

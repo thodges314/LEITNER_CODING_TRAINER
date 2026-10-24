@@ -1,11 +1,11 @@
 Implement two custom utility hooks: `useToggle` and `useCounter`.
 
-### useToggle(initial?: boolean): [boolean, () => void, (next: boolean) => void]
+### useToggle(initial: boolean = false): [boolean, () => void, (next: boolean) => void]:
 - **Returns**: `[value, toggle, setValue]`.
 - `toggle()`: Flips `value`. It must ignore any passed arguments (e.g. an `onClick` event) and maintain a stable function identity across renders.
 - `setValue(next)`: Directly sets `value` to `next` (boolean).
 
-### useCounter(options?: UseCounterOptions): UseCounterReturn
+### useCounter({ initial = 0, min = -Infinity, max = Infinity, step = 1 }: UseCounterOptions = {}): UseCounterReturn:
 - **Returns**: `{ count, increment, decrement, reset, set }`.
 - **Clamping**: All operations clamp `count` to `[min, max]`, including the initial value, `increment()`, `decrement()`, and `set(n)`.
 - **Operations**:

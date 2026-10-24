@@ -4,7 +4,7 @@ Implement a factory function for a React Theme Context:
 - Creates an internal React context via `createContext(null)`.
 - Returns an object containing `{ ThemeProvider, useTheme }`.
 
-### ThemeProvider(props: ThemeProviderProps): JSX.Element
+### ThemeProvider({ children, defaultTheme = 'light' }: ThemeProviderProps): JSX.Element:
 - Manages theme state (`'light' | 'dark'`) initialized to `defaultTheme` (defaults to `'light'`).
 - Provides a context value object: `{ theme, setTheme, toggle }`.
   - `toggle()` flips between `'light'` and `'dark'`.

@@ -1,6 +1,7 @@
-### DropdownMenu(props: DropdownMenuProps): JSX.Element:
-Build `DropdownMenu({ label, items, onSelect })` where `items` is `[{ id, label, disabled? }]`.
+Build an accessible dropdown menu component:
 
+### DropdownMenu({ label, items, onSelect }: DropdownMenuProps): JSX.Element:
+- `items` is an array of `[{ id, label, disabled? }]`.
 - **Trigger**: A trigger `<button aria-haspopup="menu" aria-expanded>` shows `label` and toggles the menu.
 - **Menu**: While open, render `<ul role="menu">` with `<li role="menuitem" tabIndex={-1}>` items (disabled ones get `aria-disabled="true"`).
 - **Keyboard Navigation**:

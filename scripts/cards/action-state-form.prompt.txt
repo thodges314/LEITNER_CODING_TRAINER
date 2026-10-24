@@ -1,8 +1,8 @@
-### SubscribeForm(props: SubscribeFormProps): JSX.Element
-Build SubscribeForm({ subscribe }) using a React 19 form action. subscribe(email) is async and resolves to { ok: true } or { ok: false, error: string }.
+Build a subscription form using a React 19 form action:
 
-Use useActionState(action, { status: 'idle', message: '' }); it returns [state, formAction, isPending]. Render <form action={formAction}> with <input name="email" aria-label="Email">, a submit button, and <p role="status">{state.message}</p>.
-
-The action is async and receives (previousState, formData). Read the email with formData.get('email') and trim it. A blank email returns { status: 'error', message: 'Enter an email' } without calling subscribe. Otherwise await subscribe(email): on ok return { status: 'success', message: `Subscribed ${email}` }, on failure return { status: 'error', message: result.error }.
-
-The button is disabled and reads "Subscribing…" while isPending, and reads "Subscribe" otherwise. `useActionState` is available as a plain name.
+### SubscribeForm({ subscribe }: SubscribeFormProps): JSX.Element:
+- `subscribe(email)` is async and resolves to `{ ok: true }` or `{ ok: false, error: string }`.
+- Use `useActionState(action, { status: 'idle', message: '' })`; it returns `[state, formAction, isPending]`.
+- Render `<form action={formAction}>` with `<input name="email" aria-label="Email">`, a submit button, and `<p role="status">{state.message}</p>`.
+- The action receives `(previousState, formData)`. Read the email with `formData.get('email')` and trim it. A blank email returns `{ status: 'error', message: 'Enter an email' }` without calling `subscribe`. Otherwise await `subscribe(email)`: on ok return `{ status: 'success', message: 'Subscribed ' + email }`, on failure return `{ status: 'error', message: result.error }`.
+- The button is disabled and reads `"Subscribing…"` while `isPending`, and reads `"Subscribe"` otherwise. `useActionState` is available as a plain name.

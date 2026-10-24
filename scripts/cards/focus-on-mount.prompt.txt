@@ -1,2 +1,6 @@
-### FocusInput(props: { placeholder?: string; label?: string }): JSX.Element
-Write `FocusInput({ placeholder, label })`: it renders a `<label>` with the text `label` wrapping an `<input placeholder={placeholder}>`, and focuses that input when the component first mounts (use `useRef` and `useEffect`). It must not steal focus again on later re-renders.
+Build a component that auto-focuses on initial mount:
+
+### FocusInput({ placeholder, label }: FocusInputProps): JSX.Element:
+- Renders a `<label>` with the text `label` wrapping an `<input placeholder={placeholder}>`.
+- Focuses that input when the component first mounts (use `useRef` and `useEffect`).
+- Must not steal focus again on later re-renders.

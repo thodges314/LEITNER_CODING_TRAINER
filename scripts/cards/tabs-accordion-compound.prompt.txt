@@ -1,9 +1,9 @@
-### Tabs(props: TabsProps): JSX.Element:
 Implement compound components sharing state via context:
-- `Tabs({ defaultValue, value, onChange, children })`
-- `TabList`
-- `Tab({ value })`
-- `TabPanel({ value })`
+
+### Tabs({ defaultValue, value, onChange, children }: TabsProps): JSX.Element:
+- `TabList`: container for tab buttons.
+- `Tab({ value, children })`: single tab button.
+- `TabPanel({ value, children })`: content panel associated with a tab.
 
 **Behavior & Accessibility**:
 - `Tabs` is uncontrolled when given `defaultValue`, or controlled when `value` is passed (calling `onChange(next)` on clicks).

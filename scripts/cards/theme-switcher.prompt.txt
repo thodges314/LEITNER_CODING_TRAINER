@@ -1,6 +1,6 @@
 Build a persistent Theme Context provider and hook using `localStorage`:
 
-### ThemeProvider(props: ThemeProviderProps): JSX.Element
+### ThemeProvider({ children, storageKey = 'demo-color-scheme', defaultTheme = 'light' }: ThemeProviderProps): JSX.Element:
 - Allowed themes: `'light'` and `'dark'`.
 - **Initialization**:
   - Reads `localStorage.getItem(storageKey)` during state initialization.
