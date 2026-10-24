@@ -1,6 +1,6 @@
 Build a simple table component:
 
-### SimpleTable<T extends Record<string, unknown>>({ columns, rows }: SimpleTableProps<T>): JSX.Element:
+### SimpleTable<T extends Record<string, unknown>>({ columns, rows }: { columns: Array<{ key: keyof T & string; label: string }>; rows: T[] }): JSX.Element:
 - `columns` is an array of `[{ key, label }]` and `rows` is an array of objects.
 - Render a `<table>` with a `<thead>` row of `<th>` cells showing each `label`.
 - Render a `<tbody>` with one `<tr>` per row and one `<td>` per column in `columns` order showing `String(row[column.key])` (or an empty string `''` for missing, `undefined`, or `null` values).

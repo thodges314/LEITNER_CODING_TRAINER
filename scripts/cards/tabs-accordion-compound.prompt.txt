@@ -1,9 +1,9 @@
 Implement compound components sharing state via context:
 
-### Tabs({ defaultValue, value, onChange, children }: TabsProps): JSX.Element:
-- `TabList`: container for tab buttons.
-- `Tab({ value, children })`: single tab button.
-- `TabPanel({ value, children })`: content panel associated with a tab.
+### Tabs({ defaultValue, value, onChange, children }: { defaultValue?: string; value?: string; onChange?: (value: string) => void; children: React.ReactNode }): JSX.Element:
+- `TabList({ children }: { children: React.ReactNode })`: container for tab buttons.
+- `Tab({ value, children }: { value: string; children: React.ReactNode })`: single tab button.
+- `TabPanel({ value, children }: { value: string; children: React.ReactNode })`: content panel associated with a tab.
 
 **Behavior & Accessibility**:
 - `Tabs` is uncontrolled when given `defaultValue`, or controlled when `value` is passed (calling `onChange(next)` on clicks).

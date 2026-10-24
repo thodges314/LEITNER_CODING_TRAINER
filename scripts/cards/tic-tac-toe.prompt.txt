@@ -1,6 +1,6 @@
 Build an accessible, interactive Tic-Tac-Toe game component:
 
-### TicTacToe({ onGameEnd }: TicTacToeProps): JSX.Element:
+### TicTacToe({ onGameEnd }: { onGameEnd?: (result: 'X' | 'O' | 'draw') => void }): JSX.Element:
 - `onGameEnd` is an optional callback: `onGameEnd(result)` where result is `'X'`, `'O'`, or `'draw'`.
 - Derives the winner dynamically from board state rather than storing it in state.
 

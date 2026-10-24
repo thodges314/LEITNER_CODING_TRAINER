@@ -1,6 +1,6 @@
 Build an accessible pagination bar as a controlled component:
 
-### Pagination({ page, totalPages, onPageChange, siblings = 1 }: PaginationProps): JSX.Element:
+### Pagination({ page, totalPages, onPageChange, siblings = 1 }: { page: number; totalPages: number; onPageChange: (page: number) => void; siblings?: number }): JSX.Element:
 - **DOM Structure**: Render `<nav aria-label="Pagination">` containing `<button>Previous</button>`, a `<ul>` of `<li>` items, and `<button>Next</button>`.
 - **Page Display Rules**:
   - The list always shows page `1`, the last page (`totalPages`), and the pages within `siblings` distance of the current `page`.

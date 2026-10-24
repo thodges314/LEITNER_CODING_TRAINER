@@ -1,13 +1,13 @@
 Build an accessible toast notification system:
 
-### ToastProvider({ children, limit = 3 }: ToastProviderProps): JSX.Element:
+### ToastProvider({ children, limit = 3 }: { children: React.ReactNode; limit?: number }): JSX.Element:
 - **DOM Structure**: The provider renders its `children` plus `<div role="region" aria-label="Notifications">` containing one `<div role="status">` per toast with the message text and a `<button aria-label="Dismiss">` that removes only that toast.
 - **Queue & Timing Rules**:
   - Toasts appear in creation order; only the newest `limit` are kept.
   - A toast removes itself after `duration` ms (a duration of `0` or `Infinity` keeps it until manually dismissed).
   - Clear pending timers when the provider unmounts.
 
-### useToast(): UseToastReturn
+### useToast(): { show: (message: string, options?: { duration?: number }) => number; dismiss: (id: number) => void }:
 - Custom hook returning `{ show, dismiss }`:
   - `show(message, { duration = 3000 } = {})`: adds a toast and returns its numeric `id`.
   - `dismiss(id)`: removes that toast.

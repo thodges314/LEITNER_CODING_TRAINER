@@ -1,6 +1,6 @@
 Build an accessible accordion where items can be expanded/collapsed:
 
-### Accordion({ items, allowMultiple = false }: AccordionProps): JSX.Element:
+### Accordion({ items, allowMultiple = false }: { items: Array<{ id: string; title: string; content: string }>; allowMultiple?: boolean }): JSX.Element:
 - `items` is an array of `[{ id, title, content }]`.
 - For each item, render a heading `<h3>` containing `<button id="<buttonId>" aria-expanded aria-controls="<panelId>">` with the title, followed by its panel `<div role="region" id="<panelId>" aria-labelledby="<buttonId>">` (rendered **ONLY** while open). Use `useId` so IDs are unique per component instance.
 - All panels start closed.

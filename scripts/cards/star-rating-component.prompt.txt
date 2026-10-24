@@ -1,6 +1,6 @@
 Build an accessible star rating as a controlled component:
 
-### StarRating({ value = 0, onChange, max = 5 }: StarRatingProps): JSX.Element:
+### StarRating({ value = 0, onChange, max = 5 }: { value?: number; onChange: (rating: number) => void; max?: number }): JSX.Element:
 - **DOM Structure**: Render `<div role="radiogroup" aria-label="Rating">` containing `max` `<button type="button" role="radio">` stars.
 - **ARIA & Labels**: Each button has `aria-label="1 star"`, `"2 stars"`, ..., and `aria-checked={true}` only for the star matching `value`.
 - **Roving `tabIndex`**: Only the selected star (or the first star when `value` is 0) has `tabIndex={0}`; all others have `tabIndex={-1}`.

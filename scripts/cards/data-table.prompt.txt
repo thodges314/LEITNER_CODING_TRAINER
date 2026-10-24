@@ -1,6 +1,6 @@
 Build a sortable, filterable, paginated data table component:
 
-### DataTable<T extends Record<string, unknown>>({ rows, columns, pageSize = 5 }: DataTableProps<T>): JSX.Element:
+### DataTable<T extends Record<string, unknown>>({ rows, columns, pageSize = 5 }: { rows: T[]; columns: Array<{ key: keyof T & string; label: string }>; pageSize?: number }): JSX.Element:
 - `columns` is an array of `[{ key, label }]`.
 - **Headers & Sorting**: Each `<th>` holds a `<button>` with the label and carries `aria-sort` (`"none"` | `"ascending"` | `"descending"`). Clicking a header cycles that column `none → ascending → descending → none` (sorting a different column starts at `ascending`). Numbers sort numerically, everything else with `localeCompare`. Sorting applies to ALL rows before pagination.
 - **Filtering**: An `<input aria-label="Filter">` keeps rows where ANY column's text contains the query (case-insensitive) and resets to page 1.

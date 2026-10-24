@@ -1,6 +1,6 @@
 Build a subscription form using a React 19 form action:
 
-### SubscribeForm({ subscribe }: SubscribeFormProps): JSX.Element:
+### SubscribeForm({ subscribe }: { subscribe: (email: string) => Promise<{ ok: boolean; error?: string }> }): JSX.Element:
 - `subscribe(email)` is async and resolves to `{ ok: true }` or `{ ok: false, error: string }`.
 - Use `useActionState(action, { status: 'idle', message: '' })`; it returns `[state, formAction, isPending]`.
 - Render `<form action={formAction}>` with `<input name="email" aria-label="Email">`, a submit button, and `<p role="status">{state.message}</p>`.

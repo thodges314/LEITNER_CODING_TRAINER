@@ -1,6 +1,6 @@
 Build an accessible progress bar supporting determinate and indeterminate states:
 
-### ProgressBar({ value, max = 100, label = 'Progress' }: ProgressBarProps): JSX.Element:
+### ProgressBar({ value, max = 100, label = 'Progress' }: { value?: number; max?: number; label?: string }): JSX.Element:
 - **Root Element**: Render `<div role="progressbar">` with `aria-label={label}`, `aria-valuemin="0"`, and `aria-valuemax={max}`. Let `clamped` be `value` limited to the range `[0, max]`.
 - **Determinate State** (when `value` is defined):
   - Set `aria-valuenow` to `clamped` on the root.

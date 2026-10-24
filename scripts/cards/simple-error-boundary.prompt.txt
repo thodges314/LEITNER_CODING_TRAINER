@@ -1,6 +1,6 @@
 Write SimpleErrorBoundary as a class component:
 
-### SimpleErrorBoundary({ fallback, onError, children }: SimpleErrorBoundaryProps): JSX.Element:
+### SimpleErrorBoundary({ fallback, onError, children }: { fallback: React.ReactNode; onError?: (error: Error) => void; children: React.ReactNode }): JSX.Element:
 - It renders `children` normally.
 - If any descendant throws while rendering it renders `fallback` instead (and keeps doing so), and calls `onError(error)` once with the thrown error.
 - A failure inside one boundary must not affect other boundaries or components outside it. (Error boundaries can only be class components.)

@@ -1,6 +1,6 @@
-Implement pure state helper functions to manage a toast notification queue (`{ id, message, expiresAt? }`) without mutating input arrays:
+Implement pure state helper functions to manage a toast notification queue without mutating input arrays:
 
-### addToast(toasts: Toast[], toast: Toast, max: number = 3): Toast[]:
+### addToast<T extends { id: string | number; message: string; expiresAt?: number }>(toasts: T[], toast: T, max: number = 3): T[]:
 - If a toast with the same `id` already exists:
   - Updates that toast in-place by merging new fields while preserving its queue position.
 - Otherwise:
@@ -8,10 +8,10 @@ Implement pure state helper functions to manage a toast notification queue (`{ i
   - If the resulting length exceeds `max`, drops the oldest toasts from the front so at most `max` items remain.
 - Returns the new queue array.
 
-### dismissToast(toasts: Toast[], id: string | number): Toast[]:
+### dismissToast<T extends { id: string | number }>(toasts: T[], id: string | number): T[]:
 - Returns a new array excluding the toast with the given `id`.
 - If `id` is not found, returns the queue unchanged.
 
-### expireToasts(toasts: Toast[], now: number): Toast[]:
+### expireToasts<T extends { expiresAt?: number }>(toasts: T[], now: number): T[]:
 - Returns a new array removing every toast whose `expiresAt <= now`.
 - Toasts without an `expiresAt` property never expire.

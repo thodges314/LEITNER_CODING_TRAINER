@@ -1,6 +1,6 @@
 Build an accessible modal dialog rendered with `ReactDOM.createPortal` into `document.body`:
 
-### Modal({ isOpen, onClose, children }: ModalProps): JSX.Element | null:
+### Modal({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }): JSX.Element | null:
 - Renders nothing when closed (`isOpen` is falsy).
 - **Structure**: A backdrop element containing a `role="dialog"` `aria-modal="true"` element wrapping `children`.
 - **Dismissal**:

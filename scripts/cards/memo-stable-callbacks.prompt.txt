@@ -1,6 +1,12 @@
-### Parent({ items, onListRender }: ParentProps): JSX.Element
-Prevent needless re-renders.
+Prevent needless re-renders using `React.memo` and stable callbacks:
 
-Write List({ items, onSelect, onRender }) wrapped in React.memo: it renders a <ul> with one <li> per item string (clicking an <li> calls onSelect(item)) and calls onRender() every time it renders.
+### Parent({ items, onListRender }: { items: string[]; onListRender?: () => void }): JSX.Element:
+- Has a counter button labelled `Count: N` (increments on click).
+- Shows `Selected: <item or none>`.
+- Renders `<List items={items} onSelect={...} onRender={onListRender} />`.
+- Clicking the counter or selecting an item must **not** re-render `List`; passing a new `items` array must.
 
-Write Parent({ items, onListRender }): it has a counter button labelled `Count: N` (increments on click), shows `Selected: <item or none>`, and renders <List items={items} onSelect={...} onRender={onListRender} />. Clicking the counter or selecting an item must NOT re-render List; passing a new items array must.
+### List({ items, onSelect, onRender }: { items: string[]; onSelect: (item: string) => void; onRender?: () => void }): JSX.Element:
+- Wrapped in `React.memo`.
+- Renders a `<ul>` with one `<li>` per item string (clicking an `<li>` calls `onSelect(item)`).
+- Calls `onRender()` every time it renders.

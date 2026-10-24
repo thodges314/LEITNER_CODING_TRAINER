@@ -1,6 +1,6 @@
 React 19 can read a promise during render with the `use()` API:
 
-### UserBadge({ userPromise }: UserBadgeProps): JSX.Element:
+### UserBadge({ userPromise }: { userPromise: Promise<{ name: string; role: string }> }): JSX.Element:
 - `userPromise` resolves to `{ name, role }`.
 - `UserBadge` renders `<Suspense fallback={<p>Loading…</p>}>` (the text is exactly `"Loading…"`) around a child component that calls `use(userPromise)` and renders `<p>{name} ({role})</p>`, for example `"Ada (admin)"`.
 - The parent creates the promise and keeps it the same across re-renders, so never create a promise inside the component.

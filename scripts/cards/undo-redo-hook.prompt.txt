@@ -1,6 +1,6 @@
 Implement an undo/redo state history hook:
 
-### useHistory<T>(initial: T, limit: number = 100): UseHistoryReturn<T>:
+### useHistory<T>(initial: T, limit: number = 100): { state: T; set: (valueOrUpdater: T | ((prev: T) => T)) => void; undo: () => void; redo: () => void; canUndo: boolean; canRedo: boolean }:
 - **Returns**: `{ state, set, undo, redo, canUndo, canRedo }`.
 - **`set(valueOrUpdater)`**:
   - Pushes a new present state (an updater function receives the current `state`).

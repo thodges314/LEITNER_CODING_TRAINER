@@ -1,6 +1,6 @@
 Implement a form state management hook:
 
-### useForm<T extends Record<string, unknown>>({ initialValues, validate = () => ({}), onSubmit }: UseFormOptions<T>): UseFormReturn<T>:
+### useForm<T extends Record<string, unknown>>({ initialValues, validate = () => ({}), onSubmit }: { initialValues: T; validate?: (values: T) => Partial<Record<keyof T, string>>; onSubmit?: (values: T) => Promise<void> | void }): { values: T; errors: Partial<Record<keyof T, string>>; touched: Partial<Record<keyof T, boolean>>; isSubmitting: boolean; handleChange: (e: { target: { name: string; type?: string; value: string; checked?: boolean } }) => void; handleBlur: (e: { target: { name: string } }) => void; handleSubmit: (e?: { preventDefault: () => void }) => Promise<void>; reset: () => void }:
 - Returns `{ values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset }`.
 - `handleChange(e)` reads `e.target.{name, type, value, checked}` and updates that field (checkboxes use `checked`).
 - `handleBlur(e)` marks `e.target.name` touched.

@@ -1,6 +1,6 @@
 Build a countdown timer component:
 
-### Countdown({ seconds, onDone, tickMs = 1000 }: CountdownProps): JSX.Element:
+### Countdown({ seconds, onDone, tickMs = 1000 }: { seconds: number; onDone: () => void; tickMs?: number }): JSX.Element:
 - Renders `<span role="timer">` with the remaining seconds and three buttons labelled Start, Pause and Reset.
 - Shows `seconds` and does **NOT** run until Start is clicked; while running it decrements every `tickMs`; at 0 it stops and calls `onDone` exactly once (use the latest `onDone`).
 - Pause stops the countdown and Start resumes from where it stopped; Reset stops it and restores `seconds`.
