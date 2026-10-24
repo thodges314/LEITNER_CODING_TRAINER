@@ -91,8 +91,8 @@ export const parseParagraphLines = (para: string): LineGroup[] => {
     const trimmed = line.trim();
     if (!trimmed) continue;
 
-    // Heading (#, ##, ###)
-    const headingMatch = trimmed.match(/^(#{1,3})\s+(.*)$/);
+    // Heading (#, ##, ###, ####, #####, ######)
+    const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
     if (headingMatch) {
       ulStack = [];
       olStack = [];

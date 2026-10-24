@@ -96,12 +96,16 @@ const x = 42;
 
   it('renders headings', () => {
     act(() => {
-      root.render(<MarkdownContent text={'### Heading 3\n\nSome paragraph text'} />);
+      root.render(<MarkdownContent text={'### Heading 3\n\nSome paragraph text\n\n#### Heading 4\n\nLevel 4 paragraph text'} />);
     });
 
     const h4 = container.querySelector('h4');
     expect(h4).not.toBeNull();
     expect(h4?.textContent).toBe('Heading 3');
+
+    const h5 = container.querySelector('h5');
+    expect(h5).not.toBeNull();
+    expect(h5?.textContent).toBe('Heading 4');
   });
 
   it('handles empty text gracefully', () => {
