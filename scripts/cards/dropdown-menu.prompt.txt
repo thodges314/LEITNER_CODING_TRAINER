@@ -1,7 +1,15 @@
+```ts
+interface MenuItem {
+  id: string;
+  label: string;
+  disabled?: boolean;
+}
+```
+
 Build an accessible dropdown menu component:
 
-### DropdownMenu({ label, items, onSelect }: { label: string; items: Array<{ id: string; label: string; disabled?: boolean }>; onSelect: (id: string) => void }): JSX.Element:
-- `items` is an array of `[{ id, label, disabled? }]`.
+### DropdownMenu({ label, items, onSelect }: { label: string; items: MenuItem[]; onSelect: (id: string) => void }): JSX.Element:
+- `items` is an array of `MenuItem` (`[{ id, label, disabled? }]`).
 - **Trigger**: A trigger `<button aria-haspopup="menu" aria-expanded>` shows `label` and toggles the menu.
 - **Menu**: While open, render `<ul role="menu">` with `<li role="menuitem" tabIndex={-1}>` items (disabled ones get `aria-disabled="true"`).
 - **Keyboard Navigation**:

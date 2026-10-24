@@ -1,4 +1,19 @@
-### useTransferList({ initialLeft = [], initialRight = [] }: { initialLeft?: string[]; initialRight?: string[] } = {}): { left: string[]; right: string[]; leftSelected: string[]; rightSelected: string[]; toggleLeft: (item: string) => void; toggleRight: (item: string) => void; moveRight: () => void; moveLeft: () => void; moveAllRight: () => void; moveAllLeft: () => void }:
+```ts
+interface TransferListResult {
+  left: string[];
+  right: string[];
+  leftSelected: string[];
+  rightSelected: string[];
+  toggleLeft: (item: string) => void;
+  toggleRight: (item: string) => void;
+  moveRight: () => void;
+  moveLeft: () => void;
+  moveAllRight: () => void;
+  moveAllLeft: () => void;
+}
+```
+
+### useTransferList({ initialLeft = [], initialRight = [] }: { initialLeft?: string[]; initialRight?: string[] } = {}): TransferListResult:
 
 Implement a dual-column selection manager hook `useTransferList`.
 
@@ -11,4 +26,4 @@ Implement a dual-column selection manager hook `useTransferList`.
   - `moveLeft()`: moves all items currently in `rightSelected` from `right` to `left`, and clears `rightSelected`.
   - `moveAllRight()`: moves all items from `left` to `right`, clearing `left` and `leftSelected`.
   - `moveAllLeft()`: moves all items from `right` to `left`, clearing `right` and `rightSelected`.
-- **Return Value**: Returns `{ left, right, leftSelected, rightSelected, toggleLeft, toggleRight, moveRight, moveLeft, moveAllRight, moveAllLeft }`.
+- **Return Value**: Returns `TransferListResult` containing `{ left, right, leftSelected, rightSelected, toggleLeft, toggleRight, moveRight, moveLeft, moveAllRight, moveAllLeft }`.

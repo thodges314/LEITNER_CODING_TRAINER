@@ -1,4 +1,4 @@
-interface DropdownMenuItem {
+interface MenuItem {
   id: string;
   label: string;
   disabled?: boolean;
@@ -6,7 +6,7 @@ interface DropdownMenuItem {
 
 interface DropdownMenuProps {
   label: string;
-  items: DropdownMenuItem[];
+  items: MenuItem[];
   onSelect?: (id: string) => void;
 }
 
@@ -39,7 +39,7 @@ function DropdownMenu({ label, items, onSelect }: DropdownMenuProps): JSX.Elemen
     if (refocus && triggerRef.current) triggerRef.current.focus();
   };
 
-  const choose = (item: DropdownMenuItem): void => {
+  const choose = (item: MenuItem): void => {
     if (item.disabled) return;
     if (onSelect) onSelect(item.id);
     close(true);

@@ -1,7 +1,18 @@
+```ts
+interface HistoryResult<T> {
+  state: T;
+  set: (valueOrUpdater: T | ((prev: T) => T)) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+}
+```
+
 Implement an undo/redo state history hook:
 
-### useHistory<T>(initial: T, limit: number = 100): { state: T; set: (valueOrUpdater: T | ((prev: T) => T)) => void; undo: () => void; redo: () => void; canUndo: boolean; canRedo: boolean }:
-- **Returns**: `{ state, set, undo, redo, canUndo, canRedo }`.
+### useHistory<T>(initial: T, limit: number = 100): HistoryResult<T>:
+- **Returns**: `HistoryResult<T>` containing `{ state, set, undo, redo, canUndo, canRedo }`.
 - **`set(valueOrUpdater)`**:
   - Pushes a new present state (an updater function receives the current `state`).
   - Setting a value that is `Object.is`-equal to the current state is a no-op.

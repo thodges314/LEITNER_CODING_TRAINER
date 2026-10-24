@@ -1,6 +1,14 @@
+```ts
+interface FancyInputHandle {
+  focus(): void;
+  clear(): void;
+  getValue(): string;
+}
+```
+
 Build a specialized input component using `forwardRef` and `useImperativeHandle`:
 
-### FancyInput(props: React.InputHTMLAttributes<HTMLInputElement>, ref: React.Ref<{ focus(): void; clear(): void; getValue(): string }>): JSX.Element:
+### FancyInput(props: React.InputHTMLAttributes<HTMLInputElement>, ref: React.Ref<FancyInputHandle>): JSX.Element:
 - Wrapped with `forwardRef((props, ref) => ...)`.
 - Renders an `<input ref={inputRef} {...props} />` passing through props (such as `placeholder`, `type`, etc.).
 - Instead of exposing the raw DOM element, exposes an imperative handle object via `useImperativeHandle(ref, () => ({ ... }), [])`.

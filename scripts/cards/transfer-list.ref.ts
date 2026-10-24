@@ -1,10 +1,4 @@
-function useTransferList({
-  initialLeft = [],
-  initialRight = [],
-}: {
-  initialLeft?: string[];
-  initialRight?: string[];
-} = {}): {
+interface TransferListResult {
   left: string[];
   right: string[];
   leftSelected: string[];
@@ -15,7 +9,15 @@ function useTransferList({
   moveLeft: () => void;
   moveAllRight: () => void;
   moveAllLeft: () => void;
-} {
+}
+
+function useTransferList({
+  initialLeft = [],
+  initialRight = [],
+}: {
+  initialLeft?: string[];
+  initialRight?: string[];
+} = {}): TransferListResult {
   const [left, setLeft] = React.useState<string[]>(initialLeft);
   const [right, setRight] = React.useState<string[]>(initialRight);
   const [leftSelected, setLeftSelected] = React.useState<string[]>([]);

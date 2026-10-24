@@ -1,6 +1,13 @@
+```ts
+type DiffChange =
+  | { path: string; type: 'removed'; from: unknown }
+  | { path: string; type: 'added'; to: unknown }
+  | { path: string; type: 'changed'; from: unknown; to: unknown };
+```
+
 Implement structural object diffing producing path-level change records:
 
-### `diff(a: Record<string, unknown>, b: Record<string, unknown>): { path: string; type: 'added' | 'removed' | 'changed'; from?: unknown; to?: unknown }[]`
+### diff(a: Record<string, unknown>, b: Record<string, unknown>): DiffChange[]:
 - Recursively compares plain objects `a` and `b` and returns an array of change records:
   - `{ path, type: 'added', to }` — key exists in `b` but not `a`.
   - `{ path, type: 'removed', from }` — key exists in `a` but not `b`.

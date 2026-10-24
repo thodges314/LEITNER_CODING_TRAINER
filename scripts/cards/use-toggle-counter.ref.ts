@@ -1,13 +1,13 @@
 type UseToggleReturn = [boolean, () => void, (next: boolean) => void];
 
-interface UseCounterOptions {
+interface CounterOptions {
   initial?: number;
   min?: number;
   max?: number;
   step?: number;
 }
 
-interface UseCounterReturn {
+interface CounterResult {
   count: number;
   increment: () => void;
   decrement: () => void;
@@ -26,7 +26,7 @@ function useCounter({
   min = -Infinity,
   max = Infinity,
   step = 1,
-}: UseCounterOptions = {}): UseCounterReturn {
+}: CounterOptions = {}): CounterResult {
   const clamp = useCallback((n: number) => Math.min(max, Math.max(min, n)), [min, max]);
   const [count, setCount] = useState(() => clamp(initial));
   const increment = useCallback(() => setCount((c: number) => clamp(c + step)), [clamp, step]);

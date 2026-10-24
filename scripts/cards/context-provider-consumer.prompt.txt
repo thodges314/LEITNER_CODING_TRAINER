@@ -1,16 +1,31 @@
+```ts
+type Theme = 'light' | 'dark';
+
+interface ThemeContextValue {
+  theme: Theme;
+  setTheme: (next: Theme) => void;
+  toggle: () => void;
+}
+
+interface ThemeProviderProps {
+  children?: React.ReactNode;
+  defaultTheme?: Theme;
+}
+```
+
 Implement a factory function for a React Theme Context:
 
-### createThemeContext(): { ThemeProvider: (props: { children: React.ReactNode; defaultTheme?: 'light' | 'dark' }) => JSX.Element; useTheme: () => { theme: 'light' | 'dark'; setTheme: (next: 'light' | 'dark') => void; toggle: () => void } }:
+### createThemeContext(): { ThemeProvider: (props: ThemeProviderProps) => JSX.Element; useTheme: () => ThemeContextValue }:
 - Creates an internal React context via `createContext(null)`.
 - Returns an object containing `{ ThemeProvider, useTheme }`.
 
-### ThemeProvider({ children, defaultTheme = 'light' }: { children: React.ReactNode; defaultTheme?: 'light' | 'dark' }): JSX.Element:
+### ThemeProvider({ children, defaultTheme = 'light' }: ThemeProviderProps): JSX.Element:
 - Manages theme state (`'light' | 'dark'`) initialized to `defaultTheme` (defaults to `'light'`).
 - Provides a context value object: `{ theme, setTheme, toggle }`.
   - `toggle()` flips between `'light'` and `'dark'`.
   - Memoizes callbacks and the context value object where appropriate.
 
-### useTheme(): { theme: 'light' | 'dark'; setTheme: (next: 'light' | 'dark') => void; toggle: () => void }:
+### useTheme(): ThemeContextValue:
 - Custom hook that consumes the theme context via `useContext`.
 - Returns `{ theme, setTheme, toggle }`.
 - Throws an `Error` whose message mentions `'ThemeProvider'` when invoked outside of a `<ThemeProvider>`.

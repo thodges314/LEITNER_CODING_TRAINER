@@ -6,7 +6,7 @@ interface HistoryState<T> {
 
 type SetStateAction<T> = T | ((prev: T) => T);
 
-interface UseHistoryReturn<T> {
+interface HistoryResult<T> {
   state: T;
   set: (next: SetStateAction<T>) => void;
   undo: () => void;
@@ -15,7 +15,7 @@ interface UseHistoryReturn<T> {
   canRedo: boolean;
 }
 
-function useHistory<T>(initial: T, limit: number = 100): UseHistoryReturn<T> {
+function useHistory<T>(initial: T, limit: number = 100): HistoryResult<T> {
   const [history, setHistory] = useState<HistoryState<T>>({ past: [], present: initial, future: [] });
 
   const set = useCallback(

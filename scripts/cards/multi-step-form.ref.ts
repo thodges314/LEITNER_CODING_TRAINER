@@ -1,8 +1,18 @@
+interface FormFieldDef {
+  name: string;
+  label: string;
+}
+
+interface StepDef {
+  title: string;
+  fields: FormFieldDef[];
+}
+
 function Wizard({
   steps,
   onSubmit,
 }: {
-  steps: Array<{ title: string; fields: Array<{ name: string; label: string }> }>;
+  steps: StepDef[];
   onSubmit: (values: Record<string, string>) => void;
 }): JSX.Element {
   const [index, setIndex] = useState<number>(0);
@@ -36,7 +46,7 @@ function Wizard({
           <input
             name={field.name}
             value={values[field.name] ?? ''}
-            onChange={(e: { target: { value: string } }) =>
+            onChange={(e: { target: { value: string } }): void =>
               setValues((v) => ({ ...v, [field.name]: e.target.value }))
             }
           />
@@ -46,7 +56,7 @@ function Wizard({
       <button
         type="button"
         disabled={index === 0}
-        onClick={() => {
+        onClick={(): void => {
           setError(null);
           setIndex(index - 1);
         }}
