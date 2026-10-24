@@ -1,0 +1,31 @@
+Build an accessible drag-and-drop sortable list supporting both pointer drag-and-drop and keyboard/button reordering.
+
+## Description
+```ts
+export interface SortableItem {
+  id: string;
+  label: string;
+}
+
+export interface DragSortableListProps {
+  items: SortableItem[];
+  onReorder?: (items: SortableItem[]) => void;
+}
+```
+
+### DragSortableList({ items, onReorder }: DragSortableListProps): JSX.Element
+- **List Rendering**:
+  - Renders a list container with `data-sortable-list`.
+  - Each item is rendered with `data-item-id={item.id}`, `data-item-index={index}`, and attribute `draggable="true"`.
+  - Renders the item's label in `data-item-label`.
+- **Keyboard & Button Reordering**:
+  - Each item renders a "Move Up" button (`data-action="move-up"`) and a "Move Down" button (`data-action="move-down"`).
+  - Move Up is disabled on the first item (`index === 0`).
+  - Move Down is disabled on the last item (`index === items.length - 1`).
+  - Clicking Move Up swaps the item at `index` with `index - 1`, updates list state, and calls `onReorder(newItems)`.
+  - Clicking Move Down swaps the item at `index` with `index + 1`, updates list state, and calls `onReorder(newItems)`.
+- **Drag and Drop Interactions**:
+  - On `dragstart`, sets data transfer format `'text/plain'` with the source index, and tracks active drag state.
+  - On `dragover`, calls `preventDefault()` on the event to allow dropping.
+  - On `drop`, calls `preventDefault()`, moves the dragged item from its origin index to the target item's index, updates state, and calls `onReorder(newItems)`.
+  - If dropped onto the same index, no reordering occurs.

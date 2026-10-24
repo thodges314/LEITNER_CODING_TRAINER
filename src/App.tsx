@@ -21,6 +21,7 @@ import {
   deletePreset,
   getSchedulingAlgorithm,
   setSchedulingAlgorithm,
+  toggleTopicDeactivation,
 } from './lib/leitner';
 import type {
   PracticeFilter,
@@ -262,6 +263,12 @@ export function App() {
     if (selectedCardId === topicId) setSelectedCardId(null);
   };
 
+  const handleToggleDeactivate = (topicId: string) => {
+    const next = toggleTopicDeactivation(deckState, topicId);
+    setDeckState(next);
+    if (selectedCardId === topicId) setSelectedCardId(null);
+  };
+
   const handleAddTopic = (newTopic: {
     id: string;
     track: TrackType;
@@ -472,6 +479,7 @@ export function App() {
             onToggleLock={handleToggleLock}
             onResetBox={handleResetBox}
             onDeleteTopic={handleDeleteTopic}
+            onToggleDeactivate={handleToggleDeactivate}
             onStateUpdated={(newState) => setDeckState(newState)}
             onOpenAddModal={() => setIsAddModalOpen(true)}
             highlightExport={highlightExport}

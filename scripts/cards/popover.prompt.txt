@@ -1,0 +1,31 @@
+```ts
+type PopoverPlacement = 'top' | 'bottom' | 'left' | 'right';
+
+interface PopoverProps {
+  trigger: React.ReactNode;
+  content: React.ReactNode;
+  placement?: PopoverPlacement;
+  isOpen?: boolean;
+  onToggle?: (open: boolean) => void;
+  title?: string;
+}
+```
+
+Build an accessible, anchored popover component with configurable placement and outside-click dismissal:
+
+### Popover({ trigger, content, placement = 'bottom', isOpen: controlledIsOpen, onToggle, title }: PopoverProps): JSX.Element
+- **Trigger Element**:
+  - Render a container wrapping the trigger button.
+  - The trigger element must have `aria-haspopup="dialog"` and `aria-expanded={isOpen}`.
+  - Clicking the trigger toggles the open state between `true` and `false` and calls `onToggle?.(!isOpen)`.
+- **Popover Dialog Overlay**:
+  - Rendered only when open.
+  - Root dialog container has `role="dialog"`, `data-placement={placement}` (defaulting to `'bottom'`), and `aria-modal="false"`.
+  - If `title` is provided, render it in a `<h3 data-title>{title}</h3>`.
+  - Render the provided `content` element.
+  - Provide a dismiss button `<button type="button" data-action="close" aria-label="Close">X</button>`. Clicking it closes the popover and calls `onToggle?.(false)`.
+- **Dismissal Behaviors**:
+  - **Escape Key**: Pressing `Escape` while open closes the popover and calls `onToggle?.(false)`.
+  - **Outside Click**: Clicking anywhere outside the popover container dismisses it and calls `onToggle?.(false)`.
+- **State Control**:
+  - Supports both uncontrolled (internal `isOpen` state) and controlled operation (when `isOpen` is passed as a prop).

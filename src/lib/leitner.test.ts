@@ -8,6 +8,9 @@ import {
   checkStagedUnlocks,
   commitCardReview,
   deleteTopicFromDeck,
+  deactivateTopic,
+  reactivateTopic,
+  toggleTopicDeactivation,
   getNextCard,
   getTopicTestCases,
   isTrackType,
@@ -380,6 +383,37 @@ describe('deleteTopicFromDeck', () => {
     expect(a.deletedSeedIds).toContain('async-fetch-error-handling');
     const b = deleteTopicFromDeck(a, 'custom-1');
     expect(b.deletedSeedIds).not.toContain('custom-1');
+  });
+});
+
+describe('deactivateTopic and reactivateTopic', () => {
+  it('toggles deactivation flag and preserves card in deck topics', () => {
+    const state = deck([card({ id: 'card-1' }), card({ id: 'card-2' })]);
+    const deactivated = deactivateTopic(state, 'card-1');
+    expect(deactivated.topics.find((t) => t.id === 'card-1')?.deactivated).toBe(true);
+    expect(deactivated.topics.find((t) => t.id === 'card-2')?.deactivated).toBeFalsy();
+
+    const reactivated = reactivateTopic(deactivated, 'card-1');
+    expect(reactivated.topics.find((t) => t.id === 'card-1')?.deactivated).toBe(false);
+
+    const toggledOn = toggleTopicDeactivation(reactivated, 'card-1');
+    expect(toggledOn.topics.find((t) => t.id === 'card-1')?.deactivated).toBe(true);
+
+    const toggledOff = toggleTopicDeactivation(toggledOn, 'card-1');
+    expect(toggledOff.topics.find((t) => t.id === 'card-1')?.deactivated).toBe(false);
+  });
+
+  it('excludes deactivated cards from getNextCard scheduling', () => {
+    const c1 = card({ id: 'c1', status: 'active', box: 1, streak: 0, nextEligibleTrial: 0 });
+    const c2 = card({ id: 'c2', status: 'active', box: 1, streak: 0, nextEligibleTrial: 0 });
+    const state = deck([c1, c2]);
+
+    const deactivatedState = deactivateTopic(state, 'c1');
+    const next1 = getNextCard(deactivatedState.topics, 0, undefined, undefined, undefined, 'graduated-interval');
+    expect(next1?.id).toBe('c2');
+
+    const next2 = getNextCard(deactivatedState.topics, 0, undefined, undefined, undefined, 'leitner');
+    expect(next2?.id).toBe('c2');
   });
 });
 

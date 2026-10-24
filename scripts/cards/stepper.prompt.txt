@@ -1,0 +1,36 @@
+```ts
+interface StepItem {
+  id: string;
+  title: string;
+  description?: string;
+}
+
+interface StepperProps {
+  steps: StepItem[];
+  initialStep?: number;
+  onStepChange?: (stepIndex: number) => void;
+  onComplete?: () => void;
+}
+```
+
+Build an accessible multi-step progress stepper navigation component:
+
+### Stepper({ steps, initialStep = 0, onStepChange, onComplete }: StepperProps): JSX.Element
+- **Progress Navigation**:
+  - Render a `<nav aria-label="Progress">` containing an `<ol>` list of all steps in order.
+  - Each step is rendered as an `<li>` element containing a `<button type="button">`:
+    - Display the 1-based step index (e.g. `1`, `2`) and the step `title`.
+    - If `description` is provided, render it in a `<span>{step.description}</span>` within the step item.
+    - Set `data-status="active"` and `aria-current="step"` on the current step's item or button.
+    - Set `data-status="completed"` on steps before the current step (`index < currentStep`).
+    - Set `data-status="upcoming"` on steps after the current step (`index > currentStep`).
+- **Direct Navigation via Step Buttons**:
+  - Clicking any completed or current step button sets the active step to that index and invokes `onStepChange?.(index)`.
+  - Upcoming steps cannot be jumped to directly (their button must be disabled or clicking them does nothing).
+- **Controls & Action Buttons**:
+  - Render a previous button `<button type="button" data-action="prev">Back</button>`:
+    - Disabled when on the first step (`currentStep === 0`).
+    - Clicking decrements `currentStep` by 1 and invokes `onStepChange?.(currentStep - 1)`.
+  - Render a next / submit button `<button type="button" data-action="next">`:
+    - When on any step before the last (`currentStep < steps.length - 1`), label it `'Next'`. Clicking increments `currentStep` by 1 and invokes `onStepChange?.(currentStep + 1)`.
+    - When on the final step (`currentStep === steps.length - 1`), label it `'Complete'`. Clicking invokes `onComplete?.()`.

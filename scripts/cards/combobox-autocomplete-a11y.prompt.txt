@@ -1,0 +1,62 @@
+Build a fully accessible autocomplete combobox implementing the W3C APG ARIA 1.2 Combobox pattern with active descendant management, live region status announcements, and full keyboard navigation.
+
+## Description
+```ts
+export interface ComboboxOption {
+  id: string;
+  label: string;
+  value: string;
+  disabled?: boolean;
+}
+
+export interface ComboboxProps {
+  id: string;
+  label: string;
+  options: ComboboxOption[];
+  onSelect?: (option: ComboboxOption) => void;
+  placeholder?: string;
+}
+```
+
+### AccessibleCombobox({ id, label, options, onSelect, placeholder }: ComboboxProps): JSX.Element
+- **ARIA Structure & Semantics**:
+  - Renders a `<label htmlFor={id}>` containing `label`.
+  - Input attributes:
+    - `id={id}`
+    - `role="combobox"`
+    - `aria-autocomplete="list"`
+    - `aria-expanded={isOpen}` (boolean attribute / string `'true'`/`'false'`)
+    - `aria-haspopup="listbox"`
+    - `aria-controls={`${id}-listbox`}`
+    - `aria-activedescendant={activeOption ? activeOption.id : undefined}`
+  - Listbox attributes (when open):
+    - `id={`${id}-listbox`}`
+    - `role="listbox"`
+    - `aria-label={label}`
+  - Option attributes:
+    - `id={option.id}`
+    - `role="option"`
+    - `aria-selected={index === activeIndex}`
+    - `aria-disabled={option.disabled || undefined}`
+- **Live Status Announcements**:
+  - Includes an element with `role="status"` and `aria-live="polite"`:
+    - When open with options: announces `"{count} results available"`.
+    - When query is entered but matches 0 options: announces `"No results found"`.
+    - Otherwise empty when closed or before interaction.
+- **Filtering**:
+  - Filters `options` case-insensitively by matching `option.label.toLowerCase().includes(query.toLowerCase())`.
+  - When typing, opens the listbox if there are matching results.
+- **Keyboard Navigation**:
+  - `ArrowDown`:
+    - If closed, opens the listbox and sets active descendant to the first enabled option.
+    - If open, moves active descendant to the next enabled option (wrapping around).
+  - `ArrowUp`:
+    - If closed, opens the listbox and sets active descendant to the last enabled option.
+    - If open, moves active descendant to the previous enabled option (wrapping around).
+  - `Enter`:
+    - If listbox is open and an enabled option is active, selects it: calls `onSelect(option)`, closes the listbox, and sets the input value to `option.label`.
+  - `Escape`:
+    - Closes the listbox without selecting.
+- **Mouse Interaction**:
+  - Clicking an enabled option selects it, calls `onSelect(option)`, closes the listbox, and sets the input value to `option.label`.
+  - Clicking a disabled option does nothing.

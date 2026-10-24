@@ -158,9 +158,22 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
 
     setStatus('compiling');
     const userComponentCode = stripTestRunnerBlock(code);
-    const combined = `${userComponentCode}\n\n${card.previewCode}`;
     const mode = isTsOnlyCard(card) ? 'ts' : executionMode;
-    const transpiled = await transpileForExecution(combined, mode, 800);
+
+    if (mode === 'ts') {
+      const { checkAndTranspileTS } = await import('../utils/typeChecker');
+      const userCheck = checkAndTranspileTS(userComponentCode);
+      if (!userCheck.success) {
+        setStatus('error');
+        setErrorMessage(
+          userCheck.diagnostics.map((d) => d.formatted).join('\n') || 'TypeScript compilation error'
+        );
+        return;
+      }
+    }
+
+    const combined = `${userComponentCode}\n\n${card.previewCode}`;
+    const transpiled = await transpileForExecution(combined, 'js', 800);
 
     if (!transpiled.ok) {
       setStatus('error');

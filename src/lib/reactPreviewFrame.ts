@@ -143,16 +143,22 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
       }
     }
 
-    // log(name, returnValue) helper: appends to event log and returns optional return value
-    window.log = function log(name, returnValue) {
-      return function(...args) {
+    // log(name, ...callArgs) helper: appends to event log and returns optional return value
+    window.log = function log(name, ...callArgs) {
+      function sendEvent(args) {
         window.parent.postMessage({
           type: 'leitner-preview:event',
           name: String(name),
           args: args.map(stringify),
           timestamp: Date.now()
         }, '*');
-        return returnValue;
+      }
+      if (callArgs.length > 0 && typeof callArgs[0] !== 'undefined') {
+        sendEvent(callArgs);
+      }
+      return function(...args) {
+        sendEvent(args);
+        return callArgs[0];
       };
     };
 

@@ -1,0 +1,37 @@
+```ts
+interface CommentItem {
+  id: string;
+  author: string;
+  text: string;
+  timestamp: string;
+  children?: CommentItem[];
+}
+
+interface NestedCommentsProps {
+  comments: CommentItem[];
+  onAddReply?: (parentId: string, text: string) => void;
+  maxDepth?: number;
+}
+```
+
+Build a recursive threaded nested comments component with reply creation and branch collapsing:
+
+### NestedComments({ comments, onAddReply, maxDepth = 4 }: NestedCommentsProps): JSX.Element
+- **Comment Tree Hierarchy**:
+  - Render an unordered list `<ul>` of comments. Each comment is an `<li>` element with `data-comment-id={comment.id}`.
+  - Display author info with `<strong data-author>{comment.author}</strong>` and timestamp `<span data-time>{comment.timestamp}</span>`.
+  - Display the comment body in `<p data-text>{comment.text}</p>`.
+  - Child comments (if any) are recursively rendered within a nested `<ul>` inside the parent comment's `<li>`.
+- **Collapsible Threads**:
+  - For comments that have child replies (`comment.children?.length > 0`), render a collapse button `<button type="button" data-action="toggle-collapse">`.
+  - When expanded, label it `'Collapse'`.
+  - When collapsed, label it `'Expand'` and do **not** render the nested child comments list.
+  - Defaults to expanded.
+- **Reply Authoring**:
+  - When the comment's nesting depth is strictly less than `maxDepth` (`depth < maxDepth`, starting at `depth = 1` for root comments):
+    - Render a `<button type="button" data-action="reply">Reply</button>`.
+    - Clicking toggles open an inline reply composer with:
+      - `<textarea data-reply-input placeholder="Write a reply..."></textarea>`
+      - `<button type="button" data-action="submit-reply">Submit</button>`: Submitting calls `onAddReply?.(comment.id, trimmedText)`, clears the input, and closes the composer. Empty submissions are ignored.
+      - `<button type="button" data-action="cancel-reply">Cancel</button>`: Cancels and closes the reply composer without invoking `onAddReply`.
+  - When a comment is at or beyond `maxDepth` (`depth >= maxDepth`), omit the `'Reply'` button to prevent exceeding the depth limit.

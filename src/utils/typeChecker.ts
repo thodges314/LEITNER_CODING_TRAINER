@@ -48,6 +48,7 @@ const SANDBOX_GLOBALS = `
   declare var AbortController: { new (): AbortController; prototype: AbortController };
   declare class DOMException extends Error { constructor(message?: string, name?: string); readonly code: number }
   declare var console: { log(...a: any[]): void; error(...a: any[]): void; warn(...a: any[]): void; info(...a: any[]): void };
+  declare var log: any;
   declare function fetch(input: any, init?: any): Promise<any>;
   declare function setTimeout(cb: (...args: any[]) => void, ms?: number, ...args: any[]): any;
   declare function clearTimeout(id: any): void;
@@ -129,6 +130,9 @@ const SANDBOX_GLOBALS = `
   declare namespace JSX {
     interface Element {
       [key: string]: any;
+    }
+    interface ElementChildrenAttribute {
+      children: {};
     }
     interface IntrinsicElements {
       [elemName: string]: any;

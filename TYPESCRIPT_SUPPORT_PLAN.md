@@ -27,13 +27,13 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 1. **Zero Half-Migrated State:**  
    The execution engine checks `card.referenceSolutionTs`. If present, the UI enables the dual JS/TS toggle and validates TypeScript compilation against strict rules. If absent, the card seamlessly executes in standard JavaScript mode with no errors or missing types.
 2. **Backwards Compatibility:**  
-   All 271 existing JavaScript reference solutions and test harnesses remain 100% intact and functional.
+   All 277 existing JavaScript reference solutions and test harnesses remain 100% intact and functional.
 3. **Every Batch is Verified:**  
    The entire suite passes with 0 failures:
-   - `npm test` (all 45 test files, 1,686 tests passing, including all 271 TypeScript reference solutions and strip-type JS execution).
+   - `npm test` (all 46 test files, 1,731 tests passing, including all 277 TypeScript reference solutions and strip-type JS execution).
    - Full production build & type checks (`npx tsc -b`, `npm run lint`, `vite build`).
 4. **Immediate Value:**  
-   Delivers 100% TypeScript dual-solution coverage across all 271 cards in the deck, complete with in-browser type checking, CodeMirror hover quickinfo, and context-aware solution reveal.
+   Delivers 100% TypeScript dual-solution coverage across all 277 cards in the deck, complete with in-browser type checking, CodeMirror hover quickinfo, and context-aware solution reveal.
 
 ---
 
@@ -60,10 +60,10 @@ To ensure optimal developer experience, readable problem prompts, and strict typ
 
 ## 3. High-Level Progress Dashboard
 
-- **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **271 / 271 (100.0%)**
-- **Cards Remaining:** **0 / 271 (0.0%)**
-- **Total Batches:** 48 batches (48 completed, 0 remaining)
+- **Total Cards in Deck:** 277 cards across 9 tracks
+- **Fully Typed Cards Completed:** **277 / 277 (100.0%)**
+- **Cards Remaining:** **0 / 277 (0.0%)**
+- **Total Batches:** 50 batches (50 completed, 0 remaining)
 
 ### Track Completion Status
 
@@ -76,15 +76,15 @@ To ensure optimal developer experience, readable problem prompts, and strict typ
 | **`js-utilities`**        |     37      |      37      |   100.0%   | **COMPLETE** (Batches 24–30)                          |
 | **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
 | **`react`**               |     27      |      27      |   100.0%   | **COMPLETE** (Batches 35–39)                          |
-| **`react-components`**    |     45      |      45      |   100.0%   | **COMPLETE** (Batches 40–47)                          |
+| **`react-components`**    |     51      |      51      |   100.0%   | **COMPLETE** (Batches 40–50)                          |
 | **`testing-tooling`**     |      5      |      5       |   100.0%   | **COMPLETE** (Batch 48)                               |
-| **TOTAL**                 |   **271**   |   **271**    | **100.0%** | **48 Batches Total (100% COMPLETE)**                  |
+| **TOTAL**                 |   **277**   |   **277**    | **100.0%** | **50 Batches Total (100% COMPLETE)**                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–48: 271 Cards — 100% Complete)
+## 4. Completed Batches (Batches 1–50: 277 Cards — 100% Complete)
 
-All 271 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 277 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -156,6 +156,8 @@ All 271 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 45 (Complex Form Inputs & Chips — 5 cards):** `typeahead-autocomplete`, `tag-input`, `add-tag-rules`, `multi-step-form`, `wizard-step-logic`.
 - **Batch 46 (Trees & Multi-Lists — 5 cards):** `file-explorer-tree`, `flatten-visible-tree`, `nested-checkbox-tree`, `transfer-list`, `move-between-lists`.
 - **Batch 47 (Accessibility & Routing — 7 cards):** `a11y-form-field`, `live-announcer`, `roving-tabindex-toolbar`, `switch-toggle-a11y`, `form-error-summary`, `breadcrumbs-router`, `route-focus-and-skip-link`.
+- **Batch 49 (Progress Steps, Popover & Comment Threads — 3 cards):** `stepper`, `popover`, `nested-comments`.
+- **Batch 50 (Kanban Board, Sortable Lists & Accessible Combobox — 3 cards):** `kanban-board`, `drag-sortable-list`, `combobox-autocomplete-a11y`.
 
 ### Testing & Tooling Track (5 Cards — 100% Complete)
 
@@ -165,7 +167,7 @@ All 271 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 
 ## 5. Master Roadmap Status (100% Complete — 0 Cards Remaining)
 
-All 271 cards across all 9 tracks in the deck have received:
+All 277 cards across all 9 tracks in the deck have received:
 - Explicit typed Markdown signatures in their prompt headings (`### fn(args): ReturnType` / `### Component({ props }: { ... }): JSX.Element`).
 - Strict TypeScript reference solutions (`.ref.ts`) with zero compilation errors, zero `any`, and zero `@ts-ignore` pragmas.
 - Ingestion into `src/data/topics.json` via `build-cards.mjs`.
