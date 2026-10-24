@@ -1,3 +1,4 @@
+### Modal(props: ModalProps): JSX.Element | null:
 Create `Modal({ isOpen, onClose, children })` rendered with `ReactDOM.createPortal` into `document.body` (renders nothing when closed).
 
 - **Structure**: A backdrop element containing a `role="dialog"` `aria-modal="true"` element wrapping `children`.

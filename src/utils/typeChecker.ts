@@ -82,7 +82,17 @@ const SANDBOX_GLOBALS = `
   declare function useOptimistic<State, Action = any>(passthrough: State, updateFn?: (currentState: State, optimisticValue: Action) => State): [State, (action: Action) => void];
   declare function useActionState<State, Payload = any>(action: (state: any, payload: Payload) => any, initialState: any, permalink?: string): [any, (payload: Payload) => void, boolean];
 
+  declare class Component<P = {}, S = {}> {
+    constructor(props: P);
+    props: P & { children?: React.ReactNode };
+    state: S;
+    setState(state: Partial<S> | ((prevState: Readonly<S>, props: Readonly<P>) => Partial<S> | null), callback?: () => void): void;
+    forceUpdate(callback?: () => void): void;
+    render(): any;
+  }
+
   interface ReactNamespace {
+    Component: typeof Component;
     useRef: typeof useRef;
     useState: typeof useState;
     useReducer: typeof useReducer;
@@ -114,6 +124,7 @@ const SANDBOX_GLOBALS = `
     type ReactElement<P = any> = JSX.Element;
     type FC<P = {}> = (props: P) => any;
     type PropsWithChildren<P = {}> = P & { children?: ReactNode };
+    interface ErrorInfo { componentStack?: string; [key: string]: any; }
   }
   declare namespace JSX {
     interface Element {

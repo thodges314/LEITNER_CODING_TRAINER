@@ -1,3 +1,4 @@
+### Accordion(props: AccordionProps): JSX.Element:
 Build `Accordion({ items, allowMultiple = false })` where `items` is `[{ id, title, content }]`.
 
 - For each item, render a heading `<h3>` containing `<button id="<buttonId>" aria-expanded aria-controls="<panelId>">` with the title, followed by its panel `<div role="region" id="<panelId>" aria-labelledby="<buttonId>">` (rendered **ONLY** while open). Use `useId` so IDs are unique per component instance.

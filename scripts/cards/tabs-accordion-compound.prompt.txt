@@ -1,3 +1,4 @@
+### Tabs(props: TabsProps): JSX.Element:
 Implement compound components sharing state via context:
 - `Tabs({ defaultValue, value, onChange, children })`
 - `TabList`
