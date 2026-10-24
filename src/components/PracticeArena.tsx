@@ -213,9 +213,21 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   );
 
   const isTsTrack = currentCard?.track === 'typescript-patterns';
+  // Card id the "TypeScript-only" notice was raised for (so it disappears when the card changes).
+  const [tsOnlyNoticeFor, setTsOnlyNoticeFor] = useState<string | null>(null);
+  const tsOnlyNotice = tsOnlyNoticeFor !== null && tsOnlyNoticeFor === currentCard?.id;
+
+  useEffect(() => {
+    if (!tsOnlyNoticeFor) return undefined;
+    const timer = setTimeout(() => setTsOnlyNoticeFor(null), 4000);
+    return () => clearTimeout(timer);
+  }, [tsOnlyNoticeFor]);
 
   const handleSwitchExecutionMode = (mode: 'js' | 'ts') => {
-    if (isTsTrack && mode === 'js') return;
+    if (isTsTrack && mode === 'js') {
+      setTsOnlyNoticeFor(currentCard?.id ?? null);
+      return;
+    }
     setExecutionMode(mode);
     if (!isTsTrack) {
       setPreferredExecutionMode(mode);
@@ -2028,7 +2040,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             >
               <button
                 type="button"
-                disabled={isTsTrack}
+                aria-disabled={isTsTrack}
                 onClick={() => handleSwitchExecutionMode('js')}
                 style={{
                   padding: '4px 10px',
@@ -2075,7 +2087,16 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 {isTsTrack ? 'TS (Strict • Required)' : 'TS (Strict Type Check)'}
               </button>
             </div>
-          </div>
+            {tsOnlyNotice && (
+            <span
+              role="status"
+              data-testid="ts-only-notice"
+              style={{ fontSize: '11.5px', color: '#60a5fa' }}
+            >
+              This is a TypeScript topic, so it only runs in TypeScript mode.
+            </span>
+          )}
+        </div>
         </div>
 
         {!evalResult && (

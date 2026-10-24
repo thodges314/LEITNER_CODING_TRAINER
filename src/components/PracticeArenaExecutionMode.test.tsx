@@ -139,8 +139,14 @@ describe('PracticeArena Execution Mode & Track Override Behavior', () => {
 
     // TS is active and marked as required
     expect(tsBtn).toBeDefined();
-    // JS button is disabled on TypeScript Patterns track
-    expect(jsBtn?.disabled).toBe(true);
+    // JS button is marked unavailable on TypeScript Patterns track, but stays clickable so it can explain why
+    expect(jsBtn?.getAttribute('aria-disabled')).toBe('true');
+    expect(container?.querySelector('[data-testid="ts-only-notice"]')).toBeNull();
+    await act(async () => {
+      jsBtn?.click();
+    });
+    expect(container?.querySelector('[data-testid="ts-only-notice"]')?.textContent).toContain('TypeScript topic');
+    expect(getPreferredExecutionMode()).toBe('js');
 
     // Now advance to a non-TS card
     await act(async () => {
