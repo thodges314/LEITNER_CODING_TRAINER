@@ -28,7 +28,7 @@ in the browser; state lives in `localStorage`.
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 1,126 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Automated tests | 1,301 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
 | Browser verification | `npm run e2e` runs ALL 271 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 542 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 589 browser tests, ~6 min on an idle machine with 4 workers). **Last full run: 589 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
@@ -50,15 +50,15 @@ src/
     formatter.test.ts          unit tests for formatting and syntax error resilience
     runner.ts                  sandbox + harness execution (see §5)
     domTools.ts, mockFetch.ts  headless DOM test tools ($dom) and deterministic fetch mock
-    harnessContracts.ts        extracts the "Target Contract" table shown for a card
-    ai.ts                      optional AI evaluator (Gemini/OpenAI-compatible): the tests decide whether code works; the AI can fail a passing run (shown as a note, overridable) but never rescue a failing one
+    harnessContracts.ts        extracts the "Target Contract" table shown for a card; `sanitizeCallSignature` only turns `\n` into line breaks OUTSIDE string literals
+    ai.ts                      optional AI evaluator (Gemini/OpenAI-compatible; replies are validated by `parseEvaluationPayload`, unparseable ones are shown raw via `rawOutput`): the tests decide whether code works; the AI can fail a passing run (shown as a note, overridable) but never rescue a failing one
     drafts.ts                  per-card editor autosave (localStorage `leitner_draft:<id>`)
   types/
     rainbowbrackets.d.ts       type declarations for rainbowbrackets extension
   utils/typeChecker.ts         lazy-loaded TS compiler + real ES2022 lib files for strict-mode checking
   data/topics.json             GENERATED seed deck (do not hand-edit; see §4)
 scripts/
-  build-cards.mjs              builds topics.json from the sources below   (npm run build:cards)
+  build-cards.mjs              builds topics.json from the sources below   (npm run build:cards; `npm run check:cards` = read-only staleness check, exits 1 if topics.json is out of date)
   difficulty.json              id -> { difficulty 1-5, concept }
   cards/<id>.{meta.json,prompt.txt,ref.js,harness.js,extra.js}
   testcases/part1-8.mjs, index.mjs   hand-written input/expected pairs
@@ -412,9 +412,9 @@ Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates r
 - **Phase 2 Buffer Policy (Complete)**:
   - Cold-start recall integrity is strictly preserved: the editor buffer is NOT overwritten or injected with stubs upon switching between JS and TS modes.
   - Typed signatures are embedded into prompt headings (`### fn(arg: Type): ReturnType`).
-- **Phase 3 Dual Solutions Rollout**:
-  - Batch 1 (8 Foundational Algorithms) complete: `binary-search-exact`, `two-pointer-sorted-sum`, `sliding-window-fixed`, `valid-parentheses-stack`, `merge-intervals`, `two-sum-hashmap`, `interval-overlap`, `anagram-palindrome`.
-  - Next batches in queue: Tree & Graph Algorithms (ambient `TreeNode`), Linked Lists & Stacks/Heaps (ambient `ListNode`), React Components & Hooks, JS Utilities & Async.
+- **Phase 3 Dual Solutions Rollout** (in progress; 147 of 271 cards have a `.ref.ts`; `TYPESCRIPT_SUPPORT_PLAN.md` is the authoritative batch-by-batch status):
+  - Complete: Algorithms, Async JS, JS Language and TypeScript Patterns tracks, plus part of JS Utilities.
+  - Remaining: rest of JS Utilities, DOM/Browser, React, React Components, Testing/Tooling.
 
 #### Next Steps (in priority order)
 1. Complete remaining TypeScript dual-solution batches on `feature/typescript-support` (Trees/Graphs -> Lists/Heaps -> React -> JS Utilities).
@@ -483,7 +483,7 @@ Rule in code (`ai.ts`): with an AI key, `passed = AI says passed && the harness 
 
 - Never run or recreate a bulk fixture generator. Write cases by hand: concrete input and concrete expected value.
 - After touching cards: `npm run build:cards && npm test && npm run lint && npx tsc -b`. Then (ideally) smoke-test in the browser.
-- Do not edit `src/data/topics.json` directly; it is overwritten by `build:cards`.
+- Do not edit `src/data/topics.json` directly; it is overwritten by `build:cards`. `npm run check:cards` reports stale cards without writing. Contributor quick rules live in `AGENTS.md`.
 - Test files that need `localStorage`/DOM start with `// @vitest-environment jsdom` (default environment is `node`).
 - `scripts/cards/**` is excluded from ESLint (the files are sandbox snippets, not modules).
 - Keep titles, prompts, and reference solutions consistent (a past audit found cards whose titles promised functions the prompt never asked for).

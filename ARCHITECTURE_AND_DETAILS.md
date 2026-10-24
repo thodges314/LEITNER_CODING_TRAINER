@@ -126,6 +126,8 @@ Located in [runner.ts](src/lib/runner.ts):
 
 ## 5. AI Evaluator & Multi-Key Vault
 
+Model replies are untrusted: [ai.ts](src/lib/ai.ts) `parseEvaluationPayload` strips code fences, validates the schema and filters JSON scaffolding; unparseable replies surface as `rawOutput`.
+
 Located in [ai.ts](src/lib/ai.ts) and [SettingsModal.tsx](src/components/SettingsModal.tsx):
 
 - **Independent Multi-Key Storage**: Stores API keys per provider in an isolated vault in `localStorage` (`ai_evaluator_keys_vault`).
@@ -152,7 +154,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (1,126+ unit tests)**: Tests verifying:
+- **Vitest Suite (1,301+ unit tests)**: Tests verifying:
   - Reference solutions pass for all 271 topic cards (218 default + 53 in the optional `algorithms-advanced` pack) across 1,934 documented test cases.
   - Empty submissions fail for all cards.
   - 100% of cards formatted with structured GitHub-flavored Markdown instructions.

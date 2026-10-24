@@ -70,6 +70,7 @@ The deck includes **271 cards** across 9 tracks (218 default + 53 in the optiona
 - **Dual-Solution Architecture**: Reference solutions are authored in `scripts/cards/<id>.ref.js` and optionally `<id>.ref.ts`.
 - `scripts/testcases/*.mjs` holds the input/output pairs for every card (the "Target Contract" table).
   `scripts/cards/<id>.{prompt.txt,ref.js,ref.ts,harness.js,extra.js}` hold prompts, reference solutions and specialized harnesses.
+  `npm run check:cards` is a read-only check that `topics.json` is up to date with the card sources. Quick contributor rules are in `AGENTS.md`.
   `npm run build:cards` regenerates `promptSeed`, the reference solutions, `testCases` and `testHarness` in `topics.json`.
   Harnesses are generated from the cases (each case becomes one `$test.run(...)` assertion) unless a card has a
   hand-written `harness.js` (React/DOM cards), and `extra.js` appends type-level (`@ts-expect-error`) checks for TS cards.
@@ -78,7 +79,7 @@ The deck includes **271 cards** across 9 tracks (218 default + 53 in the optiona
   the page's real DOM in the browser and jsdom in tests, with a mock `IntersectionObserver` and a deterministic `fetch`.
   Built-in prototypes patched by a solution (polyfill cards) are restored after each run.
 
-The test suite (`1,126+ Vitest tests` + `589 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
+The test suite (`1,301+ Vitest tests` + `589 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
 
 ## Deploy
 

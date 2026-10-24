@@ -12,7 +12,8 @@ import { loadCases, toTestCaseItems, generateHarness } from './testcases/index.m
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const file = path.join(here, '..', 'src/data/topics.json');
-const topics = JSON.parse(fs.readFileSync(file, 'utf8'));
+const committedText = fs.readFileSync(file, 'utf8');
+const topics = JSON.parse(committedText);
 const cases = loadCases();
 const read = (id, suffix) => {
   const p = path.join(here, 'cards', `${id}.${suffix}`);
@@ -131,5 +132,31 @@ for (const t of topics) {
     delete t.rendersComponent;
   }
 }
-fs.writeFileSync(file, JSON.stringify(topics, null, 2) + '\n');
+const output = JSON.stringify(topics, null, 2) + '\n';
+
+if (process.argv.includes('--check')) {
+  // Read-only: report cards whose committed topics.json entry differs from a fresh build. Never writes.
+  const committed = JSON.parse(committedText);
+  const byId = new Map(committed.map((t) => [t.id, t]));
+  const stale = [];
+  for (const t of topics) {
+    const old = byId.get(t.id);
+    if (!old) {
+      stale.push(`${t.id} (missing from topics.json)`);
+      continue;
+    }
+    const keys = new Set([...Object.keys(old), ...Object.keys(t)]);
+    const diff = [...keys].filter((k) => JSON.stringify(old[k]) !== JSON.stringify(t[k]));
+    if (diff.length) stale.push(`${t.id} (${diff.join(', ')})`);
+  }
+  for (const id of byId.keys()) if (!topics.some((t) => t.id === id)) stale.push(`${id} (in topics.json but no source)`);
+  if (stale.length === 0 && output === committedText) {
+    console.log('topics.json is up to date.');
+    process.exit(0);
+  }
+  console.error(`topics.json is STALE for ${stale.length} card(s). Run: npm run build:cards\n  ` + (stale.join('\n  ') || '(formatting only)'));
+  process.exit(1);
+}
+
+fs.writeFileSync(file, output);
 console.log(`built ${topics.length} cards, ${n} test cases`);
