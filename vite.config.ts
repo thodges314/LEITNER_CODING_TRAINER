@@ -7,12 +7,17 @@ export default defineConfig({
   base: './',
   plugins: [
     react(),
-    visualizer({
-      filename: 'stats.html',
-      open: true,
-      gzipSize: true,
-      brotliSize: true,
-    }),
+    // Bundle report only on demand: `ANALYZE=1 npm run build` (writes stats.html and opens it).
+    ...(process.env.ANALYZE
+      ? [
+          visualizer({
+            filename: 'stats.html',
+            open: true,
+            gzipSize: true,
+            brotliSize: true,
+          }),
+        ]
+      : []),
   ],
   build: {
     // The TypeScript compiler chunk is lazy-loaded (only for strict TS mode), so it is allowed to be large.

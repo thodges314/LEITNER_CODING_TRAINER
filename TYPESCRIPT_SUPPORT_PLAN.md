@@ -335,3 +335,12 @@ Every single batch follows this strict automated loop:
 > - **WIP branch:** `wip/batch-26-map-frequency-counter` was merged into `feature/ts-coverage`. It can be deleted.
 > - **Next step:** finish the remaining 4 cards of Batch 26 (`set-unique-operations`, `group-by-count-by`, `unique-sort-dedupe`, `custom-array-reduce`), then continue the roadmap below.
 > - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.
+>
+> ### Handoff procedure (for any assistant resuming card work)
+> 1. `git checkout feature/ts-coverage` (never commit to `master`; a push to `master` deploys). Run `npm run report:ts` for the live remaining-card list.
+> 2. Per card `<id>`: type the prompt heading in `scripts/cards/<id>.prompt.txt` (`### fn<T>(arg: Type): Return`), make sure `scripts/cards/<id>.ref.js` exists (copy from `topics.json` `referenceSolution` if needed), and add `scripts/cards/<id>.ref.ts` (same behaviour, strict types, no `any`, no `@ts-ignore`). Do **not** edit `src/data/topics.json` by hand.
+> 3. `npm run build:cards`, then `npx vitest run src/lib/seedCards.test.ts -t "<id>"` (three tests must pass: JS reference, empty solution fails, TypeScript reference).
+> 4. Commit every 3-5 cards: `feat(batch-N): TypeScript support for <topic> (N cards)`. Each commit must leave `npx tsc -b`, `npm run lint` and `npm test` green. Update the counts in this file's dashboard (`npm run report:ts -- --check` tells you when they are wrong) and the one-line summary in `ARCHITECTURE_AND_ROADMAP.md` in the same commit.
+> 5. React cards (`react`, `react-components`) are the riskiest: pilot ONE card first, check that `$dom`, hooks and JSX type-check in the sandbox (`SANDBOX_GLOBALS` in `src/utils/typeChecker.ts`), and only then do the batch.
+> 6. Lint gotcha: `npm run lint` fails on `no-useless-escape` (for example `[\[]` in a regex). Run `npx eslint .` before committing, not only tests.
+
