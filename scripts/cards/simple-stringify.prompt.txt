@@ -1,14 +1,20 @@
-Implement a lightweight stringifier for primitive types and arrays without calling `JSON.stringify`:
+Implement a lightweight stringifier for primitive values and arrays, **without calling `JSON.stringify`**. It should return the same text `JSON.stringify` would, except that `NaN` and `±Infinity` become `'null'`.
 
 ### `simpleStringify(value)`
+
+Returns a **string** (or `undefined`). Everything below is written as JavaScript literals, so `\n` and `\\` inside quotes are escape sequences.
+
 - **Primitives**:
   - `null` -> `'null'`
-  - Booleans -> `'true'` / `'false'`
-  - Finite numbers -> `String(value)`
+  - `true` / `false` -> `'true'` / `'false'`
+  - Finite numbers -> `String(value)`, e.g. `-1.5` -> `'-1.5'`
   - `NaN`, `Infinity`, `-Infinity` -> `'null'`
-  - Strings -> wrapped in double quotes with `\`, `"`, and newline characters escaped as `\\`, `\"`, and `\n`.
-  - Top-level `undefined` returns `undefined`.
+  - Top-level `undefined` -> `undefined` (not a string)
+- **Strings** -> wrap in double quotes, e.g. `'hi'` -> `'"hi"'`. First put a backslash in front of:
+  - a double quote `"`, which becomes `\"`
+  - a backslash `\`, which becomes `\\`
+  - a newline, which becomes the two characters `\n` (backslash, then the letter n)
 - **Arrays**:
-  - Serialized as `'[a,b,c]'` with no spaces.
-  - Recursively serializes nested arrays.
-  - Elements evaluating to `undefined` are serialized as `'null'`.
+  - Join the serialized elements with `,` and no spaces: `[1, 'a', null]` -> `'[1,"a",null]'`, `[]` -> `'[]'`
+  - Nested arrays recurse: `[[1, 2], []]` -> `'[[1,2],[]]'`
+  - An `undefined` element becomes `'null'`: `[undefined, 1]` -> `'[null,1]'`

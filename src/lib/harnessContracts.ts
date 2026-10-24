@@ -210,8 +210,24 @@ export function extractHarnessContracts(harness?: string): TestCaseItem[] {
 export function sanitizeCallSignature(input?: string): string {
   if (!input || typeof input !== 'string') return '';
 
-  // Normalize escaped newlines if coming from serialized JSON
-  const raw = input.replace(/\\n/g, '\n');
+  // Normalize escaped newlines if coming from serialized JSON. Only escapes outside string
+  // literals are statement separators; inside quotes `\n` is a real escape sequence and must stay.
+  let raw = '';
+  let quote: string | null = null;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    if (quote) {
+      raw += ch;
+      if (ch === '\\' && i + 1 < input.length) raw += input[++i];
+      else if (ch === quote) quote = null;
+    } else if (ch === '\\' && input[i + 1] === 'n') {
+      raw += '\n';
+      i++;
+    } else {
+      if (ch === '"' || ch === "'" || ch === '`') quote = ch;
+      raw += ch;
+    }
+  }
 
   const lines = raw.split('\n');
   const cleanLines = lines.filter((line) => {

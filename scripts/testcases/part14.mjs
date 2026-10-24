@@ -100,8 +100,8 @@ export default {
   'simple-stringify': [
     c('Primitives', `[simpleStringify(null), simpleStringify(true), simpleStringify(42), simpleStringify(-1.5)]`, "['null', 'true', '42', '-1.5']"),
     c('Strings are quoted', `simpleStringify('hi')`, String.raw`'"hi"'`),
-    c('Quotes and backslashes in strings are escaped', String.raw`simpleStringify('say "hi" \\ ok')`, String.raw`'"say \\"hi\\" \\\\ ok"'`),
-    c('Newlines are escaped', String.raw`simpleStringify('a\nb')`, String.raw`'"a\\nb"'`),
+    c('Each " and \\ gets a backslash in front (shown as JS literals)', String.raw`simpleStringify('say "hi" \\ ok')`, String.raw`'"say \\"hi\\" \\\\ ok"'`),
+    c('A newline becomes a backslash followed by n (JS literal shown)', String.raw`simpleStringify('a\nb')`, String.raw`'"a\\nb"'`),
     c('NaN and Infinity become null', `[simpleStringify(NaN), simpleStringify(Infinity)]`, "['null', 'null']"),
     c('Arrays have no spaces', `simpleStringify([1, 'a', true, null])`, String.raw`'[1,"a",true,null]'`),
     c('Nested and empty arrays', `[simpleStringify([[1, 2], [], [3]]), simpleStringify([])]`, "['[[1,2],[],[3]]', '[]']"),
