@@ -12,6 +12,7 @@ import {
   importDeckBackup,
   difficultyOf,
   DIFFICULTY_LABELS,
+  isCardAttempted,
 } from '../lib/leitner';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
 import { FEATURES } from '../lib/features';
@@ -354,7 +355,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         const getRankAsc = (item: TopicItem) => {
           if (item.deactivated) return 4;
           if (item.status === 'locked') return 1;
-          if (item.box > 1 || item.streak > 0 || item.nextEligibleTrial > 0) return 3;
+          if (isCardAttempted(item)) return 3;
           return 2; // unlocked
         };
         const rankA = getRankAsc(a);
@@ -366,7 +367,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         const getRankDesc = (item: TopicItem) => {
           if (item.deactivated) return 0;
           if (item.status === 'locked') return 1;
-          if (item.box > 1 || item.streak > 0 || item.nextEligibleTrial > 0) return 3; // attempted
+          if (isCardAttempted(item)) return 3; // attempted
           return 2; // unlocked
         };
         const rankA = getRankDesc(a);
@@ -433,8 +434,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         const activeBoxes = Array.isArray(selectedBox) ? selectedBox : [selectedBox];
         if (!activeBoxes.includes(t.box)) return false;
       }
-      const isAttempted = !t.deactivated && t.status === 'active' && (t.box > 1 || t.streak > 0 || t.nextEligibleTrial > 0);
-      const isUnattempted = !t.deactivated && t.status === 'active' && t.box === 1 && t.streak === 0 && t.nextEligibleTrial === 0;
+      const isAttempted = isCardAttempted(t);
+      const isUnattempted = !t.deactivated && t.status === 'active' && !isAttempted;
 
       if (selectedStatus === 'attempted' && !isAttempted) return false;
       if (selectedStatus === 'unattempted' && !isUnattempted) return false;
@@ -740,7 +741,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         )}
         <div className="filter-panel-header">
           <div className="filter-panel-title">
-            <span>Filter Tracks:</span>
+            <span>Filter Topics:</span>
             {!isAllTracks && (
               <span className="filter-count-badge">
                 {selectedTracks.length} of {allAvailableTracks.length} selected
@@ -754,13 +755,13 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               onClick={() => setSelectedTracks(['all'])}
               style={{ fontSize: '11.5px', padding: '2px 8px' }}
             >
-              Reset to All Tracks
+              Reset to All Topics
             </button>
           )}
         </div>
 
         <div className="filter-pills-row">
-          {/* 'All Tracks' Pill */}
+          {/* 'All Topics' Pill */}
           <button
             key="all"
             type="button"
@@ -768,7 +769,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             onClick={() => handleToggleTrack('all')}
           >
             {isAllTracks && <Check size={13} />}
-            All Tracks ({topics.length})
+            All Topics ({topics.length})
           </button>
 
           {/* Individual Tracks */}
@@ -804,7 +805,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             <Search size={14} className="catalog-search-icon" />
             <input
               type="text"
-              placeholder="Search topics, tags, or tracks..."
+              placeholder="Search cards, tags, or topics..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="catalog-search-input"
@@ -855,19 +856,21 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as CatalogSortOption)}
               className="catalog-select"
-              aria-label="Sort Topics"
+              aria-label="Sort Cards"
             >
-              <option value="track-asc">Sort: Track (A-Z) → Difficulty (Default)</option>
-              <option value="track-desc">Sort: Track (Z-A)</option>
+              <option value="track-asc">Sort: Topic (A-Z) → Difficulty (Default)</option>
+              <option value="track-desc">Sort: Topic (Z-A)</option>
               <option value="streak-desc">Sort: Streak (Highest First 🔥)</option>
               <option value="streak-asc">Sort: Streak (Lowest First)</option>
               <option value="difficulty-asc">Sort: Difficulty (Easiest First)</option>
               <option value="difficulty-desc">Sort: Difficulty (Hardest First)</option>
               <option value="box-desc">Sort: {tierName} (Highest First)</option>
               <option value="box-asc">Sort: {tierName} (Lowest First)</option>
-              <option value="title-asc">Sort: Topic Name (A-Z)</option>
-              <option value="title-desc">Sort: Topic Name (Z-A)</option>
-              <option value="due-asc">Sort: Next Trial (Ready now first)</option>
+              <option value="title-asc">Sort: Card Title (A-Z)</option>
+              <option value="title-desc">Sort: Card Title (Z-A)</option>
+              <option value="status-desc">Sort: Status (Attempted → Locked)</option>
+              <option value="status-asc">Sort: Status (Locked → Attempted)</option>
+              <option value="due-asc">Sort: Due for Practice First</option>
             </select>
           </div>
         </div>
@@ -875,7 +878,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         {/* Results Count & Reset Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-            Showing <strong style={{ color: 'var(--text-primary)' }}>{filteredTopics.length}</strong> of {topics.length} topics
+            Showing <strong style={{ color: 'var(--text-primary)' }}>{filteredTopics.length}</strong> of {topics.length} cards
           </span>
           {hasActiveFilters && (
             <button
@@ -906,20 +909,20 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 onClick={() => handleHeaderSort('title')}
                 className="catalog-th"
                 style={{ cursor: 'pointer', minWidth: '220px' }}
-                title="Click to sort by topic name"
+                title="Click to sort by card name"
               >
                 <div className="catalog-th-btn">
-                  Topic {renderSortIndicator('title')}
+                  Card {renderSortIndicator('title')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('track')}
                 className="catalog-th"
                 style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap' }}
-                title="Click to sort by track name"
+                title="Click to sort by topic name"
               >
                 <div className="catalog-th-btn">
-                  Track {renderSortIndicator('track')}
+                  Topic {renderSortIndicator('track')}
                 </div>
               </th>
               <th
@@ -953,16 +956,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 </div>
               </th>
               <th
-                onClick={() => handleHeaderSort('due')}
-                className="catalog-th"
-                style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap' }}
-                title="Click to sort by next eligible trial"
-              >
-                <div className="catalog-th-btn">
-                  Next Eligible Trial {renderSortIndicator('due')}
-                </div>
-              </th>
-              <th
                 onClick={() => handleHeaderSort('status')}
                 className="catalog-th"
                 style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap' }}
@@ -978,14 +971,13 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           <tbody>
             {filteredTopics.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  No topics match your current filter criteria.
+                <td colSpan={7} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  No cards match your current filter criteria.
                 </td>
               </tr>
             ) : (
               filteredTopics.map((topic) => {
                 const trkMeta = getTrackMeta(topic.track);
-                const isEligible = !topic.deactivated && topic.status === 'active' && topic.nextEligibleTrial <= totalCompletedReviews;
                 return (
                   <tr
                     key={topic.id}
@@ -1063,33 +1055,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                       )}
                     </td>
 
-                    {/* Next Eligible Trial */}
-                    <td className="catalog-td">
-                      {!topic.deactivated && topic.status === 'active' ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span
-                            style={{
-                              fontFamily: 'var(--font-mono)',
-                              fontSize: '12px',
-                              fontWeight: isEligible ? 700 : 500,
-                              color: isEligible ? 'var(--accent-secondary)' : 'var(--text-secondary)',
-                            }}
-                          >
-                            Trial #{topic.nextEligibleTrial}
-                          </span>
-                          {isEligible && (
-                            <span className="badge trial-badge-ready">
-                              Ready
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <span style={{ color: 'var(--text-dim)', fontSize: '12px', fontWeight: 500 }}>
-                          {topic.deactivated ? 'Inactive' : 'Locked'}
-                        </span>
-                      )}
-                    </td>
-
                     {/* Status */}
                     <td className="catalog-td">
                       {topic.deactivated ? (
@@ -1102,7 +1067,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                           <Lock size={11} />
                           <span>Locked</span>
                         </span>
-                      ) : (topic.box > 1 || topic.streak > 0 || topic.nextEligibleTrial > 0) ? (
+                      ) : isCardAttempted(topic) ? (
                         <span className="badge status-badge-attempted" title="Active card in study rotation (attempted at least once)">
                           <CheckCircle2 size={11} />
                           <span>Attempted</span>
@@ -1209,11 +1174,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', color: 'var(--accent-orange, #f97316)' }}>
               <Archive size={22} />
               <h3 id="deactivate-confirm-title" style={{ fontSize: '17px', fontWeight: 600 }}>
-                Deactivate Topic
+                Deactivate Card
               </h3>
             </div>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '22px' }}>
-              Deactivate topic '{topicToDeactivate.title}'? It will be pulled out of your active spaced repetition study cycle. You can reactivate it at any time from this catalog table.
+              Deactivate card '{topicToDeactivate.title}'? It will be pulled out of your active spaced repetition study cycle. You can reactivate it at any time from this catalog table.
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
               <button
@@ -1232,7 +1197,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                   setTopicToDeactivate(null);
                 }}
               >
-                Deactivate Topic
+                Deactivate Card
               </button>
             </div>
           </div>

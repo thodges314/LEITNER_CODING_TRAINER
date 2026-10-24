@@ -115,7 +115,7 @@ export const FocusModal: React.FC<FocusModalProps> = ({
                 Practice Focus
               </h2>
               <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                Select tracks, tags, or difficulty levels to focus your practice session.
+                Select topics, tags, or difficulty levels to focus your practice session.
               </p>
             </div>
           </div>
@@ -211,7 +211,7 @@ export const FocusModal: React.FC<FocusModalProps> = ({
         </div>
 
         <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
-          Tracks
+          Topics
         </h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '18px' }}>
           {tracks.map((track) => {

@@ -30,6 +30,8 @@ export interface TopicItem {
   streak: number;
   nextEligibleTrial: number; // The global trial index when this card can next appear
   status: 'active' | 'locked';
+  /** True once this card has been attempted in practice at least once. */
+  attempted?: boolean;
   /** True when a user has pulled this card out of active spaced repetition study cycle without deleting it. */
   deactivated?: boolean;
   tags: string[];
@@ -794,6 +796,7 @@ export function commitCardReview(
       streak: nextStreak,
       nextEligibleTrial,
       status: 'active',
+      attempted: true,
     };
     updatedCard = modified;
     return modified;
@@ -999,10 +1002,14 @@ export function getNextCard(
   return sorted[0] ?? null;
 }
 
+export function isCardAttempted(card: TopicItem): boolean {
+  return !card.deactivated && card.status === 'active' && Boolean(card.attempted || card.box > 1 || card.streak > 0);
+}
+
 export function unlockSingleCard(state: LeitnerDeckState, topicId: string): LeitnerDeckState {
   const updated = state.topics.map((t) =>
     t.id === topicId
-      ? { ...t, status: 'active' as const, nextEligibleTrial: state.totalCompletedReviews }
+      ? { ...t, status: 'active' as const, nextEligibleTrial: 0 }
       : t
   );
   const nextState = { ...state, topics: updated };

@@ -29,3 +29,8 @@ export interface DragSortableListProps {
   - On `dragover`, calls `preventDefault()` on the event to allow dropping.
   - On `drop`, calls `preventDefault()`, moves the dragged item from its origin index to the target item's index, updates state, and calls `onReorder(newItems)`.
   - If dropped onto the same index, no reordering occurs.
+
+### Optional Styling (CSS is not graded):
+Preloaded helper classes are available if you wish to use them:
+- `.sortable-list` (or `[data-sortable-list]`): Resets list style with vertical flex gap.
+- `.sortable-item` (or `[data-item-id]`): Card container with grab cursor, border, and button spacing.

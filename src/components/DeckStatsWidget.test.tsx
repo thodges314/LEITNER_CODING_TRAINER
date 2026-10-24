@@ -137,7 +137,7 @@ describe('DeckStatsWidget', () => {
       orbitBtn.click();
     });
 
-    expect(container?.textContent).toContain('Track Orbit');
+    expect(container?.textContent).toContain('Topic Orbit');
     expect(container?.textContent).toContain('Active Cards');
 
     // Switch to Concentric Rings / Mastery Tiers

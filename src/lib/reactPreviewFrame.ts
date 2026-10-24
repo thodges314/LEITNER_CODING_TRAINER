@@ -257,6 +257,50 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
       font-weight: 600;
       opacity: 0.9;
     }
+
+    /* Drag Sortable List helpers */
+    .sortable-list, [data-sortable-list] {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sortable-item, [data-item-id] {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: ${cardBg};
+      border: 1px solid ${border};
+      border-radius: 6px;
+      color: inherit;
+      font-size: 13px;
+      cursor: grab;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, ${isLight ? '0.08' : '0.2'});
+    }
+    .sortable-item:active, [data-item-id]:active {
+      cursor: grabbing;
+    }
+    .sortable-item button, [data-item-id] button {
+      padding: 4px 9px;
+      font-size: 11px;
+      border-radius: 4px;
+      background: ${isLight ? '#e2e8f0' : '#334155'};
+      color: inherit;
+      border: none;
+      cursor: pointer;
+      margin-left: 4px;
+    }
+    .sortable-item button:hover:not(:disabled), [data-item-id] button:hover:not(:disabled) {
+      background: #0284c7;
+      color: #fff;
+    }
+    .sortable-item button:disabled, [data-item-id] button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
   </style>
   <script>${safeBundle}</script>
 </head>
@@ -418,6 +462,16 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
         timestamp: Date.now()
       }, '*');
     });
+
+    // Intercept link clicks so navigating relative or hash links doesn't unload/break preview iframe
+    document.addEventListener('click', function(e) {
+      const a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (a) {
+        e.preventDefault();
+        const href = a.getAttribute('href');
+        console.log('[Preview] Navigation prevented for link:', href);
+      }
+    }, true);
 
     class PreviewErrorBoundary extends React.Component {
       constructor(props) {

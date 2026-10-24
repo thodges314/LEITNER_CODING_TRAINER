@@ -154,7 +154,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
 
   const modes: { id: StatsViewMode; label: string; icon: React.ReactNode }[] = [
     { id: 'radar', label: 'Skill Matrix', icon: <Activity size={13} /> },
-    { id: 'orbit', label: 'Track Orbit', icon: <PieChart size={13} /> },
+    { id: 'orbit', label: 'Topic Orbit', icon: <PieChart size={13} /> },
     { id: 'tiers', label: 'Mastery Tiers', icon: <Layers size={13} /> },
     { id: 'activity', label: 'Activity', icon: <BarChart3 size={13} /> },
   ];
@@ -398,7 +398,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
               color: 'var(--text-muted)',
             }}
           >
-            No active cards in rotation yet. Unlock topics to see live proportion analytics.
+            No active cards in rotation yet. Unlock cards to see live proportion analytics.
           </div>
         ) : mode === 'radar' ? (
           /* Mode 1 (Default): Skill Matrix Radar */
@@ -534,7 +534,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
             </div>
           </div>
         ) : mode === 'orbit' ? (
-          /* Mode 2: Track Orbit Donut */
+          /* Mode 2: Topic Orbit Donut */
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <svg data-testid="stats-chart-svg" width={width} height={height} style={{ overflow: 'visible' }}>
               <g transform={`translate(${centerX}, ${centerY})`}>
