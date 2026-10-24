@@ -157,13 +157,33 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
                           </h3>
                         );
                       }
+                      if (group.level === 3) {
+                        return (
+                          <h4
+                            key={gIdx}
+                            style={{ ...headingStyles, fontSize: '14px' }}
+                          >
+                            {renderInlineMarkdown(group.text)}
+                          </h4>
+                        );
+                      }
+                      if (group.level === 4) {
+                        return (
+                          <h5
+                            key={gIdx}
+                            style={{ ...headingStyles, fontSize: '13px' }}
+                          >
+                            {renderInlineMarkdown(group.text)}
+                          </h5>
+                        );
+                      }
                       return (
-                        <h4
+                        <h6
                           key={gIdx}
-                          style={{ ...headingStyles, fontSize: '14px' }}
+                          style={{ ...headingStyles, fontSize: '12px' }}
                         >
                           {renderInlineMarkdown(group.text)}
-                        </h4>
+                        </h6>
                       );
                     }
 

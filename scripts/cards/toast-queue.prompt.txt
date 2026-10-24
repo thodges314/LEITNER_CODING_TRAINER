@@ -11,3 +11,9 @@ Build an accessible toast notification system:
 - Custom hook returning `{ show, dismiss }`:
   - `show(message, { duration = 3000 } = {})`: adds a toast and returns its numeric `id`.
   - `dismiss(id)`: removes that toast.
+
+### Optional Styling (CSS is not graded):
+Preloaded helper classes are available if you wish to use them:
+- `.toast-viewport`: Fixed bottom-right notification stack container.
+- `.toast-item`: Floating toast card with shadow, border, and flex spacing.
+- `.toast-dismiss`: Minimal dismiss button styling.

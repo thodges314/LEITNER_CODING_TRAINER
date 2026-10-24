@@ -20,3 +20,9 @@ Build an accessible, interactive Tic-Tac-Toe game component:
 - Clicking an occupied square or any square after the game has ended does nothing.
 - When the game ends, invokes `onGameEnd` **exactly once** with `"X"`, `"O"`, or `"draw"`.
 - Renders a `<button type="button">Restart</button>`: resets the board to empty and gives `X` the first move again.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.grid-3x3`: 3x3 CSS grid layout with spacing for the 9 board cells.
+- `.grid-cell`: square button with centered mark and clean border.
+You are free to use these classes, custom styles, or your own class names.

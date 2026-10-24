@@ -22,7 +22,7 @@ npm run build      # type-check + production build into dist/
   - **Classic Leitner Boxes**: 5 boxes with trial-based intervals (+1, +4, +10, +22, +45 reviews). A pass promotes to the next box; a failure resets the card to Box 1 and schedules its setback trial.
   - **Graduated Interval Recall & Chaining**: Spaced repetition progression across Tier 1 (+1), Tier 2 (+3), Tier 3 (+7), Tier 4 (+16), Tier 5 (+35), Tier 6 (+75), Tier 7 (+165), Tier 8 (+360), Tier 9 (+800), and dynamic geometric expansion (~2.2x) for Tier 10+. Features an active deck ceiling guard (capping interval offsets to the active deck size $N$ so cards don't disappear past a full deck cycle). On pass, advances to the next tier; on failure, applies a gentle half-tier setback (`Math.max(1, Math.floor(tier / 2))`) followed by an immediate zero-stat practice drill.
   - **Immediate Reinforcement Drill**: Committing a card failure launches an isolated practice drill on the same card. The user can replicate the solution and retest until they get it right; practice in the drill has **zero effect on tier/box or streak stats**. Once replicated, they continue to the next card.
-  - In both algorithms, tracks are interleaved, and every 4 cards in box/tier 3+ unlock 4 more locked cards along the difficulty ladder.
+  - In both algorithms, topics are interleaved, and every 4 cards in box/tier 3+ unlock 4 more locked cards along the difficulty ladder.
 - **Cold-Start Editor & Aesthetics** (`src/components/PracticeArena.tsx`):
   - Powered by **CodeMirror 6** (`@uiw/react-codemirror`) styled for high-contrast dark themes.
   - **Autocomplete & IntelliSense strictly disabled**: No ghost text, no dropdown suggestions, preserving cold-start recall conditions for realistic interview drills.
@@ -64,7 +64,7 @@ Settings accepts Gemini, OpenAI, Groq, OpenRouter, or any OpenAI-compatible endp
 
 ## Content & Authoring Pipeline
 
-The deck includes **277 cards** across 9 tracks (224 default + 53 in the optional `algorithms-advanced` pack) with **1,964 test cases**:
+The deck includes **277 cards** across 9 topics (224 default + 53 in the optional `algorithms-advanced` pack) with **1,964 test cases**:
 - **100% Structured Markdown Instructions**: Every card features clean GitHub-flavored Markdown instructions detailing the problem description, target signature, parameters, return value, constraints, and edge cases.
 - **Authoring Model**: Cards are primarily AI-written through structured batch pipelines into `scripts/cards/` and `scripts/testcases/`. Rather than relying on unverified generators, every card is gated by automated test runners, contract extraction, reference validation, empty-solution rejection, and mutation test verification.
 - **Dual-Solution Architecture**: Reference solutions are authored in `scripts/cards/<id>.ref.js` and optionally `<id>.ref.ts`.

@@ -211,7 +211,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       setStatus('error');
       setErrorMessage(err instanceof Error ? err.message : String(err));
     }
-  }, [card.previewCode, card.track, code, executionMode, clearWatchdog]);
+  }, [card, code, executionMode, clearWatchdog]);
 
   // Reset timeout halt whenever user changes code
   useEffect(() => {
@@ -711,7 +711,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           key={currentEnvKey}
           ref={iframeRef}
           title="React Component Preview"
-          sandbox="allow-scripts"
+          sandbox="allow-scripts allow-forms"
           srcDoc={frameModule.createPreviewSrcDoc(theme, currentEnvKey)}
           onLoad={handleIframeLoad}
           style={{

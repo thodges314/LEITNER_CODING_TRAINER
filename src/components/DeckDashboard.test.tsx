@@ -255,7 +255,7 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
     });
 
     // Change sort option to 'difficulty-desc'
-    const sortSelect = container?.querySelector('select[aria-label="Sort Topics"]') as HTMLSelectElement;
+    const sortSelect = container?.querySelector('select[aria-label="Sort Cards"]') as HTMLSelectElement;
     expect(sortSelect).toBeTruthy();
     await act(async () => {
       sortSelect.value = 'difficulty-desc';
@@ -263,7 +263,7 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
     });
 
     // Change search query
-    const searchInput = container?.querySelector('input[placeholder*="Search topics"]') as HTMLInputElement;
+    const searchInput = container?.querySelector('input[placeholder*="Search cards"]') as HTMLInputElement;
     expect(searchInput).toBeTruthy();
     const inputSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
     await act(async () => {
@@ -288,8 +288,8 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
     // Verify filters and sort are still applied
     const restoredPill5 = container?.querySelector('[data-testid="tier-pill-5"]') as HTMLElement;
     const restoredStatusSelect = container?.querySelector('select[aria-label="Filter by Status"]') as HTMLSelectElement;
-    const restoredSortSelect = container?.querySelector('select[aria-label="Sort Topics"]') as HTMLSelectElement;
-    const restoredSearchInput = container?.querySelector('input[placeholder*="Search topics"]') as HTMLInputElement;
+    const restoredSortSelect = container?.querySelector('select[aria-label="Sort Cards"]') as HTMLSelectElement;
+    const restoredSearchInput = container?.querySelector('input[placeholder*="Search cards"]') as HTMLInputElement;
 
     expect(restoredPill5.getAttribute('aria-pressed')).toBe('true');
     expect(restoredStatusSelect.value).toBe('unlocked');
