@@ -1,5 +1,6 @@
-Build `Typeahead({ onSelect, fetchSuggestions, delay = 300 })`:
+Build an accessible typeahead / autocomplete component:
 
+### Typeahead({ onSelect, fetchSuggestions, delay = 300 }: { onSelect: (item: string) => void; fetchSuggestions: (query: string) => Promise<string[]>; delay?: number }): JSX.Element:
 - **Input & Search**: A text input that debounces typing by `delay` ms, then calls `fetchSuggestions(query)` (`async`, returns `string[]`) and displays results.
 - **Race Condition Handling**: Ignore out-of-order responses (only the latest query's results are shown).
 - **Keyboard Navigation**:

@@ -1,5 +1,6 @@
-Build `Wizard({ steps, onSubmit })` where `steps` is `[{ title, fields: [{ name, label }] }]`.
+Build a multi-step form wizard component:
 
+### Wizard({ steps, onSubmit }: { steps: Array<{ title: string; fields: Array<{ name: string; label: string }> }>; onSubmit: (values: Record<string, string>) => void }): JSX.Element:
 - Render one `<form>` displaying `<p>Step X of N</p>`, an `<h2>` with the step title, and for each field a `<label>` wrapping a controlled `<input name>`.
 - Controls: Provide `<button type="button">Back</button>` (disabled on the first step) and `<button type="submit">` labelled `'Next'` (or `'Submit'` on the last step).
 - **Validation**: Submitting the form (via `Enter` or the submit button) validates the **CURRENT** step only:

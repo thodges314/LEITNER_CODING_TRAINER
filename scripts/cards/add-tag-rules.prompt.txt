@@ -1,6 +1,6 @@
 Implement immutable tag (chip) input list processing rules. Each function returns a new array without mutating the input:
 
-### `addTag(tags, input, { max = Infinity } = {})`
+### addTag(tags: string[], input: string, { max = Infinity }: { max?: number } = {}): string[]:
 - Trims the input string: `const tag = input.trim()`.
 - Appends `tag` to the end of `tags` only if:
   1. `tag` is not empty.
@@ -8,11 +8,11 @@ Implement immutable tag (chip) input list processing rules. Each function return
   3. The current `tags` count is strictly less than `max`.
 - Otherwise returns an unchanged copy of the array `[...tags]`.
 
-### `removeTag(tags, index)`
+### removeTag(tags: string[], index: number): string[]:
 - Returns a new array with the item at `index` removed.
 - If `index` is out of bounds, returns a copy of `tags` without changes.
 
-### `parseTags(text)`
+### parseTags(text: string): string[]:
 - Handles pasted text by splitting on commas and newlines (`/[,\n]/`).
 - Progressively applies `addTag` rules to each trimmed segment (ignoring empty segments and case-insensitive duplicates).
 - Example: `parseTags('a, b,\n A ,,C')` returns `['a', 'b', 'C']`.

@@ -1,5 +1,6 @@
-Build `TagInput({ value, onChange, max = Infinity })` as a controlled component where `value` is an array of strings.
+Build a controlled tag (chip) input component where `value` is an array of strings:
 
+### TagInput({ value, onChange, max = Infinity }: { value: string[]; onChange: (next: string[]) => void; max?: number }): JSX.Element:
 - **DOM Structure**: Render `<ul aria-label="Tags">` with one `<li>` per tag containing the tag text and `<button type="button" aria-label="Remove <tag>">`, followed by `<input aria-label="Add tag">` (local input text state).
 - **Adding Tags**: Pressing `Enter` or `,` adds the trimmed text via `onChange([...value, tag])`, clears the input, and prevents the key's default behavior:
   - Empty text and duplicates (case-insensitive) are ignored (the input is cleared for a duplicate).

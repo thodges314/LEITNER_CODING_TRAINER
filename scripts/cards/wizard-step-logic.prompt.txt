@@ -1,22 +1,22 @@
 Implement pure helper functions for multi-step wizard navigation and form validation (steps `0` to `total - 1`):
 
-### `nextStep(step, total)`
+### nextStep(step: number, total: number): number:
 - Advances to `step + 1`, clamped at `total - 1` (or `0` if `total <= 0`).
 
-### `prevStep(step)`
+### prevStep(step: number): number:
 - Moves back to `step - 1`, clamped at `0`.
 
-### `stepStatuses(current, total)`
+### stepStatuses(current: number, total: number): Array<'done' | 'current' | 'upcoming'>:
 - Returns an array of `total` strings describing each step's status:
   - `'done'` for step indexes before `current`.
   - `'current'` for the step index equal to `current`.
   - `'upcoming'` for step indexes after `current`.
 
-### `missingFields(values, required)`
+### missingFields(values: Record<string, unknown>, required: string[]): string[]:
 - Returns an array of field names from `required` (preserving order) whose value in `values` is missing:
   - Missing is defined as `undefined`, `null`, or a string that is empty after `.trim()`.
   - Valid values include `0`, `false`, and non-empty strings.
 
-### `progressPercent(current, total)`
+### progressPercent(current: number, total: number): number:
 - Returns the percentage of completed steps (`current / total * 100`), rounded to the nearest whole integer via `Math.round()`.
 - Returns `0` if `total <= 0`.
