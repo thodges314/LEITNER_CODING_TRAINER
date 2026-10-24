@@ -56,6 +56,7 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
   let root: ReactDOMClient.Root | null = null;
 
   beforeEach(() => {
+    localStorage.clear();
     container = document.createElement('div');
     document.body.appendChild(container);
     root = ReactDOMClient.createRoot(container);
@@ -229,6 +230,85 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
 
     expect(pill5.getAttribute('aria-pressed')).toBe('false');
     expect(pill6.getAttribute('aria-pressed')).toBe('false');
+    expect(container?.textContent).toContain('Tier 1 Learning Card');
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).toContain('Tier 6 Veteran Card');
+  });
+
+  it('persists filters and sort across unmount and remount (navigating to a card and back)', async () => {
+    // Mount first time
+    await renderDashboard();
+
+    // Select Tier 5 pill
+    const pill5 = container?.querySelector('[data-testid="tier-pill-5"]') as HTMLElement;
+    expect(pill5).toBeTruthy();
+    await act(async () => {
+      pill5.click();
+    });
+
+    // Change status filter to 'active'
+    const statusSelect = container?.querySelector('select[aria-label="Filter by Status"]') as HTMLSelectElement;
+    expect(statusSelect).toBeTruthy();
+    await act(async () => {
+      statusSelect.value = 'active';
+      statusSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    // Change sort option to 'difficulty-desc'
+    const sortSelect = container?.querySelector('select[aria-label="Sort Topics"]') as HTMLSelectElement;
+    expect(sortSelect).toBeTruthy();
+    await act(async () => {
+      sortSelect.value = 'difficulty-desc';
+      sortSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    // Change search query
+    const searchInput = container?.querySelector('input[placeholder*="Search topics"]') as HTMLInputElement;
+    expect(searchInput).toBeTruthy();
+    const inputSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    await act(async () => {
+      inputSetter?.call(searchInput, 'Mastered');
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // Verify filtered output on initial mount
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).not.toContain('Tier 1 Learning Card');
+    expect(container?.textContent).not.toContain('Tier 6 Veteran Card');
+
+    // Simulate unmounting (user goes to a card to practice)
+    await act(async () => {
+      root?.unmount();
+    });
+    root = ReactDOMClient.createRoot(container!);
+
+    // Simulate remounting (user backs out to deck screen)
+    await renderDashboard();
+
+    // Verify filters and sort are still applied
+    const restoredPill5 = container?.querySelector('[data-testid="tier-pill-5"]') as HTMLElement;
+    const restoredStatusSelect = container?.querySelector('select[aria-label="Filter by Status"]') as HTMLSelectElement;
+    const restoredSortSelect = container?.querySelector('select[aria-label="Sort Topics"]') as HTMLSelectElement;
+    const restoredSearchInput = container?.querySelector('input[placeholder*="Search topics"]') as HTMLInputElement;
+
+    expect(restoredPill5.getAttribute('aria-pressed')).toBe('true');
+    expect(restoredStatusSelect.value).toBe('active');
+    expect(restoredSortSelect.value).toBe('difficulty-desc');
+    expect(restoredSearchInput.value).toBe('Mastered');
+
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).not.toContain('Tier 1 Learning Card');
+    expect(container?.textContent).not.toContain('Tier 6 Veteran Card');
+
+    // Reset filters button restores defaults
+    const allButtons = Array.from(container?.querySelectorAll('button') || []);
+    const resetFiltersBtn = allButtons.find((b) => b.textContent?.includes('Reset Filters'));
+    expect(resetFiltersBtn).toBeTruthy();
+    await act(async () => {
+      resetFiltersBtn?.click();
+    });
+
+    expect(restoredPill5.getAttribute('aria-pressed')).toBe('false');
     expect(container?.textContent).toContain('Tier 1 Learning Card');
     expect(container?.textContent).toContain('Tier 5 Mastered Card');
     expect(container?.textContent).toContain('Tier 6 Veteran Card');

@@ -1,6 +1,6 @@
 import { DifficultyBadge } from './DifficultyBadge';
 import { DeckStatsWidget } from './DeckStatsWidget';
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 import type { AppTheme } from '../lib/theme';
 import {
@@ -13,7 +13,7 @@ import {
   difficultyOf,
   DIFFICULTY_LABELS,
 } from '../lib/leitner';
-import type { TopicItem, LeitnerDeckState } from '../lib/leitner';
+import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
 import { FEATURES } from '../lib/features';
 import { isHintSeen, markHintSeen, TRACK_FILTER_HINT_KEY } from '../lib/hints';
 import {
@@ -34,24 +34,13 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
-
-export type CatalogSortOption =
-  | 'track-asc'
-  | 'track-desc'
-  | 'difficulty-asc'
-  | 'difficulty-desc'
-  | 'streak-desc'
-  | 'streak-asc'
-  | 'box-desc'
-  | 'box-asc'
-  | 'title-asc'
-  | 'title-desc'
-  | 'due-asc'
-  | 'due-desc'
-  | 'status-asc'
-  | 'status-desc';
-
-export type CatalogStatusFilter = 'all' | 'active' | 'locked' | 'due' | 'scheduled' | 'mastered';
+import {
+  loadDeckCatalogPreferences,
+  saveDeckCatalogPreferences,
+  clearDeckCatalogPreferences,
+} from '../lib/deckFilters';
+import type { CatalogSortOption, CatalogStatusFilter } from '../lib/deckFilters';
+export type { CatalogSortOption, CatalogStatusFilter };
 
 const LIGHT_TRACK_STYLES: Record<string, { color: string; bg: string; border: string }> = {
   'async-js': {
@@ -137,14 +126,34 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       ),
     [state]
   );
-  const [selectedTracks, setSelectedTracks] = useState<string[]>(['all']);
-  const [selectedBox, setSelectedBox] = useState<number | number[] | 'all'>('all');
-  const [selectedStatus, setSelectedStatus] = useState<CatalogStatusFilter>('all');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<number | 'all'>('all');
-  const [sortOption, setSortOption] = useState<CatalogSortOption>('track-asc');
-  const [searchQuery, setSearchQuery] = useState('');
+  const initialPrefs = useMemo(() => {
+    const prefs = loadDeckCatalogPreferences();
+    if (!prefs.selectedTracks.includes('all')) {
+      const valid = prefs.selectedTracks.filter((t) => allAvailableTracks.includes(t as TrackType));
+      prefs.selectedTracks = valid.length > 0 ? valid : ['all'];
+    }
+    return prefs;
+  }, [allAvailableTracks]);
+
+  const [selectedTracks, setSelectedTracks] = useState<string[]>(() => initialPrefs.selectedTracks);
+  const [selectedBox, setSelectedBox] = useState<number | number[] | 'all'>(() => initialPrefs.selectedBox);
+  const [selectedStatus, setSelectedStatus] = useState<CatalogStatusFilter>(() => initialPrefs.selectedStatus);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<number | 'all'>(() => initialPrefs.selectedDifficulty);
+  const [sortOption, setSortOption] = useState<CatalogSortOption>(() => initialPrefs.sortOption);
+  const [searchQuery, setSearchQuery] = useState(() => initialPrefs.searchQuery);
   const [topicToDelete, setTopicToDelete] = useState<TopicItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    saveDeckCatalogPreferences({
+      selectedTracks,
+      selectedBox,
+      selectedStatus,
+      selectedDifficulty,
+      sortOption,
+      searchQuery,
+    });
+  }, [selectedTracks, selectedBox, selectedStatus, selectedDifficulty, sortOption, searchQuery]);
 
   const algorithm = getSchedulingAlgorithm(state);
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
@@ -250,6 +259,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
     setSelectedDifficulty('all');
     setSearchQuery('');
     setSortOption('track-asc');
+    clearDeckCatalogPreferences();
   };
 
   const hasActiveFilters =

@@ -79,4 +79,41 @@ test.describe('back button', () => {
     await page.waitForTimeout(300);
     expect(page.url()).toMatch(/^http:\/\/localhost:\d+\//);
   });
+
+  test('filters and sort in deck catalog remain applied when going into a card and backing out', async ({ page }) => {
+    await openApp(page);
+    // Navigate to Deck Catalog
+    await page.getByRole('button', { name: /Deck Catalog/ }).click();
+    await expect(page.getByText(DECK_HEADING)).toBeVisible();
+
+    // Apply a difficulty filter (e.g. Level 3)
+    const diffSelect = page.getByRole('combobox', { name: 'Filter by Difficulty' });
+    await diffSelect.selectOption('3');
+
+    // Apply a sort option (e.g. Difficulty Hardest First)
+    const sortSelect = page.getByRole('combobox', { name: 'Sort Topics' });
+    await sortSelect.selectOption('difficulty-desc');
+
+    // Search for a keyword
+    const searchInput = page.getByPlaceholder(/Search topics, tags, or tracks/);
+    await searchInput.fill('window');
+
+    // Click on a practice button for a visible card to go into practice
+    const practiceBtn = page.getByRole('button', { name: /Practice/ }).first();
+    await expect(practiceBtn).toBeVisible();
+    await practiceBtn.click();
+
+    // Verify we are now in the practice view
+    await expect(page.getByRole('button', { name: /Submit Final Answer/ })).toBeVisible();
+    await expect(page.getByText(DECK_HEADING)).toHaveCount(0);
+
+    // Back out to Deck Catalog
+    await page.getByRole('button', { name: /Deck Catalog/ }).click();
+    await expect(page.getByText(DECK_HEADING)).toBeVisible();
+
+    // Verify filters and sort are still applied
+    await expect(diffSelect).toHaveValue('3');
+    await expect(sortSelect).toHaveValue('difficulty-desc');
+    await expect(searchInput).toHaveValue('window');
+  });
 });
