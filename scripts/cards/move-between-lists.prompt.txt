@@ -1,6 +1,10 @@
+```ts
+type TransferDirection = 'left' | 'right';
+```
+
 Implement transfer list logic using plain arrays of strings without mutating input arrays:
 
-### `moveSelected(left, right, selected, direction)`
+### moveSelected(left: string[], right: string[], selected: string[], direction: TransferDirection): { left: string[]; right: string[] }:
 - `direction` is `'right'` (move from left to right) or `'left'` (move from right to left).
 - Identifies the source list and target list based on `direction`.
 - Every item in the source list present in `selected` is removed from the source list and appended to the end of the target list.
@@ -8,6 +12,6 @@ Implement transfer list logic using plain arrays of strings without mutating inp
 - Ignores items in `selected` that do not exist in the source list.
 - Returns `{ left, right }` containing new arrays.
 
-### `moveAll(left, right, direction)`
+### moveAll(left: string[], right: string[], direction: TransferDirection): { left: string[]; right: string[] }:
 - Moves all items from the source list to the end of the target list, leaving the source list empty.
 - Returns `{ left, right }` containing new arrays.

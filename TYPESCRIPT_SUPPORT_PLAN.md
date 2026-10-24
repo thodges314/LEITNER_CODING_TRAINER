@@ -45,9 +45,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **254 / 271 (93.7%)**
-- **Cards Remaining:** **17 / 271 (6.3%)**
-- **Total Batches:** 48 batches (45 completed, 3 remaining)
+- **Fully Typed Cards Completed:** **259 / 271 (95.6%)**
+- **Cards Remaining:** **12 / 271 (4.4%)**
+- **Total Batches:** 48 batches (46 completed, 2 remaining)
 
 ### Track Completion Status
 
@@ -60,15 +60,15 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`js-utilities`**        |     37      |      37      |   100.0%   | **COMPLETE** (Batches 24–30)                          |
 | **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
 | **`react`**               |     27      |      27      |   100.0%   | **COMPLETE** (Batches 35–39)                          |
-| **`react-components`**    |     45      |      33      |   73.3%    | In Progress (Batches 40–45 done, Batches 46–47 remaining) |
+| **`react-components`**    |     45      |      38      |   84.4%    | In Progress (Batches 40–46 done, Batch 47 remaining)  |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
-| **TOTAL**                 |   **271**   |   **254**    | **93.7%**  | **48 Batches Total**                                  |
+| **TOTAL**                 |   **271**   |   **259**    | **95.6%**  | **48 Batches Total**                                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–45: 254 Cards)
+## 4. Completed Batches (Batches 1–46: 259 Cards)
 
-All 254 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 259 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -138,25 +138,19 @@ All 254 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 43 (Lists, Filtering & Pagination — 6 cards):** `filter-list`, `paginate-items`, `load-more-list`, `pagination-controls`, `simple-table`, `data-table`.
 - **Batch 44 (Virtualization & Carousels — 5 cards):** `infinite-scroll-list`, `virtual-list`, `visible-window-range`, `image-carousel`, `carousel-index-math`.
 - **Batch 45 (Complex Form Inputs & Chips — 5 cards):** `typeahead-autocomplete`, `tag-input`, `add-tag-rules`, `multi-step-form`, `wizard-step-logic`.
+- **Batch 46 (Trees & Multi-Lists — 5 cards):** `file-explorer-tree`, `flatten-visible-tree`, `nested-checkbox-tree`, `transfer-list`, `move-between-lists`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 46–48: 17 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 47–48: 12 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
 ---
 
-### Track: `react-components` (12 cards remaining — Batches 46 to 47)
+### Track: `react-components` (7 cards remaining — Batch 47)
 
-_Focus: React props interfaces (`interface ButtonProps`, `SelectProps<T>`), compound components, and accessibility._
-
-- **Batch 46: Trees & Multi-Lists (5 cards)**
-  - `file-explorer-tree`: File Explorer Tree
-  - `flatten-visible-tree`: Flatten a Tree into Visible Rows
-  - `nested-checkbox-tree`: Nested Checkbox Tree: Tri-State Parent Selection (Indeterminate)
-  - `transfer-list`: Transfer List: Dual-Column Item Picker
-  - `move-between-lists`: Move Items Between Two Lists
+_Focus: React props interfaces, accessibility (A11y), and routing._
 
 - **Batch 47: Accessibility (A11y) & Routing (7 cards)**
   - `a11y-form-field`: Accessible Form Field and Toggle Button

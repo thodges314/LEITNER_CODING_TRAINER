@@ -1,4 +1,13 @@
-Build `FileTree({ nodes, onSelect })` where `nodes` is `[{ name, children? }]`. An item with a `children` array is a folder.
+```ts
+interface FileNode {
+  name: string;
+  children?: FileNode[];
+}
+```
+
+### FileTree({ nodes, onSelect }: { nodes: FileNode[]; onSelect?: (path: string) => void }): JSX.Element:
+
+Build a file explorer tree where `nodes` is `FileNode[]`. An item with a `children` array is a folder.
 
 - Render `<ul role="tree">` with one `<li role="treeitem">` per node, each containing a `<button>` showing the name.
 - **Folders**: Start collapsed, carry `aria-expanded` (`false` / `true`), and toggle when their button is clicked. Their children render inside a nested `<ul role="group">` **ONLY** while expanded, with each folder maintaining its own state.

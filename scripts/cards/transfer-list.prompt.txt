@@ -1,4 +1,6 @@
-Implement a dual-column selection manager hook `useTransferList({ initialLeft = [], initialRight = [] } = {})`.
+### useTransferList({ initialLeft = [], initialRight = [] }: { initialLeft?: string[]; initialRight?: string[] } = {}): { left: string[]; right: string[]; leftSelected: string[]; rightSelected: string[]; toggleLeft: (item: string) => void; toggleRight: (item: string) => void; moveRight: () => void; moveLeft: () => void; moveAllRight: () => void; moveAllLeft: () => void }:
+
+Implement a dual-column selection manager hook `useTransferList`.
 
 - **State**: Maintains items in `left` and `right` string arrays, along with `leftSelected` and `rightSelected` arrays.
 - **Selection**:

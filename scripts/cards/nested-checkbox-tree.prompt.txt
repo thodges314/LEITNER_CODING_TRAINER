@@ -1,4 +1,16 @@
-Implement `useCheckboxTree(treeData, initialChecked = [])` to manage hierarchical checkbox states with indeterminate status propagation.
+```ts
+interface TreeNode {
+  id: string;
+  label: string;
+  children?: TreeNode[];
+}
+
+type CheckboxStatus = 'checked' | 'unchecked' | 'indeterminate';
+```
+
+### useCheckboxTree(treeData: TreeNode[], initialChecked: string[] = []): { checkedIds: string[]; getStatus: (id: string) => CheckboxStatus; toggle: (id: string) => void }:
+
+Implement `useCheckboxTree` to manage hierarchical checkbox states with indeterminate status propagation.
 
 Tree Node structure:
 ```ts

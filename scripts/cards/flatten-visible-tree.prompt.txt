@@ -1,8 +1,24 @@
+```ts
+interface TreeNode {
+  id: string;
+  label: string;
+  children?: TreeNode[];
+}
+
+interface VisibleRow {
+  id: string;
+  label: string;
+  depth: number;
+  hasChildren: boolean;
+  expanded: boolean;
+}
+```
+
 Tree nodes have the structure `{ id: string, label: string, children?: TreeNode[] }`.
 
 Write tree flattening and expansion utilities for virtualized tree rendering:
 
-### `flattenVisible(nodes, expandedIds)`
+### flattenVisible(nodes: TreeNode[], expandedIds: Set<string>): VisibleRow[]:
 - Flattens hierarchical tree nodes into an ordered array of visible row objects (depth-first traversal, parent before children, siblings in order).
 - `expandedIds` is a `Set` containing IDs of currently expanded nodes.
 - Each row is `{ id, label, depth, hasChildren, expanded }`:
@@ -11,7 +27,7 @@ Write tree flattening and expansion utilities for virtualized tree rendering:
   - `expanded`: `true` only if `hasChildren` is true and `expandedIds.has(node.id)`.
 - Children are visited and included only when their immediate parent is `expanded`. A collapsed parent hides its entire subtree (even if a nested descendant's ID is in `expandedIds`).
 
-### `toggleExpanded(expandedIds, id)`
+### toggleExpanded(expandedIds: Set<string>, id: string): Set<string>:
 - Immutably toggles membership of `id` in `expandedIds`.
 - Returns a **new `Set`** with `id` added if previously missing, or deleted if previously present.
 - Does not mutate the input `expandedIds` set.
