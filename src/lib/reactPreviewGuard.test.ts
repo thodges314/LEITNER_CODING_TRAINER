@@ -66,6 +66,22 @@ describe('React preview guard: every previewCode mounts with the reference solut
         `Transpilation failed for ${card.id}: ${transpiled.diagnostics.map((d) => d.formatted).join('; ')}`
       ).toBe(true);
 
+      if (card.referenceSolutionTs) {
+        const { checkAndTranspileTS } = await import('../utils/typeChecker');
+        const tsResult = checkAndTranspileTS(card.referenceSolutionTs);
+        expect(
+          tsResult.success,
+          `TypeScript reference solution check failed for ${card.id}: ${tsResult.diagnostics.map((d) => d.formatted).join('; ')}`
+        ).toBe(true);
+
+        const combinedTs = `${card.referenceSolutionTs}\n\n${card.previewCode}`;
+        const transpiledTs = await transpileForExecution(combinedTs, 'js');
+        expect(
+          transpiledTs.ok,
+          `Preview transpilation with TS reference solution failed for ${card.id}: ${transpiledTs.diagnostics.map((d) => d.formatted).join('; ')}`
+        ).toBe(true);
+      }
+
       const logCallbacks: Array<(...args: unknown[]) => unknown> = [];
       const loggedEvents: Array<{ name: string; args: unknown[] }> = [];
 

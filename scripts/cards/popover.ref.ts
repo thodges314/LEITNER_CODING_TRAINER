@@ -75,30 +75,41 @@ function Popover({
         {trigger}
       </button>
 
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="false"
-          data-placement={placement}
-          style={
-            {
-              position: 'absolute',
-              zIndex: 100,
-            } as Record<string, string | number>
-          }
-        >
-          {title && <h3 data-title>{title}</h3>}
-          <button
-            type="button"
-            data-action="close"
-            aria-label="Close"
-            onClick={(): void => setOpen(false)}
+      {open && (() => {
+        const placementStyles: Record<string, Record<string, string | number>> = {
+          top: { bottom: '100%', left: '50%', transform: 'translateX(-50%)', marginBottom: '8px' },
+          bottom: { top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: '8px' },
+          left: { right: '100%', top: '50%', transform: 'translateY(-50%)', marginRight: '8px' },
+          right: { left: '100%', top: '50%', transform: 'translateY(-50%)', marginLeft: '8px' },
+        };
+        const currentPlacementStyle = placementStyles[placement] || placementStyles.bottom;
+
+        return (
+          <div
+            role="dialog"
+            aria-modal="false"
+            data-placement={placement}
+            style={
+              {
+                position: 'absolute',
+                zIndex: 100,
+                ...currentPlacementStyle,
+              } as Record<string, string | number>
+            }
           >
-            X
-          </button>
-          <div>{content}</div>
-        </div>
-      )}
+            {title && <h3 data-title>{title}</h3>}
+            <button
+              type="button"
+              data-action="close"
+              aria-label="Close"
+              onClick={(): void => setOpen(false)}
+            >
+              X
+            </button>
+            <div>{content}</div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

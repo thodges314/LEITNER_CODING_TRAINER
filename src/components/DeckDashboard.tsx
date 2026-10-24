@@ -895,7 +895,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('track')}
                 className="catalog-th"
-                style={{ cursor: 'pointer', width: '135px' }}
+                style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap' }}
                 title="Click to sort by track name"
               >
                 <div className="catalog-th-btn">
@@ -905,7 +905,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('difficulty')}
                 className="catalog-th"
-                style={{ cursor: 'pointer', width: '165px' }}
+                style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap' }}
                 title="Click to sort by difficulty level"
               >
                 <div className="catalog-th-btn">
@@ -915,7 +915,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('box')}
                 className="catalog-th"
-                style={{ cursor: 'pointer', width: '90px', textAlign: 'center' }}
+                style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap', textAlign: 'center' }}
                 title={`Click to sort by ${tierName} level`}
               >
                 <div className="catalog-th-btn" style={{ justifyContent: 'center', width: '100%' }}>
@@ -925,7 +925,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('streak')}
                 className="catalog-th"
-                style={{ cursor: 'pointer', width: '70px', textAlign: 'center' }}
+                style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap', textAlign: 'center' }}
                 title="Click to sort by streak"
               >
                 <div className="catalog-th-btn" style={{ justifyContent: 'center', width: '100%' }}>
@@ -935,7 +935,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('due')}
                 className="catalog-th"
-                style={{ cursor: 'pointer', width: '145px' }}
+                style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap' }}
                 title="Click to sort by next eligible trial"
               >
                 <div className="catalog-th-btn">
@@ -945,14 +945,14 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('status')}
                 className="catalog-th"
-                style={{ cursor: 'pointer', width: '110px' }}
+                style={{ cursor: 'pointer', width: '1%', whiteSpace: 'nowrap' }}
                 title="Click to sort by card status"
               >
                 <div className="catalog-th-btn">
                   Status {renderSortIndicator('status')}
                 </div>
               </th>
-              <th className="catalog-th" style={{ width: '190px', textAlign: 'right' }}>Actions</th>
+              <th className="catalog-th" style={{ width: '1%', whiteSpace: 'nowrap', textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
