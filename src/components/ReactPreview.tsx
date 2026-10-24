@@ -58,7 +58,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
 
   const isLight = theme === 'apple-gsos';
-  const currentEnvKey = `${iframeKey}-${theme}-${isPoppedOut ? 'popup' : 'inline'}`;
+  const currentEnvKey = `${card.id}-${iframeKey}-${theme}-${isPoppedOut ? 'popup' : 'inline'}`;
   const [frameModule, setFrameModule] = useState<PreviewFrameModule | null>(null);
   useEffect(() => {
     let alive = true;
@@ -712,7 +712,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           ref={iframeRef}
           title="React Component Preview"
           sandbox="allow-scripts allow-forms"
-          srcDoc={frameModule.createPreviewSrcDoc(theme, currentEnvKey)}
+          srcDoc={frameModule.createPreviewSrcDoc(theme, currentEnvKey, card.id)}
           onLoad={handleIframeLoad}
           style={{
             width: '100%',

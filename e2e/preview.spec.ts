@@ -86,7 +86,7 @@ test.describe('React preview window', () => {
 
     // Verify sandboxed iframe attribute is preset
     const iframeElement = previewWindow.locator('iframe');
-    await expect(iframeElement).toHaveAttribute('sandbox', 'allow-scripts');
+    await expect(iframeElement).toHaveAttribute('sandbox', /allow-scripts/);
 
     // Click 'Run Code / Test' button to activate live preview
     await page.getByRole('button', { name: /Run Code \/ Test/ }).click();

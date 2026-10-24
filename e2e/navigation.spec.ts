@@ -91,11 +91,11 @@ test.describe('back button', () => {
     await diffSelect.selectOption('3');
 
     // Apply a sort option (e.g. Difficulty Hardest First)
-    const sortSelect = page.getByRole('combobox', { name: 'Sort Topics' });
+    const sortSelect = page.getByRole('combobox', { name: /Sort (Cards|Topics)/ });
     await sortSelect.selectOption('difficulty-desc');
 
     // Search for a keyword
-    const searchInput = page.getByPlaceholder(/Search topics, tags, or tracks/);
+    const searchInput = page.getByPlaceholder(/Search (cards|topics), tags/i);
     await searchInput.fill('window');
 
     // Click on a practice button for a visible card to go into practice
