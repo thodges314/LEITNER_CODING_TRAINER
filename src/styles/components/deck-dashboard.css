@@ -408,7 +408,7 @@
 }
 
 .catalog-th {
-  padding: 10px 10px;
+  padding: 11px 14px;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -452,15 +452,15 @@
 }
 
 .catalog-td {
-  padding: 10px 10px;
+  padding: 11px 14px;
   vertical-align: middle;
 }
 
 .catalog-actions-cell {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   white-space: nowrap;
 }
 
