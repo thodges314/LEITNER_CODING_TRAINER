@@ -50,5 +50,14 @@ describe('seed cards', () => {
       summary: expect.stringMatching(/^[1-9]\d* passed, 0 failed$/),
     });
   }, 30000);
+
+  // Two-stage contract: the TypeScript solution, once its types are stripped, must also behave correctly as JavaScript.
+  const dualTopics = tsTopics.filter((t) => !isTsOnlyCard(t));
+  it.each(dualTopics.map((t) => [t.id, t] as const))('%s: TypeScript reference solution, types stripped, passes its harness in JS mode', async (_id, t) => {
+    const r = await runHarness(t, t.referenceSolutionTs!, 'js', 20000);
+    expect({ id: t.id, summary: r.summary, lines: r.lines.filter((l) => /FAIL|error/i.test(l)) }).toMatchObject({
+      summary: expect.stringMatching(/^[1-9]\d* passed, 0 failed$/),
+    });
+  }, 30000);
 });
 
