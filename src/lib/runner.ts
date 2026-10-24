@@ -5,6 +5,7 @@ import type { TopicItem } from './leitner';
 import { createMockFetch } from './mockFetch';
 import { createDomTools, MockIntersectionObserver } from './domTools';
 import type { DomTools } from './domTools';
+import { isTsOnlyCard } from './tsOnly';
 
 export type ExecutionMode = 'js' | 'ts';
 
@@ -376,13 +377,13 @@ export async function runHarness(
   if (!harness) return notRun('No test harness is defined for this card.');
 
   // Type-level checks (@ts-expect-error in the harness) only mean something under strict checking.
-  if (card.track === 'typescript-patterns') mode = 'ts';
+  if (isTsOnlyCard(card)) mode = 'ts';
 
   const combined = bufferContainsHarness(code, harness) ? code : `${code}\n\n${harness}\n`;
 
   // In TS mode, strictly type-check the user's solution (or combined buffer for typescript-patterns puzzles).
   if (mode === 'ts') {
-    const codeToCheck = card.track === 'typescript-patterns' ? combined : code;
+    const codeToCheck = isTsOnlyCard(card) ? combined : code;
     const { checkAndTranspileTS } = await import('../utils/typeChecker');
     const tsCheck = checkAndTranspileTS(codeToCheck);
     if (!tsCheck.success) {

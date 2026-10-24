@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import seed from '../data/topics.json';
 import { runHarness } from './runner';
 import type { TopicItem } from './leitner';
+import { isTsOnlyCard } from './tsOnly';
 
 const topics = seed as unknown as TopicItem[];
 
@@ -23,12 +24,12 @@ describe('seed cards', () => {
   });
 
   it.each(topics.map((t) => [t.id, t] as const))('%s: reference solution passes its harness', async (_id, t) => {
-    const mode = t.track === 'typescript-patterns' ? 'ts' : 'js';
+    const mode = isTsOnlyCard(t) ? 'ts' : 'js';
     const r = await runHarness(t, t.referenceSolution!, mode, 20000);
     expect({ id: t.id, summary: r.summary, lines: r.lines.filter((l) => /FAIL|error/i.test(l)) }).toMatchObject({
       summary: expect.stringMatching(/^[1-9]\d* passed, 0 failed$/),
     });
-    if (t.track !== 'typescript-patterns') {
+    if (!isTsOnlyCard(t)) {
       // Every documented case is asserted under the same label (so failures show the matching input/expected).
       const labels = new Set(r.lines.map((l) => l.replace(/^\[\w+\] /, '').replace(/:\s*(PASS|FAIL).*$/s, '')));
       const missing = (t.testCases ?? []).map((c) => c.description ?? '').filter((d) => !labels.has(d));
@@ -37,7 +38,7 @@ describe('seed cards', () => {
   }, 30000);
 
   it.each(topics.map((t) => [t.id, t] as const))('%s: an empty solution does NOT pass the harness', async (_id, t) => {
-    const mode = t.track === 'typescript-patterns' ? 'ts' : 'js';
+    const mode = isTsOnlyCard(t) ? 'ts' : 'js';
     const r = await runHarness(t, '// intentionally empty', mode, 20000);
     expect(r.passed, `${t.id}: harness passed with no solution (${r.summary})`).toBe(false);
   }, 30000);

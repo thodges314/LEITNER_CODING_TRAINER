@@ -60,6 +60,7 @@ import { formatCode } from '../lib/formatter';
 import { getTimedModeEnabled, getTimedModeDuration } from '../lib/timedMode';
 import { ReactPreview } from './ReactPreview';
 import { MarkdownContent } from './MarkdownContent';
+import { isTsOnlyCard } from '../lib/tsOnly';
 
 const TIER_METADATA: Record<number, { level: string; desc: string }> = {
   1: { level: 'Initial Encounter', desc: 'Immediate reinforcement (+1 review) to anchor core pattern.' },
@@ -212,7 +213,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     resolveExecutionModeForCard(currentCard)
   );
 
-  const isTsTrack = currentCard?.track === 'typescript-patterns';
+  const isTsTrack = isTsOnlyCard(currentCard);
   // Card id the "TypeScript-only" notice was raised for (so it disappears when the card changes).
   const [tsOnlyNoticeFor, setTsOnlyNoticeFor] = useState<string | null>(null);
   const tsOnlyNotice = tsOnlyNoticeFor !== null && tsOnlyNoticeFor === currentCard?.id;

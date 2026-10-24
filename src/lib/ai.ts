@@ -1,6 +1,7 @@
 import { TRACK_TYPES, isTrackType } from './leitner';
 import type { TopicItem, TrackType } from './leitner';
 import type { HarnessReport } from './runner';
+import { isTsOnlyCard } from './tsOnly';
 
 export interface EvaluationResult {
   passed: boolean;
@@ -38,9 +39,9 @@ const SCHEMA_KEYS = ['passed', 'timeComplexity', 'spaceComplexity', 'invariantsM
 function isJsonNoise(s: string): boolean {
   const t = s.trim().replace(/,$/, '');
   if (!t) return true;
-  if (/^[\[\]{}:,"]+$/.test(t)) return true;
-  const key = t.replace(/^"|"?\s*:?\s*[\[{]?$/g, '').replace(/"$/, '');
-  return SCHEMA_KEYS.includes(key) && /^"?\w+"?\s*:\s*[\[{]?$/.test(t);
+  if (/^[[\]{}:,"]+$/.test(t)) return true;
+  const key = t.replace(/^"|"?\s*:?\s*[[{]?$/g, '').replace(/"$/, '');
+  return SCHEMA_KEYS.includes(key) && /^"?\w+"?\s*:\s*[[{]?$/.test(t);
 }
 
 function toStringList(value: unknown): string[] {
@@ -460,7 +461,7 @@ export async function evaluateCodeSubmission(
     return heuristicEvaluateCode(topic, submittedCode, harness);
   }
 
-  const isTypeScript = mode === 'ts' || topic.track === 'typescript-patterns';
+  const isTypeScript = mode === 'ts' || isTsOnlyCard(topic);
   const languageLabel = isTypeScript ? 'TypeScript' : 'JavaScript';
   const codeFence = isTypeScript ? 'typescript' : 'javascript';
 

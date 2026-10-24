@@ -1,3 +1,5 @@
+import { isTsOnlyCard } from './tsOnly';
+
 export const TS_HOVER_ENABLED_KEY = 'leitner_ts_hover_enabled';
 
 /**
@@ -60,7 +62,7 @@ export function setPreferredExecutionMode(mode: PreferredExecutionMode): void {
  * - All other cards use the user's stored preferred execution mode ('js' by default, or 'ts' if switched).
  */
 export function resolveExecutionModeForCard(card: { track?: string } | null | undefined): PreferredExecutionMode {
-  if (card?.track === 'typescript-patterns') {
+  if (isTsOnlyCard(card)) {
     return 'ts';
   }
   return getPreferredExecutionMode();
