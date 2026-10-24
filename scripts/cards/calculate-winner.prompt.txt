@@ -2,15 +2,15 @@ Tic-tac-toe boards are represented as a 9-element array (read left-to-right, row
 
 Write helper functions for evaluating game state:
 
-### `calculateWinner(squares)`
+### calculateWinner(squares: (string | null)[]): 'X' | 'O' | null
 - Checks all 8 possible winning lines (3 horizontal rows, 3 vertical columns, and 2 diagonals).
 - Returns `'X'` or `'O'` if that player owns all 3 squares of a line.
 - Otherwise returns `null` (three `null` squares do not count as a win).
 
-### `isBoardFull(squares)`
+### isBoardFull(squares: (string | null)[]): boolean
 - Returns `true` if every square is occupied (no `null` elements exist), `false` otherwise.
 
-### `getStatus(squares, xIsNext)`
+### getStatus(squares: (string | null)[], xIsNext: boolean): string
 - Computes game status:
   - If a player has won: returns `'Winner: X'` or `'Winner: O'`. Note: a win always takes precedence over a draw, even if the board is completely full.
   - Otherwise, if the board is full: returns `'Draw'`.

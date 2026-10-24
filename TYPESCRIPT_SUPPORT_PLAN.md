@@ -45,9 +45,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **221 / 271 (81.5%)**
-- **Cards Remaining:** **50 / 271 (18.5%)**
-- **Total Batches:** 48 batches (39 completed, 9 remaining)
+- **Fully Typed Cards Completed:** **227 / 271 (83.8%)**
+- **Cards Remaining:** **44 / 271 (16.2%)**
+- **Total Batches:** 48 batches (40 completed, 8 remaining)
 
 ### Track Completion Status
 
@@ -60,15 +60,15 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`js-utilities`**        |     37      |      37      |   100.0%   | **COMPLETE** (Batches 24–30)                          |
 | **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
 | **`react`**               |     27      |      27      |   100.0%   | **COMPLETE** (Batches 35–39)                          |
-| **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                               |
+| **`react-components`**    |     45      |      6       |   13.3%    | In Progress (Batch 40 done, Batches 41–47 remaining) |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
-| **TOTAL**                 |   **271**   |   **221**    | **81.5%**  | **48 Batches Total**                                  |
+| **TOTAL**                 |   **271**   |   **227**    | **83.8%**  | **48 Batches Total**                                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–39: 221 Cards)
+## 4. Completed Batches (Batches 1–40: 227 Cards)
 
-All 221 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 227 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -130,34 +130,38 @@ All 221 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 38 (Context, External Stores & Performance — 6 cards):** `context-provider-consumer`, `theme-switcher`, `external-store-hook`, `forward-ref-imperative-handle`, `memo-derived-list`, `memo-stable-callbacks`.
 - **Batch 39 (Async, Debouncing & React 19 Concurrent — 6 cards):** `use-debounce-hook`, `use-fetch-basic`, `use-fetch-hook`, `action-state-form`, `suspense-use-promise`, `tabs-transition-suspense`.
 
+### React Components Track (6 of 45 Cards)
+
+- **Batch 40 (Timers, Ratings & Tic-Tac-Toe — 6 cards):** `star-rating-component`, `countdown-component`, `progress-bar`, `stopwatch`, `tic-tac-toe`, `calculate-winner`.
+
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 40–48: 50 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 41–48: 44 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
 ---
 
-### Track: `react-components` (45 cards — Batches 40 to 47)
+### Track: `react-components` (39 cards remaining — Batches 41 to 47)
 
 _Focus: React props interfaces (`interface ButtonProps`, `SelectProps<T>`), compound components, and accessibility._
 
-- **Batch 40: Essential UI Widgets (6 cards)**
-  - `star-rating-component`: Star Rating Component
-  - `countdown-component`: Countdown Timer Component
-  - `stopwatch`: Stopwatch with Laps
-  - `progress-bar`: Accessible Progress Bar
+- **Batch 41: Tooltips, Menus & Notifications (6 cards)**
   - `tooltip`: Accessible Tooltip
   - `dropdown-menu`: Accessible Dropdown Menu
+  - `optimistic-like-button`: Optimistic Like Button with Rollback
+  - `optimistic-list-update`: Optimistic Update: Apply, Confirm, Roll Back
+  - `toast-queue`: Toast Notifications (Provider + useToast)
+  - `toast-queue-logic`: Toast Queue Logic
 
-- **Batch 41: Accordions, Tabs & Modals (5 cards)**
+- **Batch 42: Accordions, Tabs & Modals (5 cards)**
   - `accordion-component`: Accordion Component
   - `tabs-accordion-compound`: Compound Components (Tabs)
   - `modal-portal-focus`: Accessible Modal with Portal and Focus Trap
   - `error-boundary-reset`: Error Boundary with Reset
   - `simple-error-boundary`: Minimal Error Boundary
 
-- **Batch 42: Lists, Filtering & Pagination (6 cards)**
+- **Batch 43: Lists, Filtering & Pagination (6 cards)**
   - `filter-list`: Filterable List
   - `paginate-items`: Paginate a List
   - `load-more-list`: Paginated List with "Load more"
@@ -165,34 +169,26 @@ _Focus: React props interfaces (`interface ButtonProps`, `SelectProps<T>`), comp
   - `simple-table`: Simple Data Table
   - `data-table`: Data Table: Sort, Filter, Paginate
 
-- **Batch 43: Virtualization, Images & Infinite Scroll (5 cards)**
+- **Batch 44: Virtualization, Images & Infinite Scroll (5 cards)**
   - `infinite-scroll-list`: Infinite Scroll with IntersectionObserver
   - `virtual-list`: Virtualized (Windowed) List
   - `visible-window-range`: Windowing Math for a Virtual List
   - `image-carousel`: Carousel with Dots and Autoplay
   - `carousel-index-math`: Carousel Index Math
 
-- **Batch 44: Complex Form Inputs & Chips (5 cards)**
+- **Batch 45: Complex Form Inputs & Chips (5 cards)**
   - `typeahead-autocomplete`: Typeahead / Autocomplete Component
   - `tag-input`: Tag / Chip Input
   - `add-tag-rules`: Tag Input Rules: Add, Remove, Paste
   - `multi-step-form`: Multi-Step Form Wizard
   - `wizard-step-logic`: Wizard Step Logic
 
-- **Batch 45: Trees & Multi-Lists (5 cards)**
+- **Batch 46: Trees & Multi-Lists (5 cards)**
   - `file-explorer-tree`: File Explorer Tree
   - `flatten-visible-tree`: Flatten a Tree into Visible Rows
   - `nested-checkbox-tree`: Nested Checkbox Tree: Tri-State Parent Selection (Indeterminate)
   - `transfer-list`: Transfer List: Dual-Column Item Picker
   - `move-between-lists`: Move Items Between Two Lists
-
-- **Batch 46: Games, Notifications & Optimistic Updates (6 cards)**
-  - `tic-tac-toe`: Tic-Tac-Toe Board
-  - `calculate-winner`: Tic-Tac-Toe: Who Won?
-  - `optimistic-like-button`: Optimistic Like Button with Rollback
-  - `optimistic-list-update`: Optimistic Update: Apply, Confirm, Roll Back
-  - `toast-queue`: Toast Notifications (Provider + useToast)
-  - `toast-queue-logic`: Toast Queue Logic
 
 - **Batch 47: Accessibility (A11y) & Routing (7 cards)**
   - `a11y-form-field`: Accessible Form Field and Toggle Button
@@ -233,8 +229,8 @@ Every single batch follows this strict automated loop:
 >
 > ### Checkpoint & Quota Pause (21 October 2026)
 >
-> - **State (24 October 2026):** Batches 1–39 (221 cards) complete and passing. 7 of 9 tracks are 100% complete! Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
-> - **Next step:** Batch 40 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
+> - **State (24 October 2026):** Batches 1–40 (227 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
+> - **Next step:** Batch 41 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
 > - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.
 >
 > ### Handoff procedure (for any assistant resuming card work)

@@ -1,6 +1,6 @@
 Build an accurate, drift-free Stopwatch component in React:
 
-### `Stopwatch()`
+### Stopwatch(): JSX.Element
 - Tracks elapsed time calculated from timestamps via `Date.now()` (not by accumulating tick counts).
 - Updates rendering via a `setInterval(~10ms)` timer while running.
 

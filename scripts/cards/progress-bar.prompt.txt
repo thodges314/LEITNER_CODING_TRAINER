@@ -1,3 +1,4 @@
+### ProgressBar(props: ProgressBarProps): JSX.Element
 Build `ProgressBar({ value, max = 100, label = "Progress" })`:
 
 - **Root Element**: Render `<div role="progressbar">` with `aria-label={label}`, `aria-valuemin="0"`, and `aria-valuemax={max}`. Let `clamped` be `value` limited to the range `[0, max]`.
