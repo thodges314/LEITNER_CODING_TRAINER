@@ -1,12 +1,12 @@
 Implement shallow copy and shallow equality utilities:
 
-### `shallowCopy(value)`
+### `shallowCopy<T>(value: T): T`
 - Creates a shallow clone of `value`:
   - Arrays return a new array with identical elements (`[...value]`).
   - Plain objects return a new object with identical properties (`{ ...value }`).
   - All other types (primitives, functions, `null`, non-plain objects) are returned as-is.
 
-### `shallowEqual(a, b)`
+### `shallowEqual(a: unknown, b: unknown): boolean`
 - Compares `a` and `b` for shallow equality:
   - Returns `true` if `Object.is(a, b)` is true.
   - Returns `true` if both are plain objects (or both are arrays) with the identical set of keys, and every key's value is equal by `Object.is`.

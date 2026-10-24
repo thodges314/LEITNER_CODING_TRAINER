@@ -1,6 +1,6 @@
 Implement deep equality comparison supporting primitives, structural objects, and edge cases:
 
-### `deepEqual(a, b)`
+### `deepEqual(a: unknown, b: unknown): boolean`
 - **Primitives & NaN**:
   - Compares primitives by value (`a === b`).
   - Treats `NaN` as equal to `NaN`.

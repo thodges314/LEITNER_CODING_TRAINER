@@ -1,6 +1,6 @@
 Implement a comprehensive deep clone utility:
 
-### `deepClone(value)`
+### `deepClone<T>(value: T): T`
 - Creates a complete, independent deep clone of `value`.
 - Supports primitives, plain objects, arrays, `Date` instances, `Map` instances, and `Set` instances.
 - Detects circular references using a `WeakMap` cache, preserving shared reference structures and preventing infinite recursion.

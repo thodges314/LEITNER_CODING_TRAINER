@@ -1,6 +1,6 @@
 Implement deep cloning for nested objects and arrays without using `JSON.parse(JSON.stringify())` or `structuredClone()`:
 
-### `deepClone(value)`
+### `deepClone<T>(value: T): T`
 - Recursively creates independent copies of nested plain objects and arrays.
 - Mutating the cloned structure must never mutate the original input.
 - Primitives, functions, and `null` are returned as-is.
