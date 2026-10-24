@@ -16,7 +16,6 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Task | Who | Branch | Status |
 |---|---|---|---|
 | Comprehensive TypeScript Support (Plumbing, Ambient Types, Dual Solution Reveal, Typed Stubs) | Antigravity | `feature/ts-coverage` | complete |
-| Deck Catalog UX Polish (Diff: removal, Attempted status chip & sorting) and Optional Component CSS Classes | Antigravity | `feature/catalog-status-and-preview-styling` | complete |
 
 
 
