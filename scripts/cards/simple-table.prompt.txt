@@ -1,3 +1,4 @@
+### SimpleTable<T extends Record<string, unknown>>(props: SimpleTableProps<T>): JSX.Element:
 Build `SimpleTable({ columns, rows })` where `columns` is `[{ key, label }]` and `rows` is an array of objects.
 
 - Render a `<table>` with a `<thead>` row of `<th>` cells showing each `label`.

@@ -1,3 +1,4 @@
+### Pagination(props: PaginationProps): JSX.Element:
 Build `Pagination({ page, totalPages, onPageChange, siblings = 1 })` as a controlled component.
 
 - **DOM Structure**: Render `<nav aria-label="Pagination">` containing `<button>Previous</button>`, a `<ul>` of `<li>` items, and `<button>Next</button>`.

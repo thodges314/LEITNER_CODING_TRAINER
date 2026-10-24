@@ -1,3 +1,4 @@
+### DataTable<T extends Record<string, unknown>>(props: DataTableProps<T>): JSX.Element:
 Build `DataTable({ rows, columns, pageSize = 5 })` with `columns` as `[{ key, label }]`.
 
 - **Headers & Sorting**: Each `<th>` holds a `<button>` with the label and carries `aria-sort` (`"none"` | `"ascending"` | `"descending"`). Clicking a header cycles that column `none → ascending → descending → none` (sorting a different column starts at `ascending`). Numbers sort numerically, everything else with `localeCompare`. Sorting applies to ALL rows before pagination.

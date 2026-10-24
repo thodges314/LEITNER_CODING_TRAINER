@@ -1,6 +1,6 @@
+### FilterList(props: FilterListProps): JSX.Element:
 Build a filterable list component for an array of strings:
 
-### `FilterList({ items })`
 - **Search Input**:
   - Controlled `<input aria-label="Filter" value={query} onChange={...} />`.
 - **Filtering Logic**:

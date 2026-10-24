@@ -1,6 +1,6 @@
+### LoadMoreList(props: LoadMoreListProps): JSX.Element:
 Build a paginated list with append-loading and retry handling:
 
-### `LoadMoreList({ fetchPage })`
 - `fetchPage(page)` returns a `Promise` resolving to `{ items: string[], hasMore: boolean }` (page indices start at `1`).
 - On initial mount, fetches page `1`.
 
