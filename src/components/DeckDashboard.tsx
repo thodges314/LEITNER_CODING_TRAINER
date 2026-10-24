@@ -32,6 +32,7 @@ import {
   ArrowUp,
   ArrowDown,
   Check,
+  CheckCircle2,
   Sparkles,
   X,
 } from 'lucide-react';
@@ -350,14 +351,26 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         return a.title.localeCompare(b.title);
       }
       case 'status-asc': {
-        const rankA = a.deactivated ? 2 : a.status === 'locked' ? 1 : 0;
-        const rankB = b.deactivated ? 2 : b.status === 'locked' ? 1 : 0;
+        const getRankAsc = (item: TopicItem) => {
+          if (item.deactivated) return 4;
+          if (item.status === 'locked') return 1;
+          if (item.box > 1 || item.streak > 0 || item.nextEligibleTrial > 0) return 3;
+          return 2; // unlocked
+        };
+        const rankA = getRankAsc(a);
+        const rankB = getRankAsc(b);
         if (rankA !== rankB) return rankA - rankB;
         return a.title.localeCompare(b.title);
       }
       case 'status-desc': {
-        const rankA = a.deactivated ? 2 : a.status === 'locked' ? 1 : 0;
-        const rankB = b.deactivated ? 2 : b.status === 'locked' ? 1 : 0;
+        const getRankDesc = (item: TopicItem) => {
+          if (item.deactivated) return 0;
+          if (item.status === 'locked') return 1;
+          if (item.box > 1 || item.streak > 0 || item.nextEligibleTrial > 0) return 3; // attempted
+          return 2; // unlocked
+        };
+        const rankA = getRankDesc(a);
+        const rankB = getRankDesc(b);
         if (rankA !== rankB) return rankB - rankA;
         return a.title.localeCompare(b.title);
       }
@@ -420,6 +433,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         const activeBoxes = Array.isArray(selectedBox) ? selectedBox : [selectedBox];
         if (!activeBoxes.includes(t.box)) return false;
       }
+      const isAttempted = !t.deactivated && t.status === 'active' && (t.box > 1 || t.streak > 0 || t.nextEligibleTrial > 0);
+      const isUnattempted = !t.deactivated && t.status === 'active' && t.box === 1 && t.streak === 0 && t.nextEligibleTrial === 0;
+
+      if (selectedStatus === 'attempted' && !isAttempted) return false;
+      if (selectedStatus === 'unattempted' && !isUnattempted) return false;
       if ((selectedStatus === 'unlocked' || selectedStatus === 'active') && (t.status !== 'active' || t.deactivated)) return false;
       if (selectedStatus === 'locked' && (t.status !== 'locked' || t.deactivated)) return false;
       if (selectedStatus === 'deactivated' && !t.deactivated) return false;
@@ -802,8 +820,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               aria-label="Filter by Status"
             >
               <option value="all">Status: All</option>
+              <option value="attempted">Status: Attempted Only</option>
+              <option value="unattempted">Status: Unattempted (New) Only</option>
               <option value="unlocked">Status: Unlocked Only</option>
-              {selectedStatus === 'active' && <option value="active">Status: Unlocked Only</option>}
+              {selectedStatus === 'active' && <option value="active">Status: Unlocked / Active</option>}
               <option value="locked">Status: Locked (Reserve) Only</option>
               <option value="deactivated">Status: Deactivated Only</option>
               <option value="due">Status: Due for Practice (Ready Now)</option>
@@ -1077,10 +1097,20 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                           <Archive size={11} />
                           <span>Deactivated</span>
                         </span>
+                      ) : topic.status === 'locked' ? (
+                        <span className="badge status-badge-locked" title="Locked in reserve deck">
+                          <Lock size={11} />
+                          <span>Locked</span>
+                        </span>
+                      ) : (topic.box > 1 || topic.streak > 0 || topic.nextEligibleTrial > 0) ? (
+                        <span className="badge status-badge-attempted" title="Active card in study rotation (attempted at least once)">
+                          <CheckCircle2 size={11} />
+                          <span>Attempted</span>
+                        </span>
                       ) : (
-                        <span className={`badge ${topic.status === 'active' ? 'status-badge-active' : 'status-badge-locked'}`}>
-                          {topic.status === 'active' ? <Unlock size={11} /> : <Lock size={11} />}
-                          <span>{topic.status === 'active' ? 'Unlocked' : 'Locked'}</span>
+                        <span className="badge status-badge-active" title="Unlocked card ready for initial practice">
+                          <Unlock size={11} />
+                          <span>Unlocked</span>
                         </span>
                       )}
                     </td>

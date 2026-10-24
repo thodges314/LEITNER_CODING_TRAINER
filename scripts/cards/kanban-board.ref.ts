@@ -93,22 +93,22 @@ function KanbanBoard({
   };
 
   return (
-    <div data-kanban-board>
+    <div data-kanban-board className="kanban-board">
       {columns.map((column: KanbanColumn, colIdx: number) => (
-        <div key={column.id} data-column-id={column.id}>
-          <div>
-            <h3 data-column-title>{column.title}</h3>
-            <span data-column-count>{column.cards.length}</span>
+        <div key={column.id} data-column-id={column.id} className="kanban-column">
+          <div className="kanban-column-header">
+            <h3 data-column-title className="kanban-column-title">{column.title}</h3>
+            <span data-column-count className="kanban-column-count">{column.cards.length}</span>
           </div>
 
-          <div data-card-list>
+          <div data-card-list className="kanban-card-list">
             {column.cards.map((card: KanbanCard) => (
-              <div key={card.id} data-card-id={card.id}>
-                <h4 data-card-title>{card.title}</h4>
+              <div key={card.id} data-card-id={card.id} className="kanban-card">
+                <h4 data-card-title className="kanban-card-title">{card.title}</h4>
                 {card.description && (
-                  <p data-card-description>{card.description}</p>
+                  <p data-card-description className="kanban-card-description">{card.description}</p>
                 )}
-                <div>
+                <div className="kanban-card-actions">
                   <button
                     type="button"
                     data-action="move-left"
@@ -133,6 +133,7 @@ function KanbanBoard({
           <div>
             {activeFormColId === column.id ? (
               <form
+                className="flex-col gap-xs"
                 onSubmit={(e: { preventDefault: () => void }): void => {
                   e.preventDefault();
                   handleAddSubmit(column.id);
@@ -155,7 +156,7 @@ function KanbanBoard({
                     setNewDescription(e.target.value)
                   }
                 />
-                <div>
+                <div className="flex-row gap-xs">
                   <button type="submit" data-action="submit-card">
                     Submit
                   </button>

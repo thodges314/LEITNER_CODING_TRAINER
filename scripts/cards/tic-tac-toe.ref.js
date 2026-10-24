@@ -34,9 +34,9 @@ function TicTacToe({ onGameEnd }) {
   return (
     <div>
       <p role="status">{status}</p>
-      <div role="group" aria-label="Tic-tac-toe board">
+      <div role="group" aria-label="Tic-tac-toe board" className="grid-3x3">
         {cells.map((value, i) => (
-          <button key={i} type="button" aria-label={`Cell ${i + 1}`} onClick={() => play(i)}>
+          <button key={i} type="button" aria-label={`Cell ${i + 1}`} className="grid-cell" onClick={() => play(i)}>
             {value}
           </button>
         ))}

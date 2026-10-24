@@ -4,6 +4,10 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
   const isLight = theme === 'apple-gsos';
   const bg = isLight ? '#f8fafc' : '#030712';
   const text = isLight ? '#0f172a' : '#f1f5f9';
+  const border = isLight ? '#cbd5e1' : '#334155';
+  const cardBg = isLight ? '#ffffff' : '#1e293b';
+  const colBg = isLight ? '#f1f5f9' : '#0f172a';
+  const subtleText = isLight ? '#64748b' : '#94a3b8';
   const safeBundle = REACT_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
 
   return `<!DOCTYPE html>
@@ -29,10 +33,144 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
     }
     button {
       cursor: pointer;
+      padding: 6px 12px;
+      border: 1px solid ${border};
+      border-radius: 6px;
+      background: ${cardBg};
+      color: inherit;
+    }
+    button:hover:not(:disabled) {
+      background: ${isLight ? '#e2e8f0' : '#334155'};
+    }
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    input[type="text"], input[type="search"], textarea, select {
+      padding: 6px 10px;
+      border: 1px solid ${border};
+      border-radius: 6px;
+      background: ${cardBg};
+      color: inherit;
     }
     :focus-visible {
       outline: 2px solid #06b6d4;
       outline-offset: 2px;
+    }
+
+    /* Optional utility classes for React challenges (borders, spacing, flex) */
+    .border { border: 1px solid ${border}; }
+    .rounded { border-radius: 6px; }
+    .rounded-lg { border-radius: 8px; }
+    .p-xs { padding: 4px; }
+    .p-sm { padding: 8px; }
+    .p-md { padding: 16px; }
+    .p-lg { padding: 24px; }
+    .gap-xs { gap: 4px; }
+    .gap-sm { gap: 8px; }
+    .gap-md { gap: 16px; }
+    .flex-row { display: flex; flex-direction: row; gap: 8px; align-items: center; }
+    .flex-col { display: flex; flex-direction: column; gap: 8px; }
+    .card, .panel, .box {
+      border: 1px solid ${border};
+      border-radius: 8px;
+      padding: 12px;
+      background: ${cardBg};
+    }
+
+    /* Tic-Tac-Toe & 3x3 Grid helpers */
+    .grid-3x3, .board-grid-3x3, [role="group"][aria-label="Tic-tac-toe board"] {
+      display: inline-grid;
+      grid-template-columns: repeat(3, 56px);
+      grid-template-rows: repeat(3, 56px);
+      gap: 6px;
+      margin: 8px 0;
+    }
+    .grid-cell, [role="group"][aria-label="Tic-tac-toe board"] > button {
+      width: 56px;
+      height: 56px;
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid ${border};
+      border-radius: 6px;
+      background: ${cardBg};
+      color: inherit;
+    }
+
+    /* Kanban Board helpers */
+    .kanban-board, [data-kanban-board] {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      align-items: flex-start;
+      overflow-x: auto;
+      padding-bottom: 12px;
+    }
+    .kanban-column, .kanban-col, [data-column-id] {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 250px;
+      min-width: 220px;
+      padding: 12px;
+      border: 1px solid ${border};
+      border-radius: 8px;
+      background: ${colBg};
+    }
+    .kanban-column-header, [data-column-id] > div:first-child {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid ${border};
+    }
+    .kanban-column-title, [data-column-title] {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .kanban-column-count, [data-column-count] {
+      background: ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)'};
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    .kanban-card-list, [data-card-list] {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 40px;
+    }
+    .kanban-card, .kanban-task, [data-card-id] {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid ${border};
+      border-radius: 6px;
+      background: ${cardBg};
+    }
+    .kanban-card-title, [data-card-title] {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .kanban-card-description, [data-card-description] {
+      margin: 0;
+      font-size: 12px;
+      color: ${subtleText};
+      line-height: 1.4;
+    }
+    .kanban-card-actions {
+      display: flex;
+      flex-direction: row;
+      gap: 6px;
+      margin-top: 4px;
     }
   </style>
   <script>${safeBundle}</script>

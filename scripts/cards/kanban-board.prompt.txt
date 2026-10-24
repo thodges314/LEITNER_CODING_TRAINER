@@ -45,3 +45,11 @@ export interface KanbanBoardProps {
   - Clicking cancel resets form fields and closes the creation form.
   - Submitting with empty/whitespace-only title does nothing.
   - Submitting with valid title appends a new card to the column, resets/closes the form, and calls `onCardAdd(columnId, { title, description })`.
+
+### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.kanban-board`: horizontal flex row layout with gap and horizontal scrolling.
+- `.kanban-column` (or `.kanban-col`): column container with border, background, and spacing.
+- `.kanban-card`: task card with border, rounded corners, padding, and background.
+- `.kanban-card-actions`: row layout with gap for move buttons.
+You may use these classes, custom styles, or your own class names.

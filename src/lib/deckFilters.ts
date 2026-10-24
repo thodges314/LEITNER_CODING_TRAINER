@@ -16,6 +16,8 @@ export type CatalogSortOption =
 
 export type CatalogStatusFilter =
   | 'all'
+  | 'attempted'
+  | 'unattempted'
   | 'unlocked'
   | 'active'
   | 'locked'
@@ -46,6 +48,8 @@ export const DECK_CATALOG_STORAGE_KEY = 'leitner_deck_catalog_preferences';
 
 const VALID_STATUSES: readonly CatalogStatusFilter[] = [
   'all',
+  'attempted',
+  'unattempted',
   'unlocked',
   'active',
   'locked',
