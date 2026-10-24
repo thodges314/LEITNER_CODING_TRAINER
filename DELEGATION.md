@@ -16,7 +16,6 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Task | Who | Branch | Status |
 |---|---|---|---|
 | Comprehensive TypeScript Support (Plumbing, Ambient Types, Dual Solution Reveal, Typed Stubs) | Antigravity | `feature/ts-coverage` | complete |
-| Remaining Component & A11y Cards (Stepper, Popover, Nested Comments, Kanban Board, Drag Sortable List, Combobox ARIA 1.2) | Antigravity | `feature/batch-remaining-components` | complete |
 
 
 
