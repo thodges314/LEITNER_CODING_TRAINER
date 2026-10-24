@@ -12,7 +12,7 @@ describe('tour steps', () => {
   });
 
   it('every anchor a step points at exists in the app source as data-tour="..."', () => {
-    const sources = import.meta.glob(['../App.tsx', '../components/*.tsx'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+    const sources = import.meta.glob(['../App.tsx', '../components/*.tsx', '../components/**/*.tsx'], { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
     const source = Object.values(sources).join('\n');
     expect(Object.keys(sources).length).toBeGreaterThan(5);
     for (const s of TOUR_STEPS) {

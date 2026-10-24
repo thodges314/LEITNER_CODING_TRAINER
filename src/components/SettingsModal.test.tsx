@@ -5,7 +5,6 @@ import * as ReactDOMClient from 'react-dom/client';
 import { SettingsModal } from './SettingsModal';
 import { getTsHoverEnabled, setTsHoverEnabled } from '../lib/editorSettings';
 
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('SettingsModal TypeScript Hover Toggle', () => {

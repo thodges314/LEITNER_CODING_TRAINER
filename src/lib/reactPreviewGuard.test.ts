@@ -8,7 +8,6 @@ import { transpileForExecution } from './runner';
 import type { TopicItem } from './leitner';
 
 // Configure React act environment for jsdom
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 if (typeof globalThis.IntersectionObserver === 'undefined') {

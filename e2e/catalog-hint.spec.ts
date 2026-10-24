@@ -5,7 +5,7 @@ async function openCatalog(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: /Start practicing/ }).click();
   await page.getByRole('button', { name: /Deck Catalog/ }).click();
-  await expect(page.getByText(/Filter Tracks/)).toBeVisible();
+  await expect(page.getByText(/Filter (Tracks|Topics)/)).toBeVisible();
 }
 
 const chip = (page: Page) => page.locator('button[title^="Click to"]').first();

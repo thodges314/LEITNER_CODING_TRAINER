@@ -7,7 +7,6 @@ import { ActivityView } from './ActivityView';
 import { localDateKey } from '../lib/dailyStats';
 import type { TopicItem, LeitnerDeckState } from '../lib/leitner';
 
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const topic = (id: string, box: number): TopicItem => ({
@@ -45,7 +44,7 @@ describe('ActivityView', () => {
   it('draws one bar per day for 30 days, ending today, and summarises the window', async () => {
     const stats = { [dayKey(0)]: { reviews: 4, passes: 3 }, [dayKey(1)]: { reviews: 1, passes: 1 } };
     await act(async () => root.render(<ActivityView stats={stats} />));
-    const bars = [...container.querySelectorAll('[data-testid="activity-bar"]')] as SVGElement[];
+    const bars = Array.from(container.querySelectorAll('[data-testid="activity-bar"]')) as SVGElement[];
     expect(bars).toHaveLength(30);
     expect(bars[29].getAttribute('data-date')).toBe(dayKey(0));
     expect(bars[28].getAttribute('data-date')).toBe(dayKey(1));
@@ -71,7 +70,7 @@ describe('Activity as the fourth mode of the stats widget', () => {
 
   it('adds an "Activity" tab after the three existing ones', async () => {
     await render(stateWith(), [topic('a', 1)]);
-    const tabs = [...container.querySelectorAll('[data-testid^="stats-mode-"]')].map((b) => b.getAttribute('data-testid'));
+    const tabs = Array.from(container.querySelectorAll('[data-testid^="stats-mode-"]')).map((b) => b.getAttribute('data-testid'));
     expect(tabs).toEqual(['stats-mode-radar', 'stats-mode-orbit', 'stats-mode-tiers', 'stats-mode-activity']);
     expect(q('stats-mode-activity')?.textContent).toContain('Activity');
     expect(q('activity-view')).toBeNull(); // the default view is still the Skill Matrix

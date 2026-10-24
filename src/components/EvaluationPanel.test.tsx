@@ -6,7 +6,6 @@ import { EvaluationPanel } from './EvaluationPanel';
 import type { TopicItem } from '../lib/leitner';
 import type { EvaluationResult } from '../lib/ai';
 
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const sampleTopic: TopicItem = {

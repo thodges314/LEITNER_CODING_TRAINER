@@ -5,7 +5,6 @@ import * as ReactDOMClient from 'react-dom/client';
 import { MarkdownContent } from './MarkdownContent';
 import { renderInlineMarkdown } from '../lib/markdown';
 
-// @ts-expect-error IS_REACT_ACT_ENVIRONMENT is a React global flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 describe('MarkdownContent', () => {

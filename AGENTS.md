@@ -2,6 +2,10 @@
 
 Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_AND_ROADMAP.md` (system map, gotchas) for the full picture.
 
+## Terminology: Cards vs Topics
+- **Card**: An individual flashcard / coding challenge / exercise (e.g. `tic-tac-toe`, `two-sum`, `stepper`). A card has an ID, prompt, test harness, reference solutions (`.ref.js` and `.ref.ts`), difficulty, box/tier, and streak.
+- **Topic**: The high-level subject track / category (e.g. `react-components`, `algorithms`, `async-js`, `js-utilities`, `dom-browser`) that groups cards. In UI controls and filters, category pills and table headers are labeled "Topic" / "Topics", while individual problem items are called "Cards".
+
 ## Card content: edit the sources, not `src/data/topics.json`
 `src/data/topics.json` is **generated** by `npm run build:cards`. It is committed, but never edit it by hand: the next build would overwrite the change. Edit the source instead:
 

@@ -47,4 +47,33 @@ describe('createPreviewSrcDoc $dom and $test shims', () => {
     expect(html).toContain('fire: {');
     expect(html).toContain('check: function(');
   });
+
+  it('injects card-specific styles conditionally based on cardId', () => {
+    const generic = createPreviewSrcDoc('dark', 'test-env');
+    expect(generic).toContain('.flex-row');
+    expect(generic).not.toContain('.grid-3x3');
+    expect(generic).not.toContain('.kanban-board');
+    expect(generic).not.toContain('.toast-viewport');
+
+    const ttt = createPreviewSrcDoc('dark', 'test-env', 'tic-tac-toe');
+    expect(ttt).toContain('.grid-3x3');
+    expect(ttt).not.toContain('.kanban-board');
+
+    const kanban = createPreviewSrcDoc('dark', 'test-env', 'kanban-board');
+    expect(kanban).toContain('.kanban-board');
+    expect(kanban).not.toContain('.grid-3x3');
+
+    const toast = createPreviewSrcDoc('dark', 'test-env', 'toast-queue');
+    expect(toast).toContain('.toast-viewport');
+    expect(toast).not.toContain('.sortable-list');
+
+    const breadcrumbs = createPreviewSrcDoc('dark', 'test-env', 'breadcrumbs-router');
+    expect(breadcrumbs).toContain('.breadcrumbs');
+    expect(breadcrumbs).not.toContain('.toast-viewport');
+
+    const sortable = createPreviewSrcDoc('dark', 'test-env', 'drag-sortable-list');
+    expect(sortable).toContain('.sortable-list');
+    expect(sortable).not.toContain('.breadcrumbs');
+  });
 });
+

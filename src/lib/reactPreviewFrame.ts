@@ -1,83 +1,21 @@
 import { REACT_PREVIEW_BUNDLE } from './reactPreviewBundle';
+import { getThemeColors } from '../styles/colors';
 
-export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKey = ''): string {
-  const isLight = theme === 'apple-gsos';
-  const bg = isLight ? '#f8fafc' : '#030712';
-  const text = isLight ? '#0f172a' : '#f1f5f9';
-  const border = isLight ? '#cbd5e1' : '#334155';
-  const cardBg = isLight ? '#ffffff' : '#1e293b';
-  const colBg = isLight ? '#f1f5f9' : '#0f172a';
-  const subtleText = isLight ? '#64748b' : '#94a3b8';
-  const safeBundle = REACT_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
+export interface CardThemeColors {
+  border: string;
+  cardBg: string;
+  colBg: string;
+  subtleText: string;
+  accentPrimary: string;
+  hoverBg: string;
+  isLight: boolean;
+}
 
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      padding: 14px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
-      color: ${text};
-      background-color: ${bg};
-      overflow-wrap: break-word;
-    }
-    button, input, select, textarea {
-      font-family: inherit;
-      font-size: inherit;
-    }
-    button {
-      cursor: pointer;
-      padding: 6px 12px;
-      border: 1px solid ${border};
-      border-radius: 6px;
-      background: ${cardBg};
-      color: inherit;
-    }
-    button:hover:not(:disabled) {
-      background: ${isLight ? '#e2e8f0' : '#334155'};
-    }
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-    input[type="text"], input[type="search"], textarea, select {
-      padding: 6px 10px;
-      border: 1px solid ${border};
-      border-radius: 6px;
-      background: ${cardBg};
-      color: inherit;
-    }
-    :focus-visible {
-      outline: 2px solid #06b6d4;
-      outline-offset: 2px;
-    }
-
-    /* Optional utility classes for React challenges (borders, spacing, flex) */
-    .border { border: 1px solid ${border}; }
-    .rounded { border-radius: 6px; }
-    .rounded-lg { border-radius: 8px; }
-    .p-xs { padding: 4px; }
-    .p-sm { padding: 8px; }
-    .p-md { padding: 16px; }
-    .p-lg { padding: 24px; }
-    .gap-xs { gap: 4px; }
-    .gap-sm { gap: 8px; }
-    .gap-md { gap: 16px; }
-    .flex-row { display: flex; flex-direction: row; gap: 8px; align-items: center; }
-    .flex-col { display: flex; flex-direction: column; gap: 8px; }
-    .card, .panel, .box {
-      border: 1px solid ${border};
-      border-radius: 8px;
-      padding: 12px;
-      background: ${cardBg};
-    }
-
+export function getCardSpecificStyles(cardId: string | undefined, colors: CardThemeColors): string {
+  const { border, cardBg, colBg, subtleText, accentPrimary, hoverBg, isLight } = colors;
+  switch (cardId) {
+    case 'tic-tac-toe':
+      return `
     /* Tic-Tac-Toe & 3x3 Grid helpers */
     .grid-3x3, .board-grid-3x3, [role="group"][aria-label="Tic-tac-toe board"] {
       display: inline-grid;
@@ -100,7 +38,9 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
       background: ${cardBg};
       color: inherit;
     }
-
+`;
+    case 'kanban-board':
+      return `
     /* Kanban Board helpers */
     .kanban-board, [data-kanban-board] {
       display: flex;
@@ -172,7 +112,9 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
       gap: 6px;
       margin-top: 4px;
     }
-
+`;
+    case 'toast-queue':
+      return `
     /* Toast Queue helpers */
     .toast-viewport, [role="region"][aria-label="Notifications"] {
       position: fixed;
@@ -219,7 +161,9 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
       from { transform: translateY(8px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-
+`;
+    case 'breadcrumbs-router':
+      return `
     /* Breadcrumbs helpers */
     .breadcrumbs, [aria-label="Breadcrumb"] > ol {
       display: flex;
@@ -257,7 +201,9 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
       font-weight: 600;
       opacity: 0.9;
     }
-
+`;
+    case 'drag-sortable-list':
+      return `
     /* Drag Sortable List helpers */
     .sortable-list, [data-sortable-list] {
       list-style: none;
@@ -287,20 +233,111 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
       padding: 4px 9px;
       font-size: 11px;
       border-radius: 4px;
-      background: ${isLight ? '#e2e8f0' : '#334155'};
+      background: ${hoverBg};
       color: inherit;
       border: none;
       cursor: pointer;
       margin-left: 4px;
     }
     .sortable-item button:hover:not(:disabled), [data-item-id] button:hover:not(:disabled) {
-      background: #0284c7;
+      background: ${accentPrimary};
       color: #fff;
     }
     .sortable-item button:disabled, [data-item-id] button:disabled {
       opacity: 0.35;
       cursor: not-allowed;
     }
+`;
+    default:
+      return '';
+  }
+}
+
+export function createPreviewSrcDoc(
+  theme: 'dark' | 'apple-gsos' = 'dark',
+  envKey = '',
+  cardId?: string
+): string {
+  const palette = getThemeColors(theme);
+  const isLight = palette.isLight;
+  const bg = palette.bgMain;
+  const text = palette.textPrimary;
+  const border = palette.borderMedium;
+  const cardBg = palette.bgCard;
+  const colBg = palette.bgSurface;
+  const subtleText = palette.textSecondary;
+  const accentPrimary = palette.accentPrimary;
+  const hoverBg = isLight ? palette.bgElevated : palette.borderMedium;
+  const safeBundle = REACT_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: ${text};
+      background-color: ${bg};
+      overflow-wrap: break-word;
+    }
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+    }
+    button {
+      cursor: pointer;
+      padding: 6px 12px;
+      border: 1px solid ${border};
+      border-radius: 6px;
+      background: ${cardBg};
+      color: inherit;
+    }
+    button:hover:not(:disabled) {
+      background: ${hoverBg};
+    }
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    input[type="text"], input[type="search"], textarea, select {
+      padding: 6px 10px;
+      border: 1px solid ${border};
+      border-radius: 6px;
+      background: ${cardBg};
+      color: inherit;
+    }
+    :focus-visible {
+      outline: 2px solid ${accentPrimary};
+      outline-offset: 2px;
+    }
+
+    /* Optional universal utility classes for React challenges (borders, spacing, flex) */
+    .border { border: 1px solid ${border}; }
+    .rounded { border-radius: 6px; }
+    .rounded-lg { border-radius: 8px; }
+    .p-xs { padding: 4px; }
+    .p-sm { padding: 8px; }
+    .p-md { padding: 16px; }
+    .p-lg { padding: 24px; }
+    .gap-xs { gap: 4px; }
+    .gap-sm { gap: 8px; }
+    .gap-md { gap: 16px; }
+    .flex-row { display: flex; flex-direction: row; gap: 8px; align-items: center; }
+    .flex-col { display: flex; flex-direction: column; gap: 8px; }
+    .card, .panel, .box {
+      border: 1px solid ${border};
+      border-radius: 8px;
+      padding: 12px;
+      background: ${cardBg};
+    }
+${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrimary, hoverBg, isLight })}
   </style>
   <script>${safeBundle}</script>
 </head>
