@@ -61,4 +61,18 @@ describe('typeChecker & getTSQuickInfo', () => {
     expect(getTSQuickInfo(code, -1)).toBeNull();
     expect(getTSQuickInfo(code, 999)).toBeNull();
   });
+
+  it('validates ambient DOM and browser globals without errors', () => {
+    const code = `
+      const u = new URLSearchParams("a=1");
+      const w = window.location.pathname;
+      const d = document.createElement("div");
+      const store = localStorage.getItem("key");
+      const frame = requestAnimationFrame(() => {});
+      cancelAnimationFrame(frame);
+    `;
+    const result = checkAndTranspileTS(code);
+    expect(result.success).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+  });
 });

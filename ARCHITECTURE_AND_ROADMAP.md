@@ -412,9 +412,9 @@ Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates r
 - **Phase 2 Buffer Policy (Complete)**:
   - Cold-start recall integrity is strictly preserved: the editor buffer is NOT overwritten or injected with stubs upon switching between JS and TS modes.
   - Typed signatures are embedded into prompt headings (`### fn(arg: Type): ReturnType`).
-- **Phase 3 Dual Solutions Rollout** (in progress; 174 of 271 cards have a `.ref.ts`; `npm run report:ts` prints the live numbers; `TYPESCRIPT_SUPPORT_PLAN.md` is the authoritative batch-by-batch status):
-  - Complete: Algorithms, Async JS, JS Language, TypeScript Patterns, and JS Utilities tracks.
-  - Remaining: DOM/Browser, React, React Components, Testing/Tooling.
+- **Phase 3 Dual Solutions Rollout** (in progress; 179 of 271 cards have a `.ref.ts`; `npm run report:ts` prints the live numbers; `TYPESCRIPT_SUPPORT_PLAN.md` is the authoritative batch-by-batch status):
+  - Complete: Algorithms, Async JS, JS Language, TypeScript Patterns, and JS Utilities tracks, plus part of DOM/Browser.
+  - Remaining: rest of DOM/Browser, React, React Components, Testing/Tooling.
 
 #### Next Steps (in priority order)
 1. Complete remaining TypeScript dual-solution batches on `feature/typescript-support` (Trees/Graphs -> Lists/Heaps -> React -> JS Utilities).

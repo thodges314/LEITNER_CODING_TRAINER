@@ -1,6 +1,6 @@
 Calculate and compare CSS selector specificity vectors:
 
-### `specificity(selector)`
+### `specificity(selector: string): [ids: number, classes: number, elements: number]`
 - Parses a single complex selector string (no top-level commas).
 - Returns a 3-tuple `[ids, classes, elements]`:
   - **IDs (`ids`)**: counts `#id` selectors.
@@ -11,7 +11,7 @@ Calculate and compare CSS selector specificity vectors:
   - `:where(X)` adds nothing `[0, 0, 0]`.
   - `:not(X)` adds the specificity of its inner argument `X` (the `:not` pseudo-class itself contributes 0).
 
-### `compareSpecificity(a, b)`
+### `compareSpecificity(a: string, b: string): 1 | -1 | 0`
 - Compares the specificity of two selector strings `a` and `b` by comparing `ids`, then `classes`, then `elements`.
 - Returns `1` if selector `a` is more specific than `b`.
 - Returns `-1` if selector `b` is more specific than `a`.

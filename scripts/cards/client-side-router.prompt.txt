@@ -1,7 +1,10 @@
 Implement an in-memory client-side router with path parameters and query string parsing:
 
-### `createRouter(routes, initialPath = '/')`
-- `routes` is an array of route definitions: `[{ path: '/users/:id', name: 'user' }, ...]`.
+### `matchRoute(pattern: string, pathname: string): Record<string, string> | null`
+- Matches a pathname against a pattern and extracts route parameters (supports `:param` and `*` wildcard).
+
+### `createRouter(routes: Array<{ pattern: string; name: string }>, initialPath?: string): Router`
+- `routes` is an array of route definitions: `[{ pattern: '/users/:id', name: 'user' }, ...]`.
 - Initialized with `initialPath` (defaults to `'/'`).
 
 #### Route Resolution

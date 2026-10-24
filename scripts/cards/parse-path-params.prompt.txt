@@ -1,6 +1,6 @@
 Extract named dynamic route parameters from a URL path:
 
-### `parsePath(pattern, path)`
+### `parsePath(pattern: string, path: string): Record<string, string> | null`
 - Parses dynamic path parameters defined by `:param` segments in `pattern`.
 - Example: `parsePath('/users/:id/posts/:postId', '/users/7/posts/42')` returns `{ id: '7', postId: '42' }`.
 

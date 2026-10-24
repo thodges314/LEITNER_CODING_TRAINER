@@ -1,4 +1,6 @@
-Implement `matchRoute(pattern, pathname)` to match URL pathnames against Next.js-style file-system route patterns and extract parameter mappings.
+Implement Next.js-style route pattern matching:
+
+### `matchRoute(pattern: string, pathname: string): { params: Record<string, string | string[]> } | null`
 
 Segment rules:
 1. Static segments: exact string match (e.g. `/posts/latest`).

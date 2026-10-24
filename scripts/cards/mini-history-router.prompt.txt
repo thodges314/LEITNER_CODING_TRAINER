@@ -1,6 +1,6 @@
 Build a lightweight browser client-side router integrated with the HTML5 History API:
 
-### `createRouter(routes, win = window)`
+### `createRouter(routes: Array<{ name: string; path: string }>, win?: any): Router`
 - `routes` is an ordered list of route definitions: `[{ name: 'user', path: '/users/:id' }, ...]`.
 - Starts at `win.location.pathname` and listens to `win` for `'popstate'` events.
 
