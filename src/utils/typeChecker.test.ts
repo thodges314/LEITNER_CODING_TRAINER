@@ -70,6 +70,7 @@ describe('typeChecker & getTSQuickInfo', () => {
       const store = localStorage.getItem("key");
       const frame = requestAnimationFrame(() => {});
       cancelAnimationFrame(frame);
+      function handle(e: KeyboardEvent, el: HTMLElement, node: Node, evt: Event): void {}
     `;
     const result = checkAndTranspileTS(code);
     expect(result.success).toBe(true);

@@ -1,3 +1,4 @@
+### createSequenceMatcher(bindings: Record<string, string>, timeoutMs?: number): (key: string, now: number) => string | null
 Write `createSequenceMatcher(bindings, timeoutMs = 1000)` for GitHub / Vim-style multi-key sequences (e.g. `'g i'`):
 
 - **Parameters**:

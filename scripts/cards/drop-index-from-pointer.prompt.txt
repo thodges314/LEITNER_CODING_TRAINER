@@ -1,1 +1,12 @@
-Write the logic behind a drag-sortable list. dropIndex(pointerY, rects) takes the pointer's vertical position and an array of { top, height } rectangles (one per item, top to bottom) and returns the insertion index 0...rects.length: the position of the first item whose vertical midpoint is BELOW the pointer (a pointer exactly on a midpoint counts as past it), or rects.length when the pointer is below every midpoint. moveItem(list, from, to) returns a NEW array with the item at index `from` moved so that it sits in the gap `to` of the ORIGINAL list (gap 0 is before the first item, gap list.length after the last one). Moving an item into its own gap (to === from or to === from + 1) returns an unchanged copy. Never mutate the input. reorderOnDrop(list, from, pointerY, rects) combines the two.
+Write the logic behind a drag-sortable list:
+
+### dropIndex(pointerY: number, rects: Rect[]): number
+- Takes the pointer's vertical position and an array of `{ top, height }` rectangles (one per item, top to bottom).
+- Returns the insertion index `0...rects.length`: the position of the first item whose vertical midpoint is BELOW the pointer (a pointer exactly on a midpoint counts as past it), or `rects.length` when the pointer is below every midpoint.
+
+### moveItem<T>(list: T[], from: number, to: number): T[]
+- Returns a NEW array with the item at index `from` moved so that it sits in the gap `to` of the ORIGINAL list (gap 0 is before the first item, gap `list.length` after the last one).
+- Moving an item into its own gap (`to === from` or `to === from + 1`) returns an unchanged copy. Never mutate the input.
+
+### reorderOnDrop<T>(list: T[], from: number, pointerY: number, rects: Rect[]): T[]
+- Combines `dropIndex` and `moveItem`: calculates the target gap with `dropIndex(pointerY, rects)` and moves the item.

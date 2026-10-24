@@ -1,6 +1,6 @@
 Write three utility functions for managing and matching keyboard shortcuts: `parseShortcut`, `matchesShortcut`, and `findShortcut`.
 
-### `parseShortcut(text)`
+### parseShortcut(text: string): ParsedShortcut
 - Parses a shortcut string (e.g. `'Ctrl+Shift+K'`) into `{ key, ctrl, meta, alt, shift, mod }`.
 - Split tokens on `'+'`, trim whitespace, and normalize case-insensitively.
 - The returned non-modifier `key` is lowercased.
@@ -13,11 +13,11 @@ Write three utility functions for managing and matching keyboard shortcuts: `par
   - `space` $\rightarrow$ `' '`
   - `'mod'` is recorded in its own boolean flag.
 
-### `matchesShortcut(event, shortcut, isMac = false)`
+### matchesShortcut(event: KeyEventLike, shortcut: string | ParsedShortcut, isMac?: boolean): boolean
 - Takes an event-like object `{ key, ctrlKey, metaKey, altKey, shiftKey }` and a parsed shortcut (or string).
 - Returns `true` only when the primary `key` matches (case-insensitive) **AND** all modifier flags match exactly (any missing or extra modifier fails the match).
 - When `shortcut.mod` is set: evaluates as `metaKey` on Mac (`isMac: true`) and `ctrlKey` on non-Mac platforms (`isMac: false`).
 
-### `findShortcut(event, bindings, isMac = false)`
+### findShortcut(event: KeyEventLike, bindings: Record<string, string | ParsedShortcut>, isMac?: boolean): string | null
 - Takes an event object and a dictionary `bindings` of `{ [actionName]: shortcutStringOrObject }`.
 - Returns the action name of the first matching binding, or `null` if none match.

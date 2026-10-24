@@ -93,16 +93,27 @@ const SANDBOX_GLOBALS = `
   declare var localStorage: any;
   declare var sessionStorage: any;
   declare var Storage: any;
+  interface Storage { [key: string]: any; }
   declare var URLSearchParams: any;
+  interface URLSearchParams { [key: string]: any; }
   declare var URL: any;
+  interface URL { [key: string]: any; }
   declare var Event: any;
+  interface Event { [key: string]: any; }
   declare var CustomEvent: any;
+  interface CustomEvent extends Event { [key: string]: any; }
   declare var MouseEvent: any;
+  interface MouseEvent extends Event { [key: string]: any; }
   declare var KeyboardEvent: any;
-  declare var Element: any;
-  declare var HTMLElement: any;
+  interface KeyboardEvent extends Event { [key: string]: any; }
   declare var Node: any;
+  interface Node { [key: string]: any; }
+  declare var Element: any;
+  interface Element extends Node { [key: string]: any; }
+  declare var HTMLElement: any;
+  interface HTMLElement extends Element { [key: string]: any; }
   declare var Text: any;
+  interface Text extends Node { [key: string]: any; }
   declare var requestAnimationFrame: (callback: (time: number) => void) => number;
   declare var cancelAnimationFrame: (handle: number) => void;
   declare var $test: any;

@@ -1,3 +1,4 @@
+### createFocusTrap(getFocusable: () => FocusableElement[], doc: DocumentLike): (event: KeyEventLike) => void
 Write `createFocusTrap(getFocusable, doc)` returning a keydown handler `handleKeydown(event)` that traps `Tab` focus within a dialog:
 
 - **Context**:
