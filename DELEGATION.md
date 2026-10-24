@@ -16,6 +16,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Task | Who | Branch | Status |
 |---|---|---|---|
 | Comprehensive TypeScript Support (Plumbing, Ambient Types, Dual Solution Reveal, Typed Stubs) | Antigravity | `feature/ts-coverage` | complete |
+| Card-Scoped Preview CSS & DeckDashboard Component Modularization | Antigravity | `feature/card-scoped-preview-css-and-dashboard-refactor` | in progress |
 
 
 
