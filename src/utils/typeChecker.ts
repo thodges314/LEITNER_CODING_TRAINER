@@ -136,6 +136,8 @@ const SANDBOX_GLOBALS = `
   interface Storage { [key: string]: any; }
   declare var URLSearchParams: any;
   interface URLSearchParams { [key: string]: any; }
+  declare var FormData: any;
+  interface FormData { [key: string]: any; }
   declare var URL: any;
   interface URL { [key: string]: any; }
   declare var Event: any;

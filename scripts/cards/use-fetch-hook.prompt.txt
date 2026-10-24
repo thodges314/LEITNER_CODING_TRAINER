@@ -1,3 +1,4 @@
+### useFetch<T = unknown>(url: string): UseFetchReturn<T>
 Build `useFetch(url)`:
 
 - **Returns**: `{ data, error, loading }`.

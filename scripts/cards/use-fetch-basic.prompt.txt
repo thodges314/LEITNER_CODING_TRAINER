@@ -1,6 +1,6 @@
 Write a custom hook for fetching JSON data from a URL:
 
-### `useFetch(url)`
+### useFetch<T = unknown>(url: string): UseFetchReturn<T>
 - Returns `{ data, loading, error }`.
 
 #### Lifecycle & State Progression

@@ -1,11 +1,11 @@
 Implement two timing utility hooks: `useDebounce` and `useThrottle`.
 
-### `useDebounce(value, delay)`
+### useDebounce<T>(value: T, delay: number): T
 - **Behavior**: Returns `initialValue` immediately on mount, then updates to the latest `value` only after it has remained unchanged for `delay` ms.
 - **Cleanup**: Clears pending timers whenever `value` or `delay` changes and on component unmount.
 - Always respects the latest `delay` value.
 
-### `useThrottle(value, interval)`
+### useThrottle<T>(value: T, interval: number): T
 - **Behavior**: The returned value updates at most once per `interval` ms.
 - **Leading & Trailing Updates**:
   - An update arriving after `interval` ms has elapsed since the last update is applied immediately.

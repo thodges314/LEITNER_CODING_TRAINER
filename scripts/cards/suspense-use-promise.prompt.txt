@@ -1,3 +1,4 @@
+### UserBadge(props: UserBadgeProps): JSX.Element
 React 19 can read a promise during render with the use() API. Build UserBadge({ userPromise }), where userPromise resolves to { name, role }.
 
 UserBadge renders a <Suspense fallback={<p>Loading…</p>}> (the text is exactly "Loading…") around a child component that calls use(userPromise) and renders <p>{name} ({role})</p>, for example "Ada (admin)".
