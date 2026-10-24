@@ -59,17 +59,6 @@ const SANDBOX_GLOBALS = `
     myCall(context: any, ...args: any[]): any;
     myApply(context: any, args?: any[]): any;
   }
-  declare var React: any;
-  declare namespace JSX {
-    interface Element {
-      [key: string]: any;
-    }
-    interface IntrinsicElements {
-      [elemName: string]: any;
-    }
-  }
-  declare var ReactDOM: any;
-  declare var mount: (componentOrElement: any, props?: any) => void;
   interface MutableRefObject<T> { current: T; }
   declare function useRef<T = any>(initialValue?: T): MutableRefObject<T>;
   declare function useState<T = any>(initialState?: T | (() => T)): [T, (next: T | ((prev: T) => T)) => void];
@@ -91,6 +80,41 @@ const SANDBOX_GLOBALS = `
   declare function useDeferredValue<T = any>(value: T): T;
   declare function useOptimistic<State, Action = any>(passthrough: State, updateFn?: (currentState: State, optimisticValue: Action) => State): [State, (action: Action) => void];
   declare function useActionState<State, Payload = any>(action: (state: any, payload: Payload) => any, initialState: any, permalink?: string): [any, (payload: Payload) => void, boolean];
+
+  interface ReactNamespace {
+    useRef: typeof useRef;
+    useState: typeof useState;
+    useReducer: typeof useReducer;
+    useCallback: typeof useCallback;
+    useMemo: typeof useMemo;
+    useEffect: typeof useEffect;
+    useLayoutEffect: typeof useLayoutEffect;
+    useContext: typeof useContext;
+    useId: typeof useId;
+    useSyncExternalStore: typeof useSyncExternalStore;
+    useImperativeHandle: typeof useImperativeHandle;
+    forwardRef: typeof forwardRef;
+    createContext: typeof createContext;
+    use: typeof use;
+    Suspense: any;
+    startTransition: typeof startTransition;
+    useTransition: typeof useTransition;
+    useDeferredValue: typeof useDeferredValue;
+    useOptimistic: typeof useOptimistic;
+    useActionState: typeof useActionState;
+    [key: string]: any;
+  }
+  declare var React: ReactNamespace;
+  declare namespace JSX {
+    interface Element {
+      [key: string]: any;
+    }
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+  }
+  declare var ReactDOM: any;
+  declare var mount: (componentOrElement: any, props?: any) => void;
   declare var IntersectionObserver: any;
   declare var ResizeObserver: any;
   declare var MutationObserver: any;

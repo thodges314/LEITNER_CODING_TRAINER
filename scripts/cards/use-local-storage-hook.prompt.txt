@@ -1,4 +1,5 @@
-Write `useLocalStorage(key, initialValue)` returning `[value, setValue]`.
+### useLocalStorage<T>(key: string, initialValue: T): [T, (next: T | ((prev: T) => T)) => void]
+Write `useLocalStorage(key, initialValue)` returning `[value, setValue]`:
 
 - **Initialization**: Reads and JSON-parses the stored value in `localStorage` on initial render. Falls back to `initialValue` if nothing is stored or the stored text is corrupt JSON.
 - **`setValue(valueOrUpdater)`**:

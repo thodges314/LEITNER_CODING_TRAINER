@@ -45,9 +45,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **199 / 271 (73.4%)**
-- **Cards Remaining:** **72 / 271 (26.6%)**
-- **Total Batches:** 48 batches (35 completed, 13 remaining)
+- **Fully Typed Cards Completed:** **204 / 271 (75.3%)**
+- **Cards Remaining:** **67 / 271 (24.7%)**
+- **Total Batches:** 48 batches (36 completed, 12 remaining)
 
 ### Track Completion Status
 
@@ -59,16 +59,16 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`typescript-patterns`** |     14      |      14      |   100.0%   | **COMPLETE** (Batches 21–23)                          |
 | **`js-utilities`**        |     37      |      37      |   100.0%   | **COMPLETE** (Batches 24–30)                          |
 | **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
-| **`react`**               |     27      |      5       |   18.5%    | In Progress (Batch 35 done, Batches 36–39 remaining)  |
+| **`react`**               |     27      |      10      |   37.0%    | In Progress (Batches 35–36 done, Batches 37–39 remaining) |
 | **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                               |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
-| **TOTAL**                 |   **271**   |   **199**    | **73.4%**  | **48 Batches Total**                                  |
+| **TOTAL**                 |   **271**   |   **204**    | **75.3%**  | **48 Batches Total**                                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–35: 199 Cards)
+## 4. Completed Batches (Batches 1–36: 204 Cards)
 
-All 199 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 204 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -122,28 +122,22 @@ All 199 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 33 (Events & User Interaction — 5 cards):** `event-delegation`, `keyboard-shortcut-matcher`, `key-sequence-matcher`, `focus-trap-keydown`, `drop-index-from-pointer`.
 - **Batch 34 (DOM Observers & Animation — 5 cards):** `vnode-to-dom`, `raf-throttle`, `lazy-load-observer`, `resize-breakpoints`, `watch-added-elements`.
 
-### React Track (5 of 27 Cards)
+### React Track (10 of 27 Cards)
 
 - **Batch 35 (Core State & Input Hooks — 5 cards):** `controlled-vs-uncontrolled-input`, `use-toggle-counter`, `focus-on-mount`, `form-state-hook`, `hook-use-previous`.
+- **Batch 36 (Advanced Refs & Lifecycle Hooks — 5 cards):** `use-previous-latest-ref`, `use-is-mounted`, `on-click-outside-hook`, `use-media-query`, `use-local-storage-hook`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 36–48: 72 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 37–48: 67 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
 ---
 
-### Track: `react` (22 cards remaining — Batches 36 to 39)
+### Track: `react` (17 cards remaining — Batches 37 to 39)
 
 _Focus: Hook signatures (`usePrevious<T>`, `useLocalStorage<T>`), reducer actions, and React 19 types._
-
-- **Batch 36: Advanced Refs & Lifecycle Hooks (5 cards)**
-  - `use-previous-latest-ref`: usePrevious, useLatest, and useInterval
-  - `use-is-mounted`: useIsMounted Hook: Component Mount Status Guard
-  - `on-click-outside-hook`: useOnClickOutside Hook
-  - `use-media-query`: useMediaQuery Hook: Responsive MatchMedia Listener
-  - `use-local-storage-hook`: useLocalStorage Hook
 
 - **Batch 37: Reducers, History & Stores (5 cards)**
   - `todo-list-reducer`: Todo List State: Reducer + Selectors
@@ -265,8 +259,8 @@ Every single batch follows this strict automated loop:
 >
 > ### Checkpoint & Quota Pause (21 October 2026)
 >
-> - **State (24 October 2026):** Batches 1–35 (199 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
-> - **Next step:** Batch 36 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
+> - **State (24 October 2026):** Batches 1–36 (204 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
+> - **Next step:** Batch 37 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
 > - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.
 >
 > ### Handoff procedure (for any assistant resuming card work)

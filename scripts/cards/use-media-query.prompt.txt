@@ -1,4 +1,5 @@
-Implement a custom React hook `useMediaQuery(query)` that listens for responsive viewport changes.
+### useMediaQuery(query: string): boolean
+Implement a custom React hook `useMediaQuery(query)` that listens for responsive viewport changes:
 
 - **Parameter**: Accepts a CSS media query string (e.g. `'(min-width: 768px)'`).
 - **Initial State**: Initializes boolean state using `window.matchMedia(query).matches` (defaulting to `false` if `window.matchMedia` is undefined).

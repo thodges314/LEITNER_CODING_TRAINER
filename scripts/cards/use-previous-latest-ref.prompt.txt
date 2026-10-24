@@ -1,12 +1,12 @@
 Implement three reference and timer utility hooks: `usePrevious`, `useLatest`, and `useInterval`.
 
-### `usePrevious(value)`
+### usePrevious<T>(value: T): T | undefined
 - Returns the value from the previous render (`undefined` on initial mount).
 
-### `useLatest(value)`
+### useLatest<T>(value: T): { readonly current: T }
 - Returns a React `ref` object whose `.current` property is always updated to the latest `value`, allowing effects or callbacks to read the current value without adding it to dependency arrays.
 
-### `useInterval(callback, delay)`
+### useInterval(callback: () => void, delay: number | null): void
 - Invokes the **LATEST** `callback` every `delay` ms.
 - Changing `callback` does **NOT** reset the active timer.
 - Setting `delay = null` pauses the interval; restoring a numeric delay resumes it.

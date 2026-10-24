@@ -1,3 +1,4 @@
+### useOnClickOutside(ref: { current: HTMLElement | null }, handler: (event: Event) => void): void
 Write `useOnClickOutside(ref, handler)`:
 
 - **Trigger**: Calls `handler(event)` when a `mousedown` or `touchstart` event occurs anywhere outside `ref.current`.
