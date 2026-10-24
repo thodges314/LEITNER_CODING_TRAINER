@@ -267,7 +267,7 @@
       "map",
       "frequency-counter"
     ],
-    "promptSeed": "Count item occurrences using standard JavaScript `Map` operations:\n\n### `countFrequencies(arr)`\n- Iterates through array `arr` and counts the frequency of each element using a `Map` instance (`.get()`, `.set()`, `.has()`).\n- Runs in O(n) time and O(n) auxiliary space.\n- Returns the resulting `Map` object mapping items to their counts.",
+    "promptSeed": "### `countFrequencies<T>(arr: T[]): Map<T, number>`\n\nCount item occurrences using standard JavaScript `Map` operations:\n\n- Iterates through array `arr` and counts the frequency of each element using a `Map` instance (`.get()`, `.set()`, `.has()`).\n- Runs in O(n) time and O(n) auxiliary space.\n- Returns the resulting `Map` object mapping items to their counts.",
     "testHarness": "await $test.run(\"Counts repeated items\", async () => {\n  const sleep = $test.sleep;\n  return (countFrequencies(['a', 'b', 'a', 'c', 'b', 'a']));\n}, () => (new Map([['a', 3], ['b', 2], ['c', 1]])));\n\nawait $test.run(\"Empty array\", async () => {\n  const sleep = $test.sleep;\n  return (countFrequencies([]));\n}, () => (new Map()));\n\nawait $test.run(\"1 and \\\"1\\\" are different keys\", async () => {\n  const sleep = $test.sleep;\n  return (countFrequencies([1, '1', 1]));\n}, () => (new Map([[1, 2], ['1', 1]])));\n\nawait $test.run(\"The result is a Map that keeps first-seen order and has no entry for unseen items\", async () => {\n  const sleep = $test.sleep;\n  const m = countFrequencies(['x', 'y', 'x']);\n  return ([m instanceof Map, [...m.keys()], m.get('x'), m.get('z')]);\n}, () => ([true, ['x', 'y'], 2, undefined]));\n\nawait $test.run(\"NaN is counted as a single key (Map uses SameValueZero)\", async () => {\n  const sleep = $test.sleep;\n  return (countFrequencies([NaN, NaN, 1]).get(NaN));\n}, () => (2));",
     "referenceSolution": "function countFrequencies(arr) {\n  const map = new Map();\n  for (const item of arr) {\n    map.set(item, (map.get(item) || 0) + 1);\n  }\n  return map;\n}",
     "testCases": [
@@ -301,7 +301,8 @@
     "concept": "collections",
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
-    "complexityExplanation": "Each element processed once with constant-time Map operations."
+    "complexityExplanation": "Each element processed once with constant-time Map operations.",
+    "referenceSolutionTs": "function countFrequencies<T>(arr: T[]): Map<T, number> {\n  const map = new Map<T, number>();\n  for (const item of arr) {\n    map.set(item, (map.get(item) ?? 0) + 1);\n  }\n  return map;\n}"
   },
   {
     "id": "set-unique-operations",
