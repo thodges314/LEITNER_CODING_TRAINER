@@ -1,6 +1,6 @@
 Implement immutable state logic and selectors for a todo list:
 
-### `todoReducer(state, action)`
+### todoReducer(state: TodoState, action: TodoAction): TodoState
 - State shape: `{ todos: [{ id, text, done }], filter: 'all' | 'active' | 'done' }`.
 - Never mutates state directly.
 - Handles action types:
@@ -11,12 +11,12 @@ Implement immutable state logic and selectors for a todo list:
   - `'SET_FILTER'`: updates `filter` to `action.filter`.
   - Default: returns the exact same `state` reference for unknown action types.
 
-### `selectVisibleTodos(state)`
+### selectVisibleTodos(state: TodoState): Todo[]
 - Computes visible todos based on `state.filter`:
   - `'active'`: returns todos where `!t.done`.
   - `'done'`: returns todos where `t.done`.
   - `'all'` (or default): returns all `state.todos`.
 
-### `selectCounts(state)`
+### selectCounts(state: TodoState): TodoCounts
 - Computes summary counts across `state.todos`:
 - Returns `{ total, active, done }`.

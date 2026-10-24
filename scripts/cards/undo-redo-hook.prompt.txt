@@ -1,3 +1,4 @@
+### useHistory<T>(initial: T, limit?: number): UseHistoryReturn<T>
 Write `useHistory(initial, limit = 100)`:
 
 - **Returns**: `{ state, set, undo, redo, canUndo, canRedo }`.

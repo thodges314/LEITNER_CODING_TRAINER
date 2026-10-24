@@ -1,3 +1,4 @@
+### todoReducer(state: TodoItem[], action: TodoAction): TodoItem[]
 Implement `todoReducer(state, action)` for a todo list held in `useReducer(todoReducer, [])`:
 
 - **State Shape**: An array of `{ id, text, done }` objects.

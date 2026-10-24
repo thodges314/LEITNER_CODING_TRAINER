@@ -1,6 +1,6 @@
 Implement an undo/redo history manager:
 
-### `createHistory(initial)`
+### createHistory<T>(initial: T): HistoryManager<T>
 - Tracks `past` entries, the current `present` value (starts as `initial`), and `future` entries.
 - Returns an object providing the following methods:
 

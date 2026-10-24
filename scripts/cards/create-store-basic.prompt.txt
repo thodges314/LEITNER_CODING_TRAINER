@@ -1,6 +1,6 @@
 Build a lightweight observable state store:
 
-### `createStore(initialState)`
+### createStore<T extends Record<string, unknown>>(initialState: T): Store<T>
 - Returns `{ getState, setState, subscribe }`.
 
 #### Store Methods
