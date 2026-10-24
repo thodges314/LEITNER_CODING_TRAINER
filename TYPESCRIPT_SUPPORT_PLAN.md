@@ -45,9 +45,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **189 / 271 (69.7%)**
-- **Cards Remaining:** **82 / 271 (30.3%)**
-- **Total Batches:** 48 batches (33 completed, 15 remaining)
+- **Fully Typed Cards Completed:** **194 / 271 (71.6%)**
+- **Cards Remaining:** **77 / 271 (28.4%)**
+- **Total Batches:** 48 batches (34 completed, 14 remaining)
 
 ### Track Completion Status
 
@@ -58,17 +58,17 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`js-language`**         |     25      |      25      |   100.0%   | **COMPLETE** (Batches 16–20)                          |
 | **`typescript-patterns`** |     14      |      14      |   100.0%   | **COMPLETE** (Batches 21–23)                          |
 | **`js-utilities`**        |     37      |      37      |   100.0%   | **COMPLETE** (Batches 24–30)                          |
-| **`dom-browser`**         |     20      |      15      |   75.0%    | In Progress (Batches 31–33 done, Batch 34 remaining)  |
+| **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
 | **`react`**               |     27      |      0       |    0.0%    | Planned (Batches 35–39)                               |
 | **`react-components`**    |     45      |      0       |    0.0%    | Planned (Batches 40–47)                               |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
-| **TOTAL**                 |   **271**   |   **189**    | **69.7%**  | **48 Batches Total**                                  |
+| **TOTAL**                 |   **271**   |   **194**    | **71.6%**  | **48 Batches Total**                                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–33: 189 Cards)
+## 4. Completed Batches (Batches 1–34: 194 Cards)
 
-All 189 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 194 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -115,30 +115,18 @@ All 189 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 29 (Object Path Access & Merging — 6 cards):** `get-set-path`, `deep-merge-objects`, `highlight-matches`, `simple-stringify`, `json-stringify-polyfill`, `query-string-url`.
 - **Batch 30 (Caching & Event Architectures — 6 cards):** `fifo-cache`, `lru-cache-implementation`, `lru-cache-ttl`, `callback-emitter`, `event-emitter`, `pub-sub-wildcard-emitter`.
 
-### DOM & Browser APIs Track (15 of 20 Cards)
+### DOM & Browser APIs Track (20 Cards — 100% Complete)
 
 - **Batch 31 (Routing & URL Patterns — 5 cards):** `parse-path-params`, `client-side-router`, `mini-history-router`, `next-route-matcher`, `css-specificity`.
 - **Batch 32 (Browser Storage & Cookies — 5 cards):** `safe-json-storage`, `storage-ttl-wrapper`, `cookie-parse-serialize`, `copy-to-clipboard`, `parse-style-string`.
 - **Batch 33 (Events & User Interaction — 5 cards):** `event-delegation`, `keyboard-shortcut-matcher`, `key-sequence-matcher`, `focus-trap-keydown`, `drop-index-from-pointer`.
+- **Batch 34 (DOM Observers & Animation — 5 cards):** `vnode-to-dom`, `raf-throttle`, `lazy-load-observer`, `resize-breakpoints`, `watch-added-elements`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 34–48: 82 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 35–48: 77 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
-
----
-
-### Track: `dom-browser` (5 cards remaining — Batch 34)
-
-_Focus: DOM event types (`KeyboardEvent`, `MouseEvent`), element interfaces, and browser storage models._
-
-- **Batch 34: DOM Observers & Animation (5 cards)**
-  - `vnode-to-dom`: Render a Virtual Node Tree to the DOM
-  - `raf-throttle`: requestAnimationFrame Throttle
-  - `lazy-load-observer`: Lazy-Load Images with IntersectionObserver
-  - `resize-breakpoints`: Element Breakpoints (ResizeObserver)
-  - `watch-added-elements`: Watch for Added Elements (MutationObserver)
 
 ---
 
@@ -280,8 +268,8 @@ Every single batch follows this strict automated loop:
 >
 > ### Checkpoint & Quota Pause (21 October 2026)
 >
-> - **State (24 October 2026):** Batches 1–33 (189 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
-> - **Next step:** Batch 34 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
+> - **State (24 October 2026):** Batches 1–34 (194 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
+> - **Next step:** Batch 35 and onward (pilot React cards; see the roadmap below; `npm run report:ts` lists the remaining cards).
 > - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.
 >
 > ### Handoff procedure (for any assistant resuming card work)

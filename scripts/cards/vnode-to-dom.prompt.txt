@@ -1,6 +1,6 @@
 Implement a lightweight virtual DOM to real DOM compiler and renderer:
 
-### `createDom(vnode)`
+### createDom(vnode: VNode): Node
 - Converts a virtual node tree into real DOM nodes.
 - **Primitives**:
   - `string` or `number`: creates a safe text node via `document.createTextNode(String(vnode))` (never parsed as HTML).
@@ -17,5 +17,5 @@ Implement a lightweight virtual DOM to real DOM compiler and renderer:
   - **Children**:
     - Recursively flattens and renders `vnode.children || []` (handles arbitrarily nested arrays).
 
-### `render(vnode, container)`
+### render(vnode: VNode, container: HTMLElement): void
 - Compiles `vnode` via `createDom(vnode)` and replaces the container's contents using `container.replaceChildren(...)`.

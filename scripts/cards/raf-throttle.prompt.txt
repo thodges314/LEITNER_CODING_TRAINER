@@ -1,6 +1,6 @@
 Implement requestAnimationFrame-based throttling for high-frequency events:
 
-### `rafThrottle(fn, raf = requestAnimationFrame, caf = cancelAnimationFrame)`
+### rafThrottle<TArgs extends unknown[]>(fn: (...args: TArgs) => void, raf?: (cb: (time: number) => void) => number, caf?: (handle: number) => void): ThrottledFunction<TArgs>
 - Returns a throttled function that invokes `fn` at most once per animation frame.
 - Defaults to window `requestAnimationFrame` and `cancelAnimationFrame` (can be dependency-injected in tests).
 

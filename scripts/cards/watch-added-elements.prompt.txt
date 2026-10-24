@@ -1,3 +1,4 @@
+### watchForElements(root: Element, selector: string, onFound: (element: Element) => void, MO?: MutationObserverConstructorLike): () => void
 Write `watchForElements(root, selector, onFound, MO = MutationObserver)`:
 
 - **Initial Discovery**: Calls `onFound(element)` for all matching elements already present in `root` in document order (`root.querySelectorAll(selector)`).

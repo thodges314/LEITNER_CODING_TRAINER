@@ -1,6 +1,6 @@
 Implement element container queries using `ResizeObserver`:
 
-### `observeBreakpoint(element, breakpoints, onChange, RO = ResizeObserver)`
+### observeBreakpoint(element: Element, breakpoints: Record<string, number>, onChange: (name: string | null) => void, RO?: ResizeObserverConstructorLike): () => void
 - Observes the content width of `element` and triggers `onChange(name)` when its matching container breakpoint changes.
 - `breakpoints` maps breakpoint names to minimum width thresholds in any key order (e.g. `{ sm: 0, md: 600, lg: 1000 }`).
 
