@@ -1,15 +1,15 @@
 Implement data collection and transformation grouping utilities:
 
-### `groupBy(items, keyFnOrProp)`
+### `groupBy<T>(items: T[], keyFnOrProp: ((item: T, index: number) => PropertyKey) | keyof T): Record<string, T[]>`
 - Groups elements of `items` by a key derived via property name string or function `(item, index) => key`.
 - Returns an object mapping each key to an array of its corresponding items in insertion order.
 - Returns `{}` for an empty collection.
 
-### `countBy(items, keyFnOrProp)`
+### `countBy<T>(items: T[], keyFnOrProp: ((item: T, index: number) => PropertyKey) | keyof T): Record<string, number>`
 - Computes the frequency count of elements grouped by the derived key.
 - Returns an object mapping each key to the number of items associated with it.
 
-### `keyBy(items, keyFnOrProp)`
+### `keyBy<T>(items: T[], keyFnOrProp: ((item: T, index: number) => PropertyKey) | keyof T): Record<string, T>`
 - Indexes each item by its derived key.
 - If multiple items produce the same key, the last item in `items` wins.
 - Returns `{}` for an empty collection.

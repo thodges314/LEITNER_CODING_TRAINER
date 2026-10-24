@@ -1,6 +1,6 @@
 Implement record deduplication and multi-key stable sorting:
 
-### `dedupeAndSort(records, sortBy = 'id')`
+### `dedupeAndSort<T extends { id: string | number }>(records: T[], sortBy: string | string[] = 'id'): T[]`
 - **Deduplication**:
   - Deduplicates records by `id`. When duplicate IDs occur, the latest record in `records` wins.
 - **Sorting**:

@@ -1,13 +1,13 @@
 Implement set operations on arrays using JavaScript `Set` in O(n + m) time:
 
-### `arrayIntersection(a, b)`
+### `arrayIntersection<T>(a: T[], b: T[]): T[]`
 - Returns an array of unique elements present in both `a` and `b`.
 - Preserves the order of elements as they first appear in `b`.
 
-### `arrayUnion(a, b)`
+### `arrayUnion<T>(a: T[], b: T[]): T[]`
 - Returns an array of all unique elements present in either `a` or `b`.
 - Elements from `a` appear first, followed by unique elements from `b`.
 
-### `arrayDifference(a, b)`
+### `arrayDifference<T>(a: T[], b: T[]): T[]`
 - Returns an array of unique elements present in `a` but absent from `b`.
 - Preserves the relative order of elements in `a`.
