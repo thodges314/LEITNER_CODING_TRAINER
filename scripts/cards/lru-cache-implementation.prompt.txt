@@ -1,6 +1,6 @@
 Implement a Least Recently Used (LRU) cache class operating in O(1) time complexity for all operations:
 
-### `LRUCache(capacity)`
+### `new LRUCache<K = number, V = number>(capacity: number): LRUCache<K, V>`
 
 - **`get(key)`**:
   - Returns the cached value associated with `key`.

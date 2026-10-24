@@ -1,6 +1,6 @@
 Implement a First-In-First-Out (FIFO) in-memory cache class:
 
-### `FifoCache(capacity)`
+### `new FifoCache<K = unknown, V = unknown>(capacity: number): FifoCache<K, V>`
 
 - **`get size`**:
   - Getter returning the current number of cached entries.

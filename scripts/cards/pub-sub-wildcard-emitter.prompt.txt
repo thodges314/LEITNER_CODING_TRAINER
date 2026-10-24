@@ -1,5 +1,7 @@
 Write `class PubSub` supporting pattern-based event emission:
 
+### `new PubSub(): PubSub`
+
 - **`subscribe(pattern, handler)`**:
   - Registers `handler` for `pattern` and returns an unsubscribe function `() => void`.
   - Patterns support exact names (e.g. `'user.login'`) or wildcards:

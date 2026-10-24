@@ -1,6 +1,6 @@
 Implement a lightweight publish-subscribe callback emitter:
 
-### `createEmitter()`
+### `createEmitter(): { on(event: string, fn: (...args: unknown[]) => void): void; emit(event: string, ...args: unknown[]): number }`
 Returns an emitter object with the following methods:
 
 - **`on(event, fn)`**:

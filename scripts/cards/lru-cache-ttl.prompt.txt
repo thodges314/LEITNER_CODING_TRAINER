@@ -1,6 +1,6 @@
 Implement a Least Recently Used (LRU) cache class with Time-To-Live (TTL) expiration in O(1) time:
 
-### `LRUCacheTTL(capacity)`
+### `new LRUCacheTTL<K = unknown, V = unknown>(capacity: number): LRUCacheTTL<K, V>`
 
 - **`get(key)`**:
   - Returns the cached value for `key`.

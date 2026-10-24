@@ -1,6 +1,6 @@
 Build a robust, object-oriented event emitter class:
 
-### `EventEmitter`
+### `new EventEmitter(): EventEmitter`
 
 - **`on(event, fn)`**:
   - Registers `fn` as a listener for `event`. Listeners execute in registration order.
