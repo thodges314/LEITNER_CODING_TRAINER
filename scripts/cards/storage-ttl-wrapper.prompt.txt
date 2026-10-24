@@ -1,6 +1,6 @@
 Wrap a `localStorage`-like backend with namespacing and TTL (Time-To-Live) expiration:
 
-### `createStorage(backend, options = {})`
+### `createStorage(backend: Storage, options?: { prefix?: string; now?: () => number }): StorageWrapper`
 - Wraps `backend` supporting `getItem`, `setItem`, `removeItem`, `key(i)`, and `length`.
 - Options:
   - `prefix`: string namespace prepended to all backend keys (defaults to `'app:'`).

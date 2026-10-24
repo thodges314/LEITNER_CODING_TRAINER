@@ -1,4 +1,6 @@
-Write async `copyToClipboard(text, env = {})` that resolves `true` when the text was copied and `false` otherwise.
+Write async text copying utility with HTML5 Clipboard API and DOM textarea fallback:
+
+### `copyToClipboard(text: string, env?: { navigator?: any; document?: any }): Promise<boolean>`
 
 `env` holds the browser objects to use (`{ navigator, document }`) so they can be replaced in tests: use the browser global only when that key is missing from `env`, and treat an explicit `null` or `undefined` value as "not available".
 

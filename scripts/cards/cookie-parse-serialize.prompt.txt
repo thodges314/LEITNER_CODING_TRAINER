@@ -1,6 +1,6 @@
 Implement HTTP cookie parsing and serialization utilities:
 
-### `parseCookies(header)`
+### `parseCookies(header: string | null | undefined): Record<string, string>`
 - Parses a `Cookie` request header or `document.cookie` string (e.g. `'a=1; b=hello%20world'`).
 - Returns an object mapping cookie names to decoded values:
   - Splits segments on `';'` and skips empty segments.
@@ -9,7 +9,7 @@ Implement HTTP cookie parsing and serialization utilities:
   - Decodes values with `decodeURIComponent` (if decoding throws, preserves the raw text).
   - Preserves the **first** occurrence if a cookie name is duplicated.
 
-### `serializeCookie(name, value, options = {})`
+### `serializeCookie(name: string, value: string, options?: CookieOptions): string`
 - Generates a `Set-Cookie` header string: `name=encodeURIComponent(value)`.
 - **Validation**:
   - Throws `TypeError('Invalid cookie name')` if `name` is empty or contains `'='`, `';'`, `','`, or whitespace.

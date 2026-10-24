@@ -1,5 +1,10 @@
-Write `safeParse(text, fallback)` returning the parsed JSON or `fallback` when text is not valid JSON (or not a string).
+Safe JSON parsing and browser storage read/write utilities:
 
-Write `safeGet(storage, key, fallback)` that reads `storage.getItem(key)` (a localStorage-like object with `getItem` and `setItem`) and returns the parsed value or `fallback` when the key is missing or the stored text is corrupt.
+### `safeParse<T>(text: unknown, fallback: T): T`
+- Returns the parsed JSON or `fallback` when text is not valid JSON (or not a string).
 
-Write `safeSet(storage, key, value)` that stringifies `value` with `JSON.stringify` and stores the JSON string with `storage.setItem(key, jsonString)`, returning `true`, or `false` if `storage.setItem` throws.
+### `safeGet<T>(storage: { getItem(key: string): string | null }, key: string, fallback: T): T`
+- Reads `storage.getItem(key)` (a localStorage-like object with `getItem` and `setItem`) and returns the parsed value or `fallback` when the key is missing or the stored text is corrupt.
+
+### `safeSet(storage: { setItem(key: string, value: string): void }, key: string, value: unknown): boolean`
+- Stringifies `value` with `JSON.stringify` and stores the JSON string with `storage.setItem(key, jsonString)`, returning `true`, or `false` if `storage.setItem` throws.

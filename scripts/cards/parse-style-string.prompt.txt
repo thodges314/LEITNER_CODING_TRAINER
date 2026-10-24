@@ -1,6 +1,6 @@
 Convert between CSS inline style strings and JavaScript style objects:
 
-### `parseStyle(text)`
+### parseStyle(text: string): Record<string, string>
 - Parses an inline CSS style declaration string (e.g. `'color: red; margin-top: 4px;'`).
 - Returns a camelCased style object: `{ color: 'red', marginTop: '4px' }`.
 - Rules:
@@ -9,7 +9,7 @@ Convert between CSS inline style strings and JavaScript style objects:
   - Trims leading and trailing whitespace from both property names and values.
   - Converts kebab-case property names to camelCase (`margin-top` -> `marginTop`).
 
-### `styleToString(obj)`
+### styleToString(obj: Record<string, string | number>): string
 - Converts a style object back into a CSS inline style string.
 - Converts camelCase keys to kebab-case (e.g. `marginTop` -> `margin-top`).
 - Formats each property as `property: value;`.
