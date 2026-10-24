@@ -14,7 +14,15 @@ export type CatalogSortOption =
   | 'status-asc'
   | 'status-desc';
 
-export type CatalogStatusFilter = 'all' | 'active' | 'locked' | 'due' | 'scheduled' | 'mastered';
+export type CatalogStatusFilter =
+  | 'all'
+  | 'unlocked'
+  | 'active'
+  | 'locked'
+  | 'deactivated'
+  | 'due'
+  | 'scheduled'
+  | 'mastered';
 
 export interface DeckCatalogPreferences {
   selectedTracks: string[];
@@ -38,8 +46,10 @@ export const DECK_CATALOG_STORAGE_KEY = 'leitner_deck_catalog_preferences';
 
 const VALID_STATUSES: readonly CatalogStatusFilter[] = [
   'all',
+  'unlocked',
   'active',
   'locked',
+  'deactivated',
   'due',
   'scheduled',
   'mastered',

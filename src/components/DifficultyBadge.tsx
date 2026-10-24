@@ -28,14 +28,9 @@ export const DifficultyBadge: React.FC<{
       tabIndex={onClick ? 0 : undefined}
       title={disableTooltip ? undefined : `Difficulty: Level ${d} of 5 (${DIFFICULTY_LABELS[d]})\n• 1: Warm-up\n• 2: Easy\n• 3: Medium\n• 4: Hard\n• 5: Expert`}
     >
-      {shouldShowPrefix && (
-        <span className="difficulty-prefix">
-          Diff:
-        </span>
-      )}
+      {shouldShowPrefix && <span className="difficulty-prefix">Diff:</span>}
       <span aria-hidden="true" className="difficulty-pips">
-        {'●'.repeat(d)}
-        <span className="difficulty-empty-pips">{'●'.repeat(5 - d)}</span>
+        {'●'.repeat(d)}<span className="difficulty-empty-pips">{'●'.repeat(5 - d)}</span>
       </span>
       {showLabel && <span className="difficulty-label">{DIFFICULTY_LABELS[d]}</span>}
     </span>

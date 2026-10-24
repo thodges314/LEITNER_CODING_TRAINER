@@ -30,7 +30,7 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
    All 277 existing JavaScript reference solutions and test harnesses remain 100% intact and functional.
 3. **Every Batch is Verified:**  
    The entire suite passes with 0 failures:
-   - `npm test` (all 46 test files, 1,729 tests passing, including all 277 TypeScript reference solutions and strip-type JS execution).
+   - `npm test` (all 46 test files, 1,731 tests passing, including all 277 TypeScript reference solutions and strip-type JS execution).
    - Full production build & type checks (`npx tsc -b`, `npm run lint`, `vite build`).
 4. **Immediate Value:**  
    Delivers 100% TypeScript dual-solution coverage across all 277 cards in the deck, complete with in-browser type checking, CodeMirror hover quickinfo, and context-aware solution reveal.

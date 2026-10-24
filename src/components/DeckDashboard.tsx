@@ -26,7 +26,8 @@ import {
   Plus,
   Search,
   Flame,
-  Trash2,
+  Archive,
+  ArchiveRestore,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -49,7 +50,8 @@ interface DeckDashboardProps {
   onSelectCardToPractice: (card: TopicItem) => void;
   onToggleLock: (topicId: string, currentStatus: 'active' | 'locked') => void;
   onResetBox: (topicId: string) => void;
-  onDeleteTopic: (topicId: string) => void;
+  onDeleteTopic?: (topicId: string) => void;
+  onToggleDeactivate?: (topicId: string) => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
   onOpenAddModal: () => void;
   /** Opens the Focus dialog (used by the one-time hint under the track filter). */
@@ -65,6 +67,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onToggleLock,
   onResetBox,
   onDeleteTopic,
+  onToggleDeactivate,
   onStateUpdated,
   onOpenAddModal,
   onOpenFocus,
@@ -94,7 +97,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const [selectedDifficulty, setSelectedDifficulty] = useState<number | 'all'>(() => initialPrefs.selectedDifficulty);
   const [sortOption, setSortOption] = useState<CatalogSortOption>(() => initialPrefs.sortOption);
   const [searchQuery, setSearchQuery] = useState(() => initialPrefs.searchQuery);
-  const [topicToDelete, setTopicToDelete] = useState<TopicItem | null>(null);
+  const [topicToDeactivate, setTopicToDeactivate] = useState<TopicItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -347,11 +350,15 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         return a.title.localeCompare(b.title);
       }
       case 'status-asc': {
-        if (a.status !== b.status) return a.status === 'active' ? -1 : 1;
+        const rankA = a.deactivated ? 2 : a.status === 'locked' ? 1 : 0;
+        const rankB = b.deactivated ? 2 : b.status === 'locked' ? 1 : 0;
+        if (rankA !== rankB) return rankA - rankB;
         return a.title.localeCompare(b.title);
       }
       case 'status-desc': {
-        if (a.status !== b.status) return a.status === 'locked' ? -1 : 1;
+        const rankA = a.deactivated ? 2 : a.status === 'locked' ? 1 : 0;
+        const rankB = b.deactivated ? 2 : b.status === 'locked' ? 1 : 0;
+        if (rankA !== rankB) return rankB - rankA;
         return a.title.localeCompare(b.title);
       }
       default:
@@ -413,12 +420,13 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         const activeBoxes = Array.isArray(selectedBox) ? selectedBox : [selectedBox];
         if (!activeBoxes.includes(t.box)) return false;
       }
-      if (selectedStatus === 'active' && t.status !== 'active') return false;
-      if (selectedStatus === 'locked' && t.status !== 'locked') return false;
-      if (selectedStatus === 'due' && (t.status !== 'active' || t.nextEligibleTrial > totalCompletedReviews)) return false;
-      if (selectedStatus === 'scheduled' && (t.status !== 'active' || t.nextEligibleTrial <= totalCompletedReviews)) return false;
+      if ((selectedStatus === 'unlocked' || selectedStatus === 'active') && (t.status !== 'active' || t.deactivated)) return false;
+      if (selectedStatus === 'locked' && (t.status !== 'locked' || t.deactivated)) return false;
+      if (selectedStatus === 'deactivated' && !t.deactivated) return false;
+      if (selectedStatus === 'due' && (t.status !== 'active' || t.deactivated || t.nextEligibleTrial > totalCompletedReviews)) return false;
+      if (selectedStatus === 'scheduled' && (t.status !== 'active' || t.deactivated || t.nextEligibleTrial <= totalCompletedReviews)) return false;
       if (selectedStatus === 'mastered') {
-        const isMastered = t.status === 'active' && (algorithm === 'graduated-interval' ? t.box >= 5 : t.box === 5);
+        const isMastered = t.status === 'active' && !t.deactivated && (algorithm === 'graduated-interval' ? t.box >= 5 : t.box === 5);
         if (!isMastered) return false;
       }
       if (selectedDifficulty !== 'all' && difficultyOf(t) !== selectedDifficulty) return false;
@@ -794,8 +802,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               aria-label="Filter by Status"
             >
               <option value="all">Status: All</option>
-              <option value="active">Status: Active Only</option>
+              <option value="unlocked">Status: Unlocked Only</option>
+              {selectedStatus === 'active' && <option value="active">Status: Unlocked Only</option>}
               <option value="locked">Status: Locked (Reserve) Only</option>
+              <option value="deactivated">Status: Deactivated Only</option>
               <option value="due">Status: Due for Practice (Ready Now)</option>
               <option value="scheduled">Status: In Interval Spacing</option>
               <option value="mastered">Status: Mastered (Tier 5+)</option>
@@ -875,7 +885,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('title')}
                 className="catalog-th"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', minWidth: '220px' }}
                 title="Click to sort by topic name"
               >
                 <div className="catalog-th-btn">
@@ -885,7 +895,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('track')}
                 className="catalog-th"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', width: '135px' }}
                 title="Click to sort by track name"
               >
                 <div className="catalog-th-btn">
@@ -895,7 +905,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('difficulty')}
                 className="catalog-th"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', width: '165px' }}
                 title="Click to sort by difficulty level"
               >
                 <div className="catalog-th-btn">
@@ -905,27 +915,27 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('box')}
                 className="catalog-th"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', width: '90px', textAlign: 'center' }}
                 title={`Click to sort by ${tierName} level`}
               >
-                <div className="catalog-th-btn">
+                <div className="catalog-th-btn" style={{ justifyContent: 'center', width: '100%' }}>
                   {tierName} Level {renderSortIndicator('box')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('streak')}
                 className="catalog-th"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', width: '70px', textAlign: 'center' }}
                 title="Click to sort by streak"
               >
-                <div className="catalog-th-btn">
+                <div className="catalog-th-btn" style={{ justifyContent: 'center', width: '100%' }}>
                   Streak {renderSortIndicator('streak')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('due')}
                 className="catalog-th"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', width: '145px' }}
                 title="Click to sort by next eligible trial"
               >
                 <div className="catalog-th-btn">
@@ -935,14 +945,14 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <th
                 onClick={() => handleHeaderSort('status')}
                 className="catalog-th"
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', width: '110px' }}
                 title="Click to sort by card status"
               >
                 <div className="catalog-th-btn">
                   Status {renderSortIndicator('status')}
                 </div>
               </th>
-              <th className="catalog-th" style={{ textAlign: 'right' }}>Actions</th>
+              <th className="catalog-th" style={{ width: '190px', textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -955,19 +965,32 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             ) : (
               filteredTopics.map((topic) => {
                 const trkMeta = getTrackMeta(topic.track);
-                const isEligible = topic.status === 'active' && topic.nextEligibleTrial <= totalCompletedReviews;
-
+                const isEligible = !topic.deactivated && topic.status === 'active' && topic.nextEligibleTrial <= totalCompletedReviews;
                 return (
                   <tr
                     key={topic.id}
                     className="catalog-tr"
                     style={{
-                      backgroundColor: topic.status === 'locked' ? (isLight ? 'rgba(0, 0, 0, 0.025)' : 'rgba(0,0,0,0.2)') : undefined,
+                      backgroundColor: topic.deactivated
+                        ? (isLight ? 'rgba(0, 0, 0, 0.04)' : 'rgba(0, 0, 0, 0.35)')
+                        : topic.status === 'locked'
+                        ? (isLight ? 'rgba(0, 0, 0, 0.025)' : 'rgba(0,0,0,0.2)')
+                        : undefined,
+                      opacity: topic.deactivated ? 0.72 : 1,
                     }}
                   >
                     {/* Title & Tags */}
                     <td className="catalog-td">
-                      <div style={{ fontWeight: 600, color: topic.status === 'active' ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                      <div
+                        style={{
+                          fontWeight: 600,
+                          color: topic.deactivated
+                            ? 'var(--text-dim)'
+                            : topic.status === 'active'
+                            ? 'var(--text-primary)'
+                            : 'var(--text-muted)',
+                        }}
+                      >
                         {topic.title}
                       </div>
                       <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
@@ -987,13 +1010,13 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                     </td>
 
                     {/* Difficulty */}
-                    <td className="catalog-td">
+                    <td className="catalog-td" style={{ whiteSpace: 'nowrap' }}>
                       <DifficultyBadge card={topic} showLabel={true} />
                     </td>
 
                     {/* Box */}
-                    <td className="catalog-td">
-                      {topic.status === 'active' ? (
+                    <td className="catalog-td" style={{ textAlign: 'center' }}>
+                      {!topic.deactivated && topic.status === 'active' ? (
                         <span
                           className="badge"
                           style={{
@@ -1010,8 +1033,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                     </td>
 
                     {/* Streak */}
-                    <td className="catalog-td">
-                      {topic.status === 'active' ? (
+                    <td className="catalog-td" style={{ textAlign: 'center' }}>
+                      {!topic.deactivated && topic.status === 'active' ? (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--accent-orange, #f97316)', fontWeight: 600 }}>
                           <Flame size={13} /> {topic.streak}
                         </span>
@@ -1022,7 +1045,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
 
                     {/* Next Eligible Trial */}
                     <td className="catalog-td">
-                      {topic.status === 'active' ? (
+                      {!topic.deactivated && topic.status === 'active' ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span
                             style={{
@@ -1041,68 +1064,94 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                           )}
                         </div>
                       ) : (
-                        <span style={{ color: 'var(--text-dim)', fontSize: '12px', fontWeight: 500 }}>Locked</span>
+                        <span style={{ color: 'var(--text-dim)', fontSize: '12px', fontWeight: 500 }}>
+                          {topic.deactivated ? 'Inactive' : 'Locked'}
+                        </span>
                       )}
                     </td>
 
                     {/* Status */}
                     <td className="catalog-td">
-                      <span className={`badge ${topic.status === 'active' ? 'status-badge-active' : 'status-badge-locked'}`}>
-                        {topic.status === 'active' ? <Unlock size={11} /> : <Lock size={11} />}
-                        <span>{topic.status === 'active' ? 'Active' : 'Locked'}</span>
-                      </span>
+                      {topic.deactivated ? (
+                        <span className="badge status-badge-deactivated" title="Card pulled out of active study rotation">
+                          <Archive size={11} />
+                          <span>Deactivated</span>
+                        </span>
+                      ) : (
+                        <span className={`badge ${topic.status === 'active' ? 'status-badge-active' : 'status-badge-locked'}`}>
+                          {topic.status === 'active' ? <Unlock size={11} /> : <Lock size={11} />}
+                          <span>{topic.status === 'active' ? 'Unlocked' : 'Locked'}</span>
+                        </span>
+                      )}
                     </td>
 
                     {/* Actions */}
                     <td className="catalog-td" style={{ textAlign: 'right' }}>
                       <div className="catalog-actions-cell">
-                        {topic.status === 'active' ? (
-                          <>
-                            <button
-                              className="btn btn-primary"
-                              style={{ padding: '5px 10px', fontSize: '12px' }}
-                              onClick={() => onSelectCardToPractice(topic)}
-                              title="Start blank-buffer practice on this topic immediately"
-                            >
-                              <Play size={12} /> Practice
-                            </button>
-                            <button
-                              className="btn btn-outline"
-                              style={{ padding: '5px 8px', fontSize: '12px' }}
-                              onClick={() => onResetBox(topic.id)}
-                              title="Reset to Box 1"
-                            >
-                              <RotateCcw size={12} />
-                            </button>
-                            <button
-                              className="btn btn-outline"
-                              style={{ padding: '5px 8px', fontSize: '12px' }}
-                              onClick={() => onToggleLock(topic.id, topic.status)}
-                              title="Lock card"
-                            >
-                              <Lock size={12} />
-                            </button>
-                          </>
-                        ) : (
+                        {topic.deactivated ? (
                           <button
                             className="btn btn-secondary"
                             style={{ padding: '5px 10px', fontSize: '12px' }}
-                            onClick={() => onToggleLock(topic.id, topic.status)}
-                            title="Unlock card to active rotation"
+                            onClick={() => {
+                              if (onToggleDeactivate) onToggleDeactivate(topic.id);
+                              else if (onDeleteTopic) onDeleteTopic(topic.id);
+                            }}
+                            title="Reactivate card to study rotation"
+                            aria-label={`Reactivate topic '${topic.title}'`}
                           >
-                            <Unlock size={12} /> Unlock
+                            <ArchiveRestore size={12} /> Reactivate
                           </button>
-                        )}
+                        ) : (
+                          <>
+                            {topic.status === 'active' ? (
+                              <>
+                                <button
+                                  className="btn btn-primary"
+                                  style={{ padding: '5px 10px', fontSize: '12px' }}
+                                  onClick={() => onSelectCardToPractice(topic)}
+                                  title="Start blank-buffer practice on this topic immediately"
+                                >
+                                  <Play size={12} /> Practice
+                                </button>
+                                <button
+                                  className="btn btn-outline"
+                                  style={{ padding: '5px 8px', fontSize: '12px' }}
+                                  onClick={() => onResetBox(topic.id)}
+                                  title="Reset to Box 1"
+                                >
+                                  <RotateCcw size={12} />
+                                </button>
+                                <button
+                                  className="btn btn-outline"
+                                  style={{ padding: '5px 8px', fontSize: '12px' }}
+                                  onClick={() => onToggleLock(topic.id, topic.status)}
+                                  title="Lock card"
+                                >
+                                  <Lock size={12} />
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                className="btn btn-secondary"
+                                style={{ padding: '5px 10px', fontSize: '12px' }}
+                                onClick={() => onToggleLock(topic.id, topic.status)}
+                                title="Unlock card to active rotation"
+                              >
+                                <Unlock size={12} /> Unlock
+                              </button>
+                            )}
 
-                        <button
-                          className="btn btn-danger"
-                          style={{ padding: '5px 8px', fontSize: '12px' }}
-                          onClick={() => setTopicToDelete(topic)}
-                          title={`Delete topic '${topic.title}'`}
-                          aria-label={`Delete topic '${topic.title}'`}
-                        >
-                          <Trash2 size={12} />
-                        </button>
+                            <button
+                              className="btn btn-outline"
+                              style={{ padding: '5px 8px', fontSize: '12px', color: 'var(--text-muted)' }}
+                              onClick={() => setTopicToDeactivate(topic)}
+                              title={`Deactivate topic '${topic.title}' (remove from study rotation)`}
+                              aria-label={`Deactivate topic '${topic.title}'`}
+                            >
+                              <Archive size={12} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -1113,47 +1162,47 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         </table>
       </div>
 
-      {/* Lightweight Delete Confirmation Modal */}
-      {topicToDelete && (
+      {/* Lightweight Deactivate Confirmation Modal */}
+      {topicToDeactivate && (
         <div
           className="modal-overlay"
-          onClick={() => setTopicToDelete(null)}
+          onClick={() => setTopicToDeactivate(null)}
           role="dialog"
           aria-modal="true"
-          aria-labelledby="delete-confirm-title"
+          aria-labelledby="deactivate-confirm-title"
         >
           <div
             className="modal-content"
             style={{ maxWidth: '440px', padding: '24px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', color: 'var(--accent-rose)' }}>
-              <Trash2 size={22} />
-              <h3 id="delete-confirm-title" style={{ fontSize: '17px', fontWeight: 600 }}>
-                Delete Topic
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', color: 'var(--accent-orange, #f97316)' }}>
+              <Archive size={22} />
+              <h3 id="deactivate-confirm-title" style={{ fontSize: '17px', fontWeight: 600 }}>
+                Deactivate Topic
               </h3>
             </div>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '22px' }}>
-              Delete topic '{topicToDelete.title}'? This cannot be undone.
+              Deactivate topic '{topicToDeactivate.title}'? It will be pulled out of your active spaced repetition study cycle. You can reactivate it at any time from this catalog table.
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
               <button
                 type="button"
                 className="btn btn-outline"
-                onClick={() => setTopicToDelete(null)}
+                onClick={() => setTopicToDeactivate(null)}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="btn btn-danger"
-                style={{ backgroundColor: 'rgba(239, 68, 68, 0.85)', color: '#ffffff' }}
+                className="btn btn-primary"
                 onClick={() => {
-                  onDeleteTopic(topicToDelete.id);
-                  setTopicToDelete(null);
+                  if (onToggleDeactivate) onToggleDeactivate(topicToDeactivate.id);
+                  else if (onDeleteTopic) onDeleteTopic(topicToDeactivate.id);
+                  setTopicToDeactivate(null);
                 }}
               >
-                Delete
+                Deactivate Topic
               </button>
             </div>
           </div>

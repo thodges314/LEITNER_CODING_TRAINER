@@ -30,6 +30,8 @@ export interface TopicItem {
   streak: number;
   nextEligibleTrial: number; // The global trial index when this card can next appear
   status: 'active' | 'locked';
+  /** True when a user has pulled this card out of active spaced repetition study cycle without deleting it. */
+  deactivated?: boolean;
   tags: string[];
   /** 1 (warm-up) to 5 (expert). Easier rungs of a concept are mastered before harder ones unlock. */
   difficulty?: number;
@@ -849,7 +851,7 @@ export function getNextCardGraduatedInterval(
   currentCardId?: string,
   filter?: PracticeFilter
 ): TopicItem | null {
-  const activeTopics = topics.filter((t) => t.status === 'active' && cardMatchesFilter(t, filter));
+  const activeTopics = topics.filter((t) => t.status === 'active' && !t.deactivated && cardMatchesFilter(t, filter));
   if (activeTopics.length === 0) return null;
   if (activeTopics.length === 1) return activeTopics[0];
 
@@ -946,7 +948,7 @@ export function getNextCard(
     return getNextCardGraduatedInterval(topics, totalCompletedReviews, lastTrack, currentCardId, filter);
   }
 
-  const activeTopics = topics.filter((t) => t.status === 'active' && cardMatchesFilter(t, filter));
+  const activeTopics = topics.filter((t) => t.status === 'active' && !t.deactivated && cardMatchesFilter(t, filter));
   if (activeTopics.length === 0) return null;
   if (activeTopics.length === 1) return activeTopics[0];
 
@@ -1097,6 +1099,34 @@ export function deleteTopicFromDeck(state: LeitnerDeckState, topicId: string): L
   };
   saveDeckState(nextState);
   return nextState;
+}
+
+/** Deactivates a topic, pulling it out of the active spaced repetition study cycle while keeping it in the catalog. */
+export function deactivateTopic(state: LeitnerDeckState, topicId: string): LeitnerDeckState {
+  clearDraft(topicId);
+  const nextState: LeitnerDeckState = {
+    ...state,
+    topics: state.topics.map((t) => (t.id === topicId ? { ...t, deactivated: true } : t)),
+  };
+  saveDeckState(nextState);
+  return nextState;
+}
+
+/** Reactivates a deactivated topic back into the active study cycle. */
+export function reactivateTopic(state: LeitnerDeckState, topicId: string): LeitnerDeckState {
+  const nextState: LeitnerDeckState = {
+    ...state,
+    topics: state.topics.map((t) => (t.id === topicId ? { ...t, deactivated: false } : t)),
+  };
+  saveDeckState(nextState);
+  return nextState;
+}
+
+/** Toggles topic deactivation status. */
+export function toggleTopicDeactivation(state: LeitnerDeckState, topicId: string): LeitnerDeckState {
+  const target = state.topics.find((t) => t.id === topicId);
+  if (!target) return state;
+  return target.deactivated ? reactivateTopic(state, topicId) : deactivateTopic(state, topicId);
 }
 
 export function exportDeckBackup(state: LeitnerDeckState): void {

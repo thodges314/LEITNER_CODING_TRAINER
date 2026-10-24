@@ -246,11 +246,11 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
       pill5.click();
     });
 
-    // Change status filter to 'active'
+    // Change status filter to 'unlocked'
     const statusSelect = container?.querySelector('select[aria-label="Filter by Status"]') as HTMLSelectElement;
     expect(statusSelect).toBeTruthy();
     await act(async () => {
-      statusSelect.value = 'active';
+      statusSelect.value = 'unlocked';
       statusSelect.dispatchEvent(new Event('change', { bubbles: true }));
     });
 
@@ -292,7 +292,7 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
     const restoredSearchInput = container?.querySelector('input[placeholder*="Search topics"]') as HTMLInputElement;
 
     expect(restoredPill5.getAttribute('aria-pressed')).toBe('true');
-    expect(restoredStatusSelect.value).toBe('active');
+    expect(restoredStatusSelect.value).toBe('unlocked');
     expect(restoredSortSelect.value).toBe('difficulty-desc');
     expect(restoredSearchInput.value).toBe('Mastered');
 
