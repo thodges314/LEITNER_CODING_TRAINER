@@ -24,36 +24,20 @@ export const DeactivateModal: React.FC<DeactivateModalProps> = ({
       aria-labelledby="deactivate-confirm-title"
     >
       <div
-        className="modal-content"
-        style={{ maxWidth: '440px', padding: '24px' }}
+        className="modal-content deactivate-modal-content"
         onClick={(e) => e.stopPropagation()}
       >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            marginBottom: '14px',
-            color: 'var(--accent-orange, #f97316)',
-          }}
-        >
+        <div className="deactivate-modal-header">
           <Archive size={22} />
-          <h3 id="deactivate-confirm-title" style={{ fontSize: '17px', fontWeight: 600 }}>
+          <h3 id="deactivate-confirm-title" className="deactivate-modal-title">
             Deactivate Card
           </h3>
         </div>
-        <p
-          style={{
-            fontSize: '14px',
-            color: 'var(--text-secondary)',
-            lineHeight: 1.5,
-            marginBottom: '22px',
-          }}
-        >
+        <p className="deactivate-modal-desc">
           Deactivate card '{topic.title}'? It will be pulled out of your active spaced
           repetition study cycle. You can reactivate it at any time from this catalog table.
         </p>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+        <div className="deactivate-modal-actions">
           <button type="button" className="btn btn-outline" onClick={onClose}>
             Cancel
           </button>

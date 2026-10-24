@@ -36,17 +36,16 @@ export const TopicFilterBar: React.FC<TopicFilterBarProps> = ({
           data-testid="track-filter-hint"
           className="track-filter-hint"
         >
-          <span style={{ flex: '1 1 320px' }}>
+          <span className="track-filter-hint-text">
             <strong>This filter is for inspecting cards.</strong> It only changes what
             you see in the catalog. To choose what you actually practice, use the{' '}
             <strong>Focus</strong> button in the top bar.
           </span>
-          <span style={{ display: 'flex', gap: '8px' }}>
+          <span className="track-filter-hint-actions">
             {onOpenFocus && (
               <button
                 type="button"
-                className="btn btn-primary"
-                style={{ fontSize: '12.5px' }}
+                className="btn btn-primary track-filter-hint-btn"
                 onClick={() => {
                   onDismissHint();
                   onOpenFocus();
@@ -57,8 +56,7 @@ export const TopicFilterBar: React.FC<TopicFilterBarProps> = ({
             )}
             <button
               type="button"
-              className="btn btn-outline"
-              style={{ fontSize: '12.5px' }}
+              className="btn btn-outline track-filter-hint-btn"
               onClick={onDismissHint}
             >
               Got it
@@ -78,9 +76,8 @@ export const TopicFilterBar: React.FC<TopicFilterBarProps> = ({
         {!isAllTracks && (
           <button
             type="button"
-            className="btn btn-outline"
+            className="btn btn-outline topic-filter-reset-btn"
             onClick={onResetTracks}
-            style={{ fontSize: '11.5px', padding: '2px 8px' }}
           >
             Reset to All Topics
           </button>

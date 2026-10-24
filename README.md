@@ -79,7 +79,7 @@ The deck includes **277 cards** across 9 topics (224 default + 53 in the optiona
   the page's real DOM in the browser and jsdom in tests, with a mock `IntersectionObserver` and a deterministic `fetch`.
   Built-in prototypes patched by a solution (polyfill cards) are restored after each run.
 
-The test suite (`1,732 Vitest tests` + `602 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
+The test suite (`1,741 Vitest tests` + `602 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
 
 ## Deploy
 

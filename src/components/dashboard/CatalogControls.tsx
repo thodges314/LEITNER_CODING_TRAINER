@@ -36,15 +36,7 @@ export const CatalogControls: React.FC<CatalogControlsProps> = ({
 }) => {
   return (
     <div className="catalog-controls-bar">
-      <div
-        style={{
-          display: 'flex',
-          gap: '10px',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          flex: 1,
-        }}
-      >
+      <div className="catalog-controls-group">
         {/* Search Input */}
         <div className="catalog-search-box">
           <Search size={14} className="catalog-search-icon" />
@@ -58,7 +50,7 @@ export const CatalogControls: React.FC<CatalogControlsProps> = ({
         </div>
 
         {/* Status Filter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div className="catalog-select-wrapper">
           <select
             value={selectedStatus}
             onChange={(e) => onStatusChange(e.target.value as CatalogStatusFilter)}
@@ -81,7 +73,7 @@ export const CatalogControls: React.FC<CatalogControlsProps> = ({
         </div>
 
         {/* Difficulty Filter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div className="catalog-select-wrapper">
           <select
             value={selectedDifficulty === 'all' ? 'all' : String(selectedDifficulty)}
             onChange={(e) =>
@@ -102,7 +94,7 @@ export const CatalogControls: React.FC<CatalogControlsProps> = ({
         </div>
 
         {/* Sort Options */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div className="catalog-select-wrapper">
           <select
             value={sortOption}
             onChange={(e) => onSortChange(e.target.value as CatalogSortOption)}
@@ -127,24 +119,15 @@ export const CatalogControls: React.FC<CatalogControlsProps> = ({
       </div>
 
       {/* Results Count & Reset Button */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-          Showing{' '}
-          <strong style={{ color: 'var(--text-primary)' }}>{filteredCount}</strong> of{' '}
-          {totalCount} cards
+      <div className="catalog-results-summary">
+        <span className="catalog-results-count">
+          Showing <strong>{filteredCount}</strong> of {totalCount} cards
         </span>
         {hasActiveFilters && (
           <button
             type="button"
-            className="btn btn-outline"
+            className="btn btn-outline catalog-reset-filters-btn"
             onClick={onResetFilters}
-            style={{
-              padding: '4px 10px',
-              fontSize: '12px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-            }}
             title="Reset all search queries, track selections, filters, and sort to default"
           >
             <RotateCcw size={12} /> Reset Filters

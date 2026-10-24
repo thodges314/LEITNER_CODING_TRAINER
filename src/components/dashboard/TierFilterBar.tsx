@@ -42,9 +42,8 @@ export const TierFilterBar: React.FC<TierFilterBarProps> = ({
         {isSelected && (
           <button
             type="button"
-            className="btn btn-outline"
+            className="btn btn-outline tier-filter-reset-btn"
             onClick={onResetBoxes}
-            style={{ fontSize: '11.5px', padding: '2px 8px' }}
           >
             Reset to All {tierName}s
           </button>
@@ -73,12 +72,8 @@ export const TierFilterBar: React.FC<TierFilterBarProps> = ({
               className={`tier-pill ${isBoxSelected ? 'active' : ''}`}
             >
               <div
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  backgroundColor: `var(--box-${Math.min(9, b)})`,
-                }}
+                className="tier-pill-indicator"
+                style={{ backgroundColor: `var(--box-${Math.min(9, b)})` }}
               />
               <span>
                 {tierName} {b} (+{intervalForBox(b, algorithm)})

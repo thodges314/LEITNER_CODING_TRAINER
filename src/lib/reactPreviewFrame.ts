@@ -1,15 +1,18 @@
 import { REACT_PREVIEW_BUNDLE } from './reactPreviewBundle';
+import { getThemeColors } from '../styles/colors';
 
 export interface CardThemeColors {
   border: string;
   cardBg: string;
   colBg: string;
   subtleText: string;
+  accentPrimary: string;
+  hoverBg: string;
   isLight: boolean;
 }
 
 export function getCardSpecificStyles(cardId: string | undefined, colors: CardThemeColors): string {
-  const { border, cardBg, colBg, subtleText, isLight } = colors;
+  const { border, cardBg, colBg, subtleText, accentPrimary, hoverBg, isLight } = colors;
   switch (cardId) {
     case 'tic-tac-toe':
       return `
@@ -230,14 +233,14 @@ export function getCardSpecificStyles(cardId: string | undefined, colors: CardTh
       padding: 4px 9px;
       font-size: 11px;
       border-radius: 4px;
-      background: ${isLight ? '#e2e8f0' : '#334155'};
+      background: ${hoverBg};
       color: inherit;
       border: none;
       cursor: pointer;
       margin-left: 4px;
     }
     .sortable-item button:hover:not(:disabled), [data-item-id] button:hover:not(:disabled) {
-      background: #0284c7;
+      background: ${accentPrimary};
       color: #fff;
     }
     .sortable-item button:disabled, [data-item-id] button:disabled {
@@ -255,13 +258,16 @@ export function createPreviewSrcDoc(
   envKey = '',
   cardId?: string
 ): string {
-  const isLight = theme === 'apple-gsos';
-  const bg = isLight ? '#f8fafc' : '#030712';
-  const text = isLight ? '#0f172a' : '#f1f5f9';
-  const border = isLight ? '#cbd5e1' : '#334155';
-  const cardBg = isLight ? '#ffffff' : '#1e293b';
-  const colBg = isLight ? '#f1f5f9' : '#0f172a';
-  const subtleText = isLight ? '#64748b' : '#94a3b8';
+  const palette = getThemeColors(theme);
+  const isLight = palette.isLight;
+  const bg = palette.bgMain;
+  const text = palette.textPrimary;
+  const border = palette.borderMedium;
+  const cardBg = palette.bgCard;
+  const colBg = palette.bgSurface;
+  const subtleText = palette.textSecondary;
+  const accentPrimary = palette.accentPrimary;
+  const hoverBg = isLight ? palette.bgElevated : palette.borderMedium;
   const safeBundle = REACT_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
 
   return `<!DOCTYPE html>
@@ -294,7 +300,7 @@ export function createPreviewSrcDoc(
       color: inherit;
     }
     button:hover:not(:disabled) {
-      background: ${isLight ? '#e2e8f0' : '#334155'};
+      background: ${hoverBg};
     }
     button:disabled {
       opacity: 0.45;
@@ -308,7 +314,7 @@ export function createPreviewSrcDoc(
       color: inherit;
     }
     :focus-visible {
-      outline: 2px solid #06b6d4;
+      outline: 2px solid ${accentPrimary};
       outline-offset: 2px;
     }
 
@@ -331,7 +337,7 @@ export function createPreviewSrcDoc(
       padding: 12px;
       background: ${cardBg};
     }
-${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, isLight })}
+${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrimary, hoverBg, isLight })}
   </style>
   <script>${safeBundle}</script>
 </head>

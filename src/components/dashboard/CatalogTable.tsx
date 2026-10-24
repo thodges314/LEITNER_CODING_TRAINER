@@ -36,7 +36,6 @@ export interface CatalogTableProps {
 export const CatalogTable: React.FC<CatalogTableProps> = ({
   topics,
   tierName,
-  isLight,
   sortOption,
   onHeaderSort,
   onSelectCardToPractice,
@@ -68,23 +67,22 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
       (column === 'status' && sortOption === 'status-desc');
 
     if (isAsc) {
-      return <ArrowUp size={12} style={{ color: 'var(--accent-primary)' }} />;
+      return <ArrowUp size={12} className="kpi-cyan" />;
     }
     if (isDesc) {
-      return <ArrowDown size={12} style={{ color: 'var(--accent-primary)' }} />;
+      return <ArrowDown size={12} className="kpi-cyan" />;
     }
-    return <ArrowUpDown size={11} style={{ opacity: 0.35 }} />;
+    return <ArrowUpDown size={11} className="catalog-text-dim" />;
   };
 
   return (
-    <div className="glass-panel catalog-table-wrapper" style={{ overflowX: 'auto' }}>
+    <div className="glass-panel catalog-table-wrapper">
       <table className="catalog-table">
         <thead>
           <tr>
             <th
               onClick={() => onHeaderSort('title')}
-              className="catalog-th"
-              style={{ cursor: 'pointer', minWidth: '220px' }}
+              className="catalog-th col-card-title"
               title="Click to sort by card name"
             >
               <div className="catalog-th-btn">
@@ -93,8 +91,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
             </th>
             <th
               onClick={() => onHeaderSort('track')}
-              className="catalog-th"
-              style={{ cursor: 'pointer', minWidth: '150px', whiteSpace: 'nowrap' }}
+              className="catalog-th col-topic"
               title="Click to sort by topic name"
             >
               <div className="catalog-th-btn">
@@ -103,8 +100,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
             </th>
             <th
               onClick={() => onHeaderSort('difficulty')}
-              className="catalog-th"
-              style={{ cursor: 'pointer', minWidth: '130px', whiteSpace: 'nowrap' }}
+              className="catalog-th col-difficulty"
               title="Click to sort by difficulty level"
             >
               <div className="catalog-th-btn">
@@ -113,54 +109,32 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
             </th>
             <th
               onClick={() => onHeaderSort('box')}
-              className="catalog-th"
-              style={{
-                cursor: 'pointer',
-                minWidth: '100px',
-                whiteSpace: 'nowrap',
-                textAlign: 'center',
-              }}
+              className="catalog-th col-tier"
               title={`Click to sort by ${tierName} level`}
             >
-              <div
-                className="catalog-th-btn"
-                style={{ justifyContent: 'center', width: '100%' }}
-              >
+              <div className="catalog-th-btn catalog-th-btn-center">
                 {tierName} Level {renderSortIndicator('box')}
               </div>
             </th>
             <th
               onClick={() => onHeaderSort('streak')}
-              className="catalog-th"
-              style={{
-                cursor: 'pointer',
-                minWidth: '85px',
-                whiteSpace: 'nowrap',
-                textAlign: 'center',
-              }}
+              className="catalog-th col-streak"
               title="Click to sort by streak"
             >
-              <div
-                className="catalog-th-btn"
-                style={{ justifyContent: 'center', width: '100%' }}
-              >
+              <div className="catalog-th-btn catalog-th-btn-center">
                 Streak {renderSortIndicator('streak')}
               </div>
             </th>
             <th
               onClick={() => onHeaderSort('status')}
-              className="catalog-th"
-              style={{ cursor: 'pointer', minWidth: '120px', whiteSpace: 'nowrap' }}
+              className="catalog-th col-status"
               title="Click to sort by card status"
             >
               <div className="catalog-th-btn">
                 Status {renderSortIndicator('status')}
               </div>
             </th>
-            <th
-              className="catalog-th"
-              style={{ minWidth: '175px', whiteSpace: 'nowrap', textAlign: 'left' }}
-            >
+            <th className="catalog-th col-actions">
               Actions
             </th>
           </tr>
@@ -168,59 +142,35 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
         <tbody>
           {topics.length === 0 ? (
             <tr>
-              <td
-                colSpan={7}
-                style={{
-                  padding: '36px',
-                  textAlign: 'center',
-                  color: 'var(--text-muted)',
-                }}
-              >
+              <td colSpan={7} className="catalog-empty-cell">
                 No cards match your current filter criteria.
               </td>
             </tr>
           ) : (
             topics.map((topic) => {
               const trkMeta = getTrackMeta(topic.track);
+              const trStateClass = topic.deactivated
+                ? 'catalog-tr-deactivated'
+                : topic.status === 'locked'
+                ? 'catalog-tr-locked'
+                : '';
+              const titleStateClass = topic.deactivated
+                ? 'catalog-card-title-deactivated'
+                : topic.status === 'locked'
+                ? 'catalog-card-title-locked'
+                : 'catalog-card-title';
+
               return (
                 <tr
                   key={topic.id}
-                  className="catalog-tr"
-                  style={{
-                    backgroundColor: topic.deactivated
-                      ? isLight
-                        ? 'rgba(0, 0, 0, 0.04)'
-                        : 'rgba(0, 0, 0, 0.35)'
-                      : topic.status === 'locked'
-                      ? isLight
-                        ? 'rgba(0, 0, 0, 0.025)'
-                        : 'rgba(0,0,0,0.2)'
-                      : undefined,
-                    opacity: topic.deactivated ? 0.72 : 1,
-                  }}
+                  className={`catalog-tr ${trStateClass}`}
                 >
                   {/* Title & Tags */}
                   <td className="catalog-td">
-                    <div
-                      style={{
-                        fontWeight: 600,
-                        color: topic.deactivated
-                          ? 'var(--text-dim)'
-                          : topic.status === 'active'
-                          ? 'var(--text-primary)'
-                          : 'var(--text-muted)',
-                      }}
-                    >
+                    <div className={titleStateClass}>
                       {topic.title}
                     </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: '4px',
-                        flexWrap: 'wrap',
-                        marginTop: '4px',
-                      }}
-                    >
+                    <div className="catalog-tags-row">
                       {topic.tags.slice(0, 3).map((tg) => (
                         <span key={tg} className="table-tag-chip">
                           #{tg}
@@ -237,44 +187,35 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                   </td>
 
                   {/* Difficulty */}
-                  <td className="catalog-td" style={{ whiteSpace: 'nowrap' }}>
+                  <td className="catalog-td col-difficulty">
                     <DifficultyBadge card={topic} showLabel={true} />
                   </td>
 
                   {/* Box */}
-                  <td className="catalog-td" style={{ textAlign: 'center' }}>
+                  <td className="catalog-td catalog-tier-cell">
                     {!topic.deactivated && topic.status === 'active' ? (
                       <span
-                        className="badge"
+                        className="badge catalog-tier-badge"
                         style={{
                           border: `1.5px solid var(--box-${Math.min(9, topic.box)})`,
                           color: `var(--box-${Math.min(9, topic.box)})`,
-                          fontWeight: 700,
                         }}
                       >
                         {tierName} {topic.box}
                       </span>
                     ) : (
-                      <span style={{ color: 'var(--text-dim)', fontSize: '12px' }}>—</span>
+                      <span className="catalog-text-dim">—</span>
                     )}
                   </td>
 
                   {/* Streak */}
-                  <td className="catalog-td" style={{ textAlign: 'center' }}>
+                  <td className="catalog-td catalog-streak-cell">
                     {!topic.deactivated && topic.status === 'active' ? (
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          color: 'var(--accent-orange, #f97316)',
-                          fontWeight: 600,
-                        }}
-                      >
+                      <span className="catalog-streak-badge">
                         <Flame size={13} /> {topic.streak}
                       </span>
                     ) : (
-                      <span style={{ color: 'var(--text-dim)' }}>0</span>
+                      <span className="catalog-text-dim">0</span>
                     )}
                   </td>
 
@@ -320,8 +261,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                     <div className="catalog-actions-cell">
                       {topic.deactivated ? (
                         <button
-                          className="btn btn-secondary"
-                          style={{ padding: '5px 10px', fontSize: '12px' }}
+                          className="btn btn-secondary catalog-action-btn-sm"
                           onClick={() => {
                             if (onToggleDeactivate) onToggleDeactivate(topic.id);
                             else if (onDeleteTopic) onDeleteTopic(topic.id);
@@ -336,24 +276,21 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                           {topic.status === 'active' ? (
                             <>
                               <button
-                                className="btn btn-primary"
-                                style={{ padding: '5px 10px', fontSize: '12px' }}
+                                className="btn btn-primary catalog-action-btn-sm"
                                 onClick={() => onSelectCardToPractice(topic)}
                                 title="Start blank-buffer practice on this topic immediately"
                               >
                                 <Play size={12} /> Practice
                               </button>
                               <button
-                                className="btn btn-outline"
-                                style={{ padding: '5px 8px', fontSize: '12px' }}
+                                className="btn btn-outline catalog-action-icon-btn"
                                 onClick={() => onResetBox(topic.id)}
                                 title="Reset to Box 1"
                               >
                                 <RotateCcw size={12} />
                               </button>
                               <button
-                                className="btn btn-outline"
-                                style={{ padding: '5px 8px', fontSize: '12px' }}
+                                className="btn btn-outline catalog-action-icon-btn"
                                 onClick={() => onToggleLock(topic.id, topic.status)}
                                 title="Lock card"
                               >
@@ -362,8 +299,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                             </>
                           ) : (
                             <button
-                              className="btn btn-secondary"
-                              style={{ padding: '5px 10px', fontSize: '12px' }}
+                              className="btn btn-secondary catalog-action-btn-sm"
                               onClick={() => onToggleLock(topic.id, topic.status)}
                               title="Unlock card to active rotation"
                             >
@@ -372,12 +308,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                           )}
 
                           <button
-                            className="btn btn-outline"
-                            style={{
-                              padding: '5px 8px',
-                              fontSize: '12px',
-                              color: 'var(--text-muted)',
-                            }}
+                            className="btn btn-outline catalog-deactivate-btn"
                             onClick={() => onDeactivateClick(topic)}
                             title={`Deactivate topic '${topic.title}' (remove from study rotation)`}
                             aria-label={`Deactivate topic '${topic.title}'`}

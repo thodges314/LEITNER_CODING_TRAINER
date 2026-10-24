@@ -487,29 +487,20 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 data-testid="export-callout-bubble"
                 role="status"
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <Sparkles size={16} style={{ color: isLight ? '#b45309' : '#fbbf24', flexShrink: 0, marginTop: '2px' }} />
-                  <div style={{ flex: 1, fontSize: '12px', lineHeight: '1.45' }}>
-                    <div style={{ fontWeight: 700, marginBottom: '2px', color: 'var(--text-primary)' }}>
+                <div className="export-callout-inner">
+                  <Sparkles size={16} className="export-sparkle-icon" />
+                  <div className="export-callout-content">
+                    <div className="export-callout-title">
                       Download Backup Here
                     </div>
-                    <div style={{ color: 'var(--text-secondary)' }}>
+                    <div className="export-callout-desc">
                       Click <strong>Export Progress</strong> to save your current deck as a <code>.json</code> file you can restore anytime.
                     </div>
                   </div>
                   <button
                     onClick={onDismissHighlightExport}
                     aria-label="Dismiss export alert"
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--text-secondary)',
-                      cursor: 'pointer',
-                      padding: '2px',
-                      borderRadius: '4px',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
+                    className="export-callout-dismiss"
                   >
                     <X size={14} />
                   </button>
@@ -532,23 +523,16 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       </div>
 
       {/* Top Section: 2x2 KPI Cards + Circular Stats Widget */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          gap: '16px',
-          alignItems: 'stretch',
-        }}
-      >
+      <div className="dashboard-top-section">
         {/* Left: 2x2 KPI Grid */}
         <div className="dashboard-kpi-grid">
           {/* Total Reviews */}
           <div className="glass-panel dashboard-kpi-card">
             <div className="dashboard-kpi-label">Completed Reviews</div>
-            <div className="dashboard-kpi-val" style={{ color: 'var(--accent-cyan)' }}>
+            <div className="dashboard-kpi-val kpi-cyan">
               #{totalCompletedReviews}
             </div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+            <div className="dashboard-kpi-sub">
               Global trial progression
             </div>
           </div>
@@ -557,9 +541,9 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           <div className="glass-panel dashboard-kpi-card">
             <div className="dashboard-kpi-label">Deck Distribution</div>
             <div className="dashboard-kpi-val">
-              {activeCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {topics.length}</span>
+              {activeCount} <span className="dashboard-kpi-val-denom">/ {topics.length}</span>
             </div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+            <div className="dashboard-kpi-sub">
               {lockedCount} cards locked in reserve
             </div>
           </div>
@@ -569,10 +553,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             <div className="dashboard-kpi-label">
               {algorithm === 'graduated-interval' ? 'Mastered / Long-term (Tier 5+)' : 'Mastered (Box 5)'}
             </div>
-            <div className="dashboard-kpi-val" style={{ color: 'var(--accent-emerald)' }}>
+            <div className="dashboard-kpi-val kpi-emerald">
               {masteredCount}
             </div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+            <div className="dashboard-kpi-sub">
               {algorithm === 'graduated-interval' ? '+35 to +800+ review intervals' : '+45 review interval reached'}
             </div>
           </div>
@@ -580,10 +564,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           {/* Staged Unlock Progress */}
           <div className="glass-panel dashboard-kpi-card">
             <div className="dashboard-kpi-label">Staged Unlock Progress</div>
-            <div className="dashboard-kpi-val" style={{ color: 'var(--accent-amber)' }}>
-              {box3PlusCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {nextUnlockTarget} in B3+</span>
+            <div className="dashboard-kpi-val kpi-amber">
+              {box3PlusCount} <span className="dashboard-kpi-val-denom">/ {nextUnlockTarget} in B3+</span>
             </div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+            <div className="dashboard-kpi-sub">
               {lockedCount > 0
                 ? `${cardsNeededForNextUnlock} more Box 3+ cards unlocks 4 new topics`
                 : 'All topics unlocked!'}
