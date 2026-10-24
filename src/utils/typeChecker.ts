@@ -60,28 +60,37 @@ const SANDBOX_GLOBALS = `
     myApply(context: any, args?: any[]): any;
   }
   declare var React: any;
+  declare namespace JSX {
+    interface Element {
+      [key: string]: any;
+    }
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+  }
   declare var ReactDOM: any;
   declare var mount: (componentOrElement: any, props?: any) => void;
-  declare var useState: any;
-  declare var useEffect: any;
-  declare var useLayoutEffect: any;
-  declare var useRef: any;
-  declare var useReducer: any;
-  declare var useMemo: any;
-  declare var useCallback: any;
-  declare var useContext: any;
-  declare var useId: any;
-  declare var useSyncExternalStore: any;
-  declare var useImperativeHandle: any;
-  declare var forwardRef: any;
-  declare var createContext: any;
-  declare var use: any;
+  interface MutableRefObject<T> { current: T; }
+  declare function useRef<T = any>(initialValue?: T): MutableRefObject<T>;
+  declare function useState<T = any>(initialState?: T | (() => T)): [T, (next: T | ((prev: T) => T)) => void];
+  declare function useReducer<R extends (state: any, action: any) => any, I>(reducer: R, initialArg: I, init?: (arg: I) => any): any;
+  declare function useCallback<T extends (...args: any[]) => any>(callback: T, deps?: any[]): T;
+  declare function useMemo<T = any>(factory: () => T, deps?: any[]): T;
+  declare function useEffect(effect: () => void | (() => void), deps?: any[]): void;
+  declare function useLayoutEffect(effect: () => void | (() => void), deps?: any[]): void;
+  declare function useContext<T = any>(context: any): T;
+  declare function useId(): string;
+  declare function useSyncExternalStore<Snapshot>(subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => Snapshot, getServerSnapshot?: () => Snapshot): Snapshot;
+  declare function useImperativeHandle<T, R extends T>(ref: any, init: () => R, deps?: any[]): void;
+  declare function forwardRef<T = any, P = any>(render: (props: P, ref: any) => any): any;
+  declare function createContext<T = any>(defaultValue?: T): any;
+  declare function use<T = any>(usable: any): T;
   declare var Suspense: any;
-  declare var startTransition: any;
-  declare var useTransition: any;
-  declare var useDeferredValue: any;
-  declare var useOptimistic: any;
-  declare var useActionState: any;
+  declare function startTransition(scope: () => void): void;
+  declare function useTransition(): [boolean, (callback: () => void) => void];
+  declare function useDeferredValue<T = any>(value: T): T;
+  declare function useOptimistic<State, Action = any>(passthrough: State, updateFn?: (currentState: State, optimisticValue: Action) => State): [State, (action: Action) => void];
+  declare function useActionState<State, Payload = any>(action: (state: any, payload: Payload) => any, initialState: any, permalink?: string): [any, (payload: Payload) => void, boolean];
   declare var IntersectionObserver: any;
   declare var ResizeObserver: any;
   declare var MutationObserver: any;

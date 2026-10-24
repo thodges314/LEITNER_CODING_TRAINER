@@ -76,4 +76,19 @@ describe('typeChecker & getTSQuickInfo', () => {
     expect(result.success).toBe(true);
     expect(result.diagnostics).toHaveLength(0);
   });
+
+  it('validates React component and JSX without errors', () => {
+    const code = `
+      interface SearchFormProps {
+        onSearch: (query: string) => void;
+      }
+      function SearchForm({ onSearch }: SearchFormProps) {
+        const [query, setQuery] = useState('');
+        return <form><input value={query} /><button type="submit">Search</button></form>;
+      }
+    `;
+    const result = checkAndTranspileTS(code);
+    expect(result.success).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+  });
 });

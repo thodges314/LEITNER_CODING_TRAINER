@@ -1,1 +1,8 @@
-Write useForm({ initialValues, validate = () => ({}), onSubmit }) returning { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset }. handleChange(e) reads e.target.{name, type, value, checked} and updates that field (checkboxes use `checked`). handleBlur(e) marks e.target.name touched. `errors` is validate(values) for the CURRENT values. handleSubmit(e) calls e.preventDefault(), marks EVERY field touched, and — only if validate returns no errors — awaits onSubmit(values) with isSubmitting true while it runs. reset() restores initialValues and clears touched.
+### useForm<T extends Record<string, unknown>>(options: UseFormOptions<T>): UseFormReturn<T>
+Write `useForm({ initialValues, validate = () => ({}), onSubmit })` returning `{ values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit, reset }`:
+
+- `handleChange(e)` reads `e.target.{name, type, value, checked}` and updates that field (checkboxes use `checked`).
+- `handleBlur(e)` marks `e.target.name` touched.
+- `errors` is `validate(values)` for the CURRENT values.
+- `handleSubmit(e)` calls `e.preventDefault()`, marks EVERY field touched, and — only if `validate` returns no errors — awaits `onSubmit(values)` with `isSubmitting: true` while it runs.
+- `reset()` restores `initialValues` and clears `touched`.

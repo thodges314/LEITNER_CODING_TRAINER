@@ -1,6 +1,6 @@
 Write a custom hook to track a value from the previous render:
 
-### `usePrevious(value)`
+### usePrevious<T>(value: T): T | undefined
 - Uses `useRef()` and `useEffect()` to store and track `value`.
 - **Render Order**:
   - `ref.current` is returned during the render phase.
