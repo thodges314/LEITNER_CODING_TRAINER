@@ -1,6 +1,7 @@
+### `countFrequencies<T>(arr: T[]): Map<T, number>`
+
 Count item occurrences using standard JavaScript `Map` operations:
 
-### `countFrequencies(arr)`
 - Iterates through array `arr` and counts the frequency of each element using a `Map` instance (`.get()`, `.set()`, `.has()`).
 - Runs in O(n) time and O(n) auxiliary space.
 - Returns the resulting `Map` object mapping items to their counts.
