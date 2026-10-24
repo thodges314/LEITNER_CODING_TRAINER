@@ -1,19 +1,19 @@
 Implement pure state helper functions for optimistic UI updates without mutating input objects or arrays:
 
-### `toggleLike(post)`
+### toggleLike(post: { id: number | string; liked: boolean; likes: number }): { id: number | string; liked: boolean; likes: number }:
 - Given a post object `{ id, liked, likes }`, returns a new object with:
   - `liked` flipped (`!post.liked`).
   - `likes` incremented by `1` if previously unliked, or decremented by `1` if previously liked.
 
-### `applyOptimistic(items, id, patch)`
+### applyOptimistic(items: Item[], id: number | string, patch: Record<string, unknown>): Item[]:
 - Returns a new array where the item matching `id` is replaced by a new object with `patch` merged in and `pending: true`.
 - All other items retain their exact object identities.
 - If `id` is not found, returns items unchanged.
 
-### `confirmOptimistic(items, id, serverItem)`
+### confirmOptimistic(items: Item[], id: number | string, serverItem: Item): Item[]:
 - Returns a new array where the item matching `id` is replaced by a copy of `serverItem` with `pending: false`.
 - If `id` is not found, returns items unchanged.
 
-### `rollbackOptimistic(items, id, original)`
+### rollbackOptimistic(items: Item[], id: number | string, original: Item): Item[]:
 - Returns a new array where the item matching `id` is replaced by `original` exactly as it was (without a `pending` flag).
 - If `id` is not found, returns items unchanged.

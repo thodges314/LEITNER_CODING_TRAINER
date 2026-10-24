@@ -1,6 +1,6 @@
 Build an optimistic like button component with automatic error rollback:
 
-### `LikeButton({ initialLiked = false, initialCount = 0, onToggle })`
+### LikeButton(props: { initialLiked?: boolean; initialCount?: number; onToggle: (nextLiked: boolean) => Promise<unknown> }): JSX.Element:
 - `onToggle(nextLiked)` is an asynchronous function returning a `Promise`.
 
 #### Button Rendering

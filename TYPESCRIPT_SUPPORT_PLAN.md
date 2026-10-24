@@ -45,9 +45,9 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 ## 3. High-Level Progress Dashboard
 
 - **Total Cards in Deck:** 271 cards across 9 tracks
-- **Fully Typed Cards Completed:** **227 / 271 (83.8%)**
-- **Cards Remaining:** **44 / 271 (16.2%)**
-- **Total Batches:** 48 batches (40 completed, 8 remaining)
+- **Fully Typed Cards Completed:** **233 / 271 (86.0%)**
+- **Cards Remaining:** **38 / 271 (14.0%)**
+- **Total Batches:** 48 batches (41 completed, 7 remaining)
 
 ### Track Completion Status
 
@@ -60,15 +60,15 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 | **`js-utilities`**        |     37      |      37      |   100.0%   | **COMPLETE** (Batches 24–30)                          |
 | **`dom-browser`**         |     20      |      20      |   100.0%   | **COMPLETE** (Batches 31–34)                          |
 | **`react`**               |     27      |      27      |   100.0%   | **COMPLETE** (Batches 35–39)                          |
-| **`react-components`**    |     45      |      6       |   13.3%    | In Progress (Batch 40 done, Batches 41–47 remaining) |
+| **`react-components`**    |     45      |      12      |   26.7%    | In Progress (Batches 40–41 done, Batches 42–47 remaining) |
 | **`testing-tooling`**     |      5      |      0       |    0.0%    | Planned (Batch 48)                                    |
-| **TOTAL**                 |   **271**   |   **227**    | **83.8%**  | **48 Batches Total**                                  |
+| **TOTAL**                 |   **271**   |   **233**    | **86.0%**  | **48 Batches Total**                                  |
 
 ---
 
-## 4. Completed Batches (Batches 1–40: 227 Cards)
+## 4. Completed Batches (Batches 1–41: 233 Cards)
 
-All 227 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
+All 233 cards below have typed prompt headers (`### fn(args): ReturnType`), canonical `.ref.ts` solutions, and passing dual-mode seed tests.
 
 ### Algorithms Track (77 Cards — 100% Complete)
 
@@ -130,29 +130,22 @@ All 227 cards below have typed prompt headers (`### fn(args): ReturnType`), cano
 - **Batch 38 (Context, External Stores & Performance — 6 cards):** `context-provider-consumer`, `theme-switcher`, `external-store-hook`, `forward-ref-imperative-handle`, `memo-derived-list`, `memo-stable-callbacks`.
 - **Batch 39 (Async, Debouncing & React 19 Concurrent — 6 cards):** `use-debounce-hook`, `use-fetch-basic`, `use-fetch-hook`, `action-state-form`, `suspense-use-promise`, `tabs-transition-suspense`.
 
-### React Components Track (6 of 45 Cards)
+### React Components Track (12 of 45 Cards)
 
 - **Batch 40 (Timers, Ratings & Tic-Tac-Toe — 6 cards):** `star-rating-component`, `countdown-component`, `progress-bar`, `stopwatch`, `tic-tac-toe`, `calculate-winner`.
+- **Batch 41 (Tooltips, Menus & Notifications — 6 cards):** `tooltip`, `dropdown-menu`, `optimistic-like-button`, `optimistic-list-update`, `toast-queue`, `toast-queue-logic`.
 
 ---
 
-## 5. Master Roadmap for Remaining Work (Batches 41–48: 44 Cards)
+## 5. Master Roadmap for Remaining Work (Batches 42–48: 38 Cards)
 
 Every remaining card in the deck is cataloged below into deterministic, conceptually grouped batches of 4–7 cards.
 
 ---
 
-### Track: `react-components` (39 cards remaining — Batches 41 to 47)
+### Track: `react-components` (33 cards remaining — Batches 42 to 47)
 
 _Focus: React props interfaces (`interface ButtonProps`, `SelectProps<T>`), compound components, and accessibility._
-
-- **Batch 41: Tooltips, Menus & Notifications (6 cards)**
-  - `tooltip`: Accessible Tooltip
-  - `dropdown-menu`: Accessible Dropdown Menu
-  - `optimistic-like-button`: Optimistic Like Button with Rollback
-  - `optimistic-list-update`: Optimistic Update: Apply, Confirm, Roll Back
-  - `toast-queue`: Toast Notifications (Provider + useToast)
-  - `toast-queue-logic`: Toast Queue Logic
 
 - **Batch 42: Accordions, Tabs & Modals (5 cards)**
   - `accordion-component`: Accordion Component
@@ -229,8 +222,8 @@ Every single batch follows this strict automated loop:
 >
 > ### Checkpoint & Quota Pause (21 October 2026)
 >
-> - **State (24 October 2026):** Batches 1–40 (227 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
-> - **Next step:** Batch 41 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
+> - **State (24 October 2026):** Batches 1–41 (233 cards) complete and passing. Work continues on branch `feature/ts-coverage`. `feature/typescript-support` is fully merged into `master` and is no longer used.
+> - **Next step:** Batch 42 and onward (see the roadmap below; `npm run report:ts` lists the remaining cards).
 > - **Live numbers:** run `npm run report:ts` (per-track counts and the remaining-card list). `npm run report:ts -- --check` fails if the dashboard above is out of date.
 >
 > ### Handoff procedure (for any assistant resuming card work)

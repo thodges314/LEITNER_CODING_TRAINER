@@ -1,3 +1,4 @@
+### Tooltip(props: { content: React.ReactNode; children: React.ReactElement }): JSX.Element:
 Build `Tooltip({ content, children })` where `children` is a single React element (typically a `<button>`):
 
 - **Trigger Cloning**: Use `React.cloneElement` on `children` to attach event handlers while preserving all original child props and existing handlers (`onMouseEnter`, `onMouseLeave`, `onFocus`, `onBlur`, `onKeyDown`).

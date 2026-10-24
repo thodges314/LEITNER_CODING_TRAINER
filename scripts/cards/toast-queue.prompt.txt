@@ -1,3 +1,4 @@
+### ToastProvider(props: ToastProviderProps): JSX.Element:
 Build `ToastProvider({ children, limit = 3 })` and `useToast()`:
 
 - **Hook API**: `useToast()` returns `{ show, dismiss }`:

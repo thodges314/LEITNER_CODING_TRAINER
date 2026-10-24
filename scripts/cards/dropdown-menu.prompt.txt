@@ -1,3 +1,4 @@
+### DropdownMenu(props: DropdownMenuProps): JSX.Element:
 Build `DropdownMenu({ label, items, onSelect })` where `items` is `[{ id, label, disabled? }]`.
 
 - **Trigger**: A trigger `<button aria-haspopup="menu" aria-expanded>` shows `label` and toggles the menu.

@@ -104,11 +104,14 @@ const SANDBOX_GLOBALS = `
     useDeferredValue: typeof useDeferredValue;
     useOptimistic: typeof useOptimistic;
     useActionState: typeof useActionState;
+    cloneElement: <P = any>(element: any, props?: any, ...children: any[]) => any;
+    Children: { only: (children: any) => any; count: (children: any) => number; map: (children: any, fn: (child: any, index: number) => any) => any[]; forEach: (children: any, fn: (child: any, index: number) => void) => void; toArray: (children: any) => any[]; [key: string]: any };
     [key: string]: any;
   }
   declare var React: ReactNamespace;
   declare namespace React {
     type ReactNode = JSX.Element | string | number | boolean | null | undefined | Iterable<ReactNode>;
+    type ReactElement<P = any> = JSX.Element;
     type FC<P = {}> = (props: P) => any;
     type PropsWithChildren<P = {}> = P & { children?: ReactNode };
   }
@@ -156,6 +159,16 @@ const SANDBOX_GLOBALS = `
   interface HTMLElement extends Element { [key: string]: any; }
   declare var HTMLInputElement: any;
   interface HTMLInputElement extends HTMLElement { value: string; [key: string]: any; }
+  declare var HTMLButtonElement: any;
+  interface HTMLButtonElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLDivElement: any;
+  interface HTMLDivElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLUListElement: any;
+  interface HTMLUListElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLLIElement: any;
+  interface HTMLLIElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLSpanElement: any;
+  interface HTMLSpanElement extends HTMLElement { [key: string]: any; }
   declare var Text: any;
   interface Text extends Node { [key: string]: any; }
   declare var requestAnimationFrame: (callback: (time: number) => void) => number;
