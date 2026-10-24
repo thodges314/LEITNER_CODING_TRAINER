@@ -28,7 +28,7 @@ in the browser; state lives in `localStorage`.
 | Tracks (default deck / total) | algorithms 47/77, react-components 51, js-utilities 37, react 27, js-language 25, async-js 21, dom-browser 20, typescript-patterns 14, testing-tooling 5. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 1,741 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, TypeScript dual-mode tests, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Automated tests | 1,757 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, TypeScript dual-mode tests, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
 | Browser verification | `npm run e2e` runs ALL 277 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 554 card tests + 13 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 602 browser tests, ~6 min on an idle machine with 4 workers). **Last full run: 602 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
@@ -43,7 +43,7 @@ src/
     FocusModal.tsx             practice focus: include/exclude tracks+tags, difficulty range, presets
     DifficultyBadge.tsx        ●●●○○ label
     AddTopicModal.tsx, SettingsModal.tsx, EvaluationPanel.tsx
-    practice/                  consoleFormat.ts (log -> pass/fail classification), starterSnippet.ts, ReactTestErrorBoundary.tsx
+    practice/                  modular arena subcomponents (PracticeHeader, ContractTable, EditorToolbar, ConsoleRunnerDrawer, ComponentPreviewPane, ReinforcementBanner, starterSnippet, consoleFormat, ReactTestErrorBoundary)
   lib/
     leitner.ts                 ALL scheduling/state logic (Leitner + Graduated Interval Recall, localStorage persistence)
     leitner.test.ts            unit tests for Leitner & Graduated Interval algorithms
