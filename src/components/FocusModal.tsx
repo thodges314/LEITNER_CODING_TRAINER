@@ -105,24 +105,13 @@ export const FocusModal: React.FC<FocusModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky Header */}
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 10,
-            backgroundColor: 'var(--bg-card)',
-            borderBottom: '1px solid var(--border-medium)',
-            padding: '16px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Crosshair size={20} color="var(--accent-cyan)" />
+        <div className="modal-header">
+          <div className="modal-header-left">
+            <div className="modal-header-icon">
+              <Crosshair size={20} />
+            </div>
             <div>
-              <h2 id="focus-title" style={{ fontSize: '18px', fontWeight: 600, margin: 0 }}>
+              <h2 id="focus-title" className="modal-title">
                 Practice Focus
               </h2>
               <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
@@ -132,14 +121,14 @@ export const FocusModal: React.FC<FocusModalProps> = ({
           </div>
           <button
             type="button"
-            className="btn btn-outline"
-            style={{ padding: '6px', borderRadius: '50%', flexShrink: 0 }}
+            className="modal-close-btn"
             onClick={onClose}
             aria-label="Close"
           >
             <X size={16} />
           </button>
         </div>
+
 
         {/* Scrollable Body */}
         <div style={{ padding: '20px 24px 24px 24px', overflowY: 'auto', maxHeight: 'calc(90vh - 75px)' }}>

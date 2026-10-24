@@ -59,6 +59,8 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
+import { getThemeColors } from './styles/colors';
+
 
 // Evaluated once at module load, before the app creates and saves its default deck.
 const FIRST_VISIT = isFirstVisit();
@@ -298,118 +300,48 @@ export function App() {
   void aiSettingsVersion;
   const activeCount = shownTopics.filter((t) => t.status === 'active').length;
 
+  const colors = getThemeColors(theme);
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
+    <div className="app-shell">
       {/* Mobile Experience Notice Modal */}
       <MobileNoticeModal />
 
       {/* Global Header */}
-      <header
-        className="app-header"
-        style={{
-          borderBottom: '1px solid var(--border-subtle)',
-          backgroundColor: 'var(--bg-navigation)',
-          backdropFilter: 'blur(12px)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1240px',
-            margin: '0 auto',
-            padding: '12px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '16px',
-            flexWrap: 'wrap',
-          }}
-        >
+      <header className="app-header">
+        <div className="app-header-inner">
           {/* Brand Logo & Name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                background: theme === 'apple-gsos' ? '#4455AA' : 'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)',
-                border: theme === 'apple-gsos' ? '1px solid #1C1C1C' : 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                boxShadow: theme === 'apple-gsos' ? '1px 1px 0px #1C1C1C' : '0 2px 10px rgba(56, 189, 248, 0.35)',
-              }}
-            >
-              <Zap size={22} fill="white" />
+          <div className="app-brand">
+            <div className="app-brand-logo">
+              <Zap size={20} fill="white" />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-                Leitner Coding Trainer
-              </span>
-            </div>
+            <span className="app-brand-title">Leitner Coding Trainer</span>
           </div>
 
           {/* View Toggle Navigation */}
-          <nav
-            className="nav-view-toggle"
-            data-tour="deck-nav"
-            style={{
-              display: 'flex',
-              padding: '4px',
-              borderRadius: '10px',
-              backgroundColor: 'var(--bg-editor)',
-              border: '1px solid var(--border-subtle)',
-            }}
-          >
+          <nav className="nav-view-toggle app-nav-tabs" data-tour="deck-nav">
             <button
-              className={`btn ${activeView === 'practice' ? 'nav-btn-active' : 'nav-btn-inactive'}`}
+              className={`nav-tab-btn ${activeView === 'practice' ? 'active' : ''}`}
               onClick={() => setActiveView('practice')}
-              style={{
-                padding: '6px 16px',
-                fontSize: '13px',
-                fontWeight: 600,
-                backgroundColor: activeView === 'practice' ? (theme === 'apple-gsos' ? 'var(--accent-primary)' : 'var(--bg-elevated)') : 'transparent',
-                borderColor: activeView === 'practice' ? (theme === 'apple-gsos' ? 'var(--border-ui)' : 'var(--border-medium)') : 'transparent',
-                color: activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : 'var(--text-primary)') : 'var(--text-secondary)',
-                boxShadow: activeView === 'practice' ? 'var(--shadow-sm)' : 'none',
-              }}
             >
-              <Terminal size={15} color={activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : '#38bdf8') : undefined} />
+              <Terminal size={15} color={activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentCyan) : undefined} />
               Practice Arena
             </button>
             <button
-              className={`btn ${activeView === 'dashboard' ? 'nav-btn-active' : 'nav-btn-inactive'}`}
+              className={`nav-tab-btn ${activeView === 'dashboard' ? 'active' : ''}`}
               onClick={() => setActiveView('dashboard')}
-              style={{
-                padding: '6px 16px',
-                fontSize: '13px',
-                fontWeight: 600,
-                backgroundColor: activeView === 'dashboard' ? (theme === 'apple-gsos' ? 'var(--accent-primary)' : 'var(--bg-elevated)') : 'transparent',
-                borderColor: activeView === 'dashboard' ? (theme === 'apple-gsos' ? 'var(--border-ui)' : 'var(--border-medium)') : 'transparent',
-                color: activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : 'var(--text-primary)') : 'var(--text-secondary)',
-                boxShadow: activeView === 'dashboard' ? 'var(--shadow-sm)' : 'none',
-              }}
               title={`${activeCount} active in rotation • ${shownTopics.length - activeCount} locked in reserve`}
             >
-              <Layers size={15} color={activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : '#c084fc') : undefined} />
+              <Layers size={15} color={activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentPurple) : undefined} />
               Deck Catalog ({shownTopics.length})
             </button>
           </nav>
 
           {/* Quick Info & Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button data-tour="focus"
-              className="btn btn-outline"
-              style={{
-                padding: '7px 12px',
-                fontSize: '12.5px',
-                gap: '6px',
-                borderColor: filterActive ? '#38bdf8' : undefined,
-                color: filterActive ? '#38bdf8' : undefined,
-              }}
+          <div className="app-header-right">
+            <button
+              data-tour="focus"
+              className={`btn btn-outline ${filterActive ? 'filter-active' : ''}`}
               onClick={() => setIsFocusOpen(true)}
               title="Choose which tracks and tags to practice"
             >
@@ -422,89 +354,29 @@ export function App() {
               {apiKey ? (
                 <button
                   type="button"
-                  className="badge"
-                  style={{
-                    backgroundColor: isAiStatusOpen
-                      ? (theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.18)' : 'rgba(56, 189, 248, 0.22)')
-                      : (theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.1)' : 'rgba(56, 189, 248, 0.12)'),
-                    color: theme === 'apple-gsos' ? '#4455AA' : '#38bdf8',
-                    border: isAiStatusOpen
-                      ? (theme === 'apple-gsos' ? '1px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.55)')
-                      : (theme === 'apple-gsos' ? '1px solid rgba(68, 85, 170, 0.3)' : '1px solid rgba(56, 189, 248, 0.3)'),
-                    padding: '6px 11px',
-                    fontSize: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    borderRadius: '7px',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'all 0.15s ease',
-                  }}
+                  className={`header-action-badge ${isAiStatusOpen ? 'active' : ''}`}
                   onClick={() => setIsAiStatusOpen((prev) => !prev)}
                   title={`AI Engine: ${provider.toUpperCase()} (${model}) • Click to view live rate limits & quota`}
                   aria-label={`AI Engine: ${provider.toUpperCase()}`}
                   aria-haspopup="dialog"
                   aria-expanded={isAiStatusOpen}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.2)' : 'rgba(56, 189, 248, 0.2)';
-                    e.currentTarget.style.borderColor = theme === 'apple-gsos' ? '#4455AA' : 'rgba(56, 189, 248, 0.5)';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isAiStatusOpen) {
-                      e.currentTarget.style.backgroundColor = theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.1)' : 'rgba(56, 189, 248, 0.12)';
-                      e.currentTarget.style.borderColor = theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.3)' : 'rgba(56, 189, 248, 0.3)';
-                    }
-                  }}
                 >
-                  <Sparkles size={13} color={theme === 'apple-gsos' ? '#4455AA' : '#38bdf8'} />
+                  <Sparkles size={13} color={colors.accentPrimary} />
                   <span>AI: {provider.toUpperCase()}</span>
                 </button>
               ) : (
                 <button
                   type="button"
-                  className="badge"
-                  style={{
-                    backgroundColor: isAiRecommendOpen
-                      ? (theme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.15)' : 'rgba(56, 189, 248, 0.12)')
-                      : (theme === 'apple-gsos' ? '#EBEAE3' : 'rgba(255, 255, 255, 0.04)'),
-                    color: isAiRecommendOpen
-                      ? (theme === 'apple-gsos' ? '#4455AA' : 'var(--accent-primary)')
-                      : 'var(--text-muted)',
-                    border: isAiRecommendOpen
-                      ? (theme === 'apple-gsos' ? '1px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.4)')
-                      : '1px solid var(--border-subtle)',
-                    padding: '6px 11px',
-                    fontSize: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    borderRadius: '7px',
-                    cursor: 'pointer',
-                    fontFamily: 'inherit',
-                    transition: 'all 0.18s ease',
-                  }}
+                  className={`header-action-badge ${isAiRecommendOpen ? 'active' : ''}`}
                   onClick={() => setIsAiRecommendOpen((prev) => !prev)}
                   title="Operating in Keyless mode • Click to learn how adding an AI key in Settings unlocks live mentoring & deeper features"
                   aria-label="Operating in Keyless mode. Click to see AI recommendation"
                   aria-haspopup="dialog"
                   aria-expanded={isAiRecommendOpen}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = theme === 'apple-gsos' ? '#E0DFD7' : 'rgba(56, 189, 248, 0.1)';
-                    e.currentTarget.style.borderColor = theme === 'apple-gsos' ? 'var(--accent-primary)' : 'rgba(56, 189, 248, 0.4)';
-                    e.currentTarget.style.color = theme === 'apple-gsos' ? 'var(--accent-primary)' : 'var(--text-primary)';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isAiRecommendOpen) {
-                      e.currentTarget.style.backgroundColor = theme === 'apple-gsos' ? '#EBEAE3' : 'rgba(255, 255, 255, 0.04)';
-                      e.currentTarget.style.borderColor = 'var(--border-subtle)';
-                      e.currentTarget.style.color = 'var(--text-muted)';
-                    }
-                  }}
                 >
-                  <ShieldCheck size={13} color="var(--text-dim)" />
+                  <ShieldCheck size={13} color={colors.textDim} />
                   <span>Keyless Engine</span>
-                  <Sparkles size={11} color="var(--accent-primary)" style={{ opacity: 0.7 }} />
+                  <Sparkles size={11} color={colors.accentPrimary} style={{ opacity: 0.7 }} />
                 </button>
               )}
 
@@ -533,9 +405,9 @@ export function App() {
             </div>
 
             {/* Dedicated Settings Button */}
-            <button data-tour="settings"
+            <button
+              data-tour="settings"
               className="btn btn-outline"
-              style={{ padding: '7px 12px', fontSize: '12.5px', gap: '6px' }}
               onClick={() => setIsSettingsOpen(true)}
               title="Configure Spaced Repetition method, theme, and AI engine"
             >
@@ -547,25 +419,18 @@ export function App() {
             <button
               className="btn btn-outline"
               data-testid="theme-toggle-btn"
-              style={{
-                padding: '7px 12px',
-                fontSize: '12px',
-                gap: '6px',
-                fontWeight: 600,
-                borderColor: theme === 'apple-gsos' ? 'var(--accent-primary)' : undefined,
-              }}
               onClick={handleToggleTheme}
               title={theme === 'apple-gsos' ? 'Switch to Synthwave / Nightcore Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
               aria-label={theme === 'apple-gsos' ? 'Switch to Synthwave / Nightcore Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
             >
               {theme === 'apple-gsos' ? (
                 <>
-                  <Moon size={14} color="#4455AA" />
+                  <Moon size={14} color={colors.accentPrimary} />
                   <span>Dark</span>
                 </>
               ) : (
                 <>
-                  <Sun size={14} color="#fbbf24" />
+                  <Sun size={14} color={colors.accentAmber} />
                   <span>Light</span>
                 </>
               )}
@@ -576,29 +441,14 @@ export function App() {
 
       {/* Staged Unlock Notification Toast */}
       {unlockToast && (
-        <div
-          style={{
-            backgroundColor: 'rgba(234, 179, 8, 0.15)',
-            borderBottom: '1px solid rgba(234, 179, 8, 0.4)',
-            color: '#fbbf24',
-            padding: '10px 24px',
-            textAlign: 'center',
-            fontSize: '13.5px',
-            fontWeight: 600,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            animation: 'fadeIn 0.2s ease',
-          }}
-        >
+        <div className="app-unlock-toast">
           <Sparkles size={18} />
           <span>{unlockToast}</span>
         </div>
       )}
 
       {/* Main Container */}
-      <main style={{ flex: 1, padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
+      <main className="app-main">
         {activeView === 'practice' ? (
           <PracticeArena
             key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
@@ -631,43 +481,15 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer
-        style={{
-          borderTop: '1px solid var(--border-subtle)',
-          padding: '14px 24px',
-          textAlign: 'center',
-          fontSize: '12px',
-          color: 'var(--text-muted)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '12px',
-          maxWidth: '1240px',
-          margin: '0 auto',
-          width: '100%',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
+      <footer className="app-footer">
+        <div>
           <span>© {new Date().getFullYear()} Thomas Hodges</span>
         </div>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '12px' }}>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <button
             type="button"
             onClick={() => setIsAboutOpen(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              fontSize: '12px',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              textDecoration: 'none',
-              transition: 'color 0.15s ease',
-              fontWeight: 500,
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            className="footer-link"
           >
             About
           </button>
@@ -676,13 +498,7 @@ export function App() {
             href="https://www.javascriptonline.org"
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              color: 'var(--text-secondary)',
-              textDecoration: 'none',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            className="footer-link"
           >
             Portfolio
           </a>
@@ -691,13 +507,7 @@ export function App() {
             href="https://www.linkedin.com/in/thomas-hodges/"
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              color: 'var(--text-secondary)',
-              textDecoration: 'none',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            className="footer-link"
           >
             LinkedIn
           </a>
@@ -706,13 +516,7 @@ export function App() {
             href="https://github.com/thodges314"
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              color: 'var(--text-secondary)',
-              textDecoration: 'none',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+            className="footer-link"
           >
             GitHub
           </a>
@@ -745,27 +549,11 @@ export function App() {
       />
 
       {backHint && (
-        <div
-          role="status"
-          style={{
-            position: 'fixed',
-            bottom: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            padding: '10px 18px',
-            borderRadius: '999px',
-            backgroundColor: 'var(--bg-elevated)',
-            border: '1px solid var(--border-medium)',
-            color: 'var(--text-primary)',
-            fontSize: '13.5px',
-            fontWeight: 600,
-            boxShadow: 'var(--shadow-lg)',
-            zIndex: 2000,
-          }}
-        >
+        <div role="status" className="back-hint-toast">
           Press Back again to leave the app
         </div>
       )}
+
 
       {FEATURES.quickAdd && (
         <AddTopicModal

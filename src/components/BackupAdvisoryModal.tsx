@@ -25,10 +25,6 @@ export const BackupAdvisoryModal: React.FC<BackupAdvisoryModalProps> = ({
 
   if (!isOpen) return null;
 
-  const isLight =
-    typeof document !== 'undefined' &&
-    document.documentElement.getAttribute('data-theme') === 'apple-gsos';
-
   return (
     <div
       className="modal-overlay"
@@ -40,71 +36,27 @@ export const BackupAdvisoryModal: React.FC<BackupAdvisoryModalProps> = ({
     >
       <div
         className="modal-content"
-        style={{
-          maxWidth: '560px',
-          padding: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          borderRadius: '16px',
-          boxShadow: isLight
-            ? '0 20px 40px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.1)'
-            : '0 24px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08)',
-        }}
+        style={{ maxWidth: '560px', padding: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div
-          style={{
-            padding: '20px 24px 16px',
-            borderBottom: '1px solid var(--border-medium)',
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: '16px',
-            background: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)',
-          }}
-        >
-          <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+        <div className="modal-header">
+          <div className="modal-header-left">
             <div
+              className="modal-header-icon"
               style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '12px',
-                background: isLight ? 'rgba(217, 119, 6, 0.12)' : 'rgba(245, 158, 11, 0.18)',
-                color: isLight ? '#b45309' : '#fbbf24',
-                border: isLight ? '1px solid rgba(217, 119, 6, 0.3)' : '1px solid rgba(245, 158, 11, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                background: 'rgba(245, 158, 11, 0.15)',
+                color: 'var(--accent-amber)',
+                borderColor: 'rgba(245, 158, 11, 0.3)',
               }}
             >
               <HardDrive size={22} />
             </div>
             <div>
-              <div
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: isLight ? '#b45309' : '#fbbf24',
-                  marginBottom: '2px',
-                }}
-              >
+              <div className="modal-subtitle">
                 Session Advisory • 4 Problems Completed
               </div>
-              <h2
-                id="backup-advisory-title"
-                style={{
-                  fontSize: '18px',
-                  fontWeight: 700,
-                  margin: 0,
-                  color: 'var(--text-primary)',
-                  letterSpacing: '-0.01em',
-                }}
-              >
+              <h2 id="backup-advisory-title" className="modal-title">
                 Back Up Your Practice Progress
               </h2>
             </div>
@@ -112,40 +64,20 @@ export const BackupAdvisoryModal: React.FC<BackupAdvisoryModalProps> = ({
           <button
             onClick={onDismiss}
             aria-label="Dismiss warning"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              padding: '6px',
-              borderRadius: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+            className="modal-close-btn"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Body Content */}
-        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="modal-body">
           <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6', color: 'var(--text-primary)' }}>
             You've completed your first <strong>4 problems</strong>! To protect your hard work, we strongly recommend downloading a backup of your progress regularly—<strong>at least at the end of every session</strong>.
           </p>
 
           {/* Key Callout Boxes */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              padding: '16px',
-              borderRadius: '10px',
-              background: isLight ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border-medium)',
-            }}
-          >
+          <div className="modal-callout">
             <div style={{ fontSize: '13px', lineHeight: '1.5' }}>
               <strong style={{ color: 'var(--text-primary)' }}>100% Private in Browser Storage:</strong>{' '}
               <span style={{ color: 'var(--text-secondary)' }}>
@@ -167,17 +99,7 @@ export const BackupAdvisoryModal: React.FC<BackupAdvisoryModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div
-          style={{
-            padding: '16px 24px',
-            borderTop: '1px solid var(--border-medium)',
-            background: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)',
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: '12px',
-            flexWrap: 'wrap',
-          }}
-        >
+        <div className="modal-footer">
           <button
             type="button"
             className="btn btn-secondary"
@@ -192,12 +114,7 @@ export const BackupAdvisoryModal: React.FC<BackupAdvisoryModalProps> = ({
             className="btn btn-primary"
             onClick={onAgree}
             data-testid="backup-advisory-agree-btn"
-            style={{
-              fontSize: '13px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
+            style={{ fontSize: '13px' }}
           >
             <Download size={15} />
             Go to Export Progress

@@ -178,3 +178,23 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
   `welcome` mode: a "How a session works" block and a "Start practicing" button on top of the usual About content. Dismissing it sets `leitner_welcomed`.
   Existing users (a saved deck) never see it. `isFirstVisit()` is evaluated once at module load, before the default deck is created and saved.
 - Tests: `src/lib/backNavigation.test.ts`, `src/lib/welcome.test.ts`, and the real-browser `e2e/navigation.spec.ts`.
+
+---
+
+## 9. Design System & Modular Styling Architecture
+
+All visual styling is separated into a modular design system under [src/styles/](src/styles/):
+
+- **Color Library & Tokens**:
+  - [src/styles/colors.css](src/styles/colors.css): Comprehensive CSS variable definitions for both Synthwave Dark (`:root`) and Apple GS/OS Light (`[data-theme="apple-gsos"]`), defining tokens for canvases, borders, typography, accents, tiers 1–9, difficulties 1–5, and all 9 domain tracks.
+  - [src/styles/colors.ts](src/styles/colors.ts): Type-safe theme bridge (`ThemePalette` interface, `SYNTHWAVE_DARK_PALETTE`, `APPLE_GSOS_PALETTE`, and `getThemeColors(theme)`) for components requiring raw color values (e.g. D3 charts and Lucide SVG icons).
+- **Layout & Base Shell**:
+  - [src/styles/layout.css](src/styles/layout.css): App shell container, navigation tabs, branding, header actions, footer, and toast notifications.
+- **Component Stylesheets**:
+  - [src/styles/components/badges.css](src/styles/components/badges.css): Track badges (`data-track="..."`), difficulty badges (`data-difficulty="..."`), status pills, and complexity pills.
+  - [src/styles/components/deck-dashboard.css](src/styles/components/deck-dashboard.css): KPI cards, filter panels, tier pills, controls bar, catalog table, and track filter hint banner.
+  - [src/styles/components/modals.css](src/styles/components/modals.css): Shared modal header, icons, titles, callouts, footers, and mobile advisory notice.
+  - [src/styles/components/popovers.css](src/styles/components/popovers.css): Popover containers, headers, metric cards, and footers for AI recommendations and status.
+  - [src/styles/components/arena.css](src/styles/components/arena.css): Practice arena layout, split panes, toolbar, empty state, and reinforcement drill banner.
+  - [src/styles/components/evaluation.css](src/styles/components/evaluation.css): Evaluation verdict banners (`data-verdict="passed|failed"`), stat metric grids, critique boxes, and interactive critique follow-up chat.
+

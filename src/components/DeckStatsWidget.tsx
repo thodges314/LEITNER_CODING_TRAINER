@@ -5,6 +5,7 @@ import { ActivityView } from './ActivityView';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
 import { getTrackMeta, getSchedulingAlgorithm } from '../lib/leitner';
 import type { AppTheme } from '../lib/theme';
+import { getThemeColors } from '../styles/colors';
 
 export type StatsViewMode = 'radar' | 'orbit' | 'tiers' | 'activity';
 
@@ -22,30 +23,6 @@ interface DeckStatsWidgetProps {
   /** Backwards compatibility alias */
   onSelectTrack?: (track: string) => void;
 }
-
-const DARK_TRACK_COLORS: Record<string, string> = {
-  'algorithms': '#f59e0b',
-  'async-js': '#06b6d4',
-  'js-language': '#f97316',
-  'js-utilities': '#10b981',
-  'dom-browser': '#84cc16',
-  'react': '#38bdf8',
-  'react-components': '#818cf8',
-  'typescript-patterns': '#3b82f6',
-  'testing-tooling': '#f43f5e',
-};
-
-const GSOS_TRACK_COLORS: Record<string, string> = {
-  'algorithms': '#b45309',
-  'async-js': '#0284c7',
-  'js-language': '#c2410c',
-  'js-utilities': '#047857',
-  'dom-browser': '#4d7c0f',
-  'react': '#0e7490',
-  'react-components': '#4338ca',
-  'typescript-patterns': '#1d4ed8',
-  'testing-tooling': '#be123c',
-};
 
 const RADAR_DOMAINS: { id: string; label: string; tracks: TrackType[] }[] = [
   { id: 'algorithms', label: 'Algorithms', tracks: ['algorithms'] },
@@ -92,7 +69,14 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   const [hoveredDomain, setHoveredDomain] = useState<string | null>(null);
   const [hoveredBox, setHoveredBox] = useState<number | null>(null);
 
-  const trackColors = isLight ? GSOS_TRACK_COLORS : DARK_TRACK_COLORS;
+  const palette = useMemo(() => getThemeColors(theme), [theme]);
+  const trackColors = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const [k, v] of Object.entries(palette.tracks)) {
+      map[k] = v.color;
+    }
+    return map;
+  }, [palette]);
 
   const activeTopics = useMemo(() => topics.filter((t) => t.status === 'active'), [topics]);
 
@@ -143,13 +127,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
       const b = Math.min(5, Math.max(1, t.box || 1));
       counts[b] = (counts[b] || 0) + 1;
     }
-    const colors: Record<number, string> = {
-      1: isLight ? '#dd3322' : '#fb7185',
-      2: isLight ? '#c2410c' : '#f97316',
-      3: isLight ? '#d97706' : '#fbbf24',
-      4: isLight ? '#0284c7' : '#38bdf8',
-      5: isLight ? '#229955' : '#34d399',
-    };
+    const colors: Record<number, string> = palette.boxes;
     const intervals: Record<number, string> = {
       1: '+1 trial interval',
       2: '+3/4 trial interval',
@@ -172,7 +150,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
       interval: intervals[box],
       percentage: activeTopics.length > 0 ? ((counts[box] || 0) / activeTopics.length) * 100 : 0,
     }));
-  }, [activeTopics, isLight, tierName]);
+  }, [activeTopics, palette.boxes, tierName]);
 
   const modes: { id: StatsViewMode; label: string; icon: React.ReactNode }[] = [
     { id: 'radar', label: 'Skill Matrix', icon: <Activity size={13} /> },

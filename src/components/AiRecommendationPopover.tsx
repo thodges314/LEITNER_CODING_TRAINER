@@ -56,24 +56,12 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
       {/* Anchored Popover Container */}
       <div
         ref={popoverRef}
-        className="ai-recommendation-popover"
+        className="ai-recommendation-popover popover-container"
         role="dialog"
         aria-modal="true"
         aria-labelledby="ai-recommendation-title"
         style={{
-          position: 'absolute',
-          top: 'calc(100% + 11px)',
-          right: 0,
-          width: '390px',
-          maxWidth: 'calc(100vw - 24px)',
-          backgroundColor: 'var(--bg-card)',
-          border: '1px solid var(--border-medium)',
-          borderRadius: '12px',
-          boxShadow: 'var(--shadow-lg), 0 0 24px -4px rgba(56, 189, 248, 0.2)',
-          zIndex: 111,
-          display: 'flex',
-          flexDirection: 'column',
-          animation: 'fadeIn 0.18s ease-out',
+          width: '380px',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -95,20 +83,7 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
         />
 
         {/* Header Bar */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 3,
-            padding: '14px 16px',
-            borderBottom: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: 'var(--bg-elevated)',
-            borderTopLeftRadius: '11px',
-            borderTopRightRadius: '11px',
-          }}
-        >
+        <div className="popover-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div
               style={{
@@ -125,21 +100,10 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
               <Sparkles size={15} />
             </div>
             <div>
-              <h3
-                id="ai-recommendation-title"
-                style={{
-                  margin: 0,
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
+              <h3 id="ai-recommendation-title" className="popover-title">
                 Supercharge with AI
               </h3>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span className="popover-subtitle">
                 Enhanced evaluation & mentoring
               </span>
             </div>
@@ -147,36 +111,15 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
           <button
             onClick={onClose}
             aria-label="Close recommendation dialog"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--text-muted)',
-              padding: '4px',
-              borderRadius: '5px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+            className="modal-close-btn"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Content Body */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '14px',
-          }}
-        >
+        <div className="popover-body">
+
           {/* Current Engine Badge */}
           <div
             style={{

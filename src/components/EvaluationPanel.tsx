@@ -20,6 +20,7 @@ import { intervalForBox } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { askCritiqueFollowUp, type EvaluationResult } from '../lib/ai';
 import { summarizeVerdict } from '../lib/verdict';
+import { getThemeColors } from '../styles/colors';
 
 import { MarkdownContent } from './MarkdownContent';
 
@@ -113,6 +114,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   executionMode = 'js',
 }) => {
   const isLight = theme === 'apple-gsos';
+  const palette = useMemo(() => getThemeColors(theme), [theme]);
   // Human override state, initialized to AI verdict
   const [effectiveVerdict, setEffectiveVerdict] = useState<boolean>(result.passed);
   const verdict = summarizeVerdict(result);
@@ -208,50 +210,22 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-        animation: 'fadeIn 0.25s ease-out',
-      }}
-    >
+    <div className="eval-panel-container">
       {/* Top Banner / Verdict */}
       <div
-        style={{
-          padding: '20px',
-          borderRadius: '12px',
-          backgroundColor: effectiveVerdict
-            ? (isLight ? '#F0FDF4' : 'rgba(16, 185, 129, 0.08)')
-            : (isLight ? '#FFF5F5' : 'rgba(239, 68, 68, 0.08)'),
-          border: isLight
-            ? `1.5px solid ${effectiveVerdict ? '#229955' : '#DD3322'}`
-            : `1px solid ${effectiveVerdict ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)'}`,
-          boxShadow: isLight ? '3px 3px 0px rgba(28, 28, 28, 0.2)' : 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}
+        className="eval-verdict-banner"
+        data-verdict={effectiveVerdict ? 'passed' : 'failed'}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="eval-verdict-header">
+          <div className="eval-verdict-title-group">
             {effectiveVerdict ? (
-              <CheckCircle2 size={32} color={isLight ? '#229955' : '#34d399'} />
+              <CheckCircle2 size={32} color={palette.accentSecondary} />
             ) : (
-              <XCircle size={32} color={isLight ? '#DD3322' : '#f87171'} />
+              <XCircle size={32} color={palette.accentHighlight} />
             )}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span
-                  style={{
-                    fontSize: '20px',
-                    fontWeight: 700,
-                    letterSpacing: '-0.02em',
-                    color: effectiveVerdict
-                      ? (isLight ? '#15803D' : '#34d399')
-                      : (isLight ? '#B91C1C' : '#f87171'),
-                  }}
-                >
+                <span className="eval-verdict-title">
                   {isReinforcement
                     ? (effectiveVerdict ? 'PATTERN REPLICATED!' : 'NEEDS REVISION (DRILL)')
                     : (effectiveVerdict ? 'PASSED' : 'NEEDS REVISION')}

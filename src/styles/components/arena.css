@@ -1,0 +1,268 @@
+/**
+ * Leitner Coding Trainer - Practice Arena Stylesheet
+ * Component styling for Arena layout, empty states, banners, split panes, and actions.
+ */
+
+.arena-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Empty State */
+.arena-empty-state {
+  padding: 48px;
+  text-align: center;
+  max-width: 680px;
+  margin: 40px auto;
+  border-radius: 12px;
+}
+
+[data-theme="apple-gsos"] .arena-empty-state {
+  border: 2px solid #8A887E;
+  background: #FFFFFF;
+}
+
+.arena-empty-state-icon {
+  margin: 0 auto 16px;
+  color: var(--accent-emerald);
+}
+
+.arena-empty-state-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.arena-empty-state-desc {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Reinforcement Drill Banner */
+.arena-reinforcement-banner {
+  padding: 12px 18px;
+  border-radius: 10px;
+  background-color: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+[data-theme="apple-gsos"] .arena-reinforcement-banner {
+  background-color: #F3E8FF;
+  border-color: #C084FC;
+}
+
+.arena-reinforcement-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.arena-reinforcement-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-purple);
+  box-shadow: 0 0 8px var(--accent-purple);
+}
+
+.arena-reinforcement-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #e9d5ff;
+}
+
+[data-theme="apple-gsos"] .arena-reinforcement-title {
+  color: #6B46C1;
+}
+
+.arena-reinforcement-sub {
+  font-size: 12.5px;
+  color: var(--accent-purple);
+}
+
+[data-theme="apple-gsos"] .arena-reinforcement-sub {
+  color: #7E22CE;
+}
+
+/* Header Banner */
+.arena-header-banner {
+  padding: 18px 24px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+[data-theme="apple-gsos"] .arena-header-banner {
+  border: 1.5px solid #8A887E;
+  background: #FFFFFF;
+}
+
+.arena-topic-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.arena-topic-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.arena-topic-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.arena-stats-pill-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Workspace Layout */
+.arena-workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .arena-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+.arena-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.arena-card {
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+[data-theme="apple-gsos"] .arena-card {
+  border: 1.5px solid #8A887E;
+  background: #FFFFFF;
+}
+
+.arena-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.arena-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Editor Toolbar */
+.arena-editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Arena Action Bar */
+.arena-action-bar {
+  padding: 16px 24px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+[data-theme="apple-gsos"] .arena-action-bar {
+  border: 1.5px solid #8A887E;
+  background: #FFFFFF;
+}
+
+.arena-action-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Console Log Container */
+.arena-console {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background: var(--bg-surface-card);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+[data-theme="apple-gsos"] .arena-console {
+  background: #FAFAFA;
+  border: 1px solid #C4C3BA;
+}
+
+.arena-console-header {
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+[data-theme="apple-gsos"] .arena-console-header {
+  background: #E8E7DF;
+  color: #1C1C1C;
+  border-bottom: 1px solid #D0CEBE;
+}
+
+.arena-console-logs {
+  padding: 12px 14px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}

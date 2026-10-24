@@ -118,24 +118,12 @@ export const ActiveModelStatusPopover: React.FC<ActiveModelStatusPopoverProps> =
       {/* Anchored Popover Container */}
       <div
         ref={popoverRef}
-        className="ai-status-popover"
+        className="ai-status-popover popover-container"
         role="dialog"
         aria-modal="true"
         aria-labelledby="ai-status-title"
         style={{
-          position: 'absolute',
-          top: 'calc(100% + 11px)',
-          right: 0,
-          width: '390px',
-          maxWidth: 'calc(100vw - 24px)',
-          backgroundColor: 'var(--bg-card)',
-          border: '1px solid var(--border-medium)',
-          borderRadius: '12px',
-          boxShadow: 'var(--shadow-lg), 0 0 24px -4px rgba(56, 189, 248, 0.2)',
-          zIndex: 111,
-          display: 'flex',
-          flexDirection: 'column',
-          animation: 'fadeIn 0.18s ease-out',
+          width: '380px',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -157,20 +145,7 @@ export const ActiveModelStatusPopover: React.FC<ActiveModelStatusPopoverProps> =
         />
 
         {/* Header Bar */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 3,
-            padding: '14px 16px',
-            borderBottom: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backgroundColor: 'var(--bg-elevated)',
-            borderTopLeftRadius: '11px',
-            borderTopRightRadius: '11px',
-          }}
-        >
+        <div className="popover-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div
               style={{
@@ -187,21 +162,10 @@ export const ActiveModelStatusPopover: React.FC<ActiveModelStatusPopoverProps> =
               <Sparkles size={15} />
             </div>
             <div>
-              <h3
-                id="ai-status-title"
-                style={{
-                  margin: 0,
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
+              <h3 id="ai-status-title" className="popover-title">
                 Active AI Engine
               </h3>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span className="popover-subtitle">
                 Live provider & rate limit status
               </span>
             </div>
@@ -209,36 +173,15 @@ export const ActiveModelStatusPopover: React.FC<ActiveModelStatusPopoverProps> =
           <button
             onClick={onClose}
             aria-label="Close status dialog"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--text-muted)',
-              padding: '4px',
-              borderRadius: '5px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'color 0.15s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+            className="modal-close-btn"
           >
             <X size={16} />
           </button>
         </div>
 
         {/* Content Body */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            padding: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-          }}
-        >
+        <div className="popover-body">
+
           {/* Active Model & Provider Card */}
           <div
             style={{

@@ -38,55 +38,24 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome
         style={{
           maxWidth: '680px',
           padding: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          maxHeight: '90vh',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky Header */}
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 10,
-            backgroundColor: 'var(--bg-card)',
-            borderBottom: '1px solid var(--border-medium)',
-            padding: '16px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                background: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: isLight ? '#4455AA' : 'var(--accent-cyan)',
-                border: isLight ? '1px solid rgba(68, 85, 170, 0.25)' : 'none',
-                flexShrink: 0,
-              }}
-            >
+        <div className="modal-header">
+          <div className="modal-header-left">
+            <div className="modal-header-icon">
               <Brain size={20} />
             </div>
             <div>
-              <h2 id="about-title" style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
+              <h2 id="about-title" className="modal-title">
                 {welcome ? 'Welcome to Leitner Coding Trainer' : 'About Leitner Coding Trainer'}
               </h2>
             </div>
           </div>
           <button
             type="button"
-            className="btn btn-outline"
-            style={{ padding: '6px', borderRadius: '50%', flexShrink: 0 }}
+            className="modal-close-btn"
             onClick={onClose}
             aria-label="Close about modal"
           >
@@ -95,18 +64,8 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome
         </div>
 
         {/* Scrollable Body */}
-        <div
-          style={{
-            padding: '24px',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '20px',
-            lineHeight: 1.6,
-            fontSize: '14px',
-            color: 'var(--text-secondary)',
-          }}
-        >
+        <div className="modal-body" style={{ gap: '20px', color: 'var(--text-secondary)' }}>
+
           {welcome && (
             <div
               style={{

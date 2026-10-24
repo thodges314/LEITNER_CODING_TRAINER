@@ -1,0 +1,191 @@
+/**
+ * Leitner Coding Trainer - Badges & Pill Components
+ * Reusable badges for tracks, difficulties, statuses, complexities, and test cases.
+ */
+
+/* Track Badges */
+.track-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.track-badge[data-track="async-js"] {
+  color: var(--track-async-js-color);
+  background-color: var(--track-async-js-bg);
+  border: 1px solid var(--track-async-js-border);
+}
+
+.track-badge[data-track="react"] {
+  color: var(--track-react-color);
+  background-color: var(--track-react-bg);
+  border: 1px solid var(--track-react-border);
+}
+
+.track-badge[data-track="algorithms"] {
+  color: var(--track-algorithms-color);
+  background-color: var(--track-algorithms-bg);
+  border: 1px solid var(--track-algorithms-border);
+}
+
+.track-badge[data-track="typescript-patterns"] {
+  color: var(--track-typescript-patterns-color);
+  background-color: var(--track-typescript-patterns-bg);
+  border: 1px solid var(--track-typescript-patterns-border);
+}
+
+.track-badge[data-track="js-language"] {
+  color: var(--track-js-language-color);
+  background-color: var(--track-js-language-bg);
+  border: 1px solid var(--track-js-language-border);
+}
+
+.track-badge[data-track="dom-browser"] {
+  color: var(--track-dom-browser-color);
+  background-color: var(--track-dom-browser-bg);
+  border: 1px solid var(--track-dom-browser-border);
+}
+
+.track-badge[data-track="react-components"] {
+  color: var(--track-react-components-color);
+  background-color: var(--track-react-components-bg);
+  border: 1px solid var(--track-react-components-border);
+}
+
+.track-badge[data-track="testing-tooling"] {
+  color: var(--track-testing-tooling-color);
+  background-color: var(--track-testing-tooling-bg);
+  border: 1px solid var(--track-testing-tooling-border);
+}
+
+.track-badge[data-track="js-utilities"] {
+  color: var(--track-js-utilities-color);
+  background-color: var(--track-js-utilities-bg);
+  border: 1px solid var(--track-js-utilities-border);
+}
+
+/* Difficulty Badges */
+.difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  user-select: none;
+  font-family: inherit;
+}
+
+.difficulty-badge.is-interactive {
+  cursor: pointer;
+}
+
+.difficulty-badge[data-difficulty="1"] {
+  color: var(--difficulty-1);
+}
+
+.difficulty-badge[data-difficulty="2"] {
+  color: var(--difficulty-2);
+}
+
+.difficulty-badge[data-difficulty="3"] {
+  color: var(--difficulty-3);
+}
+
+.difficulty-badge[data-difficulty="4"] {
+  color: var(--difficulty-4);
+}
+
+.difficulty-badge[data-difficulty="5"] {
+  color: var(--difficulty-5);
+}
+
+.difficulty-prefix {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.difficulty-pips {
+  letter-spacing: 1.5px;
+  font-size: 10px;
+}
+
+.difficulty-empty-pips {
+  opacity: 0.25;
+}
+
+[data-theme="apple-gsos"] .difficulty-empty-pips {
+  opacity: 0.35;
+  color: #64748B;
+}
+
+.difficulty-label {
+  font-weight: 600;
+}
+
+/* Status Badges */
+.status-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-pill.status-active {
+  background-color: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.status-pill.status-locked {
+  background-color: rgba(148, 163, 184, 0.12);
+  color: var(--text-muted);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+[data-theme="apple-gsos"] .status-pill.status-active {
+  background-color: #DCFCE7;
+  color: #15803D;
+  border-color: #86EFAC;
+}
+
+[data-theme="apple-gsos"] .status-pill.status-locked {
+  background-color: #F1F5F9;
+  color: #64748B;
+  border-color: #CBD5E1;
+}
+
+/* Complexity Pill */
+.complexity-pill {
+  font-size: 11px;
+  color: var(--badge-complexity-text);
+  background: var(--badge-complexity-bg);
+  border: 1px solid var(--badge-complexity-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+/* Streak Badge */
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--badge-streak-text);
+  background: var(--badge-streak-bg);
+  border: 1px solid var(--badge-streak-border);
+  padding: 1px 6px;
+  border-radius: 4px;
+}

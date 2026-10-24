@@ -54,6 +54,10 @@ src/
     ai.ts                      optional AI evaluator (Gemini/OpenAI-compatible; replies are validated by `parseEvaluationPayload`, unparseable ones are shown raw via `rawOutput`): the tests decide whether code works; the AI can fail a passing run (shown as a note, overridable) but never rescue a failing one
     drafts.ts                  per-card editor autosave (localStorage `leitner_draft:<id>`)
     deckFilters.ts             deck catalog filter and sort preferences persistence (localStorage `leitner_deck_catalog_preferences`)
+  styles/
+    colors.css, colors.ts      unified color library: Synthwave Dark & Apple GS/OS Light design tokens + TS ThemePalette
+    layout.css                 app shell, navigation, header, footer, toast styles
+    components/                modular stylesheets for deck-dashboard, modals, popovers, badges, arena, evaluation
   types/
     rainbowbrackets.d.ts       type declarations for rainbowbrackets extension
   utils/typeChecker.ts         lazy-loaded TS compiler + real ES2022 lib files for strict-mode checking

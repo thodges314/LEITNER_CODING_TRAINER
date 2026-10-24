@@ -1,0 +1,251 @@
+/**
+ * Leitner Coding Trainer - Color System & Design Tokens
+ * Defines complete semantic palettes for Synthwave Dark (:root) and Apple GS/OS Platinum ([data-theme="apple-gsos"]).
+ */
+
+:root {
+  /* ==========================================================================
+     SYNTHWAVE DARK THEME (Default)
+     ========================================================================== */
+
+  /* Canvas & Background Surfaces */
+  --bg-main: #090c12;
+  --bg-app-shell: #090c12;
+  --bg-surface: #0f141f;
+  --bg-card: #141b29;
+  --bg-surface-card: #141b29;
+  --bg-elevated: #1a2336;
+  --bg-editor: #0c1018;
+  --bg-navigation: rgba(15, 20, 31, 0.85);
+  --bg-table-header: rgba(56, 189, 248, 0.12);
+  --bg-table-header-bar: rgba(255, 255, 255, 0.03);
+  --bg-table-body: rgba(2, 6, 23, 0.6);
+  --bg-table-row-hover: rgba(255, 255, 255, 0.03);
+  --bg-instruction: #0c1018;
+  --bg-modal-overlay: rgba(0, 0, 0, 0.75);
+
+  /* Borders & Dividers */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.16);
+  --border-focus: rgba(56, 189, 248, 0.5);
+  --border-ui: rgba(255, 255, 255, 0.16);
+  --border-instruction: rgba(255, 255, 255, 0.08);
+
+  /* Typography Colors */
+  --text-primary: #f1f5f9;
+  --text-instruction: #ede8dc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-dim: #475569;
+  --text-on-accent: #ffffff;
+
+  /* Accents & Brand Colors */
+  --accent-primary: #38bdf8;
+  --accent-secondary: #34d399;
+  --accent-highlight: #fb7185;
+  --accent-cyan: #38bdf8;
+  --accent-purple: #c084fc;
+  --accent-teal: #2dd4bf;
+  --accent-amber: #fbbf24;
+  --accent-rose: #fb7185;
+  --accent-emerald: #34d399;
+  --accent-orange: #f97316;
+
+  /* Interactive States & Badges */
+  --badge-complexity-bg: rgba(56, 189, 248, 0.08);
+  --badge-complexity-border: rgba(56, 189, 248, 0.25);
+  --badge-complexity-text: var(--text-secondary);
+
+  --badge-streak-bg: rgba(249, 115, 22, 0.15);
+  --badge-streak-border: rgba(249, 115, 22, 0.3);
+  --badge-streak-text: #f97316;
+
+  --badge-test-case-bg: rgba(56, 189, 248, 0.15);
+  --badge-test-case-text: var(--accent-cyan);
+
+  /* Leitner Tiers / Boxes */
+  --box-1: #fb7185;
+  --box-2: #f97316;
+  --box-3: #fbbf24;
+  --box-4: #38bdf8;
+  --box-5: #34d399;
+  --box-6: #2dd4bf;
+  --box-7: #818cf8;
+  --box-8: #a78bfa;
+  --box-9: #f472b6;
+
+  /* Difficulty Levels */
+  --difficulty-1: #34d399;
+  --difficulty-2: #a3e635;
+  --difficulty-3: #fbbf24;
+  --difficulty-4: #fb923c;
+  --difficulty-5: #f87171;
+
+  /* Track Badge Colors (Dark) */
+  --track-async-js-color: #38bdf8;
+  --track-async-js-bg: rgba(56, 189, 248, 0.12);
+  --track-async-js-border: rgba(56, 189, 248, 0.35);
+
+  --track-react-color: #06b6d4;
+  --track-react-bg: rgba(6, 182, 212, 0.12);
+  --track-react-border: rgba(6, 182, 212, 0.35);
+
+  --track-algorithms-color: #f59e0b;
+  --track-algorithms-bg: rgba(245, 158, 11, 0.12);
+  --track-algorithms-border: rgba(245, 158, 11, 0.35);
+
+  --track-typescript-patterns-color: #3178c6;
+  --track-typescript-patterns-bg: rgba(49, 120, 198, 0.12);
+  --track-typescript-patterns-border: rgba(49, 120, 198, 0.35);
+
+  --track-js-language-color: #f97316;
+  --track-js-language-bg: rgba(249, 115, 22, 0.12);
+  --track-js-language-border: rgba(249, 115, 22, 0.35);
+
+  --track-dom-browser-color: #84cc16;
+  --track-dom-browser-bg: rgba(132, 204, 22, 0.12);
+  --track-dom-browser-border: rgba(132, 204, 22, 0.35);
+
+  --track-react-components-color: #22d3ee;
+  --track-react-components-bg: rgba(34, 211, 238, 0.12);
+  --track-react-components-border: rgba(34, 211, 238, 0.35);
+
+  --track-testing-tooling-color: #f43f5e;
+  --track-testing-tooling-bg: rgba(244, 63, 94, 0.12);
+  --track-testing-tooling-border: rgba(244, 63, 94, 0.35);
+
+  --track-js-utilities-color: #10b981;
+  --track-js-utilities-bg: rgba(16, 185, 129, 0.12);
+  --track-js-utilities-border: rgba(16, 185, 129, 0.35);
+
+  /* Typography & Shadows */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Fira Code', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px -2px rgba(56, 189, 248, 0.25);
+}
+
+[data-theme="apple-gsos"] {
+  /* ==========================================================================
+     APPLE IIGS / GS/OS LIGHT THEME
+     ========================================================================== */
+
+  /* Canvas & Background Surfaces */
+  --bg-main: #DDDCD4;             /* Platinum Base */
+  --bg-app-shell: #DDDCD4;
+  --bg-surface: #F2F1EA;          /* Menu Bar off-white */
+  --bg-card: #FFFFFF;             /* Active Window pure white */
+  --bg-surface-card: #FFFFFF;
+  --bg-elevated: #E8E7DF;         /* Platinum bevel panel */
+  --bg-editor: #FAFAFA;           /* Document canvas */
+  --bg-navigation: #F2F1EA;       /* Top nav bar */
+  --bg-table-header: #A2B5CD;     /* Window title bar periwinkle */
+  --bg-table-header-bar: #A2B5CD;
+  --bg-table-body: #FFFFFF;
+  --bg-table-row-hover: #F0EFE8;
+  --bg-instruction: #FAFAFA;
+  --bg-modal-overlay: rgba(60, 60, 60, 0.6);
+
+  /* Borders & Dividers */
+  --border-subtle: #D0CEBE;
+  --border-medium: #8A887E;
+  --border-ui: #1C1C1C;           /* Crisp 1px Dark Borders */
+  --border-focus: #4455AA;
+  --border-instruction: #8A887E;
+
+  /* Typography Colors */
+  --text-primary: #1C1C1C;        /* Dark Charcoal */
+  --text-instruction: #1C1C1C;
+  --text-secondary: #555555;      /* Slate Muted */
+  --text-muted: #555555;
+  --text-dim: #777777;
+  --text-on-accent: #FFFFFF;
+
+  /* Accents & Brand Colors */
+  --accent-primary: #4455AA;      /* System Highlight Periwinkle Blue */
+  --accent-secondary: #229955;    /* Apple Leaf Green */
+  --accent-highlight: #DD3322;    /* Apple Red-Orange */
+  --accent-cyan: #4455AA;
+  --accent-purple: #5544AA;
+  --accent-teal: #229955;
+  --accent-amber: #D97706;
+  --accent-rose: #DD3322;
+  --accent-emerald: #229955;
+  --accent-orange: #D97706;
+
+  /* Interactive States & Badges */
+  --badge-complexity-bg: #229955;
+  --badge-complexity-border: #1B7A43;
+  --badge-complexity-text: #FFFFFF;
+
+  --badge-streak-bg: #229955;
+  --badge-streak-border: #1B7A43;
+  --badge-streak-text: #FFFFFF;
+
+  --badge-test-case-bg: #DD3322;
+  --badge-test-case-text: #FFFFFF;
+
+  /* Leitner Tiers / Boxes */
+  --box-1: #DD3322;
+  --box-2: #D97706;
+  --box-3: #B45309;
+  --box-4: #4455AA;
+  --box-5: #229955;
+  --box-6: #1B7A43;
+  --box-7: #5544AA;
+  --box-8: #6B46C1;
+  --box-9: #990055;
+
+  /* Difficulty Levels */
+  --difficulty-1: #15803d;
+  --difficulty-2: #4d7c0f;
+  --difficulty-3: #b45309;
+  --difficulty-4: #c2410c;
+  --difficulty-5: #dc2626;
+
+  /* Track Badge Colors (Light) */
+  --track-async-js-color: #0369A1;
+  --track-async-js-bg: #E0F2FE;
+  --track-async-js-border: #7DD3FC;
+
+  --track-react-color: #0E7490;
+  --track-react-bg: #CFFAFE;
+  --track-react-border: #67E8F9;
+
+  --track-algorithms-color: #B45309;
+  --track-algorithms-bg: #FEF3C7;
+  --track-algorithms-border: #FCD34D;
+
+  --track-typescript-patterns-color: #1E40AF;
+  --track-typescript-patterns-bg: #DBEAFE;
+  --track-typescript-patterns-border: #93C5FD;
+
+  --track-js-language-color: #C2410C;
+  --track-js-language-bg: #FFEDD5;
+  --track-js-language-border: #FDBA74;
+
+  --track-dom-browser-color: #4D7C0F;
+  --track-dom-browser-bg: #ECFCCB;
+  --track-dom-browser-border: #BEF264;
+
+  --track-react-components-color: #0284C7;
+  --track-react-components-bg: #E0F2FE;
+  --track-react-components-border: #7DD3FC;
+
+  --track-testing-tooling-color: #BE123C;
+  --track-testing-tooling-bg: #FFE4E6;
+  --track-testing-tooling-border: #FDA4AF;
+
+  --track-js-utilities-color: #047857;
+  --track-js-utilities-bg: #D1FAE5;
+  --track-js-utilities-border: #6EE7B7;
+
+  /* Shadows - Retro bevels */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-md: 2px 2px 0px rgba(28, 28, 28, 0.12);
+  --shadow-lg: 3px 3px 0px rgba(28, 28, 28, 0.2);
+  --shadow-glow: 0 0 10px rgba(68, 85, 170, 0.2);
+}

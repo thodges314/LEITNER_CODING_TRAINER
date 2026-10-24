@@ -702,20 +702,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   if (!currentCard) {
     return (
-      <div
-        className="glass-panel"
-        style={{
-          padding: '48px',
-          textAlign: 'center',
-          maxWidth: '680px',
-          margin: '40px auto',
-        }}
-      >
-        <CheckCircle size={48} color="#34d399" style={{ margin: '0 auto 16px' }} />
-        <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>
+      <div className="glass-panel arena-empty-state">
+        <CheckCircle size={48} className="arena-empty-state-icon" />
+        <h3 className="arena-empty-state-title">
           No Active Cards in Rotation
         </h3>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '14px' }}>
+        <p className="arena-empty-state-desc">
           All cards are currently locked or there are no cards in the deck. Head to the Catalog Dashboard to unlock cards or create new topics.
         </p>
         <button className="btn btn-primary" onClick={onOpenDeckView}>
@@ -730,36 +722,16 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const errorCount = outputLogs.filter((l) => l.failure).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="arena-container">
       {/* Reinforcement Drill Banner */}
       {isReinforcement && (
-        <div
-          style={{
-            padding: '12px 18px',
-            borderRadius: '10px',
-            backgroundColor: 'rgba(168, 85, 247, 0.12)',
-            border: '1px solid rgba(168, 85, 247, 0.35)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span
-              style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: '#c084fc',
-                boxShadow: '0 0 8px #c084fc',
-              }}
-            />
-            <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#e9d5ff' }}>
+        <div className="arena-reinforcement-banner">
+          <div className="arena-reinforcement-info">
+            <span className="arena-reinforcement-dot" />
+            <span className="arena-reinforcement-title">
               Immediate Reinforcement Drill
             </span>
-            <span style={{ fontSize: '12.5px', color: '#c084fc' }}>
+            <span className="arena-reinforcement-sub">
               Solidify pattern memory before moving on. This drill has zero effect on tier, box, or streak stats.
             </span>
           </div>

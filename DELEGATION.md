@@ -17,6 +17,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 |---|---|---|---|
 | Comprehensive TypeScript Support (Plumbing, Ambient Types, Dual Solution Reveal, Typed Stubs) | Antigravity | `feature/ts-coverage` | complete |
 | Persist Deck Catalog Filters and Sort across Card Navigation | Antigravity | `feature/persist-deck-filters` | complete |
+| App-wide CSS Extraction & Modular Color Library | Antigravity | `feature/css-design-system` | complete |
 
 
 

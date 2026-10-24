@@ -76,78 +76,30 @@ export const MobileNoticeModal: React.FC = () => {
         </button>
 
         {/* Header Icon Layout */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
-          <div
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '14px',
-              backgroundColor: 'rgba(56, 189, 248, 0.12)',
-              border: '1px solid rgba(56, 189, 248, 0.25)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--accent-primary)',
-              boxShadow: '0 0 20px -2px rgba(56, 189, 248, 0.25)',
-            }}
-          >
-            <Monitor size={28} />
-          </div>
+        <div className="mobile-notice-icon-box">
+          <Monitor size={28} />
         </div>
 
         {/* Modal Title */}
-        <h2
-          id="mobile-modal-title"
-          style={{
-            margin: '0 0 8px 0',
-            fontSize: '17px',
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            textAlign: 'center',
-            lineHeight: 1.3,
-            wordBreak: 'break-word',
-          }}
-        >
+        <h2 id="mobile-modal-title" className="mobile-notice-title">
           Desktop & Keyboard Recommended
         </h2>
 
         {/* Subtitle */}
-        <p
-          style={{
-            margin: '0 0 14px 0',
-            fontSize: '12.5px',
-            color: 'var(--text-secondary)',
-            textAlign: 'center',
-            lineHeight: 1.45,
-            wordBreak: 'break-word',
-          }}
-        >
+        <p className="mobile-notice-desc">
           <strong>Leitner Coding Trainer</strong> is specifically designed for a full-sized screen and physical keyboard coding experience.
         </p>
 
         {/* Highlight Callout Box */}
-        <div
-          style={{
-            padding: '10px 12px',
-            borderRadius: '10px',
-            backgroundColor: 'var(--bg-elevated)',
-            border: '1px solid var(--border-medium)',
-            marginBottom: '14px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-            textAlign: 'left',
-            boxSizing: 'border-box',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+        <div className="mobile-notice-callout">
+          <div className="mobile-notice-item">
             <Keyboard size={15} color="var(--accent-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
             <span style={{ fontSize: '11.5px', color: 'var(--text-primary)', lineHeight: 1.4, wordBreak: 'break-word' }}>
               Writing solutions from muscle memory, indenting code, running tests, and using keyboard shortcuts requires a full keyboard.
             </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+          <div className="mobile-notice-item">
             <Smartphone size={15} color="var(--accent-amber)" style={{ flexShrink: 0, marginTop: '2px' }} />
             <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', lineHeight: 1.4, wordBreak: 'break-word' }}>
               A reduced flashcard review version may come in the future, but for now we strongly recommend using a desktop or laptop.
@@ -158,17 +110,7 @@ export const MobileNoticeModal: React.FC = () => {
         {/* Action Button */}
         <button
           type="button"
-          className="btn btn-primary"
-          style={{
-            width: '100%',
-            padding: '10px 14px',
-            fontSize: '13px',
-            fontWeight: 600,
-            gap: '8px',
-            whiteSpace: 'normal',
-            lineHeight: 1.3,
-            boxSizing: 'border-box',
-          }}
+          className="btn btn-primary mobile-notice-btn"
           onClick={handleDismiss}
         >
           <span>Continue to Trainer Anyway</span>

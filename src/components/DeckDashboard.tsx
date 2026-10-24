@@ -42,53 +42,6 @@ import {
 import type { CatalogSortOption, CatalogStatusFilter } from '../lib/deckFilters';
 export type { CatalogSortOption, CatalogStatusFilter };
 
-const LIGHT_TRACK_STYLES: Record<string, { color: string; bg: string; border: string }> = {
-  'async-js': {
-    color: '#0369A1',
-    bg: '#E0F2FE',
-    border: '#7DD3FC',
-  },
-  'react': {
-    color: '#0E7490',
-    bg: '#CFFAFE',
-    border: '#67E8F9',
-  },
-  'algorithms': {
-    color: '#B45309',
-    bg: '#FEF3C7',
-    border: '#FCD34D',
-  },
-  'typescript-patterns': {
-    color: '#1E40AF',
-    bg: '#DBEAFE',
-    border: '#93C5FD',
-  },
-  'js-language': {
-    color: '#C2410C',
-    bg: '#FFEDD5',
-    border: '#FDBA74',
-  },
-  'dom-browser': {
-    color: '#4D7C0F',
-    bg: '#ECFCCB',
-    border: '#BEF264',
-  },
-  'react-components': {
-    color: '#0284C7',
-    bg: '#E0F2FE',
-    border: '#7DD3FC',
-  },
-  'testing-tooling': {
-    color: '#BE123C',
-    bg: '#FFE4E6',
-    border: '#FDA4AF',
-  },
-  'js-utilities': {
-    color: '#047857',
-    bg: '#D1FAE5',
-    border: '#6EE7B7',
-  },
-};
 
 interface DeckDashboardProps {
   state: LeitnerDeckState;
@@ -444,10 +397,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       (column === 'status' && sortOption === 'status-desc');
 
     if (isAsc) {
-      return <ArrowUp size={12} style={{ color: isLight ? '#2B3A8C' : 'var(--accent-cyan)' }} />;
+      return <ArrowUp size={12} style={{ color: 'var(--accent-primary)' }} />;
     }
     if (isDesc) {
-      return <ArrowDown size={12} style={{ color: isLight ? '#2B3A8C' : 'var(--accent-cyan)' }} />;
+      return <ArrowDown size={12} style={{ color: 'var(--accent-primary)' }} />;
     }
     return <ArrowUpDown size={11} style={{ opacity: 0.35 }} />;
   };
@@ -509,16 +462,16 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="dashboard-container">
       {/* Top Banner Actions */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+      <div className="dashboard-banner">
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em' }}>
+          <h1 className="dashboard-title">
             Catalog & Deck Performance
           </h1>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="dashboard-actions">
           {FEATURES.quickAdd && (
             <button className="btn btn-primary" onClick={onOpenAddModal}>
               <Plus size={16} /> Quick Add Topic
@@ -597,55 +550,49 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         }}
       >
         {/* Left: 2x2 KPI Grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '12px',
-          }}
-        >
+        <div className="dashboard-kpi-grid">
           {/* Total Reviews */}
-          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Completed Reviews</div>
-            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--accent-cyan)' }}>
+          <div className="glass-panel dashboard-kpi-card">
+            <div className="dashboard-kpi-label">Completed Reviews</div>
+            <div className="dashboard-kpi-val" style={{ color: 'var(--accent-cyan)' }}>
               #{totalCompletedReviews}
             </div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
               Global trial progression
             </div>
           </div>
 
           {/* Active vs Locked */}
-          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Deck Distribution</div>
-            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: 'var(--text-primary)' }}>
+          <div className="glass-panel dashboard-kpi-card">
+            <div className="dashboard-kpi-label">Deck Distribution</div>
+            <div className="dashboard-kpi-val">
               {activeCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {topics.length}</span>
             </div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
               {lockedCount} cards locked in reserve
             </div>
           </div>
 
           {/* Mastered */}
-          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>
+          <div className="glass-panel dashboard-kpi-card">
+            <div className="dashboard-kpi-label">
               {algorithm === 'graduated-interval' ? 'Mastered / Long-term (Tier 5+)' : 'Mastered (Box 5)'}
             </div>
-            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#34d399' }}>
+            <div className="dashboard-kpi-val" style={{ color: 'var(--accent-emerald)' }}>
               {masteredCount}
             </div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
               {algorithm === 'graduated-interval' ? '+35 to +800+ review intervals' : '+45 review interval reached'}
             </div>
           </div>
 
           {/* Staged Unlock Progress */}
-          <div className="glass-panel" style={{ padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 500 }}>Staged Unlock Progress</div>
-            <div style={{ fontSize: '26px', fontWeight: 700, marginTop: '4px', color: '#fbbf24' }}>
+          <div className="glass-panel dashboard-kpi-card">
+            <div className="dashboard-kpi-label">Staged Unlock Progress</div>
+            <div className="dashboard-kpi-val" style={{ color: 'var(--accent-amber)' }}>
               {box3PlusCount} <span style={{ fontSize: '14px', fontWeight: 400, color: 'var(--text-muted)' }}>/ {nextUnlockTarget} in B3+</span>
             </div>
-            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+            <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
               {lockedCount > 0
                 ? `${cardsNeededForNextUnlock} more Box 3+ cards unlocks 4 new topics`
                 : 'All topics unlocked!'}
@@ -670,32 +617,12 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       </div>
 
       {/* Leitner Box Breakdown Strip */}
-      <div
-        className="glass-panel"
-        style={{
-          padding: '16px 20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-              Active Spacing {tierName}s:
-            </span>
+      <div className="glass-panel catalog-filter-panel">
+        <div className="filter-panel-header">
+          <div className="filter-panel-title">
+            <span>Active Spacing {tierName}s:</span>
             {selectedBox !== 'all' && (
-              <span
-                style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  padding: '2px 8px',
-                  borderRadius: '12px',
-                  backgroundColor: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)',
-                  color: isLight ? '#4455AA' : 'var(--accent-cyan)',
-                  border: isLight ? '1px solid #C4C3BA' : '1px solid rgba(56, 189, 248, 0.3)',
-                }}
-              >
+              <span className="filter-count-badge">
                 {(Array.isArray(selectedBox) ? selectedBox.length : 1)} of {displayedBoxes.length} selected
               </span>
             )}
@@ -711,7 +638,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             </button>
           )}
         </div>
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <div className="filter-pills-row">
           {displayedBoxes.map((b, idx) => {
             const isBoxSelected =
               selectedBox !== 'all' &&
@@ -731,18 +658,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                     handleToggleBox(b);
                   }
                 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '6px 12px',
-                  borderRadius: '8px',
-                  backgroundColor: isBoxSelected ? 'var(--bg-elevated)' : 'rgba(255, 255, 255, 0.03)',
-                  border: isBoxSelected ? `1px solid var(--box-${Math.min(9, b)})` : '1px solid var(--border-subtle)',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  userSelect: 'none',
-                }}
+                className={`tier-pill ${isBoxSelected ? 'active' : ''}`}
               >
                 <div
                   style={{
@@ -752,18 +668,10 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                     backgroundColor: `var(--box-${Math.min(9, b)})`,
                   }}
                 />
-                <span style={{ fontSize: '12.5px', fontWeight: 600 }}>
+                <span>
                   {tierName} {b} (+{intervalForBox(b, algorithm)})
                 </span>
-                <span
-                  style={{
-                    fontSize: '11.5px',
-                    padding: '1px 6px',
-                    borderRadius: '10px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    color: 'var(--text-primary)',
-                  }}
-                >
+                <span className="tier-pill-count">
                   {boxCounts[idx]}
                 </span>
               </div>
@@ -771,398 +679,270 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           })}
         </div>
       </div>
-        {/* Track Filters (Multi-Select with 'All Tracks') */}
-        <div
-          className="glass-panel"
-          style={{
-            padding: '16px 20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            width: '100%',
-          }}
-        >
-          {showTrackHint && (
-            <div
-              role="status"
-              data-testid="track-filter-hint"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '10px',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                fontSize: '13px',
-                lineHeight: 1.5,
-                color: 'var(--text-primary)',
-                backgroundColor: 'rgba(56, 189, 248, 0.10)',
-                border: '1px solid rgba(56, 189, 248, 0.45)',
-              }}
-            >
-              <span style={{ flex: '1 1 320px' }}>
-                <strong>This filter is for inspecting cards.</strong> It only changes what you see in the catalog. To choose what you
-                actually practice, use the <strong>Focus</strong> button in the top bar.
-              </span>
-              <span style={{ display: 'flex', gap: '8px' }}>
-                {onOpenFocus && (
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    style={{ fontSize: '12.5px' }}
-                    onClick={() => {
-                      setShowTrackHint(false);
-                      onOpenFocus();
-                    }}
-                  >
-                    Open Focus
-                  </button>
-                )}
-                <button type="button" className="btn btn-outline" style={{ fontSize: '12.5px' }} onClick={() => setShowTrackHint(false)}>
-                  Got it
-                </button>
-              </span>
-            </div>
-          )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Filter Tracks:
-              </span>
-              {!isAllTracks && (
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    padding: '2px 8px',
-                    borderRadius: '12px',
-                    backgroundColor: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)',
-                    color: isLight ? '#4455AA' : 'var(--accent-cyan)',
-                    border: isLight ? '1px solid #C4C3BA' : '1px solid rgba(56, 189, 248, 0.3)',
+
+      {/* Track Filters (Multi-Select with 'All Tracks') */}
+      <div className="glass-panel catalog-filter-panel">
+        {showTrackHint && (
+          <div
+            role="status"
+            data-testid="track-filter-hint"
+            className="track-filter-hint"
+          >
+            <span style={{ flex: '1 1 320px' }}>
+              <strong>This filter is for inspecting cards.</strong> It only changes what you see in the catalog. To choose what you
+              actually practice, use the <strong>Focus</strong> button in the top bar.
+            </span>
+            <span style={{ display: 'flex', gap: '8px' }}>
+              {onOpenFocus && (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ fontSize: '12.5px' }}
+                  onClick={() => {
+                    setShowTrackHint(false);
+                    onOpenFocus();
                   }}
                 >
-                  {selectedTracks.length} of {allAvailableTracks.length} selected
-                </span>
+                  Open Focus
+                </button>
               )}
-            </div>
-            {!isAllTracks && (
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => setSelectedTracks(['all'])}
-                style={{ fontSize: '11.5px', padding: '2px 8px' }}
-              >
-                Reset to All Tracks
+              <button type="button" className="btn btn-outline" style={{ fontSize: '12.5px' }} onClick={() => setShowTrackHint(false)}>
+                Got it
               </button>
+            </span>
+          </div>
+        )}
+        <div className="filter-panel-header">
+          <div className="filter-panel-title">
+            <span>Filter Tracks:</span>
+            {!isAllTracks && (
+              <span className="filter-count-badge">
+                {selectedTracks.length} of {allAvailableTracks.length} selected
+              </span>
             )}
           </div>
-
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {/* 'All Tracks' Pill */}
+          {!isAllTracks && (
             <button
-              key="all"
               type="button"
-              className="btn"
-              onClick={() => handleToggleTrack('all')}
+              className="btn btn-outline"
+              onClick={() => setSelectedTracks(['all'])}
+              style={{ fontSize: '11.5px', padding: '2px 8px' }}
+            >
+              Reset to All Tracks
+            </button>
+          )}
+        </div>
+
+        <div className="filter-pills-row">
+          {/* 'All Tracks' Pill */}
+          <button
+            key="all"
+            type="button"
+            className={`track-filter-btn ${isAllTracks ? 'active' : ''}`}
+            onClick={() => handleToggleTrack('all')}
+          >
+            {isAllTracks && <Check size={13} />}
+            All Tracks ({topics.length})
+          </button>
+
+          {/* Individual Tracks */}
+          {allAvailableTracks.map((trk) => {
+            const isSelected = !isAllTracks && selectedTracks.includes(trk);
+            const meta = getTrackMeta(trk);
+            const count = trackCounts[trk] || 0;
+
+            return (
+              <button
+                key={trk}
+                type="button"
+                className={`track-filter-btn ${isSelected ? 'active' : ''}`}
+                onClick={() => handleToggleTrack(trk)}
+                title={isSelected ? `Click to remove ${meta.label}` : `Click to add ${meta.label} to filter`}
+              >
+                {isSelected && <Check size={12} />}
+                <span>{meta.label}</span>
+                <span className="track-filter-count">
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Search, Filter & Sort Controls Bar */}
+      <div className="catalog-controls-bar">
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+          {/* Search Input */}
+          <div className="catalog-search-box">
+            <Search size={14} className="catalog-search-icon" />
+            <input
+              type="text"
+              placeholder="Search topics, tags, or tracks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="catalog-search-input"
+            />
+          </div>
+
+          {/* Status Filter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value as CatalogStatusFilter)}
+              className="catalog-select"
+              aria-label="Filter by Status"
+            >
+              <option value="all">Status: All</option>
+              <option value="active">Status: Active Only</option>
+              <option value="locked">Status: Locked (Reserve) Only</option>
+              <option value="due">Status: Due for Practice (Ready Now)</option>
+              <option value="scheduled">Status: In Interval Spacing</option>
+              <option value="mastered">Status: Mastered (Tier 5+)</option>
+            </select>
+          </div>
+
+          {/* Difficulty Filter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <select
+              value={selectedDifficulty === 'all' ? 'all' : String(selectedDifficulty)}
+              onChange={(e) => setSelectedDifficulty(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+              className="catalog-select"
+              aria-label="Filter by Difficulty"
+            >
+              <option value="all">Difficulty: All</option>
+              <option value="1">Level 1: {DIFFICULTY_LABELS[1]}</option>
+              <option value="2">Level 2: {DIFFICULTY_LABELS[2]}</option>
+              <option value="3">Level 3: {DIFFICULTY_LABELS[3]}</option>
+              <option value="4">Level 4: {DIFFICULTY_LABELS[4]}</option>
+              <option value="5">Level 5: {DIFFICULTY_LABELS[5]}</option>
+            </select>
+          </div>
+
+          {/* Sort Options */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as CatalogSortOption)}
+              className="catalog-select"
+              aria-label="Sort Topics"
+            >
+              <option value="track-asc">Sort: Track (A-Z) → Difficulty (Default)</option>
+              <option value="track-desc">Sort: Track (Z-A)</option>
+              <option value="streak-desc">Sort: Streak (Highest First 🔥)</option>
+              <option value="streak-asc">Sort: Streak (Lowest First)</option>
+              <option value="difficulty-asc">Sort: Difficulty (Easiest First)</option>
+              <option value="difficulty-desc">Sort: Difficulty (Hardest First)</option>
+              <option value="box-desc">Sort: {tierName} (Highest First)</option>
+              <option value="box-asc">Sort: {tierName} (Lowest First)</option>
+              <option value="title-asc">Sort: Topic Name (A-Z)</option>
+              <option value="title-desc">Sort: Topic Name (Z-A)</option>
+              <option value="due-asc">Sort: Next Trial (Ready now first)</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Results Count & Reset Button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
+            Showing <strong style={{ color: 'var(--text-primary)' }}>{filteredTopics.length}</strong> of {topics.length} topics
+          </span>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={handleResetFilters}
               style={{
-                padding: '6px 12px',
+                padding: '4px 10px',
                 fontSize: '12px',
-                backgroundColor: isAllTracks ? (isLight ? '#4455AA' : 'var(--bg-elevated)') : (isLight ? '#FFFFFF' : 'transparent'),
-                borderColor: isAllTracks ? (isLight ? '#2B3A8C' : 'var(--accent-cyan)') : (isLight ? '#C4C3BA' : 'var(--border-subtle)'),
-                color: isAllTracks ? (isLight ? '#FFFFFF' : 'var(--text-primary)') : (isLight ? '#333333' : 'var(--text-muted)'),
-                fontWeight: isAllTracks ? 700 : 500,
-                boxShadow: isAllTracks && !isLight ? '0 0 10px rgba(56, 189, 248, 0.15)' : 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '5px',
               }}
+              title="Reset all search queries, track selections, filters, and sort to default"
             >
-              {isAllTracks && <Check size={13} />}
-              All Tracks ({topics.length})
+              <RotateCcw size={12} /> Reset Filters
             </button>
-
-            {/* Individual Tracks */}
-            {allAvailableTracks.map((trk) => {
-              const isSelected = !isAllTracks && selectedTracks.includes(trk);
-              const meta = getTrackMeta(trk);
-              const count = trackCounts[trk] || 0;
-              const lightTrk = LIGHT_TRACK_STYLES[trk] || { color: '#334155', bg: '#F1F5F9', border: '#CBD5E1' };
-
-              return (
-                <button
-                  key={trk}
-                  type="button"
-                  className="btn"
-                  onClick={() => handleToggleTrack(trk)}
-                  title={isSelected ? `Click to remove ${meta.label}` : `Click to add ${meta.label} to filter`}
-                  style={{
-                    padding: '6px 11px',
-                    fontSize: '12px',
-                    backgroundColor: isSelected
-                      ? (isLight ? lightTrk.bg : 'rgba(56, 189, 248, 0.15)')
-                      : (isLight ? '#FFFFFF' : 'transparent'),
-                    borderColor: isSelected
-                      ? (isLight ? lightTrk.border : 'var(--accent-cyan)')
-                      : (isLight ? '#C4C3BA' : 'var(--border-subtle)'),
-                    color: isSelected
-                      ? (isLight ? lightTrk.color : 'var(--text-primary)')
-                      : (isLight ? '#475569' : 'var(--text-secondary)'),
-                    fontWeight: isSelected ? 700 : 500,
-                    boxShadow: isSelected && !isLight ? '0 0 8px rgba(56, 189, 248, 0.2)' : 'none',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  {isSelected && <Check size={12} />}
-                  <span>{meta.label}</span>
-                  <span
-                    style={{
-                      fontSize: '10.5px',
-                      opacity: isSelected ? 0.9 : 0.6,
-                      padding: '1px 5px',
-                      borderRadius: '8px',
-                      backgroundColor: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.08)',
-                    }}
-                  >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          )}
         </div>
-
-        {/* Search, Filter & Sort Controls Bar */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '12px',
-            width: '100%',
-          }}
-        >
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
-            {/* Search Input */}
-            <div style={{ position: 'relative', minWidth: '220px', flex: '1 1 220px', maxWidth: '340px' }}>
-              <Search
-                size={14}
-                style={{
-                  position: 'absolute',
-                  left: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: isLight ? '#555555' : 'var(--text-muted)',
-                }}
-              />
-              <input
-                type="text"
-                placeholder="Search topics, tags, or tracks..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="code-buffer"
-                style={{
-                  height: '34px',
-                  paddingLeft: '32px',
-                  paddingRight: '10px',
-                  fontSize: '12.5px',
-                  width: '100%',
-                  backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-editor)',
-                  color: isLight ? '#1C1C1C' : '#e2e8f0',
-                  border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
-                }}
-              />
-            </div>
-
-            {/* Status Filter */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value as CatalogStatusFilter)}
-                className="code-buffer"
-                style={{
-                  height: '34px',
-                  padding: '4px 10px',
-                  fontSize: '12.5px',
-                  backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-elevated)',
-                  color: isLight ? '#1C1C1C' : 'var(--text-primary)',
-                  border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
-                  width: 'auto',
-                }}
-                aria-label="Filter by Status"
-              >
-                <option value="all">Status: All</option>
-                <option value="active">Status: Active Only</option>
-                <option value="locked">Status: Locked (Reserve) Only</option>
-                <option value="due">Status: Due for Practice (Ready Now)</option>
-                <option value="scheduled">Status: In Interval Spacing</option>
-                <option value="mastered">Status: Mastered (Tier 5+)</option>
-              </select>
-            </div>
-
-            {/* Difficulty Filter */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <select
-                value={selectedDifficulty === 'all' ? 'all' : String(selectedDifficulty)}
-                onChange={(e) => setSelectedDifficulty(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-                className="code-buffer"
-                style={{
-                  height: '34px',
-                  padding: '4px 10px',
-                  fontSize: '12.5px',
-                  backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-elevated)',
-                  color: isLight ? '#1C1C1C' : 'var(--text-primary)',
-                  border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
-                  width: 'auto',
-                }}
-                aria-label="Filter by Difficulty"
-              >
-                <option value="all">Difficulty: All</option>
-                <option value="1">Level 1: {DIFFICULTY_LABELS[1]}</option>
-                <option value="2">Level 2: {DIFFICULTY_LABELS[2]}</option>
-                <option value="3">Level 3: {DIFFICULTY_LABELS[3]}</option>
-                <option value="4">Level 4: {DIFFICULTY_LABELS[4]}</option>
-                <option value="5">Level 5: {DIFFICULTY_LABELS[5]}</option>
-              </select>
-            </div>
-
-            {/* Sort Options */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <select
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value as CatalogSortOption)}
-                className="code-buffer"
-                style={{
-                  height: '34px',
-                  padding: '4px 10px',
-                  fontSize: '12.5px',
-                  backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-elevated)',
-                  color: isLight ? '#1C1C1C' : 'var(--text-primary)',
-                  border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-medium)',
-                  width: 'auto',
-                }}
-                aria-label="Sort Topics"
-              >
-                <option value="track-asc">Sort: Track (A-Z) → Difficulty (Default)</option>
-                <option value="track-desc">Sort: Track (Z-A)</option>
-                <option value="streak-desc">Sort: Streak (Highest First 🔥)</option>
-                <option value="streak-asc">Sort: Streak (Lowest First)</option>
-                <option value="difficulty-asc">Sort: Difficulty (Easiest First)</option>
-                <option value="difficulty-desc">Sort: Difficulty (Hardest First)</option>
-                <option value="box-desc">Sort: {tierName} (Highest First)</option>
-                <option value="box-asc">Sort: {tierName} (Lowest First)</option>
-                <option value="title-asc">Sort: Topic Name (A-Z)</option>
-                <option value="title-desc">Sort: Topic Name (Z-A)</option>
-                <option value="due-asc">Sort: Next Trial (Ready now first)</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Results Count & Reset Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>
-              Showing <strong style={{ color: 'var(--text-primary)' }}>{filteredTopics.length}</strong> of {topics.length} topics
-            </span>
-            {hasActiveFilters && (
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={handleResetFilters}
-                style={{
-                  padding: '4px 10px',
-                  fontSize: '12px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                }}
-                title="Reset all search queries, track selections, filters, and sort to default"
-              >
-                <RotateCcw size={12} /> Reset Filters
-              </button>
-            )}
-          </div>
-        </div>
+      </div>
 
       {/* Catalog Table */}
-      <div
-        className="glass-panel"
-        style={{
-          overflowX: 'auto',
-          borderRadius: '12px',
-          border: '1px solid var(--border-subtle)',
-        }}
-      >
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
+      <div className="glass-panel catalog-table-wrapper" style={{ overflowX: 'auto' }}>
+        <table className="catalog-table">
           <thead>
-            <tr style={{ backgroundColor: 'var(--bg-elevated)', borderBottom: '1px solid var(--border-medium)' }}>
+            <tr>
               <th
                 onClick={() => handleHeaderSort('title')}
-                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                className="catalog-th"
+                style={{ cursor: 'pointer' }}
                 title="Click to sort by topic name"
               >
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div className="catalog-th-btn">
                   Topic {renderSortIndicator('title')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('track')}
-                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                className="catalog-th"
+                style={{ cursor: 'pointer' }}
                 title="Click to sort by track name"
               >
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div className="catalog-th-btn">
                   Track {renderSortIndicator('track')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('difficulty')}
-                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                className="catalog-th"
+                style={{ cursor: 'pointer' }}
                 title="Click to sort by difficulty level"
               >
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div className="catalog-th-btn">
                   Difficulty {renderSortIndicator('difficulty')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('box')}
-                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                className="catalog-th"
+                style={{ cursor: 'pointer' }}
                 title={`Click to sort by ${tierName} level`}
               >
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div className="catalog-th-btn">
                   {tierName} Level {renderSortIndicator('box')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('streak')}
-                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                className="catalog-th"
+                style={{ cursor: 'pointer' }}
                 title="Click to sort by streak"
               >
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div className="catalog-th-btn">
                   Streak {renderSortIndicator('streak')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('due')}
-                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                className="catalog-th"
+                style={{ cursor: 'pointer' }}
                 title="Click to sort by next eligible trial"
               >
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div className="catalog-th-btn">
                   Next Eligible Trial {renderSortIndicator('due')}
                 </div>
               </th>
               <th
                 onClick={() => handleHeaderSort('status')}
-                style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}
+                className="catalog-th"
+                style={{ cursor: 'pointer' }}
                 title="Click to sort by card status"
               >
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <div className="catalog-th-btn">
                   Status {renderSortIndicator('status')}
                 </div>
               </th>
-              <th style={{ padding: '12px 16px', fontWeight: 600, color: 'var(--text-secondary)', textAlign: 'right' }}>Actions</th>
+              <th className="catalog-th" style={{ textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -1177,42 +957,22 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 const trkMeta = getTrackMeta(topic.track);
                 const isEligible = topic.status === 'active' && topic.nextEligibleTrial <= totalCompletedReviews;
 
-                const lightTrk = LIGHT_TRACK_STYLES[topic.track] || {
-                  color: '#334155',
-                  bg: '#F1F5F9',
-                  border: '#CBD5E1',
-                };
-                const trkBg = isLight ? lightTrk.bg : trkMeta.bg;
-                const trkColor = isLight ? lightTrk.color : trkMeta.color;
-                const trkBorder = isLight ? lightTrk.border : trkMeta.border;
-
                 return (
                   <tr
                     key={topic.id}
+                    className="catalog-tr"
                     style={{
-                      borderBottom: '1px solid var(--border-subtle)',
-                      transition: 'background-color 0.1s',
-                      backgroundColor: topic.status === 'locked' ? (isLight ? 'rgba(0, 0, 0, 0.025)' : 'rgba(0,0,0,0.2)') : 'transparent',
+                      backgroundColor: topic.status === 'locked' ? (isLight ? 'rgba(0, 0, 0, 0.025)' : 'rgba(0,0,0,0.2)') : undefined,
                     }}
                   >
                     {/* Title & Tags */}
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                      <div style={{ fontWeight: 600, color: topic.status === 'active' ? 'var(--text-primary)' : (isLight ? '#475569' : 'var(--text-muted)') }}>
+                    <td className="catalog-td">
+                      <div style={{ fontWeight: 600, color: topic.status === 'active' ? 'var(--text-primary)' : 'var(--text-muted)' }}>
                         {topic.title}
                       </div>
                       <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
                         {topic.tags.slice(0, 3).map((tg) => (
-                          <span
-                            key={tg}
-                            style={{
-                              fontSize: '10.5px',
-                              color: isLight ? '#334155' : 'var(--text-dim)',
-                              backgroundColor: isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.03)',
-                              border: isLight ? '1px solid #CBD5E1' : 'none',
-                              padding: '1px 6px',
-                              borderRadius: '3px',
-                            }}
-                          >
+                          <span key={tg} className="table-tag-chip">
                             #{tg}
                           </span>
                         ))}
@@ -1220,33 +980,23 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                     </td>
 
                     {/* Track */}
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                      <span
-                        className="badge"
-                        style={{
-                          backgroundColor: trkBg,
-                          color: trkColor,
-                          border: `1px solid ${trkBorder}`,
-                          fontSize: '11px',
-                          fontWeight: isLight ? 600 : 500,
-                        }}
-                      >
+                    <td className="catalog-td">
+                      <span className="track-badge" data-track={topic.track}>
                         {trkMeta.label}
                       </span>
                     </td>
 
                     {/* Difficulty */}
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                    <td className="catalog-td">
                       <DifficultyBadge card={topic} showLabel={true} />
                     </td>
 
                     {/* Box */}
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                    <td className="catalog-td">
                       {topic.status === 'active' ? (
                         <span
                           className="badge"
                           style={{
-                            backgroundColor: isLight ? 'rgba(0, 0, 0, 0.03)' : `rgba(255, 255, 255, 0.05)`,
                             border: `1.5px solid var(--box-${Math.min(9, topic.box)})`,
                             color: `var(--box-${Math.min(9, topic.box)})`,
                             fontWeight: 700,
@@ -1255,23 +1005,23 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                           {tierName} {topic.box}
                         </span>
                       ) : (
-                        <span style={{ color: isLight ? '#64748B' : 'var(--text-dim)', fontSize: '12px' }}>—</span>
+                        <span style={{ color: 'var(--text-dim)', fontSize: '12px' }}>—</span>
                       )}
                     </td>
 
                     {/* Streak */}
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                    <td className="catalog-td">
                       {topic.status === 'active' ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#f97316', fontWeight: 600 }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--accent-orange, #f97316)', fontWeight: 600 }}>
                           <Flame size={13} /> {topic.streak}
                         </span>
                       ) : (
-                        <span style={{ color: isLight ? '#64748B' : 'var(--text-dim)' }}>0</span>
+                        <span style={{ color: 'var(--text-dim)' }}>0</span>
                       )}
                     </td>
 
                     {/* Next Eligible Trial */}
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                    <td className="catalog-td">
                       {topic.status === 'active' ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <span
@@ -1279,66 +1029,33 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                               fontFamily: 'var(--font-mono)',
                               fontSize: '12px',
                               fontWeight: isEligible ? 700 : 500,
-                              color: isEligible ? (isLight ? '#15803D' : '#34d399') : (isLight ? '#334155' : 'var(--text-secondary)'),
+                              color: isEligible ? 'var(--accent-secondary)' : 'var(--text-secondary)',
                             }}
                           >
                             Trial #{topic.nextEligibleTrial}
                           </span>
                           {isEligible && (
-                            <span
-                              className="badge"
-                              style={{
-                                backgroundColor: isLight ? '#DCFCE7' : 'rgba(52, 211, 153, 0.15)',
-                                color: isLight ? '#15803D' : '#34d399',
-                                border: isLight ? '1px solid #86EFAC' : 'none',
-                                fontSize: '10px',
-                                fontWeight: 700,
-                                padding: '1px 5px',
-                              }}
-                            >
+                            <span className="badge trial-badge-ready">
                               Ready
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span style={{ color: isLight ? '#64748B' : 'var(--text-dim)', fontSize: '12px', fontWeight: 500 }}>Locked</span>
+                        <span style={{ color: 'var(--text-dim)', fontSize: '12px', fontWeight: 500 }}>Locked</span>
                       )}
                     </td>
 
                     {/* Status */}
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
-                      {topic.status === 'active' ? (
-                        <span
-                          className="badge"
-                          style={{
-                            backgroundColor: isLight ? '#E0F2FE' : 'rgba(56, 189, 248, 0.1)',
-                            color: isLight ? '#0284C7' : '#38bdf8',
-                            border: isLight ? '1px solid #7DD3FC' : 'none',
-                            fontSize: '11px',
-                            fontWeight: 600,
-                          }}
-                        >
-                          <Unlock size={11} /> Active
-                        </span>
-                      ) : (
-                        <span
-                          className="badge"
-                          style={{
-                            backgroundColor: isLight ? '#F1F5F9' : 'rgba(148, 163, 184, 0.08)',
-                            color: isLight ? '#334155' : 'var(--text-muted)',
-                            border: isLight ? '1px solid #94A3B8' : 'none',
-                            fontSize: '11px',
-                            fontWeight: 600,
-                          }}
-                        >
-                          <Lock size={11} /> Locked
-                        </span>
-                      )}
+                    <td className="catalog-td">
+                      <span className={`badge ${topic.status === 'active' ? 'status-badge-active' : 'status-badge-locked'}`}>
+                        {topic.status === 'active' ? <Unlock size={11} /> : <Lock size={11} />}
+                        <span>{topic.status === 'active' ? 'Active' : 'Locked'}</span>
+                      </span>
                     </td>
 
                     {/* Actions */}
-                    <td style={{ padding: '12px 16px', verticalAlign: 'middle', textAlign: 'right' }}>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                    <td className="catalog-td" style={{ textAlign: 'right' }}>
+                      <div className="catalog-actions-cell">
                         {topic.status === 'active' ? (
                           <>
                             <button

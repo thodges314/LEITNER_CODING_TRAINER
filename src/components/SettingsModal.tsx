@@ -409,47 +409,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         style={{
           maxWidth: '540px',
           padding: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          maxHeight: '90vh',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Sticky Header */}
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 10,
-            backgroundColor: 'var(--bg-card)',
-            borderBottom: '1px solid var(--border-medium)',
-            padding: '16px 24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '12px',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '8px',
-                background: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: isLight ? '#4455AA' : '#38bdf8',
-                border: isLight ? '1px solid rgba(68, 85, 170, 0.25)' : 'none',
-                flexShrink: 0,
-              }}
-            >
+        <div className="modal-header">
+          <div className="modal-header-left">
+            <div className="modal-header-icon">
               <Sliders size={20} />
             </div>
             <div>
-              <h2 id="settings-title" style={{ fontSize: '18px', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
+              <h2 id="settings-title" className="modal-title">
                 Trainer Settings
               </h2>
             </div>
@@ -475,8 +445,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </span>
             )}
             <button
-              className="btn btn-outline"
-              style={{ padding: '6px', borderRadius: '50%', flexShrink: 0 }}
+              className="modal-close-btn"
               onClick={onClose}
               aria-label="Close settings"
             >
@@ -486,16 +455,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Scrollable Body */}
-        <div
-          style={{
-            padding: '24px',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '18px',
-            maxHeight: 'calc(90vh - 68px)',
-          }}
-        >
+        <div className="modal-body" style={{ gap: '18px' }}>
+
           {/* Optional card packs */}
           {packs.length > 0 && (
             <div style={{ marginBottom: '20px' }}>
