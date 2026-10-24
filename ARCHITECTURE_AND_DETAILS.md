@@ -154,9 +154,10 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (1,490 unit tests)**: Tests verifying:
+- **Vitest Suite (1,686 unit tests)**: Tests verifying:
   - Reference solutions pass for all 271 topic cards (218 default + 53 in the optional `algorithms-advanced` pack) across 1,934 documented test cases.
   - Empty submissions fail for all cards.
+  - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.
   - 100% of cards formatted with structured GitHub-flavored Markdown instructions.
   - Optional card packs (`src/lib/packs.test.ts`): off by default, excluded from scheduling and staged unlocks, persisted, core algorithms keep fair coverage.
   - Leitner and Graduated Interval algorithms, intervals, promotions, and setbacks.

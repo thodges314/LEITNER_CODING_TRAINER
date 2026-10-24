@@ -28,7 +28,7 @@ in the browser; state lives in `localStorage`.
 | Tracks (default deck / total) | algorithms 47/80, js-utilities 34, react-components 31, js-language 25, react 23, async-js 22, typescript-patterns 14, dom-browser 9, testing-tooling 4. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 1,490 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Automated tests | 1,686 Vitest tests (jsdom/node): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, TypeScript dual-mode tests, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
 | Browser verification | `npm run e2e` runs ALL 271 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 542 card tests + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 589 browser tests, ~6 min on an idle machine with 4 workers). **Last full run: 589 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
@@ -401,8 +401,8 @@ Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates r
 3. **CI Deployment Optimization**:
    - Deploy workflow (`.github/workflows/deploy.yml`) ignores Markdown (`paths-ignore: ["**.md", "docs/**"]`), conserving GitHub Actions minutes and eliminating in-flight deploy cancellations during documentation updates.
 
-#### Current Work in Progress: Comprehensive TypeScript Support (`feature/typescript-support`)
-- See [TYPESCRIPT_SUPPORT_PLAN.md](TYPESCRIPT_SUPPORT_PLAN.md) for detailed technical architecture.
+#### TypeScript Dual-Solution Architecture & Coverage (100% Complete)
+- See [TYPESCRIPT_SUPPORT_PLAN.md](TYPESCRIPT_SUPPORT_PLAN.md) for detailed technical architecture and conventions.
 - **Phase 1 Infrastructure (Complete)**:
   - Added optional `referenceSolutionTs?: string` to `TopicItem` in `src/lib/leitner.ts`.
   - Ingestion of `<id>.ref.ts` into `topics.json` via `scripts/build-cards.mjs`.
@@ -412,10 +412,14 @@ Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates r
 - **Phase 2 Buffer Policy (Complete)**:
   - Cold-start recall integrity is strictly preserved: the editor buffer is NOT overwritten or injected with stubs upon switching between JS and TS modes.
   - Typed signatures are embedded into prompt headings (`### fn(arg: Type): ReturnType`).
-- **Phase 3 Dual Solutions Rollout (Complete)**:
+- **Phase 3 Dual Solutions Rollout (100% Complete — 271 / 271 cards)**:
   - 271 of 271 cards (100.0%) across all 9 tracks now have canonical `.ref.ts` solutions and explicit typed signatures in prompt headers.
   - Complete: Algorithms (77/77), Async JS (21/21), JS Language (25/25), TypeScript Patterns (14/14), JS Utilities (37/37), DOM/Browser (20/20), React (27/27), React Components (45/45), and Testing/Tooling (5/5).
-  - All 48 batches verified with dual-mode seed tests (`seedCards.test.ts`), `npx tsc -b`, `npm run lint`, and `npm test`.
+  - All 48 batches verified with dual-mode seed tests (`seedCards.test.ts`), `npx tsc -b`, `npm run lint`, and `npm test` (1,686 tests passing).
+- **Type/Interface Design Strategy**:
+  - Complex options, structured models, and nested return types are extracted into dedicated ` ```ts ` interface blocks at the top of prompt descriptions to keep heading signatures clean and readable while avoiding undefined opaque types.
+  - Destructured parameters and default arguments are strictly preserved in TS signatures and reference implementations.
+  - Canonical `.ref.ts` solutions declare and consume the exact same interfaces displayed in the prompt.
 
 #### Next Steps (in priority order)
 1. Keep `npm run e2e` green on `master` (run after card/runner modifications).

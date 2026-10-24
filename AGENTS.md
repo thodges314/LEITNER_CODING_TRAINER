@@ -29,6 +29,20 @@ Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_
 ## AI evaluator output
 Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/ai.ts`); malformed output is shown raw via `rawOutput` instead of being split into lists.
 
+## TypeScript prompt and interface conventions
+- **Readable signatures vs extracted interfaces**:
+  - Keep `### signature(args): ReturnType` headings clean and readable. Never bloat headings with massive 200+ character inline object literals.
+  - Never hide parameter or return structures behind opaque interface names without defining what is inside them.
+  - When a card involves complex option objects, custom item/node models, or structured return types (e.g. tree nodes, table columns, router definitions, multi-step wizard configs), extract and declare the `interface` or `type` in a ` ```ts ` block at the top of the prompt's `## Description` section.
+  - Reference the extracted type in the `### signature` heading.
+  - Ensure the canonical TypeScript reference solution (`<id>.ref.ts`) exports/declares and uses the exact same interface shapes so prompt contracts and reference code are 100% synchronized.
+- **Destructured parameters and default arguments**:
+  - Preserve all destructured parameters and default argument values in both the prompt signature and the `.ref.ts` solution. Do not replace destructured parameters with a single opaque props object if the original contract expects destructured defaults.
+- **Sandbox globals and ambient types (`src/utils/typeChecker.ts`)**:
+  - Browser DOM element types available in the sandbox include: `HTMLElement`, `HTMLInputElement`, `HTMLButtonElement`, `HTMLDivElement`, `HTMLUListElement`, `HTMLLIElement`.
+  - For heading or section tags (`<h1>`..`<h6>`, `<nav>`), type refs as `HTMLElement` (avoid `HTMLHeadingElement` which is not in `SANDBOX_GLOBALS`).
+  - For inline React styles, use `Record<string, string | number>` instead of `React.CSSProperties`.
+
 ## Keep the `.md` files current (same commit as the change)
 Docs drift quickly, so update them whenever you change what they describe. Don't wait to be reminded.
 - **Counts** (cards, cases, Vitest tests, Playwright tests): `README.md`, `DELEGATION.md` "Current state", `ARCHITECTURE_AND_DETAILS.md`, `ARCHITECTURE_AND_ROADMAP.md`. Get the real numbers from `npm test` and `npx playwright test --list`; don't guess.

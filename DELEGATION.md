@@ -4,7 +4,7 @@ Read `ARCHITECTURE_AND_ROADMAP.md` first (system map, card pipeline, gotchas). T
 criteria**, plus the rules every contributor follows. Tasks marked **[owner decision]** need the owner's approval before coding.
 
 ## Current state (keep this block up to date in the same commit as any change it describes)
-- `master` = the deployed app. **271 cards** (218 in the default deck + 53 in the optional "algorithms-advanced" pack), **1,934 documented cases**, **100% Markdown formatted instructions** across all 271 cards (Batches 1–23 complete), 1,490 unit tests, 589 browser tests (2 per card + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests). A push to `master` deploys (Markdown changes ignored in deploy workflow to conserve Actions minutes), and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
+- `master` = the deployed app. **271 cards** (218 in the default deck + 53 in the optional "algorithms-advanced" pack), **1,934 documented cases**, **100% Markdown formatted instructions** across all 271 cards (Batches 1–23 complete), **100% TypeScript dual solutions** across all 271 cards (Batches 1–48 complete), 1,686 unit tests, 589 browser tests (2 per card + 12 navigation/shortcut tests + 10 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests). A push to `master` deploys (Markdown changes ignored in deploy workflow to conserve Actions minutes), and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
 - Quick rules for any contributor are in `AGENTS.md`. `npm run check:cards` is a read-only check that `src/data/topics.json` matches the card sources (run it, or `build:cards`, after any card edit).
 - AI evaluator replies are parsed by `parseEvaluationPayload` (`src/lib/ai.ts`); malformed replies are shown raw (`rawOutput`) in the evaluation panel instead of being split into lists.
 - First-4-problems backup advisory & export spotlight feature: alerts users after 4 completed problems (scored reviews, excluding unscored reinforcement repeats) to export their `localStorage` state to JSON, with spotlight pulse & callout bubble on the Deck Catalog export button. Verified by unit tests (`src/lib/backupAdvisory.test.ts`) and Playwright E2E (`e2e/backup-advisory.spec.ts`).
@@ -15,7 +15,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
-| Comprehensive TypeScript Support (Plumbing, Ambient Types, Dual Solution Reveal, Typed Stubs) | Antigravity | `feature/ts-coverage` | in progress |
+| Comprehensive TypeScript Support (Plumbing, Ambient Types, Dual Solution Reveal, Typed Stubs) | Antigravity | `feature/ts-coverage` | complete |
 
 
 

@@ -29,16 +29,32 @@ The Leitner Coding Trainer provides first-class support for both **JavaScript ru
 2. **Backwards Compatibility:**  
    All 271 existing JavaScript reference solutions and test harnesses remain 100% intact and functional.
 3. **Every Batch is Verified:**  
-   No batch is committed without passing:
-   - `npx vitest run src/lib/seedCards.test.ts` (currently 98/98 TypeScript reference solutions pass runtime tests).
-   - `npm run build` (`eslint .`, `tsc -b`, and `vite build`).
+   The entire suite passes with 0 failures:
+   - `npm test` (all 45 test files, 1,686 tests passing, including all 271 TypeScript reference solutions and strip-type JS execution).
+   - Full production build & type checks (`npx tsc -b`, `npm run lint`, `vite build`).
 4. **Immediate Value:**  
-   Merging today immediately delivers:
-   - The TypeScript compilation & test harness engine (in-browser `tsc` diagnostics + Sucrase transpilation).
-   - CodeMirror QuickInfo hover tooltips for type inspection.
-   - Dual-solution reveal panel (`referenceSolutionTs` vs `referenceSolution`).
-   - **98 fully typed cards** covering 100% of the **Algorithms** track and 100% of the **Async JS** track.
-   - When quota resets, work can resume on the exact next planned batch without any rework.
+   Delivers 100% TypeScript dual-solution coverage across all 271 cards in the deck, complete with in-browser type checking, CodeMirror hover quickinfo, and context-aware solution reveal.
+
+---
+
+## 2.1 Type & Interface Design Strategy
+
+To ensure optimal developer experience, readable problem prompts, and strict type safety:
+
+1. **Explicit Extracted Interfaces vs. Opaque/Bloated Inline Types:**
+   - **Never Bloat Heading Signatures:** Long, nested object signatures (e.g. 200+ characters of inline table column shapes, router route configs, or multi-step wizard state) degrade legibility when crammed into the `### signature(args): ReturnType` heading.
+   - **Never Hide Structures Behind Undefined Opaque Types:** Avoid introducing types like `Props` or `Options` without defining what fields exist inside them.
+   - **Extracted Code Blocks at Top of Prompt:** When a card involves complex option bags, custom item models, or structured return types, the interface is explicitly declared in a ` ```ts ` code block at the beginning of the prompt's `## Description` section. The `### signature` heading then references that declared interface cleanly.
+   - **Canonical Synchronization:** The canonical TypeScript reference solution (`<id>.ref.ts`) declares and utilizes the exact same interfaces, ensuring that the learner's instructions and reference implementation are 100% aligned.
+
+2. **Destructured Parameters & Default Arguments Preservation:**
+   - When converting JavaScript functions or React components to TypeScript, preserve all parameter destructuring and default argument values (e.g., `({ initialLiked = false, onLike }: LikeButtonProps)`).
+   - Never replace destructured parameters with a single opaque parameter object if the contract relies on defaulted properties.
+
+3. **In-Browser Sandbox Globals (`SANDBOX_GLOBALS`):**
+   - The browser-side TypeScript sandbox defines core standard DOM types (`HTMLElement`, `HTMLButtonElement`, `HTMLInputElement`, `HTMLDivElement`, `HTMLUListElement`, `HTMLLIElement`).
+   - For elements without specific global declarations (e.g. `<h1>`..`<h6>`, `<nav>`), refs are typed as `HTMLElement`.
+   - For React component inline styles, `Record<string, string | number>` is used instead of `React.CSSProperties`.
 
 ---
 
