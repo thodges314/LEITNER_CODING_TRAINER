@@ -1,4 +1,6 @@
-Build `Layout({ path, title, children })` for accessible client-side routing:
+### Layout({ path, title, children }: { path: string; title: string; children?: React.ReactNode }): JSX.Element:
+
+Build `Layout` for accessible client-side routing:
 
 - **DOM Structure (in exact order)**:
   1. Skip link: `<a href="#main-content">Skip to main content</a>`.

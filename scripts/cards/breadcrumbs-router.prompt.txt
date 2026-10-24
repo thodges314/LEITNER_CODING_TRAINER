@@ -1,6 +1,14 @@
-Implement `generateBreadcrumbs(pathname, customLabels = {})` and an accessible React component `Breadcrumbs({ pathname, labels })`.
+```ts
+interface BreadcrumbItem {
+  path: string;
+  label: string;
+  isCurrent: boolean;
+}
+```
 
-### `generateBreadcrumbs(pathname, customLabels)`
+Implement `generateBreadcrumbs(pathname, customLabels = {})` and an accessible React component `Breadcrumbs({ pathname, labels = {} })`.
+
+### generateBreadcrumbs(pathname: string, customLabels: Record<string, string> = {}): BreadcrumbItem[]:
 - Normalizes consecutive or trailing slashes (e.g. `'/products/123/'` -> segments `['products', '123']`).
 - Always includes the root breadcrumb `{ path: '/', label: customLabels['/'] || 'Home', isCurrent: false }`.
 - For each subpath, constructs cumulative path (e.g. `'/products'`, `'/products/123'`).
@@ -8,7 +16,7 @@ Implement `generateBreadcrumbs(pathname, customLabels = {})` and an accessible R
 - The final item in the array has `isCurrent: true`; all preceding items have `isCurrent: false`.
 - If pathname is `'/'` or empty, returns `[{ path: '/', label: customLabels['/'] || 'Home', isCurrent: true }]`.
 
-### `Breadcrumbs({ pathname, labels })`
+### Breadcrumbs({ pathname, labels = {} }: { pathname: string; labels?: Record<string, string> }): JSX.Element:
 - Renders a `<nav aria-label="Breadcrumb">` wrapping an `<ol className="breadcrumbs">`.
 - For non-current crumbs, renders `<a href={crumb.path}>{crumb.label}</a>`.
 - For the current crumb, renders `<span aria-current="page">{crumb.label}</span>`.

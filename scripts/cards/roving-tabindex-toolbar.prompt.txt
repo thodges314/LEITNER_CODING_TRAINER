@@ -1,4 +1,13 @@
-Build `Toolbar({ label, items })` where `items` is `[{ id, label }]`.
+```ts
+interface ToolbarItem {
+  id: string;
+  label: string;
+}
+```
+
+### Toolbar({ label, items }: { label: string; items: ToolbarItem[] }): JSX.Element:
+
+Build a toolbar with roving tabindex where `items` is `ToolbarItem[]`.
 
 - **DOM Structure**: Render `<div role="toolbar" aria-label={label} aria-orientation="horizontal">` containing one `<button type="button">` per item displaying its `label`.
 - **Roving `tabIndex`**:

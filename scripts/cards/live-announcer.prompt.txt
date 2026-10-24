@@ -1,12 +1,20 @@
+```ts
+interface AnnounceOptions {
+  politeness?: 'polite' | 'assertive';
+}
+
+type AnnounceFn = (message: string, options?: AnnounceOptions) => void;
+```
+
 Build a screen reader announcer system consisting of `AnnouncerProvider` and `useAnnounce()`.
 
-### `AnnouncerProvider({ children })`
+### AnnouncerProvider({ children }: { children: React.ReactNode }): JSX.Element:
 - **DOM Structure**: Renders `children` followed by two live regions:
   - Polite region: `<div role="status" aria-live="polite" aria-atomic="true">`
   - Assertive region: `<div role="alert" aria-live="assertive" aria-atomic="true">`
 - **Visual Hiding**: Hide both regions visually while keeping them accessible to screen readers (e.g. `position: absolute`, `width: 1px`, `height: 1px`, `overflow: hidden`, `clip`). Never use `display: none`, `visibility: hidden`, or the `hidden` attribute, which would silence assistive technology.
 
-### `useAnnounce()`
+### useAnnounce(): AnnounceFn:
 - **Returns**: `announce(message, { politeness = 'polite' } = {})`.
 - **Targeting**:
   - `announce(message)` (or `{ politeness: 'polite' }`): Sets `message` in the polite region and empties the assertive region.

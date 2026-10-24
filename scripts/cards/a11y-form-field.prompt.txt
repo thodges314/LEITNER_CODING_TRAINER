@@ -1,11 +1,19 @@
+```ts
+interface FormFieldRenderProps {
+  id: string;
+  'aria-describedby'?: string;
+  'aria-invalid'?: true;
+}
+```
+
 Build accessible form field and toggle components:
 
-### `ToggleButton({ pressed, onPressedChange, children })`
+### ToggleButton({ pressed, onPressedChange, children }: { pressed: boolean; onPressedChange: (next: boolean) => void; children: React.ReactNode }): JSX.Element:
 - Renders `<button type="button" aria-pressed={pressed}>`.
 - On click, invokes `onPressedChange(!pressed)`.
 - Renders `children` inside the button.
 
-### `FormField({ label, hint, error, children })`
+### FormField({ label, hint, error, children }: { label: React.ReactNode; hint?: React.ReactNode; error?: React.ReactNode; children: (props: FormFieldRenderProps) => React.ReactNode }): JSX.Element:
 - Generates a unique base id via `useId()`.
 - Generates sub-ids: `hintId = id + '-hint'` and `errorId = id + '-error'`.
 - Computes `describedBy`: joins active IDs (`hintId`, `errorId`) separated by a space (or `undefined` if neither exists).

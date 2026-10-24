@@ -1,4 +1,13 @@
-Build `SignupForm({ onSubmit })` with two labelled text inputs: Name (`id="name"`) and Email (`id="email"`), and a submit button inside `<form noValidate>` (validating only on submit).
+```ts
+interface SignupFormValues {
+  name: string;
+  email: string;
+}
+```
+
+### SignupForm({ onSubmit }: { onSubmit: (values: SignupFormValues) => void }): JSX.Element:
+
+Build a signup form with two labelled text inputs: Name (`id="name"`) and Email (`id="email"`), and a submit button inside `<form noValidate>` (validating only on submit).
 
 - **Validation Rules**:
   - **Name**: Must not be blank (error message: `'Enter your name'`).
