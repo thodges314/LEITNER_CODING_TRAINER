@@ -33,11 +33,16 @@ function ToastProvider({ children, limit = 3 }) {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div role="region" aria-label="Notifications">
+      <div role="region" aria-label="Notifications" className="toast-viewport">
         {toasts.map((toast) => (
-          <div key={toast.id} role="status">
+          <div key={toast.id} role="status" className="toast-item">
             {toast.message}
-            <button aria-label="Dismiss" onClick={() => dismiss(toast.id)}>
+            <button
+              type="button"
+              className="toast-dismiss"
+              aria-label="Dismiss"
+              onClick={() => dismiss(toast.id)}
+            >
               ×
             </button>
           </div>

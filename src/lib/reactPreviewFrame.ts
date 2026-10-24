@@ -172,6 +172,91 @@ export function createPreviewSrcDoc(theme: 'dark' | 'apple-gsos' = 'dark', envKe
       gap: 6px;
       margin-top: 4px;
     }
+
+    /* Toast Queue helpers */
+    .toast-viewport, [role="region"][aria-label="Notifications"] {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1000;
+      pointer-events: none;
+      max-width: 320px;
+    }
+    .toast-item, [role="region"][aria-label="Notifications"] > [role="status"] {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      background: ${cardBg};
+      border: 1px solid ${border};
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, ${isLight ? '0.12' : '0.4'});
+      color: inherit;
+      font-size: 13px;
+      animation: toast-slide-in 0.2s ease-out;
+    }
+    .toast-dismiss, [role="region"][aria-label="Notifications"] button[aria-label="Dismiss"] {
+      background: transparent;
+      border: none;
+      color: inherit;
+      opacity: 0.6;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .toast-dismiss:hover, [role="region"][aria-label="Notifications"] button[aria-label="Dismiss"]:hover {
+      opacity: 1;
+      background: ${isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.1)'};
+    }
+    @keyframes toast-slide-in {
+      from { transform: translateY(8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Breadcrumbs helpers */
+    .breadcrumbs, [aria-label="Breadcrumb"] > ol {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      gap: 6px;
+      font-size: 13px;
+    }
+    .breadcrumb-item, [aria-label="Breadcrumb"] > ol > li {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .breadcrumb-item + .breadcrumb-item::before,
+    [aria-label="Breadcrumb"] > ol > li + li::before {
+      content: '/';
+      opacity: 0.45;
+      font-size: 12px;
+      user-select: none;
+      margin: 0 2px;
+    }
+    .breadcrumb-item a, [aria-label="Breadcrumb"] a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+    .breadcrumb-item a:hover, [aria-label="Breadcrumb"] a:hover {
+      text-decoration: underline;
+    }
+    .breadcrumb-item [aria-current="page"],
+    [aria-label="Breadcrumb"] [aria-current="page"],
+    .breadcrumb-item.active {
+      font-weight: 600;
+      opacity: 0.9;
+    }
   </style>
   <script>${safeBundle}</script>
 </head>

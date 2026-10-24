@@ -20,3 +20,8 @@ Implement `generateBreadcrumbs(pathname, customLabels = {})` and an accessible R
 - Renders a `<nav aria-label="Breadcrumb">` wrapping an `<ol className="breadcrumbs">`.
 - For non-current crumbs, renders `<a href={crumb.path}>{crumb.label}</a>`.
 - For the current crumb, renders `<span aria-current="page">{crumb.label}</span>`.
+
+### Optional Styling (CSS is not graded):
+Preloaded helper classes are available if you wish to use them:
+- `.breadcrumbs`: Flex row container resetting default list styles.
+- `.breadcrumb-item`: Inline-flex crumb item with automatic `/` separator.
