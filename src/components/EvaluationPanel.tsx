@@ -645,7 +645,28 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         {!isFollowUpOpen ? (
           <div style={{ fontSize: '13.5px', color: 'var(--text-primary)', lineHeight: 1.55 }}>
             <MarkdownContent text={result.critique} />
+            {result.rawOutput !== undefined && (
+              <pre
+                data-testid="raw-evaluator-output"
+                style={{
+                  marginTop: '10px',
+                  padding: '10px',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  maxHeight: '240px',
+                  overflowY: 'auto',
+                  backgroundColor: 'rgba(0,0,0,0.25)',
+                  border: '1px solid var(--border-subtle)',
+                }}
+              >
+                {result.rawOutput}
+              </pre>
+            )}
           </div>
+
         ) : (
           <div onClick={(e) => e.stopPropagation()}>
             {/* Unified Scrolling Dialog Transcript */}

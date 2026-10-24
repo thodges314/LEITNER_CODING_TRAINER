@@ -10,6 +10,8 @@ export interface EvaluationResult {
   invariantsMissed: string[];
   critique: string;
   evaluationSource?: 'api' | 'heuristic-mock';
+  /** Set when the reviewer reply could not be parsed as the expected JSON schema. */
+  rawOutput?: string;
   /** Result of running the card's test harness; when present it decides pass/fail. */
   harness?: HarnessReport;
 }
@@ -28,6 +30,48 @@ export interface DraftedTopic {
   testHarness?: string;
   difficulty?: number;
   concept?: string;
+}
+
+const SCHEMA_KEYS = ['passed', 'timeComplexity', 'spaceComplexity', 'invariantsMet', 'invariantsMissed', 'critique'];
+
+/** True for strings that are JSON scaffolding (braces, bare keys, lone colons) rather than real content. */
+function isJsonNoise(s: string): boolean {
+  const t = s.trim().replace(/,$/, '');
+  if (!t) return true;
+  if (/^[\[\]{}:,"]+$/.test(t)) return true;
+  const key = t.replace(/^"|"?\s*:?\s*[\[{]?$/g, '').replace(/"$/, '');
+  return SCHEMA_KEYS.includes(key) && /^"?\w+"?\s*:\s*[\[{]?$/.test(t);
+}
+
+function toStringList(value: unknown): string[] {
+  const arr = Array.isArray(value) ? value : typeof value === 'string' ? [value] : [];
+  return arr
+    .filter((v) => typeof v === 'string' || typeof v === 'number')
+    .map((v) => String(v).trim())
+    .filter((v) => !isJsonNoise(v));
+}
+
+/**
+ * Extracts and validates the reviewer's JSON payload. Returns null when the
+ * text cannot be parsed into an object carrying the expected schema.
+ */
+export function parseEvaluationPayload(raw: string): Record<string, unknown> | null {
+  let text = raw.trim();
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (fence) text = fence[1].trim();
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start !== -1 && end > start) text = text.slice(start, end + 1);
+  try {
+    let parsed: unknown = JSON.parse(text);
+    if (typeof parsed === 'string') parsed = JSON.parse(parsed); // double-encoded payload
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+    const obj = parsed as Record<string, unknown>;
+    if (!SCHEMA_KEYS.some((k) => k in obj)) return null;
+    return obj;
+  } catch {
+    return null;
+  }
 }
 
 export const API_KEY_KEY = 'ai_evaluator_key';
@@ -549,23 +593,37 @@ Evaluate functional correctness and invariants according to your system instruct
       rawJson = data.choices?.[0]?.message?.content || '';
     }
 
-    // Clean JSON markdown blocks if any
-    const cleanedJson = rawJson.replace(/```(?:json)?\s*([\s\S]*?)\s*```/g, '$1').trim();
-    const parsed = JSON.parse(cleanedJson);
+    const parsed = parseEvaluationPayload(rawJson);
+    const harnessFailed = Boolean(harness?.ran && !harness.passed);
+
+    if (!parsed) {
+      // Malformed reply: show it verbatim instead of fragmenting it across lists.
+      const missed: string[] = harnessFailed && harness ? [`Test harness: ${harness.summary}`] : [];
+      return {
+        harness,
+        passed: false,
+        timeComplexity: 'Unknown',
+        spaceComplexity: 'Unknown',
+        invariantsMet: [],
+        invariantsMissed: missed,
+        critique: 'The reviewer response could not be parsed as structured JSON. Raw output is shown below.',
+        evaluationSource: 'api',
+        rawOutput: rawJson.trim() || '(empty response)',
+      };
+    }
 
     // A failing automated harness always wins over the model's opinion.
-    const harnessFailed = Boolean(harness?.ran && !harness.passed);
-    const missed: string[] = Array.isArray(parsed.invariantsMissed) ? parsed.invariantsMissed.map(String) : [];
+    const missed = toStringList(parsed.invariantsMissed);
     if (harnessFailed && harness) missed.unshift(`Test harness: ${harness.summary}`);
 
     return {
       harness,
-      passed: Boolean(parsed.passed) && !harnessFailed,
+      passed: parsed.passed === true && !harnessFailed,
       timeComplexity: String(parsed.timeComplexity || 'O(n)'),
       spaceComplexity: String(parsed.spaceComplexity || 'O(1)'),
-      invariantsMet: Array.isArray(parsed.invariantsMet) ? parsed.invariantsMet.map(String) : [],
+      invariantsMet: toStringList(parsed.invariantsMet),
       invariantsMissed: missed,
-      critique: String(parsed.critique || 'Evaluation complete.'),
+      critique: typeof parsed.critique === 'string' && parsed.critique.trim() ? parsed.critique : 'Evaluation complete.',
       evaluationSource: 'api',
     };
   } catch (err: unknown) {
