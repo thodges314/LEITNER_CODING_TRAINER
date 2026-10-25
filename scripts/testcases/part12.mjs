@@ -13,13 +13,41 @@ export default {
     r('A duration of 0 or Infinity keeps the toast until dismissed', "show('Sticky', { duration: 0 }); show('Forever', { duration: Infinity }); wait 300 ms", "both toasts still shown"),
   ],
   'image-carousel': [
-    r('Shows the first slide with a "1 of N" label', "<Carousel slides={['one','two','three']} />", "only 'one' rendered; group aria-label '1 of 3'; section aria-roledescription='carousel'"),
-    r('Next and Previous move between slides', "Next, Next, then Previous", "'three' ('3 of 3'), then 'two'"),
-    r('With loop the carousel wraps around at both ends', "Previous on slide 1, then Next", "'three', then 'one'"),
-    r('Without loop the buttons are disabled at the ends', "loop={false}: start, then Next twice", "Previous disabled at the start; Next disabled on 'three'"),
-    r('Dots jump to a slide and mark only the current one with aria-current', "click 'Go to slide 3'", "'three'; only that dot has aria-current='true'"),
-    r('Arrow keys on the carousel change slides', "ArrowRight, ArrowRight, ArrowLeft on the section", "'two'; the section has tabIndex 0"),
-    r('autoPlayMs advances the slide automatically', 'autoPlayMs={90}', "the slide changes by itself and keeps advancing (wrapping)"),
+    r(
+      'Shows the first slide with a "1 of N" label',
+      "<Carousel slides={['one', 'two', 'three']} />",
+      '<section aria-roledescription="carousel" aria-label="Gallery" tabIndex={0}><div role="group" aria-roledescription="slide" aria-label="1 of 3">one</div><button>Previous</button><button>Next</button><button aria-label="Go to slide 1" aria-current="true" /><button aria-label="Go to slide 2" /><button aria-label="Go to slide 3" /></section>'
+    ),
+    r(
+      'Next and Previous move between slides',
+      'click Next, Next, then Previous',
+      'Next x2 shows <div aria-label="3 of 3">three</div>; Previous moves back to <div aria-label="2 of 3">two</div>'
+    ),
+    r(
+      'With loop the carousel wraps around at both ends',
+      'click Previous on slide 1, then Next',
+      'Previous wraps around to "three" (3 of 3); Next wraps back to "one" (1 of 3)'
+    ),
+    r(
+      'Without loop the buttons are disabled at the ends',
+      '<Carousel slides={slides} loop={false} />',
+      'at start: Previous is disabled, Next enabled; on slide 3: Next is disabled, Previous enabled'
+    ),
+    r(
+      'Dots jump to a slide and mark only the current one with aria-current',
+      'click dot with aria-label="Go to slide 3"',
+      'jumps directly to "three"; only dot 3 has aria-current="true"'
+    ),
+    r(
+      'Arrow keys on the carousel change slides',
+      'press ArrowRight, ArrowRight, ArrowLeft on section',
+      'section tabIndex={0} receives keydown; navigates 1 -> 2 -> 3 -> 2 ("two")'
+    ),
+    r(
+      'autoPlayMs advances the slide automatically',
+      '<Carousel slides={slides} autoPlayMs={90} />',
+      'timer advances slides automatically (e.g. "one" -> "two" -> "three") and wraps around'
+    ),
   ],
   'optimistic-like-button': [
     r('Renders "Like (count)" with aria-pressed false', '<LikeButton initialCount={4} />', "'Like (4)'; aria-pressed='false'"),

@@ -1,12 +1,14 @@
+interface CarouselProps {
+  slides: string[];
+  loop?: boolean;
+  autoPlayMs?: number;
+}
+
 function Carousel({
   slides,
   loop = true,
   autoPlayMs,
-}: {
-  slides: string[];
-  loop?: boolean;
-  autoPlayMs?: number;
-}): JSX.Element {
+}: CarouselProps): JSX.Element {
   const [index, setIndex] = useState<number>(0);
   const last = slides.length - 1;
 

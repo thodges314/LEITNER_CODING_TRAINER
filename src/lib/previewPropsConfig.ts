@@ -240,9 +240,18 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'position', type: 'enum', defaultValue: 'bottom-right', options: ['bottom-right', 'bottom-left', 'top-right', 'top-left'], description: 'Toast stack position on viewport' },
   ],
   'image-carousel': [
+    {
+      name: 'slides',
+      type: 'json',
+      defaultValue: [
+        'Slide 1: Welcome to Leitner',
+        'Slide 2: Spaced Repetition',
+        'Slide 3: Cold-Start Mastery',
+      ],
+      description: 'Array of slide text contents',
+    },
     { name: 'loop', type: 'boolean', defaultValue: true, description: 'Wrap around back to first slide after last' },
-    { name: 'autoPlay', type: 'boolean', defaultValue: false, description: 'Automatically advance slides on timer' },
-    { name: 'interval', type: 'number', defaultValue: 3000, min: 500, max: 10000, step: 500, description: 'Auto-play delay in milliseconds' },
+    { name: 'autoPlayMs', type: 'number', defaultValue: 3000, min: 500, max: 10000, step: 500, placeholder: 'ms (optional)', description: 'Auto-play delay in milliseconds (clear to disable)' },
   ],
   'breadcrumbs-router': [
     {
