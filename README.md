@@ -35,6 +35,9 @@ npm run build      # type-check + production build into dist/
   - `Cmd + Shift + Enter` / `Ctrl + Shift + Enter`: Submit final answer
   - `Tab`: Indent with 2 spaces
   - `Cmd + /` / `Ctrl + /`: Toggle line comments
+- **Live React Component Preview & Props Control Panel**: For cards authoring React components, a live sandboxed preview pane (`sandbox="allow-scripts"`) renders your component in real-time as you code.
+  - Features an interactive **Props Control Panel** supporting dynamic live adjustment of props (`string`, `number`, `boolean`, `enum`, `function`, and `json`).
+  - Supports compound component prop grouping, live callback event logging, infinite loop watchdog protection, and an external pop-out window with two-way sync.
 - **Grading** (`src/lib/runner.ts`): on submit the card's test harness is run headlessly against your code.
   A card passes only if the harness logs at least one `PASS` and no `FAIL`/errors. An AI model (optional) adds
   reviews the approach and can mark a passing run as needing revision (the result panel then says so), but it can
@@ -79,7 +82,7 @@ The deck includes **277 cards** across 9 topics (224 default + 53 in the optiona
   the page's real DOM in the browser and jsdom in tests, with a mock `IntersectionObserver` and a deterministic `fetch`.
   Built-in prototypes patched by a solution (polyfill cards) are restored after each run.
 
-The test suite (`1,764 Vitest tests` + `603 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
+The test suite (`1,766 Vitest tests` + `603 real Chromium Playwright tests`) runs every card's harness against its reference solution (must pass), checks that every documented case is asserted under the same label, and checks that an empty solution does NOT pass.
 
 ## Deploy
 

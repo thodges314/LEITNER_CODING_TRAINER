@@ -122,6 +122,20 @@ Located in [runner.ts](src/lib/runner.ts):
    - Ambient declarations in `SANDBOX_GLOBALS` (`src/utils/typeChecker.ts`) include `ListNode<T>` and `TreeNode<T>` for common algorithm data structures.
    - When inspecting the suggested solution in `EvaluationPanel`, the trainer renders the solution matching the learner's active mode with dynamic language badges (`TypeScript` blue badge vs `JavaScript` amber badge).
 
+### 4.1 React Component Live Preview & Props Control Panel
+
+Located in `src/components/practice/ReactPreview.tsx`, `PropsControlPanel.tsx`, and `src/hooks/usePreviewProps.ts`:
+
+- **Isolated Preview Sandbox**: Runs user component implementations inside a dedicated sandboxed iframe (`sandbox="allow-scripts"`). The React runtime bundle (`reactPreviewBundle.ts`) is loaded on-demand dynamically when a previewable card mounts.
+- **Dedicated Props Control Panel**:
+  - Declaratively configured in `src/lib/previewPropsConfig.ts` with type-safe prop editors: `string`, `number`, `boolean`, `enum`, `function`, and `json`.
+  - Supports compound component prop grouping (`group` key) for multi-component cards (e.g. `a11y-form-field`).
+  - Real-time two-way synchronization between the host panel and the preview iframe via structured `postMessage` protocol (`usePreviewProps`).
+  - Automatically un-mounts and mounts uncontrolled components with `key={defaultValue}` so changing default uncontrolled values in the panel immediately triggers a state reset.
+- **Event Logger**: Captures callback payloads and mock handlers (e.g. `onChange`, `onDone`, `onClick`), streaming arguments into an interactive event log under the preview.
+- **Loop & Render Watchdog**: Protected against infinite synchronous loops via AST loop instrumentation and rapid re-render storms (>100 commits/sec) via React profiling watchdog.
+- **Pop-Out Window Portal**: Supports detaching the live preview into a separate external browser window with live two-way prop synchronization and seamless dock-back.
+
 ---
 
 ## 5. AI Evaluator & Multi-Key Vault
@@ -154,7 +168,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (1,764 unit tests)**: Tests verifying:
+- **Vitest Suite (1,766 unit tests)**: Tests verifying:
   - Reference solutions pass for all 277 cards across 9 topics (224 default + 53 in the optional `algorithms-advanced` pack) across 1,964 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.

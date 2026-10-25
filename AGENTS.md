@@ -47,6 +47,22 @@ Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/
   - For heading or section tags (`<h1>`..`<h6>`, `<nav>`), type refs as `HTMLElement` (avoid `HTMLHeadingElement` which is not in `SANDBOX_GLOBALS`).
   - For inline React styles, use `Record<string, string | number>` instead of `React.CSSProperties`.
 
+## Component and Live Preview Conventions
+- **Cold-Start Recall vs Styling**:
+  - Exercises are strictly for cold retrieval of JavaScript/TypeScript, React architecture, component patterns, state management, and accessibility contracts.
+  - They are NOT styling drills. Canonical solutions (`.ref.js` and `.ref.ts`) must remain direct, functional, and structurally minimal without extraneous CSS class names or decorative styles.
+  - Custom CSS classes are never required or graded unless spatial layout (e.g. Kanban columns, carousel slide container) or visual active state (e.g. filled star ratings) is strictly necessary to decode the UI.
+  - When optional preview CSS classes are provided, always document them in the prompt under:
+    ```markdown
+    #### Optional Styling (CSS is not graded)
+    Optional helper classes are available in the preview environment:
+    - `.class-name`: short description.
+    You may use these classes, custom styles, or your own class names.
+    ```
+- **Live Preview Props Panel & Uncontrolled Components**:
+  - The live preview sandbox features a dedicated Props Control Panel (`PropsControlPanel`, `previewPropsConfig.ts`, `usePreviewProps`) supporting `string`, `number`, `boolean`, `enum`, `function`, and `json` prop types, component grouping, and postMessage synchronization.
+  - For uncontrolled React components (components that initialize local state from a prop via `useState(defaultValue)` upon mount), preview wrappers must pass `key={defaultValue}` so changing the default prop in the Props panel triggers a clean re-mount and state re-initialization.
+
 ## Keep the `.md` files current (same commit as the change)
 Docs drift quickly, so update them whenever you change what they describe. Don't wait to be reminded.
 - **Counts** (cards, cases, Vitest tests, Playwright tests): `README.md`, `DELEGATION.md` "Current state", `ARCHITECTURE_AND_DETAILS.md`, `ARCHITECTURE_AND_ROADMAP.md`. Get the real numbers from `npm test` and `npx playwright test --list`; don't guess.
