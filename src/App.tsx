@@ -3,6 +3,7 @@ import {
   loadDeckState,
   saveDeckState,
   commitCardReview,
+  overrideCommittedReview,
   getNextCard,
   unlockSingleCard,
   lockSingleCard,
@@ -138,16 +139,21 @@ export function App() {
     );
   })();
 
-  const handleCommitReview = (passed: boolean) => {
+  const [cardSnapshotBeforeReview, setCardSnapshotBeforeReview] = useState<TopicItem | null>(null);
+  const [practiceSessionKey, setPracticeSessionKey] = useState(0);
+
+  const handleRecordReview = (passed: boolean) => {
     if (!currentCard) return;
     clearDraft(currentCard.id);
+    setSelectedCardId(currentCard.id);
+    setCardSnapshotBeforeReview(currentCard);
 
     const { shouldShowAdvisory } = recordProblemCompletion();
     if (shouldShowAdvisory) {
       setIsBackupAdvisoryOpen(true);
     }
 
-    const { nextState, newlyUnlockedCount, updatedCard } = commitCardReview(
+    const { nextState, newlyUnlockedCount } = commitCardReview(
       deckState,
       currentCard.id,
       passed,
@@ -159,6 +165,50 @@ export function App() {
       setUnlockToast(`🎉 Staged Milestone Achieved! ${newlyUnlockedCount} locked cards have been unlocked to your active rotation.`);
       setTimeout(() => setUnlockToast(null), 5000);
     }
+  };
+
+  const handleOverrideReview = (passed: boolean) => {
+    const cardToUse = cardSnapshotBeforeReview || currentCard;
+    if (!cardToUse) return;
+    const nextState = overrideCommittedReview(
+      deckState,
+      cardToUse,
+      passed,
+      algorithm
+    );
+    setDeckState(nextState);
+  };
+
+  const handleCommitReview = (passed: boolean) => {
+    if (!currentCard) return;
+    clearDraft(currentCard.id);
+
+    let currentState = deckState;
+    let trackToAdvance = currentCard.track;
+
+    // If review was not already recorded upon submission (e.g. tests or direct call), record it now
+    if (!cardSnapshotBeforeReview) {
+      const { shouldShowAdvisory } = recordProblemCompletion();
+      if (shouldShowAdvisory) {
+        setIsBackupAdvisoryOpen(true);
+      }
+      const { nextState, newlyUnlockedCount, updatedCard } = commitCardReview(
+        deckState,
+        currentCard.id,
+        passed,
+        algorithm
+      );
+      currentState = nextState;
+      trackToAdvance = updatedCard.track;
+      setDeckState(nextState);
+      if (newlyUnlockedCount > 0) {
+        setUnlockToast(`🎉 Staged Milestone Achieved! ${newlyUnlockedCount} locked cards have been unlocked to your active rotation.`);
+        setTimeout(() => setUnlockToast(null), 5000);
+      }
+    }
+
+    setCardSnapshotBeforeReview(null);
+    setPracticeSessionKey((k) => k + 1);
 
     // If failed, enter immediate reinforcement drill for this card (practice-only, zero stat impact)
     if (!passed) {
@@ -171,11 +221,11 @@ export function App() {
     // Cold-start review passed: clear any reinforcement drill state and advance
     setReinforcingCardId(null);
     const next = getNextCard(
-      nextState.topics,
-      nextState.totalCompletedReviews,
-      updatedCard.track,
+      currentState.topics,
+      currentState.totalCompletedReviews,
+      trackToAdvance,
       currentCard.id,
-      scheduleFilter(deckState),
+      scheduleFilter(currentState),
       algorithm
     );
     if (next) clearDraft(next.id);
@@ -186,6 +236,8 @@ export function App() {
     if (!currentCard) return;
     clearDraft(currentCard.id);
 
+    setCardSnapshotBeforeReview(null);
+    setPracticeSessionKey((k) => k + 1);
     setReinforcingCardId(null);
     const next = getNextCard(
       deckState.topics,
@@ -202,6 +254,8 @@ export function App() {
   const handleSkipCard = () => {
     if (!currentCard) return;
     clearDraft(currentCard.id);
+    setCardSnapshotBeforeReview(null);
+    setPracticeSessionKey((k) => k + 1);
     setReinforcingCardId(null);
     const next = getNextCard(
       deckState.topics,
@@ -240,6 +294,8 @@ export function App() {
   };
 
   const handleSelectCardToPractice = (card: TopicItem) => {
+    setCardSnapshotBeforeReview(null);
+    setPracticeSessionKey((k) => k + 1);
     setReinforcingCardId(null);
     clearDraft(card.id);
     // If card is locked, unlock it first
@@ -464,13 +520,15 @@ export function App() {
       <main className="app-main">
         {activeView === 'practice' ? (
           <PracticeArena
-            key={`${currentCard?.id || 'none'}-${deckState.totalCompletedReviews}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
+            key={`${currentCard?.id || 'none'}-${practiceSessionKey}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
             currentCard={currentCard}
             totalCompletedReviews={deckState.totalCompletedReviews}
             activeDeckSize={activeCount}
             algorithm={algorithm}
             theme={theme}
             onCommitReview={handleCommitReview}
+            onRecordReview={handleRecordReview}
+            onOverrideReview={handleOverrideReview}
             onSkipCard={handleSkipCard}
             onOpenDeckView={() => setActiveView('dashboard')}
             onOpenSettings={(section) => handleOpenSettings(section || 'ai')}

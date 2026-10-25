@@ -1,7 +1,7 @@
 import seedTopicsData from '../data/topics.json';
 import { extractHarnessContracts } from './harnessContracts';
 import { clearDraft } from './drafts';
-import { recordDailyStat, sanitizeDailyStats } from './dailyStats';
+import { recordDailyStat, updateDailyStatVerdict, sanitizeDailyStats } from './dailyStats';
 import type { DailyStats } from './dailyStats';
 
 export type TrackType =
@@ -861,6 +861,77 @@ export function commitCardReview(
     newlyUnlockedCount: newlyUnlocked,
     updatedCard: updatedCard || state.topics[0],
   };
+}
+
+/**
+ * Overrides the verdict of the review that was just committed for cardBeforeReview.
+ * Updates box, streak, nextEligibleTrial, recentReviews entry, and dailyStats
+ * without incrementing totalCompletedReviews again.
+ */
+export function overrideCommittedReview(
+  state: LeitnerDeckState,
+  cardBeforeReview: TopicItem,
+  passed: boolean,
+  algorithmOverride?: SpacedAlgorithm
+): LeitnerDeckState {
+  const algo = algorithmOverride ?? getSchedulingAlgorithm(state);
+  const activeDeckSize = state.topics.filter((t) => t.status === 'active').length;
+  const currentTotal = state.totalCompletedReviews;
+
+  let nextBox: number;
+  let nextStreak: number;
+  let nextEligibleTrial: number;
+
+  if (passed) {
+    nextBox = algo === 'graduated-interval' ? cardBeforeReview.box + 1 : Math.min(5, cardBeforeReview.box + 1);
+    nextStreak = cardBeforeReview.streak + 1;
+    nextEligibleTrial = currentTotal + intervalForBox(nextBox, algo, activeDeckSize);
+  } else {
+    nextBox = algo === 'graduated-interval' ? Math.max(1, Math.floor(cardBeforeReview.box / 2)) : 1;
+    nextStreak = 0;
+    nextEligibleTrial = currentTotal + intervalForBox(nextBox, algo, activeDeckSize);
+  }
+
+  const updatedTopics = state.topics.map((item) => {
+    if (item.id !== cardBeforeReview.id) return item;
+    return {
+      ...item,
+      box: nextBox,
+      streak: nextStreak,
+      nextEligibleTrial,
+      status: 'active' as const,
+      attempted: true,
+    };
+  });
+
+  const { updatedTopics: finalTopics } = checkStagedUnlocks(
+    updatedTopics,
+    state.unlockedStageCount ?? 0,
+    (card) => cardMatchesFilter(card, scheduleFilter(state))
+  );
+
+  let reviewTimestamp = Date.now();
+  const updatedRecent = (state.recentReviews ?? []).map((entry, idx, arr) => {
+    if (idx === arr.length - 1 && entry.topicId === cardBeforeReview.id) {
+      if (entry.timestamp) reviewTimestamp = entry.timestamp;
+      return {
+        ...entry,
+        passed,
+        box: nextBox,
+      };
+    }
+    return entry;
+  });
+
+  const nextState: LeitnerDeckState = {
+    ...state,
+    topics: finalTopics,
+    recentReviews: updatedRecent,
+    dailyStats: updateDailyStatVerdict(state.dailyStats, reviewTimestamp, passed),
+  };
+
+  saveDeckState(nextState);
+  return nextState;
 }
 
 /**

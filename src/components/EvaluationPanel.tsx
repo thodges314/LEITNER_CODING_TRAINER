@@ -90,6 +90,7 @@ interface EvaluationPanelProps {
   activeDeckSize?: number;
   algorithm?: SpacedAlgorithm;
   onCommit: (passed: boolean) => void;
+  onOverrideVerdict?: (passed: boolean) => void;
   onRetry: () => void;
   showSolution?: boolean;
   onToggleShowSolution?: () => void;
@@ -108,6 +109,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   activeDeckSize,
   algorithm = 'leitner',
   onCommit,
+  onOverrideVerdict,
   onRetry,
   showSolution,
   onToggleShowSolution,
@@ -123,6 +125,13 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   const [effectiveVerdict, setEffectiveVerdict] = useState<boolean>(result.passed);
   const verdict = summarizeVerdict(result);
   const isOverridden = effectiveVerdict !== result.passed;
+  const [overrideNotice, setOverrideNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!overrideNotice) return undefined;
+    const timer = setTimeout(() => setOverrideNotice(null), 2500);
+    return () => clearTimeout(timer);
+  }, [overrideNotice]);
 
   // Canonical solution reveal state
   const [internalShowSolution, setInternalShowSolution] = useState(false);
@@ -459,36 +468,64 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             </span>
           </div>
 
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              cursor: 'pointer',
-              userSelect: 'none',
-              fontSize: '13px',
-              fontWeight: 500,
-            }}
-          >
-            <input
-              type="checkbox"
-              checked={effectiveVerdict !== result.passed}
-              onChange={(e) => {
-                setEffectiveVerdict(e.target.checked ? !result.passed : result.passed);
-              }}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {overrideNotice && (
+              <span
+                role="status"
+                data-testid="override-saved-notice"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: isLight ? '#15803D' : '#34d399',
+                  backgroundColor: isLight ? 'rgba(34, 197, 94, 0.12)' : 'rgba(16, 185, 129, 0.18)',
+                  border: isLight ? '1px solid rgba(34, 197, 94, 0.4)' : '1px solid rgba(16, 185, 129, 0.45)',
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  animation: 'fadeIn 0.15s ease',
+                }}
+              >
+                <Check size={13} strokeWidth={2.5} />
+                <span>{overrideNotice}</span>
+              </span>
+            )}
+
+            <label
               style={{
-                width: '16px',
-                height: '16px',
-                accentColor: 'var(--accent-amber)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
                 cursor: 'pointer',
+                userSelect: 'none',
+                fontSize: '13px',
+                fontWeight: 500,
               }}
-            />
-            <span style={{ color: 'var(--text-primary)' }}>
-              {result.passed
-                ? 'Override this verdict (Mark as Failed)'
-                : 'Override this verdict (Mark as Passed)'}
-            </span>
-          </label>
+            >
+              <input
+                type="checkbox"
+                checked={effectiveVerdict !== result.passed}
+                onChange={(e) => {
+                  const next = e.target.checked ? !result.passed : result.passed;
+                  setEffectiveVerdict(next);
+                  onOverrideVerdict?.(next);
+                  setOverrideNotice(next ? 'Saved: Marked as Passed' : 'Saved: Marked as Failed');
+                }}
+                style={{
+                  width: '16px',
+                  height: '16px',
+                  accentColor: 'var(--accent-amber)',
+                  cursor: 'pointer',
+                }}
+              />
+              <span style={{ color: 'var(--text-primary)' }}>
+                {result.passed
+                  ? 'Override this verdict (Mark as Failed)'
+                  : 'Override this verdict (Mark as Passed)'}
+              </span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -1107,29 +1144,22 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-            <button
-              type="button"
-              className={effectiveVerdict ? 'btn btn-success' : 'btn btn-primary'}
-              onClick={() => onCommit(effectiveVerdict)}
-              style={{ fontSize: '13.5px', padding: '10px 20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
-            >
-              {effectiveVerdict ? (
-                <>
-                  <Check size={16} /> Continue to Next Card
-                </>
-              ) : (
-                <>
-                  <ArrowRight size={16} /> Practice the Pattern
-                </>
-              )}
-            </button>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)', maxWidth: '300px', textAlign: 'right' }}>
-              {effectiveVerdict
-                ? 'Your result is recorded when you continue.'
-                : 'Your attempt is recorded. Next you retype the solution as a short drill (no score impact).'}
-            </span>
-          </div>
+          <button
+            type="button"
+            className={effectiveVerdict ? 'btn btn-success' : 'btn btn-primary'}
+            onClick={() => onCommit(effectiveVerdict)}
+            style={{ fontSize: '13.5px', padding: '10px 20px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            {effectiveVerdict ? (
+              <>
+                <Check size={16} /> Continue to Next Card
+              </>
+            ) : (
+              <>
+                <ArrowRight size={16} /> Practice the Pattern
+              </>
+            )}
+          </button>
         </div>
       )}
     </div>

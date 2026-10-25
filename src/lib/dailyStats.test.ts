@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DAILY_STATS_KEEP_DAYS, lastDays, localDateKey, recordDailyStat, sanitizeDailyStats, summarizeDays } from './dailyStats';
+import { DAILY_STATS_KEEP_DAYS, lastDays, localDateKey, recordDailyStat, updateDailyStatVerdict, sanitizeDailyStats, summarizeDays } from './dailyStats';
 
 const at = (y: number, m: number, d: number, h = 12) => new Date(y, m - 1, d, h).getTime();
 
@@ -32,6 +32,18 @@ describe('recordDailyStat', () => {
     const s = recordDailyStat({ [old]: { reviews: 1, passes: 1 }, [edge]: { reviews: 2, passes: 2 } }, now, true);
     expect(Object.keys(s)).toContain(edge);
     expect(Object.keys(s)).not.toContain(old);
+  });
+});
+
+describe('updateDailyStatVerdict', () => {
+  it('updates pass count when a verdict is overridden without changing reviews count', () => {
+    const time = at(2026, 10, 18, 12);
+    let s = recordDailyStat(undefined, time, false);
+    expect(s).toEqual({ '2026-10-18': { reviews: 1, passes: 0 } });
+    s = updateDailyStatVerdict(s, time, true);
+    expect(s).toEqual({ '2026-10-18': { reviews: 1, passes: 1 } });
+    s = updateDailyStatVerdict(s, time, false);
+    expect(s).toEqual({ '2026-10-18': { reviews: 1, passes: 0 } });
   });
 });
 

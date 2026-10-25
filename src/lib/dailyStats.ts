@@ -33,6 +33,18 @@ export function recordDailyStat(stats: DailyStats | undefined, timestamp: number
   return next;
 }
 
+/** Updates the pass count of the day of `timestamp` when a review verdict is overridden. */
+export function updateDailyStatVerdict(stats: DailyStats | undefined, timestamp: number, newPassed: boolean): DailyStats {
+  const key = localDateKey(timestamp);
+  const next: DailyStats = { ...(stats ?? {}) };
+  const today = next[key];
+  if (today) {
+    const nextPasses = Math.max(0, Math.min(today.reviews, today.passes + (newPassed ? 1 : -1)));
+    next[key] = { ...today, passes: nextPasses };
+  }
+  return next;
+}
+
 /** Validates a stored or imported log: bad keys and impossible counts are dropped. Returns undefined when nothing is left. */
 export function sanitizeDailyStats(raw: unknown): DailyStats | undefined {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;

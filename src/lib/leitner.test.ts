@@ -7,6 +7,7 @@ import {
   getGraduatedTierInterval,
   checkStagedUnlocks,
   commitCardReview,
+  overrideCommittedReview,
   deleteTopicFromDeck,
   deactivateTopic,
   reactivateTopic,
@@ -68,6 +69,37 @@ describe('commitCardReview', () => {
   it('records the reviewed track', () => {
     const { nextState } = commitCardReview(deck([card({ id: 'a', track: 'react' })]), 'a', true);
     expect(nextState.lastReviewedTrack).toBe('react');
+  });
+});
+
+describe('overrideCommittedReview', () => {
+  it('overrides an initial failure to a pass without incrementing totalCompletedReviews', () => {
+    const initialCard = card({ id: 'a', box: 2, streak: 1 });
+    const initialDeck = deck([initialCard], { totalCompletedReviews: 5 });
+
+    // Review committed as failure
+    const { nextState } = commitCardReview(initialDeck, 'a', false);
+    expect(nextState.totalCompletedReviews).toBe(6);
+    const failedCard = nextState.topics.find((t) => t.id === 'a');
+    expect(failedCard?.box).toBe(1);
+    expect(failedCard?.streak).toBe(0);
+    expect(nextState.recentReviews?.[0].passed).toBe(false);
+
+    // Override to pass
+    const overridden = overrideCommittedReview(nextState, initialCard, true);
+    expect(overridden.totalCompletedReviews).toBe(6); // Total should not increment again
+    const passedCard = overridden.topics.find((t) => t.id === 'a');
+    expect(passedCard?.box).toBe(3);
+    expect(passedCard?.streak).toBe(2);
+    expect(overridden.recentReviews?.[0].passed).toBe(true);
+
+    // Revert back to fail
+    const reverted = overrideCommittedReview(overridden, initialCard, false);
+    expect(reverted.totalCompletedReviews).toBe(6);
+    const revertedCard = reverted.topics.find((t) => t.id === 'a');
+    expect(revertedCard?.box).toBe(1);
+    expect(revertedCard?.streak).toBe(0);
+    expect(reverted.recentReviews?.[0].passed).toBe(false);
   });
 });
 

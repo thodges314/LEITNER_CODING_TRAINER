@@ -43,6 +43,8 @@ interface PracticeArenaProps {
   activeDeckSize?: number;
   algorithm?: SpacedAlgorithm;
   onCommitReview: (passed: boolean) => void;
+  onRecordReview?: (passed: boolean) => void;
+  onOverrideReview?: (passed: boolean) => void;
   onSkipCard: () => void;
   onOpenDeckView: () => void;
   onOpenSettings?: (section?: 'ai') => void;
@@ -57,6 +59,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   activeDeckSize,
   algorithm = 'leitner',
   onCommitReview,
+  onRecordReview,
+  onOverrideReview,
   onSkipCard,
   onOpenDeckView,
   onOpenSettings,
@@ -64,6 +68,15 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   onFinishReinforcement,
   theme = 'dark',
 }) => {
+  const [activeCardId, setActiveCardId] = useState(() => currentCard?.id);
+  const [cardSnapshot, setCardSnapshot] = useState<TopicItem | null>(() => currentCard);
+  const [reviewsSnapshot, setReviewsSnapshot] = useState(() => totalCompletedReviews);
+
+  if (currentCard && currentCard.id !== activeCardId) {
+    setActiveCardId(currentCard.id);
+    setCardSnapshot(currentCard);
+    setReviewsSnapshot(totalCompletedReviews);
+  }
   const [code, setCode] = useState(() =>
     isReinforcement ? getStarterSnippet(currentCard) : (loadDraft(currentCard?.id) ?? getStarterSnippet(currentCard))
   );
@@ -525,6 +538,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       setEvalResult(res);
       setShowSolution(!res.passed);
       setIsTimerRunning(false);
+      if (!isReinforcement) {
+        onRecordReview?.(res.passed);
+      }
     } catch (err) {
       console.error('Evaluation error:', err);
     } finally {
@@ -707,12 +723,17 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       {evalResult && (
         <EvaluationPanel
           theme={theme}
-          topic={currentCard}
+          topic={cardSnapshot || currentCard}
           submittedCode={code}
           result={evalResult}
-          totalCompletedReviews={totalCompletedReviews}
+          totalCompletedReviews={reviewsSnapshot}
           activeDeckSize={activeDeckSize}
           algorithm={algorithm}
+          onOverrideVerdict={(passed) => {
+            if (!isReinforcement) {
+              onOverrideReview?.(passed);
+            }
+          }}
           onCommit={(passed) => {
             clearDraft(currentCard.id);
             if (isReinforcement) {
@@ -721,7 +742,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
               onCommitReview(passed);
               setEvalResult(null);
               setShowSolution(false);
-              setCode('');
               setOutputLogs([]);
               setExecutionStatus('idle');
               setIsPreviewLive(false);

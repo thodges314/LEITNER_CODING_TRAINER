@@ -763,6 +763,7 @@
   border: 1px solid var(--border-subtle);
   flex-wrap: wrap;
   gap: 8px;
+  margin-bottom: 12px;
 }
 
 .arena-mode-toggle-group {
@@ -827,7 +828,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  padding-top: 4px;
+  padding-top: 0;
 }
 
 .arena-controls-btn-skip {

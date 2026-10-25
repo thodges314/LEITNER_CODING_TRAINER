@@ -227,12 +227,6 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
               </button>
             </div>
           </div>
-
-          <p className="arena-submit-help" data-testid="submit-help">
-            {isReinforcement
-              ? 'Practice drill: nothing here changes your score. Retype the solution, then check it.'
-              : 'Run Code / Test checks your code without scoring it. Submit Final Answer is your scored attempt.'}
-          </p>
         </>
       )}
     </>

@@ -37,12 +37,11 @@ async function openCardWithDraft(page: Page, draft: string) {
 const submit = (page: Page) => page.getByRole('button', { name: /Submit Final Answer|Check My Practice/ });
 
 test.describe('answer flow', () => {
-  test('while answering: Run is free, Submit is the final answer, and the page says so', async ({ page }) => {
+  test('while answering: Run is free, Submit is the final answer', async ({ page }) => {
     await openCardWithDraft(page, reference);
     await expect(page.getByRole('button', { name: /Submit Final Answer/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /Run Code \/ Test/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /Skip Card/ })).toBeVisible();
-    await expect(page.getByTestId('submit-help')).toContainText(/without scoring/i);
     await expect(page.getByRole('button', { name: /Edit & Retest|Commit/ })).toHaveCount(0);
   });
 
@@ -57,6 +56,35 @@ test.describe('answer flow', () => {
     await expect(page.getByRole('button', { name: /Submit Final Answer|Check My Practice|Run Code \/ Test|Skip Card/ })).toHaveCount(0);
     await expect(page.getByText('Your Submitted Answer (locked)')).toBeVisible();
     await expect(page.getByRole('button', { name: /Edit & Retest|Practice Again|Commit/ })).toHaveCount(0);
+  });
+
+  test('submitting registers result immediately in localStorage and override checkbox updates it immediately', async ({ page }) => {
+    await openCardWithDraft(page, reference);
+    await submit(page).click();
+    await expect(page.getByTestId('verdict-summary')).toContainText('Tests passed', { timeout: 15000 });
+
+    // Verify localStorage has saved review immediately without clicking through
+    const savedDeckState = await page.evaluate(() => {
+      const raw = localStorage.getItem('leitner_coding_deck');
+      return raw ? JSON.parse(raw) : null;
+    });
+    expect(savedDeckState.totalCompletedReviews).toBeGreaterThan(0);
+    const lastReview = savedDeckState.recentReviews?.[savedDeckState.recentReviews.length - 1];
+    expect(lastReview?.passed).toBe(true);
+
+    // Toggle override checkbox (Mark as Failed)
+    const overrideCheckbox = page.getByRole('checkbox');
+    await overrideCheckbox.check();
+    await expect(page.getByTestId('override-saved-notice')).toBeVisible();
+    await expect(page.getByTestId('override-saved-notice')).toContainText('Saved: Marked as Failed');
+
+    // Verify localStorage was updated immediately
+    const overriddenDeckState = await page.evaluate(() => {
+      const raw = localStorage.getItem('leitner_coding_deck');
+      return raw ? JSON.parse(raw) : null;
+    });
+    const overriddenReview = overriddenDeckState.recentReviews?.[overriddenDeckState.recentReviews.length - 1];
+    expect(overriddenReview?.passed).toBe(false);
   });
 
   test('a wrong answer: one next step, failed checks named, the solution shown once and not pasted into the critique', async ({ page }) => {
@@ -81,7 +109,6 @@ test.describe('answer flow', () => {
 
     // now in the unscored drill
     await expect(page.getByRole('button', { name: /Check My Practice/ })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByTestId('submit-help')).toContainText(/nothing here changes your score/i);
 
     // miss it again: two choices only
     await page.locator('.cm-content').click();
