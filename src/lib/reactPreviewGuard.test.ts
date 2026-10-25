@@ -117,6 +117,7 @@ describe('React preview guard: every previewCode mounts with the reference solut
         forwardRef: React.forwardRef,
         Suspense: React.Suspense,
         IntersectionObserver: globalThis.IntersectionObserver,
+        usePreviewProps: <T extends Record<string, unknown>>(defaults: T): T => defaults,
         log: mockLog,
         exports: {},
         require: (mod: string) => {

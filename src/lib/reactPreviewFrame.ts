@@ -375,6 +375,34 @@ ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrima
     window.Suspense = React.Suspense;
     window.createPortal = ReactDOM.createPortal;
 
+    // Interactive Preview Props runtime
+    window.__previewProps = {};
+    window.__previewPropListeners = new Set();
+    window.__setPreviewProps = function(newProps) {
+      window.__previewProps = Object.assign({}, window.__previewProps, newProps);
+      window.__previewPropListeners.forEach(function(fn) {
+        try { fn(window.__previewProps); } catch(_) {}
+      });
+    };
+
+    window.usePreviewProps = function(defaults) {
+      const [props, setProps] = React.useState(function() {
+        return Object.assign({}, defaults, window.__previewProps);
+      });
+      React.useEffect(function() {
+        function listener(p) {
+          setProps(function(prev) {
+            return Object.assign({}, defaults, prev, p);
+          });
+        }
+        window.__previewPropListeners.add(listener);
+        return function() {
+          window.__previewPropListeners.delete(listener);
+        };
+      }, []);
+      return props;
+    };
+
     // Safe mock shims for $dom, $test, and mount so that any test harness code
     // evaluated inside the preview frame runs safely without throwing ReferenceErrors.
     window.mount = function() {};
@@ -579,7 +607,19 @@ ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrima
 
     window.addEventListener('message', function(event) {
       const data = event.data;
-      if (!data || data.type !== 'leitner-preview:render') return;
+      if (!data || typeof data !== 'object') return;
+
+      if (data.type === 'leitner-preview:set-props') {
+        if (data.props) {
+          window.__setPreviewProps(data.props);
+        }
+        return;
+      }
+
+      if (data.type !== 'leitner-preview:render') return;
+      if (data.props) {
+        window.__setPreviewProps(data.props);
+      }
       const code = data.code;
       const renderId = data.renderId;
       activeRenderId = renderId;

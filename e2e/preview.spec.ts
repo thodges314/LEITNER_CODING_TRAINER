@@ -249,14 +249,79 @@ test.describe('React preview window', () => {
     await expect(bar).toBeVisible({ timeout: 5000 });
     await expect(bar).toHaveAttribute('aria-valuenow', '45');
 
-    // Click '+10%' button inside iframe demo
-    const plusBtn = frame.getByRole('button', { name: '+10%' });
-    await plusBtn.click();
+    // Use the dedicated Props Control Panel below preview window to update value
+    const propsPanel = previewWindow.locator('[data-testid="react-preview-props-panel"]');
+    await expect(propsPanel).toBeVisible();
+
+    const valueInput = previewWindow.locator('[data-testid="prop-input-value"]');
+    await expect(valueInput).toHaveValue('45');
+    await valueInput.fill('55');
     await expect(bar).toHaveAttribute('aria-valuenow', '55');
 
     // Event log should record the change
     const eventLog = previewWindow.getByText(/progress/);
     await expect(eventLog.first()).toBeVisible();
+  });
+
+  test('props control panel: displays slots for props, edits numbers, strings, tri-state booleans, dropdowns, and resets', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'progress-bar');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'progress-bar', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    const propsPanel = previewWindow.locator('[data-testid="react-preview-props-panel"]');
+    await expect(propsPanel).toBeVisible();
+
+    // Verify slots are rendered for defined props
+    await expect(previewWindow.locator('[data-testid="props-slot-value"]')).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="props-slot-max"]')).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="props-slot-label"]')).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="props-slot-indeterminate"]')).toBeVisible();
+
+    // Verify autofilled suggested defaults
+    const valueInput = previewWindow.locator('[data-testid="prop-input-value"]');
+    await expect(valueInput).toHaveValue('45');
+
+    const maxInput = previewWindow.locator('[data-testid="prop-input-max"]');
+    await expect(maxInput).toHaveValue('100');
+
+    const labelInput = previewWindow.locator('[data-testid="prop-input-label"]');
+    await expect(labelInput).toHaveValue('Upload Progress');
+
+    const falseBtn = previewWindow.locator('[data-testid="prop-bool-false-indeterminate"]');
+    await expect(falseBtn).toHaveClass(/active-false/);
+
+    // Edit number prop
+    await valueInput.fill('80');
+    await expect(valueInput).toHaveValue('80');
+
+    // Edit string prop
+    await labelInput.fill('Exporting Data');
+    await expect(labelInput).toHaveValue('Exporting Data');
+
+    // Toggle boolean prop to true
+    const trueBtn = previewWindow.locator('[data-testid="prop-bool-true-indeterminate"]');
+    await trueBtn.click();
+    await expect(trueBtn).toHaveClass(/active-true/);
+
+    // Toggle boolean prop to undefined
+    const undefBtn = previewWindow.locator('[data-testid="prop-bool-undefined-indeterminate"]');
+    await undefBtn.click();
+    await expect(undefBtn).toHaveClass(/active-undefined/);
+
+    // Click Reset Defaults button
+    const resetBtn = previewWindow.locator('[data-testid="props-reset-btn"]');
+    await expect(resetBtn).toBeVisible();
+    await resetBtn.click();
+
+    // All props restore to suggested initial values
+    await expect(valueInput).toHaveValue('45');
+    await expect(labelInput).toHaveValue('Upload Progress');
+    await expect(falseBtn).toHaveClass(/active-false/);
   });
 
   test('progress-bar: pop-out, dock-back, and theme toggle do not vanish the live preview', async ({ page }) => {

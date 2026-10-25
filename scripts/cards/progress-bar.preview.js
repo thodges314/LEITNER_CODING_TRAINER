@@ -1,12 +1,14 @@
 function Demo() {
-  const [val, setVal] = useState(45);
-  const [indeterminate, setIndeterminate] = useState(false);
-  const logger = log('progress');
+  const { value = 45, max = 100, label = 'Upload Progress', indeterminate = false } = usePreviewProps({
+    value: 45,
+    max: 100,
+    label: 'Upload Progress',
+    indeterminate: false,
+  });
 
-  const update = (next) => {
-    setVal(next);
-    logger({ value: next });
-  };
+  useEffect(() => {
+    log('progress')({ value: indeterminate ? undefined : value, max, indeterminate });
+  }, [value, max, indeterminate]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '6px' }}>
@@ -53,49 +55,12 @@ function Demo() {
         <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px' }}>
           Accessible Progress Bar (Interactive Preview):
         </div>
-        <ProgressBar value={indeterminate ? undefined : val} max={100} label="Upload Progress" />
-      </div>
-
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          onClick={() => update(Math.max(0, val - 10))}
-          style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          -10%
-        </button>
-        <button
-          type="button"
-          onClick={() => update(Math.min(100, val + 10))}
-          style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          +10%
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            const next = !indeterminate;
-            setIndeterminate(next);
-            logger({ indeterminate: next });
-          }}
-          style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          {indeterminate ? 'Set Determinate' : 'Set Indeterminate'}
-        </button>
-        <button
-          type="button"
-          onClick={() => update(100)}
-          style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          100%
-        </button>
-        <button
-          type="button"
-          onClick={() => update(0)}
-          style={{ padding: '4px 10px', fontSize: '12px', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          Reset
-        </button>
+        <ProgressBar
+          value={indeterminate ? undefined : value}
+          max={max}
+          label={label}
+          indeterminate={indeterminate}
+        />
       </div>
     </div>
   );

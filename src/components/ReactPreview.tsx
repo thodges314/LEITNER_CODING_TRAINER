@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Layers,
@@ -17,6 +17,9 @@ import { transpileForExecution } from '../lib/runner';
 import type { ExecutionMode } from '../lib/runner';
 import { stripTestRunnerBlock } from '../lib/stripTestRunner';
 import { isTsOnlyCard } from '../lib/tsOnly';
+import { PropsControlPanel } from './practice/PropsControlPanel';
+import { getComponentPropsConfig, getInitialPropValues } from '../lib/previewPropsConfig';
+
 // The preview runtime (about 220 KB of bundled React) is loaded on demand, only for cards that show a preview.
 type PreviewFrameModule = typeof import('../lib/reactPreviewFrame');
 
@@ -60,6 +63,23 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   const isLight = theme === 'apple-gsos';
   const currentEnvKey = `${card.id}-${iframeKey}-${theme}-${isPoppedOut ? 'popup' : 'inline'}`;
   const [frameModule, setFrameModule] = useState<PreviewFrameModule | null>(null);
+
+  // Dedicated interactive props management
+  const propDefs = useMemo(() => getComponentPropsConfig(card.id), [card.id]);
+  const [prevCardId, setPrevCardId] = useState(card.id);
+  const [propValues, setPropValues] = useState<Record<string, unknown>>(() => getInitialPropValues(card.id));
+  const propValuesRef = useRef(propValues);
+
+  if (prevCardId !== card.id) {
+    setPrevCardId(card.id);
+    const defaults = getInitialPropValues(card.id);
+    setPropValues(defaults);
+  }
+
+  useEffect(() => {
+    propValuesRef.current = propValues;
+  }, [propValues]);
+
   useEffect(() => {
     let alive = true;
     void import('../lib/reactPreviewFrame').then((m) => {
@@ -81,6 +101,16 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       clearTimeout(watchdogTimerRef.current);
       watchdogTimerRef.current = null;
     }
+  }, []);
+
+  const getTargetWindow = useCallback((): Window | null => {
+    const popup = popupWindowRef.current;
+    return (
+      iframeRef.current?.contentWindow ||
+      (popup && !popup.closed ? (popup.document.querySelector('iframe')?.contentWindow as Window | null) : null) ||
+      (document.querySelector('.react-preview-window iframe') as HTMLIFrameElement | null)?.contentWindow ||
+      null
+    );
   }, []);
 
   // PostMessage listener
@@ -138,20 +168,11 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
 
   // Transpile and send code to iframe
   const sendToIframe = useCallback(async () => {
-    const popup = popupWindowRef.current;
-    let targetWindow =
-      iframeRef.current?.contentWindow ||
-      (popup && !popup.closed ? (popup.document.querySelector('iframe')?.contentWindow as Window | null) : null) ||
-      (document.querySelector('.react-preview-window iframe') as HTMLIFrameElement | null)?.contentWindow ||
-      null;
+    let targetWindow = getTargetWindow();
 
     if (!targetWindow) {
       await new Promise((r) => setTimeout(r, 50));
-      targetWindow =
-        iframeRef.current?.contentWindow ||
-        (popup && !popup.closed ? (popup.document.querySelector('iframe')?.contentWindow as Window | null) : null) ||
-        (document.querySelector('.react-preview-window iframe') as HTMLIFrameElement | null)?.contentWindow ||
-        null;
+      targetWindow = getTargetWindow();
     }
 
     if (!card.previewCode || !targetWindow) return;
@@ -202,6 +223,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         {
           type: 'leitner-preview:render',
           code: transpiled.code,
+          props: propValuesRef.current,
           renderId,
         },
         '*'
@@ -211,7 +233,50 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       setStatus('error');
       setErrorMessage(err instanceof Error ? err.message : String(err));
     }
-  }, [card, code, executionMode, clearWatchdog]);
+  }, [card, code, executionMode, clearWatchdog, getTargetWindow]);
+
+  // Handle interactive props updates from the Props control panel
+  const handlePropChange = useCallback((name: string, value: unknown) => {
+    setPropValues((prev) => {
+      const next = { ...prev, [name]: value };
+      propValuesRef.current = next;
+      const targetWindow = getTargetWindow();
+      if (targetWindow) {
+        try {
+          targetWindow.postMessage(
+            {
+              type: 'leitner-preview:set-props',
+              props: next,
+            },
+            '*'
+          );
+        } catch {
+          // Ignore cross-window communication errors
+        }
+      }
+      return next;
+    });
+  }, [getTargetWindow]);
+
+  const handleResetProps = useCallback(() => {
+    const defaults = getInitialPropValues(card.id);
+    setPropValues(defaults);
+    propValuesRef.current = defaults;
+    const targetWindow = getTargetWindow();
+    if (targetWindow) {
+      try {
+        targetWindow.postMessage(
+          {
+            type: 'leitner-preview:set-props',
+            props: defaults,
+          },
+          '*'
+        );
+      } catch {
+        // Ignore cross-window communication errors
+      }
+    }
+  }, [card.id, getTargetWindow]);
 
   // Reset timeout halt whenever user changes code
   useEffect(() => {
@@ -403,113 +468,40 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
 
   const previewPane = (
     <div
-      className="react-preview-window"
+      className={`react-preview-window ${isPoppedOut ? 'react-preview-popout' : ''}`}
       data-testid={isPoppedOut ? 'react-preview-popout-window' : 'react-preview-window'}
-      style={{
-        borderRadius: isPoppedOut ? '0px' : '8px',
-        border: isPoppedOut ? 'none' : '1px solid rgba(6, 182, 212, 0.35)',
-        backgroundColor: isLight ? '#ffffff' : '#030712',
-        overflow: 'hidden',
-        boxShadow: isPoppedOut ? 'none' : '0 4px 20px rgba(0, 0, 0, 0.5)',
-        display: 'flex',
-        flexDirection: 'column',
-        marginBottom: '0px',
-        flex: isPoppedOut ? 1 : undefined,
-        height: isPoppedOut ? '100%' : undefined,
-      }}
     >
       {/* Title Bar */}
-      <div
-        style={{
-          padding: '10px 14px',
-          backgroundColor: isLight ? '#f1f5f9' : '#061320',
-          borderBottom: '1px solid rgba(6, 182, 212, 0.2)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          userSelect: 'none',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="react-preview-titlebar">
+        <div className="react-preview-titlebar-left">
           <Layers size={16} color="#06b6d4" />
-          <span style={{ fontSize: '13px', fontWeight: 600, color: isLight ? '#0f172a' : '#f1f5f9' }}>
+          <span className="react-preview-title">
             Live React Preview Window {isPoppedOut ? '(Pop-out)' : ''}
           </span>
 
           {/* Status Badge */}
           {!isLive && (
             <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: '11px',
-                fontWeight: 600,
-                color: '#94a3b8',
-                backgroundColor: 'rgba(148, 163, 184, 0.1)',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                border: '1px solid rgba(148, 163, 184, 0.25)',
-              }}
+              className="preview-badge preview-badge-ready"
               data-testid="preview-status-badge"
             >
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  backgroundColor: '#94a3b8',
-                }}
-              />
+              <span className="preview-badge-dot" />
               Ready
             </span>
           )}
           {isLive && (status === 'compiling' || status === 'idle') && (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '11px',
-                color: '#38bdf8',
-                backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                padding: '2px 8px',
-                borderRadius: '12px',
-              }}
-            >
+            <span className="preview-badge preview-badge-compiling">
               <Loader2 size={11} className="animate-spin" /> Compiling...
             </span>
           )}
           {isLive && status === 'rendering' && (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '11px',
-                color: '#fbbf24',
-                backgroundColor: 'rgba(251, 191, 36, 0.1)',
-                padding: '2px 8px',
-                borderRadius: '12px',
-              }}
-            >
+            <span className="preview-badge preview-badge-rendering">
               <Loader2 size={11} className="animate-spin" /> Rendering...
             </span>
           )}
           {isLive && status === 'live' && (
             <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: '11px',
-                fontWeight: 600,
-                color: '#34d399',
-                backgroundColor: 'rgba(52, 211, 153, 0.12)',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                border: '1px solid rgba(52, 211, 153, 0.35)',
-              }}
+              className="preview-badge preview-badge-live"
               data-testid="preview-status-badge"
             >
               <CheckCircle2 size={11} color="#10b981" /> Live
@@ -517,18 +509,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           )}
           {isLive && status === 'error' && (
             <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '11px',
-                fontWeight: 600,
-                color: '#f87171',
-                backgroundColor: 'rgba(248, 113, 113, 0.12)',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                border: '1px solid rgba(248, 113, 113, 0.35)',
-              }}
+              className="preview-badge preview-badge-error"
               data-testid="preview-status-badge"
             >
               <AlertTriangle size={11} color="#f87171" /> Error
@@ -536,18 +517,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           )}
           {isLive && status === 'timeout' && (
             <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '11px',
-                fontWeight: 600,
-                color: '#fb923c',
-                backgroundColor: 'rgba(251, 146, 60, 0.12)',
-                padding: '2px 8px',
-                borderRadius: '12px',
-                border: '1px solid rgba(251, 146, 60, 0.35)',
-              }}
+              className="preview-badge preview-badge-timeout"
               data-testid="preview-status-badge"
             >
               <AlertTriangle size={11} color="#fb923c" /> Timed Out
@@ -555,23 +525,12 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="react-preview-actions">
           <button
             type="button"
             onClick={handleRestart}
             data-testid="preview-restart-btn"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--text-dim)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              fontSize: '11.5px',
-              padding: '3px 8px',
-              borderRadius: '4px',
-            }}
+            className="react-preview-action-btn"
             title="Restart preview sandbox"
           >
             <RotateCcw size={12} /> Restart
@@ -582,18 +541,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
               type="button"
               onClick={handleDockBack}
               data-testid="preview-dock-btn"
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-dim)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '11.5px',
-                padding: '3px 8px',
-                borderRadius: '4px',
-              }}
+              className="react-preview-action-btn"
               title="Dock preview back into main window"
             >
               <Minimize2 size={12} /> Dock back
@@ -603,18 +551,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
               type="button"
               onClick={handlePopOut}
               data-testid="preview-popout-btn"
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-dim)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                fontSize: '11.5px',
-                padding: '3px 8px',
-                borderRadius: '4px',
-              }}
+              className="react-preview-action-btn"
               title="Open preview in a pop-out window"
             >
               <ExternalLink size={12} /> Pop out
@@ -628,16 +565,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
                 if (isPoppedOut) handleDockBack();
                 onClose();
               }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-dim)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                padding: '3px 6px',
-                borderRadius: '4px',
-              }}
+              className="react-preview-action-btn"
               title="Close preview"
               aria-label="Close preview"
             >
@@ -649,20 +577,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
 
       {/* Error Notice Box (if any and live) */}
       {isLive && errorMessage && (
-        <div
-          role="alert"
-          style={{
-            padding: '10px 14px',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderBottom: '1px solid rgba(239, 68, 68, 0.25)',
-            color: '#f87171',
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            whiteSpace: 'pre-wrap',
-            maxHeight: '120px',
-            overflowY: 'auto',
-          }}
-        >
+        <div role="alert" className="react-preview-error-box">
           <strong>Preview Error:</strong> {errorMessage}
         </div>
       )}
@@ -671,25 +586,13 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
       {!isLive && (
         <div
           data-testid="preview-ready-placeholder"
-          style={{
-            width: '100%',
-            height: isPoppedOut ? '380px' : '240px',
-            flex: isPoppedOut ? '1 1 auto' : undefined,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-            padding: '20px 12px',
-            color: '#64748b',
-            backgroundColor: isLight ? '#f8fafc' : '#030712',
-          }}
+          className={`react-preview-placeholder ${isPoppedOut ? 'react-preview-placeholder-popout' : ''}`}
         >
-          <Layers size={28} color="#0891b2" style={{ marginBottom: '8px', opacity: 0.7 }} />
-          <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8', marginBottom: '4px' }}>
+          <Layers size={28} color="#0891b2" className="react-preview-placeholder-icon" />
+          <div className="react-preview-placeholder-title">
             Ready to Preview
           </div>
-          <div style={{ fontSize: '11.5px', maxWidth: '320px', lineHeight: 1.5, color: '#64748b' }}>
+          <div className="react-preview-placeholder-subtitle">
             Run code to start live component preview.
           </div>
         </div>
@@ -697,68 +600,40 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
 
       {/* Sandboxed Iframe Window (initialized in background, visible once live) */}
       <div
-        style={{
-          width: '100%',
-          height: isPoppedOut ? '380px' : '240px',
-          flex: isPoppedOut ? '1 1 auto' : undefined,
-          backgroundColor: isLight ? '#f8fafc' : '#030712',
-          position: 'relative',
-          display: isLive ? 'block' : 'none',
-        }}
+        className={`react-preview-iframe-wrapper ${isPoppedOut ? 'react-preview-iframe-wrapper-popout' : ''}`}
+        style={{ display: isLive ? 'block' : 'none' }}
       >
         {frameModule && (
-        <iframe
-          key={currentEnvKey}
-          ref={iframeRef}
-          title="React Component Preview"
-          sandbox="allow-scripts allow-forms"
-          srcDoc={frameModule.createPreviewSrcDoc(theme, currentEnvKey, card.id)}
-          onLoad={handleIframeLoad}
-          style={{
-            width: '100%',
-            height: '100%',
-            border: 'none',
-            display: 'block',
-          }}
-        />
+          <iframe
+            key={currentEnvKey}
+            ref={iframeRef}
+            title="React Component Preview"
+            sandbox="allow-scripts allow-forms"
+            srcDoc={frameModule.createPreviewSrcDoc(theme, currentEnvKey, card.id)}
+            onLoad={handleIframeLoad}
+            className="react-preview-iframe"
+          />
         )}
       </div>
 
+      {/* Interactive Component Props Control Panel */}
+      <PropsControlPanel
+        cardId={card.id}
+        propDefs={propDefs}
+        values={propValues}
+        onChange={handlePropChange}
+        onReset={handleResetProps}
+      />
+
       {/* Event Log & Console Panel (rendered once live) */}
       {isLive && (
-        <div
-          style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-            backgroundColor: isLight ? '#f8fafc' : 'rgba(0, 0, 0, 0.4)',
-            padding: '8px 12px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '6px',
-            maxHeight: isPoppedOut ? '220px' : '160px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: '11.5px',
-              color: 'var(--text-dim)',
-              userSelect: 'none',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div className={`react-preview-log-panel ${isPoppedOut ? 'react-preview-log-panel-popout' : ''}`}>
+          <div className="react-preview-log-header">
+            <div className="react-preview-log-header-left">
               <Terminal size={12} color="#94a3b8" />
-              <span style={{ fontWeight: 600 }}>Event Log & Output</span>
+              <span>Event Log & Output</span>
               {logs.length > 0 && (
-                <span
-                  style={{
-                    fontSize: '10.5px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    padding: '1px 6px',
-                    borderRadius: '10px',
-                  }}
-                >
+                <span className="react-preview-log-count">
                   {logs.length}
                 </span>
               )}
@@ -767,17 +642,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
               <button
                 type="button"
                 onClick={handleClearLogs}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-dim)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '3px',
-                  fontSize: '11px',
-                  padding: '2px 4px',
-                }}
+                className="react-preview-log-clear-btn"
                 title="Clear log"
               >
                 <Trash2 size={11} /> Clear
@@ -785,48 +650,24 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             )}
           </div>
 
-          <div
-            style={{
-              overflowY: 'auto',
-              maxHeight: isPoppedOut ? '180px' : '120px',
-              fontSize: '11.5px',
-              fontFamily: 'monospace',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-            }}
-          >
+          <div className={`react-preview-log-items ${isPoppedOut ? 'react-preview-log-items-popout' : ''}`}>
             {logs.length === 0 ? (
-              <div style={{ color: '#64748b', fontStyle: 'italic', padding: '4px 0' }}>
+              <div className="react-preview-log-empty">
                 No callback events or logs captured yet. Interact with the preview to test callbacks.
               </div>
             ) : (
               logs.map((item) => (
-                <div
-                  key={item.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: '8px',
-                    lineHeight: 1.4,
-                  }}
-                >
+                <div key={item.id} className="react-preview-log-entry">
                   <span
-                    style={{
-                      fontSize: '10px',
-                      color: item.type === 'event' ? '#38bdf8' : '#a855f7',
-                      backgroundColor:
-                        item.type === 'event'
-                          ? 'rgba(56, 189, 248, 0.12)'
-                          : 'rgba(168, 85, 247, 0.12)',
-                      padding: '1px 5px',
-                      borderRadius: '3px',
-                      flexShrink: 0,
-                    }}
+                    className={`react-preview-log-type-tag ${
+                      item.type === 'event'
+                        ? 'react-preview-log-type-event'
+                        : 'react-preview-log-type-console'
+                    }`}
                   >
                     {item.type === 'event' ? 'event' : item.method}
                   </span>
-                  <span style={{ color: isLight ? '#0f172a' : '#cbd5e1' }}>
+                  <span className="react-preview-log-content">
                     {item.type === 'event' ? (
                       <>
                         <strong style={{ color: '#38bdf8' }}>{item.name}</strong>(
@@ -849,19 +690,8 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     return (
       <>
         <div
-          className="react-preview-window react-preview-docked"
+          className="react-preview-docked-notice"
           data-testid="react-preview-window"
-          style={{
-            borderRadius: '8px',
-            border: '1px solid rgba(6, 182, 212, 0.35)',
-            backgroundColor: isLight ? '#ffffff' : '#030712',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '0px',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
-          }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Layers size={18} color="#06b6d4" />
@@ -891,16 +721,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
                   handleDockBack();
                   onClose();
                 }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-dim)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '3px 6px',
-                  borderRadius: '4px',
-                }}
+                className="react-preview-action-btn"
                 title="Close preview"
                 aria-label="Close preview"
               >

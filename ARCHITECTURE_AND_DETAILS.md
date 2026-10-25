@@ -154,7 +154,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (1,757 unit tests)**: Tests verifying:
+- **Vitest Suite (1,764 unit tests)**: Tests verifying:
   - Reference solutions pass for all 277 cards across 9 topics (224 default + 53 in the optional `algorithms-advanced` pack) across 1,964 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.
@@ -165,7 +165,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
   - Multi-key vault persistence, prefix detection, and provider switching.
   - Timed Recall Mode configuration and persistence.
   - Deck catalog filter and sort persistence (`src/lib/deckFilters.ts`): track, tier/box, status, difficulty, search keyword, and sort selections persist across card navigation sessions.
-- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (602 tests: 554 card tests + navigation, shortcuts, preview, flow, tour, catalog, and backup advisory tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
+- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (603 tests: 554 card tests + navigation, shortcuts, preview, flow, tour, catalog, and backup advisory tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
 - **Production Build**: Verified via `npm run build` (`tsc -b && vite build`) with zero lint or type errors.
 
 ## 8. Navigation and first-run welcome
@@ -197,4 +197,5 @@ All visual styling is separated into a modular design system under [src/styles/]
   - [src/styles/components/popovers.css](src/styles/components/popovers.css): Popover containers, headers, metric cards, and footers for AI recommendations and status.
   - [src/styles/components/arena.css](src/styles/components/arena.css): Practice arena layout, split panes, toolbar, empty state, and reinforcement drill banner.
   - [src/styles/components/evaluation.css](src/styles/components/evaluation.css): Evaluation verdict banners (`data-verdict="passed|failed"`), stat metric grids, critique boxes, and interactive critique follow-up chat.
+  - [src/styles/components/react-preview.css](src/styles/components/react-preview.css): React component preview frame, docked window, pop-out portal, event log, and interactive Props Control Panel.
 
