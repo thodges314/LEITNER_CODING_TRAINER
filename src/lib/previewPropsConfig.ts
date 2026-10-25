@@ -144,6 +144,32 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       type: 'function',
       description: 'Render prop: (fieldProps) => ReactNode',
     },
+    {
+      name: 'childControlType',
+      propName: 'controlType',
+      group: 'Child Control',
+      type: 'enum',
+      defaultValue: 'input',
+      options: ['input', 'textarea', 'generic-div'],
+      description: 'Element type rendered by child render prop',
+    },
+    {
+      name: 'childPlaceholder',
+      propName: 'placeholder',
+      group: 'Child Control',
+      type: 'string',
+      defaultValue: 'you@domain.com',
+      placeholder: 'Placeholder text',
+      description: 'Placeholder attribute on child control',
+    },
+    {
+      name: 'childDisabled',
+      propName: 'disabled',
+      group: 'Child Control',
+      type: 'boolean',
+      defaultValue: false,
+      description: 'Whether child control is disabled',
+    },
   ],
   'simple-table': [
     {
