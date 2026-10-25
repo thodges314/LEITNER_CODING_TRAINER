@@ -73,4 +73,31 @@ test.describe('Deck Selector & Preset Decks', () => {
     await expect(deckTrigger).toContainText('197 Cards');
     await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(197);
   });
+
+  test('migrates legacy stored deck where algorithms-advanced was a pack and shows all cards', async ({ page }) => {
+    await page.addInitScript(() => {
+      // Simulate stored deck from earlier version where advanced cards had pack: 'algorithms-advanced'
+      const legacyState = {
+        topics: [
+          { id: 'tree-depth-sum', pack: 'algorithms-advanced', track: 'algorithms', box: 1, streak: 0, nextEligibleTrial: 0, status: 'active' },
+        ],
+        totalCompletedReviews: 0,
+      };
+      localStorage.setItem('leitner_coding_deck', JSON.stringify(legacyState));
+    });
+    await page.goto('/');
+
+    const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
+    await catalogNavBtn.click();
+
+    // Verify all 277 cards are present in Full Library
+    const deckTrigger = page.getByTestId('deck-dropdown-trigger');
+    await expect(deckTrigger).toContainText('277 Cards');
+
+    // Switch to Advanced Algorithms
+    await deckTrigger.click();
+    await page.getByTestId('deck-option-advanced-algorithms').click();
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(53);
+    await expect(page.locator('tbody tr.catalog-tr').filter({ hasText: 'Binary Tree: Depth, Sum, Count' })).toBeVisible();
+  });
 });

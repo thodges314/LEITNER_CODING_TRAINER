@@ -180,7 +180,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
   - Multi-key vault persistence, prefix detection, and provider switching.
   - Timed Recall Mode configuration and persistence.
   - Deck catalog filter and sort persistence (`src/lib/deckFilters.ts`): track, tier/box, status, difficulty, search keyword, and sort selections persist across card navigation sessions.
-- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (605 tests: 554 card tests + navigation, shortcuts, preview, flow, tour, catalog, backup advisory, and deck selector tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
+- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (606 tests: 554 card tests + navigation, shortcuts, preview, flow, tour, catalog, backup advisory, and deck selector tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
 - **Production Build**: Verified via `npm run build` (`tsc -b && vite build`) with zero lint or type errors.
 
 ## 8. Navigation and first-run welcome

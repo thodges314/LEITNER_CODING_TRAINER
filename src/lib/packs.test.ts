@@ -5,10 +5,8 @@ import {
   CARD_PACKS,
   checkStagedUnlocks,
   disabledPacks,
-  getNextCard,
   isPackEnabled,
   parseDeckBackup,
-  scheduleFilter,
   setEnabledPacks,
   visibleTopics,
   mergeStoredWithSeed,
@@ -25,37 +23,39 @@ describe('optional card packs', () => {
     totalCompletedReviews: 0,
   };
 
-  it('packs are off by default and on when listed in enabledPacks', () => {
-    expect(disabledPacks(state)).toEqual(['algorithms-advanced']);
-    expect(disabledPacks({ enabledPacks: ['algorithms-advanced'] })).toEqual([]);
-    expect(isPackEnabled(state.topics[1], state)).toBe(false);
-    expect(visibleTopics(state).map((t) => t.id)).toEqual(['core']);
-    expect(visibleTopics({ ...state, enabledPacks: ['algorithms-advanced'] })).toHaveLength(2);
+  it('all built-in card packs have been migrated to first-class topic tracks', () => {
+    expect(CARD_PACKS).toEqual({});
+    expect(disabledPacks(state)).toEqual([]);
+    expect(isPackEnabled(state.topics[0], state)).toBe(true);
+    expect(isPackEnabled(state.topics[1], state)).toBe(true);
+    expect(visibleTopics(state)).toHaveLength(2);
   });
 
-  it('disabled-pack cards are never scheduled, even when they are the easiest', () => {
-    expect(getNextCard(state.topics, 0, undefined, undefined, scheduleFilter(state))?.id).toBe('core');
-    const on = { ...state, enabledPacks: ['algorithms-advanced'] };
-    expect(getNextCard(on.topics, 0, undefined, undefined, scheduleFilter(on))?.id).toBe('adv'); // easier first
+  it('legacy stored cards with pack: algorithms-advanced have pack stripped and are visible', () => {
+    const legacy = card('tree-depth-sum', { pack: 'algorithms-advanced', track: 'algorithms' });
+    const merged = mergeStoredWithSeed({ topics: [legacy], totalCompletedReviews: 0 });
+    expect(merged.topics[0].pack).toBeUndefined();
+    expect(merged.topics[0].track).toBe('advanced-algorithms');
+    expect(isPackEnabled(merged.topics[0], merged)).toBe(true);
+    expect(visibleTopics(merged).map((t) => t.id)).toContain('tree-depth-sum');
   });
 
-  it('staged unlocks skip locked cards of disabled packs', () => {
+  it('staged unlocks work across active cards', () => {
     const passed = [1, 2, 3, 4].map((i) => card(`p${i}`, { box: 3, concept: `c${i}`, difficulty: 1 }));
-    const locked = [card('l-adv', { status: 'locked', pack: 'algorithms-advanced', difficulty: 1 }), card('l-core', { status: 'locked', difficulty: 3 })];
+    const locked = [card('l-1', { status: 'locked', difficulty: 1 }), card('l-2', { status: 'locked', difficulty: 3 })];
     const { updatedTopics } = checkStagedUnlocks([...passed, ...locked], 0, (c) => isPackEnabled(c, { enabledPacks: [] }));
     const unlocked = updatedTopics.filter((t) => t.id.startsWith('l-') && t.status === 'active').map((t) => t.id);
-    expect(unlocked).toEqual(['l-core']);
+    expect(unlocked).toEqual(['l-1', 'l-2']);
   });
 
-  it('enabledPacks survive save/merge/backup and unknown pack names are dropped', () => {
+  it('unknown pack names in enabledPacks are safely filtered', () => {
     localStorage.clear();
-    const next = setEnabledPacks(state, ['algorithms-advanced', 'nope']);
-    expect(next.enabledPacks).toEqual(['algorithms-advanced']);
-    expect(JSON.parse(localStorage.getItem('leitner_coding_deck') ?? '{}').enabledPacks).toEqual(['algorithms-advanced']);
-    expect(mergeStoredWithSeed(next, []).enabledPacks).toEqual(['algorithms-advanced']);
+    const next = setEnabledPacks(state, ['nope']);
+    expect(next.enabledPacks).toEqual([]);
+    expect(JSON.parse(localStorage.getItem('leitner_coding_deck') ?? '{}').enabledPacks).toEqual([]);
+    expect(mergeStoredWithSeed(next, []).enabledPacks).toEqual([]);
     const parsed = parseDeckBackup(JSON.stringify({ ...next, topics: state.topics }));
-    expect(parsed.enabledPacks).toEqual(['algorithms-advanced']);
-    expect(parsed.topics.find((t) => t.id === 'adv')?.pack).toBe('algorithms-advanced');
+    expect(parsed.enabledPacks).toEqual([]);
   });
 });
 
