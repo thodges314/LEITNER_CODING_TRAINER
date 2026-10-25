@@ -70,48 +70,48 @@ export default {
 
   'breadcrumbs-router': [
     c(
-      'renders root breadcrumb marked with aria-current="page" for home path',
-      `const { render } = $dom;\nconst r = render(<Breadcrumbs pathname="/" />);\n[r.container.querySelector('nav')?.getAttribute('aria-label'), r.container.querySelector('span[aria-current="page"]')?.textContent]`,
-      `['Breadcrumb', 'Home']`,
+      'renders root breadcrumb in accessible navigation for home path',
+      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="/" />);\n[r.container.querySelector('nav')?.getAttribute('aria-label'), r.container.querySelector('ol')?.className, qa('li', r.container).map((li) => { const a = li.querySelector('a'); const s = li.querySelector('span'); return a ? [a.getAttribute('href'), a.textContent] : [s?.getAttribute('aria-current'), s?.textContent]; })]`,
+      `['Breadcrumb', 'breadcrumbs', [['page', 'Home']]]`,
       {
         callSignature: "<Breadcrumbs pathname='/' />",
-        x: '<nav aria-label="Breadcrumb"><ol><li><span aria-current="page">Home</span></li></ol></nav>',
+        x: '<span aria-current="page">Home</span>',
       }
     ),
     c(
       'generates hierarchical crumb links with capitalized default labels',
-      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="/products/shoes/sneakers" />);\n[qa('a', r.container).map((a) => a.getAttribute('href')), qa('a', r.container).map((a) => a.textContent), r.container.querySelector('span')?.textContent]`,
-      `[['/', '/products', '/products/shoes'], ['Home', 'Products', 'Shoes'], 'Sneakers']`,
+      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="/products/shoes/sneakers" />);\nqa('li', r.container).map((li) => { const a = li.querySelector('a'); const s = li.querySelector('span'); return a ? [a.getAttribute('href'), a.textContent] : [s?.getAttribute('aria-current'), s?.textContent]; })`,
+      `[['/', 'Home'], ['/products', 'Products'], ['/products/shoes', 'Shoes'], ['page', 'Sneakers']]`,
       {
         callSignature: "<Breadcrumbs pathname='/products/shoes/sneakers' />",
-        x: '<a href="/">Home</a>, <a href="/products">Products</a>, <a href="/products/shoes">Shoes</a>, <span aria-current="page">Sneakers</span>',
+        x: '<a href="/">Home</a> / <a href="/products">Products</a> / <a href="/products/shoes">Shoes</a> / <span aria-current="page">Sneakers</span>',
       }
     ),
     c(
       'applies custom label overrides for matching subpaths',
-      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="/users/123/edit" labels={{ '/users/123': 'Alice', '/users/123/edit': 'Profile Settings' }} />);\n[qa('a', r.container).find((a) => a.getAttribute('href') === '/users/123')?.textContent, r.container.querySelector('span')?.textContent]`,
-      `['Alice', 'Profile Settings']`,
+      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="/users/123/edit" labels={{ '/users/123': 'Alice', '/users/123/edit': 'Profile Settings' }} />);\nqa('li', r.container).map((li) => { const a = li.querySelector('a'); const s = li.querySelector('span'); return a ? [a.getAttribute('href'), a.textContent] : [s?.getAttribute('aria-current'), s?.textContent]; })`,
+      `[['/', 'Home'], ['/users', 'Users'], ['/users/123', 'Alice'], ['page', 'Profile Settings']]`,
       {
         callSignature: "<Breadcrumbs pathname='/users/123/edit' labels={{ '/users/123': 'Alice', '/users/123/edit': 'Profile Settings' }} />",
-        x: '<a href="/users/123">Alice</a>, <span aria-current="page">Profile Settings</span>',
+        x: '<a href="/">Home</a> / <a href="/users">Users</a> / <a href="/users/123">Alice</a> / <span aria-current="page">Profile Settings</span>',
       }
     ),
     c(
       'normalizes multiple and trailing slashes in route paths',
-      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="//dashboard//analytics/" />);\n[qa('a', r.container).map((a) => a.textContent), r.container.querySelector('span')?.textContent]`,
-      `[['Home', 'Dashboard'], 'Analytics']`,
+      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="//dashboard//analytics/" />);\nqa('li', r.container).map((li) => { const a = li.querySelector('a'); const s = li.querySelector('span'); return a ? [a.getAttribute('href'), a.textContent] : [s?.getAttribute('aria-current'), s?.textContent]; })`,
+      `[['/', 'Home'], ['/dashboard', 'Dashboard'], ['page', 'Analytics']]`,
       {
         callSignature: "<Breadcrumbs pathname='//dashboard//analytics/' />",
-        x: 'links: Home (/), Dashboard (/dashboard) | current: <span aria-current="page">Analytics</span>',
+        x: '<a href="/">Home</a> / <a href="/dashboard">Dashboard</a> / <span aria-current="page">Analytics</span>',
       }
     ),
     c(
-      'wraps items in an ordered list with breadcrumb classes',
-      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="/account" />);\n[r.container.querySelector('ol')?.className, qa('li', r.container).length]`,
-      `['breadcrumbs', 2]`,
+      'renders single-level subpage with Home link and active crumb',
+      `const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname="/account" />);\nqa('li', r.container).map((li) => { const a = li.querySelector('a'); const s = li.querySelector('span'); return a ? [a.getAttribute('href'), a.textContent] : [s?.getAttribute('aria-current'), s?.textContent]; })`,
+      `[['/', 'Home'], ['page', 'Account']]`,
       {
         callSignature: "<Breadcrumbs pathname='/account' />",
-        x: '<ol className="breadcrumbs"><li className="breadcrumb-item"> (2 items)',
+        x: '<a href="/">Home</a> / <span aria-current="page">Account</span>',
       }
     ),
   ],
