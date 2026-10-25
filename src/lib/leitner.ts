@@ -550,12 +550,37 @@ export function mergeStoredWithSeed(
     merged.streak = Math.max(0, Math.floor(Number(t.streak)) || 0);
     merged.nextEligibleTrial = Math.max(0, Math.floor(Number(t.nextEligibleTrial)) || 0);
     merged.status = t.status === 'locked' || t.status === 'active' ? t.status : (seed.status === 'active' ? 'active' : 'locked');
+    if (deleted.has(t.id)) {
+      merged.deactivated = true;
+      deleted.delete(t.id);
+    }
 
     return merged;
   });
 
-  // Append new seed topics that are not in stored deck and not deleted by user
   const seenIds = new Set(hydratedTopics.map((t) => t.id));
+
+  // Automatically convert legacy deleted seed cards into suspended (deactivated: true) topics
+  const convertedDeletedTopics: TopicItem[] = [];
+  for (const id of Array.from(deleted)) {
+    const seed = seedMap.get(id);
+    if (seed && !RETIRED_SEED_IDS.has(id)) {
+      if (!seenIds.has(id)) {
+        seenIds.add(id);
+        convertedDeletedTopics.push({
+          ...seed,
+          box: Math.max(1, Math.floor(Number(seed.box)) || 1),
+          streak: Math.max(0, Math.floor(Number(seed.streak)) || 0),
+          nextEligibleTrial: Math.max(0, Math.floor(Number(seed.nextEligibleTrial)) || 0),
+          status: seed.status === 'active' ? ('active' as const) : ('locked' as const),
+          deactivated: true,
+        });
+      }
+      deleted.delete(id);
+    }
+  }
+
+  // Append new seed topics that are not in stored deck and not deleted by user
   const newSeedTopics = seedTopics
     .filter((t) => !seenIds.has(t.id) && !deleted.has(t.id))
     .map((t) => {
@@ -570,7 +595,7 @@ export function mergeStoredWithSeed(
     });
 
   return {
-    topics: [...hydratedTopics, ...newSeedTopics],
+    topics: [...hydratedTopics, ...convertedDeletedTopics, ...newSeedTopics],
     totalCompletedReviews: typeof parsed.totalCompletedReviews === 'number' && Number.isInteger(parsed.totalCompletedReviews) && parsed.totalCompletedReviews >= 0 ? parsed.totalCompletedReviews : 0,
     lastReviewedTrack: parsed.lastReviewedTrack,
     unlockedStageCount: typeof parsed.unlockedStageCount === 'number' && Number.isInteger(parsed.unlockedStageCount) && parsed.unlockedStageCount >= 0 ? parsed.unlockedStageCount : 0,

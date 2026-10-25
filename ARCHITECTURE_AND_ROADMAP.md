@@ -178,8 +178,7 @@ The trainer supports two user-selectable algorithms via the Settings modal (`alg
   backup export/import, with named presets.
 - **Merge on load** (`mergeStoredWithSeed`): progress (box/tier, streak, schedule, status) comes from the stored deck; content fields
   (`track,title,tags,difficulty,concept,promptSeed,starterCode,testHarness,solution,referenceSolution,testCases`) are refreshed from
-  the seed so edits to cards take effect; new seed cards are appended locked; seed cards the user deleted stay deleted
-  (`deletedSeedIds`).
+  the seed so edits to cards take effect; new seed cards are appended locked; legacy deleted seed cards (`deletedSeedIds`) are automatically converted on load to suspended (deactivated: true) cards so they remain accessible in the Deck Catalog and can be reactivated.
 - **UI Dynamic Terms**: All badges, headers, modals, tooltips, and dashboard filters dynamically switch between "Box" and "Tier" terminology depending on the active algorithm.
 - **Backup Advisory & Export Highlighting**: After completing 4 problems (scored reviews, excluding unscored reinforcement repeats), a modal informs users that all progress, box tiers, and review history reside strictly in browser `localStorage`. It advises downloading a JSON backup regularly (at least at the end of each session) to avoid accidental data loss. Dismissing records the advisory as seen. Agreeing navigates the user to the Deck Catalog, where the 'Export Progress' button is spotlighted with an attention-grabbing amber pulse and a dismissible callout bubble guiding the user to download their `.json` backup file.
 

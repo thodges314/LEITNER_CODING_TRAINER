@@ -223,9 +223,12 @@ describe('mergeStoredWithSeed', () => {
     expect(s3.status).toBe('active');
   });
 
-  it('does not resurrect seed topics the user deleted', () => {
+  it('converts legacy deleted seed topics to suspended (deactivated) topics', () => {
     const merged = mergeStoredWithSeed(deck([card({ id: 's1' })], { deletedSeedIds: ['s2'] }), seed);
-    expect(merged.topics.map((t) => t.id)).toEqual(['s1']);
+    expect(merged.topics.map((t) => t.id)).toEqual(['s1', 's2']);
+    const s2 = merged.topics.find((t) => t.id === 's2');
+    expect(s2?.deactivated).toBe(true);
+    expect(merged.deletedSeedIds).toEqual([]);
   });
 
   it('leaves custom cards untouched and preserves their progress', () => {
