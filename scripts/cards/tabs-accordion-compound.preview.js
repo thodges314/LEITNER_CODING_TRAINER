@@ -10,6 +10,7 @@ function Demo() {
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
       <Tabs
+        key={defaultValue}
         defaultValue={defaultValue}
         value={value || undefined}
         onChange={(v) => {
