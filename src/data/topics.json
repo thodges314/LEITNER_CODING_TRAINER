@@ -12978,31 +12978,31 @@
       {
         "description": "renders root breadcrumb marked with aria-current=\"page\" for home path",
         "input": "const { render } = $dom;\nconst r = render(<Breadcrumbs pathname=\"/\" />);\n[r.container.querySelector('nav')?.getAttribute('aria-label'), r.container.querySelector('span[aria-current=\"page\"]')?.textContent]",
-        "expected": "<nav aria-label='Breadcrumb'> with <span aria-current='page'>Home</span>",
+        "expected": "<nav aria-label=\"Breadcrumb\"><ol><li><span aria-current=\"page\">Home</span></li></ol></nav>",
         "callSignature": "<Breadcrumbs pathname='/' />"
       },
       {
         "description": "generates hierarchical crumb links with capitalized default labels",
         "input": "const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname=\"/products/shoes/sneakers\" />);\n[qa('a', r.container).map((a) => a.getAttribute('href')), qa('a', r.container).map((a) => a.textContent), r.container.querySelector('span')?.textContent]",
-        "expected": "links ['/', '/products', '/products/shoes'] and current 'Sneakers'",
+        "expected": "<a href=\"/\">Home</a>, <a href=\"/products\">Products</a>, <a href=\"/products/shoes\">Shoes</a>, <span aria-current=\"page\">Sneakers</span>",
         "callSignature": "<Breadcrumbs pathname='/products/shoes/sneakers' />"
       },
       {
         "description": "applies custom label overrides for matching subpaths",
         "input": "const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname=\"/users/123/edit\" labels={{ '/users/123': 'Alice', '/users/123/edit': 'Profile Settings' }} />);\n[qa('a', r.container).find((a) => a.getAttribute('href') === '/users/123')?.textContent, r.container.querySelector('span')?.textContent]",
-        "expected": "custom link label 'Alice' and current page 'Profile Settings'",
+        "expected": "<a href=\"/users/123\">Alice</a>, <span aria-current=\"page\">Profile Settings</span>",
         "callSignature": "<Breadcrumbs pathname='/users/123/edit' labels={{ '/users/123': 'Alice', '/users/123/edit': 'Profile Settings' }} />"
       },
       {
         "description": "normalizes multiple and trailing slashes in route paths",
         "input": "const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname=\"//dashboard//analytics/\" />);\n[qa('a', r.container).map((a) => a.textContent), r.container.querySelector('span')?.textContent]",
-        "expected": "links ['Home', 'Dashboard'] and current page 'Analytics'",
+        "expected": "links: Home (/), Dashboard (/dashboard) | current: <span aria-current=\"page\">Analytics</span>",
         "callSignature": "<Breadcrumbs pathname='//dashboard//analytics/' />"
       },
       {
         "description": "wraps items in an ordered list with breadcrumb classes",
         "input": "const { render, qa } = $dom;\nconst r = render(<Breadcrumbs pathname=\"/account\" />);\n[r.container.querySelector('ol')?.className, qa('li', r.container).length]",
-        "expected": "<ol className='breadcrumbs'> with 2 <li> items",
+        "expected": "<ol className=\"breadcrumbs\"><li className=\"breadcrumb-item\"> (2 items)",
         "callSignature": "<Breadcrumbs pathname='/account' />"
       }
     ],

@@ -75,7 +75,7 @@ export default {
       `['Breadcrumb', 'Home']`,
       {
         callSignature: "<Breadcrumbs pathname='/' />",
-        x: "<nav aria-label='Breadcrumb'> with <span aria-current='page'>Home</span>",
+        x: '<nav aria-label="Breadcrumb"><ol><li><span aria-current="page">Home</span></li></ol></nav>',
       }
     ),
     c(
@@ -84,7 +84,7 @@ export default {
       `[['/', '/products', '/products/shoes'], ['Home', 'Products', 'Shoes'], 'Sneakers']`,
       {
         callSignature: "<Breadcrumbs pathname='/products/shoes/sneakers' />",
-        x: "links ['/', '/products', '/products/shoes'] and current 'Sneakers'",
+        x: '<a href="/">Home</a>, <a href="/products">Products</a>, <a href="/products/shoes">Shoes</a>, <span aria-current="page">Sneakers</span>',
       }
     ),
     c(
@@ -93,7 +93,7 @@ export default {
       `['Alice', 'Profile Settings']`,
       {
         callSignature: "<Breadcrumbs pathname='/users/123/edit' labels={{ '/users/123': 'Alice', '/users/123/edit': 'Profile Settings' }} />",
-        x: "custom link label 'Alice' and current page 'Profile Settings'",
+        x: '<a href="/users/123">Alice</a>, <span aria-current="page">Profile Settings</span>',
       }
     ),
     c(
@@ -102,7 +102,7 @@ export default {
       `[['Home', 'Dashboard'], 'Analytics']`,
       {
         callSignature: "<Breadcrumbs pathname='//dashboard//analytics/' />",
-        x: "links ['Home', 'Dashboard'] and current page 'Analytics'",
+        x: 'links: Home (/), Dashboard (/dashboard) | current: <span aria-current="page">Analytics</span>',
       }
     ),
     c(
@@ -111,7 +111,7 @@ export default {
       `['breadcrumbs', 2]`,
       {
         callSignature: "<Breadcrumbs pathname='/account' />",
-        x: "<ol className='breadcrumbs'> with 2 <li> items",
+        x: '<ol className="breadcrumbs"><li className="breadcrumb-item"> (2 items)',
       }
     ),
   ],
