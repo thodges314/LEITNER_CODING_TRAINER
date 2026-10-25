@@ -361,20 +361,11 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       defaultValue: 'Something went wrong.',
       placeholder: 'Fallback message',
       description: 'Fallback content rendered when an error occurs',
-      group: 'SimpleErrorBoundary Props',
     },
     {
       name: 'onError',
       type: 'function',
       description: 'Callback invoked when a descendant throws',
-      group: 'SimpleErrorBoundary Props',
-    },
-    {
-      name: 'shouldThrow',
-      type: 'boolean',
-      defaultValue: false,
-      description: 'Force the wrapped child component to throw during render',
-      group: 'Wrapped Child (Children)',
     },
   ],
   'multi-step-form': [
