@@ -13,6 +13,6 @@ Implement immutable tag (chip) input list processing rules. Each function return
 - If `index` is out of bounds, returns a copy of `tags` without changes.
 
 ### parseTags(text: string): string[]:
-- Handles pasted text by splitting on commas and newlines (`/[,\n]/`).
+- Handles pasted text by splitting on commas and newlines (`/[,\r\n]+/`).
 - Progressively applies `addTag` rules to each trimmed segment (ignoring empty segments and case-insensitive duplicates).
 - Example: `parseTags('a, b,\n A ,,C')` returns `['a', 'b', 'C']`.

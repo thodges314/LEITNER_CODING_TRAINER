@@ -22,7 +22,7 @@ in the browser; state lives in `localStorage`.
 | Item | Value |
 |---|---|
 | Cards | 277 total = **224 default + 53 in the optional `algorithms-advanced` pack** (89 default cards active at first run) |
-| Documented test cases | 1964 (each shown as input → expected in the UI) |
+| Documented test cases | 1965 (each shown as input → expected in the UI) |
 | Markdown formatting | **100% complete** across all 277 cards with structured descriptions, parameters, returns, constraints, and edge cases |
 | Difficulty spread | all 277: d1 36 · d2 91 · d3 109 · d4 38 · d5 3; default 224: d1 33 · d2 78 · d3 83 · d4 27 · d5 3 |
 | Tracks (default deck / total) | algorithms 47/77, react-components 51, js-utilities 37, react 27, js-language 25, async-js 21, dom-browser 20, typescript-patterns 14, testing-tooling 5. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |

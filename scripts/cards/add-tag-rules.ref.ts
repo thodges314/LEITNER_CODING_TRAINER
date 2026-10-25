@@ -10,5 +10,5 @@ function removeTag(tags: string[], index: number): string[] {
 }
 
 function parseTags(text: string): string[] {
-  return text.split(/[,\n]/).reduce<string[]>((list, part) => addTag(list, part), []);
+  return text.split(/[,\r\n]+/).reduce<string[]>((list, part) => addTag(list, part), []);
 }

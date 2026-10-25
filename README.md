@@ -97,7 +97,7 @@ Switchable in Settings between two spaced-repetition models:
 
 ## Content & Authoring Pipeline
 
-The repository includes **277 curated cards** across 9 topic tracks with **1,964 test cases**:
+The repository includes **277 curated cards** across 9 topic tracks with **1,965 test cases**:
 - **Algorithms** (77 cards)
 - **React Components** (51 cards)
 - **JS Utilities** (37 cards)

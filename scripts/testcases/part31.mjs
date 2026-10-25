@@ -51,6 +51,7 @@ const more = addTag(tags, 'b');
 [removeTag(tags, 1), tags]`, "[['a', 'c'], ['a', 'b', 'c']]"),
     c('removeTag with an index that does not exist changes nothing', `[removeTag(['a', 'b'], 5), removeTag(['a', 'b'], -1)]`, "[['a', 'b'], ['a', 'b']]"),
     c('parseTags splits on commas and line breaks, trims, and drops blanks and repeats', `parseTags('a, b,\\n A ,,C')`, "['a', 'b', 'C']"),
+    c('parseTags handles Windows CRLF and consecutive delimiters', `parseTags('a, b,\\r\\n A ,,\\r\\nC')`, "['a', 'b', 'C']"),
     c('parseTags of empty or separator-only text is an empty list', `[parseTags(''), parseTags(' , \\n ,')]`, '[[], []]'),
   ],
   'visible-window-range': [
