@@ -168,11 +168,31 @@ elapsed >= 130 && elapsed < 450`, `true  (about 140 ms of waiting in total)`, { 
     r('Body scroll is restored after close', 'close the modal', "document.body.style.overflow is no longer 'hidden'"),
   ],
   'tabs-accordion-compound': [
-    r('defaultValue shows only its panel', "<Tabs defaultValue='one'><TabList><Tab value='one'>One</Tab><Tab value='two'>Two</Tab></TabList><TabPanel value='one'>Panel one</TabPanel><TabPanel value='two'>Panel two</TabPanel></Tabs>", "only 'Panel one' is rendered"),
-    r('Clicking a tab switches the panel', "click tab 'two'", "only 'Panel two' rendered; tab two aria-selected='true', tab one 'false'"),
-    r('Tabs and panels are wired with ARIA', 'inspect the selected tab and its panel', "role='tablist'; tab aria-controls === panel.id; panel aria-labelledby === tab.id"),
-    r('Arrow keys move focus between tabs (wrapping)', "focus tab one, ArrowRight → tab two; ArrowRight ×2 more → wraps to tab one", 'document.activeElement follows: two, then one'),
-    r('Controlled mode calls onChange and waits for the value prop', "<Tabs value='one' onChange={handleChange}>...</Tabs>", "fn('two') called; 'Panel one' stays until the prop changes, then 'Panel two'"),
+    r(
+      'defaultValue shows only its panel',
+      "<Tabs defaultValue='one'><TabList><Tab value='one'>One</Tab><Tab value='two'>Two</Tab></TabList><TabPanel value='one'>Panel one</TabPanel><TabPanel value='two'>Panel two</TabPanel></Tabs>",
+      '<div role="tablist"><button role="tab" id=":id:-tab-one" aria-selected="true" aria-controls=":id:-panel-one" tabIndex={0}>One</button><button role="tab" id=":id:-tab-two" aria-selected="false" aria-controls=":id:-panel-two" tabIndex={-1}>Two</button></div><div role="tabpanel" id=":id:-panel-one" aria-labelledby=":id:-tab-one">Panel one</div>'
+    ),
+    r(
+      'Clicking a tab switches the panel',
+      "click tab 'two'",
+      'renders <div role="tabpanel">Panel two</div>; Tab two aria-selected="true", Tab one aria-selected="false"'
+    ),
+    r(
+      'Tabs and panels are wired with ARIA',
+      'inspect the selected tab and its panel',
+      'TabList role="tablist"; Tab aria-controls === panel.id; TabPanel aria-labelledby === tab.id'
+    ),
+    r(
+      'Arrow keys move focus between tabs (wrapping)',
+      'focus tab one, ArrowRight → tab two; ArrowRight ×2 more → wraps to tab one',
+      'activeElement follows: Tab two, Tab three, then wraps to Tab one'
+    ),
+    r(
+      'Controlled mode calls onChange and waits for the value prop',
+      "<Tabs value='one' onChange={handleChange}>... click Tab two",
+      "calls handleChange('two'); Panel one remains visible until parent re-renders with value='two'"
+    ),
   ],
 };
 

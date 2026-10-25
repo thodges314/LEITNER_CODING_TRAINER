@@ -87,8 +87,20 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'allowMultiple', type: 'boolean', defaultValue: false, description: 'Allow expanding multiple accordion panels simultaneously' },
   ],
   'tabs-accordion-compound': [
-    { name: 'orientation', type: 'enum', defaultValue: 'horizontal', options: ['horizontal', 'vertical'], description: 'Tabs layout direction' },
-    { name: 'defaultIndex', type: 'number', defaultValue: 0, min: 0, max: 4, description: 'Initial active tab index' },
+    {
+      name: 'defaultValue',
+      type: 'enum',
+      defaultValue: 'account',
+      options: ['account', 'password', 'settings'],
+      description: 'Initial active tab value (uncontrolled mode)',
+    },
+    {
+      name: 'value',
+      type: 'enum',
+      options: ['account', 'password', 'settings'],
+      description: 'Controlled active tab value (overrides internal state)',
+    },
+    { name: 'onChange', type: 'function', description: 'Callback fired when active tab changes' },
   ],
   'a11y-form-field': [
     {
