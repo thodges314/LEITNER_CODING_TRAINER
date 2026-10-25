@@ -279,8 +279,12 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'pageSize', type: 'number', defaultValue: 5, min: 1, max: 20, description: 'Number of items fetched per load batch' },
   ],
   'filter-list': [
-    { name: 'placeholder', type: 'string', defaultValue: 'Filter items...', placeholder: 'Search placeholder', description: 'Filter input placeholder' },
-    { name: 'caseSensitive', type: 'boolean', defaultValue: false, description: 'Case-sensitive substring matching' },
+    {
+      name: 'items',
+      type: 'json',
+      defaultValue: ['TypeScript', 'JavaScript', 'Python', 'Rust', 'Go', 'Swift', 'Kotlin', 'C++'],
+      description: 'Array of string items to filter',
+    },
   ],
   'typeahead-autocomplete': [
     { name: 'placeholder', type: 'string', defaultValue: 'Search items...', placeholder: 'Typeahead placeholder', description: 'Search input placeholder' },

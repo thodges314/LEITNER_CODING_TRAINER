@@ -1,6 +1,12 @@
+```ts
+interface FilterListProps {
+  items: string[];
+}
+```
+
 Build a filterable list component for an array of strings:
 
-### FilterList({ items }: { items: string[] }): JSX.Element:
+### FilterList({ items }: FilterListProps): JSX.Element
 - **Search Input**:
   - Controlled `<input aria-label="Filter" value={query} onChange={...} />`.
 - **Filtering Logic**:
@@ -10,6 +16,6 @@ Build a filterable list component for an array of strings:
 - **Render Output**:
   - `<ul>` rendering one `<li>` per matching item.
   - `<p role="status">` announcing results:
-    - `'5 results'` (plural for counts $\ne$ 1).
+    - `'5 results'` (plural for counts !== 1, e.g. 2, 5).
     - `'1 result'` (singular).
     - `'No matches'` (when 0 items match).
