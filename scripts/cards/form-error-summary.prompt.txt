@@ -28,13 +28,9 @@ Build a signup form with two labelled text inputs: Name (`id="name"`) and Email 
   - Valid inputs receive neither attribute.
 
 #### Optional Styling (CSS is not graded)
-Optional helper classes are available in the preview environment:
-- `.error-summary`: red-bordered summary container with soft tint for `<div role="alert">`.
+Optional helper classes are available in the preview environment to highlight error states:
+- `.error-summary`: red-bordered alert container with soft tint for `<div role="alert">`.
 - `.error-summary-title`: heading styling for `<h2 tabIndex={-1}>`.
-- `.error-summary-list`: unordered list with clean link spacing.
-- `.form-group`: stacked container for label, input, and inline error.
-- `.form-label`: bold label styling with spacing.
-- `.form-input`: styled input field with red border when `[aria-invalid="true"]`.
-- `.form-error-message`: inline red error message below inputs.
-- `.form-submit-btn`: primary styled submit button.
-You may use these classes, custom styles, or your own class names.
+- `.error-summary-list`: unordered list of error links.
+- `.form-error-message`: inline red error message below invalid inputs.
+Inputs with `aria-invalid="true"` automatically display a red border. You may use these classes, custom styles, or your own class names.

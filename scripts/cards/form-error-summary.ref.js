@@ -59,11 +59,10 @@ function SignupForm({ onSubmit }) {
         </div>
       )}
       {FIELDS.map((field) => (
-        <div key={field.id} className="form-group">
-          <label htmlFor={field.id} className="form-label">{field.label}</label>
+        <div key={field.id}>
+          <label htmlFor={field.id}>{field.label}</label>
           <input
             id={field.id}
-            className="form-input"
             ref={(el) => {
               inputs.current[field.id] = el;
             }}
@@ -75,7 +74,7 @@ function SignupForm({ onSubmit }) {
           {errors[field.id] && <p id={field.id + '-error'} className="form-error-message">{errors[field.id]}</p>}
         </div>
       ))}
-      <button type="submit" className="form-submit-btn">Create account</button>
+      <button type="submit">Create account</button>
     </form>
   );
 }
