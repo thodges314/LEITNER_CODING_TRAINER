@@ -1,18 +1,27 @@
 interface FormFieldRenderProps {
   id: string;
   'aria-describedby'?: string;
-  'aria-invalid'?: true;
+  'aria-invalid'?: boolean;
+}
+
+interface ToggleButtonProps {
+  pressed: boolean;
+  onPressedChange: (next: boolean) => void;
+  children: React.ReactNode;
+}
+
+interface FormFieldProps {
+  label: React.ReactNode;
+  hint?: React.ReactNode;
+  error?: React.ReactNode;
+  children: (props: FormFieldRenderProps) => React.ReactNode;
 }
 
 function ToggleButton({
   pressed,
   onPressedChange,
   children,
-}: {
-  pressed: boolean;
-  onPressedChange: (next: boolean) => void;
-  children: React.ReactNode;
-}): JSX.Element {
+}: ToggleButtonProps): JSX.Element {
   return (
     <button type="button" aria-pressed={pressed} onClick={(): void => onPressedChange(!pressed)}>
       {children}
@@ -25,12 +34,7 @@ function FormField({
   hint,
   error,
   children,
-}: {
-  label: React.ReactNode;
-  hint?: React.ReactNode;
-  error?: React.ReactNode;
-  children: (props: FormFieldRenderProps) => React.ReactNode;
-}): JSX.Element {
+}: FormFieldProps): JSX.Element {
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
