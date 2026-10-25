@@ -91,7 +91,7 @@ export default {
     ),
     c(
       'Breadcrumbs component renders accessible navigation with active label',
-      `const { render } = $dom;\nconst r = render(React.createElement(Breadcrumbs, { pathname: '/account' }));\n[r.container.querySelector('nav').getAttribute('aria-label'), r.container.querySelector('span').textContent]`,
+      `const { render } = $dom;\nconst r = render(<Breadcrumbs pathname="/account" />);\n[r.container.querySelector('nav').getAttribute('aria-label'), r.container.querySelector('span').textContent]`,
       `['Breadcrumb', 'Account']`,
       { callSignature: "<Breadcrumbs pathname='/account' />" }
     ),

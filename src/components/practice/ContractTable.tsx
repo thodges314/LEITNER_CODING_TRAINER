@@ -75,7 +75,7 @@ export const ContractTable: React.FC<ContractTableProps> = ({
                     </td>
                     <td className="contract-table-td">
                       <pre className="contract-code-pre">
-                        {sanitizeCallSignature(tc.input)}
+                        {sanitizeCallSignature(tc.callSignature || tc.input)}
                       </pre>
                     </td>
                     <td className="contract-table-td">

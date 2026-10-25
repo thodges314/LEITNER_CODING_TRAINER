@@ -1,4 +1,4 @@
-const breadcrumbLabels = {
+const defaultBreadcrumbLabels = {
   '/': 'Home',
   '/products': 'Catalog',
   '/products/electronics': 'Electronics',
@@ -6,9 +6,17 @@ const breadcrumbLabels = {
 };
 
 function Demo() {
+  const {
+    pathname = '/products/electronics/audio',
+    labels = defaultBreadcrumbLabels,
+  } = usePreviewProps({
+    pathname: '/products/electronics/audio',
+    labels: defaultBreadcrumbLabels,
+  });
+
   return (
     <div style={{ padding: '16px' }}>
-      <Breadcrumbs pathname="/products/electronics/audio" labels={breadcrumbLabels} />
+      <Breadcrumbs pathname={pathname || '/'} labels={labels || {}} />
     </div>
   );
 }

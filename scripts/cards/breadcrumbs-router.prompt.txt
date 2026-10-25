@@ -4,24 +4,30 @@ interface BreadcrumbItem {
   label: string;
   isCurrent: boolean;
 }
+
+interface BreadcrumbsProps {
+  pathname: string;
+  labels?: Record<string, string>;
+}
 ```
 
-Implement `generateBreadcrumbs(pathname, customLabels = {})` and an accessible React component `Breadcrumbs({ pathname, labels = {} })`.
+Implement `generateBreadcrumbs(pathname, customLabels = {})` and an accessible React component `Breadcrumbs({ pathname, labels = {} })`:
 
-### generateBreadcrumbs(pathname: string, customLabels: Record<string, string> = {}): BreadcrumbItem[]:
+### generateBreadcrumbs(pathname: string, customLabels: Record<string, string> = {}): BreadcrumbItem[]
 - Normalizes consecutive or trailing slashes (e.g. `'/products/123/'` -> segments `['products', '123']`).
 - Always includes the root breadcrumb `{ path: '/', label: customLabels['/'] || 'Home', isCurrent: false }`.
 - For each subpath, constructs cumulative path (e.g. `'/products'`, `'/products/123'`).
 - Resolves label from `customLabels[path]` if present; otherwise capitalizes the segment string (e.g. `'products'` -> `'Products'`).
 - The final item in the array has `isCurrent: true`; all preceding items have `isCurrent: false`.
-- If pathname is `'/'` or empty, returns `[{ path: '/', label: customLabels['/'] || 'Home', isCurrent: true }]`.
+- If `pathname` is `'/'` or empty, returns `[{ path: '/', label: customLabels['/'] || 'Home', isCurrent: true }]`.
 
-### Breadcrumbs({ pathname, labels = {} }: { pathname: string; labels?: Record<string, string> }): JSX.Element:
-- Renders a `<nav aria-label="Breadcrumb">` wrapping an `<ol className="breadcrumbs">`.
-- For non-current crumbs, renders `<a href={crumb.path}>{crumb.label}</a>`.
-- For the current crumb, renders `<span aria-current="page">{crumb.label}</span>`.
+### Breadcrumbs({ pathname, labels = {} }: BreadcrumbsProps): JSX.Element
+- Uses `generateBreadcrumbs(pathname, labels)` to obtain the crumb items.
+- Renders `<nav aria-label="Breadcrumb">` wrapping an `<ol className="breadcrumbs">`.
+- For each crumb:
+  - Non-current crumbs render `<li>` with `<a href={crumb.path}>{crumb.label}</a>`.
+  - The current crumb renders `<li>` with `<span aria-current="page">{crumb.label}</span>`.
 
-### Optional Styling (CSS is not graded):
-Preloaded helper classes are available if you wish to use them:
+### Preloaded Helper Classes (optional styling):
 - `.breadcrumbs`: Flex row container resetting default list styles.
 - `.breadcrumb-item`: Inline-flex crumb item with automatic `/` separator.

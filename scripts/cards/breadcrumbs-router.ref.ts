@@ -4,6 +4,11 @@ interface BreadcrumbItem {
   isCurrent: boolean;
 }
 
+interface BreadcrumbsProps {
+  pathname: string;
+  labels?: Record<string, string>;
+}
+
 function generateBreadcrumbs(
   pathname: string,
   customLabels: Record<string, string> = {}
@@ -38,27 +43,22 @@ function generateBreadcrumbs(
 function Breadcrumbs({
   pathname,
   labels = {},
-}: {
-  pathname: string;
-  labels?: Record<string, string>;
-}): JSX.Element {
+}: BreadcrumbsProps): JSX.Element {
   const crumbs = generateBreadcrumbs(pathname, labels);
 
-  return React.createElement(
-    'nav',
-    { 'aria-label': 'Breadcrumb' },
-    React.createElement(
-      'ol',
-      { className: 'breadcrumbs' },
-      crumbs.map((c) =>
-        React.createElement(
-          'li',
-          { key: c.path, className: c.isCurrent ? 'breadcrumb-item active' : 'breadcrumb-item' },
-          c.isCurrent
-            ? React.createElement('span', { 'aria-current': 'page' }, c.label)
-            : React.createElement('a', { href: c.path }, c.label)
-        )
-      )
-    )
+  return (
+    <nav aria-label="Breadcrumb">
+      <ol className="breadcrumbs">
+        {crumbs.map((c) => (
+          <li key={c.path} className={c.isCurrent ? 'breadcrumb-item active' : 'breadcrumb-item'}>
+            {c.isCurrent ? (
+              <span aria-current="page">{c.label}</span>
+            ) : (
+              <a href={c.path}>{c.label}</a>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
   );
 }

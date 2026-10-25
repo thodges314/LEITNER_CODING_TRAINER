@@ -250,8 +250,24 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'interval', type: 'number', defaultValue: 3000, min: 500, max: 10000, step: 500, description: 'Auto-play delay in milliseconds' },
   ],
   'breadcrumbs-router': [
-    { name: 'separator', type: 'string', defaultValue: '/', placeholder: 'Separator character', description: 'Divider character or icon between crumb links' },
-    { name: 'maxItems', type: 'number', defaultValue: 4, min: 2, max: 10, description: 'Maximum crumbs shown before collapsing' },
+    {
+      name: 'pathname',
+      type: 'string',
+      defaultValue: '/products/electronics/audio',
+      placeholder: '/path/to/page',
+      description: 'Current router route pathname',
+    },
+    {
+      name: 'labels',
+      type: 'json',
+      defaultValue: {
+        '/': 'Home',
+        '/products': 'Catalog',
+        '/products/electronics': 'Electronics',
+        '/products/electronics/audio': 'Wireless Audio',
+      },
+      description: 'Record of custom label overrides per subpath',
+    },
   ],
   'virtual-list': [
     { name: 'itemHeight', type: 'number', defaultValue: 36, min: 20, max: 100, description: 'Fixed pixel height of each item' },
