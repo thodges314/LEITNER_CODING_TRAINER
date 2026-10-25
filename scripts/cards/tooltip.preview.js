@@ -1,6 +1,6 @@
 function Demo() {
-  const { content = 'Additional details appear on hover or keyboard focus' } = usePreviewProps({
-    content: 'Additional details appear on hover or keyboard focus',
+  const { content = 'Additional details appear on hover or focus' } = usePreviewProps({
+    content: 'Additional details appear on hover or focus',
   });
 
   return (
