@@ -2,6 +2,8 @@ export type PropType = 'number' | 'string' | 'boolean' | 'enum' | 'function' | '
 
 export interface PropDefinition {
   name: string;
+  propName?: string; // Display name when disambiguating multi-component cards (e.g. 'children')
+  group?: string; // Component group name (e.g. 'ToggleButton', 'FormField')
   type: PropType;
   defaultValue?: unknown;
   options?: string[]; // for enum dropdowns
@@ -84,11 +86,64 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'defaultIndex', type: 'number', defaultValue: 0, min: 0, max: 4, description: 'Initial active tab index' },
   ],
   'a11y-form-field': [
-    { name: 'label', type: 'string', defaultValue: 'Username', placeholder: 'Field label', description: 'Associated form field label' },
-    { name: 'error', type: 'string', defaultValue: '', placeholder: 'Validation error message', description: 'Accessible error message' },
-    { name: 'hint', type: 'string', defaultValue: 'Must be 3-16 characters', placeholder: 'Helper text', description: 'Field helper description' },
-    { name: 'required', type: 'boolean', defaultValue: true, description: 'Mark field as required' },
-    { name: 'disabled', type: 'boolean', defaultValue: false, description: 'Disable input field' },
+    {
+      name: 'togglePressed',
+      propName: 'pressed',
+      group: 'ToggleButton',
+      type: 'boolean',
+      defaultValue: false,
+      description: 'Active aria-pressed state of toggle button',
+    },
+    {
+      name: 'toggleChildren',
+      propName: 'children',
+      group: 'ToggleButton',
+      type: 'string',
+      defaultValue: 'Unmuted',
+      placeholder: 'Button content/label',
+      description: 'Button text content',
+    },
+    {
+      name: 'toggleOnPressedChange',
+      propName: 'onPressedChange',
+      group: 'ToggleButton',
+      type: 'function',
+      description: 'Callback fired on toggle click: (next: boolean) => void',
+    },
+    {
+      name: 'formLabel',
+      propName: 'label',
+      group: 'FormField',
+      type: 'string',
+      defaultValue: 'Email Address:',
+      placeholder: 'Label text',
+      description: 'Associated form field label',
+    },
+    {
+      name: 'formHint',
+      propName: 'hint',
+      group: 'FormField',
+      type: 'string',
+      defaultValue: 'We will not share your email',
+      placeholder: 'Helper text (optional)',
+      description: 'Accessible helper description',
+    },
+    {
+      name: 'formError',
+      propName: 'error',
+      group: 'FormField',
+      type: 'string',
+      defaultValue: '',
+      placeholder: 'Error message (optional)',
+      description: 'Validation alert message',
+    },
+    {
+      name: 'formChildren',
+      propName: 'children',
+      group: 'FormField',
+      type: 'function',
+      description: 'Render prop: (fieldProps) => ReactNode',
+    },
   ],
   'simple-table': [
     {

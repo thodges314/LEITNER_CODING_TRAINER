@@ -284,4 +284,43 @@ describe('PropsControlPanel', () => {
     });
     expect(onChange).toHaveBeenCalledWith('columns', undefined);
   });
+
+  it('renders component groups with headers and counts for multi-component cards', async () => {
+    const onChange = vi.fn();
+    const onReset = vi.fn();
+    const groupedDefs: PropDefinition[] = [
+      { name: 'togglePressed', propName: 'pressed', group: 'ToggleButton', type: 'boolean', defaultValue: false },
+      { name: 'toggleChildren', propName: 'children', group: 'ToggleButton', type: 'string', defaultValue: 'Muted' },
+      { name: 'formLabel', propName: 'label', group: 'FormField', type: 'string', defaultValue: 'Email' },
+      { name: 'formChildren', propName: 'children', group: 'FormField', type: 'function' },
+    ];
+
+    await act(async () => {
+      root?.render(
+        <PropsControlPanel
+          cardId="test-card"
+          propDefs={groupedDefs}
+          values={{ togglePressed: false, toggleChildren: 'Muted', formLabel: 'Email' }}
+          onChange={onChange}
+          onReset={onReset}
+        />
+      );
+    });
+
+    const toggleGroup = container?.querySelector('[data-testid="props-group-ToggleButton"]');
+    expect(toggleGroup).not.toBeNull();
+    expect(toggleGroup?.textContent).toContain('ToggleButton');
+    expect(toggleGroup?.textContent).toContain('2 props');
+
+    const formGroup = container?.querySelector('[data-testid="props-group-FormField"]');
+    expect(formGroup).not.toBeNull();
+    expect(formGroup?.textContent).toContain('FormField');
+    expect(formGroup?.textContent).toContain('2 props');
+
+    const toggleChildrenSlot = toggleGroup?.querySelector('[data-testid="props-slot-toggleChildren"]');
+    expect(toggleChildrenSlot?.textContent).toContain('children');
+
+    const formChildrenSlot = formGroup?.querySelector('[data-testid="props-slot-formChildren"]');
+    expect(formChildrenSlot?.textContent).toContain('children');
+  });
 });

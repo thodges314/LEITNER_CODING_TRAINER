@@ -1,25 +1,43 @@
 function Demo() {
-  const [pressed, setPressed] = useState(false);
+  const {
+    togglePressed = false,
+    toggleChildren = 'Unmuted',
+    formLabel = 'Email Address:',
+    formHint = 'We will not share your email',
+    formError = '',
+  } = usePreviewProps({
+    togglePressed: false,
+    toggleChildren: 'Unmuted',
+    formLabel: 'Email Address:',
+    formHint: 'We will not share your email',
+    formError: '',
+  });
+
+  const [activePressed, setActivePressed] = useState(togglePressed);
   const [val, setVal] = useState('');
+
+  useEffect(() => {
+    setActivePressed(togglePressed);
+  }, [togglePressed]);
 
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <div>
         <ToggleButton
-          pressed={pressed}
+          pressed={activePressed}
           onPressedChange={(next) => {
-            setPressed(next);
+            setActivePressed(next);
             log('onPressedChange')(next);
           }}
         >
-          {pressed ? 'Muted' : 'Unmuted'}
+          {toggleChildren}
         </ToggleButton>
       </div>
 
       <FormField
-        label="Email Address:"
-        hint="We will not share your email"
-        error={val.length > 0 && !val.includes('@') ? 'Invalid email address' : undefined}
+        label={formLabel}
+        hint={formHint || undefined}
+        error={formError || (val.length > 0 && !val.includes('@') ? 'Invalid email address' : undefined)}
       >
         {(fieldProps) => (
           <input

@@ -298,6 +298,62 @@
   padding: 4px 0;
 }
 
+/* Props Groups Wrapper & Section */
+.props-groups-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.props-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 10px;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
+[data-theme="apple-gsos"] .props-group-section {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+}
+
+.props-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.props-group-title {
+  font-family: var(--font-mono, monospace);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #06b6d4;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="apple-gsos"] .props-group-title {
+  color: #0284C7;
+}
+
+.props-group-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  background-color: rgba(255, 255, 255, 0.06);
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+[data-theme="apple-gsos"] .props-group-count {
+  background-color: #E2E8F0;
+  color: #64748B;
+}
+
 /* Props Slots Grid */
 .props-slots-grid {
   display: grid;
