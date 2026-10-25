@@ -14,6 +14,14 @@ export const FRONTEND_TRACKS: ReadonlySet<TrackType> = new Set<TrackType>([
   'typescript-patterns',
 ]);
 
+export const ALGORITHMIC_UTILITY_CONCEPTS: ReadonlySet<string> = new Set<string>([
+  'collections',
+  'flatten',
+  'array-polyfills',
+  'equality-clone',
+  'lru',
+]);
+
 export interface DeckPreset {
   id: string;
   name: string;
@@ -39,10 +47,18 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
   {
     id: 'full-library',
     name: 'Full Library (All Cards)',
-    description: 'Complete 277-card curriculum across all frontend and computer-science domains',
+    description: 'Complete 277-card curriculum across all 10 frontend and computer-science domains',
     badge: '277 Cards',
     isBuiltIn: true,
     filter: () => true,
+  },
+  {
+    id: 'full-stack',
+    name: 'Full-Stack Core',
+    description: 'Practical full-stack interview prep: React, DOM, async JS, utilities, TypeScript, and core interview algorithms',
+    badge: '224 Cards',
+    isBuiltIn: true,
+    filter: (card) => card.track !== 'advanced-algorithms',
   },
   {
     id: 'frontend-specialist',
@@ -53,20 +69,15 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
     filter: (card) => FRONTEND_TRACKS.has(card.track),
   },
   {
-    id: 'core-algorithms',
-    name: 'Core Algorithms',
-    description: 'Practical coding interview algorithms: arrays, hashing, two pointers, sliding window, binary search, intervals, linked lists',
-    badge: '27 Cards',
+    id: 'algorithms',
+    name: 'Algorithms & Data Structures',
+    description: 'Practical algorithms, trees, graphs, DP, backtracking, heaps, and algorithmic JS utilities',
+    badge: '96 Cards',
     isBuiltIn: true,
-    filter: (card) => card.track === 'algorithms',
-  },
-  {
-    id: 'advanced-algorithms',
-    name: 'Advanced Algorithms',
-    description: 'Academic computer science: trees, BSTs, graphs, heaps, dynamic programming, backtracking, tries, bit manipulation',
-    badge: '53 Cards',
-    isBuiltIn: true,
-    filter: (card) => card.track === 'advanced-algorithms',
+    filter: (card) =>
+      card.track === 'algorithms' ||
+      card.track === 'advanced-algorithms' ||
+      (card.track === 'js-utilities' && ALGORITHMIC_UTILITY_CONCEPTS.has(card.concept ?? '')),
   },
 ];
 
@@ -75,6 +86,9 @@ export function getBuiltInDecks(): DeckPreset[] {
 }
 
 export function getBuiltInDeck(id: string): DeckPreset | undefined {
+  if (id === 'core-algorithms' || id === 'advanced-algorithms') {
+    return BUILT_IN_DECKS.find((d) => d.id === 'algorithms');
+  }
   return BUILT_IN_DECKS.find((d) => d.id === id);
 }
 
@@ -82,7 +96,9 @@ export function getStoredActiveDeckId(): string {
   if (typeof localStorage === 'undefined') return 'full-library';
   try {
     const val = localStorage.getItem(ACTIVE_DECK_STORAGE_KEY);
-    return val || 'full-library';
+    if (!val) return 'full-library';
+    if (val === 'core-algorithms' || val === 'advanced-algorithms') return 'algorithms';
+    return val;
   } catch {
     return 'full-library';
   }
@@ -133,12 +149,13 @@ export function filterCardsByDeck(
     return cards;
   }
 
-  const builtIn = getBuiltInDeck(deckId);
+  const normalizedId = deckId === 'core-algorithms' || deckId === 'advanced-algorithms' ? 'algorithms' : deckId;
+  const builtIn = getBuiltInDeck(normalizedId);
   if (builtIn) {
     return cards.filter(builtIn.filter);
   }
 
-  const custom = customDecks.find((d) => d.id === deckId);
+  const custom = customDecks.find((d) => d.id === normalizedId);
   if (custom) {
     const allowed = new Set(custom.cardIds);
     return cards.filter((c) => allowed.has(c.id));

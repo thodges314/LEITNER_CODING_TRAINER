@@ -31,29 +31,27 @@ test.describe('Deck Selector & Preset Decks', () => {
     await expect(dropdownMenu).toBeVisible();
     await expect(dropdownMenu).toContainText('Built-in Starter Decks');
 
-    // Switch to Core Algorithms
-    const coreOption = page.getByTestId('deck-option-core-algorithms');
-    await expect(coreOption).toBeVisible();
-    await coreOption.click();
+    // Switch to Full-Stack Core
+    const fullStackOption = page.getByTestId('deck-option-full-stack');
+    await expect(fullStackOption).toBeVisible();
+    await fullStackOption.click();
 
-    // Verify menu closed and trigger reflects Core Algorithms
+    // Verify menu closed and trigger reflects Full-Stack Core
     await expect(dropdownMenu).not.toBeVisible();
-    await expect(deckTrigger).toContainText('Core Algorithms');
-    await expect(deckTrigger).toContainText('27 Cards');
+    await expect(deckTrigger).toContainText('Full-Stack Core');
+    await expect(deckTrigger).toContainText('224 Cards');
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(224);
+    await expect(page.getByText('Showing 224 of 224 cards')).toBeVisible();
 
-    // Verify table rows are scoped to 27 cards
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(27);
-    await expect(page.getByText('Showing 27 of 27 cards')).toBeVisible();
-
-    // Switch to Advanced Algorithms
+    // Switch to Algorithms & Data Structures
     await deckTrigger.click();
-    const advOption = page.getByTestId('deck-option-advanced-algorithms');
-    await advOption.click();
+    const algoOption = page.getByTestId('deck-option-algorithms');
+    await algoOption.click();
 
-    await expect(deckTrigger).toContainText('Advanced Algorithms');
-    await expect(deckTrigger).toContainText('53 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(53);
-    await expect(page.getByText('Showing 53 of 53 cards')).toBeVisible();
+    await expect(deckTrigger).toContainText('Algorithms & Data Structures');
+    await expect(deckTrigger).toContainText('96 Cards');
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(96);
+    await expect(page.getByText('Showing 96 of 96 cards')).toBeVisible();
 
     // Switch to Frontend Specialist
     await deckTrigger.click();
@@ -94,10 +92,10 @@ test.describe('Deck Selector & Preset Decks', () => {
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
     await expect(deckTrigger).toContainText('277 Cards');
 
-    // Switch to Advanced Algorithms
+    // Switch to Algorithms & Data Structures
     await deckTrigger.click();
-    await page.getByTestId('deck-option-advanced-algorithms').click();
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(53);
+    await page.getByTestId('deck-option-algorithms').click();
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(96);
     await expect(page.locator('tbody tr.catalog-tr').filter({ hasText: 'Binary Tree: Depth, Sum, Count' })).toBeVisible();
   });
 });

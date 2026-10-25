@@ -81,9 +81,9 @@ describe('DeckSelector component', () => {
     expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).not.toBeNull();
     expect(container!.textContent).toContain('Built-in Starter Decks');
     expect(container!.querySelector('[data-testid="deck-option-full-library"]')).not.toBeNull();
+    expect(container!.querySelector('[data-testid="deck-option-full-stack"]')).not.toBeNull();
     expect(container!.querySelector('[data-testid="deck-option-frontend-specialist"]')).not.toBeNull();
-    expect(container!.querySelector('[data-testid="deck-option-core-algorithms"]')).not.toBeNull();
-    expect(container!.querySelector('[data-testid="deck-option-advanced-algorithms"]')).not.toBeNull();
+    expect(container!.querySelector('[data-testid="deck-option-algorithms"]')).not.toBeNull();
   });
 
   it('calls onSelectDeck and closes dropdown when an option is clicked', () => {
@@ -103,12 +103,12 @@ describe('DeckSelector component', () => {
       trigger.click();
     });
 
-    const coreOption = container!.querySelector('[data-testid="deck-option-core-algorithms"]') as HTMLButtonElement;
+    const algoOption = container!.querySelector('[data-testid="deck-option-algorithms"]') as HTMLButtonElement;
     act(() => {
-      coreOption.click();
+      algoOption.click();
     });
 
-    expect(handleSelect).toHaveBeenCalledWith('core-algorithms');
+    expect(handleSelect).toHaveBeenCalledWith('algorithms');
     expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).toBeNull();
   });
 
