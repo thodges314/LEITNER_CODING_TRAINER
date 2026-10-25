@@ -70,6 +70,24 @@ export function getCardSpecificStyles(cardId: string | undefined, colors: CardTh
       outline-offset: 2px;
     }
 `;
+    case 'image-carousel':
+      return `
+    /* Image Carousel Slide helper */
+    .carousel-slide, [aria-roledescription="slide"] {
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      margin-bottom: 12px;
+      background: ${cardBg};
+      border: 1px solid ${border};
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: center;
+    }
+`;
 
     case 'kanban-board':
       return `

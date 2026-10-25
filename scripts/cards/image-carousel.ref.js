@@ -24,7 +24,7 @@ function Carousel({ slides, loop = true, autoPlayMs }) {
 
   return (
     <section aria-roledescription="carousel" aria-label="Gallery" tabIndex={0} onKeyDown={onKeyDown}>
-      <div role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${slides.length}`}>
+      <div role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${slides.length}`} className="carousel-slide">
         {slides[index]}
       </div>
       <button onClick={() => step(-1)} disabled={!loop && index === 0}>

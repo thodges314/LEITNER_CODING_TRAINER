@@ -15,3 +15,8 @@ Build an accessible image carousel component for an array of slide strings:
   - Provide one dot button per slide with `aria-label="Go to slide N"` and `aria-current="true"` on the active dot only.
 - **Keyboard Navigation**: Pressing `ArrowRight` or `ArrowLeft` on the focused section navigates slides.
 - **Auto-Play**: When `autoPlayMs` is set, advance every `autoPlayMs` milliseconds (respecting `loop`), and clear the timer on unmount.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.carousel-slide`: styled slide container with height, centering, and soft background for `<div role="group">`.
+You may use these classes, custom styles, or your own class names.
