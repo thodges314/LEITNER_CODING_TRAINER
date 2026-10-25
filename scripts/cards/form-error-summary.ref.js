@@ -37,11 +37,11 @@ function SignupForm({ onSubmit }) {
   return (
     <form onSubmit={submit} noValidate>
       {failing.length > 0 && (
-        <div role="alert" className="error-summary">
-          <h2 tabIndex={-1} ref={summaryRef} className="error-summary-title">
+        <div role="alert">
+          <h2 tabIndex={-1} ref={summaryRef}>
             There is a problem
           </h2>
-          <ul className="error-summary-list">
+          <ul>
             {failing.map((field) => (
               <li key={field.id}>
                 <a
@@ -71,7 +71,7 @@ function SignupForm({ onSubmit }) {
             aria-invalid={errors[field.id] ? 'true' : undefined}
             aria-describedby={errors[field.id] ? field.id + '-error' : undefined}
           />
-          {errors[field.id] && <p id={field.id + '-error'} className="form-error-message">{errors[field.id]}</p>}
+          {errors[field.id] && <p id={field.id + '-error'}>{errors[field.id]}</p>}
         </div>
       ))}
       <button type="submit">Create account</button>

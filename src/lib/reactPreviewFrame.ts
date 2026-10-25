@@ -70,49 +70,7 @@ export function getCardSpecificStyles(cardId: string | undefined, colors: CardTh
       outline-offset: 2px;
     }
 `;
-    case 'form-error-summary':
-      return `
-    /* Form Error Summary - Error State Styles */
-    .error-summary, [role="alert"] {
-      border: 2px solid #ef4444;
-      background: rgba(239, 68, 68, 0.08);
-      border-radius: 8px;
-      padding: 14px 18px;
-      margin-bottom: 16px;
-    }
-    .error-summary-title, [role="alert"] h2 {
-      margin: 0 0 8px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #f87171;
-    }
-    .error-summary-title:focus-visible, [role="alert"] h2:focus-visible {
-      outline: 2px solid #f87171;
-      outline-offset: 2px;
-    }
-    .error-summary-list, [role="alert"] ul {
-      margin: 0;
-      padding-left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .error-summary-list a, [role="alert"] a {
-      color: #38bdf8;
-      text-decoration: underline;
-      font-size: 13px;
-    }
-    input[aria-invalid="true"] {
-      border-color: #ef4444 !important;
-      background: rgba(239, 68, 68, 0.06);
-    }
-    .form-error-message, p[id$="-error"] {
-      margin: 4px 0 0;
-      font-size: 12px;
-      color: #f87171;
-      font-weight: 500;
-    }
-`;
+
     case 'kanban-board':
       return `
     /* Kanban Board helpers */
