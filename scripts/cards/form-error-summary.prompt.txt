@@ -14,8 +14,8 @@ interface SignupFormProps {
 Build a signup form with two labelled text inputs: Name (`id="name"`) and Email (`id="email"`), and a submit button inside `<form noValidate>` (validating only on submit).
 
 - **Validation Rules**:
-  - **Name**: Must not be blank (error message: `'Enter your name'`).
-  - **Email**: Must match `text@text.text` format after trimming (error message: `'Enter a valid email address'`).
+  - **Name**: Must not be blank after trimming (error message: `'Enter your name'`).
+  - **Email**: Must match `/^\S+@\S+\.\S+$/` after trimming (error message: `'Enter a valid email address'`).
   - **Valid Submission**: When all fields are valid, call `onSubmit({ name, email })` with trimmed values and clear any existing error summary.
 - **Error Summary (on invalid submit)**:
   - Rendered above form fields: `<div role="alert">` containing `<h2 tabIndex={-1}>There is a problem</h2>`.
