@@ -35,6 +35,7 @@ import { ContractTable } from './practice/ContractTable';
 import { EditorToolbar, EditorActionControls } from './practice/EditorToolbar';
 import { ConsoleRunnerDrawer } from './practice/ConsoleRunnerDrawer';
 import { ComponentPreviewPane } from './practice/ComponentPreviewPane';
+import { SocraticClarificationAssistant } from './practice/SocraticClarificationAssistant';
 
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
@@ -44,6 +45,7 @@ interface PracticeArenaProps {
   onCommitReview: (passed: boolean) => void;
   onSkipCard: () => void;
   onOpenDeckView: () => void;
+  onOpenSettings?: () => void;
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
   theme?: 'dark' | 'apple-gsos';
@@ -57,6 +59,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   onCommitReview,
   onSkipCard,
   onOpenDeckView,
+  onOpenSettings,
   isReinforcement,
   onFinishReinforcement,
   theme = 'dark',
@@ -682,7 +685,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       />
 
       {/* Prompt Seed Instructions */}
-      <div data-tour="problem" className="prompt-seed-box">
+      <div data-tour="problem" className="prompt-seed-box" style={{ position: 'relative' }}>
+        <SocraticClarificationAssistant
+          topic={currentCard}
+          currentCode={code}
+          theme={theme}
+          onOpenSettings={onOpenSettings}
+        />
         <MarkdownContent text={currentCard.promptSeed} />
       </div>
 

@@ -980,3 +980,165 @@ ${question}`;
   }
 }
 
+/**
+ * Solicits Socratic conceptual guidance, problem requirement clarifications, or
+ * debugging hints from the AI tutor without revealing the actual code solution.
+ */
+export async function askSocraticClarification(
+  topic: TopicItem,
+  userCode: string,
+  question: string,
+  history: CritiqueFollowUpMessage[] = []
+): Promise<string> {
+  const apiKey = getStoredApiKey();
+  const provider = getStoredProvider();
+
+  // Offline guidance when no API key is saved
+  if (!apiKey) {
+    await new Promise((r) => setTimeout(r, 250));
+    return `**Offline Socratic Coach**\n\nYou are in offline mode. To ask live clarification questions and receive real-time conceptual guidance, configure an API key in **Settings** (Groq offers a 100% free tier!).\n\n💡 **Conceptual Starting Point for "${topic.title}"**:\n- Review the Target Contract table below for boundary cases.\n- Target Complexity: ${topic.targetTime || 'O(n)'} time, ${topic.targetSpace || 'O(1)'} space.`;
+  }
+
+  const canonicalCode = topic.referenceSolutionTs || topic.referenceSolution || topic.solution || topic.starterCode || '';
+
+  const systemPrompt = `You are an expert Socratic coding tutor and interview coach in a deliberate practice trainer.
+The learner is practicing cold-start recall for a coding challenge.
+CRITICAL MANDATORY RULES:
+1. NEVER output the code solution, executable snippets, or direct implementations that solve the problem. Do NOT write code that the user can copy-paste to pass.
+2. If asked how an algorithm works (e.g. insertion sort, quicksort, topological sort, binary search), explain the algorithmic mechanics conceptually in plain English using analogies or step-by-step logic, but NO code blocks.
+3. If asked about problem requirements or rules, clarify the contract without ambiguity.
+4. If asked why their current approach might be broken, analyze their code against edge cases and ask guiding questions to lead them to the fix.
+5. Be concise (2-4 paragraphs maximum), encouraging, and technically exact.`;
+
+  const contractSample = (topic.testCases || [])
+    .slice(0, 8)
+    .map((c) => `- Input: ${c.input} -> Expected: ${c.expected} (${c.description})`)
+    .join('\n');
+
+  const contextPrompt = `Problem Title: ${topic.title} (${topic.track})
+Target Concept: ${topic.concept || 'General'}
+Target Complexity: Time ${topic.targetTime || 'O(n)'}, Space ${topic.targetSpace || 'O(1)'}
+
+Prompt & Requirements:
+${topic.promptSeed}
+
+Target Contract Cases:
+${contractSample || '(Standard contract)'}
+
+Canonical Reference Solution (FOR YOUR EYES ONLY - STRICTLY DO NOT REVEAL OR COPY CODE FROM THIS):
+${canonicalCode}
+
+Learner's Current Editor Code:
+${userCode ? userCode : '(Editor is currently empty)'}
+
+Learner's Question / Request:
+${question}`;
+
+  try {
+    if (provider === 'gemini') {
+      const model = getStoredModel() || 'gemini-2.5-flash';
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: [
+            ...history.map((h) => ({
+              role: h.role === 'assistant' ? 'model' : 'user',
+              parts: [{ text: h.content }],
+            })),
+            { role: 'user', parts: [{ text: contextPrompt }] },
+          ],
+          generationConfig: { temperature: 0.3 },
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Gemini error (${response.status}): ${await response.text()}`);
+      }
+      const data = await response.json();
+      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'No response generated.';
+    } else if (provider === 'anthropic') {
+      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
+      const endpoint = 'https://api.anthropic.com/v1/messages';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 1024,
+          temperature: 0.3,
+          system: systemPrompt,
+          messages: [
+            ...history.map((h) => ({
+              role: h.role,
+              content: h.content,
+            })),
+            { role: 'user', content: contextPrompt },
+          ],
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Anthropic error (${response.status}): ${await response.text()}`);
+      }
+      const data = await response.json();
+      return data.content?.[0]?.text?.trim() || 'No response generated.';
+    } else {
+      let baseUrl = getStoredBaseUrl();
+      let model = getStoredModel();
+      if (provider === 'openai') {
+        baseUrl = baseUrl || 'https://api.openai.com/v1';
+        model = model || 'gpt-4o-mini';
+      } else if (provider === 'groq') {
+        baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
+        model = model || 'openai/gpt-oss-120b';
+      } else if (provider === 'cerebras') {
+        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
+        model = model || 'llama3.3-70b';
+      } else if (provider === 'mistral') {
+        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
+        model = model || 'codestral-latest';
+      } else if (provider === 'openrouter') {
+        baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
+        model = model || 'nvidia/nemotron-3-super-120b-a12b:free';
+      }
+
+      const endpoint = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...history.map((h) => ({
+              role: h.role,
+              content: h.content,
+            })),
+            { role: 'user', content: contextPrompt },
+          ],
+          temperature: 0.3,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error (${response.status}): ${await response.text()}`);
+      }
+
+      const data = await response.json();
+      return data.choices?.[0]?.message?.content?.trim() || 'No response generated.';
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return `[Tutor guidance failed (${msg})]. Please check your API key or network connection.`;
+  }
+}
+

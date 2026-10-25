@@ -467,6 +467,7 @@ export function App() {
             onCommitReview={handleCommitReview}
             onSkipCard={handleSkipCard}
             onOpenDeckView={() => setActiveView('dashboard')}
+            onOpenSettings={() => setIsSettingsOpen(true)}
             isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
             onFinishReinforcement={handleFinishReinforcement}
           />
