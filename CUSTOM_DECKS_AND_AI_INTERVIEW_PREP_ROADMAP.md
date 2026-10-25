@@ -203,7 +203,8 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
 - **Preset Built-in Starter Decks**:
   - **Full-Stack Core** (default balanced library: algorithms, React, DOM, async, utilities).
   - **Frontend Specialist** (focused strictly on React components, hooks, DOM/browser APIs, UI patterns, and async plumbing).
-  - **Core Algorithms** (focused strictly on algorithms, trees, graphs, sorting, and data structures).
+  - **Core Algorithms** (focused on standard data structures, sliding window, two-pointer, intervals, and binary search).
+  - **MAANG Algorithms** (focused strictly on hardcore LeetCode Medium/Hard algorithmic rungs: dynamic programming, graphs, backtracking, tries, and min-heaps).
 - **Deck Switcher Dropdown UX**:
   - Located prominently on the main navigation bar / catalog header:
     ```
@@ -212,6 +213,7 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
        • Full-Stack Core (224 cards)
        • Frontend Specialist (125 cards)
        • Core Algorithms (47 cards)
+       • MAANG Algorithms (53 cards)
        ───────────────────────────────────────
        📁 Custom Decks
        • Stripe Senior Screen (19 cards)
@@ -221,11 +223,12 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
        🎯 Tailor with AI Copilot...
     ```
 - **Practice Arena Scheduling**: Update `getNextCard` candidate selection so practice runs strictly within the active deck when one is selected.
-- **Catalog Filtering**: When a deck is active, the Deck Catalog filters down to show cards in that deck, with a clear indicator (e.g. *"Showing 19 cards in 'Stripe Senior Screen' · [View All Cards]"*). Topic filters (React, Algorithms, etc.) continue to filter within the active deck.
+- **Catalog Filtering**: When a deck is active, the Deck Catalog filters down to show cards in that deck, with a clear indicator (e.g. *"Showing 19 cards in 'Stripe Senior Screen' · [View All Cards]"*). Topic filters (React, MAANG Algorithms, etc.) continue to filter within the active deck.
 - **Catalog Management**: Add multi-select checkboxes in the Deck Catalog table allowing users to manually assemble or add cards to any custom deck.
-- **Unification of `algorithms-advanced`**:
-  - Once Decks exist as first-class collections, migrate the 53 `algorithms-advanced` cards back to being first-class topics in the catalog rather than an awkward hidden pack.
-  - Beginners are protected because they start on the "Frontend Specialist" or "Core Algorithms" deck. Learners targeting FAANG/quant screens can select an "Advanced Algorithms" deck or add them to custom decks directly without pack-gating awkwardness.
+- **Establish First-Class `maang-algorithms` Topic Track**:
+  - Replace the awkward `algorithms-advanced` hidden pack mechanism by promoting it to a first-class topic track: `maang-algorithms` (labeled **"MAANG Algorithms"**, styled in vibrant purple/magenta `#a855f7`).
+  - Contains the 53 advanced cards (N-Queens, Word Ladder, Median in Data Stream, Word Break, LIS, Topological Sort, Min Path Sum, etc.).
+  - Visible openly in the catalog under its own dedicated Topic Filter chip, but completely quarantined from beginners who practice with the "Frontend Specialist" or "Core Algorithms" decks!
 
 ### Phase 2: Catalog Indexing & Structured Prompt Pipeline
 - **Catalog Index Script (`scripts/build-catalog-index.mjs`)**: Compiles 277 cards into a minified ~12 KB descriptor index (`id`, `track`, `title`, `concept`, `difficulty`, `tags`, `shortSummary`).
