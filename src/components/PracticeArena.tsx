@@ -687,13 +687,11 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       </div>
 
       {/* Target Contract (Input vs Expected Output) */}
-      <div data-tour="contract">
-        <ContractTable
-          contractCases={contractCases}
-          showHarness={showHarness}
-          onToggleShowHarness={() => setShowHarness((prev) => !prev)}
-        />
-      </div>
+      <ContractTable
+        contractCases={contractCases}
+        showHarness={showHarness}
+        onToggleShowHarness={() => setShowHarness((prev) => !prev)}
+      />
 
       {/* AI Evaluation Result Panel */}
       {evalResult && (
