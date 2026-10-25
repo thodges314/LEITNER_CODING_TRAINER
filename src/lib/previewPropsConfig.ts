@@ -35,7 +35,6 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'countdown-component': [
     { name: 'seconds', type: 'number', defaultValue: 10, min: 1, max: 300, description: 'Starting countdown duration in seconds' },
     { name: 'tickMs', type: 'number', defaultValue: 500, min: 100, max: 2000, step: 100, description: 'Timer tick interval in milliseconds' },
-    { name: 'autoStart', type: 'boolean', defaultValue: true, description: 'Automatically begin countdown on mount' },
     { name: 'onDone', type: 'function', description: 'Callback fired when timer reaches 0' },
   ],
   'switch-toggle-a11y': [
