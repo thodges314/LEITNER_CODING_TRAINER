@@ -276,7 +276,11 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'threshold', type: 'number', defaultValue: 100, min: 10, max: 500, description: 'Bottom scroll threshold in pixels before loading more' },
   ],
   'load-more-list': [
-    { name: 'pageSize', type: 'number', defaultValue: 5, min: 1, max: 20, description: 'Number of items fetched per load batch' },
+    {
+      name: 'fetchPage',
+      type: 'function',
+      description: 'Async function: (page: number) => Promise<{ items: string[], hasMore: boolean }>',
+    },
   ],
   'filter-list': [
     {

@@ -41,11 +41,11 @@ export default {
     r('Without hint or error there is no aria-describedby or aria-invalid', "<FormField label='Email'>{(p) => <input {...p} />}</FormField>", 'neither attribute on the input; no role=alert'),
   ],
   'load-more-list': [
-    r('Loads the first page on mount and shows a loading state', '<LoadMoreList fetchPage={fetchPage} />', "fetchPage(1) called once; <p role='status'> shown; no 'Load more' button"),
-    r('Shows the items and a Load more button while hasMore is true', "page 1 resolves { items: ['a','b'], hasMore: true }", "<li> a, b; 'Load more' button; no loading status"),
-    r('Load more appends the next page', "click 'Load more'; page 2 resolves ['c']", 'requested pages 1, 2; list a, b, c'),
-    r('The button disappears after the last page', "page 2 resolves { items: ['b'], hasMore: false }", "no 'Load more'; list a, b"),
-    r('A failed page shows an alert and Retry reloads the same page', "page 2 rejects, click 'Retry'", "alert 'Failed to load' and list 'a'; page 2 requested again; after success list a, b and no alert"),
-    r('Ignores extra clicks while a page is loading', "click 'Load more' three times quickly", 'fetchPage called only twice in total'),
+    r('Initial mount loading state', '<LoadMoreList fetchPage={fetchPage} />', "calls fetchPage(1); renders <p role='status'>Loading…</p>; <ul></ul> (empty); no 'Load more' button"),
+    r("Render items and 'Load more' button", "page 1 resolves { items: ['a', 'b'], hasMore: true }", "renders <ul><li>a</li><li>b</li></ul> and <button>Load more</button>; no loading status"),
+    r("Append next page on click", "click 'Load more' → page 2 resolves { items: ['c'], hasMore: true }", "calls fetchPage(2); appends to <ul><li>a</li><li>b</li><li>c</li></ul>"),
+    r("Hide button on final page", "page 2 resolves { items: ['b'], hasMore: false }", "renders <ul><li>a</li><li>b</li></ul>; <button>Load more</button> is removed"),
+    r("Error alert and Retry", "page 2 rejects with Error → click 'Retry'", "shows <p role='alert'>Failed to load</p> & <button>Retry</button>; Retry re-fetches page 2"),
+    r("Ignore clicks while loading", "click 'Load more' 3 times while request is pending", "calls fetchPage only once for page 2; extra clicks are ignored"),
   ],
 };
