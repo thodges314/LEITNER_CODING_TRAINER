@@ -239,6 +239,10 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
     - Upon confirming the name, the system clones the preset into a custom deck minus the removed card, switches the active deck to this new personal deck, and immediately advances to the next eligible card.
     - When already studying in a custom personal deck, clicking **"Remove From Deck"** immediately excludes the card from that custom deck's `cardIds` without asking for a new deck name, quickly moving on to the next card.
 - **Catalog Management**: Add multi-select checkboxes in the Deck Catalog table allowing users to manually assemble or add cards to any custom deck.
+- **Default Opening Screen & Two-Stage Split Guided Tour**:
+  - **Decks Screen as Default Entrypoint**: The default initial view on first launch transitions from the practice arena to the Deck Catalog (`DeckDashboard`), giving learners an immediate high-level overview of their available curriculum and decks.
+  - **Stage 1 Tour (Deck Catalog & Decks Concept)**: On first visit, the initial tour triggers directly on the Deck Catalog screen. It introduces the deck architecture (preset starter decks vs. personal/custom decks), filtering by topic/mastery, and clearly spotlights where to click to begin practicing (the primary `[ Start Practicing ]` button in the navigation header as well as 1-click card practice in the table).
+  - **Stage 2 Tour (Practice Arena)**: When the learner clicks through to the Practice Arena for the very first time, the second phase of the tour opens seamlessly. It guides them through reading the problem & contract table, the cold-start editor buffer, Run Code / Test vs. Submit Final Answer, live component previews, and the Socratic AI hint assistant (`(?)`).
 - **Establish First-Class `maang-algorithms` Topic Track**:
   - Replace the awkward `algorithms-advanced` hidden pack mechanism by promoting it to a first-class topic track: `maang-algorithms` (labeled **"MAANG Algorithms"**, styled in vibrant purple/magenta `#a855f7`).
   - Contains the 53 advanced cards (N-Queens, Word Ladder, Median in Data Stream, Word Break, LIS, Topological Sort, Min Path Sum, etc.).
