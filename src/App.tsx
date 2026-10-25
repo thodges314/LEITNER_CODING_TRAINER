@@ -148,11 +148,6 @@ export function App() {
     setSelectedCardId(currentCard.id);
     setCardSnapshotBeforeReview(currentCard);
 
-    const { shouldShowAdvisory } = recordProblemCompletion();
-    if (shouldShowAdvisory) {
-      setIsBackupAdvisoryOpen(true);
-    }
-
     const { nextState, newlyUnlockedCount } = commitCardReview(
       deckState,
       currentCard.id,
@@ -188,10 +183,6 @@ export function App() {
 
     // If review was not already recorded upon submission (e.g. tests or direct call), record it now
     if (!cardSnapshotBeforeReview) {
-      const { shouldShowAdvisory } = recordProblemCompletion();
-      if (shouldShowAdvisory) {
-        setIsBackupAdvisoryOpen(true);
-      }
       const { nextState, newlyUnlockedCount, updatedCard } = commitCardReview(
         deckState,
         currentCard.id,
@@ -205,6 +196,11 @@ export function App() {
         setUnlockToast(`🎉 Staged Milestone Achieved! ${newlyUnlockedCount} locked cards have been unlocked to your active rotation.`);
         setTimeout(() => setUnlockToast(null), 5000);
       }
+    }
+
+    const { shouldShowAdvisory } = recordProblemCompletion();
+    if (shouldShowAdvisory) {
+      setIsBackupAdvisoryOpen(true);
     }
 
     setCardSnapshotBeforeReview(null);
