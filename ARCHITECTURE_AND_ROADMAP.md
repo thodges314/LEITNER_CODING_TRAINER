@@ -72,6 +72,10 @@ scripts/
   testcases/part1-8.mjs, index.mjs   hand-written input/expected pairs
 ```
 
+Feature & Content Roadmaps:
+- `CUSTOM_DECKS_AND_AI_INTERVIEW_PREP_ROADMAP.md`: Custom decks, AI interview tailor, candidate calibration, and downloadable PDF study guide.
+- `TOPIC_EXPANSION_ROADMAP.md`: Specifications, card blueprints, in-browser execution architecture, and authoring templates for Tailwind CSS, GraphQL, and SQL (PostgreSQL via in-browser WASM SQLite).
+
 State keys in `localStorage`: `leitner_coding_deck` (deck + filter + presets + algorithm preference; **stored slim**: built-in cards keep only their progress and small metadata, because `slimForStorage` in `leitner.ts` strips `HEAVY_SEED_FIELDS` and `mergeStoredWithSeed` refills them from the bundled deck on load; custom cards are stored in full; a stored card that is gone from the bundled deck and has no content is dropped), `leitner_draft:<cardId>`, AI settings keys
 (see `ai.ts`). The API key is stored in plaintext in `localStorage` (acceptable for personal use, documented in Settings).
 
