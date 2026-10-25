@@ -255,24 +255,25 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
 - **Printable Dossier View**: Clean print-media stylesheet for high-resolution paper or PDF export.
 
 ### Phase 5: In-Arena AI Socratic Clarification & Hint Assistant ("Ask AI")
-- **The Problem**: When practicing cold-start recall, learners occasionally experience total mental blocks on an algorithm's mechanics (e.g. *"I remember quicksort uses a partition, but I forgot how the two pointers swap"*) or need ambiguity clarified in a prompt requirement. Revealing the solution ruins the practice trial, but being completely stuck stalls momentum.
-- **Trigger & UI Placement**:
-  - A discrete `?` (or Socratic bulb) icon button positioned in the corner of the problem description header (`PracticeHeader.tsx`).
-  - Clicking it opens a focused slide-over drawer / popover chat (`SocraticTutorDrawer.tsx`).
-  - Quick-action prompt chips:
-    - `[ 💡 Explain the core concept (no code) ]`
+- **The Problem**: When practicing cold-start recall, learners occasionally experience total mental blocks on an algorithm's definition or mechanics (e.g. *"I forgot the conceptual premise of insertion sort"*) or need ambiguity clarified in a prompt contract. Revealing the solution ruins the practice trial, and leaving the app to Google it breaks immersion.
+- **Visual Design & Placement**:
+  - Located in the **top-right corner of the problem statement box** (`PracticeHeader.tsx`).
+  - Rendered as a subtle, translucent question mark inside a circle `(?)`. Because prompt text rarely stretches completely across the top-right margin, it remains clean, unobtrusive, and uncrowded.
+- **Interaction & Expand Animation**:
+  - Clicking the `(?)` button smoothly expands an overlay panel downward and outward from that top-right corner, staying **strictly contained within the left prompt section**.
+  - **Zero Editor Disruption**: The right-hand CodeMirror editor remains 100% visible, active, and typable so the learner can write code while glancing at the clarification.
+- **Two-Way Chat & Quick Prompt Chips**:
+  - Quick-action prompt chips for instant 1-click answers:
     - `[ ❓ Clarify problem requirements / rules ]`
+    - `[ 🧠 Conceptual refresher (e.g. "How does insertion sort work?") ]`
     - `[ ⚠️ What edge cases should I watch for? ]`
-    - `[ 🔍 Why might my current logic get stuck? ]`
-    - Plus a free-form input box to ask specific questions.
-- **Context Injection**:
-  - The request passes the card title, domain track, exact prompt text, target contract table, the learner's current editor code, and the canonical reference solution (`.ref.js` and `.ref.ts`).
-  - Having access to the reference solution guarantees the AI's guidance is 100% grounded and never gives misleading advice.
+    - `[ 🔍 Why might my current approach get stuck? ]`
+  - An open text field supporting continuous two-way conversational follow-ups.
 - **Strict Anti-Spoiler / Socratic Guardrails**:
-  - System prompt strictly forbids generating code solutions:
+  - System prompt passes the prompt, contract table, user code, and the canonical reference solution (`.ref.js` and `.ref.ts`), guaranteeing 100% accuracy while enforcing the strict Socratic rule:
     > *"CRITICAL RULE: You are a Socratic coding interview coach. You must NEVER output the code solution, executable snippets, or direct implementations that solve the problem. Instead, explain the algorithmic concept in plain English, ask guiding questions to steer the learner's thinking, clarify what a contract requirement means, or highlight an unhandled edge case. Keep answers concise (under 3 paragraphs)."*
-- **Provider Multi-Key Vault Integration**:
-  - Uses the learner's active key from `src/lib/ai.ts`. Groq Llama 3.3 / Gemini Flash provide instant (<1s), free answers, while Claude 3.5 Sonnet provides staff-level Socratic coaching.
+- **Offline / No-API-Key State**:
+  - If a user clicks the `(?)` without an AI key configured, it opens the **exact same panel style**, explaining the Socratic AI Coach feature and providing a friendly 1-click button (`[ Add Free AI Key in Settings ]`) that links directly to the Multi-Key Vault (pointing out Groq's free tier).
 
 ---
 
