@@ -687,6 +687,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       {/* Prompt Seed Instructions */}
       <div data-tour="problem" className="prompt-seed-box" style={{ position: 'relative' }}>
         <SocraticClarificationAssistant
+          key={currentCard.id}
           topic={currentCard}
           currentCode={code}
           theme={theme}

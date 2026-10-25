@@ -27,8 +27,8 @@ const sampleTopic: TopicItem = {
   promptSeed: 'Implement binarySearch(nums, target) returning the index or -1.',
   box: 1,
   streak: 0,
-  lastReviewed: 0,
-  nextReviewTrial: 1,
+  nextEligibleTrial: 1,
+  status: 'active',
 };
 
 describe('SocraticClarificationAssistant', () => {
@@ -184,4 +184,84 @@ describe('SocraticClarificationAssistant', () => {
     });
     expect(onOpenSettings).toHaveBeenCalledTimes(1);
   });
+
+  it('renders all four follow-up chips when in active conversation', async () => {
+    await act(async () => {
+      root?.render(
+        <SocraticClarificationAssistant
+          topic={sampleTopic}
+          currentCode="function binarySearch() {}"
+        />
+      );
+    });
+
+    const openBtn = container?.querySelector('button[aria-label="Ask AI Tutor for Clarification or Hints"]') as HTMLButtonElement;
+    await act(async () => {
+      openBtn.click();
+    });
+
+    const firstChip = Array.from(container?.querySelectorAll('.socratic-chip-btn') || [])[0] as HTMLButtonElement;
+    await act(async () => {
+      firstChip.click();
+    });
+
+    // Wait for reply and streaming
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 200));
+    });
+
+    const followUpChips = Array.from(container?.querySelectorAll('.socratic-chip-btn') || []);
+    expect(followUpChips.length).toBe(4);
+    expect(followUpChips.some((b) => b.textContent?.includes('Clarify Prompt'))).toBe(true);
+    expect(followUpChips.some((b) => b.textContent?.includes('Concept Refresher'))).toBe(true);
+    expect(followUpChips.some((b) => b.textContent?.includes('Edge Cases'))).toBe(true);
+    expect(followUpChips.some((b) => b.textContent?.includes('Why is current approach broken?'))).toBe(true);
+  });
+
+  it('does not replay streaming animation when closing and reopening chat', async () => {
+    await act(async () => {
+      root?.render(
+        <SocraticClarificationAssistant
+          topic={sampleTopic}
+          currentCode="function binarySearch() {}"
+        />
+      );
+    });
+
+    const openBtn = container?.querySelector('button[aria-label="Ask AI Tutor for Clarification or Hints"]') as HTMLButtonElement;
+    await act(async () => {
+      openBtn.click();
+    });
+
+    const firstChip = Array.from(container?.querySelectorAll('.socratic-chip-btn') || [])[0] as HTMLButtonElement;
+    await act(async () => {
+      firstChip.click();
+    });
+
+    // Wait until streaming completely finishes (onComplete fires and clears animatingIndex)
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 400));
+    });
+
+    expect(container?.textContent).toContain('Binary search divides the sorted space');
+
+    // Close the panel
+    const closeBtn = container?.querySelector('button[aria-label="Close tutor panel"]') as HTMLButtonElement;
+    await act(async () => {
+      closeBtn.click();
+    });
+    expect(container?.textContent).not.toContain('Socratic AI Tutor');
+
+    // Reopen the panel
+    await act(async () => {
+      openBtn.click();
+    });
+
+    // Message should immediately be present in full without having to wait for typewriter interval
+    expect(container?.textContent).toContain('Binary search divides the sorted space');
+    // Ensure no blinking cursor is rendered
+    const blinkCursor = container?.querySelector('span[style*="socraticCursorBlink"]');
+    expect(blinkCursor).toBeNull();
+  });
 });
+

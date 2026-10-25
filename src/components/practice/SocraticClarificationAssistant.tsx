@@ -26,13 +26,22 @@ const StreamedAssistantReply: React.FC<{
   text: string;
   isNew: boolean;
   onScrollToBottom: () => void;
-}> = ({ text, isNew, onScrollToBottom }) => {
+  onComplete?: () => void;
+}> = ({ text, isNew, onScrollToBottom, onComplete }) => {
   const tokens = useMemo(() => {
     return text.match(/(\s+|\S+)/g) || [text];
   }, [text]);
 
   const [tokenCount, setTokenCount] = useState(() => (isNew ? 0 : tokens.length));
   const [isDone, setIsDone] = useState(!isNew);
+
+  const onCompleteRef = useRef(onComplete);
+  const onScrollToBottomRef = useRef(onScrollToBottom);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    onScrollToBottomRef.current = onScrollToBottom;
+  });
 
   useEffect(() => {
     if (!isNew) return;
@@ -44,14 +53,15 @@ const StreamedAssistantReply: React.FC<{
         setTokenCount(tokens.length);
         setIsDone(true);
         clearInterval(interval);
+        onCompleteRef.current?.();
       } else {
         setTokenCount(current);
       }
-      onScrollToBottom();
+      onScrollToBottomRef.current?.();
     }, 20);
 
     return () => clearInterval(interval);
-  }, [isNew, tokens, onScrollToBottom]);
+  }, [isNew, tokens]);
 
   const currentText = useMemo(() => {
     if (isDone || !isNew) return text;
@@ -84,12 +94,22 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
   theme = 'dark',
   onOpenSettings,
 }) => {
+  const [prevTopicId, setPrevTopicId] = useState(topic.id);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<CritiqueFollowUpMessage[]>([]);
+  const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
   const [inputVal, setInputVal] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const chatScrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Reset assistant session if user switches topic without remounting
+  if (prevTopicId !== topic.id) {
+    setPrevTopicId(topic.id);
+    setMessages([]);
+    setAnimatingIndex(null);
+    setIsOpen(false);
+  }
 
   const hasApiKey = Boolean(getStoredApiKey());
   const isLight = theme === 'apple-gsos';
@@ -98,6 +118,21 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
+  };
+
+  const handleToggle = () => {
+    setIsOpen((prev) => {
+      if (prev) {
+        setAnimatingIndex(null);
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setAnimatingIndex(null);
   };
 
   useEffect(() => {
@@ -113,7 +148,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
+        handleClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -131,9 +166,13 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
 
     try {
       const reply = await askSocraticClarification(topic, currentCode, query, messages);
+      const newAssistantIdx = newHistory.length;
+      setAnimatingIndex(newAssistantIdx);
       setMessages([...newHistory, { role: 'assistant', content: reply }]);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
+      const newAssistantIdx = newHistory.length;
+      setAnimatingIndex(newAssistantIdx);
       setMessages([...newHistory, { role: 'assistant', content: `[Clarification error: ${msg}]` }]);
     } finally {
       setIsLoading(false);
@@ -203,7 +242,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
       {/* Floating Translucent Question Mark in Top Right Corner */}
       <button
         type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={handleToggle}
         aria-label="Ask AI Tutor for Clarification or Hints"
         title="Ask AI Tutor for Clarification or Hints (Socratic Mode)"
         style={{
@@ -324,7 +363,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
 
             <button
               type="button"
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
               aria-label="Close tutor panel"
               style={{
                 background: 'none',
@@ -467,8 +506,9 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                     >
                       <StreamedAssistantReply
                         text={msg.content}
-                        isNew={idx === messages.length - 1}
+                        isNew={idx === animatingIndex}
                         onScrollToBottom={scrollToBottom}
+                        onComplete={() => setAnimatingIndex(null)}
                       />
                     </div>
                   )}
@@ -500,12 +540,12 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                 padding: '6px 14px',
                 display: 'flex',
                 gap: '6px',
-                overflowX: 'auto',
+                flexWrap: 'wrap',
                 borderTop: `1px solid ${isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)'}`,
                 backgroundColor: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.15)',
               }}
             >
-              {CHIPS.slice(0, 3).map((chip, idx) => (
+              {CHIPS.map((chip, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -513,7 +553,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                   style={{ fontSize: '11px', padding: '3px 8px' }}
                   onClick={() => handleSendMessage(chip.query)}
                 >
-                  {chip.label.split(' ')[0]} {chip.label.split(' ').slice(1).join(' ')}
+                  {chip.label}
                 </button>
               ))}
             </div>
