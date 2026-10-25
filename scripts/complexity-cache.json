@@ -77,7 +77,7 @@
   "controlled-vs-uncontrolled-input": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Each render and event handling performs constant\u2011time work and stores only a single query string in state."
+    "complexityExplanation": "Each render and event handling performs constant‑time work and stores only a single query string in state."
   },
   "two-pointer-sorted-sum": {
     "targetTime": "O(n)",
@@ -117,7 +117,7 @@
   "memoize": {
     "targetTime": "O(1)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Each call performs constant\u2011time map lookups/inserts, while the cache grows linearly with the number of distinct keys stored."
+    "complexityExplanation": "Each call performs constant‑time map lookups/inserts, while the cache grows linearly with the number of distinct keys stored."
   },
   "bind-call-apply": {
     "targetTime": "O(1)",
@@ -132,7 +132,7 @@
   "event-emitter": {
     "targetTime": "O(1) average for on/off/once, O(N) for emit",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Listeners are kept in per\u2011event collections enabling constant\u2011time registration/removal, while emitting must iterate over all listeners of the event."
+    "complexityExplanation": "Listeners are kept in per‑event collections enabling constant‑time registration/removal, while emitting must iterate over all listeners of the event."
   },
   "curry-compose": {
     "targetTime": "O(n)",
@@ -152,17 +152,17 @@
   "retry-with-backoff": {
     "targetTime": "O(retries)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Performs at most retries+1 sequential attempts, each constant\u2011time, giving linear time in the retry count and constant auxiliary space."
+    "complexityExplanation": "Performs at most retries+1 sequential attempts, each constant‑time, giving linear time in the retry count and constant auxiliary space."
   },
   "fetch-timeout-dedupe": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Map lookup/insertion and timeout setup are constant\u2011time, and only one promise per key is stored, yielding O(1) time and O(1) extra space per call."
+    "complexityExplanation": "Map lookup/insertion and timeout setup are constant‑time, and only one promise per key is stored, yielding O(1) time and O(1) extra space per call."
   },
   "async-queue-scheduler": {
     "targetTime": "O(1)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Each add attaches a constant\u2011size closure to the promise chain in constant time, storing one promise per queued task, yielding O(1) per operation and O(N) total space."
+    "complexityExplanation": "Each add attaches a constant‑size closure to the promise chain in constant time, storing one promise per queued task, yielding O(1) per operation and O(N) total space."
   },
   "express-middleware-chain": {
     "targetTime": "O(N)",
@@ -172,12 +172,12 @@
   "rate-limiter-middleware": {
     "targetTime": "O(1)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Each request updates only its client\u2019s bucket and lazily evicts stale entries in O(1) amortized time, while storing one bucket per active client."
+    "complexityExplanation": "Each request updates only its client’s bucket and lazily evicts stale entries in O(1) amortized time, while storing one bucket per active client."
   },
   "lru-cache-ttl": {
     "targetTime": "O(1)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Uses a hash map for key lookup and a linked ordering structure to move entries, giving constant\u2011time get/set while storing at most the cache capacity."
+    "complexityExplanation": "Uses a hash map for key lookup and a linked ordering structure to move entries, giving constant‑time get/set while storing at most the cache capacity."
   },
   "flatten-array-object": {
     "targetTime": "O(N)",
@@ -197,7 +197,7 @@
   "get-set-path": {
     "targetTime": "O(p)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Both get and set traverse the path once, performing constant\u2011time work per segment and using only a few scalar variables."
+    "complexityExplanation": "Both get and set traverse the path once, performing constant‑time work per segment and using only a few scalar variables."
   },
   "deep-equal": {
     "targetTime": "O(N)",
@@ -212,12 +212,12 @@
   "use-debounce-hook": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Both hooks perform constant\u2011time updates and keep only a few scalar state/ref values, resulting in O(1) time per render/effect and O(1) additional space."
+    "complexityExplanation": "Both hooks perform constant‑time updates and keep only a few scalar state/ref values, resulting in O(1) time per render/effect and O(1) additional space."
   },
   "use-fetch-hook": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Each fetch triggers one network request and constant\u2011time state updates, with only constant\u2011size bookkeeping aside from the returned data."
+    "complexityExplanation": "Each fetch triggers one network request and constant‑time state updates, with only constant‑size bookkeeping aside from the returned data."
   },
   "typeahead-autocomplete": {
     "targetTime": "O(n)",
@@ -227,7 +227,7 @@
   "use-previous-latest-ref": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "All hooks perform constant\u2011time operations and store only a single ref, yielding O(1) time and O(1) space."
+    "complexityExplanation": "All hooks perform constant‑time operations and store only a single ref, yielding O(1) time and O(1) space."
   },
   "infinite-scroll-list": {
     "targetTime": "O(n)",
@@ -247,12 +247,12 @@
   "tabs-accordion-compound": {
     "targetTime": "O(1)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Selecting/focusing a tab and rendering the active panel are constant\u2011time operations, while storing the list of tabs/panels requires linear space in the number of tabs."
+    "complexityExplanation": "Selecting/focusing a tab and rendering the active panel are constant‑time operations, while storing the list of tabs/panels requires linear space in the number of tabs."
   },
   "two-sum-hashmap": {
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
-    "complexityExplanation": "A single linear scan with a hash map provides constant\u2011time complement lookups, yielding linear time and linear extra space."
+    "complexityExplanation": "A single linear scan with a hash map provides constant‑time complement lookups, yielding linear time and linear extra space."
   },
   "tree-traversal-dom": {
     "targetTime": "O(N)",
@@ -282,12 +282,12 @@
   "ts-custom-type-guards": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Both functions perform a fixed number of constant\u2011time operations and use only constant extra space."
+    "complexityExplanation": "Both functions perform a fixed number of constant‑time operations and use only constant extra space."
   },
   "ts-typed-event-emitter": {
     "targetTime": "O(1) average for registration, O(L) for emission",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Listeners are stored in a hash map allowing constant\u2011time registration and linear\u2011time dispatch over the listeners of the emitted event."
+    "complexityExplanation": "Listeners are stored in a hash map allowing constant‑time registration and linear‑time dispatch over the listeners of the emitted event."
   },
   "classnames-utility": {
     "targetTime": "O(N)",
@@ -302,7 +302,7 @@
   "css-specificity": {
     "targetTime": "O(n)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "A single linear scan of the selector string with constant\u2011size counters yields the specificity, giving linear time and constant auxiliary space."
+    "complexityExplanation": "A single linear scan of the selector string with constant‑size counters yields the specificity, giving linear time and constant auxiliary space."
   },
   "format-utilities": {
     "targetTime": "O(n)",
@@ -327,7 +327,7 @@
   "new-instanceof-create": {
     "targetTime": "O(n)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "All operations are constant\u2011time except myInstanceOf, which may traverse the prototype chain linearly."
+    "complexityExplanation": "All operations are constant‑time except myInstanceOf, which may traverse the prototype chain linearly."
   },
   "promise-class-scratch": {
     "targetTime": "O(1) amortized per method (settling callbacks O(k))",
@@ -337,7 +337,7 @@
   "promisify-callback": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "The wrapper adds constant\u2011time overhead (creating a Promise and invoking the callback) independent of the original function's work."
+    "complexityExplanation": "The wrapper adds constant‑time overhead (creating a Promise and invoking the callback) independent of the original function's work."
   },
   "query-string-url": {
     "targetTime": "O(n)",
@@ -352,7 +352,7 @@
   "event-delegation": {
     "targetTime": "O(N)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Each event traverses up the DOM tree with closest, taking time proportional to the tree depth (worst\u2011case linear in element count) while using only constant extra space."
+    "complexityExplanation": "Each event traverses up the DOM tree with closest, taking time proportional to the tree depth (worst‑case linear in element count) while using only constant extra space."
   },
   "storage-ttl-wrapper": {
     "targetTime": "O(1)",
@@ -387,17 +387,17 @@
   "on-click-outside-hook": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Each event handler runs in constant time checking the ref and invoking the latest handler, and the hook maintains only constant\u2011size references."
+    "complexityExplanation": "Each event handler runs in constant time checking the ref and invoking the latest handler, and the hook maintains only constant‑size references."
   },
   "use-local-storage-hook": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Each hook operation reads or writes a single localStorage key and parses/stringifies its value, which are constant\u2011time and constant\u2011space actions independent of input size."
+    "complexityExplanation": "Each hook operation reads or writes a single localStorage key and parses/stringifies its value, which are constant‑time and constant‑space actions independent of input size."
   },
   "bind-method-partial": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Both functions create a constant\u2011size closure and invoke the underlying function with a simple argument spread, yielding constant time and space per operation."
+    "complexityExplanation": "Both functions create a constant‑size closure and invoke the underlying function with a simple argument spread, yielding constant time and space per operation."
   },
   "callback-emitter": {
     "targetTime": "O(k)",
@@ -407,7 +407,7 @@
   "fifo-cache": {
     "targetTime": "O(1)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "All operations run in constant time using a hash map with insertion\u2011order tracking, while storing at most the fixed capacity of entries."
+    "complexityExplanation": "All operations run in constant time using a hash map with insertion‑order tracking, while storing at most the fixed capacity of entries."
   },
   "focus-on-mount": {
     "targetTime": "O(1)",
@@ -452,7 +452,7 @@
   "sleep-and-delay": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "All functions perform only constant\u2011time operations (creating a Promise, setting a timer, and reading timestamps) and use only constant extra space."
+    "complexityExplanation": "All functions perform only constant‑time operations (creating a Promise, setting a timer, and reading timestamps) and use only constant extra space."
   },
   "tree-depth-sum": {
     "targetTime": "O(N)",
@@ -467,7 +467,7 @@
   "file-explorer-tree": {
     "targetTime": "O(N)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Each node is visited once during rendering and each folder stores a constant\u2011size open flag, yielding linear time and space in the total number of nodes."
+    "complexityExplanation": "Each node is visited once during rendering and each folder stores a constant‑size open flag, yielding linear time and space in the total number of nodes."
   },
   "star-rating-component": {
     "targetTime": "O(N)",
@@ -502,12 +502,12 @@
   "use-toggle-counter": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Both hooks perform constant\u2011time state updates and maintain only a few scalar values, requiring O(1) time per operation and O(1) auxiliary space."
+    "complexityExplanation": "Both hooks perform constant‑time state updates and maintain only a few scalar values, requiring O(1) time per operation and O(1) auxiliary space."
   },
   "data-table": {
-    "targetTime": "O(N\u202flog\u202fN)",
+    "targetTime": "O(N log N)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "Filtering scans all rows (O(N\u202fM)) and sorting the filtered rows dominates with O(N\u202flog\u202fN) time, using O(N) extra space for the filtered/sorted list."
+    "complexityExplanation": "Filtering scans all rows (O(N M)) and sorting the filtered rows dominates with O(N log N) time, using O(N) extra space for the filtered/sorted list."
   },
   "dropdown-menu": {
     "targetTime": "O(N)",
@@ -525,19 +525,19 @@
     "complexityExplanation": "Sorting a copy of the items array costs O(n log n) time and O(n) extra space, and useMemo avoids recomputation on unrelated state changes."
   },
   "simple-table": {
-    "targetTime": "O(R\u202f\u00d7\u202fC)",
-    "targetSpace": "O(R\u202f\u00d7\u202fC)",
+    "targetTime": "O(R × C)",
+    "targetSpace": "O(R × C)",
     "complexityExplanation": "The table renders each column header once and each cell once, requiring R*C cell operations plus O(C) header work."
   },
   "undo-redo-hook": {
     "targetTime": "O(1)",
     "targetSpace": "O(N)",
-    "complexityExplanation": "All operations (set, undo, redo) manipulate only the ends of bounded past/future buffers, giving constant\u2011time work while storing at most\u202flimit\u202fstates, i.e., linear space in the limit."
+    "complexityExplanation": "All operations (set, undo, redo) manipulate only the ends of bounded past/future buffers, giving constant‑time work while storing at most limit states, i.e., linear space in the limit."
   },
   "virtual-list": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Computes visible range in constant time and renders only a constant\u2011size window of items regardless of total list length"
+    "complexityExplanation": "Computes visible range in constant time and renders only a constant‑size window of items regardless of total list length"
   },
   "image-carousel": {
     "targetTime": "O(1)",
@@ -547,7 +547,7 @@
   "optimistic-like-button": {
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
-    "complexityExplanation": "Each click performs a constant\u2011time state update and a single async call, with only constant\u2011size state stored in the component."
+    "complexityExplanation": "Each click performs a constant‑time state update and a single async call, with only constant‑size state stored in the component."
   },
   "toast-queue": {
     "targetTime": "O(1)",
@@ -575,8 +575,8 @@
     "complexityExplanation": "One pass over each string with a character-count map (bounded by alphabet size); prefix comparison is linear in total characters."
   },
   "group-anagrams-top-k": {
-    "targetTime": "O(n\u00b7k log k + d log d)",
-    "targetSpace": "O(n\u00b7k)",
+    "targetTime": "O(n·k log k + d log d)",
+    "targetSpace": "O(n·k)",
     "complexityExplanation": "Sorting each word (length k) builds the group key; top-K counts in one pass then sorts the d distinct values."
   },
   "climb-stairs-fib-dp": {
@@ -585,12 +585,12 @@
     "complexityExplanation": "Iterating with two rolling values computes each Fibonacci step once without storing the whole table."
   },
   "coin-change-dp": {
-    "targetTime": "O(amount \u00d7 coins)",
+    "targetTime": "O(amount × coins)",
     "targetSpace": "O(amount)",
     "complexityExplanation": "The DP table has amount+1 entries and each entry tries every coin denomination."
   },
   "lis-house-robber-dp": {
-    "targetTime": "O(n\u00b2)",
+    "targetTime": "O(n²)",
     "targetSpace": "O(n)",
     "complexityExplanation": "House robber is O(n) with two rolling values; the quadratic LIS compares each element with all earlier ones using an O(n) table."
   },
@@ -605,8 +605,8 @@
     "complexityExplanation": "Validation and inversion visit every node once; LCA walks one path; recursion depth is the tree height h."
   },
   "flood-fill-islands": {
-    "targetTime": "O(rows \u00d7 cols)",
-    "targetSpace": "O(rows \u00d7 cols)",
+    "targetTime": "O(rows × cols)",
+    "targetSpace": "O(rows × cols)",
     "complexityExplanation": "Each cell is visited at most once; the recursion stack and the visited set can grow to the grid size."
   },
   "course-schedule-topo": {
@@ -630,9 +630,9 @@
     "complexityExplanation": "Divide-and-conquer halves the input log n times with linear merging or partitioning per level; the copying versions allocate O(n)."
   },
   "permutations-subsets-backtracking": {
-    "targetTime": "O(n \u00b7 n!) / O(n \u00b7 2\u207f) / O(4\u207f/\u221an)",
+    "targetTime": "O(n · n!) / O(n · 2ⁿ) / O(4ⁿ/√n)",
     "targetSpace": "O(n) recursion",
-    "complexityExplanation": "Output size dominates: n! permutations, 2\u207f subsets and Catalan-many parentheses strings, while the recursion depth stays at most O(n)."
+    "complexityExplanation": "Output size dominates: n! permutations, 2ⁿ subsets and Catalan-many parentheses strings, while the recursion depth stays at most O(n)."
   },
   "binary-search-variants": {
     "targetTime": "O(log n)",
@@ -645,8 +645,8 @@
     "complexityExplanation": "At each step one half is guaranteed sorted, so the range halves with constant extra state."
   },
   "matrix-rotate-spiral": {
-    "targetTime": "O(rows \u00d7 cols)",
-    "targetSpace": "O(rows \u00d7 cols)",
+    "targetTime": "O(rows × cols)",
+    "targetSpace": "O(rows × cols)",
     "complexityExplanation": "Every cell is read exactly once and the new rotated or spiral output holds all cells."
   },
   "kadane-prefix-sum": {
@@ -655,7 +655,7 @@
     "complexityExplanation": "Each function is a single pass; productExceptSelf and subarraySum keep an O(n) output array or prefix-sum map (Kadane alone is O(1) space)."
   },
   "insertion-sort-basic": {
-    "targetTime": "O(n\u00b2)",
+    "targetTime": "O(n²)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Insertion sort shifts elements within nested loops over n items and selection sort scans the unsorted rest n times, both using constant extra space apart from the output copy."
   },
@@ -670,13 +670,13 @@
     "complexityExplanation": "Building visits every character of every word once and creates at most one nested object per character; lookups cost one step per character."
   },
   "binary-strings-combinations": {
-    "targetTime": "O(n \u00b7 2\u207f) / O(k \u00b7 C(n,k))",
+    "targetTime": "O(n · 2ⁿ) / O(k · C(n,k))",
     "targetSpace": "O(n)",
-    "complexityExplanation": "Output size dominates (2\u207f strings or C(n,k) combinations) while the recursion depth and current path stay at most n long."
+    "complexityExplanation": "Output size dominates (2ⁿ strings or C(n,k) combinations) while the recursion depth and current path stay at most n long."
   },
   "matrix-basics": {
-    "targetTime": "O(rows \u00d7 cols)",
-    "targetSpace": "O(rows \u00d7 cols)",
+    "targetTime": "O(rows × cols)",
+    "targetSpace": "O(rows × cols)",
     "complexityExplanation": "Creating or summing touches every cell once; diagonalSum is O(n) and createMatrix allocates the full grid."
   },
   "graph-adjacency-bfs": {
@@ -815,23 +815,23 @@
     "complexityExplanation": "Every bar is pushed and popped at most once, so both functions are linear with a stack of up to n indices."
   },
   "unique-paths-grid": {
-    "targetTime": "O(m \u00d7 n)",
+    "targetTime": "O(m × n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Every cell is computed once from its top and left neighbours, keeping only one row of counts."
   },
   "min-path-sum-grid": {
-    "targetTime": "O(m \u00d7 n)",
+    "targetTime": "O(m × n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Each grid or triangle cell is visited once and only a single row of best-so-far sums is stored."
   },
   "lcs-subsequence": {
-    "targetTime": "O(m \u00d7 n)",
-    "targetSpace": "O(m \u00d7 n)",
+    "targetTime": "O(m × n)",
+    "targetSpace": "O(m × n)",
     "complexityExplanation": "The LCS table has (m + 1) x (n + 1) cells each filled once; isSubsequence is a single linear two-pointer pass."
   },
   "edit-distance-knapsack": {
-    "targetTime": "O(m \u00d7 n) / O(items \u00d7 capacity)",
-    "targetSpace": "O(m \u00d7 n) / O(capacity)",
+    "targetTime": "O(m × n) / O(items × capacity)",
+    "targetSpace": "O(m × n) / O(capacity)",
     "complexityExplanation": "Edit distance fills an (m + 1) x (n + 1) table; the knapsack tries each item against every capacity using a single capacity-sized array."
   },
   "jump-game-greedy": {
@@ -870,22 +870,22 @@
     "complexityExplanation": "Each function scans the string once and builds an output proportional to its length."
   },
   "longest-palindrome-substring": {
-    "targetTime": "O(n\u00b2)",
+    "targetTime": "O(n²)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Expanding around each of the 2n - 1 centers costs up to n steps each, with only index variables stored."
   },
   "string-arithmetic": {
-    "targetTime": "O(n + m) / O(n \u00d7 m)",
+    "targetTime": "O(n + m) / O(n × m)",
     "targetSpace": "O(n + m)",
     "complexityExplanation": "Addition walks both strings once with a carry; schoolbook multiplication fills an n + m digit array."
   },
   "word-break-decode": {
-    "targetTime": "O(n\u00b2) / O(n)",
+    "targetTime": "O(n²) / O(n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Word break checks each prefix against each earlier split point; decode ways does one pass with a table of n + 1 counts."
   },
   "partition-subset-sum": {
-    "targetTime": "O(n \u00d7 S)",
+    "targetTime": "O(n × S)",
     "targetSpace": "O(S)",
     "complexityExplanation": "Each number updates a one-dimensional table indexed by the subset sum S being searched."
   },
@@ -1128,5 +1128,20 @@
     "targetTime": "O(n)",
     "targetSpace": "O(n)",
     "complexityExplanation": "Computing and updating tri-state status traverses tree nodes in linear time."
+  },
+  "calculate-winner": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Checks 8 fixed winning combinations on a constant 3x3 board."
+  },
+  "flatten-visible-tree": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(h)",
+    "complexityExplanation": "Depth-first traversal visits each node once with recursion depth bounded by tree height."
+  },
+  "visible-window-range": {
+    "targetTime": "O(1)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Constant-time arithmetic and math clamping for virtual scroll offsets and indices."
   }
 }

@@ -937,11 +937,11 @@
   },
   "calculate-winner": {
     "difficulty": 1,
-    "concept": "game-board"
+    "concept": "board-game-logic"
   },
   "paginate-items": {
     "difficulty": 1,
-    "concept": "pagination"
+    "concept": "pagination-utility"
   },
   "create-store-basic": {
     "difficulty": 2,
@@ -949,15 +949,15 @@
   },
   "flatten-visible-tree": {
     "difficulty": 2,
-    "concept": "tree-ui"
+    "concept": "tree-virtualization"
   },
   "add-tag-rules": {
     "difficulty": 1,
-    "concept": "tag-input"
+    "concept": "tag-rules"
   },
   "visible-window-range": {
     "difficulty": 2,
-    "concept": "virtualization"
+    "concept": "windowing-math"
   },
   "history-stack-basic": {
     "difficulty": 2,
@@ -965,23 +965,23 @@
   },
   "carousel-index-math": {
     "difficulty": 1,
-    "concept": "carousel"
+    "concept": "carousel-math"
   },
   "move-between-lists": {
     "difficulty": 2,
-    "concept": "dual-list"
+    "concept": "dual-list-logic"
   },
   "toast-queue-logic": {
     "difficulty": 2,
-    "concept": "notifications"
+    "concept": "toast-queue-state"
   },
   "wizard-step-logic": {
     "difficulty": 2,
-    "concept": "wizard"
+    "concept": "wizard-logic"
   },
   "optimistic-list-update": {
     "difficulty": 2,
-    "concept": "optimistic-ui"
+    "concept": "optimistic-state"
   },
   "call-recorder-spy": {
     "difficulty": 2,
@@ -1108,4 +1108,3 @@
     "concept": "a11y-components"
   }
 }
-
