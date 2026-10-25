@@ -1,6 +1,13 @@
+```ts
+interface TooltipProps {
+  content: React.ReactNode;
+  children: React.ReactElement;
+}
+```
+
 Build an accessible tooltip component:
 
-### Tooltip({ content, children }: { content: React.ReactNode; children: React.ReactElement }): JSX.Element:
+### Tooltip({ content, children }: TooltipProps): JSX.Element
 - `children` is a single React element (typically a `<button>`).
 - **Trigger Cloning**: Use `React.cloneElement` on `children` to attach event handlers while preserving all original child props and existing handlers (`onMouseEnter`, `onMouseLeave`, `onFocus`, `onBlur`, `onKeyDown`).
 - **Visibility Triggers**:

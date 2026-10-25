@@ -49,8 +49,6 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   ],
   'tooltip': [
     { name: 'content', type: 'string', defaultValue: 'Additional details appear on hover or focus', placeholder: 'Tooltip content', description: 'Tooltip popup message' },
-    { name: 'placement', type: 'enum', defaultValue: 'top', options: ['top', 'bottom', 'left', 'right'], description: 'Tooltip floating placement' },
-    { name: 'delay', type: 'number', defaultValue: 200, min: 0, max: 1500, step: 50, description: 'Hover show delay in ms' },
   ],
   'popover': [
     { name: 'placement', type: 'enum', defaultValue: 'top', options: ['top', 'bottom', 'left', 'right'], description: 'Popover placement relative to trigger' },

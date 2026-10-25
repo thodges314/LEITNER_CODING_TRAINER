@@ -13693,7 +13693,7 @@
       "overlay",
       "cloneElement"
     ],
-    "promptSeed": "Build an accessible tooltip component:\n\n### Tooltip({ content, children }: { content: React.ReactNode; children: React.ReactElement }): JSX.Element:\n- `children` is a single React element (typically a `<button>`).\n- **Trigger Cloning**: Use `React.cloneElement` on `children` to attach event handlers while preserving all original child props and existing handlers (`onMouseEnter`, `onMouseLeave`, `onFocus`, `onBlur`, `onKeyDown`).\n- **Visibility Triggers**:\n  - **Show**: On mouse enter (`mouseenter`) and on keyboard focus (`focus`).\n  - **Hide**: On mouse leave (`mouseleave`), on blur (`blur`), or when `Escape` is pressed.\n- **Accessibility & ARIA**:\n  - While visible, render `<span role=\"tooltip\" id={id}>{content}</span>` next to the trigger (`content` may be any React node) and set `aria-describedby={id}` on the trigger element.\n  - While hidden, render no tooltip element and omit `aria-describedby` from the trigger.\n  - Generate `id` using React's `useId()`.",
+    "promptSeed": "```ts\ninterface TooltipProps {\n  content: React.ReactNode;\n  children: React.ReactElement;\n}\n```\n\nBuild an accessible tooltip component:\n\n### Tooltip({ content, children }: TooltipProps): JSX.Element\n- `children` is a single React element (typically a `<button>`).\n- **Trigger Cloning**: Use `React.cloneElement` on `children` to attach event handlers while preserving all original child props and existing handlers (`onMouseEnter`, `onMouseLeave`, `onFocus`, `onBlur`, `onKeyDown`).\n- **Visibility Triggers**:\n  - **Show**: On mouse enter (`mouseenter`) and on keyboard focus (`focus`).\n  - **Hide**: On mouse leave (`mouseleave`), on blur (`blur`), or when `Escape` is pressed.\n- **Accessibility & ARIA**:\n  - While visible, render `<span role=\"tooltip\" id={id}>{content}</span>` next to the trigger (`content` may be any React node) and set `aria-describedby={id}` on the trigger element.\n  - While hidden, render no tooltip element and omit `aria-describedby` from the trigger.\n  - Generate `id` using React's `useId()`.",
     "difficulty": 3,
     "concept": "a11y-components",
     "referenceSolution": "function Tooltip({ content, children }) {\n  const [open, setOpen] = useState(false);\n  const id = useId();\n  const child = React.Children.only(children);\n  const show = () => setOpen(true);\n  const hide = () => setOpen(false);\n  const chain = (name, handler) => (e) => {\n    if (typeof child.props[name] === 'function') child.props[name](e);\n    handler(e);\n  };\n\n  const trigger = React.cloneElement(child, {\n    'aria-describedby': open ? id : undefined,\n    onMouseEnter: chain('onMouseEnter', show),\n    onMouseLeave: chain('onMouseLeave', hide),\n    onFocus: chain('onFocus', show),\n    onBlur: chain('onBlur', hide),\n    onKeyDown: chain('onKeyDown', (e) => {\n      if (e.key === 'Escape') hide();\n    }),\n  });\n\n  return (\n    <span style={{ position: 'relative', display: 'inline-block' }}>\n      {trigger}\n      {open && (\n        <span role=\"tooltip\" id={id}>\n          {content}\n        </span>\n      )}\n    </span>\n  );\n}",
@@ -13701,42 +13701,42 @@
       {
         "description": "Hidden by default: the child renders, no tooltip, no aria-describedby",
         "input": "<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>",
-        "expected": "button 'Save' only; no role='tooltip'; no aria-describedby"
+        "expected": "<button>Save</button> (no role=\"tooltip\"; no aria-describedby)"
       },
       {
         "description": "Hovering shows role=\"tooltip\" with the content and links it via aria-describedby",
         "input": "mouseover the button",
-        "expected": "role='tooltip' text 'Saves the file' with an id; button aria-describedby equals that id"
+        "expected": "<button aria-describedby=\":id:\">Save</button><span role=\"tooltip\" id=\":id:\">Saves the file</span>"
       },
       {
         "description": "Leaving the trigger hides the tooltip and removes aria-describedby",
         "input": "mouseover, then mouseout",
-        "expected": "no tooltip; no aria-describedby"
+        "expected": "<button>Save</button> (no tooltip; no aria-describedby)"
       },
       {
         "description": "Keyboard users get it too: focus shows the tooltip, blur hides it",
         "input": "focus the button, then blur it",
-        "expected": "tooltip visible after focus; gone after blur"
+        "expected": "renders <span role=\"tooltip\"> on focus; removed on blur"
       },
       {
         "description": "Escape dismisses the tooltip; other keys do not",
         "input": "focus; press Enter; press Escape",
-        "expected": "still visible after Enter; hidden after Escape"
+        "expected": "remains visible on Enter; removed on Escape"
       },
       {
         "description": "The child's own handlers and props are preserved",
         "input": "child has onFocus, onMouseEnter, onKeyDown and className=\"primary\"; hover, focus, press \"a\"",
-        "expected": "calls: enter, focus, key; className still 'primary'"
+        "expected": "calls: enter, focus, key; button retains className=\"primary\""
       },
       {
         "description": "The content can be any React node",
         "input": "content={<b>Bold tip</b>}",
-        "expected": "tooltip contains a <b> with text 'Bold tip'"
+        "expected": "<span role=\"tooltip\"><b>Bold tip</b></span>"
       }
     ],
     "testHarness": "const { render, fire, q, wait } = $dom;\nconst trigger = (c) => q('button', c);\nconst tip = (c) => q('[role=\"tooltip\"]', c);\nconst hover = async (el) => { fire.event(el, new MouseEvent('mouseover', { bubbles: true })); await wait(30); };\nconst unhover = async (el) => { fire.event(el, new MouseEvent('mouseout', { bubbles: true })); await wait(30); };\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  $test.check('Hidden by default: the child renders, no tooltip, no aria-describedby', trigger(r.container).textContent === 'Save' && tip(r.container) === null && !trigger(r.container).hasAttribute('aria-describedby'), r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  await hover(trigger(r.container));\n  const t = tip(r.container);\n  $test.check('Hovering shows role=\"tooltip\" with the content and links it via aria-describedby', t !== null && t.textContent === 'Saves the file' && t.id !== '' && trigger(r.container).getAttribute('aria-describedby') === t.id, r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  await hover(trigger(r.container));\n  await unhover(trigger(r.container));\n  $test.check('Leaving the trigger hides the tooltip and removes aria-describedby', tip(r.container) === null && !trigger(r.container).hasAttribute('aria-describedby'), r.container.innerHTML);\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  fire.focus(trigger(r.container));\n  await wait(30);\n  const shownOnFocus = tip(r.container) !== null;\n  trigger(r.container).blur();\n  await wait(30);\n  $test.check('Keyboard users get it too: focus shows the tooltip, blur hides it', shownOnFocus && tip(r.container) === null, { shownOnFocus, afterBlur: tip(r.container) !== null });\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content=\"Saves the file\"><button>Save</button></Tooltip>);\n  fire.focus(trigger(r.container));\n  await wait(30);\n  fire.keyDown(trigger(r.container), 'Enter');\n  await wait(30);\n  const stillOpen = tip(r.container) !== null;\n  fire.keyDown(trigger(r.container), 'Escape');\n  await wait(30);\n  $test.check('Escape dismisses the tooltip; other keys do not', stillOpen && tip(r.container) === null, { stillOpen, afterEscape: tip(r.container) !== null });\n  r.unmount();\n}\n{\n  const calls = [];\n  const r = render(\n    <Tooltip content=\"Tip\">\n      <button onFocus={() => calls.push('focus')} onMouseEnter={() => calls.push('enter')} onKeyDown={() => calls.push('key')} className=\"primary\">Go</button>\n    </Tooltip>\n  );\n  await hover(trigger(r.container));\n  fire.focus(trigger(r.container));\n  fire.keyDown(trigger(r.container), 'a');\n  await wait(30);\n  $test.check(\"The child's own handlers and props are preserved\", calls.join() === 'enter,focus,key' && trigger(r.container).className === 'primary', { calls, className: trigger(r.container).className });\n  r.unmount();\n}\n{\n  const r = render(<Tooltip content={<b>Bold tip</b>}><button>?</button></Tooltip>);\n  await hover(trigger(r.container));\n  $test.check('The content can be any React node', tip(r.container) !== null && tip(r.container).querySelector('b') !== null && tip(r.container).textContent === 'Bold tip', r.container.innerHTML);\n  r.unmount();\n}",
     "rendersComponent": true,
-    "previewCode": "<div style={{ fontFamily: 'system-ui, sans-serif', padding: 24 }}>\n  <Tooltip content=\"Tooltip: Additional details appear on hover or keyboard focus\">\n    <button\n      type=\"button\"\n      style={{\n        padding: '8px 16px',\n        borderRadius: 6,\n        border: '1px solid #334155',\n        backgroundColor: '#0f172a',\n        color: '#f8fafc',\n        cursor: 'pointer',\n      }}\n      onClick={() => log('click', 'Button clicked')}\n    >\n      Hover or Focus Me\n    </button>\n  </Tooltip>\n</div>",
+    "previewCode": "function Demo() {\n  const { content = 'Additional details appear on hover or keyboard focus' } = usePreviewProps({\n    content: 'Additional details appear on hover or keyboard focus',\n  });\n\n  return (\n    <div style={{ fontFamily: 'system-ui, sans-serif', padding: 24 }}>\n      <Tooltip content={content}>\n        <button\n          type=\"button\"\n          style={{\n            padding: '8px 16px',\n            borderRadius: 6,\n            border: '1px solid #334155',\n            backgroundColor: '#0f172a',\n            color: '#f8fafc',\n            cursor: 'pointer',\n          }}\n          onClick={() => log('click', 'Button clicked')}\n        >\n          Hover or Focus Me\n        </button>\n      </Tooltip>\n    </div>\n  );\n}\n\n<Demo />",
     "referenceSolutionTs": "interface TooltipProps {\n  content: React.ReactNode;\n  children: React.ReactElement;\n}\n\nfunction Tooltip({ content, children }: TooltipProps): JSX.Element {\n  const [open, setOpen] = useState<boolean>(false);\n  const id = useId();\n  const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>;\n  const show = (): void => setOpen(true);\n  const hide = (): void => setOpen(false);\n  const chain = (name: string, handler: (e: unknown) => void) => (e: unknown): void => {\n    const fn = child.props[name];\n    if (typeof fn === 'function') (fn as (e: unknown) => void)(e);\n    handler(e);\n  };\n\n  const trigger = React.cloneElement(child, {\n    'aria-describedby': open ? id : undefined,\n    onMouseEnter: chain('onMouseEnter', show),\n    onMouseLeave: chain('onMouseLeave', hide),\n    onFocus: chain('onFocus', show),\n    onBlur: chain('onBlur', hide),\n    onKeyDown: chain('onKeyDown', (e: unknown) => {\n      if ((e as KeyboardEvent).key === 'Escape') hide();\n    }),\n  });\n\n  return (\n    <span style={{ position: 'relative', display: 'inline-block' }}>\n      {trigger}\n      {open && (\n        <span role=\"tooltip\" id={id}>\n          {content}\n        </span>\n      )}\n    </span>\n  );\n}"
   },
   {
