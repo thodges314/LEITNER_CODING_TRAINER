@@ -21,25 +21,25 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 277 total = **224 default + 53 in the optional `algorithms-advanced` pack** (89 default cards active at first run) |
+| Cards | 277 total = organized into 4 built-in preset study decks: **Full Library** (277 cards), **Frontend Specialist** (197 cards), **Core Algorithms** (27 cards), and **Advanced Algorithms** (53 cards) |
 | Documented test cases | 1965 (each shown as input → expected in the UI) |
 | Markdown formatting | **100% complete** across all 277 cards with structured descriptions, parameters, returns, constraints, and edge cases |
-| Difficulty spread | all 277: d1 36 · d2 91 · d3 109 · d4 38 · d5 3; default 224: d1 33 · d2 78 · d3 83 · d4 27 · d5 3 |
-| Tracks (default deck / total) | algorithms 47/77, react-components 51, js-utilities 37, react 27, js-language 25, async-js 21, dom-browser 20, typescript-patterns 14, testing-tooling 5. 9 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`). Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
+| Difficulty spread | all 277: d1 36 · d2 91 · d3 109 · d4 38 · d5 3 |
+| Tracks | 10 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`): js-utilities 44, react-components 41, algorithms 27, react 27, js-language 25, async-js 21, dom-browser 20, typescript-patterns 14, advanced-algorithms 53, testing-tooling 5. Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`, `algorithms-advanced`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
-| Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: track `algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 1,773 Vitest tests (jsdom/node across 59 test files): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, Socratic assistant tests, TypeScript dual-mode tests, scheduling, packs, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 277 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 554 card tests + 13 navigation/shortcut tests + 11 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 603 browser tests, ~6 min on an idle machine with 4 workers). **Last full run: 603 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: tracks `algorithms` and `advanced-algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
+| Automated tests | 1,793 Vitest tests (jsdom/node across 61 test files): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, Socratic assistant tests, TypeScript dual-mode tests, scheduling, preset decks, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Browser verification | `npm run e2e` runs ALL 277 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 554 card tests + 13 navigation/shortcut tests + 11 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 1 deck-selector test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 605 browser tests). **Last full run: 605 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
 ```
 src/
-  App.tsx                      app shell: deck state, view switch, header (Focus / Settings / Add Topic)
+  App.tsx                      app shell: deck state, active study deck, view switch, header (Focus / Settings / Add Topic)
   components/
     PracticeArena.tsx          CodeMirror 6 buffer, Run Code, Submit, timer, console, Prettier format, draft autosave
     DeckDashboard.tsx          catalog container: KPI metrics, layout composition
-    dashboard/                 modular catalog subcomponents (CatalogControls, CatalogTable, TierFilterBar, TopicFilterBar, DeactivateModal)
+    dashboard/                 modular catalog subcomponents (CatalogControls, CatalogTable, TierFilterBar, TopicFilterBar, DeckSelector, DeactivateModal)
     FocusModal.tsx             practice focus: include/exclude tracks+tags, difficulty range, presets
     DifficultyBadge.tsx        ●●●○○ label
     AddTopicModal.tsx, SettingsModal.tsx, EvaluationPanel.tsx
@@ -48,6 +48,8 @@ src/
   lib/
     leitner.ts                 ALL scheduling/state logic (Leitner + Graduated Interval Recall, localStorage persistence)
     leitner.test.ts            unit tests for Leitner & Graduated Interval algorithms
+    decks.ts                   preset study decks architecture (Full Library, Frontend Specialist, Core Algorithms, Advanced Algorithms, Custom Decks)
+    decks.test.ts              unit tests for preset decks and custom decks filtering
     formatter.ts               in-browser Prettier standalone formatting for JS/TS/JSX
     formatter.test.ts          unit tests for formatting and syntax error resilience
     runner.ts                  sandbox + harness execution (see §5)

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   loadDeckState,
   saveDeckState,
@@ -14,9 +14,7 @@ import {
   EMPTY_FILTER,
   isFilterActive,
   scheduleFilter,
-  CARD_PACKS,
   visibleTopics,
-  setEnabledPacks,
   setPracticeFilter,
   savePreset,
   deletePreset,
@@ -35,6 +33,13 @@ import { getStoredApiKey, getStoredProvider, getStoredModel } from './lib/ai';
 import { clearDraft, clearAllDrafts } from './lib/drafts';
 import { getStoredTheme, setStoredTheme, applyThemeToDocument } from './lib/theme';
 import type { AppTheme } from './lib/theme';
+import {
+  filterCardsByDeck,
+  getStoredActiveDeckId,
+  setStoredActiveDeckId,
+  getStoredCustomDecks,
+} from './lib/decks';
+import type { CustomDeck } from './lib/decks';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
 import { AddTopicModal } from './components/AddTopicModal';
@@ -110,7 +115,22 @@ export function App() {
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
   const filterActive = isFilterActive(filter);
   const algorithm = getSchedulingAlgorithm(deckState);
-  const shownTopics = visibleTopics(deckState); // cards of disabled optional packs are hidden everywhere
+
+  // Active study deck selection
+  const [activeDeckId, setActiveDeckId] = useState<string>(() => getStoredActiveDeckId());
+  const [customDecks] = useState<CustomDeck[]>(() => getStoredCustomDecks());
+
+  const handleSelectDeck = (deckId: string) => {
+    setActiveDeckId(deckId);
+    setStoredActiveDeckId(deckId);
+    setSelectedCardId(null);
+    setReinforcingCardId(null);
+  };
+
+  const shownTopics = useMemo<TopicItem[]>(
+    () => filterCardsByDeck(visibleTopics(deckState), activeDeckId, customDecks),
+    [deckState, activeDeckId, customDecks]
+  );
 
   // Unlocked notification toast
   const [unlockToast, setUnlockToast] = useState<string | null>(null);
@@ -129,8 +149,9 @@ export function App() {
       const found = shownTopics.find((t) => t.id === selectedCardId && t.status === 'active');
       if (found) return found;
     }
+    const deckCards = filterCardsByDeck(deckState.topics, activeDeckId, customDecks);
     return getNextCard(
-      deckState.topics,
+      deckCards,
       deckState.totalCompletedReviews,
       deckState.lastReviewedTrack,
       undefined,
@@ -220,8 +241,9 @@ export function App() {
 
     // Cold-start review passed: clear any reinforcement drill state and advance
     setReinforcingCardId(null);
+    const candidates = filterCardsByDeck(currentState.topics, activeDeckId, customDecks);
     const next = getNextCard(
-      currentState.topics,
+      candidates,
       currentState.totalCompletedReviews,
       trackToAdvance,
       currentCard.id,
@@ -239,8 +261,9 @@ export function App() {
     setCardSnapshotBeforeReview(null);
     setPracticeSessionKey((k) => k + 1);
     setReinforcingCardId(null);
+    const candidates = filterCardsByDeck(deckState.topics, activeDeckId, customDecks);
     const next = getNextCard(
-      deckState.topics,
+      candidates,
       deckState.totalCompletedReviews,
       currentCard.track,
       currentCard.id,
@@ -257,8 +280,9 @@ export function App() {
     setCardSnapshotBeforeReview(null);
     setPracticeSessionKey((k) => k + 1);
     setReinforcingCardId(null);
+    const candidates = filterCardsByDeck(deckState.topics, activeDeckId, customDecks);
     const next = getNextCard(
-      deckState.topics,
+      candidates,
       deckState.totalCompletedReviews,
       currentCard.track,
       currentCard.id,
@@ -268,19 +292,6 @@ export function App() {
     if (next) clearDraft(next.id);
     setSelectedCardId(next?.id ?? null);
   };
-
-  const handlePacksChange = (packs: string[]) => {
-    setDeckState(setEnabledPacks(deckState, packs));
-    setSelectedCardId(null);
-  };
-
-  const packSummary = Object.entries(CARD_PACKS).map(([id, meta]) => ({
-    id,
-    label: meta.label,
-    description: meta.description,
-    count: deckState.topics.filter((t) => t.pack === id).length,
-    enabled: (deckState.enabledPacks ?? []).includes(id),
-  }));
 
   const handleAlgorithmChange = (nextAlgo: SpacedAlgorithm) => {
     const next = setSchedulingAlgorithm(deckState, nextAlgo);
@@ -538,6 +549,9 @@ export function App() {
         ) : (
           <DeckDashboard
             theme={theme}
+            activeDeckId={activeDeckId}
+            onSelectDeck={handleSelectDeck}
+            customDecks={customDecks}
             onOpenFocus={() => setIsFocusOpen(true)}
             state={deckState}
             onSelectCardToPractice={handleSelectCardToPractice}
@@ -675,8 +689,6 @@ export function App() {
           onThemeChange={handleSetTheme}
           onSettingsSaved={() => setAiSettingsVersion((v) => v + 1)}
           onResetDeckToDefaults={handleResetDeckToDefaults}
-          packs={packSummary}
-          onPacksChange={handlePacksChange}
         />
       )}
     </div>

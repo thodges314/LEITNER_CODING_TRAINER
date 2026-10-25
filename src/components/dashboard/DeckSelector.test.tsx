@@ -1,0 +1,172 @@
+// @vitest-environment jsdom
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { act } from 'react';
+import * as ReactDOMClient from 'react-dom/client';
+import { DeckSelector } from './DeckSelector';
+import seed from '../../data/topics.json';
+import type { TopicItem } from '../../lib/leitner';
+
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+
+const cards = seed as unknown as TopicItem[];
+
+describe('DeckSelector component', () => {
+  let container: HTMLDivElement | null = null;
+  let root: ReactDOMClient.Root | null = null;
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = ReactDOMClient.createRoot(container);
+  });
+
+  afterEach(() => {
+    act(() => {
+      root?.unmount();
+    });
+    container?.remove();
+    container = null;
+    root = null;
+  });
+
+  it('renders with default Full Library active', () => {
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="full-library"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+        />
+      );
+    });
+
+    expect(container!.textContent).toContain('Study Deck');
+    expect(container!.textContent).toContain('Full Library (All Cards)');
+    expect(container!.textContent).toContain('277 Cards');
+  });
+
+  it('renders Frontend Specialist active deck info', () => {
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="frontend-specialist"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+        />
+      );
+    });
+
+    expect(container!.textContent).toContain('Frontend Specialist');
+    expect(container!.textContent).toContain('197 Cards');
+  });
+
+  it('opens dropdown on click and displays all presets with their descriptions', () => {
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="full-library"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+        />
+      );
+    });
+
+    const trigger = container!.querySelector('[data-testid="deck-dropdown-trigger"]') as HTMLButtonElement;
+    expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).toBeNull();
+
+    act(() => {
+      trigger.click();
+    });
+
+    expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).not.toBeNull();
+    expect(container!.textContent).toContain('Built-in Starter Decks');
+    expect(container!.querySelector('[data-testid="deck-option-full-library"]')).not.toBeNull();
+    expect(container!.querySelector('[data-testid="deck-option-frontend-specialist"]')).not.toBeNull();
+    expect(container!.querySelector('[data-testid="deck-option-core-algorithms"]')).not.toBeNull();
+    expect(container!.querySelector('[data-testid="deck-option-advanced-algorithms"]')).not.toBeNull();
+  });
+
+  it('calls onSelectDeck and closes dropdown when an option is clicked', () => {
+    const handleSelect = vi.fn();
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="full-library"
+          allCards={cards}
+          onSelectDeck={handleSelect}
+        />
+      );
+    });
+
+    const trigger = container!.querySelector('[data-testid="deck-dropdown-trigger"]') as HTMLButtonElement;
+    act(() => {
+      trigger.click();
+    });
+
+    const coreOption = container!.querySelector('[data-testid="deck-option-core-algorithms"]') as HTMLButtonElement;
+    act(() => {
+      coreOption.click();
+    });
+
+    expect(handleSelect).toHaveBeenCalledWith('core-algorithms');
+    expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).toBeNull();
+  });
+
+  it('renders personal custom decks if provided', () => {
+    const customDecks = [
+      {
+        id: 'stripe-screen',
+        name: 'Stripe Screen',
+        description: 'Targeted cards for Stripe frontend loop',
+        cardIds: ['tabs-accordion-compound', 'two-sum-hashmap'],
+        createdAt: 100,
+        updatedAt: 100,
+      },
+    ];
+
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="stripe-screen"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+          customDecks={customDecks}
+        />
+      );
+    });
+
+    expect(container!.textContent).toContain('Stripe Screen');
+    expect(container!.textContent).toContain('2 Cards');
+
+    const trigger = container!.querySelector('[data-testid="deck-dropdown-trigger"]') as HTMLButtonElement;
+    act(() => {
+      trigger.click();
+    });
+
+    expect(container!.textContent).toContain('Personal Decks');
+    expect(container!.querySelector('[data-testid="deck-option-stripe-screen"]')).not.toBeNull();
+  });
+
+  it('closes dropdown when Escape key is pressed', () => {
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="full-library"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+        />
+      );
+    });
+
+    const trigger = container!.querySelector('[data-testid="deck-dropdown-trigger"]') as HTMLButtonElement;
+    act(() => {
+      trigger.click();
+    });
+    expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).not.toBeNull();
+
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+    expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).toBeNull();
+  });
+});

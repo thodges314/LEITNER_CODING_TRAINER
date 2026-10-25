@@ -12,3 +12,6 @@ export type { CatalogControlsProps } from './CatalogControls';
 
 export { CatalogTable } from './CatalogTable';
 export type { CatalogTableProps } from './CatalogTable';
+
+export { DeckSelector } from './DeckSelector';
+export type { DeckSelectorProps } from './DeckSelector';

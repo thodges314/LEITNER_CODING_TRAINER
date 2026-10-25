@@ -1,0 +1,76 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Deck Selector & Preset Decks', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.addInitScript(() => {
+      localStorage.setItem('leitner_welcomed', '1');
+      localStorage.setItem('leitner_theme', 'dark');
+      if (!localStorage.getItem('leitner_active_deck_id')) {
+        localStorage.setItem('leitner_active_deck_id', 'full-library');
+      }
+    });
+  });
+
+  test('deck selector dropdown switches active preset and scopes catalog table cards', async ({ page }) => {
+    await page.goto('/');
+
+    // Navigate to the Deck Catalog
+    const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
+    await catalogNavBtn.click();
+
+    // Verify Deck Selector panel is rendered
+    const deckTrigger = page.getByTestId('deck-dropdown-trigger');
+    await expect(deckTrigger).toBeVisible();
+    await expect(deckTrigger).toContainText('Full Library (All Cards)');
+    await expect(deckTrigger).toContainText('277 Cards');
+
+    // Open Dropdown
+    await deckTrigger.click();
+    const dropdownMenu = page.getByTestId('deck-dropdown-menu');
+    await expect(dropdownMenu).toBeVisible();
+    await expect(dropdownMenu).toContainText('Built-in Starter Decks');
+
+    // Switch to Core Algorithms
+    const coreOption = page.getByTestId('deck-option-core-algorithms');
+    await expect(coreOption).toBeVisible();
+    await coreOption.click();
+
+    // Verify menu closed and trigger reflects Core Algorithms
+    await expect(dropdownMenu).not.toBeVisible();
+    await expect(deckTrigger).toContainText('Core Algorithms');
+    await expect(deckTrigger).toContainText('27 Cards');
+
+    // Verify table rows are scoped to 27 cards
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(27);
+    await expect(page.getByText('Showing 27 of 27 cards')).toBeVisible();
+
+    // Switch to Advanced Algorithms
+    await deckTrigger.click();
+    const advOption = page.getByTestId('deck-option-advanced-algorithms');
+    await advOption.click();
+
+    await expect(deckTrigger).toContainText('Advanced Algorithms');
+    await expect(deckTrigger).toContainText('53 Cards');
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(53);
+    await expect(page.getByText('Showing 53 of 53 cards')).toBeVisible();
+
+    // Switch to Frontend Specialist
+    await deckTrigger.click();
+    const feOption = page.getByTestId('deck-option-frontend-specialist');
+    await feOption.click();
+
+    await expect(deckTrigger).toContainText('Frontend Specialist');
+    await expect(deckTrigger).toContainText('197 Cards');
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(197);
+    await expect(page.getByText('Showing 197 of 197 cards')).toBeVisible();
+
+    // Reload page and verify active deck persists in localStorage
+    await page.reload();
+    const reloadedCatalogBtn = page.getByRole('button', { name: /Deck Catalog/i });
+    await reloadedCatalogBtn.click();
+    await expect(deckTrigger).toContainText('Frontend Specialist');
+    await expect(deckTrigger).toContainText('197 Cards');
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(197);
+  });
+});

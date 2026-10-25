@@ -6,6 +6,7 @@ import type { DailyStats } from './dailyStats';
 
 export type TrackType =
   | 'algorithms'
+  | 'advanced-algorithms'
   | 'async-js'
   | 'js-language'
   | 'js-utilities'
@@ -209,6 +210,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     bg: 'rgba(16, 185, 129, 0.12)',
     border: 'rgba(16, 185, 129, 0.35)',
   },
+  'advanced-algorithms': {
+    label: 'Advanced Algorithms',
+    color: '#a855f7',
+    bg: 'rgba(168, 85, 247, 0.12)',
+    border: 'rgba(168, 85, 247, 0.35)',
+  },
 };
 
 export const TRACK_TYPES = Object.keys(TRACK_METADATA) as TrackType[];
@@ -229,6 +236,7 @@ export const TRACK_ALIASES: Record<string, TrackType[]> = {
   'collections-transformations': ['js-utilities'],
   'data-structures': ['js-utilities'],
   'algorithmic-screens': ['algorithms'],
+  'algorithms-advanced': ['advanced-algorithms'],
 };
 
 /** Maps a (possibly retired) track id to a current one; anything else is returned unchanged. */

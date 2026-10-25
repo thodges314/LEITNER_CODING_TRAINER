@@ -172,9 +172,6 @@ interface SettingsModalProps {
   onThemeChange?: (theme: AppTheme) => void;
   onSettingsSaved?: () => void;
   onResetDeckToDefaults?: () => void;
-  /** Optional card packs (e.g. advanced algorithms) and their on/off state. */
-  packs?: Array<{ id: string; label: string; description: string; count: number; enabled: boolean }>;
-  onPacksChange?: (enabledPackIds: string[]) => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -187,8 +184,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onThemeChange,
   onSettingsSaved,
   onResetDeckToDefaults,
-  packs = [],
-  onPacksChange,
 }) => {
   const isLight = currentTheme === 'apple-gsos';
   const modalContentRef = useRef<HTMLDivElement>(null);
@@ -478,52 +473,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Scrollable Body */}
         <div className="modal-body" style={{ gap: '18px' }}>
-
-          {/* Optional card packs */}
-          {packs.length > 0 && (
-            <div style={{ marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '4px' }}>Optional card packs</h3>
-              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
-                Packs are off by default. Cards in a disabled pack are not scheduled, unlocked or listed; your progress on them is kept.
-              </p>
-              {packs.map((pack) => (
-                <label
-                  key={pack.id}
-                  style={{
-                    display: 'flex',
-                    gap: '10px',
-                    alignItems: 'flex-start',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-subtle)',
-                    backgroundColor: 'var(--bg-surface)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={pack.enabled}
-                    aria-label={`Enable ${pack.label}`}
-                    onChange={(e) => {
-                      const enabled = new Set(packs.filter((p) => p.enabled).map((p) => p.id));
-                      if (e.target.checked) enabled.add(pack.id);
-                      else enabled.delete(pack.id);
-                      onPacksChange?.([...enabled]);
-                    }}
-                    style={{ marginTop: '3px' }}
-                  />
-                  <span>
-                    <strong style={{ fontSize: '13.5px' }}>
-                      {pack.label} ({pack.count} cards)
-                    </strong>
-                    <span style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                      {pack.description}
-                    </span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          )}
 
           {/* Spaced Repetition Algorithm Selection */}
           <div

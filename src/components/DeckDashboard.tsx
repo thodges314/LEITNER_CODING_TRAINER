@@ -33,13 +33,19 @@ import {
   CatalogControls,
   CatalogTable,
   DeactivateModal,
+  DeckSelector,
 } from './dashboard';
+import { filterCardsByDeck } from '../lib/decks';
+import type { CustomDeck } from '../lib/decks';
 
 export type { CatalogSortOption, CatalogStatusFilter };
 
 interface DeckDashboardProps {
   state: LeitnerDeckState;
   theme?: AppTheme;
+  activeDeckId?: string;
+  onSelectDeck?: (deckId: string) => void;
+  customDecks?: CustomDeck[];
   onSelectCardToPractice: (card: TopicItem) => void;
   onToggleLock: (topicId: string, currentStatus: 'active' | 'locked') => void;
   onResetBox: (topicId: string) => void;
@@ -56,6 +62,9 @@ interface DeckDashboardProps {
 export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   state,
   theme,
+  activeDeckId = 'full-library',
+  onSelectDeck = () => {},
+  customDecks = [],
   onSelectCardToPractice,
   onToggleLock,
   onResetBox,
@@ -68,12 +77,18 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onDismissHighlightExport,
 }) => {
   const isLight = theme === 'apple-gsos';
+  const allVisibleCards = useMemo(() => visibleTopics(state), [state]);
+  const topics = useMemo(
+    () => filterCardsByDeck(allVisibleCards, activeDeckId, customDecks),
+    [allVisibleCards, activeDeckId, customDecks]
+  );
+
   const allAvailableTracks = useMemo(
     () =>
-      Array.from(new Set(visibleTopics(state).map((t) => t.track))).sort((a, b) =>
+      Array.from(new Set(topics.map((t) => t.track))).sort((a, b) =>
         getTrackMeta(a).label.localeCompare(getTrackMeta(b).label)
       ),
-    [state]
+    [topics]
   );
 
   const initialPrefs = useMemo(() => {
@@ -109,7 +124,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
   const { totalCompletedReviews, unlockedStageCount = 0 } = state;
-  const topics = visibleTopics(state); // cards of disabled optional packs are hidden
 
   const isAllTracks =
     selectedTracks.includes('all') ||
@@ -591,17 +605,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         />
       </div>
 
-      {/* Leitner Box Breakdown Strip */}
-      <TierFilterBar
-        tierName={tierName}
-        selectedBox={selectedBox}
-        displayedBoxes={displayedBoxes}
-        boxCounts={boxCounts}
-        algorithm={algorithm}
-        onToggleBox={handleToggleBox}
-        onResetBoxes={() => setSelectedBox('all')}
-      />
-
       {/* Track Filters (Multi-Select with 'All Topics') */}
       <TopicFilterBar
         allAvailableTracks={allAvailableTracks}
@@ -614,6 +617,25 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onResetTracks={() => setSelectedTracks(['all'])}
         onDismissHint={() => setShowTrackHint(false)}
         onOpenFocus={onOpenFocus}
+      />
+
+      {/* Deck Selector via Dropdown (above Active Spacing Tiers, below Filter Topics) */}
+      <DeckSelector
+        activeDeckId={activeDeckId}
+        allCards={allVisibleCards}
+        onSelectDeck={onSelectDeck}
+        customDecks={customDecks}
+      />
+
+      {/* Leitner Box Breakdown Strip */}
+      <TierFilterBar
+        tierName={tierName}
+        selectedBox={selectedBox}
+        displayedBoxes={displayedBoxes}
+        boxCounts={boxCounts}
+        algorithm={algorithm}
+        onToggleBox={handleToggleBox}
+        onResetBoxes={() => setSelectedBox('all')}
       />
 
       {/* Search, Filter & Sort Controls Bar */}
