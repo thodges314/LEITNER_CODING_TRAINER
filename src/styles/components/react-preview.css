@@ -386,6 +386,12 @@
   border: 1px solid rgba(244, 114, 182, 0.25);
 }
 
+.props-type-badge-json {
+  color: #fb923c;
+  background-color: rgba(251, 146, 60, 0.12);
+  border: 1px solid rgba(251, 146, 60, 0.25);
+}
+
 .props-description {
   font-size: 10.5px;
   color: var(--text-dim);
@@ -404,6 +410,23 @@
   border-radius: 4px;
   outline: none;
   transition: all 0.15s ease;
+}
+
+.props-input-json {
+  min-height: 72px;
+  resize: vertical;
+  line-height: 1.35;
+  font-size: 11px;
+}
+
+.props-input-error {
+  border-color: #ef4444 !important;
+}
+
+.props-json-error {
+  font-size: 10px;
+  color: #ef4444;
+  margin-top: 2px;
 }
 
 [data-theme="apple-gsos"] .props-input {

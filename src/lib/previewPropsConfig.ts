@@ -1,4 +1,4 @@
-export type PropType = 'number' | 'string' | 'boolean' | 'enum' | 'function';
+export type PropType = 'number' | 'string' | 'boolean' | 'enum' | 'function' | 'json';
 
 export interface PropDefinition {
   name: string;
@@ -91,14 +91,52 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'disabled', type: 'boolean', defaultValue: false, description: 'Disable input field' },
   ],
   'simple-table': [
-    { name: 'caption', type: 'string', defaultValue: 'User Roster', placeholder: 'Table caption', description: 'Accessible caption element' },
-    { name: 'striped', type: 'boolean', defaultValue: true, description: 'Alternate zebra striping on table rows' },
-    { name: 'bordered', type: 'boolean', defaultValue: true, description: 'Display borders around cells' },
+    {
+      name: 'columns',
+      type: 'json',
+      defaultValue: [
+        { key: 'framework', label: 'Framework' },
+        { key: 'language', label: 'Language' },
+        { key: 'stars', label: 'GitHub Stars' },
+      ],
+      description: 'Array of Column<T> objects with key and label',
+    },
+    {
+      name: 'rows',
+      type: 'json',
+      defaultValue: [
+        { framework: 'React', language: 'JavaScript / TypeScript', stars: '220k' },
+        { framework: 'Vue', language: 'TypeScript', stars: '205k' },
+        { framework: 'Svelte', language: 'TypeScript', stars: '75k' },
+      ],
+      description: 'Array of row data objects (set to [] to test No rows)',
+    },
   ],
   'data-table': [
-    { name: 'pageSize', type: 'number', defaultValue: 5, min: 1, max: 25, description: 'Rows per pagination page' },
-    { name: 'sortable', type: 'boolean', defaultValue: true, description: 'Enable column sort clicking' },
-    { name: 'filterable', type: 'boolean', defaultValue: true, description: 'Enable search filter' },
+    {
+      name: 'columns',
+      type: 'json',
+      defaultValue: [
+        { key: 'name', label: 'Name' },
+        { key: 'role', label: 'Role' },
+        { key: 'score', label: 'Score' },
+      ],
+      description: 'Array of Column<T> objects with key and label',
+    },
+    {
+      name: 'rows',
+      type: 'json',
+      defaultValue: [
+        { name: 'Alice', role: 'Engineer', score: 95 },
+        { name: 'Bob', role: 'Designer', score: 88 },
+        { name: 'Charlie', role: 'Manager', score: 92 },
+        { name: 'Diana', role: 'DevOps', score: 97 },
+        { name: 'Evan', role: 'QA', score: 85 },
+        { name: 'Fiona', role: 'Engineer', score: 91 },
+      ],
+      description: 'Array of row data objects',
+    },
+    { name: 'pageSize', type: 'number', defaultValue: 3, min: 1, max: 25, description: 'Rows per pagination page' },
   ],
   'pagination-controls': [
     { name: 'page', type: 'number', defaultValue: 2, min: 1, max: 20, description: 'Current active page number' },

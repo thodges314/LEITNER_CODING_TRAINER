@@ -10,6 +10,61 @@ export interface PropsControlPanelProps {
   onReset: () => void;
 }
 
+const JsonInput: React.FC<{
+  name: string;
+  value: unknown;
+  placeholder?: string;
+  onChange: (name: string, value: unknown) => void;
+}> = ({ name, value, placeholder, onChange }) => {
+  const [prevValue, setPrevValue] = React.useState(value);
+  const [text, setText] = React.useState(() =>
+    value !== undefined && value !== null ? JSON.stringify(value, null, 2) : ''
+  );
+  const [error, setError] = React.useState<string | null>(null);
+
+  if (prevValue !== value) {
+    setPrevValue(value);
+    setText(value !== undefined && value !== null ? JSON.stringify(value, null, 2) : '');
+    setError(null);
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const raw = e.target.value;
+    setText(raw);
+    if (raw.trim() === '') {
+      setError(null);
+      onChange(name, undefined);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      setError(null);
+      onChange(name, parsed);
+    } catch {
+      setError('Invalid JSON');
+    }
+  };
+
+  return (
+    <div className="props-json-container">
+      <textarea
+        className={`props-input props-input-json ${error ? 'props-input-error' : ''}`}
+        data-testid={`prop-input-${name}`}
+        rows={4}
+        value={text}
+        placeholder={placeholder ?? 'JSON array or object'}
+        onChange={handleChange}
+        spellCheck={false}
+      />
+      {error && (
+        <div className="props-json-error" data-testid={`prop-json-error-${name}`}>
+          {error}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
   propDefs,
   values,
@@ -152,6 +207,15 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
                       </option>
                     ))}
                   </select>
+                )}
+
+                {prop.type === 'json' && (
+                  <JsonInput
+                    name={prop.name}
+                    value={currentValue}
+                    placeholder={prop.placeholder}
+                    onChange={onChange}
+                  />
                 )}
 
                 {prop.type === 'function' && (

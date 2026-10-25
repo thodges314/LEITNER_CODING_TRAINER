@@ -244,4 +244,44 @@ describe('PropsControlPanel', () => {
     });
     expect(onReset).toHaveBeenCalled();
   });
+
+  it('handles json prop changes, invalid json, and clearing', async () => {
+    const onChange = vi.fn();
+    const onReset = vi.fn();
+    const jsonDefs: PropDefinition[] = [
+      { name: 'columns', type: 'json', defaultValue: [{ key: 'id', label: 'ID' }] },
+    ];
+
+    await act(async () => {
+      root?.render(
+        <PropsControlPanel
+          cardId="test-card"
+          propDefs={jsonDefs}
+          values={{ columns: [{ key: 'id', label: 'ID' }] }}
+          onChange={onChange}
+          onReset={onReset}
+        />
+      );
+    });
+
+    const textarea = container?.querySelector('[data-testid="prop-input-columns"]') as HTMLTextAreaElement;
+    expect(textarea).not.toBeNull();
+    expect(textarea.value).toContain('"id"');
+
+    // Valid JSON input
+    await act(async () => {
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value')?.set;
+      setter?.call(textarea, '[{"key":"name","label":"Name"}]');
+      textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(onChange).toHaveBeenCalledWith('columns', [{ key: 'name', label: 'Name' }]);
+
+    // Clearing textarea
+    await act(async () => {
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value')?.set;
+      setter?.call(textarea, '');
+      textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(onChange).toHaveBeenCalledWith('columns', undefined);
+  });
 });
