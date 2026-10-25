@@ -199,11 +199,33 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
 
 ## 6. Implementation Roadmap
 
-### Phase 1: Custom Decks Core Architecture (Foundation)
-- **Data Model Evolution**: Add `customDecks: CustomDeck[]` and `activeDeckId?: string` to `LeitnerDeckState`.
-- **Practice Arena Scheduling**: Update `getNextCard` candidate selection so practice runs strictly within the active custom deck when one is selected.
-- **Deck Switcher UI**: Add a clean deck selector in the header bar and Deck Catalog (`[ All Cards (277) ▾ ]` vs `[ Stripe Prep (22) ]`).
+### Phase 1: Custom Decks Core Architecture & Preset Starter Decks
+- **Preset Built-in Starter Decks**:
+  - **Full-Stack Core** (default balanced library: algorithms, React, DOM, async, utilities).
+  - **Frontend Specialist** (focused strictly on React components, hooks, DOM/browser APIs, UI patterns, and async plumbing).
+  - **Core Algorithms** (focused strictly on algorithms, trees, graphs, sorting, and data structures).
+- **Deck Switcher Dropdown UX**:
+  - Located prominently on the main navigation bar / catalog header:
+    ```
+    [ 🗂️ Deck: Frontend Specialist (125) ▾ ]
+       ⭐ Built-in Starter Decks
+       • Full-Stack Core (224 cards)
+       • Frontend Specialist (125 cards)
+       • Core Algorithms (47 cards)
+       ───────────────────────────────────────
+       📁 Custom Decks
+       • Stripe Senior Screen (19 cards)
+       • Weak Spots Sprint (8 cards)
+       ───────────────────────────────────────
+       ➕ Create Custom Deck...
+       🎯 Tailor with AI Copilot...
+    ```
+- **Practice Arena Scheduling**: Update `getNextCard` candidate selection so practice runs strictly within the active deck when one is selected.
+- **Catalog Filtering**: When a deck is active, the Deck Catalog filters down to show cards in that deck, with a clear indicator (e.g. *"Showing 19 cards in 'Stripe Senior Screen' · [View All Cards]"*). Topic filters (React, Algorithms, etc.) continue to filter within the active deck.
 - **Catalog Management**: Add multi-select checkboxes in the Deck Catalog table allowing users to manually assemble or add cards to any custom deck.
+- **Unification of `algorithms-advanced`**:
+  - Once Decks exist as first-class collections, migrate the 53 `algorithms-advanced` cards back to being first-class topics in the catalog rather than an awkward hidden pack.
+  - Beginners are protected because they start on the "Frontend Specialist" or "Core Algorithms" deck. Learners targeting FAANG/quant screens can select an "Advanced Algorithms" deck or add them to custom decks directly without pack-gating awkwardness.
 
 ### Phase 2: Catalog Indexing & Structured Prompt Pipeline
 - **Catalog Index Script (`scripts/build-catalog-index.mjs`)**: Compiles 277 cards into a minified ~12 KB descriptor index (`id`, `track`, `title`, `concept`, `difficulty`, `tags`, `shortSummary`).
