@@ -94,7 +94,10 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
                     data-testid={`prop-input-${prop.name}`}
                     value={currentValue !== undefined && currentValue !== null ? String(currentValue) : ''}
                     placeholder={prop.placeholder ?? 'string'}
-                    onChange={(e) => onChange(prop.name, e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      onChange(prop.name, val === '' ? undefined : val);
+                    }}
                   />
                 )}
 

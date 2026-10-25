@@ -19,10 +19,9 @@ export interface ComponentPropsConfig {
 
 export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'progress-bar': [
-    { name: 'value', type: 'number', defaultValue: 45, min: 0, max: 100, step: 5, description: 'Current progress value' },
-    { name: 'max', type: 'number', defaultValue: 100, min: 1, max: 500, description: 'Maximum progress limit' },
-    { name: 'label', type: 'string', defaultValue: 'Upload Progress', placeholder: 'Progress bar label', description: 'Accessible label' },
-    { name: 'indeterminate', type: 'boolean', defaultValue: false, description: 'Unmetered busy animation' },
+    { name: 'value', type: 'number', defaultValue: 45, min: 0, max: 100, step: 5, description: 'Current progress value (clear to trigger indeterminate)' },
+    { name: 'max', type: 'number', defaultValue: 100, min: 1, max: 500, description: 'Maximum progress limit (defaults to 100)' },
+    { name: 'label', type: 'string', defaultValue: 'Upload Progress', placeholder: 'Progress bar label', description: 'Accessible label (defaults to Progress)' },
   ],
   'star-rating-component': [
     { name: 'value', type: 'number', defaultValue: 3, min: 0, max: 10, step: 1, description: 'Selected star rating' },

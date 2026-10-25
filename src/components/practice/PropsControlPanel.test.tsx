@@ -133,7 +133,7 @@ describe('PropsControlPanel', () => {
     expect(onChange).toHaveBeenCalledWith('value', undefined);
   });
 
-  it('handles string changes', async () => {
+  it('handles string changes and clearing to undefined', async () => {
     const onChange = vi.fn();
     const onReset = vi.fn();
 
@@ -155,6 +155,11 @@ describe('PropsControlPanel', () => {
       setInputValue(input, 'Download Progress');
     });
     expect(onChange).toHaveBeenCalledWith('label', 'Download Progress');
+
+    await act(async () => {
+      setInputValue(input, '');
+    });
+    expect(onChange).toHaveBeenCalledWith('label', undefined);
   });
 
   it('handles tri-state boolean selection (true, false, undefined)', async () => {

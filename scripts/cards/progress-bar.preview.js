@@ -1,14 +1,13 @@
 function Demo() {
-  const { value = 45, max = 100, label = 'Upload Progress', indeterminate = false } = usePreviewProps({
+  const { value, max, label } = usePreviewProps({
     value: 45,
     max: 100,
     label: 'Upload Progress',
-    indeterminate: false,
   });
 
   useEffect(() => {
-    log('progress')({ value: indeterminate ? undefined : value, max, indeterminate });
-  }, [value, max, indeterminate]);
+    log('progress')({ value, max, label });
+  }, [value, max, label]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '6px' }}>
@@ -51,17 +50,11 @@ function Demo() {
           100% { left: 100%; }
         }
       `}</style>
-      <div>
-        <div style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '8px' }}>
-          Accessible Progress Bar (Interactive Preview):
-        </div>
-        <ProgressBar
-          value={indeterminate ? undefined : value}
-          max={max}
-          label={label}
-          indeterminate={indeterminate}
-        />
-      </div>
+      <ProgressBar
+        value={value}
+        max={max}
+        label={label}
+      />
     </div>
   );
 }

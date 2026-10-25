@@ -258,12 +258,21 @@ test.describe('React preview window', () => {
     await valueInput.fill('55');
     await expect(bar).toHaveAttribute('aria-valuenow', '55');
 
+    // Deleting the value prop should enter indeterminate state
+    await valueInput.fill('');
+    await expect(bar).toHaveAttribute('data-indeterminate', 'true');
+    await expect(bar).not.toHaveAttribute('aria-valuenow');
+
+    // Restoring value restores determinate state
+    await valueInput.fill('70');
+    await expect(bar).toHaveAttribute('aria-valuenow', '70');
+
     // Event log should record the change
     const eventLog = previewWindow.getByText(/progress/);
     await expect(eventLog.first()).toBeVisible();
   });
 
-  test('props control panel: displays slots for props, edits numbers, strings, tri-state booleans, dropdowns, and resets', async ({ page }) => {
+  test('props control panel: displays slots for props, edits numbers, strings, and resets', async ({ page }) => {
     const card = topics.find((t) => t.id === 'progress-bar');
     expect(card).toBeDefined();
     const solution = card?.referenceSolution || card?.solution || '';
@@ -276,11 +285,11 @@ test.describe('React preview window', () => {
     const propsPanel = previewWindow.locator('[data-testid="react-preview-props-panel"]');
     await expect(propsPanel).toBeVisible();
 
-    // Verify slots are rendered for defined props
+    // Verify slots are rendered for defined props (only value, max, label)
     await expect(previewWindow.locator('[data-testid="props-slot-value"]')).toBeVisible();
     await expect(previewWindow.locator('[data-testid="props-slot-max"]')).toBeVisible();
     await expect(previewWindow.locator('[data-testid="props-slot-label"]')).toBeVisible();
-    await expect(previewWindow.locator('[data-testid="props-slot-indeterminate"]')).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="props-slot-indeterminate"]')).toHaveCount(0);
 
     // Verify autofilled suggested defaults
     const valueInput = previewWindow.locator('[data-testid="prop-input-value"]');
@@ -292,9 +301,6 @@ test.describe('React preview window', () => {
     const labelInput = previewWindow.locator('[data-testid="prop-input-label"]');
     await expect(labelInput).toHaveValue('Upload Progress');
 
-    const falseBtn = previewWindow.locator('[data-testid="prop-bool-false-indeterminate"]');
-    await expect(falseBtn).toHaveClass(/active-false/);
-
     // Edit number prop
     await valueInput.fill('80');
     await expect(valueInput).toHaveValue('80');
@@ -302,16 +308,6 @@ test.describe('React preview window', () => {
     // Edit string prop
     await labelInput.fill('Exporting Data');
     await expect(labelInput).toHaveValue('Exporting Data');
-
-    // Toggle boolean prop to true
-    const trueBtn = previewWindow.locator('[data-testid="prop-bool-true-indeterminate"]');
-    await trueBtn.click();
-    await expect(trueBtn).toHaveClass(/active-true/);
-
-    // Toggle boolean prop to undefined
-    const undefBtn = previewWindow.locator('[data-testid="prop-bool-undefined-indeterminate"]');
-    await undefBtn.click();
-    await expect(undefBtn).toHaveClass(/active-undefined/);
 
     // Click Reset Defaults button
     const resetBtn = previewWindow.locator('[data-testid="props-reset-btn"]');
@@ -321,7 +317,6 @@ test.describe('React preview window', () => {
     // All props restore to suggested initial values
     await expect(valueInput).toHaveValue('45');
     await expect(labelInput).toHaveValue('Upload Progress');
-    await expect(falseBtn).toHaveClass(/active-false/);
   });
 
   test('progress-bar: pop-out, dock-back, and theme toggle do not vanish the live preview', async ({ page }) => {
