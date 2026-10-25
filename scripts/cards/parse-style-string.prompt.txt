@@ -7,10 +7,12 @@ Convert between CSS inline style strings and JavaScript style objects:
   - Splits declarations on `';'` and ignores empty segments.
   - Splits each declaration at the **first colon only** (values may contain colons, such as in `url(...)`).
   - Trims leading and trailing whitespace from both property names and values.
-  - Converts kebab-case property names to camelCase (`margin-top` -> `marginTop`). Helper expression: `name.replace(/-([a-z])/g, (_, c) => c.toUpperCase())`.
+  - Converts kebab-case property names to camelCase (`margin-top` -> `marginTop`).
+    - Helper expression: `name.replace(/-([a-z])/g, (_, c) => c.toUpperCase())`
 
 ### styleToString(obj: Record<string, string | number>): string
 - Converts a style object back into a CSS inline style string.
-- Converts camelCase keys to kebab-case (e.g. `marginTop` -> `margin-top`). Helper expression: `name.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())`.
+- Converts camelCase keys to kebab-case (e.g. `marginTop` -> `margin-top`).
+  - Helper expression: `name.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase())`
 - Formats each property as `property: value;`.
 - Joins multiple declarations separated by a single space (e.g. `'color: red; margin-top: 4px;'`).
