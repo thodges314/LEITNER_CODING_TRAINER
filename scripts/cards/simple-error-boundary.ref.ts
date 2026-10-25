@@ -1,25 +1,32 @@
 interface SimpleErrorBoundaryProps {
-  fallback: React.ReactNode;
-  onError?: (error: Error) => void;
+  fallback: React.ReactNode | ((error: Error) => React.ReactNode);
+  onError?: (error: Error, errorInfo?: React.ErrorInfo) => void;
   children: React.ReactNode;
 }
 
 interface SimpleErrorBoundaryState {
-  failed: boolean;
+  error: Error | null;
 }
 
 class SimpleErrorBoundary extends React.Component<SimpleErrorBoundaryProps, SimpleErrorBoundaryState> {
-  state: SimpleErrorBoundaryState = { failed: false };
+  state: SimpleErrorBoundaryState = { error: null };
 
-  static getDerivedStateFromError(): SimpleErrorBoundaryState {
-    return { failed: true };
+  static getDerivedStateFromError(error: Error): SimpleErrorBoundaryState {
+    return { error };
   }
 
-  componentDidCatch(error: Error): void {
-    if (this.props.onError) this.props.onError(error);
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    this.props.onError?.(error, errorInfo);
   }
 
   render(): React.ReactNode {
-    return this.state.failed ? this.props.fallback : this.props.children;
+    const { error } = this.state;
+    const { fallback, children } = this.props;
+
+    if (error) {
+      return typeof fallback === 'function' ? fallback(error) : fallback;
+    }
+
+    return children;
   }
 }

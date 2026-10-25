@@ -1,15 +1,22 @@
 class SimpleErrorBoundary extends React.Component {
-  state = { failed: false };
+  state = { error: null };
 
-  static getDerivedStateFromError() {
-    return { failed: true };
+  static getDerivedStateFromError(error) {
+    return { error };
   }
 
-  componentDidCatch(error) {
-    if (this.props.onError) this.props.onError(error);
+  componentDidCatch(error, errorInfo) {
+    this.props.onError?.(error, errorInfo);
   }
 
   render() {
-    return this.state.failed ? this.props.fallback : this.props.children;
+    const { error } = this.state;
+    const { fallback, children } = this.props;
+
+    if (error) {
+      return typeof fallback === 'function' ? fallback(error) : fallback;
+    }
+
+    return children;
   }
 }

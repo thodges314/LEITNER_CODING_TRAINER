@@ -1,23 +1,29 @@
 ```ts
 interface SimpleErrorBoundaryProps {
-  fallback: React.ReactNode;
-  onError?: (error: Error) => void;
+  fallback: React.ReactNode | ((error: Error) => React.ReactNode);
+  onError?: (error: Error, errorInfo?: React.ErrorInfo) => void;
   children: React.ReactNode;
 }
 
 interface SimpleErrorBoundaryState {
-  failed: boolean;
+  error: Error | null;
 }
 ```
 
-Write `SimpleErrorBoundary` as a class component (in React, error boundaries must be class components):
+Write `SimpleErrorBoundary` as a class component:
 
 ### class SimpleErrorBoundary extends React.Component<SimpleErrorBoundaryProps, SimpleErrorBoundaryState>
-- **Normal Render**:
-  - Renders `children` normally when no error has occurred.
-- **Error Handling**:
-  - Catches render errors from any descendant component using `static getDerivedStateFromError()`.
-  - Sets `{ failed: true }` in state and renders `fallback` instead of `children`.
-  - Calls `onError(error)` once in `componentDidCatch(error)` with the caught error (if `onError` is provided).
+
+**Why a Class Component?**
+Even in modern React (React 18 & 19), React does not provide a Hook equivalent for error boundaries. Catching rendering exceptions requires the class lifecycle methods `static getDerivedStateFromError` and `componentDidCatch`. Writing an error boundary class is the standard, canonical pattern across modern React codebases and libraries (including `react-error-boundary`).
+
+- **Initial State**:
+  - Initializes state with `{ error: null }`.
+- **Catching Render Errors**:
+  - Catches descendant render errors via `static getDerivedStateFromError(error)` and updates state with `{ error }`.
+  - Invokes `onError?.(error, errorInfo)` in `componentDidCatch(error, errorInfo)` when the `onError` prop is provided.
+- **Rendering**:
+  - If an error has occurred (`error !== null`), renders `fallback` (or `fallback(error)` if `fallback` is a function).
+  - Otherwise, renders `children` normally.
 - **Fault Isolation**:
-  - A failure inside one boundary must not affect sibling boundaries or outside components.
+  - A failure inside one boundary must not affect sibling boundaries or parent components outside it.
