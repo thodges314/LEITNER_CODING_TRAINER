@@ -254,6 +254,26 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
 - **One-Click Download Action**: Download button on the custom deck header generating `[Company]_[Role]_Prep_Guide.pdf`.
 - **Printable Dossier View**: Clean print-media stylesheet for high-resolution paper or PDF export.
 
+### Phase 5: In-Arena AI Socratic Clarification & Hint Assistant ("Ask AI")
+- **The Problem**: When practicing cold-start recall, learners occasionally experience total mental blocks on an algorithm's mechanics (e.g. *"I remember quicksort uses a partition, but I forgot how the two pointers swap"*) or need ambiguity clarified in a prompt requirement. Revealing the solution ruins the practice trial, but being completely stuck stalls momentum.
+- **Trigger & UI Placement**:
+  - A discrete `?` (or Socratic bulb) icon button positioned in the corner of the problem description header (`PracticeHeader.tsx`).
+  - Clicking it opens a focused slide-over drawer / popover chat (`SocraticTutorDrawer.tsx`).
+  - Quick-action prompt chips:
+    - `[ 💡 Explain the core concept (no code) ]`
+    - `[ ❓ Clarify problem requirements / rules ]`
+    - `[ ⚠️ What edge cases should I watch for? ]`
+    - `[ 🔍 Why might my current logic get stuck? ]`
+    - Plus a free-form input box to ask specific questions.
+- **Context Injection**:
+  - The request passes the card title, domain track, exact prompt text, target contract table, the learner's current editor code, and the canonical reference solution (`.ref.js` and `.ref.ts`).
+  - Having access to the reference solution guarantees the AI's guidance is 100% grounded and never gives misleading advice.
+- **Strict Anti-Spoiler / Socratic Guardrails**:
+  - System prompt strictly forbids generating code solutions:
+    > *"CRITICAL RULE: You are a Socratic coding interview coach. You must NEVER output the code solution, executable snippets, or direct implementations that solve the problem. Instead, explain the algorithmic concept in plain English, ask guiding questions to steer the learner's thinking, clarify what a contract requirement means, or highlight an unhandled edge case. Keep answers concise (under 3 paragraphs)."*
+- **Provider Multi-Key Vault Integration**:
+  - Uses the learner's active key from `src/lib/ai.ts`. Groq Llama 3.3 / Gemini Flash provide instant (<1s), free answers, while Claude 3.5 Sonnet provides staff-level Socratic coaching.
+
 ---
 
 ## 7. Security, Privacy & Integrity
