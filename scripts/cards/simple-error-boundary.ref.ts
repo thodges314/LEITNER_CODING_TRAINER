@@ -1,7 +1,7 @@
 interface SimpleErrorBoundaryProps {
-  fallback?: React.ReactNode;
-  onError?: (error: unknown) => void;
-  children?: React.ReactNode;
+  fallback: React.ReactNode;
+  onError?: (error: Error) => void;
+  children: React.ReactNode;
 }
 
 interface SimpleErrorBoundaryState {
@@ -15,7 +15,7 @@ class SimpleErrorBoundary extends React.Component<SimpleErrorBoundaryProps, Simp
     return { failed: true };
   }
 
-  componentDidCatch(error: unknown): void {
+  componentDidCatch(error: Error): void {
     if (this.props.onError) this.props.onError(error);
   }
 

@@ -1,28 +1,54 @@
-function BadChild({ bomb }) {
-  if (bomb) throw new Error('Explosion');
-  return <div style={{ color: '#34d399', fontSize: '13px' }}>Safe child rendering normally.</div>;
+function ChildWidget({ shouldThrow }) {
+  if (shouldThrow) {
+    throw new Error('Simulated render error in descendant');
+  }
+  return (
+    <div
+      style={{
+        color: '#34d399',
+        fontSize: '13px',
+        padding: '12px 16px',
+        background: 'rgba(52, 211, 153, 0.08)',
+        border: '1px solid rgba(52, 211, 153, 0.25)',
+        borderRadius: '6px',
+      }}
+    >
+      Safe child rendering normally.
+    </div>
+  );
 }
 
 function Demo() {
-  const [bomb, setBomb] = useState(false);
+  const {
+    fallback = 'Something went wrong.',
+    onError = log('onError'),
+    shouldThrow = false,
+  } = usePreviewProps({
+    fallback: 'Something went wrong.',
+    onError: log('onError'),
+    shouldThrow: false,
+  });
 
   return (
-    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      <button
-        type="button"
-        onClick={() => {
-          setBomb(true);
-          log('triggerError')(true);
-        }}
-        style={{ padding: '4px 8px', width: 'fit-content', fontSize: '12px' }}
-      >
-        Trigger Error
-      </button>
+    <div key={String(shouldThrow)} style={{ padding: '16px' }}>
       <SimpleErrorBoundary
-        fallback={<div style={{ color: '#f87171', padding: '8px', background: 'rgba(239, 68, 68, 0.1)' }}>Something went wrong.</div>}
-        onError={log('onError')}
+        fallback={
+          <div
+            style={{
+              color: '#f87171',
+              padding: '12px 16px',
+              background: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              borderRadius: '6px',
+              fontSize: '13px',
+            }}
+          >
+            {fallback}
+          </div>
+        }
+        onError={onError}
       >
-        <BadChild bomb={bomb} />
+        <ChildWidget shouldThrow={shouldThrow} />
       </SimpleErrorBoundary>
     </div>
   );

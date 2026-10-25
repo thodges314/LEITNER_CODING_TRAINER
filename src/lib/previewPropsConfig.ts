@@ -355,7 +355,27 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'onReset', type: 'function', description: 'Callback invoked to recover from error' },
   ],
   'simple-error-boundary': [
-    { name: 'fallbackMessage', type: 'string', defaultValue: 'An unexpected error occurred', placeholder: 'Fallback message', description: 'Fallback text displayed on catch' },
+    {
+      name: 'fallback',
+      type: 'string',
+      defaultValue: 'Something went wrong.',
+      placeholder: 'Fallback message',
+      description: 'Fallback content rendered when an error occurs',
+      group: 'SimpleErrorBoundary',
+    },
+    {
+      name: 'onError',
+      type: 'function',
+      description: 'Callback invoked when a descendant throws',
+      group: 'SimpleErrorBoundary',
+    },
+    {
+      name: 'shouldThrow',
+      type: 'boolean',
+      defaultValue: false,
+      description: 'Simulate a descendant throwing an error during render',
+      group: 'Child Simulation',
+    },
   ],
   'multi-step-form': [
     { name: 'initialStep', type: 'number', defaultValue: 1, min: 1, max: 3, description: 'Starting form step (1-indexed)' },
