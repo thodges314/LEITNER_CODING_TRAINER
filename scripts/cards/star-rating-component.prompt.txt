@@ -9,8 +9,7 @@ interface StarRatingProps {
 ```
 
 ### StarRating({ value = 0, onChange, max = 5 }: StarRatingProps): JSX.Element
-- **DOM Structure**: Render `<div role="radiogroup" aria-label="Rating" className="star-rating">` containing `max` `<button type="button" role="radio" className="star-btn">` star buttons rendering the `★` character.
-  - Optional pre-styled classes in the sandbox: `.star-rating` (flex container) and `.star-btn` (transparent button with golden hover/filled state).
+- **DOM Structure**: Render `<div role="radiogroup" aria-label="Rating">` containing `max` `<button type="button" role="radio">` star buttons rendering the `★` character.
 - **ARIA & Labels**: Each button has `aria-label="1 star"`, `"2 stars"`, ..., and `aria-checked={true}` only for the star matching `value`.
 - **Roving `tabIndex`**: Only the selected star (or the first star when `value` is 0) has `tabIndex={0}`; all others have `tabIndex={-1}`.
 - **Visual State**: Stars up to the displayed rating carry `data-filled="true"` (others `"false"`). Hovering over a star previews that rating until the pointer leaves the group.
@@ -18,3 +17,9 @@ interface StarRatingProps {
 - **Keyboard Navigation**:
   - `ArrowRight` / `ArrowUp` call `onChange(min(max, value + 1))`.
   - `ArrowLeft` / `ArrowDown` call `onChange(max(1, value - 1))`.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.star-rating`: horizontal flex container with star spacing.
+- `.star-btn`: clean button styling without borders, smooth hover scale, and golden amber color when `[data-filled="true"]`.
+You may use these classes, custom styles, or your own class names.
