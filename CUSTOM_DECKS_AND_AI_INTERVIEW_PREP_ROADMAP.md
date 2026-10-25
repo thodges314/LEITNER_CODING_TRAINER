@@ -222,8 +222,14 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
        ➕ Create Custom Deck...
        🎯 Tailor with AI Copilot...
     ```
+- **Card-Level Data Representation**:
+  - A deck is **never a category container**; it is an explicit array of **individual card IDs** (`cardIds: string[]`).
+  - Example: A "Stripe Senior Screen" deck contains `cardIds: ['tabs-accordion-compound', 'lru-cache-implementation', 'a11y-form-field', ...]`.
+- **Identical Catalog Table Experience (Scoped to Active Deck)**:
+  - When viewing a deck, the Deck Catalog displays the **exact same table UI as today** (Title, Topic, Difficulty, Box/Tier, Streak, actions).
+  - The rows are simply scoped to the cards in `activeDeck.cardIds`.
+  - All existing table controls continue to work within the deck: learners can still use the **Topic Filter Bar** (to isolate e.g. only React cards within that deck), search by name, or filter by difficulty/mastery tier.
 - **Practice Arena Scheduling**: Update `getNextCard` candidate selection so practice runs strictly within the active deck when one is selected.
-- **Catalog Filtering**: When a deck is active, the Deck Catalog filters down to show cards in that deck, with a clear indicator (e.g. *"Showing 19 cards in 'Stripe Senior Screen' · [View All Cards]"*). Topic filters (React, MAANG Algorithms, etc.) continue to filter within the active deck.
 - **Catalog Management**: Add multi-select checkboxes in the Deck Catalog table allowing users to manually assemble or add cards to any custom deck.
 - **Establish First-Class `maang-algorithms` Topic Track**:
   - Replace the awkward `algorithms-advanced` hidden pack mechanism by promoting it to a first-class topic track: `maang-algorithms` (labeled **"MAANG Algorithms"**, styled in vibrant purple/magenta `#a855f7`).
