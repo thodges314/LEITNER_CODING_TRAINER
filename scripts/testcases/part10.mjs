@@ -13,7 +13,7 @@ export default {
     r('useCounter functions keep a stable identity', 'useCounter({ initial: 1, step: 2 }), increment once, compare functions', 'increment, decrement, reset, set are unchanged'),
   ],
   'filter-list': [
-    r('Shows every item and the count before typing', "<FilterList items={['Apple','Banana','Cherry','apricot','Blueberry']} />", "5 <li>; status '5 results'"),
+    r('Shows every item and the count before typing', "<FilterList items={['Apple','Banana','Cherry','apricot','Blueberry']} />", '<div><input aria-label="Filter" value="" /><ul><li>Apple</li><li>Banana</li><li>Cherry</li><li>apricot</li><li>Blueberry</li></ul><p role="status">5 results</p></div>'),
     r('Filters case-insensitively as you type', "type 'AP'", "Apple, apricot; '2 results'"),
     r('Whitespace around the query is ignored', "type '  blue '", 'Blueberry'),
     r('Shows "No matches" when nothing matches', "type 'zzz'", "no <li>; status 'No matches'"),

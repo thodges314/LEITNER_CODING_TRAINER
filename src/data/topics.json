@@ -5489,7 +5489,7 @@
       {
         "description": "Shows every item and the count before typing",
         "input": "<FilterList items={['Apple','Banana','Cherry','apricot','Blueberry']} />",
-        "expected": "5 <li>; status '5 results'"
+        "expected": "<div><input aria-label=\"Filter\" value=\"\" /><ul><li>Apple</li><li>Banana</li><li>Cherry</li><li>apricot</li><li>Blueberry</li></ul><p role=\"status\">5 results</p></div>"
       },
       {
         "description": "Filters case-insensitively as you type",
