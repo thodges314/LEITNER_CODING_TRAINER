@@ -306,8 +306,11 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'message', type: 'string', defaultValue: 'Changes saved successfully', placeholder: 'Announcement text', description: 'Message sent to screen reader' },
   ],
   'form-error-summary': [
-    { name: 'title', type: 'string', defaultValue: 'Please fix the following errors:', placeholder: 'Banner title', description: 'Error summary banner title' },
-    { name: 'autoFocus', type: 'boolean', defaultValue: true, description: 'Automatically focus banner on mount' },
+    {
+      name: 'onSubmit',
+      type: 'function',
+      description: 'Callback invoked on valid submission: (values: { name: string, email: string }) => void',
+    },
   ],
   'action-state-form': [
     { name: 'action', type: 'function', description: 'Form submit action handler' },

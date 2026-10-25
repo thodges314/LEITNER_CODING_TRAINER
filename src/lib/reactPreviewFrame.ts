@@ -70,6 +70,92 @@ export function getCardSpecificStyles(cardId: string | undefined, colors: CardTh
       outline-offset: 2px;
     }
 `;
+    case 'form-error-summary':
+      return `
+    /* Form Error Summary helpers */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 380px;
+    }
+    .error-summary, [role="alert"] {
+      border: 2px solid #ef4444;
+      background: rgba(239, 68, 68, 0.08);
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+    .error-summary-title, [role="alert"] h2 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #f87171;
+    }
+    .error-summary-title:focus-visible, [role="alert"] h2:focus-visible {
+      outline: 2px solid #f87171;
+      outline-offset: 2px;
+    }
+    .error-summary-list, [role="alert"] ul {
+      margin: 0;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .error-summary-list a, [role="alert"] a {
+      color: #38bdf8;
+      text-decoration: underline;
+      font-size: 13px;
+    }
+    .form-group, form > div:not([role="alert"]) {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-label, form label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+    .form-input, form input {
+      padding: 8px 12px;
+      border: 1px solid ${border};
+      border-radius: 6px;
+      background: ${cardBg};
+      color: inherit;
+      font-size: 13px;
+    }
+    .form-input:focus, form input:focus {
+      outline: 2px solid ${accentPrimary};
+      outline-offset: -1px;
+    }
+    .form-input[aria-invalid="true"], form input[aria-invalid="true"] {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.06);
+    }
+    .form-error-message, form p[id$="-error"] {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: #f87171;
+      font-weight: 500;
+    }
+    .form-submit-btn, form button[type="submit"] {
+      padding: 8px 18px;
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      align-self: flex-start;
+      margin-top: 4px;
+      transition: background 0.15s ease;
+    }
+    .form-submit-btn:hover, form button[type="submit"]:hover {
+      background: #0369a1;
+    }
+`;
     case 'kanban-board':
       return `
     /* Kanban Board helpers */

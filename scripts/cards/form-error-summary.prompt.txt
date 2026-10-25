@@ -3,9 +3,13 @@ interface SignupFormValues {
   name: string;
   email: string;
 }
+
+interface SignupFormProps {
+  onSubmit: (values: SignupFormValues) => void;
+}
 ```
 
-### SignupForm({ onSubmit }: { onSubmit: (values: SignupFormValues) => void }): JSX.Element:
+### SignupForm({ onSubmit }: SignupFormProps): JSX.Element
 
 Build a signup form with two labelled text inputs: Name (`id="name"`) and Email (`id="email"`), and a submit button inside `<form noValidate>` (validating only on submit).
 
@@ -22,3 +26,15 @@ Build a signup form with two labelled text inputs: Name (`id="name"`) and Email 
   - Mark each invalid input with `aria-invalid="true"` and `aria-describedby="<id>-error"`.
   - Render the error message in `<p id="<id>-error">` directly below the input.
   - Valid inputs receive neither attribute.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.error-summary`: red-bordered summary container with soft tint for `<div role="alert">`.
+- `.error-summary-title`: heading styling for `<h2 tabIndex={-1}>`.
+- `.error-summary-list`: unordered list with clean link spacing.
+- `.form-group`: stacked container for label, input, and inline error.
+- `.form-label`: bold label styling with spacing.
+- `.form-input`: styled input field with red border when `[aria-invalid="true"]`.
+- `.form-error-message`: inline red error message below inputs.
+- `.form-submit-btn`: primary styled submit button.
+You may use these classes, custom styles, or your own class names.

@@ -37,11 +37,11 @@ function SignupForm({ onSubmit }) {
   return (
     <form onSubmit={submit} noValidate>
       {failing.length > 0 && (
-        <div role="alert">
-          <h2 tabIndex={-1} ref={summaryRef}>
+        <div role="alert" className="error-summary">
+          <h2 tabIndex={-1} ref={summaryRef} className="error-summary-title">
             There is a problem
           </h2>
-          <ul>
+          <ul className="error-summary-list">
             {failing.map((field) => (
               <li key={field.id}>
                 <a
@@ -59,10 +59,11 @@ function SignupForm({ onSubmit }) {
         </div>
       )}
       {FIELDS.map((field) => (
-        <div key={field.id}>
-          <label htmlFor={field.id}>{field.label}</label>
+        <div key={field.id} className="form-group">
+          <label htmlFor={field.id} className="form-label">{field.label}</label>
           <input
             id={field.id}
+            className="form-input"
             ref={(el) => {
               inputs.current[field.id] = el;
             }}
@@ -71,10 +72,10 @@ function SignupForm({ onSubmit }) {
             aria-invalid={errors[field.id] ? 'true' : undefined}
             aria-describedby={errors[field.id] ? field.id + '-error' : undefined}
           />
-          {errors[field.id] && <p id={field.id + '-error'}>{errors[field.id]}</p>}
+          {errors[field.id] && <p id={field.id + '-error'} className="form-error-message">{errors[field.id]}</p>}
         </div>
       ))}
-      <button type="submit">Create account</button>
+      <button type="submit" className="form-submit-btn">Create account</button>
     </form>
   );
 }

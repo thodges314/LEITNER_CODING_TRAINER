@@ -3,6 +3,10 @@ interface SignupFormValues {
   email: string;
 }
 
+interface SignupFormProps {
+  onSubmit: (values: SignupFormValues) => void;
+}
+
 const FIELDS: { id: keyof SignupFormValues; label: string }[] = [
   { id: 'name', label: 'Name' },
   { id: 'email', label: 'Email' },
@@ -15,11 +19,7 @@ function validate(values: SignupFormValues): Partial<Record<keyof SignupFormValu
   return errors;
 }
 
-function SignupForm({
-  onSubmit,
-}: {
-  onSubmit: (values: SignupFormValues) => void;
-}): JSX.Element {
+function SignupForm({ onSubmit }: SignupFormProps): JSX.Element {
   const [values, setValues] = useState<SignupFormValues>({ name: '', email: '' });
   const [errors, setErrors] = useState<Partial<Record<keyof SignupFormValues, string>>>({});
   const [attempt, setAttempt] = useState<number>(0);
@@ -46,11 +46,11 @@ function SignupForm({
   return (
     <form onSubmit={submit} noValidate>
       {failing.length > 0 && (
-        <div role="alert">
-          <h2 tabIndex={-1} ref={summaryRef}>
+        <div role="alert" className="error-summary">
+          <h2 tabIndex={-1} ref={summaryRef} className="error-summary-title">
             There is a problem
           </h2>
-          <ul>
+          <ul className="error-summary-list">
             {failing.map((field) => (
               <li key={field.id}>
                 <a
@@ -68,10 +68,11 @@ function SignupForm({
         </div>
       )}
       {FIELDS.map((field) => (
-        <div key={field.id}>
-          <label htmlFor={field.id}>{field.label}</label>
+        <div key={field.id} className="form-group">
+          <label htmlFor={field.id} className="form-label">{field.label}</label>
           <input
             id={field.id}
+            className="form-input"
             ref={(el: HTMLInputElement | null): void => {
               inputs.current[field.id] = el;
             }}
@@ -82,10 +83,10 @@ function SignupForm({
             aria-invalid={errors[field.id] ? 'true' : undefined}
             aria-describedby={errors[field.id] ? field.id + '-error' : undefined}
           />
-          {errors[field.id] && <p id={field.id + '-error'}>{errors[field.id]}</p>}
+          {errors[field.id] && <p id={field.id + '-error'} className="form-error-message">{errors[field.id]}</p>}
         </div>
       ))}
-      <button type="submit">Create account</button>
+      <button type="submit" className="form-submit-btn">Create account</button>
     </form>
   );
 }
