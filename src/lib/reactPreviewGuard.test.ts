@@ -144,6 +144,12 @@ describe('React preview guard: every previewCode mounts with the reference solut
         root?.render(element as React.ReactElement);
       });
 
+      if (container && container.innerHTML.trim().length === 0) {
+        await act(async () => {
+          await new Promise((r) => setTimeout(r, 20));
+        });
+      }
+
       // Assert non-empty DOM
       expect(container?.innerHTML.trim().length, `DOM for ${card.id} must not be empty`).toBeGreaterThan(0);
       expect(container?.children.length, `DOM for ${card.id} must have child elements`).toBeGreaterThan(0);
