@@ -15,8 +15,6 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
-| React Preview Dedicated Props Control Panel | Antigravity | `feature/react-preview-props-controls` | in progress |
-| Comprehensive TypeScript Support (Plumbing, Ambient Types, Dual Solution Reveal, Typed Stubs) | Antigravity | `feature/ts-coverage` | complete |
 
 
 
