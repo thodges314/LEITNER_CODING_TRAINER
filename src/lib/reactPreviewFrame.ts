@@ -39,6 +39,37 @@ export function getCardSpecificStyles(cardId: string | undefined, colors: CardTh
       color: inherit;
     }
 `;
+    case 'star-rating-component':
+      return `
+    /* Star Rating Component helpers */
+    .star-rating, [role="radiogroup"][aria-label="Rating"] {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .star-btn, [role="radiogroup"] > [role="radio"] {
+      background: transparent;
+      border: none;
+      font-size: 32px;
+      line-height: 1;
+      color: ${isLight ? '#94a3b8' : '#475569'};
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover, [role="radiogroup"] > [role="radio"]:hover {
+      transform: scale(1.15);
+    }
+    .star-btn[data-filled="true"], .star-btn.filled,
+    [role="radiogroup"] > [role="radio"][data-filled="true"] {
+      color: #f59e0b;
+    }
+    .star-btn:focus-visible, [role="radiogroup"] > [role="radio"]:focus-visible {
+      outline: 2px solid ${accentPrimary};
+      outline-offset: 2px;
+    }
+`;
     case 'kanban-board':
       return `
     /* Kanban Board helpers */

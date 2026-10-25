@@ -4,14 +4,14 @@ const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by the DOM 
 // react-components track.
 export default {
   'star-rating-component': [
-    r('Renders a labelled radiogroup with max stars (default 5)', '<StarRating value={2} />', "role='radiogroup'; 5 radios labelled '1 star', '2 stars', ..."),
-    r('The max prop changes the number of stars', '<StarRating value={2} max={8} />', '8 radios'),
-    r('The selected star is aria-checked and stars up to the value are filled', '<StarRating value={3} />', "aria-checked: false,false,true,false,false; data-filled='true' on 3 stars"),
-    r('Clicking a star calls onChange with its number', 'value=2; click the 4th star', 'onChange(4)'),
-    r('Clicking the current rating clears it (onChange(0))', 'value=2; click the 2nd star', 'onChange(0)'),
-    r('Hovering previews a rating and leaving the group restores it', 'value=1; mouseover the 4th star; then mouseout of the group', '4 stars filled while hovering, then 1'),
-    r('Arrow keys change the rating within 1..max', 'value=5: ArrowRight, ArrowLeft; value=1: ArrowLeft, ArrowUp', 'onChange calls: 5, 4, 1, 2'),
-    r('Only one star is in the tab order (roving tabindex)', 'value=3, then value=0', 'tabIndex -1,-1,0,-1,-1 then 0,-1,-1,-1,-1'),
+    r('Renders a labelled radiogroup with max stars (default 5)', '<StarRating value={2} />', "<div role='radiogroup' aria-label='Rating'><button role='radio' aria-label='1 star' aria-checked='false' tabindex='-1' data-filled='true'>★</button><button role='radio' aria-label='2 stars' aria-checked='true' tabindex='0' data-filled='true'>★</button><button role='radio' aria-label='3 stars' aria-checked='false' tabindex='-1' data-filled='false'>★</button><button role='radio' aria-label='4 stars' aria-checked='false' tabindex='-1' data-filled='false'>★</button><button role='radio' aria-label='5 stars' aria-checked='false' tabindex='-1' data-filled='false'>★</button></div>"),
+    r('The max prop changes the number of stars', '<StarRating value={2} max={8} />', 'renders 8 star buttons with role="radio"'),
+    r('The selected star is aria-checked and stars up to the value are filled', '<StarRating value={3} />', 'star 3 has aria-checked="true"; stars 1..3 carry data-filled="true" (stars 4..5 "false")'),
+    r('Clicking a star calls onChange with its number', 'value=2; click star 4', 'calls onChange(4)'),
+    r('Clicking the current rating clears it (onChange(0))', 'value=2; click star 2', 'calls onChange(0) (clears selection)'),
+    r('Hovering previews a rating and leaving the group restores it', 'value=1; hover star 4, then mouse out of radiogroup', 'data-filled="true" on 4 stars during hover; restores to 1 star after mouseout'),
+    r('Arrow keys change the rating within 1..max', 'value=5: ArrowRight, ArrowLeft; value=1: ArrowLeft, ArrowUp', 'calls onChange with clamped values: 5, 4, 1, 2'),
+    r('Only one star is in the tab order (roving tabindex)', 'value=3, then value=0', 'tabIndex 0 on 3rd star (others -1); when value=0, tabIndex 0 on 1st star'),
   ],
   'countdown-component': [
     r('Shows the starting seconds and does not run until Start', '<Countdown seconds={3} tickMs={60} />, wait 180 ms', "timer still shows '3'"),

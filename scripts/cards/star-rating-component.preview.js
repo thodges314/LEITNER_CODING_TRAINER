@@ -1,18 +1,32 @@
 function Demo() {
-  const [rating, setRating] = useState(3);
-  const logger = log('onChange');
+  const {
+    value: controlledValue = 3,
+    max = 5,
+    onChange = log('onChange'),
+  } = usePreviewProps({
+    value: 3,
+    max: 5,
+    onChange: log('onChange'),
+  });
+
+  const [rating, setRating] = useState(controlledValue);
+
+  useEffect(() => {
+    setRating(controlledValue);
+  }, [controlledValue]);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
       <StarRating
         value={rating}
-        max={5}
+        max={max}
         onChange={(next) => {
           setRating(next);
-          logger(next);
+          onChange(next);
         }}
       />
       <div style={{ fontSize: '13px', color: '#94a3b8' }}>
-        Current rating: {rating} / 5
+        Current rating: <strong style={{ color: '#e2e8f0' }}>{rating}</strong> / {max}
       </div>
     </div>
   );

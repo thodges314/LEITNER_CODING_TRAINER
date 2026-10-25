@@ -28,8 +28,6 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'star-rating-component': [
     { name: 'value', type: 'number', defaultValue: 3, min: 0, max: 10, step: 1, description: 'Selected star rating' },
     { name: 'max', type: 'number', defaultValue: 5, min: 1, max: 10, step: 1, description: 'Total star count' },
-    { name: 'size', type: 'enum', defaultValue: 'medium', options: ['small', 'medium', 'large'], description: 'Visual star size' },
-    { name: 'disabled', type: 'boolean', defaultValue: false, description: 'Disable star rating selection' },
     { name: 'onChange', type: 'function', description: 'Triggered when rating changes' },
   ],
   'countdown-component': [
