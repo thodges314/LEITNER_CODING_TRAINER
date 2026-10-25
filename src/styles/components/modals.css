@@ -201,3 +201,40 @@
   box-sizing: border-box;
 }
 
+/* High-contrast, visible scrollbar for all modal content */
+.modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.45) rgba(0, 0, 0, 0.2);
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 9px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.45);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.75);
+}
+
+[data-theme="apple-gsos"] .modal-content {
+  scrollbar-color: #8A887E #EBEAE3;
+}
+
+[data-theme="apple-gsos"] .modal-content::-webkit-scrollbar-track {
+  background: #EBEAE3;
+}
+
+[data-theme="apple-gsos"] .modal-content::-webkit-scrollbar-thumb {
+  background: #8A887E;
+}
+
+

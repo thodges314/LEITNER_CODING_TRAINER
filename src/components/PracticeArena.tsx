@@ -45,7 +45,7 @@ interface PracticeArenaProps {
   onCommitReview: (passed: boolean) => void;
   onSkipCard: () => void;
   onOpenDeckView: () => void;
-  onOpenSettings?: () => void;
+  onOpenSettings?: (section?: 'ai') => void;
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
   theme?: 'dark' | 'apple-gsos';
@@ -737,6 +737,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           isReinforcement={isReinforcement}
           onFinishReinforcement={handleFinishDrill}
           executionMode={executionMode}
+          onOpenSettings={onOpenSettings}
         />
       )}
 

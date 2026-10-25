@@ -94,5 +94,21 @@ describe('SettingsModal TypeScript Hover Toggle', () => {
     expect(checkbox).not.toBeNull();
     expect(checkbox?.checked).toBe(false);
   });
+
+  it('renders and targets AI section when initialSection="ai"', async () => {
+    await act(async () => {
+      root?.render(
+        <SettingsModal
+          isOpen={true}
+          initialSection="ai"
+          onClose={vi.fn()}
+        />
+      );
+    });
+
+    const aiSection = container?.querySelector('#settings-ai-section') as HTMLElement | null;
+    expect(aiSection).not.toBeNull();
+    expect(aiSection?.textContent).toContain('AI Provider & Multi-Key Vault');
+  });
 });
 

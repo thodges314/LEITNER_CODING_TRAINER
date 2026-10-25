@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   X,
   Sliders,
@@ -165,6 +165,7 @@ import type { AppTheme } from '../lib/theme';
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialSection?: 'ai' | null;
   currentAlgorithm?: SpacedAlgorithm;
   onAlgorithmChange?: (algo: SpacedAlgorithm) => void;
   currentTheme?: AppTheme;
@@ -179,6 +180,7 @@ interface SettingsModalProps {
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
+  initialSection,
   currentAlgorithm,
   onAlgorithmChange,
   currentTheme = 'dark',
@@ -189,6 +191,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onPacksChange,
 }) => {
   const isLight = currentTheme === 'apple-gsos';
+  const modalContentRef = useRef<HTMLDivElement>(null);
+  const aiSectionRef = useRef<HTMLDivElement>(null);
   const [algorithm, setAlgorithm] = useState<SpacedAlgorithm>(() => currentAlgorithm ?? getStoredAlgorithm());
   const [apiKey, setApiKey] = useState(() => getStoredApiKey());
   const [keyInput, setKeyInput] = useState(() => getStoredApiKey());
@@ -211,6 +215,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [modelDiscoveryError, setModelDiscoveryError] = useState<string | null>(null);
   const [customModelMode, setCustomModelMode] = useState(false);
+
+  // Smooth scroll to AI section when opened from AI connect buttons
+  useEffect(() => {
+    if (isOpen && initialSection === 'ai') {
+      const timer = setTimeout(() => {
+        if (aiSectionRef.current) {
+          try {
+            aiSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } catch {
+            const top = aiSectionRef.current.offsetTop - 65;
+            modalContentRef.current?.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+          }
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, initialSection]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -405,6 +426,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   return (
     <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div
+        ref={modalContentRef}
         className="modal-content"
         style={{
           maxWidth: '540px',
@@ -825,7 +847,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Provider Selection */}
-          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '16px' }}>
+          <div
+            ref={aiSectionRef}
+            id="settings-ai-section"
+            style={{
+              borderTop: '1px solid var(--border-subtle)',
+              paddingTop: '16px',
+              scrollMarginTop: '65px',
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
               <label style={{ fontSize: '13px', fontWeight: 500 }}>
                 AI Provider & Multi-Key Vault

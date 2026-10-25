@@ -19,7 +19,7 @@ import type { ProviderAccountInfo } from '../lib/modelDiscovery';
 interface ActiveModelStatusPopoverProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenSettings: () => void;
+  onOpenSettings: (section?: 'ai') => void;
   provider: AIProvider;
   model: string;
   apiKey: string;
@@ -409,7 +409,7 @@ export const ActiveModelStatusPopover: React.FC<ActiveModelStatusPopoverProps> =
             }}
             onClick={() => {
               onClose();
-              onOpenSettings();
+              onOpenSettings('ai');
             }}
           >
             <Settings size={13} />

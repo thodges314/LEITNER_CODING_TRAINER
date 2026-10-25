@@ -15,10 +15,11 @@ import {
   EyeOff,
   Copy,
   Loader2,
+  KeyRound,
 } from 'lucide-react';
 import { intervalForBox } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
-import { askCritiqueFollowUp, type EvaluationResult } from '../lib/ai';
+import { askCritiqueFollowUp, getStoredApiKey, type EvaluationResult } from '../lib/ai';
 import { summarizeVerdict } from '../lib/verdict';
 import { getThemeColors } from '../styles/colors';
 
@@ -95,6 +96,7 @@ interface EvaluationPanelProps {
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
   executionMode?: 'js' | 'ts';
+  onOpenSettings?: (section?: 'ai') => void;
 }
 
 export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
@@ -112,8 +114,10 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   isReinforcement,
   onFinishReinforcement,
   executionMode = 'js',
+  onOpenSettings,
 }) => {
   const isLight = theme === 'apple-gsos';
+  const hasApiKey = Boolean(getStoredApiKey());
   const palette = useMemo(() => getThemeColors(theme), [theme]);
   // Human override state, initialized to AI verdict
   const [effectiveVerdict, setEffectiveVerdict] = useState<boolean>(result.passed);
@@ -597,22 +601,50 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             </h4>
           </div>
           {!isFollowUpOpen && (
-            <span
-              style={{
-                fontSize: '11px',
-                color: 'var(--accent-cyan)',
-                backgroundColor: 'rgba(56, 189, 248, 0.08)',
-                padding: '2px 8px',
-                borderRadius: '4px',
-                border: '1px solid rgba(56, 189, 248, 0.2)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-            >
-              <span>click to ask follow-up</span>
-              <span style={{ fontWeight: 700, fontFamily: 'var(--font-mono, monospace)' }}>&gt;</span>
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  color: 'var(--accent-cyan)',
+                  backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  border: '1px solid rgba(56, 189, 248, 0.2)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <span>click to ask follow-up</span>
+                <span style={{ fontWeight: 700, fontFamily: 'var(--font-mono, monospace)' }}>&gt;</span>
+              </span>
+              {!hasApiKey && onOpenSettings && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenSettings('ai');
+                  }}
+                  title="Connect an AI key in Settings to chat with evaluator"
+                  style={{
+                    fontSize: '11px',
+                    padding: '2px 7px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    backgroundColor: '#f59e0b',
+                    color: '#000',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <KeyRound size={11} />
+                  <span>Connect Key</span>
+                </button>
+              )}
+            </div>
           )}
         </div>
 
@@ -643,6 +675,50 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
 
         ) : (
           <div onClick={(e) => e.stopPropagation()}>
+            {!hasApiKey && (
+              <div
+                style={{
+                  marginBottom: '10px',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  backgroundColor: isLight ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.12)',
+                  border: `1px solid ${isLight ? 'rgba(245, 158, 11, 0.2)' : 'rgba(245, 158, 11, 0.25)'}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px',
+                  fontSize: '12px',
+                }}
+              >
+                <span style={{ color: isLight ? '#92400e' : '#fbbf24' }}>
+                  <strong>Offline Mode:</strong> Connect an AI key to ask follow-up questions on this critique.
+                </span>
+                {onOpenSettings && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenSettings('ai')}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '3px 8px',
+                      borderRadius: '4px',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      backgroundColor: '#f59e0b',
+                      color: '#000',
+                      border: 'none',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <KeyRound size={12} />
+                    Add Key
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Unified Scrolling Dialog Transcript */}
             <div
               ref={transcriptRef}
@@ -687,6 +763,30 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                         isNew={idx === followUpMessages.length - 1}
                         onScrollToBottom={scrollToBottom}
                       />
+                      {msg.content.includes('requires an AI provider API key') && onOpenSettings && (
+                        <div style={{ marginTop: '8px' }}>
+                          <button
+                            type="button"
+                            onClick={() => onOpenSettings('ai')}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              padding: '4px 10px',
+                              borderRadius: '4px',
+                              fontSize: '11.5px',
+                              fontWeight: 600,
+                              backgroundColor: '#f59e0b',
+                              color: '#000',
+                              border: 'none',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <KeyRound size={12} />
+                            <span>Connect AI Key in Settings</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

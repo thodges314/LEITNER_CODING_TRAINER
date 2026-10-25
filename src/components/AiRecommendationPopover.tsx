@@ -13,7 +13,7 @@ import {
 interface AiRecommendationPopoverProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenSettings: () => void;
+  onOpenSettings: (section?: 'ai') => void;
 }
 
 export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = ({
@@ -286,7 +286,7 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
             }}
             onClick={() => {
               onClose();
-              onOpenSettings();
+              onOpenSettings('ai');
             }}
           >
             <Settings size={13} />

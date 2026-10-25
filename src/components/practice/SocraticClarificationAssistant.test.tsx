@@ -147,9 +147,12 @@ describe('SocraticClarificationAssistant', () => {
     expect(aiModule.askSocraticClarification).toHaveBeenCalledTimes(1);
 
     // Wait for streamed response
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 100));
-    });
+    for (let i = 0; i < 25; i++) {
+      if (container?.textContent?.includes('Binary search')) break;
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 40));
+      });
+    }
 
     expect(container?.textContent).toContain('Binary search');
   });
@@ -206,9 +209,13 @@ describe('SocraticClarificationAssistant', () => {
     });
 
     // Wait for reply and streaming
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 200));
-    });
+    for (let i = 0; i < 25; i++) {
+      const chips = container?.querySelectorAll('.socratic-chip-btn');
+      if (chips && chips.length === 4) break;
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 40));
+      });
+    }
 
     const followUpChips = Array.from(container?.querySelectorAll('.socratic-chip-btn') || []);
     expect(followUpChips.length).toBe(4);
@@ -239,9 +246,12 @@ describe('SocraticClarificationAssistant', () => {
     });
 
     // Wait until streaming completely finishes (onComplete fires and clears animatingIndex)
-    await act(async () => {
-      await new Promise((r) => setTimeout(r, 400));
-    });
+    for (let i = 0; i < 30; i++) {
+      if (container?.textContent?.includes('Binary search divides the sorted space')) break;
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 40));
+      });
+    }
 
     expect(container?.textContent).toContain('Binary search divides the sorted space');
 

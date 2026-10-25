@@ -89,6 +89,12 @@ export function App() {
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsInitialSection, setSettingsInitialSection] = useState<'ai' | null>(null);
+
+  const handleOpenSettings = (section?: 'ai') => {
+    setSettingsInitialSection(section || null);
+    setIsSettingsOpen(true);
+  };
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(FIRST_VISIT);
   const [welcomeMode, setWelcomeMode] = useState(FIRST_VISIT);
@@ -393,7 +399,7 @@ export function App() {
                 onClose={() => setIsAiRecommendOpen(false)}
                 onOpenSettings={() => {
                   setIsAiRecommendOpen(false);
-                  setIsSettingsOpen(true);
+                  handleOpenSettings('ai');
                 }}
               />
 
@@ -403,7 +409,7 @@ export function App() {
                 onClose={() => setIsAiStatusOpen(false)}
                 onOpenSettings={() => {
                   setIsAiStatusOpen(false);
-                  setIsSettingsOpen(true);
+                  handleOpenSettings('ai');
                 }}
                 provider={provider}
                 model={model}
@@ -415,7 +421,7 @@ export function App() {
             <button
               data-tour="settings"
               className="btn btn-outline"
-              onClick={() => setIsSettingsOpen(true)}
+              onClick={() => handleOpenSettings()}
               title="Configure Spaced Repetition method, theme, and AI engine"
             >
               <Settings size={15} />
@@ -467,7 +473,7 @@ export function App() {
             onCommitReview={handleCommitReview}
             onSkipCard={handleSkipCard}
             onOpenDeckView={() => setActiveView('dashboard')}
-            onOpenSettings={() => setIsSettingsOpen(true)}
+            onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
             isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
             onFinishReinforcement={handleFinishReinforcement}
           />
@@ -599,8 +605,10 @@ export function App() {
       {isSettingsOpen && (
         <SettingsModal
           isOpen={isSettingsOpen}
+          initialSection={settingsInitialSection}
           onClose={() => {
             setIsSettingsOpen(false);
+            setSettingsInitialSection(null);
             setAiSettingsVersion((v) => v + 1);
           }}
           currentAlgorithm={algorithm}

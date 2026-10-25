@@ -19,7 +19,7 @@ interface SocraticClarificationAssistantProps {
   topic: TopicItem;
   currentCode: string;
   theme?: 'dark' | 'apple-gsos';
-  onOpenSettings?: () => void;
+  onOpenSettings?: (section?: 'ai') => void;
 }
 
 const StreamedAssistantReply: React.FC<{
@@ -403,7 +403,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
               {onOpenSettings && (
                 <button
                   type="button"
-                  onClick={onOpenSettings}
+                  onClick={() => onOpenSettings('ai')}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
