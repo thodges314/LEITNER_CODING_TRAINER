@@ -230,6 +230,14 @@ It is **very straightforward and lightweight**. In a zero-backend browser enviro
   - The rows are simply scoped to the cards in `activeDeck.cardIds`.
   - All existing table controls continue to work within the deck: learners can still use the **Topic Filter Bar** (to isolate e.g. only React cards within that deck), search by name, or filter by difficulty/mastery tier.
 - **Practice Arena Scheduling**: Update `getNextCard` candidate selection so practice runs strictly within the active deck when one is selected.
+- **"Remove From Deck" Paradigm (Replacing Card Deactivation)**:
+  - Instead of an isolated "Deactivate Card" toggle, card pruning is handled through decks. The master/full library always retains all cards.
+  - Both in the Practice Arena (positioned next to "Skip Card") and in the catalog table, provide a rapid **"Remove From Deck"** action.
+  - **Forking Preset Decks into Personal Custom Decks**:
+    - Built-in starter decks (Full-Stack Core, Frontend Specialist, Core Algorithms, MAANG Algorithms) serve as clean, immutable presets.
+    - If a user clicks **"Remove From Deck"** while practicing on a built-in preset deck, a modal pops up prompting them to name their new personal deck (pre-filled with e.g. *"<Preset Name> (Personal)"*).
+    - Upon confirming the name, the system clones the preset into a custom deck minus the removed card, switches the active deck to this new personal deck, and immediately advances to the next eligible card.
+    - When already studying in a custom personal deck, clicking **"Remove From Deck"** immediately excludes the card from that custom deck's `cardIds` without asking for a new deck name, quickly moving on to the next card.
 - **Catalog Management**: Add multi-select checkboxes in the Deck Catalog table allowing users to manually assemble or add cards to any custom deck.
 - **Establish First-Class `maang-algorithms` Topic Track**:
   - Replace the awkward `algorithms-advanced` hidden pack mechanism by promoting it to a first-class topic track: `maang-algorithms` (labeled **"MAANG Algorithms"**, styled in vibrant purple/magenta `#a855f7`).
