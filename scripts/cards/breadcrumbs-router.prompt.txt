@@ -1,33 +1,18 @@
 ```ts
-interface BreadcrumbItem {
-  path: string;
-  label: string;
-  isCurrent: boolean;
-}
-
 interface BreadcrumbsProps {
   pathname: string;
   labels?: Record<string, string>;
 }
 ```
 
-Implement `generateBreadcrumbs(pathname, customLabels = {})` and an accessible React component `Breadcrumbs({ pathname, labels = {} })`:
-
-### generateBreadcrumbs(pathname: string, customLabels: Record<string, string> = {}): BreadcrumbItem[]
-- Normalizes consecutive or trailing slashes (e.g. `'/products/123/'` -> segments `['products', '123']`).
-- Always includes the root breadcrumb `{ path: '/', label: customLabels['/'] || 'Home', isCurrent: false }`.
-- For each subpath, constructs cumulative path (e.g. `'/products'`, `'/products/123'`).
-- Resolves label from `customLabels[path]` if present; otherwise capitalizes the segment string (e.g. `'products'` -> `'Products'`).
-- The final item in the array has `isCurrent: true`; all preceding items have `isCurrent: false`.
-- If `pathname` is `'/'` or empty, returns `[{ path: '/', label: customLabels['/'] || 'Home', isCurrent: true }]`.
+Implement an accessible React breadcrumb navigation component:
 
 ### Breadcrumbs({ pathname, labels = {} }: BreadcrumbsProps): JSX.Element
-- Uses `generateBreadcrumbs(pathname, labels)` to obtain the crumb items.
-- Renders `<nav aria-label="Breadcrumb">` wrapping an `<ol className="breadcrumbs">`.
-- For each crumb:
-  - Non-current crumbs render `<li>` with `<a href={crumb.path}>{crumb.label}</a>`.
-  - The current crumb renders `<li>` with `<span aria-current="page">{crumb.label}</span>`.
-
-### Preloaded Helper Classes (optional styling):
-- `.breadcrumbs`: Flex row container resetting default list styles.
-- `.breadcrumb-item`: Inline-flex crumb item with automatic `/` separator.
+- Normalizes consecutive or trailing slashes in `pathname` (e.g. `'/products/123/'` -> segments `['products', '123']`).
+- Always includes a root crumb `{ path: '/', label: labels['/'] || 'Home' }`.
+- For each subpath segment, constructs the cumulative route path (e.g. `'/products'`, `'/products/123'`).
+- Resolves each crumb label from `labels[path]` if specified; otherwise defaults to capitalizing the path segment (e.g. `'products'` -> `'Products'`).
+- Renders an accessible `<nav aria-label="Breadcrumb">` wrapping an ordered list `<ol className="breadcrumbs">`.
+- For each crumb, renders an `<li className="breadcrumb-item">`:
+  - Preceding crumbs render an anchor link `<a href={crumb.path}>{crumb.label}</a>`.
+  - The current/active page crumb (the final segment, or `'/'` if at root) renders `<span aria-current="page">{crumb.label}</span>` instead of a link.

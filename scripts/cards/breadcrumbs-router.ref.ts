@@ -1,25 +1,25 @@
+interface BreadcrumbsProps {
+  pathname: string;
+  labels?: Record<string, string>;
+}
+
 interface BreadcrumbItem {
   path: string;
   label: string;
   isCurrent: boolean;
 }
 
-interface BreadcrumbsProps {
-  pathname: string;
-  labels?: Record<string, string>;
-}
-
-function generateBreadcrumbs(
-  pathname: string,
-  customLabels: Record<string, string> = {}
-): BreadcrumbItem[] {
+function Breadcrumbs({
+  pathname,
+  labels = {},
+}: BreadcrumbsProps): JSX.Element {
   const clean = pathname ? pathname.replace(/\/+/g, '/').replace(/\/$/, '') : '';
   const segments = clean.split('/').filter(Boolean);
 
   const crumbs: BreadcrumbItem[] = [
     {
       path: '/',
-      label: customLabels['/'] || 'Home',
+      label: labels['/'] || 'Home',
       isCurrent: segments.length === 0,
     },
   ];
@@ -32,19 +32,10 @@ function generateBreadcrumbs(
     const defaultLabel = seg.charAt(0).toUpperCase() + seg.slice(1);
     crumbs.push({
       path: currentPath,
-      label: customLabels[currentPath] || defaultLabel,
+      label: labels[currentPath] || defaultLabel,
       isCurrent,
     });
   }
-
-  return crumbs;
-}
-
-function Breadcrumbs({
-  pathname,
-  labels = {},
-}: BreadcrumbsProps): JSX.Element {
-  const crumbs = generateBreadcrumbs(pathname, labels);
 
   return (
     <nav aria-label="Breadcrumb">

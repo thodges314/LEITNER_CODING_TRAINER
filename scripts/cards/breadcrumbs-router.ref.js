@@ -1,11 +1,11 @@
-function generateBreadcrumbs(pathname, customLabels = {}) {
+function Breadcrumbs({ pathname, labels = {} }) {
   const clean = pathname ? pathname.replace(/\/+/g, '/').replace(/\/$/, '') : '';
   const segments = clean.split('/').filter(Boolean);
 
   const crumbs = [
     {
       path: '/',
-      label: customLabels['/'] || 'Home',
+      label: labels['/'] || 'Home',
       isCurrent: segments.length === 0,
     },
   ];
@@ -18,16 +18,10 @@ function generateBreadcrumbs(pathname, customLabels = {}) {
     const defaultLabel = seg.charAt(0).toUpperCase() + seg.slice(1);
     crumbs.push({
       path: currentPath,
-      label: customLabels[currentPath] || defaultLabel,
+      label: labels[currentPath] || defaultLabel,
       isCurrent,
     });
   }
-
-  return crumbs;
-}
-
-function Breadcrumbs({ pathname, labels = {} }) {
-  const crumbs = generateBreadcrumbs(pathname, labels);
 
   return (
     <nav aria-label="Breadcrumb">
