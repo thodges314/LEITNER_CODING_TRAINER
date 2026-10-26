@@ -236,4 +236,33 @@ describe('DeckSelector component', () => {
 
     expect(onDelete).toHaveBeenCalledWith('deck-to-delete');
   });
+
+  it('calls onTailorWithAIClick and closes dropdown when AI tailor button is clicked', () => {
+    const onTailorClick = vi.fn();
+
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="full-library"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+          onTailorWithAIClick={onTailorClick}
+        />
+      );
+    });
+
+    const trigger = container!.querySelector('[data-testid="deck-dropdown-trigger"]') as HTMLButtonElement;
+    act(() => {
+      trigger.click();
+    });
+
+    const aiBtn = container!.querySelector('[data-testid="deck-dropdown-ai-btn"]') as HTMLButtonElement;
+    expect(aiBtn).not.toBeNull();
+    act(() => {
+      aiBtn.click();
+    });
+
+    expect(onTailorClick).toHaveBeenCalledTimes(1);
+    expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).toBeNull();
+  });
 });

@@ -1,0 +1,94 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('AI Interview Prep Copilot Flow', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.addInitScript(() => {
+      localStorage.setItem('leitner_welcomed', '1');
+      localStorage.setItem('leitner_theme', 'dark');
+      if (!localStorage.getItem('leitner_active_deck_id')) {
+        localStorage.setItem('leitner_active_deck_id', 'full-library');
+      }
+    });
+  });
+
+  test('opens AI copilot from deck selector, synthesizes curriculum, and creates tailored deck', async ({ page }) => {
+    await page.goto('/');
+
+    // Navigate to the Deck Catalog
+    const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
+    await catalogNavBtn.click();
+
+    // Verify Deck Catalog is visible
+    await expect(page.locator('.dashboard-title')).toContainText('Catalog');
+
+    // Open Deck Selector dropdown
+    const dropdownTrigger = page.getByTestId('deck-dropdown-trigger');
+    await dropdownTrigger.click();
+
+    // Click Tailor Deck with AI Copilot
+    const aiCopilotBtn = page.getByTestId('deck-dropdown-ai-btn');
+    await expect(aiCopilotBtn).toBeVisible();
+    await aiCopilotBtn.click();
+
+    // Verify modal opened
+    const modal = page.getByTestId('interview-prep-modal');
+    await expect(modal).toBeVisible();
+    await expect(page.locator('#ai-prep-modal-title')).toHaveText('AI Interview Prep Copilot');
+
+    // Fill in target company and role
+    const companyInput = page.getByTestId('ai-prep-company-input');
+    await companyInput.fill('Stripe');
+
+    const roleInput = page.getByTestId('ai-prep-role-input');
+    await roleInput.fill('Senior Frontend Engineer');
+
+    const rawNotesInput = page.getByTestId('ai-prep-raw-notes-input');
+    await rawNotesInput.fill('Stripe interview onsite: Focus on compound components, form accessibility, and state machines.');
+
+    // Select weakness chip
+    const weaknessChip = page.locator('[data-testid^="ai-weakness-chip-"]').first();
+    await weaknessChip.click();
+
+    // Click Synthesize Prep Curriculum
+    const generateBtn = page.getByTestId('ai-prep-generate-btn');
+    await generateBtn.click();
+
+    // Verify review view appears
+    const reviewView = page.getByTestId('ai-prep-review-view');
+    await expect(reviewView).toBeVisible({ timeout: 5000 });
+
+    // Verify deck name populated with Stripe
+    const deckNameInput = page.getByTestId('ai-prep-review-deck-name');
+    await expect(deckNameInput).toHaveValue(/Stripe/);
+
+    // Check tabs
+    const guideTab = page.getByTestId('ai-prep-tab-guide');
+    await guideTab.click();
+    await expect(page.locator('.guide-topics-grid')).toBeVisible();
+
+    const toolsTab = page.getByTestId('ai-prep-tab-tools');
+    await toolsTab.click();
+    await expect(page.locator('.interactive-tools-grid')).toBeVisible();
+    await expect(page.locator('.countdown-checklist-list')).toBeVisible();
+
+    // Switch back to cards tab
+    const cardsTab = page.getByTestId('ai-prep-tab-cards');
+    await cardsTab.click();
+
+    // Verify card items exist with priority badges
+    const cardItems = page.locator('.ai-prep-card-item');
+    const cardCount = await cardItems.count();
+    expect(cardCount).toBeGreaterThan(0);
+
+    // Click Create Custom Deck
+    const createDeckBtn = page.getByTestId('ai-prep-create-deck-btn');
+    await createDeckBtn.click();
+
+    // Modal should close
+    await expect(modal).not.toBeVisible();
+
+    // Verify active deck is switched to the new Stripe custom deck
+    await expect(page.locator('.deck-dropdown-active-name')).toHaveText(/Stripe/);
+  });
+});

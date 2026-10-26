@@ -6,8 +6,8 @@ Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_
 - **Card**: An individual flashcard / coding challenge / exercise (e.g. `tic-tac-toe`, `two-sum`, `stepper`). A card has an ID, prompt, test harness, reference solutions (`.ref.js` and `.ref.ts`), difficulty, box/tier, and streak.
 - **Topic**: The high-level subject track / category (e.g. `react-components`, `algorithms`, `async-js`, `js-utilities`, `dom-browser`) that groups cards. In UI controls and filters, category pills and table headers are labeled "Topic" / "Topics", while individual problem items are called "Cards".
 
-## Card content: edit the sources, not `src/data/topics.json`
-`src/data/topics.json` is **generated** by `npm run build:cards`. It is committed, but never edit it by hand: the next build would overwrite the change. Edit the source instead:
+## Card content: edit the sources, not `src/data/topics.json` or `src/data/catalogIndex.json`
+`src/data/topics.json` and `src/data/catalogIndex.json` are **generated** by `npm run build:cards`. They are committed, but never edit them by hand: the next build would overwrite the change. Edit the source instead:
 
 | To change | Edit |
 | --- | --- |
@@ -22,7 +22,7 @@ Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_
 ## After any card change
 1. `npm run build:cards` (then `GROQ_API_KEY=unused node scripts/enrich-complexities.mjs` per `DELEGATION.md`).
 2. `npm test`. It checks every reference solution against its own harness.
-3. `npm run check:cards` is a read-only check that `topics.json` matches the sources. It lists any stale cards and exits 1. It never writes.
+3. `npm run check:cards` is a read-only check that `topics.json` and `catalogIndex.json` match the sources. It lists any stale cards and exits 1. It never writes.
 
 ## Escaping conventions in card text
 - Contract inputs and expected values are **JavaScript source text**. `'a\nb'` is a string with a real newline; its expected output `'"a\\nb"'` is the five characters `"a\nb"` (a backslash followed by `n`).

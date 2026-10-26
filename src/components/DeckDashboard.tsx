@@ -56,6 +56,7 @@ interface DeckDashboardProps {
   onDeleteCustomDeck?: (deckId: string) => void;
   onAddCardsToDeck?: (deckId: string, cardIds: string[]) => void;
   onOpenCreateDeckWithCards?: (cardIds: string[]) => void;
+  onTailorWithAIClick?: () => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
   onOpenAddModal: () => void;
   /** Opens the Focus dialog (used by the one-time hint under the track filter). */
@@ -80,6 +81,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onDeleteCustomDeck,
   onAddCardsToDeck,
   onOpenCreateDeckWithCards,
+  onTailorWithAIClick,
   onStateUpdated,
   onOpenAddModal,
   onOpenFocus,
@@ -637,6 +639,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         customDecks={customDecks}
         onCreateCustomDeckClick={onCreateCustomDeckClick}
         onDeleteCustomDeck={onDeleteCustomDeck}
+        onTailorWithAIClick={onTailorWithAIClick}
       />
 
       {/* Leitner Box Breakdown Strip */}

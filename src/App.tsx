@@ -45,7 +45,7 @@ import {
 import type { CustomDeck } from './lib/decks';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
-import { RemoveFromDeckModal, CreateDeckModal } from './components/dashboard';
+import { RemoveFromDeckModal, CreateDeckModal, InterviewPrepModal } from './components/dashboard';
 import { AddTopicModal } from './components/AddTopicModal';
 import { FEATURES } from './lib/features';
 import { SettingsModal } from './components/SettingsModal';
@@ -127,6 +127,11 @@ export function App() {
   const [cardPendingRemoval, setCardPendingRemoval] = useState<TopicItem | null>(null);
   const [isCreateDeckModalOpen, setIsCreateDeckModalOpen] = useState(false);
   const [initialCardsForNewDeck, setInitialCardsForNewDeck] = useState<string[]>([]);
+  const [isInterviewPrepModalOpen, setIsInterviewPrepModalOpen] = useState(false);
+
+  const currentBox1CardIds = useMemo(() => {
+    return deckState.topics.filter((t) => t.box === 1).map((t) => t.id);
+  }, [deckState.topics]);
 
   const handleSelectDeck = (deckId: string) => {
     setActiveDeckId(deckId);
@@ -683,7 +688,8 @@ export function App() {
             onDeleteCustomDeck={handleDeleteCustomDeck}
             onAddCardsToDeck={handleAddCardsToDeck}
             onOpenCreateDeckWithCards={handleOpenCreateDeckWithCards}
-            onStateUpdated={(newState) => setDeckState(newState)}
+            onTailorWithAIClick={() => setIsInterviewPrepModalOpen(true)}
+            onStateUpdated={(newState: LeitnerDeckState) => setDeckState(newState)}
             onOpenAddModal={() => setIsAddModalOpen(true)}
             highlightExport={highlightExport}
             onDismissHighlightExport={() => setHighlightExport(false)}
@@ -808,6 +814,13 @@ export function App() {
           setIsCreateDeckModalOpen(false);
           setInitialCardsForNewDeck([]);
         }}
+      />
+
+      <InterviewPrepModal
+        isOpen={isInterviewPrepModalOpen}
+        onClose={() => setIsInterviewPrepModalOpen(false)}
+        onCreateCustomDeck={handleCreateCustomDeck}
+        currentBox1CardIds={currentBox1CardIds}
       />
 
       <FocusModal

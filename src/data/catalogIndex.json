@@ -1,0 +1,3786 @@
+[
+  {
+    "id": "async-fetch-error-handling",
+    "title": "Fetch with Async/Await & HTTP Error Handling",
+    "track": "async-js",
+    "concept": "fetch",
+    "difficulty": 2,
+    "tags": [
+      "fetch",
+      "async-await",
+      "promises"
+    ],
+    "summary": "Write an async HTTP request utility using native fetch"
+  },
+  {
+    "id": "promise-chaining-syntax",
+    "title": "Promise Chaining without Async/Await",
+    "track": "async-js",
+    "concept": "promise",
+    "difficulty": 2,
+    "tags": [
+      "promises",
+      "then",
+      "catch"
+    ],
+    "summary": "Write a promise pipeline using explicit chaining syntax (.then(), .catch(), .finally()) without async/await"
+  },
+  {
+    "id": "promise-all-vs-settled",
+    "title": "Parallel Network Requests (allSettled)",
+    "track": "async-js",
+    "concept": "promise-combinators",
+    "difficulty": 2,
+    "tags": [
+      "promises",
+      "concurrency"
+    ],
+    "summary": "Write an async function fetchAllUsers(urls) that requests all URLs in parallel using Promise.allSettled"
+  },
+  {
+    "id": "fetch-abort-controller",
+    "title": "Request Cancellation via AbortController",
+    "track": "async-js",
+    "concept": "fetch",
+    "difficulty": 3,
+    "tags": [
+      "fetch",
+      "abort-controller",
+      "cancellation"
+    ],
+    "summary": "Write an HTTP fetch utility that enforces request timeouts using AbortController"
+  },
+  {
+    "id": "debounce-implementation",
+    "title": "Debounce Function Implementation",
+    "track": "js-utilities",
+    "concept": "rate-limiting",
+    "difficulty": 2,
+    "tags": [
+      "closures",
+      "debounce",
+      "timers"
+    ],
+    "summary": "Implement a trailing-edge debounce(fn, delay) from scratch: fn is not called until delay ms have passed since the LAST call to the returned functio..."
+  },
+  {
+    "id": "throttle-implementation",
+    "title": "Throttle Function Implementation",
+    "track": "js-utilities",
+    "concept": "rate-limiting",
+    "difficulty": 2,
+    "tags": [
+      "closures",
+      "throttle",
+      "timers"
+    ],
+    "summary": "Implement a leading-edge throttle(fn, limit) from scratch in vanilla JavaScript: the first call runs fn immediately; any calls made during the foll..."
+  },
+  {
+    "id": "map-frequency-counter",
+    "title": "Frequency Counter via Native Map",
+    "track": "js-utilities",
+    "concept": "collections",
+    "difficulty": 1,
+    "tags": [
+      "map",
+      "frequency-counter"
+    ],
+    "summary": "Count item occurrences using standard JavaScript Map operations"
+  },
+  {
+    "id": "set-unique-operations",
+    "title": "Set Operations & Array Deduplication",
+    "track": "js-utilities",
+    "concept": "collections",
+    "difficulty": 1,
+    "tags": [
+      "set",
+      "dedup",
+      "intersection"
+    ],
+    "summary": "Implement set operations on arrays using JavaScript Set in O(n + m) time"
+  },
+  {
+    "id": "array-flatten-recursive",
+    "title": "Recursive Array Flattening",
+    "track": "js-utilities",
+    "concept": "flatten",
+    "difficulty": 2,
+    "tags": [
+      "recursion",
+      "arrays"
+    ],
+    "summary": "Flatten arbitrarily nested arrays without built-in methods"
+  },
+  {
+    "id": "custom-array-reduce",
+    "title": "Custom Array.prototype.reduce",
+    "track": "js-utilities",
+    "concept": "array-polyfills",
+    "difficulty": 2,
+    "tags": [
+      "arrays",
+      "prototypes",
+      "reduce"
+    ],
+    "summary": "Implement a standalone reducer function from scratch"
+  },
+  {
+    "id": "object-deep-clone",
+    "title": "Deep Clone of Plain Objects",
+    "track": "js-utilities",
+    "concept": "equality-clone",
+    "difficulty": 2,
+    "tags": [
+      "objects",
+      "recursion",
+      "cloning"
+    ],
+    "summary": "Implement deep cloning for nested objects and arrays without using JSON.parse(JSON.stringify()) or structuredClone()"
+  },
+  {
+    "id": "lru-cache-implementation",
+    "title": "LRU Cache Implementation",
+    "track": "js-utilities",
+    "concept": "lru",
+    "difficulty": 3,
+    "tags": [
+      "lru",
+      "cache",
+      "map"
+    ],
+    "summary": "Implement a Least Recently Used (LRU) cache class operating in O(1) time complexity for all operations"
+  },
+  {
+    "id": "controlled-vs-uncontrolled-input",
+    "title": "Controlled Search Form",
+    "track": "react",
+    "concept": "react-forms",
+    "difficulty": 1,
+    "tags": [
+      "react",
+      "forms",
+      "controlled-inputs"
+    ],
+    "summary": "Build a controlled search form component in React"
+  },
+  {
+    "id": "hook-use-previous",
+    "title": "usePrevious Hook via useRef",
+    "track": "react",
+    "concept": "react-hooks-utility",
+    "difficulty": 1,
+    "tags": [
+      "react",
+      "custom-hooks",
+      "useref"
+    ],
+    "summary": "Write a custom hook to track a value from the previous render"
+  },
+  {
+    "id": "use-reducer-todo-list",
+    "title": "Complex State with useReducer",
+    "track": "react",
+    "concept": "reducer",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "usereducer",
+      "state"
+    ],
+    "summary": "Implement todoReducer(state, action) for a todo list held in useReducer(todoReducer, [])"
+  },
+  {
+    "id": "context-provider-consumer",
+    "title": "React Context Provider with Custom Hook",
+    "track": "react",
+    "concept": "context",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "context"
+    ],
+    "summary": "Implement a factory function for a React Theme Context"
+  },
+  {
+    "id": "two-pointer-sorted-sum",
+    "title": "Two-Pointer Sorted Pair Sum",
+    "track": "algorithms",
+    "concept": "two-pointer",
+    "difficulty": 2,
+    "tags": [
+      "algorithms",
+      "two-pointers"
+    ],
+    "summary": "Implement two sum on a pre-sorted array using two pointers in O(n) time and O(1) space"
+  },
+  {
+    "id": "sliding-window-fixed",
+    "title": "Maximum Sum Subarray of Size K",
+    "track": "algorithms",
+    "concept": "sliding-window",
+    "difficulty": 2,
+    "tags": [
+      "algorithms",
+      "sliding-window"
+    ],
+    "summary": "Implement fixed-size sliding window summation in O(n) time"
+  },
+  {
+    "id": "valid-parentheses-stack",
+    "title": "Valid Parentheses via Stack",
+    "track": "algorithms",
+    "concept": "stack",
+    "difficulty": 2,
+    "tags": [
+      "algorithms",
+      "stack"
+    ],
+    "summary": "Implement bracket validation using a stack"
+  },
+  {
+    "id": "binary-search-exact",
+    "title": "Binary Search Implementation",
+    "track": "algorithms",
+    "concept": "binary-search",
+    "difficulty": 2,
+    "tags": [
+      "algorithms",
+      "binary-search"
+    ],
+    "summary": "Implement classical exact binary search on sorted sequences"
+  },
+  {
+    "id": "merge-intervals",
+    "title": "Merge Overlapping Intervals",
+    "track": "algorithms",
+    "concept": "intervals",
+    "difficulty": 3,
+    "tags": [
+      "algorithms",
+      "intervals",
+      "sorting"
+    ],
+    "summary": "Implement interval merging on an array of [start, end] pairs"
+  },
+  {
+    "id": "debounce",
+    "title": "Debounce with Cancel and Flush",
+    "track": "js-utilities",
+    "concept": "rate-limiting",
+    "difficulty": 3,
+    "tags": [
+      "closures",
+      "timers",
+      "this-binding"
+    ],
+    "summary": "interface DebouncedFunction<T extends (...args: any[]) => any> {"
+  },
+  {
+    "id": "throttle",
+    "title": "Throttle with Leading/Trailing Options",
+    "track": "js-utilities",
+    "concept": "rate-limiting",
+    "difficulty": 3,
+    "tags": [
+      "closures",
+      "timers",
+      "rate-limiting"
+    ],
+    "summary": "interface ThrottleOptions {"
+  },
+  {
+    "id": "memoize",
+    "title": "Memoize with Custom Key Resolver",
+    "track": "js-utilities",
+    "concept": "memoize",
+    "difficulty": 2,
+    "tags": [
+      "closures",
+      "caching",
+      "map"
+    ],
+    "summary": "Implement a robust function memoizer"
+  },
+  {
+    "id": "bind-call-apply",
+    "title": "Function.prototype bind / call / apply Polyfills",
+    "track": "js-language",
+    "concept": "this-binding",
+    "difficulty": 4,
+    "tags": [
+      "this-binding",
+      "prototype",
+      "polyfill"
+    ],
+    "summary": "Implement Function.prototype.myBind (partial application; a bound function invoked with new must ignore the bound this and keep the prototype chain..."
+  },
+  {
+    "id": "deep-clone",
+    "title": "Deep Clone with Cycles",
+    "track": "js-utilities",
+    "concept": "equality-clone",
+    "difficulty": 4,
+    "tags": [
+      "recursion",
+      "weakmap",
+      "types"
+    ],
+    "summary": "Implement a comprehensive deep clone utility"
+  },
+  {
+    "id": "event-emitter",
+    "title": "Event Emitter (on / off / once / emit)",
+    "track": "js-utilities",
+    "concept": "emitter",
+    "difficulty": 3,
+    "tags": [
+      "pub-sub",
+      "typescript",
+      "generics"
+    ],
+    "summary": "Build a robust, object-oriented event emitter class"
+  },
+  {
+    "id": "curry-compose",
+    "title": "Curry and Compose/Pipe",
+    "track": "js-utilities",
+    "concept": "currying",
+    "difficulty": 2,
+    "tags": [
+      "functional",
+      "closures",
+      "arity"
+    ],
+    "summary": "Implement functional programming composition and currying utilities"
+  },
+  {
+    "id": "promise-all-polyfill",
+    "title": "Promise.all / allSettled / race Polyfills",
+    "track": "async-js",
+    "concept": "promise-combinators",
+    "difficulty": 3,
+    "tags": [
+      "promises",
+      "polyfill",
+      "concurrency"
+    ],
+    "summary": "Implement three core Promise concurrency combinators: promiseAll, promiseAllSettled, and promiseRace."
+  },
+  {
+    "id": "promise-pool",
+    "title": "Concurrency-Limited Promise Pool",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 4,
+    "tags": [
+      "concurrency",
+      "queue",
+      "async"
+    ],
+    "summary": "Implement concurrent asynchronous task throttling"
+  },
+  {
+    "id": "retry-with-backoff",
+    "title": "Retry with Exponential Backoff and Abort",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 3,
+    "tags": [
+      "async",
+      "abortcontroller",
+      "fetch"
+    ],
+    "summary": "Implement retry(fn, options) for an async function fn"
+  },
+  {
+    "id": "fetch-timeout-dedupe",
+    "title": "Fetch with Timeout and In-Flight Deduplication",
+    "track": "async-js",
+    "concept": "fetch",
+    "difficulty": 4,
+    "tags": [
+      "fetch",
+      "dedupe",
+      "abortcontroller"
+    ],
+    "summary": "Implement request deduplication with timeout abortion"
+  },
+  {
+    "id": "async-queue-scheduler",
+    "title": "Sequential Async Task Queue",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 3,
+    "tags": [
+      "queue",
+      "promises",
+      "ordering"
+    ],
+    "summary": "Build a sequential asynchronous task queue"
+  },
+  {
+    "id": "express-middleware-chain",
+    "title": "Express-Style Middleware Pipeline",
+    "track": "async-js",
+    "concept": "middleware",
+    "difficulty": 4,
+    "tags": [
+      "node",
+      "middleware",
+      "composition"
+    ],
+    "summary": "Implement a minimal Express-style middleware execution pipeline"
+  },
+  {
+    "id": "rate-limiter-middleware",
+    "title": "In-Memory Rate Limiter Middleware",
+    "track": "js-utilities",
+    "concept": "rate-limiting",
+    "difficulty": 4,
+    "tags": [
+      "node",
+      "rate-limiting",
+      "token-bucket"
+    ],
+    "summary": "interface RateLimiterOptions {"
+  },
+  {
+    "id": "lru-cache-ttl",
+    "title": "LRU Cache with TTL",
+    "track": "js-utilities",
+    "concept": "lru",
+    "difficulty": 4,
+    "tags": [
+      "cache",
+      "map",
+      "ttl",
+      "data-structures"
+    ],
+    "summary": "Implement a Least Recently Used (LRU) cache class with Time-To-Live (TTL) expiration in O(1) time"
+  },
+  {
+    "id": "flatten-array-object",
+    "title": "Flatten Nested Arrays and Objects",
+    "track": "js-utilities",
+    "concept": "flatten",
+    "difficulty": 3,
+    "tags": [
+      "recursion",
+      "arrays",
+      "objects"
+    ],
+    "summary": "Implement recursive flattening utilities for arrays and nested objects without mutating inputs"
+  },
+  {
+    "id": "group-by-count-by",
+    "title": "groupBy / countBy / keyBy with reduce",
+    "track": "js-utilities",
+    "concept": "collections",
+    "difficulty": 2,
+    "tags": [
+      "reduce",
+      "aggregation",
+      "objects"
+    ],
+    "summary": "Implement data collection and transformation grouping utilities"
+  },
+  {
+    "id": "array-method-polyfills",
+    "title": "Array map / filter / reduce Polyfills",
+    "track": "js-utilities",
+    "concept": "array-polyfills",
+    "difficulty": 3,
+    "tags": [
+      "polyfill",
+      "arrays",
+      "sparse"
+    ],
+    "summary": "Implement polyfills on Array.prototype for core iteration methods"
+  },
+  {
+    "id": "get-set-path",
+    "title": "Safe get / set by Path",
+    "track": "js-utilities",
+    "concept": "collections",
+    "difficulty": 3,
+    "tags": [
+      "objects",
+      "parsing",
+      "lodash"
+    ],
+    "summary": "Implement path-based object property accessors"
+  },
+  {
+    "id": "deep-equal",
+    "title": "Deep Equality Comparison",
+    "track": "js-utilities",
+    "concept": "equality-clone",
+    "difficulty": 4,
+    "tags": [
+      "recursion",
+      "equality",
+      "edge-cases"
+    ],
+    "summary": "Implement deep equality comparison supporting primitives, structural objects, and edge cases"
+  },
+  {
+    "id": "unique-sort-dedupe",
+    "title": "Immutable Dedupe and Multi-Key Sort",
+    "track": "js-utilities",
+    "concept": "collections",
+    "difficulty": 2,
+    "tags": [
+      "sorting",
+      "immutability",
+      "stability"
+    ],
+    "summary": "Implement record deduplication and multi-key stable sorting"
+  },
+  {
+    "id": "use-debounce-hook",
+    "title": "useDebounce and useThrottle Hooks",
+    "track": "react",
+    "concept": "react-hooks-utility",
+    "difficulty": 3,
+    "tags": [
+      "hooks",
+      "effects",
+      "cleanup"
+    ],
+    "summary": "Implement two timing utility hooks: useDebounce and useThrottle."
+  },
+  {
+    "id": "use-fetch-hook",
+    "title": "useFetch with Race-Condition Safety",
+    "track": "react",
+    "concept": "react-fetch",
+    "difficulty": 3,
+    "tags": [
+      "hooks",
+      "fetch",
+      "abortcontroller",
+      "race-conditions"
+    ],
+    "summary": "Build useFetch(url)"
+  },
+  {
+    "id": "typeahead-autocomplete",
+    "title": "Typeahead / Autocomplete Component",
+    "track": "react-components",
+    "concept": "typeahead",
+    "difficulty": 4,
+    "tags": [
+      "components",
+      "debounce",
+      "keyboard",
+      "a11y"
+    ],
+    "summary": "Build an accessible typeahead / autocomplete component"
+  },
+  {
+    "id": "use-previous-latest-ref",
+    "title": "usePrevious, useLatest, and useInterval",
+    "track": "react",
+    "concept": "react-hooks-utility",
+    "difficulty": 3,
+    "tags": [
+      "hooks",
+      "refs",
+      "stale-closures"
+    ],
+    "summary": "Implement three reference and timer utility hooks: usePrevious, useLatest, and useInterval."
+  },
+  {
+    "id": "infinite-scroll-list",
+    "title": "Infinite Scroll with IntersectionObserver",
+    "track": "react-components",
+    "concept": "infinite-scroll",
+    "difficulty": 3,
+    "tags": [
+      "components",
+      "intersection-observer",
+      "pagination"
+    ],
+    "summary": "Build an infinite scroll list with an intersection sentinel"
+  },
+  {
+    "id": "modal-portal-focus",
+    "title": "Accessible Modal with Portal and Focus Trap",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 4,
+    "tags": [
+      "portal",
+      "a11y",
+      "focus",
+      "events"
+    ],
+    "summary": "Build an accessible modal dialog rendered with ReactDOM.createPortal into document.body"
+  },
+  {
+    "id": "todo-list-reducer",
+    "title": "Todo List State: Reducer + Selectors",
+    "track": "react",
+    "concept": "reducer",
+    "difficulty": 3,
+    "tags": [
+      "useReducer",
+      "state",
+      "immutability",
+      "keys"
+    ],
+    "summary": "Implement immutable state logic and selectors for a todo list"
+  },
+  {
+    "id": "tabs-accordion-compound",
+    "title": "Compound Components (Tabs)",
+    "track": "react-components",
+    "concept": "compound",
+    "difficulty": 3,
+    "tags": [
+      "context",
+      "composition",
+      "a11y",
+      "typescript"
+    ],
+    "summary": "Implement compound components sharing state via context"
+  },
+  {
+    "id": "two-sum-hashmap",
+    "title": "Two Sum and Hash-Map Lookups",
+    "track": "algorithms",
+    "concept": "hashing",
+    "difficulty": 1,
+    "tags": [
+      "hashmap",
+      "arrays",
+      "complexity"
+    ],
+    "summary": "Implement the classic two sum lookup algorithm in O(n) time using a hash map"
+  },
+  {
+    "id": "tree-traversal-dom",
+    "title": "DOM / Tree Traversal (BFS, DFS, getElementsByClassName)",
+    "track": "algorithms",
+    "concept": "trees",
+    "difficulty": 4,
+    "tags": [
+      "trees",
+      "recursion",
+      "dom",
+      "bfs-dfs"
+    ],
+    "summary": "Implement general tree and DOM-like node traversal utilities on nodes shaped { id, children?, classList? }"
+  },
+  {
+    "id": "ts-discriminated-unions-exhaustiveness",
+    "title": "Discriminated Unions & Exhaustiveness Checking",
+    "track": "typescript-patterns",
+    "concept": "ts-unions",
+    "difficulty": 3,
+    "tags": [
+      "typescript",
+      "discriminated-unions",
+      "never",
+      "type-narrowing"
+    ],
+    "summary": "Define a generic discriminated union and exhaustive state formatter"
+  },
+  {
+    "id": "ts-generic-api-client",
+    "title": "Generic Fetch Client with Typed Payloads",
+    "track": "typescript-patterns",
+    "concept": "ts-generics",
+    "difficulty": 3,
+    "tags": [
+      "typescript",
+      "generics",
+      "fetch",
+      "promises"
+    ],
+    "summary": "Implement a type-safe HTTP client wrapper and custom error class"
+  },
+  {
+    "id": "ts-custom-utility-types",
+    "title": "Custom Utility Types (DeepPartial & PickByType)",
+    "track": "typescript-patterns",
+    "concept": "ts-types",
+    "difficulty": 4,
+    "tags": [
+      "typescript",
+      "generics",
+      "utility-types",
+      "conditional-types"
+    ],
+    "summary": "Implement advanced TypeScript generic utility types"
+  },
+  {
+    "id": "ts-generic-component-props",
+    "title": "Generic React Component Props (Generic Select<T>)",
+    "track": "typescript-patterns",
+    "concept": "ts-generics",
+    "difficulty": 2,
+    "tags": [
+      "typescript",
+      "react",
+      "generics",
+      "props"
+    ],
+    "summary": "Define a generic component prop interface and rendering function where TypeScript enforces type parity across items and value"
+  },
+  {
+    "id": "ts-custom-type-guards",
+    "title": "Custom User-Defined Type Guards (isRecord, isError)",
+    "track": "typescript-patterns",
+    "concept": "ts-narrowing",
+    "difficulty": 2,
+    "tags": [
+      "typescript",
+      "type-guards",
+      "narrowing"
+    ],
+    "summary": "Implement TypeScript custom type guards for runtime validation"
+  },
+  {
+    "id": "ts-typed-event-emitter",
+    "title": "Strictly Typed Event Emitter Map",
+    "track": "typescript-patterns",
+    "concept": "ts-generics",
+    "difficulty": 3,
+    "tags": [
+      "typescript",
+      "generics",
+      "mapped-types",
+      "pub-sub"
+    ],
+    "summary": "Create a type-safe event emitter class TypedEmitter<Events extends Record<string, any>>"
+  },
+  {
+    "id": "classnames-utility",
+    "title": "classNames / clsx Utility",
+    "track": "js-utilities",
+    "concept": "string-utils",
+    "difficulty": 1,
+    "tags": [
+      "css",
+      "classnames",
+      "recursion",
+      "utility"
+    ],
+    "summary": "type ClassValue ="
+  },
+  {
+    "id": "closures-private-state",
+    "title": "Closures: Private State, once, and Loop Capture",
+    "track": "js-language",
+    "concept": "closures",
+    "difficulty": 2,
+    "tags": [
+      "closures",
+      "scope",
+      "encapsulation",
+      "once"
+    ],
+    "summary": "Use closures (no classes, no this, no module-level state)"
+  },
+  {
+    "id": "css-specificity",
+    "title": "CSS Selector Specificity Calculator",
+    "track": "dom-browser",
+    "concept": "css",
+    "difficulty": 3,
+    "tags": [
+      "css",
+      "specificity",
+      "regex",
+      "parsing"
+    ],
+    "summary": "Calculate and compare CSS selector specificity vectors"
+  },
+  {
+    "id": "format-utilities",
+    "title": "Formatting: Numbers, Bytes, Relative Time, Truncate",
+    "track": "js-utilities",
+    "concept": "string-utils",
+    "difficulty": 2,
+    "tags": [
+      "formatting",
+      "intl",
+      "dates",
+      "strings"
+    ],
+    "summary": "Implement common formatting utility functions without relying on the Intl API"
+  },
+  {
+    "id": "infinite-currying-sum",
+    "title": "Infinite Currying: sum(1)(2)(3)()",
+    "track": "js-utilities",
+    "concept": "currying",
+    "difficulty": 3,
+    "tags": [
+      "currying",
+      "closures",
+      "valueOf",
+      "functional"
+    ],
+    "summary": "interface CurriedSum {"
+  },
+  {
+    "id": "iterators-generators",
+    "title": "Iterators and Generators",
+    "track": "js-language",
+    "concept": "iterators",
+    "difficulty": 3,
+    "tags": [
+      "generator",
+      "iterator",
+      "symbol.iterator",
+      "lazy"
+    ],
+    "summary": "Write lazy iterator utilities and a custom iterable class using generators"
+  },
+  {
+    "id": "json-stringify-polyfill",
+    "title": "JSON.stringify Polyfill",
+    "track": "js-utilities",
+    "concept": "serialization",
+    "difficulty": 4,
+    "tags": [
+      "json",
+      "recursion",
+      "serialization",
+      "edge-cases"
+    ],
+    "summary": "Implement a recursive JSON.stringify polyfill from scratch without delegating to JSON.stringify"
+  },
+  {
+    "id": "new-instanceof-create",
+    "title": "Implement new, instanceof and Object.create",
+    "track": "js-language",
+    "concept": "this-binding",
+    "difficulty": 4,
+    "tags": [
+      "prototype",
+      "new",
+      "instanceof",
+      "object.create"
+    ],
+    "summary": "Without using the new operator, Reflect.construct or Object.create, implement"
+  },
+  {
+    "id": "promise-class-scratch",
+    "title": "Promise Class from Scratch",
+    "track": "async-js",
+    "concept": "promise",
+    "difficulty": 5,
+    "tags": [
+      "promise",
+      "thenable",
+      "microtask",
+      "chaining"
+    ],
+    "summary": "Implement class MyPromise<T>(executor) from scratch without using native Promises for internal state"
+  },
+  {
+    "id": "promisify-callback",
+    "title": "promisify: Callback API to Promise",
+    "track": "async-js",
+    "concept": "promise",
+    "difficulty": 2,
+    "tags": [
+      "promisify",
+      "callbacks",
+      "node-style",
+      "this"
+    ],
+    "summary": "Implement a Node.js callback-to-promise adapter"
+  },
+  {
+    "id": "query-string-url",
+    "title": "Query String Parse / Stringify",
+    "track": "js-utilities",
+    "concept": "string-utils",
+    "difficulty": 2,
+    "tags": [
+      "url",
+      "query-string",
+      "encoding",
+      "parsing"
+    ],
+    "summary": "Implement URL query string serialization and deserialization helpers"
+  },
+  {
+    "id": "client-side-router",
+    "title": "Client-Side Router with Params and History",
+    "track": "dom-browser",
+    "concept": "router",
+    "difficulty": 4,
+    "tags": [
+      "router",
+      "history",
+      "params",
+      "url"
+    ],
+    "summary": "Implement an in-memory client-side router with path parameters and query string parsing"
+  },
+  {
+    "id": "event-delegation",
+    "title": "Event Delegation",
+    "track": "dom-browser",
+    "concept": "dom",
+    "difficulty": 2,
+    "tags": [
+      "dom",
+      "events",
+      "bubbling",
+      "closest"
+    ],
+    "summary": "Write delegate(root, selector, eventType, handler) that attaches ONE listener to root and calls handler(event, matchedElement) (with this also set ..."
+  },
+  {
+    "id": "storage-ttl-wrapper",
+    "title": "localStorage Wrapper with TTL and Namespacing",
+    "track": "dom-browser",
+    "concept": "storage",
+    "difficulty": 3,
+    "tags": [
+      "localstorage",
+      "json",
+      "ttl",
+      "error-handling"
+    ],
+    "summary": "Wrap a localStorage-like backend with namespacing and TTL (Time-To-Live) expiration"
+  },
+  {
+    "id": "vnode-to-dom",
+    "title": "Render a Virtual Node Tree to the DOM",
+    "track": "dom-browser",
+    "concept": "dom",
+    "difficulty": 3,
+    "tags": [
+      "dom",
+      "virtual-dom",
+      "createElement",
+      "rendering"
+    ],
+    "summary": "Implement a lightweight virtual DOM to real DOM compiler and renderer"
+  },
+  {
+    "id": "error-boundary-reset",
+    "title": "Error Boundary with Reset",
+    "track": "react-components",
+    "concept": "resilience",
+    "difficulty": 3,
+    "tags": [
+      "error-boundary",
+      "class-component",
+      "resilience",
+      "resetKeys"
+    ],
+    "summary": "Write an ErrorBoundary class component"
+  },
+  {
+    "id": "external-store-hook",
+    "title": "External Store with useSyncExternalStore",
+    "track": "react",
+    "concept": "state-management",
+    "difficulty": 4,
+    "tags": [
+      "hooks",
+      "state-management",
+      "useSyncExternalStore",
+      "selectors"
+    ],
+    "summary": "Build a Zustand-style external store and subscription hook"
+  },
+  {
+    "id": "forward-ref-imperative-handle",
+    "title": "forwardRef and useImperativeHandle",
+    "track": "react",
+    "concept": "refs",
+    "difficulty": 3,
+    "tags": [
+      "refs",
+      "forwardRef",
+      "useImperativeHandle",
+      "api-design"
+    ],
+    "summary": "Build a specialized input component using forwardRef and useImperativeHandle"
+  },
+  {
+    "id": "memo-stable-callbacks",
+    "title": "React.memo and Stable Callbacks",
+    "track": "react",
+    "concept": "react-perf",
+    "difficulty": 3,
+    "tags": [
+      "performance",
+      "memo",
+      "useCallback",
+      "re-renders"
+    ],
+    "summary": "Prevent needless re-renders using React.memo and stable callbacks"
+  },
+  {
+    "id": "on-click-outside-hook",
+    "title": "useOnClickOutside Hook",
+    "track": "react",
+    "concept": "react-hooks-utility",
+    "difficulty": 3,
+    "tags": [
+      "hooks",
+      "events",
+      "refs",
+      "cleanup"
+    ],
+    "summary": "Write useOnClickOutside(ref, handler)"
+  },
+  {
+    "id": "use-local-storage-hook",
+    "title": "useLocalStorage Hook",
+    "track": "react",
+    "concept": "react-hooks-utility",
+    "difficulty": 3,
+    "tags": [
+      "hooks",
+      "localstorage",
+      "storage-event",
+      "sync"
+    ],
+    "summary": "Write useLocalStorage(key, initialValue) returning [value, setValue]"
+  },
+  {
+    "id": "bind-method-partial",
+    "title": "Losing and Keeping this: bindMethod and partial",
+    "track": "js-language",
+    "concept": "this-binding",
+    "difficulty": 2,
+    "tags": [
+      "this",
+      "bind",
+      "partial-application",
+      "basics"
+    ],
+    "summary": "Methods lose their this when extracted (const f = obj.method)."
+  },
+  {
+    "id": "callback-emitter",
+    "title": "Tiny Event Emitter (on / emit)",
+    "track": "js-utilities",
+    "concept": "emitter",
+    "difficulty": 1,
+    "tags": [
+      "events",
+      "callbacks",
+      "observer",
+      "basics"
+    ],
+    "summary": "Implement a lightweight publish-subscribe callback emitter"
+  },
+  {
+    "id": "fifo-cache",
+    "title": "Fixed-Size Cache (evict oldest)",
+    "track": "js-utilities",
+    "concept": "lru",
+    "difficulty": 2,
+    "tags": [
+      "cache",
+      "map",
+      "eviction",
+      "basics"
+    ],
+    "summary": "Implement a First-In-First-Out (FIFO) in-memory cache class"
+  },
+  {
+    "id": "focus-on-mount",
+    "title": "Focus an Input on Mount (useRef + useEffect)",
+    "track": "react",
+    "concept": "refs",
+    "difficulty": 1,
+    "tags": [
+      "react",
+      "refs",
+      "useEffect",
+      "basics"
+    ],
+    "summary": "Build a component that auto-focuses on initial mount"
+  },
+  {
+    "id": "interval-overlap",
+    "title": "Do Two Intervals Overlap?",
+    "track": "algorithms",
+    "concept": "intervals",
+    "difficulty": 2,
+    "tags": [
+      "intervals",
+      "arrays",
+      "basics"
+    ],
+    "summary": "Implement interval overlap detection and total span calculations for closed intervals [start, end] (where start <= end and touching endpoints overlap)"
+  },
+  {
+    "id": "memoize-basics",
+    "title": "Memoize a Single-Argument Function",
+    "track": "js-utilities",
+    "concept": "memoize",
+    "difficulty": 1,
+    "tags": [
+      "memoize",
+      "cache",
+      "map",
+      "closures"
+    ],
+    "summary": "Implement function memoization helpers for single-argument functions"
+  },
+  {
+    "id": "parse-path-params",
+    "title": "Parse Path Params from a URL Pattern",
+    "track": "dom-browser",
+    "concept": "router",
+    "difficulty": 2,
+    "tags": [
+      "router",
+      "url",
+      "params",
+      "basics"
+    ],
+    "summary": "Extract named dynamic route parameters from a URL path"
+  },
+  {
+    "id": "parse-style-string",
+    "title": "Parse and Build Inline Style Strings",
+    "track": "dom-browser",
+    "concept": "css",
+    "difficulty": 1,
+    "tags": [
+      "css",
+      "strings",
+      "parsing",
+      "basics"
+    ],
+    "summary": "Convert between CSS inline style strings and JavaScript style objects"
+  },
+  {
+    "id": "run-in-sequence",
+    "title": "Run Async Tasks in Sequence and in Parallel",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 2,
+    "tags": [
+      "async-await",
+      "promises",
+      "sequencing",
+      "basics"
+    ],
+    "summary": "Tasks are zero-argument functions returning a Promise (or a value)."
+  },
+  {
+    "id": "safe-json-storage",
+    "title": "Safe JSON Read and Write",
+    "track": "dom-browser",
+    "concept": "storage",
+    "difficulty": 1,
+    "tags": [
+      "json",
+      "localstorage",
+      "error-handling",
+      "basics"
+    ],
+    "summary": "Safe JSON parsing and browser storage read/write utilities"
+  },
+  {
+    "id": "shallow-copy-equal",
+    "title": "Shallow Copy and Shallow Equal",
+    "track": "js-utilities",
+    "concept": "equality-clone",
+    "difficulty": 1,
+    "tags": [
+      "objects",
+      "copy",
+      "equality",
+      "basics"
+    ],
+    "summary": "Implement shallow copy and shallow equality utilities"
+  },
+  {
+    "id": "sleep-and-delay",
+    "title": "sleep(ms) and delay(value, ms)",
+    "track": "async-js",
+    "concept": "promise",
+    "difficulty": 1,
+    "tags": [
+      "promise",
+      "timers",
+      "async-await",
+      "basics"
+    ],
+    "summary": "Implement asynchronous timing helpers using Promises"
+  },
+  {
+    "id": "tree-depth-sum",
+    "title": "Binary Tree: Depth, Sum, Count",
+    "track": "advanced-algorithms",
+    "concept": "advanced-trees",
+    "difficulty": 1,
+    "tags": [
+      "tree",
+      "recursion",
+      "dfs",
+      "basics"
+    ],
+    "summary": "Implement recursive binary tree calculations on nodes shaped { val, left, right }"
+  },
+  {
+    "id": "countdown-component",
+    "title": "Countdown Timer Component",
+    "track": "react-components",
+    "concept": "react-timers",
+    "difficulty": 2,
+    "tags": [
+      "component",
+      "timers",
+      "useEffect",
+      "cleanup"
+    ],
+    "summary": "Build a countdown timer component"
+  },
+  {
+    "id": "file-explorer-tree",
+    "title": "File Explorer Tree",
+    "track": "react-components",
+    "concept": "tree-ui",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "recursion",
+      "tree",
+      "aria"
+    ],
+    "summary": "Build a file explorer tree where nodes is FileNode[]. An item with a children array is a folder."
+  },
+  {
+    "id": "star-rating-component",
+    "title": "Star Rating Component",
+    "track": "react-components",
+    "concept": "rating-controls",
+    "difficulty": 2,
+    "tags": [
+      "component",
+      "a11y",
+      "radiogroup",
+      "keyboard"
+    ],
+    "summary": "Build an accessible star rating as a controlled component"
+  },
+  {
+    "id": "a11y-form-field",
+    "title": "Accessible Form Field and Toggle Button",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 2,
+    "tags": [
+      "a11y",
+      "aria",
+      "forms",
+      "labels"
+    ],
+    "summary": "Build accessible form field and toggle components"
+  },
+  {
+    "id": "accordion-component",
+    "title": "Accordion Component",
+    "track": "react-components",
+    "concept": "compound",
+    "difficulty": 2,
+    "tags": [
+      "component",
+      "aria",
+      "disclosure",
+      "state"
+    ],
+    "summary": "Build an accessible accordion where items can be expanded and collapsed"
+  },
+  {
+    "id": "filter-list",
+    "title": "Filterable List",
+    "track": "react-components",
+    "concept": "typeahead",
+    "difficulty": 2,
+    "tags": [
+      "component",
+      "controlled-input",
+      "derived-state",
+      "a11y"
+    ],
+    "summary": "Build a filterable list component for an array of strings"
+  },
+  {
+    "id": "load-more-list",
+    "title": "Paginated List with \"Load more\"",
+    "track": "react-components",
+    "concept": "infinite-scroll",
+    "difficulty": 2,
+    "tags": [
+      "component",
+      "async",
+      "pagination",
+      "error-handling"
+    ],
+    "summary": "Build a paginated list with append-loading and retry handling"
+  },
+  {
+    "id": "simple-error-boundary",
+    "title": "Minimal Error Boundary",
+    "track": "react-components",
+    "concept": "resilience",
+    "difficulty": 2,
+    "tags": [
+      "error-boundary",
+      "class-component",
+      "fallback",
+      "basics"
+    ],
+    "summary": "Write SimpleErrorBoundary as a class component"
+  },
+  {
+    "id": "use-toggle-counter",
+    "title": "useToggle and useCounter",
+    "track": "react",
+    "concept": "react-hooks-utility",
+    "difficulty": 1,
+    "tags": [
+      "hooks",
+      "state",
+      "useCallback",
+      "basics"
+    ],
+    "summary": "Implement two custom utility hooks: useToggle and useCounter."
+  },
+  {
+    "id": "data-table",
+    "title": "Data Table: Sort, Filter, Paginate",
+    "track": "react-components",
+    "concept": "tables",
+    "difficulty": 4,
+    "tags": [
+      "component",
+      "table",
+      "sorting",
+      "pagination"
+    ],
+    "summary": "Build a sortable, filterable, paginated data table component"
+  },
+  {
+    "id": "dropdown-menu",
+    "title": "Accessible Dropdown Menu",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 4,
+    "tags": [
+      "component",
+      "a11y",
+      "keyboard",
+      "focus-management"
+    ],
+    "summary": "Build an accessible dropdown menu component"
+  },
+  {
+    "id": "form-state-hook",
+    "title": "useForm: Values, Errors, Touched, Submit",
+    "track": "react",
+    "concept": "react-forms",
+    "difficulty": 3,
+    "tags": [
+      "hooks",
+      "forms",
+      "validation",
+      "async"
+    ],
+    "summary": "Implement a form state management hook"
+  },
+  {
+    "id": "memo-derived-list",
+    "title": "useMemo for a Derived List",
+    "track": "react",
+    "concept": "react-perf",
+    "difficulty": 2,
+    "tags": [
+      "performance",
+      "useMemo",
+      "derived-state",
+      "re-renders"
+    ],
+    "summary": "Build a memoized sorted list component"
+  },
+  {
+    "id": "simple-table",
+    "title": "Simple Data Table",
+    "track": "react-components",
+    "concept": "tables",
+    "difficulty": 1,
+    "tags": [
+      "component",
+      "table",
+      "props",
+      "empty-state"
+    ],
+    "summary": "Build a simple table component"
+  },
+  {
+    "id": "undo-redo-hook",
+    "title": "useHistory: Undo / Redo",
+    "track": "react",
+    "concept": "history-state",
+    "difficulty": 3,
+    "tags": [
+      "hooks",
+      "state",
+      "undo-redo",
+      "immutability"
+    ],
+    "summary": "Implement an undo/redo state history hook"
+  },
+  {
+    "id": "virtual-list",
+    "title": "Virtualized (Windowed) List",
+    "track": "react-components",
+    "concept": "virtualization",
+    "difficulty": 4,
+    "tags": [
+      "component",
+      "performance",
+      "virtualization",
+      "scroll"
+    ],
+    "summary": "Build a virtualized list component for long lists of strings"
+  },
+  {
+    "id": "image-carousel",
+    "title": "Carousel with Dots and Autoplay",
+    "track": "react-components",
+    "concept": "carousel",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "a11y",
+      "keyboard",
+      "timers"
+    ],
+    "summary": "Build an accessible image carousel component for an array of slide strings"
+  },
+  {
+    "id": "optimistic-like-button",
+    "title": "Optimistic Like Button with Rollback",
+    "track": "react-components",
+    "concept": "optimistic-ui",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "optimistic-ui",
+      "async",
+      "error-handling"
+    ],
+    "summary": "Build an optimistic like button component with automatic error rollback"
+  },
+  {
+    "id": "toast-queue",
+    "title": "Toast Notifications (Provider + useToast)",
+    "track": "react-components",
+    "concept": "notifications",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "context",
+      "timers",
+      "a11y"
+    ],
+    "summary": "Build an accessible toast notification system"
+  },
+  {
+    "id": "anagram-palindrome",
+    "title": "Strings: Anagram, Palindrome, Common Prefix",
+    "track": "algorithms",
+    "concept": "strings",
+    "difficulty": 2,
+    "tags": [
+      "string",
+      "hash-map",
+      "basics"
+    ],
+    "summary": "Implement classic string inspection algorithms"
+  },
+  {
+    "id": "binary-search-variants",
+    "title": "Binary Search: Classic, Lower Bound, Integer Square Root",
+    "track": "algorithms",
+    "concept": "binary-search",
+    "difficulty": 2,
+    "tags": [
+      "binary-search",
+      "array",
+      "basics"
+    ],
+    "summary": "Implement binary search algorithms in O(log n) time on sorted arrays"
+  },
+  {
+    "id": "bst-search-insert",
+    "title": "Binary Search Tree: Search, Insert, Min/Max",
+    "track": "advanced-algorithms",
+    "concept": "bst",
+    "difficulty": 2,
+    "tags": [
+      "tree",
+      "bst",
+      "recursion",
+      "basics"
+    ],
+    "summary": "Implement core Binary Search Tree (BST) operations on nodes shaped { val, left, right } (where left.val < node.val < right.val, with no duplicates)"
+  },
+  {
+    "id": "bst-validate-lca-invert",
+    "title": "Binary Tree: Validate BST, Invert, Lowest Common Ancestor",
+    "track": "advanced-algorithms",
+    "concept": "bst",
+    "difficulty": 3,
+    "tags": [
+      "tree",
+      "bst",
+      "recursion",
+      "lca"
+    ],
+    "summary": "Implement classic binary tree and BST algorithms on nodes shaped { val, left, right }"
+  },
+  {
+    "id": "climb-stairs-fib-dp",
+    "title": "Dynamic Programming: Fibonacci and Climbing Stairs",
+    "track": "advanced-algorithms",
+    "concept": "dp",
+    "difficulty": 1,
+    "tags": [
+      "dp",
+      "memoization",
+      "recursion",
+      "basics"
+    ],
+    "summary": "Implement dynamic programming fundamentals for sequence and counting problems"
+  },
+  {
+    "id": "coin-change-dp",
+    "title": "Dynamic Programming: Coin Change",
+    "track": "advanced-algorithms",
+    "concept": "dp",
+    "difficulty": 3,
+    "tags": [
+      "dp",
+      "bottom-up",
+      "array"
+    ],
+    "summary": "Implement classical unbounded knapsack dynamic programming solutions for coin change"
+  },
+  {
+    "id": "course-schedule-topo",
+    "title": "Graph: Course Schedule (Topological Sort)",
+    "track": "advanced-algorithms",
+    "concept": "graphs",
+    "difficulty": 4,
+    "tags": [
+      "graph",
+      "topological-sort",
+      "bfs",
+      "cycle"
+    ],
+    "summary": "Implement topological sort dependency algorithms for course scheduling with courses labeled 0 through numCourses - 1"
+  },
+  {
+    "id": "flood-fill-islands",
+    "title": "Grid DFS: Flood Fill and Number of Islands",
+    "track": "advanced-algorithms",
+    "concept": "graphs",
+    "difficulty": 3,
+    "tags": [
+      "graph",
+      "grid",
+      "dfs",
+      "bfs"
+    ],
+    "summary": "Implement grid graph exploration algorithms using depth-first search"
+  },
+  {
+    "id": "group-anagrams-top-k",
+    "title": "Hash Map: Group Anagrams and Top K Frequent",
+    "track": "algorithms",
+    "concept": "hashing",
+    "difficulty": 2,
+    "tags": [
+      "hash-map",
+      "sorting",
+      "frequency"
+    ],
+    "summary": "Implement grouping and frequency ranking algorithms using hash maps"
+  },
+  {
+    "id": "kadane-prefix-sum",
+    "title": "Arrays: Maximum Subarray and Prefix Sums",
+    "track": "algorithms",
+    "concept": "arrays",
+    "difficulty": 2,
+    "tags": [
+      "array",
+      "dp",
+      "prefix-sum",
+      "kadane"
+    ],
+    "summary": "Implement array prefix sum, product, and dynamic programming algorithms"
+  },
+  {
+    "id": "linked-list-cycle-merge",
+    "title": "Linked List: Cycle Detection and Merge Sorted Lists",
+    "track": "algorithms",
+    "concept": "linked-lists",
+    "difficulty": 2,
+    "tags": [
+      "linked-list",
+      "two-pointer",
+      "floyd"
+    ],
+    "summary": "Implement cycle detection and sorted list merging on singly linked list nodes ({ val, next })"
+  },
+  {
+    "id": "lis-house-robber-dp",
+    "title": "Dynamic Programming: House Robber and Longest Increasing Subsequence",
+    "track": "advanced-algorithms",
+    "concept": "dp",
+    "difficulty": 3,
+    "tags": [
+      "dp",
+      "subsequence",
+      "array"
+    ],
+    "summary": "Implement classic 1D dynamic programming optimization algorithms"
+  },
+  {
+    "id": "matrix-rotate-spiral",
+    "title": "Matrix: Rotate 90 Degrees and Spiral Order",
+    "track": "algorithms",
+    "concept": "matrix",
+    "difficulty": 3,
+    "tags": [
+      "matrix",
+      "2d-array",
+      "simulation"
+    ],
+    "summary": "Implement geometric matrix transformations and traversals"
+  },
+  {
+    "id": "merge-sort-quick-sort",
+    "title": "Sorting: Merge Sort and Quick Sort",
+    "track": "algorithms",
+    "concept": "sorting",
+    "difficulty": 3,
+    "tags": [
+      "sorting",
+      "recursion",
+      "divide-and-conquer"
+    ],
+    "summary": "Implement divide-and-conquer sorting algorithms from scratch without calling Array.prototype.sort"
+  },
+  {
+    "id": "min-heap-class",
+    "title": "Heap: MinHeap From Scratch",
+    "track": "advanced-algorithms",
+    "concept": "heap",
+    "difficulty": 3,
+    "tags": [
+      "heap",
+      "priority-queue",
+      "class",
+      "array"
+    ],
+    "summary": "Implement an array-backed binary min-heap and sorting utility"
+  },
+  {
+    "id": "min-stack",
+    "title": "MinStack and Queue From Two Stacks",
+    "track": "algorithms",
+    "concept": "stack",
+    "difficulty": 2,
+    "tags": [
+      "stack",
+      "queue",
+      "design",
+      "class"
+    ],
+    "summary": "Implement stack and queue data structures with O(1) performance"
+  },
+  {
+    "id": "permutations-subsets-backtracking",
+    "title": "Backtracking: Subsets, Permutations, Parentheses",
+    "track": "advanced-algorithms",
+    "concept": "backtracking",
+    "difficulty": 3,
+    "tags": [
+      "backtracking",
+      "recursion",
+      "combinatorics"
+    ],
+    "summary": "Implement classic backtracking search algorithms"
+  },
+  {
+    "id": "reverse-linked-list",
+    "title": "Linked List: Reverse and Middle",
+    "track": "algorithms",
+    "concept": "linked-lists",
+    "difficulty": 1,
+    "tags": [
+      "linked-list",
+      "pointers",
+      "basics"
+    ],
+    "summary": "Implement singly linked list utilities on nodes shaped as { val, next } (terminal node has next: null)"
+  },
+  {
+    "id": "search-rotated-array",
+    "title": "Binary Search: Rotated Sorted Array",
+    "track": "algorithms",
+    "concept": "binary-search",
+    "difficulty": 4,
+    "tags": [
+      "binary-search",
+      "array",
+      "rotated"
+    ],
+    "summary": "Implement binary search algorithms in O(log n) time on a sorted, rotated array of distinct numbers (e.g. [4, 5, 6, 7, 0, 1, 2])"
+  },
+  {
+    "id": "trie-prefix-tree",
+    "title": "Trie: Insert, Search, Prefix",
+    "track": "advanced-algorithms",
+    "concept": "trie",
+    "difficulty": 3,
+    "tags": [
+      "trie",
+      "class",
+      "string",
+      "design"
+    ],
+    "summary": "Implement an object-based Prefix Tree (Trie) data structure"
+  },
+  {
+    "id": "binary-strings-combinations",
+    "title": "Backtracking: Binary Strings and Combinations",
+    "track": "advanced-algorithms",
+    "concept": "backtracking",
+    "difficulty": 2,
+    "tags": [
+      "backtracking",
+      "recursion",
+      "basics"
+    ],
+    "summary": "Implement combinatorial generation utilities"
+  },
+  {
+    "id": "compose-middleware",
+    "title": "Middleware: compose(fns) With next()",
+    "track": "async-js",
+    "concept": "middleware",
+    "difficulty": 2,
+    "tags": [
+      "middleware",
+      "compose",
+      "async",
+      "basics"
+    ],
+    "summary": "Implement Koa-style middleware composition"
+  },
+  {
+    "id": "event-loop-order",
+    "title": "Event Loop: Sync, Microtask, Timeout Order",
+    "track": "async-js",
+    "concept": "event-loop",
+    "difficulty": 2,
+    "tags": [
+      "event-loop",
+      "microtask",
+      "promise",
+      "basics"
+    ],
+    "summary": "Demonstrate JavaScript event loop execution order, microtasks, macrotasks, and async/await mechanics"
+  },
+  {
+    "id": "graph-adjacency-bfs",
+    "title": "Graph Basics: Adjacency List and BFS Path",
+    "track": "advanced-algorithms",
+    "concept": "graphs",
+    "difficulty": 2,
+    "tags": [
+      "graph",
+      "bfs",
+      "basics"
+    ],
+    "summary": "Implement fundamental undirected graph representation and search algorithms from an edge list of [a, b] pairs"
+  },
+  {
+    "id": "heap-array-basics",
+    "title": "Heap Basics: Index Math, isMinHeap, siftUp",
+    "track": "advanced-algorithms",
+    "concept": "heap",
+    "difficulty": 2,
+    "tags": [
+      "heap",
+      "array",
+      "basics"
+    ],
+    "summary": "Implement foundational array-based binary heap indexing and invariants"
+  },
+  {
+    "id": "insertion-sort-basic",
+    "title": "Sorting: Insertion Sort, Selection Sort, isSorted",
+    "track": "algorithms",
+    "concept": "sorting",
+    "difficulty": 2,
+    "tags": [
+      "sorting",
+      "array",
+      "basics"
+    ],
+    "summary": "Implement elementary comparison sorting and validation algorithms without using Array.prototype.sort"
+  },
+  {
+    "id": "iterable-range-class",
+    "title": "Iterators: Iterable Range Class and take()",
+    "track": "js-language",
+    "concept": "iterators",
+    "difficulty": 2,
+    "tags": [
+      "iterator",
+      "symbol",
+      "class",
+      "basics"
+    ],
+    "summary": "Write a custom iterable class and an array extraction utility"
+  },
+  {
+    "id": "matrix-basics",
+    "title": "Matrix Basics: Create, Sum, Diagonal",
+    "track": "algorithms",
+    "concept": "matrix",
+    "difficulty": 1,
+    "tags": [
+      "matrix",
+      "2d-array",
+      "basics"
+    ],
+    "summary": "Implement fundamental 2D matrix utilities"
+  },
+  {
+    "id": "promise-all-by-hand",
+    "title": "Promise.all By Hand (Counter)",
+    "track": "async-js",
+    "concept": "promise-combinators",
+    "difficulty": 2,
+    "tags": [
+      "promise",
+      "combinators",
+      "basics"
+    ],
+    "summary": "Without using native Promise.all, implement an array concurrency combinator"
+  },
+  {
+    "id": "simple-stringify",
+    "title": "Serialization: simpleStringify (Primitives and Arrays)",
+    "track": "js-utilities",
+    "concept": "serialization",
+    "difficulty": 1,
+    "tags": [
+      "json",
+      "serialization",
+      "recursion",
+      "basics"
+    ],
+    "summary": "Implement a lightweight stringifier for primitive values and arrays, **without calling JSON.stringify**. It should return the same text JSON.string..."
+  },
+  {
+    "id": "trie-nested-object",
+    "title": "Trie From Nested Objects",
+    "track": "advanced-algorithms",
+    "concept": "trie",
+    "difficulty": 2,
+    "tags": [
+      "trie",
+      "string",
+      "basics"
+    ],
+    "summary": "Implement a lightweight Trie using plain nested JavaScript objects"
+  },
+  {
+    "id": "ts-identity-first-generics",
+    "title": "TS Generics: identity, first, Box<T>",
+    "track": "typescript-patterns",
+    "concept": "ts-generics",
+    "difficulty": 1,
+    "tags": [
+      "typescript",
+      "generics",
+      "basics"
+    ],
+    "summary": "Implement generic TypeScript helper functions and container types without using any"
+  },
+  {
+    "id": "ts-narrowing-typeof-in",
+    "title": "TS Unions: Narrowing With typeof and in",
+    "track": "typescript-patterns",
+    "concept": "ts-unions",
+    "difficulty": 1,
+    "tags": [
+      "typescript",
+      "unions",
+      "narrowing",
+      "basics"
+    ],
+    "summary": "Implement TypeScript narrowing using typeof, Array.isArray, and in"
+  },
+  {
+    "id": "ts-reimplement-utility-types",
+    "title": "TS Types: Rebuild Partial, Readonly, Pick, Record",
+    "track": "typescript-patterns",
+    "concept": "ts-types",
+    "difficulty": 1,
+    "tags": [
+      "typescript",
+      "mapped-types",
+      "utility-types",
+      "basics"
+    ],
+    "summary": "Without using built-in TypeScript utility types, define foundational mapped types"
+  },
+  {
+    "id": "copy-descriptors-mixin",
+    "title": "Descriptors: Clone With Descriptors and Mixin",
+    "track": "js-language",
+    "concept": "descriptors",
+    "difficulty": 3,
+    "tags": [
+      "descriptors",
+      "mixin",
+      "clone",
+      "getOwnPropertyDescriptors"
+    ],
+    "summary": "Write object cloning and composition utilities that operate at the property descriptor level"
+  },
+  {
+    "id": "descriptor-basics",
+    "title": "Property Descriptors: Hidden, Constant, Flags",
+    "track": "js-language",
+    "concept": "descriptors",
+    "difficulty": 1,
+    "tags": [
+      "defineProperty",
+      "descriptor",
+      "enumerable",
+      "basics"
+    ],
+    "summary": "Implement property descriptor helper utilities using Object.defineProperty and Object.getOwnPropertyDescriptor"
+  },
+  {
+    "id": "getter-setter-pairs",
+    "title": "Descriptors: Getter/Setter Pairs and Lazy Properties",
+    "track": "js-language",
+    "concept": "descriptors",
+    "difficulty": 2,
+    "tags": [
+      "defineProperty",
+      "getter",
+      "setter",
+      "lazy"
+    ],
+    "summary": "Returns an object with an enumerable data property celsius and a **non-enumerable** accessor property fahrenheit defined with Object.defineProperty."
+  },
+  {
+    "id": "manual-prototype-linking",
+    "title": "Prototypes: ES5 Constructor Inheritance (Animal, Dog)",
+    "track": "js-language",
+    "concept": "prototypes",
+    "difficulty": 2,
+    "tags": [
+      "prototype",
+      "constructor",
+      "inheritance",
+      "es5"
+    ],
+    "summary": "Without using class, write the constructor functions Animal(name) and Dog(name, breed)"
+  },
+  {
+    "id": "proto-chain-hasinstance",
+    "title": "Prototypes: Chain Walking and Custom instanceof",
+    "track": "js-language",
+    "concept": "prototypes",
+    "difficulty": 3,
+    "tags": [
+      "prototype",
+      "instanceof",
+      "Symbol.hasInstance",
+      "chain"
+    ],
+    "summary": "Implement prototype chain inspection and custom instance resolution utilities"
+  },
+  {
+    "id": "proto-object-create",
+    "title": "Prototypes: Object.create, hasOwn, Chain Length",
+    "track": "js-language",
+    "concept": "prototypes",
+    "difficulty": 1,
+    "tags": [
+      "prototype",
+      "Object.create",
+      "inheritance",
+      "basics"
+    ],
+    "summary": "Implement prototype creation and inspection helper functions"
+  },
+  {
+    "id": "proxy-default-logging",
+    "title": "Proxy: Default Values and Access Counting",
+    "track": "js-language",
+    "concept": "proxy",
+    "difficulty": 1,
+    "tags": [
+      "proxy",
+      "reflect",
+      "get-trap",
+      "basics"
+    ],
+    "summary": "Implement fallback defaulting and read counting via JavaScript Proxy"
+  },
+  {
+    "id": "proxy-negative-index",
+    "title": "Proxy: Negative Array Indexing",
+    "track": "js-language",
+    "concept": "proxy",
+    "difficulty": 2,
+    "tags": [
+      "proxy",
+      "array",
+      "get-trap",
+      "set-trap"
+    ],
+    "summary": "Implement an array wrapper that supports negative indexing via JavaScript Proxy"
+  },
+  {
+    "id": "proxy-revocable-readonly",
+    "title": "Proxy: Revocable Deep Read-Only View",
+    "track": "js-language",
+    "concept": "proxy",
+    "difficulty": 3,
+    "tags": [
+      "proxy",
+      "revocable",
+      "immutability",
+      "traps"
+    ],
+    "summary": "Implement a deeply immutable and revocable object view using Proxy.revocable"
+  },
+  {
+    "id": "proxy-validation-traps",
+    "title": "Proxy: Validation, Delete and Has Traps",
+    "track": "js-language",
+    "concept": "proxy",
+    "difficulty": 3,
+    "tags": [
+      "proxy",
+      "validation",
+      "set-trap",
+      "traps"
+    ],
+    "summary": "Implement schema-validated and private-field proxy traps"
+  },
+  {
+    "id": "weak-tag-seen",
+    "title": "WeakMap and WeakSet: Tagging and Seen-Marks",
+    "track": "js-language",
+    "concept": "weak-collections",
+    "difficulty": 1,
+    "tags": [
+      "weakmap",
+      "weakset",
+      "metadata",
+      "basics"
+    ],
+    "summary": "Implement side-channel metadata and visited-tracking utilities using module-level WeakMap and WeakSet (without modifying or adding properties to th..."
+  },
+  {
+    "id": "weakmap-memoize-object",
+    "title": "WeakMap: Memoize By Object and Stable IDs",
+    "track": "js-language",
+    "concept": "weak-collections",
+    "difficulty": 2,
+    "tags": [
+      "weakmap",
+      "memoize",
+      "cache",
+      "identity"
+    ],
+    "summary": "Implement object-keyed caching and stable identity tracking using WeakMap"
+  },
+  {
+    "id": "weakmap-private-state",
+    "title": "WeakMap: Private Instance State (Counter, Stack)",
+    "track": "js-language",
+    "concept": "weak-collections",
+    "difficulty": 2,
+    "tags": [
+      "weakmap",
+      "privacy",
+      "class",
+      "encapsulation"
+    ],
+    "summary": "Without using # fields, closures-per-instance or properties on the instance, keep each instance's state in module-level WeakMaps."
+  },
+  {
+    "id": "weakset-cycle-detection",
+    "title": "WeakSet: Cycle Detection and Object Counting",
+    "track": "js-language",
+    "concept": "weak-collections",
+    "difficulty": 3,
+    "tags": [
+      "weakset",
+      "graph",
+      "recursion",
+      "cycle"
+    ],
+    "summary": "Implement cycle detection and object graph traversal using WeakSet"
+  },
+  {
+    "id": "bit-basics",
+    "title": "Bit Manipulation: Single Number, Count Bits, Power of Two",
+    "track": "advanced-algorithms",
+    "concept": "bits",
+    "difficulty": 1,
+    "tags": [
+      "bit-manipulation",
+      "xor",
+      "basics"
+    ],
+    "summary": "Implement essential bitwise operations using bit manipulation"
+  },
+  {
+    "id": "bit-tricks-more",
+    "title": "Bit Manipulation: Missing Number, Hamming, Counting Bits, Bit Flags",
+    "track": "advanced-algorithms",
+    "concept": "bits",
+    "difficulty": 2,
+    "tags": [
+      "bit-manipulation",
+      "xor",
+      "dp"
+    ],
+    "summary": "Implement bitwise tricks, Hamming distances, and bit-level flags"
+  },
+  {
+    "id": "container-water-two-pointer",
+    "title": "Two Pointers: Container With Most Water and Trapping Rain Water",
+    "track": "algorithms",
+    "concept": "two-pointer",
+    "difficulty": 3,
+    "tags": [
+      "two-pointer",
+      "greedy",
+      "array"
+    ],
+    "summary": "Implement geometric two-pointer algorithms in O(n) time"
+  },
+  {
+    "id": "edit-distance-knapsack",
+    "title": "2D DP: Edit Distance and 0/1 Knapsack",
+    "track": "advanced-algorithms",
+    "concept": "dp2d",
+    "difficulty": 4,
+    "tags": [
+      "dp",
+      "2d-dp",
+      "string",
+      "knapsack"
+    ],
+    "summary": "Implement classical 2D dynamic programming algorithms"
+  },
+  {
+    "id": "greedy-intervals-circuit",
+    "title": "Greedy: Non-Overlapping Intervals, Meetings, Gas Station",
+    "track": "advanced-algorithms",
+    "concept": "greedy",
+    "difficulty": 3,
+    "tags": [
+      "greedy",
+      "intervals",
+      "sorting"
+    ],
+    "summary": "Implement greedy interval scheduling and circular circuit traversal algorithms"
+  },
+  {
+    "id": "jump-game-greedy",
+    "title": "Greedy: Jump Game and Minimum Jumps",
+    "track": "advanced-algorithms",
+    "concept": "greedy",
+    "difficulty": 2,
+    "tags": [
+      "greedy",
+      "array",
+      "reachability"
+    ],
+    "summary": "Implement greedy reachability and jump minimization algorithms"
+  },
+  {
+    "id": "lcs-subsequence",
+    "title": "2D DP: Longest Common Subsequence and isSubsequence",
+    "track": "advanced-algorithms",
+    "concept": "dp2d",
+    "difficulty": 3,
+    "tags": [
+      "dp",
+      "2d-dp",
+      "string",
+      "subsequence"
+    ],
+    "summary": "Implement subsequence comparison algorithms"
+  },
+  {
+    "id": "min-path-sum-grid",
+    "title": "2D DP: Minimum Path Sum and Triangle",
+    "track": "advanced-algorithms",
+    "concept": "dp2d",
+    "difficulty": 3,
+    "tags": [
+      "dp",
+      "2d-dp",
+      "grid",
+      "triangle"
+    ],
+    "summary": "Implement minimum path sum dynamic programming algorithms on 2D structures"
+  },
+  {
+    "id": "monotonic-stack-basics",
+    "title": "Monotonic Stack: Next Greater Element and Daily Temperatures",
+    "track": "advanced-algorithms",
+    "concept": "monotonic-stack",
+    "difficulty": 2,
+    "tags": [
+      "stack",
+      "monotonic-stack",
+      "array"
+    ],
+    "summary": "Implement linear-time monotonic stack algorithms in O(n) time"
+  },
+  {
+    "id": "monotonic-stack-histogram",
+    "title": "Monotonic Stack: Stock Span and Largest Rectangle in Histogram",
+    "track": "advanced-algorithms",
+    "concept": "monotonic-stack",
+    "difficulty": 4,
+    "tags": [
+      "stack",
+      "monotonic-stack",
+      "histogram"
+    ],
+    "summary": "Implement classic monotonic stack algorithms in O(n) time"
+  },
+  {
+    "id": "unique-paths-grid",
+    "title": "2D DP: Unique Paths and Unique Paths With Obstacles",
+    "track": "advanced-algorithms",
+    "concept": "dp2d",
+    "difficulty": 2,
+    "tags": [
+      "dp",
+      "2d-dp",
+      "grid",
+      "combinatorics"
+    ],
+    "summary": "A robot is located at the top-left corner of a grid and can only move either down or right at any point"
+  },
+  {
+    "id": "dp-array-variants",
+    "title": "DP: Circular House Robber, Max Product Subarray, Min Cost Stairs",
+    "track": "advanced-algorithms",
+    "concept": "dp",
+    "difficulty": 3,
+    "tags": [
+      "dp",
+      "array",
+      "1d-dp"
+    ],
+    "summary": "Implement dynamic programming variants on 1D arrays"
+  },
+  {
+    "id": "longest-palindrome-substring",
+    "title": "Strings: Longest Palindromic Substring and Count",
+    "track": "advanced-algorithms",
+    "concept": "advanced-strings",
+    "difficulty": 3,
+    "tags": [
+      "string",
+      "palindrome",
+      "expand-around-center"
+    ],
+    "summary": "Implement palindromic substring algorithms using the expand-around-center technique"
+  },
+  {
+    "id": "longest-substring-window",
+    "title": "Sliding Window: Longest Substring Without Repeats and K Distinct",
+    "track": "algorithms",
+    "concept": "sliding-window",
+    "difficulty": 3,
+    "tags": [
+      "sliding-window",
+      "string",
+      "hash-map"
+    ],
+    "summary": "Implement variable-size sliding window algorithms for substring character frequency constraints"
+  },
+  {
+    "id": "min-window-permutation",
+    "title": "Sliding Window: Minimum Window Substring, Permutation, Anagram Indices",
+    "track": "advanced-algorithms",
+    "concept": "advanced-sliding-window",
+    "difficulty": 3,
+    "tags": [
+      "sliding-window",
+      "string",
+      "frequency"
+    ],
+    "summary": "Implement substring pattern matching and sliding window algorithms"
+  },
+  {
+    "id": "partition-subset-sum",
+    "title": "DP: Partition Equal Subset Sum and Target Sum Ways",
+    "track": "advanced-algorithms",
+    "concept": "dp",
+    "difficulty": 4,
+    "tags": [
+      "dp",
+      "subset-sum",
+      "knapsack"
+    ],
+    "summary": "Implement subset-sum dynamic programming reductions"
+  },
+  {
+    "id": "stock-profit-dp",
+    "title": "DP: Best Time to Buy and Sell Stock (One, Many, Cooldown)",
+    "track": "advanced-algorithms",
+    "concept": "dp",
+    "difficulty": 3,
+    "tags": [
+      "dp",
+      "array",
+      "state-machine",
+      "greedy"
+    ],
+    "summary": "Implement state-machine and greedy dynamic programming for stock trading"
+  },
+  {
+    "id": "string-arithmetic",
+    "title": "Strings: Add Binary, Add Big Numbers, Multiply Strings",
+    "track": "advanced-algorithms",
+    "concept": "advanced-strings",
+    "difficulty": 3,
+    "tags": [
+      "string",
+      "math",
+      "carry",
+      "big-number"
+    ],
+    "summary": "Implement arbitrary-precision string arithmetic without converting whole strings to numbers"
+  },
+  {
+    "id": "strings-basics",
+    "title": "Strings: Reverse Words, Run-Length Encoding, Rotation",
+    "track": "algorithms",
+    "concept": "strings",
+    "difficulty": 1,
+    "tags": [
+      "string",
+      "basics",
+      "encoding"
+    ],
+    "summary": "Implement essential string manipulation, encoding, and rotation algorithms"
+  },
+  {
+    "id": "window-replacement-ones",
+    "title": "Sliding Window: Character Replacement, Longest Ones, Shortest Subarray",
+    "track": "advanced-algorithms",
+    "concept": "advanced-sliding-window",
+    "difficulty": 3,
+    "tags": [
+      "sliding-window",
+      "array",
+      "two-pointer"
+    ],
+    "summary": "Implement dynamic sliding window optimization algorithms"
+  },
+  {
+    "id": "word-break-decode",
+    "title": "DP: Word Break and Decode Ways",
+    "track": "advanced-algorithms",
+    "concept": "dp",
+    "difficulty": 3,
+    "tags": [
+      "dp",
+      "1d-dp",
+      "string"
+    ],
+    "summary": "Implement string segmentation and decoding algorithms using dynamic programming"
+  },
+  {
+    "id": "bst-kth-insert-build",
+    "title": "BST: Kth Smallest/Largest, Insert, Sorted Array to BST",
+    "track": "advanced-algorithms",
+    "concept": "bst",
+    "difficulty": 3,
+    "tags": [
+      "bst",
+      "inorder",
+      "recursion"
+    ],
+    "summary": "Implement operations for Binary Search Trees whose nodes are { val, left, right }"
+  },
+  {
+    "id": "list-add-numbers",
+    "title": "Linked Lists: Add Two Numbers, Odd-Even, Intersection",
+    "track": "advanced-algorithms",
+    "concept": "advanced-linked-lists",
+    "difficulty": 3,
+    "tags": [
+      "linked-list",
+      "carry",
+      "two-pointer"
+    ],
+    "summary": "Implement linked list algorithms on nodes shaped { val, next } (null ends the list)"
+  },
+  {
+    "id": "list-remove-reorder",
+    "title": "Linked Lists: Remove Nth From End, Reorder, Remove Duplicates",
+    "track": "algorithms",
+    "concept": "linked-lists",
+    "difficulty": 2,
+    "tags": [
+      "linked-list",
+      "two-pointer",
+      "in-place"
+    ],
+    "summary": "Implement in-place linked list manipulations on nodes shaped { val, next } (null ends the list)"
+  },
+  {
+    "id": "list-reverse-k-group",
+    "title": "Linked Lists: Reverse in K-Groups, Reverse Between, Swap Pairs",
+    "track": "advanced-algorithms",
+    "concept": "advanced-linked-lists",
+    "difficulty": 4,
+    "tags": [
+      "linked-list",
+      "reversal",
+      "pointers"
+    ],
+    "summary": "Implement linked list reversal algorithms on nodes shaped { val, next } (null ends the list)"
+  },
+  {
+    "id": "tree-build-serialize",
+    "title": "Trees: Build from Preorder + Inorder, Serialize / Deserialize",
+    "track": "advanced-algorithms",
+    "concept": "advanced-trees",
+    "difficulty": 4,
+    "tags": [
+      "tree",
+      "recursion",
+      "serialization"
+    ],
+    "summary": "Implement tree reconstruction and serialization algorithms on nodes shaped { val, left, right }"
+  },
+  {
+    "id": "tree-diameter-balanced",
+    "title": "Trees: Diameter, Balanced, Symmetric",
+    "track": "advanced-algorithms",
+    "concept": "advanced-trees",
+    "difficulty": 3,
+    "tags": [
+      "tree",
+      "dfs",
+      "height"
+    ],
+    "summary": "Implement structural binary tree algorithms on nodes shaped { val, left, right }"
+  },
+  {
+    "id": "tree-level-order",
+    "title": "Trees: Level Order, Right Side View, Zigzag",
+    "track": "advanced-algorithms",
+    "concept": "advanced-trees",
+    "difficulty": 2,
+    "tags": [
+      "tree",
+      "bfs",
+      "queue"
+    ],
+    "summary": "Implement breadth-first level-order traversals on binary tree nodes shaped { val, left, right }"
+  },
+  {
+    "id": "tree-max-path-sum",
+    "title": "Trees: Max Path Sum, Root-to-Leaf Numbers, Good Nodes",
+    "track": "advanced-algorithms",
+    "concept": "advanced-trees",
+    "difficulty": 4,
+    "tags": [
+      "tree",
+      "dfs",
+      "post-order"
+    ],
+    "summary": "Implement advanced tree path and valuation algorithms on binary tree nodes { val, left, right }"
+  },
+  {
+    "id": "tree-path-sum",
+    "title": "Trees: Path Sum, All Root-to-Leaf Paths, Min Depth",
+    "track": "advanced-algorithms",
+    "concept": "advanced-trees",
+    "difficulty": 2,
+    "tags": [
+      "tree",
+      "dfs",
+      "recursion"
+    ],
+    "summary": "Implement root-to-leaf path algorithms on binary tree nodes shaped { val, left, right }"
+  },
+  {
+    "id": "graph-clone-bipartite",
+    "title": "Graphs: Clone Graph, Bipartite Check, Valid Tree",
+    "track": "advanced-algorithms",
+    "concept": "graphs",
+    "difficulty": 3,
+    "tags": [
+      "graph",
+      "bfs",
+      "union-find",
+      "coloring"
+    ],
+    "summary": "Implement deep graph cloning, coloring, and tree-validation algorithms"
+  },
+  {
+    "id": "graph-components-paths",
+    "title": "Graphs: Connected Components, Valid Path, Star Center",
+    "track": "advanced-algorithms",
+    "concept": "graphs",
+    "difficulty": 2,
+    "tags": [
+      "graph",
+      "bfs",
+      "dfs",
+      "adjacency-list"
+    ],
+    "summary": "Implement connectivity and topological properties on undirected graphs with n vertices (0 to n - 1)"
+  },
+  {
+    "id": "graph-grid-bfs",
+    "title": "Graphs: Rotting Oranges, Binary Matrix Path, 01 Matrix (Multi-Source BFS)",
+    "track": "advanced-algorithms",
+    "concept": "graphs",
+    "difficulty": 3,
+    "tags": [
+      "graph",
+      "bfs",
+      "grid",
+      "multi-source"
+    ],
+    "summary": "Implement multi-source and shortest-path Breadth-First Search on 2D grids"
+  },
+  {
+    "id": "graph-word-ladder",
+    "title": "Graphs: Word Ladder, Minimum Gene Mutation, Open the Lock",
+    "track": "advanced-algorithms",
+    "concept": "graphs",
+    "difficulty": 4,
+    "tags": [
+      "graph",
+      "bfs",
+      "implicit-graph",
+      "strings"
+    ],
+    "summary": "Implement shortest path searches over implicit state graphs using BFS"
+  },
+  {
+    "id": "heap-kth-largest",
+    "title": "Heaps: Kth Largest, Streaming Kth Largest, Last Stone Weight",
+    "track": "advanced-algorithms",
+    "concept": "heap",
+    "difficulty": 2,
+    "tags": [
+      "heap",
+      "priority-queue",
+      "top-k"
+    ],
+    "summary": "Implement heap-based selection and simulation algorithms (include an internal binary heap helper)"
+  },
+  {
+    "id": "heap-median-stream",
+    "title": "Heaps: Median from a Data Stream and Task Scheduler",
+    "track": "advanced-algorithms",
+    "concept": "heap",
+    "difficulty": 4,
+    "tags": [
+      "heap",
+      "two-heaps",
+      "median",
+      "greedy"
+    ],
+    "summary": "Implement streaming median finding and CPU task scheduling (include an internal binary heap helper)"
+  },
+  {
+    "id": "heap-merge-k-lists",
+    "title": "Heaps: Merge K Sorted Lists and Arrays, K Closest Points",
+    "track": "advanced-algorithms",
+    "concept": "heap",
+    "difficulty": 4,
+    "tags": [
+      "heap",
+      "merge",
+      "k-way"
+    ],
+    "summary": "Implement multi-way merge and spatial selection algorithms (include an internal binary heap helper; list nodes are shaped { val, next })"
+  },
+  {
+    "id": "backtrack-combination-sum",
+    "title": "Backtracking: Combination Sum I, II and III",
+    "track": "advanced-algorithms",
+    "concept": "backtracking",
+    "difficulty": 3,
+    "tags": [
+      "backtracking",
+      "combinations",
+      "recursion"
+    ],
+    "summary": "Implement target-sum combination search algorithms using backtracking"
+  },
+  {
+    "id": "backtrack-n-queens",
+    "title": "Backtracking: N-Queens (Boards and Count)",
+    "track": "advanced-algorithms",
+    "concept": "backtracking",
+    "difficulty": 4,
+    "tags": [
+      "backtracking",
+      "n-queens",
+      "constraint"
+    ],
+    "summary": "Implement the classic N-Queens puzzle algorithms"
+  },
+  {
+    "id": "backtrack-palindrome-partition",
+    "title": "Backtracking: Palindrome Partitioning, Phone Letters, Restore IPs",
+    "track": "advanced-algorithms",
+    "concept": "backtracking",
+    "difficulty": 3,
+    "tags": [
+      "backtracking",
+      "strings",
+      "partition"
+    ],
+    "summary": "Implement string partitioning and generation algorithms using backtracking"
+  },
+  {
+    "id": "backtrack-subsets-permute-unique",
+    "title": "Backtracking: Subsets II, Permutations II, Combinations",
+    "track": "advanced-algorithms",
+    "concept": "backtracking",
+    "difficulty": 3,
+    "tags": [
+      "backtracking",
+      "duplicates",
+      "permutations"
+    ],
+    "summary": "Implement duplicate-handling backtracking algorithms"
+  },
+  {
+    "id": "backtrack-word-search",
+    "title": "Backtracking: Word Search and Word Search II",
+    "track": "advanced-algorithms",
+    "concept": "backtracking",
+    "difficulty": 3,
+    "tags": [
+      "backtracking",
+      "grid",
+      "dfs"
+    ],
+    "summary": "Implement grid word-search backtracking on a 2D board of single-character strings"
+  },
+  {
+    "id": "generators-coroutines",
+    "title": "Generators: Coroutines, Bidirectional Communication, Mini-Co Runner",
+    "track": "js-language",
+    "concept": "iterators",
+    "difficulty": 4,
+    "tags": [
+      "generators",
+      "coroutines",
+      "async",
+      "co"
+    ],
+    "summary": "Implement generator workflows and an asynchronous coroutine runner"
+  },
+  {
+    "id": "hoisting-tdz-scope",
+    "title": "Scope: Hoisting, Temporal Dead Zone, Loop Closure Capture",
+    "track": "js-language",
+    "concept": "closures",
+    "difficulty": 2,
+    "tags": [
+      "scope",
+      "hoisting",
+      "tdz",
+      "closures"
+    ],
+    "summary": "Implement functions demonstrating variable hoisting, Temporal Dead Zone (TDZ), and closure scope in loops"
+  },
+  {
+    "id": "symbol-async-iterator",
+    "title": "Async Iterators: Symbol.asyncIterator, For-Await-Of, Async Range",
+    "track": "js-language",
+    "concept": "iterators",
+    "difficulty": 3,
+    "tags": [
+      "iterators",
+      "async",
+      "symbol",
+      "stream"
+    ],
+    "summary": "Implement asynchronous iteration utilities using Symbol.asyncIterator"
+  },
+  {
+    "id": "tagged-template-literals",
+    "title": "Tagged Templates: Safe HTML Escaping, Raw Strings, Highlighting",
+    "track": "js-language",
+    "concept": "tagged-templates",
+    "difficulty": 2,
+    "tags": [
+      "template-literals",
+      "tagged-templates",
+      "security",
+      "strings"
+    ],
+    "summary": "Implement tagged template literal functions for HTML escaping, markup wrapping, and raw string extraction"
+  },
+  {
+    "id": "this-context-binding",
+    "title": "Context: this Resolution, Detached Methods, Explicit Context Invocation",
+    "track": "js-language",
+    "concept": "this-binding",
+    "difficulty": 3,
+    "tags": [
+      "this",
+      "context",
+      "arrow-functions",
+      "oop"
+    ],
+    "summary": "Implement utilities demonstrating JavaScript context binding, dynamic dispatch, and constructor invocation"
+  },
+  {
+    "id": "async-generator-pagination",
+    "title": "Async Generators: Paginated Streaming API, Filter and Collect",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 4,
+    "tags": [
+      "async-generator",
+      "pagination",
+      "streams",
+      "iterators"
+    ],
+    "summary": "Build streaming utilities using asynchronous generators and for await...of"
+  },
+  {
+    "id": "cancelable-promise-abort",
+    "title": "Async Control: Cancelable Promises and withTimeout Wrapper",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 3,
+    "tags": [
+      "async",
+      "promise",
+      "cancellation",
+      "timeout"
+    ],
+    "summary": "Implement two asynchronous control-flow utilities: makeCancelable and withTimeout."
+  },
+  {
+    "id": "polling-exponential-backoff",
+    "title": "Async Control: Polling with Exponential Backoff and Jitter Limit",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 3,
+    "tags": [
+      "async",
+      "polling",
+      "backoff",
+      "retry"
+    ],
+    "summary": "Write pollUntil(fn, predicate, options = {})"
+  },
+  {
+    "id": "promise-any-aggregate",
+    "title": "Promises: Promise.any and AggregateError Polyfill",
+    "track": "async-js",
+    "concept": "promise-combinators",
+    "difficulty": 3,
+    "tags": [
+      "promise",
+      "promise-combinators",
+      "aggregate-error",
+      "async"
+    ],
+    "summary": "Write promiseAny(promises)"
+  },
+  {
+    "id": "pub-sub-wildcard-emitter",
+    "title": "Event Architecture: PubSub with Wildcard Topics and Once Listeners",
+    "track": "js-utilities",
+    "concept": "emitter",
+    "difficulty": 3,
+    "tags": [
+      "pub-sub",
+      "event-emitter",
+      "wildcard",
+      "observer"
+    ],
+    "summary": "Write class PubSub supporting pattern-based event emission"
+  },
+  {
+    "id": "ts-branded-nominal-types",
+    "title": "TS Branded Types: Nominal IDs, Validated Email, Brand Helpers",
+    "track": "typescript-patterns",
+    "concept": "ts-types",
+    "difficulty": 2,
+    "tags": [
+      "typescript",
+      "types",
+      "branded-types",
+      "nominal-typing"
+    ],
+    "summary": "Define a generic nominal branding type and brand constructor functions to prevent accidental assignment between identical underlying primitives"
+  },
+  {
+    "id": "ts-infer-conditional-unpack",
+    "title": "TS Conditional Types: infer, Function Unwrappers, DeepAwaited",
+    "track": "typescript-patterns",
+    "concept": "ts-types",
+    "difficulty": 3,
+    "tags": [
+      "typescript",
+      "types",
+      "conditional-types",
+      "infer"
+    ],
+    "summary": "Define advanced conditional utility types using the infer keyword"
+  },
+  {
+    "id": "ts-mapped-modifiers-deep-readonly",
+    "title": "TS Mapped Modifiers: DeepReadonly, Mutable, Concrete, KeyRemap",
+    "track": "typescript-patterns",
+    "concept": "ts-types",
+    "difficulty": 4,
+    "tags": [
+      "typescript",
+      "types",
+      "mapped-types",
+      "modifiers",
+      "key-remapping"
+    ],
+    "summary": "Define advanced TypeScript mapped types using modifier removal (-readonly, -?), key remapping (as), and a runtime helper"
+  },
+  {
+    "id": "ts-overloads-exhaustive-narrowing",
+    "title": "TS Function Overloads: Type-Safe Event Map, assertNever",
+    "track": "typescript-patterns",
+    "concept": "ts-narrowing",
+    "difficulty": 3,
+    "tags": [
+      "typescript",
+      "narrowing",
+      "overloads",
+      "exhaustiveness"
+    ],
+    "summary": "Write function overloads and exhaustive checking utilities"
+  },
+  {
+    "id": "ts-template-literal-strings",
+    "title": "TS Template Literals: KebabCase, Split, and DotPaths",
+    "track": "typescript-patterns",
+    "concept": "ts-types",
+    "difficulty": 3,
+    "tags": [
+      "typescript",
+      "types",
+      "template-literals",
+      "string-manipulation"
+    ],
+    "summary": "Define recursive template literal string types and a runtime path resolution helper"
+  },
+  {
+    "id": "fake-timers",
+    "title": "Fake Timers: Virtual Micro-Clock Harness",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 4,
+    "tags": [
+      "testing",
+      "timers",
+      "fake-timers",
+      "event-loop"
+    ],
+    "summary": "Implement a virtual timer controller FakeTimers (or factory createFakeTimers()) to control synchronous time progression for testing async code"
+  },
+  {
+    "id": "mini-expect",
+    "title": "Mini Expect: Assertion Runner with Deep Equality & Not Chaining",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 3,
+    "tags": [
+      "testing",
+      "assertions",
+      "expect",
+      "deep-equality"
+    ],
+    "summary": "Implement a standalone expect(actual) assertion runner supporting core matchers and .not negation chaining"
+  },
+  {
+    "id": "mock-fn",
+    "title": "Mock Function: Call & Argument Tracker (Jest-Style fn)",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 3,
+    "tags": [
+      "testing",
+      "mock",
+      "spy",
+      "jest"
+    ],
+    "summary": "Implement a Jest-style mock function mockFn(impl?)."
+  },
+  {
+    "id": "next-route-matcher",
+    "title": "Next.js Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
+    "track": "dom-browser",
+    "concept": "router",
+    "difficulty": 3,
+    "tags": [
+      "routing",
+      "nextjs",
+      "pattern-matching",
+      "regex"
+    ],
+    "summary": "Implement Next.js-style route pattern matching"
+  },
+  {
+    "id": "test-runner-lifecycle",
+    "title": "Test Runner Lifecycle: Nested Describe, Hooks & Hierarchical Reporter",
+    "track": "testing-tooling",
+    "concept": "architecture",
+    "difficulty": 5,
+    "tags": [
+      "testing",
+      "framework",
+      "lifecycle",
+      "architecture",
+      "expert"
+    ],
+    "summary": "Implement an asynchronous, in-memory test runner engine createTestRunner() (or class TestRunner) supporting nested suites, lifecycle hooks, and hie..."
+  },
+  {
+    "id": "breadcrumbs-router",
+    "title": "Breadcrumbs: Dynamic Path Breadcrumb Generator",
+    "track": "react-components",
+    "concept": "routing-ui",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "routing",
+      "breadcrumbs",
+      "navigation",
+      "a11y"
+    ],
+    "summary": "Implement an accessible React breadcrumb navigation component"
+  },
+  {
+    "id": "nested-checkbox-tree",
+    "title": "Nested Checkbox Tree: Tri-State Parent Selection (Indeterminate)",
+    "track": "react-components",
+    "concept": "tree-ui",
+    "difficulty": 3,
+    "tags": [
+      "react",
+      "state",
+      "tree",
+      "indeterminate",
+      "checkbox"
+    ],
+    "summary": "Implement useCheckboxTree to manage hierarchical checkbox states with indeterminate status propagation."
+  },
+  {
+    "id": "transfer-list",
+    "title": "Transfer List: Dual-Column Item Picker",
+    "track": "react-components",
+    "concept": "dual-list",
+    "difficulty": 3,
+    "tags": [
+      "react",
+      "state",
+      "transfer-list",
+      "ui-patterns"
+    ],
+    "summary": "Implement a dual-column selection manager hook useTransferList."
+  },
+  {
+    "id": "use-is-mounted",
+    "title": "useIsMounted Hook: Component Mount Status Guard",
+    "track": "react",
+    "concept": "react-hooks-utility",
+    "difficulty": 1,
+    "tags": [
+      "react",
+      "hooks",
+      "lifecycle",
+      "ref"
+    ],
+    "summary": "Implement a custom React hook useIsMounted() that returns a stable function () => boolean"
+  },
+  {
+    "id": "use-media-query",
+    "title": "useMediaQuery Hook: Responsive MatchMedia Listener",
+    "track": "react",
+    "concept": "react-hooks-utility",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "hooks",
+      "responsive",
+      "media-query"
+    ],
+    "summary": "Implement a custom React hook useMediaQuery(query) that listens for responsive viewport changes"
+  },
+  {
+    "id": "multi-step-form",
+    "title": "Multi-Step Form Wizard",
+    "track": "react-components",
+    "concept": "wizard",
+    "difficulty": 4,
+    "tags": [
+      "component",
+      "forms",
+      "state",
+      "validation"
+    ],
+    "summary": "Build a multi-step form wizard component"
+  },
+  {
+    "id": "pagination-controls",
+    "title": "Pagination Controls with Ellipsis",
+    "track": "react-components",
+    "concept": "pagination",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "pagination",
+      "a11y"
+    ],
+    "summary": "Build an accessible pagination bar as a controlled component"
+  },
+  {
+    "id": "tag-input",
+    "title": "Tag / Chip Input",
+    "track": "react-components",
+    "concept": "tag-input",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "controlled",
+      "keyboard",
+      "a11y"
+    ],
+    "summary": "Build a controlled tag (chip) input component where value is an array of strings"
+  },
+  {
+    "id": "progress-bar",
+    "title": "Accessible Progress Bar",
+    "track": "react-components",
+    "concept": "progress",
+    "difficulty": 1,
+    "tags": [
+      "component",
+      "a11y",
+      "progressbar",
+      "props"
+    ],
+    "summary": "Build an accessible progress bar supporting determinate and indeterminate states"
+  },
+  {
+    "id": "stopwatch",
+    "title": "Stopwatch with Laps",
+    "track": "react-components",
+    "concept": "react-timers",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "timers",
+      "effects",
+      "cleanup"
+    ],
+    "summary": "Build an accurate, drift-free Stopwatch component in React"
+  },
+  {
+    "id": "tic-tac-toe",
+    "title": "Tic-Tac-Toe Board",
+    "track": "react-components",
+    "concept": "game-board",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "state",
+      "game",
+      "derived-state"
+    ],
+    "summary": "Build an accessible, interactive Tic-Tac-Toe game component"
+  },
+  {
+    "id": "theme-switcher",
+    "title": "Theme Switcher (Context + localStorage)",
+    "track": "react",
+    "concept": "context",
+    "difficulty": 3,
+    "tags": [
+      "context",
+      "hooks",
+      "localStorage",
+      "dom"
+    ],
+    "summary": "Build a persistent Theme Context provider and hook using localStorage"
+  },
+  {
+    "id": "tooltip",
+    "title": "Accessible Tooltip",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "a11y",
+      "overlay",
+      "cloneElement"
+    ],
+    "summary": "Build an accessible tooltip component"
+  },
+  {
+    "id": "calculate-winner",
+    "title": "Tic-Tac-Toe: Who Won?",
+    "track": "algorithms",
+    "concept": "board-game-logic",
+    "difficulty": 1,
+    "tags": [
+      "game",
+      "board",
+      "logic",
+      "basics"
+    ],
+    "summary": "Tic-tac-toe boards are represented as a 9-element array (read left-to-right, row-by-row) where each square is 'X', 'O', or null."
+  },
+  {
+    "id": "create-store-basic",
+    "title": "A Tiny Store: getState, setState, subscribe",
+    "track": "react",
+    "concept": "state-management",
+    "difficulty": 2,
+    "tags": [
+      "state",
+      "store",
+      "subscribe",
+      "basics"
+    ],
+    "summary": "Build a lightweight observable state store"
+  },
+  {
+    "id": "paginate-items",
+    "title": "Paginate a List",
+    "track": "js-utilities",
+    "concept": "pagination-utility",
+    "difficulty": 1,
+    "tags": [
+      "pagination",
+      "arrays",
+      "basics"
+    ],
+    "summary": "Write paginate(items, page, pageSize) for a paged list. Pages are numbered from 1 and page is an integer. It returns a new object"
+  },
+  {
+    "id": "add-tag-rules",
+    "title": "Tag Input Rules: Add, Remove, Paste",
+    "track": "js-utilities",
+    "concept": "tag-rules",
+    "difficulty": 1,
+    "tags": [
+      "tag-input",
+      "strings",
+      "component-logic",
+      "basics"
+    ],
+    "summary": "Implement immutable tag (chip) input list processing rules. Each function returns a new array without mutating the input"
+  },
+  {
+    "id": "flatten-visible-tree",
+    "title": "Flatten a Tree into Visible Rows",
+    "track": "algorithms",
+    "concept": "tree-virtualization",
+    "difficulty": 2,
+    "tags": [
+      "tree",
+      "recursion",
+      "component-logic",
+      "basics"
+    ],
+    "summary": "Tree nodes have the structure { id: string, label: string, children?: TreeNode[] }."
+  },
+  {
+    "id": "visible-window-range",
+    "title": "Windowing Math for a Virtual List",
+    "track": "algorithms",
+    "concept": "windowing-math",
+    "difficulty": 2,
+    "tags": [
+      "virtualization",
+      "math",
+      "component-logic",
+      "basics"
+    ],
+    "summary": "Calculate visible row ranges and offsets for a fixed-height virtualized list"
+  },
+  {
+    "id": "carousel-index-math",
+    "title": "Carousel Index Math",
+    "track": "js-utilities",
+    "concept": "carousel-math",
+    "difficulty": 1,
+    "tags": [
+      "carousel",
+      "modulo",
+      "component-logic",
+      "basics"
+    ],
+    "summary": "Implement pure helper functions to manage index calculations and indicator states for a carousel (indexes 0 to length - 1)"
+  },
+  {
+    "id": "history-stack-basic",
+    "title": "Undo / Redo History Stack",
+    "track": "react",
+    "concept": "history-state",
+    "difficulty": 2,
+    "tags": [
+      "history",
+      "undo-redo",
+      "state",
+      "basics"
+    ],
+    "summary": "Implement an undo/redo history manager"
+  },
+  {
+    "id": "move-between-lists",
+    "title": "Move Items Between Two Lists",
+    "track": "js-utilities",
+    "concept": "dual-list-logic",
+    "difficulty": 2,
+    "tags": [
+      "transfer-list",
+      "arrays",
+      "component-logic",
+      "basics"
+    ],
+    "summary": "Implement transfer list logic using plain arrays of strings without mutating input arrays"
+  },
+  {
+    "id": "optimistic-list-update",
+    "title": "Optimistic Update: Apply, Confirm, Roll Back",
+    "track": "js-utilities",
+    "concept": "optimistic-state",
+    "difficulty": 2,
+    "tags": [
+      "optimistic-ui",
+      "state",
+      "component-logic",
+      "basics"
+    ],
+    "summary": "Implement pure state helper functions for optimistic UI updates without mutating input objects or arrays"
+  },
+  {
+    "id": "toast-queue-logic",
+    "title": "Toast Queue Logic",
+    "track": "js-utilities",
+    "concept": "toast-queue-state",
+    "difficulty": 2,
+    "tags": [
+      "notifications",
+      "toast",
+      "component-logic",
+      "basics"
+    ],
+    "summary": "Implement pure state helper functions to manage a toast notification queue without mutating input arrays"
+  },
+  {
+    "id": "wizard-step-logic",
+    "title": "Wizard Step Logic",
+    "track": "js-utilities",
+    "concept": "wizard-logic",
+    "difficulty": 2,
+    "tags": [
+      "wizard",
+      "forms",
+      "component-logic",
+      "basics"
+    ],
+    "summary": "Implement pure helper functions for multi-step wizard navigation and form validation (steps 0 to total - 1)"
+  },
+  {
+    "id": "call-recorder-spy",
+    "title": "A Call-Recording Spy",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 2,
+    "tags": [
+      "testing",
+      "spy",
+      "mock",
+      "basics"
+    ],
+    "summary": "Write createSpy(impl) like a tiny jest.fn(). It returns a function (the spy) that"
+  },
+  {
+    "id": "use-fetch-basic",
+    "title": "useFetch: Load JSON on Mount",
+    "track": "react",
+    "concept": "react-fetch",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "hooks",
+      "fetch",
+      "basics"
+    ],
+    "summary": "Write a custom hook for fetching JSON data from a URL"
+  },
+  {
+    "id": "live-announcer",
+    "title": "Screen-Reader Announcer (aria-live)",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "a11y",
+      "aria-live",
+      "context"
+    ],
+    "summary": "Build a screen reader announcer system consisting of AnnouncerProvider and useAnnounce()."
+  },
+  {
+    "id": "roving-tabindex-toolbar",
+    "title": "Toolbar with Roving tabindex",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "a11y",
+      "keyboard",
+      "focus-management"
+    ],
+    "summary": "Build a toolbar with roving tabindex where items is ToolbarItem[]."
+  },
+  {
+    "id": "switch-toggle-a11y",
+    "title": "Accessible Switch (role=switch)",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 1,
+    "tags": [
+      "component",
+      "a11y",
+      "aria",
+      "keyboard"
+    ],
+    "summary": "Build a controlled accessible on/off switch"
+  },
+  {
+    "id": "form-error-summary",
+    "title": "Accessible Form Error Summary",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "a11y",
+      "forms",
+      "validation"
+    ],
+    "summary": "Build a signup form with two labelled text inputs: Name (id=\"name\") and Email (id=\"email\"), and a submit button inside <form noValidate> (validatin..."
+  },
+  {
+    "id": "route-focus-and-skip-link",
+    "title": "SPA Route Change: Skip Link and Focus",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "a11y",
+      "focus-management",
+      "routing"
+    ],
+    "summary": "Build Layout for accessible client-side routing"
+  },
+  {
+    "id": "action-state-form",
+    "title": "React 19 Form Action with useActionState",
+    "track": "react",
+    "concept": "react-forms",
+    "difficulty": 3,
+    "tags": [
+      "react19",
+      "forms",
+      "useActionState",
+      "actions"
+    ],
+    "summary": "Build a subscription form using a React 19 form action"
+  },
+  {
+    "id": "suspense-use-promise",
+    "title": "React 19 use(promise) with Suspense",
+    "track": "react",
+    "concept": "suspense-transitions",
+    "difficulty": 2,
+    "tags": [
+      "react19",
+      "suspense",
+      "use",
+      "data-fetching"
+    ],
+    "summary": "React 19 can read a promise during render with the use() API"
+  },
+  {
+    "id": "tabs-transition-suspense",
+    "title": "Tabs with useTransition + Suspense",
+    "track": "react",
+    "concept": "suspense-transitions",
+    "difficulty": 4,
+    "tags": [
+      "react19",
+      "suspense",
+      "transition",
+      "use"
+    ],
+    "summary": "Build a tabbed viewer with smooth transitions"
+  },
+  {
+    "id": "cookie-parse-serialize",
+    "title": "Cookie Parse and Serialize",
+    "track": "dom-browser",
+    "concept": "storage",
+    "difficulty": 2,
+    "tags": [
+      "cookies",
+      "parsing",
+      "encoding",
+      "http"
+    ],
+    "summary": "Implement HTTP cookie parsing and serialization utilities"
+  },
+  {
+    "id": "copy-to-clipboard",
+    "title": "Copy to Clipboard with Fallback",
+    "track": "dom-browser",
+    "concept": "clipboard",
+    "difficulty": 2,
+    "tags": [
+      "clipboard",
+      "async",
+      "fallback",
+      "dom"
+    ],
+    "summary": "Write async text copying utility with HTML5 Clipboard API and DOM textarea fallback"
+  },
+  {
+    "id": "keyboard-shortcut-matcher",
+    "title": "Keyboard Shortcut Matcher",
+    "track": "dom-browser",
+    "concept": "keyboard",
+    "difficulty": 2,
+    "tags": [
+      "keyboard",
+      "events",
+      "shortcuts",
+      "modifiers"
+    ],
+    "summary": "Write three utility functions for managing and matching keyboard shortcuts: parseShortcut, matchesShortcut, and findShortcut."
+  },
+  {
+    "id": "drop-index-from-pointer",
+    "title": "Drag and Drop: Drop Index and Reorder",
+    "track": "dom-browser",
+    "concept": "drag-drop",
+    "difficulty": 2,
+    "tags": [
+      "drag-and-drop",
+      "reorder",
+      "pointer",
+      "lists"
+    ],
+    "summary": "Write the logic behind a drag-sortable list"
+  },
+  {
+    "id": "lazy-load-observer",
+    "title": "Lazy-Load Images with IntersectionObserver",
+    "track": "dom-browser",
+    "concept": "observers",
+    "difficulty": 3,
+    "tags": [
+      "intersectionobserver",
+      "lazy-loading",
+      "images",
+      "dom"
+    ],
+    "summary": "Write lazyLoadImages(root, IO = the global IntersectionObserver) that lazy-loads images. Find every img[data-src] inside root and observe each one ..."
+  },
+  {
+    "id": "raf-throttle",
+    "title": "requestAnimationFrame Throttle",
+    "track": "dom-browser",
+    "concept": "animation-frame",
+    "difficulty": 2,
+    "tags": [
+      "requestanimationframe",
+      "throttle",
+      "performance",
+      "events"
+    ],
+    "summary": "Implement requestAnimationFrame-based throttling for high-frequency events"
+  },
+  {
+    "id": "key-sequence-matcher",
+    "title": "Key Sequence Matcher (g then i)",
+    "track": "dom-browser",
+    "concept": "keyboard",
+    "difficulty": 3,
+    "tags": [
+      "keyboard",
+      "events",
+      "shortcuts",
+      "state-machine"
+    ],
+    "summary": "Write createSequenceMatcher(bindings, timeoutMs = 1000) for GitHub / Vim-style multi-key sequences (e.g. 'g i')"
+  },
+  {
+    "id": "resize-breakpoints",
+    "title": "Element Breakpoints (ResizeObserver)",
+    "track": "dom-browser",
+    "concept": "resize-observer",
+    "difficulty": 2,
+    "tags": [
+      "resizeobserver",
+      "responsive",
+      "observers",
+      "cleanup"
+    ],
+    "summary": "Implement element container queries using ResizeObserver"
+  },
+  {
+    "id": "watch-added-elements",
+    "title": "Watch for Added Elements (MutationObserver)",
+    "track": "dom-browser",
+    "concept": "mutation-observer",
+    "difficulty": 3,
+    "tags": [
+      "mutationobserver",
+      "dom",
+      "observers",
+      "cleanup"
+    ],
+    "summary": "Write watchForElements(root, selector, onFound, MO = MutationObserver)"
+  },
+  {
+    "id": "focus-trap-keydown",
+    "title": "Focus Trap for a Dialog (Tab handling)",
+    "track": "dom-browser",
+    "concept": "focus-management",
+    "difficulty": 3,
+    "tags": [
+      "a11y",
+      "focus-management",
+      "keyboard",
+      "dialog"
+    ],
+    "summary": "Write createFocusTrap(getFocusable, doc) returning a keydown handler handleKeydown(event) that traps Tab focus within a dialog"
+  },
+  {
+    "id": "mini-history-router",
+    "title": "Mini Router (history.pushState)",
+    "track": "dom-browser",
+    "concept": "history-api",
+    "difficulty": 3,
+    "tags": [
+      "history",
+      "router",
+      "popstate",
+      "url-params"
+    ],
+    "summary": "Write a tiny client-side router built on the HTML5 History API"
+  },
+  {
+    "id": "calendar-month-grid",
+    "title": "Calendar Month Grid",
+    "track": "js-utilities",
+    "concept": "dates",
+    "difficulty": 3,
+    "tags": [
+      "dates",
+      "calendar",
+      "date-picker",
+      "arrays"
+    ],
+    "summary": "Implement the calendar grid generation logic for date pickers and monthly calendars"
+  },
+  {
+    "id": "deep-merge-objects",
+    "title": "Deep Merge Objects",
+    "track": "js-utilities",
+    "concept": "object-merge",
+    "difficulty": 3,
+    "tags": [
+      "objects",
+      "recursion",
+      "immutability",
+      "security"
+    ],
+    "summary": "Implement recursive object merging with prototype pollution defenses"
+  },
+  {
+    "id": "highlight-matches",
+    "title": "Highlight Search Matches",
+    "track": "js-utilities",
+    "concept": "string-search",
+    "difficulty": 2,
+    "tags": [
+      "strings",
+      "regex",
+      "search",
+      "escaping"
+    ],
+    "summary": "Implement text segmentation for search-result highlighting"
+  },
+  {
+    "id": "object-diff",
+    "title": "Object Diff (changed, added, removed)",
+    "track": "js-utilities",
+    "concept": "object-diff",
+    "difficulty": 3,
+    "tags": [
+      "objects",
+      "recursion",
+      "diff",
+      "paths"
+    ],
+    "summary": "Implement structural object diffing producing path-level change records"
+  },
+  {
+    "id": "nested-comments",
+    "title": "Nested Comments Thread",
+    "track": "react-components",
+    "concept": "comments",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "comments",
+      "recursion",
+      "tree",
+      "hierarchy"
+    ],
+    "summary": "Build a recursive threaded nested comments component with reply creation and branch collapsing"
+  },
+  {
+    "id": "popover",
+    "title": "Popover with Anchor Placement",
+    "track": "react-components",
+    "concept": "popover",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "popover",
+      "overlay",
+      "a11y",
+      "positioning"
+    ],
+    "summary": "Build an accessible, anchored popover component with configurable placement and outside-click dismissal"
+  },
+  {
+    "id": "stepper",
+    "title": "Interactive Stepper",
+    "track": "react-components",
+    "concept": "wizard",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "wizard",
+      "stepper",
+      "navigation",
+      "a11y"
+    ],
+    "summary": "Build an accessible multi-step progress stepper navigation component"
+  },
+  {
+    "id": "combobox-autocomplete-a11y",
+    "title": "Accessible Combobox: W3C APG ARIA 1.2 Autocomplete Pattern",
+    "track": "react-components",
+    "concept": "a11y-components",
+    "difficulty": 5,
+    "tags": [
+      "component",
+      "a11y",
+      "combobox",
+      "autocomplete",
+      "aria",
+      "keyboard",
+      "expert"
+    ],
+    "summary": "Build a fully accessible autocomplete combobox implementing the W3C APG ARIA 1.2 Combobox pattern with active descendant management, live region st..."
+  },
+  {
+    "id": "drag-sortable-list",
+    "title": "Drag & Keyboard Sortable List: Accessible Reordering",
+    "track": "react-components",
+    "concept": "reorder",
+    "difficulty": 3,
+    "tags": [
+      "component",
+      "reorder",
+      "drag-drop",
+      "list",
+      "a11y",
+      "keyboard"
+    ],
+    "summary": "Build an accessible drag-and-drop sortable list supporting both pointer drag-and-drop and keyboard/button reordering."
+  },
+  {
+    "id": "kanban-board",
+    "title": "Kanban Board: Multi-Column State, Card Movement & Creation",
+    "track": "react-components",
+    "concept": "kanban",
+    "difficulty": 4,
+    "tags": [
+      "component",
+      "kanban",
+      "board",
+      "state-management",
+      "workflow"
+    ],
+    "summary": "Build an interactive multi-column Kanban board for tracking tasks across workflow stages."
+  }
+]

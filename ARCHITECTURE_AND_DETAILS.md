@@ -168,19 +168,20 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (1,801 unit tests across 63 test files)**: Tests verifying:
+- **Vitest Suite (1,814 unit tests across 66 test files)**: Tests verifying:
   - Reference solutions pass for all 277 cards across 10 topics across 1,965 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.
   - 100% of cards formatted with structured GitHub-flavored Markdown instructions.
   - Preset study decks architecture (`src/lib/decks.test.ts`): built-in presets, scoping, custom decks, and local persistence.
-  - Deck selector, custom deck builder, and remove-from-deck modal component tests (`src/components/dashboard/DeckSelector.test.tsx`, `CreateDeckModal.test.tsx`, `RemoveFromDeckModal.test.tsx`).
+  - Deck selector, custom deck builder, remove-from-deck modal, and AI Interview Prep Copilot wizard component tests (`src/components/dashboard/DeckSelector.test.tsx`, `CreateDeckModal.test.tsx`, `RemoveFromDeckModal.test.tsx`, `InterviewPrepModal.test.tsx`).
+  - Catalog index build pipeline and AI interview prep prompt engine tests (`src/lib/catalogIndex.test.ts`, `src/lib/interviewPrep.test.ts`).
   - Leitner and Graduated Interval algorithms, intervals, promotions, and setbacks.
   - Prettier standalone formatter for JS, JSX, TS, and syntax errors.
   - Multi-key vault persistence, prefix detection, and provider switching.
   - Timed Recall Mode configuration and persistence.
   - Deck catalog filter and sort persistence (`src/lib/deckFilters.ts`): track, tier/box, status, difficulty, search keyword, and sort selections persist across card navigation sessions.
-- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (611 tests: 554 card tests + navigation, shortcuts, preview, flow, tour, catalog, backup advisory, deck selector, remove-from-deck, and custom-deck tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
+- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (612 tests: 554 card tests + navigation, shortcuts, preview, flow, tour, catalog, backup advisory, deck selector, remove-from-deck, custom-deck, and interview-prep tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
 - **Production Build**: Verified via `npm run build` (`tsc -b && vite build`) with zero lint or type errors.
 
 ## 8. Navigation and first-run welcome

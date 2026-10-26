@@ -15,6 +15,7 @@ export interface DeckSelectorProps {
   customDecks?: CustomDeck[];
   onCreateCustomDeckClick?: () => void;
   onDeleteCustomDeck?: (deckId: string) => void;
+  onTailorWithAIClick?: () => void;
 }
 
 export const DeckSelector: React.FC<DeckSelectorProps> = ({
@@ -24,6 +25,7 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
   customDecks = [],
   onCreateCustomDeckClick,
   onDeleteCustomDeck,
+  onTailorWithAIClick,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -207,22 +209,38 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                 </>
               )}
 
-              {/* Create Custom Deck Action */}
-              {onCreateCustomDeckClick && (
+              {/* Actions Footer */}
+              {(onCreateCustomDeckClick || onTailorWithAIClick) && (
                 <>
                   <div className="deck-dropdown-divider" />
-                  <button
-                    type="button"
-                    className="deck-dropdown-create-btn"
-                    onClick={() => {
-                      setIsOpen(false);
-                      onCreateCustomDeckClick();
-                    }}
-                    data-testid="deck-dropdown-create-btn"
-                  >
-                    <Plus size={14} />
-                    <span>Create Custom Deck...</span>
-                  </button>
+                  {onTailorWithAIClick && (
+                    <button
+                      type="button"
+                      className="deck-dropdown-ai-btn"
+                      onClick={() => {
+                        setIsOpen(false);
+                        onTailorWithAIClick();
+                      }}
+                      data-testid="deck-dropdown-ai-btn"
+                    >
+                      <Sparkles size={14} className="ai-btn-icon" />
+                      <span>Tailor Deck with AI Copilot...</span>
+                    </button>
+                  )}
+                  {onCreateCustomDeckClick && (
+                    <button
+                      type="button"
+                      className="deck-dropdown-create-btn"
+                      onClick={() => {
+                        setIsOpen(false);
+                        onCreateCustomDeckClick();
+                      }}
+                      data-testid="deck-dropdown-create-btn"
+                    >
+                      <Plus size={14} />
+                      <span>Create Custom Deck...</span>
+                    </button>
+                  )}
                 </>
               )}
             </div>
