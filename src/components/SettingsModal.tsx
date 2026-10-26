@@ -324,7 +324,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setStoredProvider(p);
     let defaultModel = model;
     if (p === 'gemini') defaultModel = 'gemini-2.5-flash';
-    else if (p === 'groq') defaultModel = 'openai/gpt-oss-120b';
+    else if (p === 'groq') defaultModel = 'llama-3.3-70b-versatile';
     else if (p === 'cerebras') defaultModel = 'llama3.3-70b';
     else if (p === 'mistral') defaultModel = 'codestral-latest';
     else if (p === 'anthropic') defaultModel = 'claude-3-5-sonnet-20241022';
@@ -914,7 +914,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             >
               <Zap size={15} color={isLight ? '#4455AA' : '#38bdf8'} style={{ flexShrink: 0 }} />
               <span>
-                <strong style={{ color: isLight ? '#2B3A8C' : 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong style={{ color: isLight ? '#1C1C1C' : undefined }}>Groq</strong> (openai/gpt-oss-120b) or <strong style={{ color: isLight ? '#1C1C1C' : undefined }}>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
+                <strong style={{ color: isLight ? '#2B3A8C' : 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong style={{ color: isLight ? '#1C1C1C' : undefined }}>Groq</strong> (llama-3.3-70b-versatile) or <strong style={{ color: isLight ? '#1C1C1C' : undefined }}>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
               </span>
             </div>
           </div>
@@ -1568,7 +1568,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     provider === 'gemini'
                       ? 'gemini-2.5-flash'
                       : provider === 'groq'
-                      ? 'openai/gpt-oss-120b'
+                      ? 'llama-3.3-70b-versatile'
                       : provider === 'cerebras'
                       ? 'llama3.3-70b'
                       : provider === 'mistral'

@@ -15,6 +15,7 @@ import {
   generateInterviewPrepDossier,
   type CatalogIndexEntry,
   type InterviewPrepRequest,
+  type InterviewPrepDossier,
 } from './interviewPrep';
 
 const MOCK_CATALOG: CatalogIndexEntry[] = [

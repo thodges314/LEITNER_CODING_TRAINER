@@ -246,7 +246,7 @@ export const AiRecommendationPopover: React.FC<AiRecommendationPopoverProps> = (
                 lineHeight: 1.5,
               }}
             >
-              Add an API key in Settings to activate AI evaluation. We recommend <strong style={{ color: 'var(--text-primary)' }}>Groq</strong> (<code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>openai/gpt-oss-120b</code>) for the fastest zero-cost evaluations, or <strong style={{ color: 'var(--text-primary)' }}>Google Gemini</strong> (<code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>gemini-2.5-flash</code>). Both offer generous free developer tiers with no credit card required.
+              Add an API key in Settings to activate AI evaluation. We recommend <strong style={{ color: 'var(--text-primary)' }}>Groq</strong> (<code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>llama-3.3-70b-versatile</code>) for the fastest zero-cost evaluations, or <strong style={{ color: 'var(--text-primary)' }}>Google Gemini</strong> (<code style={{ fontSize: '11px', padding: '1px 5px', borderRadius: '4px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-subtle)', color: 'var(--accent-cyan)' }}>gemini-2.5-flash</code>). Both offer generous free developer tiers with no credit card required.
             </p>
           </div>
         </div>

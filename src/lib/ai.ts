@@ -185,7 +185,7 @@ export function setStoredApiKey(key: string, targetProvider?: AIProvider): void 
   if (detected) {
     setStoredProvider(detected);
     if (detected === 'gemini') setStoredModel('gemini-2.5-flash');
-    else if (detected === 'groq') setStoredModel('openai/gpt-oss-120b');
+    else if (detected === 'groq') setStoredModel('llama-3.3-70b-versatile');
     else if (detected === 'cerebras') setStoredModel('llama3.3-70b');
     else if (detected === 'mistral') setStoredModel('codestral-latest');
     else if (detected === 'anthropic') setStoredModel('claude-3-5-sonnet-20241022');
@@ -245,8 +245,11 @@ export function getStoredModel(): string {
   const prov = getStoredProvider();
   const val = localStorage.getItem(API_MODEL_KEY);
   if (val) {
-    // If model conflicts with provider (e.g. model is gemini-2.5-flash but provider is groq)
-    if (prov === 'groq' && val.includes('gemini')) return 'openai/gpt-oss-120b';
+    // If model conflicts with provider or is the invalid legacy Groq model
+    if (prov === 'groq' && (val.includes('gemini') || val === 'openai/gpt-oss-120b' || !val)) {
+      setStoredModel('llama-3.3-70b-versatile');
+      return 'llama-3.3-70b-versatile';
+    }
     if (prov === 'gemini' && (val.includes('llama') || val.includes('gpt') || val.includes('claude'))) return 'gemini-2.5-flash';
     if (prov === 'openai' && (val.includes('gemini') || val.includes('llama') || val.includes('claude'))) return 'gpt-4o-mini';
     if (prov === 'cerebras' && (val.includes('gemini') || val.includes('gpt') || val.includes('claude'))) return 'llama3.3-70b';
@@ -255,7 +258,7 @@ export function getStoredModel(): string {
     return val;
   }
   if (prov === 'gemini') return 'gemini-2.5-flash';
-  if (prov === 'groq') return 'openai/gpt-oss-120b';
+  if (prov === 'groq') return 'llama-3.3-70b-versatile';
   if (prov === 'cerebras') return 'llama3.3-70b';
   if (prov === 'mistral') return 'codestral-latest';
   if (prov === 'anthropic') return 'claude-3-5-sonnet-20241022';
@@ -934,7 +937,7 @@ ${question}`;
         model = model || 'gpt-4o-mini';
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'openai/gpt-oss-120b';
+        model = model || 'llama-3.3-70b-versatile';
       } else if (provider === 'cerebras') {
         baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
         model = model || 'llama3.3-70b';
@@ -1096,7 +1099,7 @@ ${question}`;
         model = model || 'gpt-4o-mini';
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'openai/gpt-oss-120b';
+        model = model || 'llama-3.3-70b-versatile';
       } else if (provider === 'cerebras') {
         baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
         model = model || 'llama3.3-70b';
