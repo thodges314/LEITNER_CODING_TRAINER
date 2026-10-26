@@ -662,6 +662,7 @@ export async function generateInterviewPrepDossier(
             { role: 'user', content: user },
           ],
           temperature: 0.2,
+          max_tokens: 3000,
         }),
       });
 
@@ -723,6 +724,8 @@ export async function continueInterviewDialogue(
 ${progressContext.recentBox1Titles.length > 0 ? `Setback Cards: ${progressContext.recentBox1Titles.join(', ')}` : ''}`
     : 'No live Leitner progress reported yet.';
 
+  const wantsCardChanges = /\b(add|swap|replace|include|more cards|change deck|remove|trim)\b/i.test(userMessage);
+
   const systemPrompt = `You are an expert technical interview coach for a candidate preparing for an upcoming technical interview at ${dossier.company} for the role of ${dossier.role}.
 The candidate has a tailored curriculum of ${dossier.selectedCards.length} flashcards and an interview preparation dossier.
 
@@ -731,10 +734,7 @@ ${selectedCardsSummary}
 
 PROGRESS STATUS:
 ${progressSummary}
-
-FULL CARD CATALOG AVAILABLE FOR MODIFICATIONS OR SWAPS:
-${formatCompactCatalogForDialogue(catalog)}
-
+${wantsCardChanges ? `\nFULL CARD CATALOG AVAILABLE FOR MODIFICATIONS OR SWAPS:\n${formatCompactCatalogForDialogue(catalog)}\n` : ''}
 COACHING DIRECTIVES:
 1. Provide concise, direct, senior-level coaching and tactical advice.
 2. If the user asks questions or reports progress, analyze what they should focus on next with actionable suggestions.
@@ -758,7 +758,7 @@ Only include this JSON block if the candidate requested a modification to the de
     { role: 'system', content: systemPrompt },
   ];
 
-  const history = (dossier.conversation || []).slice(-6);
+  const history = (dossier.conversation || []).slice(-4);
   if (history.length > 0 && history[0].role === 'assistant') {
     normalizedMessages.push({
       role: 'user',
@@ -767,12 +767,17 @@ Only include this JSON block if the candidate requested a modification to the de
   }
 
   for (const msg of history) {
+    let content = msg.content;
+    // Condense lengthy initial executive briefings in the multi-turn context so tight TPM limits aren't exceeded
+    if (msg.role === 'assistant' && content.length > 600) {
+      content = content.slice(0, 600) + '... [briefing summary truncated for conversation context]';
+    }
     if (normalizedMessages.length > 0 && normalizedMessages[normalizedMessages.length - 1].role === msg.role) {
-      normalizedMessages[normalizedMessages.length - 1].content += `\n\n${msg.content}`;
+      normalizedMessages[normalizedMessages.length - 1].content += `\n\n${content}`;
     } else {
       normalizedMessages.push({
         role: msg.role,
-        content: msg.content,
+        content,
       });
     }
   }
@@ -803,7 +808,7 @@ Only include this JSON block if the candidate requested a modification to the de
         body: JSON.stringify({
           system_instruction: { parts: [{ text: systemPrompt }] },
           contents: geminiContents,
-          generationConfig: { temperature: 0.3 },
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1024 },
         }),
       });
       if (!response.ok) {
@@ -837,7 +842,7 @@ Only include this JSON block if the candidate requested a modification to the de
         },
         body: JSON.stringify({
           model,
-          max_tokens: 2000,
+          max_tokens: 1024,
           system: systemPrompt,
           messages: anthropicMessages,
         }),
@@ -879,6 +884,7 @@ Only include this JSON block if the candidate requested a modification to the de
           model,
           messages: normalizedMessages,
           temperature: 0.3,
+          max_tokens: 1024,
         }),
       });
       if (!response.ok) {
