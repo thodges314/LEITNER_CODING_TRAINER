@@ -1405,13 +1405,21 @@
 
 .ai-prep-modal-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 16px;
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 14px;
   position: relative;
   flex-shrink: 0;
+}
+
+.ai-prep-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
 .ai-prep-header-icon-wrap {
@@ -1441,17 +1449,25 @@
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text-primary);
-  white-space: nowrap;
 }
 
 .ai-prep-modal-subtitle {
-  margin: 3px 0 0;
+  margin: 4px 0 0;
   font-size: 12.5px;
   color: var(--text-muted);
-  line-height: 1.35;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.45;
+  white-space: normal;
+  max-width: 380px;
+}
+
+.ai-prep-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 320px;
+  max-width: 420px;
 }
 
 .ai-prep-header-deck-meta {
@@ -1459,9 +1475,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
-  max-width: 360px;
-  min-width: 180px;
-  flex: 1;
+  width: 100%;
 }
 
 .header-deck-name-row {
@@ -2406,71 +2420,6 @@
   overflow: hidden;
 }
 
-.ai-prep-strategy-overview-box {
-  padding: 14px 16px;
-  background: rgba(168, 85, 247, 0.07);
-  border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 220px;
-  overflow-y: auto;
-  flex-shrink: 0;
-}
-
-.strategy-overview-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.strategy-sparkle-icon {
-  color: #c084fc;
-}
-
-.strategy-overview-title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #c084fc;
-}
-
-.strategy-overview-paragraphs {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.strategy-overview-p {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--text-primary);
-}
-
-.strategy-coach-helper-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  background: rgba(168, 85, 247, 0.12);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--text-secondary);
-}
-
-.strategy-coach-helper-note strong {
-  color: #c084fc;
-}
-
-.coach-note-icon {
-  color: #c084fc;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
 
 .dialogue-messages-scroll {
   flex: 1;

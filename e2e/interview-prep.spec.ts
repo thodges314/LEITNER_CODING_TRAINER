@@ -64,9 +64,11 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     const deckDescInput = page.getByTestId('ai-prep-review-deck-desc');
     await expect(deckDescInput).toBeVisible();
 
-    // Tab 1 (AI Strategy & Coach) is active by default
-    await expect(page.getByTestId('ai-prep-strategy-overview-box')).toBeVisible();
+    // Tab 1 (AI Strategy & Coach) is active by default with the Strategic Executive Summary as the opening message
     await expect(page.locator('.dialogue-messages-scroll')).toBeVisible();
+    const firstAssistantMsg = page.locator('.dialogue-bubble.assistant').first();
+    await expect(firstAssistantMsg).toBeVisible();
+    await expect(firstAssistantMsg).toContainText(/Stripe/);
 
     // Test sending a curriculum modification message to the AI Coach
     const dialogueInput = page.locator('.dialogue-text-input');

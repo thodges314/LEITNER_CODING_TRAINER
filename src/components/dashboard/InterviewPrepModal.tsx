@@ -90,18 +90,19 @@ const ModelRecommendationBanner: React.FC<{
 
   if (dismissed) return null;
 
-  // Check which premier keys are stored
+  // Check which keys are stored
+  const hasOpenRouter = Boolean(storedKeys.openrouter);
   const hasAnthropic = Boolean(storedKeys.anthropic);
   const hasOpenAI = Boolean(storedKeys.openai);
-  const hasGroq = Boolean(storedKeys.groq);
   const hasGemini = Boolean(storedKeys.gemini);
+  const hasGroq = Boolean(storedKeys.groq);
 
-  const isPremierActive =
-    (activeProvider === 'anthropic' && activeModel.includes('claude-3-5')) ||
-    (activeProvider === 'openai' && activeModel.includes('gpt-4o')) ||
-    (activeProvider === 'groq' && activeModel.includes('llama-3.3-70b'));
+  const isTier1Active =
+    (activeProvider === 'openrouter' && (activeModel.includes('claude-3.5') || activeModel.includes('claude-3-5') || activeModel.includes('gpt-4o'))) ||
+    (activeProvider === 'anthropic' && (activeModel.includes('claude-3-5') || activeModel.includes('claude-3.5'))) ||
+    (activeProvider === 'openai' && activeModel.includes('gpt-4o'));
 
-  if (isPremierActive) return null;
+  if (isTier1Active) return null;
 
   if (switchedNotice) {
     return (
@@ -112,14 +113,49 @@ const ModelRecommendationBanner: React.FC<{
     );
   }
 
-  // Suggest Claude 3.5 Sonnet if key exists and not active
+  // Tier 1 Top Choice: Claude 3.5 Sonnet via OpenRouter
+  if (hasOpenRouter && (activeProvider !== 'openrouter' || !activeModel.includes('claude-3.5'))) {
+    return (
+      <div className="ai-prep-model-banner" role="note">
+        <div className="banner-text">
+          <Sparkles size={14} className="banner-icon" />
+          <span>
+            <strong>Tier 1 Recommended:</strong> You have an <strong>OpenRouter</strong> key. Claude 3.5 Sonnet is the gold standard for recognizing architectural patterns and synthesizing executive study guides.
+          </span>
+        </div>
+        <div className="banner-actions">
+          <button
+            type="button"
+            className="btn-switch-model"
+            onClick={() => {
+              onSwitchModel('openrouter', 'anthropic/claude-3.5-sonnet');
+              setSwitchedNotice('Switched active engine to Claude 3.5 Sonnet (OpenRouter) for Interview Prep!');
+              setTimeout(() => setSwitchedNotice(null), 3000);
+            }}
+          >
+            Switch to Claude 3.5 Sonnet
+          </button>
+          <button
+            type="button"
+            className="btn-dismiss-banner"
+            onClick={() => setDismissed(true)}
+            aria-label="Dismiss recommendation"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Tier 1 Top Choice: Claude 3.5 Sonnet via Anthropic
   if (hasAnthropic && activeProvider !== 'anthropic') {
     return (
       <div className="ai-prep-model-banner" role="note">
         <div className="banner-text">
           <Sparkles size={14} className="banner-icon" />
           <span>
-            <strong>AI Recommendation:</strong> You have a saved key for <strong>Anthropic</strong>. Claude 3.5 Sonnet excels at company interview intelligence & job description analysis.
+            <strong>Tier 1 Recommended:</strong> You have an <strong>Anthropic</strong> key. Claude 3.5 Sonnet is the gold standard for interview intelligence and architectural nuance.
           </span>
         </div>
         <div className="banner-actions">
@@ -147,14 +183,14 @@ const ModelRecommendationBanner: React.FC<{
     );
   }
 
-  // Suggest GPT-4o if key exists and not active
+  // Tier 1 Premium Alternative: GPT-4o via OpenAI
   if (hasOpenAI && activeProvider !== 'openai') {
     return (
       <div className="ai-prep-model-banner" role="note">
         <div className="banner-text">
           <Sparkles size={14} className="banner-icon" />
           <span>
-            <strong>AI Recommendation:</strong> You have a saved key for <strong>OpenAI</strong>. GPT-4o provides deep reasoning for candidate risk calibration.
+            <strong>Tier 1 Alternative:</strong> You have an <strong>OpenAI</strong> key. GPT-4o offers high accuracy on company interview pattern recognition and rubric calibration.
           </span>
         </div>
         <div className="banner-actions">
@@ -182,14 +218,49 @@ const ModelRecommendationBanner: React.FC<{
     );
   }
 
-  // Suggest Groq Llama 3.3 70B if key exists and not active
+  // Tier 2 Deep Strategic: Gemini 2.5 Pro via Google AI
+  if (hasGemini && (activeProvider !== 'gemini' || !activeModel.includes('gemini-2.5-pro'))) {
+    return (
+      <div className="ai-prep-model-banner" role="note">
+        <div className="banner-text">
+          <Sparkles size={14} className="banner-icon" />
+          <span>
+            <strong>Tier 2 Deep Strategic:</strong> You have a <strong>Google Gemini</strong> key. Gemini 2.5 Pro features an enormous context window and deep FAANG rubric reasoning.
+          </span>
+        </div>
+        <div className="banner-actions">
+          <button
+            type="button"
+            className="btn-switch-model"
+            onClick={() => {
+              onSwitchModel('gemini', 'gemini-2.5-pro');
+              setSwitchedNotice('Switched active engine to Gemini 2.5 Pro for Interview Prep!');
+              setTimeout(() => setSwitchedNotice(null), 3000);
+            }}
+          >
+            Switch to Gemini 2.5 Pro
+          </button>
+          <button
+            type="button"
+            className="btn-dismiss-banner"
+            onClick={() => setDismissed(true)}
+            aria-label="Dismiss recommendation"
+          >
+            <X size={12} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Tier 3 Fast / Free: Groq Llama 3.3 70B (only if no Tier 1 or Tier 2 key is available)
   if (hasGroq && activeProvider !== 'groq') {
     return (
       <div className="ai-prep-model-banner" role="note">
         <div className="banner-text">
           <Sparkles size={14} className="banner-icon" />
           <span>
-            <strong>AI Recommendation:</strong> You have a saved key for <strong>Groq</strong>. Llama 3.3 70B delivers rapid, deep company strategy analysis.
+            <strong>Tier 3 Fast / Free:</strong> You have a saved key for <strong>Groq</strong>. Llama 3.3 70B delivers rapid, zero-cost curriculum setup for everyday practice drills.
           </span>
         </div>
         <div className="banner-actions">
@@ -253,6 +324,37 @@ const ModelRecommendationBanner: React.FC<{
   return null;
 };
 
+function ensureDossierChatOpener(d: InterviewPrepDossier | null): InterviewPrepDossier | null {
+  if (!d) return null;
+  const initialPromptNote = `Ask questions about this company's interview loop, request curriculum adjustments (e.g. "trim deck to 12 cards", "add more state machine problems"), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.`;
+  const desiredOpener = `${d.executiveSummary}\n\n${initialPromptNote}`;
+
+  if (!d.conversation || d.conversation.length === 0) {
+    return {
+      ...d,
+      conversation: [
+        {
+          id: `msg_init_${d.generatedAt || Date.now()}`,
+          role: 'assistant',
+          content: desiredOpener,
+          timestamp: d.generatedAt || Date.now(),
+        },
+      ],
+    };
+  }
+
+  if (d.conversation[0].content.startsWith("I've synthesized your interview preparation dossier")) {
+    const updated = [...d.conversation];
+    updated[0] = {
+      ...updated[0],
+      content: desiredOpener,
+    };
+    return { ...d, conversation: updated };
+  }
+
+  return d;
+}
+
 const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   onClose,
   onCreateCustomDeck,
@@ -267,13 +369,15 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const [showSavedDropdown, setShowSavedDropdown] = useState(false);
 
   // Initialize initial dossier and step
-  const initialDossier = initialDossierId
+  const rawInitialDossier = initialDossierId
     ? savedDossiers.find((d) => d.id === initialDossierId) || null
     : initialStep === 'input'
       ? null
       : savedDossiers.length > 0
         ? savedDossiers[0]
         : null;
+
+  const initialDossier = ensureDossierChatOpener(rawInitialDossier);
 
   const [step, setStep] = useState<'input' | 'loading' | 'review'>(() => {
     if (initialStep) return initialStep;
@@ -355,10 +459,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
       );
 
       clearInterval(interval);
-      setDossier(generated);
-      setEditableDeckName(generated.deckName);
-      setEditableDescription(generated.deckDescription);
-      setCheckedCardIds(new Set(generated.selectedCards.map((c) => c.id)));
+      const readyDossier = ensureDossierChatOpener(generated)!;
+      setDossier(readyDossier);
+      setEditableDeckName(readyDossier.deckName);
+      setEditableDescription(readyDossier.deckDescription);
+      setCheckedCardIds(new Set(readyDossier.selectedCards.map((c) => c.id)));
       setSavedDossiers(getAllSavedDossiers());
       setStep('review');
     } catch {
@@ -368,13 +473,14 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   };
 
   const handleLoadSavedDossier = (saved: InterviewPrepDossier) => {
-    setDossier(saved);
-    setCompany(saved.company);
-    setRole(saved.role);
-    setTargetDate(saved.targetDate || '');
-    setEditableDeckName(saved.deckName);
-    setEditableDescription(saved.deckDescription);
-    setCheckedCardIds(new Set(saved.selectedCards.map((c) => c.id)));
+    const readySaved = ensureDossierChatOpener(saved)!;
+    setDossier(readySaved);
+    setCompany(readySaved.company);
+    setRole(readySaved.role);
+    setTargetDate(readySaved.targetDate || '');
+    setEditableDeckName(readySaved.deckName);
+    setEditableDescription(readySaved.deckDescription);
+    setCheckedCardIds(new Set(readySaved.selectedCards.map((c) => c.id)));
     setShowSavedDropdown(false);
     setStep('review');
   };
@@ -624,161 +730,165 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
         <div className="modal-content glass-panel ai-prep-modal-container">
           {/* Header */}
           <div className="ai-prep-modal-header">
-            <div className="ai-prep-header-icon-wrap">
-              <Sparkles size={20} className="ai-prep-header-icon" />
-            </div>
-            <div className="ai-prep-header-titles">
-              <h2 id="ai-prep-modal-title" className="ai-prep-modal-title">
-                AI Interview Prep Coach
-              </h2>
-              <p className="ai-prep-modal-subtitle">
-                Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
-              </p>
-            </div>
-
-            {/* Stacked Deck Name & Description in Header on Right */}
-            {step === 'review' && dossier && (
-              <div className="ai-prep-header-deck-meta" data-testid="ai-prep-header-deck-meta">
-                <div className="header-deck-name-row">
-                  <input
-                    ref={deckNameInputRef}
-                    type="text"
-                    className="header-deck-name-input"
-                    value={editableDeckName}
-                    onChange={(e) => setEditableDeckName(e.target.value)}
-                    placeholder="Custom Deck Name"
-                    title="Click to edit deck name"
-                    data-testid="ai-prep-review-deck-name"
-                  />
-                  <button
-                    type="button"
-                    className="header-deck-pencil-btn"
-                    onClick={() => deckNameInputRef.current?.focus()}
-                    title="Click to edit deck name"
-                    aria-label="Edit deck name"
-                  >
-                    <Pencil size={11} className="header-deck-pencil-icon" />
-                  </button>
-                </div>
-                <div className="header-deck-desc-row">
-                  <input
-                    ref={deckDescInputRef}
-                    type="text"
-                    className="header-deck-desc-input"
-                    value={editableDescription}
-                    onChange={(e) => setEditableDescription(e.target.value)}
-                    placeholder="Deck Description"
-                    title="Click to edit deck description"
-                    data-testid="ai-prep-review-deck-desc"
-                  />
-                  <button
-                    type="button"
-                    className="header-deck-pencil-btn"
-                    onClick={() => deckDescInputRef.current?.focus()}
-                    title="Click to edit deck description"
-                    aria-label="Edit deck description"
-                  >
-                    <Pencil size={10} className="header-deck-pencil-icon" />
-                  </button>
-                </div>
+            <div className="ai-prep-header-left">
+              <div className="ai-prep-header-icon-wrap">
+                <Sparkles size={20} className="ai-prep-header-icon" />
               </div>
-            )}
+              <div className="ai-prep-header-titles">
+                <h2 id="ai-prep-modal-title" className="ai-prep-modal-title">
+                  AI Interview Prep Coach
+                </h2>
+                <p className="ai-prep-modal-subtitle">
+                  Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
+                </p>
+              </div>
+            </div>
 
-            <div className="ai-prep-header-controls">
-              {/* New Prep button to start fresh from review */}
-              {step === 'review' && (
-                <button
-                  type="button"
-                  className="ai-prep-history-btn ai-prep-new-plan-btn"
-                  onClick={() => {
-                    setDossier(null);
-                    setCompany('');
-                    setRole('');
-                    setTargetDate('');
-                    setRawNotes('');
-                    setSelectedWeaknesses([]);
-                    setEditableDeckName('');
-                    setEditableDescription('');
-                    setCheckedCardIds(new Set());
-                    setStep('input');
-                  }}
-                  title="Create a new interview preparation dossier for another company or role"
-                  data-testid="ai-prep-new-plan-btn"
-                >
-                  <Plus size={13} />
-                  <span>+ New Prep</span>
-                </button>
-              )}
-
-              {/* Delete Dossier button in review header */}
-              {step === 'review' && dossier && (
-                <button
-                  type="button"
-                  className="ai-prep-history-btn ai-prep-delete-plan-btn"
-                  onClick={handleDeleteCurrentDossier}
-                  title="Delete this interview briefing and start fresh"
-                  data-testid="ai-prep-delete-plan-btn"
-                >
-                  <Trash2 size={13} />
-                  <span>Delete Dossier</span>
-                </button>
-              )}
-
-              {/* Saved Briefings dropdown */}
-              {savedDossiers.length > 0 && (
-                <div className="ai-prep-saved-dossiers-wrap">
+            <div className="ai-prep-header-right">
+              <div className="ai-prep-header-controls">
+                {/* New Prep button to start fresh from review */}
+                {step === 'review' && (
                   <button
                     type="button"
-                    className="ai-prep-history-btn"
-                    onClick={() => setShowSavedDropdown(!showSavedDropdown)}
-                    title="View saved interview prep dossiers"
+                    className="ai-prep-history-btn ai-prep-new-plan-btn"
+                    onClick={() => {
+                      setDossier(null);
+                      setCompany('');
+                      setRole('');
+                      setTargetDate('');
+                      setRawNotes('');
+                      setSelectedWeaknesses([]);
+                      setEditableDeckName('');
+                      setEditableDescription('');
+                      setCheckedCardIds(new Set());
+                      setStep('input');
+                    }}
+                    title="Create a new interview preparation dossier for another company or role"
+                    data-testid="ai-prep-new-plan-btn"
                   >
-                    <Clock size={13} />
-                    <span>Saved Briefings ({savedDossiers.length})</span>
+                    <Plus size={13} />
+                    <span>+ New Prep</span>
                   </button>
+                )}
 
-                  {showSavedDropdown && (
-                    <div className="ai-prep-saved-menu">
-                      <div className="saved-menu-header">Saved Interview Briefings</div>
-                      <div className="saved-menu-list">
-                        {savedDossiers.map((d) => (
-                          <div
-                            key={d.id || `${d.company}_${d.generatedAt}`}
-                            className="saved-menu-item"
-                            onClick={() => handleLoadSavedDossier(d)}
-                          >
-                            <div className="saved-item-info">
-                              <span className="saved-item-name">{d.deckName}</span>
-                              <span className="saved-item-meta">
-                                {d.selectedCards.length} cards • {new Date(d.generatedAt).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <button
-                              type="button"
-                              className="saved-item-del-btn"
-                              title="Delete briefing"
-                              onClick={(e) => handleDeleteSavedDossier(e, d.id || '')}
+                {/* Delete Dossier button in review header */}
+                {step === 'review' && dossier && (
+                  <button
+                    type="button"
+                    className="ai-prep-history-btn ai-prep-delete-plan-btn"
+                    onClick={handleDeleteCurrentDossier}
+                    title="Delete this interview briefing and start fresh"
+                    data-testid="ai-prep-delete-plan-btn"
+                  >
+                    <Trash2 size={13} />
+                    <span>Delete Dossier</span>
+                  </button>
+                )}
+
+                {/* Saved Briefings dropdown */}
+                {savedDossiers.length > 0 && (
+                  <div className="ai-prep-saved-dossiers-wrap">
+                    <button
+                      type="button"
+                      className="ai-prep-history-btn"
+                      onClick={() => setShowSavedDropdown(!showSavedDropdown)}
+                      title="View saved interview prep dossiers"
+                    >
+                      <Clock size={13} />
+                      <span>Saved Briefings ({savedDossiers.length})</span>
+                    </button>
+
+                    {showSavedDropdown && (
+                      <div className="ai-prep-saved-menu">
+                        <div className="saved-menu-header">Saved Interview Briefings</div>
+                        <div className="saved-menu-list">
+                          {savedDossiers.map((d) => (
+                            <div
+                              key={d.id || `${d.company}_${d.generatedAt}`}
+                              className="saved-menu-item"
+                              onClick={() => handleLoadSavedDossier(d)}
                             >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
-                        ))}
+                              <div className="saved-item-info">
+                                <span className="saved-item-name">{d.deckName}</span>
+                                <span className="saved-item-meta">
+                                  {d.selectedCards.length} cards • {new Date(d.generatedAt).toLocaleDateString()}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                className="saved-item-del-btn"
+                                title="Delete briefing"
+                                onClick={(e) => handleDeleteSavedDossier(e, d.id || '')}
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
+                  </div>
+                )}
 
-              {step !== 'loading' && (
-                <button
-                  type="button"
-                  className="modal-close-btn"
-                  onClick={onClose}
-                  aria-label="Close modal"
-                  data-testid="ai-prep-close-btn"
-                >
-                  <X size={18} />
-                </button>
+                {step !== 'loading' && (
+                  <button
+                    type="button"
+                    className="modal-close-btn"
+                    onClick={onClose}
+                    aria-label="Close modal"
+                    data-testid="ai-prep-close-btn"
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
+
+              {/* Stacked Deck Name & Description in Header on Right, underneath buttons */}
+              {step === 'review' && dossier && (
+                <div className="ai-prep-header-deck-meta" data-testid="ai-prep-header-deck-meta">
+                  <div className="header-deck-name-row">
+                    <input
+                      ref={deckNameInputRef}
+                      type="text"
+                      className="header-deck-name-input"
+                      value={editableDeckName}
+                      onChange={(e) => setEditableDeckName(e.target.value)}
+                      placeholder="Custom Deck Name"
+                      title="Click to edit deck name"
+                      data-testid="ai-prep-review-deck-name"
+                    />
+                    <button
+                      type="button"
+                      className="header-deck-pencil-btn"
+                      onClick={() => deckNameInputRef.current?.focus()}
+                      title="Click to edit deck name"
+                      aria-label="Edit deck name"
+                    >
+                      <Pencil size={11} className="header-deck-pencil-icon" />
+                    </button>
+                  </div>
+                  <div className="header-deck-desc-row">
+                    <input
+                      ref={deckDescInputRef}
+                      type="text"
+                      className="header-deck-desc-input"
+                      value={editableDescription}
+                      onChange={(e) => setEditableDescription(e.target.value)}
+                      placeholder="Deck Description"
+                      title="Click to edit deck description"
+                      data-testid="ai-prep-review-deck-desc"
+                    />
+                    <button
+                      type="button"
+                      className="header-deck-pencil-btn"
+                      onClick={() => deckDescInputRef.current?.focus()}
+                      title="Click to edit deck description"
+                      aria-label="Edit deck description"
+                    >
+                      <Pencil size={10} className="header-deck-pencil-icon" />
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -1263,28 +1373,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
               {/* TAB CONTENT: STRATEGY OVERVIEW & COACH DIALOGUE */}
               {activeTab === 'dialogue' && (
                 <div className="ai-prep-dialogue-tab-body" data-testid="ai-prep-dialogue-tab-body">
-                  {/* Strategic Interview Overview & Executive Summary */}
-                  <div className="ai-prep-strategy-overview-box" data-testid="ai-prep-strategy-overview-box">
-                    <div className="strategy-overview-header">
-                      <Sparkles size={14} className="strategy-sparkle-icon" />
-                      <span className="strategy-overview-title">Strategic Interview Executive Summary</span>
-                    </div>
-                    <div className="strategy-overview-paragraphs">
-                      {dossier.executiveSummary.split('\n\n').map((paragraph, idx) => (
-                        <p key={idx} className="strategy-overview-p">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-
-                    <div className="strategy-coach-helper-note">
-                      <Sparkles size={13} className="coach-note-icon" />
-                      <span>
-                        <strong>Your AI Strategy Coach is ready:</strong> Ask questions about this company&rsquo;s interview loop, request curriculum adjustments (e.g. <em>&ldquo;trim deck to 12 cards&rdquo;</em>, <em>&ldquo;add more state machine problems&rdquo;</em>), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.
-                      </span>
-                    </div>
-                  </div>
-
                   <div className="dialogue-messages-scroll">
                     {dossier.conversation?.map((msg) => (
                       <div

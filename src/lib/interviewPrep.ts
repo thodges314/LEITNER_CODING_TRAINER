@@ -344,15 +344,11 @@ export function parseInterviewPrepResponse(
   }
 
   const dossierId = `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  const initialPromptNote = `Ask questions about this company's interview loop, request curriculum adjustments (e.g. "trim deck to 12 cards", "add more state machine problems"), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.`;
   const initialMessage: DossierMessage = {
     id: `msg_${Date.now().toString(36)}_0`,
     role: 'assistant',
-    content: `I've synthesized your interview preparation dossier for **${company}** (${role}). The curriculum contains **${selectedCards.length} curated flashcards** focused on the highest-probability patterns for this role.
-
-You can ask me to:
-- Adjust card selections (e.g. *"Trim deck to 10 most critical cards"*, *"Add more React custom hooks"*)
-- Clarify why any problem was selected
-- Report your Leitner practice progress and get targeted drill advice!`,
+    content: `${executiveSummary}\n\n${initialPromptNote}`,
     timestamp: Date.now(),
   };
 
@@ -486,15 +482,11 @@ export function generateHeuristicDossier(
   const executiveSummary = `${archetypeParagraph}\n\n${calibrationParagraph}\n\n${gapsParagraph}\n\n${resourcesParagraph}`;
 
   const dossierId = `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  const initialPromptNote = `Ask questions about this company's interview loop, request curriculum adjustments (e.g. "trim deck to 12 cards", "add more state machine problems"), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.`;
   const initialMessage: DossierMessage = {
     id: `msg_${Date.now().toString(36)}_0`,
     role: 'assistant',
-    content: `I've synthesized your interview preparation dossier for **${company}** (${role}). The curriculum contains **${selectedCards.length} curated flashcards** focused on the highest-probability patterns for this role.
-
-You can ask me to:
-- Adjust card selections (e.g. *"Trim deck to 10 most critical cards"*, *"Add more React custom hooks"*)
-- Clarify why any problem was selected
-- Report your Leitner practice progress and get targeted drill advice!`,
+    content: `${executiveSummary}\n\n${initialPromptNote}`,
     timestamp: Date.now(),
   };
 
