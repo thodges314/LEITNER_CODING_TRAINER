@@ -89,6 +89,15 @@ export function formatCatalogForPrompt(entries: CatalogIndexEntry[]): string {
 }
 
 /**
+ * Compiles a ultra-compact catalog for dialogue conversations to avoid rate-limiting
+ */
+export function formatCompactCatalogForDialogue(entries: CatalogIndexEntry[]): string {
+  return entries
+    .map((e) => `- [${e.id}] ${e.title} (${e.track})`)
+    .join('\n');
+}
+
+/**
  * Constructs the system and user prompts for synthesizing an interview prep plan
  */
 export function buildInterviewPrepPrompt(
@@ -724,7 +733,7 @@ PROGRESS STATUS:
 ${progressSummary}
 
 FULL CARD CATALOG AVAILABLE FOR MODIFICATIONS OR SWAPS:
-${formatCatalogForPrompt(catalog)}
+${formatCompactCatalogForDialogue(catalog)}
 
 COACHING DIRECTIVES:
 1. Provide concise, direct, senior-level coaching and tactical advice.
@@ -740,20 +749,39 @@ COACHING DIRECTIVES:
 \`\`\`
 Only include this JSON block if the candidate requested a modification to the deck cards.`;
 
-  const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+  // Build a normalized message sequence:
+  // 1. system prompt
+  // 2. user introduction if the conversation history starts with an assistant message
+  // 3. alternating user/assistant history without consecutive duplicates
+  // 4. final user message
+  const normalizedMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
     { role: 'system', content: systemPrompt },
   ];
 
-  if (dossier.conversation && dossier.conversation.length > 0) {
-    for (const msg of dossier.conversation.slice(-6)) {
-      messages.push({
+  const history = (dossier.conversation || []).slice(-6);
+  if (history.length > 0 && history[0].role === 'assistant') {
+    normalizedMessages.push({
+      role: 'user',
+      content: `Hello coach, let's review my preparation for ${dossier.company} (${dossier.role}).`,
+    });
+  }
+
+  for (const msg of history) {
+    if (normalizedMessages.length > 0 && normalizedMessages[normalizedMessages.length - 1].role === msg.role) {
+      normalizedMessages[normalizedMessages.length - 1].content += `\n\n${msg.content}`;
+    } else {
+      normalizedMessages.push({
         role: msg.role,
         content: msg.content,
       });
     }
   }
 
-  messages.push({ role: 'user', content: userMessage });
+  if (normalizedMessages.length > 0 && normalizedMessages[normalizedMessages.length - 1].role === 'user') {
+    normalizedMessages[normalizedMessages.length - 1].content += `\n\n${userMessage}`;
+  } else {
+    normalizedMessages.push({ role: 'user', content: userMessage });
+  }
 
   try {
     let rawReply = '';
@@ -762,20 +790,11 @@ Only include this JSON block if the candidate requested a modification to the de
       const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
 
       const geminiContents: Array<{ role: 'user' | 'model'; parts: [{ text: string }] }> = [];
-      if (dossier.conversation && dossier.conversation.length > 0) {
-        for (const msg of dossier.conversation.slice(-6)) {
-          const role = msg.role === 'assistant' ? 'model' : 'user';
-          if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === role) {
-            geminiContents[geminiContents.length - 1].parts[0].text += `\n\n${msg.content}`;
-          } else {
-            geminiContents.push({ role, parts: [{ text: msg.content }] });
-          }
-        }
-      }
-      if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === 'user') {
-        geminiContents[geminiContents.length - 1].parts[0].text += `\n\n${userMessage}`;
-      } else {
-        geminiContents.push({ role: 'user', parts: [{ text: userMessage }] });
+      for (const m of normalizedMessages.filter((msg) => msg.role !== 'system')) {
+        geminiContents.push({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.content }],
+        });
       }
 
       const response = await fetch(endpoint, {
@@ -799,23 +818,13 @@ Only include this JSON block if the candidate requested a modification to the de
       const endpoint = 'https://api.anthropic.com/v1/messages';
 
       const anthropicMessages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
-      if (dossier.conversation && dossier.conversation.length > 0) {
-        for (const msg of dossier.conversation.slice(-6)) {
-          if (anthropicMessages.length > 0 && anthropicMessages[anthropicMessages.length - 1].role === msg.role) {
-            anthropicMessages[anthropicMessages.length - 1].content += `\n\n${msg.content}`;
-          } else {
-            anthropicMessages.push({ role: msg.role, content: msg.content });
-          }
-        }
-      }
-      if (anthropicMessages.length > 0 && anthropicMessages[anthropicMessages.length - 1].role === 'user') {
-        anthropicMessages[anthropicMessages.length - 1].content += `\n\n${userMessage}`;
-      } else {
-        anthropicMessages.push({ role: 'user', content: userMessage });
-      }
-
-      if (anthropicMessages.length > 0 && anthropicMessages[0].role === 'assistant') {
-        anthropicMessages.unshift({ role: 'user', content: `Hello coach, let's discuss my preparation for ${dossier.company}.` });
+      for (const m of normalizedMessages.filter(
+        (msg): msg is { role: 'user' | 'assistant'; content: string } => msg.role !== 'system'
+      )) {
+        anthropicMessages.push({
+          role: m.role,
+          content: m.content,
+        });
       }
 
       const response = await fetch(endpoint, {
@@ -848,7 +857,7 @@ Only include this JSON block if the candidate requested a modification to the de
         model = model || 'gpt-4o-mini';
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'llama-3.3-70b-versatile';
+        model = model || 'openai/gpt-oss-120b';
       } else if (provider === 'cerebras') {
         baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
         model = model || 'llama3.3-70b';
@@ -868,14 +877,21 @@ Only include this JSON block if the candidate requested a modification to the de
         },
         body: JSON.stringify({
           model,
-          messages,
+          messages: normalizedMessages,
           temperature: 0.3,
         }),
       });
       if (!response.ok) {
         const errText = await response.text();
         console.warn(`[AI Coach] ${provider} error (${response.status}):`, errText);
-        throw new Error(`${provider} error (${response.status}): ${errText}`);
+        let errorSnippet = errText;
+        try {
+          const parsedErr = JSON.parse(errText);
+          if (parsedErr.error?.message) errorSnippet = parsedErr.error.message;
+        } catch {
+          /* ignore */
+        }
+        throw new Error(`${provider} (${response.status}): ${errorSnippet}`);
       }
       const data = await response.json();
       rawReply = data.choices?.[0]?.message?.content?.trim() || '';
@@ -923,7 +939,7 @@ Only include this JSON block if the candidate requested a modification to the de
     if (apiKey) {
       return {
         ...fallback,
-        reply: `*(Note: Live model request encountered an issue. Showing coaching guidance:)*\n\n${fallback.reply}`,
+        reply: `*(Note: Live model request error: ${errorMsg.slice(0, 120)}. Showing coaching guidance:)*\n\n${fallback.reply}`,
       };
     }
     return fallback;

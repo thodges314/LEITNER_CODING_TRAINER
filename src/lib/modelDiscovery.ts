@@ -33,6 +33,7 @@ export interface ModelDiscoveryResult {
 // Curated priority models to pin at the top per provider for coding cold-start practice
 const RECOMMENDED_MODELS: Record<AIProvider, string[]> = {
   groq: [
+    'openai/gpt-oss-120b',
     'llama-3.3-70b-versatile',
     'llama-3.1-8b-instant',
     'qwen-2.5-coder-32b',
