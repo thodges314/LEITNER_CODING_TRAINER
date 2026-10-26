@@ -1,6 +1,12 @@
 export { DeactivateModal } from './DeactivateModal';
 export type { DeactivateModalProps } from './DeactivateModal';
 
+export { RemoveFromDeckModal } from './RemoveFromDeckModal';
+export type { RemoveFromDeckModalProps } from './RemoveFromDeckModal';
+
+export { CreateDeckModal } from './CreateDeckModal';
+export type { CreateDeckModalProps } from './CreateDeckModal';
+
 export { TierFilterBar } from './TierFilterBar';
 export type { TierFilterBarProps } from './TierFilterBar';
 

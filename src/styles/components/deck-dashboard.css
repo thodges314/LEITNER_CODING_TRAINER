@@ -1192,4 +1192,167 @@
   margin: 6px 4px;
 }
 
+.deck-dropdown-create-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-top: 4px;
+  border-radius: 6px;
+  border: 1px dashed var(--border-medium);
+  background: rgba(56, 189, 248, 0.05);
+  color: var(--accent-cyan);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.deck-dropdown-create-btn:hover {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: var(--accent-cyan);
+}
+
+[data-theme="apple-gsos"] .deck-dropdown-create-btn {
+  background: #EBEAE3;
+  color: #4455AA;
+  border: 1px dashed #4455AA;
+}
+
+.deck-dropdown-item-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  border-radius: 6px;
+  transition: background 0.12s ease;
+}
+
+.deck-dropdown-item-row .deck-dropdown-item {
+  flex: 1;
+}
+
+.deck-item-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px;
+  margin-right: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: all 0.12s ease;
+}
+
+.deck-item-delete-btn:hover {
+  opacity: 1;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Catalog Table Batch Selection Bar */
+.catalog-batch-bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  margin: 16px 0 0;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-cyan);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 16px rgba(56, 189, 248, 0.2);
+  backdrop-filter: blur(16px);
+}
+
+[data-theme="apple-gsos"] .catalog-batch-bar {
+  background: #F2F1EA;
+  border: 2px solid #4455AA;
+  box-shadow: 2px 2px 0 #1C1C1C;
+}
+
+.catalog-batch-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.catalog-batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.catalog-batch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.catalog-batch-dropdown-container {
+  position: relative;
+}
+
+.catalog-batch-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 30;
+}
+
+.catalog-batch-menu-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.catalog-batch-menu-item:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.catalog-checkbox-cell {
+  width: 38px;
+  text-align: center;
+  vertical-align: middle;
+  padding: 8px 6px !important;
+}
+
+.catalog-checkbox {
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent-cyan);
+}
+
+
 

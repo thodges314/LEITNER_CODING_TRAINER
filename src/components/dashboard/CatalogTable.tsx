@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Unlock,
   Lock,
@@ -11,11 +11,17 @@ import {
   ArrowUp,
   ArrowDown,
   CheckCircle2,
+  FolderMinus,
+  CheckSquare,
+  ChevronDown,
+  FolderPlus,
+  Plus,
 } from 'lucide-react';
 import { DifficultyBadge } from '../DifficultyBadge';
 import { getTrackMeta, isCardAttempted } from '../../lib/leitner';
 import type { TopicItem } from '../../lib/leitner';
 import type { CatalogSortOption } from '../../lib/deckFilters';
+import type { CustomDeck } from '../../lib/decks';
 
 export interface CatalogTableProps {
   topics: TopicItem[];
@@ -28,9 +34,13 @@ export interface CatalogTableProps {
   onSelectCardToPractice: (card: TopicItem) => void;
   onResetBox: (topicId: string) => void;
   onToggleLock: (topicId: string, currentStatus: 'active' | 'locked') => void;
-  onDeactivateClick: (topic: TopicItem) => void;
+  onDeactivateClick?: (topic: TopicItem) => void;
+  onRemoveFromDeck?: (topic: TopicItem) => void;
   onToggleDeactivate?: (topicId: string) => void;
   onDeleteTopic?: (topicId: string) => void;
+  customDecks?: CustomDeck[];
+  onAddCardsToDeck?: (deckId: string, cardIds: string[]) => void;
+  onOpenCreateDeckWithCards?: (cardIds: string[]) => void;
 }
 
 export const CatalogTable: React.FC<CatalogTableProps> = ({
@@ -42,9 +52,32 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
   onResetBox,
   onToggleLock,
   onDeactivateClick,
+  onRemoveFromDeck,
   onToggleDeactivate,
   onDeleteTopic,
+  customDecks = [],
+  onAddCardsToDeck,
+  onOpenCreateDeckWithCards,
 }) => {
+  const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set());
+  const [isBatchMenuOpen, setIsBatchMenuOpen] = useState(false);
+
+  const handleToggleSelectCard = (id: string) => {
+    setSelectedCardIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleToggleSelectAll = () => {
+    if (topics.length > 0 && topics.every((t) => selectedCardIds.has(t.id))) {
+      setSelectedCardIds(new Set());
+    } else {
+      setSelectedCardIds(new Set(topics.map((t) => t.id)));
+    }
+  };
   const renderSortIndicator = (
     column: 'title' | 'track' | 'difficulty' | 'box' | 'streak' | 'due' | 'status'
   ) => {
@@ -80,6 +113,16 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
       <table className="catalog-table">
         <thead>
           <tr>
+            <th className="catalog-th catalog-checkbox-cell" style={{ width: 38 }}>
+              <input
+                type="checkbox"
+                className="catalog-checkbox"
+                aria-label="Select all cards in table"
+                checked={topics.length > 0 && topics.every((t) => selectedCardIds.has(t.id))}
+                onChange={handleToggleSelectAll}
+                data-testid="catalog-select-all-checkbox"
+              />
+            </th>
             <th
               onClick={() => onHeaderSort('title')}
               className="catalog-th col-card-title"
@@ -142,7 +185,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
         <tbody>
           {topics.length === 0 ? (
             <tr>
-              <td colSpan={7} className="catalog-empty-cell">
+              <td colSpan={8} className="catalog-empty-cell">
                 No cards match your current filter criteria.
               </td>
             </tr>
@@ -165,6 +208,18 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                   key={topic.id}
                   className={`catalog-tr ${trStateClass}`}
                 >
+                  {/* Select Checkbox */}
+                  <td className="catalog-td catalog-checkbox-cell">
+                    <input
+                      type="checkbox"
+                      className="catalog-checkbox"
+                      aria-label={`Select card ${topic.title}`}
+                      checked={selectedCardIds.has(topic.id)}
+                      onChange={() => handleToggleSelectCard(topic.id)}
+                      data-testid={`catalog-card-checkbox-${topic.id}`}
+                    />
+                  </td>
+
                   {/* Title & Tags */}
                   <td className="catalog-td">
                     <div className={titleStateClass}>
@@ -309,11 +364,15 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
 
                           <button
                             className="btn btn-outline catalog-deactivate-btn"
-                            onClick={() => onDeactivateClick(topic)}
-                            title={`Deactivate topic '${topic.title}' (remove from study rotation)`}
-                            aria-label={`Deactivate topic '${topic.title}'`}
+                            onClick={() => {
+                              if (onRemoveFromDeck) onRemoveFromDeck(topic);
+                              else onDeactivateClick?.(topic);
+                            }}
+                            title={`Remove topic '${topic.title}' from deck (Deactivate topic)`}
+                            aria-label={`Remove topic '${topic.title}' from deck`}
+                            data-testid="catalog-remove-from-deck-btn"
                           >
-                            <Archive size={12} />
+                            <FolderMinus size={12} />
                           </button>
                         </>
                       )}
@@ -325,6 +384,73 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
           )}
         </tbody>
       </table>
+
+      {selectedCardIds.size > 0 && (
+        <div className="catalog-batch-bar" data-testid="catalog-batch-bar">
+          <div className="catalog-batch-info">
+            <CheckSquare size={16} />
+            <span>
+              <strong>{selectedCardIds.size}</strong> {selectedCardIds.size === 1 ? 'card' : 'cards'} selected
+            </span>
+          </div>
+          <div className="catalog-batch-actions">
+            {customDecks.length > 0 && onAddCardsToDeck && (
+              <div className="catalog-batch-dropdown-container">
+                <button
+                  type="button"
+                  className="btn btn-secondary catalog-batch-btn"
+                  onClick={() => setIsBatchMenuOpen((prev) => !prev)}
+                  data-testid="catalog-batch-add-to-deck-btn"
+                >
+                  <FolderPlus size={14} /> Add to Deck <ChevronDown size={13} />
+                </button>
+                {isBatchMenuOpen && (
+                  <div className="catalog-batch-menu" data-testid="catalog-batch-menu">
+                    {customDecks.map((d) => (
+                      <button
+                        key={d.id}
+                        type="button"
+                        className="catalog-batch-menu-item"
+                        onClick={() => {
+                          onAddCardsToDeck(d.id, Array.from(selectedCardIds));
+                          setIsBatchMenuOpen(false);
+                          setSelectedCardIds(new Set());
+                        }}
+                        data-testid={`catalog-batch-target-deck-${d.id}`}
+                      >
+                        {d.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {onOpenCreateDeckWithCards && (
+              <button
+                type="button"
+                className="btn btn-primary catalog-batch-btn"
+                onClick={() => {
+                  onOpenCreateDeckWithCards(Array.from(selectedCardIds));
+                  setSelectedCardIds(new Set());
+                }}
+                data-testid="catalog-batch-new-deck-btn"
+              >
+                <Plus size={14} /> Create Deck With Selected
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="btn btn-outline catalog-batch-btn"
+              onClick={() => setSelectedCardIds(new Set())}
+              data-testid="catalog-batch-clear-btn"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

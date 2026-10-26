@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Layers, ChevronDown, Check, Sparkles } from 'lucide-react';
+import { Layers, ChevronDown, Check, Sparkles, Plus, Trash2 } from 'lucide-react';
 import {
   BUILT_IN_DECKS,
   getBuiltInDeck,
@@ -13,6 +13,8 @@ export interface DeckSelectorProps {
   allCards: TopicItem[];
   onSelectDeck: (deckId: string) => void;
   customDecks?: CustomDeck[];
+  onCreateCustomDeckClick?: () => void;
+  onDeleteCustomDeck?: (deckId: string) => void;
 }
 
 export const DeckSelector: React.FC<DeckSelectorProps> = ({
@@ -20,6 +22,8 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
   allCards,
   onSelectDeck,
   customDecks = [],
+  onCreateCustomDeckClick,
+  onDeleteCustomDeck,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -156,30 +160,69 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                     const isSelected = activeDeckId === custom.id;
 
                     return (
-                      <button
+                      <div
                         key={custom.id}
-                        type="button"
-                        role="option"
-                        aria-selected={isSelected}
-                        className={`deck-dropdown-item ${isSelected ? 'selected' : ''}`}
-                        onClick={() => handleSelect(custom.id)}
-                        data-testid={`deck-option-${custom.id}`}
+                        className={`deck-dropdown-item-row ${isSelected ? 'selected' : ''}`}
                       >
-                        <div className="deck-item-indicator">
-                          {isSelected ? <Check size={14} /> : <span className="deck-bullet" />}
-                        </div>
-                        <div className="deck-item-text">
-                          <div className="deck-item-header">
-                            <span className="deck-item-name">{custom.name}</span>
-                            <span className="deck-item-badge">{count} cards</span>
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          className={`deck-dropdown-item ${isSelected ? 'selected' : ''}`}
+                          onClick={() => handleSelect(custom.id)}
+                          data-testid={`deck-option-${custom.id}`}
+                        >
+                          <div className="deck-item-indicator">
+                            {isSelected ? <Check size={14} /> : <span className="deck-bullet" />}
                           </div>
-                          {custom.description && (
-                            <p className="deck-item-description">{custom.description}</p>
-                          )}
-                        </div>
-                      </button>
+                          <div className="deck-item-text">
+                            <div className="deck-item-header">
+                              <span className="deck-item-name">{custom.name}</span>
+                              <span className="deck-item-badge">{count} cards</span>
+                            </div>
+                            {custom.description && (
+                              <p className="deck-item-description">{custom.description}</p>
+                            )}
+                          </div>
+                        </button>
+                        {onDeleteCustomDeck && (
+                          <button
+                            type="button"
+                            className="deck-item-delete-btn"
+                            title={`Delete custom deck '${custom.name}'`}
+                            aria-label={`Delete custom deck '${custom.name}'`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsOpen(false);
+                              onDeleteCustomDeck(custom.id);
+                            }}
+                            data-testid={`deck-delete-${custom.id}`}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        )}
+                      </div>
                     );
                   })}
+                </>
+              )}
+
+              {/* Create Custom Deck Action */}
+              {onCreateCustomDeckClick && (
+                <>
+                  <div className="deck-dropdown-divider" />
+                  <button
+                    type="button"
+                    className="deck-dropdown-create-btn"
+                    onClick={() => {
+                      setIsOpen(false);
+                      onCreateCustomDeckClick();
+                    }}
+                    data-testid="deck-dropdown-create-btn"
+                  >
+                    <Plus size={14} />
+                    <span>Create Custom Deck...</span>
+                  </button>
                 </>
               )}
             </div>

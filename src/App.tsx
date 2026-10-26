@@ -38,10 +38,14 @@ import {
   getStoredActiveDeckId,
   setStoredActiveDeckId,
   getStoredCustomDecks,
+  setStoredCustomDecks,
+  getBuiltInDeck,
+  getDeckName,
 } from './lib/decks';
 import type { CustomDeck } from './lib/decks';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
+import { RemoveFromDeckModal, CreateDeckModal } from './components/dashboard';
 import { AddTopicModal } from './components/AddTopicModal';
 import { FEATURES } from './lib/features';
 import { SettingsModal } from './components/SettingsModal';
@@ -118,7 +122,11 @@ export function App() {
 
   // Active study deck selection
   const [activeDeckId, setActiveDeckId] = useState<string>(() => getStoredActiveDeckId());
-  const [customDecks] = useState<CustomDeck[]>(() => getStoredCustomDecks());
+  const [customDecks, setCustomDecks] = useState<CustomDeck[]>(() => getStoredCustomDecks());
+  const [isRemoveFromDeckModalOpen, setIsRemoveFromDeckModalOpen] = useState(false);
+  const [cardPendingRemoval, setCardPendingRemoval] = useState<TopicItem | null>(null);
+  const [isCreateDeckModalOpen, setIsCreateDeckModalOpen] = useState(false);
+  const [initialCardsForNewDeck, setInitialCardsForNewDeck] = useState<string[]>([]);
 
   const handleSelectDeck = (deckId: string) => {
     setActiveDeckId(deckId);
@@ -287,6 +295,117 @@ export function App() {
     );
     if (next) clearDraft(next.id);
     setSelectedCardId(next?.id ?? null);
+  };
+
+  const handleInitiateRemoveFromDeck = (card: TopicItem) => {
+    const isBuiltIn = Boolean(getBuiltInDeck(activeDeckId));
+    if (isBuiltIn) {
+      setCardPendingRemoval(card);
+      setIsRemoveFromDeckModalOpen(true);
+    } else {
+      const updatedCustomDecks = customDecks.map((d) => {
+        if (d.id === activeDeckId) {
+          return {
+            ...d,
+            cardIds: d.cardIds.filter((id) => id !== card.id),
+            updatedAt: Date.now(),
+          };
+        }
+        return d;
+      });
+      setCustomDecks(updatedCustomDecks);
+      setStoredCustomDecks(updatedCustomDecks);
+
+      if (activeView === 'practice' && currentCard?.id === card.id) {
+        handleSkipCard();
+      }
+      setUnlockToast(`Removed "${card.title}" from ${getDeckName(activeDeckId, customDecks)}`);
+    }
+  };
+
+  const handleConfirmForkAndRemove = (cardId: string, newDeckName: string) => {
+    const presetCards = filterCardsByDeck(deckState.topics, activeDeckId, customDecks);
+    const remainingIds = presetCards.map((c) => c.id).filter((id) => id !== cardId);
+
+    const newCustomDeck: CustomDeck = {
+      id: `custom-${Date.now()}`,
+      name: newDeckName,
+      description: `Personal copy forked from ${getDeckName(activeDeckId, customDecks)}`,
+      cardIds: remainingIds,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    const updatedCustomDecks = [...customDecks, newCustomDeck];
+    setCustomDecks(updatedCustomDecks);
+    setStoredCustomDecks(updatedCustomDecks);
+
+    handleSelectDeck(newCustomDeck.id);
+
+    if (activeView === 'practice' && currentCard?.id === cardId) {
+      handleSkipCard();
+    }
+
+    const removedCard = deckState.topics.find((t) => t.id === cardId);
+    setUnlockToast(`Created "${newDeckName}" without "${removedCard?.title ?? cardId}"`);
+    setIsRemoveFromDeckModalOpen(false);
+    setCardPendingRemoval(null);
+  };
+
+  const handleCreateCustomDeck = (name: string, description?: string, cardIds: string[] = []) => {
+    const newDeck: CustomDeck = {
+      id: `custom-${Date.now()}`,
+      name,
+      description,
+      cardIds,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+    const updated = [...customDecks, newDeck];
+    setCustomDecks(updated);
+    setStoredCustomDecks(updated);
+    handleSelectDeck(newDeck.id);
+    setUnlockToast(`Created custom deck "${name}" with ${cardIds.length} cards.`);
+    setIsCreateDeckModalOpen(false);
+    setInitialCardsForNewDeck([]);
+  };
+
+  const handleAddCardsToDeck = (targetDeckId: string, cardIdsToAdd: string[]) => {
+    let addedCount = 0;
+    const updated = customDecks.map((d) => {
+      if (d.id === targetDeckId) {
+        const existing = new Set(d.cardIds);
+        const merged = [...d.cardIds];
+        for (const id of cardIdsToAdd) {
+          if (!existing.has(id)) {
+            merged.push(id);
+            addedCount++;
+          }
+        }
+        return { ...d, cardIds: merged, updatedAt: Date.now() };
+      }
+      return d;
+    });
+    setCustomDecks(updated);
+    setStoredCustomDecks(updated);
+    const target = updated.find((d) => d.id === targetDeckId);
+    setUnlockToast(`Added ${addedCount} cards to "${target?.name ?? 'deck'}".`);
+  };
+
+  const handleDeleteCustomDeck = (deckId: string) => {
+    const deckToDelete = customDecks.find((d) => d.id === deckId);
+    const updated = customDecks.filter((d) => d.id !== deckId);
+    setCustomDecks(updated);
+    setStoredCustomDecks(updated);
+    if (activeDeckId === deckId) {
+      handleSelectDeck('full-library');
+    }
+    setUnlockToast(`Deleted deck "${deckToDelete?.name ?? 'custom deck'}".`);
+  };
+
+  const handleOpenCreateDeckWithCards = (cardIds: string[]) => {
+    setInitialCardsForNewDeck(cardIds);
+    setIsCreateDeckModalOpen(true);
   };
 
   const handleAlgorithmChange = (nextAlgo: SpacedAlgorithm) => {
@@ -537,6 +656,7 @@ export function App() {
             onRecordReview={handleRecordReview}
             onOverrideReview={handleOverrideReview}
             onSkipCard={handleSkipCard}
+            onRemoveFromDeck={handleInitiateRemoveFromDeck}
             onOpenDeckView={() => setActiveView('dashboard')}
             onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
             isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
@@ -555,6 +675,14 @@ export function App() {
             onResetBox={handleResetBox}
             onDeleteTopic={handleDeleteTopic}
             onToggleDeactivate={handleToggleDeactivate}
+            onRemoveFromDeck={handleInitiateRemoveFromDeck}
+            onCreateCustomDeckClick={() => {
+              setInitialCardsForNewDeck([]);
+              setIsCreateDeckModalOpen(true);
+            }}
+            onDeleteCustomDeck={handleDeleteCustomDeck}
+            onAddCardsToDeck={handleAddCardsToDeck}
+            onOpenCreateDeckWithCards={handleOpenCreateDeckWithCards}
             onStateUpdated={(newState) => setDeckState(newState)}
             onOpenAddModal={() => setIsAddModalOpen(true)}
             highlightExport={highlightExport}
@@ -657,6 +785,28 @@ export function App() {
         onDismiss={() => {
           markBackupAdvisorySeen();
           setIsBackupAdvisoryOpen(false);
+        }}
+      />
+
+      <RemoveFromDeckModal
+        isOpen={isRemoveFromDeckModalOpen}
+        card={cardPendingRemoval}
+        activeDeckName={getDeckName(activeDeckId, customDecks)}
+        onConfirmForkAndRemove={handleConfirmForkAndRemove}
+        onClose={() => {
+          setIsRemoveFromDeckModalOpen(false);
+          setCardPendingRemoval(null);
+        }}
+      />
+
+      <CreateDeckModal
+        isOpen={isCreateDeckModalOpen}
+        initialCardIds={initialCardsForNewDeck}
+        allCards={deckState.topics}
+        onConfirmCreateDeck={handleCreateCustomDeck}
+        onClose={() => {
+          setIsCreateDeckModalOpen(false);
+          setInitialCardsForNewDeck([]);
         }}
       />
 

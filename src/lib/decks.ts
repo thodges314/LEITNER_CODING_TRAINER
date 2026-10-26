@@ -92,6 +92,15 @@ export function getBuiltInDeck(id: string): DeckPreset | undefined {
   return BUILT_IN_DECKS.find((d) => d.id === id);
 }
 
+export function getDeckName(deckId: string, customDecks: CustomDeck[] = []): string {
+  const normalizedId = deckId === 'core-algorithms' || deckId === 'advanced-algorithms' ? 'algorithms' : deckId;
+  const builtIn = getBuiltInDeck(normalizedId);
+  if (builtIn) return builtIn.name;
+  const custom = customDecks.find((d) => d.id === normalizedId);
+  if (custom) return custom.name;
+  return 'Full Library (All Cards)';
+}
+
 export function getStoredActiveDeckId(): string {
   if (typeof localStorage === 'undefined') return 'full-library';
   try {

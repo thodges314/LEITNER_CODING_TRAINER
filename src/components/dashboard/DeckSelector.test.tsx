@@ -5,6 +5,7 @@ import * as ReactDOMClient from 'react-dom/client';
 import { DeckSelector } from './DeckSelector';
 import seed from '../../data/topics.json';
 import type { TopicItem } from '../../lib/leitner';
+import type { CustomDeck } from '../../lib/decks';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -168,5 +169,71 @@ describe('DeckSelector component', () => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     });
     expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).toBeNull();
+  });
+
+  it('calls onCreateCustomDeckClick when Create Custom Deck button is clicked', () => {
+    const onCreateClick = vi.fn();
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="full-library"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+          onCreateCustomDeckClick={onCreateClick}
+        />
+      );
+    });
+
+    const trigger = container!.querySelector('[data-testid="deck-dropdown-trigger"]') as HTMLButtonElement;
+    act(() => {
+      trigger.click();
+    });
+
+    const createBtn = container!.querySelector('[data-testid="deck-dropdown-create-btn"]') as HTMLButtonElement;
+    expect(createBtn).not.toBeNull();
+    act(() => {
+      createBtn.click();
+    });
+
+    expect(onCreateClick).toHaveBeenCalledTimes(1);
+    expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).toBeNull();
+  });
+
+  it('calls onDeleteCustomDeck when trash icon is clicked on a custom deck', () => {
+    const onDelete = vi.fn();
+    const customDecks: CustomDeck[] = [
+      {
+        id: 'deck-to-delete',
+        name: 'Temporary Practice',
+        cardIds: ['c1'],
+        createdAt: 1000,
+        updatedAt: 1000,
+      },
+    ];
+
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="full-library"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+          customDecks={customDecks}
+          onDeleteCustomDeck={onDelete}
+        />
+      );
+    });
+
+    const trigger = container!.querySelector('[data-testid="deck-dropdown-trigger"]') as HTMLButtonElement;
+    act(() => {
+      trigger.click();
+    });
+
+    const deleteBtn = container!.querySelector('[data-testid="deck-delete-deck-to-delete"]') as HTMLButtonElement;
+    expect(deleteBtn).not.toBeNull();
+    act(() => {
+      deleteBtn.click();
+    });
+
+    expect(onDelete).toHaveBeenCalledWith('deck-to-delete');
   });
 });

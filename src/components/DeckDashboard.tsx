@@ -51,6 +51,11 @@ interface DeckDashboardProps {
   onResetBox: (topicId: string) => void;
   onDeleteTopic?: (topicId: string) => void;
   onToggleDeactivate?: (topicId: string) => void;
+  onRemoveFromDeck?: (topic: TopicItem) => void;
+  onCreateCustomDeckClick?: () => void;
+  onDeleteCustomDeck?: (deckId: string) => void;
+  onAddCardsToDeck?: (deckId: string, cardIds: string[]) => void;
+  onOpenCreateDeckWithCards?: (cardIds: string[]) => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
   onOpenAddModal: () => void;
   /** Opens the Focus dialog (used by the one-time hint under the track filter). */
@@ -70,6 +75,11 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onResetBox,
   onDeleteTopic,
   onToggleDeactivate,
+  onRemoveFromDeck,
+  onCreateCustomDeckClick,
+  onDeleteCustomDeck,
+  onAddCardsToDeck,
+  onOpenCreateDeckWithCards,
   onStateUpdated,
   onOpenAddModal,
   onOpenFocus,
@@ -625,6 +635,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         allCards={allVisibleCards}
         onSelectDeck={onSelectDeck}
         customDecks={customDecks}
+        onCreateCustomDeckClick={onCreateCustomDeckClick}
+        onDeleteCustomDeck={onDeleteCustomDeck}
       />
 
       {/* Leitner Box Breakdown Strip */}
@@ -666,8 +678,12 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onResetBox={onResetBox}
         onToggleLock={onToggleLock}
         onDeactivateClick={setTopicToDeactivate}
+        onRemoveFromDeck={onRemoveFromDeck}
         onToggleDeactivate={onToggleDeactivate}
         onDeleteTopic={onDeleteTopic}
+        customDecks={customDecks}
+        onAddCardsToDeck={onAddCardsToDeck}
+        onOpenCreateDeckWithCards={onOpenCreateDeckWithCards}
       />
 
       {/* Lightweight Deactivate Confirmation Modal */}

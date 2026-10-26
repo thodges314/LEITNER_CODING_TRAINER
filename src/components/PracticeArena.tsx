@@ -46,6 +46,7 @@ interface PracticeArenaProps {
   onRecordReview?: (passed: boolean) => void;
   onOverrideReview?: (passed: boolean) => void;
   onSkipCard: () => void;
+  onRemoveFromDeck?: (topic: TopicItem) => void;
   onOpenDeckView: () => void;
   onOpenSettings?: (section?: 'ai') => void;
   isReinforcement?: boolean;
@@ -62,6 +63,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   onRecordReview,
   onOverrideReview,
   onSkipCard,
+  onRemoveFromDeck,
   onOpenDeckView,
   onOpenSettings,
   isReinforcement,
@@ -806,6 +808,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             tsOnlyNotice={tsOnlyNotice}
             onSwitchExecutionMode={handleSwitchExecutionMode}
             onSkip={handleSkip}
+            onRemoveFromDeck={onRemoveFromDeck && currentCard ? () => onRemoveFromDeck(currentCard) : undefined}
             onRunCode={handleRunCode}
             onSubmit={handleSubmit}
             isEvaluating={isEvaluating}
