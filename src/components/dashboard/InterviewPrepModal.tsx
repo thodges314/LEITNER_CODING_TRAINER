@@ -25,6 +25,7 @@ import {
   Download,
   Pencil,
 } from 'lucide-react';
+import { MarkdownContent } from '../MarkdownContent';
 import catalogIndexData from '../../data/catalogIndex.json';
 import {
   generateInterviewPrepDossier,
@@ -1417,7 +1418,9 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                             {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
-                        <div className="bubble-content">{msg.content}</div>
+                        <div className="bubble-content">
+                          <MarkdownContent text={msg.content} />
+                        </div>
                         {msg.updatedCards && (
                           <div className="bubble-card-update-pill">
                             <Sparkles size={11} />

@@ -2520,8 +2520,36 @@
 }
 
 .bubble-content {
-  white-space: pre-wrap;
   word-break: break-word;
+}
+
+.bubble-content .markdown-content {
+  color: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.bubble-content .markdown-content p {
+  margin: 0 0 8px 0;
+}
+
+.bubble-content .markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.bubble-content .markdown-content ul,
+.bubble-content .markdown-content ol {
+  margin: 4px 0 8px 0;
+}
+
+.bubble-content .markdown-content li {
+  margin-bottom: 3px;
+}
+
+.dialogue-bubble.user .bubble-content .markdown-inline-code {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .bubble-card-update-pill {
