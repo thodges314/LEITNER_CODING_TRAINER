@@ -271,15 +271,15 @@ Hope this helps!`;
 
       // loadAllInterviewDossiers should auto-heal and assign an id
       const loaded = loadAllInterviewDossiers();
-      expect(loaded['old-custom-deck'].id).toBeDefined();
-      expect(loaded['old-custom-deck'].id.length).toBeGreaterThan(0);
+      expect(loaded['old-custom-deck']?.id).toBeDefined();
+      expect(loaded['old-custom-deck']?.id?.length).toBeGreaterThan(0);
 
       // deleteInterviewDossier should succeed even when passing an object without an id
       deleteInterviewDossier({
         company: 'Amazon',
         role: 'SDE II',
         generatedAt: 5000,
-      } as any);
+      } as Partial<InterviewPrepDossier>);
 
       expect(getAllSavedDossiers().filter((d) => d.company === 'Amazon')).toHaveLength(0);
     });
@@ -336,6 +336,63 @@ Hope this helps!`;
 
       expect(res.reply).toContain('Box 1 setback cards');
       expect(res.reply).toContain('Solid progress');
+    });
+
+    it('predicts interview questions tailored to target company and role', async () => {
+      const dossier = generateHeuristicDossier(
+        { company: 'IPSY', role: 'Senior Software Engineer', rawNotes: '' },
+        MOCK_CATALOG
+      );
+
+      const res = await continueInterviewDialogue(
+        dossier,
+        'What kind of questions do you predict them asking?',
+        MOCK_CATALOG
+      );
+
+      expect(res.reply).toContain('IPSY');
+      expect(res.reply).toContain('Live Component Construction');
+      expect(res.reply).toContain('Async Orchestration');
+      expect(res.reply).toContain('Accessibility');
+    });
+
+    it('guides external resources and study time allocation', async () => {
+      const dossier = generateHeuristicDossier(
+        { company: 'Airbnb', role: 'Staff UI Engineer', rawNotes: '' },
+        MOCK_CATALOG
+      );
+
+      const res = await continueInterviewDialogue(
+        dossier,
+        'Which external resources should I spend the most time on?',
+        MOCK_CATALOG
+      );
+
+      expect(res.reply).toContain('Airbnb');
+      expect(res.reply).toContain('Time Allocation');
+      expect(res.reply).toContain('Flashcard Coding Drills');
+    });
+
+    it('dynamically addresses custom inquiries rather than repeating a single canned string', async () => {
+      const dossier = generateHeuristicDossier(
+        { company: 'Datadog', role: 'Systems Engineer', rawNotes: '' },
+        MOCK_CATALOG
+      );
+
+      const res1 = await continueInterviewDialogue(
+        dossier,
+        'What is their company culture and rubric?',
+        MOCK_CATALOG
+      );
+      const res2 = await continueInterviewDialogue(
+        dossier,
+        'Give me a countdown checklist for the day of the interview',
+        MOCK_CATALOG
+      );
+
+      expect(res1.reply).toContain('Architectural Clarity');
+      expect(res2.reply).toContain('countdown checklist');
+      expect(res1.reply).not.toEqual(res2.reply);
     });
   });
 

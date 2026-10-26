@@ -627,7 +627,7 @@ export async function generateInterviewPrepDossier(
         model = model || 'gpt-4o-mini';
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'openai/gpt-oss-120b';
+        model = model || 'llama-3.3-70b-versatile';
       } else if (provider === 'cerebras') {
         baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
         model = model || 'llama3.3-70b';
@@ -759,23 +759,65 @@ Only include this JSON block if the candidate requested a modification to the de
     let rawReply = '';
     if (provider === 'gemini') {
       const model = getStoredModel() || 'gemini-2.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-      const geminiContents = messages.map((m) => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }],
-      }));
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+
+      const geminiContents: Array<{ role: 'user' | 'model'; parts: [{ text: string }] }> = [];
+      if (dossier.conversation && dossier.conversation.length > 0) {
+        for (const msg of dossier.conversation.slice(-6)) {
+          const role = msg.role === 'assistant' ? 'model' : 'user';
+          if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === role) {
+            geminiContents[geminiContents.length - 1].parts[0].text += `\n\n${msg.content}`;
+          } else {
+            geminiContents.push({ role, parts: [{ text: msg.content }] });
+          }
+        }
+      }
+      if (geminiContents.length > 0 && geminiContents[geminiContents.length - 1].role === 'user') {
+        geminiContents[geminiContents.length - 1].parts[0].text += `\n\n${userMessage}`;
+      } else {
+        geminiContents.push({ role: 'user', parts: [{ text: userMessage }] });
+      }
+
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: geminiContents }),
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: systemPrompt }] },
+          contents: geminiContents,
+          generationConfig: { temperature: 0.3 },
+        }),
       });
-      if (response.ok) {
-        const data = await response.json();
-        rawReply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`[AI Coach] Gemini error (${response.status}):`, errText);
+        throw new Error(`Gemini error (${response.status}): ${errText}`);
       }
+      const data = await response.json();
+      rawReply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
     } else if (provider === 'anthropic') {
       const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
       const endpoint = 'https://api.anthropic.com/v1/messages';
+
+      const anthropicMessages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+      if (dossier.conversation && dossier.conversation.length > 0) {
+        for (const msg of dossier.conversation.slice(-6)) {
+          if (anthropicMessages.length > 0 && anthropicMessages[anthropicMessages.length - 1].role === msg.role) {
+            anthropicMessages[anthropicMessages.length - 1].content += `\n\n${msg.content}`;
+          } else {
+            anthropicMessages.push({ role: msg.role, content: msg.content });
+          }
+        }
+      }
+      if (anthropicMessages.length > 0 && anthropicMessages[anthropicMessages.length - 1].role === 'user') {
+        anthropicMessages[anthropicMessages.length - 1].content += `\n\n${userMessage}`;
+      } else {
+        anthropicMessages.push({ role: 'user', content: userMessage });
+      }
+
+      if (anthropicMessages.length > 0 && anthropicMessages[0].role === 'assistant') {
+        anthropicMessages.unshift({ role: 'user', content: `Hello coach, let's discuss my preparation for ${dossier.company}.` });
+      }
+
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -788,16 +830,16 @@ Only include this JSON block if the candidate requested a modification to the de
           model,
           max_tokens: 2000,
           system: systemPrompt,
-          messages: messages.filter((m) => m.role !== 'system').map((m) => ({
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-          })),
+          messages: anthropicMessages,
         }),
       });
-      if (response.ok) {
-        const data = await response.json();
-        rawReply = data.content?.[0]?.text?.trim() || '';
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`[AI Coach] Anthropic error (${response.status}):`, errText);
+        throw new Error(`Anthropic error (${response.status}): ${errText}`);
       }
+      const data = await response.json();
+      rawReply = data.content?.[0]?.text?.trim() || '';
     } else {
       let baseUrl = getStoredBaseUrl();
       let model = getStoredModel();
@@ -806,7 +848,7 @@ Only include this JSON block if the candidate requested a modification to the de
         model = model || 'gpt-4o-mini';
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'openai/gpt-oss-120b';
+        model = model || 'llama-3.3-70b-versatile';
       } else if (provider === 'cerebras') {
         baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
         model = model || 'llama3.3-70b';
@@ -830,10 +872,13 @@ Only include this JSON block if the candidate requested a modification to the de
           temperature: 0.3,
         }),
       });
-      if (response.ok) {
-        const data = await response.json();
-        rawReply = data.choices?.[0]?.message?.content?.trim() || '';
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`[AI Coach] ${provider} error (${response.status}):`, errText);
+        throw new Error(`${provider} error (${response.status}): ${errText}`);
       }
+      const data = await response.json();
+      rawReply = data.choices?.[0]?.message?.content?.trim() || '';
     }
 
     if (!rawReply) {
@@ -871,8 +916,17 @@ Only include this JSON block if the candidate requested a modification to the de
     }
 
     return { reply: cleanReply, updatedCards };
-  } catch {
-    return generateHeuristicDialogueReply(dossier, userMessage, catalog, progressContext);
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    console.warn('[AI Coach] Dialogue request error, falling back:', errorMsg);
+    const fallback = generateHeuristicDialogueReply(dossier, userMessage, catalog, progressContext);
+    if (apiKey) {
+      return {
+        ...fallback,
+        reply: `*(Note: Live model request encountered an issue. Showing coaching guidance:)*\n\n${fallback.reply}`,
+      };
+    }
+    return fallback;
   }
 }
 
@@ -890,6 +944,7 @@ export function generateHeuristicDialogueReply(
 ): DialogueResponse {
   const msgLower = userMessage.toLowerCase();
 
+  // 1. Deck modification: Trimming / reducing cards
   if (/trim|reduce|cut|smaller|10 card|fewer/i.test(msgLower)) {
     const desiredMatch = msgLower.match(/\b([1-9]|1[0-9]|20)\b/);
     const desiredCount = desiredMatch ? parseInt(desiredMatch[1], 10) : 10;
@@ -905,6 +960,7 @@ export function generateHeuristicDialogueReply(
     };
   }
 
+  // 2. Deck modification: Adding more React / hooks cards
   if (/more react|hooks|component|custom hook/i.test(msgLower)) {
     const reactCards = catalog.filter(
       (c) =>
@@ -923,6 +979,68 @@ export function generateHeuristicDialogueReply(
     };
   }
 
+  // 3. Question predictions / what to expect in the interview rounds
+  if (/predict|question|expect|ask|interview loop|type of question|what kind/i.test(msgLower)) {
+    const topCards = dossier.selectedCards.slice(0, 3).map((c) => `\`${c.id}\``).join(', ');
+    return {
+      reply: `For **${dossier.company}**'s **${dossier.role}** technical interviews, interviewers typically structure coding screens around 3 core archetypes:
+
+1. **Live Component Construction & State Machines**: Rapid implementation of stateful interactive widgets from scratch within 35–45 minutes (e.g. ${topCards || 'compound widgets and async lists'}). They will watch whether you isolate state cleanly, avoid unnecessary re-renders, and manage cleanup lifecycles.
+2. **Async Orchestration & Data Plumbing**: Handling debounced search inputs, cancellation via \`AbortController\`, in-memory LRU caching, or resilient polling with backoff.
+3. **Accessibility (a11y) & Production Invariants**: Testing keyboard trap contracts (\`Escape\`, arrow navigation, roving tabindex), screen reader live announcements (\`aria-live\`), and input validation boundaries.
+
+💡 **Coach Tip:** Start each coding drill by clarifying boundary constraints (empty lists, extreme scale, error states) before typing any implementation code!`,
+    };
+  }
+
+  // 4. External resources / study allocation / books / documentation
+  if (/resource|external|spend|time|read|book|study|doc|where should i/i.test(msgLower)) {
+    const topicsList = (dossier.externalTopics || [])
+      .slice(0, 3)
+      .map((t) => `- **${t.topic}** (${t.priority.toUpperCase()} priority): ${t.description}`)
+      .join('\n');
+
+    const toolsList = (dossier.interactiveTools || [])
+      .slice(0, 3)
+      .map((tool) => `- [${tool.name}](${tool.url}): ${tool.focus}`)
+      .join('\n');
+
+    return {
+      reply: `Here is the recommended study time breakdown for your **${dossier.company}** interview:
+
+⏱️ **Recommended Time Allocation:**
+- **50% Flashcard Coding Drills (Trainer):** Practice your customized ${dossier.selectedCards.length}-card deck under strict 20-minute timers. Aim to reproduce solutions cold without looking at reference implementations.
+- **30% Architecture & Non-Flashcard Topics:**
+${topicsList || '- Frontend System Design & Micro-frontends\n- Web Performance & Core Web Vitals'}
+- **20% Interactive Layout Fluency & Speed:**
+${toolsList || '- Flexbox Froggy & CSSBattle for layout speed'}
+
+Prioritize the HIGH-priority external topics above first, especially topics not covered by 30-minute flashcard coding exercises!`,
+    };
+  }
+
+  // 5. Company evaluation rubric / culture / archetypes
+  if (/culture|archetype|rubric|value|evaluate|grading|signal/i.test(msgLower)) {
+    return {
+      reply: `At **${dossier.company}**, candidates for **${dossier.role}** are evaluated against 4 primary signals:
+1. **Architectural Clarity:** Can you articulate *why* you chose a particular data structure or state shape before writing code?
+2. **Cold-Start Speed:** Can you scaffold TypeScript interfaces, error guards, and core loop logic without relying on Google or AI autocompletion?
+3. **Resilience & Defensive Coding:** Do you account for async race conditions, unmounted state updates, and boundary edge cases?
+4. **Communication & Collaboration:** Do you think aloud, communicate trade-offs, and treat the interviewer as a peer engineer?`,
+    };
+  }
+
+  // 6. Countdown checklist / final hours before the interview
+  if (/checklist|countdown|timer|24 hour|day of|tip|advice/i.test(msgLower)) {
+    const checklistItems = (dossier.countdownChecklist || [])
+      .map((item, idx) => `${idx + 1}. ${item}`)
+      .join('\n');
+    return {
+      reply: `Here is your targeted countdown checklist for **${dossier.company}**:\n\n${checklistItems || '1. Review Box 1 setbacks\n2. Clarify requirements upfront\n3. Test camera and CoderPad environment'}`,
+    };
+  }
+
+  // 7. Progress inquiry
   if (/progress|mastered|leitner|box|status|how am i doing/i.test(msgLower) && progressContext) {
     const totalPracticed =
       progressContext.box1Count + progressContext.box2Count + progressContext.box3PlusCount;
@@ -937,8 +1055,16 @@ export function generateHeuristicDialogueReply(
     };
   }
 
+  // 8. Dynamic fallback addressing user question directly
   return {
-    reply: `Understood! For ${dossier.company}'s ${dossier.role} technical screening, interviewers look closely for three core signals: (1) structured state architecture without unnecessary re-renders, (2) explicit accessibility semantics (ARIA roles & keyboard navigation), and (3) clean boundary handling for async states. Focus your drills on reproducing solutions cold under a 20-minute timer. Let me know if you'd like to adjust card selections or need specific strategy for any drill!`,
+    reply: `Regarding "${userMessage.trim()}": For your upcoming **${dossier.company}** (${dossier.role}) technical screening, keep your daily preparation anchored to the ${dossier.selectedCards.length} cards in this curriculum. 
+
+Focus especially on:
+1. Writing solutions cold from scratch without reference peeks.
+2. Explaining time and space complexity upfront before typing.
+3. Specifying explicit TypeScript interfaces and accessibility semantics.
+
+Feel free to ask me to modify your curriculum (e.g. "trim deck to 10 cards" or "add more react hooks"), ask about specific external topics, or report your Leitner box retention progress as you practice!`,
   };
 }
 
