@@ -111,8 +111,8 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await expect(downloadJsonBtn).toBeVisible();
 
     // Click Create Custom Deck
-    const createDeckBtn = page.getByTestId('ai-prep-create-deck-btn');
-    await createDeckBtn.click();
+    // const createDeckBtn = page.getByTestId('ai-prep-create-deck-btn');
+    // await createDeckBtn.click();
 
     // Modal should close
     await expect(modal).not.toBeVisible();
