@@ -2,8 +2,8 @@ import React from 'react';
 
 export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
   const parts: React.ReactNode[] = [];
-  // Match `inline code`, **bold**, *italic*, _italic_
-  const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_)/g;
+  // Match `inline code`, **bold**, *italic*, _italic_, <br>
+  const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_|<br\s*\/?>)/gi;
   let lastIdx = 0;
   let match: RegExpExecArray | null;
 
@@ -58,6 +58,8 @@ export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
           token.slice(1, -1)
         )
       );
+    } else if (token.toLowerCase().startsWith('<br')) {
+      parts.push(React.createElement('br', { key: match.index }));
     }
     lastIdx = regex.lastIndex;
   }
@@ -78,7 +80,28 @@ export type LineGroup =
   | { type: 'heading'; level: number; text: string }
   | { type: 'ul'; items: MarkdownListItem[] }
   | { type: 'ol'; items: MarkdownListItem[] }
+  | { type: 'table'; headers: string[]; rows: string[][] }
   | { type: 'text'; lines: string[] };
+
+const isTableDelimiter = (line: string): boolean => {
+  const trimmed = line.trim();
+  if (!trimmed.includes('|') && !trimmed.includes('-')) return false;
+  const cells = trimmed
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map((c) => c.trim());
+  return cells.length > 0 && cells.every((c) => /^:?-+:?$/.test(c));
+};
+
+const parseTableRow = (line: string): string[] => {
+  return line
+    .trim()
+    .replace(/^\|/, '')
+    .replace(/\|$/, '')
+    .split('|')
+    .map((c) => c.trim());
+};
 
 export const parseParagraphLines = (para: string): LineGroup[] => {
   const lines = para.split('\n');
@@ -87,9 +110,33 @@ export const parseParagraphLines = (para: string): LineGroup[] => {
   let ulStack: { indent: number; item: MarkdownListItem }[] = [];
   let olStack: { indent: number; item: MarkdownListItem }[] = [];
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmed = line.trim();
     if (!trimmed) continue;
+
+    // Check for Markdown Table: current line has '|' and next line is a delimiter row
+    if (
+      i + 1 < lines.length &&
+      trimmed.includes('|') &&
+      isTableDelimiter(lines[i + 1])
+    ) {
+      ulStack = [];
+      olStack = [];
+      const headers = parseTableRow(line);
+      i++; // advance past delimiter
+      const rows: string[][] = [];
+      while (i + 1 < lines.length && lines[i + 1].trim().includes('|')) {
+        i++;
+        rows.push(parseTableRow(lines[i]));
+      }
+      groups.push({
+        type: 'table',
+        headers,
+        rows,
+      });
+      continue;
+    }
 
     // Heading (#, ##, ###, ####, #####, ######)
     const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);

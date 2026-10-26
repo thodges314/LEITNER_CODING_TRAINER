@@ -195,6 +195,82 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
                       return renderOrderedList(group.items, 0, gIdx);
                     }
 
+                    if (group.type === 'table') {
+                      return (
+                        <div
+                          key={gIdx}
+                          className="markdown-table-wrapper"
+                          style={{
+                            overflowX: 'auto',
+                            margin: '8px 0',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.12))',
+                          }}
+                        >
+                          <table
+                            className="markdown-table"
+                            style={{
+                              width: '100%',
+                              borderCollapse: 'collapse',
+                              fontSize: '12px',
+                              lineHeight: 1.5,
+                              textAlign: 'left',
+                            }}
+                          >
+                            <thead>
+                              <tr
+                                style={{
+                                  background: 'var(--bg-surface-elevated, rgba(255, 255, 255, 0.05))',
+                                  borderBottom: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.15))',
+                                }}
+                              >
+                                {group.headers.map((h, hIdx) => (
+                                  <th
+                                    key={hIdx}
+                                    style={{
+                                      padding: '8px 12px',
+                                      fontWeight: 600,
+                                      color: 'var(--text-primary)',
+                                      whiteSpace: 'nowrap',
+                                    }}
+                                  >
+                                    {renderInlineMarkdown(h)}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {group.rows.map((row, rIdx) => (
+                                <tr
+                                  key={rIdx}
+                                  style={{
+                                    borderBottom:
+                                      rIdx < group.rows.length - 1
+                                        ? '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))'
+                                        : 'none',
+                                    background: rIdx % 2 === 1 ? 'rgba(255, 255, 255, 0.02)' : 'transparent',
+                                  }}
+                                >
+                                  {row.map((cell, cIdx) => (
+                                    <td
+                                      key={cIdx}
+                                      style={{
+                                        padding: '8px 12px',
+                                        verticalAlign: 'top',
+                                        color: 'var(--text-primary)',
+                                      }}
+                                    >
+                                      {renderInlineMarkdown(cell)}
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      );
+                    }
+
                     return (
                       <div key={gIdx} style={{ lineHeight: 1.62 }}>
                         {group.lines.map((line, lIdx) => (

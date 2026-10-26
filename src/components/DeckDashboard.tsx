@@ -20,6 +20,9 @@ import {
   Plus,
   Sparkles,
   X,
+  Printer,
+  Calendar,
+  Trash2,
 } from 'lucide-react';
 import {
   loadDeckCatalogPreferences,
@@ -33,18 +36,41 @@ import {
   CatalogControls,
   CatalogTable,
   DeactivateModal,
+  DeckSelector,
 } from './dashboard';
+import { filterCardsByDeck } from '../lib/decks';
+import type { CustomDeck } from '../lib/decks';
+import {
+  getInterviewDossier,
+  deleteInterviewDossier,
+  type CatalogIndexEntry,
+} from '../lib/interviewPrep';
+import { printInterviewDossier } from '../lib/printDossier';
+import catalogIndexData from '../data/catalogIndex.json';
+
+const catalogIndex = catalogIndexData as CatalogIndexEntry[];
 
 export type { CatalogSortOption, CatalogStatusFilter };
 
 interface DeckDashboardProps {
   state: LeitnerDeckState;
   theme?: AppTheme;
+  activeDeckId?: string;
+  onSelectDeck?: (deckId: string) => void;
+  customDecks?: CustomDeck[];
   onSelectCardToPractice: (card: TopicItem) => void;
   onToggleLock: (topicId: string, currentStatus: 'active' | 'locked') => void;
   onResetBox: (topicId: string) => void;
   onDeleteTopic?: (topicId: string) => void;
   onToggleDeactivate?: (topicId: string) => void;
+  onRemoveFromDeck?: (topic: TopicItem) => void;
+  onCreateCustomDeckClick?: () => void;
+  onDeleteCustomDeck?: (deckId: string) => void;
+  onAddCardsToDeck?: (deckId: string, cardIds: string[]) => void;
+  onOpenCreateDeckWithCards?: (cardIds: string[]) => void;
+  onTailorWithAIClick?: () => void;
+  onOpenInterviewPrepDossier?: (dossierId?: string, step?: 'input' | 'review') => void;
+  onDeleteInterviewDossier?: (dossierId: string) => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
   onOpenAddModal: () => void;
   /** Opens the Focus dialog (used by the one-time hint under the track filter). */
@@ -56,11 +82,22 @@ interface DeckDashboardProps {
 export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   state,
   theme,
+  activeDeckId = 'full-library',
+  onSelectDeck = () => {},
+  customDecks = [],
   onSelectCardToPractice,
   onToggleLock,
   onResetBox,
   onDeleteTopic,
   onToggleDeactivate,
+  onRemoveFromDeck,
+  onCreateCustomDeckClick,
+  onDeleteCustomDeck,
+  onAddCardsToDeck,
+  onOpenCreateDeckWithCards,
+  onTailorWithAIClick,
+  onOpenInterviewPrepDossier,
+  onDeleteInterviewDossier,
   onStateUpdated,
   onOpenAddModal,
   onOpenFocus,
@@ -68,12 +105,24 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onDismissHighlightExport,
 }) => {
   const isLight = theme === 'apple-gsos';
+  const allVisibleCards = useMemo(() => visibleTopics(state), [state]);
+  const topics = useMemo(
+    () => filterCardsByDeck(allVisibleCards, activeDeckId, customDecks),
+    [allVisibleCards, activeDeckId, customDecks]
+  );
+
+  const activeCustom = customDecks.find((d) => d.id === activeDeckId);
+  const linkedDossier = useMemo(() => {
+    return (activeCustom?.dossierId ? getInterviewDossier(activeCustom.dossierId) : null)
+      || (activeDeckId ? getInterviewDossier(activeDeckId) : null);
+  }, [activeCustom, activeDeckId]);
+
   const allAvailableTracks = useMemo(
     () =>
-      Array.from(new Set(visibleTopics(state).map((t) => t.track))).sort((a, b) =>
+      Array.from(new Set(topics.map((t) => t.track))).sort((a, b) =>
         getTrackMeta(a).label.localeCompare(getTrackMeta(b).label)
       ),
-    [state]
+    [topics]
   );
 
   const initialPrefs = useMemo(() => {
@@ -109,7 +158,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
   const { totalCompletedReviews, unlockedStageCount = 0 } = state;
-  const topics = visibleTopics(state); // cards of disabled optional packs are hidden
 
   const isAllTracks =
     selectedTracks.includes('all') ||
@@ -591,17 +639,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         />
       </div>
 
-      {/* Leitner Box Breakdown Strip */}
-      <TierFilterBar
-        tierName={tierName}
-        selectedBox={selectedBox}
-        displayedBoxes={displayedBoxes}
-        boxCounts={boxCounts}
-        algorithm={algorithm}
-        onToggleBox={handleToggleBox}
-        onResetBoxes={() => setSelectedBox('all')}
-      />
-
       {/* Track Filters (Multi-Select with 'All Topics') */}
       <TopicFilterBar
         allAvailableTracks={allAvailableTracks}
@@ -614,6 +651,103 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onResetTracks={() => setSelectedTracks(['all'])}
         onDismissHint={() => setShowTrackHint(false)}
         onOpenFocus={onOpenFocus}
+      />
+
+      {/* Active Interview Strategy Briefing Banner */}
+      {linkedDossier && (
+        <div className="glass-panel active-strategy-briefing-banner" data-testid="active-strategy-briefing-banner">
+          <div className="strategy-banner-left">
+            <div className="strategy-banner-tag">
+              <Sparkles size={13} />
+              <span>Active Interview Strategy Briefing</span>
+            </div>
+            <h3 className="strategy-banner-title">
+              {linkedDossier.company} — {linkedDossier.role}
+              {linkedDossier.targetDate && (
+                <span className="strategy-target-date">
+                  <Calendar size={13} />
+                  <span>Target: {linkedDossier.targetDate}</span>
+                </span>
+              )}
+            </h3>
+            <p className="strategy-banner-desc">
+              {linkedDossier.executiveSummary.split('\n\n')[0]}
+            </p>
+            <div className="strategy-banner-metrics">
+              <span className="strategy-metric-pill">
+                <strong>{topics.length}</strong> Cards in Curriculum
+              </span>
+              <span className="strategy-metric-pill">
+                <strong>{topics.filter((t) => t.box >= 3).length}</strong> High Retention (B3+)
+              </span>
+              <span className="strategy-metric-pill">
+                <strong>{topics.filter((t) => t.box === 1).length}</strong> Needs Practice (B1)
+              </span>
+            </div>
+          </div>
+          <div className="strategy-banner-right">
+            <button
+              type="button"
+              className="btn btn-primary strategy-open-btn"
+              onClick={() => onOpenInterviewPrepDossier?.(linkedDossier.id, 'review')}
+              data-testid="strategy-banner-open-copilot-btn"
+            >
+              <Sparkles size={14} />
+              <span>Open Strategy & Coach</span>
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary strategy-print-btn"
+              onClick={() => printInterviewDossier(linkedDossier, catalogIndex)}
+              data-testid="strategy-banner-print-btn"
+            >
+              <Printer size={14} />
+              <span>Print Briefing</span>
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary strategy-delete-btn"
+              onClick={() => {
+                deleteInterviewDossier(linkedDossier);
+                if (linkedDossier.id) onDeleteInterviewDossier?.(linkedDossier.id);
+                if (activeCustom?.dossierId) {
+                  deleteInterviewDossier(activeCustom.dossierId);
+                  onDeleteInterviewDossier?.(activeCustom.dossierId);
+                }
+                if (activeDeckId) {
+                  deleteInterviewDossier(activeDeckId);
+                }
+              }}
+              title="Delete this interview briefing and unlink it from this deck"
+              data-testid="strategy-banner-delete-btn"
+            >
+              <Trash2 size={14} />
+              <span>Delete Briefing</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Deck Selector via Dropdown (above Active Spacing Tiers, below Filter Topics) */}
+      <DeckSelector
+        activeDeckId={activeDeckId}
+        allCards={allVisibleCards}
+        onSelectDeck={onSelectDeck}
+        customDecks={customDecks}
+        onCreateCustomDeckClick={onCreateCustomDeckClick}
+        onDeleteCustomDeck={onDeleteCustomDeck}
+        onTailorWithAIClick={onTailorWithAIClick}
+      />
+
+      {/* Leitner Box Breakdown Strip */}
+      <TierFilterBar
+        tierName={tierName}
+        selectedBox={selectedBox}
+        displayedBoxes={displayedBoxes}
+        boxCounts={boxCounts}
+        algorithm={algorithm}
+        onToggleBox={handleToggleBox}
+        onResetBoxes={() => setSelectedBox('all')}
       />
 
       {/* Search, Filter & Sort Controls Bar */}
@@ -644,8 +778,12 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onResetBox={onResetBox}
         onToggleLock={onToggleLock}
         onDeactivateClick={setTopicToDeactivate}
+        onRemoveFromDeck={onRemoveFromDeck}
         onToggleDeactivate={onToggleDeactivate}
         onDeleteTopic={onDeleteTopic}
+        customDecks={customDecks}
+        onAddCardsToDeck={onAddCardsToDeck}
+        onOpenCreateDeckWithCards={onOpenCreateDeckWithCards}
       />
 
       {/* Lightweight Deactivate Confirmation Modal */}

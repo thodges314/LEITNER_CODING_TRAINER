@@ -134,6 +134,38 @@ for (const t of topics) {
 }
 const output = JSON.stringify(topics, null, 2) + '\n';
 
+function extractCardSummary(prompt, title) {
+  if (!prompt) return title;
+  const cleaned = prompt.replace(/^```ts[\s\S]*?```\s*/, '').trim();
+  const lines = cleaned.split('\n').map((l) => l.trim()).filter(Boolean);
+  for (const line of lines) {
+    if (line.startsWith('#')) continue;
+    let s = line.replace(/^[*-]\s+/, '').replace(/`/g, '');
+    if (s.endsWith(':')) s = s.slice(0, -1);
+    if (s.length > 10) {
+      return s.length > 150 ? s.slice(0, 147) + '...' : s;
+    }
+  }
+  return title;
+}
+
+const catalogIndex = topics.map((t) => ({
+  id: t.id,
+  title: t.title,
+  track: t.track,
+  concept: t.concept,
+  difficulty: t.difficulty,
+  tags: t.tags || [],
+  summary: extractCardSummary(t.promptSeed, t.title),
+}));
+
+const indexFile = path.join(here, '..', 'src/data/catalogIndex.json');
+const indexOutput = JSON.stringify(catalogIndex, null, 2) + '\n';
+let indexCommittedText = '';
+if (fs.existsSync(indexFile)) {
+  indexCommittedText = fs.readFileSync(indexFile, 'utf8');
+}
+
 if (process.argv.includes('--check')) {
   // Read-only: report cards whose committed topics.json entry differs from a fresh build. Never writes.
   const committed = JSON.parse(committedText);
@@ -150,13 +182,23 @@ if (process.argv.includes('--check')) {
     if (diff.length) stale.push(`${t.id} (${diff.join(', ')})`);
   }
   for (const id of byId.keys()) if (!topics.some((t) => t.id === id)) stale.push(`${id} (in topics.json but no source)`);
-  if (stale.length === 0 && output === committedText) {
-    console.log('topics.json is up to date.');
+  const indexStale = indexOutput !== indexCommittedText;
+
+  if (stale.length === 0 && output === committedText && !indexStale) {
+    console.log('topics.json and catalogIndex.json are up to date.');
     process.exit(0);
   }
-  console.error(`topics.json is STALE for ${stale.length} card(s). Run: npm run build:cards\n  ` + (stale.join('\n  ') || '(formatting only)'));
+  const errors = [];
+  if (stale.length > 0 || output !== committedText) {
+    errors.push(`topics.json is STALE for ${stale.length} card(s).\n  ` + (stale.join('\n  ') || '(formatting only)'));
+  }
+  if (indexStale) {
+    errors.push('catalogIndex.json is STALE or missing.');
+  }
+  console.error(errors.join('\n') + '\nRun: npm run build:cards');
   process.exit(1);
 }
 
 fs.writeFileSync(file, output);
-console.log(`built ${topics.length} cards, ${n} test cases`);
+fs.writeFileSync(indexFile, indexOutput);
+console.log(`built ${topics.length} cards, ${n} test cases, and catalogIndex.json (${catalogIndex.length} indexed cards)`);

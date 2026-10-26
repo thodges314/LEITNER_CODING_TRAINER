@@ -337,7 +337,7 @@
   },
   "tree-depth-sum": {
     "difficulty": 1,
-    "concept": "trees"
+    "concept": "advanced-trees"
   },
   "interval-overlap": {
     "difficulty": 2,
@@ -685,11 +685,11 @@
   },
   "min-window-permutation": {
     "difficulty": 3,
-    "concept": "sliding-window"
+    "concept": "advanced-sliding-window"
   },
   "window-replacement-ones": {
     "difficulty": 3,
-    "concept": "sliding-window"
+    "concept": "advanced-sliding-window"
   },
   "strings-basics": {
     "difficulty": 1,
@@ -697,11 +697,11 @@
   },
   "longest-palindrome-substring": {
     "difficulty": 3,
-    "concept": "strings"
+    "concept": "advanced-strings"
   },
   "string-arithmetic": {
     "difficulty": 3,
-    "concept": "strings"
+    "concept": "advanced-strings"
   },
   "word-break-decode": {
     "difficulty": 3,
@@ -721,15 +721,15 @@
   },
   "tree-level-order": {
     "difficulty": 2,
-    "concept": "trees"
+    "concept": "advanced-trees"
   },
   "tree-path-sum": {
     "difficulty": 2,
-    "concept": "trees"
+    "concept": "advanced-trees"
   },
   "tree-diameter-balanced": {
     "difficulty": 3,
-    "concept": "trees"
+    "concept": "advanced-trees"
   },
   "bst-kth-insert-build": {
     "difficulty": 3,
@@ -737,11 +737,11 @@
   },
   "tree-build-serialize": {
     "difficulty": 4,
-    "concept": "trees"
+    "concept": "advanced-trees"
   },
   "tree-max-path-sum": {
     "difficulty": 4,
-    "concept": "trees"
+    "concept": "advanced-trees"
   },
   "list-remove-reorder": {
     "difficulty": 2,
@@ -749,11 +749,11 @@
   },
   "list-add-numbers": {
     "difficulty": 3,
-    "concept": "linked-lists"
+    "concept": "advanced-linked-lists"
   },
   "list-reverse-k-group": {
     "difficulty": 4,
-    "concept": "linked-lists"
+    "concept": "advanced-linked-lists"
   },
   "heap-kth-largest": {
     "difficulty": 2,

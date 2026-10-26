@@ -12,7 +12,7 @@ if (!apiKey) {
   console.error('  GROQ_API_KEY=your_key node scripts/enrich-complexities.mjs');
   process.exit(1);
 }
-const model = 'openai/gpt-oss-120b';
+const model = 'llama-3.3-70b-versatile';
 
 const topics = JSON.parse(fs.readFileSync(topicsPath, 'utf8'));
 

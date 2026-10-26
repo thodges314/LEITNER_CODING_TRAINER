@@ -7,6 +7,7 @@ import {
   Play,
   Send,
   SkipForward,
+  FolderMinus,
   Loader2,
   AlertTriangle,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ export interface EditorToolbarProps {
   onFormatCode: () => void;
   onResetStarter: () => void;
   onClearBuffer: () => void;
+  onOpenInterviewStrategy?: () => void;
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
@@ -31,6 +33,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onFormatCode,
   onResetStarter,
   onClearBuffer,
+  onOpenInterviewStrategy,
 }) => {
   return (
     <>
@@ -87,6 +90,20 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
               <Eraser size={12} /> Clear
             </button>
           )}
+
+          {/* Open Interview Strategy & AI Coach */}
+          {onOpenInterviewStrategy && (
+            <button
+              type="button"
+              onClick={onOpenInterviewStrategy}
+              className="arena-editor-btn-text"
+              title="Open Interview Prep Strategy & AI Coach (Review briefing, checklist & dialogue)"
+              data-testid="arena-editor-strategy-btn"
+            >
+              <Sparkles size={12} color="var(--accent-purple)" />
+              <span>Strategy</span>
+            </button>
+          )}
         </div>
       </div>
     </>
@@ -100,6 +117,7 @@ export interface EditorActionControlsProps {
   tsOnlyNotice: boolean;
   onSwitchExecutionMode: (mode: 'js' | 'ts') => void;
   onSkip: () => void;
+  onRemoveFromDeck?: () => void;
   onRunCode: () => void;
   onSubmit: () => void;
   isEvaluating: boolean;
@@ -115,6 +133,7 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
   tsOnlyNotice,
   onSwitchExecutionMode,
   onSkip,
+  onRemoveFromDeck,
   onRunCode,
   onSubmit,
   isEvaluating,
@@ -174,18 +193,33 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
         </div>
       </div>
 
-      {/* Primary Action Buttons: Skip, Run Code, Submit */}
+      {/* Primary Action Buttons: Skip, Remove From Deck, Run Code, Submit */}
       {!evalResult && (
         <>
           <div className="arena-controls-bar">
-            <button
-              type="button"
-              className="btn btn-outline arena-controls-btn-skip"
-              onClick={onSkip}
-              disabled={isEvaluating || isRunning}
-            >
-              <SkipForward size={15} /> Skip Card
-            </button>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button
+                type="button"
+                className="btn btn-outline arena-controls-btn-skip"
+                onClick={onSkip}
+                disabled={isEvaluating || isRunning}
+              >
+                <SkipForward size={15} /> Skip Card
+              </button>
+
+              {onRemoveFromDeck && (
+                <button
+                  type="button"
+                  className="btn btn-outline arena-controls-btn-remove-deck"
+                  onClick={onRemoveFromDeck}
+                  disabled={isEvaluating || isRunning}
+                  title="Remove this card from current deck"
+                  data-testid="arena-remove-from-deck-btn"
+                >
+                  <FolderMinus size={15} /> Remove From Deck
+                </button>
+              )}
+            </div>
 
             <div className="arena-controls-btn-group">
               {/* Secondary Button: Run Code / Test */}

@@ -46,11 +46,13 @@ interface PracticeArenaProps {
   onRecordReview?: (passed: boolean) => void;
   onOverrideReview?: (passed: boolean) => void;
   onSkipCard: () => void;
+  onRemoveFromDeck?: (topic: TopicItem) => void;
   onOpenDeckView: () => void;
   onOpenSettings?: (section?: 'ai') => void;
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
   theme?: 'dark' | 'apple-gsos';
+  onOpenInterviewStrategy?: () => void;
 }
 
 export const PracticeArena: React.FC<PracticeArenaProps> = ({
@@ -62,11 +64,13 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   onRecordReview,
   onOverrideReview,
   onSkipCard,
+  onRemoveFromDeck,
   onOpenDeckView,
   onOpenSettings,
   isReinforcement,
   onFinishReinforcement,
   theme = 'dark',
+  onOpenInterviewStrategy,
 }) => {
   const [activeCardId, setActiveCardId] = useState(() => currentCard?.id);
   const [cardSnapshot, setCardSnapshot] = useState<TopicItem | null>(() => currentCard);
@@ -776,6 +780,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             setMountedComponent(null);
           }}
           onClearBuffer={() => setCode('')}
+          onOpenInterviewStrategy={onOpenInterviewStrategy}
         />
 
         {/* CodeMirror 6 Editor with Rainbow Brackets & Cold-Start Mode */}
@@ -806,6 +811,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             tsOnlyNotice={tsOnlyNotice}
             onSwitchExecutionMode={handleSwitchExecutionMode}
             onSkip={handleSkip}
+            onRemoveFromDeck={onRemoveFromDeck && currentCard ? () => onRemoveFromDeck(currentCard) : undefined}
             onRunCode={handleRunCode}
             onSubmit={handleSubmit}
             isEvaluating={isEvaluating}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   loadDeckState,
   saveDeckState,
@@ -14,9 +14,7 @@ import {
   EMPTY_FILTER,
   isFilterActive,
   scheduleFilter,
-  CARD_PACKS,
   visibleTopics,
-  setEnabledPacks,
   setPracticeFilter,
   savePreset,
   deletePreset,
@@ -35,8 +33,20 @@ import { getStoredApiKey, getStoredProvider, getStoredModel } from './lib/ai';
 import { clearDraft, clearAllDrafts } from './lib/drafts';
 import { getStoredTheme, setStoredTheme, applyThemeToDocument } from './lib/theme';
 import type { AppTheme } from './lib/theme';
+import {
+  filterCardsByDeck,
+  getStoredActiveDeckId,
+  setStoredActiveDeckId,
+  getStoredCustomDecks,
+  setStoredCustomDecks,
+  getBuiltInDeck,
+  getDeckName,
+} from './lib/decks';
+import type { CustomDeck } from './lib/decks';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
+import { RemoveFromDeckModal, CreateDeckModal, InterviewPrepModal } from './components/dashboard';
+import { getAllSavedDossiers } from './lib/interviewPrep';
 import { AddTopicModal } from './components/AddTopicModal';
 import { FEATURES } from './lib/features';
 import { SettingsModal } from './components/SettingsModal';
@@ -110,7 +120,43 @@ export function App() {
   const filter = deckState.practiceFilter ?? EMPTY_FILTER;
   const filterActive = isFilterActive(filter);
   const algorithm = getSchedulingAlgorithm(deckState);
-  const shownTopics = visibleTopics(deckState); // cards of disabled optional packs are hidden everywhere
+
+  // Active study deck selection
+  const [activeDeckId, setActiveDeckId] = useState<string>(() => getStoredActiveDeckId());
+  const [customDecks, setCustomDecks] = useState<CustomDeck[]>(() => getStoredCustomDecks());
+  const [isRemoveFromDeckModalOpen, setIsRemoveFromDeckModalOpen] = useState(false);
+  const [cardPendingRemoval, setCardPendingRemoval] = useState<TopicItem | null>(null);
+  const [isCreateDeckModalOpen, setIsCreateDeckModalOpen] = useState(false);
+  const [initialCardsForNewDeck, setInitialCardsForNewDeck] = useState<string[]>([]);
+  const [isInterviewPrepModalOpen, setIsInterviewPrepModalOpen] = useState(false);
+  const [selectedDossierId, setSelectedDossierId] = useState<string | undefined>(undefined);
+  const [interviewPrepStep, setInterviewPrepStep] = useState<'input' | 'review' | undefined>(undefined);
+
+  const savedDossiersCount = useMemo(() => {
+    return isInterviewPrepModalOpen ? getAllSavedDossiers().length : getAllSavedDossiers().length;
+  }, [isInterviewPrepModalOpen]);
+
+  const handleOpenInterviewPrep = (dossierId?: string, step?: 'input' | 'review') => {
+    setSelectedDossierId(dossierId);
+    setInterviewPrepStep(step);
+    setIsInterviewPrepModalOpen(true);
+  };
+
+  const currentBox1CardIds = useMemo(() => {
+    return deckState.topics.filter((t) => t.box === 1).map((t) => t.id);
+  }, [deckState.topics]);
+
+  const handleSelectDeck = (deckId: string) => {
+    setActiveDeckId(deckId);
+    setStoredActiveDeckId(deckId);
+    setSelectedCardId(null);
+    setReinforcingCardId(null);
+  };
+
+  const shownTopics = useMemo<TopicItem[]>(
+    () => filterCardsByDeck(visibleTopics(deckState), activeDeckId, customDecks),
+    [deckState, activeDeckId, customDecks]
+  );
 
   // Unlocked notification toast
   const [unlockToast, setUnlockToast] = useState<string | null>(null);
@@ -129,8 +175,9 @@ export function App() {
       const found = shownTopics.find((t) => t.id === selectedCardId && t.status === 'active');
       if (found) return found;
     }
+    const deckCards = filterCardsByDeck(deckState.topics, activeDeckId, customDecks);
     return getNextCard(
-      deckState.topics,
+      deckCards,
       deckState.totalCompletedReviews,
       deckState.lastReviewedTrack,
       undefined,
@@ -216,8 +263,9 @@ export function App() {
 
     // Cold-start review passed: clear any reinforcement drill state and advance
     setReinforcingCardId(null);
+    const candidates = filterCardsByDeck(currentState.topics, activeDeckId, customDecks);
     const next = getNextCard(
-      currentState.topics,
+      candidates,
       currentState.totalCompletedReviews,
       trackToAdvance,
       currentCard.id,
@@ -235,8 +283,9 @@ export function App() {
     setCardSnapshotBeforeReview(null);
     setPracticeSessionKey((k) => k + 1);
     setReinforcingCardId(null);
+    const candidates = filterCardsByDeck(deckState.topics, activeDeckId, customDecks);
     const next = getNextCard(
-      deckState.topics,
+      candidates,
       deckState.totalCompletedReviews,
       currentCard.track,
       currentCard.id,
@@ -253,8 +302,9 @@ export function App() {
     setCardSnapshotBeforeReview(null);
     setPracticeSessionKey((k) => k + 1);
     setReinforcingCardId(null);
+    const candidates = filterCardsByDeck(deckState.topics, activeDeckId, customDecks);
     const next = getNextCard(
-      deckState.topics,
+      candidates,
       deckState.totalCompletedReviews,
       currentCard.track,
       currentCard.id,
@@ -265,18 +315,153 @@ export function App() {
     setSelectedCardId(next?.id ?? null);
   };
 
-  const handlePacksChange = (packs: string[]) => {
-    setDeckState(setEnabledPacks(deckState, packs));
-    setSelectedCardId(null);
+  const handleInitiateRemoveFromDeck = (card: TopicItem) => {
+    const isBuiltIn = Boolean(getBuiltInDeck(activeDeckId));
+    if (isBuiltIn) {
+      setCardPendingRemoval(card);
+      setIsRemoveFromDeckModalOpen(true);
+    } else {
+      const updatedCustomDecks = customDecks.map((d) => {
+        if (d.id === activeDeckId) {
+          return {
+            ...d,
+            cardIds: d.cardIds.filter((id) => id !== card.id),
+            updatedAt: Date.now(),
+          };
+        }
+        return d;
+      });
+      setCustomDecks(updatedCustomDecks);
+      setStoredCustomDecks(updatedCustomDecks);
+
+      if (activeView === 'practice' && currentCard?.id === card.id) {
+        handleSkipCard();
+      }
+      setUnlockToast(`Removed "${card.title}" from ${getDeckName(activeDeckId, customDecks)}`);
+    }
   };
 
-  const packSummary = Object.entries(CARD_PACKS).map(([id, meta]) => ({
-    id,
-    label: meta.label,
-    description: meta.description,
-    count: deckState.topics.filter((t) => t.pack === id).length,
-    enabled: (deckState.enabledPacks ?? []).includes(id),
-  }));
+  const handleConfirmForkAndRemove = (cardId: string, newDeckName: string) => {
+    const presetCards = filterCardsByDeck(deckState.topics, activeDeckId, customDecks);
+    const remainingIds = presetCards.map((c) => c.id).filter((id) => id !== cardId);
+
+    const newCustomDeck: CustomDeck = {
+      id: `custom-${Date.now()}`,
+      name: newDeckName,
+      description: `Personal copy forked from ${getDeckName(activeDeckId, customDecks)}`,
+      cardIds: remainingIds,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    const updatedCustomDecks = [...customDecks, newCustomDeck];
+    setCustomDecks(updatedCustomDecks);
+    setStoredCustomDecks(updatedCustomDecks);
+
+    handleSelectDeck(newCustomDeck.id);
+
+    if (activeView === 'practice' && currentCard?.id === cardId) {
+      handleSkipCard();
+    }
+
+    const removedCard = deckState.topics.find((t) => t.id === cardId);
+    setUnlockToast(`Created "${newDeckName}" without "${removedCard?.title ?? cardId}"`);
+    setIsRemoveFromDeckModalOpen(false);
+    setCardPendingRemoval(null);
+  };
+
+  const handleCreateCustomDeck = (
+    name: string,
+    description?: string,
+    cardIds: string[] = [],
+    dossierId?: string
+  ) => {
+    if (dossierId) {
+      const existing = customDecks.find((d) => d.dossierId === dossierId);
+      if (existing) {
+        const updated = customDecks.map((d) =>
+          d.id === existing.id
+            ? { ...d, name, description, cardIds, updatedAt: Date.now() }
+            : d
+        );
+        setCustomDecks(updated);
+        setStoredCustomDecks(updated);
+        handleSelectDeck(existing.id);
+        setUnlockToast(`Updated custom deck "${name}" with ${cardIds.length} cards.`);
+        setIsCreateDeckModalOpen(false);
+        setInitialCardsForNewDeck([]);
+        return;
+      }
+    }
+
+    const newDeck: CustomDeck = {
+      id: `custom-${Date.now()}`,
+      name,
+      description,
+      cardIds,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      dossierId,
+    };
+    const updated = [...customDecks, newDeck];
+    setCustomDecks(updated);
+    setStoredCustomDecks(updated);
+    handleSelectDeck(newDeck.id);
+    setUnlockToast(`Created custom deck "${name}" with ${cardIds.length} cards.`);
+    setIsCreateDeckModalOpen(false);
+    setInitialCardsForNewDeck([]);
+  };
+
+  const handleAddCardsToDeck = (targetDeckId: string, cardIdsToAdd: string[]) => {
+    let addedCount = 0;
+    const updated = customDecks.map((d) => {
+      if (d.id === targetDeckId) {
+        const existing = new Set(d.cardIds);
+        const merged = [...d.cardIds];
+        for (const id of cardIdsToAdd) {
+          if (!existing.has(id)) {
+            merged.push(id);
+            addedCount++;
+          }
+        }
+        return { ...d, cardIds: merged, updatedAt: Date.now() };
+      }
+      return d;
+    });
+    setCustomDecks(updated);
+    setStoredCustomDecks(updated);
+    const target = updated.find((d) => d.id === targetDeckId);
+    setUnlockToast(`Added ${addedCount} cards to "${target?.name ?? 'deck'}".`);
+  };
+
+  const handleDeleteCustomDeck = (deckId: string) => {
+    const deckToDelete = customDecks.find((d) => d.id === deckId);
+    const updated = customDecks.filter((d) => d.id !== deckId);
+    setCustomDecks(updated);
+    setStoredCustomDecks(updated);
+    if (activeDeckId === deckId) {
+      handleSelectDeck('full-library');
+    }
+    setUnlockToast(`Deleted deck "${deckToDelete?.name ?? 'custom deck'}".`);
+  };
+
+  const handleDeleteDossier = (dossierId: string) => {
+    const updated = customDecks.map((d) => {
+      if (d.dossierId === dossierId) {
+        const copy = { ...d };
+        delete copy.dossierId;
+        return copy;
+      }
+      return d;
+    });
+    setCustomDecks(updated);
+    setStoredCustomDecks(updated);
+  };
+
+  const handleOpenCreateDeckWithCards = (cardIds: string[]) => {
+    setInitialCardsForNewDeck(cardIds);
+    setIsCreateDeckModalOpen(true);
+  };
 
   const handleAlgorithmChange = (nextAlgo: SpacedAlgorithm) => {
     const next = setSchedulingAlgorithm(deckState, nextAlgo);
@@ -404,6 +589,23 @@ export function App() {
 
           {/* Quick Info & Action Buttons */}
           <div className="app-header-right">
+            {/* Interview Strategy & Coach Header Button */}
+            <button
+              className="btn btn-outline ai-strategy-header-btn"
+              onClick={() => {
+                const activeCustom = customDecks.find((d) => d.id === activeDeckId);
+                handleOpenInterviewPrep(activeCustom?.dossierId);
+              }}
+              title="Open AI Interview Prep & Strategy Coach (Review briefings, check readiness, dialogue with AI)"
+              data-testid="header-interview-prep-btn"
+            >
+              <Sparkles size={14} color="var(--accent-purple)" />
+              <span>Interview Strategy</span>
+              {savedDossiersCount > 0 && (
+                <span className="header-badge-count">{savedDossiersCount}</span>
+              )}
+            </button>
+
             <button
               data-tour="focus"
               className={`btn btn-outline ${filterActive ? 'filter-active' : ''}`}
@@ -526,14 +728,22 @@ export function App() {
             onRecordReview={handleRecordReview}
             onOverrideReview={handleOverrideReview}
             onSkipCard={handleSkipCard}
+            onRemoveFromDeck={handleInitiateRemoveFromDeck}
             onOpenDeckView={() => setActiveView('dashboard')}
             onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
             isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
             onFinishReinforcement={handleFinishReinforcement}
+            onOpenInterviewStrategy={() => {
+              const activeCustom = customDecks.find((d) => d.id === activeDeckId);
+              handleOpenInterviewPrep(activeCustom?.dossierId);
+            }}
           />
         ) : (
           <DeckDashboard
             theme={theme}
+            activeDeckId={activeDeckId}
+            onSelectDeck={handleSelectDeck}
+            customDecks={customDecks}
             onOpenFocus={() => setIsFocusOpen(true)}
             state={deckState}
             onSelectCardToPractice={handleSelectCardToPractice}
@@ -541,7 +751,18 @@ export function App() {
             onResetBox={handleResetBox}
             onDeleteTopic={handleDeleteTopic}
             onToggleDeactivate={handleToggleDeactivate}
-            onStateUpdated={(newState) => setDeckState(newState)}
+            onRemoveFromDeck={handleInitiateRemoveFromDeck}
+            onCreateCustomDeckClick={() => {
+              setInitialCardsForNewDeck([]);
+              setIsCreateDeckModalOpen(true);
+            }}
+            onDeleteCustomDeck={handleDeleteCustomDeck}
+            onAddCardsToDeck={handleAddCardsToDeck}
+            onOpenCreateDeckWithCards={handleOpenCreateDeckWithCards}
+            onTailorWithAIClick={() => handleOpenInterviewPrep(undefined, 'input')}
+            onOpenInterviewPrepDossier={handleOpenInterviewPrep}
+            onDeleteInterviewDossier={handleDeleteDossier}
+            onStateUpdated={(newState: LeitnerDeckState) => setDeckState(newState)}
             onOpenAddModal={() => setIsAddModalOpen(true)}
             highlightExport={highlightExport}
             onDismissHighlightExport={() => setHighlightExport(false)}
@@ -646,6 +867,43 @@ export function App() {
         }}
       />
 
+      <RemoveFromDeckModal
+        isOpen={isRemoveFromDeckModalOpen}
+        card={cardPendingRemoval}
+        activeDeckName={getDeckName(activeDeckId, customDecks)}
+        onConfirmForkAndRemove={handleConfirmForkAndRemove}
+        onClose={() => {
+          setIsRemoveFromDeckModalOpen(false);
+          setCardPendingRemoval(null);
+        }}
+      />
+
+      <CreateDeckModal
+        isOpen={isCreateDeckModalOpen}
+        initialCardIds={initialCardsForNewDeck}
+        allCards={deckState.topics}
+        onConfirmCreateDeck={handleCreateCustomDeck}
+        onClose={() => {
+          setIsCreateDeckModalOpen(false);
+          setInitialCardsForNewDeck([]);
+        }}
+      />
+
+      <InterviewPrepModal
+        isOpen={isInterviewPrepModalOpen}
+        onClose={() => {
+          setIsInterviewPrepModalOpen(false);
+          setSelectedDossierId(undefined);
+          setInterviewPrepStep(undefined);
+        }}
+        onCreateCustomDeck={handleCreateCustomDeck}
+        onDeleteDossier={handleDeleteDossier}
+        currentBox1CardIds={currentBox1CardIds}
+        initialDossierId={selectedDossierId}
+        initialStep={interviewPrepStep}
+        onOpenSettings={(sec) => handleOpenSettings(sec)}
+      />
+
       <FocusModal
           isOpen={isFocusOpen}
           onClose={() => setIsFocusOpen(false)}
@@ -671,8 +929,6 @@ export function App() {
           onThemeChange={handleSetTheme}
           onSettingsSaved={() => setAiSettingsVersion((v) => v + 1)}
           onResetDeckToDefaults={handleResetDeckToDefaults}
-          packs={packSummary}
-          onPacksChange={handlePacksChange}
         />
       )}
     </div>

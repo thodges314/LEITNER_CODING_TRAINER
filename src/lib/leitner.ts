@@ -6,6 +6,7 @@ import type { DailyStats } from './dailyStats';
 
 export type TrackType =
   | 'algorithms'
+  | 'advanced-algorithms'
   | 'async-js'
   | 'js-language'
   | 'js-utilities'
@@ -209,6 +210,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     bg: 'rgba(16, 185, 129, 0.12)',
     border: 'rgba(16, 185, 129, 0.35)',
   },
+  'advanced-algorithms': {
+    label: 'Advanced Algorithms',
+    color: '#a855f7',
+    bg: 'rgba(168, 85, 247, 0.12)',
+    border: 'rgba(168, 85, 247, 0.35)',
+  },
 };
 
 export const TRACK_TYPES = Object.keys(TRACK_METADATA) as TrackType[];
@@ -229,6 +236,7 @@ export const TRACK_ALIASES: Record<string, TrackType[]> = {
   'collections-transformations': ['js-utilities'],
   'data-structures': ['js-utilities'],
   'algorithmic-screens': ['algorithms'],
+  'algorithms-advanced': ['advanced-algorithms'],
 };
 
 /** Maps a (possibly retired) track id to a current one; anything else is returned unchanged. */
@@ -326,16 +334,7 @@ export function isFilterActive(filter: PracticeFilter | undefined): boolean {
 }
 
 /** Optional card packs. A pack is OFF unless listed in deck state `enabledPacks`. */
-export const CARD_PACKS: Record<string, { label: string; description: string }> = {
-  'algorithms-advanced': {
-    label: 'Advanced algorithms',
-    description:
-      'Academic, whiteboard-style computer-science material: binary trees and BSTs (depth, validation, traversals, serialization), graph algorithms ' +
-      '(BFS/DFS, topological sort, grid flood fill), heaps, tries, dynamic programming, backtracking, bit manipulation, monotonic stacks and similar. ' +
-      'The practical set stays in the main deck: arrays and strings, hashing, two pointers, sliding window, stacks, binary search, linked lists, ' +
-      'intervals, matrices, sorting and DOM / tree traversal.',
-  },
-};
+export const CARD_PACKS: Record<string, { label: string; description: string }> = {};
 
 export function disabledPacks(state: Pick<LeitnerDeckState, 'enabledPacks'>): string[] {
   const enabled = new Set(state.enabledPacks ?? []);
@@ -519,7 +518,7 @@ export function mergeStoredWithSeed(
       // Custom (non-seed) card: keep untouched, ensuring progress invariants are numbers
       const rawBox = Math.max(1, Math.floor(Number(t.box)) || 1);
       const isGraduated = (parsed.algorithm ?? getStoredAlgorithm()) === 'graduated-interval';
-      return {
+      const customTopic: TopicItem = {
         ...t,
         track: migrateTrackId(t.track) as TrackType,
         box: isGraduated ? rawBox : Math.min(5, rawBox),
@@ -527,6 +526,8 @@ export function mergeStoredWithSeed(
         nextEligibleTrial: Math.max(0, Math.floor(Number(t.nextEligibleTrial)) || 0),
         status: t.status === 'locked' ? ('locked' as const) : ('active' as const),
       };
+      if (customTopic.pack === 'algorithms-advanced') delete customTopic.pack;
+      return customTopic;
     }
 
     // Seed-backed card: refresh content fields from seed
@@ -542,6 +543,8 @@ export function mergeStoredWithSeed(
     // Older saved decks carry full duplicate copies of the reference solution; the seed no longer has them.
     if (seed.solution === undefined) delete merged.solution;
     if (seed.starterCode === undefined) delete merged.starterCode;
+    if (seed.pack === undefined || merged.pack === 'algorithms-advanced') delete merged.pack;
+    merged.track = (seed.track ?? migrateTrackId(merged.track)) as TrackType;
 
     // Strictly preserve user review progress fields
     const isGraduated = (parsed.algorithm ?? getStoredAlgorithm()) === 'graduated-interval';
@@ -567,14 +570,16 @@ export function mergeStoredWithSeed(
     if (seed && !RETIRED_SEED_IDS.has(id)) {
       if (!seenIds.has(id)) {
         seenIds.add(id);
-        convertedDeletedTopics.push({
+        const converted: TopicItem = {
           ...seed,
           box: Math.max(1, Math.floor(Number(seed.box)) || 1),
           streak: Math.max(0, Math.floor(Number(seed.streak)) || 0),
           nextEligibleTrial: Math.max(0, Math.floor(Number(seed.nextEligibleTrial)) || 0),
           status: seed.status === 'active' ? ('active' as const) : ('locked' as const),
           deactivated: true,
-        });
+        };
+        if (converted.pack === 'algorithms-advanced' || seed.pack === undefined) delete converted.pack;
+        convertedDeletedTopics.push(converted);
       }
       deleted.delete(id);
     }
@@ -585,13 +590,15 @@ export function mergeStoredWithSeed(
     .filter((t) => !seenIds.has(t.id) && !deleted.has(t.id))
     .map((t) => {
       seenIds.add(t.id);
-      return {
+      const newTopic: TopicItem = {
         ...t,
         box: Math.max(1, Math.floor(Number(t.box)) || 1),
         streak: Math.max(0, Math.floor(Number(t.streak)) || 0),
         nextEligibleTrial: Math.max(0, Math.floor(Number(t.nextEligibleTrial)) || 0),
         status: t.status === 'active' ? ('active' as const) : ('locked' as const),
       };
+      if (newTopic.pack === 'algorithms-advanced' || t.pack === undefined) delete newTopic.pack;
+      return newTopic;
     });
 
   return {
