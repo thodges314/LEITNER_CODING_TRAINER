@@ -23,6 +23,7 @@ import {
   Zap,
   Plus,
   Download,
+  Pencil,
 } from 'lucide-react';
 import catalogIndexData from '../../data/catalogIndex.json';
 import {
@@ -298,7 +299,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   // Review state
   const [editableDeckName, setEditableDeckName] = useState(() => initialDossier?.deckName || '');
   const [editableDescription, setEditableDescription] = useState(() => initialDossier?.deckDescription || '');
-  const [activeTab, setActiveTab] = useState<'cards' | 'guide' | 'tools' | 'dialogue'>('cards');
+  const [activeTab, setActiveTab] = useState<'cards' | 'guide' | 'tools' | 'dialogue'>('dialogue');
   const [checkedCardIds, setCheckedCardIds] = useState<Set<string>>(
     () => new Set(initialDossier?.selectedCards.map((c) => c.id) || [])
   );
@@ -315,6 +316,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const [activeModel, setActiveModel] = useState<string>(() => getStoredModel());
 
   const companyInputRef = useRef<HTMLInputElement>(null);
+  const deckNameInputRef = useRef<HTMLInputElement>(null);
+  const deckDescInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (step === 'input') {
@@ -479,6 +482,21 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     downloadDossierHtml(dossier, catalogIndex);
   };
 
+  const handleDownloadJson = () => {
+    if (!dossier) return;
+    const jsonString = JSON.stringify(dossier, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const filename = `${(company || dossier.company || 'interview').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-dossier.json`;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const handleSendDialogueMessage = async (textToSend?: string) => {
     const text = (textToSend || dialogueInput).trim();
     if (!text || !dossier || isDialogueLoading) return;
@@ -617,6 +635,54 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
               </p>
             </div>
+
+            {/* Stacked Deck Name & Description in Header on Right */}
+            {step === 'review' && dossier && (
+              <div className="ai-prep-header-deck-meta" data-testid="ai-prep-header-deck-meta">
+                <div className="header-deck-name-row">
+                  <input
+                    ref={deckNameInputRef}
+                    type="text"
+                    className="header-deck-name-input"
+                    value={editableDeckName}
+                    onChange={(e) => setEditableDeckName(e.target.value)}
+                    placeholder="Custom Deck Name"
+                    title="Click to edit deck name"
+                    data-testid="ai-prep-review-deck-name"
+                  />
+                  <button
+                    type="button"
+                    className="header-deck-pencil-btn"
+                    onClick={() => deckNameInputRef.current?.focus()}
+                    title="Click to edit deck name"
+                    aria-label="Edit deck name"
+                  >
+                    <Pencil size={11} className="header-deck-pencil-icon" />
+                  </button>
+                </div>
+                <div className="header-deck-desc-row">
+                  <input
+                    ref={deckDescInputRef}
+                    type="text"
+                    className="header-deck-desc-input"
+                    value={editableDescription}
+                    onChange={(e) => setEditableDescription(e.target.value)}
+                    placeholder="Deck Description"
+                    title="Click to edit deck description"
+                    data-testid="ai-prep-review-deck-desc"
+                  />
+                  <button
+                    type="button"
+                    className="header-deck-pencil-btn"
+                    onClick={() => deckDescInputRef.current?.focus()}
+                    title="Click to edit deck description"
+                    aria-label="Edit deck description"
+                  >
+                    <Pencil size={10} className="header-deck-pencil-icon" />
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="ai-prep-header-controls">
               {/* New Prep button to start fresh from review */}
@@ -1000,49 +1066,19 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 </div>
               )}
 
-              {/* Dossier Header Info */}
-              <div className="ai-prep-review-header">
-                <div className="ai-prep-deck-name-row">
-                  <div className="ai-prep-field" style={{ flex: 2 }}>
-                    <label htmlFor="ai-review-deck-name" className="ai-prep-label">
-                      <span>Generated Deck Name</span>
-                    </label>
-                    <input
-                      id="ai-review-deck-name"
-                      type="text"
-                      className="modal-input"
-                      value={editableDeckName}
-                      onChange={(e) => setEditableDeckName(e.target.value)}
-                      data-testid="ai-prep-review-deck-name"
-                    />
-                  </div>
-                  <div className="ai-prep-field" style={{ flex: 3 }}>
-                    <label htmlFor="ai-review-deck-desc" className="ai-prep-label">
-                      <span>Deck Description</span>
-                    </label>
-                    <input
-                      id="ai-review-deck-desc"
-                      type="text"
-                      className="modal-input"
-                      value={editableDescription}
-                      onChange={(e) => setEditableDescription(e.target.value)}
-                      data-testid="ai-prep-review-deck-desc"
-                    />
-                  </div>
-                </div>
-
-                {/* Executive Summary Callout */}
-                <div className="ai-prep-executive-callout">
-                  <div className="executive-callout-header">
-                    <Sparkles size={14} className="executive-icon" />
-                    <span className="executive-title">Strategic Interview Executive Summary</span>
-                  </div>
-                  <p className="executive-text">{dossier.executiveSummary}</p>
-                </div>
-              </div>
-
               {/* Navigation Tabs */}
               <div className="ai-prep-tabs-bar" role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'dialogue'}
+                  className={`ai-prep-tab-btn ${activeTab === 'dialogue' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('dialogue')}
+                  data-testid="ai-prep-tab-dialogue"
+                >
+                  <MessageSquare size={14} />
+                  <span>AI Strategy & Coach {dossier.conversation && dossier.conversation.length > 1 ? `(${dossier.conversation.length})` : ''}</span>
+                </button>
                 <button
                   type="button"
                   role="tab"
@@ -1063,7 +1099,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   data-testid="ai-prep-tab-guide"
                 >
                   <BookOpen size={14} />
-                  <span>External Topics ({dossier.externalTopics.length})</span>
+                  <span>External Topics & Gaps ({dossier.externalTopics.length})</span>
                 </button>
                 <button
                   type="button"
@@ -1075,17 +1111,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 >
                   <CheckCircle size={14} />
                   <span>Interactive Drills & Checklist</span>
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === 'dialogue'}
-                  className={`ai-prep-tab-btn ${activeTab === 'dialogue' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('dialogue')}
-                  data-testid="ai-prep-tab-dialogue"
-                >
-                  <MessageSquare size={14} />
-                  <span>AI Coach Dialogue {dossier.conversation && dossier.conversation.length > 1 ? `(${dossier.conversation.length})` : ''}</span>
                 </button>
               </div>
 
@@ -1235,9 +1260,31 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 </div>
               )}
 
-              {/* TAB CONTENT: COPILOT DIALOGUE & REFINEMENT */}
+              {/* TAB CONTENT: STRATEGY OVERVIEW & COACH DIALOGUE */}
               {activeTab === 'dialogue' && (
                 <div className="ai-prep-dialogue-tab-body" data-testid="ai-prep-dialogue-tab-body">
+                  {/* Strategic Interview Overview & Executive Summary */}
+                  <div className="ai-prep-strategy-overview-box" data-testid="ai-prep-strategy-overview-box">
+                    <div className="strategy-overview-header">
+                      <Sparkles size={14} className="strategy-sparkle-icon" />
+                      <span className="strategy-overview-title">Strategic Interview Executive Summary</span>
+                    </div>
+                    <div className="strategy-overview-paragraphs">
+                      {dossier.executiveSummary.split('\n\n').map((paragraph, idx) => (
+                        <p key={idx} className="strategy-overview-p">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+
+                    <div className="strategy-coach-helper-note">
+                      <Sparkles size={13} className="coach-note-icon" />
+                      <span>
+                        <strong>Your AI Strategy Coach is ready:</strong> Ask questions about this company&rsquo;s interview loop, request curriculum adjustments (e.g. <em>&ldquo;trim deck to 12 cards&rdquo;</em>, <em>&ldquo;add more state machine problems&rdquo;</em>), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.
+                      </span>
+                    </div>
+                  </div>
+
                   <div className="dialogue-messages-scroll">
                     {dossier.conversation?.map((msg) => (
                       <div
@@ -1270,42 +1317,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                       </div>
                     )}
                     <div ref={chatEndRef} />
-                  </div>
-
-                  {/* Quick suggestion chips */}
-                  <div className="dialogue-suggestion-chips">
-                    <button
-                      type="button"
-                      className="suggestion-chip"
-                      disabled={isDialogueLoading}
-                      onClick={() => handleSendDialogueMessage('Trim the deck to the top 10 most critical cards.')}
-                    >
-                      ✂️ Trim to 10 cards
-                    </button>
-                    <button
-                      type="button"
-                      className="suggestion-chip"
-                      disabled={isDialogueLoading}
-                      onClick={() => handleSendDialogueMessage('Focus more heavily on React architecture and custom hooks.')}
-                    >
-                      ⚛️ Emphasize React Architecture
-                    </button>
-                    <button
-                      type="button"
-                      className="suggestion-chip"
-                      disabled={isDialogueLoading}
-                      onClick={() => handleSendDialogueMessage('How should I prioritize my remaining practice before interview day?')}
-                    >
-                      🎯 Prioritize Next Drills
-                    </button>
-                    <button
-                      type="button"
-                      className="suggestion-chip"
-                      disabled={isDialogueLoading}
-                      onClick={() => handleSendDialogueMessage('Report Leitner practice progress: How am I doing with my current box retention?')}
-                    >
-                      📊 Report Leitner Progress
-                    </button>
                   </div>
 
                   {/* Input form */}
@@ -1384,6 +1395,17 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   >
                     <Download size={14} />
                     <span>Download HTML</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-secondary ai-prep-download-json-btn"
+                    onClick={handleDownloadJson}
+                    title="Download raw JSON backup of this dossier"
+                    data-testid="ai-prep-download-json-btn"
+                  >
+                    <Download size={14} />
+                    <span>Download JSON</span>
                   </button>
 
                   <button

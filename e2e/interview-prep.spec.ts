@@ -58,15 +58,39 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     const reviewView = page.getByTestId('ai-prep-review-view');
     await expect(reviewView).toBeVisible({ timeout: 5000 });
 
-    // Verify deck name populated with Stripe
+    // Verify deck name populated with Stripe in stacked header
     const deckNameInput = page.getByTestId('ai-prep-review-deck-name');
     await expect(deckNameInput).toHaveValue(/Stripe/);
+    const deckDescInput = page.getByTestId('ai-prep-review-deck-desc');
+    await expect(deckDescInput).toBeVisible();
 
-    // Check tabs
+    // Tab 1 (AI Strategy & Coach) is active by default
+    await expect(page.getByTestId('ai-prep-strategy-overview-box')).toBeVisible();
+    await expect(page.locator('.dialogue-messages-scroll')).toBeVisible();
+
+    // Test sending a curriculum modification message to the AI Coach
+    const dialogueInput = page.locator('.dialogue-text-input');
+    await dialogueInput.fill('Trim to 10 cards');
+    await page.locator('.dialogue-send-btn').click();
+
+    // Wait for dialogue reply
+    await expect(page.locator('.dialogue-bubble.assistant').last()).toContainText(/streamlined your curriculum/i);
+
+    // Check Tab 2 (Selected Cards)
+    const cardsTab = page.getByTestId('ai-prep-tab-cards');
+    await cardsTab.click();
+
+    // Verify card items exist with priority badges
+    const cardItems = page.locator('.ai-prep-card-item');
+    const cardCount = await cardItems.count();
+    expect(cardCount).toBeGreaterThan(0);
+
+    // Check Tab 3 (External Topics & Gaps)
     const guideTab = page.getByTestId('ai-prep-tab-guide');
     await guideTab.click();
     await expect(page.locator('.guide-topics-grid')).toBeVisible();
 
+    // Check Tab 4 (Interactive Drills & Checklist)
     const toolsTab = page.getByTestId('ai-prep-tab-tools');
     await toolsTab.click();
     await expect(page.locator('.interactive-tools-grid')).toBeVisible();
@@ -77,30 +101,12 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await expect(printDoc).toHaveCount(1);
     await expect(printDoc.locator('.print-title')).toContainText('Stripe');
 
-    // Test Copilot Dialogue tab
-    const dialogueTab = page.getByTestId('ai-prep-tab-dialogue');
-    await dialogueTab.click();
-    await expect(page.locator('.dialogue-messages-scroll')).toBeVisible();
-
-    // Click Trim to 10 cards chip
-    const trimChip = page.getByRole('button', { name: /Trim to 10 cards/i });
-    await trimChip.click();
-
-    // Wait for dialogue reply
-    await expect(page.locator('.dialogue-bubble.assistant').last()).toContainText(/streamlined your curriculum/i);
-
-    // Switch back to cards tab
-    const cardsTab = page.getByTestId('ai-prep-tab-cards');
-    await cardsTab.click();
-
-    // Verify card items exist with priority badges
-    const cardItems = page.locator('.ai-prep-card-item');
-    const cardCount = await cardItems.count();
-    expect(cardCount).toBeGreaterThan(0);
-
-    // Verify Download HTML button is visible in review actions
+    // Verify Download HTML and Download JSON buttons are visible in review actions
     const downloadHtmlBtn = page.getByTestId('ai-prep-download-html-btn');
     await expect(downloadHtmlBtn).toBeVisible();
+
+    const downloadJsonBtn = page.getByTestId('ai-prep-download-json-btn');
+    await expect(downloadJsonBtn).toBeVisible();
 
     // Click Create Custom Deck
     const createDeckBtn = page.getByTestId('ai-prep-create-deck-btn');
