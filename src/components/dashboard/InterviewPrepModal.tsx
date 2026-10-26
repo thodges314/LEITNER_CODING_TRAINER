@@ -60,6 +60,7 @@ export interface InterviewPrepModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreateCustomDeck: (deckName: string, description?: string, cardIds?: string[], dossierId?: string) => void;
+  onDeleteDossier?: (dossierId: string) => void;
   currentBox1CardIds?: string[];
   initialDossierId?: string;
   initialStep?: 'input' | 'review';
@@ -254,6 +255,7 @@ const ModelRecommendationBanner: React.FC<{
 const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   onClose,
   onCreateCustomDeck,
+  onDeleteDossier,
   currentBox1CardIds = [],
   initialDossierId,
   initialStep,
@@ -266,9 +268,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   // Initialize initial dossier and step
   const initialDossier = initialDossierId
     ? savedDossiers.find((d) => d.id === initialDossierId) || null
-    : savedDossiers.length > 0 && initialStep !== 'input'
-      ? savedDossiers[0]
-      : null;
+    : initialStep === 'input'
+      ? null
+      : savedDossiers.length > 0
+        ? savedDossiers[0]
+        : null;
 
   const [step, setStep] = useState<'input' | 'loading' | 'review'>(() => {
     if (initialStep) return initialStep;
@@ -372,16 +376,44 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     setStep('review');
   };
 
+  const handleDeleteCurrentDossier = () => {
+    if (!dossier) return;
+    const idToDelete = dossier.id || '';
+    deleteInterviewDossier(idToDelete);
+    onDeleteDossier?.(idToDelete);
+    const updated = getAllSavedDossiers();
+    setSavedDossiers(updated);
+    setDossier(null);
+    setCompany('');
+    setRole('');
+    setTargetDate('');
+    setRawNotes('');
+    setSelectedWeaknesses([]);
+    setEditableDeckName('');
+    setEditableDescription('');
+    setCheckedCardIds(new Set());
+    setStep('input');
+  };
+
   const handleDeleteSavedDossier = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     deleteInterviewDossier(id);
+    onDeleteDossier?.(id);
     const updated = getAllSavedDossiers();
     setSavedDossiers(updated);
-    if (dossier?.id === id) {
+    if (!dossier || dossier.id === id) {
       if (updated.length > 0) {
         handleLoadSavedDossier(updated[0]);
       } else {
         setDossier(null);
+        setCompany('');
+        setRole('');
+        setTargetDate('');
+        setRawNotes('');
+        setSelectedWeaknesses([]);
+        setEditableDeckName('');
+        setEditableDescription('');
+        setCheckedCardIds(new Set());
         setStep('input');
       }
     }
@@ -579,7 +611,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
             </div>
             <div className="ai-prep-header-titles">
               <h2 id="ai-prep-modal-title" className="ai-prep-modal-title">
-                AI Interview Prep Copilot
+                AI Interview Prep Coach
               </h2>
               <p className="ai-prep-modal-subtitle">
                 Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
@@ -599,6 +631,9 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     setTargetDate('');
                     setRawNotes('');
                     setSelectedWeaknesses([]);
+                    setEditableDeckName('');
+                    setEditableDescription('');
+                    setCheckedCardIds(new Set());
                     setStep('input');
                   }}
                   title="Create a new interview preparation dossier for another company or role"
@@ -606,6 +641,20 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 >
                   <Plus size={13} />
                   <span>+ New Prep</span>
+                </button>
+              )}
+
+              {/* Delete Dossier button in review header */}
+              {step === 'review' && dossier && (
+                <button
+                  type="button"
+                  className="ai-prep-history-btn ai-prep-delete-plan-btn"
+                  onClick={handleDeleteCurrentDossier}
+                  title="Delete this interview briefing and start fresh"
+                  data-testid="ai-prep-delete-plan-btn"
+                >
+                  <Trash2 size={13} />
+                  <span>Delete Dossier</span>
                 </button>
               )}
 
@@ -1036,7 +1085,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   data-testid="ai-prep-tab-dialogue"
                 >
                   <MessageSquare size={14} />
-                  <span>Copilot Dialogue {dossier.conversation && dossier.conversation.length > 1 ? `(${dossier.conversation.length})` : ''}</span>
+                  <span>AI Coach Dialogue {dossier.conversation && dossier.conversation.length > 1 ? `(${dossier.conversation.length})` : ''}</span>
                 </button>
               </div>
 
@@ -1313,6 +1362,17 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   >
                     <Printer size={14} />
                     <span>Print / Save PDF</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-secondary ai-prep-delete-dossier-btn"
+                    onClick={handleDeleteCurrentDossier}
+                    title="Delete this interview briefing and start fresh"
+                    data-testid="ai-prep-delete-dossier-footer-btn"
+                  >
+                    <Trash2 size={14} />
+                    <span>Delete Dossier</span>
                   </button>
 
                   <button

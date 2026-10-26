@@ -339,7 +339,7 @@ export function generateDossierPrintHtml(
   </div>
 
   <div class="footer-note">
-    Synthesized by Leitner Coding Trainer AI Interview Prep Copilot &bull; Confidential Candidate Study Guide
+    Synthesized by Leitner Coding Trainer AI Interview Prep Coach &bull; Confidential Candidate Study Guide
   </div>
 </body>
 </html>`;

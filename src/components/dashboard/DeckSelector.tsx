@@ -227,7 +227,7 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                       data-testid="deck-dropdown-ai-btn"
                     >
                       <Sparkles size={14} className="ai-btn-icon" />
-                      <span>Tailor Deck with AI Copilot...</span>
+                      <span>Tailor Deck with AI Coach...</span>
                     </button>
                   )}
                   {onCreateCustomDeckClick && (

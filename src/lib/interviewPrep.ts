@@ -1007,17 +1007,43 @@ export function getAllSavedDossiers(): InterviewPrepDossier[] {
 export function deleteInterviewDossier(deckOrDossierId: string): void {
   if (typeof window === 'undefined') return;
   const all = loadAllInterviewDossiers();
-  const dossier = all[deckOrDossierId];
-  if (all[deckOrDossierId]) {
-    delete all[deckOrDossierId];
+  const targetDossier = all[deckOrDossierId];
+  const targetId = targetDossier?.id || deckOrDossierId;
+  const targetCompany = targetDossier?.company;
+  const targetRole = targetDossier?.role;
+  const targetGeneratedAt = targetDossier?.generatedAt;
+
+  for (const key of Object.keys(all)) {
+    const item = all[key];
+    if (
+      key === deckOrDossierId ||
+      key === targetId ||
+      item?.id === targetId ||
+      item?.id === deckOrDossierId ||
+      (targetCompany &&
+        targetRole &&
+        item?.company === targetCompany &&
+        item?.role === targetRole &&
+        item?.generatedAt === targetGeneratedAt)
+    ) {
+      delete all[key];
+    }
   }
-  if (dossier?.id && all[dossier.id]) {
-    delete all[dossier.id];
-  }
+
   try {
     localStorage.setItem(INTERVIEW_DOSSIERS_STORAGE_KEY, JSON.stringify(all));
   } catch {
     /* ignore */
   }
 }
+
+export function clearAllInterviewDossiers(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(INTERVIEW_DOSSIERS_STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 

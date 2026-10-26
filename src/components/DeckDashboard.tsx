@@ -22,6 +22,7 @@ import {
   X,
   Printer,
   Calendar,
+  Trash2,
 } from 'lucide-react';
 import {
   loadDeckCatalogPreferences,
@@ -39,7 +40,11 @@ import {
 } from './dashboard';
 import { filterCardsByDeck } from '../lib/decks';
 import type { CustomDeck } from '../lib/decks';
-import { getInterviewDossier, type CatalogIndexEntry } from '../lib/interviewPrep';
+import {
+  getInterviewDossier,
+  deleteInterviewDossier,
+  type CatalogIndexEntry,
+} from '../lib/interviewPrep';
 import { printInterviewDossier } from '../lib/printDossier';
 import catalogIndexData from '../data/catalogIndex.json';
 
@@ -65,6 +70,7 @@ interface DeckDashboardProps {
   onOpenCreateDeckWithCards?: (cardIds: string[]) => void;
   onTailorWithAIClick?: () => void;
   onOpenInterviewPrepDossier?: (dossierId?: string, step?: 'input' | 'review') => void;
+  onDeleteInterviewDossier?: (dossierId: string) => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
   onOpenAddModal: () => void;
   /** Opens the Focus dialog (used by the one-time hint under the track filter). */
@@ -91,6 +97,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onOpenCreateDeckWithCards,
   onTailorWithAIClick,
   onOpenInterviewPrepDossier,
+  onDeleteInterviewDossier,
   onStateUpdated,
   onOpenAddModal,
   onOpenFocus,
@@ -686,7 +693,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               data-testid="strategy-banner-open-copilot-btn"
             >
               <Sparkles size={14} />
-              <span>Open Strategy & Copilot</span>
+              <span>Open Strategy & Coach</span>
             </button>
             <button
               type="button"
@@ -696,6 +703,20 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             >
               <Printer size={14} />
               <span>Print Briefing</span>
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary strategy-delete-btn"
+              onClick={() => {
+                const id = linkedDossier.id || '';
+                deleteInterviewDossier(id);
+                onDeleteInterviewDossier?.(id);
+              }}
+              title="Delete this interview briefing and unlink it from this deck"
+              data-testid="strategy-banner-delete-btn"
+            >
+              <Trash2 size={14} />
+              <span>Delete Briefing</span>
             </button>
           </div>
         </div>

@@ -34,7 +34,7 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     // Verify modal opened
     const modal = page.getByTestId('interview-prep-modal');
     await expect(modal).toBeVisible();
-    await expect(page.locator('#ai-prep-modal-title')).toHaveText('AI Interview Prep Copilot');
+    await expect(page.locator('#ai-prep-modal-title')).toHaveText('AI Interview Prep Coach');
 
     // Fill in target company and role
     const companyInput = page.getByTestId('ai-prep-company-input');
@@ -124,9 +124,16 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await expect(modal).toBeVisible();
     await expect(page.getByTestId('ai-prep-review-view')).toBeVisible();
 
-    // Verify "+ New Prep" button is visible in modal header
+    // Verify "+ New Prep" and "Delete Dossier" buttons are visible in modal header
     const newPrepBtn = page.getByTestId('ai-prep-new-plan-btn');
     await expect(newPrepBtn).toBeVisible();
+
+    const deletePlanBtn = page.getByTestId('ai-prep-delete-plan-btn');
+    await expect(deletePlanBtn).toBeVisible();
+
+    // Verify footer "Delete Dossier" button is also visible
+    const deleteFooterBtn = page.getByTestId('ai-prep-delete-dossier-footer-btn');
+    await expect(deleteFooterBtn).toBeVisible();
 
     // Close modal
     const closeBtn = page.getByTestId('ai-prep-close-btn');
@@ -150,7 +157,22 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await arenaStrategyBtn.click();
     await expect(modal).toBeVisible();
     await expect(page.getByTestId('ai-prep-review-view')).toBeVisible();
+
+    // 5. Test Deleting Dossier to Start Fresh
+    // Click Delete Dossier from the modal header
+    await page.getByTestId('ai-prep-delete-plan-btn').click();
+
+    // Should immediately transition to the fresh input form with empty company input
+    await expect(page.getByTestId('ai-prep-company-input')).toBeVisible();
+    await expect(page.getByTestId('ai-prep-company-input')).toHaveValue('');
+
+    // Close modal and return to Deck Catalog
     await closeBtn.click();
     await expect(modal).not.toBeVisible();
+
+    await catalogNavBtn.click();
+
+    // Active briefing banner should no longer be present on the dashboard
+    await expect(page.getByTestId('active-strategy-briefing-banner')).not.toBeVisible();
   });
 });

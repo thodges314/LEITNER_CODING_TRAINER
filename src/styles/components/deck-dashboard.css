@@ -2837,6 +2837,42 @@
   color: var(--accent-purple);
 }
 
+.ai-prep-delete-plan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 6px;
+  color: #ef4444;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ai-prep-delete-plan-btn:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: #ef4444;
+  color: #f87171;
+}
+
+.ai-prep-delete-dossier-btn,
+.strategy-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.ai-prep-delete-dossier-btn:hover,
+.strategy-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: #ef4444 !important;
+}
+
 /* Download HTML Button */
 .ai-prep-download-html-btn {
   display: inline-flex;
