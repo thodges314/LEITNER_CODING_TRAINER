@@ -174,4 +174,43 @@ const x = 42;
     expect(subLis?.length).toBe(2);
     expect(subLis?.[0].textContent).toBe('Detail A');
   });
+
+  it('renders markdown tables with headers, cells, bold, inline code, and br line breaks', () => {
+    const tableText = `Below is your question map:
+
+| # | Question bucket | Typical prompt(s) | Quick senior-level tip |
+|---|-----------------|-------------------|------------------------|
+| 1️⃣ | Core algorithms & data-structures | • "Given an array." <br>• "MinStack." | Write solution **first on the board**. |
+| 2️⃣ | JS/TS utilities | • "Implement \`groupBy\` using \`reduce\`." | Walk through **step-by-step**. |`;
+
+    act(() => {
+      root.render(<MarkdownContent text={tableText} />);
+    });
+
+    const table = container.querySelector('table');
+    expect(table).not.toBeNull();
+
+    const ths = container.querySelectorAll('th');
+    expect(ths.length).toBe(4);
+    expect(ths[1].textContent).toBe('Question bucket');
+
+    const trs = container.querySelectorAll('tbody tr');
+    expect(trs.length).toBe(2);
+
+    const tds = container.querySelectorAll('td');
+    expect(tds.length).toBe(8);
+
+    // Verify inline markdown rendered inside cells
+    const strong = container.querySelector('strong');
+    expect(strong).not.toBeNull();
+    expect(strong?.textContent).toBe('first on the board');
+
+    const code = container.querySelector('code');
+    expect(code).not.toBeNull();
+    expect(code?.textContent).toBe('groupBy');
+
+    // Verify <br> rendered inside cell
+    const br = container.querySelector('td br');
+    expect(br).not.toBeNull();
+  });
 });

@@ -588,34 +588,34 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     }
   };
 
-  const handleConfirmCreateCustomDeck = () => {
-    if (!dossier) return;
-    const finalCardIds = dossier.selectedCards
-      .filter((c) => checkedCardIds.has(c.id))
-      .map((c) => c.id);
+  // const handleConfirmCreateCustomDeck = () => {
+  //   if (!dossier) return;
+  //   const finalCardIds = dossier.selectedCards
+  //     .filter((c) => checkedCardIds.has(c.id))
+  //     .map((c) => c.id);
 
-    if (finalCardIds.length === 0) return;
+  //   if (finalCardIds.length === 0) return;
 
-    const trimmedName = editableDeckName.trim() || dossier.deckName;
-    const finalDescription = editableDescription.trim() || dossier.deckDescription;
+  //   const trimmedName = editableDeckName.trim() || dossier.deckName;
+  //   const finalDescription = editableDescription.trim() || dossier.deckDescription;
 
-    const dossierIdToSave =
-      dossier.id ||
-      `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  //   const dossierIdToSave =
+  //     dossier.id ||
+  //     `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
 
-    const updatedDossier: InterviewPrepDossier = {
-      ...dossier,
-      id: dossierIdToSave,
-      deckName: trimmedName,
-      deckDescription: finalDescription,
-      selectedCards: dossier.selectedCards.filter((c) => checkedCardIds.has(c.id)),
-    };
+  //   const updatedDossier: InterviewPrepDossier = {
+  //     ...dossier,
+  //     id: dossierIdToSave,
+  //     deckName: trimmedName,
+  //     deckDescription: finalDescription,
+  //     selectedCards: dossier.selectedCards.filter((c) => checkedCardIds.has(c.id)),
+  //   };
 
-    saveInterviewDossier(dossierIdToSave, updatedDossier);
+  //   saveInterviewDossier(dossierIdToSave, updatedDossier);
 
-    onCreateCustomDeck(trimmedName, finalDescription, finalCardIds, dossierIdToSave);
-    onClose();
-  };
+  //   onCreateCustomDeck(trimmedName, finalDescription, finalCardIds, dossierIdToSave);
+  //   onClose();
+  // };
 
   const handlePrintDossier = () => {
     if (!dossier) return;
@@ -1653,13 +1653,13 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
                   <button
                     type="button"
-                    className="btn btn-primary"
-                    disabled={checkedCardIds.size === 0}
-                    onClick={handleConfirmCreateCustomDeck}
-                    data-testid="ai-prep-create-deck-btn"
+                    className="btn btn-primary ai-prep-done-btn"
+                    onClick={onClose}
+                    title="Close interview preparation briefing"
+                    data-testid="ai-prep-done-btn"
                   >
                     <CheckCircle size={14} />
-                    <span>Practice Custom Deck ({checkedCardIds.size} Cards)</span>
+                    <span>Done</span>
                   </button>
                 </div>
               </div>

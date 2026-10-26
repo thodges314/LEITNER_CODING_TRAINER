@@ -2552,6 +2552,41 @@
   border-color: rgba(255, 255, 255, 0.3);
 }
 
+.bubble-content .markdown-table-wrapper {
+  margin: 10px 0;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.bubble-content .markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.bubble-content .markdown-table th {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.15));
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.bubble-content .markdown-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.07));
+  vertical-align: top;
+}
+
+.bubble-content .markdown-table tr:last-child td {
+  border-bottom: none;
+}
+
 .bubble-card-update-pill {
   display: inline-flex;
   align-items: center;

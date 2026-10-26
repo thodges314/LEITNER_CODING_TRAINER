@@ -122,18 +122,19 @@ describe('InterviewPrepModal Component', () => {
     });
     expect(document.querySelector('[data-testid="ai-prep-dialogue-tab-body"]')).not.toBeNull();
 
-    // Verify cards tab
-    const createDeckBtn = document.querySelector('[data-testid="ai-prep-create-deck-btn"]') as HTMLButtonElement;
-    expect(createDeckBtn).not.toBeNull();
-
-    // Click Create Custom Deck
-    await act(async () => {
-      createDeckBtn.click();
-    });
-
+    // Verify custom deck was automatically created upon synthesis
     expect(handleCreateDeck).toHaveBeenCalled();
     expect(handleCreateDeck.mock.calls[0][0]).toContain('Stripe');
     expect(handleCreateDeck.mock.calls[0][2].length).toBeGreaterThan(0);
+
+    const doneBtn = document.querySelector('[data-testid="ai-prep-done-btn"]') as HTMLButtonElement;
+    expect(doneBtn).not.toBeNull();
+
+    // Click Done to close briefing
+    await act(async () => {
+      doneBtn.click();
+    });
+
     expect(handleClose).toHaveBeenCalled();
   });
 
