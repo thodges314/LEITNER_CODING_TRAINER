@@ -136,4 +136,54 @@ describe('InterviewPrepModal Component', () => {
     expect(handleCreateDeck.mock.calls[0][2].length).toBeGreaterThan(0);
     expect(handleClose).toHaveBeenCalled();
   });
+
+  it('imports a JSON dossier and automatically creates the custom deck', async () => {
+    const handleCreateDeck = vi.fn();
+    const handleClose = vi.fn();
+
+    await act(async () => {
+      root?.render(
+        <InterviewPrepModal
+          isOpen={true}
+          onClose={handleClose}
+          onCreateCustomDeck={handleCreateDeck}
+        />
+      );
+    });
+
+    const fileInput = document.querySelector('[data-testid="ai-prep-import-json-input"]') as HTMLInputElement;
+    expect(fileInput).not.toBeNull();
+
+    const mockDossierJson = JSON.stringify({
+      id: 'dossier_import_123',
+      company: 'Airbnb',
+      role: 'Frontend Architect',
+      deckName: 'Airbnb Frontend Architect Prep',
+      deckDescription: 'Imported test dossier.',
+      selectedCards: [{ id: 'tabs-accordion-compound', priority: 'must-know', rationale: 'Compound patterns' }],
+      executiveSummary: 'Focus on compound component design.',
+      conversation: [{ id: 'm1', role: 'assistant', content: 'Welcome to your Airbnb briefing', timestamp: 123 }],
+    });
+
+    const file = new File([mockDossierJson], 'airbnb-dossier.json', { type: 'application/json' });
+
+    await act(async () => {
+      Object.defineProperty(fileInput, 'files', {
+        value: [file],
+        writable: true,
+      });
+      fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    await vi.waitFor(() => {
+      expect(handleCreateDeck).toHaveBeenCalledWith(
+        'Airbnb Frontend Architect Prep',
+        'Imported test dossier.',
+        ['tabs-accordion-compound'],
+        'dossier_import_123'
+      );
+    });
+
+    expect(document.querySelector('[data-testid="ai-prep-review-view"]')).not.toBeNull();
+  });
 });

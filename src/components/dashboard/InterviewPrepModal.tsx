@@ -23,6 +23,7 @@ import {
   Zap,
   Plus,
   Download,
+  Upload,
   Pencil,
 } from 'lucide-react';
 import { MarkdownContent } from '../MarkdownContent';
@@ -424,6 +425,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const companyInputRef = useRef<HTMLInputElement>(null);
   const deckNameInputRef = useRef<HTMLInputElement>(null);
   const deckDescInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (step === 'input') {
@@ -466,7 +468,17 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
       setEditableDeckName(readyDossier.deckName);
       setEditableDescription(readyDossier.deckDescription);
       setCheckedCardIds(new Set(readyDossier.selectedCards.map((c) => c.id)));
+      saveInterviewDossier(readyDossier.id || 'current_dossier', readyDossier);
       setSavedDossiers(getAllSavedDossiers());
+
+      // Automatically create and select custom deck immediately upon generation
+      onCreateCustomDeck(
+        readyDossier.deckName,
+        readyDossier.deckDescription,
+        readyDossier.selectedCards.map((c) => c.id),
+        readyDossier.id
+      );
+
       setStep('review');
     } catch {
       clearInterval(interval);
@@ -484,6 +496,15 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     setEditableDescription(readySaved.deckDescription);
     setCheckedCardIds(new Set(readySaved.selectedCards.map((c) => c.id)));
     setShowSavedDropdown(false);
+
+    // Sync active custom deck when switching saved dossiers
+    onCreateCustomDeck(
+      readySaved.deckName,
+      readySaved.deckDescription,
+      readySaved.selectedCards.map((c) => c.id),
+      readySaved.id
+    );
+
     setStep('review');
   };
 
@@ -621,6 +642,75 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const handleTriggerImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportJsonFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const raw = event.target?.result;
+        if (typeof raw !== 'string') return;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.selectedCards)) {
+          alert('Invalid dossier backup: JSON file must contain a "selectedCards" array.');
+          return;
+        }
+
+        const dossierId =
+          parsed.id || `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+
+        const importedDossier: InterviewPrepDossier = {
+          ...parsed,
+          id: dossierId,
+          company: parsed.company || 'Company',
+          role: parsed.role || 'Software Engineer',
+          deckName: parsed.deckName || `${parsed.company || 'Interview'} Prep Deck`,
+          deckDescription: parsed.deckDescription || 'Imported AI interview preparation curriculum.',
+          generatedAt: parsed.generatedAt || Date.now(),
+          selectedCards: parsed.selectedCards,
+          externalTopics: Array.isArray(parsed.externalTopics) ? parsed.externalTopics : [],
+          countdownChecklist: Array.isArray(parsed.countdownChecklist) ? parsed.countdownChecklist : [],
+          interactiveTools: Array.isArray(parsed.interactiveTools) ? parsed.interactiveTools : [],
+          executiveSummary: parsed.executiveSummary || '',
+          conversation: Array.isArray(parsed.conversation) ? parsed.conversation : [],
+        };
+
+        const ready = ensureDossierChatOpener(importedDossier)!;
+        saveInterviewDossier(ready.id || dossierId, ready);
+        setDossier(ready);
+        setCompany(ready.company);
+        setRole(ready.role);
+        setTargetDate(ready.targetDate || '');
+        setEditableDeckName(ready.deckName);
+        setEditableDescription(ready.deckDescription);
+        setCheckedCardIds(new Set(ready.selectedCards.map((c) => c.id)));
+        setSavedDossiers(getAllSavedDossiers());
+
+        // Automatically create and select custom deck for the imported briefing
+        onCreateCustomDeck(
+          ready.deckName,
+          ready.deckDescription,
+          ready.selectedCards.map((c) => c.id),
+          ready.id
+        );
+
+        setStep('review');
+        setActiveTab('dialogue');
+      } catch (err) {
+        console.error('Failed to parse imported dossier JSON:', err);
+        alert('Could not import dossier JSON. Please ensure the file is valid JSON.');
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleSendDialogueMessage = async (textToSend?: string) => {
     const text = (textToSend || dialogueInput).trim();
     if (!text || !dossier || isDialogueLoading) return;
@@ -701,6 +791,13 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           `Curriculum updated! Now contains ${response.updatedCards.length} tailored cards.`
         );
         setTimeout(() => setDialogueUpdateNotification(null), 4000);
+        // Automatically sync the custom deck with the coach's new card selection
+        onCreateCustomDeck(
+          finalDossier.deckName,
+          finalDossier.deckDescription,
+          response.updatedCards.map((c) => c.id),
+          finalDossier.id
+        );
       }
 
       setDossier(finalDossier);
@@ -800,6 +897,20 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   >
                     <Trash2 size={13} />
                     <span>Delete Dossier</span>
+                  </button>
+                )}
+
+                {/* Import Briefing JSON button in header */}
+                {step !== 'loading' && (
+                  <button
+                    type="button"
+                    className="ai-prep-history-btn"
+                    onClick={handleTriggerImport}
+                    title="Import a saved interview dossier (.json)"
+                    data-testid="ai-prep-import-json-header-btn"
+                  >
+                    <Upload size={13} />
+                    <span>Import Briefing</span>
                   </button>
                 )}
 
@@ -1368,7 +1479,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   <div className="tools-section">
                     <h4 className="section-title">Curated Interactive Practice Playgrounds</h4>
                     <div className="interactive-tools-grid">
-                      {dossier.interactiveTools.map((tool, i) => (
+                      {dossier.interactiveTools?.map((tool, i) => (
                         <a
                           key={i}
                           href={tool.url}
@@ -1390,7 +1501,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   <div className="checklist-section">
                     <h4 className="section-title">24-Hour Countdown & Interview Day Protocol</h4>
                     <div className="countdown-checklist-list">
-                      {dossier.countdownChecklist.map((item, i) => (
+                      {dossier.countdownChecklist?.map((item, i) => (
                         <div key={i} className="checklist-item-row">
                           <CheckCircle size={15} className="checklist-check-icon" />
                           <span className="checklist-item-text">{item}</span>
@@ -1522,11 +1633,22 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     type="button"
                     className="btn btn-secondary ai-prep-download-json-btn"
                     onClick={handleDownloadJson}
-                    title="Download raw JSON backup of this dossier"
+                    title="Download / Export raw JSON backup of this dossier"
                     data-testid="ai-prep-download-json-btn"
                   >
                     <Download size={14} />
-                    <span>Download JSON</span>
+                    <span>Export JSON</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-secondary ai-prep-import-json-btn"
+                    onClick={handleTriggerImport}
+                    title="Import an interview dossier JSON file"
+                    data-testid="ai-prep-import-json-footer-btn"
+                  >
+                    <Upload size={14} />
+                    <span>Import JSON</span>
                   </button>
 
                   <button
@@ -1536,13 +1658,22 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     onClick={handleConfirmCreateCustomDeck}
                     data-testid="ai-prep-create-deck-btn"
                   >
-                    <Layers size={14} />
-                    <span>Create Custom Deck ({checkedCardIds.size} Cards)</span>
+                    <CheckCircle size={14} />
+                    <span>Practice Custom Deck ({checkedCardIds.size} Cards)</span>
                   </button>
                 </div>
               </div>
             </div>
           )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,application/json"
+            style={{ display: 'none' }}
+            onChange={handleImportJsonFile}
+            data-testid="ai-prep-import-json-input"
+          />
         </div>
       </div>
 
@@ -1628,7 +1759,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           <div className="print-section">
             <h2 className="print-section-heading">24-Hour Countdown & Interview Day Protocol</h2>
             <div className="print-checklist">
-              {dossier.countdownChecklist.map((item, idx) => (
+              {dossier.countdownChecklist?.map((item, idx) => (
                 <div key={idx} className="print-checklist-item">
                   <span className="print-checkbox">&#9744;</span>
                   <span>{item}</span>
@@ -1640,7 +1771,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           <div className="print-section">
             <h2 className="print-section-heading">Curated Practice Playgrounds</h2>
             <div className="print-tools-list">
-              {dossier.interactiveTools.map((t, idx) => (
+              {dossier.interactiveTools?.map((t, idx) => (
                 <div key={idx} className="print-tool-item">
                   <strong>{t.name}</strong> &mdash; {t.focus} ({t.url})
                 </div>

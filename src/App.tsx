@@ -376,6 +376,24 @@ export function App() {
     cardIds: string[] = [],
     dossierId?: string
   ) => {
+    if (dossierId) {
+      const existing = customDecks.find((d) => d.dossierId === dossierId);
+      if (existing) {
+        const updated = customDecks.map((d) =>
+          d.id === existing.id
+            ? { ...d, name, description, cardIds, updatedAt: Date.now() }
+            : d
+        );
+        setCustomDecks(updated);
+        setStoredCustomDecks(updated);
+        handleSelectDeck(existing.id);
+        setUnlockToast(`Updated custom deck "${name}" with ${cardIds.length} cards.`);
+        setIsCreateDeckModalOpen(false);
+        setInitialCardsForNewDeck([]);
+        return;
+      }
+    }
+
     const newDeck: CustomDeck = {
       id: `custom-${Date.now()}`,
       name,
