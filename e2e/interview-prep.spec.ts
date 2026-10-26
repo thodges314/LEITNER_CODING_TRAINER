@@ -72,6 +72,23 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await expect(page.locator('.interactive-tools-grid')).toBeVisible();
     await expect(page.locator('.countdown-checklist-list')).toBeVisible();
 
+    // Verify dedicated print document exists
+    const printDoc = page.locator('.ai-prep-print-document');
+    await expect(printDoc).toHaveCount(1);
+    await expect(printDoc.locator('.print-title')).toContainText('Stripe');
+
+    // Test Copilot Dialogue tab
+    const dialogueTab = page.getByTestId('ai-prep-tab-dialogue');
+    await dialogueTab.click();
+    await expect(page.locator('.dialogue-messages-scroll')).toBeVisible();
+
+    // Click Trim to 10 cards chip
+    const trimChip = page.getByRole('button', { name: /Trim to 10 cards/i });
+    await trimChip.click();
+
+    // Wait for dialogue reply
+    await expect(page.locator('.dialogue-bubble.assistant').last()).toContainText(/streamlined your curriculum/i);
+
     // Switch back to cards tab
     const cardsTab = page.getByTestId('ai-prep-tab-cards');
     await cardsTab.click();

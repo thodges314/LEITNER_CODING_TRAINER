@@ -39,7 +39,16 @@ export interface InteractiveToolRecommendation {
   focus: string;
 }
 
+export interface DossierMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
+  updatedCards?: InterviewPrepCardSelection[];
+}
+
 export interface InterviewPrepDossier {
+  id?: string;
   company: string;
   role: string;
   targetDate?: string;
@@ -51,6 +60,7 @@ export interface InterviewPrepDossier {
   interactiveTools: InteractiveToolRecommendation[];
   countdownChecklist: string[];
   generatedAt: number;
+  conversation?: DossierMessage[];
 }
 
 export interface InterviewPrepRequest {
@@ -112,10 +122,14 @@ CRITICAL RULES:
       ? `Candidate Recent Setbacks / Box 1 Cards in Trainer:\n${request.weakCardIds.map((id) => `- ${id}`).join('\n')}`
       : 'Candidate Trainer Setbacks: (None recorded)';
 
+  const cardCountText = request.targetCardCount
+    ? `Target Card Count: ${request.targetCardCount} cards`
+    : 'Target Card Count: Auto (Select an optimal curriculum depth between 10 and 22 cards based on the candidate\'s timeline, role seniority, and intelligence dump. Do not include redundant cards).';
+
   const user = `Target Company: ${request.company || 'Tech Company'}
 Role & Level: ${request.role || 'Senior Software Engineer'}
 Target Date / Timeline: ${request.targetDate || 'Upcoming in 1-2 weeks'}
-Target Card Count: ${request.targetCardCount || 18} cards
+${cardCountText}
 
 ${weaknessText}
 
@@ -321,7 +335,21 @@ export function parseInterviewPrepResponse(
     }
   }
 
+  const dossierId = `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  const initialMessage: DossierMessage = {
+    id: `msg_${Date.now().toString(36)}_0`,
+    role: 'assistant',
+    content: `I've synthesized your interview preparation dossier for **${company}** (${role}). The curriculum contains **${selectedCards.length} curated flashcards** focused on the highest-probability patterns for this role.
+
+You can ask me to:
+- Adjust card selections (e.g. *"Trim deck to 10 most critical cards"*, *"Add more React custom hooks"*)
+- Clarify why any problem was selected
+- Report your Leitner practice progress and get targeted drill advice!`,
+    timestamp: Date.now(),
+  };
+
   return {
+    id: dossierId,
     company,
     role,
     targetDate,
@@ -333,6 +361,7 @@ export function parseInterviewPrepResponse(
     interactiveTools: interactiveTools.length > 0 ? interactiveTools : getDefaultInteractiveTools(),
     countdownChecklist: countdownChecklist.length > 0 ? countdownChecklist : getDefaultChecklist(),
     generatedAt: Date.now(),
+    conversation: [initialMessage],
   };
 }
 
@@ -387,7 +416,17 @@ export function generateHeuristicDossier(
 
   scored.sort((a, b) => b.score - a.score || a.card.difficulty - b.card.difficulty);
 
-  const targetCount = request.targetCardCount || 16;
+  let targetCount = request.targetCardCount;
+  if (!targetCount) {
+    if (/10 card|quick|sprint|short|light/i.test(notesLower)) {
+      targetCount = 10;
+    } else if (/20 card|thorough|comprehensive|extensive/i.test(notesLower)) {
+      targetCount = 20;
+    } else {
+      targetCount = 14;
+    }
+  }
+
   const picked = scored.slice(0, targetCount);
 
   const selectedCards: InterviewPrepCardSelection[] = picked.map((item, idx) => ({
@@ -396,7 +435,21 @@ export function generateHeuristicDossier(
     rationale: `Highly relevant for ${company} ${role} technical screening.`,
   }));
 
+  const dossierId = `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  const initialMessage: DossierMessage = {
+    id: `msg_${Date.now().toString(36)}_0`,
+    role: 'assistant',
+    content: `I've synthesized your interview preparation dossier for **${company}** (${role}). The curriculum contains **${selectedCards.length} curated flashcards** focused on the highest-probability patterns for this role.
+
+You can ask me to:
+- Adjust card selections (e.g. *"Trim deck to 10 most critical cards"*, *"Add more React custom hooks"*)
+- Clarify why any problem was selected
+- Report your Leitner practice progress and get targeted drill advice!`,
+    timestamp: Date.now(),
+  };
+
   return {
+    id: dossierId,
     company,
     role,
     targetDate: request.targetDate,
@@ -408,6 +461,7 @@ export function generateHeuristicDossier(
     interactiveTools: getDefaultInteractiveTools(),
     countdownChecklist: getDefaultChecklist(),
     generatedAt: Date.now(),
+    conversation: [initialMessage],
   };
 }
 
@@ -575,6 +629,278 @@ export async function generateInterviewPrepDossier(
 }
 
 // ---------------------------------------------------------------------------
+// AI Copilot Dialogue & Refinement
+// ---------------------------------------------------------------------------
+
+export interface DialogueResponse {
+  reply: string;
+  updatedCards?: InterviewPrepCardSelection[];
+}
+
+export async function continueInterviewDialogue(
+  dossier: InterviewPrepDossier,
+  userMessage: string,
+  catalog: CatalogIndexEntry[],
+  progressContext?: {
+    box1Count: number;
+    box2Count: number;
+    box3PlusCount: number;
+    masteredCount: number;
+    recentBox1Titles: string[];
+  }
+): Promise<DialogueResponse> {
+  const validIds = new Set(catalog.map((c) => c.id));
+  const apiKey = getStoredApiKey();
+  const provider = getStoredProvider();
+
+  if (!apiKey) {
+    return generateHeuristicDialogueReply(dossier, userMessage, catalog, progressContext);
+  }
+
+  const selectedCardsSummary = dossier.selectedCards
+    .map((c) => {
+      const entry = catalog.find((x) => x.id === c.id);
+      return `- [${c.priority.toUpperCase()}] ${c.id}: ${entry?.title || c.id} (${entry?.track || 'track'}) — ${c.rationale}`;
+    })
+    .join('\n');
+
+  const progressSummary = progressContext
+    ? `Candidate Leitner Practice Progress:
+- Mastered / High Retention (Box 3+): ${progressContext.box3PlusCount + progressContext.masteredCount}
+- Maturing (Box 2): ${progressContext.box2Count}
+- Recent Setbacks / Active Retention Need (Box 1): ${progressContext.box1Count}
+${progressContext.recentBox1Titles.length > 0 ? `Setback Cards: ${progressContext.recentBox1Titles.join(', ')}` : ''}`
+    : 'No live Leitner progress reported yet.';
+
+  const systemPrompt = `You are an expert technical interview coach for a candidate preparing for an upcoming technical interview at ${dossier.company} for the role of ${dossier.role}.
+The candidate has a tailored curriculum of ${dossier.selectedCards.length} flashcards and an interview preparation dossier.
+
+CURRENT CURRICULUM:
+${selectedCardsSummary}
+
+PROGRESS STATUS:
+${progressSummary}
+
+FULL CARD CATALOG AVAILABLE FOR MODIFICATIONS OR SWAPS:
+${formatCatalogForPrompt(catalog)}
+
+COACHING DIRECTIVES:
+1. Provide concise, direct, senior-level coaching and tactical advice.
+2. If the user asks questions or reports progress, analyze what they should focus on next with actionable suggestions.
+3. If the user asks to ADD, REMOVE, TRIM, or MODIFY cards in their custom deck (e.g. "trim to 10 cards", "remove algorithms", "add more react hooks"), make the necessary adjustments to the curriculum.
+4. If you modified the curriculum, append a JSON block at the very end of your response with the FULL updated selected cards list:
+\`\`\`json
+{
+  "updatedCards": [
+    { "id": "card-id-from-catalog", "priority": "must-know" | "recommended" | "optional", "rationale": "one concise sentence" }
+  ]
+}
+\`\`\`
+Only include this JSON block if the candidate requested a modification to the deck cards.`;
+
+  const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+    { role: 'system', content: systemPrompt },
+  ];
+
+  if (dossier.conversation && dossier.conversation.length > 0) {
+    for (const msg of dossier.conversation.slice(-6)) {
+      messages.push({
+        role: msg.role,
+        content: msg.content,
+      });
+    }
+  }
+
+  messages.push({ role: 'user', content: userMessage });
+
+  try {
+    let rawReply = '';
+    if (provider === 'gemini') {
+      const model = getStoredModel() || 'gemini-2.5-flash';
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const geminiContents = messages.map((m) => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      }));
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: geminiContents }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        rawReply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+      }
+    } else if (provider === 'anthropic') {
+      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
+      const endpoint = 'https://api.anthropic.com/v1/messages';
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 2000,
+          system: systemPrompt,
+          messages: messages.filter((m) => m.role !== 'system').map((m) => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          })),
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        rawReply = data.content?.[0]?.text?.trim() || '';
+      }
+    } else {
+      let baseUrl = getStoredBaseUrl();
+      let model = getStoredModel();
+      if (provider === 'openai') {
+        baseUrl = baseUrl || 'https://api.openai.com/v1';
+        model = model || 'gpt-4o-mini';
+      } else if (provider === 'groq') {
+        baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
+        model = model || 'openai/gpt-oss-120b';
+      } else if (provider === 'cerebras') {
+        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
+        model = model || 'llama3.3-70b';
+      } else if (provider === 'mistral') {
+        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
+        model = model || 'codestral-latest';
+      } else if (provider === 'openrouter') {
+        baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
+        model = model || 'anthropic/claude-3.5-sonnet';
+      }
+      const endpoint = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature: 0.3,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        rawReply = data.choices?.[0]?.message?.content?.trim() || '';
+      }
+    }
+
+    if (!rawReply) {
+      return generateHeuristicDialogueReply(dossier, userMessage, catalog, progressContext);
+    }
+
+    const jsonMatch = rawReply.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    let updatedCards: InterviewPrepCardSelection[] | undefined = undefined;
+    let cleanReply = rawReply;
+
+    if (jsonMatch) {
+      try {
+        const parsed = JSON.parse(jsonMatch[1].trim());
+        if (Array.isArray(parsed.updatedCards)) {
+          const cards: InterviewPrepCardSelection[] = [];
+          const seen = new Set<string>();
+          for (const c of parsed.updatedCards) {
+            if (c && typeof c.id === 'string' && validIds.has(c.id) && !seen.has(c.id)) {
+              seen.add(c.id);
+              cards.push({
+                id: c.id,
+                priority: c.priority === 'must-know' || c.priority === 'optional' ? c.priority : 'recommended',
+                rationale: typeof c.rationale === 'string' ? c.rationale : `Targeted for ${dossier.company}.`,
+              });
+            }
+          }
+          if (cards.length > 0) {
+            updatedCards = cards;
+            cleanReply = rawReply.replace(/```(?:json)?\s*[\s\S]*?\s*```/, '').trim();
+          }
+        }
+      } catch {
+        /* ignore parsing issues in chat */
+      }
+    }
+
+    return { reply: cleanReply, updatedCards };
+  } catch {
+    return generateHeuristicDialogueReply(dossier, userMessage, catalog, progressContext);
+  }
+}
+
+export function generateHeuristicDialogueReply(
+  dossier: InterviewPrepDossier,
+  userMessage: string,
+  catalog: CatalogIndexEntry[],
+  progressContext?: {
+    box1Count: number;
+    box2Count: number;
+    box3PlusCount: number;
+    masteredCount: number;
+    recentBox1Titles: string[];
+  }
+): DialogueResponse {
+  const msgLower = userMessage.toLowerCase();
+
+  if (/trim|reduce|cut|smaller|10 card|fewer/i.test(msgLower)) {
+    const desiredMatch = msgLower.match(/\b([1-9]|1[0-9]|20)\b/);
+    const desiredCount = desiredMatch ? parseInt(desiredMatch[1], 10) : 10;
+    const targetCount = Math.max(6, Math.min(desiredCount, 24));
+    const sorted = [...dossier.selectedCards].sort((a, b) => {
+      const pOrder = { 'must-know': 0, 'recommended': 1, 'optional': 2 };
+      return pOrder[a.priority] - pOrder[b.priority];
+    });
+    const updatedCards = sorted.slice(0, targetCount);
+    return {
+      reply: `I've streamlined your curriculum down to the top ${updatedCards.length} highest-priority cards for ${dossier.company}. This focuses your preparation on essential state contracts, core architectural patterns, and accessibility requirements without unnecessary fatigue.`,
+      updatedCards,
+    };
+  }
+
+  if (/more react|hooks|component|custom hook/i.test(msgLower)) {
+    const reactCards = catalog.filter(
+      (c) =>
+        (c.track === 'react-components' || c.tags.includes('react') || c.tags.includes('hooks')) &&
+        !dossier.selectedCards.some((sc) => sc.id === c.id)
+    );
+    const additions: InterviewPrepCardSelection[] = reactCards.slice(0, 3).map((c) => ({
+      id: c.id,
+      priority: 'must-know',
+      rationale: `Direct React pattern assessment for ${dossier.company}.`,
+    }));
+    const updatedCards = [...dossier.selectedCards, ...additions];
+    return {
+      reply: `I've expanded the curriculum with ${additions.length} additional targeted React component and custom hook drills (${additions.map((a) => a.id).join(', ')}). These reinforce component isolation, state machine synchronization, and lifecycle cleanups.`,
+      updatedCards,
+    };
+  }
+
+  if (/progress|mastered|leitner|box|status|how am i doing/i.test(msgLower) && progressContext) {
+    const totalPracticed =
+      progressContext.box1Count + progressContext.box2Count + progressContext.box3PlusCount;
+    if (totalPracticed === 0) {
+      return {
+        reply: `You haven't recorded any completed trials in this deck yet. I recommend starting with the top 3 "MUST-KNOW" cards today in 25-minute focused bursts. Aim to write code cold without looking at reference solutions!`,
+      };
+    }
+    const mastered = progressContext.box3PlusCount + progressContext.masteredCount;
+    return {
+      reply: `Solid progress! You currently have ${mastered} cards at high retention (Box 3+), ${progressContext.box2Count} developing in Box 2, and ${progressContext.box1Count} in Box 1 setbacks.\n\n🎯 **Immediate Next Step:** Clear the ${progressContext.box1Count} Box 1 setback cards first before attempting new cards. In ${dossier.company} interviews, stumbling on basic syntax or edge cases causes setbacks—re-drilling these cements immediate fluency.`,
+    };
+  }
+
+  return {
+    reply: `Understood! For ${dossier.company}'s ${dossier.role} technical screening, interviewers look closely for three core signals: (1) structured state architecture without unnecessary re-renders, (2) explicit accessibility semantics (ARIA roles & keyboard navigation), and (3) clean boundary handling for async states. Focus your drills on reproducing solutions cold under a 20-minute timer. Let me know if you'd like to adjust card selections or need specific strategy for any drill!`,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // LocalStorage Persistence for Dossiers
 // ---------------------------------------------------------------------------
 
@@ -588,10 +914,18 @@ export function loadAllInterviewDossiers(): Record<string, InterviewPrepDossier>
   }
 }
 
-export function saveInterviewDossier(deckId: string, dossier: InterviewPrepDossier): void {
+export function saveInterviewDossier(deckOrDossierId: string, dossier: InterviewPrepDossier): void {
   if (typeof window === 'undefined') return;
   const all = loadAllInterviewDossiers();
-  all[deckId] = dossier;
+  if (!dossier.id) {
+    dossier.id = deckOrDossierId.startsWith('dossier_')
+      ? deckOrDossierId
+      : `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  }
+  all[deckOrDossierId] = dossier;
+  if (dossier.id && dossier.id !== deckOrDossierId) {
+    all[dossier.id] = dossier;
+  }
   try {
     localStorage.setItem(INTERVIEW_DOSSIERS_STORAGE_KEY, JSON.stringify(all));
   } catch {
@@ -599,20 +933,41 @@ export function saveInterviewDossier(deckId: string, dossier: InterviewPrepDossi
   }
 }
 
-export function getInterviewDossier(deckId: string): InterviewPrepDossier | null {
+export function getInterviewDossier(deckOrDossierId: string): InterviewPrepDossier | null {
   const all = loadAllInterviewDossiers();
-  return all[deckId] || null;
+  return all[deckOrDossierId] || null;
 }
 
-export function deleteInterviewDossier(deckId: string): void {
-  if (typeof window === 'undefined') return;
+export function getAllSavedDossiers(): InterviewPrepDossier[] {
   const all = loadAllInterviewDossiers();
-  if (all[deckId]) {
-    delete all[deckId];
-    try {
-      localStorage.setItem(INTERVIEW_DOSSIERS_STORAGE_KEY, JSON.stringify(all));
-    } catch {
-      /* ignore */
+  const list = Object.values(all);
+  const map = new Map<string, InterviewPrepDossier>();
+  for (const d of list) {
+    if (!d || !d.company) continue;
+    const key = d.id || `${d.company}_${d.role}_${d.generatedAt}`;
+    if (!map.has(key) || ((map.get(key)!.generatedAt || 0) < (d.generatedAt || 0))) {
+      map.set(key, d);
     }
   }
+  return Array.from(map.values()).sort(
+    (a, b) => (b.generatedAt || 0) - (a.generatedAt || 0)
+  );
 }
+
+export function deleteInterviewDossier(deckOrDossierId: string): void {
+  if (typeof window === 'undefined') return;
+  const all = loadAllInterviewDossiers();
+  const dossier = all[deckOrDossierId];
+  if (all[deckOrDossierId]) {
+    delete all[deckOrDossierId];
+  }
+  if (dossier?.id && all[dossier.id]) {
+    delete all[dossier.id];
+  }
+  try {
+    localStorage.setItem(INTERVIEW_DOSSIERS_STORAGE_KEY, JSON.stringify(all));
+  } catch {
+    /* ignore */
+  }
+}
+

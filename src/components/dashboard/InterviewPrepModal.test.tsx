@@ -109,6 +109,19 @@ describe('InterviewPrepModal Component', () => {
     const deckNameInput = document.querySelector('[data-testid="ai-prep-review-deck-name"]') as HTMLInputElement;
     expect(deckNameInput.value).toContain('Stripe');
 
+    // Verify dedicated print document was rendered in the DOM
+    const printDoc = document.querySelector('.ai-prep-print-document');
+    expect(printDoc).not.toBeNull();
+    expect(printDoc?.textContent).toContain('TECHNICAL INTERVIEW PREPARATION DOSSIER');
+
+    // Click Dialogue Tab
+    const dialogueTab = document.querySelector('[data-testid="ai-prep-tab-dialogue"]') as HTMLButtonElement;
+    expect(dialogueTab).not.toBeNull();
+    await act(async () => {
+      dialogueTab.click();
+    });
+    expect(document.querySelector('[data-testid="ai-prep-dialogue-tab-body"]')).not.toBeNull();
+
     // Verify cards tab
     const createDeckBtn = document.querySelector('[data-testid="ai-prep-create-deck-btn"]') as HTMLButtonElement;
     expect(createDeckBtn).not.toBeNull();

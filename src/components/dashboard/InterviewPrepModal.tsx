@@ -16,14 +16,23 @@ import {
   CheckSquare,
   Square,
   ArrowLeft,
+  MessageSquare,
+  Send,
+  Clock,
+  Trash2,
+  Zap,
 } from 'lucide-react';
 import catalogIndexData from '../../data/catalogIndex.json';
 import {
   generateInterviewPrepDossier,
   saveInterviewDossier,
+  getAllSavedDossiers,
+  deleteInterviewDossier,
+  continueInterviewDialogue,
   type CatalogIndexEntry,
   type InterviewPrepDossier,
   type CardPriority,
+  type DossierMessage,
 } from '../../lib/interviewPrep';
 import { getStoredProvider, getStoredModel } from '../../lib/ai';
 
@@ -67,10 +76,15 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const [targetDate, setTargetDate] = useState('');
+  const [deckSizeMode, setDeckSizeMode] = useState<'auto' | 'custom'>('auto');
   const [targetCardCount, setTargetCardCount] = useState(16);
   const [rawNotes, setRawNotes] = useState('');
   const [selectedWeaknesses, setSelectedWeaknesses] = useState<string[]>([]);
   const [syncBox1Cards, setSyncBox1Cards] = useState(currentBox1CardIds.length > 0);
+
+  // Saved briefings history
+  const [savedDossiers, setSavedDossiers] = useState<InterviewPrepDossier[]>(() => getAllSavedDossiers());
+  const [showSavedDropdown, setShowSavedDropdown] = useState(false);
 
   // Loading animation state
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
@@ -79,8 +93,14 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const [dossier, setDossier] = useState<InterviewPrepDossier | null>(null);
   const [editableDeckName, setEditableDeckName] = useState('');
   const [editableDescription, setEditableDescription] = useState('');
-  const [activeTab, setActiveTab] = useState<'cards' | 'guide' | 'tools'>('cards');
+  const [activeTab, setActiveTab] = useState<'cards' | 'guide' | 'tools' | 'dialogue'>('cards');
   const [checkedCardIds, setCheckedCardIds] = useState<Set<string>>(new Set());
+
+  // Dialogue state
+  const [dialogueInput, setDialogueInput] = useState('');
+  const [isDialogueLoading, setIsDialogueLoading] = useState(false);
+  const [dialogueUpdateNotification, setDialogueUpdateNotification] = useState<string | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const companyInputRef = useRef<HTMLInputElement>(null);
 
@@ -115,7 +135,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           rawNotes,
           candidateWeaknesses: selectedWeaknesses,
           weakCardIds: syncBox1Cards ? currentBox1CardIds : [],
-          targetCardCount,
+          targetCardCount: deckSizeMode === 'custom' ? targetCardCount : undefined,
         },
         catalogIndex
       );
@@ -125,11 +145,30 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
       setEditableDeckName(generated.deckName);
       setEditableDescription(generated.deckDescription);
       setCheckedCardIds(new Set(generated.selectedCards.map((c) => c.id)));
+      setSavedDossiers(getAllSavedDossiers());
       setStep('review');
     } catch {
       clearInterval(interval);
       setStep('input');
     }
+  };
+
+  const handleLoadSavedDossier = (saved: InterviewPrepDossier) => {
+    setDossier(saved);
+    setCompany(saved.company);
+    setRole(saved.role);
+    setTargetDate(saved.targetDate || '');
+    setEditableDeckName(saved.deckName);
+    setEditableDescription(saved.deckDescription);
+    setCheckedCardIds(new Set(saved.selectedCards.map((c) => c.id)));
+    setShowSavedDropdown(false);
+    setStep('review');
+  };
+
+  const handleDeleteSavedDossier = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    deleteInterviewDossier(id);
+    setSavedDossiers(getAllSavedDossiers());
   };
 
   const toggleCardCheck = (cardId: string) => {
@@ -186,6 +225,100 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     window.print();
   };
 
+  const handleSendDialogueMessage = async (textToSend?: string) => {
+    const text = (textToSend || dialogueInput).trim();
+    if (!text || !dossier || isDialogueLoading) return;
+
+    const userMsg: DossierMessage = {
+      id: `msg_user_${Date.now()}`,
+      role: 'user',
+      content: text,
+      timestamp: Date.now(),
+    };
+
+    const updatedConversation = [...(dossier.conversation || []), userMsg];
+    const updatedDossier = { ...dossier, conversation: updatedConversation };
+    setDossier(updatedDossier);
+    setDialogueInput('');
+    setIsDialogueLoading(true);
+
+    // Calculate candidate Leitner practice progress if available
+    let progressContext = undefined;
+    try {
+      const storedDeckState = localStorage.getItem('leitner_deck_state');
+      if (storedDeckState) {
+        const parsed = JSON.parse(storedDeckState);
+        const cardBoxes: Record<string, number> = parsed.cardBoxes || {};
+        let box1 = 0;
+        let box2 = 0;
+        let box3Plus = 0;
+        const recentBox1Titles: string[] = [];
+        for (const card of dossier.selectedCards) {
+          const b = cardBoxes[card.id] || 0;
+          if (b === 1) {
+            box1++;
+            const entry = catalogIndex.find((e) => e.id === card.id);
+            recentBox1Titles.push(entry?.title || card.id);
+          } else if (b === 2) {
+            box2++;
+          } else if (b >= 3) {
+            box3Plus++;
+          }
+        }
+        progressContext = {
+          box1Count: box1,
+          box2Count: box2,
+          box3PlusCount: box3Plus,
+          masteredCount: 0,
+          recentBox1Titles: recentBox1Titles.slice(0, 4),
+        };
+      }
+    } catch {
+      /* ignore */
+    }
+
+    try {
+      const response = await continueInterviewDialogue(
+        updatedDossier,
+        text,
+        catalogIndex,
+        progressContext
+      );
+
+      const assistantMsg: DossierMessage = {
+        id: `msg_ast_${Date.now()}`,
+        role: 'assistant',
+        content: response.reply,
+        timestamp: Date.now(),
+        updatedCards: response.updatedCards,
+      };
+
+      const finalDossier: InterviewPrepDossier = {
+        ...updatedDossier,
+        conversation: [...updatedConversation, assistantMsg],
+      };
+
+      if (response.updatedCards && response.updatedCards.length > 0) {
+        finalDossier.selectedCards = response.updatedCards;
+        setCheckedCardIds(new Set(response.updatedCards.map((c) => c.id)));
+        setDialogueUpdateNotification(
+          `Curriculum updated! Now contains ${response.updatedCards.length} tailored cards.`
+        );
+        setTimeout(() => setDialogueUpdateNotification(null), 4000);
+      }
+
+      setDossier(finalDossier);
+      saveInterviewDossier(finalDossier.id || 'current_dossier', finalDossier);
+    } catch (err) {
+      console.error('Dialogue error:', err);
+    } finally {
+      setIsDialogueLoading(false);
+      setTimeout(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
   const getPriorityBadgeClass = (priority: CardPriority) => {
     switch (priority) {
       case 'must-know':
@@ -205,489 +338,808 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   ];
 
   return (
-    <div
-      className="modal-overlay ai-prep-modal-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="ai-prep-modal-title"
-      data-testid="interview-prep-modal"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && step !== 'loading') onClose();
-      }}
-    >
-      <div className="modal-content glass-panel ai-prep-modal-container">
-        {/* Header */}
-        <div className="ai-prep-modal-header">
-          <div className="ai-prep-header-icon-wrap">
-            <Sparkles size={20} className="ai-prep-header-icon" />
-          </div>
-          <div className="ai-prep-header-titles">
-            <h2 id="ai-prep-modal-title" className="ai-prep-modal-title">
-              AI Interview Prep Copilot
-            </h2>
-            <p className="ai-prep-modal-subtitle">
-              Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
-            </p>
-          </div>
-          {step !== 'loading' && (
-            <button
-              type="button"
-              className="modal-close-btn"
-              onClick={onClose}
-              aria-label="Close modal"
-              data-testid="ai-prep-close-btn"
-            >
-              <X size={18} />
-            </button>
-          )}
-        </div>
-
-        {/* STEP 1: INPUT FORM */}
-        {step === 'input' && (
-          <form onSubmit={handleStartGeneration} className="ai-prep-form">
-            <div className="ai-prep-fields-grid">
-              <div className="ai-prep-field">
-                <label htmlFor="ai-prep-company" className="ai-prep-label">
-                  <Building2 size={13} className="label-icon" />
-                  <span>Target Company</span>
-                </label>
-                <input
-                  id="ai-prep-company"
-                  ref={companyInputRef}
-                  type="text"
-                  className="modal-input"
-                  placeholder="e.g. Stripe, Airbnb, Datadog, Meta"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  data-testid="ai-prep-company-input"
-                />
-              </div>
-
-              <div className="ai-prep-field">
-                <label htmlFor="ai-prep-role" className="ai-prep-label">
-                  <Briefcase size={13} className="label-icon" />
-                  <span>Role & Target Level</span>
-                </label>
-                <input
-                  id="ai-prep-role"
-                  type="text"
-                  className="modal-input"
-                  placeholder="e.g. Senior Frontend Engineer"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  data-testid="ai-prep-role-input"
-                />
-              </div>
-
-              <div className="ai-prep-field">
-                <label htmlFor="ai-prep-date" className="ai-prep-label">
-                  <Calendar size={13} className="label-icon" />
-                  <span>Target Date / Timeline (Optional)</span>
-                </label>
-                <input
-                  id="ai-prep-date"
-                  type="text"
-                  className="modal-input"
-                  placeholder="e.g. In 5 days, or 2026-11-05"
-                  value={targetDate}
-                  onChange={(e) => setTargetDate(e.target.value)}
-                  data-testid="ai-prep-date-input"
-                />
-              </div>
-
-              <div className="ai-prep-field">
-                <label htmlFor="ai-prep-count" className="ai-prep-label">
-                  <Sliders size={13} className="label-icon" />
-                  <span>Target Deck Size: {targetCardCount} Cards</span>
-                </label>
-                <input
-                  id="ai-prep-count"
-                  type="range"
-                  min="10"
-                  max="24"
-                  step="2"
-                  className="ai-prep-slider"
-                  value={targetCardCount}
-                  onChange={(e) => setTargetCardCount(Number(e.target.value))}
-                  data-testid="ai-prep-count-slider"
-                />
-              </div>
+    <>
+      <div
+        className="modal-overlay ai-prep-modal-overlay"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ai-prep-modal-title"
+        data-testid="interview-prep-modal"
+        onClick={(e) => {
+          if (e.target === e.currentTarget && step !== 'loading') onClose();
+        }}
+      >
+        <div className="modal-content glass-panel ai-prep-modal-container">
+          {/* Header */}
+          <div className="ai-prep-modal-header">
+            <div className="ai-prep-header-icon-wrap">
+              <Sparkles size={20} className="ai-prep-header-icon" />
+            </div>
+            <div className="ai-prep-header-titles">
+              <h2 id="ai-prep-modal-title" className="ai-prep-modal-title">
+                AI Interview Prep Copilot
+              </h2>
+              <p className="ai-prep-modal-subtitle">
+                Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
+              </p>
             </div>
 
-            {/* Raw Intelligence Dump Box */}
-            <div className="ai-prep-field">
-              <label htmlFor="ai-prep-raw-notes" className="ai-prep-label">
-                <BookOpen size={13} className="label-icon" />
-                <span>Raw Intelligence Dump (Job Description, Recruiter Emails, Round Notes)</span>
-              </label>
-              <textarea
-                id="ai-prep-raw-notes"
-                className="ai-prep-textarea"
-                rows={4}
-                placeholder="Paste the job description, recruiter bullet points, onsite round descriptions, Glassdoor questions, or tech stack requirements here. The AI copilot will extract the tactical signals automatically."
-                value={rawNotes}
-                onChange={(e) => setRawNotes(e.target.value)}
-                data-testid="ai-prep-raw-notes-input"
-              />
-            </div>
-
-            {/* Candidate Weaknesses Checklist */}
-            <div className="ai-prep-field">
-              <label className="ai-prep-label">
-                <AlertTriangle size={13} className="label-icon" />
-                <span>Candidate Calibration (Select areas where you feel rusty under pressure)</span>
-              </label>
-              <div className="ai-prep-weaknesses-list">
-                {WEAKNESS_OPTIONS.map((opt) => {
-                  const isChecked = selectedWeaknesses.includes(opt);
-                  return (
-                    <button
-                      key={opt}
-                      type="button"
-                      className={`ai-prep-weakness-chip ${isChecked ? 'selected' : ''}`}
-                      onClick={() => toggleWeakness(opt)}
-                      data-testid={`ai-weakness-chip-${opt.slice(0, 10)}`}
-                    >
-                      {isChecked ? (
-                        <CheckSquare size={14} className="chip-check" />
-                      ) : (
-                        <Square size={14} className="chip-check" />
-                      )}
-                      <span>{opt}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Box 1 Sync Toggle */}
-            {currentBox1CardIds.length > 0 && (
-              <label className="ai-prep-sync-box1-row">
-                <input
-                  type="checkbox"
-                  checked={syncBox1Cards}
-                  onChange={(e) => setSyncBox1Cards(e.target.checked)}
-                  className="catalog-checkbox"
-                  data-testid="ai-prep-sync-box1-checkbox"
-                />
-                <span className="sync-box1-label">
-                  Include my recent setbacks from Leitner practice ({currentBox1CardIds.length} cards currently in Box 1)
-                </span>
-              </label>
-            )}
-
-            {/* Model & Provider Badge */}
-            <div className="ai-prep-provider-bar">
-              <div className="ai-prep-provider-badge">
-                <span className="provider-dot" />
-                <span>
-                  Active Model: <strong>{model || provider}</strong> ({provider})
-                </span>
-              </div>
-              <span className="ai-prep-provider-note">
-                Groq offers a 100% free tier. Claude 3.5 Sonnet / GPT-4o recommended for high-stakes on-sites.
-              </span>
-            </div>
-
-            {/* Actions */}
-            <div className="modal-actions ai-prep-actions">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onClose}
-                data-testid="ai-prep-cancel-btn"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary ai-prep-generate-btn"
-                data-testid="ai-prep-generate-btn"
-              >
-                <Sparkles size={15} />
-                <span>Synthesize Prep Curriculum</span>
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* STEP 2: LOADING */}
-        {step === 'loading' && (
-          <div className="ai-prep-loading-view" data-testid="ai-prep-loading-view">
-            <div className="ai-prep-spinner-wrap">
-              <Loader2 size={36} className="ai-prep-spinner animate-spin" />
-            </div>
-            <h3 className="ai-prep-loading-title">Analyzing & Assembling Curriculum</h3>
-            <p className="ai-prep-loading-subtext">{loadingMessages[loadingMessageIndex]}</p>
-          </div>
-        )}
-
-        {/* STEP 3: REVIEW & DECK ASSEMBLY */}
-        {step === 'review' && dossier && (
-          <div className="ai-prep-review-view" data-testid="ai-prep-review-view">
-            {/* Dossier Header Info */}
-            <div className="ai-prep-review-header">
-              <div className="ai-prep-deck-name-row">
-                <div className="ai-prep-field" style={{ flex: 2 }}>
-                  <label htmlFor="ai-review-deck-name" className="ai-prep-label">
-                    <span>Generated Deck Name</span>
-                  </label>
-                  <input
-                    id="ai-review-deck-name"
-                    type="text"
-                    className="modal-input"
-                    value={editableDeckName}
-                    onChange={(e) => setEditableDeckName(e.target.value)}
-                    data-testid="ai-prep-review-deck-name"
-                  />
-                </div>
-                <div className="ai-prep-field" style={{ flex: 3 }}>
-                  <label htmlFor="ai-review-deck-desc" className="ai-prep-label">
-                    <span>Deck Description</span>
-                  </label>
-                  <input
-                    id="ai-review-deck-desc"
-                    type="text"
-                    className="modal-input"
-                    value={editableDescription}
-                    onChange={(e) => setEditableDescription(e.target.value)}
-                    data-testid="ai-prep-review-deck-desc"
-                  />
-                </div>
-              </div>
-
-              {/* Executive Summary Callout */}
-              <div className="ai-prep-executive-callout">
-                <div className="executive-callout-header">
-                  <Sparkles size={14} className="executive-icon" />
-                  <span className="executive-title">Strategic Interview Executive Summary</span>
-                </div>
-                <p className="executive-text">{dossier.executiveSummary}</p>
-              </div>
-            </div>
-
-            {/* Navigation Tabs */}
-            <div className="ai-prep-tabs-bar" role="tablist">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeTab === 'cards'}
-                className={`ai-prep-tab-btn ${activeTab === 'cards' ? 'active' : ''}`}
-                onClick={() => setActiveTab('cards')}
-                data-testid="ai-prep-tab-cards"
-              >
-                <Layers size={14} />
-                <span>Selected Cards ({checkedCardIds.size}/{dossier.selectedCards.length})</span>
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeTab === 'guide'}
-                className={`ai-prep-tab-btn ${activeTab === 'guide' ? 'active' : ''}`}
-                onClick={() => setActiveTab('guide')}
-                data-testid="ai-prep-tab-guide"
-              >
-                <BookOpen size={14} />
-                <span>External Topics ({dossier.externalTopics.length})</span>
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeTab === 'tools'}
-                className={`ai-prep-tab-btn ${activeTab === 'tools' ? 'active' : ''}`}
-                onClick={() => setActiveTab('tools')}
-                data-testid="ai-prep-tab-tools"
-              >
-                <CheckCircle size={14} />
-                <span>Interactive Drills & Checklist</span>
-              </button>
-            </div>
-
-            {/* TAB CONTENT: CARDS */}
-            {activeTab === 'cards' && (
-              <div className="ai-prep-cards-tab-body">
-                <div className="ai-prep-cards-actions-bar">
+            <div className="ai-prep-header-controls">
+              {/* Saved Briefings dropdown */}
+              {savedDossiers.length > 0 && (
+                <div className="ai-prep-saved-dossiers-wrap">
                   <button
                     type="button"
-                    className="ai-prep-select-all-btn"
-                    onClick={handleSelectAllCards}
+                    className="ai-prep-history-btn"
+                    onClick={() => setShowSavedDropdown(!showSavedDropdown)}
+                    title="View saved interview prep dossiers"
                   >
-                    {checkedCardIds.size === dossier.selectedCards.length ? (
-                      <>
-                        <CheckSquare size={13} />
-                        <span>Deselect All</span>
-                      </>
-                    ) : (
-                      <>
-                        <Square size={13} />
-                        <span>Select All</span>
-                      </>
-                    )}
+                    <Clock size={13} />
+                    <span>Saved Briefings ({savedDossiers.length})</span>
                   </button>
-                  <span className="cards-tab-counter">
-                    {checkedCardIds.size} cards ready for custom deck
-                  </span>
-                </div>
 
-                <div className="ai-prep-cards-scroll-list">
-                  {dossier.selectedCards.map((sel) => {
-                    const card = catalogIndex.find((c) => c.id === sel.id);
-                    const isChecked = checkedCardIds.has(sel.id);
-
-                    return (
-                      <div
-                        key={sel.id}
-                        className={`ai-prep-card-item ${isChecked ? 'checked' : 'unchecked'}`}
-                        onClick={() => toggleCardCheck(sel.id)}
-                        data-testid={`ai-card-item-${sel.id}`}
-                      >
-                        <div className="card-item-checkbox">
-                          {isChecked ? (
-                            <CheckSquare size={16} className="text-primary" />
-                          ) : (
-                            <Square size={16} className="text-muted" />
-                          )}
-                        </div>
-
-                        <div className="card-item-content">
-                          <div className="card-item-top-row">
-                            <span className="card-item-title">{card?.title || sel.id}</span>
-                            <span className={getPriorityBadgeClass(sel.priority)}>
-                              {sel.priority.toUpperCase()}
-                            </span>
-                            {card && (
-                              <span className="card-item-diff-badge">D{card.difficulty}</span>
-                            )}
-                            {card && (
-                              <span className="card-item-track-badge">{card.track}</span>
-                            )}
-                          </div>
-                          <p className="card-item-rationale">{sel.rationale}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* TAB CONTENT: EXTERNAL TOPICS */}
-            {activeTab === 'guide' && (
-              <div className="ai-prep-guide-tab-body">
-                <p className="guide-intro">
-                  The following topics are critical for {dossier.company}&apos;s rounds but fall outside standard flashcard coding drills. Review these strategic focus areas:
-                </p>
-                <div className="guide-topics-grid">
-                  {dossier.externalTopics.map((topic, i) => (
-                    <div key={i} className="guide-topic-card">
-                      <div className="guide-topic-header">
-                        <span className="guide-topic-name">{topic.topic}</span>
-                        <span className={`guide-priority-pill ${topic.priority}`}>
-                          {topic.priority.toUpperCase()} PRIORITY
-                        </span>
-                      </div>
-                      <p className="guide-topic-desc">{topic.description}</p>
-                      {topic.recommendedResources.length > 0 && (
-                        <div className="guide-resources-list">
-                          <span className="resources-label">Recommended Crash Courses:</span>
-                          {topic.recommendedResources.map((res, rIdx) => (
-                            <a
-                              key={rIdx}
-                              href={res.url || '#'}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="guide-resource-link"
+                  {showSavedDropdown && (
+                    <div className="ai-prep-saved-menu">
+                      <div className="saved-menu-header">Saved Interview Briefings</div>
+                      <div className="saved-menu-list">
+                        {savedDossiers.map((d) => (
+                          <div
+                            key={d.id || `${d.company}_${d.generatedAt}`}
+                            className="saved-menu-item"
+                            onClick={() => handleLoadSavedDossier(d)}
+                          >
+                            <div className="saved-item-info">
+                              <span className="saved-item-name">{d.deckName}</span>
+                              <span className="saved-item-meta">
+                                {d.selectedCards.length} cards • {new Date(d.generatedAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              className="saved-item-del-btn"
+                              title="Delete briefing"
+                              onClick={(e) => handleDeleteSavedDossier(e, d.id || '')}
                             >
-                              <span>{res.title}</span>
-                              <ExternalLink size={11} />
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* TAB CONTENT: INTERACTIVE TOOLS & CHECKLIST */}
-            {activeTab === 'tools' && (
-              <div className="ai-prep-tools-tab-body">
-                <div className="tools-section">
-                  <h4 className="section-title">Curated Interactive Practice Playgrounds</h4>
-                  <div className="interactive-tools-grid">
-                    {dossier.interactiveTools.map((tool, i) => (
-                      <a
-                        key={i}
-                        href={tool.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="interactive-tool-card"
-                      >
-                        <div className="tool-card-header">
-                          <span className="tool-name">{tool.name}</span>
-                          <ExternalLink size={12} className="tool-icon" />
-                        </div>
-                        <p className="tool-focus">{tool.focus}</p>
-                        <span className="tool-url-label">{tool.url}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="checklist-section">
-                  <h4 className="section-title">24-Hour Countdown & Interview Day Protocol</h4>
-                  <div className="countdown-checklist-list">
-                    {dossier.countdownChecklist.map((item, i) => (
-                      <div key={i} className="checklist-item-row">
-                        <CheckCircle size={15} className="checklist-check-icon" />
-                        <span className="checklist-item-text">{item}</span>
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Review Footer Actions */}
-            <div className="ai-prep-review-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setStep('input')}
-                data-testid="ai-prep-back-btn"
-              >
-                <ArrowLeft size={14} />
-                <span>Adjust Inputs</span>
-              </button>
-
-              <div className="review-footer-right">
+              {step !== 'loading' && (
                 <button
                   type="button"
-                  className="btn btn-secondary ai-prep-print-btn"
-                  onClick={handlePrintDossier}
-                  title="Print or save PDF study dossier"
-                  data-testid="ai-prep-print-dossier-btn"
+                  className="modal-close-btn"
+                  onClick={onClose}
+                  aria-label="Close modal"
+                  data-testid="ai-prep-close-btn"
                 >
-                  <Printer size={14} />
-                  <span>Print / Save PDF</span>
+                  <X size={18} />
                 </button>
-
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  disabled={checkedCardIds.size === 0}
-                  onClick={handleConfirmCreateCustomDeck}
-                  data-testid="ai-prep-create-deck-btn"
-                >
-                  <Layers size={14} />
-                  <span>Create Custom Deck ({checkedCardIds.size} Cards)</span>
-                </button>
-              </div>
+              )}
             </div>
           </div>
-        )}
+
+          {/* STEP 1: INPUT FORM */}
+          {step === 'input' && (
+            <form onSubmit={handleStartGeneration} className="ai-prep-form">
+              <div className="ai-prep-form-rows">
+                {/* Row 1: Target Company (Full width) */}
+                <div className="ai-prep-form-row">
+                  <label htmlFor="ai-prep-company" className="ai-prep-label">
+                    <Building2 size={14} className="label-icon" />
+                    <span>Target Company</span>
+                  </label>
+                  <input
+                    id="ai-prep-company"
+                    ref={companyInputRef}
+                    type="text"
+                    className="modal-input ai-prep-input-lg"
+                    placeholder="e.g. Stripe, Airbnb, Datadog, Meta, Apple, Google, DoorDash, Figma"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    data-testid="ai-prep-company-input"
+                  />
+                </div>
+
+                {/* Row 2: Role & Target Level (Full width) */}
+                <div className="ai-prep-form-row">
+                  <label htmlFor="ai-prep-role" className="ai-prep-label">
+                    <Briefcase size={14} className="label-icon" />
+                    <span>Role & Target Level</span>
+                  </label>
+                  <input
+                    id="ai-prep-role"
+                    type="text"
+                    className="modal-input ai-prep-input-lg"
+                    placeholder="e.g. Senior Frontend Engineer, Staff UI Engineer, Full-Stack L5"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    data-testid="ai-prep-role-input"
+                  />
+                </div>
+
+                {/* Row 3: Target Timeline & Deck Sizing (Full width row with clean split) */}
+                <div className="ai-prep-split-row">
+                  <div className="ai-prep-split-col">
+                    <label htmlFor="ai-prep-date" className="ai-prep-label">
+                      <Calendar size={14} className="label-icon" />
+                      <span>Target Date / Timeline (Optional)</span>
+                    </label>
+                    <input
+                      id="ai-prep-date"
+                      type="text"
+                      className="modal-input ai-prep-input-lg"
+                      placeholder="e.g. In 5 days, next Tuesday, or 2026-11-05"
+                      value={targetDate}
+                      onChange={(e) => setTargetDate(e.target.value)}
+                      data-testid="ai-prep-date-input"
+                    />
+                  </div>
+
+                  <div className="ai-prep-split-col">
+                    <div className="ai-prep-deck-size-header">
+                      <label className="ai-prep-label">
+                        <Sliders size={14} className="label-icon" />
+                        <span>Curriculum Sizing</span>
+                      </label>
+                      <div className="ai-prep-size-mode-toggle">
+                        <button
+                          type="button"
+                          className={`size-mode-btn ${deckSizeMode === 'auto' ? 'active' : ''}`}
+                          onClick={() => setDeckSizeMode('auto')}
+                        >
+                          <Zap size={12} />
+                          <span>Auto (AI Decides)</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={`size-mode-btn ${deckSizeMode === 'custom' ? 'active' : ''}`}
+                          onClick={() => setDeckSizeMode('custom')}
+                        >
+                          <Sliders size={12} />
+                          <span>Custom Count</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {deckSizeMode === 'auto' ? (
+                      <div className="ai-prep-auto-size-note">
+                        <span>AI calibrates deck depth (10–22 cards) based on your timeline and notes below.</span>
+                      </div>
+                    ) : (
+                      <div className="ai-prep-slider-container">
+                        <div className="slider-label-row">
+                          <span className="slider-label-text">Target Deck Size:</span>
+                          <span className="slider-val-badge">{targetCardCount} Cards</span>
+                        </div>
+                        <input
+                          id="ai-prep-count"
+                          type="range"
+                          min="10"
+                          max="24"
+                          step="2"
+                          className="ai-prep-slider"
+                          value={targetCardCount}
+                          onChange={(e) => setTargetCardCount(Number(e.target.value))}
+                          data-testid="ai-prep-count-slider"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Row 4: Raw Intelligence Dump (Full width, larger) */}
+                <div className="ai-prep-form-row">
+                  <label htmlFor="ai-prep-raw-notes" className="ai-prep-label">
+                    <BookOpen size={14} className="label-icon" />
+                    <span>Raw Intelligence Dump & Special Guidance</span>
+                  </label>
+                  <p className="ai-prep-field-hint">
+                    Paste the job description, recruiter emails, onsite round details, Glassdoor questions, or special requests (e.g. <em>&ldquo;keep deck under 12 cards&rdquo;</em>, <em>&ldquo;focus heavily on React architecture and accessibility&rdquo;</em>).
+                  </p>
+                  <textarea
+                    id="ai-prep-raw-notes"
+                    className="ai-prep-textarea ai-prep-textarea-lg"
+                    rows={5}
+                    placeholder="Paste job description, recruiter notes, interview format, tech stack details, or specific sizing requests here..."
+                    value={rawNotes}
+                    onChange={(e) => setRawNotes(e.target.value)}
+                    data-testid="ai-prep-raw-notes-input"
+                  />
+                </div>
+
+                {/* Row 5: Candidate Weaknesses Calibration (Full width) */}
+                <div className="ai-prep-form-row">
+                  <label className="ai-prep-label">
+                    <AlertTriangle size={14} className="label-icon" />
+                    <span>Candidate Calibration (Select areas where you feel rusty under pressure)</span>
+                  </label>
+                  <div className="ai-prep-weaknesses-list">
+                    {WEAKNESS_OPTIONS.map((opt) => {
+                      const isChecked = selectedWeaknesses.includes(opt);
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          className={`ai-prep-weakness-chip ${isChecked ? 'selected' : ''}`}
+                          onClick={() => toggleWeakness(opt)}
+                          data-testid={`ai-weakness-chip-${opt.slice(0, 10)}`}
+                        >
+                          {isChecked ? (
+                            <CheckSquare size={14} className="chip-check" />
+                          ) : (
+                            <Square size={14} className="chip-check" />
+                          )}
+                          <span>{opt}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Box 1 Sync Toggle */}
+                {currentBox1CardIds.length > 0 && (
+                  <label className="ai-prep-sync-box1-row">
+                    <input
+                      type="checkbox"
+                      checked={syncBox1Cards}
+                      onChange={(e) => setSyncBox1Cards(e.target.checked)}
+                      className="catalog-checkbox"
+                      data-testid="ai-prep-sync-box1-checkbox"
+                    />
+                    <span className="sync-box1-label">
+                      Include my recent setbacks from Leitner practice ({currentBox1CardIds.length} cards currently in Box 1)
+                    </span>
+                  </label>
+                )}
+
+                {/* Model & Provider Badge */}
+                <div className="ai-prep-provider-bar">
+                  <div className="ai-prep-provider-badge">
+                    <span className="provider-dot" />
+                    <span>
+                      Active Model: <strong>{model || provider}</strong> ({provider})
+                    </span>
+                  </div>
+                  <span className="ai-prep-provider-note">
+                    Groq offers a 100% free tier. Claude 3.5 Sonnet / GPT-4o recommended for high-stakes on-sites.
+                  </span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="modal-actions ai-prep-actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={onClose}
+                  data-testid="ai-prep-cancel-btn"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary ai-prep-generate-btn"
+                  data-testid="ai-prep-generate-btn"
+                >
+                  <Sparkles size={15} />
+                  <span>Synthesize Prep Curriculum</span>
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* STEP 2: LOADING */}
+          {step === 'loading' && (
+            <div className="ai-prep-loading-view" data-testid="ai-prep-loading-view">
+              <div className="ai-prep-spinner-wrap">
+                <Loader2 size={36} className="ai-prep-spinner animate-spin" />
+              </div>
+              <h3 className="ai-prep-loading-title">Analyzing & Assembling Curriculum</h3>
+              <p className="ai-prep-loading-subtext">{loadingMessages[loadingMessageIndex]}</p>
+            </div>
+          )}
+
+          {/* STEP 3: REVIEW & DECK ASSEMBLY */}
+          {step === 'review' && dossier && (
+            <div className="ai-prep-review-view" data-testid="ai-prep-review-view">
+              {/* Notification Banner when Dialogue modifies curriculum */}
+              {dialogueUpdateNotification && (
+                <div className="ai-prep-update-banner">
+                  <Sparkles size={14} />
+                  <span>{dialogueUpdateNotification}</span>
+                </div>
+              )}
+
+              {/* Dossier Header Info */}
+              <div className="ai-prep-review-header">
+                <div className="ai-prep-deck-name-row">
+                  <div className="ai-prep-field" style={{ flex: 2 }}>
+                    <label htmlFor="ai-review-deck-name" className="ai-prep-label">
+                      <span>Generated Deck Name</span>
+                    </label>
+                    <input
+                      id="ai-review-deck-name"
+                      type="text"
+                      className="modal-input"
+                      value={editableDeckName}
+                      onChange={(e) => setEditableDeckName(e.target.value)}
+                      data-testid="ai-prep-review-deck-name"
+                    />
+                  </div>
+                  <div className="ai-prep-field" style={{ flex: 3 }}>
+                    <label htmlFor="ai-review-deck-desc" className="ai-prep-label">
+                      <span>Deck Description</span>
+                    </label>
+                    <input
+                      id="ai-review-deck-desc"
+                      type="text"
+                      className="modal-input"
+                      value={editableDescription}
+                      onChange={(e) => setEditableDescription(e.target.value)}
+                      data-testid="ai-prep-review-deck-desc"
+                    />
+                  </div>
+                </div>
+
+                {/* Executive Summary Callout */}
+                <div className="ai-prep-executive-callout">
+                  <div className="executive-callout-header">
+                    <Sparkles size={14} className="executive-icon" />
+                    <span className="executive-title">Strategic Interview Executive Summary</span>
+                  </div>
+                  <p className="executive-text">{dossier.executiveSummary}</p>
+                </div>
+              </div>
+
+              {/* Navigation Tabs */}
+              <div className="ai-prep-tabs-bar" role="tablist">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'cards'}
+                  className={`ai-prep-tab-btn ${activeTab === 'cards' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('cards')}
+                  data-testid="ai-prep-tab-cards"
+                >
+                  <Layers size={14} />
+                  <span>Selected Cards ({checkedCardIds.size}/{dossier.selectedCards.length})</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'guide'}
+                  className={`ai-prep-tab-btn ${activeTab === 'guide' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('guide')}
+                  data-testid="ai-prep-tab-guide"
+                >
+                  <BookOpen size={14} />
+                  <span>External Topics ({dossier.externalTopics.length})</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'tools'}
+                  className={`ai-prep-tab-btn ${activeTab === 'tools' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('tools')}
+                  data-testid="ai-prep-tab-tools"
+                >
+                  <CheckCircle size={14} />
+                  <span>Interactive Drills & Checklist</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === 'dialogue'}
+                  className={`ai-prep-tab-btn ${activeTab === 'dialogue' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('dialogue')}
+                  data-testid="ai-prep-tab-dialogue"
+                >
+                  <MessageSquare size={14} />
+                  <span>Copilot Dialogue {dossier.conversation && dossier.conversation.length > 1 ? `(${dossier.conversation.length})` : ''}</span>
+                </button>
+              </div>
+
+              {/* TAB CONTENT: CARDS */}
+              {activeTab === 'cards' && (
+                <div className="ai-prep-cards-tab-body">
+                  <div className="ai-prep-cards-actions-bar">
+                    <button
+                      type="button"
+                      className="ai-prep-select-all-btn"
+                      onClick={handleSelectAllCards}
+                    >
+                      {checkedCardIds.size === dossier.selectedCards.length ? (
+                        <>
+                          <CheckSquare size={13} />
+                          <span>Deselect All</span>
+                        </>
+                      ) : (
+                        <>
+                          <Square size={13} />
+                          <span>Select All</span>
+                        </>
+                      )}
+                    </button>
+                    <span className="cards-tab-counter">
+                      {checkedCardIds.size} cards ready for custom deck
+                    </span>
+                  </div>
+
+                  <div className="ai-prep-cards-scroll-list">
+                    {dossier.selectedCards.map((sel) => {
+                      const card = catalogIndex.find((c) => c.id === sel.id);
+                      const isChecked = checkedCardIds.has(sel.id);
+
+                      return (
+                        <div
+                          key={sel.id}
+                          className={`ai-prep-card-item ${isChecked ? 'checked' : 'unchecked'}`}
+                          onClick={() => toggleCardCheck(sel.id)}
+                          data-testid={`ai-card-item-${sel.id}`}
+                        >
+                          <div className="card-item-checkbox">
+                            {isChecked ? (
+                              <CheckSquare size={16} className="text-primary" />
+                            ) : (
+                              <Square size={16} className="text-muted" />
+                            )}
+                          </div>
+
+                          <div className="card-item-content">
+                            <div className="card-item-top-row">
+                              <span className="card-item-title">{card?.title || sel.id}</span>
+                              <span className={getPriorityBadgeClass(sel.priority)}>
+                                {sel.priority.toUpperCase()}
+                              </span>
+                              {card && (
+                                <span className="card-item-diff-badge">D{card.difficulty}</span>
+                              )}
+                              {card && (
+                                <span className="card-item-track-badge">{card.track}</span>
+                              )}
+                            </div>
+                            <p className="card-item-rationale">{sel.rationale}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB CONTENT: EXTERNAL TOPICS */}
+              {activeTab === 'guide' && (
+                <div className="ai-prep-guide-tab-body">
+                  <p className="guide-intro">
+                    The following topics are critical for {dossier.company}&apos;s rounds but fall outside standard flashcard coding drills. Review these strategic focus areas:
+                  </p>
+                  <div className="guide-topics-grid">
+                    {dossier.externalTopics.map((topic, i) => (
+                      <div key={i} className="guide-topic-card">
+                        <div className="guide-topic-header">
+                          <span className="guide-topic-name">{topic.topic}</span>
+                          <span className={`guide-priority-pill ${topic.priority}`}>
+                            {topic.priority.toUpperCase()} PRIORITY
+                          </span>
+                        </div>
+                        <p className="guide-topic-desc">{topic.description}</p>
+                        {topic.recommendedResources.length > 0 && (
+                          <div className="guide-resources-list">
+                            <span className="resources-label">Recommended Crash Courses:</span>
+                            {topic.recommendedResources.map((res, rIdx) => (
+                              <a
+                                key={rIdx}
+                                href={res.url || '#'}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="guide-resource-link"
+                              >
+                                <span>{res.title}</span>
+                                <ExternalLink size={11} />
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB CONTENT: INTERACTIVE TOOLS & CHECKLIST */}
+              {activeTab === 'tools' && (
+                <div className="ai-prep-tools-tab-body">
+                  <div className="tools-section">
+                    <h4 className="section-title">Curated Interactive Practice Playgrounds</h4>
+                    <div className="interactive-tools-grid">
+                      {dossier.interactiveTools.map((tool, i) => (
+                        <a
+                          key={i}
+                          href={tool.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="interactive-tool-card"
+                        >
+                          <div className="tool-card-header">
+                            <span className="tool-name">{tool.name}</span>
+                            <ExternalLink size={12} className="tool-icon" />
+                          </div>
+                          <p className="tool-focus">{tool.focus}</p>
+                          <span className="tool-url-label">{tool.url}</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="checklist-section">
+                    <h4 className="section-title">24-Hour Countdown & Interview Day Protocol</h4>
+                    <div className="countdown-checklist-list">
+                      {dossier.countdownChecklist.map((item, i) => (
+                        <div key={i} className="checklist-item-row">
+                          <CheckCircle size={15} className="checklist-check-icon" />
+                          <span className="checklist-item-text">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB CONTENT: COPILOT DIALOGUE & REFINEMENT */}
+              {activeTab === 'dialogue' && (
+                <div className="ai-prep-dialogue-tab-body" data-testid="ai-prep-dialogue-tab-body">
+                  <div className="dialogue-messages-scroll">
+                    {dossier.conversation?.map((msg) => (
+                      <div
+                        key={msg.id}
+                        className={`dialogue-bubble ${msg.role === 'user' ? 'user' : 'assistant'}`}
+                      >
+                        <div className="bubble-header">
+                          <span className="bubble-sender">
+                            {msg.role === 'user' ? 'You' : 'AI Interview Coach'}
+                          </span>
+                          <span className="bubble-time">
+                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <div className="bubble-content">{msg.content}</div>
+                        {msg.updatedCards && (
+                          <div className="bubble-card-update-pill">
+                            <Sparkles size={11} />
+                            <span>Curriculum updated to {msg.updatedCards.length} cards</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {isDialogueLoading && (
+                      <div className="dialogue-bubble assistant loading">
+                        <div className="dialogue-typing-indicator">
+                          <Loader2 size={14} className="animate-spin" />
+                          <span>AI Coach is analyzing and adjusting...</span>
+                        </div>
+                      </div>
+                    )}
+                    <div ref={chatEndRef} />
+                  </div>
+
+                  {/* Quick suggestion chips */}
+                  <div className="dialogue-suggestion-chips">
+                    <button
+                      type="button"
+                      className="suggestion-chip"
+                      disabled={isDialogueLoading}
+                      onClick={() => handleSendDialogueMessage('Trim the deck to the top 10 most critical cards.')}
+                    >
+                      ✂️ Trim to 10 cards
+                    </button>
+                    <button
+                      type="button"
+                      className="suggestion-chip"
+                      disabled={isDialogueLoading}
+                      onClick={() => handleSendDialogueMessage('Focus more heavily on React architecture and custom hooks.')}
+                    >
+                      ⚛️ Emphasize React Architecture
+                    </button>
+                    <button
+                      type="button"
+                      className="suggestion-chip"
+                      disabled={isDialogueLoading}
+                      onClick={() => handleSendDialogueMessage('How should I prioritize my remaining practice before interview day?')}
+                    >
+                      🎯 Prioritize Next Drills
+                    </button>
+                    <button
+                      type="button"
+                      className="suggestion-chip"
+                      disabled={isDialogueLoading}
+                      onClick={() => handleSendDialogueMessage('Report Leitner practice progress: How am I doing with my current box retention?')}
+                    >
+                      📊 Report Leitner Progress
+                    </button>
+                  </div>
+
+                  {/* Input form */}
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSendDialogueMessage();
+                    }}
+                    className="dialogue-input-bar"
+                  >
+                    <input
+                      type="text"
+                      className="dialogue-text-input"
+                      placeholder="Ask the coach to modify cards, explain drill choices, or report your progress..."
+                      value={dialogueInput}
+                      onChange={(e) => setDialogueInput(e.target.value)}
+                      disabled={isDialogueLoading}
+                    />
+                    <button
+                      type="submit"
+                      className="dialogue-send-btn"
+                      disabled={isDialogueLoading || !dialogueInput.trim()}
+                      title="Send message to AI Coach"
+                    >
+                      {isDialogueLoading ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Send size={14} />
+                      )}
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {/* Review Footer Actions */}
+              <div className="ai-prep-review-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setStep('input')}
+                  data-testid="ai-prep-back-btn"
+                >
+                  <ArrowLeft size={14} />
+                  <span>Adjust Inputs</span>
+                </button>
+
+                <div className="review-footer-right">
+                  <button
+                    type="button"
+                    className="btn btn-secondary ai-prep-print-btn"
+                    onClick={handlePrintDossier}
+                    title="Print clean multi-page document or save as PDF"
+                    data-testid="ai-prep-print-dossier-btn"
+                  >
+                    <Printer size={14} />
+                    <span>Print / Save PDF</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={checkedCardIds.size === 0}
+                    onClick={handleConfirmCreateCustomDeck}
+                    data-testid="ai-prep-create-deck-btn"
+                  >
+                    <Layers size={14} />
+                    <span>Create Custom Deck ({checkedCardIds.size} Cards)</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {/* DEDICATED CLEAN PRINT DOCUMENT (Visible ONLY @media print) */}
+      {dossier && (
+        <div className="ai-prep-print-document" aria-hidden="true">
+          <div className="print-header">
+            <div className="print-brand">
+              <span className="print-brand-badge">LEITNER CODING TRAINER</span>
+              <span className="print-doc-type">TECHNICAL INTERVIEW PREPARATION DOSSIER</span>
+            </div>
+            <h1 className="print-title">{dossier.company} — {dossier.role}</h1>
+            <div className="print-meta-grid">
+              <div><strong>Target Company:</strong> {dossier.company}</div>
+              <div><strong>Role & Level:</strong> {dossier.role}</div>
+              <div><strong>Target Timeline:</strong> {dossier.targetDate || 'Upcoming in 1-2 weeks'}</div>
+              <div><strong>Prepared Date:</strong> {new Date(dossier.generatedAt).toLocaleDateString()}</div>
+              <div><strong>Curriculum Depth:</strong> {dossier.selectedCards.length} Flashcard Drills</div>
+            </div>
+          </div>
+
+          <div className="print-section">
+            <h2 className="print-section-heading">Strategic Interview Executive Summary</h2>
+            <div className="print-summary-box">
+              <p>{dossier.executiveSummary}</p>
+            </div>
+          </div>
+
+          <div className="print-section">
+            <h2 className="print-section-heading">Curated Flashcard Coding Curriculum ({dossier.selectedCards.length} Cards)</h2>
+            <table className="print-cards-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '13%' }}>Priority</th>
+                  <th style={{ width: '27%' }}>Problem Drill</th>
+                  <th style={{ width: '13%' }}>Domain</th>
+                  <th style={{ width: '7%' }}>Diff</th>
+                  <th style={{ width: '40%' }}>Tactical Interview Rationale</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dossier.selectedCards.map((sel) => {
+                  const card = catalogIndex.find((c) => c.id === sel.id);
+                  return (
+                    <tr key={sel.id}>
+                      <td>
+                        <span className={`print-priority-tag ${sel.priority}`}>
+                          {sel.priority.toUpperCase()}
+                        </span>
+                      </td>
+                      <td><strong>{card?.title || sel.id}</strong></td>
+                      <td>{card?.track || 'General'}</td>
+                      <td>D{card?.difficulty || 2}</td>
+                      <td>{sel.rationale}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="print-section">
+            <h2 className="print-section-heading">External Interview Topics & Study Guide</h2>
+            <div className="print-topics-list">
+              {dossier.externalTopics.map((top, idx) => (
+                <div key={idx} className="print-topic-card">
+                  <div className="print-topic-title-row">
+                    <span className="print-topic-name">{top.topic}</span>
+                    <span className="print-topic-priority">[{top.priority.toUpperCase()} PRIORITY]</span>
+                  </div>
+                  <p className="print-topic-desc">{top.description}</p>
+                  {top.recommendedResources.length > 0 && (
+                    <div className="print-topic-resources">
+                      <strong>Crash Courses & References: </strong>
+                      {top.recommendedResources.map((r) => r.title + (r.url ? ` (${r.url})` : '')).join(' • ')}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="print-section">
+            <h2 className="print-section-heading">24-Hour Countdown & Interview Day Protocol</h2>
+            <div className="print-checklist">
+              {dossier.countdownChecklist.map((item, idx) => (
+                <div key={idx} className="print-checklist-item">
+                  <span className="print-checkbox">&#9744;</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="print-section">
+            <h2 className="print-section-heading">Curated Practice Playgrounds</h2>
+            <div className="print-tools-list">
+              {dossier.interactiveTools.map((t, idx) => (
+                <div key={idx} className="print-tool-item">
+                  <strong>{t.name}</strong> &mdash; {t.focus} ({t.url})
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };

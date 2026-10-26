@@ -9,6 +9,8 @@ import {
   getInterviewDossier,
   deleteInterviewDossier,
   loadAllInterviewDossiers,
+  getAllSavedDossiers,
+  continueInterviewDialogue,
   generateInterviewPrepDossier,
   type CatalogIndexEntry,
   type InterviewPrepRequest,
@@ -226,6 +228,70 @@ Hope this helps!`;
       deleteInterviewDossier('custom-datadog-123');
       expect(getInterviewDossier('custom-datadog-123')).toBeNull();
     });
+
+    it('retrieves all unique saved dossiers sorted by generation date', () => {
+      const d1 = generateHeuristicDossier(
+        { company: 'Apple', role: 'UI Engineer', rawNotes: '' },
+        MOCK_CATALOG
+      );
+      d1.generatedAt = 1000;
+      saveInterviewDossier('apple-deck', d1);
+
+      const d2 = generateHeuristicDossier(
+        { company: 'Netflix', role: 'Senior Frontend', rawNotes: '' },
+        MOCK_CATALOG
+      );
+      d2.generatedAt = 2000;
+      saveInterviewDossier('netflix-deck', d2);
+
+      const list = getAllSavedDossiers();
+      expect(list.length).toBeGreaterThanOrEqual(2);
+      expect(list[0].company).toBe('Netflix');
+      expect(list[1].company).toBe('Apple');
+    });
+  });
+
+  describe('continueInterviewDialogue', () => {
+    it('provides conversational guidance and trims cards when user requests a smaller deck', async () => {
+      const dossier = generateHeuristicDossier(
+        { company: 'Stripe', role: 'Staff Frontend Engineer', rawNotes: '' },
+        MOCK_CATALOG
+      );
+      expect(dossier.selectedCards.length).toBeGreaterThan(2);
+
+      const res = await continueInterviewDialogue(
+        dossier,
+        'Can you trim the deck to 2 cards?',
+        MOCK_CATALOG
+      );
+
+      expect(res.reply).toContain('streamlined your curriculum');
+      expect(res.updatedCards).toBeDefined();
+      expect(res.updatedCards?.length).toBeLessThanOrEqual(dossier.selectedCards.length);
+    });
+
+    it('evaluates Leitner practice progress when reported by candidate', async () => {
+      const dossier = generateHeuristicDossier(
+        { company: 'Stripe', role: 'Staff Frontend Engineer', rawNotes: '' },
+        MOCK_CATALOG
+      );
+
+      const res = await continueInterviewDialogue(
+        dossier,
+        'Report Leitner practice progress: How am I doing with my current box retention?',
+        MOCK_CATALOG,
+        {
+          box1Count: 2,
+          box2Count: 4,
+          box3PlusCount: 5,
+          masteredCount: 1,
+          recentBox1Titles: ['LRU Cache Implementation'],
+        }
+      );
+
+      expect(res.reply).toContain('Box 1 setback cards');
+      expect(res.reply).toContain('Solid progress');
+    });
   });
 
   describe('generateInterviewPrepDossier (offline mode)', () => {
@@ -237,6 +303,17 @@ Hope this helps!`;
 
       expect(dossier.company).toBe('Google');
       expect(dossier.selectedCards.length).toBeGreaterThan(0);
+      expect(dossier.conversation).toBeDefined();
+      expect(dossier.conversation?.length).toBeGreaterThan(0);
+    });
+
+    it('auto-determines card count when targetCardCount is omitted', async () => {
+      const dossierShort = await generateInterviewPrepDossier(
+        { company: 'DoorDash', role: 'Frontend', rawNotes: 'Quick 10 card sprint' },
+        MOCK_CATALOG
+      );
+      // MOCK_CATALOG has 5 total cards, so it caps at available catalog entries
+      expect(dossierShort.selectedCards.length).toBe(MOCK_CATALOG.length);
     });
   });
 });
