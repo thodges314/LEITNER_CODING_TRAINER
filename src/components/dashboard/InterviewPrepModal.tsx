@@ -1637,7 +1637,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     data-testid="ai-prep-download-json-btn"
                   >
                     <Download size={14} />
-                    <span>Export JSON</span>
+                    <span>Export Dossier</span>
                   </button>
 
                   <button
@@ -1648,7 +1648,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     data-testid="ai-prep-import-json-footer-btn"
                   >
                     <Upload size={14} />
-                    <span>Import JSON</span>
+                    <span>Import Dossier</span>
                   </button>
 
                   {/* <button
