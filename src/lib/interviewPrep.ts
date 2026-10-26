@@ -100,15 +100,23 @@ Your mission is to analyze the candidate's target company, role, recruiter commu
 
 CRITICAL RULES:
 1. ONLY select card IDs that exist in the provided Card Catalog Index. DO NOT invent or hallucinate any card IDs.
-2. Select between 12 and 24 cards tailored to the target role, company interview archetype, and candidate weaknesses.
+2. Select an appropriate number of cards tailored to the target role, company interview archetype, and candidate weaknesses:
+   - When the candidate has an immediate interview (sprint, 1–3 days), select a concentrated set of 6–10 high-impact cards.
+   - When preparing for thorough multi-round Big Tech interviews (Google, Amazon, Meta, Apple, Stripe) weeks or months out, select an extensive curriculum of 25–55+ cards.
+   - If targetCardCount is specified, honor it closely (allowable range: 6 to 70 cards).
 3. For each selected card, provide:
    - "id": exact matching card ID from the index
    - "priority": "must-know" | "recommended" | "optional"
    - "rationale": concise 1-sentence reason why this card is essential for this company's interview rounds.
-4. Extract 2–4 key external topics (System Design, GraphQL, Web Performance, Micro-frontends, CI/CD, SQL, etc.) that are outside flashcard coding scope, with targeted study guidance.
-5. Recommend 3–5 interactive learning tools (Flexbox Froggy, CSSBattle, SQLBolt, Web.dev Learn Accessibility, etc.).
-6. Provide a 3–5 item 24-hour countdown checklist.
-7. Return ONLY valid JSON adhering strictly to the schema below. No conversational chatter outside the JSON.`;
+4. Executive Summary: Write a detailed, multi-paragraph strategic interview briefing (3 to 5 substantial paragraphs):
+   - Paragraph 1: Target Company Engineering Archetype & Culture: Analyze what this specific company values (e.g. Amazon's Operational Excellence & Leadership Principles, Google's algorithmic rigor & scale, Meta's rapid UI execution & DOM/tree fluency, Stripe's extreme reliability & API precision). Synthesize any specific intelligence from the job description, recruiter notes, and company interview culture.
+   - Paragraph 2: Candidate Risk Calibration: Map the candidate's self-reported weaknesses and current Leitner setbacks against the company's evaluation rubric.
+   - Paragraph 3: Topics Not Covered by Flashcards (Gaps Analysis): Explicitly call out critical interview topics not tested in 30-minute flashcard coding exercises—such as Frontend System Design, Microfrontend architecture, WebSockets/SSE real-time streams, Core Web Vitals profiling, Asset bundling/Vite/Webpack, CI/CD, and Behavioral/Leadership rounds.
+   - Paragraph 4: Recommended External Deep-Dive Resources: Recommend specific external resources (books like Designing Data-Intensive Applications, Alex Xu's System Design, GreatFrontEnd, web.dev, MDN specifications) to bridge these exact gaps.
+5. Extract 3–5 key external topics (System Design, GraphQL, Web Performance, Micro-frontends, CI/CD, SQL, etc.) that are outside flashcard coding scope, with targeted study guidance and specific high-quality resource links.
+6. Recommend 3–5 interactive learning tools (Flexbox Froggy, CSSBattle, SQLBolt, Web.dev Learn Accessibility, etc.).
+7. Provide a 3–5 item 24-hour countdown checklist.
+8. Return ONLY valid JSON adhering strictly to the schema below. No conversational chatter outside the JSON.`;
 
   const catalogText = formatCatalogForPrompt(catalog);
 
@@ -124,7 +132,7 @@ CRITICAL RULES:
 
   const cardCountText = request.targetCardCount
     ? `Target Card Count: ${request.targetCardCount} cards`
-    : 'Target Card Count: Auto (Select an optimal curriculum depth between 10 and 22 cards based on the candidate\'s timeline, role seniority, and intelligence dump. Do not include redundant cards).';
+    : 'Target Card Count: Auto (Select an optimal curriculum depth between 6 and 50 cards based on the candidate\'s timeline, role seniority, company tier, and intelligence dump. For immediate sprints select 6-10 cards; for Big Tech or multi-month runway select 25-50 cards).';
 
   const user = `Target Company: ${request.company || 'Tech Company'}
 Role & Level: ${request.role || 'Senior Software Engineer'}
@@ -147,7 +155,7 @@ Respond with a JSON object in this exact schema:
 {
   "deckName": "${request.company ? `${request.company} — ` : ''}${request.role || 'Interview Prep'} Core",
   "deckDescription": "Targeted curriculum for ${request.company || 'tech'} interview rounds",
-  "executiveSummary": "2-3 sentence strategic overview of the company's interview focus and how this deck prepares the candidate",
+  "executiveSummary": "Comprehensive multi-paragraph strategic interview briefing covering: 1) Company engineering archetype & interview culture, 2) Candidate risk calibration, 3) Topics not covered by flashcards (system design, real-time streams, build tooling), and 4) Recommended external study resources.",
   "selectedCards": [
     {
       "id": "card-id-from-index",
@@ -157,9 +165,9 @@ Respond with a JSON object in this exact schema:
   ],
   "externalTopics": [
     {
-      "topic": "Topic Name (e.g. GraphQL, System Design)",
+      "topic": "Topic Name (e.g. Frontend System Design, Real-time WebSockets)",
       "priority": "high",
-      "description": "What to study and focus on",
+      "description": "What to study and focus on for rounds outside coding drills",
       "recommendedResources": [
         { "title": "Resource Name", "url": "https://..." }
       ]
@@ -418,22 +426,64 @@ export function generateHeuristicDossier(
 
   let targetCount = request.targetCardCount;
   if (!targetCount) {
-    if (/10 card|quick|sprint|short|light/i.test(notesLower)) {
-      targetCount = 10;
-    } else if (/20 card|thorough|comprehensive|extensive/i.test(notesLower)) {
-      targetCount = 20;
+    if (
+      /sprint|urgent|tomorrow|3-day|3 day|48 hour|immediate|quick/i.test(notesLower) ||
+      /sprint|urgent/i.test(request.targetDate || '')
+    ) {
+      targetCount = 8;
+    } else if (
+      /google|amazon|meta|facebook|apple|stripe|netflix/i.test(companyLower) ||
+      /comprehensive|deep|thorough|month|marathon/i.test(notesLower)
+    ) {
+      targetCount = 36;
     } else {
-      targetCount = 14;
+      targetCount = 18;
     }
   }
+  // Clamp between 1 and min(catalog.length, 75)
+  targetCount = Math.max(1, Math.min(catalog.length, Math.min(75, targetCount)));
 
   const picked = scored.slice(0, targetCount);
 
+  const mustKnowCutoff = Math.max(2, Math.floor(picked.length * 0.28));
+  const recommendedCutoff = Math.max(mustKnowCutoff + 2, Math.floor(picked.length * 0.72));
+
   const selectedCards: InterviewPrepCardSelection[] = picked.map((item, idx) => ({
     id: item.card.id,
-    priority: idx < 5 ? 'must-know' : idx < 12 ? 'recommended' : 'optional',
+    priority: idx < mustKnowCutoff ? 'must-know' : idx < recommendedCutoff ? 'recommended' : 'optional',
     rationale: `Highly relevant for ${company} ${role} technical screening.`,
   }));
+
+  // Company Archetype intelligence paragraph
+  let archetypeParagraph = `${company}'s engineering assessment focuses on strong engineering fundamentals, transparent problem-solving, and clean architectural abstractions. Expect interviewers to evaluate not just whether your solution runs, but how clearly you communicate tradeoffs, structure modular functions, and validate edge cases under timed constraints.`;
+
+  if (companyLower.includes('google') || companyLower.includes('alphabet')) {
+    archetypeParagraph = `Google evaluates candidates through an engineering lens that strictly values asymptotic complexity, rock-solid data structure manipulation, and zero-leak memory discipline. Expect interviewers to dig deep into Big-O time and space tradeoffs, boundary edge cases (off-by-one, empty inputs, sparse trees), and how your implementations scale when data volume grows by multiple orders of magnitude.`;
+  } else if (companyLower.includes('amazon') || companyLower.includes('aws')) {
+    archetypeParagraph = `Amazon pairs coding evaluations directly with their Leadership Principles (notably Customer Obsession, Ownership, and Dive Deep). Technical rounds focus heavily on operational robustness: resilient retry policies, idempotent operations, graceful error handling, and writing clean, maintainable modular code that can withstand real-world production failures.`;
+  } else if (companyLower.includes('meta') || companyLower.includes('facebook')) {
+    archetypeParagraph = `Meta's frontend bar centers on velocity, DOM tree traversal fluency, and intuitive component state architecture. Interviewers assess your ability to implement custom hooks, virtualized lists, and clean compound UI widgets within strict 35–45 minute coding windows, prioritizing clean separation of concerns and immediate bug-free execution.`;
+  } else if (companyLower.includes('stripe')) {
+    archetypeParagraph = `Stripe is legendary for its practical, real-world development environment interviews. Rather than abstract puzzles, you will build and debug real-world software: designing composable API utilities, implementing rate limiters or LRU caches, handling network race conditions, and writing bulletproof, type-safe code that models financial-grade reliability.`;
+  } else if (companyLower.includes('apple')) {
+    archetypeParagraph = `Apple's software engineering ethos prioritizes buttery-smooth 60fps responsiveness, pixel-perfect layout mechanics, and strict adherence to accessibility (WAI-ARIA) and privacy contracts. Expect focus on event loop performance, clean lifecycle teardown, and deterministic UI state machines.`;
+  } else if (companyLower.includes('netflix')) {
+    archetypeParagraph = `Netflix engineering emphasizes distributed client-side resilience, telemetry, caching layers, and media playback synchronization. Technical screenings value proactive defensive programming, observable error metrics, and decoupled asynchronous state management.`;
+  }
+
+  // Candidate calibration paragraph
+  const weaknessList = request.candidateWeaknesses && request.candidateWeaknesses.length > 0
+    ? request.candidateWeaknesses.join(', ')
+    : 'core component state transitions and asynchronous lifecycle edge cases';
+  const calibrationParagraph = `To address your calibrated focus areas (${weaknessList}), this curriculum prioritizes high-yield hands-on drills that convert theoretical knowledge into instantaneous muscle memory. Regular spaced intervals will ensure that syntactic speed and invariant validation become second nature during live whiteboard or pairing sessions.`;
+
+  // Gap analysis paragraph (What Flashcards Don't Cover)
+  const gapsParagraph = `Topics Not Covered by Flashcards (Gap Analysis): While this flashcard deck builds rapid retrieval for in-browser JavaScript, TypeScript, DOM APIs, and React component mechanics, standard interview loops also feature non-coding rounds. Specifically, you must prepare for: 1) Frontend System Design & High-Level Architecture (data normalization, offline caching, SSR vs CSR tradeoffs), 2) Real-time Data Plumbing (WebSockets vs Server-Sent Events vs long-polling), and 3) Build Tooling & Core Web Vitals (bundling strategies, code splitting, and INP/LCP profiling).`;
+
+  // External resource recommendations paragraph
+  const resourcesParagraph = `Recommended External Resources: To bridge these architectural gaps, we recommend: Alex Xu's 'System Design Interview – An Insider's Guide' (Vol 2), the GreatFrontEnd System Design Playbook, web.dev's Core Web Vitals architecture guide, and the MDN WAI-ARIA authoring practices. Review these alongside your daily spaced-repetition drills to ensure full-spectrum interview readiness.`;
+
+  const executiveSummary = `${archetypeParagraph}\n\n${calibrationParagraph}\n\n${gapsParagraph}\n\n${resourcesParagraph}`;
 
   const dossierId = `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   const initialMessage: DossierMessage = {
@@ -455,7 +505,7 @@ You can ask me to:
     targetDate: request.targetDate,
     deckName: `${company} — ${role} Core`,
     deckDescription: `Curated ${selectedCards.length}-card curriculum for ${company} technical interviews`,
-    executiveSummary: `${company}'s technical interview process emphasizes robust code architecture, predictable error handling, and clean component contracts. This curriculum targets the most frequently assessed patterns for this role.`,
+    executiveSummary,
     selectedCards,
     externalTopics: getDefaultExternalTopics(),
     interactiveTools: getDefaultInteractiveTools(),

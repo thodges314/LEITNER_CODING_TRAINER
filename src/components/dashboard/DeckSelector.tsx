@@ -180,6 +180,9 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                           <div className="deck-item-text">
                             <div className="deck-item-header">
                               <span className="deck-item-name">{custom.name}</span>
+                              {custom.dossierId && (
+                                <span className="deck-dossier-tag" title="Created from AI Interview Briefing">🎯 Briefing</span>
+                              )}
                               <span className="deck-item-badge">{count} cards</span>
                             </div>
                             {custom.description && (

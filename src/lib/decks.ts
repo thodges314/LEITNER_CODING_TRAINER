@@ -39,6 +39,7 @@ export interface CustomDeck {
   createdAt: number;
   updatedAt: number;
   isBuiltIn?: false;
+  dossierId?: string;
 }
 
 export type DeckDefinition = DeckPreset | CustomDeck;

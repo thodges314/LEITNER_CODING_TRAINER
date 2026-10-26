@@ -20,6 +20,8 @@ import {
   Plus,
   Sparkles,
   X,
+  Printer,
+  Calendar,
 } from 'lucide-react';
 import {
   loadDeckCatalogPreferences,
@@ -37,6 +39,11 @@ import {
 } from './dashboard';
 import { filterCardsByDeck } from '../lib/decks';
 import type { CustomDeck } from '../lib/decks';
+import { getInterviewDossier, type CatalogIndexEntry } from '../lib/interviewPrep';
+import { printInterviewDossier } from '../lib/printDossier';
+import catalogIndexData from '../data/catalogIndex.json';
+
+const catalogIndex = catalogIndexData as CatalogIndexEntry[];
 
 export type { CatalogSortOption, CatalogStatusFilter };
 
@@ -57,6 +64,7 @@ interface DeckDashboardProps {
   onAddCardsToDeck?: (deckId: string, cardIds: string[]) => void;
   onOpenCreateDeckWithCards?: (cardIds: string[]) => void;
   onTailorWithAIClick?: () => void;
+  onOpenInterviewPrepDossier?: (dossierId?: string, step?: 'input' | 'review') => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
   onOpenAddModal: () => void;
   /** Opens the Focus dialog (used by the one-time hint under the track filter). */
@@ -82,6 +90,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onAddCardsToDeck,
   onOpenCreateDeckWithCards,
   onTailorWithAIClick,
+  onOpenInterviewPrepDossier,
   onStateUpdated,
   onOpenAddModal,
   onOpenFocus,
@@ -94,6 +103,12 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
     () => filterCardsByDeck(allVisibleCards, activeDeckId, customDecks),
     [allVisibleCards, activeDeckId, customDecks]
   );
+
+  const activeCustom = customDecks.find((d) => d.id === activeDeckId);
+  const linkedDossier = useMemo(() => {
+    return (activeCustom?.dossierId ? getInterviewDossier(activeCustom.dossierId) : null)
+      || (activeDeckId ? getInterviewDossier(activeDeckId) : null);
+  }, [activeCustom, activeDeckId]);
 
   const allAvailableTracks = useMemo(
     () =>
@@ -630,6 +645,61 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onDismissHint={() => setShowTrackHint(false)}
         onOpenFocus={onOpenFocus}
       />
+
+      {/* Active Interview Strategy Briefing Banner */}
+      {linkedDossier && (
+        <div className="glass-panel active-strategy-briefing-banner" data-testid="active-strategy-briefing-banner">
+          <div className="strategy-banner-left">
+            <div className="strategy-banner-tag">
+              <Sparkles size={13} />
+              <span>Active Interview Strategy Briefing</span>
+            </div>
+            <h3 className="strategy-banner-title">
+              {linkedDossier.company} — {linkedDossier.role}
+              {linkedDossier.targetDate && (
+                <span className="strategy-target-date">
+                  <Calendar size={13} />
+                  <span>Target: {linkedDossier.targetDate}</span>
+                </span>
+              )}
+            </h3>
+            <p className="strategy-banner-desc">
+              {linkedDossier.executiveSummary.split('\n\n')[0]}
+            </p>
+            <div className="strategy-banner-metrics">
+              <span className="strategy-metric-pill">
+                <strong>{topics.length}</strong> Cards in Curriculum
+              </span>
+              <span className="strategy-metric-pill">
+                <strong>{topics.filter((t) => t.box >= 3).length}</strong> High Retention (B3+)
+              </span>
+              <span className="strategy-metric-pill">
+                <strong>{topics.filter((t) => t.box === 1).length}</strong> Needs Practice (B1)
+              </span>
+            </div>
+          </div>
+          <div className="strategy-banner-right">
+            <button
+              type="button"
+              className="btn btn-primary strategy-open-btn"
+              onClick={() => onOpenInterviewPrepDossier?.(linkedDossier.id, 'review')}
+              data-testid="strategy-banner-open-copilot-btn"
+            >
+              <Sparkles size={14} />
+              <span>Open Strategy & Copilot</span>
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary strategy-print-btn"
+              onClick={() => printInterviewDossier(linkedDossier, catalogIndex)}
+              data-testid="strategy-banner-print-btn"
+            >
+              <Printer size={14} />
+              <span>Print Briefing</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Deck Selector via Dropdown (above Active Spacing Tiers, below Filter Topics) */}
       <DeckSelector

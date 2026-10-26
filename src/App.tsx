@@ -46,6 +46,7 @@ import type { CustomDeck } from './lib/decks';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
 import { RemoveFromDeckModal, CreateDeckModal, InterviewPrepModal } from './components/dashboard';
+import { getAllSavedDossiers } from './lib/interviewPrep';
 import { AddTopicModal } from './components/AddTopicModal';
 import { FEATURES } from './lib/features';
 import { SettingsModal } from './components/SettingsModal';
@@ -128,6 +129,18 @@ export function App() {
   const [isCreateDeckModalOpen, setIsCreateDeckModalOpen] = useState(false);
   const [initialCardsForNewDeck, setInitialCardsForNewDeck] = useState<string[]>([]);
   const [isInterviewPrepModalOpen, setIsInterviewPrepModalOpen] = useState(false);
+  const [selectedDossierId, setSelectedDossierId] = useState<string | undefined>(undefined);
+  const [interviewPrepStep, setInterviewPrepStep] = useState<'input' | 'review' | undefined>(undefined);
+
+  const savedDossiersCount = useMemo(() => {
+    return isInterviewPrepModalOpen ? getAllSavedDossiers().length : getAllSavedDossiers().length;
+  }, [isInterviewPrepModalOpen]);
+
+  const handleOpenInterviewPrep = (dossierId?: string, step?: 'input' | 'review') => {
+    setSelectedDossierId(dossierId);
+    setInterviewPrepStep(step);
+    setIsInterviewPrepModalOpen(true);
+  };
 
   const currentBox1CardIds = useMemo(() => {
     return deckState.topics.filter((t) => t.box === 1).map((t) => t.id);
@@ -357,7 +370,12 @@ export function App() {
     setCardPendingRemoval(null);
   };
 
-  const handleCreateCustomDeck = (name: string, description?: string, cardIds: string[] = []) => {
+  const handleCreateCustomDeck = (
+    name: string,
+    description?: string,
+    cardIds: string[] = [],
+    dossierId?: string
+  ) => {
     const newDeck: CustomDeck = {
       id: `custom-${Date.now()}`,
       name,
@@ -365,6 +383,7 @@ export function App() {
       cardIds,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      dossierId,
     };
     const updated = [...customDecks, newDeck];
     setCustomDecks(updated);
@@ -539,6 +558,23 @@ export function App() {
 
           {/* Quick Info & Action Buttons */}
           <div className="app-header-right">
+            {/* Interview Strategy & Copilot Header Button */}
+            <button
+              className="btn btn-outline ai-strategy-header-btn"
+              onClick={() => {
+                const activeCustom = customDecks.find((d) => d.id === activeDeckId);
+                handleOpenInterviewPrep(activeCustom?.dossierId);
+              }}
+              title="Open AI Interview Prep & Strategy Copilot (Review briefings, check readiness, dialogue with AI)"
+              data-testid="header-interview-prep-btn"
+            >
+              <Sparkles size={14} color="var(--accent-purple)" />
+              <span>Interview Strategy</span>
+              {savedDossiersCount > 0 && (
+                <span className="header-badge-count">{savedDossiersCount}</span>
+              )}
+            </button>
+
             <button
               data-tour="focus"
               className={`btn btn-outline ${filterActive ? 'filter-active' : ''}`}
@@ -666,6 +702,10 @@ export function App() {
             onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
             isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
             onFinishReinforcement={handleFinishReinforcement}
+            onOpenInterviewStrategy={() => {
+              const activeCustom = customDecks.find((d) => d.id === activeDeckId);
+              handleOpenInterviewPrep(activeCustom?.dossierId);
+            }}
           />
         ) : (
           <DeckDashboard
@@ -688,7 +728,8 @@ export function App() {
             onDeleteCustomDeck={handleDeleteCustomDeck}
             onAddCardsToDeck={handleAddCardsToDeck}
             onOpenCreateDeckWithCards={handleOpenCreateDeckWithCards}
-            onTailorWithAIClick={() => setIsInterviewPrepModalOpen(true)}
+            onTailorWithAIClick={() => handleOpenInterviewPrep()}
+            onOpenInterviewPrepDossier={handleOpenInterviewPrep}
             onStateUpdated={(newState: LeitnerDeckState) => setDeckState(newState)}
             onOpenAddModal={() => setIsAddModalOpen(true)}
             highlightExport={highlightExport}
@@ -818,9 +859,16 @@ export function App() {
 
       <InterviewPrepModal
         isOpen={isInterviewPrepModalOpen}
-        onClose={() => setIsInterviewPrepModalOpen(false)}
+        onClose={() => {
+          setIsInterviewPrepModalOpen(false);
+          setSelectedDossierId(undefined);
+          setInterviewPrepStep(undefined);
+        }}
         onCreateCustomDeck={handleCreateCustomDeck}
         currentBox1CardIds={currentBox1CardIds}
+        initialDossierId={selectedDossierId}
+        initialStep={interviewPrepStep}
+        onOpenSettings={(sec) => handleOpenSettings(sec)}
       />
 
       <FocusModal

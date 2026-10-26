@@ -22,6 +22,7 @@ export interface EditorToolbarProps {
   onFormatCode: () => void;
   onResetStarter: () => void;
   onClearBuffer: () => void;
+  onOpenInterviewStrategy?: () => void;
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
@@ -32,6 +33,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onFormatCode,
   onResetStarter,
   onClearBuffer,
+  onOpenInterviewStrategy,
 }) => {
   return (
     <>
@@ -86,6 +88,20 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
               title="Clear code buffer"
             >
               <Eraser size={12} /> Clear
+            </button>
+          )}
+
+          {/* Open Interview Strategy & AI Coach */}
+          {onOpenInterviewStrategy && (
+            <button
+              type="button"
+              onClick={onOpenInterviewStrategy}
+              className="arena-editor-btn-text"
+              title="Open Interview Prep Strategy & AI Coach (Review briefing, checklist & dialogue)"
+              data-testid="arena-editor-strategy-btn"
+            >
+              <Sparkles size={12} color="var(--accent-purple)" />
+              <span>Strategy</span>
             </button>
           )}
         </div>

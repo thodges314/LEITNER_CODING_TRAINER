@@ -98,6 +98,10 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     const cardCount = await cardItems.count();
     expect(cardCount).toBeGreaterThan(0);
 
+    // Verify Download HTML button is visible in review actions
+    const downloadHtmlBtn = page.getByTestId('ai-prep-download-html-btn');
+    await expect(downloadHtmlBtn).toBeVisible();
+
     // Click Create Custom Deck
     const createDeckBtn = page.getByTestId('ai-prep-create-deck-btn');
     await createDeckBtn.click();
@@ -107,5 +111,46 @@ test.describe('AI Interview Prep Copilot Flow', () => {
 
     // Verify active deck is switched to the new Stripe custom deck
     await expect(page.locator('.deck-dropdown-active-name')).toHaveText(/Stripe/);
+
+    // 1. Verify Active Interview Strategy Briefing banner is visible on Dashboard
+    const strategyBanner = page.getByTestId('active-strategy-briefing-banner');
+    await expect(strategyBanner).toBeVisible();
+    await expect(strategyBanner.locator('.strategy-banner-title')).toContainText('Stripe');
+    await expect(strategyBanner.locator('.strategy-banner-metrics')).toBeVisible();
+
+    // 2. Click "Open Strategy & Copilot" from the dashboard banner to reopen
+    const bannerOpenBtn = page.getByTestId('strategy-banner-open-copilot-btn');
+    await bannerOpenBtn.click();
+    await expect(modal).toBeVisible();
+    await expect(page.getByTestId('ai-prep-review-view')).toBeVisible();
+
+    // Verify "+ New Prep" button is visible in modal header
+    const newPrepBtn = page.getByTestId('ai-prep-new-plan-btn');
+    await expect(newPrepBtn).toBeVisible();
+
+    // Close modal
+    const closeBtn = page.getByTestId('ai-prep-close-btn');
+    await closeBtn.click();
+    await expect(modal).not.toBeVisible();
+
+    // 3. Test reopening via Global Header button
+    const headerStrategyBtn = page.getByTestId('header-interview-prep-btn');
+    await expect(headerStrategyBtn).toBeVisible();
+    await headerStrategyBtn.click();
+    await expect(modal).toBeVisible();
+    await closeBtn.click();
+    await expect(modal).not.toBeVisible();
+
+    // 4. Test reopening via Practice Arena toolbar button without leaving practice
+    const arenaNavBtn = page.getByRole('button', { name: /Practice Arena/i });
+    await arenaNavBtn.click();
+
+    const arenaStrategyBtn = page.getByTestId('arena-editor-strategy-btn');
+    await expect(arenaStrategyBtn).toBeVisible();
+    await arenaStrategyBtn.click();
+    await expect(modal).toBeVisible();
+    await expect(page.getByTestId('ai-prep-review-view')).toBeVisible();
+    await closeBtn.click();
+    await expect(modal).not.toBeVisible();
   });
 });

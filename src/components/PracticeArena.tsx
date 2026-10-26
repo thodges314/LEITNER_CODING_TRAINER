@@ -52,6 +52,7 @@ interface PracticeArenaProps {
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
   theme?: 'dark' | 'apple-gsos';
+  onOpenInterviewStrategy?: () => void;
 }
 
 export const PracticeArena: React.FC<PracticeArenaProps> = ({
@@ -69,6 +70,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   isReinforcement,
   onFinishReinforcement,
   theme = 'dark',
+  onOpenInterviewStrategy,
 }) => {
   const [activeCardId, setActiveCardId] = useState(() => currentCard?.id);
   const [cardSnapshot, setCardSnapshot] = useState<TopicItem | null>(() => currentCard);
@@ -778,6 +780,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             setMountedComponent(null);
           }}
           onClearBuffer={() => setCode('')}
+          onOpenInterviewStrategy={onOpenInterviewStrategy}
         />
 
         {/* CodeMirror 6 Editor with Rainbow Brackets & Cold-Start Mode */}
