@@ -708,9 +708,15 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               type="button"
               className="btn btn-secondary strategy-delete-btn"
               onClick={() => {
-                const id = linkedDossier.id || '';
-                deleteInterviewDossier(id);
-                onDeleteInterviewDossier?.(id);
+                deleteInterviewDossier(linkedDossier);
+                if (linkedDossier.id) onDeleteInterviewDossier?.(linkedDossier.id);
+                if (activeCustom?.dossierId) {
+                  deleteInterviewDossier(activeCustom.dossierId);
+                  onDeleteInterviewDossier?.(activeCustom.dossierId);
+                }
+                if (activeDeckId) {
+                  deleteInterviewDossier(activeDeckId);
+                }
               }}
               title="Delete this interview briefing and unlink it from this deck"
               data-testid="strategy-banner-delete-btn"

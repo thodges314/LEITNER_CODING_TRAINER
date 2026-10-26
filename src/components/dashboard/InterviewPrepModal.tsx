@@ -31,6 +31,7 @@ import {
   saveInterviewDossier,
   getAllSavedDossiers,
   deleteInterviewDossier,
+  clearAllInterviewDossiers,
   continueInterviewDialogue,
   type CatalogIndexEntry,
   type InterviewPrepDossier,
@@ -487,9 +488,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
   const handleDeleteCurrentDossier = () => {
     if (!dossier) return;
-    const idToDelete = dossier.id || '';
-    deleteInterviewDossier(idToDelete);
-    onDeleteDossier?.(idToDelete);
+    deleteInterviewDossier(dossier);
+    if (dossier.id) onDeleteDossier?.(dossier.id);
     const updated = getAllSavedDossiers();
     setSavedDossiers(updated);
     setDossier(null);
@@ -504,13 +504,13 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     setStep('input');
   };
 
-  const handleDeleteSavedDossier = (e: React.MouseEvent, id: string) => {
+  const handleDeleteSavedDossier = (e: React.MouseEvent, target: InterviewPrepDossier) => {
     e.stopPropagation();
-    deleteInterviewDossier(id);
-    onDeleteDossier?.(id);
+    deleteInterviewDossier(target);
+    if (target.id) onDeleteDossier?.(target.id);
     const updated = getAllSavedDossiers();
     setSavedDossiers(updated);
-    if (!dossier || dossier.id === id) {
+    if (!dossier || dossier.id === target.id || (dossier.company === target.company && dossier.role === target.role)) {
       if (updated.length > 0) {
         handleLoadSavedDossier(updated[0]);
       } else {
@@ -526,6 +526,23 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
         setStep('input');
       }
     }
+  };
+
+  const handleClearAllDossiers = () => {
+    if (!window.confirm('Delete all saved interview dossiers? This will reset all briefings.')) return;
+    clearAllInterviewDossiers();
+    setSavedDossiers([]);
+    setDossier(null);
+    setCompany('');
+    setRole('');
+    setTargetDate('');
+    setRawNotes('');
+    setSelectedWeaknesses([]);
+    setEditableDeckName('');
+    setEditableDescription('');
+    setCheckedCardIds(new Set());
+    setShowSavedDropdown(false);
+    setStep('input');
   };
 
   const toggleCardCheck = (cardId: string) => {
@@ -818,12 +835,25 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                                 type="button"
                                 className="saved-item-del-btn"
                                 title="Delete briefing"
-                                onClick={(e) => handleDeleteSavedDossier(e, d.id || '')}
+                                onClick={(e) => handleDeleteSavedDossier(e, d)}
+                                data-testid={`ai-prep-delete-saved-${d.id}`}
                               >
                                 <Trash2 size={12} />
                               </button>
                             </div>
                           ))}
+                        </div>
+                        <div className="saved-menu-footer">
+                          <button
+                            type="button"
+                            className="saved-menu-clear-all-btn"
+                            onClick={handleClearAllDossiers}
+                            title="Delete all saved interview briefings"
+                            data-testid="ai-prep-clear-all-dossiers-btn"
+                          >
+                            <Trash2 size={11} />
+                            <span>Clear All Saved Briefings</span>
+                          </button>
                         </div>
                       </div>
                     )}

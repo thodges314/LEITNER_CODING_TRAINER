@@ -8,6 +8,7 @@ import {
   saveInterviewDossier,
   getInterviewDossier,
   deleteInterviewDossier,
+  clearAllInterviewDossiers,
   loadAllInterviewDossiers,
   getAllSavedDossiers,
   continueInterviewDialogue,
@@ -248,6 +249,50 @@ Hope this helps!`;
       expect(list.length).toBeGreaterThanOrEqual(2);
       expect(list[0].company).toBe('Netflix');
       expect(list[1].company).toBe('Apple');
+    });
+
+    it('auto-heals dossiers missing id and deletes by target object or metadata', () => {
+      // Simulate an older corrupt entry saved without an id
+      const corruptRaw = {
+        'old-custom-deck': {
+          company: 'Amazon',
+          role: 'SDE II',
+          deckName: 'Amazon Interview Prep',
+          deckDescription: 'Amazon prep cards',
+          executiveSummary: 'Amazon briefing',
+          selectedCards: [],
+          externalTopics: [],
+          interactiveTools: [],
+          countdownChecklist: [],
+          generatedAt: 5000,
+        },
+      };
+      localStorage.setItem('leitner_interview_dossiers', JSON.stringify(corruptRaw));
+
+      // loadAllInterviewDossiers should auto-heal and assign an id
+      const loaded = loadAllInterviewDossiers();
+      expect(loaded['old-custom-deck'].id).toBeDefined();
+      expect(loaded['old-custom-deck'].id.length).toBeGreaterThan(0);
+
+      // deleteInterviewDossier should succeed even when passing an object without an id
+      deleteInterviewDossier({
+        company: 'Amazon',
+        role: 'SDE II',
+        generatedAt: 5000,
+      } as any);
+
+      expect(getAllSavedDossiers().filter((d) => d.company === 'Amazon')).toHaveLength(0);
+    });
+
+    it('clearAllInterviewDossiers purges all stored interview dossiers', () => {
+      saveInterviewDossier('deck-1', generateHeuristicDossier({ company: 'Meta', role: 'SWE', rawNotes: '' }, MOCK_CATALOG));
+      saveInterviewDossier('deck-2', generateHeuristicDossier({ company: 'Google', role: 'SWE', rawNotes: '' }, MOCK_CATALOG));
+
+      expect(getAllSavedDossiers().length).toBeGreaterThanOrEqual(2);
+
+      clearAllInterviewDossiers();
+      expect(getAllSavedDossiers()).toHaveLength(0);
+      expect(loadAllInterviewDossiers()).toEqual({});
     });
   });
 
