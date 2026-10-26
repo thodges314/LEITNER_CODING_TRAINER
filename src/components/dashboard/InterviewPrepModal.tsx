@@ -1651,7 +1651,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     <span>Import JSON</span>
                   </button>
 
-                  <button
+                  {/* <button
                     type="button"
                     className="btn btn-primary ai-prep-done-btn"
                     onClick={onClose}
@@ -1660,7 +1660,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   >
                     <CheckCircle size={14} />
                     <span>Done</span>
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
