@@ -1,6 +1,6 @@
 Build a memoized sorted list component:
 
-### SortedList({ items, onCompute }: { items: number[]; onCompute: () => void }): JSX.Element:
+### SortedList({ items, onCompute }: { items: number[]; onCompute?: () => void }): JSX.Element:
 - Build `SortedList({ items, onCompute })` with `useMemo`.
 - It renders a `<button>` labelled `Count: N` (an unrelated counter that increments on click) and a `<ul>` with one `<li>` per item sorted ascending as numbers **without mutating** the `items` prop.
 - The sorting must run inside `useMemo`, keyed on `items`, and call `onCompute()` each time it actually runs — so clicking the counter must **not** call `onCompute` again, while passing a new `items` array must.
