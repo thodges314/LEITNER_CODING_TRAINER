@@ -359,8 +359,11 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'showSelectAll', type: 'boolean', defaultValue: true, description: 'Display select all / deselect all buttons' },
   ],
   'controlled-vs-uncontrolled-input': [
-    { name: 'defaultValue', type: 'string', defaultValue: 'Initial text', placeholder: 'Default text', description: 'Uncontrolled initial value' },
-    { name: 'placeholder', type: 'string', defaultValue: 'Type something...', placeholder: 'Input placeholder', description: 'Text input placeholder' },
+    {
+      name: 'onSearch',
+      type: 'function',
+      description: 'Callback invoked with trimmed query string upon form submission',
+    },
   ],
   'forward-ref-imperative-handle': [
     { name: 'placeholder', type: 'string', defaultValue: 'Focus me with ref', placeholder: 'Input placeholder', description: 'Input field placeholder' },
