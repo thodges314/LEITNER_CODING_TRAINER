@@ -3,7 +3,7 @@
  * The test runner section (e.g. `// Test runner example:`) is meant for headless evaluation / test
  * harness runs, whereas the preview iframe renders the live interactive component demo.
  */
-export function stripTestRunnerBlock(rawCode: string): string {
+export function stripTestRunnerBlock(rawCode: string, testHarness?: string): string {
   const markerRegex = /(?:\r?\n|^)[ \t]*\/\/[ \t]*Test runner example:[^\n]*(?:\r?\n|$)/i;
   const match = markerRegex.exec(rawCode);
   if (match && match.index !== undefined) {
@@ -13,6 +13,15 @@ export function stripTestRunnerBlock(rawCode: string): string {
   const idx = rawCode.indexOf(fallbackMarker);
   if (idx !== -1) {
     return rawCode.slice(0, idx).trimEnd();
+  }
+  if (testHarness) {
+    const trimmedHarness = testHarness.trim();
+    if (trimmedHarness) {
+      const hIdx = rawCode.indexOf(trimmedHarness);
+      if (hIdx !== -1) {
+        return rawCode.slice(0, hIdx).trimEnd();
+      }
+    }
   }
   return rawCode;
 }

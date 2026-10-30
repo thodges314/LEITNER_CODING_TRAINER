@@ -777,7 +777,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             setIsPreviewLive(false);
             setMountedComponent(null);
           }}
-          onClearBuffer={() => setCode('')}
         />
 
         {/* CodeMirror 6 Editor with Rainbow Brackets & Cold-Start Mode */}

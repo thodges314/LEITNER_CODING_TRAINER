@@ -35,6 +35,12 @@ $test.check('renders', true);`;
     expect(stripTestRunnerBlock('')).toBe('');
     expect(stripTestRunnerBlock('   ')).toBe('   ');
   });
+
+  it('strips test harness if passed even without marker comment', () => {
+    const harness = 'const compileChecksG1 = () => {};\n$test.check("ok", true);';
+    const code = `function identity(x) { return x; }\n\n${harness}`;
+    expect(stripTestRunnerBlock(code, harness)).toBe('function identity(x) { return x; }');
+  });
 });
 
 describe('createPreviewSrcDoc $dom and $test shims', () => {

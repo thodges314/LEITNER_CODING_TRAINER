@@ -30,10 +30,9 @@ describe('EditorToolbar and EditorActionControls', () => {
   });
 
   describe('EditorToolbar', () => {
-    it('renders format, reset, and clear buttons and fires handlers', async () => {
+    it('renders format and reset buttons and fires handlers', async () => {
       const handleFormat = vi.fn();
       const handleReset = vi.fn();
-      const handleClear = vi.fn();
 
       await act(async () => {
         root?.render(
@@ -44,7 +43,6 @@ describe('EditorToolbar and EditorActionControls', () => {
             code="const a = 1;"
             onFormatCode={handleFormat}
             onResetStarter={handleReset}
-            onClearBuffer={handleClear}
           />
         );
       });
@@ -57,19 +55,14 @@ describe('EditorToolbar and EditorActionControls', () => {
       const resetBtn = Array.from(container?.querySelectorAll('button') ?? []).find((b) =>
         b.textContent?.includes('Reset')
       );
-      const clearBtn = Array.from(container?.querySelectorAll('button') ?? []).find((b) =>
-        b.textContent?.includes('Clear')
-      );
 
       await act(async () => {
         formatBtn?.click();
         resetBtn?.click();
-        clearBtn?.click();
       });
 
       expect(handleFormat).toHaveBeenCalledTimes(1);
       expect(handleReset).toHaveBeenCalledTimes(1);
-      expect(handleClear).toHaveBeenCalledTimes(1);
     });
 
     it('shows locked state when evalResult is present', async () => {
@@ -89,7 +82,6 @@ describe('EditorToolbar and EditorActionControls', () => {
             code="const a = 1;"
             onFormatCode={vi.fn()}
             onResetStarter={vi.fn()}
-            onClearBuffer={vi.fn()}
           />
         );
       });

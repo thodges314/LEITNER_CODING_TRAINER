@@ -3,7 +3,6 @@ import {
   Terminal,
   Sparkles,
   RotateCcw,
-  Eraser,
   Play,
   Send,
   SkipForward,
@@ -21,7 +20,6 @@ export interface EditorToolbarProps {
   code: string;
   onFormatCode: () => void;
   onResetStarter: () => void;
-  onClearBuffer: () => void;
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
@@ -31,7 +29,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   code,
   onFormatCode,
   onResetStarter,
-  onClearBuffer,
 }) => {
   return (
     <>
@@ -76,18 +73,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           >
             <RotateCcw size={12} /> Reset
           </button>
-
-          {/* Clear buffer */}
-          {code.length > 0 && (
-            <button
-              type="button"
-              onClick={onClearBuffer}
-              className="arena-editor-btn-muted"
-              title="Clear code buffer"
-            >
-              <Eraser size={12} /> Clear
-            </button>
-          )}
         </div>
       </div>
     </>

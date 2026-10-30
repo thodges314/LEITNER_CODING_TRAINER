@@ -109,6 +109,14 @@ describe('AI Multi-Key Vault and Provider Management', () => {
       const tsUserContent = capturedPayload!.messages[1].content;
       expect(tsUserContent).toContain('Language: TypeScript');
       expect(tsUserContent).toContain('```typescript\nconst twoSum = (nums: number[], target: number) => {}\n```');
+
+      // Verify that starter snippet test runner blocks are stripped before sending to the model
+      const codeWithRunner = `function identity<T>(x: T): T { return x; }\n\n// Test runner example:\nconst compileChecksG1 = () => {};\n$test.check('ok', true);`;
+      await evaluateCodeSubmission(topic, codeWithRunner, undefined, 'ts');
+      const strippedContent = capturedPayload!.messages[1].content;
+      expect(strippedContent).toContain('function identity<T>(x: T): T { return x; }');
+      expect(strippedContent).not.toContain('compileChecksG1');
+      expect(strippedContent).not.toContain('// Test runner example:');
     } finally {
       globalThis.fetch = originalFetch;
     }
