@@ -22,7 +22,6 @@ export interface EditorToolbarProps {
   onFormatCode: () => void;
   onResetStarter: () => void;
   onClearBuffer: () => void;
-  onOpenInterviewStrategy?: () => void;
 }
 
 export const EditorToolbar: React.FC<EditorToolbarProps> = ({
@@ -33,7 +32,6 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
   onFormatCode,
   onResetStarter,
   onClearBuffer,
-  onOpenInterviewStrategy,
 }) => {
   return (
     <>

@@ -44,10 +44,6 @@ export function generateDossierPrintHtml(
     })
     .join('');
 
-  const checklistHtml = dossier.countdownChecklist
-    .map((item) => `<li><span class="checkbox">&#9744;</span> <span>${escapeHtml(item)}</span></li>`)
-    .join('');
-
   const toolsHtml = dossier.interactiveTools
     .map((tool) => `<li><strong>${escapeHtml(tool.name)}</strong>: ${escapeHtml(tool.focus)} <span class="url">(${escapeHtml(tool.url)})</span></li>`)
     .join('');

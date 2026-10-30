@@ -733,10 +733,6 @@ export function App() {
             onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
             isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
             onFinishReinforcement={handleFinishReinforcement}
-            onOpenInterviewStrategy={() => {
-              const activeCustom = customDecks.find((d) => d.id === activeDeckId);
-              handleOpenInterviewPrep(activeCustom?.dossierId);
-            }}
           />
         ) : (
           <DeckDashboard
