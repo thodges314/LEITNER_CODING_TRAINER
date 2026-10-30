@@ -325,13 +325,6 @@ export function generateDossierPrintHtml(
   </div>
 
   <div class="section">
-    <div class="section-title">24-Hour Countdown & Interview Day Protocol</div>
-    <ul class="checklist">
-      ${checklistHtml}
-    </ul>
-  </div>
-
-  <div class="section">
     <div class="section-title">Curated Interactive Practice Playgrounds</div>
     <ul class="tools">
       ${toolsHtml}

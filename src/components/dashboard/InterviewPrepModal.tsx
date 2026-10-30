@@ -1497,18 +1497,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                       ))}
                     </div>
                   </div>
-
-                  <div className="checklist-section">
-                    <h4 className="section-title">24-Hour Countdown & Interview Day Protocol</h4>
-                    <div className="countdown-checklist-list">
-                      {dossier.countdownChecklist?.map((item, i) => (
-                        <div key={i} className="checklist-item-row">
-                          <CheckCircle size={15} className="checklist-check-icon" />
-                          <span className="checklist-item-text">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -1756,7 +1744,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
             </div>
           </div>
 
-          <div className="print-section">
+          {/* <div className="print-section">
             <h2 className="print-section-heading">24-Hour Countdown & Interview Day Protocol</h2>
             <div className="print-checklist">
               {dossier.countdownChecklist?.map((item, idx) => (
@@ -1766,7 +1754,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className="print-section">
             <h2 className="print-section-heading">Curated Practice Playgrounds</h2>

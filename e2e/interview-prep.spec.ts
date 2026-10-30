@@ -96,7 +96,6 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     const toolsTab = page.getByTestId('ai-prep-tab-tools');
     await toolsTab.click();
     await expect(page.locator('.interactive-tools-grid')).toBeVisible();
-    await expect(page.locator('.countdown-checklist-list')).toBeVisible();
 
     // Verify dedicated print document exists
     const printDoc = page.locator('.ai-prep-print-document');

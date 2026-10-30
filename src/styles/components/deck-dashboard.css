@@ -2384,28 +2384,6 @@
   text-overflow: ellipsis;
 }
 
-.countdown-checklist-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.checklist-item-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-}
-
-.checklist-check-icon {
-  color: #22c55e;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
 .checklist-item-text {
   font-size: 12px;
   line-height: 1.4;
@@ -2895,19 +2873,19 @@
     color: #4b5563;
   }
 
-  .print-checklist-item {
+  /* .print-checklist-item {
     display: flex;
     gap: 6px;
     font-size: 9pt;
     margin-bottom: 4px;
     page-break-inside: avoid;
     break-inside: avoid;
-  }
+  } */
 
-  .print-checkbox {
+  /* .print-checkbox {
     font-size: 10pt;
     line-height: 1;
-  }
+  } */
 
   .print-tools-list {
     font-size: 8.5pt;
