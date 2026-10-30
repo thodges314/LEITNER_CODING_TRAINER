@@ -160,7 +160,7 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     const arenaNavBtn = page.getByRole('button', { name: /Practice Arena/i });
     await arenaNavBtn.click();
 
-    const arenaStrategyBtn = page.getByTestId('arena-editor-strategy-btn');
+    const arenaStrategyBtn = page.getByTestId('header-interview-prep-btn'); // rename this
     await expect(arenaStrategyBtn).toBeVisible();
     await arenaStrategyBtn.click();
     await expect(modal).toBeVisible();
