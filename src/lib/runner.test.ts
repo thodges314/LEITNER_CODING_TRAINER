@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bufferContainsHarness, classifyLogLine, runHarness } from './runner';
+import { bufferContainsHarness, classifyLogLine, prepareSqlCode, runHarness } from './runner';
 import type { TopicItem } from './leitner';
 
 const base: TopicItem = {
@@ -162,3 +162,71 @@ describe('runWithTimeout', () => {
     expect(r.passCount).toBe(1);
   });
 });
+
+describe('prepareSqlCode', () => {
+  it('preserves JavaScript declarations of query even with starter comment', () => {
+    const input = `// Write your implementation below\n\nconst query = \`SELECT 1;\`;`;
+    expect(prepareSqlCode(input)).toBe(input);
+  });
+
+  it('preserves export const query and function declarations', () => {
+    const input1 = `export const query = \`SELECT 1;\`;`;
+    expect(prepareSqlCode(input1)).toBe(input1);
+
+    const input2 = `function query() {\n  return \`SELECT 1;\`;\n}`;
+    expect(prepareSqlCode(input2)).toBe(input2);
+  });
+
+  it('wraps pure SQL into query string and strips JS comment lines', () => {
+    const input = `// Write your implementation below\n\nSELECT * FROM Customers;`;
+    const prepared = prepareSqlCode(input);
+    expect(prepared).toBe('const query = "SELECT * FROM Customers;";\nconst solution = query;\n');
+  });
+
+  it('strips example test runner block before wrapping pure SQL', () => {
+    const harness = 'await (async () => { /* test */ })();';
+    const input = `// Write your implementation below\n\nSELECT * FROM Customers;\n\n// Test runner example:\n${harness}`;
+    const prepared = prepareSqlCode(input, harness);
+    expect(prepared).toBe('const query = "SELECT * FROM Customers;";\nconst solution = query;\n');
+  });
+});
+
+describe('SQL runner with PGlite', () => {
+  const sqlCard: TopicItem = {
+    id: 'sql-test',
+    track: 'sql-postgres',
+    title: 'SQL Test',
+    box: 1,
+    streak: 0,
+    nextEligibleTrial: 0,
+    status: 'active',
+    tags: ['sql'],
+    promptSeed: 'Test',
+    testHarness: `
+      await (async () => {
+        const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');
+        const db = new PGlite();
+        await db.exec('CREATE TABLE T (v INT); INSERT INTO T VALUES (42);');
+        const res = (await db.query(userSql)).rows;
+        $test.check('returns 42', $test.equal(res, [{ v: 42 }]), res);
+      })();
+    `,
+  };
+
+  it('passes when user submits JS query with starter comment', async () => {
+    const code = `// Write your implementation below\n\nconst query = \`SELECT v FROM T;\`;`;
+    const r = await runHarness(sqlCard, code, 'js');
+    expect(r.passed).toBe(true);
+    expect(r.passCount).toBe(1);
+    expect(r.failCount).toBe(0);
+  });
+
+  it('passes when user submits pure SQL with starter comment', async () => {
+    const code = `// Write your implementation below\n\nSELECT v FROM T;`;
+    const r = await runHarness(sqlCard, code, 'js');
+    expect(r.passed).toBe(true);
+    expect(r.passCount).toBe(1);
+    expect(r.failCount).toBe(0);
+  });
+});
+

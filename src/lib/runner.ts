@@ -7,6 +7,7 @@ import { createDomTools, MockIntersectionObserver } from './domTools';
 import type { DomTools } from './domTools';
 import { isTsOnlyCard } from './tsOnly';
 import { PGlite } from '@electric-sql/pglite';
+import { stripTestRunnerBlock } from './stripTestRunner';
 
 export type ExecutionMode = 'js' | 'ts';
 
@@ -368,6 +369,44 @@ export function bufferContainsHarness(code: string, harness: string): boolean {
 }
 
 /**
+ * Normalizes user code for SQL / PostgreSQL track cards.
+ * Accepts:
+ * 1. JavaScript / TypeScript defining `query` or `solution` (e.g. `const query = \`...\``),
+ *    even with preceding comments or instructions like `// Write your implementation below`.
+ * 2. Raw SQL (e.g. `SELECT ...` or `WITH ...`), with or without starter comments or SQL comments (`--`).
+ */
+export function prepareSqlCode(code: string, testHarness?: string): string {
+  // If the user buffer includes the example test runner block, strip it first for analysis
+  const stripped = stripTestRunnerBlock(code, testHarness);
+
+  // Check if the user declared `query` or `solution` using JS/TS declaration syntax anywhere
+  const hasJsDeclaration = /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:query|solution)\b/.test(code);
+  if (hasJsDeclaration) {
+    return code;
+  }
+
+  // Strip leading JS/TS comments and whitespace to see if the first code token is a JS keyword
+  const withoutLeadingComments = stripped
+    .replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, '')
+    .trim();
+
+  const startsWithJs = /^(?:const|let|var|function|class|export|import)\b/.test(withoutLeadingComments);
+  if (startsWithJs) {
+    return code;
+  }
+
+  // Otherwise, user provided raw SQL text.
+  // Strip lines starting with `//` (like `// Write your implementation below`) which are invalid in PostgreSQL.
+  const cleanSql = stripped
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('//'))
+    .join('\n')
+    .trim();
+
+  return `const query = ${JSON.stringify(cleanSql)};\nconst solution = query;\n`;
+}
+
+/**
  * Runs the user's code followed by the card's test harness without any UI,
  * counting PASS/FAIL console output. This is the source of truth for pass/fail.
  */
@@ -385,11 +424,7 @@ export async function runHarness(
 
   let effectiveCode = code;
   if (card.track === 'sql-postgres') {
-    const trimmed = code.trim();
-    const isJsDeclaration = /^(?:const|let|var|function|class|export|import)\b/.test(trimmed);
-    if (!isJsDeclaration) {
-      effectiveCode = `const query = ${JSON.stringify(trimmed)};\nconst solution = query;\n`;
-    }
+    effectiveCode = prepareSqlCode(code, harness);
   }
 
   const combined = bufferContainsHarness(effectiveCode, harness) ? effectiveCode : `${effectiveCode}\n\n${harness}\n`;
