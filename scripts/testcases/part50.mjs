@@ -331,6 +331,49 @@ export default {
       '"/a/b/c/f/g/i"'
     ),
   ],
+
+  'sort-colors': [
+    c(
+      'Sorts mixed array of red (0), white (1), and blue (2)',
+      'sortColors([2, 0, 2, 1, 1, 0])',
+      '[0, 0, 1, 1, 2, 2]'
+    ),
+    c(
+      'Sorts small array with only two distinct colors',
+      'sortColors([2, 0, 1])',
+      '[0, 1, 2]'
+    ),
+    c(
+      'Handles single-element array',
+      'sortColors([0])',
+      '[0]'
+    ),
+    c(
+      'Handles already sorted array',
+      'sortColors([0, 0, 1, 1, 2, 2, 2])',
+      '[0, 0, 1, 1, 2, 2, 2]'
+    ),
+    c(
+      'Handles completely reverse-sorted array',
+      'sortColors([2, 2, 2, 1, 1, 0, 0])',
+      '[0, 0, 1, 1, 2, 2, 2]'
+    ),
+    c(
+      'Handles array with only one color present (all 2s or all 1s)',
+      '[sortColors([2, 2, 2]), sortColors([1, 1])]',
+      '[[2, 2, 2], [1, 1]]'
+    ),
+    c(
+      'Handles empty array',
+      'sortColors([])',
+      '[]'
+    ),
+    c(
+      'Sorts in-place mutating the original array reference',
+      '(() => { const arr = [2, 0, 1]; const res = sortColors(arr); return res === arr && arr[0] === 0 && arr[1] === 1 && arr[2] === 2; })()',
+      'true'
+    ),
+  ],
 };
 
 
