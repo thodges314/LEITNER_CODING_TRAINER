@@ -1858,30 +1858,24 @@
 
 .ai-prep-slider-container {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 12px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 6px;
-  padding: 7px 12px;
+  padding: 0 12px;
   height: 42px;
-  justify-content: center;
-}
-
-.slider-label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-}
-
-.slider-label-text {
-  color: var(--text-muted);
+  box-sizing: border-box;
 }
 
 .slider-val-badge {
   color: var(--accent-cyan);
   font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  min-width: 65px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .ai-prep-field-hint {
@@ -1917,10 +1911,12 @@
 }
 
 .ai-prep-slider {
+  flex: 1;
   width: 100%;
   accent-color: var(--accent-cyan);
   cursor: pointer;
-  margin-top: 4px;
+  margin: 0;
+  height: 6px;
 }
 
 .ai-prep-textarea {
@@ -2993,38 +2989,6 @@
    AI Interview Prep Copilot Enhancements: Banners, Presets & Dashboard View
    ------------------------------------------------------------------------- */
 
-/* Quick Deck Sizing Preset Pills */
-.ai-prep-presets-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.size-preset-pill {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-medium);
-  border-radius: 12px;
-  padding: 3px 8px;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.size-preset-pill:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-light);
-  border-color: var(--accent-cyan);
-}
-
-.size-preset-pill.active {
-  background: rgba(6, 182, 212, 0.15);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  font-weight: 600;
-}
 
 /* New Prep Button in Modal Header */
 .ai-prep-new-plan-btn {

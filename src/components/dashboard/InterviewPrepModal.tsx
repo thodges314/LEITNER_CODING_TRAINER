@@ -973,10 +973,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                       </div>
                     ) : (
                       <div className="ai-prep-slider-container">
-                        <div className="slider-label-row">
-                          <span className="slider-label-text">Target Deck Size:</span>
-                          <span className="slider-val-badge">{targetCardCount} Cards</span>
-                        </div>
                         <input
                           id="ai-prep-count"
                           type="range"
@@ -987,44 +983,9 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                           value={targetCardCount}
                           onChange={(e) => setTargetCardCount(Number(e.target.value))}
                           data-testid="ai-prep-count-slider"
+                          aria-label="Target deck size in cards"
                         />
-                        <div className="ai-prep-presets-row">
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 8 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(8)}
-                          >
-                            ⚡ 8 Sprint (1–3d)
-                          </button>
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 16 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(16)}
-                          >
-                            🎯 16 Focused
-                          </button>
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 28 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(28)}
-                          >
-                            📘 28 Full
-                          </button>
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 45 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(45)}
-                          >
-                            🏛️ 45 Big Tech
-                          </button>
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 60 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(60)}
-                          >
-                            🚀 60 Marathon
-                          </button>
-                        </div>
+                        <span className="slider-val-badge">{targetCardCount} Cards</span>
                       </div>
                     )}
                   </div>
