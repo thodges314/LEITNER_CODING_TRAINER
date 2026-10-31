@@ -352,8 +352,31 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
     });
 
     expect(searchInput.value).toBe('#typescript');
+    expect(tsChip?.getAttribute('aria-pressed')).toBe('true');
+    expect(tsChip?.className).toContain('table-tag-chip-active');
     expect(container?.textContent).toContain('Tier 6 Veteran Card');
     expect(container?.textContent).not.toContain('Tier 1 Learning Card');
     expect(container?.textContent).not.toContain('Tier 5 Mastered Card');
+
+    // Click the active tag chip again to toggle off
+    await act(async () => {
+      tsChip?.click();
+    });
+
+    expect(searchInput.value).toBe('');
+    expect(tsChip?.getAttribute('aria-pressed')).toBe('false');
+    expect(container?.textContent).toContain('Tier 1 Learning Card');
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).toContain('Tier 6 Veteran Card');
+
+    // Additive multi-token search by hand: "tier card"
+    await act(async () => {
+      nativeSetter?.call(searchInput, 'tier mastered');
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).not.toContain('Tier 1 Learning Card');
+    expect(container?.textContent).not.toContain('Tier 6 Veteran Card');
   });
 });

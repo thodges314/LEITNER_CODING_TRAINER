@@ -515,6 +515,14 @@
   border-color: rgba(56, 189, 248, 0.4);
 }
 
+.table-tag-chip-active {
+  color: #fff;
+  background-color: rgba(56, 189, 248, 0.22);
+  border-color: rgba(56, 189, 248, 0.6);
+  font-weight: 600;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+}
+
 [data-theme="apple-gsos"] .table-tag-chip {
   color: #334155;
   background-color: rgba(0, 0, 0, 0.05);
@@ -525,6 +533,13 @@
   color: #0284C7;
   background-color: #E0F2FE;
   border-color: #7DD3FC;
+}
+
+[data-theme="apple-gsos"] .table-tag-chip-active {
+  color: #0284C7;
+  background-color: #BAE6FD;
+  border-color: #38BDF8;
+  font-weight: 600;
 }
 
 .status-badge {

@@ -157,17 +157,22 @@ const DeckEditorModalDialog: React.FC<DeckEditorModalProps> = ({
 
         // Query check
         if (!query) return true;
-        const tagQuery = query.startsWith('#') ? query.slice(1).trim() : query;
-        if (query === '#') {
-          return card.tags.length > 0;
-        }
-        const matchTitle = card.title.toLowerCase().includes(tagQuery);
-        const matchConcept = card.concept?.toLowerCase().includes(tagQuery);
-        const matchTags = card.tags.some((t) => {
-          const lower = t.toLowerCase();
-          return lower.includes(tagQuery) || (`#${lower}`).includes(query);
+        const tokens = query.split(/\s+/).filter(Boolean);
+        const matchesAll = tokens.every((token) => {
+          if (token === '#') return card.tags.length > 0;
+          if (token.startsWith('#')) {
+            const rawTag = token.slice(1).trim();
+            return card.tags.some((t) => {
+              const lower = t.toLowerCase();
+              return lower === rawTag || lower.includes(rawTag) || (`#${lower}`).includes(token);
+            });
+          }
+          const matchTitle = card.title.toLowerCase().includes(token);
+          const matchConcept = card.concept?.toLowerCase().includes(token);
+          const matchTags = card.tags.some((t) => t.toLowerCase().includes(token));
+          return matchTitle || matchConcept || matchTags;
         });
-        return matchTitle || matchConcept || matchTags;
+        return matchesAll;
       });
       map.set(track, filtered);
     }

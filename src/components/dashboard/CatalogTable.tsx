@@ -12,7 +12,7 @@ import {
   ArrowDown,
   FolderMinus,
   CheckCircle2,
-  Sparkles,
+  CircleDot,
 } from 'lucide-react';
 import { DifficultyBadge } from '../DifficultyBadge';
 import { getTrackMeta, isCardAttempted } from '../../lib/leitner';
@@ -35,6 +35,7 @@ export interface CatalogTableProps {
   onToggleDeactivate?: (topicId: string) => void;
   onDeleteTopic?: (topicId: string) => void;
   onTagClick?: (tag: string) => void;
+  searchQuery?: string;
 }
 
 export const CatalogTable: React.FC<CatalogTableProps> = ({
@@ -50,7 +51,11 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
   onToggleDeactivate,
   onDeleteTopic,
   onTagClick,
+  searchQuery = '',
 }) => {
+  const activeSearchTokens = React.useMemo(() => {
+    return new Set(searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean));
+  }, [searchQuery]);
   const renderSortIndicator = (
     column: 'title' | 'track' | 'difficulty' | 'box' | 'streak' | 'due' | 'status'
   ) => {
@@ -177,17 +182,23 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                       {topic.title}
                     </div>
                     <div className="catalog-tags-row">
-                      {topic.tags.slice(0, 3).map((tg) => (
-                        <button
-                          key={tg}
-                          type="button"
-                          className="table-tag-chip"
-                          onClick={() => onTagClick?.(tg)}
-                          title={`Filter cards by #${tg}`}
-                        >
-                          #{tg}
-                        </button>
-                      ))}
+                      {topic.tags.slice(0, 3).map((tg) => {
+                        const isTagActive =
+                          activeSearchTokens.has(tg.toLowerCase()) ||
+                          activeSearchTokens.has(`#${tg.toLowerCase()}`);
+                        return (
+                          <button
+                            key={tg}
+                            type="button"
+                            className={`table-tag-chip ${isTagActive ? 'table-tag-chip-active' : ''}`}
+                            onClick={() => onTagClick?.(tg)}
+                            title={isTagActive ? `Remove #${tg} filter` : `Filter cards by #${tg}`}
+                            aria-pressed={isTagActive}
+                          >
+                            #{tg}
+                          </button>
+                        );
+                      })}
                     </div>
                   </td>
 
@@ -254,7 +265,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                         className="status-badge status-badge-active"
                         title="New card in active deck pool, ready for initial practice"
                       >
-                        <Sparkles size={11} />
+                        <CircleDot size={11} />
                         <span>New</span>
                       </span>
                     )}
