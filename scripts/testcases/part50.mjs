@@ -374,6 +374,49 @@ export default {
       'true'
     ),
   ],
+
+  'longest-continuous-subarray-limit': [
+    c(
+      'Finds longest continuous subarray when elements vary within limit',
+      'longestSubarray([8, 2, 4, 7], 4)',
+      '2'
+    ),
+    c(
+      'Finds subarray spanning multiple elements within larger limit',
+      'longestSubarray([10, 1, 2, 4, 7, 2], 5)',
+      '4'
+    ),
+    c(
+      'Finds longest subarray with alternating values',
+      'longestSubarray([4, 2, 2, 2, 4, 4, 2, 2], 0)',
+      '3'
+    ),
+    c(
+      'Returns 1 when single element array is provided',
+      'longestSubarray([7], 10)',
+      '1'
+    ),
+    c(
+      'Returns full array length when all elements are within limit',
+      'longestSubarray([1, 2, 3, 4, 5], 10)',
+      '5'
+    ),
+    c(
+      'Returns 1 when adjacent elements exceed limit throughout',
+      'longestSubarray([1, 10, 1, 10, 1], 2)',
+      '1'
+    ),
+    c(
+      'Handles large array with sliding max/min bounds',
+      'longestSubarray([1, 5, 6, 7, 8, 10, 6, 5, 6], 4)',
+      '5'
+    ),
+    c(
+      'Handles zero limit with duplicate values',
+      'longestSubarray([5, 5, 5, 5, 5], 0)',
+      '5'
+    ),
+  ],
 };
 
 

@@ -19222,5 +19222,69 @@
       }
     ],
     "testHarness": "await $test.run(\"Sorts mixed array of red (0), white (1), and blue (2)\", async () => {\n  const sleep = $test.sleep;\n  return (sortColors([2, 0, 2, 1, 1, 0]));\n}, () => ([0, 0, 1, 1, 2, 2]));\n\nawait $test.run(\"Sorts small array with only two distinct colors\", async () => {\n  const sleep = $test.sleep;\n  return (sortColors([2, 0, 1]));\n}, () => ([0, 1, 2]));\n\nawait $test.run(\"Handles single-element array\", async () => {\n  const sleep = $test.sleep;\n  return (sortColors([0]));\n}, () => ([0]));\n\nawait $test.run(\"Handles already sorted array\", async () => {\n  const sleep = $test.sleep;\n  return (sortColors([0, 0, 1, 1, 2, 2, 2]));\n}, () => ([0, 0, 1, 1, 2, 2, 2]));\n\nawait $test.run(\"Handles completely reverse-sorted array\", async () => {\n  const sleep = $test.sleep;\n  return (sortColors([2, 2, 2, 1, 1, 0, 0]));\n}, () => ([0, 0, 1, 1, 2, 2, 2]));\n\nawait $test.run(\"Handles array with only one color present (all 2s or all 1s)\", async () => {\n  const sleep = $test.sleep;\n  return ([sortColors([2, 2, 2]), sortColors([1, 1])]);\n}, () => ([[2, 2, 2], [1, 1]]));\n\nawait $test.run(\"Handles empty array\", async () => {\n  const sleep = $test.sleep;\n  return (sortColors([]));\n}, () => ([]));\n\nawait $test.run(\"Sorts in-place mutating the original array reference\", async () => {\n  const sleep = $test.sleep;\n  return ((() => { const arr = [2, 0, 1]; const res = sortColors(arr); return res === arr && arr[0] === 0 && arr[1] === 1 && arr[2] === 2; })());\n}, () => (true));"
+  },
+  {
+    "id": "longest-continuous-subarray-limit",
+    "track": "advanced-algorithms",
+    "title": "Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sliding-window",
+      "monotonic-queue",
+      "deque",
+      "array",
+      "capital-one"
+    ],
+    "promptSeed": "## Description\n\nGiven an array of integers `nums` and an integer `limit`, return the size of the longest non-empty subarray such that the absolute difference between any two elements of this subarray is less than or equal to `limit`.\n\n### longestSubarray(nums: number[], limit: number): number\n\n#### Parameters\n- `nums: number[]`: An array of integers.\n- `limit: number`: The maximum permitted difference between any two elements in the subarray.\n\n#### Returns\n- `number`: The maximum length of a valid continuous subarray.\n\n#### Constraints\n- `1 <= nums.length <= 10^5`\n- `1 <= nums[i] <= 10^9`\n- `0 <= limit <= 10^9`\n- Time Complexity: $O(n)$ using monotonic deques.\n- Space Complexity: $O(n)$ auxiliary memory.\n\n#### Edge Cases\n- `limit = 0`: Only contiguous subarrays of identical numbers qualify.\n- Single-element array returns `1`.\n- When all elements satisfy the limit, returns `nums.length`.",
+    "difficulty": 3,
+    "concept": "advanced-sliding-window",
+    "referenceSolution": "function longestSubarray(nums, limit) {\n  let left = 0;\n  let maxLen = 0;\n  const maxDeque = [];\n  const minDeque = [];\n\n  for (let right = 0; right < nums.length; right++) {\n    const val = nums[right];\n\n    while (maxDeque.length > 0 && val > maxDeque[maxDeque.length - 1]) {\n      maxDeque.pop();\n    }\n    maxDeque.push(val);\n\n    while (minDeque.length > 0 && val < minDeque[minDeque.length - 1]) {\n      minDeque.pop();\n    }\n    minDeque.push(val);\n\n    while (maxDeque[0] - minDeque[0] > limit) {\n      if (maxDeque[0] === nums[left]) {\n        maxDeque.shift();\n      }\n      if (minDeque[0] === nums[left]) {\n        minDeque.shift();\n      }\n      left++;\n    }\n\n    const currentLen = right - left + 1;\n    if (currentLen > maxLen) {\n      maxLen = currentLen;\n    }\n  }\n\n  return maxLen;\n}",
+    "referenceSolutionTs": "function longestSubarray(nums: number[], limit: number): number {\n  let left = 0;\n  let maxLen = 0;\n  const maxDeque: number[] = [];\n  const minDeque: number[] = [];\n\n  for (let right = 0; right < nums.length; right++) {\n    const val = nums[right];\n\n    while (maxDeque.length > 0 && val > maxDeque[maxDeque.length - 1]) {\n      maxDeque.pop();\n    }\n    maxDeque.push(val);\n\n    while (minDeque.length > 0 && val < minDeque[minDeque.length - 1]) {\n      minDeque.pop();\n    }\n    minDeque.push(val);\n\n    while (maxDeque[0] - minDeque[0] > limit) {\n      if (maxDeque[0] === nums[left]) {\n        maxDeque.shift();\n      }\n      if (minDeque[0] === nums[left]) {\n        minDeque.shift();\n      }\n      left++;\n    }\n\n    const currentLen = right - left + 1;\n    if (currentLen > maxLen) {\n      maxLen = currentLen;\n    }\n  }\n\n  return maxLen;\n}",
+    "testCases": [
+      {
+        "description": "Finds longest continuous subarray when elements vary within limit",
+        "input": "longestSubarray([8, 2, 4, 7], 4)",
+        "expected": "2"
+      },
+      {
+        "description": "Finds subarray spanning multiple elements within larger limit",
+        "input": "longestSubarray([10, 1, 2, 4, 7, 2], 5)",
+        "expected": "4"
+      },
+      {
+        "description": "Finds longest subarray with alternating values",
+        "input": "longestSubarray([4, 2, 2, 2, 4, 4, 2, 2], 0)",
+        "expected": "3"
+      },
+      {
+        "description": "Returns 1 when single element array is provided",
+        "input": "longestSubarray([7], 10)",
+        "expected": "1"
+      },
+      {
+        "description": "Returns full array length when all elements are within limit",
+        "input": "longestSubarray([1, 2, 3, 4, 5], 10)",
+        "expected": "5"
+      },
+      {
+        "description": "Returns 1 when adjacent elements exceed limit throughout",
+        "input": "longestSubarray([1, 10, 1, 10, 1], 2)",
+        "expected": "1"
+      },
+      {
+        "description": "Handles large array with sliding max/min bounds",
+        "input": "longestSubarray([1, 5, 6, 7, 8, 10, 6, 5, 6], 4)",
+        "expected": "5"
+      },
+      {
+        "description": "Handles zero limit with duplicate values",
+        "input": "longestSubarray([5, 5, 5, 5, 5], 0)",
+        "expected": "5"
+      }
+    ],
+    "testHarness": "await $test.run(\"Finds longest continuous subarray when elements vary within limit\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([8, 2, 4, 7], 4));\n}, () => (2));\n\nawait $test.run(\"Finds subarray spanning multiple elements within larger limit\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([10, 1, 2, 4, 7, 2], 5));\n}, () => (4));\n\nawait $test.run(\"Finds longest subarray with alternating values\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([4, 2, 2, 2, 4, 4, 2, 2], 0));\n}, () => (3));\n\nawait $test.run(\"Returns 1 when single element array is provided\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([7], 10));\n}, () => (1));\n\nawait $test.run(\"Returns full array length when all elements are within limit\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([1, 2, 3, 4, 5], 10));\n}, () => (5));\n\nawait $test.run(\"Returns 1 when adjacent elements exceed limit throughout\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([1, 10, 1, 10, 1], 2));\n}, () => (1));\n\nawait $test.run(\"Handles large array with sliding max/min bounds\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([1, 5, 6, 7, 8, 10, 6, 5, 6], 4));\n}, () => (5));\n\nawait $test.run(\"Handles zero limit with duplicate values\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([5, 5, 5, 5, 5], 0));\n}, () => (5));"
   }
 ]

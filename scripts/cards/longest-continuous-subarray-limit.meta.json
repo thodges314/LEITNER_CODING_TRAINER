@@ -1,0 +1,5 @@
+{
+  "title": "Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit",
+  "track": "advanced-algorithms",
+  "tags": ["sliding-window", "monotonic-queue", "deque", "array", "capital-one"]
+}

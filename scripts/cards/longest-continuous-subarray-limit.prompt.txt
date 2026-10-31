@@ -1,0 +1,24 @@
+## Description
+
+Given an array of integers `nums` and an integer `limit`, return the size of the longest non-empty subarray such that the absolute difference between any two elements of this subarray is less than or equal to `limit`.
+
+### longestSubarray(nums: number[], limit: number): number
+
+#### Parameters
+- `nums: number[]`: An array of integers.
+- `limit: number`: The maximum permitted difference between any two elements in the subarray.
+
+#### Returns
+- `number`: The maximum length of a valid continuous subarray.
+
+#### Constraints
+- `1 <= nums.length <= 10^5`
+- `1 <= nums[i] <= 10^9`
+- `0 <= limit <= 10^9`
+- Time Complexity: $O(n)$ using monotonic deques.
+- Space Complexity: $O(n)$ auxiliary memory.
+
+#### Edge Cases
+- `limit = 0`: Only contiguous subarrays of identical numbers qualify.
+- Single-element array returns `1`.
+- When all elements satisfy the limit, returns `nums.length`.
