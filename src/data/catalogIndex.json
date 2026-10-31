@@ -4573,5 +4573,19 @@
       "codesignal"
     ],
     "summary": "Implement a linear-time greedy optimization algorithm to ensure all buildings have unobstructed sightlines"
+  },
+  {
+    "id": "simplify-path",
+    "title": "Simplify Path (Canonical Unix Path)",
+    "track": "algorithms",
+    "concept": "stack",
+    "difficulty": 2,
+    "tags": [
+      "stack",
+      "string",
+      "unix",
+      "capital-one"
+    ],
+    "summary": "Implement a Unix path simplification algorithm using a stack to normalize directory structures"
   }
 ]

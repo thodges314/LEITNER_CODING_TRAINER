@@ -1,0 +1,15 @@
+Implement a Unix path simplification algorithm using a stack to normalize directory structures:
+
+### `simplifyPath(path: string): string`
+- Receives an absolute Unix path string `path` beginning with `/`.
+- Normalizes and converts `path` into its canonical simplified representation according to Unix directory navigation rules:
+  - A single period `.` represents the current directory and should be ignored.
+  - A double period `..` moves the directory up one level into the parent directory (pops the top directory from the stack if available; if already at the root directory, it remains at `/`).
+  - Multiple consecutive slashes such as `//` or `///` are treated as a single slash `/`.
+  - Any sequence of periods other than `.` and `..` (such as `...` or `....`) is treated as a valid directory or file name.
+- Formatting requirements for the canonical output:
+  - The path must start with a single slash `/`.
+  - Directories must be separated by exactly one slash `/`.
+  - The path must not end with a trailing slash `/`, unless it represents the root directory `/`.
+  - Returns `'/'` for empty directory stacks or root-level traversals.
+- Runs in **O(n) time** and **O(n) auxiliary space**, where `n` is the length of `path`.

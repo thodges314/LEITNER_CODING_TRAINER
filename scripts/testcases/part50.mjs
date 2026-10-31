@@ -288,6 +288,49 @@ export default {
       '1249975000'
     ),
   ],
+
+  'simplify-path': [
+    c(
+      'Normalizes simple path with trailing slash',
+      'simplifyPath("/home/")',
+      '"/home"'
+    ),
+    c(
+      'Traverses parent directory with double dots',
+      'simplifyPath("/home/user/Documents/../Pictures")',
+      '"/home/user/Pictures"'
+    ),
+    c(
+      'Resolves root boundary without popping above root',
+      'simplifyPath("/../")',
+      '"/"'
+    ),
+    c(
+      'Collapses multiple consecutive slashes',
+      'simplifyPath("/home//foo/")',
+      '"/home/foo"'
+    ),
+    c(
+      'Resolves mixed current directory and parent directory references',
+      'simplifyPath("/a/./b/../../c/")',
+      '"/c"'
+    ),
+    c(
+      'Treats sequences of three or more periods as valid directory names',
+      'simplifyPath("/.../a/../b/c/../d/./")',
+      '"/.../b/d"'
+    ),
+    c(
+      'Handles root, empty string, or repeated parent navigation at root level',
+      '[simplifyPath("/"), simplifyPath(""), simplifyPath("/a/../../b/../c//.//")]',
+      '["/", "/", "/c"]'
+    ),
+    c(
+      'Normalizes deeply nested path structure in linear time',
+      'simplifyPath("/a/b/c/d/e/../../f/g/./h/../i")',
+      '"/a/b/c/f/g/i"'
+    ),
+  ],
 };
 
 

@@ -23,7 +23,7 @@ test.describe('Deck Selector & Preset Decks', () => {
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
     await expect(deckTrigger).toBeVisible();
     await expect(deckTrigger).toContainText('Full Library (All Cards)');
-    await expect(deckTrigger).toContainText('330 Cards');
+    await expect(deckTrigger).toContainText('331 Cards');
 
     // Open Dropdown
     await deckTrigger.click();
@@ -39,9 +39,9 @@ test.describe('Deck Selector & Preset Decks', () => {
     // Verify menu closed and trigger reflects Full-Stack Core
     await expect(dropdownMenu).not.toBeVisible();
     await expect(deckTrigger).toContainText('Full-Stack Core');
-    await expect(deckTrigger).toContainText('275 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(275);
-    await expect(page.getByText('Showing 275 of 275 cards')).toBeVisible();
+    await expect(deckTrigger).toContainText('276 Cards');
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(276);
+    await expect(page.getByText('Showing 276 of 276 cards')).toBeVisible();
 
     // Switch to Algorithms & Data Structures
     await deckTrigger.click();
@@ -49,9 +49,9 @@ test.describe('Deck Selector & Preset Decks', () => {
     await algoOption.click();
 
     await expect(deckTrigger).toContainText('Algorithms & Data Structures');
-    await expect(deckTrigger).toContainText('98 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(98);
-    await expect(page.getByText('Showing 98 of 98 cards')).toBeVisible();
+    await expect(deckTrigger).toContainText('99 Cards');
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(99);
+    await expect(page.getByText('Showing 99 of 99 cards')).toBeVisible();
 
     // Switch to Frontend Specialist
     await deckTrigger.click();
@@ -88,14 +88,14 @@ test.describe('Deck Selector & Preset Decks', () => {
     const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
     await catalogNavBtn.click();
 
-    // Verify all 330 cards are present in Full Library
+    // Verify all 331 cards are present in Full Library
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
-    await expect(deckTrigger).toContainText('330 Cards');
+    await expect(deckTrigger).toContainText('331 Cards');
 
     // Switch to Algorithms & Data Structures
     await deckTrigger.click();
     await page.getByTestId('deck-option-algorithms').click();
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(98);
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(99);
     await expect(page.locator('tbody tr.catalog-tr').filter({ hasText: 'Binary Tree: Depth, Sum, Count' })).toBeVisible();
   });
 });
