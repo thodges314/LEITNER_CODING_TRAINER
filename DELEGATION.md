@@ -14,7 +14,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task / card | Branch | Owner | Status |
-|---|---|---|---|
+| `longest-continuous-subarray-limit` | `feature/card-longest-continuous-subarray-limit` | Antigravity | Authoring monotonic deque sliding window card |
 
 
 
