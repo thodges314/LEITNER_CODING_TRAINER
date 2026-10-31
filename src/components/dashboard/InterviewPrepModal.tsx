@@ -924,10 +924,12 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 {/* Row 3: Target Timeline & Deck Sizing (Full width row with clean split) */}
                 <div className="ai-prep-split-row">
                   <div className="ai-prep-split-col">
-                    <label htmlFor="ai-prep-date" className="ai-prep-label">
-                      <Calendar size={14} className="label-icon" />
-                      <span>Target Date / Timeline (Optional)</span>
-                    </label>
+                    <div className="ai-prep-split-header">
+                      <label htmlFor="ai-prep-date" className="ai-prep-label">
+                        <Calendar size={14} className="label-icon" />
+                        <span>Target Date / Timeline (Optional)</span>
+                      </label>
+                    </div>
                     <input
                       id="ai-prep-date"
                       type="text"

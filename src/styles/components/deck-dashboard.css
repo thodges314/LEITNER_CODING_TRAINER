@@ -1807,10 +1807,13 @@
   gap: 6px;
 }
 
-.ai-prep-deck-size-header {
+.ai-prep-deck-size-header,
+.ai-prep-split-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 28px;
+  height: 28px;
 }
 
 .ai-prep-size-mode-toggle {
@@ -1849,9 +1852,10 @@
   background: rgba(56, 189, 248, 0.06);
   border: 1px dashed rgba(56, 189, 248, 0.25);
   border-radius: 6px;
-  padding: 10px 12px;
+  padding: 0 12px;
   line-height: 1.4;
   height: 42px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
 }
