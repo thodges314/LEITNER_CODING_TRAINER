@@ -1,20 +1,10 @@
-type ScalarType = 'String' | 'Int' | 'Float' | 'Boolean' | 'ID';
-
-interface InputFieldSchema {
-  type: ScalarType;
-  required?: boolean;
-  enumValues?: string[];
-}
-
-interface InputSchema {
-  [fieldName: string]: InputFieldSchema;
-}
-
-interface SanitizedResult<T = any> {
-  valid: boolean;
-  data?: T;
-  errors?: string[];
-}
+const SCALAR_CHECKS: Record<string, (v: any) => boolean> = {
+  String: (v) => typeof v === 'string',
+  Int: (v) => typeof v === 'number' && Number.isInteger(v),
+  Float: (v) => typeof v === 'number' && Number.isFinite(v),
+  Boolean: (v) => typeof v === 'boolean',
+  ID: (v) => typeof v === 'string' || typeof v === 'number',
+};
 
 function sanitizeInput<T = any>(
   schema: InputSchema,
@@ -28,34 +18,12 @@ function sanitizeInput<T = any>(
     const val = data[name];
 
     if (val === undefined || val === null) {
-      if (field.required) {
-        errors.push(`Field '${name}' is required`);
-      }
+      if (field.required) errors.push(`Field '${name}' is required`);
       continue;
     }
 
-    let typeValid = true;
-    switch (field.type) {
-      case 'String':
-        typeValid = typeof val === 'string';
-        break;
-      case 'Int':
-        typeValid = typeof val === 'number' && Number.isInteger(val);
-        break;
-      case 'Float':
-        typeValid = typeof val === 'number' && Number.isFinite(val);
-        break;
-      case 'Boolean':
-        typeValid = typeof val === 'boolean';
-        break;
-      case 'ID':
-        typeValid = typeof val === 'string' || typeof val === 'number';
-        break;
-      default:
-        typeValid = true;
-    }
-
-    if (!typeValid) {
+    const checker = SCALAR_CHECKS[field.type];
+    if (checker && !checker(val)) {
       errors.push(`Field '${name}' must be of type ${field.type}`);
       continue;
     }
@@ -68,9 +36,6 @@ function sanitizeInput<T = any>(
     sanitized[name] = val;
   }
 
-  if (errors.length > 0) {
-    return { valid: false, errors };
-  }
-
-  return { valid: true, data: sanitized as T };
+  return errors.length > 0 ? { valid: false, errors } : { valid: true, data: sanitized as T };
 }
+

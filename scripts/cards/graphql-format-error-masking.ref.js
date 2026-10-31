@@ -8,33 +8,13 @@ const SAFE_CODES = new Set([
 function maskAndFormatError(error, isProduction = true) {
   const code = error?.extensions?.code || 'INTERNAL_SERVER_ERROR';
   const isSafe = SAFE_CODES.has(code);
+  const shouldMask = isProduction && !isSafe;
 
-  if (isProduction && !isSafe) {
-    const formatted = {
-      message: 'Internal server error',
-      extensions: { code: 'INTERNAL_SERVER_ERROR' },
-    };
-    if (error?.locations) {
-      formatted.locations = error.locations;
-    }
-    if (error?.path) {
-      formatted.path = error.path;
-    }
-    return formatted;
-  }
-
-  const formatted = {
-    message: error?.message,
-    extensions: {
-      ...(error?.extensions || {}),
-      code,
-    },
+  return {
+    message: shouldMask ? 'Internal server error' : error?.message,
+    ...(error?.locations ? { locations: error.locations } : {}),
+    ...(error?.path ? { path: error.path } : {}),
+    extensions: shouldMask ? { code: 'INTERNAL_SERVER_ERROR' } : { ...(error?.extensions || {}), code },
   };
-  if (error?.locations) {
-    formatted.locations = error.locations;
-  }
-  if (error?.path) {
-    formatted.path = error.path;
-  }
-  return formatted;
 }
+

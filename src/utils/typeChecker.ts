@@ -224,6 +224,131 @@ const SANDBOX_GLOBALS = `
     neighbors: GraphNode<T>[];
     constructor(val?: T, neighbors?: GraphNode<T>[]);
   }
+
+  // GraphQL Domain Interfaces
+  interface GraphQLResponse<T = any> {
+    data?: T;
+    errors?: Array<{
+      message: string;
+      locations?: Array<{ line: number; column: number }>;
+      path?: Array<string | number>;
+    }>;
+  }
+  interface IDataLoader<K, V> {
+    load(key: K): Promise<V>;
+    loadMany(keys: K[]): Promise<Array<V | Error>>;
+    clear(key: K): this;
+    clearAll(): this;
+  }
+  interface Edge<T> {
+    node: T;
+    cursor: string;
+  }
+  interface PageInfo {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor: string | null;
+    endCursor: string | null;
+  }
+  interface Connection<T> {
+    edges: Edge<T>[];
+    pageInfo: PageInfo;
+    totalCount: number;
+  }
+  interface ConnectionArgs {
+    first?: number;
+    after?: string;
+    last?: number;
+    before?: string;
+  }
+  interface PaginationArgs {
+    first?: number;
+    after?: string;
+    last?: number;
+    before?: string;
+  }
+  interface PaginationOptions {
+    defaultLimit?: number;
+    maxLimit?: number;
+  }
+  interface ParsedPagination {
+    isForward: boolean;
+    limit: number;
+    cursor?: string;
+  }
+  interface FieldNode {
+    name: string;
+    args?: Record<string, any>;
+    fields?: FieldNode[];
+  }
+  interface ComplexityConfig {
+    defaultCost?: number;
+    fieldCosts?: Record<string, number>;
+    maxComplexity?: number;
+  }
+  interface ComplexityResult {
+    complexity: number;
+    exceeded: boolean;
+  }
+  interface GraphQLErrorLike {
+    message: string;
+    locations?: Array<{ line: number; column: number }>;
+    path?: Array<string | number>;
+    extensions?: {
+      code?: string;
+      [key: string]: any;
+    };
+  }
+  interface FormattedError {
+    message: string;
+    locations?: Array<{ line: number; column: number }>;
+    path?: Array<string | number>;
+    extensions: {
+      code: string;
+      [key: string]: any;
+    };
+  }
+  interface FieldDefinition {
+    name: string;
+    type: string;
+    required?: boolean;
+    isArray?: boolean;
+    itemRequired?: boolean;
+  }
+  interface ModelDefinition {
+    name: string;
+    fields: FieldDefinition[];
+    description?: string;
+  }
+  interface InputFieldSchema {
+    type: 'String' | 'Int' | 'Float' | 'Boolean' | 'ID' | string;
+    required?: boolean;
+    enumValues?: string[];
+  }
+  interface InputSchema {
+    [fieldName: string]: InputFieldSchema;
+  }
+  interface SanitizedResult<T = any> {
+    valid: boolean;
+    data?: T;
+    errors?: string[];
+  }
+  interface TypeResolverMap {
+    [typeName: string]: (value: any) => boolean;
+  }
+  interface UserPayload {
+    id: string;
+    roles?: string[];
+  }
+  interface AuthContext {
+    user?: UserPayload | null;
+    [key: string]: any;
+  }
+  interface VariableValidationResult {
+    valid: boolean;
+    missing: string[];
+  }
+
   declare module 'react' {
     const React: any;
     export = React;

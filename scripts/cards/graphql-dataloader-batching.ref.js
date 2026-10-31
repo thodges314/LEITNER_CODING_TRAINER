@@ -1,84 +1,40 @@
 class DataLoader {
   constructor(batchFn) {
-    if (typeof batchFn !== 'function') {
-      throw new TypeError('DataLoader must be constructed with a function');
-    }
     this._batchFn = batchFn;
     this._cache = new Map();
     this._queue = [];
   }
 
   load(key) {
-    if (this._cache.has(key)) {
-      return this._cache.get(key);
-    }
-
-    let resolvePromise;
-    let rejectPromise;
-    const promise = new Promise((resolve, reject) => {
-      resolvePromise = resolve;
-      rejectPromise = reject;
-    });
-
+    if (this._cache.has(key)) return this._cache.get(key);
+    let resolve, reject;
+    const promise = new Promise((res, rej) => { resolve = res; reject = rej; });
     this._cache.set(key, promise);
-    this._queue.push({ key, resolve: resolvePromise, reject: rejectPromise });
+    this._queue.push({ key, resolve, reject });
 
     if (this._queue.length === 1) {
-      queueMicrotask(() => {
-        this._dispatch().catch(() => {});
+      queueMicrotask(async () => {
+        const queue = this._queue;
+        this._queue = [];
+        try {
+          const keys = queue.map((q) => q.key);
+          const results = await this._batchFn(keys);
+          if (!Array.isArray(results) || results.length !== keys.length) {
+            throw new Error('Batch function must return an array of the same length as keys');
+          }
+          queue.forEach((q, i) => results[i] instanceof Error ? q.reject(results[i]) : q.resolve(results[i]));
+        } catch (err) {
+          queue.forEach((q) => q.reject(err));
+        }
       });
     }
-
     return promise;
   }
 
-  async _dispatch() {
-    const queue = this._queue;
-    this._queue = [];
-    if (queue.length === 0) return;
-
-    const keys = queue.map((item) => item.key);
-    try {
-      const batchPromise = this._batchFn(keys);
-      if (batchPromise && typeof batchPromise.catch === 'function') {
-        batchPromise.catch(() => {});
-      }
-      const results = await batchPromise;
-      if (!Array.isArray(results) || results.length !== keys.length) {
-        throw new Error('Batch function must return an array of the same length as keys');
-      }
-
-      queue.forEach((item, index) => {
-        const val = results[index];
-        if (val instanceof Error) {
-          item.reject(val);
-        } else {
-          item.resolve(val);
-        }
-      });
-    } catch (err) {
-      queue.forEach((item) => item.reject(err));
-    }
-  }
-
   loadMany(keys) {
-    if (!Array.isArray(keys)) {
-      throw new TypeError('loadMany expects an array of keys');
-    }
-    return Promise.all(
-      keys.map((k) =>
-        this.load(k).catch((err) => (err instanceof Error ? err : new Error(String(err))))
-      )
-    );
+    return Promise.all(keys.map((k) => this.load(k).catch((err) => (err instanceof Error ? err : new Error(String(err))))));
   }
 
-  clear(key) {
-    this._cache.delete(key);
-    return this;
-  }
-
-  clearAll() {
-    this._cache.clear();
-    return this;
-  }
+  clear(key) { this._cache.delete(key); return this; }
+  clearAll() { this._cache.clear(); return this; }
 }
