@@ -830,7 +830,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     data-testid="ai-prep-new-plan-btn"
                   >
                     <Plus size={13} />
-                    <span>+ New Prep</span>
+                    <span>New Prep</span>
                   </button>
                 )}
 
