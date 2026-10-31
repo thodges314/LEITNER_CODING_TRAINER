@@ -81,6 +81,17 @@ describe('runHarness', () => {
     const good = await runHarness(base, 'function add(a: number, b: number): number { return a + b; }', 'ts');
     expect(good.passed).toBe(true);
   });
+
+  it('allows generic arrow functions without trailing comma in ts mode', async () => {
+    const card: TopicItem = {
+      ...base,
+      id: 'generic-identity',
+      testHarness: "$test.check('identity works', identity(42) === 42 && identity('a') === 'a');",
+    };
+    const r = await runHarness(card, 'const identity = <T>(value: T): T => value;', 'ts');
+    expect(r.passed).toBe(true);
+    expect(r.ran).toBe(true);
+  });
 });
 
 describe('sandbox hygiene', () => {

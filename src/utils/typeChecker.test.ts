@@ -91,4 +91,40 @@ describe('typeChecker & getTSQuickInfo', () => {
     expect(result.success).toBe(true);
     expect(result.diagnostics).toHaveLength(0);
   });
+
+  it('validates generic arrow functions without trailing comma in type parameters', () => {
+    const code = 'const identity = <T>(value: T): T => value;';
+    const result = checkAndTranspileTS(code);
+    expect(result.success).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+    expect(result.code).toContain('const identity = (value) => value;');
+  });
+
+  it('reports type errors on generic arrow functions without trailing comma', () => {
+    const code = 'const identity = <T>(value: T): T => 123;';
+    const result = checkAndTranspileTS(code);
+    expect(result.success).toBe(false);
+    expect(result.diagnostics.length).toBeGreaterThan(0);
+    expect(result.diagnostics[0].message).toContain("Type 'number' is not assignable to type 'T'");
+  });
+
+  it('retrieves hover QuickInfo on generic arrow function without trailing comma', () => {
+    const code = 'const identity = <T>(value: T): T => value;';
+    const pos = code.indexOf('identity');
+    const info = getTSQuickInfo(code, pos);
+    expect(info).not.toBeNull();
+    expect(info?.signature).toBe('const identity: <T>(value: T) => T');
+  });
+
+  it('supports generic arrow functions without trailing comma in files containing JSX', () => {
+    const code = `
+      const identity = <T>(value: T): T => value;
+      function App() {
+        return <div>{identity("test")}</div>;
+      }
+    `;
+    const result = checkAndTranspileTS(code);
+    expect(result.success).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+  });
 });
