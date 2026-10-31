@@ -8,7 +8,7 @@
 
 A client-only, zero-backend deliberate practice environment designed to simulate cold-start front-end technical interview screening.
 Learners write solutions from scratch without autocomplete or hints, execute their implementation headlessly in a browser sandbox against comprehensive test harnesses, and review cards according to spaced repetition schedules.
-The deck features **306 cards** across **12 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [306], **Full-Stack Core** [253], **Frontend Specialist** [211], and **Algorithms & Data Structures** [96]) with **2,123 documented test cases** and **100% structured Markdown instructions**.
+The deck features **312 cards** across **13 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [312], **Full-Stack Core** [259], **Frontend Specialist** [211], and **Algorithms & Data Structures** [96]) with **2,147 documented test cases** and **100% structured Markdown instructions**.
 
 - **Frontend Core**: React 19, TypeScript (strict mode), Vite 8.
 - **Content & Quality Pipeline**: Primarily AI-authored across structured batch pipelines with automated validation (reference passes, empty fails, label parity, mutation checks).
@@ -168,8 +168,8 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (1,979 unit tests across 66 test files)**: Tests verifying:
-  - Reference solutions pass for all 306 cards across 12 topics across 2,123 documented test cases.
+- **Vitest Suite (2,009 unit tests across 66 test files)**: Tests verifying:
+  - Reference solutions pass for all 312 cards across 13 topics across 2,147 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.
   - 100% of cards formatted with structured GitHub-flavored Markdown instructions.
@@ -181,7 +181,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
   - Multi-key vault persistence, prefix detection, and provider switching.
   - Timed Recall Mode configuration and persistence.
   - Deck catalog filter and sort persistence (`src/lib/deckFilters.ts`): track, tier/box, status, difficulty, search keyword, and sort selections persist across card navigation sessions.
-- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (670 tests: 612 card tests + navigation, shortcuts, preview, flow, tour, catalog, backup advisory, deck selector, remove-from-deck, custom-deck, and interview-prep tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
+- **Browser smoke test** (`npm run e2e`, Playwright, real Chromium, production build): every card's reference solution must show PASSED and an empty buffer NEEDS REVISION (682 tests: 624 card tests + navigation, shortcuts, preview, flow, tour, catalog, backup advisory, deck selector, remove-from-deck, custom-deck, and interview-prep tests). jsdom hides production-React and real-browser differences, so this is the gate for new or changed cards (see roadmap §7.4a).
 - **Production Build**: Verified via `npm run build` (`tsc -b && vite build`) with zero lint or type errors.
 
 ## 8. Navigation and first-run welcome

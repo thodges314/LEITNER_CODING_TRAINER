@@ -1,0 +1,36 @@
+Write a PostgreSQL query to compute the cancellation rate of requests involving unbanned users for each day.
+
+### Schema: `Trips`
+- `id` (INT, PRIMARY KEY)
+- `client_id` (INT): User id of rider
+- `driver_id` (INT): User id of driver
+- `status` (TEXT): `'completed'`, `'cancelled_by_driver'`, or `'cancelled_by_client'`
+- `request_at` (TEXT): Date in `'YYYY-MM-DD'` format
+
+### Schema: `Users`
+- `id` (INT, PRIMARY KEY)
+- `banned` (TEXT): `'Yes'` or `'No'`
+- `role` (TEXT): `'client'`, `'driver'`, or `'partner'`
+
+### Query Contract
+- Both the client and the driver must not be banned (`banned = 'No'`).
+- The cancellation rate is the number of cancelled requests (by client or driver) divided by the total number of unbanned requests on that day.
+- Returns columns `"Day"` and `"Cancellation Rate"`.
+- `"Cancellation Rate"` must be rounded to 2 decimal places using `ROUND(..., 2)::float`.
+- Ordered by `"Day"` ASC.
+
+### Example
+`Users`:
+- `{ id: 1, banned: "No", role: "client" }`
+- `{ id: 2, banned: "Yes", role: "client" }`
+- `{ id: 10, banned: "No", role: "driver" }`
+- `{ id: 11, banned: "No", role: "driver" }`
+
+`Trips`:
+- `{ id: 1, client_id: 1, driver_id: 10, status: "completed", request_at: "2024-03-01" }`
+- `{ id: 2, client_id: 1, driver_id: 11, status: "cancelled_by_driver", request_at: "2024-03-01" }`
+- `{ id: 3, client_id: 2, driver_id: 10, status: "cancelled_by_client", request_at: "2024-03-01" }` (ignored: client 2 is banned)
+
+Returns for `2024-03-01`:
+- 1 completed + 1 cancelled = 2 trips. Cancellation rate = 1 / 2 = 0.50.
+- `[{ "Day": "2024-03-01", "Cancellation Rate": 0.5 }]`

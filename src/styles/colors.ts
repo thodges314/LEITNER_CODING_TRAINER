@@ -151,6 +151,11 @@ export const SYNTHWAVE_DARK_PALETTE: ThemePalette = {
       bg: 'rgba(74, 222, 128, 0.12)',
       border: 'rgba(74, 222, 128, 0.35)',
     },
+    'sql-postgres': {
+      color: '#38bdf8',
+      bg: 'rgba(56, 189, 248, 0.12)',
+      border: 'rgba(56, 189, 248, 0.35)',
+    },
   },
 };
 
@@ -263,6 +268,11 @@ export const APPLE_GSOS_PALETTE: ThemePalette = {
       color: '#15803d',
       bg: '#DCFCE7',
       border: '#86EFAC',
+    },
+    'sql-postgres': {
+      color: '#0369a1',
+      bg: '#E0F2FE',
+      border: '#7DD3FC',
     },
   },
 };

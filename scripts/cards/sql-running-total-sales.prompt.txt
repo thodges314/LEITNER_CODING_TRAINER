@@ -1,0 +1,20 @@
+Write a PostgreSQL query to compute a running cumulative sum of order amounts over time.
+
+### Schema: `Orders`
+- `id` (INT, PRIMARY KEY)
+- `order_date` (TEXT): Date in `'YYYY-MM-DD'` format
+- `amount` (INT): Order revenue amount
+
+### Query Contract
+- Returns columns `order_date`, `amount`, and `running_total`.
+- The running total must accumulate preceding order amounts up to and including the current row.
+- Ordered by `order_date` ASC, then `id` ASC.
+
+### Example
+Given `Orders`:
+- `{ id: 1, order_date: "2024-01-01", amount: 100 }`
+- `{ id: 2, order_date: "2024-01-02", amount: 150 }`
+- `{ id: 3, order_date: "2024-01-03", amount: 200 }`
+
+Returns:
+- `[{ order_date: "2024-01-01", amount: 100, running_total: 100 }, { order_date: "2024-01-02", amount: 150, running_total: 250 }, { order_date: "2024-01-03", amount: 200, running_total: 450 }]`

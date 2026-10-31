@@ -43,7 +43,7 @@ describe('DeckSelector component', () => {
 
     expect(container!.textContent).toContain('Study Deck');
     expect(container!.textContent).toContain('Full Library (All Cards)');
-    expect(container!.textContent).toContain('306 Cards');
+    expect(container!.textContent).toContain('312 Cards');
   });
 
   it('renders Frontend Specialist active deck info', () => {

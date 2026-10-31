@@ -16,7 +16,9 @@ export type TrackType =
   | 'typescript-patterns'
   | 'testing-tooling'
   | 'graphql'
-  | 'node';
+  | 'node'
+  | 'sql-postgres';
+
 
 export interface TestCaseItem {
   input: string;
@@ -229,6 +231,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#4ade80',
     bg: 'rgba(74, 222, 128, 0.12)',
     border: 'rgba(74, 222, 128, 0.35)',
+  },
+  'sql-postgres': {
+    label: 'PostgreSQL',
+    color: '#38bdf8',
+    bg: 'rgba(56, 189, 248, 0.12)',
+    border: 'rgba(56, 189, 248, 0.35)',
   },
 };
 

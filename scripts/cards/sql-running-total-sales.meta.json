@@ -1,0 +1,10 @@
+{
+  "track": "sql-postgres",
+  "title": "Cumulative Running Total Sales",
+  "tags": [
+    "sql",
+    "postgres",
+    "window-functions",
+    "running-total"
+  ]
+}

@@ -4216,5 +4216,93 @@
       "schema"
     ],
     "summary": "Write a variable validation utility for GraphQL operations that checks whether all required variables are supplied"
+  },
+  {
+    "id": "sql-cancellation-rate",
+    "title": "Trips Cancellation Rate (CASE WHEN)",
+    "track": "sql-postgres",
+    "concept": "sql-conditional-aggregation",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "case-when",
+      "round",
+      "analytics"
+    ],
+    "summary": "Write a PostgreSQL query to compute the cancellation rate of requests involving unbanned users for each day."
+  },
+  {
+    "id": "sql-customer-order-frequency",
+    "title": "High-Volume Customers (HAVING Filter)",
+    "track": "sql-postgres",
+    "concept": "sql-grouping",
+    "difficulty": 2,
+    "tags": [
+      "sql",
+      "postgres",
+      "group-by",
+      "having",
+      "join"
+    ],
+    "summary": "Write a PostgreSQL query to find customers who have placed at least 2 orders."
+  },
+  {
+    "id": "sql-department-average-salary",
+    "title": "Employees Above Department Average Salary",
+    "track": "sql-postgres",
+    "concept": "sql-aggregates",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "subquery",
+      "aggregate",
+      "filter"
+    ],
+    "summary": "Write a PostgreSQL query to find all employees whose salary is strictly greater than the average salary of their respective department."
+  },
+  {
+    "id": "sql-department-highest-salary",
+    "title": "Department Highest Salary (DENSE_RANK)",
+    "track": "sql-postgres",
+    "concept": "sql-window-functions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "join",
+      "cte"
+    ],
+    "summary": "Write a PostgreSQL query to find employees who have the highest salary in each department using DENSE_RANK()."
+  },
+  {
+    "id": "sql-running-total-sales",
+    "title": "Cumulative Running Total Sales",
+    "track": "sql-postgres",
+    "concept": "sql-window-functions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "running-total"
+    ],
+    "summary": "Write a PostgreSQL query to compute a running cumulative sum of order amounts over time."
+  },
+  {
+    "id": "sql-second-highest-salary",
+    "title": "Second Highest Salary",
+    "track": "sql-postgres",
+    "concept": "sql-aggregates",
+    "difficulty": 2,
+    "tags": [
+      "sql",
+      "postgres",
+      "aggregate",
+      "subquery"
+    ],
+    "summary": "Write a PostgreSQL query to find the second highest distinct salary from the Employee table."
   }
 ]

@@ -1222,5 +1222,30 @@
   "graphql-schema-stitching-merger": {
     "difficulty": 5,
     "concept": "graphql-stitching"
+  },
+  "sql-second-highest-salary": {
+    "difficulty": 2,
+    "concept": "sql-aggregates"
+  },
+  "sql-department-average-salary": {
+    "difficulty": 3,
+    "concept": "sql-aggregates"
+  },
+  "sql-customer-order-frequency": {
+    "difficulty": 2,
+    "concept": "sql-grouping"
+  },
+  "sql-department-highest-salary": {
+    "difficulty": 3,
+    "concept": "sql-window-functions"
+  },
+  "sql-running-total-sales": {
+    "difficulty": 3,
+    "concept": "sql-window-functions"
+  },
+  "sql-cancellation-rate": {
+    "difficulty": 3,
+    "concept": "sql-conditional-aggregation"
   }
 }
+

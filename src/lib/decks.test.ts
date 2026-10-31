@@ -33,15 +33,15 @@ describe('preset decks architecture', () => {
     ]);
   });
 
-  it('Full Library contains all 306 seed cards', () => {
+  it('Full Library contains all 312 seed cards', () => {
     const full = filterCardsByDeck(cards, 'full-library');
-    expect(full).toHaveLength(306);
-    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(306);
+    expect(full).toHaveLength(312);
+    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(312);
   });
 
-  it('Full-Stack Core contains 253 cards excluding advanced algorithms', () => {
+  it('Full-Stack Core contains 259 cards excluding advanced algorithms', () => {
     const fsDeck = filterCardsByDeck(cards, 'full-stack');
-    expect(fsDeck).toHaveLength(253);
+    expect(fsDeck).toHaveLength(259);
     for (const c of fsDeck) {
       expect(c.track).not.toBe('advanced-algorithms');
     }
@@ -103,7 +103,7 @@ describe('preset decks architecture', () => {
 
   it('falls back to all cards for unknown deck id', () => {
     const filtered = filterCardsByDeck(cards, 'non-existent-deck');
-    expect(filtered).toHaveLength(306);
+    expect(filtered).toHaveLength(312);
   });
 
   it('handles getStoredActiveDeckId and setStoredActiveDeckId', () => {

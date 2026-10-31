@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Department Highest Salary (DENSE_RANK)",
+  "tags": [
+    "sql",
+    "postgres",
+    "window-functions",
+    "join",
+    "cte"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Trips Cancellation Rate (CASE WHEN)",
+  "tags": [
+    "sql",
+    "postgres",
+    "case-when",
+    "round",
+    "analytics"
+  ]
+}

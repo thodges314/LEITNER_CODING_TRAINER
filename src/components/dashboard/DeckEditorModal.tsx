@@ -39,6 +39,7 @@ const ORDERED_TRACKS: TrackType[] = [
   'js-language',
   'node',
   'graphql',
+  'sql-postgres',
   'testing-tooling',
   'typescript-patterns',
   'algorithms',

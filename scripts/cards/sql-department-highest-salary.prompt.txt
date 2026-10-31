@@ -1,0 +1,31 @@
+Write a PostgreSQL query to find employees who have the highest salary in each department using `DENSE_RANK()`.
+
+### Schema: `Employee`
+- `id` (INT, PRIMARY KEY)
+- `name` (TEXT): Employee full name
+- `salary` (INT): Compensation amount
+- `department_id` (INT): Foreign key referencing `Department(id)`
+
+### Schema: `Department`
+- `id` (INT, PRIMARY KEY)
+- `name` (TEXT): Department name
+
+### Query Contract
+- Returns columns `"Department"`, `"Employee"`, and `"Salary"`.
+- If multiple employees in the same department tie for the highest salary, include all tied employees.
+- Result should be ordered by `"Department"` ASC, then `"Employee"` ASC.
+
+### Example
+`Department`:
+- `{ id: 1, name: "IT" }`
+- `{ id: 2, name: "Sales" }`
+
+`Employee`:
+- `{ id: 1, name: "Joe", salary: 70000, department_id: 1 }`
+- `{ id: 2, name: "Jim", salary: 90000, department_id: 1 }`
+- `{ id: 3, name: "Henry", salary: 80000, department_id: 2 }`
+- `{ id: 4, name: "Sam", salary: 60000, department_id: 2 }`
+- `{ id: 5, name: "Max", salary: 90000, department_id: 1 }`
+
+Returns:
+- `[{ "Department": "IT", "Employee": "Jim", "Salary": 90000 }, { "Department": "IT", "Employee": "Max", "Salary": 90000 }, { "Department": "Sales", "Employee": "Henry", "Salary": 80000 }]`

@@ -6,8 +6,10 @@ import { createMockFetch } from './mockFetch';
 import { createDomTools, MockIntersectionObserver } from './domTools';
 import type { DomTools } from './domTools';
 import { isTsOnlyCard } from './tsOnly';
+import { PGlite } from '@electric-sql/pglite';
 
 export type ExecutionMode = 'js' | 'ts';
+
 
 export interface TranspileOutcome {
   ok: boolean;
@@ -223,6 +225,7 @@ const SANDBOX_NAMES = [
   'IntersectionObserver',
   '$dom',
   '$test',
+  'PGlite',
 ] as const;
 
 export interface SandboxScope {
@@ -288,6 +291,7 @@ export function createSandboxScope(options: {
     MockIntersectionObserver,
     lazyDom,
     createTestHelpers(options.console as ConsoleLike),
+    PGlite,
   ];
   return {
     names: SANDBOX_NAMES,
@@ -379,11 +383,20 @@ export async function runHarness(
   // Type-level checks (@ts-expect-error in the harness) only mean something under strict checking.
   if (isTsOnlyCard(card)) mode = 'ts';
 
-  const combined = bufferContainsHarness(code, harness) ? code : `${code}\n\n${harness}\n`;
+  let effectiveCode = code;
+  if (card.track === 'sql-postgres') {
+    const trimmed = code.trim();
+    const isJsDeclaration = /^(?:const|let|var|function|class|export|import)\b/.test(trimmed);
+    if (!isJsDeclaration) {
+      effectiveCode = `const query = ${JSON.stringify(trimmed)};\nconst solution = query;\n`;
+    }
+  }
+
+  const combined = bufferContainsHarness(effectiveCode, harness) ? effectiveCode : `${effectiveCode}\n\n${harness}\n`;
 
   // In TS mode, strictly type-check the user's solution (or combined buffer for typescript-patterns puzzles).
   if (mode === 'ts') {
-    const codeToCheck = isTsOnlyCard(card) ? combined : code;
+    const codeToCheck = isTsOnlyCard(card) ? combined : effectiveCode;
     const { checkAndTranspileTS } = await import('../utils/typeChecker');
     const tsCheck = checkAndTranspileTS(codeToCheck);
     if (!tsCheck.success) {

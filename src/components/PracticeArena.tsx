@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import CodeMirror from '@uiw/react-codemirror';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import { sql } from '@codemirror/lang-sql';
 import rainbowBrackets from 'rainbowbrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
@@ -337,8 +338,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   );
 
   const extensions = useMemo(() => {
+    const isSql = currentCard?.track === 'sql-postgres';
+    const langExt = isSql ? sql() : javascript({ jsx: true, typescript: executionMode === 'ts' });
     const list = [
-      javascript({ jsx: true, typescript: executionMode === 'ts' }),
+      langExt,
       rainbowBrackets(),
       EditorView.lineWrapping,
       keymap.of([indentWithTab]),
@@ -355,11 +358,11 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         },
       }),
     ];
-    if (executionMode === 'ts') {
+    if (executionMode === 'ts' && !isSql) {
       list.push(createTsHoverExtension());
     }
     return list;
-  }, [executionMode]);
+  }, [executionMode, currentCard?.track]);
 
   const actionsRef = useRef<{
     handleRunCode: () => Promise<void>;

@@ -1,0 +1,22 @@
+Write a PostgreSQL query to find all employees whose salary is strictly greater than the average salary of their respective department.
+
+### Schema: `Employee`
+- `id` (INT, PRIMARY KEY)
+- `name` (TEXT): Employee name
+- `salary` (INT): Compensation
+- `department_id` (INT): Department identifier
+
+### Query Contract
+- Returns columns `"Employee"`, `"Salary"`, and `"DepartmentId"`.
+- Filters out employees who earn less than or equal to their department's average salary.
+- Ordered by `"DepartmentId"` ASC, then `"Salary"` DESC, then `"Employee"` ASC.
+
+### Example
+Given `Employee`:
+- `{ id: 1, name: "Alice", salary: 100, department_id: 1 }` (Dept 1 avg: 85)
+- `{ id: 2, name: "Bob", salary: 70, department_id: 1 }`
+- `{ id: 3, name: "Charlie", salary: 120, department_id: 2 }` (Dept 2 avg: 110)
+- `{ id: 4, name: "David", salary: 100, department_id: 2 }`
+
+Returns:
+- `[{ "Employee": "Alice", "Salary": 100, "DepartmentId": 1 }, { "Employee": "Charlie", "Salary": 120, "DepartmentId": 2 }]`
