@@ -106,8 +106,10 @@ describe('InterviewPrepModal Component', () => {
     );
 
     // Verify deck name populated
-    const deckNameInput = document.querySelector('[data-testid="ai-prep-review-deck-name"]') as HTMLInputElement;
-    expect(deckNameInput.value).toContain('Stripe');
+    const deckNameEl = document.querySelector('[data-testid="ai-prep-review-deck-name"]');
+    expect(deckNameEl).not.toBeNull();
+    const deckNameText = (deckNameEl as HTMLInputElement).value || deckNameEl?.textContent || '';
+    expect(deckNameText).toContain('Stripe');
 
     // Verify dedicated print document was rendered in the DOM
     const printDoc = document.querySelector('.ai-prep-print-document');
