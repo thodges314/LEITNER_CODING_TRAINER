@@ -1,0 +1,21 @@
+Implement a GraphQL `__resolveType` helper factory for abstract Union and Interface types:
+
+## Description
+
+```ts
+type PredicateFn = (value: any) => boolean;
+
+interface TypeResolverMap {
+  [typeName: string]: PredicateFn;
+}
+```
+
+### `createTypeResolver(typeMap: TypeResolverMap): (value: any) => string | null`
+
+- **Factory Pattern**:
+  - Accepts a `typeMap` object where keys are GraphQL type names (e.g. `'User'`, `'Product'`) and values are predicate functions `(value: any) => boolean`.
+  - Returns a resolver function `(value: any) => string | null`.
+- **Resolution Precedence**:
+  1. **Explicit Typename**: If `value` is an object with a string `__typename` property, returns `value.__typename` immediately.
+  2. **Predicate Evaluation**: If no `__typename` is present, tests the predicate functions in `typeMap` in iteration order (`Object.entries(typeMap)`). Returns the first matching `typeName`.
+  3. **Fallback**: If no predicate returns true, or if `value` is falsy / non-object, returns `null`.

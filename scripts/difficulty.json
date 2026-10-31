@@ -1118,7 +1118,20 @@
   "graphql-variable-validator": {
     "difficulty": 1,
     "concept": "graphql-variables"
+  },
+  "graphql-sdl-type-generator": {
+    "difficulty": 2,
+    "concept": "graphql-sdl"
+  },
+  "graphql-input-object-sanitizer": {
+    "difficulty": 2,
+    "concept": "graphql-validation"
+  },
+  "graphql-discriminated-union-resolver": {
+    "difficulty": 2,
+    "concept": "graphql-resolvers"
   }
 }
+
 
 

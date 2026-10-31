@@ -16693,5 +16693,154 @@
       }
     ],
     "testHarness": "await $test.run(\"Returns valid when all required variables are supplied\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', filter: 'String' }, { id: 'usr_100', filter: 'active' }));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Flags missing required variables in definition order\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', role: 'String!', limit: 'Int' }, { limit: 10 }));\n}, () => ({ valid: false, missing: ['id', 'role'] }));\n\nawait $test.run(\"Treats null or undefined values as missing for required fields\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', token: 'String!' }, { id: null, token: undefined }));\n}, () => ({ valid: false, missing: ['id', 'token'] }));\n\nawait $test.run(\"Treats falsy values (0, empty string, false) as validly provided\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ count: 'Int!', name: 'String!', active: 'Boolean!' }, { count: 0, name: '', active: false }));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Allows optional variables to be omitted without error\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ offset: 'Int', limit: 'Int' }, {}));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Handles omitted or null variables object by marking all required as missing\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ requiredA: 'String!', optionalB: 'Int' }));\n}, () => ({ valid: false, missing: ['requiredA'] }));"
+  },
+  {
+    "id": "graphql-discriminated-union-resolver",
+    "track": "graphql",
+    "title": "GraphQL Resolvers: Discriminated Union Resolver",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "resolvers",
+      "unions",
+      "schema"
+    ],
+    "promptSeed": "Implement a GraphQL `__resolveType` helper factory for abstract Union and Interface types:\n\n## Description\n\n```ts\ntype PredicateFn = (value: any) => boolean;\n\ninterface TypeResolverMap {\n  [typeName: string]: PredicateFn;\n}\n```\n\n### `createTypeResolver(typeMap: TypeResolverMap): (value: any) => string | null`\n\n- **Factory Pattern**:\n  - Accepts a `typeMap` object where keys are GraphQL type names (e.g. `'User'`, `'Product'`) and values are predicate functions `(value: any) => boolean`.\n  - Returns a resolver function `(value: any) => string | null`.\n- **Resolution Precedence**:\n  1. **Explicit Typename**: If `value` is an object with a string `__typename` property, returns `value.__typename` immediately.\n  2. **Predicate Evaluation**: If no `__typename` is present, tests the predicate functions in `typeMap` in iteration order (`Object.entries(typeMap)`). Returns the first matching `typeName`.\n  3. **Fallback**: If no predicate returns true, or if `value` is falsy / non-object, returns `null`.",
+    "difficulty": 2,
+    "concept": "graphql-resolvers",
+    "referenceSolution": "function createTypeResolver(typeMap) {\n  const entries = Object.entries(typeMap || {});\n\n  return function resolveType(value) {\n    if (!value || typeof value !== 'object') return null;\n\n    if (typeof value.__typename === 'string') {\n      return value.__typename;\n    }\n\n    for (const [typeName, predicate] of entries) {\n      if (typeof predicate === 'function' && predicate(value)) {\n        return typeName;\n      }\n    }\n\n    return null;\n  };\n}",
+    "referenceSolutionTs": "type PredicateFn = (value: any) => boolean;\n\ninterface TypeResolverMap {\n  [typeName: string]: PredicateFn;\n}\n\nfunction createTypeResolver(\n  typeMap: TypeResolverMap\n): (value: any) => string | null {\n  const entries = Object.entries(typeMap || {});\n\n  return function resolveType(value: any): string | null {\n    if (!value || typeof value !== 'object') return null;\n\n    if (typeof value.__typename === 'string') {\n      return value.__typename;\n    }\n\n    for (const [typeName, predicate] of entries) {\n      if (typeof predicate === 'function' && predicate(value)) {\n        return typeName;\n      }\n    }\n\n    return null;\n  };\n}",
+    "testCases": [
+      {
+        "description": "Resolves type using custom predicates when __typename is absent",
+        "input": "const resolve = createTypeResolver({ User: (v) => Boolean(v.email), Product: (v) => Boolean(v.sku) });\n[resolve({ email: 'a@b.com' }), resolve({ sku: 'P-100' })]",
+        "expected": "['User', 'Product']"
+      },
+      {
+        "description": "Short-circuits immediately when explicit __typename is already present",
+        "input": "const resolve = createTypeResolver({ User: () => true });\nresolve({ __typename: 'SpecialOverride', email: 'a@b.com' })",
+        "expected": "'SpecialOverride'"
+      },
+      {
+        "description": "Respects predicate order when evaluating ambiguous inputs",
+        "input": "const resolve = createTypeResolver({ First: () => true, Second: () => true });\nresolve({ test: 1 })",
+        "expected": "'First'"
+      },
+      {
+        "description": "Returns null when no predicate matches or value is non-object",
+        "input": "const resolve = createTypeResolver({ User: (v) => Boolean(v.email) });\n[resolve({ unknown: 1 }), resolve(null), resolve('not an object')]",
+        "expected": "[null, null, null]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Resolves type using custom predicates when __typename is absent\", async () => {\n  const sleep = $test.sleep;\n  const resolve = createTypeResolver({ User: (v) => Boolean(v.email), Product: (v) => Boolean(v.sku) });\n  return ([resolve({ email: 'a@b.com' }), resolve({ sku: 'P-100' })]);\n}, () => (['User', 'Product']));\n\nawait $test.run(\"Short-circuits immediately when explicit __typename is already present\", async () => {\n  const sleep = $test.sleep;\n  const resolve = createTypeResolver({ User: () => true });\n  return (resolve({ __typename: 'SpecialOverride', email: 'a@b.com' }));\n}, () => ('SpecialOverride'));\n\nawait $test.run(\"Respects predicate order when evaluating ambiguous inputs\", async () => {\n  const sleep = $test.sleep;\n  const resolve = createTypeResolver({ First: () => true, Second: () => true });\n  return (resolve({ test: 1 }));\n}, () => ('First'));\n\nawait $test.run(\"Returns null when no predicate matches or value is non-object\", async () => {\n  const sleep = $test.sleep;\n  const resolve = createTypeResolver({ User: (v) => Boolean(v.email) });\n  return ([resolve({ unknown: 1 }), resolve(null), resolve('not an object')]);\n}, () => ([null, null, null]));"
+  },
+  {
+    "id": "graphql-input-object-sanitizer",
+    "track": "graphql",
+    "title": "GraphQL Validation: Input Object Sanitizer",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "validation",
+      "mutation",
+      "input"
+    ],
+    "promptSeed": "Write an input validation and sanitization utility for GraphQL mutation arguments:\n\n## Description\n\n```ts\ntype ScalarType = 'String' | 'Int' | 'Float' | 'Boolean' | 'ID';\n\ninterface InputFieldSchema {\n  type: ScalarType;\n  required?: boolean;\n  enumValues?: string[];\n}\n\ninterface InputSchema {\n  [fieldName: string]: InputFieldSchema;\n}\n\ninterface SanitizedResult<T = any> {\n  valid: boolean;\n  data?: T;\n  errors?: string[];\n}\n```\n\n### `sanitizeInput<T = any>(schema: InputSchema, input: Record<string, any>): SanitizedResult<T>`\n\n- **Unknown Field Stripping**:\n  - Properties present on `input` that are not defined in `schema` must be stripped from the output `data`.\n- **Validation Rules**:\n  - **Required Fields**: If `field.required` is true, the property must be defined and non-null in `input`. If missing, append error: `Field '${name}' is required`.\n  - **Type Checking** (when property is provided and not null):\n    - `'String'`: must be a `string`.\n    - `'Int'`: must be an integer `number` (`typeof val === 'number' && Number.isInteger(val)`).\n    - `'Float'`: must be a finite `number` (`typeof val === 'number' && Number.isFinite(val)`).\n    - `'Boolean'`: must be a `boolean`.\n    - `'ID'`: must be a `string` or `number`.\n    - On mismatch, append error: `Field '${name}' must be of type ${field.type}`.\n  - **Enum Values**:\n    - If `field.enumValues` is an array of strings, the value must be included in `enumValues`.\n    - If invalid, append error: `Field '${name}' must be one of: ${enumValues.join(', ')}`.\n- **Return Value**:\n  - If all checks pass, returns `{ valid: true, data: sanitizedObject }`.\n  - If any errors occur, returns `{ valid: false, errors: [...] }`.",
+    "difficulty": 2,
+    "concept": "graphql-validation",
+    "referenceSolution": "function sanitizeInput(schema, input) {\n  const errors = [];\n  const sanitized = {};\n  const data = input || {};\n\n  for (const [name, field] of Object.entries(schema || {})) {\n    const val = data[name];\n\n    if (val === undefined || val === null) {\n      if (field.required) {\n        errors.push(`Field '${name}' is required`);\n      }\n      continue;\n    }\n\n    let typeValid = true;\n    switch (field.type) {\n      case 'String':\n        typeValid = typeof val === 'string';\n        break;\n      case 'Int':\n        typeValid = typeof val === 'number' && Number.isInteger(val);\n        break;\n      case 'Float':\n        typeValid = typeof val === 'number' && Number.isFinite(val);\n        break;\n      case 'Boolean':\n        typeValid = typeof val === 'boolean';\n        break;\n      case 'ID':\n        typeValid = typeof val === 'string' || typeof val === 'number';\n        break;\n      default:\n        typeValid = true;\n    }\n\n    if (!typeValid) {\n      errors.push(`Field '${name}' must be of type ${field.type}`);\n      continue;\n    }\n\n    if (Array.isArray(field.enumValues) && !field.enumValues.includes(val)) {\n      errors.push(`Field '${name}' must be one of: ${field.enumValues.join(', ')}`);\n      continue;\n    }\n\n    sanitized[name] = val;\n  }\n\n  if (errors.length > 0) {\n    return { valid: false, errors };\n  }\n\n  return { valid: true, data: sanitized };\n}",
+    "referenceSolutionTs": "type ScalarType = 'String' | 'Int' | 'Float' | 'Boolean' | 'ID';\n\ninterface InputFieldSchema {\n  type: ScalarType;\n  required?: boolean;\n  enumValues?: string[];\n}\n\ninterface InputSchema {\n  [fieldName: string]: InputFieldSchema;\n}\n\ninterface SanitizedResult<T = any> {\n  valid: boolean;\n  data?: T;\n  errors?: string[];\n}\n\nfunction sanitizeInput<T = any>(\n  schema: InputSchema,\n  input: Record<string, any>\n): SanitizedResult<T> {\n  const errors: string[] = [];\n  const sanitized: Record<string, any> = {};\n  const data = input || {};\n\n  for (const [name, field] of Object.entries(schema || {})) {\n    const val = data[name];\n\n    if (val === undefined || val === null) {\n      if (field.required) {\n        errors.push(`Field '${name}' is required`);\n      }\n      continue;\n    }\n\n    let typeValid = true;\n    switch (field.type) {\n      case 'String':\n        typeValid = typeof val === 'string';\n        break;\n      case 'Int':\n        typeValid = typeof val === 'number' && Number.isInteger(val);\n        break;\n      case 'Float':\n        typeValid = typeof val === 'number' && Number.isFinite(val);\n        break;\n      case 'Boolean':\n        typeValid = typeof val === 'boolean';\n        break;\n      case 'ID':\n        typeValid = typeof val === 'string' || typeof val === 'number';\n        break;\n      default:\n        typeValid = true;\n    }\n\n    if (!typeValid) {\n      errors.push(`Field '${name}' must be of type ${field.type}`);\n      continue;\n    }\n\n    if (Array.isArray(field.enumValues) && !field.enumValues.includes(val)) {\n      errors.push(`Field '${name}' must be one of: ${field.enumValues.join(', ')}`);\n      continue;\n    }\n\n    sanitized[name] = val;\n  }\n\n  if (errors.length > 0) {\n    return { valid: false, errors };\n  }\n\n  return { valid: true, data: sanitized as T };\n}",
+    "testCases": [
+      {
+        "description": "Sanitizes valid inputs and strips undeclared extra fields",
+        "input": "sanitizeInput({ name: { type: 'String', required: true }, age: { type: 'Int' } }, { name: 'Alice', age: 30, rogueField: 'ignored' })",
+        "expected": "{ valid: true, data: { name: 'Alice', age: 30 } }"
+      },
+      {
+        "description": "Flags missing required fields with error messages preserving definition order",
+        "input": "sanitizeInput({ first: { type: 'String', required: true }, second: { type: 'String', required: true } }, {})",
+        "expected": "{ valid: false, errors: [\"Field 'first' is required\", \"Field 'second' is required\"] }"
+      },
+      {
+        "description": "Validates scalar types: String, Int, Float, Boolean, ID",
+        "input": "sanitizeInput({ intVal: { type: 'Int' }, floatVal: { type: 'Float' }, boolVal: { type: 'Boolean' }, idVal: { type: 'ID' } }, { intVal: 3.14, floatVal: 'not-a-float', boolVal: 'true', idVal: {} })",
+        "expected": "{ valid: false, errors: [\"Field 'intVal' must be of type Int\", \"Field 'floatVal' must be of type Float\", \"Field 'boolVal' must be of type Boolean\", \"Field 'idVal' must be of type ID\"] }"
+      },
+      {
+        "description": "Validates Float rejects non-finite numbers like Infinity",
+        "input": "sanitizeInput({ amount: { type: 'Float' } }, { amount: Infinity })",
+        "expected": "{ valid: false, errors: [\"Field 'amount' must be of type Float\"] }"
+      },
+      {
+        "description": "Enforces enumValues constraints on input fields in declaration order",
+        "input": "sanitizeInput({ r1: { type: 'String', enumValues: ['A'] }, r2: { type: 'String', enumValues: ['B'] } }, { r1: 'X', r2: 'Y' })",
+        "expected": "{ valid: false, errors: [\"Field 'r1' must be one of: A\", \"Field 'r2' must be one of: B\"] }"
+      },
+      {
+        "description": "Allows optional fields to be omitted without generating errors",
+        "input": "sanitizeInput({ title: { type: 'String', required: true }, subtitle: { type: 'String' } }, { title: 'Hello World' })",
+        "expected": "{ valid: true, data: { title: 'Hello World' } }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Sanitizes valid inputs and strips undeclared extra fields\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ name: { type: 'String', required: true }, age: { type: 'Int' } }, { name: 'Alice', age: 30, rogueField: 'ignored' }));\n}, () => ({ valid: true, data: { name: 'Alice', age: 30 } }));\n\nawait $test.run(\"Flags missing required fields with error messages preserving definition order\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ first: { type: 'String', required: true }, second: { type: 'String', required: true } }, {}));\n}, () => ({ valid: false, errors: [\"Field 'first' is required\", \"Field 'second' is required\"] }));\n\nawait $test.run(\"Validates scalar types: String, Int, Float, Boolean, ID\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ intVal: { type: 'Int' }, floatVal: { type: 'Float' }, boolVal: { type: 'Boolean' }, idVal: { type: 'ID' } }, { intVal: 3.14, floatVal: 'not-a-float', boolVal: 'true', idVal: {} }));\n}, () => ({ valid: false, errors: [\"Field 'intVal' must be of type Int\", \"Field 'floatVal' must be of type Float\", \"Field 'boolVal' must be of type Boolean\", \"Field 'idVal' must be of type ID\"] }));\n\nawait $test.run(\"Validates Float rejects non-finite numbers like Infinity\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ amount: { type: 'Float' } }, { amount: Infinity }));\n}, () => ({ valid: false, errors: [\"Field 'amount' must be of type Float\"] }));\n\nawait $test.run(\"Enforces enumValues constraints on input fields in declaration order\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ r1: { type: 'String', enumValues: ['A'] }, r2: { type: 'String', enumValues: ['B'] } }, { r1: 'X', r2: 'Y' }));\n}, () => ({ valid: false, errors: [\"Field 'r1' must be one of: A\", \"Field 'r2' must be one of: B\"] }));\n\nawait $test.run(\"Allows optional fields to be omitted without generating errors\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ title: { type: 'String', required: true }, subtitle: { type: 'String' } }, { title: 'Hello World' }));\n}, () => ({ valid: true, data: { title: 'Hello World' } }));"
+  },
+  {
+    "id": "graphql-sdl-type-generator",
+    "track": "graphql",
+    "title": "GraphQL SDL: Type Definition Generator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "codegen"
+    ],
+    "promptSeed": "Write a utility function to generate formatted GraphQL Schema Definition Language (SDL) type definitions from model objects:\n\n## Description\n\n```ts\ninterface FieldDefinition {\n  name: string;\n  type: string;\n  required?: boolean;\n  isArray?: boolean;\n  itemRequired?: boolean;\n}\n\ninterface ModelDefinition {\n  name: string;\n  fields: FieldDefinition[];\n  description?: string;\n}\n```\n\n### `generateTypeDefs(models: ModelDefinition[]): string`\n\n- **Type Declaration**:\n  - Each model generates a GraphQL object type: `type <ModelName> {\\n  <fields>\\n}`.\n  - If `description` is provided, prefixes the type declaration with a docstring `\"\"\"<description>\"\"\"\\n`.\n- **Field Formatting**:\n  - Indented by 2 spaces: `  <fieldName>: <FieldType>`.\n  - **Scalar & Object Types**: `field.type` (e.g. `ID`, `String`, `User`).\n  - **Array Modifier (`isArray`)**:\n    - If `isArray` is true and `itemRequired` is true, items inside the list are non-null: `[Type!]`.\n    - If `isArray` is true and `itemRequired` is falsy: `[Type]`.\n  - **Non-Null Modifier (`required`)**:\n    - If `required` is true, appends `!` to the outer type (e.g. `String!`, `[Type]!`, `[Type!]!`).\n    - If `required` is falsy, the outer type remains nullable (e.g. `String`, `[Type!]`).\n- **Joining Models**:\n  - Multiple models are separated by two newlines (`\\n\\n`).\n  - An empty models array returns an empty string `\"\"`.",
+    "difficulty": 2,
+    "concept": "graphql-sdl",
+    "referenceSolution": "function generateTypeDefs(models) {\n  if (!Array.isArray(models) || models.length === 0) return '';\n\n  return models\n    .map((model) => {\n      const desc = model.description ? `\"\"\"${model.description}\"\"\"\\n` : '';\n      const fields = (model.fields || [])\n        .map((f) => {\n          let t = f.type;\n          if (f.isArray) {\n            t = `[${t}${f.itemRequired ? '!' : ''}]`;\n          }\n          if (f.required) {\n            t = `${t}!`;\n          }\n          return `  ${f.name}: ${t}`;\n        })\n        .join('\\n');\n\n      return `${desc}type ${model.name} {\\n${fields}\\n}`;\n    })\n    .join('\\n\\n');\n}",
+    "referenceSolutionTs": "interface FieldDefinition {\n  name: string;\n  type: string;\n  required?: boolean;\n  isArray?: boolean;\n  itemRequired?: boolean;\n}\n\ninterface ModelDefinition {\n  name: string;\n  fields: FieldDefinition[];\n  description?: string;\n}\n\nfunction generateTypeDefs(models: ModelDefinition[]): string {\n  if (!Array.isArray(models) || models.length === 0) return '';\n\n  return models\n    .map((model) => {\n      const desc = model.description ? `\"\"\"${model.description}\"\"\"\\n` : '';\n      const fields = (model.fields || [])\n        .map((f) => {\n          let t = f.type;\n          if (f.isArray) {\n            t = `[${t}${f.itemRequired ? '!' : ''}]`;\n          }\n          if (f.required) {\n            t = `${t}!`;\n          }\n          return `  ${f.name}: ${t}`;\n        })\n        .join('\\n');\n\n      return `${desc}type ${model.name} {\\n${fields}\\n}`;\n    })\n    .join('\\n\\n');\n}",
+    "testCases": [
+      {
+        "description": "Formats single object type with scalar fields and required markers",
+        "input": "generateTypeDefs([{ name: 'User', fields: [{ name: 'id', type: 'ID', required: true }, { name: 'email', type: 'String', required: true }, { name: 'age', type: 'Int' }] }])",
+        "expected": "\"type User {\\n  id: ID!\\n  email: String!\\n  age: Int\\n}\""
+      },
+      {
+        "description": "Formats list fields with both item and list nullability combinations",
+        "input": "generateTypeDefs([{ name: 'Post', fields: [{ name: 'tags', type: 'String', isArray: true }, { name: 'authors', type: 'User', isArray: true, itemRequired: true }, { name: 'comments', type: 'Comment', isArray: true, itemRequired: true, required: true }] }])",
+        "expected": "\"type Post {\\n  tags: [String]\\n  authors: [User!]\\n  comments: [Comment!]!\\n}\""
+      },
+      {
+        "description": "Prepends docstring description when provided",
+        "input": "generateTypeDefs([{ name: 'Viewer', description: 'Active authenticated session', fields: [{ name: 'id', type: 'ID', required: true }] }])",
+        "expected": "'\"\"\"Active authenticated session\"\"\"\\ntype Viewer {\\n  id: ID!\\n}'"
+      },
+      {
+        "description": "Joins multiple type definitions with double newlines",
+        "input": "generateTypeDefs([{ name: 'A', fields: [{ name: 'id', type: 'ID' }] }, { name: 'B', fields: [{ name: 'id', type: 'ID' }] }])",
+        "expected": "\"type A {\\n  id: ID\\n}\\n\\ntype B {\\n  id: ID\\n}\""
+      },
+      {
+        "description": "Returns empty string for empty models array or non-array input",
+        "input": "generateTypeDefs([])",
+        "expected": "''"
+      },
+      {
+        "description": "Returns empty string when input is null or undefined",
+        "input": "generateTypeDefs(null)",
+        "expected": "''"
+      }
+    ],
+    "testHarness": "await $test.run(\"Formats single object type with scalar fields and required markers\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'User', fields: [{ name: 'id', type: 'ID', required: true }, { name: 'email', type: 'String', required: true }, { name: 'age', type: 'Int' }] }]));\n}, () => (\"type User {\\n  id: ID!\\n  email: String!\\n  age: Int\\n}\"));\n\nawait $test.run(\"Formats list fields with both item and list nullability combinations\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'Post', fields: [{ name: 'tags', type: 'String', isArray: true }, { name: 'authors', type: 'User', isArray: true, itemRequired: true }, { name: 'comments', type: 'Comment', isArray: true, itemRequired: true, required: true }] }]));\n}, () => (\"type Post {\\n  tags: [String]\\n  authors: [User!]\\n  comments: [Comment!]!\\n}\"));\n\nawait $test.run(\"Prepends docstring description when provided\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'Viewer', description: 'Active authenticated session', fields: [{ name: 'id', type: 'ID', required: true }] }]));\n}, () => ('\"\"\"Active authenticated session\"\"\"\\ntype Viewer {\\n  id: ID!\\n}'));\n\nawait $test.run(\"Joins multiple type definitions with double newlines\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'A', fields: [{ name: 'id', type: 'ID' }] }, { name: 'B', fields: [{ name: 'id', type: 'ID' }] }]));\n}, () => (\"type A {\\n  id: ID\\n}\\n\\ntype B {\\n  id: ID\\n}\"));\n\nawait $test.run(\"Returns empty string for empty models array or non-array input\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([]));\n}, () => (''));\n\nawait $test.run(\"Returns empty string when input is null or undefined\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs(null));\n}, () => (''));"
   }
 ]

@@ -116,4 +116,94 @@ export default {
       "{ valid: false, missing: ['requiredA'] }"
     ),
   ],
+
+  'graphql-sdl-type-generator': [
+    c(
+      'Formats single object type with scalar fields and required markers',
+      "generateTypeDefs([{ name: 'User', fields: [{ name: 'id', type: 'ID', required: true }, { name: 'email', type: 'String', required: true }, { name: 'age', type: 'Int' }] }])",
+      `"type User {\\n  id: ID!\\n  email: String!\\n  age: Int\\n}"`
+    ),
+    c(
+      'Formats list fields with both item and list nullability combinations',
+      "generateTypeDefs([{ name: 'Post', fields: [{ name: 'tags', type: 'String', isArray: true }, { name: 'authors', type: 'User', isArray: true, itemRequired: true }, { name: 'comments', type: 'Comment', isArray: true, itemRequired: true, required: true }] }])",
+      `"type Post {\\n  tags: [String]\\n  authors: [User!]\\n  comments: [Comment!]!\\n}"`
+    ),
+    c(
+      'Prepends docstring description when provided',
+      "generateTypeDefs([{ name: 'Viewer', description: 'Active authenticated session', fields: [{ name: 'id', type: 'ID', required: true }] }])",
+      `'"""Active authenticated session"""\\ntype Viewer {\\n  id: ID!\\n}'`
+    ),
+    c(
+      'Joins multiple type definitions with double newlines',
+      "generateTypeDefs([{ name: 'A', fields: [{ name: 'id', type: 'ID' }] }, { name: 'B', fields: [{ name: 'id', type: 'ID' }] }])",
+      `"type A {\\n  id: ID\\n}\\n\\ntype B {\\n  id: ID\\n}"`
+    ),
+    c(
+      'Returns empty string for empty models array or non-array input',
+      "generateTypeDefs([])",
+      "''"
+    ),
+    c(
+      'Returns empty string when input is null or undefined',
+      "generateTypeDefs(null)",
+      "''"
+    ),
+  ],
+
+  'graphql-input-object-sanitizer': [
+    c(
+      'Sanitizes valid inputs and strips undeclared extra fields',
+      "sanitizeInput({ name: { type: 'String', required: true }, age: { type: 'Int' } }, { name: 'Alice', age: 30, rogueField: 'ignored' })",
+      "{ valid: true, data: { name: 'Alice', age: 30 } }"
+    ),
+    c(
+      'Flags missing required fields with error messages preserving definition order',
+      "sanitizeInput({ first: { type: 'String', required: true }, second: { type: 'String', required: true } }, {})",
+      "{ valid: false, errors: [\"Field 'first' is required\", \"Field 'second' is required\"] }"
+    ),
+    c(
+      'Validates scalar types: String, Int, Float, Boolean, ID',
+      "sanitizeInput({ intVal: { type: 'Int' }, floatVal: { type: 'Float' }, boolVal: { type: 'Boolean' }, idVal: { type: 'ID' } }, { intVal: 3.14, floatVal: 'not-a-float', boolVal: 'true', idVal: {} })",
+      "{ valid: false, errors: [\"Field 'intVal' must be of type Int\", \"Field 'floatVal' must be of type Float\", \"Field 'boolVal' must be of type Boolean\", \"Field 'idVal' must be of type ID\"] }"
+    ),
+    c(
+      'Validates Float rejects non-finite numbers like Infinity',
+      "sanitizeInput({ amount: { type: 'Float' } }, { amount: Infinity })",
+      "{ valid: false, errors: [\"Field 'amount' must be of type Float\"] }"
+    ),
+    c(
+      'Enforces enumValues constraints on input fields in declaration order',
+      "sanitizeInput({ r1: { type: 'String', enumValues: ['A'] }, r2: { type: 'String', enumValues: ['B'] } }, { r1: 'X', r2: 'Y' })",
+      "{ valid: false, errors: [\"Field 'r1' must be one of: A\", \"Field 'r2' must be one of: B\"] }"
+    ),
+    c(
+      'Allows optional fields to be omitted without generating errors',
+      "sanitizeInput({ title: { type: 'String', required: true }, subtitle: { type: 'String' } }, { title: 'Hello World' })",
+      "{ valid: true, data: { title: 'Hello World' } }"
+    ),
+  ],
+
+  'graphql-discriminated-union-resolver': [
+    c(
+      'Resolves type using custom predicates when __typename is absent',
+      "const resolve = createTypeResolver({ User: (v) => Boolean(v.email), Product: (v) => Boolean(v.sku) });\n[resolve({ email: 'a@b.com' }), resolve({ sku: 'P-100' })]",
+      "['User', 'Product']"
+    ),
+    c(
+      'Short-circuits immediately when explicit __typename is already present',
+      "const resolve = createTypeResolver({ User: () => true });\nresolve({ __typename: 'SpecialOverride', email: 'a@b.com' })",
+      "'SpecialOverride'"
+    ),
+    c(
+      'Respects predicate order when evaluating ambiguous inputs',
+      "const resolve = createTypeResolver({ First: () => true, Second: () => true });\nresolve({ test: 1 })",
+      "'First'"
+    ),
+    c(
+      'Returns null when no predicate matches or value is non-object',
+      "const resolve = createTypeResolver({ User: (v) => Boolean(v.email) });\n[resolve({ unknown: 1 }), resolve(null), resolve('not an object')]",
+      '[null, null, null]'
+    ),
+  ],
 };
+

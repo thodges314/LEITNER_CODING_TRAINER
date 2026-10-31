@@ -3826,5 +3826,47 @@
       "schema"
     ],
     "summary": "Write a variable validation utility for GraphQL operations that checks whether all required variables are supplied"
+  },
+  {
+    "id": "graphql-discriminated-union-resolver",
+    "title": "GraphQL Resolvers: Discriminated Union Resolver",
+    "track": "graphql",
+    "concept": "graphql-resolvers",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "resolvers",
+      "unions",
+      "schema"
+    ],
+    "summary": "Implement a GraphQL __resolveType helper factory for abstract Union and Interface types"
+  },
+  {
+    "id": "graphql-input-object-sanitizer",
+    "title": "GraphQL Validation: Input Object Sanitizer",
+    "track": "graphql",
+    "concept": "graphql-validation",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "validation",
+      "mutation",
+      "input"
+    ],
+    "summary": "Write an input validation and sanitization utility for GraphQL mutation arguments"
+  },
+  {
+    "id": "graphql-sdl-type-generator",
+    "title": "GraphQL SDL: Type Definition Generator",
+    "track": "graphql",
+    "concept": "graphql-sdl",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "codegen"
+    ],
+    "summary": "Write a utility function to generate formatted GraphQL Schema Definition Language (SDL) type definitions from model objects"
   }
 ]
