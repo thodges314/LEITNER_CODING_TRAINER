@@ -1506,26 +1506,30 @@
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
-  background: transparent;
-  border: 1px solid transparent;
+  background: transparent !important;
+  border: 1px solid transparent !important;
   border-radius: 4px;
-  padding: 2px 6px;
+  padding: 2px 4px;
   text-align: left;
   width: 100%;
   max-width: 650px;
   outline: none;
+  cursor: text;
+  box-shadow: none !important;
   transition: all 0.15s ease;
 }
 
 .header-deck-name-input-prominent:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--border-subtle);
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .header-deck-name-input-prominent:focus {
-  background: var(--bg-surface);
-  border-color: #a855f7;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+  background: var(--bg-surface) !important;
+  border: 1px solid #a855f7 !important;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2) !important;
+  padding: 2px 6px;
 }
 
 .header-deck-desc-row-prominent {
@@ -1539,31 +1543,35 @@
   font-size: 12.5px;
   font-weight: 400;
   color: var(--text-muted);
-  background: transparent;
-  border: 1px solid transparent;
+  background: transparent !important;
+  border: 1px solid transparent !important;
   border-radius: 4px;
-  padding: 1px 6px;
+  padding: 1px 4px;
   text-align: left;
   width: 100%;
   max-width: 650px;
   outline: none;
+  cursor: text;
+  box-shadow: none !important;
   transition: all 0.15s ease;
 }
 
 .header-deck-desc-input-prominent:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: var(--border-subtle);
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 
 .header-deck-desc-input-prominent:focus {
-  background: var(--bg-surface);
-  border-color: #a855f7;
+  background: var(--bg-surface) !important;
+  border: 1px solid #a855f7 !important;
   color: var(--text-primary);
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2) !important;
+  padding: 1px 6px;
 }
 
 .header-deck-pencil-btn {
-  background: transparent;
+  background: transparent !important;
   border: none;
   padding: 2px;
   margin: 0;
@@ -1572,15 +1580,15 @@
   justify-content: center;
   cursor: pointer;
   color: var(--text-muted);
-  opacity: 0.6;
+  opacity: 0.4;
   border-radius: 3px;
   transition: opacity 0.15s ease, color 0.15s ease;
 }
 
 .header-deck-pencil-btn:hover {
-  opacity: 1;
-  color: #c084fc;
-  background: rgba(168, 85, 247, 0.1);
+  opacity: 0.85;
+  color: var(--text-primary);
+  background: transparent !important;
 }
 
 .header-deck-pencil-icon {
@@ -3777,4 +3785,259 @@
 [data-theme="apple-gsos"] .deck-editor-accordion-scroll::-webkit-scrollbar-thumb {
   background: #8A887E;
 }
+
+/* ==========================================================================
+   AI Interview Prep Coach - Apple GS/OS Light Mode High-Contrast Enhancements
+   ========================================================================== */
+
+[data-theme="apple-gsos"] .ai-prep-modal-container {
+  background: #F8F7F2;
+  border: 1px solid #8A887E;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="apple-gsos"] .ai-prep-header-icon-wrap {
+  background: #F3E8FF;
+  border: 1px solid #DDD6FE;
+}
+
+[data-theme="apple-gsos"] .ai-prep-header-icon {
+  color: #6B21A8;
+}
+
+[data-theme="apple-gsos"] .ai-prep-modal-title {
+  color: #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .ai-prep-modal-title.review-mode {
+  color: #6B21A8;
+}
+
+[data-theme="apple-gsos"] .ai-prep-modal-subtitle {
+  color: #555555;
+}
+
+/* Clean Titles without ovals in Day Mode */
+[data-theme="apple-gsos"] .header-deck-name-input-prominent,
+[data-theme="apple-gsos"] .header-deck-desc-input-prominent {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  color: #1C1C1C !important;
+}
+
+[data-theme="apple-gsos"] .header-deck-desc-input-prominent {
+  color: #555555 !important;
+}
+
+[data-theme="apple-gsos"] .header-deck-name-input-prominent:hover,
+[data-theme="apple-gsos"] .header-deck-desc-input-prominent:hover {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+[data-theme="apple-gsos"] .header-deck-name-input-prominent:focus,
+[data-theme="apple-gsos"] .header-deck-desc-input-prominent:focus {
+  background: #FFFFFF !important;
+  border: 1px solid #4455AA !important;
+  color: #1C1C1C !important;
+  box-shadow: 0 0 0 2px rgba(68, 85, 170, 0.2) !important;
+}
+
+[data-theme="apple-gsos"] .header-deck-pencil-btn {
+  color: #777777;
+}
+
+[data-theme="apple-gsos"] .header-deck-pencil-btn:hover {
+  color: #1C1C1C;
+}
+
+/* Form inputs & textareas in Day Mode */
+[data-theme="apple-gsos"] .ai-prep-label {
+  color: #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .label-icon {
+  color: #4455AA;
+}
+
+[data-theme="apple-gsos"] .ai-prep-field-hint {
+  color: #555555;
+}
+
+[data-theme="apple-gsos"] .ai-prep-input-lg,
+[data-theme="apple-gsos"] .ai-prep-textarea,
+[data-theme="apple-gsos"] .ai-prep-textarea-lg {
+  background-color: #FFFFFF !important;
+  color: #1C1C1C !important;
+  border: 1px solid #8A887E !important;
+}
+
+[data-theme="apple-gsos"] .ai-prep-input-lg:focus,
+[data-theme="apple-gsos"] .ai-prep-textarea:focus,
+[data-theme="apple-gsos"] .ai-prep-textarea-lg:focus {
+  border-color: #4455AA !important;
+  box-shadow: 0 0 0 2px rgba(68, 85, 170, 0.2) !important;
+}
+
+[data-theme="apple-gsos"] .ai-prep-form input:-webkit-autofill,
+[data-theme="apple-gsos"] .ai-prep-form input:-webkit-autofill:hover,
+[data-theme="apple-gsos"] .ai-prep-form input:-webkit-autofill:focus,
+[data-theme="apple-gsos"] .ai-prep-form textarea:-webkit-autofill,
+[data-theme="apple-gsos"] .ai-prep-form textarea:-webkit-autofill:hover,
+[data-theme="apple-gsos"] .ai-prep-form textarea:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #FFFFFF inset !important;
+  -webkit-text-fill-color: #1C1C1C !important;
+}
+
+/* Curriculum Sizing Toggle & Slider in Day Mode */
+[data-theme="apple-gsos"] .ai-prep-size-mode-toggle {
+  background: #FFFFFF;
+  border-color: #8A887E;
+}
+
+[data-theme="apple-gsos"] .size-mode-btn {
+  color: #555555;
+}
+
+[data-theme="apple-gsos"] .size-mode-btn:hover {
+  color: #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .size-mode-btn.active {
+  background: #4455AA;
+  color: #FFFFFF !important;
+  font-weight: 700;
+}
+
+[data-theme="apple-gsos"] .size-mode-btn.active svg {
+  color: #FFFFFF !important;
+}
+
+[data-theme="apple-gsos"] .ai-prep-auto-size-note {
+  background: #F0EFE8;
+  border: 1px dashed #8A887E;
+  color: #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .ai-prep-slider-container {
+  background: #FFFFFF;
+  border: 1px solid #8A887E;
+}
+
+[data-theme="apple-gsos"] .ai-prep-slider {
+  accent-color: #4455AA;
+}
+
+[data-theme="apple-gsos"] .slider-val-badge {
+  color: #4455AA;
+  font-weight: 700;
+}
+
+/* Tabs & Review Mode in Day Mode */
+[data-theme="apple-gsos"] .ai-prep-tab-btn {
+  color: #555555;
+}
+
+[data-theme="apple-gsos"] .ai-prep-tab-btn:hover {
+  color: #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .ai-prep-tab-btn.active {
+  color: #6B21A8 !important;
+  border-bottom-color: #7E22CE !important;
+  font-weight: 700;
+}
+
+[data-theme="apple-gsos"] .ai-prep-card-item {
+  background: #FFFFFF;
+  border: 1px solid #D0CEBE;
+}
+
+[data-theme="apple-gsos"] .ai-prep-card-item:hover {
+  border-color: #4455AA;
+}
+
+[data-theme="apple-gsos"] .priority-badge.must-know {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border: 1px solid #FCA5A5;
+}
+
+[data-theme="apple-gsos"] .priority-badge.recommended {
+  background: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #7DD3FC;
+}
+
+[data-theme="apple-gsos"] .priority-badge.optional {
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+}
+
+[data-theme="apple-gsos"] .card-item-diff-badge {
+  background: #E8E7DF;
+  color: #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .guide-topic-card {
+  background: #FFFFFF;
+  border: 1px solid #D0CEBE;
+}
+
+[data-theme="apple-gsos"] .guide-priority-pill.high {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+[data-theme="apple-gsos"] .guide-priority-pill.medium {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+[data-theme="apple-gsos"] .guide-priority-pill.low {
+  background: #F1F5F9;
+  color: #475569;
+}
+
+[data-theme="apple-gsos"] .interactive-tool-card {
+  background: #FFFFFF;
+  border: 1px solid #D0CEBE;
+}
+
+[data-theme="apple-gsos"] .interactive-tool-card:hover {
+  border-color: #4455AA;
+}
+
+[data-theme="apple-gsos"] .interactive-tool-card .tool-icon {
+  color: #4455AA;
+}
+
+[data-theme="apple-gsos"] .dialogue-input-bar {
+  background: #F4F3ED;
+  border-top: 1px solid #D0CEBE;
+}
+
+[data-theme="apple-gsos"] .dialogue-text-input {
+  background: #FFFFFF;
+  border: 1px solid #8A887E;
+  color: #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .ai-prep-history-btn,
+[data-theme="apple-gsos"] .ai-prep-new-plan-btn {
+  background: #FFFFFF;
+  border: 1px solid #8A887E;
+  color: #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .ai-prep-history-btn:hover,
+[data-theme="apple-gsos"] .ai-prep-new-plan-btn:hover {
+  background: #F0EFE8;
+  border-color: #1C1C1C;
+  color: #1C1C1C;
+}
+
 
