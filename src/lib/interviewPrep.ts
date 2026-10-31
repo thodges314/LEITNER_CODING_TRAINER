@@ -1245,7 +1245,7 @@ async function callAiJson(
       model = model || 'codestral-latest';
     } else if (provider === 'openrouter') {
       baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-      model = model || 'anthropic/claude-3.5-sonnet';
+      model = model || 'meta-llama/llama-3.3-70b-instruct:free';
     }
 
     const endpoint = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
@@ -1699,7 +1699,7 @@ Only include this JSON block if the candidate requested a modification to the de
         model = model || 'codestral-latest';
       } else if (provider === 'openrouter') {
         baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'anthropic/claude-3.5-sonnet';
+        model = model || 'meta-llama/llama-3.3-70b-instruct:free';
       }
       const endpoint = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
       const response = await fetch(endpoint, {

@@ -70,6 +70,7 @@ import {
   ShieldCheck,
   Sun,
   Moon,
+  X,
 } from 'lucide-react';
 import { getThemeColors } from './styles/colors';
 
@@ -160,6 +161,15 @@ export function App() {
 
   // Unlocked notification toast
   const [unlockToast, setUnlockToast] = useState<string | null>(null);
+
+  // Auto-dismiss notification banner after 4 seconds
+  useEffect(() => {
+    if (!unlockToast) return undefined;
+    const timer = setTimeout(() => {
+      setUnlockToast(null);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [unlockToast]);
 
   // Back = to the deck and stay; a quick second Back leaves the app.
   useBackNavigation({ view: activeView, onShowDeck: () => setActiveView('dashboard'), onHint: () => setBackHint(true) });
@@ -748,9 +758,19 @@ export function App() {
 
       {/* Staged Unlock Notification Toast */}
       {unlockToast && (
-        <div className="app-unlock-toast">
-          <Sparkles size={18} />
-          <span>{unlockToast}</span>
+        <div className="app-unlock-toast" role="status">
+          <div className="app-unlock-toast-content">
+            <Sparkles size={16} />
+            <span>{unlockToast}</span>
+          </div>
+          <button
+            type="button"
+            className="app-unlock-toast-close"
+            onClick={() => setUnlockToast(null)}
+            aria-label="Dismiss notification"
+          >
+            <X size={14} />
+          </button>
         </div>
       )}
 

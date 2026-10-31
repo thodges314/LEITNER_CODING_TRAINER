@@ -224,10 +224,11 @@
 }
 
 .app-unlock-toast {
+  position: relative;
   background-color: rgba(234, 179, 8, 0.15);
   border-bottom: 1px solid rgba(234, 179, 8, 0.4);
   color: var(--accent-amber);
-  padding: 10px 24px;
+  padding: 10px 48px 10px 24px;
   text-align: center;
   font-size: 13.5px;
   font-weight: 600;
@@ -236,6 +237,36 @@
   justify-content: center;
   gap: 8px;
   animation: fadeIn 0.2s ease;
+}
+
+.app-unlock-toast-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.app-unlock-toast-close {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.app-unlock-toast-close:hover {
+  opacity: 1;
+  background-color: rgba(234, 179, 8, 0.2);
 }
 
 [data-theme="apple-gsos"] .app-unlock-toast {

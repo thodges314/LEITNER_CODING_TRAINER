@@ -44,9 +44,6 @@ import {
 import {
   getStoredProvider,
   getStoredModel,
-  getAllStoredKeys,
-  setStoredProvider,
-  setStoredModel,
   type AIProvider,
 } from '../../lib/ai';
 import { printInterviewDossier } from '../../lib/printDossier';
@@ -105,251 +102,6 @@ export const InterviewPrepModal: React.FC<InterviewPrepModalProps> = (props) => 
   );
 };
 
-const ModelRecommendationBanner: React.FC<{
-  storedKeys: Record<AIProvider, string>;
-  activeProvider: AIProvider;
-  activeModel: string;
-  onSwitchModel: (provider: AIProvider, model: string) => void;
-  onOpenSettings?: (section?: 'ai') => void;
-}> = ({ storedKeys, activeProvider, activeModel, onSwitchModel, onOpenSettings }) => {
-  const [dismissed, setDismissed] = useState(false);
-  const [switchedNotice, setSwitchedNotice] = useState<string | null>(null);
-
-  if (dismissed) return null;
-
-  // Check which keys are stored
-  const hasOpenRouter = Boolean(storedKeys.openrouter);
-  const hasAnthropic = Boolean(storedKeys.anthropic);
-  const hasOpenAI = Boolean(storedKeys.openai);
-  const hasGemini = Boolean(storedKeys.gemini);
-  const hasGroq = Boolean(storedKeys.groq);
-
-  const isTier1Active =
-    (activeProvider === 'openrouter' && (activeModel.includes('claude-3.5') || activeModel.includes('claude-3-5') || activeModel.includes('gpt-4o'))) ||
-    (activeProvider === 'anthropic' && (activeModel.includes('claude-3-5') || activeModel.includes('claude-3.5'))) ||
-    (activeProvider === 'openai' && activeModel.includes('gpt-4o'));
-
-  if (isTier1Active) return null;
-
-  if (switchedNotice) {
-    return (
-      <div className="ai-prep-model-banner switched" role="status">
-        <Sparkles size={14} className="banner-icon" />
-        <span>{switchedNotice}</span>
-      </div>
-    );
-  }
-
-  // Tier 1 Top Choice: Claude 3.5 Sonnet via OpenRouter
-  if (hasOpenRouter && (activeProvider !== 'openrouter' || !activeModel.includes('claude-3.5'))) {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 1 Recommended:</strong> You have an <strong>OpenRouter</strong> key. Claude 3.5 Sonnet is the gold standard for recognizing architectural patterns and synthesizing executive study guides.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('openrouter', 'anthropic/claude-3.5-sonnet');
-              setSwitchedNotice('Switched active engine to Claude 3.5 Sonnet (OpenRouter) for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to Claude 3.5 Sonnet
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Tier 1 Top Choice: Claude 3.5 Sonnet via Anthropic
-  if (hasAnthropic && activeProvider !== 'anthropic') {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 1 Recommended:</strong> You have an <strong>Anthropic</strong> key. Claude 3.5 Sonnet is the gold standard for interview intelligence and architectural nuance.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('anthropic', 'claude-3-5-sonnet-20241022');
-              setSwitchedNotice('Switched active engine to Claude 3.5 Sonnet for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to Claude 3.5 Sonnet
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Tier 1 Premium Alternative: GPT-4o via OpenAI
-  if (hasOpenAI && activeProvider !== 'openai') {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 1 Alternative:</strong> You have an <strong>OpenAI</strong> key. GPT-4o offers high accuracy on company interview pattern recognition and rubric calibration.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('openai', 'gpt-4o');
-              setSwitchedNotice('Switched active engine to GPT-4o for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to GPT-4o
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Tier 2 Deep Strategic: Gemini 2.5 Pro via Google AI
-  if (hasGemini && (activeProvider !== 'gemini' || !activeModel.includes('gemini-2.5-pro'))) {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 2 Deep Strategic:</strong> You have a <strong>Google Gemini</strong> key. Gemini 2.5 Pro features an enormous context window and deep FAANG rubric reasoning.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('gemini', 'gemini-2.5-pro');
-              setSwitchedNotice('Switched active engine to Gemini 2.5 Pro for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to Gemini 2.5 Pro
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Tier 3 Fast / Free: Groq Llama 3.3 70B (only if no Tier 1 or Tier 2 key is available)
-  if (hasGroq && activeProvider !== 'groq') {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 3 Fast / Free:</strong> You have a saved key for <strong>Groq</strong>. Llama 3.3 70B delivers rapid, zero-cost curriculum setup for everyday practice drills.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('groq', 'llama-3.3-70b-versatile');
-              setSwitchedNotice('Switched active engine to Groq Llama 3.3 70B for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to Groq Llama 3.3
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // If running completely keyless:
-  if (!hasAnthropic && !hasOpenAI && !hasGroq && !hasGemini) {
-    return (
-      <div className="ai-prep-model-banner keyless-hint" role="note">
-        <div className="banner-text">
-          <Zap size={14} className="banner-icon" />
-          <span>
-            <strong>Keyless Heuristic Engine:</strong> Generating curriculum via deterministic algorithms. Adding a free Groq or Gemini key unlocks live AI JD synthesis.
-          </span>
-        </div>
-        {onOpenSettings && (
-          <div className="banner-actions">
-            <button
-              type="button"
-              className="btn-switch-model"
-              onClick={() => onOpenSettings('ai')}
-            >
-              Configure AI Key
-            </button>
-            <button
-              type="button"
-              className="btn-dismiss-banner"
-              onClick={() => setDismissed(true)}
-              aria-label="Dismiss recommendation"
-            >
-              <X size={12} />
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return null;
-};
 
 function ensureDossierChatOpener(d: InterviewPrepDossier | null): InterviewPrepDossier | null {
   if (!d) return null;
@@ -391,7 +143,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   currentBox1CardIds = [],
   initialDossierId,
   initialStep,
-  onOpenSettings,
   onEditCustomDeck,
 }) => {
   // Saved briefings history
@@ -447,10 +198,9 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const [dialogueUpdateNotification, setDialogueUpdateNotification] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // AI Model Vault state
-  const [storedKeys] = useState(() => getAllStoredKeys());
-  const [activeProvider, setActiveProvider] = useState<AIProvider>(() => getStoredProvider());
-  const [activeModel, setActiveModel] = useState<string>(() => getStoredModel());
+  // AI Model info
+  const [activeProvider] = useState<AIProvider>(() => getStoredProvider());
+  const [activeModel] = useState<string>(() => getStoredModel());
 
   const companyInputRef = useRef<HTMLInputElement>(null);
   const deckNameInputRef = useRef<HTMLInputElement>(null);
@@ -1129,20 +879,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
             </div>
           </div>
 
-          {/* Model Recommendation Banner */}
-          <ModelRecommendationBanner
-            storedKeys={storedKeys}
-            activeProvider={activeProvider}
-            activeModel={activeModel}
-            onSwitchModel={(p, m) => {
-              setStoredProvider(p);
-              setStoredModel(m);
-              setActiveProvider(p);
-              setActiveModel(m);
-            }}
-            onOpenSettings={onOpenSettings}
-          />
-
           {/* STEP 1: INPUT FORM */}
           {step === 'input' && (
             <form onSubmit={handleStartGeneration} className="ai-prep-form">
@@ -1368,9 +1104,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                       Active Model: <strong>{activeModel || activeProvider}</strong> ({activeProvider})
                     </span>
                   </div>
-                  <span className="ai-prep-provider-note">
-                    Groq offers a 100% free tier. Claude 3.5 Sonnet / GPT-4o recommended for high-stakes on-sites.
-                  </span>
                 </div>
               </div>
 
