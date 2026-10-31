@@ -1318,5 +1318,9 @@
   "gql-schema-sdl-enums-unions": {
     "difficulty": 3,
     "concept": "gql-schema-definitions"
+  },
+  "simplify-path": {
+    "difficulty": 2,
+    "concept": "stack"
   }
 }

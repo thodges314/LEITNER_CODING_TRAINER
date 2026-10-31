@@ -19095,5 +19095,68 @@
       }
     ],
     "testHarness": "await $test.run(\"Calculates minimum floors added for a staggered skyline\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([4, 2, 3, 1]));\n}, () => (3));\n\nawait $test.run(\"Calculates floors for two buildings requiring elevation\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([1, 2]));\n}, () => (2));\n\nawait $test.run(\"Calculates floors when buildings are in strictly ascending order\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([1, 2, 3]));\n}, () => (6));\n\nawait $test.run(\"Calculates floors when all buildings share identical initial height\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([3, 3, 3]));\n}, () => (3));\n\nawait $test.run(\"Requires zero floors when skyline is already strictly decreasing\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([5, 4, 3, 2, 1]));\n}, () => (0));\n\nawait $test.run(\"Returns 0 for base cases with empty array or single building\", async () => {\n  const sleep = $test.sleep;\n  return ([minFloorsForOceanView([]), minFloorsForOceanView([42])]);\n}, () => ([0, 0]));\n\nawait $test.run(\"Computes optimal floors for skyline with multiple peaks and troughs\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([2, 5, 3, 6, 2]));\n}, () => (14));\n\nawait $test.run(\"Solves massive 50,000 building dataset in linear time without overflow\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView(Array.from({ length: 50000 }, () => 1)));\n}, () => (1249975000));"
+  },
+  {
+    "id": "simplify-path",
+    "track": "algorithms",
+    "title": "Simplify Path (Canonical Unix Path)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "stack",
+      "string",
+      "unix",
+      "capital-one"
+    ],
+    "promptSeed": "Implement a Unix path simplification algorithm using a stack to normalize directory structures:\n\n### `simplifyPath(path: string): string`\n- Receives an absolute Unix path string `path` beginning with `/`.\n- Normalizes and converts `path` into its canonical simplified representation according to Unix directory navigation rules:\n  - A single period `.` represents the current directory and should be ignored.\n  - A double period `..` moves the directory up one level into the parent directory (pops the top directory from the stack if available; if already at the root directory, it remains at `/`).\n  - Multiple consecutive slashes such as `//` or `///` are treated as a single slash `/`.\n  - Any sequence of periods other than `.` and `..` (such as `...` or `....`) is treated as a valid directory or file name.\n- Formatting requirements for the canonical output:\n  - The path must start with a single slash `/`.\n  - Directories must be separated by exactly one slash `/`.\n  - The path must not end with a trailing slash `/`, unless it represents the root directory `/`.\n  - Returns `'/'` for empty directory stacks or root-level traversals.\n- Runs in **O(n) time** and **O(n) auxiliary space**, where `n` is the length of `path`.",
+    "difficulty": 2,
+    "concept": "stack",
+    "referenceSolution": "function simplifyPath(path) {\n  if (typeof path !== 'string' || !path.length) return '/';\n  const parts = path.split('/');\n  const stack = [];\n\n  for (const part of parts) {\n    if (!part || part === '.') {\n      continue;\n    }\n    if (part === '..') {\n      if (stack.length > 0) {\n        stack.pop();\n      }\n    } else {\n      stack.push(part);\n    }\n  }\n\n  return '/' + stack.join('/');\n}",
+    "referenceSolutionTs": "function simplifyPath(path: string): string {\n  if (typeof path !== 'string' || !path.length) return '/';\n  const parts: string[] = path.split('/');\n  const stack: string[] = [];\n\n  for (const part of parts) {\n    if (!part || part === '.') {\n      continue;\n    }\n    if (part === '..') {\n      if (stack.length > 0) {\n        stack.pop();\n      }\n    } else {\n      stack.push(part);\n    }\n  }\n\n  return '/' + stack.join('/');\n}",
+    "testCases": [
+      {
+        "description": "Normalizes simple path with trailing slash",
+        "input": "simplifyPath(\"/home/\")",
+        "expected": "\"/home\""
+      },
+      {
+        "description": "Traverses parent directory with double dots",
+        "input": "simplifyPath(\"/home/user/Documents/../Pictures\")",
+        "expected": "\"/home/user/Pictures\""
+      },
+      {
+        "description": "Resolves root boundary without popping above root",
+        "input": "simplifyPath(\"/../\")",
+        "expected": "\"/\""
+      },
+      {
+        "description": "Collapses multiple consecutive slashes",
+        "input": "simplifyPath(\"/home//foo/\")",
+        "expected": "\"/home/foo\""
+      },
+      {
+        "description": "Resolves mixed current directory and parent directory references",
+        "input": "simplifyPath(\"/a/./b/../../c/\")",
+        "expected": "\"/c\""
+      },
+      {
+        "description": "Treats sequences of three or more periods as valid directory names",
+        "input": "simplifyPath(\"/.../a/../b/c/../d/./\")",
+        "expected": "\"/.../b/d\""
+      },
+      {
+        "description": "Handles root, empty string, or repeated parent navigation at root level",
+        "input": "[simplifyPath(\"/\"), simplifyPath(\"\"), simplifyPath(\"/a/../../b/../c//.//\")]",
+        "expected": "[\"/\", \"/\", \"/c\"]"
+      },
+      {
+        "description": "Normalizes deeply nested path structure in linear time",
+        "input": "simplifyPath(\"/a/b/c/d/e/../../f/g/./h/../i\")",
+        "expected": "\"/a/b/c/f/g/i\""
+      }
+    ],
+    "testHarness": "await $test.run(\"Normalizes simple path with trailing slash\", async () => {\n  const sleep = $test.sleep;\n  return (simplifyPath(\"/home/\"));\n}, () => (\"/home\"));\n\nawait $test.run(\"Traverses parent directory with double dots\", async () => {\n  const sleep = $test.sleep;\n  return (simplifyPath(\"/home/user/Documents/../Pictures\"));\n}, () => (\"/home/user/Pictures\"));\n\nawait $test.run(\"Resolves root boundary without popping above root\", async () => {\n  const sleep = $test.sleep;\n  return (simplifyPath(\"/../\"));\n}, () => (\"/\"));\n\nawait $test.run(\"Collapses multiple consecutive slashes\", async () => {\n  const sleep = $test.sleep;\n  return (simplifyPath(\"/home//foo/\"));\n}, () => (\"/home/foo\"));\n\nawait $test.run(\"Resolves mixed current directory and parent directory references\", async () => {\n  const sleep = $test.sleep;\n  return (simplifyPath(\"/a/./b/../../c/\"));\n}, () => (\"/c\"));\n\nawait $test.run(\"Treats sequences of three or more periods as valid directory names\", async () => {\n  const sleep = $test.sleep;\n  return (simplifyPath(\"/.../a/../b/c/../d/./\"));\n}, () => (\"/.../b/d\"));\n\nawait $test.run(\"Handles root, empty string, or repeated parent navigation at root level\", async () => {\n  const sleep = $test.sleep;\n  return ([simplifyPath(\"/\"), simplifyPath(\"\"), simplifyPath(\"/a/../../b/../c//.//\")]);\n}, () => ([\"/\", \"/\", \"/c\"]));\n\nawait $test.run(\"Normalizes deeply nested path structure in linear time\", async () => {\n  const sleep = $test.sleep;\n  return (simplifyPath(\"/a/b/c/d/e/../../f/g/./h/../i\"));\n}, () => (\"/a/b/c/f/g/i\"));"
   }
 ]
