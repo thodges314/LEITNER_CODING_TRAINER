@@ -76,7 +76,7 @@ graph TD
 
 ---
 
-### Tier 3: Resolvers & Execution Lifecycle (Difficulty 3)
+### Tier 3: Resolvers & Execution Lifecycle (Difficulty 3) — Completed
 
 #### 7. `graphql-nested-field-resolvers`
 - **Concept**: `graphql-resolvers`

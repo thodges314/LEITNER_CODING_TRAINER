@@ -1130,8 +1130,21 @@
   "graphql-discriminated-union-resolver": {
     "difficulty": 2,
     "concept": "graphql-resolvers"
+  },
+  "graphql-nested-field-resolvers": {
+    "difficulty": 3,
+    "concept": "graphql-resolvers"
+  },
+  "graphql-context-auth-guard": {
+    "difficulty": 3,
+    "concept": "graphql-middleware"
+  },
+  "graphql-format-error-masking": {
+    "difficulty": 3,
+    "concept": "graphql-errors"
   }
 }
+
 
 
 

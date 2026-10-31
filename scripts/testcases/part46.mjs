@@ -205,5 +205,84 @@ export default {
       '[null, null, null]'
     ),
   ],
+
+  'graphql-nested-field-resolvers': [
+    c(
+      'Query.authors and Query.books call db.getAuthors and db.getBooks',
+      "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthors: () => [{ id: '1', name: 'Alice' }], getBooks: () => [{ id: 'b1', title: 'Book 1', authorId: '1' }] } };\n[res.Query.authors(null, {}, ctx), res.Query.books(null, {}, ctx)]",
+      "[[{ id: '1', name: 'Alice' }], [{ id: 'b1', title: 'Book 1', authorId: '1' }]]"
+    ),
+    c(
+      'Query.author passes args.id to db.getAuthorById',
+      "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthorById: (id) => id === '42' ? { id: '42', name: 'Douglas' } : null } };\n[res.Query.author(null, { id: '42' }, ctx), res.Query.author(null, { id: '99' }, ctx)]",
+      "[{ id: '42', name: 'Douglas' }, null]"
+    ),
+    c(
+      'Author.books passes parent.id to db.getBooksByAuthorId',
+      "const res = createLibraryResolvers();\nconst ctx = { db: { getBooksByAuthorId: (id) => [{ id: 'b_' + id, authorId: id }] } };\nres.Author.books({ id: 'auth_7', name: 'Seven' }, {}, ctx)",
+      "[{ id: 'b_auth_7', authorId: 'auth_7' }]"
+    ),
+    c(
+      'Book.author passes parent.authorId to db.getAuthorById',
+      "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthorById: (id) => ({ id, name: 'Author of ' + id }) } };\nres.Book.author({ id: 'b1', title: 'Book 1', authorId: 'auth_99' }, {}, ctx)",
+      "{ id: 'auth_99', name: 'Author of auth_99' }"
+    ),
+  ],
+
+  'graphql-context-auth-guard': [
+    c(
+      'Allows authenticated user without role restriction and passes resolver arguments through',
+      "const guard = withAuth((p, a, c, i) => ({ p, a, userId: c.user.id, i }));\nguard('parentVal', { key: 'val' }, { user: { id: 'u1' } }, 'infoVal')",
+      "{ p: 'parentVal', a: { key: 'val' }, userId: 'u1', i: 'infoVal' }"
+    ),
+    c(
+      'Throws UNAUTHENTICATED when context.user is missing or null',
+      "const guard = withAuth(() => 'ok');\nconst err1 = (() => { try { guard(null, {}, {}); return 'no error'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { guard(null, {}, { user: null }); return 'no error'; } catch (e) { return e.message; } })();\n[err1, err2]",
+      "['UNAUTHENTICATED', 'UNAUTHENTICATED']"
+    ),
+    c(
+      'Allows access when user possesses at least one required role',
+      "const guard = withAuth(() => 'authorized', ['admin', 'editor']);\nguard(null, {}, { user: { id: 'u1', roles: ['user', 'editor'] } })",
+      "'authorized'"
+    ),
+    c(
+      'Throws FORBIDDEN when user lacks any required role or has empty roles',
+      "const guard = withAuth(() => 'authorized', ['admin', 'superadmin']);\nconst err1 = (() => { try { guard(null, {}, { user: { id: 'u1', roles: ['guest'] } }); return 'no error'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { guard(null, {}, { user: { id: 'u2', roles: [] } }); return 'no error'; } catch (e) { return e.message; } })();\nconst err3 = (() => { try { guard(null, {}, { user: { id: 'u3' } }); return 'no error'; } catch (e) { return e.message; } })();\n[err1, err2, err3]",
+      "['FORBIDDEN', 'FORBIDDEN', 'FORBIDDEN']"
+    ),
+    c(
+      'Supports asynchronous resolvers returning a promise',
+      "const guard = withAuth(async (p, a) => a.count * 2);\nawait guard(null, { count: 21 }, { user: { id: 'u1' } })",
+      '42'
+    ),
+  ],
+
+  'graphql-format-error-masking': [
+    c(
+      'Preserves message and extensions for all safe client error codes in production',
+      "['BAD_USER_INPUT', 'UNAUTHENTICATED', 'FORBIDDEN', 'GRAPHQL_VALIDATION_FAILED'].map(code => maskAndFormatError({ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code, custom: 123 } }, true))",
+      "[{ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'BAD_USER_INPUT', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'UNAUTHENTICATED', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'FORBIDDEN', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'GRAPHQL_VALIDATION_FAILED', custom: 123 } }]"
+    ),
+    c(
+      'Masks internal server error and strips sensitive extensions in production by default',
+      "maskAndFormatError({ message: 'connection refused to pg://secret:5432', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR', stacktrace: ['line 1', 'line 2'], secret: 'pwd' } })",
+      "{ message: 'Internal server error', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+    ),
+    c(
+      'Masks unlisted / database error codes in production',
+      "maskAndFormatError({ message: 'Deadlock found when trying to get lock', extensions: { code: 'DATABASE_DEADLOCK', table: 'users' } }, true)",
+      "{ message: 'Internal server error', extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+    ),
+    c(
+      'Preserves message and full extensions when isProduction is false',
+      "maskAndFormatError({ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }, false)",
+      "{ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }"
+    ),
+    c(
+      'Defaults extensions.code to INTERNAL_SERVER_ERROR when omitted in dev mode',
+      "maskAndFormatError({ message: 'Uncaught TypeError' }, false)",
+      "{ message: 'Uncaught TypeError', extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+    ),
+  ],
 };
 

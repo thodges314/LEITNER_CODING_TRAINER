@@ -3,9 +3,9 @@ import catalogIndex from '../data/catalogIndex.json';
 import topics from '../data/topics.json';
 
 describe('Catalog Index Pipeline', () => {
-  it('contains exactly the same 283 cards as topics.json in matching order', () => {
+  it('contains exactly the same 286 cards as topics.json in matching order', () => {
     expect(catalogIndex.length).toBe(topics.length);
-    expect(catalogIndex.length).toBe(283);
+    expect(catalogIndex.length).toBe(286);
 
     for (let i = 0; i < topics.length; i++) {
       expect(catalogIndex[i].id).toBe(topics[i].id);

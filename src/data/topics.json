@@ -16842,5 +16842,144 @@
       }
     ],
     "testHarness": "await $test.run(\"Formats single object type with scalar fields and required markers\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'User', fields: [{ name: 'id', type: 'ID', required: true }, { name: 'email', type: 'String', required: true }, { name: 'age', type: 'Int' }] }]));\n}, () => (\"type User {\\n  id: ID!\\n  email: String!\\n  age: Int\\n}\"));\n\nawait $test.run(\"Formats list fields with both item and list nullability combinations\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'Post', fields: [{ name: 'tags', type: 'String', isArray: true }, { name: 'authors', type: 'User', isArray: true, itemRequired: true }, { name: 'comments', type: 'Comment', isArray: true, itemRequired: true, required: true }] }]));\n}, () => (\"type Post {\\n  tags: [String]\\n  authors: [User!]\\n  comments: [Comment!]!\\n}\"));\n\nawait $test.run(\"Prepends docstring description when provided\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'Viewer', description: 'Active authenticated session', fields: [{ name: 'id', type: 'ID', required: true }] }]));\n}, () => ('\"\"\"Active authenticated session\"\"\"\\ntype Viewer {\\n  id: ID!\\n}'));\n\nawait $test.run(\"Joins multiple type definitions with double newlines\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'A', fields: [{ name: 'id', type: 'ID' }] }, { name: 'B', fields: [{ name: 'id', type: 'ID' }] }]));\n}, () => (\"type A {\\n  id: ID\\n}\\n\\ntype B {\\n  id: ID\\n}\"));\n\nawait $test.run(\"Returns empty string for empty models array or non-array input\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([]));\n}, () => (''));\n\nawait $test.run(\"Returns empty string when input is null or undefined\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs(null));\n}, () => (''));"
+  },
+  {
+    "id": "graphql-context-auth-guard",
+    "track": "graphql",
+    "title": "GraphQL Middleware: Context Auth Guard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "middleware",
+      "auth",
+      "resolvers"
+    ],
+    "promptSeed": "Implement a higher-order resolver guard that enforces authentication and role-based authorization from the GraphQL `context`:\n\n## Description\n\n```ts\ntype GraphQLResolver<TSource = any, TArgs = any, TContext = any, TResult = any> = (\n  parent: TSource,\n  args: TArgs,\n  context: TContext,\n  info: any\n) => TResult;\n\ninterface UserPayload {\n  id: string;\n  roles?: string[];\n}\n\ninterface AuthContext {\n  user?: UserPayload | null;\n  [key: string]: any;\n}\n```\n\n### `withAuth<TSource = any, TArgs = any, TResult = any>(resolver: GraphQLResolver<TSource, TArgs, AuthContext, TResult>, requiredRoles?: string[]): GraphQLResolver<TSource, TArgs, AuthContext, TResult>`\n\n- **Authentication Guard**:\n  - Inspects `context.user`.\n  - If `context.user` is absent or `null`, throws an `Error('UNAUTHENTICATED')`.\n- **Role-Based Authorization (`requiredRoles`)**:\n  - If `requiredRoles` is provided and non-empty, checks whether `context.user.roles` contains at least one of the required roles.\n  - If the user has no matching roles (or `context.user.roles` is undefined/empty), throws an `Error('FORBIDDEN')`.\n  - If `requiredRoles` is omitted or empty, any authenticated user passes.\n- **Resolver Execution**:\n  - When authorized, calls and returns `resolver(parent, args, context, info)`.\n  - Seamlessly handles both synchronous return values and asynchronous promises.",
+    "difficulty": 3,
+    "concept": "graphql-middleware",
+    "referenceSolution": "function withAuth(resolver, requiredRoles = []) {\n  return function authenticatedResolver(parent, args, context, info) {\n    const user = context?.user;\n    if (!user) {\n      throw new Error('UNAUTHENTICATED');\n    }\n\n    if (Array.isArray(requiredRoles) && requiredRoles.length > 0) {\n      const userRoles = Array.isArray(user.roles) ? user.roles : [];\n      const hasRole = requiredRoles.some((role) => userRoles.includes(role));\n      if (!hasRole) {\n        throw new Error('FORBIDDEN');\n      }\n    }\n\n    return resolver(parent, args, context, info);\n  };\n}",
+    "referenceSolutionTs": "type GraphQLResolver<TSource = any, TArgs = any, TContext = any, TResult = any> = (\n  parent: TSource,\n  args: TArgs,\n  context: TContext,\n  info: any\n) => TResult;\n\ninterface UserPayload {\n  id: string;\n  roles?: string[];\n}\n\ninterface AuthContext {\n  user?: UserPayload | null;\n  [key: string]: any;\n}\n\nfunction withAuth<TSource = any, TArgs = any, TResult = any>(\n  resolver: GraphQLResolver<TSource, TArgs, AuthContext, TResult>,\n  requiredRoles: string[] = []\n): GraphQLResolver<TSource, TArgs, AuthContext, TResult> {\n  return function authenticatedResolver(parent: TSource, args: TArgs, context: AuthContext, info: any): TResult {\n    const user = context?.user;\n    if (!user) {\n      throw new Error('UNAUTHENTICATED');\n    }\n\n    if (Array.isArray(requiredRoles) && requiredRoles.length > 0) {\n      const userRoles = Array.isArray(user.roles) ? user.roles : [];\n      const hasRole = requiredRoles.some((role) => userRoles.includes(role));\n      if (!hasRole) {\n        throw new Error('FORBIDDEN');\n      }\n    }\n\n    return resolver(parent, args, context, info);\n  };\n}",
+    "testCases": [
+      {
+        "description": "Allows authenticated user without role restriction and passes resolver arguments through",
+        "input": "const guard = withAuth((p, a, c, i) => ({ p, a, userId: c.user.id, i }));\nguard('parentVal', { key: 'val' }, { user: { id: 'u1' } }, 'infoVal')",
+        "expected": "{ p: 'parentVal', a: { key: 'val' }, userId: 'u1', i: 'infoVal' }"
+      },
+      {
+        "description": "Throws UNAUTHENTICATED when context.user is missing or null",
+        "input": "const guard = withAuth(() => 'ok');\nconst err1 = (() => { try { guard(null, {}, {}); return 'no error'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { guard(null, {}, { user: null }); return 'no error'; } catch (e) { return e.message; } })();\n[err1, err2]",
+        "expected": "['UNAUTHENTICATED', 'UNAUTHENTICATED']"
+      },
+      {
+        "description": "Allows access when user possesses at least one required role",
+        "input": "const guard = withAuth(() => 'authorized', ['admin', 'editor']);\nguard(null, {}, { user: { id: 'u1', roles: ['user', 'editor'] } })",
+        "expected": "'authorized'"
+      },
+      {
+        "description": "Throws FORBIDDEN when user lacks any required role or has empty roles",
+        "input": "const guard = withAuth(() => 'authorized', ['admin', 'superadmin']);\nconst err1 = (() => { try { guard(null, {}, { user: { id: 'u1', roles: ['guest'] } }); return 'no error'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { guard(null, {}, { user: { id: 'u2', roles: [] } }); return 'no error'; } catch (e) { return e.message; } })();\nconst err3 = (() => { try { guard(null, {}, { user: { id: 'u3' } }); return 'no error'; } catch (e) { return e.message; } })();\n[err1, err2, err3]",
+        "expected": "['FORBIDDEN', 'FORBIDDEN', 'FORBIDDEN']"
+      },
+      {
+        "description": "Supports asynchronous resolvers returning a promise",
+        "input": "const guard = withAuth(async (p, a) => a.count * 2);\nawait guard(null, { count: 21 }, { user: { id: 'u1' } })",
+        "expected": "42"
+      }
+    ],
+    "testHarness": "await $test.run(\"Allows authenticated user without role restriction and passes resolver arguments through\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth((p, a, c, i) => ({ p, a, userId: c.user.id, i }));\n  return (guard('parentVal', { key: 'val' }, { user: { id: 'u1' } }, 'infoVal'));\n}, () => ({ p: 'parentVal', a: { key: 'val' }, userId: 'u1', i: 'infoVal' }));\n\nawait $test.run(\"Throws UNAUTHENTICATED when context.user is missing or null\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth(() => 'ok');\n  const err1 = (() => { try { guard(null, {}, {}); return 'no error'; } catch (e) { return e.message; } })();\n  const err2 = (() => { try { guard(null, {}, { user: null }); return 'no error'; } catch (e) { return e.message; } })();\n  return ([err1, err2]);\n}, () => (['UNAUTHENTICATED', 'UNAUTHENTICATED']));\n\nawait $test.run(\"Allows access when user possesses at least one required role\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth(() => 'authorized', ['admin', 'editor']);\n  return (guard(null, {}, { user: { id: 'u1', roles: ['user', 'editor'] } }));\n}, () => ('authorized'));\n\nawait $test.run(\"Throws FORBIDDEN when user lacks any required role or has empty roles\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth(() => 'authorized', ['admin', 'superadmin']);\n  const err1 = (() => { try { guard(null, {}, { user: { id: 'u1', roles: ['guest'] } }); return 'no error'; } catch (e) { return e.message; } })();\n  const err2 = (() => { try { guard(null, {}, { user: { id: 'u2', roles: [] } }); return 'no error'; } catch (e) { return e.message; } })();\n  const err3 = (() => { try { guard(null, {}, { user: { id: 'u3' } }); return 'no error'; } catch (e) { return e.message; } })();\n  return ([err1, err2, err3]);\n}, () => (['FORBIDDEN', 'FORBIDDEN', 'FORBIDDEN']));\n\nawait $test.run(\"Supports asynchronous resolvers returning a promise\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth(async (p, a) => a.count * 2);\n  return (await guard(null, { count: 21 }, { user: { id: 'u1' } }));\n}, () => (42));"
+  },
+  {
+    "id": "graphql-format-error-masking",
+    "track": "graphql",
+    "title": "GraphQL Errors: Error Masking and Formatting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "errors",
+      "security",
+      "sanitization"
+    ],
+    "promptSeed": "Implement a GraphQL `formatError` sanitization hook that masks internal server errors in production:\n\n## Description\n\n```ts\ninterface GraphQLErrorLike {\n  message: string;\n  locations?: Array<{ line: number; column: number }>;\n  path?: Array<string | number>;\n  extensions?: {\n    code?: string;\n    [key: string]: any;\n  };\n}\n\ninterface FormattedError {\n  message: string;\n  locations?: Array<{ line: number; column: number }>;\n  path?: Array<string | number>;\n  extensions: {\n    code: string;\n    [key: string]: any;\n  };\n}\n```\n\n### `maskAndFormatError(error: GraphQLErrorLike, isProduction = true): FormattedError`\n\n- **Known Client Errors**:\n  - The following error codes are safe client-facing errors:\n    `'BAD_USER_INPUT'`, `'UNAUTHENTICATED'`, `'FORBIDDEN'`, `'GRAPHQL_VALIDATION_FAILED'`.\n  - When `error.extensions?.code` is one of these known codes:\n    - Retains original `error.message`.\n    - Preserves `locations` and `path` if present.\n    - Copies extensions, ensuring `extensions.code` is set.\n- **Internal / Unknown Errors in Production (`isProduction === true`)**:\n  - If `error.extensions?.code` is `'INTERNAL_SERVER_ERROR'`, `'DATABASE_ERROR'`, missing, or unlisted:\n    - Replaces `message` with `'Internal server error'`.\n    - Sets `extensions.code` to `'INTERNAL_SERVER_ERROR'`.\n    - Preserves `locations` and `path` if present.\n    - Strips all other extensions (e.g. `stacktrace`, `exception`, `details`) to prevent information leakage.\n- **Development Mode (`isProduction === false`)**:\n  - Does **not** mask the error message.\n  - Keeps all original extensions intact, defaulting `extensions.code` to `'INTERNAL_SERVER_ERROR'` if not provided.",
+    "difficulty": 3,
+    "concept": "graphql-errors",
+    "referenceSolution": "const SAFE_CODES = new Set([\n  'BAD_USER_INPUT',\n  'UNAUTHENTICATED',\n  'FORBIDDEN',\n  'GRAPHQL_VALIDATION_FAILED',\n]);\n\nfunction maskAndFormatError(error, isProduction = true) {\n  const code = error?.extensions?.code || 'INTERNAL_SERVER_ERROR';\n  const isSafe = SAFE_CODES.has(code);\n\n  if (isProduction && !isSafe) {\n    const formatted = {\n      message: 'Internal server error',\n      extensions: { code: 'INTERNAL_SERVER_ERROR' },\n    };\n    if (error?.locations) {\n      formatted.locations = error.locations;\n    }\n    if (error?.path) {\n      formatted.path = error.path;\n    }\n    return formatted;\n  }\n\n  const formatted = {\n    message: error?.message,\n    extensions: {\n      ...(error?.extensions || {}),\n      code,\n    },\n  };\n  if (error?.locations) {\n    formatted.locations = error.locations;\n  }\n  if (error?.path) {\n    formatted.path = error.path;\n  }\n  return formatted;\n}",
+    "referenceSolutionTs": "interface GraphQLErrorLike {\n  message: string;\n  locations?: Array<{ line: number; column: number }>;\n  path?: Array<string | number>;\n  extensions?: {\n    code?: string;\n    [key: string]: any;\n  };\n}\n\ninterface FormattedError {\n  message: string;\n  locations?: Array<{ line: number; column: number }>;\n  path?: Array<string | number>;\n  extensions: {\n    code: string;\n    [key: string]: any;\n  };\n}\n\nconst SAFE_CODES = new Set<string>([\n  'BAD_USER_INPUT',\n  'UNAUTHENTICATED',\n  'FORBIDDEN',\n  'GRAPHQL_VALIDATION_FAILED',\n]);\n\nfunction maskAndFormatError(\n  error: GraphQLErrorLike,\n  isProduction = true\n): FormattedError {\n  const code = error?.extensions?.code || 'INTERNAL_SERVER_ERROR';\n  const isSafe = SAFE_CODES.has(code);\n\n  if (isProduction && !isSafe) {\n    const formatted: FormattedError = {\n      message: 'Internal server error',\n      extensions: { code: 'INTERNAL_SERVER_ERROR' },\n    };\n    if (error?.locations) {\n      formatted.locations = error.locations;\n    }\n    if (error?.path) {\n      formatted.path = error.path;\n    }\n    return formatted;\n  }\n\n  const formatted: FormattedError = {\n    message: error?.message,\n    extensions: {\n      ...(error?.extensions || {}),\n      code,\n    },\n  };\n  if (error?.locations) {\n    formatted.locations = error.locations;\n  }\n  if (error?.path) {\n    formatted.path = error.path;\n  }\n  return formatted;\n}",
+    "testCases": [
+      {
+        "description": "Preserves message and extensions for all safe client error codes in production",
+        "input": "['BAD_USER_INPUT', 'UNAUTHENTICATED', 'FORBIDDEN', 'GRAPHQL_VALIDATION_FAILED'].map(code => maskAndFormatError({ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code, custom: 123 } }, true))",
+        "expected": "[{ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'BAD_USER_INPUT', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'UNAUTHENTICATED', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'FORBIDDEN', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'GRAPHQL_VALIDATION_FAILED', custom: 123 } }]"
+      },
+      {
+        "description": "Masks internal server error and strips sensitive extensions in production by default",
+        "input": "maskAndFormatError({ message: 'connection refused to pg://secret:5432', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR', stacktrace: ['line 1', 'line 2'], secret: 'pwd' } })",
+        "expected": "{ message: 'Internal server error', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+      },
+      {
+        "description": "Masks unlisted / database error codes in production",
+        "input": "maskAndFormatError({ message: 'Deadlock found when trying to get lock', extensions: { code: 'DATABASE_DEADLOCK', table: 'users' } }, true)",
+        "expected": "{ message: 'Internal server error', extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+      },
+      {
+        "description": "Preserves message and full extensions when isProduction is false",
+        "input": "maskAndFormatError({ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }, false)",
+        "expected": "{ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }"
+      },
+      {
+        "description": "Defaults extensions.code to INTERNAL_SERVER_ERROR when omitted in dev mode",
+        "input": "maskAndFormatError({ message: 'Uncaught TypeError' }, false)",
+        "expected": "{ message: 'Uncaught TypeError', extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Preserves message and extensions for all safe client error codes in production\", async () => {\n  const sleep = $test.sleep;\n  return (['BAD_USER_INPUT', 'UNAUTHENTICATED', 'FORBIDDEN', 'GRAPHQL_VALIDATION_FAILED'].map(code => maskAndFormatError({ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code, custom: 123 } }, true)));\n}, () => ([{ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'BAD_USER_INPUT', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'UNAUTHENTICATED', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'FORBIDDEN', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'GRAPHQL_VALIDATION_FAILED', custom: 123 } }]));\n\nawait $test.run(\"Masks internal server error and strips sensitive extensions in production by default\", async () => {\n  const sleep = $test.sleep;\n  return (maskAndFormatError({ message: 'connection refused to pg://secret:5432', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR', stacktrace: ['line 1', 'line 2'], secret: 'pwd' } }));\n}, () => ({ message: 'Internal server error', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR' } }));\n\nawait $test.run(\"Masks unlisted / database error codes in production\", async () => {\n  const sleep = $test.sleep;\n  return (maskAndFormatError({ message: 'Deadlock found when trying to get lock', extensions: { code: 'DATABASE_DEADLOCK', table: 'users' } }, true));\n}, () => ({ message: 'Internal server error', extensions: { code: 'INTERNAL_SERVER_ERROR' } }));\n\nawait $test.run(\"Preserves message and full extensions when isProduction is false\", async () => {\n  const sleep = $test.sleep;\n  return (maskAndFormatError({ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }, false));\n}, () => ({ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }));\n\nawait $test.run(\"Defaults extensions.code to INTERNAL_SERVER_ERROR when omitted in dev mode\", async () => {\n  const sleep = $test.sleep;\n  return (maskAndFormatError({ message: 'Uncaught TypeError' }, false));\n}, () => ({ message: 'Uncaught TypeError', extensions: { code: 'INTERNAL_SERVER_ERROR' } }));"
+  },
+  {
+    "id": "graphql-nested-field-resolvers",
+    "track": "graphql",
+    "title": "GraphQL Resolvers: Nested Relational Field Resolvers",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "resolvers",
+      "relational",
+      "schema"
+    ],
+    "promptSeed": "Implement the resolver map for a relational GraphQL schema connecting `Author` and `Book` entities:\n\n## Description\n\n```ts\ninterface AuthorRecord {\n  id: string;\n  name: string;\n}\n\ninterface BookRecord {\n  id: string;\n  title: string;\n  authorId: string;\n}\n\ninterface LibraryContext {\n  db: {\n    getAuthors(): AuthorRecord[];\n    getAuthorById(id: string): AuthorRecord | null;\n    getBooks(): BookRecord[];\n    getBooksByAuthorId(authorId: string): BookRecord[];\n  };\n}\n\ninterface LibraryResolvers {\n  Query: {\n    authors(_parent: any, _args: any, context: LibraryContext): AuthorRecord[];\n    books(_parent: any, _args: any, context: LibraryContext): BookRecord[];\n    author(_parent: any, args: { id: string }, context: LibraryContext): AuthorRecord | null;\n  };\n  Author: {\n    books(parent: AuthorRecord, _args: any, context: LibraryContext): BookRecord[];\n  };\n  Book: {\n    author(parent: BookRecord, _args: any, context: LibraryContext): AuthorRecord | null;\n  };\n}\n```\n\n### `createLibraryResolvers(): LibraryResolvers`\n\n- **Resolver Signatures**:\n  Every GraphQL field resolver follows the canonical 4-argument signature `(parent, args, context, info)`.\n- **Top-Level `Query` Resolvers**:\n  - `Query.authors(_parent, _args, context)`: Returns all authors by calling `context.db.getAuthors()`.\n  - `Query.books(_parent, _args, context)`: Returns all books by calling `context.db.getBooks()`.\n  - `Query.author(_parent, args, context)`: Looks up a single author by calling `context.db.getAuthorById(args.id)`.\n- **Nested Type Resolvers**:\n  - `Author.books(parent, _args, context)`: Uses `parent.id` to fetch the author's books via `context.db.getBooksByAuthorId(parent.id)`.\n  - `Book.author(parent, _args, context)`: Uses `parent.authorId` to resolve the author via `context.db.getAuthorById(parent.authorId)`.",
+    "difficulty": 3,
+    "concept": "graphql-resolvers",
+    "referenceSolution": "function createLibraryResolvers() {\n  return {\n    Query: {\n      authors(_parent, _args, context) {\n        return context.db.getAuthors();\n      },\n      books(_parent, _args, context) {\n        return context.db.getBooks();\n      },\n      author(_parent, args, context) {\n        return context.db.getAuthorById(args.id);\n      },\n    },\n    Author: {\n      books(parent, _args, context) {\n        return context.db.getBooksByAuthorId(parent.id);\n      },\n    },\n    Book: {\n      author(parent, _args, context) {\n        return context.db.getAuthorById(parent.authorId);\n      },\n    },\n  };\n}",
+    "referenceSolutionTs": "interface AuthorRecord {\n  id: string;\n  name: string;\n}\n\ninterface BookRecord {\n  id: string;\n  title: string;\n  authorId: string;\n}\n\ninterface LibraryContext {\n  db: {\n    getAuthors(): AuthorRecord[];\n    getAuthorById(id: string): AuthorRecord | null;\n    getBooks(): BookRecord[];\n    getBooksByAuthorId(authorId: string): BookRecord[];\n  };\n}\n\ninterface LibraryResolvers {\n  Query: {\n    authors(_parent: any, _args: any, context: LibraryContext): AuthorRecord[];\n    books(_parent: any, _args: any, context: LibraryContext): BookRecord[];\n    author(_parent: any, args: { id: string }, context: LibraryContext): AuthorRecord | null;\n  };\n  Author: {\n    books(parent: AuthorRecord, _args: any, context: LibraryContext): BookRecord[];\n  };\n  Book: {\n    author(parent: BookRecord, _args: any, context: LibraryContext): AuthorRecord | null;\n  };\n}\n\nfunction createLibraryResolvers(): LibraryResolvers {\n  return {\n    Query: {\n      authors(_parent, _args, context) {\n        return context.db.getAuthors();\n      },\n      books(_parent, _args, context) {\n        return context.db.getBooks();\n      },\n      author(_parent, args, context) {\n        return context.db.getAuthorById(args.id);\n      },\n    },\n    Author: {\n      books(parent, _args, context) {\n        return context.db.getBooksByAuthorId(parent.id);\n      },\n    },\n    Book: {\n      author(parent, _args, context) {\n        return context.db.getAuthorById(parent.authorId);\n      },\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "Query.authors and Query.books call db.getAuthors and db.getBooks",
+        "input": "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthors: () => [{ id: '1', name: 'Alice' }], getBooks: () => [{ id: 'b1', title: 'Book 1', authorId: '1' }] } };\n[res.Query.authors(null, {}, ctx), res.Query.books(null, {}, ctx)]",
+        "expected": "[[{ id: '1', name: 'Alice' }], [{ id: 'b1', title: 'Book 1', authorId: '1' }]]"
+      },
+      {
+        "description": "Query.author passes args.id to db.getAuthorById",
+        "input": "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthorById: (id) => id === '42' ? { id: '42', name: 'Douglas' } : null } };\n[res.Query.author(null, { id: '42' }, ctx), res.Query.author(null, { id: '99' }, ctx)]",
+        "expected": "[{ id: '42', name: 'Douglas' }, null]"
+      },
+      {
+        "description": "Author.books passes parent.id to db.getBooksByAuthorId",
+        "input": "const res = createLibraryResolvers();\nconst ctx = { db: { getBooksByAuthorId: (id) => [{ id: 'b_' + id, authorId: id }] } };\nres.Author.books({ id: 'auth_7', name: 'Seven' }, {}, ctx)",
+        "expected": "[{ id: 'b_auth_7', authorId: 'auth_7' }]"
+      },
+      {
+        "description": "Book.author passes parent.authorId to db.getAuthorById",
+        "input": "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthorById: (id) => ({ id, name: 'Author of ' + id }) } };\nres.Book.author({ id: 'b1', title: 'Book 1', authorId: 'auth_99' }, {}, ctx)",
+        "expected": "{ id: 'auth_99', name: 'Author of auth_99' }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Query.authors and Query.books call db.getAuthors and db.getBooks\", async () => {\n  const sleep = $test.sleep;\n  const res = createLibraryResolvers();\n  const ctx = { db: { getAuthors: () => [{ id: '1', name: 'Alice' }], getBooks: () => [{ id: 'b1', title: 'Book 1', authorId: '1' }] } };\n  return ([res.Query.authors(null, {}, ctx), res.Query.books(null, {}, ctx)]);\n}, () => ([[{ id: '1', name: 'Alice' }], [{ id: 'b1', title: 'Book 1', authorId: '1' }]]));\n\nawait $test.run(\"Query.author passes args.id to db.getAuthorById\", async () => {\n  const sleep = $test.sleep;\n  const res = createLibraryResolvers();\n  const ctx = { db: { getAuthorById: (id) => id === '42' ? { id: '42', name: 'Douglas' } : null } };\n  return ([res.Query.author(null, { id: '42' }, ctx), res.Query.author(null, { id: '99' }, ctx)]);\n}, () => ([{ id: '42', name: 'Douglas' }, null]));\n\nawait $test.run(\"Author.books passes parent.id to db.getBooksByAuthorId\", async () => {\n  const sleep = $test.sleep;\n  const res = createLibraryResolvers();\n  const ctx = { db: { getBooksByAuthorId: (id) => [{ id: 'b_' + id, authorId: id }] } };\n  return (res.Author.books({ id: 'auth_7', name: 'Seven' }, {}, ctx));\n}, () => ([{ id: 'b_auth_7', authorId: 'auth_7' }]));\n\nawait $test.run(\"Book.author passes parent.authorId to db.getAuthorById\", async () => {\n  const sleep = $test.sleep;\n  const res = createLibraryResolvers();\n  const ctx = { db: { getAuthorById: (id) => ({ id, name: 'Author of ' + id }) } };\n  return (res.Book.author({ id: 'b1', title: 'Book 1', authorId: 'auth_99' }, {}, ctx));\n}, () => ({ id: 'auth_99', name: 'Author of auth_99' }));"
   }
 ]

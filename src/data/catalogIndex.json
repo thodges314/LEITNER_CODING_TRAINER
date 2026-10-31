@@ -3868,5 +3868,47 @@
       "codegen"
     ],
     "summary": "Write a utility function to generate formatted GraphQL Schema Definition Language (SDL) type definitions from model objects"
+  },
+  {
+    "id": "graphql-context-auth-guard",
+    "title": "GraphQL Middleware: Context Auth Guard",
+    "track": "graphql",
+    "concept": "graphql-middleware",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "middleware",
+      "auth",
+      "resolvers"
+    ],
+    "summary": "Implement a higher-order resolver guard that enforces authentication and role-based authorization from the GraphQL context"
+  },
+  {
+    "id": "graphql-format-error-masking",
+    "title": "GraphQL Errors: Error Masking and Formatting",
+    "track": "graphql",
+    "concept": "graphql-errors",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "errors",
+      "security",
+      "sanitization"
+    ],
+    "summary": "Implement a GraphQL formatError sanitization hook that masks internal server errors in production"
+  },
+  {
+    "id": "graphql-nested-field-resolvers",
+    "title": "GraphQL Resolvers: Nested Relational Field Resolvers",
+    "track": "graphql",
+    "concept": "graphql-resolvers",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "resolvers",
+      "relational",
+      "schema"
+    ],
+    "summary": "Implement the resolver map for a relational GraphQL schema connecting Author and Book entities"
   }
 ]
