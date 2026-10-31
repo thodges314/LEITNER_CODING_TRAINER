@@ -1,12 +1,12 @@
-function ToastTrigger() {
+function ToastTrigger({ message, duration }) {
   const { show } = useToast();
   return (
     <div style={{ display: 'flex', gap: '8px' }}>
       <button
         type="button"
         onClick={() => {
-          show('Changes saved successfully!', { duration: 4000 });
-          log('showToast')('saved');
+          show(message || 'Changes saved successfully!', { duration: Number(duration) || 3000 });
+          log('showToast', message);
         }}
         style={{ padding: '6px 12px' }}
       >
@@ -15,8 +15,8 @@ function ToastTrigger() {
       <button
         type="button"
         onClick={() => {
-          show('Network sync warning', { duration: 4000 });
-          log('showToast')('warning');
+          show('Network sync warning', { duration: Number(duration) || 3000 });
+          log('showToast', 'Network sync warning');
         }}
         style={{ padding: '6px 12px' }}
       >
@@ -27,10 +27,22 @@ function ToastTrigger() {
 }
 
 function Demo() {
+  const {
+    limit = 3,
+    duration = 3000,
+    message = 'Changes saved successfully!',
+  } = usePreviewProps({
+    limit: 3,
+    duration: 3000,
+    message: 'Changes saved successfully!',
+  });
+
+  const parsedLimit = Number(limit) || 3;
+
   return (
     <div style={{ padding: '16px' }}>
-      <ToastProvider limit={3}>
-        <ToastTrigger />
+      <ToastProvider key={parsedLimit} limit={parsedLimit}>
+        <ToastTrigger message={message} duration={duration} />
       </ToastProvider>
     </div>
   );

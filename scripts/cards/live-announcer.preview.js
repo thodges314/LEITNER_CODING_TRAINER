@@ -1,4 +1,4 @@
-function AnnounceControls() {
+function AnnounceControls({ message, politeness }) {
   const announce = useAnnounce();
 
   return (
@@ -6,7 +6,7 @@ function AnnounceControls() {
       <p style={{ margin: 0, fontSize: 13, color: '#94a3b8' }}>
         Screen reader live regions (polite and assertive status announcements).
       </p>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <button
           type="button"
           style={{
@@ -18,11 +18,12 @@ function AnnounceControls() {
             cursor: 'pointer',
           }}
           onClick={() => {
-            announce('Changes saved successfully.', { politeness: 'polite' });
-            log('announce', 'polite: Changes saved successfully.');
+            const msg = message || 'Changes saved successfully.';
+            announce(msg, { politeness: politeness || 'polite' });
+            log('announce', `${politeness || 'polite'}: ${msg}`);
           }}
         >
-          Announce Polite
+          Announce {politeness === 'assertive' ? 'Assertive' : 'Polite'}
         </button>
         <button
           type="button"
@@ -39,7 +40,7 @@ function AnnounceControls() {
             log('announce', 'assertive: Connection lost! Check network.');
           }}
         >
-          Announce Assertive
+          Urgent Alert
         </button>
       </div>
     </div>
@@ -47,10 +48,18 @@ function AnnounceControls() {
 }
 
 function Demo() {
+  const {
+    politeness = 'polite',
+    message = 'Changes saved successfully.',
+  } = usePreviewProps({
+    politeness: 'polite',
+    message: 'Changes saved successfully.',
+  });
+
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', padding: 16 }}>
       <AnnouncerProvider>
-        <AnnounceControls />
+        <AnnounceControls message={message} politeness={politeness} />
       </AnnouncerProvider>
     </div>
   );

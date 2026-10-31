@@ -1,4 +1,4 @@
-const sampleTree = [
+const defaultTree = [
   {
     id: 'frontend',
     label: 'Frontend',
@@ -36,7 +36,7 @@ function CheckboxTreeNode({ node, getStatus, toggle }) {
           checked={status === 'checked'}
           onChange={() => {
             toggle(node.id);
-            log('toggle')(node.id);
+            log('toggle', node.id);
           }}
         />
         <span style={{ fontSize: '13px' }}>{node.label || node.id}</span>
@@ -52,14 +52,37 @@ function CheckboxTreeNode({ node, getStatus, toggle }) {
   );
 }
 
+function TreeRenderer({ treeData, initialChecked }) {
+  const { getStatus, toggle } = useCheckboxTree(treeData, initialChecked);
+  return (
+    <div>
+      {treeData.map((node) => (
+        <CheckboxTreeNode key={node.id} node={node} getStatus={getStatus} toggle={toggle} />
+      ))}
+    </div>
+  );
+}
+
 function Demo() {
-  const { getStatus, toggle } = useCheckboxTree(sampleTree, ['react']);
+  const {
+    treeData = defaultTree,
+    initialChecked = ['react'],
+  } = usePreviewProps({
+    treeData: defaultTree,
+    initialChecked: ['react'],
+  });
+
+  const parsedTree = Array.isArray(treeData) && treeData.length > 0 ? treeData : defaultTree;
+  const parsedChecked = Array.isArray(initialChecked) ? initialChecked : ['react'];
+
   return (
     <div style={{ padding: '16px' }}>
       <div style={{ fontSize: '13px', color: '#94a3b8', marginBottom: '8px' }}>Nested Checkbox Tree:</div>
-      {sampleTree.map((node) => (
-        <CheckboxTreeNode key={node.id} node={node} getStatus={getStatus} toggle={toggle} />
-      ))}
+      <TreeRenderer
+        key={`${JSON.stringify(parsedChecked)}-${JSON.stringify(parsedTree)}`}
+        treeData={parsedTree}
+        initialChecked={parsedChecked}
+      />
     </div>
   );
 }

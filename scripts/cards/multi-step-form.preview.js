@@ -1,4 +1,4 @@
-const wizardSteps = [
+const defaultWizardSteps = [
   {
     title: 'Account Information',
     fields: [
@@ -16,9 +16,22 @@ const wizardSteps = [
 ];
 
 function Demo() {
+  const { steps = defaultWizardSteps, onSubmit } = usePreviewProps({
+    steps: defaultWizardSteps,
+  });
+
+  const parsedSteps = Array.isArray(steps) && steps.length > 0 ? steps : defaultWizardSteps;
+
   return (
     <div style={{ padding: '16px' }}>
-      <Wizard steps={wizardSteps} onSubmit={log('onSubmit')} />
+      <Wizard
+        key={JSON.stringify(parsedSteps)}
+        steps={parsedSteps}
+        onSubmit={(values) => {
+          if (onSubmit) onSubmit(values);
+          log('onSubmit', values);
+        }}
+      />
     </div>
   );
 }

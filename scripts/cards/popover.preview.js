@@ -1,5 +1,16 @@
 function PopoverDemo() {
-  const [placement, setPlacement] = useState('bottom' as any);
+  const {
+    placement = 'bottom',
+    title = 'Popover Details',
+    content = 'Helpful contextual information and action items.',
+    isOpen = false,
+    onToggle,
+  } = usePreviewProps({
+    placement: 'bottom',
+    title: 'Popover Details',
+    content: 'Helpful contextual information and action items.',
+    isOpen: false,
+  });
 
   return (
     <div style={{ padding: '60px 40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '30px', fontFamily: 'sans-serif' }}>
@@ -60,38 +71,22 @@ function PopoverDemo() {
           margin-left: 8px;
         }
       `}</style>
-      <div style={{ display: 'flex', gap: '8px' }}>
-        {['top', 'bottom', 'left', 'right'].map((p) => (
-          <button
-            key={p}
-            onClick={() => setPlacement(p)}
-            style={{
-              padding: '5px 12px',
-              borderRadius: '6px',
-              fontSize: '12px',
-              fontWeight: placement === p ? 'bold' : 'normal',
-              border: placement === p ? '2px solid #38bdf8' : '1px solid #64748b',
-              background: placement === p ? 'rgba(56, 189, 248, 0.15)' : '#0f172a',
-              color: placement === p ? '#38bdf8' : '#cbd5e1',
-              cursor: 'pointer',
-            }}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
 
       <Popover
-        placement={placement as any}
-        title={`Placement: ${placement}`}
+        placement={placement}
+        title={title || undefined}
+        isOpen={isOpen ? true : undefined}
         trigger={<span style={{ display: 'inline-block', padding: '10px 20px', background: 'linear-gradient(135deg, #0284c7, #0ea5e9)', color: '#ffffff', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>Toggle Popover</span>}
         content={
           <div style={{ width: '220px' }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '13px' }}>This popover is anchored to the trigger with placement <strong>{placement}</strong>.</p>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px' }}>{content}</p>
             <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>Press Escape or click outside to dismiss.</p>
           </div>
         }
-        onToggle={(isOpen) => log('onToggle')(isOpen ? 'Opened' : 'Closed')}
+        onToggle={(open) => {
+          if (onToggle) onToggle(open);
+          log('onToggle', open ? 'Opened' : 'Closed');
+        }}
       />
     </div>
   );

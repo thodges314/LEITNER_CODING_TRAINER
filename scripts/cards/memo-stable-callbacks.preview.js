@@ -1,8 +1,24 @@
+const defaultItems = ['Alpha', 'Beta', 'Gamma', 'Delta'];
+
 function Demo() {
-  const sampleItems = ['Alpha', 'Beta', 'Gamma', 'Delta'];
+  const {
+    items = defaultItems,
+    onListRender,
+  } = usePreviewProps({
+    items: defaultItems,
+  });
+
+  const parsedItems = Array.isArray(items) && items.length > 0 ? items : defaultItems;
+
   return (
     <div style={{ padding: '16px' }}>
-      <Parent items={sampleItems} onListRender={log('onListRender')} />
+      <Parent
+        items={parsedItems}
+        onListRender={() => {
+          if (onListRender) onListRender();
+          log('onListRender');
+        }}
+      />
     </div>
   );
 }

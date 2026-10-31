@@ -1,4 +1,4 @@
-function Demo() {
+function TransferListInner({ initialLeft, initialRight }) {
   const {
     left,
     right,
@@ -11,8 +11,8 @@ function Demo() {
     moveAllRight,
     moveAllLeft,
   } = useTransferList({
-    initialLeft: ['HTML', 'CSS', 'JavaScript'],
-    initialRight: ['React', 'TypeScript'],
+    initialLeft,
+    initialRight,
   });
 
   return (
@@ -26,7 +26,7 @@ function Demo() {
               checked={leftSelected.includes(item)}
               onChange={() => {
                 toggleLeft(item);
-                log('toggleLeft')(item);
+                log('toggleLeft', item);
               }}
             />{' '}
             {item}
@@ -35,10 +35,10 @@ function Demo() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        <button type="button" onClick={() => { moveRight(); log('moveRight')(); }} style={{ fontSize: '11px', padding: '3px 8px' }}>&gt;</button>
-        <button type="button" onClick={() => { moveLeft(); log('moveLeft')(); }} style={{ fontSize: '11px', padding: '3px 8px' }}>&lt;</button>
-        <button type="button" onClick={() => { moveAllRight(); log('moveAllRight')(); }} style={{ fontSize: '11px', padding: '3px 8px' }}>&gt;&gt;</button>
-        <button type="button" onClick={() => { moveAllLeft(); log('moveAllLeft')(); }} style={{ fontSize: '11px', padding: '3px 8px' }}>&lt;&lt;</button>
+        <button type="button" onClick={() => { moveRight(); log('moveRight'); }} style={{ fontSize: '11px', padding: '3px 8px' }}>&gt;</button>
+        <button type="button" onClick={() => { moveLeft(); log('moveLeft'); }} style={{ fontSize: '11px', padding: '3px 8px' }}>&lt;</button>
+        <button type="button" onClick={() => { moveAllRight(); log('moveAllRight'); }} style={{ fontSize: '11px', padding: '3px 8px' }}>&gt;&gt;</button>
+        <button type="button" onClick={() => { moveAllLeft(); log('moveAllLeft'); }} style={{ fontSize: '11px', padding: '3px 8px' }}>&lt;&lt;</button>
       </div>
 
       <div style={{ border: '1px solid rgba(255,255,255,0.1)', padding: '10px', minWidth: '120px' }}>
@@ -50,7 +50,7 @@ function Demo() {
               checked={rightSelected.includes(item)}
               onChange={() => {
                 toggleRight(item);
-                log('toggleRight')(item);
+                log('toggleRight', item);
               }}
             />{' '}
             {item}
@@ -58,6 +58,27 @@ function Demo() {
         ))}
       </div>
     </div>
+  );
+}
+
+function Demo() {
+  const {
+    initialLeft = ['HTML', 'CSS', 'JavaScript'],
+    initialRight = ['React', 'TypeScript'],
+  } = usePreviewProps({
+    initialLeft: ['HTML', 'CSS', 'JavaScript'],
+    initialRight: ['React', 'TypeScript'],
+  });
+
+  const parsedLeft = Array.isArray(initialLeft) ? initialLeft : ['HTML', 'CSS', 'JavaScript'];
+  const parsedRight = Array.isArray(initialRight) ? initialRight : ['React', 'TypeScript'];
+
+  return (
+    <TransferListInner
+      key={`${JSON.stringify(parsedLeft)}-${JSON.stringify(parsedRight)}`}
+      initialLeft={parsedLeft}
+      initialRight={parsedRight}
+    />
   );
 }
 

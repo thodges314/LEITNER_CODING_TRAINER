@@ -1,4 +1,6 @@
 function TicTacToePreview() {
+  const { onGameEnd } = usePreviewProps({});
+
   const [lastResult, setLastResult] = useState('');
 
   return (
@@ -6,7 +8,8 @@ function TicTacToePreview() {
       <TicTacToe
         onGameEnd={(result) => {
           setLastResult(result);
-          if (typeof log === 'function') log('onGameEnd', result);
+          if (onGameEnd) onGameEnd(result);
+          log('onGameEnd', result);
         }}
       />
       {lastResult && (

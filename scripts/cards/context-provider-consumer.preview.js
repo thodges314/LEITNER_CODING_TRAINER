@@ -11,7 +11,7 @@ function ConsumerDemo() {
         type="button"
         onClick={() => {
           toggle();
-          log('toggleTheme')(theme === 'light' ? 'dark' : 'light');
+          log('toggleTheme', theme === 'light' ? 'dark' : 'light');
         }}
         style={{ padding: '6px 12px', width: 'fit-content', borderRadius: '4px', cursor: 'pointer' }}
       >
@@ -21,6 +21,16 @@ function ConsumerDemo() {
   );
 }
 
-<ThemeProvider defaultTheme="light">
-  <ConsumerDemo />
-</ThemeProvider>
+function Demo() {
+  const { defaultTheme = 'light' } = usePreviewProps({
+    defaultTheme: 'light',
+  });
+
+  return (
+    <ThemeProvider key={defaultTheme} defaultTheme={defaultTheme}>
+      <ConsumerDemo />
+    </ThemeProvider>
+  );
+}
+
+<Demo />

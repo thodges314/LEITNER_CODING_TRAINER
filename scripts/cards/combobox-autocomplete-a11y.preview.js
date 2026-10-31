@@ -1,4 +1,4 @@
-const countries = [
+const defaultCountries = [
   { id: 'c-us', label: 'United States', value: 'US' },
   { id: 'c-ca', label: 'Canada', value: 'CA' },
   { id: 'c-mx', label: 'Mexico', value: 'MX' },
@@ -9,7 +9,18 @@ const countries = [
 ];
 
 function AccessibleComboboxPreview() {
-  const [selected, setSelected] = useState(null as any);
+  const {
+    label = 'Destination Country',
+    placeholder = 'Search countries...',
+    options = defaultCountries,
+    onSelect,
+  } = usePreviewProps({
+    label: 'Destination Country',
+    placeholder: 'Search countries...',
+    options: defaultCountries,
+  });
+
+  const [selected, setSelected] = useState(null);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '380px', fontFamily: 'sans-serif', padding: '10px' }}>
@@ -58,12 +69,13 @@ function AccessibleComboboxPreview() {
       `}</style>
       <AccessibleCombobox
         id="country-selector"
-        label="Destination Country"
-        options={countries}
-        placeholder="Search countries..."
+        label={label || 'Destination Country'}
+        options={Array.isArray(options) ? options : defaultCountries}
+        placeholder={placeholder || ''}
         onSelect={(opt) => {
           setSelected(opt);
-          log('onSelect')(opt);
+          if (onSelect) onSelect(opt);
+          log('onSelect', opt);
         }}
       />
       {selected && (
