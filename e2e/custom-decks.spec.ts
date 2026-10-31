@@ -53,9 +53,9 @@ test.describe('Custom Deck Creation, Batch Management & Deletion', () => {
     const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
     await catalogNavBtn.click();
 
-    // Initially on full library with 277 cards
+    // Initially on full library with 292 cards
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
-    await expect(deckTrigger).toContainText('277 Cards');
+    await expect(deckTrigger).toContainText('292 Cards');
 
     // Batch bar should not be visible initially
     await expect(page.getByTestId('catalog-batch-bar')).not.toBeVisible();
@@ -150,6 +150,6 @@ test.describe('Custom Deck Creation, Batch Management & Deletion', () => {
     await deleteBtn.click();
 
     await expect(deckTrigger).toContainText('Full Library (All Cards)');
-    await expect(deckTrigger).toContainText('277 Cards');
+    await expect(deckTrigger).toContainText('292 Cards');
   });
 });

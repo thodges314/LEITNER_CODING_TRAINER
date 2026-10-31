@@ -141,21 +141,21 @@ The **Node.js track strictly avoids duplicating these patterns**. Instead, it fo
 
 ---
 
-### Tier 5: Distributed, Resilience & Concurrency
+### Tier 5: Distributed, Resilience & Concurrency (Completed: 2/2)
 
-#### 14. `node-graceful-shutdown-coordinator`
+#### 14. `node-graceful-shutdown-coordinator` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 5 (Master)
 - **Concept**: `process-lifecycle`
-- **Signature**: `class GracefulShutdownCoordinator` with `register(name: string, handler: () => Promise<void>, options?: { timeoutMs?: number; priority?: number }): void` and `shutdown(signal: string): Promise<ShutdownReport>`
+- **Signature**: `class GracefulShutdownCoordinator` with `register(name, fn, options?)`, `shutdown(signal?, timeoutMs?): Promise<ShutdownReport>`, and `isShuttingDown`
 - **Description**: Process lifecycle coordinator for production Node.js services. Executes cleanup handlers in descending priority order (e.g. stop accepting new HTTP requests first, drain database connections second). Guarantees shutdown within a global deadline, timing out hanging handlers and reporting failure states.
-- **Key Edge Cases**: Duplicate shutdown signals (idempotent trigger); one failing handler does not abort subsequent cleanup handlers; priority grouping runs same-priority handlers concurrently.
+- **Key Edge Cases**: Duplicate shutdown signals return identical promise reference (idempotent trigger); one failing handler does not abort subsequent cleanup handlers; priority grouping runs same-priority handlers concurrently.
 
-#### 15. `node-worker-pool-dispatcher`
+#### 15. `node-worker-pool-dispatcher` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 5 (Master)
 - **Concept**: `worker-threads`
-- **Signature**: `class WorkerPoolDispatcher` with `dispatch(taskData: any): Promise<any>` and `handleWorkerCrash(workerId: string): void`
-- **Description**: Simulated worker pool manager implementing least-busy worker routing, bounded concurrency, pending task FIFO queues, and crash resilience. If a worker crashes while processing a task, the task is re-queued and a replacement worker is initialized.
-- **Key Edge Cases**: Backpressure queue rejection when queue limit is reached; task retry limits on repeated worker crashes.
+- **Signature**: `class WorkerPoolDispatcher` with `dispatch(data, executeFn): Promise<any>`, `getStats(): PoolStats`, and `terminate(): Promise<void>`
+- **Description**: Worker pool dispatcher managing task dispatching, bounded concurrency, pending task FIFO queues, and graceful termination. When all workers are busy, tasks queue up to `maxQueueSize`.
+- **Key Edge Cases**: Rejection when max queue limit is exceeded; graceful termination waits for active tasks and rejects pending tasks; worker stats tracking.
 
 ---
 

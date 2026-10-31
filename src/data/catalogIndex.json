@@ -3977,5 +3977,36 @@
       "vfs"
     ],
     "summary": "In-memory virtual file systems (like memfs) are commonly used in Node.js test harnesses, bundlers, and serverless runtimes to simulate POSIX file o..."
+  },
+  {
+    "id": "node-graceful-shutdown-coordinator",
+    "title": "Graceful Shutdown Coordinator",
+    "track": "node",
+    "concept": "process-lifecycle",
+    "difficulty": 5,
+    "tags": [
+      "node",
+      "process",
+      "lifecycle",
+      "shutdown",
+      "signals"
+    ],
+    "summary": "In production Node.js services (running under Kubernetes, Docker, or PM2), when termination signals (SIGTERM, SIGINT) arrive, the service must exec..."
+  },
+  {
+    "id": "node-worker-pool-dispatcher",
+    "title": "Worker Pool Task Dispatcher",
+    "track": "node",
+    "concept": "worker-threads",
+    "difficulty": 5,
+    "tags": [
+      "node",
+      "workers",
+      "threads",
+      "concurrency",
+      "dispatcher",
+      "queue"
+    ],
+    "summary": "CPU-intensive jobs (cryptography hashing, compression, image resizing, matrix math) block Node.js's main event loop unless offloaded to a pool of w..."
   }
 ]

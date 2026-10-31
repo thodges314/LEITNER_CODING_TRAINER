@@ -1,0 +1,6 @@
+{
+  "title": "Worker Pool Task Dispatcher",
+  "track": "node",
+  "tags": ["node", "workers", "threads", "concurrency", "dispatcher", "queue"],
+  "concept": "worker-threads"
+}

@@ -1,0 +1,6 @@
+{
+  "title": "Graceful Shutdown Coordinator",
+  "track": "node",
+  "tags": ["node", "process", "lifecycle", "shutdown", "signals"],
+  "concept": "process-lifecycle"
+}

@@ -1158,5 +1158,13 @@
   "node-length-prefixed-ipc-framing": {
     "difficulty": 4,
     "concept": "ipc-framing"
+  },
+  "node-graceful-shutdown-coordinator": {
+    "difficulty": 5,
+    "concept": "process-lifecycle"
+  },
+  "node-worker-pool-dispatcher": {
+    "difficulty": 5,
+    "concept": "worker-threads"
   }
 }

@@ -1,0 +1,56 @@
+## Description
+In production Node.js services (running under Kubernetes, Docker, or PM2), when termination signals (`SIGTERM`, `SIGINT`) arrive, the service must execute teardown procedures in prioritized stages: stop accepting new HTTP requests, drain database queries, flush loggers, and close socket connections.
+
+Implement the `GracefulShutdownCoordinator` class to orchestrate prioritized, resilient service shutdown.
+
+```ts
+interface ShutdownHandlerOptions {
+  priority?: number;  // Higher numbers run earlier; default 0
+  timeoutMs?: number; // Optional timeout for this specific task
+}
+
+interface TaskResult {
+  name: string;
+  status: 'fulfilled' | 'rejected' | 'timed_out';
+  error?: string;
+}
+
+interface ShutdownReport {
+  signal: string;
+  completed: boolean;
+  results: TaskResult[];
+}
+```
+
+### `class GracefulShutdownCoordinator`
+- **`register(name: string, handler: () => Promise<void> | void, options?: ShutdownHandlerOptions): void`**:
+  - Registers a cleanup handler with a descriptive name, execution priority (default `0`), and optional task timeout in milliseconds.
+- **`shutdown(signal?: string, globalTimeoutMs?: number): Promise<ShutdownReport>`**:
+  - Initiates the shutdown sequence for the given `signal` (defaults to `'SIGTERM'`).
+  - **Idempotency**: If called multiple times (e.g. repeated `SIGTERM` signals), returns the same active shutdown promise without re-running handlers.
+  - **Priority Execution**:
+    - Groups tasks by numeric priority.
+    - Executes priority groups in descending order (e.g. priority 10 before priority 5 before priority 0).
+    - Within the same priority group, tasks execute concurrently via `Promise.all`.
+  - **Fault Tolerance**:
+    - If a task rejects, records `status: 'rejected'` with the error message and continues executing remaining priority groups.
+    - If a task exceeds its `timeoutMs`, records `status: 'timed_out'` and continues.
+  - **Global Timeout**:
+    - If `globalTimeoutMs` is exceeded, aborts further task group execution and sets `completed: false` on the final report. Otherwise `completed: true`.
+  - Returns `Promise<ShutdownReport>` containing `signal`, `completed`, and array of all `TaskResult` entries.
+- **`get isShuttingDown(): boolean`**:
+  - Returns `true` once `shutdown()` has been triggered; otherwise `false`.
+
+## Examples
+```js
+const coord = new GracefulShutdownCoordinator();
+
+coord.register("http-server", async () => { /* stop accepting requests */ }, { priority: 10 });
+coord.register("db-pool", async () => { /* drain pool */ }, { priority: 5 });
+coord.register("analytics", async () => { /* flush telemetry */ }, { priority: 1 });
+
+const report = await coord.shutdown("SIGTERM");
+report.completed; // true
+report.results.map(r => r.name);
+// => ["http-server", "db-pool", "analytics"]
+```

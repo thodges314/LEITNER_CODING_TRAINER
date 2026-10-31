@@ -23,7 +23,7 @@ test.describe('Deck Selector & Preset Decks', () => {
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
     await expect(deckTrigger).toBeVisible();
     await expect(deckTrigger).toContainText('Full Library (All Cards)');
-    await expect(deckTrigger).toContainText('277 Cards');
+    await expect(deckTrigger).toContainText('292 Cards');
 
     // Open Dropdown
     await deckTrigger.click();
@@ -88,9 +88,9 @@ test.describe('Deck Selector & Preset Decks', () => {
     const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
     await catalogNavBtn.click();
 
-    // Verify all 277 cards are present in Full Library
+    // Verify all 292 cards are present in Full Library
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
-    await expect(deckTrigger).toContainText('277 Cards');
+    await expect(deckTrigger).toContainText('292 Cards');
 
     // Switch to Algorithms & Data Structures
     await deckTrigger.click();

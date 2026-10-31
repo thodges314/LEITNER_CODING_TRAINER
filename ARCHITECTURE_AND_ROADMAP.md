@@ -21,15 +21,15 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 277 total = organized into 4 built-in preset study decks: **Full Library** (277 cards), **Frontend Specialist** (197 cards), **Core Algorithms** (27 cards), and **Advanced Algorithms** (53 cards) |
-| Documented test cases | 1965 (each shown as input → expected in the UI) |
-| Markdown formatting | **100% complete** across all 277 cards with structured descriptions, parameters, returns, constraints, and edge cases |
-| Difficulty spread | all 277: d1 36 · d2 91 · d3 109 · d4 38 · d5 3 |
-| Tracks | 10 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`): js-utilities 44, react-components 41, algorithms 27, react 27, js-language 25, async-js 21, dom-browser 20, typescript-patterns 14, advanced-algorithms 53, testing-tooling 5. Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`, `algorithms-advanced`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
+| Cards | 292 total = organized into 4 built-in preset study decks: **Full Library** (292 cards), **Full-Stack Core** (239 cards), **Frontend Specialist** (197 cards), and **Algorithms & Data Structures** (96 cards) |
+| Documented test cases | 2049 (each shown as input → expected in the UI) |
+| Markdown formatting | **100% complete** across all 292 cards with structured descriptions, parameters, returns, constraints, and edge cases |
+| Difficulty spread | all 292: d1 39 · d2 94 · d3 113 · d4 41 · d5 5 |
+| Tracks | 11 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`): js-utilities 44, react-components 41, algorithms 27, react 27, js-language 25, async-js 21, dom-browser 20, node 15, typescript-patterns 14, advanced-algorithms 53, testing-tooling 5. Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`, `algorithms-advanced`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: tracks `algorithms` and `advanced-algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 1,824 Vitest tests (jsdom/node across 66 test files): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, Socratic assistant tests, TypeScript dual-mode tests, scheduling, preset decks, custom deck management, catalog index pipeline, AI interview prep copilot, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 277 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 554 card tests + 13 navigation/shortcut tests + 11 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 2 deck-selector tests + 2 remove-from-deck tests + 3 custom-deck tests + 1 interview-prep test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 612 browser tests). **Last full run: 612 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Automated tests | 1,901 Vitest tests (jsdom/node across 66 test files): every card's harness must pass with its reference solution **and fail with an empty solution**, plus preview guard tests mounting reference solutions, Socratic assistant tests, TypeScript dual-mode tests, scheduling, preset decks, custom deck management, catalog index pipeline, AI interview prep copilot, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Browser verification | `npm run e2e` runs ALL 292 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 584 card tests + 13 navigation/shortcut tests + 11 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 2 deck-selector tests + 2 remove-from-deck tests + 3 custom-deck tests + 1 interview-prep test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests = 642 browser tests). **Last full run: 642 passed, 0 flaky, 0 failed.** See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -426,10 +426,10 @@ Audit result: 17 cards re-rated (see git log `Difficulty audit`), 8 duplicates r
 - **Phase 2 Buffer Policy (Complete)**:
   - Cold-start recall integrity is strictly preserved: the editor buffer is NOT overwritten or injected with stubs upon switching between JS and TS modes.
   - Typed signatures are embedded into prompt headings (`### fn(arg: Type): ReturnType`).
-- **Phase 3 Dual Solutions Rollout (100% Complete — 277 / 277 cards)**:
-  - 277 of 277 cards (100.0%) across all 9 tracks now have canonical `.ref.ts` solutions and explicit typed signatures in prompt headers.
-  - Complete: Algorithms (77/77), Async JS (21/21), JS Language (25/25), TypeScript Patterns (14/14), JS Utilities (37/37), DOM/Browser (20/20), React (27/27), React Components (51/51), and Testing/Tooling (5/5).
-  - All batches verified with dual-mode seed tests (`seedCards.test.ts`), `npx tsc -b`, `npm run lint`, and `npm test` (1,731 tests passing).
+- **Phase 3 Dual Solutions Rollout (100% Complete — 292 / 292 cards)**:
+  - 292 of 292 cards (100.0%) across all 11 tracks now have canonical `.ref.ts` solutions and explicit typed signatures in prompt headers.
+  - Complete: Algorithms (77/77), Async JS (21/21), JS Language (25/25), TypeScript Patterns (14/14), JS Utilities (37/37), DOM/Browser (20/20), React (27/27), React Components (51/51), Node.js Runtime (15/15), and Testing/Tooling (5/5).
+  - All batches verified with dual-mode seed tests (`seedCards.test.ts`), `npx tsc -b`, `npm run lint`, and `npm test` (1,901 tests passing).
 - **Type/Interface Design Strategy**:
   - Complex options, structured models, and nested return types are extracted into dedicated ` ```ts ` interface blocks at the top of prompt descriptions to keep heading signatures clean and readable while avoiding undefined opaque types.
   - Destructured parameters and default arguments are strictly preserved in TS signatures and reference implementations.

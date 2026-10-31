@@ -419,4 +419,50 @@ export default {
       '[]'
     ),
   ],
+
+  'node-graceful-shutdown-coordinator': [
+    c(
+      'Executes tasks in descending priority order',
+      'const c = new GracefulShutdownCoordinator();\nconst log = [];\nc.register("db", async () => { log.push("db"); }, { priority: 2 });\nc.register("http", async () => { log.push("http"); }, { priority: 10 });\nc.register("cache", async () => { log.push("cache"); }, { priority: 5 });\nconst r = await c.shutdown("SIGTERM");\n[r.signal, r.completed, log]',
+      '["SIGTERM", true, ["http", "cache", "db"]]'
+    ),
+    c(
+      'Idempotent shutdown calls return same active promise',
+      'const c = new GracefulShutdownCoordinator();\nlet count = 0;\nc.register("once", async () => { count++; });\nconst p1 = c.shutdown();\nconst p2 = c.shutdown();\nawait Promise.all([p1, p2]);\n[count, p1 === p2, c.isShuttingDown]',
+      '[1, true, true]'
+    ),
+    c(
+      'Captures rejected task error without stopping subsequent priority tasks',
+      'const c = new GracefulShutdownCoordinator();\nconst order = [];\nc.register("step1", async () => { order.push(1); }, { priority: 2 });\nc.register("failing", async () => { throw new Error("cleanup failed"); }, { priority: 2 });\nc.register("step2", async () => { order.push(2); }, { priority: 1 });\nconst r = await c.shutdown();\n[order, r.results.map(x => x.status)]',
+      '[[1, 2], ["fulfilled", "rejected", "fulfilled"]]'
+    ),
+    c(
+      'Handles task timeout gracefully',
+      'const c = new GracefulShutdownCoordinator();\nc.register("stalled", async () => new Promise(r => setTimeout(r, 100)), { timeoutMs: 10 });\nconst r = await c.shutdown();\nr.results[0].status',
+      '"timed_out"'
+    ),
+  ],
+
+  'node-worker-pool-dispatcher': [
+    c(
+      'Dispatches tasks across workers up to pool size and reports stats',
+      'const pool = new WorkerPoolDispatcher({ size: 2 });\nconst p1 = pool.dispatch(5, x => x * 2);\nconst p2 = pool.dispatch(10, x => x * 2);\nconst res = await Promise.all([p1, p2]);\nconst s = pool.getStats();\n[res, s.size, s.busyWorkers, s.idleWorkers]',
+      '[[10, 20], 2, 0, 2]'
+    ),
+    c(
+      'Queues tasks FIFO when workers are busy and drains queue on completion',
+      'const pool = new WorkerPoolDispatcher({ size: 1 });\nconst p1 = pool.dispatch(1, async x => { await new Promise(r => setTimeout(r, 20)); return x; });\nconst p2 = pool.dispatch(2, x => x * 10);\nconst sWhileBusy = pool.getStats();\nconst res = await Promise.all([p1, p2]);\n[sWhileBusy.pendingQueueLength, res]',
+      '[1, [1, 20]]'
+    ),
+    c(
+      'Rejects immediately when maxQueueSize is exceeded',
+      'const pool = new WorkerPoolDispatcher({ size: 1, maxQueueSize: 1 });\npool.dispatch(1, () => new Promise(r => setTimeout(r, 50)));\npool.dispatch(2, () => 2);\nlet caught = false;\ntry { await pool.dispatch(3, () => 3); } catch (e) { caught = e.message; }\ncaught',
+      '"Queue full"'
+    ),
+    c(
+      'Terminate rejects queued tasks and blocks new dispatches',
+      'const pool = new WorkerPoolDispatcher({ size: 1 });\npool.dispatch(1, () => new Promise(r => setTimeout(r, 30)));\nconst pQueued = pool.dispatch(2, () => 2);\nlet queuedErr = "";\npQueued.catch(e => { queuedErr = e.message; });\nawait pool.terminate();\nlet postErr = "";\ntry { await pool.dispatch(3, () => 3); } catch (e) { postErr = e.message; }\n[queuedErr, postErr]',
+      '["Pool terminated", "Pool terminated"]'
+    ),
+  ],
 };

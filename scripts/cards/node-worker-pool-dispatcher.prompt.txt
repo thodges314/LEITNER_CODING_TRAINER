@@ -1,0 +1,60 @@
+## Description
+CPU-intensive jobs (cryptography hashing, compression, image resizing, matrix math) block Node.js's main event loop unless offloaded to a pool of worker threads. Libraries like `piscina` manage a fixed pool of workers with concurrency bounds, pending FIFO queues, and termination safety.
+
+Implement `WorkerPoolDispatcher` to manage task dispatching and queuing across a pool of concurrent workers.
+
+```ts
+interface WorkerPoolOptions {
+  size: number;
+  maxQueueSize?: number; // defaults to Infinity
+}
+
+interface PoolStats {
+  size: number;
+  busyWorkers: number;
+  idleWorkers: number;
+  pendingQueueLength: number;
+}
+```
+
+### `class WorkerPoolDispatcher`
+- **`constructor(options: WorkerPoolOptions)`**:
+  - Initializes `size` workers.
+  - Sets `maxQueueSize` (defaults to `Infinity`).
+- **`dispatch(data: any, executeFn: (data: any) => Promise<any> | any): Promise<any>`**:
+  - If the pool is terminated, returns a rejected `Promise` with `new Error("Pool terminated")`.
+  - If an idle worker is available:
+    - Marks the worker busy.
+    - Executes `executeFn(data)`.
+    - Once completed (fulfilled or rejected), marks worker idle and processes the next task in the pending queue if one exists.
+  - If all workers are currently busy:
+    - If the number of waiting tasks in the queue has reached `maxQueueSize`, returns a rejected `Promise` with `new Error("Queue full")`.
+    - Otherwise, enqueues the task into a pending FIFO queue and returns a `Promise` that resolves/rejects once executed.
+- **`getStats(): PoolStats`**:
+  - Returns current pool metrics:
+    - `size`: Total number of configured workers.
+    - `busyWorkers`: Number of workers currently executing tasks.
+    - `idleWorkers`: Number of workers currently waiting for work (`size - busyWorkers`).
+    - `pendingQueueLength`: Number of tasks queued waiting for an available worker.
+- **`terminate(): Promise<void>`**:
+  - Marks the pool as terminated (rejects subsequent `dispatch()` calls).
+  - Rejects all currently pending queued tasks with `new Error("Pool terminated")`.
+  - Returns a `Promise` that resolves once all currently executing tasks finish.
+
+## Examples
+```js
+const pool = new WorkerPoolDispatcher({ size: 2, maxQueueSize: 5 });
+
+// Dispatches tasks across 2 concurrent workers
+const p1 = pool.dispatch(10, async (n) => n * 2);
+const p2 = pool.dispatch(20, async (n) => n * 2);
+
+// Third task queues because both workers are busy
+const p3 = pool.dispatch(30, async (n) => n * 2);
+
+pool.getStats();
+// => { size: 2, busyWorkers: 2, idleWorkers: 0, pendingQueueLength: 1 }
+
+const results = await Promise.all([p1, p2, p3]);
+// => [20, 40, 60]
+```
