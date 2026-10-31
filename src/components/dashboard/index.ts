@@ -7,6 +7,9 @@ export type { RemoveFromDeckModalProps } from './RemoveFromDeckModal';
 export { CreateDeckModal } from './CreateDeckModal';
 export type { CreateDeckModalProps } from './CreateDeckModal';
 
+export { DeckEditorModal } from './DeckEditorModal';
+export type { DeckEditorModalProps } from './DeckEditorModal';
+
 export { TierFilterBar } from './TierFilterBar';
 export type { TierFilterBarProps } from './TierFilterBar';
 

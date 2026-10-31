@@ -69,6 +69,7 @@ export interface InterviewPrepModalProps {
   initialDossierId?: string;
   initialStep?: 'input' | 'review';
   onOpenSettings?: (section?: 'ai') => void;
+  onEditCustomDeck?: (deckId: string) => void;
 }
 
 export const InterviewPrepModal: React.FC<InterviewPrepModalProps> = (props) => {
@@ -366,6 +367,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   initialDossierId,
   initialStep,
   onOpenSettings,
+  onEditCustomDeck,
 }) => {
   // Saved briefings history
   const [savedDossiers, setSavedDossiers] = useState<InterviewPrepDossier[]>(() => getAllSavedDossiers());
@@ -900,6 +902,23 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   </button>
                 )}
 
+                {/* Edit in Deck Builder button in review header */}
+                {step === 'review' && dossier && onEditCustomDeck && (
+                  <button
+                    type="button"
+                    className="ai-prep-history-btn"
+                    onClick={() => {
+                      onClose();
+                      onEditCustomDeck(dossier.id || 'current_dossier');
+                    }}
+                    title="Open manual deck builder to customize cards in this deck"
+                    data-testid="ai-prep-edit-in-builder-btn"
+                  >
+                    <Pencil size={13} />
+                    <span>Edit in Deck Builder</span>
+                  </button>
+                )}
+
                 {/* Import Briefing JSON button in header */}
                 {step !== 'loading' && (
                   <button
@@ -1390,6 +1409,22 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     <span className="cards-tab-counter">
                       {checkedCardIds.size} cards ready for custom deck
                     </span>
+                    {onEditCustomDeck && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary ai-prep-edit-cards-btn"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, padding: '5px 10px', marginLeft: 'auto' }}
+                        onClick={() => {
+                          onClose();
+                          onEditCustomDeck(dossier.id || 'current_dossier');
+                        }}
+                        title="Open full manual accordion builder"
+                        data-testid="ai-prep-open-accordion-builder-btn"
+                      >
+                        <Pencil size={12} />
+                        <span>Open in Deck Builder</span>
+                      </button>
+                    )}
                   </div>
 
                   <div className="ai-prep-cards-scroll-list">

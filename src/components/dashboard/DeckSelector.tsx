@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Layers, ChevronDown, Check, Sparkles, Plus, Trash2 } from 'lucide-react';
+import { Layers, ChevronDown, Check, Sparkles, Plus, Trash2, Pencil } from 'lucide-react';
 import {
   BUILT_IN_DECKS,
   getBuiltInDeck,
@@ -14,6 +14,7 @@ export interface DeckSelectorProps {
   onSelectDeck: (deckId: string) => void;
   customDecks?: CustomDeck[];
   onCreateCustomDeckClick?: () => void;
+  onEditCustomDeck?: (deckId: string) => void;
   onDeleteCustomDeck?: (deckId: string) => void;
   onTailorWithAIClick?: () => void;
 }
@@ -24,6 +25,7 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
   onSelectDeck,
   customDecks = [],
   onCreateCustomDeckClick,
+  onEditCustomDeck,
   onDeleteCustomDeck,
   onTailorWithAIClick,
 }) => {
@@ -34,31 +36,37 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
   const activeCustom = customDecks.find((d) => d.id === activeDeckId);
   const activeDeckName = activeBuiltIn?.name ?? activeCustom?.name ?? 'Full Library (All Cards)';
 
+  // Calculate card count for active deck
   const activeCardCount = activeBuiltIn
     ? getDeckCardCount(activeBuiltIn, allCards)
     : activeCustom
     ? getDeckCardCount(activeCustom, allCards)
     : allCards.length;
 
-  // Close dropdown on outside click or Escape
+  // Close dropdown on outside click
   useEffect(() => {
-    if (!isOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  // Handle keyboard escape
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
   const handleSelect = (deckId: string) => {
@@ -86,168 +94,224 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
           </div>
         </div>
 
-        {/* Dropdown Trigger */}
-        <div className="deck-dropdown-container">
-          <button
-            type="button"
-            className="deck-dropdown-trigger"
-            onClick={() => setIsOpen((prev) => !prev)}
-            aria-expanded={isOpen}
-            aria-haspopup="listbox"
-            aria-label={`Current Study Deck: ${activeDeckName}. Click to switch decks.`}
-            data-testid="deck-dropdown-trigger"
-          >
-            <div className="deck-dropdown-trigger-content">
-              <span className="deck-dropdown-active-name">{activeDeckName}</span>
-              <span className="deck-count-pill">{activeCardCount} Cards</span>
-            </div>
-            <ChevronDown
-              size={16}
-              className={`deck-dropdown-chevron ${isOpen ? 'open' : ''}`}
-              aria-hidden="true"
-            />
-          </button>
-
-          {/* Floating Dropdown Menu */}
-          {isOpen && (
-            <div
-              className="deck-dropdown-menu"
-              role="listbox"
-              aria-label="Available Study Decks"
-              data-testid="deck-dropdown-menu"
+        {/* Action Controls Group: Edit Deck (if custom) + Create Deck + Dropdown Trigger */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {/* Edit Deck button for active custom deck */}
+          {activeCustom && onEditCustomDeck && (
+            <button
+              type="button"
+              className="btn btn-secondary deck-edit-active-btn"
+              onClick={() => onEditCustomDeck(activeCustom.id)}
+              title={`Edit custom deck '${activeCustom.name}' in deck builder`}
+              aria-label={`Edit custom deck '${activeCustom.name}'`}
+              data-testid="deck-edit-active-btn"
             >
-              <div className="deck-dropdown-section-title">
-                <Sparkles size={13} className="deck-section-icon" />
-                <span>Built-in Starter Decks</span>
+              <Pencil size={13} />
+              <span>Edit Deck</span>
+            </button>
+          )}
+
+          {/* Direct + Custom Deck button */}
+          {onCreateCustomDeckClick && (
+            <button
+              type="button"
+              className="btn btn-outline deck-quick-create-btn"
+              onClick={onCreateCustomDeckClick}
+              title="Create a new custom study deck using the manual builder"
+              aria-label="Create a new custom study deck"
+              data-testid="deck-quick-create-btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '7px 12px',
+                fontSize: 13,
+              }}
+            >
+              <Plus size={14} />
+              <span>+ Custom Deck</span>
+            </button>
+          )}
+
+          {/* Dropdown Container */}
+          <div className="deck-dropdown-container">
+            <button
+              type="button"
+              className="deck-dropdown-trigger"
+              onClick={() => setIsOpen((prev) => !prev)}
+              aria-expanded={isOpen}
+              aria-haspopup="listbox"
+              aria-label={`Current Study Deck: ${activeDeckName}. Click to switch decks.`}
+              data-testid="deck-dropdown-trigger"
+            >
+              <div className="deck-dropdown-trigger-content">
+                <span className="deck-dropdown-active-name">{activeDeckName}</span>
+                <span className="deck-count-pill">{activeCardCount} Cards</span>
               </div>
+              <ChevronDown
+                size={16}
+                className={`deck-dropdown-chevron ${isOpen ? 'open' : ''}`}
+                aria-hidden="true"
+              />
+            </button>
 
-              {BUILT_IN_DECKS.map((preset) => {
-                const count = getDeckCardCount(preset, allCards);
-                const isSelected = activeDeckId === preset.id || (!activeDeckId && preset.id === 'full-library');
+            {/* Floating Dropdown Menu */}
+            {isOpen && (
+              <div
+                className="deck-dropdown-menu"
+                role="listbox"
+                aria-label="Available Study Decks"
+                data-testid="deck-dropdown-menu"
+              >
+                <div className="deck-dropdown-section-title">
+                  <Sparkles size={13} className="deck-section-icon" />
+                  <span>Built-in Starter Decks</span>
+                </div>
 
-                return (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    className={`deck-dropdown-item ${isSelected ? 'selected' : ''}`}
-                    onClick={() => handleSelect(preset.id)}
-                    data-testid={`deck-option-${preset.id}`}
-                  >
-                    <div className="deck-item-indicator">
-                      {isSelected ? <Check size={14} /> : <span className="deck-bullet" />}
-                    </div>
-                    <div className="deck-item-text">
-                      <div className="deck-item-header">
-                        <span className="deck-item-name">{preset.name}</span>
-                        <span className="deck-item-badge">{count} cards</span>
+                {BUILT_IN_DECKS.map((preset) => {
+                  const count = getDeckCardCount(preset, allCards);
+                  const isSelected = activeDeckId === preset.id || (!activeDeckId && preset.id === 'full-library');
+
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      className={`deck-dropdown-item ${isSelected ? 'selected' : ''}`}
+                      onClick={() => handleSelect(preset.id)}
+                      data-testid={`deck-option-${preset.id}`}
+                    >
+                      <div className="deck-item-indicator">
+                        {isSelected ? <Check size={14} /> : <span className="deck-bullet" />}
                       </div>
-                      <p className="deck-item-description">{preset.description}</p>
+                      <div className="deck-item-text">
+                        <div className="deck-item-header">
+                          <span className="deck-item-name">{preset.name}</span>
+                          <span className="deck-item-badge">{count} cards</span>
+                        </div>
+                        <p className="deck-item-description">{preset.description}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+
+                {/* Personal Custom Decks Section */}
+                {customDecks.length > 0 && (
+                  <>
+                    <div className="deck-dropdown-divider" />
+                    <div className="deck-dropdown-section-title">
+                      <Layers size={13} className="deck-section-icon" />
+                      <span>Personal Decks</span>
                     </div>
-                  </button>
-                );
-              })}
+                    {customDecks.map((custom) => {
+                      const count = getDeckCardCount(custom, allCards);
+                      const isSelected = activeDeckId === custom.id;
 
-              {/* Personal Custom Decks Section */}
-              {customDecks.length > 0 && (
-                <>
-                  <div className="deck-dropdown-divider" />
-                  <div className="deck-dropdown-section-title">
-                    <Layers size={13} className="deck-section-icon" />
-                    <span>Personal Decks</span>
-                  </div>
-                  {customDecks.map((custom) => {
-                    const count = getDeckCardCount(custom, allCards);
-                    const isSelected = activeDeckId === custom.id;
-
-                    return (
-                      <div
-                        key={custom.id}
-                        className={`deck-dropdown-item-row ${isSelected ? 'selected' : ''}`}
-                      >
-                        <button
-                          type="button"
-                          role="option"
-                          aria-selected={isSelected}
-                          className={`deck-dropdown-item ${isSelected ? 'selected' : ''}`}
-                          onClick={() => handleSelect(custom.id)}
-                          data-testid={`deck-option-${custom.id}`}
+                      return (
+                        <div
+                          key={custom.id}
+                          className={`deck-dropdown-item-row ${isSelected ? 'selected' : ''}`}
                         >
-                          <div className="deck-item-indicator">
-                            {isSelected ? <Check size={14} /> : <span className="deck-bullet" />}
-                          </div>
-                          <div className="deck-item-text">
-                            <div className="deck-item-header">
-                              <span className="deck-item-name">{custom.name}</span>
-                              {custom.dossierId && (
-                                <span className="deck-dossier-tag" title="Created from AI Interview Briefing">🎯 Briefing</span>
-                              )}
-                              <span className="deck-item-badge">{count} cards</span>
-                            </div>
-                            {custom.description && (
-                              <p className="deck-item-description">{custom.description}</p>
-                            )}
-                          </div>
-                        </button>
-                        {onDeleteCustomDeck && (
                           <button
                             type="button"
-                            className="deck-item-delete-btn"
-                            title={`Delete custom deck '${custom.name}'`}
-                            aria-label={`Delete custom deck '${custom.name}'`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setIsOpen(false);
-                              onDeleteCustomDeck(custom.id);
-                            }}
-                            data-testid={`deck-delete-${custom.id}`}
+                            role="option"
+                            aria-selected={isSelected}
+                            className={`deck-dropdown-item ${isSelected ? 'selected' : ''}`}
+                            onClick={() => handleSelect(custom.id)}
+                            data-testid={`deck-option-${custom.id}`}
                           >
-                            <Trash2 size={13} />
+                            <div className="deck-item-indicator">
+                              {isSelected ? <Check size={14} /> : <span className="deck-bullet" />}
+                            </div>
+                            <div className="deck-item-text">
+                              <div className="deck-item-header">
+                                <span className="deck-item-name">{custom.name}</span>
+                                {custom.dossierId && (
+                                  <span className="deck-dossier-tag" title="Created from AI Interview Briefing">🎯 Briefing</span>
+                                )}
+                                <span className="deck-item-badge">{count} cards</span>
+                              </div>
+                              {custom.description && (
+                                <p className="deck-item-description">{custom.description}</p>
+                              )}
+                            </div>
                           </button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </>
-              )}
+                          {onEditCustomDeck && (
+                            <button
+                              type="button"
+                              className="deck-item-edit-btn"
+                              title={`Edit custom deck '${custom.name}'`}
+                              aria-label={`Edit custom deck '${custom.name}'`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsOpen(false);
+                                onEditCustomDeck(custom.id);
+                              }}
+                              data-testid={`deck-edit-${custom.id}`}
+                            >
+                              <Pencil size={13} />
+                            </button>
+                          )}
+                          {onDeleteCustomDeck && (
+                            <button
+                              type="button"
+                              className="deck-item-delete-btn"
+                              title={`Delete custom deck '${custom.name}'`}
+                              aria-label={`Delete custom deck '${custom.name}'`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setIsOpen(false);
+                                onDeleteCustomDeck(custom.id);
+                              }}
+                              data-testid={`deck-delete-${custom.id}`}
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
 
-              {/* Actions Footer */}
-              {(onCreateCustomDeckClick || onTailorWithAIClick) && (
-                <>
-                  <div className="deck-dropdown-divider" />
-                  {onTailorWithAIClick && (
-                    <button
-                      type="button"
-                      className="deck-dropdown-ai-btn"
-                      onClick={() => {
-                        setIsOpen(false);
-                        onTailorWithAIClick();
-                      }}
-                      data-testid="deck-dropdown-ai-btn"
-                    >
-                      <Sparkles size={14} className="ai-btn-icon" />
-                      <span>Tailor Deck with AI Coach...</span>
-                    </button>
-                  )}
-                  {onCreateCustomDeckClick && (
-                    <button
-                      type="button"
-                      className="deck-dropdown-create-btn"
-                      onClick={() => {
-                        setIsOpen(false);
-                        onCreateCustomDeckClick();
-                      }}
-                      data-testid="deck-dropdown-create-btn"
-                    >
-                      <Plus size={14} />
-                      <span>Create Custom Deck...</span>
-                    </button>
-                  )}
-                </>
-              )}
-            </div>
-          )}
+                {/* Actions Footer */}
+                {(onCreateCustomDeckClick || onTailorWithAIClick) && (
+                  <>
+                    <div className="deck-dropdown-divider" />
+                    {onTailorWithAIClick && (
+                      <button
+                        type="button"
+                        className="deck-dropdown-ai-btn"
+                        onClick={() => {
+                          setIsOpen(false);
+                          onTailorWithAIClick();
+                        }}
+                        data-testid="deck-dropdown-ai-btn"
+                      >
+                        <Sparkles size={14} className="ai-btn-icon" />
+                        <span>Tailor Deck with AI Coach...</span>
+                      </button>
+                    )}
+                    {onCreateCustomDeckClick && (
+                      <button
+                        type="button"
+                        className="deck-dropdown-create-btn"
+                        onClick={() => {
+                          setIsOpen(false);
+                          onCreateCustomDeckClick();
+                        }}
+                        data-testid="deck-dropdown-create-btn"
+                      >
+                        <Plus size={14} />
+                        <span>Create Custom Deck...</span>
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

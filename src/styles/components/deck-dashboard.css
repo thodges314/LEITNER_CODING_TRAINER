@@ -3206,3 +3206,519 @@
   border-radius: 8px;
   margin-left: 6px;
 }
+
+/* ==========================================================================
+   Deck Editor & Builder Modal (Accordion, Tri-State, Seen/Unseen Badges)
+   ========================================================================== */
+
+.deck-editor-modal-container {
+  max-width: 860px !important;
+  width: 92vw;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.deck-editor-header {
+  flex-shrink: 0;
+}
+
+.deck-editor-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.deck-editor-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 16px 22px;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.deck-editor-meta-inputs {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.deck-editor-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.deck-editor-input-group.name-group {
+  flex: 1.2;
+}
+
+.deck-editor-input-group.desc-group {
+  flex: 1.8;
+}
+
+.deck-editor-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.deck-editor-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid var(--border-medium);
+  background-color: var(--bg-input, var(--bg-card));
+  color: var(--text-primary);
+  transition: border-color 0.15s ease;
+}
+
+.deck-editor-input:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+}
+
+/* Toolbar: Search, Seen Filter, Quick Action Buttons */
+.deck-editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  flex-shrink: 0;
+}
+
+.deck-editor-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: 6px;
+  padding: 4px 10px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.deck-editor-search-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.deck-editor-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 12px;
+  width: 100%;
+}
+
+.deck-editor-search-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deck-editor-search-clear:hover {
+  color: var(--text-primary);
+}
+
+.deck-editor-pill-filters {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.deck-editor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 9px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.deck-editor-pill:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+}
+
+.deck-editor-pill.active {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.deck-editor-pill.seen.active {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: #10b981;
+  color: #34d399;
+}
+
+.deck-editor-pill.unseen.active {
+  background: rgba(148, 163, 184, 0.14);
+  border-color: #94a3b8;
+  color: #cbd5e1;
+}
+
+.deck-editor-quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.deck-editor-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.deck-editor-action-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+/* Accordion Topics List */
+.deck-editor-accordion-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.deck-editor-topic-card {
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.015);
+  overflow: hidden;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.deck-editor-topic-card.expanded {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.deck-editor-topic-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  user-select: none;
+  transition: background 0.12s ease;
+}
+
+.deck-editor-topic-header:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.topic-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deck-editor-caret-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease;
+}
+
+.deck-editor-caret-wrap.rotated {
+  transform: rotate(90deg);
+  color: var(--accent-cyan);
+}
+
+.deck-editor-topic-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-cyan);
+}
+
+.topic-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topic-selection-counter {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.topic-selection-counter.has-selected {
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.09);
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+/* Topic Card List Inside Accordion */
+.deck-editor-topic-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.14);
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.deck-editor-no-match {
+  padding: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+.deck-editor-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.deck-editor-card-row:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.deck-editor-card-row.selected {
+  background: rgba(56, 189, 248, 0.06);
+  border-color: rgba(56, 189, 248, 0.2);
+}
+
+.card-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.deck-editor-card-checkbox {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: var(--accent-cyan);
+  flex-shrink: 0;
+}
+
+.card-row-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+/* Seen vs Unseen Badges */
+.deck-editor-seen-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.deck-editor-seen-badge.seen {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  color: #34d399;
+}
+
+.deck-editor-seen-badge.unseen {
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  color: var(--text-muted);
+}
+
+.seen-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+  flex-shrink: 0;
+}
+
+.unseen-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #94a3b8;
+  flex-shrink: 0;
+}
+
+.seen-tier-tag {
+  font-size: 9.5px;
+  opacity: 0.85;
+  margin-left: 1px;
+}
+
+.card-row-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.card-tags-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-concept-chip {
+  font-size: 10.5px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Modal Footer */
+.deck-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px;
+  border-top: 1px solid var(--border-medium);
+  flex-shrink: 0;
+}
+
+.deck-editor-footer-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+
+.footer-stats-icon {
+  color: var(--accent-cyan);
+}
+
+.stats-seen-text {
+  color: #34d399;
+  font-weight: 600;
+}
+
+.stats-unseen-text {
+  color: var(--text-secondary);
+}
+
+.deck-editor-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Active Deck Banner Edit Button */
+.deck-edit-active-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.deck-item-edit-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px;
+  margin-right: 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: all 0.12s ease;
+}
+
+.deck-item-edit-btn:hover {
+  opacity: 1;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.12);
+}
+
+/* GS/OS Light Theme Overrides */
+[data-theme="apple-gsos"] .deck-editor-modal-container {
+  background: #F2F1EA;
+  border: 2px solid #1C1C1C;
+  box-shadow: 4px 4px 0 #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .deck-editor-topic-card {
+  background: #FFFFFF;
+  border: 1px solid #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .deck-editor-topic-header {
+  background: #E8E7DF;
+}
+
+[data-theme="apple-gsos"] .deck-editor-card-row.selected {
+  background: #D9D7C9;
+}
+
+[data-theme="apple-gsos"] .deck-editor-seen-badge.seen {
+  background: #D4EDDA;
+  color: #155724;
+  border: 1px solid #C3E6CB;
+}

@@ -23,6 +23,7 @@ import {
   Printer,
   Calendar,
   Trash2,
+  Pencil,
 } from 'lucide-react';
 import {
   loadDeckCatalogPreferences,
@@ -65,9 +66,8 @@ interface DeckDashboardProps {
   onToggleDeactivate?: (topicId: string) => void;
   onRemoveFromDeck?: (topic: TopicItem) => void;
   onCreateCustomDeckClick?: () => void;
+  onEditCustomDeck?: (deckId: string) => void;
   onDeleteCustomDeck?: (deckId: string) => void;
-  onAddCardsToDeck?: (deckId: string, cardIds: string[]) => void;
-  onOpenCreateDeckWithCards?: (cardIds: string[]) => void;
   onTailorWithAIClick?: () => void;
   onOpenInterviewPrepDossier?: (dossierId?: string, step?: 'input' | 'review') => void;
   onDeleteInterviewDossier?: (dossierId: string) => void;
@@ -92,9 +92,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onToggleDeactivate,
   onRemoveFromDeck,
   onCreateCustomDeckClick,
+  onEditCustomDeck,
   onDeleteCustomDeck,
-  onAddCardsToDeck,
-  onOpenCreateDeckWithCards,
   onTailorWithAIClick,
   onOpenInterviewPrepDossier,
   onDeleteInterviewDossier,
@@ -695,6 +694,19 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
               <Sparkles size={14} />
               <span>Open Strategy & Coach</span>
             </button>
+            {activeCustom && onEditCustomDeck && (
+              <button
+                type="button"
+                className="btn btn-secondary strategy-edit-btn"
+                onClick={() => onEditCustomDeck(activeCustom.id)}
+                title="Edit this custom deck in the manual deck builder"
+                data-testid="strategy-banner-edit-deck-btn"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Pencil size={14} />
+                <span>Edit Deck Cards</span>
+              </button>
+            )}
             <button
               type="button"
               className="btn btn-secondary strategy-print-btn"
@@ -735,6 +747,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onSelectDeck={onSelectDeck}
         customDecks={customDecks}
         onCreateCustomDeckClick={onCreateCustomDeckClick}
+        onEditCustomDeck={onEditCustomDeck}
         onDeleteCustomDeck={onDeleteCustomDeck}
         onTailorWithAIClick={onTailorWithAIClick}
       />
@@ -781,9 +794,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onRemoveFromDeck={onRemoveFromDeck}
         onToggleDeactivate={onToggleDeactivate}
         onDeleteTopic={onDeleteTopic}
-        customDecks={customDecks}
-        onAddCardsToDeck={onAddCardsToDeck}
-        onOpenCreateDeckWithCards={onOpenCreateDeckWithCards}
       />
 
       {/* Lightweight Deactivate Confirmation Modal */}

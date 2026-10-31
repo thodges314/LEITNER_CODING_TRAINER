@@ -45,7 +45,7 @@ import {
 import type { CustomDeck } from './lib/decks';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
-import { RemoveFromDeckModal, CreateDeckModal, InterviewPrepModal } from './components/dashboard';
+import { RemoveFromDeckModal, DeckEditorModal, InterviewPrepModal } from './components/dashboard';
 import { getAllSavedDossiers } from './lib/interviewPrep';
 import { AddTopicModal } from './components/AddTopicModal';
 import { FEATURES } from './lib/features';
@@ -126,8 +126,8 @@ export function App() {
   const [customDecks, setCustomDecks] = useState<CustomDeck[]>(() => getStoredCustomDecks());
   const [isRemoveFromDeckModalOpen, setIsRemoveFromDeckModalOpen] = useState(false);
   const [cardPendingRemoval, setCardPendingRemoval] = useState<TopicItem | null>(null);
-  const [isCreateDeckModalOpen, setIsCreateDeckModalOpen] = useState(false);
-  const [initialCardsForNewDeck, setInitialCardsForNewDeck] = useState<string[]>([]);
+  const [isDeckEditorModalOpen, setIsDeckEditorModalOpen] = useState(false);
+  const [deckToEdit, setDeckToEdit] = useState<CustomDeck | null>(null);
   const [isInterviewPrepModalOpen, setIsInterviewPrepModalOpen] = useState(false);
   const [selectedDossierId, setSelectedDossierId] = useState<string | undefined>(undefined);
   const [interviewPrepStep, setInterviewPrepStep] = useState<'input' | 'review' | undefined>(undefined);
@@ -388,8 +388,8 @@ export function App() {
         setStoredCustomDecks(updated);
         handleSelectDeck(existing.id);
         setUnlockToast(`Updated custom deck "${name}" with ${cardIds.length} cards.`);
-        setIsCreateDeckModalOpen(false);
-        setInitialCardsForNewDeck([]);
+        setIsDeckEditorModalOpen(false);
+        setDeckToEdit(null);
         return;
       }
     }
@@ -408,30 +408,75 @@ export function App() {
     setStoredCustomDecks(updated);
     handleSelectDeck(newDeck.id);
     setUnlockToast(`Created custom deck "${name}" with ${cardIds.length} cards.`);
-    setIsCreateDeckModalOpen(false);
-    setInitialCardsForNewDeck([]);
+    setIsDeckEditorModalOpen(false);
+    setDeckToEdit(null);
   };
 
-  const handleAddCardsToDeck = (targetDeckId: string, cardIdsToAdd: string[]) => {
-    let addedCount = 0;
-    const updated = customDecks.map((d) => {
-      if (d.id === targetDeckId) {
-        const existing = new Set(d.cardIds);
-        const merged = [...d.cardIds];
-        for (const id of cardIdsToAdd) {
-          if (!existing.has(id)) {
-            merged.push(id);
-            addedCount++;
-          }
-        }
-        return { ...d, cardIds: merged, updatedAt: Date.now() };
-      }
-      return d;
-    });
-    setCustomDecks(updated);
-    setStoredCustomDecks(updated);
-    const target = updated.find((d) => d.id === targetDeckId);
-    setUnlockToast(`Added ${addedCount} cards to "${target?.name ?? 'deck'}".`);
+  const handleOpenCreateDeck = () => {
+    setDeckToEdit(null);
+    setIsDeckEditorModalOpen(true);
+  };
+
+  const handleOpenEditDeck = (deckId: string) => {
+    let deck = customDecks.find((d) => d.id === deckId);
+    if (!deck) {
+      deck = customDecks.find((d) => d.dossierId === deckId);
+    }
+    if (!deck && activeDeckId && !getBuiltInDeck(activeDeckId)) {
+      deck = customDecks.find((d) => d.id === activeDeckId);
+    }
+    if (deck) {
+      setDeckToEdit(deck);
+      setIsDeckEditorModalOpen(true);
+    }
+  };
+
+  const handleSaveDeck = ({
+    id,
+    name,
+    description,
+    cardIds,
+    dossierId,
+  }: {
+    id?: string;
+    name: string;
+    description?: string;
+    cardIds: string[];
+    dossierId?: string;
+  }) => {
+    if (id) {
+      const updated = customDecks.map((d) =>
+        d.id === id
+          ? {
+              ...d,
+              name,
+              description,
+              cardIds,
+              updatedAt: Date.now(),
+            }
+          : d
+      );
+      setCustomDecks(updated);
+      setStoredCustomDecks(updated);
+      setUnlockToast(`Updated "${name}" (${cardIds.length} cards)`);
+    } else {
+      const newDeck: CustomDeck = {
+        id: `custom-${Date.now()}`,
+        name,
+        description,
+        cardIds,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        dossierId,
+      };
+      const updated = [...customDecks, newDeck];
+      setCustomDecks(updated);
+      setStoredCustomDecks(updated);
+      handleSelectDeck(newDeck.id);
+      setUnlockToast(`Created custom deck "${name}" with ${cardIds.length} cards`);
+    }
+    setIsDeckEditorModalOpen(false);
+    setDeckToEdit(null);
   };
 
   const handleDeleteCustomDeck = (deckId: string) => {
@@ -456,11 +501,6 @@ export function App() {
     });
     setCustomDecks(updated);
     setStoredCustomDecks(updated);
-  };
-
-  const handleOpenCreateDeckWithCards = (cardIds: string[]) => {
-    setInitialCardsForNewDeck(cardIds);
-    setIsCreateDeckModalOpen(true);
   };
 
   const handleAlgorithmChange = (nextAlgo: SpacedAlgorithm) => {
@@ -748,13 +788,9 @@ export function App() {
             onDeleteTopic={handleDeleteTopic}
             onToggleDeactivate={handleToggleDeactivate}
             onRemoveFromDeck={handleInitiateRemoveFromDeck}
-            onCreateCustomDeckClick={() => {
-              setInitialCardsForNewDeck([]);
-              setIsCreateDeckModalOpen(true);
-            }}
+            onCreateCustomDeckClick={handleOpenCreateDeck}
+            onEditCustomDeck={handleOpenEditDeck}
             onDeleteCustomDeck={handleDeleteCustomDeck}
-            onAddCardsToDeck={handleAddCardsToDeck}
-            onOpenCreateDeckWithCards={handleOpenCreateDeckWithCards}
             onTailorWithAIClick={() => handleOpenInterviewPrep(undefined, 'input')}
             onOpenInterviewPrepDossier={handleOpenInterviewPrep}
             onDeleteInterviewDossier={handleDeleteDossier}
@@ -874,14 +910,14 @@ export function App() {
         }}
       />
 
-      <CreateDeckModal
-        isOpen={isCreateDeckModalOpen}
-        initialCardIds={initialCardsForNewDeck}
+      <DeckEditorModal
+        isOpen={isDeckEditorModalOpen}
+        deckToEdit={deckToEdit}
         allCards={deckState.topics}
-        onConfirmCreateDeck={handleCreateCustomDeck}
+        onSaveDeck={handleSaveDeck}
         onClose={() => {
-          setIsCreateDeckModalOpen(false);
-          setInitialCardsForNewDeck([]);
+          setIsDeckEditorModalOpen(false);
+          setDeckToEdit(null);
         }}
       />
 
@@ -893,6 +929,7 @@ export function App() {
           setInterviewPrepStep(undefined);
         }}
         onCreateCustomDeck={handleCreateCustomDeck}
+        onEditCustomDeck={handleOpenEditDeck}
         onDeleteDossier={handleDeleteDossier}
         currentBox1CardIds={currentBox1CardIds}
         initialDossierId={selectedDossierId}

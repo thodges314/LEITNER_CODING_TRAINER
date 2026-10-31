@@ -265,4 +265,50 @@ describe('DeckSelector component', () => {
     expect(onTailorClick).toHaveBeenCalledTimes(1);
     expect(container!.querySelector('[data-testid="deck-dropdown-menu"]')).toBeNull();
   });
+
+  it('calls onEditCustomDeck when edit button is clicked in dropdown or active banner', () => {
+    const onEdit = vi.fn();
+    const customDecks: CustomDeck[] = [
+      {
+        id: 'deck-to-edit',
+        name: 'Stripe Screen',
+        cardIds: ['c1'],
+        createdAt: 1000,
+        updatedAt: 1000,
+      },
+    ];
+
+    act(() => {
+      root!.render(
+        <DeckSelector
+          activeDeckId="deck-to-edit"
+          allCards={cards}
+          onSelectDeck={vi.fn()}
+          customDecks={customDecks}
+          onEditCustomDeck={onEdit}
+        />
+      );
+    });
+
+    // Active banner edit button should be visible
+    const bannerEditBtn = container!.querySelector('[data-testid="deck-edit-active-btn"]') as HTMLButtonElement;
+    expect(bannerEditBtn).not.toBeNull();
+    act(() => {
+      bannerEditBtn.click();
+    });
+    expect(onEdit).toHaveBeenCalledWith('deck-to-edit');
+
+    // Open dropdown to check dropdown item edit button
+    const trigger = container!.querySelector('[data-testid="deck-dropdown-trigger"]') as HTMLButtonElement;
+    act(() => {
+      trigger.click();
+    });
+
+    const itemEditBtn = container!.querySelector('[data-testid="deck-edit-deck-to-edit"]') as HTMLButtonElement;
+    expect(itemEditBtn).not.toBeNull();
+    act(() => {
+      itemEditBtn.click();
+    });
+    expect(onEdit).toHaveBeenCalledTimes(2);
+  });
 });

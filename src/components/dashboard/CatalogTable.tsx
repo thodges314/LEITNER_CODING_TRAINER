@@ -1,27 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Unlock,
   Lock,
   RotateCcw,
   Play,
   Flame,
-  Archive,
   ArchiveRestore,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  CheckCircle2,
   FolderMinus,
-  CheckSquare,
-  ChevronDown,
-  FolderPlus,
-  Plus,
 } from 'lucide-react';
 import { DifficultyBadge } from '../DifficultyBadge';
-import { getTrackMeta, isCardAttempted } from '../../lib/leitner';
+import { getTrackMeta } from '../../lib/leitner';
 import type { TopicItem } from '../../lib/leitner';
 import type { CatalogSortOption } from '../../lib/deckFilters';
-import type { CustomDeck } from '../../lib/decks';
 
 export interface CatalogTableProps {
   topics: TopicItem[];
@@ -38,9 +31,6 @@ export interface CatalogTableProps {
   onRemoveFromDeck?: (topic: TopicItem) => void;
   onToggleDeactivate?: (topicId: string) => void;
   onDeleteTopic?: (topicId: string) => void;
-  customDecks?: CustomDeck[];
-  onAddCardsToDeck?: (deckId: string, cardIds: string[]) => void;
-  onOpenCreateDeckWithCards?: (cardIds: string[]) => void;
 }
 
 export const CatalogTable: React.FC<CatalogTableProps> = ({
@@ -55,29 +45,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
   onRemoveFromDeck,
   onToggleDeactivate,
   onDeleteTopic,
-  customDecks = [],
-  onAddCardsToDeck,
-  onOpenCreateDeckWithCards,
 }) => {
-  const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set());
-  const [isBatchMenuOpen, setIsBatchMenuOpen] = useState(false);
-
-  const handleToggleSelectCard = (id: string) => {
-    setSelectedCardIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const handleToggleSelectAll = () => {
-    if (topics.length > 0 && topics.every((t) => selectedCardIds.has(t.id))) {
-      setSelectedCardIds(new Set());
-    } else {
-      setSelectedCardIds(new Set(topics.map((t) => t.id)));
-    }
-  };
   const renderSortIndicator = (
     column: 'title' | 'track' | 'difficulty' | 'box' | 'streak' | 'due' | 'status'
   ) => {
@@ -113,16 +81,6 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
       <table className="catalog-table">
         <thead>
           <tr>
-            <th className="catalog-th catalog-checkbox-cell" style={{ width: 38 }}>
-              <input
-                type="checkbox"
-                className="catalog-checkbox"
-                aria-label="Select all cards in table"
-                checked={topics.length > 0 && topics.every((t) => selectedCardIds.has(t.id))}
-                onChange={handleToggleSelectAll}
-                data-testid="catalog-select-all-checkbox"
-              />
-            </th>
             <th
               onClick={() => onHeaderSort('title')}
               className="catalog-th col-card-title"
@@ -185,7 +143,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
         <tbody>
           {topics.length === 0 ? (
             <tr>
-              <td colSpan={8} className="catalog-empty-cell">
+              <td colSpan={7} className="catalog-empty-cell">
                 No cards match your current filter criteria.
               </td>
             </tr>
@@ -208,18 +166,6 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                   key={topic.id}
                   className={`catalog-tr ${trStateClass}`}
                 >
-                  {/* Select Checkbox */}
-                  <td className="catalog-td catalog-checkbox-cell">
-                    <input
-                      type="checkbox"
-                      className="catalog-checkbox"
-                      aria-label={`Select card ${topic.title}`}
-                      checked={selectedCardIds.has(topic.id)}
-                      onChange={() => handleToggleSelectCard(topic.id)}
-                      data-testid={`catalog-card-checkbox-${topic.id}`}
-                    />
-                  </td>
-
                   {/* Title & Tags */}
                   <td className="catalog-td">
                     <div className={titleStateClass}>
@@ -248,84 +194,57 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
 
                   {/* Box */}
                   <td className="catalog-td catalog-tier-cell">
-                    {!topic.deactivated && topic.status === 'active' ? (
-                      <span
-                        className="badge catalog-tier-badge"
-                        style={{
-                          border: `1.5px solid var(--box-${Math.min(9, topic.box)})`,
-                          color: `var(--box-${Math.min(9, topic.box)})`,
-                        }}
-                      >
-                        {tierName} {topic.box}
-                      </span>
-                    ) : (
-                      <span className="catalog-text-dim">—</span>
-                    )}
+                    <span className={`tier-badge tier-${topic.box || 1}`}>
+                      {tierName} {topic.box || 1}
+                    </span>
                   </td>
 
                   {/* Streak */}
-                  <td className="catalog-td catalog-streak-cell">
-                    {!topic.deactivated && topic.status === 'active' ? (
-                      <span className="catalog-streak-badge">
-                        <Flame size={13} /> {topic.streak}
+                  <td className="catalog-td col-streak">
+                    <div className="catalog-streak-wrap">
+                      <Flame
+                        size={13}
+                        className={topic.streak > 0 ? 'text-amber-400' : 'catalog-streak-zero'}
+                      />
+                      <span className={topic.streak > 0 ? 'catalog-streak-active' : 'catalog-streak-zero'}>
+                        {topic.streak}
                       </span>
-                    ) : (
-                      <span className="catalog-text-dim">0</span>
-                    )}
+                    </div>
                   </td>
 
                   {/* Status */}
-                  <td className="catalog-td">
+                  <td className="catalog-td col-status">
                     {topic.deactivated ? (
-                      <span
-                        className="badge status-badge-deactivated"
-                        title="Card pulled out of active study rotation"
-                      >
-                        <Archive size={11} />
-                        <span>Deactivated</span>
-                      </span>
-                    ) : topic.status === 'locked' ? (
-                      <span
-                        className="badge status-badge-locked"
-                        title="Locked in reserve deck"
-                      >
-                        <Lock size={11} />
-                        <span>Locked</span>
-                      </span>
-                    ) : isCardAttempted(topic) ? (
-                      <span
-                        className="badge status-badge-attempted"
-                        title="Active card in study rotation (attempted at least once)"
-                      >
-                        <CheckCircle2 size={11} />
-                        <span>Attempted</span>
-                      </span>
+                      <span className="badge badge-deactivated">Deactivated</span>
+                    ) : topic.status === 'active' ? (
+                      <span className="badge badge-active">Active</span>
                     ) : (
-                      <span
-                        className="badge status-badge-active"
-                        title="Unlocked card ready for initial practice"
-                      >
-                        <Unlock size={11} />
-                        <span>Unlocked</span>
-                      </span>
+                      <span className="badge badge-locked">Locked</span>
                     )}
                   </td>
 
                   {/* Actions */}
-                  <td className="catalog-td">
+                  <td className="catalog-td col-actions">
                     <div className="catalog-actions-cell">
                       {topic.deactivated ? (
-                        <button
-                          className="btn btn-secondary catalog-action-btn-sm"
-                          onClick={() => {
-                            if (onToggleDeactivate) onToggleDeactivate(topic.id);
-                            else if (onDeleteTopic) onDeleteTopic(topic.id);
-                          }}
-                          title="Reactivate card to study rotation"
-                          aria-label={`Reactivate topic '${topic.title}'`}
-                        >
-                          <ArchiveRestore size={12} /> Reactivate
-                        </button>
+                        <>
+                          <button
+                            className="btn btn-secondary catalog-action-btn-sm"
+                            onClick={() => onToggleDeactivate?.(topic.id)}
+                            title="Reactivate card into study pool"
+                          >
+                            <ArchiveRestore size={12} /> Reactivate
+                          </button>
+                          {onDeleteTopic && (
+                            <button
+                              className="btn btn-outline catalog-action-btn-sm text-red-400"
+                              onClick={() => onDeleteTopic(topic.id)}
+                              title="Permanently delete topic"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </>
                       ) : (
                         <>
                           {topic.status === 'active' ? (
@@ -333,19 +252,20 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                               <button
                                 className="btn btn-primary catalog-action-btn-sm"
                                 onClick={() => onSelectCardToPractice(topic)}
-                                title="Start blank-buffer practice on this topic immediately"
+                                title="Start blank-buffer practice on this card"
+                                data-testid="catalog-practice-btn"
                               >
-                                <Play size={12} /> Practice
+                                <Play size={11} fill="currentColor" /> Practice
                               </button>
                               <button
-                                className="btn btn-outline catalog-action-icon-btn"
+                                className="btn btn-secondary catalog-action-icon-btn"
                                 onClick={() => onResetBox(topic.id)}
-                                title="Reset to Box 1"
+                                title={`Reset to ${tierName} 1`}
                               >
                                 <RotateCcw size={12} />
                               </button>
                               <button
-                                className="btn btn-outline catalog-action-icon-btn"
+                                className="btn btn-secondary catalog-action-icon-btn"
                                 onClick={() => onToggleLock(topic.id, topic.status)}
                                 title="Lock card"
                               >
@@ -384,73 +304,6 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
           )}
         </tbody>
       </table>
-
-      {selectedCardIds.size > 0 && (
-        <div className="catalog-batch-bar" data-testid="catalog-batch-bar">
-          <div className="catalog-batch-info">
-            <CheckSquare size={16} />
-            <span>
-              <strong>{selectedCardIds.size}</strong> {selectedCardIds.size === 1 ? 'card' : 'cards'} selected
-            </span>
-          </div>
-          <div className="catalog-batch-actions">
-            {customDecks.length > 0 && onAddCardsToDeck && (
-              <div className="catalog-batch-dropdown-container">
-                <button
-                  type="button"
-                  className="btn btn-secondary catalog-batch-btn"
-                  onClick={() => setIsBatchMenuOpen((prev) => !prev)}
-                  data-testid="catalog-batch-add-to-deck-btn"
-                >
-                  <FolderPlus size={14} /> Add to Deck <ChevronDown size={13} />
-                </button>
-                {isBatchMenuOpen && (
-                  <div className="catalog-batch-menu" data-testid="catalog-batch-menu">
-                    {customDecks.map((d) => (
-                      <button
-                        key={d.id}
-                        type="button"
-                        className="catalog-batch-menu-item"
-                        onClick={() => {
-                          onAddCardsToDeck(d.id, Array.from(selectedCardIds));
-                          setIsBatchMenuOpen(false);
-                          setSelectedCardIds(new Set());
-                        }}
-                        data-testid={`catalog-batch-target-deck-${d.id}`}
-                      >
-                        {d.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {onOpenCreateDeckWithCards && (
-              <button
-                type="button"
-                className="btn btn-primary catalog-batch-btn"
-                onClick={() => {
-                  onOpenCreateDeckWithCards(Array.from(selectedCardIds));
-                  setSelectedCardIds(new Set());
-                }}
-                data-testid="catalog-batch-new-deck-btn"
-              >
-                <Plus size={14} /> Create Deck With Selected
-              </button>
-            )}
-
-            <button
-              type="button"
-              className="btn btn-outline catalog-batch-btn"
-              onClick={() => setSelectedCardIds(new Set())}
-              data-testid="catalog-batch-clear-btn"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
