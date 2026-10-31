@@ -1,67 +1,27 @@
 function negotiateAccept(acceptHeader, availableTypes) {
-  if (!availableTypes || availableTypes.length === 0) return null;
-  if (!acceptHeader || acceptHeader.trim() === '' || acceptHeader === '*/*') {
-    return availableTypes[0];
-  }
+  if (!availableTypes?.length) return null;
+  if (!acceptHeader?.trim() || acceptHeader === '*/*') return availableTypes[0];
 
-  const clauses = [];
-  const parts = acceptHeader.split(',');
-
-  for (let idx = 0; idx < parts.length; idx++) {
-    const raw = parts[idx].trim();
-    if (!raw) continue;
-
-    const tokens = raw.split(';').map((t) => t.trim());
-    const mediaType = tokens[0].toLowerCase();
-    let q = 1.0;
-
-    for (let i = 1; i < tokens.length; i++) {
-      const param = tokens[i];
-      if (param.startsWith('q=')) {
-        const parsedQ = parseFloat(param.slice(2));
-        if (!isNaN(parsedQ)) {
-          q = parsedQ;
-        }
-      }
-    }
-
+  const clauses = acceptHeader.split(',').map((raw, idx) => {
+    const [mediaType, ...params] = raw.trim().toLowerCase().split(';').map((t) => t.trim());
+    const qParam = params.find((p) => p.startsWith('q='));
+    const q = qParam ? (parseFloat(qParam.slice(2)) || 0) : 1.0;
     const [type, subtype] = mediaType.split('/');
-    let specificity = 0;
-    if (type === '*') {
-      specificity = 1;
-    } else if (subtype === '*') {
-      specificity = 2;
-    } else {
-      specificity = 3;
-    }
+    const specificity = type === '*' ? 1 : subtype === '*' ? 2 : 3;
+    return { mediaType, type, subtype, q, specificity, idx };
+  }).filter((c) => c.mediaType);
 
-    clauses.push({ mediaType, type, subtype, q, specificity, originalIndex: idx });
-  }
+  clauses.sort((a, b) => b.q - a.q || b.specificity - a.specificity || a.idx - b.idx);
 
-  clauses.sort((a, b) => {
-    if (b.q !== a.q) return b.q - a.q;
-    if (b.specificity !== a.specificity) return b.specificity - a.specificity;
-    return a.originalIndex - b.originalIndex;
-  });
-
-  for (const clause of clauses) {
-    if (clause.q === 0) continue;
-
-    for (const available of availableTypes) {
-      const availLower = available.toLowerCase();
-      const [availType] = availLower.split('/');
-
-      if (clause.mediaType === '*/*') {
-        return available;
-      }
-      if (clause.subtype === '*' && clause.type === availType) {
-        return available;
-      }
-      if (clause.mediaType === availLower) {
-        return available;
+  for (const c of clauses) {
+    if (c.q <= 0) continue;
+    for (const avail of availableTypes) {
+      const [aType] = avail.toLowerCase().split('/');
+      if (c.mediaType === '*/*' || (c.subtype === '*' && c.type === aType) || c.mediaType === avail.toLowerCase()) {
+        return avail;
       }
     }
   }
-
   return null;
 }
+

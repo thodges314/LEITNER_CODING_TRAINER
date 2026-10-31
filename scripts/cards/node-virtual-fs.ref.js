@@ -1,67 +1,47 @@
 class VirtualFS {
-  constructor() {
-    this.root = { type: 'dir', children: {} };
-  }
+  root = { type: 'dir', children: {} };
 
-  _parsePath(p) {
-    return p.split('/').filter(Boolean);
-  }
-
-  _traverse(parts) {
+  #nav(p) {
     let curr = this.root;
-    for (const part of parts) {
-      if (!curr || curr.type !== 'dir' || !curr.children[part]) {
-        return null;
-      }
+    for (const part of p.split('/').filter(Boolean)) {
+      if (!curr?.children?.[part]) return null;
       curr = curr.children[part];
     }
     return curr;
   }
 
   mkdirp(dirPath) {
-    const parts = this._parsePath(dirPath);
     let curr = this.root;
-    for (const part of parts) {
-      if (!curr.children[part]) {
-        curr.children[part] = { type: 'dir', children: {} };
-      } else if (curr.children[part].type !== 'dir') {
-        throw new Error(`ENOTDIR: not a directory, ${part}`);
-      }
-      curr = curr.children[part];
+    for (const p of dirPath.split('/').filter(Boolean)) {
+      curr = curr.children[p] ??= { type: 'dir', children: {} };
+      if (curr.type !== 'dir') throw new Error(`ENOTDIR: ${p}`);
     }
   }
 
   writeFile(filePath, content) {
-    const parts = this._parsePath(filePath);
-    if (parts.length === 0) throw new Error('Invalid path');
-    const fileName = parts.pop();
-    const parent = this._traverse(parts);
-    if (!parent || parent.type !== 'dir') {
-      throw new Error('ENOENT: no such file or directory');
-    }
-    parent.children[fileName] = { type: 'file', content: String(content) };
+    const parts = filePath.split('/').filter(Boolean), name = parts.pop();
+    const parent = this.#nav(parts.join('/'));
+    if (!parent || parent.type !== 'dir') throw new Error('ENOENT');
+    parent.children[name] = { type: 'file', content: String(content) };
   }
 
   readFile(filePath) {
-    const parts = this._parsePath(filePath);
-    const node = this._traverse(parts);
-    if (!node) throw new Error('ENOENT: no such file or directory');
-    if (node.type === 'dir') throw new Error('EISDIR: illegal operation on a directory');
+    const node = this.#nav(filePath);
+    if (!node) throw new Error('ENOENT');
+    if (node.type === 'dir') throw new Error('EISDIR');
     return node.content;
   }
 
   readdir(dirPath) {
-    const parts = this._parsePath(dirPath);
-    const node = this._traverse(parts);
-    if (!node) throw new Error('ENOENT: no such file or directory');
-    if (node.type !== 'dir') throw new Error('ENOTDIR: not a directory');
+    const node = this.#nav(dirPath);
+    if (!node) throw new Error('ENOENT');
+    if (node.type !== 'dir') throw new Error('ENOTDIR');
     return Object.keys(node.children).sort();
   }
 
   stat(targetPath) {
-    const parts = this._parsePath(targetPath);
-    const node = this._traverse(parts);
-    if (!node) throw new Error('ENOENT: no such file or directory');
+    const node = this.#nav(targetPath);
+    if (!node) throw new Error('ENOENT');
     return {
       isFile: () => node.type === 'file',
       isDirectory: () => node.type === 'dir',
@@ -70,16 +50,12 @@ class VirtualFS {
   }
 
   rm(targetPath, options = {}) {
-    const parts = this._parsePath(targetPath);
-    if (parts.length === 0) throw new Error('Cannot remove root');
-    const name = parts.pop();
-    const parent = this._traverse(parts);
-    if (!parent || !parent.children[name]) {
-      throw new Error('ENOENT: no such file or directory');
-    }
-    const node = parent.children[name];
-    if (node.type === 'dir' && Object.keys(node.children).length > 0 && !options.recursive) {
-      throw new Error('ENOTEMPTY: directory not empty');
+    const parts = targetPath.split('/').filter(Boolean), name = parts.pop();
+    const parent = this.#nav(parts.join('/'));
+    const node = parent?.children?.[name];
+    if (!node) throw new Error('ENOENT');
+    if (node.type === 'dir' && Object.keys(node.children).length && !options.recursive) {
+      throw new Error('ENOTEMPTY');
     }
     delete parent.children[name];
   }

@@ -1,62 +1,48 @@
 class EventEmitter {
   constructor() {
-    this._events = Object.create(null);
+    this._events = {};
   }
 
-  on(event, listener) {
-    if (typeof listener !== 'function') throw new TypeError('Listener must be a function');
-    if (!this._events[event]) this._events[event] = [];
-    this._events[event].push(listener);
+  on(event, fn) {
+    (this._events[event] ??= []).push(fn);
     return this;
   }
 
-  prependListener(event, listener) {
-    if (typeof listener !== 'function') throw new TypeError('Listener must be a function');
-    if (!this._events[event]) this._events[event] = [];
-    this._events[event].unshift(listener);
+  prependListener(event, fn) {
+    (this._events[event] ??= []).unshift(fn);
     return this;
   }
 
-  once(event, listener) {
-    if (typeof listener !== 'function') throw new TypeError('Listener must be a function');
+  once(event, fn) {
     const wrapper = (...args) => {
       this.off(event, wrapper);
-      listener.apply(this, args);
+      fn.apply(this, args);
     };
-    wrapper.original = listener;
+    wrapper.original = fn;
     return this.on(event, wrapper);
   }
 
-  off(event, listener) {
+  off(event, fn) {
     const list = this._events[event];
-    if (!list || list.length === 0) return this;
-    const idx = list.findIndex((fn) => fn === listener || fn.original === listener);
-    if (idx !== -1) {
-      list.splice(idx, 1);
-      if (list.length === 0) delete this._events[event];
+    if (list) {
+      const idx = list.findIndex((h) => h === fn || h.original === fn);
+      if (idx !== -1) list.splice(idx, 1);
     }
     return this;
   }
 
   emit(event, ...args) {
-    if (event === 'error') {
-      const list = this._events['error'];
-      if (!list || list.length === 0) {
-        const err = args[0] instanceof Error ? args[0] : new Error(args[0] ? String(args[0]) : 'Unhandled error');
-        throw err;
-      }
-    }
     const list = this._events[event];
-    if (!list || list.length === 0) return false;
-    const copy = list.slice();
-    for (const fn of copy) {
-      fn.apply(this, args);
+    if (event === 'error' && (!list || !list.length)) {
+      throw args[0] instanceof Error ? args[0] : new Error(String(args[0]));
     }
+    if (!list || !list.length) return false;
+    [...list].forEach((fn) => fn.apply(this, args));
     return true;
   }
 
   listenerCount(event) {
-    const list = this._events[event];
-    return list ? list.length : 0;
+    return this._events[event]?.length || 0;
   }
 }
+

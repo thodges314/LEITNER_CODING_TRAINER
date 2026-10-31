@@ -1,87 +1,47 @@
-interface FSStats {
-  isFile(): boolean;
-  isDirectory(): boolean;
-  size: number;
-}
-
-interface FSNodeDir {
-  type: 'dir';
-  children: Record<string, FSNode>;
-}
-
-interface FSNodeFile {
-  type: 'file';
-  content: string;
-}
-
-type FSNode = FSNodeDir | FSNodeFile;
-
 class VirtualFS {
-  private root: FSNodeDir;
+  root: any = { type: 'dir', children: {} };
 
-  constructor() {
-    this.root = { type: 'dir', children: {} };
-  }
-
-  private _parsePath(p: string): string[] {
-    return p.split('/').filter(Boolean);
-  }
-
-  private _traverse(parts: string[]): FSNode | null {
-    let curr: FSNode = this.root;
-    for (const part of parts) {
-      if (!curr || curr.type !== 'dir' || !curr.children[part]) {
-        return null;
-      }
+  #nav(p: string): any {
+    let curr: any = this.root;
+    for (const part of p.split('/').filter(Boolean)) {
+      if (!curr?.children?.[part]) return null;
       curr = curr.children[part];
     }
     return curr;
   }
 
   mkdirp(dirPath: string): void {
-    const parts = this._parsePath(dirPath);
-    let curr: FSNodeDir = this.root;
-    for (const part of parts) {
-      if (!curr.children[part]) {
-        curr.children[part] = { type: 'dir', children: {} };
-      } else if (curr.children[part].type !== 'dir') {
-        throw new Error(`ENOTDIR: not a directory, ${part}`);
-      }
-      curr = curr.children[part] as FSNodeDir;
+    let curr = this.root;
+    for (const p of dirPath.split('/').filter(Boolean)) {
+      curr = curr.children[p] ??= { type: 'dir', children: {} };
+      if (curr.type !== 'dir') throw new Error(`ENOTDIR: ${p}`);
     }
   }
 
   writeFile(filePath: string, content: string): void {
-    const parts = this._parsePath(filePath);
-    if (parts.length === 0) throw new Error('Invalid path');
-    const fileName = parts.pop()!;
-    const parent = this._traverse(parts);
-    if (!parent || parent.type !== 'dir') {
-      throw new Error('ENOENT: no such file or directory');
-    }
-    parent.children[fileName] = { type: 'file', content: String(content) };
+    const parts = filePath.split('/').filter(Boolean), name = parts.pop()!;
+    const parent = this.#nav(parts.join('/'));
+    if (!parent || parent.type !== 'dir') throw new Error('ENOENT');
+    parent.children[name] = { type: 'file', content: String(content) };
   }
 
   readFile(filePath: string): string {
-    const parts = this._parsePath(filePath);
-    const node = this._traverse(parts);
-    if (!node) throw new Error('ENOENT: no such file or directory');
-    if (node.type === 'dir') throw new Error('EISDIR: illegal operation on a directory');
+    const node = this.#nav(filePath);
+    if (!node) throw new Error('ENOENT');
+    if (node.type === 'dir') throw new Error('EISDIR');
     return node.content;
   }
 
   readdir(dirPath: string): string[] {
-    const parts = this._parsePath(dirPath);
-    const node = this._traverse(parts);
-    if (!node) throw new Error('ENOENT: no such file or directory');
-    if (node.type !== 'dir') throw new Error('ENOTDIR: not a directory');
+    const node = this.#nav(dirPath);
+    if (!node) throw new Error('ENOENT');
+    if (node.type !== 'dir') throw new Error('ENOTDIR');
     return Object.keys(node.children).sort();
   }
 
-  stat(targetPath: string): FSStats {
-    const parts = this._parsePath(targetPath);
-    const node = this._traverse(parts);
-    if (!node) throw new Error('ENOENT: no such file or directory');
+  stat(targetPath: string): VirtualFSStat {
+    const node = this.#nav(targetPath);
+    if (!node) throw new Error('ENOENT');
     return {
       isFile: () => node.type === 'file',
       isDirectory: () => node.type === 'dir',
@@ -89,17 +49,13 @@ class VirtualFS {
     };
   }
 
-  rm(targetPath: string, options: { recursive?: boolean } = {}): void {
-    const parts = this._parsePath(targetPath);
-    if (parts.length === 0) throw new Error('Cannot remove root');
-    const name = parts.pop()!;
-    const parent = this._traverse(parts);
-    if (!parent || parent.type !== 'dir' || !parent.children[name]) {
-      throw new Error('ENOENT: no such file or directory');
-    }
-    const node = parent.children[name];
-    if (node.type === 'dir' && Object.keys(node.children).length > 0 && !options.recursive) {
-      throw new Error('ENOTEMPTY: directory not empty');
+  rm(targetPath: string, options: VirtualFSOptions = {}): void {
+    const parts = targetPath.split('/').filter(Boolean), name = parts.pop()!;
+    const parent = this.#nav(parts.join('/'));
+    const node = parent?.children?.[name];
+    if (!node) throw new Error('ENOENT');
+    if (node.type === 'dir' && Object.keys(node.children).length && !options.recursive) {
+      throw new Error('ENOTEMPTY');
     }
     delete parent.children[name];
   }

@@ -1,123 +1,49 @@
-interface WorkerPoolOptions {
-  size: number;
-  maxQueueSize?: number;
-}
-
-interface PoolStats {
-  size: number;
-  busyWorkers: number;
-  idleWorkers: number;
-  pendingQueueLength: number;
-}
-
-interface PoolWorker {
-  id: number;
-  busy: boolean;
-  completed: number;
-}
-
-interface PendingTask {
-  data: any;
-  executeFn: (data: any) => Promise<any> | any;
-  resolve: (value: any) => void;
-  reject: (reason: any) => void;
-}
-
 class WorkerPoolDispatcher {
-  public size: number;
-  public maxQueueSize: number;
-  private workers: PoolWorker[];
-  private queue: PendingTask[];
-  private terminated: boolean;
-  private activeTaskCount: number;
-  private _drainResolvers: Array<() => void>;
+  size: number;
+  maxQueueSize: number;
+  active = 0;
+  queue: Array<{ data: any; executeFn: (d: any) => any; resolve: (v: any) => void; reject: (e: any) => void }> = [];
+  terminated = false;
+  drains: Array<() => void> = [];
 
-  constructor(options: WorkerPoolOptions) {
+  constructor(options: WorkerPoolOptions = {}) {
     this.size = options.size || 2;
-    this.maxQueueSize = options.maxQueueSize || Infinity;
-    this.workers = Array.from({ length: this.size }, (_, i) => ({
-      id: i,
-      busy: false,
-      completed: 0,
-    }));
-    this.queue = [];
-    this.terminated = false;
-    this.activeTaskCount = 0;
-    this._drainResolvers = [];
+    this.maxQueueSize = options.maxQueueSize ?? Infinity;
   }
 
-  dispatch(data: any, executeFn: (data: any) => Promise<any> | any): Promise<any> {
-    if (this.terminated) {
-      return Promise.reject(new Error('Pool terminated'));
-    }
-
-    const idleWorker = this.workers.find((w) => !w.busy);
-    if (idleWorker) {
-      return this._runTask(idleWorker, data, executeFn);
-    }
-
-    if (this.queue.length >= this.maxQueueSize) {
-      return Promise.reject(new Error('Queue full'));
-    }
-
-    return new Promise((resolve, reject) => {
-      this.queue.push({ data, executeFn, resolve, reject });
-    });
+  dispatch<T, R>(data: T, executeFn: (arg: T) => R | Promise<R>): Promise<R> {
+    if (this.terminated) return Promise.reject(new Error('Pool terminated'));
+    if (this.active < this.size) return this.#run(data, executeFn);
+    if (this.queue.length >= this.maxQueueSize) return Promise.reject(new Error('Queue full'));
+    return new Promise((resolve, reject) => this.queue.push({ data, executeFn, resolve, reject }));
   }
 
-  private async _runTask(
-    worker: PoolWorker,
-    data: any,
-    executeFn: (data: any) => Promise<any> | any
-  ): Promise<any> {
-    worker.busy = true;
-    this.activeTaskCount++;
+  async #run(data: any, executeFn: (d: any) => any): Promise<any> {
+    this.active++;
     try {
-      const result = await executeFn(data);
-      return result;
+      return await executeFn(data);
     } finally {
-      worker.completed++;
-      worker.busy = false;
-      this.activeTaskCount--;
-      if (this.activeTaskCount === 0 && this._drainResolvers.length > 0) {
-        const resolvers = [...this._drainResolvers];
-        this._drainResolvers = [];
-        for (const r of resolvers) r();
+      this.active--;
+      if (!this.active) while (this.drains.length) this.drains.shift()!();
+      if (!this.terminated && this.queue.length && this.active < this.size) {
+        const { data: d, executeFn: fn, resolve, reject } = this.queue.shift()!;
+        this.#run(d, fn).then(resolve, reject);
       }
-      this._drainQueue();
     }
   }
 
-  private _drainQueue(): void {
-    if (this.terminated || this.queue.length === 0) return;
-    const idleWorker = this.workers.find((w) => !w.busy);
-    if (!idleWorker) return;
-
-    const task = this.queue.shift();
-    if (!task) return;
-
-    this._runTask(idleWorker, task.data, task.executeFn).then(task.resolve, task.reject);
-  }
-
-  getStats(): PoolStats {
-    const busyWorkers = this.workers.filter((w) => w.busy).length;
+  getStats(): WorkerPoolStats {
     return {
       size: this.size,
-      busyWorkers,
-      idleWorkers: this.size - busyWorkers,
+      busyWorkers: this.active,
+      idleWorkers: this.size - this.active,
       pendingQueueLength: this.queue.length,
     };
   }
 
   async terminate(): Promise<void> {
     this.terminated = true;
-    while (this.queue.length > 0) {
-      const task = this.queue.shift();
-      if (task) task.reject(new Error('Pool terminated'));
-    }
-    if (this.activeTaskCount === 0) return;
-    await new Promise<void>((resolve) => {
-      this._drainResolvers.push(resolve);
-    });
+    while (this.queue.length) this.queue.shift()!.reject(new Error('Pool terminated'));
+    if (this.active) await new Promise<void>(r => this.drains.push(r));
   }
 }

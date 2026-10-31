@@ -15,7 +15,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
-| GraphQL Curriculum Slimming & Ambient Types | Thomas / Assistant | feature/graphql-curriculum-slimming-and-ambient-types | in progress |
+| GraphQL & Node.js Curriculum Slimming & Ambient Types | Thomas / Assistant | feature/graphql-curriculum-slimming-and-ambient-types | in progress |
 
 
 

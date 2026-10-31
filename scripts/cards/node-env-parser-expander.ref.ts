@@ -1,62 +1,28 @@
-type EnvDictionary = Record<string, string>;
+function parseEnv(src = '', baseEnv: Record<string, string> = {}): Record<string, string> {
+  const res: Record<string, string> = {}, ctx: Record<string, string> = { ...baseEnv };
+  const expand = (str: string) => str.replace(/\$(\{([A-Za-z0-9_]+)(?::-([^}]*))?\}|([A-Za-z0-9_]+))/g, (_, _b, k1, def = '', k2) => ctx[k1 || k2] || def);
+  const unesc: Record<string, string> = { '\\n': '\n', '\\r': '\r', '\\t': '\t', '\\"': '"', '\\\\': '\\' };
 
-function parseEnv(src: string, baseEnv: EnvDictionary = {}): EnvDictionary {
-  const result: EnvDictionary = {};
-  const context: EnvDictionary = { ...baseEnv };
-
-  if (!src || typeof src !== 'string') return result;
-
-  const lines = src.split(/\r?\n/);
-
-  function expand(str: string): string {
-    return str.replace(/\$(\{([A-Za-z0-9_]+)(?::-([^}]*))?\}|([A-Za-z0-9_]+))/g, (_, bracketed, varName1, defaultVal, varName2) => {
-      const name = (varName1 || varName2) as string;
-      const def = defaultVal !== undefined ? (defaultVal as string) : '';
-      if (context[name] !== undefined && context[name] !== '') {
-        return context[name];
-      }
-      return def;
-    });
-  }
-
-  for (let line of lines) {
+  for (let line of src.split(/\r?\n/)) {
     line = line.trim();
     if (!line || line.startsWith('#')) continue;
+    if (line.startsWith('export ')) line = line.slice(7).trim();
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+    const key = line.slice(0, eq).trim();
+    let val = line.slice(eq + 1).trim();
+    if (!key) continue;
 
-    if (line.startsWith('export ')) {
-      line = line.slice(7).trim();
-    }
-
-    const eqIdx = line.indexOf('=');
-    if (eqIdx === -1) continue;
-
-    const rawKey = line.slice(0, eqIdx).trim();
-    let rawVal = line.slice(eqIdx + 1).trim();
-
-    if (!rawKey) continue;
-
-    let finalVal = '';
-    if (rawVal.startsWith('"') && rawVal.endsWith('"') && rawVal.length >= 2) {
-      const inner = rawVal.slice(1, -1)
-        .replace(/\\n/g, '\n')
-        .replace(/\\r/g, '\r')
-        .replace(/\\t/g, '\t')
-        .replace(/\\"/g, '"')
-        .replace(/\\\\/g, '\\');
-      finalVal = expand(inner);
-    } else if (rawVal.startsWith("'") && rawVal.endsWith("'") && rawVal.length >= 2) {
-      finalVal = rawVal.slice(1, -1);
+    if (val.startsWith('"') && val.endsWith('"')) {
+      val = expand(val.slice(1, -1).replace(/\\(\\|n|r|t|")/g, m => unesc[m] || m));
+    } else if (val.startsWith("'") && val.endsWith("'")) {
+      val = val.slice(1, -1);
     } else {
-      const commentIdx = rawVal.indexOf(' #');
-      if (commentIdx !== -1) {
-        rawVal = rawVal.slice(0, commentIdx).trim();
-      }
-      finalVal = expand(rawVal);
+      const c = val.indexOf(' #');
+      if (c !== -1) val = val.slice(0, c).trim();
+      val = expand(val);
     }
-
-    result[rawKey] = finalVal;
-    context[rawKey] = finalVal;
+    res[key] = ctx[key] = val;
   }
-
-  return result;
+  return res;
 }

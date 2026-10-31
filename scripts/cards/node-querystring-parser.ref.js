@@ -1,69 +1,30 @@
-function decodeSafe(str) {
-  try {
-    return decodeURIComponent(str.replace(/\+/g, ' '));
-  } catch {
-    return str;
-  }
-}
+const decodeSafe = (s) => {
+  try { return decodeURIComponent(s.replace(/\+/g, ' ')); } catch { return s; }
+};
 
-function parseQuery(str, sep = '&', eq = '=') {
-  if (!str || typeof str !== 'string') return {};
-  const cleaned = str.startsWith('?') ? str.slice(1) : str;
-  if (!cleaned) return {};
-
-  const result = {};
-  const pairs = cleaned.split(sep);
-
-  for (const pair of pairs) {
+function parseQuery(str = '', sep = '&', eq = '=') {
+  const q = str.startsWith('?') ? str.slice(1) : str;
+  if (!q) return {};
+  const res = {};
+  for (const pair of q.split(sep)) {
     if (!pair) continue;
-    const eqIdx = pair.indexOf(eq);
-    let rawKey;
-    let rawVal;
-
-    if (eqIdx !== -1) {
-      rawKey = pair.slice(0, eqIdx);
-      rawVal = pair.slice(eqIdx + eq.length);
-    } else {
-      rawKey = pair;
-      rawVal = '';
-    }
-
-    const key = decodeSafe(rawKey);
-    const val = decodeSafe(rawVal);
-
-    if (Object.prototype.hasOwnProperty.call(result, key)) {
-      if (Array.isArray(result[key])) {
-        result[key].push(val);
-      } else {
-        result[key] = [result[key], val];
-      }
-    } else {
-      result[key] = val;
-    }
+    const idx = pair.indexOf(eq);
+    const k = decodeSafe(idx === -1 ? pair : pair.slice(0, idx));
+    const v = decodeSafe(idx === -1 ? '' : pair.slice(idx + eq.length));
+    res[k] = k in res ? (Array.isArray(res[k]) ? [...res[k], v] : [res[k], v]) : v;
   }
-
-  return result;
+  return res;
 }
 
-function stringifyQuery(obj, sep = '&', eq = '=') {
+function stringifyQuery(obj = {}, sep = '&', eq = '=') {
   if (!obj || typeof obj !== 'object') return '';
   const parts = [];
-
-  for (const key of Object.keys(obj)) {
-    const val = obj[key];
-    if (val === undefined || val === null || typeof val === 'function') continue;
-
-    const encodedKey = encodeURIComponent(key);
-
-    if (Array.isArray(val)) {
-      for (const item of val) {
-        if (item === undefined || item === null) continue;
-        parts.push(`${encodedKey}${eq}${encodeURIComponent(String(item))}`);
-      }
-    } else {
-      parts.push(`${encodedKey}${eq}${encodeURIComponent(String(val))}`);
-    }
+  for (const [k, v] of Object.entries(obj)) {
+    if (v == null || typeof v === 'function') continue;
+    const key = encodeURIComponent(k);
+    const arr = Array.isArray(v) ? v : [v];
+    arr.forEach((item) => item != null && parts.push(`${key}${eq}${encodeURIComponent(String(item))}`));
   }
-
   return parts.join(sep);
 }
+

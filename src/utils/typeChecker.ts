@@ -349,6 +349,51 @@ const SANDBOX_GLOBALS = `
     missing: string[];
   }
 
+  // Node.js Domain Interfaces
+  interface BackpressurePipeOptions {
+    highWaterMark?: number;
+  }
+  interface ShutdownHandlerOptions {
+    priority?: number;
+    timeoutMs?: number;
+  }
+  interface TaskResult {
+    name: string;
+    status: 'fulfilled' | 'rejected' | 'timed_out';
+    error?: string;
+  }
+  interface ShutdownReport {
+    signal: string;
+    completed: boolean;
+    results: TaskResult[];
+  }
+  interface WorkerPoolOptions {
+    size?: number;
+    maxQueueSize?: number;
+  }
+  interface WorkerPoolStats {
+    size: number;
+    busyWorkers: number;
+    idleWorkers: number;
+    pendingQueueLength: number;
+  }
+  interface TLVRecord {
+    type: number;
+    value: string;
+  }
+  interface VirtualFSStat {
+    isFile: () => boolean;
+    isDirectory: () => boolean;
+    size: number;
+  }
+  interface VirtualFSOptions {
+    recursive?: boolean;
+  }
+  interface RouteMatch {
+    handler: (...args: any[]) => any;
+    params: Record<string, string>;
+  }
+
   declare module 'react' {
     const React: any;
     export = React;
