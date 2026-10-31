@@ -404,6 +404,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
   // Loading animation state
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [pipelineProgressMessage, setPipelineProgressMessage] = useState<string | null>(null);
 
   // Review state
   const [editableDeckName, setEditableDeckName] = useState(() => initialDossier?.deckName || '');
@@ -445,6 +446,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     e.preventDefault();
     setStep('loading');
     setLoadingMessageIndex(0);
+    setPipelineProgressMessage(null);
 
     const interval = setInterval(() => {
       setLoadingMessageIndex((prev) => (prev + 1) % 4);
@@ -461,7 +463,12 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           weakCardIds: syncBox1Cards ? currentBox1CardIds : [],
           targetCardCount: deckSizeMode === 'custom' ? targetCardCount : undefined,
         },
-        catalogIndex
+        catalogIndex,
+        {
+          onProgress: (_step, message) => {
+            setPipelineProgressMessage(message);
+          },
+        }
       );
 
       clearInterval(interval);
@@ -1322,7 +1329,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 <Loader2 size={36} className="ai-prep-spinner animate-spin" />
               </div>
               <h3 className="ai-prep-loading-title">Analyzing & Assembling Curriculum</h3>
-              <p className="ai-prep-loading-subtext">{loadingMessages[loadingMessageIndex]}</p>
+              <p className="ai-prep-loading-subtext">{pipelineProgressMessage || loadingMessages[loadingMessageIndex]}</p>
             </div>
           )}
 
