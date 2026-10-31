@@ -959,6 +959,7 @@ export function buildDossierSynthesisPrompt(
 CRITICAL RULES:
 1. ONLY reference and use the pre-filtered card IDs listed below. DO NOT invent or hallucinate any card IDs.
 2. For each card in the provided list, refine its priority ("must-know" | "recommended" | "optional") and provide a crisp 1-sentence rationale tying it directly to ${request.company || 'the target company'}'s interview rounds. If a card was directly matched to a reported question, retain "must-know" priority.
+   - PRIORITY BALANCE: Distribute priorities realistically: allocate ~25-35% as "must-know" (core screening blockers & exact question matches), ~45-55% as "recommended" (high-yield secondary patterns), and ~15-20% as "optional" (stretch drills). DO NOT mark every card as "must-know".
 3. Write a comprehensive, multi-paragraph strategic executive summary (3 to 4 paragraphs):
    - Paragraph 1: Target Company Engineering Archetype & Culture (what this company tests, engineering values, interview format).
    - Paragraph 2: Candidate Risk Calibration (mapping candidate weaknesses & setbacks against the interview rubric).
@@ -1091,6 +1092,27 @@ export function parseDossierSynthesisResponse(
   for (const orig of preFilteredCards) {
     if (!seenIds.has(orig.id)) {
       selectedCards.push(orig);
+    }
+  }
+
+  // Calibrate priorities if model over-assigned must-know to almost all cards
+  const mustKnowCount = selectedCards.filter((c) => c.priority === 'must-know').length;
+  const maxAllowedMustKnow = Math.max(3, Math.ceil(selectedCards.length * 0.4));
+  if (mustKnowCount > maxAllowedMustKnow && selectedCards.length > 3) {
+    let keptMustKnow = 0;
+    const recommendedCutoff = Math.ceil(selectedCards.length * 0.8);
+    for (let i = 0; i < selectedCards.length; i++) {
+      const card = selectedCards[i];
+      const isExactQuestionMatch = /direct match for interview question/i.test(card.rationale);
+      const isBox1Setback = /recent leitner box 1 setback/i.test(card.rationale);
+      if (isExactQuestionMatch || isBox1Setback || keptMustKnow < maxAllowedMustKnow) {
+        card.priority = 'must-know';
+        keptMustKnow++;
+      } else if (i < recommendedCutoff) {
+        card.priority = 'recommended';
+      } else {
+        card.priority = 'optional';
+      }
     }
   }
 

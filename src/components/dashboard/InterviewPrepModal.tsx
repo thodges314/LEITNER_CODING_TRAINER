@@ -859,12 +859,61 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 <Sparkles size={20} className="ai-prep-header-icon" />
               </div>
               <div className="ai-prep-header-titles">
-                <h2 id="ai-prep-modal-title" className="ai-prep-modal-title">
-                  AI Interview Prep Coach
-                </h2>
-                <p className="ai-prep-modal-subtitle">
-                  Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
-                </p>
+                <div className="ai-prep-modal-title-row">
+                  <h2 id="ai-prep-modal-title" className={`ai-prep-modal-title ${step === 'review' ? 'review-mode' : ''}`}>
+                    AI Interview Prep Coach
+                  </h2>
+                </div>
+                {step === 'review' && dossier ? (
+                  <div className="header-deck-meta-prominent" data-testid="ai-prep-header-deck-meta">
+                    <div className="header-deck-name-row-prominent">
+                      <input
+                        ref={deckNameInputRef}
+                        type="text"
+                        className="header-deck-name-input-prominent"
+                        value={editableDeckName}
+                        onChange={(e) => setEditableDeckName(e.target.value)}
+                        placeholder="Custom Deck Name"
+                        title="Click to edit deck name"
+                        data-testid="ai-prep-review-deck-name"
+                      />
+                      <button
+                        type="button"
+                        className="header-deck-pencil-btn"
+                        onClick={() => deckNameInputRef.current?.focus()}
+                        title="Click to edit deck name"
+                        aria-label="Edit deck name"
+                      >
+                        <Pencil size={12} className="header-deck-pencil-icon" />
+                      </button>
+                    </div>
+                    <div className="header-deck-desc-row-prominent">
+                      <input
+                        ref={deckDescInputRef}
+                        type="text"
+                        className="header-deck-desc-input-prominent"
+                        value={editableDescription}
+                        onChange={(e) => setEditableDescription(e.target.value)}
+                        placeholder="Deck Description"
+                        title="Click to edit deck description"
+                        data-testid="ai-prep-review-deck-desc"
+                      />
+                      <button
+                        type="button"
+                        className="header-deck-pencil-btn"
+                        onClick={() => deckDescInputRef.current?.focus()}
+                        title="Click to edit deck description"
+                        aria-label="Edit deck description"
+                      >
+                        <Pencil size={11} className="header-deck-pencil-icon" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="ai-prep-modal-subtitle">
+                    Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -909,25 +958,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   </button>
                 )}
 
-                {/* Edit in Deck Builder button in review header */}
-                {step === 'review' && dossier && onEditCustomDeck && (
-                  <button
-                    type="button"
-                    className="ai-prep-history-btn"
-                    onClick={() => {
-                      onClose();
-                      onEditCustomDeck(dossier.id || 'current_dossier');
-                    }}
-                    title="Open manual deck builder to customize cards in this deck"
-                    data-testid="ai-prep-edit-in-builder-btn"
-                  >
-                    <Pencil size={13} />
-                    <span>Edit in Deck Builder</span>
-                  </button>
-                )}
-
-                {/* Import Briefing JSON button in header */}
-                {step !== 'loading' && (
+                {/* Import Briefing JSON button in input header */}
+                {step === 'input' && (
                   <button
                     type="button"
                     className="ai-prep-history-btn"
@@ -1010,54 +1042,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   </button>
                 )}
               </div>
-
-              {/* Stacked Deck Name & Description in Header on Right, underneath buttons */}
-              {step === 'review' && dossier && (
-                <div className="ai-prep-header-deck-meta" data-testid="ai-prep-header-deck-meta">
-                  <div className="header-deck-name-row">
-                    <input
-                      ref={deckNameInputRef}
-                      type="text"
-                      className="header-deck-name-input"
-                      value={editableDeckName}
-                      onChange={(e) => setEditableDeckName(e.target.value)}
-                      placeholder="Custom Deck Name"
-                      title="Click to edit deck name"
-                      data-testid="ai-prep-review-deck-name"
-                    />
-                    <button
-                      type="button"
-                      className="header-deck-pencil-btn"
-                      onClick={() => deckNameInputRef.current?.focus()}
-                      title="Click to edit deck name"
-                      aria-label="Edit deck name"
-                    >
-                      <Pencil size={11} className="header-deck-pencil-icon" />
-                    </button>
-                  </div>
-                  <div className="header-deck-desc-row">
-                    <input
-                      ref={deckDescInputRef}
-                      type="text"
-                      className="header-deck-desc-input"
-                      value={editableDescription}
-                      onChange={(e) => setEditableDescription(e.target.value)}
-                      placeholder="Deck Description"
-                      title="Click to edit deck description"
-                      data-testid="ai-prep-review-deck-desc"
-                    />
-                    <button
-                      type="button"
-                      className="header-deck-pencil-btn"
-                      onClick={() => deckDescInputRef.current?.focus()}
-                      title="Click to edit deck description"
-                      aria-label="Edit deck description"
-                    >
-                      <Pencil size={10} className="header-deck-pencil-icon" />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -1396,26 +1380,29 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
               {activeTab === 'cards' && (
                 <div className="ai-prep-cards-tab-body">
                   <div className="ai-prep-cards-actions-bar">
-                    <button
-                      type="button"
-                      className="ai-prep-select-all-btn"
-                      onClick={handleSelectAllCards}
-                    >
-                      {checkedCardIds.size === dossier.selectedCards.length ? (
-                        <>
-                          <CheckSquare size={13} />
-                          <span>Deselect All</span>
-                        </>
-                      ) : (
-                        <>
-                          <Square size={13} />
-                          <span>Select All</span>
-                        </>
-                      )}
-                    </button>
-                    <span className="cards-tab-counter">
-                      {checkedCardIds.size} cards ready for custom deck
-                    </span>
+                    <div className="cards-tab-actions-left">
+                      <button
+                        type="button"
+                        className="ai-prep-select-all-btn"
+                        onClick={handleSelectAllCards}
+                      >
+                        {checkedCardIds.size === dossier.selectedCards.length ? (
+                          <>
+                            <CheckSquare size={13} />
+                            <span>Deselect All</span>
+                          </>
+                        ) : (
+                          <>
+                            <Square size={13} />
+                            <span>Select All</span>
+                          </>
+                        )}
+                      </button>
+                      <span className="cards-tab-counter-divider">•</span>
+                      <span className="cards-tab-counter">
+                        {checkedCardIds.size} cards ready for custom deck
+                      </span>
+                    </div>
                     {onEditCustomDeck && (
                       <button
                         type="button"
@@ -1457,15 +1444,17 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                           <div className="card-item-content">
                             <div className="card-item-top-row">
                               <span className="card-item-title">{card?.title || sel.id}</span>
-                              <span className={getPriorityBadgeClass(sel.priority)}>
-                                {sel.priority.toUpperCase()}
-                              </span>
-                              {card && (
-                                <span className="card-item-diff-badge">D{card.difficulty}</span>
-                              )}
-                              {card && (
-                                <span className="card-item-track-badge">{card.track}</span>
-                              )}
+                              <div className="card-item-badges">
+                                <span className={getPriorityBadgeClass(sel.priority)}>
+                                  {sel.priority.toUpperCase()}
+                                </span>
+                                {card && (
+                                  <span className="card-item-diff-badge">D{card.difficulty}</span>
+                                )}
+                                {card && (
+                                  <span className="card-item-track-badge">{card.track}</span>
+                                )}
+                              </div>
                             </div>
                             <p className="card-item-rationale">{sel.rationale}</p>
                           </div>
@@ -1539,6 +1528,24 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                       ))}
                     </div>
                   </div>
+
+                  {dossier.countdownChecklist && dossier.countdownChecklist.length > 0 && (
+                    <div className="countdown-checklist-section">
+                      <h4 className="section-title">Final 24-Hour Countdown & Interview Day Protocol</h4>
+                      <div className="countdown-checklist-grid">
+                        {dossier.countdownChecklist.map((item, idx) => (
+                          <div key={idx} className="countdown-checklist-card">
+                            <div className="checklist-card-num-badge">
+                              {idx + 1}
+                            </div>
+                            <div className="checklist-card-content">
+                              <span className="checklist-card-text">{item}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
