@@ -1,0 +1,38 @@
+Implement a static GraphQL query complexity analysis function that computes recursive execution costs to protect backends from denial-of-service queries:
+
+## Description
+
+```ts
+interface FieldNode {
+  name: string;
+  args?: Record<string, any>;
+  fields?: FieldNode[];
+}
+
+interface ComplexityConfig {
+  defaultCost?: number;
+  fieldCosts?: Record<string, number>;
+  maxComplexity?: number;
+}
+
+interface ComplexityResult {
+  complexity: number;
+  exceeded: boolean;
+}
+```
+
+### `calculateQueryComplexity(nodes: FieldNode[], config?: ComplexityConfig): ComplexityResult`
+
+- **Field Node Cost Calculation**:
+  - For each `FieldNode`:
+    - Base cost is `config?.fieldCosts?.[node.name]` if defined, otherwise `config?.defaultCost ?? 1`.
+    - Multiplier argument is determined by `node.args?.first` or `node.args?.limit`. If provided and a positive number (`> 0`), use that value; otherwise the multiplier is `1`.
+    - If `node.fields` is provided and non-empty, the recursive child cost is calculated. The total cost contributed by this node is:
+      $$\text{nodeCost} = \text{baseCost} + (\text{multiplier} \times \text{childCost})$$
+    - If `node.fields` is empty or omitted, the node contributes only `baseCost`.
+- **Aggregation**:
+  - The total complexity is the sum of costs across all root-level nodes in `nodes`.
+  - Empty or non-array `nodes` evaluates to a total complexity of `0`.
+- **Max Complexity Constraint**:
+  - If `config?.maxComplexity` is specified (positive number), `exceeded` is `true` whenever `complexity > config.maxComplexity`.
+  - Otherwise, `exceeded` is `false`.

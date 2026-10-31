@@ -16516,5 +16516,715 @@
     "testHarness": "const { render, fire, q, qa } = $dom;\n\nconst SAMPLE_COLUMNS = [\n  {\n    id: 'todo',\n    title: 'To Do',\n    cards: [\n      { id: 'c1', title: 'Task 1', description: 'First task' },\n      { id: 'c2', title: 'Task 2' },\n    ],\n  },\n  {\n    id: 'in-progress',\n    title: 'In Progress',\n    cards: [{ id: 'c3', title: 'Task 3' }],\n  },\n  {\n    id: 'done',\n    title: 'Done',\n    cards: [],\n  },\n];\n\n// 1. Renders multi-column Kanban board with titles, card counts, and cards\n{\n  const r = render(<KanbanBoard initialColumns={SAMPLE_COLUMNS} />);\n  const cols = qa('[data-column-id]', r.container);\n  const todoCol = q('[data-column-id=\"todo\"]', r.container);\n  const titleEl = todoCol ? q('[data-column-title]', todoCol) : null;\n  const countEl = todoCol ? q('[data-column-count]', todoCol) : null;\n  const cards = todoCol ? qa('[data-card-id]', todoCol) : [];\n\n  $test.check(\n    'Renders multi-column Kanban board with titles, card counts, and cards',\n    cols.length === 3 &&\n      titleEl !== null &&\n      titleEl.textContent === 'To Do' &&\n      countEl !== null &&\n      countEl.textContent === '2' &&\n      cards.length === 2 &&\n      q('[data-card-title]', cards[0])?.textContent === 'Task 1',\n    { colCount: cols.length, cardsInTodo: cards.length }\n  );\n  r.unmount();\n}\n\n// 2. Boundary move buttons are disabled for outer columns\n{\n  const r = render(<KanbanBoard initialColumns={SAMPLE_COLUMNS} />);\n  const card1 = q('[data-card-id=\"c1\"]', r.container);\n  const moveLeft1 = card1 ? q('button[data-action=\"move-left\"]', card1) : null;\n  const moveRight1 = card1 ? q('button[data-action=\"move-right\"]', card1) : null;\n\n  // Move c3 to Done so Done has a card to inspect\n  const card3 = q('[data-card-id=\"c3\"]', r.container);\n  const moveRight3 = card3 ? q('button[data-action=\"move-right\"]', card3) : null;\n  if (moveRight3) fire.click(moveRight3);\n\n  const doneCard3 = q('[data-card-id=\"c3\"]', r.container);\n  const moveRightDone = doneCard3 ? q('button[data-action=\"move-right\"]', doneCard3) : null;\n\n  $test.check(\n    'Boundary move buttons are disabled for outer columns',\n    moveLeft1 !== null &&\n      moveLeft1.disabled === true &&\n      moveRight1 !== null &&\n      moveRight1.disabled === false &&\n      moveRightDone !== null &&\n      moveRightDone.disabled === true,\n    { moveLeft1Disabled: moveLeft1?.disabled, moveRightDoneDisabled: moveRightDone?.disabled }\n  );\n  r.unmount();\n}\n\n// 3. Clicking Move Right shifts card to next column and fires onCardMove callback\n{\n  let movePayload = null;\n  const r = render(\n    <KanbanBoard\n      initialColumns={SAMPLE_COLUMNS}\n      onCardMove={(cardId, fromCol, toCol, newIdx) => {\n        movePayload = { cardId, fromCol, toCol, newIdx };\n      }}\n    />\n  );\n\n  const card1 = q('[data-card-id=\"c1\"]', r.container);\n  const moveRight1 = card1 ? q('button[data-action=\"move-right\"]', card1) : null;\n  if (moveRight1) fire.click(moveRight1);\n\n  const inProgressCards = qa('[data-column-id=\"in-progress\"] [data-card-id]', r.container);\n  const passed =\n    movePayload !== null &&\n    movePayload.cardId === 'c1' &&\n    movePayload.fromCol === 'todo' &&\n    movePayload.toCol === 'in-progress' &&\n    movePayload.newIdx === 1 &&\n    inProgressCards.length === 2 &&\n    inProgressCards[1].getAttribute('data-card-id') === 'c1';\n\n  $test.check(\n    'Clicking Move Right shifts card to next column and fires onCardMove callback',\n    passed,\n    { movePayload, inProgressCount: inProgressCards.length }\n  );\n  r.unmount();\n}\n\n// 4. Clicking Move Left shifts card to previous column and fires onCardMove callback\n{\n  let movePayload = null;\n  const r = render(\n    <KanbanBoard\n      initialColumns={SAMPLE_COLUMNS}\n      onCardMove={(cardId, fromCol, toCol, newIdx) => {\n        movePayload = { cardId, fromCol, toCol, newIdx };\n      }}\n    />\n  );\n\n  const card3 = q('[data-card-id=\"c3\"]', r.container);\n  const moveLeft3 = card3 ? q('button[data-action=\"move-left\"]', card3) : null;\n  if (moveLeft3) fire.click(moveLeft3);\n\n  const todoCards = qa('[data-column-id=\"todo\"] [data-card-id]', r.container);\n  const passed =\n    movePayload !== null &&\n    movePayload.cardId === 'c3' &&\n    movePayload.fromCol === 'in-progress' &&\n    movePayload.toCol === 'todo' &&\n    movePayload.newIdx === 2 &&\n    todoCards.length === 3 &&\n    todoCards[2].getAttribute('data-card-id') === 'c3';\n\n  $test.check(\n    'Clicking Move Left shifts card to previous column and fires onCardMove callback',\n    passed,\n    { movePayload, todoCount: todoCards.length }\n  );\n  r.unmount();\n}\n\n// 5. Adding a new card appends it to the column and fires onCardAdd callback\n{\n  let addPayload = null;\n  const r = render(\n    <KanbanBoard\n      initialColumns={SAMPLE_COLUMNS}\n      onCardAdd={(columnId, card) => {\n        addPayload = { columnId, card };\n      }}\n    />\n  );\n\n  const doneCol = q('[data-column-id=\"done\"]', r.container);\n  const toggleBtn = doneCol ? q('button[data-action=\"toggle-add-card\"]', doneCol) : null;\n  if (toggleBtn) fire.click(toggleBtn);\n\n  const titleInput = doneCol ? q('[data-card-input=\"title\"]', doneCol) : null;\n  const descInput = doneCol ? q('[data-card-input=\"description\"]', doneCol) : null;\n  const submitBtn = doneCol ? q('button[data-action=\"submit-card\"]', doneCol) : null;\n\n  if (titleInput) fire.change(titleInput, 'Ship Feature');\n  if (descInput) fire.change(descInput, 'Ready for deployment');\n  if (submitBtn) fire.click(submitBtn);\n\n  const doneCards = qa('[data-column-id=\"done\"] [data-card-id]', r.container);\n  const passed =\n    addPayload !== null &&\n    addPayload.columnId === 'done' &&\n    addPayload.card.title === 'Ship Feature' &&\n    addPayload.card.description === 'Ready for deployment' &&\n    doneCards.length === 1 &&\n    q('[data-card-title]', doneCards[0])?.textContent === 'Ship Feature';\n\n  $test.check(\n    'Adding a new card appends it to the column and fires onCardAdd callback',\n    passed,\n    { addPayload, doneCardCount: doneCards.length }\n  );\n  r.unmount();\n}",
     "previewCode": "const initialColumns = [\n  {\n    id: 'backlog',\n    title: 'Backlog',\n    cards: [\n      { id: 'b1', title: 'Audit a11y focus rings', description: 'Ensure 3:1 contrast' },\n      { id: 'b2', title: 'Optimize bundle splitting' },\n    ],\n  },\n  {\n    id: 'in-dev',\n    title: 'In Progress',\n    cards: [\n      { id: 'd1', title: 'Kanban board card authoring', description: 'Adding full TS types' },\n    ],\n  },\n  {\n    id: 'done',\n    title: 'Completed',\n    cards: [\n      { id: 'c1', title: 'Interactive Stepper' },\n      { id: 'c2', title: 'Popover positioning' },\n    ],\n  },\n];\n\nfunction KanbanBoardPreview() {\n  const [logMsg, setLogMsg] = useState('Try moving cards or creating a new task');\n\n  return (\n    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '4px' }}>\n      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>\n        <h4 style={{ margin: 0 }}>Sprint Board Preview</h4>\n        <span style={{ fontSize: '12px', color: '#38bdf8' }}>{logMsg}</span>\n      </div>\n\n      <KanbanBoard\n        initialColumns={initialColumns}\n        onCardMove={(cardId, fromCol, toCol, newIdx) => {\n          setLogMsg(`Moved ${cardId} (${fromCol} → ${toCol} at index ${newIdx})`);\n          if (typeof log === 'function') log('onCardMove', cardId, fromCol, toCol, newIdx);\n        }}\n        onCardAdd={(colId, card) => {\n          setLogMsg(`Added \"${card.title}\" to ${colId}`);\n          if (typeof log === 'function') log('onCardAdd', colId, card);\n        }}\n      />\n    </div>\n  );\n}\n\n<KanbanBoardPreview />",
     "rendersComponent": true
+  },
+  {
+    "id": "graphql-mini-client",
+    "track": "graphql",
+    "title": "GraphQL Client: Fetch with Error Handling",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "client",
+      "fetch",
+      "network",
+      "async"
+    ],
+    "promptSeed": "Write a lightweight GraphQL client request utility using native `fetch`:\n\n## Description\n\n```ts\ninterface GraphQLResponse<T = any> {\n  data?: T;\n  errors?: Array<{\n    message: string;\n    locations?: Array<{ line: number; column: number }>;\n    path?: Array<string | number>;\n  }>;\n}\n```\n\n### `fetchGraphQL<T = any>(endpoint: string, query: string, variables?: Record<string, any>, headers?: Record<string, string>): Promise<T>`\n\n- **HTTP Request**:\n  - Sends a `POST` request to `endpoint` via `fetch(endpoint, init)`.\n  - Sets `'Content-Type': 'application/json'` in the request headers, merging in any custom `headers` passed to the function.\n  - JSON-serializes `{ query, variables }` into the request body.\n- **HTTP Error Handling**:\n  - Inspects `response.ok`. If `response.ok` is false, throws an `Error` whose message includes the HTTP status code (e.g. `500`).\n- **GraphQL Error Handling**:\n  - Parses the response JSON as a `GraphQLResponse<T>`.\n  - If the response payload contains a non-empty `errors` array (`errors.length > 0`), throws an `Error` containing the first error's `message`.\n- **Success & Network Failure**:\n  - When successful and without errors, resolves with `data` (cast to `T`).\n  - Network rejections from `fetch` itself must propagate directly without being swallowed.",
+    "difficulty": 1,
+    "concept": "graphql-client",
+    "referenceSolution": "async function fetchGraphQL(endpoint, query, variables, headers = {}) {\n  const response = await fetch(endpoint, {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      ...headers,\n    },\n    body: JSON.stringify({ query, variables }),\n  });\n\n  if (!response.ok) {\n    throw new Error(`HTTP error! status: ${response.status}`);\n  }\n\n  const payload = await response.json();\n\n  if (payload.errors && payload.errors.length > 0) {\n    throw new Error(`GraphQL error: ${payload.errors[0].message}`);\n  }\n\n  return payload.data;\n}",
+    "referenceSolutionTs": "interface GraphQLResponse<T = any> {\n  data?: T;\n  errors?: Array<{\n    message: string;\n    locations?: Array<{ line: number; column: number }>;\n    path?: Array<string | number>;\n  }>;\n}\n\nasync function fetchGraphQL<T = any>(\n  endpoint: string,\n  query: string,\n  variables?: Record<string, any>,\n  headers: Record<string, string> = {}\n): Promise<T> {\n  const response = await fetch(endpoint, {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      ...headers,\n    },\n    body: JSON.stringify({ query, variables }),\n  });\n\n  if (!response.ok) {\n    throw new Error(`HTTP error! status: ${response.status}`);\n  }\n\n  const payload: GraphQLResponse<T> = await response.json();\n\n  if (payload.errors && payload.errors.length > 0) {\n    throw new Error(`GraphQL error: ${payload.errors[0].message}`);\n  }\n\n  return payload.data as T;\n}",
+    "testCases": [
+      {
+        "description": "Sends POST request with query and variables in JSON body",
+        "input": "fetchGraphQL('/graphql', 'query { viewer { name } }', { limit: 10 })",
+        "expected": "POST with Content-Type: application/json; body has { query, variables }; returns data { viewer: { name: 'Alice' } }",
+        "callSignature": "fetchGraphQL('/graphql', query, variables)"
+      },
+      {
+        "description": "Merges custom headers into request",
+        "input": "fetchGraphQL('/graphql', 'query { count }', undefined, { 'Authorization': 'Bearer token-xyz' })",
+        "expected": "headers include Authorization: Bearer token-xyz and Content-Type: application/json; returns data { count: 42 }",
+        "callSignature": "fetchGraphQL('/graphql', query, undefined, headers)"
+      },
+      {
+        "description": "Returns data when errors array is empty",
+        "input": "fetchGraphQL('/graphql', 'query { active }')  // payload has { data: { active: true }, errors: [] }",
+        "expected": "returns data { active: true } without throwing",
+        "callSignature": "fetchGraphQL('/graphql', query)"
+      },
+      {
+        "description": "Throws an error if response.ok is false",
+        "input": "fetchGraphQL('/graphql', query)  // response status 500",
+        "expected": "rejects with Error containing status code 500",
+        "callSignature": "fetchGraphQL('/graphql', query)"
+      },
+      {
+        "description": "Throws an error if GraphQL errors are returned in payload",
+        "input": "fetchGraphQL('/graphql', query)  // payload contains { errors: [{ message: 'Field not found' }] }",
+        "expected": "rejects with Error containing GraphQL error message 'Field not found'",
+        "callSignature": "fetchGraphQL('/graphql', query)"
+      },
+      {
+        "description": "Propagates network errors if fetch rejects",
+        "input": "fetchGraphQL('/graphql', query)  // fetch rejects TypeError('Failed to fetch')",
+        "expected": "rejects with the original TypeError: Failed to fetch",
+        "callSignature": "fetchGraphQL('/graphql', query)"
+      }
+    ],
+    "testHarness": "const originalFetch = fetch;\n\ntry {\n  await $test.run(\"Sends POST request with query and variables in JSON body\", async () => {\n    let captured = null;\n    fetch = async (url, init) => {\n      captured = { url, ...init, parsedBody: JSON.parse(init.body) };\n      return {\n        ok: true,\n        status: 200,\n        json: async () => ({ data: { viewer: { id: '1', name: 'Alice' } } }),\n      };\n    };\n\n    const res = await fetchGraphQL('/graphql', 'query { viewer { name } }', { limit: 10 });\n    const isPost = captured.method === 'POST';\n    const hasContentType = captured.headers['Content-Type'] === 'application/json';\n    const matchesQuery = captured.parsedBody.query === 'query { viewer { name } }';\n    const matchesVars = captured.parsedBody.variables?.limit === 10;\n    return isPost && hasContentType && matchesQuery && matchesVars && res.viewer.name === 'Alice';\n  }, () => true);\n\n  await $test.run(\"Merges custom headers into request\", async () => {\n    let capturedHeaders = null;\n    fetch = async (_url, init) => {\n      capturedHeaders = init.headers;\n      return {\n        ok: true,\n        status: 200,\n        json: async () => ({ data: { count: 42 } }),\n      };\n    };\n\n    const res = await fetchGraphQL('/graphql', 'query { count }', undefined, { 'Authorization': 'Bearer token-xyz' });\n    const hasAuth = capturedHeaders['Authorization'] === 'Bearer token-xyz';\n    const hasContentType = capturedHeaders['Content-Type'] === 'application/json';\n    return hasAuth && hasContentType && res.count === 42;\n  }, () => true);\n\n  await $test.run(\"Returns data when errors array is empty\", async () => {\n    fetch = async () => ({\n      ok: true,\n      status: 200,\n      json: async () => ({\n        data: { active: true },\n        errors: [],\n      }),\n    });\n\n    const res = await fetchGraphQL('/graphql', 'query { active }');\n    return res.active === true;\n  }, () => true);\n\n  fetch = async () => ({\n    ok: false,\n    status: 500,\n    statusText: 'Internal Server Error',\n    json: async () => ({}),\n  });\n  await $test.rejects(\"Throws an error if response.ok is false\", () => fetchGraphQL('/graphql', 'query { viewer { id } }'), '500');\n\n  fetch = async () => ({\n    ok: true,\n    status: 200,\n    json: async () => ({\n      errors: [{ message: 'Field \"secret\" does not exist on type \"User\"' }],\n    }),\n  });\n  await $test.rejects(\"Throws an error if GraphQL errors are returned in payload\", () => fetchGraphQL('/graphql', 'query { secret }'), 'Field \"secret\" does not exist');\n\n  fetch = async () => {\n    throw new TypeError('Failed to fetch');\n  };\n  await $test.rejects(\"Propagates network errors if fetch rejects\", () => fetchGraphQL('/graphql', 'query { viewer { id } }'), 'Failed to fetch');\n} finally {\n  fetch = originalFetch;\n}"
+  },
+  {
+    "id": "graphql-extract-operation-name",
+    "track": "graphql",
+    "title": "GraphQL AST: Extract Operation Name",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "ast",
+      "regex",
+      "parsing",
+      "query"
+    ],
+    "promptSeed": "Write a utility function to extract the operation name from a GraphQL document string without third-party AST parser dependencies:\n\n### `getOperationName(document: string): string | null`\n\n- **Parsing Invariants**:\n  - Extracts the identifier name following the operation type keyword (`query`, `mutation`, or `subscription`).\n  - Supports named queries (e.g. `query GetProfile { ... }` -> `'GetProfile'`).\n  - Supports named mutations (e.g. `mutation CreateItem($input: ItemInput!) { ... }` -> `'CreateItem'`).\n  - Supports named subscriptions (e.g. `subscription OnNotification { ... }` -> `'OnNotification'`).\n- **Comments & Formatting**:\n  - Strips single-line GraphQL comments (lines beginning with `#` or text following `#`) before parsing.\n  - Tolerates arbitrary leading/trailing whitespace, newlines, and indentation.\n- **Anonymous & Empty Queries**:\n  - Anonymous / shorthand queries (e.g. `{ viewer { id } }` or `query { viewer { id } }`) have no operation name; return `null`.\n  - Empty strings, whitespace-only strings, or non-string inputs must return `null`.",
+    "difficulty": 1,
+    "concept": "graphql-ast",
+    "referenceSolution": "function getOperationName(document) {\n  if (!document || typeof document !== 'string') return null;\n  const cleaned = document.replace(/#[^\\r\\n]*/g, '');\n  const match = cleaned.match(/(?:query|mutation|subscription)\\s+([A-Za-z_][A-Za-z0-9_]*)/);\n  return match ? match[1] : null;\n}",
+    "referenceSolutionTs": "function getOperationName(document: string): string | null {\n  if (!document || typeof document !== 'string') return null;\n  const cleaned = document.replace(/#[^\\r\\n]*/g, '');\n  const match = cleaned.match(/(?:query|mutation|subscription)\\s+([A-Za-z_][A-Za-z0-9_]*)/);\n  return match ? match[1] : null;\n}",
+    "testCases": [
+      {
+        "description": "Extracts operation name from a named query",
+        "input": "getOperationName('query GetUserProfile { user { id name } }')",
+        "expected": "'GetUserProfile'"
+      },
+      {
+        "description": "Extracts operation name from a named mutation with variables",
+        "input": "getOperationName('mutation CreateOrder($input: OrderInput!) { createOrder(input: $input) { id } }')",
+        "expected": "'CreateOrder'"
+      },
+      {
+        "description": "Extracts operation name from a named subscription",
+        "input": "getOperationName('subscription OnCommentAdded($repoId: ID!) { commentAdded(repoId: $repoId) { text } }')",
+        "expected": "'OnCommentAdded'"
+      },
+      {
+        "description": "Ignores leading comments and whitespace",
+        "input": "getOperationName('# Fetches user\\n# Author: team-core\\n  query FetchActiveUser { activeUser { id } }')",
+        "expected": "'FetchActiveUser'"
+      },
+      {
+        "description": "Returns null for anonymous shorthand query",
+        "input": "getOperationName('{ viewer { id } }')",
+        "expected": "null"
+      },
+      {
+        "description": "Returns null for anonymous query with keyword",
+        "input": "getOperationName('query { viewer { id } }')",
+        "expected": "null"
+      },
+      {
+        "description": "Returns null for empty or invalid input",
+        "input": "getOperationName('')",
+        "expected": "null"
+      },
+      {
+        "description": "Returns null for non-string input",
+        "input": "getOperationName(123)",
+        "expected": "null"
+      }
+    ],
+    "testHarness": "await $test.run(\"Extracts operation name from a named query\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('query GetUserProfile { user { id name } }'));\n}, () => ('GetUserProfile'));\n\nawait $test.run(\"Extracts operation name from a named mutation with variables\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('mutation CreateOrder($input: OrderInput!) { createOrder(input: $input) { id } }'));\n}, () => ('CreateOrder'));\n\nawait $test.run(\"Extracts operation name from a named subscription\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('subscription OnCommentAdded($repoId: ID!) { commentAdded(repoId: $repoId) { text } }'));\n}, () => ('OnCommentAdded'));\n\nawait $test.run(\"Ignores leading comments and whitespace\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('# Fetches user\\n# Author: team-core\\n  query FetchActiveUser { activeUser { id } }'));\n}, () => ('FetchActiveUser'));\n\nawait $test.run(\"Returns null for anonymous shorthand query\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('{ viewer { id } }'));\n}, () => (null));\n\nawait $test.run(\"Returns null for anonymous query with keyword\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('query { viewer { id } }'));\n}, () => (null));\n\nawait $test.run(\"Returns null for empty or invalid input\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName(''));\n}, () => (null));\n\nawait $test.run(\"Returns null for non-string input\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName(123));\n}, () => (null));"
+  },
+  {
+    "id": "graphql-variable-validator",
+    "track": "graphql",
+    "title": "GraphQL Variables: Required Variable Validator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "variables",
+      "validation",
+      "schema"
+    ],
+    "promptSeed": "Write a variable validation utility for GraphQL operations that checks whether all required variables are supplied:\n\n## Description\n\n```ts\ninterface VariableValidationResult {\n  valid: boolean;\n  missing: string[];\n}\n```\n\n### `validateVariables(variableDefinitions: Record<string, string>, variables?: Record<string, any> | null): VariableValidationResult`\n\n- **Required Variables**:\n  - A variable is required if its type definition ends with `'!'` (e.g. `'ID!'`, `'String!'`, `'[Int]!'`).\n  - Types that do not end with `'!'` (e.g. `'Int'`, `'String'`, `'[ID]'`) are optional.\n- **Missing Check**:\n  - A required variable is considered missing if its key is absent from `variables`, or if its value is strictly `undefined` or `null`.\n  - Falsy values like `0`, `\"\"` (empty string), and `false` are considered valid provided values and must **not** be marked as missing.\n- **Return Value**:\n  - If all required variables are provided, returns `{ valid: true, missing: [] }`.\n  - If any required variables are missing, returns `{ valid: false, missing: [...] }` preserving the declaration order of the missing variables from `variableDefinitions`.\n  - If `variables` is omitted, `null`, or `undefined`, all required variables are returned as `missing`.",
+    "difficulty": 1,
+    "concept": "graphql-variables",
+    "referenceSolution": "function validateVariables(variableDefinitions, variables = {}) {\n  const vars = variables ?? {};\n  const missing = [];\n\n  for (const [name, typeDef] of Object.entries(variableDefinitions || {})) {\n    if (typeof typeDef === 'string' && typeDef.trim().endsWith('!')) {\n      const val = vars[name];\n      if (val === undefined || val === null) {\n        missing.push(name);\n      }\n    }\n  }\n\n  return {\n    valid: missing.length === 0,\n    missing,\n  };\n}",
+    "referenceSolutionTs": "interface VariableValidationResult {\n  valid: boolean;\n  missing: string[];\n}\n\nfunction validateVariables(\n  variableDefinitions: Record<string, string>,\n  variables?: Record<string, any> | null\n): VariableValidationResult {\n  const vars = variables ?? {};\n  const missing: string[] = [];\n\n  for (const [name, typeDef] of Object.entries(variableDefinitions || {})) {\n    if (typeof typeDef === 'string' && typeDef.trim().endsWith('!')) {\n      const val = vars[name];\n      if (val === undefined || val === null) {\n        missing.push(name);\n      }\n    }\n  }\n\n  return {\n    valid: missing.length === 0,\n    missing,\n  };\n}",
+    "testCases": [
+      {
+        "description": "Returns valid when all required variables are supplied",
+        "input": "validateVariables({ id: 'ID!', filter: 'String' }, { id: 'usr_100', filter: 'active' })",
+        "expected": "{ valid: true, missing: [] }"
+      },
+      {
+        "description": "Flags missing required variables in definition order",
+        "input": "validateVariables({ id: 'ID!', role: 'String!', limit: 'Int' }, { limit: 10 })",
+        "expected": "{ valid: false, missing: ['id', 'role'] }"
+      },
+      {
+        "description": "Treats null or undefined values as missing for required fields",
+        "input": "validateVariables({ id: 'ID!', token: 'String!' }, { id: null, token: undefined })",
+        "expected": "{ valid: false, missing: ['id', 'token'] }"
+      },
+      {
+        "description": "Treats falsy values (0, empty string, false) as validly provided",
+        "input": "validateVariables({ count: 'Int!', name: 'String!', active: 'Boolean!' }, { count: 0, name: '', active: false })",
+        "expected": "{ valid: true, missing: [] }"
+      },
+      {
+        "description": "Allows optional variables to be omitted without error",
+        "input": "validateVariables({ offset: 'Int', limit: 'Int' }, {})",
+        "expected": "{ valid: true, missing: [] }"
+      },
+      {
+        "description": "Handles omitted or null variables object by marking all required as missing",
+        "input": "validateVariables({ requiredA: 'String!', optionalB: 'Int' })",
+        "expected": "{ valid: false, missing: ['requiredA'] }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Returns valid when all required variables are supplied\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', filter: 'String' }, { id: 'usr_100', filter: 'active' }));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Flags missing required variables in definition order\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', role: 'String!', limit: 'Int' }, { limit: 10 }));\n}, () => ({ valid: false, missing: ['id', 'role'] }));\n\nawait $test.run(\"Treats null or undefined values as missing for required fields\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', token: 'String!' }, { id: null, token: undefined }));\n}, () => ({ valid: false, missing: ['id', 'token'] }));\n\nawait $test.run(\"Treats falsy values (0, empty string, false) as validly provided\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ count: 'Int!', name: 'String!', active: 'Boolean!' }, { count: 0, name: '', active: false }));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Allows optional variables to be omitted without error\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ offset: 'Int', limit: 'Int' }, {}));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Handles omitted or null variables object by marking all required as missing\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ requiredA: 'String!', optionalB: 'Int' }));\n}, () => ({ valid: false, missing: ['requiredA'] }));"
+  },
+  {
+    "id": "graphql-discriminated-union-resolver",
+    "track": "graphql",
+    "title": "GraphQL Resolvers: Discriminated Union Resolver",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "resolvers",
+      "unions",
+      "schema"
+    ],
+    "promptSeed": "Implement a GraphQL `__resolveType` helper factory for abstract Union and Interface types:\n\n## Description\n\n```ts\ntype PredicateFn = (value: any) => boolean;\n\ninterface TypeResolverMap {\n  [typeName: string]: PredicateFn;\n}\n```\n\n### `createTypeResolver(typeMap: TypeResolverMap): (value: any) => string | null`\n\n- **Factory Pattern**:\n  - Accepts a `typeMap` object where keys are GraphQL type names (e.g. `'User'`, `'Product'`) and values are predicate functions `(value: any) => boolean`.\n  - Returns a resolver function `(value: any) => string | null`.\n- **Resolution Precedence**:\n  1. **Explicit Typename**: If `value` is an object with a string `__typename` property, returns `value.__typename` immediately.\n  2. **Predicate Evaluation**: If no `__typename` is present, tests the predicate functions in `typeMap` in iteration order (`Object.entries(typeMap)`). Returns the first matching `typeName`.\n  3. **Fallback**: If no predicate returns true, or if `value` is falsy / non-object, returns `null`.",
+    "difficulty": 2,
+    "concept": "graphql-resolvers",
+    "referenceSolution": "function createTypeResolver(typeMap) {\n  const entries = Object.entries(typeMap || {});\n\n  return function resolveType(value) {\n    if (!value || typeof value !== 'object') return null;\n\n    if (typeof value.__typename === 'string') {\n      return value.__typename;\n    }\n\n    for (const [typeName, predicate] of entries) {\n      if (typeof predicate === 'function' && predicate(value)) {\n        return typeName;\n      }\n    }\n\n    return null;\n  };\n}",
+    "referenceSolutionTs": "type PredicateFn = (value: any) => boolean;\n\ninterface TypeResolverMap {\n  [typeName: string]: PredicateFn;\n}\n\nfunction createTypeResolver(\n  typeMap: TypeResolverMap\n): (value: any) => string | null {\n  const entries = Object.entries(typeMap || {});\n\n  return function resolveType(value: any): string | null {\n    if (!value || typeof value !== 'object') return null;\n\n    if (typeof value.__typename === 'string') {\n      return value.__typename;\n    }\n\n    for (const [typeName, predicate] of entries) {\n      if (typeof predicate === 'function' && predicate(value)) {\n        return typeName;\n      }\n    }\n\n    return null;\n  };\n}",
+    "testCases": [
+      {
+        "description": "Resolves type using custom predicates when __typename is absent",
+        "input": "const resolve = createTypeResolver({ User: (v) => Boolean(v.email), Product: (v) => Boolean(v.sku) });\n[resolve({ email: 'a@b.com' }), resolve({ sku: 'P-100' })]",
+        "expected": "['User', 'Product']"
+      },
+      {
+        "description": "Short-circuits immediately when explicit __typename is already present",
+        "input": "const resolve = createTypeResolver({ User: () => true });\nresolve({ __typename: 'SpecialOverride', email: 'a@b.com' })",
+        "expected": "'SpecialOverride'"
+      },
+      {
+        "description": "Respects predicate order when evaluating ambiguous inputs",
+        "input": "const resolve = createTypeResolver({ First: () => true, Second: () => true });\nresolve({ test: 1 })",
+        "expected": "'First'"
+      },
+      {
+        "description": "Returns null when no predicate matches or value is non-object",
+        "input": "const resolve = createTypeResolver({ User: (v) => Boolean(v.email) });\n[resolve({ unknown: 1 }), resolve(null), resolve('not an object')]",
+        "expected": "[null, null, null]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Resolves type using custom predicates when __typename is absent\", async () => {\n  const sleep = $test.sleep;\n  const resolve = createTypeResolver({ User: (v) => Boolean(v.email), Product: (v) => Boolean(v.sku) });\n  return ([resolve({ email: 'a@b.com' }), resolve({ sku: 'P-100' })]);\n}, () => (['User', 'Product']));\n\nawait $test.run(\"Short-circuits immediately when explicit __typename is already present\", async () => {\n  const sleep = $test.sleep;\n  const resolve = createTypeResolver({ User: () => true });\n  return (resolve({ __typename: 'SpecialOverride', email: 'a@b.com' }));\n}, () => ('SpecialOverride'));\n\nawait $test.run(\"Respects predicate order when evaluating ambiguous inputs\", async () => {\n  const sleep = $test.sleep;\n  const resolve = createTypeResolver({ First: () => true, Second: () => true });\n  return (resolve({ test: 1 }));\n}, () => ('First'));\n\nawait $test.run(\"Returns null when no predicate matches or value is non-object\", async () => {\n  const sleep = $test.sleep;\n  const resolve = createTypeResolver({ User: (v) => Boolean(v.email) });\n  return ([resolve({ unknown: 1 }), resolve(null), resolve('not an object')]);\n}, () => ([null, null, null]));"
+  },
+  {
+    "id": "graphql-input-object-sanitizer",
+    "track": "graphql",
+    "title": "GraphQL Validation: Input Object Sanitizer",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "validation",
+      "mutation",
+      "input"
+    ],
+    "promptSeed": "Write an input validation and sanitization utility for GraphQL mutation arguments:\n\n## Description\n\n```ts\ntype ScalarType = 'String' | 'Int' | 'Float' | 'Boolean' | 'ID';\n\ninterface InputFieldSchema {\n  type: ScalarType;\n  required?: boolean;\n  enumValues?: string[];\n}\n\ninterface InputSchema {\n  [fieldName: string]: InputFieldSchema;\n}\n\ninterface SanitizedResult<T = any> {\n  valid: boolean;\n  data?: T;\n  errors?: string[];\n}\n```\n\n### `sanitizeInput<T = any>(schema: InputSchema, input: Record<string, any>): SanitizedResult<T>`\n\n- **Unknown Field Stripping**:\n  - Properties present on `input` that are not defined in `schema` must be stripped from the output `data`.\n- **Validation Rules**:\n  - **Required Fields**: If `field.required` is true, the property must be defined and non-null in `input`. If missing, append error: `Field '${name}' is required`.\n  - **Type Checking** (when property is provided and not null):\n    - `'String'`: must be a `string`.\n    - `'Int'`: must be an integer `number` (`typeof val === 'number' && Number.isInteger(val)`).\n    - `'Float'`: must be a finite `number` (`typeof val === 'number' && Number.isFinite(val)`).\n    - `'Boolean'`: must be a `boolean`.\n    - `'ID'`: must be a `string` or `number`.\n    - On mismatch, append error: `Field '${name}' must be of type ${field.type}`.\n  - **Enum Values**:\n    - If `field.enumValues` is an array of strings, the value must be included in `enumValues`.\n    - If invalid, append error: `Field '${name}' must be one of: ${enumValues.join(', ')}`.\n- **Return Value**:\n  - If all checks pass, returns `{ valid: true, data: sanitizedObject }`.\n  - If any errors occur, returns `{ valid: false, errors: [...] }`.",
+    "difficulty": 2,
+    "concept": "graphql-validation",
+    "referenceSolution": "function sanitizeInput(schema, input) {\n  const errors = [];\n  const sanitized = {};\n  const data = input || {};\n\n  for (const [name, field] of Object.entries(schema || {})) {\n    const val = data[name];\n\n    if (val === undefined || val === null) {\n      if (field.required) {\n        errors.push(`Field '${name}' is required`);\n      }\n      continue;\n    }\n\n    let typeValid = true;\n    switch (field.type) {\n      case 'String':\n        typeValid = typeof val === 'string';\n        break;\n      case 'Int':\n        typeValid = typeof val === 'number' && Number.isInteger(val);\n        break;\n      case 'Float':\n        typeValid = typeof val === 'number' && Number.isFinite(val);\n        break;\n      case 'Boolean':\n        typeValid = typeof val === 'boolean';\n        break;\n      case 'ID':\n        typeValid = typeof val === 'string' || typeof val === 'number';\n        break;\n      default:\n        typeValid = true;\n    }\n\n    if (!typeValid) {\n      errors.push(`Field '${name}' must be of type ${field.type}`);\n      continue;\n    }\n\n    if (Array.isArray(field.enumValues) && !field.enumValues.includes(val)) {\n      errors.push(`Field '${name}' must be one of: ${field.enumValues.join(', ')}`);\n      continue;\n    }\n\n    sanitized[name] = val;\n  }\n\n  if (errors.length > 0) {\n    return { valid: false, errors };\n  }\n\n  return { valid: true, data: sanitized };\n}",
+    "referenceSolutionTs": "type ScalarType = 'String' | 'Int' | 'Float' | 'Boolean' | 'ID';\n\ninterface InputFieldSchema {\n  type: ScalarType;\n  required?: boolean;\n  enumValues?: string[];\n}\n\ninterface InputSchema {\n  [fieldName: string]: InputFieldSchema;\n}\n\ninterface SanitizedResult<T = any> {\n  valid: boolean;\n  data?: T;\n  errors?: string[];\n}\n\nfunction sanitizeInput<T = any>(\n  schema: InputSchema,\n  input: Record<string, any>\n): SanitizedResult<T> {\n  const errors: string[] = [];\n  const sanitized: Record<string, any> = {};\n  const data = input || {};\n\n  for (const [name, field] of Object.entries(schema || {})) {\n    const val = data[name];\n\n    if (val === undefined || val === null) {\n      if (field.required) {\n        errors.push(`Field '${name}' is required`);\n      }\n      continue;\n    }\n\n    let typeValid = true;\n    switch (field.type) {\n      case 'String':\n        typeValid = typeof val === 'string';\n        break;\n      case 'Int':\n        typeValid = typeof val === 'number' && Number.isInteger(val);\n        break;\n      case 'Float':\n        typeValid = typeof val === 'number' && Number.isFinite(val);\n        break;\n      case 'Boolean':\n        typeValid = typeof val === 'boolean';\n        break;\n      case 'ID':\n        typeValid = typeof val === 'string' || typeof val === 'number';\n        break;\n      default:\n        typeValid = true;\n    }\n\n    if (!typeValid) {\n      errors.push(`Field '${name}' must be of type ${field.type}`);\n      continue;\n    }\n\n    if (Array.isArray(field.enumValues) && !field.enumValues.includes(val)) {\n      errors.push(`Field '${name}' must be one of: ${field.enumValues.join(', ')}`);\n      continue;\n    }\n\n    sanitized[name] = val;\n  }\n\n  if (errors.length > 0) {\n    return { valid: false, errors };\n  }\n\n  return { valid: true, data: sanitized as T };\n}",
+    "testCases": [
+      {
+        "description": "Sanitizes valid inputs and strips undeclared extra fields",
+        "input": "sanitizeInput({ name: { type: 'String', required: true }, age: { type: 'Int' } }, { name: 'Alice', age: 30, rogueField: 'ignored' })",
+        "expected": "{ valid: true, data: { name: 'Alice', age: 30 } }"
+      },
+      {
+        "description": "Flags missing required fields with error messages preserving definition order",
+        "input": "sanitizeInput({ first: { type: 'String', required: true }, second: { type: 'String', required: true } }, {})",
+        "expected": "{ valid: false, errors: [\"Field 'first' is required\", \"Field 'second' is required\"] }"
+      },
+      {
+        "description": "Validates scalar types: String, Int, Float, Boolean, ID",
+        "input": "sanitizeInput({ intVal: { type: 'Int' }, floatVal: { type: 'Float' }, boolVal: { type: 'Boolean' }, idVal: { type: 'ID' } }, { intVal: 3.14, floatVal: 'not-a-float', boolVal: 'true', idVal: {} })",
+        "expected": "{ valid: false, errors: [\"Field 'intVal' must be of type Int\", \"Field 'floatVal' must be of type Float\", \"Field 'boolVal' must be of type Boolean\", \"Field 'idVal' must be of type ID\"] }"
+      },
+      {
+        "description": "Validates Float rejects non-finite numbers like Infinity",
+        "input": "sanitizeInput({ amount: { type: 'Float' } }, { amount: Infinity })",
+        "expected": "{ valid: false, errors: [\"Field 'amount' must be of type Float\"] }"
+      },
+      {
+        "description": "Enforces enumValues constraints on input fields in declaration order",
+        "input": "sanitizeInput({ r1: { type: 'String', enumValues: ['A'] }, r2: { type: 'String', enumValues: ['B'] } }, { r1: 'X', r2: 'Y' })",
+        "expected": "{ valid: false, errors: [\"Field 'r1' must be one of: A\", \"Field 'r2' must be one of: B\"] }"
+      },
+      {
+        "description": "Allows optional fields to be omitted without generating errors",
+        "input": "sanitizeInput({ title: { type: 'String', required: true }, subtitle: { type: 'String' } }, { title: 'Hello World' })",
+        "expected": "{ valid: true, data: { title: 'Hello World' } }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Sanitizes valid inputs and strips undeclared extra fields\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ name: { type: 'String', required: true }, age: { type: 'Int' } }, { name: 'Alice', age: 30, rogueField: 'ignored' }));\n}, () => ({ valid: true, data: { name: 'Alice', age: 30 } }));\n\nawait $test.run(\"Flags missing required fields with error messages preserving definition order\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ first: { type: 'String', required: true }, second: { type: 'String', required: true } }, {}));\n}, () => ({ valid: false, errors: [\"Field 'first' is required\", \"Field 'second' is required\"] }));\n\nawait $test.run(\"Validates scalar types: String, Int, Float, Boolean, ID\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ intVal: { type: 'Int' }, floatVal: { type: 'Float' }, boolVal: { type: 'Boolean' }, idVal: { type: 'ID' } }, { intVal: 3.14, floatVal: 'not-a-float', boolVal: 'true', idVal: {} }));\n}, () => ({ valid: false, errors: [\"Field 'intVal' must be of type Int\", \"Field 'floatVal' must be of type Float\", \"Field 'boolVal' must be of type Boolean\", \"Field 'idVal' must be of type ID\"] }));\n\nawait $test.run(\"Validates Float rejects non-finite numbers like Infinity\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ amount: { type: 'Float' } }, { amount: Infinity }));\n}, () => ({ valid: false, errors: [\"Field 'amount' must be of type Float\"] }));\n\nawait $test.run(\"Enforces enumValues constraints on input fields in declaration order\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ r1: { type: 'String', enumValues: ['A'] }, r2: { type: 'String', enumValues: ['B'] } }, { r1: 'X', r2: 'Y' }));\n}, () => ({ valid: false, errors: [\"Field 'r1' must be one of: A\", \"Field 'r2' must be one of: B\"] }));\n\nawait $test.run(\"Allows optional fields to be omitted without generating errors\", async () => {\n  const sleep = $test.sleep;\n  return (sanitizeInput({ title: { type: 'String', required: true }, subtitle: { type: 'String' } }, { title: 'Hello World' }));\n}, () => ({ valid: true, data: { title: 'Hello World' } }));"
+  },
+  {
+    "id": "graphql-sdl-type-generator",
+    "track": "graphql",
+    "title": "GraphQL SDL: Type Definition Generator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "codegen"
+    ],
+    "promptSeed": "Write a utility function to generate formatted GraphQL Schema Definition Language (SDL) type definitions from model objects:\n\n## Description\n\n```ts\ninterface FieldDefinition {\n  name: string;\n  type: string;\n  required?: boolean;\n  isArray?: boolean;\n  itemRequired?: boolean;\n}\n\ninterface ModelDefinition {\n  name: string;\n  fields: FieldDefinition[];\n  description?: string;\n}\n```\n\n### `generateTypeDefs(models: ModelDefinition[]): string`\n\n- **Type Declaration**:\n  - Each model generates a GraphQL object type: `type <ModelName> {\\n  <fields>\\n}`.\n  - If `description` is provided, prefixes the type declaration with a docstring `\"\"\"<description>\"\"\"\\n`.\n- **Field Formatting**:\n  - Indented by 2 spaces: `  <fieldName>: <FieldType>`.\n  - **Scalar & Object Types**: `field.type` (e.g. `ID`, `String`, `User`).\n  - **Array Modifier (`isArray`)**:\n    - If `isArray` is true and `itemRequired` is true, items inside the list are non-null: `[Type!]`.\n    - If `isArray` is true and `itemRequired` is falsy: `[Type]`.\n  - **Non-Null Modifier (`required`)**:\n    - If `required` is true, appends `!` to the outer type (e.g. `String!`, `[Type]!`, `[Type!]!`).\n    - If `required` is falsy, the outer type remains nullable (e.g. `String`, `[Type!]`).\n- **Joining Models**:\n  - Multiple models are separated by two newlines (`\\n\\n`).\n  - An empty models array returns an empty string `\"\"`.",
+    "difficulty": 2,
+    "concept": "graphql-sdl",
+    "referenceSolution": "function generateTypeDefs(models) {\n  if (!Array.isArray(models) || models.length === 0) return '';\n\n  return models\n    .map((model) => {\n      const desc = model.description ? `\"\"\"${model.description}\"\"\"\\n` : '';\n      const fields = (model.fields || [])\n        .map((f) => {\n          let t = f.type;\n          if (f.isArray) {\n            t = `[${t}${f.itemRequired ? '!' : ''}]`;\n          }\n          if (f.required) {\n            t = `${t}!`;\n          }\n          return `  ${f.name}: ${t}`;\n        })\n        .join('\\n');\n\n      return `${desc}type ${model.name} {\\n${fields}\\n}`;\n    })\n    .join('\\n\\n');\n}",
+    "referenceSolutionTs": "interface FieldDefinition {\n  name: string;\n  type: string;\n  required?: boolean;\n  isArray?: boolean;\n  itemRequired?: boolean;\n}\n\ninterface ModelDefinition {\n  name: string;\n  fields: FieldDefinition[];\n  description?: string;\n}\n\nfunction generateTypeDefs(models: ModelDefinition[]): string {\n  if (!Array.isArray(models) || models.length === 0) return '';\n\n  return models\n    .map((model) => {\n      const desc = model.description ? `\"\"\"${model.description}\"\"\"\\n` : '';\n      const fields = (model.fields || [])\n        .map((f) => {\n          let t = f.type;\n          if (f.isArray) {\n            t = `[${t}${f.itemRequired ? '!' : ''}]`;\n          }\n          if (f.required) {\n            t = `${t}!`;\n          }\n          return `  ${f.name}: ${t}`;\n        })\n        .join('\\n');\n\n      return `${desc}type ${model.name} {\\n${fields}\\n}`;\n    })\n    .join('\\n\\n');\n}",
+    "testCases": [
+      {
+        "description": "Formats single object type with scalar fields and required markers",
+        "input": "generateTypeDefs([{ name: 'User', fields: [{ name: 'id', type: 'ID', required: true }, { name: 'email', type: 'String', required: true }, { name: 'age', type: 'Int' }] }])",
+        "expected": "\"type User {\\n  id: ID!\\n  email: String!\\n  age: Int\\n}\""
+      },
+      {
+        "description": "Formats list fields with both item and list nullability combinations",
+        "input": "generateTypeDefs([{ name: 'Post', fields: [{ name: 'tags', type: 'String', isArray: true }, { name: 'authors', type: 'User', isArray: true, itemRequired: true }, { name: 'comments', type: 'Comment', isArray: true, itemRequired: true, required: true }] }])",
+        "expected": "\"type Post {\\n  tags: [String]\\n  authors: [User!]\\n  comments: [Comment!]!\\n}\""
+      },
+      {
+        "description": "Prepends docstring description when provided",
+        "input": "generateTypeDefs([{ name: 'Viewer', description: 'Active authenticated session', fields: [{ name: 'id', type: 'ID', required: true }] }])",
+        "expected": "'\"\"\"Active authenticated session\"\"\"\\ntype Viewer {\\n  id: ID!\\n}'"
+      },
+      {
+        "description": "Joins multiple type definitions with double newlines",
+        "input": "generateTypeDefs([{ name: 'A', fields: [{ name: 'id', type: 'ID' }] }, { name: 'B', fields: [{ name: 'id', type: 'ID' }] }])",
+        "expected": "\"type A {\\n  id: ID\\n}\\n\\ntype B {\\n  id: ID\\n}\""
+      },
+      {
+        "description": "Returns empty string for empty models array or non-array input",
+        "input": "generateTypeDefs([])",
+        "expected": "''"
+      },
+      {
+        "description": "Returns empty string when input is null or undefined",
+        "input": "generateTypeDefs(null)",
+        "expected": "''"
+      }
+    ],
+    "testHarness": "await $test.run(\"Formats single object type with scalar fields and required markers\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'User', fields: [{ name: 'id', type: 'ID', required: true }, { name: 'email', type: 'String', required: true }, { name: 'age', type: 'Int' }] }]));\n}, () => (\"type User {\\n  id: ID!\\n  email: String!\\n  age: Int\\n}\"));\n\nawait $test.run(\"Formats list fields with both item and list nullability combinations\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'Post', fields: [{ name: 'tags', type: 'String', isArray: true }, { name: 'authors', type: 'User', isArray: true, itemRequired: true }, { name: 'comments', type: 'Comment', isArray: true, itemRequired: true, required: true }] }]));\n}, () => (\"type Post {\\n  tags: [String]\\n  authors: [User!]\\n  comments: [Comment!]!\\n}\"));\n\nawait $test.run(\"Prepends docstring description when provided\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'Viewer', description: 'Active authenticated session', fields: [{ name: 'id', type: 'ID', required: true }] }]));\n}, () => ('\"\"\"Active authenticated session\"\"\"\\ntype Viewer {\\n  id: ID!\\n}'));\n\nawait $test.run(\"Joins multiple type definitions with double newlines\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([{ name: 'A', fields: [{ name: 'id', type: 'ID' }] }, { name: 'B', fields: [{ name: 'id', type: 'ID' }] }]));\n}, () => (\"type A {\\n  id: ID\\n}\\n\\ntype B {\\n  id: ID\\n}\"));\n\nawait $test.run(\"Returns empty string for empty models array or non-array input\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs([]));\n}, () => (''));\n\nawait $test.run(\"Returns empty string when input is null or undefined\", async () => {\n  const sleep = $test.sleep;\n  return (generateTypeDefs(null));\n}, () => (''));"
+  },
+  {
+    "id": "graphql-context-auth-guard",
+    "track": "graphql",
+    "title": "GraphQL Middleware: Context Auth Guard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "middleware",
+      "auth",
+      "resolvers"
+    ],
+    "promptSeed": "Implement a higher-order resolver guard that enforces authentication and role-based authorization from the GraphQL `context`:\n\n## Description\n\n```ts\ntype GraphQLResolver<TSource = any, TArgs = any, TContext = any, TResult = any> = (\n  parent: TSource,\n  args: TArgs,\n  context: TContext,\n  info: any\n) => TResult;\n\ninterface UserPayload {\n  id: string;\n  roles?: string[];\n}\n\ninterface AuthContext {\n  user?: UserPayload | null;\n  [key: string]: any;\n}\n```\n\n### `withAuth<TSource = any, TArgs = any, TResult = any>(resolver: GraphQLResolver<TSource, TArgs, AuthContext, TResult>, requiredRoles?: string[]): GraphQLResolver<TSource, TArgs, AuthContext, TResult>`\n\n- **Authentication Guard**:\n  - Inspects `context.user`.\n  - If `context.user` is absent or `null`, throws an `Error('UNAUTHENTICATED')`.\n- **Role-Based Authorization (`requiredRoles`)**:\n  - If `requiredRoles` is provided and non-empty, checks whether `context.user.roles` contains at least one of the required roles.\n  - If the user has no matching roles (or `context.user.roles` is undefined/empty), throws an `Error('FORBIDDEN')`.\n  - If `requiredRoles` is omitted or empty, any authenticated user passes.\n- **Resolver Execution**:\n  - When authorized, calls and returns `resolver(parent, args, context, info)`.\n  - Seamlessly handles both synchronous return values and asynchronous promises.",
+    "difficulty": 3,
+    "concept": "graphql-middleware",
+    "referenceSolution": "function withAuth(resolver, requiredRoles = []) {\n  return function authenticatedResolver(parent, args, context, info) {\n    const user = context?.user;\n    if (!user) {\n      throw new Error('UNAUTHENTICATED');\n    }\n\n    if (Array.isArray(requiredRoles) && requiredRoles.length > 0) {\n      const userRoles = Array.isArray(user.roles) ? user.roles : [];\n      const hasRole = requiredRoles.some((role) => userRoles.includes(role));\n      if (!hasRole) {\n        throw new Error('FORBIDDEN');\n      }\n    }\n\n    return resolver(parent, args, context, info);\n  };\n}",
+    "referenceSolutionTs": "type GraphQLResolver<TSource = any, TArgs = any, TContext = any, TResult = any> = (\n  parent: TSource,\n  args: TArgs,\n  context: TContext,\n  info: any\n) => TResult;\n\ninterface UserPayload {\n  id: string;\n  roles?: string[];\n}\n\ninterface AuthContext {\n  user?: UserPayload | null;\n  [key: string]: any;\n}\n\nfunction withAuth<TSource = any, TArgs = any, TResult = any>(\n  resolver: GraphQLResolver<TSource, TArgs, AuthContext, TResult>,\n  requiredRoles: string[] = []\n): GraphQLResolver<TSource, TArgs, AuthContext, TResult> {\n  return function authenticatedResolver(parent: TSource, args: TArgs, context: AuthContext, info: any): TResult {\n    const user = context?.user;\n    if (!user) {\n      throw new Error('UNAUTHENTICATED');\n    }\n\n    if (Array.isArray(requiredRoles) && requiredRoles.length > 0) {\n      const userRoles = Array.isArray(user.roles) ? user.roles : [];\n      const hasRole = requiredRoles.some((role) => userRoles.includes(role));\n      if (!hasRole) {\n        throw new Error('FORBIDDEN');\n      }\n    }\n\n    return resolver(parent, args, context, info);\n  };\n}",
+    "testCases": [
+      {
+        "description": "Allows authenticated user without role restriction and passes resolver arguments through",
+        "input": "const guard = withAuth((p, a, c, i) => ({ p, a, userId: c.user.id, i }));\nguard('parentVal', { key: 'val' }, { user: { id: 'u1' } }, 'infoVal')",
+        "expected": "{ p: 'parentVal', a: { key: 'val' }, userId: 'u1', i: 'infoVal' }"
+      },
+      {
+        "description": "Throws UNAUTHENTICATED when context.user is missing or null",
+        "input": "const guard = withAuth(() => 'ok');\nconst err1 = (() => { try { guard(null, {}, {}); return 'no error'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { guard(null, {}, { user: null }); return 'no error'; } catch (e) { return e.message; } })();\n[err1, err2]",
+        "expected": "['UNAUTHENTICATED', 'UNAUTHENTICATED']"
+      },
+      {
+        "description": "Allows access when user possesses at least one required role",
+        "input": "const guard = withAuth(() => 'authorized', ['admin', 'editor']);\nguard(null, {}, { user: { id: 'u1', roles: ['user', 'editor'] } })",
+        "expected": "'authorized'"
+      },
+      {
+        "description": "Throws FORBIDDEN when user lacks any required role or has empty roles",
+        "input": "const guard = withAuth(() => 'authorized', ['admin', 'superadmin']);\nconst err1 = (() => { try { guard(null, {}, { user: { id: 'u1', roles: ['guest'] } }); return 'no error'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { guard(null, {}, { user: { id: 'u2', roles: [] } }); return 'no error'; } catch (e) { return e.message; } })();\nconst err3 = (() => { try { guard(null, {}, { user: { id: 'u3' } }); return 'no error'; } catch (e) { return e.message; } })();\n[err1, err2, err3]",
+        "expected": "['FORBIDDEN', 'FORBIDDEN', 'FORBIDDEN']"
+      },
+      {
+        "description": "Supports asynchronous resolvers returning a promise",
+        "input": "const guard = withAuth(async (p, a) => a.count * 2);\nawait guard(null, { count: 21 }, { user: { id: 'u1' } })",
+        "expected": "42"
+      }
+    ],
+    "testHarness": "await $test.run(\"Allows authenticated user without role restriction and passes resolver arguments through\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth((p, a, c, i) => ({ p, a, userId: c.user.id, i }));\n  return (guard('parentVal', { key: 'val' }, { user: { id: 'u1' } }, 'infoVal'));\n}, () => ({ p: 'parentVal', a: { key: 'val' }, userId: 'u1', i: 'infoVal' }));\n\nawait $test.run(\"Throws UNAUTHENTICATED when context.user is missing or null\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth(() => 'ok');\n  const err1 = (() => { try { guard(null, {}, {}); return 'no error'; } catch (e) { return e.message; } })();\n  const err2 = (() => { try { guard(null, {}, { user: null }); return 'no error'; } catch (e) { return e.message; } })();\n  return ([err1, err2]);\n}, () => (['UNAUTHENTICATED', 'UNAUTHENTICATED']));\n\nawait $test.run(\"Allows access when user possesses at least one required role\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth(() => 'authorized', ['admin', 'editor']);\n  return (guard(null, {}, { user: { id: 'u1', roles: ['user', 'editor'] } }));\n}, () => ('authorized'));\n\nawait $test.run(\"Throws FORBIDDEN when user lacks any required role or has empty roles\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth(() => 'authorized', ['admin', 'superadmin']);\n  const err1 = (() => { try { guard(null, {}, { user: { id: 'u1', roles: ['guest'] } }); return 'no error'; } catch (e) { return e.message; } })();\n  const err2 = (() => { try { guard(null, {}, { user: { id: 'u2', roles: [] } }); return 'no error'; } catch (e) { return e.message; } })();\n  const err3 = (() => { try { guard(null, {}, { user: { id: 'u3' } }); return 'no error'; } catch (e) { return e.message; } })();\n  return ([err1, err2, err3]);\n}, () => (['FORBIDDEN', 'FORBIDDEN', 'FORBIDDEN']));\n\nawait $test.run(\"Supports asynchronous resolvers returning a promise\", async () => {\n  const sleep = $test.sleep;\n  const guard = withAuth(async (p, a) => a.count * 2);\n  return (await guard(null, { count: 21 }, { user: { id: 'u1' } }));\n}, () => (42));"
+  },
+  {
+    "id": "graphql-format-error-masking",
+    "track": "graphql",
+    "title": "GraphQL Errors: Error Masking and Formatting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "errors",
+      "security",
+      "sanitization"
+    ],
+    "promptSeed": "Implement a GraphQL `formatError` sanitization hook that masks internal server errors in production:\n\n## Description\n\n```ts\ninterface GraphQLErrorLike {\n  message: string;\n  locations?: Array<{ line: number; column: number }>;\n  path?: Array<string | number>;\n  extensions?: {\n    code?: string;\n    [key: string]: any;\n  };\n}\n\ninterface FormattedError {\n  message: string;\n  locations?: Array<{ line: number; column: number }>;\n  path?: Array<string | number>;\n  extensions: {\n    code: string;\n    [key: string]: any;\n  };\n}\n```\n\n### `maskAndFormatError(error: GraphQLErrorLike, isProduction = true): FormattedError`\n\n- **Known Client Errors**:\n  - The following error codes are safe client-facing errors:\n    `'BAD_USER_INPUT'`, `'UNAUTHENTICATED'`, `'FORBIDDEN'`, `'GRAPHQL_VALIDATION_FAILED'`.\n  - When `error.extensions?.code` is one of these known codes:\n    - Retains original `error.message`.\n    - Preserves `locations` and `path` if present.\n    - Copies extensions, ensuring `extensions.code` is set.\n- **Internal / Unknown Errors in Production (`isProduction === true`)**:\n  - If `error.extensions?.code` is `'INTERNAL_SERVER_ERROR'`, `'DATABASE_ERROR'`, missing, or unlisted:\n    - Replaces `message` with `'Internal server error'`.\n    - Sets `extensions.code` to `'INTERNAL_SERVER_ERROR'`.\n    - Preserves `locations` and `path` if present.\n    - Strips all other extensions (e.g. `stacktrace`, `exception`, `details`) to prevent information leakage.\n- **Development Mode (`isProduction === false`)**:\n  - Does **not** mask the error message.\n  - Keeps all original extensions intact, defaulting `extensions.code` to `'INTERNAL_SERVER_ERROR'` if not provided.",
+    "difficulty": 3,
+    "concept": "graphql-errors",
+    "referenceSolution": "const SAFE_CODES = new Set([\n  'BAD_USER_INPUT',\n  'UNAUTHENTICATED',\n  'FORBIDDEN',\n  'GRAPHQL_VALIDATION_FAILED',\n]);\n\nfunction maskAndFormatError(error, isProduction = true) {\n  const code = error?.extensions?.code || 'INTERNAL_SERVER_ERROR';\n  const isSafe = SAFE_CODES.has(code);\n\n  if (isProduction && !isSafe) {\n    const formatted = {\n      message: 'Internal server error',\n      extensions: { code: 'INTERNAL_SERVER_ERROR' },\n    };\n    if (error?.locations) {\n      formatted.locations = error.locations;\n    }\n    if (error?.path) {\n      formatted.path = error.path;\n    }\n    return formatted;\n  }\n\n  const formatted = {\n    message: error?.message,\n    extensions: {\n      ...(error?.extensions || {}),\n      code,\n    },\n  };\n  if (error?.locations) {\n    formatted.locations = error.locations;\n  }\n  if (error?.path) {\n    formatted.path = error.path;\n  }\n  return formatted;\n}",
+    "referenceSolutionTs": "interface GraphQLErrorLike {\n  message: string;\n  locations?: Array<{ line: number; column: number }>;\n  path?: Array<string | number>;\n  extensions?: {\n    code?: string;\n    [key: string]: any;\n  };\n}\n\ninterface FormattedError {\n  message: string;\n  locations?: Array<{ line: number; column: number }>;\n  path?: Array<string | number>;\n  extensions: {\n    code: string;\n    [key: string]: any;\n  };\n}\n\nconst SAFE_CODES = new Set<string>([\n  'BAD_USER_INPUT',\n  'UNAUTHENTICATED',\n  'FORBIDDEN',\n  'GRAPHQL_VALIDATION_FAILED',\n]);\n\nfunction maskAndFormatError(\n  error: GraphQLErrorLike,\n  isProduction = true\n): FormattedError {\n  const code = error?.extensions?.code || 'INTERNAL_SERVER_ERROR';\n  const isSafe = SAFE_CODES.has(code);\n\n  if (isProduction && !isSafe) {\n    const formatted: FormattedError = {\n      message: 'Internal server error',\n      extensions: { code: 'INTERNAL_SERVER_ERROR' },\n    };\n    if (error?.locations) {\n      formatted.locations = error.locations;\n    }\n    if (error?.path) {\n      formatted.path = error.path;\n    }\n    return formatted;\n  }\n\n  const formatted: FormattedError = {\n    message: error?.message,\n    extensions: {\n      ...(error?.extensions || {}),\n      code,\n    },\n  };\n  if (error?.locations) {\n    formatted.locations = error.locations;\n  }\n  if (error?.path) {\n    formatted.path = error.path;\n  }\n  return formatted;\n}",
+    "testCases": [
+      {
+        "description": "Preserves message and extensions for all safe client error codes in production",
+        "input": "['BAD_USER_INPUT', 'UNAUTHENTICATED', 'FORBIDDEN', 'GRAPHQL_VALIDATION_FAILED'].map(code => maskAndFormatError({ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code, custom: 123 } }, true))",
+        "expected": "[{ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'BAD_USER_INPUT', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'UNAUTHENTICATED', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'FORBIDDEN', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'GRAPHQL_VALIDATION_FAILED', custom: 123 } }]"
+      },
+      {
+        "description": "Masks internal server error and strips sensitive extensions in production by default",
+        "input": "maskAndFormatError({ message: 'connection refused to pg://secret:5432', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR', stacktrace: ['line 1', 'line 2'], secret: 'pwd' } })",
+        "expected": "{ message: 'Internal server error', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+      },
+      {
+        "description": "Masks unlisted / database error codes in production",
+        "input": "maskAndFormatError({ message: 'Deadlock found when trying to get lock', extensions: { code: 'DATABASE_DEADLOCK', table: 'users' } }, true)",
+        "expected": "{ message: 'Internal server error', extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+      },
+      {
+        "description": "Preserves message and full extensions when isProduction is false",
+        "input": "maskAndFormatError({ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }, false)",
+        "expected": "{ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }"
+      },
+      {
+        "description": "Defaults extensions.code to INTERNAL_SERVER_ERROR when omitted in dev mode",
+        "input": "maskAndFormatError({ message: 'Uncaught TypeError' }, false)",
+        "expected": "{ message: 'Uncaught TypeError', extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Preserves message and extensions for all safe client error codes in production\", async () => {\n  const sleep = $test.sleep;\n  return (['BAD_USER_INPUT', 'UNAUTHENTICATED', 'FORBIDDEN', 'GRAPHQL_VALIDATION_FAILED'].map(code => maskAndFormatError({ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code, custom: 123 } }, true)));\n}, () => ([{ message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'BAD_USER_INPUT', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'UNAUTHENTICATED', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'FORBIDDEN', custom: 123 } }, { message: 'safe message', locations: [{ line: 1, column: 2 }], path: ['field'], extensions: { code: 'GRAPHQL_VALIDATION_FAILED', custom: 123 } }]));\n\nawait $test.run(\"Masks internal server error and strips sensitive extensions in production by default\", async () => {\n  const sleep = $test.sleep;\n  return (maskAndFormatError({ message: 'connection refused to pg://secret:5432', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR', stacktrace: ['line 1', 'line 2'], secret: 'pwd' } }));\n}, () => ({ message: 'Internal server error', locations: [{ line: 10, column: 1 }], path: ['user'], extensions: { code: 'INTERNAL_SERVER_ERROR' } }));\n\nawait $test.run(\"Masks unlisted / database error codes in production\", async () => {\n  const sleep = $test.sleep;\n  return (maskAndFormatError({ message: 'Deadlock found when trying to get lock', extensions: { code: 'DATABASE_DEADLOCK', table: 'users' } }, true));\n}, () => ({ message: 'Internal server error', extensions: { code: 'INTERNAL_SERVER_ERROR' } }));\n\nawait $test.run(\"Preserves message and full extensions when isProduction is false\", async () => {\n  const sleep = $test.sleep;\n  return (maskAndFormatError({ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }, false));\n}, () => ({ message: 'syntax error in SQL query', extensions: { code: 'SQL_SYNTAX_ERROR', sql: 'SELECT * FROM secrets' } }));\n\nawait $test.run(\"Defaults extensions.code to INTERNAL_SERVER_ERROR when omitted in dev mode\", async () => {\n  const sleep = $test.sleep;\n  return (maskAndFormatError({ message: 'Uncaught TypeError' }, false));\n}, () => ({ message: 'Uncaught TypeError', extensions: { code: 'INTERNAL_SERVER_ERROR' } }));"
+  },
+  {
+    "id": "graphql-nested-field-resolvers",
+    "track": "graphql",
+    "title": "GraphQL Resolvers: Nested Relational Field Resolvers",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "resolvers",
+      "relational",
+      "schema"
+    ],
+    "promptSeed": "Implement the resolver map for a relational GraphQL schema connecting `Author` and `Book` entities:\n\n## Description\n\n```ts\ninterface AuthorRecord {\n  id: string;\n  name: string;\n}\n\ninterface BookRecord {\n  id: string;\n  title: string;\n  authorId: string;\n}\n\ninterface LibraryContext {\n  db: {\n    getAuthors(): AuthorRecord[];\n    getAuthorById(id: string): AuthorRecord | null;\n    getBooks(): BookRecord[];\n    getBooksByAuthorId(authorId: string): BookRecord[];\n  };\n}\n\ninterface LibraryResolvers {\n  Query: {\n    authors(_parent: any, _args: any, context: LibraryContext): AuthorRecord[];\n    books(_parent: any, _args: any, context: LibraryContext): BookRecord[];\n    author(_parent: any, args: { id: string }, context: LibraryContext): AuthorRecord | null;\n  };\n  Author: {\n    books(parent: AuthorRecord, _args: any, context: LibraryContext): BookRecord[];\n  };\n  Book: {\n    author(parent: BookRecord, _args: any, context: LibraryContext): AuthorRecord | null;\n  };\n}\n```\n\n### `createLibraryResolvers(): LibraryResolvers`\n\n- **Resolver Signatures**:\n  Every GraphQL field resolver follows the canonical 4-argument signature `(parent, args, context, info)`.\n- **Top-Level `Query` Resolvers**:\n  - `Query.authors(_parent, _args, context)`: Returns all authors by calling `context.db.getAuthors()`.\n  - `Query.books(_parent, _args, context)`: Returns all books by calling `context.db.getBooks()`.\n  - `Query.author(_parent, args, context)`: Looks up a single author by calling `context.db.getAuthorById(args.id)`.\n- **Nested Type Resolvers**:\n  - `Author.books(parent, _args, context)`: Uses `parent.id` to fetch the author's books via `context.db.getBooksByAuthorId(parent.id)`.\n  - `Book.author(parent, _args, context)`: Uses `parent.authorId` to resolve the author via `context.db.getAuthorById(parent.authorId)`.",
+    "difficulty": 3,
+    "concept": "graphql-resolvers",
+    "referenceSolution": "function createLibraryResolvers() {\n  return {\n    Query: {\n      authors(_parent, _args, context) {\n        return context.db.getAuthors();\n      },\n      books(_parent, _args, context) {\n        return context.db.getBooks();\n      },\n      author(_parent, args, context) {\n        return context.db.getAuthorById(args.id);\n      },\n    },\n    Author: {\n      books(parent, _args, context) {\n        return context.db.getBooksByAuthorId(parent.id);\n      },\n    },\n    Book: {\n      author(parent, _args, context) {\n        return context.db.getAuthorById(parent.authorId);\n      },\n    },\n  };\n}",
+    "referenceSolutionTs": "interface AuthorRecord {\n  id: string;\n  name: string;\n}\n\ninterface BookRecord {\n  id: string;\n  title: string;\n  authorId: string;\n}\n\ninterface LibraryContext {\n  db: {\n    getAuthors(): AuthorRecord[];\n    getAuthorById(id: string): AuthorRecord | null;\n    getBooks(): BookRecord[];\n    getBooksByAuthorId(authorId: string): BookRecord[];\n  };\n}\n\ninterface LibraryResolvers {\n  Query: {\n    authors(_parent: any, _args: any, context: LibraryContext): AuthorRecord[];\n    books(_parent: any, _args: any, context: LibraryContext): BookRecord[];\n    author(_parent: any, args: { id: string }, context: LibraryContext): AuthorRecord | null;\n  };\n  Author: {\n    books(parent: AuthorRecord, _args: any, context: LibraryContext): BookRecord[];\n  };\n  Book: {\n    author(parent: BookRecord, _args: any, context: LibraryContext): AuthorRecord | null;\n  };\n}\n\nfunction createLibraryResolvers(): LibraryResolvers {\n  return {\n    Query: {\n      authors(_parent, _args, context) {\n        return context.db.getAuthors();\n      },\n      books(_parent, _args, context) {\n        return context.db.getBooks();\n      },\n      author(_parent, args, context) {\n        return context.db.getAuthorById(args.id);\n      },\n    },\n    Author: {\n      books(parent, _args, context) {\n        return context.db.getBooksByAuthorId(parent.id);\n      },\n    },\n    Book: {\n      author(parent, _args, context) {\n        return context.db.getAuthorById(parent.authorId);\n      },\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "Query.authors and Query.books call db.getAuthors and db.getBooks",
+        "input": "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthors: () => [{ id: '1', name: 'Alice' }], getBooks: () => [{ id: 'b1', title: 'Book 1', authorId: '1' }] } };\n[res.Query.authors(null, {}, ctx), res.Query.books(null, {}, ctx)]",
+        "expected": "[[{ id: '1', name: 'Alice' }], [{ id: 'b1', title: 'Book 1', authorId: '1' }]]"
+      },
+      {
+        "description": "Query.author passes args.id to db.getAuthorById",
+        "input": "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthorById: (id) => id === '42' ? { id: '42', name: 'Douglas' } : null } };\n[res.Query.author(null, { id: '42' }, ctx), res.Query.author(null, { id: '99' }, ctx)]",
+        "expected": "[{ id: '42', name: 'Douglas' }, null]"
+      },
+      {
+        "description": "Author.books passes parent.id to db.getBooksByAuthorId",
+        "input": "const res = createLibraryResolvers();\nconst ctx = { db: { getBooksByAuthorId: (id) => [{ id: 'b_' + id, authorId: id }] } };\nres.Author.books({ id: 'auth_7', name: 'Seven' }, {}, ctx)",
+        "expected": "[{ id: 'b_auth_7', authorId: 'auth_7' }]"
+      },
+      {
+        "description": "Book.author passes parent.authorId to db.getAuthorById",
+        "input": "const res = createLibraryResolvers();\nconst ctx = { db: { getAuthorById: (id) => ({ id, name: 'Author of ' + id }) } };\nres.Book.author({ id: 'b1', title: 'Book 1', authorId: 'auth_99' }, {}, ctx)",
+        "expected": "{ id: 'auth_99', name: 'Author of auth_99' }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Query.authors and Query.books call db.getAuthors and db.getBooks\", async () => {\n  const sleep = $test.sleep;\n  const res = createLibraryResolvers();\n  const ctx = { db: { getAuthors: () => [{ id: '1', name: 'Alice' }], getBooks: () => [{ id: 'b1', title: 'Book 1', authorId: '1' }] } };\n  return ([res.Query.authors(null, {}, ctx), res.Query.books(null, {}, ctx)]);\n}, () => ([[{ id: '1', name: 'Alice' }], [{ id: 'b1', title: 'Book 1', authorId: '1' }]]));\n\nawait $test.run(\"Query.author passes args.id to db.getAuthorById\", async () => {\n  const sleep = $test.sleep;\n  const res = createLibraryResolvers();\n  const ctx = { db: { getAuthorById: (id) => id === '42' ? { id: '42', name: 'Douglas' } : null } };\n  return ([res.Query.author(null, { id: '42' }, ctx), res.Query.author(null, { id: '99' }, ctx)]);\n}, () => ([{ id: '42', name: 'Douglas' }, null]));\n\nawait $test.run(\"Author.books passes parent.id to db.getBooksByAuthorId\", async () => {\n  const sleep = $test.sleep;\n  const res = createLibraryResolvers();\n  const ctx = { db: { getBooksByAuthorId: (id) => [{ id: 'b_' + id, authorId: id }] } };\n  return (res.Author.books({ id: 'auth_7', name: 'Seven' }, {}, ctx));\n}, () => ([{ id: 'b_auth_7', authorId: 'auth_7' }]));\n\nawait $test.run(\"Book.author passes parent.authorId to db.getAuthorById\", async () => {\n  const sleep = $test.sleep;\n  const res = createLibraryResolvers();\n  const ctx = { db: { getAuthorById: (id) => ({ id, name: 'Author of ' + id }) } };\n  return (res.Book.author({ id: 'b1', title: 'Book 1', authorId: 'auth_99' }, {}, ctx));\n}, () => ({ id: 'auth_99', name: 'Author of auth_99' }));"
+  },
+  {
+    "id": "graphql-cursor-pagination-extractor",
+    "track": "graphql",
+    "title": "GraphQL Cursor Pagination Argument Parser",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "cursor",
+      "validation",
+      "api-design"
+    ],
+    "promptSeed": "Implement a GraphQL cursor pagination argument parser adhering to the Relay Cursor Connections Specification:\n\n## Description\n\n```ts\ninterface PaginationArgs {\n  first?: number;\n  after?: string;\n  last?: number;\n  before?: string;\n}\n\ninterface PaginationOptions {\n  defaultLimit?: number;\n  maxLimit?: number;\n}\n\ninterface ParsedPagination {\n  isForward: boolean;\n  limit: number;\n  cursor?: string;\n}\n```\n\n### `parsePaginationArgs(args?: PaginationArgs, options?: PaginationOptions): ParsedPagination`\n\n- **Relay Specification Invariants**:\n  - Cannot mix forward and backward pagination slicing.\n  - If both `first` and `last` are defined, throw `new Error('Cannot combine first and last')`.\n  - If both `first` and `before` are defined, throw `new Error('Cannot combine first and before')`.\n  - If both `last` and `after` are defined, throw `new Error('Cannot combine last and after')`.\n  - If both `after` and `before` are defined, throw `new Error('Cannot combine after and before')`.\n- **Bounds Checking**:\n  - `first` must be non-negative (`first >= 0`). If negative, throw `new Error('first must be non-negative')`.\n  - `last` must be non-negative (`last >= 0`). If negative, throw `new Error('last must be non-negative')`.\n- **Limits and Clamping**:\n  - `defaultLimit` defaults to `20`.\n  - `maxLimit` defaults to `50`.\n  - The requested limit is clamped to at most `maxLimit`: `Math.min(requested, maxLimit)`.\n- **Direction Determination**:\n  - If `first` or `after` is present (and no backward args), returns `isForward: true`.\n  - If `last` or `before` is present (and no forward args), returns `isForward: false`.\n  - If neither `first` nor `last` is supplied:\n    - If `before` is provided: `isForward: false`, `limit: defaultLimit`, `cursor: args.before`.\n    - If `after` is provided: `isForward: true`, `limit: defaultLimit`, `cursor: args.after`.\n    - If no args are supplied: `isForward: true`, `limit: defaultLimit`, `cursor: undefined`.\n  - When `cursor` is present and non-empty, include `cursor` in the returned object.",
+    "difficulty": 4,
+    "concept": "graphql-pagination",
+    "referenceSolution": "function parsePaginationArgs(args = {}, options = {}) {\n  const { first, after, last, before } = args || {};\n  const defaultLimit = typeof options.defaultLimit === 'number' ? options.defaultLimit : 20;\n  const maxLimit = typeof options.maxLimit === 'number' ? options.maxLimit : 50;\n\n  if (first !== undefined && last !== undefined) {\n    throw new Error('Cannot combine first and last');\n  }\n  if (first !== undefined && before !== undefined) {\n    throw new Error('Cannot combine first and before');\n  }\n  if (last !== undefined && after !== undefined) {\n    throw new Error('Cannot combine last and after');\n  }\n  if (after !== undefined && before !== undefined) {\n    throw new Error('Cannot combine after and before');\n  }\n\n  if (typeof first === 'number' && first < 0) {\n    throw new Error('first must be non-negative');\n  }\n  if (typeof last === 'number' && last < 0) {\n    throw new Error('last must be non-negative');\n  }\n\n  let isForward = true;\n  let limit = defaultLimit;\n  let cursor;\n\n  if (first !== undefined) {\n    isForward = true;\n    limit = Math.min(first, maxLimit);\n    cursor = after;\n  } else if (last !== undefined) {\n    isForward = false;\n    limit = Math.min(last, maxLimit);\n    cursor = before;\n  } else if (before !== undefined) {\n    isForward = false;\n    limit = defaultLimit;\n    cursor = before;\n  } else if (after !== undefined) {\n    isForward = true;\n    limit = defaultLimit;\n    cursor = after;\n  }\n\n  const result = { isForward, limit };\n  if (cursor !== undefined && cursor !== '') {\n    result.cursor = cursor;\n  }\n  return result;\n}",
+    "referenceSolutionTs": "interface PaginationArgs {\n  first?: number;\n  after?: string;\n  last?: number;\n  before?: string;\n}\n\ninterface PaginationOptions {\n  defaultLimit?: number;\n  maxLimit?: number;\n}\n\ninterface ParsedPagination {\n  isForward: boolean;\n  limit: number;\n  cursor?: string;\n}\n\nfunction parsePaginationArgs(\n  args: PaginationArgs = {},\n  options: PaginationOptions = {}\n): ParsedPagination {\n  const { first, after, last, before } = args || {};\n  const defaultLimit = typeof options.defaultLimit === 'number' ? options.defaultLimit : 20;\n  const maxLimit = typeof options.maxLimit === 'number' ? options.maxLimit : 50;\n\n  if (first !== undefined && last !== undefined) {\n    throw new Error('Cannot combine first and last');\n  }\n  if (first !== undefined && before !== undefined) {\n    throw new Error('Cannot combine first and before');\n  }\n  if (last !== undefined && after !== undefined) {\n    throw new Error('Cannot combine last and after');\n  }\n  if (after !== undefined && before !== undefined) {\n    throw new Error('Cannot combine after and before');\n  }\n\n  if (typeof first === 'number' && first < 0) {\n    throw new Error('first must be non-negative');\n  }\n  if (typeof last === 'number' && last < 0) {\n    throw new Error('last must be non-negative');\n  }\n\n  let isForward = true;\n  let limit = defaultLimit;\n  let cursor: string | undefined;\n\n  if (first !== undefined) {\n    isForward = true;\n    limit = Math.min(first, maxLimit);\n    cursor = after;\n  } else if (last !== undefined) {\n    isForward = false;\n    limit = Math.min(last, maxLimit);\n    cursor = before;\n  } else if (before !== undefined) {\n    isForward = false;\n    limit = defaultLimit;\n    cursor = before;\n  } else if (after !== undefined) {\n    isForward = true;\n    limit = defaultLimit;\n    cursor = after;\n  }\n\n  const result: ParsedPagination = { isForward, limit };\n  if (cursor !== undefined && cursor !== '') {\n    result.cursor = cursor;\n  }\n  return result;\n}",
+    "testCases": [
+      {
+        "description": "Parses valid forward pagination arguments and clamps to maxLimit",
+        "input": "parsePaginationArgs({ first: 25, after: 'cursor_123' }, { maxLimit: 20 })",
+        "expected": "{ isForward: true, limit: 20, cursor: 'cursor_123' }"
+      },
+      {
+        "description": "Parses backward pagination arguments with default limit",
+        "input": "parsePaginationArgs({ last: 10, before: 'cursor_999' })",
+        "expected": "{ isForward: false, limit: 10, cursor: 'cursor_999' }"
+      },
+      {
+        "description": "Defaults to forward pagination with defaultLimit when no arguments given",
+        "input": "parsePaginationArgs({}, { defaultLimit: 15 })",
+        "expected": "{ isForward: true, limit: 15 }"
+      },
+      {
+        "description": "Throws error when combining forward and backward slicing",
+        "input": "const err1 = (() => { try { parsePaginationArgs({ first: 10, last: 5 }); return 'ok'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { parsePaginationArgs({ first: 10, before: 'abc' }); return 'ok'; } catch (e) { return e.message; } })();\nconst err3 = (() => { try { parsePaginationArgs({ after: 'a', before: 'b' }); return 'ok'; } catch (e) { return e.message; } })();\n[err1, err2, err3]",
+        "expected": "['Cannot combine first and last', 'Cannot combine first and before', 'Cannot combine after and before']"
+      },
+      {
+        "description": "Throws error when first or last is negative",
+        "input": "const err1 = (() => { try { parsePaginationArgs({ first: -1 }); return 'ok'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { parsePaginationArgs({ last: -5 }); return 'ok'; } catch (e) { return e.message; } })();\n[err1, err2]",
+        "expected": "['first must be non-negative', 'last must be non-negative']"
+      }
+    ],
+    "testHarness": "await $test.run(\"Parses valid forward pagination arguments and clamps to maxLimit\", async () => {\n  const sleep = $test.sleep;\n  return (parsePaginationArgs({ first: 25, after: 'cursor_123' }, { maxLimit: 20 }));\n}, () => ({ isForward: true, limit: 20, cursor: 'cursor_123' }));\n\nawait $test.run(\"Parses backward pagination arguments with default limit\", async () => {\n  const sleep = $test.sleep;\n  return (parsePaginationArgs({ last: 10, before: 'cursor_999' }));\n}, () => ({ isForward: false, limit: 10, cursor: 'cursor_999' }));\n\nawait $test.run(\"Defaults to forward pagination with defaultLimit when no arguments given\", async () => {\n  const sleep = $test.sleep;\n  return (parsePaginationArgs({}, { defaultLimit: 15 }));\n}, () => ({ isForward: true, limit: 15 }));\n\nawait $test.run(\"Throws error when combining forward and backward slicing\", async () => {\n  const sleep = $test.sleep;\n  const err1 = (() => { try { parsePaginationArgs({ first: 10, last: 5 }); return 'ok'; } catch (e) { return e.message; } })();\n  const err2 = (() => { try { parsePaginationArgs({ first: 10, before: 'abc' }); return 'ok'; } catch (e) { return e.message; } })();\n  const err3 = (() => { try { parsePaginationArgs({ after: 'a', before: 'b' }); return 'ok'; } catch (e) { return e.message; } })();\n  return ([err1, err2, err3]);\n}, () => (['Cannot combine first and last', 'Cannot combine first and before', 'Cannot combine after and before']));\n\nawait $test.run(\"Throws error when first or last is negative\", async () => {\n  const sleep = $test.sleep;\n  const err1 = (() => { try { parsePaginationArgs({ first: -1 }); return 'ok'; } catch (e) { return e.message; } })();\n  const err2 = (() => { try { parsePaginationArgs({ last: -5 }); return 'ok'; } catch (e) { return e.message; } })();\n  return ([err1, err2]);\n}, () => (['first must be non-negative', 'last must be non-negative']));"
+  },
+  {
+    "id": "graphql-dataloader-batching",
+    "track": "graphql",
+    "title": "GraphQL DataLoader: Microtask Request Batching",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "performance",
+      "n-plus-one",
+      "dataloader",
+      "promises",
+      "microtasks"
+    ],
+    "promptSeed": "Implement a lightweight `DataLoader` class that batches concurrent key requests within a single event-loop microtask to eliminate N+1 query waterfalls:\n\n## Description\n\n```ts\ntype BatchFunction<K, V> = (keys: readonly K[]) => Promise<Array<V | Error>>;\n\ninterface IDataLoader<K, V> {\n  load(key: K): Promise<V>;\n  loadMany(keys: K[]): Promise<Array<V | Error>>;\n  clear(key: K): this;\n  clearAll(): this;\n}\n```\n\n### `class DataLoader<K, V> implements IDataLoader<K, V>`\n\n#### Constructor\n- `new DataLoader(batchFn: BatchFunction<K, V>)`:\n  - Accepts a batch function that takes an array of keys and returns a Promise resolving to an array of equal length containing values or `Error` instances.\n\n#### Methods\n- `load(key: K): Promise<V>`:\n  - Caches promises by key so identical keys requested synchronously reuse the same Promise.\n  - Schedules a batch dispatch on the microtask queue using `queueMicrotask` (or `Promise.resolve().then`) if one is not already scheduled for the current tick.\n  - When dispatched:\n    - Calls `batchFn(keys)` with all unique keys queued during that microtask.\n    - If the result array length does not match `keys.length`, rejects all batch promises with `new Error('Batch function must return an array of the same length as keys')`.\n    - Resolves each key's promise with its corresponding result value, or rejects if the result is an `instanceof Error`.\n    - If `batchFn` rejects, all key promises in that batch reject with the thrown error.\n- `loadMany(keys: K[]): Promise<Array<V | Error>>`:\n  - Resolves all keys concurrently. If an individual key rejects, captures the `Error` in the return array rather than rejecting the entire `loadMany` promise.\n- `clear(key: K): this`:\n  - Removes `key` from the internal cache and returns `this` for chaining.\n- `clearAll(): this`:\n  - Clears the entire cache and returns `this`.",
+    "difficulty": 4,
+    "concept": "graphql-dataloader",
+    "referenceSolution": "class DataLoader {\n  constructor(batchFn) {\n    if (typeof batchFn !== 'function') {\n      throw new TypeError('DataLoader must be constructed with a function');\n    }\n    this._batchFn = batchFn;\n    this._cache = new Map();\n    this._queue = [];\n  }\n\n  load(key) {\n    if (this._cache.has(key)) {\n      return this._cache.get(key);\n    }\n\n    let resolvePromise;\n    let rejectPromise;\n    const promise = new Promise((resolve, reject) => {\n      resolvePromise = resolve;\n      rejectPromise = reject;\n    });\n\n    this._cache.set(key, promise);\n    this._queue.push({ key, resolve: resolvePromise, reject: rejectPromise });\n\n    if (this._queue.length === 1) {\n      queueMicrotask(() => {\n        this._dispatch().catch(() => {});\n      });\n    }\n\n    return promise;\n  }\n\n  async _dispatch() {\n    const queue = this._queue;\n    this._queue = [];\n    if (queue.length === 0) return;\n\n    const keys = queue.map((item) => item.key);\n    try {\n      const batchPromise = this._batchFn(keys);\n      if (batchPromise && typeof batchPromise.catch === 'function') {\n        batchPromise.catch(() => {});\n      }\n      const results = await batchPromise;\n      if (!Array.isArray(results) || results.length !== keys.length) {\n        throw new Error('Batch function must return an array of the same length as keys');\n      }\n\n      queue.forEach((item, index) => {\n        const val = results[index];\n        if (val instanceof Error) {\n          item.reject(val);\n        } else {\n          item.resolve(val);\n        }\n      });\n    } catch (err) {\n      queue.forEach((item) => item.reject(err));\n    }\n  }\n\n  loadMany(keys) {\n    if (!Array.isArray(keys)) {\n      throw new TypeError('loadMany expects an array of keys');\n    }\n    return Promise.all(\n      keys.map((k) =>\n        this.load(k).catch((err) => (err instanceof Error ? err : new Error(String(err))))\n      )\n    );\n  }\n\n  clear(key) {\n    this._cache.delete(key);\n    return this;\n  }\n\n  clearAll() {\n    this._cache.clear();\n    return this;\n  }\n}",
+    "referenceSolutionTs": "type BatchFunction<K, V> = (keys: readonly K[]) => Promise<Array<V | Error>>;\n\ninterface IDataLoader<K, V> {\n  load(key: K): Promise<V>;\n  loadMany(keys: K[]): Promise<Array<V | Error>>;\n  clear(key: K): this;\n  clearAll(): this;\n}\n\ninterface QueueItem<K, V> {\n  key: K;\n  resolve: (value: V) => void;\n  reject: (reason: any) => void;\n}\n\nclass DataLoader<K, V> implements IDataLoader<K, V> {\n  private _batchFn: BatchFunction<K, V>;\n  private _cache: Map<K, Promise<V>>;\n  private _queue: QueueItem<K, V>[];\n\n  constructor(batchFn: BatchFunction<K, V>) {\n    if (typeof batchFn !== 'function') {\n      throw new TypeError('DataLoader must be constructed with a function');\n    }\n    this._batchFn = batchFn;\n    this._cache = new Map<K, Promise<V>>();\n    this._queue = [];\n  }\n\n  load(key: K): Promise<V> {\n    if (this._cache.has(key)) {\n      return this._cache.get(key)!;\n    }\n\n    let resolvePromise!: (value: V) => void;\n    let rejectPromise!: (reason: any) => void;\n    const promise = new Promise<V>((resolve, reject) => {\n      resolvePromise = resolve;\n      rejectPromise = reject;\n    });\n\n    this._cache.set(key, promise);\n    this._queue.push({ key, resolve: resolvePromise, reject: rejectPromise });\n\n    if (this._queue.length === 1) {\n      queueMicrotask(() => {\n        this._dispatch().catch(() => {});\n      });\n    }\n\n    return promise;\n  }\n\n  private async _dispatch(): Promise<void> {\n    const queue = this._queue;\n    this._queue = [];\n    if (queue.length === 0) return;\n\n    const keys = queue.map((item) => item.key);\n    try {\n      const batchPromise = this._batchFn(keys);\n      if (batchPromise && typeof batchPromise.catch === 'function') {\n        batchPromise.catch(() => {});\n      }\n      const results = await batchPromise;\n      if (!Array.isArray(results) || results.length !== keys.length) {\n        throw new Error('Batch function must return an array of the same length as keys');\n      }\n\n      queue.forEach((item, index) => {\n        const val = results[index];\n        if (val instanceof Error) {\n          item.reject(val);\n        } else {\n          item.resolve(val);\n        }\n      });\n    } catch (err) {\n      queue.forEach((item) => item.reject(err));\n    }\n  }\n\n  loadMany(keys: K[]): Promise<Array<V | Error>> {\n    if (!Array.isArray(keys)) {\n      throw new TypeError('loadMany expects an array of keys');\n    }\n    return Promise.all(\n      keys.map((k) =>\n        this.load(k).catch((err) => (err instanceof Error ? err : new Error(String(err))))\n      )\n    );\n  }\n\n  clear(key: K): this {\n    this._cache.delete(key);\n    return this;\n  }\n\n  clearAll(): this {\n    this._cache.clear();\n    return this;\n  }\n}",
+    "testCases": [
+      {
+        "description": "Batches concurrent load calls within the microtask tick into a single batch call",
+        "input": "let batchCalls = 0;\nconst loader = new DataLoader(async (keys) => {\n  batchCalls++;\n  return keys.map((k) => 'val_' + k);\n});\nconst p1 = loader.load(1);\nconst p2 = loader.load(2);\nconst p3 = loader.load(3);\nconst results = await Promise.all([p1, p2, p3]);\n[results, batchCalls]",
+        "expected": "[['val_1', 'val_2', 'val_3'], 1]"
+      },
+      {
+        "description": "Deduplicates identical keys requested in the same microtask and returns the same value",
+        "input": "let batchKeys = [];\nconst loader = new DataLoader(async (keys) => {\n  batchKeys.push(...keys);\n  return keys.map((k) => 'cached_' + k);\n});\nconst [a, b] = await Promise.all([loader.load('x'), loader.load('x')]);\n[a, b, batchKeys]",
+        "expected": "['cached_x', 'cached_x', ['x']]"
+      },
+      {
+        "description": "loadMany resolves all keys and captures individual errors without rejecting the call",
+        "input": "const loader = new DataLoader(async (keys) => {\n  return keys.map((k) => k === 'bad' ? new Error('failed_' + k) : 'good_' + k);\n});\nconst res = await loader.loadMany(['ok', 'bad']);\n[res[0], res[1] instanceof Error, res[1].message]",
+        "expected": "['good_ok', true, 'failed_bad']"
+      },
+      {
+        "description": "clear removes an item from cache, triggering a new batch on subsequent load",
+        "input": "let runs = 0;\nconst loader = new DataLoader(async (keys) => {\n  runs++;\n  return keys.map((k) => runs);\n});\nconst first = await loader.load('item');\nloader.clear('item');\nconst second = await loader.load('item');\n[first, second, runs]",
+        "expected": "[1, 2, 2]"
+      },
+      {
+        "description": "Rejects all keys if batch function throws or rejects",
+        "input": "const loader = new DataLoader(async () => {\n  throw new Error('Database connection failed');\n});\nconst err = await (async () => {\n  try {\n    await loader.load(1);\n    return 'no error';\n  } catch (e) {\n    return e.message;\n  }\n})();\nerr",
+        "expected": "'Database connection failed'"
+      }
+    ],
+    "testHarness": "await $test.run(\"Batches concurrent load calls within the microtask tick into a single batch call\", async () => {\n  const sleep = $test.sleep;\n  let batchCalls = 0;\n  const loader = new DataLoader(async (keys) => {\n    batchCalls++;\n    return keys.map((k) => 'val_' + k);\n  });\n  const p1 = loader.load(1);\n  const p2 = loader.load(2);\n  const p3 = loader.load(3);\n  const results = await Promise.all([p1, p2, p3]);\n  return ([results, batchCalls]);\n}, () => ([['val_1', 'val_2', 'val_3'], 1]));\n\nawait $test.run(\"Deduplicates identical keys requested in the same microtask and returns the same value\", async () => {\n  const sleep = $test.sleep;\n  let batchKeys = [];\n  const loader = new DataLoader(async (keys) => {\n    batchKeys.push(...keys);\n    return keys.map((k) => 'cached_' + k);\n  });\n  const [a, b] = await Promise.all([loader.load('x'), loader.load('x')]);\n  return ([a, b, batchKeys]);\n}, () => (['cached_x', 'cached_x', ['x']]));\n\nawait $test.run(\"loadMany resolves all keys and captures individual errors without rejecting the call\", async () => {\n  const sleep = $test.sleep;\n  const loader = new DataLoader(async (keys) => {\n    return keys.map((k) => k === 'bad' ? new Error('failed_' + k) : 'good_' + k);\n  });\n  const res = await loader.loadMany(['ok', 'bad']);\n  return ([res[0], res[1] instanceof Error, res[1].message]);\n}, () => (['good_ok', true, 'failed_bad']));\n\nawait $test.run(\"clear removes an item from cache, triggering a new batch on subsequent load\", async () => {\n  const sleep = $test.sleep;\n  let runs = 0;\n  const loader = new DataLoader(async (keys) => {\n    runs++;\n    return keys.map((k) => runs);\n  });\n  const first = await loader.load('item');\n  loader.clear('item');\n  const second = await loader.load('item');\n  return ([first, second, runs]);\n}, () => ([1, 2, 2]));\n\nawait $test.run(\"Rejects all keys if batch function throws or rejects\", async () => {\n  const sleep = $test.sleep;\n  const loader = new DataLoader(async () => {\n    throw new Error('Database connection failed');\n  });\n  const err = await (async () => {\n    try {\n      await loader.load(1);\n      return 'no error';\n    } catch (e) {\n      return e.message;\n    }\n  })();\n  return (err);\n}, () => ('Database connection failed'));"
+  },
+  {
+    "id": "graphql-query-complexity-calculator",
+    "track": "graphql",
+    "title": "GraphQL Query Complexity Cost Calculator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "security",
+      "dos-protection",
+      "complexity",
+      "recursion",
+      "ast"
+    ],
+    "promptSeed": "Implement a static GraphQL query complexity analysis function that computes recursive execution costs to protect backends from denial-of-service queries:\n\n## Description\n\n```ts\ninterface FieldNode {\n  name: string;\n  args?: Record<string, any>;\n  fields?: FieldNode[];\n}\n\ninterface ComplexityConfig {\n  defaultCost?: number;\n  fieldCosts?: Record<string, number>;\n  maxComplexity?: number;\n}\n\ninterface ComplexityResult {\n  complexity: number;\n  exceeded: boolean;\n}\n```\n\n### `calculateQueryComplexity(nodes: FieldNode[], config?: ComplexityConfig): ComplexityResult`\n\n- **Field Node Cost Calculation**:\n  - For each `FieldNode`:\n    - Base cost is `config?.fieldCosts?.[node.name]` if defined, otherwise `config?.defaultCost ?? 1`.\n    - Multiplier argument is determined by `node.args?.first` or `node.args?.limit`. If provided and a positive number (`> 0`), use that value; otherwise the multiplier is `1`.\n    - If `node.fields` is provided and non-empty, the recursive child cost is calculated. The total cost contributed by this node is:\n      $$\\text{nodeCost} = \\text{baseCost} + (\\text{multiplier} \\times \\text{childCost})$$\n    - If `node.fields` is empty or omitted, the node contributes only `baseCost`.\n- **Aggregation**:\n  - The total complexity is the sum of costs across all root-level nodes in `nodes`.\n  - Empty or non-array `nodes` evaluates to a total complexity of `0`.\n- **Max Complexity Constraint**:\n  - If `config?.maxComplexity` is specified (positive number), `exceeded` is `true` whenever `complexity > config.maxComplexity`.\n  - Otherwise, `exceeded` is `false`.",
+    "difficulty": 4,
+    "concept": "graphql-complexity",
+    "referenceSolution": "function calculateQueryComplexity(nodes, config = {}) {\n  const defaultCost = typeof config.defaultCost === 'number' ? config.defaultCost : 1;\n  const fieldCosts = config.fieldCosts || {};\n\n  function computeNodesCost(list) {\n    if (!Array.isArray(list) || list.length === 0) return 0;\n\n    let sum = 0;\n    for (const node of list) {\n      if (!node || typeof node !== 'object') continue;\n\n      const baseCost = typeof fieldCosts[node.name] === 'number' ? fieldCosts[node.name] : defaultCost;\n\n      let multiplier = 1;\n      const first = node.args?.first;\n      const limit = node.args?.limit;\n      if (typeof first === 'number' && first > 0) {\n        multiplier = first;\n      } else if (typeof limit === 'number' && limit > 0) {\n        multiplier = limit;\n      }\n\n      const childCost = Array.isArray(node.fields) && node.fields.length > 0 ? computeNodesCost(node.fields) : 0;\n      sum += baseCost + multiplier * childCost;\n    }\n    return sum;\n  }\n\n  const complexity = computeNodesCost(nodes);\n  const maxComplexity = config.maxComplexity;\n  const exceeded = typeof maxComplexity === 'number' && maxComplexity > 0 ? complexity > maxComplexity : false;\n\n  return { complexity, exceeded };\n}",
+    "referenceSolutionTs": "interface FieldNode {\n  name: string;\n  args?: Record<string, any>;\n  fields?: FieldNode[];\n}\n\ninterface ComplexityConfig {\n  defaultCost?: number;\n  fieldCosts?: Record<string, number>;\n  maxComplexity?: number;\n}\n\ninterface ComplexityResult {\n  complexity: number;\n  exceeded: boolean;\n}\n\nfunction calculateQueryComplexity(\n  nodes: FieldNode[],\n  config: ComplexityConfig = {}\n): ComplexityResult {\n  const defaultCost = typeof config.defaultCost === 'number' ? config.defaultCost : 1;\n  const fieldCosts = config.fieldCosts || {};\n\n  function computeNodesCost(list?: FieldNode[]): number {\n    if (!Array.isArray(list) || list.length === 0) return 0;\n\n    let sum = 0;\n    for (const node of list) {\n      if (!node || typeof node !== 'object') continue;\n\n      const baseCost = typeof fieldCosts[node.name] === 'number' ? fieldCosts[node.name] : defaultCost;\n\n      let multiplier = 1;\n      const first = node.args?.first;\n      const limit = node.args?.limit;\n      if (typeof first === 'number' && first > 0) {\n        multiplier = first;\n      } else if (typeof limit === 'number' && limit > 0) {\n        multiplier = limit;\n      }\n\n      const childCost = Array.isArray(node.fields) && node.fields.length > 0 ? computeNodesCost(node.fields) : 0;\n      sum += baseCost + multiplier * childCost;\n    }\n    return sum;\n  }\n\n  const complexity = computeNodesCost(nodes);\n  const maxComplexity = config.maxComplexity;\n  const exceeded = typeof maxComplexity === 'number' && maxComplexity > 0 ? complexity > maxComplexity : false;\n\n  return { complexity, exceeded };\n}",
+    "testCases": [
+      {
+        "description": "Calculates baseline complexity for flat scalar fields",
+        "input": "calculateQueryComplexity([{ name: 'id' }, { name: 'title' }, { name: 'views' }])",
+        "expected": "{ complexity: 3, exceeded: false }"
+      },
+      {
+        "description": "Applies multiplier argument (first or limit) to nested child fields",
+        "input": "calculateQueryComplexity([{ name: 'users', args: { first: 5 }, fields: [{ name: 'id' }, { name: 'email' }] }])",
+        "expected": "{ complexity: 11, exceeded: false }"
+      },
+      {
+        "description": "Respects custom fieldCosts configurations",
+        "input": "calculateQueryComplexity([{ name: 'search', fields: [{ name: 'results' }] }], { fieldCosts: { search: 10 } })",
+        "expected": "{ complexity: 11, exceeded: false }"
+      },
+      {
+        "description": "Detects when query cost exceeds maxComplexity",
+        "input": "calculateQueryComplexity([{ name: 'posts', args: { limit: 10 }, fields: [{ name: 'comments', args: { first: 5 }, fields: [{ name: 'text' }] }] }], { maxComplexity: 50 })",
+        "expected": "{ complexity: 61, exceeded: true }"
+      },
+      {
+        "description": "Returns 0 complexity for empty input",
+        "input": "calculateQueryComplexity([])",
+        "expected": "{ complexity: 0, exceeded: false }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Calculates baseline complexity for flat scalar fields\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([{ name: 'id' }, { name: 'title' }, { name: 'views' }]));\n}, () => ({ complexity: 3, exceeded: false }));\n\nawait $test.run(\"Applies multiplier argument (first or limit) to nested child fields\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([{ name: 'users', args: { first: 5 }, fields: [{ name: 'id' }, { name: 'email' }] }]));\n}, () => ({ complexity: 11, exceeded: false }));\n\nawait $test.run(\"Respects custom fieldCosts configurations\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([{ name: 'search', fields: [{ name: 'results' }] }], { fieldCosts: { search: 10 } }));\n}, () => ({ complexity: 11, exceeded: false }));\n\nawait $test.run(\"Detects when query cost exceeds maxComplexity\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([{ name: 'posts', args: { limit: 10 }, fields: [{ name: 'comments', args: { first: 5 }, fields: [{ name: 'text' }] }] }], { maxComplexity: 50 }));\n}, () => ({ complexity: 61, exceeded: true }));\n\nawait $test.run(\"Returns 0 complexity for empty input\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([]));\n}, () => ({ complexity: 0, exceeded: false }));"
+  },
+  {
+    "id": "graphql-relay-connection-builder",
+    "track": "graphql",
+    "title": "GraphQL Relay Connection & Cursor Pagination Spec",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "connections",
+      "cursors",
+      "specifications"
+    ],
+    "promptSeed": "Implement a compliant Relay Cursor Connections builder that transforms a dataset and pagination arguments into a structured `Connection<T>`:\n\n## Description\n\n```ts\ninterface Edge<T> {\n  node: T;\n  cursor: string;\n}\n\ninterface PageInfo {\n  hasNextPage: boolean;\n  hasPreviousPage: boolean;\n  startCursor: string | null;\n  endCursor: string | null;\n}\n\ninterface Connection<T> {\n  edges: Edge<T>[];\n  pageInfo: PageInfo;\n  totalCount: number;\n}\n\ninterface ConnectionArgs {\n  first?: number;\n  after?: string;\n  last?: number;\n  before?: string;\n}\n```\n\n### `buildRelayConnection<T>(items: T[], args?: ConnectionArgs): Connection<T>`\n\n- **Cursor Encoding**:\n  - Each item index $i$ in `items` produces a base64-encoded string cursor: `btoa(String(i))`.\n  - Use `atob(cursor)` to decode cursor back to numeric index.\n- **Relay Slicing Algorithm**:\n  1. Initialize all edges from `items`: `edges = items.map((node, i) => ({ node, cursor: btoa(String(i)) }))`.\n  2. If `args?.after` is provided:\n     - Decode `afterIndex = parseInt(atob(args.after), 10)`.\n     - Retain only edges strictly after `afterIndex`: `edges.slice(afterIndex + 1)`.\n  3. If `args?.before` is provided:\n     - Decode `beforeIndex = parseInt(atob(args.before), 10)`.\n     - Retain only edges strictly before `beforeIndex`: `edges.slice(0, beforeIndex)`.\n  4. If `args?.first !== undefined`:\n     - If `args.first < 0`, throw `new Error('first must be non-negative')`.\n     - Slice to at most `args.first` items from the beginning.\n  5. If `args?.last !== undefined`:\n     - If `args.last < 0`, throw `new Error('last must be non-negative')`.\n     - Slice to at most `args.last` items from the end.\n- **`PageInfo` Calculation**:\n  - `hasPreviousPage`:\n    - `true` if `last` was applied and more items existed in the range than `last`.\n    - `true` if `after` was applied and `afterIndex >= 0`.\n    - Otherwise `false`.\n  - `hasNextPage`:\n    - `true` if `first` was applied and more items existed in the range than `first`.\n    - `true` if `before` was applied and `beforeIndex < items.length`.\n    - Otherwise `false`.\n  - `startCursor`: Cursor of the first edge in `edges`, or `null` if empty.\n  - `endCursor`: Cursor of the last edge in `edges`, or `null` if empty.\n- **Return Value**:\n  - Returns `{ edges, pageInfo, totalCount: items.length }`.",
+    "difficulty": 5,
+    "concept": "graphql-relay",
+    "referenceSolution": "function encodeCursor(index) {\n  return btoa(String(index));\n}\n\nfunction decodeCursor(cursor) {\n  return parseInt(atob(cursor), 10);\n}\n\nfunction buildRelayConnection(items = [], args = {}) {\n  const safeItems = Array.isArray(items) ? items : [];\n  const totalCount = safeItems.length;\n  let edges = safeItems.map((node, index) => ({\n    node,\n    cursor: encodeCursor(index),\n  }));\n\n  const { first, after, last, before } = args || {};\n\n  let afterIndex;\n  if (typeof after === 'string' && after.length > 0) {\n    afterIndex = decodeCursor(after);\n    if (!isNaN(afterIndex)) {\n      edges = edges.filter((e) => decodeCursor(e.cursor) > afterIndex);\n    }\n  }\n\n  let beforeIndex;\n  if (typeof before === 'string' && before.length > 0) {\n    beforeIndex = decodeCursor(before);\n    if (!isNaN(beforeIndex)) {\n      edges = edges.filter((e) => decodeCursor(e.cursor) < beforeIndex);\n    }\n  }\n\n  let hasPreviousPage = false;\n  let hasNextPage = false;\n\n  if (afterIndex !== undefined && !isNaN(afterIndex) && afterIndex >= 0) {\n    hasPreviousPage = true;\n  }\n  if (beforeIndex !== undefined && !isNaN(beforeIndex) && beforeIndex < totalCount) {\n    hasNextPage = true;\n  }\n\n  if (first !== undefined) {\n    if (typeof first === 'number' && first < 0) {\n      throw new Error('first must be non-negative');\n    }\n    if (edges.length > first) {\n      hasNextPage = true;\n      edges = edges.slice(0, first);\n    }\n  }\n\n  if (last !== undefined) {\n    if (typeof last === 'number' && last < 0) {\n      throw new Error('last must be non-negative');\n    }\n    if (edges.length > last) {\n      hasPreviousPage = true;\n      edges = edges.slice(edges.length - last);\n    }\n  }\n\n  const startCursor = edges.length > 0 ? edges[0].cursor : null;\n  const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;\n\n  return {\n    edges,\n    pageInfo: {\n      hasNextPage,\n      hasPreviousPage,\n      startCursor,\n      endCursor,\n    },\n    totalCount,\n  };\n}",
+    "referenceSolutionTs": "interface Edge<T> {\n  node: T;\n  cursor: string;\n}\n\ninterface PageInfo {\n  hasNextPage: boolean;\n  hasPreviousPage: boolean;\n  startCursor: string | null;\n  endCursor: string | null;\n}\n\ninterface Connection<T> {\n  edges: Edge<T>[];\n  pageInfo: PageInfo;\n  totalCount: number;\n}\n\ninterface ConnectionArgs {\n  first?: number;\n  after?: string;\n  last?: number;\n  before?: string;\n}\n\nfunction encodeCursor(index: number): string {\n  return btoa(String(index));\n}\n\nfunction decodeCursor(cursor: string): number {\n  return parseInt(atob(cursor), 10);\n}\n\nfunction buildRelayConnection<T>(\n  items: T[] = [],\n  args: ConnectionArgs = {}\n): Connection<T> {\n  const safeItems = Array.isArray(items) ? items : [];\n  const totalCount = safeItems.length;\n  let edges: Edge<T>[] = safeItems.map((node, index) => ({\n    node,\n    cursor: encodeCursor(index),\n  }));\n\n  const { first, after, last, before } = args || {};\n\n  let afterIndex: number | undefined;\n  if (typeof after === 'string' && after.length > 0) {\n    afterIndex = decodeCursor(after);\n    if (!isNaN(afterIndex)) {\n      edges = edges.filter((e) => decodeCursor(e.cursor) > afterIndex!);\n    }\n  }\n\n  let beforeIndex: number | undefined;\n  if (typeof before === 'string' && before.length > 0) {\n    beforeIndex = decodeCursor(before);\n    if (!isNaN(beforeIndex)) {\n      edges = edges.filter((e) => decodeCursor(e.cursor) < beforeIndex!);\n    }\n  }\n\n  let hasPreviousPage = false;\n  let hasNextPage = false;\n\n  if (afterIndex !== undefined && !isNaN(afterIndex) && afterIndex >= 0) {\n    hasPreviousPage = true;\n  }\n  if (beforeIndex !== undefined && !isNaN(beforeIndex) && beforeIndex < totalCount) {\n    hasNextPage = true;\n  }\n\n  if (first !== undefined) {\n    if (typeof first === 'number' && first < 0) {\n      throw new Error('first must be non-negative');\n    }\n    if (edges.length > first) {\n      hasNextPage = true;\n      edges = edges.slice(0, first);\n    }\n  }\n\n  if (last !== undefined) {\n    if (typeof last === 'number' && last < 0) {\n      throw new Error('last must be non-negative');\n    }\n    if (edges.length > last) {\n      hasPreviousPage = true;\n      edges = edges.slice(edges.length - last);\n    }\n  }\n\n  const startCursor = edges.length > 0 ? edges[0].cursor : null;\n  const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;\n\n  return {\n    edges,\n    pageInfo: {\n      hasNextPage,\n      hasPreviousPage,\n      startCursor,\n      endCursor,\n    },\n    totalCount,\n  };\n}",
+    "testCases": [
+      {
+        "description": "Constructs connection with forward slicing and computes pageInfo",
+        "input": "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2 });\n[conn.edges.map(e => e.node), conn.pageInfo, conn.totalCount]",
+        "expected": "[[\"a\", \"b\"], { endCursor: \"MQ==\", hasNextPage: true, hasPreviousPage: false, startCursor: \"MA==\" }, 4]"
+      },
+      {
+        "description": "Slices after cursor and updates hasPreviousPage",
+        "input": "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2, after: btoa('1') });\n[conn.edges.map(e => e.node), conn.pageInfo]",
+        "expected": "[[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]"
+      },
+      {
+        "description": "Supports backward pagination with last argument",
+        "input": "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { last: 2 });\n[conn.edges.map(e => e.node), conn.pageInfo]",
+        "expected": "[[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]"
+      },
+      {
+        "description": "Handles empty dataset gracefully with null cursors",
+        "input": "const conn = buildRelayConnection([], { first: 5 });\n[conn.edges, conn.pageInfo, conn.totalCount]",
+        "expected": "[[], { endCursor: null, hasNextPage: false, hasPreviousPage: false, startCursor: null }, 0]"
+      },
+      {
+        "description": "Throws error when first or last is negative",
+        "input": "const err = (() => { try { buildRelayConnection(['a'], { first: -1 }); return 'ok'; } catch (e) { return e.message; } })();\nerr",
+        "expected": "'first must be non-negative'"
+      }
+    ],
+    "testHarness": "await $test.run(\"Constructs connection with forward slicing and computes pageInfo\", async () => {\n  const sleep = $test.sleep;\n  const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2 });\n  return ([conn.edges.map(e => e.node), conn.pageInfo, conn.totalCount]);\n}, () => ([[\"a\", \"b\"], { endCursor: \"MQ==\", hasNextPage: true, hasPreviousPage: false, startCursor: \"MA==\" }, 4]));\n\nawait $test.run(\"Slices after cursor and updates hasPreviousPage\", async () => {\n  const sleep = $test.sleep;\n  const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2, after: btoa('1') });\n  return ([conn.edges.map(e => e.node), conn.pageInfo]);\n}, () => ([[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]));\n\nawait $test.run(\"Supports backward pagination with last argument\", async () => {\n  const sleep = $test.sleep;\n  const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { last: 2 });\n  return ([conn.edges.map(e => e.node), conn.pageInfo]);\n}, () => ([[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]));\n\nawait $test.run(\"Handles empty dataset gracefully with null cursors\", async () => {\n  const sleep = $test.sleep;\n  const conn = buildRelayConnection([], { first: 5 });\n  return ([conn.edges, conn.pageInfo, conn.totalCount]);\n}, () => ([[], { endCursor: null, hasNextPage: false, hasPreviousPage: false, startCursor: null }, 0]));\n\nawait $test.run(\"Throws error when first or last is negative\", async () => {\n  const sleep = $test.sleep;\n  const err = (() => { try { buildRelayConnection(['a'], { first: -1 }); return 'ok'; } catch (e) { return e.message; } })();\n  return (err);\n}, () => ('first must be non-negative'));"
+  },
+  {
+    "id": "graphql-schema-stitching-merger",
+    "track": "graphql",
+    "title": "GraphQL Schema Stitching Resolver Merger",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "schema-stitching",
+      "federation",
+      "resolvers",
+      "conflict-detection",
+      "microservices"
+    ],
+    "promptSeed": "Implement a schema stitching utility that unifies distributed subsystem resolver maps into a consolidated root schema while preventing conflicting field collisions:\n\n## Description\n\n```ts\ntype ResolverFn = (...args: any[]) => any;\n\ninterface ResolverMap {\n  [typeName: string]: {\n    [fieldName: string]: ResolverFn | any;\n  };\n}\n```\n\n### `mergeResolvers(...resolverMaps: ResolverMap[]): ResolverMap`\n\n- **Type-Level Deep Merging**:\n  - Merges each input resolver map in left-to-right order.\n  - Combines field resolvers under matching type definitions (e.g. `Query`, `Mutation`, `User`, `Review`).\n- **Conflict Detection**:\n  - When two or more resolver maps attempt to define the same field on the same type:\n    - Throws an `Error` with the message:\n      `Conflict: resolver for \"<typeName>.<fieldName>\" is defined multiple times`\n- **Graceful Input Handling**:\n  - Omits `null`, `undefined`, or non-object resolver maps.\n  - Returns a clean new object without mutating input maps.",
+    "difficulty": 5,
+    "concept": "graphql-stitching",
+    "referenceSolution": "function mergeResolvers(...resolverMaps) {\n  const merged = {};\n\n  for (const map of resolverMaps) {\n    if (!map || typeof map !== 'object') continue;\n\n    for (const typeName of Object.keys(map)) {\n      const typeFields = map[typeName];\n      if (!typeFields || typeof typeFields !== 'object') continue;\n\n      if (!merged[typeName]) {\n        merged[typeName] = {};\n      }\n\n      for (const fieldName of Object.keys(typeFields)) {\n        if (Object.prototype.hasOwnProperty.call(merged[typeName], fieldName)) {\n          throw new Error(\n            `Conflict: resolver for \"${typeName}.${fieldName}\" is defined multiple times`\n          );\n        }\n        merged[typeName][fieldName] = typeFields[fieldName];\n      }\n    }\n  }\n\n  return merged;\n}",
+    "referenceSolutionTs": "type ResolverFn = (...args: any[]) => any;\n\ninterface ResolverMap {\n  [typeName: string]: {\n    [fieldName: string]: ResolverFn | any;\n  };\n}\n\nfunction mergeResolvers(...resolverMaps: ResolverMap[]): ResolverMap {\n  const merged: ResolverMap = {};\n\n  for (const map of resolverMaps) {\n    if (!map || typeof map !== 'object') continue;\n\n    for (const typeName of Object.keys(map)) {\n      const typeFields = map[typeName];\n      if (!typeFields || typeof typeFields !== 'object') continue;\n\n      if (!merged[typeName]) {\n        merged[typeName] = {};\n      }\n\n      for (const fieldName of Object.keys(typeFields)) {\n        if (Object.prototype.hasOwnProperty.call(merged[typeName], fieldName)) {\n          throw new Error(\n            `Conflict: resolver for \"${typeName}.${fieldName}\" is defined multiple times`\n          );\n        }\n        merged[typeName][fieldName] = typeFields[fieldName];\n      }\n    }\n  }\n\n  return merged;\n}",
+    "testCases": [
+      {
+        "description": "Merges distinct subsystem resolver maps across shared types",
+        "input": "const userMap = { Query: { user: () => 'u' }, User: { id: (p) => p.id } };\nconst reviewMap = { Query: { reviews: () => [] }, User: { reviews: () => [] } };\nconst merged = mergeResolvers(userMap, reviewMap);\n[Object.keys(merged.Query).sort(), Object.keys(merged.User).sort()]",
+        "expected": "[[\"reviews\", \"user\"], [\"id\", \"reviews\"]]"
+      },
+      {
+        "description": "Throws conflict error when duplicate field is defined on the same type",
+        "input": "const map1 = { Query: { user: () => 1 } };\nconst map2 = { Query: { user: () => 2 } };\nconst err = (() => { try { mergeResolvers(map1, map2); return 'no error'; } catch (e) { return e.message; } })();\nerr",
+        "expected": "'Conflict: resolver for \"Query.user\" is defined multiple times'"
+      },
+      {
+        "description": "Gracefully skips null, undefined, or empty inputs",
+        "input": "const merged = mergeResolvers(null, { Query: { ping: () => 'pong' } }, undefined, {});\nObject.keys(merged.Query)",
+        "expected": "[\"ping\"]"
+      },
+      {
+        "description": "Preserves custom type resolvers such as __resolveType",
+        "input": "const map1 = { SearchResult: { __resolveType: () => 'User' } };\nconst merged = mergeResolvers(map1);\ntypeof merged.SearchResult.__resolveType",
+        "expected": "'function'"
+      }
+    ],
+    "testHarness": "await $test.run(\"Merges distinct subsystem resolver maps across shared types\", async () => {\n  const sleep = $test.sleep;\n  const userMap = { Query: { user: () => 'u' }, User: { id: (p) => p.id } };\n  const reviewMap = { Query: { reviews: () => [] }, User: { reviews: () => [] } };\n  const merged = mergeResolvers(userMap, reviewMap);\n  return ([Object.keys(merged.Query).sort(), Object.keys(merged.User).sort()]);\n}, () => ([[\"reviews\", \"user\"], [\"id\", \"reviews\"]]));\n\nawait $test.run(\"Throws conflict error when duplicate field is defined on the same type\", async () => {\n  const sleep = $test.sleep;\n  const map1 = { Query: { user: () => 1 } };\n  const map2 = { Query: { user: () => 2 } };\n  const err = (() => { try { mergeResolvers(map1, map2); return 'no error'; } catch (e) { return e.message; } })();\n  return (err);\n}, () => ('Conflict: resolver for \"Query.user\" is defined multiple times'));\n\nawait $test.run(\"Gracefully skips null, undefined, or empty inputs\", async () => {\n  const sleep = $test.sleep;\n  const merged = mergeResolvers(null, { Query: { ping: () => 'pong' } }, undefined, {});\n  return (Object.keys(merged.Query));\n}, () => ([\"ping\"]));\n\nawait $test.run(\"Preserves custom type resolvers such as __resolveType\", async () => {\n  const sleep = $test.sleep;\n  const map1 = { SearchResult: { __resolveType: () => 'User' } };\n  const merged = mergeResolvers(map1);\n  return (typeof merged.SearchResult.__resolveType);\n}, () => ('function'));"
   }
 ]

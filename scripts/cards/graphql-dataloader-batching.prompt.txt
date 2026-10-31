@@ -1,0 +1,36 @@
+Implement a lightweight `DataLoader` class that batches concurrent key requests within a single event-loop microtask to eliminate N+1 query waterfalls:
+
+## Description
+
+```ts
+type BatchFunction<K, V> = (keys: readonly K[]) => Promise<Array<V | Error>>;
+
+interface IDataLoader<K, V> {
+  load(key: K): Promise<V>;
+  loadMany(keys: K[]): Promise<Array<V | Error>>;
+  clear(key: K): this;
+  clearAll(): this;
+}
+```
+
+### `class DataLoader<K, V> implements IDataLoader<K, V>`
+
+#### Constructor
+- `new DataLoader(batchFn: BatchFunction<K, V>)`:
+  - Accepts a batch function that takes an array of keys and returns a Promise resolving to an array of equal length containing values or `Error` instances.
+
+#### Methods
+- `load(key: K): Promise<V>`:
+  - Caches promises by key so identical keys requested synchronously reuse the same Promise.
+  - Schedules a batch dispatch on the microtask queue using `queueMicrotask` (or `Promise.resolve().then`) if one is not already scheduled for the current tick.
+  - When dispatched:
+    - Calls `batchFn(keys)` with all unique keys queued during that microtask.
+    - If the result array length does not match `keys.length`, rejects all batch promises with `new Error('Batch function must return an array of the same length as keys')`.
+    - Resolves each key's promise with its corresponding result value, or rejects if the result is an `instanceof Error`.
+    - If `batchFn` rejects, all key promises in that batch reject with the thrown error.
+- `loadMany(keys: K[]): Promise<Array<V | Error>>`:
+  - Resolves all keys concurrently. If an individual key rejects, captures the `Error` in the return array rather than rejecting the entire `loadMany` promise.
+- `clear(key: K): this`:
+  - Removes `key` from the internal cache and returns `this` for chaining.
+- `clearAll(): this`:
+  - Clears the entire cache and returns `this`.

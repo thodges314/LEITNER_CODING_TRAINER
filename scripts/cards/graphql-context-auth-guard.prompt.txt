@@ -1,0 +1,35 @@
+Implement a higher-order resolver guard that enforces authentication and role-based authorization from the GraphQL `context`:
+
+## Description
+
+```ts
+type GraphQLResolver<TSource = any, TArgs = any, TContext = any, TResult = any> = (
+  parent: TSource,
+  args: TArgs,
+  context: TContext,
+  info: any
+) => TResult;
+
+interface UserPayload {
+  id: string;
+  roles?: string[];
+}
+
+interface AuthContext {
+  user?: UserPayload | null;
+  [key: string]: any;
+}
+```
+
+### `withAuth<TSource = any, TArgs = any, TResult = any>(resolver: GraphQLResolver<TSource, TArgs, AuthContext, TResult>, requiredRoles?: string[]): GraphQLResolver<TSource, TArgs, AuthContext, TResult>`
+
+- **Authentication Guard**:
+  - Inspects `context.user`.
+  - If `context.user` is absent or `null`, throws an `Error('UNAUTHENTICATED')`.
+- **Role-Based Authorization (`requiredRoles`)**:
+  - If `requiredRoles` is provided and non-empty, checks whether `context.user.roles` contains at least one of the required roles.
+  - If the user has no matching roles (or `context.user.roles` is undefined/empty), throws an `Error('FORBIDDEN')`.
+  - If `requiredRoles` is omitted or empty, any authenticated user passes.
+- **Resolver Execution**:
+  - When authorized, calls and returns `resolver(parent, args, context, info)`.
+  - Seamlessly handles both synchronous return values and asynchronous promises.

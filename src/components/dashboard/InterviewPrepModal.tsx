@@ -825,7 +825,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
   const loadingMessages = [
     `Analyzing interview archetypes for ${company || 'your target company'}...`,
-    'Screening 277 curated cards across 10 engineering domains...',
+    'Screening 291 curated cards across 11 engineering domains...',
     'Calibrating against your candidate weakness profile...',
     'Synthesizing tailored executive study dossier & checklist...',
   ];

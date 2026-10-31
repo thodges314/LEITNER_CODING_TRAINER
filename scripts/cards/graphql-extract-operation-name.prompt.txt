@@ -1,0 +1,15 @@
+Write a utility function to extract the operation name from a GraphQL document string without third-party AST parser dependencies:
+
+### `getOperationName(document: string): string | null`
+
+- **Parsing Invariants**:
+  - Extracts the identifier name following the operation type keyword (`query`, `mutation`, or `subscription`).
+  - Supports named queries (e.g. `query GetProfile { ... }` -> `'GetProfile'`).
+  - Supports named mutations (e.g. `mutation CreateItem($input: ItemInput!) { ... }` -> `'CreateItem'`).
+  - Supports named subscriptions (e.g. `subscription OnNotification { ... }` -> `'OnNotification'`).
+- **Comments & Formatting**:
+  - Strips single-line GraphQL comments (lines beginning with `#` or text following `#`) before parsing.
+  - Tolerates arbitrary leading/trailing whitespace, newlines, and indentation.
+- **Anonymous & Empty Queries**:
+  - Anonymous / shorthand queries (e.g. `{ viewer { id } }` or `query { viewer { id } }`) have no operation name; return `null`.
+  - Empty strings, whitespace-only strings, or non-string inputs must return `null`.

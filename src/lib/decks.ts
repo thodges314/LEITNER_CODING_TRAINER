@@ -12,6 +12,7 @@ export const FRONTEND_TRACKS: ReadonlySet<TrackType> = new Set<TrackType>([
   'js-language',
   'testing-tooling',
   'typescript-patterns',
+  'graphql',
 ]);
 
 export const ALGORITHMIC_UTILITY_CONCEPTS: ReadonlySet<string> = new Set<string>([
@@ -48,8 +49,8 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
   {
     id: 'full-library',
     name: 'Full Library (All Cards)',
-    description: 'Complete 277-card curriculum across all 10 frontend and computer-science domains',
-    badge: '277 Cards',
+    description: 'Complete 291-card curriculum across all 11 frontend and computer-science domains',
+    badge: '291 Cards',
     isBuiltIn: true,
     filter: () => true,
   },
@@ -57,7 +58,7 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
     id: 'full-stack',
     name: 'Full-Stack Core',
     description: 'Practical full-stack interview prep: React, DOM, async JS, utilities, TypeScript, and core interview algorithms',
-    badge: '224 Cards',
+    badge: '238 Cards',
     isBuiltIn: true,
     filter: (card) => card.track !== 'advanced-algorithms',
   },
@@ -65,7 +66,7 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
     id: 'frontend-specialist',
     name: 'Frontend Specialist',
     description: 'React components, hooks, DOM APIs, async plumbing, and core JS/TS utilities',
-    badge: '197 Cards',
+    badge: '211 Cards',
     isBuiltIn: true,
     filter: (card) => FRONTEND_TRACKS.has(card.track),
   },

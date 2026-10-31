@@ -1,0 +1,26 @@
+Implement a schema stitching utility that unifies distributed subsystem resolver maps into a consolidated root schema while preventing conflicting field collisions:
+
+## Description
+
+```ts
+type ResolverFn = (...args: any[]) => any;
+
+interface ResolverMap {
+  [typeName: string]: {
+    [fieldName: string]: ResolverFn | any;
+  };
+}
+```
+
+### `mergeResolvers(...resolverMaps: ResolverMap[]): ResolverMap`
+
+- **Type-Level Deep Merging**:
+  - Merges each input resolver map in left-to-right order.
+  - Combines field resolvers under matching type definitions (e.g. `Query`, `Mutation`, `User`, `Review`).
+- **Conflict Detection**:
+  - When two or more resolver maps attempt to define the same field on the same type:
+    - Throws an `Error` with the message:
+      `Conflict: resolver for "<typeName>.<fieldName>" is defined multiple times`
+- **Graceful Input Handling**:
+  - Omits `null`, `undefined`, or non-object resolver maps.
+  - Returns a clean new object without mutating input maps.
