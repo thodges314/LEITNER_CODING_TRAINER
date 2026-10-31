@@ -13,9 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 - Authoring pitfalls for Suspense / transitions / `use()` harnesses are in the roadmap, section 8. Read them before writing React 19 cards.
 
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
-| Task / card | Branch | Owner | Status |
-| --- | --- | --- | --- |
-| `ocean-view-buildings` | `feature/card-ocean-view-buildings` | Antigravity | Authoring prompt, cases, and JS/TS solutions |
+| *(no active claims — all merged to master)* | | | |
 
 
 
