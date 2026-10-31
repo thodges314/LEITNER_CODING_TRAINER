@@ -3,6 +3,27 @@ import { extractHarnessContracts } from './harnessContracts';
 import { clearDraft } from './drafts';
 import { recordDailyStat, updateDailyStatVerdict, sanitizeDailyStats } from './dailyStats';
 import type { DailyStats } from './dailyStats';
+import {
+  CURRENT_DECK_VERSION,
+  migrateDeckState,
+  migrateV1ToV2,
+  migrateV2ToV3,
+  TRACK_ALIASES,
+  RETIRED_SEED_IDS,
+  migrateTrackId,
+  migrateTrackList,
+} from './deckMigrations';
+
+export {
+  CURRENT_DECK_VERSION,
+  migrateDeckState,
+  migrateV1ToV2,
+  migrateV2ToV3,
+  TRACK_ALIASES,
+  RETIRED_SEED_IDS,
+  migrateTrackId,
+  migrateTrackList,
+};
 
 export type TrackType =
   | 'algorithms'
@@ -90,6 +111,8 @@ export function difficultyOf(card: Pick<TopicItem, 'difficulty'>): number {
 export const EMPTY_FILTER: PracticeFilter = { includeTracks: [], excludeTracks: [], includeTags: [], excludeTags: [] };
 
 export interface LeitnerDeckState {
+  /** Schema version of the deck state, used for sequential migrations. */
+  deckVersion?: number;
   /** Practice focus: only matching cards are scheduled. */
   practiceFilter?: PracticeFilter;
   /** Enabled optional card packs (see CARD_PACKS). Default: none, i.e. optional packs are hidden. */
@@ -253,51 +276,7 @@ export function isTrackType(value: unknown): value is TrackType {
   return typeof value === 'string' && Object.prototype.hasOwnProperty.call(TRACK_METADATA, value);
 }
 
-/**
- * Tracks that were merged into others (track consolidation). Saved Focus filters and custom cards may still name them.
- * The first successor is the "primary" one: includes expand to every successor, excludes use the primary only
- * (so a saved exclude never hides more than it used to).
- */
-export const TRACK_ALIASES: Record<string, TrackType[]> = {
-  'react-patterns': ['react', 'react-components'],
-  'async-web-plumbing': ['async-js'],
-  'js-runtime-fundamentals': ['js-utilities', 'js-language'],
-  'collections-transformations': ['js-utilities'],
-  'data-structures': ['js-utilities'],
-  'algorithmic-screens': ['algorithms'],
-  'algorithms-advanced': ['advanced-algorithms'],
-};
-
-/** Maps a (possibly retired) track id to a current one; anything else is returned unchanged. */
-export function migrateTrackId<T>(track: T): T | TrackType {
-  if (typeof track === 'string' && Object.prototype.hasOwnProperty.call(TRACK_ALIASES, track)) return TRACK_ALIASES[track][0];
-  return track;
-}
-
-export function migrateTrackList(list: string[], mode: 'include' | 'exclude'): string[] {
-  const out: string[] = [];
-  for (const id of list) {
-    const successors = Object.prototype.hasOwnProperty.call(TRACK_ALIASES, id) ? TRACK_ALIASES[id] : null;
-    const mapped = successors ? (mode === 'include' ? successors : [successors[0]]) : [id];
-    for (const m of mapped) if (!out.includes(m)) out.push(m);
-  }
-  return out;
-}
-
-/**
- * Seed cards that were removed as duplicates of a better card. Saved decks drop them on load so they do not linger as
- * orphan "custom" cards (their content lives only in the old save). Never reuse one of these ids.
- */
-export const RETIRED_SEED_IDS: ReadonlySet<string> = new Set([
-  'hook-fetch-cleanup',
-  'infinite-scroll-observer',
-  'sliding-window-dynamic',
-  'tree-level-order-bfs',
-  'hook-use-debounce',
-  'event-loop-microtasks',
-  'currying-function',
-  'interval-merge-sliding-window',
-]);
+// TRACK_ALIASES, RETIRED_SEED_IDS, migrateTrackId, migrateTrackList imported and re-exported from ./deckMigrations above
 
 /** React cards (hooks and components) share the React starter/test-harness hints. */
 export const isReactTrack = (track: string): boolean => track === 'react' || track === 'react-components';
@@ -493,6 +472,7 @@ export function getDefaultDeckState(
   seedTopics: TopicItem[] = seedTopicsData as unknown as TopicItem[]
 ): LeitnerDeckState {
   return {
+    deckVersion: CURRENT_DECK_VERSION,
     topics: seedTopics.map((t) => ({ ...t })),
     totalCompletedReviews: 0,
     lastReviewedTrack: undefined,
@@ -531,9 +511,10 @@ export const SEED_CONTENT_FIELDS = [
  * - Custom (non-seed) cards are left untouched with preserved progress.
  */
 export function mergeStoredWithSeed(
-  parsed: LeitnerDeckState,
+  rawParsed: LeitnerDeckState,
   seedTopics: TopicItem[] = seedTopicsData as unknown as TopicItem[]
 ): LeitnerDeckState {
+  const parsed = migrateDeckState(rawParsed);
   const seedMap = new Map(seedTopics.map((t) => [t.id, t]));
   const deleted = new Set(parsed.deletedSeedIds ?? []);
 
@@ -631,6 +612,7 @@ export function mergeStoredWithSeed(
     });
 
   return {
+    deckVersion: CURRENT_DECK_VERSION,
     topics: [...hydratedTopics, ...convertedDeletedTopics, ...newSeedTopics],
     totalCompletedReviews: typeof parsed.totalCompletedReviews === 'number' && Number.isInteger(parsed.totalCompletedReviews) && parsed.totalCompletedReviews >= 0 ? parsed.totalCompletedReviews : 0,
     lastReviewedTrack: parsed.lastReviewedTrack,
@@ -699,6 +681,7 @@ export function slimForStorage(state: LeitnerDeckState): LeitnerDeckState {
   const seedIds = seedIdSet;
   return {
     ...state,
+    deckVersion: state.deckVersion ?? CURRENT_DECK_VERSION,
     topics: state.topics.map((t) => {
       if (!seedIds.has(t.id)) return t;
       const slim: Record<string, unknown> = { ...t };
@@ -1300,12 +1283,13 @@ function parseTestCases(value: unknown): TestCaseItem[] | undefined {
 
 /** Validates and normalizes a backup file, preserving every card field. */
 export function parseDeckBackup(jsonText: string): LeitnerDeckState {
-  const parsed = JSON.parse(jsonText);
-  if (!parsed || !Array.isArray(parsed.topics)) {
+  const rawParsed = JSON.parse(jsonText);
+  if (!rawParsed || !Array.isArray(rawParsed.topics)) {
     throw new Error('Invalid Leitner backup file: missing topics array.');
   }
+  const parsed = migrateDeckState(rawParsed);
   const isGraduated = parsed.algorithm === 'graduated-interval';
-  const validTopics: TopicItem[] = parsed.topics.map((item: Record<string, unknown>) => {
+  const validTopics: TopicItem[] = parsed.topics.map((item: TopicItem) => {
     const rawBox = Math.max(1, Math.floor(Number(item.box)) || 1);
     const box = isGraduated ? rawBox : Math.min(5, rawBox);
     return {
@@ -1316,23 +1300,24 @@ export function parseDeckBackup(jsonText: string): LeitnerDeckState {
       streak: Math.max(0, Number(item.streak) || 0),
       nextEligibleTrial: Math.max(0, Number(item.nextEligibleTrial) || 0),
       status: item.status === 'locked' ? 'locked' : 'active',
-    tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
-    difficulty: Number.isInteger(Number(item.difficulty)) && Number(item.difficulty) >= 1 && Number(item.difficulty) <= 5 ? Number(item.difficulty) : undefined,
-    concept: optionalString(item.concept),
-    pack: optionalString(item.pack),
-    promptSeed: String(item.promptSeed || ''),
-    starterCode: optionalString(item.starterCode),
-    testHarness: optionalString(item.testHarness),
-    solution: optionalString(item.solution),
-    referenceSolution: optionalString(item.referenceSolution),
-    testCases: parseTestCases(item.testCases),
-    targetTime: optionalString(item.targetTime),
-    targetSpace: optionalString(item.targetSpace),
-    complexityExplanation: optionalString(item.complexityExplanation),
+      tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
+      difficulty: Number.isInteger(Number(item.difficulty)) && Number(item.difficulty) >= 1 && Number(item.difficulty) <= 5 ? Number(item.difficulty) : undefined,
+      concept: optionalString(item.concept),
+      pack: optionalString(item.pack),
+      promptSeed: String(item.promptSeed || ''),
+      starterCode: optionalString(item.starterCode),
+      testHarness: optionalString(item.testHarness),
+      solution: optionalString(item.solution),
+      referenceSolution: optionalString(item.referenceSolution),
+      testCases: parseTestCases(item.testCases),
+      targetTime: optionalString(item.targetTime),
+      targetSpace: optionalString(item.targetSpace),
+      complexityExplanation: optionalString(item.complexityExplanation),
     };
   });
 
   return {
+    deckVersion: CURRENT_DECK_VERSION,
     topics: validTopics,
     totalCompletedReviews: Number.isInteger(parsed.totalCompletedReviews) ? parsed.totalCompletedReviews : 0,
     lastReviewedTrack: isTrackType(migrateTrackId(parsed.lastReviewedTrack)) ? (migrateTrackId(parsed.lastReviewedTrack) as TrackType) : undefined,

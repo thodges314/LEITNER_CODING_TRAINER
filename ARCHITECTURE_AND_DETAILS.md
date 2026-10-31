@@ -170,11 +170,12 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (2,106 unit tests across 66 test files)**: Tests verifying:
+- **Vitest Suite (2,127 unit tests across 68 test files)**: Tests verifying:
   - Reference solutions pass for all 328 cards across 14 topics across 2,211 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.
   - 100% of cards formatted with structured GitHub-flavored Markdown instructions.
+  - State schema versioning and sequential migrations (`src/lib/deckMigrations.ts`): `deckVersion: 3`, incremental migrations (`migrateV1ToV2`, `migrateV2ToV3`), backward-compatible track consolidation, and GraphQL client/server split.
   - Preset study decks architecture (`src/lib/decks.test.ts`): built-in presets, scoping, custom decks, and local persistence.
   - Deck selector, custom deck builder, remove-from-deck modal, and AI Interview Prep Copilot wizard component tests (`src/components/dashboard/DeckSelector.test.tsx`, `CreateDeckModal.test.tsx`, `RemoveFromDeckModal.test.tsx`, `InterviewPrepModal.test.tsx`).
   - Catalog index build pipeline and AI interview prep prompt engine tests (`src/lib/catalogIndex.test.ts`, `src/lib/interviewPrep.test.ts`).
