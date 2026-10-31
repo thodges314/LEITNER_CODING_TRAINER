@@ -14,7 +14,8 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | PostgreSQL PGlite WASM Track & Pilot Cards | Thomas / Assistant | feature/postgresql-pglite-track | merged to feature branch |
-| GraphQL Track Split & Query Operations Rework | Thomas / Assistant | feature/graphql-tracks-rework | in progress |
+| GraphQL Track Split & Query Operations Rework | Thomas / Assistant | feature/graphql-tracks-rework | completed |
+| Multi-Step AI Dossier & Exact-Match Pipeline | Thomas / Assistant | feature/ai-dossier-pipeline | in progress |
 
 
 
