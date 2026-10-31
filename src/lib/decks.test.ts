@@ -33,10 +33,10 @@ describe('preset decks architecture', () => {
     ]);
   });
 
-  it('Full Library contains all 328 seed cards', () => {
+  it('Full Library contains all 329 seed cards', () => {
     const full = filterCardsByDeck(cards, 'full-library');
-    expect(full).toHaveLength(328);
-    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(328);
+    expect(full).toHaveLength(329);
+    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(329);
   });
 
   it('Full-Stack Core contains 275 cards excluding advanced algorithms', () => {
@@ -64,23 +64,23 @@ describe('preset decks architecture', () => {
     expect(tracks.has('typescript-patterns')).toBe(true);
   });
 
-  it('Algorithms & Data Structures contains 96 cards (core + advanced + algorithmic utilities)', () => {
+  it('Algorithms & Data Structures contains 97 cards (core + advanced + algorithmic utilities)', () => {
     const algo = filterCardsByDeck(cards, 'algorithms');
-    expect(algo).toHaveLength(96);
+    expect(algo).toHaveLength(97);
 
     const coreCount = algo.filter((c) => c.track === 'algorithms').length;
     const advCount = algo.filter((c) => c.track === 'advanced-algorithms').length;
     const utilCount = algo.filter((c) => c.track === 'js-utilities').length;
 
     expect(coreCount).toBe(27);
-    expect(advCount).toBe(53);
+    expect(advCount).toBe(54);
     expect(utilCount).toBe(16);
-    expect(coreCount + advCount + utilCount).toBe(96);
+    expect(coreCount + advCount + utilCount).toBe(97);
   });
 
   it('aliases legacy core-algorithms and advanced-algorithms to unified algorithms deck', () => {
-    expect(filterCardsByDeck(cards, 'core-algorithms')).toHaveLength(96);
-    expect(filterCardsByDeck(cards, 'advanced-algorithms')).toHaveLength(96);
+    expect(filterCardsByDeck(cards, 'core-algorithms')).toHaveLength(97);
+    expect(filterCardsByDeck(cards, 'advanced-algorithms')).toHaveLength(97);
     expect(getBuiltInDeck('core-algorithms')?.id).toBe('algorithms');
     expect(getBuiltInDeck('advanced-algorithms')?.id).toBe('algorithms');
   });

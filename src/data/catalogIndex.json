@@ -4544,5 +4544,19 @@
       "lead-lag"
     ],
     "summary": "Write a PostgreSQL query to sessionize user event streams into distinct browsing sessions. A new session begins whenever an event occurs more than ..."
+  },
+  {
+    "id": "ocean-view-buildings",
+    "title": "Ocean View Buildings (Monotonic Sightline)",
+    "track": "advanced-algorithms",
+    "concept": "monotonic-stack",
+    "difficulty": 2,
+    "tags": [
+      "stack",
+      "monotonic-stack",
+      "array",
+      "capital-one"
+    ],
+    "summary": "Implement a linear-time sightline algorithm to identify unobstructed coastal views"
   }
 ]

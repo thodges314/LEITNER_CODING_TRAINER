@@ -651,6 +651,10 @@
     "difficulty": 4,
     "concept": "monotonic-stack"
   },
+  "ocean-view-buildings": {
+    "difficulty": 2,
+    "concept": "monotonic-stack"
+  },
   "unique-paths-grid": {
     "difficulty": 2,
     "concept": "dp2d"
