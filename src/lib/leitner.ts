@@ -14,7 +14,8 @@ export type TrackType =
   | 'react'
   | 'react-components'
   | 'typescript-patterns'
-  | 'testing-tooling';
+  | 'testing-tooling'
+  | 'node';
 
 export interface TestCaseItem {
   input: string;
@@ -215,6 +216,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#a855f7',
     bg: 'rgba(168, 85, 247, 0.12)',
     border: 'rgba(168, 85, 247, 0.35)',
+  },
+  'node': {
+    label: 'Node.js',
+    color: '#4ade80',
+    bg: 'rgba(74, 222, 128, 0.12)',
+    border: 'rgba(74, 222, 128, 0.35)',
   },
 };
 

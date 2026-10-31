@@ -1,0 +1,10 @@
+{
+  "track": "node",
+  "title": "Custom EventEmitter with Prepend & Error Trapping",
+  "tags": [
+    "node",
+    "events",
+    "architecture",
+    "patterns"
+  ]
+}

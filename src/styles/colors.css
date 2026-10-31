@@ -118,6 +118,10 @@
   --track-js-utilities-bg: rgba(16, 185, 129, 0.12);
   --track-js-utilities-border: rgba(16, 185, 129, 0.35);
 
+  --track-node-color: #4ade80;
+  --track-node-bg: rgba(74, 222, 128, 0.12);
+  --track-node-border: rgba(74, 222, 128, 0.35);
+
   /* Typography & Shadows */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Fira Code', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -242,6 +246,10 @@
   --track-js-utilities-color: #047857;
   --track-js-utilities-bg: #D1FAE5;
   --track-js-utilities-border: #6EE7B7;
+
+  --track-node-color: #15803d;
+  --track-node-bg: #DCFCE7;
+  --track-node-border: #86EFAC;
 
   /* Shadows - Retro bevels */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);

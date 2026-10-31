@@ -1,0 +1,10 @@
+{
+  "track": "node",
+  "title": "Path Resolution & Traversal Guard",
+  "tags": [
+    "node",
+    "path",
+    "security",
+    "filesystem"
+  ]
+}

@@ -1081,6 +1081,7 @@
 .arena-track-react, .arena-track-react-components { color: var(--accent-primary); border-color: rgba(56, 189, 248, 0.35); background-color: rgba(56, 189, 248, 0.12); }
 .arena-track-typescript-patterns { color: var(--accent-cyan); border-color: rgba(56, 189, 248, 0.35); background-color: rgba(56, 189, 248, 0.12); }
 .arena-track-testing-tooling { color: var(--accent-rose); border-color: rgba(251, 113, 133, 0.35); background-color: rgba(251, 113, 133, 0.12); }
+.arena-track-node { color: #4ade80; border-color: rgba(74, 222, 128, 0.35); background-color: rgba(74, 222, 128, 0.12); }
 
 .arena-popover-desc {
   color: var(--text-secondary);

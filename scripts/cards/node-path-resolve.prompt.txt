@@ -1,0 +1,14 @@
+Implement path resolution and directory traversal defense for server-side file handling:
+
+### `resolvePath(...segments: string[]): string`
+- Resolves a sequence of paths or path segments into an absolute normalized POSIX path (similar to `path.posix.resolve`).
+- Processes segments from right to left until an absolute path (starting with `/`) is constructed.
+- If after processing all segments no absolute path is reached, prepends `'/'` as root.
+- Resolves all `.` (current dir) and `..` (parent dir) segments. Multiple consecutive slashes (`//`) are collapsed to a single `/`.
+- Trailing slashes are stripped unless the resolved path is the root `'/'`.
+
+### `isSafePath(rootPath: string, userPath: string): boolean`
+- Determines whether `userPath` resolved against `rootPath` is safely contained within `rootPath`.
+- Prevents path traversal vulnerabilities where malicious inputs (e.g. `../../etc/passwd` or `../sibling-dir`) escape the intended root directory.
+- Note: A path like `/app/data-secret` is **not** inside `/app/data` because it is a different directory name.
+- Returns `true` if the resolved path is `rootPath` or a sub-path inside `rootPath`, `false` otherwise.

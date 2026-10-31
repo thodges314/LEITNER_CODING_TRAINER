@@ -72,6 +72,12 @@
   border: 1px solid var(--track-js-utilities-border);
 }
 
+.track-badge[data-track="node"] {
+  color: var(--track-node-color);
+  background-color: var(--track-node-bg);
+  border: 1px solid var(--track-node-border);
+}
+
 /* Difficulty Badges */
 .difficulty-badge {
   display: inline-flex;

@@ -3782,5 +3782,47 @@
       "workflow"
     ],
     "summary": "Build an interactive multi-column Kanban board for tracking tasks across workflow stages."
+  },
+  {
+    "id": "node-cli-argv-parser",
+    "title": "CLI Argument & Option Parser",
+    "track": "node",
+    "concept": "cli-tooling",
+    "difficulty": 1,
+    "tags": [
+      "node",
+      "cli",
+      "parsing",
+      "tooling"
+    ],
+    "summary": "Parse command-line argument arrays (e.g. process.argv.slice(2)) into a structured options object and positional array"
+  },
+  {
+    "id": "node-event-emitter",
+    "title": "Custom EventEmitter with Prepend & Error Trapping",
+    "track": "node",
+    "concept": "event-emitter",
+    "difficulty": 1,
+    "tags": [
+      "node",
+      "events",
+      "architecture",
+      "patterns"
+    ],
+    "summary": "Implement Node.js's core EventEmitter class for event-driven coordination"
+  },
+  {
+    "id": "node-path-resolve",
+    "title": "Path Resolution & Traversal Guard",
+    "track": "node",
+    "concept": "path-resolution",
+    "difficulty": 1,
+    "tags": [
+      "node",
+      "path",
+      "security",
+      "filesystem"
+    ],
+    "summary": "Implement path resolution and directory traversal defense for server-side file handling"
   }
 ]

@@ -141,6 +141,11 @@ export const SYNTHWAVE_DARK_PALETTE: ThemePalette = {
       bg: 'rgba(16, 185, 129, 0.12)',
       border: 'rgba(16, 185, 129, 0.35)',
     },
+    'node': {
+      color: '#4ade80',
+      bg: 'rgba(74, 222, 128, 0.12)',
+      border: 'rgba(74, 222, 128, 0.35)',
+    },
   },
 };
 
@@ -243,6 +248,11 @@ export const APPLE_GSOS_PALETTE: ThemePalette = {
       color: '#047857',
       bg: '#D1FAE5',
       border: '#6EE7B7',
+    },
+    'node': {
+      color: '#15803d',
+      bg: '#DCFCE7',
+      border: '#86EFAC',
     },
   },
 };

@@ -1,0 +1,25 @@
+Parse command-line argument arrays (e.g. `process.argv.slice(2)`) into a structured options object and positional array:
+
+```ts
+interface ParsedArgv {
+  _: Array<string | number>;
+  [key: string]: any;
+}
+```
+
+### `parseArgv(args: string[]): ParsedArgv`
+- Returns an object containing a positional arguments array `_` and key-value options.
+- **Short flags**:
+  - Single flag: `'-v'` -> `{ v: true }`.
+  - Combined flags: `'-abc'` -> `{ a: true, b: true, c: true }`.
+  - Short flag with argument: If a short flag is followed by a non-flag argument, e.g. `['-p', '8080']`, it parses as `{ p: 8080 }` (parsed as a number if valid number).
+- **Long options**:
+  - `--key=value`: parsed as `{ key: value }` (e.g. `'--port=3000'` -> `{ port: 3000 }`).
+  - `--key value`: parsed as `{ key: value }` (e.g. `['--host', 'localhost']` -> `{ host: 'localhost' }`).
+  - Boolean flag `--dry-run`: if not followed by a value (or followed by another flag), parses as `{ 'dry-run': true }`.
+  - Negated boolean `--no-watch`: parses as `{ watch: false }`.
+- **Positional delimiter (`--`)**:
+  - All arguments following a standalone `'--'` token are treated strictly as positional elements in `_`, even if they start with `-` or `--`.
+- **Value Coercion**:
+  - Numeric strings (e.g. `'8080'`, `'-42'`) coerce to numbers.
+  - Boolean strings `'true'` / `'false'` coerce to booleans.

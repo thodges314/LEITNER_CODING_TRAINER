@@ -31,6 +31,7 @@ const RADAR_DOMAINS: { id: string; label: string; tracks: TrackType[] }[] = [
   { id: 'typescript', label: 'TypeScript', tracks: ['typescript-patterns'] },
   { id: 'dom', label: 'DOM & Web APIs', tracks: ['dom-browser'] },
   { id: 'core', label: 'JS Core & Tools', tracks: ['js-language', 'js-utilities', 'testing-tooling'] },
+  { id: 'node', label: 'Node.js', tracks: ['node'] },
 ];
 
 export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({

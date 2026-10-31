@@ -257,6 +257,12 @@
   --track-border: var(--track-js-utilities-border);
 }
 
+.track-badge[data-track="node"] {
+  --track-color: var(--track-node-color);
+  --track-bg: var(--track-node-bg);
+  --track-border: var(--track-node-border);
+}
+
 /* Track Filter Button Pill */
 .track-filter-btn {
   padding: 6px 11px;

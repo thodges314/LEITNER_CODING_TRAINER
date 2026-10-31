@@ -1,0 +1,26 @@
+Implement Node.js's core `EventEmitter` class for event-driven coordination:
+
+### `on(event: string, listener: (...args: any[]) => void): this`
+- Registers `listener` to be called when `event` is emitted.
+- Multiple listeners registered for the same event execute in insertion order.
+- Returns `this` for chaining.
+
+### `emit(event: string, ...args: any[]): boolean`
+- Synchronously calls each listener registered for `event` in order with the supplied `args`.
+- Returns `true` if the event had listeners, `false` otherwise.
+- **Special Error Handling**: If `event === 'error'` and there are no listeners registered for `'error'`, `emit` must throw the passed error argument (or an `Error('Unhandled error')` if no argument was passed).
+
+### `once(event: string, listener: (...args: any[]) => void): this`
+- Adds a one-time `listener` for `event`. The next time `event` is triggered, this listener is removed and then invoked.
+- Returns `this`.
+
+### `off(event: string, listener: (...args: any[]) => void): this`
+- Removes `listener` from the listener array for `event`. If `listener` was added via `.once()`, it must also be successfully removed using the original listener reference.
+- Returns `this`.
+
+### `prependListener(event: string, listener: (...args: any[]) => void): this`
+- Adds `listener` to the beginning of the listeners array for `event`.
+- Returns `this`.
+
+### `listenerCount(event: string): number`
+- Returns the number of active listeners registered for `event`.
