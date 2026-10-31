@@ -1690,7 +1690,7 @@ Only include this JSON block if the candidate requested a modification to the de
         model = model || 'gpt-4o-mini';
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'openai/gpt-oss-120b';
+        model = model || 'llama-3.3-70b-versatile';
       } else if (provider === 'cerebras') {
         baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
         model = model || 'llama3.3-70b';

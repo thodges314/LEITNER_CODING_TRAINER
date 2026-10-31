@@ -44,7 +44,6 @@ import {
 import {
   getStoredProvider,
   getStoredModel,
-  type AIProvider,
 } from '../../lib/ai';
 import { printInterviewDossier } from '../../lib/printDossier';
 
@@ -199,8 +198,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // AI Model info
-  const [activeProvider] = useState<AIProvider>(() => getStoredProvider());
-  const [activeModel] = useState<string>(() => getStoredModel());
+  const activeProvider = getStoredProvider();
+  const activeModel = getStoredModel();
 
   const companyInputRef = useRef<HTMLInputElement>(null);
   const deckNameInputRef = useRef<HTMLInputElement>(null);
