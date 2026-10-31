@@ -4587,5 +4587,20 @@
       "capital-one"
     ],
     "summary": "Implement a Unix path simplification algorithm using a stack to normalize directory structures"
+  },
+  {
+    "id": "sort-colors",
+    "title": "Sort Colors (Dutch National Flag)",
+    "track": "algorithms",
+    "concept": "two-pointer",
+    "difficulty": 2,
+    "tags": [
+      "two-pointer",
+      "array",
+      "sorting",
+      "in-place",
+      "capital-one"
+    ],
+    "summary": "Given an array nums containing n objects colored red, white, or blue, sort them **in-place** so that objects of the same color are adjacent, with t..."
   }
 ]

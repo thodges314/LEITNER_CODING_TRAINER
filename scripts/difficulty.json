@@ -1322,5 +1322,9 @@
   "simplify-path": {
     "difficulty": 2,
     "concept": "stack"
+  },
+  "sort-colors": {
+    "difficulty": 2,
+    "concept": "two-pointer"
   }
 }

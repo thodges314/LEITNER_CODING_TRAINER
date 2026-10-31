@@ -1,0 +1,25 @@
+## Description
+
+Given an array `nums` containing `n` objects colored red, white, or blue, sort them **in-place** so that objects of the same color are adjacent, with the colors ordered `0` (red), `1` (white), and `2` (blue).
+
+You must solve this problem without using the library's `Array.prototype.sort` function, and using only $O(1)$ constant extra space.
+
+### sortColors(nums: number[]): number[]
+
+#### Parameters
+- `nums: number[]`: An array of integers where each element is `0`, `1`, or `2`.
+
+#### Returns
+- `number[]`: The input array `nums` sorted in-place in ascending order (`0`s, then `1`s, then `2`s).
+
+#### Constraints
+- `0 <= nums.length <= 300`
+- `nums[i]` is either `0`, `1`, or `2`.
+- Time Complexity: $O(n)$ single-pass.
+- Space Complexity: $O(1)$ auxiliary memory (in-place).
+
+#### Edge Cases
+- Empty array `[]` returns `[]`.
+- Single-element array `[0]` remains unchanged.
+- Arrays containing only one distinct color (e.g. `[2, 2, 2]`) or two colors (`[2, 0]`).
+- Already sorted arrays or reverse-sorted arrays.
