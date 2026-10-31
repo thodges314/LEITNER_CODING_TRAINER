@@ -1,0 +1,51 @@
+Implement the resolver map for a relational GraphQL schema connecting `Author` and `Book` entities:
+
+## Description
+
+```ts
+interface AuthorRecord {
+  id: string;
+  name: string;
+}
+
+interface BookRecord {
+  id: string;
+  title: string;
+  authorId: string;
+}
+
+interface LibraryContext {
+  db: {
+    getAuthors(): AuthorRecord[];
+    getAuthorById(id: string): AuthorRecord | null;
+    getBooks(): BookRecord[];
+    getBooksByAuthorId(authorId: string): BookRecord[];
+  };
+}
+
+interface LibraryResolvers {
+  Query: {
+    authors(_parent: any, _args: any, context: LibraryContext): AuthorRecord[];
+    books(_parent: any, _args: any, context: LibraryContext): BookRecord[];
+    author(_parent: any, args: { id: string }, context: LibraryContext): AuthorRecord | null;
+  };
+  Author: {
+    books(parent: AuthorRecord, _args: any, context: LibraryContext): BookRecord[];
+  };
+  Book: {
+    author(parent: BookRecord, _args: any, context: LibraryContext): AuthorRecord | null;
+  };
+}
+```
+
+### `createLibraryResolvers(): LibraryResolvers`
+
+- **Resolver Signatures**:
+  Every GraphQL field resolver follows the canonical 4-argument signature `(parent, args, context, info)`.
+- **Top-Level `Query` Resolvers**:
+  - `Query.authors(_parent, _args, context)`: Returns all authors by calling `context.db.getAuthors()`.
+  - `Query.books(_parent, _args, context)`: Returns all books by calling `context.db.getBooks()`.
+  - `Query.author(_parent, args, context)`: Looks up a single author by calling `context.db.getAuthorById(args.id)`.
+- **Nested Type Resolvers**:
+  - `Author.books(parent, _args, context)`: Uses `parent.id` to fetch the author's books via `context.db.getBooksByAuthorId(parent.id)`.
+  - `Book.author(parent, _args, context)`: Uses `parent.authorId` to resolve the author via `context.db.getAuthorById(parent.authorId)`.

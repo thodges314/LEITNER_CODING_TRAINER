@@ -1,0 +1,37 @@
+Write a utility function to generate formatted GraphQL Schema Definition Language (SDL) type definitions from model objects:
+
+## Description
+
+```ts
+interface FieldDefinition {
+  name: string;
+  type: string;
+  required?: boolean;
+  isArray?: boolean;
+  itemRequired?: boolean;
+}
+
+interface ModelDefinition {
+  name: string;
+  fields: FieldDefinition[];
+  description?: string;
+}
+```
+
+### `generateTypeDefs(models: ModelDefinition[]): string`
+
+- **Type Declaration**:
+  - Each model generates a GraphQL object type: `type <ModelName> {\n  <fields>\n}`.
+  - If `description` is provided, prefixes the type declaration with a docstring `"""<description>"""\n`.
+- **Field Formatting**:
+  - Indented by 2 spaces: `  <fieldName>: <FieldType>`.
+  - **Scalar & Object Types**: `field.type` (e.g. `ID`, `String`, `User`).
+  - **Array Modifier (`isArray`)**:
+    - If `isArray` is true and `itemRequired` is true, items inside the list are non-null: `[Type!]`.
+    - If `isArray` is true and `itemRequired` is falsy: `[Type]`.
+  - **Non-Null Modifier (`required`)**:
+    - If `required` is true, appends `!` to the outer type (e.g. `String!`, `[Type]!`, `[Type!]!`).
+    - If `required` is falsy, the outer type remains nullable (e.g. `String`, `[Type!]`).
+- **Joining Models**:
+  - Multiple models are separated by two newlines (`\n\n`).
+  - An empty models array returns an empty string `""`.

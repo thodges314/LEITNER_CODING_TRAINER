@@ -1166,5 +1166,61 @@
   "node-worker-pool-dispatcher": {
     "difficulty": 5,
     "concept": "worker-threads"
+  },
+  "graphql-mini-client": {
+    "difficulty": 1,
+    "concept": "graphql-client"
+  },
+  "graphql-extract-operation-name": {
+    "difficulty": 1,
+    "concept": "graphql-ast"
+  },
+  "graphql-variable-validator": {
+    "difficulty": 1,
+    "concept": "graphql-variables"
+  },
+  "graphql-sdl-type-generator": {
+    "difficulty": 2,
+    "concept": "graphql-sdl"
+  },
+  "graphql-input-object-sanitizer": {
+    "difficulty": 2,
+    "concept": "graphql-validation"
+  },
+  "graphql-discriminated-union-resolver": {
+    "difficulty": 2,
+    "concept": "graphql-resolvers"
+  },
+  "graphql-nested-field-resolvers": {
+    "difficulty": 3,
+    "concept": "graphql-resolvers"
+  },
+  "graphql-context-auth-guard": {
+    "difficulty": 3,
+    "concept": "graphql-middleware"
+  },
+  "graphql-format-error-masking": {
+    "difficulty": 3,
+    "concept": "graphql-errors"
+  },
+  "graphql-dataloader-batching": {
+    "difficulty": 4,
+    "concept": "graphql-dataloader"
+  },
+  "graphql-query-complexity-calculator": {
+    "difficulty": 4,
+    "concept": "graphql-complexity"
+  },
+  "graphql-cursor-pagination-extractor": {
+    "difficulty": 4,
+    "concept": "graphql-pagination"
+  },
+  "graphql-relay-connection-builder": {
+    "difficulty": 5,
+    "concept": "graphql-relay"
+  },
+  "graphql-schema-stitching-merger": {
+    "difficulty": 5,
+    "concept": "graphql-stitching"
   }
 }

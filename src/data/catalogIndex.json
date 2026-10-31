@@ -4008,5 +4008,213 @@
       "queue"
     ],
     "summary": "CPU-intensive jobs (cryptography hashing, compression, image resizing, matrix math) block Node.js's main event loop unless offloaded to a pool of w..."
+  },
+  {
+    "id": "graphql-context-auth-guard",
+    "title": "GraphQL Middleware: Context Auth Guard",
+    "track": "graphql",
+    "concept": "graphql-middleware",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "middleware",
+      "auth",
+      "resolvers"
+    ],
+    "summary": "Implement a higher-order resolver guard that enforces authentication and role-based authorization from the GraphQL context"
+  },
+  {
+    "id": "graphql-cursor-pagination-extractor",
+    "title": "GraphQL Cursor Pagination Argument Parser",
+    "track": "graphql",
+    "concept": "graphql-pagination",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "cursor",
+      "validation",
+      "api-design"
+    ],
+    "summary": "Implement a GraphQL cursor pagination argument parser adhering to the Relay Cursor Connections Specification"
+  },
+  {
+    "id": "graphql-dataloader-batching",
+    "title": "GraphQL DataLoader: Microtask Request Batching",
+    "track": "graphql",
+    "concept": "graphql-dataloader",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "performance",
+      "n-plus-one",
+      "dataloader",
+      "promises",
+      "microtasks"
+    ],
+    "summary": "Implement a lightweight DataLoader class that batches concurrent key requests within a single event-loop microtask to eliminate N+1 query waterfalls"
+  },
+  {
+    "id": "graphql-discriminated-union-resolver",
+    "title": "GraphQL Resolvers: Discriminated Union Resolver",
+    "track": "graphql",
+    "concept": "graphql-resolvers",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "resolvers",
+      "unions",
+      "schema"
+    ],
+    "summary": "Implement a GraphQL __resolveType helper factory for abstract Union and Interface types"
+  },
+  {
+    "id": "graphql-extract-operation-name",
+    "title": "GraphQL AST: Extract Operation Name",
+    "track": "graphql",
+    "concept": "graphql-ast",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "ast",
+      "regex",
+      "parsing",
+      "query"
+    ],
+    "summary": "Write a utility function to extract the operation name from a GraphQL document string without third-party AST parser dependencies"
+  },
+  {
+    "id": "graphql-format-error-masking",
+    "title": "GraphQL Errors: Error Masking and Formatting",
+    "track": "graphql",
+    "concept": "graphql-errors",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "errors",
+      "security",
+      "sanitization"
+    ],
+    "summary": "Implement a GraphQL formatError sanitization hook that masks internal server errors in production"
+  },
+  {
+    "id": "graphql-input-object-sanitizer",
+    "title": "GraphQL Validation: Input Object Sanitizer",
+    "track": "graphql",
+    "concept": "graphql-validation",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "validation",
+      "mutation",
+      "input"
+    ],
+    "summary": "Write an input validation and sanitization utility for GraphQL mutation arguments"
+  },
+  {
+    "id": "graphql-mini-client",
+    "title": "GraphQL Client: Fetch with Error Handling",
+    "track": "graphql",
+    "concept": "graphql-client",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "client",
+      "fetch",
+      "network",
+      "async"
+    ],
+    "summary": "Write a lightweight GraphQL client request utility using native fetch"
+  },
+  {
+    "id": "graphql-nested-field-resolvers",
+    "title": "GraphQL Resolvers: Nested Relational Field Resolvers",
+    "track": "graphql",
+    "concept": "graphql-resolvers",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "resolvers",
+      "relational",
+      "schema"
+    ],
+    "summary": "Implement the resolver map for a relational GraphQL schema connecting Author and Book entities"
+  },
+  {
+    "id": "graphql-query-complexity-calculator",
+    "title": "GraphQL Query Complexity Cost Calculator",
+    "track": "graphql",
+    "concept": "graphql-complexity",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "security",
+      "dos-protection",
+      "complexity",
+      "recursion",
+      "ast"
+    ],
+    "summary": "Implement a static GraphQL query complexity analysis function that computes recursive execution costs to protect backends from denial-of-service qu..."
+  },
+  {
+    "id": "graphql-relay-connection-builder",
+    "title": "GraphQL Relay Connection & Cursor Pagination Spec",
+    "track": "graphql",
+    "concept": "graphql-relay",
+    "difficulty": 5,
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "connections",
+      "cursors",
+      "specifications"
+    ],
+    "summary": "Implement a compliant Relay Cursor Connections builder that transforms a dataset and pagination arguments into a structured Connection<T>"
+  },
+  {
+    "id": "graphql-schema-stitching-merger",
+    "title": "GraphQL Schema Stitching Resolver Merger",
+    "track": "graphql",
+    "concept": "graphql-stitching",
+    "difficulty": 5,
+    "tags": [
+      "graphql",
+      "schema-stitching",
+      "federation",
+      "resolvers",
+      "conflict-detection",
+      "microservices"
+    ],
+    "summary": "Implement a schema stitching utility that unifies distributed subsystem resolver maps into a consolidated root schema while preventing conflicting ..."
+  },
+  {
+    "id": "graphql-sdl-type-generator",
+    "title": "GraphQL SDL: Type Definition Generator",
+    "track": "graphql",
+    "concept": "graphql-sdl",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "codegen"
+    ],
+    "summary": "Write a utility function to generate formatted GraphQL Schema Definition Language (SDL) type definitions from model objects"
+  },
+  {
+    "id": "graphql-variable-validator",
+    "title": "GraphQL Variables: Required Variable Validator",
+    "track": "graphql",
+    "concept": "graphql-variables",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "variables",
+      "validation",
+      "schema"
+    ],
+    "summary": "Write a variable validation utility for GraphQL operations that checks whether all required variables are supplied"
   }
 ]

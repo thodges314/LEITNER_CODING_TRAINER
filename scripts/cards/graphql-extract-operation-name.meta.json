@@ -1,0 +1,5 @@
+{
+  "track": "graphql",
+  "title": "GraphQL AST: Extract Operation Name",
+  "tags": ["graphql", "ast", "regex", "parsing", "query"]
+}

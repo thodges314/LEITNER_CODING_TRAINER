@@ -1,0 +1,44 @@
+Implement a GraphQL `formatError` sanitization hook that masks internal server errors in production:
+
+## Description
+
+```ts
+interface GraphQLErrorLike {
+  message: string;
+  locations?: Array<{ line: number; column: number }>;
+  path?: Array<string | number>;
+  extensions?: {
+    code?: string;
+    [key: string]: any;
+  };
+}
+
+interface FormattedError {
+  message: string;
+  locations?: Array<{ line: number; column: number }>;
+  path?: Array<string | number>;
+  extensions: {
+    code: string;
+    [key: string]: any;
+  };
+}
+```
+
+### `maskAndFormatError(error: GraphQLErrorLike, isProduction = true): FormattedError`
+
+- **Known Client Errors**:
+  - The following error codes are safe client-facing errors:
+    `'BAD_USER_INPUT'`, `'UNAUTHENTICATED'`, `'FORBIDDEN'`, `'GRAPHQL_VALIDATION_FAILED'`.
+  - When `error.extensions?.code` is one of these known codes:
+    - Retains original `error.message`.
+    - Preserves `locations` and `path` if present.
+    - Copies extensions, ensuring `extensions.code` is set.
+- **Internal / Unknown Errors in Production (`isProduction === true`)**:
+  - If `error.extensions?.code` is `'INTERNAL_SERVER_ERROR'`, `'DATABASE_ERROR'`, missing, or unlisted:
+    - Replaces `message` with `'Internal server error'`.
+    - Sets `extensions.code` to `'INTERNAL_SERVER_ERROR'`.
+    - Preserves `locations` and `path` if present.
+    - Strips all other extensions (e.g. `stacktrace`, `exception`, `details`) to prevent information leakage.
+- **Development Mode (`isProduction === false`)**:
+  - Does **not** mask the error message.
+  - Keeps all original extensions intact, defaulting `extensions.code` to `'INTERNAL_SERVER_ERROR'` if not provided.

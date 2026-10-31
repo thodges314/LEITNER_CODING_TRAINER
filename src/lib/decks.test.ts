@@ -33,23 +33,23 @@ describe('preset decks architecture', () => {
     ]);
   });
 
-  it('Full Library contains all 292 seed cards', () => {
+  it('Full Library contains all 306 seed cards', () => {
     const full = filterCardsByDeck(cards, 'full-library');
-    expect(full).toHaveLength(292);
-    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(292);
+    expect(full).toHaveLength(306);
+    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(306);
   });
 
-  it('Full-Stack Core contains 239 cards excluding advanced algorithms', () => {
+  it('Full-Stack Core contains 253 cards excluding advanced algorithms', () => {
     const fsDeck = filterCardsByDeck(cards, 'full-stack');
-    expect(fsDeck).toHaveLength(239);
+    expect(fsDeck).toHaveLength(253);
     for (const c of fsDeck) {
       expect(c.track).not.toBe('advanced-algorithms');
     }
   });
 
-  it('Frontend Specialist contains 197 frontend cards and zero algorithm cards', () => {
+  it('Frontend Specialist contains 211 frontend cards and zero algorithm cards', () => {
     const fe = filterCardsByDeck(cards, 'frontend-specialist');
-    expect(fe).toHaveLength(197);
+    expect(fe).toHaveLength(211);
     const tracks = new Set(fe.map((c) => c.track));
     expect(tracks.has('algorithms')).toBe(false);
     expect(tracks.has('advanced-algorithms')).toBe(false);
@@ -57,6 +57,7 @@ describe('preset decks architecture', () => {
     expect(tracks.has('react-components')).toBe(true);
     expect(tracks.has('dom-browser')).toBe(true);
     expect(tracks.has('async-js')).toBe(true);
+    expect(tracks.has('graphql')).toBe(true);
     expect(tracks.has('js-utilities')).toBe(true);
     expect(tracks.has('js-language')).toBe(true);
     expect(tracks.has('testing-tooling')).toBe(true);
@@ -102,7 +103,7 @@ describe('preset decks architecture', () => {
 
   it('falls back to all cards for unknown deck id', () => {
     const filtered = filterCardsByDeck(cards, 'non-existent-deck');
-    expect(filtered).toHaveLength(292);
+    expect(filtered).toHaveLength(306);
   });
 
   it('handles getStoredActiveDeckId and setStoredActiveDeckId', () => {

@@ -1,0 +1,5 @@
+{
+  "track": "graphql",
+  "title": "GraphQL Query Complexity Cost Calculator",
+  "tags": ["graphql", "security", "dos-protection", "complexity", "recursion", "ast"]
+}

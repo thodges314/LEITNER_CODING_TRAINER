@@ -1,0 +1,63 @@
+Implement a compliant Relay Cursor Connections builder that transforms a dataset and pagination arguments into a structured `Connection<T>`:
+
+## Description
+
+```ts
+interface Edge<T> {
+  node: T;
+  cursor: string;
+}
+
+interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string | null;
+  endCursor: string | null;
+}
+
+interface Connection<T> {
+  edges: Edge<T>[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+
+interface ConnectionArgs {
+  first?: number;
+  after?: string;
+  last?: number;
+  before?: string;
+}
+```
+
+### `buildRelayConnection<T>(items: T[], args?: ConnectionArgs): Connection<T>`
+
+- **Cursor Encoding**:
+  - Each item index $i$ in `items` produces a base64-encoded string cursor: `btoa(String(i))`.
+  - Use `atob(cursor)` to decode cursor back to numeric index.
+- **Relay Slicing Algorithm**:
+  1. Initialize all edges from `items`: `edges = items.map((node, i) => ({ node, cursor: btoa(String(i)) }))`.
+  2. If `args?.after` is provided:
+     - Decode `afterIndex = parseInt(atob(args.after), 10)`.
+     - Retain only edges strictly after `afterIndex`: `edges.slice(afterIndex + 1)`.
+  3. If `args?.before` is provided:
+     - Decode `beforeIndex = parseInt(atob(args.before), 10)`.
+     - Retain only edges strictly before `beforeIndex`: `edges.slice(0, beforeIndex)`.
+  4. If `args?.first !== undefined`:
+     - If `args.first < 0`, throw `new Error('first must be non-negative')`.
+     - Slice to at most `args.first` items from the beginning.
+  5. If `args?.last !== undefined`:
+     - If `args.last < 0`, throw `new Error('last must be non-negative')`.
+     - Slice to at most `args.last` items from the end.
+- **`PageInfo` Calculation**:
+  - `hasPreviousPage`:
+    - `true` if `last` was applied and more items existed in the range than `last`.
+    - `true` if `after` was applied and `afterIndex >= 0`.
+    - Otherwise `false`.
+  - `hasNextPage`:
+    - `true` if `first` was applied and more items existed in the range than `first`.
+    - `true` if `before` was applied and `beforeIndex < items.length`.
+    - Otherwise `false`.
+  - `startCursor`: Cursor of the first edge in `edges`, or `null` if empty.
+  - `endCursor`: Cursor of the last edge in `edges`, or `null` if empty.
+- **Return Value**:
+  - Returns `{ edges, pageInfo, totalCount: items.length }`.

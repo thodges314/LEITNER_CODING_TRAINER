@@ -1,0 +1,47 @@
+Implement a GraphQL cursor pagination argument parser adhering to the Relay Cursor Connections Specification:
+
+## Description
+
+```ts
+interface PaginationArgs {
+  first?: number;
+  after?: string;
+  last?: number;
+  before?: string;
+}
+
+interface PaginationOptions {
+  defaultLimit?: number;
+  maxLimit?: number;
+}
+
+interface ParsedPagination {
+  isForward: boolean;
+  limit: number;
+  cursor?: string;
+}
+```
+
+### `parsePaginationArgs(args?: PaginationArgs, options?: PaginationOptions): ParsedPagination`
+
+- **Relay Specification Invariants**:
+  - Cannot mix forward and backward pagination slicing.
+  - If both `first` and `last` are defined, throw `new Error('Cannot combine first and last')`.
+  - If both `first` and `before` are defined, throw `new Error('Cannot combine first and before')`.
+  - If both `last` and `after` are defined, throw `new Error('Cannot combine last and after')`.
+  - If both `after` and `before` are defined, throw `new Error('Cannot combine after and before')`.
+- **Bounds Checking**:
+  - `first` must be non-negative (`first >= 0`). If negative, throw `new Error('first must be non-negative')`.
+  - `last` must be non-negative (`last >= 0`). If negative, throw `new Error('last must be non-negative')`.
+- **Limits and Clamping**:
+  - `defaultLimit` defaults to `20`.
+  - `maxLimit` defaults to `50`.
+  - The requested limit is clamped to at most `maxLimit`: `Math.min(requested, maxLimit)`.
+- **Direction Determination**:
+  - If `first` or `after` is present (and no backward args), returns `isForward: true`.
+  - If `last` or `before` is present (and no forward args), returns `isForward: false`.
+  - If neither `first` nor `last` is supplied:
+    - If `before` is provided: `isForward: false`, `limit: defaultLimit`, `cursor: args.before`.
+    - If `after` is provided: `isForward: true`, `limit: defaultLimit`, `cursor: args.after`.
+    - If no args are supplied: `isForward: true`, `limit: defaultLimit`, `cursor: undefined`.
+  - When `cursor` is present and non-empty, include `cursor` in the returned object.

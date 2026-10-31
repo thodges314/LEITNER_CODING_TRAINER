@@ -23,10 +23,10 @@ describe('track consolidation: the seed deck', () => {
     }
   });
 
-  it('there are exactly 11 tracks, and none of the retired ids is still in use', () => {
+  it('there are exactly 12 tracks, and none of the retired ids is still in use', () => {
     const used = new Set<string>(cards.map((c) => c.track));
     expect([...used].sort()).toEqual(
-      ['advanced-algorithms', 'algorithms', 'async-js', 'dom-browser', 'js-language', 'js-utilities', 'node', 'react', 'react-components', 'testing-tooling', 'typescript-patterns']
+      ['advanced-algorithms', 'algorithms', 'async-js', 'dom-browser', 'graphql', 'js-language', 'js-utilities', 'node', 'react', 'react-components', 'testing-tooling', 'typescript-patterns']
     );
     for (const retired of Object.keys(TRACK_ALIASES)) expect(used.has(retired), retired).toBe(false);
   });

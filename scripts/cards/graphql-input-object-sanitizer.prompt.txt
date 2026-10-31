@@ -1,0 +1,43 @@
+Write an input validation and sanitization utility for GraphQL mutation arguments:
+
+## Description
+
+```ts
+type ScalarType = 'String' | 'Int' | 'Float' | 'Boolean' | 'ID';
+
+interface InputFieldSchema {
+  type: ScalarType;
+  required?: boolean;
+  enumValues?: string[];
+}
+
+interface InputSchema {
+  [fieldName: string]: InputFieldSchema;
+}
+
+interface SanitizedResult<T = any> {
+  valid: boolean;
+  data?: T;
+  errors?: string[];
+}
+```
+
+### `sanitizeInput<T = any>(schema: InputSchema, input: Record<string, any>): SanitizedResult<T>`
+
+- **Unknown Field Stripping**:
+  - Properties present on `input` that are not defined in `schema` must be stripped from the output `data`.
+- **Validation Rules**:
+  - **Required Fields**: If `field.required` is true, the property must be defined and non-null in `input`. If missing, append error: `Field '${name}' is required`.
+  - **Type Checking** (when property is provided and not null):
+    - `'String'`: must be a `string`.
+    - `'Int'`: must be an integer `number` (`typeof val === 'number' && Number.isInteger(val)`).
+    - `'Float'`: must be a finite `number` (`typeof val === 'number' && Number.isFinite(val)`).
+    - `'Boolean'`: must be a `boolean`.
+    - `'ID'`: must be a `string` or `number`.
+    - On mismatch, append error: `Field '${name}' must be of type ${field.type}`.
+  - **Enum Values**:
+    - If `field.enumValues` is an array of strings, the value must be included in `enumValues`.
+    - If invalid, append error: `Field '${name}' must be one of: ${enumValues.join(', ')}`.
+- **Return Value**:
+  - If all checks pass, returns `{ valid: true, data: sanitizedObject }`.
+  - If any errors occur, returns `{ valid: false, errors: [...] }`.

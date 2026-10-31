@@ -1,0 +1,23 @@
+Write a variable validation utility for GraphQL operations that checks whether all required variables are supplied:
+
+## Description
+
+```ts
+interface VariableValidationResult {
+  valid: boolean;
+  missing: string[];
+}
+```
+
+### `validateVariables(variableDefinitions: Record<string, string>, variables?: Record<string, any> | null): VariableValidationResult`
+
+- **Required Variables**:
+  - A variable is required if its type definition ends with `'!'` (e.g. `'ID!'`, `'String!'`, `'[Int]!'`).
+  - Types that do not end with `'!'` (e.g. `'Int'`, `'String'`, `'[ID]'`) are optional.
+- **Missing Check**:
+  - A required variable is considered missing if its key is absent from `variables`, or if its value is strictly `undefined` or `null`.
+  - Falsy values like `0`, `""` (empty string), and `false` are considered valid provided values and must **not** be marked as missing.
+- **Return Value**:
+  - If all required variables are provided, returns `{ valid: true, missing: [] }`.
+  - If any required variables are missing, returns `{ valid: false, missing: [...] }` preserving the declaration order of the missing variables from `variableDefinitions`.
+  - If `variables` is omitted, `null`, or `undefined`, all required variables are returned as `missing`.
