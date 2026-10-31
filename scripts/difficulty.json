@@ -1142,6 +1142,18 @@
   "graphql-format-error-masking": {
     "difficulty": 3,
     "concept": "graphql-errors"
+  },
+  "graphql-dataloader-batching": {
+    "difficulty": 4,
+    "concept": "graphql-dataloader"
+  },
+  "graphql-query-complexity-calculator": {
+    "difficulty": 4,
+    "concept": "graphql-complexity"
+  },
+  "graphql-cursor-pagination-extractor": {
+    "difficulty": 4,
+    "concept": "graphql-pagination"
   }
 }
 

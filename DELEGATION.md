@@ -4,7 +4,7 @@ Read `ARCHITECTURE_AND_ROADMAP.md` first (system map, card pipeline, gotchas). T
 criteria**, plus the rules every contributor follows. Tasks marked **[owner decision]** need the owner's approval before coding.
 
 ## Current state (keep this block up to date in the same commit as any change it describes)
-- `master` = the deployed app. **286 cards** (across 11 first-class topic tracks, organized into 4 built-in preset study decks: Full Library [286], Full-Stack Core [233], Frontend Specialist [206], and Algorithms & Data Structures [96]), **2,015 documented cases**, **100% Markdown formatted instructions** across all 286 cards, **100% TypeScript dual solutions** across all 286 cards, 1,871 unit tests (66 test files), 630 browser tests (2 per card + 13 navigation/shortcut tests + 11 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 2 deck-selector tests + 2 remove-from-deck tests + 3 custom-deck tests + 1 interview-prep test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests). A push to `master` deploys (Markdown changes ignored in deploy workflow to conserve Actions minutes), and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
+- `master` = the deployed app. **289 cards** (across 11 first-class topic tracks, organized into 4 built-in preset study decks: Full Library [289], Full-Stack Core [236], Frontend Specialist [209], and Algorithms & Data Structures [96]), **2,030 documented cases**, **100% Markdown formatted instructions** across all 289 cards, **100% TypeScript dual solutions** across all 289 cards, 1,883 unit tests (66 test files), 636 browser tests (2 per card + 13 navigation/shortcut tests + 11 preview tests + 4 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 2 deck-selector tests + 2 remove-from-deck tests + 3 custom-deck tests + 1 interview-prep test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests). A push to `master` deploys (Markdown changes ignored in deploy workflow to conserve Actions minutes), and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
 - Quick rules for any contributor are in `AGENTS.md`. `npm run check:cards` is a read-only check that `src/data/topics.json` and `src/data/catalogIndex.json` match the card sources (run it, or `build:cards`, after any card edit).
 - AI evaluator replies are parsed by `parseEvaluationPayload` (`src/lib/ai.ts`); malformed replies are shown raw (`rawOutput`) in the evaluation panel instead of being split into lists.
 - First-4-problems backup advisory & export spotlight feature: alerts users after 4 completed problems (scored reviews, excluding unscored reinforcement repeats) to export their `localStorage` state to JSON, with spotlight pulse & callout bubble on the Deck Catalog export button. Verified by unit tests (`src/lib/backupAdvisory.test.ts`) and Playwright E2E (`e2e/backup-advisory.spec.ts`).
@@ -16,7 +16,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Task | Who | Branch | Status |
 |---|---|---|---|
 | Custom Decks, Batch Management & AI Interview Prep Copilot | Antigravity | feature/custom-decks-core | In progress |
-| GraphQL Track & Curriculum (Batch 3: Resolvers, Context & Formatting) | Antigravity | feat/graphql-track | In progress |
+| GraphQL Track & Curriculum (Batch 4: Batching & Pagination) | Antigravity | feat/graphql-track | In progress |
 
 
 

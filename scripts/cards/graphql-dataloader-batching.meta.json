@@ -1,0 +1,5 @@
+{
+  "track": "graphql",
+  "title": "GraphQL DataLoader: Microtask Request Batching",
+  "tags": ["graphql", "performance", "n-plus-one", "dataloader", "promises", "microtasks"]
+}

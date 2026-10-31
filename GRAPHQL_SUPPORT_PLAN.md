@@ -98,7 +98,7 @@ graph TD
 
 ---
 
-### Tier 4: Batching & The N+1 Problem (Difficulty 4)
+### Tier 4: Batching & The N+1 Problem (Difficulty 4) — Completed
 
 #### 10. `graphql-dataloader-batching`
 - **Concept**: `graphql-dataloader`

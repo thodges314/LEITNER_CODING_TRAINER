@@ -284,5 +284,89 @@ export default {
       "{ message: 'Uncaught TypeError', extensions: { code: 'INTERNAL_SERVER_ERROR' } }"
     ),
   ],
+
+  'graphql-dataloader-batching': [
+    c(
+      'Batches concurrent load calls within the microtask tick into a single batch call',
+      "let batchCalls = 0;\nconst loader = new DataLoader(async (keys) => {\n  batchCalls++;\n  return keys.map((k) => 'val_' + k);\n});\nconst p1 = loader.load(1);\nconst p2 = loader.load(2);\nconst p3 = loader.load(3);\nconst results = await Promise.all([p1, p2, p3]);\n[results, batchCalls]",
+      "[['val_1', 'val_2', 'val_3'], 1]"
+    ),
+    c(
+      'Deduplicates identical keys requested in the same microtask and returns the same value',
+      "let batchKeys = [];\nconst loader = new DataLoader(async (keys) => {\n  batchKeys.push(...keys);\n  return keys.map((k) => 'cached_' + k);\n});\nconst [a, b] = await Promise.all([loader.load('x'), loader.load('x')]);\n[a, b, batchKeys]",
+      "['cached_x', 'cached_x', ['x']]"
+    ),
+    c(
+      'loadMany resolves all keys and captures individual errors without rejecting the call',
+      "const loader = new DataLoader(async (keys) => {\n  return keys.map((k) => k === 'bad' ? new Error('failed_' + k) : 'good_' + k);\n});\nconst res = await loader.loadMany(['ok', 'bad']);\n[res[0], res[1] instanceof Error, res[1].message]",
+      "['good_ok', true, 'failed_bad']"
+    ),
+    c(
+      'clear removes an item from cache, triggering a new batch on subsequent load',
+      "let runs = 0;\nconst loader = new DataLoader(async (keys) => {\n  runs++;\n  return keys.map((k) => runs);\n});\nconst first = await loader.load('item');\nloader.clear('item');\nconst second = await loader.load('item');\n[first, second, runs]",
+      "[1, 2, 2]"
+    ),
+    c(
+      'Rejects all keys if batch function throws or rejects',
+      "const loader = new DataLoader(async () => {\n  throw new Error('Database connection failed');\n});\nconst err = await (async () => {\n  try {\n    await loader.load(1);\n    return 'no error';\n  } catch (e) {\n    return e.message;\n  }\n})();\nerr",
+      "'Database connection failed'"
+    ),
+  ],
+
+  'graphql-query-complexity-calculator': [
+    c(
+      'Calculates baseline complexity for flat scalar fields',
+      "calculateQueryComplexity([{ name: 'id' }, { name: 'title' }, { name: 'views' }])",
+      '{ complexity: 3, exceeded: false }'
+    ),
+    c(
+      'Applies multiplier argument (first or limit) to nested child fields',
+      "calculateQueryComplexity([{ name: 'users', args: { first: 5 }, fields: [{ name: 'id' }, { name: 'email' }] }])",
+      '{ complexity: 11, exceeded: false }'
+    ),
+    c(
+      'Respects custom fieldCosts configurations',
+      "calculateQueryComplexity([{ name: 'search', fields: [{ name: 'results' }] }], { fieldCosts: { search: 10 } })",
+      '{ complexity: 11, exceeded: false }'
+    ),
+    c(
+      'Detects when query cost exceeds maxComplexity',
+      "calculateQueryComplexity([{ name: 'posts', args: { limit: 10 }, fields: [{ name: 'comments', args: { first: 5 }, fields: [{ name: 'text' }] }] }], { maxComplexity: 50 })",
+      '{ complexity: 61, exceeded: true }'
+    ),
+    c(
+      'Returns 0 complexity for empty input',
+      "calculateQueryComplexity([])",
+      '{ complexity: 0, exceeded: false }'
+    ),
+  ],
+
+  'graphql-cursor-pagination-extractor': [
+    c(
+      'Parses valid forward pagination arguments and clamps to maxLimit',
+      "parsePaginationArgs({ first: 25, after: 'cursor_123' }, { maxLimit: 20 })",
+      "{ isForward: true, limit: 20, cursor: 'cursor_123' }"
+    ),
+    c(
+      'Parses backward pagination arguments with default limit',
+      "parsePaginationArgs({ last: 10, before: 'cursor_999' })",
+      "{ isForward: false, limit: 10, cursor: 'cursor_999' }"
+    ),
+    c(
+      'Defaults to forward pagination with defaultLimit when no arguments given',
+      "parsePaginationArgs({}, { defaultLimit: 15 })",
+      '{ isForward: true, limit: 15 }'
+    ),
+    c(
+      'Throws error when combining forward and backward slicing',
+      "const err1 = (() => { try { parsePaginationArgs({ first: 10, last: 5 }); return 'ok'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { parsePaginationArgs({ first: 10, before: 'abc' }); return 'ok'; } catch (e) { return e.message; } })();\nconst err3 = (() => { try { parsePaginationArgs({ after: 'a', before: 'b' }); return 'ok'; } catch (e) { return e.message; } })();\n[err1, err2, err3]",
+      "['Cannot combine first and last', 'Cannot combine first and before', 'Cannot combine after and before']"
+    ),
+    c(
+      'Throws error when first or last is negative',
+      "const err1 = (() => { try { parsePaginationArgs({ first: -1 }); return 'ok'; } catch (e) { return e.message; } })();\nconst err2 = (() => { try { parsePaginationArgs({ last: -5 }); return 'ok'; } catch (e) { return e.message; } })();\n[err1, err2]",
+      "['first must be non-negative', 'last must be non-negative']"
+    ),
+  ],
 };
 

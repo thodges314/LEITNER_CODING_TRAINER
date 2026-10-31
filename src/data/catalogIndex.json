@@ -3910,5 +3910,53 @@
       "schema"
     ],
     "summary": "Implement the resolver map for a relational GraphQL schema connecting Author and Book entities"
+  },
+  {
+    "id": "graphql-cursor-pagination-extractor",
+    "title": "GraphQL Cursor Pagination Argument Parser",
+    "track": "graphql",
+    "concept": "graphql-pagination",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "cursor",
+      "validation",
+      "api-design"
+    ],
+    "summary": "Implement a GraphQL cursor pagination argument parser adhering to the Relay Cursor Connections Specification"
+  },
+  {
+    "id": "graphql-dataloader-batching",
+    "title": "GraphQL DataLoader: Microtask Request Batching",
+    "track": "graphql",
+    "concept": "graphql-dataloader",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "performance",
+      "n-plus-one",
+      "dataloader",
+      "promises",
+      "microtasks"
+    ],
+    "summary": "Implement a lightweight DataLoader class that batches concurrent key requests within a single event-loop microtask to eliminate N+1 query waterfalls"
+  },
+  {
+    "id": "graphql-query-complexity-calculator",
+    "title": "GraphQL Query Complexity Cost Calculator",
+    "track": "graphql",
+    "concept": "graphql-complexity",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "security",
+      "dos-protection",
+      "complexity",
+      "recursion",
+      "ast"
+    ],
+    "summary": "Implement a static GraphQL query complexity analysis function that computes recursive execution costs to protect backends from denial-of-service qu..."
   }
 ]

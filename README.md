@@ -11,8 +11,8 @@ Built with **React 19 + TypeScript + Vite**. Zero backend — everything runs lo
 ```bash
 npm install
 npm run dev           # Start Vite development server (localhost:5173)
-npm test              # Run Vitest suite (1,871 tests across 66 test files)
-npm run e2e           # Run Playwright E2E suite in real Chromium (630 tests)
+npm test              # Run Vitest suite (1,883 tests across 66 test files)
+npm run e2e           # Run Playwright E2E suite in real Chromium (636 tests)
 npm run check:cards   # Read-only check: verify topics.json & catalogIndex.json match source cards
 npm run build:cards   # Rebuild topics.json & catalogIndex.json from scripts/cards/ sources
 npm run lint          # Run ESLint across workspace
