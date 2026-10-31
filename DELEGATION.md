@@ -13,9 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 - Authoring pitfalls for Suspense / transitions / `use()` harnesses are in the roadmap, section 8. Read them before writing React 19 cards.
 
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
-| Claimed | Branch | Contributor | Notes |
-|---|---|---|---|
-| Interview prep custom count slider polish | `fix/interview-prep-custom-count-slider` | Assistant | Clean up custom count slider, remove preset buttons, eliminate text ghosting |
+| *(no active claims — all merged to master)* | | | |
 
 
 
