@@ -25,8 +25,7 @@
   height: 60px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  transition: min-height 0.2s ease, padding 0.2s ease;
 }
 
 [data-theme="apple-gsos"] .app-header {
@@ -38,7 +37,8 @@
 .app-header-left {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
+  flex-shrink: 0;
 }
 
 .app-brand {
@@ -214,13 +214,121 @@
 .app-header-inner {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 12px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  flex-wrap: wrap;
   width: 100%;
+}
+
+/* Header Action Button Responsive Labels */
+.btn-label-long {
+  display: inline;
+}
+
+.btn-label-short {
+  display: none;
+}
+
+.btn-label-collapse {
+  display: inline;
+}
+
+/* Intermediate screens: compact labels to keep header sleek on a single row */
+@media (max-width: 1240px) and (min-width: 1061px) {
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .app-header-left {
+    gap: 14px;
+  }
+
+  .app-brand-title {
+    font-size: 14.5px;
+  }
+
+  .nav-tab-btn {
+    padding: 6px 10px;
+    font-size: 12.5px;
+    gap: 5px;
+  }
+
+  .app-header-right {
+    gap: 6px;
+  }
+
+  .btn-label-long {
+    display: none;
+  }
+
+  .btn-label-short {
+    display: inline;
+  }
+
+  .header-settings-btn .btn-label-collapse,
+  .header-theme-btn .btn-label-collapse {
+    display: none;
+  }
+
+  .header-settings-btn,
+  .header-theme-btn {
+    padding: 6px 9px;
+  }
+}
+
+/* Standard tablet & smaller: step into an intentional, clean 2-tier header */
+@media (max-width: 1060px) {
+  .app-header {
+    height: auto;
+    min-height: 98px;
+    padding: 8px 20px;
+  }
+
+  .app-header-inner {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .app-header-left {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .app-header-right {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .btn-label-long {
+    display: none;
+  }
+
+  .btn-label-short {
+    display: inline;
+  }
+}
+
+/* Mobile: hide title text so brand icon & nav tabs stay on row 1 */
+@media (max-width: 680px) {
+  .app-brand-title {
+    display: none;
+  }
+
+  .app-header-right {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .header-settings-btn .btn-label-collapse,
+  .header-theme-btn .btn-label-collapse {
+    display: none;
+  }
 }
 
 .app-unlock-toast {

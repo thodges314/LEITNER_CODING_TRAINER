@@ -1362,31 +1362,44 @@
 
 /* AI Copilot Dropdown Action */
 .deck-dropdown-ai-btn {
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  width: 100%;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #a855f7;
-  background: transparent;
-  border: none;
+  padding: 8px 12px;
+  margin-top: 6px;
   border-radius: 6px;
+  border: 1px dashed rgba(168, 85, 247, 0.45);
+  background: rgba(168, 85, 247, 0.06);
+  color: var(--accent-purple);
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  text-align: left;
   transition: all 0.15s ease;
 }
 
 .deck-dropdown-ai-btn:hover {
-  background: rgba(168, 85, 247, 0.12);
+  background: rgba(168, 85, 247, 0.15);
+  border-color: #a855f7;
   color: #c084fc;
-  padding-left: 17px;
+}
+
+.deck-dropdown-ai-btn:hover .ai-btn-icon {
+  transform: rotate(15deg) scale(1.15);
+  color: #c084fc;
+}
+
+[data-theme="apple-gsos"] .deck-dropdown-ai-btn {
+  background: #F4EFF8;
+  color: #6B21A8;
+  border: 1px dashed #6B21A8;
 }
 
 .ai-btn-icon {
   color: #a855f7;
   flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.15s ease;
 }
 
 /* AI Prep Modal */

@@ -610,32 +610,34 @@ export function App() {
       {/* Global Header */}
       <header className="app-header">
         <div className="app-header-inner">
-          {/* Brand Logo & Name */}
-          <div className="app-brand">
-            <div className="app-brand-logo">
-              <Zap size={20} fill="white" />
+          <div className="app-header-left">
+            {/* Brand Logo & Name */}
+            <div className="app-brand">
+              <div className="app-brand-logo">
+                <Zap size={20} fill="white" />
+              </div>
+              <span className="app-brand-title">Leitner Coding Trainer</span>
             </div>
-            <span className="app-brand-title">Leitner Coding Trainer</span>
-          </div>
 
-          {/* View Toggle Navigation */}
-          <nav className="nav-view-toggle app-nav-tabs" data-tour="deck-nav">
-            <button
-              className={`nav-tab-btn ${activeView === 'practice' ? 'active' : ''}`}
-              onClick={() => setActiveView('practice')}
-            >
-              <Terminal size={15} color={activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentCyan) : undefined} />
-              Practice Arena
-            </button>
-            <button
-              className={`nav-tab-btn ${activeView === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveView('dashboard')}
-              title={`${activeCount} active in rotation • ${shownTopics.length - activeCount} locked in reserve`}
-            >
-              <Layers size={15} color={activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentPurple) : undefined} />
-              Deck Catalog ({shownTopics.length})
-            </button>
-          </nav>
+            {/* View Toggle Navigation */}
+            <nav className="nav-view-toggle app-nav-tabs" data-tour="deck-nav">
+              <button
+                className={`nav-tab-btn ${activeView === 'practice' ? 'active' : ''}`}
+                onClick={() => setActiveView('practice')}
+              >
+                <Terminal size={15} color={activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentCyan) : undefined} />
+                Practice Arena
+              </button>
+              <button
+                className={`nav-tab-btn ${activeView === 'dashboard' ? 'active' : ''}`}
+                onClick={() => setActiveView('dashboard')}
+                title={`${activeCount} active in rotation • ${shownTopics.length - activeCount} locked in reserve`}
+              >
+                <Layers size={15} color={activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentPurple) : undefined} />
+                Deck Catalog ({shownTopics.length})
+              </button>
+            </nav>
+          </div>
 
           {/* Quick Info & Action Buttons */}
           <div className="app-header-right">
@@ -650,7 +652,8 @@ export function App() {
               data-testid="header-interview-prep-btn"
             >
               <Sparkles size={14} color="var(--accent-purple)" />
-              <span>Interview Strategy</span>
+              <span className="btn-label-long">Interview Strategy</span>
+              <span className="btn-label-short">Strategy</span>
               {savedDossiersCount > 0 && (
                 <span className="header-badge-count">{savedDossiersCount}</span>
               )}
@@ -663,7 +666,7 @@ export function App() {
               title="Choose which tracks and tags to practice"
             >
               <Crosshair size={15} />
-              {filterActive ? 'Focus on' : 'Focus'}
+              <span>{filterActive ? 'Focus on' : 'Focus'}</span>
             </button>
 
             {/* AI Engine Status Indicator */}
@@ -724,17 +727,17 @@ export function App() {
             {/* Dedicated Settings Button */}
             <button
               data-tour="settings"
-              className="btn btn-outline"
+              className="btn btn-outline header-settings-btn"
               onClick={() => handleOpenSettings()}
               title="Configure Spaced Repetition method, theme, and AI engine"
             >
               <Settings size={15} />
-              <span>Settings</span>
+              <span className="btn-label-collapse">Settings</span>
             </button>
 
             {/* Header Theme Switcher Toggle Button */}
             <button
-              className="btn btn-outline"
+              className="btn btn-outline header-theme-btn"
               data-testid="theme-toggle-btn"
               onClick={handleToggleTheme}
               title={theme === 'apple-gsos' ? 'Switch to Synthwave / Nightcore Mode' : 'Switch to Apple IIGS / GS/OS Light Mode'}
@@ -743,12 +746,12 @@ export function App() {
               {theme === 'apple-gsos' ? (
                 <>
                   <Moon size={14} color={colors.accentPrimary} />
-                  <span>Dark</span>
+                  <span className="btn-label-collapse">Dark</span>
                 </>
               ) : (
                 <>
                   <Sun size={14} color={colors.accentAmber} />
-                  <span>Light</span>
+                  <span className="btn-label-collapse">Light</span>
                 </>
               )}
             </button>

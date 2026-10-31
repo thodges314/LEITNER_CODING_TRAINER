@@ -969,7 +969,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
                     {deckSizeMode === 'auto' ? (
                       <div className="ai-prep-auto-size-note">
-                        <span>AI adapts deck size: 8 cards for sprints, 16–20 for standard timelines, 35–45 for Big Tech (Google, Amazon, Meta, Stripe) or multi-month runway.</span>
+                        <span>Deck size adapts automatically</span>
                       </div>
                     ) : (
                       <div className="ai-prep-slider-container">

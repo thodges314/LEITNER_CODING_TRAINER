@@ -240,20 +240,6 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                 {(onCreateCustomDeckClick || onTailorWithAIClick) && (
                   <>
                     <div className="deck-dropdown-divider" />
-                    {onTailorWithAIClick && (
-                      <button
-                        type="button"
-                        className="deck-dropdown-ai-btn"
-                        onClick={() => {
-                          setIsOpen(false);
-                          onTailorWithAIClick();
-                        }}
-                        data-testid="deck-dropdown-ai-btn"
-                      >
-                        <Sparkles size={14} className="ai-btn-icon" />
-                        <span>Tailor Deck with AI Coach...</span>
-                      </button>
-                    )}
                     {onCreateCustomDeckClick && (
                       <button
                         type="button"
@@ -265,7 +251,21 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                         data-testid="deck-dropdown-create-btn"
                       >
                         <Plus size={14} />
-                        <span>Create Custom Deck...</span>
+                        <span>Build Custom Deck...</span>
+                      </button>
+                    )}
+                    {onTailorWithAIClick && (
+                      <button
+                        type="button"
+                        className="deck-dropdown-ai-btn"
+                        onClick={() => {
+                          setIsOpen(false);
+                          onTailorWithAIClick();
+                        }}
+                        data-testid="deck-dropdown-ai-btn"
+                      >
+                        <Sparkles size={14} className="ai-btn-icon" />
+                        <span>Build Interview Deck with AI...</span>
                       </button>
                     )}
                   </>
