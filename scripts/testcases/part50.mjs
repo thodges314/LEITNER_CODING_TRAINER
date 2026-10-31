@@ -245,5 +245,49 @@ export default {
       '50000'
     ),
   ],
+
+  'min-floors-ocean-view': [
+    c(
+      'Calculates minimum floors added for a staggered skyline',
+      'minFloorsForOceanView([4, 2, 3, 1])',
+      '3'
+    ),
+    c(
+      'Calculates floors for two buildings requiring elevation',
+      'minFloorsForOceanView([1, 2])',
+      '2'
+    ),
+    c(
+      'Calculates floors when buildings are in strictly ascending order',
+      'minFloorsForOceanView([1, 2, 3])',
+      '6'
+    ),
+    c(
+      'Calculates floors when all buildings share identical initial height',
+      'minFloorsForOceanView([3, 3, 3])',
+      '3'
+    ),
+    c(
+      'Requires zero floors when skyline is already strictly decreasing',
+      'minFloorsForOceanView([5, 4, 3, 2, 1])',
+      '0'
+    ),
+    c(
+      'Returns 0 for base cases with empty array or single building',
+      '[minFloorsForOceanView([]), minFloorsForOceanView([42])]',
+      '[0, 0]'
+    ),
+    c(
+      'Computes optimal floors for skyline with multiple peaks and troughs',
+      'minFloorsForOceanView([2, 5, 3, 6, 2])',
+      '14'
+    ),
+    c(
+      'Solves massive 50,000 building dataset in linear time without overflow',
+      'minFloorsForOceanView(Array.from({ length: 50000 }, () => 1))',
+      '1249975000'
+    ),
+  ],
 };
+
 

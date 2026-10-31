@@ -4558,5 +4558,20 @@
       "capital-one"
     ],
     "summary": "Implement a linear-time sightline algorithm to identify unobstructed coastal views"
+  },
+  {
+    "id": "min-floors-ocean-view",
+    "title": "Minimum Floors for Full Ocean View",
+    "track": "advanced-algorithms",
+    "concept": "greedy",
+    "difficulty": 2,
+    "tags": [
+      "greedy",
+      "array",
+      "scan",
+      "capital-one",
+      "codesignal"
+    ],
+    "summary": "Implement a linear-time greedy optimization algorithm to ensure all buildings have unobstructed sightlines"
   }
 ]

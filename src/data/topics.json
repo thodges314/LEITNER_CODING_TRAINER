@@ -19031,5 +19031,69 @@
       }
     ],
     "testHarness": "await $test.run(\"Identifies unobstructed ocean views in a staggered skyline\", async () => {\n  const sleep = $test.sleep;\n  return (findOceanViewBuildings([4, 2, 3, 1]));\n}, () => ([0, 2, 3]));\n\nawait $test.run(\"Returns all indices when heights are strictly decreasing\", async () => {\n  const sleep = $test.sleep;\n  return (findOceanViewBuildings([4, 3, 2, 1]));\n}, () => ([0, 1, 2, 3]));\n\nawait $test.run(\"Blocks all preceding buildings when the easternmost tower is the tallest\", async () => {\n  const sleep = $test.sleep;\n  return (findOceanViewBuildings([1, 3, 2, 4]));\n}, () => ([3]));\n\nawait $test.run(\"Blocks sightlines for equal-height buildings so only the easternmost sees the ocean\", async () => {\n  const sleep = $test.sleep;\n  return (findOceanViewBuildings([2, 2, 2, 2]));\n}, () => ([3]));\n\nawait $test.run(\"Handles base cases with a single building or an empty array\", async () => {\n  const sleep = $test.sleep;\n  return ([findOceanViewBuildings([7]), findOceanViewBuildings([])]);\n}, () => ([[0], []]));\n\nawait $test.run(\"Evaluates complex skylines with multiple valleys and peaks\", async () => {\n  const sleep = $test.sleep;\n  return (findOceanViewBuildings([10, 4, 6, 3, 5, 2, 1]));\n}, () => ([0, 2, 4, 5, 6]));\n\nawait $test.run(\"Executes efficiently in O(n) time on a massive dataset of 50,000 buildings\", async () => {\n  const sleep = $test.sleep;\n  return (findOceanViewBuildings(Array.from({ length: 50000 }, (_, i) => 50000 - i)).length);\n}, () => (50000));"
+  },
+  {
+    "id": "min-floors-ocean-view",
+    "track": "advanced-algorithms",
+    "title": "Minimum Floors for Full Ocean View",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "greedy",
+      "array",
+      "scan",
+      "capital-one",
+      "codesignal"
+    ],
+    "promptSeed": "Implement a linear-time greedy optimization algorithm to ensure all buildings have unobstructed sightlines:\n\n### `minFloorsForOceanView(heights: number[]): number`\n- Receives an array `heights` where `heights[i]` represents the initial height of the `i`-th building in a line from west to east (indices `0` to `n - 1`).\n- The ocean is situated to the east (to the right of the array).\n- Every building must have an **unobstructed ocean view**, meaning each building must be **strictly taller** than all buildings to its east:\n  $$h'[i] > h'[i+1] \\quad \\text{for all } 0 \\le i < n - 1$$\n- You may only **add floors** to buildings (i.e. final height $h'[i] \\ge heights[i]$). Demolishing floors is prohibited.\n- Returns the **minimum total number of additional floors** ($\\sum (h'[i] - heights[i])$) that must be added across all buildings to achieve full sightline visibility.\n- Returns `0` if `heights` has length `<= 1` or if `heights` is already strictly decreasing.\n- Runs in **O(n) time** and **O(1) auxiliary space**:\n  - Must avoid naive $O(n^2)$ comparisons, forward passes, or incrementing floors one by one, which timeout on massive datasets.\n  - Can be solved optimally with a single backwards pass from east to west maintaining the minimum required height for the next building to the west.",
+    "difficulty": 2,
+    "concept": "greedy",
+    "referenceSolution": "function minFloorsForOceanView(heights) {\n  if (heights.length <= 1) return 0;\n  let totalFloors = 0;\n  let minRequired = heights[heights.length - 1] + 1;\n  for (let i = heights.length - 2; i >= 0; i--) {\n    if (heights[i] < minRequired) {\n      totalFloors += minRequired - heights[i];\n      minRequired++;\n    } else {\n      minRequired = heights[i] + 1;\n    }\n  }\n  return totalFloors;\n}",
+    "referenceSolutionTs": "function minFloorsForOceanView(heights: number[]): number {\n  if (heights.length <= 1) return 0;\n  let totalFloors = 0;\n  let minRequired = heights[heights.length - 1] + 1;\n  for (let i = heights.length - 2; i >= 0; i--) {\n    if (heights[i] < minRequired) {\n      totalFloors += minRequired - heights[i];\n      minRequired++;\n    } else {\n      minRequired = heights[i] + 1;\n    }\n  }\n  return totalFloors;\n}",
+    "testCases": [
+      {
+        "description": "Calculates minimum floors added for a staggered skyline",
+        "input": "minFloorsForOceanView([4, 2, 3, 1])",
+        "expected": "3"
+      },
+      {
+        "description": "Calculates floors for two buildings requiring elevation",
+        "input": "minFloorsForOceanView([1, 2])",
+        "expected": "2"
+      },
+      {
+        "description": "Calculates floors when buildings are in strictly ascending order",
+        "input": "minFloorsForOceanView([1, 2, 3])",
+        "expected": "6"
+      },
+      {
+        "description": "Calculates floors when all buildings share identical initial height",
+        "input": "minFloorsForOceanView([3, 3, 3])",
+        "expected": "3"
+      },
+      {
+        "description": "Requires zero floors when skyline is already strictly decreasing",
+        "input": "minFloorsForOceanView([5, 4, 3, 2, 1])",
+        "expected": "0"
+      },
+      {
+        "description": "Returns 0 for base cases with empty array or single building",
+        "input": "[minFloorsForOceanView([]), minFloorsForOceanView([42])]",
+        "expected": "[0, 0]"
+      },
+      {
+        "description": "Computes optimal floors for skyline with multiple peaks and troughs",
+        "input": "minFloorsForOceanView([2, 5, 3, 6, 2])",
+        "expected": "14"
+      },
+      {
+        "description": "Solves massive 50,000 building dataset in linear time without overflow",
+        "input": "minFloorsForOceanView(Array.from({ length: 50000 }, () => 1))",
+        "expected": "1249975000"
+      }
+    ],
+    "testHarness": "await $test.run(\"Calculates minimum floors added for a staggered skyline\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([4, 2, 3, 1]));\n}, () => (3));\n\nawait $test.run(\"Calculates floors for two buildings requiring elevation\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([1, 2]));\n}, () => (2));\n\nawait $test.run(\"Calculates floors when buildings are in strictly ascending order\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([1, 2, 3]));\n}, () => (6));\n\nawait $test.run(\"Calculates floors when all buildings share identical initial height\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([3, 3, 3]));\n}, () => (3));\n\nawait $test.run(\"Requires zero floors when skyline is already strictly decreasing\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([5, 4, 3, 2, 1]));\n}, () => (0));\n\nawait $test.run(\"Returns 0 for base cases with empty array or single building\", async () => {\n  const sleep = $test.sleep;\n  return ([minFloorsForOceanView([]), minFloorsForOceanView([42])]);\n}, () => ([0, 0]));\n\nawait $test.run(\"Computes optimal floors for skyline with multiple peaks and troughs\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView([2, 5, 3, 6, 2]));\n}, () => (14));\n\nawait $test.run(\"Solves massive 50,000 building dataset in linear time without overflow\", async () => {\n  const sleep = $test.sleep;\n  return (minFloorsForOceanView(Array.from({ length: 50000 }, () => 1)));\n}, () => (1249975000));"
   }
 ]

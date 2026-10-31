@@ -675,6 +675,10 @@
     "difficulty": 2,
     "concept": "greedy"
   },
+  "min-floors-ocean-view": {
+    "difficulty": 2,
+    "concept": "greedy"
+  },
   "container-water-two-pointer": {
     "difficulty": 3,
     "concept": "two-pointer"

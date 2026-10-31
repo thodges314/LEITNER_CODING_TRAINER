@@ -49,8 +49,8 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
   {
     id: 'full-library',
     name: 'Full Library (All Cards)',
-    description: 'Complete 329-card curriculum across all 14 frontend, backend, database, and computer-science domains',
-    badge: '329 Cards',
+    description: 'Complete 330-card curriculum across all 14 frontend, backend, database, and computer-science domains',
+    badge: '330 Cards',
     isBuiltIn: true,
     filter: () => true,
   },
@@ -74,7 +74,7 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
     id: 'algorithms',
     name: 'Algorithms & Data Structures',
     description: 'Practical algorithms, trees, graphs, DP, backtracking, heaps, and algorithmic JS utilities',
-    badge: '97 Cards',
+    badge: '98 Cards',
     isBuiltIn: true,
     filter: (card) =>
       card.track === 'algorithms' ||
