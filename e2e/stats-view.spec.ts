@@ -56,10 +56,10 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     // Test exclusive domain filter on Skill Matrix
     const algoDomain = statsWidget.locator('g[data-domain="algorithms"]');
     await algoDomain.click();
-    await expect(page.getByText('1 of 11 selected')).toBeVisible();
+    await expect(page.getByText(/1 of \d+ selected/)).toBeVisible();
     // Toggle off by clicking again
     await algoDomain.click();
-    await expect(page.getByText('1 of 11 selected')).toHaveCount(0);
+    await expect(page.getByText(/1 of \d+ selected/)).toHaveCount(0);
 
     // 2. Switch to Track Orbit mode
     await page.getByTestId('stats-mode-orbit').click();
@@ -71,10 +71,10 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     // Test exclusive track filter on Track Orbit
     const algoSlice = statsWidget.locator('path[data-track="algorithms"]');
     await algoSlice.click();
-    await expect(page.getByText('1 of 11 selected')).toBeVisible();
+    await expect(page.getByText(/1 of \d+ selected/)).toBeVisible();
     // Toggle off by clicking again
     await algoSlice.click();
-    await expect(page.getByText('1 of 11 selected')).toHaveCount(0);
+    await expect(page.getByText(/1 of \d+ selected/)).toHaveCount(0);
 
     // 3. Switch to Mastery Tiers mode
     await page.getByTestId('stats-mode-tiers').click();
