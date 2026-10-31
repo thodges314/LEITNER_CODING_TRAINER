@@ -1,0 +1,12 @@
+Implement a linear-time sightline algorithm to identify unobstructed coastal views:
+
+### `findOceanViewBuildings(heights: number[]): number[]`
+- Receives an array `heights` where `heights[i]` represents the height of the `i`-th building in a line from west to east (indices `0` to `n - 1`).
+- The ocean is situated to the east (to the right of the array).
+- A building has an **unobstructed ocean view** if every building to its right (east) is **strictly shorter** than it.
+- The easternmost building (at index `heights.length - 1`) always has an ocean view.
+- Returns an array of **0-based indices** of all buildings that have an ocean view, sorted in **ascending order**.
+- Returns `[]` if `heights` is empty `[]`.
+- Runs in **O(n) time** and **O(n) auxiliary space**:
+  - Must avoid naive $O(n^2)$ comparisons or repeated `Array.prototype.unshift()` calls inside loops, which degrade to quadratic time on large datasets.
+  - Can be solved via a monotonic decreasing stack from left to right or a backwards scan tracking the running maximum height.

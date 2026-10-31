@@ -207,4 +207,43 @@ export default {
       '[]'
     ),
   ],
+
+  'ocean-view-buildings': [
+    c(
+      'Identifies unobstructed ocean views in a staggered skyline',
+      'findOceanViewBuildings([4, 2, 3, 1])',
+      '[0, 2, 3]'
+    ),
+    c(
+      'Returns all indices when heights are strictly decreasing',
+      'findOceanViewBuildings([4, 3, 2, 1])',
+      '[0, 1, 2, 3]'
+    ),
+    c(
+      'Blocks all preceding buildings when the easternmost tower is the tallest',
+      'findOceanViewBuildings([1, 3, 2, 4])',
+      '[3]'
+    ),
+    c(
+      'Blocks sightlines for equal-height buildings so only the easternmost sees the ocean',
+      'findOceanViewBuildings([2, 2, 2, 2])',
+      '[3]'
+    ),
+    c(
+      'Handles base cases with a single building or an empty array',
+      '[findOceanViewBuildings([7]), findOceanViewBuildings([])]',
+      '[[0], []]'
+    ),
+    c(
+      'Evaluates complex skylines with multiple valleys and peaks',
+      'findOceanViewBuildings([10, 4, 6, 3, 5, 2, 1])',
+      '[0, 2, 4, 5, 6]'
+    ),
+    c(
+      'Executes efficiently in O(n) time on a massive dataset of 50,000 buildings',
+      'findOceanViewBuildings(Array.from({ length: 50000 }, (_, i) => 50000 - i)).length',
+      '50000'
+    ),
+  ],
 };
+
