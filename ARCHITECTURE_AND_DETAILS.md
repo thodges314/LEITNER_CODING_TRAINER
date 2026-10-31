@@ -106,11 +106,13 @@ Located in [runner.ts](src/lib/runner.ts):
    - JS Mode: Fast in-browser transformation via Sucrase.
    - TS Mode: Strict compile-time type diagnostics via lazy-loaded TypeScript compiler with ES2022 lib files.
    - **Loop Guard Protection** ([loopGuards.ts](src/lib/loopGuards.ts)): Automatically instruments all loops (`while`, `for`, `do..while`, `for..of`, `for..in`) with lightweight bitwise-checked iteration timers (`(++iter & 1023) === 0 && Date.now() - start > timeoutMs`). If code gets trapped in a synchronous infinite loop, it throws an informative timeout error after 3000ms, completely preventing browser freezing.
-2. **Web Worker helper (`runWithTimeout`) — NOT used by the app yet**:
-   - Located in [runner.ts](src/lib/runner.ts). It can run plain code in a dedicated Web Worker and `terminate()` it after `timeoutMs`.
-   - Only its unit tests call it. Card grading (`runHarness`) runs in the **page itself**, so the only runaway protection today is the loop guard above:
-     it stops synchronous `while/for` loops, but not runaway recursion (stack overflow is caught as an error), a loop that never reaches an instrumented
-     statement, or an endless `await` chain. DOM harnesses need a `document`, so a real fix is a sandboxed iframe (see the roadmap, §7.3).
+2. **Dedicated Web Worker Sandbox & Runaway Watchdog**:
+   - Located in [workerClient.ts](src/lib/workerClient.ts) and [sandboxWorker.ts](src/lib/sandboxWorker.ts).
+   - Non-React and non-DOM cards (algorithms, utilities, async, language, node, sql, graphql) execute inside a dedicated, isolated Web Worker thread via `runInWorker`.
+   - Streams live logs back to the Practice Arena console drawer via structured `postMessage`.
+   - Hard watchdog timer kills the worker via `worker.terminate()` if execution exceeds `timeoutMs` (e.g. from pathological regex catastrophic backtracking, endless promise chains, or un-instrumented infinite loops), guaranteeing zero browser tab lockups.
+   - Polyfill prototypes modified by user solutions are completely confined to the worker thread without leaking into the main browser thread.
+   - Seamless fallback to `AsyncFunction` in environments without Web Worker support (e.g. Node / Vitest jsdom).
 3. **Sandbox Scope**:
    - User code and harness concatenated in an `AsyncFunction`.
    - Injected globals: React, ReactDOM, native hooks, `$dom` (render, query, fire events, act, wait), `$test` (check, run, equal, rejects, sleep), mock `fetch`, mock `IntersectionObserver`.

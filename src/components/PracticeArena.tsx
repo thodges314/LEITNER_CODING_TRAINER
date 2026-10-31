@@ -19,7 +19,13 @@ import { evaluateCodeSubmission } from '../lib/ai';
 import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
 import { CheckCircle } from 'lucide-react';
-import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, bufferContainsHarness } from '../lib/runner';
+import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, bufferContainsHarness, classifyLogLine } from '../lib/runner';
+import {
+  runInWorker,
+  supportsWebWorker,
+  isBrowserDomOrReactCard,
+  terminateActiveWorker,
+} from '../lib/workerClient';
 import { extractHarnessContracts } from '../lib/harnessContracts';
 import { formatConsoleArg, formatAssertionFailure } from './practice/consoleFormat';
 import type { ConsoleLogEntry } from './practice/consoleFormat';
@@ -280,6 +286,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     if (editorRef.current?.view) {
       editorRef.current.view.focus();
     }
+    return () => {
+      terminateActiveWorker();
+    };
   }, [currentCard?.id]);
 
   const formatTimer = (seconds: number) => {
@@ -487,6 +496,65 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       return;
     }
     const executableCode = transpiled.code;
+
+    // For non-React and non-DOM cards, offload execution to the isolated Web Worker
+    if (currentCard && !isBrowserDomOrReactCard(currentCard) && supportsWebWorker()) {
+      try {
+        const outcome = await runInWorker({
+          code: executableCode,
+          timeoutMs: 6000,
+          onLog: (msg) => {
+            const entry: ConsoleLogEntry = {
+              type: msg.method === 'warn' ? 'warn' : msg.method === 'error' ? 'error' : 'info',
+              content: msg.text,
+              timestamp: now(),
+              failure: msg.method === 'error' || classifyLogLine(msg.method, msg.args) === 'fail',
+            };
+            logs.push(entry);
+            setOutputLogs([...logs]);
+          },
+        });
+
+        if (outcome.returnValue !== undefined) {
+          appendLog('info', `↳ Return: ${formatConsoleArg(outcome.returnValue)}`);
+        }
+
+        if (outcome.report.timedOut) {
+          const timeoutEntry: ConsoleLogEntry = {
+            type: 'error',
+            content: 'Execution timed out after 6000ms (terminated runaway worker thread to prevent tab freeze)',
+            timestamp: now(),
+            failure: true,
+          };
+          logs.push(timeoutEntry);
+          setOutputLogs([...logs]);
+          setExecutionStatus('error');
+        } else {
+          if (logs.length === 0) {
+            appendLog(
+              'info',
+              '(Code executed successfully with no console outputs. Uncomment the test lines at the bottom to view results!)'
+            );
+          }
+          const hasError = logs.some((l) => l.failure) || outcome.report.errorCount > 0 || outcome.report.failCount > 0;
+          setExecutionStatus(hasError ? 'error' : 'success');
+        }
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+        const errorEntry: ConsoleLogEntry = {
+          type: 'error',
+          content: errorMsg,
+          timestamp: now(),
+          failure: true,
+        };
+        logs.push(errorEntry);
+        setOutputLogs([...logs]);
+        setExecutionStatus('error');
+      } finally {
+        setIsRunning(false);
+      }
+      return;
+    }
 
     const scope = createSandboxScope({
       console: customConsole,
