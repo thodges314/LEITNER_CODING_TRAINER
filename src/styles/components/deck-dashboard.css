@@ -3199,7 +3199,42 @@
   flex-shrink: 0;
 }
 
-.strategy-open-btn,
+.strategy-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(147, 51, 234, 0.12) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  color: #e9d5ff;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.2);
+  transition: all 0.15s ease;
+}
+
+.strategy-open-btn:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.32) 0%, rgba(147, 51, 234, 0.22) 100%);
+  border-color: #a855f7;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+}
+
+.strategy-open-btn svg {
+  color: #c084fc;
+}
+
+[data-theme="apple-gsos"] .strategy-open-btn {
+  background: #E8E2F2;
+  border: 1.5px solid #6B21A8;
+  color: #6B21A8;
+  box-shadow: 1px 1px 0px #1C1C1C;
+}
+
+[data-theme="apple-gsos"] .strategy-open-btn:hover {
+  background: #DDD5E8;
+}
+
 .strategy-print-btn {
   display: inline-flex;
   align-items: center;

@@ -610,34 +610,32 @@ export function App() {
       {/* Global Header */}
       <header className="app-header">
         <div className="app-header-inner">
-          <div className="app-header-left">
-            {/* Brand Logo & Name */}
-            <div className="app-brand">
-              <div className="app-brand-logo">
-                <Zap size={20} fill="white" />
-              </div>
-              <span className="app-brand-title">Leitner Coding Trainer</span>
+          {/* Brand Logo & Name */}
+          <div className="app-brand">
+            <div className="app-brand-logo">
+              <Zap size={20} fill="white" />
             </div>
-
-            {/* View Toggle Navigation */}
-            <nav className="nav-view-toggle app-nav-tabs" data-tour="deck-nav">
-              <button
-                className={`nav-tab-btn ${activeView === 'practice' ? 'active' : ''}`}
-                onClick={() => setActiveView('practice')}
-              >
-                <Terminal size={15} color={activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentCyan) : undefined} />
-                Practice Arena
-              </button>
-              <button
-                className={`nav-tab-btn ${activeView === 'dashboard' ? 'active' : ''}`}
-                onClick={() => setActiveView('dashboard')}
-                title={`${activeCount} active in rotation • ${shownTopics.length - activeCount} locked in reserve`}
-              >
-                <Layers size={15} color={activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentPurple) : undefined} />
-                Deck Catalog ({shownTopics.length})
-              </button>
-            </nav>
+            <span className="app-brand-title">Leitner Coding Trainer</span>
           </div>
+
+          {/* View Toggle Navigation */}
+          <nav className="nav-view-toggle app-nav-tabs" data-tour="deck-nav">
+            <button
+              className={`nav-tab-btn ${activeView === 'practice' ? 'active' : ''}`}
+              onClick={() => setActiveView('practice')}
+            >
+              <Terminal size={15} color={activeView === 'practice' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentCyan) : undefined} />
+              Practice Arena
+            </button>
+            <button
+              className={`nav-tab-btn ${activeView === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveView('dashboard')}
+              title={`${activeCount} active in rotation • ${shownTopics.length - activeCount} locked in reserve`}
+            >
+              <Layers size={15} color={activeView === 'dashboard' ? (theme === 'apple-gsos' ? '#ffffff' : colors.accentPurple) : undefined} />
+              Deck Catalog ({shownTopics.length})
+            </button>
+          </nav>
 
           {/* Quick Info & Action Buttons */}
           <div className="app-header-right">

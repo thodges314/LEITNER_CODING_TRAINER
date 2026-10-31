@@ -80,12 +80,19 @@
 .app-nav-tabs {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 3px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 3px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  margin-left: 20px;
+  margin-right: auto;
 }
 
 .nav-tab-btn {
   font-size: 13px;
-  padding: 6px 14px;
+  padding: 5px 13px;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -95,20 +102,20 @@
   font-weight: 500;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--text-secondary);
-  transition: all 0.15s ease;
+  color: var(--text-muted);
+  transition: all 0.18s ease;
 }
 
-.nav-tab-btn:hover {
+.nav-tab-btn:hover:not(.active) {
   color: var(--text-primary);
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .nav-tab-btn.active {
   background-color: var(--bg-elevated);
   border-color: var(--border-medium);
   color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="apple-gsos"] .nav-tab-btn {
@@ -212,7 +219,7 @@
 }
 
 .app-header-inner {
-  max-width: 1240px;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -237,11 +244,11 @@
 /* Intermediate screens: compact labels to keep header sleek on a single row */
 @media (max-width: 1240px) and (min-width: 1061px) {
   .app-header {
-    padding: 0 16px;
+    padding: 0 20px;
   }
 
-  .app-header-left {
-    gap: 14px;
+  .app-nav-tabs {
+    margin-left: 14px;
   }
 
   .app-brand-title {
@@ -249,7 +256,7 @@
   }
 
   .nav-tab-btn {
-    padding: 6px 10px;
+    padding: 5px 10px;
     font-size: 12.5px;
     gap: 5px;
   }
@@ -277,30 +284,42 @@
   }
 }
 
-/* Standard tablet & smaller: step into an intentional, clean 2-tier header */
+/* Standard tablet & smaller: step into an intentional 2-tier header with centered brand on left */
 @media (max-width: 1060px) {
   .app-header {
     height: auto;
     min-height: 98px;
-    padding: 8px 20px;
+    padding: 10px 20px;
   }
 
   .app-header-inner {
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: center;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    row-gap: 8px;
+    column-gap: 16px;
+    align-items: center;
   }
 
-  .app-header-left {
-    width: 100%;
-    justify-content: space-between;
-    gap: 12px;
+  .app-brand {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+    align-self: center;
+  }
+
+  .app-nav-tabs {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: end;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .app-header-right {
+    grid-row: 2;
+    grid-column: 2;
+    justify-self: end;
     width: 100%;
-    justify-content: flex-end;
     gap: 8px;
   }
 
@@ -313,16 +332,16 @@
   }
 }
 
-/* Mobile: hide title text so brand icon & nav tabs stay on row 1 */
+/* Mobile: hide title text so brand icon stays centered vertically on left */
 @media (max-width: 680px) {
   .app-brand-title {
     display: none;
   }
 
   .app-header-right {
-    justify-content: center;
+    justify-content: flex-end;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 5px;
   }
 
   .header-settings-btn .btn-label-collapse,

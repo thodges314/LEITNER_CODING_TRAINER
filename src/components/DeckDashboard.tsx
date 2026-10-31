@@ -687,7 +687,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
           <div className="strategy-banner-right">
             <button
               type="button"
-              className="btn btn-primary strategy-open-btn"
+              className="btn strategy-open-btn"
               onClick={() => onOpenInterviewPrepDossier?.(linkedDossier.id, 'review')}
               data-testid="strategy-banner-open-copilot-btn"
             >
