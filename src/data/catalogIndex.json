@@ -4602,5 +4602,20 @@
       "capital-one"
     ],
     "summary": "Given an array nums containing n objects colored red, white, or blue, sort them **in-place** so that objects of the same color are adjacent, with t..."
+  },
+  {
+    "id": "longest-continuous-subarray-limit",
+    "title": "Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit",
+    "track": "advanced-algorithms",
+    "concept": "advanced-sliding-window",
+    "difficulty": 3,
+    "tags": [
+      "sliding-window",
+      "monotonic-queue",
+      "deque",
+      "array",
+      "capital-one"
+    ],
+    "summary": "Given an array of integers nums and an integer limit, return the size of the longest non-empty subarray such that the absolute difference between a..."
   }
 ]

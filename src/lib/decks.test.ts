@@ -33,10 +33,10 @@ describe('preset decks architecture', () => {
     ]);
   });
 
-  it('Full Library contains all 332 seed cards', () => {
+  it('Full Library contains all 333 seed cards', () => {
     const full = filterCardsByDeck(cards, 'full-library');
-    expect(full).toHaveLength(332);
-    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(332);
+    expect(full).toHaveLength(333);
+    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(333);
   });
 
   it('Full-Stack Core contains 277 cards excluding advanced algorithms', () => {
@@ -64,23 +64,23 @@ describe('preset decks architecture', () => {
     expect(tracks.has('typescript-patterns')).toBe(true);
   });
 
-  it('Algorithms & Data Structures contains 100 cards (core + advanced + algorithmic utilities)', () => {
+  it('Algorithms & Data Structures contains 101 cards (core + advanced + algorithmic utilities)', () => {
     const algo = filterCardsByDeck(cards, 'algorithms');
-    expect(algo).toHaveLength(100);
+    expect(algo).toHaveLength(101);
 
     const coreCount = algo.filter((c) => c.track === 'algorithms').length;
     const advCount = algo.filter((c) => c.track === 'advanced-algorithms').length;
     const utilCount = algo.filter((c) => c.track === 'js-utilities').length;
 
     expect(coreCount).toBe(29);
-    expect(advCount).toBe(55);
+    expect(advCount).toBe(56);
     expect(utilCount).toBe(16);
-    expect(coreCount + advCount + utilCount).toBe(100);
+    expect(coreCount + advCount + utilCount).toBe(101);
   });
 
   it('aliases legacy core-algorithms and advanced-algorithms to unified algorithms deck', () => {
-    expect(filterCardsByDeck(cards, 'core-algorithms')).toHaveLength(100);
-    expect(filterCardsByDeck(cards, 'advanced-algorithms')).toHaveLength(100);
+    expect(filterCardsByDeck(cards, 'core-algorithms')).toHaveLength(101);
+    expect(filterCardsByDeck(cards, 'advanced-algorithms')).toHaveLength(101);
     expect(getBuiltInDeck('core-algorithms')?.id).toBe('algorithms');
     expect(getBuiltInDeck('advanced-algorithms')?.id).toBe('algorithms');
   });
