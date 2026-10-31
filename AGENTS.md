@@ -24,6 +24,15 @@ Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_
 2. `npm test`. It checks every reference solution against its own harness.
 3. `npm run check:cards` is a read-only check that `topics.json` and `catalogIndex.json` match the sources. It lists any stale cards and exits 1. It never writes.
 
+## State Schema Migrations (`src/lib/deckMigrations.ts`)
+- **Adding new cards or editing existing card content does NOT require a migration**:
+  - `mergeStoredWithSeed` automatically discovers new seed cards and appends them to user decks, and automatically refreshes all content fields (instructions, reference solutions, test cases, metadata) from the seed files on load while preserving the user's box, streak, and trial schedule.
+- **When to add a migration (`CURRENT_DECK_VERSION++` and `migrateV<N>ToV<N+1>`)**:
+  - **Track splits or renames**: When existing cards are moved to a brand-new track name (e.g. splitting `graphql` into `graphql` and `graphql-server`), so existing user decks in `localStorage` update their card tracks and preserved `practiceFilter`/`filterPresets` include the new track.
+  - **Track consolidation or retirement**: When a track is retired and mapped to successor tracks (e.g. `TRACK_ALIASES`).
+  - **Structural state schema changes**: When top-level fields in `LeitnerDeckState` are added, renamed, or change data types.
+  - Increment `CURRENT_DECK_VERSION` and add the new sequential migration function to `deckMigrations.ts`, ensuring past user state is never corrupted or reset.
+
 ## Escaping conventions in card text
 - Contract inputs and expected values are **JavaScript source text**. `'a\nb'` is a string with a real newline; its expected output `'"a\\nb"'` is the five characters `"a\nb"` (a backslash followed by `n`).
 - Don't hand-count backslashes: write expected values with `String.raw` in `testcases/part*.mjs`, and say in the case description what the characters mean.
