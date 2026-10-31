@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { X, Crosshair, Save, Trash2 } from 'lucide-react';
 import { DIFFICULTY_LABELS, EMPTY_FILTER, cardMatchesFilter, getTrackMeta, isFilterActive } from '../lib/leitner';
 import type { PracticeFilter, TopicItem } from '../lib/leitner';
@@ -26,6 +26,15 @@ export const FocusModal: React.FC<FocusModalProps> = ({
 }) => {
   const [tagQuery, setTagQuery] = useState('');
   const [presetName, setPresetName] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const tracks = useMemo(() => Array.from(new Set(topics.map((t) => t.track))), [topics]);
   const tagCounts = useMemo(() => {
@@ -92,7 +101,7 @@ export const FocusModal: React.FC<FocusModalProps> = ({
   );
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="focus-title">
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="focus-title">
       <div
         className="modal-content"
         style={{

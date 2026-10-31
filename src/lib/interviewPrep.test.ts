@@ -156,9 +156,6 @@ Here is your study plan:
       "url": "https://flexboxfroggy.com",
       "focus": "CSS layout alignment"
     }
-  ],
-  "countdownChecklist": [
-    "Test your local Node environment"
   ]
 }
 \`\`\`
@@ -181,7 +178,6 @@ Hope this helps!`;
       expect(dossier.externalTopics.length).toBe(1);
       expect(dossier.externalTopics[0].topic).toBe('GraphQL Caching');
       expect(dossier.interactiveTools[0].name).toBe('Flexbox Froggy');
-      expect(dossier.countdownChecklist).toContain('Test your local Node environment');
     });
 
     it('falls back to heuristic dossier gracefully when response text is malformed or empty', () => {
@@ -273,7 +269,6 @@ Hope this helps!`;
           selectedCards: [],
           externalTopics: [],
           interactiveTools: [],
-          countdownChecklist: [],
           generatedAt: 5000,
         },
       };
@@ -396,12 +391,12 @@ Hope this helps!`;
       );
       const res2 = await continueInterviewDialogue(
         dossier,
-        'Give me a countdown checklist for the day of the interview',
+        'Give me advice for the day of the interview',
         MOCK_CATALOG
       );
 
       expect(res1.reply).toContain('Architectural Clarity');
-      expect(res2.reply).toContain('countdown checklist');
+      expect(res2.reply).toContain('day-of recommendations');
       expect(res1.reply).not.toEqual(res2.reply);
     });
   });
@@ -651,8 +646,7 @@ Screening notes:
     }
   ],
   "externalTopics": [],
-  "interactiveTools": [],
-  "countdownChecklist": ["Step 1", "Step 2"]
+  "interactiveTools": []
 }
 \`\`\``;
 

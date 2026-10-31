@@ -291,6 +291,14 @@ const DeckEditorModalDialog: React.FC<DeckEditorModalProps> = ({
     onClose();
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const isAllExpanded = effectiveExpandedTopics.size === ORDERED_TRACKS.length;
 
   return (
@@ -300,9 +308,6 @@ const DeckEditorModalDialog: React.FC<DeckEditorModalProps> = ({
       aria-modal="true"
       aria-labelledby="deck-editor-modal-title"
       data-testid="create-deck-modal"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
     >
       <div
         className="modal-content glass-panel deck-editor-modal-container"

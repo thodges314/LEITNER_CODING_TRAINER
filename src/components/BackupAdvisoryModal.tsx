@@ -28,7 +28,6 @@ export const BackupAdvisoryModal: React.FC<BackupAdvisoryModalProps> = ({
   return (
     <div
       className="modal-overlay"
-      onClick={onDismiss}
       role="dialog"
       aria-modal="true"
       aria-labelledby="backup-advisory-title"

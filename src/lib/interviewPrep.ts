@@ -58,7 +58,6 @@ export interface InterviewPrepDossier {
   selectedCards: InterviewPrepCardSelection[];
   externalTopics: ExternalStudyTopic[];
   interactiveTools: InteractiveToolRecommendation[];
-  countdownChecklist?: string[];
   generatedAt: number;
   conversation?: DossierMessage[];
 }
@@ -208,10 +207,6 @@ Respond with a JSON object in this exact schema:
       "url": "https://...",
       "focus": "Brief focus description"
     }
-  ],
-  "countdownChecklist": [
-    "Checklist item 1",
-    "Checklist item 2"
   ]
 }`;
 
@@ -362,16 +357,6 @@ export function parseInterviewPrepResponse(
     }
   }
 
-  // Parse checklist
-  const countdownChecklist: string[] = [];
-  if (Array.isArray(parsed.countdownChecklist)) {
-    for (const item of parsed.countdownChecklist) {
-      if (typeof item === 'string' && item.trim()) {
-        countdownChecklist.push(item.trim());
-      }
-    }
-  }
-
   const dossierId = `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   const initialPromptNote = `Ask questions about this company's interview loop, request curriculum adjustments (e.g. "trim deck to 12 cards", "add more state machine problems"), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.`;
   const initialMessage: DossierMessage = {
@@ -392,7 +377,6 @@ export function parseInterviewPrepResponse(
     selectedCards,
     externalTopics: externalTopics.length > 0 ? externalTopics : getDefaultExternalTopics(),
     interactiveTools: interactiveTools.length > 0 ? interactiveTools : getDefaultInteractiveTools(),
-    countdownChecklist: countdownChecklist.length > 0 ? countdownChecklist : undefined,
     generatedAt: Date.now(),
     conversation: [initialMessage],
   };
@@ -1896,13 +1880,10 @@ Prioritize the HIGH-priority external topics above first, especially topics not 
     };
   }
 
-  // 6. Countdown checklist / final hours before the interview
-  if (/checklist|countdown|timer|24 hour|day of|tip|advice/i.test(msgLower)) {
-    const checklistItems = (dossier.countdownChecklist || [])
-      .map((item, idx) => `${idx + 1}. ${item}`)
-      .join('\n');
+  // 6. Final preparation tips / day of advice
+  if (/day of|final tip|prep advice|interview day/i.test(msgLower)) {
     return {
-      reply: `Here is your targeted countdown checklist for **${dossier.company}**:\n\n${checklistItems || '1. Review Box 1 setbacks\n2. Clarify requirements upfront\n3. Test camera and CoderPad environment'}`,
+      reply: `Here are core day-of recommendations for your **${dossier.company}** interview:\n\n1. Review your high-priority cards and Box 1 setback patterns\n2. Clarify requirements and constraints upfront before coding\n3. State complexity and trade-offs explicitly\n4. Treat the interviewer as a collaborative engineering peer`,
     };
   }
 

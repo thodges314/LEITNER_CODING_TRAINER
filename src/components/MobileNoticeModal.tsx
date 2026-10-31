@@ -51,6 +51,15 @@ export const MobileNoticeModal: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (!visible) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleDismiss();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [visible]);
+
   if (!visible) return null;
 
   return (
@@ -59,7 +68,6 @@ export const MobileNoticeModal: React.FC = () => {
       role="dialog"
       aria-modal="true"
       aria-labelledby="mobile-modal-title"
-      onClick={handleDismiss}
     >
       <div
         className="mobile-modal-content"

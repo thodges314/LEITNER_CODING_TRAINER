@@ -39,6 +39,14 @@ const RemoveFromDeckModalDialog: React.FC<RemoveFromDeckModalDialogProps> = ({
     inputRef.current?.select();
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = deckName.trim();
@@ -54,9 +62,6 @@ const RemoveFromDeckModalDialog: React.FC<RemoveFromDeckModalDialogProps> = ({
       aria-modal="true"
       aria-labelledby="fork-deck-modal-title"
       data-testid="remove-from-deck-modal"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
     >
       <div className="modal-content glass-panel" style={{ maxWidth: 480 }}>
         {/* Header */}

@@ -187,4 +187,54 @@ describe('InterviewPrepModal Component', () => {
 
     expect(document.querySelector('[data-testid="ai-prep-review-view"]')).not.toBeNull();
   });
+
+  it('persists partially filled form draft in localStorage and clears it on Cancel', async () => {
+    const handleClose = vi.fn();
+
+    // 1. Mount modal with empty inputs
+    await act(async () => {
+      root?.render(
+        <InterviewPrepModal
+          isOpen={true}
+          onClose={handleClose}
+          onCreateCustomDeck={vi.fn()}
+        />
+      );
+    });
+
+    const companyInput = document.querySelector('[data-testid="ai-prep-company-input"]') as HTMLInputElement;
+    const roleInput = document.querySelector('[data-testid="ai-prep-role-input"]') as HTMLInputElement;
+
+    // 2. Type partial info
+    await act(async () => {
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      setter?.call(companyInput, 'Netflix');
+      companyInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+      setter?.call(roleInput, 'Senior UI Engineer');
+      roleInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // 3. Verify draft was saved in localStorage
+    const savedDraft = JSON.parse(localStorage.getItem('leitner_interview_prep_draft') || '{}');
+    expect(savedDraft.company).toBe('Netflix');
+    expect(savedDraft.role).toBe('Senior UI Engineer');
+
+    // 4. Simulate hitting Escape to close modal without losing work
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    });
+    expect(handleClose).toHaveBeenCalled();
+    // Draft remains persisted
+    expect(localStorage.getItem('leitner_interview_prep_draft')).not.toBeNull();
+
+    // 5. Click Cancel button to explicitly clear the draft
+    const cancelBtn = document.querySelector('[data-testid="ai-prep-cancel-btn"]') as HTMLButtonElement;
+    await act(async () => {
+      cancelBtn.click();
+    });
+
+    // Verify draft was purged
+    expect(localStorage.getItem('leitner_interview_prep_draft')).toBeNull();
+  });
 });

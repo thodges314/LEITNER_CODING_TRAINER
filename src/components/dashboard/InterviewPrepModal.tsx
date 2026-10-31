@@ -53,6 +53,28 @@ import { printInterviewDossier } from '../../lib/printDossier';
 
 const catalogIndex = catalogIndexData as CatalogIndexEntry[];
 
+const DRAFT_STORAGE_KEY = 'leitner_interview_prep_draft';
+
+interface InterviewPrepDraft {
+  company: string;
+  role: string;
+  targetDate: string;
+  deckSizeMode: 'auto' | 'custom';
+  targetCardCount: number;
+  rawNotes: string;
+  selectedWeaknesses: string[];
+  syncBox1Cards: boolean;
+}
+
+function loadInterviewPrepDraft(): InterviewPrepDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 const WEAKNESS_OPTIONS = [
   'Complex React Architecture (Compound components, Context, custom hooks)',
   'Accessibility & DOM Contracts (ARIA roles, roving tabindex, focus management)',
@@ -395,15 +417,17 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
   const [dossier, setDossier] = useState<InterviewPrepDossier | null>(initialDossier);
 
-  // Input form state
-  const [company, setCompany] = useState(() => initialDossier?.company || '');
-  const [role, setRole] = useState(() => initialDossier?.role || '');
-  const [targetDate, setTargetDate] = useState(() => initialDossier?.targetDate || '');
-  const [deckSizeMode, setDeckSizeMode] = useState<'auto' | 'custom'>('auto');
-  const [targetCardCount, setTargetCardCount] = useState(16);
-  const [rawNotes, setRawNotes] = useState('');
-  const [selectedWeaknesses, setSelectedWeaknesses] = useState<string[]>([]);
-  const [syncBox1Cards, setSyncBox1Cards] = useState(currentBox1CardIds.length > 0);
+  const [initialDraft] = useState<InterviewPrepDraft | null>(() => loadInterviewPrepDraft());
+
+  // Input form state (initialized from saved briefing or saved draft)
+  const [company, setCompany] = useState(() => initialDossier?.company || initialDraft?.company || '');
+  const [role, setRole] = useState(() => initialDossier?.role || initialDraft?.role || '');
+  const [targetDate, setTargetDate] = useState(() => initialDossier?.targetDate || initialDraft?.targetDate || '');
+  const [deckSizeMode, setDeckSizeMode] = useState<'auto' | 'custom'>(() => initialDraft?.deckSizeMode || 'auto');
+  const [targetCardCount, setTargetCardCount] = useState(() => initialDraft?.targetCardCount || 16);
+  const [rawNotes, setRawNotes] = useState(() => initialDraft?.rawNotes || '');
+  const [selectedWeaknesses, setSelectedWeaknesses] = useState<string[]>(() => initialDraft?.selectedWeaknesses || []);
+  const [syncBox1Cards, setSyncBox1Cards] = useState(() => initialDraft?.syncBox1Cards ?? (currentBox1CardIds.length > 0));
 
   // Loading animation state
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
@@ -438,6 +462,57 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
       companyInputRef.current?.focus();
     }
   }, [step]);
+
+  // Persist form draft as user edits so partial inputs are never lost on accidental modal close or refresh
+  useEffect(() => {
+    if (step === 'input') {
+      try {
+        if (company || role || targetDate || rawNotes || selectedWeaknesses.length > 0) {
+          const draft: InterviewPrepDraft = {
+            company,
+            role,
+            targetDate,
+            deckSizeMode,
+            targetCardCount,
+            rawNotes,
+            selectedWeaknesses,
+            syncBox1Cards,
+          };
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+        }
+      } catch {
+        // Ignore localStorage errors
+      }
+    }
+  }, [step, company, role, targetDate, deckSizeMode, targetCardCount, rawNotes, selectedWeaknesses, syncBox1Cards]);
+
+  // Close modal only via Escape key or explicit buttons
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && step !== 'loading') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [step, onClose]);
+
+  const handleCancel = () => {
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {
+      // Ignore localStorage errors
+    }
+    setCompany('');
+    setRole('');
+    setTargetDate('');
+    setRawNotes('');
+    setSelectedWeaknesses([]);
+    setSyncBox1Cards(currentBox1CardIds.length > 0);
+    setDeckSizeMode('auto');
+    setTargetCardCount(16);
+    onClose();
+  };
 
   const toggleWeakness = (weakness: string) => {
     setSelectedWeaknesses((prev) =>
@@ -480,6 +555,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
       setEditableDeckName(readyDossier.deckName);
       setEditableDescription(readyDossier.deckDescription);
       setCheckedCardIds(new Set(readyDossier.selectedCards.map((c) => c.id)));
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch {
+        // Ignore
+      }
       saveInterviewDossier(readyDossier.id || 'current_dossier', readyDossier);
       setSavedDossiers(getAllSavedDossiers());
 
@@ -522,6 +602,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
   const handleDeleteCurrentDossier = () => {
     if (!dossier) return;
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {
+      // Ignore
+    }
     deleteInterviewDossier(dossier);
     if (dossier.id) onDeleteDossier?.(dossier.id);
     const updated = getAllSavedDossiers();
@@ -681,7 +766,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           generatedAt: parsed.generatedAt || Date.now(),
           selectedCards: parsed.selectedCards,
           externalTopics: Array.isArray(parsed.externalTopics) ? parsed.externalTopics : [],
-          countdownChecklist: Array.isArray(parsed.countdownChecklist) ? parsed.countdownChecklist : [],
           interactiveTools: Array.isArray(parsed.interactiveTools) ? parsed.interactiveTools : [],
           executiveSummary: parsed.executiveSummary || '',
           conversation: Array.isArray(parsed.conversation) ? parsed.conversation : [],
@@ -845,9 +929,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
         aria-modal="true"
         aria-labelledby="ai-prep-modal-title"
         data-testid="interview-prep-modal"
-        onClick={(e) => {
-          if (e.target === e.currentTarget && step !== 'loading') onClose();
-        }}
       >
         <div className="modal-content glass-panel ai-prep-modal-container">
           {/* Header */}
@@ -923,6 +1004,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     type="button"
                     className="ai-prep-history-btn ai-prep-new-plan-btn"
                     onClick={() => {
+                      try {
+                        localStorage.removeItem(DRAFT_STORAGE_KEY);
+                      } catch {
+                        // Ignore
+                      }
                       setDossier(null);
                       setCompany('');
                       setRole('');
@@ -1071,6 +1157,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     id="ai-prep-company"
                     ref={companyInputRef}
                     type="text"
+                    autoComplete="off"
+                    spellCheck={false}
                     className="modal-input ai-prep-input-lg"
                     placeholder="e.g. Stripe, Airbnb, Datadog, Meta, Apple, Google, DoorDash, Figma"
                     value={company}
@@ -1088,6 +1176,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   <input
                     id="ai-prep-role"
                     type="text"
+                    autoComplete="off"
+                    spellCheck={false}
                     className="modal-input ai-prep-input-lg"
                     placeholder="e.g. Senior Frontend Engineer, Staff UI Engineer, Full-Stack L5"
                     value={role}
@@ -1106,6 +1196,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     <input
                       id="ai-prep-date"
                       type="text"
+                      autoComplete="off"
+                      spellCheck={false}
                       className="modal-input ai-prep-input-lg"
                       placeholder="e.g. In 5 days, next Tuesday, or 2026-11-05"
                       value={targetDate}
@@ -1286,8 +1378,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
               <div className="modal-actions ai-prep-actions">
                 <button
                   type="button"
-                  className="btn btn-secondary"
-                  onClick={onClose}
+                  className="btn btn-secondary ai-prep-cancel-btn"
+                  onClick={handleCancel}
                   data-testid="ai-prep-cancel-btn"
                 >
                   Cancel
@@ -1750,18 +1842,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
               ))}
             </div>
           </div>
-
-          {/* <div className="print-section">
-            <h2 className="print-section-heading">24-Hour Countdown & Interview Day Protocol</h2>
-            <div className="print-checklist">
-              {dossier.countdownChecklist?.map((item, idx) => (
-                <div key={idx} className="print-checklist-item">
-                  <span className="print-checkbox">&#9744;</span>
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div> */}
 
           <div className="print-section">
             <h2 className="print-section-heading">Curated Practice Playgrounds</h2>

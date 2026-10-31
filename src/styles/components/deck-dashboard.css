@@ -1749,6 +1749,30 @@
   font-size: 14px !important;
   padding: 10px 14px !important;
   width: 100% !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+.ai-prep-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 16px !important;
+  margin-top: 24px !important;
+}
+
+/* Ensure browser autofill matches dark modal background instead of harsh white */
+.ai-prep-form input:-webkit-autofill,
+.ai-prep-form input:-webkit-autofill:hover,
+.ai-prep-form input:-webkit-autofill:focus,
+.ai-prep-form textarea:-webkit-autofill,
+.ai-prep-form textarea:-webkit-autofill:hover,
+.ai-prep-form textarea:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .ai-prep-split-row {
