@@ -1,0 +1,55 @@
+Write a GraphQL query named `GetArticle` that accepts a variable `$slug: String!`.
+
+### Requirements
+- Operation signature: `query GetArticle($slug: String!)`
+- Top-level field: `article(slug: $slug)`
+- Fields to select on `article`:
+  - `id`
+  - `title`
+  - `publishedAt`
+  - `author`: select `id`, `name`, and `avatarUrl`
+  - `comments(limit: 3)`: select `id`, `text`, `createdAt`, and `author { name }`
+
+### Schema Context
+```graphql
+type Query {
+  article(slug: String!): Article
+}
+type Author {
+  id: ID!
+  name: String!
+  avatarUrl: String
+}
+type Comment {
+  id: ID!
+  text: String!
+  createdAt: String!
+  author: CommentAuthor!
+}
+type CommentAuthor {
+  name: String!
+}
+type Article {
+  id: ID!
+  title: String!
+  publishedAt: String!
+  author: Author!
+  comments(limit: Int): [Comment!]!
+}
+```
+
+### Example
+When executed with variables `{ slug: "understanding-graphql" }`, the query returns:
+```json
+{
+  "article": {
+    "id": "a1",
+    "title": "Understanding GraphQL",
+    "publishedAt": "2026-10-31",
+    "author": { "id": "u1", "name": "Alice", "avatarUrl": "https://example.com/avatar.png" },
+    "comments": [
+      { "id": "c1", "text": "Helpful!", "createdAt": "2026-10-31T01:00:00Z", "author": { "name": "Bob" } }
+    ]
+  }
+}
+```

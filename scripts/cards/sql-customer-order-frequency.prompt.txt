@@ -1,0 +1,32 @@
+Write a PostgreSQL query to find customers who have placed at least 2 orders.
+
+### Schema: `Customers`
+- `id` (INT, PRIMARY KEY)
+- `name` (TEXT): Customer full name
+- `email` (TEXT): Customer email address
+
+### Schema: `Orders`
+- `id` (INT, PRIMARY KEY)
+- `customer_id` (INT): Foreign key referencing `Customers(id)`
+- `amount` (INT): Order cost
+
+### Query Contract
+- Returns columns `email`, `order_count`, and `total_spent`.
+- Only includes customers with `COUNT(Orders.id) >= 2`.
+- Ordered by `total_spent` DESC, then `email` ASC.
+
+### Example
+`Customers`:
+- `{ id: 1, name: "Alice", email: "alice@example.com" }`
+- `{ id: 2, name: "Bob", email: "bob@example.com" }`
+- `{ id: 3, name: "Carol", email: "carol@example.com" }`
+
+`Orders`:
+- `{ id: 101, customer_id: 1, amount: 50 }`
+- `{ id: 102, customer_id: 1, amount: 70 }`
+- `{ id: 103, customer_id: 2, amount: 200 }`
+- `{ id: 104, customer_id: 3, amount: 30 }`
+- `{ id: 105, customer_id: 3, amount: 40 }`
+
+Returns:
+- `[{ email: "alice@example.com", order_count: 2, total_spent: 120 }, { email: "carol@example.com", order_count: 2, total_spent: 70 }]`

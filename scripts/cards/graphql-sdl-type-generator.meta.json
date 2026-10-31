@@ -1,5 +1,10 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL SDL: Type Definition Generator",
-  "tags": ["graphql", "sdl", "schema", "codegen"]
+  "tags": [
+    "graphql",
+    "sdl",
+    "schema",
+    "codegen"
+  ]
 }

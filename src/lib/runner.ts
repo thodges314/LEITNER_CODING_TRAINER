@@ -6,8 +6,12 @@ import { createMockFetch } from './mockFetch';
 import { createDomTools, MockIntersectionObserver } from './domTools';
 import type { DomTools } from './domTools';
 import { isTsOnlyCard } from './tsOnly';
+import { PGlite } from '@electric-sql/pglite';
+import { graphql as executeGraphql, buildSchema, parse as parseGraphql, validate as validateGraphql } from 'graphql';
+import { stripTestRunnerBlock } from './stripTestRunner';
 
 export type ExecutionMode = 'js' | 'ts';
+
 
 export interface TranspileOutcome {
   ok: boolean;
@@ -223,6 +227,11 @@ const SANDBOX_NAMES = [
   'IntersectionObserver',
   '$dom',
   '$test',
+  'PGlite',
+  'graphql',
+  'buildSchema',
+  'parseGraphql',
+  'validateGraphql',
 ] as const;
 
 export interface SandboxScope {
@@ -256,6 +265,15 @@ export function createSandboxScope(options: {
     if (mod === 'react') return { default: React, ...React };
     if (mod === 'react-dom') return { default: customReactDOM, ...customReactDOM };
     if (mod === 'react-dom/client') return { default: customReactDOM, ...customReactDOM };
+    if (mod === 'graphql') {
+      return {
+        default: { graphql: executeGraphql, buildSchema, parse: parseGraphql, validate: validateGraphql },
+        graphql: executeGraphql,
+        buildSchema,
+        parse: parseGraphql,
+        validate: validateGraphql,
+      };
+    }
     throw new Error(`Cannot find module '${mod}' in browser sandbox`);
   };
   const values: unknown[] = [
@@ -288,6 +306,11 @@ export function createSandboxScope(options: {
     MockIntersectionObserver,
     lazyDom,
     createTestHelpers(options.console as ConsoleLike),
+    PGlite,
+    executeGraphql,
+    buildSchema,
+    parseGraphql,
+    validateGraphql,
   ];
   return {
     names: SANDBOX_NAMES,
@@ -364,6 +387,77 @@ export function bufferContainsHarness(code: string, harness: string): boolean {
 }
 
 /**
+ * Normalizes user code for SQL / PostgreSQL track cards.
+ * Accepts:
+ * 1. JavaScript / TypeScript defining `query` or `solution` (e.g. `const query = \`...\``),
+ *    even with preceding comments or instructions like `// Write your implementation below`.
+ * 2. Raw SQL (e.g. `SELECT ...` or `WITH ...`), with or without starter comments or SQL comments (`--`).
+ */
+export function prepareSqlCode(code: string, testHarness?: string): string {
+  // If the user buffer includes the example test runner block, strip it first for analysis
+  const stripped = stripTestRunnerBlock(code, testHarness);
+
+  // Check if the user declared `query` or `solution` using JS/TS declaration syntax anywhere
+  const hasJsDeclaration = /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:query|solution)\b/.test(code);
+  if (hasJsDeclaration) {
+    return code;
+  }
+
+  // Strip leading JS/TS comments and whitespace to see if the first code token is a JS keyword
+  const withoutLeadingComments = stripped
+    .replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, '')
+    .trim();
+
+  const startsWithJs = /^(?:const|let|var|function|class|export|import)\b/.test(withoutLeadingComments);
+  if (startsWithJs) {
+    return code;
+  }
+
+  // Otherwise, user provided raw SQL text.
+  // Strip lines starting with `//` (like `// Write your implementation below`) which are invalid in PostgreSQL.
+  const cleanSql = stripped
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('//'))
+    .join('\n')
+    .trim();
+
+  return `const query = ${JSON.stringify(cleanSql)};\nconst solution = query;\n`;
+}
+
+/**
+ * Normalizes user code for GraphQL track cards (operations, queries, mutations, fragments, and SDL).
+ * Accepts:
+ * 1. JavaScript / TypeScript defining `query`, `schema`, or `solution` (e.g. `const query = \`...\``),
+ *    even with preceding comments or instructions like `// Write your implementation below`.
+ * 2. Raw GraphQL text (e.g. `query GetUser { ... }` or `type User { ... }`).
+ */
+export function prepareGraphqlCode(code: string, testHarness?: string): string {
+  const stripped = stripTestRunnerBlock(code, testHarness);
+
+  const hasJsDeclaration = /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:query|schema|solution)\b/.test(code);
+  if (hasJsDeclaration) {
+    return code;
+  }
+
+  const withoutLeadingComments = stripped
+    .replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, '')
+    .trim();
+
+  const startsWithJs = /^(?:const|let|var|function|class|export|import)\b/.test(withoutLeadingComments);
+  if (startsWithJs) {
+    return code;
+  }
+
+  const cleanGql = stripped
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('//'))
+    .join('\n')
+    .trim();
+
+  return `const query = ${JSON.stringify(cleanGql)};\nconst schema = query;\nconst solution = query;\n`;
+}
+
+/**
  * Runs the user's code followed by the card's test harness without any UI,
  * counting PASS/FAIL console output. This is the source of truth for pass/fail.
  */
@@ -379,11 +473,18 @@ export async function runHarness(
   // Type-level checks (@ts-expect-error in the harness) only mean something under strict checking.
   if (isTsOnlyCard(card)) mode = 'ts';
 
-  const combined = bufferContainsHarness(code, harness) ? code : `${code}\n\n${harness}\n`;
+  let effectiveCode = code;
+  if (card.track === 'sql-postgres') {
+    effectiveCode = prepareSqlCode(code, harness);
+  } else if (card.track === 'graphql') {
+    effectiveCode = prepareGraphqlCode(code, harness);
+  }
+
+  const combined = bufferContainsHarness(effectiveCode, harness) ? effectiveCode : `${effectiveCode}\n\n${harness}\n`;
 
   // In TS mode, strictly type-check the user's solution (or combined buffer for typescript-patterns puzzles).
   if (mode === 'ts') {
-    const codeToCheck = isTsOnlyCard(card) ? combined : code;
+    const codeToCheck = isTsOnlyCard(card) ? combined : effectiveCode;
     const { checkAndTranspileTS } = await import('../utils/typeChecker');
     const tsCheck = checkAndTranspileTS(codeToCheck);
     if (!tsCheck.success) {

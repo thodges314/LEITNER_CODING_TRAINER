@@ -1,5 +1,10 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Middleware: Context Auth Guard",
-  "tags": ["graphql", "middleware", "auth", "resolvers"]
+  "tags": [
+    "graphql",
+    "middleware",
+    "auth",
+    "resolvers"
+  ]
 }

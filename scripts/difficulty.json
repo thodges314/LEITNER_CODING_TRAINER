@@ -1222,5 +1222,57 @@
   "graphql-schema-stitching-merger": {
     "difficulty": 5,
     "concept": "graphql-stitching"
+  },
+  "sql-second-highest-salary": {
+    "difficulty": 2,
+    "concept": "sql-aggregates"
+  },
+  "sql-department-average-salary": {
+    "difficulty": 3,
+    "concept": "sql-aggregates"
+  },
+  "sql-customer-order-frequency": {
+    "difficulty": 2,
+    "concept": "sql-grouping"
+  },
+  "sql-department-highest-salary": {
+    "difficulty": 3,
+    "concept": "sql-window-functions"
+  },
+  "sql-running-total-sales": {
+    "difficulty": 3,
+    "concept": "sql-window-functions"
+  },
+  "sql-cancellation-rate": {
+    "difficulty": 3,
+    "concept": "sql-conditional-aggregation"
+  },
+  "gql-query-nested-fields": {
+    "difficulty": 1,
+    "concept": "gql-queries"
+  },
+  "gql-query-aliases-fragments": {
+    "difficulty": 2,
+    "concept": "gql-fragments"
+  },
+  "gql-query-variables-directives": {
+    "difficulty": 2,
+    "concept": "gql-directives"
+  },
+  "gql-query-pagination": {
+    "difficulty": 3,
+    "concept": "gql-relay-queries"
+  },
+  "gql-mutation-input-payload": {
+    "difficulty": 2,
+    "concept": "gql-mutations"
+  },
+  "gql-schema-sdl-types": {
+    "difficulty": 2,
+    "concept": "gql-schema-types"
+  },
+  "gql-schema-sdl-enums-unions": {
+    "difficulty": 3,
+    "concept": "gql-schema-definitions"
   }
 }

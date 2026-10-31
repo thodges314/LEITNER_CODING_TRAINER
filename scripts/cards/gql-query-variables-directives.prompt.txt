@@ -1,0 +1,32 @@
+Write a GraphQL query named `GetProduct` with variables and conditional directives.
+
+### Requirements
+- Operation signature: `query GetProduct($id: ID!, $withReviews: Boolean = false, $skipPricing: Boolean = false)`
+- Query top-level field `product(id: $id)`
+- Fields to select on `product`:
+  - `id`
+  - `name`
+  - `price @skip(if: $skipPricing)`
+  - `reviews @include(if: $withReviews)`: select `id`, `rating`, and `comment`
+
+### Schema Context
+```graphql
+type Query {
+  product(id: ID!): Product
+}
+type Review {
+  id: ID!
+  rating: Int!
+  comment: String!
+}
+type Product {
+  id: ID!
+  name: String!
+  price: Float!
+  reviews: [Review!]!
+}
+```
+
+### Example
+- With `{ id: "p1" }`: returns `{ product: { id: "p1", name: "Laptop", price: 999.99 } }` (reviews omitted, price included).
+- With `{ id: "p1", withReviews: true, skipPricing: true }`: returns `{ product: { id: "p1", name: "Laptop", reviews: [{ id: "r1", rating: 5, comment: "Fast" }] } }`.

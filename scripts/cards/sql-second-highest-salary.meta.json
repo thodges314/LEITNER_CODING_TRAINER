@@ -1,0 +1,10 @@
+{
+  "track": "sql-postgres",
+  "title": "Second Highest Salary",
+  "tags": [
+    "sql",
+    "postgres",
+    "aggregate",
+    "subquery"
+  ]
+}

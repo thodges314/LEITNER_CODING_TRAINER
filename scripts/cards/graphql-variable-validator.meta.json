@@ -1,5 +1,10 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Variables: Required Variable Validator",
-  "tags": ["graphql", "variables", "validation", "schema"]
+  "tags": [
+    "graphql",
+    "variables",
+    "validation",
+    "schema"
+  ]
 }

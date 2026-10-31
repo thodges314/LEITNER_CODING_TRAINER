@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "High-Volume Customers (HAVING Filter)",
+  "tags": [
+    "sql",
+    "postgres",
+    "group-by",
+    "having",
+    "join"
+  ]
+}

@@ -16,7 +16,10 @@ export type TrackType =
   | 'typescript-patterns'
   | 'testing-tooling'
   | 'graphql'
-  | 'node';
+  | 'graphql-server'
+  | 'node'
+  | 'sql-postgres';
+
 
 export interface TestCaseItem {
   input: string;
@@ -224,11 +227,23 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     bg: 'rgba(229, 53, 171, 0.12)',
     border: 'rgba(229, 53, 171, 0.35)',
   },
+  'graphql-server': {
+    label: 'GraphQL Server',
+    color: '#c084fc',
+    bg: 'rgba(192, 132, 252, 0.12)',
+    border: 'rgba(192, 132, 252, 0.35)',
+  },
   'node': {
     label: 'Node.js',
     color: '#4ade80',
     bg: 'rgba(74, 222, 128, 0.12)',
     border: 'rgba(74, 222, 128, 0.35)',
+  },
+  'sql-postgres': {
+    label: 'PostgreSQL',
+    color: '#38bdf8',
+    bg: 'rgba(56, 189, 248, 0.12)',
+    border: 'rgba(56, 189, 248, 0.35)',
   },
 };
 

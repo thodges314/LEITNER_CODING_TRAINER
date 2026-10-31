@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Employees Above Department Average Salary",
+  "tags": [
+    "sql",
+    "postgres",
+    "subquery",
+    "aggregate",
+    "filter"
+  ]
+}

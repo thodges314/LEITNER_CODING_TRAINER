@@ -1,0 +1,32 @@
+Write a GraphQL query named `CompareUsers` that accepts two variables `$primaryId: ID!` and `$secondaryId: ID!`.
+
+### Requirements
+- Operation signature: `query CompareUsers($primaryId: ID!, $secondaryId: ID!)`
+- Query the `user` field twice using field aliases:
+  - `primary: user(id: $primaryId)`
+  - `secondary: user(id: $secondaryId)`
+- Define and spread a named fragment `UserSummary` on both selections:
+  - `fragment UserSummary on User`
+  - Selects `id`, `name`, `email`, and `role`
+
+### Schema Context
+```graphql
+type Query {
+  user(id: ID!): User
+}
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  role: String!
+}
+```
+
+### Example
+When executed with variables `{ primaryId: "1", secondaryId: "2" }`, returns:
+```json
+{
+  "primary": { "id": "1", "name": "Alice", "email": "alice@example.com", "role": "ADMIN" },
+  "secondary": { "id": "2", "name": "Bob", "email": "bob@example.com", "role": "MEMBER" }
+}
+```

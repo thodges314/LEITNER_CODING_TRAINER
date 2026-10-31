@@ -1,0 +1,21 @@
+Write a PostgreSQL query to find the second highest distinct salary from the `Employee` table.
+
+### Schema: `Employee`
+- `id` (INT, PRIMARY KEY): Unique employee identifier.
+- `salary` (INT): Employee compensation amount.
+
+### Query Contract
+- Returns a single row with column `"SecondHighestSalary"`.
+- If the second highest salary does not exist (e.g. fewer than 2 distinct salaries), the query must return `NULL` as the value for `"SecondHighestSalary"`.
+
+### Example
+Given `Employee` records:
+- `{ id: 1, salary: 100 }`
+- `{ id: 2, salary: 200 }`
+- `{ id: 3, salary: 300 }`
+
+The query returns:
+- `[{ "SecondHighestSalary": 200 }]`
+
+If `Employee` has only `{ id: 1, salary: 100 }`:
+- Returns `[{ "SecondHighestSalary": null }]`

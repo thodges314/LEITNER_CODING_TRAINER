@@ -1,5 +1,10 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Validation: Input Object Sanitizer",
-  "tags": ["graphql", "validation", "mutation", "input"]
+  "tags": [
+    "graphql",
+    "validation",
+    "mutation",
+    "input"
+  ]
 }

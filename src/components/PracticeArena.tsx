@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import CodeMirror from '@uiw/react-codemirror';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import { sql } from '@codemirror/lang-sql';
 import rainbowBrackets from 'rainbowbrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
@@ -18,7 +19,7 @@ import { evaluateCodeSubmission } from '../lib/ai';
 import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
 import { CheckCircle } from 'lucide-react';
-import { transpileForExecution, runHarness, createSandboxScope } from '../lib/runner';
+import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, bufferContainsHarness } from '../lib/runner';
 import { extractHarnessContracts } from '../lib/harnessContracts';
 import { formatConsoleArg, formatAssertionFailure } from './practice/consoleFormat';
 import type { ConsoleLogEntry } from './practice/consoleFormat';
@@ -337,8 +338,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   );
 
   const extensions = useMemo(() => {
+    const isSql = currentCard?.track === 'sql-postgres';
+    const langExt = isSql ? sql() : javascript({ jsx: true, typescript: executionMode === 'ts' });
     const list = [
-      javascript({ jsx: true, typescript: executionMode === 'ts' }),
+      langExt,
       rainbowBrackets(),
       EditorView.lineWrapping,
       keymap.of([indentWithTab]),
@@ -355,11 +358,11 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         },
       }),
     ];
-    if (executionMode === 'ts') {
+    if (executionMode === 'ts' && !isSql) {
       list.push(createTsHoverExtension());
     }
     return list;
-  }, [executionMode]);
+  }, [executionMode, currentCard?.track]);
 
   const actionsRef = useRef<{
     handleRunCode: () => Promise<void>;
@@ -454,7 +457,21 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       }),
     };
 
-    const transpiled = await transpileForExecution(code, executionMode);
+    const isDocTrack = currentCard?.track === 'sql-postgres' || currentCard?.track === 'graphql';
+    const rawCodeToRun =
+      currentCard?.track === 'sql-postgres'
+        ? prepareSqlCode(code, currentCard.testHarness)
+        : currentCard?.track === 'graphql'
+          ? prepareGraphqlCode(code, currentCard.testHarness)
+          : code;
+    const executableSource =
+      isDocTrack &&
+      currentCard?.testHarness &&
+      !bufferContainsHarness(rawCodeToRun, currentCard.testHarness)
+        ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`
+        : rawCodeToRun;
+
+    const transpiled = await transpileForExecution(executableSource, executionMode);
     for (const diag of transpiled.diagnostics) {
       logs.push({
         type: diag.type === 'warn' ? 'warn' : 'error',

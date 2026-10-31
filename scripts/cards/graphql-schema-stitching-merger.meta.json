@@ -1,5 +1,12 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Schema Stitching Resolver Merger",
-  "tags": ["graphql", "schema-stitching", "federation", "resolvers", "conflict-detection", "microservices"]
+  "tags": [
+    "graphql",
+    "schema-stitching",
+    "federation",
+    "resolvers",
+    "conflict-detection",
+    "microservices"
+  ]
 }

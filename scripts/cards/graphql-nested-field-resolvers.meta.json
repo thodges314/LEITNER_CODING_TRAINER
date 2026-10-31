@@ -1,5 +1,10 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Resolvers: Nested Relational Field Resolvers",
-  "tags": ["graphql", "resolvers", "relational", "schema"]
+  "tags": [
+    "graphql",
+    "resolvers",
+    "relational",
+    "schema"
+  ]
 }

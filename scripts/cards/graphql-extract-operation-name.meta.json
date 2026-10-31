@@ -1,5 +1,11 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL AST: Extract Operation Name",
-  "tags": ["graphql", "ast", "regex", "parsing", "query"]
+  "tags": [
+    "graphql",
+    "ast",
+    "regex",
+    "parsing",
+    "query"
+  ]
 }

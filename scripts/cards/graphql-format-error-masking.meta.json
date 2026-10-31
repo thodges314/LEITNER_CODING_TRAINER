@@ -1,5 +1,10 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Errors: Error Masking and Formatting",
-  "tags": ["graphql", "errors", "security", "sanitization"]
+  "tags": [
+    "graphql",
+    "errors",
+    "security",
+    "sanitization"
+  ]
 }

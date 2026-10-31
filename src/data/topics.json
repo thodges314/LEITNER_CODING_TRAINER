@@ -17300,7 +17300,7 @@
   },
   {
     "id": "graphql-context-auth-guard",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Middleware: Context Auth Guard",
     "box": 1,
     "streak": 0,
@@ -17348,7 +17348,7 @@
   },
   {
     "id": "graphql-cursor-pagination-extractor",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Cursor Pagination Argument Parser",
     "box": 1,
     "streak": 0,
@@ -17398,7 +17398,7 @@
   },
   {
     "id": "graphql-dataloader-batching",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL DataLoader: Microtask Request Batching",
     "box": 1,
     "streak": 0,
@@ -17448,7 +17448,7 @@
   },
   {
     "id": "graphql-discriminated-union-resolver",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Resolvers: Discriminated Union Resolver",
     "box": 1,
     "streak": 0,
@@ -17491,7 +17491,7 @@
   },
   {
     "id": "graphql-extract-operation-name",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL AST: Extract Operation Name",
     "box": 1,
     "streak": 0,
@@ -17555,7 +17555,7 @@
   },
   {
     "id": "graphql-format-error-masking",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Errors: Error Masking and Formatting",
     "box": 1,
     "streak": 0,
@@ -17603,7 +17603,7 @@
   },
   {
     "id": "graphql-input-object-sanitizer",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Validation: Input Object Sanitizer",
     "box": 1,
     "streak": 0,
@@ -17656,7 +17656,7 @@
   },
   {
     "id": "graphql-mini-client",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Client: Fetch with Error Handling",
     "box": 1,
     "streak": 0,
@@ -17716,7 +17716,7 @@
   },
   {
     "id": "graphql-nested-field-resolvers",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Resolvers: Nested Relational Field Resolvers",
     "box": 1,
     "streak": 0,
@@ -17759,7 +17759,7 @@
   },
   {
     "id": "graphql-query-complexity-calculator",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Query Complexity Cost Calculator",
     "box": 1,
     "streak": 0,
@@ -17809,7 +17809,7 @@
   },
   {
     "id": "graphql-relay-connection-builder",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Relay Connection & Cursor Pagination Spec",
     "box": 1,
     "streak": 0,
@@ -17859,7 +17859,7 @@
   },
   {
     "id": "graphql-schema-stitching-merger",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Schema Stitching Resolver Merger",
     "box": 1,
     "streak": 0,
@@ -17904,7 +17904,7 @@
   },
   {
     "id": "graphql-sdl-type-generator",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL SDL: Type Definition Generator",
     "box": 1,
     "streak": 0,
@@ -17957,7 +17957,7 @@
   },
   {
     "id": "graphql-variable-validator",
-    "track": "graphql",
+    "track": "graphql-server",
     "title": "GraphQL Variables: Required Variable Validator",
     "box": 1,
     "streak": 0,
@@ -18007,5 +18007,574 @@
       }
     ],
     "testHarness": "await $test.run(\"Returns valid when all required variables are supplied\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', filter: 'String' }, { id: 'usr_100', filter: 'active' }));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Flags missing required variables in definition order\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', role: 'String!', limit: 'Int' }, { limit: 10 }));\n}, () => ({ valid: false, missing: ['id', 'role'] }));\n\nawait $test.run(\"Treats null or undefined values as missing for required fields\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', token: 'String!' }, { id: null, token: undefined }));\n}, () => ({ valid: false, missing: ['id', 'token'] }));\n\nawait $test.run(\"Treats falsy values (0, empty string, false) as validly provided\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ count: 'Int!', name: 'String!', active: 'Boolean!' }, { count: 0, name: '', active: false }));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Allows optional variables to be omitted without error\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ offset: 'Int', limit: 'Int' }, {}));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Handles omitted or null variables object by marking all required as missing\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ requiredA: 'String!', optionalB: 'Int' }));\n}, () => ({ valid: false, missing: ['requiredA'] }));"
+  },
+  {
+    "id": "sql-cancellation-rate",
+    "track": "sql-postgres",
+    "title": "Trips Cancellation Rate (CASE WHEN)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "case-when",
+      "round",
+      "analytics"
+    ],
+    "promptSeed": "Write a PostgreSQL query to compute the cancellation rate of requests involving unbanned users for each day.\n\n### Schema: `Trips`\n- `id` (INT, PRIMARY KEY)\n- `client_id` (INT): User id of rider\n- `driver_id` (INT): User id of driver\n- `status` (TEXT): `'completed'`, `'cancelled_by_driver'`, or `'cancelled_by_client'`\n- `request_at` (TEXT): Date in `'YYYY-MM-DD'` format\n\n### Schema: `Users`\n- `id` (INT, PRIMARY KEY)\n- `banned` (TEXT): `'Yes'` or `'No'`\n- `role` (TEXT): `'client'`, `'driver'`, or `'partner'`\n\n### Query Contract\n- Both the client and the driver must not be banned (`banned = 'No'`).\n- The cancellation rate is the number of cancelled requests (by client or driver) divided by the total number of unbanned requests on that day.\n- Returns columns `\"Day\"` and `\"Cancellation Rate\"`.\n- `\"Cancellation Rate\"` must be rounded to 2 decimal places using `ROUND(..., 2)::float`.\n- Ordered by `\"Day\"` ASC.\n\n### Example\n`Users`:\n- `{ id: 1, banned: \"No\", role: \"client\" }`\n- `{ id: 2, banned: \"Yes\", role: \"client\" }`\n- `{ id: 10, banned: \"No\", role: \"driver\" }`\n- `{ id: 11, banned: \"No\", role: \"driver\" }`\n\n`Trips`:\n- `{ id: 1, client_id: 1, driver_id: 10, status: \"completed\", request_at: \"2024-03-01\" }`\n- `{ id: 2, client_id: 1, driver_id: 11, status: \"cancelled_by_driver\", request_at: \"2024-03-01\" }`\n- `{ id: 3, client_id: 2, driver_id: 10, status: \"cancelled_by_client\", request_at: \"2024-03-01\" }` (ignored: client 2 is banned)\n\nReturns for `2024-03-01`:\n- 1 completed + 1 cancelled = 2 trips. Cancellation rate = 1 / 2 = 0.50.\n- `[{ \"Day\": \"2024-03-01\", \"Cancellation Rate\": 0.5 }]`",
+    "difficulty": 3,
+    "concept": "sql-conditional-aggregation",
+    "referenceSolution": "const query = `\nSELECT t.request_at AS \"Day\",\n       ROUND(SUM(CASE WHEN t.status != 'completed' THEN 1.0 ELSE 0.0 END) / COUNT(*), 2)::float AS \"Cancellation Rate\"\nFROM Trips t\nJOIN Users c ON t.client_id = c.id AND c.banned = 'No'\nJOIN Users d ON t.driver_id = d.id AND d.banned = 'No'\nGROUP BY t.request_at\nORDER BY t.request_at ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT t.request_at AS \"Day\",\n       ROUND(SUM(CASE WHEN t.status != 'completed' THEN 1.0 ELSE 0.0 END) / COUNT(*), 2)::float AS \"Cancellation Rate\"\nFROM Trips t\nJOIN Users c ON t.client_id = c.id AND c.banned = 'No'\nJOIN Users d ON t.driver_id = d.id AND d.banned = 'No'\nGROUP BY t.request_at\nORDER BY t.request_at ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Computes cancellation rate for unbanned users",
+        "input": "query",
+        "expected": "[{\"Day\": \"2024-03-01\", \"Cancellation Rate\": 0.5}, {\"Day\": \"2024-03-02\", \"Cancellation Rate\": 0}]"
+      },
+      {
+        "description": "Returns 0 when all trips are completed",
+        "input": "query",
+        "expected": "[{\"Day\": \"2024-03-05\", \"Cancellation Rate\": 0}]"
+      },
+      {
+        "description": "Returns empty when no trips exist",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns 1 when all unbanned trips are cancelled",
+        "input": "query",
+        "expected": "[{\"Day\": \"2024-04-01\", \"Cancellation Rate\": 1}]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE Users (id INT PRIMARY KEY, banned TEXT, role TEXT);\n    CREATE TABLE Trips (id INT PRIMARY KEY, client_id INT, driver_id INT, status TEXT, request_at TEXT);\n  `);\n\n  // Case 1: Multiple trips across days with banned users filtered\n  await db.exec(`\n    INSERT INTO Users VALUES\n      (1, 'No', 'client'),\n      (2, 'Yes', 'client'),\n      (3, 'No', 'client'),\n      (10, 'No', 'driver'),\n      (11, 'No', 'driver'),\n      (12, 'Yes', 'driver');\n    INSERT INTO Trips VALUES\n      (1, 1, 10, 'completed', '2024-03-01'),\n      (2, 1, 11, 'cancelled_by_driver', '2024-03-01'),\n      (3, 2, 10, 'cancelled_by_client', '2024-03-01'),\n      (4, 3, 10, 'completed', '2024-03-02'),\n      (5, 1, 12, 'cancelled_by_client', '2024-03-02');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Computes cancellation rate for unbanned users', r1 !== null && $test.equal(r1, [\n    { Day: '2024-03-01', 'Cancellation Rate': 0.5 },\n    { Day: '2024-03-02', 'Cancellation Rate': 0 },\n  ]), r1);\n\n  // Case 2: All trips completed (0.0 cancellation rate)\n  await db.exec(`\n    DELETE FROM Trips;\n    INSERT INTO Trips VALUES (1, 1, 10, 'completed', '2024-03-05');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Returns 0 when all trips are completed', r2 !== null && $test.equal(r2, [\n    { Day: '2024-03-05', 'Cancellation Rate': 0 },\n  ]), r2);\n\n  // Case 3: Empty trips\n  await db.exec(`DELETE FROM Trips;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty when no trips exist', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: 100% cancellation rate\n  await db.exec(`\n    DELETE FROM Trips; DELETE FROM Users;\n    INSERT INTO Users VALUES (1, 'No', 'client'), (10, 'No', 'driver');\n    INSERT INTO Trips VALUES (1, 1, 10, 'cancelled_by_client', '2024-04-01');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Returns 1 when all unbanned trips are cancelled', r4 !== null && $test.equal(r4, [\n    { Day: '2024-04-01', 'Cancellation Rate': 1 },\n  ]), r4);\n})();"
+  },
+  {
+    "id": "sql-customer-order-frequency",
+    "track": "sql-postgres",
+    "title": "High-Volume Customers (HAVING Filter)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "sql",
+      "postgres",
+      "group-by",
+      "having",
+      "join"
+    ],
+    "promptSeed": "Write a PostgreSQL query to find customers who have placed at least 2 orders.\n\n### Schema: `Customers`\n- `id` (INT, PRIMARY KEY)\n- `name` (TEXT): Customer full name\n- `email` (TEXT): Customer email address\n\n### Schema: `Orders`\n- `id` (INT, PRIMARY KEY)\n- `customer_id` (INT): Foreign key referencing `Customers(id)`\n- `amount` (INT): Order cost\n\n### Query Contract\n- Returns columns `email`, `order_count`, and `total_spent`.\n- Only includes customers with `COUNT(Orders.id) >= 2`.\n- Ordered by `total_spent` DESC, then `email` ASC.\n\n### Example\n`Customers`:\n- `{ id: 1, name: \"Alice\", email: \"alice@example.com\" }`\n- `{ id: 2, name: \"Bob\", email: \"bob@example.com\" }`\n- `{ id: 3, name: \"Carol\", email: \"carol@example.com\" }`\n\n`Orders`:\n- `{ id: 101, customer_id: 1, amount: 50 }`\n- `{ id: 102, customer_id: 1, amount: 70 }`\n- `{ id: 103, customer_id: 2, amount: 200 }`\n- `{ id: 104, customer_id: 3, amount: 30 }`\n- `{ id: 105, customer_id: 3, amount: 40 }`\n\nReturns:\n- `[{ email: \"alice@example.com\", order_count: 2, total_spent: 120 }, { email: \"carol@example.com\", order_count: 2, total_spent: 70 }]`",
+    "difficulty": 2,
+    "concept": "sql-grouping",
+    "referenceSolution": "const query = `\nSELECT c.email, COUNT(o.id) AS order_count, SUM(o.amount) AS total_spent\nFROM Customers c\nJOIN Orders o ON c.id = o.customer_id\nGROUP BY c.id, c.email\nHAVING COUNT(o.id) >= 2\nORDER BY total_spent DESC, c.email ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT c.email, COUNT(o.id) AS order_count, SUM(o.amount) AS total_spent\nFROM Customers c\nJOIN Orders o ON c.id = o.customer_id\nGROUP BY c.id, c.email\nHAVING COUNT(o.id) >= 2\nORDER BY total_spent DESC, c.email ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Returns customers with >= 2 orders sorted by total spent",
+        "input": "query",
+        "expected": "[{\"email\": \"alice@example.com\", \"order_count\": 2, \"total_spent\": 120}, {\"email\": \"carol@example.com\", \"order_count\": 2, \"total_spent\": 70}]"
+      },
+      {
+        "description": "Returns empty when no customer has at least 2 orders",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty when no orders exist",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Breaks ties in total spent by customer email ascending",
+        "input": "query",
+        "expected": "[{\"email\": \"aaron@example.com\", \"order_count\": 2, \"total_spent\": 100}, {\"email\": \"zoe@example.com\", \"order_count\": 2, \"total_spent\": 100}]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE Customers (id INT PRIMARY KEY, name TEXT, email TEXT);\n    CREATE TABLE Orders (id INT PRIMARY KEY, customer_id INT, amount INT);\n  `);\n\n  // Case 1: Multiple customers, only those with >= 2 orders returned\n  await db.exec(`\n    INSERT INTO Customers VALUES\n      (1, 'Alice', 'alice@example.com'),\n      (2, 'Bob', 'bob@example.com'),\n      (3, 'Carol', 'carol@example.com');\n    INSERT INTO Orders VALUES\n      (101, 1, 50),\n      (102, 1, 70),\n      (103, 2, 200),\n      (104, 3, 30),\n      (105, 3, 40);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Returns customers with >= 2 orders sorted by total spent', r1 !== null && $test.equal(r1, [\n    { email: 'alice@example.com', order_count: 2, total_spent: 120 },\n    { email: 'carol@example.com', order_count: 2, total_spent: 70 },\n  ]), r1);\n\n  // Case 2: No customers meet threshold\n  await db.exec(`\n    DELETE FROM Orders;\n    INSERT INTO Orders VALUES (201, 1, 100), (202, 2, 100), (203, 3, 100);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Returns empty when no customer has at least 2 orders', r2 !== null && $test.equal(r2, []), r2);\n\n  // Case 3: Empty orders\n  await db.exec(`DELETE FROM Orders;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty when no orders exist', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: Breaks ties in total spent by customer email ascending\n  await db.exec(`\n    DELETE FROM Orders;\n    DELETE FROM Customers;\n    INSERT INTO Customers VALUES (1, 'Zoe', 'zoe@example.com'), (2, 'Aaron', 'aaron@example.com');\n    INSERT INTO Orders VALUES (1, 1, 50), (2, 1, 50), (3, 2, 40), (4, 2, 60);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Breaks ties in total spent by customer email ascending', r4 !== null && $test.equal(r4, [\n    { email: 'aaron@example.com', order_count: 2, total_spent: 100 },\n    { email: 'zoe@example.com', order_count: 2, total_spent: 100 },\n  ]), r4);\n})();"
+  },
+  {
+    "id": "sql-department-average-salary",
+    "track": "sql-postgres",
+    "title": "Employees Above Department Average Salary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "subquery",
+      "aggregate",
+      "filter"
+    ],
+    "promptSeed": "Write a PostgreSQL query to find all employees whose salary is strictly greater than the average salary of their respective department.\n\n### Schema: `Employee`\n- `id` (INT, PRIMARY KEY)\n- `name` (TEXT): Employee name\n- `salary` (INT): Compensation\n- `department_id` (INT): Department identifier\n\n### Query Contract\n- Returns columns `\"Employee\"`, `\"Salary\"`, and `\"DepartmentId\"`.\n- Filters out employees who earn less than or equal to their department's average salary.\n- Ordered by `\"DepartmentId\"` ASC, then `\"Salary\"` DESC, then `\"Employee\"` ASC.\n\n### Example\nGiven `Employee`:\n- `{ id: 1, name: \"Alice\", salary: 100, department_id: 1 }` (Dept 1 avg: 85)\n- `{ id: 2, name: \"Bob\", salary: 70, department_id: 1 }`\n- `{ id: 3, name: \"Charlie\", salary: 120, department_id: 2 }` (Dept 2 avg: 110)\n- `{ id: 4, name: \"David\", salary: 100, department_id: 2 }`\n\nReturns:\n- `[{ \"Employee\": \"Alice\", \"Salary\": 100, \"DepartmentId\": 1 }, { \"Employee\": \"Charlie\", \"Salary\": 120, \"DepartmentId\": 2 }]`",
+    "difficulty": 3,
+    "concept": "sql-aggregates",
+    "referenceSolution": "const query = `\nSELECT e.name AS \"Employee\", e.salary AS \"Salary\", e.department_id AS \"DepartmentId\"\nFROM Employee e\nWHERE e.salary > (\n  SELECT AVG(salary)\n  FROM Employee\n  WHERE department_id = e.department_id\n)\nORDER BY e.department_id ASC, e.salary DESC, e.name ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT e.name AS \"Employee\", e.salary AS \"Salary\", e.department_id AS \"DepartmentId\"\nFROM Employee e\nWHERE e.salary > (\n  SELECT AVG(salary)\n  FROM Employee\n  WHERE department_id = e.department_id\n)\nORDER BY e.department_id ASC, e.salary DESC, e.name ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Returns employees strictly above department average",
+        "input": "query",
+        "expected": "[{\"Employee\": \"Alice\", \"Salary\": 100, \"DepartmentId\": 1}, {\"Employee\": \"Charlie\", \"Salary\": 120, \"DepartmentId\": 2}]"
+      },
+      {
+        "description": "Returns empty when all salaries are equal to average",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty when table has no records",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Filters out solo department employees matching average and keeps above-average in multi-employee departments",
+        "input": "query",
+        "expected": "[{\"Employee\": \"High\", \"Salary\": 150, \"DepartmentId\": 2}]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE Employee (id INT PRIMARY KEY, name TEXT, salary INT, department_id INT);`);\n\n  // Case 1: Standard comparison\n  await db.exec(`\n    INSERT INTO Employee VALUES\n      (1, 'Alice', 100, 1),\n      (2, 'Bob', 70, 1),\n      (3, 'Charlie', 120, 2),\n      (4, 'David', 100, 2);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Returns employees strictly above department average', r1 !== null && $test.equal(r1, [\n    { Employee: 'Alice', Salary: 100, DepartmentId: 1 },\n    { Employee: 'Charlie', Salary: 120, DepartmentId: 2 },\n  ]), r1);\n\n  // Case 2: All employees have same salary (none above average)\n  await db.exec(`DELETE FROM Employee; INSERT INTO Employee VALUES (1, 'Eve', 100, 1), (2, 'Frank', 100, 1);`);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Returns empty when all salaries are equal to average', r2 !== null && $test.equal(r2, []), r2);\n\n  // Case 3: Empty table\n  await db.exec(`DELETE FROM Employee;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty when table has no records', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: Solo employee matching average vs multi-employee department\n  await db.exec(`\n    DELETE FROM Employee;\n    INSERT INTO Employee VALUES (1, 'Solo', 100, 1), (2, 'Low', 50, 2), (3, 'High', 150, 2);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Filters out solo department employees matching average and keeps above-average in multi-employee departments', r4 !== null && $test.equal(r4, [\n    { Employee: 'High', Salary: 150, DepartmentId: 2 },\n  ]), r4);\n})();"
+  },
+  {
+    "id": "sql-department-highest-salary",
+    "track": "sql-postgres",
+    "title": "Department Highest Salary (DENSE_RANK)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "join",
+      "cte"
+    ],
+    "promptSeed": "Write a PostgreSQL query to find employees who have the highest salary in each department using `DENSE_RANK()`.\n\n### Schema: `Employee`\n- `id` (INT, PRIMARY KEY)\n- `name` (TEXT): Employee full name\n- `salary` (INT): Compensation amount\n- `department_id` (INT): Foreign key referencing `Department(id)`\n\n### Schema: `Department`\n- `id` (INT, PRIMARY KEY)\n- `name` (TEXT): Department name\n\n### Query Contract\n- Returns columns `\"Department\"`, `\"Employee\"`, and `\"Salary\"`.\n- If multiple employees in the same department tie for the highest salary, include all tied employees.\n- Result should be ordered by `\"Department\"` ASC, then `\"Employee\"` ASC.\n\n### Example\n`Department`:\n- `{ id: 1, name: \"IT\" }`\n- `{ id: 2, name: \"Sales\" }`\n\n`Employee`:\n- `{ id: 1, name: \"Joe\", salary: 70000, department_id: 1 }`\n- `{ id: 2, name: \"Jim\", salary: 90000, department_id: 1 }`\n- `{ id: 3, name: \"Henry\", salary: 80000, department_id: 2 }`\n- `{ id: 4, name: \"Sam\", salary: 60000, department_id: 2 }`\n- `{ id: 5, name: \"Max\", salary: 90000, department_id: 1 }`\n\nReturns:\n- `[{ \"Department\": \"IT\", \"Employee\": \"Jim\", \"Salary\": 90000 }, { \"Department\": \"IT\", \"Employee\": \"Max\", \"Salary\": 90000 }, { \"Department\": \"Sales\", \"Employee\": \"Henry\", \"Salary\": 80000 }]`",
+    "difficulty": 3,
+    "concept": "sql-window-functions",
+    "referenceSolution": "const query = `\nWITH Ranked AS (\n  SELECT d.name AS \"Department\", e.name AS \"Employee\", e.salary AS \"Salary\",\n         DENSE_RANK() OVER (PARTITION BY e.department_id ORDER BY e.salary DESC) AS rnk\n  FROM Employee e\n  JOIN Department d ON e.department_id = d.id\n)\nSELECT \"Department\", \"Employee\", \"Salary\"\nFROM Ranked\nWHERE rnk = 1\nORDER BY \"Department\" ASC, \"Employee\" ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nWITH Ranked AS (\n  SELECT d.name AS \"Department\", e.name AS \"Employee\", e.salary AS \"Salary\",\n         DENSE_RANK() OVER (PARTITION BY e.department_id ORDER BY e.salary DESC) AS rnk\n  FROM Employee e\n  JOIN Department d ON e.department_id = d.id\n)\nSELECT \"Department\", \"Employee\", \"Salary\"\nFROM Ranked\nWHERE rnk = 1\nORDER BY \"Department\" ASC, \"Employee\" ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Returns department top earners preserving ties",
+        "input": "query",
+        "expected": "[{\"Department\": \"IT\", \"Employee\": \"Jim\", \"Salary\": 90000}, {\"Department\": \"IT\", \"Employee\": \"Max\", \"Salary\": 90000}, {\"Department\": \"Sales\", \"Employee\": \"Henry\", \"Salary\": 80000}]"
+      },
+      {
+        "description": "Works with single department",
+        "input": "query",
+        "expected": "[{\"Department\": \"Engineering\", \"Employee\": \"Alice\", \"Salary\": 120000}]"
+      },
+      {
+        "description": "Returns empty list when tables are empty",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns highest earner across distinct non-tied departments",
+        "input": "query",
+        "expected": "[{\"Department\": \"Finance\", \"Employee\": \"Bob\", \"Salary\": 75000}, {\"Department\": \"HR\", \"Employee\": \"Amy\", \"Salary\": 50000}]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE Department (id INT PRIMARY KEY, name TEXT);\n    CREATE TABLE Employee (id INT PRIMARY KEY, name TEXT, salary INT, department_id INT);\n  `);\n\n  // Case 1: Standard department rankings with tie\n  await db.exec(`\n    INSERT INTO Department VALUES (1, 'IT'), (2, 'Sales');\n    INSERT INTO Employee VALUES\n      (1, 'Joe', 70000, 1),\n      (2, 'Jim', 90000, 1),\n      (3, 'Henry', 80000, 2),\n      (4, 'Sam', 60000, 2),\n      (5, 'Max', 90000, 1);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Returns department top earners preserving ties', r1 !== null && $test.equal(r1, [\n    { Department: 'IT', Employee: 'Jim', Salary: 90000 },\n    { Department: 'IT', Employee: 'Max', Salary: 90000 },\n    { Department: 'Sales', Employee: 'Henry', Salary: 80000 },\n  ]), r1);\n\n  // Case 2: Single department\n  await db.exec(`\n    DELETE FROM Employee;\n    DELETE FROM Department;\n    INSERT INTO Department VALUES (10, 'Engineering');\n    INSERT INTO Employee VALUES (1, 'Alice', 120000, 10), (2, 'Bob', 110000, 10);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Works with single department', r2 !== null && $test.equal(r2, [\n    { Department: 'Engineering', Employee: 'Alice', Salary: 120000 },\n  ]), r2);\n\n  // Case 3: Empty departments\n  await db.exec(`DELETE FROM Employee; DELETE FROM Department;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty list when tables are empty', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: Distinct non-tied departments\n  await db.exec(`\n    DELETE FROM Employee;\n    DELETE FROM Department;\n    INSERT INTO Department VALUES (1, 'Finance'), (2, 'HR');\n    INSERT INTO Employee VALUES (1, 'Amy', 50000, 2), (2, 'Bob', 75000, 1);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Returns highest earner across distinct non-tied departments', r4 !== null && $test.equal(r4, [\n    { Department: 'Finance', Employee: 'Bob', Salary: 75000 },\n    { Department: 'HR', Employee: 'Amy', Salary: 50000 },\n  ]), r4);\n})();"
+  },
+  {
+    "id": "sql-running-total-sales",
+    "track": "sql-postgres",
+    "title": "Cumulative Running Total Sales",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "running-total"
+    ],
+    "promptSeed": "Write a PostgreSQL query to compute a running cumulative sum of order amounts over time.\n\n### Schema: `Orders`\n- `id` (INT, PRIMARY KEY)\n- `order_date` (TEXT): Date in `'YYYY-MM-DD'` format\n- `amount` (INT): Order revenue amount\n\n### Query Contract\n- Returns columns `order_date`, `amount`, and `running_total`.\n- The running total must accumulate preceding order amounts up to and including the current row.\n- Ordered by `order_date` ASC, then `id` ASC.\n\n### Example\nGiven `Orders`:\n- `{ id: 1, order_date: \"2024-01-01\", amount: 100 }`\n- `{ id: 2, order_date: \"2024-01-02\", amount: 150 }`\n- `{ id: 3, order_date: \"2024-01-03\", amount: 200 }`\n\nReturns:\n- `[{ order_date: \"2024-01-01\", amount: 100, running_total: 100 }, { order_date: \"2024-01-02\", amount: 150, running_total: 250 }, { order_date: \"2024-01-03\", amount: 200, running_total: 450 }]`",
+    "difficulty": 3,
+    "concept": "sql-window-functions",
+    "referenceSolution": "const query = `\nSELECT order_date, amount,\n       SUM(amount) OVER (ORDER BY order_date ASC, id ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total\nFROM Orders\nORDER BY order_date ASC, id ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT order_date, amount,\n       SUM(amount) OVER (ORDER BY order_date ASC, id ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total\nFROM Orders\nORDER BY order_date ASC, id ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Computes cumulative running total",
+        "input": "query",
+        "expected": "[{\"order_date\": \"2024-01-01\", \"amount\": 100, \"running_total\": 100}, {\"order_date\": \"2024-01-02\", \"amount\": 150, \"running_total\": 250}, {\"order_date\": \"2024-01-03\", \"amount\": 200, \"running_total\": 450}]"
+      },
+      {
+        "description": "Breaks ties on same date using id",
+        "input": "query",
+        "expected": "[{\"order_date\": \"2024-02-01\", \"amount\": 50, \"running_total\": 50}, {\"order_date\": \"2024-02-01\", \"amount\": 25, \"running_total\": 75}, {\"order_date\": \"2024-02-02\", \"amount\": 25, \"running_total\": 100}]"
+      },
+      {
+        "description": "Returns empty when no orders exist",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Computes running total correctly for a single order",
+        "input": "query",
+        "expected": "[{\"order_date\": \"2024-05-10\", \"amount\": 42, \"running_total\": 42}]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE Orders (id INT PRIMARY KEY, order_date TEXT, amount INT);`);\n\n  // Case 1: Multiple daily orders\n  await db.exec(`\n    INSERT INTO Orders VALUES\n      (1, '2024-01-01', 100),\n      (2, '2024-01-02', 150),\n      (3, '2024-01-03', 200);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Computes cumulative running total', r1 !== null && $test.equal(r1, [\n    { order_date: '2024-01-01', amount: 100, running_total: 100 },\n    { order_date: '2024-01-02', amount: 150, running_total: 250 },\n    { order_date: '2024-01-03', amount: 200, running_total: 450 },\n  ]), r1);\n\n  // Case 2: Same date multiple orders\n  await db.exec(`\n    DELETE FROM Orders;\n    INSERT INTO Orders VALUES\n      (1, '2024-02-01', 50),\n      (2, '2024-02-01', 25),\n      (3, '2024-02-02', 25);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Breaks ties on same date using id', r2 !== null && $test.equal(r2, [\n    { order_date: '2024-02-01', amount: 50, running_total: 50 },\n    { order_date: '2024-02-01', amount: 25, running_total: 75 },\n    { order_date: '2024-02-02', amount: 25, running_total: 100 },\n  ]), r2);\n\n  // Case 3: Empty orders\n  await db.exec(`DELETE FROM Orders;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty when no orders exist', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: Single order\n  await db.exec(`\n    DELETE FROM Orders;\n    INSERT INTO Orders VALUES (1, '2024-05-10', 42);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Computes running total correctly for a single order', r4 !== null && $test.equal(r4, [\n    { order_date: '2024-05-10', amount: 42, running_total: 42 },\n  ]), r4);\n})();"
+  },
+  {
+    "id": "sql-second-highest-salary",
+    "track": "sql-postgres",
+    "title": "Second Highest Salary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "sql",
+      "postgres",
+      "aggregate",
+      "subquery"
+    ],
+    "promptSeed": "Write a PostgreSQL query to find the second highest distinct salary from the `Employee` table.\n\n### Schema: `Employee`\n- `id` (INT, PRIMARY KEY): Unique employee identifier.\n- `salary` (INT): Employee compensation amount.\n\n### Query Contract\n- Returns a single row with column `\"SecondHighestSalary\"`.\n- If the second highest salary does not exist (e.g. fewer than 2 distinct salaries), the query must return `NULL` as the value for `\"SecondHighestSalary\"`.\n\n### Example\nGiven `Employee` records:\n- `{ id: 1, salary: 100 }`\n- `{ id: 2, salary: 200 }`\n- `{ id: 3, salary: 300 }`\n\nThe query returns:\n- `[{ \"SecondHighestSalary\": 200 }]`\n\nIf `Employee` has only `{ id: 1, salary: 100 }`:\n- Returns `[{ \"SecondHighestSalary\": null }]`",
+    "difficulty": 2,
+    "concept": "sql-aggregates",
+    "referenceSolution": "const query = `\nSELECT MAX(salary) AS \"SecondHighestSalary\"\nFROM Employee\nWHERE salary < (SELECT MAX(salary) FROM Employee);\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT MAX(salary) AS \"SecondHighestSalary\"\nFROM Employee\nWHERE salary < (SELECT MAX(salary) FROM Employee);\n`;",
+    "testCases": [
+      {
+        "description": "Returns second highest salary when multiple distinct salaries exist",
+        "input": "query",
+        "expected": "[{\"SecondHighestSalary\": 200}]"
+      },
+      {
+        "description": "Returns null when only 1 record exists",
+        "input": "query",
+        "expected": "[{\"SecondHighestSalary\": null}]"
+      },
+      {
+        "description": "Returns null when table is empty",
+        "input": "query",
+        "expected": "[{\"SecondHighestSalary\": null}]"
+      },
+      {
+        "description": "Handles duplicate highest salaries correctly",
+        "input": "query",
+        "expected": "[{\"SecondHighestSalary\": 400}]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE Employee (id INT PRIMARY KEY, salary INT);`);\n\n  // Case 1: Standard 3 distinct salaries\n  await db.exec(`DELETE FROM Employee; INSERT INTO Employee VALUES (1, 100), (2, 200), (3, 300);`);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Returns second highest salary when multiple distinct salaries exist', r1 !== null && $test.equal(r1, [{ SecondHighestSalary: 200 }]), r1);\n\n  // Case 2: Only 1 employee\n  await db.exec(`DELETE FROM Employee; INSERT INTO Employee VALUES (1, 100);`);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Returns null when only 1 record exists', r2 !== null && $test.equal(r2, [{ SecondHighestSalary: null }]), r2);\n\n  // Case 3: Empty table\n  await db.exec(`DELETE FROM Employee;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns null when table is empty', r3 !== null && $test.equal(r3, [{ SecondHighestSalary: null }]), r3);\n\n  // Case 4: Duplicate top salaries\n  await db.exec(`INSERT INTO Employee VALUES (1, 500), (2, 500), (3, 400), (4, 300);`);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Handles duplicate highest salaries correctly', r4 !== null && $test.equal(r4, [{ SecondHighestSalary: 400 }]), r4);\n})();"
+  },
+  {
+    "id": "gql-mutation-input-payload",
+    "track": "graphql",
+    "title": "Mutation with Input Object & Result Payload",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "mutation",
+      "input-objects",
+      "payload",
+      "errors"
+    ],
+    "promptSeed": "Write a GraphQL mutation named `CreateTeam` utilizing an input object variable and structured payload pattern.\n\n### Requirements\n- Operation signature: `mutation CreateTeam($input: CreateTeamInput!)`\n- Call mutation field: `createTeam(input: $input)`\n- On the returned payload, select:\n  - `team`: select `id`, `name`, `slug`, and `memberCount`\n  - `userErrors`: select `field`, `message`, and `code`\n\n### Schema Context\n```graphql\ninput CreateTeamInput {\n  name: String!\n  slug: String!\n  description: String\n}\ntype UserError {\n  field: [String!]\n  message: String!\n  code: String\n}\ntype Team {\n  id: ID!\n  name: String!\n  slug: String!\n  memberCount: Int!\n}\ntype CreateTeamPayload {\n  team: Team\n  userErrors: [UserError!]!\n}\ntype Mutation {\n  createTeam(input: CreateTeamInput!): CreateTeamPayload!\n}\n```",
+    "difficulty": 2,
+    "concept": "gql-mutations",
+    "referenceSolution": "const query = `\nmutation CreateTeam($input: CreateTeamInput!) {\n  createTeam(input: $input) {\n    team {\n      id\n      name\n      slug\n      memberCount\n    }\n    userErrors {\n      field\n      message\n      code\n    }\n  }\n}\n`;",
+    "referenceSolutionTs": "const query: string = `\nmutation CreateTeam($input: CreateTeamInput!) {\n  createTeam(input: $input) {\n    team {\n      id\n      name\n      slug\n      memberCount\n    }\n    userErrors {\n      field\n      message\n      code\n    }\n  }\n}\n`;",
+    "testCases": [
+      {
+        "description": "Executes mutation and selects team fields (id, name, slug, memberCount)",
+        "input": "mutation CreateTeam($input: CreateTeamInput!) { createTeam(input: $input) { team { ... } } }",
+        "expected": "returns created team { id: \"team_1\", name: \"Core Eng\", slug: \"core-eng\", memberCount: 1 }"
+      },
+      {
+        "description": "Selects userErrors array with field, message, and code",
+        "input": "userErrors { field message code }",
+        "expected": "returns userErrors array with field, message, and code"
+      },
+      {
+        "description": "Defines named mutation CreateTeam",
+        "input": "mutation CreateTeam",
+        "expected": "operation is named CreateTeam"
+      },
+      {
+        "description": "Accepts non-null variable $input: CreateTeamInput!",
+        "input": "$input: CreateTeamInput!",
+        "expected": "declares $input as non-nullable CreateTeamInput!"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof query === \"string\" ? query : typeof solution === \"string\" ? solution : \"\").trim();\n  const testSchema = buildSchema(`\n    input CreateTeamInput {\n      name: String!\n      slug: String!\n      description: String\n    }\n    type UserError {\n      field: [String!]\n      message: String!\n      code: String\n    }\n    type Team {\n      id: ID!\n      name: String!\n      slug: String!\n      memberCount: Int!\n    }\n    type CreateTeamPayload {\n      team: Team\n      userErrors: [UserError!]!\n    }\n    type Query {\n      _dummy: String\n    }\n    type Mutation {\n      createTeam(input: CreateTeamInput!): CreateTeamPayload!\n    }\n  `);\n\n  const root = {\n    createTeam: ({ input }) => ({\n      team: {\n        id: \"team_1\",\n        name: input.name,\n        slug: input.slug,\n        memberCount: 1,\n      },\n      userErrors: [],\n    }),\n  };\n\n  async function runSafe(vars) {\n    try {\n      const res = await graphql({ schema: testSchema, source: userDoc, rootValue: root, variableValues: vars });\n      return res;\n    } catch (e) {\n      return { errors: [e] };\n    }\n  }\n\n  const r1 = await runSafe({ input: { name: \"Core Eng\", slug: \"core-eng\" } });\n\n  // Case 1: Executes mutation and returns created team\n  const t = r1.data?.createTeam?.team;\n  $test.check(\"Executes mutation and selects team fields (id, name, slug, memberCount)\", !r1.errors && t?.id === \"team_1\" && t?.name === \"Core Eng\" && t?.slug === \"core-eng\" && t?.memberCount === 1, r1);\n\n  // Case 2: Selects userErrors payload fields\n  $test.check(\"Selects userErrors array with field, message, and code\", !r1.errors && Array.isArray(r1.data?.createTeam?.userErrors), r1);\n\n  // Case 3: Operation name is CreateTeam\n  $test.check(\"Defines named mutation CreateTeam\", /mutation\\s+CreateTeam\\b/.test(userDoc), userDoc);\n\n  // Case 4: Accepts $input: CreateTeamInput!\n  $test.check(\"Accepts non-null variable $input: CreateTeamInput!\", /\\$input\\s*:\\s*CreateTeamInput!/.test(userDoc), userDoc);\n})();"
+  },
+  {
+    "id": "gql-query-aliases-fragments",
+    "track": "graphql",
+    "title": "Field Aliases & Named Fragments",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "query",
+      "aliases",
+      "fragments"
+    ],
+    "promptSeed": "Write a GraphQL query named `CompareUsers` that accepts two variables `$primaryId: ID!` and `$secondaryId: ID!`.\n\n### Requirements\n- Operation signature: `query CompareUsers($primaryId: ID!, $secondaryId: ID!)`\n- Query the `user` field twice using field aliases:\n  - `primary: user(id: $primaryId)`\n  - `secondary: user(id: $secondaryId)`\n- Define and spread a named fragment `UserSummary` on both selections:\n  - `fragment UserSummary on User`\n  - Selects `id`, `name`, `email`, and `role`\n\n### Schema Context\n```graphql\ntype Query {\n  user(id: ID!): User\n}\ntype User {\n  id: ID!\n  name: String!\n  email: String!\n  role: String!\n}\n```\n\n### Example\nWhen executed with variables `{ primaryId: \"1\", secondaryId: \"2\" }`, returns:\n```json\n{\n  \"primary\": { \"id\": \"1\", \"name\": \"Alice\", \"email\": \"alice@example.com\", \"role\": \"ADMIN\" },\n  \"secondary\": { \"id\": \"2\", \"name\": \"Bob\", \"email\": \"bob@example.com\", \"role\": \"MEMBER\" }\n}\n```",
+    "difficulty": 2,
+    "concept": "gql-fragments",
+    "referenceSolution": "const query = `\nquery CompareUsers($primaryId: ID!, $secondaryId: ID!) {\n  primary: user(id: $primaryId) {\n    ...UserSummary\n  }\n  secondary: user(id: $secondaryId) {\n    ...UserSummary\n  }\n}\n\nfragment UserSummary on User {\n  id\n  name\n  email\n  role\n}\n`;",
+    "referenceSolutionTs": "const query: string = `\nquery CompareUsers($primaryId: ID!, $secondaryId: ID!) {\n  primary: user(id: $primaryId) {\n    ...UserSummary\n  }\n  secondary: user(id: $secondaryId) {\n    ...UserSummary\n  }\n}\n\nfragment UserSummary on User {\n  id\n  name\n  email\n  role\n}\n`;",
+    "testCases": [
+      {
+        "description": "Queries primary alias with UserSummary fragment",
+        "input": "primary: user(id: $primaryId) { ...UserSummary }",
+        "expected": "{ id: \"1\", name: \"Alice\", email: \"alice@example.com\", role: \"ADMIN\" }"
+      },
+      {
+        "description": "Queries secondary alias with UserSummary fragment",
+        "input": "secondary: user(id: $secondaryId) { ...UserSummary }",
+        "expected": "{ id: \"2\", name: \"Bob\", email: \"bob@example.com\", role: \"MEMBER\" }"
+      },
+      {
+        "description": "Defines fragment UserSummary on User",
+        "input": "fragment UserSummary on User",
+        "expected": "fragment specifies id, name, email, and role"
+      },
+      {
+        "description": "Spreads ...UserSummary into user selections",
+        "input": "...UserSummary",
+        "expected": "fragment is spread on both user selections"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof query === \"string\" ? query : typeof solution === \"string\" ? solution : \"\").trim();\n  const testSchema = buildSchema(`\n    type Query {\n      user(id: ID!): User\n    }\n    type User {\n      id: ID!\n      name: String!\n      email: String!\n      role: String!\n    }\n  `);\n\n  const users = {\n    \"1\": { id: \"1\", name: \"Alice\", email: \"alice@example.com\", role: \"ADMIN\" },\n    \"2\": { id: \"2\", name: \"Bob\", email: \"bob@example.com\", role: \"MEMBER\" },\n  };\n  const root = {\n    user: ({ id }) => users[id] || null,\n  };\n\n  async function runSafe(vars) {\n    try {\n      const res = await graphql({ schema: testSchema, source: userDoc, rootValue: root, variableValues: vars });\n      return res;\n    } catch (e) {\n      return { errors: [e] };\n    }\n  }\n\n  const r1 = await runSafe({ primaryId: \"1\", secondaryId: \"2\" });\n\n  // Case 1: Queries primary user alias with fragment\n  const p = r1.data?.primary;\n  $test.check(\"Queries primary alias with UserSummary fragment\", !r1.errors && p?.id === \"1\" && p?.name === \"Alice\" && p?.email === \"alice@example.com\" && p?.role === \"ADMIN\", r1);\n\n  // Case 2: Queries secondary user alias with fragment\n  const s = r1.data?.secondary;\n  $test.check(\"Queries secondary alias with UserSummary fragment\", !r1.errors && s?.id === \"2\" && s?.name === \"Bob\" && s?.email === \"bob@example.com\" && s?.role === \"MEMBER\", r1);\n\n  // Case 3: Defines UserSummary fragment\n  $test.check(\"Defines fragment UserSummary on User\", /fragment\\s+UserSummary\\s+on\\s+User\\b/.test(userDoc), userDoc);\n\n  // Case 4: Spreads fragment into both aliases\n  $test.check(\"Spreads ...UserSummary into user selections\", userDoc.includes(\"...UserSummary\"), userDoc);\n})();"
+  },
+  {
+    "id": "gql-query-nested-fields",
+    "track": "graphql",
+    "title": "Querying Nested Fields & Arguments",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "query",
+      "nested-fields",
+      "arguments"
+    ],
+    "promptSeed": "Write a GraphQL query named `GetArticle` that accepts a variable `$slug: String!`.\n\n### Requirements\n- Operation signature: `query GetArticle($slug: String!)`\n- Top-level field: `article(slug: $slug)`\n- Fields to select on `article`:\n  - `id`\n  - `title`\n  - `publishedAt`\n  - `author`: select `id`, `name`, and `avatarUrl`\n  - `comments(limit: 3)`: select `id`, `text`, `createdAt`, and `author { name }`\n\n### Schema Context\n```graphql\ntype Query {\n  article(slug: String!): Article\n}\ntype Author {\n  id: ID!\n  name: String!\n  avatarUrl: String\n}\ntype Comment {\n  id: ID!\n  text: String!\n  createdAt: String!\n  author: CommentAuthor!\n}\ntype CommentAuthor {\n  name: String!\n}\ntype Article {\n  id: ID!\n  title: String!\n  publishedAt: String!\n  author: Author!\n  comments(limit: Int): [Comment!]!\n}\n```\n\n### Example\nWhen executed with variables `{ slug: \"understanding-graphql\" }`, the query returns:\n```json\n{\n  \"article\": {\n    \"id\": \"a1\",\n    \"title\": \"Understanding GraphQL\",\n    \"publishedAt\": \"2026-10-31\",\n    \"author\": { \"id\": \"u1\", \"name\": \"Alice\", \"avatarUrl\": \"https://example.com/avatar.png\" },\n    \"comments\": [\n      { \"id\": \"c1\", \"text\": \"Helpful!\", \"createdAt\": \"2026-10-31T01:00:00Z\", \"author\": { \"name\": \"Bob\" } }\n    ]\n  }\n}\n```",
+    "difficulty": 1,
+    "concept": "gql-queries",
+    "referenceSolution": "const query = `\nquery GetArticle($slug: String!) {\n  article(slug: $slug) {\n    id\n    title\n    publishedAt\n    author {\n      id\n      name\n      avatarUrl\n    }\n    comments(limit: 3) {\n      id\n      text\n      createdAt\n      author {\n        name\n      }\n    }\n  }\n}\n`;",
+    "referenceSolutionTs": "const query: string = `\nquery GetArticle($slug: String!) {\n  article(slug: $slug) {\n    id\n    title\n    publishedAt\n    author {\n      id\n      name\n      avatarUrl\n    }\n    comments(limit: 3) {\n      id\n      text\n      createdAt\n      author {\n        name\n      }\n    }\n  }\n}\n`;",
+    "testCases": [
+      {
+        "description": "Queries article by slug with nested author details",
+        "input": "query GetArticle($slug: String!)",
+        "expected": "returns article with id, title, publishedAt, and nested author { id, name, avatarUrl }"
+      },
+      {
+        "description": "Limits comments to 3 and selects nested author name",
+        "input": "comments(limit: 3)",
+        "expected": "returns exactly 3 comments with id, text, createdAt, and author { name }"
+      },
+      {
+        "description": "Defines named query GetArticle",
+        "input": "query GetArticle",
+        "expected": "operation is named GetArticle"
+      },
+      {
+        "description": "Accepts non-null variable $slug: String!",
+        "input": "$slug: String!",
+        "expected": "declares $slug as non-nullable String!"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof query === \"string\" ? query : typeof solution === \"string\" ? solution : \"\").trim();\n  const testSchema = buildSchema(`\n    type Query {\n      article(slug: String!): Article\n    }\n    type Author {\n      id: ID!\n      name: String!\n      avatarUrl: String\n    }\n    type Comment {\n      id: ID!\n      text: String!\n      createdAt: String!\n      author: CommentAuthor!\n    }\n    type CommentAuthor {\n      name: String!\n    }\n    type Article {\n      id: ID!\n      title: String!\n      publishedAt: String!\n      author: Author!\n      comments(limit: Int): [Comment!]!\n    }\n  `);\n\n  const root = {\n    article: ({ slug }) => ({\n      id: \"a1\",\n      title: \"Article: \" + slug,\n      publishedAt: \"2026-10-31\",\n      author: { id: \"u1\", name: \"Alice\", avatarUrl: \"https://example.com/a.png\" },\n      comments: ({ limit }) => [\n        { id: \"c1\", text: \"First\", createdAt: \"2026-10-31T01:00:00Z\", author: { name: \"Bob\" } },\n        { id: \"c2\", text: \"Second\", createdAt: \"2026-10-31T02:00:00Z\", author: { name: \"Carol\" } },\n        { id: \"c3\", text: \"Third\", createdAt: \"2026-10-31T03:00:00Z\", author: { name: \"Dave\" } },\n        { id: \"c4\", text: \"Fourth\", createdAt: \"2026-10-31T04:00:00Z\", author: { name: \"Eve\" } },\n      ].slice(0, limit),\n    }),\n  };\n\n  async function runSafe(vars) {\n    try {\n      const res = await graphql({ schema: testSchema, source: userDoc, rootValue: root, variableValues: vars });\n      return res;\n    } catch (e) {\n      return { errors: [e] };\n    }\n  }\n\n  // Case 1: Valid execution returning article and author details\n  const r1 = await runSafe({ slug: \"intro\" });\n  $test.check(\"Queries article by slug with nested author details\", !r1.errors && r1.data?.article?.id === \"a1\" && r1.data?.article?.author?.name === \"Alice\", r1);\n\n  // Case 2: Limits comments to 3 with text and nested comment author name\n  $test.check(\"Limits comments to 3 and selects nested author name\", !r1.errors && Array.isArray(r1.data?.article?.comments) && r1.data?.article?.comments?.length === 3 && r1.data?.article?.comments[0]?.author?.name === \"Bob\", r1);\n\n  // Case 3: Operation name is GetArticle\n  $test.check(\"Defines named query GetArticle\", /query\\s+GetArticle\\b/.test(userDoc), userDoc);\n\n  // Case 4: Correctly parameterizes $slug variable\n  $test.check(\"Accepts non-null variable $slug: String!\", /\\$slug\\s*:\\s*String!/.test(userDoc), userDoc);\n})();"
+  },
+  {
+    "id": "gql-query-pagination",
+    "track": "graphql",
+    "title": "Relay Cursor Connection Query",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "query",
+      "pagination",
+      "relay",
+      "connections"
+    ],
+    "promptSeed": "Write a GraphQL query named `GetProjectMembers` that implements Relay cursor connection pagination.\n\n### Requirements\n- Operation signature: `query GetProjectMembers($projectId: ID!, $first: Int! = 10, $after: String)`\n- Query top-level field `project(id: $projectId)`\n- Query connection field `members(first: $first, after: $after)` on `project`\n- Select the following connection fields:\n  - `totalCount`\n  - `pageInfo`: select `hasNextPage` and `endCursor`\n  - `edges`: select `cursor` and `node { id name email }`\n\n### Schema Context\n```graphql\ntype Query {\n  project(id: ID!): Project\n}\ntype User {\n  id: ID!\n  name: String!\n  email: String!\n}\ntype UserEdge {\n  cursor: String!\n  node: User!\n}\ntype PageInfo {\n  hasNextPage: Boolean!\n  endCursor: String\n}\ntype UserConnection {\n  totalCount: Int!\n  pageInfo: PageInfo!\n  edges: [UserEdge!]!\n}\ntype Project {\n  id: ID!\n  members(first: Int, after: String): UserConnection!\n}\n```",
+    "difficulty": 3,
+    "concept": "gql-relay-queries",
+    "referenceSolution": "const query = `\nquery GetProjectMembers($projectId: ID!, $first: Int! = 10, $after: String) {\n  project(id: $projectId) {\n    members(first: $first, after: $after) {\n      totalCount\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      edges {\n        cursor\n        node {\n          id\n          name\n          email\n        }\n      }\n    }\n  }\n}\n`;",
+    "referenceSolutionTs": "const query: string = `\nquery GetProjectMembers($projectId: ID!, $first: Int! = 10, $after: String) {\n  project(id: $projectId) {\n    members(first: $first, after: $after) {\n      totalCount\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      edges {\n        cursor\n        node {\n          id\n          name\n          email\n        }\n      }\n    }\n  }\n}\n`;",
+    "testCases": [
+      {
+        "description": "Queries totalCount and pageInfo with hasNextPage and endCursor",
+        "input": "members(first: $first, after: $after) { totalCount pageInfo { ... } }",
+        "expected": "returns totalCount: 42, hasNextPage: true, endCursor: \"cursor_2\""
+      },
+      {
+        "description": "Queries edges with cursor and node user details",
+        "input": "edges { cursor node { id name email } }",
+        "expected": "returns edges with cursor and node { id: \"u1\", name: \"Alice\", email: \"alice@example.com\" }"
+      },
+      {
+        "description": "Defines named query GetProjectMembers",
+        "input": "query GetProjectMembers",
+        "expected": "operation is named GetProjectMembers"
+      },
+      {
+        "description": "Sets default $first: Int! = 10 and optional $after: String",
+        "input": "operation header",
+        "expected": "declares $first: Int! = 10 and $after: String"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof query === \"string\" ? query : typeof solution === \"string\" ? solution : \"\").trim();\n  const testSchema = buildSchema(`\n    type Query {\n      project(id: ID!): Project\n    }\n    type User {\n      id: ID!\n      name: String!\n      email: String!\n    }\n    type UserEdge {\n      cursor: String!\n      node: User!\n    }\n    type PageInfo {\n      hasNextPage: Boolean!\n      endCursor: String\n    }\n    type UserConnection {\n      totalCount: Int!\n      pageInfo: PageInfo!\n      edges: [UserEdge!]!\n    }\n    type Project {\n      id: ID!\n      members(first: Int, after: String): UserConnection!\n    }\n  `);\n\n  const root = {\n    project: ({ id }) => ({\n      id,\n      members: ({ first, after }) => ({\n        totalCount: 42,\n        pageInfo: {\n          hasNextPage: true,\n          endCursor: \"cursor_2\",\n        },\n        edges: [\n          { cursor: \"cursor_1\", node: { id: \"u1\", name: \"Alice\", email: \"alice@example.com\" } },\n          { cursor: \"cursor_2\", node: { id: \"u2\", name: \"Bob\", email: \"bob@example.com\" } },\n        ].slice(0, first || 10),\n      }),\n    }),\n  };\n\n  async function runSafe(vars) {\n    try {\n      const res = await graphql({ schema: testSchema, source: userDoc, rootValue: root, variableValues: vars });\n      return res;\n    } catch (e) {\n      return { errors: [e] };\n    }\n  }\n\n  const r1 = await runSafe({ projectId: \"prj_1\" });\n\n  // Case 1: Queries totalCount and pageInfo\n  $test.check(\"Queries totalCount and pageInfo with hasNextPage and endCursor\", !r1.errors && r1.data?.project?.members?.totalCount === 42 && r1.data?.project?.members?.pageInfo?.hasNextPage === true && r1.data?.project?.members?.pageInfo?.endCursor === \"cursor_2\", r1);\n\n  // Case 2: Queries edges with cursor and node { id, name, email }\n  $test.check(\"Queries edges with cursor and node user details\", !r1.errors && r1.data?.project?.members?.edges?.length === 2 && r1.data?.project?.members?.edges[0]?.cursor === \"cursor_1\" && r1.data?.project?.members?.edges[0]?.node?.name === \"Alice\", r1);\n\n  // Case 3: Operation name is GetProjectMembers\n  $test.check(\"Defines named query GetProjectMembers\", /query\\s+GetProjectMembers\\b/.test(userDoc), userDoc);\n\n  // Case 4: Default argument $first: Int! = 10\n  $test.check(\"Sets default $first: Int! = 10 and optional $after: String\", /\\$first\\s*:\\s*Int!\\s*=\\s*10/.test(userDoc) && /\\$after\\s*:\\s*String\\b/.test(userDoc), userDoc);\n})();"
+  },
+  {
+    "id": "gql-query-variables-directives",
+    "track": "graphql",
+    "title": "Variables & Conditional Directives",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "query",
+      "directives",
+      "include",
+      "skip",
+      "variables"
+    ],
+    "promptSeed": "Write a GraphQL query named `GetProduct` with variables and conditional directives.\n\n### Requirements\n- Operation signature: `query GetProduct($id: ID!, $withReviews: Boolean = false, $skipPricing: Boolean = false)`\n- Query top-level field `product(id: $id)`\n- Fields to select on `product`:\n  - `id`\n  - `name`\n  - `price @skip(if: $skipPricing)`\n  - `reviews @include(if: $withReviews)`: select `id`, `rating`, and `comment`\n\n### Schema Context\n```graphql\ntype Query {\n  product(id: ID!): Product\n}\ntype Review {\n  id: ID!\n  rating: Int!\n  comment: String!\n}\ntype Product {\n  id: ID!\n  name: String!\n  price: Float!\n  reviews: [Review!]!\n}\n```\n\n### Example\n- With `{ id: \"p1\" }`: returns `{ product: { id: \"p1\", name: \"Laptop\", price: 999.99 } }` (reviews omitted, price included).\n- With `{ id: \"p1\", withReviews: true, skipPricing: true }`: returns `{ product: { id: \"p1\", name: \"Laptop\", reviews: [{ id: \"r1\", rating: 5, comment: \"Fast\" }] } }`.",
+    "difficulty": 2,
+    "concept": "gql-directives",
+    "referenceSolution": "const query = `\nquery GetProduct($id: ID!, $withReviews: Boolean = false, $skipPricing: Boolean = false) {\n  product(id: $id) {\n    id\n    name\n    price @skip(if: $skipPricing)\n    reviews @include(if: $withReviews) {\n      id\n      rating\n      comment\n    }\n  }\n}\n`;",
+    "referenceSolutionTs": "const query: string = `\nquery GetProduct($id: ID!, $withReviews: Boolean = false, $skipPricing: Boolean = false) {\n  product(id: $id) {\n    id\n    name\n    price @skip(if: $skipPricing)\n    reviews @include(if: $withReviews) {\n      id\n      rating\n      comment\n    }\n  }\n}\n`;",
+    "testCases": [
+      {
+        "description": "Default variables include price and omit reviews",
+        "input": "{ id: \"p1\" }",
+        "expected": "{ product: { id: \"p1\", name: \"Mechanical Keyboard\", price: 149.99 } }"
+      },
+      {
+        "description": "@include(if: $withReviews) includes reviews when true",
+        "input": "{ id: \"p1\", withReviews: true }",
+        "expected": "reviews array is included with rating and comment"
+      },
+      {
+        "description": "@skip(if: $skipPricing) omits price when true",
+        "input": "{ id: \"p1\", skipPricing: true }",
+        "expected": "price field is omitted from returned product"
+      },
+      {
+        "description": "Declares default values for $withReviews and $skipPricing",
+        "input": "operation header",
+        "expected": "$withReviews: Boolean = false and $skipPricing: Boolean = false"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof query === \"string\" ? query : typeof solution === \"string\" ? solution : \"\").trim();\n  const testSchema = buildSchema(`\n    type Query {\n      product(id: ID!): Product\n    }\n    type Review {\n      id: ID!\n      rating: Int!\n      comment: String!\n    }\n    type Product {\n      id: ID!\n      name: String!\n      price: Float!\n      reviews: [Review!]!\n    }\n  `);\n\n  const root = {\n    product: ({ id }) => ({\n      id,\n      name: \"Mechanical Keyboard\",\n      price: 149.99,\n      reviews: [{ id: \"r1\", rating: 5, comment: \"Great tactile feedback\" }],\n    }),\n  };\n\n  async function runSafe(vars) {\n    try {\n      const res = await graphql({ schema: testSchema, source: userDoc, rootValue: root, variableValues: vars });\n      return res;\n    } catch (e) {\n      return { errors: [e] };\n    }\n  }\n\n  // Case 1: Default execution skips reviews and includes price\n  const r1 = await runSafe({ id: \"p1\" });\n  $test.check(\"Default variables include price and omit reviews\", !r1.errors && r1.data?.product?.price === 149.99 && r1.data?.product?.reviews === undefined, r1);\n\n  // Case 2: withReviews=true includes reviews\n  const r2 = await runSafe({ id: \"p1\", withReviews: true });\n  $test.check(\"@include(if: $withReviews) includes reviews when true\", !r2.errors && r2.data?.product?.reviews?.length === 1 && r2.data?.product?.reviews[0]?.rating === 5, r2);\n\n  // Case 3: skipPricing=true skips price\n  const r3 = await runSafe({ id: \"p1\", skipPricing: true });\n  $test.check(\"@skip(if: $skipPricing) omits price when true\", !r3.errors && r3.data?.product?.price === undefined, r3);\n\n  // Case 4: Variable defaults declared in operation signature\n  $test.check(\"Declares default values for $withReviews and $skipPricing\", /\\$withReviews\\s*:\\s*Boolean\\s*=\\s*false/.test(userDoc) && /\\$skipPricing\\s*:\\s*Boolean\\s*=\\s*false/.test(userDoc), userDoc);\n})();"
+  },
+  {
+    "id": "gql-schema-sdl-enums-unions",
+    "track": "graphql",
+    "title": "Schema Definition: Enums & Unions",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "enums",
+      "unions"
+    ],
+    "promptSeed": "Write an SDL (Schema Definition Language) schema string defining enums, union types, and structured domain models.\n\n### Requirements\nDefine the following definitions in standard GraphQL SDL:\n\n1. `enum TicketStatus`:\n   - Values: `OPEN`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`\n\n2. `type Bug`:\n   - `id`: non-null `ID!`\n   - `title`: non-null `String!`\n   - `severity`: non-null `Int!`\n\n3. `type Feature`:\n   - `id`: non-null `ID!`\n   - `title`: non-null `String!`\n   - `targetRelease`: non-null `String!`\n\n4. `union TaskItem`:\n   - Union of `Bug` and `Feature`: `union TaskItem = Bug | Feature`\n\n5. `type Project`:\n   - `id`: non-null `ID!`\n   - `status`: non-null `TicketStatus!`\n   - `tasks`: non-null list of non-null `[TaskItem!]!`",
+    "difficulty": 3,
+    "concept": "gql-schema-definitions",
+    "referenceSolution": "const schema = `\nenum TicketStatus {\n  OPEN\n  IN_PROGRESS\n  RESOLVED\n  CLOSED\n}\n\ntype Bug {\n  id: ID!\n  title: String!\n  severity: Int!\n}\n\ntype Feature {\n  id: ID!\n  title: String!\n  targetRelease: String!\n}\n\nunion TaskItem = Bug | Feature\n\ntype Project {\n  id: ID!\n  status: TicketStatus!\n  tasks: [TaskItem!]!\n}\n`;",
+    "referenceSolutionTs": "const schema: string = `\nenum TicketStatus {\n  OPEN\n  IN_PROGRESS\n  RESOLVED\n  CLOSED\n}\n\ntype Bug {\n  id: ID!\n  title: String!\n  severity: Int!\n}\n\ntype Feature {\n  id: ID!\n  title: String!\n  targetRelease: String!\n}\n\nunion TaskItem = Bug | Feature\n\ntype Project {\n  id: ID!\n  status: TicketStatus!\n  tasks: [TaskItem!]!\n}\n`;",
+    "testCases": [
+      {
+        "description": "SDL parses successfully into valid GraphQL schema",
+        "input": "schema definition",
+        "expected": "parses cleanly via buildSchema"
+      },
+      {
+        "description": "enum TicketStatus defines OPEN, IN_PROGRESS, RESOLVED, CLOSED",
+        "input": "enum TicketStatus",
+        "expected": "contains exact 4 enum members"
+      },
+      {
+        "description": "union TaskItem defines Bug | Feature",
+        "input": "union TaskItem",
+        "expected": "unions Bug | Feature"
+      },
+      {
+        "description": "type Project defines id: ID!, status: TicketStatus!, and tasks: [TaskItem!]!",
+        "input": "type Project",
+        "expected": "status is TicketStatus! and tasks is [TaskItem!]!"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof schema === 'string' ? schema : typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();\n  let parsedSchema = null;\n  try {\n    parsedSchema = buildSchema(userDoc + '\\ntype Query { _dummy: String }\\n');\n  } catch (e) {\n    parsedSchema = null;\n  }\n\n  // Case 1: Schema parses without syntax errors\n  $test.check('SDL parses successfully into valid GraphQL schema', parsedSchema !== null, parsedSchema);\n\n  // Case 2: enum TicketStatus has all 4 values\n  const enumType = parsedSchema?.getType('TicketStatus');\n  const enumValues = enumType?.getValues?.()?.map((v) => v.name) || [];\n  $test.check('enum TicketStatus defines OPEN, IN_PROGRESS, RESOLVED, CLOSED', $test.equal(enumValues.sort(), ['CLOSED', 'IN_PROGRESS', 'OPEN', 'RESOLVED']), enumValues);\n\n  // Case 3: union TaskItem unions Bug and Feature\n  const unionType = parsedSchema?.getType('TaskItem');\n  const unionMembers = unionType?.getTypes?.()?.map((t) => t.name) || [];\n  $test.check('union TaskItem defines Bug | Feature', $test.equal(unionMembers.sort(), ['Bug', 'Feature']), unionMembers);\n\n  // Case 4: type Project defines id: ID!, status: TicketStatus!, and tasks: [TaskItem!]!\n  const projectType = parsedSchema?.getType('Project');\n  const projectFields = projectType?.getFields?.();\n  const hasProjectValid = Boolean(\n    projectFields?.id?.type?.toString() === 'ID!' &&\n    projectFields?.status?.type?.toString() === 'TicketStatus!' &&\n    projectFields?.tasks?.type?.toString() === '[TaskItem!]!'\n  );\n  $test.check('type Project defines id: ID!, status: TicketStatus!, and tasks: [TaskItem!]!', hasProjectValid, projectFields);\n})();"
+  },
+  {
+    "id": "gql-schema-sdl-types",
+    "track": "graphql",
+    "title": "Schema Definition: Types & Input Objects",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "types",
+      "input"
+    ],
+    "promptSeed": "Write an SDL (Schema Definition Language) schema string defining `User`, `Post`, and `CreatePostInput`.\n\n### Requirements\nDefine the following three definitions in standard GraphQL SDL:\n\n1. `type User`:\n   - `id`: non-null `ID!`\n   - `name`: non-null `String!`\n   - `email`: non-null `String!`\n   - `posts`: non-null list of non-null `[Post!]!`\n\n2. `type Post`:\n   - `id`: non-null `ID!`\n   - `title`: non-null `String!`\n   - `published`: non-null `Boolean!`\n   - `author`: non-null `User!`\n\n3. `input CreatePostInput`:\n   - `title`: non-null `String!`\n   - `authorId`: non-null `ID!`\n   - `published`: optional `Boolean` with default value `false` (`Boolean = false`)",
+    "difficulty": 2,
+    "concept": "gql-schema-types",
+    "referenceSolution": "const schema = `\ntype User {\n  id: ID!\n  name: String!\n  email: String!\n  posts: [Post!]!\n}\n\ntype Post {\n  id: ID!\n  title: String!\n  published: Boolean!\n  author: User!\n}\n\ninput CreatePostInput {\n  title: String!\n  authorId: ID!\n  published: Boolean = false\n}\n`;",
+    "referenceSolutionTs": "const schema: string = `\ntype User {\n  id: ID!\n  name: String!\n  email: String!\n  posts: [Post!]!\n}\n\ntype Post {\n  id: ID!\n  title: String!\n  published: Boolean!\n  author: User!\n}\n\ninput CreatePostInput {\n  title: String!\n  authorId: ID!\n  published: Boolean = false\n}\n`;",
+    "testCases": [
+      {
+        "description": "SDL parses successfully into valid GraphQL schema",
+        "input": "schema definition",
+        "expected": "parses cleanly via buildSchema"
+      },
+      {
+        "description": "type User defines id: ID!, name: String!, email: String!, and posts: [Post!]!",
+        "input": "type User",
+        "expected": "fields match specified types and [Post!]! non-null list"
+      },
+      {
+        "description": "type Post defines id: ID!, title: String!, published: Boolean!, and author: User!",
+        "input": "type Post",
+        "expected": "fields match specified types and User! relation"
+      },
+      {
+        "description": "input CreatePostInput defines title: String!, authorId: ID!, published: Boolean = false",
+        "input": "input CreatePostInput",
+        "expected": "input fields match types and defaultValue false"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof schema === 'string' ? schema : typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();\n  let parsedSchema = null;\n  try {\n    parsedSchema = buildSchema(userDoc + '\\ntype Query { _dummy: String }\\n');\n  } catch (e) {\n    parsedSchema = null;\n  }\n\n  // Case 1: Schema parses without SDL syntax errors\n  $test.check('SDL parses successfully into valid GraphQL schema', parsedSchema !== null, parsedSchema);\n\n  // Case 2: User type has non-null scalar fields and non-null list of non-null posts [Post!]!\n  const userType = parsedSchema?.getType('User');\n  const userFields = userType?.getFields?.();\n  const hasUserValid = Boolean(\n    userFields?.id?.type?.toString() === 'ID!' &&\n    userFields?.name?.type?.toString() === 'String!' &&\n    userFields?.email?.type?.toString() === 'String!' &&\n    userFields?.posts?.type?.toString() === '[Post!]!'\n  );\n  $test.check('type User defines id: ID!, name: String!, email: String!, and posts: [Post!]!', hasUserValid, userFields);\n\n  // Case 3: Post type has id: ID!, title: String!, published: Boolean!, and author: User!\n  const postType = parsedSchema?.getType('Post');\n  const postFields = postType?.getFields?.();\n  const hasPostValid = Boolean(\n    postFields?.id?.type?.toString() === 'ID!' &&\n    postFields?.title?.type?.toString() === 'String!' &&\n    postFields?.published?.type?.toString() === 'Boolean!' &&\n    postFields?.author?.type?.toString() === 'User!'\n  );\n  $test.check('type Post defines id: ID!, title: String!, published: Boolean!, and author: User!', hasPostValid, postFields);\n\n  // Case 4: CreatePostInput defines title: String!, authorId: ID!, and published: Boolean = false\n  const inputType = parsedSchema?.getType('CreatePostInput');\n  const inputFields = inputType?.getFields?.();\n  const hasInputValid = Boolean(\n    inputFields?.title?.type?.toString() === 'String!' &&\n    inputFields?.authorId?.type?.toString() === 'ID!' &&\n    inputFields?.published?.type?.toString() === 'Boolean' &&\n    (inputFields?.published?.defaultValue === false || inputFields?.published?.astNode?.defaultValue?.value === false || inputFields?.published?.default?.literal?.value === false)\n  );\n  $test.check('input CreatePostInput defines title: String!, authorId: ID!, published: Boolean = false', hasInputValid, inputFields);\n})();"
   }
 ]

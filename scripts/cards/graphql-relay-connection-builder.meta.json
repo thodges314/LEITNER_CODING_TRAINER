@@ -1,5 +1,12 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Relay Connection & Cursor Pagination Spec",
-  "tags": ["graphql", "relay", "pagination", "connections", "cursors", "specifications"]
+  "tags": [
+    "graphql",
+    "relay",
+    "pagination",
+    "connections",
+    "cursors",
+    "specifications"
+  ]
 }

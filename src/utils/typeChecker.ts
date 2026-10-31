@@ -206,6 +206,11 @@ const SANDBOX_GLOBALS = `
   declare var cancelAnimationFrame: (handle: number) => void;
   declare var $test: any;
   declare var $dom: any;
+  declare var PGlite: any;
+  declare var graphql: any;
+  declare var buildSchema: any;
+  declare var parseGraphql: any;
+  declare var validateGraphql: any;
   declare function list<T = any>(...vals: T[]): ListNode<T> | null;
   declare function toArray<T = any>(node: ListNode<T> | null): T[];
   declare class ListNode<T = any> {

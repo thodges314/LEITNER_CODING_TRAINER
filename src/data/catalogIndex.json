@@ -4012,7 +4012,7 @@
   {
     "id": "graphql-context-auth-guard",
     "title": "GraphQL Middleware: Context Auth Guard",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-middleware",
     "difficulty": 3,
     "tags": [
@@ -4026,7 +4026,7 @@
   {
     "id": "graphql-cursor-pagination-extractor",
     "title": "GraphQL Cursor Pagination Argument Parser",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-pagination",
     "difficulty": 4,
     "tags": [
@@ -4042,7 +4042,7 @@
   {
     "id": "graphql-dataloader-batching",
     "title": "GraphQL DataLoader: Microtask Request Batching",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-dataloader",
     "difficulty": 4,
     "tags": [
@@ -4058,7 +4058,7 @@
   {
     "id": "graphql-discriminated-union-resolver",
     "title": "GraphQL Resolvers: Discriminated Union Resolver",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-resolvers",
     "difficulty": 2,
     "tags": [
@@ -4072,7 +4072,7 @@
   {
     "id": "graphql-extract-operation-name",
     "title": "GraphQL AST: Extract Operation Name",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-ast",
     "difficulty": 1,
     "tags": [
@@ -4087,7 +4087,7 @@
   {
     "id": "graphql-format-error-masking",
     "title": "GraphQL Errors: Error Masking and Formatting",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-errors",
     "difficulty": 3,
     "tags": [
@@ -4101,7 +4101,7 @@
   {
     "id": "graphql-input-object-sanitizer",
     "title": "GraphQL Validation: Input Object Sanitizer",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-validation",
     "difficulty": 2,
     "tags": [
@@ -4115,7 +4115,7 @@
   {
     "id": "graphql-mini-client",
     "title": "GraphQL Client: Fetch with Error Handling",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-client",
     "difficulty": 1,
     "tags": [
@@ -4130,7 +4130,7 @@
   {
     "id": "graphql-nested-field-resolvers",
     "title": "GraphQL Resolvers: Nested Relational Field Resolvers",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-resolvers",
     "difficulty": 3,
     "tags": [
@@ -4144,7 +4144,7 @@
   {
     "id": "graphql-query-complexity-calculator",
     "title": "GraphQL Query Complexity Cost Calculator",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-complexity",
     "difficulty": 4,
     "tags": [
@@ -4160,7 +4160,7 @@
   {
     "id": "graphql-relay-connection-builder",
     "title": "GraphQL Relay Connection & Cursor Pagination Spec",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-relay",
     "difficulty": 5,
     "tags": [
@@ -4176,7 +4176,7 @@
   {
     "id": "graphql-schema-stitching-merger",
     "title": "GraphQL Schema Stitching Resolver Merger",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-stitching",
     "difficulty": 5,
     "tags": [
@@ -4192,7 +4192,7 @@
   {
     "id": "graphql-sdl-type-generator",
     "title": "GraphQL SDL: Type Definition Generator",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-sdl",
     "difficulty": 2,
     "tags": [
@@ -4206,7 +4206,7 @@
   {
     "id": "graphql-variable-validator",
     "title": "GraphQL Variables: Required Variable Validator",
-    "track": "graphql",
+    "track": "graphql-server",
     "concept": "graphql-variables",
     "difficulty": 1,
     "tags": [
@@ -4216,5 +4216,197 @@
       "schema"
     ],
     "summary": "Write a variable validation utility for GraphQL operations that checks whether all required variables are supplied"
+  },
+  {
+    "id": "sql-cancellation-rate",
+    "title": "Trips Cancellation Rate (CASE WHEN)",
+    "track": "sql-postgres",
+    "concept": "sql-conditional-aggregation",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "case-when",
+      "round",
+      "analytics"
+    ],
+    "summary": "Write a PostgreSQL query to compute the cancellation rate of requests involving unbanned users for each day."
+  },
+  {
+    "id": "sql-customer-order-frequency",
+    "title": "High-Volume Customers (HAVING Filter)",
+    "track": "sql-postgres",
+    "concept": "sql-grouping",
+    "difficulty": 2,
+    "tags": [
+      "sql",
+      "postgres",
+      "group-by",
+      "having",
+      "join"
+    ],
+    "summary": "Write a PostgreSQL query to find customers who have placed at least 2 orders."
+  },
+  {
+    "id": "sql-department-average-salary",
+    "title": "Employees Above Department Average Salary",
+    "track": "sql-postgres",
+    "concept": "sql-aggregates",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "subquery",
+      "aggregate",
+      "filter"
+    ],
+    "summary": "Write a PostgreSQL query to find all employees whose salary is strictly greater than the average salary of their respective department."
+  },
+  {
+    "id": "sql-department-highest-salary",
+    "title": "Department Highest Salary (DENSE_RANK)",
+    "track": "sql-postgres",
+    "concept": "sql-window-functions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "join",
+      "cte"
+    ],
+    "summary": "Write a PostgreSQL query to find employees who have the highest salary in each department using DENSE_RANK()."
+  },
+  {
+    "id": "sql-running-total-sales",
+    "title": "Cumulative Running Total Sales",
+    "track": "sql-postgres",
+    "concept": "sql-window-functions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "running-total"
+    ],
+    "summary": "Write a PostgreSQL query to compute a running cumulative sum of order amounts over time."
+  },
+  {
+    "id": "sql-second-highest-salary",
+    "title": "Second Highest Salary",
+    "track": "sql-postgres",
+    "concept": "sql-aggregates",
+    "difficulty": 2,
+    "tags": [
+      "sql",
+      "postgres",
+      "aggregate",
+      "subquery"
+    ],
+    "summary": "Write a PostgreSQL query to find the second highest distinct salary from the Employee table."
+  },
+  {
+    "id": "gql-mutation-input-payload",
+    "title": "Mutation with Input Object & Result Payload",
+    "track": "graphql",
+    "concept": "gql-mutations",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "mutation",
+      "input-objects",
+      "payload",
+      "errors"
+    ],
+    "summary": "Write a GraphQL mutation named CreateTeam utilizing an input object variable and structured payload pattern."
+  },
+  {
+    "id": "gql-query-aliases-fragments",
+    "title": "Field Aliases & Named Fragments",
+    "track": "graphql",
+    "concept": "gql-fragments",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "query",
+      "aliases",
+      "fragments"
+    ],
+    "summary": "Write a GraphQL query named CompareUsers that accepts two variables $primaryId: ID! and $secondaryId: ID!."
+  },
+  {
+    "id": "gql-query-nested-fields",
+    "title": "Querying Nested Fields & Arguments",
+    "track": "graphql",
+    "concept": "gql-queries",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "query",
+      "nested-fields",
+      "arguments"
+    ],
+    "summary": "Write a GraphQL query named GetArticle that accepts a variable $slug: String!."
+  },
+  {
+    "id": "gql-query-pagination",
+    "title": "Relay Cursor Connection Query",
+    "track": "graphql",
+    "concept": "gql-relay-queries",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "query",
+      "pagination",
+      "relay",
+      "connections"
+    ],
+    "summary": "Write a GraphQL query named GetProjectMembers that implements Relay cursor connection pagination."
+  },
+  {
+    "id": "gql-query-variables-directives",
+    "title": "Variables & Conditional Directives",
+    "track": "graphql",
+    "concept": "gql-directives",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "query",
+      "directives",
+      "include",
+      "skip",
+      "variables"
+    ],
+    "summary": "Write a GraphQL query named GetProduct with variables and conditional directives."
+  },
+  {
+    "id": "gql-schema-sdl-enums-unions",
+    "title": "Schema Definition: Enums & Unions",
+    "track": "graphql",
+    "concept": "gql-schema-definitions",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "enums",
+      "unions"
+    ],
+    "summary": "Write an SDL (Schema Definition Language) schema string defining enums, union types, and structured domain models."
+  },
+  {
+    "id": "gql-schema-sdl-types",
+    "title": "Schema Definition: Types & Input Objects",
+    "track": "graphql",
+    "concept": "gql-schema-types",
+    "difficulty": 2,
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "types",
+      "input"
+    ],
+    "summary": "Write an SDL (Schema Definition Language) schema string defining User, Post, and CreatePostInput."
   }
 ]
