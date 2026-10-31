@@ -25,6 +25,7 @@ import {
   Download,
   Upload,
   Pencil,
+  Check,
 } from 'lucide-react';
 import { MarkdownContent } from '../MarkdownContent';
 import catalogIndexData from '../../data/catalogIndex.json';
@@ -186,6 +187,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   // Review state
   const [editableDeckName, setEditableDeckName] = useState(() => initialDossier?.deckName || '');
   const [editableDescription, setEditableDescription] = useState(() => initialDossier?.deckDescription || '');
+  const [isEditingDeckName, setIsEditingDeckName] = useState(false);
+  const [isEditingDeckDesc, setIsEditingDeckDesc] = useState(false);
   const [activeTab, setActiveTab] = useState<'cards' | 'guide' | 'tools' | 'dialogue'>('dialogue');
   const [checkedCardIds, setCheckedCardIds] = useState<Set<string>>(
     () => new Set(initialDossier?.selectedCards.map((c) => c.id) || [])
@@ -695,45 +698,99 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 {step === 'review' && dossier ? (
                   <div className="header-deck-meta-prominent" data-testid="ai-prep-header-deck-meta">
                     <div className="header-deck-name-row-prominent">
-                      <input
-                        ref={deckNameInputRef}
-                        type="text"
-                        className="header-deck-name-input-prominent"
-                        value={editableDeckName}
-                        onChange={(e) => setEditableDeckName(e.target.value)}
-                        placeholder="Custom Deck Name"
-                        title="Click to edit deck name"
-                        data-testid="ai-prep-review-deck-name"
-                      />
+                      {isEditingDeckName ? (
+                        <input
+                          ref={deckNameInputRef}
+                          type="text"
+                          className="header-deck-name-input-prominent editing"
+                          value={editableDeckName}
+                          onChange={(e) => setEditableDeckName(e.target.value)}
+                          onBlur={() => setIsEditingDeckName(false)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === 'Escape') {
+                              setIsEditingDeckName(false);
+                            }
+                          }}
+                          placeholder="Custom Deck Name"
+                          autoFocus
+                          data-testid="ai-prep-review-deck-name"
+                        />
+                      ) : (
+                        <span
+                          className="header-deck-name-text-prominent"
+                          data-testid="ai-prep-review-deck-name"
+                        >
+                          {editableDeckName}
+                        </span>
+                      )}
                       <button
                         type="button"
                         className="header-deck-pencil-btn"
-                        onClick={() => deckNameInputRef.current?.focus()}
-                        title="Click to edit deck name"
-                        aria-label="Edit deck name"
+                        onClick={() => {
+                          if (isEditingDeckName) {
+                            setIsEditingDeckName(false);
+                          } else {
+                            setIsEditingDeckName(true);
+                            setTimeout(() => deckNameInputRef.current?.focus(), 0);
+                          }
+                        }}
+                        title={isEditingDeckName ? 'Done editing' : 'Click pencil to edit deck name'}
+                        aria-label={isEditingDeckName ? 'Done editing deck name' : 'Edit deck name'}
+                        data-testid="ai-prep-edit-deck-name-btn"
                       >
-                        <Pencil size={12} className="header-deck-pencil-icon" />
+                        {isEditingDeckName ? (
+                          <Check size={12} className="header-deck-pencil-icon" />
+                        ) : (
+                          <Pencil size={12} className="header-deck-pencil-icon" />
+                        )}
                       </button>
                     </div>
                     <div className="header-deck-desc-row-prominent">
-                      <input
-                        ref={deckDescInputRef}
-                        type="text"
-                        className="header-deck-desc-input-prominent"
-                        value={editableDescription}
-                        onChange={(e) => setEditableDescription(e.target.value)}
-                        placeholder="Deck Description"
-                        title="Click to edit deck description"
-                        data-testid="ai-prep-review-deck-desc"
-                      />
+                      {isEditingDeckDesc ? (
+                        <input
+                          ref={deckDescInputRef}
+                          type="text"
+                          className="header-deck-desc-input-prominent editing"
+                          value={editableDescription}
+                          onChange={(e) => setEditableDescription(e.target.value)}
+                          onBlur={() => setIsEditingDeckDesc(false)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === 'Escape') {
+                              setIsEditingDeckDesc(false);
+                            }
+                          }}
+                          placeholder="Deck Description"
+                          autoFocus
+                          data-testid="ai-prep-review-deck-desc"
+                        />
+                      ) : (
+                        <span
+                          className="header-deck-desc-text-prominent"
+                          data-testid="ai-prep-review-deck-desc"
+                        >
+                          {editableDescription}
+                        </span>
+                      )}
                       <button
                         type="button"
                         className="header-deck-pencil-btn"
-                        onClick={() => deckDescInputRef.current?.focus()}
-                        title="Click to edit deck description"
-                        aria-label="Edit deck description"
+                        onClick={() => {
+                          if (isEditingDeckDesc) {
+                            setIsEditingDeckDesc(false);
+                          } else {
+                            setIsEditingDeckDesc(true);
+                            setTimeout(() => deckDescInputRef.current?.focus(), 0);
+                          }
+                        }}
+                        title={isEditingDeckDesc ? 'Done editing' : 'Click pencil to edit deck description'}
+                        aria-label={isEditingDeckDesc ? 'Done editing deck description' : 'Edit deck description'}
+                        data-testid="ai-prep-edit-deck-desc-btn"
                       >
-                        <Pencil size={11} className="header-deck-pencil-icon" />
+                        {isEditingDeckDesc ? (
+                          <Check size={11} className="header-deck-pencil-icon" />
+                        ) : (
+                          <Pencil size={11} className="header-deck-pencil-icon" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -773,7 +830,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     data-testid="ai-prep-new-plan-btn"
                   >
                     <Plus size={13} />
-                    <span>+ New Prep</span>
+                    <span>New Prep</span>
                   </button>
                 )}
 
@@ -924,10 +981,12 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 {/* Row 3: Target Timeline & Deck Sizing (Full width row with clean split) */}
                 <div className="ai-prep-split-row">
                   <div className="ai-prep-split-col">
-                    <label htmlFor="ai-prep-date" className="ai-prep-label">
-                      <Calendar size={14} className="label-icon" />
-                      <span>Target Date / Timeline (Optional)</span>
-                    </label>
+                    <div className="ai-prep-split-header">
+                      <label htmlFor="ai-prep-date" className="ai-prep-label">
+                        <Calendar size={14} className="label-icon" />
+                        <span>Target Date / Timeline (Optional)</span>
+                      </label>
+                    </div>
                     <input
                       id="ai-prep-date"
                       type="text"
@@ -973,10 +1032,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                       </div>
                     ) : (
                       <div className="ai-prep-slider-container">
-                        <div className="slider-label-row">
-                          <span className="slider-label-text">Target Deck Size:</span>
-                          <span className="slider-val-badge">{targetCardCount} Cards</span>
-                        </div>
                         <input
                           id="ai-prep-count"
                           type="range"
@@ -987,44 +1042,9 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                           value={targetCardCount}
                           onChange={(e) => setTargetCardCount(Number(e.target.value))}
                           data-testid="ai-prep-count-slider"
+                          aria-label="Target deck size in cards"
                         />
-                        <div className="ai-prep-presets-row">
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 8 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(8)}
-                          >
-                            ⚡ 8 Sprint (1–3d)
-                          </button>
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 16 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(16)}
-                          >
-                            🎯 16 Focused
-                          </button>
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 28 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(28)}
-                          >
-                            📘 28 Full
-                          </button>
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 45 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(45)}
-                          >
-                            🏛️ 45 Big Tech
-                          </button>
-                          <button
-                            type="button"
-                            className={`size-preset-pill ${targetCardCount === 60 ? 'active' : ''}`}
-                            onClick={() => setTargetCardCount(60)}
-                          >
-                            🚀 60 Marathon
-                          </button>
-                        </div>
+                        <span className="slider-val-badge">{targetCardCount} Cards</span>
                       </div>
                     )}
                   </div>

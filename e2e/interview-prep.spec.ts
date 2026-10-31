@@ -59,10 +59,16 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await expect(reviewView).toBeVisible({ timeout: 5000 });
 
     // Verify deck name populated with Stripe in stacked header
-    const deckNameInput = page.getByTestId('ai-prep-review-deck-name');
-    await expect(deckNameInput).toHaveValue(/Stripe/);
-    const deckDescInput = page.getByTestId('ai-prep-review-deck-desc');
-    await expect(deckDescInput).toBeVisible();
+    const deckNameEl = page.getByTestId('ai-prep-review-deck-name');
+    await expect(deckNameEl).toBeVisible();
+    const tagName = await deckNameEl.evaluate((el) => el.tagName.toLowerCase());
+    if (tagName === 'input') {
+      await expect(deckNameEl).toHaveValue(/Stripe/);
+    } else {
+      await expect(deckNameEl).toHaveText(/Stripe/);
+    }
+    const deckDescText = page.getByTestId('ai-prep-review-deck-desc');
+    await expect(deckDescText).toBeVisible();
 
     // Tab 1 (AI Strategy & Coach) is active by default with the Strategic Executive Summary as the opening message
     await expect(page.locator('.dialogue-messages-scroll')).toBeVisible();
