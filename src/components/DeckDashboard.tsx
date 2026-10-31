@@ -437,6 +437,19 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
     }
   };
 
+  const handleTagClick = (tag: string) => {
+    const tagToken = `#${tag.toLowerCase()}`;
+    setSearchQuery((prev) => {
+      const tokens = prev.trim().split(/\s+/).filter(Boolean);
+      const index = tokens.findIndex((t) => t.toLowerCase() === tagToken);
+      if (index >= 0) {
+        tokens.splice(index, 1);
+        return tokens.join(' ');
+      }
+      return tokens.length > 0 ? `${tokens.join(' ')} ${tagToken}` : tagToken;
+    });
+  };
+
   // Filtered and sorted topics
   const filteredTopics = topics
     .filter((t) => {
@@ -461,12 +474,25 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       }
       if (selectedDifficulty !== 'all' && difficultyOf(t) !== selectedDifficulty) return false;
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchTitle = t.title.toLowerCase().includes(q);
-        const matchTags = t.tags.some((tag) => tag.toLowerCase().includes(q));
-        const matchId = t.id.toLowerCase().includes(q);
-        const matchTrackLabel = getTrackMeta(t.track).label.toLowerCase().includes(q);
-        if (!matchTitle && !matchTags && !matchId && !matchTrackLabel) return false;
+        const tokens = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        const matchesAll = tokens.every((token) => {
+          if (token === '#') {
+            return t.tags.length > 0;
+          }
+          if (token.startsWith('#')) {
+            const rawTag = token.slice(1).trim();
+            return t.tags.some((tag) => {
+              const lower = tag.toLowerCase();
+              return lower === rawTag || lower.includes(rawTag) || (`#${lower}`).includes(token);
+            });
+          }
+          const matchTitle = t.title.toLowerCase().includes(token);
+          const matchTags = t.tags.some((tag) => tag.toLowerCase().includes(token));
+          const matchId = t.id.toLowerCase().includes(token);
+          const matchTrackLabel = getTrackMeta(t.track).label.toLowerCase().includes(token);
+          return matchTitle || matchTags || matchId || matchTrackLabel;
+        });
+        if (!matchesAll) return false;
       }
       return true;
     })
@@ -794,6 +820,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onRemoveFromDeck={onRemoveFromDeck}
         onToggleDeactivate={onToggleDeactivate}
         onDeleteTopic={onDeleteTopic}
+        onTagClick={handleTagClick}
+        searchQuery={searchQuery}
       />
 
       {/* Lightweight Deactivate Confirmation Modal */}

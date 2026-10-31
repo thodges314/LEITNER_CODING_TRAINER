@@ -312,4 +312,71 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
     expect(container?.textContent).toContain('Tier 5 Mastered Card');
     expect(container?.textContent).toContain('Tier 6 Veteran Card');
   });
+
+  it('filters cards by hashtag search and allows clicking tag chips', async () => {
+    await renderDashboard();
+
+    const searchInput = container?.querySelector('input[placeholder*="Search cards"]') as HTMLInputElement;
+    expect(searchInput).toBeTruthy();
+
+    // Type "#react" into search box
+    const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+    await act(async () => {
+      nativeSetter?.call(searchInput, '#react');
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).not.toContain('Tier 1 Learning Card');
+    expect(container?.textContent).not.toContain('Tier 6 Veteran Card');
+
+    // Click Reset Filters
+    const allButtons = Array.from(container?.querySelectorAll('button') || []);
+    const resetFiltersBtn = allButtons.find((b) => b.textContent?.includes('Reset Filters'));
+    expect(resetFiltersBtn).toBeTruthy();
+    await act(async () => {
+      resetFiltersBtn?.click();
+    });
+
+    expect(container?.textContent).toContain('Tier 1 Learning Card');
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).toContain('Tier 6 Veteran Card');
+
+    // Click on a tag chip in the table (e.g. #typescript)
+    const tagChips = Array.from(container?.querySelectorAll('.table-tag-chip') || []) as HTMLButtonElement[];
+    const tsChip = tagChips.find((c) => c.textContent?.includes('#typescript'));
+    expect(tsChip).toBeTruthy();
+
+    await act(async () => {
+      tsChip?.click();
+    });
+
+    expect(searchInput.value).toBe('#typescript');
+    expect(tsChip?.getAttribute('aria-pressed')).toBe('true');
+    expect(tsChip?.className).toContain('table-tag-chip-active');
+    expect(container?.textContent).toContain('Tier 6 Veteran Card');
+    expect(container?.textContent).not.toContain('Tier 1 Learning Card');
+    expect(container?.textContent).not.toContain('Tier 5 Mastered Card');
+
+    // Click the active tag chip again to toggle off
+    await act(async () => {
+      tsChip?.click();
+    });
+
+    expect(searchInput.value).toBe('');
+    expect(tsChip?.getAttribute('aria-pressed')).toBe('false');
+    expect(container?.textContent).toContain('Tier 1 Learning Card');
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).toContain('Tier 6 Veteran Card');
+
+    // Additive multi-token search by hand: "tier card"
+    await act(async () => {
+      nativeSetter?.call(searchInput, 'tier mastered');
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    expect(container?.textContent).toContain('Tier 5 Mastered Card');
+    expect(container?.textContent).not.toContain('Tier 1 Learning Card');
+    expect(container?.textContent).not.toContain('Tier 6 Veteran Card');
+  });
 });

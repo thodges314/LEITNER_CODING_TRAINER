@@ -157,10 +157,22 @@ const DeckEditorModalDialog: React.FC<DeckEditorModalProps> = ({
 
         // Query check
         if (!query) return true;
-        const matchTitle = card.title.toLowerCase().includes(query);
-        const matchConcept = card.concept?.toLowerCase().includes(query);
-        const matchTags = card.tags.some((t) => t.toLowerCase().includes(query));
-        return matchTitle || matchConcept || matchTags;
+        const tokens = query.split(/\s+/).filter(Boolean);
+        const matchesAll = tokens.every((token) => {
+          if (token === '#') return card.tags.length > 0;
+          if (token.startsWith('#')) {
+            const rawTag = token.slice(1).trim();
+            return card.tags.some((t) => {
+              const lower = t.toLowerCase();
+              return lower === rawTag || lower.includes(rawTag) || (`#${lower}`).includes(token);
+            });
+          }
+          const matchTitle = card.title.toLowerCase().includes(token);
+          const matchConcept = card.concept?.toLowerCase().includes(token);
+          const matchTags = card.tags.some((t) => t.toLowerCase().includes(token));
+          return matchTitle || matchConcept || matchTags;
+        });
+        return matchesAll;
       });
       map.set(track, filtered);
     }
