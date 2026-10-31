@@ -3958,5 +3958,37 @@
       "ast"
     ],
     "summary": "Implement a static GraphQL query complexity analysis function that computes recursive execution costs to protect backends from denial-of-service qu..."
+  },
+  {
+    "id": "graphql-relay-connection-builder",
+    "title": "GraphQL Relay Connection & Cursor Pagination Spec",
+    "track": "graphql",
+    "concept": "graphql-relay",
+    "difficulty": 5,
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "connections",
+      "cursors",
+      "specifications"
+    ],
+    "summary": "Implement a compliant Relay Cursor Connections builder that transforms a dataset and pagination arguments into a structured Connection<T>"
+  },
+  {
+    "id": "graphql-schema-stitching-merger",
+    "title": "GraphQL Schema Stitching Resolver Merger",
+    "track": "graphql",
+    "concept": "graphql-stitching",
+    "difficulty": 5,
+    "tags": [
+      "graphql",
+      "schema-stitching",
+      "federation",
+      "resolvers",
+      "conflict-detection",
+      "microservices"
+    ],
+    "summary": "Implement a schema stitching utility that unifies distributed subsystem resolver maps into a consolidated root schema while preventing conflicting ..."
   }
 ]

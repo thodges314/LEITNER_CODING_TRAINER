@@ -17131,5 +17131,100 @@
       }
     ],
     "testHarness": "await $test.run(\"Calculates baseline complexity for flat scalar fields\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([{ name: 'id' }, { name: 'title' }, { name: 'views' }]));\n}, () => ({ complexity: 3, exceeded: false }));\n\nawait $test.run(\"Applies multiplier argument (first or limit) to nested child fields\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([{ name: 'users', args: { first: 5 }, fields: [{ name: 'id' }, { name: 'email' }] }]));\n}, () => ({ complexity: 11, exceeded: false }));\n\nawait $test.run(\"Respects custom fieldCosts configurations\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([{ name: 'search', fields: [{ name: 'results' }] }], { fieldCosts: { search: 10 } }));\n}, () => ({ complexity: 11, exceeded: false }));\n\nawait $test.run(\"Detects when query cost exceeds maxComplexity\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([{ name: 'posts', args: { limit: 10 }, fields: [{ name: 'comments', args: { first: 5 }, fields: [{ name: 'text' }] }] }], { maxComplexity: 50 }));\n}, () => ({ complexity: 61, exceeded: true }));\n\nawait $test.run(\"Returns 0 complexity for empty input\", async () => {\n  const sleep = $test.sleep;\n  return (calculateQueryComplexity([]));\n}, () => ({ complexity: 0, exceeded: false }));"
+  },
+  {
+    "id": "graphql-relay-connection-builder",
+    "track": "graphql",
+    "title": "GraphQL Relay Connection & Cursor Pagination Spec",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "connections",
+      "cursors",
+      "specifications"
+    ],
+    "promptSeed": "Implement a compliant Relay Cursor Connections builder that transforms a dataset and pagination arguments into a structured `Connection<T>`:\n\n## Description\n\n```ts\ninterface Edge<T> {\n  node: T;\n  cursor: string;\n}\n\ninterface PageInfo {\n  hasNextPage: boolean;\n  hasPreviousPage: boolean;\n  startCursor: string | null;\n  endCursor: string | null;\n}\n\ninterface Connection<T> {\n  edges: Edge<T>[];\n  pageInfo: PageInfo;\n  totalCount: number;\n}\n\ninterface ConnectionArgs {\n  first?: number;\n  after?: string;\n  last?: number;\n  before?: string;\n}\n```\n\n### `buildRelayConnection<T>(items: T[], args?: ConnectionArgs): Connection<T>`\n\n- **Cursor Encoding**:\n  - Each item index $i$ in `items` produces a base64-encoded string cursor: `btoa(String(i))`.\n  - Use `atob(cursor)` to decode cursor back to numeric index.\n- **Relay Slicing Algorithm**:\n  1. Initialize all edges from `items`: `edges = items.map((node, i) => ({ node, cursor: btoa(String(i)) }))`.\n  2. If `args?.after` is provided:\n     - Decode `afterIndex = parseInt(atob(args.after), 10)`.\n     - Retain only edges strictly after `afterIndex`: `edges.slice(afterIndex + 1)`.\n  3. If `args?.before` is provided:\n     - Decode `beforeIndex = parseInt(atob(args.before), 10)`.\n     - Retain only edges strictly before `beforeIndex`: `edges.slice(0, beforeIndex)`.\n  4. If `args?.first !== undefined`:\n     - If `args.first < 0`, throw `new Error('first must be non-negative')`.\n     - Slice to at most `args.first` items from the beginning.\n  5. If `args?.last !== undefined`:\n     - If `args.last < 0`, throw `new Error('last must be non-negative')`.\n     - Slice to at most `args.last` items from the end.\n- **`PageInfo` Calculation**:\n  - `hasPreviousPage`:\n    - `true` if `last` was applied and more items existed in the range than `last`.\n    - `true` if `after` was applied and `afterIndex >= 0`.\n    - Otherwise `false`.\n  - `hasNextPage`:\n    - `true` if `first` was applied and more items existed in the range than `first`.\n    - `true` if `before` was applied and `beforeIndex < items.length`.\n    - Otherwise `false`.\n  - `startCursor`: Cursor of the first edge in `edges`, or `null` if empty.\n  - `endCursor`: Cursor of the last edge in `edges`, or `null` if empty.\n- **Return Value**:\n  - Returns `{ edges, pageInfo, totalCount: items.length }`.",
+    "difficulty": 5,
+    "concept": "graphql-relay",
+    "referenceSolution": "function encodeCursor(index) {\n  return btoa(String(index));\n}\n\nfunction decodeCursor(cursor) {\n  return parseInt(atob(cursor), 10);\n}\n\nfunction buildRelayConnection(items = [], args = {}) {\n  const safeItems = Array.isArray(items) ? items : [];\n  const totalCount = safeItems.length;\n  let edges = safeItems.map((node, index) => ({\n    node,\n    cursor: encodeCursor(index),\n  }));\n\n  const { first, after, last, before } = args || {};\n\n  let afterIndex;\n  if (typeof after === 'string' && after.length > 0) {\n    afterIndex = decodeCursor(after);\n    if (!isNaN(afterIndex)) {\n      edges = edges.filter((e) => decodeCursor(e.cursor) > afterIndex);\n    }\n  }\n\n  let beforeIndex;\n  if (typeof before === 'string' && before.length > 0) {\n    beforeIndex = decodeCursor(before);\n    if (!isNaN(beforeIndex)) {\n      edges = edges.filter((e) => decodeCursor(e.cursor) < beforeIndex);\n    }\n  }\n\n  let hasPreviousPage = false;\n  let hasNextPage = false;\n\n  if (afterIndex !== undefined && !isNaN(afterIndex) && afterIndex >= 0) {\n    hasPreviousPage = true;\n  }\n  if (beforeIndex !== undefined && !isNaN(beforeIndex) && beforeIndex < totalCount) {\n    hasNextPage = true;\n  }\n\n  if (first !== undefined) {\n    if (typeof first === 'number' && first < 0) {\n      throw new Error('first must be non-negative');\n    }\n    if (edges.length > first) {\n      hasNextPage = true;\n      edges = edges.slice(0, first);\n    }\n  }\n\n  if (last !== undefined) {\n    if (typeof last === 'number' && last < 0) {\n      throw new Error('last must be non-negative');\n    }\n    if (edges.length > last) {\n      hasPreviousPage = true;\n      edges = edges.slice(edges.length - last);\n    }\n  }\n\n  const startCursor = edges.length > 0 ? edges[0].cursor : null;\n  const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;\n\n  return {\n    edges,\n    pageInfo: {\n      hasNextPage,\n      hasPreviousPage,\n      startCursor,\n      endCursor,\n    },\n    totalCount,\n  };\n}",
+    "referenceSolutionTs": "interface Edge<T> {\n  node: T;\n  cursor: string;\n}\n\ninterface PageInfo {\n  hasNextPage: boolean;\n  hasPreviousPage: boolean;\n  startCursor: string | null;\n  endCursor: string | null;\n}\n\ninterface Connection<T> {\n  edges: Edge<T>[];\n  pageInfo: PageInfo;\n  totalCount: number;\n}\n\ninterface ConnectionArgs {\n  first?: number;\n  after?: string;\n  last?: number;\n  before?: string;\n}\n\nfunction encodeCursor(index: number): string {\n  return btoa(String(index));\n}\n\nfunction decodeCursor(cursor: string): number {\n  return parseInt(atob(cursor), 10);\n}\n\nfunction buildRelayConnection<T>(\n  items: T[] = [],\n  args: ConnectionArgs = {}\n): Connection<T> {\n  const safeItems = Array.isArray(items) ? items : [];\n  const totalCount = safeItems.length;\n  let edges: Edge<T>[] = safeItems.map((node, index) => ({\n    node,\n    cursor: encodeCursor(index),\n  }));\n\n  const { first, after, last, before } = args || {};\n\n  let afterIndex: number | undefined;\n  if (typeof after === 'string' && after.length > 0) {\n    afterIndex = decodeCursor(after);\n    if (!isNaN(afterIndex)) {\n      edges = edges.filter((e) => decodeCursor(e.cursor) > afterIndex!);\n    }\n  }\n\n  let beforeIndex: number | undefined;\n  if (typeof before === 'string' && before.length > 0) {\n    beforeIndex = decodeCursor(before);\n    if (!isNaN(beforeIndex)) {\n      edges = edges.filter((e) => decodeCursor(e.cursor) < beforeIndex!);\n    }\n  }\n\n  let hasPreviousPage = false;\n  let hasNextPage = false;\n\n  if (afterIndex !== undefined && !isNaN(afterIndex) && afterIndex >= 0) {\n    hasPreviousPage = true;\n  }\n  if (beforeIndex !== undefined && !isNaN(beforeIndex) && beforeIndex < totalCount) {\n    hasNextPage = true;\n  }\n\n  if (first !== undefined) {\n    if (typeof first === 'number' && first < 0) {\n      throw new Error('first must be non-negative');\n    }\n    if (edges.length > first) {\n      hasNextPage = true;\n      edges = edges.slice(0, first);\n    }\n  }\n\n  if (last !== undefined) {\n    if (typeof last === 'number' && last < 0) {\n      throw new Error('last must be non-negative');\n    }\n    if (edges.length > last) {\n      hasPreviousPage = true;\n      edges = edges.slice(edges.length - last);\n    }\n  }\n\n  const startCursor = edges.length > 0 ? edges[0].cursor : null;\n  const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;\n\n  return {\n    edges,\n    pageInfo: {\n      hasNextPage,\n      hasPreviousPage,\n      startCursor,\n      endCursor,\n    },\n    totalCount,\n  };\n}",
+    "testCases": [
+      {
+        "description": "Constructs connection with forward slicing and computes pageInfo",
+        "input": "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2 });\n[conn.edges.map(e => e.node), conn.pageInfo, conn.totalCount]",
+        "expected": "[[\"a\", \"b\"], { endCursor: \"MQ==\", hasNextPage: true, hasPreviousPage: false, startCursor: \"MA==\" }, 4]"
+      },
+      {
+        "description": "Slices after cursor and updates hasPreviousPage",
+        "input": "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2, after: btoa('1') });\n[conn.edges.map(e => e.node), conn.pageInfo]",
+        "expected": "[[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]"
+      },
+      {
+        "description": "Supports backward pagination with last argument",
+        "input": "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { last: 2 });\n[conn.edges.map(e => e.node), conn.pageInfo]",
+        "expected": "[[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]"
+      },
+      {
+        "description": "Handles empty dataset gracefully with null cursors",
+        "input": "const conn = buildRelayConnection([], { first: 5 });\n[conn.edges, conn.pageInfo, conn.totalCount]",
+        "expected": "[[], { endCursor: null, hasNextPage: false, hasPreviousPage: false, startCursor: null }, 0]"
+      },
+      {
+        "description": "Throws error when first or last is negative",
+        "input": "const err = (() => { try { buildRelayConnection(['a'], { first: -1 }); return 'ok'; } catch (e) { return e.message; } })();\nerr",
+        "expected": "'first must be non-negative'"
+      }
+    ],
+    "testHarness": "await $test.run(\"Constructs connection with forward slicing and computes pageInfo\", async () => {\n  const sleep = $test.sleep;\n  const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2 });\n  return ([conn.edges.map(e => e.node), conn.pageInfo, conn.totalCount]);\n}, () => ([[\"a\", \"b\"], { endCursor: \"MQ==\", hasNextPage: true, hasPreviousPage: false, startCursor: \"MA==\" }, 4]));\n\nawait $test.run(\"Slices after cursor and updates hasPreviousPage\", async () => {\n  const sleep = $test.sleep;\n  const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2, after: btoa('1') });\n  return ([conn.edges.map(e => e.node), conn.pageInfo]);\n}, () => ([[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]));\n\nawait $test.run(\"Supports backward pagination with last argument\", async () => {\n  const sleep = $test.sleep;\n  const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { last: 2 });\n  return ([conn.edges.map(e => e.node), conn.pageInfo]);\n}, () => ([[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]));\n\nawait $test.run(\"Handles empty dataset gracefully with null cursors\", async () => {\n  const sleep = $test.sleep;\n  const conn = buildRelayConnection([], { first: 5 });\n  return ([conn.edges, conn.pageInfo, conn.totalCount]);\n}, () => ([[], { endCursor: null, hasNextPage: false, hasPreviousPage: false, startCursor: null }, 0]));\n\nawait $test.run(\"Throws error when first or last is negative\", async () => {\n  const sleep = $test.sleep;\n  const err = (() => { try { buildRelayConnection(['a'], { first: -1 }); return 'ok'; } catch (e) { return e.message; } })();\n  return (err);\n}, () => ('first must be non-negative'));"
+  },
+  {
+    "id": "graphql-schema-stitching-merger",
+    "track": "graphql",
+    "title": "GraphQL Schema Stitching Resolver Merger",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "schema-stitching",
+      "federation",
+      "resolvers",
+      "conflict-detection",
+      "microservices"
+    ],
+    "promptSeed": "Implement a schema stitching utility that unifies distributed subsystem resolver maps into a consolidated root schema while preventing conflicting field collisions:\n\n## Description\n\n```ts\ntype ResolverFn = (...args: any[]) => any;\n\ninterface ResolverMap {\n  [typeName: string]: {\n    [fieldName: string]: ResolverFn | any;\n  };\n}\n```\n\n### `mergeResolvers(...resolverMaps: ResolverMap[]): ResolverMap`\n\n- **Type-Level Deep Merging**:\n  - Merges each input resolver map in left-to-right order.\n  - Combines field resolvers under matching type definitions (e.g. `Query`, `Mutation`, `User`, `Review`).\n- **Conflict Detection**:\n  - When two or more resolver maps attempt to define the same field on the same type:\n    - Throws an `Error` with the message:\n      `Conflict: resolver for \"<typeName>.<fieldName>\" is defined multiple times`\n- **Graceful Input Handling**:\n  - Omits `null`, `undefined`, or non-object resolver maps.\n  - Returns a clean new object without mutating input maps.",
+    "difficulty": 5,
+    "concept": "graphql-stitching",
+    "referenceSolution": "function mergeResolvers(...resolverMaps) {\n  const merged = {};\n\n  for (const map of resolverMaps) {\n    if (!map || typeof map !== 'object') continue;\n\n    for (const typeName of Object.keys(map)) {\n      const typeFields = map[typeName];\n      if (!typeFields || typeof typeFields !== 'object') continue;\n\n      if (!merged[typeName]) {\n        merged[typeName] = {};\n      }\n\n      for (const fieldName of Object.keys(typeFields)) {\n        if (Object.prototype.hasOwnProperty.call(merged[typeName], fieldName)) {\n          throw new Error(\n            `Conflict: resolver for \"${typeName}.${fieldName}\" is defined multiple times`\n          );\n        }\n        merged[typeName][fieldName] = typeFields[fieldName];\n      }\n    }\n  }\n\n  return merged;\n}",
+    "referenceSolutionTs": "type ResolverFn = (...args: any[]) => any;\n\ninterface ResolverMap {\n  [typeName: string]: {\n    [fieldName: string]: ResolverFn | any;\n  };\n}\n\nfunction mergeResolvers(...resolverMaps: ResolverMap[]): ResolverMap {\n  const merged: ResolverMap = {};\n\n  for (const map of resolverMaps) {\n    if (!map || typeof map !== 'object') continue;\n\n    for (const typeName of Object.keys(map)) {\n      const typeFields = map[typeName];\n      if (!typeFields || typeof typeFields !== 'object') continue;\n\n      if (!merged[typeName]) {\n        merged[typeName] = {};\n      }\n\n      for (const fieldName of Object.keys(typeFields)) {\n        if (Object.prototype.hasOwnProperty.call(merged[typeName], fieldName)) {\n          throw new Error(\n            `Conflict: resolver for \"${typeName}.${fieldName}\" is defined multiple times`\n          );\n        }\n        merged[typeName][fieldName] = typeFields[fieldName];\n      }\n    }\n  }\n\n  return merged;\n}",
+    "testCases": [
+      {
+        "description": "Merges distinct subsystem resolver maps across shared types",
+        "input": "const userMap = { Query: { user: () => 'u' }, User: { id: (p) => p.id } };\nconst reviewMap = { Query: { reviews: () => [] }, User: { reviews: () => [] } };\nconst merged = mergeResolvers(userMap, reviewMap);\n[Object.keys(merged.Query).sort(), Object.keys(merged.User).sort()]",
+        "expected": "[[\"reviews\", \"user\"], [\"id\", \"reviews\"]]"
+      },
+      {
+        "description": "Throws conflict error when duplicate field is defined on the same type",
+        "input": "const map1 = { Query: { user: () => 1 } };\nconst map2 = { Query: { user: () => 2 } };\nconst err = (() => { try { mergeResolvers(map1, map2); return 'no error'; } catch (e) { return e.message; } })();\nerr",
+        "expected": "'Conflict: resolver for \"Query.user\" is defined multiple times'"
+      },
+      {
+        "description": "Gracefully skips null, undefined, or empty inputs",
+        "input": "const merged = mergeResolvers(null, { Query: { ping: () => 'pong' } }, undefined, {});\nObject.keys(merged.Query)",
+        "expected": "[\"ping\"]"
+      },
+      {
+        "description": "Preserves custom type resolvers such as __resolveType",
+        "input": "const map1 = { SearchResult: { __resolveType: () => 'User' } };\nconst merged = mergeResolvers(map1);\ntypeof merged.SearchResult.__resolveType",
+        "expected": "'function'"
+      }
+    ],
+    "testHarness": "await $test.run(\"Merges distinct subsystem resolver maps across shared types\", async () => {\n  const sleep = $test.sleep;\n  const userMap = { Query: { user: () => 'u' }, User: { id: (p) => p.id } };\n  const reviewMap = { Query: { reviews: () => [] }, User: { reviews: () => [] } };\n  const merged = mergeResolvers(userMap, reviewMap);\n  return ([Object.keys(merged.Query).sort(), Object.keys(merged.User).sort()]);\n}, () => ([[\"reviews\", \"user\"], [\"id\", \"reviews\"]]));\n\nawait $test.run(\"Throws conflict error when duplicate field is defined on the same type\", async () => {\n  const sleep = $test.sleep;\n  const map1 = { Query: { user: () => 1 } };\n  const map2 = { Query: { user: () => 2 } };\n  const err = (() => { try { mergeResolvers(map1, map2); return 'no error'; } catch (e) { return e.message; } })();\n  return (err);\n}, () => ('Conflict: resolver for \"Query.user\" is defined multiple times'));\n\nawait $test.run(\"Gracefully skips null, undefined, or empty inputs\", async () => {\n  const sleep = $test.sleep;\n  const merged = mergeResolvers(null, { Query: { ping: () => 'pong' } }, undefined, {});\n  return (Object.keys(merged.Query));\n}, () => ([\"ping\"]));\n\nawait $test.run(\"Preserves custom type resolvers such as __resolveType\", async () => {\n  const sleep = $test.sleep;\n  const map1 = { SearchResult: { __resolveType: () => 'User' } };\n  const merged = mergeResolvers(map1);\n  return (typeof merged.SearchResult.__resolveType);\n}, () => ('function'));"
   }
 ]

@@ -1,0 +1,5 @@
+{
+  "track": "graphql",
+  "title": "GraphQL Schema Stitching Resolver Merger",
+  "tags": ["graphql", "schema-stitching", "federation", "resolvers", "conflict-detection", "microservices"]
+}

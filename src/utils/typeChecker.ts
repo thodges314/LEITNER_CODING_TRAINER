@@ -55,6 +55,8 @@ const SANDBOX_GLOBALS = `
   declare function setInterval(cb: (...args: any[]) => void, ms?: number, ...args: any[]): any;
   declare function clearInterval(id: any): void;
   declare function queueMicrotask(cb: () => void): void;
+  declare function btoa(data: string): string;
+  declare function atob(data: string): string;
   interface Function {
     myBind(context: any, ...boundArgs: any[]): (...args: any[]) => any;
     myCall(context: any, ...args: any[]): any;

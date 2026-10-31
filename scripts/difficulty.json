@@ -1154,6 +1154,14 @@
   "graphql-cursor-pagination-extractor": {
     "difficulty": 4,
     "concept": "graphql-pagination"
+  },
+  "graphql-relay-connection-builder": {
+    "difficulty": 5,
+    "concept": "graphql-relay"
+  },
+  "graphql-schema-stitching-merger": {
+    "difficulty": 5,
+    "concept": "graphql-stitching"
   }
 }
 

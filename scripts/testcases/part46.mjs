@@ -368,5 +368,56 @@ export default {
       "['first must be non-negative', 'last must be non-negative']"
     ),
   ],
+
+  'graphql-relay-connection-builder': [
+    c(
+      'Constructs connection with forward slicing and computes pageInfo',
+      "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2 });\n[conn.edges.map(e => e.node), conn.pageInfo, conn.totalCount]",
+      "[[\"a\", \"b\"], { endCursor: \"MQ==\", hasNextPage: true, hasPreviousPage: false, startCursor: \"MA==\" }, 4]"
+    ),
+    c(
+      'Slices after cursor and updates hasPreviousPage',
+      "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { first: 2, after: btoa('1') });\n[conn.edges.map(e => e.node), conn.pageInfo]",
+      "[[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]"
+    ),
+    c(
+      'Supports backward pagination with last argument',
+      "const conn = buildRelayConnection(['a', 'b', 'c', 'd'], { last: 2 });\n[conn.edges.map(e => e.node), conn.pageInfo]",
+      "[[\"c\", \"d\"], { endCursor: \"Mw==\", hasNextPage: false, hasPreviousPage: true, startCursor: \"Mg==\" }]"
+    ),
+    c(
+      'Handles empty dataset gracefully with null cursors',
+      "const conn = buildRelayConnection([], { first: 5 });\n[conn.edges, conn.pageInfo, conn.totalCount]",
+      "[[], { endCursor: null, hasNextPage: false, hasPreviousPage: false, startCursor: null }, 0]"
+    ),
+    c(
+      'Throws error when first or last is negative',
+      "const err = (() => { try { buildRelayConnection(['a'], { first: -1 }); return 'ok'; } catch (e) { return e.message; } })();\nerr",
+      "'first must be non-negative'"
+    ),
+  ],
+
+  'graphql-schema-stitching-merger': [
+    c(
+      'Merges distinct subsystem resolver maps across shared types',
+      "const userMap = { Query: { user: () => 'u' }, User: { id: (p) => p.id } };\nconst reviewMap = { Query: { reviews: () => [] }, User: { reviews: () => [] } };\nconst merged = mergeResolvers(userMap, reviewMap);\n[Object.keys(merged.Query).sort(), Object.keys(merged.User).sort()]",
+      "[[\"reviews\", \"user\"], [\"id\", \"reviews\"]]"
+    ),
+    c(
+      'Throws conflict error when duplicate field is defined on the same type',
+      "const map1 = { Query: { user: () => 1 } };\nconst map2 = { Query: { user: () => 2 } };\nconst err = (() => { try { mergeResolvers(map1, map2); return 'no error'; } catch (e) { return e.message; } })();\nerr",
+      "'Conflict: resolver for \"Query.user\" is defined multiple times'"
+    ),
+    c(
+      'Gracefully skips null, undefined, or empty inputs',
+      "const merged = mergeResolvers(null, { Query: { ping: () => 'pong' } }, undefined, {});\nObject.keys(merged.Query)",
+      "[\"ping\"]"
+    ),
+    c(
+      'Preserves custom type resolvers such as __resolveType',
+      "const map1 = { SearchResult: { __resolveType: () => 'User' } };\nconst merged = mergeResolvers(map1);\ntypeof merged.SearchResult.__resolveType",
+      "'function'"
+    ),
+  ],
 };
 
