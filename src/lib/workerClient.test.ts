@@ -93,7 +93,7 @@ describe('workerClient', () => {
         postMessage() {
           setTimeout(() => {
             if (this.onerror) {
-              this.onerror(new ErrorEvent('error', { message: 'Out of memory' }));
+              this.onerror({ message: 'Out of memory' } as unknown as ErrorEvent);
             }
           }, 10);
         }
