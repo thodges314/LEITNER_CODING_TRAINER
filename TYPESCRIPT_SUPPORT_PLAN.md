@@ -60,10 +60,10 @@ To ensure optimal developer experience, readable problem prompts, and strict typ
 
 ## 3. High-Level Progress Dashboard
 
-- **Total Cards in Deck:** 312 cards across 13 tracks
-- **Fully Typed Cards Completed:** **312 / 312 (100.0%)**
-- **Cards Remaining:** **0 / 312 (0.0%)**
-- **Total Batches:** 57 batches (57 completed, 0 remaining)
+- **Total Cards in Deck:** 319 cards across 14 tracks
+- **Fully Typed Cards Completed:** **319 / 319 (100.0%)**
+- **Cards Remaining:** **0 / 319 (0.0%)**
+- **Total Batches:** 58 batches (58 completed, 0 remaining)
 
 ### Track Completion Status
 
@@ -80,9 +80,10 @@ To ensure optimal developer experience, readable problem prompts, and strict typ
 | **`react-components`**    |     41      |      41      |   100.0%   | **COMPLETE** (Batches 40–50)                          |
 | **`testing-tooling`**     |      5      |      5       |   100.0%   | **COMPLETE** (Batch 48)                               |
 | **`node`**                |     15      |      15      |   100.0%   | **COMPLETE** (Batch 51)                               |
-| **`graphql`**             |     14      |      14      |   100.0%   | **COMPLETE** (Batch 52)                               |
+| **`graphql-server`**      |     14      |      14      |   100.0%   | **COMPLETE** (Batch 52: Server & Resolvers)            |
+| **`graphql`**             |      7      |       7      |   100.0%   | **COMPLETE** (Batch 54: Client Operations & SDL)       |
 | **`sql-postgres`**        |      6      |      6       |   100.0%   | **COMPLETE** (Batch 53)                               |
-| **TOTAL**                 |   **312**   |   **312**    | **100.0%** | **57 Batches Total (100% COMPLETE)**                  |
+| **TOTAL**                 |   **319**   |   **319**    | **100.0%** | **58 Batches Total (100% COMPLETE)**                  |
 
 ---
 

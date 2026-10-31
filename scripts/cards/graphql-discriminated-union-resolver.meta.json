@@ -1,5 +1,10 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Resolvers: Discriminated Union Resolver",
-  "tags": ["graphql", "resolvers", "unions", "schema"]
+  "tags": [
+    "graphql",
+    "resolvers",
+    "unions",
+    "schema"
+  ]
 }

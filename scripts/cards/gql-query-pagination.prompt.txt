@@ -1,0 +1,39 @@
+Write a GraphQL query named `GetProjectMembers` that implements Relay cursor connection pagination.
+
+### Requirements
+- Operation signature: `query GetProjectMembers($projectId: ID!, $first: Int! = 10, $after: String)`
+- Query top-level field `project(id: $projectId)`
+- Query connection field `members(first: $first, after: $after)` on `project`
+- Select the following connection fields:
+  - `totalCount`
+  - `pageInfo`: select `hasNextPage` and `endCursor`
+  - `edges`: select `cursor` and `node { id name email }`
+
+### Schema Context
+```graphql
+type Query {
+  project(id: ID!): Project
+}
+type User {
+  id: ID!
+  name: String!
+  email: String!
+}
+type UserEdge {
+  cursor: String!
+  node: User!
+}
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+type UserConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [UserEdge!]!
+}
+type Project {
+  id: ID!
+  members(first: Int, after: String): UserConnection!
+}
+```

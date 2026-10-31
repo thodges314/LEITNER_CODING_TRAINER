@@ -1,0 +1,21 @@
+Write an SDL (Schema Definition Language) schema string defining `User`, `Post`, and `CreatePostInput`.
+
+### Requirements
+Define the following three definitions in standard GraphQL SDL:
+
+1. `type User`:
+   - `id`: non-null `ID!`
+   - `name`: non-null `String!`
+   - `email`: non-null `String!`
+   - `posts`: non-null list of non-null `[Post!]!`
+
+2. `type Post`:
+   - `id`: non-null `ID!`
+   - `title`: non-null `String!`
+   - `published`: non-null `Boolean!`
+   - `author`: non-null `User!`
+
+3. `input CreatePostInput`:
+   - `title`: non-null `String!`
+   - `authorId`: non-null `ID!`
+   - `published`: optional `Boolean` with default value `false` (`Boolean = false`)

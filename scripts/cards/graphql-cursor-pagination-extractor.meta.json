@@ -1,5 +1,12 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Cursor Pagination Argument Parser",
-  "tags": ["graphql", "relay", "pagination", "cursor", "validation", "api-design"]
+  "tags": [
+    "graphql",
+    "relay",
+    "pagination",
+    "cursor",
+    "validation",
+    "api-design"
+  ]
 }

@@ -1,0 +1,35 @@
+Write a GraphQL mutation named `CreateTeam` utilizing an input object variable and structured payload pattern.
+
+### Requirements
+- Operation signature: `mutation CreateTeam($input: CreateTeamInput!)`
+- Call mutation field: `createTeam(input: $input)`
+- On the returned payload, select:
+  - `team`: select `id`, `name`, `slug`, and `memberCount`
+  - `userErrors`: select `field`, `message`, and `code`
+
+### Schema Context
+```graphql
+input CreateTeamInput {
+  name: String!
+  slug: String!
+  description: String
+}
+type UserError {
+  field: [String!]
+  message: String!
+  code: String
+}
+type Team {
+  id: ID!
+  name: String!
+  slug: String!
+  memberCount: Int!
+}
+type CreateTeamPayload {
+  team: Team
+  userErrors: [UserError!]!
+}
+type Mutation {
+  createTeam(input: CreateTeamInput!): CreateTeamPayload!
+}
+```

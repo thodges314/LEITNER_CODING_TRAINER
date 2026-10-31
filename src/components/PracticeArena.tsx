@@ -19,7 +19,7 @@ import { evaluateCodeSubmission } from '../lib/ai';
 import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
 import { CheckCircle } from 'lucide-react';
-import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, bufferContainsHarness } from '../lib/runner';
+import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, bufferContainsHarness } from '../lib/runner';
 import { extractHarnessContracts } from '../lib/harnessContracts';
 import { formatConsoleArg, formatAssertionFailure } from './practice/consoleFormat';
 import type { ConsoleLogEntry } from './practice/consoleFormat';
@@ -457,13 +457,16 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       }),
     };
 
+    const isDocTrack = currentCard?.track === 'sql-postgres' || currentCard?.track === 'graphql';
     const rawCodeToRun =
       currentCard?.track === 'sql-postgres'
         ? prepareSqlCode(code, currentCard.testHarness)
-        : code;
+        : currentCard?.track === 'graphql'
+          ? prepareGraphqlCode(code, currentCard.testHarness)
+          : code;
     const executableSource =
-      currentCard?.track === 'sql-postgres' &&
-      currentCard.testHarness &&
+      isDocTrack &&
+      currentCard?.testHarness &&
       !bufferContainsHarness(rawCodeToRun, currentCard.testHarness)
         ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`
         : rawCodeToRun;

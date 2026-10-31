@@ -32,6 +32,7 @@ const RADAR_DOMAINS: { id: string; label: string; tracks: TrackType[] }[] = [
   { id: 'dom', label: 'DOM & Web APIs', tracks: ['dom-browser'] },
   { id: 'core', label: 'JS Core & Tools', tracks: ['js-language', 'js-utilities', 'testing-tooling'] },
   { id: 'node', label: 'Node.js', tracks: ['node'] },
+  { id: 'graphql', label: 'GraphQL', tracks: ['graphql', 'graphql-server'] },
   { id: 'sql-postgres', label: 'PostgreSQL', tracks: ['sql-postgres'] },
 ];
 

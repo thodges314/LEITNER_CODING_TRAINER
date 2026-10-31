@@ -1,0 +1,25 @@
+Write an SDL (Schema Definition Language) schema string defining enums, union types, and structured domain models.
+
+### Requirements
+Define the following definitions in standard GraphQL SDL:
+
+1. `enum TicketStatus`:
+   - Values: `OPEN`, `IN_PROGRESS`, `RESOLVED`, `CLOSED`
+
+2. `type Bug`:
+   - `id`: non-null `ID!`
+   - `title`: non-null `String!`
+   - `severity`: non-null `Int!`
+
+3. `type Feature`:
+   - `id`: non-null `ID!`
+   - `title`: non-null `String!`
+   - `targetRelease`: non-null `String!`
+
+4. `union TaskItem`:
+   - Union of `Bug` and `Feature`: `union TaskItem = Bug | Feature`
+
+5. `type Project`:
+   - `id`: non-null `ID!`
+   - `status`: non-null `TicketStatus!`
+   - `tasks`: non-null list of non-null `[TaskItem!]!`

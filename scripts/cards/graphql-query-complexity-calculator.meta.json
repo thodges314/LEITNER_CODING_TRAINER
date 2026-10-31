@@ -1,5 +1,12 @@
 {
-  "track": "graphql",
+  "track": "graphql-server",
   "title": "GraphQL Query Complexity Cost Calculator",
-  "tags": ["graphql", "security", "dos-protection", "complexity", "recursion", "ast"]
+  "tags": [
+    "graphql",
+    "security",
+    "dos-protection",
+    "complexity",
+    "recursion",
+    "ast"
+  ]
 }

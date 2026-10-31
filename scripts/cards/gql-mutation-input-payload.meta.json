@@ -1,0 +1,11 @@
+{
+  "track": "graphql",
+  "title": "Mutation with Input Object & Result Payload",
+  "tags": [
+    "graphql",
+    "mutation",
+    "input-objects",
+    "payload",
+    "errors"
+  ]
+}
