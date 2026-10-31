@@ -15,7 +15,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
-| Manual Deck Builder & Editor Modal (Topic Accordion, Tri-state Category Selection, Seen/Unseen Color Coding) | Antigravity | feat/custom-deck-builder-accordion | In progress |
+
 
 
 
