@@ -1106,5 +1106,10 @@
   "combobox-autocomplete-a11y": {
     "difficulty": 5,
     "concept": "a11y-components"
+  },
+  "graphql-mini-client": {
+    "difficulty": 1,
+    "concept": "graphql-client"
   }
 }
+

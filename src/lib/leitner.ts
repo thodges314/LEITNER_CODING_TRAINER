@@ -14,7 +14,8 @@ export type TrackType =
   | 'react'
   | 'react-components'
   | 'typescript-patterns'
-  | 'testing-tooling';
+  | 'testing-tooling'
+  | 'graphql';
 
 export interface TestCaseItem {
   input: string;
@@ -215,6 +216,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#a855f7',
     bg: 'rgba(168, 85, 247, 0.12)',
     border: 'rgba(168, 85, 247, 0.35)',
+  },
+  'graphql': {
+    label: 'GraphQL',
+    color: '#e535ab',
+    bg: 'rgba(229, 53, 171, 0.12)',
+    border: 'rgba(229, 53, 171, 0.35)',
   },
 };
 

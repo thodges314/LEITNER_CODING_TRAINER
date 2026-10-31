@@ -1,0 +1,29 @@
+Write a lightweight GraphQL client request utility using native `fetch`:
+
+## Description
+
+```ts
+interface GraphQLResponse<T = any> {
+  data?: T;
+  errors?: Array<{
+    message: string;
+    locations?: Array<{ line: number; column: number }>;
+    path?: Array<string | number>;
+  }>;
+}
+```
+
+### `fetchGraphQL<T = any>(endpoint: string, query: string, variables?: Record<string, any>, headers?: Record<string, string>): Promise<T>`
+
+- **HTTP Request**:
+  - Sends a `POST` request to `endpoint` via `fetch(endpoint, init)`.
+  - Sets `'Content-Type': 'application/json'` in the request headers, merging in any custom `headers` passed to the function.
+  - JSON-serializes `{ query, variables }` into the request body.
+- **HTTP Error Handling**:
+  - Inspects `response.ok`. If `response.ok` is false, throws an `Error` whose message includes the HTTP status code (e.g. `500`).
+- **GraphQL Error Handling**:
+  - Parses the response JSON as a `GraphQLResponse<T>`.
+  - If the response payload contains a non-empty `errors` array (`errors.length > 0`), throws an `Error` containing the first error's `message`.
+- **Success & Network Failure**:
+  - When successful and without errors, resolves with `data` (cast to `T`).
+  - Network rejections from `fetch` itself must propagate directly without being swallowed.

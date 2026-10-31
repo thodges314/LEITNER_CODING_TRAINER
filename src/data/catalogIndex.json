@@ -3782,5 +3782,20 @@
       "workflow"
     ],
     "summary": "Build an interactive multi-column Kanban board for tracking tasks across workflow stages."
+  },
+  {
+    "id": "graphql-mini-client",
+    "title": "GraphQL Client: Fetch with Error Handling",
+    "track": "graphql",
+    "concept": "graphql-client",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "client",
+      "fetch",
+      "network",
+      "async"
+    ],
+    "summary": "Write a lightweight GraphQL client request utility using native fetch"
   }
 ]
