@@ -20,6 +20,7 @@ import {
   detectCurriculumGaps,
   buildDossierSynthesisPrompt,
   parseDossierSynthesisResponse,
+  calibrateCardPriorities,
   type CatalogIndexEntry,
   type InterviewPrepRequest,
   type InterviewPrepDossier,
@@ -193,7 +194,7 @@ Hope this helps!`;
       expect(dossier.deckName).toContain('Airbnb');
       expect(dossier.selectedCards.length).toBeGreaterThan(0);
       expect(dossier.externalTopics.length).toBeGreaterThan(0);
-      expect(dossier.countdownChecklist.length).toBeGreaterThan(0);
+      expect(dossier.interactiveTools.length).toBeGreaterThan(0);
     });
   });
 
@@ -706,6 +707,23 @@ Screening notes:
         const webrtcTopic = dossier.externalTopics.find((t) => t.topic.includes('WebRTC'));
         expect(webrtcTopic).toBeDefined();
         expect(webrtcTopic?.priority).toBe('high');
+      });
+
+      it('calibrates cards into tiered priorities when model over-assigns must-know', () => {
+        const allMustKnow = Array.from({ length: 18 }, (_, i) => ({
+          id: `card-${i}`,
+          priority: 'must-know' as const,
+          rationale: `Rationale for card ${i}`,
+        }));
+
+        const calibrated = calibrateCardPriorities(allMustKnow);
+        const mustKnows = calibrated.filter((c) => c.priority === 'must-know');
+        const recommended = calibrated.filter((c) => c.priority === 'recommended');
+        const optional = calibrated.filter((c) => c.priority === 'optional');
+
+        expect(mustKnows.length).toBe(5);
+        expect(recommended.length).toBe(9);
+        expect(optional.length).toBe(4);
       });
     });
   });

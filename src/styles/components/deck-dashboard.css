@@ -2034,6 +2034,20 @@
 
 .ai-prep-spinner {
   color: #c084fc;
+  animation: aiPrepSpin 1s linear infinite;
+}
+
+@keyframes aiPrepSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: aiPrepSpin 1s linear infinite;
 }
 
 .ai-prep-loading-title {
@@ -2433,73 +2447,7 @@
 }
 
 /* Countdown Checklist */
-.countdown-checklist-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 4px;
-}
 
-.countdown-checklist-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-@media (max-width: 768px) {
-  .countdown-checklist-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.countdown-checklist-card {
-  padding: 10px 14px;
-  border-radius: 6px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  transition: all 0.12s ease;
-}
-
-.countdown-checklist-card:hover {
-  border-color: rgba(168, 85, 247, 0.4);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.checklist-card-num-badge {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(168, 85, 247, 0.18);
-  border: 1px solid rgba(168, 85, 247, 0.35);
-  color: #c084fc;
-  font-size: 11px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.checklist-card-content {
-  flex: 1;
-  min-width: 0;
-}
-
-.checklist-card-text {
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.45;
-}
-
-.checklist-item-text {
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--text-primary);
-}
 
 .ai-prep-review-footer {
   display: flex;

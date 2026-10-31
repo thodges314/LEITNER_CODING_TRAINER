@@ -35,6 +35,7 @@ import {
   deleteInterviewDossier,
   clearAllInterviewDossiers,
   continueInterviewDialogue,
+  calibrateCardPriorities,
   type CatalogIndexEntry,
   type InterviewPrepDossier,
   type CardPriority,
@@ -48,7 +49,7 @@ import {
   setStoredModel,
   type AIProvider,
 } from '../../lib/ai';
-import { printInterviewDossier, downloadDossierHtml } from '../../lib/printDossier';
+import { printInterviewDossier } from '../../lib/printDossier';
 
 const catalogIndex = catalogIndexData as CatalogIndexEntry[];
 
@@ -330,12 +331,14 @@ const ModelRecommendationBanner: React.FC<{
 
 function ensureDossierChatOpener(d: InterviewPrepDossier | null): InterviewPrepDossier | null {
   if (!d) return null;
+  const calibratedCards = calibrateCardPriorities(d.selectedCards);
   const initialPromptNote = `Ask questions about this company's interview loop, request curriculum adjustments (e.g. "trim deck to 12 cards", "add more state machine problems"), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.`;
   const desiredOpener = `${d.executiveSummary}\n\n${initialPromptNote}`;
 
   if (!d.conversation || d.conversation.length === 0) {
     return {
       ...d,
+      selectedCards: calibratedCards,
       conversation: [
         {
           id: `msg_init_${d.generatedAt || Date.now()}`,
@@ -353,10 +356,10 @@ function ensureDossierChatOpener(d: InterviewPrepDossier | null): InterviewPrepD
       ...updated[0],
       content: desiredOpener,
     };
-    return { ...d, conversation: updated };
+    return { ...d, selectedCards: calibratedCards, conversation: updated };
   }
 
-  return d;
+  return { ...d, selectedCards: calibratedCards };
 }
 
 const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
@@ -631,11 +634,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     printInterviewDossier(dossier, catalogIndex);
   };
 
-  const handleDownloadHtml = () => {
-    if (!dossier) return;
-    downloadDossierHtml(dossier, catalogIndex);
-  };
-
   const handleDownloadJson = () => {
     if (!dossier) return;
     const jsonString = JSON.stringify(dossier, null, 2);
@@ -836,7 +834,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     `Analyzing interview archetypes for ${company || 'your target company'}...`,
     'Screening 312 curated cards across 13 engineering domains...',
     'Calibrating against your candidate weakness profile...',
-    'Synthesizing tailored executive study dossier & checklist...',
+    'Synthesizing tailored executive study dossier & curriculum...',
   ];
 
   return (
@@ -964,11 +962,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     type="button"
                     className="ai-prep-history-btn"
                     onClick={handleTriggerImport}
-                    title="Import a saved interview dossier (.json)"
+                    title="Restore a saved interview dossier (.json)"
                     data-testid="ai-prep-import-json-header-btn"
                   >
                     <Upload size={13} />
-                    <span>Import Briefing</span>
+                    <span>Restore Backup (.json)</span>
                   </button>
                 )}
 
@@ -1372,7 +1370,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   data-testid="ai-prep-tab-tools"
                 >
                   <CheckCircle size={14} />
-                  <span>Interactive Drills & Checklist</span>
+                  <span>Interactive Practice Playgrounds</span>
                 </button>
               </div>
 
@@ -1528,24 +1526,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                       ))}
                     </div>
                   </div>
-
-                  {dossier.countdownChecklist && dossier.countdownChecklist.length > 0 && (
-                    <div className="countdown-checklist-section">
-                      <h4 className="section-title">Final 24-Hour Countdown & Interview Day Protocol</h4>
-                      <div className="countdown-checklist-grid">
-                        {dossier.countdownChecklist.map((item, idx) => (
-                          <div key={idx} className="countdown-checklist-card">
-                            <div className="checklist-card-num-badge">
-                              {idx + 1}
-                            </div>
-                            <div className="checklist-card-content">
-                              <span className="checklist-card-text">{item}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -1646,46 +1626,24 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
                   <button
                     type="button"
-                    className="btn btn-secondary ai-prep-delete-dossier-btn"
-                    onClick={handleDeleteCurrentDossier}
-                    title="Delete this interview briefing and start fresh"
-                    data-testid="ai-prep-delete-dossier-footer-btn"
-                  >
-                    <Trash2 size={14} />
-                    <span>Delete Dossier</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-secondary ai-prep-download-html-btn"
-                    onClick={handleDownloadHtml}
-                    title="Download standalone HTML dossier for offline reading or manual archiving"
-                    data-testid="ai-prep-download-html-btn"
-                  >
-                    <Download size={14} />
-                    <span>Download HTML</span>
-                  </button>
-
-                  <button
-                    type="button"
                     className="btn btn-secondary ai-prep-download-json-btn"
                     onClick={handleDownloadJson}
-                    title="Download / Export raw JSON backup of this dossier"
+                    title="Export raw JSON backup file of this dossier"
                     data-testid="ai-prep-download-json-btn"
                   >
                     <Download size={14} />
-                    <span>Export Dossier</span>
+                    <span>Backup Dossier (.json)</span>
                   </button>
 
                   <button
                     type="button"
                     className="btn btn-secondary ai-prep-import-json-btn"
                     onClick={handleTriggerImport}
-                    title="Import an interview dossier JSON file"
+                    title="Restore an interview dossier from JSON backup file"
                     data-testid="ai-prep-import-json-footer-btn"
                   >
                     <Upload size={14} />
-                    <span>Import Dossier</span>
+                    <span>Restore Backup (.json)</span>
                   </button>
 
                   {/* <button

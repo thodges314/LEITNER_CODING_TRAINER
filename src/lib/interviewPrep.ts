@@ -58,7 +58,7 @@ export interface InterviewPrepDossier {
   selectedCards: InterviewPrepCardSelection[];
   externalTopics: ExternalStudyTopic[];
   interactiveTools: InteractiveToolRecommendation[];
-  countdownChecklist: string[];
+  countdownChecklist?: string[];
   generatedAt: number;
   conversation?: DossierMessage[];
 }
@@ -392,7 +392,7 @@ export function parseInterviewPrepResponse(
     selectedCards,
     externalTopics: externalTopics.length > 0 ? externalTopics : getDefaultExternalTopics(),
     interactiveTools: interactiveTools.length > 0 ? interactiveTools : getDefaultInteractiveTools(),
-    countdownChecklist: countdownChecklist.length > 0 ? countdownChecklist : getDefaultChecklist(),
+    countdownChecklist: countdownChecklist.length > 0 ? countdownChecklist : undefined,
     generatedAt: Date.now(),
     conversation: [initialMessage],
   };
@@ -959,15 +959,14 @@ export function buildDossierSynthesisPrompt(
 CRITICAL RULES:
 1. ONLY reference and use the pre-filtered card IDs listed below. DO NOT invent or hallucinate any card IDs.
 2. For each card in the provided list, refine its priority ("must-know" | "recommended" | "optional") and provide a crisp 1-sentence rationale tying it directly to ${request.company || 'the target company'}'s interview rounds. If a card was directly matched to a reported question, retain "must-know" priority.
-   - PRIORITY BALANCE: Distribute priorities realistically: allocate ~25-35% as "must-know" (core screening blockers & exact question matches), ~45-55% as "recommended" (high-yield secondary patterns), and ~15-20% as "optional" (stretch drills). DO NOT mark every card as "must-know".
+   - STRICT PRIORITY DISTRIBUTION: Assign a tiered distribution across the cards: allocate ~25-35% as "must-know" (top core screening blockers & exact question matches), ~45-55% as "recommended" (high-yield architecture & secondary patterns), and ~15-20% as "optional" (stretch drills). NEVER mark all cards as "must-know".
 3. Write a comprehensive, multi-paragraph strategic executive summary (3 to 4 paragraphs):
    - Paragraph 1: Target Company Engineering Archetype & Culture (what this company tests, engineering values, interview format).
    - Paragraph 2: Candidate Risk Calibration (mapping candidate weaknesses & setbacks against the interview rubric).
    - Paragraph 3: Topics Not Covered by Flashcards (Gap Analysis): highlight system design, microfrontends, real-time streaming, WebRTC, performance profiling, and behavioral rounds.
    - Paragraph 4: Recommended External Resources to bridge those gaps.
 4. Refine the external topics and interactive learning tools provided.
-5. Provide a 3-5 item countdown checklist for the final 24-48 hours.
-6. Return ONLY valid JSON adhering strictly to the schema below. No conversational text outside JSON.`;
+5. Return ONLY valid JSON adhering strictly to the schema below. No conversational text outside JSON.`;
 
   const cardsSummary = preFilteredCards
     .map((c) => {
@@ -1002,9 +1001,19 @@ Respond with a JSON object in this exact schema:
   "executiveSummary": "Comprehensive multi-paragraph strategic interview briefing...",
   "selectedCards": [
     {
-      "id": "card-id-from-above-list",
+      "id": "first-card-id-from-above-list",
       "priority": "must-know",
-      "rationale": "Direct rationale"
+      "rationale": "Direct match for core screening requirement"
+    },
+    {
+      "id": "second-card-id-from-above-list",
+      "priority": "recommended",
+      "rationale": "High-yield secondary architectural pattern"
+    },
+    {
+      "id": "third-card-id-from-above-list",
+      "priority": "optional",
+      "rationale": "Valuable supplementary drill for edge cases"
     }
   ],
   "externalTopics": [
@@ -1023,9 +1032,6 @@ Respond with a JSON object in this exact schema:
       "url": "https://...",
       "focus": "Focus description"
     }
-  ],
-  "countdownChecklist": [
-    "Checklist item 1"
   ]
 }`;
 
@@ -1095,26 +1101,8 @@ export function parseDossierSynthesisResponse(
     }
   }
 
-  // Calibrate priorities if model over-assigned must-know to almost all cards
-  const mustKnowCount = selectedCards.filter((c) => c.priority === 'must-know').length;
-  const maxAllowedMustKnow = Math.max(3, Math.ceil(selectedCards.length * 0.4));
-  if (mustKnowCount > maxAllowedMustKnow && selectedCards.length > 3) {
-    let keptMustKnow = 0;
-    const recommendedCutoff = Math.ceil(selectedCards.length * 0.8);
-    for (let i = 0; i < selectedCards.length; i++) {
-      const card = selectedCards[i];
-      const isExactQuestionMatch = /direct match for interview question/i.test(card.rationale);
-      const isBox1Setback = /recent leitner box 1 setback/i.test(card.rationale);
-      if (isExactQuestionMatch || isBox1Setback || keptMustKnow < maxAllowedMustKnow) {
-        card.priority = 'must-know';
-        keptMustKnow++;
-      } else if (i < recommendedCutoff) {
-        card.priority = 'recommended';
-      } else {
-        card.priority = 'optional';
-      }
-    }
-  }
+  // Calibrate priorities to ensure balanced distribution
+  const calibratedCards = calibrateCardPriorities(selectedCards);
 
   // Parse external topics
   const externalTopics: ExternalStudyTopic[] = [];
@@ -1167,16 +1155,6 @@ export function parseDossierSynthesisResponse(
     }
   }
 
-  // Parse countdown checklist
-  const countdownChecklist: string[] = [];
-  if (Array.isArray(parsed.countdownChecklist)) {
-    for (const item of parsed.countdownChecklist) {
-      if (typeof item === 'string' && item.trim()) {
-        countdownChecklist.push(item.trim());
-      }
-    }
-  }
-
   const dossierId = `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
   const initialPromptNote = `Ask questions about this company's interview loop, request curriculum adjustments (e.g. "trim deck to 12 cards", "add more state machine problems"), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.`;
   const initialMessage: DossierMessage = {
@@ -1194,10 +1172,9 @@ export function parseDossierSynthesisResponse(
     deckName,
     deckDescription,
     executiveSummary,
-    selectedCards,
+    selectedCards: calibratedCards,
     externalTopics: externalTopics.length > 0 ? externalTopics : getDefaultExternalTopics(),
     interactiveTools: interactiveTools.length > 0 ? interactiveTools : getDefaultInteractiveTools(),
-    countdownChecklist: countdownChecklist.length > 0 ? countdownChecklist : getDefaultChecklist(),
     generatedAt: Date.now(),
     conversation: [initialMessage],
   };
@@ -1391,10 +1368,9 @@ export function generateHeuristicDossier(
     deckName: `${company} — ${role} Core`,
     deckDescription: `Curated ${matchResult.selectedCards.length}-card curriculum for ${company} technical interviews`,
     executiveSummary,
-    selectedCards: matchResult.selectedCards,
+    selectedCards: calibrateCardPriorities(matchResult.selectedCards),
     externalTopics: externalTopics.length > 0 ? externalTopics : getDefaultExternalTopics(),
     interactiveTools: getDefaultInteractiveTools(),
-    countdownChecklist: getDefaultChecklist(),
     generatedAt: Date.now(),
     conversation: [initialMessage],
   };
@@ -1438,13 +1414,33 @@ export function getDefaultInteractiveTools(): InteractiveToolRecommendation[] {
   ];
 }
 
-export function getDefaultChecklist(): string[] {
-  return [
-    '24 Hours Out: Complete a timed review of all Box 1 and setback cards in the trainer',
-    'Interview Environment: Test webcam, microphone, screen sharing, and Node environment in CoderPad/CodeSandbox',
-    'First 5 Minutes: Clarify requirements, expected input/output ranges, scale, and constraints before typing',
-    'During Coding: State your time and space complexity upfront and verify edge cases explicitly',
-  ];
+export function calibrateCardPriorities(
+  cards: InterviewPrepCardSelection[]
+): InterviewPrepCardSelection[] {
+  if (!cards || cards.length === 0) return cards;
+  const mustKnowCount = cards.filter((c) => c.priority === 'must-know').length;
+  const targetMustKnow = Math.max(2, Math.floor(cards.length * 0.28));
+  const targetRecommended = Math.max(targetMustKnow + 2, Math.floor(cards.length * 0.78));
+
+  if (mustKnowCount > targetMustKnow) {
+    let assignedMustKnow = 0;
+    return cards.map((card, idx) => {
+      const isExactQuestionMatch = /direct match for interview question/i.test(card.rationale);
+      const isBox1Setback = /recent leitner box 1 setback/i.test(card.rationale);
+
+      let priority: CardPriority;
+      if ((isExactQuestionMatch || isBox1Setback || assignedMustKnow < targetMustKnow) && assignedMustKnow < targetMustKnow + 1) {
+        priority = 'must-know';
+        assignedMustKnow++;
+      } else if (idx < targetRecommended) {
+        priority = 'recommended';
+      } else {
+        priority = 'optional';
+      }
+      return { ...card, priority };
+    });
+  }
+  return cards;
 }
 
 /**
@@ -1496,7 +1492,7 @@ export async function generateInterviewPrepDossier(
     const externalTopics = detectCurriculumGaps(extraction, matchResult.unmatchedQuestions);
 
     // Step 4: Strategic Synthesis Call
-    options?.onProgress?.('synthesizing', 'Synthesizing strategic briefing & countdown checklist...');
+    options?.onProgress?.('synthesizing', 'Synthesizing strategic briefing & curriculum...');
     let dossier: InterviewPrepDossier;
     try {
       const synthesisPrompt = buildDossierSynthesisPrompt(
