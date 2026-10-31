@@ -13,11 +13,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 - Authoring pitfalls for Suspense / transitions / `use()` harnesses are in the roadmap, section 8. Read them before writing React 19 cards.
 
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
-| PostgreSQL PGlite WASM Track & Pilot Cards | Thomas / Assistant | feature/postgresql-pglite-track | merged to feature branch |
-| GraphQL Track Split & Query Operations Rework | Thomas / Assistant | feature/graphql-tracks-rework | completed |
-| Multi-Step AI Dossier & Exact-Match Pipeline | Thomas / Assistant | feature/ai-dossier-pipeline | completed |
-| PostgreSQL Track Curriculum Expansion (6 to 15 cards) | Thomas / Assistant | feature/sql-postgres-expansion | completed |
-| Web Worker Sandbox Runner & UI Freeze Prevention | Thomas / Assistant | feature/web-worker-sandbox | completed |
+| *(no active claims — all merged to master)* | | | |
 
 
 
