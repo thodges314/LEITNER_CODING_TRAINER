@@ -1118,5 +1118,17 @@
   "node-cli-argv-parser": {
     "difficulty": 1,
     "concept": "cli-tooling"
+  },
+  "node-buffer-tlv-codec": {
+    "difficulty": 2,
+    "concept": "buffers-binary"
+  },
+  "node-querystring-parser": {
+    "difficulty": 2,
+    "concept": "url-query"
+  },
+  "node-env-parser-expander": {
+    "difficulty": 2,
+    "concept": "configuration"
   }
 }

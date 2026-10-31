@@ -3824,5 +3824,50 @@
       "filesystem"
     ],
     "summary": "Implement path resolution and directory traversal defense for server-side file handling"
+  },
+  {
+    "id": "node-buffer-tlv-codec",
+    "title": "Buffer TLV Codec",
+    "track": "node",
+    "concept": "buffers-binary",
+    "difficulty": 2,
+    "tags": [
+      "node",
+      "buffer",
+      "binary",
+      "encoding",
+      "network"
+    ],
+    "summary": "Binary protocols (such as DNS, TLS, WebSocket extensions, and IPC framing) frequently organize arbitrary payload records into Type-Length-Value (TL..."
+  },
+  {
+    "id": "node-env-parser-expander",
+    "title": "Dotenv Parser & Variable Expander",
+    "track": "node",
+    "concept": "configuration",
+    "difficulty": 2,
+    "tags": [
+      "node",
+      "env",
+      "configuration",
+      "parser",
+      "interpolation"
+    ],
+    "summary": "Environment configuration files (.env) are standard across Node.js applications. Libraries like dotenv and dotenv-expand parse key-value lines and ..."
+  },
+  {
+    "id": "node-querystring-parser",
+    "title": "Querystring Parser & Stringifier",
+    "track": "node",
+    "concept": "url-query",
+    "difficulty": 2,
+    "tags": [
+      "node",
+      "url",
+      "querystring",
+      "parser",
+      "encoding"
+    ],
+    "summary": "Node.js provides the legacy yet ubiquitous querystring core module (querystring.parse and querystring.stringify), which differs from URLSearchParam..."
   }
 ]

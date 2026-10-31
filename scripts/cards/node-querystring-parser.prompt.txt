@@ -1,0 +1,46 @@
+## Description
+Node.js provides the legacy yet ubiquitous `querystring` core module (`querystring.parse` and `querystring.stringify`), which differs from `URLSearchParams` by supporting custom delimiters, handling duplicate keys as arrays, and converting non-standard inputs.
+
+Implement two functions `parseQuery` and `stringifyQuery` that serialize and deserialize URL query strings.
+
+```ts
+type ParsedQueryValue = string | string[];
+type ParsedQuery = Record<string, ParsedQueryValue>;
+type QueryInput = Record<string, unknown>;
+```
+
+### `parseQuery(str: string, sep?: string, eq?: string): ParsedQuery`
+Deserializes a query string into a key-value object:
+- `sep` defaults to `'&'`.
+- `eq` defaults to `'='`.
+- Strips an optional leading `'?'` (e.g. from `window.location.search` or `req.url`).
+- Splits by `sep` into key-value pairs:
+  - If `eq` is present in a pair, the text before the first `eq` is the key, and the rest is the value.
+  - If `eq` is omitted, the key is the full pair and the value is `""`.
+- Keys and values are percent-decoded (`decodeURIComponent`), treating `+` as space `' '`. If decoding fails on malformed sequences, retains the raw unescaped string.
+- If a key appears multiple times, aggregates its values into an array of strings in order of occurrence.
+- Returns `{}` for empty, null, or non-string inputs.
+
+### `stringifyQuery(obj: QueryInput, sep?: string, eq?: string): string`
+Serializes an object into a query string:
+- `sep` defaults to `'&'`.
+- `eq` defaults to `'='`.
+- For each own enumerable key in `obj`:
+  - Ignores values that are `undefined`, `null`, or functions.
+  - If a value is an array, serializes each non-nullish element as `key=val` joined by `sep`.
+  - Non-string primitives (numbers, booleans) are converted to string.
+  - Both keys and values are encoded with `encodeURIComponent`.
+- Returns `""` for empty, null, or non-object inputs.
+
+## Examples
+```js
+parseQuery("search=node+js&tag=async&tag=streams&limit=10");
+// => { search: "node js", tag: ["async", "streams"], limit: "10" }
+
+stringifyQuery({ page: 2, sort: ["asc", "desc"], filter: null });
+// => "page=2&sort=asc&sort=desc"
+
+// Custom delimiters
+parseQuery("a:1;b:2;b:3", ";", ":");
+// => { a: "1", b: ["2", "3"] }
+```

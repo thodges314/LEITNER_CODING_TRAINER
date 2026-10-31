@@ -158,6 +158,20 @@ const SANDBOX_GLOBALS = `
   interface FormData { [key: string]: any; }
   declare var URL: any;
   interface URL { [key: string]: any; }
+  interface TextEncoder {
+    readonly encoding: string;
+    encode(input?: string): Uint8Array;
+    encodeInto(source: string, destination: Uint8Array): { read: number; written: number };
+  }
+  declare var TextEncoder: { new (): TextEncoder; prototype: TextEncoder };
+  interface TextDecoder {
+    readonly encoding: string;
+    readonly fatal: boolean;
+    readonly ignoreBOM: boolean;
+    decode(input?: any, options?: { stream?: boolean }): string;
+  }
+  declare var TextDecoder: { new (label?: string, options?: { fatal?: boolean; ignoreBOM?: boolean }): TextDecoder; prototype: TextDecoder };
+  declare var Buffer: any;
   declare var Event: any;
   interface Event { [key: string]: any; }
   declare var CustomEvent: any;

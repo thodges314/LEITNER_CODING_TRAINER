@@ -1,0 +1,43 @@
+## Description
+Binary protocols (such as DNS, TLS, WebSocket extensions, and IPC framing) frequently organize arbitrary payload records into Type-Length-Value (TLV) packets. Each packet encodes an 8-bit numeric tag, a 16-bit big-endian payload length, followed by the variable-length raw byte payload.
+
+Implement two functions `encodeTLV` and `decodeTLV` to serialize and deserialize an array of TLV packets to and from raw binary byte buffers (`Uint8Array`).
+
+```ts
+interface TLVPacket {
+  type: number;   // 1-byte unsigned integer (0 - 255)
+  value: string;  // UTF-8 string payload
+}
+```
+
+### `encodeTLV(packets: TLVPacket[]): Uint8Array`
+Serializes an array of packets into a contiguous byte buffer:
+- Each packet consists of:
+  - 1 byte `type`: 8-bit unsigned integer (UInt8).
+  - 2 bytes `length`: 16-bit big-endian unsigned integer (UInt16BE) representing the byte length of the UTF-8 encoded string `value`.
+  - `length` bytes `value`: The UTF-8 encoded payload bytes.
+- Total byte size of the returned buffer equals `sum(3 + byteLength(packet.value))` for all packets.
+- An empty packets array returns a `Uint8Array` of length 0.
+
+### `decodeTLV(buffer: Uint8Array): TLVPacket[]`
+Parses a byte buffer into an array of `TLVPacket` objects:
+- Reads sequentially from offset 0 to `buffer.byteLength`.
+- In each packet:
+  - Reads 1 byte for `type`.
+  - Reads 2 bytes (big-endian) for payload byte length `length`.
+  - Reads `length` bytes and decodes them into a UTF-8 string `value`.
+- Throws an `Error` if the buffer is truncated (e.g. fewer than 3 bytes remaining when reading header, or fewer than `length` bytes remaining when reading payload).
+- Correctly parses empty payloads (`length = 0` yielding `value = ""`).
+
+## Examples
+```js
+const packets = [
+  { type: 1, value: "Node.js" },
+  { type: 2, value: "Streams" }
+];
+
+const buf = encodeTLV(packets);
+// Total length: 3 + 7 bytes ("Node.js") + 3 + 7 bytes ("Streams") = 20 bytes
+decodeTLV(buf);
+// => [{ type: 1, value: "Node.js" }, { type: 2, value: "Streams" }]
+```

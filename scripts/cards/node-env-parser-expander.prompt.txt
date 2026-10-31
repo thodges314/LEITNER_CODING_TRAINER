@@ -1,0 +1,52 @@
+## Description
+Environment configuration files (`.env`) are standard across Node.js applications. Libraries like `dotenv` and `dotenv-expand` parse key-value lines and interpolate variable references across environment variables.
+
+Implement `parseEnv` to parse a `.env` configuration string and expand variable interpolations.
+
+```ts
+type EnvDictionary = Record<string, string>;
+```
+
+### `parseEnv(src: string, baseEnv?: EnvDictionary): EnvDictionary`
+Parses `.env` content into a dictionary of string key-value pairs:
+- `baseEnv` (defaults to `{}`) provides existing environment variables available for expansion.
+- Splits lines by `\r?\n`.
+- Skips empty lines and comment lines (lines where the first non-whitespace character is `#`).
+- Supports optional leading `export ` prefix (e.g. `export PORT=3000` defines key `PORT`).
+- The key is the trimmed string before the first `=` delimiter.
+- Value parsing and quoting:
+  - If enclosed in double quotes `"..."`:
+    - Handles escape sequences: `\n` (newline), `\r` (carriage return), `\t` (tab), `\\` (backslash), `\"` (double quote).
+    - Performs variable expansion on the decoded content.
+  - If enclosed in single quotes `'...'`:
+    - Treated as an unexpanded literal string without escape processing.
+  - If unquoted:
+    - Strips inline comments (` #...`) if preceded by whitespace.
+    - Trims leading and trailing whitespace.
+    - Performs variable expansion.
+- Variable Expansion:
+  - Expands `$NAME`, `${NAME}`, and default fallback syntax `${NAME:-defaultValue}`.
+  - Variable lookups resolve first against variables defined earlier in the current file, then against `baseEnv`, and fallback to the default value if provided or `""`.
+  - Sequential references within the same file resolve progressively (a variable on line 2 can reference a variable defined on line 1).
+- Returns only the dictionary of keys parsed from `src` (does not copy untouched keys from `baseEnv`).
+
+## Examples
+```js
+const src = `
+# Server configuration
+PORT=8080 # default port
+HOST=localhost
+URL="http://$HOST:$PORT/api"
+SECRET='$RAW_TEXT'
+FALLBACK="\${MISSING:-production}"
+`;
+
+parseEnv(src);
+// => {
+//   PORT: "8080",
+//   HOST: "localhost",
+//   URL: "http://localhost:8080/api",
+//   SECRET: "$RAW_TEXT",
+//   FALLBACK: "production"
+// }
+```

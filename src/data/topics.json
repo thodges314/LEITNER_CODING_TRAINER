@@ -16675,5 +16675,177 @@
       }
     ],
     "testHarness": "await $test.run(\"Resolves relative segments to absolute root\", async () => {\n  const sleep = $test.sleep;\n  return (resolvePath(\"a\", \"b\", \"c\"));\n}, () => (\"/a/b/c\"));\n\nawait $test.run(\"Resolves from right-to-left when an absolute path segment is encountered\", async () => {\n  const sleep = $test.sleep;\n  return (resolvePath(\"/var/log\", \"/etc\", \"nginx/nginx.conf\"));\n}, () => (\"/etc/nginx/nginx.conf\"));\n\nawait $test.run(\"Normalizes . and .. parent directory segments and collapses redundant slashes\", async () => {\n  const sleep = $test.sleep;\n  return (resolvePath(\"/app/src/../dist/./bundle//app.js\"));\n}, () => (\"/app/dist/bundle/app.js\"));\n\nawait $test.run(\"isSafePath returns true for valid subpaths and exact match\", async () => {\n  const sleep = $test.sleep;\n  return ([isSafePath(\"/app/uploads\", \"images/photo.png\"), isSafePath(\"/app/uploads\", \"/app/uploads\")]);\n}, () => ([true, true]));\n\nawait $test.run(\"isSafePath returns false for directory traversal escaping root\", async () => {\n  const sleep = $test.sleep;\n  return ([isSafePath(\"/app/uploads\", \"../../etc/passwd\"), isSafePath(\"/app/uploads\", \"../uploads-secret\")]);\n}, () => ([false, false]));\n\nawait $test.run(\"isSafePath prevents prefix collision where another dir shares the name prefix\", async () => {\n  const sleep = $test.sleep;\n  return (isSafePath(\"/app/data\", \"/app/data-secret/file.txt\"));\n}, () => (false));"
+  },
+  {
+    "id": "node-buffer-tlv-codec",
+    "track": "node",
+    "title": "Buffer TLV Codec",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "buffer",
+      "binary",
+      "encoding",
+      "network"
+    ],
+    "promptSeed": "## Description\nBinary protocols (such as DNS, TLS, WebSocket extensions, and IPC framing) frequently organize arbitrary payload records into Type-Length-Value (TLV) packets. Each packet encodes an 8-bit numeric tag, a 16-bit big-endian payload length, followed by the variable-length raw byte payload.\n\nImplement two functions `encodeTLV` and `decodeTLV` to serialize and deserialize an array of TLV packets to and from raw binary byte buffers (`Uint8Array`).\n\n```ts\ninterface TLVPacket {\n  type: number;   // 1-byte unsigned integer (0 - 255)\n  value: string;  // UTF-8 string payload\n}\n```\n\n### `encodeTLV(packets: TLVPacket[]): Uint8Array`\nSerializes an array of packets into a contiguous byte buffer:\n- Each packet consists of:\n  - 1 byte `type`: 8-bit unsigned integer (UInt8).\n  - 2 bytes `length`: 16-bit big-endian unsigned integer (UInt16BE) representing the byte length of the UTF-8 encoded string `value`.\n  - `length` bytes `value`: The UTF-8 encoded payload bytes.\n- Total byte size of the returned buffer equals `sum(3 + byteLength(packet.value))` for all packets.\n- An empty packets array returns a `Uint8Array` of length 0.\n\n### `decodeTLV(buffer: Uint8Array): TLVPacket[]`\nParses a byte buffer into an array of `TLVPacket` objects:\n- Reads sequentially from offset 0 to `buffer.byteLength`.\n- In each packet:\n  - Reads 1 byte for `type`.\n  - Reads 2 bytes (big-endian) for payload byte length `length`.\n  - Reads `length` bytes and decodes them into a UTF-8 string `value`.\n- Throws an `Error` if the buffer is truncated (e.g. fewer than 3 bytes remaining when reading header, or fewer than `length` bytes remaining when reading payload).\n- Correctly parses empty payloads (`length = 0` yielding `value = \"\"`).\n\n## Examples\n```js\nconst packets = [\n  { type: 1, value: \"Node.js\" },\n  { type: 2, value: \"Streams\" }\n];\n\nconst buf = encodeTLV(packets);\n// Total length: 3 + 7 bytes (\"Node.js\") + 3 + 7 bytes (\"Streams\") = 20 bytes\ndecodeTLV(buf);\n// => [{ type: 1, value: \"Node.js\" }, { type: 2, value: \"Streams\" }]\n```",
+    "difficulty": 2,
+    "concept": "buffers-binary",
+    "referenceSolution": "function encodeTLV(packets) {\n  const encoder = new TextEncoder();\n  const encoded = packets.map((p) => ({\n    type: p.type,\n    bytes: encoder.encode(p.value || ''),\n  }));\n\n  const totalLength = encoded.reduce((sum, p) => sum + 3 + p.bytes.length, 0);\n  const out = new Uint8Array(totalLength);\n  const view = new DataView(out.buffer, out.byteOffset, out.byteLength);\n\n  let offset = 0;\n  for (const { type, bytes } of encoded) {\n    out[offset++] = type;\n    view.setUint16(offset, bytes.length, false);\n    offset += 2;\n    out.set(bytes, offset);\n    offset += bytes.length;\n  }\n\n  return out;\n}\n\nfunction decodeTLV(buffer) {\n  const decoder = new TextDecoder();\n  const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);\n  const packets = [];\n  let offset = 0;\n\n  while (offset < buffer.byteLength) {\n    if (offset + 3 > buffer.byteLength) {\n      throw new Error('Truncated TLV header');\n    }\n    const type = buffer[offset++];\n    const length = view.getUint16(offset, false);\n    offset += 2;\n\n    if (offset + length > buffer.byteLength) {\n      throw new Error('Truncated TLV payload');\n    }\n\n    const slice = buffer.subarray(offset, offset + length);\n    packets.push({ type, value: decoder.decode(slice) });\n    offset += length;\n  }\n\n  return packets;\n}",
+    "referenceSolutionTs": "interface TLVPacket {\n  type: number;\n  value: string;\n}\n\nfunction encodeTLV(packets: TLVPacket[]): Uint8Array {\n  const encoder = new TextEncoder();\n  const encoded = packets.map((p) => ({\n    type: p.type,\n    bytes: encoder.encode(p.value || ''),\n  }));\n\n  const totalLength = encoded.reduce((sum, p) => sum + 3 + p.bytes.length, 0);\n  const out = new Uint8Array(totalLength);\n  const view = new DataView(out.buffer, out.byteOffset, out.byteLength);\n\n  let offset = 0;\n  for (const { type, bytes } of encoded) {\n    out[offset++] = type;\n    view.setUint16(offset, bytes.length, false);\n    offset += 2;\n    out.set(bytes, offset);\n    offset += bytes.length;\n  }\n\n  return out;\n}\n\nfunction decodeTLV(buffer: Uint8Array): TLVPacket[] {\n  const decoder = new TextDecoder();\n  const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);\n  const packets: TLVPacket[] = [];\n  let offset = 0;\n\n  while (offset < buffer.byteLength) {\n    if (offset + 3 > buffer.byteLength) {\n      throw new Error('Truncated TLV header');\n    }\n    const type = buffer[offset++];\n    const length = view.getUint16(offset, false);\n    offset += 2;\n\n    if (offset + length > buffer.byteLength) {\n      throw new Error('Truncated TLV payload');\n    }\n\n    const slice = buffer.subarray(offset, offset + length);\n    packets.push({ type, value: decoder.decode(slice) });\n    offset += length;\n  }\n\n  return packets;\n}",
+    "testCases": [
+      {
+        "description": "Encodes and decodes a single TLV packet",
+        "input": "const packets = [{ type: 1, value: \"Node.js\" }];\nconst buf = encodeTLV(packets);\ndecodeTLV(buf)",
+        "expected": "[{ type: 1, value: \"Node.js\" }]"
+      },
+      {
+        "description": "Encodes and decodes multiple packets preserving order and lengths",
+        "input": "const packets = [{ type: 10, value: \"alpha\" }, { type: 20, value: \"beta\" }, { type: 30, value: \"gamma\" }];\nconst buf = encodeTLV(packets);\ndecodeTLV(buf)",
+        "expected": "[{ type: 10, value: \"alpha\" }, { type: 20, value: \"beta\" }, { type: 30, value: \"gamma\" }]"
+      },
+      {
+        "description": "Handles packets with empty payload value",
+        "input": "const packets = [{ type: 42, value: \"\" }];\nconst buf = encodeTLV(packets);\n[buf.byteLength, decodeTLV(buf)]",
+        "expected": "[3, [{ type: 42, value: \"\" }]]"
+      },
+      {
+        "description": "Encodes and decodes empty packet array to 0-byte buffer",
+        "input": "const buf = encodeTLV([]);\n[buf.byteLength, decodeTLV(buf)]",
+        "expected": "[0, []]"
+      },
+      {
+        "description": "Throws error when decoding truncated header or payload",
+        "input": "let caught = false;\ntry { decodeTLV(new Uint8Array([1, 0])); } catch { caught = true; }\ncaught",
+        "expected": "true"
+      },
+      {
+        "description": "Correctly calculates byte length and decodes multi-byte UTF-8 characters",
+        "input": "const packets = [{ type: 99, value: \"🚀 Node ⚡\" }];\nconst buf = encodeTLV(packets);\ndecodeTLV(buf)[0].value",
+        "expected": "\"🚀 Node ⚡\""
+      }
+    ],
+    "testHarness": "await $test.run(\"Encodes and decodes a single TLV packet\", async () => {\n  const sleep = $test.sleep;\n  const packets = [{ type: 1, value: \"Node.js\" }];\n  const buf = encodeTLV(packets);\n  return (decodeTLV(buf));\n}, () => ([{ type: 1, value: \"Node.js\" }]));\n\nawait $test.run(\"Encodes and decodes multiple packets preserving order and lengths\", async () => {\n  const sleep = $test.sleep;\n  const packets = [{ type: 10, value: \"alpha\" }, { type: 20, value: \"beta\" }, { type: 30, value: \"gamma\" }];\n  const buf = encodeTLV(packets);\n  return (decodeTLV(buf));\n}, () => ([{ type: 10, value: \"alpha\" }, { type: 20, value: \"beta\" }, { type: 30, value: \"gamma\" }]));\n\nawait $test.run(\"Handles packets with empty payload value\", async () => {\n  const sleep = $test.sleep;\n  const packets = [{ type: 42, value: \"\" }];\n  const buf = encodeTLV(packets);\n  return ([buf.byteLength, decodeTLV(buf)]);\n}, () => ([3, [{ type: 42, value: \"\" }]]));\n\nawait $test.run(\"Encodes and decodes empty packet array to 0-byte buffer\", async () => {\n  const sleep = $test.sleep;\n  const buf = encodeTLV([]);\n  return ([buf.byteLength, decodeTLV(buf)]);\n}, () => ([0, []]));\n\nawait $test.run(\"Throws error when decoding truncated header or payload\", async () => {\n  const sleep = $test.sleep;\n  let caught = false;\n  try { decodeTLV(new Uint8Array([1, 0])); } catch { caught = true; }\n  return (caught);\n}, () => (true));\n\nawait $test.run(\"Correctly calculates byte length and decodes multi-byte UTF-8 characters\", async () => {\n  const sleep = $test.sleep;\n  const packets = [{ type: 99, value: \"🚀 Node ⚡\" }];\n  const buf = encodeTLV(packets);\n  return (decodeTLV(buf)[0].value);\n}, () => (\"🚀 Node ⚡\"));"
+  },
+  {
+    "id": "node-env-parser-expander",
+    "track": "node",
+    "title": "Dotenv Parser & Variable Expander",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "env",
+      "configuration",
+      "parser",
+      "interpolation"
+    ],
+    "promptSeed": "## Description\nEnvironment configuration files (`.env`) are standard across Node.js applications. Libraries like `dotenv` and `dotenv-expand` parse key-value lines and interpolate variable references across environment variables.\n\nImplement `parseEnv` to parse a `.env` configuration string and expand variable interpolations.\n\n```ts\ntype EnvDictionary = Record<string, string>;\n```\n\n### `parseEnv(src: string, baseEnv?: EnvDictionary): EnvDictionary`\nParses `.env` content into a dictionary of string key-value pairs:\n- `baseEnv` (defaults to `{}`) provides existing environment variables available for expansion.\n- Splits lines by `\\r?\\n`.\n- Skips empty lines and comment lines (lines where the first non-whitespace character is `#`).\n- Supports optional leading `export ` prefix (e.g. `export PORT=3000` defines key `PORT`).\n- The key is the trimmed string before the first `=` delimiter.\n- Value parsing and quoting:\n  - If enclosed in double quotes `\"...\"`:\n    - Handles escape sequences: `\\n` (newline), `\\r` (carriage return), `\\t` (tab), `\\\\` (backslash), `\\\"` (double quote).\n    - Performs variable expansion on the decoded content.\n  - If enclosed in single quotes `'...'`:\n    - Treated as an unexpanded literal string without escape processing.\n  - If unquoted:\n    - Strips inline comments (` #...`) if preceded by whitespace.\n    - Trims leading and trailing whitespace.\n    - Performs variable expansion.\n- Variable Expansion:\n  - Expands `$NAME`, `${NAME}`, and default fallback syntax `${NAME:-defaultValue}`.\n  - Variable lookups resolve first against variables defined earlier in the current file, then against `baseEnv`, and fallback to the default value if provided or `\"\"`.\n  - Sequential references within the same file resolve progressively (a variable on line 2 can reference a variable defined on line 1).\n- Returns only the dictionary of keys parsed from `src` (does not copy untouched keys from `baseEnv`).\n\n## Examples\n```js\nconst src = `\n# Server configuration\nPORT=8080 # default port\nHOST=localhost\nURL=\"http://$HOST:$PORT/api\"\nSECRET='$RAW_TEXT'\nFALLBACK=\"\\${MISSING:-production}\"\n`;\n\nparseEnv(src);\n// => {\n//   PORT: \"8080\",\n//   HOST: \"localhost\",\n//   URL: \"http://localhost:8080/api\",\n//   SECRET: \"$RAW_TEXT\",\n//   FALLBACK: \"production\"\n// }\n```",
+    "difficulty": 2,
+    "concept": "configuration",
+    "referenceSolution": "function parseEnv(src, baseEnv = {}) {\n  const result = {};\n  const context = { ...baseEnv };\n\n  if (!src || typeof src !== 'string') return result;\n\n  const lines = src.split(/\\r?\\n/);\n\n  function expand(str) {\n    return str.replace(/\\$(\\{([A-Za-z0-9_]+)(?::-([^}]*))?\\}|([A-Za-z0-9_]+))/g, (_, bracketed, varName1, defaultVal, varName2) => {\n      const name = varName1 || varName2;\n      const def = defaultVal !== undefined ? defaultVal : '';\n      if (context[name] !== undefined && context[name] !== '') {\n        return context[name];\n      }\n      return def;\n    });\n  }\n\n  for (let line of lines) {\n    line = line.trim();\n    if (!line || line.startsWith('#')) continue;\n\n    if (line.startsWith('export ')) {\n      line = line.slice(7).trim();\n    }\n\n    const eqIdx = line.indexOf('=');\n    if (eqIdx === -1) continue;\n\n    const rawKey = line.slice(0, eqIdx).trim();\n    let rawVal = line.slice(eqIdx + 1).trim();\n\n    if (!rawKey) continue;\n\n    let finalVal = '';\n    if (rawVal.startsWith('\"') && rawVal.endsWith('\"') && rawVal.length >= 2) {\n      const inner = rawVal.slice(1, -1)\n        .replace(/\\\\n/g, '\\n')\n        .replace(/\\\\r/g, '\\r')\n        .replace(/\\\\t/g, '\\t')\n        .replace(/\\\\\"/g, '\"')\n        .replace(/\\\\\\\\/g, '\\\\');\n      finalVal = expand(inner);\n    } else if (rawVal.startsWith(\"'\") && rawVal.endsWith(\"'\") && rawVal.length >= 2) {\n      finalVal = rawVal.slice(1, -1);\n    } else {\n      const commentIdx = rawVal.indexOf(' #');\n      if (commentIdx !== -1) {\n        rawVal = rawVal.slice(0, commentIdx).trim();\n      }\n      finalVal = expand(rawVal);\n    }\n\n    result[rawKey] = finalVal;\n    context[rawKey] = finalVal;\n  }\n\n  return result;\n}",
+    "referenceSolutionTs": "type EnvDictionary = Record<string, string>;\n\nfunction parseEnv(src: string, baseEnv: EnvDictionary = {}): EnvDictionary {\n  const result: EnvDictionary = {};\n  const context: EnvDictionary = { ...baseEnv };\n\n  if (!src || typeof src !== 'string') return result;\n\n  const lines = src.split(/\\r?\\n/);\n\n  function expand(str: string): string {\n    return str.replace(/\\$(\\{([A-Za-z0-9_]+)(?::-([^}]*))?\\}|([A-Za-z0-9_]+))/g, (_, bracketed, varName1, defaultVal, varName2) => {\n      const name = (varName1 || varName2) as string;\n      const def = defaultVal !== undefined ? (defaultVal as string) : '';\n      if (context[name] !== undefined && context[name] !== '') {\n        return context[name];\n      }\n      return def;\n    });\n  }\n\n  for (let line of lines) {\n    line = line.trim();\n    if (!line || line.startsWith('#')) continue;\n\n    if (line.startsWith('export ')) {\n      line = line.slice(7).trim();\n    }\n\n    const eqIdx = line.indexOf('=');\n    if (eqIdx === -1) continue;\n\n    const rawKey = line.slice(0, eqIdx).trim();\n    let rawVal = line.slice(eqIdx + 1).trim();\n\n    if (!rawKey) continue;\n\n    let finalVal = '';\n    if (rawVal.startsWith('\"') && rawVal.endsWith('\"') && rawVal.length >= 2) {\n      const inner = rawVal.slice(1, -1)\n        .replace(/\\\\n/g, '\\n')\n        .replace(/\\\\r/g, '\\r')\n        .replace(/\\\\t/g, '\\t')\n        .replace(/\\\\\"/g, '\"')\n        .replace(/\\\\\\\\/g, '\\\\');\n      finalVal = expand(inner);\n    } else if (rawVal.startsWith(\"'\") && rawVal.endsWith(\"'\") && rawVal.length >= 2) {\n      finalVal = rawVal.slice(1, -1);\n    } else {\n      const commentIdx = rawVal.indexOf(' #');\n      if (commentIdx !== -1) {\n        rawVal = rawVal.slice(0, commentIdx).trim();\n      }\n      finalVal = expand(rawVal);\n    }\n\n    result[rawKey] = finalVal;\n    context[rawKey] = finalVal;\n  }\n\n  return result;\n}",
+    "testCases": [
+      {
+        "description": "Parses unquoted key-values and ignores comment lines and blank lines",
+        "input": "parseEnv(\"# Config\\nPORT=8080\\nHOST=localhost\\n# end\")",
+        "expected": "{ PORT: \"8080\", HOST: \"localhost\" }"
+      },
+      {
+        "description": "Strips export prefix and ignores inline comments on unquoted values",
+        "input": "parseEnv(\"export API_KEY=secret123 # dev key\\nexport DEBUG=true\")",
+        "expected": "{ API_KEY: \"secret123\", DEBUG: \"true\" }"
+      },
+      {
+        "description": "Unescapes escape sequences and expands variables in double quotes",
+        "input": "parseEnv(\"HOST=127.0.0.1\\nPORT=3000\\nURL=\\\"http://$HOST:$PORT/api\\\"\\nMSG=\\\"line1\\\\nline2\\\"\")",
+        "expected": "{ HOST: \"127.0.0.1\", PORT: \"3000\", URL: \"http://127.0.0.1:3000/api\", MSG: \"line1\\nline2\" }"
+      },
+      {
+        "description": "Preserves literal value without variable expansion in single quotes",
+        "input": "parseEnv(\"USER=alice\\nRAW='$USER-$NOT_EXPANDED'\")",
+        "expected": "{ USER: \"alice\", RAW: \"$USER-$NOT_EXPANDED\" }"
+      },
+      {
+        "description": "Expands variable with fallback default when variable is missing",
+        "input": "parseEnv(\"APP_ENV=${ENV:-production}\\nPORT=${PORT:-8000}\")",
+        "expected": "{ APP_ENV: \"production\", PORT: \"8000\" }"
+      },
+      {
+        "description": "Expands references from provided baseEnv without returning baseEnv keys",
+        "input": "parseEnv(\"GREETING=\\\"Hello, $NAME!\\\"\\nENV=$APP_STAGE\", { NAME: \"World\", APP_STAGE: \"staging\", UNTOUCHED: \"extra\" })",
+        "expected": "{ GREETING: \"Hello, World!\", ENV: \"staging\" }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Parses unquoted key-values and ignores comment lines and blank lines\", async () => {\n  const sleep = $test.sleep;\n  return (parseEnv(\"# Config\\nPORT=8080\\nHOST=localhost\\n# end\"));\n}, () => ({ PORT: \"8080\", HOST: \"localhost\" }));\n\nawait $test.run(\"Strips export prefix and ignores inline comments on unquoted values\", async () => {\n  const sleep = $test.sleep;\n  return (parseEnv(\"export API_KEY=secret123 # dev key\\nexport DEBUG=true\"));\n}, () => ({ API_KEY: \"secret123\", DEBUG: \"true\" }));\n\nawait $test.run(\"Unescapes escape sequences and expands variables in double quotes\", async () => {\n  const sleep = $test.sleep;\n  return (parseEnv(\"HOST=127.0.0.1\\nPORT=3000\\nURL=\\\"http://$HOST:$PORT/api\\\"\\nMSG=\\\"line1\\\\nline2\\\"\"));\n}, () => ({ HOST: \"127.0.0.1\", PORT: \"3000\", URL: \"http://127.0.0.1:3000/api\", MSG: \"line1\\nline2\" }));\n\nawait $test.run(\"Preserves literal value without variable expansion in single quotes\", async () => {\n  const sleep = $test.sleep;\n  return (parseEnv(\"USER=alice\\nRAW='$USER-$NOT_EXPANDED'\"));\n}, () => ({ USER: \"alice\", RAW: \"$USER-$NOT_EXPANDED\" }));\n\nawait $test.run(\"Expands variable with fallback default when variable is missing\", async () => {\n  const sleep = $test.sleep;\n  return (parseEnv(\"APP_ENV=${ENV:-production}\\nPORT=${PORT:-8000}\"));\n}, () => ({ APP_ENV: \"production\", PORT: \"8000\" }));\n\nawait $test.run(\"Expands references from provided baseEnv without returning baseEnv keys\", async () => {\n  const sleep = $test.sleep;\n  return (parseEnv(\"GREETING=\\\"Hello, $NAME!\\\"\\nENV=$APP_STAGE\", { NAME: \"World\", APP_STAGE: \"staging\", UNTOUCHED: \"extra\" }));\n}, () => ({ GREETING: \"Hello, World!\", ENV: \"staging\" }));"
+  },
+  {
+    "id": "node-querystring-parser",
+    "track": "node",
+    "title": "Querystring Parser & Stringifier",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "url",
+      "querystring",
+      "parser",
+      "encoding"
+    ],
+    "promptSeed": "## Description\nNode.js provides the legacy yet ubiquitous `querystring` core module (`querystring.parse` and `querystring.stringify`), which differs from `URLSearchParams` by supporting custom delimiters, handling duplicate keys as arrays, and converting non-standard inputs.\n\nImplement two functions `parseQuery` and `stringifyQuery` that serialize and deserialize URL query strings.\n\n```ts\ntype ParsedQueryValue = string | string[];\ntype ParsedQuery = Record<string, ParsedQueryValue>;\ntype QueryInput = Record<string, unknown>;\n```\n\n### `parseQuery(str: string, sep?: string, eq?: string): ParsedQuery`\nDeserializes a query string into a key-value object:\n- `sep` defaults to `'&'`.\n- `eq` defaults to `'='`.\n- Strips an optional leading `'?'` (e.g. from `window.location.search` or `req.url`).\n- Splits by `sep` into key-value pairs:\n  - If `eq` is present in a pair, the text before the first `eq` is the key, and the rest is the value.\n  - If `eq` is omitted, the key is the full pair and the value is `\"\"`.\n- Keys and values are percent-decoded (`decodeURIComponent`), treating `+` as space `' '`. If decoding fails on malformed sequences, retains the raw unescaped string.\n- If a key appears multiple times, aggregates its values into an array of strings in order of occurrence.\n- Returns `{}` for empty, null, or non-string inputs.\n\n### `stringifyQuery(obj: QueryInput, sep?: string, eq?: string): string`\nSerializes an object into a query string:\n- `sep` defaults to `'&'`.\n- `eq` defaults to `'='`.\n- For each own enumerable key in `obj`:\n  - Ignores values that are `undefined`, `null`, or functions.\n  - If a value is an array, serializes each non-nullish element as `key=val` joined by `sep`.\n  - Non-string primitives (numbers, booleans) are converted to string.\n  - Both keys and values are encoded with `encodeURIComponent`.\n- Returns `\"\"` for empty, null, or non-object inputs.\n\n## Examples\n```js\nparseQuery(\"search=node+js&tag=async&tag=streams&limit=10\");\n// => { search: \"node js\", tag: [\"async\", \"streams\"], limit: \"10\" }\n\nstringifyQuery({ page: 2, sort: [\"asc\", \"desc\"], filter: null });\n// => \"page=2&sort=asc&sort=desc\"\n\n// Custom delimiters\nparseQuery(\"a:1;b:2;b:3\", \";\", \":\");\n// => { a: \"1\", b: [\"2\", \"3\"] }\n```",
+    "difficulty": 2,
+    "concept": "url-query",
+    "referenceSolution": "function decodeSafe(str) {\n  try {\n    return decodeURIComponent(str.replace(/\\+/g, ' '));\n  } catch {\n    return str;\n  }\n}\n\nfunction parseQuery(str, sep = '&', eq = '=') {\n  if (!str || typeof str !== 'string') return {};\n  const cleaned = str.startsWith('?') ? str.slice(1) : str;\n  if (!cleaned) return {};\n\n  const result = {};\n  const pairs = cleaned.split(sep);\n\n  for (const pair of pairs) {\n    if (!pair) continue;\n    const eqIdx = pair.indexOf(eq);\n    let rawKey;\n    let rawVal;\n\n    if (eqIdx !== -1) {\n      rawKey = pair.slice(0, eqIdx);\n      rawVal = pair.slice(eqIdx + eq.length);\n    } else {\n      rawKey = pair;\n      rawVal = '';\n    }\n\n    const key = decodeSafe(rawKey);\n    const val = decodeSafe(rawVal);\n\n    if (Object.prototype.hasOwnProperty.call(result, key)) {\n      if (Array.isArray(result[key])) {\n        result[key].push(val);\n      } else {\n        result[key] = [result[key], val];\n      }\n    } else {\n      result[key] = val;\n    }\n  }\n\n  return result;\n}\n\nfunction stringifyQuery(obj, sep = '&', eq = '=') {\n  if (!obj || typeof obj !== 'object') return '';\n  const parts = [];\n\n  for (const key of Object.keys(obj)) {\n    const val = obj[key];\n    if (val === undefined || val === null || typeof val === 'function') continue;\n\n    const encodedKey = encodeURIComponent(key);\n\n    if (Array.isArray(val)) {\n      for (const item of val) {\n        if (item === undefined || item === null) continue;\n        parts.push(`${encodedKey}${eq}${encodeURIComponent(String(item))}`);\n      }\n    } else {\n      parts.push(`${encodedKey}${eq}${encodeURIComponent(String(val))}`);\n    }\n  }\n\n  return parts.join(sep);\n}",
+    "referenceSolutionTs": "type ParsedQueryValue = string | string[];\ntype ParsedQuery = Record<string, ParsedQueryValue>;\ntype QueryInput = Record<string, unknown>;\n\nfunction decodeSafe(str: string): string {\n  try {\n    return decodeURIComponent(str.replace(/\\+/g, ' '));\n  } catch {\n    return str;\n  }\n}\n\nfunction parseQuery(str: string, sep: string = '&', eq: string = '='): ParsedQuery {\n  if (!str || typeof str !== 'string') return {};\n  const cleaned = str.startsWith('?') ? str.slice(1) : str;\n  if (!cleaned) return {};\n\n  const result: ParsedQuery = {};\n  const pairs = cleaned.split(sep);\n\n  for (const pair of pairs) {\n    if (!pair) continue;\n    const eqIdx = pair.indexOf(eq);\n    let rawKey: string;\n    let rawVal: string;\n\n    if (eqIdx !== -1) {\n      rawKey = pair.slice(0, eqIdx);\n      rawVal = pair.slice(eqIdx + eq.length);\n    } else {\n      rawKey = pair;\n      rawVal = '';\n    }\n\n    const key = decodeSafe(rawKey);\n    const val = decodeSafe(rawVal);\n\n    if (Object.prototype.hasOwnProperty.call(result, key)) {\n      const existing = result[key];\n      if (Array.isArray(existing)) {\n        existing.push(val);\n      } else {\n        result[key] = [existing as string, val];\n      }\n    } else {\n      result[key] = val;\n    }\n  }\n\n  return result;\n}\n\nfunction stringifyQuery(obj: QueryInput, sep: string = '&', eq: string = '='): string {\n  if (!obj || typeof obj !== 'object') return '';\n  const parts: string[] = [];\n\n  for (const key of Object.keys(obj)) {\n    const val = obj[key];\n    if (val === undefined || val === null || typeof val === 'function') continue;\n\n    const encodedKey = encodeURIComponent(key);\n\n    if (Array.isArray(val)) {\n      for (const item of val) {\n        if (item === undefined || item === null) continue;\n        parts.push(`${encodedKey}${eq}${encodeURIComponent(String(item))}`);\n      }\n    } else {\n      parts.push(`${encodedKey}${eq}${encodeURIComponent(String(val))}`);\n    }\n  }\n\n  return parts.join(sep);\n}",
+    "testCases": [
+      {
+        "description": "Parses standard key-value query string into object",
+        "input": "parseQuery(\"name=alice&role=admin&active=true\")",
+        "expected": "{ name: \"alice\", role: \"admin\", active: \"true\" }"
+      },
+      {
+        "description": "Strips leading ? and decodes plus signs and percent encodings",
+        "input": "parseQuery(\"?search=node+js&city=San%20Francisco\")",
+        "expected": "{ search: \"node js\", city: \"San Francisco\" }"
+      },
+      {
+        "description": "Aggregates repeated keys into arrays",
+        "input": "parseQuery(\"tag=react&tag=node&tag=typescript&single=val\")",
+        "expected": "{ tag: [\"react\", \"node\", \"typescript\"], single: \"val\" }"
+      },
+      {
+        "description": "Supports custom pair separator and assignment characters",
+        "input": "parseQuery(\"user:bob;role:dev;role:ops\", \";\", \":\")",
+        "expected": "{ user: \"bob\", role: [\"dev\", \"ops\"] }"
+      },
+      {
+        "description": "Treats keys without equals sign as empty string values",
+        "input": "parseQuery(\"flag&enabled=&key=value\")",
+        "expected": "{ flag: \"\", enabled: \"\", key: \"value\" }"
+      },
+      {
+        "description": "Stringifies objects with primitives and arrays",
+        "input": "stringifyQuery({ page: 1, filter: [\"active\", \"verified\"], debug: true })",
+        "expected": "\"page=1&filter=active&filter=verified&debug=true\""
+      },
+      {
+        "description": "Encodes special characters and omits null or undefined values",
+        "input": "stringifyQuery({ query: \"hello world\", missing: null, unused: undefined })",
+        "expected": "\"query=hello%20world\""
+      },
+      {
+        "description": "Stringifies with custom sep and eq delimiters",
+        "input": "stringifyQuery({ a: 1, b: 2 }, \";\", \":\")",
+        "expected": "\"a:1;b:2\""
+      }
+    ],
+    "testHarness": "await $test.run(\"Parses standard key-value query string into object\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery(\"name=alice&role=admin&active=true\"));\n}, () => ({ name: \"alice\", role: \"admin\", active: \"true\" }));\n\nawait $test.run(\"Strips leading ? and decodes plus signs and percent encodings\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery(\"?search=node+js&city=San%20Francisco\"));\n}, () => ({ search: \"node js\", city: \"San Francisco\" }));\n\nawait $test.run(\"Aggregates repeated keys into arrays\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery(\"tag=react&tag=node&tag=typescript&single=val\"));\n}, () => ({ tag: [\"react\", \"node\", \"typescript\"], single: \"val\" }));\n\nawait $test.run(\"Supports custom pair separator and assignment characters\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery(\"user:bob;role:dev;role:ops\", \";\", \":\"));\n}, () => ({ user: \"bob\", role: [\"dev\", \"ops\"] }));\n\nawait $test.run(\"Treats keys without equals sign as empty string values\", async () => {\n  const sleep = $test.sleep;\n  return (parseQuery(\"flag&enabled=&key=value\"));\n}, () => ({ flag: \"\", enabled: \"\", key: \"value\" }));\n\nawait $test.run(\"Stringifies objects with primitives and arrays\", async () => {\n  const sleep = $test.sleep;\n  return (stringifyQuery({ page: 1, filter: [\"active\", \"verified\"], debug: true }));\n}, () => (\"page=1&filter=active&filter=verified&debug=true\"));\n\nawait $test.run(\"Encodes special characters and omits null or undefined values\", async () => {\n  const sleep = $test.sleep;\n  return (stringifyQuery({ query: \"hello world\", missing: null, unused: undefined }));\n}, () => (\"query=hello%20world\"));\n\nawait $test.run(\"Stringifies with custom sep and eq delimiters\", async () => {\n  const sleep = $test.sleep;\n  return (stringifyQuery({ a: 1, b: 2 }, \";\", \":\"));\n}, () => (\"a:1;b:2\"));"
   }
 ]

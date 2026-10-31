@@ -34,23 +34,23 @@ The **Node.js track strictly avoids duplicating these patterns**. Instead, it fo
 
 ---
 
-### Tier 1: Core Runtime Primitives & Utilities
+### Tier 1: Core Runtime Primitives & Utilities (Completed: 3/3)
 
-#### 1. `node-event-emitter`
+#### 1. `node-event-emitter` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 1 (Novice)
 - **Concept**: `event-emitter`
 - **Signature**: `class EventEmitter`
 - **Description**: Implement Node.js's core `EventEmitter` pattern supporting `.on(event, listener)`, `.emit(event, ...args)`, `.once(event, listener)`, `.off(event, listener)`, `.prependListener(event, listener)`, and `.listenerCount(event)`. If an `'error'` event is emitted and has no registered listeners, it must throw an Error.
 - **Key Edge Cases**: Modifying listener array during `.emit()` must not affect the current dispatch iteration; `.once()` must wrap cleanly and allow removal via `.off()` using original listener reference.
 
-#### 2. `node-path-resolve`
+#### 2. `node-path-resolve` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 1 (Novice)
 - **Concept**: `path-resolution`
 - **Signature**: `resolvePath(...segments: string[]): string` and `isSafePath(rootPath: string, userPath: string): boolean`
 - **Description**: Normalize and resolve file path segments from right to left until an absolute root is formed (similar to `path.resolve`), handling `.` and `..` properly. Provide `isSafePath` to verify that `userPath` resolved against `rootPath` does not escape `rootPath` (preventing directory traversal attacks like `../../etc/passwd`).
 - **Key Edge Cases**: Redundant slashes, trailing slashes, empty segments, and boundary checks (e.g. `/app/data-secret` is not inside `/app/data`).
 
-#### 3. `node-cli-argv-parser`
+#### 3. `node-cli-argv-parser` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 1 (Novice)
 - **Concept**: `cli-tooling`
 - **Signature**: `parseArgv(args: string[]): { _: string[]; [key: string]: any }`
@@ -59,28 +59,28 @@ The **Node.js track strictly avoids duplicating these patterns**. Instead, it fo
 
 ---
 
-### Tier 2: Binary & Data Serialization
+### Tier 2: Binary & Data Serialization (Completed: 3/3)
 
-#### 4. `node-buffer-tlv-codec`
+#### 4. `node-buffer-tlv-codec` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 2 (Apprentice)
 - **Concept**: `buffers-binary`
-- **Signature**: `encodeTLV(records: Array<{ tag: number; value: Uint8Array | string }>): Uint8Array` and `decodeTLV(buffer: Uint8Array): Array<{ tag: number; value: Uint8Array }>`
-- **Description**: Implement a binary Tag-Length-Value (TLV) packet encoder and decoder commonly used in binary protocols and network communication. Each field has a 1-byte Tag (uint8), a 2-byte Length (uint16 big-endian), followed by the binary Value.
-- **Key Edge Cases**: Truncated buffers throw `RangeError`; zero-length values; multi-record sequence parsing.
+- **Signature**: `encodeTLV(packets: TLVPacket[]): Uint8Array` and `decodeTLV(buffer: Uint8Array): TLVPacket[]`
+- **Description**: Implement a binary Tag-Length-Value (TLV) packet encoder and decoder commonly used in binary protocols and network communication. Each field has a 1-byte Type (uint8), a 2-byte Length (uint16 big-endian), followed by the UTF-8 payload.
+- **Key Edge Cases**: Truncated buffers throw `Error`; zero-length values; multi-record sequence parsing; multi-byte UTF-8 string encoding/decoding.
 
-#### 5. `node-querystring-parser`
+#### 5. `node-querystring-parser` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 2 (Apprentice)
 - **Concept**: `url-query`
-- **Signature**: `parseQueryString(query: string): Record<string, any>` and `stringifyQueryString(obj: Record<string, any>): string`
-- **Description**: Parse and stringify URL query strings supporting percent-encoded characters, repeated keys as arrays (`tag=js&tag=node` -> `tag: ['js', 'node']`), and nested bracket notation (`user[name]=alice&user[age]=30`).
-- **Key Edge Cases**: Empty values (`flag&key=val`), leading `?` stripping, plus-sign spaces (`+` -> `' '`), properly sorted output in stringify.
+- **Signature**: `parseQuery(str: string, sep?: string, eq?: string): ParsedQuery` and `stringifyQuery(obj: QueryInput, sep?: string, eq?: string): string`
+- **Description**: Parse and stringify URL query strings supporting percent-encoded characters, repeated keys as arrays (`tag=js&tag=node` -> `tag: ['js', 'node']`), custom delimiters, and omitted values.
+- **Key Edge Cases**: Empty values (`flag&key=val`), leading `?` stripping, plus-sign spaces (`+` -> `' '`), custom `sep` and `eq` support.
 
-#### 6. `node-env-parser-expander`
+#### 6. `node-env-parser-expander` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 2 (Apprentice)
 - **Concept**: `configuration`
-- **Signature**: `parseEnv(content: string, baseEnv?: Record<string, string>): Record<string, string>`
+- **Signature**: `parseEnv(src: string, baseEnv?: EnvDictionary): EnvDictionary`
 - **Description**: Parse `.env` file configuration with variable expansion and default fallbacks. Supports `#` comments, single and double quotes with escape sequences, empty lines, and variable expansion (`${PORT}` or `${PORT:-3000}`).
-- **Key Edge Cases**: Mutually recursive or undefined variables resolve to fallback or empty string; preserve internal quotes when quoted.
+- **Key Edge Cases**: Mutually recursive or undefined variables resolve to fallback or empty string; preserve internal literal values in single quotes; unescape escape characters in double quotes; inline comments in unquoted values.
 
 ---
 
