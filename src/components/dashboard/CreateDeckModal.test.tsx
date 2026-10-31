@@ -100,6 +100,13 @@ describe('DeckEditorModal & CreateDeckModal', () => {
     expect(container?.textContent).toContain('Create Custom Deck');
     expect(container?.textContent).toContain('Selected: 1 of 3 cards');
 
+    // Accordions are closed by default; expand react-components to inspect cards
+    const reactHeader = container?.querySelector('[data-testid="deck-editor-topic-header-react-components"]') as HTMLElement;
+    expect(reactHeader).toBeTruthy();
+    await act(async () => {
+      reactHeader.click();
+    });
+
     // Check seen badge for stepper (practiced) and tabs (unseen)
     const seenBadge = container?.querySelector('[data-testid="deck-editor-card-seen-stepper"]');
     expect(seenBadge).toBeTruthy();
@@ -181,6 +188,13 @@ describe('DeckEditorModal & CreateDeckModal', () => {
 
     const nameInput = container?.querySelector('input[data-testid="create-deck-name-input"]') as HTMLInputElement;
     expect(nameInput.value).toBe('Stripe Senior Loop');
+
+    // Expand react-components topic accordion
+    const reactHeader = container?.querySelector('[data-testid="deck-editor-topic-header-react-components"]') as HTMLElement;
+    expect(reactHeader).toBeTruthy();
+    await act(async () => {
+      reactHeader.click();
+    });
 
     // Deselect stepper and select node card
     const stepperCheckbox = container?.querySelector('[data-testid="deck-editor-card-checkbox-stepper"]') as HTMLInputElement;

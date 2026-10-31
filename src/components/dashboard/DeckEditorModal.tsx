@@ -105,20 +105,8 @@ const DeckEditorModalDialog: React.FC<DeckEditorModalProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [seenFilter, setSeenFilter] = useState<'all' | 'seen' | 'unseen'>('all');
 
-  // Track which topic accordions are expanded
-  const [expandedTopics, setExpandedTopics] = useState<Set<TrackType>>(() => {
-    // If in edit mode, auto-expand topics that contain selected cards. Otherwise expand all by default for clear visibility.
-    if (deckToEdit && deckToEdit.cardIds.length > 0) {
-      const activeTracks = new Set<TrackType>();
-      const cardMap = new Map(allCards.map((c) => [c.id, c.track]));
-      for (const id of deckToEdit.cardIds) {
-        const trk = cardMap.get(id);
-        if (trk) activeTracks.add(trk);
-      }
-      return activeTracks.size > 0 ? activeTracks : new Set(ORDERED_TRACKS);
-    }
-    return new Set(ORDERED_TRACKS);
-  });
+  // Track which topic accordions are expanded (all closed by default)
+  const [expandedTopics, setExpandedTopics] = useState<Set<TrackType>>(() => new Set<TrackType>());
 
   const inputRef = useRef<HTMLInputElement>(null);
 

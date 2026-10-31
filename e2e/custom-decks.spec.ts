@@ -15,10 +15,13 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
     const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
     await catalogNavBtn.click();
 
-    // Click "+ Custom Deck" quick button
-    const quickCreateBtn = page.getByTestId('deck-quick-create-btn');
-    await expect(quickCreateBtn).toBeVisible();
-    await quickCreateBtn.click();
+    // Open Deck Selector dropdown and click "Create Custom Deck..."
+    const deckTrigger = page.getByTestId('deck-dropdown-trigger');
+    await deckTrigger.click();
+
+    const createDeckBtn = page.getByTestId('deck-dropdown-create-btn');
+    await expect(createDeckBtn).toBeVisible();
+    await createDeckBtn.click();
 
     // Modal appears
     const modal = page.getByTestId('deck-editor-modal');
@@ -32,20 +35,21 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
     const descInput = page.getByTestId('create-deck-description-input');
     await descInput.fill('Targeted UI and Node.js drills');
 
-    // Check that topic accordions exist with rotating carets and tri-state checkboxes
-    const reactTopic = page.getByTestId('deck-editor-topic-react-components');
-    await expect(reactTopic).toBeVisible();
+    // Accordion panels are closed by default; click react-components header to expand it
+    const reactTopicHeader = page.getByTestId('deck-editor-topic-header-react-components');
+    await expect(reactTopicHeader).toBeVisible();
+    await reactTopicHeader.click();
 
     // Select stepper card in react-components
     const stepperCheckbox = page.getByTestId('deck-editor-card-checkbox-stepper');
-    await expect(stepperCheckbox).toBeVisible();
     await stepperCheckbox.check();
+    await expect(stepperCheckbox).toBeChecked();
 
     // Verify footer updates with selected count
     const footerStats = page.getByTestId('deck-editor-footer-stats');
     await expect(footerStats).toContainText('Selected: 1 of 306 cards');
 
-    // Select entire node category via topic checkbox
+    // Select entire node category via topic checkbox without needing to expand
     const nodeTopicCheckbox = page.getByTestId('deck-editor-topic-checkbox-node');
     await expect(nodeTopicCheckbox).toBeVisible();
     await nodeTopicCheckbox.check();
@@ -62,7 +66,6 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
     await expect(page.locator('.app-unlock-toast')).toBeVisible();
 
     // Active deck should now be Stripe Frontend Screen with 16 cards
-    const deckTrigger = page.getByTestId('deck-dropdown-trigger');
     await expect(deckTrigger).toContainText('Stripe Frontend Screen');
     await expect(deckTrigger).toContainText('16 Cards');
     await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(16);
@@ -100,10 +103,11 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
     await expect(deckTrigger).toContainText('Algorithms Sprint');
     await expect(deckTrigger).toContainText('2 Cards');
 
-    // Click "Edit Deck" in the active deck banner
-    const editBannerBtn = page.getByTestId('deck-edit-active-btn');
-    await expect(editBannerBtn).toBeVisible();
-    await editBannerBtn.click();
+    // Open dropdown to edit Algorithms Sprint via pencil button
+    await deckTrigger.click();
+    const editPencilBtn = page.getByTestId('deck-edit-custom-algo-sprint');
+    await expect(editPencilBtn).toBeVisible();
+    await editPencilBtn.click();
 
     // Modal appears in edit mode
     const modal = page.getByTestId('deck-editor-modal');
@@ -115,7 +119,9 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
     const nameInput = page.getByTestId('create-deck-name-input');
     await nameInput.fill('Algorithms Sprint (Expanded)');
 
-    // Toggle stepper card on in react-components
+    // Expand react-components topic to toggle stepper card
+    const reactHeader = page.getByTestId('deck-editor-topic-header-react-components');
+    await reactHeader.click();
     const stepperCheckbox = page.getByTestId('deck-editor-card-checkbox-stepper');
     await stepperCheckbox.check();
 

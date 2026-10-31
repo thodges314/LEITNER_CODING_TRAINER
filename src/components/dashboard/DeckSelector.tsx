@@ -94,66 +94,27 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
           </div>
         </div>
 
-        {/* Action Controls Group: Edit Deck (if custom) + Create Deck + Dropdown Trigger */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {/* Edit Deck button for active custom deck */}
-          {activeCustom && onEditCustomDeck && (
-            <button
-              type="button"
-              className="btn btn-secondary deck-edit-active-btn"
-              onClick={() => onEditCustomDeck(activeCustom.id)}
-              title={`Edit custom deck '${activeCustom.name}' in deck builder`}
-              aria-label={`Edit custom deck '${activeCustom.name}'`}
-              data-testid="deck-edit-active-btn"
-            >
-              <Pencil size={13} />
-              <span>Edit Deck</span>
-            </button>
-          )}
-
-          {/* Direct + Custom Deck button */}
-          {onCreateCustomDeckClick && (
-            <button
-              type="button"
-              className="btn btn-outline deck-quick-create-btn"
-              onClick={onCreateCustomDeckClick}
-              title="Create a new custom study deck using the manual builder"
-              aria-label="Create a new custom study deck"
-              data-testid="deck-quick-create-btn"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '7px 12px',
-                fontSize: 13,
-              }}
-            >
-              <Plus size={14} />
-              <span>+ Custom Deck</span>
-            </button>
-          )}
-
-          {/* Dropdown Container */}
-          <div className="deck-dropdown-container">
-            <button
-              type="button"
-              className="deck-dropdown-trigger"
-              onClick={() => setIsOpen((prev) => !prev)}
-              aria-expanded={isOpen}
-              aria-haspopup="listbox"
-              aria-label={`Current Study Deck: ${activeDeckName}. Click to switch decks.`}
-              data-testid="deck-dropdown-trigger"
-            >
-              <div className="deck-dropdown-trigger-content">
-                <span className="deck-dropdown-active-name">{activeDeckName}</span>
-                <span className="deck-count-pill">{activeCardCount} Cards</span>
-              </div>
-              <ChevronDown
-                size={16}
-                className={`deck-dropdown-chevron ${isOpen ? 'open' : ''}`}
-                aria-hidden="true"
-              />
-            </button>
+        {/* Dropdown Container */}
+        <div className="deck-dropdown-container">
+          <button
+            type="button"
+            className="deck-dropdown-trigger"
+            onClick={() => setIsOpen((prev) => !prev)}
+            aria-expanded={isOpen}
+            aria-haspopup="listbox"
+            aria-label={`Current Study Deck: ${activeDeckName}. Click to switch decks.`}
+            data-testid="deck-dropdown-trigger"
+          >
+            <div className="deck-dropdown-trigger-content">
+              <span className="deck-dropdown-active-name">{activeDeckName}</span>
+              <span className="deck-count-pill">{activeCardCount} Cards</span>
+            </div>
+            <ChevronDown
+              size={16}
+              className={`deck-dropdown-chevron ${isOpen ? 'open' : ''}`}
+              aria-hidden="true"
+            />
+          </button>
 
             {/* Floating Dropdown Menu */}
             {isOpen && (
@@ -314,6 +275,6 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
           </div>
         </div>
       </div>
-    </div>
   );
 };
+
