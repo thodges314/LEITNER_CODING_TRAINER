@@ -1,0 +1,54 @@
+## Description
+Modern Node.js web frameworks (such as Fastify and Koa routers) rely on Radix Trie (prefix tree) routing rather than linear regular expressions. A Radix Trie segments paths by `/` to provide fast lookup, path parameter extraction (`:id`), and wildcard catch-alls (`*filepath`).
+
+Implement the `RadixRouter` class to register and route HTTP endpoints.
+
+```ts
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+type RouteHandler = (...args: any[]) => any;
+type RouteParams = Record<string, string>;
+
+interface RouteMatch {
+  handler: RouteHandler;
+  params: RouteParams;
+}
+```
+
+### `class RadixRouter`
+- **`add(method: HttpMethod, path: string, handler: RouteHandler): void`**:
+  - Registers `handler` for the specified HTTP `method` and `path`.
+  - Normalizes path slashes (ensures leading `/` and removes trailing `/` unless the path is root `/`).
+  - Supports three segment types:
+    - **Static segments**: Exact match (e.g. `/users`, `/api/v1/posts`).
+    - **Parameter segments**: `:paramName` matches any non-empty single path segment (e.g. `/users/:userId`).
+    - **Wildcard segments**: `*paramName` or `*` matches the remainder of the path, including multiple slashes (e.g. `/static/*filepath`).
+- **`find(method: HttpMethod, path: string): RouteMatch | null`**:
+  - Finds the route matching `method` and `path`.
+  - Normalizes `path` before lookup.
+  - Precedence order for segment conflicts: **Static match > Param match (`:param`) > Wildcard (`*`)**.
+  - Populates `params` dictionary with extracted values:
+    - `:userId` -> `params.userId = '123'`
+    - `*filepath` -> `params.filepath = 'css/app.css'` (or `params['*']` if no name provided after `*`).
+  - Returns `{ handler, params }` if a match is found.
+  - Returns `null` if no route matches or the HTTP method is not registered.
+
+## Examples
+```js
+const router = new RadixRouter();
+router.add("GET", "/users", () => "users list");
+router.add("GET", "/users/:id", (id) => `user ${id}`);
+router.add("GET", "/users/:id/posts/:slug", () => "post detail");
+router.add("GET", "/static/*file", () => "file");
+
+router.find("GET", "/users/42");
+// => { handler: [Function], params: { id: "42" } }
+
+router.find("GET", "/users/42/posts/intro-to-node");
+// => { handler: [Function], params: { id: "42", slug: "intro-to-node" } }
+
+router.find("GET", "/static/images/logo.png");
+// => { handler: [Function], params: { file: "images/logo.png" } }
+
+router.find("POST", "/users");
+// => null (method mismatch)
+```

@@ -1,0 +1,46 @@
+## Description
+Newline Delimited JSON (NDJSON or JSON Lines) is a standard format for streaming data in Node.js, AI LLM responses, and large logging pipelines. When reading chunks from a readable stream, JSON lines often arrive fragmented across arbitrary chunk boundaries (a line may start in one chunk and end in the next), and a single chunk may contain multiple complete lines.
+
+Implement `NDJSONSplitter` to buffer incoming chunk fragments and parse completed JSON records.
+
+```ts
+type JsonRecord = any;
+```
+
+### `class NDJSONSplitter`
+- **`push(chunk: string): JsonRecord[]`**:
+  - Appends `chunk` to an internal buffer.
+  - Splits buffered text by `\n` (handling optional carriage return `\r`).
+  - Lines preceding the last `\n` are considered complete:
+    - Parses each complete line using `JSON.parse`.
+    - Skips empty lines or lines consisting solely of whitespace.
+  - The fragment following the final `\n` remains in the internal buffer awaiting future chunks.
+  - Returns an array of parsed JSON objects completed by this chunk (in order of arrival).
+  - Returns an empty array `[]` if no complete lines were terminated or if chunk was empty.
+- **`flush(): JsonRecord[]`**:
+  - Treats any remaining buffered text as the final line.
+  - If the remainder contains non-whitespace text, parses it with `JSON.parse` and clears the internal buffer.
+  - Returns an array containing the parsed object, or `[]` if the buffer was empty or whitespace.
+- **`get remainder(): string`**:
+  - Returns the unparsed string fragment currently remaining in the internal buffer.
+
+## Examples
+```js
+const splitter = new NDJSONSplitter();
+
+// Chunk 1 contains 1 complete record and 1 partial fragment
+splitter.push('{"id":1}\n{"id":2,');
+// => [{ id: 1 }]
+splitter.remainder;
+// => '{"id":2,'
+
+// Chunk 2 completes record 2 and provides record 3 without trailing newline
+splitter.push('"name":"Node"}\n{"id":3}');
+// => [{ id: 2, name: "Node" }]
+splitter.remainder;
+// => '{"id":3}'
+
+// Flush final record at stream end
+splitter.flush();
+// => [{ id: 3 }]
+```

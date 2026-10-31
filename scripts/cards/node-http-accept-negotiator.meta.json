@@ -1,0 +1,6 @@
+{
+  "title": "HTTP Accept Header Negotiator",
+  "track": "node",
+  "tags": ["node", "http", "headers", "content-negotiation", "mime"],
+  "concept": "http-content-negotiation"
+}

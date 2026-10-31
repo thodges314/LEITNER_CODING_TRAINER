@@ -208,4 +208,126 @@ export default {
       '{ GREETING: "Hello, World!", ENV: "staging" }'
     ),
   ],
+
+  'node-stream-backpressure-pipe': [
+    c(
+      'Writes under watermark return true and track bufferedAmount',
+      'const p = new BackpressurePipe({ highWaterMark: 3 });\n[p.write("a"), p.write("b"), p.bufferedAmount, p.isPaused]',
+      '[true, true, 2, false]'
+    ),
+    c(
+      'Write reaching watermark returns false and marks isPaused',
+      'const p = new BackpressurePipe({ highWaterMark: 2 });\np.write(1);\nconst ok = p.write(2);\n[ok, p.isPaused, p.bufferedAmount]',
+      '[false, true, 2]'
+    ),
+    c(
+      'Reads dequeue in FIFO order',
+      'const p = new BackpressurePipe({ highWaterMark: 4 });\np.write("first");\np.write("second");\n[p.read(), p.read(), p.read()]',
+      '["first", "second", undefined]'
+    ),
+    c(
+      'Fires drain event exactly when buffer completely empties after backpressure',
+      'const p = new BackpressurePipe({ highWaterMark: 2 });\np.write(10);\np.write(20);\nlet drained = false;\np.on("drain", () => { drained = true; });\np.read();\nconst d1 = drained;\np.read();\n[d1, drained, p.isPaused]',
+      '[false, true, false]'
+    ),
+    c(
+      'Unregisters drain listener with off',
+      'const p = new BackpressurePipe({ highWaterMark: 1 });\nlet count = 0;\nconst fn = () => count++;\np.on("drain", fn);\np.off("drain", fn);\np.write("x");\np.read();\ncount',
+      '0'
+    ),
+  ],
+
+  'node-ndjson-stream-splitter': [
+    c(
+      'Parses complete lines and keeps partial tail in remainder',
+      'const s = new NDJSONSplitter();\nconst r = s.push(\'{"a":1}\\n{"b":2\');\n[r, s.remainder]',
+      '[[{ a: 1 }], \'{"b":2\']'
+    ),
+    c(
+      'Subsequent push completes line and processes multiple lines',
+      'const s = new NDJSONSplitter();\ns.push(\'{"msg":"hel\');\nconst r = s.push(\'lo"}\\n{"msg":"world"}\\n\');\n[r, s.remainder]',
+      '[[{ msg: "hello" }, { msg: "world" }], ""]'
+    ),
+    c(
+      'Skips blank lines and whitespace',
+      'const s = new NDJSONSplitter();\nconst r = s.push(\'\\n  \\n{"valid":true}\\n\\n\');\nr',
+      '[{ valid: true }]'
+    ),
+    c(
+      'Flush parses final non-newline-terminated JSON line and clears remainder',
+      'const s = new NDJSONSplitter();\ns.push(\'{"final":42}\');\nconst flushed = s.flush();\n[flushed, s.remainder]',
+      '[[{ final: 42 }], ""]'
+    ),
+    c(
+      'Flush on empty buffer returns empty array',
+      'const s = new NDJSONSplitter();\ns.flush()',
+      '[]'
+    ),
+  ],
+
+  'node-radix-trie-router': [
+    c(
+      'Matches static routes and ignores trailing slashes',
+      'const r = new RadixRouter();\nr.add("GET", "/api/users", () => "users");\nconst m1 = r.find("GET", "/api/users");\nconst m2 = r.find("GET", "/api/users/");\n[m1.handler(), m2.handler()]',
+      '["users", "users"]'
+    ),
+    c(
+      'Matches single and multiple parameters',
+      'const r = new RadixRouter();\nr.add("GET", "/orgs/:orgId/repos/:repoId", () => "repo");\nconst m = r.find("GET", "/orgs/acme/repos/core");\n[m.handler(), m.params]',
+      '["repo", { orgId: "acme", repoId: "core" }]'
+    ),
+    c(
+      'Priority: static over param',
+      'const r = new RadixRouter();\nr.add("GET", "/users/me", () => "current-user");\nr.add("GET", "/users/:id", () => "any-user");\n[r.find("GET", "/users/me").handler(), r.find("GET", "/users/123").handler()]',
+      '["current-user", "any-user"]'
+    ),
+    c(
+      'Wildcard route captures remainder',
+      'const r = new RadixRouter();\nr.add("GET", "/static/*path", () => "assets");\nconst m = r.find("GET", "/static/images/avatars/user.png");\n[m.handler(), m.params]',
+      '["assets", { path: "images/avatars/user.png" }]'
+    ),
+    c(
+      'Returns null on method or path mismatch',
+      'const r = new RadixRouter();\nr.add("POST", "/submit", () => "ok");\n[r.find("GET", "/submit"), r.find("POST", "/other")]',
+      '[null, null]'
+    ),
+  ],
+
+  'node-http-accept-negotiator': [
+    c(
+      'Selects highest q factor',
+      'negotiateAccept("text/html, application/json;q=0.9", ["application/json", "text/html"])',
+      '"text/html"'
+    ),
+    c(
+      'Respects explicit q weights',
+      'negotiateAccept("application/xml;q=0.5, application/json;q=0.8", ["application/xml", "application/json"])',
+      '"application/json"'
+    ),
+    c(
+      'Wildcard subtype matching',
+      'negotiateAccept("image/*;q=0.8, text/plain;q=0.5", ["text/plain", "image/png"])',
+      '"image/png"'
+    ),
+    c(
+      'Ties broken by specificity',
+      'negotiateAccept("text/*, text/html", ["text/plain", "text/html"])',
+      '"text/html"'
+    ),
+    c(
+      'q=0 explicitly disallows type',
+      'negotiateAccept("application/json;q=0", ["application/json"])',
+      'null'
+    ),
+    c(
+      'Null or empty accept header defaults to first available type',
+      '[negotiateAccept(null, ["text/html", "application/json"]), negotiateAccept("", ["image/png"])]',
+      '["text/html", "image/png"]'
+    ),
+    c(
+      'No matching types returns null',
+      'negotiateAccept("audio/mp3", ["video/mp4", "application/pdf"])',
+      'null'
+    ),
+  ],
 };

@@ -1,0 +1,51 @@
+## Description
+In Node.js streams, when a fast producer writes data to a slower consumer, data accumulates in memory unless backpressure flow control is enforced. When an internal write buffer fills up to or beyond `highWaterMark`, `stream.write()` returns `false`, signaling the producer to pause writes. Once the consumer reads and completely flushes the buffered data, the stream emits a `'drain'` event to signal the producer to resume writing.
+
+Implement the `BackpressurePipe` class simulating Node.js stream flow control.
+
+```ts
+interface BackpressurePipeOptions {
+  highWaterMark?: number;
+}
+
+type DrainListener = () => void;
+```
+
+### `class BackpressurePipe`
+- **`constructor(options?: BackpressurePipeOptions)`**:
+  - Initializes internal queue buffer.
+  - Sets `highWaterMark` (defaults to `16`).
+- **`write(chunk: any): boolean`**:
+  - Adds `chunk` to the internal buffer.
+  - Returns `true` if the new buffer length is strictly less than `highWaterMark`.
+  - Returns `false` if buffer length reaches or exceeds `highWaterMark` (triggering backpressure state `isPaused = true`).
+- **`read(): any | undefined`**:
+  - Removes and returns the first chunk from the internal buffer.
+  - Returns `undefined` if the buffer is empty.
+  - If the pipe was paused (under backpressure) and this read empties the buffer (`bufferedAmount === 0`), the pipe clears pause state and synchronously invokes all registered `'drain'` listeners in order of registration.
+- **`on(event: 'drain', listener: DrainListener): void`**:
+  - Registers a listener for the `'drain'` event.
+- **`off(event: 'drain', listener: DrainListener): void`**:
+  - Removes a registered listener for the `'drain'` event.
+- **`get bufferedAmount(): number`**:
+  - Returns the current count of buffered chunks.
+- **`get isPaused(): boolean`**:
+  - Returns `true` if backpressure is active (`write()` returned `false` and has not yet drained); otherwise `false`.
+
+## Examples
+```js
+const pipe = new BackpressurePipe({ highWaterMark: 2 });
+pipe.write("msg 1"); // true
+pipe.write("msg 2"); // false (watermark reached)
+pipe.isPaused;       // true
+
+let drained = false;
+pipe.on("drain", () => { drained = true; });
+
+pipe.read(); // "msg 1"
+drained;     // false (1 chunk still buffered)
+
+pipe.read(); // "msg 2"
+drained;     // true (buffer completely drained)
+pipe.isPaused; // false
+```

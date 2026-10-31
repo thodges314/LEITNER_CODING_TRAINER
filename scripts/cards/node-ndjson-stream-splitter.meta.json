@@ -1,0 +1,6 @@
+{
+  "title": "NDJSON Stream Splitter",
+  "track": "node",
+  "tags": ["node", "streams", "ndjson", "jsonl", "parser", "streaming"],
+  "concept": "streaming-parser"
+}

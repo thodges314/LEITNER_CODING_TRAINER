@@ -1130,5 +1130,21 @@
   "node-env-parser-expander": {
     "difficulty": 2,
     "concept": "configuration"
+  },
+  "node-stream-backpressure-pipe": {
+    "difficulty": 3,
+    "concept": "streams-backpressure"
+  },
+  "node-ndjson-stream-splitter": {
+    "difficulty": 3,
+    "concept": "streaming-parser"
+  },
+  "node-radix-trie-router": {
+    "difficulty": 3,
+    "concept": "http-routing"
+  },
+  "node-http-accept-negotiator": {
+    "difficulty": 3,
+    "concept": "http-content-negotiation"
   }
 }

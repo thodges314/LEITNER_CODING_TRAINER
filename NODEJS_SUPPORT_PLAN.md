@@ -84,35 +84,35 @@ The **Node.js track strictly avoids duplicating these patterns**. Instead, it fo
 
 ---
 
-### Tier 3: Streams, Protocol & Web Server Plumbing
+### Tier 3: Streams, Protocol & Web Server Plumbing (Completed: 4/4)
 
-#### 7. `node-stream-backpressure-pipe`
+#### 7. `node-stream-backpressure-pipe` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 3 (Competent)
 - **Concept**: `streams-backpressure`
-- **Signature**: `createBackpressurePipe(highWaterMark?: number): BackpressurePipe`
-- **Description**: Simulate Node.js stream backpressure mechanics. A producer pushes chunks into the pipe. When the buffer size reaches or exceeds `highWaterMark`, `write()` returns `false`, signaling the producer to pause. As consumers drain chunks, the pipe emits a `'drain'` event once the buffer drops below the watermark, signaling the producer to resume.
-- **Key Edge Cases**: Multiple sequential writes exceeding watermark; drain event only fires once after a `false` write was acknowledged.
+- **Signature**: `class BackpressurePipe` with `write(chunk): boolean`, `read(): any`, `on('drain', fn)`, `off('drain', fn)`, `bufferedAmount`, and `isPaused`
+- **Description**: Simulate Node.js stream backpressure mechanics. A producer pushes chunks into the pipe. When the buffer size reaches or exceeds `highWaterMark`, `write()` returns `false`, signaling the producer to pause. As consumers read and completely empty the buffer, the pipe emits a `'drain'` event to signal the producer to resume.
+- **Key Edge Cases**: Multiple sequential writes exceeding watermark; drain event only fires once after a `false` write was acknowledged and buffer empties.
 
-#### 8. `node-ndjson-stream-splitter`
+#### 8. `node-ndjson-stream-splitter` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 3 (Competent)
-- **Concept**: `stream-chunking`
-- **Signature**: `createNDJSONParser(onRecord: (record: any) => void, onError?: (err: Error) => void): { push(chunk: string): void; flush(): void }`
+- **Concept**: `streaming-parser`
+- **Signature**: `class NDJSONSplitter` with `push(chunk: string): JsonRecord[]`, `flush(): JsonRecord[]`, and `remainder: string`
 - **Description**: Streaming line-delimited JSON (NDJSON) parser that receives arbitrary string chunks (which may split lines across chunk boundaries), buffers incomplete line fragments, and emits parsed JSON objects immediately upon completing each line.
-- **Key Edge Cases**: Chunks splitting in the middle of a JSON token; empty lines / trailing newlines ignored; malformed JSON invokes `onError` without corrupting downstream lines.
+- **Key Edge Cases**: Chunks splitting in the middle of a JSON token; empty lines and whitespace ignored; remainder tracking; flush parses trailing non-newline data.
 
-#### 9. `node-radix-trie-router`
+#### 9. `node-radix-trie-router` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 3 (Competent)
 - **Concept**: `http-routing`
-- **Signature**: `class RadixRouter<T>` with `add(method: string, path: string, handler: T): void` and `find(method: string, path: string): { handler: T; params: Record<string, string> } | null`
+- **Signature**: `class RadixRouter` with `add(method, path, handler)` and `find(method, path): RouteMatch | null`
 - **Description**: High-performance HTTP trie router supporting exact routes (`/api/v1/health`), parameterized segments (`/users/:userId/posts/:postId`), and wildcard prefix catch-alls (`/static/*filepath`).
-- **Key Edge Cases**: Parameter precedence (exact matches prefer over `:param`, which prefer over `*`); trailing slashes; root `/` handling.
+- **Key Edge Cases**: Parameter precedence (exact matches prefer over `:param`, which prefer over `*`); trailing slashes; root `/` handling; method mismatch returns null.
 
-#### 10. `node-http-accept-negotiator`
+#### 10. `node-http-accept-negotiator` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 3 (Competent)
-- **Concept**: `http-protocol`
-- **Signature**: `negotiateAccept(header: string, availableTypes: string[]): string | null`
+- **Concept**: `http-content-negotiation`
+- **Signature**: `negotiateAccept(acceptHeader: string | null, availableTypes: string[]): string | null`
 - **Description**: Parse HTTP `Accept` headers with quality values (e.g. `text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8`) and select the best matching MIME type from `availableTypes` according to RFC 7231 specificity rules.
-- **Key Edge Cases**: Type specificity preference (e.g. `text/html` beats `text/*`, which beats `*/*` even at equal `q` values); invalid syntax handling.
+- **Key Edge Cases**: Type specificity preference (e.g. `text/html` beats `text/*`, which beats `*/*` at equal `q` values); `q=0` explicit disallow; fallback for missing header or empty list.
 
 ---
 

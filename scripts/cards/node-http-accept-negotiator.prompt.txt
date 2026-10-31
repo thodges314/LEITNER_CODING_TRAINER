@@ -1,0 +1,49 @@
+## Description
+In Node.js HTTP servers and REST APIs (such as Express's `req.accepts()`), content negotiation allows clients to specify the media types they can understand using the `Accept` request header with optional quality (`q`) preference weights (e.g. `text/html, application/json;q=0.9, image/*;q=0.8, */*;q=0.1`).
+
+Implement `negotiateAccept` to determine the best matching MIME media type from a list of server-supported types.
+
+### `negotiateAccept(acceptHeader: string | undefined | null, availableTypes: string[]): string | null`
+Determines the preferred media type supported by the server:
+- Parses comma-separated media clauses from `acceptHeader`:
+  - Each clause consists of `type/subtype` followed by optional parameters like `;q=weight`.
+  - Quality weights `q` range from `0.0` to `1.0` (defaults to `1.0` if omitted).
+  - Media types with `q = 0` are explicitly unacceptable and must not be selected.
+- Specificity precedence (when `q` values are equal):
+  1. Exact media type: `application/json` (specificity = 3)
+  2. Subtype wildcard: `application/*` or `image/*` (specificity = 2)
+  3. Global wildcard: `*/*` (specificity = 1)
+- Ranking order:
+  - Clauses are sorted by highest `q` value first.
+  - If `q` values tie, higher specificity takes precedence.
+  - If both `q` and specificity tie, the clause appearing earlier in `acceptHeader` takes precedence.
+- Server type matching:
+  - Iterates through the client's ranked preferences and finds the first matching candidate in `availableTypes`:
+    - `type/subtype` matches exact type case-insensitively.
+    - `type/*` matches any type with that top-level category (e.g. `image/*` matches `image/png` or `image/jpeg`).
+    - `*/*` matches any candidate in `availableTypes`.
+- Edge cases:
+  - If `availableTypes` is empty, returns `null`.
+  - If `acceptHeader` is undefined, null, empty, or `*/*`, returns `availableTypes[0]`.
+  - If no types match or all matching types have `q = 0`, returns `null`.
+
+## Examples
+```js
+const available = ["application/json", "text/html", "image/png"];
+
+// Prefers text/html (q=1.0) over application/json (q=0.9)
+negotiateAccept("text/html, application/json;q=0.9", available);
+// => "text/html"
+
+// Wildcard match
+negotiateAccept("image/*;q=0.8, text/plain;q=0.5", available);
+// => "image/png"
+
+// Missing or wildcard header returns default first type
+negotiateAccept(null, available);
+// => "application/json"
+
+// Disallowed type (q=0)
+negotiateAccept("application/json;q=0", ["application/json"]);
+// => null
+```

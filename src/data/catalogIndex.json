@@ -3869,5 +3869,67 @@
       "encoding"
     ],
     "summary": "Node.js provides the legacy yet ubiquitous querystring core module (querystring.parse and querystring.stringify), which differs from URLSearchParam..."
+  },
+  {
+    "id": "node-http-accept-negotiator",
+    "title": "HTTP Accept Header Negotiator",
+    "track": "node",
+    "concept": "http-content-negotiation",
+    "difficulty": 3,
+    "tags": [
+      "node",
+      "http",
+      "headers",
+      "content-negotiation",
+      "mime"
+    ],
+    "summary": "In Node.js HTTP servers and REST APIs (such as Express's req.accepts()), content negotiation allows clients to specify the media types they can und..."
+  },
+  {
+    "id": "node-ndjson-stream-splitter",
+    "title": "NDJSON Stream Splitter",
+    "track": "node",
+    "concept": "streaming-parser",
+    "difficulty": 3,
+    "tags": [
+      "node",
+      "streams",
+      "ndjson",
+      "jsonl",
+      "parser",
+      "streaming"
+    ],
+    "summary": "Newline Delimited JSON (NDJSON or JSON Lines) is a standard format for streaming data in Node.js, AI LLM responses, and large logging pipelines. Wh..."
+  },
+  {
+    "id": "node-radix-trie-router",
+    "title": "Radix Trie HTTP Router",
+    "track": "node",
+    "concept": "http-routing",
+    "difficulty": 3,
+    "tags": [
+      "node",
+      "http",
+      "routing",
+      "radix",
+      "trie",
+      "fastify"
+    ],
+    "summary": "Modern Node.js web frameworks (such as Fastify and Koa routers) rely on Radix Trie (prefix tree) routing rather than linear regular expressions. A ..."
+  },
+  {
+    "id": "node-stream-backpressure-pipe",
+    "title": "Stream Backpressure Pipe",
+    "track": "node",
+    "concept": "streams-backpressure",
+    "difficulty": 3,
+    "tags": [
+      "node",
+      "streams",
+      "backpressure",
+      "flow-control",
+      "events"
+    ],
+    "summary": "In Node.js streams, when a fast producer writes data to a slower consumer, data accumulates in memory unless backpressure flow control is enforced...."
   }
 ]
