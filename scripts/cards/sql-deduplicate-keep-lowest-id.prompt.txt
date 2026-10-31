@@ -1,0 +1,23 @@
+Write a PostgreSQL query to deduplicate email contacts from the `contacts` table, retaining only the record with the lowest `id` for each duplicate `email` address.
+
+### Schema: `contacts`
+- `id` (INT, PRIMARY KEY): Unique identifier for each contact record.
+- `name` (VARCHAR): Contact full name.
+- `email` (VARCHAR): Contact email address (may contain duplicates).
+
+### Query Contract
+- Output columns: `id`, `name`, `email`.
+- For each unique `email`, select the single row that has the minimum `id`.
+- Sort the final result set by `id` ascending (`ORDER BY id ASC`).
+- If `contacts` is empty, return an empty result set (0 rows).
+
+### Example
+Given `contacts` records:
+- `{ id: 1, name: "Alice Smith", email: "alice@example.com" }`
+- `{ id: 2, name: "Bob Jones", email: "bob@example.com" }`
+- `{ id: 3, name: "Alice S.", email: "alice@example.com" }`
+- `{ id: 4, name: "Charlie Brown", email: "charlie@example.com" }`
+- `{ id: 5, name: "Bob Duplicate", email: "bob@example.com" }`
+
+The query returns:
+- `[{ "id": 1, "name": "Alice Smith", "email": "alice@example.com" }, { "id": 2, "name": "Bob Jones", "email": "bob@example.com" }, { "id": 4, "name": "Charlie Brown", "email": "charlie@example.com" }]`

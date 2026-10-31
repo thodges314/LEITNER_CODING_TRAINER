@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Pivot Monthly Product Sales",
+  "tags": [
+    "sql",
+    "postgres",
+    "aggregation",
+    "pivot",
+    "filter-clause"
+  ]
+}

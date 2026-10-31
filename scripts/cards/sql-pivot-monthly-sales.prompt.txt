@@ -1,0 +1,27 @@
+Write a PostgreSQL query to pivot product sales into monthly total columns for the first quarter of 2024 (`'2024-01'`, `'2024-02'`, and `'2024-03'`).
+
+### Schema: `product_sales`
+- `id` (INT, PRIMARY KEY): Sales record identifier.
+- `product` (VARCHAR): Product name.
+- `sale_date` (DATE): Date the sale took place.
+- `amount` (INT): Sale amount.
+
+### Query Contract
+- Output columns: `product`, `jan_sales`, `feb_sales`, `mar_sales`.
+- `jan_sales`: Total amount for `'2024-01'`, or `0` if no sales occurred in January for that product.
+- `feb_sales`: Total amount for `'2024-02'`, or `0` if no sales occurred in February for that product.
+- `mar_sales`: Total amount for `'2024-03'`, or `0` if no sales occurred in March for that product.
+- All sales totals must be integers (e.g. `COALESCE(SUM(...) FILTER (WHERE ...), 0)::INT`).
+- Group by `product` and sort by `product` ascending (`ORDER BY product ASC`).
+- If `product_sales` is empty, return an empty result set (0 rows).
+
+### Example
+Given `product_sales` records:
+- `{ id: 1, product: "Widget", sale_date: "2024-01-10", amount: 100 }`
+- `{ id: 2, product: "Widget", sale_date: "2024-01-20", amount: 150 }`
+- `{ id: 3, product: "Widget", sale_date: "2024-02-14", amount: 200 }`
+- `{ id: 4, product: "Gadget", sale_date: "2024-02-05", amount: 300 }`
+- `{ id: 5, product: "Gadget", sale_date: "2024-03-22", amount: 400 }`
+
+The query returns:
+- `[{ "product": "Gadget", "jan_sales": 0, "feb_sales": 300, "mar_sales": 400 }, { "product": "Widget", "jan_sales": 250, "feb_sales": 200, "mar_sales": 0 }]`

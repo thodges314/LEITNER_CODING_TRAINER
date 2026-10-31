@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Consecutive Numbers in Logs",
+  "tags": [
+    "sql",
+    "postgres",
+    "window-functions",
+    "lead-lag",
+    "consecutive"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Consecutive Seat Swaps",
+  "tags": [
+    "sql",
+    "postgres",
+    "case-expressions",
+    "math",
+    "subqueries"
+  ]
+}

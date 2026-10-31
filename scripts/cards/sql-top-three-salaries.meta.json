@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Department Top Three Salaries",
+  "tags": [
+    "sql",
+    "postgres",
+    "window-functions",
+    "dense-rank",
+    "join"
+  ]
+}

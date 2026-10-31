@@ -1,0 +1,26 @@
+Write a PostgreSQL query using a recursive Common Table Expression (`WITH RECURSIVE`) to traverse an organization's reporting hierarchy.
+
+Starting from top-level executives (employees where `manager_id IS NULL` at depth 0), calculate each employee's depth in the reporting chain and identify the root executive at the top of their chain.
+
+### Schema: `Employees`
+- `id` (INT, PRIMARY KEY): Unique employee identifier.
+- `name` (VARCHAR): Employee name.
+- `manager_id` (INT, NULLABLE): Identifier of employee's direct manager (`NULL` for root leaders).
+
+### Query Contract
+- Returns columns:
+  - `"id"` (INT): Employee identifier.
+  - `"name"` (VARCHAR): Employee name.
+  - `"depth"` (INT): 0 for root executives, 1 for direct reports, 2 for skip-level reports, etc.
+  - `"root_leader"` (VARCHAR): Name of the root executive at the top of this employee's reporting chain.
+- Ordered by `"depth"` ASC, `"name"` ASC, and `"id"` ASC.
+
+### Example
+Given `Employees`:
+- `{ id: 1, name: "Satya", manager_id: null }`
+- `{ id: 2, name: "Kevin", manager_id: 1 }`
+- `{ id: 3, name: "Amy", manager_id: 1 }`
+- `{ id: 4, name: "Phil", manager_id: 2 }`
+
+The query returns:
+- `[{ "id": 1, "name": "Satya", "depth": 0, "root_leader": "Satya" }, { "id": 3, "name": "Amy", "depth": 1, "root_leader": "Satya" }, { "id": 2, "name": "Kevin", "depth": 1, "root_leader": "Satya" }, { "id": 4, "name": "Phil", "depth": 2, "root_leader": "Satya" }]`

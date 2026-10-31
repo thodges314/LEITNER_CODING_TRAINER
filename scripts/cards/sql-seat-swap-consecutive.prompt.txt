@@ -1,0 +1,23 @@
+Write a PostgreSQL query to swap the seat `id` of every two consecutive students in the classroom seating chart. If the total number of students is odd, the seat ID of the last student is not swapped.
+
+### Schema: `seat`
+- `id` (INT, PRIMARY KEY): Continuous sequential integer (1, 2, 3, ...).
+- `student` (VARCHAR): Student name.
+
+### Query Contract
+- Output columns: `id`, `student`.
+- Swap seat 1 with seat 2, seat 3 with seat 4, etc.
+- If total student count is odd, leave the final student's seat `id` unchanged.
+- Order the output by `id` ascending (`ORDER BY id ASC`).
+- If `seat` is empty, return an empty result set (0 rows).
+
+### Example
+Given `seat` records:
+- `{ id: 1, student: "Abbot" }`
+- `{ id: 2, student: "Doris" }`
+- `{ id: 3, student: "Emerson" }`
+- `{ id: 4, student: "Green" }`
+- `{ id: 5, student: "Jeames" }`
+
+The query returns:
+- `[{ "id": 1, "student": "Doris" }, { "id": 2, "student": "Abbot" }, { "id": 3, "student": "Green" }, { "id": 4, "student": "Emerson" }, { "id": 5, "student": "Jeames" }]`

@@ -47,7 +47,7 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
 
     // Verify footer updates with selected count
     const footerStats = page.getByTestId('deck-editor-footer-stats');
-    await expect(footerStats).toContainText('Selected: 1 of 319 cards');
+    await expect(footerStats).toContainText('Selected: 1 of 328 cards');
 
     // Select entire node category via topic checkbox without needing to expand
     const nodeTopicCheckbox = page.getByTestId('deck-editor-topic-checkbox-node');
@@ -55,7 +55,7 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
     await nodeTopicCheckbox.check();
 
     // Now 16 cards selected (1 stepper + 15 node cards)
-    await expect(footerStats).toContainText('Selected: 16 of 319 cards');
+    await expect(footerStats).toContainText('Selected: 16 of 328 cards');
 
     // Submit
     const submitBtn = page.getByTestId('create-deck-submit-btn');
@@ -185,6 +185,6 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
 
     // Reverts to Full Library
     await expect(deckTrigger).toContainText('Full Library (All Cards)');
-    await expect(deckTrigger).toContainText('319 Cards');
+    await expect(deckTrigger).toContainText('328 Cards');
   });
 });

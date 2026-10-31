@@ -60,10 +60,10 @@ To ensure optimal developer experience, readable problem prompts, and strict typ
 
 ## 3. High-Level Progress Dashboard
 
-- **Total Cards in Deck:** 319 cards across 14 tracks
-- **Fully Typed Cards Completed:** **319 / 319 (100.0%)**
-- **Cards Remaining:** **0 / 319 (0.0%)**
-- **Total Batches:** 58 batches (58 completed, 0 remaining)
+- **Total Cards in Deck:** 328 cards across 14 tracks
+- **Fully Typed Cards Completed:** **328 / 328 (100.0%)**
+- **Cards Remaining:** **0 / 328 (0.0%)**
+- **Total Batches:** 59 batches (59 completed, 0 remaining)
 
 ### Track Completion Status
 
@@ -82,8 +82,8 @@ To ensure optimal developer experience, readable problem prompts, and strict typ
 | **`node`**                |     15      |      15      |   100.0%   | **COMPLETE** (Batch 51)                               |
 | **`graphql-server`**      |     14      |      14      |   100.0%   | **COMPLETE** (Batch 52: Server & Resolvers)            |
 | **`graphql`**             |      7      |       7      |   100.0%   | **COMPLETE** (Batch 54: Client Operations & SDL)       |
-| **`sql-postgres`**        |      6      |      6       |   100.0%   | **COMPLETE** (Batch 53)                               |
-| **TOTAL**                 |   **319**   |   **319**    | **100.0%** | **58 Batches Total (100% COMPLETE)**                  |
+| **`sql-postgres`**        |     15      |     15       |   100.0%   | **COMPLETE** (Batches 53, 55: Expanded Curriculum)     |
+| **TOTAL**                 |   **328**   |   **328**    | **100.0%** | **59 Batches Total (100% COMPLETE)**                  |
 
 ---
 

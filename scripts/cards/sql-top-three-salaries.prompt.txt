@@ -1,0 +1,40 @@
+A company's executives are interested in seeing who earns the most money in each of the company's departments. A high earner in a department is an employee who has a salary in the top **three unique** salaries for that department.
+
+Write a PostgreSQL query to find the employees who are high earners in each department.
+
+### Schema: `Department`
+- `id` (INT, PRIMARY KEY): Department identifier.
+- `name` (VARCHAR): Department name.
+
+### Schema: `Employee`
+- `id` (INT, PRIMARY KEY): Unique employee identifier.
+- `name` (VARCHAR): Employee name.
+- `salary` (INT): Employee compensation amount.
+- `departmentId` (INT): Foreign key referencing `Department(id)`.
+
+### Query Contract
+- Returns columns:
+  - `"Department"`: Department name.
+  - `"Employee"`: Employee name.
+  - `"Salary"`: Employee compensation amount.
+- An employee is included if their salary's dense rank within their department is $\le 3$ (e.g. `DENSE_RANK() OVER (PARTITION BY departmentId ORDER BY salary DESC) <= 3`).
+- Ties must be preserved: if multiple employees in the same department share the same salary, all tied employees are included as long as their unique salary rank is $\le 3$.
+- Output rows ordered by `"Department"` ASC, `"Salary"` DESC, and `"Employee"` ASC.
+- If a department has fewer than 3 employees, all employees in that department are included.
+
+### Example
+Given `Department`:
+- `{ id: 1, name: "IT" }`
+- `{ id: 2, name: "Sales" }`
+
+Given `Employee`:
+- `{ id: 1, name: "Joe", salary: 85000, departmentId: 1 }`
+- `{ id: 2, name: "Henry", salary: 80000, departmentId: 2 }`
+- `{ id: 3, name: "Sam", salary: 60000, departmentId: 2 }`
+- `{ id: 4, name: "Max", salary: 90000, departmentId: 1 }`
+- `{ id: 5, name: "Janet", salary: 69000, departmentId: 1 }`
+- `{ id: 6, name: "Randy", salary: 85000, departmentId: 1 }`
+- `{ id: 7, name: "Will", salary: 70000, departmentId: 1 }`
+
+The query returns:
+- `[{ "Department": "IT", "Employee": "Max", "Salary": 90000 }, { "Department": "IT", "Employee": "Joe", "Salary": 85000 }, { "Department": "IT", "Employee": "Randy", "Salary": 85000 }, { "Department": "IT", "Employee": "Will", "Salary": 70000 }, { "Department": "Sales", "Employee": "Henry", "Salary": 80000 }, { "Department": "Sales", "Employee": "Sam", "Salary": 60000 }]`

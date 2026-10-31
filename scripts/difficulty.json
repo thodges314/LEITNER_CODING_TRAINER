@@ -1247,6 +1247,42 @@
     "difficulty": 3,
     "concept": "sql-conditional-aggregation"
   },
+  "sql-consecutive-numbers": {
+    "difficulty": 3,
+    "concept": "sql-window-functions"
+  },
+  "sql-top-three-salaries": {
+    "difficulty": 4,
+    "concept": "sql-window-functions"
+  },
+  "sql-org-hierarchy-cte": {
+    "difficulty": 4,
+    "concept": "sql-recursive-cte"
+  },
+  "sql-deduplicate-keep-lowest-id": {
+    "difficulty": 3,
+    "concept": "sql-window-functions"
+  },
+  "sql-pivot-monthly-sales": {
+    "difficulty": 3,
+    "concept": "sql-conditional-aggregation"
+  },
+  "sql-customers-who-never-order": {
+    "difficulty": 2,
+    "concept": "sql-joins"
+  },
+  "sql-seat-swap-consecutive": {
+    "difficulty": 3,
+    "concept": "sql-conditional-logic"
+  },
+  "sql-monthly-active-users-retention": {
+    "difficulty": 4,
+    "concept": "sql-cohort-retention"
+  },
+  "sql-user-session-timeout": {
+    "difficulty": 4,
+    "concept": "sql-gaps-and-islands"
+  },
   "gql-query-nested-fields": {
     "difficulty": 1,
     "concept": "gql-queries"

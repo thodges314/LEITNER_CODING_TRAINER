@@ -4408,5 +4408,141 @@
       "input"
     ],
     "summary": "Write an SDL (Schema Definition Language) schema string defining User, Post, and CreatePostInput."
+  },
+  {
+    "id": "sql-consecutive-numbers",
+    "title": "Consecutive Numbers in Logs",
+    "track": "sql-postgres",
+    "concept": "sql-window-functions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "lead-lag",
+      "consecutive"
+    ],
+    "summary": "Write a PostgreSQL query to find all numbers that appear at least three times consecutively in the Logs table."
+  },
+  {
+    "id": "sql-org-hierarchy-cte",
+    "title": "Organization Hierarchy & Reporting Depth",
+    "track": "sql-postgres",
+    "concept": "sql-recursive-cte",
+    "difficulty": 4,
+    "tags": [
+      "sql",
+      "postgres",
+      "recursive-cte",
+      "hierarchy",
+      "trees"
+    ],
+    "summary": "Write a PostgreSQL query using a recursive Common Table Expression (WITH RECURSIVE) to traverse an organization's reporting hierarchy."
+  },
+  {
+    "id": "sql-top-three-salaries",
+    "title": "Department Top Three Salaries",
+    "track": "sql-postgres",
+    "concept": "sql-window-functions",
+    "difficulty": 4,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "dense-rank",
+      "join"
+    ],
+    "summary": "A company's executives are interested in seeing who earns the most money in each of the company's departments. A high earner in a department is an ..."
+  },
+  {
+    "id": "sql-customers-who-never-order",
+    "title": "Customers Who Never Order",
+    "track": "sql-postgres",
+    "concept": "sql-joins",
+    "difficulty": 2,
+    "tags": [
+      "sql",
+      "postgres",
+      "joins",
+      "anti-join",
+      "null-check"
+    ],
+    "summary": "Write a PostgreSQL query to find all customers who have never placed any orders."
+  },
+  {
+    "id": "sql-deduplicate-keep-lowest-id",
+    "title": "Deduplicate Rows (Keep Lowest ID)",
+    "track": "sql-postgres",
+    "concept": "sql-window-functions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "deduplication",
+      "row-number"
+    ],
+    "summary": "Write a PostgreSQL query to deduplicate email contacts from the contacts table, retaining only the record with the lowest id for each duplicate ema..."
+  },
+  {
+    "id": "sql-monthly-active-users-retention",
+    "title": "Monthly Active User Retention",
+    "track": "sql-postgres",
+    "concept": "sql-cohort-retention",
+    "difficulty": 4,
+    "tags": [
+      "sql",
+      "postgres",
+      "retention",
+      "self-join",
+      "date-trunc"
+    ],
+    "summary": "Write a PostgreSQL query to calculate the number of retained active users for each calendar month."
+  },
+  {
+    "id": "sql-pivot-monthly-sales",
+    "title": "Pivot Monthly Product Sales",
+    "track": "sql-postgres",
+    "concept": "sql-conditional-aggregation",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "aggregation",
+      "pivot",
+      "filter-clause"
+    ],
+    "summary": "Write a PostgreSQL query to pivot product sales into monthly total columns for the first quarter of 2024 ('2024-01', '2024-02', and '2024-03')."
+  },
+  {
+    "id": "sql-seat-swap-consecutive",
+    "title": "Consecutive Seat Swaps",
+    "track": "sql-postgres",
+    "concept": "sql-conditional-logic",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "case-expressions",
+      "math",
+      "subqueries"
+    ],
+    "summary": "Write a PostgreSQL query to swap the seat id of every two consecutive students in the classroom seating chart. If the total number of students is o..."
+  },
+  {
+    "id": "sql-user-session-timeout",
+    "title": "Sessionize Event Stream (30-Minute Timeout)",
+    "track": "sql-postgres",
+    "concept": "sql-gaps-and-islands",
+    "difficulty": 4,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "gaps-and-islands",
+      "sessionization",
+      "lead-lag"
+    ],
+    "summary": "Write a PostgreSQL query to sessionize user event streams into distinct browsing sessions. A new session begins whenever an event occurs more than ..."
   }
 ]

@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Organization Hierarchy & Reporting Depth",
+  "tags": [
+    "sql",
+    "postgres",
+    "recursive-cte",
+    "hierarchy",
+    "trees"
+  ]
+}

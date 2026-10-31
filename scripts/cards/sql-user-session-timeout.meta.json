@@ -1,0 +1,12 @@
+{
+  "track": "sql-postgres",
+  "title": "Sessionize Event Stream (30-Minute Timeout)",
+  "tags": [
+    "sql",
+    "postgres",
+    "window-functions",
+    "gaps-and-islands",
+    "sessionization",
+    "lead-lag"
+  ]
+}

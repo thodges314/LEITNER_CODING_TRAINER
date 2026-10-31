@@ -1,0 +1,30 @@
+Write a PostgreSQL query to find all customers who have never placed any orders.
+
+### Schema: `customers`
+- `id` (INT, PRIMARY KEY): Unique identifier for each customer.
+- `name` (VARCHAR): Customer's name.
+
+### Schema: `orders`
+- `id` (INT, PRIMARY KEY): Unique identifier for each order.
+- `customer_id` (INT): Foreign key referencing `customers.id`.
+- `amount` (INT): Order total amount.
+
+### Query Contract
+- Output column: `customer_name` (the customer's name from `customers.name`).
+- Return only customers who have no corresponding rows in `orders`.
+- Sort results by `customer_name` ascending (`ORDER BY customer_name ASC`).
+- If all customers have placed orders or if `customers` is empty, return an empty result set (0 rows).
+
+### Example
+Given `customers` records:
+- `{ id: 1, name: "Joe" }`
+- `{ id: 2, name: "Henry" }`
+- `{ id: 3, name: "Sam" }`
+- `{ id: 4, name: "Max" }`
+
+Given `orders` records:
+- `{ id: 1, customer_id: 3, amount: 150 }`
+- `{ id: 2, customer_id: 1, amount: 200 }`
+
+The query returns:
+- `[{ "customer_name": "Henry" }, { "customer_name": "Max" }]`

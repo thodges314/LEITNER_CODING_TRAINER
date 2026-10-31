@@ -1,0 +1,25 @@
+Write a PostgreSQL query to find all numbers that appear at least three times consecutively in the `Logs` table.
+
+### Schema: `Logs`
+- `id` (INT, PRIMARY KEY): Auto-incrementing row identifier.
+- `num` (INT): Logged numeric value.
+
+### Query Contract
+- Returns a column named `"ConsecutiveNums"` containing the distinct numbers that appear at least three consecutive times (where consecutive rows have sequential IDs `id`, `id + 1`, and `id + 2` with identical `num` values).
+- Results must be ordered by `"ConsecutiveNums"` ascending.
+- If no numbers repeat consecutively at least three times, return an empty result set (0 rows).
+
+### Example
+Given `Logs` records:
+- `{ id: 1, num: 1 }`
+- `{ id: 2, num: 1 }`
+- `{ id: 3, num: 1 }`
+- `{ id: 4, num: 2 }`
+- `{ id: 5, num: 1 }`
+- `{ id: 6, num: 2 }`
+- `{ id: 7, num: 2 }`
+
+The query returns:
+- `[{ "ConsecutiveNums": 1 }]`
+
+Notice that `1` is the only number that appears for at least three consecutive IDs (`1`, `2`, `3`). While `2` appears three times total, it only appears two times consecutively in rows 6 and 7.

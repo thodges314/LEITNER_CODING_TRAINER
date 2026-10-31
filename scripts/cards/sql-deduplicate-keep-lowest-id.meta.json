@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Deduplicate Rows (Keep Lowest ID)",
+  "tags": [
+    "sql",
+    "postgres",
+    "window-functions",
+    "deduplication",
+    "row-number"
+  ]
+}

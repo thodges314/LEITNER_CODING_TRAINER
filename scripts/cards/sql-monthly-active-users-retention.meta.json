@@ -1,0 +1,11 @@
+{
+  "track": "sql-postgres",
+  "title": "Monthly Active User Retention",
+  "tags": [
+    "sql",
+    "postgres",
+    "retention",
+    "self-join",
+    "date-trunc"
+  ]
+}
