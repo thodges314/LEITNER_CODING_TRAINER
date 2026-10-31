@@ -15,6 +15,8 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task | Who | Branch | Status |
 |---|---|---|---|
+| PostgreSQL PGlite WASM Track & Pilot Cards | Thomas / Assistant | feature/postgresql-pglite-track | in progress |
+
 
 
 
