@@ -16576,5 +16576,122 @@
       }
     ],
     "testHarness": "const originalFetch = fetch;\n\ntry {\n  await $test.run(\"Sends POST request with query and variables in JSON body\", async () => {\n    let captured = null;\n    fetch = async (url, init) => {\n      captured = { url, ...init, parsedBody: JSON.parse(init.body) };\n      return {\n        ok: true,\n        status: 200,\n        json: async () => ({ data: { viewer: { id: '1', name: 'Alice' } } }),\n      };\n    };\n\n    const res = await fetchGraphQL('/graphql', 'query { viewer { name } }', { limit: 10 });\n    const isPost = captured.method === 'POST';\n    const hasContentType = captured.headers['Content-Type'] === 'application/json';\n    const matchesQuery = captured.parsedBody.query === 'query { viewer { name } }';\n    const matchesVars = captured.parsedBody.variables?.limit === 10;\n    return isPost && hasContentType && matchesQuery && matchesVars && res.viewer.name === 'Alice';\n  }, () => true);\n\n  await $test.run(\"Merges custom headers into request\", async () => {\n    let capturedHeaders = null;\n    fetch = async (_url, init) => {\n      capturedHeaders = init.headers;\n      return {\n        ok: true,\n        status: 200,\n        json: async () => ({ data: { count: 42 } }),\n      };\n    };\n\n    const res = await fetchGraphQL('/graphql', 'query { count }', undefined, { 'Authorization': 'Bearer token-xyz' });\n    const hasAuth = capturedHeaders['Authorization'] === 'Bearer token-xyz';\n    const hasContentType = capturedHeaders['Content-Type'] === 'application/json';\n    return hasAuth && hasContentType && res.count === 42;\n  }, () => true);\n\n  await $test.run(\"Returns data when errors array is empty\", async () => {\n    fetch = async () => ({\n      ok: true,\n      status: 200,\n      json: async () => ({\n        data: { active: true },\n        errors: [],\n      }),\n    });\n\n    const res = await fetchGraphQL('/graphql', 'query { active }');\n    return res.active === true;\n  }, () => true);\n\n  fetch = async () => ({\n    ok: false,\n    status: 500,\n    statusText: 'Internal Server Error',\n    json: async () => ({}),\n  });\n  await $test.rejects(\"Throws an error if response.ok is false\", () => fetchGraphQL('/graphql', 'query { viewer { id } }'), '500');\n\n  fetch = async () => ({\n    ok: true,\n    status: 200,\n    json: async () => ({\n      errors: [{ message: 'Field \"secret\" does not exist on type \"User\"' }],\n    }),\n  });\n  await $test.rejects(\"Throws an error if GraphQL errors are returned in payload\", () => fetchGraphQL('/graphql', 'query { secret }'), 'Field \"secret\" does not exist');\n\n  fetch = async () => {\n    throw new TypeError('Failed to fetch');\n  };\n  await $test.rejects(\"Propagates network errors if fetch rejects\", () => fetchGraphQL('/graphql', 'query { viewer { id } }'), 'Failed to fetch');\n} finally {\n  fetch = originalFetch;\n}"
+  },
+  {
+    "id": "graphql-extract-operation-name",
+    "track": "graphql",
+    "title": "GraphQL AST: Extract Operation Name",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "ast",
+      "regex",
+      "parsing",
+      "query"
+    ],
+    "promptSeed": "Write a utility function to extract the operation name from a GraphQL document string without third-party AST parser dependencies:\n\n### `getOperationName(document: string): string | null`\n\n- **Parsing Invariants**:\n  - Extracts the identifier name following the operation type keyword (`query`, `mutation`, or `subscription`).\n  - Supports named queries (e.g. `query GetProfile { ... }` -> `'GetProfile'`).\n  - Supports named mutations (e.g. `mutation CreateItem($input: ItemInput!) { ... }` -> `'CreateItem'`).\n  - Supports named subscriptions (e.g. `subscription OnNotification { ... }` -> `'OnNotification'`).\n- **Comments & Formatting**:\n  - Strips single-line GraphQL comments (lines beginning with `#` or text following `#`) before parsing.\n  - Tolerates arbitrary leading/trailing whitespace, newlines, and indentation.\n- **Anonymous & Empty Queries**:\n  - Anonymous / shorthand queries (e.g. `{ viewer { id } }` or `query { viewer { id } }`) have no operation name; return `null`.\n  - Empty strings, whitespace-only strings, or non-string inputs must return `null`.",
+    "difficulty": 1,
+    "concept": "graphql-ast",
+    "referenceSolution": "function getOperationName(document) {\n  if (!document || typeof document !== 'string') return null;\n  const cleaned = document.replace(/#[^\\r\\n]*/g, '');\n  const match = cleaned.match(/(?:query|mutation|subscription)\\s+([A-Za-z_][A-Za-z0-9_]*)/);\n  return match ? match[1] : null;\n}",
+    "referenceSolutionTs": "function getOperationName(document: string): string | null {\n  if (!document || typeof document !== 'string') return null;\n  const cleaned = document.replace(/#[^\\r\\n]*/g, '');\n  const match = cleaned.match(/(?:query|mutation|subscription)\\s+([A-Za-z_][A-Za-z0-9_]*)/);\n  return match ? match[1] : null;\n}",
+    "testCases": [
+      {
+        "description": "Extracts operation name from a named query",
+        "input": "getOperationName('query GetUserProfile { user { id name } }')",
+        "expected": "'GetUserProfile'"
+      },
+      {
+        "description": "Extracts operation name from a named mutation with variables",
+        "input": "getOperationName('mutation CreateOrder($input: OrderInput!) { createOrder(input: $input) { id } }')",
+        "expected": "'CreateOrder'"
+      },
+      {
+        "description": "Extracts operation name from a named subscription",
+        "input": "getOperationName('subscription OnCommentAdded($repoId: ID!) { commentAdded(repoId: $repoId) { text } }')",
+        "expected": "'OnCommentAdded'"
+      },
+      {
+        "description": "Ignores leading comments and whitespace",
+        "input": "getOperationName('# Fetches user\\n# Author: team-core\\n  query FetchActiveUser { activeUser { id } }')",
+        "expected": "'FetchActiveUser'"
+      },
+      {
+        "description": "Returns null for anonymous shorthand query",
+        "input": "getOperationName('{ viewer { id } }')",
+        "expected": "null"
+      },
+      {
+        "description": "Returns null for anonymous query with keyword",
+        "input": "getOperationName('query { viewer { id } }')",
+        "expected": "null"
+      },
+      {
+        "description": "Returns null for empty or invalid input",
+        "input": "getOperationName('')",
+        "expected": "null"
+      },
+      {
+        "description": "Returns null for non-string input",
+        "input": "getOperationName(123)",
+        "expected": "null"
+      }
+    ],
+    "testHarness": "await $test.run(\"Extracts operation name from a named query\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('query GetUserProfile { user { id name } }'));\n}, () => ('GetUserProfile'));\n\nawait $test.run(\"Extracts operation name from a named mutation with variables\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('mutation CreateOrder($input: OrderInput!) { createOrder(input: $input) { id } }'));\n}, () => ('CreateOrder'));\n\nawait $test.run(\"Extracts operation name from a named subscription\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('subscription OnCommentAdded($repoId: ID!) { commentAdded(repoId: $repoId) { text } }'));\n}, () => ('OnCommentAdded'));\n\nawait $test.run(\"Ignores leading comments and whitespace\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('# Fetches user\\n# Author: team-core\\n  query FetchActiveUser { activeUser { id } }'));\n}, () => ('FetchActiveUser'));\n\nawait $test.run(\"Returns null for anonymous shorthand query\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('{ viewer { id } }'));\n}, () => (null));\n\nawait $test.run(\"Returns null for anonymous query with keyword\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName('query { viewer { id } }'));\n}, () => (null));\n\nawait $test.run(\"Returns null for empty or invalid input\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName(''));\n}, () => (null));\n\nawait $test.run(\"Returns null for non-string input\", async () => {\n  const sleep = $test.sleep;\n  return (getOperationName(123));\n}, () => (null));"
+  },
+  {
+    "id": "graphql-variable-validator",
+    "track": "graphql",
+    "title": "GraphQL Variables: Required Variable Validator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "variables",
+      "validation",
+      "schema"
+    ],
+    "promptSeed": "Write a variable validation utility for GraphQL operations that checks whether all required variables are supplied:\n\n## Description\n\n```ts\ninterface VariableValidationResult {\n  valid: boolean;\n  missing: string[];\n}\n```\n\n### `validateVariables(variableDefinitions: Record<string, string>, variables?: Record<string, any> | null): VariableValidationResult`\n\n- **Required Variables**:\n  - A variable is required if its type definition ends with `'!'` (e.g. `'ID!'`, `'String!'`, `'[Int]!'`).\n  - Types that do not end with `'!'` (e.g. `'Int'`, `'String'`, `'[ID]'`) are optional.\n- **Missing Check**:\n  - A required variable is considered missing if its key is absent from `variables`, or if its value is strictly `undefined` or `null`.\n  - Falsy values like `0`, `\"\"` (empty string), and `false` are considered valid provided values and must **not** be marked as missing.\n- **Return Value**:\n  - If all required variables are provided, returns `{ valid: true, missing: [] }`.\n  - If any required variables are missing, returns `{ valid: false, missing: [...] }` preserving the declaration order of the missing variables from `variableDefinitions`.\n  - If `variables` is omitted, `null`, or `undefined`, all required variables are returned as `missing`.",
+    "difficulty": 1,
+    "concept": "graphql-variables",
+    "referenceSolution": "function validateVariables(variableDefinitions, variables = {}) {\n  const vars = variables ?? {};\n  const missing = [];\n\n  for (const [name, typeDef] of Object.entries(variableDefinitions || {})) {\n    if (typeof typeDef === 'string' && typeDef.trim().endsWith('!')) {\n      const val = vars[name];\n      if (val === undefined || val === null) {\n        missing.push(name);\n      }\n    }\n  }\n\n  return {\n    valid: missing.length === 0,\n    missing,\n  };\n}",
+    "referenceSolutionTs": "interface VariableValidationResult {\n  valid: boolean;\n  missing: string[];\n}\n\nfunction validateVariables(\n  variableDefinitions: Record<string, string>,\n  variables?: Record<string, any> | null\n): VariableValidationResult {\n  const vars = variables ?? {};\n  const missing: string[] = [];\n\n  for (const [name, typeDef] of Object.entries(variableDefinitions || {})) {\n    if (typeof typeDef === 'string' && typeDef.trim().endsWith('!')) {\n      const val = vars[name];\n      if (val === undefined || val === null) {\n        missing.push(name);\n      }\n    }\n  }\n\n  return {\n    valid: missing.length === 0,\n    missing,\n  };\n}",
+    "testCases": [
+      {
+        "description": "Returns valid when all required variables are supplied",
+        "input": "validateVariables({ id: 'ID!', filter: 'String' }, { id: 'usr_100', filter: 'active' })",
+        "expected": "{ valid: true, missing: [] }"
+      },
+      {
+        "description": "Flags missing required variables in definition order",
+        "input": "validateVariables({ id: 'ID!', role: 'String!', limit: 'Int' }, { limit: 10 })",
+        "expected": "{ valid: false, missing: ['id', 'role'] }"
+      },
+      {
+        "description": "Treats null or undefined values as missing for required fields",
+        "input": "validateVariables({ id: 'ID!', token: 'String!' }, { id: null, token: undefined })",
+        "expected": "{ valid: false, missing: ['id', 'token'] }"
+      },
+      {
+        "description": "Treats falsy values (0, empty string, false) as validly provided",
+        "input": "validateVariables({ count: 'Int!', name: 'String!', active: 'Boolean!' }, { count: 0, name: '', active: false })",
+        "expected": "{ valid: true, missing: [] }"
+      },
+      {
+        "description": "Allows optional variables to be omitted without error",
+        "input": "validateVariables({ offset: 'Int', limit: 'Int' }, {})",
+        "expected": "{ valid: true, missing: [] }"
+      },
+      {
+        "description": "Handles omitted or null variables object by marking all required as missing",
+        "input": "validateVariables({ requiredA: 'String!', optionalB: 'Int' })",
+        "expected": "{ valid: false, missing: ['requiredA'] }"
+      }
+    ],
+    "testHarness": "await $test.run(\"Returns valid when all required variables are supplied\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', filter: 'String' }, { id: 'usr_100', filter: 'active' }));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Flags missing required variables in definition order\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', role: 'String!', limit: 'Int' }, { limit: 10 }));\n}, () => ({ valid: false, missing: ['id', 'role'] }));\n\nawait $test.run(\"Treats null or undefined values as missing for required fields\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ id: 'ID!', token: 'String!' }, { id: null, token: undefined }));\n}, () => ({ valid: false, missing: ['id', 'token'] }));\n\nawait $test.run(\"Treats falsy values (0, empty string, false) as validly provided\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ count: 'Int!', name: 'String!', active: 'Boolean!' }, { count: 0, name: '', active: false }));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Allows optional variables to be omitted without error\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ offset: 'Int', limit: 'Int' }, {}));\n}, () => ({ valid: true, missing: [] }));\n\nawait $test.run(\"Handles omitted or null variables object by marking all required as missing\", async () => {\n  const sleep = $test.sleep;\n  return (validateVariables({ requiredA: 'String!', optionalB: 'Int' }));\n}, () => ({ valid: false, missing: ['requiredA'] }));"
   }
 ]

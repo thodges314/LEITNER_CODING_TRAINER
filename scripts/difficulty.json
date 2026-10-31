@@ -1110,6 +1110,15 @@
   "graphql-mini-client": {
     "difficulty": 1,
     "concept": "graphql-client"
+  },
+  "graphql-extract-operation-name": {
+    "difficulty": 1,
+    "concept": "graphql-ast"
+  },
+  "graphql-variable-validator": {
+    "difficulty": 1,
+    "concept": "graphql-variables"
   }
 }
+
 

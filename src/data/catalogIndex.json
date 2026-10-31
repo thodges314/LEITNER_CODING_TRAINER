@@ -3797,5 +3797,34 @@
       "async"
     ],
     "summary": "Write a lightweight GraphQL client request utility using native fetch"
+  },
+  {
+    "id": "graphql-extract-operation-name",
+    "title": "GraphQL AST: Extract Operation Name",
+    "track": "graphql",
+    "concept": "graphql-ast",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "ast",
+      "regex",
+      "parsing",
+      "query"
+    ],
+    "summary": "Write a utility function to extract the operation name from a GraphQL document string without third-party AST parser dependencies"
+  },
+  {
+    "id": "graphql-variable-validator",
+    "title": "GraphQL Variables: Required Variable Validator",
+    "track": "graphql",
+    "concept": "graphql-variables",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "variables",
+      "validation",
+      "schema"
+    ],
+    "summary": "Write a variable validation utility for GraphQL operations that checks whether all required variables are supplied"
   }
 ]
