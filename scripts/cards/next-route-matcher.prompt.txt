@@ -12,3 +12,9 @@ Return value:
 - Returns `{ params: Record<string, string | string[]> }` if `pathname` matches `pattern`.
 - Returns `null` if `pathname` does not match the pattern.
 - Leading and trailing slashes should be normalized.
+
+#### Useful Patterns
+- Optional catch-all: `segment.match(/^\[\[\.\.\.([^\]]+)\]\]$/)`
+- Catch-all: `segment.match(/^\[\.\.\.([^\]]+)\]$/)`
+- Dynamic parameter: `segment.match(/^\[([^\]]+)\]$/)`
+

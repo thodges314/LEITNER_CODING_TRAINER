@@ -3,6 +3,8 @@ Implement common formatting utility functions without relying on the `Intl` API:
 ### `formatNumber(n: number, decimals: number = 0): string`
 - Formats number `n` with thousands separators (`','`) and fixed `decimals` places (e.g., `'1,234,567.89'`).
 - Negative numbers preserve their leading minus sign.
+- Helpful thousands separator regex: `/\B(?=(\d{3})+(?!\d))/g` (e.g. `integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')`).
+
 
 ### `formatBytes(bytes: number, decimals: number = 1): string`
 - Formats byte count using 1024-based units (`'B'`, `'KB'`, `'MB'`, `'GB'`, `'TB'`).

@@ -28,7 +28,9 @@ Parses `.env` content into a dictionary of string key-value pairs:
   - Expands `$NAME`, `${NAME}`, and default fallback syntax `${NAME:-defaultValue}`.
   - Variable lookups resolve first against variables defined earlier in the current file, then against `baseEnv`, and fallback to the default value if provided or `""`.
   - Sequential references within the same file resolve progressively (a variable on line 2 can reference a variable defined on line 1).
+  - Helpful regex pattern: `/\$(\{([A-Za-z0-9_]+)(?::-([^}]*))?\}|([A-Za-z0-9_]+))/g`
 - Returns only the dictionary of keys parsed from `src` (does not copy untouched keys from `baseEnv`).
+
 
 ## Examples
 ```js

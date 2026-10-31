@@ -12,3 +12,8 @@ Implement text segmentation for search-result highlighting:
   - If `text` is empty `''`, returns `[]`.
   - If `query` is empty `''`, returns `[{ text, match: false }]`.
   - Concatenating all segment `text` properties reconstructs the original `text`.
+
+#### Useful Regex Patterns
+- Escape special regex characters: `query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')`
+- Split preserving captured matches: `text.split(new RegExp(`(${escaped})`, 'i'))`
+

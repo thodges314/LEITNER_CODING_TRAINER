@@ -13,3 +13,8 @@ Write a utility function to extract the operation name from a GraphQL document s
 - **Anonymous & Empty Queries**:
   - Anonymous / shorthand queries (e.g. `{ viewer { id } }` or `query { viewer { id } }`) have no operation name; return `null`.
   - Empty strings, whitespace-only strings, or non-string inputs must return `null`.
+
+#### Useful Regex Patterns
+- Strip single-line comments: `doc.replace(/#[^\r\n]*/g, '')`
+- Match operation type and name: `/(?:query|mutation|subscription)\s+([A-Za-z_][A-Za-z0-9_]*)/`
+
