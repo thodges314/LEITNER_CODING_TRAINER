@@ -272,10 +272,66 @@ function formatDiagnostic(d: ts.Diagnostic, sourceText: string): FormattedDiagno
 }
 
 /**
+ * In TSX mode, single unconstrained generic arrow functions (e.g. `<T>(x: T) => x`)
+ * are ambiguous with opening JSX tags and trigger TS17008 / TS1382.
+ * Appending a trailing comma `<T,>(` disambiguates type parameter lists in TSX.
+ */
+function normalizeGenericArrowInTsx(src: string): string {
+  return src.replace(/<([A-Za-z_$][A-Za-z0-9_$]*)>(\s*\()/g, (match, typeParam, rest) => {
+    // If the file explicitly contains a matching JSX closing tag </T>, do not rewrite.
+    if (src.includes(`</${typeParam}>`)) return match;
+    return `<${typeParam},>${rest}`;
+  });
+}
+
+export interface FileTargetInfo {
+  fileName: 'solution.ts' | 'solution.tsx';
+  isJsx: boolean;
+  codeToTranspile: string;
+}
+
+function getParseDiagnostics(sf: ts.SourceFile): readonly ts.Diagnostic[] {
+  return (sf as unknown as { parseDiagnostics?: readonly ts.Diagnostic[] }).parseDiagnostics ?? [];
+}
+
+export function determineFileTarget(rawCode: string): FileTargetInfo {
+  // 1. Try parsing cleanly as pure TypeScript (.ts)
+  const sfTs = ts.createSourceFile('solution.ts', rawCode, ts.ScriptTarget.ES2022, true, ts.ScriptKind.TS);
+  if (getParseDiagnostics(sfTs).length === 0) {
+    return { fileName: 'solution.ts', isJsx: false, codeToTranspile: rawCode };
+  }
+
+  // 2. If .ts had parse diagnostics, test .tsx
+  const sfTsx = ts.createSourceFile('solution.tsx', rawCode, ts.ScriptTarget.ES2022, true, ts.ScriptKind.TSX);
+  if (getParseDiagnostics(sfTsx).length === 0) {
+    return { fileName: 'solution.tsx', isJsx: true, codeToTranspile: rawCode };
+  }
+
+  // 3. If both had parse diagnostics, check if normalizing single-parameter generic arrow functions in TSX resolves it
+  const normalized = normalizeGenericArrowInTsx(rawCode);
+  if (normalized !== rawCode) {
+    const sfNorm = ts.createSourceFile('solution.tsx', normalized, ts.ScriptTarget.ES2022, true, ts.ScriptKind.TSX);
+    if (getParseDiagnostics(sfNorm).length === 0) {
+      return { fileName: 'solution.tsx', isJsx: true, codeToTranspile: normalized };
+    }
+  }
+
+  // 4. Fallback for code with syntax errors: prefer .tsx only if JSX elements/fragments are detected
+  const hasJsxClues = /<\s*\/|\/>|<[a-z][a-z0-9-]*(\s|>)/.test(rawCode);
+  if (hasJsxClues) {
+    return { fileName: 'solution.tsx', isJsx: true, codeToTranspile: normalized !== rawCode ? normalized : rawCode };
+  }
+  return { fileName: 'solution.ts', isJsx: false, codeToTranspile: rawCode };
+}
+
+/**
  * Validates code using ts.transpileModule and strict semantic checking.
  * Returns formatted diagnostics and transpiled code.
  */
 export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
+  const target = determineFileTarget(rawCode);
+  const { fileName, isJsx, codeToTranspile } = target;
+
   const compilerOptions: ts.CompilerOptions = {
     strict: true,
     noImplicitAny: true,
@@ -285,34 +341,32 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
     noImplicitThis: true,
     target: ts.ScriptTarget.ES2022,
     module: ts.ModuleKind.ESNext,
-    jsx: ts.JsxEmit.React,
+    ...(isJsx ? { jsx: ts.JsxEmit.React } : {}),
     noLib: false,
   };
 
   // 1. Syntactic check & transpilation via ts.transpileModule
-  const transpileResult = ts.transpileModule(rawCode, {
+  const transpileResult = ts.transpileModule(codeToTranspile, {
     compilerOptions,
     reportDiagnostics: true,
-    fileName: 'solution.tsx',
+    fileName,
   });
 
   const formattedDiagnostics: FormattedDiagnostic[] = [];
 
-if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0) {
-    const harnessStartIndex = rawCode.indexOf('// Test runner example:');
+  if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0) {
+    const harnessStartIndex = codeToTranspile.indexOf('// Test runner example:');
     for (const diag of transpileResult.diagnostics) {
       if (harnessStartIndex !== -1 && diag.start !== undefined && diag.start >= harnessStartIndex) {
         continue;
       }
-      formattedDiagnostics.push(formatDiagnostic(diag, rawCode));
+      formattedDiagnostics.push(formatDiagnostic(diag, codeToTranspile));
     }
   }
 
   // 2. Semantic strict type-checking using an in-memory virtual program
-  const fileName = 'solution.tsx';
-
   // Type-check as a module so top-level await is allowed (appended after a newline; positions are unchanged).
-  const checkedSource = `${rawCode}\nexport {};`;
+  const checkedSource = `${codeToTranspile}\nexport {};`;
 
   const fileText = (name: string): string | undefined => {
     if (name === fileName) return checkedSource;
@@ -344,7 +398,7 @@ if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0) {
     const program = ts.createProgram([fileName, GLOBALS_FILE], { ...compilerOptions, noLib: false, types: [] }, host);
     const semanticDiags = program.getSemanticDiagnostics();
 
-    const harnessStartIndex = rawCode.indexOf('// Test runner example:');
+    const harnessStartIndex = codeToTranspile.indexOf('// Test runner example:');
 
     for (const diag of semanticDiags) {
       if (diag.file && diag.file.fileName !== fileName) continue;
@@ -354,7 +408,7 @@ if (transpileResult.diagnostics && transpileResult.diagnostics.length > 0) {
         continue;
       }
 
-      formattedDiagnostics.push(formatDiagnostic(diag, rawCode));
+      formattedDiagnostics.push(formatDiagnostic(diag, codeToTranspile));
     }
   } catch (err) {
     console.warn('Semantic analysis skipped due to host evaluation error:', err);
@@ -396,13 +450,16 @@ function getOrCreateLanguageService(): ts.LanguageService {
     noLib: false,
   };
 
-  const fileName = 'solution.tsx';
-
   const host: ts.LanguageServiceHost = {
-    getScriptFileNames: () => [fileName, GLOBALS_FILE],
-    getScriptVersion: (name) => (name === fileName ? String(activeSourceVersion) : '1'),
+    getScriptFileNames: () => ['solution.ts', 'solution.tsx', GLOBALS_FILE],
+    getScriptVersion: (name) =>
+      name === 'solution.ts' || name === 'solution.tsx' ? String(activeSourceVersion) : '1',
     getScriptSnapshot: (name) => {
-      if (name === fileName) return ts.ScriptSnapshot.fromString(activeSourceCode);
+      if (name === 'solution.ts' || name === 'solution.tsx') {
+        const target = determineFileTarget(activeSourceCode);
+        const codeForFile = target.fileName === name ? target.codeToTranspile : activeSourceCode;
+        return ts.ScriptSnapshot.fromString(codeForFile);
+      }
       if (name === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(SANDBOX_GLOBALS);
       const text = LIBS[name.split('/').pop() as string];
       if (text !== undefined) return ts.ScriptSnapshot.fromString(text);
@@ -412,11 +469,14 @@ function getOrCreateLanguageService(): ts.LanguageService {
     getCompilationSettings: () => compilerOptions,
     getDefaultLibFileName: () => DEFAULT_LIB,
     fileExists: (name) => {
-      if (name === fileName || name === GLOBALS_FILE) return true;
+      if (name === 'solution.ts' || name === 'solution.tsx' || name === GLOBALS_FILE) return true;
       return LIBS[name.split('/').pop() as string] !== undefined;
     },
     readFile: (name) => {
-      if (name === fileName) return activeSourceCode;
+      if (name === 'solution.ts' || name === 'solution.tsx') {
+        const target = determineFileTarget(activeSourceCode);
+        return target.fileName === name ? target.codeToTranspile : activeSourceCode;
+      }
       if (name === GLOBALS_FILE) return SANDBOX_GLOBALS;
       return LIBS[name.split('/').pop() as string];
     },
@@ -441,8 +501,9 @@ export function getTSQuickInfo(rawCode: string, position: number): TSQuickInfo |
   }
 
   try {
+    const target = determineFileTarget(rawCode);
     const service = getOrCreateLanguageService();
-    const info = service.getQuickInfoAtPosition('solution.tsx', position);
+    const info = service.getQuickInfoAtPosition(target.fileName, position);
     if (!info || !info.displayParts) return null;
 
     const signature = ts.displayPartsToString(info.displayParts);
