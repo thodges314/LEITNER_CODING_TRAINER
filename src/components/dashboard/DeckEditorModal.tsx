@@ -157,9 +157,16 @@ const DeckEditorModalDialog: React.FC<DeckEditorModalProps> = ({
 
         // Query check
         if (!query) return true;
-        const matchTitle = card.title.toLowerCase().includes(query);
-        const matchConcept = card.concept?.toLowerCase().includes(query);
-        const matchTags = card.tags.some((t) => t.toLowerCase().includes(query));
+        const tagQuery = query.startsWith('#') ? query.slice(1).trim() : query;
+        if (query === '#') {
+          return card.tags.length > 0;
+        }
+        const matchTitle = card.title.toLowerCase().includes(tagQuery);
+        const matchConcept = card.concept?.toLowerCase().includes(tagQuery);
+        const matchTags = card.tags.some((t) => {
+          const lower = t.toLowerCase();
+          return lower.includes(tagQuery) || (`#${lower}`).includes(query);
+        });
         return matchTitle || matchConcept || matchTags;
       });
       map.set(track, filtered);

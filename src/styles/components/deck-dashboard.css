@@ -494,11 +494,25 @@
 
 /* Table Tags & Status Badges */
 .table-tag-chip {
+  display: inline-flex;
+  align-items: center;
   font-size: 10.5px;
   color: var(--text-dim);
-  background-color: rgba(255, 255, 255, 0.03);
-  padding: 1px 6px;
-  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 1.5px 6.5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  line-height: 1.35;
+  user-select: none;
+}
+
+.table-tag-chip:hover {
+  color: var(--accent-cyan, #38bdf8);
+  background-color: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.4);
 }
 
 [data-theme="apple-gsos"] .table-tag-chip {
@@ -507,11 +521,30 @@
   border: 1px solid #CBD5E1;
 }
 
-.status-badge-active {
-  background-color: rgba(56, 189, 248, 0.1);
-  color: var(--accent-cyan);
+[data-theme="apple-gsos"] .table-tag-chip:hover {
+  color: #0284C7;
+  background-color: #E0F2FE;
+  border-color: #7DD3FC;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2.5px 8px;
+  border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.status-badge-active {
+  background-color: rgba(56, 189, 248, 0.12);
+  color: var(--accent-cyan, #38bdf8);
+  border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
 [data-theme="apple-gsos"] .status-badge-active {
@@ -523,8 +556,7 @@
 .status-badge-attempted {
   background-color: rgba(52, 211, 153, 0.14);
   color: #34d399;
-  font-size: 11px;
-  font-weight: 600;
+  border: 1px solid rgba(52, 211, 153, 0.35);
 }
 
 [data-theme="apple-gsos"] .status-badge-attempted {
@@ -536,8 +568,7 @@
 .status-badge-locked {
   background-color: rgba(148, 163, 184, 0.08);
   color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.22);
 }
 
 [data-theme="apple-gsos"] .status-badge-locked {
@@ -547,10 +578,8 @@
 }
 
 .status-badge-deactivated {
-  background-color: rgba(148, 163, 184, 0.12);
+  background-color: rgba(148, 163, 184, 0.1);
   color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 600;
   border: 1px dashed var(--border-medium);
 }
 

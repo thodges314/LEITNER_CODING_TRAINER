@@ -6,13 +6,16 @@ import {
   Play,
   Flame,
   ArchiveRestore,
+  Archive,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
   FolderMinus,
+  CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 import { DifficultyBadge } from '../DifficultyBadge';
-import { getTrackMeta } from '../../lib/leitner';
+import { getTrackMeta, isCardAttempted } from '../../lib/leitner';
 import type { TopicItem } from '../../lib/leitner';
 import type { CatalogSortOption } from '../../lib/deckFilters';
 
@@ -31,6 +34,7 @@ export interface CatalogTableProps {
   onRemoveFromDeck?: (topic: TopicItem) => void;
   onToggleDeactivate?: (topicId: string) => void;
   onDeleteTopic?: (topicId: string) => void;
+  onTagClick?: (tag: string) => void;
 }
 
 export const CatalogTable: React.FC<CatalogTableProps> = ({
@@ -45,6 +49,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
   onRemoveFromDeck,
   onToggleDeactivate,
   onDeleteTopic,
+  onTagClick,
 }) => {
   const renderSortIndicator = (
     column: 'title' | 'track' | 'difficulty' | 'box' | 'streak' | 'due' | 'status'
@@ -173,9 +178,15 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                     </div>
                     <div className="catalog-tags-row">
                       {topic.tags.slice(0, 3).map((tg) => (
-                        <span key={tg} className="table-tag-chip">
+                        <button
+                          key={tg}
+                          type="button"
+                          className="table-tag-chip"
+                          onClick={() => onTagClick?.(tg)}
+                          title={`Filter cards by #${tg}`}
+                        >
                           #{tg}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </td>
@@ -215,11 +226,37 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                   {/* Status */}
                   <td className="catalog-td col-status">
                     {topic.deactivated ? (
-                      <span className="badge badge-deactivated">Deactivated</span>
-                    ) : topic.status === 'active' ? (
-                      <span className="badge badge-active">Active</span>
+                      <span
+                        className="status-badge status-badge-deactivated"
+                        title="Card pulled out of active study rotation"
+                      >
+                        <Archive size={11} />
+                        <span>Deactivated</span>
+                      </span>
+                    ) : topic.status === 'locked' ? (
+                      <span
+                        className="status-badge status-badge-locked"
+                        title="Locked in reserve deck"
+                      >
+                        <Lock size={11} />
+                        <span>Locked</span>
+                      </span>
+                    ) : isCardAttempted(topic) ? (
+                      <span
+                        className="status-badge status-badge-attempted"
+                        title="Active card in study rotation (attempted at least once)"
+                      >
+                        <CheckCircle2 size={11} />
+                        <span>Attempted</span>
+                      </span>
                     ) : (
-                      <span className="badge badge-locked">Locked</span>
+                      <span
+                        className="status-badge status-badge-active"
+                        title="New card in active deck pool, ready for initial practice"
+                      >
+                        <Sparkles size={11} />
+                        <span>New</span>
+                      </span>
                     )}
                   </td>
 

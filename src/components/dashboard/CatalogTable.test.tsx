@@ -42,6 +42,17 @@ const testCards: TopicItem[] = [
     tags: ['closure'],
     nextEligibleTrial: 0,
   },
+  {
+    id: 'test-card-4',
+    title: 'New Unattempted Card',
+    track: 'algorithms',
+    box: 1,
+    status: 'active',
+    streak: 0,
+    promptSeed: '',
+    tags: ['a11y'],
+    nextEligibleTrial: 0,
+  },
 ];
 
 describe('CatalogTable', () => {
@@ -69,6 +80,7 @@ describe('CatalogTable', () => {
     const onResetBox = vi.fn();
     const onToggleLock = vi.fn();
     const onDeactivateClick = vi.fn();
+    const onTagClick = vi.fn();
 
     await act(async () => {
       root?.render(
@@ -82,6 +94,7 @@ describe('CatalogTable', () => {
           onResetBox={onResetBox}
           onToggleLock={onToggleLock}
           onDeactivateClick={onDeactivateClick}
+          onTagClick={onTagClick}
         />
       );
     });
@@ -89,8 +102,23 @@ describe('CatalogTable', () => {
     expect(container?.textContent).toContain('Two Sum Algorithm');
     expect(container?.textContent).toContain('Counter Component');
     expect(container?.textContent).toContain('Debounce Utility');
+    expect(container?.textContent).toContain('New Unattempted Card');
     expect(container?.textContent).toContain('Tier 2');
     expect(container?.textContent).toContain('3'); // streak
+
+    // Status badges assertions: Attempted, Locked, Deactivated, New
+    expect(container?.querySelector('.status-badge-attempted')?.textContent).toContain('Attempted');
+    expect(container?.querySelector('.status-badge-locked')?.textContent).toContain('Locked');
+    expect(container?.querySelector('.status-badge-deactivated')?.textContent).toContain('Deactivated');
+    expect(container?.querySelector('.status-badge-active')?.textContent).toContain('New');
+
+    // Click tag chip
+    const tagBtn = container?.querySelector('.table-tag-chip') as HTMLButtonElement;
+    expect(tagBtn).toBeTruthy();
+    await act(async () => {
+      tagBtn.click();
+    });
+    expect(onTagClick).toHaveBeenCalledWith('array');
 
     // Click header to sort
     const titleHeader = container?.querySelector('.col-card-title') as HTMLElement;

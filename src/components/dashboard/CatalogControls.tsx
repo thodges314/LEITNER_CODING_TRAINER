@@ -59,7 +59,7 @@ export const CatalogControls: React.FC<CatalogControlsProps> = ({
           >
             <option value="all">Status: All</option>
             <option value="attempted">Status: Attempted Only</option>
-            <option value="unattempted">Status: Unattempted (New) Only</option>
+            <option value="unattempted">Status: New Only</option>
             <option value="unlocked">Status: Unlocked Only</option>
             {selectedStatus === 'active' && (
               <option value="active">Status: Unlocked / Active</option>

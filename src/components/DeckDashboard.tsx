@@ -461,12 +461,20 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       }
       if (selectedDifficulty !== 'all' && difficultyOf(t) !== selectedDifficulty) return false;
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchTitle = t.title.toLowerCase().includes(q);
-        const matchTags = t.tags.some((tag) => tag.toLowerCase().includes(q));
-        const matchId = t.id.toLowerCase().includes(q);
-        const matchTrackLabel = getTrackMeta(t.track).label.toLowerCase().includes(q);
-        if (!matchTitle && !matchTags && !matchId && !matchTrackLabel) return false;
+        const q = searchQuery.toLowerCase().trim();
+        const tagQ = q.startsWith('#') ? q.slice(1).trim() : q;
+        if (q === '#') {
+          if (t.tags.length === 0) return false;
+        } else {
+          const matchTitle = t.title.toLowerCase().includes(tagQ);
+          const matchTags = t.tags.some((tag) => {
+            const lowerTag = tag.toLowerCase();
+            return lowerTag.includes(tagQ) || (`#${lowerTag}`).includes(q);
+          });
+          const matchId = t.id.toLowerCase().includes(tagQ);
+          const matchTrackLabel = getTrackMeta(t.track).label.toLowerCase().includes(tagQ);
+          if (!matchTitle && !matchTags && !matchId && !matchTrackLabel) return false;
+        }
       }
       return true;
     })
@@ -794,6 +802,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         onRemoveFromDeck={onRemoveFromDeck}
         onToggleDeactivate={onToggleDeactivate}
         onDeleteTopic={onDeleteTopic}
+        onTagClick={(tag) => setSearchQuery('#' + tag)}
       />
 
       {/* Lightweight Deactivate Confirmation Modal */}
