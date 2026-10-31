@@ -386,12 +386,21 @@ const SANDBOX_GLOBALS = `
     isDirectory: () => boolean;
     size: number;
   }
+  type FSStats = VirtualFSStat;
   interface VirtualFSOptions {
     recursive?: boolean;
   }
   interface RouteMatch {
     handler: (...args: any[]) => any;
     params: Record<string, string>;
+  }
+  type RouteHandler = (...args: any[]) => any;
+  type RouteParams = Record<string, string>;
+  type PoolStats = WorkerPoolStats;
+  type EnvDictionary = Record<string, string>;
+  interface ParsedArgv {
+    _: Array<string | number>;
+    [key: string]: any;
   }
 
   declare module 'react' {
