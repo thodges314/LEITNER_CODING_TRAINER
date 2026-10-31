@@ -330,4 +330,93 @@ export default {
       'null'
     ),
   ],
+
+  'node-commonjs-module-loader': [
+    c(
+      'Loads module and resolves relative paths',
+      'const loader = createModuleLoader({ "/main.js": "const val = require(\x27./data\x27); module.exports = val * 2;", "/data.js": "module.exports = 21;" });\nloader.require("/main")',
+      '42'
+    ),
+    c(
+      'Resolves circular dependency without infinite recursion',
+      'const loader = createModuleLoader({ "/a.js": "const b = require(\x27./b\x27); exports.name = \x27A\x27; exports.bName = b.name;", "/b.js": "const a = require(\x27./a\x27); exports.name = \x27B\x27; exports.aName = a.name;" });\nconst a = loader.require("/a");\n[a.name, a.bName]',
+      '["A", "B"]'
+    ),
+    c(
+      'Caches module instance on subsequent requires',
+      'const loader = createModuleLoader({ "/counter.js": "exports.count = 0; exports.inc = () => exports.count++;" });\nconst c1 = loader.require("/counter");\nc1.inc();\nconst c2 = loader.require("/counter");\n[c1.count, c2.count, c1 === c2]',
+      '[1, 1, true]'
+    ),
+    c(
+      'Automatically resolves /index.js and .js extensions',
+      'const loader = createModuleLoader({ "/lib/index.js": "module.exports = \x27lib-index\x27;" });\nloader.require("./lib")',
+      '"lib-index"'
+    ),
+    c(
+      'Throws error for nonexistent module',
+      'const loader = createModuleLoader({});\nlet caught = false;\ntry { loader.require("/missing"); } catch { caught = true; }\ncaught',
+      'true'
+    ),
+  ],
+
+  'node-virtual-fs': [
+    c(
+      'Creates nested directories and writes and reads files',
+      'const fs = new VirtualFS();\nfs.mkdirp("/var/www/html");\nfs.writeFile("/var/www/html/index.html", "<h1>Hello</h1>");\nfs.readFile("/var/www/html/index.html")',
+      '"<h1>Hello</h1>"'
+    ),
+    c(
+      'readdir lists direct children sorted',
+      'const fs = new VirtualFS();\nfs.mkdirp("/app/src");\nfs.writeFile("/app/src/a.ts", "a");\nfs.writeFile("/app/src/b.ts", "b");\nfs.writeFile("/app/package.json", "{}");\nfs.readdir("/app/src")',
+      '["a.ts", "b.ts"]'
+    ),
+    c(
+      'stat reports file and directory metadata accurately',
+      'const fs = new VirtualFS();\nfs.mkdirp("/logs");\nfs.writeFile("/logs/app.log", "12345");\nconst sFile = fs.stat("/logs/app.log");\nconst sDir = fs.stat("/logs");\n[sFile.isFile(), sFile.size, sDir.isDirectory()]',
+      '[true, 5, true]'
+    ),
+    c(
+      'rm deletes file and recursive rm deletes directory tree',
+      'const fs = new VirtualFS();\nfs.mkdirp("/tmp/sub");\nfs.writeFile("/tmp/sub/file.txt", "data");\nfs.rm("/tmp/sub", { recursive: true });\nfs.readdir("/tmp")',
+      '[]'
+    ),
+    c(
+      'Non-recursive rm on non-empty directory throws ENOTEMPTY',
+      'const fs = new VirtualFS();\nfs.mkdirp("/dir/sub");\nlet caught = false;\ntry { fs.rm("/dir"); } catch { caught = true; }\ncaught',
+      'true'
+    ),
+    c(
+      'Reading nonexistent file throws ENOENT',
+      'const fs = new VirtualFS();\nlet caught = false;\ntry { fs.readFile("/not-found.txt"); } catch { caught = true; }\ncaught',
+      'true'
+    ),
+  ],
+
+  'node-length-prefixed-ipc-framing': [
+    c(
+      'Frames payload with 4-byte UInt32BE length prefix',
+      'const f = new IPCFramer();\nconst buf = f.frame({ test: 123 });\nconst view = new DataView(buf.buffer, buf.byteOffset, buf.byteLength);\n[buf.byteLength, view.getUint32(0, false)]',
+      '[16, 12]'
+    ),
+    c(
+      'Decodes complete frame from single chunk',
+      'const f = new IPCFramer();\nconst buf = f.frame({ ok: true });\nf.push(buf)',
+      '[{ ok: true }]'
+    ),
+    c(
+      'Handles fragmented chunks arriving across multiple pushes',
+      'const f = new IPCFramer();\nconst frame = f.frame({ event: "telemetry", value: 42 });\nconst c1 = frame.subarray(0, 6);\nconst c2 = frame.subarray(6);\n[f.push(c1), f.push(c2)]',
+      '[[], [{ event: "telemetry", value: 42 }]]'
+    ),
+    c(
+      'Multiple frames delivered in single chunk',
+      'const f = new IPCFramer();\nconst f1 = f.frame({ id: 1 });\nconst f2 = f.frame({ id: 2 });\nconst merged = new Uint8Array(f1.length + f2.length);\nmerged.set(f1, 0);\nmerged.set(f2, f1.length);\nf.push(merged)',
+      '[{ id: 1 }, { id: 2 }]'
+    ),
+    c(
+      'reset clears unparsed accumulation buffer',
+      'const f = new IPCFramer();\nconst frame = f.frame({ a: 1 });\nf.push(frame.subarray(0, 5));\nf.reset();\nf.push(frame.subarray(5))',
+      '[]'
+    ),
+  ],
 };

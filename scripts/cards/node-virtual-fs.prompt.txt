@@ -1,0 +1,55 @@
+## Description
+In-memory virtual file systems (like `memfs`) are commonly used in Node.js test harnesses, bundlers, and serverless runtimes to simulate POSIX file operations without hitting physical disk.
+
+Implement the `VirtualFS` class managing an in-memory directory tree and file records.
+
+```ts
+interface FSStats {
+  isFile(): boolean;
+  isDirectory(): boolean;
+  size: number;
+}
+```
+
+### `class VirtualFS`
+- **`mkdirp(dirPath: string): void`**:
+  - Recursively creates `dirPath` and any missing ancestor directories.
+  - Throws an `Error` (`ENOTDIR`) if an existing intermediate segment is a file.
+- **`writeFile(filePath: string, content: string): void`**:
+  - Creates or overwrites `filePath` with `content`.
+  - Throws an `Error` (`ENOENT`) if the immediate parent directory does not exist.
+- **`readFile(filePath: string): string`**:
+  - Returns the string content of `filePath`.
+  - Throws an `Error` (`ENOENT`) if the file does not exist, or `EISDIR` if target is a directory.
+- **`readdir(dirPath: string): string[]`**:
+  - Returns a sorted array of direct child names (files and directories) inside `dirPath`.
+  - Throws an `Error` (`ENOENT`) if directory does not exist, or `ENOTDIR` if target is a file.
+- **`stat(targetPath: string): FSStats`**:
+  - Returns a stats object with `isFile(): boolean`, `isDirectory(): boolean`, and `size: number` (character length for files, 0 for directories).
+  - Throws an `Error` (`ENOENT`) if path does not exist.
+- **`rm(targetPath: string, options?: { recursive?: boolean }): void`**:
+  - Deletes a file or directory.
+  - Throws an `Error` (`ENOENT`) if target does not exist.
+  - If target is a non-empty directory and `options.recursive` is not `true`, throws an `Error` (`ENOTEMPTY`).
+  - Throws an `Error` if attempting to delete the root directory `'/'`.
+
+## Examples
+```js
+const fs = new VirtualFS();
+fs.mkdirp("/var/log");
+fs.writeFile("/var/log/app.log", "ready");
+fs.writeFile("/var/log/error.log", "none");
+
+fs.readdir("/var/log");
+// => ["app.log", "error.log"]
+
+fs.stat("/var/log/app.log").size;
+// => 5
+
+fs.readFile("/var/log/app.log");
+// => "ready"
+
+fs.rm("/var/log", { recursive: true });
+fs.readdir("/var");
+// => []
+```

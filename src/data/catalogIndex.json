@@ -3931,5 +3931,51 @@
       "events"
     ],
     "summary": "In Node.js streams, when a fast producer writes data to a slower consumer, data accumulates in memory unless backpressure flow control is enforced...."
+  },
+  {
+    "id": "node-commonjs-module-loader",
+    "title": "CommonJS Module Loader",
+    "track": "node",
+    "concept": "module-system",
+    "difficulty": 4,
+    "tags": [
+      "node",
+      "modules",
+      "commonjs",
+      "require",
+      "circular-dependency"
+    ],
+    "summary": "Node.js's original module system (require and module.exports) executes JavaScript files inside an isolated CommonJS wrapper function, caches export..."
+  },
+  {
+    "id": "node-length-prefixed-ipc-framing",
+    "title": "Length-Prefixed IPC Framing",
+    "track": "node",
+    "concept": "ipc-framing",
+    "difficulty": 4,
+    "tags": [
+      "node",
+      "buffer",
+      "binary",
+      "ipc",
+      "protocol",
+      "framing"
+    ],
+    "summary": "When streaming structured messages over TCP sockets, Unix domain sockets, or ChildProcess IPC pipes in Node.js, messages lack native message bounda..."
+  },
+  {
+    "id": "node-virtual-fs",
+    "title": "Virtual Hierarchical File System",
+    "track": "node",
+    "concept": "file-system",
+    "difficulty": 4,
+    "tags": [
+      "node",
+      "fs",
+      "filesystem",
+      "tree",
+      "vfs"
+    ],
+    "summary": "In-memory virtual file systems (like memfs) are commonly used in Node.js test harnesses, bundlers, and serverless runtimes to simulate POSIX file o..."
   }
 ]

@@ -1146,5 +1146,17 @@
   "node-http-accept-negotiator": {
     "difficulty": 3,
     "concept": "http-content-negotiation"
+  },
+  "node-commonjs-module-loader": {
+    "difficulty": 4,
+    "concept": "module-system"
+  },
+  "node-virtual-fs": {
+    "difficulty": 4,
+    "concept": "file-system"
+  },
+  "node-length-prefixed-ipc-framing": {
+    "difficulty": 4,
+    "concept": "ipc-framing"
   }
 }

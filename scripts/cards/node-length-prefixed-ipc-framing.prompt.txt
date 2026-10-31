@@ -1,0 +1,44 @@
+## Description
+When streaming structured messages over TCP sockets, Unix domain sockets, or ChildProcess IPC pipes in Node.js, messages lack native message boundaries. A standard solution is length-prefixed framing: each message is preceded by a fixed-length numeric header indicating the byte length of the encoded payload.
+
+Implement `IPCFramer` to frame JSON payloads into binary chunks and reassemble fragmented stream buffers into parsed objects.
+
+```ts
+type IPCMessage = any;
+```
+
+### `class IPCFramer`
+- **`frame(payload: IPCMessage): Uint8Array`**:
+  - Serializes `payload` to JSON string (`JSON.stringify(payload)`).
+  - Encodes the JSON string into UTF-8 bytes.
+  - Prepends a 4-byte big-endian unsigned integer (UInt32BE) header representing the byte length of the UTF-8 payload.
+  - Returns the framed buffer of length `4 + payloadByteLength`.
+- **`push(chunk: Uint8Array): IPCMessage[]`**:
+  - Appends incoming raw byte chunk to internal accumulation buffer.
+  - Reconstructs and extracts complete frames:
+    - Reads the 4-byte big-endian length prefix.
+    - If the buffer contains at least `4 + payloadLength` bytes, slices the payload, decodes the UTF-8 string, and parses the JSON message.
+    - Advances the buffer and repeats if multiple frames are present.
+    - If fewer than `4 + payloadLength` bytes are available, retains the partial fragment in the internal buffer awaiting future chunks.
+  - Returns an array of parsed message objects completed by this chunk (or `[]` if no frames completed).
+- **`reset(): void`**:
+  - Clears any accumulated unparsed buffer data.
+
+## Examples
+```js
+const framer = new IPCFramer();
+
+const frame1 = framer.frame({ action: "start", jobId: 101 });
+// Frame: 4 bytes length prefix + JSON UTF-8 payload bytes
+
+// Stream delivers first frame + first 3 bytes of a second frame in one chunk
+const chunk1 = new Uint8Array([...frame1, 0, 0, 0]);
+framer.push(chunk1);
+// => [{ action: "start", jobId: 101 }]
+
+// Stream delivers the remainder of second frame
+const frame2 = framer.frame({ action: "stop" });
+const chunk2 = frame2.subarray(3);
+framer.push(chunk2);
+// => [{ action: "stop" }]
+```

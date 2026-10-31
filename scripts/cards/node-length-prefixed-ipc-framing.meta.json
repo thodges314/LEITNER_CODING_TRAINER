@@ -1,0 +1,6 @@
+{
+  "title": "Length-Prefixed IPC Framing",
+  "track": "node",
+  "tags": ["node", "buffer", "binary", "ipc", "protocol", "framing"],
+  "concept": "ipc-framing"
+}

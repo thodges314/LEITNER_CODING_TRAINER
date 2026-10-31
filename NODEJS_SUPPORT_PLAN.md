@@ -116,28 +116,28 @@ The **Node.js track strictly avoids duplicating these patterns**. Instead, it fo
 
 ---
 
-### Tier 4: Architecture, Process & Modules
+### Tier 4: Architecture, Process & Modules (Completed: 3/3)
 
-#### 11. `node-commonjs-module-loader`
+#### 11. `node-commonjs-module-loader` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 4 (Proficient)
 - **Concept**: `module-system`
-- **Signature**: `createModuleLoader(files: Record<string, string>): { require(id: string): any }`
-- **Description**: Implement an in-memory CommonJS module loader and module cache. Executes module code in an isolated scope with `module`, `exports`, `require`, and `__filename`. Handles relative path resolution and successfully resolves circular dependencies via cached `module.exports` object references.
-- **Key Edge Cases**: Circular `require()` references return partially evaluated exports; re-requiring the same path returns cached instance without re-evaluating.
+- **Signature**: `createModuleLoader(files: Record<string, string>): ModuleLoader`
+- **Description**: Implement an in-memory CommonJS module loader and module cache. Executes module code in an isolated scope with `module`, `exports`, `require`, `__filename`, and `__dirname`. Handles relative path resolution and successfully resolves circular dependencies via cached `module.exports` object references.
+- **Key Edge Cases**: Circular `require()` references return partially evaluated exports; re-requiring the same path returns cached instance without re-evaluating; automatic `/index.js` and `.js` resolution.
 
-#### 12. `node-virtual-fs`
+#### 12. `node-virtual-fs` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 4 (Proficient)
 - **Concept**: `file-system`
-- **Signature**: `class VirtualFS` with `mkdirp(path)`, `writeFile(path, data)`, `readFile(path)`, `readdir(path, options?)`, `stat(path)`, and `rmdir(path, { recursive: true })`
-- **Description**: In-memory hierarchical filesystem tree implementing POSIX-like operations: directory creation (`mkdirp`), atomic file writes, recursive directory reads with entry types (file vs directory), file stats (size, timestamps), and recursive deletion.
-- **Key Edge Cases**: Overwriting existing files; reading non-existent paths throws `ENOENT`; writing to a non-existent parent directory throws `ENOENT` unless `mkdirp` was called.
+- **Signature**: `class VirtualFS` with `mkdirp(path)`, `writeFile(path, data)`, `readFile(path)`, `readdir(path)`, `stat(path)`, and `rm(path, options?)`
+- **Description**: In-memory hierarchical filesystem tree implementing POSIX-like operations: directory creation (`mkdirp`), file writes and reads, directory listing, file and directory stats, and recursive deletion.
+- **Key Edge Cases**: Reading non-existent paths throws `ENOENT`; writing to a non-existent parent directory throws `ENOENT`; non-recursive deletion of non-empty directory throws `ENOTEMPTY`.
 
-#### 13. `node-length-prefixed-ipc-framing`
+#### 13. `node-length-prefixed-ipc-framing` [DONE]
 - **Track**: `node` | **Difficulty**: Tier 4 (Proficient)
-- **Concept**: `ipc-protocol`
-- **Signature**: `class FrameDecoder` with `write(chunk: Uint8Array): Uint8Array[]` and `encodeFrame(payload: Uint8Array): Uint8Array`
-- **Description**: Message framing protocol for streaming sockets / IPC. Encodes payloads with a 4-byte big-endian unsigned integer header representing message length. The decoder handles arbitrary chunk fragmentation (a chunk containing half a header, multiple messages, or an incomplete body).
-- **Key Edge Cases**: Multiple messages in a single packet; packet boundary splitting the 4-byte length header; zero-length payload frames.
+- **Concept**: `ipc-framing`
+- **Signature**: `class IPCFramer` with `frame(payload: any): Uint8Array`, `push(chunk: Uint8Array): any[]`, and `reset(): void`
+- **Description**: Message framing protocol for streaming sockets / IPC. Encodes JSON payloads with a 4-byte big-endian unsigned integer header representing message byte length. The decoder handles arbitrary chunk fragmentation (a chunk containing half a header, multiple messages, or an incomplete body).
+- **Key Edge Cases**: Multiple messages in a single packet; packet boundary splitting the 4-byte length header; chunk reconstruction across pushes.
 
 ---
 

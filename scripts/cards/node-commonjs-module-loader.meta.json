@@ -1,0 +1,6 @@
+{
+  "title": "CommonJS Module Loader",
+  "track": "node",
+  "tags": ["node", "modules", "commonjs", "require", "circular-dependency"],
+  "concept": "module-system"
+}

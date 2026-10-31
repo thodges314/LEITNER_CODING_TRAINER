@@ -1,0 +1,45 @@
+## Description
+Node.js's original module system (`require` and `module.exports`) executes JavaScript files inside an isolated CommonJS wrapper function, caches exported objects to prevent duplicate evaluation, and resolves circular dependencies by caching partially-evaluated export objects.
+
+Implement `createModuleLoader` to simulate an in-memory CommonJS module system.
+
+```ts
+interface ModuleLoader {
+  require(id: string): any;
+}
+```
+
+### `createModuleLoader(files: Record<string, string>): ModuleLoader`
+Returns an object with a `require` function to execute and load modules from the `files` map:
+- `files` maps absolute file paths to JavaScript source code strings (e.g. `{ '/index.js': 'module.exports = 42;' }`).
+- **Path Resolution**:
+  - Top-level `loader.require(id)` resolves `id` relative to root `'/'`.
+  - Inside a module, `require(relId)` resolves relative to the current module's directory (`__dirname`).
+  - Supports `./` and `../` path navigation (collapsing `.` and `..` segments).
+  - Automatically appends `.js` or `/index.js` if the exact path is not found in `files`.
+  - Throws an `Error` if the module cannot be resolved.
+- **Module Execution**:
+  - Executes module code with five scoped parameters: `(exports, require, module, __filename, __dirname)`.
+  - `module.exports` is initially an empty object `{}`.
+  - `exports` references `module.exports`.
+- **Caching & Circular Dependency Resolution**:
+  - Each resolved absolute path is evaluated only once; subsequent `require` calls return the cached `module.exports`.
+  - The module object must be placed into the cache **before** executing the module's code.
+  - If module A requires module B while module B requires module A, module B receives module A's partially completed `exports` object without infinite recursion.
+
+## Examples
+```js
+const files = {
+  "/main.js": `
+    const math = require("./math");
+    module.exports = math.add(2, 3);
+  `,
+  "/math.js": `
+    exports.add = (a, b) => a + b;
+  `
+};
+
+const loader = createModuleLoader(files);
+loader.require("/main");
+// => 5
+```
