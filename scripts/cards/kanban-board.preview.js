@@ -1,10 +1,10 @@
-const initialColumns = [
+const defaultColumns = [
   {
-    id: 'backlog',
-    title: 'Backlog',
+    id: 'todo',
+    title: 'To Do',
     cards: [
-      { id: 'b1', title: 'Audit a11y focus rings', description: 'Ensure 3:1 contrast' },
-      { id: 'b2', title: 'Optimize bundle splitting' },
+      { id: 't1', title: 'Implement Auth Flow', description: 'JWT tokens and refresh flow' },
+      { id: 't2', title: 'Cache Strategy', description: 'Configure Redis cache layers' },
     ],
   },
   {
@@ -25,6 +25,15 @@ const initialColumns = [
 ];
 
 function KanbanBoardPreview() {
+  const {
+    initialColumns = defaultColumns,
+    onCardMove,
+    onCardAdd,
+  } = usePreviewProps({
+    initialColumns: defaultColumns,
+  });
+
+  const parsedColumns = Array.isArray(initialColumns) && initialColumns.length > 0 ? initialColumns : defaultColumns;
   const [logMsg, setLogMsg] = useState('Try moving cards or creating a new task');
 
   return (
@@ -35,14 +44,17 @@ function KanbanBoardPreview() {
       </div>
 
       <KanbanBoard
-        initialColumns={initialColumns}
+        key={JSON.stringify(parsedColumns)}
+        initialColumns={parsedColumns}
         onCardMove={(cardId, fromCol, toCol, newIdx) => {
           setLogMsg(`Moved ${cardId} (${fromCol} → ${toCol} at index ${newIdx})`);
-          if (typeof log === 'function') log('onCardMove', cardId, fromCol, toCol, newIdx);
+          if (onCardMove) onCardMove(cardId, fromCol, toCol, newIdx);
+          log('onCardMove', cardId, fromCol, toCol, newIdx);
         }}
         onCardAdd={(colId, card) => {
           setLogMsg(`Added "${card.title}" to ${colId}`);
-          if (typeof log === 'function') log('onCardAdd', colId, card);
+          if (onCardAdd) onCardAdd(colId, card);
+          log('onCardAdd', colId, card);
         }}
       />
     </div>

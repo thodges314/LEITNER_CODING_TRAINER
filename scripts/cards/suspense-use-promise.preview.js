@@ -1,5 +1,19 @@
 function Demo() {
-  const [promise, setPromise] = useState(() => Promise.resolve({ name: 'Ada Lovelace', role: 'Algorithm Pioneer' }));
+  const {
+    delayMs = 800,
+    name = 'Ada Lovelace',
+    role = 'Algorithm Pioneer',
+  } = usePreviewProps({
+    delayMs: 800,
+    name: 'Ada Lovelace',
+    role: 'Algorithm Pioneer',
+  });
+
+  const [promise, setPromise] = useState(() => Promise.resolve({ name, role }));
+
+  useEffect(() => {
+    setPromise(Promise.resolve({ name, role }));
+  }, [name, role]);
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', padding: 16 }}>
@@ -15,10 +29,10 @@ function Demo() {
           marginBottom: 12,
         }}
         onClick={() => {
-          log('fetch', 'fetching next user with 800ms delay');
+          log('fetch', `fetching with ${delayMs}ms delay`);
           setPromise(
             new Promise((resolve) =>
-              setTimeout(() => resolve({ name: 'Grace Hopper', role: 'Compiler Pioneer' }), 800)
+              setTimeout(() => resolve({ name, role }), Number(delayMs) || 800)
             )
           );
         }}

@@ -39,39 +39,62 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'checked', type: 'boolean', defaultValue: false, description: 'Whether the switch is on' },
     { name: 'disabled', type: 'boolean', defaultValue: false, description: 'Prevent user interaction' },
     { name: 'children', type: 'string', defaultValue: 'Wi-Fi', placeholder: 'Switch label text', description: 'Label displayed next to switch' },
-    { name: 'onChange', type: 'function', description: 'Callback fired on toggle' },
+    { name: 'onChange', type: 'function', description: 'Callback fired on toggle: (next: boolean) => void' },
   ],
   'tag-input': [
-    { name: 'max', type: 'number', defaultValue: 5, min: 1, max: 20, description: 'Maximum allowed tags' },
-    { name: 'placeholder', type: 'string', defaultValue: 'Add a tag...', placeholder: 'Input placeholder', description: 'Placeholder for new tag input' },
-    { name: 'disabled', type: 'boolean', defaultValue: false, description: 'Disable tag entry' },
-    { name: 'onChange', type: 'function', description: 'Callback with updated tag array' },
+    {
+      name: 'value',
+      type: 'json',
+      defaultValue: ['react', 'javascript', 'typescript'],
+      description: 'Array of current string tags',
+    },
+    { name: 'max', type: 'number', defaultValue: 5, min: 1, max: 20, placeholder: 'Max tags (or empty for Infinity)', description: 'Maximum allowed tags' },
+    { name: 'onChange', type: 'function', description: 'Callback with updated tag array: (next: string[]) => void' },
   ],
   'tooltip': [
     { name: 'content', type: 'string', defaultValue: 'Additional details appear on hover or focus', placeholder: 'Tooltip content', description: 'Tooltip popup message' },
   ],
   'popover': [
-    { name: 'placement', type: 'enum', defaultValue: 'top', options: ['top', 'bottom', 'left', 'right'], description: 'Popover placement relative to trigger' },
-    { name: 'title', type: 'string', defaultValue: 'Popover Details', placeholder: 'Popover title', description: 'Header title text' },
+    { name: 'placement', type: 'enum', defaultValue: 'bottom', options: ['bottom', 'top', 'left', 'right'], description: 'Popover placement relative to trigger' },
+    { name: 'title', type: 'string', defaultValue: 'Popover Details', placeholder: 'Popover title (optional)', description: 'Header title text' },
     { name: 'content', type: 'string', defaultValue: 'Helpful contextual information and action items.', placeholder: 'Popover content', description: 'Body text inside popover' },
-    { name: 'arrow', type: 'boolean', defaultValue: true, description: 'Show triangular indicator arrow' },
+    { name: 'isOpen', type: 'boolean', defaultValue: false, description: 'Controlled open state (toggle to test controlled mode)' },
+    { name: 'onToggle', type: 'function', description: 'Callback fired when open state toggles: (open: boolean) => void' },
   ],
   'stepper': [
+    {
+      name: 'steps',
+      type: 'json',
+      defaultValue: [
+        { id: '1', title: 'Personal Details', description: 'Name & Contact' },
+        { id: '2', title: 'Account Setup', description: 'Password & Security' },
+        { id: '3', title: 'Confirmation', description: 'Review & Submit' },
+      ],
+      description: 'Array of StepItem objects ({ id, title, description? })',
+    },
     { name: 'initialStep', type: 'number', defaultValue: 0, min: 0, max: 5, description: 'Starting step index (0-indexed)' },
-    { name: 'orientation', type: 'enum', defaultValue: 'horizontal', options: ['horizontal', 'vertical'], description: 'Layout orientation of steps' },
-    { name: 'onStepChange', type: 'function', description: 'Triggered when active step changes' },
-    { name: 'onComplete', type: 'function', description: 'Triggered when stepper finishes' },
+    { name: 'onStepChange', type: 'function', description: 'Callback fired when active step changes: (index: number) => void' },
+    { name: 'onComplete', type: 'function', description: 'Callback fired when stepper finishes: () => void' },
   ],
   'dropdown-menu': [
-    { name: 'label', type: 'string', defaultValue: 'Actions', placeholder: 'Menu button label', description: 'Trigger button label' },
-    { name: 'disabled', type: 'boolean', defaultValue: false, description: 'Disable opening menu' },
-    { name: 'onSelect', type: 'function', description: 'Callback when menu item is clicked' },
+    { name: 'label', type: 'string', defaultValue: 'Options ▾', placeholder: 'Menu trigger label', description: 'Trigger button label' },
+    {
+      name: 'items',
+      type: 'json',
+      defaultValue: [
+        { id: 'edit', label: 'Edit Profile' },
+        { id: 'duplicate', label: 'Duplicate Entry' },
+        { id: 'archive', label: 'Archive Record', disabled: true },
+        { id: 'delete', label: 'Delete Forever' },
+      ],
+      description: 'Array of MenuItem objects ({ id, label, disabled? })',
+    },
+    { name: 'onSelect', type: 'function', description: 'Callback when menu item is clicked: (id: string) => void' },
   ],
   'modal-portal-focus': [
-    { name: 'isOpen', type: 'boolean', defaultValue: true, description: 'Controls whether modal is rendered' },
-    { name: 'title', type: 'string', defaultValue: 'Confirm Action', placeholder: 'Modal title', description: 'Modal header title' },
-    { name: 'closeOnOverlayClick', type: 'boolean', defaultValue: true, description: 'Dismiss when backdrop is clicked' },
-    { name: 'onClose', type: 'function', description: 'Callback fired to dismiss modal' },
+    { name: 'isOpen', type: 'boolean', defaultValue: false, description: 'Controls whether modal is rendered' },
+    { name: 'content', type: 'string', defaultValue: 'Focus is trapped inside this modal while open.', placeholder: 'Modal body text', description: 'Modal body content' },
+    { name: 'onClose', type: 'function', description: 'Callback fired to dismiss modal: () => void' },
   ],
   'accordion-component': [
     {
@@ -239,17 +262,18 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'pagination-controls': [
     { name: 'page', type: 'number', defaultValue: 2, min: 1, max: 20, description: 'Current active page number' },
     { name: 'totalPages', type: 'number', defaultValue: 10, min: 1, max: 100, description: 'Total available pages' },
-    { name: 'siblingCount', type: 'number', defaultValue: 1, min: 0, max: 3, description: 'Number of sibling page links adjacent to current' },
-    { name: 'onPageChange', type: 'function', description: 'Callback with newly selected page number' },
+    { name: 'siblings', type: 'number', defaultValue: 1, min: 0, max: 3, description: 'Number of sibling page links adjacent to current (defaults to 1)' },
+    { name: 'onPageChange', type: 'function', description: 'Callback with newly selected page number: (page: number) => void' },
   ],
   'optimistic-like-button': [
-    { name: 'initialLikes', type: 'number', defaultValue: 42, min: 0, max: 9999, description: 'Initial like count' },
-    { name: 'initialLiked', type: 'boolean', defaultValue: false, description: 'Whether the current user has already liked' },
-    { name: 'onLike', type: 'function', description: 'Async callback invoked on click' },
+    { name: 'initialCount', type: 'number', defaultValue: 42, min: 0, max: 9999, description: 'Initial like count (defaults to 0)' },
+    { name: 'initialLiked', type: 'boolean', defaultValue: false, description: 'Whether the current user has already liked (defaults to false)' },
+    { name: 'onToggle', type: 'function', description: 'Async callback invoked on like toggle: (nextLiked: boolean) => Promise<unknown>' },
   ],
   'toast-queue': [
+    { name: 'limit', type: 'number', defaultValue: 3, min: 1, max: 10, description: 'Maximum visible concurrent toasts' },
     { name: 'duration', type: 'number', defaultValue: 3000, min: 500, max: 10000, step: 500, description: 'Auto-dismiss delay in ms' },
-    { name: 'position', type: 'enum', defaultValue: 'bottom-right', options: ['bottom-right', 'bottom-left', 'top-right', 'top-left'], description: 'Toast stack position on viewport' },
+    { name: 'message', type: 'string', defaultValue: 'Changes saved successfully!', placeholder: 'Toast message', description: 'Message for new toast' },
   ],
   'image-carousel': [
     {
@@ -286,11 +310,21 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     },
   ],
   'virtual-list': [
-    { name: 'itemHeight', type: 'number', defaultValue: 36, min: 20, max: 100, description: 'Fixed pixel height of each item' },
-    { name: 'windowHeight', type: 'number', defaultValue: 240, min: 100, max: 600, description: 'Height of virtual scrolling viewport' },
+    { name: 'itemHeight', type: 'number', defaultValue: 35, min: 20, max: 100, step: 5, description: 'Fixed pixel height of each item' },
+    { name: 'height', type: 'number', defaultValue: 200, min: 100, max: 600, step: 20, description: 'Height in pixels of virtual scrolling viewport' },
+    { name: 'overscan', type: 'number', defaultValue: 3, min: 0, max: 10, description: 'Extra buffer items rendered above/below visible window (defaults to 3)' },
+    { name: 'itemsCount', type: 'number', defaultValue: 1000, min: 10, max: 10000, step: 100, description: 'Total number of items in dataset' },
   ],
   'infinite-scroll-list': [
-    { name: 'threshold', type: 'number', defaultValue: 100, min: 10, max: 500, description: 'Bottom scroll threshold in pixels before loading more' },
+    {
+      name: 'items',
+      type: 'json',
+      defaultValue: ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'],
+      description: 'Initial array of string items rendered in the list',
+    },
+    { name: 'hasMore', type: 'boolean', defaultValue: true, description: 'Whether further pages remain to be fetched' },
+    { name: 'loading', type: 'boolean', defaultValue: false, description: 'Active loading state flag' },
+    { name: 'onLoadMore', type: 'function', description: 'Callback fired when sentinel intersects: () => void' },
   ],
   'load-more-list': [
     {
@@ -308,21 +342,51 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     },
   ],
   'typeahead-autocomplete': [
-    { name: 'placeholder', type: 'string', defaultValue: 'Search items...', placeholder: 'Typeahead placeholder', description: 'Search input placeholder' },
-    { name: 'minChars', type: 'number', defaultValue: 1, min: 1, max: 5, description: 'Minimum keystrokes before suggestions open' },
-    { name: 'debounceMs', type: 'number', defaultValue: 200, min: 0, max: 1000, step: 50, description: 'Debounce delay for suggestions' },
+    { name: 'delay', type: 'number', defaultValue: 100, min: 0, max: 1000, step: 50, placeholder: 'ms (default 300)', description: 'Debounce delay in milliseconds before fetching suggestions' },
+    {
+      name: 'suggestions',
+      type: 'json',
+      defaultValue: ['Apple', 'Apricot', 'Avocado', 'Banana', 'Blueberry', 'Cherry', 'Cranberry', 'Date', 'Elderberry', 'Fig', 'Grape'],
+      description: 'Suggestion pool filtered by fetchSuggestions',
+    },
+    { name: 'onSelect', type: 'function', description: 'Callback fired when an item is chosen: (item: string) => void' },
   ],
   'combobox-autocomplete-a11y': [
-    { name: 'label', type: 'string', defaultValue: 'Choose an option', placeholder: 'Combobox label', description: 'Accessible label' },
-    { name: 'placeholder', type: 'string', defaultValue: 'Type to search...', placeholder: 'Search placeholder', description: 'Input placeholder text' },
-    { name: 'disabled', type: 'boolean', defaultValue: false, description: 'Disable combobox interaction' },
+    { name: 'label', type: 'string', defaultValue: 'Destination Country', placeholder: 'Combobox label', description: 'Accessible label' },
+    { name: 'placeholder', type: 'string', defaultValue: 'Search countries...', placeholder: 'Search placeholder', description: 'Input placeholder text' },
+    {
+      name: 'options',
+      type: 'json',
+      defaultValue: [
+        { id: 'c-us', label: 'United States', value: 'US' },
+        { id: 'c-ca', label: 'Canada', value: 'CA' },
+        { id: 'c-mx', label: 'Mexico', value: 'MX' },
+        { id: 'c-gb', label: 'United Kingdom', value: 'GB' },
+        { id: 'c-fr', label: 'France', value: 'FR' },
+        { id: 'c-de', label: 'Germany', value: 'DE', disabled: true },
+        { id: 'c-jp', label: 'Japan', value: 'JP' },
+      ],
+      description: 'Array of ComboboxOption objects ({ id, label, value, disabled? })',
+    },
+    { name: 'onSelect', type: 'function', description: 'Callback fired when an option is selected: (option) => void' },
   ],
   'roving-tabindex-toolbar': [
-    { name: 'orientation', type: 'enum', defaultValue: 'horizontal', options: ['horizontal', 'vertical'], description: 'Keyboard arrow navigation direction' },
+    { name: 'label', type: 'string', defaultValue: 'Editor Actions', placeholder: 'Toolbar label', description: 'Accessible toolbar label' },
+    {
+      name: 'items',
+      type: 'json',
+      defaultValue: [
+        { id: 'cut', label: 'Cut' },
+        { id: 'copy', label: 'Copy' },
+        { id: 'paste', label: 'Paste' },
+        { id: 'delete', label: 'Delete' },
+      ],
+      description: 'Array of ToolbarItem objects ({ id, label })',
+    },
   ],
   'live-announcer': [
-    { name: 'politeness', type: 'enum', defaultValue: 'polite', options: ['polite', 'assertive', 'off'], description: 'ARIA live region politeness' },
-    { name: 'message', type: 'string', defaultValue: 'Changes saved successfully', placeholder: 'Announcement text', description: 'Message sent to screen reader' },
+    { name: 'politeness', type: 'enum', defaultValue: 'polite', options: ['polite', 'assertive'], description: 'ARIA live region politeness' },
+    { name: 'message', type: 'string', defaultValue: 'Changes saved successfully.', placeholder: 'Announcement text', description: 'Message sent to screen reader' },
   ],
   'form-error-summary': [
     {
@@ -332,31 +396,169 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     },
   ],
   'action-state-form': [
-    { name: 'action', type: 'function', description: 'Form submit action handler' },
+    { name: 'delayMs', type: 'number', defaultValue: 600, min: 100, max: 3000, step: 100, description: 'Simulated server network delay in milliseconds' },
+    {
+      name: 'subscribe',
+      type: 'function',
+      description: 'Async submission action: (email: string) => Promise<{ ok: boolean; error?: string }>',
+    },
   ],
   'suspense-use-promise': [
     { name: 'delayMs', type: 'number', defaultValue: 800, min: 100, max: 3000, step: 100, description: 'Simulated async resource delay in ms' },
+    { name: 'name', type: 'string', defaultValue: 'Ada Lovelace', placeholder: 'User name', description: 'User name resolved by promise' },
+    { name: 'role', type: 'string', defaultValue: 'Algorithm Pioneer', placeholder: 'User role', description: 'User role resolved by promise' },
   ],
   'tabs-transition-suspense': [
-    { name: 'defaultTab', type: 'enum', defaultValue: 'profile', options: ['profile', 'settings', 'dashboard'], description: 'Starting tab panel' },
+    { name: 'delayMs', type: 'number', defaultValue: 600, min: 100, max: 2000, step: 100, description: 'Simulated async tab data delay in milliseconds' },
+    { name: 'load', type: 'function', description: 'Async function fetching tab text: (tabId: string) => Promise<string>' },
   ],
   'file-explorer-tree': [
-    { name: 'expandAll', type: 'boolean', defaultValue: false, description: 'Expand all folders by default' },
+    {
+      name: 'nodes',
+      type: 'json',
+      defaultValue: [
+        {
+          name: 'src',
+          children: [
+            { name: 'App.jsx' },
+            { name: 'index.css' },
+            {
+              name: 'components',
+              children: [{ name: 'Button.jsx' }, { name: 'Header.jsx' }],
+            },
+          ],
+        },
+        { name: 'package.json' },
+        { name: 'README.md' },
+      ],
+      description: 'Array of FileNode objects ({ name, children? })',
+    },
+    { name: 'onSelect', type: 'function', description: 'Callback fired when a leaf file node is clicked: (path: string) => void' },
   ],
   'nested-checkbox-tree': [
-    { name: 'cascade', type: 'boolean', defaultValue: true, description: 'Cascade check state down and up to parent checkboxes' },
+    {
+      name: 'treeData',
+      type: 'json',
+      defaultValue: [
+        {
+          id: 'frontend',
+          label: 'Frontend',
+          children: [
+            { id: 'react', label: 'React' },
+            { id: 'typescript', label: 'TypeScript' },
+          ],
+        },
+        {
+          id: 'backend',
+          label: 'Backend',
+          children: [
+            { id: 'node', label: 'Node.js' },
+            { id: 'postgres', label: 'PostgreSQL' },
+          ],
+        },
+      ],
+      description: 'Array of TreeNode objects ({ id, label, children? })',
+    },
+    {
+      name: 'initialChecked',
+      type: 'json',
+      defaultValue: ['react'],
+      description: 'Initial array of checked node IDs',
+    },
   ],
   'nested-comments': [
-    { name: 'maxDepth', type: 'number', defaultValue: 4, min: 1, max: 8, description: 'Maximum nesting depth for child replies' },
+    {
+      name: 'comments',
+      type: 'json',
+      defaultValue: [
+        {
+          id: '1',
+          author: 'Sarah Chen',
+          timestamp: '3 hours ago',
+          text: 'What is the best way to handle optimistic UI updates with nested comments?',
+          children: [
+            {
+              id: '2',
+              author: 'Alex River',
+              timestamp: '2 hours ago',
+              text: 'Assign a client-generated UUID and rollback if the server responds with an error.',
+            },
+          ],
+        },
+        {
+          id: '3',
+          author: 'Jordan Miller',
+          timestamp: '1 hour ago',
+          text: 'Great article on tree traversals for threaded discussions.',
+        },
+      ],
+      description: 'Array of CommentItem objects ({ id, author, text, timestamp, children? })',
+    },
+    { name: 'maxDepth', type: 'number', defaultValue: 4, min: 1, max: 8, description: 'Maximum nesting depth for child replies (defaults to 4)' },
+    { name: 'onAddReply', type: 'function', description: 'Callback fired when a reply is submitted: (parentId: string, text: string) => void' },
   ],
   'kanban-board': [
-    { name: 'allowNewTasks', type: 'boolean', defaultValue: true, description: 'Enable adding new cards to columns' },
+    {
+      name: 'initialColumns',
+      type: 'json',
+      defaultValue: [
+        {
+          id: 'todo',
+          title: 'To Do',
+          cards: [
+            { id: 't1', title: 'Implement Auth Flow', description: 'JWT tokens and refresh flow' },
+            { id: 't2', title: 'Cache Strategy', description: 'Configure Redis cache layers' },
+          ],
+        },
+        {
+          id: 'in-dev',
+          title: 'In Progress',
+          cards: [
+            { id: 'd1', title: 'Kanban board card authoring', description: 'Adding full TS types' },
+          ],
+        },
+        {
+          id: 'done',
+          title: 'Completed',
+          cards: [
+            { id: 'c1', title: 'Interactive Stepper' },
+            { id: 'c2', title: 'Popover positioning' },
+          ],
+        },
+      ],
+      description: 'Array of KanbanColumn objects ({ id, title, cards: [{ id, title, description? }] })',
+    },
+    { name: 'onCardMove', type: 'function', description: 'Callback fired when a card moves: (cardId, fromCol, toCol, newIdx) => void' },
+    { name: 'onCardAdd', type: 'function', description: 'Callback fired when a card is added: (colId, card) => void' },
   ],
   'drag-sortable-list': [
-    { name: 'direction', type: 'enum', defaultValue: 'vertical', options: ['vertical', 'horizontal'], description: 'List layout orientation' },
+    {
+      name: 'items',
+      type: 'json',
+      defaultValue: [
+        { id: 'step-1', label: '1. Gather Requirements' },
+        { id: 'step-2', label: '2. Design System Tokens' },
+        { id: 'step-3', label: '3. Implement Accessible Components' },
+        { id: 'step-4', label: '4. Run Mutation & E2E Tests' },
+        { id: 'step-5', label: '5. Deploy to Production' },
+      ],
+      description: 'Array of SortableItem objects ({ id, label })',
+    },
+    { name: 'onReorder', type: 'function', description: 'Callback fired when items are reordered: (items) => void' },
   ],
   'transfer-list': [
-    { name: 'showSelectAll', type: 'boolean', defaultValue: true, description: 'Display select all / deselect all buttons' },
+    {
+      name: 'initialLeft',
+      type: 'json',
+      defaultValue: ['HTML', 'CSS', 'JavaScript'],
+      description: 'Initial array of items in the left available list',
+    },
+    {
+      name: 'initialRight',
+      type: 'json',
+      defaultValue: ['React', 'TypeScript'],
+      description: 'Initial array of items in the right selected list',
+    },
   ],
   'controlled-vs-uncontrolled-input': [
     {
@@ -366,20 +568,35 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     },
   ],
   'forward-ref-imperative-handle': [
-    { name: 'placeholder', type: 'string', defaultValue: 'Focus me with ref', placeholder: 'Input placeholder', description: 'Input field placeholder' },
+    { name: 'placeholder', type: 'string', defaultValue: 'Type here...', placeholder: 'Input placeholder', description: 'Input field placeholder' },
+    { name: 'defaultValue', type: 'string', defaultValue: 'Hello World', placeholder: 'Initial text value', description: 'Initial input text' },
   ],
   'memo-stable-callbacks': [
-    { name: 'multiplier', type: 'number', defaultValue: 2, min: 1, max: 10, description: 'Calculation multiplier prop' },
+    {
+      name: 'items',
+      type: 'json',
+      defaultValue: ['Alpha', 'Beta', 'Gamma', 'Delta'],
+      description: 'Array of string items passed to memoized List child',
+    },
+    { name: 'onListRender', type: 'function', description: 'Callback fired when List child renders: () => void' },
   ],
   'memo-derived-list': [
-    { name: 'searchTerm', type: 'string', defaultValue: '', placeholder: 'Filter list...', description: 'Substring filter query' },
+    {
+      name: 'items',
+      type: 'json',
+      defaultValue: [42, 7, 19, 3, 99, 14, 28],
+      description: 'Array of numbers to sort via useMemo',
+    },
+    { name: 'onCompute', type: 'function', description: 'Callback fired on sort recalculation: () => void' },
   ],
   'focus-on-mount': [
-    { name: 'autoFocus', type: 'boolean', defaultValue: true, description: 'Focus target input upon mounting' },
+    { name: 'label', type: 'string', defaultValue: 'Username:', placeholder: 'Input label', description: 'Associated input label' },
+    { name: 'placeholder', type: 'string', defaultValue: 'Focuses automatically on mount', placeholder: 'Input placeholder', description: 'Input placeholder text' },
   ],
   'error-boundary-reset': [
-    { name: 'errorMessage', type: 'string', defaultValue: 'Failed to load component data', placeholder: 'Error message', description: 'Simulated failure message' },
-    { name: 'onReset', type: 'function', description: 'Callback invoked to recover from error' },
+    { name: 'errorMessage', type: 'string', defaultValue: 'Crashed in BuggyWidget', placeholder: 'Error message', description: 'Simulated failure message' },
+    { name: 'resetKey', type: 'number', defaultValue: 0, min: 0, max: 100, description: 'Numeric reset key passed in resetKeys array' },
+    { name: 'onError', type: 'function', description: 'Callback invoked when a descendant throws: (error, info) => void' },
   ],
   'simple-error-boundary': [
     {
@@ -396,19 +613,40 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     },
   ],
   'multi-step-form': [
-    { name: 'initialStep', type: 'number', defaultValue: 1, min: 1, max: 3, description: 'Starting form step (1-indexed)' },
+    {
+      name: 'steps',
+      type: 'json',
+      defaultValue: [
+        {
+          title: 'Account Information',
+          fields: [
+            { name: 'username', label: 'Username:' },
+            { name: 'email', label: 'Email:' },
+          ],
+        },
+        {
+          title: 'Profile Details',
+          fields: [
+            { name: 'fullName', label: 'Full Name:' },
+            { name: 'role', label: 'Role:' },
+          ],
+        },
+      ],
+      description: 'Array of StepDef objects ({ title, fields: [{ name, label }] })',
+    },
+    { name: 'onSubmit', type: 'function', description: 'Callback fired on final step completion: (values: Record<string, string>) => void' },
   ],
   'route-focus-and-skip-link': [
-    { name: 'skipTarget', type: 'string', defaultValue: '#main', placeholder: 'Skip target selector', description: 'Target element ID for skip link' },
+    { name: 'path', type: 'string', defaultValue: '/dashboard', placeholder: '/route/path', description: 'Current router URL path' },
+    { name: 'title', type: 'string', defaultValue: 'Dashboard', placeholder: 'Page title', description: 'Current page title' },
+    { name: 'children', type: 'string', defaultValue: 'On route change, focus moves to the h1 heading for screen readers. A skip-link is available above.', placeholder: 'Main body content', description: 'Page body content' },
   ],
   'context-provider-consumer': [
     { name: 'defaultTheme', type: 'enum', defaultValue: 'light', options: ['light', 'dark'], description: 'Initial theme value' },
   ],
-  'stopwatch': [
-    { name: 'format', type: 'enum', defaultValue: 'ms', options: ['ms', 'seconds'], description: 'Elapsed time display resolution' },
-  ],
+  'stopwatch': [],
   'tic-tac-toe': [
-    { name: 'startingPlayer', type: 'enum', defaultValue: 'X', options: ['X', 'O'], description: 'First turn player mark' },
+    { name: 'onGameEnd', type: 'function', description: 'Callback fired when game ends: (result: "X" | "O" | "draw") => void' },
   ],
 };
 

@@ -1,11 +1,23 @@
-const sampleSteps = [
+const defaultStepperSteps = [
   { id: '1', title: 'Personal Details', description: 'Name & Contact' },
   { id: '2', title: 'Account Setup', description: 'Password & Security' },
   { id: '3', title: 'Confirmation', description: 'Review & Submit' },
 ];
 
 function StepperDemo() {
+  const {
+    steps = defaultStepperSteps,
+    initialStep = 0,
+    onStepChange,
+    onComplete,
+  } = usePreviewProps({
+    steps: defaultStepperSteps,
+    initialStep: 0,
+  });
+
   const [completed, setCompleted] = useState(false);
+  const parsedSteps = Array.isArray(steps) && steps.length > 0 ? steps : defaultStepperSteps;
+  const parsedInitial = Number(initialStep) || 0;
 
   return (
     <div style={{ padding: '24px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif' }}>
@@ -74,11 +86,17 @@ function StepperDemo() {
         }
       `}</style>
       <Stepper
-        steps={sampleSteps}
-        onStepChange={(idx) => log('onStepChange')(idx)}
+        key={`${parsedInitial}-${JSON.stringify(parsedSteps)}`}
+        steps={parsedSteps}
+        initialStep={parsedInitial}
+        onStepChange={(idx) => {
+          if (onStepChange) onStepChange(idx);
+          log('onStepChange', idx);
+        }}
         onComplete={() => {
           setCompleted(true);
-          log('onComplete')('Stepper flow finished!');
+          if (onComplete) onComplete();
+          log('onComplete', 'Stepper flow finished!');
         }}
       />
       {completed && (

@@ -1,16 +1,26 @@
 function Demo() {
-  const [on, setOn] = useState(false);
-  const logger = log('onChange');
+  const { checked = false, disabled = false, children = 'Wi-Fi', onChange } = usePreviewProps({
+    checked: false,
+    disabled: false,
+    children: 'Wi-Fi',
+  });
+  const [on, setOn] = useState(checked);
+  useEffect(() => {
+    setOn(checked);
+  }, [checked]);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start', padding: '16px' }}>
       <Switch
         checked={on}
+        disabled={Boolean(disabled)}
         onChange={(next) => {
           setOn(next);
-          logger(next);
+          if (onChange) onChange(next);
+          log('onChange', next);
         }}
       >
-        Wi-Fi {on ? 'Connected' : 'Disconnected'}
+        {children} {on ? '(On)' : '(Off)'}
       </Switch>
     </div>
   );

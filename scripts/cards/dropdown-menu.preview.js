@@ -1,4 +1,4 @@
-const sampleMenuItems = [
+const defaultMenuItems = [
   { id: 'edit', label: 'Edit Profile' },
   { id: 'duplicate', label: 'Duplicate Entry' },
   { id: 'archive', label: 'Archive Record', disabled: true },
@@ -6,9 +6,25 @@ const sampleMenuItems = [
 ];
 
 function Demo() {
+  const {
+    label = 'Options ▾',
+    items = defaultMenuItems,
+    onSelect,
+  } = usePreviewProps({
+    label: 'Options ▾',
+    items: defaultMenuItems,
+  });
+
   return (
     <div style={{ padding: '16px' }}>
-      <DropdownMenu label="Options ▾" items={sampleMenuItems} onSelect={log('onSelect')} />
+      <DropdownMenu
+        label={label || 'Options ▾'}
+        items={Array.isArray(items) ? items : defaultMenuItems}
+        onSelect={(id) => {
+          if (onSelect) onSelect(id);
+          log('onSelect', id);
+        }}
+      />
     </div>
   );
 }

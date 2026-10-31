@@ -1,5 +1,18 @@
 function Demo() {
-  const [route, setRoute] = useState({ path: '/dashboard', title: 'Dashboard' });
+  const {
+    path = '/dashboard',
+    title = 'Dashboard',
+    children = 'On route change, focus moves to the h1 heading for screen readers. A skip-link is available above.',
+  } = usePreviewProps({
+    path: '/dashboard',
+    title: 'Dashboard',
+    children: 'On route change, focus moves to the h1 heading for screen readers. A skip-link is available above.',
+  });
+
+  const [currentRoute, setCurrentRoute] = useState({ path, title });
+  useEffect(() => {
+    setCurrentRoute({ path: path || '/dashboard', title: title || 'Dashboard' });
+  }, [path, title]);
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', padding: 16 }}>
@@ -10,12 +23,12 @@ function Demo() {
             padding: '6px 12px',
             borderRadius: 6,
             border: '1px solid #334155',
-            backgroundColor: route.path === '/dashboard' ? '#1e293b' : '#0f172a',
+            backgroundColor: currentRoute.path === '/dashboard' ? '#1e293b' : '#0f172a',
             color: '#f8fafc',
             cursor: 'pointer',
           }}
           onClick={() => {
-            setRoute({ path: '/dashboard', title: 'Dashboard' });
+            setCurrentRoute({ path: '/dashboard', title: 'Dashboard' });
             log('navigate', '/dashboard');
           }}
         >
@@ -27,22 +40,20 @@ function Demo() {
             padding: '6px 12px',
             borderRadius: 6,
             border: '1px solid #334155',
-            backgroundColor: route.path === '/settings' ? '#1e293b' : '#0f172a',
+            backgroundColor: currentRoute.path === '/settings' ? '#1e293b' : '#0f172a',
             color: '#f8fafc',
             cursor: 'pointer',
           }}
           onClick={() => {
-            setRoute({ path: '/settings', title: 'Settings' });
+            setCurrentRoute({ path: '/settings', title: 'Settings' });
             log('navigate', '/settings');
           }}
         >
           Settings
         </button>
       </nav>
-      <Layout path={route.path} title={route.title}>
-        <p style={{ color: '#cbd5e1' }}>
-          On route change, focus moves to the h1 heading for screen readers. A skip-link is available above.
-        </p>
+      <Layout path={currentRoute.path} title={currentRoute.title}>
+        <p style={{ color: '#cbd5e1' }}>{children}</p>
       </Layout>
     </div>
   );
