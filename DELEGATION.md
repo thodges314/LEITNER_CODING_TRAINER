@@ -14,8 +14,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task / card | Branch | Owner | Status |
-| --- | --- | --- | --- |
-| `min-floors-ocean-view` | `feature/card-min-floors-ocean-view` | Antigravity | Authoring prompt, cases, and JS/TS solutions |
+| *(no active claims — all merged to master)* | | | |
 
 
 
