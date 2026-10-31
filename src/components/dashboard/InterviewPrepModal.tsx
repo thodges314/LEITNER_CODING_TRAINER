@@ -35,6 +35,7 @@ import {
   deleteInterviewDossier,
   clearAllInterviewDossiers,
   continueInterviewDialogue,
+  calibrateCardPriorities,
   type CatalogIndexEntry,
   type InterviewPrepDossier,
   type CardPriority,
@@ -43,14 +44,32 @@ import {
 import {
   getStoredProvider,
   getStoredModel,
-  getAllStoredKeys,
-  setStoredProvider,
-  setStoredModel,
-  type AIProvider,
 } from '../../lib/ai';
-import { printInterviewDossier, downloadDossierHtml } from '../../lib/printDossier';
+import { printInterviewDossier } from '../../lib/printDossier';
 
 const catalogIndex = catalogIndexData as CatalogIndexEntry[];
+
+const DRAFT_STORAGE_KEY = 'leitner_interview_prep_draft';
+
+interface InterviewPrepDraft {
+  company: string;
+  role: string;
+  targetDate: string;
+  deckSizeMode: 'auto' | 'custom';
+  targetCardCount: number;
+  rawNotes: string;
+  selectedWeaknesses: string[];
+  syncBox1Cards: boolean;
+}
+
+function loadInterviewPrepDraft(): InterviewPrepDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
 
 const WEAKNESS_OPTIONS = [
   'Complex React Architecture (Compound components, Context, custom hooks)',
@@ -82,260 +101,17 @@ export const InterviewPrepModal: React.FC<InterviewPrepModalProps> = (props) => 
   );
 };
 
-const ModelRecommendationBanner: React.FC<{
-  storedKeys: Record<AIProvider, string>;
-  activeProvider: AIProvider;
-  activeModel: string;
-  onSwitchModel: (provider: AIProvider, model: string) => void;
-  onOpenSettings?: (section?: 'ai') => void;
-}> = ({ storedKeys, activeProvider, activeModel, onSwitchModel, onOpenSettings }) => {
-  const [dismissed, setDismissed] = useState(false);
-  const [switchedNotice, setSwitchedNotice] = useState<string | null>(null);
-
-  if (dismissed) return null;
-
-  // Check which keys are stored
-  const hasOpenRouter = Boolean(storedKeys.openrouter);
-  const hasAnthropic = Boolean(storedKeys.anthropic);
-  const hasOpenAI = Boolean(storedKeys.openai);
-  const hasGemini = Boolean(storedKeys.gemini);
-  const hasGroq = Boolean(storedKeys.groq);
-
-  const isTier1Active =
-    (activeProvider === 'openrouter' && (activeModel.includes('claude-3.5') || activeModel.includes('claude-3-5') || activeModel.includes('gpt-4o'))) ||
-    (activeProvider === 'anthropic' && (activeModel.includes('claude-3-5') || activeModel.includes('claude-3.5'))) ||
-    (activeProvider === 'openai' && activeModel.includes('gpt-4o'));
-
-  if (isTier1Active) return null;
-
-  if (switchedNotice) {
-    return (
-      <div className="ai-prep-model-banner switched" role="status">
-        <Sparkles size={14} className="banner-icon" />
-        <span>{switchedNotice}</span>
-      </div>
-    );
-  }
-
-  // Tier 1 Top Choice: Claude 3.5 Sonnet via OpenRouter
-  if (hasOpenRouter && (activeProvider !== 'openrouter' || !activeModel.includes('claude-3.5'))) {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 1 Recommended:</strong> You have an <strong>OpenRouter</strong> key. Claude 3.5 Sonnet is the gold standard for recognizing architectural patterns and synthesizing executive study guides.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('openrouter', 'anthropic/claude-3.5-sonnet');
-              setSwitchedNotice('Switched active engine to Claude 3.5 Sonnet (OpenRouter) for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to Claude 3.5 Sonnet
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Tier 1 Top Choice: Claude 3.5 Sonnet via Anthropic
-  if (hasAnthropic && activeProvider !== 'anthropic') {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 1 Recommended:</strong> You have an <strong>Anthropic</strong> key. Claude 3.5 Sonnet is the gold standard for interview intelligence and architectural nuance.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('anthropic', 'claude-3-5-sonnet-20241022');
-              setSwitchedNotice('Switched active engine to Claude 3.5 Sonnet for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to Claude 3.5 Sonnet
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Tier 1 Premium Alternative: GPT-4o via OpenAI
-  if (hasOpenAI && activeProvider !== 'openai') {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 1 Alternative:</strong> You have an <strong>OpenAI</strong> key. GPT-4o offers high accuracy on company interview pattern recognition and rubric calibration.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('openai', 'gpt-4o');
-              setSwitchedNotice('Switched active engine to GPT-4o for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to GPT-4o
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Tier 2 Deep Strategic: Gemini 2.5 Pro via Google AI
-  if (hasGemini && (activeProvider !== 'gemini' || !activeModel.includes('gemini-2.5-pro'))) {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 2 Deep Strategic:</strong> You have a <strong>Google Gemini</strong> key. Gemini 2.5 Pro features an enormous context window and deep FAANG rubric reasoning.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('gemini', 'gemini-2.5-pro');
-              setSwitchedNotice('Switched active engine to Gemini 2.5 Pro for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to Gemini 2.5 Pro
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Tier 3 Fast / Free: Groq Llama 3.3 70B (only if no Tier 1 or Tier 2 key is available)
-  if (hasGroq && activeProvider !== 'groq') {
-    return (
-      <div className="ai-prep-model-banner" role="note">
-        <div className="banner-text">
-          <Sparkles size={14} className="banner-icon" />
-          <span>
-            <strong>Tier 3 Fast / Free:</strong> You have a saved key for <strong>Groq</strong>. Llama 3.3 70B delivers rapid, zero-cost curriculum setup for everyday practice drills.
-          </span>
-        </div>
-        <div className="banner-actions">
-          <button
-            type="button"
-            className="btn-switch-model"
-            onClick={() => {
-              onSwitchModel('groq', 'llama-3.3-70b-versatile');
-              setSwitchedNotice('Switched active engine to Groq Llama 3.3 70B for Interview Prep!');
-              setTimeout(() => setSwitchedNotice(null), 3000);
-            }}
-          >
-            Switch to Groq Llama 3.3
-          </button>
-          <button
-            type="button"
-            className="btn-dismiss-banner"
-            onClick={() => setDismissed(true)}
-            aria-label="Dismiss recommendation"
-          >
-            <X size={12} />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // If running completely keyless:
-  if (!hasAnthropic && !hasOpenAI && !hasGroq && !hasGemini) {
-    return (
-      <div className="ai-prep-model-banner keyless-hint" role="note">
-        <div className="banner-text">
-          <Zap size={14} className="banner-icon" />
-          <span>
-            <strong>Keyless Heuristic Engine:</strong> Generating curriculum via deterministic algorithms. Adding a free Groq or Gemini key unlocks live AI JD synthesis.
-          </span>
-        </div>
-        {onOpenSettings && (
-          <div className="banner-actions">
-            <button
-              type="button"
-              className="btn-switch-model"
-              onClick={() => onOpenSettings('ai')}
-            >
-              Configure AI Key
-            </button>
-            <button
-              type="button"
-              className="btn-dismiss-banner"
-              onClick={() => setDismissed(true)}
-              aria-label="Dismiss recommendation"
-            >
-              <X size={12} />
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return null;
-};
 
 function ensureDossierChatOpener(d: InterviewPrepDossier | null): InterviewPrepDossier | null {
   if (!d) return null;
+  const calibratedCards = calibrateCardPriorities(d.selectedCards);
   const initialPromptNote = `Ask questions about this company's interview loop, request curriculum adjustments (e.g. "trim deck to 12 cards", "add more state machine problems"), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.`;
   const desiredOpener = `${d.executiveSummary}\n\n${initialPromptNote}`;
 
   if (!d.conversation || d.conversation.length === 0) {
     return {
       ...d,
+      selectedCards: calibratedCards,
       conversation: [
         {
           id: `msg_init_${d.generatedAt || Date.now()}`,
@@ -353,10 +129,10 @@ function ensureDossierChatOpener(d: InterviewPrepDossier | null): InterviewPrepD
       ...updated[0],
       content: desiredOpener,
     };
-    return { ...d, conversation: updated };
+    return { ...d, selectedCards: calibratedCards, conversation: updated };
   }
 
-  return d;
+  return { ...d, selectedCards: calibratedCards };
 }
 
 const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
@@ -366,7 +142,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   currentBox1CardIds = [],
   initialDossierId,
   initialStep,
-  onOpenSettings,
   onEditCustomDeck,
 }) => {
   // Saved briefings history
@@ -392,18 +167,21 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
   const [dossier, setDossier] = useState<InterviewPrepDossier | null>(initialDossier);
 
-  // Input form state
-  const [company, setCompany] = useState(() => initialDossier?.company || '');
-  const [role, setRole] = useState(() => initialDossier?.role || '');
-  const [targetDate, setTargetDate] = useState(() => initialDossier?.targetDate || '');
-  const [deckSizeMode, setDeckSizeMode] = useState<'auto' | 'custom'>('auto');
-  const [targetCardCount, setTargetCardCount] = useState(16);
-  const [rawNotes, setRawNotes] = useState('');
-  const [selectedWeaknesses, setSelectedWeaknesses] = useState<string[]>([]);
-  const [syncBox1Cards, setSyncBox1Cards] = useState(currentBox1CardIds.length > 0);
+  const [initialDraft] = useState<InterviewPrepDraft | null>(() => loadInterviewPrepDraft());
+
+  // Input form state (initialized from saved briefing or saved draft)
+  const [company, setCompany] = useState(() => initialDossier?.company || initialDraft?.company || '');
+  const [role, setRole] = useState(() => initialDossier?.role || initialDraft?.role || '');
+  const [targetDate, setTargetDate] = useState(() => initialDossier?.targetDate || initialDraft?.targetDate || '');
+  const [deckSizeMode, setDeckSizeMode] = useState<'auto' | 'custom'>(() => initialDraft?.deckSizeMode || 'auto');
+  const [targetCardCount, setTargetCardCount] = useState(() => initialDraft?.targetCardCount || 16);
+  const [rawNotes, setRawNotes] = useState(() => initialDraft?.rawNotes || '');
+  const [selectedWeaknesses, setSelectedWeaknesses] = useState<string[]>(() => initialDraft?.selectedWeaknesses || []);
+  const [syncBox1Cards, setSyncBox1Cards] = useState(() => initialDraft?.syncBox1Cards ?? (currentBox1CardIds.length > 0));
 
   // Loading animation state
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [pipelineProgressMessage, setPipelineProgressMessage] = useState<string | null>(null);
 
   // Review state
   const [editableDeckName, setEditableDeckName] = useState(() => initialDossier?.deckName || '');
@@ -419,10 +197,9 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const [dialogueUpdateNotification, setDialogueUpdateNotification] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // AI Model Vault state
-  const [storedKeys] = useState(() => getAllStoredKeys());
-  const [activeProvider, setActiveProvider] = useState<AIProvider>(() => getStoredProvider());
-  const [activeModel, setActiveModel] = useState<string>(() => getStoredModel());
+  // AI Model info
+  const activeProvider = getStoredProvider();
+  const activeModel = getStoredModel();
 
   const companyInputRef = useRef<HTMLInputElement>(null);
   const deckNameInputRef = useRef<HTMLInputElement>(null);
@@ -435,6 +212,57 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     }
   }, [step]);
 
+  // Persist form draft as user edits so partial inputs are never lost on accidental modal close or refresh
+  useEffect(() => {
+    if (step === 'input') {
+      try {
+        if (company || role || targetDate || rawNotes || selectedWeaknesses.length > 0) {
+          const draft: InterviewPrepDraft = {
+            company,
+            role,
+            targetDate,
+            deckSizeMode,
+            targetCardCount,
+            rawNotes,
+            selectedWeaknesses,
+            syncBox1Cards,
+          };
+          localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+        }
+      } catch {
+        // Ignore localStorage errors
+      }
+    }
+  }, [step, company, role, targetDate, deckSizeMode, targetCardCount, rawNotes, selectedWeaknesses, syncBox1Cards]);
+
+  // Close modal only via Escape key or explicit buttons
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && step !== 'loading') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [step, onClose]);
+
+  const handleCancel = () => {
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {
+      // Ignore localStorage errors
+    }
+    setCompany('');
+    setRole('');
+    setTargetDate('');
+    setRawNotes('');
+    setSelectedWeaknesses([]);
+    setSyncBox1Cards(currentBox1CardIds.length > 0);
+    setDeckSizeMode('auto');
+    setTargetCardCount(16);
+    onClose();
+  };
+
   const toggleWeakness = (weakness: string) => {
     setSelectedWeaknesses((prev) =>
       prev.includes(weakness) ? prev.filter((w) => w !== weakness) : [...prev, weakness]
@@ -445,6 +273,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     e.preventDefault();
     setStep('loading');
     setLoadingMessageIndex(0);
+    setPipelineProgressMessage(null);
 
     const interval = setInterval(() => {
       setLoadingMessageIndex((prev) => (prev + 1) % 4);
@@ -461,7 +290,12 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           weakCardIds: syncBox1Cards ? currentBox1CardIds : [],
           targetCardCount: deckSizeMode === 'custom' ? targetCardCount : undefined,
         },
-        catalogIndex
+        catalogIndex,
+        {
+          onProgress: (_step, message) => {
+            setPipelineProgressMessage(message);
+          },
+        }
       );
 
       clearInterval(interval);
@@ -470,6 +304,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
       setEditableDeckName(readyDossier.deckName);
       setEditableDescription(readyDossier.deckDescription);
       setCheckedCardIds(new Set(readyDossier.selectedCards.map((c) => c.id)));
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch {
+        // Ignore
+      }
       saveInterviewDossier(readyDossier.id || 'current_dossier', readyDossier);
       setSavedDossiers(getAllSavedDossiers());
 
@@ -512,6 +351,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
   const handleDeleteCurrentDossier = () => {
     if (!dossier) return;
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {
+      // Ignore
+    }
     deleteInterviewDossier(dossier);
     if (dossier.id) onDeleteDossier?.(dossier.id);
     const updated = getAllSavedDossiers();
@@ -624,11 +468,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     printInterviewDossier(dossier, catalogIndex);
   };
 
-  const handleDownloadHtml = () => {
-    if (!dossier) return;
-    downloadDossierHtml(dossier, catalogIndex);
-  };
-
   const handleDownloadJson = () => {
     if (!dossier) return;
     const jsonString = JSON.stringify(dossier, null, 2);
@@ -676,7 +515,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           generatedAt: parsed.generatedAt || Date.now(),
           selectedCards: parsed.selectedCards,
           externalTopics: Array.isArray(parsed.externalTopics) ? parsed.externalTopics : [],
-          countdownChecklist: Array.isArray(parsed.countdownChecklist) ? parsed.countdownChecklist : [],
           interactiveTools: Array.isArray(parsed.interactiveTools) ? parsed.interactiveTools : [],
           executiveSummary: parsed.executiveSummary || '',
           conversation: Array.isArray(parsed.conversation) ? parsed.conversation : [],
@@ -829,7 +667,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
     `Analyzing interview archetypes for ${company || 'your target company'}...`,
     'Screening 312 curated cards across 13 engineering domains...',
     'Calibrating against your candidate weakness profile...',
-    'Synthesizing tailored executive study dossier & checklist...',
+    'Synthesizing tailored executive study dossier & curriculum...',
   ];
 
   return (
@@ -840,9 +678,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
         aria-modal="true"
         aria-labelledby="ai-prep-modal-title"
         data-testid="interview-prep-modal"
-        onClick={(e) => {
-          if (e.target === e.currentTarget && step !== 'loading') onClose();
-        }}
       >
         <div className="modal-content glass-panel ai-prep-modal-container">
           {/* Header */}
@@ -852,12 +687,61 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 <Sparkles size={20} className="ai-prep-header-icon" />
               </div>
               <div className="ai-prep-header-titles">
-                <h2 id="ai-prep-modal-title" className="ai-prep-modal-title">
-                  AI Interview Prep Coach
-                </h2>
-                <p className="ai-prep-modal-subtitle">
-                  Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
-                </p>
+                <div className="ai-prep-modal-title-row">
+                  <h2 id="ai-prep-modal-title" className={`ai-prep-modal-title ${step === 'review' ? 'review-mode' : ''}`}>
+                    AI Interview Prep Coach
+                  </h2>
+                </div>
+                {step === 'review' && dossier ? (
+                  <div className="header-deck-meta-prominent" data-testid="ai-prep-header-deck-meta">
+                    <div className="header-deck-name-row-prominent">
+                      <input
+                        ref={deckNameInputRef}
+                        type="text"
+                        className="header-deck-name-input-prominent"
+                        value={editableDeckName}
+                        onChange={(e) => setEditableDeckName(e.target.value)}
+                        placeholder="Custom Deck Name"
+                        title="Click to edit deck name"
+                        data-testid="ai-prep-review-deck-name"
+                      />
+                      <button
+                        type="button"
+                        className="header-deck-pencil-btn"
+                        onClick={() => deckNameInputRef.current?.focus()}
+                        title="Click to edit deck name"
+                        aria-label="Edit deck name"
+                      >
+                        <Pencil size={12} className="header-deck-pencil-icon" />
+                      </button>
+                    </div>
+                    <div className="header-deck-desc-row-prominent">
+                      <input
+                        ref={deckDescInputRef}
+                        type="text"
+                        className="header-deck-desc-input-prominent"
+                        value={editableDescription}
+                        onChange={(e) => setEditableDescription(e.target.value)}
+                        placeholder="Deck Description"
+                        title="Click to edit deck description"
+                        data-testid="ai-prep-review-deck-desc"
+                      />
+                      <button
+                        type="button"
+                        className="header-deck-pencil-btn"
+                        onClick={() => deckDescInputRef.current?.focus()}
+                        title="Click to edit deck description"
+                        aria-label="Edit deck description"
+                      >
+                        <Pencil size={11} className="header-deck-pencil-icon" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="ai-prep-modal-subtitle">
+                    Synthesize a targeted flashcard curriculum & study guide from your target role, recruiter notes, and personal weak spots.
+                  </p>
+                )}
               </div>
             </div>
 
@@ -869,6 +753,11 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     type="button"
                     className="ai-prep-history-btn ai-prep-new-plan-btn"
                     onClick={() => {
+                      try {
+                        localStorage.removeItem(DRAFT_STORAGE_KEY);
+                      } catch {
+                        // Ignore
+                      }
                       setDossier(null);
                       setCompany('');
                       setRole('');
@@ -902,34 +791,17 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   </button>
                 )}
 
-                {/* Edit in Deck Builder button in review header */}
-                {step === 'review' && dossier && onEditCustomDeck && (
-                  <button
-                    type="button"
-                    className="ai-prep-history-btn"
-                    onClick={() => {
-                      onClose();
-                      onEditCustomDeck(dossier.id || 'current_dossier');
-                    }}
-                    title="Open manual deck builder to customize cards in this deck"
-                    data-testid="ai-prep-edit-in-builder-btn"
-                  >
-                    <Pencil size={13} />
-                    <span>Edit in Deck Builder</span>
-                  </button>
-                )}
-
-                {/* Import Briefing JSON button in header */}
-                {step !== 'loading' && (
+                {/* Import Briefing JSON button in input header */}
+                {step === 'input' && (
                   <button
                     type="button"
                     className="ai-prep-history-btn"
                     onClick={handleTriggerImport}
-                    title="Import a saved interview dossier (.json)"
+                    title="Restore a saved interview dossier (.json)"
                     data-testid="ai-prep-import-json-header-btn"
                   >
                     <Upload size={13} />
-                    <span>Import Briefing</span>
+                    <span>Restore Backup (.json)</span>
                   </button>
                 )}
 
@@ -1003,70 +875,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   </button>
                 )}
               </div>
-
-              {/* Stacked Deck Name & Description in Header on Right, underneath buttons */}
-              {step === 'review' && dossier && (
-                <div className="ai-prep-header-deck-meta" data-testid="ai-prep-header-deck-meta">
-                  <div className="header-deck-name-row">
-                    <input
-                      ref={deckNameInputRef}
-                      type="text"
-                      className="header-deck-name-input"
-                      value={editableDeckName}
-                      onChange={(e) => setEditableDeckName(e.target.value)}
-                      placeholder="Custom Deck Name"
-                      title="Click to edit deck name"
-                      data-testid="ai-prep-review-deck-name"
-                    />
-                    <button
-                      type="button"
-                      className="header-deck-pencil-btn"
-                      onClick={() => deckNameInputRef.current?.focus()}
-                      title="Click to edit deck name"
-                      aria-label="Edit deck name"
-                    >
-                      <Pencil size={11} className="header-deck-pencil-icon" />
-                    </button>
-                  </div>
-                  <div className="header-deck-desc-row">
-                    <input
-                      ref={deckDescInputRef}
-                      type="text"
-                      className="header-deck-desc-input"
-                      value={editableDescription}
-                      onChange={(e) => setEditableDescription(e.target.value)}
-                      placeholder="Deck Description"
-                      title="Click to edit deck description"
-                      data-testid="ai-prep-review-deck-desc"
-                    />
-                    <button
-                      type="button"
-                      className="header-deck-pencil-btn"
-                      onClick={() => deckDescInputRef.current?.focus()}
-                      title="Click to edit deck description"
-                      aria-label="Edit deck description"
-                    >
-                      <Pencil size={10} className="header-deck-pencil-icon" />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
-
-          {/* Model Recommendation Banner */}
-          <ModelRecommendationBanner
-            storedKeys={storedKeys}
-            activeProvider={activeProvider}
-            activeModel={activeModel}
-            onSwitchModel={(p, m) => {
-              setStoredProvider(p);
-              setStoredModel(m);
-              setActiveProvider(p);
-              setActiveModel(m);
-            }}
-            onOpenSettings={onOpenSettings}
-          />
 
           {/* STEP 1: INPUT FORM */}
           {step === 'input' && (
@@ -1082,6 +892,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     id="ai-prep-company"
                     ref={companyInputRef}
                     type="text"
+                    autoComplete="off"
+                    spellCheck={false}
                     className="modal-input ai-prep-input-lg"
                     placeholder="e.g. Stripe, Airbnb, Datadog, Meta, Apple, Google, DoorDash, Figma"
                     value={company}
@@ -1099,6 +911,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   <input
                     id="ai-prep-role"
                     type="text"
+                    autoComplete="off"
+                    spellCheck={false}
                     className="modal-input ai-prep-input-lg"
                     placeholder="e.g. Senior Frontend Engineer, Staff UI Engineer, Full-Stack L5"
                     value={role}
@@ -1117,6 +931,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                     <input
                       id="ai-prep-date"
                       type="text"
+                      autoComplete="off"
+                      spellCheck={false}
                       className="modal-input ai-prep-input-lg"
                       placeholder="e.g. In 5 days, next Tuesday, or 2026-11-05"
                       value={targetDate}
@@ -1287,9 +1103,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                       Active Model: <strong>{activeModel || activeProvider}</strong> ({activeProvider})
                     </span>
                   </div>
-                  <span className="ai-prep-provider-note">
-                    Groq offers a 100% free tier. Claude 3.5 Sonnet / GPT-4o recommended for high-stakes on-sites.
-                  </span>
                 </div>
               </div>
 
@@ -1297,8 +1110,8 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
               <div className="modal-actions ai-prep-actions">
                 <button
                   type="button"
-                  className="btn btn-secondary"
-                  onClick={onClose}
+                  className="btn btn-secondary ai-prep-cancel-btn"
+                  onClick={handleCancel}
                   data-testid="ai-prep-cancel-btn"
                 >
                   Cancel
@@ -1322,7 +1135,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 <Loader2 size={36} className="ai-prep-spinner animate-spin" />
               </div>
               <h3 className="ai-prep-loading-title">Analyzing & Assembling Curriculum</h3>
-              <p className="ai-prep-loading-subtext">{loadingMessages[loadingMessageIndex]}</p>
+              <p className="ai-prep-loading-subtext">{pipelineProgressMessage || loadingMessages[loadingMessageIndex]}</p>
             </div>
           )}
 
@@ -1381,7 +1194,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   data-testid="ai-prep-tab-tools"
                 >
                   <CheckCircle size={14} />
-                  <span>Interactive Drills & Checklist</span>
+                  <span>Interactive Practice Playgrounds</span>
                 </button>
               </div>
 
@@ -1389,26 +1202,29 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
               {activeTab === 'cards' && (
                 <div className="ai-prep-cards-tab-body">
                   <div className="ai-prep-cards-actions-bar">
-                    <button
-                      type="button"
-                      className="ai-prep-select-all-btn"
-                      onClick={handleSelectAllCards}
-                    >
-                      {checkedCardIds.size === dossier.selectedCards.length ? (
-                        <>
-                          <CheckSquare size={13} />
-                          <span>Deselect All</span>
-                        </>
-                      ) : (
-                        <>
-                          <Square size={13} />
-                          <span>Select All</span>
-                        </>
-                      )}
-                    </button>
-                    <span className="cards-tab-counter">
-                      {checkedCardIds.size} cards ready for custom deck
-                    </span>
+                    <div className="cards-tab-actions-left">
+                      <button
+                        type="button"
+                        className="ai-prep-select-all-btn"
+                        onClick={handleSelectAllCards}
+                      >
+                        {checkedCardIds.size === dossier.selectedCards.length ? (
+                          <>
+                            <CheckSquare size={13} />
+                            <span>Deselect All</span>
+                          </>
+                        ) : (
+                          <>
+                            <Square size={13} />
+                            <span>Select All</span>
+                          </>
+                        )}
+                      </button>
+                      <span className="cards-tab-counter-divider">•</span>
+                      <span className="cards-tab-counter">
+                        {checkedCardIds.size} cards ready for custom deck
+                      </span>
+                    </div>
                     {onEditCustomDeck && (
                       <button
                         type="button"
@@ -1450,15 +1266,17 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                           <div className="card-item-content">
                             <div className="card-item-top-row">
                               <span className="card-item-title">{card?.title || sel.id}</span>
-                              <span className={getPriorityBadgeClass(sel.priority)}>
-                                {sel.priority.toUpperCase()}
-                              </span>
-                              {card && (
-                                <span className="card-item-diff-badge">D{card.difficulty}</span>
-                              )}
-                              {card && (
-                                <span className="card-item-track-badge">{card.track}</span>
-                              )}
+                              <div className="card-item-badges">
+                                <span className={getPriorityBadgeClass(sel.priority)}>
+                                  {sel.priority.toUpperCase()}
+                                </span>
+                                {card && (
+                                  <span className="card-item-diff-badge">D{card.difficulty}</span>
+                                )}
+                                {card && (
+                                  <span className="card-item-track-badge">{card.track}</span>
+                                )}
+                              </div>
                             </div>
                             <p className="card-item-rationale">{sel.rationale}</p>
                           </div>
@@ -1632,46 +1450,24 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
 
                   <button
                     type="button"
-                    className="btn btn-secondary ai-prep-delete-dossier-btn"
-                    onClick={handleDeleteCurrentDossier}
-                    title="Delete this interview briefing and start fresh"
-                    data-testid="ai-prep-delete-dossier-footer-btn"
-                  >
-                    <Trash2 size={14} />
-                    <span>Delete Dossier</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-secondary ai-prep-download-html-btn"
-                    onClick={handleDownloadHtml}
-                    title="Download standalone HTML dossier for offline reading or manual archiving"
-                    data-testid="ai-prep-download-html-btn"
-                  >
-                    <Download size={14} />
-                    <span>Download HTML</span>
-                  </button>
-
-                  <button
-                    type="button"
                     className="btn btn-secondary ai-prep-download-json-btn"
                     onClick={handleDownloadJson}
-                    title="Download / Export raw JSON backup of this dossier"
+                    title="Export raw JSON backup file of this dossier"
                     data-testid="ai-prep-download-json-btn"
                   >
                     <Download size={14} />
-                    <span>Export Dossier</span>
+                    <span>Backup Dossier (.json)</span>
                   </button>
 
                   <button
                     type="button"
                     className="btn btn-secondary ai-prep-import-json-btn"
                     onClick={handleTriggerImport}
-                    title="Import an interview dossier JSON file"
+                    title="Restore an interview dossier from JSON backup file"
                     data-testid="ai-prep-import-json-footer-btn"
                   >
                     <Upload size={14} />
-                    <span>Import Dossier</span>
+                    <span>Restore Backup (.json)</span>
                   </button>
 
                   {/* <button
@@ -1778,18 +1574,6 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
               ))}
             </div>
           </div>
-
-          {/* <div className="print-section">
-            <h2 className="print-section-heading">24-Hour Countdown & Interview Day Protocol</h2>
-            <div className="print-checklist">
-              {dossier.countdownChecklist?.map((item, idx) => (
-                <div key={idx} className="print-checklist-item">
-                  <span className="print-checkbox">&#9744;</span>
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div> */}
 
           <div className="print-section">
             <h2 className="print-section-heading">Curated Practice Playgrounds</h2>

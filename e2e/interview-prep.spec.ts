@@ -102,12 +102,12 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await expect(printDoc).toHaveCount(1);
     await expect(printDoc.locator('.print-title')).toContainText('Stripe');
 
-    // Verify Download HTML and Download JSON buttons are visible in review actions
-    const downloadHtmlBtn = page.getByTestId('ai-prep-download-html-btn');
-    await expect(downloadHtmlBtn).toBeVisible();
-
+    // Verify Backup Dossier JSON and Restore Backup JSON buttons are visible in review actions
     const downloadJsonBtn = page.getByTestId('ai-prep-download-json-btn');
     await expect(downloadJsonBtn).toBeVisible();
+
+    const importJsonFooterBtn = page.getByTestId('ai-prep-import-json-footer-btn');
+    await expect(importJsonFooterBtn).toBeVisible();
 
     // Click Create Custom Deck
     const prepCloseBtn = page.getByTestId('ai-prep-close-btn');
@@ -137,10 +137,6 @@ test.describe('AI Interview Prep Copilot Flow', () => {
 
     const deletePlanBtn = page.getByTestId('ai-prep-delete-plan-btn');
     await expect(deletePlanBtn).toBeVisible();
-
-    // Verify footer "Delete Dossier" button is also visible
-    const deleteFooterBtn = page.getByTestId('ai-prep-delete-dossier-footer-btn');
-    await expect(deleteFooterBtn).toBeVisible();
 
     // Close modal
     const closeBtn = page.getByTestId('ai-prep-close-btn');

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import {
   X,
@@ -59,6 +59,15 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
   const [starterCode, setStarterCode] = useState('');
   const [testHarness, setTestHarness] = useState('');
   const [showCodeDetails, setShowCodeDetails] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -147,7 +156,6 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
   return (
     <div
       className="modal-overlay"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="add-topic-title"

@@ -58,7 +58,6 @@ export interface InterviewPrepDossier {
   selectedCards: InterviewPrepCardSelection[];
   externalTopics: ExternalStudyTopic[];
   interactiveTools: InteractiveToolRecommendation[];
-  countdownChecklist: string[];
   generatedAt: number;
   conversation?: DossierMessage[];
 }
@@ -72,6 +71,26 @@ export interface InterviewPrepRequest {
   weakCardIds?: string[];
   dailyCapacity?: number;
   targetCardCount?: number;
+}
+
+export interface JobIntelligenceExtraction {
+  companyArchetype: string;
+  seniorityLevel: string;
+  coreLanguages: string[];
+  frameworksAndLibs: string[];
+  concepts: string[];
+  specificQuestionsMentioned: string[];
+  candidateWeaknessFocus: string[];
+}
+
+export interface DeterministicMatchResult {
+  selectedCards: InterviewPrepCardSelection[];
+  matchedQuestions: string[];
+  unmatchedQuestions: string[];
+}
+
+export interface GenerateDossierOptions {
+  onProgress?: (step: 'extracting' | 'matching' | 'synthesizing', message: string) => void;
 }
 
 export const INTERVIEW_DOSSIERS_STORAGE_KEY = 'leitner_interview_dossiers';
@@ -188,10 +207,6 @@ Respond with a JSON object in this exact schema:
       "url": "https://...",
       "focus": "Brief focus description"
     }
-  ],
-  "countdownChecklist": [
-    "Checklist item 1",
-    "Checklist item 2"
   ]
 }`;
 
@@ -342,12 +357,784 @@ export function parseInterviewPrepResponse(
     }
   }
 
-  // Parse checklist
-  const countdownChecklist: string[] = [];
-  if (Array.isArray(parsed.countdownChecklist)) {
-    for (const item of parsed.countdownChecklist) {
-      if (typeof item === 'string' && item.trim()) {
-        countdownChecklist.push(item.trim());
+  const dossierId = `dossier_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  const initialPromptNote = `Ask questions about this company's interview loop, request curriculum adjustments (e.g. "trim deck to 12 cards", "add more state machine problems"), or ask for an analysis of your current Leitner box progress as you practice. Type any request below.`;
+  const initialMessage: DossierMessage = {
+    id: `msg_${Date.now().toString(36)}_0`,
+    role: 'assistant',
+    content: `${executiveSummary}\n\n${initialPromptNote}`,
+    timestamp: Date.now(),
+  };
+
+  return {
+    id: dossierId,
+    company,
+    role,
+    targetDate,
+    deckName,
+    deckDescription,
+    executiveSummary,
+    selectedCards,
+    externalTopics: externalTopics.length > 0 ? externalTopics : getDefaultExternalTopics(),
+    interactiveTools: interactiveTools.length > 0 ? interactiveTools : getDefaultInteractiveTools(),
+    generatedAt: Date.now(),
+    conversation: [initialMessage],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Step 1: Input Compression & Extraction (The "Filter" Call)
+// ---------------------------------------------------------------------------
+
+function extractJsonPayload(rawText: string): Record<string, unknown> | null {
+  try {
+    let text = rawText.trim();
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      text = jsonMatch[1].trim();
+    }
+    const startIdx = text.indexOf('{');
+    const endIdx = text.lastIndexOf('}');
+    if (startIdx !== -1 && endIdx > startIdx) {
+      text = text.slice(startIdx, endIdx + 1);
+    }
+    const parsed = JSON.parse(text);
+    if (parsed && typeof parsed === 'object') {
+      return parsed as Record<string, unknown>;
+    }
+  } catch {
+    /* ignore parsing errors */
+  }
+  return null;
+}
+
+export function buildJobExtractionPrompt(request: InterviewPrepRequest): { system: string; user: string } {
+  const system = `You are an elite technical interview intelligence parser.
+Analyze raw interview notes, job postings, recruiter communications, candidate weaknesses, and company details.
+Extract clean, structured intelligence keywords and SPECIFIC interview questions mentioned.
+
+CRITICAL INSTRUCTIONS:
+1. Extract "specificQuestionsMentioned": An array of specific coding challenges or interview problems explicitly mentioned in the notes (e.g. "LRU Cache with TTL", "Nested Comments UI", "EventEmitter with once and emit", "Second Highest Salary", "WebRTC Video Stream", "Two Sum"). Do not invent questions if none are mentioned.
+2. Extract "coreLanguages": (e.g. ["TypeScript", "JavaScript", "SQL"]).
+3. Extract "frameworksAndLibs": (e.g. ["React", "Next.js", "Redux", "Node.js"]).
+4. Extract "concepts": (e.g. ["LRU Cache", "DOM Manipulation", "Compound Components", "Virtualization", "Debounce / Throttle", "Concurrency", "Accessibility"]).
+5. Extract "candidateWeaknessFocus": candidate self-reported weaknesses.
+6. Extract "companyArchetype": summary of the company interview focus (e.g. "Stripe (Financial Reliability & System Primitives)", "Meta (UI Velocity & DOM Trees)").
+7. Extract "seniorityLevel": ("Junior", "Mid-level", "Senior", "Staff / Principal").
+8. Return ONLY valid JSON matching the specified schema. No markdown prose outside the JSON.`;
+
+  const user = `Target Company: ${request.company || 'Tech Company'}
+Role & Level: ${request.role || 'Software Engineer'}
+Target Date / Timeline: ${request.targetDate || 'Upcoming in 1-2 weeks'}
+Self-Reported Weaknesses: ${(request.candidateWeaknesses || []).join(', ') || 'None specified'}
+
+Raw Intelligence Dump (Recruiter emails, round notes, glassdoor questions, job description):
+"""
+${request.rawNotes.trim() || 'General frontend and full-stack software engineer interview.'}
+"""
+
+Respond with a JSON object adhering strictly to this schema:
+{
+  "companyArchetype": "Company (Interview Focus)",
+  "seniorityLevel": "Senior",
+  "coreLanguages": ["TypeScript", "JavaScript"],
+  "frameworksAndLibs": ["React"],
+  "concepts": ["LRU Cache", "DOM Trees", "State Management"],
+  "specificQuestionsMentioned": ["LRU Cache with TTL", "Nested Comments UI"],
+  "candidateWeaknessFocus": ["Accessibility contracts"]
+}`;
+
+  return { system, user };
+}
+
+export function extractHeuristicIntelligence(
+  request: InterviewPrepRequest
+): JobIntelligenceExtraction {
+  const notes = request.rawNotes || '';
+  const notesLower = notes.toLowerCase();
+  const company = request.company?.trim() || 'Tech Company';
+  const role = request.role?.trim() || 'Software Engineer';
+  const roleLower = role.toLowerCase();
+
+  // Seniority extraction
+  let seniorityLevel = 'Mid-level';
+  if (/staff|principal|distinguished|director/i.test(roleLower)) {
+    seniorityLevel = 'Staff / Principal';
+  } else if (/senior|lead|sr\b/i.test(roleLower)) {
+    seniorityLevel = 'Senior';
+  } else if (/junior|entry|associate|intern|new grad/i.test(roleLower)) {
+    seniorityLevel = 'Junior / Entry';
+  }
+
+  // Company Archetype
+  let companyArchetype = `${company} Engineering`;
+  if (/google|alphabet/i.test(company)) companyArchetype = 'Google (Algorithmic Rigor & Scale)';
+  else if (/amazon|aws/i.test(company)) companyArchetype = 'Amazon (Leadership Principles & Operational Robustness)';
+  else if (/meta|facebook/i.test(company)) companyArchetype = 'Meta (Rapid UI Execution & Tree Traversal)';
+  else if (/stripe/i.test(company)) companyArchetype = 'Stripe (Production Pragmatism & Financial Reliability)';
+  else if (/airbnb/i.test(company)) companyArchetype = 'Airbnb (Design Systems & Component Quality)';
+  else if (/datadog/i.test(company)) companyArchetype = 'Datadog (High-Frequency Telemetry & Browser Performance)';
+  else if (/apple/i.test(company)) companyArchetype = 'Apple (Pixel Precision & Accessibility)';
+  else if (/netflix/i.test(company)) companyArchetype = 'Netflix (Distributed Client Resilience & Telemetry)';
+
+  // Core languages
+  const coreLanguages: string[] = [];
+  if (/typescript|\bts\b/i.test(notesLower) || /typescript/i.test(roleLower)) coreLanguages.push('TypeScript');
+  if (/javascript|\bjs\b/i.test(notesLower) || /frontend|web|ui/i.test(roleLower)) coreLanguages.push('JavaScript');
+  if (/sql|postgres|database/i.test(notesLower) || /fullstack|backend/i.test(roleLower)) coreLanguages.push('SQL');
+  if (coreLanguages.length === 0) coreLanguages.push('TypeScript', 'JavaScript');
+
+  // Frameworks & libraries
+  const frameworksAndLibs: string[] = [];
+  if (/react/i.test(notesLower) || /react/i.test(roleLower)) frameworksAndLibs.push('React');
+  if (/next\.?js/i.test(notesLower)) frameworksAndLibs.push('Next.js');
+  if (/vue/i.test(notesLower)) frameworksAndLibs.push('Vue');
+  if (/node/i.test(notesLower) || /backend/i.test(roleLower)) frameworksAndLibs.push('Node.js');
+  if (/graphql/i.test(notesLower)) frameworksAndLibs.push('GraphQL');
+  if (/redux|zustand|recoil/i.test(notesLower)) frameworksAndLibs.push('State Management (Redux/Zustand)');
+
+  // Concepts
+  const concepts: string[] = [];
+  const conceptDictionary = [
+    { regex: /lru|cache/i, name: 'LRU Cache & In-Memory Caching' },
+    { regex: /debounce|throttle/i, name: 'Debounce & Throttle Timing' },
+    { regex: /promise|async|await|event loop|concurrency/i, name: 'Async JS & Concurrency' },
+    { regex: /dom|event delegation|virtual dom/i, name: 'DOM Manipulation & Event Plumbing' },
+    { regex: /compound|context|hook/i, name: 'React Hooks & Compound Patterns' },
+    { regex: /a11y|accessibility|aria|keyboard/i, name: 'Web Accessibility (a11y) & ARIA' },
+    { regex: /tree|graph|traversal|bfs|dfs/i, name: 'Trees & Graph Traversal' },
+    { regex: /sort|search|binary search/i, name: 'Sorting & Binary Search' },
+    { regex: /hash ?map|two sum/i, name: 'Hash Maps & Fast Lookups' },
+    { regex: /rate limit/i, name: 'Rate Limiting & Throttling' },
+  ];
+  for (const item of conceptDictionary) {
+    if (item.regex.test(notesLower)) {
+      concepts.push(item.name);
+    }
+  }
+
+  // Specific questions mentioned:
+  // Parse lines and conjunctions (and, also, as well as, bullets, semicolons)
+  const specificQuestionsMentioned: string[] = [];
+  const lines = notes.split(/\r?\n|[;•]/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const segments = trimmed.split(/\s+(?:and|also|plus|as well as)\s+/i);
+    for (const segment of segments) {
+      const segTrimmed = segment.trim();
+      const questionMatch = segTrimmed.match(
+        /^[-*•\d.)\s]*(?:asked|question|challenge|problem|implement|build|design|create|expect)?\s*:?\s*(.+)$/i
+      );
+      const candidate = questionMatch ? questionMatch[1].trim() : segTrimmed;
+      if (
+        candidate.length >= 4 &&
+        candidate.length <= 120 &&
+        /(lru|cache|two sum|throttle|debounce|accordion|tabs|modal|autocomplete|typeahead|event ?emitter|flatten|curry|deep ?clone|promise|virtual|tree|comment|salary|sql|webrtc|timer|clock|stopwatch|carousel|slider|calendar|star rating)/i.test(
+          candidate
+        )
+      ) {
+        const clean = candidate
+          .replace(/^["'`]|["'`]$/g, '')
+          .replace(/^(?:expect|asked|implement|build)\s+/i, '')
+          .replace(/[.]+$/, '')
+          .trim();
+        if (clean.length >= 3 && !specificQuestionsMentioned.includes(clean)) {
+          specificQuestionsMentioned.push(clean);
+        }
+      }
+    }
+  }
+
+  return {
+    companyArchetype,
+    seniorityLevel,
+    coreLanguages,
+    frameworksAndLibs,
+    concepts,
+    specificQuestionsMentioned,
+    candidateWeaknessFocus: request.candidateWeaknesses || [],
+  };
+}
+
+export function parseJobExtractionResponse(
+  rawText: string,
+  fallbackRequest: InterviewPrepRequest
+): JobIntelligenceExtraction {
+  const parsed = extractJsonPayload(rawText);
+  if (!parsed) {
+    return extractHeuristicIntelligence(fallbackRequest);
+  }
+
+  const toStringArray = (val: unknown): string[] => {
+    if (!Array.isArray(val)) return [];
+    return val
+      .filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+      .map((s) => s.trim());
+  };
+
+  const heuristic = extractHeuristicIntelligence(fallbackRequest);
+
+  return {
+    companyArchetype:
+      typeof parsed.companyArchetype === 'string' && parsed.companyArchetype.trim()
+        ? parsed.companyArchetype.trim()
+        : heuristic.companyArchetype,
+    seniorityLevel:
+      typeof parsed.seniorityLevel === 'string' && parsed.seniorityLevel.trim()
+        ? parsed.seniorityLevel.trim()
+        : heuristic.seniorityLevel,
+    coreLanguages:
+      toStringArray(parsed.coreLanguages).length > 0
+        ? toStringArray(parsed.coreLanguages)
+        : heuristic.coreLanguages,
+    frameworksAndLibs:
+      toStringArray(parsed.frameworksAndLibs).length > 0
+        ? toStringArray(parsed.frameworksAndLibs)
+        : heuristic.frameworksAndLibs,
+    concepts:
+      toStringArray(parsed.concepts).length > 0
+        ? toStringArray(parsed.concepts)
+        : heuristic.concepts,
+    specificQuestionsMentioned:
+      Array.isArray(parsed.specificQuestionsMentioned)
+        ? toStringArray(parsed.specificQuestionsMentioned)
+        : heuristic.specificQuestionsMentioned,
+    candidateWeaknessFocus:
+      toStringArray(parsed.candidateWeaknessFocus).length > 0
+        ? toStringArray(parsed.candidateWeaknessFocus)
+        : heuristic.candidateWeaknessFocus,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Step 2: Deterministic Catalog Matching Engine with Exact-Match Detection
+// ---------------------------------------------------------------------------
+
+function normalizeText(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function extractSignificantTokens(str: string): Set<string> {
+  const stopWords = new Set([
+    'a', 'an', 'the', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'and', 'or',
+    'implement', 'implementation', 'create', 'build', 'write', 'design', 'code',
+    'problem', 'question', 'challenge', 'component', 'function', 'class', 'exercise',
+    'screen', 'screening', 'round', 'interview', 'asked', 'asking', 'via', 'using'
+  ]);
+  const words = normalizeText(str)
+    .split(/\s+/)
+    .filter((w) => w.length > 1 && !stopWords.has(w));
+  return new Set(words);
+}
+
+function matchQuestionToCard(
+  question: string,
+  card: CatalogIndexEntry
+): { isMatch: boolean; confidence: number } {
+  const normQ = normalizeText(question);
+  const normTitle = normalizeText(card.title);
+  const normId = normalizeText(card.id.replace(/-/g, ' '));
+
+  // 1. Exact match on normalized title or slug
+  if (normQ === normTitle || normQ === normId) {
+    return { isMatch: true, confidence: 1.0 };
+  }
+
+  // 2. Exact substring containment
+  if (normQ.length >= 6 && (normTitle.includes(normQ) || normId.includes(normQ))) {
+    return { isMatch: true, confidence: 0.95 };
+  }
+  if (normTitle.length >= 6 && normQ.includes(normTitle)) {
+    return { isMatch: true, confidence: 0.95 };
+  }
+
+  // 3. Token Jaccard & Significant Word Overlap
+  const qTokens = extractSignificantTokens(question);
+  const cardTokens = extractSignificantTokens(`${card.id} ${card.title} ${card.concept}`);
+
+  if (qTokens.size === 0 || cardTokens.size === 0) {
+    return { isMatch: false, confidence: 0 };
+  }
+
+  let intersectionCount = 0;
+  for (const t of qTokens) {
+    if (cardTokens.has(t)) {
+      intersectionCount++;
+    } else {
+      // Check prefix/stem match (e.g. "throttling" vs "throttle", "cached" vs "cache")
+      for (const ct of cardTokens) {
+        if ((t.length >= 4 && ct.startsWith(t)) || (ct.length >= 4 && t.startsWith(ct))) {
+          intersectionCount += 0.85;
+          break;
+        }
+      }
+    }
+  }
+
+  const unionCount = qTokens.size + cardTokens.size - intersectionCount;
+  const jaccard = unionCount > 0 ? intersectionCount / unionCount : 0;
+  const coverageOfCard = cardTokens.size > 0 ? intersectionCount / cardTokens.size : 0;
+  const coverageOfQ = qTokens.size > 0 ? intersectionCount / qTokens.size : 0;
+
+  if (jaccard >= 0.45 || (qTokens.size >= 2 && coverageOfCard >= 0.65) || (qTokens.size >= 2 && coverageOfQ >= 0.65)) {
+    return { isMatch: true, confidence: Math.max(jaccard, Math.min(coverageOfCard, coverageOfQ)) };
+  }
+
+  return { isMatch: false, confidence: 0 };
+}
+
+export function matchCatalogDeterministically(
+  extraction: JobIntelligenceExtraction,
+  catalog: CatalogIndexEntry[],
+  options?: {
+    weakCardIds?: string[];
+    targetCardCount?: number;
+    targetDate?: string;
+  }
+): DeterministicMatchResult {
+  const companyLower = extraction.companyArchetype.toLowerCase();
+  const matchedQuestionMap = new Map<string, string>(); // card.id -> question
+  const matchedQuestions = new Set<string>();
+
+  // Check each specific question against catalog cards
+  for (const question of extraction.specificQuestionsMentioned) {
+    let bestMatch: { card: CatalogIndexEntry; confidence: number } | null = null;
+    for (const card of catalog) {
+      const match = matchQuestionToCard(question, card);
+      if (match.isMatch && (!bestMatch || match.confidence > bestMatch.confidence)) {
+        bestMatch = { card, confidence: match.confidence };
+      }
+    }
+    if (bestMatch) {
+      matchedQuestionMap.set(bestMatch.card.id, question);
+      matchedQuestions.add(question);
+    }
+  }
+
+  const unmatchedQuestions = extraction.specificQuestionsMentioned.filter(
+    (q) => !matchedQuestions.has(q)
+  );
+
+  // Score all cards deterministically
+  const scored = catalog.map((card) => {
+    let score = 0;
+    const cardText = `${card.id} ${card.title} ${card.concept} ${card.tags.join(' ')} ${card.summary}`.toLowerCase();
+    const matchedQ = matchedQuestionMap.get(card.id);
+
+    // Exact or near-perfect question match gets top priority
+    if (matchedQ) {
+      score += 150;
+    }
+
+    // Recent Box 1 Setback boost
+    if (options?.weakCardIds?.includes(card.id)) {
+      score += 35;
+    }
+
+    // Candidate self-reported weaknesses boost
+    for (const weakness of extraction.candidateWeaknessFocus) {
+      const wTokens = extractSignificantTokens(weakness);
+      let matchCount = 0;
+      for (const token of wTokens) {
+        if (cardText.includes(token)) matchCount++;
+      }
+      if (matchCount > 0) {
+        score += matchCount * 10;
+      }
+    }
+
+    // Company Archetype boosts
+    if (companyLower.includes('stripe')) {
+      if (/lru|a11y|compound|tab|event-emitter|fetch|form|retry|cache/i.test(cardText)) score += 12;
+    } else if (companyLower.includes('airbnb')) {
+      if (/calendar|star|carousel|combobox|modal|date|rating|accordion/i.test(cardText)) score += 12;
+    } else if (companyLower.includes('datadog')) {
+      if (/raf|throttle|debounce|observer|progress|spy|metric/i.test(cardText)) score += 12;
+    } else if (companyLower.includes('meta') || companyLower.includes('facebook')) {
+      if (/dom|tree|virtual|hook|memo|search|traversal|comment/i.test(cardText)) score += 12;
+    } else if (companyLower.includes('google') || companyLower.includes('alphabet')) {
+      if (/tree|graph|binary|algorithm|sort|hash/i.test(cardText)) score += 12;
+    } else if (companyLower.includes('amazon') || companyLower.includes('aws')) {
+      if (/retry|promise|async|queue|throttle/i.test(cardText)) score += 12;
+    }
+
+    // Concepts & Frameworks Overlap
+    for (const concept of extraction.concepts) {
+      const cTokens = extractSignificantTokens(concept);
+      for (const token of cTokens) {
+        if (cardText.includes(token)) score += 8;
+      }
+    }
+    for (const lib of extraction.frameworksAndLibs) {
+      if (cardText.includes(lib.toLowerCase())) score += 8;
+    }
+
+    return {
+      card,
+      score,
+      matchedQuestion: matchedQ,
+    };
+  });
+
+  scored.sort((a, b) => b.score - a.score || a.card.difficulty - b.card.difficulty);
+
+  // Determine optimal deck size
+  let targetCount = options?.targetCardCount;
+  if (!targetCount) {
+    if (
+      /sprint|urgent|tomorrow|3-day|3 day|48 hour|immediate|quick/i.test(extraction.companyArchetype) ||
+      /sprint|urgent/i.test(options?.targetDate || '')
+    ) {
+      targetCount = 8;
+    } else if (
+      /google|amazon|meta|facebook|apple|stripe|netflix/i.test(companyLower) ||
+      /staff|principal/i.test(extraction.seniorityLevel)
+    ) {
+      targetCount = 36;
+    } else {
+      targetCount = 18;
+    }
+  }
+
+  // Ensure all directly matched questions are included
+  const minRequiredCount = Math.max(matchedQuestionMap.size, 1);
+  targetCount = Math.max(minRequiredCount, Math.min(catalog.length, Math.min(75, targetCount)));
+
+  const picked = scored.slice(0, targetCount);
+
+  // Guarantee any card with a matchedQuestion is in picked even if beyond targetCount
+  for (const item of scored) {
+    if (item.matchedQuestion && !picked.some((p) => p.card.id === item.card.id)) {
+      picked.push(item);
+    }
+  }
+
+  const mustKnowCutoff = Math.max(2, Math.floor(picked.length * 0.3));
+  const recommendedCutoff = Math.max(mustKnowCutoff + 2, Math.floor(picked.length * 0.75));
+
+  const selectedCards: InterviewPrepCardSelection[] = picked.map((item, idx) => {
+    let priority: CardPriority;
+    let rationale: string;
+
+    if (item.matchedQuestion) {
+      priority = 'must-know';
+      rationale = `Direct match for interview question reported for ${extraction.companyArchetype}: "${item.matchedQuestion}"`;
+    } else if (options?.weakCardIds?.includes(item.card.id)) {
+      priority = 'must-know';
+      rationale = `Recent Leitner Box 1 setback. Re-drilling cements syntax fluency under timed constraints.`;
+    } else if (idx < mustKnowCutoff) {
+      priority = 'must-know';
+      rationale = `Essential foundation for ${extraction.companyArchetype} technical screening.`;
+    } else if (idx < recommendedCutoff) {
+      priority = 'recommended';
+      rationale = `High-yield architectural pattern frequently assessed in ${extraction.companyArchetype} coding rounds.`;
+    } else {
+      priority = 'optional';
+      rationale = `Valuable supplementary practice for edge case handling and timed implementation speed.`;
+    }
+
+    return {
+      id: item.card.id,
+      priority,
+      rationale,
+    };
+  });
+
+  return {
+    selectedCards,
+    matchedQuestions: Array.from(matchedQuestions),
+    unmatchedQuestions,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Step 3: Curriculum Gap Detection
+// ---------------------------------------------------------------------------
+
+export function detectCurriculumGaps(
+  extraction: JobIntelligenceExtraction,
+  unmatchedQuestions: string[]
+): ExternalStudyTopic[] {
+  const topics: ExternalStudyTopic[] = [];
+  const seenTopics = new Set<string>();
+
+  // 1. Unmatched interview questions become high-priority external topics!
+  for (const q of unmatchedQuestions) {
+    const key = q.toLowerCase();
+    if (!seenTopics.has(key)) {
+      seenTopics.add(key);
+      topics.push({
+        topic: `Reported Question: ${q}`,
+        priority: 'high',
+        description: `This specific interview challenge was reported for ${extraction.companyArchetype || 'your target company'}, but is not currently in the local flashcard coding catalog. Practice building this offline or in a sandbox.`,
+        recommendedResources: [
+          {
+            title: `Search "${q}" on LeetCode / Discussion Forums`,
+            url: `https://www.google.com/search?q=${encodeURIComponent(`${q} interview question leetcode`)}`,
+          },
+          {
+            title: 'MDN Web Docs Reference',
+            url: 'https://developer.mozilla.org',
+          },
+        ],
+      });
+    }
+  }
+
+  // 2. Architectural & non-flashcard topics (System Design, Realtime, WebRTC, Perf, etc.)
+  const allText = `${extraction.concepts.join(' ')} ${extraction.frameworksAndLibs.join(' ')} ${unmatchedQuestions.join(' ')}`.toLowerCase();
+
+  if (/webrtc|video|audio|stream/i.test(allText) && !seenTopics.has('webrtc')) {
+    seenTopics.add('webrtc');
+    topics.push({
+      topic: 'WebRTC & Real-Time Media Streaming',
+      priority: 'high',
+      description: 'PeerConnection negotiation, ICE candidates, SDP offer/answer exchanges, and MediaStream track lifecycle.',
+      recommendedResources: [
+        { title: 'WebRTC.org Official Architecture Guide', url: 'https://webrtc.org/getting-started/overview' },
+        { title: 'MDN WebRTC API Tutorial', url: 'https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API' },
+      ],
+    });
+  }
+
+  if (/system design|architecture|microfrontend|micro-frontend/i.test(allText) && !seenTopics.has('system-design')) {
+    seenTopics.add('system-design');
+    topics.push({
+      topic: 'Frontend System Design & Scaled Architecture',
+      priority: 'high',
+      description: 'Client data stores, normalized caching, offline synchronization, Microfrontends (Module Federation), and resilience.',
+      recommendedResources: [
+        { title: 'GreatFrontEnd System Design Playbook', url: 'https://www.greatfrontend.com' },
+        { title: 'ByteByteGo System Design Newsletter', url: 'https://blog.bytebytego.com' },
+      ],
+    });
+  }
+
+  // Always ensure Core Web Vitals & Web Accessibility are present if list is short
+  if (topics.length < 3) {
+    for (const def of getDefaultExternalTopics()) {
+      if (!seenTopics.has(def.topic.toLowerCase()) && topics.length < 5) {
+        seenTopics.add(def.topic.toLowerCase());
+        topics.push(def);
+      }
+    }
+  }
+
+  return topics;
+}
+
+// ---------------------------------------------------------------------------
+// Step 4: Strategic Synthesis Call
+// ---------------------------------------------------------------------------
+
+export function buildDossierSynthesisPrompt(
+  request: InterviewPrepRequest,
+  extraction: JobIntelligenceExtraction,
+  preFilteredCards: InterviewPrepCardSelection[],
+  catalog: CatalogIndexEntry[],
+  externalTopics: ExternalStudyTopic[]
+): { system: string; user: string } {
+  const system = `You are an elite technical interview preparation coach synthesizing a strategic interview briefing and tailored study dossier for ${request.company || 'a top technology company'} (${request.role || 'Software Engineer'}).
+
+CRITICAL RULES:
+1. ONLY reference and use the pre-filtered card IDs listed below. DO NOT invent or hallucinate any card IDs.
+2. For each card in the provided list, refine its priority ("must-know" | "recommended" | "optional") and provide a crisp 1-sentence rationale tying it directly to ${request.company || 'the target company'}'s interview rounds. If a card was directly matched to a reported question, retain "must-know" priority.
+   - STRICT PRIORITY DISTRIBUTION: Assign a tiered distribution across the cards: allocate ~25-35% as "must-know" (top core screening blockers & exact question matches), ~45-55% as "recommended" (high-yield architecture & secondary patterns), and ~15-20% as "optional" (stretch drills). NEVER mark all cards as "must-know".
+3. Write a comprehensive, multi-paragraph strategic executive summary (3 to 4 paragraphs):
+   - Paragraph 1: Target Company Engineering Archetype & Culture (what this company tests, engineering values, interview format).
+   - Paragraph 2: Candidate Risk Calibration (mapping candidate weaknesses & setbacks against the interview rubric).
+   - Paragraph 3: Topics Not Covered by Flashcards (Gap Analysis): highlight system design, microfrontends, real-time streaming, WebRTC, performance profiling, and behavioral rounds.
+   - Paragraph 4: Recommended External Resources to bridge those gaps.
+4. Refine the external topics and interactive learning tools provided.
+5. Return ONLY valid JSON adhering strictly to the schema below. No conversational text outside JSON.`;
+
+  const cardsSummary = preFilteredCards
+    .map((c) => {
+      const entry = catalog.find((x) => x.id === c.id);
+      return `- [${c.id}] ${entry?.title || c.id} (${entry?.track || 'track'} | D${entry?.difficulty || 3}) [${c.priority}]: ${c.rationale}`;
+    })
+    .join('\n');
+
+  const gapsSummary = externalTopics
+    .map((t) => `- [${t.priority.toUpperCase()}] ${t.topic}: ${t.description}`)
+    .join('\n');
+
+  const user = `Target Company: ${request.company || 'Tech Company'}
+Role & Level: ${request.role || 'Software Engineer'} (${extraction.seniorityLevel})
+Company Archetype: ${extraction.companyArchetype}
+Core Languages: ${extraction.coreLanguages.join(', ')}
+Frameworks: ${extraction.frameworksAndLibs.join(', ')}
+Key Concepts: ${extraction.concepts.join(', ')}
+Specific Questions Mentioned: ${extraction.specificQuestionsMentioned.length > 0 ? extraction.specificQuestionsMentioned.join(', ') : '(None)'}
+Candidate Weaknesses: ${extraction.candidateWeaknessFocus.join(', ') || 'None specified'}
+
+Pre-Filtered Coding Cards (Refine rationales & priorities for these exact cards):
+${cardsSummary}
+
+Identified Curriculum Gaps & External Topics:
+${gapsSummary}
+
+Respond with a JSON object in this exact schema:
+{
+  "deckName": "${request.company ? `${request.company} — ` : ''}${request.role || 'Interview Prep'} Core",
+  "deckDescription": "Targeted curriculum for ${request.company || 'tech'} interview rounds",
+  "executiveSummary": "Comprehensive multi-paragraph strategic interview briefing...",
+  "selectedCards": [
+    {
+      "id": "first-card-id-from-above-list",
+      "priority": "must-know",
+      "rationale": "Direct match for core screening requirement"
+    },
+    {
+      "id": "second-card-id-from-above-list",
+      "priority": "recommended",
+      "rationale": "High-yield secondary architectural pattern"
+    },
+    {
+      "id": "third-card-id-from-above-list",
+      "priority": "optional",
+      "rationale": "Valuable supplementary drill for edge cases"
+    }
+  ],
+  "externalTopics": [
+    {
+      "topic": "Topic Name",
+      "priority": "high",
+      "description": "Study guidance",
+      "recommendedResources": [
+        { "title": "Resource Name", "url": "https://..." }
+      ]
+    }
+  ],
+  "interactiveTools": [
+    {
+      "name": "Tool Name",
+      "url": "https://...",
+      "focus": "Focus description"
+    }
+  ]
+}`;
+
+  return { system, user };
+}
+
+export function parseDossierSynthesisResponse(
+  rawText: string,
+  preFilteredCards: InterviewPrepCardSelection[],
+  fallback: { company: string; role: string; targetDate?: string }
+): InterviewPrepDossier {
+  const parsed = extractJsonPayload(rawText);
+  const company = fallback.company || 'Target Company';
+  const role = fallback.role || 'Software Engineer';
+  const targetDate = fallback.targetDate;
+
+  if (!parsed) {
+    throw new Error('Malformed JSON payload from synthesis model');
+  }
+
+  const deckName =
+    typeof parsed.deckName === 'string' && parsed.deckName.trim()
+      ? parsed.deckName.trim()
+      : `${company} — ${role} Core`;
+
+  const deckDescription =
+    typeof parsed.deckDescription === 'string' && parsed.deckDescription.trim()
+      ? parsed.deckDescription.trim()
+      : `Tailored interview preparation curriculum for ${company}`;
+
+  const executiveSummary =
+    typeof parsed.executiveSummary === 'string' && parsed.executiveSummary.trim()
+      ? parsed.executiveSummary.trim()
+      : `${company}'s technical interview rounds focus on solid engineering fundamentals, clean architecture, and practical problem solving.`;
+
+  const validPreFilteredMap = new Map(preFilteredCards.map((c) => [c.id, c]));
+  const selectedCards: InterviewPrepCardSelection[] = [];
+  const seenIds = new Set<string>();
+
+  if (Array.isArray(parsed.selectedCards)) {
+    for (const item of parsed.selectedCards) {
+      if (item && typeof item === 'object' && typeof (item as { id?: unknown }).id === 'string') {
+        const id = (item as { id: string }).id;
+        const original = validPreFilteredMap.get(id);
+        if (original && !seenIds.has(id)) {
+          seenIds.add(id);
+          const rawPriority = (item as { priority?: unknown }).priority;
+          const priority: CardPriority =
+            rawPriority === 'must-know' || rawPriority === 'recommended' || rawPriority === 'optional'
+              ? rawPriority
+              : original.priority;
+          const rawRationale = (item as { rationale?: unknown }).rationale;
+          const rationale =
+            typeof rawRationale === 'string' && rawRationale.trim()
+              ? rawRationale.trim()
+              : original.rationale;
+          selectedCards.push({ id, priority, rationale });
+        }
+      }
+    }
+  }
+
+  // Preserve any preFilteredCards that were not included in the response
+  for (const orig of preFilteredCards) {
+    if (!seenIds.has(orig.id)) {
+      selectedCards.push(orig);
+    }
+  }
+
+  // Calibrate priorities to ensure balanced distribution
+  const calibratedCards = calibrateCardPriorities(selectedCards);
+
+  // Parse external topics
+  const externalTopics: ExternalStudyTopic[] = [];
+  if (Array.isArray(parsed.externalTopics)) {
+    for (const top of parsed.externalTopics) {
+      if (top && typeof top === 'object' && typeof (top as { topic?: unknown }).topic === 'string') {
+        const topObj = top as {
+          topic: string;
+          priority?: unknown;
+          description?: unknown;
+          recommendedResources?: unknown;
+        };
+        const resources: Array<{ title: string; url?: string }> = [];
+        if (Array.isArray(topObj.recommendedResources)) {
+          for (const res of topObj.recommendedResources) {
+            if (res && typeof res === 'object' && typeof (res as { title?: unknown }).title === 'string') {
+              resources.push({
+                title: String((res as { title: string }).title),
+                url: typeof (res as { url?: unknown }).url === 'string' ? String((res as { url: string }).url) : undefined,
+              });
+            }
+          }
+        }
+        externalTopics.push({
+          topic: topObj.topic,
+          priority: topObj.priority === 'high' || topObj.priority === 'low' ? topObj.priority : 'medium',
+          description: typeof topObj.description === 'string' ? topObj.description : '',
+          recommendedResources: resources,
+        });
+      }
+    }
+  }
+
+  // Parse interactive tools
+  const interactiveTools: InteractiveToolRecommendation[] = [];
+  if (Array.isArray(parsed.interactiveTools)) {
+    for (const tool of parsed.interactiveTools) {
+      if (
+        tool &&
+        typeof tool === 'object' &&
+        typeof (tool as { name?: unknown }).name === 'string' &&
+        typeof (tool as { url?: unknown }).url === 'string'
+      ) {
+        interactiveTools.push({
+          name: String((tool as { name: string }).name),
+          url: String((tool as { url: string }).url),
+          focus: typeof (tool as { focus?: unknown }).focus === 'string' ? String((tool as { focus: string }).focus) : '',
+        });
       }
     }
   }
@@ -369,17 +1156,136 @@ export function parseInterviewPrepResponse(
     deckName,
     deckDescription,
     executiveSummary,
-    selectedCards,
+    selectedCards: calibratedCards,
     externalTopics: externalTopics.length > 0 ? externalTopics : getDefaultExternalTopics(),
     interactiveTools: interactiveTools.length > 0 ? interactiveTools : getDefaultInteractiveTools(),
-    countdownChecklist: countdownChecklist.length > 0 ? countdownChecklist : getDefaultChecklist(),
     generatedAt: Date.now(),
     conversation: [initialMessage],
   };
 }
 
+// ---------------------------------------------------------------------------
+// Unified AI Provider JSON Invoker
+// ---------------------------------------------------------------------------
+
+async function callAiJson(
+  system: string,
+  user: string,
+  options?: { temperature?: number; maxTokens?: number }
+): Promise<string> {
+  const apiKey = getStoredApiKey();
+  const provider = getStoredProvider();
+
+  if (!apiKey) {
+    throw new Error('No API key configured');
+  }
+
+  const temperature = options?.temperature ?? 0.2;
+  const maxTokens = options?.maxTokens ?? 2048;
+
+  if (provider === 'gemini') {
+    const model = getStoredModel() || 'gemini-2.5-flash';
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: system }] },
+        contents: [{ role: 'user', parts: [{ text: user }] }],
+        generationConfig: {
+          temperature,
+          maxOutputTokens: maxTokens,
+          response_mime_type: 'application/json',
+        },
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`Gemini error (${response.status}): ${await response.text()}`);
+    }
+    const data = await response.json();
+    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+  } else if (provider === 'anthropic') {
+    const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
+    const endpoint = 'https://api.anthropic.com/v1/messages';
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: maxTokens,
+        temperature,
+        system,
+        messages: [{ role: 'user', content: user }],
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`Anthropic error (${response.status}): ${await response.text()}`);
+    }
+    const data = await response.json();
+    return data.content?.[0]?.text?.trim() || '';
+  } else {
+    let baseUrl = getStoredBaseUrl();
+    let model = getStoredModel();
+    if (provider === 'openai') {
+      baseUrl = baseUrl || 'https://api.openai.com/v1';
+      model = model || 'gpt-4o-mini';
+    } else if (provider === 'groq') {
+      baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
+      model = model || 'llama-3.3-70b-versatile';
+    } else if (provider === 'cerebras') {
+      baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
+      model = model || 'llama3.3-70b';
+    } else if (provider === 'mistral') {
+      baseUrl = baseUrl || 'https://api.mistral.ai/v1';
+      model = model || 'codestral-latest';
+    } else if (provider === 'openrouter') {
+      baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
+      model = model || 'meta-llama/llama-3.3-70b-instruct:free';
+    }
+
+    const endpoint = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+        temperature,
+        max_tokens: maxTokens,
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      let errorSnippet = errText;
+      try {
+        const parsed = JSON.parse(errText);
+        if (parsed.error?.message) errorSnippet = parsed.error.message;
+      } catch {
+        /* ignore */
+      }
+      throw new Error(`${provider} (${response.status}): ${errorSnippet}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim() || '';
+  }
+}
+
 /**
- * Deterministic heuristic generator when running offline or testing
+ * Deterministic heuristic generator when running offline or testing.
+ * Uses the deterministic catalog matching and gap detection engine.
  */
 export function generateHeuristicDossier(
   request: InterviewPrepRequest,
@@ -388,76 +1294,14 @@ export function generateHeuristicDossier(
   const company = request.company?.trim() || 'Tech Company';
   const role = request.role?.trim() || 'Software Engineer';
   const companyLower = company.toLowerCase();
-  const notesLower = (request.rawNotes || '').toLowerCase();
-  const isFrontend = /frontend|ui|react|web|client/i.test(role);
 
-  // Score catalog cards based on role, company archetypes, and text signals
-  const scored = catalog.map((card) => {
-    let score = 0;
-    const cardText = `${card.id} ${card.title} ${card.tags.join(' ')} ${card.summary}`.toLowerCase();
-
-    // Archetype boosts
-    if (companyLower.includes('stripe')) {
-      if (/lru|a11y|compound|tab|event-emitter|fetch|form|retry/i.test(cardText)) score += 5;
-    } else if (companyLower.includes('airbnb')) {
-      if (/calendar|star|carousel|combobox|modal|date|rating/i.test(cardText)) score += 5;
-    } else if (companyLower.includes('datadog')) {
-      if (/raf|throttle|debounce|observer|progress|spy|metric/i.test(cardText)) score += 5;
-    } else if (companyLower.includes('meta') || companyLower.includes('facebook')) {
-      if (/dom|tree|virtual|hook|memo|search|traversal/i.test(cardText)) score += 5;
-    }
-
-    // Role boosts
-    if (isFrontend) {
-      if (card.track === 'react-components' || card.track === 'react') score += 4;
-      if (card.track === 'dom-browser' || card.track === 'async-js') score += 3;
-      if (card.track === 'advanced-algorithms') score -= 2;
-    } else {
-      if (card.track === 'algorithms' || card.track === 'js-utilities') score += 3;
-    }
-
-    // Match keywords from raw notes
-    for (const word of ['promise', 'tree', 'hook', 'state', 'debounce', 'sort', 'graph', 'form', 'cache']) {
-      if (notesLower.includes(word) && cardText.includes(word)) score += 3;
-    }
-
-    // Weakness boost
-    if (request.weakCardIds?.includes(card.id)) score += 4;
-
-    return { card, score };
+  const extraction = extractHeuristicIntelligence(request);
+  const matchResult = matchCatalogDeterministically(extraction, catalog, {
+    weakCardIds: request.weakCardIds,
+    targetCardCount: request.targetCardCount,
+    targetDate: request.targetDate,
   });
-
-  scored.sort((a, b) => b.score - a.score || a.card.difficulty - b.card.difficulty);
-
-  let targetCount = request.targetCardCount;
-  if (!targetCount) {
-    if (
-      /sprint|urgent|tomorrow|3-day|3 day|48 hour|immediate|quick/i.test(notesLower) ||
-      /sprint|urgent/i.test(request.targetDate || '')
-    ) {
-      targetCount = 8;
-    } else if (
-      /google|amazon|meta|facebook|apple|stripe|netflix/i.test(companyLower) ||
-      /comprehensive|deep|thorough|month|marathon/i.test(notesLower)
-    ) {
-      targetCount = 36;
-    } else {
-      targetCount = 18;
-    }
-  }
-  // Clamp between 1 and min(catalog.length, 75)
-  targetCount = Math.max(1, Math.min(catalog.length, Math.min(75, targetCount)));
-
-  const picked = scored.slice(0, targetCount);
-
-  const mustKnowCutoff = Math.max(2, Math.floor(picked.length * 0.28));
-  const recommendedCutoff = Math.max(mustKnowCutoff + 2, Math.floor(picked.length * 0.72));
-
-  const selectedCards: InterviewPrepCardSelection[] = picked.map((item, idx) => ({
-    id: item.card.id,
-    priority: idx < mustKnowCutoff ? 'must-know' : idx < recommendedCutoff ? 'recommended' : 'optional',
-    rationale: `Highly relevant for ${company} ${role} technical screening.`,
-  }));
+  const externalTopics = detectCurriculumGaps(extraction, matchResult.unmatchedQuestions);
 
   // Company Archetype intelligence paragraph
   let archetypeParagraph = `${company}'s engineering assessment focuses on strong engineering fundamentals, transparent problem-solving, and clean architectural abstractions. Expect interviewers to evaluate not just whether your solution runs, but how clearly you communicate tradeoffs, structure modular functions, and validate edge cases under timed constraints.`;
@@ -477,9 +1321,10 @@ export function generateHeuristicDossier(
   }
 
   // Candidate calibration paragraph
-  const weaknessList = request.candidateWeaknesses && request.candidateWeaknesses.length > 0
-    ? request.candidateWeaknesses.join(', ')
-    : 'core component state transitions and asynchronous lifecycle edge cases';
+  const weaknessList =
+    request.candidateWeaknesses && request.candidateWeaknesses.length > 0
+      ? request.candidateWeaknesses.join(', ')
+      : 'core component state transitions and asynchronous lifecycle edge cases';
   const calibrationParagraph = `To address your calibrated focus areas (${weaknessList}), this curriculum prioritizes high-yield hands-on drills that convert theoretical knowledge into instantaneous muscle memory. Regular spaced intervals will ensure that syntactic speed and invariant validation become second nature during live whiteboard or pairing sessions.`;
 
   // Gap analysis paragraph (What Flashcards Don't Cover)
@@ -505,12 +1350,11 @@ export function generateHeuristicDossier(
     role,
     targetDate: request.targetDate,
     deckName: `${company} — ${role} Core`,
-    deckDescription: `Curated ${selectedCards.length}-card curriculum for ${company} technical interviews`,
+    deckDescription: `Curated ${matchResult.selectedCards.length}-card curriculum for ${company} technical interviews`,
     executiveSummary,
-    selectedCards,
-    externalTopics: getDefaultExternalTopics(),
+    selectedCards: calibrateCardPriorities(matchResult.selectedCards),
+    externalTopics: externalTopics.length > 0 ? externalTopics : getDefaultExternalTopics(),
     interactiveTools: getDefaultInteractiveTools(),
-    countdownChecklist: getDefaultChecklist(),
     generatedAt: Date.now(),
     conversation: [initialMessage],
   };
@@ -554,128 +1398,112 @@ export function getDefaultInteractiveTools(): InteractiveToolRecommendation[] {
   ];
 }
 
-export function getDefaultChecklist(): string[] {
-  return [
-    '24 Hours Out: Complete a timed review of all Box 1 and setback cards in the trainer',
-    'Interview Environment: Test webcam, microphone, screen sharing, and Node environment in CoderPad/CodeSandbox',
-    'First 5 Minutes: Clarify requirements, expected input/output ranges, scale, and constraints before typing',
-    'During Coding: State your time and space complexity upfront and verify edge cases explicitly',
-  ];
+export function calibrateCardPriorities(
+  cards: InterviewPrepCardSelection[]
+): InterviewPrepCardSelection[] {
+  if (!cards || cards.length === 0) return cards;
+  const mustKnowCount = cards.filter((c) => c.priority === 'must-know').length;
+  const targetMustKnow = Math.max(2, Math.floor(cards.length * 0.28));
+  const targetRecommended = Math.max(targetMustKnow + 2, Math.floor(cards.length * 0.78));
+
+  if (mustKnowCount > targetMustKnow) {
+    let assignedMustKnow = 0;
+    return cards.map((card, idx) => {
+      const isExactQuestionMatch = /direct match for interview question/i.test(card.rationale);
+      const isBox1Setback = /recent leitner box 1 setback/i.test(card.rationale);
+
+      let priority: CardPriority;
+      if ((isExactQuestionMatch || isBox1Setback || assignedMustKnow < targetMustKnow) && assignedMustKnow < targetMustKnow + 1) {
+        priority = 'must-know';
+        assignedMustKnow++;
+      } else if (idx < targetRecommended) {
+        priority = 'recommended';
+      } else {
+        priority = 'optional';
+      }
+      return { ...card, priority };
+    });
+  }
+  return cards;
 }
 
 /**
- * Generates an InterviewPrepDossier by querying the active AI provider
+ * Generates an InterviewPrepDossier through the 4-step pipeline:
+ * 1. Fast extraction call (compresses verbose notes to JSON)
+ * 2. Deterministic catalog matching with exact question detection
+ * 3. Curriculum gap detection (unmatched questions -> external topics)
+ * 4. Strategic synthesis call (compact prompt, zero hallucination)
  */
 export async function generateInterviewPrepDossier(
   request: InterviewPrepRequest,
-  catalog: CatalogIndexEntry[]
+  catalog: CatalogIndexEntry[],
+  options?: GenerateDossierOptions
 ): Promise<InterviewPrepDossier> {
   const apiKey = getStoredApiKey();
-  const provider = getStoredProvider();
 
-  // If no API key configured, use the deterministic heuristic generator
+  // If no API key configured, use deterministic offline pipeline
   if (!apiKey) {
+    options?.onProgress?.('matching', 'Matching catalog cards deterministically (offline mode)...');
     await new Promise((r) => setTimeout(r, 400));
     return generateHeuristicDossier(request, catalog);
   }
 
-  const { system, user } = buildInterviewPrepPrompt(request, catalog);
-
   try {
-    if (provider === 'gemini') {
-      const model = getStoredModel() || 'gemini-2.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: system }] },
-          contents: [{ role: 'user', parts: [{ text: user }] }],
-          generationConfig: {
-            temperature: 0.2,
-            response_mime_type: 'application/json',
-          },
-        }),
+    // Step 1: Input Compression & Extraction
+    options?.onProgress?.('extracting', 'Extracting requirements & interview questions...');
+    let extraction: JobIntelligenceExtraction;
+    try {
+      const extractionPrompt = buildJobExtractionPrompt(request);
+      const rawExtraction = await callAiJson(extractionPrompt.system, extractionPrompt.user, {
+        temperature: 0.1,
+        maxTokens: 1000,
       });
-      if (!response.ok) {
-        throw new Error(`Gemini error (${response.status}): ${await response.text()}`);
-      }
-      const data = await response.json();
-      const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-      return parseInterviewPrepResponse(rawText, catalog, request);
-    } else if (provider === 'anthropic') {
-      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
-      const endpoint = 'https://api.anthropic.com/v1/messages';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 3000,
-          temperature: 0.2,
-          system,
-          messages: [{ role: 'user', content: user }],
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Anthropic error (${response.status}): ${await response.text()}`);
-      }
-      const data = await response.json();
-      const rawText = data.content?.[0]?.text?.trim() || '';
-      return parseInterviewPrepResponse(rawText, catalog, request);
-    } else {
-      let baseUrl = getStoredBaseUrl();
-      let model = getStoredModel();
-      if (provider === 'openai') {
-        baseUrl = baseUrl || 'https://api.openai.com/v1';
-        model = model || 'gpt-4o-mini';
-      } else if (provider === 'groq') {
-        baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'llama-3.3-70b-versatile';
-      } else if (provider === 'cerebras') {
-        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
-        model = model || 'llama3.3-70b';
-      } else if (provider === 'mistral') {
-        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
-        model = model || 'codestral-latest';
-      } else if (provider === 'openrouter') {
-        baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'anthropic/claude-3.5-sonnet';
-      }
-
-      const endpoint = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user },
-          ],
-          temperature: 0.2,
-          max_tokens: 3000,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error (${response.status}): ${await response.text()}`);
-      }
-
-      const data = await response.json();
-      const rawText = data.choices?.[0]?.message?.content?.trim() || '';
-      return parseInterviewPrepResponse(rawText, catalog, request);
+      extraction = parseJobExtractionResponse(rawExtraction, request);
+    } catch (extractErr) {
+      console.warn('[AI Prep] Step 1 extraction call failed, using heuristic extraction:', extractErr);
+      extraction = extractHeuristicIntelligence(request);
     }
-  } catch {
-    // If external call fails, gracefully fall back to heuristic generator
+
+    // Step 2: Deterministic Catalog Matching Engine
+    options?.onProgress?.('matching', 'Analyzing catalog for exact question matches & archetypes...');
+    const matchResult = matchCatalogDeterministically(extraction, catalog, {
+      weakCardIds: request.weakCardIds,
+      targetCardCount: request.targetCardCount,
+      targetDate: request.targetDate,
+    });
+
+    // Step 3: Curriculum Gap Detection
+    const externalTopics = detectCurriculumGaps(extraction, matchResult.unmatchedQuestions);
+
+    // Step 4: Strategic Synthesis Call
+    options?.onProgress?.('synthesizing', 'Synthesizing strategic briefing & curriculum...');
+    let dossier: InterviewPrepDossier;
+    try {
+      const synthesisPrompt = buildDossierSynthesisPrompt(
+        request,
+        extraction,
+        matchResult.selectedCards,
+        catalog,
+        externalTopics
+      );
+      const rawSynthesis = await callAiJson(synthesisPrompt.system, synthesisPrompt.user, {
+        temperature: 0.2,
+        maxTokens: 2500,
+      });
+      dossier = parseDossierSynthesisResponse(rawSynthesis, matchResult.selectedCards, request);
+      if (dossier.externalTopics.length === 0) {
+        dossier.externalTopics = externalTopics;
+      }
+    } catch (synthErr) {
+      console.warn('[AI Prep] Step 4 synthesis call failed, using heuristic synthesis:', synthErr);
+      dossier = generateHeuristicDossier(request, catalog);
+      dossier.selectedCards = matchResult.selectedCards;
+      dossier.externalTopics = externalTopics;
+    }
+
+    return dossier;
+  } catch (err) {
+    console.warn('[AI Prep] Pipeline error, falling back to heuristic dossier:', err);
     return generateHeuristicDossier(request, catalog);
   }
 }
@@ -862,7 +1690,7 @@ Only include this JSON block if the candidate requested a modification to the de
         model = model || 'gpt-4o-mini';
       } else if (provider === 'groq') {
         baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'openai/gpt-oss-120b';
+        model = model || 'llama-3.3-70b-versatile';
       } else if (provider === 'cerebras') {
         baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
         model = model || 'llama3.3-70b';
@@ -871,7 +1699,7 @@ Only include this JSON block if the candidate requested a modification to the de
         model = model || 'codestral-latest';
       } else if (provider === 'openrouter') {
         baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'anthropic/claude-3.5-sonnet';
+        model = model || 'meta-llama/llama-3.3-70b-instruct:free';
       }
       const endpoint = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
       const response = await fetch(endpoint, {
@@ -1052,13 +1880,10 @@ Prioritize the HIGH-priority external topics above first, especially topics not 
     };
   }
 
-  // 6. Countdown checklist / final hours before the interview
-  if (/checklist|countdown|timer|24 hour|day of|tip|advice/i.test(msgLower)) {
-    const checklistItems = (dossier.countdownChecklist || [])
-      .map((item, idx) => `${idx + 1}. ${item}`)
-      .join('\n');
+  // 6. Final preparation tips / day of advice
+  if (/day of|final tip|prep advice|interview day/i.test(msgLower)) {
     return {
-      reply: `Here is your targeted countdown checklist for **${dossier.company}**:\n\n${checklistItems || '1. Review Box 1 setbacks\n2. Clarify requirements upfront\n3. Test camera and CoderPad environment'}`,
+      reply: `Here are core day-of recommendations for your **${dossier.company}** interview:\n\n1. Review your high-priority cards and Box 1 setback patterns\n2. Clarify requirements and constraints upfront before coding\n3. State complexity and trade-offs explicitly\n4. Treat the interviewer as a collaborative engineering peer`,
     };
   }
 

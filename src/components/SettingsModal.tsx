@@ -416,10 +416,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const isKeyModified = keyInput.trim() !== apiKey;
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div
         ref={modalContentRef}
         className="modal-content"

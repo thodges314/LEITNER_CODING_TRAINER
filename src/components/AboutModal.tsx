@@ -27,12 +27,21 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome
     return () => document.removeEventListener('focusin', pullBack);
   }, [isOpen, welcome]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const isLight = typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'apple-gsos';
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="about-title">
+    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="about-title">
       <div
         className="modal-content"
         style={{

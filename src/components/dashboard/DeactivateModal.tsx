@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Archive } from 'lucide-react';
 import type { TopicItem } from '../../lib/leitner';
 
@@ -13,12 +13,20 @@ export const DeactivateModal: React.FC<DeactivateModalProps> = ({
   onClose,
   onConfirm,
 }) => {
+  useEffect(() => {
+    if (!topic) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [topic, onClose]);
+
   if (!topic) return null;
 
   return (
     <div
       className="modal-overlay"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="deactivate-confirm-title"

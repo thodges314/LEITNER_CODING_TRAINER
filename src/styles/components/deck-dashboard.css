@@ -1457,94 +1457,92 @@
   color: var(--text-primary);
 }
 
+.ai-prep-modal-title.review-mode {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c084fc;
+  margin-bottom: 2px;
+}
+
 .ai-prep-modal-subtitle {
   margin: 4px 0 0;
   font-size: 12.5px;
   color: var(--text-muted);
   line-height: 1.45;
   white-space: normal;
-  max-width: 380px;
+  max-width: 480px;
 }
 
-.ai-prep-header-right {
+.header-deck-meta-prominent {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  flex-shrink: 0;
-  min-width: 320px;
-  max-width: 420px;
-}
-
-.ai-prep-header-deck-meta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
   gap: 2px;
   width: 100%;
 }
 
-.header-deck-name-row {
+.header-deck-name-row-prominent {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   width: 100%;
-  justify-content: flex-end;
 }
 
-.header-deck-name-input {
-  font-size: 14px;
+.header-deck-name-input-prominent {
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
   padding: 2px 6px;
-  text-align: right;
+  text-align: left;
   width: 100%;
+  max-width: 650px;
   outline: none;
   transition: all 0.15s ease;
 }
 
-.header-deck-name-input:hover {
+.header-deck-name-input-prominent:hover {
   background: rgba(255, 255, 255, 0.04);
   border-color: var(--border-subtle);
 }
 
-.header-deck-name-input:focus {
+.header-deck-name-input-prominent:focus {
   background: var(--bg-surface);
   border-color: #a855f7;
   box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
 }
 
-.header-deck-desc-row {
+.header-deck-desc-row-prominent {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   width: 100%;
-  justify-content: flex-end;
 }
 
-.header-deck-desc-input {
-  font-size: 11.5px;
+.header-deck-desc-input-prominent {
+  font-size: 12.5px;
   font-weight: 400;
   color: var(--text-muted);
   background: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
   padding: 1px 6px;
-  text-align: right;
+  text-align: left;
   width: 100%;
+  max-width: 650px;
   outline: none;
   transition: all 0.15s ease;
 }
 
-.header-deck-desc-input:hover {
+.header-deck-desc-input-prominent:hover {
   background: rgba(255, 255, 255, 0.04);
   border-color: var(--border-subtle);
 }
 
-.header-deck-desc-input:focus {
+.header-deck-desc-input-prominent:focus {
   background: var(--bg-surface);
   border-color: #a855f7;
   color: var(--text-primary);
@@ -1576,10 +1574,18 @@
   flex-shrink: 0;
 }
 
+.ai-prep-header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .ai-prep-header-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ai-prep-saved-dossiers-wrap {
@@ -1743,6 +1749,30 @@
   font-size: 14px !important;
   padding: 10px 14px !important;
   width: 100% !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-medium) !important;
+}
+
+.ai-prep-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 16px !important;
+  margin-top: 24px !important;
+}
+
+/* Ensure browser autofill matches dark modal background instead of harsh white */
+.ai-prep-form input:-webkit-autofill,
+.ai-prep-form input:-webkit-autofill:hover,
+.ai-prep-form input:-webkit-autofill:focus,
+.ai-prep-form textarea:-webkit-autofill,
+.ai-prep-form textarea:-webkit-autofill:hover,
+.ai-prep-form textarea:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary) !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
 .ai-prep-split-row {
@@ -2028,6 +2058,20 @@
 
 .ai-prep-spinner {
   color: #c084fc;
+  animation: aiPrepSpin 1s linear infinite;
+}
+
+@keyframes aiPrepSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: aiPrepSpin 1s linear infinite;
 }
 
 .ai-prep-loading-title {
@@ -2104,6 +2148,18 @@
   flex-shrink: 0;
 }
 
+.cards-tab-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cards-tab-counter-divider {
+  color: var(--text-muted);
+  opacity: 0.5;
+  font-size: 10px;
+}
+
 .ai-prep-select-all-btn {
   display: flex;
   align-items: center;
@@ -2168,14 +2224,25 @@
 .card-item-top-row {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .card-item-title {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.card-item-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .priority-badge {
@@ -2235,8 +2302,14 @@
 
 .guide-topics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .guide-topics-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .guide-topic-card {
@@ -2338,8 +2411,14 @@
 
 .interactive-tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .interactive-tools-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .interactive-tool-card {
@@ -2388,13 +2467,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
-.checklist-item-text {
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--text-primary);
-}
+/* Countdown Checklist */
+
 
 .ai-prep-review-footer {
   display: flex;
@@ -2902,85 +2979,6 @@
 /* -------------------------------------------------------------------------
    AI Interview Prep Copilot Enhancements: Banners, Presets & Dashboard View
    ------------------------------------------------------------------------- */
-
-/* Model Recommendation Banner in Wizard */
-.ai-prep-model-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 16px;
-  font-size: 0.85rem;
-  color: var(--text-light);
-}
-
-.ai-prep-model-banner.switched {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #34d399;
-}
-
-.ai-prep-model-banner.keyless-hint {
-  background: rgba(245, 158, 11, 0.08);
-  border-color: rgba(245, 158, 11, 0.25);
-}
-
-.ai-prep-model-banner .banner-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
-
-.ai-prep-model-banner .banner-icon {
-  color: var(--accent-purple);
-  flex-shrink: 0;
-}
-
-.ai-prep-model-banner .banner-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.ai-prep-model-banner .btn-switch-model {
-  background: var(--accent-purple);
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.ai-prep-model-banner .btn-switch-model:hover {
-  filter: brightness(1.15);
-  transform: translateY(-1px);
-}
-
-.ai-prep-model-banner .btn-dismiss-banner {
-  background: transparent;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-}
-
-.ai-prep-model-banner .btn-dismiss-banner:hover {
-  color: var(--text-light);
-  background: rgba(255, 255, 255, 0.08);
-}
 
 /* Quick Deck Sizing Preset Pills */
 .ai-prep-presets-row {
