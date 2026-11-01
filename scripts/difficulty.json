@@ -1330,5 +1330,9 @@
   "longest-continuous-subarray-limit": {
     "difficulty": 3,
     "concept": "advanced-sliding-window"
+  },
+  "text-justification": {
+    "difficulty": 3,
+    "concept": "advanced-strings"
   }
 }

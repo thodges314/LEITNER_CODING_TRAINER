@@ -1,0 +1,30 @@
+## Description
+
+Given an array of strings `words` and a width `maxWidth`, format the text such that each line has exactly `maxWidth` characters and is fully (left and right) justified.
+
+You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces `' '` when necessary so that each line has exactly `maxWidth` characters.
+
+Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
+
+For the last line of text, it should be left-justified, and no extra space is inserted between words (i.e. single space between words, with trailing spaces padding out the rest of `maxWidth`). A line containing only one word is also left-justified and padded with spaces on the right.
+
+### fullJustify(words: string[], maxWidth: number): string[]
+
+#### Parameters
+- `words: string[]`: An array of words where each word consists of non-space characters.
+- `maxWidth: number`: The fixed length required for every formatted line.
+
+#### Returns
+- `string[]`: An array of lines where each string has a length of exactly `maxWidth`.
+
+#### Constraints
+- `1 <= words.length <= 300`
+- `1 <= words[i].length <= maxWidth <= 100`
+- `words[i]` consists of English letters and symbols.
+- Time Complexity: $O(n)$ where $n$ is the total number of characters across all words.
+- Space Complexity: $O(n)$ auxiliary memory for the formatted lines.
+
+#### Edge Cases
+- Single word fitting the entire width or requiring trailing padding.
+- Last line with multiple words: separated by single spaces and padded to the right.
+- Uneven space distribution between word gaps (extra spaces placed in leftmost gaps).
