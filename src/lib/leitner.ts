@@ -92,13 +92,9 @@ export interface TopicItem {
 export type CardInputLanguage = 'javascript' | 'typescript' | 'html' | 'sql' | 'graphql';
 
 export function getCardInputLanguage(
-  card: Pick<TopicItem, 'inputLanguage' | 'track'> | null | undefined
+  card: Pick<TopicItem, 'inputLanguage'> | null | undefined
 ): CardInputLanguage {
-  if (card?.inputLanguage) return card.inputLanguage;
-  if (card?.track === 'sql-postgres') return 'sql';
-  if (card?.track === 'graphql') return 'graphql';
-  if (card?.track === 'typescript-patterns') return 'typescript';
-  return 'javascript';
+  return card?.inputLanguage ?? 'javascript';
 }
 
 export function isHtmlCard(

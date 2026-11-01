@@ -584,6 +584,10 @@ test.describe('React preview window', () => {
     const panelTitle = previewWindow.locator('.props-panel-title');
     await expect(panelTitle).toHaveText('Parameters');
 
+    // Verify input language badge says HTML and no JS/TS switch is shown
+    await expect(page.locator('[data-testid="input-language-badge"]')).toHaveText('HTML');
+    await expect(page.locator('.arena-mode-toggle-group')).toHaveCount(0);
+
     await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
 
     await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
