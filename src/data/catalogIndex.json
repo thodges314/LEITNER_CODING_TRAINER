@@ -4664,5 +4664,20 @@
       "coordinates"
     ],
     "summary": "Use D3 scales to compute absolute 2D coordinate positions and dimensions for rendering standard HTML <div> elements outside SVG or canvas."
+  },
+  {
+    "id": "d3-graph-theory-visualizer",
+    "title": "D3 Graph Theory Force Simulation",
+    "track": "d3",
+    "concept": "d3-force-graph",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "force-simulation",
+      "graphs",
+      "svg",
+      "network"
+    ],
+    "summary": "Build an interactive graph theory network visualizer that simulates a force-directed graph using D3's physics simulation inside an SVG canvas."
   }
 ]

@@ -1,0 +1,61 @@
+Build an interactive graph theory network visualizer that simulates a force-directed graph using D3's physics simulation inside an SVG canvas.
+
+## Description
+
+Force-directed graph layouts simulate physical forces (springs on edges and electrostatic repulsion between vertices) to position connected nodes intuitively.
+
+In this exercise, implement a vanilla JavaScript function `renderForceGraph` that takes an HTML container, configures a D3 force simulation with nodes and links, tracks selected nodes, and renders clean SVG elements.
+
+```ts
+interface GraphNode {
+  id: string;
+  label: string;
+  x?: number;
+  y?: number;
+  vx?: number;
+  vy?: number;
+}
+
+interface GraphLink {
+  source: string | GraphNode;
+  target: string | GraphNode;
+}
+
+interface ForceGraphOptions {
+  nodes: GraphNode[];
+  links: GraphLink[];
+  width?: number; // default: 400
+  height?: number; // default: 300
+  onSelectNode?: (node: GraphNode) => void;
+}
+```
+
+### `renderForceGraph(container: HTMLElement, options: ForceGraphOptions): { simulation: any; destroy: () => void }`
+
+- **SVG Canvas**:
+  - Clears `container` and appends an `<svg>` element with `width={width}`, `height={height}`, `role="img"`, and `aria-label="Force graph"`.
+  - Default `width` is `400`, default `height` is `300`.
+- **Force Simulation**:
+  - Configures `d3.forceSimulation(nodesCopy)`:
+    - `.force('link', d3.forceLink(linksCopy).id(d => d.id).distance(60))`
+    - `.force('charge', d3.forceManyBody().strength(-120))`
+    - `.force('center', d3.forceCenter(width / 2, height / 2))`
+  - Updates node group transforms (`translate(x, y)`) and link coordinates (`x1, y1, x2, y2`) on simulation `tick`.
+  - Invokes `simulation.tick()` once during initialization so initial coordinates are populated synchronously.
+- **Rendered Elements**:
+  - **Links**: An SVG `<line class="graph-link">` inside a `<g class="links">` for each link:
+    - Attributes: `stroke="steelblue"`, `stroke-width="2"`
+    - Data attributes:
+      - `data-source={typeof link.source === 'object' ? link.source.id : link.source}`
+      - `data-target={typeof link.target === 'object' ? link.target.id : link.target}`
+  - **Nodes**: An SVG `<g class="graph-node-group">` inside a `<g class="nodes">` for each node:
+    - `<circle class="graph-node">`:
+      - Radius `r="14"`
+      - `data-node-id={node.id}`
+      - `data-selected="false"` initially
+      - `fill="skyblue"` (selected node: `"orange"`)
+      - `stroke="steelblue"`, `stroke-width="1.5"`
+    - `<text text-anchor="middle" dy=".3em" font-size="11" fill="black">{node.label}</text>`
+    - Clicking a node sets `data-selected="true"` and `fill="orange"` on the selected node's circle (resetting others to `"false"` and `"skyblue"`), and invokes `onSelectNode?.(node)`.
+- **Return Value**:
+  - Returns `{ simulation, destroy }` where `destroy()` stops the simulation (`simulation.stop()`) and removes the SVG canvas.

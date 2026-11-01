@@ -17,14 +17,24 @@ function Demo() {
     height: 280,
   });
 
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const cleanup = renderCoordinateLayout(containerRef.current, {
+      data,
+      width: Number(width) || 400,
+      height: Number(height) || 280,
+      onSelectPoint: (p) => log('selectPoint', p),
+    });
+    return () => {
+      if (typeof cleanup === 'function') cleanup();
+    };
+  }, [data, width, height]);
+
   return (
     <div style={{ padding: '16px' }}>
-      <D3CoordinateLayout
-        data={data}
-        width={Number(width) || 400}
-        height={Number(height) || 280}
-        onSelectPoint={(p) => log('selectPoint', p)}
-      />
+      <div ref={containerRef} />
     </div>
   );
 }

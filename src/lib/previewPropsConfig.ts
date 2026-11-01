@@ -719,6 +719,54 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Callback fired on point click: (point: CoordinatePoint) => void',
     },
   ],
+  'd3-graph-theory-visualizer': [
+    {
+      name: 'nodes',
+      type: 'json',
+      defaultValue: [
+        { id: '1', label: 'Router' },
+        { id: '2', label: 'Server A' },
+        { id: '3', label: 'Server B' },
+        { id: '4', label: 'Client 1' },
+        { id: '5', label: 'Client 2' },
+      ],
+      description: 'Array of GraphNode objects ({ id, label })',
+    },
+    {
+      name: 'links',
+      type: 'json',
+      defaultValue: [
+        { source: '1', target: '2' },
+        { source: '1', target: '3' },
+        { source: '2', target: '4' },
+        { source: '3', target: '5' },
+      ],
+      description: 'Array of GraphLink objects ({ source, target })',
+    },
+    {
+      name: 'width',
+      type: 'number',
+      defaultValue: 400,
+      min: 250,
+      max: 600,
+      step: 25,
+      description: 'SVG canvas width in pixels',
+    },
+    {
+      name: 'height',
+      type: 'number',
+      defaultValue: 300,
+      min: 200,
+      max: 500,
+      step: 20,
+      description: 'SVG canvas height in pixels',
+    },
+    {
+      name: 'onSelectNode',
+      type: 'function',
+      description: 'Callback fired on node click: (node: GraphNode) => void',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

@@ -1342,5 +1342,9 @@
   "d3-css-coordinate-layout": {
     "difficulty": 3,
     "concept": "d3-layout"
+  },
+  "d3-graph-theory-visualizer": {
+    "difficulty": 3,
+    "concept": "d3-force-graph"
   }
 }

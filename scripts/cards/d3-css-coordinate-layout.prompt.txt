@@ -2,9 +2,9 @@ Use D3 scales to compute absolute 2D coordinate positions and dimensions for ren
 
 ## Description
 
-D3 is commonly associated exclusively with SVG or `<canvas>`. However, D3's pure mathematical modules (`d3.scaleLinear`, `d3.scaleSqrt`, etc.) can drive standard HTML `<div>` layouts. This enables responsive DOM elements with standard CSS styling, accessible buttons, and rich tooltips without SVG complexity.
+D3 is commonly associated exclusively with SVG or `<canvas>`. However, D3's pure mathematical modules (`d3.scaleLinear`, `d3.scaleSqrt`, etc.) can drive standard HTML `<div>` layouts. This enables responsive DOM elements with standard CSS styling, accessible controls, and tooltips without SVG complexity.
 
-In this exercise, build a React component `D3CoordinateLayout` that takes an array of data points and maps them to absolutely positioned HTML `<div>` elements inside a container.
+In this exercise, implement a vanilla JavaScript function `renderCoordinateLayout` that takes an HTML container and data points, computes positions with D3 scales, and mounts absolutely positioned HTML `<div>` elements.
 
 ```ts
 interface CoordinatePoint {
@@ -16,36 +16,36 @@ interface CoordinatePoint {
   color?: string;
 }
 
-interface D3CoordinateLayoutProps {
+interface CoordinateLayoutOptions {
   data: CoordinatePoint[];
-  width?: number;
-  height?: number;
+  width?: number; // default: 400
+  height?: number; // default: 300
   onSelectPoint?: (point: CoordinatePoint) => void;
 }
 ```
 
-### `D3CoordinateLayout({ data, width = 400, height = 300, onSelectPoint }: D3CoordinateLayoutProps)`
+### `renderCoordinateLayout(container: HTMLElement, options: CoordinateLayoutOptions): () => void`
 
-- **Container**:
-  - Renders a container `<div className="coordinate-layout">` with inline styles: `position: 'relative'`, `width`, and `height`. Default `width` is `400`, default `height` is `300`.
+- **Container Setup**:
+  - Sets `container.style.position = 'relative'`, `container.style.width = width + 'px'`, and `container.style.height = height + 'px'`.
+  - Default `width` is `400`, default `height` is `300`.
+  - Clears previous contents of `container`.
 - **Scales (using 20px padding)**:
   - `xScale`: maps the range of `x` values in `data` to `[20, width - 20]`. If `data` is empty or all points share the same `x`, use domain `[0, 100]`.
   - `yScale`: maps the range of `y` values in `data` to `[height - 20, 20]`. (Screen coordinates invert the Y-axis: larger `y` values are placed closer to the top at `20`). If `data` is empty or all points share the same `y`, use domain `[0, 100]`.
   - `sizeScale`: maps `value` to a diameter between `16` and `48` pixels (`[16, 48]`). If `data` is empty or all values are identical, use fixed diameter `32`.
 - **Point Elements**:
-  - For each point in `data`, renders a child `<div className="coordinate-point">`:
-    - `data-point-id={p.id}`
-    - `data-label={p.label}`
-    - `data-x={p.x}`
-    - `data-y={p.y}`
-    - `data-selected={p.id === selectedId ? "true" : "false"}`
+  - For each point in `data`, creates a child `<div class="coordinate-point">`:
+    - Attributes: `data-point-id={p.id}`, `data-label={p.label}`, `data-x={p.x}`, `data-y={p.y}`, `data-selected="false"`.
     - Inline styles:
-      - `position: 'absolute'`
-      - `left: xScale(p.x) - size / 2`
-      - `top: yScale(p.y) - size / 2`
-      - `width: size`
-      - `height: size`
-      - `borderRadius: '50%'`
-      - `backgroundColor: p.id === selectedId ? 'orange' : (p.color || 'steelblue')`
-    - Child text: renders `{p.label}` inside the point element.
-    - Clicking a point updates the selected point and calls `onSelectPoint?.(p)`.
+      - `position = 'absolute'`
+      - `left = (xScale(p.x) - size / 2) + 'px'`
+      - `top = (yScale(p.y) - size / 2) + 'px'`
+      - `width = size + 'px'`
+      - `height = size + 'px'`
+      - `borderRadius = '50%'`
+      - `backgroundColor = p.color || 'steelblue'`
+    - Sets text content to `{p.label}`.
+    - Clicking a point marks it as selected (`data-selected="true"`, `backgroundColor = 'orange'`), resets any other selected point to `data-selected="false"` and its default color, and invokes `onSelectPoint?.(point)`.
+- **Cleanup**:
+  - Returns a cleanup function `() => void` that clears the container and removes event listeners.

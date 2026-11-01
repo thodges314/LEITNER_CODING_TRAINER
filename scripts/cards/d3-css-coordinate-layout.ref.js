@@ -1,5 +1,15 @@
-function D3CoordinateLayout({ data = [], width = 400, height = 300, onSelectPoint }) {
-  const [selectedId, setSelectedId] = useState(null);
+function renderCoordinateLayout(container, options = {}) {
+  const {
+    data = [],
+    width = 400,
+    height = 300,
+    onSelectPoint,
+  } = options;
+
+  container.innerHTML = '';
+  container.style.position = 'relative';
+  container.style.width = width + 'px';
+  container.style.height = height + 'px';
 
   const padding = 20;
 
@@ -18,53 +28,62 @@ function D3CoordinateLayout({ data = [], width = 400, height = 300, onSelectPoin
   const yScale = d3.scaleLinear().domain(yDomain).range([height - padding, padding]);
 
   const valExtent = d3.extent(data, (d) => d.value);
-  const sizeScale =
-    valExtent[0] === undefined || valExtent[0] === valExtent[1]
-      ? () => 32
-      : d3.scaleLinear().domain(valExtent).range([16, 48]);
+  const hasDistinctValues =
+    valExtent[0] !== undefined && valExtent[0] !== valExtent[1];
+  const sizeScale = hasDistinctValues
+    ? d3.scaleSqrt().domain(valExtent).range([16, 48])
+    : () => 32;
 
-  const handleClick = (p) => {
-    setSelectedId(p.id);
-    if (typeof onSelectPoint === 'function') {
-      onSelectPoint(p);
-    }
+  let selectedId = null;
+  const pointElements = [];
+
+  const updateSelections = () => {
+    pointElements.forEach(({ el, point }) => {
+      const isSelected = point.id === selectedId;
+      el.setAttribute('data-selected', isSelected ? 'true' : 'false');
+      el.style.backgroundColor = isSelected ? 'orange' : (point.color || 'steelblue');
+    });
   };
 
-  return (
-    <div
-      className="coordinate-layout"
-      style={{ position: 'relative', width, height }}
-    >
-      {data.map((p) => {
-        const size = sizeScale(p.value);
-        const left = xScale(p.x) - size / 2;
-        const top = yScale(p.y) - size / 2;
-        const isSelected = p.id === selectedId;
+  data.forEach((p) => {
+    const el = document.createElement('div');
+    el.className = 'coordinate-point';
+    el.setAttribute('data-point-id', p.id);
+    el.setAttribute('data-label', p.label);
+    el.setAttribute('data-x', String(p.x));
+    el.setAttribute('data-y', String(p.y));
+    el.setAttribute('data-selected', 'false');
 
-        return (
-          <div
-            key={p.id}
-            className="coordinate-point"
-            data-point-id={p.id}
-            data-label={p.label}
-            data-x={p.x}
-            data-y={p.y}
-            data-selected={isSelected ? 'true' : 'false'}
-            onClick={() => handleClick(p)}
-            style={{
-              position: 'absolute',
-              left,
-              top,
-              width: size,
-              height: size,
-              borderRadius: '50%',
-              backgroundColor: isSelected ? 'orange' : (p.color || 'steelblue'),
-            }}
-          >
-            {p.label}
-          </div>
-        );
-      })}
-    </div>
-  );
+    const size = sizeScale(p.value);
+    const left = xScale(p.x) - size / 2;
+    const top = yScale(p.y) - size / 2;
+
+    el.style.position = 'absolute';
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.borderRadius = '50%';
+    el.style.backgroundColor = p.color || 'steelblue';
+    el.textContent = p.label;
+
+    const clickHandler = () => {
+      selectedId = p.id;
+      updateSelections();
+      if (typeof onSelectPoint === 'function') {
+        onSelectPoint(p);
+      }
+    };
+
+    el.addEventListener('click', clickHandler);
+    container.appendChild(el);
+    pointElements.push({ el, point: p, clickHandler });
+  });
+
+  return () => {
+    pointElements.forEach(({ el, clickHandler }) => {
+      el.removeEventListener('click', clickHandler);
+    });
+    container.innerHTML = '';
+  };
 }

@@ -43,9 +43,9 @@ export default {
   'd3-css-coordinate-layout': [
     r(
       'Initial render mounts container with specified width/height and renders coordinate points',
-      '<D3CoordinateLayout data={SAMPLE_POINTS} width={400} height={300} />',
+      'renderCoordinateLayout(container, { data: SAMPLE_POINTS, width: 400, height: 300 })',
       'Container rendered with 3 .coordinate-point children for p1, p2, p3',
-      { callSignature: '<D3CoordinateLayout data={POINTS} width={400} height={300} />' }
+      { callSignature: 'renderCoordinateLayout(container, { data: POINTS, width: 400, height: 300 })' }
     ),
     r(
       'D3 linear scales calculate correct left and top coordinates with inverted Y-axis',
@@ -67,9 +67,41 @@ export default {
     ),
     r(
       'Empty or single-point data gracefully falls back to default domain and sizes',
-      '<D3CoordinateLayout data={[{ id: "solo", x: 50, y: 50, value: 100 }]} />',
+      'renderCoordinateLayout(container, { data: [{ id: "solo", x: 50, y: 50, value: 100 }] })',
       'Point renders with valid non-NaN coordinates and default diameter 32px',
-      { callSignature: '<D3CoordinateLayout data={[singlePoint]} />' }
+      { callSignature: 'renderCoordinateLayout(container, { data: [singlePoint] })' }
+    ),
+  ],
+  'd3-graph-theory-visualizer': [
+    r(
+      'Renders SVG canvas with correct dimensions and role',
+      'renderForceGraph(container, { nodes, links, width: 400, height: 300 })',
+      '<svg width="400" height="300" role="img" aria-label="Force graph">',
+      { callSignature: 'renderForceGraph(container, { nodes, links, width: 400, height: 300 })' }
+    ),
+    r(
+      'Renders lines for links with source and target data attributes',
+      'inspect .graph-link elements',
+      'lines render with data-source="A", data-target="B", stroke="steelblue", stroke-width="2"',
+      { callSignature: 'container.querySelectorAll(".graph-link")' }
+    ),
+    r(
+      'Renders circles for nodes with data-node-id and label text',
+      'inspect .graph-node elements and labels',
+      'circles render with data-node-id matching node IDs, r=14, stroke="steelblue"',
+      { callSignature: 'container.querySelectorAll(".graph-node")' }
+    ),
+    r(
+      'Clicking a node highlights it with data-selected=true and fires onSelectNode',
+      'click [data-node-id="B"]',
+      'data-selected="true", fill="orange", onSelectNode called with node B',
+      { callSignature: 'nodeB.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Handles empty nodes and links gracefully and cleans up on destroy',
+      'renderForceGraph(container, { nodes: [], links: [] })',
+      'Renders empty graph and cleans up simulation without throwing exceptions',
+      { callSignature: 'renderForceGraph(container, { nodes: [], links: [] })' }
     ),
   ],
 };

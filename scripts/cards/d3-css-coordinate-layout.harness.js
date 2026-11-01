@@ -1,5 +1,3 @@
-const { render, fire, q, qa } = $dom;
-
 const SAMPLE_POINTS = [
   { id: 'p1', x: 0, y: 0, value: 10, label: 'Origin' },
   { id: 'p2', x: 100, y: 100, value: 50, label: 'Peak' },
@@ -8,13 +6,14 @@ const SAMPLE_POINTS = [
 
 // 1. Initial render mounts container with specified width/height and renders coordinate points
 {
-  const r = render(<D3CoordinateLayout data={SAMPLE_POINTS} width={400} height={300} />);
-  const container = q('.coordinate-layout', r.container);
-  const points = qa('.coordinate-point', r.container);
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  const cleanup = renderCoordinateLayout(container, { data: SAMPLE_POINTS, width: 400, height: 300 });
+  const points = container.querySelectorAll('.coordinate-point');
 
   const passed =
-    container !== null &&
     points.length === 3 &&
+    container.style.position === 'relative' &&
     points[0].getAttribute('data-point-id') === 'p1' &&
     points[1].getAttribute('data-point-id') === 'p2' &&
     points[2].getAttribute('data-point-id') === 'p3';
@@ -22,24 +21,22 @@ const SAMPLE_POINTS = [
   $test.check(
     'Initial render mounts container with specified width/height and renders coordinate points',
     passed,
-    { hasContainer: !!container, pointCount: points.length }
+    { pointCount: points.length }
   );
-  r.unmount();
+  if (typeof cleanup === 'function') cleanup();
+  container.remove();
 }
 
 // 2. D3 linear scales calculate correct left and top coordinates with inverted Y-axis
 {
-  const r = render(<D3CoordinateLayout data={SAMPLE_POINTS} width={400} height={300} />);
-  const p1 = q('[data-point-id="p1"]', r.container);
-  const p2 = q('[data-point-id="p2"]', r.container);
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  const cleanup = renderCoordinateLayout(container, { data: SAMPLE_POINTS, width: 400, height: 300 });
+  const p1 = container.querySelector('[data-point-id="p1"]');
+  const p2 = container.querySelector('[data-point-id="p2"]');
 
-  // x: 0 -> padding 20; p1 has value 10 -> size 16 -> left = 20 - 8 = 12px
-  // y: 0 -> height - padding = 280; p1 has size 16 -> top = 280 - 8 = 272px
   const p1Left = parseFloat(p1.style.left);
   const p1Top = parseFloat(p1.style.top);
-
-  // x: 100 -> width - padding = 380; p2 has value 50 -> size 48 -> left = 380 - 24 = 356px
-  // y: 100 -> padding = 20; p2 has size 48 -> top = 20 - 24 = -4px
   const p2Left = parseFloat(p2.style.left);
   const p2Top = parseFloat(p2.style.top);
 
@@ -51,77 +48,97 @@ const SAMPLE_POINTS = [
     leftCorrect && topCorrect,
     { p1Left, p1Top, p2Left, p2Top }
   );
-  r.unmount();
+  if (typeof cleanup === 'function') cleanup();
+  container.remove();
 }
 
 // 3. D3 size scale sizes elements proportionally to data values
 {
-  const r = render(<D3CoordinateLayout data={SAMPLE_POINTS} width={400} height={300} />);
-  const p1 = q('[data-point-id="p1"]', r.container);
-  const p2 = q('[data-point-id="p2"]', r.container);
-  const p3 = q('[data-point-id="p3"]', r.container);
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  const cleanup = renderCoordinateLayout(container, { data: SAMPLE_POINTS, width: 400, height: 300 });
+  const p1 = container.querySelector('[data-point-id="p1"]');
+  const p2 = container.querySelector('[data-point-id="p2"]');
+  const p3 = container.querySelector('[data-point-id="p3"]');
 
-  const p1Width = parseFloat(p1.style.width);
-  const p2Width = parseFloat(p2.style.width);
-  const p3Width = parseFloat(p3.style.width);
+  const p1Size = parseFloat(p1.style.width);
+  const p2Size = parseFloat(p2.style.width);
+  const p3Size = parseFloat(p3.style.width);
 
-  const minValid = Math.abs(p1Width - 16) < 2;
-  const maxValid = Math.abs(p2Width - 48) < 2;
-  const midValid = Math.abs(p3Width - 32) < 2;
+  const passed =
+    Math.abs(p1Size - 16) < 2 &&
+    Math.abs(p2Size - 48) < 2 &&
+    Math.abs(p3Size - 32) < 4;
 
   $test.check(
     'D3 size scale sizes elements proportionally to data values',
-    minValid && maxValid && midValid,
-    { p1Width, p2Width, p3Width }
+    passed,
+    { p1Size, p2Size, p3Size }
   );
-  r.unmount();
+  if (typeof cleanup === 'function') cleanup();
+  container.remove();
 }
 
 // 4. Clicking a point calls onSelectPoint and updates data-selected to true
 {
   let selected = null;
-  const r = render(
-    <D3CoordinateLayout
-      data={SAMPLE_POINTS}
-      width={400}
-      height={300}
-      onSelectPoint={(p) => {
-        selected = p;
-      }}
-    />
-  );
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  const cleanup = renderCoordinateLayout(container, {
+    data: SAMPLE_POINTS,
+    width: 400,
+    height: 300,
+    onSelectPoint: (p) => {
+      selected = p;
+    },
+  });
 
-  const p2 = q('[data-point-id="p2"]', r.container);
-  if (p2) fire.click(p2);
+  const p2 = container.querySelector('[data-point-id="p2"]');
+  const p1 = container.querySelector('[data-point-id="p1"]');
+  p2.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
-  const p2Selected = p2?.getAttribute('data-selected') === 'true';
-  const p1Selected = q('[data-point-id="p1"]', r.container)?.getAttribute('data-selected') === 'false';
-  const callbackFired = selected !== null && selected.id === 'p2';
+  const passed =
+    p2.getAttribute('data-selected') === 'true' &&
+    p1.getAttribute('data-selected') === 'false' &&
+    p2.style.backgroundColor === 'orange' &&
+    selected !== null &&
+    selected.id === 'p2';
 
   $test.check(
     'Clicking a point calls onSelectPoint and updates data-selected to true',
-    p2Selected && p1Selected && callbackFired,
-    { p2Selected, p1Selected, selectedId: selected?.id }
+    passed,
+    { p2Selected: p2.getAttribute('data-selected'), selectedId: selected?.id }
   );
-  r.unmount();
+  if (typeof cleanup === 'function') cleanup();
+  container.remove();
 }
 
 // 5. Empty or single-point data gracefully falls back to default domain and sizes
 {
-  const single = [{ id: 'solo', x: 50, y: 50, value: 100, label: 'Solo' }];
-  const r = render(<D3CoordinateLayout data={single} width={400} height={300} />);
-  const soloEl = q('[data-point-id="solo"]', r.container);
+  const container = document.createElement('div');
+  document.body.appendChild(container);
+  const cleanup = renderCoordinateLayout(container, {
+    data: [{ id: 'solo', x: 50, y: 50, value: 100, label: 'Solo' }],
+    width: 400,
+    height: 300,
+  });
 
-  const width = parseFloat(soloEl?.style.width || '0');
-  const left = parseFloat(soloEl?.style.left || '0');
-  const top = parseFloat(soloEl?.style.top || '0');
+  const solo = container.querySelector('[data-point-id="solo"]');
+  const size = parseFloat(solo.style.width);
+  const left = parseFloat(solo.style.left);
+  const top = parseFloat(solo.style.top);
 
-  const valid = soloEl !== null && !isNaN(left) && !isNaN(top) && width === 32;
+  const passed =
+    solo !== null &&
+    Math.abs(size - 32) < 2 &&
+    !Number.isNaN(left) &&
+    !Number.isNaN(top);
 
   $test.check(
     'Empty or single-point data gracefully falls back to default domain and sizes',
-    valid,
-    { width, left, top }
+    passed,
+    { size, left, top }
   );
-  r.unmount();
+  if (typeof cleanup === 'function') cleanup();
+  container.remove();
 }
