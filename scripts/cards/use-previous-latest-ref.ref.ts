@@ -21,5 +21,5 @@ function useInterval(callback: () => void, delay: number | null): void {
     if (delay === null) return; // paused
     const id = setInterval(() => saved.current(), delay);
     return () => clearInterval(id);
-  }, [delay, saved]);
+  }, [delay]);
 }

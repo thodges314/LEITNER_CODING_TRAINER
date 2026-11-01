@@ -27,10 +27,10 @@ const { renderHook, wait } = $dom;
 {
   let a = 0;
   let b = 0;
-  const h = renderHook(({ cb, d }) => useInterval(cb, d), { initialProps: { cb: () => a++, d: 180 } });
-  await wait(105);
-  h.rerender({ cb: () => b++, d: 180 }); // new callback at ~105 ms; the 180 ms tick must not be postponed
-  await wait(135); // ~240 ms: the original timer has ticked once, using the new callback
+  const h = renderHook(({ cb, d }) => useInterval(cb, d), { initialProps: { cb: () => a++, d: 300 } });
+  await wait(60);
+  h.rerender({ cb: () => b++, d: 300 }); // new callback at ~60 ms; the 300 ms tick must not be postponed
+  await wait(360); // ~420 ms: the original timer has ticked once, using the new callback
   h.unmount();
   $test.check('useInterval always calls the latest callback without resetting the timer', a === 0 && b >= 1, { a, b });
 }
