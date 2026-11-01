@@ -1,0 +1,7 @@
+{
+  "title": "D3 SVG Scatter Plot",
+  "track": "d3",
+  "tags": ["d3", "data-visualization", "svg", "scatter-plot", "linear-scale", "axes"],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}

@@ -1,0 +1,73 @@
+### `renderScatterPlot(container: HTMLElement, data: ScatterDatum[], options?: ScatterPlotOptions): ScatterPlotInstance`
+
+## Description
+
+```ts
+interface ScatterDatum {
+  x: number;
+  y: number;
+  label?: string;
+  radius?: number;
+}
+
+interface Margin {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+interface ScatterPlotOptions {
+  width?: number;
+  height?: number;
+  margin?: Partial<Margin>;
+  defaultRadius?: number;
+  color?: string;
+  onSelectPoint?: (datum: ScatterDatum, index: number) => void;
+}
+
+interface ScatterPlotInstance {
+  svg: SVGSVGElement;
+  destroy: () => void;
+}
+```
+
+Implement a 2D SVG scatter plot visualizer using continuous linear scales (`d3.scaleLinear()`), SVG axes (`d3.axisBottom`, `d3.axisLeft`), and circular point markers.
+
+The function mounts into `container` and returns an object containing the root `<svg>` element and a `destroy()` cleanup callback.
+
+### Requirements
+
+- **Canvas & Dimensions**:
+  - Empties `container.innerHTML` before rendering.
+  - Appends an `<svg>` element with `width` and `height` attributes (default `width: 450`, `height: 300`).
+  - Sets `role="img"` and `aria-label="Scatter plot"`.
+  - Margin defaults: `{ top: 20, right: 20, bottom: 40, left: 40 }`.
+  - Computes `innerWidth = width - margin.left - margin.right` and `innerHeight = height - margin.top - margin.bottom`.
+  - Appends `<g class="chart-area">` translated to `translate(margin.left, margin.top)`.
+
+- **Scales & Axes**:
+  - Derives X domain from `d3.extent(data, d => d.x)` (fallback `[0, 1]` if empty or null).
+  - Derives Y domain from `d3.extent(data, d => d.y)` (fallback `[0, 1]` if empty or null).
+  - Configures `xScale = d3.scaleLinear().domain(xDomain).nice().range([0, innerWidth])`.
+  - Configures `yScale = d3.scaleLinear().domain(yDomain).nice().range([innerHeight, 0])` (inverted Y-axis for SVG screen coordinates).
+  - Appends `<g class="x-axis">` translated to `translate(0, innerHeight)` and calls `d3.axisBottom(xScale)`.
+  - Appends `<g class="y-axis">` and calls `d3.axisLeft(yScale)`.
+
+- **Scatter Dots**:
+  - Binds data to `<circle class="scatter-dot">` elements inside `g.chart-area`.
+  - Positions each circle at `cx = xScale(d.x)` and `cy = yScale(d.y)`.
+  - Radius `r` is `d.radius || defaultRadius || 5`.
+  - Fill color defaults to `options.color || '#3b82f6'`.
+  - Sets data attributes: `data-x="d.x"`, `data-y="d.y"`, and `data-index="index"`. If `d.label` is provided, also sets `data-label="d.label"`.
+  - Clicking a dot invokes `options.onSelectPoint(d, index)` if provided.
+
+- **Lifecycle & Edge Cases**:
+  - If `data` is empty (`[]`), renders the axes with default domains `[0, 1]` without rendering circles or throwing errors.
+  - `instance.destroy()` removes the SVG element and empties `container.innerHTML`.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.scatter-dot`: individual scatter circle with hover outline transition.
+- `.chart-area`: chart container group.
+You may use these classes, custom styles, or your own class names.

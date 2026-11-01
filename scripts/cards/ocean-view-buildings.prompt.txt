@@ -8,5 +8,5 @@ Implement a linear-time sightline algorithm to identify unobstructed coastal vie
 - Returns an array of **0-based indices** of all buildings that have an ocean view, sorted in **ascending order**.
 - Returns `[]` if `heights` is empty `[]`.
 - Runs in **O(n) time** and **O(n) auxiliary space**:
-  - Must avoid naive $O(n^2)$ comparisons or repeated `Array.prototype.unshift()` calls inside loops, which degrade to quadratic time on large datasets.
+  - Must avoid naive `O(n²)` comparisons or repeated `Array.prototype.unshift()` calls inside loops, which degrade to quadratic time on large datasets.
   - Can be solved via a monotonic decreasing stack from left to right or a backwards scan tracking the running maximum height.

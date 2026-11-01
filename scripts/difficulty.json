@@ -1366,5 +1366,13 @@
   "d3-svg-line-chart": {
     "difficulty": 3,
     "concept": "d3-line-chart"
+  },
+  "d3-svg-donut-chart": {
+    "difficulty": 3,
+    "concept": "d3-donut-chart"
+  },
+  "d3-svg-scatter-plot": {
+    "difficulty": 2,
+    "concept": "d3-scatter-plot"
   }
 }

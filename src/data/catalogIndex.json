@@ -4555,7 +4555,9 @@
       "stack",
       "monotonic-stack",
       "array",
-      "capital-one"
+      "capital-one",
+      "skyscraper",
+      "skyscrapers"
     ],
     "summary": "Implement a linear-time sightline algorithm to identify unobstructed coastal views"
   },
@@ -4570,7 +4572,9 @@
       "array",
       "scan",
       "capital-one",
-      "codesignal"
+      "codesignal",
+      "skyscraper",
+      "skyscrapers"
     ],
     "summary": "Implement a linear-time greedy optimization algorithm to ensure all buildings have unobstructed sightlines"
   },
@@ -4754,5 +4758,37 @@
       "generators"
     ],
     "summary": "Build an SVG line chart visualizer in D3 that plots numerical series data using linear scales, path curve generators (d3.line), SVG axes, and inter..."
+  },
+  {
+    "id": "d3-svg-donut-chart",
+    "title": "D3 SVG Donut & Pie Chart Generator",
+    "track": "d3",
+    "concept": "d3-donut-chart",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "data-visualization",
+      "svg",
+      "pie-chart",
+      "donut-chart",
+      "arc-generator"
+    ],
+    "summary": "interface DonutDatum {"
+  },
+  {
+    "id": "d3-svg-scatter-plot",
+    "title": "D3 SVG Scatter Plot",
+    "track": "d3",
+    "concept": "d3-scatter-plot",
+    "difficulty": 2,
+    "tags": [
+      "d3",
+      "data-visualization",
+      "svg",
+      "scatter-plot",
+      "linear-scale",
+      "axes"
+    ],
+    "summary": "interface ScatterDatum {"
   }
 ]

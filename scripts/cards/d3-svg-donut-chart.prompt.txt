@@ -1,0 +1,64 @@
+### `renderDonutChart(container: HTMLElement, data: DonutDatum[], options?: DonutChartOptions): DonutChartInstance`
+
+## Description
+
+```ts
+interface DonutDatum {
+  label: string;
+  value: number;
+  color?: string;
+}
+
+interface DonutChartOptions {
+  width?: number;
+  height?: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  centerLabel?: string;
+  onSelectSlice?: (datum: DonutDatum, index: number) => void;
+}
+
+interface DonutChartInstance {
+  svg: SVGSVGElement;
+  destroy: () => void;
+}
+```
+
+Implement an interactive SVG donut/pie chart visualizer using D3's pie generator (`d3.pie()`) and arc generator (`d3.arc()`).
+
+The function renders into the provided DOM `container` element and returns an instance with the created SVG element and a `destroy()` cleanup callback.
+
+### Requirements
+
+- **SVG Canvas**:
+  - Clears `container.innerHTML` before rendering.
+  - Appends an `<svg>` element with `width` and `height` attributes (default `width: 400`, `height: 300`).
+  - Sets accessibility attributes `role="img"` and `aria-label="Donut chart"`.
+  - Appends a centered container group `<g class="chart-donut">` translated to `translate(width / 2, height / 2)`.
+
+- **Arc & Pie Layout**:
+  - Computes default `outerRadius = Math.min(width, height) / 2 - 20`.
+  - Computes default `innerRadius = 60` (setting `innerRadius: 0` produces a classic solid pie chart).
+  - Uses `d3.pie().value((d) => d.value).sort(null)` to generate pie slice angle layouts for the input data.
+  - Uses `d3.arc().innerRadius(innerRadius).outerRadius(outerRadius)` to generate the path `d` strings.
+
+- **Slices**:
+  - Appends a `<path class="arc-slice">` for each arc segment.
+  - Assigns `d` attribute from the arc generator.
+  - Sets `data-label` to `d.data.label`, `data-value` to `String(d.data.value)`, and `data-index` to the slice's zero-based index.
+  - Sets `fill` attribute using `d.data.color` if defined, or cycling through `d3.schemeCategory10[index % 10]`.
+  - When a slice is clicked, invokes `options.onSelectSlice(d.data, index)` if provided.
+
+- **Center Summary Label**:
+  - If `options.centerLabel` is provided as a non-empty string, appends `<text class="center-label">` inside the centered donut group.
+  - Configures `text-anchor="middle"`, `dominant-baseline="central"`, and text content matching `options.centerLabel`.
+
+- **Lifecycle & Edge Cases**:
+  - If `data` is empty (`[]`), renders the SVG canvas, centered group, and center label (if specified) without generating slices or throwing errors.
+  - `instance.destroy()` removes the `<svg>` element and clears `container.innerHTML`.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.arc-slice`: slice path styled with stroke border and hover highlight transition.
+- `.center-label`: font sizing and fill color for central label.
+You may use these classes, custom styles, or your own class names.

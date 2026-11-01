@@ -4,10 +4,10 @@ Implement a linear-time greedy optimization algorithm to ensure all buildings ha
 - Receives an array `heights` where `heights[i]` represents the initial height of the `i`-th building in a line from west to east (indices `0` to `n - 1`).
 - The ocean is situated to the east (to the right of the array).
 - Every building must have an **unobstructed ocean view**, meaning each building must be **strictly taller** than all buildings to its east:
-  $$h'[i] > h'[i+1] \quad \text{for all } 0 \le i < n - 1$$
-- You may only **add floors** to buildings (i.e. final height $h'[i] \ge heights[i]$). Demolishing floors is prohibited.
-- Returns the **minimum total number of additional floors** ($\sum (h'[i] - heights[i])$) that must be added across all buildings to achieve full sightline visibility.
+  - `h'[i] > h'[i + 1]` for all `0 <= i < n - 1`
+- You may only **add floors** to buildings (i.e. final height `h'[i] >= heights[i]`). Demolishing floors is prohibited.
+- Returns the **minimum total number of additional floors** (`∑ (h'[i] - heights[i])`) that must be added across all buildings to achieve full sightline visibility.
 - Returns `0` if `heights` has length `<= 1` or if `heights` is already strictly decreasing.
 - Runs in **O(n) time** and **O(1) auxiliary space**:
-  - Must avoid naive $O(n^2)$ comparisons, forward passes, or incrementing floors one by one, which timeout on massive datasets.
+  - Must avoid naive `O(n²)` comparisons, forward passes, or incrementing floors one by one, which timeout on massive datasets.
   - Can be solved optimally with a single backwards pass from east to west maintaining the minimum required height for the next building to the west.

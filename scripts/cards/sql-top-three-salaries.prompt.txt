@@ -17,8 +17,8 @@ Write a PostgreSQL query to find the employees who are high earners in each depa
   - `"Department"`: Department name.
   - `"Employee"`: Employee name.
   - `"Salary"`: Employee compensation amount.
-- An employee is included if their salary's dense rank within their department is $\le 3$ (e.g. `DENSE_RANK() OVER (PARTITION BY departmentId ORDER BY salary DESC) <= 3`).
-- Ties must be preserved: if multiple employees in the same department share the same salary, all tied employees are included as long as their unique salary rank is $\le 3$.
+- An employee is included if their salary's dense rank within their department is `<= 3` (e.g. `DENSE_RANK() OVER (PARTITION BY departmentId ORDER BY salary DESC) <= 3`).
+- Ties must be preserved: if multiple employees in the same department share the same salary, all tied employees are included as long as their unique salary rank is `<= 3`.
 - Output rows ordered by `"Department"` ASC, `"Salary"` DESC, and `"Employee"` ASC.
 - If a department has fewer than 3 employees, all employees in that department are included.
 

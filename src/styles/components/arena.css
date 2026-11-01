@@ -326,6 +326,8 @@
 
 /* Arena Header & Popovers */
 .arena-glass-header {
+  position: relative;
+  z-index: 30;
   padding: 20px 24px;
   display: flex;
   flex-direction: column;

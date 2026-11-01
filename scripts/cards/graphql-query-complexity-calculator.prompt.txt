@@ -28,7 +28,7 @@ interface ComplexityResult {
     - Base cost is `config?.fieldCosts?.[node.name]` if defined, otherwise `config?.defaultCost ?? 1`.
     - Multiplier argument is determined by `node.args?.first` or `node.args?.limit`. If provided and a positive number (`> 0`), use that value; otherwise the multiplier is `1`.
     - If `node.fields` is provided and non-empty, the recursive child cost is calculated. The total cost contributed by this node is:
-      $$\text{nodeCost} = \text{baseCost} + (\text{multiplier} \times \text{childCost})$$
+      - `nodeCost = baseCost + (multiplier * childCost)`
     - If `node.fields` is empty or omitted, the node contributes only `baseCost`.
 - **Aggregation**:
   - The total complexity is the sum of costs across all root-level nodes in `nodes`.

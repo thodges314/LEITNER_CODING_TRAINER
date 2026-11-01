@@ -1,0 +1,7 @@
+{
+  "title": "D3 SVG Donut & Pie Chart Generator",
+  "track": "d3",
+  "tags": ["d3", "data-visualization", "svg", "pie-chart", "donut-chart", "arc-generator"],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}
