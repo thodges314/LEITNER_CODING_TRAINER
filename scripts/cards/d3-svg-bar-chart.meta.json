@@ -1,0 +1,7 @@
+{
+  "title": "D3 SVG Bar Chart with Scales and Axes",
+  "track": "d3",
+  "tags": ["d3", "charts", "bar-chart", "svg", "scales", "axes"],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}

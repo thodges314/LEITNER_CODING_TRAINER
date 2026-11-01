@@ -4722,5 +4722,37 @@
       "layout"
     ],
     "summary": "Construct a responsive dashboard KPI metric card using pure HTML markup styled with Tailwind CSS utility classes."
+  },
+  {
+    "id": "d3-svg-bar-chart",
+    "title": "D3 SVG Bar Chart with Scales and Axes",
+    "track": "d3",
+    "concept": "d3-bar-chart",
+    "difficulty": 2,
+    "tags": [
+      "d3",
+      "charts",
+      "bar-chart",
+      "svg",
+      "scales",
+      "axes"
+    ],
+    "summary": "Implement an SVG bar chart visualizer using D3 that maps categorical categorical data to an SVG canvas using band scales, linear scales, coordinate..."
+  },
+  {
+    "id": "d3-svg-line-chart",
+    "title": "D3 SVG Line Chart with Path Generator",
+    "track": "d3",
+    "concept": "d3-line-chart",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "charts",
+      "line-chart",
+      "svg",
+      "paths",
+      "generators"
+    ],
+    "summary": "Build an SVG line chart visualizer in D3 that plots numerical series data using linear scales, path curve generators (d3.line), SVG axes, and inter..."
   }
 ]
