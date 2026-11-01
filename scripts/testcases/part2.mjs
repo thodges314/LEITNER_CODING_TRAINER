@@ -50,9 +50,9 @@ export default {
     c('leading: false does not fire immediately', "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: false, trailing: true });\nt('a');\ngot", '[]'),
     c('leading: false fires at the end of the window', "const got = [];\nconst t = throttle((x) => got.push(x), 50, { leading: false, trailing: true });\nt('a');\nawait sleep(90);\ngot", "['a']"),
     c(`After the trailing call fires, a new window starts (the next call is throttled again)`, `let c = 0;
-const t = throttle(() => c++, 100);
+const t = throttle(() => c++, 250);
 t(); t();
-await sleep(160);
+await sleep(300);
 const before = c;
 t();
 c - before`, `0  (the call is deferred, not run immediately)`, { ev: `0` }),
