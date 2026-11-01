@@ -628,14 +628,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
         values={propValues}
         onChange={handlePropChange}
         onReset={handleResetProps}
-        term={
-          card.rendersComponent ||
-          card.track === 'react' ||
-          card.track === 'react-components' ||
-          card.previewLibraries?.includes('react')
-            ? 'props'
-            : 'parameters'
-        }
+        term={previewConfig.isReact ? 'props' : 'parameters'}
       />
 
       {/* Event Log & Console Panel (rendered once live) */}

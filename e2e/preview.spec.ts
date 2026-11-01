@@ -482,6 +482,10 @@ test.describe('React preview window', () => {
     // Verify title is "Live Preview Window"
     await expect(previewWindow.locator('.react-preview-title')).toContainText('Live Preview Window');
 
+    // Verify non-React panel title says "Parameters" instead of "Props"
+    const panelTitle = previewWindow.locator('.props-panel-title');
+    await expect(panelTitle).toHaveText('Parameters');
+
     // Click 'Run Code / Test' button to trigger run & live preview
     await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
 

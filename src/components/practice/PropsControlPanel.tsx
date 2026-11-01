@@ -265,7 +265,7 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
               <div className="props-group-header">
                 <span className="props-group-title">{groupName}</span>
                 <span className="props-group-count">
-                  {groupProps.length} {groupProps.length === 1 ? 'prop' : 'props'}
+                  {groupProps.length} {groupProps.length === 1 ? singular : plural}
                 </span>
               </div>
               <div className="props-slots-grid">

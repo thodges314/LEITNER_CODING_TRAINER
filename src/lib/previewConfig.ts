@@ -11,13 +11,15 @@ export interface CardPreviewConfig {
  * Always titled "Live Preview Window", with libraries explicitly loaded
  * based on the card's declared `previewLibraries`.
  */
-export function getCardPreviewConfig(card: { id: string; previewLibraries?: string[] }): CardPreviewConfig {
-  const libraries = card.previewLibraries || [];
-  const isReact = libraries.includes('react');
+export function getCardPreviewConfig(card: { id: string; previewLibraries?: string[]; track?: string }): CardPreviewConfig {
+  const libraries = card.previewLibraries;
+  const isReact = Array.isArray(libraries)
+    ? libraries.includes('react')
+    : Boolean(card.track === 'react' || card.track === 'react-components');
 
   return {
     title: 'Live Preview Window',
-    libraries,
+    libraries: libraries || (isReact ? ['react'] : []),
     isReact,
   };
 }

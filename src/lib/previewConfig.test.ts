@@ -70,4 +70,14 @@ describe('previewConfig and modular library injection', () => {
     expect(html).toContain('window.React');
     expect(html).toContain('https://cdn.tailwindcss.com');
   });
+
+  it('falls back to track when previewLibraries is undefined', () => {
+    const reactConfig = getCardPreviewConfig({ id: 'react-card', track: 'react' });
+    expect(reactConfig.isReact).toBe(true);
+    expect(reactConfig.libraries).toContain('react');
+
+    const d3Config = getCardPreviewConfig({ id: 'd3-card', track: 'd3' });
+    expect(d3Config.isReact).toBe(false);
+    expect(d3Config.libraries).toEqual([]);
+  });
 });
