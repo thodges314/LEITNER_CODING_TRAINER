@@ -588,6 +588,7 @@ test.describe('React preview window', () => {
 
     await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
     await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+    await expect(page.locator('.console-status-pill.console-status-success')).toContainText('Passed');
 
     const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
     const cardEl = frame.locator('.max-w-sm');

@@ -124,9 +124,9 @@ Located in [runner.ts](src/lib/runner.ts):
    - Ambient declarations in `SANDBOX_GLOBALS` (`src/utils/typeChecker.ts`) include `ListNode<T>` and `TreeNode<T>` for common algorithm data structures.
    - When inspecting the suggested solution in `EvaluationPanel`, the trainer renders the solution matching the learner's active mode with dynamic language badges (`TypeScript` blue badge vs `JavaScript` amber badge).
 
-### 4.1 React Component Live Preview & Props Control Panel
+### 4.1 Live Preview & Props / Parameters Control Panel
 
-Located in `src/components/practice/ReactPreview.tsx`, `PropsControlPanel.tsx`, and `src/hooks/usePreviewProps.ts`:
+Located in `src/components/LivePreview.tsx` (aliased as `ReactPreview.tsx`), `PropsControlPanel.tsx`, and `src/hooks/usePreviewProps.ts`:
 
 - **Isolated Preview Sandbox**: Runs user component implementations inside a dedicated sandboxed iframe (`sandbox="allow-scripts"`). The React runtime bundle (`reactPreviewBundle.ts`) is loaded on-demand dynamically when a previewable card mounts.
 - **Dedicated Props Control Panel**:

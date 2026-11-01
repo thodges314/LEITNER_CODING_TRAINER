@@ -6,7 +6,7 @@ import {
   Minimize2,
   ExternalLink,
 } from 'lucide-react';
-import { ReactPreview } from '../ReactPreview';
+import { LivePreview } from '../LivePreview';
 import { ReactTestErrorBoundary } from './ReactTestErrorBoundary';
 import type { TopicItem } from '../../lib/leitner';
 
@@ -45,7 +45,7 @@ export const ComponentPreviewPane: React.FC<ComponentPreviewPaneProps> = ({
 }) => {
   if (currentCard?.previewCode) {
     return (
-      <ReactPreview
+      <LivePreview
         card={currentCard}
         code={code}
         executionMode={executionMode}

@@ -13,13 +13,14 @@ import ReactDOM from 'react-dom/client';
 import {
   getTrackMeta,
   isReactComponentCard,
+  getCardInputLanguage,
 } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { evaluateCodeSubmission } from '../lib/ai';
 import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
 import { CheckCircle } from 'lucide-react';
-import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, bufferContainsHarness, classifyLogLine } from '../lib/runner';
+import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, prepareHtmlCode, bufferContainsHarness, classifyLogLine } from '../lib/runner';
 import {
   runInWorker,
   supportsWebWorker,
@@ -466,15 +467,18 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       }),
     };
 
-    const isDocTrack = currentCard?.track === 'sql-postgres' || currentCard?.track === 'graphql';
+    const inputLang = getCardInputLanguage(currentCard);
+    const isWrappedInput = inputLang === 'sql' || inputLang === 'graphql' || inputLang === 'html';
     const rawCodeToRun =
-      currentCard?.track === 'sql-postgres'
-        ? prepareSqlCode(code, currentCard.testHarness)
-        : currentCard?.track === 'graphql'
-          ? prepareGraphqlCode(code, currentCard.testHarness)
-          : code;
+      inputLang === 'sql'
+        ? prepareSqlCode(code, currentCard?.testHarness)
+        : inputLang === 'graphql'
+          ? prepareGraphqlCode(code, currentCard?.testHarness)
+          : inputLang === 'html'
+            ? prepareHtmlCode(code, currentCard?.testHarness)
+            : code;
     const executableSource =
-      isDocTrack &&
+      isWrappedInput &&
       currentCard?.testHarness &&
       !bufferContainsHarness(rawCodeToRun, currentCard.testHarness)
         ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`

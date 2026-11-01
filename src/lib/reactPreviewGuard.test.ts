@@ -7,6 +7,7 @@ import * as d3 from 'd3';
 import seedTopics from '../data/topics.json';
 import { transpileForExecution, prepareHtmlCode } from './runner';
 import type { TopicItem } from './leitner';
+import { isHtmlCard } from './leitner';
 
 import { getCardPreviewConfig } from './previewConfig';
 
@@ -62,11 +63,8 @@ describe('React preview guard: every previewCode mounts with the reference solut
       const referenceSolution = card.referenceSolution || card.solution || '';
       expect(referenceSolution.trim().length, `Card ${card.id} must have a reference solution`).toBeGreaterThan(0);
 
-      const isHtmlCard = Boolean(
-        (card.track === 'tailwind' && !card.rendersComponent && !card.previewLibraries?.includes('react')) ||
-        card.tags?.includes('html')
-      );
-      const effectiveSolution = isHtmlCard ? prepareHtmlCode(referenceSolution) : referenceSolution;
+      const isHtml = isHtmlCard(card);
+      const effectiveSolution = isHtml ? prepareHtmlCode(referenceSolution) : referenceSolution;
       const combined = `${effectiveSolution}\n\n${card.previewCode}`;
       const transpiled = await transpileForExecution(combined, 'js');
       expect(
@@ -82,7 +80,7 @@ describe('React preview guard: every previewCode mounts with the reference solut
           `TypeScript reference solution check failed for ${card.id}: ${tsResult.diagnostics.map((d) => d.formatted).join('; ')}`
         ).toBe(true);
 
-        const effectiveTs = isHtmlCard ? prepareHtmlCode(card.referenceSolutionTs) : card.referenceSolutionTs;
+        const effectiveTs = isHtml ? prepareHtmlCode(card.referenceSolutionTs) : card.referenceSolutionTs;
         const combinedTs = `${effectiveTs}\n\n${card.previewCode}`;
         const transpiledTs = await transpileForExecution(combinedTs, 'js');
         expect(

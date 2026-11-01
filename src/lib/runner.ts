@@ -2,6 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import * as ReactDOMClient from 'react-dom/client';
 import type { TopicItem } from './leitner';
+import { getCardInputLanguage } from './leitner';
 import { createMockFetch } from './mockFetch';
 import { createDomTools, MockIntersectionObserver } from './domTools';
 import type { DomTools } from './domTools';
@@ -389,15 +390,13 @@ export async function runHarness(
   // Type-level checks (@ts-expect-error in the harness) only mean something under strict checking.
   if (isTsOnlyCard(card)) mode = 'ts';
 
+  const inputLang = getCardInputLanguage(card);
   let effectiveCode = code;
-  if (card.track === 'sql-postgres') {
+  if (inputLang === 'sql') {
     effectiveCode = prepareSqlCode(code, harness);
-  } else if (card.track === 'graphql') {
+  } else if (inputLang === 'graphql') {
     effectiveCode = prepareGraphqlCode(code, harness);
-  } else if (
-    (card.track === 'tailwind' && !card.rendersComponent && !card.previewLibraries?.includes('react')) ||
-    card.tags?.includes('html')
-  ) {
+  } else if (inputLang === 'html') {
     effectiveCode = prepareHtmlCode(code, harness);
   }
 

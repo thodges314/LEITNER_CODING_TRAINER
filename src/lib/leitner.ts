@@ -85,6 +85,26 @@ export interface TopicItem {
   previewLibraries?: string[];
   /** Annotated by build-cards.mjs for cards that author and render a React component UI */
   rendersComponent?: boolean;
+  /** Explicit language/format expected for user input (e.g. 'html', 'javascript', 'typescript', 'sql', 'graphql') */
+  inputLanguage?: CardInputLanguage;
+}
+
+export type CardInputLanguage = 'javascript' | 'typescript' | 'html' | 'sql' | 'graphql';
+
+export function getCardInputLanguage(
+  card: Pick<TopicItem, 'inputLanguage' | 'track'> | null | undefined
+): CardInputLanguage {
+  if (card?.inputLanguage) return card.inputLanguage;
+  if (card?.track === 'sql-postgres') return 'sql';
+  if (card?.track === 'graphql') return 'graphql';
+  if (card?.track === 'typescript-patterns') return 'typescript';
+  return 'javascript';
+}
+
+export function isHtmlCard(
+  card: Pick<TopicItem, 'inputLanguage' | 'track'> | null | undefined
+): boolean {
+  return getCardInputLanguage(card) === 'html';
 }
 
 /**
@@ -519,6 +539,7 @@ export const SEED_CONTENT_FIELDS = [
   'previewCode',
   'previewLibraries',
   'rendersComponent',
+  'inputLanguage',
 ] as const;
 
 /**

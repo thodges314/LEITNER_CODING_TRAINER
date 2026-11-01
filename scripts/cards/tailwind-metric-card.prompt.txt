@@ -4,9 +4,9 @@ Construct a responsive dashboard KPI metric card using pure HTML markup styled w
 
 In modern component development, mastery of utility-first CSS layout primitives (flexbox, borders, typography, background translucency, and focus states) is essential for rapid frontend assembly without component library lock-in.
 
-Write raw HTML markup (or an exported `html` template string) for a metric stat card:
+Write raw HTML markup for a metric stat card:
 
-### `html: string`
+### html
 
 #### Card Structure & Tailwind Classes
 
