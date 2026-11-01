@@ -6,5 +6,8 @@
     "async",
     "pagination",
     "error-handling"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

@@ -6,5 +6,8 @@
     "context",
     "timers",
     "a11y"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

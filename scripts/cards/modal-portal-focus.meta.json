@@ -1,3 +1,6 @@
 {
-  "track": "react-components"
+  "track": "react-components",
+  "previewLibraries": [
+    "react"
+  ]
 }

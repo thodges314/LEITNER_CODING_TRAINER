@@ -6,5 +6,8 @@
     "recursion",
     "tree",
     "aria"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

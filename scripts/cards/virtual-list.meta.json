@@ -6,5 +6,8 @@
     "performance",
     "virtualization",
     "scroll"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

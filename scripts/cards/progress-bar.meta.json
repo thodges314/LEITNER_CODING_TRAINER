@@ -6,5 +6,8 @@
     "a11y",
     "progressbar",
     "props"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

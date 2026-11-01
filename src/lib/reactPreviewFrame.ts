@@ -1,5 +1,6 @@
-import { REACT_PREVIEW_BUNDLE } from './reactPreviewBundle';
+import { REACT_PREVIEW_BUNDLE, D3_PREVIEW_BUNDLE } from './reactPreviewBundle';
 import { getThemeColors } from '../styles/colors';
+import { getCardPreviewConfig, type CardPreviewConfig } from './previewConfig';
 
 export interface CardThemeColors {
   border: string;
@@ -306,8 +307,11 @@ export function getCardSpecificStyles(cardId: string | undefined, colors: CardTh
 export function createPreviewSrcDoc(
   theme: 'dark' | 'apple-gsos' = 'dark',
   envKey = '',
-  cardId?: string
+  cardId?: string,
+  previewConfig?: CardPreviewConfig
 ): string {
+  const config = previewConfig || getCardPreviewConfig({ id: cardId || '' });
+  const isReact = config.isReact;
   const palette = getThemeColors(theme);
   const isLight = palette.isLight;
   const bg = palette.bgMain;
@@ -318,7 +322,19 @@ export function createPreviewSrcDoc(
   const subtleText = palette.textSecondary;
   const accentPrimary = palette.accentPrimary;
   const hoverBg = isLight ? palette.bgElevated : palette.borderMedium;
-  const safeBundle = REACT_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
+
+  const libScripts: string[] = [];
+  if (config.libraries.includes('tailwind')) {
+    libScripts.push('  <script src="https://cdn.tailwindcss.com"></script>');
+  }
+  if (config.libraries.includes('d3')) {
+    const safeD3 = D3_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
+    libScripts.push(`  <script>${safeD3}</script>`);
+  }
+  if (config.libraries.includes('react')) {
+    const safeReact = REACT_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
+    libScripts.push(`  <script>${safeReact}</script>`);
+  }
 
   return `<!DOCTYPE html>
 <html>
@@ -389,41 +405,31 @@ export function createPreviewSrcDoc(
     }
 ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrimary, hoverBg, isLight })}
   </style>
-  <script>${safeBundle}</script>
+${libScripts.join('\n')}
 </head>
 <body>
   <div id="preview-root"></div>
   <script>
   (function() {
-    const React = window.React;
-    const ReactDOM = window.ReactDOM;
-    if (!React || !ReactDOM) {
+    const isReact = ${JSON.stringify(isReact)};
+    const libraries = ${JSON.stringify(config.libraries)};
+    const React = isReact ? window.React : undefined;
+    const ReactDOM = isReact ? window.ReactDOM : undefined;
+
+    if (isReact && (!React || !ReactDOM)) {
       window.parent.postMessage({ type: 'leitner-preview:error', message: 'Failed to load React in preview sandbox.' }, '*');
       return;
     }
 
-    // Expose React and hook globals
-    window.useState = React.useState;
-    window.useEffect = React.useEffect;
-    window.useLayoutEffect = React.useLayoutEffect;
-    window.useRef = React.useRef;
-    window.useReducer = React.useReducer;
-    window.useMemo = React.useMemo;
-    window.useCallback = React.useCallback;
-    window.useContext = React.useContext;
-    window.useId = React.useId;
-    window.useTransition = React.useTransition;
-    window.startTransition = React.startTransition;
-    window.useDeferredValue = React.useDeferredValue;
-    window.useImperativeHandle = React.useImperativeHandle;
-    window.useSyncExternalStore = React.useSyncExternalStore;
-    window.useActionState = React.useActionState;
-    window.use = React.use;
-    window.useOptimistic = React.useOptimistic;
-    window.createContext = React.createContext;
-    window.forwardRef = React.forwardRef;
-    window.Suspense = React.Suspense;
-    window.createPortal = ReactDOM.createPortal;
+    if (!isReact) {
+      try {
+        delete window.React;
+        delete window.ReactDOM;
+        delete window.useState;
+        delete window.useEffect;
+        delete window.useRef;
+      } catch (_) {}
+    }
 
     // Interactive Preview Props runtime
     window.__previewProps = {};
@@ -434,24 +440,55 @@ ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrima
         try { fn(window.__previewProps); } catch(_) {}
       });
     };
-
-    window.usePreviewProps = function(defaults) {
-      const [props, setProps] = React.useState(function() {
-        return Object.assign({}, defaults, window.__previewProps);
-      });
-      React.useEffect(function() {
-        function listener(p) {
-          setProps(function(prev) {
-            return Object.assign({}, defaults, prev, p);
-          });
-        }
-        window.__previewPropListeners.add(listener);
-        return function() {
-          window.__previewPropListeners.delete(listener);
-        };
-      }, []);
-      return props;
+    window.__onPreviewPropsChange = function(fn) {
+      window.__previewPropListeners.add(fn);
+      return function() {
+        window.__previewPropListeners.delete(fn);
+      };
     };
+
+    if (isReact && React && ReactDOM) {
+      // Expose React and hook globals
+      window.useState = React.useState;
+      window.useEffect = React.useEffect;
+      window.useLayoutEffect = React.useLayoutEffect;
+      window.useRef = React.useRef;
+      window.useReducer = React.useReducer;
+      window.useMemo = React.useMemo;
+      window.useCallback = React.useCallback;
+      window.useContext = React.useContext;
+      window.useId = React.useId;
+      window.useTransition = React.useTransition;
+      window.startTransition = React.startTransition;
+      window.useDeferredValue = React.useDeferredValue;
+      window.useImperativeHandle = React.useImperativeHandle;
+      window.useSyncExternalStore = React.useSyncExternalStore;
+      window.useActionState = React.useActionState;
+      window.use = React.use;
+      window.useOptimistic = React.useOptimistic;
+      window.createContext = React.createContext;
+      window.forwardRef = React.forwardRef;
+      window.Suspense = React.Suspense;
+      window.createPortal = ReactDOM.createPortal;
+
+      window.usePreviewProps = function(defaults) {
+        const [props, setProps] = React.useState(function() {
+          return Object.assign({}, defaults, window.__previewProps);
+        });
+        React.useEffect(function() {
+          function listener(p) {
+            setProps(function(prev) {
+              return Object.assign({}, defaults, prev, p);
+            });
+          }
+          window.__previewPropListeners.add(listener);
+          return function() {
+            window.__previewPropListeners.delete(listener);
+          };
+        }, []);
+        return props;
+      };
+    }
 
     // Safe mock shims for $dom, $test, and mount so that any test harness code
     // evaluated inside the preview frame runs safely without throwing ReferenceErrors.
@@ -588,46 +625,51 @@ ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrima
       }
     }, true);
 
-    class PreviewErrorBoundary extends React.Component {
-      constructor(props) {
-        super(props);
-        this.state = { hasError: false, error: null };
-      }
-      static getDerivedStateFromError(error) {
-        return { hasError: true, error: error };
-      }
-      componentDidCatch(error) {
-        window.parent.postMessage({
-          type: 'leitner-preview:error',
-          renderId: this.props.renderId,
-          message: 'Render error: ' + (error?.message || String(error)),
-          timestamp: Date.now()
-        }, '*');
-      }
-      render() {
-        if (this.state.hasError) {
-          return React.createElement('div', {
-            role: 'alert',
-            style: {
-              color: '#f87171',
-              backgroundColor: 'rgba(239, 68, 68, 0.12)',
-              padding: '10px 14px',
-              borderRadius: '6px',
-              border: '1px solid rgba(239, 68, 68, 0.35)',
-              fontSize: '12.5px',
-              fontFamily: 'monospace'
-            }
-          }, 'Render Error: ' + (this.state.error?.message || String(this.state.error)));
-        }
-        return this.props.children;
-      }
-    }
+    let PreviewErrorBoundary = null;
+    let RenderNotifier = null;
 
-    function RenderNotifier(props) {
-      React.useEffect(function() {
-        window.parent.postMessage({ type: 'leitner-preview:rendered', renderId: props.renderId }, '*');
-      }, [props.renderId]);
-      return null;
+    if (isReact && React) {
+      PreviewErrorBoundary = class extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = { hasError: false, error: null };
+        }
+        static getDerivedStateFromError(error) {
+          return { hasError: true, error: error };
+        }
+        componentDidCatch(error) {
+          window.parent.postMessage({
+            type: 'leitner-preview:error',
+            renderId: this.props.renderId,
+            message: 'Render error: ' + (error?.message || String(error)),
+            timestamp: Date.now()
+          }, '*');
+        }
+        render() {
+          if (this.state.hasError) {
+            return React.createElement('div', {
+              role: 'alert',
+              style: {
+                color: '#f87171',
+                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                padding: '10px 14px',
+                borderRadius: '6px',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                fontSize: '12.5px',
+                fontFamily: 'monospace'
+              }
+            }, 'Render Error: ' + (this.state.error?.message || String(this.state.error)));
+          }
+          return this.props.children;
+        }
+      };
+
+      RenderNotifier = function(props) {
+        React.useEffect(function() {
+          window.parent.postMessage({ type: 'leitner-preview:rendered', renderId: props.renderId }, '*');
+        }, [props.renderId]);
+        return null;
+      };
     }
 
     let root = null;
@@ -677,38 +719,57 @@ ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrima
       loopTripped = false;
 
       try {
-        if (!root) {
-          root = ReactDOM.createRoot(container);
-        }
-
         window.exports = window.exports || {};
         window.module = window.module || { exports: window.exports };
         window.require = function(mod) {
-          if (mod === 'react') return React;
-          if (mod === 'react-dom' || mod === 'react-dom/client') return ReactDOM;
-          if (mod === 'd3') return window.d3;
+          if (mod === 'react') {
+            if (isReact && React) return React;
+            throw new Error("Module 'react' is not available in vanilla DOM preview. Use vanilla DOM APIs or requested libraries.");
+          }
+          if (mod === 'react-dom' || mod === 'react-dom/client') {
+            if (isReact && ReactDOM) return ReactDOM;
+            throw new Error("Module 'react-dom' is not available in vanilla DOM preview.");
+          }
+          if (mod === 'd3') {
+            if (window.d3) return window.d3;
+            throw new Error("Cannot find module 'd3' in preview sandbox");
+          }
           throw new Error("Cannot find module '" + mod + "' in preview sandbox");
         };
 
-        const element = (0, eval)(code);
+        if (isReact && ReactDOM) {
+          if (!root) {
+            root = ReactDOM.createRoot(container);
+          }
 
-        if (React.isValidElement(element)) {
-          root.render(
-            React.createElement(React.Profiler, { id: 'preview', onRender: onProfilerRender },
-              React.createElement(PreviewErrorBoundary, { key: renderId, renderId: renderId },
-                React.createElement(React.Fragment, null,
-                  element,
-                  React.createElement(RenderNotifier, { renderId: renderId })
+          const element = (0, eval)(code);
+
+          if (React.isValidElement(element)) {
+            root.render(
+              React.createElement(React.Profiler, { id: 'preview', onRender: onProfilerRender },
+                React.createElement(PreviewErrorBoundary, { key: renderId, renderId: renderId },
+                  React.createElement(React.Fragment, null,
+                    element,
+                    React.createElement(RenderNotifier, { renderId: renderId })
+                  )
                 )
               )
-            )
-          );
+            );
+          } else {
+            window.parent.postMessage({
+              type: 'leitner-preview:error',
+              renderId: renderId,
+              message: 'Preview code did not evaluate to a valid React element. The last statement must be a JSX element (e.g. <Demo />).'
+            }, '*');
+          }
         } else {
-          window.parent.postMessage({
-            type: 'leitner-preview:error',
-            renderId: renderId,
-            message: 'Preview code did not evaluate to a valid React element. The last statement must be a JSX element (e.g. <Demo />).'
-          }, '*');
+          // Vanilla DOM preview mode
+          container.innerHTML = '';
+          const result = (0, eval)(code);
+          if (result instanceof Node) {
+            container.appendChild(result);
+          }
+          window.parent.postMessage({ type: 'leitner-preview:rendered', renderId: renderId }, '*');
         }
       } catch (err) {
         const msg = err ? (err.stack || err.message || String(err)) : 'Execution failed';

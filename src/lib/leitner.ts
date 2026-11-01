@@ -80,6 +80,8 @@ export interface TopicItem {
   targetSpace?: string;
   complexityExplanation?: string;
   previewCode?: string;
+  /** Explicit libraries to load in the preview window (e.g. ['react'], ['d3'], ['tailwind']) */
+  previewLibraries?: string[];
   /** Annotated by build-cards.mjs for cards that author and render a React component UI */
   rendersComponent?: boolean;
 }

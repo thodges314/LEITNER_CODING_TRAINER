@@ -6,5 +6,8 @@
     "class-component",
     "fallback",
     "basics"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

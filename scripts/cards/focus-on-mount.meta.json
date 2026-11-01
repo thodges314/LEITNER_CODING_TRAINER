@@ -6,5 +6,8 @@
     "refs",
     "useEffect",
     "basics"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

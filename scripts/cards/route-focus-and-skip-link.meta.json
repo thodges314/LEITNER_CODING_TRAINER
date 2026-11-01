@@ -6,5 +6,8 @@
     "a11y",
     "focus-management",
     "routing"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

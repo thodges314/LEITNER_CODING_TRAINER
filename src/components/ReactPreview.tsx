@@ -19,6 +19,7 @@ import { stripTestRunnerBlock } from '../lib/stripTestRunner';
 import { isTsOnlyCard } from '../lib/tsOnly';
 import { PropsControlPanel } from './practice/PropsControlPanel';
 import { getComponentPropsConfig, getInitialPropValues } from '../lib/previewPropsConfig';
+import { getCardPreviewConfig } from '../lib/previewConfig';
 
 // The preview runtime (about 220 KB of bundled React) is loaded on demand, only for cards that show a preview.
 type PreviewFrameModule = typeof import('../lib/reactPreviewFrame');
@@ -61,6 +62,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
 
   const isLight = theme === 'apple-gsos';
+  const previewConfig = useMemo(() => getCardPreviewConfig(card), [card]);
   const currentEnvKey = `${card.id}-${iframeKey}-${theme}-${isPoppedOut ? 'popup' : 'inline'}`;
   const [frameModule, setFrameModule] = useState<PreviewFrameModule | null>(null);
 
@@ -476,7 +478,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         <div className="react-preview-titlebar-left">
           <Layers size={16} color="#06b6d4" />
           <span className="react-preview-title">
-            Live React Preview Window {isPoppedOut ? '(Pop-out)' : ''}
+            {previewConfig.title} {isPoppedOut ? '(Pop-out)' : ''}
           </span>
 
           {/* Status Badge */}
@@ -607,9 +609,9 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
           <iframe
             key={currentEnvKey}
             ref={iframeRef}
-            title="React Component Preview"
+            title={previewConfig.title}
             sandbox="allow-scripts allow-forms"
-            srcDoc={frameModule.createPreviewSrcDoc(theme, currentEnvKey, card.id)}
+            srcDoc={frameModule.createPreviewSrcDoc(theme, currentEnvKey, card.id, previewConfig)}
             onLoad={handleIframeLoad}
             className="react-preview-iframe"
           />
@@ -697,7 +699,7 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
             <Layers size={18} color="#06b6d4" />
             <div>
               <div style={{ fontSize: '13px', fontWeight: 600, color: isLight ? '#0f172a' : '#f1f5f9' }}>
-                Live React Preview Window (Pop-out Active)
+                {previewConfig.title} (Pop-out Active)
               </div>
               <div style={{ fontSize: '11.5px', color: 'var(--text-dim)' }}>
                 Preview is running in a separate window. Code edits sync live.

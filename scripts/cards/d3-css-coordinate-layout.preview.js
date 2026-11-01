@@ -6,37 +6,39 @@ const DEFAULT_POINTS = [
   { id: '5', x: 30, y: 55, value: 40, label: 'E', color: 'teal' },
 ];
 
-function Demo() {
-  const {
-    data = DEFAULT_POINTS,
-    width = 400,
-    height = 280,
-  } = usePreviewProps({
+(function() {
+  const container = document.getElementById('preview-root');
+  if (!container) return;
+
+  let currentProps = Object.assign({
     data: DEFAULT_POINTS,
     width: 400,
     height: 280,
-  });
+  }, typeof window !== 'undefined' ? window.__previewProps : {});
 
-  const containerRef = useRef(null);
+  let cleanup = null;
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const cleanup = renderCoordinateLayout(containerRef.current, {
-      data,
-      width: Number(width) || 400,
-      height: Number(height) || 280,
-      onSelectPoint: (p) => log('selectPoint', p),
+  function render(props) {
+    if (typeof cleanup === 'function') {
+      try { cleanup(); } catch (_) {}
+    }
+    container.innerHTML = '';
+    cleanup = renderCoordinateLayout(container, {
+      data: props.data || DEFAULT_POINTS,
+      width: Number(props.width) || 400,
+      height: Number(props.height) || 280,
+      onSelectPoint: function(p) {
+        if (typeof log === 'function') log('selectPoint', p);
+      },
     });
-    return () => {
-      if (typeof cleanup === 'function') cleanup();
-    };
-  }, [data, width, height]);
+  }
 
-  return (
-    <div style={{ padding: '16px' }}>
-      <div ref={containerRef} />
-    </div>
-  );
-}
+  render(currentProps);
 
-<Demo />
+  if (typeof window !== 'undefined' && typeof window.__onPreviewPropsChange === 'function') {
+    window.__onPreviewPropsChange(function(newProps) {
+      currentProps = Object.assign({}, currentProps, newProps);
+      render(currentProps);
+    });
+  }
+})();

@@ -6,5 +6,8 @@
     "forwardRef",
     "useImperativeHandle",
     "api-design"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

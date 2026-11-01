@@ -13,43 +13,41 @@ const DEFAULT_LINKS = [
   { source: '3', target: '5' },
 ];
 
-function Demo() {
-  const {
-    nodes = DEFAULT_NODES,
-    links = DEFAULT_LINKS,
-    width = 400,
-    height = 300,
-  } = usePreviewProps({
+(function() {
+  const container = document.getElementById('preview-root');
+  if (!container) return;
+
+  let currentProps = Object.assign({
     nodes: DEFAULT_NODES,
     links: DEFAULT_LINKS,
     width: 400,
     height: 300,
-  });
+  }, typeof window !== 'undefined' ? window.__previewProps : {});
 
-  const containerRef = useRef(null);
+  let instance = null;
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const instance = renderForceGraph(containerRef.current, {
-      nodes,
-      links,
-      width: Number(width) || 400,
-      height: Number(height) || 300,
-      onSelectNode: (node) => log('selectNode', node),
+  function render(props) {
+    if (instance && typeof instance.destroy === 'function') {
+      try { instance.destroy(); } catch (_) {}
+    }
+    container.innerHTML = '';
+    instance = renderForceGraph(container, {
+      nodes: props.nodes || DEFAULT_NODES,
+      links: props.links || DEFAULT_LINKS,
+      width: Number(props.width) || 400,
+      height: Number(props.height) || 300,
+      onSelectNode: function(node) {
+        if (typeof log === 'function') log('selectNode', node);
+      },
     });
+  }
 
-    return () => {
-      if (instance && typeof instance.destroy === 'function') {
-        instance.destroy();
-      }
-    };
-  }, [nodes, links, width, height]);
+  render(currentProps);
 
-  return (
-    <div style={{ padding: '16px' }}>
-      <div ref={containerRef} />
-    </div>
-  );
-}
-
-<Demo />
+  if (typeof window !== 'undefined' && typeof window.__onPreviewPropsChange === 'function') {
+    window.__onPreviewPropsChange(function(newProps) {
+      currentProps = Object.assign({}, currentProps, newProps);
+      render(currentProps);
+    });
+  }
+})();

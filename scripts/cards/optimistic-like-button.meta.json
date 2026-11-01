@@ -6,5 +6,8 @@
     "optimistic-ui",
     "async",
     "error-handling"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

@@ -6,5 +6,8 @@
     "memo",
     "useCallback",
     "re-renders"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

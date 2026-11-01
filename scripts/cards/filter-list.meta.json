@@ -6,5 +6,8 @@
     "controlled-input",
     "derived-state",
     "a11y"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

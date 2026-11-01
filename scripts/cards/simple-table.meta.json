@@ -6,5 +6,8 @@
     "table",
     "props",
     "empty-state"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

@@ -6,5 +6,8 @@
     "timers",
     "useEffect",
     "cleanup"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

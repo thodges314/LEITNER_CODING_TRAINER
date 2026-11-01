@@ -8,6 +8,8 @@ import seedTopics from '../data/topics.json';
 import { transpileForExecution } from './runner';
 import type { TopicItem } from './leitner';
 
+import { getCardPreviewConfig } from './previewConfig';
+
 // Configure React act environment for jsdom
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -31,6 +33,7 @@ describe('React preview guard: every previewCode mounts with the reference solut
 
   beforeEach(() => {
     container = document.createElement('div');
+    container.id = 'preview-root';
     document.body.appendChild(container);
     root = ReactDOMClient.createRoot(container);
   });
@@ -94,63 +97,88 @@ describe('React preview guard: every previewCode mounts with the reference solut
         return fn;
       };
 
-      const scope = {
-        React,
-        ReactDOM: { ...ReactDOM, ...ReactDOMClient },
-        useState: React.useState,
-        useEffect: React.useEffect,
-        useLayoutEffect: React.useLayoutEffect,
-        useRef: React.useRef,
-        useReducer: React.useReducer,
-        useMemo: React.useMemo,
-        useCallback: React.useCallback,
-        useContext: React.useContext,
-        useId: React.useId,
-        useTransition: React.useTransition,
-        startTransition: React.startTransition,
-        useDeferredValue: React.useDeferredValue,
-        useImperativeHandle: React.useImperativeHandle,
-        useSyncExternalStore: React.useSyncExternalStore,
-        useActionState: (React as unknown as Record<string, unknown>).useActionState,
-        use: (React as unknown as Record<string, unknown>).use,
-        useOptimistic: (React as unknown as Record<string, unknown>).useOptimistic,
-        createContext: React.createContext,
-        forwardRef: React.forwardRef,
-        Suspense: React.Suspense,
-        IntersectionObserver: globalThis.IntersectionObserver,
-        usePreviewProps: <T extends Record<string, unknown>>(defaults: T): T => defaults,
-        d3,
+      const previewConfig = getCardPreviewConfig(card);
+      const isReact = previewConfig.isReact;
+
+      const scope: Record<string, unknown> = {
         log: mockLog,
         exports: {},
         require: (mod: string) => {
-          if (mod === 'react') return React;
-          if (mod === 'react-dom' || mod === 'react-dom/client') return ReactDOMClient;
-          if (mod === 'd3') return d3;
+          if (mod === 'react') {
+            if (isReact) return React;
+            throw new Error(`Module 'react' is not available in vanilla DOM preview.`);
+          }
+          if (mod === 'react-dom' || mod === 'react-dom/client') {
+            if (isReact) return ReactDOMClient;
+            throw new Error(`Module 'react-dom' is not available in vanilla DOM preview.`);
+          }
+          if (mod === 'd3') {
+            if (previewConfig.libraries.includes('d3')) return d3;
+            throw new Error(`Module 'd3' is not loaded in preview.`);
+          }
           throw new Error(`Cannot find module '${mod}' in preview test`);
         },
       };
+
+      if (isReact) {
+        Object.assign(scope, {
+          React,
+          ReactDOM: { ...ReactDOM, ...ReactDOMClient },
+          useState: React.useState,
+          useEffect: React.useEffect,
+          useLayoutEffect: React.useLayoutEffect,
+          useRef: React.useRef,
+          useReducer: React.useReducer,
+          useMemo: React.useMemo,
+          useCallback: React.useCallback,
+          useContext: React.useContext,
+          useId: React.useId,
+          useTransition: React.useTransition,
+          startTransition: React.startTransition,
+          useDeferredValue: React.useDeferredValue,
+          useImperativeHandle: React.useImperativeHandle,
+          useSyncExternalStore: React.useSyncExternalStore,
+          useActionState: (React as unknown as Record<string, unknown>).useActionState,
+          use: (React as unknown as Record<string, unknown>).use,
+          useOptimistic: (React as unknown as Record<string, unknown>).useOptimistic,
+          createContext: React.createContext,
+          forwardRef: React.forwardRef,
+          Suspense: React.Suspense,
+          usePreviewProps: <T extends Record<string, unknown>>(defaults: T): T => defaults,
+        });
+      }
+
+      if (previewConfig.libraries.includes('d3')) {
+        scope.d3 = d3;
+      }
 
       const fn = new Function(
         ...Object.keys(scope),
         `return eval(${JSON.stringify(transpiled.code)});`
       );
 
-      let element: unknown;
+      let result: unknown;
       expect(() => {
-        element = fn(...Object.values(scope));
+        result = fn(...Object.values(scope));
       }).not.toThrow();
 
-      expect(React.isValidElement(element), `Expected valid React element from previewCode for ${card.id}`).toBe(true);
+      if (isReact) {
+        expect(React.isValidElement(result), `Expected valid React element from previewCode for ${card.id}`).toBe(true);
 
-      // Mount the element inside React.act
-      await act(async () => {
-        root?.render(element as React.ReactElement);
-      });
-
-      if (container && container.innerHTML.trim().length === 0) {
+        // Mount the element inside React.act
         await act(async () => {
-          await new Promise((r) => setTimeout(r, 20));
+          root?.render(result as React.ReactElement);
         });
+
+        if (container && container.innerHTML.trim().length === 0) {
+          await act(async () => {
+            await new Promise((r) => setTimeout(r, 20));
+          });
+        }
+      } else {
+        if (result instanceof Node && container) {
+          container.appendChild(result);
+        }
       }
 
       // Assert non-empty DOM

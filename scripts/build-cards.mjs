@@ -117,6 +117,7 @@ for (const t of topics) {
     t.previewCode = preview;
   } else {
     delete t.previewCode;
+    delete t.previewLibraries;
   }
 
   // Card authors declare component rendering either via "rendersComponent: true"

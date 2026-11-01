@@ -6,5 +6,8 @@
     "timers",
     "effects",
     "cleanup"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

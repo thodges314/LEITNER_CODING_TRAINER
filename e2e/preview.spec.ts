@@ -468,6 +468,41 @@ test.describe('React preview window', () => {
     await input.pressSequentially('hello search');
     await expect(input).toHaveValue('hello search');
   });
+
+  test('d3-graph-theory-visualizer: displays "Live Preview Window", loads D3 without React, and renders interactive SVG graph', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'd3-graph-theory-visualizer');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'd3-graph-theory-visualizer', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    // Verify title is "Live Preview Window"
+    await expect(previewWindow.locator('.react-preview-title')).toContainText('Live Preview Window');
+
+    // Click 'Run Code / Test' button to trigger run & live preview
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    // Preview should transition to Live
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    // Frame locator to inspect inside the sandboxed iframe
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const svg = frame.locator('svg').first();
+    await expect(svg).toBeVisible({ timeout: 5000 });
+
+    // Verify circles (nodes) are rendered in SVG
+    const circles = svg.locator('circle');
+    await expect(circles).toHaveCount(5);
+
+    // Verify React is not in the preview window sandbox
+    const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
+    expect(hasReact).toBe(false);
+  });
 });
+
 
 

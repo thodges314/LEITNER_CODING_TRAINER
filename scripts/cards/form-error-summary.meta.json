@@ -6,5 +6,8 @@
     "a11y",
     "forms",
     "validation"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }
