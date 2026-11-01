@@ -477,20 +477,19 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         const tokens = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
         const matchesAll = tokens.every((token) => {
           if (token === '#') {
-            return t.tags.length > 0;
+            return tokens.length === 1 ? t.tags.length > 0 : true;
           }
           if (token.startsWith('#')) {
             const rawTag = token.slice(1).trim();
-            return t.tags.some((tag) => {
-              const lower = tag.toLowerCase();
-              return lower === rawTag || lower.includes(rawTag) || (`#${lower}`).includes(token);
-            });
+            if (!rawTag) return true;
+            return t.tags.some((tag) => tag.toLowerCase() === rawTag);
           }
           const matchTitle = t.title.toLowerCase().includes(token);
           const matchTags = t.tags.some((tag) => tag.toLowerCase().includes(token));
           const matchId = t.id.toLowerCase().includes(token);
           const matchTrackLabel = getTrackMeta(t.track).label.toLowerCase().includes(token);
-          return matchTitle || matchTags || matchId || matchTrackLabel;
+          const matchConcept = (t as { concept?: string }).concept?.toLowerCase().includes(token) ?? false;
+          return matchTitle || matchTags || matchId || matchTrackLabel || matchConcept;
         });
         if (!matchesAll) return false;
       }

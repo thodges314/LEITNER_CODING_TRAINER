@@ -153,6 +153,49 @@ describe('CatalogTable', () => {
     expect(onDeactivateClick).toHaveBeenCalledWith(testCards[0]);
   });
 
+  it('activates tag chips only when prefixed with hashtag in search query', async () => {
+    await act(async () => {
+      root?.render(
+        <CatalogTable
+          topics={testCards}
+          tierName="Tier"
+          isLight={false}
+          sortOption="track-asc"
+          onHeaderSort={vi.fn()}
+          onSelectCardToPractice={vi.fn()}
+          onResetBox={vi.fn()}
+          onToggleLock={vi.fn()}
+          searchQuery="array"
+        />
+      );
+    });
+
+    // Plain text search "array" should NOT highlight the #array hashtag chip
+    const plainActiveChips = container?.querySelectorAll('.table-tag-chip-active');
+    expect(plainActiveChips?.length).toBe(0);
+
+    // Explicit hashtag search "#array" DOES highlight the #array hashtag chip
+    await act(async () => {
+      root?.render(
+        <CatalogTable
+          topics={testCards}
+          tierName="Tier"
+          isLight={false}
+          sortOption="track-asc"
+          onHeaderSort={vi.fn()}
+          onSelectCardToPractice={vi.fn()}
+          onResetBox={vi.fn()}
+          onToggleLock={vi.fn()}
+          searchQuery="#array"
+        />
+      );
+    });
+
+    const hashActiveChips = container?.querySelectorAll('.table-tag-chip-active');
+    expect(hashActiveChips?.length).toBeGreaterThanOrEqual(1);
+    expect(hashActiveChips?.[0]?.textContent).toContain('#array');
+  });
+
   it('renders empty message when no cards match filter', async () => {
     await act(async () => {
       root?.render(

@@ -159,13 +159,11 @@ const DeckEditorModalDialog: React.FC<DeckEditorModalProps> = ({
         if (!query) return true;
         const tokens = query.split(/\s+/).filter(Boolean);
         const matchesAll = tokens.every((token) => {
-          if (token === '#') return card.tags.length > 0;
+          if (token === '#') return tokens.length === 1 ? card.tags.length > 0 : true;
           if (token.startsWith('#')) {
             const rawTag = token.slice(1).trim();
-            return card.tags.some((t) => {
-              const lower = t.toLowerCase();
-              return lower === rawTag || lower.includes(rawTag) || (`#${lower}`).includes(token);
-            });
+            if (!rawTag) return true;
+            return card.tags.some((t) => t.toLowerCase() === rawTag);
           }
           const matchTitle = card.title.toLowerCase().includes(token);
           const matchConcept = card.concept?.toLowerCase().includes(token);

@@ -11,7 +11,7 @@ import {
   ArrowUp,
   ArrowDown,
   FolderMinus,
-  CheckCircle2,
+  Pencil,
   CircleDot,
 } from 'lucide-react';
 import { DifficultyBadge } from '../DifficultyBadge';
@@ -183,9 +183,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                     </div>
                     <div className="catalog-tags-row">
                       {topic.tags.slice(0, 3).map((tg) => {
-                        const isTagActive =
-                          activeSearchTokens.has(tg.toLowerCase()) ||
-                          activeSearchTokens.has(`#${tg.toLowerCase()}`);
+                        const isTagActive = activeSearchTokens.has(`#${tg.toLowerCase()}`);
                         return (
                           <button
                             key={tg}
@@ -257,7 +255,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
                         className="status-badge status-badge-attempted"
                         title="Active card in study rotation (attempted at least once)"
                       >
-                        <CheckCircle2 size={11} />
+                        <Pencil size={11} />
                         <span>Attempted</span>
                       </span>
                     ) : (
