@@ -417,6 +417,49 @@ export default {
       '5'
     ),
   ],
+
+  'text-justification': [
+    c(
+      'Formats standard paragraph with even and uneven space distributions',
+      'fullJustify(["This", "is", "an", "example", "of", "text", "justification."], 16)',
+      '["This    is    an", "example  of text", "justification.  "]'
+    ),
+    c(
+      'Formats paragraph with multiple space distribution levels',
+      'fullJustify(["What", "must", "be", "acknowledgment", "shall", "be"], 16)',
+      '["What   must   be", "acknowledgment  ", "shall be        "]'
+    ),
+    c(
+      'Formats longer text with left-justified final line',
+      'fullJustify(["Science", "is", "what", "we", "understand", "well", "enough", "to", "explain", "to", "a", "computer.", "Art", "is", "everything", "else", "we", "do"], 20)',
+      '["Science  is  what we", "understand      well", "enough to explain to", "a  computer.  Art is", "everything  else  we", "do                  "]'
+    ),
+    c(
+      'Handles single word fitting exact width',
+      'fullJustify(["hello"], 5)',
+      '["hello"]'
+    ),
+    c(
+      'Handles single word smaller than width needing trailing spaces',
+      'fullJustify(["hello"], 10)',
+      '["hello     "]'
+    ),
+    c(
+      'Handles two words where single gap takes all remaining space',
+      'fullJustify(["two", "words"], 15)',
+      '["two words      "]'
+    ),
+    c(
+      'Distributes extra spaces to left gaps when not evenly divisible',
+      'fullJustify(["a", "b", "c", "d", "e"], 8)',
+      '["a  b c d", "e       "]'
+    ),
+    c(
+      'Handles every word on its own line',
+      'fullJustify(["one", "by", "one"], 4)',
+      '["one ", "by  ", "one "]'
+    ),
+  ],
 };
 
 

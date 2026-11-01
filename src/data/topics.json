@@ -19286,5 +19286,69 @@
       }
     ],
     "testHarness": "await $test.run(\"Finds longest continuous subarray when elements vary within limit\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([8, 2, 4, 7], 4));\n}, () => (2));\n\nawait $test.run(\"Finds subarray spanning multiple elements within larger limit\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([10, 1, 2, 4, 7, 2], 5));\n}, () => (4));\n\nawait $test.run(\"Finds longest subarray with alternating values\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([4, 2, 2, 2, 4, 4, 2, 2], 0));\n}, () => (3));\n\nawait $test.run(\"Returns 1 when single element array is provided\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([7], 10));\n}, () => (1));\n\nawait $test.run(\"Returns full array length when all elements are within limit\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([1, 2, 3, 4, 5], 10));\n}, () => (5));\n\nawait $test.run(\"Returns 1 when adjacent elements exceed limit throughout\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([1, 10, 1, 10, 1], 2));\n}, () => (1));\n\nawait $test.run(\"Handles large array with sliding max/min bounds\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([1, 5, 6, 7, 8, 10, 6, 5, 6], 4));\n}, () => (5));\n\nawait $test.run(\"Handles zero limit with duplicate values\", async () => {\n  const sleep = $test.sleep;\n  return (longestSubarray([5, 5, 5, 5, 5], 0));\n}, () => (5));"
+  },
+  {
+    "id": "text-justification",
+    "track": "advanced-algorithms",
+    "title": "Text Justification",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "string",
+      "simulation",
+      "formatting",
+      "greedy",
+      "capital-one"
+    ],
+    "promptSeed": "## Description\n\nGiven an array of strings `words` and a width `maxWidth`, format the text such that each line has exactly `maxWidth` characters and is fully (left and right) justified.\n\nYou should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces `' '` when necessary so that each line has exactly `maxWidth` characters.\n\nExtra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.\n\nFor the last line of text, it should be left-justified, and no extra space is inserted between words (i.e. single space between words, with trailing spaces padding out the rest of `maxWidth`). A line containing only one word is also left-justified and padded with spaces on the right.\n\n### fullJustify(words: string[], maxWidth: number): string[]\n\n#### Parameters\n- `words: string[]`: An array of words where each word consists of non-space characters.\n- `maxWidth: number`: The fixed length required for every formatted line.\n\n#### Returns\n- `string[]`: An array of lines where each string has a length of exactly `maxWidth`.\n\n#### Constraints\n- `1 <= words.length <= 300`\n- `1 <= words[i].length <= maxWidth <= 100`\n- `words[i]` consists of English letters and symbols.\n- Time Complexity: $O(n)$ where $n$ is the total number of characters across all words.\n- Space Complexity: $O(n)$ auxiliary memory for the formatted lines.\n\n#### Edge Cases\n- Single word fitting the entire width or requiring trailing padding.\n- Last line with multiple words: separated by single spaces and padded to the right.\n- Uneven space distribution between word gaps (extra spaces placed in leftmost gaps).",
+    "difficulty": 3,
+    "concept": "advanced-strings",
+    "referenceSolution": "function fullJustify(words, maxWidth) {\n  const result = [];\n  let i = 0;\n\n  while (i < words.length) {\n    let j = i + 1;\n    let lineChars = words[i].length;\n\n    while (j < words.length && lineChars + 1 + words[j].length <= maxWidth) {\n      lineChars += 1 + words[j].length;\n      j++;\n    }\n\n    const numWords = j - i;\n    const isLastLine = j === words.length;\n\n    if (numWords === 1 || isLastLine) {\n      let line = words.slice(i, j).join(' ');\n      line += ' '.repeat(maxWidth - line.length);\n      result.push(line);\n    } else {\n      const totalWordChars = words.slice(i, j).reduce((sum, w) => sum + w.length, 0);\n      const totalSpaces = maxWidth - totalWordChars;\n      const gaps = numWords - 1;\n      const spacePerGap = Math.floor(totalSpaces / gaps);\n      const extraSpaces = totalSpaces % gaps;\n\n      let line = '';\n      for (let k = 0; k < gaps; k++) {\n        const spacesCount = spacePerGap + (k < extraSpaces ? 1 : 0);\n        line += words[i + k] + ' '.repeat(spacesCount);\n      }\n      line += words[j - 1];\n      result.push(line);\n    }\n\n    i = j;\n  }\n\n  return result;\n}",
+    "referenceSolutionTs": "function fullJustify(words: string[], maxWidth: number): string[] {\n  const result: string[] = [];\n  let i = 0;\n\n  while (i < words.length) {\n    let j = i + 1;\n    let lineChars = words[i].length;\n\n    while (j < words.length && lineChars + 1 + words[j].length <= maxWidth) {\n      lineChars += 1 + words[j].length;\n      j++;\n    }\n\n    const numWords = j - i;\n    const isLastLine = j === words.length;\n\n    if (numWords === 1 || isLastLine) {\n      let line = words.slice(i, j).join(' ');\n      line += ' '.repeat(maxWidth - line.length);\n      result.push(line);\n    } else {\n      const totalWordChars = words.slice(i, j).reduce((sum, w) => sum + w.length, 0);\n      const totalSpaces = maxWidth - totalWordChars;\n      const gaps = numWords - 1;\n      const spacePerGap = Math.floor(totalSpaces / gaps);\n      const extraSpaces = totalSpaces % gaps;\n\n      let line = '';\n      for (let k = 0; k < gaps; k++) {\n        const spacesCount = spacePerGap + (k < extraSpaces ? 1 : 0);\n        line += words[i + k] + ' '.repeat(spacesCount);\n      }\n      line += words[j - 1];\n      result.push(line);\n    }\n\n    i = j;\n  }\n\n  return result;\n}",
+    "testCases": [
+      {
+        "description": "Formats standard paragraph with even and uneven space distributions",
+        "input": "fullJustify([\"This\", \"is\", \"an\", \"example\", \"of\", \"text\", \"justification.\"], 16)",
+        "expected": "[\"This    is    an\", \"example  of text\", \"justification.  \"]"
+      },
+      {
+        "description": "Formats paragraph with multiple space distribution levels",
+        "input": "fullJustify([\"What\", \"must\", \"be\", \"acknowledgment\", \"shall\", \"be\"], 16)",
+        "expected": "[\"What   must   be\", \"acknowledgment  \", \"shall be        \"]"
+      },
+      {
+        "description": "Formats longer text with left-justified final line",
+        "input": "fullJustify([\"Science\", \"is\", \"what\", \"we\", \"understand\", \"well\", \"enough\", \"to\", \"explain\", \"to\", \"a\", \"computer.\", \"Art\", \"is\", \"everything\", \"else\", \"we\", \"do\"], 20)",
+        "expected": "[\"Science  is  what we\", \"understand      well\", \"enough to explain to\", \"a  computer.  Art is\", \"everything  else  we\", \"do                  \"]"
+      },
+      {
+        "description": "Handles single word fitting exact width",
+        "input": "fullJustify([\"hello\"], 5)",
+        "expected": "[\"hello\"]"
+      },
+      {
+        "description": "Handles single word smaller than width needing trailing spaces",
+        "input": "fullJustify([\"hello\"], 10)",
+        "expected": "[\"hello     \"]"
+      },
+      {
+        "description": "Handles two words where single gap takes all remaining space",
+        "input": "fullJustify([\"two\", \"words\"], 15)",
+        "expected": "[\"two words      \"]"
+      },
+      {
+        "description": "Distributes extra spaces to left gaps when not evenly divisible",
+        "input": "fullJustify([\"a\", \"b\", \"c\", \"d\", \"e\"], 8)",
+        "expected": "[\"a  b c d\", \"e       \"]"
+      },
+      {
+        "description": "Handles every word on its own line",
+        "input": "fullJustify([\"one\", \"by\", \"one\"], 4)",
+        "expected": "[\"one \", \"by  \", \"one \"]"
+      }
+    ],
+    "testHarness": "await $test.run(\"Formats standard paragraph with even and uneven space distributions\", async () => {\n  const sleep = $test.sleep;\n  return (fullJustify([\"This\", \"is\", \"an\", \"example\", \"of\", \"text\", \"justification.\"], 16));\n}, () => ([\"This    is    an\", \"example  of text\", \"justification.  \"]));\n\nawait $test.run(\"Formats paragraph with multiple space distribution levels\", async () => {\n  const sleep = $test.sleep;\n  return (fullJustify([\"What\", \"must\", \"be\", \"acknowledgment\", \"shall\", \"be\"], 16));\n}, () => ([\"What   must   be\", \"acknowledgment  \", \"shall be        \"]));\n\nawait $test.run(\"Formats longer text with left-justified final line\", async () => {\n  const sleep = $test.sleep;\n  return (fullJustify([\"Science\", \"is\", \"what\", \"we\", \"understand\", \"well\", \"enough\", \"to\", \"explain\", \"to\", \"a\", \"computer.\", \"Art\", \"is\", \"everything\", \"else\", \"we\", \"do\"], 20));\n}, () => ([\"Science  is  what we\", \"understand      well\", \"enough to explain to\", \"a  computer.  Art is\", \"everything  else  we\", \"do                  \"]));\n\nawait $test.run(\"Handles single word fitting exact width\", async () => {\n  const sleep = $test.sleep;\n  return (fullJustify([\"hello\"], 5));\n}, () => ([\"hello\"]));\n\nawait $test.run(\"Handles single word smaller than width needing trailing spaces\", async () => {\n  const sleep = $test.sleep;\n  return (fullJustify([\"hello\"], 10));\n}, () => ([\"hello     \"]));\n\nawait $test.run(\"Handles two words where single gap takes all remaining space\", async () => {\n  const sleep = $test.sleep;\n  return (fullJustify([\"two\", \"words\"], 15));\n}, () => ([\"two words      \"]));\n\nawait $test.run(\"Distributes extra spaces to left gaps when not evenly divisible\", async () => {\n  const sleep = $test.sleep;\n  return (fullJustify([\"a\", \"b\", \"c\", \"d\", \"e\"], 8));\n}, () => ([\"a  b c d\", \"e       \"]));\n\nawait $test.run(\"Handles every word on its own line\", async () => {\n  const sleep = $test.sleep;\n  return (fullJustify([\"one\", \"by\", \"one\"], 4));\n}, () => ([\"one \", \"by  \", \"one \"]));"
   }
 ]

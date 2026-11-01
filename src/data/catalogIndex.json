@@ -4617,5 +4617,20 @@
       "capital-one"
     ],
     "summary": "Given an array of integers nums and an integer limit, return the size of the longest non-empty subarray such that the absolute difference between a..."
+  },
+  {
+    "id": "text-justification",
+    "title": "Text Justification",
+    "track": "advanced-algorithms",
+    "concept": "advanced-strings",
+    "difficulty": 3,
+    "tags": [
+      "string",
+      "simulation",
+      "formatting",
+      "greedy",
+      "capital-one"
+    ],
+    "summary": "Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and ri..."
   }
 ]
