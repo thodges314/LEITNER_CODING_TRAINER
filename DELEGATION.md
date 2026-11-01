@@ -15,7 +15,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task / card | Branch | Owner | Status |
 |---|---|---|---|
-| d3-charts-batch-2 (d3-svg-donut-chart, d3-svg-scatter-plot) | feature/d3-batch-donut-scatter | antigravity | In progress |
+| d3-batch-64 (d3-stratify-nested-hierarchy, d3-quadtree-spatial-index) | feature/d3-batch-stratify-quadtree | antigravity | In progress |
 
 
 
