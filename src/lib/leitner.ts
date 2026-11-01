@@ -510,6 +510,8 @@ export const SEED_CONTENT_FIELDS = [
   'targetSpace',
   'complexityExplanation',
   'previewCode',
+  'previewLibraries',
+  'rendersComponent',
 ] as const;
 
 /**
@@ -563,6 +565,8 @@ export function mergeStoredWithSeed(
     if (seed.solution === undefined) delete merged.solution;
     if (seed.starterCode === undefined) delete merged.starterCode;
     if (seed.pack === undefined || merged.pack === 'algorithms-advanced') delete merged.pack;
+    if (seed.previewLibraries === undefined) delete merged.previewLibraries;
+    if (seed.rendersComponent === undefined) delete merged.rendersComponent;
     merged.track = (seed.track ?? migrateTrackId(merged.track)) as TrackType;
 
     // Strictly preserve user review progress fields

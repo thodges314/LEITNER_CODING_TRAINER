@@ -191,6 +191,8 @@ describe('mergeStoredWithSeed', () => {
         targetSpace: 'O(1)',
         complexityExplanation: 'Binary search complexity',
         testCases: [{ input: 'test(1)', expected: '2' }],
+        previewLibraries: ['react'],
+        rendersComponent: true,
         box: 1,
         streak: 0,
         nextEligibleTrial: 0,
@@ -223,6 +225,8 @@ describe('mergeStoredWithSeed', () => {
     expect(cardResult.targetSpace).toBe('O(1)');
     expect(cardResult.complexityExplanation).toBe('Binary search complexity');
     expect(cardResult.testCases).toEqual([{ input: 'test(1)', expected: '2' }]);
+    expect(cardResult.previewLibraries).toEqual(['react']);
+    expect(cardResult.rendersComponent).toBe(true);
 
     // User progress strictly preserved
     expect(cardResult.box).toBe(4);
