@@ -34,6 +34,7 @@ export type TrackType =
   | 'dom-browser'
   | 'react'
   | 'react-components'
+  | 'd3'
   | 'typescript-patterns'
   | 'testing-tooling'
   | 'graphql'
@@ -225,6 +226,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#22d3ee',
     bg: 'rgba(34, 211, 238, 0.12)',
     border: 'rgba(34, 211, 238, 0.35)',
+  },
+  'd3': {
+    label: 'D3',
+    color: '#f97316',
+    bg: 'rgba(249, 115, 22, 0.12)',
+    border: 'rgba(249, 115, 22, 0.35)',
   },
   'testing-tooling': {
     label: 'Testing & Libraries',

@@ -40,4 +40,36 @@ export default {
       { callSignature: 'fire.click(bar2)' }
     ),
   ],
+  'd3-css-coordinate-layout': [
+    r(
+      'Initial render mounts container with specified width/height and renders coordinate points',
+      '<D3CoordinateLayout data={SAMPLE_POINTS} width={400} height={300} />',
+      'Container rendered with 3 .coordinate-point children for p1, p2, p3',
+      { callSignature: '<D3CoordinateLayout data={POINTS} width={400} height={300} />' }
+    ),
+    r(
+      'D3 linear scales calculate correct left and top coordinates with inverted Y-axis',
+      'read left and top style offsets',
+      'p1 at (12px, 272px), p2 at (356px, -4px)',
+      { callSignature: 'getComputedPosition(point)' }
+    ),
+    r(
+      'D3 size scale sizes elements proportionally to data values',
+      'read width and height styles',
+      'p1 has diameter 16px, p2 has diameter 48px, p3 has diameter 32px',
+      { callSignature: 'getDiameter(point)' }
+    ),
+    r(
+      'Clicking a point calls onSelectPoint and updates data-selected to true',
+      'click [data-point-id="p2"]',
+      'p2 receives data-selected="true", p1 receives "false", onSelectPoint fired with p2',
+      { callSignature: 'fire.click(p2)' }
+    ),
+    r(
+      'Empty or single-point data gracefully falls back to default domain and sizes',
+      '<D3CoordinateLayout data={[{ id: "solo", x: 50, y: 50, value: 100 }]} />',
+      'Point renders with valid non-NaN coordinates and default diameter 32px',
+      { callSignature: '<D3CoordinateLayout data={[singlePoint]} />' }
+    ),
+  ],
 };

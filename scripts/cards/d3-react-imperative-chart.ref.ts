@@ -96,8 +96,7 @@ const D3BarChart = forwardRef<D3BarChartHandle, D3BarChartProps>(function D3BarC
       .attr('width', x.bandwidth())
       .attr('height', (d: BarDataPoint) => Math.max(0, margin.top + chartHeight - y(d.value)))
       .attr('data-highlighted', (_: any, i: number) => (i === highlightedIndex ? 'true' : 'false'))
-      .attr('fill', (_: any, i: number) => (i === highlightedIndex ? '#38bdf8' : '#64748b'))
-      .style('cursor', 'pointer')
+      .attr('fill', (_: any, i: number) => (i === highlightedIndex ? 'orange' : 'steelblue'))
       .on('click', (_: any, d: BarDataPoint) => {
         const idx = data.indexOf(d);
         selectBar(idx);

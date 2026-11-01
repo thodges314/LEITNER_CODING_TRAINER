@@ -33,6 +33,7 @@ export interface DeckEditorModalProps {
 const ORDERED_TRACKS: TrackType[] = [
   'react',
   'react-components',
+  'd3',
   'dom-browser',
   'async-js',
   'js-utilities',

@@ -1,5 +1,5 @@
 {
   "title": "D3 in React: Imperative Handle Chart Bridge",
-  "track": "react-components",
+  "track": "d3",
   "tags": ["react", "d3", "useimperativehandle", "forwardref", "svg", "charts"]
 }

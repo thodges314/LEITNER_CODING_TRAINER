@@ -648,6 +648,77 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'tic-tac-toe': [
     { name: 'onGameEnd', type: 'function', description: 'Callback fired when game ends: (result: "X" | "O" | "draw") => void' },
   ],
+  'd3-react-imperative-chart': [
+    {
+      name: 'data',
+      type: 'json',
+      defaultValue: [
+        { label: 'Mon', value: 18 },
+        { label: 'Tue', value: 42 },
+        { label: 'Wed', value: 31 },
+        { label: 'Thu', value: 65 },
+        { label: 'Fri', value: 50 },
+        { label: 'Sat', value: 24 },
+        { label: 'Sun', value: 38 },
+      ],
+      description: 'Array of BarDataPoint objects ({ label, value })',
+    },
+    {
+      name: 'width',
+      type: 'number',
+      defaultValue: 360,
+      min: 200,
+      max: 600,
+      step: 20,
+      description: 'Chart width in pixels',
+    },
+    {
+      name: 'height',
+      type: 'number',
+      defaultValue: 160,
+      min: 100,
+      max: 400,
+      step: 10,
+      description: 'Chart height in pixels',
+    },
+  ],
+  'd3-css-coordinate-layout': [
+    {
+      name: 'data',
+      type: 'json',
+      defaultValue: [
+        { id: '1', x: 10, y: 20, value: 15, label: 'A', color: 'steelblue' },
+        { id: '2', x: 80, y: 75, value: 45, label: 'B', color: 'seagreen' },
+        { id: '3', x: 45, y: 90, value: 30, label: 'C', color: 'crimson' },
+        { id: '4', x: 70, y: 30, value: 20, label: 'D', color: 'purple' },
+        { id: '5', x: 30, y: 55, value: 40, label: 'E', color: 'teal' },
+      ],
+      description: 'Array of CoordinatePoint objects ({ id, x, y, value, label, color })',
+    },
+    {
+      name: 'width',
+      type: 'number',
+      defaultValue: 400,
+      min: 250,
+      max: 600,
+      step: 25,
+      description: 'Container width in pixels',
+    },
+    {
+      name: 'height',
+      type: 'number',
+      defaultValue: 280,
+      min: 180,
+      max: 500,
+      step: 20,
+      description: 'Container height in pixels',
+    },
+    {
+      name: 'onSelectPoint',
+      type: 'function',
+      description: 'Callback fired on point click: (point: CoordinatePoint) => void',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

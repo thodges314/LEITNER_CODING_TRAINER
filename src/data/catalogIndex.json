@@ -4636,7 +4636,7 @@
   {
     "id": "d3-react-imperative-chart",
     "title": "D3 in React: Imperative Handle Chart Bridge",
-    "track": "react-components",
+    "track": "d3",
     "concept": "d3-react",
     "difficulty": 3,
     "tags": [
@@ -4648,5 +4648,21 @@
       "charts"
     ],
     "summary": "Integrate D3 with React by building an imperative chart bridge that encapsulates direct SVG/D3 DOM manipulation within a child component while expo..."
+  },
+  {
+    "id": "d3-css-coordinate-layout",
+    "title": "D3 Coordinate Layout for HTML/CSS",
+    "track": "d3",
+    "concept": "d3-layout",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "layout",
+      "scales",
+      "css",
+      "dom",
+      "coordinates"
+    ],
+    "summary": "Use D3 scales to compute absolute 2D coordinate positions and dimensions for rendering standard HTML <div> elements outside SVG or canvas."
   }
 ]

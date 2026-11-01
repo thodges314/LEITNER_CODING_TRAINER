@@ -1338,5 +1338,9 @@
   "d3-react-imperative-chart": {
     "difficulty": 3,
     "concept": "d3-react"
+  },
+  "d3-css-coordinate-layout": {
+    "difficulty": 3,
+    "concept": "d3-layout"
   }
 }

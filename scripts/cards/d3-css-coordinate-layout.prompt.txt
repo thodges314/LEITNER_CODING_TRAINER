@@ -1,0 +1,51 @@
+Use D3 scales to compute absolute 2D coordinate positions and dimensions for rendering standard HTML `<div>` elements outside SVG or canvas.
+
+## Description
+
+D3 is commonly associated exclusively with SVG or `<canvas>`. However, D3's pure mathematical modules (`d3.scaleLinear`, `d3.scaleSqrt`, etc.) can drive standard HTML `<div>` layouts. This enables responsive DOM elements with standard CSS styling, accessible buttons, and rich tooltips without SVG complexity.
+
+In this exercise, build a React component `D3CoordinateLayout` that takes an array of data points and maps them to absolutely positioned HTML `<div>` elements inside a container.
+
+```ts
+interface CoordinatePoint {
+  id: string;
+  x: number;
+  y: number;
+  value: number;
+  label: string;
+  color?: string;
+}
+
+interface D3CoordinateLayoutProps {
+  data: CoordinatePoint[];
+  width?: number;
+  height?: number;
+  onSelectPoint?: (point: CoordinatePoint) => void;
+}
+```
+
+### `D3CoordinateLayout({ data, width = 400, height = 300, onSelectPoint }: D3CoordinateLayoutProps)`
+
+- **Container**:
+  - Renders a container `<div className="coordinate-layout">` with inline styles: `position: 'relative'`, `width`, and `height`. Default `width` is `400`, default `height` is `300`.
+- **Scales (using 20px padding)**:
+  - `xScale`: maps the range of `x` values in `data` to `[20, width - 20]`. If `data` is empty or all points share the same `x`, use domain `[0, 100]`.
+  - `yScale`: maps the range of `y` values in `data` to `[height - 20, 20]`. (Screen coordinates invert the Y-axis: larger `y` values are placed closer to the top at `20`). If `data` is empty or all points share the same `y`, use domain `[0, 100]`.
+  - `sizeScale`: maps `value` to a diameter between `16` and `48` pixels (`[16, 48]`). If `data` is empty or all values are identical, use fixed diameter `32`.
+- **Point Elements**:
+  - For each point in `data`, renders a child `<div className="coordinate-point">`:
+    - `data-point-id={p.id}`
+    - `data-label={p.label}`
+    - `data-x={p.x}`
+    - `data-y={p.y}`
+    - `data-selected={p.id === selectedId ? "true" : "false"}`
+    - Inline styles:
+      - `position: 'absolute'`
+      - `left: xScale(p.x) - size / 2`
+      - `top: yScale(p.y) - size / 2`
+      - `width: size`
+      - `height: size`
+      - `borderRadius: '50%'`
+      - `backgroundColor: p.id === selectedId ? 'orange' : (p.color || 'steelblue')`
+    - Child text: renders `{p.label}` inside the point element.
+    - Clicking a point updates the selected point and calls `onSelectPoint?.(p)`.
