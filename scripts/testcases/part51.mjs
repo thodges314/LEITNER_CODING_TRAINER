@@ -258,5 +258,81 @@ export default {
       { callSignature: 'instance.destroy()' }
     ),
   ],
+  'd3-svg-donut-chart': [
+    r(
+      'Appends SVG container with correct dimensions, role, and aria-label',
+      'renderDonutChart(container, SAMPLE_DATA, { width: 480, height: 320 })',
+      'SVG rendered with width="480", height="320", role="img", aria-label="Donut chart"',
+      { callSignature: 'renderDonutChart(container, data, { width: 480, height: 320 })' }
+    ),
+    r(
+      'Renders centered donut group translated to (width / 2, height / 2) and center label',
+      'renderDonutChart(container, SAMPLE_DATA, { width: 400, height: 300, centerLabel: "Languages" })',
+      'chart-donut translated to (200, 150) with center text "Languages"',
+      { callSignature: 'renderDonutChart(container, data, options)' }
+    ),
+    r(
+      'Renders arc slice paths with data attributes and fill colors',
+      'inspect path.arc-slice elements',
+      'slices render with data-label, data-value, data-index, valid d path, and fill colors',
+      { callSignature: 'container.querySelectorAll("path.arc-slice")' }
+    ),
+    r(
+      'Respects custom innerRadius (e.g. 0 for full pie) and outerRadius',
+      'renderDonutChart(container, SAMPLE_DATA, { innerRadius: 0, outerRadius: 100 })',
+      'Generates solid pie slice paths passing through center origin',
+      { callSignature: 'renderDonutChart(container, data, { innerRadius: 0 })' }
+    ),
+    r(
+      'Clicking a slice triggers onSelectSlice callback with datum and index',
+      'click path.arc-slice[data-index="1"]',
+      'onSelectSlice called with { label: "TypeScript", value: 35 } and index 1',
+      { callSignature: 'slice.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Calling destroy removes SVG and handles empty data gracefully',
+      'instance.destroy() and renderDonutChart(container, [], { centerLabel: "Empty" })',
+      'Container innerHTML cleared on destroy and empty slices handled gracefully',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-svg-scatter-plot': [
+    r(
+      'Appends SVG canvas with dimensions, role, and aria-label',
+      'renderScatterPlot(container, SAMPLE_POINTS, { width: 500, height: 350 })',
+      'SVG rendered with width="500", height="350", role="img", aria-label="Scatter plot"',
+      { callSignature: 'renderScatterPlot(container, points, { width: 500, height: 350 })' }
+    ),
+    r(
+      'Renders chart-area group and both x and y axis groups with translation',
+      'renderScatterPlot(container, SAMPLE_POINTS, { width: 450, height: 300, margin })',
+      'chart-area translated by margin, x-axis translated to innerHeight, y-axis mounted',
+      { callSignature: 'renderScatterPlot(container, points, options)' }
+    ),
+    r(
+      'Renders scatter dot circles with coordinate attributes and fill color',
+      'inspect circle.scatter-dot elements',
+      'circles render with data-x, data-y, data-index, fill="#8b5cf6", and inverted Y scaling',
+      { callSignature: 'container.querySelectorAll("circle.scatter-dot")' }
+    ),
+    r(
+      'Respects custom point radius per datum or defaultRadius option',
+      'inspect circle.scatter-dot[r] attributes',
+      'P1 has radius 8 from datum, P2 has radius 6 from defaultRadius option',
+      { callSignature: 'circle.getAttribute("r")' }
+    ),
+    r(
+      'Clicking a dot invokes onSelectPoint callback with datum and index',
+      'click circle.scatter-dot[data-index="2"]',
+      'onSelectPoint called with { x: 40, y: 30, label: "P3" } and index 2',
+      { callSignature: 'dot.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Handles empty dataset and cleans up container on destroy',
+      'instance.destroy() and renderScatterPlot(container, [])',
+      'Container cleared on destroy and empty dataset renders valid axes safely',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 
