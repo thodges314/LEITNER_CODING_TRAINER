@@ -4555,7 +4555,9 @@
       "stack",
       "monotonic-stack",
       "array",
-      "capital-one"
+      "capital-one",
+      "skyscraper",
+      "skyscrapers"
     ],
     "summary": "Implement a linear-time sightline algorithm to identify unobstructed coastal views"
   },
@@ -4570,7 +4572,9 @@
       "array",
       "scan",
       "capital-one",
-      "codesignal"
+      "codesignal",
+      "skyscraper",
+      "skyscrapers"
     ],
     "summary": "Implement a linear-time greedy optimization algorithm to ensure all buildings have unobstructed sightlines"
   },
