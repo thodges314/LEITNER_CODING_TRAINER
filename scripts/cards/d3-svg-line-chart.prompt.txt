@@ -1,0 +1,83 @@
+Build an SVG line chart visualizer in D3 that plots numerical series data using linear scales, path curve generators (`d3.line`), SVG axes, and interactive point markers.
+
+## Description
+
+Line charts illustrate trends across continuous or indexed intervals. Using D3 to build robust, scalable line charts requires coordinating path generators and data markers:
+1. **SVG & Margins**: An outer `<svg>` container rendered with `width` and `height`, containing a `<g class="chart-area">` positioned via margin offsets.
+2. **Scales**:
+   - `xScale`: A `d3.scaleLinear()` spanning the domain `[min(x), max(x)]` (or `[0, 1]` if empty) mapped to `[0, innerWidth]`.
+   - `yScale`: A `d3.scaleLinear()` spanning the domain `[0, max(y)]` (or `[0, 1]` if empty) mapped to `[innerHeight, 0]`.
+3. **Axes**:
+   - X-axis in `<g class="x-axis">` at `(0, innerHeight)` via `d3.axisBottom(xScale)`.
+   - Y-axis in `<g class="y-axis">` via `d3.axisLeft(yScale)`.
+4. **Path Generator**: A `d3.line()` generator using `d3.curveMonotoneX` to produce smooth, non-overshooting curves bound to a single `<path class="chart-line">`.
+5. **Data Points**: Optional `<circle class="chart-point">` markers plotted at every coordinate for precise data inspection.
+6. **Lifecycle**: Returns an instance object with the root `<svg>` node and a `destroy()` cleanup function.
+
+```ts
+interface LinePoint {
+  x: number;
+  y: number;
+}
+
+interface Margin {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+}
+
+interface LineChartOptions {
+  width?: number;
+  height?: number;
+  margin?: Margin;
+  strokeColor?: string;
+  strokeWidth?: number;
+  showPoints?: boolean;
+  onSelectPoint?: (point: LinePoint, index: number) => void;
+}
+
+interface LineChartInstance {
+  svg: SVGSVGElement;
+  destroy: () => void;
+}
+```
+
+### `renderLineChart(container: HTMLElement, data: LinePoint[], options?: LineChartOptions): LineChartInstance`
+
+- **Parameters**:
+  - `container`: Parent DOM node where the SVG chart is mounted.
+  - `data`: Array of `LinePoint` objects (`{ x: number, y: number }`).
+  - `options`: Optional styling and configuration:
+    - `width`: Total SVG width in pixels (defaults to `420`).
+    - `height`: Total SVG height in pixels (defaults to `260`).
+    - `margin`: Margin offsets `{ top, right, bottom, left }` (defaults to `{ top: 20, right: 20, bottom: 35, left: 40 }`).
+    - `strokeColor`: Line path stroke color (defaults to `'#38bdf8'`).
+    - `strokeWidth`: Stroke thickness in pixels (defaults to `2`).
+    - `showPoints`: Whether to render circle markers at each point (defaults to `true`).
+    - `onSelectPoint`: Callback fired when a point is clicked: `(point: LinePoint, index: number) => void`.
+
+- **Returns**: `LineChartInstance`:
+  - `svg`: The created `<svg>` DOM element.
+  - `destroy()`: Cleanup method that empties the container and removes event handlers.
+
+- **DOM Contract & Requirements**:
+  - Root `<svg>` must have attributes `width={width}`, `height={height}`, `role="img"`, and `aria-label="Line chart"`.
+  - Chart area group `<g class="chart-area">` translated to `translate(margin.left, margin.top)`.
+  - Inner width = `width - margin.left - margin.right`, inner height = `height - margin.top - margin.bottom`.
+  - Generates `<path class="chart-line">`:
+    - `d`: Path string created by `d3.line()`.
+    - `fill`: `"none"`.
+    - `stroke`: `strokeColor`.
+    - `stroke-width`: `strokeWidth`.
+  - When `showPoints` is `true` (default), appends a `<circle class="chart-point">` for each datum:
+    - `data-x`: string of `d.x`.
+    - `data-y`: string of `d.y`.
+    - `data-index`: 0-indexed position.
+    - `cx`: `xScale(d.x)`.
+    - `cy`: `yScale(d.y)`.
+    - `r`: `4`.
+    - `fill`: `strokeColor`.
+    - Clicking any circle calls `onSelectPoint?.(d, index)`.
+  - When `showPoints` is `false`, no `<circle class="chart-point">` elements should be rendered.
+  - If `data` is empty or has fewer than 2 points, the line path renders an empty or single-point path without throwing errors.

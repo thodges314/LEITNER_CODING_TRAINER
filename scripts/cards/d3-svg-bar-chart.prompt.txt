@@ -1,0 +1,75 @@
+Implement an SVG bar chart visualizer using D3 that maps categorical categorical data to an SVG canvas using band scales, linear scales, coordinate margins, and SVG axes.
+
+## Description
+
+Constructing robust data visualizations requires mastering D3's canonical margin convention, data binding, and coordinate transformations:
+1. **SVG & Margins**: An outer `<svg>` container of dimension `width × height` houses a nested `<g class="chart-area">` translated by `(margin.left, margin.top)`.
+2. **Scales**:
+   - `xScale`: A `d3.scaleBand()` mapped across item labels into the range `[0, innerWidth]` with `0.2` padding.
+   - `yScale`: A `d3.scaleLinear()` mapped from `[0, max(value)]` into the range `[innerHeight, 0]` with `.nice()` tick distribution.
+3. **Axes**:
+   - Bottom X-axis: A `<g class="x-axis">` translated to `(0, innerHeight)` generated via `d3.axisBottom(xScale)`.
+   - Left Y-axis: A `<g class="y-axis">` generated via `d3.axisLeft(yScale)`.
+4. **Bars**: `<rect class="bar">` elements positioned and sized via the scales.
+5. **Lifecycle**: Returns an instance object containing the root `<svg>` element and a `destroy()` cleanup function.
+
+```ts
+interface BarDatum {
+  label: string;
+  value: number;
+}
+
+interface Margin {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+}
+
+interface BarChartOptions {
+  width?: number;
+  height?: number;
+  margin?: Margin;
+  color?: string;
+  onSelectBar?: (datum: BarDatum, index: number) => void;
+}
+
+interface BarChartInstance {
+  svg: SVGSVGElement;
+  destroy: () => void;
+}
+```
+
+### `renderBarChart(container: HTMLElement, data: BarDatum[], options?: BarChartOptions): BarChartInstance`
+
+- **Parameters**:
+  - `container`: Parent DOM element where the SVG chart is appended.
+  - `data`: Array of `BarDatum` objects (`{ label: string, value: number }`).
+  - `options`: Optional configuration options:
+    - `width`: Total SVG width in pixels (defaults to `400`).
+    - `height`: Total SVG height in pixels (defaults to `260`).
+    - `margin`: Margin offsets `{ top, right, bottom, left }` (defaults to `{ top: 20, right: 20, bottom: 40, left: 40 }`).
+    - `color`: Bar fill color string (defaults to `'steelblue'`).
+    - `onSelectBar`: Callback triggered on bar click: `(datum: BarDatum, index: number) => void`.
+
+- **Returns**: `BarChartInstance` object:
+  - `svg`: The created `<svg>` DOM element.
+  - `destroy()`: Cleanup method that empties the container and removes event handlers.
+
+- **DOM Contract & Requirements**:
+  - Root `<svg>` must have attributes `width={width}`, `height={height}`, `role="img"`, and `aria-label="Bar chart"`.
+  - Chart group `<g class="chart-area">` translated to `translate(margin.left, margin.top)`.
+  - Inner width = `width - margin.left - margin.right`, inner height = `height - margin.top - margin.bottom`.
+  - X axis rendered in `<g class="x-axis">` translated to `translate(0, innerHeight)`.
+  - Y axis rendered in `<g class="y-axis">`.
+  - Each bar is rendered as `<rect class="bar">` with:
+    - `data-label`: the item's label string.
+    - `data-value`: the item's numeric value string.
+    - `data-index`: 0-indexed position.
+    - `x`: computed by `xScale(d.label)`.
+    - `y`: computed by `yScale(d.value)`.
+    - `width`: computed by `xScale.bandwidth()`.
+    - `height`: computed by `innerHeight - yScale(d.value)`.
+    - `fill`: bar color.
+  - Clicking any bar triggers `onSelectBar?.(d, index)`.
+  - If `data` is empty or undefined, the chart area and axes render with default 0-domains without throwing errors.

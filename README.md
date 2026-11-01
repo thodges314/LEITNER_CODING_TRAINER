@@ -39,7 +39,7 @@ Switchable in Settings between two spaced-repetition models:
 - **Autoclosing Brackets & Quotes**: Auto-pairs and jumps over `()`, `[]`, `{}`, `""`, `''`, and `` ` ``.
 - **In-Browser Prettier Formatting**: Client-side code formatting powered by standalone Prettier (`prettier/standalone` with Babel, TypeScript, and Estree plugins). Format via toolbar or **`Shift + Alt + F`** / **`Cmd + Shift + F`**.
 
-### 3. 100% Dual TypeScript Solutions (`340 / 340 Cards`)
+### 3. 100% Dual TypeScript Solutions (`342 / 342 Cards`)
 - Every card in the catalog features canonical **JavaScript (`<id>.ref.js`)** and **TypeScript (`<id>.ref.ts`)** reference implementations.
 - Ambient data structures (`ListNode<T>`, `TreeNode<T>`) and browser globals are baked into the execution sandbox.
 - **Clean Type Signatures**: Prompt headings feature readable signatures (`### functionName(arg: Type): ReturnType`), while complex option models and structured return types are extracted into clean ```ts interface blocks.
@@ -97,7 +97,7 @@ Switchable in Settings between two spaced-repetition models:
 
 ## Content & Authoring Pipeline
 
-The repository includes **340 curated cards** across 16 topic tracks with **2,286 test cases**:
+The repository includes **342 curated cards** across 16 topic tracks with **2,298 test cases**:
 - **Algorithms** (79 cards)
 - **Advanced Algorithms** (57 cards)
 - **React Components** (51 cards)
@@ -112,7 +112,7 @@ The repository includes **340 curated cards** across 16 topic tracks with **2,28
 - **SQL & Relational Databases** (11 cards)
 - **GraphQL Server & Schemas** (10 cards)
 - **Testing & Libraries** (5 cards)
-- **D3 Data Visualization** (3 cards)
+- **D3 Data Visualization** (5 cards)
 - **Tailwind CSS** (3 cards)
 
 ### Card Structure (`scripts/cards/`)

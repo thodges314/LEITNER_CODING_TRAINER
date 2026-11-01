@@ -1358,5 +1358,13 @@
   "tailwind-metric-card": {
     "difficulty": 1,
     "concept": "tailwind-stat"
+  },
+  "d3-svg-bar-chart": {
+    "difficulty": 2,
+    "concept": "d3-bar-chart"
+  },
+  "d3-svg-line-chart": {
+    "difficulty": 3,
+    "concept": "d3-line-chart"
   }
 }

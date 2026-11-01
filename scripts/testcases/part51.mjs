@@ -182,5 +182,81 @@ export default {
       { callSignature: 'html' }
     ),
   ],
+  'd3-svg-bar-chart': [
+    r(
+      'Appends SVG container with correct dimensions, role, and aria-label',
+      'renderBarChart(container, SAMPLE_DATA, { width: 500, height: 300 })',
+      'SVG rendered with width="500", height="300", role="img", aria-label="Bar chart"',
+      { callSignature: 'renderBarChart(container, data, { width: 500, height: 300 })' }
+    ),
+    r(
+      'Renders chart-area group and both x and y axis groups with translation',
+      'renderBarChart(container, SAMPLE_DATA, { width: 400, height: 260, margin })',
+      'chart-area translated by (margin.left, margin.top), x-axis translated by (0, innerHeight)',
+      { callSignature: 'renderBarChart(container, data, options)' }
+    ),
+    r(
+      'Renders bar elements with data attributes, proportional heights, and color',
+      'inspect rect.bar elements',
+      'rects render with data-label, data-value, data-index, fill="#10b981", and proportional heights',
+      { callSignature: 'container.querySelectorAll("rect.bar")' }
+    ),
+    r(
+      'Clicking a bar triggers onSelectBar callback with datum and index',
+      'click rect.bar[data-index="1"]',
+      'onSelectBar callback invoked with datum { label: "Beta", value: 80 } and index 1',
+      { callSignature: 'bar.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Calling destroy removes SVG and cleans up container',
+      'instance.destroy()',
+      'Container innerHTML cleared and SVG removed',
+      { callSignature: 'instance.destroy()' }
+    ),
+    r(
+      'Handles empty data gracefully without throwing',
+      'renderBarChart(container, [])',
+      'Renders empty axes without throwing errors and returns clean instance',
+      { callSignature: 'renderBarChart(container, [])' }
+    ),
+  ],
+  'd3-svg-line-chart': [
+    r(
+      'Mounts SVG container with ARIA attributes and chart-area grouping',
+      'renderLineChart(container, SAMPLE_POINTS, { width: 450, height: 280 })',
+      'SVG rendered with width="450", height="280", role="img", aria-label="Line chart"',
+      { callSignature: 'renderLineChart(container, points, { width: 450, height: 280 })' }
+    ),
+    r(
+      'Generates smooth curve path with stroke styling and M-command path string',
+      'inspect path.chart-line',
+      'path has stroke="#f59e0b", stroke-width="3", fill="none", and valid M-curve d attribute',
+      { callSignature: 'container.querySelector("path.chart-line")' }
+    ),
+    r(
+      'Renders data point markers with coordinates and data attributes',
+      'inspect circle.chart-point elements',
+      'circles render with data-x, data-y, data-index, and inverted Y coordinate scaling',
+      { callSignature: 'container.querySelectorAll("circle.chart-point")' }
+    ),
+    r(
+      'Respects showPoints: false by omitting point markers',
+      'renderLineChart(container, SAMPLE_POINTS, { showPoints: false })',
+      'Path is rendered but circle.chart-point elements are not generated',
+      { callSignature: 'renderLineChart(container, points, { showPoints: false })' }
+    ),
+    r(
+      'Clicking a point circle fires onSelectPoint with point and index',
+      'click circle.chart-point[data-index="2"]',
+      'onSelectPoint called with { x: 30, y: 25 } and index 2',
+      { callSignature: 'point.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Calling destroy cleans up container and handles empty data gracefully',
+      'instance.destroy() and renderLineChart(container, [])',
+      'Container innerHTML cleared on destroy and empty points handled safely',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 

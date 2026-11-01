@@ -1,0 +1,7 @@
+{
+  "title": "D3 SVG Line Chart with Path Generator",
+  "track": "d3",
+  "tags": ["d3", "charts", "line-chart", "svg", "paths", "generators"],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}
