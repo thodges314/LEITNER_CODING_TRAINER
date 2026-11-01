@@ -4692,7 +4692,7 @@
       "notification",
       "accessibility"
     ],
-    "summary": "Implement an interactive dismissible alert banner styled with Tailwind CSS utility classes"
+    "summary": "Implement an interactive React component (DismissibleBanner) styled with Tailwind CSS utility classes"
   },
   {
     "id": "tailwind-pricing-card",

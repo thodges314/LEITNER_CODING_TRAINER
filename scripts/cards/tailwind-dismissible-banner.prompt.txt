@@ -9,9 +9,9 @@ interface DismissibleBannerProps {
 }
 ```
 
-Implement an interactive dismissible alert banner styled with Tailwind CSS utility classes:
+Implement an interactive React component (`DismissibleBanner`) styled with Tailwind CSS utility classes:
 
-### DismissibleBanner({ variant = 'info', title, message, onDismiss }: DismissibleBannerProps): JSX.Element | null
+### `DismissibleBanner({ variant = 'info', title, message, onDismiss }: DismissibleBannerProps): JSX.Element | null`
 - **State**:
   - Manages internal visibility state initialized to `true` with `useState(true)`.
   - When dismissed, returns `null`.
