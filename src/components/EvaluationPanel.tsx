@@ -18,7 +18,8 @@ import {
   KeyRound,
 } from 'lucide-react';
 import { intervalForBox, getCardInputLanguage } from '../lib/leitner';
-import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
+import type { TopicItem, SpacedAlgorithm, CardInputLanguage } from '../lib/leitner';
+import { formatCode } from '../lib/formatter';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { sql } from '@codemirror/lang-sql';
@@ -207,7 +208,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   const isTsMode =
     inputLang === 'typescript' ||
     (executionMode === 'ts' && Boolean(topic.referenceSolutionTs));
-  const canonicalCode = isTsMode
+  const rawCanonicalCode = isTsMode
     ? (topic.referenceSolutionTs as string)
     : topic.referenceSolution || topic.solution || topic.starterCode || '';
 
@@ -218,6 +219,52 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
     if (isTsMode) return 'TypeScript';
     return 'JavaScript';
   }, [inputLang, isTsMode]);
+
+  const [formattedCanonicalState, setFormattedCanonicalState] = useState<{
+    raw: string;
+    formatted: string;
+  }>({
+    raw: rawCanonicalCode,
+    formatted: rawCanonicalCode,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!rawCanonicalCode.trim()) {
+      return;
+    }
+
+    const langToFormat: CardInputLanguage =
+      inputLang === 'html' || inputLang === 'sql' || inputLang === 'graphql'
+        ? inputLang
+        : solutionLanguageLabel === 'TypeScript'
+          ? 'typescript'
+          : 'javascript';
+
+    formatCode(rawCanonicalCode, langToFormat)
+      .then((res) => {
+        if (!cancelled && res.success && res.code) {
+          setFormattedCanonicalState({
+            raw: rawCanonicalCode,
+            formatted: res.code.trimEnd(),
+          });
+        }
+      })
+      .catch((err) => {
+        console.warn('Formatting canonical solution failed:', err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [rawCanonicalCode, inputLang, solutionLanguageLabel]);
+
+  const canonicalCode =
+    !rawCanonicalCode.trim()
+      ? ''
+      : formattedCanonicalState.raw === rawCanonicalCode
+        ? formattedCanonicalState.formatted
+        : rawCanonicalCode;
 
   const solutionBadgeStyle = useMemo(() => {
     switch (solutionLanguageLabel) {

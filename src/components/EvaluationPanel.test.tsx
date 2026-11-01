@@ -248,6 +248,56 @@ describe('EvaluationPanel context-aware solution reveal', () => {
       copyBtn?.click();
     });
 
-    expect(writeTextMock).toHaveBeenCalledWith('query CompareUsers {\n  user { id }\n}');
+    // Expect writeText to be called with the automatically formatted code
+    expect(writeTextMock).toHaveBeenCalledWith('query CompareUsers {\n  user {\n    id\n  }\n}');
+  });
+
+  it('formats recommended solution with automatic formatter across SQL and JS', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: writeTextMock,
+      },
+    });
+
+    const unformattedSqlTopic: TopicItem = {
+      ...sampleTopic,
+      id: 'sql-test-unformatted',
+      track: 'sql-postgres',
+      inputLanguage: 'sql',
+      referenceSolution: 'select c.email, count(o.id) as order_count from customers c join orders o on c.id=o.customer_id group by c.id,c.email;',
+      referenceSolutionTs: undefined,
+    };
+
+    await act(async () => {
+      root?.render(
+        <EvaluationPanel
+          topic={unformattedSqlTopic}
+          submittedCode="broken"
+          result={failedResult}
+          totalCompletedReviews={0}
+          onCommit={vi.fn()}
+          onRetry={vi.fn()}
+          showSolution={true}
+          executionMode="js"
+        />
+      );
+    });
+
+    // Give effect tick to resolve async formatter
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+
+    const copyBtn = Array.from(container?.querySelectorAll('button') ?? []).find((b) =>
+      b.textContent?.includes('Copy Solution')
+    );
+    await act(async () => {
+      copyBtn?.click();
+    });
+
+    expect(writeTextMock).toHaveBeenCalledWith(
+      expect.stringContaining('SELECT\n  c.email,\n  count(o.id) AS order_count\nFROM')
+    );
   });
 });
