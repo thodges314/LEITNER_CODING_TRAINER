@@ -1,4 +1,3 @@
-const query = `
 query GetArticle($slug: String!) {
   article(slug: $slug) {
     id
@@ -19,4 +18,3 @@ query GetArticle($slug: String!) {
     }
   }
 }
-`;

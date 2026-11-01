@@ -1,4 +1,3 @@
-const query = `
 WITH event_gaps AS (
   SELECT event_id, user_id, event_time,
          CASE
@@ -18,4 +17,3 @@ SELECT event_id, user_id,
        user_id || '-' || session_seq AS session_id
 FROM session_numbered
 ORDER BY event_id ASC;
-`;

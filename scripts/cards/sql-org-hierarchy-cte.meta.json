@@ -7,5 +7,6 @@
     "recursive-cte",
     "hierarchy",
     "trees"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

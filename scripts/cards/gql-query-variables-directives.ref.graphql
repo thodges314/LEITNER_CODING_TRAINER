@@ -1,4 +1,3 @@
-const query = `
 query GetProduct($id: ID!, $withReviews: Boolean = false, $skipPricing: Boolean = false) {
   product(id: $id) {
     id
@@ -11,4 +10,3 @@ query GetProduct($id: ID!, $withReviews: Boolean = false, $skipPricing: Boolean 
     }
   }
 }
-`;

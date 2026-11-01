@@ -7,5 +7,6 @@
     "aggregation",
     "pivot",
     "filter-clause"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

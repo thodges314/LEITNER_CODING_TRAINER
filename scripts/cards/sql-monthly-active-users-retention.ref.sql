@@ -1,4 +1,3 @@
-const query = `
 WITH user_months AS (
   SELECT DISTINCT user_id, DATE_TRUNC('month', action_date)::DATE AS act_month
   FROM user_actions
@@ -11,4 +10,3 @@ JOIN user_months prev
  AND curr.act_month = (prev.act_month + INTERVAL '1 month')::DATE
 GROUP BY curr.act_month
 ORDER BY month ASC;
-`;

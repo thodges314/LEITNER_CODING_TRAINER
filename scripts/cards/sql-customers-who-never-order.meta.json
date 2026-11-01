@@ -7,5 +7,6 @@
     "joins",
     "anti-join",
     "null-check"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

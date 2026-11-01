@@ -7,5 +7,6 @@
     "window-functions",
     "dense-rank",
     "join"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

@@ -165,7 +165,7 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
                     : 'Full TypeScript compiler type-checking (strict checks, interfaces, generics)'
                 }
               >
-                {isTsOnly ? 'TS (Strict • Required)' : 'TS (Strict Type Check)'}
+                TS (Strict Type Check)
               </button>
             </div>
 

@@ -7,5 +7,6 @@
     "window-functions",
     "deduplication",
     "row-number"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

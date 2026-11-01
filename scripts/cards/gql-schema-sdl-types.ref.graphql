@@ -1,4 +1,3 @@
-const schema: string = `
 type User {
   id: ID!
   name: String!
@@ -18,4 +17,3 @@ input CreatePostInput {
   authorId: ID!
   published: Boolean = false
 }
-`;

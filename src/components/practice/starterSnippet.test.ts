@@ -50,10 +50,10 @@ describe('starter snippet: the card checks are live code', () => {
   });
 
   it('for a SQL or GraphQL card, provides appropriate language comment without JS runner block', () => {
-    const sqlCard = { ...card('binary-search-exact'), track: 'sql-postgres' as const };
+    const sqlCard = { ...card('binary-search-exact'), inputLanguage: 'sql' as const };
     expect(getStarterSnippet(sqlCard)).toBe('-- Write your SQL query below\n\n');
 
-    const gqlCard = { ...card('binary-search-exact'), track: 'graphql' as const };
+    const gqlCard = { ...card('binary-search-exact'), inputLanguage: 'graphql' as const };
     expect(getStarterSnippet(gqlCard)).toBe('# Write your GraphQL query or schema below\n\n');
   });
 

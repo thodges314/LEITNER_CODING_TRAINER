@@ -7,5 +7,6 @@
     "retention",
     "self-join",
     "date-trunc"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

@@ -38,4 +38,28 @@ describe('formatCode', () => {
     expect(res.error).toBeDefined();
     expect(res.code).toBe(raw);
   });
+
+  it('formats HTML markup containing comments without syntax error', async () => {
+    const raw = '<!-- Write your HTML markup below -->\n\n<div class="max-w-sm  p-6"><span class="text-sm">Title</span></div>';
+    const res = await formatCode(raw, 'html');
+    expect(res.success).toBe(true);
+    expect(res.code).toContain('<!-- Write your HTML markup below -->');
+    expect(res.code).toContain('<div class="max-w-sm p-6">');
+  });
+
+  it('formats SQL queries cleanly', async () => {
+    const raw = 'select id,name from users where id=1;';
+    const res = await formatCode(raw, 'sql');
+    expect(res.success).toBe(true);
+    expect(res.code).toContain('SELECT');
+    expect(res.code).toContain('FROM');
+  });
+
+  it('formats GraphQL queries cleanly', async () => {
+    const raw = 'query MyQuery{user(id:1){id name}}';
+    const res = await formatCode(raw, 'graphql');
+    expect(res.success).toBe(true);
+    expect(res.code).toContain('query MyQuery {');
+    expect(res.code).toContain('user(id: 1)');
+  });
 });

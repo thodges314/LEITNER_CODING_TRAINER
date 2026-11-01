@@ -6,5 +6,6 @@
     "query",
     "nested-fields",
     "arguments"
-  ]
+  ],
+  "inputLanguage": "graphql"
 }

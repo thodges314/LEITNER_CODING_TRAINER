@@ -7,5 +7,6 @@
     "case-expressions",
     "math",
     "subqueries"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

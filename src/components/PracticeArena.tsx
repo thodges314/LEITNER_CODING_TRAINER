@@ -304,7 +304,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     if (!code.trim() || isFormatting) return;
     setIsFormatting(true);
     try {
-      const res = await formatCode(code, executionMode === 'ts');
+      const inputLang = getCardInputLanguage(currentCard);
+      const modeOrLang = inputLang === 'javascript' ? executionMode === 'ts' : inputLang;
+      const res = await formatCode(code, modeOrLang);
       if (res.success && res.code !== code) {
         setCode(res.code);
         setFormatToast({ message: 'Formatted with Prettier', type: 'success' });

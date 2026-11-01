@@ -1,4 +1,3 @@
-const query: string = `
 mutation CreateTeam($input: CreateTeamInput!) {
   createTeam(input: $input) {
     team {
@@ -14,4 +13,3 @@ mutation CreateTeam($input: CreateTeamInput!) {
     }
   }
 }
-`;

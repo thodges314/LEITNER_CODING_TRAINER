@@ -1,4 +1,3 @@
-const query = `
 query CompareUsers($primaryId: ID!, $secondaryId: ID!) {
   primary: user(id: $primaryId) {
     ...UserSummary
@@ -14,4 +13,3 @@ fragment UserSummary on User {
   email
   role
 }
-`;

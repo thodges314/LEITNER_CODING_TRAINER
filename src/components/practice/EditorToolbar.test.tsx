@@ -200,7 +200,7 @@ describe('EditorToolbar and EditorActionControls', () => {
       });
 
       expect(container?.textContent).toContain('Mode:');
-      expect(container?.textContent).toContain('TS (Strict • Required)');
+      expect(container?.textContent).toContain('TS (Strict Type Check)');
       const jsBtn = Array.from(container?.querySelectorAll('button') ?? []).find((b) =>
         b.textContent?.includes('JS (Fast)')
       );

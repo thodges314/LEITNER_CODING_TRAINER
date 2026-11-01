@@ -6,5 +6,6 @@
     "postgres",
     "aggregate",
     "subquery"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

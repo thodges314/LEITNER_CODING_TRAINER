@@ -1,4 +1,3 @@
-const query: string = `
 WITH RECURSIVE OrgChart AS (
   SELECT
     id,
@@ -25,4 +24,3 @@ SELECT
   root_leader
 FROM OrgChart
 ORDER BY depth ASC, name ASC, id ASC;
-`;

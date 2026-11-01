@@ -1,4 +1,3 @@
-const query = `
 WITH RankedEmployees AS (
   SELECT
     d.name AS "Department",
@@ -15,4 +14,3 @@ SELECT "Department", "Employee", "Salary"
 FROM RankedEmployees
 WHERE rank <= 3
 ORDER BY "Department" ASC, "Salary" DESC, "Employee" ASC;
-`;
