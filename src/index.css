@@ -338,6 +338,35 @@ code {
   background-color: rgba(56, 189, 248, 0.2);
 }
 
+/* Recommended Solution Read-Only CodeMirror Viewer */
+.solution-codemirror-wrapper {
+  overflow: hidden;
+}
+
+.solution-codemirror-wrapper .cm-editor {
+  background-color: var(--bg-editor);
+  font-family: var(--font-mono) !important;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.solution-codemirror-wrapper .cm-scroller {
+  max-height: 480px;
+  overflow: auto;
+}
+
+.solution-codemirror-wrapper .cm-gutters {
+  background-color: rgba(12, 16, 24, 0.7);
+  color: var(--text-dim);
+  border-right: 1px solid var(--border-subtle);
+  user-select: none;
+}
+
+.solution-codemirror-wrapper .cm-content,
+.solution-codemirror-wrapper .cm-line {
+  padding: 0 4px;
+}
+
 .cm-theme-container .cm-matchingBracket {
   background-color: rgba(56, 189, 248, 0.25);
   outline: 1px solid rgba(56, 189, 248, 0.5);

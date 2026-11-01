@@ -117,4 +117,137 @@ describe('EvaluationPanel context-aware solution reveal', () => {
     expect(container?.textContent).toContain('JavaScript');
     expect(container?.textContent).toContain('function twoSum(nums, target) { return [0, 1]; }');
   });
+
+  it('renders HTML solution and badge when inputLanguage is html', async () => {
+    const htmlTopic: TopicItem = {
+      ...sampleTopic,
+      id: 'html-pricing-card',
+      track: 'tailwind',
+      inputLanguage: 'html',
+      referenceSolution: '<div class="card">\n  <h2>Pricing</h2>\n</div>',
+      referenceSolutionTs: undefined,
+    };
+
+    await act(async () => {
+      root?.render(
+        <EvaluationPanel
+          topic={htmlTopic}
+          submittedCode="<div>broken</div>"
+          result={failedResult}
+          totalCompletedReviews={0}
+          onCommit={vi.fn()}
+          onRetry={vi.fn()}
+          showSolution={true}
+          executionMode="js"
+        />
+      );
+    });
+
+    const badge = container?.querySelector('[data-testid="solution-language-badge"]');
+    expect(badge?.textContent).toBe('HTML');
+    expect(container?.textContent).toContain('Pricing');
+  });
+
+  it('renders SQL solution and badge when inputLanguage is sql', async () => {
+    const sqlTopic: TopicItem = {
+      ...sampleTopic,
+      id: 'sql-seat-swap',
+      track: 'sql-postgres',
+      inputLanguage: 'sql',
+      referenceSolution: 'SELECT id, CASE WHEN id % 2 = 1 THEN id + 1 ELSE id - 1 END AS id FROM seat;',
+      referenceSolutionTs: undefined,
+    };
+
+    await act(async () => {
+      root?.render(
+        <EvaluationPanel
+          topic={sqlTopic}
+          submittedCode="SELECT * FROM seat;"
+          result={failedResult}
+          totalCompletedReviews={0}
+          onCommit={vi.fn()}
+          onRetry={vi.fn()}
+          showSolution={true}
+          executionMode="js"
+        />
+      );
+    });
+
+    const badge = container?.querySelector('[data-testid="solution-language-badge"]');
+    expect(badge?.textContent).toBe('SQL');
+    expect(container?.textContent).toContain('SELECT id, CASE WHEN id % 2 = 1');
+  });
+
+  it('renders GraphQL solution and badge when inputLanguage is graphql', async () => {
+    const gqlTopic: TopicItem = {
+      ...sampleTopic,
+      id: 'graphql-user-query',
+      track: 'graphql',
+      inputLanguage: 'graphql',
+      referenceSolution: 'query CompareUsers($primaryId: ID!) {\n  primary: user(id: $primaryId) { id name }\n}',
+      referenceSolutionTs: undefined,
+    };
+
+    await act(async () => {
+      root?.render(
+        <EvaluationPanel
+          topic={gqlTopic}
+          submittedCode="query { user }"
+          result={failedResult}
+          totalCompletedReviews={0}
+          onCommit={vi.fn()}
+          onRetry={vi.fn()}
+          showSolution={true}
+          executionMode="js"
+        />
+      );
+    });
+
+    const badge = container?.querySelector('[data-testid="solution-language-badge"]');
+    expect(badge?.textContent).toBe('GraphQL');
+    expect(container?.textContent).toContain('CompareUsers');
+  });
+
+  it('copies canonical solution as plain text to clipboard when copy button is clicked', async () => {
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: writeTextMock,
+      },
+    });
+
+    const gqlTopic: TopicItem = {
+      ...sampleTopic,
+      id: 'graphql-user-query',
+      inputLanguage: 'graphql',
+      referenceSolution: 'query CompareUsers {\n  user { id }\n}',
+      referenceSolutionTs: undefined,
+    };
+
+    await act(async () => {
+      root?.render(
+        <EvaluationPanel
+          topic={gqlTopic}
+          submittedCode="broken"
+          result={failedResult}
+          totalCompletedReviews={0}
+          onCommit={vi.fn()}
+          onRetry={vi.fn()}
+          showSolution={true}
+          executionMode="js"
+        />
+      );
+    });
+
+    const copyBtn = Array.from(container?.querySelectorAll('button') ?? []).find((b) =>
+      b.textContent?.includes('Copy Solution')
+    );
+    expect(copyBtn).toBeDefined();
+
+    await act(async () => {
+      copyBtn?.click();
+    });
+
+    expect(writeTextMock).toHaveBeenCalledWith('query CompareUsers {\n  user { id }\n}');
+  });
 });

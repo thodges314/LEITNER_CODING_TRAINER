@@ -4,6 +4,7 @@ import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { sql } from '@codemirror/lang-sql';
 import { html } from '@codemirror/lang-html';
+import { graphql } from 'cm6-graphql';
 import rainbowBrackets from 'rainbowbrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
@@ -357,7 +358,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         ? html()
         : inputLang === 'sql'
           ? sql()
-          : javascript({ jsx: true, typescript: executionMode === 'ts' });
+          : inputLang === 'graphql'
+            ? graphql()
+            : javascript({ jsx: true, typescript: executionMode === 'ts' });
     const list = [
       langExt,
       rainbowBrackets(),

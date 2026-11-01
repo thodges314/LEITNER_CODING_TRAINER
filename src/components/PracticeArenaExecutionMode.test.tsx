@@ -134,7 +134,7 @@ describe('PracticeArena Execution Mode & Track Override Behavior', () => {
 
     const buttons = container?.querySelectorAll('button');
     const jsBtn = Array.from(buttons ?? []).find((b) => b.textContent?.includes('JS (Fast)'));
-    const tsBtn = Array.from(buttons ?? []).find((b) => b.textContent?.includes('TS (Strict • Required)'));
+    const tsBtn = Array.from(buttons ?? []).find((b) => b.textContent?.includes('TS (Strict Type Check)'));
 
     // TS is active and marked as required
     expect(tsBtn).toBeDefined();

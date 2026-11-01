@@ -195,6 +195,7 @@ describe('SQL runner with PGlite', () => {
   const sqlCard: TopicItem = {
     id: 'sql-test',
     track: 'sql-postgres',
+    inputLanguage: 'sql',
     title: 'SQL Test',
     box: 1,
     streak: 0,

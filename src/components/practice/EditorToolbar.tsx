@@ -142,8 +142,7 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
               <button
                 type="button"
                 aria-disabled={isTsOnly}
-                disabled={isTsOnly}
-                onClick={() => !isTsOnly && onSwitchExecutionMode('js')}
+                onClick={() => onSwitchExecutionMode('js')}
                 className={`arena-mode-btn ${executionMode === 'js' ? 'arena-mode-btn-active' : ''} ${
                   isTsOnly ? 'arena-mode-btn-disabled' : ''
                 }`}
