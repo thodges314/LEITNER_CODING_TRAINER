@@ -4632,5 +4632,21 @@
       "capital-one"
     ],
     "summary": "Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and ri..."
+  },
+  {
+    "id": "d3-react-imperative-chart",
+    "title": "D3 in React: Imperative Handle Chart Bridge",
+    "track": "react-components",
+    "concept": "d3-react",
+    "difficulty": 3,
+    "tags": [
+      "react",
+      "d3",
+      "useimperativehandle",
+      "forwardref",
+      "svg",
+      "charts"
+    ],
+    "summary": "Integrate D3 with React by building an imperative chart bridge that encapsulates direct SVG/D3 DOM manipulation within a child component while expo..."
   }
 ]

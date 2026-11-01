@@ -13,8 +13,10 @@ fs.writeFileSync(
   tmp,
   `import * as React from 'react';
 import * as ReactDOM from 'react-dom/profiling';
+import * as d3 from 'd3';
 window.React = React;
 window.ReactDOM = ReactDOM;
+window.d3 = d3;
 `
 );
 

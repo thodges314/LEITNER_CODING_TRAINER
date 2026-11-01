@@ -686,6 +686,7 @@ ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrima
         window.require = function(mod) {
           if (mod === 'react') return React;
           if (mod === 'react-dom' || mod === 'react-dom/client') return ReactDOM;
+          if (mod === 'd3') return window.d3;
           throw new Error("Cannot find module '" + mod + "' in preview sandbox");
         };
 

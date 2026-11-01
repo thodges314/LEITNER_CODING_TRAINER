@@ -1334,5 +1334,9 @@
   "text-justification": {
     "difficulty": 3,
     "concept": "advanced-strings"
+  },
+  "d3-react-imperative-chart": {
+    "difficulty": 3,
+    "concept": "d3-react"
   }
 }

@@ -1,0 +1,69 @@
+Integrate D3 with React by building an imperative chart bridge that encapsulates direct SVG/D3 DOM manipulation within a child component while exposing a clean control handle to a parent dashboard via `forwardRef` and `useImperativeHandle`.
+
+## Description
+
+Combining D3 and React often presents an architectural conflict: React expects to own and reconcile the DOM tree, while D3 expects direct imperious control over DOM selections, transitions, and calculations.
+
+A proven, production-grade pattern to reconcile them is the **imperative bridge pattern**:
+1. The **Child component (`D3BarChart`)** renders a container element (such as an `<svg>`) and anchors D3 via `useRef`. A `useEffect` hook handles D3 scales (`d3.scaleBand()`, `d3.scaleLinear()`), data joins (`selectAll('rect').data(...)`), and element attributes.
+2. The child wraps its export in `forwardRef` and uses `useImperativeHandle` to expose a focused control API (`highlight`, `resetHighlight`, `getHighlightedIndex`).
+3. The **Parent component (`ChartDashboard`)** holds a ref to the child, renders high-level control buttons ("Highlight Max", "Highlight First", "Reset"), and synchronizes chart interactions with summary status indicators without manipulating raw SVG nodes.
+
+```ts
+interface BarDataPoint {
+  label: string;
+  value: number;
+}
+
+interface D3BarChartHandle {
+  highlight: (index: number) => void;
+  resetHighlight: () => void;
+  getHighlightedIndex: () => number | null;
+}
+
+interface D3BarChartProps {
+  data: BarDataPoint[];
+  width?: number;
+  height?: number;
+  onSelectBar?: (item: BarDataPoint | null, index: number | null) => void;
+}
+
+interface ChartDashboardProps {
+  data: BarDataPoint[];
+  width?: number;
+  height?: number;
+}
+```
+
+### `D3BarChart(props: D3BarChartProps, ref: any)`
+A `forwardRef` component that renders an SVG bar chart using D3:
+- Renders an `<svg>` with attributes `width={width}`, `height={height}`, `role="img"`, and `aria-label="Bar chart"`. Default `width` is `300`, default `height` is `150`.
+- Computes layout with D3:
+  - An x-scale with `d3.scaleBand()` spanning the item indices `[0, 1, ..., data.length - 1]` mapped to range `[margin.left, width - margin.right]`.
+  - A y-scale with `d3.scaleLinear()` mapping values `[0, d3.max(data, d => d.value) || 1]` to range `[height - margin.bottom, margin.top]`. (Using default margins: top: 10, right: 10, bottom: 20, left: 10).
+- Renders a `<rect>` for each data point:
+  - `data-index={index}`
+  - `data-label={d.label}`
+  - `data-value={d.value}`
+  - `data-highlighted={index === highlightedIndex ? "true" : "false"}`
+  - `x`, `y`, `width`, and `height` derived from the D3 scales.
+  - Clicking any bar selects/highlights that bar and calls `onSelectBar?.(item, index)`.
+- Exposes via `useImperativeHandle`:
+  - `highlight(index: number)`: highlights the bar at `index` (sets `data-highlighted="true"` on that bar and `"false"` on others) and calls `onSelectBar?.(data[index] ?? null, index)`.
+  - `resetHighlight()`: removes highlight from all bars and calls `onSelectBar?.(null, null)`.
+  - `getHighlightedIndex()`: returns the currently highlighted index (`number` or `null`).
+
+### `ChartDashboard({ data, width = 300, height = 150 }: ChartDashboardProps)`
+A parent dashboard component that controls and displays `D3BarChart`:
+- Maintains a ref `const chartRef = useRef<D3BarChartHandle | null>(null);`.
+- Maintains state for the currently selected item (updated via `onSelectBar`).
+- Renders:
+  - Container `<div className="chart-dashboard">`.
+  - Control bar `<div className="chart-controls">`:
+    - `<button data-action="highlight-max">Highlight Max</button>`: finds the index of the item with the highest `value` in `data` and calls `chartRef.current?.highlight(maxIndex)`.
+    - `<button data-action="highlight-first">Highlight First</button>`: calls `chartRef.current?.highlight(0)` if data is not empty.
+    - `<button data-action="reset">Reset</button>`: calls `chartRef.current?.resetHighlight()`.
+  - Status readout element `<div data-testid="status">`:
+    - Displays `"No selection"` when nothing is highlighted.
+    - Displays `Selected: ${selected.label} (${selected.value})` when a bar is selected.
+  - The chart component: `<D3BarChart ref={chartRef} data={data} width={width} height={height} onSelectBar={...} />`.

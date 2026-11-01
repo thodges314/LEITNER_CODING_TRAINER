@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import React, { act } from 'react';
 import * as ReactDOM from 'react-dom';
 import * as ReactDOMClient from 'react-dom/client';
+import * as d3 from 'd3';
 import seedTopics from '../data/topics.json';
 import { transpileForExecution } from './runner';
 import type { TopicItem } from './leitner';
@@ -118,11 +119,13 @@ describe('React preview guard: every previewCode mounts with the reference solut
         Suspense: React.Suspense,
         IntersectionObserver: globalThis.IntersectionObserver,
         usePreviewProps: <T extends Record<string, unknown>>(defaults: T): T => defaults,
+        d3,
         log: mockLog,
         exports: {},
         require: (mod: string) => {
           if (mod === 'react') return React;
           if (mod === 'react-dom' || mod === 'react-dom/client') return ReactDOMClient;
+          if (mod === 'd3') return d3;
           throw new Error(`Cannot find module '${mod}' in preview test`);
         },
       };

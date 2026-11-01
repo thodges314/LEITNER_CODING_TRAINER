@@ -8,6 +8,7 @@ import type { DomTools } from './domTools';
 import { isTsOnlyCard } from './tsOnly';
 import { PGlite } from '@electric-sql/pglite';
 import { graphql as executeGraphql, buildSchema, parse as parseGraphql, validate as validateGraphql } from 'graphql';
+import * as d3 from 'd3';
 import { stripTestRunnerBlock } from './stripTestRunner';
 
 export type ExecutionMode = 'js' | 'ts';
@@ -148,6 +149,7 @@ const SANDBOX_NAMES = [
   'buildSchema',
   'parseGraphql',
   'validateGraphql',
+  'd3',
 ] as const;
 
 export interface SandboxScope {
@@ -190,6 +192,7 @@ export function createSandboxScope(options: {
         validate: validateGraphql,
       };
     }
+    if (mod === 'd3') return { default: d3, ...d3 };
     throw new Error(`Cannot find module '${mod}' in browser sandbox`);
   };
   const values: unknown[] = [
@@ -227,6 +230,7 @@ export function createSandboxScope(options: {
     buildSchema,
     parseGraphql,
     validateGraphql,
+    d3,
   ];
   return {
     names: SANDBOX_NAMES,

@@ -1143,5 +1143,25 @@
     "targetTime": "O(1)",
     "targetSpace": "O(1)",
     "complexityExplanation": "Constant-time arithmetic and math clamping for virtual scroll offsets and indices."
+  },
+  "simplify-path": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Canonicalizing path segments with stack traverses path string in linear time and space."
+  },
+  "sort-colors": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(1)",
+    "complexityExplanation": "Dutch National Flag algorithm sorts 0s, 1s, and 2s in-place in a single pass with constant extra space."
+  },
+  "longest-continuous-subarray-limit": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Sliding window with monotonic deques pushes and pops each element at most once."
+  },
+  "text-justification": {
+    "targetTime": "O(n)",
+    "targetSpace": "O(n)",
+    "complexityExplanation": "Greedy line packing and space distribution processes words in linear time and space."
   }
 }
