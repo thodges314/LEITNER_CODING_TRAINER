@@ -1,0 +1,32 @@
+```ts
+type BannerVariant = 'info' | 'success' | 'warning' | 'error';
+
+interface DismissibleBannerProps {
+  variant?: BannerVariant; // default: 'info'
+  title: string;
+  message: string;
+  onDismiss?: () => void;
+}
+```
+
+Implement an interactive dismissible alert banner styled with Tailwind CSS utility classes:
+
+### DismissibleBanner({ variant = 'info', title, message, onDismiss }: DismissibleBannerProps): JSX.Element | null
+- **State**:
+  - Manages internal visibility state initialized to `true` with `useState(true)`.
+  - When dismissed, returns `null`.
+- **Accessibility & Container (`<div role="alert">`)**:
+  - Base classes: `relative flex items-start gap-3 p-4 rounded-xl border transition-all duration-200`
+  - Variant class mapping:
+    - `'info'`: `bg-sky-50 text-sky-900 border-sky-200`
+    - `'success'`: `bg-emerald-50 text-emerald-900 border-emerald-200`
+    - `'warning'`: `bg-amber-50 text-amber-900 border-amber-200`
+    - `'error'`: `bg-rose-50 text-rose-900 border-rose-200`
+- **Content Area**:
+  - Title: `<strong class="font-semibold text-sm leading-5 block">${title}</strong>`
+  - Message: `<p class="text-sm opacity-90 mt-0.5">${message}</p>`
+- **Dismiss Button (`<button>`)**:
+  - Attributes: `type="button"`, `aria-label="Dismiss"`
+  - Classes: `ml-auto p-1 rounded-lg transition-opacity hover:opacity-75 focus:outline-none focus:ring-2 cursor-pointer`
+  - Content: `&times;` (or `'×'`)
+  - Clicking sets visibility to `false` and calls `onDismiss?.()`.

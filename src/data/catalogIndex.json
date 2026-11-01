@@ -4679,5 +4679,34 @@
       "network"
     ],
     "summary": "Build an interactive graph theory network visualizer that simulates a force-directed graph using D3's physics simulation inside an SVG canvas."
+  },
+  {
+    "id": "tailwind-dismissible-banner",
+    "title": "Tailwind Dismissible Alert Banner",
+    "track": "tailwind",
+    "concept": "tailwind-banner",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "tailwind",
+      "notification",
+      "accessibility"
+    ],
+    "summary": "Implement an interactive dismissible alert banner styled with Tailwind CSS utility classes"
+  },
+  {
+    "id": "tailwind-pricing-card",
+    "title": "Tailwind Responsive Pricing Card",
+    "track": "tailwind",
+    "concept": "tailwind-card",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "html",
+      "responsive",
+      "css",
+      "card"
+    ],
+    "summary": "Implement a function that renders a responsive pricing card HTML string styled with Tailwind CSS utility classes"
   }
 ]

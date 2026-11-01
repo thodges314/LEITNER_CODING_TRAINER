@@ -35,6 +35,7 @@ export type TrackType =
   | 'react'
   | 'react-components'
   | 'd3'
+  | 'tailwind'
   | 'typescript-patterns'
   | 'testing-tooling'
   | 'graphql'
@@ -276,6 +277,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#38bdf8',
     bg: 'rgba(56, 189, 248, 0.12)',
     border: 'rgba(56, 189, 248, 0.35)',
+  },
+  'tailwind': {
+    label: 'Tailwind CSS',
+    color: '#06b6d4',
+    bg: 'rgba(6, 182, 212, 0.12)',
+    border: 'rgba(6, 182, 212, 0.35)',
   },
 };
 

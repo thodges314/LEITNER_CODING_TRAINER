@@ -502,6 +502,73 @@ test.describe('React preview window', () => {
     const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
     expect(hasReact).toBe(false);
   });
+
+  test('tailwind-pricing-card: displays "Live Preview Window", loads Tailwind without React, and renders pricing card', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-pricing-card');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-pricing-card', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const article = frame.locator('article').first();
+    await expect(article).toBeVisible({ timeout: 5000 });
+    await expect(article).toContainText('Pro Cloud');
+    await expect(article).toContainText('$29');
+
+    // Verify Tailwind CDN script is present in iframe head
+    const hasTailwindCdn = await frame.locator('head').evaluate((head) => {
+      return Array.from(head.querySelectorAll('script')).some((s) => s.src.includes('tailwindcss.com'));
+    });
+    expect(hasTailwindCdn).toBe(true);
+
+    // Verify React is NOT loaded in vanilla Tailwind preview
+    const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
+    expect(hasReact).toBe(false);
+  });
+
+  test('tailwind-dismissible-banner: loads React and Tailwind, renders alert banner, and dismisses on click', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-dismissible-banner');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-dismissible-banner', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const alert = frame.locator('[role="alert"]').first();
+    await expect(alert).toBeVisible({ timeout: 5000 });
+    await expect(alert).toContainText('Build Succeeded');
+
+    // Both React and Tailwind should be loaded
+    const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
+    expect(hasReact).toBe(true);
+
+    const hasTailwindCdn = await frame.locator('head').evaluate((head) => {
+      return Array.from(head.querySelectorAll('script')).some((s) => s.src.includes('tailwindcss.com'));
+    });
+    expect(hasTailwindCdn).toBe(true);
+
+    // Dismiss the banner
+    const dismissBtn = alert.locator('button[aria-label="Dismiss"]');
+    await dismissBtn.click();
+    await expect(alert).toHaveCount(0);
+  });
 });
 
 

@@ -104,4 +104,56 @@ export default {
       { callSignature: 'renderForceGraph(container, { nodes: [], links: [] })' }
     ),
   ],
+  'tailwind-pricing-card': [
+    r(
+      'Basic non-popular tier renders semantic article with slate border and features list',
+      "renderPricingCard({ name: 'Starter', price: 15, features: ['1 Project', 'Community Support'] })",
+      '<article class="... border-slate-700 ..."> with h3, $15/mo, and button',
+      { callSignature: 'renderPricingCard(tier)' }
+    ),
+    r(
+      'Popular tier renders popular badge and indigo ring styling',
+      "renderPricingCard({ name: 'Pro', price: 49, popular: true, features: ['Unlimited Projects'] })",
+      'article has border-indigo-500 ring-2, badge with "Most Popular", button has bg-indigo-600',
+      { callSignature: 'renderPricingCard(popularTier)' }
+    ),
+    r(
+      'Applies custom period and custom CTA text correctly',
+      "renderPricingCard({ name: 'Enterprise', price: 999, period: '/year', ctaText: 'Contact Sales', features: [] })",
+      'Displays $999/year and button displays "Contact Sales"',
+      { callSignature: 'renderPricingCard(enterpriseTier)' }
+    ),
+    r(
+      'Renders empty features list gracefully without extra items',
+      "renderPricingCard({ name: 'Free', price: 0, features: [] })",
+      '<ul> contains 0 <li> elements',
+      { callSignature: 'renderPricingCard(freeTier)' }
+    ),
+  ],
+  'tailwind-dismissible-banner': [
+    r(
+      "Default info variant renders with role='alert' and sky color classes",
+      '<DismissibleBanner title="Info Note" message="System is operational." />',
+      'renders role="alert" with bg-sky-50 and border-sky-200 and Dismiss button',
+      { callSignature: '<DismissibleBanner title="Info" message="..." />' }
+    ),
+    r(
+      'Success variant applies emerald color classes',
+      '<DismissibleBanner variant="success" title="Saved" message="All changes saved." />',
+      'renders role="alert" with bg-emerald-50 and border-emerald-200',
+      { callSignature: '<DismissibleBanner variant="success" ... />' }
+    ),
+    r(
+      'Warning and error variants apply matching amber and rose classes',
+      '<DismissibleBanner variant="warning" ... /> and <DismissibleBanner variant="error" ... />',
+      'renders matching bg-amber-50 and bg-rose-50 classes',
+      { callSignature: '<DismissibleBanner variant="warning|error" ... />' }
+    ),
+    r(
+      'Clicking dismiss button hides banner and invokes onDismiss',
+      'fire.click(dismissBtn)',
+      'Banner is dismissed (null rendered) and onDismiss callback is invoked',
+      { callSignature: 'fire.click(btn)' }
+    ),
+  ],
 };

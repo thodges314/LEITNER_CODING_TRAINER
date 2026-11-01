@@ -32,14 +32,12 @@ for (const f of metaFiles) {
     for (const k of ['track', 'title', 'tags']) if (!meta[k]) throw new Error(`${f}: missing "${k}"`);
     topics.push({
       id,
-      track: meta.track,
-      title: meta.title,
       box: 1,
       streak: 0,
       nextEligibleTrial: 0,
       status: 'locked',
-      tags: meta.tags,
       promptSeed: '',
+      ...meta,
     });
   }
 }

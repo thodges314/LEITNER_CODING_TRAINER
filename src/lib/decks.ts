@@ -7,6 +7,7 @@ export const FRONTEND_TRACKS: ReadonlySet<TrackType> = new Set<TrackType>([
   'react',
   'react-components',
   'd3',
+  'tailwind',
   'dom-browser',
   'async-js',
   'js-utilities',

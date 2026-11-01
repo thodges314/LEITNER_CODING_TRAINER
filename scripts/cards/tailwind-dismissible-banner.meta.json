@@ -1,0 +1,15 @@
+{
+  "track": "tailwind",
+  "title": "Tailwind Dismissible Alert Banner",
+  "tags": [
+    "react",
+    "tailwind",
+    "notification",
+    "accessibility"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}

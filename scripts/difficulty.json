@@ -1346,5 +1346,13 @@
   "d3-graph-theory-visualizer": {
     "difficulty": 3,
     "concept": "d3-force-graph"
+  },
+  "tailwind-pricing-card": {
+    "difficulty": 2,
+    "concept": "tailwind-card"
+  },
+  "tailwind-dismissible-banner": {
+    "difficulty": 2,
+    "concept": "tailwind-banner"
   }
 }
