@@ -569,7 +569,40 @@ test.describe('React preview window', () => {
     await dismissBtn.click();
     await expect(alert).toHaveCount(0);
   });
+
+  test('tailwind-metric-card: renders raw HTML with Tailwind, shows "Parameters" panel, and logs click', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-metric-card');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-metric-card', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    // Verify non-React panel title says "Parameters" instead of "Props"
+    const panelTitle = previewWindow.locator('.props-panel-title');
+    await expect(panelTitle).toHaveText('Parameters');
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const cardEl = frame.locator('.max-w-sm');
+    await expect(cardEl).toBeVisible({ timeout: 5000 });
+    await expect(cardEl).toContainText('Total Revenue');
+    await expect(cardEl).toContainText('$48,250');
+
+    // Click the button and check event log
+    const btn = cardEl.locator('button');
+    await btn.click();
+    const logItem = previewWindow.locator('.react-preview-log-entry').first();
+    await expect(logItem).toContainText('click');
+  });
 });
+
 
 
 

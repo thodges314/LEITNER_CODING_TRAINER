@@ -4708,5 +4708,19 @@
       "card"
     ],
     "summary": "Implement a function that renders a responsive pricing card HTML string styled with Tailwind CSS utility classes"
+  },
+  {
+    "id": "tailwind-metric-card",
+    "title": "Tailwind Stat Metric Card",
+    "track": "tailwind",
+    "concept": "tailwind-stat",
+    "difficulty": 1,
+    "tags": [
+      "tailwind",
+      "html",
+      "css",
+      "layout"
+    ],
+    "summary": "Construct a responsive dashboard KPI metric card using pure HTML markup styled with Tailwind CSS utility classes."
   }
 ]

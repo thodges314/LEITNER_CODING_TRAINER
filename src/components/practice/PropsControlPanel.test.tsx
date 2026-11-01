@@ -104,6 +104,27 @@ describe('PropsControlPanel', () => {
     expect(fnBadge?.textContent).toContain('(callback) → auto-logged');
   });
 
+  it('renders "Parameters" title and count badge when term="parameters"', async () => {
+    const onChange = vi.fn();
+    const onReset = vi.fn();
+
+    await act(async () => {
+      root?.render(
+        <PropsControlPanel
+          cardId="test-card"
+          propDefs={mockPropDefs}
+          values={{ value: 45 }}
+          onChange={onChange}
+          onReset={onReset}
+          term="parameters"
+        />
+      );
+    });
+
+    expect(container?.querySelector('.props-panel-title')?.textContent).toBe('Parameters');
+    expect(container?.querySelector('[data-testid="props-count-badge"]')?.textContent).toBe('5 parameters');
+  });
+
   it('handles number changes and clearing', async () => {
     const onChange = vi.fn();
     const onReset = vi.fn();

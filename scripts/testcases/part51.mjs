@@ -156,4 +156,31 @@ export default {
       { callSignature: 'fire.click(btn)' }
     ),
   ],
+  'tailwind-metric-card': [
+    r(
+      'Card container has dark background, border, padding, and max-width classes',
+      'container.firstElementChild',
+      'classList contains max-w-sm, rounded-2xl, p-6, bg-slate-900, border-slate-800',
+      { callSignature: 'html' }
+    ),
+    r(
+      'Header contains metric title and trend badge with emerald colors',
+      'container.querySelector("span.text-slate-400"), container.querySelector("span.text-emerald-400")',
+      'displays "Total Revenue" and "+12.5%" rounded-full badge',
+      { callSignature: 'html' }
+    ),
+    r(
+      'Displays formatted stat value and comparison subtext',
+      'container.querySelector(".text-3xl"), container.querySelector("p.text-slate-500")',
+      'displays "$48,250" and "vs. $42,890 last month"',
+      { callSignature: 'html' }
+    ),
+    r(
+      'Action button is styled with indigo background, rounded corners, and focus ring',
+      'container.querySelector("button")',
+      'button has type="button", "View Detailed Report", bg-indigo-600, w-full, rounded-xl',
+      { callSignature: 'html' }
+    ),
+  ],
 };
+

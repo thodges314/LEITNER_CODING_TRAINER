@@ -20,6 +20,12 @@ export interface ComponentPropsConfig {
 }
 
 export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
+  'vnode-to-dom': [
+    { name: 'cardTitle', type: 'string', defaultValue: 'Interactive Card', placeholder: 'Card title', description: 'Heading text for the virtual DOM card' },
+    { name: 'description', type: 'string', defaultValue: 'Nested DOM nodes constructed from a virtual node tree.', placeholder: 'Card description', description: 'Body text for the virtual DOM card' },
+    { name: 'buttonText', type: 'string', defaultValue: 'Click Me', placeholder: 'Button label', description: 'Text label inside the action button' },
+    { name: 'buttonColor', type: 'enum', defaultValue: '#0284c7', options: ['#0284c7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'], description: 'Background color applied to the button style object' },
+  ],
   'progress-bar': [
     { name: 'value', type: 'number', defaultValue: 45, min: 0, max: 100, step: 5, description: 'Current progress value (clear to trigger indeterminate)' },
     { name: 'max', type: 'number', defaultValue: 100, min: 1, max: 500, description: 'Maximum progress limit (defaults to 100)' },

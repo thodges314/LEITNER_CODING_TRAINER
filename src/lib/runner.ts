@@ -342,6 +342,38 @@ export function prepareGraphqlCode(code: string, testHarness?: string): string {
 }
 
 /**
+ * Normalizes user code for HTML markup and Tailwind template cards.
+ * Accepts:
+ * 1. JavaScript / TypeScript defining `html`, `template`, `solution`, or a render function.
+ * 2. Raw HTML markup text (e.g. `<div class="...">...</div>`).
+ */
+export function prepareHtmlCode(code: string, testHarness?: string): string {
+  const stripped = stripTestRunnerBlock(code, testHarness);
+
+  const hasJsDeclaration = /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:html|template|solution|render\w*)\b/.test(code);
+  if (hasJsDeclaration) {
+    return code;
+  }
+
+  const withoutLeadingComments = stripped
+    .replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, '')
+    .trim();
+
+  const startsWithJs = /^(?:const|let|var|function|class|export|import)\b/.test(withoutLeadingComments);
+  if (startsWithJs) {
+    return code;
+  }
+
+  const cleanHtml = stripped
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('//'))
+    .join('\n')
+    .trim();
+
+  return `const html = ${JSON.stringify(cleanHtml)};\nconst solution = html;\n`;
+}
+
+/**
  * Runs the user's code followed by the card's test harness without any UI,
  * counting PASS/FAIL console output. This is the source of truth for pass/fail.
  */
@@ -362,6 +394,11 @@ export async function runHarness(
     effectiveCode = prepareSqlCode(code, harness);
   } else if (card.track === 'graphql') {
     effectiveCode = prepareGraphqlCode(code, harness);
+  } else if (
+    (card.track === 'tailwind' && !card.rendersComponent && !card.previewLibraries?.includes('react')) ||
+    card.tags?.includes('html')
+  ) {
+    effectiveCode = prepareHtmlCode(code, harness);
   }
 
   const combined = bufferContainsHarness(effectiveCode, harness) ? effectiveCode : `${effectiveCode}\n\n${harness}\n`;

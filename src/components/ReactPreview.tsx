@@ -13,7 +13,7 @@ import {
   Minimize2,
 } from 'lucide-react';
 import type { TopicItem } from '../lib/leitner';
-import { transpileForExecution } from '../lib/runner';
+import { transpileForExecution, prepareHtmlCode } from '../lib/runner';
 import type { ExecutionMode } from '../lib/runner';
 import { stripTestRunnerBlock } from '../lib/stripTestRunner';
 import { isTsOnlyCard } from '../lib/tsOnly';
@@ -180,7 +180,11 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
     if (!card.previewCode || !targetWindow) return;
 
     setStatus('compiling');
-    const userComponentCode = stripTestRunnerBlock(code);
+    const isHtmlCard = Boolean(
+      (card.track === 'tailwind' && !card.rendersComponent && !card.previewLibraries?.includes('react')) ||
+      card.tags?.includes('html')
+    );
+    const userComponentCode = isHtmlCard ? prepareHtmlCode(code) : stripTestRunnerBlock(code);
     const mode = isTsOnlyCard(card) ? 'ts' : executionMode;
 
     if (mode === 'ts') {
@@ -618,13 +622,21 @@ export const ReactPreview: React.FC<ReactPreviewProps> = ({
         )}
       </div>
 
-      {/* Interactive Component Props Control Panel */}
+      {/* Interactive Component Props / Parameters Control Panel */}
       <PropsControlPanel
         cardId={card.id}
         propDefs={propDefs}
         values={propValues}
         onChange={handlePropChange}
         onReset={handleResetProps}
+        term={
+          card.rendersComponent ||
+          card.track === 'react' ||
+          card.track === 'react-components' ||
+          card.previewLibraries?.includes('react')
+            ? 'props'
+            : 'parameters'
+        }
       />
 
       {/* Event Log & Console Panel (rendered once live) */}

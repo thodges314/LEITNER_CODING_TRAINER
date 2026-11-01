@@ -15,7 +15,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task / card | Branch | Owner | Status |
 |---|---|---|---|
-| d3-curriculum & tailwind-track (d3-react-imperative-chart, d3-css-coordinate-layout, d3-graph-theory-visualizer, tailwind-pricing-card, tailwind-dismissible-banner) | feature/card-d3-imperative-chart | antigravity | Complete (Ready for review) |
+| d3-curriculum & tailwind-track (d3-react-imperative-chart, d3-css-coordinate-layout, d3-graph-theory-visualizer, tailwind-pricing-card, tailwind-dismissible-banner, tailwind-metric-card) | feature/card-d3-imperative-chart | antigravity | Complete (Ready for review) |
 
 
 

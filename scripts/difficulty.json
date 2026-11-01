@@ -1354,5 +1354,9 @@
   "tailwind-dismissible-banner": {
     "difficulty": 2,
     "concept": "tailwind-banner"
+  },
+  "tailwind-metric-card": {
+    "difficulty": 1,
+    "concept": "tailwind-stat"
   }
 }
