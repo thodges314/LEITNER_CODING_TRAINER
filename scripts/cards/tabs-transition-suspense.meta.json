@@ -6,5 +6,8 @@
     "suspense",
     "transition",
     "use"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

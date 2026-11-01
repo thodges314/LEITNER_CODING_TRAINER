@@ -7,5 +7,6 @@
     "case-when",
     "round",
     "analytics"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

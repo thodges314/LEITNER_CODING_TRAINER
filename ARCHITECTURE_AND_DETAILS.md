@@ -8,7 +8,7 @@
 
 A client-only, zero-backend deliberate practice environment designed to simulate cold-start front-end technical interview screening.
 Learners write solutions from scratch without autocomplete or hints, execute their implementation headlessly in a browser sandbox against comprehensive test harnesses, and review cards according to spaced repetition schedules.
-The deck features **334 cards** across **14 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [334], **Full-Stack Core** [277], **Frontend Specialist** [204], and **Algorithms & Data Structures** [102]) with **2,258 documented test cases** and **100% structured Markdown instructions**.
+The deck features **340 cards** across **16 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [340], **Full-Stack Core** [283], **Frontend Specialist** [210], and **Algorithms & Data Structures** [102]) with **2,286 documented test cases** and **100% structured Markdown instructions**.
 
 - **Frontend Core**: React 19, TypeScript (strict mode), Vite 8.
 - **Content & Quality Pipeline**: Primarily AI-authored across structured batch pipelines with automated validation (reference passes, empty fails, label parity, mutation checks).
@@ -124,9 +124,9 @@ Located in [runner.ts](src/lib/runner.ts):
    - Ambient declarations in `SANDBOX_GLOBALS` (`src/utils/typeChecker.ts`) include `ListNode<T>` and `TreeNode<T>` for common algorithm data structures.
    - When inspecting the suggested solution in `EvaluationPanel`, the trainer renders the solution matching the learner's active mode with dynamic language badges (`TypeScript` blue badge vs `JavaScript` amber badge).
 
-### 4.1 React Component Live Preview & Props Control Panel
+### 4.1 Live Preview & Props / Parameters Control Panel
 
-Located in `src/components/practice/ReactPreview.tsx`, `PropsControlPanel.tsx`, and `src/hooks/usePreviewProps.ts`:
+Located in `src/components/LivePreview.tsx` (aliased as `ReactPreview.tsx`), `PropsControlPanel.tsx`, and `src/hooks/usePreviewProps.ts`:
 
 - **Isolated Preview Sandbox**: Runs user component implementations inside a dedicated sandboxed iframe (`sandbox="allow-scripts"`). The React runtime bundle (`reactPreviewBundle.ts`) is loaded on-demand dynamically when a previewable card mounts.
 - **Dedicated Props Control Panel**:
@@ -170,8 +170,8 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (2,159 unit tests across 68 test files)**: Tests verifying:
-  - Reference solutions pass for all 334 cards across 14 topics across 2,258 documented test cases.
+- **Vitest Suite (2,203 unit tests across 69 test files)**: Tests verifying:
+  - Reference solutions pass for all 340 cards across 16 topics across 2,286 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.
   - 100% of cards formatted with structured GitHub-flavored Markdown instructions.

@@ -1334,5 +1334,29 @@
   "text-justification": {
     "difficulty": 3,
     "concept": "advanced-strings"
+  },
+  "d3-react-imperative-chart": {
+    "difficulty": 3,
+    "concept": "d3-react"
+  },
+  "d3-css-coordinate-layout": {
+    "difficulty": 3,
+    "concept": "d3-layout"
+  },
+  "d3-graph-theory-visualizer": {
+    "difficulty": 3,
+    "concept": "d3-force-graph"
+  },
+  "tailwind-pricing-card": {
+    "difficulty": 2,
+    "concept": "tailwind-card"
+  },
+  "tailwind-dismissible-banner": {
+    "difficulty": 2,
+    "concept": "tailwind-banner"
+  },
+  "tailwind-metric-card": {
+    "difficulty": 1,
+    "concept": "tailwind-stat"
   }
 }

@@ -198,6 +198,11 @@ const SANDBOX_GLOBALS = `
   interface HTMLUListElement extends HTMLElement { [key: string]: any; }
   declare var HTMLLIElement: any;
   interface HTMLLIElement extends HTMLElement { [key: string]: any; }
+  declare var SVGElement: any;
+  interface SVGElement extends Element { [key: string]: any; }
+  declare var SVGSVGElement: any;
+  interface SVGSVGElement extends SVGElement { [key: string]: any; }
+  declare var d3: any;
   declare var HTMLSpanElement: any;
   interface HTMLSpanElement extends HTMLElement { [key: string]: any; }
   declare var Text: any;

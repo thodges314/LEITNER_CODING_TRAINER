@@ -6,5 +6,8 @@
     "class-component",
     "resilience",
     "resetKeys"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

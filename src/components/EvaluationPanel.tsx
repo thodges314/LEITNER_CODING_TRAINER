@@ -17,8 +17,15 @@ import {
   Loader2,
   KeyRound,
 } from 'lucide-react';
-import { intervalForBox } from '../lib/leitner';
-import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
+import { intervalForBox, getCardInputLanguage } from '../lib/leitner';
+import type { TopicItem, SpacedAlgorithm, CardInputLanguage } from '../lib/leitner';
+import { formatCode } from '../lib/formatter';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { sql } from '@codemirror/lang-sql';
+import { html } from '@codemirror/lang-html';
+import { graphql } from 'cm6-graphql';
+import { EditorView } from '@codemirror/view';
 import { askCritiqueFollowUp, getStoredApiKey, type EvaluationResult } from '../lib/ai';
 import { summarizeVerdict } from '../lib/verdict';
 import { getThemeColors } from '../styles/colors';
@@ -197,10 +204,166 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
     }
   };
 
-  const isTsMode = executionMode === 'ts' && Boolean(topic.referenceSolutionTs);
-  const canonicalCode = isTsMode
+  const inputLang = getCardInputLanguage(topic);
+  const isTsMode =
+    inputLang === 'typescript' ||
+    (executionMode === 'ts' && Boolean(topic.referenceSolutionTs));
+  const rawCanonicalCode = isTsMode
     ? (topic.referenceSolutionTs as string)
     : topic.referenceSolution || topic.solution || topic.starterCode || '';
+
+  const solutionLanguageLabel = useMemo(() => {
+    if (inputLang === 'html') return 'HTML';
+    if (inputLang === 'sql') return 'SQL';
+    if (inputLang === 'graphql') return 'GraphQL';
+    if (isTsMode) return 'TypeScript';
+    return 'JavaScript';
+  }, [inputLang, isTsMode]);
+
+  const [formattedCanonicalState, setFormattedCanonicalState] = useState<{
+    raw: string;
+    formatted: string;
+  }>({
+    raw: rawCanonicalCode,
+    formatted: rawCanonicalCode,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!rawCanonicalCode.trim()) {
+      return;
+    }
+
+    const langToFormat: CardInputLanguage =
+      inputLang === 'html' || inputLang === 'sql' || inputLang === 'graphql'
+        ? inputLang
+        : solutionLanguageLabel === 'TypeScript'
+          ? 'typescript'
+          : 'javascript';
+
+    formatCode(rawCanonicalCode, langToFormat)
+      .then((res) => {
+        if (!cancelled && res.success && res.code) {
+          setFormattedCanonicalState({
+            raw: rawCanonicalCode,
+            formatted: res.code.trimEnd(),
+          });
+        }
+      })
+      .catch((err) => {
+        console.warn('Formatting canonical solution failed:', err);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [rawCanonicalCode, inputLang, solutionLanguageLabel]);
+
+  const canonicalCode =
+    !rawCanonicalCode.trim()
+      ? ''
+      : formattedCanonicalState.raw === rawCanonicalCode
+        ? formattedCanonicalState.formatted
+        : rawCanonicalCode;
+
+  const solutionBadgeStyle = useMemo(() => {
+    switch (solutionLanguageLabel) {
+      case 'HTML':
+        return {
+          backgroundColor: 'rgba(249, 115, 22, 0.12)',
+          color: '#f97316',
+          border: '1px solid rgba(249, 115, 22, 0.25)',
+        };
+      case 'SQL':
+        return {
+          backgroundColor: 'rgba(56, 189, 248, 0.12)',
+          color: '#38bdf8',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+        };
+      case 'GraphQL':
+        return {
+          backgroundColor: 'rgba(236, 72, 153, 0.12)',
+          color: '#ec4899',
+          border: '1px solid rgba(236, 72, 153, 0.25)',
+        };
+      case 'TypeScript':
+        return {
+          backgroundColor: 'rgba(56, 189, 248, 0.12)',
+          color: '#38bdf8',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+        };
+      case 'JavaScript':
+      default:
+        return {
+          backgroundColor: 'rgba(234, 179, 8, 0.12)',
+          color: '#eab308',
+          border: '1px solid rgba(234, 179, 8, 0.25)',
+        };
+    }
+  }, [solutionLanguageLabel]);
+
+  const solutionExtensions = useMemo(() => {
+    const langExt =
+      inputLang === 'html'
+        ? html()
+        : inputLang === 'sql'
+          ? sql()
+          : inputLang === 'graphql'
+            ? graphql()
+            : javascript({ jsx: true, typescript: solutionLanguageLabel === 'TypeScript' });
+    return [
+      langExt,
+      EditorView.lineWrapping,
+      EditorView.theme({
+        '&': {
+          fontFamily: 'var(--font-mono) !important',
+          backgroundColor: 'var(--bg-editor) !important',
+        },
+        '.cm-scroller': {
+          fontFamily: 'var(--font-mono) !important',
+          lineHeight: '1.6',
+          maxHeight: '480px',
+          overflow: 'auto',
+        },
+        '.cm-content, .cm-line, .cm-line *': {
+          fontFamily: 'var(--font-mono) !important',
+          fontSize: '13px',
+        },
+        '.cm-gutters': {
+          backgroundColor: 'rgba(12, 16, 24, 0.7) !important',
+          color: 'var(--text-muted) !important',
+          borderRight: '1px solid var(--border-subtle) !important',
+          userSelect: 'none',
+        },
+        '.cm-activeLine, .cm-activeLineGutter': {
+          backgroundColor: 'transparent !important',
+        },
+      }),
+    ];
+  }, [inputLang, solutionLanguageLabel]);
+
+  const solutionCmBasicSetup = useMemo(
+    () => ({
+      lineNumbers: true,
+      highlightActiveLineGutter: false,
+      highlightSpecialChars: true,
+      history: false,
+      foldGutter: false,
+      drawSelection: true,
+      dropCursor: false,
+      allowMultipleSelections: false,
+      indentOnInput: false,
+      bracketMatching: false,
+      closeBrackets: false,
+      autocompletion: false,
+      rectangularSelection: false,
+      crosshairCursor: false,
+      highlightActiveLine: false,
+      highlightSelectionMatches: false,
+      tabSize: 2,
+    }),
+    []
+  );
 
   const handleCopySolution = async () => {
     if (!canonicalCode) return;
@@ -960,18 +1123,17 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             {isSolutionVisible && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span
+                  data-testid="solution-language-badge"
                   style={{
                     fontSize: '11px',
                     fontWeight: 600,
                     padding: '2px 8px',
                     borderRadius: '4px',
-                    backgroundColor: isTsMode ? 'rgba(56, 189, 248, 0.12)' : 'rgba(234, 179, 8, 0.12)',
-                    color: isTsMode ? '#38bdf8' : '#eab308',
-                    border: isTsMode ? '1px solid rgba(56, 189, 248, 0.25)' : '1px solid rgba(234, 179, 8, 0.25)',
+                    ...solutionBadgeStyle,
                     letterSpacing: '0.02em',
                   }}
                 >
-                  {isTsMode ? 'TypeScript' : 'JavaScript'}
+                  {solutionLanguageLabel}
                 </span>
                 <button
                   type="button"
@@ -996,27 +1158,20 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
 
           {isSolutionVisible && (
             <div
+              className="solution-codemirror-wrapper"
               style={{
-                padding: '16px',
-                backgroundColor: 'var(--bg-editor)',
                 borderTop: '1px solid var(--border-subtle)',
+                backgroundColor: 'var(--bg-editor)',
               }}
             >
-              <pre
-                style={{
-                  margin: 0,
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '13px',
-                  lineHeight: 1.6,
-                  color: 'var(--text-primary)',
-                  overflowX: 'auto',
-                  whiteSpace: 'pre',
-                  fontVariantLigatures: 'normal',
-                  fontFeatureSettings: '"calt" 1, "liga" 1',
-                }}
-              >
-                <code>{canonicalCode}</code>
-              </pre>
+              <CodeMirror
+                value={canonicalCode}
+                theme="dark"
+                editable={false}
+                readOnly={true}
+                basicSetup={solutionCmBasicSetup}
+                extensions={solutionExtensions}
+              />
             </div>
           )}
         </div>

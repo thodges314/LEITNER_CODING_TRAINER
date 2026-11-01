@@ -8,5 +8,6 @@
     "gaps-and-islands",
     "sessionization",
     "lead-lag"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

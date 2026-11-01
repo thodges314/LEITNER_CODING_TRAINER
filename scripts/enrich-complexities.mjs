@@ -52,6 +52,9 @@ const initialSeed = {
   'use-reducer-todo-list': { targetTime: 'O(n)', targetSpace: 'O(n)', complexityExplanation: 'Reducer actions scan and copy the todo list of size n.' },
   'infinite-scroll-observer': { targetTime: 'O(1)', targetSpace: 'O(1)', complexityExplanation: 'IntersectionObserver setup and callback perform constant work.' },
   'context-provider-consumer': { targetTime: 'O(1)', targetSpace: 'O(1)', complexityExplanation: 'Constant-time React Context state access and update.' },
+  'tailwind-pricing-card': { targetTime: 'O(n)', targetSpace: 'O(n)', complexityExplanation: 'Linear template generation over n features to produce semantic HTML.' },
+  'tailwind-dismissible-banner': { targetTime: 'O(1)', targetSpace: 'O(1)', complexityExplanation: 'Constant-time component mount and dismissal toggle.' },
+  'tailwind-metric-card': { targetTime: 'O(1)', targetSpace: 'O(1)', complexityExplanation: 'Constant-time HTML string generation with fixed element structure.' },
 };
 
 cache = { ...initialSeed, ...cache };

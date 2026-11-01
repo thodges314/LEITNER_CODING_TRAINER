@@ -2,12 +2,14 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import * as ReactDOMClient from 'react-dom/client';
 import type { TopicItem } from './leitner';
+import { getCardInputLanguage } from './leitner';
 import { createMockFetch } from './mockFetch';
 import { createDomTools, MockIntersectionObserver } from './domTools';
 import type { DomTools } from './domTools';
 import { isTsOnlyCard } from './tsOnly';
 import { PGlite } from '@electric-sql/pglite';
 import { graphql as executeGraphql, buildSchema, parse as parseGraphql, validate as validateGraphql } from 'graphql';
+import * as d3 from 'd3';
 import { stripTestRunnerBlock } from './stripTestRunner';
 
 export type ExecutionMode = 'js' | 'ts';
@@ -148,6 +150,7 @@ const SANDBOX_NAMES = [
   'buildSchema',
   'parseGraphql',
   'validateGraphql',
+  'd3',
 ] as const;
 
 export interface SandboxScope {
@@ -190,6 +193,7 @@ export function createSandboxScope(options: {
         validate: validateGraphql,
       };
     }
+    if (mod === 'd3') return { default: d3, ...d3 };
     throw new Error(`Cannot find module '${mod}' in browser sandbox`);
   };
   const values: unknown[] = [
@@ -227,6 +231,7 @@ export function createSandboxScope(options: {
     buildSchema,
     parseGraphql,
     validateGraphql,
+    d3,
   ];
   return {
     names: SANDBOX_NAMES,
@@ -338,6 +343,38 @@ export function prepareGraphqlCode(code: string, testHarness?: string): string {
 }
 
 /**
+ * Normalizes user code for HTML markup and Tailwind template cards.
+ * Accepts:
+ * 1. JavaScript / TypeScript defining `html`, `template`, `solution`, or a render function.
+ * 2. Raw HTML markup text (e.g. `<div class="...">...</div>`).
+ */
+export function prepareHtmlCode(code: string, testHarness?: string): string {
+  const stripped = stripTestRunnerBlock(code, testHarness);
+
+  const hasJsDeclaration = /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:html|template|solution|render\w*)\b/.test(code);
+  if (hasJsDeclaration) {
+    return code;
+  }
+
+  const withoutLeadingComments = stripped
+    .replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, '')
+    .trim();
+
+  const startsWithJs = /^(?:const|let|var|function|class|export|import)\b/.test(withoutLeadingComments);
+  if (startsWithJs) {
+    return code;
+  }
+
+  const cleanHtml = stripped
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('//'))
+    .join('\n')
+    .trim();
+
+  return `const html = ${JSON.stringify(cleanHtml)};\nconst solution = html;\n`;
+}
+
+/**
  * Runs the user's code followed by the card's test harness without any UI,
  * counting PASS/FAIL console output. This is the source of truth for pass/fail.
  */
@@ -353,11 +390,14 @@ export async function runHarness(
   // Type-level checks (@ts-expect-error in the harness) only mean something under strict checking.
   if (isTsOnlyCard(card)) mode = 'ts';
 
+  const inputLang = getCardInputLanguage(card);
   let effectiveCode = code;
-  if (card.track === 'sql-postgres') {
+  if (inputLang === 'sql') {
     effectiveCode = prepareSqlCode(code, harness);
-  } else if (card.track === 'graphql') {
+  } else if (inputLang === 'graphql') {
     effectiveCode = prepareGraphqlCode(code, harness);
+  } else if (inputLang === 'html') {
+    effectiveCode = prepareHtmlCode(code, harness);
   }
 
   const combined = bufferContainsHarness(effectiveCode, harness) ? effectiveCode : `${effectiveCode}\n\n${harness}\n`;

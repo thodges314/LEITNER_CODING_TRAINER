@@ -6,5 +6,8 @@
     "controlled",
     "keyboard",
     "a11y"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

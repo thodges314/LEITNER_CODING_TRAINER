@@ -42,6 +42,21 @@ describe('starter snippet: the card checks are live code', () => {
     expect(snippet).not.toContain('// Test runner example:');
   });
 
+  it('for an HTML card, provides pure HTML starter markup without JS test runner block', () => {
+    const htmlCard = { ...card('binary-search-exact'), inputLanguage: 'html' as const };
+    const snippet = getStarterSnippet(htmlCard);
+    expect(snippet).toBe('<!-- Write your HTML markup below -->\n\n');
+    expect(snippet).not.toContain('// Test runner example:');
+  });
+
+  it('for a SQL or GraphQL card, provides appropriate language comment without JS runner block', () => {
+    const sqlCard = { ...card('binary-search-exact'), inputLanguage: 'sql' as const };
+    expect(getStarterSnippet(sqlCard)).toBe('-- Write your SQL query below\n\n');
+
+    const gqlCard = { ...card('binary-search-exact'), inputLanguage: 'graphql' as const };
+    expect(getStarterSnippet(gqlCard)).toBe('# Write your GraphQL query or schema below\n\n');
+  });
+
   it('is empty for no card', () => {
     expect(getStarterSnippet(null)).toBe('');
   });

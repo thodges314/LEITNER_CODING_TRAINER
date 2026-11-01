@@ -20,6 +20,12 @@ export interface ComponentPropsConfig {
 }
 
 export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
+  'vnode-to-dom': [
+    { name: 'cardTitle', type: 'string', defaultValue: 'Interactive Card', placeholder: 'Card title', description: 'Heading text for the virtual DOM card' },
+    { name: 'description', type: 'string', defaultValue: 'Nested DOM nodes constructed from a virtual node tree.', placeholder: 'Card description', description: 'Body text for the virtual DOM card' },
+    { name: 'buttonText', type: 'string', defaultValue: 'Click Me', placeholder: 'Button label', description: 'Text label inside the action button' },
+    { name: 'buttonColor', type: 'enum', defaultValue: '#0284c7', options: ['#0284c7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'], description: 'Background color applied to the button style object' },
+  ],
   'progress-bar': [
     { name: 'value', type: 'number', defaultValue: 45, min: 0, max: 100, step: 5, description: 'Current progress value (clear to trigger indeterminate)' },
     { name: 'max', type: 'number', defaultValue: 100, min: 1, max: 500, description: 'Maximum progress limit (defaults to 100)' },
@@ -647,6 +653,125 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'stopwatch': [],
   'tic-tac-toe': [
     { name: 'onGameEnd', type: 'function', description: 'Callback fired when game ends: (result: "X" | "O" | "draw") => void' },
+  ],
+  'd3-react-imperative-chart': [
+    {
+      name: 'data',
+      type: 'json',
+      defaultValue: [
+        { label: 'Mon', value: 18 },
+        { label: 'Tue', value: 42 },
+        { label: 'Wed', value: 31 },
+        { label: 'Thu', value: 65 },
+        { label: 'Fri', value: 50 },
+        { label: 'Sat', value: 24 },
+        { label: 'Sun', value: 38 },
+      ],
+      description: 'Array of BarDataPoint objects ({ label, value })',
+    },
+    {
+      name: 'width',
+      type: 'number',
+      defaultValue: 360,
+      min: 200,
+      max: 600,
+      step: 20,
+      description: 'Chart width in pixels',
+    },
+    {
+      name: 'height',
+      type: 'number',
+      defaultValue: 160,
+      min: 100,
+      max: 400,
+      step: 10,
+      description: 'Chart height in pixels',
+    },
+  ],
+  'd3-css-coordinate-layout': [
+    {
+      name: 'data',
+      type: 'json',
+      defaultValue: [
+        { id: '1', x: 10, y: 20, value: 15, label: 'A', color: 'steelblue' },
+        { id: '2', x: 80, y: 75, value: 45, label: 'B', color: 'seagreen' },
+        { id: '3', x: 45, y: 90, value: 30, label: 'C', color: 'crimson' },
+        { id: '4', x: 70, y: 30, value: 20, label: 'D', color: 'purple' },
+        { id: '5', x: 30, y: 55, value: 40, label: 'E', color: 'teal' },
+      ],
+      description: 'Array of CoordinatePoint objects ({ id, x, y, value, label, color })',
+    },
+    {
+      name: 'width',
+      type: 'number',
+      defaultValue: 400,
+      min: 250,
+      max: 600,
+      step: 25,
+      description: 'Container width in pixels',
+    },
+    {
+      name: 'height',
+      type: 'number',
+      defaultValue: 280,
+      min: 180,
+      max: 500,
+      step: 20,
+      description: 'Container height in pixels',
+    },
+    {
+      name: 'onSelectPoint',
+      type: 'function',
+      description: 'Callback fired on point click: (point: CoordinatePoint) => void',
+    },
+  ],
+  'd3-graph-theory-visualizer': [
+    {
+      name: 'nodes',
+      type: 'json',
+      defaultValue: [
+        { id: '1', label: 'Router' },
+        { id: '2', label: 'Server A' },
+        { id: '3', label: 'Server B' },
+        { id: '4', label: 'Client 1' },
+        { id: '5', label: 'Client 2' },
+      ],
+      description: 'Array of GraphNode objects ({ id, label })',
+    },
+    {
+      name: 'links',
+      type: 'json',
+      defaultValue: [
+        { source: '1', target: '2' },
+        { source: '1', target: '3' },
+        { source: '2', target: '4' },
+        { source: '3', target: '5' },
+      ],
+      description: 'Array of GraphLink objects ({ source, target })',
+    },
+    {
+      name: 'width',
+      type: 'number',
+      defaultValue: 400,
+      min: 250,
+      max: 600,
+      step: 25,
+      description: 'SVG canvas width in pixels',
+    },
+    {
+      name: 'height',
+      type: 'number',
+      defaultValue: 300,
+      min: 200,
+      max: 500,
+      step: 20,
+      description: 'SVG canvas height in pixels',
+    },
+    {
+      name: 'onSelectNode',
+      type: 'function',
+      description: 'Callback fired on node click: (node: GraphNode) => void',
+    },
   ],
 };
 

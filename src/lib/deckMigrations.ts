@@ -1,6 +1,6 @@
 import type { TrackType, PracticeFilter, LeitnerDeckState, ReviewHistoryEntry } from './leitner';
 
-export const CURRENT_DECK_VERSION = 3;
+export const CURRENT_DECK_VERSION = 4;
 
 /**
  * Tracks that were merged or consolidated. Saved Focus filters and custom cards may still name them.
@@ -200,6 +200,30 @@ export function migrateV2ToV3(state: Record<string, unknown>): Record<string, un
 }
 
 /**
+ * Migration from schema version 3 to 4:
+ * Introduces dedicated 'd3' track.
+ * Ensures any cards prefixed with 'd3-' have track = 'd3'.
+ */
+export function migrateV3ToV4(state: Record<string, unknown>): Record<string, unknown> {
+  const rawTopics = Array.isArray(state.topics) ? state.topics : [];
+  const migratedTopics = rawTopics
+    .filter((t): t is Record<string, unknown> => typeof t === 'object' && t !== null)
+    .map((t) => {
+      const topic = { ...t };
+      if (typeof topic.id === 'string' && topic.id.startsWith('d3-')) {
+        topic.track = 'd3';
+      }
+      return topic;
+    });
+
+  return {
+    ...state,
+    deckVersion: 4,
+    topics: migratedTopics,
+  };
+}
+
+/**
  * Sequential migration runner.
  * Takes arbitrary raw state from localStorage or a backup file, identifies its version,
  * and passes it through each incremental step until it matches CURRENT_DECK_VERSION.
@@ -226,6 +250,11 @@ export function migrateDeckState(rawState: unknown): LeitnerDeckState {
 
   if (version < 3) {
     state = migrateV2ToV3(state);
+    version = 3;
+  }
+
+  if (version < 4) {
+    state = migrateV3ToV4(state);
   }
 
   state.deckVersion = CURRENT_DECK_VERSION;

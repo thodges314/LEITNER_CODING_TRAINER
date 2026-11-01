@@ -1,0 +1,25 @@
+Construct a responsive dashboard KPI metric card using pure HTML markup styled with Tailwind CSS utility classes.
+
+## Description
+
+In modern component development, mastery of utility-first CSS layout primitives (flexbox, borders, typography, background translucency, and focus states) is essential for rapid frontend assembly without component library lock-in.
+
+Write raw HTML markup for a metric stat card:
+
+### html
+
+#### Card Structure & Tailwind Classes
+
+- **Card Container (`<div class="...">`)**:
+  - Max width, rounded corners, padding, background, border, and shadow: `max-w-sm rounded-2xl p-6 bg-slate-900 border border-slate-800 shadow-xl`
+- **Header Row (`<div class="...">`)**:
+  - Flex layout aligning items across space: `flex items-center justify-between`
+  - Metric title: `<span class="text-sm font-medium text-slate-400">Total Revenue</span>`
+  - Trend badge: `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">+12.5%</span>`
+- **Metric Value (`<div class="...">`)**:
+  - Large stat display: `<div class="mt-4 text-3xl font-extrabold text-white tracking-tight">$48,250</div>`
+- **Comparison Subtext (`<p class="...">`)**:
+  - Caption: `<p class="mt-1 text-xs text-slate-500">vs. $42,890 last month</p>`
+- **Action Button (`<button class="...">`)**:
+  - Type attribute: `type="button"`
+  - Full width button with hover and focus states: `<button type="button" class="mt-5 w-full py-2.5 px-4 rounded-xl text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500">View Detailed Report</button>`

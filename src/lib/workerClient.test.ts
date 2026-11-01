@@ -25,9 +25,11 @@ function makeCard(track: TrackType, id = 'test-card'): TopicItem {
 
 describe('workerClient', () => {
   describe('isBrowserDomOrReactCard', () => {
-    it('returns true for react, react-components, and dom-browser cards', () => {
+    it('returns true for react, react-components, d3, tailwind, and dom-browser cards', () => {
       expect(isBrowserDomOrReactCard(makeCard('react'))).toBe(true);
       expect(isBrowserDomOrReactCard(makeCard('react-components'))).toBe(true);
+      expect(isBrowserDomOrReactCard(makeCard('d3'))).toBe(true);
+      expect(isBrowserDomOrReactCard(makeCard('tailwind'))).toBe(true);
       expect(isBrowserDomOrReactCard(makeCard('dom-browser'))).toBe(true);
     });
 

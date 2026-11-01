@@ -7,5 +7,6 @@
     "input-objects",
     "payload",
     "errors"
-  ]
+  ],
+  "inputLanguage": "graphql"
 }

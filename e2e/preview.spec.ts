@@ -468,6 +468,150 @@ test.describe('React preview window', () => {
     await input.pressSequentially('hello search');
     await expect(input).toHaveValue('hello search');
   });
+
+  test('d3-graph-theory-visualizer: displays "Live Preview Window", loads D3 without React, and renders interactive SVG graph', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'd3-graph-theory-visualizer');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'd3-graph-theory-visualizer', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    // Verify title is "Live Preview Window"
+    await expect(previewWindow.locator('.react-preview-title')).toContainText('Live Preview Window');
+
+    // Verify non-React panel title says "Parameters" instead of "Props"
+    const panelTitle = previewWindow.locator('.props-panel-title');
+    await expect(panelTitle).toHaveText('Parameters');
+
+    // Click 'Run Code / Test' button to trigger run & live preview
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    // Preview should transition to Live
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    // Frame locator to inspect inside the sandboxed iframe
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const svg = frame.locator('svg').first();
+    await expect(svg).toBeVisible({ timeout: 5000 });
+
+    // Verify circles (nodes) are rendered in SVG
+    const circles = svg.locator('circle');
+    await expect(circles).toHaveCount(5);
+
+    // Verify React is not in the preview window sandbox
+    const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
+    expect(hasReact).toBe(false);
+  });
+
+  test('tailwind-pricing-card: displays "Live Preview Window", loads Tailwind without React, and renders pricing card', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-pricing-card');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-pricing-card', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const article = frame.locator('article').first();
+    await expect(article).toBeVisible({ timeout: 5000 });
+    await expect(article).toContainText('Pro Cloud');
+    await expect(article).toContainText('$29');
+
+    // Verify Tailwind CDN script is present in iframe head
+    const hasTailwindCdn = await frame.locator('head').evaluate((head) => {
+      return Array.from(head.querySelectorAll('script')).some((s) => s.src.includes('tailwindcss.com'));
+    });
+    expect(hasTailwindCdn).toBe(true);
+
+    // Verify React is NOT loaded in vanilla Tailwind preview
+    const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
+    expect(hasReact).toBe(false);
+  });
+
+  test('tailwind-dismissible-banner: loads React and Tailwind, renders alert banner, and dismisses on click', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-dismissible-banner');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-dismissible-banner', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const alert = frame.locator('[role="alert"]').first();
+    await expect(alert).toBeVisible({ timeout: 5000 });
+    await expect(alert).toContainText('Build Succeeded');
+
+    // Both React and Tailwind should be loaded
+    const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
+    expect(hasReact).toBe(true);
+
+    const hasTailwindCdn = await frame.locator('head').evaluate((head) => {
+      return Array.from(head.querySelectorAll('script')).some((s) => s.src.includes('tailwindcss.com'));
+    });
+    expect(hasTailwindCdn).toBe(true);
+
+    // Dismiss the banner
+    const dismissBtn = alert.locator('button[aria-label="Dismiss"]');
+    await dismissBtn.click();
+    await expect(alert).toHaveCount(0);
+  });
+
+  test('tailwind-metric-card: renders raw HTML with Tailwind, shows "Parameters" panel, and logs click', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-metric-card');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-metric-card', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    // Verify non-React panel title says "Parameters" instead of "Props"
+    const panelTitle = previewWindow.locator('.props-panel-title');
+    await expect(panelTitle).toHaveText('Parameters');
+
+    // Verify input language badge says HTML and no JS/TS switch is shown
+    await expect(page.locator('[data-testid="input-language-badge"]')).toHaveText('HTML');
+    await expect(page.locator('.arena-mode-toggle-group')).toHaveCount(0);
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+    await expect(page.locator('.console-status-pill.console-status-success')).toContainText('Passed');
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const cardEl = frame.locator('.max-w-sm');
+    await expect(cardEl).toBeVisible({ timeout: 5000 });
+    await expect(cardEl).toContainText('Total Revenue');
+    await expect(cardEl).toContainText('$48,250');
+
+    // Click the button and check event log
+    const btn = cardEl.locator('button');
+    await btn.click();
+    const logItem = previewWindow.locator('.react-preview-log-entry').first();
+    await expect(logItem).toContainText('click');
+  });
 });
+
+
 
 

@@ -14,6 +14,8 @@ export function isBrowserDomOrReactCard(card: TopicItem): boolean {
   return (
     card.track === 'react' ||
     card.track === 'react-components' ||
+    card.track === 'd3' ||
+    card.track === 'tailwind' ||
     card.track === 'dom-browser'
   );
 }

@@ -8,5 +8,8 @@
     "list",
     "a11y",
     "keyboard"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

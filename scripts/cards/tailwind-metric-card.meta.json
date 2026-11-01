@@ -1,0 +1,9 @@
+{
+  "id": "tailwind-metric-card",
+  "title": "Tailwind Stat Metric Card",
+  "track": "tailwind",
+  "tags": ["tailwind", "html", "css", "layout"],
+  "inputLanguage": "html",
+  "previewLibraries": ["tailwind"],
+  "rendersComponent": false
+}

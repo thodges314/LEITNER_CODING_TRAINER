@@ -8,6 +8,7 @@ export interface PropsControlPanelProps {
   values: Record<string, unknown>;
   onChange: (name: string, value: unknown) => void;
   onReset: () => void;
+  term?: 'props' | 'parameters';
 }
 
 const JsonInput: React.FC<{
@@ -70,7 +71,18 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
   values,
   onChange,
   onReset,
+  term = 'props',
 }) => {
+  const title = term === 'parameters' ? 'Parameters' : 'Props';
+  const singular = term === 'parameters' ? 'parameter' : 'prop';
+  const plural = term === 'parameters' ? 'parameters' : 'props';
+  const emptyHint = term === 'parameters'
+    ? 'No configurable parameters defined for this preview.'
+    : 'No configurable props defined for this component.';
+  const resetTitle = term === 'parameters'
+    ? 'Reset parameters to suggested defaults'
+    : 'Reset props to suggested defaults';
+
   const groupedProps = React.useMemo(() => {
     const map = new Map<string, PropDefinition[]>();
     for (const prop of propDefs) {
@@ -217,10 +229,10 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
       <div className="props-panel-header">
         <div className="props-panel-header-left">
           <SlidersHorizontal size={14} color="#06b6d4" />
-          <span className="props-panel-title">Props</span>
+          <span className="props-panel-title">{title}</span>
           {propDefs.length > 0 && (
             <span className="props-panel-count-badge" data-testid="props-count-badge">
-              {propDefs.length} {propDefs.length === 1 ? 'prop' : 'props'}
+              {propDefs.length} {propDefs.length === 1 ? singular : plural}
             </span>
           )}
         </div>
@@ -231,7 +243,7 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
             className="props-panel-reset-btn"
             data-testid="props-reset-btn"
             onClick={onReset}
-            title="Reset props to suggested defaults"
+            title={resetTitle}
           >
             <RotateCcw size={11} /> Reset Defaults
           </button>
@@ -240,7 +252,7 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
 
       {propDefs.length === 0 ? (
         <div className="props-empty-hint" data-testid="props-empty-hint">
-          No configurable props defined for this component.
+          {emptyHint}
         </div>
       ) : hasGroups ? (
         <div className="props-groups-wrapper" data-testid="props-slots-grid">
@@ -253,7 +265,7 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
               <div className="props-group-header">
                 <span className="props-group-title">{groupName}</span>
                 <span className="props-group-count">
-                  {groupProps.length} {groupProps.length === 1 ? 'prop' : 'props'}
+                  {groupProps.length} {groupProps.length === 1 ? singular : plural}
                 </span>
               </div>
               <div className="props-slots-grid">

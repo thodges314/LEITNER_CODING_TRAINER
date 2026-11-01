@@ -7,5 +7,6 @@
     "group-by",
     "having",
     "join"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

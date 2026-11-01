@@ -4632,5 +4632,95 @@
       "capital-one"
     ],
     "summary": "Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and ri..."
+  },
+  {
+    "id": "d3-react-imperative-chart",
+    "title": "D3 in React: Imperative Handle Chart Bridge",
+    "track": "d3",
+    "concept": "d3-react",
+    "difficulty": 3,
+    "tags": [
+      "react",
+      "d3",
+      "useimperativehandle",
+      "forwardref",
+      "svg",
+      "charts"
+    ],
+    "summary": "Integrate D3 with React by building an imperative chart bridge that encapsulates direct SVG/D3 DOM manipulation within a child component while expo..."
+  },
+  {
+    "id": "d3-css-coordinate-layout",
+    "title": "D3 Coordinate Layout for HTML/CSS",
+    "track": "d3",
+    "concept": "d3-layout",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "layout",
+      "scales",
+      "css",
+      "dom",
+      "coordinates"
+    ],
+    "summary": "Use D3 scales to compute absolute 2D coordinate positions and dimensions for rendering standard HTML <div> elements outside SVG or canvas."
+  },
+  {
+    "id": "d3-graph-theory-visualizer",
+    "title": "D3 Graph Theory Force Simulation",
+    "track": "d3",
+    "concept": "d3-force-graph",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "force-simulation",
+      "graphs",
+      "svg",
+      "network"
+    ],
+    "summary": "Build an interactive graph theory network visualizer that simulates a force-directed graph using D3's physics simulation inside an SVG canvas."
+  },
+  {
+    "id": "tailwind-dismissible-banner",
+    "title": "Tailwind Dismissible Alert Banner",
+    "track": "tailwind",
+    "concept": "tailwind-banner",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "tailwind",
+      "notification",
+      "accessibility"
+    ],
+    "summary": "Implement an interactive React component (DismissibleBanner) styled with Tailwind CSS utility classes"
+  },
+  {
+    "id": "tailwind-pricing-card",
+    "title": "Tailwind Responsive Pricing Card",
+    "track": "tailwind",
+    "concept": "tailwind-card",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "html",
+      "responsive",
+      "css",
+      "card"
+    ],
+    "summary": "Implement a function that renders a responsive pricing card HTML string styled with Tailwind CSS utility classes"
+  },
+  {
+    "id": "tailwind-metric-card",
+    "title": "Tailwind Stat Metric Card",
+    "track": "tailwind",
+    "concept": "tailwind-stat",
+    "difficulty": 1,
+    "tags": [
+      "tailwind",
+      "html",
+      "css",
+      "layout"
+    ],
+    "summary": "Construct a responsive dashboard KPI metric card using pure HTML markup styled with Tailwind CSS utility classes."
   }
 ]

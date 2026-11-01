@@ -6,5 +6,8 @@
     "useMemo",
     "derived-state",
     "re-renders"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

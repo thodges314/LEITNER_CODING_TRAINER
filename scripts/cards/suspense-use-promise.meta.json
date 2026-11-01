@@ -6,5 +6,8 @@
     "suspense",
     "use",
     "data-fetching"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

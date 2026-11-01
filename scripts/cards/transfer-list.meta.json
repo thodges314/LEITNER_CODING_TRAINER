@@ -6,5 +6,8 @@
     "state",
     "transfer-list",
     "ui-patterns"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

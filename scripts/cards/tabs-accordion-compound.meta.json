@@ -1,4 +1,7 @@
 {
   "title": "Compound Components (Tabs)",
-  "track": "react-components"
+  "track": "react-components",
+  "previewLibraries": [
+    "react"
+  ]
 }

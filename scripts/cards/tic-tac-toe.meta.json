@@ -6,5 +6,8 @@
     "state",
     "game",
     "derived-state"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

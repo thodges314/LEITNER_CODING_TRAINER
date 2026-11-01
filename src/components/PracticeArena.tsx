@@ -3,6 +3,8 @@ import CodeMirror from '@uiw/react-codemirror';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { sql } from '@codemirror/lang-sql';
+import { html } from '@codemirror/lang-html';
+import { graphql } from 'cm6-graphql';
 import rainbowBrackets from 'rainbowbrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
@@ -13,13 +15,14 @@ import ReactDOM from 'react-dom/client';
 import {
   getTrackMeta,
   isReactComponentCard,
+  getCardInputLanguage,
 } from '../lib/leitner';
 import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { evaluateCodeSubmission } from '../lib/ai';
 import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
 import { CheckCircle } from 'lucide-react';
-import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, bufferContainsHarness, classifyLogLine } from '../lib/runner';
+import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, prepareHtmlCode, bufferContainsHarness, classifyLogLine } from '../lib/runner';
 import {
   runInWorker,
   supportsWebWorker,
@@ -302,7 +305,9 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     if (!code.trim() || isFormatting) return;
     setIsFormatting(true);
     try {
-      const res = await formatCode(code, executionMode === 'ts');
+      const inputLang = getCardInputLanguage(currentCard);
+      const modeOrLang = inputLang === 'javascript' ? executionMode === 'ts' : inputLang;
+      const res = await formatCode(code, modeOrLang);
       if (res.success && res.code !== code) {
         setCode(res.code);
         setFormatToast({ message: 'Formatted with Prettier', type: 'success' });
@@ -347,8 +352,15 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   );
 
   const extensions = useMemo(() => {
-    const isSql = currentCard?.track === 'sql-postgres';
-    const langExt = isSql ? sql() : javascript({ jsx: true, typescript: executionMode === 'ts' });
+    const inputLang = getCardInputLanguage(currentCard);
+    const langExt =
+      inputLang === 'html'
+        ? html()
+        : inputLang === 'sql'
+          ? sql()
+          : inputLang === 'graphql'
+            ? graphql()
+            : javascript({ jsx: true, typescript: executionMode === 'ts' });
     const list = [
       langExt,
       rainbowBrackets(),
@@ -367,11 +379,11 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         },
       }),
     ];
-    if (executionMode === 'ts' && !isSql) {
+    if (executionMode === 'ts' && inputLang !== 'sql' && inputLang !== 'html') {
       list.push(createTsHoverExtension());
     }
     return list;
-  }, [executionMode, currentCard?.track]);
+  }, [executionMode, currentCard]);
 
   const actionsRef = useRef<{
     handleRunCode: () => Promise<void>;
@@ -466,15 +478,18 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       }),
     };
 
-    const isDocTrack = currentCard?.track === 'sql-postgres' || currentCard?.track === 'graphql';
+    const inputLang = getCardInputLanguage(currentCard);
+    const isWrappedInput = inputLang === 'sql' || inputLang === 'graphql' || inputLang === 'html';
     const rawCodeToRun =
-      currentCard?.track === 'sql-postgres'
-        ? prepareSqlCode(code, currentCard.testHarness)
-        : currentCard?.track === 'graphql'
-          ? prepareGraphqlCode(code, currentCard.testHarness)
-          : code;
+      inputLang === 'sql'
+        ? prepareSqlCode(code, currentCard?.testHarness)
+        : inputLang === 'graphql'
+          ? prepareGraphqlCode(code, currentCard?.testHarness)
+          : inputLang === 'html'
+            ? prepareHtmlCode(code, currentCard?.testHarness)
+            : code;
     const executableSource =
-      isDocTrack &&
+      isWrappedInput &&
       currentCard?.testHarness &&
       !bufferContainsHarness(rawCodeToRun, currentCard.testHarness)
         ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`
@@ -876,9 +891,15 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             onChange={(val) => setCode(val)}
             editable={!evalResult}
             readOnly={Boolean(evalResult)}
-            placeholder="// Type your solution from scratch without autocomplete or hints...
-// Press [Tab] for 2-space indentation.
-// Bracket pair colorization and autoclosing brackets/quotes are enabled."
+            placeholder={
+              getCardInputLanguage(currentCard) === 'html'
+                ? '<!-- Write your HTML markup here...\n     Press [Tab] for 2-space indentation.\n     Autoclosing tags and quotes are enabled. -->'
+                : getCardInputLanguage(currentCard) === 'sql'
+                  ? '-- Write your SQL query here...\n-- Press [Tab] for 2-space indentation.'
+                  : getCardInputLanguage(currentCard) === 'graphql'
+                    ? '# Write your GraphQL query or schema here...\n# Press [Tab] for 2-space indentation.'
+                    : '// Type your solution from scratch without autocomplete or hints...\n// Press [Tab] for 2-space indentation.\n// Bracket pair colorization and autoclosing brackets/quotes are enabled.'
+            }
             autoFocus
           />
         </div>
@@ -888,6 +909,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           <EditorActionControls
             evalResult={evalResult}
             executionMode={executionMode}
+            inputLanguage={getCardInputLanguage(currentCard)}
             isTsTrack={isTsTrack}
             tsOnlyNotice={tsOnlyNotice}
             onSwitchExecutionMode={handleSwitchExecutionMode}

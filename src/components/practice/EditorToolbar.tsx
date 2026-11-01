@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { shortcutAttrs } from '../../lib/shortcuts';
 import type { EvaluationResult } from '../../lib/ai';
+import type { CardInputLanguage } from '../../lib/leitner';
 
 export interface EditorToolbarProps {
   evalResult: EvaluationResult | null;
@@ -82,6 +83,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 export interface EditorActionControlsProps {
   evalResult: EvaluationResult | null;
   executionMode: 'js' | 'ts';
+  inputLanguage?: CardInputLanguage;
   isTsTrack: boolean;
   tsOnlyNotice: boolean;
   onSwitchExecutionMode: (mode: 'js' | 'ts') => void;
@@ -98,6 +100,7 @@ export interface EditorActionControlsProps {
 export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
   evalResult,
   executionMode,
+  inputLanguage,
   isTsTrack,
   tsOnlyNotice,
   onSwitchExecutionMode,
@@ -110,56 +113,72 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
   code,
   isReinforcement,
 }) => {
+  const isHtml = inputLanguage === 'html';
+  const isSql = inputLanguage === 'sql';
+  const isGraphql = inputLanguage === 'graphql';
+  const isTsOnly = inputLanguage === 'typescript' || isTsTrack;
+  const isSingleLang = isHtml || isSql || isGraphql;
   return (
     <>
-      {/* Mode Selector Bar: JS (Fast) vs TS (Strict Type Check) */}
+      {/* Mode Selector Bar: JS (Fast) vs TS (Strict Type Check) or single input language */}
       <div
         className={`arena-mode-selector-bar ${evalResult ? 'arena-mode-selector-disabled' : ''}`}
       >
-        <div className="arena-mode-selector-inner">
-          <span className="arena-mode-selector-label">
-            Mode:
-          </span>
-          <div className="arena-mode-toggle-group">
-            <button
-              type="button"
-              aria-disabled={isTsTrack}
-              onClick={() => onSwitchExecutionMode('js')}
-              className={`arena-mode-btn ${executionMode === 'js' ? 'arena-mode-btn-active' : ''} ${
-                isTsTrack ? 'arena-mode-btn-disabled' : ''
-              }`}
-              title={
-                isTsTrack
-                  ? 'TypeScript Patterns track cards require TS mode'
-                  : 'Fast transpilation (Sucrase) without strict compile-time type-checking'
-              }
-            >
-              JS (Fast)
-            </button>
-            <button
-              type="button"
-              onClick={() => onSwitchExecutionMode('ts')}
-              className={`arena-mode-btn ${executionMode === 'ts' ? 'arena-mode-btn-active' : ''}`}
-              title={
-                isTsTrack
-                  ? 'TypeScript mode is required for TypeScript Patterns cards'
-                  : 'Full TypeScript compiler type-checking (strict checks, interfaces, generics)'
-              }
-            >
-              {isTsTrack ? 'TS (Strict • Required)' : 'TS (Strict Type Check)'}
-            </button>
-          </div>
-
-          {tsOnlyNotice && (
-            <span
-              role="status"
-              data-testid="ts-only-notice"
-              className="arena-ts-notice-toast"
-            >
-              <AlertTriangle size={11} /> This is a TypeScript topic, so it only runs in TypeScript mode.
+        {isSingleLang ? (
+          <div className="arena-mode-selector-inner">
+            <span className="arena-mode-selector-label">
+              Input:
             </span>
-          )}
-        </div>
+            <span className="arena-mode-badge" data-testid="input-language-badge">
+              {isHtml ? 'HTML' : isSql ? 'SQL' : 'GraphQL'}
+            </span>
+          </div>
+        ) : (
+          <div className="arena-mode-selector-inner">
+            <span className="arena-mode-selector-label">
+              Mode:
+            </span>
+            <div className="arena-mode-toggle-group">
+              <button
+                type="button"
+                aria-disabled={isTsOnly}
+                onClick={() => onSwitchExecutionMode('js')}
+                className={`arena-mode-btn ${executionMode === 'js' ? 'arena-mode-btn-active' : ''} ${
+                  isTsOnly ? 'arena-mode-btn-disabled' : ''
+                }`}
+                title={
+                  isTsOnly
+                    ? 'TypeScript cards require TS mode'
+                    : 'Fast transpilation (Sucrase) without strict compile-time type-checking'
+                }
+              >
+                JS (Fast)
+              </button>
+              <button
+                type="button"
+                onClick={() => onSwitchExecutionMode('ts')}
+                className={`arena-mode-btn ${executionMode === 'ts' ? 'arena-mode-btn-active' : ''}`}
+                title={
+                  isTsOnly
+                    ? 'TypeScript mode is required for TypeScript cards'
+                    : 'Full TypeScript compiler type-checking (strict checks, interfaces, generics)'
+                }
+              >
+                TS (Strict Type Check)
+              </button>
+            </div>
+
+            {tsOnlyNotice && (
+              <span
+                role="status"
+                data-testid="ts-only-notice"
+                className="arena-ts-notice-toast"
+              >
+                <AlertTriangle size={11} /> This is a TypeScript topic, so it only runs in TypeScript mode.
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Primary Action Buttons: Skip, Remove From Deck, Run Code, Submit */}

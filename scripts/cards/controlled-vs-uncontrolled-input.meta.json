@@ -1,3 +1,6 @@
 {
-  "title": "Controlled Search Form"
+  "title": "Controlled Search Form",
+  "previewLibraries": [
+    "react"
+  ]
 }

@@ -6,5 +6,8 @@
     "forms",
     "state",
     "validation"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

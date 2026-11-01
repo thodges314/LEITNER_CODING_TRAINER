@@ -6,5 +6,8 @@
     "aria",
     "forms",
     "labels"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

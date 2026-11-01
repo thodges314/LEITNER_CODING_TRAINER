@@ -32,14 +32,12 @@ for (const f of metaFiles) {
     for (const k of ['track', 'title', 'tags']) if (!meta[k]) throw new Error(`${f}: missing "${k}"`);
     topics.push({
       id,
-      track: meta.track,
-      title: meta.title,
       box: 1,
       streak: 0,
       nextEligibleTrial: 0,
       status: 'locked',
-      tags: meta.tags,
       promptSeed: '',
+      ...meta,
     });
   }
 }
@@ -88,7 +86,11 @@ for (const t of topics) {
   const prompt = read(t.id, 'prompt.txt');
   if (prompt) t.promptSeed = prompt;
 
-  const ref = read(t.id, 'ref.js');
+  const refHtml = read(t.id, 'ref.html');
+  const refSql = read(t.id, 'ref.sql');
+  const refGql = read(t.id, 'ref.graphql') || read(t.id, 'ref.gql');
+  const refJs = read(t.id, 'ref.js');
+  const ref = refHtml ?? refSql ?? refGql ?? refJs;
   if (ref) {
     // One copy only: the app reads referenceSolution (readers fall back to solution/starterCode for old saved decks).
     t.referenceSolution = ref;
@@ -96,6 +98,9 @@ for (const t of topics) {
   const refTs = read(t.id, 'ref.ts');
   if (refTs) {
     t.referenceSolutionTs = refTs;
+  } else if (refHtml || refSql || refGql) {
+    // For non-JS languages (HTML, SQL, GraphQL), populate referenceSolutionTs with canonical text
+    t.referenceSolutionTs = ref;
   }
   // Legacy duplicates: older data stored the same text three times. Keep a field only if it differs from referenceSolution.
   if (t.referenceSolution) {
@@ -117,6 +122,7 @@ for (const t of topics) {
     t.previewCode = preview;
   } else {
     delete t.previewCode;
+    delete t.previewLibraries;
   }
 
   // Card authors declare component rendering either via "rendersComponent: true"

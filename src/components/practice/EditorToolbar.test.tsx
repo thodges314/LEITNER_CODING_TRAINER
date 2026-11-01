@@ -149,5 +149,62 @@ describe('EditorToolbar and EditorActionControls', () => {
       });
       expect(handleSkip).toHaveBeenCalledTimes(1);
     });
+
+    it('renders single language badge for HTML cards without JS/TS toggle', async () => {
+      await act(async () => {
+        root?.render(
+          <EditorActionControls
+            evalResult={null}
+            executionMode="js"
+            inputLanguage="html"
+            isTsTrack={false}
+            tsOnlyNotice={false}
+            onSwitchExecutionMode={vi.fn()}
+            onSkip={vi.fn()}
+            onRunCode={vi.fn()}
+            onSubmit={vi.fn()}
+            isEvaluating={false}
+            isRunning={false}
+            code="<div>Hello</div>"
+            isReinforcement={false}
+          />
+        );
+      });
+
+      const badge = container?.querySelector('[data-testid="input-language-badge"]');
+      expect(badge?.textContent).toBe('HTML');
+      expect(container?.textContent).toContain('Input:');
+      expect(container?.textContent).not.toContain('Mode:');
+      expect(container?.textContent).not.toContain('JS (Fast)');
+    });
+
+    it('renders locked TS mode button for TypeScript cards', async () => {
+      await act(async () => {
+        root?.render(
+          <EditorActionControls
+            evalResult={null}
+            executionMode="ts"
+            inputLanguage="typescript"
+            isTsTrack={false}
+            tsOnlyNotice={false}
+            onSwitchExecutionMode={vi.fn()}
+            onSkip={vi.fn()}
+            onRunCode={vi.fn()}
+            onSubmit={vi.fn()}
+            isEvaluating={false}
+            isRunning={false}
+            code="type T = number;"
+            isReinforcement={false}
+          />
+        );
+      });
+
+      expect(container?.textContent).toContain('Mode:');
+      expect(container?.textContent).toContain('TS (Strict Type Check)');
+      const jsBtn = Array.from(container?.querySelectorAll('button') ?? []).find((b) =>
+        b.textContent?.includes('JS (Fast)')
+      );
+      expect(jsBtn?.getAttribute('disabled')).toBeDefined();
+    });
   });
 });

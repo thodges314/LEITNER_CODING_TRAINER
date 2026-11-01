@@ -6,5 +6,6 @@
     "postgres",
     "window-functions",
     "running-total"
-  ]
+  ],
+  "inputLanguage": "sql"
 }

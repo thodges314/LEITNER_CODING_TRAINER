@@ -34,6 +34,8 @@ export type TrackType =
   | 'dom-browser'
   | 'react'
   | 'react-components'
+  | 'd3'
+  | 'tailwind'
   | 'typescript-patterns'
   | 'testing-tooling'
   | 'graphql'
@@ -79,8 +81,26 @@ export interface TopicItem {
   targetSpace?: string;
   complexityExplanation?: string;
   previewCode?: string;
+  /** Explicit libraries to load in the preview window (e.g. ['react'], ['d3'], ['tailwind']) */
+  previewLibraries?: string[];
   /** Annotated by build-cards.mjs for cards that author and render a React component UI */
   rendersComponent?: boolean;
+  /** Explicit language/format expected for user input (e.g. 'html', 'javascript', 'typescript', 'sql', 'graphql') */
+  inputLanguage?: CardInputLanguage;
+}
+
+export type CardInputLanguage = 'javascript' | 'typescript' | 'html' | 'sql' | 'graphql';
+
+export function getCardInputLanguage(
+  card: Pick<TopicItem, 'inputLanguage'> | null | undefined
+): CardInputLanguage {
+  return card?.inputLanguage ?? 'javascript';
+}
+
+export function isHtmlCard(
+  card: Pick<TopicItem, 'inputLanguage' | 'track'> | null | undefined
+): boolean {
+  return getCardInputLanguage(card) === 'html';
 }
 
 /**
@@ -226,6 +246,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     bg: 'rgba(34, 211, 238, 0.12)',
     border: 'rgba(34, 211, 238, 0.35)',
   },
+  'd3': {
+    label: 'D3',
+    color: '#f97316',
+    bg: 'rgba(249, 115, 22, 0.12)',
+    border: 'rgba(249, 115, 22, 0.35)',
+  },
   'testing-tooling': {
     label: 'Testing & Libraries',
     color: '#f43f5e',
@@ -267,6 +293,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#38bdf8',
     bg: 'rgba(56, 189, 248, 0.12)',
     border: 'rgba(56, 189, 248, 0.35)',
+  },
+  'tailwind': {
+    label: 'Tailwind CSS',
+    color: '#06b6d4',
+    bg: 'rgba(6, 182, 212, 0.12)',
+    border: 'rgba(6, 182, 212, 0.35)',
   },
 };
 
@@ -501,6 +533,9 @@ export const SEED_CONTENT_FIELDS = [
   'targetSpace',
   'complexityExplanation',
   'previewCode',
+  'previewLibraries',
+  'rendersComponent',
+  'inputLanguage',
 ] as const;
 
 /**
@@ -554,6 +589,8 @@ export function mergeStoredWithSeed(
     if (seed.solution === undefined) delete merged.solution;
     if (seed.starterCode === undefined) delete merged.starterCode;
     if (seed.pack === undefined || merged.pack === 'algorithms-advanced') delete merged.pack;
+    if (seed.previewLibraries === undefined) delete merged.previewLibraries;
+    if (seed.rendersComponent === undefined) delete merged.rendersComponent;
     merged.track = (seed.track ?? migrateTrackId(merged.track)) as TrackType;
 
     // Strictly preserve user review progress fields

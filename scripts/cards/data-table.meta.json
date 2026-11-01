@@ -6,5 +6,8 @@
     "table",
     "sorting",
     "pagination"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

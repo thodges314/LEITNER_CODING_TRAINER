@@ -9,5 +9,8 @@
     "aria",
     "keyboard",
     "expert"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

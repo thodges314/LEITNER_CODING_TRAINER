@@ -6,5 +6,6 @@
     "query",
     "aliases",
     "fragments"
-  ]
+  ],
+  "inputLanguage": "graphql"
 }

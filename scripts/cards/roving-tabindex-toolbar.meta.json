@@ -6,5 +6,8 @@
     "a11y",
     "keyboard",
     "focus-management"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

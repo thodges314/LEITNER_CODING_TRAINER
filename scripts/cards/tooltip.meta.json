@@ -6,5 +6,8 @@
     "a11y",
     "overlay",
     "cloneElement"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bufferContainsHarness, classifyLogLine, prepareSqlCode, runHarness } from './runner';
+import { bufferContainsHarness, classifyLogLine, prepareSqlCode, prepareHtmlCode, runHarness } from './runner';
 import type { TopicItem } from './leitner';
 
 const base: TopicItem = {
@@ -195,6 +195,7 @@ describe('SQL runner with PGlite', () => {
   const sqlCard: TopicItem = {
     id: 'sql-test',
     track: 'sql-postgres',
+    inputLanguage: 'sql',
     title: 'SQL Test',
     box: 1,
     streak: 0,
@@ -227,6 +228,25 @@ describe('SQL runner with PGlite', () => {
     expect(r.passed).toBe(true);
     expect(r.passCount).toBe(1);
     expect(r.failCount).toBe(0);
+  });
+});
+
+describe('prepareHtmlCode', () => {
+  it('preserves code when user declares html or solution variable', () => {
+    const js = 'const html = `<div class="card">Hello</div>`;';
+    expect(prepareHtmlCode(js)).toBe(js);
+  });
+
+  it('normalizes raw HTML markup into string assignment', () => {
+    const raw = `<div class="p-4 bg-slate-900 text-white rounded-lg">\n  <span>Metric</span>\n</div>`;
+    const res = prepareHtmlCode(raw);
+    expect(res).toBe(`const html = ${JSON.stringify(raw)};\nconst solution = html;\n`);
+  });
+
+  it('strips leading JS comments before raw HTML markup', () => {
+    const raw = `// Write your implementation below\n\n<div class="alert">Alert</div>`;
+    const res = prepareHtmlCode(raw);
+    expect(res).toBe(`const html = "<div class=\\"alert\\">Alert</div>";\nconst solution = html;\n`);
   });
 });
 

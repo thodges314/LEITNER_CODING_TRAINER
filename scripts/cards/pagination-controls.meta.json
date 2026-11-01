@@ -5,5 +5,8 @@
     "component",
     "pagination",
     "a11y"
+  ],
+  "previewLibraries": [
+    "react"
   ]
 }
