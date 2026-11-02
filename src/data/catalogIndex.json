@@ -4790,5 +4790,37 @@
       "axes"
     ],
     "summary": "interface ScatterDatum {"
+  },
+  {
+    "id": "d3-quadtree-spatial-index",
+    "title": "D3 Quadtree Spatial Index",
+    "track": "d3",
+    "concept": "d3-quadtree-spatial",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "quadtree",
+      "spatial-index",
+      "nearest-neighbor",
+      "geometry",
+      "algorithms"
+    ],
+    "summary": "Construct a 2D spatial quadtree index for rapid nearest-neighbor retrieval and circular region range queries using D3's quadtree engine"
+  },
+  {
+    "id": "d3-stratify-nested-hierarchy",
+    "title": "D3 Stratify Nested Hierarchy",
+    "track": "d3",
+    "concept": "d3-hierarchy-stratify",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "hierarchy",
+      "stratify",
+      "tree",
+      "data-structures",
+      "algorithms"
+    ],
+    "summary": "Construct a validated hierarchical tree model from flat relational data with parent references using D3's hierarchy stratification engine"
   }
 ]

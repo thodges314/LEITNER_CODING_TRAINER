@@ -1,0 +1,54 @@
+Construct a validated hierarchical tree model from flat relational data with parent references using D3's hierarchy stratification engine:
+
+## Description
+```ts
+interface HierarchyRecord {
+  id: string;
+  parentId: string | null;
+  value?: number;
+  [key: string]: any;
+}
+
+interface HierarchyNodeMetric {
+  id: string;
+  parentId: string | null;
+  depth: number;
+  height: number;
+  value: number;
+}
+
+interface StratifyOptions {
+  /** Custom numeric value accessor, defaults to d => Number(d.value) || 0 */
+  valueAccessor?: (d: HierarchyRecord) => number;
+}
+
+interface StratifyResult {
+  root: any;
+  rootId: string;
+  totalValue: number;
+  maxDepth: number;
+  leaves: HierarchyNodeMetric[];
+  ancestorsOf: (id: string) => string[];
+  descendantsOf: (id: string) => string[];
+  getNode: (id: string) => HierarchyNodeMetric | null;
+}
+```
+
+### `stratifyHierarchy(data: HierarchyRecord[], options?: StratifyOptions): StratifyResult`
+
+- Accepts a flat array of `HierarchyRecord` items where each record has a unique `id` and a `parentId` (root has `parentId: null` or `parentId: ""`).
+- Validates the dataset:
+  - Throws an `Error` if `data` is empty or not an array.
+  - Builds the hierarchy tree using `d3.stratify().id(d => d.id).parentId(d => d.parentId)(data)`.
+- Aggregates quantitative values:
+  - Calls `root.sum(options?.valueAccessor || (d => Number(d.value) || 0))`.
+  - Calculates the cumulative subtree value for every branch and leaf.
+- Computes and returns a `StratifyResult` object containing:
+  - `root`: The native `d3.hierarchy` root node.
+  - `rootId`: The string identifier of the root node.
+  - `totalValue`: The total cumulative value aggregated at the root (`root.value`).
+  - `maxDepth`: The maximum depth of the tree (`root.height`).
+  - `leaves`: Array of `HierarchyNodeMetric` items for all leaf nodes (`root.leaves()`), preserving `{ id, parentId, depth, height, value }`.
+  - `ancestorsOf(id)`: Returns an array of node IDs starting from the specified node and traveling up through its ancestors to the root (e.g. `['cluster', 'analytics', 'flare']`). Returns `[]` if the ID is not found.
+  - `descendantsOf(id)`: Returns an array of node IDs for the specified node and all nodes in its subtree (`node.descendants().map(n => n.id)`). Returns `[]` if the ID is not found.
+  - `getNode(id)`: Returns the `HierarchyNodeMetric` (`{ id, parentId, depth, height, value }`) for the node with matching `id`, or `null` if not found.

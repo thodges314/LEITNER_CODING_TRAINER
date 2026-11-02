@@ -1374,5 +1374,13 @@
   "d3-svg-scatter-plot": {
     "difficulty": 2,
     "concept": "d3-scatter-plot"
+  },
+  "d3-stratify-nested-hierarchy": {
+    "difficulty": 3,
+    "concept": "d3-hierarchy-stratify"
+  },
+  "d3-quadtree-spatial-index": {
+    "difficulty": 3,
+    "concept": "d3-quadtree-spatial"
   }
 }

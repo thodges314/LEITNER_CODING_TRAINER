@@ -1,0 +1,16 @@
+{
+  "title": "D3 Quadtree Spatial Index",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "quadtree",
+    "spatial-index",
+    "nearest-neighbor",
+    "geometry",
+    "algorithms"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "d3"
+  ]
+}

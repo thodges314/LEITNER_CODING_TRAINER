@@ -1,0 +1,40 @@
+Construct a 2D spatial quadtree index for rapid nearest-neighbor retrieval and circular region range queries using D3's quadtree engine:
+
+## Description
+```ts
+interface QuadPoint {
+  x: number;
+  y: number;
+  id?: string | number;
+  [key: string]: any;
+}
+
+interface QuadtreeIndexInstance {
+  tree: any;
+  size: () => number;
+  extent: () => [[number, number], [number, number]];
+  add: (point: QuadPoint) => QuadtreeIndexInstance;
+  addAll: (points: QuadPoint[]) => QuadtreeIndexInstance;
+  findNearest: (x: number, y: number, radius?: number) => QuadPoint | null;
+  findPointsInRadius: (x: number, y: number, radius: number) => QuadPoint[];
+}
+```
+
+### `createQuadtreeIndex(points?: QuadPoint[]): QuadtreeIndexInstance`
+
+- Accepts an optional array of `QuadPoint` objects having `x` and `y` coordinates.
+- Initializes a 2D quadtree using `d3.quadtree().x(d => d.x).y(d => d.y)` and populates it with `points` if provided.
+- Returns a `QuadtreeIndexInstance` exposing:
+  - `tree`: The underlying `d3.quadtree` instance.
+  - `size()`: Returns the total count of points currently indexed in the tree (`tree.size()`).
+  - `extent()`: Returns the coordinate bounding box of the tree as `[[x0, y0], [x1, y1]]` via `tree.extent()`.
+  - `add(point)`: Inserts a single point into the index and returns the instance for chaining.
+  - `addAll(points)`: Inserts an array of points into the index and returns the instance for chaining.
+  - `findNearest(x, y, radius?)`:
+    - Searches for the closest point to coordinates `(x, y)`.
+    - If `radius` is provided, restricts the search to points within that Euclidean distance.
+    - Returns the nearest `QuadPoint` object, or `null` if no point exists (or none within `radius`).
+  - `findPointsInRadius(x, y, radius)`:
+    - Uses `tree.visit(callback)` to efficiently collect all points whose Euclidean distance from `(x, y)` is `<= radius`.
+    - Must prune any quad node whose bounding box `[x0, y0, x1, y1]` does not intersect the search bounding box `[x - radius, y - radius, x + radius, y + radius]`, returning `true` to skip scanning that subtree.
+    - Returns an array of all matching `QuadPoint` objects.
