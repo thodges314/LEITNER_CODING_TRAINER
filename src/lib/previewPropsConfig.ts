@@ -956,6 +956,68 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Marker fill color',
     },
   ],
+  'd3-stratify-nested-hierarchy': [
+    {
+      name: 'data',
+      type: 'json',
+      defaultValue: [
+        { id: 'flare', parentId: null },
+        { id: 'analytics', parentId: 'flare' },
+        { id: 'cluster', parentId: 'analytics', value: 3838 },
+        { id: 'graph', parentId: 'analytics', value: 7000 },
+        { id: 'optimization', parentId: 'analytics', value: 4500 },
+        { id: 'animate', parentId: 'flare', value: 2000 },
+        { id: 'physics', parentId: 'flare', value: 3200 },
+      ],
+      description: 'Flat array of records with id, parentId, and optional value',
+    },
+  ],
+  'd3-quadtree-spatial-index': [
+    {
+      name: 'points',
+      type: 'json',
+      defaultValue: [
+        { x: 40, y: 50, id: 'P1' },
+        { x: 80, y: 120, id: 'P2' },
+        { x: 120, y: 60, id: 'P3' },
+        { x: 160, y: 200, id: 'P4' },
+        { x: 200, y: 140, id: 'P5' },
+        { x: 240, y: 80, id: 'P6' },
+        { x: 280, y: 220, id: 'P7' },
+        { x: 320, y: 110, id: 'P8' },
+        { x: 360, y: 170, id: 'P9' },
+        { x: 400, y: 90, id: 'P10' },
+      ],
+      description: 'Array of 2D coordinate objects ({ x, y, id? })',
+    },
+    {
+      name: 'searchRadius',
+      type: 'number',
+      defaultValue: 45,
+      min: 15,
+      max: 120,
+      step: 5,
+      description: 'Interactive spatial search radius in pixels',
+    },
+    {
+      name: 'width',
+      type: 'number',
+      defaultValue: 440,
+      min: 300,
+      max: 600,
+      step: 20,
+      description: 'Canvas width in pixels',
+    },
+    {
+      name: 'height',
+      type: 'number',
+      defaultValue: 280,
+      min: 200,
+      max: 400,
+      step: 20,
+      description: 'Canvas height in pixels',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

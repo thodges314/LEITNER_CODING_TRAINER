@@ -33,23 +33,23 @@ describe('preset decks architecture', () => {
     ]);
   });
 
-  it('Full Library contains all 344 seed cards', () => {
+  it('Full Library contains all 346 seed cards', () => {
     const full = filterCardsByDeck(cards, 'full-library');
-    expect(full).toHaveLength(344);
-    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(344);
+    expect(full).toHaveLength(346);
+    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(346);
   });
 
-  it('Full-Stack Core contains 287 cards excluding advanced algorithms', () => {
+  it('Full-Stack Core contains 289 cards excluding advanced algorithms', () => {
     const fsDeck = filterCardsByDeck(cards, 'full-stack');
-    expect(fsDeck).toHaveLength(287);
+    expect(fsDeck).toHaveLength(289);
     for (const c of fsDeck) {
       expect(c.track).not.toBe('advanced-algorithms');
     }
   });
 
-  it('Frontend Specialist contains 214 frontend cards and zero algorithm cards', () => {
+  it('Frontend Specialist contains 216 frontend cards and zero algorithm cards', () => {
     const fe = filterCardsByDeck(cards, 'frontend-specialist');
-    expect(fe).toHaveLength(214);
+    expect(fe).toHaveLength(216);
     const tracks = new Set(fe.map((c) => c.track));
     expect(tracks.has('algorithms')).toBe(false);
     expect(tracks.has('advanced-algorithms')).toBe(false);

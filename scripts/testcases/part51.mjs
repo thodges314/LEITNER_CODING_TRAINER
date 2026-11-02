@@ -334,5 +334,82 @@ export default {
       { callSignature: 'instance.destroy()' }
     ),
   ],
+  'd3-stratify-nested-hierarchy': [
+    r(
+      'Builds validated hierarchy tree and aggregates total root value',
+      'stratifyHierarchy(SAMPLE_TREE_DATA)',
+      'rootId="flare", totalValue=11838, maxDepth=2',
+      { callSignature: 'stratifyHierarchy(SAMPLE_TREE_DATA)' }
+    ),
+    r(
+      'Extracts leaves with correct parentId, depth, height, and values',
+      'stratifyHierarchy(SAMPLE_TREE_DATA).leaves',
+      'Leaves array contains 3 leaves with valid parentId, depth, height=0, and values',
+      { callSignature: 'result.leaves' }
+    ),
+    r(
+      'Traverses ancestors from leaf node up to root',
+      'result.ancestorsOf("cluster")',
+      'Returns ["cluster", "analytics", "flare"] and [] for unknown node',
+      { callSignature: 'result.ancestorsOf("cluster")' }
+    ),
+    r(
+      'Collects subtree descendants from branch node',
+      'result.descendantsOf("analytics")',
+      'Returns ["analytics", "cluster", "graph"] and valid node metric with value 10838',
+      { callSignature: 'result.descendantsOf("analytics")' }
+    ),
+    r(
+      'Applies custom valueAccessor option',
+      'stratifyHierarchy(customData, { valueAccessor: d => d.headcount * 10 })',
+      'totalValue=650 and leaves have custom scaled values',
+      { callSignature: 'stratifyHierarchy(data, { valueAccessor })' }
+    ),
+    r(
+      'Validates inputs and handles single root edge case',
+      'stratifyHierarchy([]) and single node',
+      'Throws on empty input; single node returns maxDepth=0 and totalValue=99',
+      { callSignature: 'stratifyHierarchy([])' }
+    ),
+  ],
+  'd3-quadtree-spatial-index': [
+    r(
+      'Initializes 2D quadtree and returns size and extent',
+      'createQuadtreeIndex(SAMPLE_POINTS)',
+      'size=3 and extent covers bounding coordinates [10..90, 20..80]',
+      { callSignature: 'createQuadtreeIndex(SAMPLE_POINTS)' }
+    ),
+    r(
+      'Finds single nearest point without distance constraint',
+      'index.findNearest(12, 22) and index.findNearest(88, 42)',
+      'Returns nearest point A for (12, 22) and C for (88, 42)',
+      { callSignature: 'index.findNearest(12, 22)' }
+    ),
+    r(
+      'Respects maximum search radius constraint in findNearest',
+      'index.findNearest(12, 22, 5) vs index.findNearest(12, 22, 1)',
+      'Radius 5 finds A; radius 1 returns null as distance exceeds threshold',
+      { callSignature: 'index.findNearest(12, 22, radius)' }
+    ),
+    r(
+      'Collects multiple points within radius using pruned quad visit',
+      'index.findPointsInRadius(30, 50, 45)',
+      'Returns matching points ["A", "B"] using pruned quadrant traversal',
+      { callSignature: 'index.findPointsInRadius(30, 50, 45)' }
+    ),
+    r(
+      'Supports incremental point insertion with add and addAll chaining',
+      'index.add(p1).addAll([p2, p3])',
+      'Inserts points with method chaining and updates index size from 0 to 3',
+      { callSignature: 'index.add(p).addAll(pts)' }
+    ),
+    r(
+      'Handles overlapping coincident points and empty index gracefully',
+      'emptyIndex and duplicate coordinate points',
+      'Empty index returns null/[]; coincident points in duplicate index both returned',
+      { callSignature: 'createQuadtreeIndex().findNearest(10, 10)' }
+    ),
+  ],
 };
+
 

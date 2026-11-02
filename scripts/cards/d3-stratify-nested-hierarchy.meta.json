@@ -1,0 +1,16 @@
+{
+  "title": "D3 Stratify Nested Hierarchy",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "hierarchy",
+    "stratify",
+    "tree",
+    "data-structures",
+    "algorithms"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "d3"
+  ]
+}
