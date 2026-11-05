@@ -127,4 +127,76 @@ describe('typeChecker & getTSQuickInfo', () => {
     expect(result.success).toBe(true);
     expect(result.diagnostics).toHaveLength(0);
   });
+
+  it('validates extended SVG, Canvas, and DOM event ambient types', () => {
+    const code = `
+      function inspectDom(
+        svg: SVGSVGElement,
+        group: SVGGElement,
+        path: SVGPathElement,
+        rect: SVGRectElement,
+        circle: SVGCircleElement,
+        canvas: HTMLCanvasElement,
+        dialog: HTMLDialogElement,
+        ptr: PointerEvent,
+        wheel: WheelEvent,
+        bounds: DOMRect,
+        list: NodeListOf<HTMLDivElement>
+      ): number {
+        const ctx = canvas.getContext('2d');
+        if (ctx && !dialog.open) dialog.showModal();
+        return bounds.width + bounds.height + list.length + (ptr ? 0 : 1) + (wheel ? 0 : 1);
+      }
+    `;
+    const result = checkAndTranspileTS(code);
+    expect(result.success).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+  });
+
+  it('validates idiomatic generic D3 APIs and type inference without errors', () => {
+    const code = `
+      interface Row { id: string; parentId: string | null; value: number; }
+      interface Pt { x: number; y: number; }
+
+      function testD3(rows: Row[], pts: Pt[], container: HTMLElement): number {
+        const root: d3.HierarchyNode<Row> = d3
+          .stratify<Row>()
+          .id((d) => d.id)
+          .parentId((d) => d.parentId)(rows)
+          .sum((d) => d.value);
+
+        const tree: d3.Quadtree<Pt> = d3
+          .quadtree<Pt>()
+          .x((d) => d.x)
+          .y((d) => d.y)
+          .addAll(pts);
+        const nearest: Pt | undefined = tree.find(10, 20, 50);
+
+        const pieGen = d3.pie<Row>().value((d) => d.value);
+        const arcs: d3.PieArcDatum<Row>[] = pieGen(rows);
+
+        const xScale = d3.scaleLinear().domain([0, 100]).range([0, 400]);
+        const lineGen = d3.line<Pt>().x((d) => xScale(d.x)).y((d) => xScale(d.y));
+        const pathData: string | null = lineGen(pts);
+
+        const delaunay = d3.Delaunay.from(pts, (d) => d.x, (d) => d.y);
+        const voronoi = delaunay.voronoi([0, 0, 400, 300]);
+        const cellPath: string = voronoi.renderCell(0);
+
+        d3.select(container).append('svg').attr('d', pathData ?? cellPath);
+        return (root.value ?? 0) + arcs.length + (nearest ? nearest.x : 0);
+      }
+    `;
+    const result = checkAndTranspileTS(code);
+    expect(result.success).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+  });
+
+  it('retrieves hover QuickInfo for ambient d3 methods', () => {
+    const code = 'const scale = d3.scaleLinear().domain([0, 10]);';
+    const pos = code.indexOf('scaleLinear');
+    const info = getTSQuickInfo(code, pos);
+    expect(info).not.toBeNull();
+    expect(info?.signature).toContain('scaleLinear');
+  });
 });
