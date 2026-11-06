@@ -29,13 +29,14 @@ export interface TranspileOutcome {
 export async function transpileForExecution(
   code: string,
   mode: ExecutionMode,
-  loopTimeoutMs = 3000
+  loopTimeoutMs = 3000,
+  extraPromptTypes?: string
 ): Promise<TranspileOutcome> {
   const diagnostics: TranspileOutcome['diagnostics'] = [];
 
   if (mode === 'ts') {
     const { checkAndTranspileTS } = await import('../utils/typeChecker');
-    const result = checkAndTranspileTS(code);
+    const result = checkAndTranspileTS(code, extraPromptTypes);
     for (const d of result.diagnostics) {
       diagnostics.push({ type: d.type, formatted: d.formatted });
     }
@@ -406,7 +407,7 @@ export async function runHarness(
   if (mode === 'ts') {
     const codeToCheck = isTsOnlyCard(card) ? combined : effectiveCode;
     const { checkAndTranspileTS } = await import('../utils/typeChecker');
-    const tsCheck = checkAndTranspileTS(codeToCheck);
+    const tsCheck = checkAndTranspileTS(codeToCheck, isTsOnlyCard(card) ? undefined : card.promptSeed);
     if (!tsCheck.success) {
       return notRun(`Code did not compile: ${tsCheck.diagnostics.map((d) => d.formatted).join('; ')}`, 1);
     }

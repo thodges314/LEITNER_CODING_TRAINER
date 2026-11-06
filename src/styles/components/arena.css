@@ -724,6 +724,67 @@
   border-color: rgba(239, 68, 68, 0.3);
 }
 
+.arena-scope-warning-popup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 1.4;
+  animation: fadeIn 0.15s ease-out;
+}
+
+[data-theme="apple-gsos"] .arena-scope-warning-popup {
+  background-color: #E8E7DF;
+  border: 1.5px solid #000080;
+  color: #1C1C1C;
+  box-shadow: 2px 2px 0px rgba(28, 28, 28, 0.15);
+}
+
+.arena-scope-warning-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arena-scope-warning-icon {
+  color: var(--accent-cyan, #38bdf8);
+  flex-shrink: 0;
+}
+
+[data-theme="apple-gsos"] .arena-scope-warning-icon {
+  color: #000080;
+}
+
+.arena-scope-warning-dismiss {
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background-color: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: var(--accent-cyan, #38bdf8);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+}
+
+.arena-scope-warning-dismiss:hover {
+  background-color: rgba(56, 189, 248, 0.28);
+}
+
+[data-theme="apple-gsos"] .arena-scope-warning-dismiss {
+  background-color: #FFFFFF;
+  border: 1px solid #1C1C1C;
+  color: #1C1C1C;
+}
+
 .arena-editor-btn-text {
   background: none;
   border: none;

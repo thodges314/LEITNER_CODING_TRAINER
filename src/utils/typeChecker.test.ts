@@ -220,4 +220,34 @@ describe('typeChecker & getTSQuickInfo', () => {
     expect(result.success).toBe(true);
     expect(result.diagnostics).toHaveLength(0);
   });
+
+  it('dynamically injects a card prompt ts interface block so non-D3 cards do not require retyping interfaces', () => {
+    const promptSeed = [
+      '```ts',
+      'export interface KanbanCard {',
+      '  id: string;',
+      '  title: string;',
+      '  description?: string;',
+      '}',
+      'export interface KanbanColumn {',
+      '  id: string;',
+      '  title: string;',
+      '  cards: KanbanCard[];',
+      '}',
+      'export interface KanbanBoardProps {',
+      '  initialColumns: KanbanColumn[];',
+      '}',
+      '```',
+    ].join('\n');
+
+    const code = `
+      function KanbanBoard({ initialColumns }: KanbanBoardProps) {
+        const firstCard: KanbanCard | undefined = initialColumns[0]?.cards[0];
+        return <div>{firstCard ? firstCard.title : 'Empty'}</div>;
+      }
+    `;
+    const result = checkAndTranspileTS(code, promptSeed);
+    expect(result.success).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+  });
 });

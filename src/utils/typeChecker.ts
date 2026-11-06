@@ -1,5 +1,6 @@
 import ts from 'typescript';
 import { SANDBOX_D3_TYPES } from './sandboxD3Types';
+import { extractPromptTypeDeclarations } from './cardPromptTypes';
 
 export interface FormattedDiagnostic {
   type: 'error' | 'warn';
@@ -324,6 +325,10 @@ const SANDBOX_GLOBALS = `
     val: T;
     left: TreeNode<T> | null;
     right: TreeNode<T> | null;
+    id?: string;
+    label?: string;
+    children?: TreeNode<T>[];
+    [key: string]: any;
     constructor(val?: T, left?: TreeNode<T> | null, right?: TreeNode<T> | null);
   }
   declare class GraphNode<T = any> {
@@ -534,6 +539,43 @@ const SANDBOX_GLOBALS = `
 /** Combined sandbox globals: DOM/React/node shims + full typed D3 namespace. */
 const SANDBOX_GLOBALS_WITH_D3 = SANDBOX_GLOBALS + SANDBOX_D3_TYPES;
 
+let activeCardPromptTypes = '';
+let activeGlobalsVersion = 1;
+
+/**
+ * Filters prompt type declarations so any identifier already declared in
+ * SANDBOX_GLOBALS_WITH_D3 is not redeclared with conflicting type parameters.
+ */
+function filterNewPromptTypes(promptSeedOrBlocks?: string, track?: string): string {
+  if (!promptSeedOrBlocks || track === 'typescript-patterns') return '';
+  const wrapped = promptSeedOrBlocks.includes('```')
+    ? promptSeedOrBlocks
+    : `\`\`\`ts\n${promptSeedOrBlocks}\n\`\`\``;
+  const decls = extractPromptTypeDeclarations(wrapped, track);
+  const filtered = decls.filter(
+    (d) => !new RegExp(`\\b(?:interface|type|class)\\s+${d.name}\\b`).test(SANDBOX_GLOBALS_WITH_D3)
+  );
+  if (filtered.length === 0) return '';
+  return `\n  // Active Card Prompt Types\n  ${filtered.map((d) => d.code).join('\n\n  ')}\n`;
+}
+
+/**
+ * Sets the active card's prompt TypeScript declarations for hover QuickInfo and type-checking.
+ */
+export function setActiveCardPromptTypes(promptSeed?: string, track?: string): void {
+  const next = filterNewPromptTypes(promptSeed, track);
+  if (next !== activeCardPromptTypes) {
+    activeCardPromptTypes = next;
+    activeGlobalsVersion++;
+  }
+}
+
+function getEffectiveGlobals(extraPromptTypes?: string): string {
+  const extra =
+    extraPromptTypes !== undefined ? filterNewPromptTypes(extraPromptTypes) : activeCardPromptTypes;
+  return extra ? SANDBOX_GLOBALS_WITH_D3 + extra : SANDBOX_GLOBALS_WITH_D3;
+}
+
 const sourceFileCache = new Map<string, ts.SourceFile>();
 function cachedLibSource(
   name: string,
@@ -638,9 +680,10 @@ export function determineFileTarget(rawCode: string): FileTargetInfo {
  * Validates code using ts.transpileModule and strict semantic checking.
  * Returns formatted diagnostics and transpiled code.
  */
-export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
+export function checkAndTranspileTS(rawCode: string, extraPromptTypes?: string): TypeCheckResult {
   const target = determineFileTarget(rawCode);
   const { fileName, isJsx, codeToTranspile } = target;
+  const effectiveGlobals = getEffectiveGlobals(extraPromptTypes);
 
   const compilerOptions: ts.CompilerOptions = {
     strict: true,
@@ -680,7 +723,7 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
 
   const fileText = (name: string): string | undefined => {
     if (name === fileName) return checkedSource;
-    if (name === GLOBALS_FILE) return SANDBOX_GLOBALS_WITH_D3;
+    if (name === GLOBALS_FILE) return effectiveGlobals;
     return LIBS[name.split('/').pop() as string];
   };
 
@@ -762,15 +805,18 @@ function getOrCreateLanguageService(): ts.LanguageService {
 
   const host: ts.LanguageServiceHost = {
     getScriptFileNames: () => ['solution.ts', 'solution.tsx', GLOBALS_FILE],
-    getScriptVersion: (name) =>
-      name === 'solution.ts' || name === 'solution.tsx' ? String(activeSourceVersion) : '1',
+    getScriptVersion: (name) => {
+      if (name === 'solution.ts' || name === 'solution.tsx') return String(activeSourceVersion);
+      if (name === GLOBALS_FILE) return String(activeGlobalsVersion);
+      return '1';
+    },
     getScriptSnapshot: (name) => {
       if (name === 'solution.ts' || name === 'solution.tsx') {
         const target = determineFileTarget(activeSourceCode);
         const codeForFile = target.fileName === name ? target.codeToTranspile : activeSourceCode;
         return ts.ScriptSnapshot.fromString(codeForFile);
       }
-      if (name === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(SANDBOX_GLOBALS_WITH_D3);
+      if (name === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(getEffectiveGlobals());
       const text = LIBS[name.split('/').pop() as string];
       if (text !== undefined) return ts.ScriptSnapshot.fromString(text);
       return undefined;
@@ -787,7 +833,7 @@ function getOrCreateLanguageService(): ts.LanguageService {
         const target = determineFileTarget(activeSourceCode);
         return target.fileName === name ? target.codeToTranspile : activeSourceCode;
       }
-      if (name === GLOBALS_FILE) return SANDBOX_GLOBALS_WITH_D3;
+      if (name === GLOBALS_FILE) return getEffectiveGlobals();
       return LIBS[name.split('/').pop() as string];
     },
     readDirectory: () => [],

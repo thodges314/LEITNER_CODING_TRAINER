@@ -21,7 +21,9 @@ import type { TopicItem, SpacedAlgorithm } from '../lib/leitner';
 import { evaluateCodeSubmission } from '../lib/ai';
 import type { EvaluationResult } from '../lib/ai';
 import { EvaluationPanel } from './EvaluationPanel';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Info } from 'lucide-react';
+import { detectRedundantScopeInput } from '../utils/cardPromptTypes';
+import type { RedundantScopeWarning } from '../utils/cardPromptTypes';
 import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, prepareHtmlCode, bufferContainsHarness, classifyLogLine } from '../lib/runner';
 import {
   runInWorker,
@@ -227,6 +229,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     message: string;
     type: 'success' | 'error';
   } | null>(null);
+  const [scopeWarning, setScopeWarning] = useState<RedundantScopeWarning | null>(null);
+  const [dismissedScopeKinds, setDismissedScopeKinds] = useState<Record<string, boolean>>({});
 
   const [outputLogs, setOutputLogs] = useState<ConsoleLogEntry[]>([]);
   const [isOutputOpen, setIsOutputOpen] = useState(false);
@@ -280,9 +284,25 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     setActivePopover(null);
     setIsPreviewLive(false);
     setMountedComponent(null);
+    setScopeWarning(null);
+    setDismissedScopeKinds({});
     if (currentCard) setInspectedTier(currentCard.box);
     setExecutionMode(resolveExecutionModeForCard(currentCard));
   }
+
+  // Sync active card prompt types into the TypeScript language service when in TS mode
+  useEffect(() => {
+    if (executionMode !== 'ts' || !currentCard) return;
+    let cancelled = false;
+    void import('../utils/typeChecker').then(({ setActiveCardPromptTypes }) => {
+      if (!cancelled) {
+        setActiveCardPromptTypes(currentCard.promptSeed, currentCard.track);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [executionMode, currentCard]);
 
   // Autofocus editor on mount and card switch
   useEffect(() => {
@@ -495,7 +515,12 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`
         : rawCodeToRun;
 
-    const transpiled = await transpileForExecution(executableSource, executionMode);
+    const transpiled = await transpileForExecution(
+      executableSource,
+      executionMode,
+      3000,
+      isTsTrack ? undefined : currentCard?.promptSeed
+    );
     for (const diag of transpiled.diagnostics) {
       logs.push({
         type: diag.type === 'warn' ? 'warn' : 'error',
@@ -876,8 +901,33 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             setCode(getStarterSnippet(currentCard));
             setIsPreviewLive(false);
             setMountedComponent(null);
+            setScopeWarning(null);
+            setDismissedScopeKinds({});
           }}
         />
+
+        {scopeWarning && !evalResult && (
+          <div
+            role="status"
+            data-testid="preloaded-scope-popup"
+            className="arena-scope-warning-popup"
+          >
+            <div className="arena-scope-warning-content">
+              <Info size={15} className="arena-scope-warning-icon" />
+              <span>{scopeWarning.message}</span>
+            </div>
+            <button
+              type="button"
+              className="arena-scope-warning-dismiss"
+              onClick={() => {
+                setDismissedScopeKinds((prev) => ({ ...prev, [scopeWarning.kind]: true }));
+                setScopeWarning(null);
+              }}
+            >
+              Got it
+            </button>
+          </div>
+        )}
 
         {/* CodeMirror 6 Editor with Rainbow Brackets & Cold-Start Mode */}
         <div className="cm-theme-container" data-tour="editor" onKeyDown={handleEditorKeyDown}>
@@ -888,7 +938,15 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             theme={theme === 'apple-gsos' ? 'light' : 'dark'}
             basicSetup={cmBasicSetup}
             extensions={extensions}
-            onChange={(val) => setCode(val)}
+            onChange={(val) => {
+              setCode(val);
+              const warning = detectRedundantScopeInput(val, currentCard);
+              if (warning && !dismissedScopeKinds[warning.kind]) {
+                setScopeWarning(warning);
+              } else {
+                setScopeWarning(null);
+              }
+            }}
             editable={!evalResult}
             readOnly={Boolean(evalResult)}
             placeholder={
