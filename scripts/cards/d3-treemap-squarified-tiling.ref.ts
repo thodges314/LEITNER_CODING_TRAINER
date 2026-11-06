@@ -22,7 +22,6 @@ interface TreemapOptions {
   paddingInner?: number;
   paddingOuter?: number;
   round?: boolean;
-  colors?: string[];
   onSelectCell?: (cell: TreemapCellMetric, index: number) => void;
 }
 
@@ -43,7 +42,6 @@ function renderTreemap(
     paddingInner = 2,
     paddingOuter = 2,
     round = true,
-    colors,
     onSelectCell,
   } = options;
 
@@ -56,22 +54,6 @@ function renderTreemap(
     .attr('height', height)
     .attr('role', 'img')
     .attr('aria-label', 'Treemap chart');
-
-  const palette: string[] =
-    Array.isArray(colors) && colors.length > 0
-      ? colors
-      : d3.schemeTableau10 || [
-          '#4e79a7',
-          '#f28e2c',
-          '#e15759',
-          '#76b7b2',
-          '#59a14f',
-          '#edc949',
-          '#af7aa1',
-          '#ff9da7',
-          '#9c755f',
-          '#bab0ab',
-        ];
 
   let leafMetrics: TreemapCellMetric[] = [];
 
@@ -129,7 +111,7 @@ function renderTreemap(
         .attr('class', 'treemap-rect')
         .attr('width', (d: TreemapCellMetric) => d.width)
         .attr('height', (d: TreemapCellMetric) => d.height)
-        .attr('fill', (_: TreemapCellMetric, i: number) => palette[i % palette.length])
+        .attr('fill', (_: TreemapCellMetric, i: number) => d3.schemeTableau10[i % 10])
         .attr('data-name', (d: TreemapCellMetric) => d.name)
         .attr('data-value', (d: TreemapCellMetric) => String(d.value));
 

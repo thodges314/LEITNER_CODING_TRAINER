@@ -1,0 +1,14 @@
+{
+  "id": "d3-data-join-enter-update-exit",
+  "title": "D3 Keyed Data Join (Enter, Update, Exit)",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "data-join",
+    "selection",
+    "svg",
+    "dom"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}

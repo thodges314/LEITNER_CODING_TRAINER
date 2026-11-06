@@ -40,7 +40,7 @@ const SAMPLE_POINTS = [
   document.body.appendChild(container);
 
   const instance = renderLineChart(container, SAMPLE_POINTS, {
-    strokeColor: '#f59e0b',
+    strokeColor: 'orange',
     strokeWidth: 3,
   });
 
@@ -50,7 +50,7 @@ const SAMPLE_POINTS = [
   const passed =
     path !== null &&
     path.getAttribute('fill') === 'none' &&
-    path.getAttribute('stroke') === '#f59e0b' &&
+    path.getAttribute('stroke') === 'orange' &&
     path.getAttribute('stroke-width') === '3' &&
     dAttr.startsWith('M') &&
     dAttr.length > 20;

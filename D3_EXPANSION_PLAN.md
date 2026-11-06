@@ -7,17 +7,21 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 ### Core Principles
 1. **D3 is an Algorithmic Engine, Not Just SVG Shapes:**  
    Advanced technical interviews assess deep understanding of data structures: spatial trees (`d3.quadtree`), hierarchical stratifications (`d3.stratify`), Delaunay/Voronoi graphs (`d3.Delaunay`), and discrete numerical approximations (`d3.forceSimulation`).
-2. **Deterministic, Headless & Sandbox Tested:**  
+2. **CSS `:hover` Transitions over Superfluous D3 Hover Listeners:**  
+   Visual hover effects (opacity, brightness, stroke, scale, fill highlights on `.bar`, `.arc-slice`, `.scatter-dot`, `.voronoi-cell`, `.treemap-cell`, `.geo-feature`, `.contour-band`) must be handled via **CSS `:hover` and `transition` rules** rather than D3 `mouseover`/`mouseenter` DOM-mutation loops. On large datasets, delegating visual hover feedback to the browser's CSS compositor avoids $O(N)$ JavaScript handler and DOM attribute mutation overhead. D3 event listeners should focus on semantic state transitions (`click` selection, `brush` rescaling, or continuous coordinate queries).
+3. **Deterministic, Headless & Sandbox Tested:**  
    Every card has concrete unit/contract tests, a strict TypeScript interface, canonical `.ref.js` and `.ref.ts` solutions, and an interactive live preview where visual feedback is valuable.
-3. **Low-Token Batch Execution:**  
+4. **Low-Token Batch Execution:**  
    Authored in strictly isolated **2-card batches** to guarantee reliable test verification, full production builds, and clean branch merging without token exhaustion.
 
 ---
 
-## 2. Current Status (11 Cards — 100% Typed & Passing)
+## 2. Current Status (17 Cards — 100% Typed & Passing)
 
 | Card ID | Description | Concepts / Modules | UI / Preview |
 |---|---|---|---|
+| `d3-data-join-enter-update-exit` | Keyed Enter–Update–Exit data join & DOM identity preservation | `selection.data(items, keyFn).join(enter, update, exit)`, `.order()` | Interactive Data Join SVG |
+| `d3-scales-domain-range-basics` | Linear & band scales, inverted SVG Y range, clamping & `.invert()` | `d3.extent()`, `d3.scaleLinear()`, `d3.scaleBand()`, `scale.invert()` | Scaled Coordinate SVG |
 | `d3-react-imperative-chart` | React `useRef` + `useEffect` D3 lifecycle integration & cleanup | `d3-selection`, React DOM ref lifecycle | SVG Bar Chart in React |
 | `d3-css-coordinate-layout` | CSS-driven layout calculations & DOM coordinates | `d3-selection`, CSS layout mapping | HTML Bars |
 | `d3-graph-theory-visualizer` | Node-link graph SVG rendering with circular layouts | `d3-selection`, SVG line/circle paths | SVG Graph |
@@ -29,6 +33,10 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 | `d3-quadtree-spatial-index` | 2D spatial indexing, $O(\log N)$ nearest-neighbor & radius search | `d3.quadtree()`, `quadtree.find()`, `quadtree.visit()` | Spatial Search Canvas |
 | `d3-delaunay-voronoi-snapping` | 2D Delaunay triangulation & Voronoi polygon snapping cells | `d3.Delaunay.from()`, `delaunay.voronoi()`, `voronoi.renderCell()` | Interactive Voronoi SVG |
 | `d3-treemap-squarified-tiling` | Squarified proportional area treemap with inner/outer padding | `d3.hierarchy()`, `d3.treemap()`, `d3.treemapSquarify` | SVG Treemap |
+| `d3-force-simulation-headless` | Synchronous headless force simulation, convergence & kinetic energy | `d3.forceSimulation()`, `d3.forceManyBody()`, `d3.forceCollide()` | Force Network SVG |
+| `d3-brush-zoom-coordinator` | Linked focus + context chart with 1D horizontal brush rescaling | `d3.brushX()`, `scale.invert()`, focus/context coordination | Brush & Zoom SVG |
+| `d3-geo-projection-path` | Geographic spherical projection, GeoJSON paths & projected centroids | `d3.geoMercator()`, `d3.geoEquirectangular()`, `d3.geoPath()` | Cartographic Map SVG |
+| `d3-contour-density-grid` | 2D kernel density estimation & marching-squares isobands | `d3.contourDensity()`, `d3.geoPath()`, `d3.scaleSequential()` | Density Isolines SVG |
 
 ---
 
@@ -127,6 +135,24 @@ graph TD
   Computes continuous 2D kernel density estimations (isoline contours) from discrete point clouds using `d3.contourDensity()`. Configures bandwidth, cell size, and threshold count to generate smooth multi-polygon GeoJSON contours. Renders multi-layer elevation polygons with color scale interpolators.
 - **Key APIs**: `d3.contourDensity()`, `d3.geoPath()`, `d3.scaleSequential()`.
 - **Harness & Verification**: Validating generated contour threshold count, nested polygon geometries, and density values.
+
+---
+
+### Batch 68: D3 Warm-Up Fundamentals — Keyed Data Join & Scales (Completed)
+- **Card 9**: `d3-data-join-enter-update-exit` — Difficulty 1 (Concept: `d3-data-join`). Enforces `.data(items, d => d.id).join(enter, update, exit)` with DOM node identity preservation (`memNodeAfter === memNodeBefore`).
+- **Card 10**: `d3-scales-domain-range-basics` — Difficulty 1 (Concept: `d3-scales-basics`). Enforces `d3.extent`, `d3.scaleBand`, and inverted SVG Y `d3.scaleLinear` (`[height - padding, padding]`, `.clamp()`, `.invert()`).
+
+---
+
+### Batch 69: D3 Data Transformation & Color Scales Warm-Ups
+- **Card 11**: `d3-array-statistics-binning` — Difficulty 2 (Concept: `d3-array-statistics`). Covers `d3.extent`, `d3.mean`, `d3.median`, `d3.quantile`, `d3.rollup`, and `d3.bin` histogram bucketing.
+- **Card 12**: `d3-color-scales-interpolators` — Difficulty 2 (Concept: `d3-color-scales`). Covers `d3.scaleOrdinal(d3.schemeTableau10)`, `d3.scaleSequential(d3.interpolateViridis)`, and `d3.scaleQuantize()` discrete bucket mapping.
+
+---
+
+### Batch 70: Performant CSS-Driven D3 Interactivity (`:hover` & Group Dimming)
+- **Card 13**: `d3-css-hover-interactivity` — Difficulty 2 (Concept: `d3-css-interactivity`).
+  - **Description**: Demonstrates why large-dataset D3 charts delegate hover and focus-dimming transitions to CSS (`:hover`, `.marks-group:hover .mark:not(:hover)`) rather than attaching JS `mouseover`/`mouseout` loops that mutate $O(N)$ DOM nodes on every pointer movement. Appends a scoped `<style>` rule block alongside the D3 data join and uses event delegation on the parent `<svg>` / `<g>` container for click selection.
 
 ---
 

@@ -8,7 +8,7 @@
 
 A client-only, zero-backend deliberate practice environment designed to simulate cold-start front-end technical interview screening.
 Learners write solutions from scratch without autocomplete or hints, execute their implementation headlessly in a browser sandbox against comprehensive test harnesses, and review cards according to spaced repetition schedules.
-The deck features **348 cards** across **16 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [348], **Full-Stack Core** [291], **Frontend Specialist** [218], and **Algorithms & Data Structures** [102]) with **2,334 documented test cases** and **100% structured Markdown instructions**.
+The deck features **354 cards** across **16 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [354], **Full-Stack Core** [297], **Frontend Specialist** [224], and **Algorithms & Data Structures** [102]) with **2,368 documented test cases** and **100% structured Markdown instructions**.
 
 - **Frontend Core**: React 19, TypeScript (strict mode), Vite 8.
 - **Content & Quality Pipeline**: Primarily AI-authored across structured batch pipelines with automated validation (reference passes, empty fails, label parity, mutation checks).
@@ -23,11 +23,13 @@ The deck features **348 cards** across **16 topic tracks**, organized into 4 bui
 Located in [PracticeArena.tsx](src/components/PracticeArena.tsx):
 
 ### 2.1 CodeMirror 6 Integration
+
 - Replaced basic HTML `<textarea>` with `@uiw/react-codemirror` and `@codemirror/lang-javascript`.
 - Supports JavaScript (JSX) and TypeScript modes (`executionMode === 'ts'`).
 - Line numbers, active line highlight, and custom dark-mode styling in [index.css](src/index.css).
 
 ### 2.2 Cold-Start Interview Integrity
+
 - **Autocompletion & IntelliSense are strictly disabled**:
   ```tsx
   basicSetup={{
@@ -42,6 +44,7 @@ Located in [PracticeArena.tsx](src/components/PracticeArena.tsx):
 - No dropdown completions, parameter hints, or ghost text appear, guaranteeing authentic cold-start recall.
 
 ### 2.3 Bracket Colorization (Path B)
+
 - Uses `rainbowbrackets` with tailored neon/pastel dark colors:
   - Red: `#f43f5e`
   - Orange: `#fb923c`
@@ -53,10 +56,12 @@ Located in [PracticeArena.tsx](src/components/PracticeArena.tsx):
 - Nested brackets `()`, `[]`, `{}` dynamically receive depth-mapped colors.
 
 ### 2.4 Autoclosing Brackets & Quotes
+
 - Autoclosing active for `()`, `[]`, `{}`, `""`, `''`, and `` ` ``.
 - Jumping over closing tokens on typing and balanced deletion on Backspace.
 
 ### 2.5 In-Browser Code Formatter (Prettier Standalone)
+
 - Located in [formatter.ts](src/lib/formatter.ts).
 - Dynamically imports `prettier/standalone`, `@prettier/plugins/babel`, `estree`, and `typescript` as lazy chunks.
 - Shortcuts:
@@ -72,12 +77,14 @@ Located in [PracticeArena.tsx](src/components/PracticeArena.tsx):
 Located in [leitner.ts](src/lib/leitner.ts). Users can toggle their preferred algorithm in the Settings Modal:
 
 ### 3.1 Classic Leitner Boxes (`leitner`)
+
 - **Boxes 1–5**: Review intervals in trial counts: `[1, 4, 10, 22, 45]`.
 - **Pass Rule**: Promotes card to next box (`box + 1`, max 5).
 - **Fail Rule**: Resets card to **Box 1** with streak 0, scheduled at setback interval `nextTotal + intervalForBox(1)`.
 - **Immediate Reinforcement Drill**: Triggers an immediate practice drill on the failed card (see Section 3.3).
 
 ### 3.2 Graduated Interval Recall & Chaining (`graduated-interval`) — the default
+
 - **Design intent (owner):** this is modelled on Pimsleur-style graduated-interval recall (expanding gaps, a small working chain of new items), which the owner has used successfully for languages; the original Leitner boxes were a misreading of what was wanted and are kept only as an alternative.
 - **Tiers 1–9**: Geometric spaced review intervals: `Tier 1 (+1) • Tier 2 (+3) • Tier 3 (+7) • Tier 4 (+16) • Tier 5 (+35) • Tier 6 (+75) • Tier 7 (+165) • Tier 8 (+360) • Tier 9 (+800)`.
 - **Dynamic Tier 10+ Scaling**: Dynamically continues geometric growth factor (~2.2x per tier, `Math.round(800 * Math.pow(2.2, tier - 9))`) so mastered cards continuously cycle on long maintenance intervals rather than stalling or hard-capping.
@@ -88,6 +95,7 @@ Located in [leitner.ts](src/lib/leitner.ts). Users can toggle their preferred al
 - **Active Working Memory Chaining**: Cards below Tier 5 form an active working chain (capacity 4). Once cards consolidate to Tier 5+, new unseen rungs enter the rotation.
 
 ### 3.3 Immediate Reinforcement Drill (Zero Stat Impact)
+
 - **Why it exists (owner):** after a miss the learner sees the better answer and gets ONE immediate shot at reproducing it from memory to anchor it. It is deliberately outside scoring, so it must never change tier/box, streak or schedule. Do not "simplify" it into a normal retry.
 - When a user commits a failed card review, the cold-start failure is recorded into deck statistics (applying the appropriate setback tier and scheduling its future recall trial).
 - The trainer immediately launches into an isolated **Immediate Reinforcement Drill** for that card:
@@ -170,8 +178,8 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (2,274 unit tests across 69 test files)**: Tests verifying:
-  - Reference solutions pass for all 348 cards across 16 topics across 2,334 documented test cases.
+- **Vitest Suite (2,298 unit tests across 69 test files)**: Tests verifying:
+  - Reference solutions pass for all 354 cards across 16 topics across 2,367 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.
   - 100% of cards formatted with structured GitHub-flavored Markdown instructions.
@@ -217,4 +225,3 @@ All visual styling is separated into a modular design system under [src/styles/]
   - [src/styles/components/arena.css](src/styles/components/arena.css): Practice arena layout, split panes, toolbar, empty state, and reinforcement drill banner.
   - [src/styles/components/evaluation.css](src/styles/components/evaluation.css): Evaluation verdict banners (`data-verdict="passed|failed"`), stat metric grids, critique boxes, and interactive critique follow-up chat.
   - [src/styles/components/react-preview.css](src/styles/components/react-preview.css): React component preview frame, docked window, pop-out portal, event log, and interactive Props Control Panel.
-

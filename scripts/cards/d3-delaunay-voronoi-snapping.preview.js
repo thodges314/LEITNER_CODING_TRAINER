@@ -46,7 +46,7 @@ const DEFAULT_VORONOI_POINTS = [
     statusBar.style.fontSize = '12px';
     statusBar.style.fontFamily = 'monospace';
     statusBar.style.color = '#94a3b8';
-    statusBar.textContent = 'Hover or click any Voronoi polygon cell to snap to its point';
+    statusBar.textContent = 'Click any Voronoi polygon cell to snap to its point (hover uses CSS :hover)';
 
     const chartBox = document.createElement('div');
     wrapper.appendChild(statusBar);
@@ -63,14 +63,6 @@ const DEFAULT_VORONOI_POINTS = [
         pointColor: props.pointColor || '#3b82f6',
         activeColor: props.activeColor || '#f97316',
         showCells: props.showCells !== false,
-        onHoverPoint: function (pt, idx) {
-          if (pt) {
-            statusBar.textContent =
-              'Hovered cell #' + idx + ': ' + (pt.label || pt.id || '') + ' (' + pt.x + ', ' + pt.y + ')';
-          } else {
-            statusBar.textContent = 'Hover or click any Voronoi polygon cell to snap to its point';
-          }
-        },
         onSelectPoint: function (pt, idx) {
           statusBar.textContent =
             'Selected cell #' + idx + ': ' + (pt.label || pt.id || '') + ' (' + pt.x + ', ' + pt.y + ')';

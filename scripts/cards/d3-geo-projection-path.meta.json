@@ -1,0 +1,18 @@
+{
+  "title": "D3 GeoJSON Cartographic Projection & Path",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "geo",
+    "cartography",
+    "geojson",
+    "projection",
+    "svg",
+    "data-visualization"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "d3"
+  ]
+}
+

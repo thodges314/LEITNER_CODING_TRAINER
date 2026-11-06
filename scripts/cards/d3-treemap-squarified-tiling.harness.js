@@ -89,11 +89,9 @@ const SAMPLE_TREE = {
   const container = document.createElement('div');
   document.body.appendChild(container);
 
-  const customColors = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b'];
   const instance = renderTreemap(container, SAMPLE_TREE, {
     width: 480,
     height: 320,
-    colors: customColors,
   });
 
   const cells = Array.from(container.querySelectorAll('g.treemap-cell'));
@@ -105,8 +103,8 @@ const SAMPLE_TREE = {
     rects.length === 4 &&
     labels.length === 4 &&
     cells[0].getAttribute('transform')?.startsWith('translate(') === true &&
-    rects[0].getAttribute('fill') === '#ef4444' &&
-    rects[1].getAttribute('fill') === '#10b981' &&
+    rects[0].getAttribute('fill') === d3.schemeTableau10[0] &&
+    rects[1].getAttribute('fill') === d3.schemeTableau10[1] &&
     Number(rects[0].getAttribute('width')) > 0 &&
     Number(rects[0].getAttribute('height')) > 0 &&
     labels.map((el) => el.textContent).includes('Parser') &&

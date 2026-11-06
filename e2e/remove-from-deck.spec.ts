@@ -1,4 +1,10 @@
 import { test, expect } from '@playwright/test';
+import topics from '../src/data/topics.json' with { type: 'json' };
+import { filterCardsByDeck } from '../src/lib/decks';
+import type { TopicItem } from '../src/lib/leitner';
+
+const cards = topics as unknown as TopicItem[];
+const FRONTEND_FORKED_COUNT = filterCardsByDeck(cards, 'frontend-specialist').length - 1;
 
 test.describe('Remove From Deck & Preset Forking', () => {
   test.beforeEach(async ({ page }) => {
@@ -57,9 +63,9 @@ test.describe('Remove From Deck & Preset Forking', () => {
 
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
     await expect(deckTrigger).toContainText('My Tailored Frontend Sprint');
-    // Frontend Specialist is 218 cards; minus 1 is 217
-    await expect(deckTrigger).toContainText('217 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(217);
+    // Frontend Specialist minus 1 removed card
+    await expect(deckTrigger).toContainText(`${FRONTEND_FORKED_COUNT} Cards`);
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(FRONTEND_FORKED_COUNT);
 
     // The removed card should not be in the catalog table
     await expect(page.locator('tbody tr.catalog-tr').filter({ hasText: firstCardTitle })).toHaveCount(0);

@@ -4854,5 +4854,101 @@
       "layout"
     ],
     "summary": "interface TreemapNodeData {"
+  },
+  {
+    "id": "d3-brush-zoom-coordinator",
+    "title": "D3 Brush & Focus-Context Coordinator",
+    "track": "d3",
+    "concept": "d3-brush-interaction",
+    "difficulty": 4,
+    "tags": [
+      "d3",
+      "brush",
+      "zoom",
+      "linked-views",
+      "svg",
+      "time-series",
+      "data-visualization"
+    ],
+    "summary": "interface BrushPoint {"
+  },
+  {
+    "id": "d3-force-simulation-headless",
+    "title": "D3 Headless Force Simulation & Convergence",
+    "track": "d3",
+    "concept": "d3-force-simulation",
+    "difficulty": 4,
+    "tags": [
+      "d3",
+      "force-simulation",
+      "physics",
+      "graph",
+      "convergence",
+      "algorithms"
+    ],
+    "summary": "interface ForceSimNode {"
+  },
+  {
+    "id": "d3-contour-density-grid",
+    "title": "D3 2D Kernel Density Estimation & Contours",
+    "track": "d3",
+    "concept": "d3-contour-density",
+    "difficulty": 4,
+    "tags": [
+      "d3",
+      "contour",
+      "density",
+      "kde",
+      "statistics",
+      "svg",
+      "data-visualization"
+    ],
+    "summary": "interface DensityPoint {"
+  },
+  {
+    "id": "d3-geo-projection-path",
+    "title": "D3 GeoJSON Cartographic Projection & Path",
+    "track": "d3",
+    "concept": "d3-geo-projection",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "geo",
+      "cartography",
+      "geojson",
+      "projection",
+      "svg",
+      "data-visualization"
+    ],
+    "summary": "interface GeoFeature {"
+  },
+  {
+    "id": "d3-data-join-enter-update-exit",
+    "title": "D3 Keyed Data Join (Enter, Update, Exit)",
+    "track": "d3",
+    "concept": "d3-data-join",
+    "difficulty": 1,
+    "tags": [
+      "d3",
+      "data-join",
+      "selection",
+      "svg",
+      "dom"
+    ],
+    "summary": "interface JoinDatum {"
+  },
+  {
+    "id": "d3-scales-domain-range-basics",
+    "title": "D3 Linear & Band Scales (Domain, Range & Invert)",
+    "track": "d3",
+    "concept": "d3-scales-basics",
+    "difficulty": 1,
+    "tags": [
+      "d3",
+      "scales",
+      "svg",
+      "coordinates"
+    ],
+    "summary": "interface CategoryMetric {"
   }
 ]

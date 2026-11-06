@@ -1,0 +1,18 @@
+{
+  "title": "D3 Brush & Focus-Context Coordinator",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "brush",
+    "zoom",
+    "linked-views",
+    "svg",
+    "time-series",
+    "data-visualization"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "d3"
+  ]
+}
+

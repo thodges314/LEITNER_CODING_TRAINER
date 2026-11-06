@@ -52,7 +52,7 @@ interface LineChartInstance {
     - `width`: Total SVG width in pixels (defaults to `420`).
     - `height`: Total SVG height in pixels (defaults to `260`).
     - `margin`: Margin offsets `{ top, right, bottom, left }` (defaults to `{ top: 20, right: 20, bottom: 35, left: 40 }`).
-    - `strokeColor`: Line path stroke color (defaults to `'#38bdf8'`).
+    - `strokeColor`: Line path stroke color (defaults to `'steelblue'`).
     - `strokeWidth`: Stroke thickness in pixels (defaults to `2`).
     - `showPoints`: Whether to render circle markers at each point (defaults to `true`).
     - `onSelectPoint`: Callback fired when a point is clicked: `(point: LinePoint, index: number) => void`.

@@ -1,4 +1,9 @@
 import { test, expect } from '@playwright/test';
+import topics from '../src/data/topics.json' with { type: 'json' };
+
+const TOTAL_CARDS = topics.length;
+const NODE_CARDS = topics.filter((t) => t.track === 'node').length;
+const EXPECTED_SELECTED = 1 + NODE_CARDS;
 
 test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deletion', () => {
   test.beforeEach(async ({ page }) => {
@@ -47,28 +52,28 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
 
     // Verify footer updates with selected count
     const footerStats = page.getByTestId('deck-editor-footer-stats');
-    await expect(footerStats).toContainText('Selected: 1 of 348 cards');
+    await expect(footerStats).toContainText(`Selected: 1 of ${TOTAL_CARDS} cards`);
 
     // Select entire node category via topic checkbox without needing to expand
     const nodeTopicCheckbox = page.getByTestId('deck-editor-topic-checkbox-node');
     await expect(nodeTopicCheckbox).toBeVisible();
     await nodeTopicCheckbox.check();
 
-    // Now 16 cards selected (1 stepper + 15 node cards)
-    await expect(footerStats).toContainText('Selected: 16 of 348 cards');
+    // Now EXPECTED_SELECTED cards selected (1 stepper + all node cards)
+    await expect(footerStats).toContainText(`Selected: ${EXPECTED_SELECTED} of ${TOTAL_CARDS} cards`);
 
     // Submit
     const submitBtn = page.getByTestId('create-deck-submit-btn');
-    await expect(submitBtn).toContainText('Create Deck (16)');
+    await expect(submitBtn).toContainText(`Create Deck (${EXPECTED_SELECTED})`);
     await submitBtn.click();
 
     await expect(modal).not.toBeVisible();
     await expect(page.locator('.app-unlock-toast')).toBeVisible();
 
-    // Active deck should now be Stripe Frontend Screen with 16 cards
+    // Active deck should now be Stripe Frontend Screen with EXPECTED_SELECTED cards
     await expect(deckTrigger).toContainText('Stripe Frontend Screen');
-    await expect(deckTrigger).toContainText('16 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(16);
+    await expect(deckTrigger).toContainText(`${EXPECTED_SELECTED} Cards`);
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(EXPECTED_SELECTED);
   });
 
   test('edits an existing custom deck using the manual builder modal', async ({ page }) => {
@@ -185,6 +190,6 @@ test.describe('Custom Deck Manual Builder, Accordion Selection, Editing & Deleti
 
     // Reverts to Full Library
     await expect(deckTrigger).toContainText('Full Library (All Cards)');
-    await expect(deckTrigger).toContainText('348 Cards');
+    await expect(deckTrigger).toContainText(`${TOTAL_CARDS} Cards`);
   });
 });

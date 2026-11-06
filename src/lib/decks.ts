@@ -51,8 +51,7 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
   {
     id: 'full-library',
     name: 'Full Library (All Cards)',
-    description: 'Complete 348-card curriculum across all 16 frontend, backend, database, and computer-science domains',
-    badge: '348 Cards',
+    description: 'Complete curriculum across all 16 frontend, backend, database, and computer-science domains',
     isBuiltIn: true,
     filter: () => true,
   },
@@ -60,7 +59,6 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
     id: 'full-stack',
     name: 'Full-Stack Core',
     description: 'Practical full-stack interview prep: React, Node.js, GraphQL, PostgreSQL, DOM, async JS, utilities, TypeScript, and core interview algorithms',
-    badge: '291 Cards',
     isBuiltIn: true,
     filter: (card) => card.track !== 'advanced-algorithms',
   },
@@ -68,7 +66,6 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
     id: 'frontend-specialist',
     name: 'Frontend Specialist',
     description: 'React components, hooks, DOM APIs, async plumbing, and core JS/TS utilities',
-    badge: '218 Cards',
     isBuiltIn: true,
     filter: (card) => FRONTEND_TRACKS.has(card.track),
   },
@@ -76,7 +73,6 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
     id: 'algorithms',
     name: 'Algorithms & Data Structures',
     description: 'Practical algorithms, trees, graphs, DP, backtracking, heaps, and algorithmic JS utilities',
-    badge: '102 Cards',
     isBuiltIn: true,
     filter: (card) =>
       card.track === 'algorithms' ||

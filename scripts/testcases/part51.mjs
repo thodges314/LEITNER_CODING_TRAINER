@@ -198,7 +198,7 @@ export default {
     r(
       'Renders bar elements with data attributes, proportional heights, and color',
       'inspect rect.bar elements',
-      'rects render with data-label, data-value, data-index, fill="#10b981", and proportional heights',
+      'rects render with data-label, data-value, data-index, fill="teal", and proportional heights',
       { callSignature: 'container.querySelectorAll("rect.bar")' }
     ),
     r(
@@ -230,7 +230,7 @@ export default {
     r(
       'Generates smooth curve path with stroke styling and M-command path string',
       'inspect path.chart-line',
-      'path has stroke="#f59e0b", stroke-width="3", fill="none", and valid M-curve d attribute',
+      'path has stroke="orange", stroke-width="3", fill="none", and valid M-curve d attribute',
       { callSignature: 'container.querySelector("path.chart-line")' }
     ),
     r(
@@ -312,7 +312,7 @@ export default {
     r(
       'Renders scatter dot circles with coordinate attributes and fill color',
       'inspect circle.scatter-dot elements',
-      'circles render with data-x, data-y, data-index, fill="#8b5cf6", and inverted Y scaling',
+      'circles render with data-x, data-y, data-index, fill="purple", and inverted Y scaling',
       { callSignature: 'container.querySelectorAll("circle.scatter-dot")' }
     ),
     r(
@@ -430,12 +430,6 @@ export default {
       { callSignature: 'instance.findClosestIndex(45, 55)' }
     ),
     r(
-      'Hovering a Voronoi cell highlights corresponding point and fires onHoverPoint',
-      'mouseenter and mouseleave on path.voronoi-cell[data-index="1"]',
-      'Point 1 receives data-active="true", active fill, and enlarged radius; resets on mouseleave',
-      { callSignature: 'cell.dispatchEvent(new MouseEvent("mouseenter"))' }
-    ),
-    r(
       'Clicking a Voronoi cell activates point and invokes onSelectPoint callback',
       'click path.voronoi-cell[data-index="2"]',
       'onSelectPoint called with Gamma point and index 2, point 2 marked data-active="true"',
@@ -483,6 +477,222 @@ export default {
       'Handles empty or zero-value hierarchy gracefully and cleans up on destroy',
       'instance.destroy() and renderTreemap(container, zeroTree)',
       'Container cleared on destroy and zero-value tree renders 0 cells safely',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-force-simulation-headless': [
+    r(
+      'Converges synchronously without mutating input nodes or links',
+      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { alphaMin: 0.05 })',
+      'Stops background timer, steps ticks until alpha < 0.05, and returns converged: true without mutating inputs',
+      { callSignature: 'runHeadlessForceSimulation(nodes, links, { alphaMin: 0.05 })' }
+    ),
+    r(
+      'Centers network centroid near canvas midpoint and resolves link geometry',
+      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { width: 500, height: 360 })',
+      'Centroids settle near (250, 180) and links expose sourceId, targetId, and Euclidean length',
+      { callSignature: 'runHeadlessForceSimulation(nodes, links, { width: 500, height: 360 })' }
+    ),
+    r(
+      'Separates overlapping coincident nodes using collision and charge forces',
+      'runHeadlessForceSimulation([{ id: "N1", x: 200, y: 150, radius: 18 }, { id: "N2", x: 200, y: 150, radius: 18 }])',
+      'Coincident nodes separate to distance >= 2 * radius via forceCollide',
+      { callSignature: 'runHeadlessForceSimulation(overlappingNodes, [], { collisionRadius: 18 })' }
+    ),
+    r(
+      'Respects maxTicks budget and reports converged: false when stopped early',
+      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { alphaMin: 0.001, maxTicks: 5 })',
+      'Executes exactly 5 ticks, returns converged: false, and computes positive kineticEnergy',
+      { callSignature: 'runHeadlessForceSimulation(nodes, links, { maxTicks: 5 })' }
+    ),
+    r(
+      'Looks up settled nodes by ID via getNode and returns null for unknown IDs',
+      'report.getNode("B") and report.getNode("UNKNOWN")',
+      'Returns settled node object for "B" and null for unknown node ID',
+      { callSignature: 'report.getNode("B")' }
+    ),
+    r(
+      'Handles empty node list gracefully without running ticks',
+      'runHeadlessForceSimulation([], [])',
+      'Returns 0 ticks, converged: true, kineticEnergy: 0, and empty nodes/links arrays',
+      { callSignature: 'runHeadlessForceSimulation([], [])' }
+    ),
+  ],
+  'd3-brush-zoom-coordinator': [
+    r(
+      'Mounts SVG with focus and context chart groups and brush layer',
+      'renderBrushCoordinator(container, SAMPLE_SERIES, { width: 500, focusHeight: 180, contextHeight: 60 })',
+      'SVG rendered with focus-chart, context-chart, brush-layer, and 6 focus dots',
+      { callSignature: 'renderBrushCoordinator(container, series, options)' }
+    ),
+    r(
+      'Renders focus and context line paths with full initial domain',
+      'renderBrushCoordinator(container, SAMPLE_SERIES, { color: "teal" })',
+      'focus-line and context-line render M-paths across full domain [0, 50]',
+      { callSignature: 'instance.getDomain()' }
+    ),
+    r(
+      'Applies initialSelection on mount and filters focus dots to active window',
+      'renderBrushCoordinator(container, SAMPLE_SERIES, { initialSelection: [10, 30] })',
+      'Focus domain set to [10, 30] and focus-dot elements filtered to x in [10, 20, 30]',
+      { callSignature: 'renderBrushCoordinator(container, series, { initialSelection: [10, 30] })' }
+    ),
+    r(
+      'Updating domain via setBrushDomain rescales focus view and fires onBrushChange',
+      'instance.setBrushDomain([20, 40])',
+      'Rescales focusX to [20, 40], updates focus dots, and invokes onBrushChange callback',
+      { callSignature: 'instance.setBrushDomain([20, 40])' }
+    ),
+    r(
+      'Clearing brush selection with null restores full domain and all data points',
+      'instance.setBrushDomain(null)',
+      'Restores active domain to [0, 50] and renders all 6 focus points',
+      { callSignature: 'instance.setBrushDomain(null)' }
+    ),
+    r(
+      'Handles empty data gracefully and cleans up DOM on destroy',
+      'renderBrushCoordinator(container, []) and instance.destroy()',
+      'Renders empty coordinator safely and clears container innerHTML on destroy',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-geo-projection-path': [
+    r(
+      'Mounts SVG container with role, aria-label, and feature/centroid groups',
+      'renderGeoMap(container, SAMPLE_GEOJSON, { width: 500, height: 320 })',
+      'SVG rendered with width="500", height="320", role="img", aria-label="Geographic map", and map groups',
+      { callSignature: 'renderGeoMap(container, geojson, { width: 500, height: 320 })' }
+    ),
+    r(
+      'Projects GeoJSON features into closed SVG paths and computes centroids',
+      'instance.getCentroids()',
+      'Renders 2 closed M...Z polygon paths and computes WEST/EAST centroids and positive areas',
+      { callSignature: 'instance.getCentroids()' }
+    ),
+    r(
+      'Supports projectionType switching and projectCoordinate lookup',
+      'renderGeoMap(..., { projectionType: "mercator" }) vs { projectionType: "equirectangular" }',
+      'Projects [-115, 40] using the selected projection and returns distinct planar coordinates',
+      { callSignature: 'instance.projectCoordinate([-115, 40])' }
+    ),
+    r(
+      'Clicking a feature highlights it and triggers onSelectFeature with metric',
+      'click path.geo-feature[data-index="1"]',
+      'Marks clicked path data-active="true" with activeColor and invokes onSelectFeature callback',
+      { callSignature: 'path.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Respects showCentroids: false by omitting centroid markers',
+      'renderGeoMap(container, SAMPLE_GEOJSON, { showCentroids: false })',
+      'Renders feature paths while omitting circle.geo-centroid elements',
+      { callSignature: 'renderGeoMap(container, geojson, { showCentroids: false })' }
+    ),
+    r(
+      'Handles empty FeatureCollection gracefully and cleans up on destroy',
+      'renderGeoMap(container, { type: "FeatureCollection", features: [] }) and instance.destroy()',
+      'Returns empty centroids array and clears container innerHTML on destroy',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-contour-density-grid': [
+    r(
+      'Mounts SVG container with dimensions, role, aria-label, and layer groups',
+      'renderContourDensity(container, SAMPLE_CLUSTER, { width: 440, height: 280 })',
+      'SVG rendered with width="440", height="280", role="img", aria-label="Contour density chart", and layer groups',
+      { callSignature: 'renderContourDensity(container, points, { width: 440, height: 280 })' }
+    ),
+    r(
+      'Generates MultiPolygon density contours and renders SVG band paths',
+      'instance.getBands() and instance.getPeakDensity()',
+      'Computes isoline MultiPolygons, renders M...Z contour-band paths, and reports positive peak density',
+      { callSignature: 'instance.getBands()' }
+    ),
+    r(
+      'Respects point weights when computing peak kernel density',
+      'renderContourDensity(container, weightedPoints, { bandwidth: 20, thresholds: 5 })',
+      'Points with weight 10 produce higher peak density than unweighted points',
+      { callSignature: 'instance.getPeakDensity()' }
+    ),
+    r(
+      'Clicking a contour band invokes onSelectBand with band summary and index',
+      'click path.contour-band[data-index="0"]',
+      'onSelectBand invoked with ContourBandSummary { index: 0, value, ringCount } and index 0',
+      { callSignature: 'bandPath.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Respects showPoints: false by hiding raw density point circles',
+      'renderContourDensity(container, SAMPLE_CLUSTER, { showPoints: false })',
+      'Renders contour bands while omitting circle.density-point elements',
+      { callSignature: 'renderContourDensity(container, points, { showPoints: false })' }
+    ),
+    r(
+      'Handles empty points array gracefully and cleans up DOM on destroy',
+      'renderContourDensity(container, []) and instance.destroy()',
+      'Returns empty bands, 0 peak density, and clears container innerHTML on destroy',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-data-join-enter-update-exit': [
+    r(
+      'Mounts SVG container and enters all initial rows with data-join="enter"',
+      'renderKeyedDataJoin(container, INITIAL_METRICS, { width: 440, rowHeight: 36 })',
+      'Renders 3 g.join-row elements with data-join="enter" and stats { entered: 3, updated: 0, exited: 0, total: 3 }',
+      { callSignature: 'renderKeyedDataJoin(container, items, options)' }
+    ),
+    r(
+      'Preserves existing DOM node identity across keyed updates and marks data-join="update"',
+      'instance.update([{ id: "mem", ... }, { id: "cpu", ... }, { id: "disk", ... }])',
+      'Surviving keys reuse the exact same DOM elements with data-join="update", new key enters, removed key exits',
+      { callSignature: 'instance.update(nextItems)' }
+    ),
+    r(
+      'Reorders DOM elements to match new data array order and updates transforms',
+      'instance.update([{ id: "net", value: 90 }, { id: "cpu", value: 25 }])',
+      'DOM node order matches nextItems and translate(0, i * rowHeight) updates accordingly',
+      { callSignature: 'instance.update(reorderedItems)' }
+    ),
+    r(
+      'Scales bar widths proportionally and clamps values exceeding maxValue',
+      'renderKeyedDataJoin(container, [{ value: 25 }, { value: 50 }, { value: 200 }], { width: 340, maxValue: 100 })',
+      'Maps [0, 100] to [0, 200]px and clamps 200 at 200px',
+      { callSignature: 'renderKeyedDataJoin(container, items, { width: 340, maxValue: 100 })' }
+    ),
+    r(
+      'Handles empty array transitions and cleans up DOM on destroy',
+      'instance.update([]) and instance.destroy()',
+      'Exits all remaining rows and clears container innerHTML on destroy',
+      { callSignature: 'instance.update([])' }
+    ),
+  ],
+  'd3-scales-domain-range-basics': [
+    r(
+      'Mounts SVG container, baseline, and scaled rect.scale-bar elements',
+      'renderScaledCoordinateChart(container, SAMPLE_METRICS, { width: 440, height: 240, padding: 30 })',
+      'SVG rendered with line.zero-baseline at y=210, 4 rect.scale-bar elements, and extent [25, 100]',
+      { callSignature: 'renderScaledCoordinateChart(container, data, options)' }
+    ),
+    r(
+      'Maps data values to inverted SVG Y coordinates and proportional heights',
+      'instance.getBarGeometry("Q1", 0), getBarGeometry("Q2", 50), getBarGeometry("Q3", 100)',
+      'Maps 0 to baseline y=200 (height 0), 50 to y=110 (height 90), and 100 to top y=20 (height 180)',
+      { callSignature: 'instance.getBarGeometry(category, value)' }
+    ),
+    r(
+      'Computes categorical band X positions, bandwidth, and centerX',
+      'instance.getBarGeometry("Q1", 25) and instance.getBarGeometry("Q4", 75)',
+      'Computes discrete band x, bandwidth, and centerX = x + bandwidth / 2',
+      { callSignature: 'instance.getBarGeometry(category, value)' }
+    ),
+    r(
+      'Supports continuous Y coordinate inversion via invertY and clamping',
+      'instance.invertY(20), instance.invertY(110), instance.invertY(200)',
+      'Inverts pixel Y coordinates back to domain values (100, 50, 0) and respects clamp option',
+      { callSignature: 'instance.invertY(pixelY)' }
+    ),
+    r(
+      'Handles empty dataset gracefully and cleans up DOM on destroy',
+      'renderScaledCoordinateChart(container, []) and instance.destroy()',
+      'Returns extent [0, 0], 0 bars, and clears container innerHTML on destroy',
       { callSignature: 'instance.destroy()' }
     ),
   ],

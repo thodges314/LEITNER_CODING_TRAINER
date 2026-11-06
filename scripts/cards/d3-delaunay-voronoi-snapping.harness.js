@@ -44,7 +44,7 @@ const SAMPLE_POINTS = [
     width: 400,
     height: 300,
     pointRadius: 5,
-    pointColor: '#10b981',
+    pointColor: 'teal',
   });
 
   const circles = Array.from(container.querySelectorAll('circle.voronoi-point'));
@@ -62,11 +62,11 @@ const SAMPLE_POINTS = [
     circles[0].getAttribute('cx') === '50' &&
     circles[0].getAttribute('cy') === '60' &&
     circles[0].getAttribute('r') === '5' &&
-    circles[0].getAttribute('fill') === '#10b981' &&
+    circles[0].getAttribute('fill') === 'teal' &&
     circles[0].getAttribute('data-label') === 'Alpha' &&
     circles[0].getAttribute('data-active') === 'false' &&
     cells[0].getAttribute('fill') === 'transparent' &&
-    cells[0].getAttribute('stroke') === '#94a3b8';
+    cells[0].getAttribute('stroke') === 'gray';
 
   $test.check(
     'Generates clipped Voronoi cell paths and point markers for each datum',
@@ -102,62 +102,7 @@ const SAMPLE_POINTS = [
   container.remove();
 }
 
-// 4. Hovering a Voronoi cell highlights corresponding point and fires onHoverPoint
-{
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
-  let hoveredPoint = undefined;
-  let hoveredIndex = undefined;
-
-  const instance = renderVoronoiSnapping(container, SAMPLE_POINTS, {
-    pointRadius: 4,
-    pointColor: '#3b82f6',
-    activeColor: '#ef4444',
-    onHoverPoint: (pt, i) => {
-      hoveredPoint = pt;
-      hoveredIndex = i;
-    },
-  });
-
-  const cells = container.querySelectorAll('path.voronoi-cell');
-  const circles = container.querySelectorAll('circle.voronoi-point');
-
-  cells[1].dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-
-  const activeOnHover =
-    hoveredPoint &&
-    hoveredPoint.label === 'Beta' &&
-    hoveredIndex === 1 &&
-    circles[1].getAttribute('data-active') === 'true' &&
-    circles[1].getAttribute('fill') === '#ef4444' &&
-    circles[1].getAttribute('r') === '7' &&
-    circles[0].getAttribute('data-active') === 'false' &&
-    circles[0].getAttribute('fill') === '#3b82f6' &&
-    circles[0].getAttribute('r') === '4';
-
-  cells[1].dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
-
-  const resetOnLeave =
-    hoveredPoint === null &&
-    hoveredIndex === null &&
-    circles[1].getAttribute('data-active') === 'false' &&
-    circles[1].getAttribute('fill') === '#3b82f6' &&
-    circles[1].getAttribute('r') === '4';
-
-  const passed = Boolean(activeOnHover && resetOnLeave);
-
-  $test.check(
-    'Hovering a Voronoi cell highlights corresponding point and fires onHoverPoint',
-    passed,
-    { activeOnHover, resetOnLeave }
-  );
-
-  instance.destroy();
-  container.remove();
-}
-
-// 5. Clicking a Voronoi cell activates point and invokes onSelectPoint callback
+// 4. Clicking a Voronoi cell activates point and invokes onSelectPoint callback
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -167,7 +112,8 @@ const SAMPLE_POINTS = [
 
   const instance = renderVoronoiSnapping(container, SAMPLE_POINTS, {
     pointRadius: 4,
-    activeColor: '#f59e0b',
+    pointColor: 'steelblue',
+    activeColor: 'orange',
     onSelectPoint: (pt, i) => {
       selectedPoint = pt;
       selectedIdx = i;
@@ -179,25 +125,43 @@ const SAMPLE_POINTS = [
 
   cells[2].dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
-  const passed =
+  const firstClickPassed =
     selectedPoint !== null &&
     selectedPoint.label === 'Gamma' &&
     selectedIdx === 2 &&
     circles[2].getAttribute('data-active') === 'true' &&
-    circles[2].getAttribute('fill') === '#f59e0b' &&
-    circles[0].getAttribute('data-active') === 'false';
+    circles[2].getAttribute('fill') === 'orange' &&
+    circles[2].getAttribute('r') === '7' &&
+    circles[0].getAttribute('data-active') === 'false' &&
+    circles[0].getAttribute('fill') === 'steelblue' &&
+    circles[0].getAttribute('r') === '4';
+
+  cells[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+  const secondClickPassed =
+    selectedPoint !== null &&
+    selectedPoint.label === 'Beta' &&
+    selectedIdx === 1 &&
+    circles[1].getAttribute('data-active') === 'true' &&
+    circles[1].getAttribute('fill') === 'orange' &&
+    circles[1].getAttribute('r') === '7' &&
+    circles[2].getAttribute('data-active') === 'false' &&
+    circles[2].getAttribute('fill') === 'steelblue' &&
+    circles[2].getAttribute('r') === '4';
+
+  const passed = firstClickPassed && secondClickPassed;
 
   $test.check(
     'Clicking a Voronoi cell activates point and invokes onSelectPoint callback',
     passed,
-    { selectedPoint, selectedIdx }
+    { selectedPoint, selectedIdx, firstClickPassed, secondClickPassed }
   );
 
   instance.destroy();
   container.remove();
 }
 
-// 6. Handles empty points and showCells option gracefully and cleans up on destroy
+// 5. Handles empty points and showCells option gracefully and cleans up on destroy
 {
   const container = document.createElement('div');
   document.body.appendChild(container);

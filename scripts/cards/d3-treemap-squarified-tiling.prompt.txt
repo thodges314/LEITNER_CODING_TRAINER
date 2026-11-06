@@ -27,7 +27,6 @@ interface TreemapOptions {
   paddingInner?: number;
   paddingOuter?: number;
   round?: boolean;
-  colors?: string[];
   onSelectCell?: (cell: TreemapCellMetric, index: number) => void;
 }
 
@@ -61,7 +60,7 @@ Implement a hierarchical area visualization that converts nested tree data into 
 - **Treemap Cells (`g.treemap-cell`)**:
   - For each positive-valued leaf at index `i`:
     - Appends `<g class="treemap-cell">` translated to `translate(x0, y0)` with `data-name="d.data.name"`, `data-value="d.value"`, and `data-index="i"`.
-    - Appends `<rect class="treemap-rect">` with `width = Math.max(0, x1 - x0)`, `height = Math.max(0, y1 - y0)`, `fill = palette[i % palette.length]` (using `options.colors` if non-empty, otherwise `d3.schemeTableau10` or a 10-color fallback palette), `data-name="d.data.name"`, and `data-value="d.value"`.
+    - Appends `<rect class="treemap-rect">` with `width = Math.max(0, x1 - x0)`, `height = Math.max(0, y1 - y0)`, `fill = d3.schemeTableau10[i % 10]`, `data-name="d.data.name"`, and `data-value="d.value"`.
     - Appends `<text class="treemap-label">` with `x="6"`, `y="16"`, and text content set to `d.data.name`.
     - Clicking `<g class="treemap-cell">` invokes `options.onSelectCell(cellMetric, i)` if provided.
 
@@ -69,11 +68,4 @@ Implement a hierarchical area visualization that converts nested tree data into 
   - `instance.getLeaves()` returns the array of `TreemapCellMetric` objects (`{ name, value, x0, y0, x1, y1, width, height, depth }`) for all rendered leaf cells.
   - If `data` is null/empty or total hierarchy value is `0`, renders the `<svg>` with no `.treemap-cell` groups and `getLeaves()` returns `[]`.
   - `instance.destroy()` removes the SVG and empties `container.innerHTML`.
-
-#### Optional Styling (CSS is not graded)
-Optional helper classes are available in the preview environment:
-- `.treemap-cell`: cell group container.
-- `.treemap-rect`: proportional area rectangle.
-- `.treemap-label`: cell text label.
-You may use these classes, custom styles, or your own class names.
 
