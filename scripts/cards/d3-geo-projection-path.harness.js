@@ -159,8 +159,8 @@ const SAMPLE_GEOJSON = {
   let selectedIdx = null;
 
   const instance = renderGeoMap(container, SAMPLE_GEOJSON, {
-    fillColor: '#1e293b',
-    activeColor: '#10b981',
+    fillColor: 'slategray',
+    activeColor: 'teal',
     onSelectFeature: (f, m, idx) => {
       selectedFeature = f;
       selectedMetric = m;
@@ -178,9 +178,9 @@ const SAMPLE_GEOJSON = {
     selectedMetric.name === 'East Ridge' &&
     selectedIdx === 1 &&
     paths[1].getAttribute('data-active') === 'true' &&
-    paths[1].getAttribute('fill') === '#10b981' &&
+    paths[1].getAttribute('fill') === 'teal' &&
     paths[0].getAttribute('data-active') === 'false' &&
-    paths[0].getAttribute('fill') === '#1e293b';
+    paths[0].getAttribute('fill') === 'slategray';
 
   $test.check(
     'Clicking a feature highlights it and triggers onSelectFeature with metric',

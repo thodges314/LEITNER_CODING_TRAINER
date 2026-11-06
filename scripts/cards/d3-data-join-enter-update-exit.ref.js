@@ -3,8 +3,8 @@ function renderKeyedDataJoin(container, initialItems, options = {}) {
     width = 440,
     rowHeight = 36,
     maxValue = 100,
-    enterColor = '#10b981',
-    updateColor = '#3b82f6',
+    enterColor = 'seagreen',
+    updateColor = 'steelblue',
   } = options;
 
   const root = d3.select(container);

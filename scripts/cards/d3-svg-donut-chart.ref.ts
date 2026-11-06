@@ -57,11 +57,6 @@ function renderDonutChart(
     .innerRadius(innerRadius)
     .outerRadius(outerRadius);
 
-  const colorScale: string[] = d3.schemeCategory10 || [
-    '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
-    '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf',
-  ];
-
   const pieData = Array.isArray(data) ? pie(data) : [];
 
   g.selectAll('path.arc-slice')
@@ -73,7 +68,7 @@ function renderDonutChart(
     .attr('data-label', (d: any) => d.data.label)
     .attr('data-value', (d: any) => String(d.data.value))
     .attr('data-index', (_: any, i: number) => String(i))
-    .attr('fill', (d: any, i: number) => d.data.color || colorScale[i % colorScale.length])
+    .attr('fill', (d: any, i: number) => d.data.color || d3.schemeCategory10[i % 10])
     .on('click', function (_: any, d: any) {
       if (typeof onSelectSlice === 'function') {
         onSelectSlice(d.data, d.index !== undefined ? d.index : 0);

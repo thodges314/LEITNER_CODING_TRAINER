@@ -48,7 +48,7 @@ Implement `renderScaledCoordinateChart` using `d3.extent`, `d3.scaleLinear`, and
      - `padding = 32`
      - `paddingInner = 0.2`
      - `clamp = true`
-     - `barColor = '#6366f1'`
+     - `barColor = 'steelblue'`
    - Create an `<svg>` with `width`, `height`, `role="img"`, and `aria-label="Scaled coordinate chart"`.
 
 2. **Extent, Band X-Scale & Inverted Linear Y-Scale**:

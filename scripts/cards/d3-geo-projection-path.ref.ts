@@ -55,9 +55,9 @@ function renderGeoMap(
     height = 300,
     projectionType = 'mercator',
     padding = 16,
-    fillColor = '#1e293b',
-    activeColor = '#3b82f6',
-    strokeColor = '#64748b',
+    fillColor = 'slategray',
+    activeColor = 'steelblue',
+    strokeColor = 'gray',
     showCentroids = true,
     onSelectFeature,
   } = options;

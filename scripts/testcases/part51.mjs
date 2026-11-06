@@ -198,7 +198,7 @@ export default {
     r(
       'Renders bar elements with data attributes, proportional heights, and color',
       'inspect rect.bar elements',
-      'rects render with data-label, data-value, data-index, fill="#10b981", and proportional heights',
+      'rects render with data-label, data-value, data-index, fill="teal", and proportional heights',
       { callSignature: 'container.querySelectorAll("rect.bar")' }
     ),
     r(
@@ -230,7 +230,7 @@ export default {
     r(
       'Generates smooth curve path with stroke styling and M-command path string',
       'inspect path.chart-line',
-      'path has stroke="#f59e0b", stroke-width="3", fill="none", and valid M-curve d attribute',
+      'path has stroke="orange", stroke-width="3", fill="none", and valid M-curve d attribute',
       { callSignature: 'container.querySelector("path.chart-line")' }
     ),
     r(
@@ -312,7 +312,7 @@ export default {
     r(
       'Renders scatter dot circles with coordinate attributes and fill color',
       'inspect circle.scatter-dot elements',
-      'circles render with data-x, data-y, data-index, fill="#8b5cf6", and inverted Y scaling',
+      'circles render with data-x, data-y, data-index, fill="purple", and inverted Y scaling',
       { callSignature: 'container.querySelectorAll("circle.scatter-dot")' }
     ),
     r(
@@ -527,7 +527,7 @@ export default {
     ),
     r(
       'Renders focus and context line paths with full initial domain',
-      'renderBrushCoordinator(container, SAMPLE_SERIES, { color: "#10b981" })',
+      'renderBrushCoordinator(container, SAMPLE_SERIES, { color: "teal" })',
       'focus-line and context-line render M-paths across full domain [0, 50]',
       { callSignature: 'instance.getDomain()' }
     ),

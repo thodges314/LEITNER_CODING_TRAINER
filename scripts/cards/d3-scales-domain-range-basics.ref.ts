@@ -39,7 +39,7 @@ function renderScaledCoordinateChart(
     padding = 32,
     paddingInner = 0.2,
     clamp = true,
-    barColor = '#6366f1',
+    barColor = 'steelblue',
   } = options;
 
   const root = d3.select(container);
@@ -94,7 +94,7 @@ function renderScaledCoordinateChart(
     .attr('y1', String(baselineY))
     .attr('x2', String(width - padding))
     .attr('y2', String(baselineY))
-    .attr('stroke', '#475569');
+    .attr('stroke', 'gray');
 
   const barsGroup = svgSel.append('g').attr('class', 'scaled-bars');
 

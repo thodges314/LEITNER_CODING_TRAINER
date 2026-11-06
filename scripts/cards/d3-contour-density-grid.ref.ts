@@ -17,7 +17,6 @@ interface ContourDensityOptions {
   thresholds?: number;
   cellSize?: number;
   showPoints?: boolean;
-  colors?: string[];
   onSelectBand?: (band: ContourBandSummary, index: number) => void;
 }
 
@@ -41,17 +40,12 @@ function renderContourDensity(
     thresholds = 8,
     cellSize = 4,
     showPoints = true,
-    colors = ['#1e3a8a', '#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],
     onSelectBand,
   } = options;
 
   container.innerHTML = '';
 
   const pts: DensityPoint[] = Array.isArray(points) ? points : [];
-  const palette =
-    Array.isArray(colors) && colors.length > 0
-      ? colors
-      : ['#1e3a8a', '#2563eb', '#60a5fa'];
 
   let contours: d3.ContourMultiPolygon[] = [];
   if (pts.length > 0) {
@@ -99,10 +93,10 @@ function renderContourDensity(
     .attr('class', 'contour-band')
     .attr('d', (c: d3.ContourMultiPolygon) => geoPath(c) || '')
     .attr('fill', (_c: d3.ContourMultiPolygon, i: number) =>
-      palette[Math.min(i, palette.length - 1)]
+      d3.interpolateBlues((i + 1) / Math.max(1, contours.length))
     )
     .attr('fill-opacity', '0.55')
-    .attr('stroke', '#38bdf8')
+    .attr('stroke', 'steelblue')
     .attr('stroke-width', '1')
     .attr('data-value', (c: d3.ContourMultiPolygon) => String(c.value))
     .attr('data-index', (_c: d3.ContourMultiPolygon, i: number) => String(i))
@@ -123,7 +117,7 @@ function renderContourDensity(
       .attr('cx', (d: DensityPoint) => d.x)
       .attr('cy', (d: DensityPoint) => d.y)
       .attr('r', 2.5)
-      .attr('fill', '#f8fafc');
+      .attr('fill', 'white');
   }
 
   return {

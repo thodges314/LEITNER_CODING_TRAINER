@@ -4,7 +4,7 @@ function renderScatterPlot(container, data, options = {}) {
     height = 300,
     margin: customMargin = {},
     defaultRadius = 5,
-    color = '#3b82f6',
+    color = 'steelblue',
     onSelectPoint,
   } = options;
 

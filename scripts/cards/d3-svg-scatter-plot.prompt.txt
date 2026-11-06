@@ -58,7 +58,7 @@ The function mounts into `container` and returns an object containing the root `
   - Binds data to `<circle class="scatter-dot">` elements inside `g.chart-area`.
   - Positions each circle at `cx = xScale(d.x)` and `cy = yScale(d.y)`.
   - Radius `r` is `d.radius || defaultRadius || 5`.
-  - Fill color defaults to `options.color || '#3b82f6'`.
+  - Fill color defaults to `options.color || 'steelblue'`.
   - Sets data attributes: `data-x="d.x"`, `data-y="d.y"`, and `data-index="index"`. If `d.label` is provided, also sets `data-label="d.label"`.
   - Clicking a dot invokes `options.onSelectPoint(d, index)` if provided.
 

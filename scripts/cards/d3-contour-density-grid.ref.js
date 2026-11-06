@@ -6,17 +6,12 @@ function renderContourDensity(container, points, options = {}) {
     thresholds = 8,
     cellSize = 4,
     showPoints = true,
-    colors = ['#1e3a8a', '#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],
     onSelectBand,
   } = options;
 
   container.innerHTML = '';
 
   const pts = Array.isArray(points) ? points : [];
-  const palette =
-    Array.isArray(colors) && colors.length > 0
-      ? colors
-      : ['#1e3a8a', '#2563eb', '#60a5fa'];
 
   let contours = [];
   if (pts.length > 0) {
@@ -60,9 +55,9 @@ function renderContourDensity(container, points, options = {}) {
     .join('path')
     .attr('class', 'contour-band')
     .attr('d', (c) => geoPath(c) || '')
-    .attr('fill', (_c, i) => palette[Math.min(i, palette.length - 1)])
+    .attr('fill', (_c, i) => d3.interpolateBlues((i + 1) / Math.max(1, contours.length)))
     .attr('fill-opacity', '0.55')
-    .attr('stroke', '#38bdf8')
+    .attr('stroke', 'steelblue')
     .attr('stroke-width', '1')
     .attr('data-value', (c) => String(c.value))
     .attr('data-index', (_c, i) => String(i))
@@ -83,7 +78,7 @@ function renderContourDensity(container, points, options = {}) {
       .attr('cx', (d) => d.x)
       .attr('cy', (d) => d.y)
       .attr('r', 2.5)
-      .attr('fill', '#f8fafc');
+      .attr('fill', 'white');
   }
 
   return {

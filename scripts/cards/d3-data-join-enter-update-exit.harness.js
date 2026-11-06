@@ -12,7 +12,7 @@ const INITIAL_METRICS = [
   const instance = renderKeyedDataJoin(container, INITIAL_METRICS, {
     width: 440,
     rowHeight: 36,
-    enterColor: '#10b981',
+    enterColor: 'seagreen',
   });
 
   const svg = container.querySelector('svg');
@@ -22,7 +22,7 @@ const INITIAL_METRICS = [
   const allEnter = rows.every(
     (r) =>
       r.getAttribute('data-join') === 'enter' &&
-      r.querySelector('rect.join-bar')?.getAttribute('fill') === '#10b981'
+      r.querySelector('rect.join-bar')?.getAttribute('fill') === 'seagreen'
   );
 
   const passed =
@@ -52,8 +52,8 @@ const INITIAL_METRICS = [
   document.body.appendChild(container);
 
   const instance = renderKeyedDataJoin(container, INITIAL_METRICS, {
-    enterColor: '#10b981',
-    updateColor: '#3b82f6',
+    enterColor: 'seagreen',
+    updateColor: 'steelblue',
   });
 
   const memNodeBefore = container.querySelector('g.join-row[data-id="mem"]');
@@ -76,10 +76,10 @@ const INITIAL_METRICS = [
     cpuNodeAfter === cpuNodeBefore &&
     netNodeAfter === null &&
     memNodeAfter.getAttribute('data-join') === 'update' &&
-    memNodeAfter.querySelector('rect.join-bar')?.getAttribute('fill') === '#3b82f6' &&
+    memNodeAfter.querySelector('rect.join-bar')?.getAttribute('fill') === 'steelblue' &&
     diskNodeAfter !== null &&
     diskNodeAfter.getAttribute('data-join') === 'enter' &&
-    diskNodeAfter.querySelector('rect.join-bar')?.getAttribute('fill') === '#10b981' &&
+    diskNodeAfter.querySelector('rect.join-bar')?.getAttribute('fill') === 'seagreen' &&
     nextStats.entered === 1 &&
     nextStats.updated === 2 &&
     nextStats.exited === 1 &&

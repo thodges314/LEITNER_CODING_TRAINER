@@ -14,7 +14,7 @@ const SAMPLE_METRICS = [
     width: 440,
     height: 240,
     padding: 30,
-    barColor: '#6366f1',
+    barColor: 'steelblue',
   });
 
   const svg = container.querySelector('svg');

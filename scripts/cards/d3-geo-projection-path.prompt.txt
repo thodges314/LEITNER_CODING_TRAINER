@@ -59,7 +59,7 @@ Implement `renderGeoMap(container, geojson, options)` to fit a GeoJSON `FeatureC
 
 - **Canvas & Projection Setup**:
   - Empties `container.innerHTML` and appends an `<svg>` element with `width={width}`, `height={height}`, `role="img"`, and `aria-label="Geographic map"`.
-  - Option defaults: `width = 480`, `height = 300`, `projectionType = 'mercator'`, `padding = 16`, `fillColor = '#1e293b'`, `activeColor = '#3b82f6'`, `strokeColor = '#64748b'`, `showCentroids = true`.
+  - Option defaults: `width = 480`, `height = 300`, `projectionType = 'mercator'`, `padding = 16`, `fillColor = 'slategray'`, `activeColor = 'steelblue'`, `strokeColor = 'gray'`, `showCentroids = true`.
   - Selects the D3 projection based on `projectionType`:
     - `'equirectangular'` -> `d3.geoEquirectangular()`
     - `'orthographic'` -> `d3.geoOrthographic()`

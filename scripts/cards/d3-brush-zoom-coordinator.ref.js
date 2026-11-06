@@ -3,7 +3,7 @@ function renderBrushCoordinator(container, data, options = {}) {
     width = 480,
     focusHeight = 200,
     contextHeight = 70,
-    color = '#3b82f6',
+    color = 'steelblue',
     initialSelection,
     onBrushChange,
   } = options;
@@ -80,7 +80,7 @@ function renderBrushCoordinator(container, data, options = {}) {
     .append('path')
     .attr('class', 'context-line')
     .attr('fill', 'none')
-    .attr('stroke', '#94a3b8')
+    .attr('stroke', 'gray')
     .attr('stroke-width', 1.5)
     .attr('d', points.length > 0 ? contextLineGen(points) : '');
 

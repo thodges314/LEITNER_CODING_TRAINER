@@ -3,7 +3,7 @@ function renderLineChart(container, data = [], options = {}) {
     width = 420,
     height = 260,
     margin: customMargin = {},
-    strokeColor = '#38bdf8',
+    strokeColor = 'steelblue',
     strokeWidth = 2,
     showPoints = true,
     onSelectPoint,

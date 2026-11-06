@@ -75,7 +75,7 @@ const SAMPLE_DATA = [
   const instance = renderBarChart(container, SAMPLE_DATA, {
     width: 400,
     height: 260,
-    color: '#10b981',
+    color: 'teal',
   });
 
   const bars = Array.from(container.querySelectorAll('rect.bar'));
@@ -87,7 +87,7 @@ const SAMPLE_DATA = [
     bars[0].getAttribute('data-index') === '0' &&
     bars[1].getAttribute('data-label') === 'Beta' &&
     bars[1].getAttribute('data-value') === '80' &&
-    bars[0].getAttribute('fill') === '#10b981' &&
+    bars[0].getAttribute('fill') === 'teal' &&
     parseFloat(bars[1].getAttribute('height') || '0') > parseFloat(bars[0].getAttribute('height') || '0');
 
   $test.check(

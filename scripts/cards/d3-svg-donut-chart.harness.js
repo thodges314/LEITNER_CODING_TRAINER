@@ -1,7 +1,7 @@
 const SAMPLE_DATA = [
-  { label: 'JavaScript', value: 45, color: '#f7df1e' },
-  { label: 'TypeScript', value: 35, color: '#3178c6' },
-  { label: 'Python', value: 20, color: '#3572a5' },
+  { label: 'JavaScript', value: 45, color: 'gold' },
+  { label: 'TypeScript', value: 35, color: 'steelblue' },
+  { label: 'Python', value: 20, color: 'seagreen' },
 ];
 
 // 1. Appends SVG container with correct dimensions, role, and aria-label
@@ -76,9 +76,9 @@ const SAMPLE_DATA = [
     slices[0].getAttribute('data-label') === 'JavaScript' &&
     slices[0].getAttribute('data-value') === '45' &&
     slices[0].getAttribute('data-index') === '0' &&
-    slices[0].getAttribute('fill') === '#f7df1e' &&
+    slices[0].getAttribute('fill') === 'gold' &&
     slices[1].getAttribute('data-label') === 'TypeScript' &&
-    slices[1].getAttribute('fill') === '#3178c6' &&
+    slices[1].getAttribute('fill') === 'steelblue' &&
     Boolean(slices[0].getAttribute('d')?.startsWith('M'));
 
   $test.check(

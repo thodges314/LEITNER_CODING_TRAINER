@@ -34,7 +34,7 @@ Implement `renderBrushCoordinator(container, data, options)` to mount a synchron
 
 - **Canvas & Layout Geometry**:
   - Empties `container.innerHTML` before mounting.
-  - Option defaults: `width = 480`, `focusHeight = 200`, `contextHeight = 70`, `color = '#3b82f6'`.
+  - Option defaults: `width = 480`, `focusHeight = 200`, `contextHeight = 70`, `color = 'steelblue'`.
   - Uses margin `{ top: 15, right: 20, bottom: 25, left: 40 }` and vertical `gap = 25` between the focus and context charts.
   - Computes `innerWidth = Math.max(0, width - margin.left - margin.right)` and `totalHeight = focusHeight + contextHeight + gap + margin.top + margin.bottom`.
   - Appends `<svg>` with `width={width}`, `height={totalHeight}`, `role="img"`, and `aria-label="Brush coordinator chart"`.
@@ -48,7 +48,7 @@ Implement `renderBrushCoordinator(container, data, options)` to mount a synchron
     - `<g class="x-axis focus-x-axis">` at `translate(0, focusHeight)` calling `d3.axisBottom(focusX)`
     - `<g class="y-axis focus-y-axis">` calling `d3.axisLeft(focusY)`
   - Appends `<g class="context-chart">` translated to `translate(margin.left, margin.top + focusHeight + gap)` containing:
-    - `<path class="context-line">` (`fill="none"`, `stroke="#94a3b8"`, `stroke-width="1.5"`) rendering all data points
+    - `<path class="context-line">` (`fill="none"`, `stroke="gray"`, `stroke-width="1.5"`) rendering all data points
     - `<g class="x-axis context-x-axis">` at `translate(0, contextHeight)` calling `d3.axisBottom(contextX)`
     - `<g class="brush-layer">` calling `d3.brushX().extent([[0, 0], [innerWidth, contextHeight]])`
 

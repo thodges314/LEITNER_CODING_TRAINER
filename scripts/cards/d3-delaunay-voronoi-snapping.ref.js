@@ -3,8 +3,8 @@ function renderVoronoiSnapping(container, points = [], options = {}) {
     width = 450,
     height = 300,
     pointRadius = 4,
-    pointColor = '#3b82f6',
-    activeColor = '#f97316',
+    pointColor = 'steelblue',
+    activeColor = 'orange',
     showCells = true,
     onSelectPoint,
   } = options;
@@ -69,7 +69,7 @@ function renderVoronoiSnapping(container, points = [], options = {}) {
       .attr('d', (_, i) => voronoi.renderCell(i))
       .attr('data-index', (_, i) => String(i))
       .attr('fill', 'transparent')
-      .attr('stroke', showCells ? '#94a3b8' : 'none')
+      .attr('stroke', showCells ? 'gray' : 'none')
       .attr('pointer-events', 'all')
       .on('click', function (_, d) {
         const idx = safePoints.indexOf(d);

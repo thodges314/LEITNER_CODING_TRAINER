@@ -5,7 +5,6 @@ function renderTreemap(container, data, options = {}) {
     paddingInner = 2,
     paddingOuter = 2,
     round = true,
-    colors,
     onSelectCell,
   } = options;
 
@@ -18,22 +17,6 @@ function renderTreemap(container, data, options = {}) {
     .attr('height', height)
     .attr('role', 'img')
     .attr('aria-label', 'Treemap chart');
-
-  const palette =
-    Array.isArray(colors) && colors.length > 0
-      ? colors
-      : d3.schemeTableau10 || [
-          '#4e79a7',
-          '#f28e2c',
-          '#e15759',
-          '#76b7b2',
-          '#59a14f',
-          '#edc949',
-          '#af7aa1',
-          '#ff9da7',
-          '#9c755f',
-          '#bab0ab',
-        ];
 
   let leafMetrics = [];
 
@@ -91,7 +74,7 @@ function renderTreemap(container, data, options = {}) {
         .attr('class', 'treemap-rect')
         .attr('width', (d) => d.width)
         .attr('height', (d) => d.height)
-        .attr('fill', (_, i) => palette[i % palette.length])
+        .attr('fill', (_, i) => d3.schemeTableau10[i % 10])
         .attr('data-name', (d) => d.name)
         .attr('data-value', (d) => String(d.value));
 

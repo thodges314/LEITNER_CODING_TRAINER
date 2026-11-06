@@ -73,7 +73,7 @@ const SAMPLE_POINTS = [
   const container = document.createElement('div');
   document.body.appendChild(container);
 
-  const instance = renderScatterPlot(container, SAMPLE_POINTS, { color: '#8b5cf6' });
+  const instance = renderScatterPlot(container, SAMPLE_POINTS, { color: 'purple' });
   const dots = Array.from(container.querySelectorAll('circle.scatter-dot'));
 
   const passed =
@@ -82,7 +82,7 @@ const SAMPLE_POINTS = [
     dots[0].getAttribute('data-y') === '20' &&
     dots[0].getAttribute('data-label') === 'P1' &&
     dots[0].getAttribute('data-index') === '0' &&
-    dots[0].getAttribute('fill') === '#8b5cf6' &&
+    dots[0].getAttribute('fill') === 'purple' &&
     // Inverted Y: P4 (y=80) should have smaller cy than P1 (y=20)
     parseFloat(dots[3].getAttribute('cy') || '999') < parseFloat(dots[0].getAttribute('cy') || '0');
 

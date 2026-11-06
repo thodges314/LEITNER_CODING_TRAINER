@@ -45,16 +45,14 @@ Voronoi overlays partition a chart's 2D plane into convex polygonal regions arou
 
 - **Point Markers (`g.points-layer`)**:
   - Renders a `<circle class="voronoi-point">` for each point in `points`.
-  - Sets `cx = d.x`, `cy = d.y`, `r = pointRadius` (default `4`), `fill = pointColor` (default `'#3b82f6'`).
+  - Sets `cx = d.x`, `cy = d.y`, `r = pointRadius` (default `4`), `fill = pointColor` (default `'steelblue'`).
   - Sets `data-index="i"`, `data-x="d.x"`, `data-y="d.y"`, and `data-active="false"`. If `d.label` is defined, also sets `data-label="d.label"`.
 
 - **Voronoi Overlay Cells & Snapping (`g.cells-layer`)**:
   - Renders a `<path class="voronoi-cell">` for each point at index `i`.
-  - Sets `d = voronoi.renderCell(i)`, `data-index="i"`, `fill="transparent"`, `pointer-events="all"`, and `stroke = showCells ? '#94a3b8' : 'none'` (where `showCells` defaults to `true`).
+  - Sets `d = voronoi.renderCell(i)`, `data-index="i"`, `fill="transparent"`, `pointer-events="all"`, and `stroke = showCells ? 'gray' : 'none'` (where `showCells` defaults to `true`).
   - **Selection (`click` on `.voronoi-cell`)**:
-    - Activates point `i` by setting its circle's `data-active="true"`, `fill = activeColor` (default `'#f97316'`), and `r = pointRadius * 1.75` (all other circles reset to `data-active="false"`, `fill = pointColor`, `r = pointRadius`), then invokes `options.onSelectPoint(points[i], i)` if provided.
-  - **Performance Note (CSS `:hover` vs. D3 Hover Loops)**:
-    - Visual hover feedback on `.voronoi-cell` should be handled by CSS `:hover` transitions rather than attaching D3 `mouseenter`/`mouseleave` handlers that re-query and mutate DOM attributes on every pointer movement.
+    - Activates point `i` by setting its circle's `data-active="true"`, `fill = activeColor` (default `'orange'`), and `r = pointRadius * 1.75` (all other circles reset to `data-active="false"`, `fill = pointColor`, `r = pointRadius`), then invokes `options.onSelectPoint(points[i], i)` if provided.
 
 - **Edge Cases & Cleanup**:
   - If `points` is empty (`[]`), renders the SVG and layer groups without circles or cell paths, and `findClosestIndex` returns `-1`.

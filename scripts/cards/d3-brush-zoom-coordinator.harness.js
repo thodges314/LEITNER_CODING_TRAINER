@@ -58,7 +58,7 @@ const SAMPLE_SERIES = [
   document.body.appendChild(container);
 
   const instance = renderBrushCoordinator(container, SAMPLE_SERIES, {
-    color: '#10b981',
+    color: 'teal',
   });
 
   const focusLine = container.querySelector('path.focus-line');
@@ -69,7 +69,7 @@ const SAMPLE_SERIES = [
   const passed =
     focusLine !== null &&
     (focusLine.getAttribute('d') || '').startsWith('M') &&
-    focusLine.getAttribute('stroke') === '#10b981' &&
+    focusLine.getAttribute('stroke') === 'teal' &&
     contextLine !== null &&
     (contextLine.getAttribute('d') || '').startsWith('M') &&
     domain[0] === 0 &&
