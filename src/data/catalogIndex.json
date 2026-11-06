@@ -4887,5 +4887,39 @@
       "algorithms"
     ],
     "summary": "interface ForceSimNode {"
+  },
+  {
+    "id": "d3-contour-density-grid",
+    "title": "D3 2D Kernel Density Estimation & Contours",
+    "track": "d3",
+    "concept": "d3-contour-density",
+    "difficulty": 4,
+    "tags": [
+      "d3",
+      "contour",
+      "density",
+      "kde",
+      "statistics",
+      "svg",
+      "data-visualization"
+    ],
+    "summary": "interface DensityPoint {"
+  },
+  {
+    "id": "d3-geo-projection-path",
+    "title": "D3 GeoJSON Cartographic Projection & Path",
+    "track": "d3",
+    "concept": "d3-geo-projection",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "geo",
+      "cartography",
+      "geojson",
+      "projection",
+      "svg",
+      "data-visualization"
+    ],
+    "summary": "interface GeoFeature {"
   }
 ]

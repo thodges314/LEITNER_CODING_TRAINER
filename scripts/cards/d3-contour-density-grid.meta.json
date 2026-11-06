@@ -1,0 +1,18 @@
+{
+  "title": "D3 2D Kernel Density Estimation & Contours",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "contour",
+    "density",
+    "kde",
+    "statistics",
+    "svg",
+    "data-visualization"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "d3"
+  ]
+}
+

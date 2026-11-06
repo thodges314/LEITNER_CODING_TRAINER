@@ -1189,6 +1189,72 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Primary stroke and dot color for the focus chart',
     },
   ],
+  'd3-geo-projection-path': [
+    {
+      name: 'projectionType',
+      type: 'enum',
+      defaultValue: 'mercator',
+      options: ['mercator', 'equirectangular', 'orthographic'],
+      description: 'Cartographic spherical-to-planar projection algorithm',
+    },
+    {
+      name: 'padding',
+      type: 'number',
+      defaultValue: 20,
+      min: 4,
+      max: 48,
+      step: 4,
+      description: 'Viewport inset padding in pixels for fitExtent',
+    },
+    {
+      name: 'activeColor',
+      type: 'enum',
+      defaultValue: '#3b82f6',
+      options: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899'],
+      description: 'Highlight color for selected region polygon and centroids',
+    },
+    {
+      name: 'showCentroids',
+      type: 'boolean',
+      defaultValue: true,
+      description: 'Render projected region centroid markers',
+    },
+  ],
+  'd3-contour-density-grid': [
+    {
+      name: 'bandwidth',
+      type: 'number',
+      defaultValue: 24,
+      min: 8,
+      max: 50,
+      step: 2,
+      description: 'Gaussian kernel smoothing bandwidth in pixels',
+    },
+    {
+      name: 'thresholds',
+      type: 'number',
+      defaultValue: 8,
+      min: 3,
+      max: 16,
+      step: 1,
+      description: 'Target number of isoline density elevation bands',
+    },
+    {
+      name: 'cellSize',
+      type: 'number',
+      defaultValue: 4,
+      min: 2,
+      max: 16,
+      step: 2,
+      description: 'Estimator grid cell size (smaller = finer contour resolution)',
+    },
+    {
+      name: 'showPoints',
+      type: 'boolean',
+      defaultValue: true,
+      description: 'Overlay raw data points on top of contour bands',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

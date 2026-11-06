@@ -14,7 +14,7 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 
 ---
 
-## 2. Current Status (13 Cards — 100% Typed & Passing)
+## 2. Current Status (15 Cards — 100% Typed & Passing)
 
 | Card ID | Description | Concepts / Modules | UI / Preview |
 |---|---|---|---|
@@ -31,6 +31,8 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 | `d3-treemap-squarified-tiling` | Squarified proportional area treemap with inner/outer padding | `d3.hierarchy()`, `d3.treemap()`, `d3.treemapSquarify` | SVG Treemap |
 | `d3-force-simulation-headless` | Synchronous headless force simulation, convergence & kinetic energy | `d3.forceSimulation()`, `d3.forceManyBody()`, `d3.forceCollide()` | Force Network SVG |
 | `d3-brush-zoom-coordinator` | Linked focus + context chart with 1D horizontal brush rescaling | `d3.brushX()`, `scale.invert()`, focus/context coordination | Brush & Zoom SVG |
+| `d3-geo-projection-path` | Geographic spherical projection, GeoJSON paths & projected centroids | `d3.geoMercator()`, `d3.geoEquirectangular()`, `d3.geoPath()` | Cartographic Map SVG |
+| `d3-contour-density-grid` | 2D kernel density estimation & marching-squares isobands | `d3.contourDensity()`, `d3.geoPath()`, `d3.scaleSequential()` | Density Isolines SVG |
 
 ---
 

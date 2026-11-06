@@ -1398,5 +1398,13 @@
   "d3-brush-zoom-coordinator": {
     "difficulty": 4,
     "concept": "d3-brush-interaction"
+  },
+  "d3-geo-projection-path": {
+    "difficulty": 3,
+    "concept": "d3-geo-projection"
+  },
+  "d3-contour-density-grid": {
+    "difficulty": 4,
+    "concept": "d3-contour-density"
   }
 }

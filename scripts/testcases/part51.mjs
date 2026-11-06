@@ -562,6 +562,82 @@ export default {
       { callSignature: 'instance.destroy()' }
     ),
   ],
+  'd3-geo-projection-path': [
+    r(
+      'Mounts SVG container with role, aria-label, and feature/centroid groups',
+      'renderGeoMap(container, SAMPLE_GEOJSON, { width: 500, height: 320 })',
+      'SVG rendered with width="500", height="320", role="img", aria-label="Geographic map", and map groups',
+      { callSignature: 'renderGeoMap(container, geojson, { width: 500, height: 320 })' }
+    ),
+    r(
+      'Projects GeoJSON features into closed SVG paths and computes centroids',
+      'instance.getCentroids()',
+      'Renders 2 closed M...Z polygon paths and computes WEST/EAST centroids and positive areas',
+      { callSignature: 'instance.getCentroids()' }
+    ),
+    r(
+      'Supports projectionType switching and projectCoordinate lookup',
+      'renderGeoMap(..., { projectionType: "mercator" }) vs { projectionType: "equirectangular" }',
+      'Projects [-115, 40] using the selected projection and returns distinct planar coordinates',
+      { callSignature: 'instance.projectCoordinate([-115, 40])' }
+    ),
+    r(
+      'Clicking a feature highlights it and triggers onSelectFeature with metric',
+      'click path.geo-feature[data-index="1"]',
+      'Marks clicked path data-active="true" with activeColor and invokes onSelectFeature callback',
+      { callSignature: 'path.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Respects showCentroids: false by omitting centroid markers',
+      'renderGeoMap(container, SAMPLE_GEOJSON, { showCentroids: false })',
+      'Renders feature paths while omitting circle.geo-centroid elements',
+      { callSignature: 'renderGeoMap(container, geojson, { showCentroids: false })' }
+    ),
+    r(
+      'Handles empty FeatureCollection gracefully and cleans up on destroy',
+      'renderGeoMap(container, { type: "FeatureCollection", features: [] }) and instance.destroy()',
+      'Returns empty centroids array and clears container innerHTML on destroy',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-contour-density-grid': [
+    r(
+      'Mounts SVG container with dimensions, role, aria-label, and layer groups',
+      'renderContourDensity(container, SAMPLE_CLUSTER, { width: 440, height: 280 })',
+      'SVG rendered with width="440", height="280", role="img", aria-label="Contour density chart", and layer groups',
+      { callSignature: 'renderContourDensity(container, points, { width: 440, height: 280 })' }
+    ),
+    r(
+      'Generates MultiPolygon density contours and renders SVG band paths',
+      'instance.getBands() and instance.getPeakDensity()',
+      'Computes isoline MultiPolygons, renders M...Z contour-band paths, and reports positive peak density',
+      { callSignature: 'instance.getBands()' }
+    ),
+    r(
+      'Respects point weights when computing peak kernel density',
+      'renderContourDensity(container, weightedPoints, { bandwidth: 20, thresholds: 5 })',
+      'Points with weight 10 produce higher peak density than unweighted points',
+      { callSignature: 'instance.getPeakDensity()' }
+    ),
+    r(
+      'Clicking a contour band invokes onSelectBand with band summary and index',
+      'click path.contour-band[data-index="0"]',
+      'onSelectBand invoked with ContourBandSummary { index: 0, value, ringCount } and index 0',
+      { callSignature: 'bandPath.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Respects showPoints: false by hiding raw density point circles',
+      'renderContourDensity(container, SAMPLE_CLUSTER, { showPoints: false })',
+      'Renders contour bands while omitting circle.density-point elements',
+      { callSignature: 'renderContourDensity(container, points, { showPoints: false })' }
+    ),
+    r(
+      'Handles empty points array gracefully and cleans up DOM on destroy',
+      'renderContourDensity(container, []) and instance.destroy()',
+      'Returns empty bands, 0 peak density, and clears container innerHTML on destroy',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 
 

@@ -1,0 +1,88 @@
+### `renderContourDensity(container: HTMLElement, points: DensityPoint[], options?: ContourDensityOptions): ContourDensityInstance`
+
+## Description
+
+```ts
+interface DensityPoint {
+  x: number;
+  y: number;
+  weight?: number;
+}
+
+interface ContourBandSummary {
+  index: number;
+  value: number;
+  ringCount: number;
+}
+
+interface ContourDensityOptions {
+  width?: number;
+  height?: number;
+  bandwidth?: number;
+  thresholds?: number;
+  cellSize?: number;
+  showPoints?: boolean;
+  colors?: string[];
+  onSelectBand?: (band: ContourBandSummary, index: number) => void;
+}
+
+interface ContourDensityInstance {
+  svg: SVGSVGElement;
+  contours: d3.ContourMultiPolygon[];
+  getBands: () => ContourBandSummary[];
+  getPeakDensity: () => number;
+  destroy: () => void;
+}
+```
+
+When scatter plots contain dense clusters of points, overplotting obscures spatial concentration. **2D Kernel Density Estimation (KDE)** (`d3.contourDensity()`) estimates continuous spatial density over a discrete grid and extracts topographic isoline `MultiPolygon` rings that render directly via `d3.geoPath()`.
+
+Implement `renderContourDensity(container, points, options)` to compute 2D KDE contour polygons, render layered elevation paths and optional point markers, and expose contour summary metrics.
+
+### Requirements
+
+- **Canvas & Option Defaults**:
+  - Empties `container.innerHTML` and appends an `<svg>` element with `width={width}`, `height={height}`, `role="img"`, and `aria-label="Contour density chart"`.
+  - Option defaults:
+    - `width = 460`, `height = 300`
+    - `bandwidth = 20`, `thresholds = 8`, `cellSize = 4`
+    - `showPoints = true`
+    - `colors = ['#1e3a8a', '#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe']`
+
+- **Kernel Density Computation (`d3.contourDensity`)**:
+  - If `points` is empty (`[]`) or non-array, `contours` is `[]`.
+  - Otherwise, configures `d3.contourDensity()`:
+    - `.x((d) => d.x)`
+    - `.y((d) => d.y)`
+    - `.weight((d) => (typeof d.weight === 'number' ? d.weight : 1))`
+    - `.size([width, height])`
+    - `.bandwidth(bandwidth)`
+    - `.thresholds(thresholds)`
+    - `.cellSize(cellSize)`
+  - Invokes the density generator on `points` to obtain `contours: d3.ContourMultiPolygon[]`.
+  - Builds a `ContourBandSummary` for each contour `(c, i)`:
+    - `index = i`
+    - `value = c.value`
+    - `ringCount = c.coordinates.reduce((sum, poly) => sum + poly.length, 0)`
+
+- **SVG Layers & Interaction**:
+  - Appends `<g class="contour-bands">` containing `<path class="contour-band">` for each contour `(c, i)`:
+    - `d = d3.geoPath()(c) || ''`
+    - `fill = colors[Math.min(i, colors.length - 1)]`, `fill-opacity = "0.55"`, `stroke = "#38bdf8"`, `stroke-width = "1"`
+    - `data-value = String(c.value)`, `data-index = String(i)`
+    - Clicking a `path.contour-band` invokes `options.onSelectBand(bands[i], i)` if provided.
+  - Appends `<g class="density-points">`:
+    - When `showPoints !== false`, renders `<circle class="density-point">` for each point `p` with `cx={p.x}`, `cy={p.y}`, `r="2.5"`, and `fill="#f8fafc"`.
+
+- **Instance API**:
+  - `contours`: array of `d3.ContourMultiPolygon` objects.
+  - `getBands()`: returns array of `ContourBandSummary` objects.
+  - `getPeakDensity()`: returns the maximum contour `value` (`0` when `contours` is empty).
+  - `destroy()`: removes the SVG element and empties `container.innerHTML`.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.contour-band`: isoline elevation polygon path.
+- `.density-point`: overlaid raw sample point circle.
+You may use these classes, custom styles, or your own class names.
+
