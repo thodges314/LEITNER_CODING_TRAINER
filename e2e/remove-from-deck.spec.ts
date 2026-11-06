@@ -57,9 +57,9 @@ test.describe('Remove From Deck & Preset Forking', () => {
 
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
     await expect(deckTrigger).toContainText('My Tailored Frontend Sprint');
-    // Frontend Specialist is 216 cards; minus 1 is 215
-    await expect(deckTrigger).toContainText('215 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(215);
+    // Frontend Specialist is 218 cards; minus 1 is 217
+    await expect(deckTrigger).toContainText('217 Cards');
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(217);
 
     // The removed card should not be in the catalog table
     await expect(page.locator('tbody tr.catalog-tr').filter({ hasText: firstCardTitle })).toHaveCount(0);

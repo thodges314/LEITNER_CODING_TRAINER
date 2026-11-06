@@ -199,4 +199,25 @@ describe('typeChecker & getTSQuickInfo', () => {
     expect(info).not.toBeNull();
     expect(info?.signature).toContain('scaleLinear');
   });
+
+  it('predefines D3 card domain interfaces globally without requiring local declaration', () => {
+    const code = `
+      function testCardInterfaces(
+        pts: VoronoiPoint[],
+        voronoiOpts: VoronoiSnappingOptions,
+        treeData: TreemapNodeData,
+        treemapOpts: TreemapOptions,
+        quadPts: QuadPoint[],
+        rows: HierarchyRecord[]
+      ): number {
+        const delaunay = d3.Delaunay.from(pts, (p) => p.x, (p) => p.y);
+        const root = d3.hierarchy(treeData).sum((d) => d.value || 0);
+        const qt = d3.quadtree<QuadPoint>().x((d) => d.x).y((d) => d.y).addAll(quadPts);
+        return delaunay.points.length + (root.value ?? 0) + qt.size() + rows.length + (voronoiOpts.width ?? 0) + (treemapOpts.height ?? 0);
+      }
+    `;
+    const result = checkAndTranspileTS(code);
+    expect(result.success).toBe(true);
+    expect(result.diagnostics).toHaveLength(0);
+  });
 });

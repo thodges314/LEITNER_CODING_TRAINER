@@ -4796,7 +4796,7 @@
     "title": "D3 Quadtree Spatial Index",
     "track": "d3",
     "concept": "d3-quadtree-spatial",
-    "difficulty": 3,
+    "difficulty": 4,
     "tags": [
       "d3",
       "quadtree",
@@ -4822,5 +4822,37 @@
       "algorithms"
     ],
     "summary": "Construct a validated hierarchical tree model from flat relational data with parent references using D3's hierarchy stratification engine"
+  },
+  {
+    "id": "d3-delaunay-voronoi-snapping",
+    "title": "D3 Delaunay & Voronoi Snapping",
+    "track": "d3",
+    "concept": "d3-voronoi-geometry",
+    "difficulty": 4,
+    "tags": [
+      "d3",
+      "data-visualization",
+      "voronoi",
+      "delaunay",
+      "computational-geometry",
+      "svg"
+    ],
+    "summary": "interface VoronoiPoint {"
+  },
+  {
+    "id": "d3-treemap-squarified-tiling",
+    "title": "D3 Squarified Treemap Layout",
+    "track": "d3",
+    "concept": "d3-treemap-layout",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "data-visualization",
+      "treemap",
+      "hierarchy",
+      "svg",
+      "layout"
+    ],
+    "summary": "interface TreemapNodeData {"
   }
 ]

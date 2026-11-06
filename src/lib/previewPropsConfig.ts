@@ -1018,6 +1018,112 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Canvas height in pixels',
     },
   ],
+  'd3-delaunay-voronoi-snapping': [
+    {
+      name: 'points',
+      type: 'json',
+      defaultValue: [
+        { x: 65, y: 55, id: 'p0', label: 'Sensor A' },
+        { x: 185, y: 70, id: 'p1', label: 'Sensor B' },
+        { x: 340, y: 65, id: 'p2', label: 'Sensor C' },
+        { x: 110, y: 155, id: 'p3', label: 'Sensor D' },
+        { x: 245, y: 150, id: 'p4', label: 'Sensor E' },
+        { x: 380, y: 175, id: 'p5', label: 'Sensor F' },
+        { x: 80, y: 240, id: 'p6', label: 'Sensor G' },
+        { x: 215, y: 235, id: 'p7', label: 'Sensor H' },
+        { x: 335, y: 245, id: 'p8', label: 'Sensor I' },
+      ],
+      description: 'Array of 2D coordinate points ({ x, y, id?, label? })',
+    },
+    {
+      name: 'pointRadius',
+      type: 'number',
+      defaultValue: 5,
+      min: 3,
+      max: 10,
+      step: 1,
+      description: 'Base point marker radius in pixels',
+    },
+    {
+      name: 'showCells',
+      type: 'boolean',
+      defaultValue: true,
+      description: 'Show Voronoi polygon cell boundaries',
+    },
+    {
+      name: 'pointColor',
+      type: 'enum',
+      defaultValue: '#3b82f6',
+      options: ['#3b82f6', '#10b981', '#8b5cf6', '#06b6d4'],
+      description: 'Default point fill color',
+    },
+    {
+      name: 'activeColor',
+      type: 'enum',
+      defaultValue: '#f97316',
+      options: ['#f97316', '#ef4444', '#eab308', '#ec4899'],
+      description: 'Highlighted point fill color on cell hover/click',
+    },
+  ],
+  'd3-treemap-squarified-tiling': [
+    {
+      name: 'data',
+      type: 'json',
+      defaultValue: {
+        name: 'Frontend Bundle',
+        children: [
+          {
+            name: 'Framework',
+            children: [
+              { name: 'react-dom', value: 420 },
+              { name: 'router', value: 160 },
+              { name: 'state', value: 95 },
+            ],
+          },
+          {
+            name: 'Visualization',
+            children: [
+              { name: 'd3-hierarchy', value: 240 },
+              { name: 'd3-shape', value: 190 },
+              { name: 'd3-scale', value: 145 },
+            ],
+          },
+          {
+            name: 'Editor',
+            children: [
+              { name: 'codemirror', value: 310 },
+              { name: 'typescript-worker', value: 275 },
+            ],
+          },
+        ],
+      },
+      description: 'Hierarchical nested tree data ({ name, value?, children? })',
+    },
+    {
+      name: 'paddingInner',
+      type: 'number',
+      defaultValue: 3,
+      min: 0,
+      max: 12,
+      step: 1,
+      description: 'Inner spacing between sibling treemap cells',
+    },
+    {
+      name: 'paddingOuter',
+      type: 'number',
+      defaultValue: 3,
+      min: 0,
+      max: 16,
+      step: 1,
+      description: 'Outer border padding around treemap container',
+    },
+    {
+      name: 'round',
+      type: 'boolean',
+      defaultValue: true,
+      description: 'Snap cell bounding coordinates to integer pixels',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

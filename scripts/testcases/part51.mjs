@@ -410,6 +410,82 @@ export default {
       { callSignature: 'createQuadtreeIndex().findNearest(10, 10)' }
     ),
   ],
+  'd3-delaunay-voronoi-snapping': [
+    r(
+      'Appends SVG canvas with dimensions, role, aria-label, and layer groups',
+      'renderVoronoiSnapping(container, SAMPLE_POINTS, { width: 480, height: 320 })',
+      'SVG rendered with width="480", height="320", role="img", aria-label="Voronoi diagram", and layer groups',
+      { callSignature: 'renderVoronoiSnapping(container, points, { width: 480, height: 320 })' }
+    ),
+    r(
+      'Generates clipped Voronoi cell paths and point markers for each datum',
+      'inspect circle.voronoi-point and path.voronoi-cell elements',
+      '4 circles and 4 closed M...Z polygon paths rendered with transparent fill and stroke',
+      { callSignature: 'container.querySelectorAll("path.voronoi-cell")' }
+    ),
+    r(
+      'Finds closest point index across 2D plane via Delaunay triangulation',
+      'instance.findClosestIndex(45, 55) and instance.findClosestIndex(205, 75)',
+      'Returns index 0 near (50, 60) and index 1 near (200, 80)',
+      { callSignature: 'instance.findClosestIndex(45, 55)' }
+    ),
+    r(
+      'Hovering a Voronoi cell highlights corresponding point and fires onHoverPoint',
+      'mouseenter and mouseleave on path.voronoi-cell[data-index="1"]',
+      'Point 1 receives data-active="true", active fill, and enlarged radius; resets on mouseleave',
+      { callSignature: 'cell.dispatchEvent(new MouseEvent("mouseenter"))' }
+    ),
+    r(
+      'Clicking a Voronoi cell activates point and invokes onSelectPoint callback',
+      'click path.voronoi-cell[data-index="2"]',
+      'onSelectPoint called with Gamma point and index 2, point 2 marked data-active="true"',
+      { callSignature: 'cell.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Handles empty points and showCells option gracefully and cleans up on destroy',
+      'renderVoronoiSnapping(container, [], { showCells: false }) and instance.destroy()',
+      'showCells: false sets stroke="none", empty points returns -1 for findClosestIndex, destroy clears DOM',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-treemap-squarified-tiling': [
+    r(
+      'Appends SVG container with dimensions, role, and aria-label',
+      'renderTreemap(container, SAMPLE_TREE, { width: 520, height: 340 })',
+      'SVG rendered with width="520", height="340", role="img", aria-label="Treemap chart"',
+      { callSignature: 'renderTreemap(container, data, { width: 520, height: 340 })' }
+    ),
+    r(
+      'Computes squarified treemap layout sorted descending by value',
+      'instance.getLeaves()',
+      'Returns 4 leaf cells summing to total canvas area, with larger values allocated proportionally larger area',
+      { callSignature: 'instance.getLeaves()' }
+    ),
+    r(
+      'Renders treemap cell groups, proportional rects, and text labels',
+      'inspect g.treemap-cell, rect.treemap-rect, and text.treemap-label',
+      '4 translated cell groups rendered with colored rects and leaf name labels',
+      { callSignature: 'container.querySelectorAll("g.treemap-cell")' }
+    ),
+    r(
+      'Respects paddingInner, paddingOuter, and round configuration options',
+      'renderTreemap(container, SAMPLE_TREE, { paddingOuter: 10, paddingInner: 4, round: true })',
+      'Leaf coordinates inset by outer padding >= 10 and rounded to integer pixel bounds',
+      { callSignature: 'renderTreemap(container, data, { paddingOuter: 10, round: true })' }
+    ),
+    r(
+      'Clicking a treemap cell invokes onSelectCell with cell metric and index',
+      'click g.treemap-cell[data-index="1"]',
+      'onSelectCell called with leaf cell metric and index 1',
+      { callSignature: 'cell.dispatchEvent(new MouseEvent("click"))' }
+    ),
+    r(
+      'Handles empty or zero-value hierarchy gracefully and cleans up on destroy',
+      'instance.destroy() and renderTreemap(container, zeroTree)',
+      'Container cleared on destroy and zero-value tree renders 0 cells safely',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 
 

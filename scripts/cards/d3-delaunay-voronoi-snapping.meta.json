@@ -1,0 +1,8 @@
+{
+  "title": "D3 Delaunay & Voronoi Snapping",
+  "track": "d3",
+  "tags": ["d3", "data-visualization", "voronoi", "delaunay", "computational-geometry", "svg"],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}
+
