@@ -61,10 +61,3 @@ Implement `renderBrushCoordinator(container, data, options)` to mount a synchron
   - `setBrushDomain(domain)`: programmatically sets the active domain `[minX, maxX]` (moving the brush selection to `[contextX(minX), contextX(maxX)]`) or resets to `fullDomain` when `null` is passed, updating the focus view and firing `onBrushChange`.
   - `destroy()`: removes the SVG element and clears `container.innerHTML`.
 
-#### Optional Styling (CSS is not graded)
-Optional helper classes are available in the preview environment:
-- `.focus-line`, `.context-line`: line path elements.
-- `.focus-dot`: data point circles in the focus chart.
-- `.brush-layer`: D3 brush group container.
-You may use these classes, custom styles, or your own class names.
-

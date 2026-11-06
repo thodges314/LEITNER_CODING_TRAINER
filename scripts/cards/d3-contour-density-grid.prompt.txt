@@ -78,9 +78,3 @@ Implement `renderContourDensity(container, points, options)` to compute 2D KDE c
   - `getPeakDensity()`: returns the maximum contour `value` (`0` when `contours` is empty).
   - `destroy()`: removes the SVG element and empties `container.innerHTML`.
 
-#### Optional Styling (CSS is not graded)
-Optional helper classes are available in the preview environment:
-- `.contour-band`: isoline elevation polygon path.
-- `.density-point`: overlaid raw sample point circle.
-You may use these classes, custom styles, or your own class names.
-

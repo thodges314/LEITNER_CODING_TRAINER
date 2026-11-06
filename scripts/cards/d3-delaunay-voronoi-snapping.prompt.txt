@@ -58,9 +58,3 @@ Voronoi overlays partition a chart's 2D plane into convex polygonal regions arou
   - If `points` is empty (`[]`), renders the SVG and layer groups without circles or cell paths, and `findClosestIndex` returns `-1`.
   - `instance.destroy()` removes the SVG and empties `container.innerHTML`.
 
-#### Optional Styling (CSS is not graded)
-Optional helper classes are available in the preview environment:
-- `.voronoi-cell`: polygon overlay path with GPU-composited CSS `:hover` highlight transition.
-- `.voronoi-point`: data point circle marker.
-You may use these classes, custom styles, or your own class names.
-

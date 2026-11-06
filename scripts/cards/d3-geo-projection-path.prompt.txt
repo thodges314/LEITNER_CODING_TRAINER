@@ -86,9 +86,3 @@ Implement `renderGeoMap(container, geojson, options)` to fit a GeoJSON `FeatureC
   - `projectCoordinate(lonLat)`: returns `projection(lonLat)`.
   - `destroy()`: removes the SVG and empties `container.innerHTML`.
 
-#### Optional Styling (CSS is not graded)
-Optional helper classes are available in the preview environment:
-- `.geo-feature`: region polygon path element.
-- `.geo-centroid`: region centroid marker circle.
-You may use these classes, custom styles, or your own class names.
-

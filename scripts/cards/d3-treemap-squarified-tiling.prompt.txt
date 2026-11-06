@@ -69,10 +69,3 @@ Implement a hierarchical area visualization that converts nested tree data into 
   - If `data` is null/empty or total hierarchy value is `0`, renders the `<svg>` with no `.treemap-cell` groups and `getLeaves()` returns `[]`.
   - `instance.destroy()` removes the SVG and empties `container.innerHTML`.
 
-#### Optional Styling (CSS is not graded)
-Optional helper classes are available in the preview environment:
-- `.treemap-cell`: cell group container.
-- `.treemap-rect`: proportional area rectangle.
-- `.treemap-label`: cell text label.
-You may use these classes, custom styles, or your own class names.
-

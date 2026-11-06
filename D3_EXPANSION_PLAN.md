@@ -138,6 +138,24 @@ graph TD
 
 ---
 
+### Batch 68: D3 Warm-Up Fundamentals — Keyed Data Join & Scales (Completed)
+- **Card 9**: `d3-data-join-enter-update-exit` — Difficulty 1 (Concept: `d3-data-join`). Enforces `.data(items, d => d.id).join(enter, update, exit)` with DOM node identity preservation (`memNodeAfter === memNodeBefore`).
+- **Card 10**: `d3-scales-domain-range-basics` — Difficulty 1 (Concept: `d3-scales-basics`). Enforces `d3.extent`, `d3.scaleBand`, and inverted SVG Y `d3.scaleLinear` (`[height - padding, padding]`, `.clamp()`, `.invert()`).
+
+---
+
+### Batch 69: D3 Data Transformation & Color Scales Warm-Ups
+- **Card 11**: `d3-array-statistics-binning` — Difficulty 2 (Concept: `d3-array-statistics`). Covers `d3.extent`, `d3.mean`, `d3.median`, `d3.quantile`, `d3.rollup`, and `d3.bin` histogram bucketing.
+- **Card 12**: `d3-color-scales-interpolators` — Difficulty 2 (Concept: `d3-color-scales`). Covers `d3.scaleOrdinal(d3.schemeTableau10)`, `d3.scaleSequential(d3.interpolateViridis)`, and `d3.scaleQuantize()` discrete bucket mapping.
+
+---
+
+### Batch 70: Performant CSS-Driven D3 Interactivity (`:hover` & Group Dimming)
+- **Card 13**: `d3-css-hover-interactivity` — Difficulty 2 (Concept: `d3-css-interactivity`).
+  - **Description**: Demonstrates why large-dataset D3 charts delegate hover and focus-dimming transitions to CSS (`:hover`, `.marks-group:hover .mark:not(:hover)`) rather than attaching JS `mouseover`/`mouseout` loops that mutate $O(N)$ DOM nodes on every pointer movement. Appends a scoped `<style>` rule block alongside the D3 data join and uses event delegation on the parent `<svg>` / `<g>` container for click selection.
+
+---
+
 ## 4. Checklist for Executing a Batch (For Resuming Agents)
 
 When ready to implement a batch (e.g. Batch 64):

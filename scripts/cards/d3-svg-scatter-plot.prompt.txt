@@ -66,8 +66,3 @@ The function mounts into `container` and returns an object containing the root `
   - If `data` is empty (`[]`), renders the axes with default domains `[0, 1]` without rendering circles or throwing errors.
   - `instance.destroy()` removes the SVG element and empties `container.innerHTML`.
 
-#### Optional Styling (CSS is not graded)
-Optional helper classes are available in the preview environment:
-- `.scatter-dot`: individual scatter circle with hover outline transition.
-- `.chart-area`: chart container group.
-You may use these classes, custom styles, or your own class names.
