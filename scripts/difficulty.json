@@ -1380,7 +1380,15 @@
     "concept": "d3-hierarchy-stratify"
   },
   "d3-quadtree-spatial-index": {
-    "difficulty": 3,
+    "difficulty": 4,
     "concept": "d3-quadtree-spatial"
+  },
+  "d3-delaunay-voronoi-snapping": {
+    "difficulty": 4,
+    "concept": "d3-voronoi-geometry"
+  },
+  "d3-treemap-squarified-tiling": {
+    "difficulty": 3,
+    "concept": "d3-treemap-layout"
   }
 }

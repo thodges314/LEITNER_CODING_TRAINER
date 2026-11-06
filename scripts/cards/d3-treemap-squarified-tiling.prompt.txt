@@ -1,0 +1,79 @@
+### `renderTreemap(container: HTMLElement, data: TreemapNodeData, options?: TreemapOptions): TreemapInstance`
+
+## Description
+
+```ts
+interface TreemapNodeData {
+  name: string;
+  value?: number;
+  children?: TreemapNodeData[];
+}
+
+interface TreemapCellMetric {
+  name: string;
+  value: number;
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  width: number;
+  height: number;
+  depth: number;
+}
+
+interface TreemapOptions {
+  width?: number;
+  height?: number;
+  paddingInner?: number;
+  paddingOuter?: number;
+  round?: boolean;
+  colors?: string[];
+  onSelectCell?: (cell: TreemapCellMetric, index: number) => void;
+}
+
+interface TreemapInstance {
+  svg: SVGSVGElement;
+  getLeaves: () => TreemapCellMetric[];
+  destroy: () => void;
+}
+```
+
+Implement a hierarchical area visualization that converts nested tree data into a squarified proportional treemap using `d3.hierarchy()` and `d3.treemap()`.
+
+### Requirements
+
+- **Canvas & Initialization**:
+  - Empties `container.innerHTML` before rendering.
+  - Appends an `<svg>` element with `width` (default `480`), `height` (default `320`), `role="img"`, and `aria-label="Treemap chart"`.
+
+- **Hierarchy & Squarified Layout**:
+  - Builds a root node with `d3.hierarchy(data)`:
+    - Sums leaf values via `.sum(d => (!d.children || d.children.length === 0 ? Math.max(0, Number(d.value) || 0) : 0))`.
+    - Sorts nodes in descending value order via `.sort((a, b) => (b.value || 0) - (a.value || 0))`.
+  - Configures `d3.treemap()` with:
+    - `.tile(d3.treemapSquarify)`
+    - `.size([width, height])`
+    - `.paddingInner(paddingInner)` (default `2`)
+    - `.paddingOuter(paddingOuter)` (default `2`)
+    - `.round(round)` (default `true`)
+  - Computes the layout on the hierarchy root and extracts leaf nodes with positive values (`(leaf.value || 0) > 0`).
+
+- **Treemap Cells (`g.treemap-cell`)**:
+  - For each positive-valued leaf at index `i`:
+    - Appends `<g class="treemap-cell">` translated to `translate(x0, y0)` with `data-name="d.data.name"`, `data-value="d.value"`, and `data-index="i"`.
+    - Appends `<rect class="treemap-rect">` with `width = Math.max(0, x1 - x0)`, `height = Math.max(0, y1 - y0)`, `fill = palette[i % palette.length]` (using `options.colors` if non-empty, otherwise `d3.schemeTableau10` or a 10-color fallback palette), `data-name="d.data.name"`, and `data-value="d.value"`.
+    - Appends `<text class="treemap-label">` with `x="6"`, `y="16"`, and text content set to `d.data.name`.
+    - Clicking `<g class="treemap-cell">` invokes `options.onSelectCell(cellMetric, i)` if provided.
+
+- **Instance API & Edge Cases**:
+  - `instance.getLeaves()` returns the array of `TreemapCellMetric` objects (`{ name, value, x0, y0, x1, y1, width, height, depth }`) for all rendered leaf cells.
+  - If `data` is null/empty or total hierarchy value is `0`, renders the `<svg>` with no `.treemap-cell` groups and `getLeaves()` returns `[]`.
+  - `instance.destroy()` removes the SVG and empties `container.innerHTML`.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.treemap-cell`: cell group container.
+- `.treemap-rect`: proportional area rectangle.
+- `.treemap-label`: cell text label.
+You may use these classes, custom styles, or your own class names.
+

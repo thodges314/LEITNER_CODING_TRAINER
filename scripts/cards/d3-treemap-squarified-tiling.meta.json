@@ -1,0 +1,8 @@
+{
+  "title": "D3 Squarified Treemap Layout",
+  "track": "d3",
+  "tags": ["d3", "data-visualization", "treemap", "hierarchy", "svg", "layout"],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}
+

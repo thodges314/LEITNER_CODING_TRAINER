@@ -14,7 +14,7 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 
 ---
 
-## 2. Current Status (9 Cards — 100% Typed & Passing)
+## 2. Current Status (11 Cards — 100% Typed & Passing)
 
 | Card ID | Description | Concepts / Modules | UI / Preview |
 |---|---|---|---|
@@ -27,6 +27,8 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 | `d3-svg-scatter-plot` | 2D continuous scatter plot with dual linear scales & radius | `d3.scaleLinear()`, `d3.extent()`, circle dot selection | SVG Scatter Plot |
 | `d3-stratify-nested-hierarchy` | Flat-to-hierarchical stratification, node sum, ancestors & leaves | `d3.stratify()`, `hierarchy.sum()`, `hierarchy.leaves()` | Tree Inspector |
 | `d3-quadtree-spatial-index` | 2D spatial indexing, $O(\log N)$ nearest-neighbor & radius search | `d3.quadtree()`, `quadtree.find()`, `quadtree.visit()` | Spatial Search Canvas |
+| `d3-delaunay-voronoi-snapping` | 2D Delaunay triangulation & Voronoi polygon snapping cells | `d3.Delaunay.from()`, `delaunay.voronoi()`, `voronoi.renderCell()` | Interactive Voronoi SVG |
+| `d3-treemap-squarified-tiling` | Squarified proportional area treemap with inner/outer padding | `d3.hierarchy()`, `d3.treemap()`, `d3.treemapSquarify` | SVG Treemap |
 
 ---
 
@@ -54,7 +56,7 @@ graph TD
 - **Harness & Verification**: Headless assertion of tree topology, root/leaf calculations, and cycle/orphan error validation.
 
 #### Card 2: `d3-quadtree-spatial-index`
-- **Track**: `d3` | **Difficulty**: 3 (Concept: `d3-quadtree-spatial`)
+- **Track**: `d3` | **Difficulty**: 4 (Concept: `d3-quadtree-spatial`)
 - **Category**: 2D Spatial Index & Search
 - **Description**:  
   Constructs a 2D quadtree from a set of $(x, y)$ coordinate points using `d3.quadtree()`. Implements two core search functions:
@@ -69,7 +71,7 @@ graph TD
 *Focus: Planar partitions, Voronoi hover targets, and hierarchical area layouts.*
 
 #### Card 3: `d3-delaunay-voronoi-snapping`
-- **Track**: `d3` | **Difficulty**: 3 (Concept: `d3-voronoi-geometry`)
+- **Track**: `d3` | **Difficulty**: 4 (Concept: `d3-voronoi-geometry`)
 - **Category**: Computational Geometry & Interaction
 - **Description**:  
   Computes a 2D Delaunay triangulation and Voronoi tessellation (`d3.Delaunay.from()`) for a set of data coordinates. Renders an interactive SVG canvas with invisible or semi-transparent Voronoi polygon paths (`path.voronoi-cell`) mapped to each data point. Mouse movement over any Voronoi cell highlights and selects the corresponding data point even if the cursor is far from the tiny dot.
@@ -98,7 +100,7 @@ graph TD
 - **Harness & Verification**: Headless assertion of distance constraints between linked nodes, collision non-overlap guarantees, and deterministic coordinate settling.
 
 #### Card 6: `d3-brush-zoom-coordinator`
-- **Track**: `d3` | **Difficulty**: 3 (Concept: `d3-brush-interaction`)
+- **Track**: `d3` | **Difficulty**: 4 (Concept: `d3-brush-interaction`)
 - **Category**: Interactive Multi-View Coordination
 - **Description**:  
   Builds a synchronized overview + detail visualization (mini-map context brush and primary focus chart). Implements `d3.brushX()` over the mini-map. When the user drags or resizes the brush window, an `onBrush` callback receives the rescaled continuous domain (`[xMin, xMax]`) and updates the focus view without full re-render.

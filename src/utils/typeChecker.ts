@@ -329,6 +329,13 @@ const SANDBOX_GLOBALS = `
   declare class GraphNode<T = any> {
     val: T;
     neighbors: GraphNode<T>[];
+    id?: string;
+    label?: string;
+    x?: number;
+    y?: number;
+    vx?: number;
+    vy?: number;
+    [key: string]: any;
     constructor(val?: T, neighbors?: GraphNode<T>[]);
   }
 
