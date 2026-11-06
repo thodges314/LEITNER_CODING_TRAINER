@@ -121,7 +121,7 @@ Located in [runner.ts](src/lib/runner.ts):
    - Submission passes if and only if harness logs ≥ 1 `PASS` and 0 `FAIL`/runtime errors.
 5. **Dual Solutions & Language-Aware Reveal**:
    - Cards support dual reference implementations: canonical JavaScript (`referenceSolution`) and canonical TypeScript (`referenceSolutionTs`).
-   - Ambient declarations in `SANDBOX_GLOBALS` (`src/utils/typeChecker.ts`) include `ListNode<T>` and `TreeNode<T>` for common algorithm data structures.
+   - Ambient declarations in `SANDBOX_GLOBALS` (`src/utils/typeChecker.ts` + `src/utils/sandboxD3Types.ts`) include `ListNode<T>`, `TreeNode<T>`, DOM/SVG/Canvas element interfaces, and the typed `d3` namespace.
    - When inspecting the suggested solution in `EvaluationPanel`, the trainer renders the solution matching the learner's active mode with dynamic language badges (`TypeScript` blue badge vs `JavaScript` amber badge).
 
 ### 4.1 Live Preview & Props / Parameters Control Panel
@@ -170,7 +170,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (2,256 unit tests across 69 test files)**: Tests verifying:
+- **Vitest Suite (2,259 unit tests across 69 test files)**: Tests verifying:
   - Reference solutions pass for all 346 cards across 16 topics across 2,322 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.

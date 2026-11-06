@@ -51,9 +51,9 @@ Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/
   - Ensure the canonical TypeScript reference solution (`<id>.ref.ts`) exports/declares and uses the exact same interface shapes so prompt contracts and reference code are 100% synchronized.
 - **Destructured parameters and default arguments**:
   - Preserve all destructured parameters and default argument values in both the prompt signature and the `.ref.ts` solution. Do not replace destructured parameters with a single opaque props object if the original contract expects destructured defaults.
-- **Sandbox globals and ambient types (`src/utils/typeChecker.ts`)**:
-  - Browser DOM element types available in the sandbox include: `HTMLElement`, `HTMLInputElement`, `HTMLButtonElement`, `HTMLDivElement`, `HTMLUListElement`, `HTMLLIElement`.
-  - For heading or section tags (`<h1>`..`<h6>`, `<nav>`), type refs as `HTMLElement` (avoid `HTMLHeadingElement` which is not in `SANDBOX_GLOBALS`).
+- **Sandbox globals and ambient types (`src/utils/typeChecker.ts` + `src/utils/sandboxD3Types.ts`)**:
+  - Browser DOM, SVG, Canvas, and event types available in the sandbox include: `HTMLElement`, `HTMLInputElement`, `HTMLTextAreaElement`, `HTMLSelectElement`, `HTMLFormElement`, `HTMLButtonElement`, `HTMLLabelElement`, `HTMLDivElement`, `HTMLSpanElement`, `HTMLParagraphElement`, `HTMLHeadingElement`, `HTMLAnchorElement`, `HTMLImageElement`, `HTMLUListElement`, `HTMLOListElement`, `HTMLLIElement`, `HTMLTableElement`, `HTMLDialogElement`, `HTMLCanvasElement`, `SVGElement`, `SVGSVGElement`, `SVGGElement`, `SVGPathElement`, `SVGRectElement`, `SVGCircleElement`, `PointerEvent`, `WheelEvent`, `DOMRect`, `NodeListOf`.
+  - Full ambient D3 type definitions (`d3.Selection`, scales, shapes, `d3.HierarchyNode<T>`, `d3.Quadtree<T>`, `d3.Delaunay`, force simulations, brushes/zoom, geo projections, contours) live in `src/utils/sandboxD3Types.ts`.
   - For inline React styles, use `Record<string, string | number>` instead of `React.CSSProperties`.
 
 ## Component and Live Preview Conventions

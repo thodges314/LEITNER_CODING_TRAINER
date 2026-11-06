@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { SANDBOX_D3_TYPES } from './sandboxD3Types';
 
 export interface FormattedDiagnostic {
   type: 'error' | 'warn';
@@ -177,34 +178,130 @@ const SANDBOX_GLOBALS = `
   declare var Event: any;
   interface Event { [key: string]: any; }
   declare var CustomEvent: any;
-  interface CustomEvent extends Event { [key: string]: any; }
+  interface CustomEvent<T = any> extends Event { detail: T; [key: string]: any; }
   declare var MouseEvent: any;
   interface MouseEvent extends Event { [key: string]: any; }
+  declare var PointerEvent: any;
+  interface PointerEvent extends MouseEvent { [key: string]: any; }
+  declare var WheelEvent: any;
+  interface WheelEvent extends MouseEvent { [key: string]: any; }
   declare var KeyboardEvent: any;
   interface KeyboardEvent extends Event { [key: string]: any; }
+  declare var FocusEvent: any;
+  interface FocusEvent extends Event { [key: string]: any; }
+  declare var InputEvent: any;
+  interface InputEvent extends Event { [key: string]: any; }
+  declare var TouchEvent: any;
+  interface TouchEvent extends Event { [key: string]: any; }
+  declare var DragEvent: any;
+  interface DragEvent extends MouseEvent { [key: string]: any; }
+  declare var ClipboardEvent: any;
+  interface ClipboardEvent extends Event { [key: string]: any; }
+  interface DOMRect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+    [key: string]: any;
+  }
   declare var Node: any;
   interface Node { [key: string]: any; }
+  interface NodeListOf<TNode extends Node = Node> extends Iterable<TNode> {
+    readonly length: number;
+    item(index: number): TNode;
+    forEach(callbackfn: (value: TNode, key: number, parent: NodeListOf<TNode>) => void, thisArg?: any): void;
+    [index: number]: TNode;
+  }
+  declare var DocumentFragment: any;
+  interface DocumentFragment extends Node { [key: string]: any; }
+  declare var ShadowRoot: any;
+  interface ShadowRoot extends DocumentFragment { [key: string]: any; }
   declare var Element: any;
   interface Element extends Node { [key: string]: any; }
   declare var HTMLElement: any;
   interface HTMLElement extends Element { [key: string]: any; }
   declare var HTMLInputElement: any;
-  interface HTMLInputElement extends HTMLElement { value: string; [key: string]: any; }
+  interface HTMLInputElement extends HTMLElement { value: string; checked: boolean; [key: string]: any; }
+  declare var HTMLTextAreaElement: any;
+  interface HTMLTextAreaElement extends HTMLElement { value: string; [key: string]: any; }
+  declare var HTMLSelectElement: any;
+  interface HTMLSelectElement extends HTMLElement { value: string; [key: string]: any; }
+  declare var HTMLFormElement: any;
+  interface HTMLFormElement extends HTMLElement { [key: string]: any; }
   declare var HTMLButtonElement: any;
   interface HTMLButtonElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLLabelElement: any;
+  interface HTMLLabelElement extends HTMLElement { [key: string]: any; }
   declare var HTMLDivElement: any;
   interface HTMLDivElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLSpanElement: any;
+  interface HTMLSpanElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLParagraphElement: any;
+  interface HTMLParagraphElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLHeadingElement: any;
+  interface HTMLHeadingElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLAnchorElement: any;
+  interface HTMLAnchorElement extends HTMLElement { href: string; [key: string]: any; }
+  declare var HTMLImageElement: any;
+  interface HTMLImageElement extends HTMLElement { src: string; alt: string; [key: string]: any; }
   declare var HTMLUListElement: any;
   interface HTMLUListElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLOListElement: any;
+  interface HTMLOListElement extends HTMLElement { [key: string]: any; }
   declare var HTMLLIElement: any;
   interface HTMLLIElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLTableElement: any;
+  interface HTMLTableElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLTableSectionElement: any;
+  interface HTMLTableSectionElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLTableRowElement: any;
+  interface HTMLTableRowElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLTableCellElement: any;
+  interface HTMLTableCellElement extends HTMLElement { [key: string]: any; }
+  declare var HTMLDialogElement: any;
+  interface HTMLDialogElement extends HTMLElement { open: boolean; showModal(): void; close(returnValue?: string): void; [key: string]: any; }
+  interface CanvasRenderingContext2D { [key: string]: any; }
+  declare var HTMLCanvasElement: any;
+  interface HTMLCanvasElement extends HTMLElement {
+    width: number;
+    height: number;
+    getContext(contextId: '2d', options?: any): CanvasRenderingContext2D | null;
+    getContext(contextId: string, options?: any): any;
+    [key: string]: any;
+  }
   declare var SVGElement: any;
   interface SVGElement extends Element { [key: string]: any; }
   declare var SVGSVGElement: any;
   interface SVGSVGElement extends SVGElement { [key: string]: any; }
-  declare var d3: any;
-  declare var HTMLSpanElement: any;
-  interface HTMLSpanElement extends HTMLElement { [key: string]: any; }
+  declare var SVGGElement: any;
+  interface SVGGElement extends SVGElement { [key: string]: any; }
+  declare var SVGPathElement: any;
+  interface SVGPathElement extends SVGElement { [key: string]: any; }
+  declare var SVGRectElement: any;
+  interface SVGRectElement extends SVGElement { [key: string]: any; }
+  declare var SVGCircleElement: any;
+  interface SVGCircleElement extends SVGElement { [key: string]: any; }
+  declare var SVGEllipseElement: any;
+  interface SVGEllipseElement extends SVGElement { [key: string]: any; }
+  declare var SVGLineElement: any;
+  interface SVGLineElement extends SVGElement { [key: string]: any; }
+  declare var SVGTextElement: any;
+  interface SVGTextElement extends SVGElement { [key: string]: any; }
+  declare var SVGTSpanElement: any;
+  interface SVGTSpanElement extends SVGElement { [key: string]: any; }
+  declare var SVGPolygonElement: any;
+  interface SVGPolygonElement extends SVGElement { [key: string]: any; }
+  declare var SVGPolylineElement: any;
+  interface SVGPolylineElement extends SVGElement { [key: string]: any; }
+  declare var SVGDefsElement: any;
+  interface SVGDefsElement extends SVGElement { [key: string]: any; }
+  declare var SVGClipPathElement: any;
+  interface SVGClipPathElement extends SVGElement { [key: string]: any; }
+  // d3 types are provided by SANDBOX_D3_TYPES (appended below)
   declare var Text: any;
   interface Text extends Node { [key: string]: any; }
   declare var requestAnimationFrame: (callback: (time: number) => void) => number;
@@ -427,6 +524,9 @@ const SANDBOX_GLOBALS = `
   }
 `;
 
+/** Combined sandbox globals: DOM/React/node shims + full typed D3 namespace. */
+const SANDBOX_GLOBALS_WITH_D3 = SANDBOX_GLOBALS + SANDBOX_D3_TYPES;
+
 const sourceFileCache = new Map<string, ts.SourceFile>();
 function cachedLibSource(
   name: string,
@@ -573,7 +673,7 @@ export function checkAndTranspileTS(rawCode: string): TypeCheckResult {
 
   const fileText = (name: string): string | undefined => {
     if (name === fileName) return checkedSource;
-    if (name === GLOBALS_FILE) return SANDBOX_GLOBALS;
+    if (name === GLOBALS_FILE) return SANDBOX_GLOBALS_WITH_D3;
     return LIBS[name.split('/').pop() as string];
   };
 
@@ -663,7 +763,7 @@ function getOrCreateLanguageService(): ts.LanguageService {
         const codeForFile = target.fileName === name ? target.codeToTranspile : activeSourceCode;
         return ts.ScriptSnapshot.fromString(codeForFile);
       }
-      if (name === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(SANDBOX_GLOBALS);
+      if (name === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(SANDBOX_GLOBALS_WITH_D3);
       const text = LIBS[name.split('/').pop() as string];
       if (text !== undefined) return ts.ScriptSnapshot.fromString(text);
       return undefined;
@@ -680,7 +780,7 @@ function getOrCreateLanguageService(): ts.LanguageService {
         const target = determineFileTarget(activeSourceCode);
         return target.fileName === name ? target.codeToTranspile : activeSourceCode;
       }
-      if (name === GLOBALS_FILE) return SANDBOX_GLOBALS;
+      if (name === GLOBALS_FILE) return SANDBOX_GLOBALS_WITH_D3;
       return LIBS[name.split('/').pop() as string];
     },
     readDirectory: () => [],

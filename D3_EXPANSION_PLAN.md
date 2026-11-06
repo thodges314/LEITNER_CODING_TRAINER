@@ -14,7 +14,7 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 
 ---
 
-## 2. Current Status (7 Cards — 100% Typed & Passing)
+## 2. Current Status (9 Cards — 100% Typed & Passing)
 
 | Card ID | Description | Concepts / Modules | UI / Preview |
 |---|---|---|---|
@@ -25,6 +25,8 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 | `d3-svg-line-chart` | Time/continuous line chart with curves and data dots | `d3.scaleTime()`, `d3.scaleLinear()`, `d3.line()`, axes | SVG Line Chart |
 | `d3-svg-donut-chart` | Donut/pie generator with slice selection & center label | `d3.pie()`, `d3.arc()`, radial coordinates | SVG Donut Chart |
 | `d3-svg-scatter-plot` | 2D continuous scatter plot with dual linear scales & radius | `d3.scaleLinear()`, `d3.extent()`, circle dot selection | SVG Scatter Plot |
+| `d3-stratify-nested-hierarchy` | Flat-to-hierarchical stratification, node sum, ancestors & leaves | `d3.stratify()`, `hierarchy.sum()`, `hierarchy.leaves()` | Tree Inspector |
+| `d3-quadtree-spatial-index` | 2D spatial indexing, $O(\log N)$ nearest-neighbor & radius search | `d3.quadtree()`, `quadtree.find()`, `quadtree.visit()` | Spatial Search Canvas |
 
 ---
 
