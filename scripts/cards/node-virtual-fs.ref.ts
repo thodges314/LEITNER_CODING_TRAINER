@@ -1,3 +1,9 @@
+interface FSStats {
+  isFile(): boolean;
+  isDirectory(): boolean;
+  size: number;
+}
+
 class VirtualFS {
   root: any = { type: 'dir', children: {} };
 
@@ -39,7 +45,7 @@ class VirtualFS {
     return Object.keys(node.children).sort();
   }
 
-  stat(targetPath: string): VirtualFSStat {
+  stat(targetPath: string): FSStats {
     const node = this.#nav(targetPath);
     if (!node) throw new Error('ENOENT');
     return {
@@ -49,7 +55,7 @@ class VirtualFS {
     };
   }
 
-  rm(targetPath: string, options: VirtualFSOptions = {}): void {
+  rm(targetPath: string, options: { recursive?: boolean } = {}): void {
     const parts = targetPath.split('/').filter(Boolean), name = parts.pop()!;
     const parent = this.#nav(parts.join('/'));
     const node = parent?.children?.[name];

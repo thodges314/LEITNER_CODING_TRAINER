@@ -1,5 +1,12 @@
 type BatchFunction<K, V> = (keys: readonly K[]) => Promise<Array<V | Error>>;
 
+interface IDataLoader<K, V> {
+  load(key: K): Promise<V>;
+  loadMany(keys: K[]): Promise<Array<V | Error>>;
+  clear(key: K): this;
+  clearAll(): this;
+}
+
 interface QueueItem<K, V> {
   key: K;
   resolve: (value: V) => void;

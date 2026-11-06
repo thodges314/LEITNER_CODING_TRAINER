@@ -1,3 +1,15 @@
+interface WorkerPoolOptions {
+  size: number;
+  maxQueueSize?: number; // defaults to Infinity
+}
+
+interface PoolStats {
+  size: number;
+  busyWorkers: number;
+  idleWorkers: number;
+  pendingQueueLength: number;
+}
+
 class WorkerPoolDispatcher {
   size: number;
   maxQueueSize: number;
@@ -6,7 +18,7 @@ class WorkerPoolDispatcher {
   terminated = false;
   drains: Array<() => void> = [];
 
-  constructor(options: WorkerPoolOptions = {}) {
+  constructor(options: WorkerPoolOptions = { size: 2 }) {
     this.size = options.size || 2;
     this.maxQueueSize = options.maxQueueSize ?? Infinity;
   }
@@ -32,7 +44,7 @@ class WorkerPoolDispatcher {
     }
   }
 
-  getStats(): WorkerPoolStats {
+  getStats(): PoolStats {
     return {
       size: this.size,
       busyWorkers: this.active,

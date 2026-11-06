@@ -1,3 +1,21 @@
+interface PaginationArgs {
+  first?: number;
+  after?: string;
+  last?: number;
+  before?: string;
+}
+
+interface PaginationOptions {
+  defaultLimit?: number;
+  maxLimit?: number;
+}
+
+interface ParsedPagination {
+  isForward: boolean;
+  limit: number;
+  cursor?: string;
+}
+
 function parsePaginationArgs(
   args: PaginationArgs = {},
   options: PaginationOptions = {}

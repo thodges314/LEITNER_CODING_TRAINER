@@ -1,3 +1,8 @@
+interface ParsedArgv {
+  _: Array<string | number>;
+  [key: string]: any;
+}
+
 function coerce(val: string): any {
   if (val === 'true') return true;
   if (val === 'false') return false;

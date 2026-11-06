@@ -1,3 +1,20 @@
+interface ShutdownHandlerOptions {
+  priority?: number;  // Higher numbers run earlier; default 0
+  timeoutMs?: number; // Optional timeout for this specific task
+}
+
+interface TaskResult {
+  name: string;
+  status: 'fulfilled' | 'rejected' | 'timed_out';
+  error?: string;
+}
+
+interface ShutdownReport {
+  signal: string;
+  completed: boolean;
+  results: TaskResult[];
+}
+
 class GracefulShutdownCoordinator {
   handlers: Array<{ name: string; fn: () => any; priority: number; timeoutMs: number }> = [];
   #promise: Promise<ShutdownReport> | null = null;

@@ -1,3 +1,7 @@
+interface BackpressurePipeOptions {
+  highWaterMark?: number;
+}
+
 type DrainListener = () => void;
 
 class BackpressurePipe {

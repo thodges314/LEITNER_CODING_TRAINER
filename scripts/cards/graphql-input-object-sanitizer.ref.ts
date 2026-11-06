@@ -1,3 +1,21 @@
+type ScalarType = 'String' | 'Int' | 'Float' | 'Boolean' | 'ID';
+
+interface InputFieldSchema {
+  type: ScalarType;
+  required?: boolean;
+  enumValues?: string[];
+}
+
+interface InputSchema {
+  [fieldName: string]: InputFieldSchema;
+}
+
+interface SanitizedResult<T = any> {
+  valid: boolean;
+  data?: T;
+  errors?: string[];
+}
+
 const SCALAR_CHECKS: Record<string, (v: any) => boolean> = {
   String: (v) => typeof v === 'string',
   Int: (v) => typeof v === 'number' && Number.isInteger(v),

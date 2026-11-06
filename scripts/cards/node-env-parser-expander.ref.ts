@@ -1,3 +1,5 @@
+type EnvDictionary = Record<string, string>;
+
 function parseEnv(src = '', baseEnv: Record<string, string> = {}): Record<string, string> {
   const res: Record<string, string> = {}, ctx: Record<string, string> = { ...baseEnv };
   const expand = (str: string) => str.replace(/\$(\{([A-Za-z0-9_]+)(?::-([^}]*))?\}|([A-Za-z0-9_]+))/g, (_, _b, k1, def = '', k2) => ctx[k1 || k2] || def);

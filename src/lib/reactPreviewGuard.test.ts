@@ -74,7 +74,7 @@ describe('React preview guard: every previewCode mounts with the reference solut
 
       if (card.referenceSolutionTs) {
         const { checkAndTranspileTS } = await import('../utils/typeChecker');
-        const tsResult = checkAndTranspileTS(card.referenceSolutionTs);
+        const tsResult = checkAndTranspileTS(card.referenceSolutionTs, card.promptSeed);
         expect(
           tsResult.success,
           `TypeScript reference solution check failed for ${card.id}: ${tsResult.diagnostics.map((d) => d.formatted).join('; ')}`

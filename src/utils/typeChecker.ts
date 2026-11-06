@@ -344,184 +344,6 @@ const SANDBOX_GLOBALS = `
     constructor(val?: T, neighbors?: GraphNode<T>[]);
   }
 
-  // GraphQL Domain Interfaces
-  interface GraphQLResponse<T = any> {
-    data?: T;
-    errors?: Array<{
-      message: string;
-      locations?: Array<{ line: number; column: number }>;
-      path?: Array<string | number>;
-    }>;
-  }
-  interface IDataLoader<K, V> {
-    load(key: K): Promise<V>;
-    loadMany(keys: K[]): Promise<Array<V | Error>>;
-    clear(key: K): this;
-    clearAll(): this;
-  }
-  interface Edge<T> {
-    node: T;
-    cursor: string;
-  }
-  interface PageInfo {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    startCursor: string | null;
-    endCursor: string | null;
-  }
-  interface Connection<T> {
-    edges: Edge<T>[];
-    pageInfo: PageInfo;
-    totalCount: number;
-  }
-  interface ConnectionArgs {
-    first?: number;
-    after?: string;
-    last?: number;
-    before?: string;
-  }
-  interface PaginationArgs {
-    first?: number;
-    after?: string;
-    last?: number;
-    before?: string;
-  }
-  interface PaginationOptions {
-    defaultLimit?: number;
-    maxLimit?: number;
-  }
-  interface ParsedPagination {
-    isForward: boolean;
-    limit: number;
-    cursor?: string;
-  }
-  interface FieldNode {
-    name: string;
-    args?: Record<string, any>;
-    fields?: FieldNode[];
-  }
-  interface ComplexityConfig {
-    defaultCost?: number;
-    fieldCosts?: Record<string, number>;
-    maxComplexity?: number;
-  }
-  interface ComplexityResult {
-    complexity: number;
-    exceeded: boolean;
-  }
-  interface GraphQLErrorLike {
-    message: string;
-    locations?: Array<{ line: number; column: number }>;
-    path?: Array<string | number>;
-    extensions?: {
-      code?: string;
-      [key: string]: any;
-    };
-  }
-  interface FormattedError {
-    message: string;
-    locations?: Array<{ line: number; column: number }>;
-    path?: Array<string | number>;
-    extensions: {
-      code: string;
-      [key: string]: any;
-    };
-  }
-  interface FieldDefinition {
-    name: string;
-    type: string;
-    required?: boolean;
-    isArray?: boolean;
-    itemRequired?: boolean;
-  }
-  interface ModelDefinition {
-    name: string;
-    fields: FieldDefinition[];
-    description?: string;
-  }
-  interface InputFieldSchema {
-    type: 'String' | 'Int' | 'Float' | 'Boolean' | 'ID' | string;
-    required?: boolean;
-    enumValues?: string[];
-  }
-  interface InputSchema {
-    [fieldName: string]: InputFieldSchema;
-  }
-  interface SanitizedResult<T = any> {
-    valid: boolean;
-    data?: T;
-    errors?: string[];
-  }
-  interface TypeResolverMap {
-    [typeName: string]: (value: any) => boolean;
-  }
-  interface UserPayload {
-    id: string;
-    roles?: string[];
-  }
-  interface AuthContext {
-    user?: UserPayload | null;
-    [key: string]: any;
-  }
-  interface VariableValidationResult {
-    valid: boolean;
-    missing: string[];
-  }
-
-  // Node.js Domain Interfaces
-  interface BackpressurePipeOptions {
-    highWaterMark?: number;
-  }
-  interface ShutdownHandlerOptions {
-    priority?: number;
-    timeoutMs?: number;
-  }
-  interface TaskResult {
-    name: string;
-    status: 'fulfilled' | 'rejected' | 'timed_out';
-    error?: string;
-  }
-  interface ShutdownReport {
-    signal: string;
-    completed: boolean;
-    results: TaskResult[];
-  }
-  interface WorkerPoolOptions {
-    size?: number;
-    maxQueueSize?: number;
-  }
-  interface WorkerPoolStats {
-    size: number;
-    busyWorkers: number;
-    idleWorkers: number;
-    pendingQueueLength: number;
-  }
-  interface TLVRecord {
-    type: number;
-    value: string;
-  }
-  interface VirtualFSStat {
-    isFile: () => boolean;
-    isDirectory: () => boolean;
-    size: number;
-  }
-  type FSStats = VirtualFSStat;
-  interface VirtualFSOptions {
-    recursive?: boolean;
-  }
-  interface RouteMatch {
-    handler: (...args: any[]) => any;
-    params: Record<string, string>;
-  }
-  type RouteHandler = (...args: any[]) => any;
-  type RouteParams = Record<string, string>;
-  type PoolStats = WorkerPoolStats;
-  type EnvDictionary = Record<string, string>;
-  interface ParsedArgv {
-    _: Array<string | number>;
-    [key: string]: any;
-  }
-
   declare module 'react' {
     const React: any;
     export = React;
@@ -539,41 +361,164 @@ const SANDBOX_GLOBALS = `
 /** Combined sandbox globals: DOM/React/node shims + full typed D3 namespace. */
 const SANDBOX_GLOBALS_WITH_D3 = SANDBOX_GLOBALS + SANDBOX_D3_TYPES;
 
-let activeCardPromptTypes = '';
+const CORE_GLOBAL_TYPE_NAMES = new Set([
+  'Observable',
+  'Observer',
+  'Subscription',
+  'TextEncoder',
+  'TextDecoder',
+  'Event',
+  'CustomEvent',
+  'MouseEvent',
+  'PointerEvent',
+  'WheelEvent',
+  'KeyboardEvent',
+  'FocusEvent',
+  'InputEvent',
+  'TouchEvent',
+  'DragEvent',
+  'ClipboardEvent',
+  'DOMRect',
+  'Node',
+  'NodeListOf',
+  'DocumentFragment',
+  'ShadowRoot',
+  'Element',
+  'HTMLElement',
+  'HTMLInputElement',
+  'HTMLTextAreaElement',
+  'HTMLSelectElement',
+  'HTMLFormElement',
+  'HTMLButtonElement',
+  'HTMLLabelElement',
+  'HTMLDivElement',
+  'HTMLSpanElement',
+  'HTMLParagraphElement',
+  'HTMLHeadingElement',
+  'HTMLAnchorElement',
+  'HTMLImageElement',
+  'HTMLUListElement',
+  'HTMLOListElement',
+  'HTMLLIElement',
+  'HTMLTableElement',
+  'HTMLTableSectionElement',
+  'HTMLTableRowElement',
+  'HTMLTableCellElement',
+  'HTMLDialogElement',
+  'CanvasRenderingContext2D',
+  'HTMLCanvasElement',
+  'SVGElement',
+  'SVGSVGElement',
+  'SVGGElement',
+  'SVGPathElement',
+  'SVGRectElement',
+  'SVGCircleElement',
+  'SVGEllipseElement',
+  'SVGLineElement',
+  'SVGTextElement',
+  'SVGTSpanElement',
+  'SVGPolygonElement',
+  'SVGPolylineElement',
+  'SVGDefsElement',
+  'SVGClipPathElement',
+  'Text',
+]);
+
+function countBracesInLine(line: string): number {
+  let delta = 0;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '{' || ch === '(') delta++;
+    else if (ch === '}' || ch === ')') delta--;
+  }
+  return delta;
+}
+
+function stripConflictingDomainDeclarations(globalsText: string, names: Set<string>): string {
+  if (names.size === 0) return globalsText;
+  const lines = globalsText.split('\n');
+  const kept: string[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const blockMatch = /^\s*(?:declare\s+class|interface)\s+([A-Za-z_$][A-Za-z0-9_$]*)\b/.exec(line);
+    if (blockMatch && names.has(blockMatch[1]) && !CORE_GLOBAL_TYPE_NAMES.has(blockMatch[1])) {
+      let depth = countBracesInLine(line);
+      i++;
+      while (i < lines.length && depth > 0) {
+        depth += countBracesInLine(lines[i]);
+        i++;
+      }
+      continue;
+    }
+    const typeMatch = /^\s*type\s+([A-Za-z_$][A-Za-z0-9_$]*)\b/.exec(line);
+    if (typeMatch && names.has(typeMatch[1]) && !CORE_GLOBAL_TYPE_NAMES.has(typeMatch[1])) {
+      let depth = countBracesInLine(line);
+      let ended = depth <= 0 && line.trim().endsWith(';');
+      i++;
+      while (i < lines.length && !ended) {
+        depth += countBracesInLine(lines[i]);
+        if (depth <= 0 && lines[i].trim().endsWith(';')) {
+          ended = true;
+        }
+        i++;
+      }
+      continue;
+    }
+    kept.push(line);
+    i++;
+  }
+  return kept.join('\n');
+}
+
+let activeCardPromptSeed: string | undefined;
+let activeCardTrack: string | undefined;
 let activeGlobalsVersion = 1;
 
 /**
- * Filters prompt type declarations so any identifier already declared in
- * SANDBOX_GLOBALS_WITH_D3 is not redeclared with conflicting type parameters.
+ * Builds effective sandbox globals for a card by injecting the active card's prompt
+ * type declarations on a per-card basis, skipping any declaration that userCode already defines.
  */
-function filterNewPromptTypes(promptSeedOrBlocks?: string, track?: string): string {
-  if (!promptSeedOrBlocks || track === 'typescript-patterns') return '';
+function buildEffectiveGlobals(
+  promptSeedOrBlocks?: string,
+  track?: string,
+  userCode?: string
+): string {
+  if (!promptSeedOrBlocks || track === 'typescript-patterns') return SANDBOX_GLOBALS_WITH_D3;
   const wrapped = promptSeedOrBlocks.includes('```')
     ? promptSeedOrBlocks
     : `\`\`\`ts\n${promptSeedOrBlocks}\n\`\`\``;
-  const decls = extractPromptTypeDeclarations(wrapped, track);
-  const filtered = decls.filter(
-    (d) => !new RegExp(`\\b(?:interface|type|class)\\s+${d.name}\\b`).test(SANDBOX_GLOBALS_WITH_D3)
-  );
-  if (filtered.length === 0) return '';
-  return `\n  // Active Card Prompt Types\n  ${filtered.map((d) => d.code).join('\n\n  ')}\n`;
+  const decls = extractPromptTypeDeclarations(wrapped, track).filter((d) => {
+    if (CORE_GLOBAL_TYPE_NAMES.has(d.name)) return false;
+    if (
+      userCode &&
+      new RegExp(`^\\s*(?:export\\s+)?(?:interface|type|class)\\s+${d.name}\\b`, 'm').test(userCode)
+    ) {
+      return false;
+    }
+    return true;
+  });
+  if (decls.length === 0) return SANDBOX_GLOBALS_WITH_D3;
+  const overrideNames = new Set(decls.map((d) => d.name));
+  const baseGlobals = stripConflictingDomainDeclarations(SANDBOX_GLOBALS_WITH_D3, overrideNames);
+  return `${baseGlobals}\n  // Active Card Prompt Types\n  ${decls.map((d) => d.code).join('\n\n  ')}\n`;
 }
 
 /**
  * Sets the active card's prompt TypeScript declarations for hover QuickInfo and type-checking.
  */
 export function setActiveCardPromptTypes(promptSeed?: string, track?: string): void {
-  const next = filterNewPromptTypes(promptSeed, track);
-  if (next !== activeCardPromptTypes) {
-    activeCardPromptTypes = next;
+  if (promptSeed !== activeCardPromptSeed || track !== activeCardTrack) {
+    activeCardPromptSeed = promptSeed;
+    activeCardTrack = track;
     activeGlobalsVersion++;
   }
 }
 
-function getEffectiveGlobals(extraPromptTypes?: string): string {
-  const extra =
-    extraPromptTypes !== undefined ? filterNewPromptTypes(extraPromptTypes) : activeCardPromptTypes;
-  return extra ? SANDBOX_GLOBALS_WITH_D3 + extra : SANDBOX_GLOBALS_WITH_D3;
+function getEffectiveGlobals(extraPromptTypes?: string, userCode?: string): string {
+  return extraPromptTypes !== undefined
+    ? buildEffectiveGlobals(extraPromptTypes, undefined, userCode)
+    : buildEffectiveGlobals(activeCardPromptSeed, activeCardTrack, userCode);
 }
 
 const sourceFileCache = new Map<string, ts.SourceFile>();
@@ -683,7 +628,7 @@ export function determineFileTarget(rawCode: string): FileTargetInfo {
 export function checkAndTranspileTS(rawCode: string, extraPromptTypes?: string): TypeCheckResult {
   const target = determineFileTarget(rawCode);
   const { fileName, isJsx, codeToTranspile } = target;
-  const effectiveGlobals = getEffectiveGlobals(extraPromptTypes);
+  const effectiveGlobals = getEffectiveGlobals(extraPromptTypes, codeToTranspile);
 
   const compilerOptions: ts.CompilerOptions = {
     strict: true,
@@ -807,7 +752,7 @@ function getOrCreateLanguageService(): ts.LanguageService {
     getScriptFileNames: () => ['solution.ts', 'solution.tsx', GLOBALS_FILE],
     getScriptVersion: (name) => {
       if (name === 'solution.ts' || name === 'solution.tsx') return String(activeSourceVersion);
-      if (name === GLOBALS_FILE) return String(activeGlobalsVersion);
+      if (name === GLOBALS_FILE) return `${activeGlobalsVersion}:${activeSourceVersion}`;
       return '1';
     },
     getScriptSnapshot: (name) => {
@@ -816,7 +761,9 @@ function getOrCreateLanguageService(): ts.LanguageService {
         const codeForFile = target.fileName === name ? target.codeToTranspile : activeSourceCode;
         return ts.ScriptSnapshot.fromString(codeForFile);
       }
-      if (name === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(getEffectiveGlobals());
+      if (name === GLOBALS_FILE) {
+        return ts.ScriptSnapshot.fromString(getEffectiveGlobals(undefined, activeSourceCode));
+      }
       const text = LIBS[name.split('/').pop() as string];
       if (text !== undefined) return ts.ScriptSnapshot.fromString(text);
       return undefined;
@@ -833,7 +780,7 @@ function getOrCreateLanguageService(): ts.LanguageService {
         const target = determineFileTarget(activeSourceCode);
         return target.fileName === name ? target.codeToTranspile : activeSourceCode;
       }
-      if (name === GLOBALS_FILE) return getEffectiveGlobals();
+      if (name === GLOBALS_FILE) return getEffectiveGlobals(undefined, activeSourceCode);
       return LIBS[name.split('/').pop() as string];
     },
     readDirectory: () => [],

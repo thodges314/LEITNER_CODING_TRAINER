@@ -1,3 +1,23 @@
+interface GraphQLErrorLike {
+  message: string;
+  locations?: Array<{ line: number; column: number }>;
+  path?: Array<string | number>;
+  extensions?: {
+    code?: string;
+    [key: string]: any;
+  };
+}
+
+interface FormattedError {
+  message: string;
+  locations?: Array<{ line: number; column: number }>;
+  path?: Array<string | number>;
+  extensions: {
+    code: string;
+    [key: string]: any;
+  };
+}
+
 const SAFE_CODES = new Set<string>([
   'BAD_USER_INPUT',
   'UNAUTHENTICATED',

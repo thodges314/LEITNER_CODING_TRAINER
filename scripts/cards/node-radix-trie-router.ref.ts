@@ -1,3 +1,12 @@
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+type RouteHandler = (...args: any[]) => any;
+type RouteParams = Record<string, string>;
+
+interface RouteMatch {
+  handler: RouteHandler;
+  params: RouteParams;
+}
+
 class RadixRouter {
   trees: Record<string, any> = {};
 

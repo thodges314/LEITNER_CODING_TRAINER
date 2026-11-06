@@ -22,8 +22,8 @@ interface GraphLink {
 }
 
 interface ForceGraphOptions {
-  nodes: GraphNode[];
-  links: GraphLink[];
+  nodes?: GraphNode[];
+  links?: GraphLink[];
   width?: number; // default: 400
   height?: number; // default: 300
   onSelectNode?: (node: GraphNode) => void;

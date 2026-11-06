@@ -200,7 +200,18 @@ describe('typeChecker & getTSQuickInfo', () => {
     expect(info?.signature).toContain('scaleLinear');
   });
 
-  it('predefines D3 card domain interfaces globally without requiring local declaration', () => {
+  it('injects D3 card domain interfaces per-card from the active card prompt without requiring local declaration', () => {
+    const promptSeed = [
+      '```ts',
+      'interface VoronoiPoint { x: number; y: number; id?: string | number; label?: string; }',
+      'interface VoronoiSnappingOptions { width?: number; height?: number; }',
+      'interface TreemapNodeData { name: string; value?: number; children?: TreemapNodeData[]; }',
+      'interface TreemapOptions { width?: number; height?: number; }',
+      'interface QuadPoint { x: number; y: number; id?: string | number; }',
+      'interface HierarchyRecord { id: string; parentId: string | null; value?: number; }',
+      '```',
+    ].join('\n');
+
     const code = `
       function testCardInterfaces(
         pts: VoronoiPoint[],
@@ -216,7 +227,7 @@ describe('typeChecker & getTSQuickInfo', () => {
         return delaunay.points.length + (root.value ?? 0) + qt.size() + rows.length + (voronoiOpts.width ?? 0) + (treemapOpts.height ?? 0);
       }
     `;
-    const result = checkAndTranspileTS(code);
+    const result = checkAndTranspileTS(code, promptSeed);
     expect(result.success).toBe(true);
     expect(result.diagnostics).toHaveLength(0);
   });
@@ -249,5 +260,11 @@ describe('typeChecker & getTSQuickInfo', () => {
     const result = checkAndTranspileTS(code, promptSeed);
     expect(result.success).toBe(true);
     expect(result.diagnostics).toHaveLength(0);
+
+    // Also compiles cleanly if the solution file (.ref.ts) includes the interfaces/types itself
+    const codeWithTypes = `${promptSeed.replace(/```ts|```/g, '').trim()}\n${code}`;
+    const resultWithTypes = checkAndTranspileTS(codeWithTypes, promptSeed);
+    expect(resultWithTypes.success).toBe(true);
+    expect(resultWithTypes.diagnostics).toHaveLength(0);
   });
 });

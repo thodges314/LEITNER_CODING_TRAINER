@@ -1,3 +1,28 @@
+interface Edge<T> {
+  node: T;
+  cursor: string;
+}
+
+interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string | null;
+  endCursor: string | null;
+}
+
+interface Connection<T> {
+  edges: Edge<T>[];
+  pageInfo: PageInfo;
+  totalCount: number;
+}
+
+interface ConnectionArgs {
+  first?: number;
+  after?: string;
+  last?: number;
+  before?: string;
+}
+
 function buildRelayConnection<T>(
   items: T[] = [],
   args: ConnectionArgs = {}
