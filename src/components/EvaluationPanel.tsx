@@ -28,6 +28,7 @@ import { graphql } from 'cm6-graphql';
 import { EditorView } from '@codemirror/view';
 import { askCritiqueFollowUp, getStoredApiKey, type EvaluationResult } from '../lib/ai';
 import { summarizeVerdict } from '../lib/verdict';
+import { stripPredefinedPromptTypes } from '../utils/cardPromptTypes';
 import { getThemeColors } from '../styles/colors';
 
 import { MarkdownContent } from './MarkdownContent';
@@ -209,7 +210,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
     inputLang === 'typescript' ||
     (executionMode === 'ts' && Boolean(topic.referenceSolutionTs));
   const rawCanonicalCode = isTsMode
-    ? (topic.referenceSolutionTs as string)
+    ? stripPredefinedPromptTypes(topic.referenceSolutionTs as string, topic.promptSeed, topic.track)
     : topic.referenceSolution || topic.solution || topic.starterCode || '';
 
   const solutionLanguageLabel = useMemo(() => {

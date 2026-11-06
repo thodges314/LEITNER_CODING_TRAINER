@@ -163,6 +163,80 @@ export function extractPromptTypeNames(promptSeed?: string, track?: string): str
 }
 
 /**
+ * Strips top-level `interface` and `type` declarations from a TypeScript reference solution
+ * when those exact type names are already predefined in the card's prompt or sandbox globals,
+ * so the revealed canonical solution displays only the implementation code.
+ */
+export function stripPredefinedPromptTypes(
+  code: string,
+  promptSeed?: string,
+  track?: string
+): string {
+  if (!code || track === 'typescript-patterns') return code;
+
+  const predefinedNames = new Set<string>([
+    ...extractPromptTypeNames(promptSeed, track),
+    'ListNode',
+    'TreeNode',
+    'GraphNode',
+  ]);
+  if (predefinedNames.size === 0) return code;
+
+  const lines = code.split('\n');
+  const kept: string[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    const ifaceMatch = /^\s*(?:export\s+)?interface\s+([A-Za-z_$][A-Za-z0-9_$]*)\b/.exec(line);
+    if (ifaceMatch && predefinedNames.has(ifaceMatch[1])) {
+      let depth = countBraces(line);
+      i++;
+      while (i < lines.length && depth > 0) {
+        depth += countBraces(lines[i]);
+        i++;
+      }
+      while (i < lines.length && lines[i].trim() === '') {
+        i++;
+      }
+      continue;
+    }
+
+    const typeMatch = /^\s*(?:export\s+)?type\s+([A-Za-z_$][A-Za-z0-9_$]*)\b/.exec(line);
+    if (typeMatch && predefinedNames.has(typeMatch[1])) {
+      let depth = countBraces(line);
+      let ended = depth <= 0 && line.trim().endsWith(';');
+      i++;
+      while (i < lines.length && !ended) {
+        const nextLine = lines[i];
+        if (
+          depth <= 0 &&
+          /^\s*(?:export\s+)?(?:interface|type|function|class|const|let|var)\b/.test(nextLine)
+        ) {
+          break;
+        }
+        depth += countBraces(nextLine);
+        if (depth <= 0 && nextLine.trim().endsWith(';')) {
+          ended = true;
+        }
+        i++;
+      }
+      while (i < lines.length && lines[i].trim() === '') {
+        i++;
+      }
+      continue;
+    }
+
+    kept.push(line);
+    i++;
+  }
+
+  const stripped = kept.join('\n').trimStart();
+  return stripped || code;
+}
+
+/**
  * Computes problem-specific preloaded runtime globals and TypeScript interfaces/types
  * for a given card so the starter comment and editor hints only mention items relevant
  * to that specific problem.

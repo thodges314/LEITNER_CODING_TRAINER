@@ -175,7 +175,37 @@ describe('EvaluationPanel context-aware solution reveal', () => {
 
     const badge = container?.querySelector('[data-testid="solution-language-badge"]');
     expect(badge?.textContent).toBe('SQL');
-    expect(container?.textContent).toContain('SELECT id, CASE WHEN id % 2 = 1');
+    expect(container?.textContent).toContain('WHEN id % 2 = 1 THEN id + 1');
+  });
+
+  it('strips predefined prompt interfaces from revealed TypeScript solution', async () => {
+    const topicWithPromptInterfaces: TopicItem = {
+      ...sampleTopic,
+      id: 'stepper',
+      track: 'react-components',
+      promptSeed: '```ts\ninterface StepItem {\n  id: string;\n  title: string;\n}\ninterface StepperProps {\n  steps: StepItem[];\n}\n```\n### Stepper(props: StepperProps)',
+      referenceSolutionTs:
+        'interface StepItem {\n  id: string;\n  title: string;\n}\n\ninterface StepperProps {\n  steps: StepItem[];\n}\n\nfunction Stepper({ steps }: StepperProps) {\n  return <div>{steps.length}</div>;\n}',
+    };
+
+    await act(async () => {
+      root?.render(
+        <EvaluationPanel
+          topic={topicWithPromptInterfaces}
+          submittedCode="broken"
+          result={failedResult}
+          totalCompletedReviews={0}
+          onCommit={vi.fn()}
+          onRetry={vi.fn()}
+          showSolution={true}
+          executionMode="ts"
+        />
+      );
+    });
+
+    expect(container?.textContent).toContain('function Stepper({ steps }: StepperProps)');
+    expect(container?.textContent).not.toContain('interface StepItem');
+    expect(container?.textContent).not.toContain('interface StepperProps');
   });
 
   it('renders GraphQL solution and badge when inputLanguage is graphql', async () => {

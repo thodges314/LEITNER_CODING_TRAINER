@@ -283,7 +283,7 @@ export function setStoredBaseUrl(url: string): void {
 
 const EVALUATION_SYSTEM_PROMPT = `Evaluate cold-start code practice against invariants and functional correctness. Do NOT grade based on verbatim similarity to a reference solution.
 Respect the indicated language mode (JavaScript vs TypeScript). Do NOT criticize, dock points, or demand TypeScript type annotations or interfaces unless the problem is explicitly in TypeScript mode or requires TypeScript invariants. Valid idiomatic JavaScript without types is expected and completely correct when running in JavaScript mode.
-Standard React hooks and primitives (React, useState, useEffect, useRef, useMemo, useCallback, useReducer, etc.) are pre-injected environment globals in this trainer. Do NOT criticize, dock points, or comment on the absence of explicit import statements (such as 'import { useState } from "react"'). Both implicit globals and explicit imports are valid and accepted in this environment.
+Standard React hooks and primitives (React, useState, useEffect, useRef, useMemo, useCallback, useReducer, etc.), d3, ListNode, TreeNode, GraphNode, and all TypeScript interfaces/types shown in the problem instructions are pre-injected environment globals in this trainer. Do NOT criticize, dock points, or comment on the absence of explicit import statements (such as 'import { useState } from "react"') or the absence of re-declared prompt TypeScript interfaces/types in the submitted code. Both implicit globals/preloaded prompt types and explicit local declarations are valid and accepted in this environment.
 Modern ECMAScript standards (ES2024+) are fully supported in this runtime. Specifically, standard Set methods (Set.prototype.intersection, union, difference, symmetricDifference, isSubsetOf, isSupersetOf, isDisjointFrom), Map.groupBy, Object.groupBy, and other standardized modern ES features ARE native standard JavaScript. Do NOT claim they are non-standard, polyfills, or throw TypeErrors. However, ensure algorithmic invariants (such as specific iteration ordering requirements or complexity) are genuinely satisfied by the implementation.
 The Automated Test Harness Result (when provided) is authoritative regarding compilation and runtime execution. If the automated test harness ran and passed, the code compiled and executed successfully—never claim there are syntax errors, duplicate identifier declarations, or that tests failed to run.
 Return pure JSON:
@@ -862,6 +862,7 @@ export async function askCritiqueFollowUp(
   const systemPrompt = `You are an expert technical coding mentor in a deliberate practice trainer.
 Answer the user's follow-up question regarding their solution and the evaluator critique.
 Be concise (2-4 sentences max), technically exact, and directly answer their question.
+Note that React hooks, d3, ListNode/TreeNode/GraphNode, and all TypeScript interfaces/types shown in the problem instructions are pre-injected in the sandbox scope and do not need to be imported or re-declared by the user.
 The context is strictly this single problem ("${topic.title}"), the user's submitted code, and the evaluation critique. Focus on algorithmic correctness, invariants, edge cases, or complexity bounds.`;
 
   const cleanedCode = stripTestRunnerBlock(submittedCode, topic.testHarness).trim() || submittedCode;
