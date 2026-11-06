@@ -1406,5 +1406,13 @@
   "d3-contour-density-grid": {
     "difficulty": 4,
     "concept": "d3-contour-density"
+  },
+  "d3-data-join-enter-update-exit": {
+    "difficulty": 1,
+    "concept": "d3-data-join"
+  },
+  "d3-scales-domain-range-basics": {
+    "difficulty": 1,
+    "concept": "d3-scales-basics"
   }
 }

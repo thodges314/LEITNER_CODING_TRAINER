@@ -1,0 +1,13 @@
+{
+  "id": "d3-scales-domain-range-basics",
+  "title": "D3 Linear & Band Scales (Domain, Range & Invert)",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "scales",
+    "svg",
+    "coordinates"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}

@@ -1255,6 +1255,73 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Overlay raw data points on top of contour bands',
     },
   ],
+  'd3-data-join-enter-update-exit': [
+    {
+      name: 'rowHeight',
+      type: 'number',
+      defaultValue: 36,
+      min: 24,
+      max: 52,
+      step: 2,
+      description: 'Vertical height per joined row in pixels',
+    },
+    {
+      name: 'maxValue',
+      type: 'number',
+      defaultValue: 100,
+      min: 50,
+      max: 200,
+      step: 10,
+      description: 'Upper domain bound for horizontal bar scale',
+    },
+    {
+      name: 'enterColor',
+      type: 'enum',
+      defaultValue: '#10b981',
+      options: ['#10b981', '#22c55e', '#14b8a6', '#f59e0b'],
+      description: 'Fill color for newly entered rows (data-join="enter")',
+    },
+    {
+      name: 'updateColor',
+      type: 'enum',
+      defaultValue: '#3b82f6',
+      options: ['#3b82f6', '#6366f1', '#8b5cf6', '#ec4899'],
+      description: 'Fill color for updated surviving rows (data-join="update")',
+    },
+  ],
+  'd3-scales-domain-range-basics': [
+    {
+      name: 'padding',
+      type: 'number',
+      defaultValue: 32,
+      min: 16,
+      max: 60,
+      step: 4,
+      description: 'Outer chart padding in pixels',
+    },
+    {
+      name: 'paddingInner',
+      type: 'number',
+      defaultValue: 0.25,
+      min: 0,
+      max: 0.6,
+      step: 0.05,
+      description: 'Fractional band spacing between categorical bars',
+    },
+    {
+      name: 'clamp',
+      type: 'boolean',
+      defaultValue: true,
+      description: 'Clamp out-of-domain values to the SVG plot range',
+    },
+    {
+      name: 'barColor',
+      type: 'enum',
+      defaultValue: '#6366f1',
+      options: ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'],
+      description: 'Fill color for scaled categorical bars',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

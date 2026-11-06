@@ -638,6 +638,70 @@ export default {
       { callSignature: 'instance.destroy()' }
     ),
   ],
+  'd3-data-join-enter-update-exit': [
+    r(
+      'Mounts SVG container and enters all initial rows with data-join="enter"',
+      'renderKeyedDataJoin(container, INITIAL_METRICS, { width: 440, rowHeight: 36 })',
+      'Renders 3 g.join-row elements with data-join="enter" and stats { entered: 3, updated: 0, exited: 0, total: 3 }',
+      { callSignature: 'renderKeyedDataJoin(container, items, options)' }
+    ),
+    r(
+      'Preserves existing DOM node identity across keyed updates and marks data-join="update"',
+      'instance.update([{ id: "mem", ... }, { id: "cpu", ... }, { id: "disk", ... }])',
+      'Surviving keys reuse the exact same DOM elements with data-join="update", new key enters, removed key exits',
+      { callSignature: 'instance.update(nextItems)' }
+    ),
+    r(
+      'Reorders DOM elements to match new data array order and updates transforms',
+      'instance.update([{ id: "net", value: 90 }, { id: "cpu", value: 25 }])',
+      'DOM node order matches nextItems and translate(0, i * rowHeight) updates accordingly',
+      { callSignature: 'instance.update(reorderedItems)' }
+    ),
+    r(
+      'Scales bar widths proportionally and clamps values exceeding maxValue',
+      'renderKeyedDataJoin(container, [{ value: 25 }, { value: 50 }, { value: 200 }], { width: 340, maxValue: 100 })',
+      'Maps [0, 100] to [0, 200]px and clamps 200 at 200px',
+      { callSignature: 'renderKeyedDataJoin(container, items, { width: 340, maxValue: 100 })' }
+    ),
+    r(
+      'Handles empty array transitions and cleans up DOM on destroy',
+      'instance.update([]) and instance.destroy()',
+      'Exits all remaining rows and clears container innerHTML on destroy',
+      { callSignature: 'instance.update([])' }
+    ),
+  ],
+  'd3-scales-domain-range-basics': [
+    r(
+      'Mounts SVG container, baseline, and scaled rect.scale-bar elements',
+      'renderScaledCoordinateChart(container, SAMPLE_METRICS, { width: 440, height: 240, padding: 30 })',
+      'SVG rendered with line.zero-baseline at y=210, 4 rect.scale-bar elements, and extent [25, 100]',
+      { callSignature: 'renderScaledCoordinateChart(container, data, options)' }
+    ),
+    r(
+      'Maps data values to inverted SVG Y coordinates and proportional heights',
+      'instance.getBarGeometry("Q1", 0), getBarGeometry("Q2", 50), getBarGeometry("Q3", 100)',
+      'Maps 0 to baseline y=200 (height 0), 50 to y=110 (height 90), and 100 to top y=20 (height 180)',
+      { callSignature: 'instance.getBarGeometry(category, value)' }
+    ),
+    r(
+      'Computes categorical band X positions, bandwidth, and centerX',
+      'instance.getBarGeometry("Q1", 25) and instance.getBarGeometry("Q4", 75)',
+      'Computes discrete band x, bandwidth, and centerX = x + bandwidth / 2',
+      { callSignature: 'instance.getBarGeometry(category, value)' }
+    ),
+    r(
+      'Supports continuous Y coordinate inversion via invertY and clamping',
+      'instance.invertY(20), instance.invertY(110), instance.invertY(200)',
+      'Inverts pixel Y coordinates back to domain values (100, 50, 0) and respects clamp option',
+      { callSignature: 'instance.invertY(pixelY)' }
+    ),
+    r(
+      'Handles empty dataset gracefully and cleans up DOM on destroy',
+      'renderScaledCoordinateChart(container, []) and instance.destroy()',
+      'Returns extent [0, 0], 0 bars, and clears container innerHTML on destroy',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 
 

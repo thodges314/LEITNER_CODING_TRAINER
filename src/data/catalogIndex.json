@@ -4921,5 +4921,34 @@
       "data-visualization"
     ],
     "summary": "interface GeoFeature {"
+  },
+  {
+    "id": "d3-data-join-enter-update-exit",
+    "title": "D3 Keyed Data Join (Enter, Update, Exit)",
+    "track": "d3",
+    "concept": "d3-data-join",
+    "difficulty": 1,
+    "tags": [
+      "d3",
+      "data-join",
+      "selection",
+      "svg",
+      "dom"
+    ],
+    "summary": "interface JoinDatum {"
+  },
+  {
+    "id": "d3-scales-domain-range-basics",
+    "title": "D3 Linear & Band Scales (Domain, Range & Invert)",
+    "track": "d3",
+    "concept": "d3-scales-basics",
+    "difficulty": 1,
+    "tags": [
+      "d3",
+      "scales",
+      "svg",
+      "coordinates"
+    ],
+    "summary": "interface CategoryMetric {"
   }
 ]

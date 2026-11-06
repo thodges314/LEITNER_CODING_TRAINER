@@ -14,10 +14,12 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 
 ---
 
-## 2. Current Status (15 Cards — 100% Typed & Passing)
+## 2. Current Status (17 Cards — 100% Typed & Passing)
 
 | Card ID | Description | Concepts / Modules | UI / Preview |
 |---|---|---|---|
+| `d3-data-join-enter-update-exit` | Keyed Enter–Update–Exit data join & DOM identity preservation | `selection.data(items, keyFn).join(enter, update, exit)`, `.order()` | Interactive Data Join SVG |
+| `d3-scales-domain-range-basics` | Linear & band scales, inverted SVG Y range, clamping & `.invert()` | `d3.extent()`, `d3.scaleLinear()`, `d3.scaleBand()`, `scale.invert()` | Scaled Coordinate SVG |
 | `d3-react-imperative-chart` | React `useRef` + `useEffect` D3 lifecycle integration & cleanup | `d3-selection`, React DOM ref lifecycle | SVG Bar Chart in React |
 | `d3-css-coordinate-layout` | CSS-driven layout calculations & DOM coordinates | `d3-selection`, CSS layout mapping | HTML Bars |
 | `d3-graph-theory-visualizer` | Node-link graph SVG rendering with circular layouts | `d3-selection`, SVG line/circle paths | SVG Graph |
