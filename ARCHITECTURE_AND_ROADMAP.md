@@ -22,7 +22,7 @@ in the browser; state lives in `localStorage`.
 | Item | Value |
 |---|---|
 | Cards | 354 total = organized into 4 built-in preset study decks: **Full Library** (354 cards), **Full-Stack Core** (297 cards), **Frontend Specialist** (224 cards), and **Algorithms & Data Structures** (102 cards) |
-| Documented test cases | 2368 (each shown as input → expected in the UI) |
+| Documented test cases | 2367 (each shown as input → expected in the UI) |
 | Markdown formatting | **100% complete** across all 354 cards with structured descriptions, parameters, returns, constraints, and edge cases |
 | Difficulty spread | all 354: d1 46 · d2 112 · d3 136 · d4 53 · d5 7 |
 | Tracks | 16 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`): advanced-algorithms 57, js-utilities 44, react-components 41, algorithms 29, react 27, js-language 25, async-js 21, dom-browser 20, d3 17, node 15, sql-postgres 15, typescript-patterns 14, graphql-server 14, graphql 7, testing-tooling 5, tailwind 3. Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`, `algorithms-advanced`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |

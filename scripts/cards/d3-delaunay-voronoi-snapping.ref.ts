@@ -12,7 +12,6 @@ interface VoronoiSnappingOptions {
   pointColor?: string;
   activeColor?: string;
   showCells?: boolean;
-  onHoverPoint?: (point: VoronoiPoint | null, index: number | null) => void;
   onSelectPoint?: (point: VoronoiPoint, index: number) => void;
 }
 
@@ -34,7 +33,6 @@ function renderVoronoiSnapping(
     pointColor = '#3b82f6',
     activeColor = '#f97316',
     showCells = true,
-    onHoverPoint,
     onSelectPoint,
   } = options;
 
@@ -106,19 +104,6 @@ function renderVoronoiSnapping(
       .attr('fill', 'transparent')
       .attr('stroke', showCells ? '#94a3b8' : 'none')
       .attr('pointer-events', 'all')
-      .on('mouseenter', function (_: any, d: VoronoiPoint) {
-        const idx = safePoints.indexOf(d);
-        setActive(idx);
-        if (typeof onHoverPoint === 'function') {
-          onHoverPoint(d, idx);
-        }
-      })
-      .on('mouseleave', function () {
-        setActive(-1);
-        if (typeof onHoverPoint === 'function') {
-          onHoverPoint(null, null);
-        }
-      })
       .on('click', function (_: any, d: VoronoiPoint) {
         const idx = safePoints.indexOf(d);
         setActive(idx);

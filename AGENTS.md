@@ -68,6 +68,7 @@ Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/
     - `.class-name`: short description.
     You may use these classes, custom styles, or your own class names.
     ```
+  - **D3 Hover Performance (CSS `:hover` over D3 `mouseover` loops)**: In D3 cards and app visualizations, never require superfluous D3 `mouseover`/`mouseenter`/`mouseleave` handlers that iterate over DOM nodes just for visual hover effects. Delegate visual hover styling and transitions to CSS `:hover` rules in the preview environment (`reactPreviewFrame.ts`), reserving D3 listeners for semantic interactions (`click` selection, `brush`, or coordinate spatial queries).
 - **Live Preview Props Panel & Uncontrolled Components**:
   - The live preview sandbox features a dedicated Props Control Panel (`PropsControlPanel`, `previewPropsConfig.ts`, `usePreviewProps`) supporting `string`, `number`, `boolean`, `enum`, `function`, and `json` prop types, component grouping, and postMessage synchronization.
   - For uncontrolled React components (components that initialize local state from a prop via `useState(defaultValue)` upon mount), preview wrappers must pass `key={defaultValue}` so changing the default prop in the Props panel triggers a clean re-mount and state re-initialization.

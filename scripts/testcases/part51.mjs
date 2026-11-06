@@ -430,12 +430,6 @@ export default {
       { callSignature: 'instance.findClosestIndex(45, 55)' }
     ),
     r(
-      'Hovering a Voronoi cell highlights corresponding point and fires onHoverPoint',
-      'mouseenter and mouseleave on path.voronoi-cell[data-index="1"]',
-      'Point 1 receives data-active="true", active fill, and enlarged radius; resets on mouseleave',
-      { callSignature: 'cell.dispatchEvent(new MouseEvent("mouseenter"))' }
-    ),
-    r(
       'Clicking a Voronoi cell activates point and invokes onSelectPoint callback',
       'click path.voronoi-cell[data-index="2"]',
       'onSelectPoint called with Gamma point and index 2, point 2 marked data-active="true"',

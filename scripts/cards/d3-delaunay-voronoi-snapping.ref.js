@@ -6,7 +6,6 @@ function renderVoronoiSnapping(container, points = [], options = {}) {
     pointColor = '#3b82f6',
     activeColor = '#f97316',
     showCells = true,
-    onHoverPoint,
     onSelectPoint,
   } = options;
 
@@ -72,19 +71,6 @@ function renderVoronoiSnapping(container, points = [], options = {}) {
       .attr('fill', 'transparent')
       .attr('stroke', showCells ? '#94a3b8' : 'none')
       .attr('pointer-events', 'all')
-      .on('mouseenter', function (_, d) {
-        const idx = safePoints.indexOf(d);
-        setActive(idx);
-        if (typeof onHoverPoint === 'function') {
-          onHoverPoint(d, idx);
-        }
-      })
-      .on('mouseleave', function () {
-        setActive(-1);
-        if (typeof onHoverPoint === 'function') {
-          onHoverPoint(null, null);
-        }
-      })
       .on('click', function (_, d) {
         const idx = safePoints.indexOf(d);
         setActive(idx);

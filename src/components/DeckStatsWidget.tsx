@@ -223,17 +223,12 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
       .cornerRadius(3);
   }, []);
 
-  const hoveredArcGenerator = useMemo(() => {
-    return d3
-      .arc<d3.PieArcDatum<{ track: TrackType; count: number; label: string; color: string; percentage: number }>>()
-      .innerRadius(51)
-      .outerRadius(87)
-      .cornerRadius(3);
-  }, []);
-
   const pieSlices = useMemo(() => {
-    return pieGenerator(trackStats);
-  }, [pieGenerator, trackStats]);
+    return pieGenerator(trackStats).map((slice) => ({
+      slice,
+      path: arcGenerator(slice) || '',
+    }));
+  }, [pieGenerator, arcGenerator, trackStats]);
 
   // D3 Radar Generator
   const radarRadius = 76;
@@ -542,10 +537,9 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
           <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <svg data-testid="stats-chart-svg" width={width} height={height} style={{ overflow: 'visible' }}>
               <g transform={`translate(${centerX}, ${centerY})`}>
-                {pieSlices.map((slice) => {
+                {pieSlices.map(({ slice, path }) => {
                   const isHovered = hoveredTrack === slice.data.track;
                   const isTrackSelected = selectedTracks && selectedTracks.includes(slice.data.track);
-                  const path = (isHovered ? hoveredArcGenerator(slice) : arcGenerator(slice)) || '';
                   return (
                     <path
                       key={slice.data.track}
@@ -556,7 +550,8 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                       strokeWidth={isTrackSelected ? 3 : 1.5}
                       style={{
                         cursor: 'pointer',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: isHovered ? 'scale(1.04)' : 'scale(1)',
+                        transition: 'transform 0.18s ease, opacity 0.18s ease, filter 0.18s ease',
                         opacity: hoveredTrack && !isHovered ? 0.45 : 1,
                         filter: isHovered && !isLight ? `drop-shadow(0 0 6px ${slice.data.color})` : 'none',
                       }}

@@ -7,9 +7,11 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 ### Core Principles
 1. **D3 is an Algorithmic Engine, Not Just SVG Shapes:**  
    Advanced technical interviews assess deep understanding of data structures: spatial trees (`d3.quadtree`), hierarchical stratifications (`d3.stratify`), Delaunay/Voronoi graphs (`d3.Delaunay`), and discrete numerical approximations (`d3.forceSimulation`).
-2. **Deterministic, Headless & Sandbox Tested:**  
+2. **CSS `:hover` Transitions over Superfluous D3 Hover Listeners:**  
+   Visual hover effects (opacity, brightness, stroke, scale, fill highlights on `.bar`, `.arc-slice`, `.scatter-dot`, `.voronoi-cell`, `.treemap-cell`, `.geo-feature`, `.contour-band`) must be handled via **CSS `:hover` and `transition` rules** rather than D3 `mouseover`/`mouseenter` DOM-mutation loops. On large datasets, delegating visual hover feedback to the browser's CSS compositor avoids $O(N)$ JavaScript handler and DOM attribute mutation overhead. D3 event listeners should focus on semantic state transitions (`click` selection, `brush` rescaling, or continuous coordinate queries).
+3. **Deterministic, Headless & Sandbox Tested:**  
    Every card has concrete unit/contract tests, a strict TypeScript interface, canonical `.ref.js` and `.ref.ts` solutions, and an interactive live preview where visual feedback is valuable.
-3. **Low-Token Batch Execution:**  
+4. **Low-Token Batch Execution:**  
    Authored in strictly isolated **2-card batches** to guarantee reliable test verification, full production builds, and clean branch merging without token exhaustion.
 
 ---

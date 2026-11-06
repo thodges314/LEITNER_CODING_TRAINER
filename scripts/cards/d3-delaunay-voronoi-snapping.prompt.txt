@@ -17,7 +17,6 @@ interface VoronoiSnappingOptions {
   pointColor?: string;
   activeColor?: string;
   showCells?: boolean;
-  onHoverPoint?: (point: VoronoiPoint | null, index: number | null) => void;
   onSelectPoint?: (point: VoronoiPoint, index: number) => void;
 }
 
@@ -52,11 +51,10 @@ Voronoi overlays partition a chart's 2D plane into convex polygonal regions arou
 - **Voronoi Overlay Cells & Snapping (`g.cells-layer`)**:
   - Renders a `<path class="voronoi-cell">` for each point at index `i`.
   - Sets `d = voronoi.renderCell(i)`, `data-index="i"`, `fill="transparent"`, `pointer-events="all"`, and `stroke = showCells ? '#94a3b8' : 'none'` (where `showCells` defaults to `true`).
-  - **Hover (`mouseenter` / `mouseleave` on `.voronoi-cell`)**:
-    - On `mouseenter`: activates point `i` by setting its circle's `data-active="true"`, `fill = activeColor` (default `'#f97316'`), and `r = pointRadius * 1.75` (all other circles reset to `data-active="false"`, `fill = pointColor`, `r = pointRadius`), then invokes `options.onHoverPoint(points[i], i)` if provided.
-    - On `mouseleave`: resets all circles to `data-active="false"`, `fill = pointColor`, and `r = pointRadius`, then invokes `options.onHoverPoint(null, null)` if provided.
   - **Selection (`click` on `.voronoi-cell`)**:
-    - Activates point `i` (`data-active="true"`, `fill = activeColor`, `r = pointRadius * 1.75`, others reset) and invokes `options.onSelectPoint(points[i], i)` if provided.
+    - Activates point `i` by setting its circle's `data-active="true"`, `fill = activeColor` (default `'#f97316'`), and `r = pointRadius * 1.75` (all other circles reset to `data-active="false"`, `fill = pointColor`, `r = pointRadius`), then invokes `options.onSelectPoint(points[i], i)` if provided.
+  - **Performance Note (CSS `:hover` vs. D3 Hover Loops)**:
+    - Visual hover feedback on `.voronoi-cell` should be handled by CSS `:hover` transitions rather than attaching D3 `mouseenter`/`mouseleave` handlers that re-query and mutate DOM attributes on every pointer movement.
 
 - **Edge Cases & Cleanup**:
   - If `points` is empty (`[]`), renders the SVG and layer groups without circles or cell paths, and `findClosestIndex` returns `-1`.
@@ -64,7 +62,7 @@ Voronoi overlays partition a chart's 2D plane into convex polygonal regions arou
 
 #### Optional Styling (CSS is not graded)
 Optional helper classes are available in the preview environment:
-- `.voronoi-cell`: polygon overlay path.
+- `.voronoi-cell`: polygon overlay path with GPU-composited CSS `:hover` highlight transition.
 - `.voronoi-point`: data point circle marker.
 You may use these classes, custom styles, or your own class names.
 

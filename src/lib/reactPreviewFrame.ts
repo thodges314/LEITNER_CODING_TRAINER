@@ -403,6 +403,29 @@ export function createPreviewSrcDoc(
       padding: 12px;
       background: ${cardBg};
     }
+
+    /* Performant CSS hover transitions for D3 SVG elements (avoids JS mouseover DOM mutation overhead) */
+    .bar, .scale-bar, .join-bar, .arc-slice, .scatter-dot, .data-dot,
+    .treemap-cell, .geo-feature, .contour-band, .graph-node {
+      cursor: pointer;
+      transition: opacity 0.15s ease, filter 0.15s ease, stroke-width 0.15s ease;
+    }
+    .bar:hover, .scale-bar:hover, .join-bar:hover, .arc-slice:hover,
+    .treemap-cell:hover, .geo-feature:hover, .contour-band:hover {
+      filter: brightness(1.18);
+    }
+    .scatter-dot:hover, .data-dot:hover, .graph-node:hover {
+      filter: brightness(1.25);
+      stroke: ${accentPrimary};
+      stroke-width: 2px;
+    }
+    .voronoi-cell {
+      cursor: pointer;
+      transition: fill 0.15s ease, stroke-opacity 0.15s ease;
+    }
+    .voronoi-cell:hover {
+      fill: rgba(56, 189, 248, 0.14);
+    }
 ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrimary, hoverBg, isLight })}
   </style>
 ${libScripts.join('\n')}
