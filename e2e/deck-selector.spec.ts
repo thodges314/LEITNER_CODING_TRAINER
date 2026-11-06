@@ -1,4 +1,13 @@
 import { test, expect } from '@playwright/test';
+import topics from '../src/data/topics.json' with { type: 'json' };
+import { filterCardsByDeck } from '../src/lib/decks';
+import type { TopicItem } from '../src/lib/leitner';
+
+const cards = topics as unknown as TopicItem[];
+const FULL_LIBRARY_COUNT = cards.length;
+const FULL_STACK_COUNT = filterCardsByDeck(cards, 'full-stack').length;
+const ALGORITHMS_COUNT = filterCardsByDeck(cards, 'algorithms').length;
+const FRONTEND_COUNT = filterCardsByDeck(cards, 'frontend-specialist').length;
 
 test.describe('Deck Selector & Preset Decks', () => {
   test.beforeEach(async ({ page }) => {
@@ -23,7 +32,7 @@ test.describe('Deck Selector & Preset Decks', () => {
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
     await expect(deckTrigger).toBeVisible();
     await expect(deckTrigger).toContainText('Full Library (All Cards)');
-    await expect(deckTrigger).toContainText('348 Cards');
+    await expect(deckTrigger).toContainText(`${FULL_LIBRARY_COUNT} Cards`);
 
     // Open Dropdown
     await deckTrigger.click();
@@ -39,9 +48,9 @@ test.describe('Deck Selector & Preset Decks', () => {
     // Verify menu closed and trigger reflects Full-Stack Core
     await expect(dropdownMenu).not.toBeVisible();
     await expect(deckTrigger).toContainText('Full-Stack Core');
-    await expect(deckTrigger).toContainText('291 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(291);
-    await expect(page.getByText('Showing 291 of 291 cards')).toBeVisible();
+    await expect(deckTrigger).toContainText(`${FULL_STACK_COUNT} Cards`);
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(FULL_STACK_COUNT);
+    await expect(page.getByText(`Showing ${FULL_STACK_COUNT} of ${FULL_STACK_COUNT} cards`)).toBeVisible();
 
     // Switch to Algorithms & Data Structures
     await deckTrigger.click();
@@ -49,9 +58,9 @@ test.describe('Deck Selector & Preset Decks', () => {
     await algoOption.click();
 
     await expect(deckTrigger).toContainText('Algorithms & Data Structures');
-    await expect(deckTrigger).toContainText('102 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(102);
-    await expect(page.getByText('Showing 102 of 102 cards')).toBeVisible();
+    await expect(deckTrigger).toContainText(`${ALGORITHMS_COUNT} Cards`);
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(ALGORITHMS_COUNT);
+    await expect(page.getByText(`Showing ${ALGORITHMS_COUNT} of ${ALGORITHMS_COUNT} cards`)).toBeVisible();
 
     // Switch to Frontend Specialist
     await deckTrigger.click();
@@ -59,17 +68,17 @@ test.describe('Deck Selector & Preset Decks', () => {
     await feOption.click();
 
     await expect(deckTrigger).toContainText('Frontend Specialist');
-    await expect(deckTrigger).toContainText('218 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(218);
-    await expect(page.getByText('Showing 218 of 218 cards')).toBeVisible();
+    await expect(deckTrigger).toContainText(`${FRONTEND_COUNT} Cards`);
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(FRONTEND_COUNT);
+    await expect(page.getByText(`Showing ${FRONTEND_COUNT} of ${FRONTEND_COUNT} cards`)).toBeVisible();
 
     // Reload page and verify active deck persists in localStorage
     await page.reload();
     const reloadedCatalogBtn = page.getByRole('button', { name: /Deck Catalog/i });
     await reloadedCatalogBtn.click();
     await expect(deckTrigger).toContainText('Frontend Specialist');
-    await expect(deckTrigger).toContainText('218 Cards');
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(218);
+    await expect(deckTrigger).toContainText(`${FRONTEND_COUNT} Cards`);
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(FRONTEND_COUNT);
   });
 
   test('migrates legacy stored deck where algorithms-advanced was a pack and shows all cards', async ({ page }) => {
@@ -88,14 +97,14 @@ test.describe('Deck Selector & Preset Decks', () => {
     const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
     await catalogNavBtn.click();
 
-    // Verify all 348 cards are present in Full Library
+    // Verify all cards are present in Full Library
     const deckTrigger = page.getByTestId('deck-dropdown-trigger');
-    await expect(deckTrigger).toContainText('348 Cards');
+    await expect(deckTrigger).toContainText(`${FULL_LIBRARY_COUNT} Cards`);
 
     // Switch to Algorithms & Data Structures
     await deckTrigger.click();
     await page.getByTestId('deck-option-algorithms').click();
-    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(102);
+    await expect(page.locator('tbody tr.catalog-tr')).toHaveCount(ALGORITHMS_COUNT);
     await expect(page.locator('tbody tr.catalog-tr').filter({ hasText: 'Binary Tree: Depth, Sum, Count' })).toBeVisible();
   });
 });

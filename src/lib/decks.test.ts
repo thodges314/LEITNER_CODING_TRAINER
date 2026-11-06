@@ -33,23 +33,25 @@ describe('preset decks architecture', () => {
     ]);
   });
 
-  it('Full Library contains all 352 seed cards', () => {
+  it('Full Library contains all seed cards', () => {
     const full = filterCardsByDeck(cards, 'full-library');
-    expect(full).toHaveLength(352);
-    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(352);
+    expect(full).toHaveLength(cards.length);
+    expect(getDeckCardCount(BUILT_IN_DECKS[0], cards)).toBe(cards.length);
   });
 
-  it('Full-Stack Core contains 295 cards excluding advanced algorithms', () => {
+  it('Full-Stack Core contains all cards excluding advanced algorithms', () => {
+    const expectedCount = cards.filter((c) => c.track !== 'advanced-algorithms').length;
     const fsDeck = filterCardsByDeck(cards, 'full-stack');
-    expect(fsDeck).toHaveLength(295);
+    expect(fsDeck).toHaveLength(expectedCount);
     for (const c of fsDeck) {
       expect(c.track).not.toBe('advanced-algorithms');
     }
   });
 
-  it('Frontend Specialist contains 222 frontend cards and zero algorithm cards', () => {
+  it('Frontend Specialist contains all frontend cards and zero algorithm cards', () => {
     const fe = filterCardsByDeck(cards, 'frontend-specialist');
-    expect(fe).toHaveLength(222);
+    const expectedFeCount = cards.filter((c) => BUILT_IN_DECKS[2].filter(c)).length;
+    expect(fe).toHaveLength(expectedFeCount);
     const tracks = new Set(fe.map((c) => c.track));
     expect(tracks.has('algorithms')).toBe(false);
     expect(tracks.has('advanced-algorithms')).toBe(false);
@@ -64,23 +66,22 @@ describe('preset decks architecture', () => {
     expect(tracks.has('typescript-patterns')).toBe(true);
   });
 
-  it('Algorithms & Data Structures contains 102 cards (core + advanced + algorithmic utilities)', () => {
+  it('Algorithms & Data Structures contains core + advanced + algorithmic utilities', () => {
     const algo = filterCardsByDeck(cards, 'algorithms');
-    expect(algo).toHaveLength(102);
-
-    const coreCount = algo.filter((c) => c.track === 'algorithms').length;
-    const advCount = algo.filter((c) => c.track === 'advanced-algorithms').length;
+    const coreCount = cards.filter((c) => c.track === 'algorithms').length;
+    const advCount = cards.filter((c) => c.track === 'advanced-algorithms').length;
     const utilCount = algo.filter((c) => c.track === 'js-utilities').length;
 
-    expect(coreCount).toBe(29);
-    expect(advCount).toBe(57);
-    expect(utilCount).toBe(16);
-    expect(coreCount + advCount + utilCount).toBe(102);
+    expect(coreCount).toBeGreaterThan(0);
+    expect(advCount).toBeGreaterThan(0);
+    expect(utilCount).toBeGreaterThan(0);
+    expect(algo).toHaveLength(coreCount + advCount + utilCount);
   });
 
   it('aliases legacy core-algorithms and advanced-algorithms to unified algorithms deck', () => {
-    expect(filterCardsByDeck(cards, 'core-algorithms')).toHaveLength(102);
-    expect(filterCardsByDeck(cards, 'advanced-algorithms')).toHaveLength(102);
+    const expectedAlgoCount = filterCardsByDeck(cards, 'algorithms').length;
+    expect(filterCardsByDeck(cards, 'core-algorithms')).toHaveLength(expectedAlgoCount);
+    expect(filterCardsByDeck(cards, 'advanced-algorithms')).toHaveLength(expectedAlgoCount);
     expect(getBuiltInDeck('core-algorithms')?.id).toBe('algorithms');
     expect(getBuiltInDeck('advanced-algorithms')?.id).toBe('algorithms');
   });

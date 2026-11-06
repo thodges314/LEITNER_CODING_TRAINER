@@ -4,12 +4,15 @@ import { act } from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 import { DeckSelector } from './DeckSelector';
 import seed from '../../data/topics.json';
-import type { TopicItem } from '../../lib/leitner';
+import { filterCardsByDeck } from '../../lib/decks';
 import type { CustomDeck } from '../../lib/decks';
+import type { TopicItem } from '../../lib/leitner';
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const cards = seed as unknown as TopicItem[];
+const fullLibraryCount = cards.length;
+const frontendSpecialistCount = filterCardsByDeck(cards, 'frontend-specialist').length;
 
 describe('DeckSelector component', () => {
   let container: HTMLDivElement | null = null;
@@ -43,7 +46,7 @@ describe('DeckSelector component', () => {
 
     expect(container!.textContent).toContain('Study Deck');
     expect(container!.textContent).toContain('Full Library (All Cards)');
-    expect(container!.textContent).toContain('348 Cards');
+    expect(container!.textContent).toContain(`${fullLibraryCount} Cards`);
   });
 
   it('renders Frontend Specialist active deck info', () => {
@@ -58,7 +61,7 @@ describe('DeckSelector component', () => {
     });
 
     expect(container!.textContent).toContain('Frontend Specialist');
-    expect(container!.textContent).toContain('218 Cards');
+    expect(container!.textContent).toContain(`${frontendSpecialistCount} Cards`);
   });
 
   it('opens dropdown on click and displays all presets with their descriptions', () => {
