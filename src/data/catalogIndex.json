@@ -4854,5 +4854,38 @@
       "layout"
     ],
     "summary": "interface TreemapNodeData {"
+  },
+  {
+    "id": "d3-brush-zoom-coordinator",
+    "title": "D3 Brush & Focus-Context Coordinator",
+    "track": "d3",
+    "concept": "d3-brush-interaction",
+    "difficulty": 4,
+    "tags": [
+      "d3",
+      "brush",
+      "zoom",
+      "linked-views",
+      "svg",
+      "time-series",
+      "data-visualization"
+    ],
+    "summary": "interface BrushPoint {"
+  },
+  {
+    "id": "d3-force-simulation-headless",
+    "title": "D3 Headless Force Simulation & Convergence",
+    "track": "d3",
+    "concept": "d3-force-simulation",
+    "difficulty": 4,
+    "tags": [
+      "d3",
+      "force-simulation",
+      "physics",
+      "graph",
+      "convergence",
+      "algorithms"
+    ],
+    "summary": "interface ForceSimNode {"
   }
 ]

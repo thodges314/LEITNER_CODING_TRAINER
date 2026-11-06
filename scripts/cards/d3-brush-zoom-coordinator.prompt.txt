@@ -1,0 +1,70 @@
+### `renderBrushCoordinator(container: HTMLElement, data: BrushPoint[], options?: BrushCoordinatorOptions): BrushCoordinatorInstance`
+
+## Description
+
+```ts
+interface BrushPoint {
+  x: number;
+  y: number;
+}
+
+interface BrushCoordinatorOptions {
+  width?: number;
+  focusHeight?: number;
+  contextHeight?: number;
+  color?: string;
+  initialSelection?: [number, number];
+  onBrushChange?: (domain: [number, number], filteredData: BrushPoint[]) => void;
+}
+
+interface BrushCoordinatorInstance {
+  svg: SVGSVGElement;
+  getDomain: () => [number, number];
+  getFilteredData: () => BrushPoint[];
+  setBrushDomain: (domain: [number, number] | null) => void;
+  destroy: () => void;
+}
+```
+
+Linked **focus + context** charts pair a detailed primary chart ("focus") with a compact overview mini-map ("context") below it. Dragging or resizing a 1D horizontal brush (`d3.brushX()`) across the context mini-map rescales the focus chart's X domain in real time via `scale.invert()`.
+
+Implement `renderBrushCoordinator(container, data, options)` to mount a synchronized focus + context SVG visualization with interactive brushing and programmatic domain control.
+
+### Requirements
+
+- **Canvas & Layout Geometry**:
+  - Empties `container.innerHTML` before mounting.
+  - Option defaults: `width = 480`, `focusHeight = 200`, `contextHeight = 70`, `color = '#3b82f6'`.
+  - Uses margin `{ top: 15, right: 20, bottom: 25, left: 40 }` and vertical `gap = 25` between the focus and context charts.
+  - Computes `innerWidth = Math.max(0, width - margin.left - margin.right)` and `totalHeight = focusHeight + contextHeight + gap + margin.top + margin.bottom`.
+  - Appends `<svg>` with `width={width}`, `height={totalHeight}`, `role="img"`, and `aria-label="Brush coordinator chart"`.
+
+- **Scales & Groups**:
+  - Derives `fullDomain: [number, number]` from `d3.extent(data, d => d.x)` (fallback `[0, 1]` when empty) and `yDomain: [number, number]` from `[0, d3.max(data, d => d.y) || 1]`.
+  - Configures `focusX` and `contextX` (`d3.scaleLinear().domain(fullDomain).range([0, innerWidth])`), `focusY` (`range([focusHeight, 0])`), and `contextY` (`range([contextHeight, 0])`).
+  - Appends `<g class="focus-chart">` translated to `translate(margin.left, margin.top)` containing:
+    - `<path class="focus-line">` (`fill="none"`, `stroke={color}`, `stroke-width="2"`)
+    - `<g class="focus-dots">` containing `<circle class="focus-dot">` elements for points inside the active domain (`d.x >= domain[0] && d.x <= domain[1]`), with `cx`, `cy`, `r="3.5"`, `fill={color}`, `data-x={String(d.x)}`, and `data-y={String(d.y)}`
+    - `<g class="x-axis focus-x-axis">` at `translate(0, focusHeight)` calling `d3.axisBottom(focusX)`
+    - `<g class="y-axis focus-y-axis">` calling `d3.axisLeft(focusY)`
+  - Appends `<g class="context-chart">` translated to `translate(margin.left, margin.top + focusHeight + gap)` containing:
+    - `<path class="context-line">` (`fill="none"`, `stroke="#94a3b8"`, `stroke-width="1.5"`) rendering all data points
+    - `<g class="x-axis context-x-axis">` at `translate(0, contextHeight)` calling `d3.axisBottom(contextX)`
+    - `<g class="brush-layer">` calling `d3.brushX().extent([[0, 0], [innerWidth, contextHeight]])`
+
+- **Brush Coordination & Instance API**:
+  - When the brush fires (`'brush end'`), if `event.selection` is `[px0, px1]`, converts pixel bounds to data domain `[contextX.invert(px0), contextX.invert(px1)]`; if `event.selection` is `null`, resets to `fullDomain`.
+  - Updating the active domain updates `focusX.domain(currentDomain)`, re-renders `path.focus-line`, `circle.focus-dot` (only points within `currentDomain`), and `g.focus-x-axis`, and invokes `options.onBrushChange(currentDomain, filteredData)` if provided.
+  - If `options.initialSelection` is provided, applies that domain on initialization.
+  - `getDomain()`: returns `[currentDomain[0], currentDomain[1]]`.
+  - `getFilteredData()`: returns points with `d.x >= currentDomain[0] && d.x <= currentDomain[1]`.
+  - `setBrushDomain(domain)`: programmatically sets the active domain `[minX, maxX]` (moving the brush selection to `[contextX(minX), contextX(maxX)]`) or resets to `fullDomain` when `null` is passed, updating the focus view and firing `onBrushChange`.
+  - `destroy()`: removes the SVG element and clears `container.innerHTML`.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.focus-line`, `.context-line`: line path elements.
+- `.focus-dot`: data point circles in the focus chart.
+- `.brush-layer`: D3 brush group container.
+You may use these classes, custom styles, or your own class names.
+

@@ -486,6 +486,82 @@ export default {
       { callSignature: 'instance.destroy()' }
     ),
   ],
+  'd3-force-simulation-headless': [
+    r(
+      'Converges synchronously without mutating input nodes or links',
+      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { alphaMin: 0.05 })',
+      'Stops background timer, steps ticks until alpha < 0.05, and returns converged: true without mutating inputs',
+      { callSignature: 'runHeadlessForceSimulation(nodes, links, { alphaMin: 0.05 })' }
+    ),
+    r(
+      'Centers network centroid near canvas midpoint and resolves link geometry',
+      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { width: 500, height: 360 })',
+      'Centroids settle near (250, 180) and links expose sourceId, targetId, and Euclidean length',
+      { callSignature: 'runHeadlessForceSimulation(nodes, links, { width: 500, height: 360 })' }
+    ),
+    r(
+      'Separates overlapping coincident nodes using collision and charge forces',
+      'runHeadlessForceSimulation([{ id: "N1", x: 200, y: 150, radius: 18 }, { id: "N2", x: 200, y: 150, radius: 18 }])',
+      'Coincident nodes separate to distance >= 2 * radius via forceCollide',
+      { callSignature: 'runHeadlessForceSimulation(overlappingNodes, [], { collisionRadius: 18 })' }
+    ),
+    r(
+      'Respects maxTicks budget and reports converged: false when stopped early',
+      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { alphaMin: 0.001, maxTicks: 5 })',
+      'Executes exactly 5 ticks, returns converged: false, and computes positive kineticEnergy',
+      { callSignature: 'runHeadlessForceSimulation(nodes, links, { maxTicks: 5 })' }
+    ),
+    r(
+      'Looks up settled nodes by ID via getNode and returns null for unknown IDs',
+      'report.getNode("B") and report.getNode("UNKNOWN")',
+      'Returns settled node object for "B" and null for unknown node ID',
+      { callSignature: 'report.getNode("B")' }
+    ),
+    r(
+      'Handles empty node list gracefully without running ticks',
+      'runHeadlessForceSimulation([], [])',
+      'Returns 0 ticks, converged: true, kineticEnergy: 0, and empty nodes/links arrays',
+      { callSignature: 'runHeadlessForceSimulation([], [])' }
+    ),
+  ],
+  'd3-brush-zoom-coordinator': [
+    r(
+      'Mounts SVG with focus and context chart groups and brush layer',
+      'renderBrushCoordinator(container, SAMPLE_SERIES, { width: 500, focusHeight: 180, contextHeight: 60 })',
+      'SVG rendered with focus-chart, context-chart, brush-layer, and 6 focus dots',
+      { callSignature: 'renderBrushCoordinator(container, series, options)' }
+    ),
+    r(
+      'Renders focus and context line paths with full initial domain',
+      'renderBrushCoordinator(container, SAMPLE_SERIES, { color: "#10b981" })',
+      'focus-line and context-line render M-paths across full domain [0, 50]',
+      { callSignature: 'instance.getDomain()' }
+    ),
+    r(
+      'Applies initialSelection on mount and filters focus dots to active window',
+      'renderBrushCoordinator(container, SAMPLE_SERIES, { initialSelection: [10, 30] })',
+      'Focus domain set to [10, 30] and focus-dot elements filtered to x in [10, 20, 30]',
+      { callSignature: 'renderBrushCoordinator(container, series, { initialSelection: [10, 30] })' }
+    ),
+    r(
+      'Updating domain via setBrushDomain rescales focus view and fires onBrushChange',
+      'instance.setBrushDomain([20, 40])',
+      'Rescales focusX to [20, 40], updates focus dots, and invokes onBrushChange callback',
+      { callSignature: 'instance.setBrushDomain([20, 40])' }
+    ),
+    r(
+      'Clearing brush selection with null restores full domain and all data points',
+      'instance.setBrushDomain(null)',
+      'Restores active domain to [0, 50] and renders all 6 focus points',
+      { callSignature: 'instance.setBrushDomain(null)' }
+    ),
+    r(
+      'Handles empty data gracefully and cleans up DOM on destroy',
+      'renderBrushCoordinator(container, []) and instance.destroy()',
+      'Renders empty coordinator safely and clears container innerHTML on destroy',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 
 

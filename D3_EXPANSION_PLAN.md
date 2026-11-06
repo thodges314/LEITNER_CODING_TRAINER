@@ -14,7 +14,7 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 
 ---
 
-## 2. Current Status (11 Cards — 100% Typed & Passing)
+## 2. Current Status (13 Cards — 100% Typed & Passing)
 
 | Card ID | Description | Concepts / Modules | UI / Preview |
 |---|---|---|---|
@@ -29,6 +29,8 @@ The **D3 track** in the Leitner Coding Trainer drills both **production SVG visu
 | `d3-quadtree-spatial-index` | 2D spatial indexing, $O(\log N)$ nearest-neighbor & radius search | `d3.quadtree()`, `quadtree.find()`, `quadtree.visit()` | Spatial Search Canvas |
 | `d3-delaunay-voronoi-snapping` | 2D Delaunay triangulation & Voronoi polygon snapping cells | `d3.Delaunay.from()`, `delaunay.voronoi()`, `voronoi.renderCell()` | Interactive Voronoi SVG |
 | `d3-treemap-squarified-tiling` | Squarified proportional area treemap with inner/outer padding | `d3.hierarchy()`, `d3.treemap()`, `d3.treemapSquarify` | SVG Treemap |
+| `d3-force-simulation-headless` | Synchronous headless force simulation, convergence & kinetic energy | `d3.forceSimulation()`, `d3.forceManyBody()`, `d3.forceCollide()` | Force Network SVG |
+| `d3-brush-zoom-coordinator` | Linked focus + context chart with 1D horizontal brush rescaling | `d3.brushX()`, `scale.invert()`, focus/context coordination | Brush & Zoom SVG |
 
 ---
 

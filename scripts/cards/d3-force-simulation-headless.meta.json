@@ -1,0 +1,17 @@
+{
+  "title": "D3 Headless Force Simulation & Convergence",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "force-simulation",
+    "physics",
+    "graph",
+    "convergence",
+    "algorithms"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "d3"
+  ]
+}
+

@@ -1390,5 +1390,13 @@
   "d3-treemap-squarified-tiling": {
     "difficulty": 3,
     "concept": "d3-treemap-layout"
+  },
+  "d3-force-simulation-headless": {
+    "difficulty": 4,
+    "concept": "d3-force-simulation"
+  },
+  "d3-brush-zoom-coordinator": {
+    "difficulty": 4,
+    "concept": "d3-brush-interaction"
   }
 }
