@@ -1,0 +1,15 @@
+{
+  "id": "d3-transitions-stagger-basics",
+  "title": "D3 Transitions (Duration, Easing & Stagger)",
+  "track": "d3",
+  "tags": [
+    "d3",
+    "transitions",
+    "animation",
+    "stagger",
+    "svg"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": ["d3"]
+}
+

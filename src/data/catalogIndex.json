@@ -4950,5 +4950,20 @@
       "algorithms"
     ],
     "summary": "interface ScaleConfig {"
+  },
+  {
+    "id": "d3-transitions-stagger-basics",
+    "title": "D3 Transitions (Duration, Easing & Stagger)",
+    "track": "d3",
+    "concept": "d3-transitions-basics",
+    "difficulty": 1,
+    "tags": [
+      "d3",
+      "transitions",
+      "animation",
+      "stagger",
+      "svg"
+    ],
+    "summary": "interface TransitionConfig {"
   }
 ]

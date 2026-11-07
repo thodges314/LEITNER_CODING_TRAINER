@@ -1414,5 +1414,9 @@
   "d3-scales-domain-range-basics": {
     "difficulty": 1,
     "concept": "d3-scales-basics"
+  },
+  "d3-transitions-stagger-basics": {
+    "difficulty": 1,
+    "concept": "d3-transitions-basics"
   }
 }

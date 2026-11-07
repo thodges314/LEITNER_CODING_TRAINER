@@ -775,6 +775,7 @@ export const SANDBOX_D3_TYPES = `
       hsl(...args: any[]): any;
       easeLinear(t: number): number;
       easeCubic(t: number): number;
+      easeCubicOut(t: number): number;
       easeCubicInOut(t: number): number;
       easeQuadInOut(t: number): number;
       easeElastic(t: number): number;

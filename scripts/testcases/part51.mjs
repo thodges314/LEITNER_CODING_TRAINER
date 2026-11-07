@@ -696,6 +696,38 @@ export default {
       { callSignature: 'scales.invertY(pixelY)' }
     ),
   ],
+  'd3-transitions-stagger-basics': [
+    r(
+      'Configures transition with specified duration and default ease',
+      'transitionBars(selection, { duration: 450 })',
+      'Transition duration is 450ms and default ease function is configured',
+      { callSignature: 'transitionBars(selection, { duration: 450 })' }
+    ),
+    r(
+      'Applies custom easing function',
+      'transitionBars(selection, { ease: d3.easeBounce })',
+      'Transition uses d3.easeBounce curve',
+      { callSignature: 'transitionBars(selection, { ease: d3.easeBounce })' }
+    ),
+    r(
+      'Staggers delay across elements by index',
+      'transitionBars(selection, { staggerMs: 60 })',
+      'Elements have delays staggered at 0ms, 60ms, 120ms',
+      { callSignature: 'transitionBars(selection, { staggerMs: 60 })' }
+    ),
+    r(
+      'Interpolates width and fill attributes',
+      'transitionBars(selection, { targetWidths: [80, 160, 240], fillColor: "seagreen" })',
+      'Sets tweens for attr.width and attr.fill',
+      { callSignature: 'transitionBars(selection, config)' }
+    ),
+    r(
+      'Returns the created D3 transition instance',
+      'transitionBars(selection)',
+      'Returns d3.Transition with duration, ease, delay, and attr methods',
+      { callSignature: 'transitionBars(selection)' }
+    ),
+  ],
 };
 
 

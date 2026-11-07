@@ -1264,6 +1264,15 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Keyed item sequence passed to updateKeyedBars',
     },
   ],
+  'd3-transitions-stagger-basics': [
+    {
+      name: 'preset',
+      type: 'enum',
+      defaultValue: 'Medium Bars',
+      options: ['Short Bars', 'Medium Bars', 'Long Bars', 'Zero Reset'],
+      description: 'Target widths sequence for transitionBars',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {
