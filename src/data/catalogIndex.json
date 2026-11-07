@@ -5507,5 +5507,83 @@
       "app-router"
     ],
     "summary": "Implement a Next.js App Router parallel route slot and intercepting route evaluator"
+  },
+  {
+    "id": "stream-event-micro-batcher",
+    "title": "Stream Event Micro-Batcher (Size & Time Window)",
+    "track": "async-js",
+    "concept": "streams-batching",
+    "difficulty": 3,
+    "tags": [
+      "async",
+      "streams",
+      "batching",
+      "scaling",
+      "performance"
+    ],
+    "summary": "Implement a high-throughput stream event micro-batcher that groups incoming events by count limit or maximum time window"
+  },
+  {
+    "id": "web-stream-transform-pipeline",
+    "title": "Web Stream Transform Pipeline (TransformStream)",
+    "track": "async-js",
+    "concept": "streams-transform",
+    "difficulty": 3,
+    "tags": [
+      "async",
+      "streams",
+      "transform",
+      "web-streams",
+      "scaling"
+    ],
+    "summary": "Implement a text line streaming sanitizer and execution pipeline using the standard Web Streams API"
+  },
+  {
+    "id": "chunked-batch-pipeline",
+    "title": "Chunked Batch Pipeline with Bounded Concurrency",
+    "track": "async-js",
+    "concept": "streams-chunking",
+    "difficulty": 3,
+    "tags": [
+      "async",
+      "concurrency",
+      "batching",
+      "streams",
+      "error-handling",
+      "performance"
+    ],
+    "summary": "Implement a memory-safe batch processing pipeline with bounded concurrency and granular error collection"
+  },
+  {
+    "id": "k-way-stream-merger",
+    "title": "K-Way Merge on Async Streams",
+    "track": "algorithms",
+    "concept": "streams-external-merge",
+    "difficulty": 4,
+    "tags": [
+      "algorithms",
+      "heap",
+      "priority-queue",
+      "streams",
+      "async-generators",
+      "sorting"
+    ],
+    "summary": "Implement an external K-way merge for sorted asynchronous iterables using a Min-Heap"
+  },
+  {
+    "id": "stream-token-bucket-shaper",
+    "title": "Token Bucket Rate Shaper",
+    "track": "async-js",
+    "concept": "streams-rate-shaping",
+    "difficulty": 4,
+    "tags": [
+      "async",
+      "rate-limiting",
+      "streams",
+      "token-bucket",
+      "algorithms",
+      "performance"
+    ],
+    "summary": "Implement a high-performance token-bucket rate limiter and stream shaper"
   }
 ]

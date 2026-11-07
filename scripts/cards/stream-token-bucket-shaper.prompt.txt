@@ -1,0 +1,44 @@
+Implement a high-performance token-bucket rate limiter and stream shaper:
+
+## Description
+
+The Token Bucket algorithm is the industry-standard traffic-shaping pattern for streaming architectures, API gateways, and message consumers. Tokens accumulate in a bucket of fixed capacity at a steady refill rate. When events or stream chunks arrive, they must consume tokens. If sufficient tokens are available, the event passes immediately; otherwise, the event waits in a FIFO queue until tokens refill.
+
+```ts
+interface TokenBucketOptions {
+  capacity: number;
+  refillRate: number;
+  initialTokens?: number;
+}
+
+interface TokenBucketLimiter {
+  acquire(tokens?: number): Promise<void>;
+  tryAcquire(tokens?: number): boolean;
+  getTokens(): number;
+}
+```
+
+### `createTokenBucket(options: TokenBucketOptions): TokenBucketLimiter`
+
+Instantiates a token-bucket rate limiter with the following parameters and behavior:
+
+- **Parameters**:
+  - `capacity`: Maximum number of tokens the bucket can hold.
+  - `refillRate`: Number of tokens added to the bucket per second (floating-point rate).
+  - `initialTokens`: Initial number of tokens present in the bucket (defaults to `capacity` if omitted).
+- **Continuous Refill**:
+  - Refills tokens continuously based on elapsed time since the last calculation: `added = (now - lastRefill) * (refillRate / 1000)`.
+  - Available tokens can never exceed `capacity`.
+- **`tryAcquire(tokens = 1): boolean`**:
+  - Checks if at least `tokens` are available in the bucket without waiting.
+  - If enough tokens exist and no pending `acquire` requests are waiting in the queue, decrements available tokens and returns `true`.
+  - Otherwise returns `false` immediately without blocking or modifying tokens.
+- **`acquire(tokens = 1): Promise<void>`**:
+  - Returns a Promise that resolves when `tokens` become available and are consumed.
+  - If sufficient tokens are currently available and the wait queue is empty, decrements tokens and resolves immediately.
+  - If insufficient tokens exist (or previous requests are still pending), enqueues the request.
+  - Queued requests **must be resolved strictly in FIFO order** (first arrived, first served) to prevent starvation.
+  - Schedules a timer to re-evaluate and drain queue items as tokens refill over time.
+- **`getTokens(): number`**:
+  - Returns current available tokens after recalculating refill up to the current timestamp.
+

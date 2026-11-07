@@ -1558,5 +1558,25 @@
   "next-parallel-intercepting-routes": {
     "difficulty": 3,
     "concept": "next-intercepting-routes"
+  },
+  "stream-event-micro-batcher": {
+    "difficulty": 3,
+    "concept": "streams-batching"
+  },
+  "web-stream-transform-pipeline": {
+    "difficulty": 3,
+    "concept": "streams-transform"
+  },
+  "chunked-batch-pipeline": {
+    "difficulty": 3,
+    "concept": "streams-chunking"
+  },
+  "stream-token-bucket-shaper": {
+    "difficulty": 4,
+    "concept": "streams-rate-shaping"
+  },
+  "k-way-stream-merger": {
+    "difficulty": 4,
+    "concept": "streams-external-merge"
   }
 }

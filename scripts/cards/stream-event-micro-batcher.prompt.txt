@@ -1,0 +1,42 @@
+Implement a high-throughput stream event micro-batcher that groups incoming events by count limit or maximum time window:
+
+## Description
+
+In high-throughput event processing (telemetry collectors, WebSocket ingestors, Kafka/SQS worker pipelines), dispatching I/O writes or network requests for every individual event overloads downstream services. A micro-batcher buffers incoming items and flushes them in batches whenever either a maximum batch size is reached or a maximum time delay expires.
+
+```ts
+interface MicroBatcherOptions<T> {
+  maxBatchSize: number;
+  maxWaitMs: number;
+  flushHandler: (batch: T[]) => Promise<void> | void;
+}
+
+interface MicroBatcher<T> {
+  add(item: T): Promise<void>;
+  flush(): Promise<void>;
+  size(): number;
+  drain(): Promise<void>;
+}
+```
+
+### createMicroBatcher<T>(options: MicroBatcherOptions<T>): MicroBatcher<T>
+
+Creates a micro-batcher instance with the given configuration:
+- **`add(item: T): Promise<void>`**:
+  - Enqueues `item` into the internal buffer.
+  - Returns a Promise that resolves when this specific item has been successfully flushed via `flushHandler`, or rejects if `flushHandler` fails for its batch.
+  - If the buffer length reaches `maxBatchSize`:
+    - Clears any pending wait timer.
+    - Immediately triggers a batch flush.
+  - If the buffer length is strictly less than `maxBatchSize` and no timer is currently active:
+    - Schedules a timer to flush the buffer after `maxWaitMs` milliseconds.
+- **`flush(): Promise<void>`**:
+  - Immediately drains and flushes any currently buffered items.
+  - Clears any scheduled timer.
+  - Guarantees sequential flush execution: if a flush is already active, waits for it to complete before running subsequent flushes.
+  - Resolves when all items in the triggered flush have completed.
+- **`size(): number`**:
+  - Returns the number of items currently buffered and awaiting a flush.
+- **`drain(): Promise<void>`**:
+  - Flushes any remaining items in the buffer and waits for all active and pending flushes to resolve.
+

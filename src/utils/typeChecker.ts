@@ -176,6 +176,75 @@ const SANDBOX_GLOBALS = `
     decode(input?: any, options?: { stream?: boolean }): string;
   }
   declare var TextDecoder: { new (label?: string, options?: { fatal?: boolean; ignoreBOM?: boolean }): TextDecoder; prototype: TextDecoder };
+  interface ReadableStreamDefaultController<R = any> {
+    readonly desiredSize: number | null;
+    close(): void;
+    enqueue(chunk: R): void;
+    error(error?: any): void;
+  }
+  interface ReadableStreamDefaultReader<R = any> {
+    read(): Promise<{ done: true; value?: undefined } | { done: false; value: R }>;
+    releaseLock(): void;
+    cancel(reason?: any): Promise<void>;
+  }
+  interface ReadableWritablePair<W = any, R = any> {
+    readable: ReadableStream<R>;
+    writable: WritableStream<W>;
+  }
+  interface ReadableStream<R = any> {
+    readonly locked: boolean;
+    getReader(): ReadableStreamDefaultReader<R>;
+    pipeThrough<T>(transform: ReadableWritablePair<R, T>, options?: any): ReadableStream<T>;
+    pipeThrough(transform: any, options?: any): ReadableStream<any>;
+    pipeTo(destination: any, options?: any): Promise<void>;
+    cancel(reason?: any): Promise<void>;
+    [Symbol.asyncIterator]?: () => AsyncIterableIterator<R>;
+  }
+  declare var ReadableStream: {
+    new <R = any>(underlyingSource?: {
+      start?(controller: ReadableStreamDefaultController<R>): void | Promise<void>;
+      pull?(controller: ReadableStreamDefaultController<R>): void | Promise<void>;
+      cancel?(reason?: any): void | Promise<void>;
+    }, strategy?: any): ReadableStream<R>;
+    prototype: ReadableStream;
+  };
+  interface WritableStreamDefaultWriter<W = any> {
+    readonly closed: Promise<undefined>;
+    readonly desiredSize: number | null;
+    readonly ready: Promise<undefined>;
+    write(chunk: W): Promise<void>;
+    close(): Promise<void>;
+    abort(reason?: any): Promise<void>;
+    releaseLock(): void;
+  }
+  interface WritableStream<W = any> {
+    readonly locked: boolean;
+    getWriter(): WritableStreamDefaultWriter<W>;
+    abort(reason?: any): Promise<void>;
+    close(): Promise<void>;
+  }
+  declare var WritableStream: {
+    new <W = any>(underlyingSink?: any, strategy?: any): WritableStream<W>;
+    prototype: WritableStream;
+  };
+  interface TransformStreamDefaultController<O = any> {
+    readonly desiredSize: number | null;
+    enqueue(chunk: O): void;
+    error(reason?: any): void;
+    terminate(): void;
+  }
+  interface TransformStream<I = any, O = any> {
+    readonly readable: ReadableStream<O>;
+    readonly writable: WritableStream<I>;
+  }
+  declare var TransformStream: {
+    new <I = any, O = any>(transformer?: {
+      start?(controller: TransformStreamDefaultController<O>): void | Promise<void>;
+      transform?(chunk: I, controller: TransformStreamDefaultController<O>): void | Promise<void>;
+      flush?(controller: TransformStreamDefaultController<O>): void | Promise<void>;
+    }, writableStrategy?: any, readableStrategy?: any): TransformStream<I, O>;
+    prototype: TransformStream;
+  };
   declare var Buffer: any;
   declare var Event: any;
   interface Event { [key: string]: any; }
