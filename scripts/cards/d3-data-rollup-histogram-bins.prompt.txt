@@ -1,0 +1,50 @@
+### `summarizeDataset(records: DataRecord[], options?: SummarizeOptions): DatasetSummary`
+
+## Description
+
+```ts
+interface DataRecord {
+  id: string;
+  department: string;
+  region: string;
+  salary: number;
+}
+
+interface SummarizeOptions {
+  thresholds?: number;
+}
+
+interface DatasetSummary {
+  groupedByDept: Map<string, DataRecord[]>;
+  salaryByRegion: Map<string, number>;
+  avgSalaryByDeptRegion: Map<string, Map<string, number>>;
+  salaryBins: Array<{ x0?: number; x1?: number; count: number }>;
+  totalSalariesFormatted: string;
+  avgSalaryFormatted: string;
+}
+```
+
+Before visualizing data, raw tabular records must be aggregated, grouped by categorical dimensions, and partitioned into continuous distribution buckets. In modern D3, `d3.group()` and `d3.rollup()` replace deprecated nesting idioms (`d3.nest()`), while `d3.bin()` computes frequency histogram bins, and `d3.format()` produces localized number formatting.
+
+Implement `summarizeDataset(records, options)` to process an array of employee data records using D3's array and formatting modules.
+
+### Requirements
+
+- **Grouping (`d3.group`)**:
+  - `groupedByDept`: Map grouping records by `d.department` using `d3.group(records, d => d.department)`.
+
+- **Single-Key Rollup (`d3.rollup` & `d3.sum`)**:
+  - `salaryByRegion`: Map of region name to total accumulated salary across all records in that region using `d3.rollup(records, v => d3.sum(v, d => d.salary), d => d.region)`.
+
+- **Multi-Key Nested Rollup (`d3.rollup` & `d3.mean`)**:
+  - `avgSalaryByDeptRegion`: Two-level nested Map (`department -> region -> averageSalary`) computing the mean salary rounded to the nearest integer (`Math.round(d3.mean(v, d => d.salary) || 0)`) via `d3.rollup(records, reduceFn, d => d.department, d => d.region)`.
+
+- **Continuous Histogram Binning (`d3.bin`)**:
+  - `salaryBins`: Array of histogram bin summaries `{ x0, x1, count }` generated with `d3.bin().value(d => d.salary).thresholds(options?.thresholds ?? 4)(records)`, where `count` is the number of records in each bin (`bin.length`).
+
+- **Formatting (`d3.format`)**:
+  - `totalSalariesFormatted`: Total salary across all records formatted as US currency with two decimal places using `d3.format('$,.2f')` (e.g. `"$590,000.00"`).
+  - `avgSalaryFormatted`: Average salary across all records formatted with `d3.format('$,.2f')` (e.g. `"$118,000.00"`). If records is empty, format `0`.
+
+- **Edge Cases**:
+  - If `records` is empty (`[]`) or non-array, return empty Maps for `groupedByDept`, `salaryByRegion`, and `avgSalaryByDeptRegion`, an empty array `[]` for `salaryBins`, and `"$0.00"` for both formatted strings.

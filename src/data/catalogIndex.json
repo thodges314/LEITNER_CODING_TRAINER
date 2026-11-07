@@ -4965,5 +4965,21 @@
       "svg"
     ],
     "summary": "interface TransitionConfig {"
+  },
+  {
+    "id": "d3-data-rollup-histogram-bins",
+    "title": "D3 Data Rollup, Binning & Grouping",
+    "track": "d3",
+    "concept": "d3-aggregation-bins",
+    "difficulty": 2,
+    "tags": [
+      "d3",
+      "data",
+      "rollup",
+      "group",
+      "bin",
+      "algorithms"
+    ],
+    "summary": "interface DataRecord {"
   }
 ]

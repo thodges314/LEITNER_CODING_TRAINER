@@ -1,0 +1,14 @@
+{
+  "id": "d3-data-rollup-histogram-bins",
+  "title": "D3 Data Rollup, Binning & Grouping",
+  "track": "d3",
+  "rendersComponent": false,
+  "tags": [
+    "d3",
+    "data",
+    "rollup",
+    "group",
+    "bin",
+    "algorithms"
+  ]
+}

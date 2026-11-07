@@ -728,6 +728,44 @@ export default {
       { callSignature: 'transitionBars(selection)' }
     ),
   ],
+  'd3-data-rollup-histogram-bins': [
+    r(
+      'Groups records by department into a Map',
+      'summary.groupedByDept.get("Eng")',
+      'Returns Map with 3 Eng records and 2 Sales records',
+      { callSignature: 'summarizeDataset(records).groupedByDept' }
+    ),
+    r(
+      'Computes single-key rollups for total salary by region',
+      'summary.salaryByRegion.get("North")',
+      'Computes 340000 for North and 250000 for South using d3.rollup and d3.sum',
+      { callSignature: 'summarizeDataset(records).salaryByRegion' }
+    ),
+    r(
+      'Computes nested multi-key rollups for department by region averages',
+      'summary.avgSalaryByDeptRegion.get("Eng").get("North")',
+      'Computes average salary of 125000 for Eng/North and 140000 for Eng/South',
+      { callSignature: 'summarizeDataset(records).avgSalaryByDeptRegion' }
+    ),
+    r(
+      'Constructs frequency histogram bins across salary distribution',
+      'summary.salaryBins',
+      'Returns array of bins with x0, x1 bounds summing to 5 total records',
+      { callSignature: 'summarizeDataset(records, { thresholds: 4 }).salaryBins' }
+    ),
+    r(
+      'Formats total and average salary metrics as localized currency strings',
+      'summary.totalSalariesFormatted and summary.avgSalaryFormatted',
+      'Formats total as "$590,000.00" and average as "$118,000.00" using d3.format',
+      { callSignature: 'summarizeDataset(records).totalSalariesFormatted' }
+    ),
+    r(
+      'Handles empty dataset gracefully with empty Maps, bins, and zeroed currency',
+      'summarizeDataset([])',
+      'Returns empty Maps, empty bins array, and "$0.00" formatted strings',
+      { callSignature: 'summarizeDataset([])' }
+    ),
+  ],
 };
 
 

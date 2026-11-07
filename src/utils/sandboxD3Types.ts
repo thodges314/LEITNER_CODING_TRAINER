@@ -267,6 +267,40 @@ export const SANDBOX_D3_TYPES = `
       [key: string]: any;
     }
 
+    // ---- d3-array (bins) & d3-shape (stacks) --------------------------------------------
+    interface Bin<T = any> extends Array<T> {
+      x0?: number;
+      x1?: number;
+    }
+
+    interface BinGenerator<T = any> {
+      (data: ArrayLike<T>): Bin<T>[];
+      value(accessor: (d: T, i: number, data: ArrayLike<T>) => number): this;
+      domain(domain: [number, number] | ((data: ArrayLike<T>) => [number, number])): this;
+      thresholds(countOrThresholds: number | number[] | ((data: ArrayLike<T>, min: number, max: number) => number[])): this;
+      [key: string]: any;
+    }
+
+    interface SeriesPoint<T = any> extends Array<number> {
+      0: number;
+      1: number;
+      data: T;
+    }
+
+    interface Series<T = any> extends Array<SeriesPoint<T>> {
+      key: string;
+      index: number;
+    }
+
+    interface Stack<T = any> {
+      (data: T[]): Series<T>[];
+      keys(keys: string[] | ((data: T[]) => string[])): this;
+      value(accessor: (d: T, key: string, i: number, data: T[]) => number): this;
+      order(order: any): this;
+      offset(offset: any): this;
+      [key: string]: any;
+    }
+
     // ---- d3-hierarchy -------------------------------------------------------------------
     interface HierarchyLink<Datum = any> {
       source: HierarchyNode<Datum>;
@@ -657,9 +691,11 @@ export const SANDBOX_D3_TYPES = `
       group<T, K1, K2>(iterable: Iterable<T>, key1: (d: T) => K1, key2: (d: T) => K2): Map<K1, Map<K2, T[]>>;
       groups<T, K>(iterable: Iterable<T>, key: (d: T) => K): Array<[K, T[]]>;
       rollup<T, R, K>(iterable: Iterable<T>, reduce: (values: T[]) => R, key: (d: T) => K): Map<K, R>;
+      rollup<T, R, K1, K2>(iterable: Iterable<T>, reduce: (values: T[]) => R, key1: (d: T) => K1, key2: (d: T) => K2): Map<K1, Map<K2, R>>;
       rollups<T, R, K>(iterable: Iterable<T>, reduce: (values: T[]) => R, key: (d: T) => K): Array<[K, R]>;
       index<T, K>(iterable: Iterable<T>, key: (d: T) => K): Map<K, T>;
       cumsum(iterable: Iterable<number | null | undefined>): Float64Array;
+      bin<T = any>(): BinGenerator<T>;
       shuffle<T>(array: T[], lo?: number, hi?: number): T[];
 
       // scales
@@ -685,6 +721,12 @@ export const SANDBOX_D3_TYPES = `
       area<Datum = any>(): Area<Datum>;
       pie<Datum = any>(): Pie<Datum>;
       arc<Datum = any>(): Arc<Datum>;
+      stack<Datum = any>(): Stack<Datum>;
+      stackOffsetNone: any;
+      stackOffsetExpand: any;
+      stackOffsetSilhouette: any;
+      stackOffsetWiggle: any;
+      stackOrderNone: any;
       linkHorizontal<LinkDatum = any, NodeDatum = any>(): Link<LinkDatum, NodeDatum>;
       linkVertical<LinkDatum = any, NodeDatum = any>(): Link<LinkDatum, NodeDatum>;
       curveLinear: CurveFactory;

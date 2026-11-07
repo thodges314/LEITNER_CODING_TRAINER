@@ -39,7 +39,7 @@ Switchable in Settings between two spaced-repetition models:
 - **Autoclosing Brackets & Quotes**: Auto-pairs and jumps over `()`, `[]`, `{}`, `""`, `''`, and `` ` ``.
 - **In-Browser Prettier Formatting**: Client-side code formatting powered by standalone Prettier (`prettier/standalone` with Babel, TypeScript, and Estree plugins). Format via toolbar or **`Shift + Alt + F`** / **`Cmd + Shift + F`**.
 
-### 3. 100% Dual TypeScript Solutions (`355 / 355 Cards`)
+### 3. 100% Dual TypeScript Solutions (`356 / 356 Cards`)
 - Every card in the catalog features canonical **JavaScript (`<id>.ref.js`)** and **TypeScript (`<id>.ref.ts`)** reference implementations.
 - Ambient data structures (`ListNode<T>`, `TreeNode<T>`) and browser globals are baked into the execution sandbox.
 - **Clean Type Signatures**: Prompt headings feature readable signatures (`### functionName(arg: Type): ReturnType`), while complex option models and structured return types are extracted into clean ```ts interface blocks.
@@ -97,7 +97,7 @@ Switchable in Settings between two spaced-repetition models:
 
 ## Content & Authoring Pipeline
 
-The repository includes **355 curated cards** across 16 topic tracks with **2,372 test cases**:
+The repository includes **356 curated cards** across 16 topic tracks with **2,378 test cases**:
 - **Algorithms** (79 cards)
 - **Advanced Algorithms** (57 cards)
 - **React Components** (51 cards)
