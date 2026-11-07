@@ -5136,5 +5136,35 @@
       "flexbox"
     ],
     "summary": "Build a responsive e-commerce product card component in React styled with modern Tailwind CSS utility classes. The component should adapt seamlessl..."
+  },
+  {
+    "id": "tailwind-segmented-control",
+    "title": "Tailwind Segmented Control",
+    "track": "tailwind",
+    "concept": "tailwind-tabs",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "tailwind",
+      "tabs",
+      "accessibility",
+      "keyboard"
+    ],
+    "summary": "interface SegmentOption {"
+  },
+  {
+    "id": "tailwind-skeleton-loader",
+    "title": "Tailwind Skeleton Loader",
+    "track": "tailwind",
+    "concept": "tailwind-skeleton",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "tailwind",
+      "skeleton",
+      "loading",
+      "accessibility"
+    ],
+    "summary": "type SkeletonVariant = 'text' | 'circular' | 'rectangular' | 'card';"
   }
 ]

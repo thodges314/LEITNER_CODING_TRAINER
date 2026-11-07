@@ -353,6 +353,8 @@ describe('PropsControlPanel', () => {
       'tailwind-pricing-card',
       'tailwind-responsive-card',
       'tailwind-modal-dialog',
+      'tailwind-segmented-control',
+      'tailwind-skeleton-loader',
     ];
 
     const { getComponentPropsConfig, getInitialPropValues } = await import('../../lib/previewPropsConfig');

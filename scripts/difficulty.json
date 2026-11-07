@@ -1351,6 +1351,14 @@
     "difficulty": 2,
     "concept": "tailwind-responsive"
   },
+  "tailwind-segmented-control": {
+    "difficulty": 2,
+    "concept": "tailwind-tabs"
+  },
+  "tailwind-skeleton-loader": {
+    "difficulty": 2,
+    "concept": "tailwind-skeleton"
+  },
   "tailwind-modal-dialog": {
     "difficulty": 3,
     "concept": "tailwind-modal"

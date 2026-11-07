@@ -1622,6 +1622,52 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
         'Callback fired when modal is dismissed (close button, backdrop, Escape): () => void',
     },
   ],
+  'tailwind-segmented-control': [
+    {
+      name: 'value',
+      type: 'enum',
+      defaultValue: 'weekly',
+      options: ['daily', 'weekly', 'monthly', 'yearly'],
+      description: 'Active selected segment value',
+    },
+    {
+      name: 'size',
+      type: 'enum',
+      defaultValue: 'md',
+      options: ['sm', 'md', 'lg'],
+      description: 'Padding and typography scale',
+    },
+    {
+      name: 'fullWidth',
+      type: 'boolean',
+      defaultValue: false,
+      description: 'Expands control across full width of parent container',
+    },
+    {
+      name: 'onChange',
+      type: 'function',
+      description:
+        'Callback fired when active segment changes: (value: string) => void',
+    },
+  ],
+  'tailwind-skeleton-loader': [
+    {
+      name: 'variant',
+      type: 'enum',
+      defaultValue: 'card',
+      options: ['card', 'text', 'circular', 'rectangular'],
+      description: 'Skeleton layout shape or composite structure',
+    },
+    {
+      name: 'lines',
+      type: 'number',
+      defaultValue: 3,
+      min: 1,
+      max: 6,
+      step: 1,
+      description: 'Number of placeholder text bars (for text variant)',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

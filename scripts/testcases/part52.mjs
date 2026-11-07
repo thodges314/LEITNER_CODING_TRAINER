@@ -302,4 +302,68 @@ empty()`,
       { callSignature: 'onClose()' }
     ),
   ],
+  'tailwind-segmented-control': [
+    r(
+      'Renders semantic tablist container with base Tailwind styling',
+      '<SegmentedControl options={sampleOptions} value="daily" onChange={fn} />',
+      'Renders role="tablist", aria-orientation="horizontal", and rounded-xl container',
+      { callSignature: '<SegmentedControl options={opts} value="daily" onChange={fn} />' }
+    ),
+    r(
+      'Renders options with proper tab roles, selected state, and styling',
+      '<SegmentedControl options={sampleOptions} value="weekly" onChange={fn} />',
+      'Renders 4 role="tab" buttons, active bg-indigo-600, tabindex="0", and disabled styling',
+      { callSignature: '<SegmentedControl options={opts} value="weekly" onChange={fn} />' }
+    ),
+    r(
+      'Invokes onChange callback when clicking an enabled option',
+      'Clicking the "Yearly" tab button',
+      'Invokes onChange callback with "yearly"',
+      { callSignature: 'onChange("yearly")' }
+    ),
+    r(
+      'Handles ArrowRight keyboard navigation skipping disabled options',
+      'Dispatching keydown event with key: "ArrowRight" on the active "weekly" tab',
+      'Skips disabled "monthly" option and invokes onChange with "yearly"',
+      { callSignature: 'onKeyDown(event)' }
+    ),
+    r(
+      'Supports fullWidth prop applying w-full and flex-1',
+      '<SegmentedControl options={sampleOptions} value="daily" onChange={fn} fullWidth={true} />',
+      'Applies w-full on container and flex-1 on all tab items',
+      { callSignature: '<SegmentedControl options={opts} value="daily" fullWidth={true} />' }
+    ),
+  ],
+  'tailwind-skeleton-loader': [
+    r(
+      'Single text line declares accessibility attributes and base pulse classes',
+      '<Skeleton />',
+      'Declares role="status", aria-label="Loading...", aria-busy="true", animate-pulse, and h-4',
+      { callSignature: '<Skeleton />' }
+    ),
+    r(
+      'Multi-line text variant renders lines container with 80% final line',
+      '<Skeleton lines={3} />',
+      'Renders space-y-2.5 container with 3 bars, last bar having w-4/5',
+      { callSignature: '<Skeleton lines={3} />' }
+    ),
+    r(
+      'Circular variant renders rounded-full with custom numeric dimensions',
+      '<Skeleton variant="circular" width={48} height={48} />',
+      'Renders rounded-full with inline style width: 48px and height: 48px',
+      { callSignature: '<Skeleton variant="circular" width={48} height={48} />' }
+    ),
+    r(
+      'Rectangular variant renders rounded-xl and default h-32',
+      '<Skeleton variant="rectangular" />',
+      'Renders rounded-xl with default h-32 and w-full',
+      { callSignature: '<Skeleton variant="rectangular" />' }
+    ),
+    r(
+      'Card composite variant renders avatar, media block, and structured text lines',
+      '<Skeleton variant="card" />',
+      'Renders composite card with avatar circle, media block, and body text lines',
+      { callSignature: '<Skeleton variant="card" />' }
+    ),
+  ],
 };
