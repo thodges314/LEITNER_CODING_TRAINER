@@ -1,6 +1,7 @@
 {
   "track": "testing-tooling",
   "title": "Mini DOM Testing Library: Semantic Role & Text Queries",
+  "requiresDom": true,
   "tags": [
     "testing",
     "dom",

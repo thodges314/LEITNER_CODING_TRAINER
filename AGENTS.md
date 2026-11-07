@@ -87,6 +87,13 @@ Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/
   - The live preview sandbox features a dedicated Props Control Panel (`PropsControlPanel`, `previewPropsConfig.ts`, `usePreviewProps`) supporting `string`, `number`, `boolean`, `enum`, `function`, and `json` prop types, component grouping, and postMessage synchronization.
   - For uncontrolled React components (components that initialize local state from a prop via `useState(defaultValue)` upon mount), preview wrappers must pass `key={defaultValue}` so changing the default prop in the Props panel triggers a clean re-mount and state re-initialization.
 
+## Execution Environment Conventions (`requiresDom` in `<id>.meta.json`)
+- **Worker vs DOM Sandbox**:
+  - By default, non-UI cards (algorithms, data structures, utilities, async, node, sql, graphql, language) execute inside an isolated Web Worker thread for performance and runaway execution isolation. Web Workers do NOT have access to DOM globals (`document`, `window`, `HTMLElement`).
+  - Cards in UI tracks (`react`, `react-components`, `d3`, `tailwind`, `dom-browser`) or with `rendersComponent: true` are automatically compiled with `requiresDom: true` to execute in the main-thread browser DOM sandbox.
+  - Whenever authoring a card in a non-DOM track (e.g. `testing-tooling`, `algorithms`) that creates, inspects, or queries DOM nodes using browser globals (`document.createElement`, `HTMLElement`), you **must** declare `"requiresDom": true` in `scripts/cards/<id>.meta.json`.
+  - Never rely on heuristic regex sniffing of card code: `requiresDom` is explicitly encoded at build time on the card model.
+
 ## Keep the `.md` files current (same commit as the change)
 Docs drift quickly, so update them whenever you change what they describe. Don't wait to be reminded.
 - **Counts** (cards, cases, Vitest tests, Playwright tests): `README.md`, `DELEGATION.md` "Current state", `ARCHITECTURE_AND_DETAILS.md`, `ARCHITECTURE_AND_ROADMAP.md`. Get the real numbers from `npm test` and `npx playwright test --list`; don't guess.

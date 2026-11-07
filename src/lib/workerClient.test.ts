@@ -47,21 +47,12 @@ describe('workerClient', () => {
       expect(isBrowserDomOrReactCard(makeCard('testing-tooling'))).toBe(false);
     });
 
-    it('returns true for cards in non-DOM tracks that have the "dom" tag or reference DOM globals', () => {
-      const domTagged = { ...makeCard('testing-tooling'), tags: ['dom'] };
-      expect(isBrowserDomOrReactCard(domTagged)).toBe(true);
+    it('respects explicit requiresDom boolean property on the card', () => {
+      const explicitDom = { ...makeCard('testing-tooling'), requiresDom: true };
+      expect(isBrowserDomOrReactCard(explicitDom)).toBe(true);
 
-      const domHarness = {
-        ...makeCard('algorithms'),
-        testHarness: 'const el = document.createElement("div");',
-      };
-      expect(isBrowserDomOrReactCard(domHarness)).toBe(true);
-
-      const starterDom = {
-        ...makeCard('testing-tooling'),
-        starterCode: 'const el = window.document.getElementById("root");',
-      };
-      expect(isBrowserDomOrReactCard(starterDom)).toBe(true);
+      const explicitNonDom = { ...makeCard('react'), requiresDom: false };
+      expect(isBrowserDomOrReactCard(explicitNonDom)).toBe(false);
     });
   });
 

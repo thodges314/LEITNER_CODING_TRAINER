@@ -85,6 +85,8 @@ export interface TopicItem {
   previewLibraries?: string[];
   /** Annotated by build-cards.mjs for cards that author and render a React component UI */
   rendersComponent?: boolean;
+  /** Explicitly marks whether the card requires a browser DOM environment (window, document, HTMLElement) */
+  requiresDom?: boolean;
   /** Explicit language/format expected for user input (e.g. 'html', 'javascript', 'typescript', 'sql', 'graphql') */
   inputLanguage?: CardInputLanguage;
 }
@@ -535,6 +537,7 @@ export const SEED_CONTENT_FIELDS = [
   'previewCode',
   'previewLibraries',
   'rendersComponent',
+  'requiresDom',
   'inputLanguage',
 ] as const;
 
@@ -591,6 +594,7 @@ export function mergeStoredWithSeed(
     if (seed.pack === undefined || merged.pack === 'algorithms-advanced') delete merged.pack;
     if (seed.previewLibraries === undefined) delete merged.previewLibraries;
     if (seed.rendersComponent === undefined) delete merged.rendersComponent;
+    if (seed.requiresDom === undefined) delete merged.requiresDom;
     merged.track = (seed.track ?? migrateTrackId(merged.track)) as TrackType;
 
     // Strictly preserve user review progress fields
