@@ -37,3 +37,4 @@ Implement an asynchronous testing suite helper `createAsyncTester()` that provid
   - Defaults: `timeout = 1000` ms, `interval = 10` ms.
   - If `predicate()` returns a truthy value (or resolves to a truthy value), immediately resolves with that truthy value.
   - If `timeout` elapses before the condition becomes truthy, rejects with an `Error('Timed out waiting for condition')`.
+

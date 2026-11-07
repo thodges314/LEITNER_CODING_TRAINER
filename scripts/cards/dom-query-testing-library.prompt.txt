@@ -56,3 +56,4 @@ Implement `createDomQueries()` returning query utilities that inspect DOM subtre
   - Returns the matching element. Throws an `Error` if 0 or multiple elements match.
 - **`queryByText(container, textOrRegex)`**:
   - Same as `getByText`, but returns `null` if 0 elements match (throws if multiple match).
+

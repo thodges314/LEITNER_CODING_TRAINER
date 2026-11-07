@@ -84,3 +84,4 @@ const { getByRole, queryByRole, getByText, queryByText } = createDomQueries();
     { boldTag: bold?.tagName, hasRegexMatch: Boolean(regexMatch), nonExistent }
   );
 }
+

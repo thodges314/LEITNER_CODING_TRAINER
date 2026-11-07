@@ -54,3 +54,4 @@ Implement an extensible assertion function `expect` supporting built-in identity
   - If `pass` is `false` in negated mode, it succeeds and returns `{ pass: true }`.
 - **Error Handling**:
   - Failed assertions must throw an `Error` whose `message` equals the result of calling the matcher's `message()` function.
+
