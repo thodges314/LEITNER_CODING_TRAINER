@@ -1,4 +1,4 @@
-async function runSequentially(tasks) {
+const runSequentially = async (tasks) => {
   const results = [];
   for (const task of tasks) {
     results.push(await task());
@@ -6,6 +6,6 @@ async function runSequentially(tasks) {
   return results;
 }
 
-function runInParallel(tasks) {
+const runInParallel = (tasks) => {
   return Promise.all(tasks.map((task) => task()));
 }

@@ -1,4 +1,4 @@
-async function pollUntil(fn, predicate, options = {}) {
+const pollUntil = async (fn, predicate, options = {}) => {
   const initialInterval = options.initialInterval ?? 50;
   const backoffFactor = options.backoffFactor ?? 2;
   const maxAttempts = options.maxAttempts ?? 5;

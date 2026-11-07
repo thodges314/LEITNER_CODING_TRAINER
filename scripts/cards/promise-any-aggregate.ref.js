@@ -1,4 +1,4 @@
-function promiseAny(promises) {
+const promiseAny = (promises) => {
   const items = Array.from(promises);
   if (items.length === 0) {
     const err = typeof AggregateError !== 'undefined'

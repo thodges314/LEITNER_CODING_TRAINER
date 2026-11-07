@@ -1,4 +1,4 @@
-function makeCancelable(promise) {
+const makeCancelable = (promise) => {
   let hasCanceled = false;
   const wrappedPromise = new Promise((resolve, reject) => {
     promise.then(
@@ -14,7 +14,7 @@ function makeCancelable(promise) {
   };
 }
 
-function withTimeout(promise, ms, timeoutError = new Error('Timeout')) {
+const withTimeout = (promise, ms, timeoutError = new Error('Timeout')) => {
   let timer;
   const timeoutPromise = new Promise((_, reject) => {
     timer = setTimeout(() => reject(timeoutError), ms);

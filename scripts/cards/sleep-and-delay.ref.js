@@ -1,12 +1,12 @@
-function sleep(ms) {
+const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
+};
 
-function delay(value, ms) {
+const delay = (value, ms) => {
   return sleep(ms).then(() => value);
-}
+};
 
-async function measure(fn) {
+const measure = async (fn) => {
   const start = Date.now();
   await fn();
   return Date.now() - start;

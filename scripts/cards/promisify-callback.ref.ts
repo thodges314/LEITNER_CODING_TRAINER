@@ -1,4 +1,4 @@
-function promisify<T = any>(fn: (...args: any[]) => void): (...args: any[]) => Promise<T> {
+const promisify = <T = any,>(fn: (...args: any[]) => void): (...args: any[]) => Promise<T> => {
   return function (this: any, ...args: any[]): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       try {

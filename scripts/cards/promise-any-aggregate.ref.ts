@@ -1,4 +1,4 @@
-function promiseAny<T>(promises: Iterable<T | Promise<T>>): Promise<T> {
+const promiseAny = <T,>(promises: Iterable<T | Promise<T>>): Promise<T> => {
   const items = Array.from(promises);
   if (items.length === 0) {
     const err = typeof AggregateError !== 'undefined'

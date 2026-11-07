@@ -1,4 +1,4 @@
-function orderOfEvents() {
+const orderOfEvents = () => {
   const log = [];
   return new Promise((resolve) => {
     log.push('start');
@@ -11,7 +11,7 @@ function orderOfEvents() {
   });
 }
 
-async function asyncOrder() {
+const asyncOrder = async () => {
   const log = [];
   async function f(log) {
     log.push('f1');
