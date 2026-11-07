@@ -1,0 +1,18 @@
+{
+  "id": "d3-zoom-pan-rescale",
+  "title": "D3 Zoom, Pan & Rescale (Geometric Transforms)",
+  "track": "d3",
+  "rendersComponent": true,
+  "previewLibraries": [
+    "d3"
+  ],
+  "tags": [
+    "d3",
+    "zoom",
+    "pan",
+    "scales",
+    "transforms",
+    "charts"
+  ]
+}
+

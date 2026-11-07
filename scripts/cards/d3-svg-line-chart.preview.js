@@ -17,7 +17,7 @@ const DEFAULT_POINTS = [
       data: DEFAULT_POINTS,
       width: 420,
       height: 260,
-      strokeColor: '#38bdf8',
+      strokeColor: 'steelblue',
       strokeWidth: 2,
       showPoints: true,
     },
@@ -39,7 +39,7 @@ const DEFAULT_POINTS = [
       {
         width: Number(props.width) || 420,
         height: Number(props.height) || 260,
-        strokeColor: props.strokeColor || '#38bdf8',
+        strokeColor: props.strokeColor || 'steelblue',
         strokeWidth: Number(props.strokeWidth) || 2,
         showPoints: props.showPoints !== false,
         onSelectPoint: function (point, index) {

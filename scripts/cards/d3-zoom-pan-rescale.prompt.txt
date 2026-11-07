@@ -1,0 +1,80 @@
+### `renderZoomChart(container: HTMLElement, data: ZoomPoint[], options?: ZoomChartOptions): ZoomChartInstance`
+
+## Description
+
+```ts
+interface ZoomPoint {
+  x: number;
+  y: number;
+  id?: string | number;
+}
+
+interface ZoomTransformState {
+  k: number;
+  x: number;
+  y: number;
+}
+
+interface ZoomChartOptions {
+  width?: number;
+  height?: number;
+  scaleExtent?: [number, number];
+  color?: string;
+  onZoomChange?: (transform: ZoomTransformState) => void;
+}
+
+interface ZoomChartInstance {
+  svg: SVGSVGElement;
+  getTransform: () => ZoomTransformState;
+  zoomBy: (factor: number) => void;
+  resetZoom: () => void;
+  destroy: () => void;
+}
+```
+
+Interactive exploration of large datasets relies on zooming and panning. D3 models zoom interactions with **`d3.zoom()`**, which captures pointer gestures (mouse wheel, drag, touch pinch) and emits transformation states containing zoom scale factor `k` and planar translation offsets `(x, y)`.
+
+Rather than scaling SVG coordinates directly, modern D3 visualizations dynamically rescale coordinate scales via **`event.transform.rescaleX(xScale)`**, redrawing axes and re-projecting data points without distorting glyph geometries or strokes.
+
+Implement `renderZoomChart(container, data, options)` to create an interactive scatter plot supporting zoom, pan, and dynamic horizontal axis rescaling.
+
+### Requirements
+
+- **Canvas & Layout**:
+  - Empties `container.innerHTML` before mounting.
+  - Defaults:
+    - `width = 480`, `height = 260`
+    - Margins: `{ top: 15, right: 20, bottom: 25, left: 40 }`
+    - `innerWidth = Math.max(0, width - margin.left - margin.right)`
+    - `innerHeight = Math.max(0, height - margin.top - margin.bottom)`
+    - `scaleExtent = options.scaleExtent ?? [1, 8]`
+    - `color = options.color ?? 'steelblue'`
+  - Appends an `<svg>` element with attributes `width` and `height`.
+  - Appends `<defs>` with `<clipPath id="zoom-chart-clip">` containing `<rect width="${innerWidth}" height="${innerHeight}">`.
+  - Appends `<g class="plot-area">` translated to `translate(${margin.left}, ${margin.top})`.
+
+- **Scales & Geometry**:
+  - `maxX = d3.max(data, d => d.x) || 100`
+  - `maxY = d3.max(data, d => d.y) || 100`
+  - `xScale = d3.scaleLinear().domain([0, maxX]).range([0, innerWidth])`
+  - `yScale = d3.scaleLinear().domain([0, maxY]).range([innerHeight, 0])`
+  - Appends `<g class="data-layer" clip-path="url(#zoom-chart-clip)">` inside `plot-area`.
+  - For each item in `data`, renders `<circle class="data-point">` with `cx = xScale(d.x)`, `cy = yScale(d.y)`, `r = 5`, and `fill = color`.
+  - Appends `<g class="x-axis">` translated to `translate(0, ${innerHeight})` calling `d3.axisBottom(xScale)`.
+  - Appends `<g class="y-axis">` calling `d3.axisLeft(yScale)`.
+
+- **Zoom Behavior**:
+  - Configures `const zoomBehavior = d3.zoom().scaleExtent(scaleExtent).extent([[0, 0], [innerWidth, innerHeight]])`.
+  - Attaches `zoomBehavior` to the SVG: `svg.call(zoomBehavior)`.
+  - On `'zoom'` event:
+    - Computes `newXScale = event.transform.rescaleX(xScale)`.
+    - Updates horizontal axis: `xAxisGroup.call(d3.axisBottom(newXScale))`.
+    - Updates data circles: `circles.attr('cx', d => newXScale(d.x))`.
+    - Invokes `options.onZoomChange({ k: event.transform.k, x: event.transform.x, y: event.transform.y })` if provided.
+
+- **Instance API**:
+  - `svg`: reference to the underlying `SVGSVGElement`.
+  - `getTransform()`: queries `d3.zoomTransform(svg.node())` and returns `{ k: transform.k, x: transform.x, y: transform.y }`.
+  - `zoomBy(factor)`: applies relative zoom scaling by factor calling `svg.call(zoomBehavior.scaleBy, factor)`.
+  - `resetZoom()`: resets zoom to identity by calling `svg.call(zoomBehavior.transform, d3.zoomIdentity)`.
+  - `destroy()`: removes the SVG element and empties `container.innerHTML`.

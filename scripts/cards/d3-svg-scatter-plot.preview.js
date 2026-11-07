@@ -16,7 +16,7 @@ const DEFAULT_POINTS = [
       data: DEFAULT_POINTS,
       width: 450,
       height: 300,
-      color: '#3b82f6',
+      color: 'steelblue',
       defaultRadius: 6,
     },
     typeof window !== 'undefined' ? window.__previewProps : {}
@@ -37,7 +37,7 @@ const DEFAULT_POINTS = [
       {
         width: Number(props.width) || 450,
         height: Number(props.height) || 300,
-        color: props.color || '#3b82f6',
+        color: props.color || 'steelblue',
         defaultRadius: Number(props.defaultRadius) || 6,
         onSelectPoint: function (datum, index) {
           if (typeof log === 'function') log('selectPoint', datum, index);

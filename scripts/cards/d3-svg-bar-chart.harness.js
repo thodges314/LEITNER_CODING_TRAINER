@@ -4,7 +4,7 @@ const SAMPLE_DATA = [
   { label: 'Gamma', value: 50 },
 ];
 
-// 1. Appends SVG container with correct dimensions, role, and aria-label
+// 1. Appends SVG container with correct dimensions
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -16,12 +16,10 @@ const SAMPLE_DATA = [
     svg !== null &&
     svg.getAttribute('width') === '500' &&
     svg.getAttribute('height') === '300' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Bar chart' &&
     instance.svg === svg;
 
   $test.check(
-    'Appends SVG container with correct dimensions, role, and aria-label',
+    'Appends SVG container with correct dimensions',
     passed,
     { width: svg?.getAttribute('width'), height: svg?.getAttribute('height') }
   );
@@ -67,7 +65,7 @@ const SAMPLE_DATA = [
   container.remove();
 }
 
-// 3. Renders bar elements with data attributes, proportional heights, and color
+// 3. Renders bar elements with proportional heights and color
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -82,18 +80,13 @@ const SAMPLE_DATA = [
 
   const passed =
     bars.length === 3 &&
-    bars[0].getAttribute('data-label') === 'Alpha' &&
-    bars[0].getAttribute('data-value') === '30' &&
-    bars[0].getAttribute('data-index') === '0' &&
-    bars[1].getAttribute('data-label') === 'Beta' &&
-    bars[1].getAttribute('data-value') === '80' &&
     bars[0].getAttribute('fill') === 'teal' &&
     parseFloat(bars[1].getAttribute('height') || '0') > parseFloat(bars[0].getAttribute('height') || '0');
 
   $test.check(
-    'Renders bar elements with data attributes, proportional heights, and color',
+    'Renders bar elements with proportional heights and color',
     passed,
-    { barCount: bars.length, alphaVal: bars[0]?.getAttribute('data-value') }
+    { barCount: bars.length, h0: bars[0]?.getAttribute('height'), h1: bars[1]?.getAttribute('height') }
   );
 
   instance.destroy();

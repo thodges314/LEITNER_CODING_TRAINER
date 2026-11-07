@@ -28,44 +28,23 @@ interface ForceSimOptions {
   maxTicks?: number;
 }
 
-interface SettledNode {
-  id: string;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-}
-
-interface SettledLink {
-  sourceId: string;
-  targetId: string;
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
-  length: number;
-}
-
 interface ForceSimReport {
-  nodes: SettledNode[];
-  links: SettledLink[];
+  nodes: ForceSimNode[];
+  links: ForceSimLink[];
   ticks: number;
   finalAlpha: number;
   converged: boolean;
-  kineticEnergy: number;
-  getNode: (id: string) => SettledNode | null;
 }
 ```
 
-In server-side graph rendering, static layout pre-computation, and large-scale network visualization, running an asynchronous animation loop on the main thread is unnecessary or too slow. Instead, `d3.forceSimulation` can be executed **headlessly** by stopping its internal timer (`sim.stop()`) and stepping through discrete numerical integration ticks (`sim.tick()`) synchronously until `alpha` decays below `alphaMin` or a maximum tick budget is reached.
+In server-side graph rendering, static layout pre-computation, and large-scale network visualization, running an asynchronous animation loop on the browser main thread is unnecessary or too slow. Instead, `d3.forceSimulation` can be executed **headlessly** by stopping its internal timer (`sim.stop()`) and stepping through discrete numerical integration ticks (`sim.tick()`) synchronously until `alpha` decays below `alphaMin` or a maximum tick budget is reached.
 
-Implement `runHeadlessForceSimulation(nodes, links, options)` to configure a multi-body physics simulation, step it synchronously to convergence, and return a settled layout report.
+Implement `runHeadlessForceSimulation(nodes, links, options)` to configure a multi-body physics simulation, step it synchronously to convergence, and return the settled layout.
 
 ### Requirements
 
 - **Immutability & Defaults**:
-  - Do not mutate the caller's `nodes` or `links` arrays or objects; clone each node (`{ ...n, radius: n.radius ?? collisionRadius }`) and link (`{ ...l }`).
+  - Do not mutate the caller's input `nodes` or `links` arrays; clone each node (`{ ...n, radius: typeof n.radius === 'number' ? n.radius : collisionRadius }`) and link (`{ ...l }`).
   - Option defaults:
     - `width = 400`, `height = 300`
     - `chargeStrength = -120`
@@ -73,25 +52,22 @@ Implement `runHeadlessForceSimulation(nodes, links, options)` to configure a mul
     - `collisionRadius = 8`
     - `alphaMin = 0.01`
     - `maxTicks = 300`
-  - If `nodes` is empty (`[]`) or non-array, return `{ nodes: [], links: [], ticks: 0, finalAlpha: 1, converged: true, kineticEnergy: 0, getNode: () => null }`.
+  - If `nodes` is empty (`[]`) or non-array, return `{ nodes: [], links: [], ticks: 0, finalAlpha: 1, converged: true }`.
 
 - **Force Configuration & Headless Stepping**:
   - Initialize `sim = d3.forceSimulation(nodesCopy)` and immediately call `sim.stop()` to halt background timers.
-  - Configure `sim.alphaMin(alphaMin)`.
+  - Set `sim.alphaMin(alphaMin)`.
   - Register four forces:
     - `'charge'`: `d3.forceManyBody().strength(chargeStrength)`
     - `'center'`: `d3.forceCenter(width / 2, height / 2)`
-    - `'collide'`: `d3.forceCollide((d) => d.radius ?? collisionRadius)`
-    - `'link'`: `d3.forceLink(linksCopy).id((d) => d.id).distance((l) => l.distance ?? linkDistance)`
+    - `'collide'`: `d3.forceCollide((d) => typeof d.radius === 'number' ? d.radius : collisionRadius)`
+    - `'link'`: `d3.forceLink(linksCopy).id((d) => d.id).distance((l) => typeof l.distance === 'number' ? l.distance : linkDistance)`
   - Step synchronously while `sim.alpha() >= alphaMin && ticks < maxTicks`:
     - Call `sim.tick()` and increment `ticks` by `1`.
 
-- **Settled Report Metrics**:
-  - `nodes`: array of `SettledNode` objects (`{ id, x, y, vx, vy, radius }`).
-  - `links`: array of `SettledLink` objects (`{ sourceId, targetId, x1, y1, x2, y2, length }`), where `length = Math.hypot(x2 - x1, y2 - y1)`.
+- **Settled Report**:
+  - `nodes`: array of settled node objects with calculated `x`, `y`, `vx`, `vy`, and `radius`.
+  - `links`: array of settled link objects whose `source` and `target` properties are resolved to their corresponding node objects.
   - `ticks`: total number of ticks executed.
   - `finalAlpha`: `sim.alpha()` after stepping finishes.
   - `converged`: `true` if `finalAlpha < alphaMin`, otherwise `false`.
-  - `kineticEnergy`: sum across all settled nodes of `0.5 * (vx * vx + vy * vy)`.
-  - `getNode(id)`: returns the settled node with matching `id`, or `null` if not found.
-

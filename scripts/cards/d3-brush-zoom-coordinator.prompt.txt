@@ -37,7 +37,7 @@ Implement `renderBrushCoordinator(container, data, options)` to mount a synchron
   - Option defaults: `width = 480`, `focusHeight = 200`, `contextHeight = 70`, `color = 'steelblue'`.
   - Uses margin `{ top: 15, right: 20, bottom: 25, left: 40 }` and vertical `gap = 25` between the focus and context charts.
   - Computes `innerWidth = Math.max(0, width - margin.left - margin.right)` and `totalHeight = focusHeight + contextHeight + gap + margin.top + margin.bottom`.
-  - Appends `<svg>` with `width={width}`, `height={totalHeight}`, `role="img"`, and `aria-label="Brush coordinator chart"`.
+  - Appends `<svg>` with `width={width}` and `height={totalHeight}`.
 
 - **Scales & Groups**:
   - Derives `fullDomain: [number, number]` from `d3.extent(data, d => d.x)` (fallback `[0, 1]` when empty) and `yDomain: [number, number]` from `[0, d3.max(data, d => d.y) || 1]`.

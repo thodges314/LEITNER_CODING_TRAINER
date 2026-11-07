@@ -14,9 +14,7 @@ function renderTreemap(container, data, options = {}) {
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Treemap chart');
+    .attr('height', height);
 
   let leafMetrics = [];
 
@@ -55,13 +53,9 @@ function renderTreemap(container, data, options = {}) {
       const cells = svg
         .selectAll('g.treemap-cell')
         .data(leafMetrics)
-        .enter()
-        .append('g')
+        .join('g')
         .attr('class', 'treemap-cell')
         .attr('transform', (d) => `translate(${d.x0}, ${d.y0})`)
-        .attr('data-name', (d) => d.name)
-        .attr('data-value', (d) => String(d.value))
-        .attr('data-index', (_, i) => String(i))
         .on('click', function (_, d) {
           if (typeof onSelectCell === 'function') {
             const idx = leafMetrics.indexOf(d);
@@ -74,9 +68,7 @@ function renderTreemap(container, data, options = {}) {
         .attr('class', 'treemap-rect')
         .attr('width', (d) => d.width)
         .attr('height', (d) => d.height)
-        .attr('fill', (_, i) => d3.schemeTableau10[i % 10])
-        .attr('data-name', (d) => d.name)
-        .attr('data-value', (d) => String(d.value));
+        .attr('fill', (_, i) => d3.schemeTableau10[i % 10]);
 
       cells
         .append('text')
@@ -98,4 +90,3 @@ function renderTreemap(container, data, options = {}) {
     },
   };
 }
-

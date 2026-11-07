@@ -17,7 +17,7 @@ const DEFAULT_DATA = [
       data: DEFAULT_DATA,
       width: 400,
       height: 260,
-      color: '#0284c7',
+      color: 'steelblue',
     },
     typeof window !== 'undefined' ? window.__previewProps : {}
   );
@@ -37,7 +37,7 @@ const DEFAULT_DATA = [
       {
         width: Number(props.width) || 400,
         height: Number(props.height) || 260,
-        color: props.color || '#0284c7',
+        color: props.color || 'steelblue',
         onSelectBar: function (datum, index) {
           if (typeof log === 'function') log('selectBar', datum, index);
         },

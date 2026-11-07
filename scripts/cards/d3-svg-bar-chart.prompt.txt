@@ -57,15 +57,12 @@ interface BarChartInstance {
   - `destroy()`: Cleanup method that empties the container and removes event handlers.
 
 - **DOM Contract & Requirements**:
-  - Root `<svg>` must have attributes `width={width}`, `height={height}`, `role="img"`, and `aria-label="Bar chart"`.
+  - Root `<svg>` must have attributes `width={width}` and `height={height}`.
   - Chart group `<g class="chart-area">` translated to `translate(margin.left, margin.top)`.
   - Inner width = `width - margin.left - margin.right`, inner height = `height - margin.top - margin.bottom`.
   - X axis rendered in `<g class="x-axis">` translated to `translate(0, innerHeight)`.
   - Y axis rendered in `<g class="y-axis">`.
   - Each bar is rendered as `<rect class="bar">` with:
-    - `data-label`: the item's label string.
-    - `data-value`: the item's numeric value string.
-    - `data-index`: 0-indexed position.
     - `x`: computed by `xScale(d.label)`.
     - `y`: computed by `yScale(d.value)`.
     - `width`: computed by `xScale.bandwidth()`.

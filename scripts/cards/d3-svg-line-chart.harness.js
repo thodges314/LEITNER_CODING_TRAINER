@@ -6,7 +6,7 @@ const SAMPLE_POINTS = [
   { x: 50, y: 45 },
 ];
 
-// 1. Mounts SVG container with ARIA attributes and chart-area grouping
+// 1. Mounts SVG container with chart-area grouping
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -19,13 +19,11 @@ const SAMPLE_POINTS = [
     svg !== null &&
     svg.getAttribute('width') === '450' &&
     svg.getAttribute('height') === '280' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Line chart' &&
     chartArea !== null &&
     instance.svg === svg;
 
   $test.check(
-    'Mounts SVG container with ARIA attributes and chart-area grouping',
+    'Mounts SVG container with chart-area grouping',
     passed,
     { width: svg?.getAttribute('width'), hasChartArea: chartArea !== null }
   );
@@ -65,7 +63,7 @@ const SAMPLE_POINTS = [
   container.remove();
 }
 
-// 3. Renders data point markers with coordinates and data attributes
+// 3. Renders data point markers with scaled coordinates
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -75,16 +73,12 @@ const SAMPLE_POINTS = [
 
   const passed =
     points.length === 5 &&
-    points[0].getAttribute('data-x') === '10' &&
-    points[0].getAttribute('data-y') === '15' &&
-    points[0].getAttribute('data-index') === '0' &&
-    points[4].getAttribute('data-x') === '50' &&
     parseFloat(points[3].getAttribute('cy') || '999') < parseFloat(points[0].getAttribute('cy') || '0');
 
   $test.check(
-    'Renders data point markers with coordinates and data attributes',
+    'Renders data point markers with scaled coordinates',
     passed,
-    { pointCount: points.length, firstX: points[0]?.getAttribute('data-x') }
+    { pointCount: points.length, cy0: points[0]?.getAttribute('cy'), cy3: points[3]?.getAttribute('cy') }
   );
 
   instance.destroy();

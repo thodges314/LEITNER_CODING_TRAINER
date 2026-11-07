@@ -5,7 +5,7 @@ const SAMPLE_POINTS = [
   { x: 55, y: 80, label: 'P4' },
 ];
 
-// 1. Appends SVG canvas with dimensions, role, and aria-label
+// 1. Appends SVG canvas with correct dimensions
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -17,12 +17,10 @@ const SAMPLE_POINTS = [
     svg !== null &&
     svg.getAttribute('width') === '500' &&
     svg.getAttribute('height') === '350' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Scatter plot' &&
     instance.svg === svg;
 
   $test.check(
-    'Appends SVG canvas with dimensions, role, and aria-label',
+    'Appends SVG canvas with correct dimensions',
     passed,
     { width: svg?.getAttribute('width'), height: svg?.getAttribute('height') }
   );
@@ -68,7 +66,7 @@ const SAMPLE_POINTS = [
   container.remove();
 }
 
-// 3. Renders scatter dot circles with coordinate attributes and fill color
+// 3. Renders scatter dot circles with scaled coordinates and fill color
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -78,18 +76,14 @@ const SAMPLE_POINTS = [
 
   const passed =
     dots.length === 4 &&
-    dots[0].getAttribute('data-x') === '10' &&
-    dots[0].getAttribute('data-y') === '20' &&
-    dots[0].getAttribute('data-label') === 'P1' &&
-    dots[0].getAttribute('data-index') === '0' &&
     dots[0].getAttribute('fill') === 'purple' &&
     // Inverted Y: P4 (y=80) should have smaller cy than P1 (y=20)
     parseFloat(dots[3].getAttribute('cy') || '999') < parseFloat(dots[0].getAttribute('cy') || '0');
 
   $test.check(
-    'Renders scatter dot circles with coordinate attributes and fill color',
+    'Renders scatter dot circles with scaled coordinates and fill color',
     passed,
-    { dotCount: dots.length, firstLabel: dots[0]?.getAttribute('data-label') }
+    { dotCount: dots.length, cy0: dots[0]?.getAttribute('cy'), cy3: dots[3]?.getAttribute('cy') }
   );
 
   instance.destroy();

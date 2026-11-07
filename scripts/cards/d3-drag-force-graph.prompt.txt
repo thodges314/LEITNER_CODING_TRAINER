@@ -1,0 +1,105 @@
+### `renderForceDirectedGraph(container: HTMLElement, data: ForceGraphData, options?: ForceGraphOptions): ForceGraphInstance`
+
+## Description
+
+```ts
+interface ForceGraphNode {
+  id: string;
+  group?: number;
+  x?: number;
+  y?: number;
+  vx?: number;
+  vy?: number;
+  fx?: number | null;
+  fy?: number | null;
+}
+
+interface ForceGraphLink {
+  source: string | ForceGraphNode;
+  target: string | ForceGraphNode;
+  value?: number;
+}
+
+interface ForceGraphData {
+  nodes: ForceGraphNode[];
+  links: ForceGraphLink[];
+}
+
+interface ForceGraphOptions {
+  width?: number;
+  height?: number;
+  nodeRadius?: number;
+  chargeStrength?: number;
+  linkDistance?: number;
+  onNodeClick?: (node: ForceGraphNode) => void;
+}
+
+interface ForceGraphInstance {
+  svg: SVGSVGElement;
+  simulation: d3.Simulation<ForceGraphNode>;
+  getNodes: () => ForceGraphNode[];
+  getLinks: () => ForceGraphLink[];
+  pinNode: (id: string, x: number, y: number) => void;
+  unpinNode: (id: string) => void;
+  destroy: () => void;
+}
+```
+
+Network topologies and entity relational diagrams in D3 combine **`d3.forceSimulation()`** for dynamic physics layout with **`d3.drag()`** for interactive gesture control.
+
+To keep the physics engine responsive while dragging:
+1. On drag start: reheat the simulation by setting `simulation.alphaTarget(0.3).restart()` and set fixed target coordinates `d.fx = d.x` and `d.fy = d.y`.
+2. On drag movement: update `d.fx = event.x` and `d.fy = event.y`.
+3. On drag end: cool down the simulation with `simulation.alphaTarget(0)` and release the temporary pin by setting `d.fx = null` and `d.fy = null` (unless permanently pinned).
+
+Implement `renderForceDirectedGraph(container, data, options)` to render an interactive network graph with link lines, circular nodes, drag interaction, and programmatic pinning.
+
+### Requirements
+
+- **Canvas & Structure**:
+  - Empties `container.innerHTML` before mounting.
+  - Defaults:
+    - `width = 480`, `height = 300`
+    - `nodeRadius = 8`
+    - `chargeStrength = -120`
+    - `linkDistance = 50`
+  - Appends `<svg>` element with attributes `width` and `height`.
+  - Appends `<g class="links-layer">` before nodes so lines render behind nodes.
+  - Appends `<g class="nodes-layer">`.
+
+- **Simulation Physics**:
+  - Creates a copy of `data.nodes` (e.g. `data.nodes.map(d => ({ ...d }))`) and `data.links` (e.g. `data.links.map(d => ({ ...d }))`) to prevent external state mutation.
+  - Configures `d3.forceSimulation(nodes)`:
+    - `.force('link', d3.forceLink(links).id(d => d.id).distance(linkDistance))`
+    - `.force('charge', d3.forceManyBody().strength(chargeStrength))`
+    - `.force('center', d3.forceCenter(width / 2, height / 2))`
+
+- **Elements & Ticks**:
+  - Links: renders `<line class="graph-link">` for each link inside `links-layer`.
+    - `stroke = "slategray"`, `stroke-opacity = "0.6"`, `stroke-width = "1.5"`.
+  - Nodes: renders `<circle class="graph-node">` for each node inside `nodes-layer`.
+    - `r = nodeRadius`, `fill = "steelblue"`, `stroke = "white"`, `stroke-width = "1.5"`.
+  - On simulation `'tick'` event:
+    - Updates link endpoints:
+      - `x1 = d.source.x`, `y1 = d.source.y`
+      - `x2 = d.target.x`, `y2 = d.target.y`
+    - Updates node positions:
+      - `cx = d.x`, `cy = d.y`
+  - Clicking a `circle.graph-node` invokes `options.onNodeClick(node)` if provided.
+
+- **Drag Interaction**:
+  - Configures `d3.drag()`:
+    - `start`: if `!event.active`, calls `simulation.alphaTarget(0.3).restart()`; assigns `d.fx = d.x`, `d.fy = d.y`.
+    - `drag`: assigns `d.fx = event.x`, `d.fy = event.y`.
+    - `end`: if `!event.active`, calls `simulation.alphaTarget(0)`; resets `d.fx = null`, `d.fy = null`.
+  - Attaches drag behavior to node circles via `.call(dragBehavior)`.
+
+- **Instance API**:
+  - `svg`: reference to the underlying `SVGSVGElement`.
+  - `simulation`: the active `d3.forceSimulation` instance.
+  - `getNodes()`: returns the current simulation nodes array.
+  - `getLinks()`: returns the current simulation links array.
+  - `pinNode(id, x, y)`: finds node by `id`, assigns `node.fx = x` and `node.fy = y`, then reheats simulation with `simulation.alpha(0.1).restart()`.
+  - `unpinNode(id)`: finds node by `id`, assigns `node.fx = null` and `node.fy = null`, then reheats simulation with `simulation.alpha(0.1).restart()`.
+  - `destroy()`: calls `simulation.stop()`, removes SVG, and empties `container.innerHTML`.
+

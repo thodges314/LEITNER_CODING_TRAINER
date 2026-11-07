@@ -41,7 +41,7 @@ Implement `renderContourDensity(container, points, options)` to compute 2D KDE c
 ### Requirements
 
 - **Canvas & Option Defaults**:
-  - Empties `container.innerHTML` and appends an `<svg>` element with `width={width}`, `height={height}`, `role="img"`, and `aria-label="Contour density chart"`.
+  - Empties `container.innerHTML` and appends an `<svg>` element with `width={width}` and `height={height}`.
   - Option defaults:
     - `width = 460`, `height = 300`
     - `bandwidth = 20`, `thresholds = 8`, `cellSize = 4`
@@ -67,7 +67,6 @@ Implement `renderContourDensity(container, points, options)` to compute 2D KDE c
   - Appends `<g class="contour-bands">` containing `<path class="contour-band">` for each contour `(c, i)`:
     - `d = d3.geoPath()(c) || ''`
     - `fill = d3.interpolateBlues((i + 1) / contours.length)`, `fill-opacity = "0.55"`, `stroke = "steelblue"`, `stroke-width = "1"`
-    - `data-value = String(c.value)`, `data-index = String(i)`
     - Clicking a `path.contour-band` invokes `options.onSelectBand(bands[i], i)` if provided.
   - Appends `<g class="density-points">`:
     - When `showPoints !== false`, renders `<circle class="density-point">` for each point `p` with `cx={p.x}`, `cy={p.y}`, `r="2.5"`, and `fill="white"`.
@@ -77,4 +76,3 @@ Implement `renderContourDensity(container, points, options)` to compute 2D KDE c
   - `getBands()`: returns array of `ContourBandSummary` objects.
   - `getPeakDensity()`: returns the maximum contour `value` (`0` when `contours` is empty).
   - `destroy()`: removes the SVG element and empties `container.innerHTML`.
-

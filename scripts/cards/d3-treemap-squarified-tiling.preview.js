@@ -1,27 +1,27 @@
 const DEFAULT_TREEMAP_DATA = {
-  name: 'Frontend Bundle',
+  name: 'root',
   children: [
     {
-      name: 'Framework',
+      name: 'Frontend',
       children: [
-        { name: 'react-dom', value: 420 },
-        { name: 'router', value: 160 },
-        { name: 'state', value: 95 },
+        { name: 'React', value: 45 },
+        { name: 'TypeScript', value: 35 },
+        { name: 'D3', value: 20 },
       ],
     },
     {
-      name: 'Visualization',
+      name: 'Backend',
       children: [
-        { name: 'd3-hierarchy', value: 240 },
-        { name: 'd3-shape', value: 190 },
-        { name: 'd3-scale', value: 145 },
+        { name: 'Node', value: 30 },
+        { name: 'Postgres', value: 25 },
+        { name: 'GraphQL', value: 15 },
       ],
     },
     {
-      name: 'Editor',
+      name: 'DevOps',
       children: [
-        { name: 'codemirror', value: 310 },
-        { name: 'typescript-worker', value: 275 },
+        { name: 'Docker', value: 18 },
+        { name: 'CI/CD', value: 12 },
       ],
     },
   ],
@@ -53,24 +53,8 @@ const DEFAULT_TREEMAP_DATA = {
     }
     container.innerHTML = '';
 
-    const wrapper = document.createElement('div');
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'column';
-    wrapper.style.gap = '8px';
-
-    const statusBar = document.createElement('div');
-    statusBar.style.fontSize = '12px';
-    statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = '#94a3b8';
-    statusBar.textContent = 'Click any treemap leaf cell to inspect its area & value';
-
-    const chartBox = document.createElement('div');
-    wrapper.appendChild(statusBar);
-    wrapper.appendChild(chartBox);
-    container.appendChild(wrapper);
-
     instance = renderTreemap(
-      chartBox,
+      container,
       props.data && typeof props.data === 'object' ? props.data : DEFAULT_TREEMAP_DATA,
       {
         width: Number(props.width) || 480,
@@ -79,18 +63,6 @@ const DEFAULT_TREEMAP_DATA = {
         paddingOuter: props.paddingOuter !== undefined ? Number(props.paddingOuter) : 3,
         round: props.round !== false,
         onSelectCell: function (cell, idx) {
-          statusBar.textContent =
-            'Selected #' +
-            idx +
-            ': ' +
-            cell.name +
-            ' (value=' +
-            cell.value +
-            ', ' +
-            Math.round(cell.width) +
-            'x' +
-            Math.round(cell.height) +
-            'px)';
           if (typeof log === 'function') log('onSelectCell', cell, idx);
         },
       }
@@ -106,4 +78,3 @@ const DEFAULT_TREEMAP_DATA = {
     });
   }
 })();
-

@@ -1,191 +1,113 @@
-const SAMPLE_METRICS = [
-  { category: 'Q1', value: 25 },
-  { category: 'Q2', value: 50 },
-  { category: 'Q3', value: 100 },
-  { category: 'Q4', value: 75 },
-];
+const SAMPLE_CONFIG = {
+  categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+  values: [20, 50, 100],
+  width: 500,
+  height: 200,
+  paddingInner: 0.25,
+  clamp: true,
+};
 
-// 1. Mounts SVG container, baseline, and scaled rect.scale-bar elements
+// 1. Constructs band xScale across [0, width] with correct domain, range, and bandwidth
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
-  const instance = renderScaledCoordinateChart(container, SAMPLE_METRICS, {
-    width: 440,
-    height: 240,
-    padding: 30,
-    barColor: 'steelblue',
-  });
-
-  const svg = container.querySelector('svg');
-  const baseline = container.querySelector('line.zero-baseline');
-  const bars = Array.from(container.querySelectorAll('rect.scale-bar'));
-  const extent = instance.getDomainExtent();
+  const scales = createCoordinateScales(SAMPLE_CONFIG);
+  const xMon = scales.xScale('Mon');
+  const xFri = scales.xScale('Fri');
+  const bw = scales.xScale.bandwidth();
+  const unknown = scales.xScale('Sat');
 
   const passed =
-    svg !== null &&
-    svg.getAttribute('width') === '440' &&
-    svg.getAttribute('height') === '240' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Scaled coordinate chart' &&
-    baseline !== null &&
-    baseline.getAttribute('y1') === '210' &&
-    bars.length === 4 &&
-    extent[0] === 25 &&
-    extent[1] === 100;
+    typeof xMon === 'number' &&
+    Math.abs(xMon) < 1e-4 &&
+    typeof xFri === 'number' &&
+    xFri > xMon &&
+    typeof bw === 'number' &&
+    bw > 0 &&
+    unknown === undefined;
 
   $test.check(
-    'Mounts SVG container, baseline, and scaled rect.scale-bar elements',
+    'Constructs band xScale across [0, width] with correct domain, range, and bandwidth',
     passed,
-    { extent, barCount: bars.length }
+    { xMon, xFri, bandwidth: bw, unknown }
   );
-
-  instance.destroy();
-  container.remove();
 }
 
-// 2. Maps data values to inverted SVG Y coordinates and proportional heights
+// 2. Constructs linear yScale with inverted range [height, 0] and domain clamping
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
-  // height=220, padding=20 -> plotY spans [200, 20] (180px total height)
-  const instance = renderScaledCoordinateChart(container, SAMPLE_METRICS, {
-    width: 400,
-    height: 220,
-    padding: 20,
-    paddingInner: 0,
-  });
-
-  const gZero = instance.getBarGeometry('Q1', 0);
-  const gHalf = instance.getBarGeometry('Q2', 50);
-  const gMax = instance.getBarGeometry('Q3', 100);
-  const gUnknown = instance.getBarGeometry('UNKNOWN', 50);
+  const scales = createCoordinateScales(SAMPLE_CONFIG);
+  const y0 = scales.yScale(0);
+  const y50 = scales.yScale(50);
+  const y100 = scales.yScale(100);
+  const yOver = scales.yScale(150);
 
   const passed =
-    gZero !== null &&
-    Math.abs(gZero.y - 200) < 0.01 &&
-    Math.abs(gZero.height - 0) < 0.01 &&
-    gHalf !== null &&
-    Math.abs(gHalf.y - 110) < 0.01 &&
-    Math.abs(gHalf.height - 90) < 0.01 &&
-    gMax !== null &&
-    Math.abs(gMax.y - 20) < 0.01 &&
-    Math.abs(gMax.height - 180) < 0.01 &&
-    gUnknown === null;
+    y0 === 200 &&
+    y50 === 100 &&
+    y100 === 0 &&
+    yOver === 0;
 
   $test.check(
-    'Maps data values to inverted SVG Y coordinates and proportional heights',
+    'Constructs linear yScale with inverted range [height, 0] and domain clamping',
     passed,
-    { gZero, gHalf, gMax, gUnknown }
+    { y0, y50, y100, yOver }
   );
-
-  instance.destroy();
-  container.remove();
 }
 
-// 3. Computes categorical band X positions, bandwidth, and centerX
+// 3. Constructs ordinal colorScale mapping categories to d3.schemeTableau10
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
-  // width=440, padding=20 -> range [20, 420] = 400px across 4 categories with paddingInner=0 -> 100px each
-  const instance = renderScaledCoordinateChart(container, SAMPLE_METRICS, {
-    width: 440,
-    height: 240,
-    padding: 20,
-    paddingInner: 0,
-  });
-
-  const g1 = instance.getBarGeometry('Q1', 25);
-  const g2 = instance.getBarGeometry('Q2', 50);
-  const g4 = instance.getBarGeometry('Q4', 75);
+  const scales = createCoordinateScales(SAMPLE_CONFIG);
+  const c0 = scales.colorScale('Mon');
+  const c1 = scales.colorScale('Tue');
+  const c2 = scales.colorScale('Wed');
 
   const passed =
-    g1 !== null &&
-    g2 !== null &&
-    g4 !== null &&
-    Math.abs(g1.x - 20) < 0.01 &&
-    Math.abs(g1.width - 100) < 0.01 &&
-    Math.abs(g1.centerX - 70) < 0.01 &&
-    Math.abs(g2.x - 120) < 0.01 &&
-    Math.abs(g4.x - 320) < 0.01;
+    c0 === d3.schemeTableau10[0] &&
+    c1 === d3.schemeTableau10[1] &&
+    c2 === d3.schemeTableau10[2];
 
   $test.check(
-    'Computes categorical band X positions, bandwidth, and centerX',
+    'Constructs ordinal colorScale mapping categories to d3.schemeTableau10',
     passed,
-    { g1, g2, g4 }
+    { c0, c1, c2 }
   );
-
-  instance.destroy();
-  container.remove();
 }
 
-// 4. Supports continuous Y coordinate inversion via invertY and clamping
+// 4. Maps valid and invalid category points to coordinate geometry and color
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
-  // height=220, padding=20 -> y=200 is value 0, y=110 is value 50, y=20 is value 100
-  const clampedChart = renderScaledCoordinateChart(container, SAMPLE_METRICS, {
-    height: 220,
-    padding: 20,
-    clamp: true,
-  });
-
-  const valAtTop = clampedChart.invertY(20);
-  const valAtMid = clampedChart.invertY(110);
-  const valAtBase = clampedChart.invertY(200);
-  const gClampedOver = clampedChart.getBarGeometry('Q3', 250);
-
-  clampedChart.destroy();
-
-  const unclampedChart = renderScaledCoordinateChart(container, SAMPLE_METRICS, {
-    height: 220,
-    padding: 20,
-    clamp: false,
-  });
-  const gUnclampedOver = unclampedChart.getBarGeometry('Q3', 150);
-  unclampedChart.destroy();
+  const scales = createCoordinateScales(SAMPLE_CONFIG);
+  const pt = scales.mapPoint('Wed', 50);
+  const missing = scales.mapPoint('Sun', 50);
 
   const passed =
-    Math.abs(valAtTop - 100) < 0.01 &&
-    Math.abs(valAtMid - 50) < 0.01 &&
-    Math.abs(valAtBase - 0) < 0.01 &&
-    gClampedOver !== null &&
-    Math.abs(gClampedOver.y - 20) < 0.01 &&
-    gUnclampedOver !== null &&
-    gUnclampedOver.y < 20;
+    pt !== null &&
+    typeof pt.x === 'number' &&
+    pt.y === 100 &&
+    typeof pt.barWidth === 'number' &&
+    pt.barWidth > 0 &&
+    pt.color === d3.schemeTableau10[2] &&
+    missing === null;
 
   $test.check(
-    'Supports continuous Y coordinate inversion via invertY and clamping',
+    'Maps valid and invalid category points to coordinate geometry and color',
     passed,
-    { valAtTop, valAtMid, valAtBase, clampedY: gClampedOver?.y, unclampedY: gUnclampedOver?.y }
+    { pt, missing }
   );
-
-  container.remove();
 }
 
-// 5. Handles empty dataset gracefully and cleans up DOM on destroy
+// 5. Inverts visual Y pixel coordinates back to original domain values
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-
-  const emptyChart = renderScaledCoordinateChart(container, []);
-  const extent = emptyChart.getDomainExtent();
-  const barCount = container.querySelectorAll('rect.scale-bar').length;
-
-  emptyChart.destroy();
-  const cleanedUp = container.innerHTML === '';
+  const scales = createCoordinateScales(SAMPLE_CONFIG);
+  const vBottom = scales.invertY(200);
+  const vMid = scales.invertY(100);
+  const vTop = scales.invertY(0);
 
   const passed =
-    extent[0] === 0 && extent[1] === 0 && barCount === 0 && cleanedUp;
+    Math.round(vBottom) === 0 &&
+    Math.round(vMid) === 50 &&
+    Math.round(vTop) === 100;
 
   $test.check(
-    'Handles empty dataset gracefully and cleans up DOM on destroy',
+    'Inverts visual Y pixel coordinates back to original domain values',
     passed,
-    { extent, barCount, cleanedUp }
+    { vBottom, vMid, vTop }
   );
-
-  container.remove();
 }

@@ -1,0 +1,45 @@
+## Description
+
+```ts
+interface TransitionConfig {
+  duration?: number;
+  staggerMs?: number;
+  ease?: (t: number) => number;
+  targetWidths?: number[];
+  fillColor?: string;
+}
+```
+
+### `transitionBars(selection: d3.Selection<SVGRectElement>, config?: TransitionConfig): d3.Transition<SVGRectElement>`
+
+In D3, **Transitions** (`selection.transition()`) animate DOM and SVG attributes over time by interpolating values across frames. Transitions support custom durations, index-based staggered delays (`.delay((_, i) => i * staggerMs)`), and various easing functions from `d3-ease`:
+- `d3.easeCubicOut` (default smooth deceleration)
+- `d3.easeElasticOut` (elastic spring oscillation / "sproingy" rubber-band overshoot)
+- `d3.easeBounceOut` (bouncing ball impact)
+- `d3.easeBackOut` (anticipation and overshoot)
+- `d3.easeLinear` (uniform linear motion)
+
+Implement `transitionBars` to apply a smooth animated transition across a selection of SVG `<rect>` elements.
+
+### Requirements
+
+1. **Default Configuration**:
+   - `duration = 300` (in milliseconds)
+   - `staggerMs = 0` (delay interval per item index)
+   - `ease = d3.easeCubicOut` (easing function)
+   - `targetWidths = []` (array of target pixel widths)
+   - `fillColor = 'steelblue'` (target fill color)
+
+2. **Transition Setup**:
+   - Create a transition on `selection` via `.transition()`.
+   - Set `.duration(duration)`.
+   - Set `.ease(ease)`.
+   - Set `.delay((_, i) => i * staggerMs)` to stagger element start times.
+
+3. **Attribute Animation**:
+   - Animate the `'width'` attribute: `targetWidths[i] ?? 0` for each element index `i`.
+   - Animate the `'fill'` attribute to `fillColor`.
+
+4. **Return Value**:
+   - Return the created `d3.Transition` object.
+

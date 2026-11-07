@@ -51,9 +51,7 @@ function renderTreemap(
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Treemap chart');
+    .attr('height', height);
 
   let leafMetrics: TreemapCellMetric[] = [];
 
@@ -90,16 +88,12 @@ function renderTreemap(
       }));
 
       const cells = svg
-        .selectAll<TreemapCellMetric>('g.treemap-cell')
+        .selectAll('g.treemap-cell')
         .data(leafMetrics)
-        .enter()
-        .append('g')
+        .join('g')
         .attr('class', 'treemap-cell')
         .attr('transform', (d: TreemapCellMetric) => `translate(${d.x0}, ${d.y0})`)
-        .attr('data-name', (d: TreemapCellMetric) => d.name)
-        .attr('data-value', (d: TreemapCellMetric) => String(d.value))
-        .attr('data-index', (_: TreemapCellMetric, i: number) => String(i))
-        .on('click', function (_: any, d: TreemapCellMetric) {
+        .on('click', function (_: MouseEvent, d: TreemapCellMetric) {
           if (typeof onSelectCell === 'function') {
             const idx = leafMetrics.indexOf(d);
             onSelectCell(d, idx);
@@ -111,9 +105,7 @@ function renderTreemap(
         .attr('class', 'treemap-rect')
         .attr('width', (d: TreemapCellMetric) => d.width)
         .attr('height', (d: TreemapCellMetric) => d.height)
-        .attr('fill', (_: TreemapCellMetric, i: number) => d3.schemeTableau10[i % 10])
-        .attr('data-name', (d: TreemapCellMetric) => d.name)
-        .attr('data-value', (d: TreemapCellMetric) => String(d.value));
+        .attr('fill', (_: TreemapCellMetric, i: number) => d3.schemeTableau10[i % 10]);
 
       cells
         .append('text')
@@ -125,8 +117,8 @@ function renderTreemap(
   }
 
   return {
-    svg: svg.node() as SVGSVGElement,
-    getLeaves(): TreemapCellMetric[] {
+    svg: (svg.node() as SVGSVGElement | null)!,
+    getLeaves() {
       return leafMetrics.slice();
     },
     destroy() {
@@ -135,4 +127,3 @@ function renderTreemap(
     },
   };
 }
-

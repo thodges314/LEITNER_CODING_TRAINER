@@ -1,82 +1,31 @@
 ## Description
 
 ```ts
-interface JoinDatum {
+interface KeyedItem {
   id: string;
-  label: string;
-  value: number;
-}
-
-interface JoinStats {
-  entered: number;
-  updated: number;
-  exited: number;
-  total: number;
-}
-
-interface DataJoinOptions {
-  width?: number;
-  rowHeight?: number;
-  maxValue?: number;
-  enterColor?: string;
-  updateColor?: string;
-}
-
-interface DataJoinInstance {
-  svg: SVGSVGElement;
-  update: (nextItems: JoinDatum[]) => JoinStats;
-  getStats: () => JoinStats;
-  destroy: () => void;
 }
 ```
 
-### renderKeyedDataJoin(container: HTMLElement, initialItems: JoinDatum[], options?: DataJoinOptions): DataJoinInstance
+### `updateKeyedBars(svg: SVGSVGElement, items?: KeyedItem[]): d3.Selection`
 
-The **Enter–Update–Exit data join** (`selection.data(items, keyFn).join(enter, update, exit)`) is the foundational paradigm of D3. By supplying a key function `(d) => d.id`, D3 matches incoming data records to existing DOM nodes by identity rather than array index—reusing and reordering surviving DOM elements (`update`), appending elements only for brand-new keys (`enter`), and removing elements whose keys disappeared (`exit`).
+The **Enter–Update–Exit data join** (`selection.data(items, keyFn).join(enter, update, exit)`) is D3's core paradigm. By supplying a key function `(d) => d.id`, D3 reconciles incoming data to existing DOM elements by identity instead of array index. Surviving elements are preserved (`update`), new elements are created (`enter`), and elements without matching data are removed (`exit`).
 
-Implement `renderKeyedDataJoin` to mount an SVG list of horizontal metric bars and expose an `.update(nextItems)` method that reconciles DOM nodes using D3's keyed `.join(enter, update, exit)`.
+Implement `updateKeyedBars` to bind `items` to SVG `<g class="box">` elements with a centered label.
 
 ### Requirements
 
-1. **Container & SVG Setup**:
-   - Clear `container` (`d3.select(container).selectAll('*').remove()`).
-   - Default options:
-     - `width = 440`
-     - `rowHeight = 36`
-     - `maxValue = 100`
-     - `enterColor = 'seagreen'`
-     - `updateColor = 'steelblue'`
-   - Create an `<svg>` with `width`, `height` (`Math.max(rowHeight, initialItems.length * rowHeight)`), `role="img"`, and `aria-label="Keyed data join chart"`.
-   - Append a `<g class="join-rows">` container group.
+1. **Keyed Data Binding**:
+   - Default `items = []` and safely guard against `undefined` or non-array inputs (treat as empty array `[]`).
+   - Select all existing `g.box` elements in `svg` and bind items using identity key `(d) => d.id`.
 
-2. **Keyed `.data(items, d => d.id).join(enter, update, exit)` inside `update(nextItems)`**:
-   - Update the `<svg>` height attribute to `String(Math.max(rowHeight, nextItems.length * rowHeight))`.
-   - Create a horizontal linear scale `xScale = d3.scaleLinear().domain([0, Math.max(1, maxValue)]).range([0, Math.max(40, width - 140)]).clamp(true)`.
-   - Select `rowsGroup.selectAll('g.join-row').data(nextItems, (d) => d.id)` and invoke `.join(enterFn, updateFn, exitFn)`:
-     - **`enter` handler**:
-       - Record `entered = enter.size()`.
-       - Append `<g class="join-row">` with `data-join="enter"`.
-       - Inside each entering `<g>`, append `<rect class="join-bar">` and `<text class="join-label">`.
-     - **`update` handler**:
-       - Record `updated = update.size()`.
-       - Keep the existing `<g class="join-row">` DOM nodes and set `data-join="update"`.
-     - **`exit` handler**:
-       - Record `exited = exit.size()`.
-       - Remove exiting elements with `exit.remove()`.
+2. **Enter, Update, Exit**:
+   - Use `.join(enter, update, exit)`:
+     - **Enter**: Append a `<g>` with `class="box"` and `data-id={d.id}`. Inside each group, append:
+       - `<rect>`: `width="40"`, `height="40"`, `fill="steelblue"`.
+       - `<text>`: `x="20"`, `y="25"`, `text-anchor="middle"`, `fill="white"`, and text content set to `d.id`.
+     - **Update**: Preserve existing matching elements.
+     - **Exit**: Remove unkeyed elements using `.remove()`.
 
-3. **Merged Selection Attributes & Ordering**:
-   - On the merged selection returned by `.join(...)`:
-     - Call `.order()` so DOM node order matches `nextItems`.
-     - Set `data-id` to `d.id`, `data-value` to `String(d.value)`, and `transform` to `translate(0, ${i * rowHeight})`.
-     - Select child `rect.join-bar` and update:
-       - `x="120"`, `y="6"`, `rx="4"`, `height={String(rowHeight - 12)}`
-       - `width={String(xScale(d.value))}`
-       - `fill`: use `enterColor` when the parent row's `data-join` attribute is `'enter'`, otherwise `updateColor`.
-     - Select child `text.join-label` and update:
-       - `x="8"`, `y={String(rowHeight / 2)}`, `dy="0.35em"`
-       - Text content: `${d.label}: ${d.value}`
-
-4. **Initial Render & Return Controller**:
-   - Call `update(initialItems)` once during initialization.
-   - Return `{ svg, update, getStats, destroy }` where `getStats()` returns a copy of the latest `{ entered, updated, exited, total: nextItems.length }` and `destroy()` removes the SVG and clears `container`.
-
+3. **Position Ordering**:
+   - For all merged groups (entered + updated), set `transform` to `translate(${i * 50}, 10)` where `i` is the item index.
+   - Return the selection.

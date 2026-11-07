@@ -33,7 +33,6 @@ The function renders into the provided DOM `container` element and returns an in
 - **SVG Canvas**:
   - Clears `container.innerHTML` before rendering.
   - Appends an `<svg>` element with `width` and `height` attributes (default `width: 400`, `height: 300`).
-  - Sets accessibility attributes `role="img"` and `aria-label="Donut chart"`.
   - Appends a centered container group `<g class="chart-donut">` translated to `translate(width / 2, height / 2)`.
 
 - **Arc & Pie Layout**:
@@ -45,7 +44,6 @@ The function renders into the provided DOM `container` element and returns an in
 - **Slices**:
   - Appends a `<path class="arc-slice">` for each arc segment.
   - Assigns `d` attribute from the arc generator.
-  - Sets `data-label` to `d.data.label`, `data-value` to `String(d.data.value)`, and `data-index` to the slice's zero-based index.
   - Sets `fill` attribute using `d.data.color` if defined, or cycling through `d3.schemeCategory10[index % 10]`.
   - When a slice is clicked, invokes `options.onSelectSlice(d.data, index)` if provided.
 

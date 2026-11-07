@@ -1411,8 +1411,28 @@
     "difficulty": 1,
     "concept": "d3-data-join"
   },
+  "d3-data-rollup-histogram-bins": {
+    "difficulty": 2,
+    "concept": "d3-aggregation-bins"
+  },
+  "d3-stacked-area-series": {
+    "difficulty": 3,
+    "concept": "d3-stacked-series"
+  },
+  "d3-zoom-pan-rescale": {
+    "difficulty": 3,
+    "concept": "d3-zoom-rescale"
+  },
+  "d3-drag-force-graph": {
+    "difficulty": 3,
+    "concept": "d3-force-drag"
+  },
   "d3-scales-domain-range-basics": {
     "difficulty": 1,
     "concept": "d3-scales-basics"
+  },
+  "d3-transitions-stagger-basics": {
+    "difficulty": 1,
+    "concept": "d3-transitions-basics"
   }
 }

@@ -4,7 +4,7 @@ const SAMPLE_DATA = [
   { label: 'Python', value: 20, color: 'seagreen' },
 ];
 
-// 1. Appends SVG container with correct dimensions, role, and aria-label
+// 1. Appends SVG container with correct dimensions
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -16,12 +16,10 @@ const SAMPLE_DATA = [
     svg !== null &&
     svg.getAttribute('width') === '480' &&
     svg.getAttribute('height') === '320' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Donut chart' &&
     instance.svg === svg;
 
   $test.check(
-    'Appends SVG container with correct dimensions, role, and aria-label',
+    'Appends SVG container with correct dimensions',
     passed,
     { width: svg?.getAttribute('width'), height: svg?.getAttribute('height') }
   );
@@ -63,7 +61,7 @@ const SAMPLE_DATA = [
   container.remove();
 }
 
-// 3. Renders arc slice paths with data attributes and fill colors
+// 3. Renders arc slice paths with valid d curves and fill colors
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -73,18 +71,14 @@ const SAMPLE_DATA = [
 
   const passed =
     slices.length === 3 &&
-    slices[0].getAttribute('data-label') === 'JavaScript' &&
-    slices[0].getAttribute('data-value') === '45' &&
-    slices[0].getAttribute('data-index') === '0' &&
     slices[0].getAttribute('fill') === 'gold' &&
-    slices[1].getAttribute('data-label') === 'TypeScript' &&
     slices[1].getAttribute('fill') === 'steelblue' &&
     Boolean(slices[0].getAttribute('d')?.startsWith('M'));
 
   $test.check(
-    'Renders arc slice paths with data attributes and fill colors',
+    'Renders arc slice paths with valid d curves and fill colors',
     passed,
-    { sliceCount: slices.length, firstLabel: slices[0]?.getAttribute('data-label') }
+    { sliceCount: slices.length, firstFill: slices[0]?.getAttribute('fill') }
   );
 
   instance.destroy();

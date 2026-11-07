@@ -184,9 +184,9 @@ export default {
   ],
   'd3-svg-bar-chart': [
     r(
-      'Appends SVG container with correct dimensions, role, and aria-label',
+      'Appends SVG container with correct dimensions',
       'renderBarChart(container, SAMPLE_DATA, { width: 500, height: 300 })',
-      'SVG rendered with width="500", height="300", role="img", aria-label="Bar chart"',
+      'SVG rendered with width="500", height="300"',
       { callSignature: 'renderBarChart(container, data, { width: 500, height: 300 })' }
     ),
     r(
@@ -196,9 +196,9 @@ export default {
       { callSignature: 'renderBarChart(container, data, options)' }
     ),
     r(
-      'Renders bar elements with data attributes, proportional heights, and color',
+      'Renders bar elements with proportional heights and color',
       'inspect rect.bar elements',
-      'rects render with data-label, data-value, data-index, fill="teal", and proportional heights',
+      'rects render with fill="teal" and proportional heights',
       { callSignature: 'container.querySelectorAll("rect.bar")' }
     ),
     r(
@@ -222,9 +222,9 @@ export default {
   ],
   'd3-svg-line-chart': [
     r(
-      'Mounts SVG container with ARIA attributes and chart-area grouping',
+      'Mounts SVG container with chart-area grouping',
       'renderLineChart(container, SAMPLE_POINTS, { width: 450, height: 280 })',
-      'SVG rendered with width="450", height="280", role="img", aria-label="Line chart"',
+      'SVG rendered with width="450", height="280", and chart-area group',
       { callSignature: 'renderLineChart(container, points, { width: 450, height: 280 })' }
     ),
     r(
@@ -234,9 +234,9 @@ export default {
       { callSignature: 'container.querySelector("path.chart-line")' }
     ),
     r(
-      'Renders data point markers with coordinates and data attributes',
+      'Renders data point markers with scaled coordinates',
       'inspect circle.chart-point elements',
-      'circles render with data-x, data-y, data-index, and inverted Y coordinate scaling',
+      'circles render with inverted Y coordinate scaling',
       { callSignature: 'container.querySelectorAll("circle.chart-point")' }
     ),
     r(
@@ -260,9 +260,9 @@ export default {
   ],
   'd3-svg-donut-chart': [
     r(
-      'Appends SVG container with correct dimensions, role, and aria-label',
+      'Appends SVG container with correct dimensions',
       'renderDonutChart(container, SAMPLE_DATA, { width: 480, height: 320 })',
-      'SVG rendered with width="480", height="320", role="img", aria-label="Donut chart"',
+      'SVG rendered with width="480", height="320"',
       { callSignature: 'renderDonutChart(container, data, { width: 480, height: 320 })' }
     ),
     r(
@@ -272,9 +272,9 @@ export default {
       { callSignature: 'renderDonutChart(container, data, options)' }
     ),
     r(
-      'Renders arc slice paths with data attributes and fill colors',
+      'Renders arc slice paths with valid d curves and fill colors',
       'inspect path.arc-slice elements',
-      'slices render with data-label, data-value, data-index, valid d path, and fill colors',
+      'slices render with valid d path and fill colors',
       { callSignature: 'container.querySelectorAll("path.arc-slice")' }
     ),
     r(
@@ -298,9 +298,9 @@ export default {
   ],
   'd3-svg-scatter-plot': [
     r(
-      'Appends SVG canvas with dimensions, role, and aria-label',
+      'Appends SVG canvas with correct dimensions',
       'renderScatterPlot(container, SAMPLE_POINTS, { width: 500, height: 350 })',
-      'SVG rendered with width="500", height="350", role="img", aria-label="Scatter plot"',
+      'SVG rendered with width="500", height="350"',
       { callSignature: 'renderScatterPlot(container, points, { width: 500, height: 350 })' }
     ),
     r(
@@ -310,9 +310,9 @@ export default {
       { callSignature: 'renderScatterPlot(container, points, options)' }
     ),
     r(
-      'Renders scatter dot circles with coordinate attributes and fill color',
+      'Renders scatter dot circles with scaled coordinates and fill color',
       'inspect circle.scatter-dot elements',
-      'circles render with data-x, data-y, data-index, fill="purple", and inverted Y scaling',
+      'circles render with fill="purple" and inverted Y scaling',
       { callSignature: 'container.querySelectorAll("circle.scatter-dot")' }
     ),
     r(
@@ -412,9 +412,9 @@ export default {
   ],
   'd3-delaunay-voronoi-snapping': [
     r(
-      'Appends SVG canvas with dimensions, role, aria-label, and layer groups',
+      'Appends SVG canvas with dimensions and layer groups',
       'renderVoronoiSnapping(container, SAMPLE_POINTS, { width: 480, height: 320 })',
-      'SVG rendered with width="480", height="320", role="img", aria-label="Voronoi diagram", and layer groups',
+      'SVG rendered with width="480", height="320", and points/cells layer groups',
       { callSignature: 'renderVoronoiSnapping(container, points, { width: 480, height: 320 })' }
     ),
     r(
@@ -431,8 +431,8 @@ export default {
     ),
     r(
       'Clicking a Voronoi cell activates point and invokes onSelectPoint callback',
-      'click path.voronoi-cell[data-index="2"]',
-      'onSelectPoint called with Gamma point and index 2, point 2 marked data-active="true"',
+      'click path.voronoi-cell',
+      'onSelectPoint called with Gamma point and index 2, updating point fill and radius',
       { callSignature: 'cell.dispatchEvent(new MouseEvent("click"))' }
     ),
     r(
@@ -444,9 +444,9 @@ export default {
   ],
   'd3-treemap-squarified-tiling': [
     r(
-      'Appends SVG container with dimensions, role, and aria-label',
+      'Appends SVG container with dimensions',
       'renderTreemap(container, SAMPLE_TREE, { width: 520, height: 340 })',
-      'SVG rendered with width="520", height="340", role="img", aria-label="Treemap chart"',
+      'SVG rendered with width="520" and height="340"',
       { callSignature: 'renderTreemap(container, data, { width: 520, height: 340 })' }
     ),
     r(
@@ -488,9 +488,9 @@ export default {
       { callSignature: 'runHeadlessForceSimulation(nodes, links, { alphaMin: 0.05 })' }
     ),
     r(
-      'Centers network centroid near canvas midpoint and resolves link geometry',
+      'Centers network centroid near canvas midpoint',
       'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { width: 500, height: 360 })',
-      'Centroids settle near (250, 180) and links expose sourceId, targetId, and Euclidean length',
+      'Network centroid (average X, Y) settles near (250, 180) via forceCenter',
       { callSignature: 'runHeadlessForceSimulation(nodes, links, { width: 500, height: 360 })' }
     ),
     r(
@@ -500,21 +500,21 @@ export default {
       { callSignature: 'runHeadlessForceSimulation(overlappingNodes, [], { collisionRadius: 18 })' }
     ),
     r(
-      'Respects maxTicks budget and reports converged: false when stopped early',
-      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { alphaMin: 0.001, maxTicks: 5 })',
-      'Executes exactly 5 ticks, returns converged: false, and computes positive kineticEnergy',
-      { callSignature: 'runHeadlessForceSimulation(nodes, links, { maxTicks: 5 })' }
+      'Resolves link endpoints to node references with position coordinates',
+      'report.links[0].source.id and report.links[0].target.id',
+      'Links resolve string IDs to settled node objects with numerical x and y coordinates',
+      { callSignature: 'report.links[0].source.x' }
     ),
     r(
-      'Looks up settled nodes by ID via getNode and returns null for unknown IDs',
-      'report.getNode("B") and report.getNode("UNKNOWN")',
-      'Returns settled node object for "B" and null for unknown node ID',
-      { callSignature: 'report.getNode("B")' }
+      'Respects maxTicks budget and reports converged: false when stopped early',
+      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { alphaMin: 0.001, maxTicks: 5 })',
+      'Executes exactly 5 ticks and reports converged: false when budget is exhausted',
+      { callSignature: 'runHeadlessForceSimulation(nodes, links, { maxTicks: 5 })' }
     ),
     r(
       'Handles empty node list gracefully without running ticks',
       'runHeadlessForceSimulation([], [])',
-      'Returns 0 ticks, converged: true, kineticEnergy: 0, and empty nodes/links arrays',
+      'Returns 0 ticks, converged: true, and empty nodes and links arrays',
       { callSignature: 'runHeadlessForceSimulation([], [])' }
     ),
   ],
@@ -558,9 +558,9 @@ export default {
   ],
   'd3-geo-projection-path': [
     r(
-      'Mounts SVG container with role, aria-label, and feature/centroid groups',
+      'Mounts SVG container with feature and centroid groups',
       'renderGeoMap(container, SAMPLE_GEOJSON, { width: 500, height: 320 })',
-      'SVG rendered with width="500", height="320", role="img", aria-label="Geographic map", and map groups',
+      'SVG rendered with width="500", height="320", and map groups',
       { callSignature: 'renderGeoMap(container, geojson, { width: 500, height: 320 })' }
     ),
     r(
@@ -577,8 +577,8 @@ export default {
     ),
     r(
       'Clicking a feature highlights it and triggers onSelectFeature with metric',
-      'click path.geo-feature[data-index="1"]',
-      'Marks clicked path data-active="true" with activeColor and invokes onSelectFeature callback',
+      'click path.geo-feature',
+      'Highlights clicked path with activeColor and invokes onSelectFeature callback',
       { callSignature: 'path.dispatchEvent(new MouseEvent("click"))' }
     ),
     r(
@@ -596,9 +596,9 @@ export default {
   ],
   'd3-contour-density-grid': [
     r(
-      'Mounts SVG container with dimensions, role, aria-label, and layer groups',
+      'Mounts SVG container with dimensions and layer groups',
       'renderContourDensity(container, SAMPLE_CLUSTER, { width: 440, height: 280 })',
-      'SVG rendered with width="440", height="280", role="img", aria-label="Contour density chart", and layer groups',
+      'SVG rendered with width="440", height="280", and contour/density layer groups',
       { callSignature: 'renderContourDensity(container, points, { width: 440, height: 280 })' }
     ),
     r(
@@ -634,65 +634,249 @@ export default {
   ],
   'd3-data-join-enter-update-exit': [
     r(
-      'Mounts SVG container and enters all initial rows with data-join="enter"',
-      'renderKeyedDataJoin(container, INITIAL_METRICS, { width: 440, rowHeight: 36 })',
-      'Renders 3 g.join-row elements with data-join="enter" and stats { entered: 3, updated: 0, exited: 0, total: 3 }',
-      { callSignature: 'renderKeyedDataJoin(container, items, options)' }
+      'Enters initial g.box elements with rect and centered text label',
+      'updateKeyedBars(svg, [{ id: "a" }, { id: "b" }, { id: "c" }])',
+      'Appends 3 g.box elements with rect (40x40 steelblue), centered text (d.id), and translates at (0, 10), (50, 10), (100, 10)',
+      { callSignature: 'updateKeyedBars(svg, items)' }
     ),
     r(
-      'Preserves existing DOM node identity across keyed updates and marks data-join="update"',
-      'instance.update([{ id: "mem", ... }, { id: "cpu", ... }, { id: "disk", ... }])',
-      'Surviving keys reuse the exact same DOM elements with data-join="update", new key enters, removed key exits',
-      { callSignature: 'instance.update(nextItems)' }
+      'Preserves DOM node identity across keyed updates',
+      'updateKeyedBars(svg, [{ id: "c" }, { id: "a" }, { id: "d" }])',
+      'Surviving keys "a" and "c" reuse the exact same DOM node references as before',
+      { callSignature: 'updateKeyedBars(svg, nextItems)' }
     ),
     r(
-      'Reorders DOM elements to match new data array order and updates transforms',
-      'instance.update([{ id: "net", value: 90 }, { id: "cpu", value: 25 }])',
-      'DOM node order matches nextItems and translate(0, i * rowHeight) updates accordingly',
-      { callSignature: 'instance.update(reorderedItems)' }
+      'Removes exiting DOM elements when keys are omitted',
+      'updateKeyedBars(svg, [{ id: "c" }, { id: "a" }, { id: "d" }])',
+      'Group with data-id="b" is removed from the SVG DOM',
+      { callSignature: 'updateKeyedBars(svg, nextItems)' }
     ),
     r(
-      'Scales bar widths proportionally and clamps values exceeding maxValue',
-      'renderKeyedDataJoin(container, [{ value: 25 }, { value: 50 }, { value: 200 }], { width: 340, maxValue: 100 })',
-      'Maps [0, 100] to [0, 200]px and clamps 200 at 200px',
-      { callSignature: 'renderKeyedDataJoin(container, items, { width: 340, maxValue: 100 })' }
+      'Updates transforms to match new index order',
+      'updateKeyedBars(svg, [{ id: "c" }, { id: "a" }, { id: "d" }])',
+      'Group "c" moves to translate(0, 10), "a" to translate(50, 10), and new group "d" to translate(100, 10)',
+      { callSignature: 'updateKeyedBars(svg, reorderedItems)' }
     ),
     r(
-      'Handles empty array transitions and cleans up DOM on destroy',
-      'instance.update([]) and instance.destroy()',
-      'Exits all remaining rows and clears container innerHTML on destroy',
-      { callSignature: 'instance.update([])' }
+      'Handles empty or undefined data by removing all elements',
+      'updateKeyedBars(svg, undefined) and updateKeyedBars(svg, [])',
+      'All g.box elements are removed from the SVG and no undefined boxes are drawn',
+      { callSignature: 'updateKeyedBars(svg, undefined)' }
     ),
   ],
   'd3-scales-domain-range-basics': [
     r(
-      'Mounts SVG container, baseline, and scaled rect.scale-bar elements',
-      'renderScaledCoordinateChart(container, SAMPLE_METRICS, { width: 440, height: 240, padding: 30 })',
-      'SVG rendered with line.zero-baseline at y=210, 4 rect.scale-bar elements, and extent [25, 100]',
-      { callSignature: 'renderScaledCoordinateChart(container, data, options)' }
+      'Constructs band xScale across [0, width] with correct domain, range, and bandwidth',
+      'createCoordinateScales(config)',
+      'xScale("Mon") ≈ 0, xScale.bandwidth() > 0, and unmapped key returns undefined',
+      { callSignature: 'createCoordinateScales(config)' }
     ),
     r(
-      'Maps data values to inverted SVG Y coordinates and proportional heights',
-      'instance.getBarGeometry("Q1", 0), getBarGeometry("Q2", 50), getBarGeometry("Q3", 100)',
-      'Maps 0 to baseline y=200 (height 0), 50 to y=110 (height 90), and 100 to top y=20 (height 180)',
-      { callSignature: 'instance.getBarGeometry(category, value)' }
+      'Constructs linear yScale with inverted range [height, 0] and domain clamping',
+      'scales.yScale(0), scales.yScale(50), scales.yScale(100), scales.yScale(150)',
+      'Maps 0 to height (200), 100 to 0, and clamps 150 to 0',
+      { callSignature: 'scales.yScale(value)' }
     ),
     r(
-      'Computes categorical band X positions, bandwidth, and centerX',
-      'instance.getBarGeometry("Q1", 25) and instance.getBarGeometry("Q4", 75)',
-      'Computes discrete band x, bandwidth, and centerX = x + bandwidth / 2',
-      { callSignature: 'instance.getBarGeometry(category, value)' }
+      'Constructs ordinal colorScale mapping categories to d3.schemeTableau10',
+      'scales.colorScale("Mon"), scales.colorScale("Tue")',
+      'Maps discrete categories to distinct d3.schemeTableau10 colors',
+      { callSignature: 'scales.colorScale(category)' }
     ),
     r(
-      'Supports continuous Y coordinate inversion via invertY and clamping',
-      'instance.invertY(20), instance.invertY(110), instance.invertY(200)',
-      'Inverts pixel Y coordinates back to domain values (100, 50, 0) and respects clamp option',
-      { callSignature: 'instance.invertY(pixelY)' }
+      'Maps valid and invalid category points to coordinate geometry and color',
+      'scales.mapPoint("Wed", 50) and scales.mapPoint("Sun", 50)',
+      'Returns { x, y: 100, barWidth, color } for mapped category and null for unknown',
+      { callSignature: 'scales.mapPoint(category, value)' }
     ),
     r(
-      'Handles empty dataset gracefully and cleans up DOM on destroy',
-      'renderScaledCoordinateChart(container, []) and instance.destroy()',
-      'Returns extent [0, 0], 0 bars, and clears container innerHTML on destroy',
+      'Inverts visual Y pixel coordinates back to original domain values',
+      'scales.invertY(200), scales.invertY(100), scales.invertY(0)',
+      'Inverts pixel Y coordinates back to domain values: 200 -> 0, 100 -> 50, 0 -> 100',
+      { callSignature: 'scales.invertY(pixelY)' }
+    ),
+  ],
+  'd3-transitions-stagger-basics': [
+    r(
+      'Configures transition with specified duration and default ease',
+      'transitionBars(selection, { duration: 450 })',
+      'Transition duration is 450ms and default ease function is configured',
+      { callSignature: 'transitionBars(selection, { duration: 450 })' }
+    ),
+    r(
+      'Applies custom easing function',
+      'transitionBars(selection, { ease: d3.easeElasticOut })',
+      'Transition uses custom ease curve (e.g. d3.easeElasticOut)',
+      { callSignature: 'transitionBars(selection, { ease: d3.easeElasticOut })' }
+    ),
+    r(
+      'Staggers delay across elements by index',
+      'transitionBars(selection, { staggerMs: 60 })',
+      'Elements have delays staggered at 0ms, 60ms, 120ms',
+      { callSignature: 'transitionBars(selection, { staggerMs: 60 })' }
+    ),
+    r(
+      'Interpolates width and fill attributes',
+      'transitionBars(selection, { targetWidths: [80, 160, 240], fillColor: "seagreen" })',
+      'Sets tweens for attr.width and attr.fill',
+      { callSignature: 'transitionBars(selection, config)' }
+    ),
+    r(
+      'Returns the created D3 transition instance',
+      'transitionBars(selection)',
+      'Returns d3.Transition with duration, ease, delay, and attr methods',
+      { callSignature: 'transitionBars(selection)' }
+    ),
+  ],
+  'd3-data-rollup-histogram-bins': [
+    r(
+      'Groups records by department into a Map',
+      'summary.groupedByDept.get("Eng")',
+      'Returns Map with 3 Eng records and 2 Sales records',
+      { callSignature: 'summarizeDataset(records).groupedByDept' }
+    ),
+    r(
+      'Computes single-key rollups for total salary by region',
+      'summary.salaryByRegion.get("North")',
+      'Computes 340000 for North and 250000 for South using d3.rollup and d3.sum',
+      { callSignature: 'summarizeDataset(records).salaryByRegion' }
+    ),
+    r(
+      'Computes nested multi-key rollups for department by region averages',
+      'summary.avgSalaryByDeptRegion.get("Eng").get("North")',
+      'Computes average salary of 125000 for Eng/North and 140000 for Eng/South',
+      { callSignature: 'summarizeDataset(records).avgSalaryByDeptRegion' }
+    ),
+    r(
+      'Constructs frequency histogram bins across salary distribution',
+      'summary.salaryBins',
+      'Returns array of bins with x0, x1 bounds summing to 5 total records',
+      { callSignature: 'summarizeDataset(records, { thresholds: 4 }).salaryBins' }
+    ),
+    r(
+      'Formats total and average salary metrics as localized currency strings',
+      'summary.totalSalariesFormatted and summary.avgSalaryFormatted',
+      'Formats total as "$590,000.00" and average as "$118,000.00" using d3.format',
+      { callSignature: 'summarizeDataset(records).totalSalariesFormatted' }
+    ),
+    r(
+      'Handles empty dataset gracefully with empty Maps, bins, and zeroed currency',
+      'summarizeDataset([])',
+      'Returns empty Maps, empty bins array, and "$0.00" formatted strings',
+      { callSignature: 'summarizeDataset([])' }
+    ),
+  ],
+  'd3-stacked-area-series': [
+    r(
+      'Mounts SVG and plot area with specified dimensions',
+      'renderStackedAreaChart(container, SAMPLE_MONTHS, { width: 500, height: 300 })',
+      'Appends svg (500x300) and plot-area translated by margin (45, 15)',
+      { callSignature: 'renderStackedAreaChart(container, data, options)' }
+    ),
+    r(
+      'Computes stacked baselines and sets dynamic upper Y domain',
+      'instance.getYDomain()',
+      'Calculates cumulative max across stacked series and sets upper domain >= 410',
+      { callSignature: 'instance.getYDomain()' }
+    ),
+    r(
+      'Renders stacked area path layers with fills and opacity',
+      'container.querySelectorAll("path.stacked-layer")',
+      'Renders path for each series layer with d attribute, stroke, and fill',
+      { callSignature: 'container.querySelectorAll("path.stacked-layer")' }
+    ),
+    r(
+      'Renders X and Y axis groups with formatted tick labels',
+      'container.querySelectorAll("g.x-axis .tick, g.y-axis .tick")',
+      'Mounts x-axis translated to bottom and left y-axis with tick labels',
+      { callSignature: 'renderStackedAreaChart(container, data)' }
+    ),
+    r(
+      'Invokes onSelectLayer callback with key and index when layer is clicked',
+      'path.dispatchEvent(new MouseEvent("click"))',
+      'Invokes onSelectLayer(key, index) with clicked series identifier',
+      { callSignature: 'options.onSelectLayer(key, index)' }
+    ),
+    r(
+      'Cleans up SVG and DOM elements on destroy()',
+      'instance.destroy()',
+      'Removes SVG element and empties container',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-zoom-pan-rescale': [
+    r(
+      'Mounts SVG with clip-path, plot-area, and data circles',
+      'renderZoomChart(container, SAMPLE_ZOOM_POINTS, { width: 480, height: 260, color: "seagreen" })',
+      'Mounts svg, clipPath rect (420x220), plot-area, and circle glyphs',
+      { callSignature: 'renderZoomChart(container, data, options)' }
+    ),
+    r(
+      'Configures linear scales and renders initial X and Y axis groups',
+      'instance.getTransform()',
+      'Initializes x and y axis groups with identity transform { k: 1, x: 0, y: 0 }',
+      { callSignature: 'instance.getTransform()' }
+    ),
+    r(
+      'Rescales X-axis and updates circle cx coordinates on zoom scaling',
+      'instance.zoomBy(2)',
+      'Multiplies zoom scale to k=2 and rescales circle horizontal coordinates',
+      { callSignature: 'instance.zoomBy(factor)' }
+    ),
+    r(
+      'Invokes onZoomChange callback with scale k and translation offsets',
+      'options.onZoomChange(state)',
+      'Calls onZoomChange with updated zoom state { k: 1.5, x, y }',
+      { callSignature: 'options.onZoomChange(state)' }
+    ),
+    r(
+      'Resets zoom transform back to identity via resetZoom()',
+      'instance.resetZoom()',
+      'Restores transform state to { k: 1, x: 0, y: 0 }',
+      { callSignature: 'instance.resetZoom()' }
+    ),
+    r(
+      'Cleans up SVG and DOM elements on destroy()',
+      'instance.destroy()',
+      'Removes SVG element and clears container DOM',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
+  'd3-drag-force-graph': [
+    r(
+      'Mounts SVG with links-layer, nodes-layer, and initial element selections',
+      'renderForceDirectedGraph(container, SAMPLE_GRAPH, { width: 480, height: 300, nodeRadius: 10 })',
+      'Mounts svg, links-layer, nodes-layer, line elements, and node circles',
+      { callSignature: 'renderForceDirectedGraph(container, data, options)' }
+    ),
+    r(
+      'Initializes force simulation with link, charge, and center forces',
+      'instance.simulation.force("link")',
+      'Initializes simulation with link, charge, and center forces',
+      { callSignature: 'instance.simulation' }
+    ),
+    r(
+      'Updates link and node SVG coordinates on simulation tick',
+      'instance.simulation.tick(10)',
+      'Updates cx, cy on circles and x1, y1, x2, y2 on link lines',
+      { callSignature: 'instance.simulation.tick()' }
+    ),
+    r(
+      'Invokes onNodeClick callback when node circle is clicked',
+      'circle.dispatchEvent(new MouseEvent("click"))',
+      'Calls onNodeClick callback with clicked node datum',
+      { callSignature: 'options.onNodeClick(node)' }
+    ),
+    r(
+      'Pins and unpins node coordinates via pinNode() and unpinNode()',
+      'instance.pinNode("A", 150, 200)',
+      'Pins node coordinates with fx, fy and clears pin with null',
+      { callSignature: 'instance.pinNode(id, x, y)' }
+    ),
+    r(
+      'Stops simulation and cleans up DOM elements on destroy()',
+      'instance.destroy()',
+      'Stops simulation, removes SVG, and empties container',
       { callSignature: 'instance.destroy()' }
     ),
   ],

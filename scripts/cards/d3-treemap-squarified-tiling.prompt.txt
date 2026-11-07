@@ -43,7 +43,7 @@ Implement a hierarchical area visualization that converts nested tree data into 
 
 - **Canvas & Initialization**:
   - Empties `container.innerHTML` before rendering.
-  - Appends an `<svg>` element with `width` (default `480`), `height` (default `320`), `role="img"`, and `aria-label="Treemap chart"`.
+  - Appends an `<svg>` element with `width` (default `480`) and `height` (default `320`).
 
 - **Hierarchy & Squarified Layout**:
   - Builds a root node with `d3.hierarchy(data)`:
@@ -59,8 +59,8 @@ Implement a hierarchical area visualization that converts nested tree data into 
 
 - **Treemap Cells (`g.treemap-cell`)**:
   - For each positive-valued leaf at index `i`:
-    - Appends `<g class="treemap-cell">` translated to `translate(x0, y0)` with `data-name="d.data.name"`, `data-value="d.value"`, and `data-index="i"`.
-    - Appends `<rect class="treemap-rect">` with `width = Math.max(0, x1 - x0)`, `height = Math.max(0, y1 - y0)`, `fill = d3.schemeTableau10[i % 10]`, `data-name="d.data.name"`, and `data-value="d.value"`.
+    - Appends `<g class="treemap-cell">` translated to `translate(x0, y0)`.
+    - Appends `<rect class="treemap-rect">` with `width = Math.max(0, x1 - x0)`, `height = Math.max(0, y1 - y0)`, and `fill = d3.schemeTableau10[i % 10]`.
     - Appends `<text class="treemap-label">` with `x="6"`, `y="16"`, and text content set to `d.data.name`.
     - Clicking `<g class="treemap-cell">` invokes `options.onSelectCell(cellMetric, i)` if provided.
 
@@ -68,4 +68,3 @@ Implement a hierarchical area visualization that converts nested tree data into 
   - `instance.getLeaves()` returns the array of `TreemapCellMetric` objects (`{ name, value, x0, y0, x1, y1, width, height, depth }`) for all rendered leaf cells.
   - If `data` is null/empty or total hierarchy value is `0`, renders the `<svg>` with no `.treemap-cell` groups and `getLeaves()` returns `[]`.
   - `instance.destroy()` removes the SVG and empties `container.innerHTML`.
-

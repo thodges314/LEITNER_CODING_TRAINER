@@ -38,7 +38,7 @@ const SAMPLE_GEOJSON = {
   ],
 };
 
-// 1. Mounts SVG container with role, aria-label, and feature/centroid groups
+// 1. Mounts SVG container with feature and centroid groups
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -56,14 +56,12 @@ const SAMPLE_GEOJSON = {
     svg !== null &&
     svg.getAttribute('width') === '500' &&
     svg.getAttribute('height') === '320' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Geographic map' &&
     featuresGroup !== null &&
     centroidsGroup !== null &&
     instance.svg === svg;
 
   $test.check(
-    'Mounts SVG container with role, aria-label, and feature/centroid groups',
+    'Mounts SVG container with feature and centroid groups',
     passed,
     { width: svg?.getAttribute('width'), height: svg?.getAttribute('height') }
   );
@@ -177,9 +175,7 @@ const SAMPLE_GEOJSON = {
     selectedMetric !== null &&
     selectedMetric.name === 'East Ridge' &&
     selectedIdx === 1 &&
-    paths[1].getAttribute('data-active') === 'true' &&
     paths[1].getAttribute('fill') === 'teal' &&
-    paths[0].getAttribute('data-active') === 'false' &&
     paths[0].getAttribute('fill') === 'slategray';
 
   $test.check(
