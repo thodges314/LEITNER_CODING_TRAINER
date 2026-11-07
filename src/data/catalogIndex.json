@@ -5012,5 +5012,21 @@
       "charts"
     ],
     "summary": "interface ZoomPoint {"
+  },
+  {
+    "id": "d3-drag-force-graph",
+    "title": "D3 Drag & Force Simulation (Graph Layout & Pinning)",
+    "track": "d3",
+    "concept": "d3-force-drag",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "force",
+      "drag",
+      "physics",
+      "graph",
+      "charts"
+    ],
+    "summary": "interface ForceGraphNode {"
   }
 ]

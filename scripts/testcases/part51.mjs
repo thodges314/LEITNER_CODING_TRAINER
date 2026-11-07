@@ -842,6 +842,44 @@ export default {
       { callSignature: 'instance.destroy()' }
     ),
   ],
+  'd3-drag-force-graph': [
+    r(
+      'Mounts SVG with links-layer, nodes-layer, and initial element selections',
+      'renderForceDirectedGraph(container, SAMPLE_GRAPH, { width: 480, height: 300, nodeRadius: 10 })',
+      'Mounts svg, links-layer, nodes-layer, line elements, and node circles',
+      { callSignature: 'renderForceDirectedGraph(container, data, options)' }
+    ),
+    r(
+      'Initializes force simulation with link, charge, and center forces',
+      'instance.simulation.force("link")',
+      'Initializes simulation with link, charge, and center forces',
+      { callSignature: 'instance.simulation' }
+    ),
+    r(
+      'Updates link and node SVG coordinates on simulation tick',
+      'instance.simulation.tick(10)',
+      'Updates cx, cy on circles and x1, y1, x2, y2 on link lines',
+      { callSignature: 'instance.simulation.tick()' }
+    ),
+    r(
+      'Invokes onNodeClick callback when node circle is clicked',
+      'circle.dispatchEvent(new MouseEvent("click"))',
+      'Calls onNodeClick callback with clicked node datum',
+      { callSignature: 'options.onNodeClick(node)' }
+    ),
+    r(
+      'Pins and unpins node coordinates via pinNode() and unpinNode()',
+      'instance.pinNode("A", 150, 200)',
+      'Pins node coordinates with fx, fy and clears pin with null',
+      { callSignature: 'instance.pinNode(id, x, y)' }
+    ),
+    r(
+      'Stops simulation and cleans up DOM elements on destroy()',
+      'instance.destroy()',
+      'Stops simulation, removes SVG, and empties container',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 
 

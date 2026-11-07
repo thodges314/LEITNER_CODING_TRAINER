@@ -1423,6 +1423,10 @@
     "difficulty": 3,
     "concept": "d3-zoom-rescale"
   },
+  "d3-drag-force-graph": {
+    "difficulty": 3,
+    "concept": "d3-force-drag"
+  },
   "d3-scales-domain-range-basics": {
     "difficulty": 1,
     "concept": "d3-scales-basics"

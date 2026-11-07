@@ -1339,6 +1339,35 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Maximum allowed zoom scale factor',
     },
   ],
+  'd3-drag-force-graph': [
+    {
+      name: 'nodeRadius',
+      type: 'number',
+      defaultValue: 8,
+      min: 4,
+      max: 20,
+      step: 1,
+      description: 'Visual circle radius of graph nodes',
+    },
+    {
+      name: 'chargeStrength',
+      type: 'number',
+      defaultValue: -120,
+      min: -300,
+      max: -20,
+      step: 10,
+      description: 'Many-body electrostatic repulsion strength',
+    },
+    {
+      name: 'linkDistance',
+      type: 'number',
+      defaultValue: 50,
+      min: 20,
+      max: 120,
+      step: 5,
+      description: 'Target geometric spring resting distance',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {
