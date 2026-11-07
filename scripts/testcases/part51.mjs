@@ -488,9 +488,9 @@ export default {
       { callSignature: 'runHeadlessForceSimulation(nodes, links, { alphaMin: 0.05 })' }
     ),
     r(
-      'Centers network centroid near canvas midpoint and resolves link geometry',
+      'Centers network centroid near canvas midpoint',
       'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { width: 500, height: 360 })',
-      'Centroids settle near (250, 180) and links expose sourceId, targetId, and Euclidean length',
+      'Network centroid (average X, Y) settles near (250, 180) via forceCenter',
       { callSignature: 'runHeadlessForceSimulation(nodes, links, { width: 500, height: 360 })' }
     ),
     r(
@@ -500,21 +500,21 @@ export default {
       { callSignature: 'runHeadlessForceSimulation(overlappingNodes, [], { collisionRadius: 18 })' }
     ),
     r(
-      'Respects maxTicks budget and reports converged: false when stopped early',
-      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { alphaMin: 0.001, maxTicks: 5 })',
-      'Executes exactly 5 ticks, returns converged: false, and computes positive kineticEnergy',
-      { callSignature: 'runHeadlessForceSimulation(nodes, links, { maxTicks: 5 })' }
+      'Resolves link endpoints to node references with position coordinates',
+      'report.links[0].source.id and report.links[0].target.id',
+      'Links resolve string IDs to settled node objects with numerical x and y coordinates',
+      { callSignature: 'report.links[0].source.x' }
     ),
     r(
-      'Looks up settled nodes by ID via getNode and returns null for unknown IDs',
-      'report.getNode("B") and report.getNode("UNKNOWN")',
-      'Returns settled node object for "B" and null for unknown node ID',
-      { callSignature: 'report.getNode("B")' }
+      'Respects maxTicks budget and reports converged: false when stopped early',
+      'runHeadlessForceSimulation(SAMPLE_NODES, SAMPLE_LINKS, { alphaMin: 0.001, maxTicks: 5 })',
+      'Executes exactly 5 ticks and reports converged: false when budget is exhausted',
+      { callSignature: 'runHeadlessForceSimulation(nodes, links, { maxTicks: 5 })' }
     ),
     r(
       'Handles empty node list gracefully without running ticks',
       'runHeadlessForceSimulation([], [])',
-      'Returns 0 ticks, converged: true, kineticEnergy: 0, and empty nodes/links arrays',
+      'Returns 0 ticks, converged: true, and empty nodes and links arrays',
       { callSignature: 'runHeadlessForceSimulation([], [])' }
     ),
   ],

@@ -66,12 +66,11 @@ const DEFAULT_SIM_LINKS = [
     statsBar.style.flexWrap = 'wrap';
     statsBar.style.gap = '14px';
     statsBar.style.fontSize = '12px';
-    statsBar.style.color = '#94a3b8';
+    statsBar.style.color = 'slategray';
     statsBar.innerHTML = `
-      <span>Ticks: <strong style="color: #38bdf8;">${report.ticks}</strong></span>
-      <span>Alpha: <strong style="color: #f59e0b;">${report.finalAlpha.toFixed(4)}</strong></span>
-      <span>Energy: <strong style="color: #a78bfa;">${report.kineticEnergy.toFixed(2)}</strong></span>
-      <span>Converged: <strong style="color: ${report.converged ? '#34d399' : '#f87171'};">${report.converged ? 'Yes' : 'No'}</strong></span>
+      <span>Ticks: <strong style="color: steelblue;">${report.ticks}</strong></span>
+      <span>Alpha: <strong style="color: orange;">${report.finalAlpha.toFixed(4)}</strong></span>
+      <span>Converged: <strong style="color: ${report.converged ? 'seagreen' : 'crimson'};">${report.converged ? 'Yes' : 'No'}</strong></span>
     `;
     container.appendChild(statsBar);
 
@@ -80,8 +79,6 @@ const DEFAULT_SIM_LINKS = [
       .append('svg')
       .attr('width', width)
       .attr('height', height)
-      .attr('role', 'img')
-      .attr('aria-label', 'Headless force simulation preview')
       .style('background', 'rgba(15, 23, 42, 0.75)')
       .style('border-radius', '8px')
       .style('border', '1px solid rgba(255, 255, 255, 0.1)');
@@ -92,10 +89,10 @@ const DEFAULT_SIM_LINKS = [
       .selectAll('line')
       .data(report.links)
       .join('line')
-      .attr('x1', (d) => d.x1)
-      .attr('y1', (d) => d.y1)
-      .attr('x2', (d) => d.x2)
-      .attr('y2', (d) => d.y2)
+      .attr('x1', (d) => d.source.x)
+      .attr('y1', (d) => d.source.y)
+      .attr('x2', (d) => d.target.x)
+      .attr('y2', (d) => d.target.y)
       .attr('stroke', 'rgba(148, 163, 184, 0.45)')
       .attr('stroke-width', 1.5);
 
@@ -117,15 +114,15 @@ const DEFAULT_SIM_LINKS = [
     nodeGroups
       .append('circle')
       .attr('r', (d) => d.radius)
-      .attr('fill', (d, i) => (i === 0 ? '#f97316' : '#3b82f6'))
-      .attr('stroke', '#0f172a')
-      .attr('stroke-width', 2);
+      .attr('fill', (d, i) => (i === 0 ? 'orange' : 'steelblue'))
+      .attr('stroke', 'black')
+      .attr('stroke-width', 1.5);
 
     nodeGroups
       .append('text')
       .attr('dy', (d) => d.radius + 12)
       .attr('text-anchor', 'middle')
-      .attr('fill', '#e2e8f0')
+      .attr('fill', 'white')
       .attr('font-size', '11px')
       .text((d) => d.id);
   }
@@ -139,4 +136,3 @@ const DEFAULT_SIM_LINKS = [
     });
   }
 })();
-
