@@ -5507,5 +5507,37 @@
       "app-router"
     ],
     "summary": "Implement a Next.js App Router parallel route slot and intercepting route evaluator"
+  },
+  {
+    "id": "sql-sequential-gaps",
+    "title": "Sequential ID Gaps in Logs (LEAD)",
+    "track": "sql-postgres",
+    "concept": "sql-gaps-and-islands",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "gaps-and-islands",
+      "lead-lag",
+      "cte"
+    ],
+    "summary": "Write a PostgreSQL query to detect missing sequential identifiers (gaps) in an audit tracking log."
+  },
+  {
+    "id": "sql-worker-queue-skip-locked",
+    "title": "Concurrent Task Queue Claim (FOR UPDATE SKIP LOCKED)",
+    "track": "sql-postgres",
+    "concept": "sql-concurrency-transactions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "concurrency",
+      "transactions",
+      "row-locking",
+      "queues"
+    ],
+    "summary": "Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue."
   }
 ]

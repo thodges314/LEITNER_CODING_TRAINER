@@ -1,0 +1,13 @@
+{
+  "track": "sql-postgres",
+  "title": "Concurrent Task Queue Claim (FOR UPDATE SKIP LOCKED)",
+  "tags": [
+    "sql",
+    "postgres",
+    "concurrency",
+    "transactions",
+    "row-locking",
+    "queues"
+  ],
+  "inputLanguage": "sql"
+}

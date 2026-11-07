@@ -1,0 +1,13 @@
+{
+  "track": "sql-postgres",
+  "title": "Sequential ID Gaps in Logs (LEAD)",
+  "tags": [
+    "sql",
+    "postgres",
+    "window-functions",
+    "gaps-and-islands",
+    "lead-lag",
+    "cte"
+  ],
+  "inputLanguage": "sql"
+}

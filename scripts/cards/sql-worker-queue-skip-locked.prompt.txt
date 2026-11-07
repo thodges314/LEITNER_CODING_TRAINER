@@ -1,0 +1,42 @@
+Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue.
+
+In high-throughput microservices and asynchronous backend architectures, PostgreSQL tables are commonly used as persistent job queues. When multiple worker processes pull jobs simultaneously using a standard `SELECT ... FOR UPDATE`, all other workers block and serialize waiting for the first transaction's lock to release. To allow concurrent workers to immediately claim distinct pending tasks without blocking each other, PostgreSQL provides the `FOR UPDATE SKIP LOCKED` locking clause.
+
+### Schema: `job_queue`
+- `id` (INT, PRIMARY KEY): Unique identifier for the queue task.
+- `task_name` (TEXT): Name of the background job type.
+- `status` (TEXT): Current queue status (`'pending'`, `'processing'`, `'completed'`, `'failed'`).
+- `priority` (INT): Integer priority level (higher number indicates higher priority).
+- `attempts` (INT): Number of previous processing attempts.
+- `created_at` (TIMESTAMP): Creation timestamp of the task.
+
+### Query Contract
+- Target only pending tasks: Filter rows strictly by `status = 'pending'`.
+- Ordering:
+  - Primary: Highest priority first (`priority DESC`).
+  - Secondary: Oldest created task first (`created_at ASC`).
+  - Tie-breaker: Lowest ID first (`id ASC`).
+- Selection count: Claim exactly 1 job (`LIMIT 1`).
+- Output columns:
+  - `id` (INT)
+  - `task_name` (TEXT)
+  - `priority` (INT)
+- Concurrency & Row Locking:
+  - Append the `FOR UPDATE SKIP LOCKED` clause to lock the selected record and skip any rows currently locked by other transactions, preventing worker lock contention.
+- If no pending tasks exist, return 0 rows (`[]`).
+
+### Example
+Given `job_queue` records:
+- `{ id: 1, task_name: "send_email", status: "pending", priority: 10, attempts: 0, created_at: "2024-01-01 10:00:00" }`
+- `{ id: 2, task_name: "generate_pdf", status: "pending", priority: 20, attempts: 0, created_at: "2024-01-01 10:05:00" }`
+- `{ id: 3, task_name: "process_video", status: "processing", priority: 30, attempts: 1, created_at: "2024-01-01 10:02:00" }`
+- `{ id: 4, task_name: "sync_contacts", status: "pending", priority: 20, attempts: 0, created_at: "2024-01-01 10:01:00" }`
+
+The query returns:
+- `[{ "id": 4, "task_name": "sync_contacts", "priority": 20 }]`
+
+Explanation:
+- Task 3 has priority 30 but is excluded because its status is `'processing'`.
+- Tasks 2 and 4 both have priority 20 (higher than task 1's 10).
+- Task 4 was created earlier (`10:01:00` vs `10:05:00`), so it wins the priority tie-break.
+- The `FOR UPDATE SKIP LOCKED` clause locks task 4 for the claiming worker.

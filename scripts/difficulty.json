@@ -1315,6 +1315,14 @@
     "difficulty": 4,
     "concept": "sql-gaps-and-islands"
   },
+  "sql-sequential-gaps": {
+    "difficulty": 3,
+    "concept": "sql-gaps-and-islands"
+  },
+  "sql-worker-queue-skip-locked": {
+    "difficulty": 3,
+    "concept": "sql-concurrency-transactions"
+  },
   "gql-query-nested-fields": {
     "difficulty": 1,
     "concept": "gql-queries"

@@ -22869,5 +22869,97 @@
       }
     ],
     "testHarness": "await (async () => {\n  const fn = typeof evaluateInterceptingRoute === 'function'\n    ? evaluateInterceptingRoute\n    : (typeof solution === 'function' ? solution : solution?.evaluateInterceptingRoute);\n\n  const def1 = {\n    routePattern: '/feed/@modal/(..)photo/[id]',\n    slotName: 'modal',\n    targetPattern: '/photo/[id]',\n  };\n\n  // Case 1: Soft navigation intercepts photo route inside @modal slot\n  const r1 = fn(def1, {\n    currentPath: '/feed',\n    targetUrl: '/photo/42',\n    isSoftNavigation: true,\n  });\n  $test.check(\n    'Soft navigation intercepts target route into modal slot with params',\n    r1.isIntercepted === true &&\n      r1.activeSlot === 'modal' &&\n      r1.renderedPattern === '/feed/@modal/(..)photo/[id]' &&\n      r1.params.id === '42',\n    { isIntercepted: r1.isIntercepted, params: r1.params }\n  );\n\n  // Case 2: Hard navigation (page refresh or direct URL) renders standalone target\n  const r2 = fn(def1, {\n    currentPath: '/feed',\n    targetUrl: '/photo/42',\n    isSoftNavigation: false,\n  });\n  $test.check(\n    'Hard navigation does not intercept and renders standalone target pattern',\n    r2.isIntercepted === false &&\n      r2.activeSlot === undefined &&\n      r2.renderedPattern === '/photo/[id]' &&\n      r2.params.id === '42',\n    { isIntercepted: r2.isIntercepted, renderedPattern: r2.renderedPattern }\n  );\n\n  // Case 3: Root interception (...) from deeply nested path\n  const defRoot = {\n    routePattern: '/dashboard/analytics/@drawer/(...)photo/[id]',\n    slotName: 'drawer',\n    targetPattern: '/photo/[id]',\n  };\n  const r3 = fn(defRoot, {\n    currentPath: '/dashboard/analytics',\n    targetUrl: '/photo/99',\n    isSoftNavigation: true,\n  });\n  $test.check(\n    'Root interceptor (...) triggers modal slot from nested path',\n    r3.isIntercepted === true &&\n      r3.activeSlot === 'drawer' &&\n      r3.params.id === '99',\n    { isIntercepted: r3.isIntercepted, activeSlot: r3.activeSlot }\n  );\n\n  // Case 4: Non-matching target URL returns not intercepted with empty params\n  const r4 = fn(def1, {\n    currentPath: '/feed',\n    targetUrl: '/articles/tech-trends',\n    isSoftNavigation: true,\n  });\n  $test.check(\n    'Target URL not matching route pattern returns false with empty params',\n    r4.isIntercepted === false &&\n      Object.keys(r4.params).length === 0,\n    { isIntercepted: r4.isIntercepted, params: r4.params }\n  );\n})();"
+  },
+  {
+    "id": "sql-sequential-gaps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Write a PostgreSQL query to detect missing sequential identifiers (gaps) in an audit tracking log.\n\nIn distributed log ingestion, financial auditing, and sequence processing pipelines, identifying gaps in primary keys or sequence numbers is critical for flagging dropped records, failed transactions, or sync errors.\n\n### Schema: `tracking_logs`\n- `log_id` (INT, PRIMARY KEY): Sequential tracking sequence identifier.\n- `event_name` (TEXT): Name of the recorded system event.\n- `logged_at` (TIMESTAMP): Timestamp of the event log.\n\n### Query Contract\n- Output columns:\n  - `gap_start` (INT): First missing sequence ID in the gap range.\n  - `gap_end` (INT): Last missing sequence ID in the gap range.\n  - `gap_size` (INT): Number of missing sequence IDs in the gap (`gap_end - gap_start + 1`).\n- Sort order: Sort results by `gap_start` ascending (`ORDER BY gap_start ASC`).\n- Logic:\n  - Use `LEAD(log_id) OVER (ORDER BY log_id ASC)` to inspect the next existing ID in the sequence.\n  - A gap occurs whenever `next_id - log_id > 1`.\n  - The gap starts at `log_id + 1` and ends at `next_id - 1`.\n  - Only detect gaps between existing sequence records (do not extrapolate before the table's minimum ID or after its maximum ID).\n  - If all IDs are contiguous (no gaps), return 0 rows (`[]`).\n  - If `tracking_logs` contains fewer than 2 rows, return 0 rows (`[]`).\n\n### Example\nGiven `tracking_logs` records:\n- `{ log_id: 1, event_name: \"auth\", logged_at: \"2024-01-01 10:00:00\" }`\n- `{ log_id: 2, event_name: \"login\", logged_at: \"2024-01-01 10:01:00\" }`\n- `{ log_id: 5, event_name: \"view\", logged_at: \"2024-01-01 10:04:00\" }`\n- `{ log_id: 6, event_name: \"click\", logged_at: \"2024-01-01 10:05:00\" }`\n- `{ log_id: 7, event_name: \"cart\", logged_at: \"2024-01-01 10:06:00\" }`\n- `{ log_id: 10, event_name: \"checkout\", logged_at: \"2024-01-01 10:09:00\" }`\n- `{ log_id: 11, event_name: \"logout\", logged_at: \"2024-01-01 10:10:00\" }`\n\nThe query returns:\n- `[{ \"gap_start\": 3, \"gap_end\": 4, \"gap_size\": 2 }, { \"gap_start\": 8, \"gap_end\": 9, \"gap_size\": 2 }]`\n\nExplanation:\n- Between ID 2 and ID 5, IDs 3 and 4 are missing (start: 3, end: 4, size: 2).\n- Between ID 7 and ID 10, IDs 8 and 9 are missing (start: 8, end: 9, size: 2).",
+    "track": "sql-postgres",
+    "title": "Sequential ID Gaps in Logs (LEAD)",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "gaps-and-islands",
+      "lead-lag",
+      "cte"
+    ],
+    "inputLanguage": "sql",
+    "difficulty": 3,
+    "concept": "sql-gaps-and-islands",
+    "referenceSolution": "WITH ranked_logs AS (\n  SELECT\n    log_id,\n    LEAD(log_id) OVER (ORDER BY log_id ASC) AS next_id\n  FROM tracking_logs\n)\nSELECT\n  log_id + 1 AS gap_start,\n  next_id - 1 AS gap_end,\n  (next_id - log_id - 1) AS gap_size\nFROM ranked_logs\nWHERE next_id - log_id > 1\nORDER BY gap_start ASC;",
+    "referenceSolutionTs": "WITH ranked_logs AS (\n  SELECT\n    log_id,\n    LEAD(log_id) OVER (ORDER BY log_id ASC) AS next_id\n  FROM tracking_logs\n)\nSELECT\n  log_id + 1 AS gap_start,\n  next_id - 1 AS gap_end,\n  (next_id - log_id - 1) AS gap_size\nFROM ranked_logs\nWHERE next_id - log_id > 1\nORDER BY gap_start ASC;",
+    "testCases": [
+      {
+        "description": "Finds multiple missing sequence ranges in tracking log IDs",
+        "input": "query",
+        "expected": "[{\"gap_end\":4,\"gap_size\":2,\"gap_start\":3},{\"gap_end\":9,\"gap_size\":2,\"gap_start\":8}]"
+      },
+      {
+        "description": "Detects single isolated missing identifier gap",
+        "input": "query",
+        "expected": "[{\"gap_end\":12,\"gap_size\":1,\"gap_start\":12}]"
+      },
+      {
+        "description": "Returns empty array when sequence is strictly contiguous",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty array when table contains fewer than two rows",
+        "input": "query",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE tracking_logs (log_id INT PRIMARY KEY, event_name TEXT, logged_at TIMESTAMP);`);\n\n  // Case 1: Multiple sequence gaps in tracking IDs\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (1, 'auth', '2024-01-01 10:00:00'),\n      (2, 'login', '2024-01-01 10:01:00'),\n      (5, 'view', '2024-01-01 10:04:00'),\n      (6, 'click', '2024-01-01 10:05:00'),\n      (7, 'cart', '2024-01-01 10:06:00'),\n      (10, 'checkout', '2024-01-01 10:09:00'),\n      (11, 'logout', '2024-01-01 10:10:00');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Finds multiple missing sequence ranges in tracking log IDs',\n    r1 !== null && $test.equal(r1, [\n      { gap_start: 3, gap_end: 4, gap_size: 2 },\n      { gap_start: 8, gap_end: 9, gap_size: 2 }\n    ]),\n    r1\n  );\n\n  // Case 2: Single missing ID gap of size 1\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (10, 'init', '2024-02-01 08:00:00'),\n      (11, 'start', '2024-02-01 08:01:00'),\n      (13, 'finish', '2024-02-01 08:03:00'),\n      (14, 'cleanup', '2024-02-01 08:04:00');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Detects single isolated missing identifier gap',\n    r2 !== null && $test.equal(r2, [\n      { gap_start: 12, gap_end: 12, gap_size: 1 }\n    ]),\n    r2\n  );\n\n  // Case 3: Contiguous sequence with zero gaps\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (100, 'step1', '2024-03-01 12:00:00'),\n      (101, 'step2', '2024-03-01 12:01:00'),\n      (102, 'step3', '2024-03-01 12:02:00'),\n      (103, 'step4', '2024-03-01 12:03:00');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when sequence is strictly contiguous',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Table with single entry or fewer than two rows\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (42, 'only_record', '2024-04-01 15:00:00');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when table contains fewer than two rows',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();"
+  },
+  {
+    "id": "sql-worker-queue-skip-locked",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue.\n\nIn high-throughput microservices and asynchronous backend architectures, PostgreSQL tables are commonly used as persistent job queues. When multiple worker processes pull jobs simultaneously using a standard `SELECT ... FOR UPDATE`, all other workers block and serialize waiting for the first transaction's lock to release. To allow concurrent workers to immediately claim distinct pending tasks without blocking each other, PostgreSQL provides the `FOR UPDATE SKIP LOCKED` locking clause.\n\n### Schema: `job_queue`\n- `id` (INT, PRIMARY KEY): Unique identifier for the queue task.\n- `task_name` (TEXT): Name of the background job type.\n- `status` (TEXT): Current queue status (`'pending'`, `'processing'`, `'completed'`, `'failed'`).\n- `priority` (INT): Integer priority level (higher number indicates higher priority).\n- `attempts` (INT): Number of previous processing attempts.\n- `created_at` (TIMESTAMP): Creation timestamp of the task.\n\n### Query Contract\n- Target only pending tasks: Filter rows strictly by `status = 'pending'`.\n- Ordering:\n  - Primary: Highest priority first (`priority DESC`).\n  - Secondary: Oldest created task first (`created_at ASC`).\n  - Tie-breaker: Lowest ID first (`id ASC`).\n- Selection count: Claim exactly 1 job (`LIMIT 1`).\n- Output columns:\n  - `id` (INT)\n  - `task_name` (TEXT)\n  - `priority` (INT)\n- Concurrency & Row Locking:\n  - Append the `FOR UPDATE SKIP LOCKED` clause to lock the selected record and skip any rows currently locked by other transactions, preventing worker lock contention.\n- If no pending tasks exist, return 0 rows (`[]`).\n\n### Example\nGiven `job_queue` records:\n- `{ id: 1, task_name: \"send_email\", status: \"pending\", priority: 10, attempts: 0, created_at: \"2024-01-01 10:00:00\" }`\n- `{ id: 2, task_name: \"generate_pdf\", status: \"pending\", priority: 20, attempts: 0, created_at: \"2024-01-01 10:05:00\" }`\n- `{ id: 3, task_name: \"process_video\", status: \"processing\", priority: 30, attempts: 1, created_at: \"2024-01-01 10:02:00\" }`\n- `{ id: 4, task_name: \"sync_contacts\", status: \"pending\", priority: 20, attempts: 0, created_at: \"2024-01-01 10:01:00\" }`\n\nThe query returns:\n- `[{ \"id\": 4, \"task_name\": \"sync_contacts\", \"priority\": 20 }]`\n\nExplanation:\n- Task 3 has priority 30 but is excluded because its status is `'processing'`.\n- Tasks 2 and 4 both have priority 20 (higher than task 1's 10).\n- Task 4 was created earlier (`10:01:00` vs `10:05:00`), so it wins the priority tie-break.\n- The `FOR UPDATE SKIP LOCKED` clause locks task 4 for the claiming worker.",
+    "track": "sql-postgres",
+    "title": "Concurrent Task Queue Claim (FOR UPDATE SKIP LOCKED)",
+    "tags": [
+      "sql",
+      "postgres",
+      "concurrency",
+      "transactions",
+      "row-locking",
+      "queues"
+    ],
+    "inputLanguage": "sql",
+    "difficulty": 3,
+    "concept": "sql-concurrency-transactions",
+    "referenceSolution": "SELECT id, task_name, priority\nFROM job_queue\nWHERE status = 'pending'\nORDER BY priority DESC, created_at ASC, id ASC\nLIMIT 1\nFOR UPDATE SKIP LOCKED;",
+    "referenceSolutionTs": "SELECT id, task_name, priority\nFROM job_queue\nWHERE status = 'pending'\nORDER BY priority DESC, created_at ASC, id ASC\nLIMIT 1\nFOR UPDATE SKIP LOCKED;",
+    "testCases": [
+      {
+        "description": "Claims highest-priority pending task using FOR UPDATE SKIP LOCKED",
+        "input": "query",
+        "expected": "[{\"id\":2,\"priority\":50,\"task_name\":\"process_payment\"}]"
+      },
+      {
+        "description": "Breaks priority ties using oldest created timestamp",
+        "input": "query",
+        "expected": "[{\"id\":11,\"priority\":30,\"task_name\":\"sync_inventory\"}]"
+      },
+      {
+        "description": "Ignores non-pending tasks and picks highest pending task",
+        "input": "query",
+        "expected": "[{\"id\":23,\"priority\":15,\"task_name\":\"send_sms_alert\"}]"
+      },
+      {
+        "description": "Returns empty array when queue has no pending tasks",
+        "input": "query",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const hasSkipLocked = /for\\s+update\\s+skip\\s+locked/i.test(userSql);\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE job_queue (\n      id INT PRIMARY KEY,\n      task_name TEXT NOT NULL,\n      status TEXT NOT NULL,\n      priority INT NOT NULL,\n      attempts INT NOT NULL DEFAULT 0,\n      created_at TIMESTAMP NOT NULL\n    );\n  `);\n\n  // Case 1: Claims highest-priority pending task using FOR UPDATE SKIP LOCKED\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (1, 'send_welcome_email', 'pending', 10, 0, '2024-01-01 10:00:00'),\n      (2, 'process_payment', 'pending', 50, 0, '2024-01-01 10:05:00'),\n      (3, 'generate_analytics', 'processing', 100, 1, '2024-01-01 10:02:00'),\n      (4, 'resize_avatar', 'pending', 20, 0, '2024-01-01 10:01:00');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Claims highest-priority pending task using FOR UPDATE SKIP LOCKED',\n    hasSkipLocked && r1 !== null && $test.equal(r1, [{ id: 2, task_name: 'process_payment', priority: 50 }]),\n    r1\n  );\n\n  // Case 2: Breaks priority ties using oldest created timestamp\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (10, 'export_csv', 'pending', 30, 0, '2024-02-01 09:15:00'),\n      (11, 'sync_inventory', 'pending', 30, 0, '2024-02-01 09:05:00'),\n      (12, 'dispatch_webhook', 'pending', 30, 0, '2024-02-01 09:20:00');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Breaks priority ties using oldest created timestamp',\n    hasSkipLocked && r2 !== null && $test.equal(r2, [{ id: 11, task_name: 'sync_inventory', priority: 30 }]),\n    r2\n  );\n\n  // Case 3: Ignores non-pending tasks and picks highest pending task\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (21, 'rebuild_search_index', 'failed', 99, 3, '2024-03-01 12:00:00'),\n      (22, 'purge_cache', 'completed', 80, 1, '2024-03-01 12:05:00'),\n      (23, 'send_sms_alert', 'pending', 15, 0, '2024-03-01 12:10:00');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Ignores non-pending tasks and picks highest pending task',\n    hasSkipLocked && r3 !== null && $test.equal(r3, [{ id: 23, task_name: 'send_sms_alert', priority: 15 }]),\n    r3\n  );\n\n  // Case 4: Returns empty array when queue has no pending tasks\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (31, 'archive_logs', 'completed', 10, 1, '2024-04-01 15:00:00');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when queue has no pending tasks',\n    hasSkipLocked && r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();"
   }
 ]
