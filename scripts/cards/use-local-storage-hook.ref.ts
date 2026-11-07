@@ -3,10 +3,10 @@ interface StorageEventLike {
   newValue?: string | null;
 }
 
-function useLocalStorage<T>(
+const useLocalStorage = <T,>(
   key: string,
   initialValue: T,
-): [T, (next: T | ((prev: T) => T)) => void] {
+): [T, (next: T | ((prev: T) => T)) => void] => {
   const read = (): T => {
     try {
       const raw = localStorage.getItem(key);

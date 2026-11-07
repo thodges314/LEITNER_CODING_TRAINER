@@ -1,4 +1,4 @@
-function useOnClickOutside(ref, handler) {
+const useOnClickOutside = (ref, handler) => {
   const saved = useRef(handler);
   useEffect(() => {
     saved.current = handler; // always the newest handler, without re-subscribing

@@ -3,7 +3,7 @@ interface SortedListProps {
   onCompute?: () => void;
 }
 
-function SortedList({ items, onCompute }: SortedListProps): JSX.Element {
+const SortedList = ({ items, onCompute }: SortedListProps): JSX.Element => {
   const [count, setCount] = useState<number>(0);
 
   const sorted = useMemo<number[]>(() => {

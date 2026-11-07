@@ -9,7 +9,7 @@ interface ParentProps {
   onListRender?: () => void;
 }
 
-const List = React.memo(function List({ items, onSelect, onRender }: ListProps): JSX.Element {
+const List = React.memo(({ items, onSelect, onRender }: ListProps): JSX.Element => {
   if (onRender) onRender();
   return (
     <ul>
@@ -22,7 +22,7 @@ const List = React.memo(function List({ items, onSelect, onRender }: ListProps):
   );
 });
 
-function Parent({ items, onListRender }: ParentProps): JSX.Element {
+const Parent = ({ items, onListRender }: ParentProps): JSX.Element => {
   const [count, setCount] = useState<number>(0);
   const [selected, setSelected] = useState<string | null>(null);
 

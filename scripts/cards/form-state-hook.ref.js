@@ -1,4 +1,4 @@
-function useForm({ initialValues, validate = () => ({}), onSubmit }) {
+const useForm = ({ initialValues, validate = () => ({}), onSubmit }) => {
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);

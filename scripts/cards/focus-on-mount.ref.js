@@ -1,4 +1,4 @@
-function FocusInput({ placeholder, label }) {
+const FocusInput = ({ placeholder, label }) => {
   const inputRef = useRef(null);
 
   useEffect(() => {

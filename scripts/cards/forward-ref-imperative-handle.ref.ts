@@ -10,10 +10,10 @@ interface FancyInputProps {
   [key: string]: unknown;
 }
 
-const FancyInput = forwardRef<FancyInputHandle, FancyInputProps>(function FancyInput(
+const FancyInput = forwardRef<FancyInputHandle, FancyInputProps>((
   props: FancyInputProps,
   ref: { current: FancyInputHandle | null } | ((instance: FancyInputHandle | null) => void) | null
-) {
+): JSX.Element => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useImperativeHandle(

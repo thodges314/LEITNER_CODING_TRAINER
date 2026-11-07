@@ -30,11 +30,11 @@ interface UseFormReturn<T extends Record<string, unknown>> {
   reset: () => void;
 }
 
-function useForm<T extends Record<string, unknown>>({
+const useForm = <T extends Record<string, unknown>>({
   initialValues,
   validate = () => ({}),
   onSubmit,
-}: UseFormOptions<T>): UseFormReturn<T> {
+}: UseFormOptions<T>): UseFormReturn<T> => {
   const [values, setValues] = useState<T>(initialValues);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
