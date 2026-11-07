@@ -53,7 +53,7 @@ Add `NEXT_SANDBOX_APIS = ['NextResponse', 'NextRequest', 'revalidateTag', 'reval
   - *Context:* `middleware.ts` running at the Edge in a multi-tenant application.
   - *Contract:* `middleware(request: NextRequest)` checking authentication cookies (`auth_token`), protecting `/dashboard/*` paths by redirecting unauthenticated users to `/login?next=...`, and letting public paths (`/`, `/about`, `/login`) pass through with `NextResponse.next()`.
 
-### Batch 2: Static Generation, Dynamic Metadata & Caching (3 Cards)
+### Batch 2: Static Generation, Dynamic Metadata & Caching (3 Cards) - COMPLETE
 - **`next-generate-metadata`**
   - *Context:* `app/products/[category]/[slug]/page.tsx` for SEO and social sharing cards.
   - *Contract:* `generateMetadata({ params, searchParams }): Promise<Metadata>` building dynamic page title (`"{product.name} | Store"`), meta description, canonical URL, and OpenGraph image tags.
@@ -64,31 +64,39 @@ Add `NEXT_SANDBOX_APIS = ['NextResponse', 'NextRequest', 'revalidateTag', 'reval
   - *Context:* `app/lib/cache.ts` managing on-demand incremental static regeneration (ISR).
   - *Contract:* Implements tag-based cache storage supporting `{ next: { tags: ['products', 'item-123'] } }` and an invalidation function `revalidateTag(tag)` that purges all entries associated with that tag.
 
-### Batch 3: Advanced Architecture & RSC Boundaries (3 Cards)
-- **`next-parallel-intercepting-routes`**
-  - *Context:* Photo gallery feed with parallel modal view (`app/feed/@modal/(.)photo/[id]/page.tsx`).
-  - *Contract:* Route matching function evaluating URL navigation to determine whether to trigger an intercepting route modal slot or fall back to full page route render.
+### Batch 3: Modern App Router Typing & Component Conventions (3 Cards) - COMPLETE
+- **`next-async-page-props`**
+  - *Context:* `app/shop/[id]/page.tsx` in a Next.js 15 product catalog.
+  - *Contract:* Handles the Next.js 15 async shift where `params` and `searchParams` are Promises. Implements an async page parser/helper that awaits `params: Promise<{ id: string }>` and safely normalizes `searchParams: Promise<Record<string, string | string[] | undefined>>` (handling multi-value query arrays vs single strings).
+- **`next-async-route-handler-context`**
+  - *Context:* `app/api/users/[userId]/posts/[postId]/route.ts` in an API service.
+  - *Contract:* Strict type safety for Next.js 15 route handler context where `context: { params: Promise<{ userId: string; postId: string }> }`. Awaits dynamic multi-segment parameters and returns typed JSON responses.
+- **`next-layout-template-composition`**
+  - *Context:* `app/dashboard/layout.tsx` vs `app/dashboard/template.tsx` composition.
+  - *Contract:* Enforces `React.ReactNode` children typing and models the core architectural distinction: Layout preserves state across route changes while Template remounts its component tree with fresh state.
+
+### Batch 4: Advanced Architecture & RSC Boundaries (2 Cards) - IN PROGRESS
 - **`next-client-boundary-guard`**
   - *Context:* React Server Component (RSC) to Client Component prop boundary serializer.
   - *Contract:* Validates props passed across the network boundary, ensuring all passed values are JSON-serializable primitives/objects/arrays, and flagging forbidden values (functions, symbols, class instances) with descriptive serialization errors.
-- **`next-optimistic-action`**
-  - *Context:* Feed post interaction with `useOptimistic` integration.
-  - *Contract:* Action coordination reducer handling pending updates, optimistic rollback on error, and final state reconciliation upon server response.
+- **`next-parallel-intercepting-routes`**
+  - *Context:* Photo gallery feed with parallel modal view (`app/feed/@modal/(.)photo/[id]/page.tsx`).
+  - *Contract:* Route matching function evaluating URL navigation to determine whether to trigger an intercepting route modal slot or fall back to full page route render.
 
 ---
 
 ## 4. Track Structure & Integration
 
-- **Track ID:** `nextjs` (or first-class sub-track within `react`/`frontend`)
+- **Track ID:** `nextjs` (first-class domain track)
 - **Track Metadata:**
   - Label: `Next.js`
   - Color Theme: Slate / Dark Neutral (`#0f172a` badge, modern aesthetic)
-  - Preset Decks: Included in **Full Library** and **Full-Stack Core**
+  - Preset Decks: Included in **Full Library**, **Full-Stack Core**, and **Frontend Specialist**
 - **Difficulty Ladder:**
-  - Tier 1: `next-route-handler-crud`, `next-server-action-form`
-  - Tier 2: `next-middleware-auth-redirect`, `next-generate-metadata`
-  - Tier 3: `next-static-params-generator`, `next-revalidation-tag-cache`
-  - Tier 4: `next-parallel-intercepting-routes`, `next-client-boundary-guard`, `next-optimistic-action`
+  - Tier 1: `next-route-handler-crud`, `next-server-action-form`, `next-layout-template-composition`
+  - Tier 2: `next-middleware-auth-redirect`, `next-generate-metadata`, `next-async-page-props`
+  - Tier 3: `next-static-params-generator`, `next-revalidation-tag-cache`, `next-async-route-handler-context`
+  - Tier 4: `next-client-boundary-guard`, `next-parallel-intercepting-routes`
 
 ---
 

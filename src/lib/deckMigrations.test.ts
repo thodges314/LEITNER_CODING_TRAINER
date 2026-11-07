@@ -155,7 +155,6 @@ describe('deckMigrations', () => {
       expect(v5.practiceFilter?.includeTracks).toContain('graphql-server');
       expect(v5.practiceFilter?.includeTracks).toContain('react');
       expect(v5.practiceFilter?.includeTracks).toContain('react-components');
-      expect(v5.practiceFilter?.includeTracks).toContain('nextjs');
     });
 
     it('upgrades v2 state directly to v5', () => {
@@ -195,7 +194,7 @@ describe('deckMigrations', () => {
       expect(migrateDeckState({}).deckVersion).toBe(5);
     });
 
-    it('migrates v4 to v5: includes nextjs in practiceFilter if react is present', () => {
+    it('migrates v4 to v5: increments deckVersion to 5 preserving filters', () => {
       const v4State = {
         deckVersion: 4,
         topics: [],
@@ -208,8 +207,7 @@ describe('deckMigrations', () => {
       };
       const migrated = migrateDeckState(v4State);
       expect(migrated.deckVersion).toBe(5);
-      expect(migrated.practiceFilter?.includeTracks).toContain('nextjs');
-      expect(migrated.practiceFilter?.includeTracks).toContain('react');
+      expect(migrated.practiceFilter?.includeTracks).toEqual(['react', 'algorithms']);
     });
   });
 

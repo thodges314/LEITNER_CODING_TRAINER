@@ -5429,5 +5429,53 @@
       "algorithms"
     ],
     "summary": "Write a static route segment matrix generator for Next.js App Router"
+  },
+  {
+    "id": "next-async-page-props",
+    "title": "Async Request APIs: Dynamic Params & SearchParams",
+    "track": "nextjs",
+    "concept": "next-async-params",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "async-params",
+      "search-params",
+      "typescript",
+      "nextjs-15"
+    ],
+    "summary": "Implement a Next.js 15 async page props parser and search query normalizer"
+  },
+  {
+    "id": "next-async-route-handler-context",
+    "title": "Async Route Context: Dynamic Segment Typing",
+    "track": "nextjs",
+    "concept": "next-async-context",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-handlers",
+      "async-params",
+      "typescript",
+      "nextjs-15"
+    ],
+    "summary": "Implement a Next.js 15 App Router Route Handler with strictly typed async route context"
+  },
+  {
+    "id": "next-layout-template-composition",
+    "title": "Layouts vs. Templates: Prop Typing & Remount Semantics",
+    "track": "nextjs",
+    "concept": "next-layouts-templates",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "layouts",
+      "templates",
+      "react-node",
+      "typescript"
+    ],
+    "summary": "Implement Next.js App Router Layout and Template components with strict prop typing and remount coordinator"
   }
 ]

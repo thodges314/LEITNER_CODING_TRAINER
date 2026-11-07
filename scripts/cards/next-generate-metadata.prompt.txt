@@ -53,3 +53,4 @@ Assume an in-memory or injected store `articlesStore = new Map<string, ArticleRe
     - `images`: If `article.thumbnailUrl` is present and non-empty, sets `[{ url: article.thumbnailUrl, alt: article.title }]`. Otherwise, sets `[]`.
   - **Draft/Preview Robot Guard**:
     - If `searchParams?.preview === 'true'`, adds `robots: { index: false, follow: false }` to prevent search crawlers from indexing unpublished drafts.
+

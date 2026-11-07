@@ -57,3 +57,4 @@ const generateStaticParams = (categories: DocCategory[]): StaticDocParam[] => {
 
   return results;
 };
+

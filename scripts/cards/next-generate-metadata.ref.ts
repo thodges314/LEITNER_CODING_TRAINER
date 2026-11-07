@@ -68,3 +68,4 @@ const generateMetadata = async ({
 
   return metadata;
 };
+

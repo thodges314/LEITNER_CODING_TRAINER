@@ -226,34 +226,9 @@ export function migrateV3ToV4(state: Record<string, unknown>): Record<string, un
 /**
  * Migration v4 -> v5:
  * - Introduces first-class 'nextjs' track for App Router route handlers, server actions, middleware, metadata, and caching.
- * - If practiceFilter includes frontend tracks ('react', 'react-components'), includes 'nextjs' so users practicing modern React automatically receive Next.js exercises.
  * - Upgrades schema version to 5.
  */
 export function migrateV4ToV5(state: Record<string, unknown>): Record<string, unknown> {
-  const filter = state.practiceFilter as PracticeFilter | undefined;
-  if (filter && Array.isArray(filter.includeTracks) && filter.includeTracks.length > 0) {
-    if (
-      (filter.includeTracks.includes('react') || filter.includeTracks.includes('react-components')) &&
-      !filter.includeTracks.includes('nextjs')
-    ) {
-      filter.includeTracks = [...filter.includeTracks, 'nextjs'];
-    }
-  }
-
-  const presets = state.filterPresets as Record<string, PracticeFilter> | undefined;
-  if (presets && typeof presets === 'object') {
-    for (const preset of Object.values(presets)) {
-      if (preset && Array.isArray(preset.includeTracks) && preset.includeTracks.length > 0) {
-        if (
-          (preset.includeTracks.includes('react') || preset.includeTracks.includes('react-components')) &&
-          !preset.includeTracks.includes('nextjs')
-        ) {
-          preset.includeTracks = [...preset.includeTracks, 'nextjs'];
-        }
-      }
-    }
-  }
-
   return {
     ...state,
     deckVersion: 5,

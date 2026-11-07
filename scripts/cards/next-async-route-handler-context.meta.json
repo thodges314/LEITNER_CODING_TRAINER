@@ -1,0 +1,14 @@
+{
+  "track": "nextjs",
+  "title": "Async Route Context: Dynamic Segment Typing",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "route-handlers",
+    "async-params",
+    "typescript",
+    "nextjs-15"
+  ],
+  "requiresDom": false
+}
+

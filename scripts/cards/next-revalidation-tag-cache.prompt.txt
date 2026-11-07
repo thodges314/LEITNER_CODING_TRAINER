@@ -46,3 +46,4 @@ Returns an object implementing `TagCacheManager`:
   - Cleans up tag associations and returns the count of purged items.
 - **`clear(): void`**:
   - Completely wipes all cached items and tag associations.
+

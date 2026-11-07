@@ -38,3 +38,4 @@ interface StaticDocParam {
   - Removes duplicate `{ category, slug }` entries.
 - **Sorting**:
   - Sorts the resulting array in ascending alphabetical order by `category`, then by `slug`.
+

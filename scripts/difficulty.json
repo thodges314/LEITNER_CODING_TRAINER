@@ -1538,5 +1538,17 @@
   "next-revalidation-tag-cache": {
     "difficulty": 3,
     "concept": "next-cache-revalidation"
+  },
+  "next-async-page-props": {
+    "difficulty": 2,
+    "concept": "next-async-params"
+  },
+  "next-async-route-handler-context": {
+    "difficulty": 3,
+    "concept": "next-async-context"
+  },
+  "next-layout-template-composition": {
+    "difficulty": 2,
+    "concept": "next-layouts-templates"
   }
 }
