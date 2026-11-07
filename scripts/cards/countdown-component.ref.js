@@ -1,4 +1,4 @@
-function Countdown({ seconds, onDone, tickMs = 1000 }) {
+const Countdown = ({ seconds, onDone, tickMs = 1000 }) => {
   const [remaining, setRemaining] = useState(seconds);
   const [running, setRunning] = useState(false);
   const onDoneRef = useRef(onDone);

@@ -1,12 +1,12 @@
-function ToggleButton({ pressed, onPressedChange, children }) {
+const ToggleButton = ({ pressed, onPressedChange, children }) => {
   return (
     <button type="button" aria-pressed={pressed} onClick={() => onPressedChange(!pressed)}>
       {children}
     </button>
   );
-}
+};
 
-function FormField({ label, hint, error, children }) {
+const FormField = ({ label, hint, error, children }) => {
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;

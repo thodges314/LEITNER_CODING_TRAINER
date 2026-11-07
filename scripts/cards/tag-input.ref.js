@@ -1,4 +1,4 @@
-function TagInput({ value, onChange, max = Infinity }) {
+const TagInput = ({ value, onChange, max = Infinity }) => {
   const [text, setText] = useState('');
 
   const addTag = () => {

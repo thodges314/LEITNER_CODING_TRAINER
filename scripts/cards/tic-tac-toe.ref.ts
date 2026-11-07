@@ -12,14 +12,14 @@ const LINES: readonly [number, number, number][] = [
   [0, 4, 8], [2, 4, 6],
 ];
 
-function calcWinner(cells: readonly CellValue[]): Player | null {
+const calcWinner = (cells: readonly CellValue[]): Player | null => {
   for (const [a, b, c] of LINES) {
     if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];
   }
   return null;
-}
+};
 
-function TicTacToe({ onGameEnd }: TicTacToeProps): JSX.Element {
+const TicTacToe = ({ onGameEnd }: TicTacToeProps): JSX.Element => {
   const [cells, setCells] = useState<CellValue[]>(Array(9).fill(null));
   const [turn, setTurn] = useState<Player>('X');
   const winner = calcWinner(cells);

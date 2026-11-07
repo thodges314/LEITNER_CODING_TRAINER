@@ -1,12 +1,12 @@
-function formatTime(ms) {
+const formatTime = (ms) => {
   const pad = (n) => String(n).padStart(2, '0');
   const cs = Math.floor(ms / 10) % 100;
   const s = Math.floor(ms / 1000) % 60;
   const m = Math.floor(ms / 60000);
   return `${pad(m)}:${pad(s)}.${pad(cs)}`;
-}
+};
 
-function Stopwatch() {
+const Stopwatch = () => {
   const [base, setBase] = useState(0); // ms accumulated before the current run
   const [startedAt, setStartedAt] = useState(null); // Date.now() when the current run began
   const [laps, setLaps] = useState([]);
