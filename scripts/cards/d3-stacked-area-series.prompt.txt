@@ -1,0 +1,74 @@
+### `renderStackedAreaChart(container: HTMLElement, data: MonthlyMetrics[], options?: StackedAreaOptions): StackedAreaInstance`
+
+## Description
+
+```ts
+interface MonthlyMetrics {
+  month: string;
+  desktop: number;
+  mobile: number;
+  tablet: number;
+  [key: string]: string | number;
+}
+
+interface StackedAreaOptions {
+  width?: number;
+  height?: number;
+  keys?: string[];
+  colors?: string[];
+  onSelectLayer?: (key: string, index: number) => void;
+}
+
+interface StackedAreaInstance {
+  svg: SVGSVGElement;
+  getLayerKeys: () => string[];
+  getYDomain: () => [number, number];
+  destroy: () => void;
+}
+```
+
+Multi-series data over time is frequently visualized as stacked areas or streamgraphs where each categorical layer is positioned above the cumulative baseline of preceding layers. D3 achieves this with **`d3.stack()`**, which transforms tabular objects into matrix layers of baseline intervals `[y0, y1]`, coupled with **`d3.area()`** to interpolate the lower baseline `y0(d => yScale(d[0]))` and upper curve `y1(d => yScale(d[1]))`.
+
+Implement `renderStackedAreaChart(container, data, options)` to construct a responsive, interactive SVG stacked area chart.
+
+### Requirements
+
+- **Canvas & Dimensions**:
+  - Empties `container.innerHTML` before mounting.
+  - Defaults:
+    - `width = 480`, `height = 280`
+    - Margins: `{ top: 15, right: 20, bottom: 25, left: 45 }`
+    - `innerWidth = Math.max(0, width - margin.left - margin.right)`
+    - `innerHeight = Math.max(0, height - margin.top - margin.bottom)`
+    - `keys = ['desktop', 'mobile', 'tablet']`
+    - `colors = ['steelblue', 'seagreen', 'orange']`
+  - Appends an `<svg>` element with `width` and `height`.
+  - Appends `<g class="plot-area">` translated to `translate(${margin.left}, ${margin.top})`.
+
+- **Stacking & Coordinates**:
+  - Uses `d3.stack().keys(keys)` to compute stacked series layers from `data`.
+  - Determines maximum cumulative value `maxY` across all layers (`d3.max(layers, layer => d3.max(layer, d => d[1])) || 1`).
+  - Scales:
+    - `xScale = d3.scalePoint().domain(data.map(d => d.month)).range([0, innerWidth])`
+    - `yScale = d3.scaleLinear().domain([0, maxY]).nice().range([innerHeight, 0])`
+
+- **Stacked Area Geometry (`g.stacked-layers`)**:
+  - Area generator configured with:
+    - `.x(d => xScale(d.data.month))`
+    - `.y0(d => yScale(d[0]))`
+    - `.y1(d => yScale(d[1]))`
+  - Appends `<g class="stacked-layers">` inside `plot-area`.
+  - For each stacked series layer `(layer, i)`:
+    - Renders `<path class="stacked-layer">` with `d = areaGenerator(layer) || ''`.
+    - `fill = colors[i % colors.length]`, `fill-opacity = "0.75"`.
+    - `stroke = colors[i % colors.length]`, `stroke-width = "1.5"`.
+    - Clicking a `path.stacked-layer` invokes `options.onSelectLayer(layer.key, i)` if provided.
+
+- **Axes**:
+  - Appends `<g class="x-axis">` translated to `translate(0, ${innerHeight})` calling `d3.axisBottom(xScale)`.
+  - Appends `<g class="y-axis">` calling `d3.axisLeft(yScale)`.
+
+- **Instance API**:
+  - `getLayerKeys()`: returns a copy of the keys array used for the stack.
+  - `getYDomain()`: returns `yScale.domain()` as `[number, number]`.
+  - `destroy()`: removes the SVG and empties `container.innerHTML`.

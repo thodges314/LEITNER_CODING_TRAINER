@@ -1292,6 +1292,26 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Delay increment per element index',
     },
   ],
+  'd3-stacked-area-series': [
+    {
+      name: 'width',
+      type: 'number',
+      defaultValue: 460,
+      min: 320,
+      max: 600,
+      step: 20,
+      description: 'SVG viewport width in pixels',
+    },
+    {
+      name: 'height',
+      type: 'number',
+      defaultValue: 260,
+      min: 180,
+      max: 400,
+      step: 20,
+      description: 'SVG viewport height in pixels',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

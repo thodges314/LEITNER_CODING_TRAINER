@@ -766,6 +766,44 @@ export default {
       { callSignature: 'summarizeDataset([])' }
     ),
   ],
+  'd3-stacked-area-series': [
+    r(
+      'Mounts SVG and plot area with specified dimensions',
+      'renderStackedAreaChart(container, SAMPLE_MONTHS, { width: 500, height: 300 })',
+      'Appends svg (500x300) and plot-area translated by margin (45, 15)',
+      { callSignature: 'renderStackedAreaChart(container, data, options)' }
+    ),
+    r(
+      'Computes stacked baselines and sets dynamic upper Y domain',
+      'instance.getYDomain()',
+      'Calculates cumulative max across stacked series and sets upper domain >= 410',
+      { callSignature: 'instance.getYDomain()' }
+    ),
+    r(
+      'Renders stacked area path layers with fills and opacity',
+      'container.querySelectorAll("path.stacked-layer")',
+      'Renders path for each series layer with d attribute, stroke, and fill',
+      { callSignature: 'container.querySelectorAll("path.stacked-layer")' }
+    ),
+    r(
+      'Renders X and Y axis groups with formatted tick labels',
+      'container.querySelectorAll("g.x-axis .tick, g.y-axis .tick")',
+      'Mounts x-axis translated to bottom and left y-axis with tick labels',
+      { callSignature: 'renderStackedAreaChart(container, data)' }
+    ),
+    r(
+      'Invokes onSelectLayer callback with key and index when layer is clicked',
+      'path.dispatchEvent(new MouseEvent("click"))',
+      'Invokes onSelectLayer(key, index) with clicked series identifier',
+      { callSignature: 'options.onSelectLayer(key, index)' }
+    ),
+    r(
+      'Cleans up SVG and DOM elements on destroy()',
+      'instance.destroy()',
+      'Removes SVG element and empties container',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 
 

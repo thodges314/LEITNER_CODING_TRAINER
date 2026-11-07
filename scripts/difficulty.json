@@ -1415,6 +1415,10 @@
     "difficulty": 2,
     "concept": "d3-aggregation-bins"
   },
+  "d3-stacked-area-series": {
+    "difficulty": 3,
+    "concept": "d3-stacked-series"
+  },
   "d3-scales-domain-range-basics": {
     "difficulty": 1,
     "concept": "d3-scales-basics"

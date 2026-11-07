@@ -4981,5 +4981,20 @@
       "algorithms"
     ],
     "summary": "interface DataRecord {"
+  },
+  {
+    "id": "d3-stacked-area-series",
+    "title": "D3 Stacked Area Series (Baselines & Layers)",
+    "track": "d3",
+    "concept": "d3-stacked-series",
+    "difficulty": 3,
+    "tags": [
+      "d3",
+      "stack",
+      "area",
+      "charts",
+      "visualizations"
+    ],
+    "summary": "interface MonthlyMetrics {"
   }
 ]
