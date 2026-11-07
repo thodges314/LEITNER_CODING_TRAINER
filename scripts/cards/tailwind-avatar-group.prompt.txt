@@ -1,0 +1,70 @@
+### `AvatarGroup({ avatars = [], max = 4, size = 'md', className = '', ...props }: AvatarGroupProps): JSX.Element`
+
+## Description
+
+```ts
+type AvatarSize = 'sm' | 'md' | 'lg';
+type AvatarStatus = 'online' | 'offline' | 'busy' | 'away';
+
+interface AvatarData {
+  src?: string;
+  name: string;
+  alt?: string;
+  status?: AvatarStatus;
+}
+
+interface AvatarProps extends AvatarData {
+  size?: AvatarSize;
+  className?: string;
+  [key: string]: any;
+}
+
+interface AvatarGroupProps {
+  avatars: AvatarData[];
+  max?: number;
+  size?: AvatarSize;
+  className?: string;
+  [key: string]: any;
+}
+```
+
+Avatar clusters represent collaborative team members, issue assignees, and active participants in compact visual headers.
+
+Build an accessible, responsive `AvatarGroup` component (and supporting `Avatar` sub-component) styled with Tailwind CSS utility classes:
+
+### Requirements
+
+- **Individual `Avatar` Component**:
+  - Container (`<span>`):
+    - Base classes: `relative inline-flex shrink-0 items-center justify-center rounded-full font-semibold select-none ring-2 ring-slate-900 bg-slate-800 text-slate-200`
+    - Sizes:
+      - `'sm'`: `h-8 w-8 text-xs`
+      - `'md'` (default): `h-10 w-10 text-sm`
+      - `'lg'`: `h-12 w-12 text-base`
+    - Forwards extra `props` (like `data-testid` or `onClick`).
+  - Image & Initials Fallback:
+    - If `src` is provided and loads without error, renders `<img src={src} alt={alt || name} className="h-full w-full rounded-full object-cover" />`.
+    - If `src` is missing or fails to load (`onError`), renders uppercase initials from `name`:
+      - Single-word name: first 2 characters (e.g. `'Sarah'` -> `'SA'`).
+      - Multi-word name: first letter of the first word and first letter of the last word (e.g. `'Alex Rivera'` -> `'AR'`, `'John Fitzgerald Kennedy'` -> `'JK'`).
+  - Status Indicator Dot:
+    - When `status` is provided, renders `<span className="..." aria-label={status} />` positioned at `absolute bottom-0 right-0 rounded-full ring-2 ring-slate-900`.
+    - Variant background colors:
+      - `'online'`: `bg-emerald-500`
+      - `'busy'`: `bg-rose-500`
+      - `'away'`: `bg-amber-500`
+      - `'offline'`: `bg-slate-500`
+    - Indicator dimensions:
+      - `'sm'`: `h-2 w-2`
+      - `'md'`: `h-2.5 w-2.5`
+      - `'lg'`: `h-3 w-3`
+
+- **`AvatarGroup` Stack Component**:
+  - Container: `<div className={containerClasses} role="group" aria-label="Team avatars" {...props}>`
+  - Base classes: `inline-flex items-center -space-x-2 overflow-hidden`
+  - Overlap & Truncation:
+    - If `avatars.length <= max`: renders all avatars in order.
+    - If `avatars.length > max`: renders the first `max` avatars, followed by an overflow indicator pill:
+      - Overflow pill: `relative inline-flex shrink-0 items-center justify-center rounded-full font-medium ring-2 ring-slate-900 bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors` matching the active `size` dimensions.
+      - Displays text `+${avatars.length - max}`.
+      - Has attribute `aria-label={`${avatars.length - max} more team members`}`.

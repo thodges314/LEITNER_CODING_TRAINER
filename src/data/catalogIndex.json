@@ -5166,5 +5166,35 @@
       "accessibility"
     ],
     "summary": "type SkeletonVariant = 'text' | 'circular' | 'rectangular' | 'card';"
+  },
+  {
+    "id": "tailwind-accordion",
+    "title": "Tailwind Accessible Accordion",
+    "track": "tailwind",
+    "concept": "tailwind-accordion",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "react",
+      "accordion",
+      "disclosure",
+      "a11y"
+    ],
+    "summary": "interface AccordionItemData {"
+  },
+  {
+    "id": "tailwind-avatar-group",
+    "title": "Tailwind Avatar Group Stack",
+    "track": "tailwind",
+    "concept": "tailwind-avatar",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "react",
+      "avatar",
+      "stack",
+      "tokens"
+    ],
+    "summary": "type AvatarSize = 'sm' | 'md' | 'lg';"
   }
 ]

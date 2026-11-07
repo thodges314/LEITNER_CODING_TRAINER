@@ -1668,6 +1668,32 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Number of placeholder text bars (for text variant)',
     },
   ],
+  'tailwind-accordion': [
+    {
+      name: 'allowMultiple',
+      type: 'boolean',
+      defaultValue: false,
+      description: 'Allow multiple accordion sections to be expanded simultaneously',
+    },
+  ],
+  'tailwind-avatar-group': [
+    {
+      name: 'max',
+      type: 'number',
+      defaultValue: 4,
+      min: 1,
+      max: 6,
+      step: 1,
+      description: 'Maximum visible avatars before overflowing with +N indicator',
+    },
+    {
+      name: 'size',
+      type: 'enum',
+      defaultValue: 'md',
+      options: ['sm', 'md', 'lg'],
+      description: 'Avatar diameter scaling and typography dimensions',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

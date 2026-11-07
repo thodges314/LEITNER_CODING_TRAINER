@@ -366,4 +366,68 @@ empty()`,
       { callSignature: '<Skeleton variant="card" />' }
     ),
   ],
+  'tailwind-accordion': [
+    r(
+      'Renders accordion container with semantic structure and base classes',
+      '<Accordion items={sampleItems} />',
+      'Renders divide-y, border, and rounded-xl container with disclosure buttons',
+      { callSignature: '<Accordion items={items} />' }
+    ),
+    r(
+      'Honors defaultExpandedIds and binds aria-expanded / aria-controls / role="region"',
+      '<Accordion items={sampleItems} defaultExpandedIds={["item-2"]} />',
+      'Item 2 has aria-expanded="true" and visible region panel with rotated chevron',
+      { callSignature: '<Accordion items={items} defaultExpandedIds={["item-2"]} />' }
+    ),
+    r(
+      'Toggles item on click and closes other item when allowMultiple is false',
+      '<Accordion items={sampleItems} defaultExpandedIds={["item-1"]} allowMultiple={false} />',
+      'Clicking item 2 opens item 2 and closes item 1; clicking item 2 again toggles it closed',
+      { callSignature: '<Accordion items={items} allowMultiple={false} />' }
+    ),
+    r(
+      'Supports allowMultiple=true with multiple items open simultaneously',
+      '<Accordion items={sampleItems} allowMultiple={true} />',
+      'Clicking item 1 and item 2 leaves both panels open simultaneously',
+      { callSignature: '<Accordion items={items} allowMultiple={true} />' }
+    ),
+    r(
+      'Prevents interaction when item is disabled',
+      '<Accordion items={sampleItems} />',
+      'Disabled trigger button has disabled and opacity-40 and ignores clicks',
+      { callSignature: '<Accordion items={items} />' }
+    ),
+  ],
+  'tailwind-avatar-group': [
+    r(
+      'Renders individual Avatar with initials, base classes, and status dot',
+      '<Avatar name="Alice Walker" status="online" size="md" />',
+      'Renders AW initials with rounded-full, bg-slate-800, and emerald status dot',
+      { callSignature: '<Avatar name="Alice Walker" status="online" />' }
+    ),
+    r(
+      'Renders Avatar image when src provided with fallback on error',
+      '<Avatar name="Sarah Connor" src="https://example.com/avatar.jpg" />',
+      'Renders img element and falls back to initials SC when error event fires',
+      { callSignature: '<Avatar name="Sarah Connor" src="url" />' }
+    ),
+    r(
+      'Renders AvatarGroup container with semantic group role and -space-x-2 overlap',
+      '<AvatarGroup avatars={sampleAvatars.slice(0, 3)} max={4} />',
+      'Renders group role container with -space-x-2 and exactly 3 visible avatars',
+      { callSignature: '<AvatarGroup avatars={avatars} max={4} />' }
+    ),
+    r(
+      'Truncates at max and displays +N overflow counter pill with aria-label',
+      '<AvatarGroup avatars={sampleAvatars} max={3} size="md" />',
+      'Renders first 3 avatars plus a +3 overflow pill with accessible aria-label',
+      { callSignature: '<AvatarGroup avatars={avatars} max={3} />' }
+    ),
+    r(
+      'Applies size variants sm and lg correctly across avatars and overflow pill',
+      '<AvatarGroup avatars={sampleAvatars} max={2} size="sm" />',
+      'Applies h-8 w-8 for sm and h-12 w-12 for lg across avatars and overflow pill',
+      { callSignature: '<AvatarGroup avatars={avatars} size="sm" />' }
+    ),
+  ],
 };

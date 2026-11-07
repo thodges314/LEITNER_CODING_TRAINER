@@ -1,0 +1,16 @@
+{
+  "title": "Tailwind Avatar Group Stack",
+  "track": "tailwind",
+  "tags": [
+    "tailwind",
+    "react",
+    "avatar",
+    "stack",
+    "tokens"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}

@@ -1351,6 +1351,14 @@
     "difficulty": 2,
     "concept": "tailwind-responsive"
   },
+  "tailwind-accordion": {
+    "difficulty": 2,
+    "concept": "tailwind-accordion"
+  },
+  "tailwind-avatar-group": {
+    "difficulty": 2,
+    "concept": "tailwind-avatar"
+  },
   "tailwind-segmented-control": {
     "difficulty": 2,
     "concept": "tailwind-tabs"

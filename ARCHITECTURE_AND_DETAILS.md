@@ -8,7 +8,7 @@
 
 A client-only, zero-backend deliberate practice environment designed to simulate cold-start front-end technical interview screening.
 Learners write solutions from scratch without autocomplete or hints, execute their implementation headlessly in a browser sandbox against comprehensive test harnesses, and review cards according to spaced repetition schedules.
-The deck features **368 cards** across **16 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [368], **Full-Stack Core** [311], **Frontend Specialist** [238], and **Algorithms & Data Structures** [102]) with **2,451 documented test cases** and **100% structured Markdown instructions**.
+The deck features **370 cards** across **16 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [370], **Full-Stack Core** [313], **Frontend Specialist** [240], and **Algorithms & Data Structures** [102]) with **2,461 documented test cases** and **100% structured Markdown instructions**.
 
 - **Frontend Core**: React 19, TypeScript (strict mode), Vite 8.
 - **Content & Quality Pipeline**: Primarily AI-authored across structured batch pipelines with automated validation (reference passes, empty fails, label parity, mutation checks).
