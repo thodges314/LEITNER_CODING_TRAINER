@@ -15,7 +15,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task / card | Branch | Owner | Status |
 |---|---|---|---|
-| Next.js App Router Expansion (Route Handlers, Server Actions, Middleware, Dynamic Metadata, Cache Revalidation, RSC Boundary) | feature/nextjs-expansion | antigravity | Ready to merge |
+| Data Scaling & Streams (Micro-Batcher, Web Streams, Chunked Pipeline, Token Bucket, K-Way Stream Merge) | feature/data-scaling-streams | antigravity | In progress |
 
 
 
