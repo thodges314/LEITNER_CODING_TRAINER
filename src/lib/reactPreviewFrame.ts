@@ -676,26 +676,51 @@ ${libScripts.join('\n')}
     const container = document.getElementById('preview-root');
 
     // Render-loop watchdog: React never stops an effect that sets state on every render, so count commits.
-    // More than 100 commits in one second means a loop (normal UI, even 60fps animation, stays below that).
+    // If commits exceed 50 in one second, unmount immediately synchronously to prevent starving the event loop.
     let commitTimes = [];
     let loopTripped = false;
     function onProfilerRender() {
       const now = Date.now();
       commitTimes.push(now);
       while (commitTimes.length && now - commitTimes[0] > 1000) commitTimes.shift();
-      if (commitTimes.length > 100 && !loopTripped) {
+      if (commitTimes.length > 50 && !loopTripped) {
         loopTripped = true;
-        setTimeout(function() {
-          if (root) { root.unmount(); root = null; }
-          window.parent.postMessage({
-            type: 'leitner-preview:error',
-            renderId: activeRenderId,
-            message: 'Possible infinite render loop: the component re-rendered more than 100 times in one second, so it was stopped. Check for an effect that sets state on every render.',
-            timestamp: Date.now()
-          }, '*');
-        }, 0);
+        const savedRenderId = activeRenderId;
+        if (root) {
+          try {
+            root.unmount();
+          } catch (e) {
+            /* ignore unmount failure */
+          }
+          root = null;
+        }
+        window.parent.postMessage({
+          type: 'leitner-preview:error',
+          renderId: savedRenderId,
+          message: 'Possible infinite render loop: the component re-rendered more than 50 times in one second, so it was stopped. Check for an effect that sets state on every render.',
+          timestamp: Date.now()
+        }, '*');
       }
     }
+
+    window.onerror = function(message, source, lineno, colno, error) {
+      window.parent.postMessage({
+        type: 'leitner-preview:error',
+        renderId: activeRenderId,
+        message: error ? (error.stack || error.message || String(error)) : String(message),
+        timestamp: Date.now()
+      }, '*');
+    };
+
+    window.addEventListener('unhandledrejection', function(event) {
+      const reason = event.reason;
+      window.parent.postMessage({
+        type: 'leitner-preview:error',
+        renderId: activeRenderId,
+        message: reason ? (reason.stack || reason.message || String(reason)) : 'Unhandled Promise Rejection',
+        timestamp: Date.now()
+      }, '*');
+    });
 
     window.addEventListener('message', function(event) {
       const data = event.data;

@@ -59,3 +59,4 @@ Build a flexible, accessible React accordion component styled with Tailwind CSS 
   - When `allowMultiple: false` (default): clicking an item toggles its open state and closes any other open items.
   - When `allowMultiple: true`: multiple items can be expanded simultaneously.
   - Clicking a disabled item does nothing.
+

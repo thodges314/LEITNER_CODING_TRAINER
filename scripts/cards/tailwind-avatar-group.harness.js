@@ -108,3 +108,4 @@ const sampleAvatars = [
     { hasSm, hasLg }
   );
 }
+

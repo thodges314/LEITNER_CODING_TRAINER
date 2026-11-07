@@ -68,3 +68,4 @@ Build an accessible, responsive `AvatarGroup` component (and supporting `Avatar`
       - Overflow pill: `relative inline-flex shrink-0 items-center justify-center rounded-full font-medium ring-2 ring-slate-900 bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors` matching the active `size` dimensions.
       - Displays text `+${avatars.length - max}`.
       - Has attribute `aria-label={`${avatars.length - max} more team members`}`.
+
