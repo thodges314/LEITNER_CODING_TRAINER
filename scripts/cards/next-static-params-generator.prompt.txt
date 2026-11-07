@@ -1,0 +1,41 @@
+Write a static route segment matrix generator for Next.js App Router:
+
+## Description
+
+### Application Context
+In a documentation and product catalog (`app/docs/[category]/[slug]/page.tsx`), you are implementing the build-time `generateStaticParams` function that reads a hierarchical content taxonomy and produces a flattened, pre-rendered route parameter matrix.
+
+```ts
+interface DocTopic {
+  slug: string;
+  title: string;
+  published?: boolean;
+}
+
+interface DocCategory {
+  name: string;
+  slug: string;
+  topics: DocTopic[];
+}
+
+interface StaticDocParam {
+  category: string;
+  slug: string;
+}
+```
+
+### `generateStaticParams(categories: DocCategory[]): StaticDocParam[]`
+
+- Iterates over each category in `categories`.
+- Validates each category:
+  - Skips any category where `category.slug` is missing, not a string, or empty.
+  - Skips any category without an array of `topics`.
+- Iterates over `topics` within each valid category:
+  - Only includes topics where `published !== false` (i.e. published topics, or topics where `published` is omitted/undefined).
+  - Skips topics where `topic.slug` is missing, not a string, or empty.
+  - Produces an entry `{ category: category.slug.trim(), slug: topic.slug.trim() }`.
+- **Deduplication**:
+  - Removes duplicate `{ category, slug }` entries.
+- **Sorting**:
+  - Sorts the resulting array in ascending alphabetical order by `category`, then by `slug`.
+

@@ -49,6 +49,13 @@ const GRAPHQL_SANDBOX_APIS = [
   'validateGraphql',
 ] as const;
 
+const NEXT_SANDBOX_APIS = [
+  'NextResponse',
+  'NextRequest',
+  'revalidateTag',
+  'revalidatePath',
+] as const;
+
 /**
  * Extracts top-level `interface` and `type` declarations from ```ts / ```typescript
  * code blocks in a card's prompt markdown.
@@ -316,6 +323,13 @@ export function getCardPreloadedScopeInfo(card: TopicItem | null): CardPreloaded
       globals.push('GraphNode');
     }
     if (!types.includes('GraphNode')) types.push('GraphNode');
+  }
+
+  // 5. Next.js runtime helpers
+  for (const api of NEXT_SANDBOX_APIS) {
+    if (new RegExp(`\\b${api}\\b`).test(`${combinedSource}\n${harness}`)) {
+      if (!globals.includes(api)) globals.push(api);
+    }
   }
 
   const allItems: string[] = [];

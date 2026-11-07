@@ -1,0 +1,28 @@
+Write a Next.js Edge Middleware function that enforces session authentication:
+
+## Description
+
+### Application Context
+In a multi-tenant SaaS application (`middleware.ts`), incoming Edge requests are intercepted before hitting route handlers or server components to protect dashboard routes and redirect unauthenticated users to login.
+
+```ts
+interface MiddlewareMatcherConfig {
+  matcher: string[];
+}
+```
+
+### `middleware(request: NextRequest): NextResponse`
+
+- Inspects the requested pathname via `request.nextUrl.pathname`.
+- **Protected Paths (`/dashboard` and subpaths)**:
+  - If `pathname.startsWith('/dashboard')`:
+    - Checks for an `auth_token` cookie via `request.cookies.get('auth_token')`.
+    - If the cookie is absent or its `.value` is empty:
+      - Constructs a redirect URL to `/login` with the query parameter `next` set to `pathname` (e.g. `/login?next=%2Fdashboard`).
+      - Returns `NextResponse.redirect(redirectUrl)`.
+    - If the cookie is present and has a non-empty string value:
+      - Allows the request to proceed by returning `NextResponse.next()`.
+- **Public Paths**:
+  - For any path that does not start with `/dashboard` (e.g. `/`, `/about`, `/login`, `/api/health`):
+    - Allows the request to proceed by returning `NextResponse.next()`.
+

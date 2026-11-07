@@ -1,0 +1,14 @@
+{
+  "track": "nextjs",
+  "title": "Layouts vs. Templates: Prop Typing & Remount Semantics",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "layouts",
+    "templates",
+    "react-node",
+    "typescript"
+  ],
+  "requiresDom": true
+}
+

@@ -1,0 +1,50 @@
+Implement a Next.js 15 async page props parser and search query normalizer:
+
+## Description
+
+### Application Context
+In a modern Next.js 15 product catalog (`app/shop/[category]/page.tsx`), page and layout components receive `params` and `searchParams` as asynchronous Promises (`Promise<Params>`). You are implementing a Server Component helper that awaits both promises and safely normalizes search query parameters (handling both scalar strings and duplicate query arrays like `?sort=asc&tag=shoes&tag=sale`).
+
+```ts
+type SearchParamsValue = string | string[] | undefined;
+
+interface RawPageProps {
+  params: Promise<{ category: string }>;
+  searchParams: Promise<Record<string, SearchParamsValue>>;
+}
+
+interface NormalizedPageData {
+  category: string;
+  filters: {
+    tags: string[];
+    sort: string;
+    page: number;
+  };
+}
+```
+
+### `parseAsyncPageProps(props: RawPageProps): Promise<NormalizedPageData>`
+
+- **Await Async Parameters**:
+  - Awaits `props.params` to resolve `{ category: string }`.
+  - Awaits `props.searchParams` to resolve `Record<string, SearchParamsValue>`.
+- **Category Processing**:
+  - Sets `category` to the resolved category string trimmed. If missing, defaults to `'all'`.
+- **Query Filter Normalization**:
+  - **`tags`**:
+    - Reads key `'tag'` or `'tags'` from searchParams.
+    - If passed as an array of strings: filters out non-string or empty items, returning the trimmed strings.
+    - If passed as a single string: wraps it in a single-element array `[val.trim()]`.
+    - If omitted or undefined: defaults to `[]`.
+  - **`sort`**:
+    - Reads key `'sort'`.
+    - If passed as a single non-empty string: uses it trimmed.
+    - If passed as an array: takes the first non-empty string trimmed.
+    - If omitted or empty: defaults to `'featured'`.
+  - **`page`**:
+    - Reads key `'page'`.
+    - If passed as a single string: parses with `parseInt(val, 10)`. If positive integer (`p >= 1`), uses `p`; otherwise defaults to `1`.
+    - If passed as an array: parses the first item.
+    - If omitted or non-numeric: defaults to `1`.
+- Returns `{ category, filters: { tags, sort, page } }`.
+

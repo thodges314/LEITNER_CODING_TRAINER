@@ -1,0 +1,14 @@
+{
+  "track": "nextjs",
+  "title": "On-Demand ISR: Cache Tags & revalidateTag",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "caching",
+    "isr",
+    "revalidation",
+    "tags"
+  ],
+  "requiresDom": false
+}
+

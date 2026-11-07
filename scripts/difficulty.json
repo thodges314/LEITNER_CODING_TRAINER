@@ -1514,5 +1514,49 @@
   "d3-transitions-stagger-basics": {
     "difficulty": 1,
     "concept": "d3-transitions-basics"
+  },
+  "next-route-handler-crud": {
+    "difficulty": 2,
+    "concept": "next-route-handlers"
+  },
+  "next-server-action-form": {
+    "difficulty": 2,
+    "concept": "next-server-actions"
+  },
+  "next-middleware-auth-redirect": {
+    "difficulty": 3,
+    "concept": "next-middleware"
+  },
+  "next-generate-metadata": {
+    "difficulty": 2,
+    "concept": "next-metadata"
+  },
+  "next-static-params-generator": {
+    "difficulty": 2,
+    "concept": "next-static-params"
+  },
+  "next-revalidation-tag-cache": {
+    "difficulty": 3,
+    "concept": "next-cache-revalidation"
+  },
+  "next-async-page-props": {
+    "difficulty": 2,
+    "concept": "next-async-params"
+  },
+  "next-async-route-handler-context": {
+    "difficulty": 3,
+    "concept": "next-async-context"
+  },
+  "next-layout-template-composition": {
+    "difficulty": 2,
+    "concept": "next-layouts-templates"
+  },
+  "next-client-boundary-guard": {
+    "difficulty": 3,
+    "concept": "next-rsc-boundaries"
+  },
+  "next-parallel-intercepting-routes": {
+    "difficulty": 3,
+    "concept": "next-intercepting-routes"
   }
 }

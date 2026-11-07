@@ -12,8 +12,8 @@ import { mergeStoredWithSeed, parseDeckBackup, getDefaultDeckState } from './lei
 import type { TopicItem, LeitnerDeckState } from './leitner';
 
 describe('deckMigrations', () => {
-  it('defines CURRENT_DECK_VERSION as 4', () => {
-    expect(CURRENT_DECK_VERSION).toBe(4);
+  it('defines CURRENT_DECK_VERSION as 5', () => {
+    expect(CURRENT_DECK_VERSION).toBe(5);
   });
 
   describe('migrateTrackId & migrateTrackList', () => {
@@ -147,29 +147,29 @@ describe('deckMigrations', () => {
         },
       };
 
-      const v4 = migrateDeckState(unversioned);
-      expect(v4.deckVersion).toBe(4);
-      expect(v4.topics[0].track).toBe('advanced-algorithms');
-      expect(v4.topics[0].pack).toBeUndefined();
-      expect(v4.topics[1].track).toBe('graphql-server');
-      expect(v4.practiceFilter?.includeTracks).toContain('graphql-server');
-      expect(v4.practiceFilter?.includeTracks).toContain('react');
-      expect(v4.practiceFilter?.includeTracks).toContain('react-components');
+      const v5 = migrateDeckState(unversioned);
+      expect(v5.deckVersion).toBe(5);
+      expect(v5.topics[0].track).toBe('advanced-algorithms');
+      expect(v5.topics[0].pack).toBeUndefined();
+      expect(v5.topics[1].track).toBe('graphql-server');
+      expect(v5.practiceFilter?.includeTracks).toContain('graphql-server');
+      expect(v5.practiceFilter?.includeTracks).toContain('react');
+      expect(v5.practiceFilter?.includeTracks).toContain('react-components');
     });
 
-    it('upgrades v2 state directly to v4', () => {
+    it('upgrades v2 state directly to v5', () => {
       const v2 = {
         deckVersion: 2,
         totalCompletedReviews: 12,
         topics: [{ id: 'graphql-context-auth-guard', track: 'graphql', title: 'Auth' }],
       };
 
-      const v4 = migrateDeckState(v2);
-      expect(v4.deckVersion).toBe(4);
-      expect(v4.topics[0].track).toBe('graphql-server');
+      const v5 = migrateDeckState(v2);
+      expect(v5.deckVersion).toBe(5);
+      expect(v5.topics[0].track).toBe('graphql-server');
     });
 
-    it('upgrades v3 state to v4 ensuring d3 cards have track d3', () => {
+    it('upgrades v3 state to v5 ensuring d3 cards have track d3', () => {
       const v3Original: LeitnerDeckState = {
         deckVersion: 3,
         totalCompletedReviews: 15,
@@ -183,25 +183,41 @@ describe('deckMigrations', () => {
       expect(direct.deckVersion).toBe(4);
 
       const migrated = migrateDeckState(v3Original);
-      expect(migrated.deckVersion).toBe(4);
+      expect(migrated.deckVersion).toBe(5);
       expect(migrated.topics[0].track).toBe('graphql-server');
       expect(migrated.topics[1].track).toBe('d3');
     });
 
     it('handles null and undefined gracefully', () => {
-      expect(migrateDeckState(null).deckVersion).toBe(4);
-      expect(migrateDeckState(undefined).deckVersion).toBe(4);
-      expect(migrateDeckState({}).deckVersion).toBe(4);
+      expect(migrateDeckState(null).deckVersion).toBe(5);
+      expect(migrateDeckState(undefined).deckVersion).toBe(5);
+      expect(migrateDeckState({}).deckVersion).toBe(5);
+    });
+
+    it('migrates v4 to v5: increments deckVersion to 5 preserving filters', () => {
+      const v4State = {
+        deckVersion: 4,
+        topics: [],
+        practiceFilter: {
+          includeTracks: ['react', 'algorithms'],
+          excludeTracks: [],
+          includeTags: [],
+          excludeTags: [],
+        },
+      };
+      const migrated = migrateDeckState(v4State);
+      expect(migrated.deckVersion).toBe(5);
+      expect(migrated.practiceFilter?.includeTracks).toEqual(['react', 'algorithms']);
     });
   });
 
   describe('integration with getDefaultDeckState, mergeStoredWithSeed, and parseDeckBackup', () => {
     it('getDefaultDeckState sets deckVersion to CURRENT_DECK_VERSION', () => {
       const defaultState = getDefaultDeckState([]);
-      expect(defaultState.deckVersion).toBe(4);
+      expect(defaultState.deckVersion).toBe(5);
     });
 
-    it('mergeStoredWithSeed migrates legacy stored deck on load and sets deckVersion to 4', () => {
+    it('mergeStoredWithSeed migrates legacy stored deck on load and sets deckVersion to 5', () => {
       const legacyStored: LeitnerDeckState = {
         totalCompletedReviews: 2,
         topics: [
@@ -232,13 +248,13 @@ describe('deckMigrations', () => {
       };
 
       const merged = mergeStoredWithSeed(legacyStored, [seedTopic]);
-      expect(merged.deckVersion).toBe(4);
+      expect(merged.deckVersion).toBe(5);
       expect(merged.topics[0].track).toBe('graphql-server');
       expect(merged.topics[0].box).toBe(2); // user progress preserved
       expect(merged.topics[0].streak).toBe(1);
     });
 
-    it('parseDeckBackup migrates unversioned backup JSON to version 4', () => {
+    it('parseDeckBackup migrates unversioned backup JSON to version 5', () => {
       const unversionedBackup = JSON.stringify({
         totalCompletedReviews: 4,
         topics: [
@@ -264,7 +280,7 @@ describe('deckMigrations', () => {
       });
 
       const parsed = parseDeckBackup(unversionedBackup);
-      expect(parsed.deckVersion).toBe(4);
+      expect(parsed.deckVersion).toBe(5);
       expect(parsed.topics[0].track).toBe('react');
       expect(parsed.topics[1].track).toBe('graphql-server');
     });

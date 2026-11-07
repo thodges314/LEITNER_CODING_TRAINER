@@ -1,0 +1,47 @@
+Implement a Next.js App Router parallel route slot and intercepting route evaluator:
+
+## Description
+
+### Application Context
+In Next.js App Router applications with photo feeds, side-drawers, or contextual modals (`app/feed/@modal/(..)photo/[id]/page.tsx`), navigation behaviour depends on client transition context. During **soft navigation** (client transitions via `<Link>` or `router.push`), an intercepting route intercepts the target URL to render inside a parallel modal slot (`@modal`) while preserving the parent layout. During **hard navigation** (browser refresh, direct URL entry, or external links), Next.js renders the canonical standalone full page (`app/photo/[id]/page.tsx`). You are implementing the route evaluator that determines whether to intercept or render standalone.
+
+```ts
+interface RouteMatchContext {
+  currentPath: string;
+  targetUrl: string;
+  isSoftNavigation: boolean;
+}
+
+interface InterceptingRouteDefinition {
+  routePattern: string;
+  slotName: string;
+  targetPattern: string;
+}
+
+interface EvaluatedRouteResult {
+  isIntercepted: boolean;
+  activeSlot?: string;
+  renderedPattern: string;
+  params: Record<string, string>;
+}
+```
+
+### evaluateInterceptingRoute(definition: InterceptingRouteDefinition, context: RouteMatchContext): EvaluatedRouteResult
+
+Evaluates a target navigation against an intercepting parallel route definition:
+- Extracts dynamic route parameters (e.g. `[id]`, `[category]`) by matching `targetPattern` (e.g. `'/photo/[id]'`) against `context.targetUrl` (e.g. `'/photo/42'`).
+  - If `context.targetUrl` does not match `targetPattern`, returns `{ isIntercepted: false, renderedPattern: definition.targetPattern, params: {} }`.
+- When `context.isSoftNavigation` is `false` (hard navigation / refresh):
+  - Interception is disabled.
+  - Returns `{ isIntercepted: false, renderedPattern: definition.targetPattern, params }`.
+- When `context.isSoftNavigation` is `true`:
+  - Inspects the interception prefix embedded in `routePattern`:
+    - `(.)`: Intercepts only if the navigation originates from the same directory level.
+    - `(..)`: Intercepts if navigation originates from one level below the target route's parent (e.g. from `/feed` to `/photo/1` when `@modal` is inside `/feed`).
+    - `(..)(..)`: Intercepts from two levels below.
+    - `(...)`: Intercepts globally from any path within the app root.
+  - If the relative path structure satisfies the interception token and dynamic parameters are valid:
+    - Returns `{ isIntercepted: true, activeSlot: definition.slotName, renderedPattern: definition.routePattern, params }`.
+  - If the path structure does not satisfy the prefix:
+    - Returns `{ isIntercepted: false, renderedPattern: definition.targetPattern, params }`.
+

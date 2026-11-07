@@ -1,0 +1,48 @@
+Write Next.js App Router Route Handlers for an inventory management API:
+
+## Description
+
+### Application Context
+In an App Router inventory and order management system (`app/api/items/[id]/route.ts`), you are implementing the backend Route Handler that retrieves and updates item inventory records in response to client requests.
+
+```ts
+interface RouteContext {
+  params: { id: string };
+}
+
+interface ItemRecord {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+interface CreateItemInput {
+  name: string;
+  quantity: number;
+  price: number;
+}
+```
+
+Maintain an in-memory `itemsStore = new Map<string, ItemRecord>()`:
+
+### `GET(request: Request, context: RouteContext): Promise<NextResponse>`
+- Retrieves the item from `itemsStore` using `context.params.id`.
+- If the item exists in `itemsStore`:
+  - Returns `NextResponse.json(item, { status: 200 })`.
+- If the item does not exist:
+  - Returns `NextResponse.json({ error: 'Item not found' }, { status: 404 })`.
+
+### `POST(request: Request, context: RouteContext): Promise<NextResponse>`
+- Parses the JSON request body using `await request.json()`.
+- Validates the payload:
+  - `name`: must be a non-empty string.
+  - `quantity`: must be a finite number greater than or equal to 0.
+  - `price`: must be a finite number greater than or equal to 0.
+- If any validation check fails:
+  - Returns `NextResponse.json({ error: 'Invalid item payload' }, { status: 400 })`.
+- If validation succeeds:
+  - Constructs a record `{ id: context.params.id, name, quantity, price }`.
+  - Saves it in `itemsStore.set(context.params.id, record)`.
+  - Returns `NextResponse.json(record, { status: 201 })`.
+

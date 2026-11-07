@@ -41,7 +41,8 @@ export type TrackType =
   | 'graphql'
   | 'graphql-server'
   | 'node'
-  | 'sql-postgres';
+  | 'sql-postgres'
+  | 'nextjs';
 
 
 export interface TestCaseItem {
@@ -301,6 +302,12 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     color: '#06b6d4',
     bg: 'rgba(6, 182, 212, 0.12)',
     border: 'rgba(6, 182, 212, 0.35)',
+  },
+  'nextjs': {
+    label: 'Next.js',
+    color: '#f8fafc',
+    bg: 'rgba(248, 250, 252, 0.12)',
+    border: 'rgba(248, 250, 252, 0.35)',
   },
 };
 

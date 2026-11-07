@@ -1,0 +1,15 @@
+{
+  "track": "nextjs",
+  "title": "Middleware: Edge Auth Guard & Redirection",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "middleware",
+    "cookies",
+    "auth",
+    "http",
+    "async"
+  ],
+  "requiresDom": false
+}
+

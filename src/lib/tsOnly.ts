@@ -3,7 +3,7 @@
  * toggle is locked. Every other card supports both JavaScript and TypeScript.
  * Keep scripts/report-ts.mjs (TS_ONLY_TRACKS) in sync with this list.
  */
-export const TS_ONLY_TRACKS: readonly string[] = ['typescript-patterns'];
+export const TS_ONLY_TRACKS: readonly string[] = ['typescript-patterns', 'nextjs'];
 
 export function isTsOnlyCard(card: { track?: string } | null | undefined): boolean {
   return card?.track !== undefined && TS_ONLY_TRACKS.includes(card.track);

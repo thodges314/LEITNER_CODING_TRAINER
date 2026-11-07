@@ -4,6 +4,7 @@ export const ACTIVE_DECK_STORAGE_KEY = 'leitner_active_deck_id';
 export const CUSTOM_DECKS_STORAGE_KEY = 'leitner_custom_decks';
 
 export const FRONTEND_TRACKS: ReadonlySet<TrackType> = new Set<TrackType>([
+  'nextjs',
   'react',
   'react-components',
   'd3',

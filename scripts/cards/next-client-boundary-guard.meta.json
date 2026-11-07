@@ -1,0 +1,13 @@
+{
+  "title": "Next.js RSC Client Boundary Serialization Guard",
+  "track": "nextjs",
+  "tags": [
+    "nextjs",
+    "rsc",
+    "serialization",
+    "client-components",
+    "validation"
+  ],
+  "requiresDom": false
+}
+

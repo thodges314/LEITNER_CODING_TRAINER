@@ -1,0 +1,49 @@
+Implement an in-memory tagged cache manager mirroring Next.js App Router on-demand revalidation:
+
+## Description
+
+### Application Context
+In an on-demand Incremental Static Regeneration (ISR) system (`app/lib/tagCache.ts`), you are implementing the underlying tagged cache manager that mirrors Next.js fetch caching (`{ next: { tags: ['products', 'item-42'] } }`) and purge propagation via `revalidateTag`.
+
+```ts
+interface CacheItem<T = any> {
+  data: T;
+  tags: string[];
+  expiresAt?: number;
+}
+
+interface TagCacheOptions {
+  tags?: string[];
+  ttlMs?: number;
+}
+
+interface TagCacheManager {
+  set<T = any>(key: string, data: T, options?: TagCacheOptions): void;
+  get<T = any>(key: string): T | null;
+  has(key: string): boolean;
+  revalidateTag(tag: string): number;
+  clear(): void;
+}
+```
+
+### `createTagCacheManager(): TagCacheManager`
+
+Returns an object implementing `TagCacheManager`:
+
+- **`set<T>(key: string, data: T, options?: TagCacheOptions): void`**:
+  - Stores `data`, normalized `tags` (defaults to `[]`), and optional `expiresAt` (`ttlMs ? Date.now() + ttlMs : undefined`).
+  - Indexing: associates the key with each specified tag for instant tag-based invalidation.
+- **`get<T>(key: string): T | null`**:
+  - Retrieves the cached item by `key`.
+  - If missing, returns `null`.
+  - If expired (`item.expiresAt && Date.now() >= item.expiresAt`), removes the item and returns `null`.
+  - Otherwise, returns `item.data`.
+- **`has(key: string): boolean`**:
+  - Returns `true` if the item exists and is not expired; otherwise `false` (purging expired entries).
+- **`revalidateTag(tag: string): number`**:
+  - Finds all cached keys associated with `tag`.
+  - Purges each found key from cache.
+  - Cleans up tag associations and returns the count of purged items.
+- **`clear(): void`**:
+  - Completely wipes all cached items and tag associations.
+

@@ -1,5 +1,6 @@
 import ts from 'typescript';
 import { SANDBOX_D3_TYPES } from './sandboxD3Types';
+import { SANDBOX_NEXT_TYPES } from './sandboxNextTypes';
 import { extractPromptTypeDeclarations } from './cardPromptTypes';
 
 export interface FormattedDiagnostic {
@@ -358,8 +359,8 @@ const SANDBOX_GLOBALS = `
   }
 `;
 
-/** Combined sandbox globals: DOM/React/node shims + full typed D3 namespace. */
-const SANDBOX_GLOBALS_WITH_D3 = SANDBOX_GLOBALS + SANDBOX_D3_TYPES;
+/** Combined sandbox globals: DOM/React/node shims + full typed D3 namespace + Next.js App Router. */
+const SANDBOX_GLOBALS_WITH_D3 = SANDBOX_GLOBALS + SANDBOX_D3_TYPES + SANDBOX_NEXT_TYPES;
 
 const CORE_GLOBAL_TYPE_NAMES = new Set([
   'Observable',

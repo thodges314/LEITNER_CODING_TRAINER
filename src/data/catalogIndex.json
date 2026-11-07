@@ -2963,7 +2963,7 @@
   },
   {
     "id": "next-route-matcher",
-    "title": "Next.js Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
+    "title": "Next.js-Style Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
     "track": "dom-browser",
     "concept": "router",
     "difficulty": 3,
@@ -5332,5 +5332,180 @@
       "documents"
     ],
     "summary": "GraphQL subscriptions allow clients to listen for real-time updates pushed from the server when events occur. A subscription document uses the subs..."
+  },
+  {
+    "id": "next-middleware-auth-redirect",
+    "title": "Middleware: Edge Auth Guard & Redirection",
+    "track": "nextjs",
+    "concept": "next-middleware",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "middleware",
+      "cookies",
+      "auth",
+      "http",
+      "async"
+    ],
+    "summary": "Write a Next.js Edge Middleware function that enforces session authentication"
+  },
+  {
+    "id": "next-route-handler-crud",
+    "title": "Route Handlers: App Router GET & POST",
+    "track": "nextjs",
+    "concept": "next-route-handlers",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-handlers",
+      "http",
+      "api",
+      "async"
+    ],
+    "summary": "Write Next.js App Router Route Handlers for an inventory management API"
+  },
+  {
+    "id": "next-server-action-form",
+    "title": "Server Action: Form State & Validation",
+    "track": "nextjs",
+    "concept": "next-server-actions",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "server-actions",
+      "forms",
+      "validation",
+      "async"
+    ],
+    "summary": "Write a Next.js App Router Server Action for shopping cart quantity updates"
+  },
+  {
+    "id": "next-generate-metadata",
+    "title": "Dynamic Metadata: OpenGraph & SEO Generator",
+    "track": "nextjs",
+    "concept": "next-metadata",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "metadata",
+      "seo",
+      "opengraph",
+      "async"
+    ],
+    "summary": "Write an App Router generateMetadata function for a content publishing portal"
+  },
+  {
+    "id": "next-revalidation-tag-cache",
+    "title": "On-Demand ISR: Cache Tags & revalidateTag",
+    "track": "nextjs",
+    "concept": "next-cache-revalidation",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "caching",
+      "isr",
+      "revalidation",
+      "tags"
+    ],
+    "summary": "Implement an in-memory tagged cache manager mirroring Next.js App Router on-demand revalidation"
+  },
+  {
+    "id": "next-static-params-generator",
+    "title": "Static Route Matrix: generateStaticParams",
+    "track": "nextjs",
+    "concept": "next-static-params",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "ssg",
+      "static-generation",
+      "routing",
+      "algorithms"
+    ],
+    "summary": "Write a static route segment matrix generator for Next.js App Router"
+  },
+  {
+    "id": "next-async-page-props",
+    "title": "Async Request APIs: Dynamic Params & SearchParams",
+    "track": "nextjs",
+    "concept": "next-async-params",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "async-params",
+      "search-params",
+      "typescript",
+      "nextjs-15"
+    ],
+    "summary": "Implement a Next.js 15 async page props parser and search query normalizer"
+  },
+  {
+    "id": "next-async-route-handler-context",
+    "title": "Async Route Context: Dynamic Segment Typing",
+    "track": "nextjs",
+    "concept": "next-async-context",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-handlers",
+      "async-params",
+      "typescript",
+      "nextjs-15"
+    ],
+    "summary": "Implement a Next.js 15 App Router Route Handler with strictly typed async route context"
+  },
+  {
+    "id": "next-layout-template-composition",
+    "title": "Layouts vs. Templates: Prop Typing & Remount Semantics",
+    "track": "nextjs",
+    "concept": "next-layouts-templates",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "layouts",
+      "templates",
+      "react-node",
+      "typescript"
+    ],
+    "summary": "Implement Next.js App Router Layout and Template components with strict prop typing and remount coordinator"
+  },
+  {
+    "id": "next-client-boundary-guard",
+    "title": "Next.js RSC Client Boundary Serialization Guard",
+    "track": "nextjs",
+    "concept": "next-rsc-boundaries",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "rsc",
+      "serialization",
+      "client-components",
+      "validation"
+    ],
+    "summary": "Implement a React Server Component (RSC) to Client Component serialization guard that validates props passed across the network boundary"
+  },
+  {
+    "id": "next-parallel-intercepting-routes",
+    "title": "Next.js Parallel & Intercepting Route Evaluator",
+    "track": "nextjs",
+    "concept": "next-intercepting-routes",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "router",
+      "parallel-routes",
+      "intercepting-routes",
+      "app-router"
+    ],
+    "summary": "Implement a Next.js App Router parallel route slot and intercepting route evaluator"
   }
 ]

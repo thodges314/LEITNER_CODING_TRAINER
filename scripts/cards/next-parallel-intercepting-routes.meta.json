@@ -1,0 +1,13 @@
+{
+  "title": "Next.js Parallel & Intercepting Route Evaluator",
+  "track": "nextjs",
+  "tags": [
+    "nextjs",
+    "router",
+    "parallel-routes",
+    "intercepting-routes",
+    "app-router"
+  ],
+  "requiresDom": false
+}
+

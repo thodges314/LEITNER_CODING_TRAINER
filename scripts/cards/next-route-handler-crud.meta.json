@@ -1,0 +1,14 @@
+{
+  "track": "nextjs",
+  "title": "Route Handlers: App Router GET & POST",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "route-handlers",
+    "http",
+    "api",
+    "async"
+  ],
+  "requiresDom": false
+}
+

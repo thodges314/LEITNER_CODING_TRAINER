@@ -1,0 +1,14 @@
+{
+  "track": "nextjs",
+  "title": "Dynamic Metadata: OpenGraph & SEO Generator",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "metadata",
+    "seo",
+    "opengraph",
+    "async"
+  ],
+  "requiresDom": false
+}
+

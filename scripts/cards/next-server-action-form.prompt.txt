@@ -1,0 +1,34 @@
+Write a Next.js App Router Server Action for shopping cart quantity updates:
+
+## Description
+
+### Application Context
+In an e-commerce checkout flow (`app/checkout/actions.ts`), a Client Component cart form invokes this Server Action to update an item's quantity in the shopping cart and recalculate totals.
+
+```ts
+interface ActionState {
+  success: boolean;
+  errors?: {
+    itemId?: string;
+    quantity?: string;
+  };
+  cart?: {
+    itemId: string;
+    quantity: number;
+    total: number;
+  };
+}
+```
+
+### `updateCartQuantity(prevState: ActionState, formData: FormData): Promise<ActionState>`
+
+- Extracts `itemId` from `formData.get('itemId')` and `quantityRaw` from `formData.get('quantity')`.
+- **Validation**:
+  - `itemId`: must be a non-empty string. If missing, null, or trimmed length is 0, records `errors.itemId = 'Item ID is required'`.
+  - `quantity`: parses `Number(quantityRaw)`. If `quantityRaw` is missing or null, not an integer (`!Number.isInteger(q)`), or less than 1 or greater than 99, records `errors.quantity = 'Quantity must be between 1 and 99'`.
+- **Failure Return**:
+  - If any validation errors exist, returns `{ success: false, errors }`.
+- **Success Return**:
+  - If valid, calculates line total assuming unit price of 25: `total = quantity * 25`.
+  - Returns `{ success: true, cart: { itemId: String(itemId).trim(), quantity, total } }`.
+

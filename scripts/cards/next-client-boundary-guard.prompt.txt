@@ -1,0 +1,38 @@
+Implement a React Server Component (RSC) to Client Component serialization guard that validates props passed across the network boundary:
+
+## Description
+
+### Application Context
+In the Next.js App Router, Server Components (`app/feed/page.tsx`) render on the server and stream their output to the client. When a Server Component passes props to a Client Component marked with `'use client'` (`components/LikeButton.tsx`), those props are serialized over the network via the React Flight protocol. Passing functions (non-action handlers), Symbols, custom class instances, BigInts, or circular object graphs fails at runtime. You are building an architectural validation helper that audits props before crossing the client boundary.
+
+```ts
+interface BoundaryValidationError {
+  path: string;
+  type: string;
+  message: string;
+}
+
+interface BoundaryValidationResult {
+  valid: boolean;
+  errors: BoundaryValidationError[];
+  sanitizedProps?: Record<string, unknown>;
+}
+```
+
+### validateClientBoundaryProps(props: Record<string, unknown>): BoundaryValidationResult
+
+Validates a dictionary of props intended for a Client Component:
+- Traverses nested objects and arrays tracking dot-separated property paths (e.g. `'user.profile.avatar'`, `'items[0].handler'`).
+- Detects circular references and records an error with `type: 'circular_reference'` at the repeating path.
+- Flags non-serializable values:
+  - Functions: `type: 'function'`, `message: 'Functions cannot be passed across RSC client boundaries. Pass an identifier or Server Action reference instead.'`
+  - Symbols: `type: 'symbol'`, `message: 'Symbols are not serializable across client boundaries.'`
+  - BigInt: `type: 'bigint'`, `message: 'BigInt values cannot be serialized in RSC boundary props without custom formatting.'`
+  - Custom Class Instances (instances whose prototype is neither `Object.prototype` nor `null` nor `Date` nor `Array.prototype`): `type: 'class_instance'`, `message: 'Class instance <ConstructorName> cannot be passed to Client Components. Convert to a plain object.'`
+- When valid (`errors.length === 0`):
+  - `valid` is `true`.
+  - `sanitizedProps` contains a deep clone of the props with all `Date` objects converted to their `.toISOString()` string representations.
+- When invalid (`errors.length > 0`):
+  - `valid` is `false`.
+  - `sanitizedProps` is `undefined`.
+

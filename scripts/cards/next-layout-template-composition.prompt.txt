@@ -1,0 +1,40 @@
+Implement Next.js App Router Layout and Template components with strict prop typing and remount coordinator:
+
+## Description
+
+### Application Context
+In a Next.js App Router dashboard (`app/dashboard/layout.tsx` vs `app/dashboard/template.tsx`), layouts and templates compose component trees. While both accept `children: React.ReactNode`, layouts persist across client route transitions (preserving local state and preventing DOM re-renders) whereas templates re-mount on every route transition (generating fresh state and re-triggering entrance animations/effects). You are implementing the typed components and an architectural transition coordinator.
+
+```ts
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+interface TemplateProps {
+  children: React.ReactNode;
+}
+
+interface RemountCoordinator {
+  shouldRemountLayout(fromPath: string, toPath: string): boolean;
+  shouldRemountTemplate(fromPath: string, toPath: string): boolean;
+  getTemplateKey(pathname: string, visitCount: number): string;
+}
+```
+
+### DashboardLayout({ children }: LayoutProps): React.ReactElement
+
+- **`DashboardLayout({ children }: LayoutProps): React.ReactElement`**:
+  - Renders `<div data-testid="dashboard-layout" className="dashboard-layout">{children}</div>`.
+- **`DashboardTemplate({ children }: TemplateProps): React.ReactElement`**:
+  - Renders `<div data-testid="dashboard-template" className="dashboard-template">{children}</div>`.
+- **`createRemountCoordinator(): RemountCoordinator`**:
+  - Returns an object with:
+    - **`shouldRemountLayout(fromPath: string, toPath: string): boolean`**:
+      - Returns `false` if both `fromPath` and `toPath` share the same layout segment root (e.g. both start with `'/dashboard'`).
+      - Returns `true` only when transitioning across layout boundaries (e.g. `'/dashboard/settings'` to `'/login'`).
+    - **`shouldRemountTemplate(fromPath: string, toPath: string): boolean`**:
+      - Returns `true` on ANY route path change (`fromPath !== toPath`), enforcing that templates always re-instantiate on navigation.
+      - Returns `false` if `fromPath === toPath`.
+    - **`getTemplateKey(pathname: string, visitCount: number): string`**:
+      - Returns `template-${pathname}-${visitCount}` to be used as a unique React `key` forcing remount.
+

@@ -1,0 +1,43 @@
+Implement a Next.js 15 App Router Route Handler with strictly typed async route context:
+
+## Description
+
+### Application Context
+In a Next.js 15 REST API (`app/api/orgs/[orgId]/members/[memberId]/route.ts`), Route Handlers receive `context.params` as a Promise (`{ params: Promise<{ orgId: string; memberId: string }> }`). You are implementing the `GET` Route Handler that strictly types the route context, awaits dynamic segment parameters, and validates organization member records.
+
+```ts
+interface RouteParams {
+  orgId: string;
+  memberId: string;
+}
+
+interface RouteContext {
+  params: Promise<RouteParams>;
+}
+
+interface MemberRecord {
+  id: string;
+  orgId: string;
+  role: 'owner' | 'admin' | 'member';
+  email: string;
+}
+```
+
+Assume an in-memory or injected store `membersStore = new Map<string, MemberRecord>()` indexed by `"${orgId}::${memberId}"`:
+
+### `GET(request: Request, context: RouteContext): Promise<NextResponse>`
+
+- **Await Async Route Context**:
+  - Awaits `context.params` to retrieve `{ orgId, memberId }`.
+- **Validation**:
+  - Validates `orgId` and `memberId`: both must be non-empty strings.
+  - If either is missing, not a string, or empty after trimming:
+    - Returns `NextResponse.json({ error: 'Invalid route parameters' }, { status: 400 })`.
+- **Store Lookup**:
+  - Constructs key: `${orgId.trim()}::${memberId.trim()}`.
+  - Retrieves member from `membersStore.get(key)`.
+  - If not found:
+    - Returns `NextResponse.json({ error: 'Member not found' }, { status: 404 })`.
+  - If found:
+    - Returns `NextResponse.json(member, { status: 200 })`.
+

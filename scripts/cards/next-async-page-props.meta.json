@@ -1,0 +1,14 @@
+{
+  "track": "nextjs",
+  "title": "Async Request APIs: Dynamic Params & SearchParams",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "async-params",
+    "search-params",
+    "typescript",
+    "nextjs-15"
+  ],
+  "requiresDom": false
+}
+
