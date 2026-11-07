@@ -1,8 +1,8 @@
-function KanbanBoard({
+const KanbanBoard = ({
   initialColumns = [],
   onCardMove = () => {},
   onCardAdd = () => {},
-}) {
+}) => {
   const [columns, setColumns] = useState(() =>
     initialColumns.map((col) => ({
       ...col,

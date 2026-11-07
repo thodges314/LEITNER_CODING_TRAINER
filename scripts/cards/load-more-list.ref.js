@@ -1,4 +1,4 @@
-function LoadMoreList({ fetchPage }) {
+const LoadMoreList = ({ fetchPage }) => {
   const [items, setItems] = useState([]);
   const [loadedPage, setLoadedPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);

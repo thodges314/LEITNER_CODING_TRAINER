@@ -1,11 +1,11 @@
-function reorder(list, fromIndex, toIndex) {
+const reorder = (list, fromIndex, toIndex) => {
   const result = [...list];
   const [removed] = result.splice(fromIndex, 1);
   result.splice(toIndex, 0, removed);
   return result;
-}
+};
 
-function DragSortableList({ items = [], onReorder = () => {} }) {
+const DragSortableList = ({ items = [], onReorder = () => {} }) => {
   const [list, setList] = useState(items);
   const [draggedIdx, setDraggedIdx] = useState(null);
 

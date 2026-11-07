@@ -1,4 +1,4 @@
-function InfiniteList({
+const InfiniteList = ({
   items = [],
   onLoadMore,
   hasMore,
@@ -8,7 +8,7 @@ function InfiniteList({
   onLoadMore: () => void;
   hasMore: boolean;
   loading: boolean;
-}): JSX.Element {
+}): JSX.Element => {
   const sentinelRef = useRef<HTMLLIElement | null>(null);
   const state = useRef<{ onLoadMore: () => void; loading: boolean }>({ onLoadMore, loading });
   state.current = { onLoadMore, loading };
