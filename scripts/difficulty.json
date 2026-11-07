@@ -1347,6 +1347,14 @@
     "difficulty": 3,
     "concept": "d3-force-graph"
   },
+  "tailwind-responsive-card": {
+    "difficulty": 2,
+    "concept": "tailwind-responsive"
+  },
+  "tailwind-modal-dialog": {
+    "difficulty": 3,
+    "concept": "tailwind-modal"
+  },
   "tailwind-arbitrary-parser": {
     "difficulty": 3,
     "concept": "tailwind-parser"

@@ -238,4 +238,68 @@ empty()`,
       { callSignature: '<Badge {...props} />' }
     ),
   ],
+  'tailwind-responsive-card': [
+    r(
+      'Returns null when product is null or undefined',
+      '<ResponsiveProductCard product={null} />',
+      'Returns null, rendering empty container',
+      { callSignature: '<ResponsiveProductCard product={null} />' }
+    ),
+    r(
+      'Renders responsive article with flex-col on mobile and md:flex-row on desktop',
+      '<ResponsiveProductCard product={{ title: "Keyboard", price: 99 }} />',
+      'Renders semantic article with flex-col and md:flex-row classes',
+      { callSignature: '<ResponsiveProductCard product={product} />' }
+    ),
+    r(
+      'Renders product image container with aspect-video and md:w-48 md:aspect-square',
+      '<ResponsiveProductCard product={{ title: "Mouse", price: 49, imageUrl: "..." }} />',
+      'Renders image wrapper with aspect-video, md:w-48, and md:aspect-square',
+      { callSignature: '<ResponsiveProductCard product={product} />' }
+    ),
+    r(
+      'Displays product title, description, and price with optional strikethrough originalPrice',
+      '<ResponsiveProductCard product={{ title: "Headphones", price: 199, originalPrice: 249, rating: 4.8 }} />',
+      'Displays title, price, line-through original price, and rating',
+      { callSignature: '<ResponsiveProductCard product={product} />' }
+    ),
+    r(
+      'Renders badge pill overlay and triggers onAddToCart callback when clicked',
+      '<ResponsiveProductCard product={{ title: "Lamp", price: 39, badge: "Best Seller" }} onAddToCart={fn} />',
+      'Renders absolute top-3 left-3 badge pill and fires onAddToCart callback',
+      { callSignature: '<ResponsiveProductCard product={product} onAddToCart={fn} />' }
+    ),
+  ],
+  'tailwind-modal-dialog': [
+    r(
+      'Returns null when isOpen is false',
+      '<ModalDialog isOpen={false} onClose={fn} title="Test">Body</ModalDialog>',
+      'Returns null, rendering empty container',
+      { callSignature: '<ModalDialog isOpen={false} onClose={fn} title="Test" />' }
+    ),
+    r(
+      'Renders backdrop overlay with fixed inset-0, z-50, and backdrop-blur-sm when isOpen is true',
+      '<ModalDialog isOpen={true} onClose={fn} title="Settings">Body</ModalDialog>',
+      'Renders fixed inset-0 z-50 backdrop overlay with backdrop-blur-sm',
+      { callSignature: '<ModalDialog isOpen={true} onClose={fn} title="Settings" />' }
+    ),
+    r(
+      'Renders semantic dialog with role="dialog", aria-modal="true", and size classes',
+      '<ModalDialog isOpen={true} size="lg" title="Delete" footer={<button>Confirm</button>}>Body</ModalDialog>',
+      'Renders dialog with role="dialog", aria-modal="true", max-w-lg, and footer',
+      { callSignature: '<ModalDialog isOpen={true} size="lg" title="Delete" />' }
+    ),
+    r(
+      'Invokes onClose when clicking close button or backdrop',
+      'Clicking close button and clicking backdrop container',
+      'Invokes onClose callback for each dismiss trigger',
+      { callSignature: 'onClose()' }
+    ),
+    r(
+      'Invokes onClose when Escape key is pressed',
+      'Dispatching keydown event with key: "Escape" on window',
+      'Invokes onClose callback on Escape key press',
+      { callSignature: 'onClose()' }
+    ),
+  ],
 };

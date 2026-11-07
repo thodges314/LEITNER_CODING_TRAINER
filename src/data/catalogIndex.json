@@ -5104,5 +5104,37 @@
       "tokens"
     ],
     "summary": "type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral';"
+  },
+  {
+    "id": "tailwind-modal-dialog",
+    "title": "Tailwind Accessible Modal Dialog",
+    "track": "tailwind",
+    "concept": "tailwind-modal",
+    "difficulty": 3,
+    "tags": [
+      "tailwind",
+      "css",
+      "react",
+      "dialog",
+      "modal",
+      "accessibility"
+    ],
+    "summary": "Build an accessible, animated modal dialog component in React styled with modern Tailwind CSS utility classes. The dialog includes a backdrop overl..."
+  },
+  {
+    "id": "tailwind-responsive-card",
+    "title": "Tailwind Responsive Product Card",
+    "track": "tailwind",
+    "concept": "tailwind-responsive",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "css",
+      "react",
+      "responsive",
+      "layout",
+      "flexbox"
+    ],
+    "summary": "Build a responsive e-commerce product card component in React styled with modern Tailwind CSS utility classes. The component should adapt seamlessl..."
   }
 ]

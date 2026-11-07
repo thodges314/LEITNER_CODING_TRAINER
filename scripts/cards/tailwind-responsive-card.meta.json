@@ -1,0 +1,10 @@
+{
+  "title": "Tailwind Responsive Product Card",
+  "track": "tailwind",
+  "concept": "tailwind",
+  "difficulty": 2,
+  "rendersComponent": true,
+  "previewLibraries": ["react", "tailwind"],
+  "tags": ["tailwind", "css", "react", "responsive", "layout", "flexbox"]
+}
+

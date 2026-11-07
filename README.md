@@ -11,7 +11,7 @@ Built with **React 19 + TypeScript + Vite**. Zero backend — everything runs lo
 ```bash
 npm install
 npm run dev           # Start Vite development server (localhost:5173)
-npm test              # Run Vitest suite (2,367 tests across 69 test files)
+npm test              # Run Vitest suite (2,379 tests across 69 test files)
 npm run e2e           # Run Playwright E2E suite in real Chromium (782 tests across 17 test files)
 npm run check:cards   # Read-only check: verify topics.json & catalogIndex.json match source cards
 npm run build:cards   # Rebuild topics.json & catalogIndex.json from scripts/cards/ sources
@@ -39,7 +39,7 @@ Switchable in Settings between two spaced-repetition models:
 - **Autoclosing Brackets & Quotes**: Auto-pairs and jumps over `()`, `[]`, `{}`, `""`, `''`, and `` ` ``.
 - **In-Browser Prettier Formatting**: Client-side code formatting powered by standalone Prettier (`prettier/standalone` with Babel, TypeScript, and Estree plugins). Format via toolbar or **`Shift + Alt + F`** / **`Cmd + Shift + F`**.
 
-### 3. 100% Dual TypeScript Solutions (`364 / 364 Cards`)
+### 3. 100% Dual TypeScript Solutions (`366 / 366 Cards`)
 - Every card in the catalog features canonical **JavaScript (`<id>.ref.js`)** and **TypeScript (`<id>.ref.ts`)** reference implementations.
 - Ambient data structures (`ListNode<T>`, `TreeNode<T>`) and browser globals are baked into the execution sandbox.
 - **Clean Type Signatures**: Prompt headings feature readable signatures (`### functionName(arg: Type): ReturnType`), while complex option models and structured return types are extracted into clean ```ts interface blocks.
@@ -97,7 +97,7 @@ Switchable in Settings between two spaced-repetition models:
 
 ## Content & Authoring Pipeline
 
-The repository includes **364 curated cards** across 16 topic tracks with **2,431 test cases**:
+The repository includes **366 curated cards** across 16 topic tracks with **2,441 test cases**:
 - **Advanced Algorithms** (57 cards)
 - **JS Utilities** (44 cards)
 - **React Components** (41 cards)
@@ -111,7 +111,7 @@ The repository includes **364 curated cards** across 16 topic tracks with **2,43
 - **Node.js Runtime & Architecture** (15 cards)
 - **GraphQL Server & Schemas** (14 cards)
 - **TypeScript Patterns** (14 cards)
-- **Tailwind CSS** (8 cards)
+- **Tailwind CSS** (10 cards)
 - **GraphQL APIs & Execution** (7 cards)
 - **Testing & Libraries** (5 cards)
 
