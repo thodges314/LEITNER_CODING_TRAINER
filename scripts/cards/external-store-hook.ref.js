@@ -1,4 +1,4 @@
-function createStore(initialState) {
+const createStore = (initialState) => {
   let state = initialState;
   const listeners = new Set();
   return {
@@ -18,6 +18,6 @@ function createStore(initialState) {
   };
 }
 
-function useStore(store, selector = (state) => state) {
+const useStore = (store, selector = (state) => state) => {
   return useSyncExternalStore(store.subscribe, () => selector(store.getState()));
 }

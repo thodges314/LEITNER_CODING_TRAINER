@@ -2,7 +2,7 @@ interface SearchFormProps {
   onSearch: (query: string) => void;
 }
 
-function SearchForm({ onSearch }: SearchFormProps): JSX.Element {
+const SearchForm = ({ onSearch }: SearchFormProps): JSX.Element => {
   const [query, setQuery] = useState('');
 
   const handleSubmit = (event: { preventDefault: () => void }): void => {
