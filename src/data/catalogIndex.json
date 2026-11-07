@@ -5073,5 +5073,36 @@
       "a11y"
     ],
     "summary": "type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'outline';"
+  },
+  {
+    "id": "tailwind-arbitrary-parser",
+    "title": "Tailwind Arbitrary Value Parser",
+    "track": "tailwind",
+    "concept": "tailwind-parser",
+    "difficulty": 3,
+    "tags": [
+      "tailwind",
+      "parser",
+      "jit",
+      "regex",
+      "utilities",
+      "arbitrary-values"
+    ],
+    "summary": "interface ParsedArbitraryClass {"
+  },
+  {
+    "id": "tailwind-badge-component",
+    "title": "Tailwind Dynamic Status Badge",
+    "track": "tailwind",
+    "concept": "tailwind-badge",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "react",
+      "badge",
+      "status",
+      "tokens"
+    ],
+    "summary": "type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral';"
   }
 ]

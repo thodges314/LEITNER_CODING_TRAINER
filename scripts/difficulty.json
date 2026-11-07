@@ -1347,6 +1347,14 @@
     "difficulty": 3,
     "concept": "d3-force-graph"
   },
+  "tailwind-arbitrary-parser": {
+    "difficulty": 3,
+    "concept": "tailwind-parser"
+  },
+  "tailwind-badge-component": {
+    "difficulty": 2,
+    "concept": "tailwind-badge"
+  },
   "tailwind-button-states": {
     "difficulty": 2,
     "concept": "tailwind-button"

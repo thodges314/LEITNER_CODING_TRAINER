@@ -159,4 +159,83 @@ empty()`,
       { callSignature: '<Button onClick={fn} {...props} />' }
     ),
   ],
+  'tailwind-arbitrary-parser': [
+    c(
+      'Parses simple dimension arbitrary value',
+      `parseArbitraryClass('w-[32rem]')`,
+      `({ property: 'w', value: '32rem', isNegative: false })`
+    ),
+    c(
+      'Parses hex color arbitrary value',
+      `parseArbitraryClass('bg-[#1da1f2]')`,
+      `({ property: 'bg', value: '#1da1f2', isNegative: false })`
+    ),
+    c(
+      'Extracts modifier chain and negative prefix flag',
+      `parseArbitraryClass('hover:-mt-[2rem]')`,
+      `({ modifier: 'hover', property: 'mt', value: '2rem', isNegative: true })`
+    ),
+    c(
+      'Parses complex property name and multi-modifier chain',
+      `parseArbitraryClass('dark:md:grid-cols-[200px_1fr]')`,
+      `({ modifier: 'dark:md', property: 'grid-cols', value: '200px_1fr', isNegative: false })`
+    ),
+    c(
+      'Parses calculation expressions containing arithmetic parentheses',
+      `parseArbitraryClass('w-[calc(100%-2rem)]')`,
+      `({ property: 'w', value: 'calc(100%-2rem)', isNegative: false })`
+    ),
+    c(
+      'Parses standalone negative directional coordinate',
+      `parseArbitraryClass('-top-[15px]')`,
+      `({ property: 'top', value: '15px', isNegative: true })`
+    ),
+    c(
+      'Returns null for standard non-arbitrary utility classes',
+      `parseArbitraryClass('p-4')`,
+      `null`
+    ),
+    c(
+      'Returns null for malformed brackets or missing property',
+      `parseArbitraryClass('[100px]')`,
+      `null`
+    ),
+    c(
+      'Returns null for empty brackets',
+      `parseArbitraryClass('w-[]')`,
+      `null`
+    ),
+  ],
+  'tailwind-badge-component': [
+    r(
+      'Renders neutral badge with md size and no dot by default',
+      '<Badge>Draft</Badge>',
+      'Renders span with inline-flex, rounded-full, text-slate-300, and border-slate-500/20',
+      { callSignature: '<Badge>Draft</Badge>' }
+    ),
+    r(
+      'Applies success, warning, danger, and info variant color tokens',
+      '<Badge variant="success" />, <Badge variant="warning" />, <Badge variant="danger" />, <Badge variant="info" />',
+      'Applies emerald, amber, rose, and sky translucent background and text color tokens',
+      { callSignature: '<Badge variant={variant} />' }
+    ),
+    r(
+      'Applies sm size padding and typography classes',
+      '<Badge size="sm">Small</Badge>',
+      'Applies text-xs and px-2 size classes',
+      { callSignature: '<Badge size="sm" />' }
+    ),
+    r(
+      'Renders decorative dot indicator with matching variant color when dot=true',
+      '<Badge variant="success" dot={true}>Active</Badge>',
+      'Renders child span with rounded-full and bg-emerald-400',
+      { callSignature: '<Badge dot={true} />' }
+    ),
+    r(
+      'Forwards extra HTML attributes to the outer container',
+      '<Badge data-testid="status-pill" aria-label="System status">Live</Badge>',
+      'Forwards data-testid and aria-label attributes to container span',
+      { callSignature: '<Badge {...props} />' }
+    ),
+  ],
 };

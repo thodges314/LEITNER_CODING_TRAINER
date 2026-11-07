@@ -1,0 +1,13 @@
+{
+  "title": "Tailwind Arbitrary Value Parser",
+  "track": "tailwind",
+  "tags": [
+    "tailwind",
+    "parser",
+    "jit",
+    "regex",
+    "utilities",
+    "arbitrary-values"
+  ]
+}
+
