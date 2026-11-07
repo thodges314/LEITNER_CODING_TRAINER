@@ -76,7 +76,23 @@ export function createDomTools() {
   if (typeof document === 'undefined') {
     throw new Error('DOM harness tools need a DOM (document is not available in this environment).');
   }
+  const prevActEnv = (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT;
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
+  const resetReactInternals = () => {
+    const internals = (React as unknown as {
+      __CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE?: {
+        actQueue: unknown;
+        thrownErrors?: unknown[];
+      };
+    }).__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE;
+    if (internals) {
+      internals.actQueue = null;
+      if (Array.isArray(internals.thrownErrors)) {
+        internals.thrownErrors.length = 0;
+      }
+    }
+  };
 
   const forceFallback = Boolean((globalThis as { __FORCE_FALLBACK_ACT?: boolean }).__FORCE_FALLBACK_ACT);
   const act = (!forceFallback && typeof React.act === 'function' ? React.act : fallbackAct) as typeof React.act;
@@ -280,6 +296,12 @@ export function createDomTools() {
       mounted.length = 0;
       MockIntersectionObserver.instances = [];
       document.body.removeAttribute('style');
+      resetReactInternals();
+      if (prevActEnv === undefined) {
+        delete (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT;
+      } else {
+        (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = prevActEnv;
+      }
     },
   };
 }
