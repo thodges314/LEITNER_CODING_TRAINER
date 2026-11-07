@@ -55,8 +55,21 @@ Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/
   - Browser DOM, SVG, Canvas, and event types available in the sandbox include: `HTMLElement`, `HTMLInputElement`, `HTMLTextAreaElement`, `HTMLSelectElement`, `HTMLFormElement`, `HTMLButtonElement`, `HTMLLabelElement`, `HTMLDivElement`, `HTMLSpanElement`, `HTMLParagraphElement`, `HTMLHeadingElement`, `HTMLAnchorElement`, `HTMLImageElement`, `HTMLUListElement`, `HTMLOListElement`, `HTMLLIElement`, `HTMLTableElement`, `HTMLDialogElement`, `HTMLCanvasElement`, `SVGElement`, `SVGSVGElement`, `SVGGElement`, `SVGPathElement`, `SVGRectElement`, `SVGCircleElement`, `PointerEvent`, `WheelEvent`, `DOMRect`, `NodeListOf`.
   - Full ambient D3 type definitions (`d3.Selection`, scales, shapes, `d3.HierarchyNode<T>`, `d3.Quadtree<T>`, `d3.Delaunay`, force simulations, brushes/zoom, geo projections, contours) and predefined D3 card domain interfaces (`VoronoiPoint`, `TreemapNodeData`, `QuadPoint`, `HierarchyRecord`, etc.) live in `src/utils/sandboxD3Types.ts` so learners in TypeScript mode can reference the prompt's interface names directly without re-typing them.
   - For inline React styles, use `Record<string, string | number>` instead of `React.CSSProperties`.
+- **Zero `import` / Zero `export` in Reference Solutions & Test Harnesses**:
+  - Execution sandboxes inject runtime libraries (`React`, `ReactDOM`, `d3`, `graphql`) and ambient types directly into the evaluation scope.
+  - Never write `import ...` or `export ...` in `.ref.js`, `.ref.ts`, or `.harness.js`. Canonical solutions declare functions/classes directly (`function renderChart(...)`, `interface ChartOptions { ... }`).
+  - `extractPromptTypeBlocks()` automatically injects extracted prompt interfaces into the ambient typechecker.
+  - `stripPredefinedPromptTypes()` automatically strips predefined prompt interfaces from the revealed solution view so learners see only pure implementation code.
+  - `detectRedundantScopeInput()` monitors user typing in real time and triggers an advisory popup if learners type `import` or retype prompt interfaces, reminding them that the symbols are already preloaded in scope.
 
 ## Component and Live Preview Conventions
+- **Preview Library Ingestion (`<id>.meta.json`)**:
+  - The live preview sandbox iframe is lightweight and conditionally injects heavy library bundles based strictly on `<id>.meta.json`'s `"previewLibraries"` array.
+  - Whenever authoring a card with `rendersComponent: true` that relies on D3, Tailwind, or React, you **must** declare `"previewLibraries": ["d3"]` (or `["tailwind"]`, `["react"]`) in `<id>.meta.json`. Without this declaration, the library bundle will not be loaded into the preview frame and the preview will throw `ReferenceError: <lib> is not defined`.
+- **Clean Live Previews (Zero Extraneous Text / Status Bars)**:
+  - Preview scripts (`<id>.preview.js`) must render strictly the graphical component or SVG directly into `#preview-root`.
+  - Never inject artificial status bars, instructional text headers ("Click on any...", "Drag nodes to..."), or canvas overlays into the preview DOM.
+  - User interactions (clicks, brush selections, drag gestures, zoom changes) must be routed to the Live Preview log drawer via `if (typeof log === 'function') log('eventName', payload)`.
 - **Cold-Start Recall vs Styling**:
   - Exercises are strictly for cold retrieval of JavaScript/TypeScript, React architecture, component patterns, state management, and accessibility contracts.
   - They are NOT styling drills. Canonical solutions (`.ref.js` and `.ref.ts`) must remain direct, functional, and structurally minimal without extraneous CSS class names or decorative styles.
