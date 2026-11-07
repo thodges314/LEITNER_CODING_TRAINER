@@ -1,0 +1,11 @@
+{
+  "track": "testing-tooling",
+  "title": "Custom Matchers: Jest/Vitest expect.extend Plugin Architecture",
+  "tags": [
+    "testing",
+    "assertions",
+    "expect",
+    "custom-matchers",
+    "plugin"
+  ]
+}

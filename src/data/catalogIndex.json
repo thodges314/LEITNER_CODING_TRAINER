@@ -5196,5 +5196,50 @@
       "tokens"
     ],
     "summary": "type AvatarSize = 'sm' | 'md' | 'lg';"
+  },
+  {
+    "id": "async-flush-promises",
+    "title": "Async Testing Utilities: Microtask Flush & Polling Pump",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 3,
+    "tags": [
+      "testing",
+      "async",
+      "event-loop",
+      "promises",
+      "microtasks"
+    ],
+    "summary": "interface WaitForOptions {"
+  },
+  {
+    "id": "custom-matcher-expect",
+    "title": "Custom Matchers: Jest/Vitest expect.extend Plugin Architecture",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 3,
+    "tags": [
+      "testing",
+      "assertions",
+      "expect",
+      "custom-matchers",
+      "plugin"
+    ],
+    "summary": "interface MatcherContext {"
+  },
+  {
+    "id": "dom-query-testing-library",
+    "title": "Mini DOM Testing Library: Semantic Role & Text Queries",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 3,
+    "tags": [
+      "testing",
+      "dom",
+      "accessibility",
+      "aria",
+      "queries"
+    ],
+    "summary": "interface ByRoleOptions {"
   }
 ]

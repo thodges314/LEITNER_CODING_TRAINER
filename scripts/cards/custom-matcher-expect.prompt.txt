@@ -1,0 +1,56 @@
+### `expect<T>(actual: T): Matchers<T>`
+
+## Description
+
+```ts
+interface MatcherContext {
+  isNot: boolean;
+}
+
+interface MatcherResult {
+  pass: boolean;
+  message: () => string;
+}
+
+type MatcherFn = (this: MatcherContext, received: any, ...args: any[]) => MatcherResult;
+
+interface AssertionResult {
+  pass: boolean;
+}
+
+interface Matchers<T = unknown> {
+  not: Matchers<T>;
+  toBe(expected: unknown): AssertionResult;
+  [customMatcher: string]: any;
+}
+
+interface ExpectFunction {
+  <T>(actual: T): Matchers<T>;
+  extend(customMatchers: Record<string, MatcherFn>): void;
+}
+```
+
+Test frameworks like Jest and Vitest allow developers to author domain-specific assertions using `expect.extend(customMatchers)`.
+
+Implement an extensible assertion function `expect` supporting built-in identity checks, custom matcher extensions, and negation chaining (`.not`):
+
+### Requirements
+
+- **Built-in `toBe(expected)`**:
+  - Compares `actual` and `expected` via `Object.is(actual, expected)`.
+  - If comparison succeeds, returns `{ pass: true }`.
+  - If comparison fails, throws an `Error` with a descriptive message (e.g. `Expected ${expected} but received ${actual}`).
+- **`expect.extend(customMatchers)`**:
+  - Static method on `expect` that registers a dictionary of custom matcher functions.
+  - Each custom matcher function is called with `this: { isNot: boolean }` and receives `(received, ...args)`.
+  - Must return an object with:
+    - `pass: boolean`: whether the positive condition was satisfied.
+    - `message: () => string`: a function returning the error explanation if the assertion fails.
+  - Multiple `expect.extend` calls accumulate new matchers without overwriting existing ones.
+- **`.not` Negation Chaining**:
+  - Accessing `.not` returns a matchers object or proxy where all assertions (built-in and custom) are inverted.
+  - Inside a custom matcher called via `.not`, `this.isNot` is `true`.
+  - If `pass` is `true` in negated mode, it throws an `Error` with the matcher's `message()`.
+  - If `pass` is `false` in negated mode, it succeeds and returns `{ pass: true }`.
+- **Error Handling**:
+  - Failed assertions must throw an `Error` whose `message` equals the result of calling the matcher's `message()` function.
