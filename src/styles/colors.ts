@@ -166,6 +166,11 @@ export const SYNTHWAVE_DARK_PALETTE: ThemePalette = {
       bg: 'rgba(56, 189, 248, 0.12)',
       border: 'rgba(56, 189, 248, 0.35)',
     },
+    'nextjs': {
+      color: '#f8fafc',
+      bg: 'rgba(248, 250, 252, 0.12)',
+      border: 'rgba(248, 250, 252, 0.35)',
+    },
   },
 };
 
@@ -293,6 +298,11 @@ export const APPLE_GSOS_PALETTE: ThemePalette = {
       color: '#0369a1',
       bg: '#E0F2FE',
       border: '#7DD3FC',
+    },
+    'nextjs': {
+      color: '#0f172a',
+      bg: '#F1F5F9',
+      border: '#94A3B8',
     },
   },
 };

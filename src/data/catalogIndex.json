@@ -5332,5 +5332,54 @@
       "documents"
     ],
     "summary": "GraphQL subscriptions allow clients to listen for real-time updates pushed from the server when events occur. A subscription document uses the subs..."
+  },
+  {
+    "id": "next-middleware-auth-redirect",
+    "title": "Middleware: Edge Auth Guard & Redirection",
+    "track": "nextjs",
+    "concept": "next-middleware",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "middleware",
+      "cookies",
+      "auth",
+      "http",
+      "async"
+    ],
+    "summary": "Write a Next.js Edge Middleware function that enforces session authentication"
+  },
+  {
+    "id": "next-route-handler-crud",
+    "title": "Route Handlers: App Router GET & POST",
+    "track": "nextjs",
+    "concept": "next-route-handlers",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-handlers",
+      "http",
+      "api",
+      "async"
+    ],
+    "summary": "Write Next.js App Router Route Handlers for an inventory management API"
+  },
+  {
+    "id": "next-server-action-form",
+    "title": "Server Action: Form State & Validation",
+    "track": "nextjs",
+    "concept": "next-server-actions",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "server-actions",
+      "forms",
+      "validation",
+      "async"
+    ],
+    "summary": "Write a Next.js App Router Server Action for shopping cart quantity updates"
   }
 ]

@@ -5,6 +5,92 @@
  */
 
 export const SANDBOX_NEXT_TYPES = `
+  interface Headers {
+    append(name: string, value: string): void;
+    delete(name: string): void;
+    get(name: string): string | null;
+    has(name: string): boolean;
+    set(name: string, value: string): void;
+    forEach(callbackfn: (value: string, key: string, parent: Headers) => void): void;
+    [key: string]: any;
+  }
+  declare var Headers: {
+    prototype: Headers;
+    new (init?: any): Headers;
+  };
+
+  interface RequestInit {
+    method?: string;
+    headers?: any;
+    body?: any;
+    mode?: any;
+    credentials?: any;
+    cache?: any;
+    redirect?: any;
+    referrer?: any;
+    integrity?: any;
+    [key: string]: any;
+  }
+
+  interface ResponseInit {
+    status?: number;
+    statusText?: string;
+    headers?: any;
+    [key: string]: any;
+  }
+
+  interface Request {
+    readonly headers: Headers;
+    readonly method: string;
+    readonly url: string;
+    json(): Promise<any>;
+    text(): Promise<string>;
+    formData(): Promise<FormData>;
+    blob(): Promise<any>;
+    arrayBuffer(): Promise<ArrayBuffer>;
+    clone(): Request;
+    [key: string]: any;
+  }
+  declare var Request: {
+    prototype: Request;
+    new (input: any, init?: RequestInit): Request;
+  };
+
+  interface Response {
+    readonly headers: Headers;
+    readonly ok: boolean;
+    readonly status: number;
+    readonly statusText: string;
+    readonly url: string;
+    json(): Promise<any>;
+    text(): Promise<string>;
+    formData(): Promise<FormData>;
+    blob(): Promise<any>;
+    arrayBuffer(): Promise<ArrayBuffer>;
+    clone(): Response;
+    [key: string]: any;
+  }
+  declare var Response: {
+    prototype: Response;
+    new (body?: any, init?: ResponseInit): Response;
+    json(data: any, init?: ResponseInit): Response;
+  };
+
+  interface FormData {
+    append(name: string, value: any, fileName?: string): void;
+    delete(name: string): void;
+    get(name: string): any;
+    getAll(name: string): any[];
+    has(name: string): boolean;
+    set(name: string, value: any, fileName?: string): void;
+    forEach(callbackfn: (value: any, key: string, parent: FormData) => void): void;
+    [key: string]: any;
+  }
+  declare var FormData: {
+    prototype: FormData;
+    new (): FormData;
+  };
+
   declare namespace NextServer {
     interface CookieItem {
       name: string;

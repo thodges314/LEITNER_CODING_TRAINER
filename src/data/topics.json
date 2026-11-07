@@ -22364,5 +22364,146 @@
       }
     ],
     "testHarness": "await (async () => {\n  const userDoc = (typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();\n  const testSchema = buildSchema(`\n    enum Priority {\n      LOW\n      NORMAL\n      HIGH\n      URGENT\n    }\n\n    type User {\n      id: ID!\n      username: String!\n      status: String!\n    }\n\n    type Message {\n      id: ID!\n      content: String!\n      priority: Priority!\n      createdAt: String!\n      author: User!\n    }\n\n    type Query {\n      _dummy: String\n    }\n\n    type Subscription {\n      messageCreated(channelId: ID!, minPriority: Priority): Message!\n    }\n  `);\n\n  let ast = null;\n  let parseErr = null;\n  try {\n    ast = parseGraphql(userDoc);\n  } catch (e) {\n    parseErr = e;\n  }\n\n  // Case 1: Parses and validates cleanly against subscription schema\n  const validationErrors = ast ? validateGraphql(testSchema, ast) : [parseErr];\n  $test.check(\n    'Document parses and validates cleanly against subscription schema',\n    ast !== null && validationErrors.length === 0,\n    validationErrors\n  );\n\n  const op = ast?.definitions?.find((d) => d.kind === 'OperationDefinition');\n\n  // Case 2: Named subscription OnMessageCreated\n  $test.check(\n    'Defines operation as subscription OnMessageCreated',\n    op?.operation === 'subscription' && op?.name?.value === 'OnMessageCreated',\n    op?.name?.value\n  );\n\n  // Case 3: Variable definitions for $channelId: ID! and optional $minPriority: Priority\n  const varDefs = op?.variableDefinitions || [];\n  const channelVar = varDefs.find((v) => v.variable?.name?.value === 'channelId');\n  const priorityVar = varDefs.find((v) => v.variable?.name?.value === 'minPriority');\n  const hasValidVars = Boolean(\n    channelVar?.type?.kind === 'NonNullType' &&\n    channelVar?.type?.type?.name?.value === 'ID' &&\n    priorityVar?.type?.kind === 'NamedType' &&\n    priorityVar?.type?.name?.value === 'Priority'\n  );\n  $test.check(\n    'Accepts $channelId: ID! and $minPriority: Priority variable definitions',\n    hasValidVars,\n    varDefs\n  );\n\n  // Case 4: Field arguments for messageCreated(channelId: $channelId, minPriority: $minPriority)\n  const rootField = op?.selectionSet?.selections?.find((s) => s.name?.value === 'messageCreated');\n  const channelArg = rootField?.arguments?.find((a) => a.name?.value === 'channelId');\n  const priorityArg = rootField?.arguments?.find((a) => a.name?.value === 'minPriority');\n  const hasValidArgs = Boolean(\n    channelArg?.value?.kind === 'Variable' &&\n    channelArg?.value?.name?.value === 'channelId' &&\n    priorityArg?.value?.kind === 'Variable' &&\n    priorityArg?.value?.name?.value === 'minPriority'\n  );\n  $test.check(\n    'Passes channelId: $channelId and minPriority: $minPriority to messageCreated',\n    hasValidArgs,\n    rootField?.arguments\n  );\n\n  // Case 5: Selects message payload fields with nested author\n  const selections = rootField?.selectionSet?.selections || [];\n  const fieldNames = selections.map((s) => s.name?.value);\n  const authorField = selections.find((s) => s.name?.value === 'author');\n  const authorSubfields = authorField?.selectionSet?.selections?.map((s) => s.name?.value) || [];\n  const hasPayload = Boolean(\n    fieldNames.includes('id') &&\n    fieldNames.includes('content') &&\n    fieldNames.includes('priority') &&\n    fieldNames.includes('createdAt') &&\n    authorSubfields.includes('id') &&\n    authorSubfields.includes('username') &&\n    authorSubfields.includes('status')\n  );\n  $test.check(\n    'Selects message fields (id, content, priority, createdAt) and author (id, username, status)',\n    hasPayload,\n    { fieldNames, authorSubfields }\n  );\n})();"
+  },
+  {
+    "id": "next-middleware-auth-redirect",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Write a Next.js Edge Middleware function that enforces session authentication:\n\n## Description\n\n### Application Context\nIn a multi-tenant SaaS application (`middleware.ts`), incoming Edge requests are intercepted before hitting route handlers or server components to protect dashboard routes and redirect unauthenticated users to login.\n\n```ts\ninterface MiddlewareMatcherConfig {\n  matcher: string[];\n}\n```\n\n### `middleware(request: NextRequest): NextResponse`\n\n- Inspects the requested pathname via `request.nextUrl.pathname`.\n- **Protected Paths (`/dashboard` and subpaths)**:\n  - If `pathname.startsWith('/dashboard')`:\n    - Checks for an `auth_token` cookie via `request.cookies.get('auth_token')`.\n    - If the cookie is absent or its `.value` is empty:\n      - Constructs a redirect URL to `/login` with the query parameter `next` set to `pathname` (e.g. `/login?next=%2Fdashboard`).\n      - Returns `NextResponse.redirect(redirectUrl)`.\n    - If the cookie is present and has a non-empty string value:\n      - Allows the request to proceed by returning `NextResponse.next()`.\n- **Public Paths**:\n  - For any path that does not start with `/dashboard` (e.g. `/`, `/about`, `/login`, `/api/health`):\n    - Allows the request to proceed by returning `NextResponse.next()`.",
+    "track": "nextjs",
+    "title": "Middleware: Edge Auth Guard & Redirection",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "middleware",
+      "cookies",
+      "auth",
+      "http",
+      "async"
+    ],
+    "difficulty": 3,
+    "concept": "next-middleware",
+    "referenceSolution": "const middleware = (request) => {\n  const pathname = request.nextUrl.pathname;\n\n  if (pathname.startsWith('/dashboard')) {\n    const authCookie = request.cookies.get('auth_token');\n    const token = authCookie?.value;\n\n    if (!token || token.trim().length === 0) {\n      const loginUrl = new URL('/login', request.nextUrl.origin);\n      loginUrl.searchParams.set('next', pathname);\n      return NextResponse.redirect(loginUrl);\n    }\n\n    return NextResponse.next();\n  }\n\n  return NextResponse.next();\n};",
+    "referenceSolutionTs": "interface MiddlewareMatcherConfig {\n  matcher: string[];\n}\n\nconst middleware = (request: NextRequest): NextResponse => {\n  const pathname = request.nextUrl.pathname;\n\n  if (pathname.startsWith('/dashboard')) {\n    const authCookie = request.cookies.get('auth_token');\n    const token = authCookie?.value;\n\n    if (!token || token.trim().length === 0) {\n      const loginUrl = new URL('/login', request.nextUrl.origin);\n      loginUrl.searchParams.set('next', pathname);\n      return NextResponse.redirect(loginUrl);\n    }\n\n    return NextResponse.next();\n  }\n\n  return NextResponse.next();\n};",
+    "testCases": [
+      {
+        "description": "Unauthenticated /dashboard redirects to /login?next=/dashboard",
+        "input": "middleware(req with url: \"/dashboard\", no cookie)",
+        "expected": "NextResponse.redirect(\"/login?next=%2Fdashboard\") with status 307"
+      },
+      {
+        "description": "Unauthenticated /dashboard/analytics redirects to /login with encoded pathname",
+        "input": "middleware(req with url: \"/dashboard/analytics\", no cookie)",
+        "expected": "NextResponse.redirect(\"/login?next=%2Fdashboard%2Fanalytics\") with status 307"
+      },
+      {
+        "description": "Authenticated /dashboard/settings allows request with NextResponse.next()",
+        "input": "middleware(req with url: \"/dashboard/settings\", cookie: \"auth_token=jwt_valid_session_token\")",
+        "expected": "NextResponse.next()"
+      },
+      {
+        "description": "Public route /about passes through with NextResponse.next() without auth cookie",
+        "input": "middleware(req with url: \"/about\", no cookie)",
+        "expected": "NextResponse.next()"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const fn = typeof middleware === 'function' ? middleware : solution;\n\n  // Case 1: Unauthenticated /dashboard redirects to /login?next=/dashboard\n  const req1 = new NextRequest('http://localhost:3000/dashboard');\n  const res1 = fn(req1);\n  const loc1 = res1.headers.get('location') || '';\n  $test.check(\n    'Unauthenticated /dashboard redirects to /login?next=/dashboard',\n    res1.status === 307 && loc1.includes('/login') && loc1.includes('next=%2Fdashboard'),\n    { status: res1.status, location: loc1 }\n  );\n\n  // Case 2: Unauthenticated /dashboard/analytics redirects to /login?next=/dashboard/analytics\n  const req2 = new NextRequest('http://localhost:3000/dashboard/analytics');\n  const res2 = fn(req2);\n  const loc2 = res2.headers.get('location') || '';\n  $test.check(\n    'Unauthenticated /dashboard/analytics redirects to /login with encoded pathname',\n    res2.status === 307 && loc2.includes('/login') && loc2.includes('next=%2Fdashboard%2Fanalytics'),\n    { status: res2.status, location: loc2 }\n  );\n\n  // Case 3: Authenticated /dashboard/settings returns NextResponse.next()\n  const req3 = new NextRequest('http://localhost:3000/dashboard/settings', {\n    headers: { cookie: 'auth_token=jwt_valid_session_token' },\n  });\n  const res3 = fn(req3);\n  $test.check(\n    'Authenticated /dashboard/settings allows request with NextResponse.next()',\n    Boolean(res3._isNext) || res3.status === 200,\n    { status: res3.status, isNext: res3._isNext }\n  );\n\n  // Case 4: Public route /about passes through without auth cookie\n  const req4 = new NextRequest('http://localhost:3000/about');\n  const res4 = fn(req4);\n  $test.check(\n    'Public route /about passes through with NextResponse.next() without auth cookie',\n    Boolean(res4._isNext) || res4.status === 200,\n    { status: res4.status, isNext: res4._isNext }\n  );\n})();"
+  },
+  {
+    "id": "next-route-handler-crud",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Write Next.js App Router Route Handlers for an inventory management API:\n\n## Description\n\n### Application Context\nIn an App Router inventory and order management system (`app/api/items/[id]/route.ts`), you are implementing the backend Route Handler that retrieves and updates item inventory records in response to client requests.\n\n```ts\ninterface RouteContext {\n  params: { id: string };\n}\n\ninterface ItemRecord {\n  id: string;\n  name: string;\n  quantity: number;\n  price: number;\n}\n\ninterface CreateItemInput {\n  name: string;\n  quantity: number;\n  price: number;\n}\n```\n\nMaintain an in-memory `itemsStore = new Map<string, ItemRecord>()`:\n\n### `GET(request: Request, context: RouteContext): Promise<NextResponse>`\n- Retrieves the item from `itemsStore` using `context.params.id`.\n- If the item exists in `itemsStore`:\n  - Returns `NextResponse.json(item, { status: 200 })`.\n- If the item does not exist:\n  - Returns `NextResponse.json({ error: 'Item not found' }, { status: 404 })`.\n\n### `POST(request: Request, context: RouteContext): Promise<NextResponse>`\n- Parses the JSON request body using `await request.json()`.\n- Validates the payload:\n  - `name`: must be a non-empty string.\n  - `quantity`: must be a finite number greater than or equal to 0.\n  - `price`: must be a finite number greater than or equal to 0.\n- If any validation check fails:\n  - Returns `NextResponse.json({ error: 'Invalid item payload' }, { status: 400 })`.\n- If validation succeeds:\n  - Constructs a record `{ id: context.params.id, name, quantity, price }`.\n  - Saves it in `itemsStore.set(context.params.id, record)`.\n  - Returns `NextResponse.json(record, { status: 201 })`.",
+    "track": "nextjs",
+    "title": "Route Handlers: App Router GET & POST",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-handlers",
+      "http",
+      "api",
+      "async"
+    ],
+    "difficulty": 2,
+    "concept": "next-route-handlers",
+    "referenceSolution": "const itemsStore = new Map();\n\nconst GET = async (request, context) => {\n  const id = context?.params?.id;\n  const item = itemsStore.get(id);\n\n  if (!item) {\n    return NextResponse.json({ error: 'Item not found' }, { status: 404 });\n  }\n\n  return NextResponse.json(item, { status: 200 });\n};\n\nconst POST = async (request, context) => {\n  const id = context?.params?.id;\n  let body;\n\n  try {\n    body = await request.json();\n  } catch {\n    return NextResponse.json({ error: 'Invalid item payload' }, { status: 400 });\n  }\n\n  const { name, quantity, price } = body || {};\n\n  const isValidName = typeof name === 'string' && name.trim().length > 0;\n  const isValidQuantity = typeof quantity === 'number' && Number.isFinite(quantity) && quantity >= 0;\n  const isValidPrice = typeof price === 'number' && Number.isFinite(price) && price >= 0;\n\n  if (!isValidName || !isValidQuantity || !isValidPrice) {\n    return NextResponse.json({ error: 'Invalid item payload' }, { status: 400 });\n  }\n\n  const record = {\n    id,\n    name: name.trim(),\n    quantity,\n    price,\n  };\n\n  itemsStore.set(id, record);\n\n  return NextResponse.json(record, { status: 201 });\n};",
+    "referenceSolutionTs": "interface RouteContext {\n  params: { id: string };\n}\n\ninterface ItemRecord {\n  id: string;\n  name: string;\n  quantity: number;\n  price: number;\n}\n\ninterface CreateItemInput {\n  name: string;\n  quantity: number;\n  price: number;\n}\n\nconst itemsStore = new Map<string, ItemRecord>();\n\nconst GET = async (request: Request, context: RouteContext): Promise<NextResponse> => {\n  const id = context?.params?.id;\n  const item = itemsStore.get(id);\n\n  if (!item) {\n    return NextResponse.json({ error: 'Item not found' }, { status: 404 });\n  }\n\n  return NextResponse.json(item, { status: 200 });\n};\n\nconst POST = async (request: Request, context: RouteContext): Promise<NextResponse> => {\n  const id = context?.params?.id;\n  let body: Partial<CreateItemInput> | undefined;\n\n  try {\n    body = await request.json();\n  } catch {\n    return NextResponse.json({ error: 'Invalid item payload' }, { status: 400 });\n  }\n\n  const name = body?.name;\n  const quantity = body?.quantity;\n  const price = body?.price;\n\n  const isValidName = typeof name === 'string' && name.trim().length > 0;\n  const isValidQuantity = typeof quantity === 'number' && Number.isFinite(quantity) && quantity >= 0;\n  const isValidPrice = typeof price === 'number' && Number.isFinite(price) && price >= 0;\n\n  if (!isValidName || !isValidQuantity || !isValidPrice) {\n    return NextResponse.json({ error: 'Invalid item payload' }, { status: 400 });\n  }\n\n  const record: ItemRecord = {\n    id,\n    name: name.trim(),\n    quantity,\n    price,\n  };\n\n  itemsStore.set(id, record);\n\n  return NextResponse.json(record, { status: 201 });\n};",
+    "testCases": [
+      {
+        "description": "GET returns 404 with error when item does not exist",
+        "input": "GET(req, { params: { id: \"unknown_999\" } })",
+        "expected": "{ status: 404, data: { error: \"Item not found\" } }"
+      },
+      {
+        "description": "POST returns 400 with error when payload is invalid",
+        "input": "POST(req, { params: { id: \"item_1\" } }) with body { name: \"\", quantity: -5, price: 10 }",
+        "expected": "{ status: 400, data: { error: \"Invalid item payload\" } }"
+      },
+      {
+        "description": "POST returns 201 with saved item record on valid payload",
+        "input": "POST(req, { params: { id: \"item_1\" } }) with body { name: \"Mechanical Keyboard\", quantity: 15, price: 120 }",
+        "expected": "{ status: 201, data: { id: \"item_1\", name: \"Mechanical Keyboard\", quantity: 15, price: 120 } }"
+      },
+      {
+        "description": "GET returns 200 with matching item record for existing item",
+        "input": "GET(req, { params: { id: \"item_1\" } })",
+        "expected": "{ status: 200, data: { id: \"item_1\", name: \"Mechanical Keyboard\", quantity: 15, price: 120 } }"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const getFn = typeof GET === 'function' ? GET : (typeof solution === 'object' && solution?.GET);\n  const postFn = typeof POST === 'function' ? POST : (typeof solution === 'object' && solution?.POST);\n\n  if (typeof itemsStore !== 'undefined' && itemsStore?.clear) {\n    itemsStore.clear();\n  }\n\n  // Case 1: GET unknown item returns 404\n  const req404 = new Request('http://localhost:3000/api/items/unknown_999');\n  const res404 = await getFn(req404, { params: { id: 'unknown_999' } });\n  const data404 = await res404.json();\n  $test.check(\n    'GET returns 404 with error when item does not exist',\n    res404.status === 404 && data404?.error === 'Item not found',\n    { status: res404.status, data: data404 }\n  );\n\n  // Case 2: POST invalid payload returns 400\n  const req400 = new Request('http://localhost:3000/api/items/item_1', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({ name: '', quantity: -5, price: 10 }),\n  });\n  const res400 = await postFn(req400, { params: { id: 'item_1' } });\n  const data400 = await res400.json();\n  $test.check(\n    'POST returns 400 with error when payload is invalid',\n    res400.status === 400 && data400?.error === 'Invalid item payload',\n    { status: res400.status, data: data400 }\n  );\n\n  // Case 3: POST valid payload returns 201 with created record\n  const req201 = new Request('http://localhost:3000/api/items/item_1', {\n    method: 'POST',\n    headers: { 'Content-Type': 'application/json' },\n    body: JSON.stringify({ name: 'Mechanical Keyboard', quantity: 15, price: 120 }),\n  });\n  const res201 = await postFn(req201, { params: { id: 'item_1' } });\n  const data201 = await res201.json();\n  $test.check(\n    'POST returns 201 with saved item record on valid payload',\n    res201.status === 201 &&\n      data201?.id === 'item_1' &&\n      data201?.name === 'Mechanical Keyboard' &&\n      data201?.quantity === 15 &&\n      data201?.price === 120,\n    { status: res201.status, data: data201 }\n  );\n\n  // Case 4: GET existing item returns 200 with matching record\n  const req200 = new Request('http://localhost:3000/api/items/item_1');\n  const res200 = await getFn(req200, { params: { id: 'item_1' } });\n  const data200 = await res200.json();\n  $test.check(\n    'GET returns 200 with matching item record for existing item',\n    res200.status === 200 &&\n      data200?.id === 'item_1' &&\n      data200?.name === 'Mechanical Keyboard' &&\n      data200?.quantity === 15 &&\n      data200?.price === 120,\n    { status: res200.status, data: data200 }\n  );\n})();"
+  },
+  {
+    "id": "next-server-action-form",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Write a Next.js App Router Server Action for shopping cart quantity updates:\n\n## Description\n\n### Application Context\nIn an e-commerce checkout flow (`app/checkout/actions.ts`), a Client Component cart form invokes this Server Action to update an item's quantity in the shopping cart and recalculate totals.\n\n```ts\ninterface ActionState {\n  success: boolean;\n  errors?: {\n    itemId?: string;\n    quantity?: string;\n  };\n  cart?: {\n    itemId: string;\n    quantity: number;\n    total: number;\n  };\n}\n```\n\n### `updateCartQuantity(prevState: ActionState, formData: FormData): Promise<ActionState>`\n\n- Extracts `itemId` from `formData.get('itemId')` and `quantityRaw` from `formData.get('quantity')`.\n- **Validation**:\n  - `itemId`: must be a non-empty string. If missing, null, or trimmed length is 0, records `errors.itemId = 'Item ID is required'`.\n  - `quantity`: parses `Number(quantityRaw)`. If `quantityRaw` is missing or null, not an integer (`!Number.isInteger(q)`), or less than 1 or greater than 99, records `errors.quantity = 'Quantity must be between 1 and 99'`.\n- **Failure Return**:\n  - If any validation errors exist, returns `{ success: false, errors }`.\n- **Success Return**:\n  - If valid, calculates line total assuming unit price of 25: `total = quantity * 25`.\n  - Returns `{ success: true, cart: { itemId: String(itemId).trim(), quantity, total } }`.",
+    "track": "nextjs",
+    "title": "Server Action: Form State & Validation",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "server-actions",
+      "forms",
+      "validation",
+      "async"
+    ],
+    "difficulty": 2,
+    "concept": "next-server-actions",
+    "referenceSolution": "const updateCartQuantity = async (prevState, formData) => {\n  const itemId = formData.get('itemId');\n  const quantityRaw = formData.get('quantity');\n\n  const errors = {};\n\n  if (!itemId || typeof itemId !== 'string' || itemId.trim().length === 0) {\n    errors.itemId = 'Item ID is required';\n  }\n\n  const q = quantityRaw !== null && quantityRaw !== '' ? Number(quantityRaw) : NaN;\n  if (!Number.isInteger(q) || q < 1 || q > 99) {\n    errors.quantity = 'Quantity must be between 1 and 99';\n  }\n\n  if (Object.keys(errors).length > 0) {\n    return {\n      success: false,\n      errors,\n    };\n  }\n\n  return {\n    success: true,\n    cart: {\n      itemId: String(itemId).trim(),\n      quantity: q,\n      total: q * 25,\n    },\n  };\n};",
+    "referenceSolutionTs": "interface ActionState {\n  success: boolean;\n  errors?: {\n    itemId?: string;\n    quantity?: string;\n  };\n  cart?: {\n    itemId: string;\n    quantity: number;\n    total: number;\n  };\n}\n\nconst updateCartQuantity = async (\n  prevState: ActionState,\n  formData: FormData\n): Promise<ActionState> => {\n  const itemId = formData.get('itemId');\n  const quantityRaw = formData.get('quantity');\n\n  const errors: NonNullable<ActionState['errors']> = {};\n\n  if (!itemId || typeof itemId !== 'string' || itemId.trim().length === 0) {\n    errors.itemId = 'Item ID is required';\n  }\n\n  const q = quantityRaw !== null && quantityRaw !== '' ? Number(quantityRaw) : NaN;\n  if (!Number.isInteger(q) || q < 1 || q > 99) {\n    errors.quantity = 'Quantity must be between 1 and 99';\n  }\n\n  if (Object.keys(errors).length > 0) {\n    return {\n      success: false,\n      errors,\n    };\n  }\n\n  return {\n    success: true,\n    cart: {\n      itemId: String(itemId).trim(),\n      quantity: q,\n      total: q * 25,\n    },\n  };\n};",
+    "testCases": [
+      {
+        "description": "Valid formData returns success: true with updated cart and computed total",
+        "input": "updateCartQuantity(prevState, formData with itemId: \"item_42\", quantity: \"3\")",
+        "expected": "{ success: true, cart: { itemId: \"item_42\", quantity: 3, total: 75 } }"
+      },
+      {
+        "description": "Missing itemId returns success: false with errors.itemId",
+        "input": "updateCartQuantity(prevState, formData with quantity: \"2\")",
+        "expected": "{ success: false, errors: { itemId: \"Item ID is required\" } }"
+      },
+      {
+        "description": "Out-of-bounds quantity (> 99) returns errors.quantity",
+        "input": "updateCartQuantity(prevState, formData with itemId: \"item_42\", quantity: \"150\")",
+        "expected": "{ success: false, errors: { quantity: \"Quantity must be between 1 and 99\" } }"
+      },
+      {
+        "description": "Non-integer quantity returns errors.quantity",
+        "input": "updateCartQuantity(prevState, formData with itemId: \"item_42\", quantity: \"2.5\")",
+        "expected": "{ success: false, errors: { quantity: \"Quantity must be between 1 and 99\" } }"
+      },
+      {
+        "description": "Both fields invalid returns errors for both itemId and quantity",
+        "input": "updateCartQuantity(prevState, formData with itemId: \"\", quantity: \"0\")",
+        "expected": "{ success: false, errors: { itemId: \"Item ID is required\", quantity: \"Quantity must be between 1 and 99\" } }"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const fn = typeof updateCartQuantity === 'function' ? updateCartQuantity : solution;\n\n  const initialState = { success: false };\n\n  // Case 1: Valid formData returns success: true with cart details\n  const fd1 = new FormData();\n  fd1.set('itemId', 'item_42');\n  fd1.set('quantity', '3');\n  const r1 = await fn(initialState, fd1);\n  $test.check(\n    'Valid formData returns success: true with updated cart and computed total',\n    r1?.success === true &&\n      r1?.cart?.itemId === 'item_42' &&\n      r1?.cart?.quantity === 3 &&\n      r1?.cart?.total === 75 &&\n      !r1?.errors,\n    r1\n  );\n\n  // Case 2: Missing itemId returns errors.itemId\n  const fd2 = new FormData();\n  fd2.set('quantity', '2');\n  const r2 = await fn(initialState, fd2);\n  $test.check(\n    'Missing itemId returns success: false with errors.itemId',\n    r2?.success === false && r2?.errors?.itemId === 'Item ID is required',\n    r2\n  );\n\n  // Case 3: Out-of-bounds quantity returns errors.quantity\n  const fd3 = new FormData();\n  fd3.set('itemId', 'item_42');\n  fd3.set('quantity', '150');\n  const r3 = await fn(initialState, fd3);\n  $test.check(\n    'Out-of-bounds quantity (> 99) returns errors.quantity',\n    r3?.success === false && r3?.errors?.quantity === 'Quantity must be between 1 and 99',\n    r3\n  );\n\n  // Case 4: Non-integer quantity returns errors.quantity\n  const fd4 = new FormData();\n  fd4.set('itemId', 'item_42');\n  fd4.set('quantity', '2.5');\n  const r4 = await fn(initialState, fd4);\n  $test.check(\n    'Non-integer quantity returns errors.quantity',\n    r4?.success === false && r4?.errors?.quantity === 'Quantity must be between 1 and 99',\n    r4\n  );\n\n  // Case 5: Both fields invalid returns both errors simultaneously\n  const fd5 = new FormData();\n  fd5.set('itemId', '');\n  fd5.set('quantity', '0');\n  const r5 = await fn(initialState, fd5);\n  $test.check(\n    'Both fields invalid returns errors for both itemId and quantity',\n    r5?.success === false &&\n      r5?.errors?.itemId === 'Item ID is required' &&\n      r5?.errors?.quantity === 'Quantity must be between 1 and 99',\n    r5\n  );\n})();"
   }
 ]

@@ -1,0 +1,44 @@
+const itemsStore = new Map();
+
+const GET = async (request, context) => {
+  const id = context?.params?.id;
+  const item = itemsStore.get(id);
+
+  if (!item) {
+    return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+  }
+
+  return NextResponse.json(item, { status: 200 });
+};
+
+const POST = async (request, context) => {
+  const id = context?.params?.id;
+  let body;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid item payload' }, { status: 400 });
+  }
+
+  const { name, quantity, price } = body || {};
+
+  const isValidName = typeof name === 'string' && name.trim().length > 0;
+  const isValidQuantity = typeof quantity === 'number' && Number.isFinite(quantity) && quantity >= 0;
+  const isValidPrice = typeof price === 'number' && Number.isFinite(price) && price >= 0;
+
+  if (!isValidName || !isValidQuantity || !isValidPrice) {
+    return NextResponse.json({ error: 'Invalid item payload' }, { status: 400 });
+  }
+
+  const record = {
+    id,
+    name: name.trim(),
+    quantity,
+    price,
+  };
+
+  itemsStore.set(id, record);
+
+  return NextResponse.json(record, { status: 201 });
+};

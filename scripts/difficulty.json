@@ -1514,5 +1514,17 @@
   "d3-transitions-stagger-basics": {
     "difficulty": 1,
     "concept": "d3-transitions-basics"
+  },
+  "next-route-handler-crud": {
+    "difficulty": 2,
+    "concept": "next-route-handlers"
+  },
+  "next-server-action-form": {
+    "difficulty": 2,
+    "concept": "next-server-actions"
+  },
+  "next-middleware-auth-redirect": {
+    "difficulty": 3,
+    "concept": "next-middleware"
   }
 }
