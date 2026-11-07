@@ -41,18 +41,14 @@ const DEFAULT_HIERARCHY_DATA = [
       return;
     }
 
-    const statsBar = document.createElement('div');
-    statsBar.style.display = 'flex';
-    statsBar.style.gap = '16px';
-    statsBar.style.fontSize = '12px';
-    statsBar.style.color = 'slategray';
-    statsBar.innerHTML = `
-      <span>Root: <strong style="color: steelblue;">${result.rootId}</strong></span>
-      <span>Total: <strong style="color: seagreen;">${result.totalValue.toLocaleString()}</strong></span>
-      <span>Depth: <strong style="color: orange;">${result.maxDepth}</strong></span>
-      <span>Leaves: <strong style="color: purple;">${result.leaves.length}</strong></span>
-    `;
-    container.appendChild(statsBar);
+    if (typeof log === 'function') {
+      log('stratifySummary', {
+        rootId: result.rootId,
+        totalValue: result.totalValue,
+        maxDepth: result.maxDepth,
+        leavesCount: result.leaves.length,
+      });
+    }
 
     const width = 420;
     const height = 240;

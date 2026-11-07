@@ -34,12 +34,6 @@ const DEFAULT_SIM_LINKS = [
 
   function render(props) {
     container.innerHTML = '';
-    container.style.display = 'flex';
-    container.style.flexDirection = 'column';
-    container.style.gap = '10px';
-    container.style.padding = '12px';
-    container.style.boxSizing = 'border-box';
-    container.style.fontFamily = 'system-ui, sans-serif';
 
     const width = 440;
     const height = 270;
@@ -61,18 +55,13 @@ const DEFAULT_SIM_LINKS = [
       maxTicks,
     });
 
-    const statsBar = document.createElement('div');
-    statsBar.style.display = 'flex';
-    statsBar.style.flexWrap = 'wrap';
-    statsBar.style.gap = '14px';
-    statsBar.style.fontSize = '12px';
-    statsBar.style.color = 'slategray';
-    statsBar.innerHTML = `
-      <span>Ticks: <strong style="color: steelblue;">${report.ticks}</strong></span>
-      <span>Alpha: <strong style="color: orange;">${report.finalAlpha.toFixed(4)}</strong></span>
-      <span>Converged: <strong style="color: ${report.converged ? 'seagreen' : 'crimson'};">${report.converged ? 'Yes' : 'No'}</strong></span>
-    `;
-    container.appendChild(statsBar);
+    if (typeof log === 'function') {
+      log('simulationReport', {
+        ticks: report.ticks,
+        finalAlpha: Number(report.finalAlpha.toFixed(4)),
+        converged: report.converged,
+      });
+    }
 
     const svg = d3
       .select(container)

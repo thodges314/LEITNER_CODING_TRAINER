@@ -45,18 +45,6 @@ const DEFAULT_QUAD_POINTS = [
 
     const index = createQuadtreeIndex(points);
 
-    const statsBar = document.createElement('div');
-    statsBar.style.display = 'flex';
-    statsBar.style.gap = '16px';
-    statsBar.style.fontSize = '12px';
-    statsBar.style.color = 'slategray';
-    statsBar.innerHTML = `
-      <span>Indexed: <strong style="color: steelblue;">${index.size()}</strong></span>
-      <span>Radius: <strong style="color: orange;">${searchRadius}px</strong></span>
-      <span id="quad-status" style="color: seagreen;">Hover canvas to search</span>
-    `;
-    container.appendChild(statsBar);
-
     const svg = d3
       .select(container)
       .append('svg')
@@ -117,8 +105,6 @@ const DEFAULT_QUAD_POINTS = [
       .attr('stroke-width', 2)
       .style('display', 'none');
 
-    const statusEl = statsBar.querySelector('#quad-status');
-
     svg.on('mousemove', function (event) {
       const [mx, my] = d3.pointer(event);
       searchCircle.attr('cx', mx).attr('cy', my).style('display', 'block');
@@ -141,19 +127,12 @@ const DEFAULT_QUAD_POINTS = [
       } else {
         connectorLine.style('display', 'none');
       }
-
-      if (statusEl) {
-        statusEl.textContent = `Found ${matches.length} within radius${nearest ? ` · Nearest: ${nearest.id ?? 'point'}` : ''}`;
-      }
     });
 
     svg.on('mouseleave', function () {
       searchCircle.style('display', 'none');
       connectorLine.style('display', 'none');
       pointDots.attr('fill', 'steelblue').attr('r', 4);
-      if (statusEl) {
-        statusEl.textContent = 'Hover canvas to search';
-      }
     });
 
     svg.on('click', function (event) {
