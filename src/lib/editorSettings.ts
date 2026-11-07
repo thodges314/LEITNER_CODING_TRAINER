@@ -61,9 +61,14 @@ export function setPreferredExecutionMode(mode: PreferredExecutionMode): void {
  * - Cards in 'typescript-patterns' are always overridden to 'ts' (without modifying the stored preference).
  * - All other cards use the user's stored preferred execution mode ('js' by default, or 'ts' if switched).
  */
-export function resolveExecutionModeForCard(card: { track?: string } | null | undefined): PreferredExecutionMode {
+export function resolveExecutionModeForCard(
+  card: { track?: string; inputLanguage?: string } | null | undefined
+): PreferredExecutionMode {
   if (isTsOnlyCard(card)) {
     return 'ts';
+  }
+  if (card && 'inputLanguage' in card && card.inputLanguage && card.inputLanguage !== 'javascript') {
+    return 'js';
   }
   return getPreferredExecutionMode();
 }

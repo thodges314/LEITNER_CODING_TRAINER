@@ -1,0 +1,13 @@
+{
+  "track": "graphql",
+  "title": "Subscription with Filter Arguments & Selection",
+  "tags": [
+    "graphql",
+    "subscriptions",
+    "realtime",
+    "operations",
+    "documents"
+  ],
+  "inputLanguage": "graphql"
+}
+

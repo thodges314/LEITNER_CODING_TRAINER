@@ -1,0 +1,12 @@
+{
+  "track": "graphql-server",
+  "title": "GraphQL Client: Normalized Response Cache & Tree Reconstruction",
+  "tags": [
+    "graphql",
+    "cache",
+    "normalization",
+    "client",
+    "state-management"
+  ]
+}
+

@@ -1,0 +1,14 @@
+subscription OnMessageCreated($channelId: ID!, $minPriority: Priority) {
+  messageCreated(channelId: $channelId, minPriority: $minPriority) {
+    id
+    content
+    priority
+    createdAt
+    author {
+      id
+      username
+      status
+    }
+  }
+}
+

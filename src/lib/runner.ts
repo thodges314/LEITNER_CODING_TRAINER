@@ -392,6 +392,9 @@ export async function runHarness(
   if (isTsOnlyCard(card)) mode = 'ts';
 
   const inputLang = getCardInputLanguage(card);
+  if (inputLang !== 'javascript') {
+    mode = 'js';
+  }
   let effectiveCode = code;
   if (inputLang === 'sql') {
     effectiveCode = prepareSqlCode(code, harness);
