@@ -6,7 +6,7 @@ interface TreeNode {
 
 type CheckboxStatus = 'checked' | 'unchecked' | 'indeterminate';
 
-function getAllDescendantIds(node: TreeNode): string[] {
+const getAllDescendantIds = (node: TreeNode): string[] => {
   const ids: string[] = [node.id];
   if (node.children) {
     for (const child of node.children) {
@@ -14,9 +14,9 @@ function getAllDescendantIds(node: TreeNode): string[] {
     }
   }
   return ids;
-}
+};
 
-function findNode(nodes: TreeNode[], id: string): TreeNode | null {
+const findNode = (nodes: TreeNode[], id: string): TreeNode | null => {
   for (const n of nodes) {
     if (n.id === id) return n;
     if (n.children) {
@@ -25,9 +25,9 @@ function findNode(nodes: TreeNode[], id: string): TreeNode | null {
     }
   }
   return null;
-}
+};
 
-function computeNodeStatus(node: TreeNode, checkedSet: Set<string>): CheckboxStatus {
+const computeNodeStatus = (node: TreeNode, checkedSet: Set<string>): CheckboxStatus => {
   if (!node.children || node.children.length === 0) {
     return checkedSet.has(node.id) ? 'checked' : 'unchecked';
   }
@@ -44,16 +44,16 @@ function computeNodeStatus(node: TreeNode, checkedSet: Set<string>): CheckboxSta
   if (checkedCount === node.children.length) return 'checked';
   if (checkedCount === 0 && !hasIndeterminate) return 'unchecked';
   return 'indeterminate';
-}
+};
 
-function useCheckboxTree(
+const useCheckboxTree = (
   treeData: TreeNode[],
   initialChecked: string[] = []
 ): {
   checkedIds: string[];
   getStatus: (id: string) => CheckboxStatus;
   toggle: (id: string) => void;
-} {
+} => {
   const [checkedIds, setCheckedIds] = React.useState<string[]>(initialChecked);
 
   const checkedSet = React.useMemo(() => new Set<string>(checkedIds), [checkedIds]);

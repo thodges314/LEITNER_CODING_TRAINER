@@ -15,12 +15,12 @@ const TABS: readonly TabItem[] = [
   { id: 'about', label: 'About' },
 ];
 
-function Panel({ load, tab }: { load: (tabId: TabId) => Promise<string>; tab: TabId }): JSX.Element {
+const Panel = ({ load, tab }: { load: (tabId: TabId) => Promise<string>; tab: TabId }): JSX.Element => {
   const text = use<string>(load(tab));
   return <p>{text}</p>;
-}
+};
 
-function TabbedViewer({ load }: TabbedViewerProps): JSX.Element {
+const TabbedViewer = ({ load }: TabbedViewerProps): JSX.Element => {
   const [tab, setTab] = useState<TabId>('home');
   const [isPending, startTransition] = useTransition();
 

@@ -1,4 +1,4 @@
-function useHistory(initial, limit = 100) {
+const useHistory = (initial, limit = 100) => {
   const [history, setHistory] = useState({ past: [], present: initial, future: [] });
 
   const set = useCallback(

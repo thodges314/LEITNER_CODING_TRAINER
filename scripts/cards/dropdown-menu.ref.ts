@@ -10,7 +10,7 @@ interface DropdownMenuProps {
   onSelect?: (id: string) => void;
 }
 
-function DropdownMenu({ label, items, onSelect }: DropdownMenuProps): JSX.Element {
+const DropdownMenu = ({ label, items, onSelect }: DropdownMenuProps): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);

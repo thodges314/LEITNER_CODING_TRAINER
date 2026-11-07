@@ -4,7 +4,7 @@ interface ProgressBarProps {
   label?: string;
 }
 
-function ProgressBar({ value, max = 100, label = 'Progress' }: ProgressBarProps): JSX.Element {
+const ProgressBar = ({ value, max = 100, label = 'Progress' }: ProgressBarProps): JSX.Element => {
   const indeterminate = value === undefined || value === null;
   const clamped = indeterminate ? 0 : Math.min(max, Math.max(0, value));
   const pct = (clamped / max) * 100;

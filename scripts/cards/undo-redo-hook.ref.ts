@@ -15,7 +15,7 @@ interface HistoryResult<T> {
   canRedo: boolean;
 }
 
-function useHistory<T>(initial: T, limit: number = 100): HistoryResult<T> {
+const useHistory = <T,>(initial: T, limit: number = 100): HistoryResult<T> => {
   const [history, setHistory] = useState<HistoryState<T>>({ past: [], present: initial, future: [] });
 
   const set = useCallback(

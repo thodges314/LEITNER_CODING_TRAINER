@@ -1,10 +1,10 @@
-function useToggle(initial = false) {
+const useToggle = (initial = false) => {
   const [value, setValue] = useState(initial);
   const toggle = useCallback(() => setValue((v) => !v), []);
   return [value, toggle, setValue];
 }
 
-function useCounter({ initial = 0, min = -Infinity, max = Infinity, step = 1 } = {}) {
+const useCounter = ({ initial = 0, min = -Infinity, max = Infinity, step = 1 } = {}) => {
   const clamp = useCallback((n) => Math.min(max, Math.max(min, n)), [min, max]);
   const [count, setCount] = useState(() => clamp(initial));
   const increment = useCallback(() => setCount((c) => clamp(c + step)), [clamp, step]);

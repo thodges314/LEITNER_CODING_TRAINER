@@ -18,7 +18,7 @@ const hiddenStyle: Record<string, string | number> = {
   whiteSpace: 'nowrap',
 };
 
-function AnnouncerProvider({ children }: { children: React.ReactNode }): JSX.Element {
+const AnnouncerProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
   const [polite, setPolite] = useState<string>('');
   const [assertive, setAssertive] = useState<string>('');
 
@@ -47,6 +47,6 @@ function AnnouncerProvider({ children }: { children: React.ReactNode }): JSX.Ele
   );
 }
 
-function useAnnounce(): AnnounceFn {
+const useAnnounce = (): AnnounceFn => {
   return useContext(AnnouncerContext)!;
-}
+};

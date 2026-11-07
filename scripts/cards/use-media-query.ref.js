@@ -1,4 +1,4 @@
-function useMediaQuery(query) {
+const useMediaQuery = (query) => {
   const [matches, setMatches] = React.useState(() => {
     if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
       return window.matchMedia(query).matches;

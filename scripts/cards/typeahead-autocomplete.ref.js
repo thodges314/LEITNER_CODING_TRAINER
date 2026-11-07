@@ -1,4 +1,4 @@
-function Typeahead({ onSelect, fetchSuggestions, delay = 300 }) {
+const Typeahead = ({ onSelect, fetchSuggestions, delay = 300 }) => {
   const [query, setQuery] = useState('');
   const [items, setItems] = useState([]);
   const [open, setOpen] = useState(false);

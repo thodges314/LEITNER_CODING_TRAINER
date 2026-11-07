@@ -1,4 +1,4 @@
-function orderOfEvents(): Promise<string[]> {
+const orderOfEvents = (): Promise<string[]> => {
   const log: string[] = [];
   return new Promise<string[]>((resolve) => {
     log.push('start');
@@ -11,7 +11,7 @@ function orderOfEvents(): Promise<string[]> {
   });
 }
 
-async function asyncOrder(): Promise<string[]> {
+const asyncOrder = async (): Promise<string[]> => {
   const log: string[] = [];
   async function f(l: string[]): Promise<void> {
     l.push('f1');

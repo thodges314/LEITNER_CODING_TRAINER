@@ -3,7 +3,7 @@ interface CancelableResult<T> {
   cancel: () => void;
 }
 
-function makeCancelable<T>(promise: Promise<T>): CancelableResult<T> {
+const makeCancelable = <T,>(promise: Promise<T>): CancelableResult<T> => {
   let hasCanceled = false;
   const wrappedPromise = new Promise<T>((resolve, reject) => {
     promise.then(
@@ -19,7 +19,7 @@ function makeCancelable<T>(promise: Promise<T>): CancelableResult<T> {
   };
 }
 
-function withTimeout<T>(promise: Promise<T>, ms: number, timeoutError: Error = new Error('Timeout')): Promise<T> {
+const withTimeout = <T,>(promise: Promise<T>, ms: number, timeoutError: Error = new Error('Timeout')): Promise<T> => {
   let timer: any;
   const timeoutPromise = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(timeoutError), ms);

@@ -1,6 +1,6 @@
 const ToastContext = createContext(null);
 
-function ToastProvider({ children, limit = 3 }) {
+const ToastProvider = ({ children, limit = 3 }) => {
   const [toasts, setToasts] = useState([]);
   const nextId = useRef(1);
   const timers = useRef(new Map());
@@ -52,6 +52,6 @@ function ToastProvider({ children, limit = 3 }) {
   );
 }
 
-function useToast() {
+const useToast = () => {
   return useContext(ToastContext);
-}
+};

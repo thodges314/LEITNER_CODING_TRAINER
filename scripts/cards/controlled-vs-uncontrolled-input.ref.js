@@ -1,4 +1,4 @@
-function SearchForm({ onSearch }) {
+const SearchForm = ({ onSearch }) => {
   const [query, setQuery] = useState('');
 
   const handleSubmit = (event) => {

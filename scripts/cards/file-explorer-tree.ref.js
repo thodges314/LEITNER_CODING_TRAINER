@@ -1,4 +1,4 @@
-function TreeNode({ node, path, onSelect }) {
+const TreeNode = ({ node, path, onSelect }) => {
   const [open, setOpen] = useState(false);
   const isFolder = Array.isArray(node.children);
   const fullPath = path ? `${path}/${node.name}` : node.name;
@@ -23,9 +23,9 @@ function TreeNode({ node, path, onSelect }) {
       )}
     </li>
   );
-}
+};
 
-function FileTree({ nodes, onSelect }) {
+const FileTree = ({ nodes, onSelect }) => {
   return (
     <ul role="tree">
       {nodes.map((node) => (
@@ -33,4 +33,4 @@ function FileTree({ nodes, onSelect }) {
       ))}
     </ul>
   );
-}
+};

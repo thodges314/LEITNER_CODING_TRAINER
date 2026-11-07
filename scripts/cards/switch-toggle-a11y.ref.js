@@ -1,4 +1,4 @@
-function Switch({ checked, onChange, disabled = false, children }) {
+const Switch = ({ checked, onChange, disabled = false, children }) => {
   return (
     <button
       type="button"

@@ -1,4 +1,4 @@
-function VirtualList({
+const VirtualList = ({
   items,
   itemHeight,
   height,
@@ -8,7 +8,7 @@ function VirtualList({
   itemHeight: number;
   height: number;
   overscan?: number;
-}): JSX.Element {
+}): JSX.Element => {
   const [scrollTop, setScrollTop] = useState<number>(0);
 
   const start = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan);

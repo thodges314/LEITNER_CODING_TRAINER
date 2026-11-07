@@ -1,4 +1,4 @@
-function Switch({
+const Switch = ({
   checked,
   onChange,
   disabled = false,
@@ -8,7 +8,7 @@ function Switch({
   onChange: (next: boolean) => void;
   disabled?: boolean;
   children: React.ReactNode;
-}): JSX.Element {
+}): JSX.Element => {
   return (
     <button
       type="button"

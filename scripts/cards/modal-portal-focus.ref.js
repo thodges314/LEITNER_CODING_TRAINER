@@ -1,6 +1,6 @@
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-function Modal({ isOpen, onClose, children }) {
+const Modal = ({ isOpen, onClose, children }) => {
   const dialogRef = useRef(null);
 
   useEffect(() => {

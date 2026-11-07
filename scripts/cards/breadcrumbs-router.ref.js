@@ -1,4 +1,4 @@
-function Breadcrumbs({ pathname, labels = {} }) {
+const Breadcrumbs = ({ pathname, labels = {} }) => {
   const clean = pathname ? pathname.replace(/\/+/g, '/').replace(/\/$/, '') : '';
   const segments = clean.split('/').filter(Boolean);
 

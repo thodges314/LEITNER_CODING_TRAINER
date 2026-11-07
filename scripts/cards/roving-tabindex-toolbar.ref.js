@@ -1,4 +1,4 @@
-function Toolbar({ label, items }) {
+const Toolbar = ({ label, items }) => {
   const [active, setActive] = useState(0);
   const refs = useRef([]);
 

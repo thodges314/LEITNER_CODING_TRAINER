@@ -1,4 +1,4 @@
-const List = React.memo(function List({ items, onSelect, onRender }) {
+const List = React.memo(({ items, onSelect, onRender }) => {
   if (onRender) onRender();
   return (
     <ul>
@@ -11,7 +11,7 @@ const List = React.memo(function List({ items, onSelect, onRender }) {
   );
 });
 
-function Parent({ items, onListRender }) {
+const Parent = ({ items, onListRender }) => {
   const [count, setCount] = useState(0);
   const [selected, setSelected] = useState(null);
 

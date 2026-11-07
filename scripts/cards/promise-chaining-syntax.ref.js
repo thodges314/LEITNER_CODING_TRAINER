@@ -1,4 +1,4 @@
-function getUserData(url) {
+const getUserData = (url) => {
   return fetch(url)
     .then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

@@ -1,4 +1,4 @@
-function SortedList({ items, onCompute }) {
+const SortedList = ({ items, onCompute }) => {
   const [count, setCount] = useState(0);
 
   const sorted = useMemo(() => {

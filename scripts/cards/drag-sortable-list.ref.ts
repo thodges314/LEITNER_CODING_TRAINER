@@ -8,17 +8,17 @@ interface DragSortableListProps {
   onReorder?: (items: SortableItem[]) => void;
 }
 
-function reorder(list: SortableItem[], fromIndex: number, toIndex: number): SortableItem[] {
+const reorder = (list: SortableItem[], fromIndex: number, toIndex: number): SortableItem[] => {
   const result = [...list];
   const [removed] = result.splice(fromIndex, 1);
   result.splice(toIndex, 0, removed);
   return result;
-}
+};
 
-function DragSortableList({
+const DragSortableList = ({
   items = [],
   onReorder = () => {},
-}: DragSortableListProps): JSX.Element {
+}: DragSortableListProps): JSX.Element => {
   const [list, setList] = useState<SortableItem[]>(items);
   const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
 

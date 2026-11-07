@@ -1,4 +1,4 @@
-function TagInput({
+const TagInput = ({
   value,
   onChange,
   max = Infinity,
@@ -6,7 +6,7 @@ function TagInput({
   value: string[];
   onChange: (next: string[]) => void;
   max?: number;
-}): JSX.Element {
+}): JSX.Element => {
   const [text, setText] = useState<string>('');
 
   const addTag = (): void => {

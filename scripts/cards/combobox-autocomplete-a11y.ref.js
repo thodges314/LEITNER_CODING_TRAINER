@@ -1,10 +1,10 @@
-function AccessibleCombobox({
+const AccessibleCombobox = ({
   id,
   label,
   options = [],
   onSelect = () => {},
   placeholder = '',
-}) {
+}) => {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);

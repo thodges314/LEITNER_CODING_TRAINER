@@ -1,4 +1,4 @@
-function Layout({
+const Layout = ({
   path,
   title,
   children,
@@ -6,7 +6,7 @@ function Layout({
   path: string;
   title: string;
   children?: React.ReactNode;
-}): JSX.Element {
+}): JSX.Element => {
   const mainRef = useRef<HTMLElement | null>(null);
   const headingRef = useRef<HTMLElement | null>(null);
   const firstRender = useRef<boolean>(true);

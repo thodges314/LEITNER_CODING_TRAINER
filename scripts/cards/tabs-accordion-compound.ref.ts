@@ -13,7 +13,7 @@ interface TabsProps {
   onChange?: (next: string) => void;
 }
 
-function Tabs({ children, defaultValue, value, onChange }: TabsProps): JSX.Element {
+const Tabs = ({ children, defaultValue, value, onChange }: TabsProps): JSX.Element => {
   const [inner, setInner] = useState<string | undefined>(defaultValue);
   const controlled = value !== undefined;
   const current = controlled ? value : inner;
@@ -29,13 +29,13 @@ function Tabs({ children, defaultValue, value, onChange }: TabsProps): JSX.Eleme
       <div>{children}</div>
     </TabsContext.Provider>
   );
-}
+};
 
 interface TabListProps {
   children?: React.ReactNode;
 }
 
-function TabList({ children }: TabListProps): JSX.Element {
+const TabList = ({ children }: TabListProps): JSX.Element => {
   const onKeyDown = (e: unknown): void => {
     const ev = e as KeyboardEvent;
     const target = ev.currentTarget as HTMLElement;
@@ -55,14 +55,14 @@ function TabList({ children }: TabListProps): JSX.Element {
       {children}
     </div>
   );
-}
+};
 
 interface TabProps {
   value: string;
   children?: React.ReactNode;
 }
 
-function Tab({ value, children }: TabProps): JSX.Element {
+const Tab = ({ value, children }: TabProps): JSX.Element => {
   const ctx = useContext(TabsContext);
   const current = ctx?.current;
   const select = ctx?.select;
@@ -80,14 +80,14 @@ function Tab({ value, children }: TabProps): JSX.Element {
       {children}
     </button>
   );
-}
+};
 
 interface TabPanelProps {
   value: string;
   children?: React.ReactNode;
 }
 
-function TabPanel({ value, children }: TabPanelProps): JSX.Element | null {
+const TabPanel = ({ value, children }: TabPanelProps): JSX.Element | null => {
   const ctx = useContext(TabsContext);
   const current = ctx?.current;
   const baseId = ctx?.baseId ?? '';

@@ -1,4 +1,4 @@
-function SubscribeForm({ subscribe }) {
+const SubscribeForm = ({ subscribe }) => {
   const [state, formAction, isPending] = useActionState(
     async (previous, formData) => {
       const email = String(formData.get('email') || '').trim();

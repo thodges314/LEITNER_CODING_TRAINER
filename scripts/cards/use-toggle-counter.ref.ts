@@ -15,18 +15,18 @@ interface CounterResult {
   set: (n: number) => void;
 }
 
-function useToggle(initial = false): UseToggleReturn {
+const useToggle = (initial = false): UseToggleReturn => {
   const [value, setValue] = useState(initial);
   const toggle = useCallback(() => setValue((v: boolean) => !v), []);
   return [value, toggle, setValue];
 }
 
-function useCounter({
+const useCounter = ({
   initial = 0,
   min = -Infinity,
   max = Infinity,
   step = 1,
-}: CounterOptions = {}): CounterResult {
+}: CounterOptions = {}): CounterResult => {
   const clamp = useCallback((n: number) => Math.min(max, Math.max(min, n)), [min, max]);
   const [count, setCount] = useState(() => clamp(initial));
   const increment = useCallback(() => setCount((c: number) => clamp(c + step)), [clamp, step]);

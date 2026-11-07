@@ -1,6 +1,6 @@
 const initialState = { todos: [], filter: 'all' };
 
-function todoReducer(state, action) {
+const todoReducer = (state, action) => {
   switch (action.type) {
     case 'ADD':
       return { ...state, todos: [...state.todos, { id: action.id, text: action.text, done: false }] };
@@ -15,9 +15,9 @@ function todoReducer(state, action) {
     default:
       return state;
   }
-}
+};
 
-function selectVisibleTodos(state) {
+const selectVisibleTodos = (state) => {
   if (state.filter === 'active') return state.todos.filter((t) => !t.done);
   if (state.filter === 'done') return state.todos.filter((t) => t.done);
   return state.todos;

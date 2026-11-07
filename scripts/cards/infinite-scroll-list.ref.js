@@ -1,4 +1,4 @@
-function InfiniteList({ items = [], onLoadMore, hasMore, loading }) {
+const InfiniteList = ({ items = [], onLoadMore, hasMore, loading }) => {
   const sentinelRef = useRef(null);
   const state = useRef({ onLoadMore, loading });
   state.current = { onLoadMore, loading };

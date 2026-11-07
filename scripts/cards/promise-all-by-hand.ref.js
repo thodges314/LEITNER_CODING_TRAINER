@@ -1,4 +1,4 @@
-function myAll(items) {
+const myAll = (items) => {
   return new Promise((resolve, reject) => {
     const results = new Array(items.length);
     let remaining = items.length;

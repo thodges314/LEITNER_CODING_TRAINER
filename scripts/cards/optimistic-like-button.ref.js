@@ -1,4 +1,4 @@
-function LikeButton({ initialLiked = false, initialCount = 0, onToggle }) {
+const LikeButton = ({ initialLiked = false, initialCount = 0, onToggle }) => {
   const [state, setState] = useState({ liked: initialLiked, count: initialCount });
   const [error, setError] = useState(false);
   const pending = useRef(false);

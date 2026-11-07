@@ -20,12 +20,12 @@ interface CommentNodeProps {
   depth: number;
 }
 
-function CommentNode({
+const CommentNode = ({
   comment,
   onAddReply,
   maxDepth,
   depth,
-}: CommentNodeProps): JSX.Element {
+}: CommentNodeProps): JSX.Element => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [replying, setReplying] = useState<boolean>(false);
   const [replyText, setReplyText] = useState<string>('');
@@ -118,11 +118,11 @@ function CommentNode({
   );
 }
 
-function NestedComments({
+const NestedComments = ({
   comments,
   onAddReply,
   maxDepth = 4,
-}: NestedCommentsProps): JSX.Element {
+}: NestedCommentsProps): JSX.Element => {
   return (
     <ul>
       {comments.map((comment) => (

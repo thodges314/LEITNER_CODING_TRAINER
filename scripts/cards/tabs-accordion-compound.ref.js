@@ -1,6 +1,6 @@
 const TabsContext = createContext(null);
 
-function Tabs({ children, defaultValue, value, onChange }) {
+const Tabs = ({ children, defaultValue, value, onChange }) => {
   const [inner, setInner] = useState(defaultValue);
   const controlled = value !== undefined;
   const current = controlled ? value : inner;
@@ -16,9 +16,9 @@ function Tabs({ children, defaultValue, value, onChange }) {
       <div>{children}</div>
     </TabsContext.Provider>
   );
-}
+};
 
-function TabList({ children }) {
+const TabList = ({ children }) => {
   const onKeyDown = (e) => {
     const tabs = [...e.currentTarget.querySelectorAll('[role="tab"]')];
     const i = tabs.indexOf(document.activeElement);
@@ -36,9 +36,9 @@ function TabList({ children }) {
       {children}
     </div>
   );
-}
+};
 
-function Tab({ value, children }) {
+const Tab = ({ value, children }) => {
   const { current, select, baseId } = useContext(TabsContext);
   const selected = current === value;
   return (
@@ -53,9 +53,9 @@ function Tab({ value, children }) {
       {children}
     </button>
   );
-}
+};
 
-function TabPanel({ value, children }) {
+const TabPanel = ({ value, children }) => {
   const { current, baseId } = useContext(TabsContext);
   if (current !== value) return null;
   return (
@@ -63,4 +63,4 @@ function TabPanel({ value, children }) {
       {children}
     </div>
   );
-}
+};

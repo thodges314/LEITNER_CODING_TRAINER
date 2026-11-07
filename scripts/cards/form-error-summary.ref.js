@@ -3,14 +3,14 @@ const FIELDS = [
   { id: 'email', label: 'Email' },
 ];
 
-function validate(values) {
+const validate = (values) => {
   const errors = {};
   if (!values.name.trim()) errors.name = 'Enter your name';
   if (!/^\S+@\S+\.\S+$/.test(values.email.trim())) errors.email = 'Enter a valid email address';
   return errors;
-}
+};
 
-function SignupForm({ onSubmit }) {
+const SignupForm = ({ onSubmit }) => {
   const [values, setValues] = useState({ name: '', email: '' });
   const [errors, setErrors] = useState({});
   const [attempt, setAttempt] = useState(0);

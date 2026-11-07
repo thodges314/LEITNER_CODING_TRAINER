@@ -1,4 +1,4 @@
-function usePrevious(value) {
+const usePrevious = (value) => {
   const ref = useRef();
   useEffect(() => {
     ref.current = value; // runs after render, so the next render sees this value

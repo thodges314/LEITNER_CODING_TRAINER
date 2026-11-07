@@ -1,4 +1,4 @@
-function useLocalStorage(key, initialValue) {
+const useLocalStorage = (key, initialValue) => {
   const read = () => {
     try {
       const raw = localStorage.getItem(key);

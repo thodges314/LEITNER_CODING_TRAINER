@@ -3,7 +3,7 @@ interface FileNode {
   children?: FileNode[];
 }
 
-function TreeNode({
+const TreeNode = ({
   node,
   path,
   onSelect,
@@ -12,7 +12,7 @@ function TreeNode({
   path: string;
   onSelect?: (path: string) => void;
   key?: string;
-}): JSX.Element {
+}): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false);
   const isFolder = Array.isArray(node.children);
   const fullPath = path ? `${path}/${node.name}` : node.name;
@@ -37,15 +37,15 @@ function TreeNode({
       )}
     </li>
   );
-}
+};
 
-function FileTree({
+const FileTree = ({
   nodes,
   onSelect,
 }: {
   nodes: FileNode[];
   onSelect?: (path: string) => void;
-}): JSX.Element {
+}): JSX.Element => {
   return (
     <ul role="tree">
       {nodes.map((node) => (
@@ -53,4 +53,4 @@ function FileTree({
       ))}
     </ul>
   );
-}
+};

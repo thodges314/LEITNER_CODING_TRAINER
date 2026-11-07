@@ -1,4 +1,4 @@
-function Layout({ path, title, children }) {
+const Layout = ({ path, title, children }) => {
   const mainRef = useRef(null);
   const headingRef = useRef(null);
   const firstRender = useRef(true);

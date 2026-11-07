@@ -5,10 +5,10 @@ interface RetryOptions {
   signal?: AbortSignal;
 }
 
-async function retry<T>(
+const retry = async <T,>(
   fn: (attempt: number) => Promise<T>,
   { retries = 3, baseDelay = 20, factor = 2, signal }: RetryOptions = {}
-): Promise<T> {
+): Promise<T> => {
   const abortReason = (): any => signal?.reason ?? new DOMException('Aborted', 'AbortError');
 
   const wait = (ms: number): Promise<void> =>

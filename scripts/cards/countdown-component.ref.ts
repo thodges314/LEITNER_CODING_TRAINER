@@ -4,7 +4,7 @@ interface CountdownProps {
   tickMs?: number;
 }
 
-function Countdown({ seconds, onDone, tickMs = 1000 }: CountdownProps): JSX.Element {
+const Countdown = ({ seconds, onDone, tickMs = 1000 }: CountdownProps): JSX.Element => {
   const [remaining, setRemaining] = useState<number>(seconds);
   const [running, setRunning] = useState<boolean>(false);
   const onDoneRef = useRef<(() => void) | undefined>(onDone);

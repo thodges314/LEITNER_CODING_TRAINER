@@ -16,11 +16,11 @@ interface KanbanBoardProps {
   onCardAdd?: (columnId: string, card: { title: string; description?: string }) => void;
 }
 
-function KanbanBoard({
+const KanbanBoard = ({
   initialColumns = [],
   onCardMove = () => {},
   onCardAdd = () => {},
-}: KanbanBoardProps): JSX.Element {
+}: KanbanBoardProps): JSX.Element => {
   const [columns, setColumns] = useState<KanbanColumn[]>(() =>
     initialColumns.map((col: KanbanColumn) => ({
       ...col,

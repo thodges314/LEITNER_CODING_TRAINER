@@ -1,6 +1,6 @@
 const inFlight = new Map();
 
-function dedupeFetch(key, fn, timeoutMs = 5000) {
+const dedupeFetch = (key, fn, timeoutMs = 5000) => {
   if (inFlight.has(key)) return inFlight.get(key);
 
   const controller = new AbortController();

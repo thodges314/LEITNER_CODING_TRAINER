@@ -6,7 +6,7 @@ interface MediaQueryListLike {
   removeListener?(listener: (e: { matches: boolean }) => void): void;
 }
 
-function useMediaQuery(query: string): boolean {
+const useMediaQuery = (query: string): boolean => {
   const [matches, setMatches] = React.useState<boolean>(() => {
     if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
       return Boolean(window.matchMedia(query).matches);

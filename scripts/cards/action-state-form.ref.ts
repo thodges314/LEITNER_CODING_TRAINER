@@ -12,7 +12,7 @@ interface FormState {
   message: string;
 }
 
-function SubscribeForm({ subscribe }: SubscribeFormProps): JSX.Element {
+const SubscribeForm = ({ subscribe }: SubscribeFormProps): JSX.Element => {
   const [state, formAction, isPending] = useActionState(
     async (_previous: FormState, formData: FormData): Promise<FormState> => {
       const email = String(formData.get('email') || '').trim();

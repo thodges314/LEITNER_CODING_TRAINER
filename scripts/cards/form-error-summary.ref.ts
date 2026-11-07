@@ -12,14 +12,14 @@ const FIELDS: { id: keyof SignupFormValues; label: string }[] = [
   { id: 'email', label: 'Email' },
 ];
 
-function validate(values: SignupFormValues): Partial<Record<keyof SignupFormValues, string>> {
+const validate = (values: SignupFormValues): Partial<Record<keyof SignupFormValues, string>> => {
   const errors: Partial<Record<keyof SignupFormValues, string>> = {};
   if (!values.name.trim()) errors.name = 'Enter your name';
   if (!/^\S+@\S+\.\S+$/.test(values.email.trim())) errors.email = 'Enter a valid email address';
   return errors;
-}
+};
 
-function SignupForm({ onSubmit }: SignupFormProps): JSX.Element {
+const SignupForm = ({ onSubmit }: SignupFormProps): JSX.Element => {
   const [values, setValues] = useState<SignupFormValues>({ name: '', email: '' });
   const [errors, setErrors] = useState<Partial<Record<keyof SignupFormValues, string>>>({});
   const [attempt, setAttempt] = useState<number>(0);

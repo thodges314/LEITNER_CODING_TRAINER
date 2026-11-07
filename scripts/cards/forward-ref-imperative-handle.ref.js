@@ -1,4 +1,4 @@
-const FancyInput = forwardRef(function FancyInput(props, ref) {
+const FancyInput = forwardRef((props, ref) => {
   const inputRef = useRef(null);
 
   useImperativeHandle(

@@ -17,24 +17,24 @@ interface FormFieldProps {
   children: (props: FormFieldRenderProps) => React.ReactNode;
 }
 
-function ToggleButton({
+const ToggleButton = ({
   pressed,
   onPressedChange,
   children,
-}: ToggleButtonProps): JSX.Element {
+}: ToggleButtonProps): JSX.Element => {
   return (
     <button type="button" aria-pressed={pressed} onClick={(): void => onPressedChange(!pressed)}>
       {children}
     </button>
   );
-}
+};
 
-function FormField({
+const FormField = ({
   label,
   hint,
   error,
   children,
-}: FormFieldProps): JSX.Element {
+}: FormFieldProps): JSX.Element => {
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;

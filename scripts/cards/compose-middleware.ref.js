@@ -1,4 +1,4 @@
-function compose(fns) {
+const compose = (fns) => {
   return function run(ctx) {
     const dispatch = (i) => {
       const fn = fns[i];

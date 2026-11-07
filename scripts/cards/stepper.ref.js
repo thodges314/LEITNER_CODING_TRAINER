@@ -1,4 +1,4 @@
-function Stepper({ steps, initialStep = 0, onStepChange, onComplete }) {
+const Stepper = ({ steps, initialStep = 0, onStepChange, onComplete }) => {
   const [currentStep, setCurrentStep] = useState(initialStep);
 
   const goToStep = (index) => {

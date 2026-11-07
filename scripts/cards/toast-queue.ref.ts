@@ -19,7 +19,7 @@ interface ToastProviderProps {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
-function ToastProvider({ children, limit = 3 }: ToastProviderProps): JSX.Element {
+const ToastProvider = ({ children, limit = 3 }: ToastProviderProps): JSX.Element => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef<number>(1);
   const timers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
@@ -72,6 +72,6 @@ function ToastProvider({ children, limit = 3 }: ToastProviderProps): JSX.Element
   );
 }
 
-function useToast(): ToastContextValue {
+const useToast = (): ToastContextValue => {
   return useContext(ToastContext) as ToastContextValue;
-}
+};

@@ -1,4 +1,4 @@
-function myAll<T>(items: (T | Promise<T>)[]): Promise<T[]> {
+const myAll = <T,>(items: (T | Promise<T>)[]): Promise<T[]> => {
   return new Promise<T[]>((resolve, reject) => {
     const results = new Array<T>(items.length);
     let remaining = items.length;

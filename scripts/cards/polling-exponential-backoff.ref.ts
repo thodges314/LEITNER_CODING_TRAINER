@@ -4,11 +4,11 @@ interface PollOptions {
   maxAttempts?: number;
 }
 
-async function pollUntil<T>(
+const pollUntil = async <T,>(
   fn: () => Promise<T>,
   predicate: (result: T) => boolean,
   options: PollOptions = {}
-): Promise<T> {
+): Promise<T> => {
   const initialInterval = options.initialInterval ?? 50;
   const backoffFactor = options.backoffFactor ?? 2;
   const maxAttempts = options.maxAttempts ?? 5;

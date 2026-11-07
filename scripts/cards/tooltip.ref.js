@@ -1,4 +1,4 @@
-function Tooltip({ content, children }) {
+const Tooltip = ({ content, children }) => {
   const [open, setOpen] = useState(false);
   const id = useId();
   const child = React.Children.only(children);

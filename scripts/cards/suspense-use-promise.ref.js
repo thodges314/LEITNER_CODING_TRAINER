@@ -1,13 +1,13 @@
-function UserDetails({ userPromise }) {
+const UserDetails = ({ userPromise }) => {
   const user = use(userPromise);
   return (
     <p>
       {user.name} ({user.role})
     </p>
   );
-}
+};
 
-function UserBadge({ userPromise }) {
+const UserBadge = ({ userPromise }) => {
   return (
     <Suspense fallback={<p>Loading…</p>}>
       <UserDetails userPromise={userPromise} />

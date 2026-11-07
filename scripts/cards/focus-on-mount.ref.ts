@@ -3,7 +3,7 @@ interface FocusInputProps {
   label?: string;
 }
 
-function FocusInput({ placeholder, label }: FocusInputProps): JSX.Element {
+const FocusInput = ({ placeholder, label }: FocusInputProps): JSX.Element => {
   const inputRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {

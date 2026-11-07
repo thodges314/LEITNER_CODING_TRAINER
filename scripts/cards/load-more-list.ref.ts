@@ -7,7 +7,7 @@ interface LoadMoreListProps {
   fetchPage: (page: number) => Promise<FetchPageResult>;
 }
 
-function LoadMoreList({ fetchPage }: LoadMoreListProps): JSX.Element {
+const LoadMoreList = ({ fetchPage }: LoadMoreListProps): JSX.Element => {
   const [items, setItems] = useState<string[]>([]);
   const [loadedPage, setLoadedPage] = useState<number>(0);
   const [hasMore, setHasMore] = useState<boolean>(true);

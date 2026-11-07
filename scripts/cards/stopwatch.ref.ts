@@ -1,12 +1,12 @@
-function formatTime(ms: number): string {
+const formatTime = (ms: number): string => {
   const pad = (n: number) => String(n).padStart(2, '0');
   const cs = Math.floor(ms / 10) % 100;
   const s = Math.floor(ms / 1000) % 60;
   const m = Math.floor(ms / 60000);
   return `${pad(m)}:${pad(s)}.${pad(cs)}`;
-}
+};
 
-function Stopwatch(): JSX.Element {
+const Stopwatch = (): JSX.Element => {
   const [base, setBase] = useState<number>(0);
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [laps, setLaps] = useState<string[]>([]);

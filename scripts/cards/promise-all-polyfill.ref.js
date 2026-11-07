@@ -1,4 +1,4 @@
-function promiseAll(iterable) {
+const promiseAll = (iterable) => {
   return new Promise((resolve, reject) => {
     const items = Array.from(iterable);
     if (items.length === 0) return resolve([]);
@@ -13,7 +13,7 @@ function promiseAll(iterable) {
   });
 }
 
-function promiseAllSettled(iterable) {
+const promiseAllSettled = (iterable) => {
   return promiseAll(
     Array.from(iterable, (item) =>
       Promise.resolve(item).then(

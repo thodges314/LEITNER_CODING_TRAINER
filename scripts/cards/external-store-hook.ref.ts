@@ -9,7 +9,7 @@ interface ExternalStore<T> {
   subscribe: (listener: Listener) => Unsubscribe;
 }
 
-function createStore<T extends Record<string, unknown>>(initialState: T): ExternalStore<T> {
+const createStore = <T extends Record<string, unknown>>(initialState: T): ExternalStore<T> => {
   let state: T = initialState;
   const listeners = new Set<Listener>();
   return {
@@ -31,9 +31,9 @@ function createStore<T extends Record<string, unknown>>(initialState: T): Extern
   };
 }
 
-function useStore<T extends Record<string, unknown>, S = T>(
+const useStore = <T extends Record<string, unknown>, S = T>(
   store: ExternalStore<T>,
   selector: (state: T) => S = (state: T) => state as unknown as S
-): S {
+): S => {
   return useSyncExternalStore(store.subscribe, () => selector(store.getState()));
 }

@@ -13,13 +13,13 @@ interface ComboboxProps {
   placeholder?: string;
 }
 
-function AccessibleCombobox({
+const AccessibleCombobox = ({
   id,
   label,
   options = [],
   onSelect = () => {},
   placeholder = '',
-}: ComboboxProps): JSX.Element {
+}: ComboboxProps): JSX.Element => {
   const [query, setQuery] = useState<string>('');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [activeIdx, setActiveIdx] = useState<number>(-1);

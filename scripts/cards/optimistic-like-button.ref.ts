@@ -9,7 +9,7 @@ interface LikeState {
   count: number;
 }
 
-function LikeButton({ initialLiked = false, initialCount = 0, onToggle }: LikeButtonProps): JSX.Element {
+const LikeButton = ({ initialLiked = false, initialCount = 0, onToggle }: LikeButtonProps): JSX.Element => {
   const [state, setState] = useState<LikeState>({ liked: initialLiked, count: initialCount });
   const [error, setError] = useState<boolean>(false);
   const pending = useRef<boolean>(false);

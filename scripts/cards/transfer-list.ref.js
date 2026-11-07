@@ -1,4 +1,4 @@
-function useTransferList({ initialLeft = [], initialRight = [] } = {}) {
+const useTransferList = ({ initialLeft = [], initialRight = [] } = {}) => {
   const [left, setLeft] = React.useState(initialLeft);
   const [right, setRight] = React.useState(initialRight);
   const [leftSelected, setLeftSelected] = React.useState([]);

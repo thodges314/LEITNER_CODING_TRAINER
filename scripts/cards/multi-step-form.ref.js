@@ -1,4 +1,4 @@
-function Wizard({ steps, onSubmit }) {
+const Wizard = ({ steps, onSubmit }) => {
   const [index, setIndex] = useState(0);
   const [values, setValues] = useState({});
   const [error, setError] = useState(null);

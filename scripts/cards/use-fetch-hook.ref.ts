@@ -4,7 +4,7 @@ interface UseFetchReturn<T> {
   loading: boolean;
 }
 
-function useFetch<T = unknown>(url: string): UseFetchReturn<T> {
+const useFetch = <T = unknown,>(url: string): UseFetchReturn<T> => {
   const [state, setState] = useState<UseFetchReturn<T>>({ data: null, loading: true, error: null });
 
   useEffect(() => {

@@ -27,7 +27,7 @@ interface TodoCounts {
 
 const initialState: TodoState = { todos: [], filter: 'all' };
 
-function todoReducer(state: TodoState, action: TodoAction): TodoState {
+const todoReducer = (state: TodoState, action: TodoAction): TodoState => {
   switch (action.type) {
     case 'ADD':
       return { ...state, todos: [...state.todos, { id: action.id as number, text: action.text as string, done: false }] };
@@ -42,9 +42,9 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
     default:
       return state;
   }
-}
+};
 
-function selectVisibleTodos(state: TodoState): Todo[] {
+const selectVisibleTodos = (state: TodoState): Todo[] => {
   if (state.filter === 'active') return state.todos.filter((t) => !t.done);
   if (state.filter === 'done') return state.todos.filter((t) => t.done);
   return state.todos;

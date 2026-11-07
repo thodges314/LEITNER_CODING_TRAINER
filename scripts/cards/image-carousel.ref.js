@@ -1,4 +1,4 @@
-function Carousel({ slides, loop = true, autoPlayMs }) {
+const Carousel = ({ slides, loop = true, autoPlayMs }) => {
   const [index, setIndex] = useState(0);
   const last = slides.length - 1;
 

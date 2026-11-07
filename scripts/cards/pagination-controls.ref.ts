@@ -5,7 +5,7 @@ interface PaginationProps {
   siblings?: number;
 }
 
-function Pagination({ page, totalPages, onPageChange, siblings = 1 }: PaginationProps): JSX.Element {
+const Pagination = ({ page, totalPages, onPageChange, siblings = 1 }: PaginationProps): JSX.Element => {
   const shown = new Set<number>([1, totalPages]);
   for (let p = page - siblings; p <= page + siblings; p++) {
     if (p >= 1 && p <= totalPages) shown.add(p);

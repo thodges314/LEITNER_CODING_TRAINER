@@ -1,4 +1,4 @@
-function createStore(initialState) {
+const createStore = (initialState) => {
   let state = initialState;
   const listeners = new Set();
 

@@ -1,4 +1,4 @@
-function useDebounce(value, delay) {
+const useDebounce = (value, delay) => {
   const [debounced, setDebounced] = useState(value);
 
   useEffect(() => {
@@ -9,7 +9,7 @@ function useDebounce(value, delay) {
   return debounced;
 }
 
-function useThrottle(value, interval) {
+const useThrottle = (value, interval) => {
   const [throttled, setThrottled] = useState(value);
   const lastUpdate = useRef(Date.now());
 
