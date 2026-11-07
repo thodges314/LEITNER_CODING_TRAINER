@@ -6,6 +6,7 @@ import type { TopicItem } from './leitner';
 describe('TypeScript-only cards', () => {
   it('recognises only the TypeScript-only tracks', () => {
     expect(isTsOnlyCard({ track: 'typescript-patterns' })).toBe(true);
+    expect(isTsOnlyCard({ track: 'nextjs' })).toBe(true);
     expect(isTsOnlyCard({ track: 'algorithms' })).toBe(false);
     expect(isTsOnlyCard(null)).toBe(false);
     expect(isTsOnlyCard({})).toBe(false);

@@ -9,7 +9,7 @@ Next.js (specifically the modern **App Router** paradigm introduced in Next.js 1
 2. **Realistic Application Context Framing:** Each card's prompt begins with a concise `### Application Context` section (2–3 sentences) anchoring the exercise in a realistic hypothetical application (e.g. an e-commerce catalog, team workspace, or SaaS dashboard) and specifying the exact project file path (e.g. `app/api/products/[id]/route.ts`, `middleware.ts`, `app/checkout/actions.ts`).
 3. **Pure Execution Sandboxing:** Avoid requiring background Node.js server daemons or heavy npm dependencies in the browser. Next.js contracts execute as pure Web Standard `Request` / `Response` contracts, server action state reducers, and cache simulators.
 4. **Zero-Import Sandbox Scope:** Following the trainer's core architectural rules, `NextResponse`, `NextRequest`, and cache utilities are injected directly into the runner scope. Ambient TypeScript definitions enable full autocomplete and strict type checking without requiring learners to type `import { NextResponse } from 'next/server'`.
-5. **100% Dual Solution Coverage:** Every card provides both canonical JavaScript (`.ref.js`) and strongly typed TypeScript (`.ref.ts`) reference solutions, both utilizing modern arrow function syntax where customary.
+5. **Exclusively TypeScript Mode (`TS_ONLY_TRACKS`):** Next.js App Router applications in modern industry practice are authored almost exclusively in TypeScript. Cards in the `nextjs` track are registered in `TS_ONLY_TRACKS` (`isTsOnlyCard`), locking the practice arena into strict TypeScript mode with extracted interface prompt blocks, full Monaco autocomplete, and compile-time type verification. Canonical solutions provide both `.ref.ts` and `.ref.js`.
 
 ---
 

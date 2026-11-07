@@ -61,3 +61,4 @@ const POST = async (request: Request, context: RouteContext): Promise<NextRespon
 
   return NextResponse.json(record, { status: 201 });
 };
+

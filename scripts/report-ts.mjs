@@ -10,7 +10,7 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const topics = JSON.parse(fs.readFileSync(path.join(root, 'src/data/topics.json'), 'utf8'));
 
 // Cards in these tracks are TypeScript-only topics: the app forces TS mode for them (see runner.ts).
-const TS_ONLY_TRACKS = new Set(['typescript-patterns']);
+const TS_ONLY_TRACKS = new Set(['typescript-patterns', 'nextjs']);
 
 const tracks = new Map();
 for (const t of topics) {

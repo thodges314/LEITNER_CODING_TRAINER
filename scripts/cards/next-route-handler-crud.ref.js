@@ -42,3 +42,4 @@ const POST = async (request, context) => {
 
   return NextResponse.json(record, { status: 201 });
 };
+

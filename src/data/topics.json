@@ -12696,7 +12696,7 @@
   {
     "id": "next-route-matcher",
     "track": "dom-browser",
-    "title": "Next.js Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
+    "title": "Next.js-Style Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,

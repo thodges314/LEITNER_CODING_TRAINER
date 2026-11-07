@@ -29,3 +29,4 @@ const updateCartQuantity = async (prevState, formData) => {
     },
   };
 };
+

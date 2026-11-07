@@ -27,13 +27,14 @@ interface DeckStatsWidgetProps {
 const RADAR_DOMAINS: { id: string; label: string; tracks: TrackType[] }[] = [
   { id: 'algorithms', label: 'Algorithms', tracks: ['algorithms'] },
   { id: 'async', label: 'Concurrency', tracks: ['async-js'] },
-  { id: 'react', label: 'React & Next.js', tracks: ['react', 'react-components', 'nextjs', 'd3'] },
+  { id: 'react', label: 'React & UI', tracks: ['react', 'react-components', 'd3'] },
   { id: 'typescript', label: 'TypeScript', tracks: ['typescript-patterns'] },
   { id: 'dom', label: 'DOM & Web APIs', tracks: ['dom-browser'] },
   { id: 'core', label: 'JS Core & Tools', tracks: ['js-language', 'js-utilities', 'testing-tooling'] },
   { id: 'node', label: 'Node.js', tracks: ['node'] },
   { id: 'graphql', label: 'GraphQL', tracks: ['graphql', 'graphql-server'] },
   { id: 'sql-postgres', label: 'PostgreSQL', tracks: ['sql-postgres'] },
+  { id: 'nextjs', label: 'Next.js', tracks: ['nextjs'] },
 ];
 
 

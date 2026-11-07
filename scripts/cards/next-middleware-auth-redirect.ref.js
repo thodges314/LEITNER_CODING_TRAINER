@@ -16,3 +16,4 @@ const middleware = (request) => {
 
   return NextResponse.next();
 };
+

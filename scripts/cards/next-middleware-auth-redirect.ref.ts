@@ -20,3 +20,4 @@ const middleware = (request: NextRequest): NextResponse => {
 
   return NextResponse.next();
 };
+

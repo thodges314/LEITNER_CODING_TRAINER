@@ -25,3 +25,4 @@ interface MiddlewareMatcherConfig {
 - **Public Paths**:
   - For any path that does not start with `/dashboard` (e.g. `/`, `/about`, `/login`, `/api/health`):
     - Allows the request to proceed by returning `NextResponse.next()`.
+
