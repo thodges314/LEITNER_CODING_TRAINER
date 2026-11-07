@@ -4946,9 +4946,9 @@
     "tags": [
       "d3",
       "scales",
-      "svg",
-      "coordinates"
+      "coordinates",
+      "algorithms"
     ],
-    "summary": "interface CategoryMetric {"
+    "summary": "interface ScaleConfig {"
   }
 ]

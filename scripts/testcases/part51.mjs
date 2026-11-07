@@ -666,34 +666,34 @@ export default {
   ],
   'd3-scales-domain-range-basics': [
     r(
-      'Mounts SVG container, baseline, and scaled rect.scale-bar elements',
-      'renderScaledCoordinateChart(container, SAMPLE_METRICS, { width: 440, height: 240, padding: 30 })',
-      'SVG rendered with line.zero-baseline at y=210, 4 rect.scale-bar elements, and extent [25, 100]',
-      { callSignature: 'renderScaledCoordinateChart(container, data, options)' }
+      'Constructs band xScale across [0, width] with correct domain, range, and bandwidth',
+      'createCoordinateScales(config)',
+      'xScale("Mon") is 0, xScale.bandwidth() > 0, and unmapped key returns undefined',
+      { callSignature: 'createCoordinateScales(config)' }
     ),
     r(
-      'Maps data values to inverted SVG Y coordinates and proportional heights',
-      'instance.getBarGeometry("Q1", 0), getBarGeometry("Q2", 50), getBarGeometry("Q3", 100)',
-      'Maps 0 to baseline y=200 (height 0), 50 to y=110 (height 90), and 100 to top y=20 (height 180)',
-      { callSignature: 'instance.getBarGeometry(category, value)' }
+      'Constructs linear yScale with inverted range [height, 0] and domain clamping',
+      'scales.yScale(0), scales.yScale(50), scales.yScale(100), scales.yScale(150)',
+      'Maps 0 to height (200), 100 to 0, and clamps 150 to 0',
+      { callSignature: 'scales.yScale(value)' }
     ),
     r(
-      'Computes categorical band X positions, bandwidth, and centerX',
-      'instance.getBarGeometry("Q1", 25) and instance.getBarGeometry("Q4", 75)',
-      'Computes discrete band x, bandwidth, and centerX = x + bandwidth / 2',
-      { callSignature: 'instance.getBarGeometry(category, value)' }
+      'Constructs ordinal colorScale mapping categories to d3.schemeTableau10',
+      'scales.colorScale("Mon"), scales.colorScale("Tue")',
+      'Maps discrete categories to distinct d3.schemeTableau10 colors',
+      { callSignature: 'scales.colorScale(category)' }
     ),
     r(
-      'Supports continuous Y coordinate inversion via invertY and clamping',
-      'instance.invertY(20), instance.invertY(110), instance.invertY(200)',
-      'Inverts pixel Y coordinates back to domain values (100, 50, 0) and respects clamp option',
-      { callSignature: 'instance.invertY(pixelY)' }
+      'Maps valid and invalid category points to coordinate geometry and color',
+      'scales.mapPoint("Wed", 50) and scales.mapPoint("Sun", 50)',
+      'Returns { x, y: 100, barWidth, color } for mapped category and null for unknown',
+      { callSignature: 'scales.mapPoint(category, value)' }
     ),
     r(
-      'Handles empty dataset gracefully and cleans up DOM on destroy',
-      'renderScaledCoordinateChart(container, []) and instance.destroy()',
-      'Returns extent [0, 0], 0 bars, and clears container innerHTML on destroy',
-      { callSignature: 'instance.destroy()' }
+      'Inverts visual Y pixel coordinates back to original domain values',
+      'scales.invertY(200), scales.invertY(100), scales.invertY(0)',
+      'Inverts pixel Y coordinates back to domain values: 200 -> 0, 100 -> 50, 0 -> 100',
+      { callSignature: 'scales.invertY(pixelY)' }
     ),
   ],
 };

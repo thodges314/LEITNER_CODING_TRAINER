@@ -1,84 +1,57 @@
 ## Description
 
 ```ts
-interface CategoryMetric {
-  category: string;
-  value: number;
-}
-
-interface BarGeometry {
-  x: number;
-  y: number;
+interface ScaleConfig {
+  categories: string[];
+  values: number[];
   width: number;
   height: number;
-  centerX: number;
-}
-
-interface ScaleChartOptions {
-  width?: number;
-  height?: number;
-  padding?: number;
   paddingInner?: number;
   clamp?: boolean;
-  barColor?: string;
 }
 
-interface ScaleChartInstance {
-  svg: SVGSVGElement;
-  getDomainExtent: () => [number, number];
-  getBarGeometry: (category: string, value: number) => BarGeometry | null;
+interface PointMapping {
+  x: number;
+  y: number;
+  barWidth: number;
+  color: string;
+}
+
+interface CoordinateScales {
+  xScale: d3.ScaleBand<string>;
+  yScale: d3.ScaleLinear<number, number>;
+  colorScale: d3.ScaleOrdinal<string, string>;
+  mapPoint: (category: string, value: number) => PointMapping | null;
   invertY: (pixelY: number) => number;
-  destroy: () => void;
 }
 ```
 
-### renderScaledCoordinateChart(container: HTMLElement, data: CategoryMetric[], options?: ScaleChartOptions): ScaleChartInstance
+### `createCoordinateScales(config: ScaleConfig): CoordinateScales`
 
-In D3, **Scales** map abstract data domains (`[min, max]` numbers or categorical keys) into visual screen ranges (SVG pixel coordinates). Because SVG origin `(0, 0)` is at the **top-left**, vertical `scaleLinear` ranges are inverted (`[height - padding, padding]`) so larger values plot higher on screen while the baseline sits at `y = height - padding`.
+In D3, **Scales** map abstract data domains (`[min, max]` numbers or discrete categories) into visual ranges (pixel positions, dimensions, or color palettes). Because SVG coordinates place `(0, 0)` at the top-left, vertical linear scales use an inverted range `[height, 0]` so that larger values map to smaller Y pixel positions (higher on screen).
 
-Implement `renderScaledCoordinateChart` using `d3.extent`, `d3.scaleLinear`, and `d3.scaleBand` to map categorical metrics into SVG bar geometry and support coordinate inversion (`yScale.invert(pixelY)`).
+Implement `createCoordinateScales` to construct coordinate and color scales from input configuration without touching the DOM.
 
 ### Requirements
 
-1. **Container & Options**:
-   - Clear `container` (`d3.select(container).selectAll('*').remove()`).
-   - Default options:
-     - `width = 440`
-     - `height = 240`
-     - `padding = 32`
-     - `paddingInner = 0.2`
-     - `clamp = true`
-     - `barColor = 'steelblue'`
-   - Create an `<svg>` with `width`, `height`, `role="img"`, and `aria-label="Scaled coordinate chart"`.
+1. **Discrete Band Scale (`xScale`)**:
+   - Construct a `d3.scaleBand()`.
+   - Set `.domain(categories)` and `.range([0, width])`.
+   - Set `.paddingInner(paddingInner ?? 0.2)`.
 
-2. **Extent, Band X-Scale & Inverted Linear Y-Scale**:
-   - Compute `[minVal, maxVal]` from `data` using `d3.extent(data, (d) => d.value)`. If `data` is empty, default the extent to `[0, 0]` and use `[0, 100]` as the Y-scale domain (`upperBound = maxVal > 0 ? maxVal : 100`).
-   - Build `xScale = d3.scaleBand()` with:
-     - `.domain(data.map((d) => d.category))`
-     - `.range([padding, width - padding])`
-     - `.paddingInner(paddingInner)`
-   - Build `yScale = d3.scaleLinear()` with:
-     - `.domain([0, upperBound])`
-     - `.range([height - padding, padding])` (inverted SVG Y range: `0` maps to baseline `height - padding`, `upperBound` maps to top `padding`)
-     - `.clamp(Boolean(clamp))`
+2. **Continuous Linear Scale (`yScale`)**:
+   - Determine the upper domain bound: `upperBound = (d3.max(values) || 100)`. If `upperBound <= 0`, default to `100`.
+   - Set `.domain([0, upperBound])`.
+   - Set an inverted range `.range([height, 0])` (so `0` maps to `height` and `upperBound` maps to `0`).
+   - Enable clamping: `.clamp(Boolean(clamp))`.
 
-3. **Bar Geometry Calculation (`getBarGeometry(category, value)`)**:
-   - Look up `x = xScale(category)`. If `x === undefined`, return `null`.
-   - Compute:
-     - `barWidth = xScale.bandwidth()`
-     - `y = yScale(value)`
-     - `baselineY = yScale(0)` (`height - padding`)
-     - `barHeight = Math.max(0, baselineY - y)`
-     - `centerX = x + barWidth / 2`
-   - Return `{ x, y, width: barWidth, height: barHeight, centerX }`.
+3. **Ordinal Color Scale (`colorScale`)**:
+   - Construct a `d3.scaleOrdinal(d3.schemeTableau10)`.
+   - Set `.domain(categories)`.
 
-4. **SVG Rendering & Controller Methods**:
-   - Append a `<line class="zero-baseline">` from `(padding, height - padding)` to `(width - padding, height - padding)`.
-   - Append a `<g class="scaled-bars">` and bind `data` with `.selectAll('rect.scale-bar').data(data, (d) => d.category).join('rect')`:
-     - Set `class="scale-bar"`, `data-category={(d) => d.category}`, `fill={barColor}`
-     - Set `x`, `y`, `width`, and `height` from each item's computed bar geometry.
-   - Return `{ svg, getDomainExtent, getBarGeometry, invertY, destroy }` where:
-     - `getDomainExtent()` returns `[minVal ?? 0, maxVal ?? 0]`.
-     - `invertY(pixelY)` returns `yScale.invert(pixelY)`.
-     - `destroy()` removes the SVG and clears `container`.
-
+4. **Helper Methods**:
+   - `mapPoint(category: string, value: number)`:
+     - Look up `x = xScale(category)`. If `x === undefined`, return `null`.
+     - Return `{ x, y: yScale(value), barWidth: xScale.bandwidth(), color: colorScale(category) }`.
+   - `invertY(pixelY: number)`:
+     - Return `yScale.invert(pixelY)`.

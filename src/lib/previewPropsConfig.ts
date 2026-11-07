@@ -1264,39 +1264,6 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Keyed item sequence passed to updateKeyedBars',
     },
   ],
-  'd3-scales-domain-range-basics': [
-    {
-      name: 'padding',
-      type: 'number',
-      defaultValue: 32,
-      min: 16,
-      max: 60,
-      step: 4,
-      description: 'Outer chart padding in pixels',
-    },
-    {
-      name: 'paddingInner',
-      type: 'number',
-      defaultValue: 0.25,
-      min: 0,
-      max: 0.6,
-      step: 0.05,
-      description: 'Fractional band spacing between categorical bars',
-    },
-    {
-      name: 'clamp',
-      type: 'boolean',
-      defaultValue: true,
-      description: 'Clamp out-of-domain values to the SVG plot range',
-    },
-    {
-      name: 'barColor',
-      type: 'enum',
-      defaultValue: '#6366f1',
-      options: ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'],
-      description: 'Fill color for scaled categorical bars',
-    },
-  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

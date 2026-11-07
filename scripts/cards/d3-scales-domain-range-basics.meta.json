@@ -5,9 +5,7 @@
   "tags": [
     "d3",
     "scales",
-    "svg",
-    "coordinates"
-  ],
-  "rendersComponent": true,
-  "previewLibraries": ["d3"]
+    "coordinates",
+    "algorithms"
+  ]
 }
