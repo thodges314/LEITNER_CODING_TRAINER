@@ -9,7 +9,7 @@ interface AccordionProps {
   allowMultiple?: boolean;
 }
 
-function Accordion({ items, allowMultiple = false }: AccordionProps): JSX.Element {
+const Accordion = ({ items, allowMultiple = false }: AccordionProps): JSX.Element => {
   const [open, setOpen] = useState<string[]>([]);
   const base = useId();
 

@@ -1,4 +1,4 @@
-function StarRating({ value = 0, onChange, max = 5 }) {
+const StarRating = ({ value = 0, onChange, max = 5 }) => {
   const [hover, setHover] = useState(null);
   const shown = hover ?? value;
 

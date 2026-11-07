@@ -1,4 +1,4 @@
-function DropdownMenu({ label, items, onSelect }) {
+const DropdownMenu = ({ label, items, onSelect }) => {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const triggerRef = useRef(null);

@@ -4,7 +4,7 @@ interface StarRatingProps {
   max?: number;
 }
 
-function StarRating({ value = 0, onChange, max = 5 }: StarRatingProps): JSX.Element {
+const StarRating = ({ value = 0, onChange, max = 5 }: StarRatingProps): JSX.Element => {
   const [hover, setHover] = useState<number | null>(null);
   const shown = hover ?? value;
 

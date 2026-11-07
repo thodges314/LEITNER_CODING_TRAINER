@@ -6,7 +6,7 @@ interface ModalProps {
   children?: React.ReactNode;
 }
 
-function Modal({ isOpen, onClose, children }: ModalProps): JSX.Element | null {
+const Modal = ({ isOpen, onClose, children }: ModalProps): JSX.Element | null => {
   const dialogRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-function FilterList({ items }) {
+const FilterList = ({ items }) => {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
   const visible = q ? items.filter((item) => item.toLowerCase().includes(q)) : items;

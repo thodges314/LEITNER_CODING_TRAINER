@@ -1,4 +1,4 @@
-function Accordion({ items, allowMultiple = false }) {
+const Accordion = ({ items, allowMultiple = false }) => {
   const [open, setOpen] = useState([]);
   const base = useId();
 

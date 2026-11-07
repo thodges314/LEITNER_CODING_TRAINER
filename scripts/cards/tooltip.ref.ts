@@ -3,7 +3,7 @@ interface TooltipProps {
   children: React.ReactElement;
 }
 
-function Tooltip({ content, children }: TooltipProps): JSX.Element {
+const Tooltip = ({ content, children }: TooltipProps): JSX.Element => {
   const [open, setOpen] = useState<boolean>(false);
   const id = useId();
   const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>;

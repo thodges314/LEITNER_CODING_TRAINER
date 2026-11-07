@@ -2,7 +2,7 @@ interface FilterListProps {
   items: string[];
 }
 
-function FilterList({ items }: FilterListProps): JSX.Element {
+const FilterList = ({ items }: FilterListProps): JSX.Element => {
   const [query, setQuery] = useState<string>('');
   const q = query.trim().toLowerCase();
   const visible = q ? items.filter((item: string) => item.toLowerCase().includes(q)) : items;

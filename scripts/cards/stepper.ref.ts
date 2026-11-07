@@ -11,12 +11,12 @@ interface StepperProps {
   onComplete?: () => void;
 }
 
-function Stepper({
+const Stepper = ({
   steps,
   initialStep = 0,
   onStepChange,
   onComplete,
-}: StepperProps): JSX.Element {
+}: StepperProps): JSX.Element => {
   const [currentStep, setCurrentStep] = useState<number>(initialStep);
 
   const goToStep = (index: number): void => {
