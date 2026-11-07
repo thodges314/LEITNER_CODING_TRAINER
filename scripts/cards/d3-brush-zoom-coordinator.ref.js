@@ -1,4 +1,4 @@
-function renderBrushCoordinator(container, data, options = {}) {
+function renderBrushCoordinator(container, data = [], options = {}) {
   const {
     width = 480,
     focusHeight = 200,
@@ -33,9 +33,7 @@ function renderBrushCoordinator(container, data, options = {}) {
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', totalHeight)
-    .attr('role', 'img')
-    .attr('aria-label', 'Brush coordinator chart');
+    .attr('height', totalHeight);
 
   const focusGroup = svg
     .append('g')
@@ -94,7 +92,7 @@ function renderBrushCoordinator(container, data, options = {}) {
     return points.filter((d) => d.x >= currentDomain[0] && d.x <= currentDomain[1]);
   }
 
-  function updateFocusView(nextDomain, notify) {
+  function updateFocusView(nextDomain, notify = false) {
     const d0 = Math.min(nextDomain[0], nextDomain[1]);
     const d1 = Math.max(nextDomain[0], nextDomain[1]);
     currentDomain = [d0, d1];
@@ -122,8 +120,6 @@ function renderBrushCoordinator(container, data, options = {}) {
     }
   }
 
-  let handledByEvent = false;
-
   const brush = d3
     .brushX()
     .extent([
@@ -131,12 +127,11 @@ function renderBrushCoordinator(container, data, options = {}) {
       [innerWidth, contextHeight],
     ])
     .on('brush end', function (event) {
-      handledByEvent = true;
       if (event && Array.isArray(event.selection)) {
         const [px0, px1] = event.selection;
         updateFocusView([contextX.invert(px0), contextX.invert(px1)], true);
       } else {
-        updateFocusView([fullDomain[0], fullDomain[1]], true);
+        updateFocusView(fullDomain, true);
       }
     });
 
@@ -148,23 +143,18 @@ function renderBrushCoordinator(container, data, options = {}) {
   updateFocusView(fullDomain, false);
 
   function setBrushDomain(domain) {
-    handledByEvent = false;
-    if (domain === null || !Array.isArray(domain)) {
+    if (!domain || !Array.isArray(domain)) {
       try {
         brushGroup.call(brush.move, null);
       } catch (_) {}
-      if (!handledByEvent) {
-        updateFocusView([fullDomain[0], fullDomain[1]], true);
-      }
+      updateFocusView(fullDomain, true);
     } else {
       const d0 = Math.min(domain[0], domain[1]);
       const d1 = Math.max(domain[0], domain[1]);
       try {
         brushGroup.call(brush.move, [contextX(d0), contextX(d1)]);
       } catch (_) {}
-      if (!handledByEvent) {
-        updateFocusView([d0, d1], true);
-      }
+      updateFocusView([d0, d1], true);
     }
   }
 
@@ -185,4 +175,3 @@ function renderBrushCoordinator(container, data, options = {}) {
     },
   };
 }
-

@@ -668,7 +668,7 @@ export default {
     r(
       'Constructs band xScale across [0, width] with correct domain, range, and bandwidth',
       'createCoordinateScales(config)',
-      'xScale("Mon") is 0, xScale.bandwidth() > 0, and unmapped key returns undefined',
+      'xScale("Mon") ≈ 0, xScale.bandwidth() > 0, and unmapped key returns undefined',
       { callSignature: 'createCoordinateScales(config)' }
     ),
     r(

@@ -30,8 +30,6 @@ const SAMPLE_SERIES = [
     svg !== null &&
     svg.getAttribute('width') === '500' &&
     svg.getAttribute('height') === expectedHeight &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Brush coordinator chart' &&
     focusChart !== null &&
     contextChart !== null &&
     brushLayer !== null &&

@@ -59,9 +59,7 @@ function renderBrushCoordinator(
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', totalHeight)
-    .attr('role', 'img')
-    .attr('aria-label', 'Brush coordinator chart');
+    .attr('height', totalHeight);
 
   const focusGroup = svg
     .append('g')
@@ -108,7 +106,7 @@ function renderBrushCoordinator(
     .attr('fill', 'none')
     .attr('stroke', 'gray')
     .attr('stroke-width', 1.5)
-    .attr('d', points.length > 0 ? contextLineGen(points) ?? '' : '');
+    .attr('d', points.length > 0 ? (contextLineGen(points) ?? '') : '');
 
   contextGroup
     .append('g')
@@ -117,17 +115,17 @@ function renderBrushCoordinator(
     .call(d3.axisBottom(contextX));
 
   function getFilteredData(): BrushPoint[] {
-    return points.filter((d) => d.x >= currentDomain[0] && d.x <= currentDomain[1]);
+    return points.filter((d: BrushPoint) => d.x >= currentDomain[0] && d.x <= currentDomain[1]);
   }
 
-  function updateFocusView(nextDomain: [number, number], notify: boolean): void {
+  function updateFocusView(nextDomain: [number, number], notify = false) {
     const d0 = Math.min(nextDomain[0], nextDomain[1]);
     const d1 = Math.max(nextDomain[0], nextDomain[1]);
     currentDomain = [d0, d1];
     focusX.domain(currentDomain);
 
     const visible = getFilteredData();
-    focusPath.attr('d', visible.length > 0 ? focusLineGen(visible) ?? '' : '');
+    focusPath.attr('d', visible.length > 0 ? (focusLineGen(visible) ?? '') : '');
 
     focusDotsGroup
       .selectAll('circle.focus-dot')
@@ -148,21 +146,18 @@ function renderBrushCoordinator(
     }
   }
 
-  let handledByEvent = false;
-
   const brush = d3
     .brushX()
     .extent([
       [0, 0],
       [innerWidth, contextHeight],
     ])
-    .on('brush end', function (event: any) {
-      handledByEvent = true;
+    .on('brush end', function (event: { selection?: [number, number] | null }) {
       if (event && Array.isArray(event.selection)) {
-        const [px0, px1] = event.selection as [number, number];
+        const [px0, px1] = event.selection;
         updateFocusView([contextX.invert(px0), contextX.invert(px1)], true);
       } else {
-        updateFocusView([fullDomain[0], fullDomain[1]], true);
+        updateFocusView(fullDomain, true);
       }
     });
 
@@ -173,24 +168,19 @@ function renderBrushCoordinator(
 
   updateFocusView(fullDomain, false);
 
-  function setBrushDomain(domain: [number, number] | null): void {
-    handledByEvent = false;
-    if (domain === null || !Array.isArray(domain)) {
+  function setBrushDomain(domain: [number, number] | null) {
+    if (!domain || !Array.isArray(domain)) {
       try {
         brushGroup.call(brush.move, null);
-      } catch {}
-      if (!handledByEvent) {
-        updateFocusView([fullDomain[0], fullDomain[1]], true);
-      }
+      } catch (_) {}
+      updateFocusView(fullDomain, true);
     } else {
       const d0 = Math.min(domain[0], domain[1]);
       const d1 = Math.max(domain[0], domain[1]);
       try {
         brushGroup.call(brush.move, [contextX(d0), contextX(d1)]);
-      } catch {}
-      if (!handledByEvent) {
-        updateFocusView([d0, d1], true);
-      }
+      } catch (_) {}
+      updateFocusView([d0, d1], true);
     }
   }
 
@@ -199,7 +189,7 @@ function renderBrushCoordinator(
   }
 
   return {
-    svg: svg.node() as SVGSVGElement,
+    svg: (svg.node() as SVGSVGElement | null)!,
     getDomain() {
       return [currentDomain[0], currentDomain[1]];
     },
@@ -211,4 +201,3 @@ function renderBrushCoordinator(
     },
   };
 }
-
