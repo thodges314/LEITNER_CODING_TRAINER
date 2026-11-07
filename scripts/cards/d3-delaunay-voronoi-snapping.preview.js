@@ -20,8 +20,8 @@ const DEFAULT_VORONOI_POINTS = [
       width: 450,
       height: 290,
       pointRadius: 5,
-      pointColor: '#3b82f6',
-      activeColor: '#f97316',
+      pointColor: 'steelblue',
+      activeColor: 'orange',
       showCells: true,
     },
     typeof window !== 'undefined' ? window.__previewProps : {}
@@ -45,7 +45,7 @@ const DEFAULT_VORONOI_POINTS = [
     const statusBar = document.createElement('div');
     statusBar.style.fontSize = '12px';
     statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = '#94a3b8';
+    statusBar.style.color = 'slategray';
     statusBar.textContent = 'Click any Voronoi polygon cell to snap to its point (hover uses CSS :hover)';
 
     const chartBox = document.createElement('div');
@@ -60,8 +60,8 @@ const DEFAULT_VORONOI_POINTS = [
         width: Number(props.width) || 450,
         height: Number(props.height) || 290,
         pointRadius: Number(props.pointRadius) || 5,
-        pointColor: props.pointColor || '#3b82f6',
-        activeColor: props.activeColor || '#f97316',
+        pointColor: props.pointColor || 'steelblue',
+        activeColor: props.activeColor || 'orange',
         showCells: props.showCells !== false,
         onSelectPoint: function (pt, idx) {
           statusBar.textContent =
@@ -81,4 +81,3 @@ const DEFAULT_VORONOI_POINTS = [
     });
   }
 })();
-

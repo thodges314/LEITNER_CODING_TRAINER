@@ -17,9 +17,7 @@ function renderVoronoiSnapping(container, points = [], options = {}) {
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Voronoi diagram');
+    .attr('height', height);
 
   const pointsLayer = svg.append('g').attr('class', 'points-layer');
   const cellsLayer = svg.append('g').attr('class', 'cells-layer');
@@ -36,26 +34,15 @@ function renderVoronoiSnapping(container, points = [], options = {}) {
     const circles = pointsLayer
       .selectAll('circle.voronoi-point')
       .data(safePoints)
-      .enter()
-      .append('circle')
+      .join('circle')
       .attr('class', 'voronoi-point')
       .attr('cx', (d) => d.x)
       .attr('cy', (d) => d.y)
       .attr('r', pointRadius)
-      .attr('fill', pointColor)
-      .attr('data-index', (_, i) => String(i))
-      .attr('data-x', (d) => String(d.x))
-      .attr('data-y', (d) => String(d.y))
-      .attr('data-active', 'false')
-      .each(function (d) {
-        if (d.label !== undefined) {
-          d3.select(this).attr('data-label', d.label);
-        }
-      });
+      .attr('fill', pointColor);
 
     const setActive = (activeIndex) => {
       circles
-        .attr('data-active', (_, i) => (i === activeIndex ? 'true' : 'false'))
         .attr('fill', (_, i) => (i === activeIndex ? activeColor : pointColor))
         .attr('r', (_, i) => (i === activeIndex ? pointRadius * 1.75 : pointRadius));
     };
@@ -63,11 +50,9 @@ function renderVoronoiSnapping(container, points = [], options = {}) {
     cellsLayer
       .selectAll('path.voronoi-cell')
       .data(safePoints)
-      .enter()
-      .append('path')
+      .join('path')
       .attr('class', 'voronoi-cell')
       .attr('d', (_, i) => voronoi.renderCell(i))
-      .attr('data-index', (_, i) => String(i))
       .attr('fill', 'transparent')
       .attr('stroke', showCells ? 'gray' : 'none')
       .attr('pointer-events', 'all')
@@ -93,4 +78,3 @@ function renderVoronoiSnapping(container, points = [], options = {}) {
     },
   };
 }
-

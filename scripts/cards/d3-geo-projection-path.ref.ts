@@ -82,19 +82,19 @@ function renderGeoMap(
         [padding, padding],
         [Math.max(padding + 1, width - padding), Math.max(padding + 1, height - padding)],
       ],
-      geojson
+      geojson as any
     );
   }
 
   const pathGenerator = d3.geoPath(projection);
 
-  const metrics: GeoCentroidMetric[] = features.map((f, i) => {
+  const metrics: GeoCentroidMetric[] = features.map((f: GeoFeature, i: number) => {
     const id = String(f.id ?? f.properties?.name ?? i);
     const name = String(f.properties?.name ?? f.id ?? `Region ${i}`);
-    const c = pathGenerator.centroid(f);
+    const c = pathGenerator.centroid(f as any);
     const x = Array.isArray(c) && Number.isFinite(c[0]) ? c[0] : 0;
     const y = Array.isArray(c) && Number.isFinite(c[1]) ? c[1] : 0;
-    const rawArea = pathGenerator.area(f);
+    const rawArea = pathGenerator.area(f as any);
     const area = Number.isFinite(rawArea) ? rawArea : 0;
     return { id, name, x, y, area };
   });
@@ -103,9 +103,7 @@ function renderGeoMap(
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Geographic map');
+    .attr('height', height);
 
   const featuresGroup = svg.append('g').attr('class', 'map-features');
   const centroidsGroup = svg.append('g').attr('class', 'map-centroids');
@@ -115,20 +113,16 @@ function renderGeoMap(
     .data(features)
     .join('path')
     .attr('class', 'geo-feature')
-    .attr('d', (f: GeoFeature) => pathGenerator(f) || '')
+    .attr('d', (f: GeoFeature) => pathGenerator(f as any) || '')
     .attr('fill', fillColor)
     .attr('stroke', strokeColor)
     .attr('stroke-width', 1.25)
-    .attr('data-id', (_f: GeoFeature, i: number) => metrics[i].id)
-    .attr('data-name', (_f: GeoFeature, i: number) => metrics[i].name)
-    .attr('data-index', (_f: GeoFeature, i: number) => String(i))
-    .attr('data-active', 'false')
-    .on('click', function (_event: any, f: GeoFeature) {
+    .on('click', function (_event: MouseEvent, f: GeoFeature) {
       const idx = features.indexOf(f);
       const index = idx >= 0 ? idx : 0;
-      featurePaths
-        .attr('data-active', (_d: GeoFeature, j: number) => (j === index ? 'true' : 'false'))
-        .attr('fill', (_d: GeoFeature, j: number) => (j === index ? activeColor : fillColor));
+      featurePaths.attr('fill', (_d: GeoFeature, j: number) =>
+        j === index ? activeColor : fillColor
+      );
       if (typeof onSelectFeature === 'function') {
         onSelectFeature(f, metrics[index], index);
       }
@@ -143,19 +137,19 @@ function renderGeoMap(
       .attr('cx', (m: GeoCentroidMetric) => m.x)
       .attr('cy', (m: GeoCentroidMetric) => m.y)
       .attr('r', 3.5)
-      .attr('fill', activeColor)
-      .attr('data-id', (m: GeoCentroidMetric) => m.id);
+      .attr('fill', activeColor);
   }
 
   return {
-    svg: svg.node() as SVGSVGElement,
+    svg: (svg.node() as SVGSVGElement | null)!,
     projection,
     pathGenerator,
     getCentroids() {
-      return metrics.map((m) => ({ ...m }));
+      return metrics.map((m: GeoCentroidMetric) => ({ ...m }));
     },
-    projectCoordinate(lonLat: [number, number]) {
-      return projection(lonLat);
+    projectCoordinate(lonLat: [number, number]): [number, number] | null {
+      if (!Array.isArray(lonLat) || lonLat.length < 2) return null;
+      return projection(lonLat) as [number, number] | null;
     },
     destroy() {
       svg.remove();
@@ -163,4 +157,3 @@ function renderGeoMap(
     },
   };
 }
-

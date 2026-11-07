@@ -29,13 +29,13 @@ interface VoronoiSnappingInstance {
 
 Implement an interactive 2D Delaunay triangulation and Voronoi tessellation overlay using `d3.Delaunay.from()` and `delaunay.voronoi()`.
 
-Voronoi overlays partition a chart's 2D plane into convex polygonal regions around each data point so that any cursor position inside a cell is guaranteed to be closer to that cell's point than to any other point. This allows tiny scatter markers to have large, responsive hover and click targets without requiring the user to aim directly at a small circle.
+Voronoi overlays partition a chart's 2D plane into convex polygonal regions around each data point so that any cursor position inside a cell is guaranteed to be closer to that cell's point than to any other point. This allows small scatter markers to have generous, responsive hover and click targets without requiring the user to aim directly at a tiny circle.
 
 ### Requirements
 
 - **Canvas & Initialization**:
   - Empties `container.innerHTML` before mounting.
-  - Appends an `<svg>` element with `width` (default `450`), `height` (default `300`), `role="img"`, and `aria-label="Voronoi diagram"`.
+  - Appends an `<svg>` element with `width` (default `450`) and `height` (default `300`).
   - Appends `<g class="points-layer">` and `<g class="cells-layer">`.
 
 - **Delaunay & Voronoi Partitioning**:
@@ -46,15 +46,13 @@ Voronoi overlays partition a chart's 2D plane into convex polygonal regions arou
 - **Point Markers (`g.points-layer`)**:
   - Renders a `<circle class="voronoi-point">` for each point in `points`.
   - Sets `cx = d.x`, `cy = d.y`, `r = pointRadius` (default `4`), `fill = pointColor` (default `'steelblue'`).
-  - Sets `data-index="i"`, `data-x="d.x"`, `data-y="d.y"`, and `data-active="false"`. If `d.label` is defined, also sets `data-label="d.label"`.
 
 - **Voronoi Overlay Cells & Snapping (`g.cells-layer`)**:
   - Renders a `<path class="voronoi-cell">` for each point at index `i`.
-  - Sets `d = voronoi.renderCell(i)`, `data-index="i"`, `fill="transparent"`, `pointer-events="all"`, and `stroke = showCells ? 'gray' : 'none'` (where `showCells` defaults to `true`).
+  - Sets `d = voronoi.renderCell(i)`, `fill="transparent"`, `pointer-events="all"`, and `stroke = showCells ? 'gray' : 'none'` (where `showCells` defaults to `true`).
   - **Selection (`click` on `.voronoi-cell`)**:
-    - Activates point `i` by setting its circle's `data-active="true"`, `fill = activeColor` (default `'orange'`), and `r = pointRadius * 1.75` (all other circles reset to `data-active="false"`, `fill = pointColor`, `r = pointRadius`), then invokes `options.onSelectPoint(points[i], i)` if provided.
+    - Activates point `i` by setting its circle's `fill = activeColor` (default `'orange'`) and `r = pointRadius * 1.75` (all other circles reset to `fill = pointColor`, `r = pointRadius`), then invokes `options.onSelectPoint(points[i], i)` if provided.
 
 - **Edge Cases & Cleanup**:
   - If `points` is empty (`[]`), renders the SVG and layer groups without circles or cell paths, and `findClosestIndex` returns `-1`.
   - `instance.destroy()` removes the SVG and empties `container.innerHTML`.
-

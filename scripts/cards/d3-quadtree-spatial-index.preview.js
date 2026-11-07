@@ -49,11 +49,11 @@ const DEFAULT_QUAD_POINTS = [
     statsBar.style.display = 'flex';
     statsBar.style.gap = '16px';
     statsBar.style.fontSize = '12px';
-    statsBar.style.color = '#94a3b8';
+    statsBar.style.color = 'slategray';
     statsBar.innerHTML = `
-      <span>Indexed: <strong style="color: #38bdf8;">${index.size()}</strong></span>
-      <span>Radius: <strong style="color: #f59e0b;">${searchRadius}px</strong></span>
-      <span id="quad-status" style="color: #34d399;">Hover canvas to search</span>
+      <span>Indexed: <strong style="color: steelblue;">${index.size()}</strong></span>
+      <span>Radius: <strong style="color: orange;">${searchRadius}px</strong></span>
+      <span id="quad-status" style="color: seagreen;">Hover canvas to search</span>
     `;
     container.appendChild(statsBar);
 
@@ -62,8 +62,6 @@ const DEFAULT_QUAD_POINTS = [
       .append('svg')
       .attr('width', width)
       .attr('height', height)
-      .attr('role', 'img')
-      .attr('aria-label', 'Quadtree spatial index')
       .style('background', 'rgba(15, 23, 42, 0.75)')
       .style('border-radius', '8px')
       .style('border', '1px solid rgba(255, 255, 255, 0.1)')
@@ -100,22 +98,22 @@ const DEFAULT_QUAD_POINTS = [
       .attr('cx', (d) => d.x)
       .attr('cy', (d) => d.y)
       .attr('r', 4)
-      .attr('fill', '#38bdf8')
-      .attr('stroke', '#0f172a')
+      .attr('fill', 'steelblue')
+      .attr('stroke', 'black')
       .attr('stroke-width', 1.5);
 
     const searchCircle = searchGroup
       .append('circle')
       .attr('r', searchRadius)
-      .attr('fill', 'rgba(56, 189, 248, 0.1)')
-      .attr('stroke', '#38bdf8')
+      .attr('fill', 'rgba(70, 130, 180, 0.1)')
+      .attr('stroke', 'steelblue')
       .attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '3,3')
       .style('display', 'none');
 
     const connectorLine = searchGroup
       .append('line')
-      .attr('stroke', '#34d399')
+      .attr('stroke', 'seagreen')
       .attr('stroke-width', 2)
       .style('display', 'none');
 
@@ -130,7 +128,7 @@ const DEFAULT_QUAD_POINTS = [
 
       const matchSet = new Set(matches);
       pointDots
-        .attr('fill', (d) => (d === nearest ? '#ec4899' : matchSet.has(d) ? '#34d399' : '#38bdf8'))
+        .attr('fill', (d) => (d === nearest ? 'crimson' : matchSet.has(d) ? 'seagreen' : 'steelblue'))
         .attr('r', (d) => (d === nearest ? 6.5 : matchSet.has(d) ? 5.5 : 4));
 
       if (nearest) {
@@ -152,7 +150,7 @@ const DEFAULT_QUAD_POINTS = [
     svg.on('mouseleave', function () {
       searchCircle.style('display', 'none');
       connectorLine.style('display', 'none');
-      pointDots.attr('fill', '#38bdf8').attr('r', 4);
+      pointDots.attr('fill', 'steelblue').attr('r', 4);
       if (statusEl) {
         statusEl.textContent = 'Hover canvas to search';
       }

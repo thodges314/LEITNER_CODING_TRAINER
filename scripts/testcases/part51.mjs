@@ -412,9 +412,9 @@ export default {
   ],
   'd3-delaunay-voronoi-snapping': [
     r(
-      'Appends SVG canvas with dimensions, role, aria-label, and layer groups',
+      'Appends SVG canvas with dimensions and layer groups',
       'renderVoronoiSnapping(container, SAMPLE_POINTS, { width: 480, height: 320 })',
-      'SVG rendered with width="480", height="320", role="img", aria-label="Voronoi diagram", and layer groups',
+      'SVG rendered with width="480", height="320", and points/cells layer groups',
       { callSignature: 'renderVoronoiSnapping(container, points, { width: 480, height: 320 })' }
     ),
     r(
@@ -431,8 +431,8 @@ export default {
     ),
     r(
       'Clicking a Voronoi cell activates point and invokes onSelectPoint callback',
-      'click path.voronoi-cell[data-index="2"]',
-      'onSelectPoint called with Gamma point and index 2, point 2 marked data-active="true"',
+      'click path.voronoi-cell',
+      'onSelectPoint called with Gamma point and index 2, updating point fill and radius',
       { callSignature: 'cell.dispatchEvent(new MouseEvent("click"))' }
     ),
     r(
@@ -444,9 +444,9 @@ export default {
   ],
   'd3-treemap-squarified-tiling': [
     r(
-      'Appends SVG container with dimensions, role, and aria-label',
+      'Appends SVG container with dimensions',
       'renderTreemap(container, SAMPLE_TREE, { width: 520, height: 340 })',
-      'SVG rendered with width="520", height="340", role="img", aria-label="Treemap chart"',
+      'SVG rendered with width="520" and height="340"',
       { callSignature: 'renderTreemap(container, data, { width: 520, height: 340 })' }
     ),
     r(
@@ -558,9 +558,9 @@ export default {
   ],
   'd3-geo-projection-path': [
     r(
-      'Mounts SVG container with role, aria-label, and feature/centroid groups',
+      'Mounts SVG container with feature and centroid groups',
       'renderGeoMap(container, SAMPLE_GEOJSON, { width: 500, height: 320 })',
-      'SVG rendered with width="500", height="320", role="img", aria-label="Geographic map", and map groups',
+      'SVG rendered with width="500", height="320", and map groups',
       { callSignature: 'renderGeoMap(container, geojson, { width: 500, height: 320 })' }
     ),
     r(
@@ -577,8 +577,8 @@ export default {
     ),
     r(
       'Clicking a feature highlights it and triggers onSelectFeature with metric',
-      'click path.geo-feature[data-index="1"]',
-      'Marks clicked path data-active="true" with activeColor and invokes onSelectFeature callback',
+      'click path.geo-feature',
+      'Highlights clicked path with activeColor and invokes onSelectFeature callback',
       { callSignature: 'path.dispatchEvent(new MouseEvent("click"))' }
     ),
     r(
@@ -596,9 +596,9 @@ export default {
   ],
   'd3-contour-density-grid': [
     r(
-      'Mounts SVG container with dimensions, role, aria-label, and layer groups',
+      'Mounts SVG container with dimensions and layer groups',
       'renderContourDensity(container, SAMPLE_CLUSTER, { width: 440, height: 280 })',
-      'SVG rendered with width="440", height="280", role="img", aria-label="Contour density chart", and layer groups',
+      'SVG rendered with width="440", height="280", and contour/density layer groups',
       { callSignature: 'renderContourDensity(container, points, { width: 440, height: 280 })' }
     ),
     r(

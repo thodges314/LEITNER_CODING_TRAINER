@@ -52,9 +52,7 @@ function renderGeoMap(container, geojson, options = {}) {
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Geographic map');
+    .attr('height', height);
 
   const featuresGroup = svg.append('g').attr('class', 'map-features');
   const centroidsGroup = svg.append('g').attr('class', 'map-centroids');
@@ -68,16 +66,10 @@ function renderGeoMap(container, geojson, options = {}) {
     .attr('fill', fillColor)
     .attr('stroke', strokeColor)
     .attr('stroke-width', 1.25)
-    .attr('data-id', (_f, i) => metrics[i].id)
-    .attr('data-name', (_f, i) => metrics[i].name)
-    .attr('data-index', (_f, i) => String(i))
-    .attr('data-active', 'false')
     .on('click', function (_event, f) {
       const idx = features.indexOf(f);
       const index = idx >= 0 ? idx : 0;
-      featurePaths
-        .attr('data-active', (_d, j) => (j === index ? 'true' : 'false'))
-        .attr('fill', (_d, j) => (j === index ? activeColor : fillColor));
+      featurePaths.attr('fill', (_d, j) => (j === index ? activeColor : fillColor));
       if (typeof onSelectFeature === 'function') {
         onSelectFeature(f, metrics[index], index);
       }
@@ -92,8 +84,7 @@ function renderGeoMap(container, geojson, options = {}) {
       .attr('cx', (m) => m.x)
       .attr('cy', (m) => m.y)
       .attr('r', 3.5)
-      .attr('fill', activeColor)
-      .attr('data-id', (m) => m.id);
+      .attr('fill', activeColor);
   }
 
   return {
@@ -104,6 +95,7 @@ function renderGeoMap(container, geojson, options = {}) {
       return metrics.map((m) => ({ ...m }));
     },
     projectCoordinate(lonLat) {
+      if (!Array.isArray(lonLat) || lonLat.length < 2) return null;
       return projection(lonLat);
     },
     destroy() {
@@ -112,4 +104,3 @@ function renderGeoMap(container, geojson, options = {}) {
     },
   };
 }
-

@@ -42,9 +42,7 @@ function renderContourDensity(container, points, options = {}) {
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Contour density chart');
+    .attr('height', height);
 
   const bandsGroup = svg.append('g').attr('class', 'contour-bands');
   const pointsGroup = svg.append('g').attr('class', 'density-points');
@@ -59,8 +57,6 @@ function renderContourDensity(container, points, options = {}) {
     .attr('fill-opacity', '0.55')
     .attr('stroke', 'steelblue')
     .attr('stroke-width', '1')
-    .attr('data-value', (c) => String(c.value))
-    .attr('data-index', (_c, i) => String(i))
     .on('click', function (_event, c) {
       const idx = contours.indexOf(c);
       const index = idx >= 0 ? idx : 0;
@@ -97,4 +93,3 @@ function renderContourDensity(container, points, options = {}) {
     },
   };
 }
-

@@ -61,7 +61,7 @@ const DEFAULT_TREEMAP_DATA = {
     const statusBar = document.createElement('div');
     statusBar.style.fontSize = '12px';
     statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = '#94a3b8';
+    statusBar.style.color = 'slategray';
     statusBar.textContent = 'Click any treemap leaf cell to inspect its area & value';
 
     const chartBox = document.createElement('div');

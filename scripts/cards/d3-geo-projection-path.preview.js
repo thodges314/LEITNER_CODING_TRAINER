@@ -80,8 +80,8 @@ const DEFAULT_GEO_COLLECTION = {
     {
       projectionType: 'mercator',
       padding: 20,
-      fillColor: '#1e293b',
-      activeColor: '#3b82f6',
+      fillColor: 'slategray',
+      activeColor: 'steelblue',
       showCentroids: true,
     },
     typeof window !== 'undefined' ? window.__previewProps : {}
@@ -105,7 +105,7 @@ const DEFAULT_GEO_COLLECTION = {
     const statusBar = document.createElement('div');
     statusBar.style.fontSize = '12px';
     statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = '#94a3b8';
+    statusBar.style.color = 'slategray';
     statusBar.textContent =
       'Projection: ' + (props.projectionType || 'mercator') + ' · Click any region polygon';
 
@@ -119,8 +119,8 @@ const DEFAULT_GEO_COLLECTION = {
       height: 270,
       projectionType: props.projectionType || 'mercator',
       padding: typeof props.padding === 'number' ? props.padding : 20,
-      fillColor: props.fillColor || '#1e293b',
-      activeColor: props.activeColor || '#3b82f6',
+      fillColor: props.fillColor || 'slategray',
+      activeColor: props.activeColor || 'steelblue',
       showCentroids: props.showCentroids !== false,
       onSelectFeature: function (_feature, metric, idx) {
         statusBar.textContent =

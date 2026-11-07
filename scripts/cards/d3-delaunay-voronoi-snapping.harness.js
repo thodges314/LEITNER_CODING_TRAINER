@@ -5,7 +5,7 @@ const SAMPLE_POINTS = [
   { x: 140, y: 220, id: 'p3', label: 'Delta' },
 ];
 
-// 1. Appends SVG canvas with dimensions, role, aria-label, and layer groups
+// 1. Appends SVG canvas with dimensions and layer groups
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -19,14 +19,12 @@ const SAMPLE_POINTS = [
     svg !== null &&
     svg.getAttribute('width') === '480' &&
     svg.getAttribute('height') === '320' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Voronoi diagram' &&
     pointsLayer !== null &&
     cellsLayer !== null &&
     instance.svg === svg;
 
   $test.check(
-    'Appends SVG canvas with dimensions, role, aria-label, and layer groups',
+    'Appends SVG canvas with dimensions and layer groups',
     passed,
     { width: svg?.getAttribute('width'), height: svg?.getAttribute('height') }
   );
@@ -63,8 +61,6 @@ const SAMPLE_POINTS = [
     circles[0].getAttribute('cy') === '60' &&
     circles[0].getAttribute('r') === '5' &&
     circles[0].getAttribute('fill') === 'teal' &&
-    circles[0].getAttribute('data-label') === 'Alpha' &&
-    circles[0].getAttribute('data-active') === 'false' &&
     cells[0].getAttribute('fill') === 'transparent' &&
     cells[0].getAttribute('stroke') === 'gray';
 
@@ -129,10 +125,8 @@ const SAMPLE_POINTS = [
     selectedPoint !== null &&
     selectedPoint.label === 'Gamma' &&
     selectedIdx === 2 &&
-    circles[2].getAttribute('data-active') === 'true' &&
     circles[2].getAttribute('fill') === 'orange' &&
     circles[2].getAttribute('r') === '7' &&
-    circles[0].getAttribute('data-active') === 'false' &&
     circles[0].getAttribute('fill') === 'steelblue' &&
     circles[0].getAttribute('r') === '4';
 
@@ -142,10 +136,8 @@ const SAMPLE_POINTS = [
     selectedPoint !== null &&
     selectedPoint.label === 'Beta' &&
     selectedIdx === 1 &&
-    circles[1].getAttribute('data-active') === 'true' &&
     circles[1].getAttribute('fill') === 'orange' &&
     circles[1].getAttribute('r') === '7' &&
-    circles[2].getAttribute('data-active') === 'false' &&
     circles[2].getAttribute('fill') === 'steelblue' &&
     circles[2].getAttribute('r') === '4';
 
@@ -192,4 +184,3 @@ const SAMPLE_POINTS = [
 
   container.remove();
 }
-

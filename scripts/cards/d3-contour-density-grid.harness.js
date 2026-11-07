@@ -9,7 +9,7 @@ const SAMPLE_CLUSTER = [
   { x: 295, y: 175 },
 ];
 
-// 1. Mounts SVG container with dimensions, role, aria-label, and layer groups
+// 1. Mounts SVG container with dimensions and layer groups
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -27,14 +27,12 @@ const SAMPLE_CLUSTER = [
     svg !== null &&
     svg.getAttribute('width') === '440' &&
     svg.getAttribute('height') === '280' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Contour density chart' &&
     bandsGroup !== null &&
     pointsGroup !== null &&
     instance.svg === svg;
 
   $test.check(
-    'Mounts SVG container with dimensions, role, aria-label, and layer groups',
+    'Mounts SVG container with dimensions and layer groups',
     passed,
     { width: svg?.getAttribute('width'), height: svg?.getAttribute('height') }
   );

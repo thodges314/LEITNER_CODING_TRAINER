@@ -58,7 +58,7 @@ Implement `renderGeoMap(container, geojson, options)` to fit a GeoJSON `FeatureC
 ### Requirements
 
 - **Canvas & Projection Setup**:
-  - Empties `container.innerHTML` and appends an `<svg>` element with `width={width}`, `height={height}`, `role="img"`, and `aria-label="Geographic map"`.
+  - Empties `container.innerHTML` and appends an `<svg>` element with `width={width}` and `height={height}`.
   - Option defaults: `width = 480`, `height = 300`, `projectionType = 'mercator'`, `padding = 16`, `fillColor = 'slategray'`, `activeColor = 'steelblue'`, `strokeColor = 'gray'`, `showCentroids = true`.
   - Selects the D3 projection based on `projectionType`:
     - `'equirectangular'` -> `d3.geoEquirectangular()`
@@ -76,13 +76,11 @@ Implement `renderGeoMap(container, geojson, options)` to fit a GeoJSON `FeatureC
     - `area = pathGenerator.area(f)` (`Number.isFinite(area) ? area : 0`)
   - Appends `<g class="map-features">` containing `<path class="geo-feature">` for each feature:
     - `d = pathGenerator(f) || ''`, `fill = fillColor`, `stroke = strokeColor`, `stroke-width = "1.25"`
-    - `data-id = metric.id`, `data-name = metric.name`, `data-index = String(i)`, `data-active = "false"`
-    - Clicking a `path.geo-feature` marks the clicked feature `data-active="true"` and `fill={activeColor}` (resetting other features to `data-active="false"` and `fill={fillColor}`) and calls `options.onSelectFeature(f, metric, i)` if provided.
+    - Clicking a `path.geo-feature` marks the clicked feature `fill={activeColor}` (resetting other features to `fill={fillColor}`) and calls `options.onSelectFeature(f, metric, i)` if provided.
   - Appends `<g class="map-centroids">`:
-    - When `showCentroids !== false`, renders `<circle class="geo-centroid">` for each feature with `cx={metric.x}`, `cy={metric.y}`, `r="3.5"`, `fill={activeColor}`, and `data-id={metric.id}`.
+    - When `showCentroids !== false`, renders `<circle class="geo-centroid">` for each feature with `cx={metric.x}`, `cy={metric.y}`, `r="3.5"`, and `fill={activeColor}`.
 
 - **Instance API**:
   - `getCentroids()`: returns the array of `GeoCentroidMetric` objects.
   - `projectCoordinate(lonLat)`: returns `projection(lonLat)`.
   - `destroy()`: removes the SVG and empties `container.innerHTML`.
-

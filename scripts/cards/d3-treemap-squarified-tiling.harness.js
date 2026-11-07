@@ -18,7 +18,7 @@ const SAMPLE_TREE = {
   ],
 };
 
-// 1. Appends SVG container with dimensions, role, and aria-label
+// 1. Appends SVG container with dimensions
 {
   const container = document.createElement('div');
   document.body.appendChild(container);
@@ -30,12 +30,10 @@ const SAMPLE_TREE = {
     svg !== null &&
     svg.getAttribute('width') === '520' &&
     svg.getAttribute('height') === '340' &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Treemap chart' &&
     instance.svg === svg;
 
   $test.check(
-    'Appends SVG container with dimensions, role, and aria-label',
+    'Appends SVG container with dimensions',
     passed,
     { width: svg?.getAttribute('width'), height: svg?.getAttribute('height') }
   );

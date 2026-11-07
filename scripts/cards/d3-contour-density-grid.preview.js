@@ -47,7 +47,7 @@ const DEFAULT_DENSITY_POINTS = [
     const statusBar = document.createElement('div');
     statusBar.style.fontSize = '12px';
     statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = '#94a3b8';
+    statusBar.style.color = 'slategray';
 
     const chartBox = document.createElement('div');
     wrapper.appendChild(statusBar);

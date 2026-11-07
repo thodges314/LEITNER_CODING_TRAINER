@@ -37,7 +37,7 @@ const DEFAULT_HIERARCHY_DATA = [
     try {
       result = stratifyHierarchy(data);
     } catch (err) {
-      container.innerHTML = `<div style="color: #ef4444; padding: 16px;">Failed to stratify hierarchy: ${err.message}</div>`;
+      container.innerHTML = `<div style="color: crimson; padding: 16px;">Failed to stratify hierarchy: ${err.message}</div>`;
       return;
     }
 
@@ -45,12 +45,12 @@ const DEFAULT_HIERARCHY_DATA = [
     statsBar.style.display = 'flex';
     statsBar.style.gap = '16px';
     statsBar.style.fontSize = '12px';
-    statsBar.style.color = '#94a3b8';
+    statsBar.style.color = 'slategray';
     statsBar.innerHTML = `
-      <span>Root: <strong style="color: #38bdf8;">${result.rootId}</strong></span>
-      <span>Total: <strong style="color: #34d399;">${result.totalValue.toLocaleString()}</strong></span>
-      <span>Depth: <strong style="color: #f59e0b;">${result.maxDepth}</strong></span>
-      <span>Leaves: <strong style="color: #a78bfa;">${result.leaves.length}</strong></span>
+      <span>Root: <strong style="color: steelblue;">${result.rootId}</strong></span>
+      <span>Total: <strong style="color: seagreen;">${result.totalValue.toLocaleString()}</strong></span>
+      <span>Depth: <strong style="color: orange;">${result.maxDepth}</strong></span>
+      <span>Leaves: <strong style="color: purple;">${result.leaves.length}</strong></span>
     `;
     container.appendChild(statsBar);
 
@@ -63,8 +63,6 @@ const DEFAULT_HIERARCHY_DATA = [
       .append('svg')
       .attr('width', width)
       .attr('height', height)
-      .attr('role', 'img')
-      .attr('aria-label', 'Stratified hierarchy tree')
       .style('background', 'rgba(15, 23, 42, 0.6)')
       .style('border-radius', '8px')
       .style('border', '1px solid rgba(255, 255, 255, 0.1)');
@@ -97,8 +95,8 @@ const DEFAULT_HIERARCHY_DATA = [
     nodes
       .append('circle')
       .attr('r', (d) => (d.children ? 6 : 4.5))
-      .attr('fill', (d) => (d.children ? '#38bdf8' : '#34d399'))
-      .attr('stroke', '#0f172a')
+      .attr('fill', (d) => (d.children ? 'steelblue' : 'seagreen'))
+      .attr('stroke', 'black')
       .attr('stroke-width', 1.5);
 
     nodes
@@ -108,7 +106,7 @@ const DEFAULT_HIERARCHY_DATA = [
       .attr('text-anchor', (d) => (d.children ? 'end' : 'start'))
       .text((d) => `${d.id} (${(d.value || 0).toLocaleString()})`)
       .attr('font-size', '11px')
-      .attr('fill', '#e2e8f0');
+      .attr('fill', 'white');
 
     nodes.on('click', function (_event, d) {
       const ancestors = result.ancestorsOf(d.id);
