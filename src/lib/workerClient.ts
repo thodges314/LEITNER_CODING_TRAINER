@@ -8,23 +8,14 @@ let activeTimer: ReturnType<typeof setTimeout> | undefined;
 /**
  * Checks whether a card requires browser DOM APIs or React execution context.
  * Non-DOM, non-React cards (algorithms, data structures, utilities, async, node,
- * graphql, sql, language, etc.) can be offloaded safely to the Web Worker.
+ * graphql, sql, language, etc.) are offloaded safely to the Web Worker.
  *
- * Cards explicitly declare DOM requirements via `requiresDom: true` in <id>.meta.json
- * or inherit it at build time from DOM-inherent tracks (react, react-components, d3, tailwind, dom-browser).
+ * Execution environment is strictly driven by the card's explicit `requiresDom` property,
+ * which is encoded at build time (`build-cards.mjs`) from DOM tracks, `rendersComponent`,
+ * or `<id>.meta.json`'s `"requiresDom": true` declaration.
  */
 export function isBrowserDomOrReactCard(card: TopicItem): boolean {
-  if (typeof card.requiresDom === 'boolean') {
-    return card.requiresDom;
-  }
-  return (
-    card.track === 'react' ||
-    card.track === 'react-components' ||
-    card.track === 'd3' ||
-    card.track === 'tailwind' ||
-    card.track === 'dom-browser' ||
-    Boolean(card.rendersComponent)
-  );
+  return Boolean(card.requiresDom);
 }
 
 /**

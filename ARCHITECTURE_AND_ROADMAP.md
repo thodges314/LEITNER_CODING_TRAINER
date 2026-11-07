@@ -96,7 +96,7 @@ State keys in `localStorage`: `leitner_coding_deck` (schema versioned via `deckV
 
 | File                  | Meaning                                                                                                    |
 | --------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `<id>.meta.json`      | `{ track, title, tags }`. For a **new** card this declares it; for an existing card it overrides fields    |
+| `<id>.meta.json`      | `{ track, title, tags, rendersComponent?, requiresDom?, previewLibraries? }`. Declares card metadata and execution environment |
 | `<id>.prompt.txt`     | the prompt shown to the learner (signatures, edge-case rules; must match the title and reference)          |
 | `<id>.ref.js`         | reference solution (also becomes `starterCode`/`solution`; TS cards use TS syntax)                         |
 | `<id>.harness.js`     | optional hand-written harness (React/DOM cards). If absent, a harness is **generated from the test cases** |
