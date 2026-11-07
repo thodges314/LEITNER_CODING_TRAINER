@@ -292,7 +292,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   // Sync active card prompt types into the TypeScript language service when in TS mode
   useEffect(() => {
-    if (executionMode !== 'ts' || !currentCard) return;
+    if (executionMode !== 'ts' || !currentCard || getCardInputLanguage(currentCard) !== 'javascript') return;
     let cancelled = false;
     void import('../utils/typeChecker').then(({ setActiveCardPromptTypes }) => {
       if (!cancelled) {
@@ -399,7 +399,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         },
       }),
     ];
-    if (executionMode === 'ts' && inputLang !== 'sql' && inputLang !== 'html') {
+    if (executionMode === 'ts' && inputLang !== 'sql' && inputLang !== 'html' && inputLang !== 'graphql') {
       list.push(createTsHoverExtension());
     }
     return list;
@@ -515,9 +515,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
         ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`
         : rawCodeToRun;
 
+    const effectiveMode = isWrappedInput ? 'js' : executionMode;
     const transpiled = await transpileForExecution(
       executableSource,
-      executionMode,
+      effectiveMode,
       3000,
       isTsTrack ? undefined : currentCard?.promptSeed
     );

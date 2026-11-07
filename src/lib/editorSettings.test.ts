@@ -73,6 +73,10 @@ describe('editorSettings', () => {
       setPreferredExecutionMode('ts');
       expect(resolveExecutionModeForCard({ track: 'algorithms' })).toBe('ts');
       expect(resolveExecutionModeForCard({ track: 'typescript-patterns' })).toBe('ts');
+      // Non-JavaScript input languages always resolve to 'js'
+      expect(resolveExecutionModeForCard({ track: 'graphql', inputLanguage: 'graphql' })).toBe('js');
+      expect(resolveExecutionModeForCard({ track: 'sql-postgres', inputLanguage: 'sql' })).toBe('js');
+      expect(resolveExecutionModeForCard({ track: 'dom-browser', inputLanguage: 'html' })).toBe('js');
     });
   });
 });
