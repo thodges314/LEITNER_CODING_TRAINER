@@ -1,0 +1,59 @@
+### `createDomQueries(): DomTestingQueries`
+
+## Description
+
+```ts
+interface ByRoleOptions {
+  name?: string | RegExp;
+}
+
+interface DomTestingQueries {
+  getByRole(container: HTMLElement, role: string, options?: ByRoleOptions): HTMLElement;
+  queryByRole(container: HTMLElement, role: string, options?: ByRoleOptions): HTMLElement | null;
+  getByText(container: HTMLElement, textOrRegex: string | RegExp): HTMLElement;
+  queryByText(container: HTMLElement, textOrRegex: string | RegExp): HTMLElement | null;
+}
+```
+
+Testing libraries like `@testing-library/dom` prioritize user-centric queries that reflect how users and assistive technologies interact with the DOM, rather than querying fragile CSS classes or internal tag names.
+
+Implement `createDomQueries()` returning query utilities that inspect DOM subtrees by accessible roles and text contents:
+
+### Requirements
+
+- **Role Detection (`role`)**:
+  - Checks explicit `role` attributes first (`el.getAttribute('role')`).
+  - Infers implicit semantic HTML roles:
+    - `<button>` $\rightarrow$ `'button'`
+    - `<a href="...">` (with `href`) $\rightarrow$ `'link'`
+    - `<h1>` through `<h6>` $\rightarrow$ `'heading'`
+    - `<nav>` $\rightarrow$ `'navigation'`
+    - `<main>` $\rightarrow$ `'main'`
+    - `<dialog>` $\rightarrow$ `'dialog'`
+    - `<select>` $\rightarrow$ `'combobox'`
+    - `<textarea>` $\rightarrow$ `'textbox'`
+    - `<input>`:
+      - `type="checkbox"` $\rightarrow$ `'checkbox'`
+      - `type="radio"` $\rightarrow$ `'radio'`
+      - `type="button" | "submit" | "reset"` $\rightarrow$ `'button'`
+      - default (`text`, `email`, `password`, `search`, `tel`, `url`, or omitted) $\rightarrow$ `'textbox'`
+- **Accessible Name Matching (`options.name`)**:
+  - When `options.name` is provided, filters elements matching role by their computed accessible name:
+    - `aria-label` attribute (if present).
+    - Or associated `<label>` text (via `for="id"` or wrapping `<label>`).
+    - Or `el.textContent.trim()`.
+  - If `options.name` is a `RegExp`, tests against the name via `regex.test(name)`.
+  - If `options.name` is a `string`, matches case-insensitively against the name.
+- **`getByRole(container, role, options?)`**:
+  - Returns the single matching `HTMLElement`.
+  - If 0 elements match, throws an `Error` indicating no element was found with that role.
+  - If multiple elements match, throws an `Error` indicating multiple elements were found.
+- **`queryByRole(container, role, options?)`**:
+  - Returns the single matching `HTMLElement` or `null` if 0 elements match.
+  - Throws an `Error` if multiple elements match.
+- **`getByText(container, textOrRegex)`**:
+  - Finds an element in `container` whose trimmed `textContent` matches `textOrRegex` (exact string or RegExp test).
+  - Returns the matching element. Throws an `Error` if 0 or multiple elements match.
+- **`queryByText(container, textOrRegex)`**:
+  - Same as `getByText`, but returns `null` if 0 elements match (throws if multiple match).
+

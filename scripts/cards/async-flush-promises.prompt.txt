@@ -1,0 +1,40 @@
+### `createAsyncTester(): AsyncTestingSuite`
+
+## Description
+
+```ts
+interface WaitForOptions {
+  timeout?: number;
+  interval?: number;
+}
+
+interface AsyncTestingSuite {
+  flushMicrotasks(ticks?: number): Promise<void>;
+  flushMacrotasks(count?: number): Promise<void>;
+  pumpEventQueue(cycles?: number): Promise<void>;
+  waitForCondition<T>(
+    predicate: () => T | Promise<T>,
+    options?: WaitForOptions
+  ): Promise<T>;
+}
+```
+
+In asynchronous front-end testing (React, Vue, Vitest, Jest), components and hooks frequently schedule state updates across microtasks (`Promise.resolve()`, `queueMicrotask`) and timer macrotasks (`setTimeout`). Arbitrary `sleep(100)` pauses in test suites cause flaky tests and slow down test runners.
+
+Implement an asynchronous testing suite helper `createAsyncTester()` that provides deterministic queue draining and polling utilities:
+
+### Requirements
+
+- **`flushMicrotasks(ticks = 1)`**:
+  - Drains pending microtasks by yielding through `ticks` cycles of microtask resolutions.
+  - Resolves when all `ticks` microtask cycles have completed.
+- **`flushMacrotasks(count = 1)`**:
+  - Drains the host macrotask queue by awaiting `count` iterations of zero-delay timers (`setTimeout(resolve, 0)`).
+- **`pumpEventQueue(cycles = 1)`**:
+  - Interleaves macrotask and microtask flushing for `cycles` iterations, ensuring cascaded asynchronous tasks resolve deterministically.
+- **`waitForCondition(predicate, options = {})`**:
+  - Periodically executes `predicate()` (supporting both synchronous return values and Promise-returning predicates).
+  - Defaults: `timeout = 1000` ms, `interval = 10` ms.
+  - If `predicate()` returns a truthy value (or resolves to a truthy value), immediately resolves with that truthy value.
+  - If `timeout` elapses before the condition becomes truthy, rejects with an `Error('Timed out waiting for condition')`.
+

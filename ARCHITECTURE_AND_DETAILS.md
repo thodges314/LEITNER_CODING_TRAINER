@@ -8,7 +8,7 @@
 
 A client-only, zero-backend deliberate practice environment designed to simulate cold-start front-end technical interview screening.
 Learners write solutions from scratch without autocomplete or hints, execute their implementation headlessly in a browser sandbox against comprehensive test harnesses, and review cards according to spaced repetition schedules.
-The deck features **370 cards** across **16 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [370], **Full-Stack Core** [313], **Frontend Specialist** [240], and **Algorithms & Data Structures** [102]) with **2,461 documented test cases** and **100% structured Markdown instructions**.
+The deck features **373 cards** across **16 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [373], **Full-Stack Core** [316], **Frontend Specialist** [243], and **Algorithms & Data Structures** [102]) with **2,476 documented test cases** and **100% structured Markdown instructions**.
 
 - **Frontend Core**: React 19, TypeScript (strict mode), Vite 8.
 - **Content & Quality Pipeline**: Primarily AI-authored across structured batch pipelines with automated validation (reference passes, empty fails, label parity, mutation checks).
@@ -116,7 +116,9 @@ Located in [runner.ts](src/lib/runner.ts):
    - **Loop Guard Protection** ([loopGuards.ts](src/lib/loopGuards.ts)): Automatically instruments all loops (`while`, `for`, `do..while`, `for..of`, `for..in`) with lightweight bitwise-checked iteration timers (`(++iter & 1023) === 0 && Date.now() - start > timeoutMs`). If code gets trapped in a synchronous infinite loop, it throws an informative timeout error after 3000ms, completely preventing browser freezing.
 2. **Dedicated Web Worker Sandbox & Runaway Watchdog**:
    - Located in [workerClient.ts](src/lib/workerClient.ts) and [sandboxWorker.ts](src/lib/sandboxWorker.ts).
-   - Non-React and non-DOM cards (algorithms, utilities, async, language, node, sql, graphql) execute inside a dedicated, isolated Web Worker thread via `runInWorker`.
+   - Execution routing is strictly driven by the card model's explicit `requiresDom: boolean` property (encoded at build time from DOM tracks, `rendersComponent`, or `<id>.meta.json`).
+   - Non-DOM cards (algorithms, utilities, async, language, node, sql, graphql) execute inside a dedicated, isolated Web Worker thread via `runInWorker`.
+   - Cards requiring DOM (`requiresDom: true`) execute in the main browser thread DOM sandbox with full access to `document`, `window`, and `HTMLElement`.
    - Streams live logs back to the Practice Arena console drawer via structured `postMessage`.
    - Hard watchdog timer kills the worker via `worker.terminate()` if execution exceeds `timeoutMs` (e.g. from pathological regex catastrophic backtracking, endless promise chains, or un-instrumented infinite loops), guaranteeing zero browser tab lockups.
    - Polyfill prototypes modified by user solutions are completely confined to the worker thread without leaking into the main browser thread.
@@ -178,7 +180,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (2,392 unit tests across 69 test files)**: Tests verifying:
+- **Vitest Suite (2,420 unit tests across 69 test files)**: Tests verifying:
   - Reference solutions pass for all 368 cards across 16 topics across 2,451 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.

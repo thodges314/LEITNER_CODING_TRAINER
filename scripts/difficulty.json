@@ -883,6 +883,18 @@
     "difficulty": 3,
     "concept": "testing-tools"
   },
+  "custom-matcher-expect": {
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
+  "async-flush-promises": {
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
+  "dom-query-testing-library": {
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
   "next-route-matcher": {
     "difficulty": 3,
     "concept": "router"

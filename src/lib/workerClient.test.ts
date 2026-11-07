@@ -6,8 +6,11 @@ import {
   runInWorker,
 } from './workerClient';
 import type { TopicItem, TrackType } from './leitner';
+import seedTopicsData from '../data/topics.json';
 
-function makeCard(track: TrackType, id = 'test-card'): TopicItem {
+const seedTopics = seedTopicsData as unknown as TopicItem[];
+
+function makeCard(track: TrackType, id = 'test-card', requiresDom?: boolean): TopicItem {
   return {
     id,
     title: 'Test',
@@ -20,31 +23,43 @@ function makeCard(track: TrackType, id = 'test-card'): TopicItem {
     status: 'active',
     promptSeed: '',
     testHarness: '',
+    requiresDom,
   };
 }
 
 describe('workerClient', () => {
   describe('isBrowserDomOrReactCard', () => {
-    it('returns true for react, react-components, d3, tailwind, and dom-browser cards', () => {
-      expect(isBrowserDomOrReactCard(makeCard('react'))).toBe(true);
-      expect(isBrowserDomOrReactCard(makeCard('react-components'))).toBe(true);
-      expect(isBrowserDomOrReactCard(makeCard('d3'))).toBe(true);
-      expect(isBrowserDomOrReactCard(makeCard('tailwind'))).toBe(true);
-      expect(isBrowserDomOrReactCard(makeCard('dom-browser'))).toBe(true);
+    it('returns true when card.requiresDom is true', () => {
+      expect(isBrowserDomOrReactCard(makeCard('react', 'card-1', true))).toBe(true);
+      expect(isBrowserDomOrReactCard(makeCard('testing-tooling', 'card-2', true))).toBe(true);
+      expect(isBrowserDomOrReactCard(makeCard('algorithms', 'card-3', true))).toBe(true);
     });
 
-    it('returns false for non-DOM / non-React tracks', () => {
-      expect(isBrowserDomOrReactCard(makeCard('algorithms'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('advanced-algorithms'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('js-utilities'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('js-language'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('async-js'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('typescript-patterns'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('node'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('sql-postgres'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('graphql'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('graphql-server'))).toBe(false);
-      expect(isBrowserDomOrReactCard(makeCard('testing-tooling'))).toBe(false);
+    it('returns false when card.requiresDom is false or undefined', () => {
+      expect(isBrowserDomOrReactCard(makeCard('algorithms', 'card-4', false))).toBe(false);
+      expect(isBrowserDomOrReactCard(makeCard('algorithms', 'card-5'))).toBe(false);
+      expect(isBrowserDomOrReactCard(makeCard('testing-tooling', 'card-6'))).toBe(false);
+      expect(isBrowserDomOrReactCard(makeCard('async-js', 'card-7'))).toBe(false);
+    });
+
+    it('accurately resolves real seed cards from topics.json', () => {
+      const domQueryCard = seedTopics.find((c) => c.id === 'dom-query-testing-library');
+      expect(domQueryCard).toBeDefined();
+      expect(isBrowserDomOrReactCard(domQueryCard!)).toBe(true);
+
+      const reactCards = seedTopics.filter((c) => c.track === 'react' || c.track === 'react-components');
+      expect(reactCards.length).toBeGreaterThan(0);
+      for (const card of reactCards) {
+        expect(isBrowserDomOrReactCard(card)).toBe(true);
+      }
+
+      const pureAlgoCard = seedTopics.find((c) => c.id === 'two-sum-hashmap');
+      expect(pureAlgoCard).toBeDefined();
+      expect(isBrowserDomOrReactCard(pureAlgoCard!)).toBe(false);
+
+      const testingMatcherCard = seedTopics.find((c) => c.id === 'custom-matcher-expect');
+      expect(testingMatcherCard).toBeDefined();
+      expect(isBrowserDomOrReactCard(testingMatcherCard!)).toBe(false);
     });
   });
 

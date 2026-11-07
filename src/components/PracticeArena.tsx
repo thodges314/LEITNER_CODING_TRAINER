@@ -571,10 +571,19 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           setExecutionStatus('error');
         } else {
           if (logs.length === 0) {
-            appendLog(
-              'info',
-              '(Code executed successfully with no console outputs. Uncomment the test lines at the bottom to view results!)'
-            );
+            if (outcome.report.lines.length > 0) {
+              for (const line of outcome.report.lines) {
+                const isFail = line.startsWith('[error]') || line.startsWith('[fail]');
+                appendLog(isFail ? 'error' : 'info', line.replace(/^\[(log|info|warn|error)\]\s*/, ''));
+              }
+            } else if (outcome.report.errorCount > 0 || outcome.report.failCount > 0) {
+              appendLog('error', outcome.report.summary || 'Execution failed with errors');
+            } else {
+              appendLog(
+                'info',
+                '(Code executed successfully with no console outputs. Uncomment the test lines at the bottom to view results!)'
+              );
+            }
           }
           const hasError = logs.some((l) => l.failure) || outcome.report.errorCount > 0 || outcome.report.failCount > 0;
           setExecutionStatus(hasError ? 'error' : 'success');

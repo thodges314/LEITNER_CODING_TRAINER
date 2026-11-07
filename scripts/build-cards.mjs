@@ -142,6 +142,29 @@ for (const t of topics) {
   } else {
     delete t.rendersComponent;
   }
+
+  // Cards declare explicit DOM requirements via "requiresDom: true" in <id>.meta.json,
+  // or inherit it from DOM-inherent tracks (react, react-components, d3, tailwind, dom-browser)
+  // or by rendering a component.
+  const isDomTrack = [
+    'react',
+    'react-components',
+    'd3',
+    'tailwind',
+    'dom-browser',
+  ].includes(t.track);
+  const explicitRequiresDom = meta && typeof meta.requiresDom === 'boolean';
+  if (explicitRequiresDom) {
+    if (meta.requiresDom) {
+      t.requiresDom = true;
+    } else {
+      delete t.requiresDom;
+    }
+  } else if (isDomTrack || t.rendersComponent) {
+    t.requiresDom = true;
+  } else {
+    delete t.requiresDom;
+  }
 }
 const output = JSON.stringify(topics, null, 2) + '\n';
 
