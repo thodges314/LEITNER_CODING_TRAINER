@@ -24,6 +24,7 @@ await (async () => {
   // Case 3: Authenticated /dashboard/settings returns NextResponse.next()
   const req3 = new NextRequest('http://localhost:3000/dashboard/settings', {
     headers: { cookie: 'auth_token=jwt_valid_session_token' },
+    cookies: { auth_token: 'jwt_valid_session_token' },
   });
   const res3 = fn(req3);
   $test.check(

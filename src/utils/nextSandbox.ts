@@ -58,11 +58,53 @@ export class NextRequest extends Request {
   public geo?: { city?: string; country?: string; region?: string };
 
   constructor(input: RequestInfo | URL, init?: RequestInit & { cookies?: Record<string, string>; nextUrl?: URL }) {
+    // In browser runtimes, passing forbidden headers like 'cookie' to new Request() may be stripped by native fetch.
+    // We safely extract it from init.headers first.
+    let rawCookie = '';
+    if (init?.headers) {
+      if (typeof (init.headers as Headers).get === 'function') {
+        rawCookie = (init.headers as Headers).get('cookie') || (init.headers as Headers).get('Cookie') || '';
+      } else if (Array.isArray(init.headers)) {
+        for (const [k, v] of init.headers) {
+          if (typeof k === 'string' && k.toLowerCase() === 'cookie') {
+            rawCookie = String(v);
+            break;
+          }
+        }
+      } else if (typeof init.headers === 'object') {
+        for (const [k, v] of Object.entries(init.headers)) {
+          if (k.toLowerCase() === 'cookie') {
+            rawCookie = String(v);
+            break;
+          }
+        }
+      }
+    }
+
     super(input, init);
     const urlStr = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
     this.nextUrl = init?.nextUrl || new URL(urlStr, 'http://localhost:3000');
-    const cookieHeader = this.headers.get('cookie') || '';
-    this.cookies = new NextRequestCookies(init?.cookies || cookieHeader);
+
+    if (!rawCookie) {
+      try {
+        rawCookie = this.headers.get('cookie') || '';
+      } catch {
+        rawCookie = '';
+      }
+    }
+
+    // Ensure headers.get('cookie') works in browser even if the native Headers dropped it
+    if (rawCookie) {
+      const origGet = this.headers.get.bind(this.headers);
+      this.headers.get = (name: string) => {
+        if (name.toLowerCase() === 'cookie') {
+          return rawCookie;
+        }
+        return origGet(name);
+      };
+    }
+
+    this.cookies = new NextRequestCookies(init?.cookies || rawCookie);
   }
 }
 

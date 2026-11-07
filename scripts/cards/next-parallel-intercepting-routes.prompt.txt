@@ -44,3 +44,4 @@ Evaluates a target navigation against an intercepting parallel route definition:
     - Returns `{ isIntercepted: true, activeSlot: definition.slotName, renderedPattern: definition.routePattern, params }`.
   - If the path structure does not satisfy the prefix:
     - Returns `{ isIntercepted: false, renderedPattern: definition.targetPattern, params }`.
+

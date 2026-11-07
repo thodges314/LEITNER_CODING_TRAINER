@@ -117,3 +117,4 @@ const validateClientBoundaryProps = (props: Record<string, unknown>): BoundaryVa
     sanitizedProps: sanitized,
   };
 };
+

@@ -35,3 +35,4 @@ Validates a dictionary of props intended for a Client Component:
 - When invalid (`errors.length > 0`):
   - `valid` is `false`.
   - `sanitizedProps` is `undefined`.
+
