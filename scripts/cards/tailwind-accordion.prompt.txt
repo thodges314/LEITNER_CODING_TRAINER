@@ -1,0 +1,62 @@
+### `Accordion({ items = [], allowMultiple = false, defaultExpandedIds = [], className = '', ...props }: AccordionProps): JSX.Element`
+
+## Description
+
+```ts
+interface AccordionItemData {
+  id: string;
+  title: string;
+  content: any;
+  disabled?: boolean;
+}
+
+interface AccordionProps {
+  items: AccordionItemData[];
+  allowMultiple?: boolean;
+  defaultExpandedIds?: string[];
+  className?: string;
+  [key: string]: any;
+}
+```
+
+Accordions group collapsible content sections, saving vertical screen real estate while maintaining progressive disclosure and full WAI-ARIA keyboard accessibility.
+
+Build a flexible, accessible React accordion component styled with Tailwind CSS utility classes:
+
+### Requirements
+
+- **Accordion Container (`<div>`)**:
+  - Base classes: `divide-y divide-slate-800 border border-slate-800 rounded-xl overflow-hidden bg-slate-900/50`
+  - Safely merges external `className` and forwards extra `props`.
+
+- **Item Header & Trigger (`<button>`)**:
+  - Semantic `<button type="button">` disclosure control.
+  - ARIA attributes:
+    - `id={`accordion-header-${item.id}`}`
+    - `aria-expanded={isOpen ? 'true' : 'false'}`
+    - `aria-controls={`accordion-panel-${item.id}`}`
+    - `disabled={Boolean(item.disabled)}`
+  - Base trigger classes: `w-full flex items-center justify-between py-4 px-5 text-left font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`
+  - Active states:
+    - When open (`isOpen: true`): text color highlights with `text-indigo-400`.
+    - When closed (`isOpen: false`): default text color `text-slate-200`.
+    - Hover: `hover:bg-slate-800/40` when enabled.
+    - Disabled: `opacity-40 cursor-not-allowed` when `item.disabled: true`.
+  - Rotating Chevron Icon:
+    - Inline SVG chevron with classes `h-4 w-4 text-slate-400 transition-transform duration-200`.
+    - Rotates `rotate-180` when `isOpen: true`.
+
+- **Content Panel (`<div>`)**:
+  - Attributes:
+    - `id={`accordion-panel-${item.id}`}`
+    - `role="region"`
+    - `aria-labelledby={`accordion-header-${item.id}`}`
+    - `hidden={!isOpen}`
+  - Inner panel classes: `px-5 pb-4 pt-1 text-sm text-slate-400 leading-relaxed`
+
+- **Expansion Behavior**:
+  - Controlled by local state initialized from `defaultExpandedIds`.
+  - When `allowMultiple: false` (default): clicking an item toggles its open state and closes any other open items.
+  - When `allowMultiple: true`: multiple items can be expanded simultaneously.
+  - Clicking a disabled item does nothing.
+

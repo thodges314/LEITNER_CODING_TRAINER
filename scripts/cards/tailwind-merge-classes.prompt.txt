@@ -1,0 +1,52 @@
+### `twMerge(...classLists: ClassValue[]): string`
+
+## Description
+
+```ts
+type ClassValue =
+  | string
+  | string[]
+  | Record<string, boolean | undefined | null>
+  | undefined
+  | null
+  | false;
+```
+
+In utility-first UI development, dynamically composing component classes with standard string concatenation or `clsx` often creates CSS cascade conflicts (for example, combining `p-2` with `p-4` leaves both classes in the DOM, where stylesheet definition order — not class list order — dictates the result).
+
+A specialized utility like `twMerge` parses utility tokens, identifies overlapping CSS property groups, and ensures that **later conflicting classes cleanly override earlier ones**.
+
+Implement `twMerge(...classLists)`:
+
+### Requirements
+
+- **Input Handling**:
+  - Accepts any number of arguments of type `ClassValue` (strings, arrays, object maps `{ 'class-name': boolean }`, or falsy values).
+  - Flatten arrays and collect all truthy string tokens.
+  - Normalizes multiple spaces and strips falsy values (`false`, `null`, `undefined`, `""`).
+
+- **Conflict Group Resolution**:
+  - When two classes belong to the same property conflict group and share the identical modifier prefix (e.g. both have no prefix, or both have `hover:`), the **later** class in the sequence overrides the earlier one.
+  - Core conflict groups to recognize:
+    - **Padding**: `p-*`, `px-*`, `py-*`, `pt-*`, `pr-*`, `pb-*`, `pl-*` (each sub-direction is its own conflict group: e.g. `p-2` vs `p-4`, `px-2` vs `px-6`).
+    - **Margin**: `m-*`, `mx-*`, `my-*`, `mt-*`, `mr-*`, `mb-*`, `ml-*`.
+    - **Background Color**: `bg-*` (e.g. `bg-red-500` vs `bg-blue-600` overrides to `bg-blue-600`).
+    - **Text Color vs Text Size**:
+      - Font size tokens (`text-xs`, `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl`, etc.) conflict with other font size tokens.
+      - Text color tokens (`text-red-500`, `text-white`, `text-black`, `text-slate-900`, etc.) conflict with other text color tokens.
+      - A text size class and a text color class **never** conflict with each other (`text-sm` and `text-red-500` are both kept).
+    - **Display**: `block`, `inline-block`, `inline`, `flex`, `inline-flex`, `grid`, `inline-grid`, `hidden`.
+    - **Dimensions**: `w-*` (width), `h-*` (height).
+    - **Rounded Corners**: `rounded` and `rounded-*` (e.g. `rounded-md`, `rounded-full`, `rounded-none`).
+    - **Opacity**: `opacity-*`.
+
+- **Modifier Prefix Scoping**:
+  - Modifiers (e.g. `hover:`, `focus:`, `dark:`, `sm:`, `md:`, `lg:`) scope conflicts to their specific prefix combination.
+  - `hover:bg-red-500` and `hover:bg-blue-500` conflict $\to$ `hover:bg-blue-500`.
+  - `bg-red-500` and `hover:bg-blue-500` do **not** conflict $\to$ both are retained.
+  - `md:p-2` and `md:p-4` conflict $\to$ `md:p-4`.
+
+- **Preservation & Formatting**:
+  - Preserves non-conflicting utilities and returns surviving classes in original chronological order.
+  - If no classes remain, returns `""` (empty string).
+

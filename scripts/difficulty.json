@@ -1347,6 +1347,50 @@
     "difficulty": 3,
     "concept": "d3-force-graph"
   },
+  "tailwind-responsive-card": {
+    "difficulty": 2,
+    "concept": "tailwind-responsive"
+  },
+  "tailwind-accordion": {
+    "difficulty": 2,
+    "concept": "tailwind-accordion"
+  },
+  "tailwind-avatar-group": {
+    "difficulty": 2,
+    "concept": "tailwind-avatar"
+  },
+  "tailwind-segmented-control": {
+    "difficulty": 2,
+    "concept": "tailwind-tabs"
+  },
+  "tailwind-skeleton-loader": {
+    "difficulty": 2,
+    "concept": "tailwind-skeleton"
+  },
+  "tailwind-modal-dialog": {
+    "difficulty": 3,
+    "concept": "tailwind-modal"
+  },
+  "tailwind-arbitrary-parser": {
+    "difficulty": 3,
+    "concept": "tailwind-parser"
+  },
+  "tailwind-badge-component": {
+    "difficulty": 2,
+    "concept": "tailwind-badge"
+  },
+  "tailwind-button-states": {
+    "difficulty": 2,
+    "concept": "tailwind-button"
+  },
+  "tailwind-cva-variants": {
+    "difficulty": 3,
+    "concept": "tailwind-cva"
+  },
+  "tailwind-merge-classes": {
+    "difficulty": 3,
+    "concept": "tailwind-merge"
+  },
   "tailwind-pricing-card": {
     "difficulty": 2,
     "concept": "tailwind-card"

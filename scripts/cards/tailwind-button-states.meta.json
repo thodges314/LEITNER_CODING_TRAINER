@@ -1,0 +1,18 @@
+{
+  "title": "Tailwind Interactive Button & States",
+  "track": "tailwind",
+  "tags": [
+    "tailwind",
+    "react",
+    "button",
+    "interactive",
+    "states",
+    "a11y"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}
+

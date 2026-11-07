@@ -7,12 +7,12 @@ interface DismissibleBannerProps {
   onDismiss?: () => void;
 }
 
-function DismissibleBanner({
+const DismissibleBanner = ({
   variant = 'info',
   title,
   message,
   onDismiss,
-}: DismissibleBannerProps): JSX.Element | null {
+}: DismissibleBannerProps): JSX.Element | null => {
   const [visible, setVisible] = useState<boolean>(true);
 
   if (!visible) return null;

@@ -1,0 +1,47 @@
+### `cva(base?: CvaClassValue, config?: CvaConfig): (props?: CvaProps) => string`
+
+## Description
+
+```ts
+type CvaClassValue = string | string[] | undefined | null | false;
+
+interface CvaConfig {
+  variants?: Record<string, Record<string, CvaClassValue>>;
+  defaultVariants?: Record<string, string>;
+  compoundVariants?: Array<Record<string, any>>;
+}
+
+type CvaProps = Record<string, any>;
+```
+
+In modern design systems (such as `shadcn/ui`, Radix Themes, and Tailwind UI), **Class Variant Authority** (`cva`) is the standard pattern for declarative, type-safe component styling. It decouples variant logic (size, intent, outline) from JSX templates while managing default selections, compound combinations, and caller overrides.
+
+Implement `cva(base, config)` to return a variant generator function:
+
+### Requirements
+
+- **Base Classes**:
+  - `base` can be a string, an array of strings, or omitted/falsy.
+  - If array or nested values are passed, flatten and collect all truthy string tokens.
+  - Split space-separated classes so internal extra whitespace is normalized.
+
+- **Variants & Defaults**:
+  - `config.variants`: An object mapping variant names (e.g. `intent`, `size`) to option records (e.g. `{ primary: 'bg-blue-600 text-white', secondary: 'bg-slate-200' }`).
+  - `config.defaultVariants`: An object defining the fallback key when a prop is `undefined` or omitted (e.g. `{ intent: 'primary', size: 'md' }`).
+  - For each variant defined in `config.variants`, resolve the active value: `props?.[variantKey] !== undefined ? props[variantKey] : config.defaultVariants?.[variantKey]`.
+  - If the resolved value matches a key in `config.variants[variantKey]`, include the corresponding class tokens.
+
+- **Compound Variants (`config.compoundVariants`)**:
+  - An optional array of condition records.
+  - A compound variant applies when *every* condition key in the entry matches the resolved variant value.
+  - Condition entries specify classes via `className` or `class`.
+  - Condition keys (e.g. `{ intent: 'primary', size: 'sm', className: 'uppercase' }`): both `intent === 'primary'` and `size === 'sm'` must match for `'uppercase'` to be appended.
+
+- **Call Overrides (`className` / `class`)**:
+  - If the caller supplies `props.className` or `props.class`, append those custom classes to the end of the generated output.
+
+- **Output Formatting**:
+  - Return a single trimmed string with classes separated by a single space.
+  - Omit any empty, null, undefined, or false values.
+  - If no classes match or exist, return `""` (empty string).
+

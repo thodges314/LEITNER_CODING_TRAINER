@@ -1,0 +1,17 @@
+{
+  "title": "Tailwind Accessible Accordion",
+  "track": "tailwind",
+  "tags": [
+    "tailwind",
+    "react",
+    "accordion",
+    "disclosure",
+    "a11y"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}
+

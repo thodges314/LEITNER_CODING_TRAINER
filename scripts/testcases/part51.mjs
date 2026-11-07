@@ -107,27 +107,27 @@ export default {
   'tailwind-pricing-card': [
     r(
       'Basic non-popular tier renders semantic article with slate border and features list',
-      "renderPricingCard({ name: 'Starter', price: 15, features: ['1 Project', 'Community Support'] })",
+      "<PricingCard tier={{ name: 'Starter', price: 15, features: ['1 Project', 'Community Support'] }} />",
       '<article class="... border-slate-700 ..."> with h3, $15/mo, and button',
-      { callSignature: 'renderPricingCard(tier)' }
+      { callSignature: '<PricingCard tier={tier} />' }
     ),
     r(
       'Popular tier renders popular badge and indigo ring styling',
-      "renderPricingCard({ name: 'Pro', price: 49, popular: true, features: ['Unlimited Projects'] })",
+      "<PricingCard tier={{ name: 'Pro', price: 49, popular: true, features: ['Unlimited Projects'] }} />",
       'article has border-indigo-500 ring-2, badge with "Most Popular", button has bg-indigo-600',
-      { callSignature: 'renderPricingCard(popularTier)' }
+      { callSignature: '<PricingCard tier={popularTier} />' }
     ),
     r(
       'Applies custom period and custom CTA text correctly',
-      "renderPricingCard({ name: 'Enterprise', price: 999, period: '/year', ctaText: 'Contact Sales', features: [] })",
+      "<PricingCard tier={{ name: 'Enterprise', price: 999, period: '/year', ctaText: 'Contact Sales', features: [] }} />",
       'Displays $999/year and button displays "Contact Sales"',
-      { callSignature: 'renderPricingCard(enterpriseTier)' }
+      { callSignature: '<PricingCard tier={enterpriseTier} />' }
     ),
     r(
       'Renders empty features list gracefully without extra items',
-      "renderPricingCard({ name: 'Free', price: 0, features: [] })",
+      "<PricingCard tier={{ name: 'Free', price: 0, features: [] }} />",
       '<ul> contains 0 <li> elements',
-      { callSignature: 'renderPricingCard(freeTier)' }
+      { callSignature: '<PricingCard tier={freeTier} />' }
     ),
   ],
   'tailwind-dismissible-banner': [

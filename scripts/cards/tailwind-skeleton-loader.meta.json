@@ -1,0 +1,17 @@
+{
+  "track": "tailwind",
+  "title": "Tailwind Skeleton Loader",
+  "tags": [
+    "react",
+    "tailwind",
+    "skeleton",
+    "loading",
+    "accessibility"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}
+

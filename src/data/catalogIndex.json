@@ -4706,12 +4706,11 @@
     "difficulty": 2,
     "tags": [
       "tailwind",
-      "html",
+      "react",
       "responsive",
-      "css",
       "card"
     ],
-    "summary": "Implement a function that renders a responsive pricing card HTML string styled with Tailwind CSS utility classes"
+    "summary": "interface PricingTier {"
   },
   {
     "id": "tailwind-metric-card",
@@ -5028,5 +5027,174 @@
       "charts"
     ],
     "summary": "interface ForceGraphNode {"
+  },
+  {
+    "id": "tailwind-cva-variants",
+    "title": "Tailwind Component Variant Authority (cva)",
+    "track": "tailwind",
+    "concept": "tailwind-cva",
+    "difficulty": 3,
+    "tags": [
+      "tailwind",
+      "cva",
+      "variants",
+      "design-system",
+      "utilities"
+    ],
+    "summary": "type CvaClassValue = string | string[] | undefined | null | false;"
+  },
+  {
+    "id": "tailwind-merge-classes",
+    "title": "Tailwind Class Conflict Resolver (twMerge)",
+    "track": "tailwind",
+    "concept": "tailwind-merge",
+    "difficulty": 3,
+    "tags": [
+      "tailwind",
+      "twmerge",
+      "utilities",
+      "classnames",
+      "conflict-resolution"
+    ],
+    "summary": "type ClassValue ="
+  },
+  {
+    "id": "tailwind-button-states",
+    "title": "Tailwind Interactive Button & States",
+    "track": "tailwind",
+    "concept": "tailwind-button",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "react",
+      "button",
+      "interactive",
+      "states",
+      "a11y"
+    ],
+    "summary": "type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'outline';"
+  },
+  {
+    "id": "tailwind-arbitrary-parser",
+    "title": "Tailwind Arbitrary Value Parser",
+    "track": "tailwind",
+    "concept": "tailwind-parser",
+    "difficulty": 3,
+    "tags": [
+      "tailwind",
+      "parser",
+      "jit",
+      "regex",
+      "utilities",
+      "arbitrary-values"
+    ],
+    "summary": "interface ParsedArbitraryClass {"
+  },
+  {
+    "id": "tailwind-badge-component",
+    "title": "Tailwind Dynamic Status Badge",
+    "track": "tailwind",
+    "concept": "tailwind-badge",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "react",
+      "badge",
+      "status",
+      "tokens"
+    ],
+    "summary": "type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral';"
+  },
+  {
+    "id": "tailwind-modal-dialog",
+    "title": "Tailwind Accessible Modal Dialog",
+    "track": "tailwind",
+    "concept": "tailwind-modal",
+    "difficulty": 3,
+    "tags": [
+      "tailwind",
+      "css",
+      "react",
+      "dialog",
+      "modal",
+      "accessibility"
+    ],
+    "summary": "Build an accessible, animated modal dialog component in React styled with modern Tailwind CSS utility classes. The dialog includes a backdrop overl..."
+  },
+  {
+    "id": "tailwind-responsive-card",
+    "title": "Tailwind Responsive Product Card",
+    "track": "tailwind",
+    "concept": "tailwind-responsive",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "css",
+      "react",
+      "responsive",
+      "layout",
+      "flexbox"
+    ],
+    "summary": "Build a responsive e-commerce product card component in React styled with modern Tailwind CSS utility classes. The component should adapt seamlessl..."
+  },
+  {
+    "id": "tailwind-segmented-control",
+    "title": "Tailwind Segmented Control",
+    "track": "tailwind",
+    "concept": "tailwind-tabs",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "tailwind",
+      "tabs",
+      "accessibility",
+      "keyboard"
+    ],
+    "summary": "interface SegmentOption {"
+  },
+  {
+    "id": "tailwind-skeleton-loader",
+    "title": "Tailwind Skeleton Loader",
+    "track": "tailwind",
+    "concept": "tailwind-skeleton",
+    "difficulty": 2,
+    "tags": [
+      "react",
+      "tailwind",
+      "skeleton",
+      "loading",
+      "accessibility"
+    ],
+    "summary": "type SkeletonVariant = 'text' | 'circular' | 'rectangular' | 'card';"
+  },
+  {
+    "id": "tailwind-accordion",
+    "title": "Tailwind Accessible Accordion",
+    "track": "tailwind",
+    "concept": "tailwind-accordion",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "react",
+      "accordion",
+      "disclosure",
+      "a11y"
+    ],
+    "summary": "interface AccordionItemData {"
+  },
+  {
+    "id": "tailwind-avatar-group",
+    "title": "Tailwind Avatar Group Stack",
+    "track": "tailwind",
+    "concept": "tailwind-avatar",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "react",
+      "avatar",
+      "stack",
+      "tokens"
+    ],
+    "summary": "type AvatarSize = 'sm' | 'md' | 'lg';"
   }
 ]

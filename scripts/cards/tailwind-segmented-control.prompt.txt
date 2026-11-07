@@ -1,0 +1,65 @@
+### `SegmentedControl({ options, value, onChange, size = 'md', fullWidth = false, className = '', ...props }: SegmentedControlProps): JSX.Element`
+
+## Description
+
+```ts
+interface SegmentOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+type SegmentSize = 'sm' | 'md' | 'lg';
+
+interface SegmentedControlProps {
+  options: SegmentOption[];
+  value: string;
+  onChange: (value: string) => void;
+  size?: SegmentSize;
+  fullWidth?: boolean;
+  className?: string;
+  [key: string]: any;
+}
+```
+
+Segmented controls (or pill tabs) allow users to toggle between mutually exclusive options, views, or filter modes. They are staple UI elements across modern web applications (dashboards, charts, and setting switchers).
+
+Build an accessible, responsive segmented control React component styled with Tailwind CSS utility classes:
+
+### Requirements
+
+- **Container (`<div role="tablist">`)**:
+  - Semantic attributes: `role="tablist"`, `aria-orientation="horizontal"`.
+  - Base classes: `inline-flex p-1 bg-slate-900 border border-slate-800 rounded-xl select-none items-center`.
+  - When `fullWidth` is `true`, includes `w-full` (otherwise `w-auto`).
+  - Merges any caller-provided `className` without clobbering base classes.
+  - Forwards extra props (`...props`) to the outer container.
+
+- **Segment Item (`<button role="tab">`)**:
+  - Semantic attributes:
+    - `type="button"`
+    - `role="tab"`
+    - `aria-selected={isSelected ? "true" : "false"}`
+    - `tabIndex={isSelected ? 0 : -1}`
+    - `disabled={Boolean(option.disabled)}`
+  - Base classes: `inline-flex items-center justify-center font-medium transition-all rounded-lg text-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`
+  - When `fullWidth` is `true`, includes `flex-1`.
+  - Size variants:
+    - `'sm'`: `text-xs px-2.5 py-1`
+    - `'md'` (default): `text-sm px-3.5 py-1.5`
+    - `'lg'`: `text-base px-5 py-2`
+  - State styling:
+    - Selected item (`isSelected`):
+      - Includes `bg-indigo-600 text-white shadow-sm`
+    - Inactive item (`!isSelected` and `!option.disabled`):
+      - Includes `text-slate-400 hover:text-slate-200 hover:bg-slate-800/50`
+    - Disabled item (`option.disabled`):
+      - Includes `opacity-40 cursor-not-allowed pointer-events-none`
+  - Clicking an enabled option calls `onChange(option.value)`.
+
+- **Keyboard Navigation (`keydown`)**:
+  - When a tab button receives keyboard focus:
+    - `ArrowRight` or `ArrowDown`: Selects the next enabled option (wrapping from the last enabled option back to the first).
+    - `ArrowLeft` or `ArrowUp`: Selects the previous enabled option (wrapping from the first enabled option to the last).
+    - When moving focus, the newly selected tab button receives focus (`focus()`) and invokes `onChange(nextValue)`.
+

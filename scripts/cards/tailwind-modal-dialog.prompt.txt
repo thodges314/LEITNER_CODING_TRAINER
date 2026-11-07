@@ -1,0 +1,56 @@
+## Description
+
+Build an accessible, animated modal dialog component in React styled with modern Tailwind CSS utility classes. The dialog includes a backdrop overlay with backdrop blur, size variants, an accessible title and close button, and keyboard `Escape` dismissal.
+
+```ts
+type ModalSize = 'sm' | 'md' | 'lg';
+
+interface ModalDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children?: any;
+  footer?: any;
+  size?: ModalSize;
+}
+```
+
+### `ModalDialog({ isOpen, onClose, title, children, footer, size = 'md' }: ModalDialogProps): JSX.Element | null`
+
+#### Parameters
+- `isOpen`: `boolean` — Whether the dialog is currently open. If `false`, returns `null`.
+- `onClose`: `() => void` — Callback invoked when the user dismisses the dialog (clicking the close button, clicking the backdrop overlay, or pressing `Escape`).
+- `title`: `string` — Accessible dialog heading text linked via `aria-labelledby="modal-title"`.
+- `children`: `React.ReactNode` — Modal body content.
+- `footer`: `React.ReactNode | undefined` — Optional modal footer action bar.
+- `size`: `'sm' | 'md' | 'lg'` — Dialog max width sizing (default: `'md'`).
+  - `'sm'`: `max-w-sm`
+  - `'md'`: `max-w-md`
+  - `'lg'`: `max-w-lg`
+
+#### Structural & Styling Requirements
+- **Backdrop Overlay**:
+  - Full-screen fixed overlay: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity`.
+  - Clicking directly on the backdrop container triggers `onClose()`.
+- **Dialog Panel**:
+  - Accessibility: `role="dialog"`, `aria-modal="true"`, `aria-labelledby="modal-title"`.
+  - Panel wrapper: `w-full bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden transition-all text-slate-100` combined with the active size class (`max-w-sm`, `max-w-md`, or `max-w-lg`).
+  - Clicks inside the panel must not trigger the backdrop's `onClose` (call `e.stopPropagation()`).
+- **Header Section**:
+  - Container: `flex items-center justify-between p-5 border-b border-slate-800`.
+  - Heading: `<h2 id="modal-title" className="text-lg font-semibold text-white">{title}</h2>`.
+  - Close button:
+    - `<button type="button" aria-label="Close dialog" onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">&times;</button>`.
+- **Body Section**:
+  - Container: `<div className="p-5 text-sm text-slate-300 space-y-4">{children}</div>`.
+- **Footer Section (Optional)**:
+  - If `footer` is provided: `<div className="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-end gap-3">{footer}</div>`.
+- **Keyboard Handling**:
+  - Use `React.useEffect` to attach a `keydown` event listener to `window` while `isOpen` is `true`.
+  - If the user presses the `Escape` key (`e.key === 'Escape'`), call `onClose()`.
+  - Ensure the event listener is removed on unmount or when `isOpen` becomes `false`.
+
+#### Edge Cases
+- When `isOpen === false`, render nothing (`null`).
+- Prevent backdrop click events from firing when clicking child controls inside the dialog card.
+

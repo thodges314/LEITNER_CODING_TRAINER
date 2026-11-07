@@ -1,0 +1,17 @@
+{
+  "track": "tailwind",
+  "title": "Tailwind Segmented Control",
+  "tags": [
+    "react",
+    "tailwind",
+    "tabs",
+    "accessibility",
+    "keyboard"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}
+

@@ -1,0 +1,56 @@
+## Description
+
+Build a responsive e-commerce product card component in React styled with modern Tailwind CSS utility classes. The component should adapt seamlessly from a vertical stacked layout on mobile screens (`flex-col`) to a horizontal side-by-side layout on desktop viewports (`md:flex-row`).
+
+```ts
+interface Product {
+  title: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  badge?: string;
+  imageUrl?: string;
+  rating?: number;
+}
+
+interface ResponsiveCardProps {
+  product: Product;
+  onAddToCart?: () => void;
+}
+```
+
+### `ResponsiveProductCard({ product, onAddToCart }: ResponsiveCardProps): JSX.Element | null`
+
+#### Parameters
+- `product`: `Product` — An object containing product details (title, description, price, optional originalPrice, optional badge, optional imageUrl, optional rating). Returns `null` if `product` is undefined or null.
+- `onAddToCart`: `(() => void) | undefined` — Optional callback invoked when the user clicks the "Add to Cart" button.
+
+#### Structural & Styling Requirements
+- **Root Element**:
+  - Semantic `<article>` element.
+  - Mobile layout: `flex flex-col`.
+  - Desktop layout (`md:`): `md:flex-row`.
+  - Styling: `rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-lg`.
+- **Media / Image Section**:
+  - Container with `relative`.
+  - Mobile layout: `w-full aspect-video`.
+  - Desktop layout: `md:w-48 md:aspect-square md:shrink-0`.
+  - Child `<img>` with `w-full h-full object-cover` using `product.imageUrl` (fallback to `'/keyboard-preview.jpeg'` if omitted) and `alt={product.title}`.
+  - If `product.badge` is provided, render an absolute overlay pill:
+    - Position and styles: `absolute top-3 left-3 bg-indigo-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full`.
+- **Content Section**:
+  - Container: `flex-1 p-5 flex flex-col justify-between`.
+  - Heading: `<h3 className="text-lg font-bold text-white">{product.title}</h3>`.
+  - Description: `<p className="text-sm text-slate-400 mt-1 line-clamp-2">{product.description}</p>`.
+  - Price & Rating Row (`mt-4 flex items-center justify-between`):
+    - Price container (`flex items-baseline`):
+      - Current price: `<span className="text-xl font-extrabold text-white">${product.price}</span>`.
+      - If `product.originalPrice` is provided: `<span className="text-sm text-slate-500 line-through ml-2">${product.originalPrice}</span>`.
+    - If `product.rating` is provided: render rating text with star icon container (`flex items-center gap-1 text-amber-400 text-sm font-medium`).
+  - Add to Cart button:
+    - `<button type="button" onClick={onAddToCart} className="mt-4 w-full md:w-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition-colors cursor-pointer text-center">Add to Cart</button>`.
+
+#### Edge Cases
+- When `product` is nullish, return `null`.
+- When `badge`, `originalPrice`, or `rating` are not provided, omit their respective elements without rendering empty tags.
+

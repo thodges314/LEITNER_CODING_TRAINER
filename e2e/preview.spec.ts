@@ -30,8 +30,17 @@ async function openCard(page: Page, id: string, code?: string) {
       const stored = localStorage.getItem(DECK_KEY);
       if (stored) {
         const deck = JSON.parse(stored);
+        let found = false;
         for (const t of deck.topics) {
-          t.status = t.id === id ? 'active' : 'locked';
+          if (t.id === id) {
+            t.status = 'active';
+            found = true;
+          } else {
+            t.status = 'locked';
+          }
+        }
+        if (!found) {
+          deck.topics.unshift({ id, status: 'active', box: 1, streak: 0, nextReview: Date.now() });
         }
         localStorage.setItem(DECK_KEY, JSON.stringify(deck));
       }
@@ -507,7 +516,7 @@ test.describe('React preview window', () => {
     expect(hasReact).toBe(false);
   });
 
-  test('tailwind-pricing-card: displays "Live Preview Window", loads Tailwind without React, and renders pricing card', async ({ page }) => {
+  test('tailwind-pricing-card: displays "Live Preview Window", loads React and Tailwind, and renders pricing card', async ({ page }) => {
     const card = topics.find((t) => t.id === 'tailwind-pricing-card');
     expect(card).toBeDefined();
     const solution = card?.referenceSolution || card?.solution || '';
@@ -534,9 +543,9 @@ test.describe('React preview window', () => {
     });
     expect(hasTailwindCdn).toBe(true);
 
-    // Verify React is NOT loaded in vanilla Tailwind preview
+    // Verify React is loaded in React + Tailwind preview
     const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
-    expect(hasReact).toBe(false);
+    expect(hasReact).toBe(true);
   });
 
   test('tailwind-dismissible-banner: loads React and Tailwind, renders alert banner, and dismisses on click', async ({ page }) => {
@@ -557,7 +566,7 @@ test.describe('React preview window', () => {
     const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
     const alert = frame.locator('[role="alert"]').first();
     await expect(alert).toBeVisible({ timeout: 5000 });
-    await expect(alert).toContainText('Build Succeeded');
+    await expect(alert).toContainText('Scheduled Maintenance');
 
     // Both React and Tailwind should be loaded
     const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
@@ -609,6 +618,109 @@ test.describe('React preview window', () => {
     await btn.click();
     const logItem = previewWindow.locator('.react-preview-log-entry').first();
     await expect(logItem).toContainText('click');
+  });
+
+  test('tailwind-segmented-control: displays tablist, switches selected tab on click, and logs event', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-segmented-control');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-segmented-control', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+    await expect(page.locator('.console-status-pill.console-status-success')).toContainText('Passed');
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const tablist = frame.locator('[role="tablist"]');
+    await expect(tablist).toBeVisible({ timeout: 5000 });
+
+    const tabs = tablist.locator('[role="tab"]');
+    await expect(tabs).toHaveCount(4);
+
+    // Click "Yearly" tab and check event log
+    const yearlyTab = tabs.nth(3);
+    await yearlyTab.click();
+    await expect(yearlyTab).toHaveAttribute('aria-selected', 'true');
+
+    const logItem = previewWindow.locator('.react-preview-log-entry').first();
+    await expect(logItem).toContainText('onChange');
+    await expect(logItem).toContainText('yearly');
+  });
+
+  test('tailwind-skeleton-loader: mounts pulse skeleton card and displays props panel', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-skeleton-loader');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-skeleton-loader', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+    await expect(page.locator('.console-status-pill.console-status-success')).toContainText('Passed');
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const skeleton = frame.locator('[role="status"]');
+    await expect(skeleton).toBeVisible({ timeout: 5000 });
+    await expect(skeleton).toHaveAttribute('aria-busy', 'true');
+
+    // Props panel contains variant selector
+    const propSlot = previewWindow.locator('[data-testid="props-slot-variant"]');
+    await expect(propSlot).toBeVisible();
+  });
+
+  test('tailwind-badge-component: mounts status badge with correct classes, dot indicator, and interactive props panel', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-badge-component');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-badge-component', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+    await expect(page.locator('.console-status-pill.console-status-success')).toContainText('Passed');
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const badge = frame.locator('span').filter({ hasText: 'Operational' }).first();
+    await expect(badge).toBeVisible({ timeout: 5000 });
+
+    // Verify emerald variant styling and base classes are present and NOT clobbered
+    await expect(badge).toHaveClass(/inline-flex/);
+    await expect(badge).toHaveClass(/rounded-full/);
+    await expect(badge).toHaveClass(/border/);
+    await expect(badge).toHaveClass(/bg-emerald-500\/10/);
+    await expect(badge).toHaveClass(/text-emerald-400/);
+
+    // Verify dot indicator is rendered
+    const dot = badge.locator('span[aria-hidden="true"]');
+    await expect(dot).toBeVisible();
+    await expect(dot).toHaveClass(/bg-emerald-400/);
+
+    // Props panel has 5 controls
+    await expect(previewWindow.locator('[data-testid="props-slot-variant"]')).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="props-slot-size"]')).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="props-slot-dot"]')).toBeVisible();
+    await expect(previewWindow.locator('[data-testid="props-slot-label"]')).toBeVisible();
+
+    // Click the badge to verify callback event logging
+    await badge.click();
+    const logItem = previewWindow.locator('.react-preview-log-entry').first();
+    await expect(logItem).toContainText('onClick');
   });
 });
 

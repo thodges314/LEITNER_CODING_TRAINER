@@ -1,0 +1,17 @@
+{
+  "title": "Tailwind Dynamic Status Badge",
+  "track": "tailwind",
+  "tags": [
+    "tailwind",
+    "react",
+    "badge",
+    "status",
+    "tokens"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}
+

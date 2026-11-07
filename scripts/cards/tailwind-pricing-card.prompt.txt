@@ -1,3 +1,7 @@
+### `PricingCard({ tier, onSelect }: PricingCardProps): JSX.Element | null`
+
+## Description
+
 ```ts
 interface PricingTier {
   name: string;
@@ -7,27 +11,41 @@ interface PricingTier {
   features: string[];
   ctaText?: string; // defaults to 'Get Started'
 }
+
+interface PricingCardProps {
+  tier: PricingTier;
+  onSelect?: (tier: PricingTier) => void;
+}
 ```
 
-Implement a function that renders a responsive pricing card HTML string styled with Tailwind CSS utility classes:
+Implement an interactive React component (`PricingCard`) styled with Tailwind CSS utility classes:
 
-### renderPricingCard(tier: PricingTier): string
-- Returns an HTML string formatted with semantic elements and Tailwind CSS utility classes:
+### Requirements
+
 - **Card Container (`<article>`)**:
   - Base classes: `rounded-2xl p-6 transition-all duration-200 border`
-  - When `popular: true`: has `border-indigo-500 ring-2 ring-indigo-500/20` and renders a badge inside:
-    - `<span class="bg-indigo-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Most Popular</span>`
-  - When `popular` is false or omitted: has `border-slate-700 bg-slate-900/50`
+  - When `tier.popular` is `true`:
+    - Container classes: includes `border-indigo-500 ring-2 ring-indigo-500/20`
+    - Renders a badge inside:
+      `<span class="bg-indigo-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Most Popular</span>`
+  - When `tier.popular` is `false` or omitted:
+    - Container classes: includes `border-slate-700 bg-slate-900/50`
+
 - **Header Section**:
   - Tier name: `<h3 class="text-xl font-bold text-white">${tier.name}</h3>`
   - Price section `<div class="mt-4 flex items-baseline">`:
     - Price: `<span class="text-3xl font-extrabold text-white">$${tier.price}</span>`
     - Period: `<span class="ml-1 text-sm text-slate-400">${tier.period || '/mo'}</span>`
+
 - **Features List (`<ul class="space-y-3 my-6">`)**:
-  - Each feature in `tier.features` rendered as:
-    - `<li class="flex items-center text-sm text-slate-300"><span>${feature}</span></li>`
+  - Each item in `tier.features` rendered as:
+    `<li class="flex items-center text-sm text-slate-300"><span>${feature}</span></li>`
+  - When `tier.features` is empty or omitted, renders an empty `<ul>`.
+
 - **Call-to-Action Button (`<button>`)**:
+  - Attributes: `type="button"`
   - Base classes: `w-full py-2.5 px-4 rounded-xl font-medium transition-colors cursor-pointer`
-  - When `popular: true`: has `bg-indigo-600 hover:bg-indigo-500 text-white`
-  - When `popular` is false or omitted: has `bg-slate-800 hover:bg-slate-700 text-white`
-  - Text: `tier.ctaText || 'Get Started'`
+  - When `tier.popular` is `true`: includes `bg-indigo-600 hover:bg-indigo-500 text-white`
+  - When `tier.popular` is `false` or omitted: includes `bg-slate-800 hover:bg-slate-700 text-white`
+  - Content: `tier.ctaText || 'Get Started'`
+  - Optional `onSelect` callback: when provided, clicking the button invokes `onSelect(tier)`.

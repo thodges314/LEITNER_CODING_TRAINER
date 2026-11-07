@@ -1,14 +1,15 @@
 {
-  "track": "tailwind",
   "title": "Tailwind Responsive Pricing Card",
+  "track": "tailwind",
   "tags": [
     "tailwind",
-    "html",
+    "react",
     "responsive",
-    "css",
     "card"
   ],
+  "rendersComponent": true,
   "previewLibraries": [
+    "react",
     "tailwind"
   ]
 }

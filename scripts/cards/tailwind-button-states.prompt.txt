@@ -1,0 +1,52 @@
+### `Button({ variant = 'primary', size = 'md', loading = false, disabled = false, children, onClick, ...props }: ButtonProps): JSX.Element`
+
+## Description
+
+```ts
+type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'outline';
+type ButtonSize = 'sm' | 'md' | 'lg';
+
+interface ButtonProps {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  loading?: boolean;
+  disabled?: boolean;
+  children?: any;
+  onClick?: (event: any) => void;
+  [key: string]: any;
+}
+```
+
+Interactive, accessible buttons with cohesive hover, focus-visible rings, press transitions, and asynchronous loading states form the bedrock of any component library.
+
+Build an accessible, versatile React button styled with Tailwind CSS utility classes:
+
+### Requirements
+
+- **Base Layout & Pseudo-States (`<button>`)**:
+  - Elements: `<button type="button" ...>` (defaults to `type="button"` unless specified in `props`).
+  - Base classes: `inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-95 cursor-pointer`
+  - Forwards extra props (such as `aria-label`, `data-testid`, or `id`) to the underlying `<button>`.
+
+- **Variant Styling**:
+  - `'primary'` (default): `bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:ring-indigo-600`
+  - `'secondary'`: `bg-slate-800 text-slate-100 hover:bg-slate-700 focus-visible:ring-slate-500`
+  - `'destructive'`: `bg-rose-600 text-white hover:bg-rose-500 focus-visible:ring-rose-600`
+  - `'outline'`: `border border-slate-700 text-slate-200 hover:bg-slate-800 focus-visible:ring-slate-500`
+
+- **Sizes & Spacing**:
+  - `'sm'`: `text-xs px-2.5 py-1.5 rounded-lg gap-1.5`
+  - `'md'` (default): `text-sm px-4 py-2 rounded-xl gap-2`
+  - `'lg'`: `text-base px-5 py-2.5 rounded-xl gap-2.5`
+
+- **Disabled State**:
+  - When `disabled` is `true` or `loading` is `true`:
+    - Sets HTML attribute `disabled={true}` on the `<button>`.
+    - Includes disabled utility classes: `disabled:opacity-50 disabled:pointer-events-none cursor-not-allowed`
+
+- **Loading State**:
+  - When `loading` is `true`:
+    - Sets `aria-busy="true"` on the `<button>`.
+    - Renders an inline SVG spinner before `children`:
+      `<svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>`
+

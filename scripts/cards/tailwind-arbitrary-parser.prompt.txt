@@ -1,0 +1,39 @@
+### `parseArbitraryClass(className: string): ParsedArbitraryClass | null`
+
+## Description
+
+```ts
+interface ParsedArbitraryClass {
+  modifier?: string;
+  property: string;
+  value: string;
+  isNegative: boolean;
+}
+```
+
+Tailwind's Just-In-Time (JIT) engine supports **arbitrary values** enclosed in brackets (e.g. `w-[calc(100%-2rem)]`, `bg-[#1da1f2]`, `hover:top-[-10px]`, `-mt-[2rem]`). Tooling like linters, CSS compilers, and design tokens must parse and validate these arbitrary utility tokens into structured representations.
+
+Implement `parseArbitraryClass(className)`:
+
+### Requirements
+
+- **Arbitrary Value Extraction**:
+  - The arbitrary value is enclosed in brackets `[...]` at the end of the class name: e.g. `w-[32rem]` $\to$ `property: 'w'`, `value: '32rem'`.
+  - Nested parentheses (like `[calc(100%-2rem)]`) or nested brackets must be correctly balanced.
+  - If the class does not contain valid brackets or is empty/non-string, return `null`.
+
+- **Modifiers / Responsive Prefixes**:
+  - Optional modifier prefixes precede a colon (e.g. `hover:`, `md:`, `dark:hover:`).
+  - If present, extract the entire modifier chain without the trailing colon: `hover:bg-[#1da1f2]` $\to$ `modifier: 'hover'`, `dark:focus:w-[50vw]` $\to$ `modifier: 'dark:focus'`.
+  - If no modifier prefix exists, `modifier` is omitted (`undefined`).
+
+- **Negative Utilities**:
+  - A utility is negative if it begins with a negative prefix `-` immediately before the property (e.g. `-top-[10px]`, `hover:-mt-[2rem]`).
+  - When negative, set `isNegative: true` and strip the leading `-` from `property` (e.g. `property: 'top'`).
+  - Otherwise, set `isNegative: false`.
+
+- **Validation & Non-Arbitrary Classes**:
+  - Return `null` for standard non-arbitrary classes (e.g. `p-4`, `text-red-500`, `flex`).
+  - Return `null` if brackets are missing a closing `]`, empty (`[]`), or if there is trailing content after the closing `]` (e.g. `w-[20px]extra`).
+  - Return `null` if there is no property preceding the bracket (e.g. `[100px]`).
+

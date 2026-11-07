@@ -1,0 +1,10 @@
+{
+  "title": "Tailwind Accessible Modal Dialog",
+  "track": "tailwind",
+  "concept": "tailwind",
+  "difficulty": 3,
+  "rendersComponent": true,
+  "previewLibraries": ["react", "tailwind"],
+  "tags": ["tailwind", "css", "react", "dialog", "modal", "accessibility"]
+}
+
