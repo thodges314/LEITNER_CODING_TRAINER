@@ -46,6 +46,23 @@ describe('workerClient', () => {
       expect(isBrowserDomOrReactCard(makeCard('graphql-server'))).toBe(false);
       expect(isBrowserDomOrReactCard(makeCard('testing-tooling'))).toBe(false);
     });
+
+    it('returns true for cards in non-DOM tracks that have the "dom" tag or reference DOM globals', () => {
+      const domTagged = { ...makeCard('testing-tooling'), tags: ['dom'] };
+      expect(isBrowserDomOrReactCard(domTagged)).toBe(true);
+
+      const domHarness = {
+        ...makeCard('algorithms'),
+        testHarness: 'const el = document.createElement("div");',
+      };
+      expect(isBrowserDomOrReactCard(domHarness)).toBe(true);
+
+      const starterDom = {
+        ...makeCard('testing-tooling'),
+        starterCode: 'const el = window.document.getElementById("root");',
+      };
+      expect(isBrowserDomOrReactCard(starterDom)).toBe(true);
+    });
   });
 
   describe('supportsWebWorker', () => {

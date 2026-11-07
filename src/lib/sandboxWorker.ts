@@ -199,9 +199,8 @@ self.onmessage = async (e: MessageEvent<WorkerRunMessage>) => {
     self.postMessage(reply);
   } catch (err: unknown) {
     const isInfiniteLoop = err instanceof Error && err.message.includes('infinite loop detected');
-    errorCount++;
     const errMsg = stringifyArg(err);
-    lines.push(`[error] ${errMsg}`);
+    workerConsole.error(err instanceof Error ? err.stack || errMsg : errMsg);
 
     const report: HarnessReport = {
       ran: true,

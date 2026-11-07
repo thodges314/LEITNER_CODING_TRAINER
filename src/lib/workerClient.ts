@@ -11,13 +11,27 @@ let activeTimer: ReturnType<typeof setTimeout> | undefined;
  * graphql, sql, language, etc.) can be offloaded safely to the Web Worker.
  */
 export function isBrowserDomOrReactCard(card: TopicItem): boolean {
-  return (
+  if (
     card.track === 'react' ||
     card.track === 'react-components' ||
     card.track === 'd3' ||
     card.track === 'tailwind' ||
     card.track === 'dom-browser'
-  );
+  ) {
+    return true;
+  }
+  if (card.tags?.includes('dom')) {
+    return true;
+  }
+  const harness = card.testHarness || '';
+  const starter = card.starterCode || '';
+  if (
+    /\b(document\.|window\.|HTMLElement|customElements)\b/.test(harness) ||
+    /\b(document\.|window\.|HTMLElement|customElements)\b/.test(starter)
+  ) {
+    return true;
+  }
+  return false;
 }
 
 /**
