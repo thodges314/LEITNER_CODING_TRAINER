@@ -1,4 +1,4 @@
-const PricingCard = ({ tier }) => {
+const PricingCard = ({ tier, onSelect }) => {
   if (!tier) return null;
   const {
     name,
@@ -16,6 +16,11 @@ const PricingCard = ({ tier }) => {
   const buttonClasses = popular
     ? 'w-full py-2.5 px-4 rounded-xl font-medium transition-colors cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white'
     : 'w-full py-2.5 px-4 rounded-xl font-medium transition-colors cursor-pointer bg-slate-800 hover:bg-slate-700 text-white';
+
+  const handleCta = () => {
+    if (typeof onSelect === 'function') onSelect(tier);
+    else if (typeof tier.onSelect === 'function') tier.onSelect(tier);
+  };
 
   return (
     <article className={containerClasses}>
@@ -38,9 +43,9 @@ const PricingCard = ({ tier }) => {
           </li>
         ))}
       </ul>
-      <button type="button" className={buttonClasses}>
+      <button type="button" onClick={handleCta} className={buttonClasses}>
         {ctaText}
       </button>
     </article>
   );
-}
+};

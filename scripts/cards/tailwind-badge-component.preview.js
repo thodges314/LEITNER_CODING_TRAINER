@@ -18,6 +18,10 @@ function BadgePreview() {
         variant={variant}
         size={size}
         dot={Boolean(dot)}
+        className="cursor-pointer"
+        onClick={() => {
+          if (typeof log === 'function') log('onClick', { variant, size, label });
+        }}
       >
         {label}
       </Badge>
@@ -26,4 +30,3 @@ function BadgePreview() {
 }
 
 <BadgePreview />
-

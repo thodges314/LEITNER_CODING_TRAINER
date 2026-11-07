@@ -21,8 +21,8 @@ function ButtonPreview() {
         size={size}
         loading={Boolean(loading)}
         disabled={Boolean(disabled)}
-        onClick={() => {
-          if (typeof log === 'function') log('buttonClick', { variant, size });
+        onClick={(e) => {
+          if (typeof log === 'function') log('onClick', { variant, size, label });
         }}
       >
         {label}

@@ -107,3 +107,31 @@ const { render } = $dom;
   );
   r.unmount();
 }
+
+// 5. Fires optional onSelect callback when CTA button is clicked
+{
+  let selected = null;
+  const tier = {
+    name: 'Team',
+    price: 99,
+    features: ['5 seats'],
+  };
+  const r = render(
+    <PricingCard
+      tier={tier}
+      onSelect={(t) => {
+        selected = t;
+      }}
+    />
+  );
+  const btn = r.container.querySelector('button');
+  $dom.fire.click(btn);
+
+  $test.check(
+    'Fires optional onSelect callback when CTA button is clicked',
+    selected !== null && selected.name === 'Team',
+    { selected: Boolean(selected) }
+  );
+  r.unmount();
+}
+

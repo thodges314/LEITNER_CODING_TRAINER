@@ -344,4 +344,48 @@ describe('PropsControlPanel', () => {
     const formChildrenSlot = formGroup?.querySelector('[data-testid="props-slot-formChildren"]');
     expect(formChildrenSlot?.textContent).toContain('children');
   });
+
+  it('renders all configured props and callbacks for Tailwind component cards', async () => {
+    const tailwindCardIds = [
+      'tailwind-badge-component',
+      'tailwind-dismissible-banner',
+      'tailwind-button-states',
+      'tailwind-pricing-card',
+      'tailwind-responsive-card',
+      'tailwind-modal-dialog',
+    ];
+
+    const { getComponentPropsConfig, getInitialPropValues } = await import('../../lib/previewPropsConfig');
+
+    for (const cardId of tailwindCardIds) {
+      const defs = getComponentPropsConfig(cardId);
+      expect(defs.length).toBeGreaterThan(0);
+
+      const defaults = getInitialPropValues(cardId);
+      expect(defaults).toBeDefined();
+
+      const onChange = vi.fn();
+      const onReset = vi.fn();
+
+      await act(async () => {
+        root?.render(
+          <PropsControlPanel
+            cardId={cardId}
+            propDefs={defs}
+            values={defaults}
+            onChange={onChange}
+            onReset={onReset}
+          />
+        );
+      });
+
+      const emptyHint = container?.querySelector('.props-panel-empty');
+      expect(emptyHint).toBeNull();
+
+      for (const def of defs) {
+        const slot = container?.querySelector(`[data-testid="props-slot-${def.name}"]`);
+        expect(slot).not.toBeNull();
+      }
+    }
+  });
 });

@@ -9,9 +9,10 @@ interface PricingTier {
 
 interface PricingCardProps {
   tier: PricingTier;
+  onSelect?: (tier: PricingTier) => void;
 }
 
-const PricingCard = ({ tier }: PricingCardProps): JSX.Element | null => {
+const PricingCard = ({ tier, onSelect }: PricingCardProps): JSX.Element | null => {
   if (!tier) return null;
   const {
     name,
@@ -29,6 +30,10 @@ const PricingCard = ({ tier }: PricingCardProps): JSX.Element | null => {
   const buttonClasses = popular
     ? 'w-full py-2.5 px-4 rounded-xl font-medium transition-colors cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white'
     : 'w-full py-2.5 px-4 rounded-xl font-medium transition-colors cursor-pointer bg-slate-800 hover:bg-slate-700 text-white';
+
+  const handleCta = (): void => {
+    if (typeof onSelect === 'function') onSelect(tier);
+  };
 
   return (
     <article className={containerClasses}>
@@ -51,9 +56,9 @@ const PricingCard = ({ tier }: PricingCardProps): JSX.Element | null => {
           </li>
         ))}
       </ul>
-      <button type="button" className={buttonClasses}>
+      <button type="button" onClick={handleCta} className={buttonClasses}>
         {ctaText}
       </button>
     </article>
   );
-}
+};

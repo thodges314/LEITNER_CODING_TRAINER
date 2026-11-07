@@ -1,4 +1,4 @@
-### `PricingCard({ tier }: PricingCardProps): JSX.Element | null`
+### `PricingCard({ tier, onSelect }: PricingCardProps): JSX.Element | null`
 
 ## Description
 
@@ -14,6 +14,7 @@ interface PricingTier {
 
 interface PricingCardProps {
   tier: PricingTier;
+  onSelect?: (tier: PricingTier) => void;
 }
 ```
 
@@ -47,3 +48,4 @@ Implement an interactive React component (`PricingCard`) styled with Tailwind CS
   - When `tier.popular` is `true`: includes `bg-indigo-600 hover:bg-indigo-500 text-white`
   - When `tier.popular` is `false` or omitted: includes `bg-slate-800 hover:bg-slate-700 text-white`
   - Content: `tier.ctaText || 'Get Started'`
+  - Optional `onSelect` callback: when provided, clicking the button invokes `onSelect(tier)`.
