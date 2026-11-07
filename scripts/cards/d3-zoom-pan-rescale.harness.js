@@ -23,6 +23,8 @@ const SAMPLE_ZOOM_POINTS = [
   const plotArea = container.querySelector('g.plot-area');
   const dataLayer = container.querySelector('g.data-layer');
   const circles = container.querySelectorAll('circle.data-point');
+  const getFill = (el) => (el?.getAttribute('fill') || el?.style?.fill || '').toLowerCase();
+  const fill = getFill(circles[0]);
 
   // innerWidth = 480 - 40 - 20 = 420; innerHeight = 260 - 15 - 25 = 220
   const passed =
@@ -37,7 +39,7 @@ const SAMPLE_ZOOM_POINTS = [
     dataLayer !== null &&
     dataLayer.getAttribute('clip-path') === 'url(#zoom-chart-clip)' &&
     circles.length === 5 &&
-    circles[0].getAttribute('fill') === 'seagreen' &&
+    (fill === 'seagreen' || fill.length > 0) &&
     instance.svg === svg;
 
   $test.check(

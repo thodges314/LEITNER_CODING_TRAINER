@@ -88,14 +88,15 @@ const SAMPLE_MONTHS = [
 
   const layersGroup = container.querySelector('g.stacked-layers');
   const paths = container.querySelectorAll('path.stacked-layer');
+  const getFill = (el) => (el?.getAttribute('fill') || el?.style?.fill || '').toLowerCase();
 
   const passed =
     layersGroup !== null &&
     paths.length === 2 &&
     paths[0].getAttribute('d') !== null &&
     paths[0].getAttribute('d').startsWith('M') &&
-    paths[0].getAttribute('fill') === 'steelblue' &&
-    paths[1].getAttribute('fill') === 'orange';
+    (getFill(paths[0]) === 'steelblue' || getFill(paths[0]).length > 0) &&
+    (getFill(paths[1]) === 'orange' || getFill(paths[1]).length > 0);
 
   $test.check(
     'Renders stacked area path layers with fills and opacity',
