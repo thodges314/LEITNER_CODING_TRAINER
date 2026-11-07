@@ -214,3 +214,4 @@ const SAMPLE_ZOOM_POINTS = [
 
   container.remove();
 }
+

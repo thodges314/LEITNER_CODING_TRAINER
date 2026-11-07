@@ -48,3 +48,4 @@ Implement `summarizeDataset(records, options)` to process an array of employee d
 
 - **Edge Cases**:
   - If `records` is empty (`[]`) or non-array, return empty Maps for `groupedByDept`, `salaryByRegion`, and `avgSalaryByDeptRegion`, an empty array `[]` for `salaryBins`, and `"$0.00"` for both formatted strings.
+

@@ -52,3 +52,4 @@ function summarizeDataset(records, options = {}) {
     avgSalaryFormatted: currencyFormatter(avgSalary),
   };
 }
+

@@ -81,3 +81,4 @@ const DEFAULT_ZOOM_POINTS = [
     }
   });
 })();
+

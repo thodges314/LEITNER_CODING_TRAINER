@@ -102,3 +102,4 @@ Implement `renderForceDirectedGraph(container, data, options)` to render an inte
   - `pinNode(id, x, y)`: finds node by `id`, assigns `node.fx = x` and `node.fy = y`, then reheats simulation with `simulation.alpha(0.1).restart()`.
   - `unpinNode(id)`: finds node by `id`, assigns `node.fx = null` and `node.fy = null`, then reheats simulation with `simulation.alpha(0.1).restart()`.
   - `destroy()`: calls `simulation.stop()`, removes SVG, and empties `container.innerHTML`.
+

@@ -72,3 +72,4 @@ Implement `renderStackedAreaChart(container, data, options)` to construct a resp
   - `getLayerKeys()`: returns a copy of the keys array used for the stack.
   - `getYDomain()`: returns `yScale.domain()` as `[number, number]`.
   - `destroy()`: removes the SVG and empties `container.innerHTML`.
+

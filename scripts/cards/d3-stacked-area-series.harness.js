@@ -201,3 +201,4 @@ const SAMPLE_MONTHS = [
 
   container.remove();
 }
+

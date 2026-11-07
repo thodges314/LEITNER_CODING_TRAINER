@@ -71,3 +71,4 @@ const DEFAULT_MONTHLY_METRICS = [
     }
   });
 })();
+

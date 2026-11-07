@@ -216,3 +216,4 @@ const SAMPLE_GRAPH = {
 
   container.remove();
 }
+
