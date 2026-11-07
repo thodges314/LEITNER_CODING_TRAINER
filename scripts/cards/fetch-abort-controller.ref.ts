@@ -1,4 +1,4 @@
-async function fetchWithTimeout(url: string, timeoutMs: number): Promise<any> {
+const fetchWithTimeout = async (url: string, timeoutMs: number): Promise<any> => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {

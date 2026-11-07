@@ -1,4 +1,4 @@
-async function fetchWithTimeout(url, timeoutMs) {
+const fetchWithTimeout = async (url, timeoutMs) => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {

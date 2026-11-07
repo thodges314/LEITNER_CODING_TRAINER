@@ -1,4 +1,4 @@
-async function retry(fn, { retries = 3, baseDelay = 20, factor = 2, signal } = {}) {
+const retry = async (fn, { retries = 3, baseDelay = 20, factor = 2, signal } = {}) => {
   const abortReason = () => signal.reason ?? new DOMException('Aborted', 'AbortError');
 
   // A delay that ends immediately (rejecting with the abort reason) when the signal fires.

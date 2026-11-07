@@ -1,4 +1,4 @@
-async function pool<T>(tasks: (() => Promise<T>)[], limit: number): Promise<T[]> {
+const pool = async <T,>(tasks: (() => Promise<T>)[], limit: number): Promise<T[]> => {
   const results = new Array<T>(tasks.length);
   let next = 0;
   let failed = false;

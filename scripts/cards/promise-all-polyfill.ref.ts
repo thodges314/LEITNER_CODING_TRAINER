@@ -1,4 +1,4 @@
-function promiseAll<T>(iterable: Iterable<T | Promise<T>>): Promise<T[]> {
+const promiseAll = <T,>(iterable: Iterable<T | Promise<T>>): Promise<T[]> => {
   return new Promise<T[]>((resolve, reject) => {
     const items = Array.from(iterable);
     if (items.length === 0) return resolve([]);
@@ -13,7 +13,7 @@ function promiseAll<T>(iterable: Iterable<T | Promise<T>>): Promise<T[]> {
   });
 }
 
-function promiseAllSettled<T>(iterable: Iterable<T | Promise<T>>): Promise<PromiseSettledResult<T>[]> {
+const promiseAllSettled = <T,>(iterable: Iterable<T | Promise<T>>): Promise<PromiseSettledResult<T>[]> => {
   return promiseAll(
     Array.from(iterable, (item) =>
       Promise.resolve(item).then(

@@ -1,4 +1,4 @@
-async function pool(tasks, limit) {
+const pool = async (tasks, limit) => {
   const results = new Array(tasks.length);
   let next = 0;
   let failed = false;
