@@ -16,7 +16,7 @@ interface DataTableProps<T extends Record<string, unknown> = Record<string, unkn
   pageSize?: number;
 }
 
-function DataTable<T extends Record<string, unknown>>({ rows, columns, pageSize = 5 }: DataTableProps<T>): JSX.Element {
+const DataTable = <T extends Record<string, unknown>>({ rows, columns, pageSize = 5 }: DataTableProps<T>): JSX.Element => {
   const [sort, setSort] = useState<SortState<T>>({ key: null, dir: 'none' });
   const [filter, setFilter] = useState<string>('');
   const [page, setPage] = useState<number>(1);

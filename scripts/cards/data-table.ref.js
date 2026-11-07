@@ -1,4 +1,4 @@
-function DataTable({ rows, columns, pageSize = 5 }) {
+const DataTable = ({ rows, columns, pageSize = 5 }) => {
   const [sort, setSort] = useState({ key: null, dir: 'none' });
   const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);

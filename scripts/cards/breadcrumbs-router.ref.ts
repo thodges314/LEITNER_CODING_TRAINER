@@ -9,10 +9,10 @@ interface BreadcrumbItem {
   isCurrent: boolean;
 }
 
-function Breadcrumbs({
+const Breadcrumbs = ({
   pathname,
   labels = {},
-}: BreadcrumbsProps): JSX.Element {
+}: BreadcrumbsProps): JSX.Element => {
   const clean = pathname ? pathname.replace(/\/+/g, '/').replace(/\/$/, '') : '';
   const segments = clean.split('/').filter(Boolean);
 

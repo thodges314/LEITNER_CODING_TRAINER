@@ -8,7 +8,7 @@ interface SimpleTableProps<T extends Record<string, unknown> = Record<string, un
   rows: T[];
 }
 
-function SimpleTable<T extends Record<string, unknown>>({ columns, rows }: SimpleTableProps<T>): JSX.Element {
+const SimpleTable = <T extends Record<string, unknown>>({ columns, rows }: SimpleTableProps<T>): JSX.Element => {
   return (
     <table>
       <thead>

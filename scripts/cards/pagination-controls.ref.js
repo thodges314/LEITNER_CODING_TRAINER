@@ -1,4 +1,4 @@
-function Pagination({ page, totalPages, onPageChange, siblings = 1 }) {
+const Pagination = ({ page, totalPages, onPageChange, siblings = 1 }) => {
   const shown = new Set([1, totalPages]);
   for (let p = page - siblings; p <= page + siblings; p++) {
     if (p >= 1 && p <= totalPages) shown.add(p);

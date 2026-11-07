@@ -1,4 +1,4 @@
-function SimpleTable({ columns, rows }) {
+const SimpleTable = ({ columns, rows }) => {
   return (
     <table>
       <thead>
