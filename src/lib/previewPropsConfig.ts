@@ -1576,8 +1576,8 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     {
       name: 'imageUrl',
       type: 'string',
-      defaultValue: '/keyboard-preview.svg',
-      placeholder: 'Image URL or path (e.g. /keyboard-preview.svg)...',
+      defaultValue: '/keyboard-preview.jpeg',
+      placeholder: 'Image URL or path (e.g. /keyboard-preview.jpeg)...',
       description: 'Product cover photo source URL',
     },
     {

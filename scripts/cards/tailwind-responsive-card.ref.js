@@ -7,7 +7,7 @@ const ResponsiveProductCard = ({ product, onAddToCart }) => {
     price,
     originalPrice,
     badge,
-    imageUrl = '/keyboard-preview.svg',
+    imageUrl = '/keyboard-preview.jpeg',
     rating,
   } = product;
 
