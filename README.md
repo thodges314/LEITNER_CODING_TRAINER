@@ -11,8 +11,8 @@ Built with **React 19 + TypeScript + Vite**. Zero backend — everything runs lo
 ```bash
 npm install
 npm run dev           # Start Vite development server (localhost:5173)
-npm test              # Run Vitest suite (2,516 tests across 70 test files)
-npm run e2e           # Run Playwright E2E suite in real Chromium (851 tests across 17 test files)
+npm test              # Run Vitest suite (2,526 tests across 70 test files)
+npm run e2e           # Run Playwright E2E suite in real Chromium (855 tests across 17 test files)
 npm run check:cards   # Read-only check: verify topics.json & catalogIndex.json match source cards
 npm run build:cards   # Rebuild topics.json & catalogIndex.json from scripts/cards/ sources
 npm run lint          # Run ESLint across workspace
@@ -39,7 +39,7 @@ Switchable in Settings between two spaced-repetition models:
 - **Autoclosing Brackets & Quotes**: Auto-pairs and jumps over `()`, `[]`, `{}`, `""`, `''`, and `` ` ``.
 - **In-Browser Prettier Formatting**: Client-side code formatting powered by standalone Prettier (`prettier/standalone` with Babel, TypeScript, and Estree plugins). Format via toolbar or **`Shift + Alt + F`** / **`Cmd + Shift + F`**.
 
-### 3. 100% Dual TypeScript Solutions (`392 / 392 Cards`)
+### 3. 100% Dual TypeScript Solutions (`394 / 394 Cards`)
 - Every card in the catalog features canonical **JavaScript (`<id>.ref.js`)** and **TypeScript (`<id>.ref.ts`)** reference implementations.
 - Ambient data structures (`ListNode<T>`, `TreeNode<T>`) and browser globals are baked into the execution sandbox.
 - **Clean Type Signatures**: Prompt headings feature readable signatures (`### functionName(arg: Type): ReturnType`), while complex option models and structured return types are extracted into clean ```ts interface blocks.
@@ -97,7 +97,7 @@ Switchable in Settings between two spaced-repetition models:
 
 ## Content & Authoring Pipeline
 
-The repository includes **392 curated cards** across 17 topic tracks with **2,563 test cases**:
+The repository includes **394 curated cards** across 17 topic tracks with **2,572 test cases**:
 - **Advanced Algorithms** (57 cards)
 - **JS Utilities** (44 cards)
 - **React Components** (41 cards)
@@ -114,7 +114,7 @@ The repository includes **392 curated cards** across 17 topic tracks with **2,56
 - **TypeScript Patterns** (14 cards)
 - **Next.js App Router** (11 cards)
 - **GraphQL APIs & Execution** (10 cards)
-- **Testing & Libraries** (8 cards)
+- **Testing & Tooling** (10 cards)
 
 ### Card Structure (`scripts/cards/`)
 Each card consists of audited modular sources:

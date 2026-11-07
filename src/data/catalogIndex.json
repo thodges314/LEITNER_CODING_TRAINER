@@ -5539,5 +5539,35 @@
       "queues"
     ],
     "summary": "Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue."
+  },
+  {
+    "id": "render-hook-harness",
+    "title": "Mini renderHook: React Hook Test Harness",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 4,
+    "tags": [
+      "testing",
+      "react",
+      "hooks",
+      "lifecycle",
+      "test-runner"
+    ],
+    "summary": "interface HookResult<T> {"
+  },
+  {
+    "id": "test-each-data-driven",
+    "title": "Data-Driven Parameterized Tests (test.each)",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 3,
+    "tags": [
+      "testing",
+      "vitest",
+      "jest",
+      "parameterized-tests",
+      "test-runner"
+    ],
+    "summary": "type TestFn = (...args: any[]) => void | Promise<void>;"
   }
 ]

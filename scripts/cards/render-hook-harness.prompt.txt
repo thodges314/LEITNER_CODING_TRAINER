@@ -1,0 +1,64 @@
+## Description
+
+```ts
+interface HookResult<T> {
+  current: T;
+}
+
+interface RenderHookOptions<P = any> {
+  initialProps?: P;
+  wrapper?: (props: { children: any }) => any;
+}
+
+interface RenderHookReturn<T, P = any> {
+  result: HookResult<T>;
+  rerender: (newProps?: P) => void;
+  unmount: () => void;
+}
+```
+
+React's Rules of Hooks enforce that custom hooks (`useState`, `useEffect`, `useReducer`, `useMemo`, etc.) can only be invoked within the body of a React functional component during rendering.
+
+To test custom hooks in isolation without authoring boilerplate components and DOM markup for every unit test, testing frameworks provide `renderHook`.
+
+Write a lightweight `renderHook` harness that programmatically mounts a wrapper component, invokes the hook under test, and exposes a live result ref alongside re-rendering and unmounting controls.
+
+### renderHook(renderCallback, options?): RenderHookReturn<T, P>
+
+#### Parameters
+- `renderCallback` (`(props?: P) => T`): A function that calls the hook under test. It is called with the latest props and its return value is stored in `result.current`.
+- `options` (`RenderHookOptions<P>`, optional):
+  - `initialProps` (`P`, optional): Props passed to `renderCallback` on the initial mount.
+  - `wrapper` (`((props: { children: any }) => any)`, optional): An optional React wrapper component (e.g. Context Provider) that wraps the test component.
+
+#### Returns
+- An object with:
+  - `result`: `{ current: T }`. An object whose `.current` property holds the latest return value of `renderCallback`.
+  - `rerender(newProps?: P)`: Re-renders the test component. If `newProps` is provided, subsequent hook executions receive `newProps`; otherwise, the previous props are reused.
+  - `unmount()`: Unmounts the test component, executing any `useEffect` cleanup callbacks and cleaning up the DOM container.
+
+#### Constraints & Environment
+- Environment globals `React`, `ReactDOM` (`ReactDOM.createRoot`), and `document` are pre-loaded in scope.
+- Use `React.act` if available to ensure renders and state updates flush synchronously during mount, rerender, and unmount.
+
+### Example
+
+```js
+const { result, rerender, unmount } = renderHook(
+  ({ initialCount }) => {
+    const [count, setCount] = useState(initialCount);
+    return { count, increment: () => setCount(c => c + 1) };
+  },
+  { initialProps: { initialCount: 0 } }
+);
+
+expect(result.current.count).toBe(0);
+
+act(() => {
+  result.current.increment();
+});
+expect(result.current.count).toBe(1);
+
+rerender({ initialCount: 100 });
+unmount();
+```

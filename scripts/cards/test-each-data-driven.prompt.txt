@@ -1,0 +1,65 @@
+## Description
+
+```ts
+type TestFn = (...args: any[]) => void | Promise<void>;
+type RegisterTestFn = (title: string, fn: () => void | Promise<void>) => void;
+type EachRunner = (titlePattern: string, testFn: TestFn) => void;
+```
+
+In test frameworks like Vitest and Jest, `test.each` enables parameterized, data-driven test suites. Instead of duplicating test blocks across multiple test inputs, `test.each` accepts a matrix of input rows, dynamically interpolates test descriptions, and registers independent test blocks with isolated scopes.
+
+Write a factory function `createTestEach` that wraps a test registration function and returns a data-driven `test.each` runner.
+
+### createTestEach(registerTest): (table: any[]) => EachRunner
+
+#### Parameters
+- `registerTest` (`RegisterTestFn`): Callback that receives a formatted test title string and a test execution function `() => void | Promise<void>`.
+
+#### Returns
+- A function `each(table)` that accepts an array of test cases and returns `(titlePattern, testFn) => void`.
+
+#### Table & Format Rules
+- `table`: An array of test cases:
+  - 2D array of argument tuples: `[ [arg1, arg2, ...], [arg1, arg2, ...] ]`
+  - 1D array of single-argument values: `[ val1, val2, ... ]` (treated as single-argument rows `[val1]`, `[val2]`)
+  - Array of objects: `[ { a: 1, b: 2, sum: 3 }, ... ]`
+- `titlePattern`: A template string with placeholders:
+  - For array rows:
+    - `%s`: Formatted as `String(val)`
+    - `%i` or `%d`: Formatted as integer (`parseInt(val, 10)`)
+    - `%f`: Formatted as float (`parseFloat(val)`)
+    - `%p` or `%j`: Formatted as JSON (`JSON.stringify(val)`)
+    - Placeholders consume arguments sequentially from left to right (`row[0]`, `row[1]`, etc.). Unmatched placeholders remain unchanged.
+  - For object rows:
+    - `$propName`: Replaced with the corresponding property value from the object row (e.g. `$a + $b = $sum`).
+    - If the property value is an object or array, format it with `JSON.stringify`; otherwise `String(val)`.
+- Test execution:
+  - For array rows, `testFn` is invoked with the row elements spread as arguments: `testFn(...row)`.
+  - For object rows, `testFn` is invoked with the row object as its single argument: `testFn(row)`.
+  - If `testFn` returns a Promise (async test), the wrapper returned to `registerTest` returns that Promise.
+  - If `table` is empty or not an array, no tests are registered.
+
+### Example
+
+```js
+const registered = [];
+const testEach = createTestEach((title, fn) => {
+  registered.push({ title, fn });
+});
+
+testEach([
+  [1, 1, 2],
+  [1, 2, 3],
+  [2, 3, 5]
+])('%i + %i returns %d', (a, b, expected) => {
+  expect(a + b).toBe(expected);
+});
+
+// registered:
+// [
+//   { title: '1 + 1 returns 2', fn: [Function] },
+//   { title: '1 + 2 returns 3', fn: [Function] },
+//   { title: '2 + 3 returns 5', fn: [Function] }
+// ]
+```
+
