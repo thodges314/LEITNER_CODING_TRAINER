@@ -12,7 +12,7 @@ const hiddenStyle = {
   whiteSpace: 'nowrap',
 };
 
-function AnnouncerProvider({ children }) {
+const AnnouncerProvider = ({ children }) => {
   const [polite, setPolite] = useState('');
   const [assertive, setAssertive] = useState('');
 
@@ -41,6 +41,6 @@ function AnnouncerProvider({ children }) {
   );
 }
 
-function useAnnounce() {
+const useAnnounce = () => {
   return useContext(AnnouncerContext);
-}
+};

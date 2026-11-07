@@ -1,4 +1,4 @@
-function CommentNode({ comment, onAddReply, maxDepth, depth }) {
+const CommentNode = ({ comment, onAddReply, maxDepth, depth }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [replying, setReplying] = useState(false);
   const [replyText, setReplyText] = useState('');
@@ -89,7 +89,7 @@ function CommentNode({ comment, onAddReply, maxDepth, depth }) {
   );
 }
 
-function NestedComments({ comments, onAddReply, maxDepth = 4 }) {
+const NestedComments = ({ comments, onAddReply, maxDepth = 4 }) => {
   return (
     <ul>
       {comments.map((comment) => (

@@ -8,13 +8,13 @@ interface StepDef {
   fields: FormFieldDef[];
 }
 
-function Wizard({
+const Wizard = ({
   steps,
   onSubmit,
 }: {
   steps: StepDef[];
   onSubmit: (values: Record<string, string>) => void;
-}): JSX.Element {
+}): JSX.Element => {
   const [index, setIndex] = useState<number>(0);
   const [values, setValues] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);

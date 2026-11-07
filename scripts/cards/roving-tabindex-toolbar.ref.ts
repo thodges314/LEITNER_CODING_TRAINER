@@ -3,13 +3,13 @@ interface ToolbarItem {
   label: string;
 }
 
-function Toolbar({
+const Toolbar = ({
   label,
   items,
 }: {
   label: string;
   items: ToolbarItem[];
-}): JSX.Element {
+}): JSX.Element => {
   const [active, setActive] = useState<number>(0);
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
 

@@ -1,4 +1,4 @@
-function getAllDescendantIds(node) {
+const getAllDescendantIds = (node) => {
   const ids = [node.id];
   if (node.children) {
     for (const child of node.children) {
@@ -6,9 +6,9 @@ function getAllDescendantIds(node) {
     }
   }
   return ids;
-}
+};
 
-function findNode(nodes, id) {
+const findNode = (nodes, id) => {
   for (const n of nodes) {
     if (n.id === id) return n;
     if (n.children) {
@@ -17,9 +17,9 @@ function findNode(nodes, id) {
     }
   }
   return null;
-}
+};
 
-function computeNodeStatus(node, checkedSet) {
+const computeNodeStatus = (node, checkedSet) => {
   if (!node.children || node.children.length === 0) {
     return checkedSet.has(node.id) ? 'checked' : 'unchecked';
   }
@@ -36,9 +36,9 @@ function computeNodeStatus(node, checkedSet) {
   if (checkedCount === node.children.length) return 'checked';
   if (checkedCount === 0 && !hasIndeterminate) return 'unchecked';
   return 'indeterminate';
-}
+};
 
-function useCheckboxTree(treeData, initialChecked = []) {
+const useCheckboxTree = (treeData, initialChecked = []) => {
   const [checkedIds, setCheckedIds] = React.useState(initialChecked);
 
   const checkedSet = React.useMemo(() => new Set(checkedIds), [checkedIds]);

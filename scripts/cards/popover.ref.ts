@@ -9,14 +9,14 @@ interface PopoverProps {
   title?: string;
 }
 
-function Popover({
+const Popover = ({
   trigger,
   content,
   placement = 'bottom',
   isOpen: controlledIsOpen,
   onToggle,
   title,
-}: PopoverProps): JSX.Element {
+}: PopoverProps): JSX.Element => {
   const [internalIsOpen, setInternalIsOpen] = useState<boolean>(false);
   const isControlled = controlledIsOpen !== undefined;
   const open = isControlled ? controlledIsOpen : internalIsOpen;
