@@ -7,7 +7,7 @@ const ResponsiveProductCard = ({ product, onAddToCart }) => {
     price,
     originalPrice,
     badge,
-    imageUrl = 'https://placehold.co/600x400/1e293b/94a3b8?text=Product',
+    imageUrl = '/keyboard-preview.svg',
     rating,
   } = product;
 

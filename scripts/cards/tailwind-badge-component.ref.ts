@@ -1,11 +1,22 @@
 type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 type BadgeSize = 'sm' | 'md';
 
+interface BadgeStyle {
+  classes: string;
+  dotColor: string;
+}
+
+interface SizeStyle {
+  classes: string;
+  dotSize: string;
+}
+
 interface BadgeProps {
   variant?: BadgeVariant;
   size?: BadgeSize;
   dot?: boolean;
   children?: any;
+  className?: string;
   [key: string]: any;
 }
 
@@ -14,9 +25,10 @@ const Badge = ({
   size = 'md',
   dot = false,
   children,
+  className = '',
   ...props
 }: BadgeProps): JSX.Element => {
-  const variantStyles: Record<BadgeVariant, { classes: string; dotColor: string }> = {
+  const variantStyles: Record<BadgeVariant, BadgeStyle> = {
     success: {
       classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
       dotColor: 'bg-emerald-400',
@@ -39,7 +51,7 @@ const Badge = ({
     },
   };
 
-  const sizeStyles: Record<BadgeSize, { classes: string; dotSize: string }> = {
+  const sizeStyles: Record<BadgeSize, SizeStyle> = {
     sm: {
       classes: 'text-xs px-2 py-0.5 gap-1',
       dotSize: 'h-1.5 w-1.5',
@@ -55,7 +67,14 @@ const Badge = ({
 
   const baseClasses =
     'inline-flex items-center font-medium rounded-full border transition-colors';
-  const containerClassName = `${baseClasses} ${activeVariant.classes} ${activeSize.classes}`;
+  const containerClassName = [
+    baseClasses,
+    activeVariant.classes,
+    activeSize.classes,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <span className={containerClassName} {...props}>
@@ -68,4 +87,4 @@ const Badge = ({
       {children}
     </span>
   );
-}
+};

@@ -1576,9 +1576,8 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     {
       name: 'imageUrl',
       type: 'string',
-      defaultValue:
-        'https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&auto=format&fit=crop&q=80',
-      placeholder: 'Image URL...',
+      defaultValue: '/keyboard-preview.svg',
+      placeholder: 'Image URL or path (e.g. /keyboard-preview.svg)...',
       description: 'Product cover photo source URL',
     },
     {

@@ -8,6 +8,7 @@ interface ButtonProps {
   disabled?: boolean;
   children?: any;
   onClick?: (event: any) => void;
+  className?: string;
   [key: string]: any;
 }
 
@@ -18,6 +19,7 @@ const Button = ({
   disabled = false,
   children,
   onClick,
+  className: extraClassName = '',
   ...props
 }: ButtonProps): JSX.Element => {
   const isDisabled = Boolean(disabled || loading);
@@ -45,7 +47,7 @@ const Button = ({
   const activeVariant = variantClasses[variant] || variantClasses.primary;
   const activeSize = sizeClasses[size] || sizeClasses.md;
 
-  const className = [baseClasses, activeVariant, activeSize, disabledClasses]
+  const className = [baseClasses, activeVariant, activeSize, disabledClasses, extraClassName]
     .filter(Boolean)
     .join(' ');
 

@@ -35,7 +35,7 @@ interface ResponsiveCardProps {
   - Container with `relative`.
   - Mobile layout: `w-full aspect-video`.
   - Desktop layout: `md:w-48 md:aspect-square md:shrink-0`.
-  - Child `<img>` with `w-full h-full object-cover` using `product.imageUrl` (fallback to `'https://placehold.co/600x400/1e293b/94a3b8?text=Product'` if omitted) and `alt={product.title}`.
+  - Child `<img>` with `w-full h-full object-cover` using `product.imageUrl` (fallback to `'/keyboard-preview.svg'` if omitted) and `alt={product.title}`.
   - If `product.badge` is provided, render an absolute overlay pill:
     - Position and styles: `absolute top-3 left-3 bg-indigo-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full`.
 - **Content Section**:

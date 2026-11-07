@@ -3,6 +3,7 @@ const Badge = ({
   size = 'md',
   dot = false,
   children,
+  className = '',
   ...props
 }) => {
   const variantStyles = {
@@ -44,7 +45,14 @@ const Badge = ({
 
   const baseClasses =
     'inline-flex items-center font-medium rounded-full border transition-colors';
-  const containerClassName = `${baseClasses} ${activeVariant.classes} ${activeSize.classes}`;
+  const containerClassName = [
+    baseClasses,
+    activeVariant.classes,
+    activeSize.classes,
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <span className={containerClassName} {...props}>
@@ -57,4 +65,4 @@ const Badge = ({
       {children}
     </span>
   );
-}
+};

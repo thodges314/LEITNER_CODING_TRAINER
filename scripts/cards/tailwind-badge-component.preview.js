@@ -14,11 +14,10 @@ function BadgePreview() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '140px', padding: '24px' }}>
       <Badge
-        key={`${variant}-${size}-${dot}`}
+        key={`${variant}-${size}-${dot}-${label}`}
         variant={variant}
         size={size}
         dot={Boolean(dot)}
-        className="cursor-pointer"
         onClick={() => {
           if (typeof log === 'function') log('onClick', { variant, size, label });
         }}
