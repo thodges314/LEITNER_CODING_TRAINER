@@ -1347,6 +1347,18 @@
     "difficulty": 3,
     "concept": "d3-force-graph"
   },
+  "tailwind-button-states": {
+    "difficulty": 2,
+    "concept": "tailwind-button"
+  },
+  "tailwind-cva-variants": {
+    "difficulty": 3,
+    "concept": "tailwind-cva"
+  },
+  "tailwind-merge-classes": {
+    "difficulty": 3,
+    "concept": "tailwind-merge"
+  },
   "tailwind-pricing-card": {
     "difficulty": 2,
     "concept": "tailwind-card"

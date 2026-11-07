@@ -83,9 +83,9 @@ To ensure optimal developer experience, readable problem prompts, and strict typ
 | **`graphql-server`**      |     14      |      14      |   100.0%   | **COMPLETE** (Batch 52: Server & Resolvers)            |
 | **`graphql`**             |      7      |       7      |   100.0%   | **COMPLETE** (Batch 54: Client Operations & SDL)       |
 | **`sql-postgres`**        |     15      |     15       |   100.0%   | **COMPLETE** (Batches 53, 55: Expanded Curriculum)     |
-| **`d3`**                  |     18      |     18       |   100.0%   | **COMPLETE** (Batches 60, 62–68: Complete D3 Track)    |
-| **`tailwind`**            |      3      |      3       |   100.0%   | **COMPLETE** (Batch 61: Modern Tailwind Design)        |
-| **TOTAL**                 |   **355**   |   **355**    | **100.0%** | **68 Batches Total (100% COMPLETE)**                  |
+| **`d3`**                  |     22      |     22       |   100.0%   | **COMPLETE** (Batches 60, 62–68: Complete D3 Track)    |
+| **`tailwind`**            |      6      |      6       |   100.0%   | **COMPLETE** (Batches 61, 69: Modern Tailwind Design)  |
+| **TOTAL**                 |   **362**   |   **362**    | **100.0%** | **69 Batches Total (100% COMPLETE)**                  |
 
 ---
 
