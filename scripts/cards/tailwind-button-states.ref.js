@@ -1,4 +1,4 @@
-function Button({
+const Button = ({
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -6,7 +6,7 @@ function Button({
   children,
   onClick,
   ...props
-}) {
+}) => {
   const isDisabled = Boolean(disabled || loading);
 
   const variantClasses = {

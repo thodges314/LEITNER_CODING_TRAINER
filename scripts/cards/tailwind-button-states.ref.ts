@@ -11,7 +11,7 @@ interface ButtonProps {
   [key: string]: any;
 }
 
-function Button({
+const Button = ({
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -19,7 +19,7 @@ function Button({
   children,
   onClick,
   ...props
-}: ButtonProps): JSX.Element {
+}: ButtonProps): JSX.Element => {
   const isDisabled = Boolean(disabled || loading);
 
   const variantClasses: Record<ButtonVariant, string> = {

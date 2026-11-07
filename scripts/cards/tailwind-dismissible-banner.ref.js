@@ -1,4 +1,4 @@
-function DismissibleBanner({ variant = 'info', title, message, onDismiss }) {
+const DismissibleBanner = ({ variant = 'info', title, message, onDismiss }) => {
   const [visible, setVisible] = useState(true);
 
   if (!visible) return null;

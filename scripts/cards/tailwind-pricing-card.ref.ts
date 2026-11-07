@@ -11,7 +11,7 @@ interface PricingCardProps {
   tier: PricingTier;
 }
 
-function PricingCard({ tier }: PricingCardProps): JSX.Element | null {
+const PricingCard = ({ tier }: PricingCardProps): JSX.Element | null => {
   if (!tier) return null;
   const {
     name,

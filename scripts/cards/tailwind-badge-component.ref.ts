@@ -9,13 +9,13 @@ interface BadgeProps {
   [key: string]: any;
 }
 
-function Badge({
+const Badge = ({
   variant = 'neutral',
   size = 'md',
   dot = false,
   children,
   ...props
-}: BadgeProps): JSX.Element {
+}: BadgeProps): JSX.Element => {
   const variantStyles: Record<BadgeVariant, { classes: string; dotColor: string }> = {
     success: {
       classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',

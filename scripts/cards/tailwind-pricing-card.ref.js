@@ -1,4 +1,4 @@
-function PricingCard({ tier }) {
+const PricingCard = ({ tier }) => {
   if (!tier) return null;
   const {
     name,

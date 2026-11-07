@@ -1,10 +1,10 @@
-function Badge({
+const Badge = ({
   variant = 'neutral',
   size = 'md',
   dot = false,
   children,
   ...props
-}) {
+}) => {
   const variantStyles = {
     success: {
       classes: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
