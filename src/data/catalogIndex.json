@@ -5381,5 +5381,53 @@
       "async"
     ],
     "summary": "Write a Next.js App Router Server Action for shopping cart quantity updates"
+  },
+  {
+    "id": "next-generate-metadata",
+    "title": "Dynamic Metadata: OpenGraph & SEO Generator",
+    "track": "nextjs",
+    "concept": "next-metadata",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "metadata",
+      "seo",
+      "opengraph",
+      "async"
+    ],
+    "summary": "Write an App Router generateMetadata function for a content publishing portal"
+  },
+  {
+    "id": "next-revalidation-tag-cache",
+    "title": "On-Demand ISR: Cache Tags & revalidateTag",
+    "track": "nextjs",
+    "concept": "next-cache-revalidation",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "caching",
+      "isr",
+      "revalidation",
+      "tags"
+    ],
+    "summary": "Implement an in-memory tagged cache manager mirroring Next.js App Router on-demand revalidation"
+  },
+  {
+    "id": "next-static-params-generator",
+    "title": "Static Route Matrix: generateStaticParams",
+    "track": "nextjs",
+    "concept": "next-static-params",
+    "difficulty": 2,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "ssg",
+      "static-generation",
+      "routing",
+      "algorithms"
+    ],
+    "summary": "Write a static route segment matrix generator for Next.js App Router"
   }
 ]

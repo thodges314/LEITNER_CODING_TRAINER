@@ -1,4 +1,8 @@
-const middleware = (request) => {
+interface MiddlewareMatcherConfig {
+  matcher: string[];
+}
+
+const middleware = (request: NextRequest): NextResponse => {
   const pathname = request.nextUrl.pathname;
 
   if (pathname.startsWith('/dashboard')) {

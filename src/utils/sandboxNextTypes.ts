@@ -180,5 +180,7 @@ export const SANDBOX_NEXT_TYPES = `
     robots?: string | { index?: boolean; follow?: boolean };
     [key: string]: any;
   }
+
+  declare var solution: any;
 `;
 

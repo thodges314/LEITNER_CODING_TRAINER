@@ -1526,5 +1526,17 @@
   "next-middleware-auth-redirect": {
     "difficulty": 3,
     "concept": "next-middleware"
+  },
+  "next-generate-metadata": {
+    "difficulty": 2,
+    "concept": "next-metadata"
+  },
+  "next-static-params-generator": {
+    "difficulty": 2,
+    "concept": "next-static-params"
+  },
+  "next-revalidation-tag-cache": {
+    "difficulty": 3,
+    "concept": "next-cache-revalidation"
   }
 }

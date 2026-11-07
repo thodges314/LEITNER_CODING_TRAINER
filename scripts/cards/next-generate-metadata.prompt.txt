@@ -1,0 +1,55 @@
+Write an App Router `generateMetadata` function for a content publishing portal:
+
+## Description
+
+### Application Context
+In a content and publishing portal (`app/articles/[category]/[slug]/page.tsx`), you are implementing the App Router `generateMetadata` export that queries article data and dynamically constructs search engine optimization (SEO) tags, canonical URLs, and OpenGraph social share previews.
+
+```ts
+interface PageProps {
+  params: { category: string; slug: string };
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
+interface ArticleRecord {
+  title: string;
+  summary: string;
+  thumbnailUrl?: string;
+  publishedAt: string;
+  author: string;
+}
+
+interface ArticleMetadata extends Metadata {
+  openGraph?: {
+    title: string;
+    description: string;
+    type?: string;
+    publishedTime?: string;
+    authors?: string[];
+    images?: Array<{ url: string; alt?: string }>;
+  };
+}
+```
+
+Assume an in-memory or injected store `articlesStore = new Map<string, ArticleRecord>()` indexed by `"${category}/${slug}"`:
+
+### `generateMetadata({ params, searchParams }: PageProps): Promise<ArticleMetadata>`
+
+- Constructs the article lookup key: `const key = `${params.category}/${params.slug}`.
+- Retrieves the article via `articlesStore.get(key)`.
+- **Missing Article (404 Fallback)**:
+  - If the article is not found in `articlesStore`:
+  - Returns `{ title: 'Article Not Found | Portal', description: 'The requested article could not be located.' }`.
+- **Found Article**:
+  - `title`: `"${article.title} | Portal"`
+  - `description`: `article.summary`
+  - `alternates`: `{ canonical: `https://example.com/articles/${params.category}/${params.slug}` }`
+  - `openGraph`:
+    - `title`: `article.title`
+    - `description`: `article.summary`
+    - `type`: `'article'`
+    - `publishedTime`: `article.publishedAt`
+    - `authors`: `[article.author]`
+    - `images`: If `article.thumbnailUrl` is present and non-empty, sets `[{ url: article.thumbnailUrl, alt: article.title }]`. Otherwise, sets `[]`.
+  - **Draft/Preview Robot Guard**:
+    - If `searchParams?.preview === 'true'`, adds `robots: { index: false, follow: false }` to prevent search crawlers from indexing unpublished drafts.

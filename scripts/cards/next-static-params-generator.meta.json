@@ -1,0 +1,13 @@
+{
+  "track": "nextjs",
+  "title": "Static Route Matrix: generateStaticParams",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "ssg",
+    "static-generation",
+    "routing",
+    "algorithms"
+  ],
+  "requiresDom": false
+}

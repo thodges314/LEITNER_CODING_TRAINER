@@ -1,8 +1,24 @@
-const updateCartQuantity = async (prevState, formData) => {
+interface ActionState {
+  success: boolean;
+  errors?: {
+    itemId?: string;
+    quantity?: string;
+  };
+  cart?: {
+    itemId: string;
+    quantity: number;
+    total: number;
+  };
+}
+
+const updateCartQuantity = async (
+  prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> => {
   const itemId = formData.get('itemId');
   const quantityRaw = formData.get('quantity');
 
-  const errors = {};
+  const errors: NonNullable<ActionState['errors']> = {};
 
   if (!itemId || typeof itemId !== 'string' || itemId.trim().length === 0) {
     errors.itemId = 'Item ID is required';
