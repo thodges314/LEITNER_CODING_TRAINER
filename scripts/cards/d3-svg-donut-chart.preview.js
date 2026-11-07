@@ -1,8 +1,8 @@
 const DEFAULT_DATA = [
-  { label: 'React', value: 40, color: '#38bdf8' },
-  { label: 'Vue', value: 25, color: '#4ade80' },
-  { label: 'Svelte', value: 20, color: '#fb923c' },
-  { label: 'Angular', value: 15, color: '#f87171' },
+  { label: 'React', value: 40, color: 'steelblue' },
+  { label: 'Vue', value: 25, color: 'seagreen' },
+  { label: 'Svelte', value: 20, color: 'orange' },
+  { label: 'Angular', value: 15, color: 'crimson' },
 ];
 
 (function () {

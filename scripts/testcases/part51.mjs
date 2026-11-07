@@ -184,9 +184,9 @@ export default {
   ],
   'd3-svg-bar-chart': [
     r(
-      'Appends SVG container with correct dimensions, role, and aria-label',
+      'Appends SVG container with correct dimensions',
       'renderBarChart(container, SAMPLE_DATA, { width: 500, height: 300 })',
-      'SVG rendered with width="500", height="300", role="img", aria-label="Bar chart"',
+      'SVG rendered with width="500", height="300"',
       { callSignature: 'renderBarChart(container, data, { width: 500, height: 300 })' }
     ),
     r(
@@ -196,9 +196,9 @@ export default {
       { callSignature: 'renderBarChart(container, data, options)' }
     ),
     r(
-      'Renders bar elements with data attributes, proportional heights, and color',
+      'Renders bar elements with proportional heights and color',
       'inspect rect.bar elements',
-      'rects render with data-label, data-value, data-index, fill="teal", and proportional heights',
+      'rects render with fill="teal" and proportional heights',
       { callSignature: 'container.querySelectorAll("rect.bar")' }
     ),
     r(
@@ -222,9 +222,9 @@ export default {
   ],
   'd3-svg-line-chart': [
     r(
-      'Mounts SVG container with ARIA attributes and chart-area grouping',
+      'Mounts SVG container with chart-area grouping',
       'renderLineChart(container, SAMPLE_POINTS, { width: 450, height: 280 })',
-      'SVG rendered with width="450", height="280", role="img", aria-label="Line chart"',
+      'SVG rendered with width="450", height="280", and chart-area group',
       { callSignature: 'renderLineChart(container, points, { width: 450, height: 280 })' }
     ),
     r(
@@ -234,9 +234,9 @@ export default {
       { callSignature: 'container.querySelector("path.chart-line")' }
     ),
     r(
-      'Renders data point markers with coordinates and data attributes',
+      'Renders data point markers with scaled coordinates',
       'inspect circle.chart-point elements',
-      'circles render with data-x, data-y, data-index, and inverted Y coordinate scaling',
+      'circles render with inverted Y coordinate scaling',
       { callSignature: 'container.querySelectorAll("circle.chart-point")' }
     ),
     r(
@@ -260,9 +260,9 @@ export default {
   ],
   'd3-svg-donut-chart': [
     r(
-      'Appends SVG container with correct dimensions, role, and aria-label',
+      'Appends SVG container with correct dimensions',
       'renderDonutChart(container, SAMPLE_DATA, { width: 480, height: 320 })',
-      'SVG rendered with width="480", height="320", role="img", aria-label="Donut chart"',
+      'SVG rendered with width="480", height="320"',
       { callSignature: 'renderDonutChart(container, data, { width: 480, height: 320 })' }
     ),
     r(
@@ -272,9 +272,9 @@ export default {
       { callSignature: 'renderDonutChart(container, data, options)' }
     ),
     r(
-      'Renders arc slice paths with data attributes and fill colors',
+      'Renders arc slice paths with valid d curves and fill colors',
       'inspect path.arc-slice elements',
-      'slices render with data-label, data-value, data-index, valid d path, and fill colors',
+      'slices render with valid d path and fill colors',
       { callSignature: 'container.querySelectorAll("path.arc-slice")' }
     ),
     r(
@@ -298,9 +298,9 @@ export default {
   ],
   'd3-svg-scatter-plot': [
     r(
-      'Appends SVG canvas with dimensions, role, and aria-label',
+      'Appends SVG canvas with correct dimensions',
       'renderScatterPlot(container, SAMPLE_POINTS, { width: 500, height: 350 })',
-      'SVG rendered with width="500", height="350", role="img", aria-label="Scatter plot"',
+      'SVG rendered with width="500", height="350"',
       { callSignature: 'renderScatterPlot(container, points, { width: 500, height: 350 })' }
     ),
     r(
@@ -310,9 +310,9 @@ export default {
       { callSignature: 'renderScatterPlot(container, points, options)' }
     ),
     r(
-      'Renders scatter dot circles with coordinate attributes and fill color',
+      'Renders scatter dot circles with scaled coordinates and fill color',
       'inspect circle.scatter-dot elements',
-      'circles render with data-x, data-y, data-index, fill="purple", and inverted Y scaling',
+      'circles render with fill="purple" and inverted Y scaling',
       { callSignature: 'container.querySelectorAll("circle.scatter-dot")' }
     ),
     r(

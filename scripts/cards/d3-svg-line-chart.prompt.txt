@@ -62,7 +62,7 @@ interface LineChartInstance {
   - `destroy()`: Cleanup method that empties the container and removes event handlers.
 
 - **DOM Contract & Requirements**:
-  - Root `<svg>` must have attributes `width={width}`, `height={height}`, `role="img"`, and `aria-label="Line chart"`.
+  - Root `<svg>` must have attributes `width={width}` and `height={height}`.
   - Chart area group `<g class="chart-area">` translated to `translate(margin.left, margin.top)`.
   - Inner width = `width - margin.left - margin.right`, inner height = `height - margin.top - margin.bottom`.
   - Generates `<path class="chart-line">`:
@@ -71,9 +71,6 @@ interface LineChartInstance {
     - `stroke`: `strokeColor`.
     - `stroke-width`: `strokeWidth`.
   - When `showPoints` is `true` (default), appends a `<circle class="chart-point">` for each datum:
-    - `data-x`: string of `d.x`.
-    - `data-y`: string of `d.y`.
-    - `data-index`: 0-indexed position.
     - `cx`: `xScale(d.x)`.
     - `cy`: `yScale(d.y)`.
     - `r`: `4`.

@@ -41,7 +41,6 @@ The function mounts into `container` and returns an object containing the root `
 - **Canvas & Dimensions**:
   - Empties `container.innerHTML` before rendering.
   - Appends an `<svg>` element with `width` and `height` attributes (default `width: 450`, `height: 300`).
-  - Sets `role="img"` and `aria-label="Scatter plot"`.
   - Margin defaults: `{ top: 20, right: 20, bottom: 40, left: 40 }`.
   - Computes `innerWidth = width - margin.left - margin.right` and `innerHeight = height - margin.top - margin.bottom`.
   - Appends `<g class="chart-area">` translated to `translate(margin.left, margin.top)`.
@@ -59,7 +58,6 @@ The function mounts into `container` and returns an object containing the root `
   - Positions each circle at `cx = xScale(d.x)` and `cy = yScale(d.y)`.
   - Radius `r` is `d.radius || defaultRadius || 5`.
   - Fill color defaults to `options.color || 'steelblue'`.
-  - Sets data attributes: `data-x="d.x"`, `data-y="d.y"`, and `data-index="index"`. If `d.label` is provided, also sets `data-label="d.label"`.
   - Clicking a dot invokes `options.onSelectPoint(d, index)` if provided.
 
 - **Lifecycle & Edge Cases**:

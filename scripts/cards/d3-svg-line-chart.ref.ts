@@ -56,9 +56,7 @@ function renderLineChart(
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Line chart');
+    .attr('height', height);
 
   const g = svg
     .append('g')
@@ -99,12 +97,8 @@ function renderLineChart(
   if (showPoints) {
     g.selectAll('circle.chart-point')
       .data(data)
-      .enter()
-      .append('circle')
+      .join('circle')
       .attr('class', 'chart-point')
-      .attr('data-x', (d: LinePoint) => d.x)
-      .attr('data-y', (d: LinePoint) => d.y)
-      .attr('data-index', (_: any, i: number) => i)
       .attr('cx', (d: LinePoint) => xScale(d.x))
       .attr('cy', (d: LinePoint) => yScale(d.y))
       .attr('r', 4)

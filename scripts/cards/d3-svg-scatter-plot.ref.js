@@ -18,9 +18,7 @@ function renderScatterPlot(container, data, options = {}) {
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Scatter plot');
+    .attr('height', height);
 
   const g = svg
     .append('g')
@@ -57,21 +55,12 @@ function renderScatterPlot(container, data, options = {}) {
 
   g.selectAll('circle.scatter-dot')
     .data(points)
-    .enter()
-    .append('circle')
+    .join('circle')
     .attr('class', 'scatter-dot')
     .attr('cx', (d) => xScale(d.x))
     .attr('cy', (d) => yScale(d.y))
     .attr('r', (d) => d.radius || defaultRadius)
     .attr('fill', color)
-    .attr('data-x', (d) => String(d.x))
-    .attr('data-y', (d) => String(d.y))
-    .attr('data-index', (_, i) => String(i))
-    .each(function (d) {
-      if (d.label !== undefined) {
-        d3.select(this).attr('data-label', d.label);
-      }
-    })
     .on('click', function (_, d) {
       if (typeof onSelectPoint === 'function') {
         const index = points.indexOf(d);

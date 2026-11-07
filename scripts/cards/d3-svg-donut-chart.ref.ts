@@ -38,9 +38,7 @@ function renderDonutChart(
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Donut chart');
+    .attr('height', height);
 
   const g = svg
     .append('g')
@@ -61,13 +59,9 @@ function renderDonutChart(
 
   g.selectAll('path.arc-slice')
     .data(pieData)
-    .enter()
-    .append('path')
+    .join('path')
     .attr('class', 'arc-slice')
     .attr('d', arc)
-    .attr('data-label', (d: any) => d.data.label)
-    .attr('data-value', (d: any) => String(d.data.value))
-    .attr('data-index', (_: any, i: number) => String(i))
     .attr('fill', (d: any, i: number) => d.data.color || d3.schemeCategory10[i % 10])
     .on('click', function (_: any, d: any) {
       if (typeof onSelectSlice === 'function') {

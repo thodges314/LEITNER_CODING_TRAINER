@@ -23,9 +23,7 @@ function renderBarChart(container, data = [], options = {}) {
     .select(container)
     .append('svg')
     .attr('width', width)
-    .attr('height', height)
-    .attr('role', 'img')
-    .attr('aria-label', 'Bar chart');
+    .attr('height', height);
 
   const g = svg
     .append('g')
@@ -58,12 +56,8 @@ function renderBarChart(container, data = [], options = {}) {
 
   g.selectAll('rect.bar')
     .data(data)
-    .enter()
-    .append('rect')
+    .join('rect')
     .attr('class', 'bar')
-    .attr('data-label', (d) => d.label)
-    .attr('data-value', (d) => d.value)
-    .attr('data-index', (_, i) => i)
     .attr('x', (d) => xScale(d.label) ?? 0)
     .attr('y', (d) => yScale(d.value))
     .attr('width', xScale.bandwidth())
