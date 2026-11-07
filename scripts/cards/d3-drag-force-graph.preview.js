@@ -48,45 +48,31 @@ const DEFAULT_FORCE_GRAPH_DATA = {
     }
     container.innerHTML = '';
 
-    const wrapper = document.createElement('div');
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'column';
-    wrapper.style.gap = '6px';
-
-    const statusBar = document.createElement('div');
-    statusBar.style.fontSize = '12px';
-    statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = 'slategray';
-    statusBar.textContent = 'Drag nodes to reheat physics and reposition | Click a node to inspect';
-
-    const chartBox = document.createElement('div');
-    wrapper.appendChild(statusBar);
-    wrapper.appendChild(chartBox);
-    container.appendChild(wrapper);
-
-    try {
-      instance = renderForceDirectedGraph(chartBox, DEFAULT_FORCE_GRAPH_DATA, {
-        width: props.width ?? 460,
-        height: props.height ?? 280,
-        nodeRadius: props.nodeRadius ?? 8,
-        chargeStrength: props.chargeStrength ?? -120,
-        linkDistance: props.linkDistance ?? 50,
-        onNodeClick: node => {
-          statusBar.textContent = `Selected Node: "${node.id}" (group: ${node.group ?? 1})`;
-        },
-      });
-    } catch (err) {
-      chartBox.innerHTML = `<div style="color: crimson; font-family: monospace; font-size: 12px; padding: 12px;">Error: ${err.message}</div>`;
-    }
+    instance = renderForceDirectedGraph(container, DEFAULT_FORCE_GRAPH_DATA, {
+      width: Number(props.width) || 460,
+      height: Number(props.height) || 280,
+      nodeRadius: Number(props.nodeRadius) || 8,
+      chargeStrength: Number(props.chargeStrength) || -120,
+      linkDistance: Number(props.linkDistance) || 50,
+      onNodeClick: function (node) {
+        if (typeof log === 'function') log('nodeClick', node.id);
+      },
+    });
   }
 
   render(currentProps);
 
-  window.addEventListener('message', event => {
+  if (typeof window !== 'undefined' && typeof window.__onPreviewPropsChange === 'function') {
+    window.__onPreviewPropsChange(function (newProps) {
+      currentProps = Object.assign({}, currentProps, newProps);
+      render(currentProps);
+    });
+  }
+
+  window.addEventListener('message', function (event) {
     if (event.data && event.data.type === 'UPDATE_PROPS') {
       currentProps = Object.assign({}, currentProps, event.data.props);
       render(currentProps);
     }
   });
 })();
-

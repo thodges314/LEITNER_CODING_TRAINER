@@ -41,44 +41,33 @@ const DEFAULT_ZOOM_POINTS = [
     }
     container.innerHTML = '';
 
-    const wrapper = document.createElement('div');
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'column';
-    wrapper.style.gap = '6px';
-
-    const statusBar = document.createElement('div');
-    statusBar.style.fontSize = '12px';
-    statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = 'slategray';
-    statusBar.textContent = 'Zoom: 1.00x | Offset: (0, 0) — Scroll wheel or drag to zoom/pan';
-
-    const chartBox = document.createElement('div');
-    wrapper.appendChild(statusBar);
-    wrapper.appendChild(chartBox);
-    container.appendChild(wrapper);
-
-    try {
-      instance = renderZoomChart(chartBox, DEFAULT_ZOOM_POINTS, {
-        width: props.width ?? 460,
-        height: props.height ?? 250,
-        color: props.color ?? 'steelblue',
-        scaleExtent: [props.scaleExtentMin ?? 1, props.scaleExtentMax ?? 8],
-        onZoomChange: state => {
-          statusBar.textContent = `Zoom: ${state.k.toFixed(2)}x | Offset: (${Math.round(state.x)}, ${Math.round(state.y)})`;
-        },
-      });
-    } catch (err) {
-      chartBox.innerHTML = `<div style="color: crimson; font-family: monospace; font-size: 12px; padding: 12px;">Error: ${err.message}</div>`;
-    }
+    instance = renderZoomChart(container, DEFAULT_ZOOM_POINTS, {
+      width: Number(props.width) || 460,
+      height: Number(props.height) || 250,
+      color: props.color || 'steelblue',
+      scaleExtent: [
+        Number(props.scaleExtentMin) || 1,
+        Number(props.scaleExtentMax) || 8,
+      ],
+      onZoomChange: function (state) {
+        if (typeof log === 'function') log('zoomChange', state);
+      },
+    });
   }
 
   render(currentProps);
 
-  window.addEventListener('message', event => {
+  if (typeof window !== 'undefined' && typeof window.__onPreviewPropsChange === 'function') {
+    window.__onPreviewPropsChange(function (newProps) {
+      currentProps = Object.assign({}, currentProps, newProps);
+      render(currentProps);
+    });
+  }
+
+  window.addEventListener('message', function (event) {
     if (event.data && event.data.type === 'UPDATE_PROPS') {
       currentProps = Object.assign({}, currentProps, event.data.props);
       render(currentProps);
     }
   });
 })();
-

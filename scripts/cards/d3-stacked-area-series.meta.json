@@ -3,6 +3,9 @@
   "title": "D3 Stacked Area Series (Baselines & Layers)",
   "track": "d3",
   "rendersComponent": true,
+  "previewLibraries": [
+    "d3"
+  ],
   "tags": [
     "d3",
     "stack",

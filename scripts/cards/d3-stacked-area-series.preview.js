@@ -31,44 +31,30 @@ const DEFAULT_MONTHLY_METRICS = [
     }
     container.innerHTML = '';
 
-    const wrapper = document.createElement('div');
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'column';
-    wrapper.style.gap = '6px';
-
-    const statusBar = document.createElement('div');
-    statusBar.style.fontSize = '12px';
-    statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = 'slategray';
-    statusBar.textContent = 'Click on any stacked area layer to select';
-
-    const chartBox = document.createElement('div');
-    wrapper.appendChild(statusBar);
-    wrapper.appendChild(chartBox);
-    container.appendChild(wrapper);
-
-    try {
-      instance = renderStackedAreaChart(chartBox, DEFAULT_MONTHLY_METRICS, {
-        width: props.width ?? 460,
-        height: props.height ?? 260,
-        keys: props.keys ?? ['desktop', 'mobile', 'tablet'],
-        colors: props.colors ?? ['steelblue', 'seagreen', 'orange'],
-        onSelectLayer: (key, index) => {
-          statusBar.textContent = `Selected Layer: "${key}" (index: ${index})`;
-        },
-      });
-    } catch (err) {
-      chartBox.innerHTML = `<div style="color: crimson; font-family: monospace; font-size: 12px; padding: 12px;">Error: ${err.message}</div>`;
-    }
+    instance = renderStackedAreaChart(container, DEFAULT_MONTHLY_METRICS, {
+      width: Number(props.width) || 460,
+      height: Number(props.height) || 260,
+      keys: props.keys || ['desktop', 'mobile', 'tablet'],
+      colors: props.colors || ['steelblue', 'seagreen', 'orange'],
+      onSelectLayer: function (key, index) {
+        if (typeof log === 'function') log('selectLayer', key, index);
+      },
+    });
   }
 
   render(currentProps);
 
-  window.addEventListener('message', event => {
+  if (typeof window !== 'undefined' && typeof window.__onPreviewPropsChange === 'function') {
+    window.__onPreviewPropsChange(function (newProps) {
+      currentProps = Object.assign({}, currentProps, newProps);
+      render(currentProps);
+    });
+  }
+
+  window.addEventListener('message', function (event) {
     if (event.data && event.data.type === 'UPDATE_PROPS') {
       currentProps = Object.assign({}, currentProps, event.data.props);
       render(currentProps);
     }
   });
 })();
-
