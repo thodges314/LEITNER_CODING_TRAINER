@@ -57,18 +57,15 @@ function Badge({
     'inline-flex items-center font-medium rounded-full border transition-colors';
   const containerClassName = `${baseClasses} ${activeVariant.classes} ${activeSize.classes}`;
 
-  return React.createElement(
-    'span',
-    {
-      className: containerClassName,
-      ...props,
-    },
-    dot &&
-      React.createElement('span', {
-        className: `rounded-full shrink-0 ${activeSize.dotSize} ${activeVariant.dotColor}`,
-        'aria-hidden': 'true',
-      }),
-    children
+  return (
+    <span className={containerClassName} {...props}>
+      {dot && (
+        <span
+          className={`rounded-full shrink-0 ${activeSize.dotSize} ${activeVariant.dotColor}`}
+          aria-hidden="true"
+        />
+      )}
+      {children}
+    </span>
   );
 }
-
