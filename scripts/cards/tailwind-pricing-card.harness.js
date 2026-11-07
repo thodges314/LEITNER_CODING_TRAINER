@@ -1,82 +1,109 @@
-function parseHtml(html) {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  return div.firstElementChild;
-}
+const { render } = $dom;
 
+// 1. Basic non-popular tier renders semantic article with slate border and features list
 {
-  const card = parseHtml(renderPricingCard({
-    name: 'Starter',
-    price: 15,
-    features: ['1 Project', 'Community Support'],
-  }));
+  const r = render(
+    <PricingCard
+      tier={{
+        name: 'Starter',
+        price: 15,
+        features: ['1 Project', 'Community Support'],
+      }}
+    />
+  );
+  const card = r.container.querySelector('article');
 
-  const hasArticle = card && card.tagName.toLowerCase() === 'article';
-  const hasSlateBorder = card && card.classList.contains('border-slate-700');
-  const hasName = card && card.querySelector('h3') && card.querySelector('h3').textContent.includes('Starter');
-  const hasPrice = card && card.textContent.includes('$15') && card.textContent.includes('/mo');
-  const hasCta = card && card.querySelector('button') && card.querySelector('button').textContent === 'Get Started';
-  const hasButtonSlate = card && card.querySelector('button') && card.querySelector('button').classList.contains('bg-slate-800');
+  const hasArticle = card !== null && card.tagName.toLowerCase() === 'article';
+  const hasSlateBorder = card !== null && card.classList.contains('border-slate-700');
+  const hasName = card !== null && card.querySelector('h3')?.textContent.includes('Starter');
+  const hasPrice = card !== null && card.textContent.includes('$15') && card.textContent.includes('/mo');
+  const hasCta = card !== null && card.querySelector('button')?.textContent === 'Get Started';
+  const hasButtonSlate = card !== null && card.querySelector('button')?.classList.contains('bg-slate-800');
 
   $test.check(
     'Basic non-popular tier renders semantic article with slate border and features list',
-    hasArticle && hasSlateBorder && hasName && hasPrice && hasCta && hasButtonSlate,
+    Boolean(hasArticle && hasSlateBorder && hasName && hasPrice && hasCta && hasButtonSlate),
     { hasArticle, hasSlateBorder, hasName, hasPrice, hasCta }
   );
+  r.unmount();
 }
 
+// 2. Popular tier renders popular badge and indigo ring styling
 {
-  const card = parseHtml(renderPricingCard({
-    name: 'Pro',
-    price: 49,
-    popular: true,
-    features: ['Unlimited Projects', 'Priority 24/7 Support'],
-  }));
+  const r = render(
+    <PricingCard
+      tier={{
+        name: 'Pro',
+        price: 49,
+        popular: true,
+        features: ['Unlimited Projects', 'Priority 24/7 Support'],
+      }}
+    />
+  );
+  const card = r.container.querySelector('article');
 
-  const hasIndigoRing = card && card.classList.contains('border-indigo-500') && card.classList.contains('ring-2');
-  const badge = card && card.querySelector('span.bg-indigo-500');
-  const hasBadgeText = badge && badge.textContent === 'Most Popular';
-  const button = card && card.querySelector('button');
-  const hasButtonIndigo = button && button.classList.contains('bg-indigo-600');
+  const hasIndigoRing =
+    card !== null &&
+    card.classList.contains('border-indigo-500') &&
+    card.classList.contains('ring-2');
+  const badge = card?.querySelector('span.bg-indigo-500');
+  const hasBadgeText = badge !== null && badge.textContent === 'Most Popular';
+  const button = card?.querySelector('button');
+  const hasButtonIndigo = button !== null && button.classList.contains('bg-indigo-600');
 
   $test.check(
     'Popular tier renders popular badge and indigo ring styling',
-    hasIndigoRing && Boolean(hasBadgeText) && hasButtonIndigo,
-    { hasIndigoRing, hasBadgeText, hasButtonIndigo }
+    Boolean(hasIndigoRing && hasBadgeText && hasButtonIndigo),
+    { hasIndigoRing, hasBadgeText: Boolean(hasBadgeText), hasButtonIndigo }
   );
+  r.unmount();
 }
 
+// 3. Applies custom period and custom CTA text correctly
 {
-  const card = parseHtml(renderPricingCard({
-    name: 'Enterprise',
-    price: 999,
-    period: '/year',
-    features: ['Custom SLA'],
-    ctaText: 'Contact Sales',
-  }));
+  const r = render(
+    <PricingCard
+      tier={{
+        name: 'Enterprise',
+        price: 999,
+        period: '/year',
+        features: ['Custom SLA'],
+        ctaText: 'Contact Sales',
+      }}
+    />
+  );
+  const card = r.container.querySelector('article');
 
-  const hasCustomPeriod = card && card.textContent.includes('/year');
-  const ctaBtn = card && card.querySelector('button');
-  const hasCustomCta = ctaBtn && ctaBtn.textContent === 'Contact Sales';
+  const hasCustomPeriod = card !== null && card.textContent.includes('/year');
+  const ctaBtn = card?.querySelector('button');
+  const hasCustomCta = ctaBtn !== null && ctaBtn.textContent === 'Contact Sales';
 
   $test.check(
     'Applies custom period and custom CTA text correctly',
-    hasCustomPeriod && hasCustomCta,
+    Boolean(hasCustomPeriod && hasCustomCta),
     { hasCustomPeriod, hasCustomCta }
   );
+  r.unmount();
 }
 
+// 4. Renders empty features list gracefully without extra items
 {
-  const card = parseHtml(renderPricingCard({
-    name: 'Free',
-    price: 0,
-    features: [],
-  }));
-
+  const r = render(
+    <PricingCard
+      tier={{
+        name: 'Free',
+        price: 0,
+        features: [],
+      }}
+    />
+  );
+  const card = r.container.querySelector('article');
   const listItems = card ? card.querySelectorAll('ul li') : [];
+
   $test.check(
     'Renders empty features list gracefully without extra items',
     listItems.length === 0,
     { itemsCount: listItems.length }
   );
+  r.unmount();
 }

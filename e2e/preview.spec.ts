@@ -507,7 +507,7 @@ test.describe('React preview window', () => {
     expect(hasReact).toBe(false);
   });
 
-  test('tailwind-pricing-card: displays "Live Preview Window", loads Tailwind without React, and renders pricing card', async ({ page }) => {
+  test('tailwind-pricing-card: displays "Live Preview Window", loads React and Tailwind, and renders pricing card', async ({ page }) => {
     const card = topics.find((t) => t.id === 'tailwind-pricing-card');
     expect(card).toBeDefined();
     const solution = card?.referenceSolution || card?.solution || '';
@@ -534,9 +534,9 @@ test.describe('React preview window', () => {
     });
     expect(hasTailwindCdn).toBe(true);
 
-    // Verify React is NOT loaded in vanilla Tailwind preview
+    // Verify React is loaded in React + Tailwind preview
     const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
-    expect(hasReact).toBe(false);
+    expect(hasReact).toBe(true);
   });
 
   test('tailwind-dismissible-banner: loads React and Tailwind, renders alert banner, and dismisses on click', async ({ page }) => {

@@ -4706,12 +4706,11 @@
     "difficulty": 2,
     "tags": [
       "tailwind",
-      "html",
+      "react",
       "responsive",
-      "css",
       "card"
     ],
-    "summary": "Implement a function that renders a responsive pricing card HTML string styled with Tailwind CSS utility classes"
+    "summary": "interface PricingTier {"
   },
   {
     "id": "tailwind-metric-card",
