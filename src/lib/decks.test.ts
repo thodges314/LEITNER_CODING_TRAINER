@@ -23,13 +23,14 @@ describe('preset decks architecture', () => {
     localStorage.clear();
   });
 
-  it('declares 4 built-in preset decks', () => {
+  it('declares 5 built-in preset decks', () => {
     const decks = getBuiltInDecks();
     expect(decks.map((d) => d.id)).toEqual([
       'full-library',
       'full-stack',
       'frontend-specialist',
       'algorithms',
+      'data-scaling-streams',
     ]);
   });
 
@@ -76,6 +77,20 @@ describe('preset decks architecture', () => {
     expect(advCount).toBeGreaterThan(0);
     expect(utilCount).toBeGreaterThan(0);
     expect(algo).toHaveLength(coreCount + advCount + utilCount);
+  });
+
+  it('Data Scaling & Streams contains target scaling, streaming, and batching cards', () => {
+    const scaling = filterCardsByDeck(cards, 'data-scaling-streams');
+    expect(scaling.length).toBeGreaterThanOrEqual(16);
+    const ids = new Set(scaling.map((c) => c.id));
+    expect(ids.has('stream-event-micro-batcher')).toBe(true);
+    expect(ids.has('web-stream-transform-pipeline')).toBe(true);
+    expect(ids.has('chunked-batch-pipeline')).toBe(true);
+    expect(ids.has('stream-token-bucket-shaper')).toBe(true);
+    expect(ids.has('k-way-stream-merger')).toBe(true);
+    expect(ids.has('async-generator-pagination')).toBe(true);
+    expect(ids.has('graphql-relay-pagination-merger')).toBe(true);
+    expect(ids.has('node-stream-backpressure-pipe')).toBe(true);
   });
 
   it('aliases legacy core-algorithms and advanced-algorithms to unified algorithms deck', () => {

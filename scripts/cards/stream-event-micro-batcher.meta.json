@@ -1,0 +1,12 @@
+{
+  "title": "Stream Event Micro-Batcher (Size & Time Window)",
+  "track": "async-js",
+  "tags": [
+    "async",
+    "streams",
+    "batching",
+    "scaling",
+    "performance"
+  ],
+  "requiresDom": false
+}

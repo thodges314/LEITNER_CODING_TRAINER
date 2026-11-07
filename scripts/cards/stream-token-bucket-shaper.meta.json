@@ -1,0 +1,7 @@
+{
+  "title": "Token Bucket Rate Shaper",
+  "track": "async-js",
+  "tags": ["async", "rate-limiting", "streams", "token-bucket", "algorithms", "performance"],
+  "difficulty": 4,
+  "concept": "Token-bucket traffic shaping algorithm for rate-limiting asynchronous event streams and API requests"
+}

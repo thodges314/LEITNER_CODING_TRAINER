@@ -26,6 +26,25 @@ export const ALGORITHMIC_UTILITY_CONCEPTS: ReadonlySet<string> = new Set<string>
   'lru',
 ]);
 
+export const DATA_SCALING_CARD_IDS: ReadonlySet<string> = new Set<string>([
+  'async-generator-pagination',
+  'promise-pool',
+  'async-queue-scheduler',
+  'graphql-dataloader-batching',
+  'graphql-query-complexity-calculator',
+  'graphql-relay-pagination-merger',
+  'graphql-relay-connection-builder',
+  'node-stream-backpressure-pipe',
+  'node-ndjson-stream-splitter',
+  'node-length-prefixed-ipc-framing',
+  'node-worker-pool-dispatcher',
+  'stream-event-micro-batcher',
+  'web-stream-transform-pipeline',
+  'chunked-batch-pipeline',
+  'stream-token-bucket-shaper',
+  'k-way-stream-merger',
+]);
+
 export interface DeckPreset {
   id: string;
   name: string;
@@ -79,6 +98,22 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
       card.track === 'algorithms' ||
       card.track === 'advanced-algorithms' ||
       (card.track === 'js-utilities' && ALGORITHMIC_UTILITY_CONCEPTS.has(card.concept ?? '')),
+  },
+  {
+    id: 'data-scaling-streams',
+    name: 'Data Scaling & Streams',
+    description: 'High-throughput data streaming, memory-bounded pagination, reactive event batching, Web Streams pipelines, and flow-control backpressure',
+    isBuiltIn: true,
+    filter: (card) => {
+      const tags = card.tags || [];
+      return (
+        DATA_SCALING_CARD_IDS.has(card.id) ||
+        tags.includes('streams') ||
+        tags.includes('scaling') ||
+        tags.includes('batching') ||
+        tags.includes('backpressure')
+      );
+    },
   },
 ];
 

@@ -1,0 +1,32 @@
+Implement an external K-way merge for sorted asynchronous iterables using a Min-Heap:
+
+## Description
+
+In distributed data pipelines and external sorting, data sets are too large to fit in memory all at once. Instead, pre-sorted shards or streams are merged on the fly. By maintaining a Min-Heap of size $K$ (where $K$ is the number of streams), the pipeline continuously emits the smallest element across all active streams in $O(N \log K)$ overall time and strictly $O(K)$ auxiliary memory, never buffering more than one item per stream.
+
+```ts
+type CompareFn<T> = (a: T, b: T) => number;
+```
+
+### `mergeKAsyncStreams<T>(streams: AsyncIterable<T>[], compareFn?: CompareFn<T>): AsyncGenerator<T, void, unknown>`
+
+Merges $K$ pre-sorted asynchronous iterables into a single globally sorted `AsyncGenerator`:
+
+- **Comparator**:
+  - `compareFn`: Optional comparison function returning negative if `a < b`, zero if equal, positive if `a > b`.
+  - If omitted, defaults to standard natural comparison: `(a, b) => (a < b ? -1 : a > b ? 1 : 0)`.
+- **Initialization**:
+  - Obtains the asynchronous iterator for each input stream via `Symbol.asyncIterator`.
+  - Concurrently fetches the first item from each non-empty stream.
+  - Builds an internal Min-Heap containing `{ value, streamIndex, iterator }` nodes.
+- **Continuous Merge Loop**:
+  - While the heap is non-empty:
+    - Extracts the root node (the minimum item according to `compareFn`).
+    - `yield`s its `value`.
+    - Pulls the next item from that node's iterator (`iterator.next()`).
+    - If the iterator is not done (`!done`), re-inserts the updated node into the heap (or sifts down).
+    - If the iterator is done, that stream is exhausted and discarded; heap size decreases by 1.
+- **Space & Memory Guarantee**:
+  - Auxiliary memory is strictly bounded by $O(K)$; at most one active item per input stream is retained in the heap at any point.
+- **Edge Cases**:
+  - If `streams` is empty or all input streams yield zero elements, the generator completes immediately without emitting values.
