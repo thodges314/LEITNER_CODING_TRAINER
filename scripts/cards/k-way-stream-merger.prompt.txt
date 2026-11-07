@@ -30,3 +30,4 @@ Merges $K$ pre-sorted asynchronous iterables into a single globally sorted `Asyn
   - Auxiliary memory is strictly bounded by $O(K)$; at most one active item per input stream is retained in the heap at any point.
 - **Edge Cases**:
   - If `streams` is empty or all input streams yield zero elements, the generator completes immediately without emitting values.
+

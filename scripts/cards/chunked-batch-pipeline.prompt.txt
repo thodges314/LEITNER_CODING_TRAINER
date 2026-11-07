@@ -41,3 +41,4 @@ Processes an array of items in successive batches of `options.batchSize`, runnin
   - On fulfillment, stores the returned value at `results[i]` and increments `successfulCount`.
 - **Edge Cases**:
   - Empty `items` array resolves with `{ results: [], successfulCount: 0, failureCount: 0 }`.
+

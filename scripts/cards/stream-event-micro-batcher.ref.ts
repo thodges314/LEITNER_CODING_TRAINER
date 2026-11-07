@@ -98,3 +98,4 @@ const createMicroBatcher = <T>(options: MicroBatcherOptions<T>): MicroBatcher<T>
     drain,
   };
 };
+

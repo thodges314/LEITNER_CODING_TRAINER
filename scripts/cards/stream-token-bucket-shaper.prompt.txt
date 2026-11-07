@@ -41,3 +41,4 @@ Instantiates a token-bucket rate limiter with the following parameters and behav
   - Schedules a timer to re-evaluate and drain queue items as tokens refill over time.
 - **`getTokens(): number`**:
   - Returns current available tokens after recalculating refill up to the current timestamp.
+

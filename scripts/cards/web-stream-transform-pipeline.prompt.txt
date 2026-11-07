@@ -30,3 +30,4 @@ Executes a complete Web Streams pipeline:
 - Constructs a `ReadableStream<string>` that enqueues each string in `chunks` and closes.
 - Pipes the readable stream through `transform` via `readable.pipeThrough(transform)`.
 - Consumes the resulting stream using a reader (`getReader()`), collects all emitted lines into an array, and returns it.
+

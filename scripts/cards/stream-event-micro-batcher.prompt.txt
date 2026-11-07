@@ -39,3 +39,4 @@ Creates a micro-batcher instance with the given configuration:
   - Returns the number of items currently buffered and awaiting a flush.
 - **`drain(): Promise<void>`**:
   - Flushes any remaining items in the buffer and waits for all active and pending flushes to resolve.
+
