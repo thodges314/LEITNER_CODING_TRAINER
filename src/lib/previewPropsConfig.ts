@@ -1272,6 +1272,25 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       options: ['Short Bars', 'Medium Bars', 'Long Bars', 'Zero Reset'],
       description: 'Target widths sequence for transitionBars',
     },
+    {
+      name: 'easing',
+      type: 'enum',
+      defaultValue: 'Elastic (Sproingy)',
+      options: ['Elastic (Sproingy)', 'Bounce', 'Cubic Out', 'Back (Overshoot)', 'Linear'],
+      description: 'Easing curve (try the sproingy elastic oscillation or bounce!)',
+    },
+    {
+      name: 'duration',
+      type: 'number',
+      defaultValue: 750,
+      description: 'Animation duration in milliseconds',
+    },
+    {
+      name: 'staggerMs',
+      type: 'number',
+      defaultValue: 80,
+      description: 'Delay increment per element index',
+    },
   ],
 };
 

@@ -30,7 +30,7 @@
   svg.appendChild(rect);
 
   const sel = d3.select(svg).selectAll('rect');
-  const customEase = d3.easeBounce;
+  const customEase = d3.easeElasticOut;
   const t = transitionBars(sel, { ease: customEase });
 
   const passed = t.ease() === customEase;

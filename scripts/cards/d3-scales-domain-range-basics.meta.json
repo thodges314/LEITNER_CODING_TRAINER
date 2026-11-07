@@ -2,6 +2,7 @@
   "id": "d3-scales-domain-range-basics",
   "title": "D3 Linear & Band Scales (Domain, Range & Invert)",
   "track": "d3",
+  "rendersComponent": false,
   "tags": [
     "d3",
     "scales",

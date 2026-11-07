@@ -705,9 +705,9 @@ export default {
     ),
     r(
       'Applies custom easing function',
-      'transitionBars(selection, { ease: d3.easeBounce })',
-      'Transition uses d3.easeBounce curve',
-      { callSignature: 'transitionBars(selection, { ease: d3.easeBounce })' }
+      'transitionBars(selection, { ease: d3.easeElasticOut })',
+      'Transition uses custom ease curve (e.g. d3.easeElasticOut)',
+      { callSignature: 'transitionBars(selection, { ease: d3.easeElasticOut })' }
     ),
     r(
       'Staggers delay across elements by index',

@@ -779,7 +779,14 @@ export const SANDBOX_D3_TYPES = `
       easeCubicInOut(t: number): number;
       easeQuadInOut(t: number): number;
       easeElastic(t: number): number;
+      easeElasticOut(t: number): number;
+      easeElasticInOut(t: number): number;
       easeBounce(t: number): number;
+      easeBounceOut(t: number): number;
+      easeBounceInOut(t: number): number;
+      easeBack(t: number): number;
+      easeBackOut(t: number): number;
+      easeBackInOut(t: number): number;
       format(specifier: string): (n: NumberValue) => string;
       timeFormat(specifier: string): (date: Date) => string;
       timeParse(specifier: string): (dateString: string) => Date | null;

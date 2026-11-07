@@ -22,10 +22,12 @@ const read = (id, suffix) => {
 
 // New cards are declared by scripts/cards/<id>.meta.json ({ track, title, tags }); existing cards may use a
 // meta file to override title/tags/track. New cards start locked, at the end of the deck.
+const metaMap = new Map();
 const metaFiles = fs.readdirSync(path.join(here, 'cards')).filter((f) => f.endsWith('.meta.json'));
 for (const f of metaFiles) {
   const id = f.replace(/\.meta\.json$/, '');
   const meta = JSON.parse(fs.readFileSync(path.join(here, 'cards', f), 'utf8'));
+  metaMap.set(id, meta);
   const existing = topics.find((t) => t.id === id);
   if (existing) Object.assign(existing, meta);
   else {
@@ -127,9 +129,12 @@ for (const t of topics) {
 
   // Card authors declare component rendering either via "rendersComponent: true"
   // in <id>.meta.json, by listing in scripts/component-cards.json, or by providing <id>.preview.js.
-  const hasExplicitMeta = typeof t.rendersComponent === 'boolean';
-  if (hasExplicitMeta) {
-    if (!t.rendersComponent) {
+  const meta = metaMap.get(t.id);
+  const explicitInMeta = meta && typeof meta.rendersComponent === 'boolean';
+  if (explicitInMeta) {
+    if (meta.rendersComponent) {
+      t.rendersComponent = true;
+    } else {
       delete t.rendersComponent;
     }
   } else if (componentCardSet.has(t.id) || Boolean(t.previewCode)) {

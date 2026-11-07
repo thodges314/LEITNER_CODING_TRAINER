@@ -12,7 +12,12 @@ interface TransitionConfig {
 
 ### `transitionBars(selection: d3.Selection<SVGRectElement>, config?: TransitionConfig): d3.Transition<SVGRectElement>`
 
-In D3, **Transitions** (`selection.transition()`) animate DOM and SVG attributes over time by interpolating values across frames. Transitions support custom durations, easing functions (such as `d3.easeCubicOut`), and index-based staggered delays (`.delay((_, i) => i * staggerMs)`).
+In D3, **Transitions** (`selection.transition()`) animate DOM and SVG attributes over time by interpolating values across frames. Transitions support custom durations, index-based staggered delays (`.delay((_, i) => i * staggerMs)`), and various easing functions from `d3-ease`:
+- `d3.easeCubicOut` (default smooth deceleration)
+- `d3.easeElasticOut` (elastic spring oscillation / "sproingy" rubber-band overshoot)
+- `d3.easeBounceOut` (bouncing ball impact)
+- `d3.easeBackOut` (anticipation and overshoot)
+- `d3.easeLinear` (uniform linear motion)
 
 Implement `transitionBars` to apply a smooth animated transition across a selection of SVG `<rect>` elements.
 
