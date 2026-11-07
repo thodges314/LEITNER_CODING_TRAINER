@@ -1,0 +1,50 @@
+### `createOptimisticStore(initialStore?: Record<string, any>): OptimisticStore`
+
+## Description
+
+```ts
+interface MutateOptions<T extends Record<string, any> = Record<string, any>> {
+  optimisticResponse: Partial<T>;
+  mutationPromise: Promise<T>;
+}
+
+interface OptimisticStore {
+  get(key: string): any;
+  getAll(): Record<string, any>;
+  mutate<T extends Record<string, any>>(options: MutateOptions<T>): Promise<T>;
+}
+```
+
+When users trigger actions in high-performance GraphQL applications (such as toggling a like, renaming a task, or posting a comment), modern clients (Apollo Client, Relay, Urql) immediately apply an optimistic response to the cache store before the network roundtrip completes. If the mutation succeeds, the cache commits the authoritative server payload; if the network call fails, the store cleanly rolls back to its pre-mutation state.
+
+Implement `createOptimisticStore(initialStore)` managing optimistic cache layers with rollback:
+
+### Requirements
+
+- **Store State**:
+  - Initializes the store with a copy of `initialStore` (or an empty dictionary if omitted).
+  - Keys are entity identifiers (e.g. `'Todo:1'`, `'User:42'`).
+  - Values are entity record objects (e.g. `{ id: 1, title: 'Buy milk', done: false }`).
+
+- **`get(key: string): any`**:
+  - Returns the current record for `key`, or `undefined` if not present.
+
+- **`getAll(): Record<string, any>`**:
+  - Returns a shallow copy of the entire store dictionary.
+
+- **`mutate({ optimisticResponse, mutationPromise })`**:
+  - **Synchronous Optimistic Patch**:
+    - Before awaiting `mutationPromise`, immediately records a checkpoint of all keys affected by `optimisticResponse`.
+    - Patches the store with `optimisticResponse`: for each key in `optimisticResponse`, merges its fields into the existing record (`{ ...existing[key], ...optimistic[key] }`), or creates the record if it did not previously exist.
+  - **Resolution (Server Success)**:
+    - When `mutationPromise` resolves with `serverData`:
+      - Applies `serverData` onto the store, merging its fields into the respective entity keys.
+      - Resolves the `mutate` promise with `serverData`.
+  - **Rejection (Network Failure & Rollback)**:
+    - When `mutationPromise` rejects with an error:
+      - Immediately restores the affected keys back to their pre-mutation values captured in the checkpoint.
+      - If a key did not exist before the mutation, deletes it from the store.
+      - Re-throws the rejection error.
+  - **Concurrent Mutations**:
+    - Multiple optimistic mutations can be in flight simultaneously without corrupting unaffected keys.
+

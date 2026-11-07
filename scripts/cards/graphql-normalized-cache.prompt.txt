@@ -1,0 +1,51 @@
+### `createNormalizedCache(): NormalizedCacheStore`
+
+## Description
+
+```ts
+interface CacheReference {
+  __ref: string;
+}
+
+interface NormalizedRecord {
+  [key: string]: unknown;
+}
+
+interface NormalizedCacheStore {
+  write(data: Record<string, unknown>): void;
+  read(rootKey: string): Record<string, unknown> | null;
+  inspect(): Record<string, NormalizedRecord>;
+}
+```
+
+Modern GraphQL clients (such as Apollo Client's `InMemoryCache` and Relay Store) normalize hierarchical query responses into a flat, relational key-value store to eliminate stale, redundant data across disparate query trees.
+
+Implement `createNormalizedCache()` returning a store that normalizes nested GraphQL query payloads and reconstructs relational entity subtrees:
+
+### Requirements
+
+- **Entity Normalization Key**:
+  - Any object containing both a string `__typename` and a primitive `id` (`string` or `number`) is treated as an identifiable entity.
+  - Its normalized entity key is `"${__typename}:${id}"`.
+  - In parent objects or arrays, nested identifiable entities are replaced with a reference pointer: `{ __ref: "${__typename}:${id}" }`.
+  - Entities are stored in a top-level dictionary by their key.
+
+- **`write(data: Record<string, unknown>): void`**:
+  - Normalizes the input query response into the flat entity store.
+  - Root fields of `data` (e.g. `user`, `posts`) are normalized and stored as fields under the special key `"ROOT_QUERY"`.
+  - Recursively traverses objects and arrays:
+    - If a nested object is an identifiable entity (`__typename` + `id`), extract it into the store under its key and replace it in the parent with `{ __ref: key }`.
+    - If an entity was previously written, its fields are merged (field-level shallow merge, preserving existing un-overwritten fields).
+    - If an object lacks `__typename` or `id`, it is an embedded value object and remains stored inline without an independent entity key.
+    - Arrays preserve order and normalize any entity elements into references.
+
+- **`read(rootKey: string): Record<string, unknown> | null`**:
+  - Reads the field named `rootKey` from `"ROOT_QUERY"` and reconstructs the full denormalized object tree.
+  - Recursively resolves all `{ __ref: key }` objects into their full entity records from the store.
+  - Recursively resolves references inside arrays and nested embedded objects.
+  - Reconstructed objects must be independent object copies (mutating a read result does not mutate the cache).
+  - Returns `null` if `"ROOT_QUERY"` does not contain `rootKey`, or if a referenced entity cannot be found in the store.
+
+- **`inspect(): Record<string, NormalizedRecord>`**:
+  - Returns a shallow copy of the internal normalized record dictionary (`{ ROOT_QUERY: ..., [entityKey]: ... }`).
+

@@ -5241,5 +5241,51 @@
       "queries"
     ],
     "summary": "interface ByRoleOptions {"
+  },
+  {
+    "id": "graphql-normalized-cache",
+    "title": "GraphQL Client: Normalized Response Cache & Tree Reconstruction",
+    "track": "graphql-server",
+    "concept": "graphql-client",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "cache",
+      "normalization",
+      "client",
+      "state-management"
+    ],
+    "summary": "interface CacheReference {"
+  },
+  {
+    "id": "graphql-optimistic-cache",
+    "title": "GraphQL Client: Optimistic Mutation Layers & Rollback",
+    "track": "graphql-server",
+    "concept": "graphql-client",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "cache",
+      "optimistic-ui",
+      "mutations",
+      "client"
+    ],
+    "summary": "interface MutateOptions<T extends Record<string, any> = Record<string, any>> {"
+  },
+  {
+    "id": "graphql-relay-pagination-merger",
+    "title": "GraphQL Client: Relay Connection Pagination Merger",
+    "track": "graphql-server",
+    "concept": "graphql-client",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "cursor",
+      "client",
+      "cache"
+    ],
+    "summary": "interface PageInfo {"
   }
 ]

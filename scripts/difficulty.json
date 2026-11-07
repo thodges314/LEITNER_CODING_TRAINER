@@ -1191,6 +1191,18 @@
     "difficulty": 1,
     "concept": "graphql-client"
   },
+  "graphql-normalized-cache": {
+    "difficulty": 3,
+    "concept": "graphql-client"
+  },
+  "graphql-optimistic-cache": {
+    "difficulty": 4,
+    "concept": "graphql-client"
+  },
+  "graphql-relay-pagination-merger": {
+    "difficulty": 4,
+    "concept": "graphql-client"
+  },
   "graphql-extract-operation-name": {
     "difficulty": 1,
     "concept": "graphql-ast"

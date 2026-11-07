@@ -1,0 +1,58 @@
+### `mergeRelayConnections(existing: RelayConnection | null | undefined, incoming: RelayConnection, direction?: 'append' | 'prepend'): RelayConnection`
+
+## Description
+
+```ts
+interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string | null;
+  endCursor: string | null;
+}
+
+interface RelayEdge<T = any> {
+  cursor: string;
+  node: T;
+}
+
+interface RelayConnection<T = any> {
+  edges: RelayEdge<T>[];
+  pageInfo: PageInfo;
+  totalCount?: number;
+}
+```
+
+In the GraphQL Relay Cursor Connection specification, paginated results return an `edges` list containing `{ cursor, node }` pairs and a `pageInfo` object describing pagination boundaries. When building infinite scroll, "Load More", or reverse chat feeds, client cache layers (e.g. Apollo's `relayStylePagination` field policy or Relay's connection handler) must merge successive query responses into a single coherent connection.
+
+Implement `mergeRelayConnections(existing, incoming, direction)` merging Relay connection pages:
+
+### Requirements
+
+- **Default Parameters**:
+  - `direction` defaults to `'append'` if omitted.
+  - If `existing` is `null` or `undefined`, returns a copy of `incoming`.
+
+- **Edge Deduplication**:
+  - Deduplicates edges between `existing` and `incoming`.
+  - An edge is considered a duplicate if its `cursor` matches, or if both nodes are objects with matching `id` properties (`node.id === other.node.id`).
+  - In case of duplicate matches, the incoming edge data takes precedence.
+
+- **Directional Merging**:
+  - When `direction === 'append'` (forward pagination):
+    - Retains existing non-duplicate edges, followed by incoming edges at the end.
+  - When `direction === 'prepend'` (backward pagination):
+    - Places incoming edges first, followed by existing non-duplicate edges.
+
+- **`pageInfo` Synthesis**:
+  - `startCursor`: The cursor of the very first edge in the final merged `edges` list, or `null` if the merged list is empty.
+  - `endCursor`: The cursor of the very last edge in the final merged `edges` list, or `null` if the merged list is empty.
+  - `hasNextPage`:
+    - For `'append'`: takes `incoming.pageInfo.hasNextPage`.
+    - For `'prepend'`: preserves `existing?.pageInfo.hasNextPage ?? incoming.pageInfo.hasNextPage`.
+  - `hasPreviousPage`:
+    - For `'prepend'`: takes `incoming.pageInfo.hasPreviousPage`.
+    - For `'append'`: preserves `existing?.pageInfo.hasPreviousPage ?? incoming.pageInfo.hasPreviousPage`.
+
+- **`totalCount` Preservation**:
+  - If `incoming.totalCount` is defined, retains `incoming.totalCount`; otherwise preserves `existing?.totalCount`.
+
