@@ -1,0 +1,25 @@
+enum Role {
+  ADMIN
+  MEMBER
+  GUEST
+}
+
+directive @auth(requires: Role = ADMIN) on FIELD_DEFINITION
+
+interface Node {
+  id: ID!
+}
+
+interface Timestamped {
+  createdAt: String!
+  updatedAt: String
+}
+
+type Article implements Node & Timestamped {
+  id: ID!
+  title: String!
+  secretNotes: String @auth(requires: ADMIN)
+  createdAt: String!
+  updatedAt: String
+}
+

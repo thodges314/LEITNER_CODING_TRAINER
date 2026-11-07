@@ -22214,5 +22214,155 @@
       }
     ],
     "testHarness": "await $test.run(\"Appends incoming edges and updates pageInfo\", async () => {\n  const sleep = $test.sleep;\n  const existing = {\n    edges: [{ cursor: 'c1', node: { id: 1, name: 'A' } }],\n    pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: 'c1', endCursor: 'c1' },\n  };\n  const incoming = {\n    edges: [{ cursor: 'c2', node: { id: 2, name: 'B' } }],\n    pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: 'c2', endCursor: 'c2' },\n  };\n  const merged = mergeRelayConnections(existing, incoming);\n  return ([merged.edges.map(e => e.cursor), merged.pageInfo.hasNextPage, merged.pageInfo.endCursor]);\n}, () => ([['c1', 'c2'], false, 'c2']));\n\nawait $test.run(\"Deduplicates overlapping edges by cursor or id taking incoming data\", async () => {\n  const sleep = $test.sleep;\n  const existing = {\n    edges: [\n      { cursor: 'c1', node: { id: 1, name: 'Old A' } },\n      { cursor: 'c2', node: { id: 2, name: 'B' } },\n    ],\n    pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: 'c1', endCursor: 'c2' },\n  };\n  const incoming = {\n    edges: [\n      { cursor: 'c1', node: { id: 1, name: 'New A' } },\n      { cursor: 'c3', node: { id: 3, name: 'C' } },\n    ],\n    pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: 'c1', endCursor: 'c3' },\n  };\n  const merged = mergeRelayConnections(existing, incoming);\n  return ([merged.edges.map(e => e.node.name), merged.edges.length]);\n}, () => ([['B', 'New A', 'C'], 3]));\n\nawait $test.run(\"Prepends incoming edges in backward pagination\", async () => {\n  const sleep = $test.sleep;\n  const existing = {\n    edges: [{ cursor: 'c2', node: { id: 2, name: 'B' } }],\n    pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: 'c2', endCursor: 'c2' },\n  };\n  const incoming = {\n    edges: [{ cursor: 'c1', node: { id: 1, name: 'A' } }],\n    pageInfo: { hasNextPage: false, hasPreviousPage: true, startCursor: 'c1', endCursor: 'c1' },\n  };\n  const merged = mergeRelayConnections(existing, incoming, 'prepend');\n  return ([merged.edges.map(e => e.cursor), merged.pageInfo.startCursor, merged.pageInfo.hasNextPage, merged.pageInfo.hasPreviousPage]);\n}, () => ([['c1', 'c2'], 'c1', true, true]));\n\nawait $test.run(\"Handles null existing connection gracefully\", async () => {\n  const sleep = $test.sleep;\n  const incoming = {\n    edges: [{ cursor: 'c1', node: { id: 1 } }],\n    pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: 'c1', endCursor: 'c1' },\n    totalCount: 1,\n  };\n  const merged = mergeRelayConnections(null, incoming);\n  return ([merged.edges.length, merged.totalCount]);\n}, () => ([1, 1]));\n\nawait $test.run(\"Preserves existing totalCount if incoming totalCount is omitted\", async () => {\n  const sleep = $test.sleep;\n  const existing = {\n    edges: [{ cursor: 'c1', node: { id: 1 } }],\n    pageInfo: { hasNextPage: true, hasPreviousPage: false, startCursor: 'c1', endCursor: 'c1' },\n    totalCount: 100,\n  };\n  const incoming = {\n    edges: [{ cursor: 'c2', node: { id: 2 } }],\n    pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: 'c2', endCursor: 'c2' },\n  };\n  return (mergeRelayConnections(existing, incoming).totalCount);\n}, () => (100));\n\nawait $test.run(\"Returns null cursors and correct pageInfo when merged edges are empty\", async () => {\n  const sleep = $test.sleep;\n  const existing = {\n    edges: [],\n    pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null },\n  };\n  const incoming = {\n    edges: [],\n    pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null },\n  };\n  const merged = mergeRelayConnections(existing, incoming);\n  return ([merged.edges.length, merged.pageInfo.startCursor, merged.pageInfo.endCursor]);\n}, () => ([0, null, null]));"
+  },
+  {
+    "id": "gql-inline-fragments-union",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "### `query SearchFeed($term: String!): SearchResult`\n\n## Description\n\nIn GraphQL, a `union` represents an abstract type that can return one of several distinct concrete object types without requiring them to share common fields. Because the concrete types have different shapes, clients query union fields using **inline fragments** (`... on TypeName`) and request the meta-field `__typename` to discriminate between received records.\n\nGiven the following GraphQL schema:\n\n```graphql\nunion SearchResult = User | Issue | Comment\n\ntype User {\n  id: ID!\n  username: String!\n  avatarUrl: String\n}\n\ntype Issue {\n  id: ID!\n  title: String!\n  status: String!\n}\n\ntype Comment {\n  id: ID!\n  body: String!\n  author: User!\n}\n\ntype Query {\n  search(term: String!): [SearchResult!]!\n}\n```\n\nWrite a GraphQL query document satisfying these requirements:\n\n### Requirements\n\n- Define an operation named `query SearchFeed` accepting a required variable `$term: String!`.\n- Query the `search(term: $term)` field.\n- On each search item, request:\n  - `__typename` to identify the concrete return type.\n  - An inline fragment `... on User` selecting `id`, `username`, and `avatarUrl`.\n  - An inline fragment `... on Issue` selecting `id`, `title`, and `status`.\n  - An inline fragment `... on Comment` selecting `id`, `body`, and nested `author { username }`.",
+    "track": "graphql",
+    "title": "Inline Fragments & Union Type Conditions",
+    "tags": [
+      "graphql",
+      "queries",
+      "unions",
+      "fragments",
+      "inline-fragments"
+    ],
+    "inputLanguage": "graphql",
+    "difficulty": 3,
+    "concept": "gql-fragments",
+    "referenceSolution": "query SearchFeed($term: String!) {\n  search(term: $term) {\n    __typename\n    ... on User {\n      id\n      username\n      avatarUrl\n    }\n    ... on Issue {\n      id\n      title\n      status\n    }\n    ... on Comment {\n      id\n      body\n      author {\n        username\n      }\n    }\n  }\n}",
+    "referenceSolutionTs": "query SearchFeed($term: String!) {\n  search(term: $term) {\n    __typename\n    ... on User {\n      id\n      username\n      avatarUrl\n    }\n    ... on Issue {\n      id\n      title\n      status\n    }\n    ... on Comment {\n      id\n      body\n      author {\n        username\n      }\n    }\n  }\n}",
+    "testCases": [
+      {
+        "description": "Executes query and selects __typename on all union results",
+        "input": "query SearchFeed($term: String!)",
+        "expected": "returns union results with __typename discriminant"
+      },
+      {
+        "description": "Selects User fields (id, username, avatarUrl) using inline fragment",
+        "input": "... on User { id username avatarUrl }",
+        "expected": "resolves concrete User fields"
+      },
+      {
+        "description": "Selects Issue fields (id, title, status) using inline fragment",
+        "input": "... on Issue { id title status }",
+        "expected": "resolves concrete Issue fields"
+      },
+      {
+        "description": "Selects Comment fields (id, body, author.username) using inline fragment",
+        "input": "... on Comment { id body author { username } }",
+        "expected": "resolves concrete Comment fields and nested author username"
+      },
+      {
+        "description": "Contains inline fragments with type conditions on User, Issue, and Comment",
+        "input": "... on User, ... on Issue, ... on Comment",
+        "expected": "includes type condition spreads for all three union members"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();\n  const testSchema = buildSchema(`\n    union SearchResult = User | Issue | Comment\n\n    type User {\n      id: ID!\n      username: String!\n      avatarUrl: String\n    }\n\n    type Issue {\n      id: ID!\n      title: String!\n      status: String!\n    }\n\n    type Comment {\n      id: ID!\n      body: String!\n      author: User!\n    }\n\n    type Query {\n      search(term: String!): [SearchResult!]!\n    }\n  `);\n\n  const mockItems = [\n    { __typename: 'User', id: 'u1', username: 'alice', avatarUrl: 'https://img.com/u1.png' },\n    { __typename: 'Issue', id: 'i1', title: 'Fix CSS bug', status: 'OPEN' },\n    { __typename: 'Comment', id: 'c1', body: 'LGTM!', author: { id: 'u2', username: 'bob', avatarUrl: null } },\n  ];\n\n  const root = {\n    search: ({ term }) => mockItems.filter(() => Boolean(term)),\n  };\n\n  async function runSafe(vars) {\n    try {\n      const res = await graphql({ schema: testSchema, source: userDoc, rootValue: root, variableValues: vars });\n      return res;\n    } catch (e) {\n      return { errors: [e] };\n    }\n  }\n\n  const r1 = await runSafe({ term: 'test' });\n  const items = r1.data?.search || [];\n  const userResult = items.find((x) => x.__typename === 'User');\n  const issueResult = items.find((x) => x.__typename === 'Issue');\n  const commentResult = items.find((x) => x.__typename === 'Comment');\n\n  // Case 1: Selects __typename on union items\n  $test.check(\n    'Executes query and selects __typename on all union results',\n    !r1.errors && items.length === 3 && items.every((x) => typeof x.__typename === 'string'),\n    r1\n  );\n\n  // Case 2: Selects User fields via inline fragment\n  $test.check(\n    'Selects User fields (id, username, avatarUrl) using inline fragment',\n    !r1.errors && userResult?.id === 'u1' && userResult?.username === 'alice' && userResult?.avatarUrl === 'https://img.com/u1.png',\n    userResult\n  );\n\n  // Case 3: Selects Issue fields via inline fragment\n  $test.check(\n    'Selects Issue fields (id, title, status) using inline fragment',\n    !r1.errors && issueResult?.id === 'i1' && issueResult?.title === 'Fix CSS bug' && issueResult?.status === 'OPEN',\n    issueResult\n  );\n\n  // Case 4: Selects Comment fields with nested author via inline fragment\n  $test.check(\n    'Selects Comment fields (id, body, author.username) using inline fragment',\n    !r1.errors && commentResult?.id === 'c1' && commentResult?.body === 'LGTM!' && commentResult?.author?.username === 'bob',\n    commentResult\n  );\n\n  // Case 5: Contains inline fragments with type conditions on User, Issue, and Comment\n  const hasUserFrag = /\\.\\.\\.\\s*on\\s+User\\b/.test(userDoc);\n  const hasIssueFrag = /\\.\\.\\.\\s*on\\s+Issue\\b/.test(userDoc);\n  const hasCommentFrag = /\\.\\.\\.\\s*on\\s+Comment\\b/.test(userDoc);\n  $test.check(\n    'Contains inline fragments with type conditions on User, Issue, and Comment',\n    hasUserFrag && hasIssueFrag && hasCommentFrag,\n    userDoc\n  );\n})();"
+  },
+  {
+    "id": "gql-schema-sdl-interfaces-directives",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Write an SDL (Schema Definition Language) schema string defining interfaces, custom directives, and implementing object types.\n\n### Requirements\n\nDefine the following definitions in standard GraphQL SDL:\n\n1. `enum Role`:\n   - Values: `ADMIN`, `MEMBER`, `GUEST`\n\n2. `directive @auth`:\n   - Argument: `requires: Role = ADMIN` (defaults to `ADMIN`)\n   - Location: `on FIELD_DEFINITION`\n\n3. `interface Node`:\n   - `id`: non-null `ID!`\n\n4. `interface Timestamped`:\n   - `createdAt`: non-null `String!`\n   - `updatedAt`: nullable `String`\n\n5. `type Article implements Node & Timestamped`:\n   - `id`: non-null `ID!`\n   - `title`: non-null `String!`\n   - `secretNotes`: nullable `String` tagged with the `@auth(requires: ADMIN)` directive\n   - `createdAt`: non-null `String!`\n   - `updatedAt`: nullable `String`",
+    "track": "graphql",
+    "title": "Schema Definition: Interfaces & Directives",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "interfaces",
+      "directives"
+    ],
+    "inputLanguage": "graphql",
+    "difficulty": 4,
+    "concept": "gql-schema-definitions",
+    "referenceSolution": "enum Role {\n  ADMIN\n  MEMBER\n  GUEST\n}\n\ndirective @auth(requires: Role = ADMIN) on FIELD_DEFINITION\n\ninterface Node {\n  id: ID!\n}\n\ninterface Timestamped {\n  createdAt: String!\n  updatedAt: String\n}\n\ntype Article implements Node & Timestamped {\n  id: ID!\n  title: String!\n  secretNotes: String @auth(requires: ADMIN)\n  createdAt: String!\n  updatedAt: String\n}",
+    "referenceSolutionTs": "enum Role {\n  ADMIN\n  MEMBER\n  GUEST\n}\n\ndirective @auth(requires: Role = ADMIN) on FIELD_DEFINITION\n\ninterface Node {\n  id: ID!\n}\n\ninterface Timestamped {\n  createdAt: String!\n  updatedAt: String\n}\n\ntype Article implements Node & Timestamped {\n  id: ID!\n  title: String!\n  secretNotes: String @auth(requires: ADMIN)\n  createdAt: String!\n  updatedAt: String\n}",
+    "testCases": [
+      {
+        "description": "SDL parses successfully into valid GraphQL schema",
+        "input": "schema SDL definition",
+        "expected": "parses cleanly via buildSchema"
+      },
+      {
+        "description": "enum Role defines ADMIN, MEMBER, GUEST",
+        "input": "enum Role",
+        "expected": "contains exact ADMIN, MEMBER, GUEST values"
+      },
+      {
+        "description": "directive @auth(requires: Role = ADMIN) on FIELD_DEFINITION is defined",
+        "input": "directive @auth(requires: Role = ADMIN) on FIELD_DEFINITION",
+        "expected": "defines directive on FIELD_DEFINITION with default ADMIN"
+      },
+      {
+        "description": "interfaces Node (id: ID!) and Timestamped (createdAt: String!, updatedAt: String) defined",
+        "input": "interface Node, interface Timestamped",
+        "expected": "defines contract interfaces with required fields"
+      },
+      {
+        "description": "type Article implements Node & Timestamped with secretNotes tagged with @auth(requires: ADMIN)",
+        "input": "type Article implements Node & Timestamped",
+        "expected": "implements both interfaces and applies @auth(requires: ADMIN) directive"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof schema === 'string' ? schema : typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();\n  let parsedSchema = null;\n  try {\n    parsedSchema = buildSchema(userDoc + '\\ntype Query { _dummy: String }\\n');\n  } catch (e) {\n    parsedSchema = null;\n  }\n\n  // Case 1: Schema parses without SDL syntax errors\n  $test.check('SDL parses successfully into valid GraphQL schema', parsedSchema !== null, parsedSchema);\n\n  // Case 2: enum Role defines ADMIN, MEMBER, GUEST\n  const roleType = parsedSchema?.getType('Role');\n  const roleValues = roleType?.getValues?.()?.map((v) => v.name) || [];\n  $test.check(\n    'enum Role defines ADMIN, MEMBER, GUEST',\n    $test.equal(roleValues.sort(), ['ADMIN', 'GUEST', 'MEMBER']),\n    roleValues\n  );\n\n  // Case 3: directive @auth defines requires: Role = ADMIN on FIELD_DEFINITION\n  const authDir = parsedSchema?.getDirective('auth');\n  const authLocations = authDir?.locations || [];\n  const requiresArg = authDir?.args?.find((a) => a.name === 'requires');\n  const defaultVal =\n    requiresArg?.defaultValue ??\n    requiresArg?.astNode?.defaultValue?.value ??\n    requiresArg?.default?.literal?.value;\n  const hasAuthValid = Boolean(\n    authDir &&\n    authLocations.includes('FIELD_DEFINITION') &&\n    requiresArg?.type?.toString() === 'Role' &&\n    defaultVal === 'ADMIN'\n  );\n  $test.check(\n    'directive @auth(requires: Role = ADMIN) on FIELD_DEFINITION is defined',\n    hasAuthValid,\n    { authLocations, argType: requiresArg?.type?.toString(), defaultVal }\n  );\n\n  // Case 4: interfaces Node and Timestamped define required fields\n  const nodeType = parsedSchema?.getType('Node');\n  const timestampedType = parsedSchema?.getType('Timestamped');\n  const nodeFields = nodeType?.getFields?.();\n  const tsFields = timestampedType?.getFields?.();\n  const hasInterfacesValid = Boolean(\n    nodeFields?.id?.type?.toString() === 'ID!' &&\n    tsFields?.createdAt?.type?.toString() === 'String!' &&\n    tsFields?.updatedAt?.type?.toString() === 'String'\n  );\n  $test.check(\n    'interfaces Node (id: ID!) and Timestamped (createdAt: String!, updatedAt: String) defined',\n    hasInterfacesValid,\n    { nodeFields, tsFields }\n  );\n\n  // Case 5: type Article implements Node & Timestamped and tags secretNotes with @auth(requires: ADMIN)\n  const articleType = parsedSchema?.getType('Article');\n  const ifaceNames = articleType?.getInterfaces?.()?.map((i) => i.name) || [];\n  const artFields = articleType?.getFields?.();\n  const secretDir = artFields?.secretNotes?.astNode?.directives?.find((d) => d.name?.value === 'auth');\n  const secretDirArg = secretDir?.arguments?.find((a) => a.name?.value === 'requires');\n  const hasArticleValid = Boolean(\n    ifaceNames.includes('Node') &&\n    ifaceNames.includes('Timestamped') &&\n    artFields?.id?.type?.toString() === 'ID!' &&\n    artFields?.title?.type?.toString() === 'String!' &&\n    artFields?.secretNotes?.type?.toString() === 'String' &&\n    artFields?.createdAt?.type?.toString() === 'String!' &&\n    artFields?.updatedAt?.type?.toString() === 'String' &&\n    secretDir &&\n    secretDirArg?.value?.value === 'ADMIN'\n  );\n  $test.check(\n    'type Article implements Node & Timestamped with secretNotes tagged with @auth(requires: ADMIN)',\n    hasArticleValid,\n    { ifaceNames, artFields }\n  );\n})();"
+  },
+  {
+    "id": "gql-subscription-document",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "### `subscription OnMessageCreated($channelId: ID!, $minPriority: Priority)`\n\n## Description\n\nGraphQL subscriptions allow clients to listen for real-time updates pushed from the server when events occur. A subscription document uses the `subscription` operation keyword, accepts variables to filter incoming events, and specifies the selection set for the event payload.\n\nGiven the following GraphQL schema:\n\n```graphql\nenum Priority {\n  LOW\n  NORMAL\n  HIGH\n  URGENT\n}\n\ntype User {\n  id: ID!\n  username: String!\n  status: String!\n}\n\ntype Message {\n  id: ID!\n  content: String!\n  priority: Priority!\n  createdAt: String!\n  author: User!\n}\n\ntype Subscription {\n  messageCreated(channelId: ID!, minPriority: Priority): Message!\n}\n```\n\nWrite a GraphQL subscription operation document satisfying these requirements:\n\n### Requirements\n\n- Define an operation named `subscription OnMessageCreated` accepting two variables:\n  - `$channelId: ID!` (required)\n  - `$minPriority: Priority` (optional)\n- Request the `messageCreated` root subscription field, passing `$channelId` and `$minPriority` to their respective arguments `(channelId: $channelId, minPriority: $minPriority)`.\n- Select the following fields on the received message:\n  - `id`\n  - `content`\n  - `priority`\n  - `createdAt`\n  - `author` sub-selection requesting `id`, `username`, and `status`.",
+    "track": "graphql",
+    "title": "Subscription with Filter Arguments & Selection",
+    "tags": [
+      "graphql",
+      "subscriptions",
+      "realtime",
+      "operations",
+      "documents"
+    ],
+    "inputLanguage": "graphql",
+    "difficulty": 3,
+    "concept": "gql-subscriptions",
+    "referenceSolution": "subscription OnMessageCreated($channelId: ID!, $minPriority: Priority) {\n  messageCreated(channelId: $channelId, minPriority: $minPriority) {\n    id\n    content\n    priority\n    createdAt\n    author {\n      id\n      username\n      status\n    }\n  }\n}",
+    "referenceSolutionTs": "subscription OnMessageCreated($channelId: ID!, $minPriority: Priority) {\n  messageCreated(channelId: $channelId, minPriority: $minPriority) {\n    id\n    content\n    priority\n    createdAt\n    author {\n      id\n      username\n      status\n    }\n  }\n}",
+    "testCases": [
+      {
+        "description": "Document parses and validates cleanly against subscription schema",
+        "input": "subscription document source",
+        "expected": "validates against GraphQL subscription schema without errors"
+      },
+      {
+        "description": "Defines operation as subscription OnMessageCreated",
+        "input": "subscription OnMessageCreated(...)",
+        "expected": "operation is named OnMessageCreated of type subscription"
+      },
+      {
+        "description": "Accepts $channelId: ID! and $minPriority: Priority variable definitions",
+        "input": "($channelId: ID!, $minPriority: Priority)",
+        "expected": "declares required $channelId and optional $minPriority variables"
+      },
+      {
+        "description": "Passes channelId: $channelId and minPriority: $minPriority to messageCreated",
+        "input": "messageCreated(channelId: $channelId, minPriority: $minPriority)",
+        "expected": "passes variables to field arguments"
+      },
+      {
+        "description": "Selects message fields (id, content, priority, createdAt) and author (id, username, status)",
+        "input": "messageCreated { id content priority createdAt author { id username status } }",
+        "expected": "selects all message fields and nested author details"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();\n  const testSchema = buildSchema(`\n    enum Priority {\n      LOW\n      NORMAL\n      HIGH\n      URGENT\n    }\n\n    type User {\n      id: ID!\n      username: String!\n      status: String!\n    }\n\n    type Message {\n      id: ID!\n      content: String!\n      priority: Priority!\n      createdAt: String!\n      author: User!\n    }\n\n    type Query {\n      _dummy: String\n    }\n\n    type Subscription {\n      messageCreated(channelId: ID!, minPriority: Priority): Message!\n    }\n  `);\n\n  let ast = null;\n  let parseErr = null;\n  try {\n    ast = parseGraphql(userDoc);\n  } catch (e) {\n    parseErr = e;\n  }\n\n  // Case 1: Parses and validates cleanly against subscription schema\n  const validationErrors = ast ? validateGraphql(testSchema, ast) : [parseErr];\n  $test.check(\n    'Document parses and validates cleanly against subscription schema',\n    ast !== null && validationErrors.length === 0,\n    validationErrors\n  );\n\n  const op = ast?.definitions?.find((d) => d.kind === 'OperationDefinition');\n\n  // Case 2: Named subscription OnMessageCreated\n  $test.check(\n    'Defines operation as subscription OnMessageCreated',\n    op?.operation === 'subscription' && op?.name?.value === 'OnMessageCreated',\n    op?.name?.value\n  );\n\n  // Case 3: Variable definitions for $channelId: ID! and optional $minPriority: Priority\n  const varDefs = op?.variableDefinitions || [];\n  const channelVar = varDefs.find((v) => v.variable?.name?.value === 'channelId');\n  const priorityVar = varDefs.find((v) => v.variable?.name?.value === 'minPriority');\n  const hasValidVars = Boolean(\n    channelVar?.type?.kind === 'NonNullType' &&\n    channelVar?.type?.type?.name?.value === 'ID' &&\n    priorityVar?.type?.kind === 'NamedType' &&\n    priorityVar?.type?.name?.value === 'Priority'\n  );\n  $test.check(\n    'Accepts $channelId: ID! and $minPriority: Priority variable definitions',\n    hasValidVars,\n    varDefs\n  );\n\n  // Case 4: Field arguments for messageCreated(channelId: $channelId, minPriority: $minPriority)\n  const rootField = op?.selectionSet?.selections?.find((s) => s.name?.value === 'messageCreated');\n  const channelArg = rootField?.arguments?.find((a) => a.name?.value === 'channelId');\n  const priorityArg = rootField?.arguments?.find((a) => a.name?.value === 'minPriority');\n  const hasValidArgs = Boolean(\n    channelArg?.value?.kind === 'Variable' &&\n    channelArg?.value?.name?.value === 'channelId' &&\n    priorityArg?.value?.kind === 'Variable' &&\n    priorityArg?.value?.name?.value === 'minPriority'\n  );\n  $test.check(\n    'Passes channelId: $channelId and minPriority: $minPriority to messageCreated',\n    hasValidArgs,\n    rootField?.arguments\n  );\n\n  // Case 5: Selects message payload fields with nested author\n  const selections = rootField?.selectionSet?.selections || [];\n  const fieldNames = selections.map((s) => s.name?.value);\n  const authorField = selections.find((s) => s.name?.value === 'author');\n  const authorSubfields = authorField?.selectionSet?.selections?.map((s) => s.name?.value) || [];\n  const hasPayload = Boolean(\n    fieldNames.includes('id') &&\n    fieldNames.includes('content') &&\n    fieldNames.includes('priority') &&\n    fieldNames.includes('createdAt') &&\n    authorSubfields.includes('id') &&\n    authorSubfields.includes('username') &&\n    authorSubfields.includes('status')\n  );\n  $test.check(\n    'Selects message fields (id, content, priority, createdAt) and author (id, username, status)',\n    hasPayload,\n    { fieldNames, authorSubfields }\n  );\n})();"
   }
 ]

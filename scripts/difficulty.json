@@ -1343,6 +1343,18 @@
     "difficulty": 3,
     "concept": "gql-schema-definitions"
   },
+  "gql-inline-fragments-union": {
+    "difficulty": 3,
+    "concept": "gql-fragments"
+  },
+  "gql-subscription-document": {
+    "difficulty": 3,
+    "concept": "gql-subscriptions"
+  },
+  "gql-schema-sdl-interfaces-directives": {
+    "difficulty": 4,
+    "concept": "gql-schema-definitions"
+  },
   "simplify-path": {
     "difficulty": 2,
     "concept": "stack"

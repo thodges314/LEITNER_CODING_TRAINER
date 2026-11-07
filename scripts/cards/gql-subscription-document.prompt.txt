@@ -1,0 +1,50 @@
+### `subscription OnMessageCreated($channelId: ID!, $minPriority: Priority)`
+
+## Description
+
+GraphQL subscriptions allow clients to listen for real-time updates pushed from the server when events occur. A subscription document uses the `subscription` operation keyword, accepts variables to filter incoming events, and specifies the selection set for the event payload.
+
+Given the following GraphQL schema:
+
+```graphql
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+type User {
+  id: ID!
+  username: String!
+  status: String!
+}
+
+type Message {
+  id: ID!
+  content: String!
+  priority: Priority!
+  createdAt: String!
+  author: User!
+}
+
+type Subscription {
+  messageCreated(channelId: ID!, minPriority: Priority): Message!
+}
+```
+
+Write a GraphQL subscription operation document satisfying these requirements:
+
+### Requirements
+
+- Define an operation named `subscription OnMessageCreated` accepting two variables:
+  - `$channelId: ID!` (required)
+  - `$minPriority: Priority` (optional)
+- Request the `messageCreated` root subscription field, passing `$channelId` and `$minPriority` to their respective arguments `(channelId: $channelId, minPriority: $minPriority)`.
+- Select the following fields on the received message:
+  - `id`
+  - `content`
+  - `priority`
+  - `createdAt`
+  - `author` sub-selection requesting `id`, `username`, and `status`.
+

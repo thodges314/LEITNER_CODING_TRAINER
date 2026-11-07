@@ -1,0 +1,27 @@
+Write an SDL (Schema Definition Language) schema string defining interfaces, custom directives, and implementing object types.
+
+### Requirements
+
+Define the following definitions in standard GraphQL SDL:
+
+1. `enum Role`:
+   - Values: `ADMIN`, `MEMBER`, `GUEST`
+
+2. `directive @auth`:
+   - Argument: `requires: Role = ADMIN` (defaults to `ADMIN`)
+   - Location: `on FIELD_DEFINITION`
+
+3. `interface Node`:
+   - `id`: non-null `ID!`
+
+4. `interface Timestamped`:
+   - `createdAt`: non-null `String!`
+   - `updatedAt`: nullable `String`
+
+5. `type Article implements Node & Timestamped`:
+   - `id`: non-null `ID!`
+   - `title`: non-null `String!`
+   - `secretNotes`: nullable `String` tagged with the `@auth(requires: ADMIN)` directive
+   - `createdAt`: non-null `String!`
+   - `updatedAt`: nullable `String`
+
