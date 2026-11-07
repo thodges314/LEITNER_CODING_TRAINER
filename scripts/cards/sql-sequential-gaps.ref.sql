@@ -11,3 +11,4 @@ SELECT
 FROM ranked_logs
 WHERE next_id - log_id > 1
 ORDER BY gap_start ASC;
+

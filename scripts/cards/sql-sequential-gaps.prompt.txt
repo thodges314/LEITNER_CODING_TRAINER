@@ -37,3 +37,4 @@ The query returns:
 Explanation:
 - Between ID 2 and ID 5, IDs 3 and 4 are missing (start: 3, end: 4, size: 2).
 - Between ID 7 and ID 10, IDs 8 and 9 are missing (start: 8, end: 9, size: 2).
+

@@ -180,7 +180,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 
 ## 7. Verification & Testing
 
-- **Vitest Suite (2,512 unit tests across 70 test files)**: Tests verifying:
+- **Vitest Suite (2,516 unit tests across 70 test files)**: Tests verifying:
   - Reference solutions pass for all 392 cards across 17 topics across 2,563 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.

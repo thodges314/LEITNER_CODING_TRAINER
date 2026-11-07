@@ -40,3 +40,4 @@ Explanation:
 - Tasks 2 and 4 both have priority 20 (higher than task 1's 10).
 - Task 4 was created earlier (`10:01:00` vs `10:05:00`), so it wins the priority tie-break.
 - The `FOR UPDATE SKIP LOCKED` clause locks task 4 for the claiming worker.
+
