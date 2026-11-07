@@ -16,7 +16,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Task / card | Branch | Owner | Status |
 |---|---|---|---|
 | Testing Tooling Expansion: 3 cards (Batch 74: custom-matcher-expect, async-flush-promises, dom-query-testing-library) | feature/testing-tooling-expansion | antigravity | Ready to merge |
-| Tailwind CSS Suite: 14 cards (Batches 69-73: tailwind-cva-variants, tailwind-merge-classes, tailwind-button-states, tailwind-arbitrary-parser, tailwind-badge-component, tailwind-pricing-card, tailwind-dismissible-banner, tailwind-metric-card, tailwind-responsive-card, tailwind-modal-dialog, tailwind-segmented-control, tailwind-skeleton-loader, tailwind-accordion, tailwind-avatar-group) | feature/tailwind-expansion | antigravity | Ready to merge |
+| GraphQL Client Expansion: 3 cards (Batch 75: graphql-normalized-cache, graphql-optimistic-cache, graphql-relay-pagination-merger) | feature/graphql-expansion | antigravity | In progress |
 | D3 Warmup & Foundation Suite: d3-data-join-enter-update-exit, d3-scales-domain-range-basics, d3-transitions-stagger-basics, d3-data-rollup-histogram-bins, d3-stacked-area-series, d3-zoom-pan-rescale, d3-drag-force-graph | feature/d3-batch-68-warmups | antigravity | Ready to merge |
 
 
