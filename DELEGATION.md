@@ -15,7 +15,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task / card | Branch | Owner | Status |
 |---|---|---|---|
-| Modern React Arrow Functions Refactor: Convert React component reference solutions and previews to idiomatic arrow functions | refactor/modern-react-arrow-functions | antigravity | In progress |
+| Modern React Arrow Functions Refactor: Convert React component reference solutions and previews to idiomatic arrow functions | refactor/modern-react-arrow-functions | antigravity | Ready to merge |
 | D3 Warmup & Foundation Suite: d3-data-join-enter-update-exit, d3-scales-domain-range-basics, d3-transitions-stagger-basics, d3-data-rollup-histogram-bins, d3-stacked-area-series, d3-zoom-pan-rescale, d3-drag-force-graph | feature/d3-batch-68-warmups | antigravity | Ready to merge |
 
 
