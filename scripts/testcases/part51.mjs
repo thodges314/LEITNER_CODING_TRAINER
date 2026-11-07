@@ -804,6 +804,44 @@ export default {
       { callSignature: 'instance.destroy()' }
     ),
   ],
+  'd3-zoom-pan-rescale': [
+    r(
+      'Mounts SVG with clip-path, plot-area, and data circles',
+      'renderZoomChart(container, SAMPLE_ZOOM_POINTS, { width: 480, height: 260, color: "seagreen" })',
+      'Mounts svg, clipPath rect (420x220), plot-area, and circle glyphs',
+      { callSignature: 'renderZoomChart(container, data, options)' }
+    ),
+    r(
+      'Configures linear scales and renders initial X and Y axis groups',
+      'instance.getTransform()',
+      'Initializes x and y axis groups with identity transform { k: 1, x: 0, y: 0 }',
+      { callSignature: 'instance.getTransform()' }
+    ),
+    r(
+      'Rescales X-axis and updates circle cx coordinates on zoom scaling',
+      'instance.zoomBy(2)',
+      'Multiplies zoom scale to k=2 and rescales circle horizontal coordinates',
+      { callSignature: 'instance.zoomBy(factor)' }
+    ),
+    r(
+      'Invokes onZoomChange callback with scale k and translation offsets',
+      'options.onZoomChange(state)',
+      'Calls onZoomChange with updated zoom state { k: 1.5, x, y }',
+      { callSignature: 'options.onZoomChange(state)' }
+    ),
+    r(
+      'Resets zoom transform back to identity via resetZoom()',
+      'instance.resetZoom()',
+      'Restores transform state to { k: 1, x: 0, y: 0 }',
+      { callSignature: 'instance.resetZoom()' }
+    ),
+    r(
+      'Cleans up SVG and DOM elements on destroy()',
+      'instance.destroy()',
+      'Removes SVG element and clears container DOM',
+      { callSignature: 'instance.destroy()' }
+    ),
+  ],
 };
 
 

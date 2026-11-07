@@ -1312,6 +1312,33 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'SVG viewport height in pixels',
     },
   ],
+  'd3-zoom-pan-rescale': [
+    {
+      name: 'color',
+      type: 'enum',
+      defaultValue: 'steelblue',
+      options: ['steelblue', 'seagreen', 'orange', 'purple', 'crimson'],
+      description: 'Color of data point circle glyphs',
+    },
+    {
+      name: 'scaleExtentMin',
+      type: 'number',
+      defaultValue: 1,
+      min: 0.5,
+      max: 2,
+      step: 0.25,
+      description: 'Minimum allowed zoom scale factor',
+    },
+    {
+      name: 'scaleExtentMax',
+      type: 'number',
+      defaultValue: 8,
+      min: 2,
+      max: 16,
+      step: 1,
+      description: 'Maximum allowed zoom scale factor',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {
