@@ -1,4 +1,4 @@
-function useIsMounted() {
+const useIsMounted = () => {
   const isMountedRef = React.useRef(true);
 
   React.useEffect(() => {

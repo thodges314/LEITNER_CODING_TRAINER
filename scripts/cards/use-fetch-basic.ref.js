@@ -1,4 +1,4 @@
-function useFetch(url) {
+const useFetch = (url) => {
   const [state, setState] = useState({ data: null, loading: true, error: null });
 
   useEffect(() => {

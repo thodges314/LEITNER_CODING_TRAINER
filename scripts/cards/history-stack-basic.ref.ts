@@ -7,7 +7,7 @@ interface HistoryManager<T> {
   redo(): T;
 }
 
-function createHistory<T>(initial: T): HistoryManager<T> {
+const createHistory = <T,>(initial: T): HistoryManager<T> => {
   const past: T[] = [];
   let present: T = initial;
   let future: T[] = [];

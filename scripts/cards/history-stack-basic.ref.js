@@ -1,4 +1,4 @@
-function createHistory(initial) {
+const createHistory = (initial) => {
   const past = [];
   let present = initial;
   let future = [];

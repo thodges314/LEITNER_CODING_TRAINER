@@ -7,7 +7,7 @@ interface Store<T> {
   subscribe(listener: Listener<T>): Unsubscribe;
 }
 
-function createStore<T extends Record<string, unknown>>(initialState: T): Store<T> {
+const createStore = <T extends Record<string, unknown>>(initialState: T): Store<T> => {
   let state: T = initialState;
   const listeners = new Set<Listener<T>>();
 

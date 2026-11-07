@@ -4,12 +4,12 @@ const TABS = [
   { id: 'about', label: 'About' },
 ];
 
-function Panel({ load, tab }) {
+const Panel = ({ load, tab }) => {
   const text = use(load(tab));
   return <p>{text}</p>;
-}
+};
 
-function TabbedViewer({ load }) {
+const TabbedViewer = ({ load }) => {
   const [tab, setTab] = useState('home');
   const [isPending, startTransition] = useTransition();
 
