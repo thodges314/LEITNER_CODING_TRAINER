@@ -1550,5 +1550,13 @@
   "next-layout-template-composition": {
     "difficulty": 2,
     "concept": "next-layouts-templates"
+  },
+  "next-client-boundary-guard": {
+    "difficulty": 3,
+    "concept": "next-rsc-boundaries"
+  },
+  "next-parallel-intercepting-routes": {
+    "difficulty": 3,
+    "concept": "next-intercepting-routes"
   }
 }

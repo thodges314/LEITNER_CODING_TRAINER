@@ -11,8 +11,8 @@ Built with **React 19 + TypeScript + Vite**. Zero backend — everything runs lo
 ```bash
 npm install
 npm run dev           # Start Vite development server (localhost:5173)
-npm test              # Run Vitest suite (2,498 tests across 70 test files)
-npm run e2e           # Run Playwright E2E suite in real Chromium (843 tests across 17 test files)
+npm test              # Run Vitest suite (2,504 tests across 70 test files)
+npm run e2e           # Run Playwright E2E suite in real Chromium (847 tests across 17 test files)
 npm run check:cards   # Read-only check: verify topics.json & catalogIndex.json match source cards
 npm run build:cards   # Rebuild topics.json & catalogIndex.json from scripts/cards/ sources
 npm run lint          # Run ESLint across workspace
@@ -97,7 +97,7 @@ Switchable in Settings between two spaced-repetition models:
 
 ## Content & Authoring Pipeline
 
-The repository includes **388 curated cards** across 17 topic tracks with **2,547 test cases**:
+The repository includes **390 curated cards** across 17 topic tracks with **2,555 test cases**:
 - **Advanced Algorithms** (57 cards)
 - **JS Utilities** (44 cards)
 - **React Components** (41 cards)
@@ -112,8 +112,8 @@ The repository includes **388 curated cards** across 17 topic tracks with **2,54
 - **SQL & Relational Databases** (15 cards)
 - **Tailwind CSS** (14 cards)
 - **TypeScript Patterns** (14 cards)
+- **Next.js App Router** (11 cards)
 - **GraphQL APIs & Execution** (10 cards)
-- **Next.js App Router** (9 cards)
 - **Testing & Libraries** (8 cards)
 
 ### Card Structure (`scripts/cards/`)

@@ -5477,5 +5477,35 @@
       "typescript"
     ],
     "summary": "Implement Next.js App Router Layout and Template components with strict prop typing and remount coordinator"
+  },
+  {
+    "id": "next-client-boundary-guard",
+    "title": "Next.js RSC Client Boundary Serialization Guard",
+    "track": "nextjs",
+    "concept": "next-rsc-boundaries",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "rsc",
+      "serialization",
+      "client-components",
+      "validation"
+    ],
+    "summary": "Implement a React Server Component (RSC) to Client Component serialization guard that validates props passed across the network boundary"
+  },
+  {
+    "id": "next-parallel-intercepting-routes",
+    "title": "Next.js Parallel & Intercepting Route Evaluator",
+    "track": "nextjs",
+    "concept": "next-intercepting-routes",
+    "difficulty": 3,
+    "tags": [
+      "nextjs",
+      "router",
+      "parallel-routes",
+      "intercepting-routes",
+      "app-router"
+    ],
+    "summary": "Implement a Next.js App Router parallel route slot and intercepting route evaluator"
   }
 ]

@@ -75,7 +75,7 @@ Add `NEXT_SANDBOX_APIS = ['NextResponse', 'NextRequest', 'revalidateTag', 'reval
   - *Context:* `app/dashboard/layout.tsx` vs `app/dashboard/template.tsx` composition.
   - *Contract:* Enforces `React.ReactNode` children typing and models the core architectural distinction: Layout preserves state across route changes while Template remounts its component tree with fresh state.
 
-### Batch 4: Advanced Architecture & RSC Boundaries (2 Cards) - IN PROGRESS
+### Batch 4: Advanced Architecture & RSC Boundaries (2 Cards) - COMPLETE
 - **`next-client-boundary-guard`**
   - *Context:* React Server Component (RSC) to Client Component prop boundary serializer.
   - *Contract:* Validates props passed across the network boundary, ensuring all passed values are JSON-serializable primitives/objects/arrays, and flagging forbidden values (functions, symbols, class instances) with descriptive serialization errors.
@@ -85,7 +85,7 @@ Add `NEXT_SANDBOX_APIS = ['NextResponse', 'NextRequest', 'revalidateTag', 'reval
 
 ---
 
-## 4. Track Structure & Integration
+## 4. Track Structure & Integration - ALL 11 CARDS COMPLETE
 
 - **Track ID:** `nextjs` (first-class domain track)
 - **Track Metadata:**
