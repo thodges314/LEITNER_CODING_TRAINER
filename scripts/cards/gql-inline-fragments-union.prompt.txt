@@ -1,0 +1,46 @@
+### `query SearchFeed($term: String!): SearchResult`
+
+## Description
+
+In GraphQL, a `union` represents an abstract type that can return one of several distinct concrete object types without requiring them to share common fields. Because the concrete types have different shapes, clients query union fields using **inline fragments** (`... on TypeName`) and request the meta-field `__typename` to discriminate between received records.
+
+Given the following GraphQL schema:
+
+```graphql
+union SearchResult = User | Issue | Comment
+
+type User {
+  id: ID!
+  username: String!
+  avatarUrl: String
+}
+
+type Issue {
+  id: ID!
+  title: String!
+  status: String!
+}
+
+type Comment {
+  id: ID!
+  body: String!
+  author: User!
+}
+
+type Query {
+  search(term: String!): [SearchResult!]!
+}
+```
+
+Write a GraphQL query document satisfying these requirements:
+
+### Requirements
+
+- Define an operation named `query SearchFeed` accepting a required variable `$term: String!`.
+- Query the `search(term: $term)` field.
+- On each search item, request:
+  - `__typename` to identify the concrete return type.
+  - An inline fragment `... on User` selecting `id`, `username`, and `avatarUrl`.
+  - An inline fragment `... on Issue` selecting `id`, `title`, and `status`.
+  - An inline fragment `... on Comment` selecting `id`, `body`, and nested `author { username }`.
+

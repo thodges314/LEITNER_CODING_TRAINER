@@ -1,0 +1,12 @@
+{
+  "track": "graphql-server",
+  "title": "GraphQL Client: Optimistic Mutation Layers & Rollback",
+  "tags": [
+    "graphql",
+    "cache",
+    "optimistic-ui",
+    "mutations",
+    "client"
+  ]
+}
+

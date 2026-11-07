@@ -1,0 +1,23 @@
+query SearchFeed($term: String!) {
+  search(term: $term) {
+    __typename
+    ... on User {
+      id
+      username
+      avatarUrl
+    }
+    ... on Issue {
+      id
+      title
+      status
+    }
+    ... on Comment {
+      id
+      body
+      author {
+        username
+      }
+    }
+  }
+}
+

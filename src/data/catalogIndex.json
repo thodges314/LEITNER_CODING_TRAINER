@@ -5241,5 +5241,96 @@
       "queries"
     ],
     "summary": "interface ByRoleOptions {"
+  },
+  {
+    "id": "graphql-normalized-cache",
+    "title": "GraphQL Client: Normalized Response Cache & Tree Reconstruction",
+    "track": "graphql-server",
+    "concept": "graphql-client",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "cache",
+      "normalization",
+      "client",
+      "state-management"
+    ],
+    "summary": "interface CacheReference {"
+  },
+  {
+    "id": "graphql-optimistic-cache",
+    "title": "GraphQL Client: Optimistic Mutation Layers & Rollback",
+    "track": "graphql-server",
+    "concept": "graphql-client",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "cache",
+      "optimistic-ui",
+      "mutations",
+      "client"
+    ],
+    "summary": "interface MutateOptions<T extends Record<string, any> = Record<string, any>> {"
+  },
+  {
+    "id": "graphql-relay-pagination-merger",
+    "title": "GraphQL Client: Relay Connection Pagination Merger",
+    "track": "graphql-server",
+    "concept": "graphql-client",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "cursor",
+      "client",
+      "cache"
+    ],
+    "summary": "interface PageInfo {"
+  },
+  {
+    "id": "gql-inline-fragments-union",
+    "title": "Inline Fragments & Union Type Conditions",
+    "track": "graphql",
+    "concept": "gql-fragments",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "queries",
+      "unions",
+      "fragments",
+      "inline-fragments"
+    ],
+    "summary": "In GraphQL, a union represents an abstract type that can return one of several distinct concrete object types without requiring them to share commo..."
+  },
+  {
+    "id": "gql-schema-sdl-interfaces-directives",
+    "title": "Schema Definition: Interfaces & Directives",
+    "track": "graphql",
+    "concept": "gql-schema-definitions",
+    "difficulty": 4,
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "interfaces",
+      "directives"
+    ],
+    "summary": "Write an SDL (Schema Definition Language) schema string defining interfaces, custom directives, and implementing object types."
+  },
+  {
+    "id": "gql-subscription-document",
+    "title": "Subscription with Filter Arguments & Selection",
+    "track": "graphql",
+    "concept": "gql-subscriptions",
+    "difficulty": 3,
+    "tags": [
+      "graphql",
+      "subscriptions",
+      "realtime",
+      "operations",
+      "documents"
+    ],
+    "summary": "GraphQL subscriptions allow clients to listen for real-time updates pushed from the server when events occur. A subscription document uses the subs..."
   }
 ]

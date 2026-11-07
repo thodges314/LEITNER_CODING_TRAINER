@@ -250,3 +250,47 @@ describe('prepareHtmlCode', () => {
   });
 });
 
+describe('GraphQL runner with pure document', () => {
+  const gqlCard: TopicItem = {
+    id: 'gql-test',
+    track: 'graphql',
+    inputLanguage: 'graphql',
+    title: 'GraphQL Test',
+    box: 1,
+    streak: 0,
+    nextEligibleTrial: 0,
+    status: 'active',
+    tags: ['graphql'],
+    promptSeed: 'Test',
+    testHarness: `
+      await (async () => {
+        const userDoc = (typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();
+        const testSchema = buildSchema('type Query { ping: String! }');
+        const root = { ping: () => 'pong' };
+        async function runSafe(vars) {
+          return await graphql({ schema: testSchema, source: userDoc, rootValue: root, variableValues: vars });
+        }
+        const r1 = await runSafe({});
+        $test.check('returns pong', !r1.errors && r1.data?.ping === 'pong', r1);
+      })();
+    `,
+  };
+
+  it('passes when user submits pure GraphQL query', async () => {
+    const code = `query { ping }`;
+    const r = await runHarness(gqlCard, code, 'js');
+    expect(r.passed).toBe(true);
+    expect(r.passCount).toBe(1);
+    expect(r.failCount).toBe(0);
+  });
+
+  it('normalizes mode to js when called in ts mode without failing on un-annotated harness functions', async () => {
+    const code = `query { ping }`;
+    const r = await runHarness(gqlCard, code, 'ts');
+    expect(r.passed).toBe(true);
+    expect(r.passCount).toBe(1);
+    expect(r.failCount).toBe(0);
+  });
+});
+
+
