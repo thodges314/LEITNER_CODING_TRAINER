@@ -30,7 +30,7 @@ function SegmentedControlPreview() {
   };
 
   return (
-    <div className="p-8 max-w-xl mx-auto flex flex-col items-center justify-center min-h-[180px] gap-6">
+    <div className="p-8 max-w-xl mx-auto flex items-center justify-center min-h-[140px]">
       <SegmentedControl
         key={`${size}-${fullWidth}`}
         options={options}
@@ -39,10 +39,6 @@ function SegmentedControlPreview() {
         size={size}
         fullWidth={Boolean(fullWidth)}
       />
-
-      <div className="text-xs text-slate-500 font-mono">
-        Active frequency: <span className="text-indigo-400 font-semibold">{currentValue}</span>
-      </div>
     </div>
   );
 }
