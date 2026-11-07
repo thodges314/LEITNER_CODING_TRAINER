@@ -1,18 +1,21 @@
 const DEFAULT_DENSITY_POINTS = [
-  { x: 130, y: 110, weight: 2 },
-  { x: 142, y: 118, weight: 3 },
-  { x: 125, y: 125, weight: 2 },
-  { x: 150, y: 105, weight: 2 },
-  { x: 138, y: 132, weight: 3 },
-  { x: 155, y: 122, weight: 2 },
-  { x: 300, y: 165, weight: 3 },
-  { x: 315, y: 175, weight: 4 },
-  { x: 290, y: 180, weight: 2 },
-  { x: 308, y: 155, weight: 3 },
-  { x: 322, y: 162, weight: 2 },
-  { x: 298, y: 190, weight: 2 },
-  { x: 220, y: 95, weight: 1.5 },
-  { x: 230, y: 105, weight: 1.5 },
+  { x: 120, y: 90 },
+  { x: 125, y: 95 },
+  { x: 115, y: 85 },
+  { x: 130, y: 100 },
+  { x: 110, y: 92 },
+  { x: 122, y: 88 },
+  { x: 128, y: 96 },
+  { x: 310, y: 170 },
+  { x: 315, y: 165 },
+  { x: 305, y: 175 },
+  { x: 320, y: 180 },
+  { x: 298, y: 168 },
+  { x: 312, y: 174 },
+  { x: 325, y: 160 },
+  { x: 220, y: 130 },
+  { x: 225, y: 135 },
+  { x: 215, y: 125 },
 ];
 
 (function () {
@@ -39,22 +42,7 @@ const DEFAULT_DENSITY_POINTS = [
     }
     container.innerHTML = '';
 
-    const wrapper = document.createElement('div');
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'column';
-    wrapper.style.gap = '8px';
-
-    const statusBar = document.createElement('div');
-    statusBar.style.fontSize = '12px';
-    statusBar.style.fontFamily = 'monospace';
-    statusBar.style.color = 'slategray';
-
-    const chartBox = document.createElement('div');
-    wrapper.appendChild(statusBar);
-    wrapper.appendChild(chartBox);
-    container.appendChild(wrapper);
-
-    instance = renderContourDensity(chartBox, DEFAULT_DENSITY_POINTS, {
+    instance = renderContourDensity(container, DEFAULT_DENSITY_POINTS, {
       width: 450,
       height: 270,
       bandwidth: typeof props.bandwidth === 'number' ? props.bandwidth : 24,
@@ -62,25 +50,11 @@ const DEFAULT_DENSITY_POINTS = [
       cellSize: typeof props.cellSize === 'number' ? props.cellSize : 4,
       showPoints: props.showPoints !== false,
       onSelectBand: function (band, idx) {
-        statusBar.textContent =
-          'Selected Isoline Band #' +
-          idx +
-          ' · Density Threshold: ' +
-          band.value.toFixed(5) +
-          ' · Rings: ' +
-          band.ringCount;
         if (typeof log === 'function') {
           log('onSelectBand', idx, Number(band.value.toFixed(5)), band.ringCount);
         }
       },
     });
-
-    statusBar.textContent =
-      'Bands: ' +
-      instance.getBands().length +
-      ' · Peak Density: ' +
-      instance.getPeakDensity().toFixed(5) +
-      ' · Click any isoline band';
   }
 
   render(currentProps);
@@ -92,4 +66,3 @@ const DEFAULT_DENSITY_POINTS = [
     });
   }
 })();
-
