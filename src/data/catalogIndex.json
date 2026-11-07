@@ -4935,7 +4935,7 @@
       "svg",
       "dom"
     ],
-    "summary": "interface JoinDatum {"
+    "summary": "interface KeyedItem {"
   },
   {
     "id": "d3-scales-domain-range-basics",

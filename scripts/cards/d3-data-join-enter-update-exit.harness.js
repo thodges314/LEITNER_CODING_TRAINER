@@ -1,202 +1,140 @@
-const INITIAL_METRICS = [
-  { id: 'cpu', label: 'CPU', value: 45 },
-  { id: 'mem', label: 'Memory', value: 70 },
-  { id: 'net', label: 'Network', value: 30 },
-];
-
-// 1. Mounts SVG container and enters all initial rows with data-join="enter"
+// 1. Enters initial g.box elements with rect and centered text label
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  document.body.appendChild(svg);
 
-  const instance = renderKeyedDataJoin(container, INITIAL_METRICS, {
-    width: 440,
-    rowHeight: 36,
-    enterColor: 'seagreen',
+  updateKeyedBars(svg, [{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+  const groups = Array.from(svg.querySelectorAll('g.box'));
+
+  const structureCorrect = groups.every((g, idx) => {
+    const id = ['a', 'b', 'c'][idx];
+    const rect = g.querySelector('rect');
+    const text = g.querySelector('text');
+    return (
+      g.getAttribute('data-id') === id &&
+      rect?.getAttribute('width') === '40' &&
+      rect?.getAttribute('height') === '40' &&
+      rect?.getAttribute('fill') === 'steelblue' &&
+      text?.getAttribute('x') === '20' &&
+      text?.getAttribute('y') === '25' &&
+      text?.getAttribute('text-anchor') === 'middle' &&
+      text?.getAttribute('fill') === 'white' &&
+      text?.textContent === id
+    );
   });
 
-  const svg = container.querySelector('svg');
-  const rows = Array.from(container.querySelectorAll('g.join-row'));
-  const stats = instance.getStats();
+  const transformsCorrect =
+    groups[0]?.getAttribute('transform') === 'translate(0, 10)' &&
+    groups[1]?.getAttribute('transform') === 'translate(50, 10)' &&
+    groups[2]?.getAttribute('transform') === 'translate(100, 10)';
 
-  const allEnter = rows.every(
-    (r) =>
-      r.getAttribute('data-join') === 'enter' &&
-      r.querySelector('rect.join-bar')?.getAttribute('fill') === 'seagreen'
-  );
-
-  const passed =
-    svg !== null &&
-    svg.getAttribute('role') === 'img' &&
-    svg.getAttribute('aria-label') === 'Keyed data join chart' &&
-    rows.length === 3 &&
-    allEnter &&
-    stats.entered === 3 &&
-    stats.updated === 0 &&
-    stats.exited === 0 &&
-    stats.total === 3;
+  const passed = groups.length === 3 && structureCorrect && transformsCorrect;
 
   $test.check(
-    'Mounts SVG container and enters all initial rows with data-join="enter"',
+    'Enters initial g.box elements with rect and centered text label',
     passed,
-    { stats, rowCount: rows.length }
+    { count: groups.length, structureCorrect, transformsCorrect }
   );
 
-  instance.destroy();
-  container.remove();
+  svg.remove();
 }
 
-// 2. Preserves existing DOM node identity across keyed updates and marks data-join="update"
+// 2. Preserves DOM node identity across keyed updates
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  document.body.appendChild(svg);
 
-  const instance = renderKeyedDataJoin(container, INITIAL_METRICS, {
-    enterColor: 'seagreen',
-    updateColor: 'steelblue',
-  });
+  updateKeyedBars(svg, [{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+  const nodeABefore = svg.querySelector('g.box[data-id="a"]');
+  const nodeCBefore = svg.querySelector('g.box[data-id="c"]');
 
-  const memNodeBefore = container.querySelector('g.join-row[data-id="mem"]');
-  const cpuNodeBefore = container.querySelector('g.join-row[data-id="cpu"]');
-
-  const nextStats = instance.update([
-    { id: 'mem', label: 'Memory', value: 85 },
-    { id: 'cpu', label: 'CPU', value: 50 },
-    { id: 'disk', label: 'Disk', value: 60 },
-  ]);
-
-  const memNodeAfter = container.querySelector('g.join-row[data-id="mem"]');
-  const cpuNodeAfter = container.querySelector('g.join-row[data-id="cpu"]');
-  const diskNodeAfter = container.querySelector('g.join-row[data-id="disk"]');
-  const netNodeAfter = container.querySelector('g.join-row[data-id="net"]');
+  updateKeyedBars(svg, [{ id: 'c' }, { id: 'a' }, { id: 'd' }]);
+  const nodeAAfter = svg.querySelector('g.box[data-id="a"]');
+  const nodeCAfter = svg.querySelector('g.box[data-id="c"]');
 
   const passed =
-    memNodeBefore !== null &&
-    memNodeAfter === memNodeBefore &&
-    cpuNodeAfter === cpuNodeBefore &&
-    netNodeAfter === null &&
-    memNodeAfter.getAttribute('data-join') === 'update' &&
-    memNodeAfter.querySelector('rect.join-bar')?.getAttribute('fill') === 'steelblue' &&
-    diskNodeAfter !== null &&
-    diskNodeAfter.getAttribute('data-join') === 'enter' &&
-    diskNodeAfter.querySelector('rect.join-bar')?.getAttribute('fill') === 'seagreen' &&
-    nextStats.entered === 1 &&
-    nextStats.updated === 2 &&
-    nextStats.exited === 1 &&
-    nextStats.total === 3;
+    nodeABefore !== null &&
+    nodeCBefore !== null &&
+    nodeAAfter === nodeABefore &&
+    nodeCAfter === nodeCBefore;
 
   $test.check(
-    'Preserves existing DOM node identity across keyed updates and marks data-join="update"',
+    'Preserves DOM node identity across keyed updates',
     passed,
-    {
-      sameMemDomNode: memNodeAfter === memNodeBefore,
-      nextStats,
-    }
+    { sameA: nodeAAfter === nodeABefore, sameC: nodeCAfter === nodeCBefore }
   );
 
-  instance.destroy();
-  container.remove();
+  svg.remove();
 }
 
-// 3. Reorders DOM elements to match new data array order and updates transforms
+// 3. Removes exiting DOM elements when keys are omitted
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  document.body.appendChild(svg);
 
-  const instance = renderKeyedDataJoin(container, INITIAL_METRICS, {
-    rowHeight: 40,
-  });
+  updateKeyedBars(svg, [{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+  updateKeyedBars(svg, [{ id: 'c' }, { id: 'a' }, { id: 'd' }]);
 
-  instance.update([
-    { id: 'net', label: 'Network', value: 90 },
-    { id: 'cpu', label: 'CPU', value: 25 },
-  ]);
+  const nodeB = svg.querySelector('g.box[data-id="b"]');
+  const nodeD = svg.querySelector('g.box[data-id="d"]');
 
-  const rows = Array.from(container.querySelectorAll('g.join-row'));
-  const idsInDomOrder = rows.map((r) => r.getAttribute('data-id'));
-  const transforms = rows.map((r) => r.getAttribute('transform'));
-  const labels = rows.map((r) => r.querySelector('text.join-label')?.textContent);
-
-  const passed =
-    idsInDomOrder.length === 2 &&
-    idsInDomOrder[0] === 'net' &&
-    idsInDomOrder[1] === 'cpu' &&
-    transforms[0] === 'translate(0, 0)' &&
-    transforms[1] === 'translate(0, 40)' &&
-    labels[0] === 'Network: 90' &&
-    labels[1] === 'CPU: 25';
+  const passed = nodeB === null && nodeD !== null;
 
   $test.check(
-    'Reorders DOM elements to match new data array order and updates transforms',
+    'Removes exiting DOM elements when keys are omitted',
     passed,
-    { idsInDomOrder, transforms, labels }
+    { bRemoved: nodeB === null, dEntered: nodeD !== null }
   );
 
-  instance.destroy();
-  container.remove();
+  svg.remove();
 }
 
-// 4. Scales bar widths proportionally and clamps values exceeding maxValue
+// 4. Updates transforms to match new index order
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  document.body.appendChild(svg);
 
-  const instance = renderKeyedDataJoin(
-    container,
-    [
-      { id: 'low', label: 'Low', value: 25 },
-      { id: 'high', label: 'High', value: 50 },
-      { id: 'over', label: 'Over', value: 200 },
-    ],
-    { width: 340, maxValue: 100 }
-  );
+  updateKeyedBars(svg, [{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+  updateKeyedBars(svg, [{ id: 'c' }, { id: 'a' }, { id: 'd' }]);
 
-  // max bar width = 340 - 140 = 200
-  const bars = Array.from(container.querySelectorAll('rect.join-bar'));
-  const widths = bars.map((b) => Number(b.getAttribute('width')));
+  const groupC = svg.querySelector('g.box[data-id="c"]');
+  const groupA = svg.querySelector('g.box[data-id="a"]');
+  const groupD = svg.querySelector('g.box[data-id="d"]');
 
   const passed =
-    widths.length === 3 &&
-    Math.abs(widths[0] - 50) < 0.01 &&
-    Math.abs(widths[1] - 100) < 0.01 &&
-    Math.abs(widths[2] - 200) < 0.01;
+    groupC?.getAttribute('transform') === 'translate(0, 10)' &&
+    groupA?.getAttribute('transform') === 'translate(50, 10)' &&
+    groupD?.getAttribute('transform') === 'translate(100, 10)';
 
   $test.check(
-    'Scales bar widths proportionally and clamps values exceeding maxValue',
+    'Updates transforms to match new index order',
     passed,
-    { widths }
+    { tC: groupC?.getAttribute('transform'), tA: groupA?.getAttribute('transform'), tD: groupD?.getAttribute('transform') }
   );
 
-  instance.destroy();
-  container.remove();
+  svg.remove();
 }
 
-// 5. Handles empty array transitions and cleans up DOM on destroy
+// 5. Handles empty or undefined data by removing all elements
 {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  document.body.appendChild(svg);
 
-  const instance = renderKeyedDataJoin(container, INITIAL_METRICS);
-  const emptyStats = instance.update([]);
-  const remainingRows = container.querySelectorAll('g.join-row').length;
+  updateKeyedBars(svg, [{ id: 'a' }, { id: 'b' }]);
+  updateKeyedBars(svg, undefined);
+  const afterUndefined = svg.querySelectorAll('g.box').length;
 
-  instance.destroy();
-  const cleanedUp = container.innerHTML === '';
+  updateKeyedBars(svg, [{ id: 'x' }]);
+  updateKeyedBars(svg, []);
+  const afterEmpty = svg.querySelectorAll('g.box').length;
 
-  const passed =
-    emptyStats.entered === 0 &&
-    emptyStats.updated === 0 &&
-    emptyStats.exited === 3 &&
-    emptyStats.total === 0 &&
-    remainingRows === 0 &&
-    cleanedUp;
+  const passed = afterUndefined === 0 && afterEmpty === 0;
 
   $test.check(
-    'Handles empty array transitions and cleans up DOM on destroy',
+    'Handles empty or undefined data by removing all elements',
     passed,
-    { emptyStats, remainingRows, cleanedUp }
+    { afterUndefined, afterEmpty }
   );
 
-  container.remove();
+  svg.remove();
 }
-

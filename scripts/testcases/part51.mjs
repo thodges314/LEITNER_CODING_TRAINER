@@ -634,34 +634,34 @@ export default {
   ],
   'd3-data-join-enter-update-exit': [
     r(
-      'Mounts SVG container and enters all initial rows with data-join="enter"',
-      'renderKeyedDataJoin(container, INITIAL_METRICS, { width: 440, rowHeight: 36 })',
-      'Renders 3 g.join-row elements with data-join="enter" and stats { entered: 3, updated: 0, exited: 0, total: 3 }',
-      { callSignature: 'renderKeyedDataJoin(container, items, options)' }
+      'Enters initial g.box elements with rect and centered text label',
+      'updateKeyedBars(svg, [{ id: "a" }, { id: "b" }, { id: "c" }])',
+      'Appends 3 g.box elements with rect (40x40 steelblue), centered text (d.id), and translates at (0, 10), (50, 10), (100, 10)',
+      { callSignature: 'updateKeyedBars(svg, items)' }
     ),
     r(
-      'Preserves existing DOM node identity across keyed updates and marks data-join="update"',
-      'instance.update([{ id: "mem", ... }, { id: "cpu", ... }, { id: "disk", ... }])',
-      'Surviving keys reuse the exact same DOM elements with data-join="update", new key enters, removed key exits',
-      { callSignature: 'instance.update(nextItems)' }
+      'Preserves DOM node identity across keyed updates',
+      'updateKeyedBars(svg, [{ id: "c" }, { id: "a" }, { id: "d" }])',
+      'Surviving keys "a" and "c" reuse the exact same DOM node references as before',
+      { callSignature: 'updateKeyedBars(svg, nextItems)' }
     ),
     r(
-      'Reorders DOM elements to match new data array order and updates transforms',
-      'instance.update([{ id: "net", value: 90 }, { id: "cpu", value: 25 }])',
-      'DOM node order matches nextItems and translate(0, i * rowHeight) updates accordingly',
-      { callSignature: 'instance.update(reorderedItems)' }
+      'Removes exiting DOM elements when keys are omitted',
+      'updateKeyedBars(svg, [{ id: "c" }, { id: "a" }, { id: "d" }])',
+      'Group with data-id="b" is removed from the SVG DOM',
+      { callSignature: 'updateKeyedBars(svg, nextItems)' }
     ),
     r(
-      'Scales bar widths proportionally and clamps values exceeding maxValue',
-      'renderKeyedDataJoin(container, [{ value: 25 }, { value: 50 }, { value: 200 }], { width: 340, maxValue: 100 })',
-      'Maps [0, 100] to [0, 200]px and clamps 200 at 200px',
-      { callSignature: 'renderKeyedDataJoin(container, items, { width: 340, maxValue: 100 })' }
+      'Updates transforms to match new index order',
+      'updateKeyedBars(svg, [{ id: "c" }, { id: "a" }, { id: "d" }])',
+      'Group "c" moves to translate(0, 10), "a" to translate(50, 10), and new group "d" to translate(100, 10)',
+      { callSignature: 'updateKeyedBars(svg, reorderedItems)' }
     ),
     r(
-      'Handles empty array transitions and cleans up DOM on destroy',
-      'instance.update([]) and instance.destroy()',
-      'Exits all remaining rows and clears container innerHTML on destroy',
-      { callSignature: 'instance.update([])' }
+      'Handles empty or undefined data by removing all elements',
+      'updateKeyedBars(svg, undefined) and updateKeyedBars(svg, [])',
+      'All g.box elements are removed from the SVG and no undefined boxes are drawn',
+      { callSignature: 'updateKeyedBars(svg, undefined)' }
     ),
   ],
   'd3-scales-domain-range-basics': [
