@@ -10,5 +10,6 @@
     "react"
   ],
   "rendersComponent": true,
-  "requiresDom": true
+  "requiresDom": true,
+  "previewLibraries": ["react", "tailwind"]
 }

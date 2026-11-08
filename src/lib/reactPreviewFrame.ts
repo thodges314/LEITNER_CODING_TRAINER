@@ -488,6 +488,115 @@ ${libScripts.join('\n')}
         }, []);
         return props;
       };
+
+      // Next.js runtime mocks & components
+      const mockRouter = {
+        pathname: '/',
+        query: {},
+        asPath: '/',
+        push: function(url) { if (typeof window.log === 'function') window.log('router:push', url); },
+        replace: function(url) { if (typeof window.log === 'function') window.log('router:replace', url); },
+        back: function() { if (typeof window.log === 'function') window.log('router:back'); },
+        forward: function() { if (typeof window.log === 'function') window.log('router:forward'); },
+        refresh: function() { if (typeof window.log === 'function') window.log('router:refresh'); },
+        prefetch: function() {},
+      };
+
+      window.useRouter = function() { return mockRouter; };
+      window.usePathname = function() { return window.location.pathname || '/'; };
+      window.useSearchParams = function() { return new URLSearchParams(window.location.search); };
+      window.notFound = function() { throw new Error('NEXT_NOT_FOUND'); };
+      window.redirect = function(url) { throw new Error('NEXT_REDIRECT: ' + url); };
+
+      window.Link = function Link(props) {
+        const href = props.href;
+        const children = props.children;
+        const className = props.className;
+        const rest = Object.assign({}, props);
+        delete rest.href;
+        delete rest.children;
+        delete rest.className;
+        delete rest.prefetch;
+        delete rest.scroll;
+        delete rest.replace;
+        const urlStr = typeof href === 'object' && href ? (href.pathname || '/') : (href || '/');
+        return React.createElement('a', Object.assign({
+          href: urlStr,
+          className: className,
+          'data-next-link': 'true',
+          onClick: function(e) {
+            e.preventDefault();
+            if (typeof window.log === 'function') window.log('navigate', urlStr);
+          }
+        }, rest), children);
+      };
+
+      window.Image = function Image(props) {
+        const src = props.src;
+        const alt = props.alt;
+        const width = props.width;
+        const height = props.height;
+        const fill = props.fill;
+        const priority = props.priority;
+        const sizes = props.sizes;
+        const className = props.className;
+        const rest = Object.assign({}, props);
+        delete rest.src;
+        delete rest.alt;
+        delete rest.width;
+        delete rest.height;
+        delete rest.fill;
+        delete rest.priority;
+        delete rest.sizes;
+        delete rest.className;
+
+        const imgProps = Object.assign({
+          src: src,
+          alt: alt,
+          'data-next-image': 'true',
+          decoding: 'async',
+          loading: priority ? 'eager' : 'lazy',
+        }, priority ? { fetchpriority: 'high' } : {}, rest);
+
+        if (fill) {
+          imgProps['data-fill'] = 'true';
+          imgProps.className = ['object-cover w-full h-full', className].filter(Boolean).join(' ');
+        } else {
+          if (width !== undefined) imgProps.width = width;
+          if (height !== undefined) imgProps.height = height;
+          if (className) imgProps.className = className;
+        }
+
+        if (sizes) imgProps.sizes = sizes;
+
+        return React.createElement('img', imgProps);
+      };
+
+      window.UserBadge = function UserBadge(props) {
+        const user = props.user || {};
+        return React.createElement('div', {
+          'data-testid': 'user-badge',
+          className: 'flex items-center gap-3 p-3 bg-slate-800/80 border border-slate-700 rounded-lg text-slate-100 max-w-sm'
+        }, [
+          React.createElement('div', {
+            key: 'avatar',
+            className: 'w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white text-base shadow-sm'
+          }, (user.name || 'U').charAt(0).toUpperCase()),
+          React.createElement('div', { key: 'details', className: 'flex flex-col' }, [
+            React.createElement('div', { key: 'name-row', className: 'flex items-center gap-2' }, [
+              React.createElement('span', { key: 'name', className: 'font-semibold text-sm' }, user.name || 'Unknown User'),
+              user.role ? React.createElement('span', {
+                key: 'role',
+                className: 'text-xs px-2 py-0.5 rounded bg-blue-900/60 text-blue-300 font-mono font-medium'
+              }, user.role) : null
+            ]),
+            user.email ? React.createElement('span', {
+              key: 'email',
+              className: 'text-xs text-slate-400 font-mono mt-0.5'
+            }, user.email) : null
+          ])
+        ]);
+      };
     }
 
     // Safe mock shims for $dom, $test, and mount so that any test harness code
@@ -759,6 +868,27 @@ ${libScripts.join('\n')}
             if (window.d3) return window.d3;
             throw new Error("Cannot find module 'd3' in preview sandbox");
           }
+          if (mod === 'next/link') return { default: window.Link, Link: window.Link };
+          if (mod === 'next/image') return { default: window.Image, Image: window.Image };
+          if (mod === 'next/navigation') {
+            return {
+              useRouter: window.useRouter,
+              usePathname: window.usePathname,
+              useSearchParams: window.useSearchParams,
+              notFound: window.notFound,
+              redirect: window.redirect
+            };
+          }
+          if (mod === 'next/server') {
+            return {
+              NextRequest: window.Request,
+              NextResponse: {
+                json: function(data, init) {
+                  return new Response(JSON.stringify(data), Object.assign({ headers: { 'Content-Type': 'application/json' } }, init));
+                }
+              }
+            };
+          }
           throw new Error("Cannot find module '" + mod + "' in preview sandbox");
         };
 
@@ -767,7 +897,45 @@ ${libScripts.join('\n')}
             root = ReactDOM.createRoot(container);
           }
 
-          const element = (0, eval)(code);
+          function isPromise(val) {
+            return Boolean(val && typeof val.then === 'function');
+          }
+
+          function isAsyncComponent(node) {
+            return (
+              React.isValidElement(node) &&
+              typeof node.type === 'function' &&
+              (node.type.constructor.name === 'AsyncFunction' || (node.type && node.type[Symbol.toStringTag] === 'AsyncFunction'))
+            );
+          }
+
+          function AsyncPreviewBridge(props) {
+            const [resolvedNode, setResolvedNode] = React.useState(null);
+            React.useEffect(function() {
+              let active = true;
+              async function resolve() {
+                let item = props.elementOrPromise;
+                if (isPromise(item)) {
+                  item = await item;
+                }
+                if (isAsyncComponent(item)) {
+                  item = await item.type(item.props);
+                }
+                if (active && React.isValidElement(item)) {
+                  setResolvedNode(item);
+                }
+              }
+              resolve();
+              return function() { active = false; };
+            }, [props.elementOrPromise]);
+            return resolvedNode;
+          }
+
+          const rawElement = (0, eval)(code);
+          const isAsync = isPromise(rawElement) || isAsyncComponent(rawElement);
+          const element = isAsync
+            ? React.createElement(AsyncPreviewBridge, { elementOrPromise: rawElement })
+            : rawElement;
 
           if (React.isValidElement(element)) {
             root.render(

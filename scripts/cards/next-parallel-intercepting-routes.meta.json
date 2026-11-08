@@ -8,6 +8,8 @@
     "intercepting-routes",
     "app-router"
   ],
-  "requiresDom": true
+  "rendersComponent": true,
+  "requiresDom": true,
+  "previewLibraries": ["react", "tailwind"]
 }
 

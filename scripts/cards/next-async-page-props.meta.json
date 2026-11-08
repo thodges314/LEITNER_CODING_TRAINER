@@ -9,6 +9,8 @@
     "typescript",
     "nextjs-15"
   ],
-  "requiresDom": true
+  "rendersComponent": true,
+  "requiresDom": true,
+  "previewLibraries": ["react", "tailwind"]
 }
 

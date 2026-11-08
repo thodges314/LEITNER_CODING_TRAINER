@@ -1694,6 +1694,48 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Avatar diameter scaling and typography dimensions',
     },
   ],
+  'next-client-boundary-guard': [
+    { name: 'userId', type: 'string', defaultValue: 'usr_101', placeholder: 'User ID', description: 'User identifier fetched by Server Component' },
+    { name: 'name', type: 'string', defaultValue: 'Alex Morgan', placeholder: 'Full Name', description: 'User full name displayed in Client UserBadge' },
+    { name: 'role', type: 'enum', defaultValue: 'Lead Engineer', options: ['Lead Engineer', 'Product Manager', 'Designer', 'Admin'], description: 'Assigned role pill' },
+    { name: 'email', type: 'string', defaultValue: 'alex.morgan@company.com', placeholder: 'Email', description: 'User email' },
+  ],
+  'next-server-client-leaf-boundary': [
+    { name: 'name', type: 'string', defaultValue: 'Mechanical Keyboard RGB', placeholder: 'Product Name', description: 'Product title displayed by Server Component' },
+    { name: 'price', type: 'number', defaultValue: 149, min: 1, max: 9999, description: 'Product price in dollars' },
+    { name: 'initialFavorited', type: 'boolean', defaultValue: false, description: 'Initial state for leaf FavoriteButton' },
+  ],
+  'next-async-page-props': [
+    { name: 'category', type: 'enum', defaultValue: 'electronics', options: ['electronics', 'apparel', 'books', 'home-goods'], description: 'Async dynamic route segment (params.category)' },
+    { name: 'sort', type: 'enum', defaultValue: 'price-asc', options: ['price-asc', 'price-desc', 'newest', 'featured'], description: 'Query sort parameter (searchParams.sort)' },
+    { name: 'page', type: 'number', defaultValue: 1, min: 1, max: 50, description: 'Query pagination parameter (searchParams.page)' },
+  ],
+  'next-link-navigation': [
+    {
+      name: 'items',
+      type: 'json',
+      defaultValue: [
+        { href: '/', label: 'Overview' },
+        { href: '/analytics', label: 'Analytics' },
+        { href: '/settings', label: 'Settings' },
+        { href: '/billing', label: 'Billing' },
+      ],
+      description: 'Navigation items rendered with next/link',
+    },
+  ],
+  'next-image-component': [
+    { name: 'src', type: 'string', defaultValue: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop', placeholder: 'Image URL', description: 'Image source URL' },
+    { name: 'alt', type: 'string', defaultValue: 'Majestic Alpine Mountain Range', placeholder: 'Alt description', description: 'Accessible image alt description' },
+    { name: 'fill', type: 'boolean', defaultValue: false, description: 'Use responsive layout fill with aspect-video container' },
+    { name: 'priority', type: 'boolean', defaultValue: true, description: 'High-priority preload (fetchPriority=high, loading=eager)' },
+    { name: 'width', type: 'number', defaultValue: 600, min: 200, max: 1200, step: 50, description: 'Fixed width in pixels (when fill is false)' },
+    { name: 'height', type: 'number', defaultValue: 340, min: 150, max: 800, step: 10, description: 'Fixed height in pixels (when fill is false)' },
+  ],
+  'next-parallel-intercepting-routes': [
+    { name: 'showModal', type: 'boolean', defaultValue: false, description: 'Whether the @modal parallel slot is active' },
+    { name: 'photoId', type: 'string', defaultValue: 'photo_42', placeholder: 'Photo ID', description: 'Photo ID displayed in modal' },
+    { name: 'photoUrl', type: 'string', defaultValue: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&auto=format&fit=crop', placeholder: 'Photo URL', description: 'Photo URL displayed in modal' },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

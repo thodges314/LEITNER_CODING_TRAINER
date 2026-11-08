@@ -8,6 +8,8 @@
     "core-web-vitals",
     "responsive"
   ],
-  "requiresDom": true
+  "rendersComponent": true,
+  "requiresDom": true,
+  "previewLibraries": ["react", "tailwind"]
 }
 
