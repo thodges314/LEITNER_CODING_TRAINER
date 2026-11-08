@@ -7,9 +7,11 @@ const CLOSE_WELCOME = /Start practicing/;
 async function openApp(page: Page) {
   await page.goto('about:blank'); // something to go "back" to when leaving the app
   await page.goto('/');
+  await expect(page.locator('.app-header')).toBeVisible();
   const welcomeBtn = page.getByRole('button', { name: CLOSE_WELCOME });
   if (await welcomeBtn.isVisible()) {
     await welcomeBtn.click();
+    await expect(welcomeBtn).toHaveCount(0);
   }
 }
 

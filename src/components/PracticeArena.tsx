@@ -264,7 +264,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
 
   // Autosave the editor buffer (debounced)
   useEffect(() => {
-    if (!currentCard || isReinforcement) return;
+    if (!currentCard || isReinforcement || isEvaluating || evalResult) return;
     const starter = getStarterSnippet(currentCard);
     const trimmed = code.trim();
     if (!trimmed || code === starter) {
@@ -275,7 +275,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       saveDraft(currentCard.id, code);
     }, 300);
     return () => clearTimeout(timer);
-  }, [code, currentCard, isReinforcement]);
+  }, [code, currentCard, isReinforcement, isEvaluating, evalResult]);
 
   if (currentCard?.id !== prevCardId) {
     setPrevCardId(currentCard?.id);

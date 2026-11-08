@@ -55,8 +55,9 @@ async function submitCard(page: Page, id: string, code: string): Promise<{ verdi
     },
     { id, code, DECK_KEY, DRAFT_PREFIX }
   );
-  await page.getByRole('button', { name: /Submit Final Answer/ }).click();
   const verdict = page.getByText(VERDICT);
+  await expect(verdict).toHaveCount(0);
+  await page.getByRole('button', { name: /Submit Final Answer/ }).click();
   await expect(verdict.first()).toBeVisible();
   // Compile failures (TS cards) have no harness summary, so don't wait for one.
   const testsBadge = page.getByText(/^Tests:/).first();
@@ -73,6 +74,7 @@ async function runCardSubmission(
   if (!workerPage || workerPage.isClosed()) {
     workerPage = await browser.newPage();
     await workerPage.goto('/?view=practice');
+    await expect(workerPage.getByRole('button', { name: /Submit Final Answer/ })).toBeVisible();
   }
   try {
     const { verdict, tests } = await submitCard(workerPage, id, code);
