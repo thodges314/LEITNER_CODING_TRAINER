@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, TrendingUp, TrendingDown, Sparkles } from 'lucide-react';
+import { Play, TrendingUp, TrendingDown, Clock } from 'lucide-react';
 import type { TopicItem, Rolling24HourStats } from '../../lib/leitner';
 
 export interface PracticeActionHeroProps {
@@ -20,7 +20,7 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
       {/* Top Banner Row */}
       <div className="practice-hero-header">
         <div className="practice-hero-badge">
-          <Sparkles size={12} className="practice-hero-sparkle" />
+          <Clock size={14} className="practice-hero-clock" />
           <span>24-Hour Rolling Window</span>
         </div>
       </div>
@@ -39,7 +39,7 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
         <div className="practice-hero-metric-tile">
           <div className="practice-hero-metric-label">Promoted</div>
           <div className="practice-hero-metric-val metric-emerald" data-testid="hero-stat-promoted">
-            <TrendingUp size={16} className="metric-trend-icon" />
+            <TrendingUp size={22} className="metric-trend-icon" />
             <span>{stats.promoted}</span>
           </div>
         </div>
@@ -48,7 +48,7 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
         <div className="practice-hero-metric-tile">
           <div className="practice-hero-metric-label">Demoted</div>
           <div className="practice-hero-metric-val metric-rose" data-testid="hero-stat-demoted">
-            <TrendingDown size={16} className="metric-trend-icon" />
+            <TrendingDown size={22} className="metric-trend-icon" />
             <span>{stats.demoted}</span>
           </div>
         </div>
@@ -63,7 +63,7 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
           data-testid="resume-practice-hero-btn"
           title="Launch Practice Arena"
         >
-          <Play size={18} fill="currentColor" />
+          <Play size={20} fill="currentColor" />
           <span className="practice-hero-launch-text">Resume Practice Arena</span>
         </button>
 

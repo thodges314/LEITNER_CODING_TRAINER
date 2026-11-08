@@ -45,15 +45,15 @@
 
 /* Practice Action Hero Tile (Replaces legacy 4 KPI tiles) */
 .practice-action-hero {
-  padding: 20px 22px;
+  padding: 24px;
   border-radius: 12px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 16px;
-  min-height: 220px;
+  gap: 20px;
+  min-height: 260px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
@@ -76,15 +76,15 @@
 .practice-hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
+  gap: 6px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--accent-cyan);
 }
 
-.practice-hero-sparkle {
+.practice-hero-clock {
   color: var(--accent-cyan);
 }
 
@@ -92,18 +92,19 @@
 .practice-hero-metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
   width: 100%;
 }
 
 .practice-hero-metric-tile {
-  padding: 12px 14px;
-  border-radius: 8px;
+  padding: 18px 16px;
+  border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: center;
+  gap: 8px;
   transition: all 0.15s ease;
 }
 
@@ -113,20 +114,20 @@
 }
 
 .practice-hero-metric-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
 }
 
 .practice-hero-metric-val {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
   line-height: 1.1;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .metric-cyan {
@@ -149,7 +150,7 @@
 .practice-hero-footer {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
 }
 
@@ -158,11 +159,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 12px 20px;
-  font-size: 15px;
+  gap: 12px;
+  padding: 16px 24px;
+  font-size: 17px;
   font-weight: 700;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   box-shadow: 0 2px 10px rgba(56, 189, 248, 0.25);
@@ -185,7 +186,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
