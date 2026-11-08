@@ -43,6 +43,240 @@
   width: 100%;
 }
 
+/* Practice Action Hero Tile (Replaces legacy 4 KPI tiles) */
+.practice-action-hero {
+  padding: 20px 22px;
+  border-radius: 12px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 260px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="apple-gsos"] .practice-action-hero {
+  border: 1.5px solid #8A887E;
+  background-color: #FFFFFF;
+  box-shadow: 2px 2px 0px rgba(28, 28, 28, 0.12);
+}
+
+.practice-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.practice-hero-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.practice-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-cyan, #38BDF8);
+}
+
+[data-theme="apple-gsos"] .practice-hero-badge {
+  color: #0284C7;
+}
+
+.practice-hero-sparkle {
+  color: var(--accent-cyan, #38BDF8);
+}
+
+.practice-hero-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.practice-hero-rotation-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: var(--accent-cyan, #38BDF8);
+}
+
+[data-theme="apple-gsos"] .practice-hero-rotation-pill {
+  background: #E0F2FE;
+  border-color: #7DD3FC;
+  color: #0369A1;
+}
+
+.practice-hero-zap {
+  color: #F59E0B;
+}
+
+/* 24-Hour Metrics Grid */
+.practice-hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.practice-hero-metric-tile {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+[data-theme="apple-gsos"] .practice-hero-metric-tile {
+  background-color: #F8FAFC;
+  border: 1px solid #CBD5E1;
+}
+
+.practice-hero-metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.practice-hero-metric-val {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-cyan {
+  color: var(--accent-cyan, #38BDF8);
+}
+
+.metric-emerald {
+  color: #10B981;
+}
+
+.metric-rose {
+  color: #F43F5E;
+}
+
+[data-theme="apple-gsos"] .metric-cyan {
+  color: #0284C7;
+}
+
+[data-theme="apple-gsos"] .metric-emerald {
+  color: #059669;
+}
+
+[data-theme="apple-gsos"] .metric-rose {
+  color: #E11D48;
+}
+
+.metric-trend-icon {
+  flex-shrink: 0;
+}
+
+.practice-hero-metric-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Action Launch Button & Subtext */
+.practice-hero-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.practice-hero-launch-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.25);
+}
+
+.practice-hero-launch-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.4);
+}
+
+.practice-hero-launch-btn:active {
+  transform: translateY(0);
+}
+
+.practice-hero-launch-text {
+  letter-spacing: -0.01em;
+}
+
+.practice-hero-launch-arrow {
+  transition: transform 0.15s ease;
+}
+
+.practice-hero-launch-btn:hover .practice-hero-launch-arrow {
+  transform: translateX(3px);
+}
+
+.practice-hero-next-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-hero-hint-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.practice-hero-hint-card {
+  color: var(--text-primary);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.practice-hero-hint-track {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
 .dashboard-kpi-card {
   padding: 14px 18px;
   border-radius: 8px;

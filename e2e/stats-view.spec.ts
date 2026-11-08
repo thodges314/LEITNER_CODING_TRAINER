@@ -36,11 +36,15 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     // Verify hidden packs banner is gone
     await expect(page.getByText(/from optional packs .* are hidden/i)).toHaveCount(0);
 
-    // Verify 4 KPI cards exist
-    await expect(page.getByText('Completed Reviews')).toBeVisible();
-    await expect(page.getByText('Deck Distribution')).toBeVisible();
-    await expect(page.getByText(/Mastered \/ Long-term/)).toBeVisible();
-    await expect(page.getByText('Staged Unlock Progress')).toBeVisible();
+    // Verify PracticeActionHero tile exists alongside DeckStatsWidget
+    const heroTile = page.getByTestId('practice-action-hero');
+    await expect(heroTile).toBeVisible();
+    await expect(heroTile.getByText('Practice Momentum')).toBeVisible();
+    await expect(heroTile.getByText('24-Hour Rolling Window')).toBeVisible();
+    await expect(heroTile.getByTestId('hero-stat-attempted')).toBeVisible();
+    await expect(heroTile.getByTestId('hero-stat-promoted')).toBeVisible();
+    await expect(heroTile.getByTestId('hero-stat-demoted')).toBeVisible();
+    await expect(heroTile.getByTestId('resume-practice-hero-btn')).toBeVisible();
 
     // Verify DeckStatsWidget exists
     const statsWidget = page.getByTestId('deck-stats-widget');
@@ -143,5 +147,24 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
 
     // Screenshot Mastery Tiers in Day theme
     await saveScreenshot(page, 'stats-widget-tiers-day.png');
+  });
+
+  test('clicking Resume Practice Arena in the hero tile navigates directly to Practice Arena', async ({ page }) => {
+    await page.goto('/');
+    const welcomeBtn = page.getByRole('button', { name: /Start practicing/ });
+    if (await welcomeBtn.isVisible()) {
+      await welcomeBtn.click();
+    }
+
+    // Switch to Deck Catalog tab
+    await page.getByRole('button', { name: /Deck Catalog/i }).click();
+    await expect(page.getByTestId('practice-action-hero')).toBeVisible();
+
+    // Click big Resume Practice Arena button
+    await page.getByTestId('resume-practice-hero-btn').click();
+
+    // Verify view navigated to Practice Arena
+    await expect(page.locator('.arena-container')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Run Code \/ Test/ })).toBeVisible();
   });
 });

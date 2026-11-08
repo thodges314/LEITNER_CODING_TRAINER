@@ -819,6 +819,8 @@ export function App() {
             onOpenAddModal={() => setIsAddModalOpen(true)}
             highlightExport={highlightExport}
             onDismissHighlightExport={() => setHighlightExport(false)}
+            onResumePractice={() => setActiveView('practice')}
+            nextCardToPractice={currentCard}
           />
         )}
       </main>
