@@ -1,6 +1,6 @@
 function Preview() {
   const props = usePreviewProps({
-    src: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop',
+    src: '/Mountains.jpeg',
     alt: 'Majestic Alpine Mountain Range',
     fill: false,
     priority: true,

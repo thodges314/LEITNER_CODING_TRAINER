@@ -2,7 +2,7 @@ function Preview() {
   const props = usePreviewProps({
     showModal: false,
     photoId: 'photo_42',
-    photoUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&auto=format&fit=crop',
+    photoUrl: '/Mountains.jpeg',
   });
 
   const [modalOpen, setModalOpen] = useState(props.showModal);

@@ -1724,7 +1724,7 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     },
   ],
   'next-image-component': [
-    { name: 'src', type: 'string', defaultValue: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop', placeholder: 'Image URL', description: 'Image source URL' },
+    { name: 'src', type: 'string', defaultValue: '/Mountains.jpeg', placeholder: 'Image URL', description: 'Image source URL' },
     { name: 'alt', type: 'string', defaultValue: 'Majestic Alpine Mountain Range', placeholder: 'Alt description', description: 'Accessible image alt description' },
     { name: 'fill', type: 'boolean', defaultValue: false, description: 'Use responsive layout fill with aspect-video container' },
     { name: 'priority', type: 'boolean', defaultValue: true, description: 'High-priority preload (fetchPriority=high, loading=eager)' },
@@ -1734,7 +1734,7 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'next-parallel-intercepting-routes': [
     { name: 'showModal', type: 'boolean', defaultValue: false, description: 'Whether the @modal parallel slot is active' },
     { name: 'photoId', type: 'string', defaultValue: 'photo_42', placeholder: 'Photo ID', description: 'Photo ID displayed in modal' },
-    { name: 'photoUrl', type: 'string', defaultValue: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&auto=format&fit=crop', placeholder: 'Photo URL', description: 'Photo URL displayed in modal' },
+    { name: 'photoUrl', type: 'string', defaultValue: '/Mountains.jpeg', placeholder: 'Photo URL', description: 'Photo URL displayed in modal' },
   ],
 };
 
