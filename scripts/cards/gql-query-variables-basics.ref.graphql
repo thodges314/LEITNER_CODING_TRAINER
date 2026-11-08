@@ -1,0 +1,12 @@
+query GetProduct($id: ID!, $withDiscount: Boolean) {
+  product(id: $id, withDiscount: $withDiscount) {
+    id
+    title
+    price
+    inStock
+    category {
+      id
+      name
+    }
+  }
+}

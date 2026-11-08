@@ -1,0 +1,44 @@
+Write a GraphQL query named `GetProduct` that accepts variables `$id: ID!` and `$withDiscount: Boolean`.
+
+### Requirements
+- Operation signature: `query GetProduct($id: ID!, $withDiscount: Boolean)`
+- Top-level field: `product(id: $id, withDiscount: $withDiscount)`
+- Fields to select on `product`:
+  - `id`
+  - `title`
+  - `price`
+  - `inStock`
+  - `category`: select `id` and `name`
+
+### Schema Context
+```graphql
+type Query {
+  product(id: ID!, withDiscount: Boolean): Product
+}
+type Category {
+  id: ID!
+  name: String!
+}
+type Product {
+  id: ID!
+  title: String!
+  price: Float!
+  inStock: Boolean!
+  category: Category!
+}
+```
+
+### Example
+When executed with variables `{ id: "prod_42", withDiscount: false }`, returns:
+```json
+{
+  "product": {
+    "id": "prod_42",
+    "title": "Trail Runner Pro",
+    "price": 129.99,
+    "inStock": true,
+    "category": { "id": "cat_footwear", "name": "Footwear" }
+  }
+}
+```
+
