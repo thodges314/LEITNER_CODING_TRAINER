@@ -61,3 +61,4 @@ Analyzes an ordered segment inheritance hierarchy (`[rootLayout, ...intermediate
     - Any segment specifies `dynamic: 'force-static'` while another specifies `dynamic: 'force-dynamic'`.
     - `dynamic: 'force-static'` is combined with `revalidate: 0` or `fetchCache: 'force-no-store'`.
   - If no conflict occurs: `hasConflict: false` and `conflictReason: undefined`.
+

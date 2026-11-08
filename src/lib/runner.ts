@@ -28,6 +28,9 @@ import {
   notFound as nextNotFound,
   Inter as nextInter,
   UserBadge as NextUserBadge,
+  after as nextAfter,
+  flushAfterTasks,
+  resetAfterTasks,
   setMockPathname,
   setMockRouter,
   setMockSearchParams,
@@ -191,6 +194,9 @@ const SANDBOX_NAMES = [
   'Inter',
   'articlesStore',
   'membersStore',
+  'after',
+  'flushAfterTasks',
+  'resetAfterTasks',
   'setMockPathname',
   'setMockRouter',
   'setMockSearchParams',
@@ -240,7 +246,7 @@ export function createSandboxScope(options: {
       };
     }
     if (mod === 'd3') return { default: d3, ...d3 };
-    if (mod === 'next/server') return { default: { NextResponse, NextRequest }, NextResponse, NextRequest };
+    if (mod === 'next/server') return { default: { NextResponse, NextRequest, after: nextAfter }, NextResponse, NextRequest, after: nextAfter };
     if (mod === 'next/cache') return { default: { revalidateTag, revalidatePath }, revalidateTag, revalidatePath };
     if (mod === 'next/link') return { default: NextLink, Link: NextLink };
     if (mod === 'next/image') return { default: NextImage, Image: NextImage };
@@ -313,6 +319,9 @@ export function createSandboxScope(options: {
     nextInter,
     sandboxArticlesStore,
     sandboxMembersStore,
+    nextAfter,
+    flushAfterTasks,
+    resetAfterTasks,
     setMockPathname,
     setMockRouter,
     setMockSearchParams,

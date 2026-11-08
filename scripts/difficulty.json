@@ -1635,6 +1635,14 @@
     "difficulty": 4,
     "concept": "next-route-segment-config"
   },
+  "next-after-lifecycle-deferred": {
+    "difficulty": 5,
+    "concept": "next-after-api"
+  },
+  "next-ppr-streaming-boundaries": {
+    "difficulty": 5,
+    "concept": "next-ppr-streaming"
+  },
   "promise-waterfall-pipeline": {
     "difficulty": 2,
     "concept": "async-control"

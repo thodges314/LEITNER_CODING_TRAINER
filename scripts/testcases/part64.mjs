@@ -70,4 +70,50 @@ export default {
       '{ hasConflict: true, conflictReason: "Conflicting segment options: cannot combine force-static with force-dynamic..." }'
     ),
   ],
+
+  'next-after-lifecycle-deferred': [
+    r(
+      'Returns HTTP 201 immediately and queues non-blocking after() tasks for background processing',
+      'POST(new Request("http://localhost:3000/api/orders", { method: "POST", body: JSON.stringify({ orderId: "ord-101", customerEmail: "alex@example.com", amount: 149.99 }) }))',
+      '{ status: 201, body: { success: true, orderId: "ord-101", status: "confirmed" } }; after flush: sendOrderReceipt and recordAuditLog executed'
+    ),
+    r(
+      'Returns HTTP 400 for invalid email or non-positive amount and skips after()',
+      'POST(new Request("http://localhost:3000/api/orders", { method: "POST", body: JSON.stringify({ orderId: "ord-102", customerEmail: "invalid", amount: -10 }) }))',
+      '{ status: 400, body: { error: "Invalid order payload" } }; zero after() tasks queued'
+    ),
+    r(
+      'Returns HTTP 500 when synchronous order processing throws and skips after()',
+      'POST(new Request("http://localhost:3000/api/orders", { method: "POST", body: JSON.stringify({ orderId: "ord-103", customerEmail: "taylor@example.com", amount: 45.0 }) })) with throwing processOrder',
+      '{ status: 500, body: { error: "Order processing failed" } }; zero after() tasks queued'
+    ),
+    r(
+      'Sequentially queues and flushes isolated after() callbacks for multiple independent requests',
+      'POST(orderA) then POST(orderB); flushAfterTasks()',
+      'both responses return 201 immediately; flush executes receipt and audit for both orders without crosstalk'
+    ),
+  ],
+
+  'next-ppr-streaming-boundaries': [
+    r(
+      'Renders static product shell and Suspense skeleton fallbacks immediately on initial mount',
+      '<ProductPPRPage product={sampleProduct} inventoryPromise={invPromise} reviewsPromise={revPromise} />',
+      'static-product-shell, product-title, and price rendered; inventory-skeleton and reviews-skeleton active'
+    ),
+    r(
+      'Streams and displays inventory status when inventory promise resolves while reviews are pending',
+      'invPromise resolves with { stockCount: 18, warehouse: "Denver Hub", lowStockAlert: false }',
+      'inventory-status displays "18 in stock (Denver Hub)"; reviews-skeleton remains pending'
+    ),
+    r(
+      'Streams and displays reviews list when reviews promise resolves independently',
+      'revPromise resolves with 2 review items',
+      'reviews-list renders review items; reviews-skeleton unmounts'
+    ),
+    r(
+      'Renders low-stock warning and handles empty reviews list',
+      'invPromise resolves with lowStockAlert: true; revPromise resolves with []',
+      'inventory-status contains "Only 3 left!"; no-reviews message displayed'
+    ),
+  ],
 };

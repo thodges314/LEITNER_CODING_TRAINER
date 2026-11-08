@@ -1,0 +1,9 @@
+{
+  "title": "Next.js Streaming & Partial Prerendering (PPR) Architecture",
+  "track": "nextjs",
+  "tags": ["nextjs", "react", "ppr", "streaming", "suspense", "app-router"],
+  "concept": "next-ppr-streaming",
+  "rendersComponent": true,
+  "previewLibraries": ["react", "tailwind"]
+}
+

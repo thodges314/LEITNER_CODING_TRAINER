@@ -42,3 +42,4 @@ Traverses the hierarchical category forest and returns a Promise resolving to th
   - Skips any article node with empty, missing, or whitespace-only slug strings.
   - If a category has no valid articles or `categories` is empty, produces no entries for that category.
   - Returns a Promise resolving to `RouteParams[]`.
+

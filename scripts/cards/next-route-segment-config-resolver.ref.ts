@@ -123,3 +123,4 @@ function resolveRouteSegmentConfig(segments: SegmentConfig[] = []): ResolvedRout
     conflictReason,
   };
 }
+

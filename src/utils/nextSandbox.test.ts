@@ -6,11 +6,16 @@ import {
   revalidatePath,
   activeRevalidationStore,
   resetRevalidationStore,
+  after,
+  flushAfterTasks,
+  resetAfterTasks,
+  scheduledAfterTasks,
 } from './nextSandbox';
 
 describe('nextSandbox runtime shims', () => {
   beforeEach(() => {
     resetRevalidationStore();
+    resetAfterTasks();
   });
 
   describe('NextResponse', () => {
@@ -78,6 +83,31 @@ describe('nextSandbox runtime shims', () => {
       revalidatePath('/products/[id]');
       expect(activeRevalidationStore.paths.has('/products/[id]')).toBe(true);
       expect(activeRevalidationStore.paths.has('/cart')).toBe(false);
+    });
+  });
+
+  describe('after() lifecycle helper', () => {
+    it('queues tasks without executing synchronously', () => {
+      let executed = false;
+      after(() => {
+        executed = true;
+      });
+      expect(executed).toBe(false);
+      expect(scheduledAfterTasks.length).toBe(1);
+    });
+
+    it('flushes queued async tasks and clears queue', async () => {
+      const order: number[] = [];
+      after(async () => {
+        order.push(1);
+      });
+      after(() => {
+        order.push(2);
+      });
+      expect(scheduledAfterTasks.length).toBe(2);
+      await flushAfterTasks();
+      expect(order).toEqual([1, 2]);
+      expect(scheduledAfterTasks.length).toBe(0);
     });
   });
 });

@@ -45,3 +45,4 @@ An interactive client component (`'use client'`) that manages optimistic task co
       - Clicking triggers `handleToggle(todo.id, todo.completed)`.
     - `<span data-testid="todo-title-${todo.id}">{todo.title}</span>`.
     - If `todo.isPending` is true: renders `<span data-testid="pending-badge">Saving...</span>`.
+

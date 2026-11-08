@@ -5944,5 +5944,37 @@
       "static-analysis"
     ],
     "summary": "Implement the Next.js App Router route segment configuration inheritance and caching resolver"
+  },
+  {
+    "id": "next-after-lifecycle-deferred",
+    "title": "Next.js 15: Background Work with the after() API",
+    "track": "nextjs",
+    "concept": "next-after-api",
+    "difficulty": 5,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "after",
+      "async",
+      "lifecycle",
+      "server"
+    ],
+    "summary": "In Next.js 15, the after() API (next/server) enables scheduling secondary asynchronous work to execute **after** the response has been returned or ..."
+  },
+  {
+    "id": "next-ppr-streaming-boundaries",
+    "title": "Next.js Streaming & Partial Prerendering (PPR) Architecture",
+    "track": "nextjs",
+    "concept": "next-ppr-streaming",
+    "difficulty": 5,
+    "tags": [
+      "nextjs",
+      "react",
+      "ppr",
+      "streaming",
+      "suspense",
+      "app-router"
+    ],
+    "summary": "Next.js App Router Partial Prerendering (PPR) combines instant static shell delivery with dynamic Server Component streaming. The static layout she..."
   }
 ]

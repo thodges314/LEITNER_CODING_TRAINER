@@ -405,3 +405,31 @@ export function UserBadge({ user }: UserBadgeProps): React.ReactElement {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Next.js 15 after() API (next/server)
+// ---------------------------------------------------------------------------
+
+export type AfterTask = (() => void | Promise<void>) | Promise<unknown>;
+export const scheduledAfterTasks: AfterTask[] = [];
+
+export function after(task: AfterTask): void {
+  scheduledAfterTasks.push(task);
+}
+
+export async function flushAfterTasks(): Promise<void> {
+  const tasks = [...scheduledAfterTasks];
+  scheduledAfterTasks.length = 0;
+  for (const task of tasks) {
+    if (typeof task === 'function') {
+      await task();
+    } else if (task && typeof (task as Promise<unknown>).then === 'function') {
+      await task;
+    }
+  }
+}
+
+export function resetAfterTasks(): void {
+  scheduledAfterTasks.length = 0;
+}
+
+

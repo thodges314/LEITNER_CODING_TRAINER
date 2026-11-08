@@ -1,0 +1,53 @@
+# Next.js 15: Background Work with the after() API
+
+## Description
+In Next.js 15, the `after()` API (`next/server`) enables scheduling secondary asynchronous work to execute **after** the response has been returned or finished streaming. This prevents slow side effects (such as audit logging, telemetry, email dispatch, or cache invalidation) from increasing user-perceived response latency.
+
+Implement an App Router Route Handler `POST` that validates an order request, commits the order synchronously, queues non-blocking background tasks via `after()`, and immediately returns an HTTP 201 response.
+
+```ts
+interface OrderPayload {
+  orderId: string;
+  customerEmail: string;
+  amount: number;
+}
+
+interface ProcessedOrderResult {
+  id: string;
+  status: 'confirmed' | 'pending';
+  total: number;
+}
+
+interface AuditLogRecord {
+  timestamp: number;
+  action: string;
+  orderId: string;
+  status: 'success' | 'failed';
+}
+
+// Injected scope services:
+declare function processOrder(order: OrderPayload): Promise<ProcessedOrderResult>;
+declare function sendOrderReceipt(email: string, orderId: string): Promise<void>;
+declare function recordAuditLog(entry: AuditLogRecord): Promise<void>;
+declare function after(task: (() => void | Promise<void>) | Promise<any>): void;
+```
+
+### POST(request: Request): Promise<NextResponse>
+
+#### Requirements
+1. **Request Body Parsing & Validation**:
+   - Parse JSON from `request.json()`.
+   - Validate that `orderId` is a non-empty string, `customerEmail` is a non-empty string containing `'@'`, and `amount` is a number strictly greater than 0.
+   - If invalid or if JSON parsing fails, immediately return `NextResponse.json({ error: 'Invalid order payload' }, { status: 400 })`. Do **not** call `processOrder` or schedule any `after()` tasks.
+2. **Order Processing**:
+   - Call `const result = await processOrder({ orderId, customerEmail, amount })`.
+   - If `processOrder` rejects or throws an error, catch it and return `NextResponse.json({ error: 'Order processing failed' }, { status: 500 })`. Do **not** schedule `after()` tasks on failure.
+3. **Deferred Execution via `after()`**:
+   - Schedule an asynchronous task with `after(async () => { ... })`:
+     - Dispatch customer receipt: `await sendOrderReceipt(customerEmail, result.id)`.
+     - Dispatch audit log: `await recordAuditLog({ timestamp: Date.now(), action: 'order_processed', orderId: result.id, status: 'success' })`.
+   - Wrap the operations inside the `after` callback in a `try...catch` block to ensure any secondary task failure is safely caught without unhandled rejections.
+4. **Immediate Response**:
+   - Return `NextResponse.json({ success: true, orderId: result.id, status: result.status }, { status: 201 })`.
+   - The response must be returned immediately without awaiting the `after()` tasks.
+

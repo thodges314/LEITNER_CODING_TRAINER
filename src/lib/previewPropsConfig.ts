@@ -1740,6 +1740,12 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'simulateFailure', type: 'boolean', defaultValue: false, description: 'Simulate Server Action failure to trigger automatic rollback' },
     { name: 'latencyMs', type: 'number', defaultValue: 600, min: 100, max: 2000, step: 100, description: 'Simulated network latency in milliseconds' },
   ],
+  'next-ppr-streaming-boundaries': [
+    { name: 'inventoryDelay', type: 'number', defaultValue: 800, min: 100, max: 3000, step: 100, description: 'Inventory streaming delay in milliseconds' },
+    { name: 'reviewsDelay', type: 'number', defaultValue: 1600, min: 100, max: 5000, step: 200, description: 'Reviews streaming delay in milliseconds' },
+    { name: 'stockCount', type: 'number', defaultValue: 14, min: 0, max: 100, step: 1, description: 'Available warehouse stock count' },
+    { name: 'lowStockAlert', type: 'boolean', defaultValue: false, description: 'Trigger low stock warning badge' },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {
