@@ -1,47 +1,47 @@
-Implement a Next.js React Server Component (RSC) to Client Component DTO serializer that validates and serializes props passed across the network boundary:
+Implement an async Next.js Server Component that fetches user data, safely strips sensitive server credentials, and passes client-safe props to a Client Component across the React Server Component (RSC) boundary:
 
 ## Description
 
 ### Application Context
-In Next.js App Router applications, Server Components fetch user and entity records from databases or backend APIs. When passing data from a Server Component to a Client Component (`'use client'`), props must cross the React Flight network serialization boundary:
-- Sensitive server-only fields (such as `passwordHash` or secret tokens) must be stripped to prevent leaking credentials to client bundles.
-- JavaScript `Date` instances are not directly JSON-serializable in standard props without formatting; they must be converted to ISO 8601 string representations.
-- Missing required fields or invalid dates must be safely rejected.
+In the Next.js App Router, Server Components fetch user and entity records from databases or backend services using internal models that contain sensitive server-only fields (such as password hashes, secret tokens, or internal flags).
+When rendering a Client Component (`'use client'`) from a Server Component, all props passed across the network boundary are serialized into the client payload (React Flight format).
+To prevent credential leaks, Server Components must safely project records by stripping sensitive fields before passing props to Client Components.
+Furthermore, React Flight natively supports serializing `Date` objects across the boundary—manual ISO string conversions are unnecessary. If the requested entity does not exist, Next.js idiomatically terminates rendering by invoking `notFound()` from `next/navigation`.
 
 ```ts
 interface ServerUserRecord {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user' | 'guest';
+  role: string;
   passwordHash: string;
+  apiSecret: string;
   createdAt: Date;
-  updatedAt: Date;
 }
 
-interface ClientUserDTO {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'user' | 'guest';
-  createdAt: string;
-  updatedAt: string;
-}
+type ClientSafeUser = Omit<ServerUserRecord, 'passwordHash' | 'apiSecret'>;
 
-interface SerializationResult {
-  success: boolean;
-  data?: ClientUserDTO;
-  error?: string;
+interface UserProfileContainerProps {
+  userId: string;
+  fetchUser: (id: string) => Promise<ServerUserRecord | null>;
 }
 ```
 
-### `serializeUserForClient(user: unknown): SerializationResult`
+### `UserProfileContainer({ userId, fetchUser }: UserProfileContainerProps): Promise<React.ReactElement>`
 
-Validates and serializes a server user record for client-side consumption:
-- If `user` is not a non-null object, returns `{ success: false, error: 'Invalid user record' }`.
-- If `id`, `name`, `email`, or `role` are missing or not non-empty strings, returns `{ success: false, error: 'Missing required user fields' }`.
-- Validates `createdAt` and `updatedAt`:
-  - Must be valid instances of `Date` (where `d instanceof Date` and `!isNaN(d.getTime())`).
-  - If invalid or missing, returns `{ success: false, error: 'Invalid date fields' }`.
-- Strips `passwordHash` from the output.
-- Returns `{ success: true, data: { id, name, email, role, createdAt: user.createdAt.toISOString(), updatedAt: user.updatedAt.toISOString() } }`.
+- **Awaits Async Data**:
+  - Calls `await fetchUser(userId)` to retrieve the server record.
+- **Not Found Handling**:
+  - If `fetchUser` returns `null` or a falsy value, invokes `notFound()` from `next/navigation`.
+- **Sensitive Field Stripping**:
+  - Safely strips `passwordHash` and `apiSecret` using object rest/destructuring (`const { passwordHash, apiSecret, ...clientSafeUser } = user`).
+  - Retains the authentic `Date` object on `createdAt`.
+- **Render Output**:
+  - Renders the pre-injected Client Component `<UserBadge user={clientSafeUser} />` inside a wrapper `<div data-testid="user-profile-boundary">`:
+    ```tsx
+    return (
+      <div data-testid="user-profile-boundary">
+        <UserBadge user={clientSafeUser} />
+      </div>
+    );
+    ```

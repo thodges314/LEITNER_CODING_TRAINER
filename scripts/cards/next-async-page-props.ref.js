@@ -31,11 +31,11 @@ async function CategoryPage({ params, searchParams }: PageProps): Promise<React.
     }
   }
 
-  return React.createElement(
-    'main',
-    { 'data-testid': 'category-page' },
-    React.createElement('h1', { 'data-testid': 'category-title' }, category),
-    React.createElement('span', { 'data-testid': 'sort-value' }, sort),
-    React.createElement('span', { 'data-testid': 'page-value' }, String(page))
+  return (
+    <main data-testid="category-page">
+      <h1 data-testid="category-title">{category}</h1>
+      <span data-testid="sort-value">{sort}</span>
+      <span data-testid="page-value">{String(page)}</span>
+    </main>
   );
 }

@@ -5480,18 +5480,18 @@
   },
   {
     "id": "next-client-boundary-guard",
-    "title": "Next.js RSC Boundary: Client DTO Serialization",
+    "title": "Next.js RSC Boundary: Safe Client Component Props",
     "track": "nextjs",
     "concept": "next-rsc-boundaries",
     "difficulty": 3,
     "tags": [
       "nextjs",
       "rsc",
-      "serialization",
+      "server-components",
       "client-components",
-      "dto"
+      "props-boundary"
     ],
-    "summary": "Implement a Next.js React Server Component (RSC) to Client Component DTO serializer that validates and serializes props passed across the network b..."
+    "summary": "Implement an async Next.js Server Component that fetches user data, safely strips sensitive server credentials, and passes client-safe props to a C..."
   },
   {
     "id": "next-parallel-intercepting-routes",

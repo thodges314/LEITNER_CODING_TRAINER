@@ -3,7 +3,9 @@ Implement a Next.js App Router parallel route layout and intercepting modal comp
 ## Description
 
 ### Application Context
-In Next.js App Router photo galleries and dashboards (`app/feed/@modal/(..)photo/[id]/page.tsx`), **Parallel Routes** allow simultaneously rendering one or more pages in the same layout using named slots (`@modal`), while **Intercepting Routes** display contextual overlays without leaving the current layout. A parallel route layout accepts slots as props alongside `children`, and the intercepted modal component navigates back to the parent route via `router.back()` from `next/navigation`.
+In Next.js App Router photo galleries and dashboards (`app/feed/@modal/(..)photo/[id]/page.tsx`), **Parallel Routes** allow simultaneously rendering one or more pages in the same layout using named slots (`@modal`), while **Intercepting Routes** display contextual overlays without leaving the current layout.
+A parallel route layout accepts slots as props alongside `children`.
+The intercepted modal component is a Client Component (`'use client'`) that consumes `useRouter()` to navigate back to the parent route via `router.back()` upon dismissal, and renders optimized media using Next.js `<Image />`.
 
 ```ts
 interface FeedLayoutProps {
@@ -26,7 +28,8 @@ interface PhotoModalProps {
     - If `modal` is provided, renders `<div data-testid="modal-slot">{modal}</div>`.
     - If `modal` is null or undefined, does not render the `modal-slot` container.
 - **`PhotoModal({ id, photoUrl, onDismiss }: PhotoModalProps): React.ReactElement`**:
+  - Declared as a client component with `'use client'`.
   - Uses `useRouter()` from Next.js (`useRouter()`).
   - Renders a `<dialog open data-testid="photo-modal" className="modal-dialog">` containing:
     - `<button data-testid="modal-close" onClick={...}>Close</button>`: On click, calls `onDismiss?.()` and invokes `router.back()`.
-    - `<img data-testid="modal-photo" src={photoUrl} alt={`Photo ${id}`} />`
+    - `<Image data-testid="modal-photo" src={photoUrl} alt={`Photo ${id}`} width={600} height={400} />`

@@ -4,24 +4,24 @@ const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by Next.js 
 export default {
   'next-client-boundary-guard': [
     r(
-      'Serializes valid user record converting Dates to ISO strings',
-      'serializeUserForClient({ id: "u-101", name: "Alice", email: "alice@example.com", role: "admin", passwordHash: "secret", createdAt: new Date("2026-01-15T12:00:00.000Z"), updatedAt: new Date("2026-01-20T18:30:00.000Z") })',
-      '{ success: true, data: { id: "u-101", name: "Alice", email: "alice@example.com", role: "admin", createdAt: "2026-01-15T12:00:00.000Z", updatedAt: "2026-01-20T18:30:00.000Z" } }'
+      'Awaits fetchUser(userId) and renders <UserBadge> inside user-profile-boundary',
+      'await UserProfileContainer({ userId: "user-77", fetchUser })',
+      'renders <div data-testid="user-profile-boundary"><UserBadge user={clientSafeUser} /></div>'
     ),
     r(
-      'Strips sensitive passwordHash field from client output',
-      'serializeUserForClient(user).data.passwordHash',
-      'undefined'
+      'Retains Date object on createdAt across the RSC boundary',
+      'userBadgeProps.createdAt instanceof Date',
+      'true'
     ),
     r(
-      'Returns error when createdAt or updatedAt is invalid',
-      'serializeUserForClient({ ...user, createdAt: new Date("invalid") })',
-      '{ success: false, error: "Invalid date fields" }'
+      'Never exposes passwordHash or apiSecret in UserBadge props',
+      '"passwordHash" in userBadgeProps || "apiSecret" in userBadgeProps',
+      'false'
     ),
     r(
-      'Returns error when required string fields are missing or empty',
-      'serializeUserForClient({ ...user, id: "" })',
-      '{ success: false, error: "Missing required user fields" }'
+      'Invokes notFound() when fetchUser returns null',
+      'await UserProfileContainer({ userId: "user-unknown", fetchUser: async () => null })',
+      'throws NextNotFoundError (calls notFound())'
     ),
   ],
 

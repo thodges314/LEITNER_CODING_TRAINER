@@ -1,3 +1,5 @@
+'use server';
+
 interface UpdateProductInput {
   id: string;
   price: number;

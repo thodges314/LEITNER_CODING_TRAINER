@@ -16,29 +16,28 @@ function HeroBanner({
   height = 400,
 }: HeroBannerProps): React.ReactElement {
   if (fill) {
-    return React.createElement(
-      'div',
-      { className: 'relative aspect-video' },
-      React.createElement(Image, {
-        src,
-        alt,
-        fill: true,
-        priority: Boolean(priority),
-        sizes: '(max-width: 768px) 100vw, 50vw',
-      })
+    return (
+      <div className="relative aspect-video">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          priority={Boolean(priority)}
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+      </div>
     );
   }
 
-  return React.createElement(
-    'div',
-    { className: 'image-wrapper' },
-    React.createElement(Image, {
-      src,
-      alt,
-      width,
-      height,
-      priority: Boolean(priority),
-    })
+  return (
+    <div className="image-wrapper">
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        priority={Boolean(priority)}
+      />
+    </div>
   );
 }
-

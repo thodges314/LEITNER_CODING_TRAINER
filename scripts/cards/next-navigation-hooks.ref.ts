@@ -1,3 +1,5 @@
+'use client';
+
 interface SearchFilterProps {
   defaultQuery?: string;
 }
@@ -20,16 +22,18 @@ function SearchFilter({ defaultQuery = '' }: SearchFilterProps): React.ReactElem
     }
   };
 
-  return React.createElement(
-    'form',
-    { role: 'search', onSubmit: handleSubmit },
-    React.createElement('input', {
-      type: 'search',
-      'data-testid': 'search-input',
-      value: query,
-      onChange: (e: { target: { value: string } }) => setQuery(e.target.value),
-    }),
-    React.createElement('button', { type: 'submit', 'data-testid': 'search-submit' }, 'Search'),
-    React.createElement('span', { 'data-testid': 'current-path' }, pathname)
+  return (
+    <form role="search" onSubmit={handleSubmit}>
+      <input
+        type="search"
+        data-testid="search-input"
+        value={query}
+        onChange={(e: { target: { value: string } }) => setQuery(e.target.value)}
+      />
+      <button type="submit" data-testid="search-submit">
+        Search
+      </button>
+      <span data-testid="current-path">{pathname}</span>
+    </form>
   );
 }

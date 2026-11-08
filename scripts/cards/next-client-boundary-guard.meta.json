@@ -1,13 +1,12 @@
 {
-  "title": "Next.js RSC Boundary: Client DTO Serialization",
+  "title": "Next.js RSC Boundary: Safe Client Component Props",
   "track": "nextjs",
   "tags": [
     "nextjs",
     "rsc",
-    "serialization",
+    "server-components",
     "client-components",
-    "dto"
+    "props-boundary"
   ],
-  "requiresDom": false
+  "requiresDom": true
 }
-

@@ -4,6 +4,7 @@ interface LayoutProps {
 
 interface TemplateProps {
   children: React.ReactNode;
+  key?: string;
 }
 
 interface DashboardRootProps {
@@ -12,26 +13,26 @@ interface DashboardRootProps {
 }
 
 function DashboardLayout({ children }: LayoutProps): React.ReactElement {
-  return React.createElement(
-    'div',
-    { 'data-testid': 'dashboard-layout' },
-    React.createElement('header', { 'data-testid': 'dashboard-header' }, 'Dashboard Shell'),
-    React.createElement('main', null, children)
+  return (
+    <div data-testid="dashboard-layout">
+      <header data-testid="dashboard-header">Dashboard Shell</header>
+      <main>{children}</main>
+    </div>
   );
 }
 
 function DashboardTemplate({ children }: TemplateProps): React.ReactElement {
-  return React.createElement(
-    'div',
-    { 'data-testid': 'dashboard-template', className: 'template-enter' },
-    children
+  return (
+    <div data-testid="dashboard-template" className="template-enter">
+      {children}
+    </div>
   );
 }
 
 function DashboardRoot({ pathname, children }: DashboardRootProps): React.ReactElement {
-  return React.createElement(
-    DashboardLayout,
-    null,
-    React.createElement(DashboardTemplate, { key: pathname }, children)
+  return (
+    <DashboardLayout>
+      <DashboardTemplate key={pathname}>{children}</DashboardTemplate>
+    </DashboardLayout>
   );
 }

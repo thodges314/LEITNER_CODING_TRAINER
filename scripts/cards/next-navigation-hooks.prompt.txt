@@ -16,6 +16,8 @@ interface SearchFilterProps {
 
 ### `SearchFilter({ defaultQuery = '' }: SearchFilterProps): React.ReactElement`
 
+- **Client Component Directive**:
+  - Add `'use client'` at the top since this component binds client events and navigation hooks.
 - **Hook Integration**:
   - Obtains `router` via `useRouter()`.
   - Obtains `searchParams` via `useSearchParams()`.

@@ -9,10 +9,11 @@ const inter = Inter({
 });
 
 function RootLayout({ children }: RootLayoutProps): React.ReactElement {
-  return React.createElement(
-    'html',
-    { lang: 'en', className: inter.variable },
-    React.createElement('body', { className: inter.className, 'data-testid': 'root-body' }, children)
+  return (
+    <html lang="en" className={inter.variable}>
+      <body className={inter.className} data-testid="root-body">
+        {children}
+      </body>
+    </html>
   );
 }
-

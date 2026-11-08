@@ -1,3 +1,5 @@
+'use client';
+
 interface FeedLayoutProps {
   children: React.ReactNode;
   modal?: React.ReactNode;
@@ -10,11 +12,11 @@ interface PhotoModalProps {
 }
 
 function FeedLayout({ children, modal }: FeedLayoutProps): React.ReactElement {
-  return React.createElement(
-    'div',
-    { 'data-testid': 'feed-layout' },
-    React.createElement('main', { 'data-testid': 'feed-content' }, children),
-    modal ? React.createElement('div', { 'data-testid': 'modal-slot' }, modal) : null
+  return (
+    <div data-testid="feed-layout">
+      <main data-testid="feed-content">{children}</main>
+      {modal ? <div data-testid="modal-slot">{modal}</div> : null}
+    </div>
   );
 }
 
@@ -26,10 +28,18 @@ function PhotoModal({ id, photoUrl, onDismiss }: PhotoModalProps): React.ReactEl
     router.back();
   };
 
-  return React.createElement(
-    'dialog',
-    { open: true, 'data-testid': 'photo-modal', className: 'modal-dialog' },
-    React.createElement('button', { 'data-testid': 'modal-close', onClick: handleClose }, 'Close'),
-    React.createElement('img', { 'data-testid': 'modal-photo', src: photoUrl, alt: `Photo ${id}` })
+  return (
+    <dialog open data-testid="photo-modal" className="modal-dialog">
+      <button data-testid="modal-close" onClick={handleClose}>
+        Close
+      </button>
+      <Image
+        data-testid="modal-photo"
+        src={photoUrl}
+        alt={`Photo ${id}`}
+        width={600}
+        height={400}
+      />
+    </dialog>
   );
 }

@@ -382,3 +382,26 @@ export function Inter(options?: { subsets?: string[]; variable?: string }) {
   };
 }
 
+export interface UserBadgeProps {
+  user: {
+    id?: string;
+    name?: string;
+    email?: string;
+    role?: string;
+    createdAt?: Date;
+    [key: string]: unknown;
+  };
+}
+
+export function UserBadge({ user }: UserBadgeProps): React.ReactElement {
+  return React.createElement(
+    'div',
+    {
+      'data-testid': 'user-badge',
+      'data-has-password-hash': String('passwordHash' in (user || {})),
+      'data-has-api-secret': String('apiSecret' in (user || {})),
+    },
+    user?.name ?? ''
+  );
+}
+

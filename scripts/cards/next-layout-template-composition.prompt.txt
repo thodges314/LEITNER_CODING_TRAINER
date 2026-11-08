@@ -12,6 +12,7 @@ interface LayoutProps {
 
 interface TemplateProps {
   children: React.ReactNode;
+  key?: string;
 }
 
 interface DashboardRootProps {

@@ -61,8 +61,9 @@ await (async () => {
       dialogEl.classList.contains('modal-dialog') &&
       imgEl?.getAttribute('src') === 'https://images.example.com/pic-42.jpg' &&
       imgEl?.getAttribute('alt') === 'Photo pic-42' &&
+      imgEl?.getAttribute('data-next-image') === 'true' &&
       closeBtn !== null,
-    { hasDialog: !!dialogEl, src: imgEl?.getAttribute('src') }
+    { hasDialog: !!dialogEl, src: imgEl?.getAttribute('src'), isNextImage: imgEl?.getAttribute('data-next-image') }
   );
 
   // Case 4: Close button interaction

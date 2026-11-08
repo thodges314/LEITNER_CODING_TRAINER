@@ -1,3 +1,5 @@
+'use server';
+
 interface ActionState {
   success: boolean;
   errors?: {
