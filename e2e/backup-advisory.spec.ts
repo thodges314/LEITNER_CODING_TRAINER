@@ -27,6 +27,10 @@ test.describe('First 4 Problems Backup Advisory and Export Highlighting', () => 
     if (await welcomeBtn.isVisible()) {
       await welcomeBtn.click();
     }
+    const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+    if (await resumeBtn.isVisible()) {
+      await resumeBtn.click();
+    }
   });
 
   test('advisory popup triggers on the 4th completed problem, explains localStorage loss, and dismisses', async ({ page }) => {
@@ -143,6 +147,10 @@ test.describe('First 4 Problems Backup Advisory and Export Highlighting', () => 
       localStorage.setItem('leitner_draft:binary-search-exact', '// intentionally broken');
     });
     await page.reload();
+    const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+    if (await resumeBtn.isVisible()) {
+      await resumeBtn.click();
+    }
 
     // Submit broken code and enter reinforcement drill (failed review counts as problem #3)
     await submitAndCommit(page);

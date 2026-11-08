@@ -34,6 +34,10 @@ async function submitCard(page: Page, id: string, code: string): Promise<{ verdi
     { id, code, DECK_KEY, DRAFT_PREFIX }
   );
   await page.reload();
+  const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+  if (await resumeBtn.isVisible()) {
+    await resumeBtn.click();
+  }
   await page.getByRole('button', { name: /Submit Final Answer/ }).click();
   const verdict = page.getByText(VERDICT);
   await expect(verdict.first()).toBeVisible();

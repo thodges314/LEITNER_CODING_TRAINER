@@ -6,6 +6,10 @@ const CLOSE_WELCOME = /Start practicing/;
 async function openApp(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: CLOSE_WELCOME }).click();
+  const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+  if (await resumeBtn.isVisible()) {
+    await resumeBtn.click();
+  }
 }
 
 const isMac = (page: Page) =>

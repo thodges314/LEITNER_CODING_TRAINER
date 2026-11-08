@@ -31,6 +31,10 @@ async function openCard(page: Page, id: string, draft: string | null) {
     { id, draft }
   );
   await page.reload();
+  const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+  if (await resumeBtn.isVisible()) {
+    await resumeBtn.click();
+  }
 }
 
 const run = (page: Page) => page.getByRole('button', { name: /Run Code \/ Test/ });

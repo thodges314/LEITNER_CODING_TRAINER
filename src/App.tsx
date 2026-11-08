@@ -80,7 +80,7 @@ const FIRST_VISIT = isFirstVisit();
 
 export function App() {
   const [deckState, setDeckState] = useState<LeitnerDeckState>(() => loadDeckState());
-  const [activeView, setActiveView] = useState<'practice' | 'dashboard'>('practice');
+  const [activeView, setActiveView] = useState<'practice' | 'dashboard'>('dashboard');
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [theme, setThemeState] = useState<AppTheme>(() => getStoredTheme());
 
@@ -889,6 +889,7 @@ export function App() {
           if (welcomeMode) {
             markWelcomed();
             setWelcomeMode(false);
+            setActiveView('practice');
           }
         }}
       />

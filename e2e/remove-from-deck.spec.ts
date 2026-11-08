@@ -21,6 +21,10 @@ test.describe('Remove From Deck & Preset Forking', () => {
     });
 
     await page.goto('/');
+    const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+    if (await resumeBtn.isVisible()) {
+      await resumeBtn.click();
+    }
 
     // Verify arena loaded
     const removeBtn = page.getByTestId('arena-remove-from-deck-btn');
@@ -88,6 +92,10 @@ test.describe('Remove From Deck & Preset Forking', () => {
     });
 
     await page.goto('/');
+    const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+    if (await resumeBtn.isVisible()) {
+      await resumeBtn.click();
+    }
 
     // Go to catalog
     const catalogNavBtn = page.getByRole('button', { name: /Deck Catalog/i });
