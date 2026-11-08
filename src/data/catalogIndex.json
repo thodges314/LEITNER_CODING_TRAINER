@@ -5601,5 +5601,36 @@
       "sequential"
     ],
     "summary": "Implement an asynchronous waterfall pipeline that executes an array of functions in strict sequence, feeding each stage's resolved output as input ..."
+  },
+  {
+    "id": "ts-assertion-functions",
+    "title": "TS Type Predicates vs. Assertion Functions",
+    "track": "typescript-patterns",
+    "concept": "ts-assertions",
+    "difficulty": 2,
+    "tags": [
+      "typescript",
+      "type-guards",
+      "assertions",
+      "narrowing",
+      "asserts"
+    ],
+    "summary": "Implement TypeScript type guards and assertion functions to contrast boolean predicates with control-flow narrowing assertion signatures"
+  },
+  {
+    "id": "ts-tuple-rest-parameters",
+    "title": "TS Tuple Manipulation: Variadic Tuples and Rest Parameters",
+    "track": "typescript-patterns",
+    "concept": "ts-tuples",
+    "difficulty": 3,
+    "tags": [
+      "typescript",
+      "tuples",
+      "variadic",
+      "rest-parameters",
+      "generics",
+      "currying"
+    ],
+    "summary": "Implement variadic tuple types and positional rest parameter utilities to manipulate strongly typed parameter lists"
   }
 ]

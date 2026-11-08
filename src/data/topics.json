@@ -23145,5 +23145,94 @@
       }
     ],
     "testHarness": "await (async () => {\n  const fn = typeof promiseWaterfall === 'function'\n    ? promiseWaterfall\n    : (typeof solution === 'function' ? solution : solution?.promiseWaterfall);\n\n  if (typeof fn !== 'function') {\n    $test.check('Chains synchronous and asynchronous transformations in sequence', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Resolves immediately with initialValue when stages array is empty', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Short-circuits immediately on stage rejection without invoking subsequent stages', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Preserves strict serial ordering across stages with variable async delays', false, { error: 'promiseWaterfall is not defined as a function' });\n    return;\n  }\n\n  // Case 1: Chains synchronous and asynchronous transformations in sequence\n  try {\n    const stages = [\n      (x) => x + 10,\n      async (x) => new Promise((resolve) => setTimeout(() => resolve(x * 2), 20)),\n      (x) => `Total: ${x}`,\n    ];\n    const result = await fn(stages, 5);\n    $test.check(\n      'Chains synchronous and asynchronous transformations in sequence',\n      result === 'Total: 30',\n      { expected: 'Total: 30', actual: result }\n    );\n  } catch (err) {\n    $test.check('Chains synchronous and asynchronous transformations in sequence', false, { error: err?.message || String(err) });\n  }\n\n  // Case 2: Resolves immediately with initialValue when stages array is empty\n  try {\n    const emptyResult = await fn([], { initialized: true });\n    $test.check(\n      'Resolves immediately with initialValue when stages array is empty',\n      Boolean(emptyResult && emptyResult.initialized === true),\n      emptyResult\n    );\n  } catch (err) {\n    $test.check('Resolves immediately with initialValue when stages array is empty', false, { error: err?.message || String(err) });\n  }\n\n  // Case 3: Short-circuits immediately on stage rejection without invoking subsequent stages\n  try {\n    const trace = [];\n    const errorStages = [\n      (x) => {\n        trace.push('stage1');\n        return x + 1;\n      },\n      () => {\n        trace.push('stage2-fail');\n        throw new Error('Pipeline failed at step 2');\n      },\n      (x) => {\n        trace.push('stage3-should-not-run');\n        return x * 10;\n      },\n    ];\n\n    let caughtError = null;\n    try {\n      await fn(errorStages, 0);\n    } catch (err) {\n      caughtError = err;\n    }\n\n    const shortCircuited =\n      caughtError !== null &&\n      caughtError.message === 'Pipeline failed at step 2' &&\n      trace.length === 2 &&\n      trace.includes('stage1') &&\n      trace.includes('stage2-fail') &&\n      !trace.includes('stage3-should-not-run');\n\n    $test.check(\n      'Short-circuits immediately on stage rejection without invoking subsequent stages',\n      shortCircuited,\n      { trace, error: caughtError?.message }\n    );\n  } catch (err) {\n    $test.check('Short-circuits immediately on stage rejection without invoking subsequent stages', false, { error: err?.message || String(err) });\n  }\n\n  // Case 4: Preserves strict serial ordering across stages with variable async delays\n  try {\n    const executionOrder = [];\n    const delayStages = [\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step1');\n          resolve(val + '-1');\n        }, 30);\n      }),\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step2');\n          resolve(val + '-2');\n        }, 10);\n      }),\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step3');\n          resolve(val + '-3');\n        }, 20);\n      }),\n    ];\n\n    const finalVal = await fn(delayStages, 'start');\n    const correctlyOrdered =\n      finalVal === 'start-1-2-3' &&\n      executionOrder.join(',') === 'step1,step2,step3';\n\n    $test.check(\n      'Preserves strict serial ordering across stages with variable async delays',\n      correctlyOrdered,\n      { finalVal, executionOrder }\n    );\n  } catch (err) {\n    $test.check('Preserves strict serial ordering across stages with variable async delays', false, { error: err?.message || String(err) });\n  }\n})();"
+  },
+  {
+    "id": "ts-assertion-functions",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Implement TypeScript type guards and assertion functions to contrast boolean predicates with control-flow narrowing assertion signatures:\n\n### `isDefined<T>(val: T | null | undefined): val is T`\n- Type predicate returning `true` if `val !== null && val !== undefined`; returns `false` for `null` or `undefined`.\n- Allows `if (isDefined(x)) { ... }` branches to narrow `x` to `T`.\n\n### `assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T>`\n- Assertion function that verifies `val` is neither `null` nor `undefined`.\n- If `val === null || val === undefined`, throws a `TypeError` with `message` (or default `'Value is null or undefined'`).\n- If valid, returns `void`. In TypeScript, this narrows `val` in the remaining control flow to `NonNullable<T>` without an `if` block.\n\n### `assertCondition(condition: unknown, message?: string): asserts condition`\n- General invariant assertion function.\n- If `condition` is falsy (`!condition`), throws an `Error` with `message` (or default `'Assertion failed'`).\n- In TypeScript, asserts truthiness of the condition expression for subsequent lines.\n\n### `assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown>`\n- Verifies `val` is a non-null plain dictionary object and not an array.\n- If `val === null || typeof val !== 'object' || Array.isArray(val)`, throws a `TypeError` with `message` (or default `'Value is not a record object'`).\n- If valid, returns `void` and narrows `val` to `Record<string, unknown>`.",
+    "track": "typescript-patterns",
+    "title": "TS Type Predicates vs. Assertion Functions",
+    "tags": [
+      "typescript",
+      "type-guards",
+      "assertions",
+      "narrowing",
+      "asserts"
+    ],
+    "difficulty": 2,
+    "concept": "ts-assertions",
+    "referenceSolution": "function isDefined<T>(val: T | null | undefined): val is T {\n  return val !== null && val !== undefined;\n}\n\nfunction assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T> {\n  if (val === null || val === undefined) {\n    throw new TypeError(message || 'Value is null or undefined');\n  }\n}\n\nfunction assertCondition(condition: unknown, message?: string): asserts condition {\n  if (!condition) {\n    throw new Error(message || 'Assertion failed');\n  }\n}\n\nfunction assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown> {\n  if (val === null || typeof val !== 'object' || Array.isArray(val)) {\n    throw new TypeError(message || 'Value is not a record object');\n  }\n}",
+    "referenceSolutionTs": "function isDefined<T>(val: T | null | undefined): val is T {\n  return val !== null && val !== undefined;\n}\n\nfunction assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T> {\n  if (val === null || val === undefined) {\n    throw new TypeError(message || 'Value is null or undefined');\n  }\n}\n\nfunction assertCondition(condition: unknown, message?: string): asserts condition {\n  if (!condition) {\n    throw new Error(message || 'Assertion failed');\n  }\n}\n\nfunction assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown> {\n  if (val === null || typeof val !== 'object' || Array.isArray(val)) {\n    throw new TypeError(message || 'Value is not a record object');\n  }\n}",
+    "testCases": [
+      {
+        "description": "isDefined returns true for values and false for null/undefined",
+        "input": "[isDefined(\"hello\"), isDefined(0), isDefined(false), isDefined(null), isDefined(undefined)]",
+        "expected": "[true, true, true, false, false]"
+      },
+      {
+        "description": "assertDefined passes valid values and throws TypeError on null/undefined",
+        "input": "let caught = null;\ntry {\n  assertDefined(null, \"Missing\");\n} catch (e: any) {\n  caught = e.message;\n}\n[assertDefined(123) === undefined, caught]",
+        "expected": "[true, \"Missing\"]"
+      },
+      {
+        "description": "assertCondition throws on falsy values with custom message",
+        "input": "let caught = null;\ntry {\n  assertCondition(false, \"Expected truthy\");\n} catch (e: any) {\n  caught = e.message;\n}\n[assertCondition(true) === undefined, caught]",
+        "expected": "[true, \"Expected truthy\"]"
+      },
+      {
+        "description": "assertRecord validates plain records and throws TypeError on arrays/primitives",
+        "input": "let caught = null;\ntry {\n  assertRecord([1, 2, 3]);\n} catch (e: any) {\n  caught = e.message;\n}\n[assertRecord({ a: 1 }) === undefined, caught]",
+        "expected": "[true, \"Value is not a record object\"]"
+      }
+    ],
+    "testHarness": "await $test.run(\"isDefined returns true for values and false for null/undefined\", async () => {\n  const sleep = $test.sleep;\n  return ([isDefined(\"hello\"), isDefined(0), isDefined(false), isDefined(null), isDefined(undefined)]);\n}, () => ([true, true, true, false, false]));\n\nawait $test.run(\"assertDefined passes valid values and throws TypeError on null/undefined\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertDefined(null, \"Missing\");\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertDefined(123) === undefined, caught]);\n}, () => ([true, \"Missing\"]));\n\nawait $test.run(\"assertCondition throws on falsy values with custom message\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertCondition(false, \"Expected truthy\");\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertCondition(true) === undefined, caught]);\n}, () => ([true, \"Expected truthy\"]));\n\nawait $test.run(\"assertRecord validates plain records and throws TypeError on arrays/primitives\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertRecord([1, 2, 3]);\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertRecord({ a: 1 }) === undefined, caught]);\n}, () => ([true, \"Value is not a record object\"]));"
+  },
+  {
+    "id": "ts-tuple-rest-parameters",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Implement variadic tuple types and positional rest parameter utilities to manipulate strongly typed parameter lists:\n\n### `type Concat<A extends readonly any[], B extends readonly any[]>`\n- Concatenates two tuple types `A` and `B` into a single combined tuple `[...A, ...B]`.\n\n### `type Shift<T extends readonly any[]>`\n- Extracts a tuple with the first element removed. If `T` has at least one element, returns `Rest` from `[any, ...infer Rest]`; if `T` is empty `[]`, returns `[]`.\n\n### `tuple<T extends any[]>(...elements: [...T]): [...T]`\n- Creates and returns a tuple with its exact literal/positional element types preserved, avoiding implicit array widening (e.g. `tuple(1, 'a', true)` produces `[number, string, boolean]`).\n\n### `partialApply<Leading extends any[], Trailing extends any[], R>(fn: (...args: [...Leading, ...Trailing]) => R, ...head: Leading): (...tail: Trailing) => R`\n- Accepts a function `fn` expecting positional arguments `[...Leading, ...Trailing]`.\n- Binds the leading arguments `...head: Leading`.\n- Returns a new function that takes strictly the remaining `...tail: Trailing` positional arguments and returns `R`.\n\n### `callWithTuple<Args extends any[], R>(fn: (...args: Args) => R, args: [...Args]): R`\n- Executes `fn` by spreading the tuple arguments `args` in position.",
+    "track": "typescript-patterns",
+    "title": "TS Tuple Manipulation: Variadic Tuples and Rest Parameters",
+    "tags": [
+      "typescript",
+      "tuples",
+      "variadic",
+      "rest-parameters",
+      "generics",
+      "currying"
+    ],
+    "difficulty": 3,
+    "concept": "ts-tuples",
+    "referenceSolution": "type Concat<A extends readonly any[], B extends readonly any[]> = [...A, ...B];\n\ntype Shift<T extends readonly any[]> = T extends readonly [any, ...infer Rest] ? Rest : [];\n\nfunction tuple<T extends any[]>(...elements: [...T]): [...T] {\n  return elements;\n}\n\nfunction partialApply<Leading extends any[], Trailing extends any[], R>(\n  fn: (...args: [...Leading, ...Trailing]) => R,\n  ...head: Leading\n): (...tail: Trailing) => R {\n  return (...tail: Trailing): R => fn(...head, ...tail);\n}\n\nfunction callWithTuple<Args extends any[], R>(\n  fn: (...args: Args) => R,\n  args: [...Args]\n): R {\n  return fn(...args);\n}",
+    "referenceSolutionTs": "type Concat<A extends readonly any[], B extends readonly any[]> = [...A, ...B];\n\ntype Shift<T extends readonly any[]> = T extends readonly [any, ...infer Rest] ? Rest : [];\n\nfunction tuple<T extends any[]>(...elements: [...T]): [...T] {\n  return elements;\n}\n\nfunction partialApply<Leading extends any[], Trailing extends any[], R>(\n  fn: (...args: [...Leading, ...Trailing]) => R,\n  ...head: Leading\n): (...tail: Trailing) => R {\n  return (...tail: Trailing): R => fn(...head, ...tail);\n}\n\nfunction callWithTuple<Args extends any[], R>(\n  fn: (...args: Args) => R,\n  args: [...Args]\n): R {\n  return fn(...args);\n}",
+    "testCases": [
+      {
+        "description": "tuple constructs a typed tuple without widening to arbitrary array",
+        "input": "tuple(1, \"ok\", true)",
+        "expected": "[1, \"ok\", true]"
+      },
+      {
+        "description": "partialApply binds leading arguments and returns function for remaining arguments",
+        "input": "const fn = (a: string, b: number, c: boolean) => `${a}-${b}-${c}`;\nconst partial = partialApply(fn, \"x\", 10);\npartial(true)",
+        "expected": "\"x-10-true\""
+      },
+      {
+        "description": "callWithTuple executes function by spreading tuple elements",
+        "input": "callWithTuple((a: number, b: number, c: number) => a * b + c, [3, 4, 5])",
+        "expected": "17"
+      },
+      {
+        "description": "Concat and Shift tuple type contracts compile and verify lengths",
+        "input": "type C = Concat<[number, string], [boolean]>;\ntype S = Shift<[string, number, boolean]>;\nconst c: C = [1, \"two\", true];\nconst s: S = [42, false];\n[c.length, s.length]",
+        "expected": "[3, 2]"
+      }
+    ],
+    "testHarness": "await $test.run(\"tuple constructs a typed tuple without widening to arbitrary array\", async () => {\n  const sleep = $test.sleep;\n  return (tuple(1, \"ok\", true));\n}, () => ([1, \"ok\", true]));\n\nawait $test.run(\"partialApply binds leading arguments and returns function for remaining arguments\", async () => {\n  const sleep = $test.sleep;\n  const fn = (a: string, b: number, c: boolean) => `${a}-${b}-${c}`;\n  const partial = partialApply(fn, \"x\", 10);\n  return (partial(true));\n}, () => (\"x-10-true\"));\n\nawait $test.run(\"callWithTuple executes function by spreading tuple elements\", async () => {\n  const sleep = $test.sleep;\n  return (callWithTuple((a: number, b: number, c: number) => a * b + c, [3, 4, 5]));\n}, () => (17));\n\nawait $test.run(\"Concat and Shift tuple type contracts compile and verify lengths\", async () => {\n  const sleep = $test.sleep;\n  type C = Concat<[number, string], [boolean]>;\n  type S = Shift<[string, number, boolean]>;\n  const c: C = [1, \"two\", true];\n  const s: S = [42, false];\n  return ([c.length, s.length]);\n}, () => ([3, 2]));"
   }
 ]

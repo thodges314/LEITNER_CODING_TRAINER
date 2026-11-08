@@ -1582,5 +1582,13 @@
   "microtask-batch-scheduler": {
     "difficulty": 3,
     "concept": "microtasks"
+  },
+  "ts-assertion-functions": {
+    "difficulty": 2,
+    "concept": "ts-assertions"
+  },
+  "ts-tuple-rest-parameters": {
+    "difficulty": 3,
+    "concept": "ts-tuples"
   }
 }

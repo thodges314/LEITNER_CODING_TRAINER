@@ -144,5 +144,51 @@ export default {
       '[["a", "b"], ["c", "d"]]'
     ),
   ],
+
+  'ts-assertion-functions': [
+    c(
+      'isDefined returns true for values and false for null/undefined',
+      '[isDefined("hello"), isDefined(0), isDefined(false), isDefined(null), isDefined(undefined)]',
+      '[true, true, true, false, false]'
+    ),
+    c(
+      'assertDefined passes valid values and throws TypeError on null/undefined',
+      'let caught = null;\ntry {\n  assertDefined(null, "Missing");\n} catch (e: any) {\n  caught = e.message;\n}\n[assertDefined(123) === undefined, caught]',
+      '[true, "Missing"]'
+    ),
+    c(
+      'assertCondition throws on falsy values with custom message',
+      'let caught = null;\ntry {\n  assertCondition(false, "Expected truthy");\n} catch (e: any) {\n  caught = e.message;\n}\n[assertCondition(true) === undefined, caught]',
+      '[true, "Expected truthy"]'
+    ),
+    c(
+      'assertRecord validates plain records and throws TypeError on arrays/primitives',
+      'let caught = null;\ntry {\n  assertRecord([1, 2, 3]);\n} catch (e: any) {\n  caught = e.message;\n}\n[assertRecord({ a: 1 }) === undefined, caught]',
+      '[true, "Value is not a record object"]'
+    ),
+  ],
+
+  'ts-tuple-rest-parameters': [
+    c(
+      'tuple constructs a typed tuple without widening to arbitrary array',
+      'tuple(1, "ok", true)',
+      '[1, "ok", true]'
+    ),
+    c(
+      'partialApply binds leading arguments and returns function for remaining arguments',
+      'const fn = (a: string, b: number, c: boolean) => `${a}-${b}-${c}`;\nconst partial = partialApply(fn, "x", 10);\npartial(true)',
+      '"x-10-true"'
+    ),
+    c(
+      'callWithTuple executes function by spreading tuple elements',
+      'callWithTuple((a: number, b: number, c: number) => a * b + c, [3, 4, 5])',
+      '17'
+    ),
+    c(
+      'Concat and Shift tuple type contracts compile and verify lengths',
+      'type C = Concat<[number, string], [boolean]>;\ntype S = Shift<[string, number, boolean]>;\nconst c: C = [1, "two", true];\nconst s: S = [42, false];\n[c.length, s.length]',
+      '[3, 2]'
+    ),
+  ],
 };
 

@@ -1,0 +1,12 @@
+{
+  "track": "typescript-patterns",
+  "title": "TS Tuple Manipulation: Variadic Tuples and Rest Parameters",
+  "tags": [
+    "typescript",
+    "tuples",
+    "variadic",
+    "rest-parameters",
+    "generics",
+    "currying"
+  ]
+}
