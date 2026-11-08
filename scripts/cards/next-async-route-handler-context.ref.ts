@@ -14,8 +14,6 @@ interface MemberRecord {
   email: string;
 }
 
-const membersStore = new Map<string, MemberRecord>();
-
 async function GET(request: Request, context: RouteContext): Promise<NextResponse> {
   let resolvedParams: RouteParams | undefined;
 

@@ -240,6 +240,7 @@ export const SANDBOX_NEXT_TYPES = `
   declare function setMockSearchParams(params: any): void;
   declare function UserBadge(props: { user: any }): React.ReactElement;
   declare var articlesStore: Map<string, any>;
+  declare var membersStore: Map<string, any>;
 
   interface Metadata {
     title?: string | { default: string; template: string };

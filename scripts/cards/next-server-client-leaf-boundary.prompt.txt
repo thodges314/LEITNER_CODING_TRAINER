@@ -7,10 +7,9 @@ In the Next.js App Router, all components in the `app/` directory are React Serv
 
 The official Next.js best practice is: **Move Client Components to the Leaves**. Keep data-fetching container components as Server Components, and extract client-side interactivity (event listeners, `useState`) into small, focused leaf components.
 
-### Architecture Note: Single-File Sandbox & Module Separation
-- **Production Architecture**: In production Next.js, `FavoriteButton` lives in its own file (`components/FavoriteButton.tsx`) starting with `'use client'`, while `ProductCard` remains in a Server Component file (`components/ProductCard.tsx`) without `'use client'`.
-- **Serializable Props**: Because Server Components cannot accept client function callbacks across the network boundary, `ProductCardProps` accepts strictly serializable data.
-- **Single-File Buffer**: In this single-file exercise, do **not** add `'use client'` at the top of the buffer—`FavoriteButton` represents the interactive client leaf embedded inside the static server container.
+> [!NOTE] Single-File Sandbox & Module Architecture
+> In a production Next.js application, `FavoriteButton` lives in its own file (`components/FavoriteButton.tsx`) starting with `'use client'`, while `ProductCard` remains in a Server Component file (`components/ProductCard.tsx`) without `'use client'`. Because Server Components cannot accept function callbacks across the network boundary, `ProductCardProps` accepts strictly serializable data.
+> In this single-file exercise, do NOT add `'use client'` at the top of the buffer—`FavoriteButton` represents the interactive client leaf embedded inside the static server container.
 
 ```ts
 interface Product {
