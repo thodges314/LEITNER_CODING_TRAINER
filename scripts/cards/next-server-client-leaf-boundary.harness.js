@@ -3,11 +3,16 @@ await (async () => {
   const FavComp = typeof FavoriteButton === 'function' ? FavoriteButton : (typeof solution === 'object' && solution?.FavoriteButton);
   const CardComp = typeof ProductCard === 'function' ? ProductCard : (typeof solution === 'object' && solution?.ProductCard);
 
+  const case1 = 'FavoriteButton renders with initial state and accessible aria-pressed';
+  const case2 = 'FavoriteButton toggles state and calls onToggle callback on click';
+  const case3 = 'ProductCard renders server product details and embeds FavoriteButton';
+  const case4 = 'ProductCard forwards productId and initialFavorited to FavoriteButton';
+
   if (!FavComp || !CardComp) {
-    $test.check('FavoriteButton renders with initial state and accessible aria-pressed', false, { error: 'FavoriteButton or ProductCard is not defined' });
-    $test.check('FavoriteButton toggles state and calls onToggle callback on click', false, { error: 'FavoriteButton or ProductCard is not defined' });
-    $test.check('ProductCard renders server product details and embeds FavoriteButton', false, { error: 'FavoriteButton or ProductCard is not defined' });
-    $test.check('ProductCard forwards initialFavorited state and toggle callback to leaf component', false, { error: 'FavoriteButton or ProductCard is not defined' });
+    $test.check(case1, false, { error: 'FavoriteButton or ProductCard is not defined' });
+    $test.check(case2, false, { error: 'FavoriteButton or ProductCard is not defined' });
+    $test.check(case3, false, { error: 'FavoriteButton or ProductCard is not defined' });
+    $test.check(case4, false, { error: 'FavoriteButton or ProductCard is not defined' });
     return;
   }
 
@@ -20,15 +25,14 @@ await (async () => {
   const labelAdd = b1?.textContent?.trim() === 'Add to Favorites';
   const isTypeBtn = b1?.getAttribute('type') === 'button';
   $test.check(
-    'FavoriteButton renders with initial state and accessible aria-pressed',
+    case1,
     b1 !== null && isAriaFalse && labelAdd && isTypeBtn,
     { found: Boolean(b1), ariaPressed: b1?.getAttribute('aria-pressed'), text: b1?.textContent?.trim() }
   );
   u1();
 
   // Case 2: FavoriteButton toggles state and calls onToggle callback on click
-  const toggles2 = [{ id: '', fav: false }];
-  toggles2.length = 0;
+  const toggles2: Array<{ id: string; fav: boolean }> = [];
   const onToggleHandler2 = function () {
     toggles2.push({ id: String(arguments[0]), fav: Boolean(arguments[1]) });
   };
@@ -46,7 +50,7 @@ await (async () => {
   const labelFav = b2?.textContent?.trim() === 'Favorited';
   const firedCorrectly = toggles2.length === 1 && toggles2[0].id === 'p-1' && toggles2[0].fav === true;
   $test.check(
-    'FavoriteButton toggles state and calls onToggle callback on click',
+    case2,
     isAriaTrue && labelFav && firedCorrectly,
     { ariaPressed: b2?.getAttribute('aria-pressed'), text: b2?.textContent?.trim(), toggles: toggles2 }
   );
@@ -63,7 +67,7 @@ await (async () => {
   const priceEl = q('[data-testid="product-price"]', c3);
   const embeddedBtn = q('[data-testid="favorite-button"]', c3);
   $test.check(
-    'ProductCard renders server product details and embeds FavoriteButton',
+    case3,
     cardEl !== null &&
       titleEl?.textContent?.trim() === 'Wireless Headphones' &&
       priceEl?.textContent?.trim() === '$99' &&
@@ -76,28 +80,23 @@ await (async () => {
   );
   u3();
 
-  // Case 4: ProductCard forwards initialFavorited state and toggle callback to leaf component
-  const toggles4 = [{ id: '', fav: false }];
-  toggles4.length = 0;
-  const onToggleHandler4 = function () {
-    toggles4.push({ id: String(arguments[0]), fav: Boolean(arguments[1]) });
-  };
-
+  // Case 4: ProductCard forwards productId and initialFavorited to FavoriteButton
   const { container: c4, unmount: u4 } = render(
     React.createElement(CardComp, {
       product: { id: 'prod-99', name: 'Wireless Headphones', price: 99 },
       initialFavorited: true,
-      onFavoriteToggle: onToggleHandler4,
     })
   );
   const b4 = q('[data-testid="favorite-button"]', c4);
   const startsFavorited = b4?.getAttribute('aria-pressed') === 'true';
+  const labelFavorited = b4?.textContent?.trim() === 'Favorited';
   if (b4) fire.click(b4);
-  const firedToggle4 = toggles4.length === 1 && toggles4[0].id === 'prod-99' && toggles4[0].fav === false;
+  const toggledOff = b4?.getAttribute('aria-pressed') === 'false';
+  const labelAddAfterToggle = b4?.textContent?.trim() === 'Add to Favorites';
   $test.check(
-    'ProductCard forwards initialFavorited state and toggle callback to leaf component',
-    startsFavorited && firedToggle4,
-    { startsFavorited, toggles4 }
+    case4,
+    startsFavorited && labelFavorited && toggledOff && labelAddAfterToggle,
+    { startsFavorited, labelFavorited, toggledOff, labelAddAfterToggle }
   );
   u4();
 })();

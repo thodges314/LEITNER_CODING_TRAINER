@@ -1,5 +1,3 @@
-'use client';
-
 interface Product {
   id: string;
   name: string;
@@ -15,7 +13,6 @@ interface FavoriteButtonProps {
 interface ProductCardProps {
   product: Product;
   initialFavorited?: boolean;
-  onFavoriteToggle?: (productId: string, favorited: boolean) => void;
 }
 
 function FavoriteButton({
@@ -49,7 +46,6 @@ function FavoriteButton({
 function ProductCard({
   product,
   initialFavorited = false,
-  onFavoriteToggle,
 }: ProductCardProps): React.ReactElement {
   return (
     <article data-testid="product-card">
@@ -58,7 +54,6 @@ function ProductCard({
       <FavoriteButton
         productId={product.id}
         initialFavorited={initialFavorited}
-        onToggle={onFavoriteToggle}
       />
     </article>
   );

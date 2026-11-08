@@ -209,9 +209,9 @@ export default {
       'renders server title "Wireless Headphones", price "$99", and leaf FavoriteButton'
     ),
     rHarness(
-      'ProductCard forwards initialFavorited state and toggle callback to leaf component',
-      '<ProductCard product={{ id: "prod-99", name: "Wireless Headphones", price: 99 }} initialFavorited={true} onFavoriteToggle={fn} />',
-      'starts with aria-pressed="true" and forwards click event to onFavoriteToggle'
+      'ProductCard forwards productId and initialFavorited to FavoriteButton',
+      '<ProductCard product={{ id: "prod-99", name: "Wireless Headphones", price: 99 }} initialFavorited={true} />',
+      'renders FavoriteButton with initialFavorited=true (aria-pressed="true") and toggles locally on click'
     ),
   ],
 
