@@ -3,6 +3,58 @@ import type { TopicItem, TrackType } from './leitner';
 import type { HarnessReport } from './runner';
 import { isTsOnlyCard } from './tsOnly';
 import { stripTestRunnerBlock } from './stripTestRunner';
+import {
+  API_KEY_KEY,
+  API_KEYS_VAULT_KEY,
+  API_PROVIDER_KEY,
+  API_MODEL_KEY,
+  API_BASE_URL_KEY,
+  detectProviderFromKey,
+  getAllStoredKeys,
+  getStoredApiKey,
+  setStoredApiKey,
+  clearStoredApiKey,
+  getStoredProvider,
+  setStoredProvider,
+  getStoredModel,
+  setStoredModel,
+  getStoredBaseUrl,
+  setStoredBaseUrl,
+  requestProviderCompletion,
+} from './aiProviders';
+import type { AIProvider, CritiqueFollowUpMessage } from './aiProviders';
+import {
+  EVALUATION_SYSTEM_PROMPT,
+  DRAFT_SYSTEM_PROMPT,
+  buildCritiqueFollowUpSystemPrompt,
+  SOCRATIC_CLARIFICATION_SYSTEM_PROMPT,
+} from './aiPrompts';
+
+export {
+  API_KEY_KEY,
+  API_KEYS_VAULT_KEY,
+  API_PROVIDER_KEY,
+  API_MODEL_KEY,
+  API_BASE_URL_KEY,
+  detectProviderFromKey,
+  getAllStoredKeys,
+  getStoredApiKey,
+  setStoredApiKey,
+  clearStoredApiKey,
+  getStoredProvider,
+  setStoredProvider,
+  getStoredModel,
+  setStoredModel,
+  getStoredBaseUrl,
+  setStoredBaseUrl,
+  requestProviderCompletion,
+  EVALUATION_SYSTEM_PROMPT,
+  DRAFT_SYSTEM_PROMPT,
+  buildCritiqueFollowUpSystemPrompt,
+  SOCRATIC_CLARIFICATION_SYSTEM_PROMPT,
+  TRACK_TYPES,
+};
+export type { AIProvider, CritiqueFollowUpMessage };
 
 export interface EvaluationResult {
   passed: boolean;
@@ -75,226 +127,6 @@ export function parseEvaluationPayload(raw: string): Record<string, unknown> | n
     return null;
   }
 }
-
-export const API_KEY_KEY = 'ai_evaluator_key';
-export const API_KEYS_VAULT_KEY = 'ai_evaluator_keys_vault';
-export const API_PROVIDER_KEY = 'ai_evaluator_provider';
-export const API_MODEL_KEY = 'ai_evaluator_model';
-export const API_BASE_URL_KEY = 'ai_evaluator_base_url';
-
-export type AIProvider =
-  | 'gemini'
-  | 'groq'
-  | 'cerebras'
-  | 'mistral'
-  | 'anthropic'
-  | 'openrouter'
-  | 'openai'
-  | 'custom';
-
-export function detectProviderFromKey(key: string): AIProvider | null {
-  const trimmed = key.trim();
-  if (trimmed.startsWith('gsk_')) return 'groq';
-  if (trimmed.startsWith('AIzaSy')) return 'gemini';
-  if (trimmed.startsWith('sk-ant-')) return 'anthropic';
-  if (trimmed.startsWith('csk-')) return 'cerebras';
-  if (trimmed.startsWith('sk-or-')) return 'openrouter';
-  if (trimmed.startsWith('sk-')) return 'openai';
-  return null;
-}
-
-export function getAllStoredKeys(): Record<AIProvider, string> {
-  if (typeof window === 'undefined') {
-    return {
-      gemini: '',
-      groq: '',
-      cerebras: '',
-      mistral: '',
-      anthropic: '',
-      openrouter: '',
-      openai: '',
-      custom: '',
-    };
-  }
-  let vault: Record<string, string> = {};
-  try {
-    const raw = localStorage.getItem(API_KEYS_VAULT_KEY);
-    if (raw) vault = JSON.parse(raw);
-  } catch {
-    vault = {};
-  }
-  // Migrate legacy single key into vault if missing
-  const legacyKey = localStorage.getItem(API_KEY_KEY) || '';
-  const detected = detectProviderFromKey(legacyKey);
-  const currentProvider = detected || (localStorage.getItem(API_PROVIDER_KEY) as AIProvider) || 'gemini';
-  if (legacyKey && !vault[currentProvider]) {
-    vault[currentProvider] = legacyKey;
-    try {
-      localStorage.setItem(API_KEYS_VAULT_KEY, JSON.stringify(vault));
-    } catch {
-      /* ignore */
-    }
-  }
-  return {
-    gemini: vault.gemini || '',
-    groq: vault.groq || '',
-    cerebras: vault.cerebras || '',
-    mistral: vault.mistral || '',
-    anthropic: vault.anthropic || '',
-    openrouter: vault.openrouter || '',
-    openai: vault.openai || '',
-    custom: vault.custom || '',
-  };
-}
-
-export function getStoredApiKey(targetProvider?: AIProvider): string {
-  if (typeof window === 'undefined') return '';
-  const prov = targetProvider || getStoredProvider();
-  const all = getAllStoredKeys();
-  if (all[prov]) return all[prov];
-  if (!targetProvider || targetProvider === getStoredProvider()) {
-    return localStorage.getItem(API_KEY_KEY) || '';
-  }
-  return '';
-}
-
-export function setStoredApiKey(key: string, targetProvider?: AIProvider): void {
-  if (typeof window === 'undefined') return;
-  const trimmed = key.trim();
-  const detected = detectProviderFromKey(trimmed);
-  const prov = targetProvider || detected || getStoredProvider();
-
-  // Save into keys vault
-  const all = getAllStoredKeys();
-  if (trimmed) {
-    all[prov] = trimmed;
-  } else {
-    delete all[prov];
-  }
-  try {
-    localStorage.setItem(API_KEYS_VAULT_KEY, JSON.stringify(all));
-  } catch {
-    /* ignore */
-  }
-
-  // If this key is for the active provider or auto-detected, update active API_KEY_KEY
-  if (!targetProvider || targetProvider === getStoredProvider() || detected) {
-    localStorage.setItem(API_KEY_KEY, trimmed);
-  }
-
-  // Auto-set provider and model if key unambiguously belongs to a provider
-  if (detected) {
-    setStoredProvider(detected);
-    if (detected === 'gemini') setStoredModel('gemini-2.5-flash');
-    else if (detected === 'groq') setStoredModel('llama-3.3-70b-versatile');
-    else if (detected === 'cerebras') setStoredModel('llama3.3-70b');
-    else if (detected === 'mistral') setStoredModel('codestral-latest');
-    else if (detected === 'anthropic') setStoredModel('claude-3-5-sonnet-20241022');
-    else if (detected === 'openai') setStoredModel('gpt-4o-mini');
-    else if (detected === 'openrouter') setStoredModel('nvidia/nemotron-3-super-120b-a12b:free');
-  }
-}
-
-export function clearStoredApiKey(providerToClear?: AIProvider): void {
-  if (typeof window === 'undefined') return;
-  const prov = providerToClear || getStoredProvider();
-  const all = getAllStoredKeys();
-  delete all[prov];
-  try {
-    localStorage.setItem(API_KEYS_VAULT_KEY, JSON.stringify(all));
-  } catch {
-    /* ignore */
-  }
-
-  if (!providerToClear || providerToClear === getStoredProvider()) {
-    localStorage.removeItem(API_KEY_KEY);
-  }
-}
-
-export function getStoredProvider(): AIProvider {
-  if (typeof window === 'undefined') return 'gemini';
-  const stored = localStorage.getItem(API_PROVIDER_KEY) as AIProvider | null;
-  const key = localStorage.getItem(API_KEY_KEY) || '';
-  const detected = detectProviderFromKey(key);
-
-  // If a key with a known unambiguous prefix is active, honor it
-  if (detected) {
-    if (!stored || (stored === 'gemini' && detected !== 'gemini')) {
-      localStorage.setItem(API_PROVIDER_KEY, detected);
-      return detected;
-    }
-  }
-
-  return stored || 'gemini';
-}
-
-export function setStoredProvider(provider: AIProvider): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(API_PROVIDER_KEY, provider);
-
-  // Auto-activate the key for this provider from the vault
-  const all = getAllStoredKeys();
-  if (all[provider]) {
-    localStorage.setItem(API_KEY_KEY, all[provider]);
-  } else {
-    localStorage.removeItem(API_KEY_KEY);
-  }
-}
-
-export function getStoredModel(): string {
-  if (typeof window === 'undefined') return 'gemini-2.5-flash';
-  const prov = getStoredProvider();
-  const val = localStorage.getItem(API_MODEL_KEY);
-  if (val) {
-    // If model conflicts with provider (e.g. model is gemini-2.5-flash but provider is groq)
-    if (prov === 'groq' && val.includes('gemini')) {
-      return 'llama-3.3-70b-versatile';
-    }
-    if (prov === 'gemini' && (val.includes('llama') || val.includes('gpt') || val.includes('claude'))) return 'gemini-2.5-flash';
-    if (prov === 'openai' && (val.includes('gemini') || val.includes('llama') || val.includes('claude'))) return 'gpt-4o-mini';
-    if (prov === 'cerebras' && (val.includes('gemini') || val.includes('gpt') || val.includes('claude'))) return 'llama3.3-70b';
-    if (prov === 'mistral' && (val.includes('gemini') || val.includes('gpt') || val.includes('claude'))) return 'codestral-latest';
-    if (prov === 'anthropic' && !val.includes('claude')) return 'claude-3-5-sonnet-20241022';
-    return val;
-  }
-  if (prov === 'gemini') return 'gemini-2.5-flash';
-  if (prov === 'groq') return 'llama-3.3-70b-versatile';
-  if (prov === 'cerebras') return 'llama3.3-70b';
-  if (prov === 'mistral') return 'codestral-latest';
-  if (prov === 'anthropic') return 'claude-3-5-sonnet-20241022';
-  if (prov === 'openrouter') return 'nvidia/nemotron-3-super-120b-a12b:free';
-  return 'gpt-4o-mini';
-}
-
-export function setStoredModel(model: string): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(API_MODEL_KEY, model.trim());
-}
-
-export function getStoredBaseUrl(): string {
-  if (typeof window === 'undefined') return '';
-  return localStorage.getItem(API_BASE_URL_KEY) || '';
-}
-
-export function setStoredBaseUrl(url: string): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(API_BASE_URL_KEY, url.trim());
-}
-
-const EVALUATION_SYSTEM_PROMPT = `Evaluate cold-start code practice against invariants and functional correctness. Do NOT grade based on verbatim similarity to a reference solution.
-Respect the indicated language mode (JavaScript vs TypeScript). Do NOT criticize, dock points, or demand TypeScript type annotations or interfaces unless the problem is explicitly in TypeScript mode or requires TypeScript invariants. Valid idiomatic JavaScript without types is expected and completely correct when running in JavaScript mode.
-Standard React hooks and primitives (React, useState, useEffect, useRef, useMemo, useCallback, useReducer, etc.), d3, ListNode, TreeNode, GraphNode, and all TypeScript interfaces/types shown in the problem instructions are pre-injected environment globals in this trainer. Do NOT criticize, dock points, or comment on the absence of explicit import statements (such as 'import { useState } from "react"') or the absence of re-declared prompt TypeScript interfaces/types in the submitted code. Both implicit globals/preloaded prompt types and explicit local declarations are valid and accepted in this environment.
-Modern ECMAScript standards (ES2024+) are fully supported in this runtime. Specifically, standard Set methods (Set.prototype.intersection, union, difference, symmetricDifference, isSubsetOf, isSupersetOf, isDisjointFrom), Map.groupBy, Object.groupBy, and other standardized modern ES features ARE native standard JavaScript. Do NOT claim they are non-standard, polyfills, or throw TypeErrors. However, ensure algorithmic invariants (such as specific iteration ordering requirements or complexity) are genuinely satisfied by the implementation.
-The Automated Test Harness Result (when provided) is authoritative regarding compilation and runtime execution. If the automated test harness ran and passed, the code compiled and executed successfully—never claim there are syntax errors, duplicate identifier declarations, or that tests failed to run.
-Return pure JSON:
-{
-  "passed": boolean,
-  "timeComplexity": string,
-  "spaceComplexity": string,
-  "invariantsMet": string[],
-  "invariantsMissed": string[],
-  "critique": string
-}`;
 
 /** Removes // and block comments, so the starter buffer's commented-out examples are never mistaken for the user's code. */
 export function stripComments(code: string): string {
@@ -495,114 +327,15 @@ ${
     }
 Evaluate functional correctness and invariants according to your system instructions.`;
 
-    let rawJson = '';
-
-    if (provider === 'gemini') {
-      const model = getStoredModel() || 'gemini-2.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: EVALUATION_SYSTEM_PROMPT }],
-          },
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: userPrompt }],
-            },
-          ],
-          generationConfig: {
-            response_mime_type: 'application/json',
-            temperature: 0.1,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Gemini API error (${response.status}): ${errorText}`);
-      }
-
-      const data = await response.json();
-      rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    } else if (provider === 'anthropic') {
-      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
-      const endpoint = 'https://api.anthropic.com/v1/messages';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 2048,
-          temperature: 0.1,
-          system: EVALUATION_SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: userPrompt }],
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Anthropic API error (${response.status}): ${errorText}`);
-      }
-
-      const data = await response.json();
-      rawJson = data.content?.[0]?.text || '';
-    } else {
-      // OpenAI-compatible endpoint (OpenAI, Groq, Cerebras, Mistral, OpenRouter, Custom)
-      let baseUrl = getStoredBaseUrl();
-      let model = getStoredModel();
-
-      if (provider === 'openai') {
-        baseUrl = baseUrl || 'https://api.openai.com/v1';
-        model = model || 'gpt-4o-mini';
-      } else if (provider === 'groq') {
-        baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'llama-3.3-70b-versatile';
-      } else if (provider === 'cerebras') {
-        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
-        model = model || 'llama3.3-70b';
-      } else if (provider === 'mistral') {
-        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
-        model = model || 'codestral-latest';
-      } else if (provider === 'openrouter') {
-        baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'nvidia/nemotron-3-super-120b-a12b:free';
-      }
-
-      const endpoint = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          response_format: { type: 'json_object' },
-          messages: [
-            { role: 'system', content: EVALUATION_SYSTEM_PROMPT },
-            { role: 'user', content: userPrompt },
-          ],
-          temperature: 0.1,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`API error (${response.status}): ${errorText}`);
-      }
-
-      const data = await response.json();
-      rawJson = data.choices?.[0]?.message?.content || '';
-    }
+    const rawJson = await requestProviderCompletion({
+      provider,
+      apiKey,
+      systemPrompt: EVALUATION_SYSTEM_PROMPT,
+      userPrompt,
+      temperature: 0.1,
+      maxTokens: 2048,
+      jsonMode: true,
+    });
 
     const parsed = parseEvaluationPayload(rawJson);
     const harnessFailed = Boolean(harness?.ran && !harness.passed);
@@ -646,22 +379,6 @@ Evaluate functional correctness and invariants according to your system instruct
   }
 }
 
-const DRAFT_SYSTEM_PROMPT = `The user will describe a coding pattern or interview concept informally. 
-Extract and return ONLY a valid JSON object matching this schema:
-{
-  "id": string (kebab-case identifier),
-  "track": one of ${TRACK_TYPES.map((t) => `'${t}'`).join(' | ')},
-  "title": string (concise name),
-  "promptSeed": string (a clear, cold-start prompt describing what to write, requirements, and invariants to satisfy),
-  "tags": string[],
-  "targetTime": string (e.g. "O(1)", "O(n)", "O(n log n)"),
-  "targetSpace": string (e.g. "O(1)", "O(n)"),
-  "complexityExplanation": string (succinct 1-2 sentence explanation of the target time and space complexity),
-  "starterCode": string (minimal boilerplate function or component signature stub),
-  "referenceSolution": string (canonical, optimal, clean implementation),
-  "testHarness": string (executable test verification script using $test.check('description', condition))
-}`;
-
 export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> {
   const apiKey = getStoredApiKey();
   const provider = getStoredProvider();
@@ -700,110 +417,15 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
   }
 
   try {
-    let rawJson = '';
-
-    if (provider === 'gemini') {
-      const model = getStoredModel() || 'gemini-2.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: DRAFT_SYSTEM_PROMPT }],
-          },
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: userNote }],
-            },
-          ],
-          generationConfig: {
-            response_mime_type: 'application/json',
-            temperature: 0.2,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Gemini API draft error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    } else if (provider === 'anthropic') {
-      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
-      const endpoint = 'https://api.anthropic.com/v1/messages';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 2048,
-          temperature: 0.2,
-          system: DRAFT_SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: userNote }],
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Anthropic API draft error (${response.status}): ${errorText}`);
-      }
-
-      const data = await response.json();
-      rawJson = data.content?.[0]?.text || '';
-    } else {
-      let baseUrl = getStoredBaseUrl();
-      let model = getStoredModel();
-      if (provider === 'openai') {
-        baseUrl = baseUrl || 'https://api.openai.com/v1';
-        model = model || 'gpt-4o-mini';
-      } else if (provider === 'groq') {
-        baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'llama-3.3-70b-versatile';
-      } else if (provider === 'cerebras') {
-        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
-        model = model || 'llama3.3-70b';
-      } else if (provider === 'mistral') {
-        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
-        model = model || 'codestral-latest';
-      } else if (provider === 'openrouter') {
-        baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'nvidia/nemotron-3-super-120b-a12b:free';
-      }
-
-      const endpoint = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          response_format: { type: 'json_object' },
-          messages: [
-            { role: 'system', content: DRAFT_SYSTEM_PROMPT },
-            { role: 'user', content: userNote },
-          ],
-          temperature: 0.2,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API draft error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      rawJson = data.choices?.[0]?.message?.content || '';
-    }
+    const rawJson = await requestProviderCompletion({
+      provider,
+      apiKey,
+      systemPrompt: DRAFT_SYSTEM_PROMPT,
+      userPrompt: userNote,
+      temperature: 0.2,
+      maxTokens: 2048,
+      jsonMode: true,
+    });
 
     const cleaned = rawJson.replace(/```(?:json)?\s*([\s\S]*?)\s*```/g, '$1').trim();
     const parsed = JSON.parse(cleaned);
@@ -843,11 +465,6 @@ export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> 
   }
 }
 
-export interface CritiqueFollowUpMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
 export async function askCritiqueFollowUp(
   topic: TopicItem,
   submittedCode: string,
@@ -864,12 +481,7 @@ export async function askCritiqueFollowUp(
     return `[Offline Mode] To ask live follow-up questions to the AI mentor, please save an API key (such as free Groq or Google Gemini) in Settings.\n\nTip for "${topic.title}": Focus on satisfying the target complexity (${topic.targetTime || 'O(n)'} time, ${topic.targetSpace || 'O(1)'} space) and checking null/boundary inputs.`;
   }
 
-  const systemPrompt = `You are an expert technical coding mentor in a deliberate practice trainer.
-Answer the user's follow-up question regarding their solution and the evaluator critique.
-Be concise (2-4 sentences max), technically exact, and directly answer their question.
-Note that React hooks, d3, ListNode/TreeNode/GraphNode, and all TypeScript interfaces/types shown in the problem instructions are pre-injected in the sandbox scope and do not need to be imported or re-declared by the user.
-The context is strictly this single problem ("${topic.title}"), the user's submitted code, and the evaluation critique. Focus on algorithmic correctness, invariants, edge cases, or complexity bounds.`;
-
+  const systemPrompt = buildCritiqueFollowUpSystemPrompt(topic.title);
   const cleanedCode = stripTestRunnerBlock(submittedCode, topic.testHarness).trim() || submittedCode;
 
   const contextPrompt = `Problem: ${topic.title} (${topic.track})
@@ -886,107 +498,16 @@ User Follow-Up Question:
 ${question}`;
 
   try {
-    if (provider === 'gemini') {
-      const model = getStoredModel() || 'gemini-2.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: [
-            ...history.map((h) => ({
-              role: h.role === 'assistant' ? 'model' : 'user',
-              parts: [{ text: h.content }],
-            })),
-            { role: 'user', parts: [{ text: contextPrompt }] },
-          ],
-          generationConfig: { temperature: 0.2 },
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Gemini error (${response.status}): ${await response.text()}`);
-      }
-      const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'No response generated.';
-    } else if (provider === 'anthropic') {
-      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
-      const endpoint = 'https://api.anthropic.com/v1/messages';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 1024,
-          temperature: 0.2,
-          system: systemPrompt,
-          messages: [
-            ...history.map((h) => ({
-              role: h.role,
-              content: h.content,
-            })),
-            { role: 'user', content: contextPrompt },
-          ],
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Anthropic error (${response.status}): ${await response.text()}`);
-      }
-      const data = await response.json();
-      return data.content?.[0]?.text?.trim() || 'No response generated.';
-    } else {
-      let baseUrl = getStoredBaseUrl();
-      let model = getStoredModel();
-      if (provider === 'openai') {
-        baseUrl = baseUrl || 'https://api.openai.com/v1';
-        model = model || 'gpt-4o-mini';
-      } else if (provider === 'groq') {
-        baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'llama-3.3-70b-versatile';
-      } else if (provider === 'cerebras') {
-        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
-        model = model || 'llama3.3-70b';
-      } else if (provider === 'mistral') {
-        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
-        model = model || 'codestral-latest';
-      } else if (provider === 'openrouter') {
-        baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'nvidia/nemotron-3-super-120b-a12b:free';
-      }
-
-      const endpoint = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...history.map((h) => ({
-              role: h.role,
-              content: h.content,
-            })),
-            { role: 'user', content: contextPrompt },
-          ],
-          temperature: 0.2,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error (${response.status}): ${await response.text()}`);
-      }
-
-      const data = await response.json();
-      return data.choices?.[0]?.message?.content?.trim() || 'No response generated.';
-    }
+    const reply = await requestProviderCompletion({
+      provider,
+      apiKey,
+      systemPrompt,
+      userPrompt: contextPrompt,
+      history,
+      temperature: 0.2,
+      maxTokens: 1024,
+    });
+    return reply.trim() || 'No response generated.';
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return `[Follow-up question failed (${msg})]. Please check your API key or network connection.`;
@@ -1014,15 +535,6 @@ export async function askSocraticClarification(
 
   const canonicalCode = topic.referenceSolutionTs || topic.referenceSolution || topic.solution || topic.starterCode || '';
 
-  const systemPrompt = `You are an expert Socratic coding tutor and interview coach in a deliberate practice trainer.
-The learner is practicing cold-start recall for a coding challenge.
-CRITICAL MANDATORY RULES:
-1. NEVER output the code solution, executable snippets, or direct implementations that solve the problem. Do NOT write code that the user can copy-paste to pass.
-2. If asked how an algorithm works (e.g. insertion sort, quicksort, topological sort, binary search), explain the algorithmic mechanics conceptually in plain English using analogies or step-by-step logic, but NO code blocks.
-3. If asked about problem requirements or rules, clarify the contract without ambiguity.
-4. If asked why their current approach might be broken, analyze their code against edge cases and ask guiding questions to lead them to the fix.
-5. Be concise (2-4 paragraphs maximum), encouraging, and technically exact.`;
-
   const contractSample = (topic.testCases || [])
     .slice(0, 8)
     .map((c) => `- Input: ${c.input} -> Expected: ${c.expected} (${c.description})`)
@@ -1048,110 +560,18 @@ Learner's Question / Request:
 ${question}`;
 
   try {
-    if (provider === 'gemini') {
-      const model = getStoredModel() || 'gemini-2.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: [
-            ...history.map((h) => ({
-              role: h.role === 'assistant' ? 'model' : 'user',
-              parts: [{ text: h.content }],
-            })),
-            { role: 'user', parts: [{ text: contextPrompt }] },
-          ],
-          generationConfig: { temperature: 0.3 },
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Gemini error (${response.status}): ${await response.text()}`);
-      }
-      const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 'No response generated.';
-    } else if (provider === 'anthropic') {
-      const model = getStoredModel() || 'claude-3-5-sonnet-20241022';
-      const endpoint = 'https://api.anthropic.com/v1/messages';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 1024,
-          temperature: 0.3,
-          system: systemPrompt,
-          messages: [
-            ...history.map((h) => ({
-              role: h.role,
-              content: h.content,
-            })),
-            { role: 'user', content: contextPrompt },
-          ],
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`Anthropic error (${response.status}): ${await response.text()}`);
-      }
-      const data = await response.json();
-      return data.content?.[0]?.text?.trim() || 'No response generated.';
-    } else {
-      let baseUrl = getStoredBaseUrl();
-      let model = getStoredModel();
-      if (provider === 'openai') {
-        baseUrl = baseUrl || 'https://api.openai.com/v1';
-        model = model || 'gpt-4o-mini';
-      } else if (provider === 'groq') {
-        baseUrl = baseUrl || 'https://api.groq.com/openai/v1';
-        model = model || 'llama-3.3-70b-versatile';
-      } else if (provider === 'cerebras') {
-        baseUrl = baseUrl || 'https://api.cerebras.ai/v1';
-        model = model || 'llama3.3-70b';
-      } else if (provider === 'mistral') {
-        baseUrl = baseUrl || 'https://api.mistral.ai/v1';
-        model = model || 'codestral-latest';
-      } else if (provider === 'openrouter') {
-        baseUrl = baseUrl || 'https://openrouter.ai/api/v1';
-        model = model || 'nvidia/nemotron-3-super-120b-a12b:free';
-      }
-
-      const endpoint = `${(baseUrl || 'https://api.openai.com/v1').replace(/\/+$/, '')}/chat/completions`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...history.map((h) => ({
-              role: h.role,
-              content: h.content,
-            })),
-            { role: 'user', content: contextPrompt },
-          ],
-          temperature: 0.3,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error (${response.status}): ${await response.text()}`);
-      }
-
-      const data = await response.json();
-      return data.choices?.[0]?.message?.content?.trim() || 'No response generated.';
-    }
+    const reply = await requestProviderCompletion({
+      provider,
+      apiKey,
+      systemPrompt: SOCRATIC_CLARIFICATION_SYSTEM_PROMPT,
+      userPrompt: contextPrompt,
+      history,
+      temperature: 0.3,
+      maxTokens: 1024,
+    });
+    return reply.trim() || 'No response generated.';
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     return `[Tutor guidance failed (${msg})]. Please check your API key or network connection.`;
   }
 }
-

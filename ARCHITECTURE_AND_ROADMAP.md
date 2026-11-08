@@ -46,8 +46,11 @@ src/
     LivePreview.tsx            universal sandboxed iframe preview (React, D3, Tailwind HTML), pop-out window with live sync, event output (aliased as ReactPreview.tsx)
     practice/                  modular arena subcomponents (PracticeHeader, ContractTable, EditorToolbar, ConsoleRunnerDrawer, ComponentPreviewPane, PropsControlPanel, ReinforcementBanner, starterSnippet, consoleFormat, ReactTestErrorBoundary)
   lib/
-    leitner.ts                 ALL scheduling/state logic (Leitner + Graduated Interval Recall, localStorage persistence)
+    leitner.ts                 core deck state persistence, review commits, custom/deactivated card mutations, and backward-compatible re-exports
     leitner.test.ts            unit tests for Leitner & Graduated Interval algorithms
+    scheduling.ts              spaced repetition interval calculations, staged ladder unlocks, and next-card selection (`getNextCard`, `getNextCardGraduatedInterval`)
+    deckTelemetry.ts           review history types (`ReviewHistoryEntry`) and rolling 24-hour velocity calculations (`computeRolling24HourStats`)
+    deckBackup.ts              deck backup JSON export, validation, and normalization (`exportDeckBackup`, `parseDeckBackup`)
     trackMeta.ts               track types (`TrackType`), visual badge palettes, labels, and track helpers (`TRACK_METADATA`, `getTrackMeta`)
     practiceFilter.ts          practice focus filter, difficulty ladder helpers, preset normalization, and card pack filtering
     storage.ts                 centralized `STORAGE_KEYS` registry and fail-safe `localStorage` accessors (`safeGetItem`, `safeSetItem`, `safeGetJson`, `safeSetJson`)
@@ -65,7 +68,9 @@ src/
     previewPropsConfig.ts      declarative schema & default suggested initial props for React component cards
     domTools.ts, mockFetch.ts  headless DOM test tools ($dom) and deterministic fetch mock
     harnessContracts.ts        extracts the "Target Contract" table shown for a card; `sanitizeCallSignature` only turns `\n` into line breaks OUTSIDE string literals
-    ai.ts                      optional AI evaluator (Gemini/OpenAI-compatible; replies are validated by `parseEvaluationPayload`, unparseable ones are shown raw via `rawOutput`): the tests decide whether code works; the AI can fail a passing run (shown as a note, overridable) but never rescue a failing one
+    ai.ts                      optional AI evaluator, topic drafter, and Socratic coach (replies are validated by `parseEvaluationPayload`, unparseable ones are shown raw via `rawOutput`)
+    aiProviders.ts             multi-provider API key vault, provider/model/baseUrl persistence, and unified LLM completion client (`requestProviderCompletion`)
+    aiPrompts.ts               system prompts for code evaluation, topic drafting, critique follow-up, and Socratic clarification
     drafts.ts                  per-card editor autosave (localStorage `leitner_draft:<id>`)
     deckFilters.ts             deck catalog filter and sort preferences persistence (localStorage `leitner_deck_catalog_preferences`)
     dossierStorage.ts          lightweight localStorage persistence for AI interview prep dossiers (`leitner_interview_dossiers`)
