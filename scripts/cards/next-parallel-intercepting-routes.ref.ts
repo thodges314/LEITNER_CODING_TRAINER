@@ -20,7 +20,11 @@ function FeedLayout({ children, modal }: FeedLayoutProps): React.ReactElement {
   );
 }
 
-function PhotoModal({ id, photoUrl, onDismiss }: PhotoModalProps): React.ReactElement {
+const PhotoModal = ({
+  id,
+  photoUrl,
+  onDismiss,
+}: PhotoModalProps): React.ReactElement => {
   const router = useRouter();
 
   const handleClose = () => {
@@ -42,4 +46,4 @@ function PhotoModal({ id, photoUrl, onDismiss }: PhotoModalProps): React.ReactEl
       />
     </dialog>
   );
-}
+};
