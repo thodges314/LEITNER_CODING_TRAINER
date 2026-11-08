@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import {
   loadDeckState,
   saveDeckState,
@@ -46,9 +46,15 @@ import {
 import type { CustomDeck } from './lib/decks';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
-import { RemoveFromDeckModal, DeckEditorModal, InterviewPrepModal } from './components/dashboard';
-import { getAllSavedDossiers } from './lib/interviewPrep';
+import { RemoveFromDeckModal, DeckEditorModal } from './components/dashboard';
+import { getAllSavedDossiers } from './lib/dossierStorage';
 import { AddTopicModal } from './components/AddTopicModal';
+
+const InterviewPrepModal = lazy(() =>
+  import('./components/dashboard/InterviewPrepModal').then((m) => ({
+    default: m.InterviewPrepModal,
+  }))
+);
 import { FEATURES } from './lib/features';
 import { SettingsModal } from './components/SettingsModal';
 import { FocusModal } from './components/FocusModal';
@@ -1024,21 +1030,25 @@ export function App() {
         }}
       />
 
-      <InterviewPrepModal
-        isOpen={isInterviewPrepModalOpen}
-        onClose={() => {
-          setIsInterviewPrepModalOpen(false);
-          setSelectedDossierId(undefined);
-          setInterviewPrepStep(undefined);
-        }}
-        onCreateCustomDeck={handleCreateCustomDeck}
-        onEditCustomDeck={handleOpenEditDeck}
-        onDeleteDossier={handleDeleteDossier}
-        currentBox1CardIds={currentBox1CardIds}
-        initialDossierId={selectedDossierId}
-        initialStep={interviewPrepStep}
-        onOpenSettings={(sec) => handleOpenSettings(sec)}
-      />
+      {isInterviewPrepModalOpen && (
+        <Suspense fallback={null}>
+          <InterviewPrepModal
+            isOpen={isInterviewPrepModalOpen}
+            onClose={() => {
+              setIsInterviewPrepModalOpen(false);
+              setSelectedDossierId(undefined);
+              setInterviewPrepStep(undefined);
+            }}
+            onCreateCustomDeck={handleCreateCustomDeck}
+            onEditCustomDeck={handleOpenEditDeck}
+            onDeleteDossier={handleDeleteDossier}
+            currentBox1CardIds={currentBox1CardIds}
+            initialDossierId={selectedDossierId}
+            initialStep={interviewPrepStep}
+            onOpenSettings={(sec) => handleOpenSettings(sec)}
+          />
+        </Suspense>
+      )}
 
       <FocusModal
           isOpen={isFocusOpen}

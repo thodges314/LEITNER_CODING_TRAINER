@@ -15,6 +15,7 @@
   --bg-card: #141b29;
   --bg-surface-card: #141b29;
   --bg-elevated: #1a2336;
+  --bg-elevated-hover: #232d44;
   --bg-editor: #0c1018;
   --bg-navigation: rgba(15, 20, 31, 0.85);
   --bg-table-header: rgba(56, 189, 248, 0.12);
@@ -22,7 +23,9 @@
   --bg-table-body: rgba(2, 6, 23, 0.6);
   --bg-table-row-hover: rgba(255, 255, 255, 0.03);
   --bg-instruction: #0c1018;
-  --bg-modal-overlay: rgba(0, 0, 0, 0.75);
+  --bg-modal-overlay: rgba(5, 8, 14, 0.75);
+  --bg-glass-panel: rgba(20, 27, 41, 0.7);
+  --bg-autofill-inset: #0f172a;
 
   /* Borders & Dividers */
   --border-subtle: rgba(255, 255, 255, 0.08);
@@ -63,6 +66,71 @@
   --badge-test-case-bg: rgba(56, 189, 248, 0.15);
   --badge-test-case-text: var(--accent-cyan);
 
+  /* Status & Trial Badges */
+  --status-active-bg: rgba(56, 189, 248, 0.12);
+  --status-active-color: var(--accent-cyan);
+  --status-active-border: rgba(56, 189, 248, 0.35);
+
+  --status-attempted-bg: rgba(52, 211, 153, 0.14);
+  --status-attempted-color: #34d399;
+  --status-attempted-border: rgba(52, 211, 153, 0.35);
+
+  --status-locked-bg: rgba(148, 163, 184, 0.08);
+  --status-locked-color: var(--text-muted);
+  --status-locked-border: rgba(148, 163, 184, 0.22);
+
+  --status-deactivated-bg: rgba(148, 163, 184, 0.1);
+  --status-deactivated-color: var(--text-muted);
+  --status-deactivated-border: var(--border-medium);
+
+  --trial-ready-bg: rgba(52, 211, 153, 0.15);
+  --trial-ready-color: #34d399;
+  --trial-ready-border: transparent;
+
+  /* Table Tag Chips */
+  --tag-chip-color: var(--text-dim);
+  --tag-chip-bg: rgba(255, 255, 255, 0.04);
+  --tag-chip-border: rgba(255, 255, 255, 0.09);
+  --tag-chip-hover-color: var(--accent-cyan);
+  --tag-chip-hover-bg: rgba(56, 189, 248, 0.12);
+  --tag-chip-hover-border: rgba(56, 189, 248, 0.4);
+  --tag-chip-active-color: #ffffff;
+  --tag-chip-active-bg: rgba(56, 189, 248, 0.22);
+  --tag-chip-active-border: rgba(56, 189, 248, 0.6);
+
+  /* AI Copilot & Strategy Tokens */
+  --ai-accent-color: #a855f7;
+  --ai-accent-hover: #c084fc;
+  --ai-accent-bg: rgba(168, 85, 247, 0.06);
+  --ai-accent-bg-hover: rgba(168, 85, 247, 0.15);
+  --ai-accent-border: rgba(168, 85, 247, 0.45);
+  --ai-dossier-tag-bg: rgba(147, 51, 234, 0.15);
+  --ai-dossier-tag-color: #c084fc;
+
+  /* CodeMirror & Rainbow Bracket Tokens */
+  --cm-text: #e2e8f0;
+  --cm-gutter-bg: #080c14;
+  --cm-gutter-text: var(--text-dim);
+  --cm-active-gutter-bg: rgba(56, 189, 248, 0.1);
+  --cm-active-line-bg: rgba(255, 255, 255, 0.025);
+  --cm-selection-bg: rgba(56, 189, 248, 0.2);
+  --cm-matching-bracket-bg: rgba(56, 189, 248, 0.25);
+  --cm-matching-bracket-border: rgba(56, 189, 248, 0.5);
+  --cm-hover-card-bg: #18181b;
+  --cm-hover-card-border: rgba(255, 255, 255, 0.14);
+  --cm-hover-card-text: #e4e4e7;
+  --cm-hover-sig-color: #38bdf8;
+  --cm-hover-doc-border: rgba(255, 255, 255, 0.08);
+  --cm-hover-doc-color: #94a3b8;
+
+  --rainbow-red: #f43f5e;
+  --rainbow-orange: #fb923c;
+  --rainbow-yellow: #facc15;
+  --rainbow-green: #4ade80;
+  --rainbow-blue: #38bdf8;
+  --rainbow-indigo: #818cf8;
+  --rainbow-violet: #c084fc;
+
   /* Leitner Tiers / Boxes */
   --box-1: #fb7185;
   --box-2: #f97316;
@@ -81,7 +149,7 @@
   --difficulty-4: #fb923c;
   --difficulty-5: #f87171;
 
-  /* Track Badge Colors (Dark) */
+  /* Track Badge Colors (All 17 Tracks - Dark) */
   --track-async-js-color: #38bdf8;
   --track-async-js-bg: rgba(56, 189, 248, 0.12);
   --track-async-js-border: rgba(56, 189, 248, 0.35);
@@ -93,6 +161,10 @@
   --track-algorithms-color: #f59e0b;
   --track-algorithms-bg: rgba(245, 158, 11, 0.12);
   --track-algorithms-border: rgba(245, 158, 11, 0.35);
+
+  --track-advanced-algorithms-color: #a855f7;
+  --track-advanced-algorithms-bg: rgba(168, 85, 247, 0.12);
+  --track-advanced-algorithms-border: rgba(168, 85, 247, 0.35);
 
   --track-typescript-patterns-color: #3178c6;
   --track-typescript-patterns-bg: rgba(49, 120, 198, 0.12);
@@ -110,6 +182,14 @@
   --track-react-components-bg: rgba(34, 211, 238, 0.12);
   --track-react-components-border: rgba(34, 211, 238, 0.35);
 
+  --track-d3-color: #f97316;
+  --track-d3-bg: rgba(249, 115, 22, 0.12);
+  --track-d3-border: rgba(249, 115, 22, 0.35);
+
+  --track-tailwind-color: #06b6d4;
+  --track-tailwind-bg: rgba(6, 182, 212, 0.12);
+  --track-tailwind-border: rgba(6, 182, 212, 0.35);
+
   --track-testing-tooling-color: #f43f5e;
   --track-testing-tooling-bg: rgba(244, 63, 94, 0.12);
   --track-testing-tooling-border: rgba(244, 63, 94, 0.35);
@@ -118,9 +198,25 @@
   --track-js-utilities-bg: rgba(16, 185, 129, 0.12);
   --track-js-utilities-border: rgba(16, 185, 129, 0.35);
 
+  --track-graphql-color: #e535ab;
+  --track-graphql-bg: rgba(229, 53, 171, 0.12);
+  --track-graphql-border: rgba(229, 53, 171, 0.35);
+
+  --track-graphql-server-color: #c084fc;
+  --track-graphql-server-bg: rgba(192, 132, 252, 0.12);
+  --track-graphql-server-border: rgba(192, 132, 252, 0.35);
+
   --track-node-color: #4ade80;
   --track-node-bg: rgba(74, 222, 128, 0.12);
   --track-node-border: rgba(74, 222, 128, 0.35);
+
+  --track-sql-postgres-color: #38bdf8;
+  --track-sql-postgres-bg: rgba(56, 189, 248, 0.12);
+  --track-sql-postgres-border: rgba(56, 189, 248, 0.35);
+
+  --track-nextjs-color: #f8fafc;
+  --track-nextjs-bg: rgba(248, 250, 252, 0.12);
+  --track-nextjs-border: rgba(248, 250, 252, 0.35);
 
   /* Typography & Shadows */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -144,6 +240,7 @@
   --bg-card: #FFFFFF;             /* Active Window pure white */
   --bg-surface-card: #FFFFFF;
   --bg-elevated: #E8E7DF;         /* Platinum bevel panel */
+  --bg-elevated-hover: #DDDCD4;
   --bg-editor: #FAFAFA;           /* Document canvas */
   --bg-navigation: #F2F1EA;       /* Top nav bar */
   --bg-table-header: #A2B5CD;     /* Window title bar periwinkle */
@@ -151,7 +248,9 @@
   --bg-table-body: #FFFFFF;
   --bg-table-row-hover: #F0EFE8;
   --bg-instruction: #FAFAFA;
-  --bg-modal-overlay: rgba(60, 60, 60, 0.6);
+  --bg-modal-overlay: rgba(40, 40, 40, 0.45);
+  --bg-glass-panel: #FFFFFF;
+  --bg-autofill-inset: #FFFFFF;
 
   /* Borders & Dividers */
   --border-subtle: #D0CEBE;
@@ -192,6 +291,83 @@
   --badge-test-case-bg: #DD3322;
   --badge-test-case-text: #FFFFFF;
 
+  /* Status & Trial Badges */
+  --status-active-bg: #E0F2FE;
+  --status-active-color: #0284C7;
+  --status-active-border: #7DD3FC;
+
+  --status-attempted-bg: #ECFDF5;
+  --status-attempted-color: #047857;
+  --status-attempted-border: #A7F3D0;
+
+  --status-locked-bg: #F1F5F9;
+  --status-locked-color: #334155;
+  --status-locked-border: #94A3B8;
+
+  --status-deactivated-bg: #E2E1DA;
+  --status-deactivated-color: #64748B;
+  --status-deactivated-border: #8A887E;
+
+  --trial-ready-bg: #DCFCE7;
+  --trial-ready-color: #15803D;
+  --trial-ready-border: #86EFAC;
+
+  /* Table Tag Chips */
+  --tag-chip-color: #334155;
+  --tag-chip-bg: rgba(0, 0, 0, 0.05);
+  --tag-chip-border: #CBD5E1;
+  --tag-chip-hover-color: #0284C7;
+  --tag-chip-hover-bg: #E0F2FE;
+  --tag-chip-hover-border: #7DD3FC;
+  --tag-chip-active-color: #0284C7;
+  --tag-chip-active-bg: #BAE6FD;
+  --tag-chip-active-border: #38BDF8;
+
+  /* AI Copilot & Strategy Tokens */
+  --ai-accent-color: #6B21A8;
+  --ai-accent-hover: #581C87;
+  --ai-accent-bg: #F4EFF8;
+  --ai-accent-bg-hover: #E9D5FF;
+  --ai-accent-border: #6B21A8;
+  --ai-dossier-tag-bg: #F3E8FF;
+  --ai-dossier-tag-color: #6B21A8;
+
+  /* CodeMirror & Rainbow Bracket Tokens */
+  --cm-text: #1C1C1C;
+  --cm-gutter-bg: #F0EFE8;
+  --cm-gutter-text: #666666;
+  --cm-active-gutter-bg: #E2E1D8;
+  --cm-active-line-bg: rgba(68, 85, 170, 0.06);
+  --cm-selection-bg: rgba(68, 85, 170, 0.18);
+  --cm-matching-bracket-bg: rgba(68, 85, 170, 0.25);
+  --cm-matching-bracket-border: #4455AA;
+  --cm-hover-card-bg: #FFFFFF;
+  --cm-hover-card-border: #1C1C1C;
+  --cm-hover-card-text: #1C1C1C;
+  --cm-hover-sig-color: #000080;
+  --cm-hover-doc-border: #CCCCCC;
+  --cm-hover-doc-color: #555555;
+
+  --rainbow-red: #DD3322;
+  --rainbow-orange: #D97706;
+  --rainbow-yellow: #B45309;
+  --rainbow-green: #229955;
+  --rainbow-blue: #4455AA;
+  --rainbow-indigo: #5B21B6;
+  --rainbow-violet: #86198F;
+
+  /* Light Mode Syntax Tokens */
+  --tok-keyword: #881391;
+  --tok-operator: #1C1C1C;
+  --tok-variable: #1C1C1C;
+  --tok-property: #1C1C1C;
+  --tok-function: #4455AA;
+  --tok-string: #1A7F37;
+  --tok-number: #005CC5;
+  --tok-comment: #6A737D;
+  --tok-bool: #DD3322;
+  --tok-type: #4455AA;
+
   /* Leitner Tiers / Boxes */
   --box-1: #DD3322;
   --box-2: #D97706;
@@ -210,7 +386,7 @@
   --difficulty-4: #c2410c;
   --difficulty-5: #dc2626;
 
-  /* Track Badge Colors (Light) */
+  /* Track Badge Colors (All 17 Tracks - Light) */
   --track-async-js-color: #0369A1;
   --track-async-js-bg: #E0F2FE;
   --track-async-js-border: #7DD3FC;
@@ -222,6 +398,10 @@
   --track-algorithms-color: #B45309;
   --track-algorithms-bg: #FEF3C7;
   --track-algorithms-border: #FCD34D;
+
+  --track-advanced-algorithms-color: #6B21A8;
+  --track-advanced-algorithms-bg: #F3E8FF;
+  --track-advanced-algorithms-border: #D8B4FE;
 
   --track-typescript-patterns-color: #1E40AF;
   --track-typescript-patterns-bg: #DBEAFE;
@@ -239,6 +419,14 @@
   --track-react-components-bg: #E0F2FE;
   --track-react-components-border: #7DD3FC;
 
+  --track-d3-color: #EA580C;
+  --track-d3-bg: #FFEDD5;
+  --track-d3-border: #FDBA74;
+
+  --track-tailwind-color: #0E7490;
+  --track-tailwind-bg: #CFFAFE;
+  --track-tailwind-border: #67E8F9;
+
   --track-testing-tooling-color: #BE123C;
   --track-testing-tooling-bg: #FFE4E6;
   --track-testing-tooling-border: #FDA4AF;
@@ -247,9 +435,25 @@
   --track-js-utilities-bg: #D1FAE5;
   --track-js-utilities-border: #6EE7B7;
 
+  --track-graphql-color: #9D174D;
+  --track-graphql-bg: #FCE7F3;
+  --track-graphql-border: #F472B6;
+
+  --track-graphql-server-color: #7e22ce;
+  --track-graphql-server-bg: #F3E8FF;
+  --track-graphql-server-border: #C084FC;
+
   --track-node-color: #15803d;
   --track-node-bg: #DCFCE7;
   --track-node-border: #86EFAC;
+
+  --track-sql-postgres-color: #0369a1;
+  --track-sql-postgres-bg: #E0F2FE;
+  --track-sql-postgres-border: #7DD3FC;
+
+  --track-nextjs-color: #0f172a;
+  --track-nextjs-bg: #F1F5F9;
+  --track-nextjs-border: #94A3B8;
 
   /* Shadows - Retro bevels */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);

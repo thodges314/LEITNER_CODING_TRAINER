@@ -3,79 +3,124 @@
  * Reusable badges for tracks, difficulties, statuses, complexities, and test cases.
  */
 
-/* Track Badges */
+/* Track Badges (All 17 Tracks) */
 .track-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 8px;
-  border-radius: 4px;
+  gap: 4px;
+  padding: 2.5px 8.5px;
+  border-radius: 12px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.02em;
   white-space: nowrap;
   font-family: inherit;
+  border: 1px solid var(--track-border, var(--border-subtle));
+  background-color: var(--track-bg, var(--bg-elevated));
+  color: var(--track-color, var(--text-secondary));
   transition: all 0.15s ease;
 }
 
 .track-badge[data-track="async-js"] {
-  color: var(--track-async-js-color);
-  background-color: var(--track-async-js-bg);
-  border: 1px solid var(--track-async-js-border);
+  --track-color: var(--track-async-js-color);
+  --track-bg: var(--track-async-js-bg);
+  --track-border: var(--track-async-js-border);
 }
 
 .track-badge[data-track="react"] {
-  color: var(--track-react-color);
-  background-color: var(--track-react-bg);
-  border: 1px solid var(--track-react-border);
+  --track-color: var(--track-react-color);
+  --track-bg: var(--track-react-bg);
+  --track-border: var(--track-react-border);
 }
 
 .track-badge[data-track="algorithms"] {
-  color: var(--track-algorithms-color);
-  background-color: var(--track-algorithms-bg);
-  border: 1px solid var(--track-algorithms-border);
+  --track-color: var(--track-algorithms-color);
+  --track-bg: var(--track-algorithms-bg);
+  --track-border: var(--track-algorithms-border);
+}
+
+.track-badge[data-track="advanced-algorithms"] {
+  --track-color: var(--track-advanced-algorithms-color);
+  --track-bg: var(--track-advanced-algorithms-bg);
+  --track-border: var(--track-advanced-algorithms-border);
 }
 
 .track-badge[data-track="typescript-patterns"] {
-  color: var(--track-typescript-patterns-color);
-  background-color: var(--track-typescript-patterns-bg);
-  border: 1px solid var(--track-typescript-patterns-border);
+  --track-color: var(--track-typescript-patterns-color);
+  --track-bg: var(--track-typescript-patterns-bg);
+  --track-border: var(--track-typescript-patterns-border);
 }
 
 .track-badge[data-track="js-language"] {
-  color: var(--track-js-language-color);
-  background-color: var(--track-js-language-bg);
-  border: 1px solid var(--track-js-language-border);
+  --track-color: var(--track-js-language-color);
+  --track-bg: var(--track-js-language-bg);
+  --track-border: var(--track-js-language-border);
 }
 
 .track-badge[data-track="dom-browser"] {
-  color: var(--track-dom-browser-color);
-  background-color: var(--track-dom-browser-bg);
-  border: 1px solid var(--track-dom-browser-border);
+  --track-color: var(--track-dom-browser-color);
+  --track-bg: var(--track-dom-browser-bg);
+  --track-border: var(--track-dom-browser-border);
 }
 
 .track-badge[data-track="react-components"] {
-  color: var(--track-react-components-color);
-  background-color: var(--track-react-components-bg);
-  border: 1px solid var(--track-react-components-border);
+  --track-color: var(--track-react-components-color);
+  --track-bg: var(--track-react-components-bg);
+  --track-border: var(--track-react-components-border);
+}
+
+.track-badge[data-track="d3"] {
+  --track-color: var(--track-d3-color);
+  --track-bg: var(--track-d3-bg);
+  --track-border: var(--track-d3-border);
+}
+
+.track-badge[data-track="tailwind"] {
+  --track-color: var(--track-tailwind-color);
+  --track-bg: var(--track-tailwind-bg);
+  --track-border: var(--track-tailwind-border);
 }
 
 .track-badge[data-track="testing-tooling"] {
-  color: var(--track-testing-tooling-color);
-  background-color: var(--track-testing-tooling-bg);
-  border: 1px solid var(--track-testing-tooling-border);
+  --track-color: var(--track-testing-tooling-color);
+  --track-bg: var(--track-testing-tooling-bg);
+  --track-border: var(--track-testing-tooling-border);
 }
 
 .track-badge[data-track="js-utilities"] {
-  color: var(--track-js-utilities-color);
-  background-color: var(--track-js-utilities-bg);
-  border: 1px solid var(--track-js-utilities-border);
+  --track-color: var(--track-js-utilities-color);
+  --track-bg: var(--track-js-utilities-bg);
+  --track-border: var(--track-js-utilities-border);
+}
+
+.track-badge[data-track="graphql"] {
+  --track-color: var(--track-graphql-color);
+  --track-bg: var(--track-graphql-bg);
+  --track-border: var(--track-graphql-border);
+}
+
+.track-badge[data-track="graphql-server"] {
+  --track-color: var(--track-graphql-server-color);
+  --track-bg: var(--track-graphql-server-bg);
+  --track-border: var(--track-graphql-server-border);
 }
 
 .track-badge[data-track="node"] {
-  color: var(--track-node-color);
-  background-color: var(--track-node-bg);
-  border: 1px solid var(--track-node-border);
+  --track-color: var(--track-node-color);
+  --track-bg: var(--track-node-bg);
+  --track-border: var(--track-node-border);
+}
+
+.track-badge[data-track="sql-postgres"] {
+  --track-color: var(--track-sql-postgres-color);
+  --track-bg: var(--track-sql-postgres-bg);
+  --track-border: var(--track-sql-postgres-border);
+}
+
+.track-badge[data-track="nextjs"] {
+  --track-color: var(--track-nextjs-color);
+  --track-bg: var(--track-nextjs-bg);
+  --track-border: var(--track-nextjs-border);
 }
 
 /* Difficulty Badges */
@@ -137,7 +182,7 @@
 
 [data-theme="apple-gsos"] .difficulty-empty-pips {
   opacity: 0.35;
-  color: #64748B;
+  color: var(--text-muted);
 }
 
 .difficulty-label {
@@ -159,27 +204,15 @@
 }
 
 .status-pill.status-active {
-  background-color: rgba(52, 211, 153, 0.12);
-  color: #34d399;
-  border: 1px solid rgba(52, 211, 153, 0.3);
+  background-color: var(--status-attempted-bg);
+  color: var(--status-attempted-color);
+  border: 1px solid var(--status-attempted-border);
 }
 
 .status-pill.status-locked {
-  background-color: rgba(148, 163, 184, 0.12);
-  color: var(--text-muted);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-[data-theme="apple-gsos"] .status-pill.status-active {
-  background-color: #DCFCE7;
-  color: #15803D;
-  border-color: #86EFAC;
-}
-
-[data-theme="apple-gsos"] .status-pill.status-locked {
-  background-color: #F1F5F9;
-  color: #64748B;
-  border-color: #CBD5E1;
+  background-color: var(--status-locked-bg);
+  color: var(--status-locked-color);
+  border: 1px solid var(--status-locked-border);
 }
 
 /* Complexity Pill */

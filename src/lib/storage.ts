@@ -23,6 +23,7 @@ export const STORAGE_KEYS = {
   DECK_CATALOG_PREFS: 'leitner_deck_catalog_preferences',
   ACTIVE_DECK_ID: 'leitner_active_deck_id',
   CUSTOM_DECKS: 'leitner_custom_decks',
+  INTERVIEW_DOSSIERS: 'leitner_interview_dossiers',
 } as const;
 
 export function getDefaultStorage(): Storage | null {

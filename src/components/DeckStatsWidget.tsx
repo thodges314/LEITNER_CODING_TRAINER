@@ -96,11 +96,11 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
         track: track as TrackType,
         count,
         label: getTrackMeta(track).label,
-        color: trackColors[track] || '#94a3b8',
+        color: trackColors[track] || palette.textSecondary,
         percentage: activeTopics.length > 0 ? (count / activeTopics.length) * 100 : 0,
       }))
       .sort((a, b) => b.count - a.count);
-  }, [activeTopics, trackColors]);
+  }, [activeTopics, trackColors, palette.textSecondary]);
 
   // Radar data: Both depth (average tier) and coverage (active cards / total cards)
   const radarData = useMemo(() => {
@@ -343,14 +343,12 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                 backgroundColor:
                   mode === m.id
                     ? isLight
-                      ? '#ffffff'
+                      ? palette.bgCard
                       : 'rgba(56, 189, 248, 0.2)'
                     : 'transparent',
                 color:
                   mode === m.id
-                    ? isLight
-                      ? '#2B3A8C'
-                      : 'var(--accent-cyan)'
+                    ? palette.accentPrimary
                     : 'var(--text-muted)',
                 boxShadow: mode === m.id ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
                 transition: 'all 0.15s ease',
@@ -456,11 +454,9 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                           fontWeight: hoveredDomain === p.id || isDomainSelected ? 700 : isLight ? 600 : 500,
                           fill:
                             hoveredDomain === p.id || isDomainSelected
-                              ? isLight
-                                ? '#2B3A8C'
-                                : 'var(--accent-cyan)'
+                              ? palette.accentPrimary
                               : isLight
-                                ? '#0F172A'
+                                ? palette.textPrimary
                                 : 'var(--text-muted)',
                           transition: 'all 0.15s ease',
                         }}
@@ -476,7 +472,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                   <path
                     d={radarPoints.pathString}
                     fill={isLight ? 'rgba(68, 85, 170, 0.28)' : 'rgba(56, 189, 248, 0.22)'}
-                    stroke={isLight ? '#4455AA' : '#38bdf8'}
+                    stroke={palette.accentPrimary}
                     strokeWidth={2}
                     style={{
                       transition: 'all 0.2s ease',
@@ -492,8 +488,8 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                     cx={p.x}
                     cy={p.y}
                     r={hoveredDomain === p.id ? 5.5 : 3.5}
-                    fill={isLight ? '#4455AA' : '#38bdf8'}
-                    stroke={isLight ? '#ffffff' : '#030712'}
+                    fill={palette.accentPrimary}
+                    stroke={palette.bgCard}
                     strokeWidth={1.5}
                     style={{
                       cursor: 'pointer',
@@ -514,9 +510,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                 fontSize: '11px',
                 fontWeight: 600,
                 color: activeDomainObj
-                  ? isLight
-                    ? '#2B3A8C'
-                    : 'var(--accent-cyan)'
+                  ? palette.accentPrimary
                   : 'var(--text-secondary)',
                 minHeight: '16px',
                 textAlign: 'center',
@@ -547,7 +541,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                       data-track={slice.data.track}
                       d={path}
                       fill={slice.data.color}
-                      stroke={isTrackSelected ? (isLight ? '#2B3A8C' : '#38bdf8') : isLight ? '#ffffff' : '#030712'}
+                      stroke={isTrackSelected ? palette.accentPrimary : palette.bgCard}
                       strokeWidth={isTrackSelected ? 3 : 1.5}
                       style={{
                         cursor: 'pointer',
@@ -566,8 +560,8 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                 {/* Center Readout */}
                 <circle
                   r={50}
-                  fill={isLight ? '#f8fafc' : '#061320'}
-                  stroke={isLight ? '#cbd5e1' : 'rgba(56, 189, 248, 0.15)'}
+                  fill={palette.bgSurface}
+                  stroke={palette.borderSubtle}
                   strokeWidth={1}
                   style={{ pointerEvents: 'none' }}
                 />
@@ -577,7 +571,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                   style={{
                     fontSize: activeTrackObj ? '13px' : '17px',
                     fontWeight: 700,
-                    fill: isLight ? '#0f172a' : '#f1f5f9',
+                    fill: palette.textPrimary,
                     fontFamily: 'inherit',
                     pointerEvents: 'none',
                   }}
@@ -678,7 +672,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                       <path
                         d={fgArc || ''}
                         fill={item.color}
-                        stroke={isBoxSelected ? (isLight ? '#2B3A8C' : '#38bdf8') : 'none'}
+                        stroke={isBoxSelected ? palette.accentPrimary : 'none'}
                         strokeWidth={isBoxSelected ? 2 : 0}
                         style={{
                           opacity: hoveredBox && !isHovered ? 0.35 : 1,
@@ -697,7 +691,7 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                   style={{
                     fontSize: activeBoxObj ? '14px' : '16px',
                     fontWeight: 700,
-                    fill: isLight ? '#0f172a' : '#f1f5f9',
+                    fill: palette.textPrimary,
                     pointerEvents: 'none',
                   }}
                 >

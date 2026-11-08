@@ -2,6 +2,9 @@
 @import './styles/layout.css';
 @import './styles/components/badges.css';
 @import './styles/components/deck-dashboard.css';
+@import './styles/components/deck-selector.css';
+@import './styles/components/interview-prep.css';
+@import './styles/components/deck-editor.css';
 @import './styles/components/modals.css';
 @import './styles/components/popovers.css';
 @import './styles/components/arena.css';
@@ -310,7 +313,7 @@ code {
   font-size: 13.5px;
   line-height: 1.6;
   background-color: var(--bg-editor);
-  color: #e2e8f0;
+  color: var(--cm-text);
 }
 
 .cm-theme-container .cm-scroller {
@@ -319,23 +322,23 @@ code {
 }
 
 .cm-theme-container .cm-gutters {
-  background-color: #080c14;
-  color: var(--text-dim);
+  background-color: var(--cm-gutter-bg);
+  color: var(--cm-gutter-text);
   border-right: 1px solid var(--border-subtle);
   user-select: none;
 }
 
 .cm-theme-container .cm-activeLineGutter {
-  background-color: rgba(56, 189, 248, 0.1);
+  background-color: var(--cm-active-gutter-bg);
   color: var(--accent-cyan);
 }
 
 .cm-theme-container .cm-activeLine {
-  background-color: rgba(255, 255, 255, 0.025);
+  background-color: var(--cm-active-line-bg);
 }
 
 .cm-theme-container .cm-selectionMatch {
-  background-color: rgba(56, 189, 248, 0.2);
+  background-color: var(--cm-selection-bg);
 }
 
 /* Recommended Solution Read-Only CodeMirror Viewer */
@@ -368,19 +371,19 @@ code {
 }
 
 .cm-theme-container .cm-matchingBracket {
-  background-color: rgba(56, 189, 248, 0.25);
-  outline: 1px solid rgba(56, 189, 248, 0.5);
+  background-color: var(--cm-matching-bracket-bg);
+  outline: 1px solid var(--cm-matching-bracket-border);
   border-radius: 2px;
 }
 
-/* Rainbow Brackets (Path B) - Rich neon/pastel dark palette */
-.cm-editor .rainbow-bracket-red { color: #f43f5e !important; font-weight: 600; }
-.cm-editor .rainbow-bracket-orange { color: #fb923c !important; font-weight: 600; }
-.cm-editor .rainbow-bracket-yellow { color: #facc15 !important; font-weight: 600; }
-.cm-editor .rainbow-bracket-green { color: #4ade80 !important; font-weight: 600; }
-.cm-editor .rainbow-bracket-blue { color: #38bdf8 !important; font-weight: 600; }
-.cm-editor .rainbow-bracket-indigo { color: #818cf8 !important; font-weight: 600; }
-.cm-editor .rainbow-bracket-violet { color: #c084fc !important; font-weight: 600; }
+/* Rainbow Brackets (Path B) - Theme-adaptive tokens */
+.cm-editor .rainbow-bracket-red { color: var(--rainbow-red) !important; font-weight: 600; }
+.cm-editor .rainbow-bracket-orange { color: var(--rainbow-orange) !important; font-weight: 600; }
+.cm-editor .rainbow-bracket-yellow { color: var(--rainbow-yellow) !important; font-weight: 600; }
+.cm-editor .rainbow-bracket-green { color: var(--rainbow-green) !important; font-weight: 600; }
+.cm-editor .rainbow-bracket-blue { color: var(--rainbow-blue) !important; font-weight: 600; }
+.cm-editor .rainbow-bracket-indigo { color: var(--rainbow-indigo) !important; font-weight: 600; }
+.cm-editor .rainbow-bracket-violet { color: var(--rainbow-violet) !important; font-weight: 600; }
 
 /* CodeMirror TypeScript Hover Tooltip Styling */
 .cm-tooltip.cm-tooltip-hover {
@@ -391,14 +394,14 @@ code {
 }
 
 .cm-ts-hover-card {
-  background: #18181b;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--cm-hover-card-bg);
+  border: 1px solid var(--cm-hover-card-border);
   border-radius: 8px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
   padding: 8px 12px;
   max-width: 520px;
   min-width: 140px;
-  color: #e4e4e7;
+  color: var(--cm-hover-card-text);
   font-family: var(--font-mono, monospace);
   font-size: 12px;
   line-height: 1.5;
@@ -406,7 +409,7 @@ code {
 }
 
 .cm-ts-hover-sig {
-  color: #38bdf8;
+  color: var(--cm-hover-sig-color);
   white-space: pre-wrap;
   word-break: break-word;
   font-weight: 500;
@@ -415,27 +418,15 @@ code {
 .cm-ts-hover-doc {
   margin-top: 6px;
   padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
+  border-top: 1px solid var(--cm-hover-doc-border);
+  color: var(--cm-hover-doc-color);
   font-family: var(--font-sans, system-ui, sans-serif);
   font-size: 11.5px;
   white-space: pre-wrap;
 }
 
 [data-theme="apple-gsos"] .cm-ts-hover-card {
-  background: #FFFFFF;
-  border: 1px solid #1C1C1C;
-  color: #1C1C1C;
-  box-shadow: 2px 2px 0px #1C1C1C;
-}
-
-[data-theme="apple-gsos"] .cm-ts-hover-sig {
-  color: #000080;
-}
-
-[data-theme="apple-gsos"] .cm-ts-hover-doc {
-  border-top: 1px solid #CCCCCC;
-  color: #555555;
+  box-shadow: 2px 2px 0px var(--border-ui);
 }
 
 /* ==========================================================================
@@ -445,26 +436,26 @@ code {
 [data-theme="apple-gsos"] input,
 [data-theme="apple-gsos"] select,
 [data-theme="apple-gsos"] textarea {
-  background-color: #FFFFFF;
-  color: #1C1C1C;
-  border: 1px solid #1C1C1C;
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-ui);
   border-radius: 6px;
 }
 
 [data-theme="apple-gsos"] input:focus,
 [data-theme="apple-gsos"] select:focus,
 [data-theme="apple-gsos"] textarea:focus {
-  border-color: #4455AA;
+  border-color: var(--border-focus);
   box-shadow: 0 0 0 2px rgba(68, 85, 170, 0.2);
 }
 
 [data-theme="apple-gsos"] ::-webkit-scrollbar-track {
-  background: #DDDCD4;
+  background: var(--bg-main);
 }
 
 [data-theme="apple-gsos"] ::-webkit-scrollbar-thumb {
   background: #B8B7AD;
-  border: 1px solid #8A887E;
+  border: 1px solid var(--border-medium);
   border-radius: 4px;
 }
 
@@ -474,69 +465,69 @@ code {
 
 /* Glass panel turns into solid Apple GS/OS active window */
 [data-theme="apple-gsos"] .glass-panel {
-  background: #FFFFFF !important;
+  background: var(--bg-card) !important;
   backdrop-filter: none !important;
-  border: 1.5px solid #1C1C1C !important;
+  border: 1.5px solid var(--border-ui) !important;
   border-radius: 8px !important;
   box-shadow: 2px 2px 0px rgba(28, 28, 28, 0.15) !important;
 }
 
 /* Header & Menu Bar */
 [data-theme="apple-gsos"] .app-header {
-  background-color: #F2F1EA !important;
-  border-bottom: 1.5px solid #1C1C1C !important;
+  background-color: var(--bg-surface) !important;
+  border-bottom: 1.5px solid var(--border-ui) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
 }
 
 [data-theme="apple-gsos"] .nav-view-toggle {
-  background-color: #DDDCD4 !important;
-  border: 1px solid #1C1C1C !important;
+  background-color: var(--bg-main) !important;
+  border: 1px solid var(--border-ui) !important;
 }
 
 [data-theme="apple-gsos"] .nav-btn-active {
-  background-color: #4455AA !important;
-  color: #FFFFFF !important;
-  border: 1px solid #1C1C1C !important;
-  box-shadow: 1px 1px 0px #1C1C1C !important;
+  background-color: var(--accent-primary) !important;
+  color: var(--text-on-accent) !important;
+  border: 1px solid var(--border-ui) !important;
+  box-shadow: 1px 1px 0px var(--border-ui) !important;
 }
 
 [data-theme="apple-gsos"] .nav-btn-active * {
-  color: #FFFFFF !important;
+  color: var(--text-on-accent) !important;
 }
 
 [data-theme="apple-gsos"] .nav-btn-inactive {
   background-color: transparent !important;
-  color: #1C1C1C !important;
+  color: var(--text-primary) !important;
   border-color: transparent !important;
 }
 
 [data-theme="apple-gsos"] .nav-btn-inactive:hover {
-  background-color: #E8E7DF !important;
+  background-color: var(--bg-elevated) !important;
 }
 
 /* Classic Apple GS/OS Buttons */
 [data-theme="apple-gsos"] .btn {
   border-radius: 6px;
-  border: 1px solid #1C1C1C;
+  border: 1px solid var(--border-ui);
   font-weight: 600;
-  box-shadow: 1px 1px 0px #1C1C1C;
+  box-shadow: 1px 1px 0px var(--border-ui);
   transition: all 0.1s ease;
 }
 
 [data-theme="apple-gsos"] .btn:hover:not(:disabled) {
   transform: translate(-1px, -1px);
-  box-shadow: 2px 2px 0px #1C1C1C;
+  box-shadow: 2px 2px 0px var(--border-ui);
 }
 
 [data-theme="apple-gsos"] .btn:active:not(:disabled) {
   transform: translate(1px, 1px);
-  box-shadow: 0px 0px 0px #1C1C1C;
+  box-shadow: 0px 0px 0px var(--border-ui);
 }
 
 [data-theme="apple-gsos"] .btn-primary {
-  background: #4455AA !important;
-  color: #FFFFFF !important;
-  box-shadow: 1px 1px 0px #1C1C1C !important;
+  background: var(--accent-primary) !important;
+  color: var(--text-on-accent) !important;
+  box-shadow: 1px 1px 0px var(--border-ui) !important;
 }
 
 [data-theme="apple-gsos"] .btn-primary:hover:not(:disabled) {
@@ -544,269 +535,271 @@ code {
 }
 
 [data-theme="apple-gsos"] .btn-secondary {
-  background: #F2F1EA !important;
-  color: #1C1C1C !important;
-  border-color: #1C1C1C !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-ui) !important;
 }
 
 [data-theme="apple-gsos"] .btn-secondary:hover:not(:disabled) {
-  background: #E8E7DF !important;
+  background: var(--bg-elevated) !important;
 }
 
 [data-theme="apple-gsos"] .btn-outline {
-  background: #FFFFFF !important;
-  color: #1C1C1C !important;
-  border-color: #1C1C1C !important;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-ui) !important;
 }
 
 [data-theme="apple-gsos"] .btn-outline:hover:not(:disabled) {
-  background: #F2F1EA !important;
-  color: #1C1C1C !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .btn-success {
-  background: #229955 !important;
-  color: #FFFFFF !important;
-  border-color: #1C1C1C !important;
+  background: var(--accent-secondary) !important;
+  color: var(--text-on-accent) !important;
+  border-color: var(--border-ui) !important;
 }
 
 [data-theme="apple-gsos"] .btn-danger {
   background: rgba(221, 51, 34, 0.12) !important;
-  border-color: #DD3322 !important;
-  color: #DD3322 !important;
+  border-color: var(--accent-highlight) !important;
+  color: var(--accent-highlight) !important;
 }
 
 [data-theme="apple-gsos"] .btn-danger:hover:not(:disabled) {
-  background: #DD3322 !important;
-  color: #FFFFFF !important;
+  background: var(--accent-highlight) !important;
+  color: var(--text-on-accent) !important;
 }
 
 /* Modals */
 [data-theme="apple-gsos"] .modal-overlay {
-  background-color: rgba(40, 40, 40, 0.45) !important;
+  background-color: var(--bg-modal-overlay) !important;
   backdrop-filter: blur(2px) !important;
 }
 
 [data-theme="apple-gsos"] .modal-content {
-  background: #FFFFFF !important;
-  border: 2px solid #1C1C1C !important;
+  background: var(--bg-card) !important;
+  border: 2px solid var(--border-ui) !important;
   border-radius: 8px !important;
-  box-shadow: 4px 4px 0px #1C1C1C !important;
+  box-shadow: 4px 4px 0px var(--border-ui) !important;
 }
 
 /* Target Contract Table */
 [data-theme="apple-gsos"] .contract-table-container {
-  background-color: #FFFFFF !important;
-  border: 1px solid #1C1C1C !important;
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-ui) !important;
   border-radius: 6px !important;
 }
 
 [data-theme="apple-gsos"] .contract-table-header {
-  background-color: #A2B5CD !important;
-  border-bottom: 1px solid #1C1C1C !important;
-  color: #1C1C1C !important;
+  background-color: var(--bg-table-header) !important;
+  border-bottom: 1px solid var(--border-ui) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .contract-table-header * {
-  color: #1C1C1C !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .contract-table-th {
-  background-color: #F2F1EA !important;
-  color: #1C1C1C !important;
-  border-bottom: 1px solid #1C1C1C !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-ui) !important;
 }
 
 [data-theme="apple-gsos"] .contract-table-td {
-  border-bottom: 1px solid #DDDCD4 !important;
-  color: #1C1C1C !important;
+  border-bottom: 1px solid var(--bg-main) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .contract-table-body {
-  background-color: #FFFFFF !important;
+  background-color: var(--bg-card) !important;
 }
 
 /* Test case numbered status circles */
 [data-theme="apple-gsos"] .test-case-circle {
-  background-color: #DD3322 !important;
-  color: #FFFFFF !important;
+  background-color: var(--badge-test-case-bg) !important;
+  color: var(--badge-test-case-text) !important;
   border: 1px solid #B02214 !important;
 }
 
 /* Badges & Indicators */
 [data-theme="apple-gsos"] .complexity-badge-chip {
-  background-color: #229955 !important;
-  border: 1px solid #1B7A43 !important;
-  color: #FFFFFF !important;
+  background-color: var(--badge-complexity-bg) !important;
+  border: 1px solid var(--badge-complexity-border) !important;
+  color: var(--badge-complexity-text) !important;
 }
 
 [data-theme="apple-gsos"] .complexity-badge-chip *,
 [data-theme="apple-gsos"] .complexity-badge-chip svg {
-  color: #FFFFFF !important;
-  stroke: #FFFFFF !important;
+  color: var(--badge-complexity-text) !important;
+  stroke: var(--badge-complexity-text) !important;
 }
 
 [data-theme="apple-gsos"] .streak-badge-chip {
-  background-color: #229955 !important;
-  border: 1px solid #1B7A43 !important;
-  color: #FFFFFF !important;
+  background-color: var(--badge-streak-bg) !important;
+  border: 1px solid var(--badge-streak-border) !important;
+  color: var(--badge-streak-text) !important;
 }
 
 [data-theme="apple-gsos"] .streak-badge-chip * {
-  color: #FFFFFF !important;
+  color: var(--badge-streak-text) !important;
 }
 
 [data-theme="apple-gsos"] .indicator-popover {
-  background-color: #FFFFFF !important;
-  border: 1.5px solid #1C1C1C !important;
-  color: #1C1C1C !important;
+  background-color: var(--bg-card) !important;
+  border: 1.5px solid var(--border-ui) !important;
+  color: var(--text-primary) !important;
   box-shadow: 3px 3px 0px rgba(28, 28, 28, 0.25) !important;
 }
 
 [data-theme="apple-gsos"] .indicator-popover-header {
-  border-bottom: 1px solid #1C1C1C !important;
+  border-bottom: 1px solid var(--border-ui) !important;
 }
 
 /* CodeMirror 6 Clean Document Canvas */
 [data-theme="apple-gsos"] .cm-theme-container {
-  background-color: #FAFAFA !important;
-  border: 1px solid #1C1C1C !important;
+  background-color: var(--bg-editor) !important;
+  border: 1px solid var(--border-ui) !important;
   border-radius: 6px !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container:focus-within {
-  border-color: #4455AA !important;
+  border-color: var(--border-focus) !important;
   box-shadow: 0 0 0 2px rgba(68, 85, 170, 0.25) !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container .cm-editor {
-  background-color: #FAFAFA !important;
-  color: #1C1C1C !important;
+  background-color: var(--bg-editor) !important;
+  color: var(--cm-text) !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container .cm-scroller {
-  background-color: #FAFAFA !important;
+  background-color: var(--bg-editor) !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container .cm-content {
-  caret-color: #1C1C1C !important;
+  caret-color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container .cm-gutters {
-  background-color: #F0EFE8 !important;
-  color: #666666 !important;
-  border-right: 1px solid #DDDCD4 !important;
+  background-color: var(--cm-gutter-bg) !important;
+  color: var(--cm-gutter-text) !important;
+  border-right: 1px solid var(--bg-main) !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container .cm-activeLineGutter {
-  background-color: #E2E1D8 !important;
-  color: #4455AA !important;
+  background-color: var(--cm-active-gutter-bg) !important;
+  color: var(--accent-primary) !important;
   font-weight: 700 !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container .cm-activeLine {
-  background-color: rgba(68, 85, 170, 0.06) !important;
+  background-color: var(--cm-active-line-bg) !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container .cm-selectionMatch {
-  background-color: rgba(68, 85, 170, 0.18) !important;
+  background-color: var(--cm-selection-bg) !important;
 }
 
 [data-theme="apple-gsos"] .cm-theme-container .cm-matchingBracket {
-  background-color: rgba(68, 85, 170, 0.25) !important;
-  outline: 1px solid #4455AA !important;
+  background-color: var(--cm-matching-bracket-bg) !important;
+  outline: 1px solid var(--cm-matching-bracket-border) !important;
 }
 
 /* Light mode syntax tokens for vintage editor workstation */
 [data-theme="apple-gsos"] .cm-editor .tok-keyword,
-[data-theme="apple-gsos"] .cm-editor [class*="ͼb"] { color: #881391 !important; font-weight: 600; }
+[data-theme="apple-gsos"] .cm-editor [class*="ͼb"] { color: var(--tok-keyword) !important; font-weight: 600; }
 [data-theme="apple-gsos"] .cm-editor .tok-operator,
-[data-theme="apple-gsos"] .cm-editor [class*="ͼg"] { color: #1C1C1C !important; }
+[data-theme="apple-gsos"] .cm-editor [class*="ͼg"] { color: var(--tok-operator) !important; }
 [data-theme="apple-gsos"] .cm-editor .tok-variableName,
-[data-theme="apple-gsos"] .cm-editor [class*="ͼe"] { color: #1C1C1C !important; }
+[data-theme="apple-gsos"] .cm-editor [class*="ͼe"] { color: var(--tok-variable) !important; }
 [data-theme="apple-gsos"] .cm-editor .tok-propertyName,
-[data-theme="apple-gsos"] .cm-editor [class*="ͼf"] { color: #1C1C1C !important; }
+[data-theme="apple-gsos"] .cm-editor [class*="ͼf"] { color: var(--tok-property) !important; }
 [data-theme="apple-gsos"] .cm-editor .tok-function,
-[data-theme="apple-gsos"] .cm-editor [class*="ͼd"] { color: #4455AA !important; font-weight: 600; }
+[data-theme="apple-gsos"] .cm-editor [class*="ͼd"] { color: var(--tok-function) !important; font-weight: 600; }
 [data-theme="apple-gsos"] .cm-editor .tok-string,
-[data-theme="apple-gsos"] .cm-editor [class*="ͼa"] { color: #1A7F37 !important; }
+[data-theme="apple-gsos"] .cm-editor [class*="ͼa"] { color: var(--tok-string) !important; }
 [data-theme="apple-gsos"] .cm-editor .tok-number,
-[data-theme="apple-gsos"] .cm-editor [class*="ͼc"] { color: #005CC5 !important; }
+[data-theme="apple-gsos"] .cm-editor [class*="ͼc"] { color: var(--tok-number) !important; }
 [data-theme="apple-gsos"] .cm-editor .tok-comment,
-[data-theme="apple-gsos"] .cm-editor [class*="ͼm"] { color: #6A737D !important; font-style: italic; }
-[data-theme="apple-gsos"] .cm-editor .tok-bool { color: #DD3322 !important; font-weight: 600; }
-[data-theme="apple-gsos"] .cm-editor .tok-typeName { color: #4455AA !important; font-weight: 600; }
+[data-theme="apple-gsos"] .cm-editor [class*="ͼm"] { color: var(--tok-comment) !important; font-style: italic; }
+[data-theme="apple-gsos"] .cm-editor .tok-bool { color: var(--tok-bool) !important; font-weight: 600; }
+[data-theme="apple-gsos"] .cm-editor .tok-typeName { color: var(--tok-type) !important; font-weight: 600; }
 
 /* Rainbow Brackets for Light Mode */
-[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-red { color: #DD3322 !important; font-weight: 700; }
-[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-orange { color: #D97706 !important; font-weight: 700; }
-[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-yellow { color: #B45309 !important; font-weight: 700; }
-[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-green { color: #229955 !important; font-weight: 700; }
-[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-blue { color: #4455AA !important; font-weight: 700; }
-[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-indigo { color: #5B21B6 !important; font-weight: 700; }
-[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-violet { color: #86198F !important; font-weight: 700; }
+[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-red,
+[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-orange,
+[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-yellow,
+[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-green,
+[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-blue,
+[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-indigo,
+[data-theme="apple-gsos"] .cm-editor .rainbow-bracket-violet {
+  font-weight: 700;
+}
 
 /* Console Runner Container in GS/OS Light Mode */
 [data-theme="apple-gsos"] .console-runner-container {
-  background-color: #FAFAFA !important;
-  border: 1px solid #1C1C1C !important;
+  background-color: var(--bg-editor) !important;
+  border: 1px solid var(--border-ui) !important;
   box-shadow: 2px 2px 0px rgba(28, 28, 28, 0.15) !important;
 }
 
 [data-theme="apple-gsos"] .console-runner-header {
-  background-color: #F2F1EA !important;
-  border-bottom-color: #1C1C1C !important;
-  color: #1C1C1C !important;
+  background-color: var(--bg-surface) !important;
+  border-bottom-color: var(--border-ui) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .console-runner-header * {
-  color: #1C1C1C !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .console-runner-body {
-  background-color: #FAFAFA !important;
-  color: #1C1C1C !important;
-  border-top: 1px solid #1C1C1C !important;
+  background-color: var(--bg-editor) !important;
+  color: var(--text-primary) !important;
+  border-top: 1px solid var(--border-ui) !important;
 }
 
 [data-theme="apple-gsos"] .prompt-seed-box {
-  background-color: #FAFAFA !important;
-  border: 1px solid #1C1C1C !important;
-  color: #1C1C1C !important;
+  background-color: var(--bg-editor) !important;
+  border: 1px solid var(--border-ui) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .prompt-seed-box .markdown-inline-code {
   background-color: #EAEAEA !important;
-  border: 1px solid #1C1C1C !important;
-  color: #1C1C1C !important;
+  border: 1px solid var(--border-ui) !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] .prompt-seed-box .markdown-code-block {
-  background-color: #FFFFFF !important;
-  border: 1px solid #1C1C1C !important;
-  color: #1C1C1C !important;
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-ui) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Crisp Input & Select Styles for GS/OS Light Mode */
 [data-theme="apple-gsos"] .code-buffer {
-  background-color: #FFFFFF !important;
-  color: #1C1C1C !important;
-  border-color: #8A887E !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-medium) !important;
 }
 
 [data-theme="apple-gsos"] .code-buffer::placeholder {
-  color: #777777 !important;
+  color: var(--text-dim) !important;
 }
 
 [data-theme="apple-gsos"] select,
 [data-theme="apple-gsos"] input[type="text"],
 [data-theme="apple-gsos"] textarea {
-  color: #1C1C1C !important;
+  color: var(--text-primary) !important;
 }
 
 [data-theme="apple-gsos"] select option {
-  background-color: #FFFFFF !important;
-  color: #1C1C1C !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
 }
 
 /* Mobile Notice Modal (Centered blocking modal on mobile) */

@@ -99,8 +99,8 @@
 }
 
 [data-theme="apple-gsos"] .eval-stat-card {
-  border: 1px solid #8A887E;
-  background: #FFFFFF;
+  border: 1px solid var(--border-medium);
+  background: var(--bg-card);
 }
 
 .eval-stat-label {
@@ -127,8 +127,8 @@
 }
 
 [data-theme="apple-gsos"] .eval-content-box {
-  border: 1.5px solid #8A887E;
-  background: #FFFFFF;
+  border: 1.5px solid var(--border-medium);
+  background: var(--bg-card);
 }
 
 .eval-box-header {
@@ -157,8 +157,8 @@
 }
 
 [data-theme="apple-gsos"] .eval-chat-container {
-  border-color: #8A887E;
-  background: #FAFAFA;
+  border-color: var(--border-medium);
+  background: var(--bg-editor);
 }
 
 .eval-chat-messages {
@@ -185,8 +185,8 @@
 }
 
 [data-theme="apple-gsos"] .eval-chat-bubble.user {
-  background-color: #4455AA;
-  color: #FFFFFF;
+  background-color: var(--accent-primary);
+  color: var(--text-on-accent);
 }
 
 .eval-chat-bubble.assistant {
@@ -197,9 +197,9 @@
 }
 
 [data-theme="apple-gsos"] .eval-chat-bubble.assistant {
-  background-color: #FFFFFF;
+  background-color: var(--bg-card);
   border-color: #C4C3BA;
-  color: #1C1C1C;
+  color: var(--text-primary);
 }
 
 .eval-chat-input-bar {
@@ -211,6 +211,6 @@
 }
 
 [data-theme="apple-gsos"] .eval-chat-input-bar {
-  border-color: #D0CEBE;
-  background: #E8E7DF;
+  border-color: var(--border-subtle);
+  background: var(--bg-elevated);
 }

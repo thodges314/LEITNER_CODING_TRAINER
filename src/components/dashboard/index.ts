@@ -25,7 +25,6 @@ export type { CatalogTableProps } from './CatalogTable';
 export { DeckSelector } from './DeckSelector';
 export type { DeckSelectorProps } from './DeckSelector';
 
-export { InterviewPrepModal } from './InterviewPrepModal';
 export type { InterviewPrepModalProps } from './InterviewPrepModal';
 
 export { PracticeActionHero } from './PracticeActionHero';

@@ -43,15 +43,8 @@ import {
 } from './dashboard';
 import { filterCardsByDeck } from '../lib/decks';
 import type { CustomDeck } from '../lib/decks';
-import {
-  getInterviewDossier,
-  deleteInterviewDossier,
-  type CatalogIndexEntry,
-} from '../lib/interviewPrep';
-import { printInterviewDossier } from '../lib/printDossier';
-import catalogIndexData from '../data/catalogIndex.json';
-
-const catalogIndex = catalogIndexData as CatalogIndexEntry[];
+import { getInterviewDossier, deleteInterviewDossier } from '../lib/dossierStorage';
+import type { CatalogIndexEntry } from '../lib/interviewPrep';
 
 export type { CatalogSortOption, CatalogStatusFilter };
 
@@ -705,7 +698,14 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
             <button
               type="button"
               className="btn btn-secondary strategy-print-btn"
-              onClick={() => printInterviewDossier(linkedDossier, catalogIndex)}
+              onClick={async () => {
+                const [{ printInterviewDossier }, { default: catalogIndexData }] =
+                  await Promise.all([
+                    import('../lib/printDossier'),
+                    import('../data/catalogIndex.json'),
+                  ]);
+                printInterviewDossier(linkedDossier, catalogIndexData as CatalogIndexEntry[]);
+              }}
               data-testid="strategy-banner-print-btn"
             >
               <Printer size={14} />

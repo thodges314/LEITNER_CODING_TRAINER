@@ -29,8 +29,8 @@
 }
 
 [data-theme="apple-gsos"] .app-header {
-  border-bottom: 1.5px solid #8A887E;
-  background-color: #F2F1EA;
+  border-bottom: 1.5px solid var(--border-medium);
+  background-color: var(--bg-surface);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
@@ -65,7 +65,7 @@
 }
 
 [data-theme="apple-gsos"] .app-brand-logo {
-  background: #4455AA;
+  background: var(--accent-primary);
   box-shadow: 1px 1px 0px #1C1C1C;
   border-radius: 4px;
 }
@@ -125,7 +125,7 @@
 [data-theme="apple-gsos"] .nav-tab-btn.active {
   background-color: var(--accent-primary);
   border-color: var(--border-ui);
-  color: #FFFFFF;
+  color: var(--text-on-accent);
 }
 
 /* Header Right Actions */
@@ -164,20 +164,20 @@
 
 [data-theme="apple-gsos"] .header-action-badge {
   background: #EBEAE3;
-  border: 1.5px solid #8A887E;
+  border: 1.5px solid var(--border-medium);
   color: var(--text-secondary);
   border-radius: 3px;
 }
 
 [data-theme="apple-gsos"] .header-action-badge:hover {
   background: #E0DFD5;
-  color: #1C1C1C;
+  color: var(--text-primary);
 }
 
 [data-theme="apple-gsos"] .header-action-badge.active {
-  background-color: #DDDCD4;
-  border-color: #4455AA;
-  color: #4455AA;
+  background-color: var(--bg-main);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 .btn.filter-active {
@@ -213,9 +213,9 @@
 }
 
 [data-theme="apple-gsos"] .app-footer {
-  border-top: 1.5px solid #8A887E;
-  background: #DDDCD4;
-  color: #555555;
+  border-top: 1.5px solid var(--border-medium);
+  background: var(--bg-main);
+  color: var(--text-secondary);
 }
 
 .app-header-inner {
@@ -442,9 +442,9 @@
 }
 
 [data-theme="apple-gsos"] .back-hint-toast {
-  background-color: #FFFFFF;
-  border: 1.5px solid #1C1C1C;
-  color: #1C1C1C;
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border-ui);
+  color: var(--text-primary);
   box-shadow: 2px 2px 0px rgba(28, 28, 28, 0.2);
 }
 

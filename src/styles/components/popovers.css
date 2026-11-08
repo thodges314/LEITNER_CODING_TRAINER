@@ -21,8 +21,8 @@
 }
 
 [data-theme="apple-gsos"] .popover-container {
-  background-color: #FFFFFF;
-  border: 2px solid #1C1C1C;
+  background-color: var(--bg-card);
+  border: 2px solid var(--border-ui);
   border-radius: 6px;
   box-shadow: 3px 3px 0px rgba(28, 28, 28, 0.2);
 }
@@ -37,8 +37,8 @@
 }
 
 [data-theme="apple-gsos"] .popover-header {
-  border-bottom: 1.5px solid #1C1C1C;
-  background-color: #F2F1EA;
+  border-bottom: 1.5px solid var(--border-ui);
+  background-color: var(--bg-surface);
 }
 
 .popover-title {
@@ -93,6 +93,6 @@
 }
 
 [data-theme="apple-gsos"] .popover-footer {
-  border-top: 1.5px solid #1C1C1C;
-  background-color: #F2F1EA;
+  border-top: 1.5px solid var(--border-ui);
+  background-color: var(--bg-surface);
 }

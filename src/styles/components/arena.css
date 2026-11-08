@@ -22,8 +22,8 @@
 }
 
 [data-theme="apple-gsos"] .arena-empty-state {
-  border: 2px solid #8A887E;
-  background: #FFFFFF;
+  border: 2px solid var(--border-medium);
+  background: var(--bg-card);
 }
 
 .arena-empty-state-icon {
@@ -60,7 +60,7 @@
 
 [data-theme="apple-gsos"] .arena-reinforcement-banner {
   background-color: #F3E8FF;
-  border-color: #C084FC;
+  border-color: var(--accent-purple);
 }
 
 .arena-reinforcement-info {
@@ -109,8 +109,8 @@
 }
 
 [data-theme="apple-gsos"] .arena-header-banner {
-  border: 1.5px solid #8A887E;
-  background: #FFFFFF;
+  border: 1.5px solid var(--border-medium);
+  background: var(--bg-card);
 }
 
 .arena-topic-info {
@@ -171,8 +171,8 @@
 }
 
 [data-theme="apple-gsos"] .arena-card {
-  border: 1.5px solid #8A887E;
-  background: #FFFFFF;
+  border: 1.5px solid var(--border-medium);
+  background: var(--bg-card);
 }
 
 .arena-card-header {
@@ -215,8 +215,8 @@
 }
 
 [data-theme="apple-gsos"] .arena-action-bar {
-  border: 1.5px solid #8A887E;
-  background: #FFFFFF;
+  border: 1.5px solid var(--border-medium);
+  background: var(--bg-card);
 }
 
 .arena-action-group {
@@ -237,7 +237,7 @@
 }
 
 [data-theme="apple-gsos"] .arena-console {
-  background: #FAFAFA;
+  background: var(--bg-editor);
   border: 1px solid #C4C3BA;
 }
 
@@ -253,9 +253,9 @@
 }
 
 [data-theme="apple-gsos"] .arena-console-header {
-  background: #E8E7DF;
-  color: #1C1C1C;
-  border-bottom: 1px solid #D0CEBE;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .arena-console-logs {
@@ -278,7 +278,7 @@
 [data-theme="apple-gsos"] .arena-reinforcement-skip-btn {
   border-color: #A855F7;
   color: #6B21A8;
-  background-color: #FFFFFF;
+  background-color: var(--bg-card);
 }
 
 .arena-time-expired-toast {
@@ -319,9 +319,9 @@
 }
 
 [data-theme="apple-gsos"] .arena-time-expired-dismiss-btn {
-  border-color: #1C1C1C;
-  color: #1C1C1C;
-  background-color: #FFFFFF;
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+  background-color: var(--bg-card);
 }
 
 /* Arena Header & Popovers */
@@ -382,11 +382,11 @@
 }
 
 [data-theme="apple-gsos"] .arena-popover-panel {
-  background-color: #FFFFFF;
+  background-color: var(--bg-card);
   backdrop-filter: none;
-  border: 1.5px solid #1C1C1C;
+  border: 1.5px solid var(--border-ui);
   box-shadow: 3px 3px 0px rgba(28, 28, 28, 0.25);
-  color: #1C1C1C;
+  color: var(--text-primary);
 }
 
 .arena-popover-header {
@@ -412,7 +412,7 @@
 }
 
 [data-theme="apple-gsos"] .arena-popover-header-title {
-  color: #1C1C1C;
+  color: var(--text-primary);
 }
 
 .arena-popover-close-btn {
@@ -425,7 +425,7 @@
 }
 
 [data-theme="apple-gsos"] .arena-popover-close-btn {
-  color: #1C1C1C;
+  color: var(--text-primary);
 }
 
 .arena-popover-body {
@@ -437,7 +437,7 @@
 }
 
 [data-theme="apple-gsos"] .arena-popover-body {
-  color: #1C1C1C;
+  color: var(--text-primary);
 }
 
 .arena-ladder-list {
@@ -462,8 +462,8 @@
 }
 
 [data-theme="apple-gsos"] .arena-ladder-row-active {
-  background-color: #E8E7DF;
-  border-color: #1C1C1C;
+  background-color: var(--bg-elevated);
+  border-color: var(--text-primary);
 }
 
 .arena-tier-pill-btn {
@@ -740,9 +740,9 @@
 }
 
 [data-theme="apple-gsos"] .arena-scope-warning-popup {
-  background-color: #E8E7DF;
+  background-color: var(--bg-elevated);
   border: 1.5px solid #000080;
-  color: #1C1C1C;
+  color: var(--text-primary);
   box-shadow: 2px 2px 0px rgba(28, 28, 28, 0.15);
 }
 
@@ -780,9 +780,9 @@
 }
 
 [data-theme="apple-gsos"] .arena-scope-warning-dismiss {
-  background-color: #FFFFFF;
-  border: 1px solid #1C1C1C;
-  color: #1C1C1C;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-ui);
+  color: var(--text-primary);
 }
 
 .arena-editor-btn-text {
@@ -838,8 +838,8 @@
 }
 
 [data-theme="apple-gsos"] .arena-mode-toggle-group {
-  background-color: #DDDCD4;
-  border: 1px solid #1C1C1C;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-ui);
 }
 
 .arena-mode-btn {
@@ -856,14 +856,14 @@
 
 .arena-mode-btn-active {
   background-color: var(--accent-primary);
-  color: #FFFFFF;
+  color: var(--text-on-accent);
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="apple-gsos"] .arena-mode-btn-active {
   background-color: #000080;
-  color: #FFFFFF;
+  color: var(--text-on-accent);
 }
 
 .arena-mode-badge {
@@ -881,14 +881,14 @@
 }
 
 [data-theme="apple-gsos"] .arena-mode-badge {
-  background-color: #E8E7DF;
-  border-color: #1C1C1C;
+  background-color: var(--bg-elevated);
+  border-color: var(--text-primary);
   color: #000080;
 }
 
 .arena-ts-notice-toast {
   font-size: 11px;
-  color: #38bdf8;
+  color: var(--accent-cyan);
   background-color: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.3);
   padding: 3px 8px;
@@ -901,7 +901,7 @@
 
 [data-theme="apple-gsos"] .arena-ts-notice-toast {
   color: #000080;
-  background-color: #E8E7DF;
+  background-color: var(--bg-elevated);
   border-color: #000080;
 }
 
@@ -1190,8 +1190,8 @@
 }
 
 [data-theme="apple-gsos"] .arena-difficulty-trigger-active {
-  border-color: #1C1C1C;
-  background-color: #E8E7DF;
+  border-color: var(--text-primary);
+  background-color: var(--bg-elevated);
 }
 
 .arena-difficulty-list {
@@ -1217,8 +1217,8 @@
 }
 
 [data-theme="apple-gsos"] .arena-difficulty-row-active {
-  background-color: #F2F1EA;
-  border-color: #1C1C1C;
+  background-color: var(--bg-surface);
+  border-color: var(--text-primary);
 }
 
 .arena-difficulty-left {
@@ -1594,7 +1594,7 @@
 }
 
 [data-theme="apple-gsos"] .console-runner-body {
-  background-color: #FAFAFA;
+  background-color: var(--bg-editor);
 }
 
 .console-empty-logs {
@@ -1767,7 +1767,7 @@
 }
 
 [data-theme="apple-gsos"] .preview-content-area {
-  background-color: #FAFAFA;
+  background-color: var(--bg-editor);
 }
 
 .preview-popped-out-placeholder {
@@ -1820,7 +1820,7 @@
 }
 
 [data-theme="apple-gsos"] .preview-portal-header {
-  background-color: #F1F5F9;
+  background-color: var(--text-primary);
 }
 
 .preview-portal-title {

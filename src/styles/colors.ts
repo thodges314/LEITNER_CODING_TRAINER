@@ -111,6 +111,11 @@ export const SYNTHWAVE_DARK_PALETTE: ThemePalette = {
       bg: 'rgba(245, 158, 11, 0.12)',
       border: 'rgba(245, 158, 11, 0.35)',
     },
+    'advanced-algorithms': {
+      color: '#a855f7',
+      bg: 'rgba(168, 85, 247, 0.12)',
+      border: 'rgba(168, 85, 247, 0.35)',
+    },
     'typescript-patterns': {
       color: '#3178c6',
       bg: 'rgba(49, 120, 198, 0.12)',
@@ -135,6 +140,11 @@ export const SYNTHWAVE_DARK_PALETTE: ThemePalette = {
       color: '#f97316',
       bg: 'rgba(249, 115, 22, 0.12)',
       border: 'rgba(249, 115, 22, 0.35)',
+    },
+    'tailwind': {
+      color: '#06b6d4',
+      bg: 'rgba(6, 182, 212, 0.12)',
+      border: 'rgba(6, 182, 212, 0.35)',
     },
     'testing-tooling': {
       color: '#f43f5e',
@@ -244,6 +254,11 @@ export const APPLE_GSOS_PALETTE: ThemePalette = {
       bg: '#FEF3C7',
       border: '#FCD34D',
     },
+    'advanced-algorithms': {
+      color: '#6B21A8',
+      bg: '#F3E8FF',
+      border: '#D8B4FE',
+    },
     'typescript-patterns': {
       color: '#1E40AF',
       bg: '#DBEAFE',
@@ -268,6 +283,11 @@ export const APPLE_GSOS_PALETTE: ThemePalette = {
       color: '#EA580C',
       bg: '#FFEDD5',
       border: '#FDBA74',
+    },
+    'tailwind': {
+      color: '#0E7490',
+      bg: '#CFFAFE',
+      border: '#67E8F9',
     },
     'testing-tooling': {
       color: '#BE123C',

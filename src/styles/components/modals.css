@@ -17,8 +17,8 @@
 }
 
 [data-theme="apple-gsos"] .modal-header {
-  border-bottom: 1.5px solid #1C1C1C;
-  background-color: #F2F1EA;
+  border-bottom: 1.5px solid var(--border-ui);
+  background-color: var(--bg-surface);
 }
 
 .modal-header-left {
@@ -42,8 +42,8 @@
 
 [data-theme="apple-gsos"] .modal-header-icon {
   background: #EBEAE3;
-  color: #4455AA;
-  border: 1px solid #8A887E;
+  color: var(--accent-primary);
+  border: 1px solid var(--border-medium);
   border-radius: 4px;
 }
 
@@ -85,7 +85,7 @@
 
 [data-theme="apple-gsos"] .modal-close-btn:hover {
   background-color: #E0DFD5;
-  color: #1C1C1C;
+  color: var(--text-primary);
 }
 
 .modal-body {
@@ -111,7 +111,7 @@
 
 [data-theme="apple-gsos"] .modal-callout {
   background: #F7F6F0;
-  border: 1.5px solid #8A887E;
+  border: 1.5px solid var(--border-medium);
 }
 
 .modal-footer {
@@ -126,8 +126,8 @@
 }
 
 [data-theme="apple-gsos"] .modal-footer {
-  border-top: 1.5px solid #1C1C1C;
-  background: #F2F1EA;
+  border-top: 1.5px solid var(--border-ui);
+  background: var(--bg-surface);
 }
 
 /* Mobile Notice Specifics */
@@ -147,8 +147,8 @@
 
 [data-theme="apple-gsos"] .mobile-notice-icon-box {
   background-color: #EBEAE3;
-  border-color: #8A887E;
-  color: #4455AA;
+  border-color: var(--border-medium);
+  color: var(--accent-primary);
   box-shadow: none;
 }
 

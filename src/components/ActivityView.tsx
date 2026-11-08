@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { lastDays, summarizeDays } from '../lib/dailyStats';
 import type { DailyStats } from '../lib/dailyStats';
 import type { AppTheme } from '../lib/theme';
+import { getThemeColors } from '../styles/colors';
 
 interface ActivityViewProps {
   stats?: DailyStats;
@@ -27,14 +28,14 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
  */
 export const ActivityView: React.FC<ActivityViewProps> = ({ stats, theme, days = 30 }) => {
   const [now] = useState(() => Date.now());
-  const isLight = theme === 'apple-gsos';
+  const palette = getThemeColors(theme);
   const points = lastDays(stats, now, days);
   const summary = summarizeDays(points);
   const pct = summary.accuracy === null ? 0 : Math.round(summary.accuracy * 100);
 
-  const barColor = isLight ? '#0284c7' : '#38bdf8';
-  const lineColor = isLight ? '#047857' : '#34d399';
-  const axisColor = isLight ? '#6B6A5F' : '#64748b';
+  const barColor = palette.accentCyan;
+  const lineColor = palette.accentEmerald;
+  const axisColor = palette.textMuted;
 
   const description =
     summary.reviews === 0
