@@ -1,7 +1,7 @@
 function Preview() {
   const props = usePreviewProps({
-    src: '/Mountains.jpeg',
-    alt: 'Majestic Alpine Mountain Range',
+    src: 'https://www.leitnercoding.dev/Mountains.jpeg',
+    alt: 'Sierra Ridge Lake Tahoe',
     fill: false,
     priority: true,
     width: 600,

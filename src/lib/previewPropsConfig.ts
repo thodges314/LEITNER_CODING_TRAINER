@@ -1724,8 +1724,8 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     },
   ],
   'next-image-component': [
-    { name: 'src', type: 'string', defaultValue: '/Mountains.jpeg', placeholder: 'Image URL', description: 'Image source URL' },
-    { name: 'alt', type: 'string', defaultValue: 'Majestic Alpine Mountain Range', placeholder: 'Alt description', description: 'Accessible image alt description' },
+    { name: 'src', type: 'string', defaultValue: 'https://www.leitnercoding.dev/Mountains.jpeg', placeholder: 'Image URL', description: 'Image source URL' },
+    { name: 'alt', type: 'string', defaultValue: 'Sierra Ridge Lake Tahoe', placeholder: 'Alt description', description: 'Accessible image alt description' },
     { name: 'fill', type: 'boolean', defaultValue: false, description: 'Use responsive layout fill with aspect-video container' },
     { name: 'priority', type: 'boolean', defaultValue: true, description: 'High-priority preload (fetchPriority=high, loading=eager)' },
     { name: 'width', type: 'number', defaultValue: 600, min: 200, max: 1200, step: 50, description: 'Fixed width in pixels (when fill is false)' },
@@ -1734,7 +1734,7 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'next-parallel-intercepting-routes': [
     { name: 'showModal', type: 'boolean', defaultValue: false, description: 'Whether the @modal parallel slot is active' },
     { name: 'photoId', type: 'string', defaultValue: 'photo_42', placeholder: 'Photo ID', description: 'Photo ID displayed in modal' },
-    { name: 'photoUrl', type: 'string', defaultValue: '/Mountains.jpeg', placeholder: 'Photo URL', description: 'Photo URL displayed in modal' },
+    { name: 'photoUrl', type: 'string', defaultValue: 'https://www.leitnercoding.dev/Mountains.jpeg', placeholder: 'Photo URL', description: 'Photo URL displayed in modal' },
   ],
 };
 

@@ -2,7 +2,7 @@ function Preview() {
   const props = usePreviewProps({
     showModal: false,
     photoId: 'photo_42',
-    photoUrl: '/Mountains.jpeg',
+    photoUrl: 'https://www.leitnercoding.dev/Mountains.jpeg',
   });
 
   const [modalOpen, setModalOpen] = useState(props.showModal);
