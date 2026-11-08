@@ -19,6 +19,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Foundational Curriculum Warm-Up Cards & Next.js Audit | feature/curriculum-warmup-cards | antigravity | Ready to merge |
 | Next.js Curriculum Expansion & Advanced App Router Cards | feature/nextjs-curriculum-expansion | antigravity | Ready to merge |
 | Curriculum Warm-Up Cards Expansion (Async JS, Testing, GraphQL) | feature/more-warmup-cards | antigravity | Ready to merge |
+| Curriculum Warm-Up Cards Batch 2 (SQL, Testing, Tailwind, GraphQL, Async) | feature/warmup-cards-batch2 | antigravity | In progress |
 
 
 
