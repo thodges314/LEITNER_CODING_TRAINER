@@ -43,6 +43,7 @@ src/
     FocusModal.tsx             practice focus: include/exclude tracks+tags, difficulty range, presets
     DifficultyBadge.tsx        ●●●○○ label
     AddTopicModal.tsx, SettingsModal.tsx, EvaluationPanel.tsx, StreamedMarkdown.tsx
+    settings/                  modular SettingsModal subcomponents (PracticeAndAppearanceSection, AiProviderVaultSection, ShortcutsAndDangerZoneSection, settingsConstants)
     LivePreview.tsx            universal sandboxed iframe preview (React, D3, Tailwind HTML), pop-out window with live sync, event output (aliased as ReactPreview.tsx)
     practice/                  modular arena subcomponents (PracticeHeader, ContractTable, EditorToolbar, ConsoleRunnerDrawer, ComponentPreviewPane, PropsControlPanel, ReinforcementBanner, starterSnippet, consoleFormat, ReactTestErrorBoundary)
   lib/
