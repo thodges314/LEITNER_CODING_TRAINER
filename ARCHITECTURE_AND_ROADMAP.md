@@ -21,15 +21,15 @@ in the browser; state lives in `localStorage`.
 
 | Item | Value |
 |---|---|
-| Cards | 404 total = organized into 4 built-in preset study decks: **Full Library** (404 cards), **Full-Stack Core** (347 cards), **Frontend Specialist** (267 cards), and **Algorithms & Data Structures** (102 cards) |
-| Documented test cases | 2612 (each shown as input → expected in the UI) |
-| Markdown formatting | **100% complete** across all 404 cards with structured descriptions, parameters, returns, constraints, and edge cases |
-| Difficulty spread | all 404: d1 53 · d2 128 · d3 159 · d4 57 · d5 7 |
-| Tracks | 17 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`): advanced-algorithms 57, js-utilities 44, react-components 41, algorithms 29, react 27, js-language 25, async-js 23, d3 22, dom-browser 21, sql-postgres 19, graphql-server 17, typescript-patterns 16, node 15, tailwind 14, nextjs 13, testing-tooling 11, graphql 10. Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`, `algorithms-advanced`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
+| Cards | 407 total = organized into 4 built-in preset study decks: **Full Library** (407 cards), **Full-Stack Core** (350 cards), **Frontend Specialist** (270 cards), and **Algorithms & Data Structures** (102 cards) |
+| Documented test cases | 2624 (each shown as input → expected in the UI) |
+| Markdown formatting | **100% complete** across all 407 cards with structured descriptions, parameters, returns, constraints, and edge cases |
+| Difficulty spread | all 407: d1 56 · d2 128 · d3 159 · d4 57 · d5 7 |
+| Tracks | 17 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`): advanced-algorithms 57, js-utilities 44, react-components 41, algorithms 29, react 27, js-language 25, async-js 23, d3 22, dom-browser 21, sql-postgres 19, graphql-server 17, typescript-patterns 16, node 15, tailwind 15, nextjs 15, testing-tooling 11, graphql 10. Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`, `algorithms-advanced`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: tracks `algorithms` and `advanced-algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 2,572 Vitest tests (jsdom/node across 70 test files): every card's harness must pass with its reference solution **and fail with an empty solution**, plus state schema migration tests, Web Worker sandbox runner unit tests, preview guard tests mounting reference solutions, Socratic assistant tests, TypeScript dual-mode tests, scheduling, preset decks, custom deck management, catalog index pipeline, AI interview prep copilot, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
-| Browser verification | `npm run e2e` runs ALL 404 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 808 card tests + 13 navigation/shortcut tests + 18 preview tests + 5 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 2 deck-selector tests + 2 remove-from-deck tests + 3 custom-deck tests + 1 interview-prep test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests + 2 worker-timeout sandbox tests = 875 browser tests across 17 files). See §7.4a. Re-run after changing cards, the runner or `domTools` |
+| Automated tests | 2,582 Vitest tests (jsdom/node across 70 test files): every card's harness must pass with its reference solution **and fail with an empty solution**, plus state schema migration tests, Web Worker sandbox runner unit tests, preview guard tests mounting reference solutions, Socratic assistant tests, TypeScript dual-mode tests, scheduling, preset decks, custom deck management, catalog index pipeline, AI interview prep copilot, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Browser verification | `npm run e2e` runs ALL 407 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 814 card tests + 13 navigation/shortcut tests + 18 preview tests + 5 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 1 stats-view test + 2 deck-selector tests + 2 remove-from-deck tests + 3 custom-deck tests + 1 interview-prep test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests + 2 worker-timeout sandbox tests = 881 browser tests across 17 files). See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
 
@@ -539,13 +539,17 @@ Rule in code (`ai.ts`): with an AI key, `passed = AI says passed && the harness 
 - **Next.js App Router Warm-Ups**:
   1. `next-server-client-leaf-boundary` (Difficulty 1): Core architectural pattern — **"Move Client Components to the Leaves"**. Async Server Component (`ProductCard`) renders static product data server-side and embeds a small, focused client component (`FavoriteButton`) marked with `'use client'` that accepts an ID prop and manages local toggle state (`useState`, `aria-pressed`). Avoids heavyweight decorative charts/UI and isolates the client boundary.
   2. `next-fetch-cache-revalidate` (Difficulty 1): **Time-Based Caching & Route Segment Revalidation**. App Router fetch request builder and cache configuration analyzer mapping data freshness requirements (`static`, `timed-isr`, `dynamic-realtime`) to Next.js fetch options (`{ cache: 'force-cache' }`, `{ next: { revalidate: N } }`, `{ cache: 'no-store' }`) and route segment options (`export const revalidate = N`).
+  3. `next-link-navigation` (Difficulty 1): **Next.js Link Client Routing & Active Route Highlighting**. Accessible navigation bar component using Next.js `<Link>` with `href`, client-side navigation interception without full reload, active route detection (`pathname === href`), and `aria-current="page"` synchronization.
+  4. `next-image-optimization` (Difficulty 1): **Next.js Image Dimensions, Priority & CLS Guard**. Core Web Vitals image component enforcing explicit layout dimensions (`width`/`height` or `fill=true`) to eliminate layout shift (CLS), with `priority={true}` setting `loading="eager"` and `fetchPriority="high"` for LCP optimization.
 - **PostgreSQL Warm-Ups**:
   1. `sql-basic-select-filter` (Difficulty 1): Intro `SELECT`, `WHERE`, `ORDER BY`, `LIMIT` query.
   2. `sql-basic-inner-join` (Difficulty 1): Intro two-table `INNER JOIN` with foreign key matching and column projection.
 - **Testing & Tooling Warm-Ups**:
-  1. `mini-expect-assertion` (Difficulty 1): Minimal test assertion library (`expect(actual).toBe(expected)`, `.toEqual()`, `.toThrow()`).
+  1. `basic-assertion-library` (Difficulty 1): Minimal test assertion library (`ok`, `equal` using `Object.is`, and `throws` with regex/string matching).
 - **DOM & Browser Warm-Ups**:
-  1. `dom-toggle-class-listener` (Difficulty 1): Element selection, event listener attachment, and classList toggle.
+  1. `dom-toggle-active-class` (Difficulty 1): Element selection, event listener attachment, `classList.toggle`, `aria-expanded`, and `destroy` cleanup.
+- **Tailwind CSS Warm-Ups**:
+  1. `tailwind-alert-banner` (Difficulty 1): Pure HTML markup styled with Tailwind utility classes (`flex`, `items-center`, `gap-4`, `p-4`, `rounded-xl`, `bg-blue-50`, `border-blue-200`, `role="alert"`), establishing a difficulty ladder with `tailwind-dismissible-banner` (d2).
 
 ## 8. Conventions and pitfalls for assistants
 

@@ -4,7 +4,7 @@ Read `ARCHITECTURE_AND_ROADMAP.md` first (system map, card pipeline, gotchas). T
 criteria**, plus the rules every contributor follows. Tasks marked **[owner decision]** need the owner's approval before coding.
 
 ## Current state (keep this block up to date in the same commit as any change it describes)
-- `master` = the deployed app. **404 cards** (across 17 first-class topic tracks, organized into 4 built-in preset study decks: Full Library [404], Full-Stack Core [347], Frontend Specialist [267], and Algorithms & Data Structures [102]), **2,612 documented cases**, **100% Markdown formatted instructions** across all 404 cards, **100% TypeScript dual solutions** across all 404 cards, 2,572 unit tests (70 test files), 875 browser tests. A push to `master` deploys (Markdown changes ignored in deploy workflow to conserve Actions minutes), and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
+- `master` = the deployed app. **407 cards** (across 17 first-class topic tracks, organized into 4 built-in preset study decks: Full Library [407], Full-Stack Core [350], Frontend Specialist [270], and Algorithms & Data Structures [102]), **2,624 documented cases**, **100% Markdown formatted instructions** across all 407 cards, **100% TypeScript dual solutions** across all 407 cards, 2,582 unit tests (70 test files), 881 browser tests. A push to `master` deploys (Markdown changes ignored in deploy workflow to conserve Actions minutes), and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
 - Quick rules for any contributor are in `AGENTS.md`. `npm run check:cards` is a read-only check that `src/data/topics.json` and `src/data/catalogIndex.json` match the card sources (run it, or `build:cards`, after any card edit).
 - AI evaluator replies are parsed by `parseEvaluationPayload` (`src/lib/ai.ts`); malformed replies are shown raw (`rawOutput`) in the evaluation panel instead of being split into lists.
 - First-4-problems backup advisory & export spotlight feature: alerts users after 4 completed problems (scored reviews, excluding unscored reinforcement repeats) to export their `localStorage` state to JSON, with spotlight pulse & callout bubble on the Deck Catalog export button. Verified by unit tests (`src/lib/backupAdvisory.test.ts`) and Playwright E2E (`e2e/backup-advisory.spec.ts`).
@@ -15,7 +15,8 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 ## Claim table (add your row in your first commit on a branch; remove it when the branch is merged)
 | Task / card | Branch | Owner | Status |
 |---|---|---|---|
-| PostgreSQL, Testing & Async JS Cards (Gaps, SKIP LOCKED, test.each, renderHook, promiseWaterfall, microtaskBatcher) | feature/postgres-advanced-cards | antigravity | In progress |
+| PostgreSQL, Testing & Async JS Cards (Gaps, SKIP LOCKED, test.each, renderHook, promiseWaterfall, microtaskBatcher) | feature/postgres-advanced-cards | human | Merging to master |
+| Foundational Curriculum Warm-Up Cards (Next.js, Postgres, Testing, DOM, Tailwind) | feature/curriculum-warmup-cards | antigravity | In progress |
 
 
 

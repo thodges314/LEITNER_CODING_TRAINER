@@ -1,0 +1,46 @@
+Implement a Next.js Image component wrapper that enforces dimension safety to prevent Cumulative Layout Shift (CLS) and optimizes Largest Contentful Paint (LCP):
+
+## Description
+
+### Application Context
+In the Next.js App Router (`components/Hero.tsx`), developers use `next/image` (`<Image />`) instead of standard `<img>` tags. To maintain excellent Core Web Vitals, Next.js strictly requires images to either declare explicit aspect-ratio dimensions (`width` and `height`) or use `fill={true}` to prevent layout shift (CLS). Furthermore, above-the-fold hero images accept `priority={true}` to disable lazy loading and set high fetch priority for instant LCP rendering. You are implementing a component embodying these Next.js Image rules.
+
+```ts
+interface NextImageProps {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  fill?: boolean;
+  priority?: boolean;
+  className?: string;
+}
+```
+
+### `NextImage({ src, alt, width, height, fill = false, priority = false, className = '' }: NextImageProps): React.ReactElement`
+
+Renders an optimized image element adhering to Next.js Image conventions:
+
+- **Dimension & CLS Validation**:
+  - Enforces that the caller provides either explicit positive dimensions (`width` and `height`) OR `fill === true`.
+  - If `!fill && (!width || !height)`, throws `new Error('Next.js Image requires either width and height or fill=true to prevent layout shift')`.
+- **Render Output**:
+  - Renders an `<img>` element with `data-testid="next-image"`.
+  - **Required Core Attributes**:
+    - `src={src}`
+    - `alt={alt}`
+    - `decoding="async"`
+  - **Layout & Sizing Mode**:
+    - When `fill === true`:
+      - Does not set `width` or `height` attributes on the image.
+      - Applies fill classes: Combines `'object-cover absolute inset-0 w-full h-full'` with any provided `className` (trimmed).
+    - When `fill === false`:
+      - Sets `width={width}` and `height={height}` attributes to reserve layout space and eliminate CLS.
+      - Applies `className={className}`.
+  - **LCP & Loading Optimization**:
+    - When `priority === true` (above-the-fold hero):
+      - Sets `loading="eager"`.
+      - Sets `fetchPriority="high"`.
+    - When `priority === false` (default):
+      - Sets `loading="lazy"`.
+      - Sets `fetchPriority="auto"`.

@@ -1,0 +1,14 @@
+{
+  "track": "nextjs",
+  "title": "Next.js Image Optimization: Dimensions, Priority & CLS Guard",
+  "tags": [
+    "nextjs",
+    "next-image",
+    "cls",
+    "core-web-vitals",
+    "lcp",
+    "performance"
+  ],
+  "rendersComponent": true,
+  "requiresDom": true
+}

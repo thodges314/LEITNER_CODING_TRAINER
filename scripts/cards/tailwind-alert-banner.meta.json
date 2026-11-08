@@ -1,0 +1,15 @@
+{
+  "track": "tailwind",
+  "title": "Tailwind CSS: Alert Notification Banner Markup",
+  "tags": [
+    "tailwind",
+    "css",
+    "html",
+    "flexbox",
+    "alert",
+    "banner"
+  ],
+  "inputLanguage": "html",
+  "previewLibraries": ["tailwind"],
+  "rendersComponent": false
+}

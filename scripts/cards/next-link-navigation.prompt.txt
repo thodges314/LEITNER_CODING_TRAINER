@@ -1,0 +1,37 @@
+Implement a Next.js App Router navigation bar component demonstrating Link client routing and active state accessibility:
+
+## Description
+
+### Application Context
+In Next.js App Router applications (`components/Navbar.tsx`), navigation between routes is performed using the `next/link` component (`<Link href="...">`) rather than native `<a href="...">` tags. Next.js Link performs fast client-side SPA route transitions without triggering a full page reload, while preserving application state. You are building a navigation bar component that renders client links and highlights the currently active route.
+
+```ts
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+interface NavigationBarProps {
+  items: NavItem[];
+  currentPath: string;
+  onNavigate?: (href: string) => void;
+}
+```
+
+### `NavigationBar({ items, currentPath, onNavigate }: NavigationBarProps): React.ReactElement`
+
+Renders an accessible navigation header with client-side routing links:
+
+- **Navigation Container**:
+  - Renders a `<nav>` element with `data-testid="nav-bar"` and `aria-label="Main Navigation"`.
+  - Inside `<nav>`, renders a `<ul>` list with `className="nav-list"`.
+- **Link Items**:
+  - Maps each item in `items` to an `<li>` element containing an `<a>` element (representing Next.js `<Link>`) with `data-testid="nav-link"`.
+  - Anchor attributes:
+    - `href`: Sets `href={item.href}`.
+    - Active Route Detection: Compares `item.href === currentPath`.
+      - If active: Sets `aria-current="page"` and `className="nav-link active"`.
+      - If inactive: Does not set `aria-current` (or sets `aria-current={undefined}`) and sets `className="nav-link"`.
+    - Content: Displays `item.label`.
+- **Client Routing Interception**:
+  - `onClick`: Prevents default browser navigation via `e.preventDefault()`, invoking `onNavigate?.(item.href)` so client transitions occur without a full page refresh.

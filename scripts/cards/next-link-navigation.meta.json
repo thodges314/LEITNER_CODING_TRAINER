@@ -1,0 +1,14 @@
+{
+  "track": "nextjs",
+  "title": "Next.js Navigation: Link Component & Active Route Styling",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "link",
+    "navigation",
+    "routing",
+    "accessibility"
+  ],
+  "rendersComponent": true,
+  "requiresDom": true
+}

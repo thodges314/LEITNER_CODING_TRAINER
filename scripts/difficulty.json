@@ -1463,6 +1463,10 @@
     "difficulty": 2,
     "concept": "tailwind-card"
   },
+  "tailwind-alert-banner": {
+    "difficulty": 1,
+    "concept": "tailwind-banner"
+  },
   "tailwind-dismissible-banner": {
     "difficulty": 2,
     "concept": "tailwind-banner"
@@ -1566,6 +1570,14 @@
   "next-static-params-generator": {
     "difficulty": 2,
     "concept": "next-static-params"
+  },
+  "next-link-navigation": {
+    "difficulty": 1,
+    "concept": "next-navigation"
+  },
+  "next-image-optimization": {
+    "difficulty": 1,
+    "concept": "next-image"
   },
   "next-server-client-leaf-boundary": {
     "difficulty": 1,

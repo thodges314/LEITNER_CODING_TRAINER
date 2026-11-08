@@ -329,5 +329,74 @@ export default {
       'throws on missing DOM nodes and cleans up click event listener so subsequent clicks do not toggle state'
     ),
   ],
+
+  'next-link-navigation': [
+    rHarness(
+      'Renders navigation container and all item links with hrefs',
+      '<NavigationBar items={navItems} currentPath="/dashboard" />',
+      'renders nav container with links to "/", "/dashboard", and "/settings"'
+    ),
+    rHarness(
+      'Applies aria-current="page" and active class to currentPath link',
+      'q("[data-testid=\'nav-link\'][href=\'/dashboard\']", c)',
+      'sets aria-current="page" and className="nav-link active"'
+    ),
+    rHarness(
+      'Leaves non-active links without aria-current attribute',
+      'qa("[data-testid=\'nav-link\']", c)',
+      'non-active links have no aria-current and have className="nav-link"'
+    ),
+    rHarness(
+      'Prevents default browser reload and triggers onNavigate callback',
+      'fire.click(targetLink)',
+      'prevents default native navigation and invokes onNavigate("/settings")'
+    ),
+  ],
+
+  'next-image-optimization': [
+    rHarness(
+      'Renders standard image with explicit width, height, and lazy loading',
+      '<NextImage src="/images/avatar.png" alt="Profile" width={120} height={120} />',
+      'renders img with width="120", height="120", and loading="lazy"'
+    ),
+    rHarness(
+      'Sets loading="eager" and fetchPriority="high" when priority is true',
+      '<NextImage src="/images/hero.jpg" alt="Hero" width={1200} height={600} priority={true} />',
+      'renders img with loading="eager" and fetchPriority="high"'
+    ),
+    rHarness(
+      'Renders responsive fill image without fixed width and height attributes',
+      '<NextImage src="/images/bg.jpg" alt="Background" fill={true} />',
+      'renders img without width/height attributes and with fill classes'
+    ),
+    rHarness(
+      'Throws error when neither dimensions nor fill=true is supplied',
+      '<NextImage src="/broken.png" alt="Missing dimensions" />',
+      'throws error enforcing Next.js anti-CLS dimension contract'
+    ),
+  ],
+
+  'tailwind-alert-banner': [
+    rHarness(
+      'Banner container has flex layout, padding, rounded corners, blue background, and alert role',
+      'html',
+      'container has flex layout, rounded corners, blue background tint, and role="alert"'
+    ),
+    rHarness(
+      'Icon badge displays centered informational indicator with rounded styling',
+      'html',
+      'icon badge has rounded styling, background, and centered "i" indicator'
+    ),
+    rHarness(
+      'Displays update headline and description subtext',
+      'html',
+      'renders "System Update Available" headline and deployment subtext'
+    ),
+    rHarness(
+      'Action button has type="button", padding, rounded corners, and update label',
+      'html',
+      'action button has type="button", blue background, and "Update Now" label'
+    ),
+  ],
 };
 
