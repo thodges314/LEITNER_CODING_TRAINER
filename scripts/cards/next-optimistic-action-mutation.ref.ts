@@ -1,3 +1,5 @@
+'use client';
+
 interface TodoItem {
   id: string;
   title: string;
@@ -46,7 +48,8 @@ const TodoListOptimistic = ({
           )
         );
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Failed to update todo';
+        const message =
+          (err as { message?: string })?.message || 'Failed to update todo';
         setErrorMessage(message);
       }
     });
@@ -80,4 +83,3 @@ const TodoListOptimistic = ({
     </div>
   );
 };
-
