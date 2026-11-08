@@ -1,0 +1,9 @@
+query GetUserAvatars($id: ID!) {
+  user(id: $id) {
+    id
+    username
+    thumb: avatarUrl(size: 64)
+    hero: avatarUrl(size: 512)
+  }
+}
+

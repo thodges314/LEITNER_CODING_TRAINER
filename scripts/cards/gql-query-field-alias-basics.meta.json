@@ -1,0 +1,14 @@
+{
+  "track": "graphql",
+  "title": "GraphQL Query: Field Aliasing",
+  "tags": [
+    "graphql",
+    "query",
+    "aliases",
+    "arguments",
+    "fields"
+  ],
+  "concept": "gql-queries",
+  "inputLanguage": "graphql"
+}
+

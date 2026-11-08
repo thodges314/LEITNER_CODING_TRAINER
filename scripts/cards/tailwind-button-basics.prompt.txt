@@ -1,0 +1,41 @@
+### `Button({ variant = 'primary', disabled = false, children, ...props }: ButtonProps): JSX.Element`
+
+## Description
+
+```ts
+type ButtonVariant = 'primary' | 'outline';
+
+interface ButtonProps {
+  variant?: ButtonVariant;
+  disabled?: boolean;
+  children?: any;
+  onClick?: (event: any) => void;
+  [key: string]: any;
+}
+```
+
+Build an accessible, versatile button component styled with Tailwind CSS utility classes:
+
+### Requirements
+- **Container (`<button>`)**:
+  - Element: `<button type="button" ...>` (defaults to `type="button"` unless specified in `props`).
+  - Base classes: `inline-flex items-center justify-center font-medium rounded-lg px-4 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 active:scale-95 cursor-pointer`
+  - Forwards extra props (such as `onClick`, `data-testid`, or `aria-label`) to the underlying `<button>`.
+- **Variants**:
+  - `'primary'` (default): `bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500`
+  - `'outline'`: `border border-gray-300 text-gray-700 hover:bg-gray-50 focus-visible:ring-gray-400`
+- **Disabled State**:
+  - When `disabled` is `true`:
+    - Sets HTML attribute `disabled={true}` on the `<button>`.
+    - Includes disabled utility classes: `disabled:opacity-50 disabled:pointer-events-none cursor-not-allowed`
+
+### Example Usage
+```tsx
+<Button variant="primary" onClick={() => console.log('clicked')}>
+  Save Changes
+</Button>
+<Button variant="outline" disabled={true}>
+  Cancel
+</Button>
+```
+

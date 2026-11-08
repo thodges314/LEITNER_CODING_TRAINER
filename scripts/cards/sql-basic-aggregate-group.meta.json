@@ -1,0 +1,15 @@
+{
+  "track": "sql-postgres",
+  "title": "SQL Aggregation Basics: GROUP BY and HAVING",
+  "tags": [
+    "sql",
+    "postgresql",
+    "aggregates",
+    "group-by",
+    "having",
+    "count",
+    "avg"
+  ],
+  "requiresDom": false
+}
+

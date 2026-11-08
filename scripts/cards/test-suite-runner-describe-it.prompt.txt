@@ -1,0 +1,63 @@
+Implement a synchronous test runner factory `createTestRunner()` providing BDD-style `describe`, `it`, `getReport`, and `reset` functions.
+
+```ts
+interface TestFailure {
+  suite: string;
+  test: string;
+  message: string;
+}
+
+interface TestReport {
+  total: number;
+  passed: number;
+  failed: number;
+  errors: TestFailure[];
+}
+
+interface TestRunner {
+  describe: (name: string, fn: () => void) => void;
+  it: (name: string, fn: () => void) => void;
+  getReport: () => TestReport;
+  reset: () => void;
+}
+```
+
+### `createTestRunner(): TestRunner`
+
+### Requirements
+- **`describe(name: string, fn: () => void)`**:
+  - Sets the current suite name context and executes `fn()`.
+  - Restores the previous suite name when `fn()` completes or throws.
+- **`it(name: string, fn: () => void)`**:
+  - Increments `total`.
+  - Executes `fn()`.
+  - If `fn()` completes without throwing, increments `passed`.
+  - If `fn()` throws, increments `failed` and records `{ suite: currentSuite, test: name, message }` in `errors`, where `message` is `err.message` (or `String(err)` if not an Error object).
+- **`getReport(): TestReport`**:
+  - Returns a snapshot of `{ total, passed, failed, errors }`.
+- **`reset(): void`**:
+  - Resets all counts to `0` and clears the `errors` array.
+
+### Example
+```ts
+const { describe, it, getReport } = createTestRunner();
+
+describe('Math', () => {
+  it('adds numbers', () => {
+    if (1 + 1 !== 2) throw new Error('Math broken');
+  });
+
+  it('fails bad math', () => {
+    throw new Error('Expected 4 but got 5');
+  });
+});
+
+console.log(getReport());
+// {
+//   total: 2,
+//   passed: 1,
+//   failed: 1,
+//   errors: [{ suite: 'Math', test: 'fails bad math', message: 'Expected 4 but got 5' }]
+// }
+```
+

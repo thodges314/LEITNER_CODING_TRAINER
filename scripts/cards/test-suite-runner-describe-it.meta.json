@@ -1,0 +1,14 @@
+{
+  "track": "testing-tooling",
+  "title": "Test Suite Runner: describe, it, and getReport",
+  "tags": [
+    "testing",
+    "bdd",
+    "runner",
+    "assertions",
+    "suite"
+  ],
+  "concept": "test-runners",
+  "requiresDom": false
+}
+

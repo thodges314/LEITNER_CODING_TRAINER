@@ -1,0 +1,19 @@
+{
+  "track": "tailwind",
+  "title": "Tailwind Button: Interactive States & Variants",
+  "tags": [
+    "tailwind",
+    "button",
+    "interactive",
+    "variants",
+    "components"
+  ],
+  "concept": "tailwind-button",
+  "requiresDom": true,
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}
+

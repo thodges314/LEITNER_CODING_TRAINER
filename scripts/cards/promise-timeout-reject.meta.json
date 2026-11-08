@@ -1,0 +1,14 @@
+{
+  "track": "async-js",
+  "title": "Promise Timeout: withTimeout Wrapper",
+  "tags": [
+    "async",
+    "promises",
+    "timeout",
+    "timer",
+    "race"
+  ],
+  "concept": "promise",
+  "requiresDom": false
+}
+
