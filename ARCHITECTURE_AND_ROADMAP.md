@@ -47,6 +47,11 @@ src/
     evaluation/                modular EvaluationPanel subcomponents (VerdictHeaderSection, CritiqueFollowUpSection, SolutionRevealSection, SpacingTransitionFooter)
     LivePreview.tsx            universal sandboxed iframe preview (React, D3, Tailwind HTML), pop-out window with live sync, event output (aliased as ReactPreview.tsx)
     practice/                  modular arena subcomponents (PracticeHeader, ContractTable, EditorToolbar, ConsoleRunnerDrawer, ComponentPreviewPane, PropsControlPanel, ReinforcementBanner, starterSnippet, consoleFormat, ReactTestErrorBoundary)
+  hooks/
+    usePracticeCodeExecution.ts sandbox/worker code runner hook for PracticeArena (transpilation, console capture, React mount, worker offload)
+    useTimedPractice.ts        Timed Recall Mode countdown timer and auto-submit hook
+    useLegacyComponentPopup.ts external pop-out window lifecycle hook for legacy component preview
+    usePreviewProps.ts         state and synchronization hook for LivePreview props control panel
   lib/
     leitner.ts                 core deck state persistence, review commits, custom/deactivated card mutations, and backward-compatible re-exports
     leitner.test.ts            unit tests for Leitner & Graduated Interval algorithms

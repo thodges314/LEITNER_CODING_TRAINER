@@ -306,3 +306,4 @@ export const SolutionRevealSection: React.FC<SolutionRevealSectionProps> = ({
     </div>
   );
 };
+

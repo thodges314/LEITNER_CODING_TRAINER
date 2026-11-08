@@ -178,3 +178,4 @@ export const SpacingTransitionFooter: React.FC<SpacingTransitionFooterProps> = (
     </div>
   );
 };
+

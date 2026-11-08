@@ -11,7 +11,6 @@ import { indentWithTab } from '@codemirror/commands';
 import { createTsHoverExtension } from './practice/tsHoverExtension';
 import { resolveExecutionModeForCard, setPreferredExecutionMode } from '../lib/editorSettings';
 import { loadDraft, saveDraft, clearDraft } from '../lib/drafts';
-import ReactDOM from 'react-dom/client';
 import {
   getTrackMeta,
   isReactComponentCard,
@@ -24,19 +23,11 @@ import { EvaluationPanel } from './EvaluationPanel';
 import { CheckCircle, Info } from 'lucide-react';
 import { detectRedundantScopeInput } from '../utils/cardPromptTypes';
 import type { RedundantScopeWarning } from '../utils/cardPromptTypes';
-import { transpileForExecution, runHarness, createSandboxScope, prepareSqlCode, prepareGraphqlCode, prepareHtmlCode, bufferContainsHarness, classifyLogLine } from '../lib/runner';
-import {
-  runInWorker,
-  supportsWebWorker,
-  isBrowserDomOrReactCard,
-  terminateActiveWorker,
-} from '../lib/workerClient';
+import { runHarness } from '../lib/runner';
+import { terminateActiveWorker } from '../lib/workerClient';
 import { extractHarnessContracts } from '../lib/harnessContracts';
-import { formatConsoleArg, formatAssertionFailure } from './practice/consoleFormat';
-import type { ConsoleLogEntry } from './practice/consoleFormat';
 import { getStarterSnippet } from './practice/starterSnippet';
 import { formatCode } from '../lib/formatter';
-import { getTimedModeEnabled, getTimedModeDuration } from '../lib/timedMode';
 import { MarkdownContent } from './MarkdownContent';
 import { isTsOnlyCard } from '../lib/tsOnly';
 import type { AppTheme } from '../lib/theme';
@@ -49,6 +40,9 @@ import { EditorToolbar, EditorActionControls } from './practice/EditorToolbar';
 import { ConsoleRunnerDrawer } from './practice/ConsoleRunnerDrawer';
 import { ComponentPreviewPane } from './practice/ComponentPreviewPane';
 import { SocraticClarificationAssistant } from './practice/SocraticClarificationAssistant';
+import { useLegacyComponentPopup } from '../hooks/useLegacyComponentPopup';
+import { useTimedPractice } from '../hooks/useTimedPractice';
+import { usePracticeCodeExecution } from '../hooks/usePracticeCodeExecution';
 
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
@@ -96,101 +90,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     isReinforcement ? getStarterSnippet(currentCard) : (loadDraft(currentCard?.id) ?? getStarterSnippet(currentCard))
   );
   const [isEvaluating, setIsEvaluating] = useState(false);
-  const [isRunning, setIsRunning] = useState(false);
-  const [executionStatus, setExecutionStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
   const [evalResult, setEvalResult] = useState<EvaluationResult | null>(null);
-
-  // Live React component mounting state
-  const [mountedComponent, setMountedComponent] = useState<{
-    element: React.ReactElement;
-    key: number;
-  } | null>(null);
-
-  // Track whether the live preview has been initialized via Run Code / Test
-  const [isPreviewLive, setIsPreviewLive] = useState<boolean>(false);
-  const [previewRunTrigger, setPreviewRunTrigger] = useState<number>(0);
-
-  // Pop-out state for legacy Component Preview / Hook Test box
-  const [legacyPopupWindow, setLegacyPopupWindow] = useState<Window | null>(null);
-  const isLegacyPoppedOut = Boolean(legacyPopupWindow && !legacyPopupWindow.closed);
-
-  const handleLegacyPopOut = useCallback(() => {
-    if (legacyPopupWindow && !legacyPopupWindow.closed) {
-      legacyPopupWindow.focus();
-      return;
-    }
-
-    const w = 640;
-    const h = 540;
-    const left = typeof window.screenX === 'number' ? window.screenX + Math.max(0, (window.outerWidth - w) / 2) : 100;
-    const top = typeof window.screenY === 'number' ? window.screenY + Math.max(0, (window.outerHeight - h) / 2) : 100;
-
-    const popup = (() => {
-      try {
-        return window.open(
-          'about:blank',
-          'leitner_legacy_component_preview',
-          `width=${w},height=${h},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no`
-        );
-      } catch {
-        return null;
-      }
-    })();
-
-    if (!popup) return;
-
-    try {
-      popup.document.title = `Component Preview: ${currentCard?.title || 'Hook Test'} — Leitner`;
-      popup.document.head.innerHTML = '';
-      for (const el of Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))) {
-        popup.document.head.appendChild(el.cloneNode(true));
-      }
-      popup.document.body.style.margin = '0';
-      popup.document.body.style.padding = '16px';
-      popup.document.body.style.backgroundColor = theme === 'apple-gsos' ? '#ffffff' : '#030712';
-      popup.document.body.style.color = theme === 'apple-gsos' ? '#0f172a' : '#cbd5e1';
-      popup.document.body.style.fontFamily = getComputedStyle(document.body).fontFamily;
-      popup.document.body.style.boxSizing = 'border-box';
-      popup.document.body.style.height = '100vh';
-      popup.document.body.style.display = 'flex';
-      popup.document.body.style.flexDirection = 'column';
-
-      popup.addEventListener('beforeunload', () => {
-        setLegacyPopupWindow(null);
-      });
-    } catch {
-      // Ignore
-    }
-
-    setLegacyPopupWindow(popup);
-  }, [currentCard, theme, legacyPopupWindow]);
-
-  const handleLegacyDockBack = useCallback(() => {
-    if (legacyPopupWindow && !legacyPopupWindow.closed) {
-      legacyPopupWindow.close();
-    }
-    setLegacyPopupWindow(null);
-  }, [legacyPopupWindow]);
-
-  // Clean up legacy popup window on unmount
-  useEffect(() => {
-    return () => {
-      if (legacyPopupWindow && !legacyPopupWindow.closed) {
-        legacyPopupWindow.close();
-      }
-    };
-  }, [legacyPopupWindow]);
-
-  // Heartbeat to detect popup closure via OS close button
-  useEffect(() => {
-    if (!legacyPopupWindow) return;
-    const timer = setInterval(() => {
-      if (legacyPopupWindow.closed) {
-        setLegacyPopupWindow(null);
-      }
-    }, 500);
-    return () => clearInterval(timer);
-  }, [legacyPopupWindow]);
 
   // Execution mode: JS (Fast) vs TS (Strict Type Check)
   const [executionMode, setExecutionMode] = useState<'js' | 'ts'>(() =>
@@ -218,12 +118,62 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     }
   };
 
-  // Countdown stopwatch (supports Timed Recall Mode with auto-start and auto-submit)
-  const timedMode = getTimedModeEnabled();
-  const configuredDuration = getTimedModeDuration();
-  const [timeRemaining, setTimeRemaining] = useState(configuredDuration);
-  const [isTimerRunning, setIsTimerRunning] = useState(timedMode);
-  const [timeExpiredToast, setTimeExpiredToast] = useState<string | null>(null);
+  const {
+    legacyPopupWindow,
+    isLegacyPoppedOut,
+    handleLegacyPopOut,
+    handleLegacyDockBack,
+  } = useLegacyComponentPopup(currentCard, theme);
+
+  const {
+    isRunning,
+    executionStatus,
+    setExecutionStatus,
+    outputLogs,
+    setOutputLogs,
+    isOutputOpen,
+    setIsOutputOpen,
+    mountedComponent,
+    setMountedComponent,
+    isPreviewLive,
+    setIsPreviewLive,
+    previewRunTrigger,
+    setPreviewRunTrigger,
+    appendConsoleLog,
+    handleRunCode,
+  } = usePracticeCodeExecution({
+    currentCard,
+    code,
+    executionMode,
+    isTsTrack,
+  });
+
+  const actionsRef = useRef<{
+    handleRunCode: () => Promise<void>;
+    handleSubmit: () => Promise<void>;
+    handleFormatCode: () => Promise<void>;
+  }>({
+    handleRunCode: () => Promise.resolve(),
+    handleSubmit: () => Promise.resolve(),
+    handleFormatCode: () => Promise.resolve(),
+  });
+
+  const handleTimeExpiredSubmit = useCallback(() => {
+    void actionsRef.current.handleSubmit();
+  }, []);
+
+  const {
+    timedMode,
+    configuredDuration,
+    timeRemaining,
+    setTimeRemaining,
+    isTimerRunning,
+    setIsTimerRunning,
+    timeExpiredToast,
+    setTimeExpiredToast,
+    formatTimer,
+  } = useTimedPractice(Boolean(evalResult), isEvaluating, handleTimeExpiredSubmit);
+
   const editorRef = useRef<ReactCodeMirrorRef>(null);
   const [isFormatting, setIsFormatting] = useState(false);
   const [formatToast, setFormatToast] = useState<{
@@ -232,9 +182,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   } | null>(null);
   const [scopeWarning, setScopeWarning] = useState<RedundantScopeWarning | null>(null);
   const [dismissedScopeKinds, setDismissedScopeKinds] = useState<Record<string, boolean>>({});
-
-  const [outputLogs, setOutputLogs] = useState<ConsoleLogEntry[]>([]);
-  const [isOutputOpen, setIsOutputOpen] = useState(false);
 
   // Reveal canonical solution state
   const [showSolution, setShowSolution] = useState(false);
@@ -314,12 +261,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       terminateActiveWorker();
     };
   }, [currentCard?.id]);
-
-  const formatTimer = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
 
   // Format code with Prettier standalone
   const handleFormatCode = async () => {
@@ -406,265 +347,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     return list;
   }, [executionMode, currentCard]);
 
-  const actionsRef = useRef<{
-    handleRunCode: () => Promise<void>;
-    handleSubmit: () => Promise<void>;
-    handleFormatCode: () => Promise<void>;
-  }>({
-    handleRunCode: () => Promise.resolve(),
-    handleSubmit: () => Promise.resolve(),
-    handleFormatCode: () => Promise.resolve(),
-  });
-
-  const appendConsoleLog = (type: 'log' | 'warn' | 'error' | 'info', content: string) => {
-    const now = new Date().toLocaleTimeString([], {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-    setOutputLogs((prev) => [
-      ...prev,
-      {
-        type,
-        content,
-        timestamp: now,
-      },
-    ]);
-    if (type === 'error') {
-      setExecutionStatus('error');
-    }
-  };
-
-  // Async Execution Handler with AsyncFunction and captured console
-  const handleRunCode = async () => {
-    setIsPreviewLive(true);
-    setPreviewRunTrigger((c) => c + 1);
-    if (!code.trim() || isRunning) return;
-    setIsOutputOpen(true);
-    setIsRunning(true);
-    setExecutionStatus('running');
-
-    const logs: ConsoleLogEntry[] = [];
-    const now = () =>
-      new Date().toLocaleTimeString([], {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      });
-
-    const appendLog = (type: 'log' | 'warn' | 'error' | 'info', ...args: unknown[]) => {
-      const failFormatted = formatAssertionFailure(args, currentCard);
-      const isFail = Boolean(failFormatted);
-      if (isFail) {
-        setExecutionStatus('error');
-      }
-      const entry: ConsoleLogEntry = {
-        type: isFail ? 'error' : type,
-        content: failFormatted || args.map(formatConsoleArg).join(' '),
-        timestamp: now(),
-        failure: isFail,
-      };
-      logs.push(entry);
-      setOutputLogs([...logs]);
-    };
-
-    const customConsole = {
-      log: (...args: unknown[]) => appendLog('log', ...args),
-      info: (...args: unknown[]) => appendLog('info', ...args),
-      warn: (...args: unknown[]) => appendLog('warn', ...args),
-      error: (...args: unknown[]) => appendLog('error', ...args),
-    };
-
-    const mount = (compOrElem: unknown, props: Record<string, unknown> = {}) => {
-      if (!compOrElem) return;
-      if (React.isValidElement(compOrElem)) {
-        setMountedComponent({ element: compOrElem, key: Date.now() });
-        appendLog('info', '↳ React Element mounted to live preview');
-      } else if (typeof compOrElem === 'function') {
-        const el = React.createElement(compOrElem as React.ComponentType, props);
-        setMountedComponent({ element: el, key: Date.now() });
-        appendLog('info', '↳ Component mounted to live preview');
-      } else {
-        appendLog('warn', `mount() received unsupported argument type: ${typeof compOrElem}`);
-      }
-    };
-
-    const customReactDOM = {
-      ...ReactDOM,
-      createRoot: () => ({
-        render: (element: React.ReactElement) => mount(element),
-        unmount: () => setMountedComponent(null),
-      }),
-    };
-
-    const inputLang = getCardInputLanguage(currentCard);
-    const isWrappedInput = inputLang === 'sql' || inputLang === 'graphql' || inputLang === 'html';
-    const rawCodeToRun =
-      inputLang === 'sql'
-        ? prepareSqlCode(code, currentCard?.testHarness)
-        : inputLang === 'graphql'
-          ? prepareGraphqlCode(code, currentCard?.testHarness)
-          : inputLang === 'html'
-            ? prepareHtmlCode(code, currentCard?.testHarness)
-            : code;
-    const executableSource =
-      isWrappedInput &&
-      currentCard?.testHarness &&
-      !bufferContainsHarness(rawCodeToRun, currentCard.testHarness)
-        ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`
-        : rawCodeToRun;
-
-    const effectiveMode = isWrappedInput ? 'js' : executionMode;
-    const transpiled = await transpileForExecution(
-      executableSource,
-      effectiveMode,
-      3000,
-      isTsTrack ? undefined : currentCard?.promptSeed
-    );
-    for (const diag of transpiled.diagnostics) {
-      logs.push({
-        type: diag.type === 'warn' ? 'warn' : 'error',
-        content: diag.formatted,
-        timestamp: now(),
-        failure: diag.type !== 'warn',
-      });
-    }
-    if (transpiled.diagnostics.length > 0) setOutputLogs([...logs]);
-    if (!transpiled.ok) {
-      setExecutionStatus('error');
-      setIsRunning(false);
-      return;
-    }
-    const executableCode = transpiled.code;
-
-    // For non-React and non-DOM cards, offload execution to the isolated Web Worker
-    if (currentCard && !isBrowserDomOrReactCard(currentCard) && supportsWebWorker()) {
-      try {
-        const outcome = await runInWorker({
-          code: executableCode,
-          timeoutMs: 6000,
-          onLog: (msg) => {
-            const entry: ConsoleLogEntry = {
-              type: msg.method === 'warn' ? 'warn' : msg.method === 'error' ? 'error' : 'info',
-              content: msg.text,
-              timestamp: now(),
-              failure: msg.method === 'error' || classifyLogLine(msg.method, msg.args) === 'fail',
-            };
-            logs.push(entry);
-            setOutputLogs([...logs]);
-          },
-        });
-
-        if (outcome.returnValue !== undefined) {
-          appendLog('info', `↳ Return: ${formatConsoleArg(outcome.returnValue)}`);
-        }
-
-        if (outcome.report.timedOut) {
-          const timeoutEntry: ConsoleLogEntry = {
-            type: 'error',
-            content: 'Execution timed out after 6000ms (terminated runaway worker thread to prevent tab freeze)',
-            timestamp: now(),
-            failure: true,
-          };
-          logs.push(timeoutEntry);
-          setOutputLogs([...logs]);
-          setExecutionStatus('error');
-        } else {
-          if (logs.length === 0) {
-            if (outcome.report.lines.length > 0) {
-              for (const line of outcome.report.lines) {
-                const isFail = line.startsWith('[error]') || line.startsWith('[fail]');
-                appendLog(isFail ? 'error' : 'info', line.replace(/^\[(log|info|warn|error)\]\s*/, ''));
-              }
-            } else if (outcome.report.errorCount > 0 || outcome.report.failCount > 0) {
-              appendLog('error', outcome.report.summary || 'Execution failed with errors');
-            } else {
-              appendLog(
-                'info',
-                '(Code executed successfully with no console outputs. Uncomment the test lines at the bottom to view results!)'
-              );
-            }
-          }
-          const hasError = logs.some((l) => l.failure) || outcome.report.errorCount > 0 || outcome.report.failCount > 0;
-          setExecutionStatus(hasError ? 'error' : 'success');
-        }
-      } catch (err: unknown) {
-        const errorMsg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
-        const errorEntry: ConsoleLogEntry = {
-          type: 'error',
-          content: errorMsg,
-          timestamp: now(),
-          failure: true,
-        };
-        logs.push(errorEntry);
-        setOutputLogs([...logs]);
-        setExecutionStatus('error');
-      } finally {
-        setIsRunning(false);
-      }
-      return;
-    }
-
-    const scope = createSandboxScope({
-      console: customConsole,
-      mount,
-      reactDOM: customReactDOM,
-      cardId: currentCard?.id,
-    });
-
-    try {
-      const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-      const fn = new AsyncFunction(...scope.names, executableCode);
-      let runTimer: ReturnType<typeof setTimeout> | undefined;
-      const timeoutPromise = new Promise((_, reject) => {
-        runTimer = setTimeout(
-          () => reject(new Error('Execution timed out after 6000ms. Check for infinite loops or unresolved promises.')),
-          6000
-        );
-      });
-      const result = await Promise.race([fn(...scope.values), timeoutPromise]);
-      clearTimeout(runTimer);
-
-      if (result !== undefined) {
-        if (React.isValidElement(result) || typeof result === 'function') {
-          mount(result);
-        } else {
-          appendLog('info', `↳ Return: ${formatConsoleArg(result)}`);
-        }
-      }
-
-      if (logs.length === 0) {
-        appendLog(
-          'info',
-          '(Code executed successfully with no console outputs. Uncomment the test lines at the bottom to view results!)'
-        );
-      }
-
-      const hasError = logs.some((l) => l.failure);
-      setExecutionStatus(hasError ? 'error' : 'success');
-    } catch (err: unknown) {
-      const errorMsg =
-        err instanceof Error
-          ? `${err.name}: ${err.message}${err.stack ? `\n${err.stack.split('\n').slice(0, 3).join('\n')}` : ''}`
-          : String(err);
-
-      const errorEntry: ConsoleLogEntry = {
-        type: 'error',
-        content: errorMsg,
-        timestamp: now(),
-        failure: true,
-      };
-      logs.push(errorEntry);
-      setOutputLogs([...logs]);
-      setExecutionStatus('error');
-    } finally {
-      scope.cleanup();
-      setIsRunning(false);
-    }
-  };
-
   const handleSubmit = async () => {
     setIsPreviewLive(true);
     setPreviewRunTrigger((c) => c + 1);
@@ -719,30 +401,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     window.addEventListener('keydown', handleGlobalKeyDown);
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
-
-  useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null;
-    if (isTimerRunning && timeRemaining > 0) {
-      interval = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            setIsTimerRunning(false);
-            if (!evalResult && !isEvaluating) {
-              setTimeExpiredToast('⏰ Time expired! Your buffer is being automatically submitted for evaluation...');
-              setTimeout(() => {
-                void actionsRef.current.handleSubmit();
-              }, 120);
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isTimerRunning, timeRemaining, timedMode, evalResult, isEvaluating]);
 
   const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -957,8 +615,8 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
                 setScopeWarning(warning);
               } else {
                 setScopeWarning(null);
-              }
-            }}
+              }}
+            }
             editable={!evalResult}
             readOnly={Boolean(evalResult)}
             placeholder={

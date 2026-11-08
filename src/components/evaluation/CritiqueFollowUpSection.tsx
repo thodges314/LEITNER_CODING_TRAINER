@@ -380,3 +380,4 @@ export const CritiqueFollowUpSection: React.FC<CritiqueFollowUpSectionProps> = (
     </div>
   );
 };
+

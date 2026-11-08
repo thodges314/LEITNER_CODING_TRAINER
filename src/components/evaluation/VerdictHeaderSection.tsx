@@ -348,3 +348,4 @@ export const VerdictHeaderSection: React.FC<VerdictHeaderSectionProps> = ({
     </div>
   );
 };
+
