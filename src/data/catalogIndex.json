@@ -5400,19 +5400,19 @@
   },
   {
     "id": "next-revalidation-tag-cache",
-    "title": "On-Demand ISR: Cache Tags & revalidateTag",
+    "title": "Next.js Server Actions: Data Mutation & revalidateTag",
     "track": "nextjs",
     "concept": "next-cache-revalidation",
     "difficulty": 3,
     "tags": [
       "nextjs",
       "app-router",
-      "caching",
-      "isr",
-      "revalidation",
-      "tags"
+      "server-actions",
+      "revalidateTag",
+      "revalidatePath",
+      "cache"
     ],
-    "summary": "Implement an in-memory tagged cache manager mirroring Next.js App Router on-demand revalidation"
+    "summary": "Implement an idiomatic Next.js Server Action that performs a data mutation and purges the Next.js Data Cache"
   },
   {
     "id": "next-static-params-generator",
@@ -5432,7 +5432,7 @@
   },
   {
     "id": "next-async-page-props",
-    "title": "Async Request APIs: Dynamic Params & SearchParams",
+    "title": "Next.js 15: Async Server Component Page Props",
     "track": "nextjs",
     "concept": "next-async-params",
     "difficulty": 2,
@@ -5444,7 +5444,7 @@
       "typescript",
       "nextjs-15"
     ],
-    "summary": "Implement a Next.js 15 async page props parser and search query normalizer"
+    "summary": "Implement a Next.js 15 async Server Component page that consumes asynchronous route parameters and search query params"
   },
   {
     "id": "next-async-route-handler-context",
@@ -5476,26 +5476,26 @@
       "react-node",
       "typescript"
     ],
-    "summary": "Implement Next.js App Router Layout and Template components with strict prop typing and remount coordinator"
+    "summary": "Implement Next.js App Router Layout and Template composition components"
   },
   {
     "id": "next-client-boundary-guard",
-    "title": "Next.js RSC Client Boundary Serialization Guard",
+    "title": "Next.js RSC Boundary: Safe Client Component Props",
     "track": "nextjs",
     "concept": "next-rsc-boundaries",
     "difficulty": 3,
     "tags": [
       "nextjs",
       "rsc",
-      "serialization",
+      "server-components",
       "client-components",
-      "validation"
+      "props-boundary"
     ],
-    "summary": "Implement a React Server Component (RSC) to Client Component serialization guard that validates props passed across the network boundary"
+    "summary": "Implement an async Next.js Server Component that fetches user data, safely strips sensitive server credentials, and passes client-safe props to a C..."
   },
   {
     "id": "next-parallel-intercepting-routes",
-    "title": "Next.js Parallel & Intercepting Route Evaluator",
+    "title": "Next.js Parallel Routes: Slot Layout & Modal Dismiss",
     "track": "nextjs",
     "concept": "next-intercepting-routes",
     "difficulty": 3,
@@ -5506,7 +5506,7 @@
       "intercepting-routes",
       "app-router"
     ],
-    "summary": "Implement a Next.js App Router parallel route slot and intercepting route evaluator"
+    "summary": "Implement a Next.js App Router parallel route layout and intercepting modal component"
   },
   {
     "id": "stream-event-micro-batcher",
@@ -5710,5 +5710,191 @@
       "currying"
     ],
     "summary": "Implement variadic tuple types and positional rest parameter utilities to manipulate strongly typed parameter lists"
+  },
+  {
+    "id": "next-fetch-cache-revalidate",
+    "title": "Next.js Data Fetching: Extended fetch() & ISR",
+    "track": "nextjs",
+    "concept": "next-cache-revalidation",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "caching",
+      "isr",
+      "revalidation",
+      "fetch"
+    ],
+    "summary": "Implement Next.js App Router data-fetching service functions with extended fetch() cache and revalidation options"
+  },
+  {
+    "id": "next-server-client-leaf-boundary",
+    "title": "Next.js Architecture: Move Client Components to the Leaves",
+    "track": "nextjs",
+    "concept": "next-client-components",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "rsc",
+      "client-components",
+      "architecture",
+      "react"
+    ],
+    "summary": "Implement Next.js App Router leaf Client Component and Server Component composition"
+  },
+  {
+    "id": "sql-basic-inner-join",
+    "title": "SQL Table Joins: Two-Table Inner Join",
+    "track": "sql-postgres",
+    "concept": "sql-joins",
+    "difficulty": 1,
+    "tags": [
+      "sql",
+      "postgresql",
+      "join",
+      "inner-join",
+      "foreign-key",
+      "aliases"
+    ],
+    "summary": "Write a PostgreSQL query to join customer and order tables using an inner join"
+  },
+  {
+    "id": "sql-basic-select-filter",
+    "title": "SQL Query Basics: Filter, Sort, and Limit",
+    "track": "sql-postgres",
+    "concept": "sql-query-basics",
+    "difficulty": 1,
+    "tags": [
+      "sql",
+      "postgresql",
+      "select",
+      "where",
+      "order-by",
+      "limit"
+    ],
+    "summary": "Write a PostgreSQL query to filter, sort, and paginate product inventory"
+  },
+  {
+    "id": "basic-assertion-library",
+    "title": "Basic Test Assertions: ok, equal, and throws",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 1,
+    "tags": [
+      "testing",
+      "assertions",
+      "assert",
+      "unit-testing"
+    ],
+    "summary": "Implement a foundational unit-test assertion suite providing ok, equal, and throws"
+  },
+  {
+    "id": "dom-toggle-active-class",
+    "title": "DOM Event Listener: Toggle Active Class & Aria-Expanded",
+    "track": "dom-browser",
+    "concept": "dom",
+    "difficulty": 1,
+    "tags": [
+      "dom",
+      "browser",
+      "events",
+      "class-list",
+      "aria",
+      "event-listener"
+    ],
+    "summary": "Implement a foundational DOM utility that binds a click listener to toggle an active class and synchronize aria-expanded"
+  },
+  {
+    "id": "next-link-navigation",
+    "title": "Next.js Navigation: Link & usePathname",
+    "track": "nextjs",
+    "concept": "next-navigation",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "link",
+      "navigation",
+      "usePathname",
+      "accessibility"
+    ],
+    "summary": "Implement an idiomatic Next.js App Router client navigation component demonstrating Link and usePathname"
+  },
+  {
+    "id": "tailwind-alert-banner",
+    "title": "Tailwind CSS: Alert Notification Banner Markup",
+    "track": "tailwind",
+    "concept": "tailwind-banner",
+    "difficulty": 1,
+    "tags": [
+      "tailwind",
+      "css",
+      "html",
+      "flexbox",
+      "alert",
+      "banner"
+    ],
+    "summary": "Construct an accessible alert notification banner using pure HTML markup styled with Tailwind CSS utility classes"
+  },
+  {
+    "id": "next-font-optimization",
+    "title": "Next.js Font Optimization: Google Fonts",
+    "track": "nextjs",
+    "concept": "next-fonts",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "font",
+      "optimization",
+      "google-fonts",
+      "root-layout"
+    ],
+    "summary": "Implement a Next.js App Router Root Layout configured with Google Fonts via next/font/google"
+  },
+  {
+    "id": "next-image-component",
+    "title": "Next.js Image: Fixed Dimensions & Responsive Fill",
+    "track": "nextjs",
+    "concept": "next-image",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "image",
+      "optimization",
+      "core-web-vitals",
+      "responsive"
+    ],
+    "summary": "Implement a Next.js responsive hero banner component using <Image /> from next/image"
+  },
+  {
+    "id": "next-navigation-hooks",
+    "title": "Next.js Navigation: useRouter & useSearchParams",
+    "track": "nextjs",
+    "concept": "next-navigation",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "router",
+      "navigation",
+      "hooks",
+      "client-components"
+    ],
+    "summary": "Implement a Next.js App Router client-side search filter component using useRouter, useSearchParams, and usePathname"
+  },
+  {
+    "id": "next-script-strategies",
+    "title": "Next.js Script: Loading Strategies",
+    "track": "nextjs",
+    "concept": "next-scripts",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "script",
+      "performance",
+      "optimization",
+      "third-party"
+    ],
+    "summary": "Implement a Next.js third-party script manager component using <Script /> from next/script"
   }
 ]

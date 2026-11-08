@@ -1,0 +1,13 @@
+{
+  "title": "Next.js Font Optimization: Google Fonts",
+  "track": "nextjs",
+  "tags": [
+    "nextjs",
+    "font",
+    "optimization",
+    "google-fonts",
+    "root-layout"
+  ],
+  "requiresDom": true
+}
+

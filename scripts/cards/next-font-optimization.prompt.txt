@@ -1,0 +1,21 @@
+Implement a Next.js App Router Root Layout configured with Google Fonts via `next/font/google`:
+
+## Description
+
+### Application Context
+In Next.js, `next/font/google` automatically optimizes fonts at build time by inlining font CSS and downloading font files with the rest of your static assets. This eliminates external network requests to Google at runtime and prevents Cumulative Layout Shift (CLS). A font instance (such as `Inter`) exposes `.className` for direct styling and `.variable` for defining CSS variables across the DOM tree.
+
+```ts
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+```
+
+### Setup & Component
+
+- **Font Configuration**:
+  - Initializes `inter` via `Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })`.
+- **`RootLayout({ children }: RootLayoutProps): React.ReactElement`**:
+  - Renders an `<html lang="en">` tag with `className={inter.variable}`.
+  - Inside `<html>`, renders `<body className={inter.className} data-testid="root-body">{children}</body>`.
+

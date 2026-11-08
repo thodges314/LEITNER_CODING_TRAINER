@@ -1,74 +1,91 @@
 await (async () => {
-  const fn = typeof evaluateInterceptingRoute === 'function'
-    ? evaluateInterceptingRoute
-    : (typeof solution === 'function' ? solution : solution?.evaluateInterceptingRoute);
+  const { render, q, fire } = $dom;
 
-  const def1 = {
-    routePattern: '/feed/@modal/(..)photo/[id]',
-    slotName: 'modal',
-    targetPattern: '/photo/[id]',
-  };
+  const LayoutComp = typeof FeedLayout === 'function' ? FeedLayout : (typeof solution === 'object' && solution?.FeedLayout);
+  const ModalComp = typeof PhotoModal === 'function' ? PhotoModal : (typeof solution === 'object' && solution?.PhotoModal);
 
-  // Case 1: Soft navigation intercepts photo route inside @modal slot
-  const r1 = fn(def1, {
-    currentPath: '/feed',
-    targetUrl: '/photo/42',
-    isSoftNavigation: true,
-  });
+  const case1 = 'FeedLayout renders children and parallel modal slot when modal prop is present';
+  const case2 = 'FeedLayout omits modal slot container when modal prop is absent';
+  const case3 = 'PhotoModal renders dialog with photo image and close button';
+  const case4 = 'Clicking close button triggers router.back() and optional onDismiss callback';
+
+  if (!LayoutComp || !ModalComp) {
+    $test.check(case1, false, { error: 'FeedLayout or PhotoModal is not defined' });
+    $test.check(case2, false, { error: 'FeedLayout or PhotoModal is not defined' });
+    $test.check(case3, false, { error: 'FeedLayout or PhotoModal is not defined' });
+    $test.check(case4, false, { error: 'FeedLayout or PhotoModal is not defined' });
+    return;
+  }
+
+  // Case 1: FeedLayout with modal
+  const { container: c1 } = render(
+    React.createElement(
+      LayoutComp,
+      { modal: React.createElement('div', { 'data-testid': 'mock-modal' }, 'Modal Content') },
+      React.createElement('div', { 'data-testid': 'feed-list' }, 'Feed Items')
+    )
+  );
+  const feedContent = q('[data-testid="feed-content"]', c1);
+  const modalSlot = q('[data-testid="modal-slot"]', c1);
   $test.check(
-    'Soft navigation intercepts target route into modal slot with params',
-    r1.isIntercepted === true &&
-      r1.activeSlot === 'modal' &&
-      r1.renderedPattern === '/feed/@modal/(..)photo/[id]' &&
-      r1.params.id === '42',
-    { isIntercepted: r1.isIntercepted, params: r1.params }
+    case1,
+    feedContent !== null && modalSlot !== null && modalSlot.textContent.includes('Modal Content') && feedContent.textContent.includes('Feed Items'),
+    { hasFeed: !!feedContent, hasSlot: !!modalSlot }
   );
 
-  // Case 2: Hard navigation (page refresh or direct URL) renders standalone target
-  const r2 = fn(def1, {
-    currentPath: '/feed',
-    targetUrl: '/photo/42',
-    isSoftNavigation: false,
-  });
+  // Case 2: FeedLayout without modal
+  const { container: c2 } = render(
+    React.createElement(
+      LayoutComp,
+      null,
+      React.createElement('div', null, 'Solo Feed')
+    )
+  );
+  const absentSlot = q('[data-testid="modal-slot"]', c2);
   $test.check(
-    'Hard navigation does not intercept and renders standalone target pattern',
-    r2.isIntercepted === false &&
-      r2.activeSlot === undefined &&
-      r2.renderedPattern === '/photo/[id]' &&
-      r2.params.id === '42',
-    { isIntercepted: r2.isIntercepted, renderedPattern: r2.renderedPattern }
+    case2,
+    absentSlot === null,
+    { absentSlot }
   );
 
-  // Case 3: Root interception (...) from deeply nested path
-  const defRoot = {
-    routePattern: '/dashboard/analytics/@drawer/(...)photo/[id]',
-    slotName: 'drawer',
-    targetPattern: '/photo/[id]',
-  };
-  const r3 = fn(defRoot, {
-    currentPath: '/dashboard/analytics',
-    targetUrl: '/photo/99',
-    isSoftNavigation: true,
-  });
+  // Case 3: PhotoModal rendering
+  const { container: c3 } = render(
+    React.createElement(ModalComp, { id: 'pic-42', photoUrl: 'https://images.example.com/pic-42.jpg' })
+  );
+  const dialogEl = q('[data-testid="photo-modal"]', c3);
+  const imgEl = q('[data-testid="modal-photo"]', c3);
+  const closeBtn = q('[data-testid="modal-close"]', c3);
   $test.check(
-    'Root interceptor (...) triggers modal slot from nested path',
-    r3.isIntercepted === true &&
-      r3.activeSlot === 'drawer' &&
-      r3.params.id === '99',
-    { isIntercepted: r3.isIntercepted, activeSlot: r3.activeSlot }
+    case3,
+    dialogEl !== null &&
+      dialogEl.classList.contains('modal-dialog') &&
+      imgEl?.getAttribute('src') === 'https://images.example.com/pic-42.jpg' &&
+      imgEl?.getAttribute('alt') === 'Photo pic-42' &&
+      imgEl?.getAttribute('data-next-image') === 'true' &&
+      closeBtn !== null,
+    { hasDialog: !!dialogEl, src: imgEl?.getAttribute('src'), isNextImage: imgEl?.getAttribute('data-next-image') }
   );
 
-  // Case 4: Non-matching target URL returns not intercepted with empty params
-  const r4 = fn(def1, {
-    currentPath: '/feed',
-    targetUrl: '/articles/tech-trends',
-    isSoftNavigation: true,
-  });
+  // Case 4: Close button interaction
+  let dismissed: boolean = false;
+  let backCount = 0;
+  const mockBack = () => { backCount++; };
+  setMockRouter({ back: mockBack });
+
+  const { container: c4 } = render(
+    React.createElement(ModalComp, {
+      id: 'pic-99',
+      photoUrl: 'https://images.example.com/pic-99.jpg',
+      onDismiss: () => { dismissed = true; },
+    })
+  );
+  const closeBtn4 = q('[data-testid="modal-close"]', c4);
+  if (closeBtn4) {
+    fire.click(closeBtn4);
+  }
   $test.check(
-    'Target URL not matching route pattern returns false with empty params',
-    r4.isIntercepted === false &&
-      Object.keys(r4.params).length === 0,
-    { isIntercepted: r4.isIntercepted, params: r4.params }
+    case4,
+    Boolean(dismissed) && backCount === 1,
+    { dismissed, backCount }
   );
 })();
-

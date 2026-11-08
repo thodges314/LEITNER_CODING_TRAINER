@@ -1,0 +1,15 @@
+{
+  "track": "nextjs",
+  "title": "Next.js Architecture: Move Client Components to the Leaves",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "rsc",
+    "client-components",
+    "architecture",
+    "react"
+  ],
+  "rendersComponent": true,
+  "requiresDom": true,
+  "previewLibraries": ["react", "tailwind"]
+}

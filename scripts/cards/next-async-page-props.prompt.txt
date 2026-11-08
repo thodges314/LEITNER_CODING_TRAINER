@@ -1,50 +1,30 @@
-Implement a Next.js 15 async page props parser and search query normalizer:
+Implement a Next.js 15 async Server Component page that consumes asynchronous route parameters and search query params:
 
 ## Description
 
 ### Application Context
-In a modern Next.js 15 product catalog (`app/shop/[category]/page.tsx`), page and layout components receive `params` and `searchParams` as asynchronous Promises (`Promise<Params>`). You are implementing a Server Component helper that awaits both promises and safely normalizes search query parameters (handling both scalar strings and duplicate query arrays like `?sort=asc&tag=shoes&tag=sale`).
+In Next.js 15 (`app/shop/[category]/page.tsx`), page and layout components receive dynamic route `params` and `searchParams` as asynchronous `Promise` objects. You are building an authentic async Server Component page that awaits both promises, normalizes query values, and renders structured semantic UI.
 
 ```ts
 type SearchParamsValue = string | string[] | undefined;
 
-interface RawPageProps {
+interface PageProps {
   params: Promise<{ category: string }>;
   searchParams: Promise<Record<string, SearchParamsValue>>;
 }
-
-interface NormalizedPageData {
-  category: string;
-  filters: {
-    tags: string[];
-    sort: string;
-    page: number;
-  };
-}
 ```
 
-### `parseAsyncPageProps(props: RawPageProps): Promise<NormalizedPageData>`
+### `CategoryPage({ params, searchParams }: PageProps): Promise<React.ReactElement>`
 
-- **Await Async Parameters**:
-  - Awaits `props.params` to resolve `{ category: string }`.
-  - Awaits `props.searchParams` to resolve `Record<string, SearchParamsValue>`.
-- **Category Processing**:
-  - Sets `category` to the resolved category string trimmed. If missing, defaults to `'all'`.
-- **Query Filter Normalization**:
-  - **`tags`**:
-    - Reads key `'tag'` or `'tags'` from searchParams.
-    - If passed as an array of strings: filters out non-string or empty items, returning the trimmed strings.
-    - If passed as a single string: wraps it in a single-element array `[val.trim()]`.
-    - If omitted or undefined: defaults to `[]`.
-  - **`sort`**:
-    - Reads key `'sort'`.
-    - If passed as a single non-empty string: uses it trimmed.
-    - If passed as an array: takes the first non-empty string trimmed.
-    - If omitted or empty: defaults to `'featured'`.
-  - **`page`**:
-    - Reads key `'page'`.
-    - If passed as a single string: parses with `parseInt(val, 10)`. If positive integer (`p >= 1`), uses `p`; otherwise defaults to `1`.
-    - If passed as an array: parses the first item.
-    - If omitted or non-numeric: defaults to `1`.
-- Returns `{ category, filters: { tags, sort, page } }`.
-
+- **Awaits Async Arguments**:
+  - Awaits `params` to resolve the dynamic route parameters `{ category: string }`.
+  - Awaits `searchParams` to resolve query parameter records.
+- **Normalization**:
+  - **Category**: Reads `category` from resolved `params`. If missing or empty, defaults to `'all'`.
+  - **Sort**: Reads `sort` from `searchParams`. If passed as an array, takes the first non-empty string. If omitted or empty, defaults to `'featured'`.
+  - **Page**: Reads `page` from `searchParams`. If passed as an array, takes the first string. Parses as integer; if positive (`>= 1`), uses that number, otherwise defaults to `1`.
+- **Render Output**:
+  - Returns a `<main data-testid="category-page">` container rendering:
+    - `<h1 data-testid="category-title">{category}</h1>`
+    - `<span data-testid="sort-value">{sort}</span>`
+    - `<span data-testid="page-value">{page}</span>`

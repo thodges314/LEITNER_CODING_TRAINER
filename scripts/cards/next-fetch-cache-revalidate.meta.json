@@ -1,0 +1,13 @@
+{
+  "track": "nextjs",
+  "title": "Next.js Data Fetching: Extended fetch() & ISR",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "caching",
+    "isr",
+    "revalidation",
+    "fetch"
+  ],
+  "requiresDom": false
+}

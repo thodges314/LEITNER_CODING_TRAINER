@@ -1,0 +1,13 @@
+{
+  "title": "Next.js Navigation: useRouter & useSearchParams",
+  "track": "nextjs",
+  "tags": [
+    "nextjs",
+    "router",
+    "navigation",
+    "hooks",
+    "client-components"
+  ],
+  "requiresDom": true
+}
+

@@ -1,0 +1,37 @@
+Implement a Next.js responsive hero banner component using `<Image />` from `next/image`:
+
+## Description
+
+### Application Context
+In Next.js applications, the `<Image />` component (`next/image`) extends the native `<img>` element with automatic image optimization, layout shift prevention (CLS), and responsive sizing. When dimensions are known upfront, passing explicit `width` and `height` properties reserves space in the document before download. When rendering fluid background or banner images where dimensions are unknown or CSS-driven, passing `fill` alongside a container and responsive `sizes` string allows Next.js to deliver correctly sized responsive images.
+
+```ts
+interface HeroBannerProps {
+  src: string;
+  alt: string;
+  priority?: boolean;
+  fill?: boolean;
+  width?: number;
+  height?: number;
+}
+```
+
+### `HeroBanner({ src, alt, priority, fill, width = 800, height = 400 }: HeroBannerProps): React.ReactElement`
+
+- **Responsive Fill Mode (`fill === true`)**:
+  - Renders a container `<div className="relative aspect-video">` containing an `<Image />`.
+  - Configures `<Image />` with:
+    - `src={src}`
+    - `alt={alt}`
+    - `fill={true}`
+    - `priority={Boolean(priority)}`
+    - `sizes="(max-width: 768px) 100vw, 50vw"`
+- **Fixed Dimension Mode (`fill !== true`)**:
+  - Renders a container `<div className="image-wrapper">` containing an `<Image />`.
+  - Configures `<Image />` with:
+    - `src={src}`
+    - `alt={alt}`
+    - `width={width}`
+    - `height={height}`
+    - `priority={Boolean(priority)}`
+

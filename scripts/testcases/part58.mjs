@@ -4,24 +4,24 @@ const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by Next.js 
 export default {
   'next-async-page-props': [
     r(
-      'Resolves promises and parses single-string query params',
-      'parseAsyncPageProps({ params: Promise.resolve({ category: "shoes" }), searchParams: Promise.resolve({ tag: "running", sort: "price_asc", page: "3" }) })',
-      '{ category: "shoes", filters: { tags: ["running"], sort: "price_asc", page: 3 } }'
+      'Awaits params and searchParams to render category title, sort, and page',
+      '<CategoryPage params={Promise.resolve({ category: "shoes" })} searchParams={Promise.resolve({ sort: "price_asc", page: "3" })} />',
+      'renders category title "shoes", sort "price_asc", and page "3"'
     ),
     r(
-      'Normalizes multi-value array query params into trimmed string array',
-      'parseAsyncPageProps({ params: Promise.resolve({ category: "apparel" }), searchParams: Promise.resolve({ tag: ["shoes", "sale"] }) })',
-      '{ category: "apparel", filters: { tags: ["shoes", "sale"] } }'
+      'Selects first valid sort entry and clamps invalid page to 1',
+      '<CategoryPage params={Promise.resolve({ category: "electronics" })} searchParams={Promise.resolve({ sort: ["rating_desc", "price_asc"], page: "-2" })} />',
+      'renders category title "electronics", sort "rating_desc", and page "1"'
     ),
     r(
-      'Applies safe defaults when searchParams is empty',
-      'parseAsyncPageProps({ params: Promise.resolve({ category: "gear" }), searchParams: Promise.resolve({}) })',
-      '{ category: "gear", filters: { tags: [], sort: "featured", page: 1 } }'
+      'Applies safe defaults (category: all, sort: featured, page: 1) when values are missing',
+      '<CategoryPage params={Promise.resolve({ category: "" })} searchParams={Promise.resolve({})} />',
+      'renders category title "all", sort "featured", and page "1"'
     ),
     r(
-      'Selects first valid sort entry and clamps negative page to 1',
-      'parseAsyncPageProps({ params: Promise.resolve({ category: "electronics" }), searchParams: Promise.resolve({ sort: ["rating_desc", "price_asc"], page: "-2" }) })',
-      '{ category: "electronics", filters: { sort: "rating_desc", page: 1 } }'
+      'Parses multi-digit page numbers and single sort parameter',
+      '<CategoryPage params={Promise.resolve({ category: "books" })} searchParams={Promise.resolve({ sort: "newest", page: "12" })} />',
+      'renders category title "books", sort "newest", and page "12"'
     ),
   ],
 
@@ -50,24 +50,24 @@ export default {
 
   'next-layout-template-composition': [
     r(
-      'DashboardLayout renders children inside data-testid="dashboard-layout"',
+      'DashboardLayout renders children inside data-testid="dashboard-layout" with header shell',
       '<DashboardLayout><span>Layout Content</span></DashboardLayout>',
-      'renders children in layout container'
+      'renders children and header inside dashboard-layout'
     ),
     r(
-      'DashboardTemplate renders children inside data-testid="dashboard-template"',
+      'DashboardTemplate renders children inside data-testid="dashboard-template" with template-enter class',
       '<DashboardTemplate><span>Template Content</span></DashboardTemplate>',
-      'renders children in template container'
+      'renders children inside template-enter wrapper'
     ),
     r(
-      'shouldRemountLayout preserves layout across sibling routes and remounts across roots',
-      'coordinator.shouldRemountLayout("/dashboard/analytics", "/dashboard/settings")',
-      'false (preserves layout state)'
+      'DashboardRoot nests DashboardTemplate with key={pathname} inside DashboardLayout',
+      '<DashboardRoot pathname="/dashboard/analytics"><Page /></DashboardRoot>',
+      'renders nested Layout and Template with pathname key'
     ),
     r(
-      'shouldRemountTemplate triggers on navigation and produces distinct template keys',
-      'coordinator.shouldRemountTemplate("/dashboard/analytics", "/dashboard/settings")',
-      'true (forces template remount)'
+      'DashboardRoot updates template key on route change while maintaining layout wrapper',
+      '<DashboardRoot pathname="/dashboard/settings"><Page /></DashboardRoot>',
+      'updates template key to /dashboard/settings'
     ),
   ],
 };

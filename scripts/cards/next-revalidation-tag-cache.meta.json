@@ -1,14 +1,13 @@
 {
   "track": "nextjs",
-  "title": "On-Demand ISR: Cache Tags & revalidateTag",
+  "title": "Next.js Server Actions: Data Mutation & revalidateTag",
   "tags": [
     "nextjs",
     "app-router",
-    "caching",
-    "isr",
-    "revalidation",
-    "tags"
+    "server-actions",
+    "revalidateTag",
+    "revalidatePath",
+    "cache"
   ],
-  "requiresDom": false
+  "requiresDom": true
 }
-

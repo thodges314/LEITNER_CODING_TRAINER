@@ -1,90 +1,105 @@
 await (async () => {
-  const fn = typeof validateClientBoundaryProps === 'function'
-    ? validateClientBoundaryProps
-    : (typeof solution === 'function' ? solution : solution?.validateClientBoundaryProps);
+  const { render, q } = $dom;
 
-  // Case 1: Valid primitive and Date props
-  const validProps = {
-    title: 'Modern Next.js',
-    views: 1250,
-    isPublished: true,
-    publishedAt: new Date('2026-01-15T12:00:00.000Z'),
-    tags: ['react', 'nextjs'],
-    author: {
-      id: 'usr_42',
-      name: 'Taylor',
+  const Comp = typeof UserProfileContainer === 'function'
+    ? UserProfileContainer
+    : (typeof solution === 'function' ? solution : (typeof solution === 'object' && solution?.UserProfileContainer));
+
+  const case1 = 'Awaits fetchUser(userId) and renders <UserBadge> inside user-profile-boundary';
+  const case2 = 'Retains Date object on createdAt across the RSC boundary';
+  const case3 = 'Never exposes passwordHash or apiSecret in UserBadge props';
+  const case4 = 'Invokes notFound() when fetchUser returns null';
+
+  if (typeof Comp !== 'function') {
+    $test.check(case1, false, { error: 'UserProfileContainer is not defined' });
+    $test.check(case2, false, { error: 'UserProfileContainer is not defined' });
+    $test.check(case3, false, { error: 'UserProfileContainer is not defined' });
+    $test.check(case4, false, { error: 'UserProfileContainer is not defined' });
+    return;
+  }
+
+  const d1 = new Date('2026-03-01T10:00:00.000Z');
+  let fetchUserArg: string | null = null;
+  const mockUser = {
+    id: 'user-77',
+    name: 'Sarah Connor',
+    email: 'sarah@resistance.org',
+    role: 'commander',
+    passwordHash: '$2b$12$superSecretHashValue99',
+    apiSecret: 'mock_server_secret_key_abc123',
+    createdAt: d1,
+  };
+
+  // Case 1: Awaits fetchUser and renders boundary container and UserBadge
+  const element1 = await Comp({
+    userId: 'user-77',
+    fetchUser: async (id: string) => {
+      fetchUserArg = id;
+      return mockUser;
     },
-  };
-  const r1 = fn(validProps);
+  });
+
+  const { container: c1 } = render(element1);
+  const boundaryEl = q('[data-testid="user-profile-boundary"]', c1);
+  const badgeEl = q('[data-testid="user-badge"]', c1);
+
   $test.check(
-    'Valid props pass and Dates are sanitized to ISO strings',
-    r1.valid === true &&
-      r1.errors.length === 0 &&
-      r1.sanitizedProps?.publishedAt === '2026-01-15T12:00:00.000Z' &&
-      r1.sanitizedProps?.title === 'Modern Next.js',
-    { valid: r1.valid, sanitized: r1.sanitizedProps }
+    case1,
+    fetchUserArg === 'user-77' &&
+      boundaryEl !== null &&
+      badgeEl !== null &&
+      badgeEl.textContent === 'Sarah Connor',
+    { fetchUserArg, hasBoundary: !!boundaryEl, hasBadge: !!badgeEl }
   );
 
-  // Case 2: Function rejected
-  const fnProps = {
-    onClick: () => {},
-    label: 'Submit',
-  };
-  const r2 = fn(fnProps);
-  let fnErr = null;
-  for (const err of r2.errors) {
-    if (err.type === 'function') {
-      fnErr = err;
-      break;
-    }
+  // Case 2: Inspect props passed to UserBadge to verify Date instance retention
+  // In element1, boundaryEl is a div whose child is UserBadge
+  let userBadgeProps: any = null;
+  if (element1 && element1.props && element1.props.children) {
+    const child = element1.props.children;
+    userBadgeProps = child.props?.user;
   }
+
   $test.check(
-    'Function prop is rejected with clear error path',
-    r2.valid === false && fnErr !== null && fnErr.path === 'onClick',
-    { valid: r2.valid, errors: r2.errors }
+    case2,
+    userBadgeProps !== null &&
+      userBadgeProps.createdAt instanceof Date &&
+      userBadgeProps.createdAt.getTime() === d1.getTime() &&
+      userBadgeProps.id === 'user-77' &&
+      userBadgeProps.role === 'commander',
+    { isDate: userBadgeProps?.createdAt instanceof Date, userBadgeProps }
   );
 
-  // Case 3: Custom class instance rejected
-  class CustomModel {
-    name = 'secret';
-  }
-  const classProps = {
-    user: new CustomModel(),
-  };
-  const r3 = fn(classProps);
-  let classErr = null;
-  for (const err of r3.errors) {
-    if (err.type === 'class_instance') {
-      classErr = err;
-      break;
-    }
-  }
+  // Case 3: Verify passwordHash and apiSecret are stripped completely
+  const hasPasswordHash = userBadgeProps ? 'passwordHash' in userBadgeProps : false;
+  const hasApiSecret = userBadgeProps ? 'apiSecret' in userBadgeProps : false;
+
   $test.check(
-    'Non-plain class instance is rejected with class name',
-    r3.valid === false &&
-      classErr !== null &&
-      classErr.path === 'user' &&
-      classErr.message.includes('CustomModel'),
-    { valid: r3.valid, errors: r3.errors }
+    case3,
+    userBadgeProps !== null &&
+      !hasPasswordHash &&
+      !hasApiSecret &&
+      userBadgeProps.passwordHash === undefined &&
+      userBadgeProps.apiSecret === undefined,
+    { hasPasswordHash, hasApiSecret }
   );
 
-  // Case 4: Circular reference in nested array/object detected
-  const circularObj = { name: 'root', self: null as unknown };
-  circularObj.self = circularObj;
-  const circularProps = {
-    node: circularObj,
-  };
-  const r4 = fn(circularProps);
-  let circErr = null;
-  for (const err of r4.errors) {
-    if (err.type === 'circular_reference') {
-      circErr = err;
-      break;
+  // Case 4: When fetchUser returns null, invokes notFound()
+  let caughtNotFound = false;
+  try {
+    await Comp({
+      userId: 'user-unknown',
+      fetchUser: async () => null,
+    });
+  } catch (err: any) {
+    if (err && (err.name === 'NextNotFoundError' || String(err).includes('NextNotFoundError') || String(err).includes('NEXT_NOT_FOUND'))) {
+      caughtNotFound = true;
     }
   }
+
   $test.check(
-    'Circular reference is detected and reported with path',
-    r4.valid === false && circErr !== null && circErr.path === 'node.self',
-    { valid: r4.valid, errors: r4.errors }
+    case4,
+    caughtNotFound === true,
+    { caughtNotFound }
   );
 })();

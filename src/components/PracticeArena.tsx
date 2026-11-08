@@ -610,6 +610,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       console: customConsole,
       mount,
       reactDOM: customReactDOM,
+      cardId: currentCard?.id,
     });
 
     try {

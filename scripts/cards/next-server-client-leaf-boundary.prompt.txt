@@ -1,0 +1,55 @@
+Implement Next.js App Router leaf Client Component and Server Component composition:
+
+## Description
+
+### Application Context
+In the Next.js App Router, all components in the `app/` directory are React Server Components (RSCs) by default. A frequent architectural pitfall is marking an entire page or large card component with `'use client'` simply because a single interactive button needs state or an event listener. Adding `'use client'` at a high level pulls the entire component subtree and all its dependencies into the client JavaScript bundle.
+
+The official Next.js best practice is: **Move Client Components to the Leaves**. Keep data-fetching container components as Server Components, and extract client-side interactivity (event listeners, `useState`) into small, focused leaf components.
+
+> [!NOTE] Single-File Sandbox & Module Architecture
+> In a production Next.js application, `FavoriteButton` lives in its own file (`components/FavoriteButton.tsx`) starting with `'use client'`, while `ProductCard` remains in a Server Component file (`components/ProductCard.tsx`) without `'use client'`. Because Server Components cannot accept function callbacks across the network boundary, `ProductCardProps` accepts strictly serializable data.
+> In this single-file exercise, do NOT add `'use client'` at the top of the buffer—`FavoriteButton` represents the interactive client leaf embedded inside the static server container.
+
+```ts
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+}
+
+interface FavoriteButtonProps {
+  productId: string;
+  initialFavorited?: boolean;
+  onToggle?: (productId: string, favorited: boolean) => void;
+}
+
+interface ProductCardProps {
+  product: Product;
+  initialFavorited?: boolean;
+}
+```
+
+### `FavoriteButton({ productId, initialFavorited = false, onToggle }: FavoriteButtonProps): React.ReactElement`
+
+A focused interactive leaf Client Component (representing `'use client'`):
+- **Local State**: Initializes boolean `favorited` state from `initialFavorited` (defaults to `false`).
+- **Render Output**:
+  - Renders a `<button>` element with:
+    - `type="button"`
+    - `data-testid="favorite-button"`
+    - `aria-pressed={favorited}`
+    - `className={favorited ? 'favorited' : ''}`
+    - Text label: `favorited ? 'Favorited' : 'Add to Favorites'`
+- **Interaction**:
+  - `onClick`: Toggles `favorited` state and invokes `onToggle?.(productId, nextFavorited)` with the new favorited boolean.
+
+### `ProductCard({ product, initialFavorited = false }: ProductCardProps): React.ReactElement`
+
+A Server Component container that renders static product data server-side and embeds the leaf client component:
+- **Render Output**:
+  - Renders an `<article>` container with `data-testid="product-card"`.
+  - Inside the article:
+    - An `<h3>` element with `data-testid="product-title"` displaying `product.name`.
+    - A `<p>` element with `data-testid="product-price"` displaying `$${product.price}`.
+    - An embedded `<FavoriteButton>` passing `productId={product.id}` and `initialFavorited={initialFavorited}`.

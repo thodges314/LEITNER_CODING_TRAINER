@@ -1,0 +1,29 @@
+Implement a Next.js third-party script manager component using `<Script />` from `next/script`:
+
+## Description
+
+### Application Context
+In Next.js applications, the `<Script />` component (`next/script`) optimizes third-party script loading to improve Core Web Vitals (such as LCP and INP). It provides explicit loading strategies:
+- `afterInteractive` (default): Loads immediately after the page becomes interactive. Ideal for essential analytics (e.g. Google Analytics or Tag Manager).
+- `lazyOnload`: Loads lazily during browser idle time. Ideal for non-critical resources (e.g. live chat widgets, support popups, or social feeds).
+- `beforeInteractive`: Inlines and executes before Next.js code and page hydration.
+
+```ts
+interface AnalyticsScriptsProps {
+  analyticsId: string;
+}
+```
+
+### `AnalyticsScripts({ analyticsId }: AnalyticsScriptsProps): React.ReactElement`
+
+- **Renders Container**:
+  - Renders a `<div data-testid="scripts-container">` containing two `<Script />` components.
+- **Analytics Script**:
+  - Sets `src={`https://analytics.example.com/tag.js?id=${encodeURIComponent(analyticsId)}`}`.
+  - Sets `strategy="afterInteractive"`.
+  - Sets `data-testid="analytics-script"`.
+- **Chat Widget Script**:
+  - Sets `src="https://chat.example.com/widget.js"`.
+  - Sets `strategy="lazyOnload"`.
+  - Sets `data-testid="chat-widget-script"`.
+

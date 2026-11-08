@@ -1,0 +1,13 @@
+{
+  "track": "dom-browser",
+  "title": "DOM Event Listener: Toggle Active Class & Aria-Expanded",
+  "tags": [
+    "dom",
+    "browser",
+    "events",
+    "class-list",
+    "aria",
+    "event-listener"
+  ],
+  "requiresDom": true
+}

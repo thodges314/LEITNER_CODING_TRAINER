@@ -1,0 +1,48 @@
+Implement a foundational DOM utility that binds a click listener to toggle an active class and synchronize aria-expanded:
+
+## Description
+
+### Application Context
+When building accessible interactive widgets without a heavy framework (`nav/disclosure.ts`), developers frequently need a clean vanilla DOM helper to bind a trigger button to a target drawer, panel, or menu, toggling an active class while keeping ARIA attributes synchronized. You are implementing a DOM binding controller.
+
+```ts
+interface ToggleBindingOptions {
+  triggerId: string;
+  targetId: string;
+  activeClass?: string;
+  initialExpanded?: boolean;
+}
+
+interface ToggleBindingController {
+  isExpanded(): boolean;
+  destroy(): void;
+}
+```
+
+### `bindClassToggle(options: ToggleBindingOptions): ToggleBindingController`
+
+Finds the trigger and target DOM elements by ID, initializes their state, and wires a click listener:
+
+- **Element Lookup & Validation**:
+  - Finds the trigger element with `document.getElementById(options.triggerId)` and target element with `document.getElementById(options.targetId)`.
+  - If either element is not found in the DOM, throws `new Error('Required element not found')`.
+- **Configuration Defaults**:
+  - `activeClass`: Defaults to `'active'`.
+  - `initialExpanded`: Defaults to `false`.
+- **Initial State Setup**:
+  - If `initialExpanded` is `true`:
+    - Adds `activeClass` to `target.classList`.
+    - Sets `trigger.setAttribute('aria-expanded', 'true')`.
+  - If `initialExpanded` is `false`:
+    - Removes `activeClass` from `target.classList`.
+    - Sets `trigger.setAttribute('aria-expanded', 'false')`.
+- **Event Handling**:
+  - Listens for `'click'` events on the trigger element.
+  - On click:
+    - Toggles `activeClass` on `target.classList`.
+    - Reads whether `target.classList.contains(activeClass)`.
+    - Updates `trigger.setAttribute('aria-expanded', String(isNowActive))`.
+- **Return Controller**:
+  - Returns an object implementing `ToggleBindingController`:
+    - **`isExpanded(): boolean`**: Returns `target.classList.contains(activeClass)`.
+    - **`destroy(): void`**: Removes the `'click'` event listener from the trigger element using `removeEventListener` so subsequent clicks no longer mutate state.

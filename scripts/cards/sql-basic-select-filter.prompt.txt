@@ -1,0 +1,40 @@
+Write a PostgreSQL query to filter, sort, and paginate product inventory:
+
+## Description
+
+### Application Context
+In a retail database (`inventory/products`), you need to retrieve in-stock electronics for a featured catalog section.
+
+```ts
+interface ProductRecord {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+}
+
+interface ProductFilterResult {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+}
+```
+
+### Table Schema
+
+- **`products`**:
+  - `id`: `INT` (Primary Key)
+  - `name`: `VARCHAR(50)`
+  - `category`: `VARCHAR(50)`
+  - `price`: `INT`
+  - `stock`: `INT`
+
+### Requirements
+
+Write a SQL query string assigned to `const query`:
+- **Projection**: Select `id`, `name`, `price`, and `stock` from `products`.
+- **Filter**: Include only products where `category = 'Electronics'` and `stock > 0`.
+- **Sort**: Order results by `price ASC` (cheapest first). For items with identical price, break ties by `name ASC` alphabetically.
+- **Pagination**: Limit the output to the first `3` records.

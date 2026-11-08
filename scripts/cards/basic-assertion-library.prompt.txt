@@ -1,0 +1,32 @@
+Implement a foundational unit-test assertion suite providing ok, equal, and throws:
+
+## Description
+
+### Application Context
+When building testing frameworks or writing custom assertions (`test/assert.ts`), developers need primitive assertion helpers to verify state and validate thrown errors without relying on heavy external dependencies. You are implementing a lightweight assertion runner factory.
+
+```ts
+interface AssertionSuite {
+  ok(value: unknown, message?: string): void;
+  equal(actual: unknown, expected: unknown, message?: string): void;
+  throws(fn: () => void, expectedError?: string | RegExp): void;
+}
+```
+
+### `createAssert(): AssertionSuite`
+
+Returns an object with three assertion methods:
+
+- **`ok(value: unknown, message?: string): void`**:
+  - Asserts that `value` is truthy.
+  - If falsy (e.g. `false`, `0`, `""`, `null`, `undefined`, `NaN`), throws `new Error(message || 'Expected truthy value')`.
+- **`equal(actual: unknown, expected: unknown, message?: string): void`**:
+  - Compares `actual` and `expected` using `Object.is(actual, expected)`.
+  - If not equal, throws `new Error(message || 'Values are not equal')`.
+- **`throws(fn: () => void, expectedError?: string | RegExp): void`**:
+  - Executes `fn()`.
+  - If `fn` finishes without throwing an error, throws `new Error('Expected function to throw')`.
+  - If `fn` throws an error `err`:
+    - If `expectedError` is a `string`: verifies `err.message` contains `expectedError`. If not, throws `new Error('Error message did not match string')`.
+    - If `expectedError` is a `RegExp`: verifies `expectedError.test(err.message)` is `true`. If not, throws `new Error('Error message did not match pattern')`.
+    - If `expectedError` is omitted or `undefined`: passes silently.

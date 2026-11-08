@@ -81,6 +81,12 @@ export type LineGroup =
   | { type: 'ul'; items: MarkdownListItem[] }
   | { type: 'ol'; items: MarkdownListItem[] }
   | { type: 'table'; headers: string[]; rows: string[][] }
+  | {
+      type: 'blockquote';
+      lines: string[];
+      alertType?: 'note' | 'tip' | 'important' | 'warning' | 'caution';
+      alertTitle?: string;
+    }
   | { type: 'text'; lines: string[] };
 
 const isTableDelimiter = (line: string): boolean => {
@@ -148,6 +154,37 @@ export const parseParagraphLines = (para: string): LineGroup[] => {
         level: headingMatch[1].length,
         text: headingMatch[2],
       });
+      continue;
+    }
+
+    // Blockquote (> or > [!NOTE])
+    const blockquoteMatch = line.match(/^[ \t]*>[ \t]?(.*)$/);
+    if (blockquoteMatch) {
+      ulStack = [];
+      olStack = [];
+      const content = blockquoteMatch[1];
+      const lastGroup = groups[groups.length - 1];
+
+      if (lastGroup && lastGroup.type === 'blockquote') {
+        lastGroup.lines.push(content);
+      } else {
+        const alertMatch = content.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*(.*)$/i);
+        if (alertMatch) {
+          const alertType = alertMatch[1].toLowerCase() as 'note' | 'tip' | 'important' | 'warning' | 'caution';
+          const alertTitle = alertMatch[2].trim() || (alertType.charAt(0).toUpperCase() + alertType.slice(1));
+          groups.push({
+            type: 'blockquote',
+            alertType,
+            alertTitle,
+            lines: [],
+          });
+        } else {
+          groups.push({
+            type: 'blockquote',
+            lines: [content],
+          });
+        }
+      }
       continue;
     }
 

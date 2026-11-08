@@ -213,4 +213,34 @@ const x = 42;
     const br = container.querySelector('td br');
     expect(br).not.toBeNull();
   });
+
+  it('renders standard blockquotes', () => {
+    const text = `> **Important**: Do not use \`BigInt\` or \`Number()\` on whole strings; process digit by digit.`;
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const bq = container.querySelector('.markdown-blockquote');
+    expect(bq).not.toBeNull();
+    expect(bq?.textContent).toContain('Important: Do not use BigInt or Number() on whole strings; process digit by digit.');
+    expect(bq?.querySelector('strong')?.textContent).toBe('Important');
+    expect(bq?.querySelector('code')?.textContent).toBe('BigInt');
+  });
+
+  it('renders GitHub-style alerts with custom or default titles', () => {
+    const text = `> [!NOTE] Single-File Sandbox & Module Architecture
+> In production Next.js, FavoriteButton lives in its own file.
+> In this single-file exercise, do NOT add 'use client'.`;
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const alert = container.querySelector('.markdown-alert.markdown-alert-note');
+    expect(alert).not.toBeNull();
+    expect(alert?.textContent).toContain('Single-File Sandbox & Module Architecture');
+    expect(alert?.textContent).toContain('In production Next.js, FavoriteButton lives in its own file.');
+    expect(alert?.textContent).toContain("In this single-file exercise, do NOT add 'use client'.");
+  });
 });

@@ -15,7 +15,7 @@ interface StaticDocParam {
   slug: string;
 }
 
-const generateStaticParams = (categories: DocCategory[]): StaticDocParam[] => {
+function generateStaticParams(categories: DocCategory[]): StaticDocParam[] {
   if (!Array.isArray(categories)) return [];
 
   const seen = new Set<string>();
@@ -56,5 +56,5 @@ const generateStaticParams = (categories: DocCategory[]): StaticDocParam[] => {
   });
 
   return results;
-};
+}
 

@@ -2,7 +2,7 @@ interface MiddlewareMatcherConfig {
   matcher: string[];
 }
 
-const middleware = (request: NextRequest): NextResponse => {
+function middleware(request: NextRequest): NextResponse {
   const pathname = request.nextUrl.pathname;
 
   if (pathname.startsWith('/dashboard')) {
@@ -19,5 +19,5 @@ const middleware = (request: NextRequest): NextResponse => {
   }
 
   return NextResponse.next();
-};
+}
 

@@ -11,7 +11,28 @@ import { PGlite } from '@electric-sql/pglite';
 import { graphql as executeGraphql, buildSchema, parse as parseGraphql, validate as validateGraphql } from 'graphql';
 import * as d3 from 'd3';
 import { stripTestRunnerBlock } from './stripTestRunner';
-import { NextResponse, NextRequest, revalidateTag, revalidatePath } from '../utils/nextSandbox';
+import {
+  NextResponse,
+  NextRequest,
+  revalidateTag,
+  revalidatePath,
+  activeRevalidationStore,
+  resetRevalidationStore,
+  Link as NextLink,
+  Image as NextImage,
+  Script as NextScript,
+  usePathname as nextUsePathname,
+  useRouter as nextUseRouter,
+  useSearchParams as nextUseSearchParams,
+  redirect as nextRedirect,
+  notFound as nextNotFound,
+  Inter as nextInter,
+  UserBadge as NextUserBadge,
+  setMockPathname,
+  setMockRouter,
+  setMockSearchParams,
+  resetMockRouter,
+} from '../utils/nextSandbox';
 
 export type ExecutionMode = 'js' | 'ts';
 
@@ -157,6 +178,22 @@ const SANDBOX_NAMES = [
   'NextRequest',
   'revalidateTag',
   'revalidatePath',
+  'activeRevalidationStore',
+  'resetRevalidationStore',
+  'Link',
+  'Image',
+  'Script',
+  'usePathname',
+  'useRouter',
+  'useSearchParams',
+  'redirect',
+  'notFound',
+  'Inter',
+  'articlesStore',
+  'membersStore',
+  'setMockPathname',
+  'setMockRouter',
+  'setMockSearchParams',
 ] as const;
 
 export interface SandboxScope {
@@ -175,6 +212,7 @@ export function createSandboxScope(options: {
   console: unknown;
   mount: (...args: never[]) => void;
   reactDOM: Record<string, unknown>;
+  cardId?: string;
 }): SandboxScope {
   let tools: DomTools | null = null;
   const restoreBuiltins = snapshotBuiltins();
@@ -186,6 +224,8 @@ export function createSandboxScope(options: {
   });
   const realFetch = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
   const customReactDOM = { ...ReactDOMClient, createPortal, ...options.reactDOM };
+  const sandboxArticlesStore = new Map<string, unknown>();
+  const sandboxMembersStore = new Map<string, unknown>();
   const requireShim = (mod: string) => {
     if (mod === 'react') return { default: React, ...React };
     if (mod === 'react-dom') return { default: customReactDOM, ...customReactDOM };
@@ -202,6 +242,22 @@ export function createSandboxScope(options: {
     if (mod === 'd3') return { default: d3, ...d3 };
     if (mod === 'next/server') return { default: { NextResponse, NextRequest }, NextResponse, NextRequest };
     if (mod === 'next/cache') return { default: { revalidateTag, revalidatePath }, revalidateTag, revalidatePath };
+    if (mod === 'next/link') return { default: NextLink, Link: NextLink };
+    if (mod === 'next/image') return { default: NextImage, Image: NextImage };
+    if (mod === 'next/script') return { default: NextScript, Script: NextScript };
+    if (mod === 'next/navigation') {
+      return {
+        usePathname: nextUsePathname,
+        useRouter: nextUseRouter,
+        useSearchParams: nextUseSearchParams,
+        redirect: nextRedirect,
+        notFound: nextNotFound,
+        setMockPathname,
+        setMockRouter,
+        setMockSearchParams,
+      };
+    }
+    if (mod === 'next/font/google') return { Inter: nextInter };
     throw new Error(`Cannot find module '${mod}' in browser sandbox`);
   };
   const values: unknown[] = [
@@ -244,13 +300,41 @@ export function createSandboxScope(options: {
     NextRequest,
     revalidateTag,
     revalidatePath,
+    activeRevalidationStore,
+    resetRevalidationStore,
+    NextLink,
+    NextImage,
+    NextScript,
+    nextUsePathname,
+    nextUseRouter,
+    nextUseSearchParams,
+    nextRedirect,
+    nextNotFound,
+    nextInter,
+    sandboxArticlesStore,
+    sandboxMembersStore,
+    setMockPathname,
+    setMockRouter,
+    setMockSearchParams,
   ];
+
+  const names: string[] = [...SANDBOX_NAMES];
+  if (options.cardId === 'next-client-boundary-guard') {
+    names.push('UserBadge');
+    values.push(NextUserBadge);
+  }
+
   return {
-    names: SANDBOX_NAMES,
+    names,
     values,
     cleanup() {
       try {
         tools?.cleanup();
+        sandboxArticlesStore.clear();
+        sandboxMembersStore.clear();
+        resetMockRouter();
+        resetRevalidationStore();
+        (globalThis as unknown as { __mockFetchHandler?: unknown }).__mockFetchHandler = null;
       } finally {
         tools = null;
         restoreBuiltins();
@@ -462,6 +546,7 @@ export async function runHarness(
     console: sandboxConsole,
     mount: () => {},
     reactDOM: { createRoot: () => ({ render: () => {}, unmount: () => {} }) },
+    cardId: card.id,
   });
 
   let timedOut = false;

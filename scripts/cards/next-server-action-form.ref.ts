@@ -1,3 +1,5 @@
+'use server';
+
 interface ActionState {
   success: boolean;
   errors?: {
@@ -11,10 +13,10 @@ interface ActionState {
   };
 }
 
-const updateCartQuantity = async (
+async function updateCartQuantity(
   prevState: ActionState,
   formData: FormData
-): Promise<ActionState> => {
+): Promise<ActionState> {
   const itemId = formData.get('itemId');
   const quantityRaw = formData.get('quantity');
 
@@ -44,5 +46,5 @@ const updateCartQuantity = async (
       total: q * 25,
     },
   };
-};
+}
 

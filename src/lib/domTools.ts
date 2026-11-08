@@ -41,8 +41,12 @@ export class MockIntersectionObserver {
 
 export interface RenderResult {
   container: HTMLElement;
-  rerender(ui: React.ReactElement): void;
+  rerender(ui: React.ReactElement | Promise<React.ReactElement>): void;
   unmount(): void;
+  then?: <TResult1 = RenderResult, TResult2 = never>(
+    onfulfilled?: ((value: RenderResult) => TResult1 | PromiseLike<TResult1>) | null,
+    onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
+  ) => Promise<TResult1 | TResult2>;
 }
 
 export interface HookResult<R> {
@@ -100,21 +104,78 @@ export function createDomTools() {
   const sleepReal = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
   MockIntersectionObserver.instances = [];
 
-  function render(ui: React.ReactElement): RenderResult {
+  function isPromise(val: unknown): val is Promise<unknown> {
+    return Boolean(val && typeof (val as PromiseLike<unknown>).then === 'function');
+  }
+
+  function isAsyncComponent(node: unknown): boolean {
+    if (!React.isValidElement(node) || typeof node.type !== 'function') return false;
+    const fn = node.type as unknown as { constructor?: { name?: string }; [key: symbol]: unknown };
+    return fn.constructor?.name === 'AsyncFunction' || fn[Symbol.toStringTag] === 'AsyncFunction';
+  }
+
+  function AsyncBridge({ elementOrPromise }: { elementOrPromise: React.ReactElement | Promise<React.ReactElement> }) {
+    const [resolvedNode, setResolvedNode] = React.useState<React.ReactElement | null>(() => {
+      if (
+        React.isValidElement(elementOrPromise) &&
+        typeof elementOrPromise.type === 'function' &&
+        elementOrPromise.type.constructor.name !== 'AsyncFunction'
+      ) {
+        return elementOrPromise;
+      }
+      return null;
+    });
+
+    React.useEffect(() => {
+      let active = true;
+      const resolveNode = async () => {
+        let node: unknown = elementOrPromise;
+        if (node && typeof (node as Promise<unknown>).then === 'function') {
+          node = await node;
+        }
+        if (isAsyncComponent(node)) {
+          const asyncFn = (node as React.ReactElement).type as (props: unknown) => Promise<React.ReactElement>;
+          node = await asyncFn((node as React.ReactElement).props);
+        }
+        if (active && React.isValidElement(node)) {
+          setResolvedNode(node as React.ReactElement);
+        }
+      };
+      resolveNode();
+      return () => {
+        active = false;
+      };
+    }, [elementOrPromise]);
+
+    return resolvedNode;
+  }
+
+  function render(ui: React.ReactElement | Promise<React.ReactElement>): RenderResult {
     const container = document.createElement('div');
     container.style.cssText = 'position:absolute;left:-10000px;top:0;';
     document.body.appendChild(container);
     const root = createRoot(container);
     const entry = { root, container, unmounted: false };
     mounted.push(entry);
+
+    const isAsync = isPromise(ui) || isAsyncComponent(ui);
+    const initialElement = isAsync
+      ? React.createElement(AsyncBridge, { elementOrPromise: ui })
+      : (ui as React.ReactElement);
+
     act(() => {
-      root.render(ui);
+      root.render(initialElement);
     });
-    return {
+
+    const result: RenderResult = {
       container,
       rerender(next) {
+        const nextAsync = isPromise(next) || isAsyncComponent(next);
+        const nextElement = nextAsync
+          ? React.createElement(AsyncBridge, { elementOrPromise: next })
+          : (next as React.ReactElement);
         act(() => {
-          root.render(next);
+          root.render(nextElement);
         });
       },
       unmount() {
@@ -125,7 +186,28 @@ export function createDomTools() {
         });
         container.remove();
       },
+      then(onfulfilled, onrejected) {
+        const promise = (async () => {
+          if (isPromise(ui)) {
+            let resolved = await ui;
+            if (isAsyncComponent(resolved)) {
+              resolved = await ((resolved as React.ReactElement).type as (props: unknown) => Promise<React.ReactElement>)((resolved as React.ReactElement).props);
+            }
+            act(() => {
+              root.render(resolved as React.ReactElement);
+            });
+          } else if (isAsyncComponent(ui)) {
+            const resolved = await ((ui as React.ReactElement).type as (props: unknown) => Promise<React.ReactElement>)((ui as React.ReactElement).props);
+            act(() => {
+              root.render(resolved as React.ReactElement);
+            });
+          }
+        })();
+        return promise.then(() => result).then(onfulfilled, onrejected);
+      },
     };
+
+    return result;
   }
 
   function renderHook<P, R>(

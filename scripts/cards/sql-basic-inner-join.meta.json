@@ -1,0 +1,13 @@
+{
+  "track": "sql-postgres",
+  "title": "SQL Table Joins: Two-Table Inner Join",
+  "tags": [
+    "sql",
+    "postgresql",
+    "join",
+    "inner-join",
+    "foreign-key",
+    "aliases"
+  ],
+  "requiresDom": false
+}

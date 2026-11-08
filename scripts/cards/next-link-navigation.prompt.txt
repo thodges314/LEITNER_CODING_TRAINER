@@ -1,0 +1,38 @@
+Implement an idiomatic Next.js App Router client navigation component demonstrating Link and usePathname:
+
+## Description
+
+### Application Context
+In Next.js App Router applications (`components/Navbar.tsx`), client navigation between routes is performed using the built-in `<Link href="...">` component from `next/link` rather than raw `<a>` tags. Next.js handles soft client navigation and prefetching automatically. To highlight the currently active link, client components inspect the browser pathname using the `usePathname()` hook from `next/navigation`.
+
+You are building a client `Navbar` component that reads the active route and renders accessible Next.js links.
+
+```ts
+interface NavItem {
+  href: string;
+  label: string;
+}
+
+interface NavbarProps {
+  items: NavItem[];
+}
+```
+
+### `Navbar({ items }: NavbarProps): React.ReactElement`
+
+Renders an accessible navigation bar consuming Next.js built-in primitives:
+
+- **Client Component Context**:
+  - Because `Navbar` reads the client route hook `usePathname()`, it operates as a Client Component (you may include the `'use client'` directive at the top).
+- **Navigation Markup**:
+  - Renders a `<nav>` container with `aria-label="Main Navigation"`.
+  - Inside `<nav>`, renders a `<ul>` list with `className="flex gap-4"`.
+  - Maps each item in `items` to an `<li>` element with `key={item.href}`.
+- **Next.js `<Link>` Integration**:
+  - Renders Next.js `<Link href={item.href}>` from `next/link` (or ambient `Link`).
+  - **Active Route Detection**:
+    - Reads the current pathname via `const pathname = usePathname()`.
+    - Computes `const isActive = pathname === item.href`.
+    - When `isActive`: Sets `aria-current="page"` and applies active styling (`className="text-blue-600 font-bold"`).
+    - When inactive: Does not set `aria-current` (or sets `aria-current={undefined}`) and applies inactive styling (`className="text-gray-600"`).
+  - Displays `item.label` as the link content.

@@ -1,0 +1,15 @@
+{
+  "track": "nextjs",
+  "title": "Next.js Navigation: Link & usePathname",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "link",
+    "navigation",
+    "usePathname",
+    "accessibility"
+  ],
+  "rendersComponent": true,
+  "requiresDom": true,
+  "previewLibraries": ["react", "tailwind"]
+}

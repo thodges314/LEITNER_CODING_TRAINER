@@ -92,12 +92,12 @@ for (const t of topics) {
   const refSql = read(t.id, 'ref.sql');
   const refGql = read(t.id, 'ref.graphql') || read(t.id, 'ref.gql');
   const refJs = read(t.id, 'ref.js');
-  const ref = refHtml ?? refSql ?? refGql ?? refJs;
+  const refTs = read(t.id, 'ref.ts');
+  const ref = refHtml ?? refSql ?? refGql ?? refJs ?? refTs;
   if (ref) {
     // One copy only: the app reads referenceSolution (readers fall back to solution/starterCode for old saved decks).
     t.referenceSolution = ref;
   }
-  const refTs = read(t.id, 'ref.ts');
   if (refTs) {
     t.referenceSolutionTs = refTs;
   } else if (refHtml || refSql || refGql) {

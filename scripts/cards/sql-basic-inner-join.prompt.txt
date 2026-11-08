@@ -1,0 +1,47 @@
+Write a PostgreSQL query to join customer and order tables using an inner join:
+
+## Description
+
+### Application Context
+In an e-commerce reporting dashboard (`sales/orders`), you need to generate a consolidated order manifest linking each placed order to its registered customer name.
+
+```ts
+interface CustomerRecord {
+  id: number;
+  name: string;
+  city: string;
+}
+
+interface OrderRecord {
+  id: number;
+  customer_id: number;
+  amount: number;
+}
+
+interface OrderJoinResult {
+  order_id: number;
+  customer_name: string;
+  amount: number;
+}
+```
+
+### Table Schema
+
+- **`customers`**:
+  - `id`: `INT` (Primary Key)
+  - `name`: `VARCHAR(50)`
+  - `city`: `VARCHAR(50)`
+- **`orders`**:
+  - `id`: `INT` (Primary Key)
+  - `customer_id`: `INT` (Foreign Key referencing `customers.id`)
+  - `amount`: `INT`
+
+### Requirements
+
+Write a SQL query string assigned to `const query`:
+- **Join**: Perform an `INNER JOIN` (or `JOIN`) between `orders` and `customers` on `orders.customer_id = customers.id`.
+- **Projection**:
+  - `orders.id` aliased as `order_id`
+  - `customers.name` aliased as `customer_name`
+  - `orders.amount` aliased as `amount`
+- **Sort**: Order results by `order_id ASC`.

@@ -22,12 +22,10 @@ interface ArticleMetadata extends Metadata {
   };
 }
 
-const articlesStore = new Map<string, ArticleRecord>();
-
-const generateMetadata = async ({
+async function generateMetadata({
   params,
   searchParams,
-}: PageProps): Promise<ArticleMetadata> => {
+}: PageProps): Promise<ArticleMetadata> {
   const category = params?.category;
   const slug = params?.slug;
   const key = `${category}/${slug}`;
@@ -55,7 +53,9 @@ const generateMetadata = async ({
       type: 'article',
       publishedTime: article.publishedAt,
       authors: [article.author],
-      images: article.thumbnailUrl ? [{ url: article.thumbnailUrl, alt: article.title }] : [],
+      images: article.thumbnailUrl
+        ? [{ url: article.thumbnailUrl, alt: article.title }]
+        : [],
     },
   };
 
@@ -67,5 +67,4 @@ const generateMetadata = async ({
   }
 
   return metadata;
-};
-
+}

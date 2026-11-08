@@ -1,13 +1,14 @@
 {
-  "title": "Next.js RSC Client Boundary Serialization Guard",
+  "title": "Next.js RSC Boundary: Safe Client Component Props",
   "track": "nextjs",
   "tags": [
     "nextjs",
     "rsc",
-    "serialization",
+    "server-components",
     "client-components",
-    "validation"
+    "props-boundary"
   ],
-  "requiresDom": false
+  "rendersComponent": true,
+  "requiresDom": true,
+  "previewLibraries": ["react", "tailwind"]
 }
-

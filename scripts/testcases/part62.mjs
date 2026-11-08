@@ -1,5 +1,6 @@
 import { c } from './part1.mjs';
 const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by PostgreSQL harness', ...o });
+const rHarness = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by component harness', ...o });
 
 export default {
   'sql-sequential-gaps': [
@@ -188,6 +189,190 @@ export default {
       'Concat and Shift tuple type contracts compile and verify lengths',
       'type C = Concat<[number, string], [boolean]>;\ntype S = Shift<[string, number, boolean]>;\nconst c: C = [1, "two", true];\nconst s: S = [42, false];\n[c.length, s.length]',
       '[3, 2]'
+    ),
+  ],
+
+  'next-server-client-leaf-boundary': [
+    rHarness(
+      'FavoriteButton renders with initial state and accessible aria-pressed',
+      '<FavoriteButton productId="p-1" initialFavorited={false} />',
+      'renders button with aria-pressed="false" and text "Add to Favorites"'
+    ),
+    rHarness(
+      'FavoriteButton toggles state and calls onToggle callback on click',
+      'fire.click(button)',
+      'toggles aria-pressed="true", text "Favorited", and fires onToggle("p-1", true)'
+    ),
+    rHarness(
+      'ProductCard renders server product details and embeds FavoriteButton',
+      '<ProductCard product={{ id: "prod-99", name: "Wireless Headphones", price: 99 }} />',
+      'renders server title "Wireless Headphones", price "$99", and leaf FavoriteButton'
+    ),
+    rHarness(
+      'ProductCard forwards productId and initialFavorited to FavoriteButton',
+      '<ProductCard product={{ id: "prod-99", name: "Wireless Headphones", price: 99 }} initialFavorited={true} />',
+      'renders FavoriteButton with initialFavorited=true (aria-pressed="true") and toggles locally on click'
+    ),
+  ],
+
+  'next-fetch-cache-revalidate': [
+    c(
+      'fetchProductCatalog requests products with revalidate: 60 and category cache tags',
+      'fetchProductCatalog("laptops")',
+      'fetches from https://api.example.com/products?category=laptops with next.revalidate=60 and tags'
+    ),
+    c(
+      'fetchProductCatalog throws Error when HTTP response is not ok',
+      'fetchProductCatalog("invalid")',
+      'throws Error("Failed to fetch product catalog")'
+    ),
+    c(
+      'fetchLiveInventory requests inventory with cache: "no-store"',
+      'fetchLiveInventory("p-100")',
+      'fetches from https://api.example.com/inventory/p-100 with cache: "no-store"'
+    ),
+    c(
+      'fetchLiveInventory throws Error when HTTP response is not ok',
+      'fetchLiveInventory("unknown")',
+      'throws Error("Failed to fetch live inventory")'
+    ),
+  ],
+
+  'sql-basic-select-filter': [
+    r(
+      'Filters by category and stock, sorts by price ASC then name ASC, and limits to 3',
+      'query',
+      '[{"id":2,"name":"Keyboard","price":50,"stock":25},{"id":3,"name":"Mouse","price":50,"stock":15},{"id":6,"name":"Webcam","price":75,"stock":8}]'
+    ),
+    r(
+      'Excludes out-of-stock electronics even if price is lowest',
+      'query',
+      '[{"id":2,"name":"Flash Drive","price":15,"stock":4}]'
+    ),
+    r(
+      'Returns empty array when no matching in-stock electronics exist',
+      'query',
+      '[]'
+    ),
+    r(
+      'Returns empty array on completely empty products table',
+      'query',
+      '[]'
+    ),
+  ],
+
+  'sql-basic-inner-join': [
+    r(
+      'Joins orders with customers and aliases columns ordered by order_id ASC',
+      'query',
+      '[{"amount":150,"customer_name":"Alice","order_id":101},{"amount":200,"customer_name":"Charlie","order_id":102},{"amount":75,"customer_name":"Alice","order_id":103}]'
+    ),
+    r(
+      'Excludes customers who have placed zero orders',
+      'query',
+      '[{"amount":320,"customer_name":"Diana","order_id":50}]'
+    ),
+    r(
+      'Excludes orders referencing non-matching customer_ids',
+      'query',
+      '[]'
+    ),
+    r(
+      'Returns empty array when orders table is empty',
+      'query',
+      '[]'
+    ),
+  ],
+
+  'basic-assertion-library': [
+    c(
+      'ok passes truthy values and throws on falsy values',
+      'const a = createAssert();\nlet caught = null;\ntry {\n  a.ok(true);\n  a.ok(1);\n  a.ok("ok");\n  a.ok(0, "Zero is falsy");\n} catch (e) {\n  caught = e.message;\n}\n[caught]',
+      '["Zero is falsy"]'
+    ),
+    c(
+      'equal passes matching values using Object.is and throws on mismatch',
+      'const a = createAssert();\nlet caught = null;\ntry {\n  a.equal(5, 5);\n  a.equal("abc", "abc");\n  a.equal(1, 2, "1 does not equal 2");\n} catch (e) {\n  caught = e.message;\n}\n[caught]',
+      '["1 does not equal 2"]'
+    ),
+    c(
+      'throws validates thrown errors matching string substring or regex pattern',
+      'const a = createAssert();\na.throws(() => { throw new Error("database timeout"); }, "timeout");\na.throws(() => { throw new TypeError("invalid arg: 42"); }, /invalid arg/);\n"all passed"',
+      '"all passed"'
+    ),
+    c(
+      'throws fails when function does not throw an error',
+      'const a = createAssert();\nlet caught = null;\ntry {\n  a.throws(() => { return 42; });\n} catch (e) {\n  caught = e.message;\n}\n[caught]',
+      '["Expected function to throw"]'
+    ),
+  ],
+
+  'dom-toggle-active-class': [
+    rHarness(
+      'Initializes default closed state and aria-expanded="false"',
+      'bindClassToggle({ triggerId: "btn-1", targetId: "menu-1" })',
+      'menu has no "active" class, button has aria-expanded="false", isExpanded() is false'
+    ),
+    rHarness(
+      'Toggles active class and aria-expanded on click',
+      'btn.dispatchEvent(new MouseEvent("click"))',
+      'toggles "active" class on menu and synchronizes aria-expanded between "true" and "false"'
+    ),
+    rHarness(
+      'Initializes with custom active class and initialExpanded=true',
+      'bindClassToggle({ triggerId: "btn-2", targetId: "drawer-2", activeClass: "drawer-open", initialExpanded: true })',
+      'drawer starts with "drawer-open" class and button has aria-expanded="true"'
+    ),
+    rHarness(
+      'Throws error when target element is missing and removes listener on destroy',
+      'c.destroy(); btn.click()',
+      'throws on missing DOM nodes and cleans up click event listener so subsequent clicks do not toggle state'
+    ),
+  ],
+
+  'next-link-navigation': [
+    rHarness(
+      'Renders navigation bar with list of routes using Next.js Link',
+      '<Navbar items={defaultItems} /> (pathname="/dashboard")',
+      'renders nav container with 3 Next.js Link items with correct hrefs'
+    ),
+    rHarness(
+      'Inspects active route via usePathname() and sets aria-current="page"',
+      '<Navbar items={defaultItems} /> (pathname="/settings")',
+      'sets aria-current="page" and active styling on /settings link'
+    ),
+    rHarness(
+      'Updates active styling when pathname changes',
+      '<Navbar items={defaultItems} /> (pathname="/profile")',
+      'sets aria-current="page" on /profile and leaves /dashboard without aria-current'
+    ),
+    rHarness(
+      'Sets inactive styling without aria-current on unselected routes',
+      '<Navbar items={defaultItems} /> (pathname="/dashboard")',
+      'unselected routes have no aria-current attribute and retain inactive styling'
+    ),
+  ],
+
+  'tailwind-alert-banner': [
+    rHarness(
+      'Banner container has flex layout, padding, rounded corners, blue background, and alert role',
+      'html',
+      'container has flex layout, rounded corners, blue background tint, and role="alert"'
+    ),
+    rHarness(
+      'Icon badge displays centered informational indicator with rounded styling',
+      'html',
+      'icon badge has rounded styling, background, and centered "i" indicator'
+    ),
+    rHarness(
+      'Displays update headline and description subtext',
+      'html',
+      'renders "System Update Available" headline and deployment subtext'
+    ),
+    rHarness(
+      'Action button has type="button", padding, rounded corners, and update label',
+      'html',
+      'action button has type="button", blue background, and "Update Now" label'
     ),
   ],
 };

@@ -1,0 +1,38 @@
+Implement a Next.js App Router client-side search filter component using `useRouter`, `useSearchParams`, and `usePathname`:
+
+## Description
+
+### Application Context
+In Next.js App Router Client Components (`'use client'`), interactive page transitions, programmatic routing, and query string synchronization are handled via `next/navigation` hooks:
+- `useRouter()`: Returns the router instance with `.push()`, `.replace()`, `.refresh()`, and `.back()`.
+- `useSearchParams()`: Returns a read-only `URLSearchParams` instance representing the current URL query parameters.
+- `usePathname()`: Returns the current URL pathname (e.g. `'/products'`).
+
+```ts
+interface SearchFilterProps {
+  defaultQuery?: string;
+}
+```
+
+### `SearchFilter({ defaultQuery = '' }: SearchFilterProps): React.ReactElement`
+
+- **Client Component Directive**:
+  - Add `'use client'` at the top since this component binds client events and navigation hooks.
+- **Hook Integration**:
+  - Obtains `router` via `useRouter()`.
+  - Obtains `searchParams` via `useSearchParams()`.
+  - Obtains `pathname` via `usePathname()`.
+- **State Management**:
+  - Initializes search input state with `searchParams.get('q') ?? defaultQuery`.
+- **Form Submission**:
+  - On `<form>` submit:
+    - Calls `e.preventDefault()`.
+    - Trims the query string.
+    - If non-empty, calls `router.push(`${pathname}?q=${encodeURIComponent(trimmedQuery)}`)`.
+    - If empty, calls `router.push(pathname)`.
+- **Render Output**:
+  - Renders a `<form role="search" onSubmit={...}>`:
+    - `<input type="search" data-testid="search-input" value={query} onChange={...} />`
+    - `<button type="submit" data-testid="search-submit">Search</button>`
+    - `<span data-testid="current-path">{pathname}</span>`
+

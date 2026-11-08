@@ -22,6 +22,11 @@ function response(status: number, body: unknown): Response {
 
 export function createMockFetch(realFetch?: typeof fetch): typeof fetch {
   return ((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const customHandler = (globalThis as unknown as { __mockFetchHandler?: typeof fetch }).__mockFetchHandler;
+    if (typeof customHandler === 'function') {
+      return customHandler(input, init);
+    }
+
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     let parsed: URL | null = null;
     try {

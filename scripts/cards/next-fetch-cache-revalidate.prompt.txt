@@ -1,0 +1,35 @@
+Implement Next.js App Router data-fetching service functions with extended `fetch()` cache and revalidation options:
+
+## Description
+
+### Application Context
+In the Next.js App Router (`app/products/page.tsx`), data freshness is controlled directly via Next.js-extended `fetch()` options:
+- **Time-Based Incremental Static Regeneration (ISR)**: Cached in the Data Cache and automatically refreshed after a given interval using `{ next: { revalidate: 60, tags: [...] } }`.
+- **Dynamic Real-Time Data**: Bypasses the cache entirely for live inventory, user carts, or real-time balances using `{ cache: 'no-store' }`.
+
+```ts
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+}
+
+interface InventoryData {
+  productId: string;
+  stock: number;
+  available: boolean;
+}
+```
+
+### Functions
+
+- **`fetchProductCatalog(category: string): Promise<Product[]>`**:
+  - Performs a `fetch` GET request to `https://api.example.com/products?category=${encodeURIComponent(category)}`.
+  - Sets Next.js extended options: `{ next: { revalidate: 60, tags: ['products', `category-${category}`] } }`.
+  - If `!res.ok`, throws `new Error('Failed to fetch product catalog')`.
+  - Returns the parsed JSON array of products.
+- **`fetchLiveInventory(productId: string): Promise<InventoryData>`**:
+  - Performs a `fetch` GET request to `https://api.example.com/inventory/${encodeURIComponent(productId)}`.
+  - Sets Next.js extended options: `{ cache: 'no-store' }`.
+  - If `!res.ok`, throws `new Error('Failed to fetch live inventory')`.
+  - Returns the parsed JSON inventory data.

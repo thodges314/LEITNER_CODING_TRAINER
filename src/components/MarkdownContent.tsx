@@ -271,6 +271,54 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
                       );
                     }
 
+                    if (group.type === 'blockquote') {
+                      const alertColors: Record<string, { border: string; bg: string }> = {
+                        note: { border: 'var(--accent, #38bdf8)', bg: 'rgba(56, 189, 248, 0.08)' },
+                        tip: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.08)' },
+                        important: { border: '#a855f7', bg: 'rgba(168, 85, 247, 0.08)' },
+                        warning: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.08)' },
+                        caution: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.08)' },
+                      };
+
+                      const styleConfig = group.alertType
+                        ? alertColors[group.alertType] ?? alertColors.note
+                        : { border: 'var(--accent, #38bdf8)', bg: 'rgba(56, 189, 248, 0.06)' };
+
+                      return (
+                        <div
+                          key={gIdx}
+                          className={`markdown-blockquote ${group.alertType ? `markdown-alert markdown-alert-${group.alertType}` : ''}`}
+                          style={{
+                            margin: '6px 0',
+                            padding: '8px 12px',
+                            borderLeft: `3px solid ${styleConfig.border}`,
+                            backgroundColor: styleConfig.bg,
+                            borderRadius: '0 6px 6px 0',
+                            fontSize: '13px',
+                            lineHeight: 1.55,
+                          }}
+                        >
+                          {group.alertTitle && (
+                            <div
+                              style={{
+                                fontWeight: 600,
+                                color: styleConfig.border,
+                                marginBottom: group.lines.length > 0 ? '4px' : '0',
+                                fontSize: '13px',
+                              }}
+                            >
+                              {group.alertTitle}
+                            </div>
+                          )}
+                          {group.lines.map((bLine, lIdx) => (
+                            <div key={lIdx} style={{ color: 'var(--text-primary)' }}>
+                              {renderInlineMarkdown(bLine)}
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    }
+
                     return (
                       <div key={gIdx} style={{ lineHeight: 1.62 }}>
                         {group.lines.map((line, lIdx) => (

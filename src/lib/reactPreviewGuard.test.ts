@@ -104,6 +104,14 @@ describe('React preview guard: every previewCode mounts with the reference solut
       const previewConfig = getCardPreviewConfig(card);
       const isReact = previewConfig.isReact;
 
+      const nextLink = ({ href, className, children, ...rest }: Record<string, unknown>) =>
+        React.createElement('a', { href: typeof href === 'object' && href ? (href as { pathname?: string }).pathname || '/' : (href as string), className: className as string, ...rest }, children as React.ReactNode);
+      const nextImage = ({ src, alt, width, height, className, fill, ...rest }: Record<string, unknown>) =>
+        React.createElement('img', { src: src as string, alt: alt as string, width: width as number, height: height as number, className: [fill ? 'object-cover' : '', className as string].filter(Boolean).join(' ') || undefined, ...rest });
+      const mockRouter = { push: () => {}, replace: () => {}, back: () => {}, refresh: () => {} };
+      const userBadge = ({ user }: Record<string, unknown>) =>
+        React.createElement('div', { 'data-testid': 'user-badge' }, (user as { name?: string })?.name || 'User');
+
       const scope: Record<string, unknown> = {
         log: mockLog,
         exports: {},
@@ -119,6 +127,25 @@ describe('React preview guard: every previewCode mounts with the reference solut
           if (mod === 'd3') {
             if (previewConfig.libraries.includes('d3')) return d3;
             throw new Error(`Module 'd3' is not loaded in preview.`);
+          }
+          if (mod === 'next/link') return { default: nextLink, Link: nextLink };
+          if (mod === 'next/image') return { default: nextImage, Image: nextImage };
+          if (mod === 'next/navigation') {
+            return {
+              useRouter: () => mockRouter,
+              usePathname: () => '/',
+              useSearchParams: () => new URLSearchParams(),
+              notFound: () => { throw new Error('NEXT_NOT_FOUND'); },
+              redirect: (url: string) => { throw new Error('NEXT_REDIRECT: ' + url); },
+            };
+          }
+          if (mod === 'next/server') {
+            return {
+              NextRequest: Request,
+              NextResponse: {
+                json: (data: unknown, init?: ResponseInit) => new Response(JSON.stringify(data), init),
+              },
+            };
           }
           throw new Error(`Cannot find module '${mod}' in preview test`);
         },
@@ -149,6 +176,14 @@ describe('React preview guard: every previewCode mounts with the reference solut
           forwardRef: React.forwardRef,
           Suspense: React.Suspense,
           usePreviewProps: <T extends Record<string, unknown>>(defaults: T): T => defaults,
+          Link: nextLink,
+          Image: nextImage,
+          useRouter: () => mockRouter,
+          usePathname: () => '/',
+          useSearchParams: () => new URLSearchParams(),
+          notFound: () => { throw new Error('NEXT_NOT_FOUND'); },
+          redirect: (url: string) => { throw new Error('NEXT_REDIRECT: ' + url); },
+          UserBadge: userBadge,
         });
       }
 
@@ -167,6 +202,15 @@ describe('React preview guard: every previewCode mounts with the reference solut
       }).not.toThrow();
 
       if (isReact) {
+        if (result && typeof (result as Promise<unknown>).then === 'function') {
+          result = await (result as Promise<unknown>);
+        }
+        if (React.isValidElement(result) && typeof result.type === 'function') {
+          const fnType = result.type as unknown as { constructor?: { name?: string }; [key: symbol]: unknown };
+          if (fnType.constructor?.name === 'AsyncFunction' || fnType[Symbol.toStringTag] === 'AsyncFunction') {
+            result = await (result.type as (props: unknown) => Promise<React.ReactElement>)(result.props);
+          }
+        }
         expect(React.isValidElement(result), `Expected valid React element from previewCode for ${card.id}`).toBe(true);
 
         // Mount the element inside React.act
