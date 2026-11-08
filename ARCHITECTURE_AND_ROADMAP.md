@@ -71,6 +71,7 @@ src/
     formatter.ts               in-browser Prettier standalone formatting for JS/TS/JSX
     formatter.test.ts          unit tests for formatting and syntax error resilience
     runner.ts                  sandbox + harness execution (see §5)
+    sandboxLibraries.ts        extensible on-demand runtime library loader (PGlite, GraphQL, D3) for runner & Web Worker
     workerClient.ts            Web Worker execution client, active timeout watchdog and worker termination
     sandboxWorker.ts           dedicated Web Worker runner environment ($test, PGlite, graphql, mockFetch)
     testHelpers.ts             shared assertion library, deep equality, and report classification

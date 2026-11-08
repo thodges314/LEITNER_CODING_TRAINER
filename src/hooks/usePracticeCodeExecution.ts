@@ -11,6 +11,7 @@ import {
   bufferContainsHarness,
   classifyLogLine,
 } from '../lib/runner';
+import { loadSandboxLibrariesForCode } from '../lib/sandboxLibraries';
 import {
   runInWorker,
   supportsWebWorker,
@@ -233,11 +234,13 @@ export function usePracticeCodeExecution({
       return;
     }
 
+    const libraries = await loadSandboxLibrariesForCode(executableCode, currentCard?.track);
     const scope = createSandboxScope({
       console: customConsole,
       mount,
       reactDOM: customReactDOM,
       cardId: currentCard?.id,
+      libraries,
     });
 
     try {

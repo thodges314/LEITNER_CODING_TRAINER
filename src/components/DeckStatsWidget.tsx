@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import * as d3 from 'd3';
+import { pie, arc, type PieArcDatum } from 'd3';
 import { Activity, BarChart3, PieChart, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ActivityView } from './ActivityView';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
@@ -209,16 +209,14 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
 
   // D3 Orbit Arc Generator
   const pieGenerator = useMemo(() => {
-    return d3
-      .pie<{ track: TrackType; count: number; label: string; color: string; percentage: number }>()
+    return pie<{ track: TrackType; count: number; label: string; color: string; percentage: number }>()
       .value((d) => d.count)
       .sort(null)
       .padAngle(0.02);
   }, []);
 
   const arcGenerator = useMemo(() => {
-    return d3
-      .arc<d3.PieArcDatum<{ track: TrackType; count: number; label: string; color: string; percentage: number }>>()
+    return arc<PieArcDatum<{ track: TrackType; count: number; label: string; color: string; percentage: number }>>()
       .innerRadius(54)
       .outerRadius(82)
       .cornerRadius(3);
@@ -236,9 +234,8 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
   const angleSlice = (Math.PI * 2) / RADAR_DOMAINS.length;
 
   const radarPoints = useMemo(() => {
-    const scale = d3.scaleLinear().domain([0, 5]).range([0, radarRadius]);
     const points = radarData.map((d, i) => {
-      const r = scale(d.score);
+      const r = (d.score / 5) * radarRadius;
       const angle = i * angleSlice - Math.PI / 2;
       return {
         ...d,
@@ -636,16 +633,14 @@ export const DeckStatsWidget: React.FC<DeckStatsWidgetProps> = ({
                   const fraction = activeTopics.length > 0 ? item.count / activeTopics.length : 0;
                   const arcAngle = Math.max(0.04, fraction * maxArcAngle);
 
-                  const bgArc = d3
-                    .arc<void>()
+                  const bgArc = arc<void>()
                     .innerRadius(r - 4)
                     .outerRadius(r + 4)
                     .startAngle(-maxArcAngle / 2)
                     .endAngle(maxArcAngle / 2)
                     .cornerRadius(4)();
 
-                  const fgArc = d3
-                    .arc<void>()
+                  const fgArc = arc<void>()
                     .innerRadius(r - 4)
                     .outerRadius(r + 4)
                     .startAngle(-maxArcAngle / 2)

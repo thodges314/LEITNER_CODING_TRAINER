@@ -7,9 +7,7 @@ import { createMockFetch } from './mockFetch';
 import { createDomTools, MockIntersectionObserver } from './domTools';
 import type { DomTools } from './domTools';
 import { isTsOnlyCard } from './tsOnly';
-import { PGlite } from '@electric-sql/pglite';
-import { graphql as executeGraphql, buildSchema, parse as parseGraphql, validate as validateGraphql } from 'graphql';
-import * as d3 from 'd3';
+import { loadSandboxLibrariesForCode, type LoadedSandboxLibraries } from './sandboxLibraries';
 import { stripTestRunnerBlock } from './stripTestRunner';
 import {
   NextResponse,
@@ -219,6 +217,7 @@ export function createSandboxScope(options: {
   mount: (...args: never[]) => void;
   reactDOM: Record<string, unknown>;
   cardId?: string;
+  libraries?: LoadedSandboxLibraries;
 }): SandboxScope {
   let tools: DomTools | null = null;
   const restoreBuiltins = snapshotBuiltins();
@@ -232,11 +231,17 @@ export function createSandboxScope(options: {
   const customReactDOM = { ...ReactDOMClient, createPortal, ...options.reactDOM };
   const sandboxArticlesStore = new Map<string, unknown>();
   const sandboxMembersStore = new Map<string, unknown>();
+  const PGlite = options.libraries?.PGlite;
+  const executeGraphql = options.libraries?.graphql?.graphql;
+  const buildSchema = options.libraries?.graphql?.buildSchema;
+  const parseGraphql = options.libraries?.graphql?.parse;
+  const validateGraphql = options.libraries?.graphql?.validate;
+  const d3 = options.libraries?.d3;
   const requireShim = (mod: string) => {
     if (mod === 'react') return { default: React, ...React };
     if (mod === 'react-dom') return { default: customReactDOM, ...customReactDOM };
     if (mod === 'react-dom/client') return { default: customReactDOM, ...customReactDOM };
-    if (mod === 'graphql') {
+    if (mod === 'graphql' && options.libraries?.graphql) {
       return {
         default: { graphql: executeGraphql, buildSchema, parse: parseGraphql, validate: validateGraphql },
         graphql: executeGraphql,
@@ -245,7 +250,7 @@ export function createSandboxScope(options: {
         validate: validateGraphql,
       };
     }
-    if (mod === 'd3') return { default: d3, ...d3 };
+    if (mod === 'd3' && d3) return { default: d3, ...d3 };
     if (mod === 'next/server') return { default: { NextResponse, NextRequest, after: nextAfter }, NextResponse, NextRequest, after: nextAfter };
     if (mod === 'next/cache') return { default: { revalidateTag, revalidatePath }, revalidateTag, revalidatePath };
     if (mod === 'next/link') return { default: NextLink, Link: NextLink };
@@ -523,11 +528,13 @@ export async function runHarness(
   const sandboxConsole = { log: make('log'), info: make('info'), warn: make('warn'), error: make('error') };
 
   // Components mounted via mount()/createRoot() by user code are not previewed during headless grading.
+  const libraries = await loadSandboxLibrariesForCode(combined, card.track);
   const scope = createSandboxScope({
     console: sandboxConsole,
     mount: () => {},
     reactDOM: { createRoot: () => ({ render: () => {}, unmount: () => {} }) },
     cardId: card.id,
+    libraries,
   });
 
   let timedOut = false;

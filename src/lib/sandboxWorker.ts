@@ -1,13 +1,7 @@
-import { PGlite } from '@electric-sql/pglite';
-import {
-  graphql as executeGraphql,
-  buildSchema,
-  parse as parseGraphql,
-  validate as validateGraphql,
-} from 'graphql';
 import { createMockFetch } from './mockFetch';
 import { createTestHelpers, classifyLogLine, stringifyArg } from './testHelpers';
 import type { HarnessReport } from './testHelpers';
+import { loadSandboxLibrariesForCode } from './sandboxLibraries';
 import { NextResponse, NextRequest, revalidateTag, revalidatePath, after, flushAfterTasks, resetAfterTasks } from '../utils/nextSandbox';
 
 export interface WorkerRunMessage {
@@ -121,9 +115,15 @@ self.onmessage = async (e: MessageEvent<WorkerRunMessage>) => {
   const testHelpers = createTestHelpers(workerConsole);
   const articlesStore = new Map<string, unknown>();
   const membersStore = new Map<string, unknown>();
+  const libraries = await loadSandboxLibrariesForCode(code, undefined, { includeDomLibs: false });
+  const PGlite = libraries.PGlite;
+  const executeGraphql = libraries.graphql?.graphql;
+  const buildSchema = libraries.graphql?.buildSchema;
+  const parseGraphql = libraries.graphql?.parse;
+  const validateGraphql = libraries.graphql?.validate;
 
   const requireShim = (mod: string) => {
-    if (mod === 'graphql') {
+    if (mod === 'graphql' && libraries.graphql) {
       return {
         default: { graphql: executeGraphql, buildSchema, parse: parseGraphql, validate: validateGraphql },
         graphql: executeGraphql,

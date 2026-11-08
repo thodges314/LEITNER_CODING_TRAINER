@@ -19,6 +19,9 @@ export default defineConfig({
         ]
       : []),
   ],
+  worker: {
+    format: 'es',
+  },
   build: {
     // The TypeScript compiler chunk is lazy-loaded (only for strict TS mode), so it is allowed to be large.
     chunkSizeWarningLimit: 6000,
@@ -27,14 +30,6 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('src/data/topics.json')) {
             return 'seed-topics';
-          }
-          if (
-            id.includes('node_modules/d3') ||
-            id.includes('node_modules/delaunator') ||
-            id.includes('node_modules/internmap') ||
-            id.includes('node_modules/robust-predicates')
-          ) {
-            return 'vendor-d3';
           }
           if (
             id.includes('node_modules/@codemirror/view') ||
