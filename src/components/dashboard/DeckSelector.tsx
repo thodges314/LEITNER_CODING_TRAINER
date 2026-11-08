@@ -75,7 +75,7 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
   };
 
   return (
-    <div className="glass-panel catalog-filter-panel deck-selector-panel" ref={dropdownRef}>
+    <div className="glass-panel catalog-filter-panel deck-selector-panel" ref={dropdownRef} data-tour="deck-selector">
       <div className="deck-selector-header">
         <div className="deck-selector-title-group">
           <div className="deck-selector-icon-wrap" aria-hidden="true">

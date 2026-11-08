@@ -29,7 +29,7 @@ export const TopicFilterBar: React.FC<TopicFilterBarProps> = ({
   onOpenFocus,
 }) => {
   return (
-    <div className="glass-panel catalog-filter-panel">
+    <div className="glass-panel catalog-filter-panel" data-tour="catalog-filters">
       {showTrackHint && (
         <div
           role="status"

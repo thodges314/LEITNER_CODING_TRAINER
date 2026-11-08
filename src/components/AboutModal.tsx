@@ -8,9 +8,20 @@ interface AboutModalProps {
   welcome?: boolean;
   /** Starts the guided tour (offered on the welcome screen, and as a replay from About). */
   onStartTour?: () => void;
+  onStartCatalogTour?: () => void;
+  onStartArenaTour?: () => void;
+  onStartPractice?: () => void;
 }
 
-export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome = false, onStartTour }) => {
+export const AboutModal: React.FC<AboutModalProps> = ({
+  isOpen,
+  onClose,
+  welcome = false,
+  onStartTour,
+  onStartCatalogTour,
+  onStartArenaTour,
+  onStartPractice,
+}) => {
   const tourButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // First-time visitors: the tour is the default action, so Enter starts it. The code editor behind the dialog grabs
@@ -100,18 +111,30 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose, welcome
                     Take a 1-minute tour
                   </button>
                 )}
-                <button type="button" className={onStartTour ? 'btn btn-outline' : 'btn btn-primary'} onClick={onClose}>
+                <button type="button" className={onStartTour ? 'btn btn-outline' : 'btn btn-primary'} onClick={onStartPractice || onClose}>
                   Start practicing
                 </button>
               </div>
             </div>
           )}
 
-          {!welcome && onStartTour && (
-            <div>
-              <button type="button" className="btn btn-outline" onClick={onStartTour}>
-                Replay the quick tour
-              </button>
+          {!welcome && (onStartTour || onStartCatalogTour || onStartArenaTour) && (
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {onStartCatalogTour && (
+                <button type="button" className="btn btn-outline" onClick={onStartCatalogTour}>
+                  Replay Deck Catalog Tour
+                </button>
+              )}
+              {onStartArenaTour && (
+                <button type="button" className="btn btn-outline" onClick={onStartArenaTour}>
+                  Replay Practice Arena Tour
+                </button>
+              )}
+              {!onStartCatalogTour && !onStartArenaTour && onStartTour && (
+                <button type="button" className="btn btn-outline" onClick={onStartTour}>
+                  Replay the quick tour
+                </button>
+              )}
             </div>
           )}
 

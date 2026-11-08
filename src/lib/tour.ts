@@ -1,4 +1,4 @@
-/** The guided tour: a short, dismissable walkthrough of the practice screen. Offered from the welcome screen and from About. */
+/** The guided tour: short, dismissable walkthroughs for the Deck Catalog and Practice Arena. */
 export interface TourStep {
   id: string;
   /** Values of the `data-tour` attribute of the elements to spotlight together (empty: a centered note). */
@@ -7,7 +7,52 @@ export interface TourStep {
   body: string;
 }
 
-export const TOUR_STEPS: TourStep[] = [
+export const CATALOG_TOUR_STEPS: TourStep[] = [
+  {
+    id: 'action-hero',
+    anchors: ['action-hero'],
+    title: '1. Your Practice Hub',
+    body: 'This is your daily command center. Track your 24-hour momentum: cards attempted, promoted to higher tiers, or demoted for review. When you are ready to drill, the Resume Practice Arena button jumps directly into your spaced repetition queue.',
+  },
+  {
+    id: 'catalog-table',
+    anchors: ['catalog-table'],
+    title: '2. Cards & Spaced Repetition',
+    body: 'Every coding challenge here is an active flashcard governed by a spaced repetition system. When you solve a card correctly, it gets promoted to higher tiers (Boxes 1 to 9) and appears less frequently over time. When you miss a card, it is demoted for prompt review. Advanced cards unlock progressively as you pass foundational ones, but you can always manually lock or unlock any card using the lock icon.',
+  },
+  {
+    id: 'deck-selector',
+    anchors: ['deck-selector'],
+    title: '3. Study Decks & Preset Curricula',
+    body: 'The trainer comes pre-loaded with focused preset decks (like Frontend Specialist, React Architect, or Algorithm Fundamentals), and lets you build your own custom decks. If a card does not fit your current study goals, you can remove it from your active deck at any time using the remove button on the far right of any row, or directly from the practice arena.',
+  },
+  {
+    id: 'interview-strategy',
+    anchors: ['interview-strategy'],
+    title: '4. AI Interview Strategy & Privacy',
+    body: 'We strongly recommend adding an AI key in Settings; it unlocks powerful coaching features across the app. With Interview Strategy, enter your target company and position, and paste in any job descriptions, recruiter notes, or interview details you have. The coach researches expected technical questions, constructs a tailored custom deck, and flags external study resources for topics outside our catalog.\n\nYour Privacy Matters: Your API keys and personal notes remain stored strictly in your browser\'s local storage. All AI requests communicate directly with your chosen provider API. No user data is ever collected or tracked by the creator of Leitner Coding.',
+  },
+  {
+    id: 'catalog-filters',
+    anchors: ['catalog-filters'],
+    title: '5. Inspecting the Library',
+    body: 'Use the category pills and search bar to explore cards by track, difficulty, or mastery tier. Important note: filtering here only changes what you see on this page for browsing; it does not alter what you study. To change the cards served during practice, select or build a custom deck.',
+  },
+  {
+    id: 'focus',
+    anchors: ['focus'],
+    title: '6. Focus Mode',
+    body: 'Want to narrow your focus for a specific study session without building a whole new deck? Click Focus to temporarily restrict your active deck to specific tracks, tags, or difficulty levels while staying on your current deck.',
+  },
+  {
+    id: 'deck-nav',
+    anchors: ['deck-nav'],
+    title: '7. Switch Views Anytime',
+    body: 'Use these tabs to switch between the Deck Catalog and the Practice Arena. The first time you launch the Practice Arena, a brief tour will show you the editor, contract assertions, and evaluation flow.',
+  },
+];
+
+export const ARENA_TOUR_STEPS: TourStep[] = [
   {
     id: 'contract',
     anchors: ['problem', 'contract'],
@@ -33,24 +78,14 @@ export const TOUR_STEPS: TourStep[] = [
     body: 'After you submit there is exactly one button: continue, or, if you missed it, practice the pattern in a short unscored drill. Cards you miss come back sooner; cards you nail come back later.',
   },
   {
-    id: 'deck',
-    anchors: ['deck-nav'],
-    title: '5. Practice Arena and Deck Catalog',
-    body: 'Practice Arena is where you solve cards, one at a time. Deck Catalog lists every card with your progress, so you can browse and inspect the whole deck.',
-  },
-  {
-    id: 'focus',
-    anchors: ['focus'],
-    title: '6. Focus: choose what you practice',
-    body: 'Focus narrows what you are served: include or exclude tracks and tags (and difficulty) to match your next interview. This is how you shape what you learn. The filters in the Deck Catalog only change what you see there.',
-  },
-  {
     id: 'settings',
     anchors: ['settings'],
-    title: '7. Settings',
-    body: 'Add an AI key for written critiques, back up or export your progress, change the theme and review the keyboard shortcuts. You can replay this tour any time from About.',
+    title: '5. Settings & AI Reviews',
+    body: 'Add an AI key in Settings for written critiques, back up or export your progress, change the theme, and review keyboard shortcuts. You can replay either tour at any time from About.',
   },
 ];
+
+export const TOUR_STEPS: TourStep[] = CATALOG_TOUR_STEPS;
 
 export const tourAnchorSelector = (anchor: string): string => `[data-tour="${anchor}"]`;
 

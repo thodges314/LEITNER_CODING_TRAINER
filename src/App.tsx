@@ -57,6 +57,7 @@ import { recordProblemCompletion, markBackupAdvisorySeen } from './lib/backupAdv
 import { DOUBLE_BACK_WINDOW_MS, useBackNavigation } from './lib/backNavigation';
 import { isFirstVisit, markWelcomed } from './lib/welcome';
 import { GuidedTour } from './components/GuidedTour';
+import { CATALOG_TOUR_STEPS, ARENA_TOUR_STEPS } from './lib/tour';
 import { AiRecommendationPopover } from './components/AiRecommendationPopover';
 import { ActiveModelStatusPopover } from './components/ActiveModelStatusPopover';
 import { MobileNoticeModal } from './components/MobileNoticeModal';
@@ -110,7 +111,12 @@ export function App() {
   const [isFocusOpen, setIsFocusOpen] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(FIRST_VISIT);
   const [welcomeMode, setWelcomeMode] = useState(FIRST_VISIT);
-  const [isTourOpen, setIsTourOpen] = useState(false);
+  const [isCatalogTourOpen, setIsCatalogTourOpen] = useState(false);
+  const [isArenaTourOpen, setIsArenaTourOpen] = useState(false);
+  const [pendingArenaTour, setPendingArenaTour] = useState(() => {
+    if (typeof localStorage === 'undefined') return false;
+    return localStorage.getItem('leitner_pending_arena_tour') === '1' && !localStorage.getItem('leitner_arena_tour_seen');
+  });
   const [backHint, setBackHint] = useState(false);
   const [isAiRecommendOpen, setIsAiRecommendOpen] = useState(false);
   const [isAiStatusOpen, setIsAiStatusOpen] = useState(false);
@@ -170,6 +176,26 @@ export function App() {
     }, 4000);
     return () => clearTimeout(timer);
   }, [unlockToast]);
+
+  // Auto-trigger Arena Tour once on first visit to Practice Arena
+  useEffect(() => {
+    if (activeView === 'practice' && pendingArenaTour && !isCatalogTourOpen && !isAboutOpen) {
+      const seen = localStorage.getItem('leitner_arena_tour_seen');
+      if (!seen) {
+        try {
+          localStorage.setItem('leitner_arena_tour_seen', '1');
+          localStorage.removeItem('leitner_pending_arena_tour');
+        } catch {
+          // storage unavailable
+        }
+        const timer = setTimeout(() => {
+          setPendingArenaTour(false);
+          setIsArenaTourOpen(true);
+        }, 250);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [activeView, pendingArenaTour, isCatalogTourOpen, isAboutOpen]);
 
   // Back = to the deck and stay; a quick second Back leaves the app.
   useBackNavigation({ view: activeView, onShowDeck: () => setActiveView('dashboard'), onHint: () => setBackHint(true) });
@@ -648,6 +674,7 @@ export function App() {
               }}
               title="Open AI Interview Prep & Strategy Coach (Review briefings, check readiness, dialogue with AI)"
               data-testid="header-interview-prep-btn"
+              data-tour="interview-strategy"
             >
               <Sparkles size={14} color="var(--accent-purple)" />
               <span className="btn-label-long">Interview Strategy</span>
@@ -869,20 +896,53 @@ export function App() {
       </footer>
 
       {/* Modals */}
-      {isTourOpen && <GuidedTour onClose={() => setIsTourOpen(false)} />}
+      {isCatalogTourOpen && (
+        <GuidedTour
+          steps={CATALOG_TOUR_STEPS}
+          onClose={() => setIsCatalogTourOpen(false)}
+        />
+      )}
+      {isArenaTourOpen && (
+        <GuidedTour
+          steps={ARENA_TOUR_STEPS}
+          onClose={() => setIsArenaTourOpen(false)}
+        />
+      )}
 
       <AboutModal
         isOpen={isAboutOpen}
         welcome={welcomeMode}
         onStartTour={() => {
-          // Close About/Welcome, show the practice screen, then start once its anchors are on the page.
           setIsAboutOpen(false);
           if (welcomeMode) {
             markWelcomed();
             setWelcomeMode(false);
+            try {
+              localStorage.setItem('leitner_pending_arena_tour', '1');
+            } catch {
+              // storage unavailable
+            }
+            setPendingArenaTour(true);
           }
+          setIsCatalogTourOpen(true);
+        }}
+        onStartCatalogTour={() => {
+          setIsAboutOpen(false);
+          setActiveView('dashboard');
+          window.setTimeout(() => setIsCatalogTourOpen(true), 150);
+        }}
+        onStartArenaTour={() => {
+          setIsAboutOpen(false);
           setActiveView('practice');
-          window.setTimeout(() => setIsTourOpen(true), 150);
+          window.setTimeout(() => setIsArenaTourOpen(true), 150);
+        }}
+        onStartPractice={() => {
+          setIsAboutOpen(false);
+          if (welcomeMode) {
+            markWelcomed();
+            setWelcomeMode(false);
+            setActiveView('practice');
+          }
         }}
         onClose={() => {
           setIsAboutOpen(false);

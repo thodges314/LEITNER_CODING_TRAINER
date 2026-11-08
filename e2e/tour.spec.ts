@@ -27,48 +27,83 @@ async function startWithTour(page: Page) {
 }
 
 test.describe('guided tour', () => {
-  test('the welcome screen offers it; all 7 steps work; the app is usable afterwards and the welcome never returns', async ({ page }) => {
+  test('the welcome screen offers it; catalog 7 steps work, then first arena launch triggers 5 arena steps', async ({ page }) => {
     await startWithTour(page);
     const tour = tourDialog(page);
-    const spotlight = page.getByTestId('tour-spotlight');
     const next = () => tour.getByRole('button', { name: 'Next' }).click();
 
-    // Step 1 lights up the problem description AND the contract table under it.
+    // Step 1: Your Practice Hub
     await expect(tour).toContainText('Step 1 of 7');
+    await expect(tour).toContainText('Your Practice Hub');
+    await expectSpotlightAround(page, 'action-hero');
+
+    // Step 2: Cards & Spaced Repetition
+    await next();
+    await expect(tour).toContainText('Step 2 of 7');
+    await expect(tour).toContainText('Cards & Spaced Repetition');
+    await expectSpotlightAround(page, 'catalog-table');
+
+    // Step 3: Study Decks & Preset Curricula (dropdown opens automatically)
+    await next();
+    await expect(tour).toContainText('Step 3 of 7');
+    await expect(tour).toContainText('Study Decks & Preset Curricula');
+    await expectSpotlightAround(page, 'deck-selector');
+    await expect(page.getByTestId('deck-dropdown-menu')).toBeVisible();
+
+    // Step 4: AI Interview Strategy & Privacy
+    await next();
+    await expect(tour).toContainText('Step 4 of 7');
+    await expect(tour).toContainText('AI Interview Strategy & Privacy');
+    await expectSpotlightAround(page, 'interview-strategy');
+
+    // Step 5: Inspecting the Library
+    await next();
+    await expect(tour).toContainText('Step 5 of 7');
+    await expect(tour).toContainText('Inspecting the Library');
+    await expectSpotlightAround(page, 'catalog-filters');
+
+    // Step 6: Focus Mode
+    await next();
+    await expect(tour).toContainText('Step 6 of 7');
+    await expect(tour).toContainText('Focus Mode');
+    await expectSpotlightAround(page, 'focus');
+
+    // Step 7: Switch Views Anytime
+    await next();
+    await expect(tour).toContainText('Step 7 of 7');
+    await expect(tour).toContainText('Switch Views Anytime');
+    await expectSpotlightAround(page, 'deck-nav');
+
+    // Finish catalog tour
+    await tour.getByRole('button', { name: 'Finish' }).click();
+    await expect(tourDialog(page)).toHaveCount(0);
+
+    // Launch Practice Arena: first visit auto-triggers the 5-step arena tour
+    await page.getByRole('button', { name: /Resume Practice Arena/i }).click();
+    await expect(tourDialog(page)).toBeVisible();
+    await expect(tour).toContainText('Step 1 of 5');
     await expect(tour).toContainText('Read the problem and its contract');
     await expectSpotlightAround(page, 'problem');
     await expectSpotlightAround(page, 'contract');
 
     await next();
-    await expect(tour).toContainText('Step 2 of 7');
+    await expect(tour).toContainText('Step 2 of 5');
     await expect(tour).toContainText('Solve it yourself');
     await expectSpotlightAround(page, 'editor');
 
     await next();
-    await expect(tour).toContainText('Step 3 of 7');
+    await expect(tour).toContainText('Step 3 of 5');
     await expect(tour).toContainText('Submit Final Answer');
     await expectSpotlightAround(page, 'actions');
 
     await next();
-    await expect(tour).toContainText('Step 4 of 7');
+    await expect(tour).toContainText('Step 4 of 5');
     await expect(tour).toContainText('One next step');
-    await expect(spotlight).toHaveCount(0); // a centered note, nothing to point at
-
-    // The top bar, one control at a time.
-    await next();
-    await expect(tour).toContainText('Step 5 of 7');
-    await expect(tour).toContainText('Deck Catalog');
-    await expectSpotlightAround(page, 'deck-nav');
+    await expect(page.getByTestId('tour-spotlight')).toHaveCount(0);
 
     await next();
-    await expect(tour).toContainText('Step 6 of 7');
-    await expect(tour).toContainText('Focus: choose what you practice');
-    await expect(tour).toContainText('only change what you see');
-    await expectSpotlightAround(page, 'focus');
-
-    await next();
-    await expect(tour).toContainText('Step 7 of 7');
-    await expect(tour).toContainText('Settings');
+    await expect(tour).toContainText('Step 5 of 5');
+    await expect(tour).toContainText('Settings & AI Reviews');
     await expectSpotlightAround(page, 'settings');
 
     await tour.getByRole('button', { name: 'Finish' }).click();
@@ -122,27 +157,21 @@ test.describe('guided tour', () => {
     await page.keyboard.press('Escape');
     await expect(tourDialog(page)).toHaveCount(0);
 
-    // Replay from About, then Skip
+    // Replay from About: Catalog Tour, then Skip
     await page.getByRole('button', { name: /^About$/ }).click();
-    await page.getByRole('button', { name: 'Replay the quick tour' }).click();
+    await page.getByRole('button', { name: 'Replay Deck Catalog Tour' }).click();
     await expect(tourDialog(page)).toBeVisible();
+    await expect(tourDialog(page)).toContainText('Your Practice Hub');
     await tourDialog(page).getByRole('button', { name: 'Skip tour' }).click();
     await expect(tourDialog(page)).toHaveCount(0);
-  });
 
-  test('replay from About works from the Deck Catalog and returns to the practice screen', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: /Start practicing/ }).click();
-    await page.getByRole('button', { name: /Deck Catalog/ }).click();
-    await expect(page.getByText(/Catalog & Deck Performance/)).toBeVisible();
-
+    // Replay from About: Arena Tour, then Skip
     await page.getByRole('button', { name: /^About$/ }).click();
-    await page.getByRole('button', { name: 'Replay the quick tour' }).click();
-
-    const tour = tourDialog(page);
-    await expect(tour).toBeVisible();
-    await expect(tour).toContainText('Step 1 of 7'); // the practice screen is showing again, so every anchor exists
-    await expect(page.getByText(/Catalog & Deck Performance/)).toHaveCount(0);
+    await page.getByRole('button', { name: 'Replay Practice Arena Tour' }).click();
+    await expect(tourDialog(page)).toBeVisible();
+    await expect(tourDialog(page)).toContainText('Read the problem and its contract');
+    await tourDialog(page).getByRole('button', { name: 'Skip tour' }).click();
+    await expect(tourDialog(page)).toHaveCount(0);
   });
 
   test('"Start practicing" still works without the tour', async ({ page }) => {

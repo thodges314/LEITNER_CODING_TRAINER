@@ -16,7 +16,7 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
   onResumePractice,
 }) => {
   return (
-    <div className="glass-panel practice-action-hero" data-testid="practice-action-hero">
+    <div className="glass-panel practice-action-hero" data-testid="practice-action-hero" data-tour="action-hero">
       {/* Top Banner Row */}
       <div className="practice-hero-header">
         <div className="practice-hero-badge">

@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { availableSteps, placeTooltip, TOUR_STEPS, tourAnchorSelector } from '../lib/tour';
-import type { Box } from '../lib/tour';
+import type { Box, TourStep } from '../lib/tour';
 
 interface GuidedTourProps {
+  steps?: TourStep[];
   onClose: () => void;
 }
 
 const PAD = 6;
-const TOOLTIP_WIDTH = 340;
-const TOOLTIP_HEIGHT_ESTIMATE = 240; // generous, so the tooltip is always placed fully inside the viewport
+const TOOLTIP_WIDTH = 380;
+const TOOLTIP_HEIGHT_ESTIMATE = 280;
 
 /**
  * The spotlight rectangle covering all the anchors of a step that are on the page, as a short string (a stable value
@@ -54,11 +55,38 @@ function parseBox(value: string): Box | null {
  * A dismissable spotlight tour. Mount it to start it, unmount it to end it. It only points at things that are on the
  * page (missing anchors are skipped), follows scrolling and resizing, and works with the keyboard (arrows, Escape).
  */
-export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
-  const [steps] = useState(() => availableSteps(TOUR_STEPS, (selector) => document.querySelector(selector) !== null));
+export const GuidedTour: React.FC<GuidedTourProps> = ({ steps: initialSteps, onClose }) => {
+  const stepsSource = initialSteps ?? TOUR_STEPS;
+  const [steps] = useState(() => availableSteps(stepsSource, (selector) => document.querySelector(selector) !== null));
   const [index, setIndex] = useState(0);
   const nextRef = useRef<HTMLButtonElement | null>(null);
+  const tipRef = useRef<HTMLDivElement | null>(null);
   const step = steps[index];
+
+  const handleClose = useCallback(() => {
+    const trigger = document.querySelector<HTMLButtonElement>('[data-testid="deck-dropdown-trigger"]');
+    if (trigger && trigger.getAttribute('aria-expanded') === 'true') {
+      trigger.click();
+    }
+    onClose();
+  }, [onClose]);
+
+  // If entering the deck-selector step, automatically pop open the dropdown
+  useEffect(() => {
+    if (step?.id === 'deck-selector') {
+      const trigger = document.querySelector<HTMLButtonElement>('[data-testid="deck-dropdown-trigger"]');
+      if (trigger && trigger.getAttribute('aria-expanded') !== 'true') {
+        trigger.click();
+        window.dispatchEvent(new Event('resize'));
+      }
+    } else {
+      const trigger = document.querySelector<HTMLButtonElement>('[data-testid="deck-dropdown-trigger"]');
+      if (trigger && trigger.getAttribute('aria-expanded') === 'true') {
+        trigger.click();
+        window.dispatchEvent(new Event('resize'));
+      }
+    }
+  }, [step?.id]);
 
   const boxValue = useSyncExternalStore(
     subscribe,
@@ -67,11 +95,29 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
   );
   const box = parseBox(boxValue);
 
+  const [tipHeight, setTipHeight] = useState(TOOLTIP_HEIGHT_ESTIMATE);
+
+  useLayoutEffect(() => {
+    if (tipRef.current) {
+      const h = tipRef.current.offsetHeight;
+      if (h && Math.abs(h - tipHeight) > 5) {
+        setTipHeight(h);
+      }
+    }
+  }, [step, tipHeight]);
+
   // Bring the target into view when the step changes.
   useLayoutEffect(() => {
     if (step) {
       const first = step.anchors.map((a) => document.querySelector(tourAnchorSelector(a))).find((el) => el !== null);
-      first?.scrollIntoView({ block: 'center', behavior: 'auto' });
+      if (first) {
+        const rect = first.getBoundingClientRect();
+        if (rect.height > window.innerHeight) {
+          first.scrollIntoView({ block: 'start', behavior: 'auto' });
+        } else {
+          first.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+        }
+      }
     }
   }, [step]);
 
@@ -81,9 +127,9 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
 
   const last = index >= steps.length - 1;
   const next = useCallback(() => {
-    if (last) onClose();
+    if (last) handleClose();
     else setIndex((i) => i + 1);
-  }, [last, onClose]);
+  }, [last, handleClose]);
   const back = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
 
   useEffect(() => {
@@ -91,7 +137,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
       if (e.key === 'Escape') {
         e.preventDefault();
         e.stopPropagation();
-        onClose();
+        handleClose();
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         next();
@@ -102,11 +148,11 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
     };
     window.addEventListener('keydown', onKey, true);
     return () => window.removeEventListener('keydown', onKey, true);
-  }, [next, back, onClose]);
+  }, [next, back, handleClose]);
 
   if (!step) return null;
 
-  const placement = placeTooltip(box, { width: TOOLTIP_WIDTH, height: TOOLTIP_HEIGHT_ESTIMATE }, { width: window.innerWidth, height: window.innerHeight });
+  const placement = placeTooltip(box, { width: TOOLTIP_WIDTH, height: tipHeight }, { width: window.innerWidth, height: window.innerHeight });
 
   return createPortal(
     <div data-testid="guided-tour" style={{ position: 'fixed', inset: 0, zIndex: 3000 }}>
@@ -132,7 +178,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
       ) : (
         <div aria-hidden="true" style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(2, 6, 23, 0.72)', pointerEvents: 'none' }} />
       )}
+
+      {/* Tooltip */}
       <div
+        ref={tipRef}
         role="dialog"
         aria-label="Guided tour"
         aria-live="polite"
@@ -142,36 +191,60 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
           left: placement.left,
           width: TOOLTIP_WIDTH,
           maxWidth: 'calc(100vw - 24px)',
+          maxHeight: 'calc(100vh - 24px)',
+          overflowY: 'auto',
           padding: '16px 18px',
           borderRadius: '12px',
           backgroundColor: 'var(--bg-card, #141b29)',
           color: 'var(--text-primary, #f1f5f9)',
           border: '1px solid var(--border-medium, rgba(255,255,255,0.16))',
           boxShadow: '0 12px 40px rgba(0, 0, 0, 0.55)',
+          zIndex: 3001,
           display: 'flex',
           flexDirection: 'column',
           gap: '10px',
         }}
       >
-        <div style={{ fontSize: '11.5px', letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-muted, #64748b)' }}>
-          Step {index + 1} of {steps.length}
-        </div>
-        <div style={{ fontSize: '16px', fontWeight: 700 }}>{step.title}</div>
-        <p style={{ margin: 0, fontSize: '13.5px', lineHeight: 1.5, color: 'var(--text-secondary, #94a3b8)' }}>{step.body}</p>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginTop: '4px' }}>
-          <button type="button" className="btn btn-outline" onClick={onClose} style={{ fontSize: '12.5px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '11.5px', letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-muted, #64748b)' }}>
+            Step {index + 1} of {steps.length}
+          </span>
+          <button
+            type="button"
+            className="btn btn-outline"
+            style={{ padding: '2px 8px', fontSize: '11.5px' }}
+            onClick={handleClose}
+          >
             Skip tour
           </button>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {index > 0 && (
-              <button type="button" className="btn btn-outline" onClick={back} style={{ fontSize: '12.5px' }}>
-                Back
-              </button>
-            )}
-            <button ref={nextRef} type="button" className="btn btn-primary" onClick={next} style={{ fontSize: '13px', fontWeight: 600 }}>
-              {last ? 'Finish' : 'Next'}
-            </button>
-          </div>
+        </div>
+
+        <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
+          {step.title}
+        </div>
+
+        <p style={{ margin: 0, fontSize: '13.5px', lineHeight: 1.5, color: 'var(--text-secondary, #94a3b8)', whiteSpace: 'pre-line' }}>
+          {step.body}
+        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginTop: '4px' }}>
+          <button
+            type="button"
+            className="btn btn-outline"
+            style={{ visibility: index > 0 ? 'visible' : 'hidden', fontSize: '12.5px' }}
+            onClick={back}
+          >
+            Back
+          </button>
+          <button
+            ref={nextRef}
+            type="button"
+            className="btn btn-primary"
+            onClick={next}
+            style={{ fontSize: '13px', fontWeight: 600 }}
+          >
+            {last ? 'Finish' : 'Next'}
+          </button>
         </div>
       </div>
     </div>,
