@@ -174,8 +174,8 @@ export interface Rolling24HourStats {
 /**
  * Computes review velocity metrics for a rolling 24-hour window:
  * - attempted: total reviews completed in the last 24h
- * - promoted: reviews resulting in an advancement to a higher box/tier (or passing at cap)
- * - demoted: reviews resulting in a setback/demotion or failure
+ * - promoted: reviews resulting in an advancement to a higher box/tier (box > previousBox)
+ * - demoted: reviews resulting in a drop to a lower box/tier (box < previousBox)
  */
 export function computeRolling24HourStats(
   recentReviews?: ReviewHistoryEntry[],
@@ -194,17 +194,16 @@ export function computeRolling24HourStats(
       let demoted = 0;
       for (const r of inWindow) {
         if (r.previousBox !== undefined) {
-          if (r.box > r.previousBox || (r.passed && r.box === r.previousBox)) {
+          if (r.box > r.previousBox) {
             promoted++;
-          } else if (r.box < r.previousBox || !r.passed) {
+          } else if (r.box < r.previousBox) {
             demoted++;
           }
         } else {
-          // Graceful fallback for legacy entries where previousBox was not stored
-          if (r.passed) {
+          // Graceful fallback for legacy entries where previousBox was not stored:
+          // Only count as promoted if passed and ended above Box 1; never assume demotion without previousBox.
+          if (r.passed && r.box > 1) {
             promoted++;
-          } else {
-            demoted++;
           }
         }
       }
@@ -216,14 +215,18 @@ export function computeRolling24HourStats(
     }
   }
 
-  // Graceful fallback to dailyStats for current calendar day if recentReviews is empty
+  // Graceful fallback to dailyStats for current calendar day if recentReviews has no timestamped entries.
+  // dailyStats does not record previousBox, so failed Box 1 cards are not counted as demotions.
   const todayKey = localDateKey(now);
   const todayStat = dailyStats?.[todayKey];
   if (todayStat && todayStat.reviews > 0) {
+    const legacyDemoted = Array.isArray(recentReviews)
+      ? recentReviews.filter((r) => r.previousBox !== undefined && r.box < r.previousBox).length
+      : 0;
     return {
       attempted: todayStat.reviews,
       promoted: todayStat.passes,
-      demoted: Math.max(0, todayStat.reviews - todayStat.passes),
+      demoted: legacyDemoted,
     };
   }
 
