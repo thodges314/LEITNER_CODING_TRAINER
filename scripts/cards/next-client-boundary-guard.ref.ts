@@ -15,10 +15,10 @@ interface UserProfileContainerProps {
   fetchUser: (id: string) => Promise<ServerUserRecord | null>;
 }
 
-async function UserProfileContainer({
+const UserProfileContainer = async ({
   userId,
   fetchUser,
-}: UserProfileContainerProps): Promise<React.ReactElement> {
+}: UserProfileContainerProps): Promise<React.ReactElement> => {
   const user = await fetchUser(userId);
   if (!user) {
     notFound();
@@ -31,4 +31,4 @@ async function UserProfileContainer({
       <UserBadge user={clientSafeUser} />
     </div>
   );
-}
+};
