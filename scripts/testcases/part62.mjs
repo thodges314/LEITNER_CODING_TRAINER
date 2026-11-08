@@ -332,24 +332,24 @@ export default {
 
   'next-link-navigation': [
     rHarness(
-      'Renders navigation container and all item links with hrefs',
-      '<NavigationBar items={navItems} currentPath="/dashboard" />',
-      'renders nav container with links to "/", "/dashboard", and "/settings"'
+      'Renders navigation bar with list of routes using Next.js Link',
+      '<Navbar items={defaultItems} /> (pathname="/dashboard")',
+      'renders nav container with 3 Next.js Link items with correct hrefs'
     ),
     rHarness(
-      'Applies aria-current="page" and active class to currentPath link',
-      'q("[data-testid=\'nav-link\'][href=\'/dashboard\']", c)',
-      'sets aria-current="page" and className="nav-link active"'
+      'Inspects active route via usePathname() and sets aria-current="page"',
+      '<Navbar items={defaultItems} /> (pathname="/settings")',
+      'sets aria-current="page" and active styling on /settings link'
     ),
     rHarness(
-      'Leaves non-active links without aria-current attribute',
-      'qa("[data-testid=\'nav-link\']", c)',
-      'non-active links have no aria-current and have className="nav-link"'
+      'Updates active styling when pathname changes',
+      '<Navbar items={defaultItems} /> (pathname="/profile")',
+      'sets aria-current="page" on /profile and leaves /dashboard without aria-current'
     ),
     rHarness(
-      'Prevents default browser reload and triggers onNavigate callback',
-      'fire.click(targetLink)',
-      'prevents default native navigation and invokes onNavigate("/settings")'
+      'Sets inactive styling without aria-current on unselected routes',
+      '<Navbar items={defaultItems} /> (pathname="/dashboard")',
+      'unselected routes have no aria-current attribute and retain inactive styling'
     ),
   ],
 

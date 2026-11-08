@@ -61,6 +61,9 @@ Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/
   - `extractPromptTypeBlocks()` automatically injects extracted prompt interfaces into the ambient typechecker.
   - `stripPredefinedPromptTypes()` automatically strips predefined prompt interfaces from the revealed solution view so learners see only pure implementation code.
   - `detectRedundantScopeInput()` monitors user typing in real time and triggers an advisory popup if learners type `import` or retype prompt interfaces, reminding them that the symbols are already preloaded in scope.
+- **Idiomatic Framework Usage (Framework Built-ins & Managed Primitives)**:
+  - Target idiomatic framework usage only. Never ask to re-implement framework internals or substitute standard library components with mock HTML tags and synthetic event listeners.
+  - When authoring cards for Next.js, React, or other frameworks, learners must consume the authentic framework primitives (`next/link`, `next/navigation`, `next/image`, `next/script`, `next/font`) rather than building synthetic custom wrappers or mocking browser clicks. Provide realistic execution mocks and ambient type declarations in the sandbox runner (`src/utils/nextSandbox.ts`, `src/utils/sandboxNextTypes.ts`).
 
 ## Component and Live Preview Conventions
 - **Preview Library Ingestion (`<id>.meta.json`)**:

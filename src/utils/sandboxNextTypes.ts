@@ -156,6 +156,86 @@ export const SANDBOX_NEXT_TYPES = `
     export function useSearchParams(): URLSearchParams;
   }
 
+  declare module 'next/link' {
+    import * as React from 'react';
+    export interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+      href: string | { pathname?: string; query?: any };
+      prefetch?: boolean;
+      scroll?: boolean;
+      replace?: boolean;
+      children?: React.ReactNode;
+      className?: string;
+    }
+    const Link: React.ComponentType<LinkProps>;
+    export default Link;
+  }
+
+  declare module 'next/image' {
+    import * as React from 'react';
+    export interface ImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+      src: string | any;
+      alt: string;
+      width?: number;
+      height?: number;
+      fill?: boolean;
+      priority?: boolean;
+      sizes?: string;
+      className?: string;
+    }
+    const Image: React.ComponentType<ImageProps>;
+    export default Image;
+  }
+
+  declare module 'next/script' {
+    import * as React from 'react';
+    export interface ScriptProps extends React.ScriptHTMLAttributes<HTMLScriptElement> {
+      src?: string;
+      strategy?: 'beforeInteractive' | 'afterInteractive' | 'lazyOnload' | 'worker';
+      onLoad?: (e: any) => void;
+      onError?: (e: any) => void;
+      children?: string;
+    }
+    const Script: React.ComponentType<ScriptProps>;
+    export default Script;
+  }
+
+  declare module 'next/font/google' {
+    export interface FontOptions {
+      subsets?: string[];
+      weight?: string | string[];
+      style?: string | string[];
+      display?: string;
+      variable?: string;
+      preload?: boolean;
+    }
+    export interface FontObject {
+      className: string;
+      style: { fontFamily: string; fontWeight?: number; fontStyle?: string };
+      variable: string;
+    }
+    export function Inter(options?: FontOptions): FontObject;
+    export function Roboto(options?: FontOptions): FontObject;
+  }
+
+  declare var Link: any;
+  declare var Image: any;
+  declare var Script: any;
+  declare function usePathname(): string;
+  declare function useRouter(): {
+    push(href: string): void;
+    replace(href: string): void;
+    refresh(): void;
+    back(): void;
+    forward(): void;
+    prefetch(href: string): void;
+  };
+  declare function useSearchParams(): URLSearchParams;
+  declare function redirect(url: string, type?: any): never;
+  declare function notFound(): never;
+  declare function setMockPathname(pathname: string): void;
+  declare function setMockRouter(router: any): void;
+  declare function setMockSearchParams(params: any): void;
+
   interface Metadata {
     title?: string | { default: string; template: string };
     description?: string;

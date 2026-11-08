@@ -1,7 +1,9 @@
+import React from 'react';
+
 /**
  * Zero-dependency in-browser and Web Worker runtime shims for Next.js App Router globals.
  * Injected into the runner evaluation scope so learners can write standard Next.js code
- * without needing 'next/server' or 'next/navigation' bundled dependencies.
+ * without needing 'next/server', 'next/navigation', 'next/link', or 'next/image' external bundles.
  */
 
 export interface CookieItem {
@@ -58,8 +60,6 @@ export class NextRequest extends Request {
   public geo?: { city?: string; country?: string; region?: string };
 
   constructor(input: RequestInfo | URL, init?: RequestInit & { cookies?: Record<string, string>; nextUrl?: URL }) {
-    // In browser runtimes, passing forbidden headers like 'cookie' to new Request() may be stripped by native fetch.
-    // We safely extract it from init.headers first.
     let rawCookie = '';
     if (init?.headers) {
       if (typeof (init.headers as Headers).get === 'function') {
@@ -93,7 +93,6 @@ export class NextRequest extends Request {
       }
     }
 
-    // Ensure headers.get('cookie') works in browser even if the native Headers dropped it
     if (rawCookie) {
       const origGet = this.headers.get.bind(this.headers);
       this.headers.get = (name: string) => {
@@ -171,3 +170,216 @@ export function resetRevalidationStore(): void {
   activeRevalidationStore.tags.clear();
   activeRevalidationStore.paths.clear();
 }
+
+// ---------------------------------------------------------------------------
+// Navigation and Routing Hooks (next/navigation)
+// ---------------------------------------------------------------------------
+
+let currentPathname = '/';
+
+export function setMockPathname(pathname: string): void {
+  currentPathname = pathname;
+}
+
+export function usePathname(): string {
+  return currentPathname;
+}
+
+export interface MockRouter {
+  push: (href: string) => void;
+  replace: (href: string) => void;
+  refresh: () => void;
+  back: () => void;
+  forward: () => void;
+  prefetch: (href: string) => void;
+  lastNavigated?: string;
+  history: string[];
+}
+
+export const activeRouter: MockRouter = {
+  history: [],
+  push(href: string) {
+    this.lastNavigated = href;
+    this.history.push(href);
+    currentPathname = href.split('?')[0];
+  },
+  replace(href: string) {
+    this.lastNavigated = href;
+    if (this.history.length > 0) this.history[this.history.length - 1] = href;
+    else this.history.push(href);
+    currentPathname = href.split('?')[0];
+  },
+  refresh() {},
+  back() {},
+  forward() {},
+  prefetch() {},
+};
+
+export function useRouter(): MockRouter {
+  return activeRouter;
+}
+
+export function setMockRouter(router: Partial<MockRouter>): void {
+  Object.assign(activeRouter, router);
+}
+
+export function resetMockRouter(): void {
+  activeRouter.history = [];
+  delete activeRouter.lastNavigated;
+  currentPathname = '/';
+}
+
+let currentSearchParams = new URLSearchParams();
+
+export function setMockSearchParams(params: string | URLSearchParams | Record<string, string>): void {
+  if (params instanceof URLSearchParams) {
+    currentSearchParams = params;
+  } else if (typeof params === 'string') {
+    currentSearchParams = new URLSearchParams(params.startsWith('?') ? params.slice(1) : params);
+  } else {
+    currentSearchParams = new URLSearchParams(params);
+  }
+}
+
+export function useSearchParams(): URLSearchParams {
+  return currentSearchParams;
+}
+
+export class NextRedirectError extends Error {
+  public url: string;
+  constructor(url: string) {
+    super(`NEXT_REDIRECT: ${url}`);
+    this.name = 'NextRedirectError';
+    this.url = url;
+  }
+}
+
+export class NextNotFoundError extends Error {
+  constructor() {
+    super('NEXT_NOT_FOUND');
+    this.name = 'NextNotFoundError';
+  }
+}
+
+export function redirect(url: string): never {
+  throw new NextRedirectError(url);
+}
+
+export function notFound(): never {
+  throw new NextNotFoundError();
+}
+
+// ---------------------------------------------------------------------------
+// Managed Next.js Primitives: <Link>, <Image>, <Script>, next/font
+// ---------------------------------------------------------------------------
+
+export interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+  href: string | { pathname?: string; query?: any };
+  prefetch?: boolean;
+  scroll?: boolean;
+  replace?: boolean;
+  children?: React.ReactNode;
+}
+
+export function Link({ href, prefetch, scroll, replace, children, className, ...rest }: LinkProps) {
+  const url = typeof href === 'object' ? href.pathname || '/' : href;
+  return React.createElement(
+    'a',
+    {
+      href: url,
+      className,
+      'data-next-link': 'true',
+      ...(prefetch !== undefined ? { 'data-prefetch': String(prefetch) } : {}),
+      ...(scroll !== undefined ? { 'data-scroll': String(scroll) } : {}),
+      ...rest,
+    },
+    children
+  );
+}
+
+export interface NextImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  fill?: boolean;
+  priority?: boolean;
+  sizes?: string;
+  className?: string;
+}
+
+export function Image({
+  src,
+  alt,
+  width,
+  height,
+  fill,
+  priority,
+  sizes,
+  className,
+  ...rest
+}: NextImageProps) {
+  const imgProps: Record<string, any> = {
+    src,
+    alt,
+    'data-next-image': 'true',
+    decoding: 'async',
+    loading: priority ? 'eager' : 'lazy',
+    ...(priority ? { fetchPriority: 'high' } : {}),
+    ...rest,
+  };
+
+  if (fill) {
+    imgProps['data-fill'] = 'true';
+    imgProps.className = ['object-cover', className].filter(Boolean).join(' ');
+  } else {
+    if (width !== undefined) imgProps.width = width;
+    if (height !== undefined) imgProps.height = height;
+    if (className) imgProps.className = className;
+  }
+
+  if (sizes) imgProps.sizes = sizes;
+
+  return React.createElement('img', imgProps);
+}
+
+export interface NextScriptProps extends React.ScriptHTMLAttributes<HTMLScriptElement> {
+  src?: string;
+  strategy?: 'beforeInteractive' | 'afterInteractive' | 'lazyOnload' | 'worker';
+  onLoad?: (e: any) => void;
+  onError?: (e: any) => void;
+  children?: string;
+}
+
+export function Script({
+  src,
+  strategy = 'afterInteractive',
+  onLoad,
+  onError,
+  children,
+  ...rest
+}: NextScriptProps) {
+  React.useEffect(() => {
+    if (onLoad) {
+      const timer = setTimeout(() => onLoad({ type: 'load' }), 10);
+      return () => clearTimeout(timer);
+    }
+  }, [onLoad]);
+
+  return React.createElement('script', {
+    src,
+    'data-next-script': 'true',
+    'data-strategy': strategy,
+    ...rest,
+  }, children);
+}
+
+export function Inter(options?: { subsets?: string[]; variable?: string }) {
+  const variable = options?.variable || '--font-inter';
+  return {
+    className: '__className_inter',
+    variable,
+    style: { fontFamily: '__font_inter, sans-serif' },
+  };
+}
+

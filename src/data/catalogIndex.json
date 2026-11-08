@@ -5729,7 +5729,7 @@
   },
   {
     "id": "next-link-navigation",
-    "title": "Next.js Navigation: Link Component & Active Route Styling",
+    "title": "Next.js Navigation: Link & usePathname",
     "track": "nextjs",
     "concept": "next-navigation",
     "difficulty": 1,
@@ -5738,10 +5738,10 @@
       "app-router",
       "link",
       "navigation",
-      "routing",
+      "usePathname",
       "accessibility"
     ],
-    "summary": "Implement a Next.js App Router navigation bar component demonstrating Link client routing and active state accessibility"
+    "summary": "Implement an idiomatic Next.js App Router client navigation component demonstrating Link and usePathname"
   },
   {
     "id": "tailwind-alert-banner",
