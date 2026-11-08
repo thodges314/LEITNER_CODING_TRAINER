@@ -8,7 +8,7 @@
 
 A client-only, zero-backend deliberate practice environment designed to simulate cold-start front-end technical interview screening.
 Learners write solutions from scratch without autocomplete or hints, execute their implementation headlessly in a browser sandbox against comprehensive test harnesses, and review cards according to spaced repetition schedules.
-The deck features **407 cards** across **17 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [407], **Full-Stack Core** [350], **Frontend Specialist** [270], and **Algorithms & Data Structures** [102]) with **2,624 documented test cases** and **100% structured Markdown instructions**.
+The deck features **406 cards** across **17 topic tracks**, organized into 4 built-in preset study decks (**Full Library** [406], **Full-Stack Core** [349], **Frontend Specialist** [269], and **Algorithms & Data Structures** [102]) with **2,620 documented test cases** and **100% structured Markdown instructions**.
 
 - **Frontend Core**: React 19, TypeScript (strict mode), Vite 8.
 - **Content & Quality Pipeline**: Primarily AI-authored across structured batch pipelines with automated validation (reference passes, empty fails, label parity, mutation checks).
@@ -181,7 +181,7 @@ Located in [timedMode.ts](src/lib/timedMode.ts) and [PracticeArena.tsx](src/comp
 ## 7. Verification & Testing
 
 - **Vitest Suite (2,582 unit tests across 70 test files)**: Tests verifying:
-  - Reference solutions pass for all 407 cards across 17 topics across 2,624 documented test cases.
+  - Reference solutions pass for all 406 cards across 17 topics across 2,620 documented test cases.
   - Empty submissions fail for all cards.
   - TypeScript reference solutions pass under dual-mode seed tests and when stripped of types in JS mode.
   - 100% of cards formatted with structured GitHub-flavored Markdown instructions.

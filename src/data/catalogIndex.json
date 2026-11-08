@@ -5728,22 +5728,6 @@
     "summary": "Implement a foundational DOM utility that binds a click listener to toggle an active class and synchronize aria-expanded"
   },
   {
-    "id": "next-image-optimization",
-    "title": "Next.js Image Optimization: Dimensions, Priority & CLS Guard",
-    "track": "nextjs",
-    "concept": "next-image",
-    "difficulty": 1,
-    "tags": [
-      "nextjs",
-      "next-image",
-      "cls",
-      "core-web-vitals",
-      "lcp",
-      "performance"
-    ],
-    "summary": "Implement a Next.js Image component wrapper that enforces dimension safety to prevent Cumulative Layout Shift (CLS) and optimizes Largest Contentfu..."
-  },
-  {
     "id": "next-link-navigation",
     "title": "Next.js Navigation: Link Component & Active Route Styling",
     "track": "nextjs",

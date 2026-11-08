@@ -353,29 +353,6 @@ export default {
     ),
   ],
 
-  'next-image-optimization': [
-    rHarness(
-      'Renders standard image with explicit width, height, and lazy loading',
-      '<NextImage src="/images/avatar.png" alt="Profile" width={120} height={120} />',
-      'renders img with width="120", height="120", and loading="lazy"'
-    ),
-    rHarness(
-      'Sets loading="eager" and fetchPriority="high" when priority is true',
-      '<NextImage src="/images/hero.jpg" alt="Hero" width={1200} height={600} priority={true} />',
-      'renders img with loading="eager" and fetchPriority="high"'
-    ),
-    rHarness(
-      'Renders responsive fill image without fixed width and height attributes',
-      '<NextImage src="/images/bg.jpg" alt="Background" fill={true} />',
-      'renders img without width/height attributes and with fill classes'
-    ),
-    rHarness(
-      'Throws error when neither dimensions nor fill=true is supplied',
-      '<NextImage src="/broken.png" alt="Missing dimensions" />',
-      'throws error enforcing Next.js anti-CLS dimension contract'
-    ),
-  ],
-
   'tailwind-alert-banner': [
     rHarness(
       'Banner container has flex layout, padding, rounded corners, blue background, and alert role',
