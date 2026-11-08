@@ -9,6 +9,7 @@
     "react-node",
     "typescript"
   ],
-  "requiresDom": true
+  "requiresDom": true,
+  "rendersComponent": true,
+  "previewLibraries": ["react", "tailwind"]
 }
-

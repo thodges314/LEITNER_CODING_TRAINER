@@ -1746,6 +1746,24 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'stockCount', type: 'number', defaultValue: 14, min: 0, max: 100, step: 1, description: 'Available warehouse stock count' },
     { name: 'lowStockAlert', type: 'boolean', defaultValue: false, description: 'Trigger low stock warning badge' },
   ],
+  'next-layout-template-composition': [
+    {
+      name: 'pathname',
+      type: 'enum',
+      defaultValue: '/dashboard/analytics',
+      options: ['/dashboard/analytics', '/dashboard/settings', '/dashboard/billing'],
+      description: 'Active dashboard route segment triggering template remount',
+    },
+  ],
+  'next-script-strategies': [
+    {
+      name: 'analyticsId',
+      type: 'string',
+      defaultValue: 'UA-998877',
+      placeholder: 'Analytics Property ID',
+      description: 'Tracking property ID passed to afterInteractive script',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

@@ -8,6 +8,7 @@
     "optimization",
     "third-party"
   ],
-  "requiresDom": true
+  "requiresDom": true,
+  "rendersComponent": true,
+  "previewLibraries": ["react", "tailwind"]
 }
-

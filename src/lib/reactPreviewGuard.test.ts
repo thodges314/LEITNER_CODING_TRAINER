@@ -108,6 +108,8 @@ describe('React preview guard: every previewCode mounts with the reference solut
         React.createElement('a', { href: typeof href === 'object' && href ? (href as { pathname?: string }).pathname || '/' : (href as string), className: className as string, ...rest }, children as React.ReactNode);
       const nextImage = ({ src, alt, width, height, className, fill, ...rest }: Record<string, unknown>) =>
         React.createElement('img', { src: src as string, alt: alt as string, width: width as number, height: height as number, className: [fill ? 'object-cover' : '', className as string].filter(Boolean).join(' ') || undefined, ...rest });
+      const nextScript = ({ src, strategy, ...rest }: Record<string, unknown>) =>
+        React.createElement('script', { src: src as string, 'data-strategy': strategy as string, ...rest });
       const mockRouter = { push: () => {}, replace: () => {}, back: () => {}, refresh: () => {} };
       const userBadge = ({ user }: Record<string, unknown>) =>
         React.createElement('div', { 'data-testid': 'user-badge' }, (user as { name?: string })?.name || 'User');
@@ -130,6 +132,7 @@ describe('React preview guard: every previewCode mounts with the reference solut
           }
           if (mod === 'next/link') return { default: nextLink, Link: nextLink };
           if (mod === 'next/image') return { default: nextImage, Image: nextImage };
+          if (mod === 'next/script') return { default: nextScript, Script: nextScript };
           if (mod === 'next/navigation') {
             return {
               useRouter: () => mockRouter,
@@ -178,6 +181,7 @@ describe('React preview guard: every previewCode mounts with the reference solut
           usePreviewProps: <T extends Record<string, unknown>>(defaults: T): T => defaults,
           Link: nextLink,
           Image: nextImage,
+          Script: nextScript,
           useRouter: () => mockRouter,
           usePathname: () => '/',
           useSearchParams: () => new URLSearchParams(),
