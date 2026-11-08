@@ -142,3 +142,4 @@ export function clearAllInterviewDossiers(): void {
   if (typeof window === 'undefined') return;
   safeRemoveItem(INTERVIEW_DOSSIERS_STORAGE_KEY);
 }
+

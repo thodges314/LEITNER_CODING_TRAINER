@@ -66,7 +66,6 @@ export interface PracticeHeaderProps {
 export const PracticeHeader: React.FC<PracticeHeaderProps> = ({
   currentCard,
   trackMeta,
-  theme = 'dark',
   algorithm = 'leitner',
   activeDeckSize,
   activePopover,
@@ -506,7 +505,7 @@ export const PracticeHeader: React.FC<PracticeHeaderProps> = ({
                 {formatTimer(timeRemaining)}
               </span>
               <span className="arena-timer-auto-tag">
-                <Zap size={10} color={theme === 'apple-gsos' ? '#B45309' : '#fbbf24'} /> Auto-submits on 00:00
+                <Zap size={10} color={'var(--accent-warning)'} /> Auto-submits on 00:00
               </span>
             </div>
 

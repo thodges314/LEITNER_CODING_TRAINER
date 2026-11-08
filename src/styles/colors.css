@@ -53,6 +53,10 @@
   --accent-rose: #fb7185;
   --accent-emerald: #34d399;
   --accent-orange: #f97316;
+  --accent-success: #34d399;
+  --accent-warning: #fbbf24;
+  --accent-danger: #f87171;
+  --accent-danger-soft: #fca5a5;
 
   /* Interactive States & Badges */
   --badge-complexity-bg: rgba(56, 189, 248, 0.08);
@@ -278,6 +282,10 @@
   --accent-rose: #DD3322;
   --accent-emerald: #229955;
   --accent-orange: #D97706;
+  --accent-success: #15803D;
+  --accent-warning: #B45309;
+  --accent-danger: #B91C1C;
+  --accent-danger-soft: #DC2626;
 
   /* Interactive States & Badges */
   --badge-complexity-bg: #229955;

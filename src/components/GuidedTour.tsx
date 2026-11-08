@@ -303,7 +303,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ steps: initialSteps, onC
               height={b.height}
               rx="8"
               fill="none"
-              stroke="var(--accent-primary, #38bdf8)"
+              stroke="var(--accent-primary)"
               strokeWidth="2"
             />
           ))}
@@ -328,8 +328,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ steps: initialSteps, onC
           overflowY: 'auto',
           padding: '16px 18px',
           borderRadius: '12px',
-          backgroundColor: 'var(--bg-card, #141b29)',
-          color: 'var(--text-primary, #f1f5f9)',
+          backgroundColor: 'var(--bg-card)',
+          color: 'var(--text-primary)',
           border: '1px solid var(--border-medium, rgba(255,255,255,0.16))',
           boxShadow: '0 12px 40px rgba(0, 0, 0, 0.55)',
           zIndex: 3001,
@@ -339,7 +339,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ steps: initialSteps, onC
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '11.5px', letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-muted, #64748b)' }}>
+          <span style={{ fontSize: '11.5px', letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
             Step {index + 1} of {steps.length}
           </span>
           <button
@@ -356,7 +356,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ steps: initialSteps, onC
           {step.title}
         </div>
 
-        <p style={{ margin: 0, fontSize: '13.5px', lineHeight: 1.5, color: 'var(--text-secondary, #94a3b8)', whiteSpace: 'pre-line' }}>
+        <p style={{ margin: 0, fontSize: '13.5px', lineHeight: 1.5, color: 'var(--text-secondary)', whiteSpace: 'pre-line' }}>
           {step.body}
         </p>
 

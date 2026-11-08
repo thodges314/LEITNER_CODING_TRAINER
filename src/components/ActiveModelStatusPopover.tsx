@@ -311,7 +311,7 @@ export const ActiveModelStatusPopover: React.FC<ActiveModelStatusPopoverProps> =
                 <span>Querying provider quotas...</span>
               </div>
             ) : error ? (
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', color: '#f43f5e' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', color: 'var(--accent-rose)' }}>
                 <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span style={{ fontSize: '11.5px', lineHeight: 1.45 }}>{error}</span>
               </div>

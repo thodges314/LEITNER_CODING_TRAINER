@@ -459,8 +459,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   padding: '3px 8px',
                   borderRadius: '6px',
                   backgroundColor: 'rgba(52, 211, 153, 0.15)',
-                  color: isLight ? '#15803D' : '#34d399',
-                  border: isLight ? '1px solid #86EFAC' : '1px solid rgba(52, 211, 153, 0.3)',
+                  color: 'var(--accent-success)',
+                  border: isLight ? '1px solid var(--status-attempted-border)' : '1px solid rgba(52, 211, 153, 0.3)',
                   fontWeight: 600,
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -512,7 +512,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 style={{
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  border: algorithm === 'graduated-interval' ? '1.5px solid #38bdf8' : '1px solid var(--border-subtle)',
+                  border: algorithm === 'graduated-interval' ? '1.5px solid var(--accent-cyan)' : '1px solid var(--border-subtle)',
                   backgroundColor: algorithm === 'graduated-interval' ? 'rgba(56, 189, 248, 0.12)' : 'var(--bg-surface)',
                   boxShadow: algorithm === 'graduated-interval' ? '0 0 12px rgba(56, 189, 248, 0.2)' : 'none',
                   cursor: 'pointer',
@@ -524,11 +524,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: algorithm === 'graduated-interval' ? '#38bdf8' : 'var(--text-primary)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: algorithm === 'graduated-interval' ? 'var(--accent-cyan)' : 'var(--text-primary)' }}>
                     Graduated Interval
                   </span>
                   {algorithm === 'graduated-interval' && (
-                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(56, 189, 248, 0.25)', color: '#38bdf8', padding: '1px 6px', borderRadius: '4px', fontWeight: 700, letterSpacing: '0.04em' }}>
+                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(56, 189, 248, 0.25)', color: 'var(--accent-cyan)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700, letterSpacing: '0.04em' }}>
                       ACTIVE
                     </span>
                   )}
@@ -544,7 +544,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 style={{
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  border: algorithm === 'leitner' ? '1.5px solid #a855f7' : '1px solid var(--border-subtle)',
+                  border: algorithm === 'leitner' ? '1.5px solid var(--accent-purple)' : '1px solid var(--border-subtle)',
                   backgroundColor: algorithm === 'leitner' ? 'rgba(168, 85, 247, 0.12)' : 'var(--bg-surface)',
                   boxShadow: algorithm === 'leitner' ? '0 0 12px rgba(168, 85, 247, 0.2)' : 'none',
                   cursor: 'pointer',
@@ -556,11 +556,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: algorithm === 'leitner' ? '#c084fc' : 'var(--text-primary)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: algorithm === 'leitner' ? 'var(--accent-purple)' : 'var(--text-primary)' }}>
                     Pure Leitner Box
                   </span>
                   {algorithm === 'leitner' && (
-                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(168, 85, 247, 0.25)', color: '#c084fc', padding: '1px 6px', borderRadius: '4px', fontWeight: 700, letterSpacing: '0.04em' }}>
+                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(168, 85, 247, 0.25)', color: 'var(--accent-purple)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700, letterSpacing: '0.04em' }}>
                       ACTIVE
                     </span>
                   )}
@@ -577,7 +577,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>
               <div>
                 <label style={{ fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Timer size={15} color="#f59e0b" />
+                  <Timer size={15} color="var(--accent-amber)" />
                   Timed Recall Mode
                 </label>
                 <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', margin: '3px 0 0 0', lineHeight: 1.45 }}>
@@ -594,11 +594,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   height: '24px',
                   borderRadius: '12px',
                   backgroundColor: timedMode
-                    ? (isLight ? '#4455AA' : 'var(--accent-cyan)')
-                    : (isLight ? '#D1D0C7' : 'rgba(255, 255, 255, 0.15)'),
+                    ? (isLight ? 'var(--accent-primary)' : 'var(--accent-cyan)')
+                    : (isLight ? 'var(--border-medium)' : 'rgba(255, 255, 255, 0.15)'),
                   position: 'relative',
                   border: isLight
-                    ? (timedMode ? '1.5px solid #2B3A8C' : '1.5px solid #8A887E')
+                    ? (timedMode ? '1.5px solid var(--accent-primary)' : '1.5px solid var(--border-medium)')
                     : '1px solid rgba(255, 255, 255, 0.2)',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
@@ -615,8 +615,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     width: '18px',
                     height: '18px',
                     borderRadius: '50%',
-                    backgroundColor: '#ffffff',
-                    border: isLight ? '1px solid #8A887E' : 'none',
+                    backgroundColor: 'var(--bg-card)',
+                    border: isLight ? '1px solid var(--border-medium)' : 'none',
                     transition: 'left 0.2s',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
                   }}
@@ -643,11 +643,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           ? (currentTheme === 'apple-gsos' ? 'rgba(217, 119, 6, 0.16)' : 'rgba(245, 158, 11, 0.15)')
                           : 'var(--bg-elevated)',
                         borderColor: timedDuration === opt.seconds
-                          ? (currentTheme === 'apple-gsos' ? '#D97706' : '#f59e0b')
+                          ? ('var(--accent-amber)')
                           : 'var(--border-subtle)',
                         borderWidth: currentTheme === 'apple-gsos' && timedDuration === opt.seconds ? '1.5px' : '1px',
                         color: timedDuration === opt.seconds
-                          ? (currentTheme === 'apple-gsos' ? '#B45309' : '#fbbf24')
+                          ? 'var(--accent-warning)'
                           : 'var(--text-secondary)',
                         fontWeight: timedDuration === opt.seconds ? 700 : 400,
                         boxShadow: currentTheme === 'apple-gsos' && timedDuration === opt.seconds ? '2px 2px 0px rgba(28, 28, 28, 0.15)' : 'none',
@@ -672,8 +672,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 cursor: 'pointer',
                 padding: '12px 14px',
                 borderRadius: '8px',
-                border: isLight ? '1.5px solid #8A887E' : '1px solid var(--border-subtle)',
-                backgroundColor: isLight ? '#FFFFFF' : 'var(--bg-surface)',
+                border: isLight ? '1.5px solid var(--border-medium)' : '1px solid var(--border-subtle)',
+                backgroundColor: isLight ? 'var(--bg-card)' : 'var(--bg-surface)',
                 boxShadow: isLight ? '2px 2px 0px rgba(28, 28, 28, 0.15)' : 'none',
               }}
             >
@@ -687,7 +687,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   width: '16px',
                   height: '16px',
                   cursor: 'pointer',
-                  accentColor: isLight ? '#4455AA' : 'var(--accent-cyan)',
+                  accentColor: isLight ? 'var(--accent-primary)' : 'var(--accent-cyan)',
                   flexShrink: 0,
                 }}
               />
@@ -702,7 +702,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     color: 'var(--text-primary)',
                   }}
                 >
-                  <Code2 size={15} color={isLight ? '#4455AA' : 'var(--accent-cyan)'} />
+                  <Code2 size={15} color={isLight ? 'var(--accent-primary)' : 'var(--accent-cyan)'} />
                   TypeScript Hover Tooltips (QuickInfo)
                 </span>
                 <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
@@ -850,11 +850,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         ? (currentTheme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.16)' : 'rgba(56, 189, 248, 0.2)')
                         : 'var(--bg-elevated)',
                       borderColor: isActive
-                        ? (currentTheme === 'apple-gsos' ? '#4455AA' : 'var(--accent-cyan)')
+                        ? (currentTheme === 'apple-gsos' ? 'var(--accent-primary)' : 'var(--accent-cyan)')
                         : 'var(--border-subtle)',
                       borderWidth: currentTheme === 'apple-gsos' && isActive ? '1.5px' : '1px',
                       color: isActive
-                        ? (currentTheme === 'apple-gsos' ? '#1C1C1C' : '#ffffff')
+                        ? (currentTheme === 'apple-gsos' ? 'var(--text-primary)' : 'var(--bg-card)')
                         : 'var(--text-secondary)',
                       boxShadow: currentTheme === 'apple-gsos' && isActive ? '2px 2px 0px rgba(28, 28, 28, 0.2)' : 'none',
                       transition: 'all 0.15s ease',
@@ -877,10 +877,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           borderRadius: '3px',
                           backgroundColor: isActive
                             ? (currentTheme === 'apple-gsos' ? 'rgba(68, 85, 170, 0.14)' : 'rgba(56, 189, 248, 0.25)')
-                            : (currentTheme === 'apple-gsos' ? '#DDDCD4' : 'rgba(255, 255, 255, 0.08)'),
+                            : (currentTheme === 'apple-gsos' ? 'var(--bg-main)' : 'rgba(255, 255, 255, 0.08)'),
                           color: isActive
-                            ? (currentTheme === 'apple-gsos' ? '#2A3B8F' : '#38bdf8')
-                            : (currentTheme === 'apple-gsos' ? '#1C1C1C' : 'var(--text-muted)'),
+                            ? ('var(--accent-cyan)')
+                            : (currentTheme === 'apple-gsos' ? 'var(--text-primary)' : 'var(--text-muted)'),
                           fontWeight: isActive ? 600 : 500,
                           whiteSpace: 'nowrap',
                         }}
@@ -890,12 +890,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     )}
 
                     {hasKey ? (
-                      <span style={{ fontSize: '10px', color: currentTheme === 'apple-gsos' ? '#15803D' : '#34d399', display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px', fontWeight: 600 }}>
-                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: currentTheme === 'apple-gsos' ? '#15803D' : '#34d399' }} />
+                      <span style={{ fontSize: '10px', color: 'var(--accent-success)', display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px', fontWeight: 600 }}>
+                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--accent-success)' }} />
                         Key Saved
                       </span>
                     ) : (
-                      <span style={{ fontSize: '10px', color: currentTheme === 'apple-gsos' ? '#555555' : 'var(--text-dim)', marginTop: '2px' }}>
+                      <span style={{ fontSize: '10px', color: currentTheme === 'apple-gsos' ? 'var(--text-secondary)' : 'var(--text-dim)', marginTop: '2px' }}>
                         No Key
                       </span>
                     )}
@@ -910,20 +910,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 marginTop: '10px',
                 padding: '10px 14px',
                 borderRadius: '8px',
-                backgroundColor: isLight ? '#EBF5FF' : 'rgba(56, 189, 248, 0.08)',
-                border: isLight ? '1.5px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.3)',
+                backgroundColor: isLight ? 'var(--status-active-bg)' : 'rgba(56, 189, 248, 0.08)',
+                border: isLight ? '1.5px solid var(--accent-primary)' : '1px solid rgba(56, 189, 248, 0.3)',
                 boxShadow: isLight ? '2px 2px 0px rgba(68, 85, 170, 0.15)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
                 fontSize: '12px',
-                color: isLight ? '#1C1C1C' : 'var(--text-secondary)',
+                color: isLight ? 'var(--text-primary)' : 'var(--text-secondary)',
                 lineHeight: 1.45,
               }}
             >
-              <Zap size={15} color={isLight ? '#4455AA' : '#38bdf8'} style={{ flexShrink: 0 }} />
+              <Zap size={15} color={'var(--accent-cyan)'} style={{ flexShrink: 0 }} />
               <span>
-                <strong style={{ color: isLight ? '#2B3A8C' : 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong style={{ color: isLight ? '#1C1C1C' : undefined }}>Groq</strong> (llama-3.3-70b-versatile) or <strong style={{ color: isLight ? '#1C1C1C' : undefined }}>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
+                <strong style={{ color: isLight ? 'var(--accent-primary)' : 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong style={{ color: isLight ? 'var(--text-primary)' : undefined }}>Groq</strong> (llama-3.3-70b-versatile) or <strong style={{ color: isLight ? 'var(--text-primary)' : undefined }}>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
               </span>
             </div>
           </div>
@@ -985,7 +985,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <span
                     style={{
                       fontSize: '11px',
-                      color: '#38bdf8',
+                      color: 'var(--accent-cyan)',
                       backgroundColor: 'rgba(56, 189, 248, 0.12)',
                       padding: '2px 6px',
                       borderRadius: '4px',
@@ -999,7 +999,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <span
                     style={{
                       fontSize: '11px',
-                      color: '#34d399',
+                      color: 'var(--accent-emerald)',
                       backgroundColor: 'rgba(52, 211, 153, 0.12)',
                       padding: '2px 6px',
                       borderRadius: '4px',
@@ -1104,7 +1104,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   gap: '8px',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f43f5e', fontSize: '13px', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-rose)', fontSize: '13px', fontWeight: 600 }}>
                   <AlertTriangle size={16} />
                   Clear stored API key?
                 </div>
@@ -1126,8 +1126,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     style={{
                       padding: '4px 14px',
                       fontSize: '12px',
-                      backgroundColor: '#f43f5e',
-                      color: '#ffffff',
+                      backgroundColor: 'var(--accent-rose)',
+                      color: 'var(--bg-card)',
                       border: 'none',
                       fontWeight: 600,
                     }}
@@ -1153,7 +1153,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   gap: '8px',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#f59e0b', fontSize: '13px', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-amber)', fontSize: '13px', fontWeight: 600 }}>
                   <AlertTriangle size={16} />
                   Replace stored API key?
                 </div>
@@ -1188,8 +1188,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   marginTop: '10px',
                   padding: '10px 14px',
                   borderRadius: '8px',
-                  backgroundColor: isLight ? '#EBF5FF' : 'rgba(56, 189, 248, 0.08)',
-                  border: isLight ? '1.5px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.3)',
+                  backgroundColor: isLight ? 'var(--status-active-bg)' : 'rgba(56, 189, 248, 0.08)',
+                  border: isLight ? '1.5px solid var(--accent-primary)' : '1px solid rgba(56, 189, 248, 0.3)',
                   boxShadow: isLight ? '2px 2px 0px rgba(68, 85, 170, 0.15)' : 'none',
                   display: 'flex',
                   alignItems: 'center',
@@ -1199,10 +1199,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   fontSize: '12px',
                 }}
               >
-                <div style={{ color: isLight ? '#1C1C1C' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Info size={15} color={isLight ? '#4455AA' : 'var(--accent-cyan)'} style={{ flexShrink: 0 }} />
+                <div style={{ color: isLight ? 'var(--text-primary)' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Info size={15} color={isLight ? 'var(--accent-primary)' : 'var(--accent-cyan)'} style={{ flexShrink: 0 }} />
                   <span>
-                    <strong style={{ color: isLight ? '#1C1C1C' : 'var(--text-primary)' }}>Need an API key?</strong> {portal.description}.
+                    <strong style={{ color: isLight ? 'var(--text-primary)' : 'var(--text-primary)' }}>Need an API key?</strong> {portal.description}.
                   </span>
                 </div>
                 <a
@@ -1210,7 +1210,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    color: isLight ? '#FFFFFF' : 'var(--accent-cyan)',
+                    color: isLight ? 'var(--bg-card)' : 'var(--accent-cyan)',
                     fontWeight: 600,
                     textDecoration: 'none',
                     display: 'inline-flex',
@@ -1219,8 +1219,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     whiteSpace: 'nowrap',
                     padding: '4px 10px',
                     borderRadius: '6px',
-                    backgroundColor: isLight ? '#4455AA' : 'rgba(56, 189, 248, 0.1)',
-                    border: isLight ? '1px solid #2B3A8C' : '1px solid rgba(56, 189, 248, 0.25)',
+                    backgroundColor: isLight ? 'var(--accent-primary)' : 'rgba(56, 189, 248, 0.1)',
+                    border: isLight ? '1px solid var(--accent-primary)' : '1px solid rgba(56, 189, 248, 0.25)',
                   }}
                 >
                   <span>{portal.label}</span>
@@ -1233,7 +1233,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               data-testid="api-key-warning"
               style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px', display: 'flex', gap: '6px', lineHeight: 1.5 }}
             >
-              <ShieldAlert size={14} color="#f59e0b" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <ShieldAlert size={14} color="var(--accent-amber)" style={{ flexShrink: 0, marginTop: '2px' }} />
               <span>
                 <strong style={{ color: 'var(--text-secondary)' }}>Your key is stored in plain text</strong> in this browser&apos;s localStorage, so
                 anyone who can use this browser profile, or any script running on this page, can read it. It is sent only to the provider you
@@ -1261,13 +1261,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
                   {isLoadingModels ? (
-                    <Loader2 size={14} className="animate-spin" color="#38bdf8" />
+                    <Loader2 size={14} className="animate-spin" color="var(--accent-cyan)" />
                   ) : modelDiscoveryError ? (
-                    <AlertTriangle size={14} color="#f43f5e" />
+                    <AlertTriangle size={14} color="var(--accent-rose)" />
                   ) : (
-                    <Cpu size={14} color="#38bdf8" />
+                    <Cpu size={14} color="var(--accent-cyan)" />
                   )}
-                  <span style={{ fontSize: '12.5px', fontWeight: 600, color: modelDiscoveryError ? '#f43f5e' : 'var(--text-primary)' }}>
+                  <span style={{ fontSize: '12.5px', fontWeight: 600, color: modelDiscoveryError ? 'var(--accent-rose)' : 'var(--text-primary)' }}>
                     {isLoadingModels
                       ? `Querying ${provider.toUpperCase()} for available models...`
                       : modelDiscoveryError
@@ -1285,7 +1285,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           padding: '2px 7px',
                           borderRadius: '12px',
                           backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                          color: '#38bdf8',
+                          color: 'var(--accent-cyan)',
                           fontWeight: 500,
                         }}
                       >
@@ -1330,13 +1330,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', fontSize: '11.5px', color: 'var(--text-secondary)' }}>
                   {accountInfo.creditsRemaining && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <Coins size={12} color="#34d399" />
-                      <strong style={{ color: '#34d399' }}>{accountInfo.creditsRemaining}</strong>
+                      <Coins size={12} color="var(--accent-emerald)" />
+                      <strong style={{ color: 'var(--accent-emerald)' }}>{accountInfo.creditsRemaining}</strong>
                     </span>
                   )}
                   {accountInfo.tokensRemaining && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <Zap size={12} color="#f59e0b" />
+                      <Zap size={12} color="var(--accent-amber)" />
                       <span>{accountInfo.tokensRemaining}</span>
                     </span>
                   )}
@@ -1495,7 +1495,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontSize: '12px', fontWeight: 600, color: '#f1f5f9' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>
                             {activeModel.name}
                           </span>
                           <span style={{ fontSize: '10.5px', color: 'var(--text-muted)' }}>
@@ -1510,7 +1510,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 padding: '1px 6px',
                                 borderRadius: '4px',
                                 backgroundColor: 'rgba(168, 85, 247, 0.2)',
-                                color: '#c084fc',
+                                color: 'var(--accent-purple)',
                                 fontWeight: 600,
                               }}
                             >
@@ -1524,7 +1524,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 padding: '1px 6px',
                                 borderRadius: '4px',
                                 backgroundColor: 'rgba(52, 211, 153, 0.2)',
-                                color: '#34d399',
+                                color: 'var(--accent-emerald)',
                                 fontWeight: 700,
                               }}
                             >
@@ -1552,7 +1552,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 padding: '1px 6px',
                                 borderRadius: '4px',
                                 backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                                color: '#38bdf8',
+                                color: 'var(--accent-cyan)',
                               }}
                             >
                               {Math.round(activeModel.contextWindow / 1000)}k context
@@ -1610,8 +1610,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   marginTop: '12px',
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  backgroundColor: isLight ? '#EBF5FF' : 'rgba(56, 189, 248, 0.08)',
-                  border: isLight ? '1.5px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.3)',
+                  backgroundColor: isLight ? 'var(--status-active-bg)' : 'rgba(56, 189, 248, 0.08)',
+                  border: isLight ? '1.5px solid var(--accent-primary)' : '1px solid rgba(56, 189, 248, 0.3)',
                   boxShadow: isLight ? '2px 2px 0px rgba(68, 85, 170, 0.15)' : 'none',
                   display: 'flex',
                   flexDirection: 'column',
@@ -1620,7 +1620,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-                    <Sparkles size={15} color="#38bdf8" />
+                    <Sparkles size={15} color="var(--accent-cyan)" />
                     <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
                       Top Free OpenRouter Picks for Code Evaluation
                     </span>
@@ -1631,7 +1631,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       padding: '2px 7px',
                       borderRadius: '10px',
                       backgroundColor: 'rgba(52, 211, 153, 0.15)',
-                      color: '#34d399',
+                      color: 'var(--accent-emerald)',
                       fontWeight: 600,
                     }}
                   >
@@ -1687,7 +1687,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       >
                         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '6px' }}>
                           <div>
-                            <div style={{ fontSize: '12px', fontWeight: 600, color: isSelected ? '#38bdf8' : 'var(--text-primary)' }}>
+                            <div style={{ fontSize: '12px', fontWeight: 600, color: isSelected ? 'var(--accent-cyan)' : 'var(--text-primary)' }}>
                               {pick.name}
                             </div>
                             <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
@@ -1701,7 +1701,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 padding: '1px 5px',
                                 borderRadius: '3px',
                                 backgroundColor: isSelected ? 'rgba(56, 189, 248, 0.25)' : 'rgba(52, 211, 153, 0.18)',
-                                color: isSelected ? '#38bdf8' : '#34d399',
+                                color: isSelected ? 'var(--accent-cyan)' : 'var(--accent-emerald)',
                                 fontWeight: 700,
                               }}
                             >
@@ -1717,7 +1717,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               padding: '1px 5px',
                               borderRadius: '3px',
                               backgroundColor: 'rgba(168, 85, 247, 0.15)',
-                              color: '#c084fc',
+                              color: 'var(--accent-purple)',
                               fontWeight: 500,
                             }}
                           >
@@ -1771,7 +1771,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             style={{
               padding: '10px 14px',
               borderRadius: '8px',
-              border: isLight ? '1.5px solid #4455AA' : '1px solid var(--border-subtle)',
+              border: isLight ? '1.5px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
               fontSize: '13px',
             }}
           >
@@ -1813,18 +1813,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             style={{
               padding: '12px 14px',
               borderRadius: '8px',
-              backgroundColor: isLight ? '#EBF5FF' : 'rgba(56, 189, 248, 0.08)',
-              border: isLight ? '1.5px solid #4455AA' : '1px solid rgba(56, 189, 248, 0.3)',
+              backgroundColor: isLight ? 'var(--status-active-bg)' : 'rgba(56, 189, 248, 0.08)',
+              border: isLight ? '1.5px solid var(--accent-primary)' : '1px solid rgba(56, 189, 248, 0.3)',
               boxShadow: isLight ? '2px 2px 0px rgba(68, 85, 170, 0.15)' : 'none',
               display: 'flex',
               gap: '10px',
               fontSize: '12px',
-              color: isLight ? '#1C1C1C' : 'var(--text-secondary)',
+              color: isLight ? 'var(--text-primary)' : 'var(--text-secondary)',
             }}
           >
-            <Info size={18} style={{ color: isLight ? '#4455AA' : '#38bdf8', flexShrink: 0, marginTop: '2px' }} />
+            <Info size={18} style={{ color: 'var(--accent-cyan)', flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <span style={{ fontWeight: 600, color: isLight ? '#1C1C1C' : 'var(--text-primary)' }}>Offline & Keyless Ready: </span>
+              <span style={{ fontWeight: 600, color: isLight ? 'var(--text-primary)' : 'var(--text-primary)' }}>Offline & Keyless Ready: </span>
               If no API key is specified, the trainer automatically uses our built-in structural invariant heuristic engine. You can practice without friction right away.
             </div>
           </div>
@@ -1841,7 +1841,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               gap: '14px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-highlight, #f87171)', fontSize: '13px', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-highlight)', fontSize: '13px', fontWeight: 600 }}>
               <AlertTriangle size={15} />
               <span>Danger Zone</span>
             </div>
@@ -1889,13 +1889,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       padding: '14px',
                       borderRadius: '8px',
                       backgroundColor: 'var(--bg-elevated)',
-                      border: '1.5px solid var(--accent-highlight, #ef4444)',
+                      border: '1.5px solid var(--accent-highlight)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '10px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-highlight, #f87171)', fontSize: '13px', fontWeight: 600 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-highlight)', fontSize: '13px', fontWeight: 600 }}>
                       <AlertTriangle size={16} />
                       Permanently reset learning progress across all decks?
                     </div>
@@ -1911,7 +1911,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           marginBottom: '6px',
                         }}
                       >
-                        To confirm, type <strong translate="no" className="notranslate" style={{ color: 'var(--accent-highlight, #f87171)', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET ALL DECKS</strong> below:
+                        To confirm, type <strong translate="no" className="notranslate" style={{ color: 'var(--accent-highlight)', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET ALL DECKS</strong> below:
                       </label>
                       <input
                         type="text"
@@ -1928,11 +1928,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           fontSize: '12.5px',
                           fontFamily: 'monospace',
                           borderColor: resetConfirmInput.trim().toUpperCase() === 'RESET ALL DECKS'
-                            ? 'var(--accent-highlight, #ef4444)'
+                            ? 'var(--accent-highlight)'
                             : 'var(--border-medium)',
                           outline: 'none',
                           color: 'var(--text-primary)',
-                          backgroundColor: 'var(--bg-editor, #FAFAFA)',
+                          backgroundColor: 'var(--bg-editor)',
                         }}
                       />
                     </div>
@@ -1980,7 +1980,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: '220px' }}>
-                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--accent-highlight, #f87171)' }}>
+                  <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--accent-highlight)' }}>
                     Reset Everything (Factory Reset)
                   </div>
                   <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginTop: '2px' }}>
@@ -2018,13 +2018,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     padding: '14px',
                     borderRadius: '8px',
                     backgroundColor: 'var(--bg-elevated)',
-                    border: '1.5px solid var(--accent-highlight, #ef4444)',
+                    border: '1.5px solid var(--accent-highlight)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '10px',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-highlight, #fda4af)', fontSize: '13px', fontWeight: 600 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-highlight)', fontSize: '13px', fontWeight: 600 }}>
                     <AlertTriangle size={16} />
                     Factory reset application and wipe all localStorage?
                   </div>
@@ -2040,7 +2040,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         marginBottom: '6px',
                       }}
                     >
-                      To confirm, type <strong translate="no" className="notranslate" style={{ color: 'var(--accent-highlight, #fda4af)', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET EVERYTHING</strong> below:
+                      To confirm, type <strong translate="no" className="notranslate" style={{ color: 'var(--accent-highlight)', fontFamily: 'monospace', letterSpacing: '0.04em' }}>RESET EVERYTHING</strong> below:
                     </label>
                     <input
                       type="text"
@@ -2057,11 +2057,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         fontSize: '12.5px',
                         fontFamily: 'monospace',
                         borderColor: resetConfirmInput.trim().toUpperCase() === 'RESET EVERYTHING'
-                          ? 'var(--accent-highlight, #e11d48)'
+                          ? 'var(--accent-highlight)'
                           : 'var(--border-medium)',
                         outline: 'none',
                         color: 'var(--text-primary)',
-                        backgroundColor: 'var(--bg-editor, #FAFAFA)',
+                        backgroundColor: 'var(--bg-editor)',
                       }}
                     />
                   </div>

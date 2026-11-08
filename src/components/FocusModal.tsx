@@ -72,7 +72,7 @@ export const FocusModal: React.FC<FocusModalProps> = ({
     set({ includeTags: inc, excludeTags: [] });
   };
 
-  const chip = (label: string, isSelected: boolean, onClick: () => void, color = '#38bdf8', count?: number) => (
+  const chip = (label: string, isSelected: boolean, onClick: () => void, color = 'var(--accent-cyan)', count?: number) => (
     <button
       key={label}
       type="button"
@@ -153,7 +153,7 @@ export const FocusModal: React.FC<FocusModalProps> = ({
             border: `1px solid ${matching === 0 ? 'rgba(239, 68, 68, 0.35)' : 'rgba(52, 211, 153, 0.35)'}`,
             marginBottom: '16px',
             fontSize: '12.5px',
-            color: matching === 0 ? '#f87171' : '#34d399',
+            color: matching === 0 ? 'var(--accent-danger)' : 'var(--accent-emerald)',
             fontWeight: 500,
           }}
         >
@@ -268,7 +268,7 @@ export const FocusModal: React.FC<FocusModalProps> = ({
               tag,
               isIncluded,
               () => toggleTag(tag),
-              '#c084fc',
+              'var(--accent-purple)',
               tagCounts.get(tag)
             );
           })}

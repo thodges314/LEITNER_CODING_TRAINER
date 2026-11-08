@@ -273,16 +273,16 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
 
                     if (group.type === 'blockquote') {
                       const alertColors: Record<string, { border: string; bg: string }> = {
-                        note: { border: 'var(--accent, #38bdf8)', bg: 'rgba(56, 189, 248, 0.08)' },
-                        tip: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.08)' },
-                        important: { border: '#a855f7', bg: 'rgba(168, 85, 247, 0.08)' },
-                        warning: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.08)' },
-                        caution: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.08)' },
+                        note: { border: 'var(--accent)', bg: 'rgba(56, 189, 248, 0.08)' },
+                        tip: { border: 'var(--accent-emerald)', bg: 'rgba(16, 185, 129, 0.08)' },
+                        important: { border: 'var(--accent-purple)', bg: 'rgba(168, 85, 247, 0.08)' },
+                        warning: { border: 'var(--accent-amber)', bg: 'rgba(245, 158, 11, 0.08)' },
+                        caution: { border: 'var(--accent-danger)', bg: 'rgba(239, 68, 68, 0.08)' },
                       };
 
                       const styleConfig = group.alertType
                         ? alertColors[group.alertType] ?? alertColors.note
-                        : { border: 'var(--accent, #38bdf8)', bg: 'rgba(56, 189, 248, 0.06)' };
+                        : { border: 'var(--accent)', bg: 'rgba(56, 189, 248, 0.06)' };
 
                       return (
                         <div

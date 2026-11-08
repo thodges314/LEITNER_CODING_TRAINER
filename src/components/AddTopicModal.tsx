@@ -176,7 +176,7 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#c084fc',
+                color: 'var(--accent-purple)',
               }}
             >
               <Sparkles size={20} />
@@ -436,10 +436,10 @@ export const AddTopicModal: React.FC<AddTopicModalProps> = ({
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Code size={13} color="#a855f7" />
+                  <Code size={13} color="var(--accent-purple)" />
                   <span>Reference Solution & Test Harness</span>
                   {(referenceSolution || testHarness) && (
-                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(52, 211, 153, 0.15)', color: '#34d399', padding: '1px 6px', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '10px', backgroundColor: 'rgba(52, 211, 153, 0.15)', color: 'var(--accent-emerald)', padding: '1px 6px', borderRadius: '4px' }}>
                       Populated
                     </span>
                   )}

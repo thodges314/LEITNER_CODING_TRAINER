@@ -228,7 +228,7 @@ export const PropsControlPanel: React.FC<PropsControlPanelProps> = ({
     <div className="react-preview-props-panel" data-testid="react-preview-props-panel">
       <div className="props-panel-header">
         <div className="props-panel-header-left">
-          <SlidersHorizontal size={14} color="#06b6d4" />
+          <SlidersHorizontal size={14} color="var(--accent-teal)" />
           <span className="props-panel-title">{title}</span>
           {propDefs.length > 0 && (
             <span className="props-panel-count-badge" data-testid="props-count-badge">

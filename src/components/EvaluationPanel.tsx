@@ -217,32 +217,32 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
       case 'HTML':
         return {
           backgroundColor: 'rgba(249, 115, 22, 0.12)',
-          color: '#f97316',
+          color: 'var(--accent-orange)',
           border: '1px solid rgba(249, 115, 22, 0.25)',
         };
       case 'SQL':
         return {
           backgroundColor: 'rgba(56, 189, 248, 0.12)',
-          color: '#38bdf8',
+          color: 'var(--accent-cyan)',
           border: '1px solid rgba(56, 189, 248, 0.25)',
         };
       case 'GraphQL':
         return {
           backgroundColor: 'rgba(236, 72, 153, 0.12)',
-          color: '#ec4899',
+          color: 'var(--accent-rose)',
           border: '1px solid rgba(236, 72, 153, 0.25)',
         };
       case 'TypeScript':
         return {
           backgroundColor: 'rgba(56, 189, 248, 0.12)',
-          color: '#38bdf8',
+          color: 'var(--accent-cyan)',
           border: '1px solid rgba(56, 189, 248, 0.25)',
         };
       case 'JavaScript':
       default:
         return {
           backgroundColor: 'rgba(234, 179, 8, 0.12)',
-          color: '#eab308',
+          color: 'var(--accent-amber)',
           border: '1px solid rgba(234, 179, 8, 0.25)',
         };
     }
@@ -358,7 +358,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     style={{
                       backgroundColor: isLight ? 'rgba(107, 70, 193, 0.12)' : 'rgba(168, 85, 247, 0.2)',
                       border: isLight ? '1px solid rgba(107, 70, 193, 0.4)' : '1px solid rgba(168, 85, 247, 0.4)',
-                      color: isLight ? '#6B46C1' : '#c084fc',
+                      color: 'var(--accent-purple)',
                       fontSize: '11px',
                     }}
                   >
@@ -371,7 +371,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     style={{
                       backgroundColor: isLight ? 'rgba(217, 119, 6, 0.12)' : 'rgba(245, 158, 11, 0.2)',
                       border: isLight ? '1px solid rgba(217, 119, 6, 0.4)' : '1px solid rgba(245, 158, 11, 0.4)',
-                      color: isLight ? '#B45309' : '#fbbf24',
+                      color: 'var(--accent-warning)',
                       fontSize: '11px',
                     }}
                   >
@@ -382,9 +382,9 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   <span
                     className="badge"
                     style={{
-                      backgroundColor: isLight ? '#F2F1EA' : 'rgba(148, 163, 184, 0.1)',
-                      color: isLight ? '#333333' : 'var(--text-muted)',
-                      border: isLight ? '1px solid #B8B7AD' : 'none',
+                      backgroundColor: isLight ? 'var(--bg-surface)' : 'rgba(148, 163, 184, 0.1)',
+                      color: isLight ? 'var(--text-secondary)' : 'var(--text-muted)',
+                      border: isLight ? '1px solid var(--border-medium)' : 'none',
                       fontSize: '11px',
                     }}
                   >
@@ -399,8 +399,8 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                         ? (isLight ? 'rgba(34, 153, 85, 0.14)' : 'rgba(52, 211, 153, 0.15)')
                         : (isLight ? 'rgba(221, 51, 34, 0.12)' : 'rgba(239, 68, 68, 0.15)'),
                       color: result.harness.passed
-                        ? (isLight ? '#15803D' : '#34d399')
-                        : (isLight ? '#B91C1C' : '#f87171'),
+                        ? ('var(--accent-success)')
+                        : ('var(--accent-danger)'),
                       border: result.harness.passed
                         ? (isLight ? '1px solid rgba(34, 153, 85, 0.4)' : 'none')
                         : (isLight ? '1px solid rgba(221, 51, 34, 0.4)' : 'none'),
@@ -427,11 +427,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 style={{
                   backgroundColor: isLight ? 'rgba(68, 85, 170, 0.12)' : 'rgba(56, 189, 248, 0.1)',
                   border: isLight
-                    ? '1.5px solid #4455AA'
+                    ? '1.5px solid var(--accent-primary)'
                     : (showComplexityExplanation
                       ? '1px solid rgba(56, 189, 248, 0.5)'
                       : '1px solid rgba(56, 189, 248, 0.25)'),
-                  color: isLight ? '#1D4ED8' : '#38bdf8',
+                  color: 'var(--accent-cyan)',
                   padding: '6px 10px',
                   cursor: topic.complexityExplanation ? 'pointer' : 'default',
                   userSelect: 'none',
@@ -445,11 +445,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   }
                 }}
               >
-                <Clock size={13} color={isLight ? '#1D4ED8' : '#38bdf8'} />
+                <Clock size={13} color={'var(--accent-cyan)'} />
                 <span>
                   Time: <strong>{result.timeComplexity || 'O(n)'}</strong>
                   {topic.targetTime && (
-                    <span style={{ fontSize: '11px', color: isLight ? '#1C1C1C' : undefined, opacity: isLight ? 0.9 : 0.85, marginLeft: '6px' }}>
+                    <span style={{ fontSize: '11px', color: isLight ? 'var(--text-primary)' : undefined, opacity: isLight ? 0.9 : 0.85, marginLeft: '6px' }}>
                       (Goal: {topic.targetTime})
                     </span>
                   )}
@@ -462,11 +462,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 style={{
                   backgroundColor: isLight ? 'rgba(109, 40, 217, 0.12)' : 'rgba(168, 85, 247, 0.1)',
                   border: isLight
-                    ? '1.5px solid #6D28D9'
+                    ? '1.5px solid var(--accent-purple)'
                     : (showComplexityExplanation
                       ? '1px solid rgba(168, 85, 247, 0.5)'
                       : '1px solid rgba(168, 85, 247, 0.25)'),
-                  color: isLight ? '#6D28D9' : '#c084fc',
+                  color: 'var(--accent-purple)',
                   padding: '6px 10px',
                   cursor: topic.complexityExplanation ? 'pointer' : 'default',
                   userSelect: 'none',
@@ -480,11 +480,11 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   }
                 }}
               >
-                <Database size={13} color={isLight ? '#6D28D9' : '#c084fc'} />
+                <Database size={13} color={'var(--accent-purple)'} />
                 <span>
                   Space: <strong>{result.spaceComplexity || 'O(1)'}</strong>
                   {topic.targetSpace && (
-                    <span style={{ fontSize: '11px', color: isLight ? '#1C1C1C' : undefined, opacity: isLight ? 0.9 : 0.85, marginLeft: '6px' }}>
+                    <span style={{ fontSize: '11px', color: isLight ? 'var(--text-primary)' : undefined, opacity: isLight ? 0.9 : 0.85, marginLeft: '6px' }}>
                       (Goal: {topic.targetSpace})
                     </span>
                   )}
@@ -498,18 +498,18 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 style={{
                   padding: '10px 12px',
                   borderRadius: '6px',
-                  backgroundColor: isLight ? '#FFFFFF' : 'rgba(15, 23, 42, 0.95)',
-                  border: isLight ? '1.5px solid #1C1C1C' : '1px solid rgba(56, 189, 248, 0.3)',
+                  backgroundColor: isLight ? 'var(--bg-card)' : 'rgba(15, 23, 42, 0.95)',
+                  border: isLight ? '1.5px solid var(--border-ui)' : '1px solid rgba(56, 189, 248, 0.3)',
                   boxShadow: isLight ? '3px 3px 0px rgba(28, 28, 28, 0.2)' : 'none',
                   fontSize: '12px',
-                  color: isLight ? '#1C1C1C' : 'var(--text-secondary)',
+                  color: isLight ? 'var(--text-primary)' : 'var(--text-secondary)',
                   lineHeight: '1.45',
                   maxWidth: '500px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '4px' }}>
                   <Sparkles size={12} color="var(--accent-cyan)" />
-                  <span style={{ fontWeight: 600, color: isLight ? '#555555' : 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <span style={{ fontWeight: 600, color: isLight ? 'var(--text-secondary)' : 'var(--text-muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Why this complexity target:
                   </span>
                 </div>
@@ -562,8 +562,8 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   fontSize: '12.5px',
                   fontWeight: 600,
                   color: result.passed
-                    ? (isLight ? '#15803D' : '#34d399')
-                    : (isLight ? '#B91C1C' : '#f87171'),
+                    ? ('var(--accent-success)')
+                    : ('var(--accent-danger)'),
                 }}
               >
                 {result.passed ? 'Pass' : 'Fail'}
@@ -588,7 +588,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   gap: '5px',
                   fontSize: '12px',
                   fontWeight: 600,
-                  color: isLight ? '#15803D' : '#34d399',
+                  color: 'var(--accent-success)',
                   backgroundColor: isLight ? 'rgba(34, 197, 94, 0.12)' : 'rgba(16, 185, 129, 0.18)',
                   border: isLight ? '1px solid rgba(34, 197, 94, 0.4)' : '1px solid rgba(16, 185, 129, 0.45)',
                   padding: '3px 8px',
@@ -649,7 +649,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             border: '1px solid var(--border-subtle)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#34d399' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: 'var(--accent-emerald)' }}>
             <ShieldCheck size={18} />
             <h4 style={{ fontSize: '13.5px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Invariants Met ({result.invariantsMet.length})
@@ -671,7 +671,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     lineHeight: 1.45,
                   }}
                 >
-                  <Check size={14} color="#34d399" style={{ flexShrink: 0, marginTop: '3px' }} />
+                  <Check size={14} color="var(--accent-emerald)" style={{ flexShrink: 0, marginTop: '3px' }} />
                   <span>{item}</span>
                 </li>
               ))}
@@ -688,14 +688,14 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
             border: '1px solid var(--border-subtle)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: '#f87171' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', color: 'var(--accent-danger)' }}>
             <ShieldAlert size={18} />
             <h4 style={{ fontSize: '13.5px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Invariants Missed / Edge Cases ({result.invariantsMissed.length})
             </h4>
           </div>
           {result.invariantsMissed.length === 0 ? (
-            <p style={{ fontSize: '13px', color: '#34d399' }}>All primary invariants satisfied!</p>
+            <p style={{ fontSize: '13px', color: 'var(--accent-emerald)' }}>All primary invariants satisfied!</p>
           ) : (
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {result.invariantsMissed.map((item, idx) => (
@@ -710,7 +710,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     lineHeight: 1.45,
                   }}
                 >
-                  <X size={14} color="#f87171" style={{ flexShrink: 0, marginTop: '3px' }} />
+                  <X size={14} color="var(--accent-danger)" style={{ flexShrink: 0, marginTop: '3px' }} />
                   <span>{item}</span>
                 </li>
               ))}
@@ -777,7 +777,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     padding: '2px 7px',
                     borderRadius: '4px',
                     border: 'none',
-                    backgroundColor: '#f59e0b',
+                    backgroundColor: 'var(--accent-amber)',
                     color: '#000',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -836,7 +836,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   fontSize: '12px',
                 }}
               >
-                <span style={{ color: isLight ? '#92400e' : '#fbbf24' }}>
+                <span style={{ color: 'var(--accent-warning)' }}>
                   <strong>Offline Mode:</strong> Connect an AI key to ask follow-up questions on this critique.
                 </span>
                 {onOpenSettings && (
@@ -851,7 +851,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                       borderRadius: '4px',
                       fontSize: '11px',
                       fontWeight: 600,
-                      backgroundColor: '#f59e0b',
+                      backgroundColor: 'var(--accent-amber)',
                       color: '#000',
                       border: 'none',
                       cursor: 'pointer',
@@ -888,7 +888,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   {msg.role === 'user' ? (
                     <div
                       style={{
-                        color: '#38bdf8',
+                        color: 'var(--accent-cyan)',
                         fontWeight: 600,
                         fontSize: '13.5px',
                         display: 'flex',
@@ -897,7 +897,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                         marginTop: '4px',
                       }}
                     >
-                      <span style={{ fontFamily: 'var(--font-mono, monospace)', fontWeight: 700, color: '#38bdf8' }}>
+                      <span style={{ fontFamily: 'var(--font-mono, monospace)', fontWeight: 700, color: 'var(--accent-cyan)' }}>
                         &gt;
                       </span>
                       <span>{msg.content}</span>
@@ -925,7 +925,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                               borderRadius: '4px',
                               fontSize: '11.5px',
                               fontWeight: 600,
-                              backgroundColor: '#f59e0b',
+                              backgroundColor: 'var(--accent-amber)',
                               color: '#000',
                               border: 'none',
                               cursor: 'pointer',
@@ -965,7 +965,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 gap: '8px',
               }}
             >
-              <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: '14px', fontFamily: 'var(--font-mono, monospace)' }}>
+              <span style={{ color: 'var(--accent-cyan)', fontWeight: 700, fontSize: '14px', fontFamily: 'var(--font-mono, monospace)' }}>
                 &gt;
               </span>
               <input
@@ -991,7 +991,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   padding: 0,
                   color: 'var(--text-primary)',
                   fontSize: '13px',
-                  caretColor: '#38bdf8',
+                  caretColor: 'var(--accent-cyan)',
                 }}
               />
               <button
@@ -1005,7 +1005,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: followUpInput.trim() && !isSendingFollowUp ? '#38bdf8' : 'var(--text-dim)',
+                  color: followUpInput.trim() && !isSendingFollowUp ? 'var(--accent-cyan)' : 'var(--text-dim)',
                   cursor: followUpInput.trim() && !isSendingFollowUp ? 'pointer' : 'default',
                   padding: '2px 8px',
                   fontSize: '12px',
@@ -1059,7 +1059,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                 padding: 0,
               }}
             >
-              {isSolutionVisible ? <EyeOff size={16} color="#38bdf8" /> : <Eye size={16} color="#38bdf8" />}
+              {isSolutionVisible ? <EyeOff size={16} color="var(--accent-cyan)" /> : <Eye size={16} color="var(--accent-cyan)" />}
               <span>
                 {isSolutionVisible
                   ? 'Hide Recommended Solution'
@@ -1098,7 +1098,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                   }}
                   title="Copy reference code to clipboard"
                 >
-                  {copied ? <Check size={13} color="#34d399" /> : <Copy size={13} />}
+                  {copied ? <Check size={13} color="var(--accent-emerald)" /> : <Copy size={13} />}
                   <span>{copied ? 'Copied!' : 'Copy Solution'}</span>
                 </button>
               </div>
@@ -1143,7 +1143,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
             <div>
-              <span style={{ fontSize: '12px', color: '#c084fc', display: 'block', fontWeight: 600 }}>
+              <span style={{ fontSize: '12px', color: 'var(--accent-purple)', display: 'block', fontWeight: 600 }}>
                 Reinforcement Practice (No Stat Impact)
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px', flexWrap: 'wrap' }}>

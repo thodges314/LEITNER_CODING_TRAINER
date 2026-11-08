@@ -74,7 +74,7 @@ export const StreamedMarkdown: React.FC<StreamedMarkdownProps> = ({
             display: 'inline-block',
             width: '6px',
             height: '14px',
-            backgroundColor: '#38bdf8',
+            backgroundColor: 'var(--accent-cyan)',
             verticalAlign: 'text-bottom',
             marginLeft: '4px',
             animation: cursorAnimation,

@@ -43,7 +43,7 @@ export class ReactTestErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
             borderRadius: '6px',
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             border: '1px solid rgba(239, 68, 68, 0.3)',
-            color: '#f87171',
+            color: 'var(--accent-danger)',
             fontFamily: 'var(--font-mono)',
             fontSize: '12px',
           }}
@@ -51,7 +51,7 @@ export class ReactTestErrorBoundary extends Component<ErrorBoundaryProps, ErrorB
           <div style={{ fontWeight: 700, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span>⚠️ React Component Render Exception</span>
           </div>
-          <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: '#fca5a5', lineHeight: 1.5 }}>
+          <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: 'var(--accent-danger-soft)', lineHeight: 1.5 }}>
             {this.state.error?.name}: {this.state.error?.message}
           </div>
           <button

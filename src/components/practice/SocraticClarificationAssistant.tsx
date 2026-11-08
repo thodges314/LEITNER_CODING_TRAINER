@@ -161,7 +161,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
           font-family: var(--font-mono, monospace);
           background: ${isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.07)'};
           border: 1px solid ${isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.12)'};
-          color: ${isLight ? '#1f2937' : '#e2e8f0'};
+          color: var(--text-primary);
           cursor: pointer;
           transition: all 0.15s ease;
           white-space: nowrap;
@@ -170,7 +170,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
         .socratic-chip-btn:hover {
           background: ${isLight ? 'rgba(56, 189, 248, 0.12)' : 'rgba(56, 189, 248, 0.18)'};
           border-color: rgba(56, 189, 248, 0.4);
-          color: #38bdf8;
+          color: var(--accent-cyan);
         }
       `}</style>
 
@@ -194,7 +194,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
           alignItems: 'center',
           justifyContent: 'center',
           border: isOpen
-            ? '1px solid #38bdf8'
+            ? '1px solid var(--accent-cyan)'
             : isLight
             ? '1px solid rgba(0, 0, 0, 0.15)'
             : '1px solid rgba(255, 255, 255, 0.18)',
@@ -204,7 +204,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
             ? 'rgba(255, 255, 255, 0.6)'
             : 'rgba(255, 255, 255, 0.08)',
           backdropFilter: 'blur(4px)',
-          color: isOpen ? '#38bdf8' : isLight ? '#4b5563' : 'rgba(255, 255, 255, 0.7)',
+          color: isOpen ? 'var(--accent-cyan)' : isLight ? 'var(--text-secondary)' : 'rgba(255, 255, 255, 0.7)',
           cursor: 'pointer',
           zIndex: 15,
           transition: 'all 0.2s ease',
@@ -212,7 +212,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.18)';
-          e.currentTarget.style.color = '#38bdf8';
+          e.currentTarget.style.color = 'var(--accent-cyan)';
           e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.5)';
         }}
         onMouseLeave={(e) => {
@@ -220,7 +220,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
             e.currentTarget.style.backgroundColor = isLight
               ? 'rgba(255, 255, 255, 0.6)'
               : 'rgba(255, 255, 255, 0.08)';
-            e.currentTarget.style.color = isLight ? '#4b5563' : 'rgba(255, 255, 255, 0.7)';
+            e.currentTarget.style.color = isLight ? 'var(--text-secondary)' : 'rgba(255, 255, 255, 0.7)';
             e.currentTarget.style.borderColor = isLight
               ? 'rgba(0, 0, 0, 0.15)'
               : 'rgba(255, 255, 255, 0.18)';
@@ -242,7 +242,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
             width: 'calc(100% - 16px)',
             maxWidth: '540px',
             maxHeight: '520px',
-            backgroundColor: isLight ? '#ffffff' : '#0f172a',
+            backgroundColor: isLight ? 'var(--bg-card)' : 'var(--bg-surface)',
             border: `1px solid ${isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(56, 189, 248, 0.35)'}`,
             borderRadius: '10px',
             boxShadow: isLight
@@ -263,7 +263,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              backgroundColor: isLight ? '#f8fafc' : 'rgba(15, 23, 42, 0.95)',
+              backgroundColor: isLight ? 'var(--bg-surface)' : 'rgba(15, 23, 42, 0.95)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -276,7 +276,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#38bdf8',
+                  color: 'var(--accent-cyan)',
                 }}
               >
                 <Sparkles size={14} />
@@ -292,7 +292,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                     padding: '2px 6px',
                     borderRadius: '4px',
                     backgroundColor: isLight ? 'rgba(16, 185, 129, 0.1)' : 'rgba(16, 185, 129, 0.2)',
-                    color: '#10b981',
+                    color: 'var(--accent-emerald)',
                     fontFamily: 'var(--font-mono, monospace)',
                   }}
                 >
@@ -338,7 +338,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                 fontSize: '12px',
               }}
             >
-              <div style={{ color: isLight ? '#92400e' : '#fbbf24', lineHeight: 1.4 }}>
+              <div style={{ color: 'var(--accent-warning)', lineHeight: 1.4 }}>
                 <strong>Offline Mode:</strong> Connect an AI key (like free Groq) for real-time interactive answers.
               </div>
               {onOpenSettings && (
@@ -353,7 +353,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                     borderRadius: '4px',
                     fontSize: '11px',
                     fontWeight: 600,
-                    backgroundColor: '#f59e0b',
+                    backgroundColor: 'var(--accent-amber)',
                     color: '#000',
                     border: 'none',
                     cursor: 'pointer',
@@ -413,7 +413,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                   {msg.role === 'user' ? (
                     <div
                       style={{
-                        color: '#38bdf8',
+                        color: 'var(--accent-cyan)',
                         fontWeight: 600,
                         fontSize: '13px',
                         display: 'flex',
@@ -426,7 +426,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                         style={{
                           fontFamily: 'var(--font-mono, monospace)',
                           fontWeight: 700,
-                          color: '#38bdf8',
+                          color: 'var(--accent-cyan)',
                         }}
                       >
                         &gt;
@@ -442,7 +442,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                         backgroundColor: isLight ? 'rgba(0, 0, 0, 0.02)' : 'rgba(255, 255, 255, 0.03)',
                         padding: '8px 10px',
                         borderRadius: '6px',
-                        borderLeft: '2px solid #38bdf8',
+                        borderLeft: '2px solid var(--accent-cyan)',
                       }}
                     >
                       <StreamedMarkdown
@@ -465,7 +465,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  color: '#38bdf8',
+                  color: 'var(--accent-cyan)',
                   fontSize: '12px',
                   fontFamily: 'var(--font-mono, monospace)',
                 }}
@@ -515,12 +515,12 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: isLight ? '#f8fafc' : 'rgba(15, 23, 42, 0.95)',
+              backgroundColor: isLight ? 'var(--bg-surface)' : 'rgba(15, 23, 42, 0.95)',
             }}
           >
             <span
               style={{
-                color: '#38bdf8',
+                color: 'var(--accent-cyan)',
                 fontWeight: 700,
                 fontSize: '14px',
                 fontFamily: 'var(--font-mono, monospace)',
@@ -551,7 +551,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                 padding: 0,
                 color: 'var(--text-primary)',
                 fontSize: '13px',
-                caretColor: '#38bdf8',
+                caretColor: 'var(--accent-cyan)',
               }}
             />
             <button
@@ -562,7 +562,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
               style={{
                 background: 'none',
                 border: 'none',
-                color: inputVal.trim() && !isLoading ? '#38bdf8' : 'var(--text-dim)',
+                color: inputVal.trim() && !isLoading ? 'var(--accent-cyan)' : 'var(--text-dim)',
                 cursor: inputVal.trim() && !isLoading ? 'pointer' : 'default',
                 display: 'flex',
                 alignItems: 'center',

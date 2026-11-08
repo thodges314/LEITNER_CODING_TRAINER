@@ -91,7 +91,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
               style={{
                 padding: '18px 20px',
                 borderRadius: '12px',
-                backgroundColor: isLight ? '#F0F9FF' : 'rgba(56, 189, 248, 0.07)',
+                backgroundColor: isLight ? 'var(--status-active-bg)' : 'rgba(56, 189, 248, 0.07)',
                 border: '1px solid var(--border-subtle)',
               }}
             >
@@ -143,12 +143,12 @@ export const AboutModal: React.FC<AboutModalProps> = ({
             style={{
               padding: '18px 20px',
               borderRadius: '12px',
-              backgroundColor: isLight ? '#F8FAFC' : 'rgba(255, 255, 255, 0.02)',
+              backgroundColor: isLight ? 'var(--bg-surface)' : 'rgba(255, 255, 255, 0.02)',
               border: '1px solid var(--border-subtle)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--text-primary)' }}>
-              <Zap size={18} style={{ color: '#f59e0b' }} />
+              <Zap size={18} style={{ color: 'var(--accent-amber)' }} />
               <h3 style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>The Origin: Reclaiming Muscle Memory in the AI Era</h3>
             </div>
             <p style={{ margin: 0 }}>
@@ -164,7 +164,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
             style={{
               padding: '18px 20px',
               borderRadius: '12px',
-              backgroundColor: isLight ? '#F8FAFC' : 'rgba(255, 255, 255, 0.02)',
+              backgroundColor: isLight ? 'var(--bg-surface)' : 'rgba(255, 255, 255, 0.02)',
               border: '1px solid var(--border-subtle)',
             }}
           >
@@ -185,12 +185,12 @@ export const AboutModal: React.FC<AboutModalProps> = ({
             style={{
               padding: '18px 20px',
               borderRadius: '12px',
-              backgroundColor: isLight ? '#F8FAFC' : 'rgba(255, 255, 255, 0.02)',
+              backgroundColor: isLight ? 'var(--bg-surface)' : 'rgba(255, 255, 255, 0.02)',
               border: '1px solid var(--border-subtle)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: 'var(--text-primary)' }}>
-              <BookOpen size={18} style={{ color: '#a855f7' }} />
+              <BookOpen size={18} style={{ color: 'var(--accent-purple)' }} />
               <h3 style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>Why Named "Leitner"?</h3>
             </div>
             <p style={{ margin: 0 }}>
@@ -251,7 +251,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                   fontSize: '12.5px',
                   fontWeight: 500,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 Portfolio <ExternalLink size={12} />
@@ -269,7 +269,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                   fontSize: '12.5px',
                   fontWeight: 500,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 GitHub <ExternalLink size={12} />
@@ -287,7 +287,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                   fontSize: '12.5px',
                   fontWeight: 500,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#38bdf8')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-cyan)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 LinkedIn <ExternalLink size={12} />

@@ -331,7 +331,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
     if (!popup || popup.closed) return;
     try {
       popup.document.body.style.backgroundColor = isLight ? '#f8fafc' : '#030712';
-      popup.document.body.style.color = isLight ? '#0f172a' : '#f1f5f9';
+      popup.document.body.style.color = 'var(--text-primary)';
     } catch {
       // Ignore cross-window errors
     }
@@ -404,7 +404,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
       popup.document.body.style.margin = '0';
       popup.document.body.style.padding = '12px';
       popup.document.body.style.backgroundColor = isLight ? '#f8fafc' : '#030712';
-      popup.document.body.style.color = isLight ? '#0f172a' : '#f1f5f9';
+      popup.document.body.style.color = 'var(--text-primary)';
       popup.document.body.style.fontFamily = getComputedStyle(document.body).fontFamily;
       popup.document.body.style.boxSizing = 'border-box';
       popup.document.body.style.height = '100vh';
@@ -480,7 +480,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
       {/* Title Bar */}
       <div className="react-preview-titlebar">
         <div className="react-preview-titlebar-left">
-          <Layers size={16} color="#06b6d4" />
+          <Layers size={16} color="var(--accent-teal)" />
           <span className="react-preview-title">
             {previewConfig.title} {isPoppedOut ? '(Pop-out)' : ''}
           </span>
@@ -510,7 +510,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
               className="preview-badge preview-badge-live"
               data-testid="preview-status-badge"
             >
-              <CheckCircle2 size={11} color="#10b981" /> Live
+              <CheckCircle2 size={11} color="var(--accent-emerald)" /> Live
             </span>
           )}
           {isLive && status === 'error' && (
@@ -518,7 +518,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
               className="preview-badge preview-badge-error"
               data-testid="preview-status-badge"
             >
-              <AlertTriangle size={11} color="#f87171" /> Error
+              <AlertTriangle size={11} color="var(--accent-danger)" /> Error
             </span>
           )}
           {isLive && status === 'timeout' && (
@@ -526,7 +526,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
               className="preview-badge preview-badge-timeout"
               data-testid="preview-status-badge"
             >
-              <AlertTriangle size={11} color="#fb923c" /> Timed Out
+              <AlertTriangle size={11} color="var(--accent-orange)" /> Timed Out
             </span>
           )}
         </div>
@@ -594,7 +594,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
           data-testid="preview-ready-placeholder"
           className={`react-preview-placeholder ${isPoppedOut ? 'react-preview-placeholder-popout' : ''}`}
         >
-          <Layers size={28} color="#0891b2" className="react-preview-placeholder-icon" />
+          <Layers size={28} color="var(--accent-teal)" className="react-preview-placeholder-icon" />
           <div className="react-preview-placeholder-title">
             Ready to Preview
           </div>
@@ -637,7 +637,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
         <div className={`react-preview-log-panel ${isPoppedOut ? 'react-preview-log-panel-popout' : ''}`}>
           <div className="react-preview-log-header">
             <div className="react-preview-log-header-left">
-              <Terminal size={12} color="#94a3b8" />
+              <Terminal size={12} color="var(--text-secondary)" />
               <span>Event Log & Output</span>
               {logs.length > 0 && (
                 <span className="react-preview-log-count">
@@ -677,7 +677,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                   <span className="react-preview-log-content">
                     {item.type === 'event' ? (
                       <>
-                        <strong style={{ color: '#38bdf8' }}>{item.name}</strong>(
+                        <strong style={{ color: 'var(--accent-cyan)' }}>{item.name}</strong>(
                         {item.args.join(', ')})
                       </>
                     ) : (
@@ -701,9 +701,9 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
           data-testid="react-preview-window"
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Layers size={18} color="#06b6d4" />
+            <Layers size={18} color="var(--accent-teal)" />
             <div>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: isLight ? '#0f172a' : '#f1f5f9' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {previewConfig.title} (Pop-out Active)
               </div>
               <div style={{ fontSize: '11.5px', color: 'var(--text-dim)' }}>

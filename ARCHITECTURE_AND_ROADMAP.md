@@ -49,6 +49,7 @@ src/
     leitner.ts                 ALL scheduling/state logic (Leitner + Graduated Interval Recall, localStorage persistence)
     leitner.test.ts            unit tests for Leitner & Graduated Interval algorithms
     trackMeta.ts               track types (`TrackType`), visual badge palettes, labels, and track helpers (`TRACK_METADATA`, `getTrackMeta`)
+    practiceFilter.ts          practice focus filter, difficulty ladder helpers, preset normalization, and card pack filtering
     storage.ts                 centralized `STORAGE_KEYS` registry and fail-safe `localStorage` accessors (`safeGetItem`, `safeSetItem`, `safeGetJson`, `safeSetJson`)
     storage.test.ts            unit tests for storage registry and fail-safe accessors
     deckMigrations.ts          state schema versioning (`deckVersion`: 3) and sequential migrations (`migrateV1ToV2`, `migrateV2ToV3`)
