@@ -46,28 +46,61 @@ import {
 import type { CustomDeck } from './lib/decks';
 import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
-import { RemoveFromDeckModal, DeckEditorModal } from './components/dashboard';
 import { getAllSavedDossiers } from './lib/dossierStorage';
-import { AddTopicModal } from './components/AddTopicModal';
+import { FEATURES } from './lib/features';
+import { recordProblemCompletion, markBackupAdvisorySeen } from './lib/backupAdvisory';
+import { DOUBLE_BACK_WINDOW_MS, useBackNavigation } from './lib/backNavigation';
+import { isFirstVisit, markWelcomed } from './lib/welcome';
+import { CATALOG_TOUR_STEPS, ARENA_TOUR_STEPS } from './lib/tour';
+import { AiRecommendationPopover } from './components/AiRecommendationPopover';
+import { ActiveModelStatusPopover } from './components/ActiveModelStatusPopover';
+import { MobileNoticeModal } from './components/MobileNoticeModal';
 
 const InterviewPrepModal = lazy(() =>
   import('./components/dashboard/InterviewPrepModal').then((m) => ({
     default: m.InterviewPrepModal,
   }))
 );
-import { FEATURES } from './lib/features';
-import { SettingsModal } from './components/SettingsModal';
-import { FocusModal } from './components/FocusModal';
-import { AboutModal } from './components/AboutModal';
-import { BackupAdvisoryModal } from './components/BackupAdvisoryModal';
-import { recordProblemCompletion, markBackupAdvisorySeen } from './lib/backupAdvisory';
-import { DOUBLE_BACK_WINDOW_MS, useBackNavigation } from './lib/backNavigation';
-import { isFirstVisit, markWelcomed } from './lib/welcome';
-import { GuidedTour } from './components/GuidedTour';
-import { CATALOG_TOUR_STEPS, ARENA_TOUR_STEPS } from './lib/tour';
-import { AiRecommendationPopover } from './components/AiRecommendationPopover';
-import { ActiveModelStatusPopover } from './components/ActiveModelStatusPopover';
-import { MobileNoticeModal } from './components/MobileNoticeModal';
+const RemoveFromDeckModal = lazy(() =>
+  import('./components/dashboard/RemoveFromDeckModal').then((m) => ({
+    default: m.RemoveFromDeckModal,
+  }))
+);
+const DeckEditorModal = lazy(() =>
+  import('./components/dashboard/DeckEditorModal').then((m) => ({
+    default: m.DeckEditorModal,
+  }))
+);
+const AddTopicModal = lazy(() =>
+  import('./components/AddTopicModal').then((m) => ({
+    default: m.AddTopicModal,
+  }))
+);
+const SettingsModal = lazy(() =>
+  import('./components/SettingsModal').then((m) => ({
+    default: m.SettingsModal,
+  }))
+);
+const FocusModal = lazy(() =>
+  import('./components/FocusModal').then((m) => ({
+    default: m.FocusModal,
+  }))
+);
+const AboutModal = lazy(() =>
+  import('./components/AboutModal').then((m) => ({
+    default: m.AboutModal,
+  }))
+);
+const BackupAdvisoryModal = lazy(() =>
+  import('./components/BackupAdvisoryModal').then((m) => ({
+    default: m.BackupAdvisoryModal,
+  }))
+);
+const GuidedTour = lazy(() =>
+  import('./components/GuidedTour').then((m) => ({
+    default: m.GuidedTour,
+  }))
+);
 import {
   Terminal,
   Layers,
@@ -817,7 +850,7 @@ export function App() {
       {unlockToast && (
         <div className="app-unlock-toast" role="status">
           <div className="app-unlock-toast-content">
-            <Sparkles size={16} />
+            <Zap size={16} />
             <span>{unlockToast}</span>
           </div>
           <button
@@ -926,58 +959,66 @@ export function App() {
 
       {/* Modals */}
       {isCatalogTourOpen && (
-        <GuidedTour
-          steps={CATALOG_TOUR_STEPS}
-          onClose={() => setIsCatalogTourOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <GuidedTour
+            steps={CATALOG_TOUR_STEPS}
+            onClose={() => setIsCatalogTourOpen(false)}
+          />
+        </Suspense>
       )}
       {isArenaTourOpen && (
-        <GuidedTour
-          steps={ARENA_TOUR_STEPS}
-          onClose={() => setIsArenaTourOpen(false)}
-        />
+        <Suspense fallback={null}>
+          <GuidedTour
+            steps={ARENA_TOUR_STEPS}
+            onClose={() => setIsArenaTourOpen(false)}
+          />
+        </Suspense>
       )}
 
-      <AboutModal
-        isOpen={isAboutOpen}
-        welcome={welcomeMode}
-        onStartTour={() => {
-          setIsAboutOpen(false);
-          if (welcomeMode) {
-            markWelcomed();
-            setWelcomeMode(false);
-            safeSetItem(STORAGE_KEYS.PENDING_ARENA_TOUR, '1');
-            setPendingArenaTour(true);
-          }
-          setIsCatalogTourOpen(true);
-        }}
-        onStartCatalogTour={() => {
-          setIsAboutOpen(false);
-          setActiveView('dashboard');
-          window.setTimeout(() => setIsCatalogTourOpen(true), 150);
-        }}
-        onStartArenaTour={() => {
-          setIsAboutOpen(false);
-          setActiveView('practice');
-          window.setTimeout(() => setIsArenaTourOpen(true), 150);
-        }}
-        onStartPractice={() => {
-          setIsAboutOpen(false);
-          if (welcomeMode) {
-            markWelcomed();
-            setWelcomeMode(false);
-            setActiveView('practice');
-          }
-        }}
-        onClose={() => {
-          setIsAboutOpen(false);
-          if (welcomeMode) {
-            markWelcomed();
-            setWelcomeMode(false);
-            setActiveView('practice');
-          }
-        }}
-      />
+      {isAboutOpen && (
+        <Suspense fallback={null}>
+          <AboutModal
+            isOpen={isAboutOpen}
+            welcome={welcomeMode}
+            onStartTour={() => {
+              setIsAboutOpen(false);
+              if (welcomeMode) {
+                markWelcomed();
+                setWelcomeMode(false);
+                safeSetItem(STORAGE_KEYS.PENDING_ARENA_TOUR, '1');
+                setPendingArenaTour(true);
+              }
+              setIsCatalogTourOpen(true);
+            }}
+            onStartCatalogTour={() => {
+              setIsAboutOpen(false);
+              setActiveView('dashboard');
+              window.setTimeout(() => setIsCatalogTourOpen(true), 150);
+            }}
+            onStartArenaTour={() => {
+              setIsAboutOpen(false);
+              setActiveView('practice');
+              window.setTimeout(() => setIsArenaTourOpen(true), 150);
+            }}
+            onStartPractice={() => {
+              setIsAboutOpen(false);
+              if (welcomeMode) {
+                markWelcomed();
+                setWelcomeMode(false);
+                setActiveView('practice');
+              }
+            }}
+            onClose={() => {
+              setIsAboutOpen(false);
+              if (welcomeMode) {
+                markWelcomed();
+                setWelcomeMode(false);
+                setActiveView('practice');
+              }
+            }}
+          />
+        </Suspense>
+      )}
 
       {backHint && (
         <div role="status" className="back-hint-toast">
@@ -986,49 +1027,63 @@ export function App() {
       )}
 
 
-      {FEATURES.quickAdd && (
-        <AddTopicModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          onAddTopic={handleAddTopic}
-        />
+      {FEATURES.quickAdd && isAddModalOpen && (
+        <Suspense fallback={null}>
+          <AddTopicModal
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            onAddTopic={handleAddTopic}
+          />
+        </Suspense>
       )}
 
-      <BackupAdvisoryModal
-        isOpen={isBackupAdvisoryOpen}
-        onAgree={() => {
-          markBackupAdvisorySeen();
-          setIsBackupAdvisoryOpen(false);
-          setHighlightExport(true);
-          setActiveView('dashboard');
-        }}
-        onDismiss={() => {
-          markBackupAdvisorySeen();
-          setIsBackupAdvisoryOpen(false);
-        }}
-      />
+      {isBackupAdvisoryOpen && (
+        <Suspense fallback={null}>
+          <BackupAdvisoryModal
+            isOpen={isBackupAdvisoryOpen}
+            onAgree={() => {
+              markBackupAdvisorySeen();
+              setIsBackupAdvisoryOpen(false);
+              setHighlightExport(true);
+              setActiveView('dashboard');
+            }}
+            onDismiss={() => {
+              markBackupAdvisorySeen();
+              setIsBackupAdvisoryOpen(false);
+            }}
+          />
+        </Suspense>
+      )}
 
-      <RemoveFromDeckModal
-        isOpen={isRemoveFromDeckModalOpen}
-        card={cardPendingRemoval}
-        activeDeckName={getDeckName(activeDeckId, customDecks)}
-        onConfirmForkAndRemove={handleConfirmForkAndRemove}
-        onClose={() => {
-          setIsRemoveFromDeckModalOpen(false);
-          setCardPendingRemoval(null);
-        }}
-      />
+      {isRemoveFromDeckModalOpen && (
+        <Suspense fallback={null}>
+          <RemoveFromDeckModal
+            isOpen={isRemoveFromDeckModalOpen}
+            card={cardPendingRemoval}
+            activeDeckName={getDeckName(activeDeckId, customDecks)}
+            onConfirmForkAndRemove={handleConfirmForkAndRemove}
+            onClose={() => {
+              setIsRemoveFromDeckModalOpen(false);
+              setCardPendingRemoval(null);
+            }}
+          />
+        </Suspense>
+      )}
 
-      <DeckEditorModal
-        isOpen={isDeckEditorModalOpen}
-        deckToEdit={deckToEdit}
-        allCards={deckState.topics}
-        onSaveDeck={handleSaveDeck}
-        onClose={() => {
-          setIsDeckEditorModalOpen(false);
-          setDeckToEdit(null);
-        }}
-      />
+      {isDeckEditorModalOpen && (
+        <Suspense fallback={null}>
+          <DeckEditorModal
+            isOpen={isDeckEditorModalOpen}
+            deckToEdit={deckToEdit}
+            allCards={deckState.topics}
+            onSaveDeck={handleSaveDeck}
+            onClose={() => {
+              setIsDeckEditorModalOpen(false);
+              setDeckToEdit(null);
+            }}
+          />
+        </Suspense>
+      )}
 
       {isInterviewPrepModalOpen && (
         <Suspense fallback={null}>
@@ -1050,32 +1105,38 @@ export function App() {
         </Suspense>
       )}
 
-      <FocusModal
-          isOpen={isFocusOpen}
-          onClose={() => setIsFocusOpen(false)}
-          topics={shownTopics}
-          filter={filter}
-          presets={deckState.filterPresets ?? {}}
-          onChange={handleFilterChange}
-          onSavePreset={(name, f) => setDeckState(savePreset(deckState, name, f))}
-          onDeletePreset={(name) => setDeckState(deletePreset(deckState, name))}
-        />
+      {isFocusOpen && (
+        <Suspense fallback={null}>
+          <FocusModal
+            isOpen={isFocusOpen}
+            onClose={() => setIsFocusOpen(false)}
+            topics={shownTopics}
+            filter={filter}
+            presets={deckState.filterPresets ?? {}}
+            onChange={handleFilterChange}
+            onSavePreset={(name, f) => setDeckState(savePreset(deckState, name, f))}
+            onDeletePreset={(name) => setDeckState(deletePreset(deckState, name))}
+          />
+        </Suspense>
+      )}
       {isSettingsOpen && (
-        <SettingsModal
-          isOpen={isSettingsOpen}
-          initialSection={settingsInitialSection}
-          onClose={() => {
-            setIsSettingsOpen(false);
-            setSettingsInitialSection(null);
-            setAiSettingsVersion((v) => v + 1);
-          }}
-          currentAlgorithm={algorithm}
-          onAlgorithmChange={handleAlgorithmChange}
-          currentTheme={theme}
-          onThemeChange={handleSetTheme}
-          onSettingsSaved={() => setAiSettingsVersion((v) => v + 1)}
-          onResetDeckToDefaults={handleResetDeckToDefaults}
-        />
+        <Suspense fallback={null}>
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            initialSection={settingsInitialSection}
+            onClose={() => {
+              setIsSettingsOpen(false);
+              setSettingsInitialSection(null);
+              setAiSettingsVersion((v) => v + 1);
+            }}
+            currentAlgorithm={algorithm}
+            onAlgorithmChange={handleAlgorithmChange}
+            currentTheme={theme}
+            onThemeChange={handleSetTheme}
+            onSettingsSaved={() => setAiSettingsVersion((v) => v + 1)}
+            onResetDeckToDefaults={handleResetDeckToDefaults}
+          />
+        </Suspense>
       )}
     </div>
   );

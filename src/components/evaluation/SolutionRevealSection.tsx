@@ -4,12 +4,9 @@ import { getCardInputLanguage } from '../../lib/leitner';
 import type { TopicItem, CardInputLanguage } from '../../lib/leitner';
 import { formatCode } from '../../lib/formatter';
 import CodeMirror from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { sql } from '@codemirror/lang-sql';
-import { html } from '@codemirror/lang-html';
-import { graphql } from 'cm6-graphql';
 import { EditorView } from '@codemirror/view';
 import { stripPredefinedPromptTypes } from '../../utils/cardPromptTypes';
+import { useCodeMirrorLanguage } from '../../hooks/useCodeMirrorLanguage';
 
 export interface SolutionRevealSectionProps {
   topic: TopicItem;
@@ -126,15 +123,9 @@ export const SolutionRevealSection: React.FC<SolutionRevealSectionProps> = ({
     }
   }, [solutionLanguageLabel]);
 
+  const langExt = useCodeMirrorLanguage(inputLang, solutionLanguageLabel === 'TypeScript');
+
   const solutionExtensions = useMemo(() => {
-    const langExt =
-      inputLang === 'html'
-        ? html()
-        : inputLang === 'sql'
-          ? sql()
-          : inputLang === 'graphql'
-            ? graphql()
-            : javascript({ jsx: true, typescript: solutionLanguageLabel === 'TypeScript' });
     return [
       langExt,
       EditorView.lineWrapping,
@@ -164,7 +155,7 @@ export const SolutionRevealSection: React.FC<SolutionRevealSectionProps> = ({
         },
       }),
     ];
-  }, [inputLang, solutionLanguageLabel]);
+  }, [langExt]);
 
   const solutionCmBasicSetup = useMemo(
     () => ({

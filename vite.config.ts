@@ -22,6 +22,45 @@ export default defineConfig({
   build: {
     // The TypeScript compiler chunk is lazy-loaded (only for strict TS mode), so it is allowed to be large.
     chunkSizeWarningLimit: 6000,
+    rolldownOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('src/data/topics.json')) {
+            return 'seed-topics';
+          }
+          if (
+            id.includes('node_modules/d3') ||
+            id.includes('node_modules/delaunator') ||
+            id.includes('node_modules/internmap') ||
+            id.includes('node_modules/robust-predicates')
+          ) {
+            return 'vendor-d3';
+          }
+          if (
+            id.includes('node_modules/@codemirror/view') ||
+            id.includes('node_modules/@codemirror/state') ||
+            id.includes('node_modules/@codemirror/language') ||
+            id.includes('node_modules/@codemirror/commands') ||
+            id.includes('node_modules/@codemirror/autocomplete') ||
+            id.includes('node_modules/@codemirror/search') ||
+            id.includes('node_modules/@codemirror/lint') ||
+            id.includes('node_modules/@codemirror/lang-javascript') ||
+            id.includes('node_modules/@lezer/common') ||
+            id.includes('node_modules/@lezer/highlight') ||
+            id.includes('node_modules/@lezer/lr') ||
+            id.includes('node_modules/@lezer/javascript') ||
+            id.includes('node_modules/@uiw/react-codemirror') ||
+            id.includes('node_modules/rainbowbrackets')
+          ) {
+            return 'vendor-codemirror';
+          }
+          if (id.includes('node_modules/lucide-react')) {
+            return 'vendor-icons';
+          }
+          return undefined;
+        },
+      },
+    },
   },
   test: {
     environment: 'node',

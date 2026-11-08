@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FolderMinus, X, Sparkles } from 'lucide-react';
+import { FolderMinus, X, Layers } from 'lucide-react';
 import type { TopicItem } from '../../lib/leitner';
 
 export interface RemoveFromDeckModalProps {
@@ -137,7 +137,7 @@ const RemoveFromDeckModalDialog: React.FC<RemoveFromDeckModalDialogProps> = ({
                 color: 'var(--text-secondary)',
               }}
             >
-              <Sparkles size={15} style={{ color: 'var(--accent-cyan)', flexShrink: 0 }} />
+              <Layers size={15} style={{ color: 'var(--accent-cyan)', flexShrink: 0 }} />
               <span>
                 Your new personal deck will include all cards from {activeDeckName} except &ldquo;{card.title}&rdquo;.
               </span>

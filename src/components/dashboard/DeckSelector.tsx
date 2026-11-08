@@ -126,7 +126,7 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                 data-tour="deck-dropdown"
               >
                 <div className="deck-dropdown-section-title">
-                  <Sparkles size={13} className="deck-section-icon" />
+                  <Layers size={13} className="deck-section-icon" />
                   <span>Built-in Starter Decks</span>
                 </div>
 
@@ -252,7 +252,7 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                         data-testid="deck-dropdown-create-btn"
                       >
                         <Plus size={14} />
-                        <span>Build Custom Deck...</span>
+                        <span>Build Custom Deck</span>
                       </button>
                     )}
                     {onTailorWithAIClick && (
@@ -266,7 +266,7 @@ export const DeckSelector: React.FC<DeckSelectorProps> = ({
                         data-testid="deck-dropdown-ai-btn"
                       >
                         <Sparkles size={14} className="ai-btn-icon" />
-                        <span>Build Interview Deck with AI...</span>
+                        <span>Build Interview Deck with AI</span>
                       </button>
                     )}
                   </>

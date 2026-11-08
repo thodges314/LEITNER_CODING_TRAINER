@@ -565,7 +565,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
                 role="status"
               >
                 <div className="export-callout-inner">
-                  <Sparkles size={16} className="export-sparkle-icon" />
+                  <Download size={16} className="export-sparkle-icon" />
                   <div className="export-callout-content">
                     <div className="export-callout-title">
                       Download Backup Here

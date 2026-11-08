@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { sql } from '@codemirror/lang-sql';
-import { html } from '@codemirror/lang-html';
-import { graphql } from 'cm6-graphql';
 import rainbowBrackets from 'rainbowbrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
@@ -43,6 +39,7 @@ import { SocraticClarificationAssistant } from './practice/SocraticClarification
 import { useLegacyComponentPopup } from '../hooks/useLegacyComponentPopup';
 import { useTimedPractice } from '../hooks/useTimedPractice';
 import { usePracticeCodeExecution } from '../hooks/usePracticeCodeExecution';
+import { useCodeMirrorLanguage } from '../hooks/useCodeMirrorLanguage';
 
 interface PracticeArenaProps {
   currentCard: TopicItem | null;
@@ -313,16 +310,10 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
     []
   );
 
+  const inputLang = getCardInputLanguage(currentCard);
+  const langExt = useCodeMirrorLanguage(inputLang, executionMode === 'ts');
+
   const extensions = useMemo(() => {
-    const inputLang = getCardInputLanguage(currentCard);
-    const langExt =
-      inputLang === 'html'
-        ? html()
-        : inputLang === 'sql'
-          ? sql()
-          : inputLang === 'graphql'
-            ? graphql()
-            : javascript({ jsx: true, typescript: executionMode === 'ts' });
     const list = [
       langExt,
       rainbowBrackets(),
@@ -345,7 +336,7 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
       list.push(createTsHoverExtension());
     }
     return list;
-  }, [executionMode, currentCard]);
+  }, [executionMode, inputLang, langExt]);
 
   const handleSubmit = async () => {
     setIsPreviewLive(true);

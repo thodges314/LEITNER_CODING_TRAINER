@@ -6,6 +6,10 @@ Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_
 - **Card**: An individual flashcard / coding challenge / exercise (e.g. `tic-tac-toe`, `two-sum`, `stepper`). A card has an ID, prompt, test harness, reference solutions (`.ref.js` and `.ref.ts`), difficulty, box/tier, and streak.
 - **Topic**: The high-level subject track / category (e.g. `react-components`, `algorithms`, `async-js`, `js-utilities`, `dom-browser`) that groups cards. In UI controls and filters, category pills and table headers are labeled "Topic" / "Topics", while individual problem items are called "Cards".
 
+## UI Iconography & Button Copy Conventions
+- **`<Sparkles />` is strictly reserved for AI features**: Only use the `Sparkles` icon on buttons, badges, headers, or popovers that directly invoke or represent AI-powered functionality (e.g. *Build Interview Deck with AI*, *Quick Add Topic with AI*, *Socratic Clarification*, *AI Critique / Follow-Up*, *AI Engine Status*). Never use `Sparkles` for non-AI items such as starter decks (use `Layers`), Prettier code formatting (use `Wand2`), backup callouts (use `Download`), or staged unlock toasts (use `Zap`).
+- **No trailing ellipses on action buttons**: Action buttons that open modals or workflows (e.g. `Build Custom Deck`, `Build Interview Deck with AI`) should be written cleanly without trailing `...` ellipses.
+
 ## Card content: edit the sources, not `src/data/topics.json` or `src/data/catalogIndex.json`
 `src/data/topics.json` and `src/data/catalogIndex.json` are **generated** by `npm run build:cards`. They are committed, but never edit them by hand: the next build would overwrite the change. Edit the source instead:
 

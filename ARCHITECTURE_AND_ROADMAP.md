@@ -15,6 +15,7 @@ in the browser; state lives in `localStorage`.
 - Scheduling: Choice of **Classic Leitner Boxes** (5 boxes) or **Graduated Interval Recall & Chaining** (7 tiers with micro-spaced chaining and half-tier setbacks).
 - Owner use: personal. Quality bar: every card must have a _correct reference solution_, a _real harness_, and
   _explicit input/expected test cases_ (the owner reads these to understand what "success" means).
+- **UI Iconography & Button Copy**: The `Sparkles` icon is strictly reserved as the visual indicator for AI-powered features and actions (use `Layers` for study decks, `Wand2` for Prettier code formatting, `Download` for exports, `Zap` for unlocks). Action buttons never use trailing `...` ellipses.
 - **Card authoring pipeline & verification:** Cards are primarily AI-authored across structured batch pipelines into `scripts/cards/` and `scripts/testcases/`. Rather than unverified generative scrapers, every card must strictly satisfy quality gates: an explicit test harness, concrete input/expected test cases, a passing reference solution, failure on empty solution, label parity, and mutation test verification. Never generate test cases with unverified regexes or loose LLM bulk fixtures; the old `generate_all_fixtures.cjs` corrupted cards and was deleted.
 
 ## 2. Current state (snapshot)
@@ -49,6 +50,7 @@ src/
     practice/                  modular arena subcomponents (PracticeHeader, ContractTable, EditorToolbar, ConsoleRunnerDrawer, ComponentPreviewPane, PropsControlPanel, ReinforcementBanner, starterSnippet, consoleFormat, ReactTestErrorBoundary)
   hooks/
     usePracticeCodeExecution.ts sandbox/worker code runner hook for PracticeArena (transpilation, console capture, React mount, worker offload)
+    useCodeMirrorLanguage.ts   CodeMirror 6 language extension hook (synchronous JS/TS + on-demand lazy loading for SQL, HTML, and GraphQL grammars)
     useTimedPractice.ts        Timed Recall Mode countdown timer and auto-submit hook
     useLegacyComponentPopup.ts external pop-out window lifecycle hook for legacy component preview
     usePreviewProps.ts         state and synchronization hook for LivePreview props control panel

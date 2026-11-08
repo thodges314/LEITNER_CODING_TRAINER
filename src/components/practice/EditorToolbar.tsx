@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Terminal,
-  Sparkles,
+  Wand2,
   RotateCcw,
   Play,
   Send,
@@ -61,7 +61,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             {...shortcutAttrs('format')}
             className="arena-editor-btn-text"
           >
-            <Sparkles size={12} color={isFormatting ? 'var(--accent-cyan)' : 'var(--accent-purple)'} />
+            <Wand2 size={12} color={isFormatting ? 'var(--accent-cyan)' : 'var(--accent-purple)'} />
             {isFormatting ? 'Formatting...' : 'Format'}
           </button>
 
