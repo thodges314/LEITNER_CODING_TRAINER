@@ -1448,9 +1448,10 @@ export async function generateInterviewPrepDossier(
   options?: GenerateDossierOptions
 ): Promise<InterviewPrepDossier> {
   const apiKey = getStoredApiKey();
+  const isMockTestKey = apiKey.startsWith('gsk_test_key');
 
-  // If no API key configured, use deterministic offline pipeline
-  if (!apiKey) {
+  // If no API key configured (or E2E mock key), use deterministic offline pipeline
+  if (!apiKey || isMockTestKey) {
     options?.onProgress?.('matching', 'Matching catalog cards deterministically (offline mode)...');
     await new Promise((r) => setTimeout(r, 400));
     return generateHeuristicDossier(request, catalog);
@@ -1541,7 +1542,7 @@ export async function continueInterviewDialogue(
   const apiKey = getStoredApiKey();
   const provider = getStoredProvider();
 
-  if (!apiKey) {
+  if (!apiKey || apiKey.startsWith('gsk_test_key')) {
     return generateHeuristicDialogueReply(dossier, userMessage, catalog, progressContext);
   }
 

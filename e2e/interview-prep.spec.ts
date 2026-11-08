@@ -6,6 +6,7 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await page.addInitScript(() => {
       localStorage.setItem('leitner_welcomed', '1');
       localStorage.setItem('leitner_theme', 'dark');
+      localStorage.setItem('ai_evaluator_key', 'gsk_test_key_e2e');
       localStorage.setItem('leitner_ai_api_key', 'gsk_test_key_e2e');
       if (!localStorage.getItem('leitner_active_deck_id')) {
         localStorage.setItem('leitner_active_deck_id', 'full-library');
