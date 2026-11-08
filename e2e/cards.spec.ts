@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Browser, Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -16,28 +16,45 @@ const DECK_KEY = 'leitner_coding_deck';
 const DRAFT_PREFIX = 'leitner_draft:';
 const VERDICT = /^(PASSED|NEEDS REVISION)$/;
 
+let workerPage: Page | null = null;
+
+test.afterAll(async () => {
+  if (workerPage && !workerPage.isClosed()) {
+    await workerPage.close();
+  }
+  workerPage = null;
+});
+
 /**
- * Opens the app with exactly one active card and the given code pre-loaded through the draft autosave
- * (so the CodeMirror editor never has to be driven), then submits it for evaluation.
- * Offline grading is harness-based, so the verdict shown is the harness verdict.
+ * Opens the app in Practice Arena view with exactly one active card and the given code pre-loaded
+ * through the draft autosave (so the CodeMirror editor never has to be driven), then submits it for evaluation.
+ * Reuses a single page per worker so the 6.5 MB production bundle is not cold-started 1,700+ times.
  */
 async function submitCard(page: Page, id: string, code: string): Promise<{ verdict: string; tests: string }> {
-  await page.goto('/');
   await page.evaluate(
     ({ id, code, DECK_KEY, DRAFT_PREFIX }) => {
-      const deck = JSON.parse(localStorage.getItem(DECK_KEY) as string);
+      const win = window as unknown as {
+        __baseDeck?: { topics: Array<{ id: string; status: string }>; enabledPacks?: string[] };
+        __E2E_FAST_EVAL?: boolean;
+      };
+      win.__E2E_FAST_EVAL = true;
+      if (!win.__baseDeck) {
+        win.__baseDeck = JSON.parse(localStorage.getItem(DECK_KEY) as string);
+      }
+      const deck = win.__baseDeck!;
       deck.enabledPacks = ['algorithms-advanced']; // optional packs are hidden by default; the smoke test covers every card
       for (const t of deck.topics) t.status = t.id === id ? 'active' : 'locked';
+      localStorage.clear();
+      localStorage.setItem('leitner_welcomed', '1');
+      localStorage.setItem('leitner_catalog_tour_seen', '1');
+      localStorage.setItem('leitner_arena_tour_seen', '1');
+      localStorage.setItem('leitner_backup_advisory_seen', '1');
       localStorage.setItem(DECK_KEY, JSON.stringify(deck));
       localStorage.setItem(DRAFT_PREFIX + id, code);
+      window.dispatchEvent(new Event('leitner:sync-storage'));
     },
     { id, code, DECK_KEY, DRAFT_PREFIX }
   );
-  await page.reload();
-  const resumeBtn = page.getByTestId('resume-practice-hero-btn');
-  if (await resumeBtn.isVisible()) {
-    await resumeBtn.click();
-  }
   await page.getByRole('button', { name: /Submit Final Answer/ }).click();
   const verdict = page.getByText(VERDICT);
   await expect(verdict.first()).toBeVisible();
@@ -47,18 +64,36 @@ async function submitCard(page: Page, id: string, code: string): Promise<{ verdi
   return { verdict: ((await verdict.first().textContent()) ?? '').trim(), tests: tests.trim() };
 }
 
+async function runCardSubmission(
+  browser: Browser,
+  id: string,
+  code: string,
+  expectedVerdict: 'PASSED' | 'NEEDS REVISION'
+): Promise<void> {
+  if (!workerPage || workerPage.isClosed()) {
+    workerPage = await browser.newPage();
+    await workerPage.goto('/?view=practice');
+  }
+  try {
+    const { verdict, tests } = await submitCard(workerPage, id, code);
+    expect(verdict, `harness said: ${tests}`).toBe(expectedVerdict);
+  } catch (err) {
+    await workerPage.close().catch(() => {});
+    workerPage = null;
+    throw err;
+  }
+}
+
 test.describe('seed cards in the production build', () => {
   for (const card of cards) {
     const reference = card.referenceSolution ?? card.solution ?? '';
 
-    test(`${card.id}: the reference solution PASSES`, async ({ page }) => {
-      const { verdict, tests } = await submitCard(page, card.id, reference);
-      expect(verdict, `harness said: ${tests}`).toBe('PASSED');
+    test(`${card.id}: the reference solution PASSES`, async ({ browser }) => {
+      await runCardSubmission(browser, card.id, reference, 'PASSED');
     });
 
-    test(`${card.id}: an empty solution FAILS`, async ({ page }) => {
-      const { verdict } = await submitCard(page, card.id, '// intentionally empty');
-      expect(verdict).toBe('NEEDS REVISION');
+    test(`${card.id}: an empty solution FAILS`, async ({ browser }) => {
+      await runCardSubmission(browser, card.id, '// intentionally empty', 'NEEDS REVISION');
     });
   }
 });

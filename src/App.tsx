@@ -81,7 +81,12 @@ const FIRST_VISIT = isFirstVisit();
 
 export function App() {
   const [deckState, setDeckState] = useState<LeitnerDeckState>(() => loadDeckState());
-  const [activeView, setActiveView] = useState<'practice' | 'dashboard'>('dashboard');
+  const [activeView, setActiveView] = useState<'practice' | 'dashboard'>(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('view') === 'practice') {
+      return 'practice';
+    }
+    return 'dashboard';
+  });
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [theme, setThemeState] = useState<AppTheme>(() => getStoredTheme());
 
@@ -224,6 +229,24 @@ export function App() {
 
   const [cardSnapshotBeforeReview, setCardSnapshotBeforeReview] = useState<TopicItem | null>(null);
   const [practiceSessionKey, setPracticeSessionKey] = useState(0);
+
+  useEffect(() => {
+    const onSyncStorage = () => {
+      setDeckState(loadDeckState());
+      setSelectedCardId(null);
+      setCardSnapshotBeforeReview(null);
+      setReinforcingCardId(null);
+      setIsAboutOpen(false);
+      setWelcomeMode(false);
+      setIsCatalogTourOpen(false);
+      setIsArenaTourOpen(false);
+      setIsBackupAdvisoryOpen(false);
+      setActiveView('practice');
+      setPracticeSessionKey((k) => k + 1);
+    };
+    window.addEventListener('leitner:sync-storage', onSyncStorage);
+    return () => window.removeEventListener('leitner:sync-storage', onSyncStorage);
+  }, []);
 
   const handleRecordReview = (passed: boolean) => {
     if (!currentCard) return;
