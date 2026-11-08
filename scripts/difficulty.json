@@ -1574,5 +1574,13 @@
   "next-parallel-intercepting-routes": {
     "difficulty": 3,
     "concept": "next-intercepting-routes"
+  },
+  "promise-waterfall-pipeline": {
+    "difficulty": 2,
+    "concept": "async-control"
+  },
+  "microtask-batch-scheduler": {
+    "difficulty": 3,
+    "concept": "microtasks"
   }
 }

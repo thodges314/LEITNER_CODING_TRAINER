@@ -98,5 +98,51 @@ export default {
       '"night-mode"'
     ),
   ],
+
+  'promise-waterfall-pipeline': [
+    r(
+      'Chains synchronous and asynchronous transformations in sequence',
+      'await promiseWaterfall([(x) => x + 10, async (x) => x * 2, (x) => `Total: ${x}`], 5)',
+      '"Total: 30"'
+    ),
+    r(
+      'Resolves immediately with initialValue when stages array is empty',
+      'await promiseWaterfall([], { initialized: true })',
+      '{"initialized":true}'
+    ),
+    r(
+      'Short-circuits immediately on stage rejection without invoking subsequent stages',
+      'await promiseWaterfall([fn1, failFn, uncalledFn], 0)',
+      'Rejects with Error'
+    ),
+    r(
+      'Preserves strict serial ordering across stages with variable async delays',
+      'await promiseWaterfall([delay30, delay10, delay20], "start")',
+      '"start-1-2-3"'
+    ),
+  ],
+
+  'microtask-batch-scheduler': [
+    r(
+      'Coalesces multiple synchronous calls into a single batch execution',
+      'await Promise.all([b.schedule(1), b.schedule(2), b.schedule(3)])',
+      '[10, 20, 30]'
+    ),
+    r(
+      'Executes batch on microtask queue strictly before macrotasks fire',
+      'order',
+      '["microtask-batch:itemA", "macrotask-timeout"]'
+    ),
+    r(
+      'Propagates batchHandler rejection to all pending promises in the batch',
+      'await b.schedule("x")',
+      'Rejects with Error'
+    ),
+    r(
+      'Processes subsequent independent batches across separate execution ticks',
+      'batches',
+      '[["a", "b"], ["c", "d"]]'
+    ),
+  ],
 };
 

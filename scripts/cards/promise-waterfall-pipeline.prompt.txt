@@ -1,0 +1,19 @@
+Implement an asynchronous waterfall pipeline that executes an array of functions in strict sequence, feeding each stage's resolved output as input to the next:
+
+### `promiseWaterfall<T = any>(stages: Array<(value: any) => any>, initialValue: any): Promise<T>`
+
+## Description
+In data pipelines, ETL workflows, and middleware architectures, tasks frequently depend on the result of the preceding operation. While parallel helpers like `Promise.all` execute tasks concurrently, a waterfall pipeline chains dynamic asynchronous operations sequentially without intermediate boilerplate.
+
+Implement `promiseWaterfall` to build a flat, continuous promise accumulator chain from scratch using `Array.prototype.reduce`.
+
+## Requirements
+- **Sequential Data Flow**: Executes functions in array order. The first function receives `initialValue`; each subsequent function receives the resolved output value of the previous stage.
+- **Synchronous & Asynchronous Support**: Stages may return either a direct synchronous value or a `Promise`. Both are handled transparently.
+- **Empty Pipeline**: If `stages` is an empty array `[]`, resolves immediately with `initialValue`.
+- **Short-Circuit on Error**: If any stage rejects or throws synchronously:
+  - Immediately stop execution.
+  - Reject the returned promise with that error.
+  - Ensure subsequent stages in the pipeline are never invoked.
+- **Preserve Ordering**: Ensure asynchronous delays in individual stages do not interleave or race; each stage only begins execution after the previous stage's promise has resolved.
+

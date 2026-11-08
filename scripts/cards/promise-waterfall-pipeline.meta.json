@@ -1,0 +1,13 @@
+{
+  "track": "async-js",
+  "title": "Promise Waterfall: Sequential Pipeline Reduction",
+  "tags": [
+    "promise",
+    "async",
+    "reduce",
+    "pipeline",
+    "waterfall",
+    "sequential"
+  ]
+}
+

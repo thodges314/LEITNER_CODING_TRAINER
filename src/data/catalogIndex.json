@@ -5569,5 +5569,37 @@
       "test-runner"
     ],
     "summary": "type TestFn = (...args: any[]) => void | Promise<void>;"
+  },
+  {
+    "id": "microtask-batch-scheduler",
+    "title": "Microtask Batch Scheduler: queueMicrotask Coalescing",
+    "track": "async-js",
+    "concept": "microtasks",
+    "difficulty": 3,
+    "tags": [
+      "queueMicrotask",
+      "microtask",
+      "batching",
+      "scheduler",
+      "coalescing",
+      "async"
+    ],
+    "summary": "Implement a microtask batch scheduler that coalesces concurrent synchronous requests into a single batched execution using the native queueMicrotas..."
+  },
+  {
+    "id": "promise-waterfall-pipeline",
+    "title": "Promise Waterfall: Sequential Pipeline Reduction",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 2,
+    "tags": [
+      "promise",
+      "async",
+      "reduce",
+      "pipeline",
+      "waterfall",
+      "sequential"
+    ],
+    "summary": "Implement an asynchronous waterfall pipeline that executes an array of functions in strict sequence, feeding each stage's resolved output as input ..."
   }
 ]
