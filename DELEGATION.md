@@ -16,7 +16,8 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Task / card | Branch | Owner | Status |
 |---|---|---|---|
 | PostgreSQL, Testing & Async JS Cards (Gaps, SKIP LOCKED, test.each, renderHook, promiseWaterfall, microtaskBatcher) | feature/postgres-advanced-cards | human | Ready to merge |
-| Foundational Curriculum Warm-Up Cards & Next.js Audit | feature/curriculum-warmup-cards | antigravity | In progress |
+| Foundational Curriculum Warm-Up Cards & Next.js Audit | feature/curriculum-warmup-cards | antigravity | Ready to merge |
+| Next.js Curriculum Expansion & Advanced App Router Cards | feature/nextjs-curriculum-expansion | antigravity | In progress |
 
 
 
