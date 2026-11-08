@@ -1,0 +1,33 @@
+Implement a text line streaming sanitizer and execution pipeline using the standard Web Streams API:
+
+## Description
+
+The Web Streams API (`ReadableStream`, `TransformStream`, `WritableStream`) is the universal standard for chunked data processing across browsers, Node.js (18+), and Edge runtimes. Rather than buffering an entire dataset in memory, a transform stream operates on chunks as they arrive over the network, emitting processed pieces down the pipe.
+
+```ts
+interface TransformPipelineRunner {
+  createLineSanitizerTransform(censorWords: string[]): TransformStream<string, string>;
+  runStreamPipeline(chunks: string[], transform: TransformStream<string, string>): Promise<string[]>;
+}
+```
+
+### `createLineSanitizerTransform(censorWords: string[]): TransformStream<string, string>`
+
+Creates a standard Web `TransformStream<string, string>` that buffers incoming arbitrary text chunks, splits on newline characters (`'\n'`), redacts sensitive words, and enqueues clean lines:
+- **Chunk Buffering**:
+  - Incoming chunks may be fragments of lines (e.g. `'hel'` followed by `'lo\n'`).
+  - Buffers text until a newline delimiter is encountered.
+  - Splits each complete line, redacts sensitive content, and calls `controller.enqueue(line)` without the trailing newline.
+- **Redaction**:
+  - For each word in `censorWords`, replaces case-insensitive whole-word occurrences with `'[REDACTED]'`.
+  - Non-sensitive content and spacing are preserved.
+- **Flush Handling**:
+  - In `flush(controller)`: If any un-terminated text remains in the internal buffer, sanitizes it and enqueues the final line before closing.
+
+### `runStreamPipeline(chunks: string[], transform: TransformStream<string, string>): Promise<string[]>`
+
+Executes a complete Web Streams pipeline:
+- Constructs a `ReadableStream<string>` that enqueues each string in `chunks` and closes.
+- Pipes the readable stream through `transform` via `readable.pipeThrough(transform)`.
+- Consumes the resulting stream using a reader (`getReader()`), collects all emitted lines into an array, and returns it.
+

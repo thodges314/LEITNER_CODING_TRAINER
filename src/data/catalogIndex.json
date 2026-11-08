@@ -5509,66 +5509,82 @@
     "summary": "Implement a Next.js App Router parallel route slot and intercepting route evaluator"
   },
   {
-    "id": "sql-sequential-gaps",
-    "title": "Sequential ID Gaps in Logs (LEAD)",
-    "track": "sql-postgres",
-    "concept": "sql-gaps-and-islands",
+    "id": "stream-event-micro-batcher",
+    "title": "Stream Event Micro-Batcher (Size & Time Window)",
+    "track": "async-js",
+    "concept": "streams-batching",
     "difficulty": 3,
     "tags": [
-      "sql",
-      "postgres",
-      "window-functions",
-      "gaps-and-islands",
-      "lead-lag",
-      "cte"
+      "async",
+      "streams",
+      "batching",
+      "scaling",
+      "performance"
     ],
-    "summary": "Write a PostgreSQL query to detect missing sequential identifiers (gaps) in an audit tracking log."
+    "summary": "Implement a high-throughput stream event micro-batcher that groups incoming events by count limit or maximum time window"
   },
   {
-    "id": "sql-worker-queue-skip-locked",
-    "title": "Concurrent Task Queue Claim (FOR UPDATE SKIP LOCKED)",
-    "track": "sql-postgres",
-    "concept": "sql-concurrency-transactions",
+    "id": "web-stream-transform-pipeline",
+    "title": "Web Stream Transform Pipeline (TransformStream)",
+    "track": "async-js",
+    "concept": "streams-transform",
     "difficulty": 3,
     "tags": [
-      "sql",
-      "postgres",
+      "async",
+      "streams",
+      "transform",
+      "web-streams",
+      "scaling"
+    ],
+    "summary": "Implement a text line streaming sanitizer and execution pipeline using the standard Web Streams API"
+  },
+  {
+    "id": "chunked-batch-pipeline",
+    "title": "Chunked Batch Pipeline with Bounded Concurrency",
+    "track": "async-js",
+    "concept": "streams-chunking",
+    "difficulty": 3,
+    "tags": [
+      "async",
       "concurrency",
-      "transactions",
-      "row-locking",
-      "queues"
+      "batching",
+      "streams",
+      "error-handling",
+      "performance"
     ],
-    "summary": "Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue."
+    "summary": "Implement a memory-safe batch processing pipeline with bounded concurrency and granular error collection"
   },
   {
-    "id": "render-hook-harness",
-    "title": "Mini renderHook: React Hook Test Harness",
-    "track": "testing-tooling",
-    "concept": "testing-tools",
+    "id": "k-way-stream-merger",
+    "title": "K-Way Merge on Async Streams",
+    "track": "algorithms",
+    "concept": "streams-external-merge",
     "difficulty": 4,
     "tags": [
-      "testing",
-      "react",
-      "hooks",
-      "lifecycle",
-      "test-runner"
+      "algorithms",
+      "heap",
+      "priority-queue",
+      "streams",
+      "async-generators",
+      "sorting"
     ],
-    "summary": "interface HookResult<T> {"
+    "summary": "Implement an external K-way merge for sorted asynchronous iterables using a Min-Heap"
   },
   {
-    "id": "test-each-data-driven",
-    "title": "Data-Driven Parameterized Tests (test.each)",
-    "track": "testing-tooling",
-    "concept": "testing-tools",
-    "difficulty": 3,
+    "id": "stream-token-bucket-shaper",
+    "title": "Token Bucket Rate Shaper",
+    "track": "async-js",
+    "concept": "streams-rate-shaping",
+    "difficulty": 4,
     "tags": [
-      "testing",
-      "vitest",
-      "jest",
-      "parameterized-tests",
-      "test-runner"
+      "async",
+      "rate-limiting",
+      "streams",
+      "token-bucket",
+      "algorithms",
+      "performance"
     ],
-    "summary": "type TestFn = (...args: any[]) => void | Promise<void>;"
+    "summary": "Implement a high-performance token-bucket rate limiter and stream shaper"
   },
   {
     "id": "microtask-batch-scheduler",
@@ -5601,6 +5617,68 @@
       "sequential"
     ],
     "summary": "Implement an asynchronous waterfall pipeline that executes an array of functions in strict sequence, feeding each stage's resolved output as input ..."
+  },
+  {
+    "id": "render-hook-harness",
+    "title": "Mini renderHook: React Hook Test Harness",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 4,
+    "tags": [
+      "testing",
+      "react",
+      "hooks",
+      "lifecycle",
+      "test-runner"
+    ],
+    "summary": "interface HookResult<T> {"
+  },
+  {
+    "id": "sql-sequential-gaps",
+    "title": "Sequential ID Gaps in Logs (LEAD)",
+    "track": "sql-postgres",
+    "concept": "sql-gaps-and-islands",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "gaps-and-islands",
+      "lead-lag",
+      "cte"
+    ],
+    "summary": "Write a PostgreSQL query to detect missing sequential identifiers (gaps) in an audit tracking log."
+  },
+  {
+    "id": "sql-worker-queue-skip-locked",
+    "title": "Concurrent Task Queue Claim (FOR UPDATE SKIP LOCKED)",
+    "track": "sql-postgres",
+    "concept": "sql-concurrency-transactions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "concurrency",
+      "transactions",
+      "row-locking",
+      "queues"
+    ],
+    "summary": "Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue."
+  },
+  {
+    "id": "test-each-data-driven",
+    "title": "Data-Driven Parameterized Tests (test.each)",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 3,
+    "tags": [
+      "testing",
+      "vitest",
+      "jest",
+      "parameterized-tests",
+      "test-runner"
+    ],
+    "summary": "type TestFn = (...args: any[]) => void | Promise<void>;"
   },
   {
     "id": "ts-assertion-functions",

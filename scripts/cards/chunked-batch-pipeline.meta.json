@@ -1,0 +1,8 @@
+{
+  "title": "Chunked Batch Pipeline with Bounded Concurrency",
+  "track": "async-js",
+  "tags": ["async", "concurrency", "batching", "streams", "error-handling", "performance"],
+  "difficulty": 3,
+  "concept": "Splitting massive input arrays into controlled chunks with bounded concurrency and resilient error tracking"
+}
+

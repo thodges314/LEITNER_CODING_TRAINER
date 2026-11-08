@@ -1,0 +1,13 @@
+{
+  "title": "Web Stream Transform Pipeline (TransformStream)",
+  "track": "async-js",
+  "tags": [
+    "async",
+    "streams",
+    "transform",
+    "web-streams",
+    "scaling"
+  ],
+  "requiresDom": false
+}
+

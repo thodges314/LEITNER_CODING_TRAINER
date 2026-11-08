@@ -1,0 +1,8 @@
+{
+  "title": "K-Way Merge on Async Streams",
+  "track": "algorithms",
+  "tags": ["algorithms", "heap", "priority-queue", "streams", "async-generators", "sorting"],
+  "difficulty": 4,
+  "concept": "Merging K pre-sorted asynchronous streams using a Min-Heap with O(N log K) time and O(K) space complexity"
+}
+
