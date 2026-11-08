@@ -1,0 +1,44 @@
+Implement a memory-safe batch processing pipeline with bounded concurrency and granular error collection:
+
+## Description
+
+When processing large datasets (e.g. 50,000 webhook payloads or database records), executing all operations concurrently with `Promise.all` overwhelms downstream APIs and causes out-of-memory crashes. Slicing items into discrete chunks and limiting active in-flight worker promises ensures predictable memory footprints and resilient throughput.
+
+```ts
+interface ChunkBatchOptions<T, R> {
+  batchSize: number;
+  concurrency: number;
+  processItem: (item: T, index: number) => Promise<R>;
+  onError?: (item: T, error: Error, index: number) => void;
+}
+
+interface ChunkBatchResult<R> {
+  results: (R | null)[];
+  successfulCount: number;
+  failureCount: number;
+}
+```
+
+### `chunkedBatchPipeline<T, R>(items: T[], options: ChunkBatchOptions<T, R>): Promise<ChunkBatchResult<R>>`
+
+Processes an array of items in successive batches of `options.batchSize`, running at most `options.concurrency` items concurrently:
+
+- **Batch Partitioning**:
+  - Divides `items` into slices of length `batchSize` (the final slice may be shorter).
+  - Processes batches sequentially from first to last: each batch must completely finish (all items either resolved or rejected) before the next batch starts.
+- **Bounded Concurrency within Batches**:
+  - Within each batch, runs items concurrently up to `concurrency` simultaneous active workers (e.g. using a pool or queue).
+  - As soon as one worker completes an item, the next pending item in that batch begins processing.
+- **Result Ordering**:
+  - The returned `results` array must preserve the exact original ordering of `items` (`results[i]` corresponds to `items[i]`).
+- **Error Handling & Dead-Letter Safety**:
+  - If `processItem(item, i)` throws or rejects:
+    - Calls `onError(item, error, i)` if provided.
+    - Sets `results[i] = null`.
+    - Increments `failureCount`.
+    - Does **not** reject the pipeline; execution continues for all remaining items.
+- **Successful Processing**:
+  - On fulfillment, stores the returned value at `results[i]` and increments `successfulCount`.
+- **Edge Cases**:
+  - Empty `items` array resolves with `{ results: [], successfulCount: 0, failureCount: 0 }`.
+
