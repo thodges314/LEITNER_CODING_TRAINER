@@ -87,7 +87,7 @@ export const CatalogTable: React.FC<CatalogTableProps> = ({
   };
 
   return (
-    <div className="glass-panel catalog-table-wrapper">
+    <div className="glass-panel catalog-table-wrapper" data-tour="catalog-table">
       <table className="catalog-table">
         <thead>
           <tr>

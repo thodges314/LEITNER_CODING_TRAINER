@@ -11,7 +11,7 @@ export default defineConfig({
   timeout: 90_000,
   expect: { timeout: 60_000 },
   fullyParallel: true,
-  workers: process.env.CI ? 2 : 4,
+  workers: 4,
   retries: 1, // one retry absorbs a timing flake; a real regression fails twice
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : [['list']],
   use: {

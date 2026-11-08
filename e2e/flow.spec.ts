@@ -31,6 +31,10 @@ async function openCardWithDraft(page: Page, draft: string) {
     { id: CARD, draft }
   );
   await page.reload();
+  const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+  if (await resumeBtn.isVisible()) {
+    await resumeBtn.click();
+  }
   await expect(page.getByText(/Binary Search/i).first()).toBeVisible();
 }
 

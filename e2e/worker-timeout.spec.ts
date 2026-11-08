@@ -21,6 +21,10 @@ async function openCard(page: Page, id: string, draft: string | null) {
     { id, draft }
   );
   await page.reload();
+  const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+  if (await resumeBtn.isVisible()) {
+    await resumeBtn.click();
+  }
 }
 
 test.describe('Web Worker sandbox execution and tab freeze protection', () => {

@@ -158,7 +158,7 @@ test.describe('AI Interview Prep Copilot Flow', () => {
     await expect(modal).not.toBeVisible();
 
     // 4. Test reopening via Practice Arena toolbar button without leaving practice
-    const arenaNavBtn = page.getByRole('button', { name: /Practice Arena/i });
+    const arenaNavBtn = page.getByRole('button', { name: 'Practice Arena', exact: true });
     await arenaNavBtn.click();
 
     const arenaStrategyBtn = page.getByTestId('header-interview-prep-btn'); // rename this

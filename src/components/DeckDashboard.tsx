@@ -10,6 +10,7 @@ import {
   importDeckBackup,
   difficultyOf,
   isCardAttempted,
+  computeRolling24HourStats,
 } from '../lib/leitner';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
 import { FEATURES } from '../lib/features';
@@ -38,6 +39,7 @@ import {
   CatalogTable,
   DeactivateModal,
   DeckSelector,
+  PracticeActionHero,
 } from './dashboard';
 import { filterCardsByDeck } from '../lib/decks';
 import type { CustomDeck } from '../lib/decks';
@@ -77,6 +79,8 @@ interface DeckDashboardProps {
   onOpenFocus?: () => void;
   highlightExport?: boolean;
   onDismissHighlightExport?: () => void;
+  onResumePractice?: () => void;
+  nextCardToPractice?: TopicItem | null;
 }
 
 export const DeckDashboard: React.FC<DeckDashboardProps> = ({
@@ -102,6 +106,8 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onOpenFocus,
   highlightExport = false,
   onDismissHighlightExport,
+  onResumePractice,
+  nextCardToPractice,
 }) => {
   const isLight = theme === 'apple-gsos';
   const allVisibleCards = useMemo(() => visibleTopics(state), [state]);
@@ -156,7 +162,7 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   const algorithm = getSchedulingAlgorithm(state);
   const tierName = algorithm === 'graduated-interval' ? 'Tier' : 'Box';
 
-  const { totalCompletedReviews, unlockedStageCount = 0 } = state;
+  const { totalCompletedReviews } = state;
 
   const isAllTracks =
     selectedTracks.includes('all') ||
@@ -269,9 +275,19 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
 
   // Compute Statistics
   const activeCount = topics.filter((t) => t.status === 'active').length;
-  const lockedCount = topics.filter((t) => t.status === 'locked').length;
-  const masteredCount = topics.filter((t) => t.status === 'active' && (algorithm === 'graduated-interval' ? t.box >= 5 : t.box === 5)).length;
-  const box3PlusCount = topics.filter((t) => t.status === 'active' && t.box >= 3).length;
+
+  const rollingStats = useMemo(() => {
+    return computeRolling24HourStats(state.recentReviews, state.dailyStats);
+  }, [state.recentReviews, state.dailyStats]);
+
+  const handleResumePractice = () => {
+    if (onResumePractice) {
+      onResumePractice();
+    } else {
+      const target = nextCardToPractice || topics.find((t) => t.status === 'active');
+      if (target) onSelectCardToPractice(target);
+    }
+  };
 
   const maxActiveBox = topics.reduce((max, t) => (t.status === 'active' ? Math.max(max, t.box) : max), 5);
   const displayedBoxes = algorithm === 'graduated-interval'
@@ -303,10 +319,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
       }
     }
   };
-
-  // Staged unlock calculation: next unlock milestone
-  const nextUnlockTarget = (unlockedStageCount + 1) * 4;
-  const cardsNeededForNextUnlock = Math.max(0, nextUnlockTarget - box3PlusCount);
 
   const compareTopics = (a: TopicItem, b: TopicItem): number => {
     switch (sortOption) {
@@ -594,58 +606,16 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         </div>
       </div>
 
-      {/* Top Section: 2x2 KPI Cards + Circular Stats Widget */}
+      {/* Top Section: Action Hero Tile + Circular Stats Widget */}
       <div className="dashboard-top-section">
-        {/* Left: 2x2 KPI Grid */}
-        <div className="dashboard-kpi-grid">
-          {/* Total Reviews */}
-          <div className="glass-panel dashboard-kpi-card">
-            <div className="dashboard-kpi-label">Completed Reviews</div>
-            <div className="dashboard-kpi-val kpi-cyan">
-              #{totalCompletedReviews}
-            </div>
-            <div className="dashboard-kpi-sub">
-              Global trial progression
-            </div>
-          </div>
-
-          {/* Active vs Locked */}
-          <div className="glass-panel dashboard-kpi-card">
-            <div className="dashboard-kpi-label">Deck Distribution</div>
-            <div className="dashboard-kpi-val">
-              {activeCount} <span className="dashboard-kpi-val-denom">/ {topics.length}</span>
-            </div>
-            <div className="dashboard-kpi-sub">
-              {lockedCount} cards locked in reserve
-            </div>
-          </div>
-
-          {/* Mastered */}
-          <div className="glass-panel dashboard-kpi-card">
-            <div className="dashboard-kpi-label">
-              {algorithm === 'graduated-interval' ? 'Mastered / Long-term (Tier 5+)' : 'Mastered (Box 5)'}
-            </div>
-            <div className="dashboard-kpi-val kpi-emerald">
-              {masteredCount}
-            </div>
-            <div className="dashboard-kpi-sub">
-              {algorithm === 'graduated-interval' ? '+35 to +800+ review intervals' : '+45 review interval reached'}
-            </div>
-          </div>
-
-          {/* Staged Unlock Progress */}
-          <div className="glass-panel dashboard-kpi-card">
-            <div className="dashboard-kpi-label">Staged Unlock Progress</div>
-            <div className="dashboard-kpi-val kpi-amber">
-              {box3PlusCount} <span className="dashboard-kpi-val-denom">/ {nextUnlockTarget} in B3+</span>
-            </div>
-            <div className="dashboard-kpi-sub">
-              {lockedCount > 0
-                ? `${cardsNeededForNextUnlock} more Box 3+ cards unlocks 4 new topics`
-                : 'All topics unlocked!'}
-            </div>
-          </div>
-        </div>
+        {/* Left: Action Hero Tile (24h Rolling Stats & Practice Arena Launch) */}
+        <PracticeActionHero
+          stats={rollingStats}
+          nextCard={nextCardToPractice}
+          activeCount={activeCount}
+          totalCards={topics.length}
+          onResumePractice={handleResumePractice}
+        />
 
         {/* Right: Rounded Stats & Visual Chart Widget */}
         <DeckStatsWidget

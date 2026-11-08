@@ -27,3 +27,6 @@ export type { DeckSelectorProps } from './DeckSelector';
 
 export { InterviewPrepModal } from './InterviewPrepModal';
 export type { InterviewPrepModalProps } from './InterviewPrepModal';
+
+export { PracticeActionHero } from './PracticeActionHero';
+export type { PracticeActionHeroProps } from './PracticeActionHero';

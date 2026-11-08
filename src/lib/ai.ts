@@ -461,7 +461,12 @@ export async function evaluateCodeSubmission(
   // If no API key is set, immediately use heuristic evaluator
   if (!apiKey) {
     // Artificial small delay for realistic UX feedback
-    await new Promise((r) => setTimeout(r, 600));
+    const skipDelay =
+      typeof window !== 'undefined' &&
+      Boolean((window as unknown as { __E2E_FAST_EVAL?: boolean }).__E2E_FAST_EVAL);
+    if (!skipDelay) {
+      await new Promise((r) => setTimeout(r, 600));
+    }
     return heuristicEvaluateCode(topic, submittedCode, harness);
   }
 

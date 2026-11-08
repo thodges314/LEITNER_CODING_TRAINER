@@ -244,7 +244,10 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
         type="button"
         onClick={handleToggle}
         aria-label="Ask AI Tutor for Clarification or Hints"
+        aria-expanded={isOpen}
         title="Ask AI Tutor for Clarification or Hints (Socratic Mode)"
+        data-tour="ai-clarification"
+        data-testid="ai-clarification-btn"
         style={{
           position: 'absolute',
           top: '12px',
@@ -295,6 +298,8 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
       {/* Expanded Socratic Clarification Panel */}
       {isOpen && (
         <div
+          data-tour="ai-clarification-panel"
+          data-testid="socratic-assistant-panel"
           style={{
             position: 'absolute',
             top: '8px',
@@ -365,6 +370,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
               type="button"
               onClick={handleClose}
               aria-label="Close tutor panel"
+              data-testid="socratic-assistant-close"
               style={{
                 background: 'none',
                 border: 'none',

@@ -23,7 +23,9 @@ import {
   getSchedulingAlgorithm,
   setSchedulingAlgorithm,
   resetCardBox,
+  computeRolling24HourStats,
 } from './leitner';
+import { localDateKey } from './dailyStats';
 import { saveDraft, loadDraft } from './drafts';
 import type { LeitnerDeckState, TopicItem } from './leitner';
 
@@ -747,5 +749,47 @@ describe('scheduling algorithm switching and backup', () => {
     expect(loadDraft('c2')).toBe('card 2 code again');
     deleteTopicFromDeck(st, 'c2');
     expect(loadDraft('c2')).toBeNull();
+  });
+
+  describe('computeRolling24HourStats', () => {
+    it('returns zero counts when recentReviews and dailyStats are empty', () => {
+      const stats = computeRolling24HourStats(undefined, undefined);
+      expect(stats).toEqual({ attempted: 0, promoted: 0, demoted: 0 });
+    });
+
+    it('accurately counts attempted, promoted, and demoted cards in the last 24 hours', () => {
+      const now = 1700000000000;
+      const hour = 3600 * 1000;
+      const reviews = [
+        // 2 hours ago: promoted (box 1 -> 2)
+        { topicId: 'c1', passed: true, box: 2, previousBox: 1, trial: 1, timestamp: now - 2 * hour },
+        // 5 hours ago: demoted (box 2 -> 1)
+        { topicId: 'c2', passed: false, box: 1, previousBox: 2, trial: 2, timestamp: now - 5 * hour },
+        // 8 hours ago: promoted (box 2 -> 3)
+        { topicId: 'c3', passed: true, box: 3, previousBox: 2, trial: 3, timestamp: now - 8 * hour },
+        // 12 hours ago: failed in box 1 (box 1 -> 1, demoted/setback)
+        { topicId: 'c4', passed: false, box: 1, previousBox: 1, trial: 4, timestamp: now - 12 * hour },
+        // 30 hours ago: outside rolling 24h window (ignored)
+        { topicId: 'c5', passed: true, box: 4, previousBox: 3, trial: 5, timestamp: now - 30 * hour },
+      ];
+
+      const stats = computeRolling24HourStats(reviews, undefined, now);
+      expect(stats.attempted).toBe(4);
+      expect(stats.promoted).toBe(2);
+      expect(stats.demoted).toBe(2);
+    });
+
+    it('falls back to today dailyStats if recentReviews has no entries in window', () => {
+      const now = 1700000000000;
+      const today = localDateKey(now);
+      const dailyStats = {
+        [today]: { reviews: 10, passes: 7 },
+      };
+
+      const stats = computeRolling24HourStats([], dailyStats, now);
+      expect(stats.attempted).toBe(10);
+      expect(stats.promoted).toBe(7);
+      expect(stats.demoted).toBe(3);
+    });
   });
 });

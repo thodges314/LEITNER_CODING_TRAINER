@@ -53,6 +53,10 @@ async function openCard(page: Page, id: string, code?: string) {
   );
 
   await page.reload();
+  const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+  if (await resumeBtn.isVisible()) {
+    await resumeBtn.click();
+  }
 }
 
 test.describe('React preview window', () => {
@@ -421,6 +425,10 @@ test.describe('React preview window', () => {
     );
 
     await page.reload();
+  const resumeBtn = page.getByTestId('resume-practice-hero-btn');
+  if (await resumeBtn.isVisible()) {
+    await resumeBtn.click();
+  }
 
     // Does not have preview-toggle-btn
     await expect(page.locator('#preview-toggle-btn')).toHaveCount(0);

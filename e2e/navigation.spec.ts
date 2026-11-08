@@ -7,7 +7,10 @@ const CLOSE_WELCOME = /Start practicing/;
 async function openApp(page: Page) {
   await page.goto('about:blank'); // something to go "back" to when leaving the app
   await page.goto('/');
-  await page.getByRole('button', { name: CLOSE_WELCOME }).click();
+  const welcomeBtn = page.getByRole('button', { name: CLOSE_WELCOME });
+  if (await welcomeBtn.isVisible()) {
+    await welcomeBtn.click();
+  }
 }
 
 test.describe('first visit', () => {
@@ -40,14 +43,18 @@ test.describe('first visit', () => {
 });
 
 test.describe('back button', () => {
-  test('the app opens on the practice view', async ({ page }) => {
+  test('the app opens on the deck catalog view by default for returning visitors', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('leitner_welcomed', '1');
+    });
     await openApp(page);
-    await expect(page.getByText(DECK_HEADING)).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /Submit Final Answer/ })).toBeVisible();
+    await expect(page.getByText(DECK_HEADING)).toBeVisible();
+    await expect(page.getByTestId('practice-action-hero')).toBeVisible();
   });
 
   test('Back from a problem shows the deck and stays in the app', async ({ page }) => {
     await openApp(page);
+    await expect(page.getByRole('button', { name: /Submit Final Answer/ })).toBeVisible();
     await page.goBack();
     await expect(page.getByText(DECK_HEADING)).toBeVisible();
     expect(page.url()).toMatch(/^http:\/\/localhost:\d+\//);
