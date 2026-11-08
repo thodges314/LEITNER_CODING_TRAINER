@@ -358,3 +358,4 @@ export const PracticeAndAppearanceSection: React.FC<PracticeAndAppearanceSection
     </>
   );
 };
+

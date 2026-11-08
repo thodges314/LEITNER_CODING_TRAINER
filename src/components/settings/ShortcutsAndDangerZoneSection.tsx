@@ -372,3 +372,4 @@ export const ShortcutsAndDangerZoneSection: React.FC<ShortcutsAndDangerZoneSecti
     </>
   );
 };
+
