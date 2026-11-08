@@ -256,7 +256,7 @@ export const TRACK_METADATA: Record<string, { label: string; color: string; bg: 
     border: 'rgba(249, 115, 22, 0.35)',
   },
   'testing-tooling': {
-    label: 'Testing & Libraries',
+    label: 'Testing & Tooling',
     color: '#f43f5e',
     bg: 'rgba(244, 63, 94, 0.12)',
     border: 'rgba(244, 63, 94, 0.35)',

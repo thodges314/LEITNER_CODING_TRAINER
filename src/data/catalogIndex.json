@@ -5585,5 +5585,130 @@
       "performance"
     ],
     "summary": "Implement a high-performance token-bucket rate limiter and stream shaper"
+  },
+  {
+    "id": "microtask-batch-scheduler",
+    "title": "Microtask Batch Scheduler: queueMicrotask Coalescing",
+    "track": "async-js",
+    "concept": "microtasks",
+    "difficulty": 3,
+    "tags": [
+      "queueMicrotask",
+      "microtask",
+      "batching",
+      "scheduler",
+      "coalescing",
+      "async"
+    ],
+    "summary": "Implement a microtask batch scheduler that coalesces concurrent synchronous requests into a single batched execution using the native queueMicrotas..."
+  },
+  {
+    "id": "promise-waterfall-pipeline",
+    "title": "Promise Waterfall: Sequential Pipeline Reduction",
+    "track": "async-js",
+    "concept": "async-control",
+    "difficulty": 2,
+    "tags": [
+      "promise",
+      "async",
+      "reduce",
+      "pipeline",
+      "waterfall",
+      "sequential"
+    ],
+    "summary": "Implement an asynchronous waterfall pipeline that executes an array of functions in strict sequence, feeding each stage's resolved output as input ..."
+  },
+  {
+    "id": "render-hook-harness",
+    "title": "Mini renderHook: React Hook Test Harness",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 4,
+    "tags": [
+      "testing",
+      "react",
+      "hooks",
+      "lifecycle",
+      "test-runner"
+    ],
+    "summary": "interface HookResult<T> {"
+  },
+  {
+    "id": "sql-sequential-gaps",
+    "title": "Sequential ID Gaps in Logs (LEAD)",
+    "track": "sql-postgres",
+    "concept": "sql-gaps-and-islands",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "gaps-and-islands",
+      "lead-lag",
+      "cte"
+    ],
+    "summary": "Write a PostgreSQL query to detect missing sequential identifiers (gaps) in an audit tracking log."
+  },
+  {
+    "id": "sql-worker-queue-skip-locked",
+    "title": "Concurrent Task Queue Claim (FOR UPDATE SKIP LOCKED)",
+    "track": "sql-postgres",
+    "concept": "sql-concurrency-transactions",
+    "difficulty": 3,
+    "tags": [
+      "sql",
+      "postgres",
+      "concurrency",
+      "transactions",
+      "row-locking",
+      "queues"
+    ],
+    "summary": "Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue."
+  },
+  {
+    "id": "test-each-data-driven",
+    "title": "Data-Driven Parameterized Tests (test.each)",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 3,
+    "tags": [
+      "testing",
+      "vitest",
+      "jest",
+      "parameterized-tests",
+      "test-runner"
+    ],
+    "summary": "type TestFn = (...args: any[]) => void | Promise<void>;"
+  },
+  {
+    "id": "ts-assertion-functions",
+    "title": "TS Type Predicates vs. Assertion Functions",
+    "track": "typescript-patterns",
+    "concept": "ts-assertions",
+    "difficulty": 2,
+    "tags": [
+      "typescript",
+      "type-guards",
+      "assertions",
+      "narrowing",
+      "asserts"
+    ],
+    "summary": "Implement TypeScript type guards and assertion functions to contrast boolean predicates with control-flow narrowing assertion signatures"
+  },
+  {
+    "id": "ts-tuple-rest-parameters",
+    "title": "TS Tuple Manipulation: Variadic Tuples and Rest Parameters",
+    "track": "typescript-patterns",
+    "concept": "ts-tuples",
+    "difficulty": 3,
+    "tags": [
+      "typescript",
+      "tuples",
+      "variadic",
+      "rest-parameters",
+      "generics",
+      "currying"
+    ],
+    "summary": "Implement variadic tuple types and positional rest parameter utilities to manipulate strongly typed parameter lists"
   }
 ]

@@ -895,6 +895,14 @@
     "difficulty": 3,
     "concept": "testing-tools"
   },
+  "test-each-data-driven": {
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
+  "render-hook-harness": {
+    "difficulty": 4,
+    "concept": "testing-tools"
+  },
   "next-route-matcher": {
     "difficulty": 3,
     "concept": "router"
@@ -1315,6 +1323,14 @@
     "difficulty": 4,
     "concept": "sql-gaps-and-islands"
   },
+  "sql-sequential-gaps": {
+    "difficulty": 3,
+    "concept": "sql-gaps-and-islands"
+  },
+  "sql-worker-queue-skip-locked": {
+    "difficulty": 3,
+    "concept": "sql-concurrency-transactions"
+  },
   "gql-query-nested-fields": {
     "difficulty": 1,
     "concept": "gql-queries"
@@ -1558,6 +1574,22 @@
   "next-parallel-intercepting-routes": {
     "difficulty": 3,
     "concept": "next-intercepting-routes"
+  },
+  "promise-waterfall-pipeline": {
+    "difficulty": 2,
+    "concept": "async-control"
+  },
+  "microtask-batch-scheduler": {
+    "difficulty": 3,
+    "concept": "microtasks"
+  },
+  "ts-assertion-functions": {
+    "difficulty": 2,
+    "concept": "ts-assertions"
+  },
+  "ts-tuple-rest-parameters": {
+    "difficulty": 3,
+    "concept": "ts-tuples"
   },
   "stream-event-micro-batcher": {
     "difficulty": 3,

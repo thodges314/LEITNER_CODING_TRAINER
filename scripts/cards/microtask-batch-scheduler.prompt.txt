@@ -1,0 +1,28 @@
+Implement a microtask batch scheduler that coalesces concurrent synchronous requests into a single batched execution using the native `queueMicrotask` API:
+
+### `createMicrotaskBatcher<T, R>(batchHandler: (items: T[]) => R[] | Promise<R[]>): MicrotaskBatcher<T, R>`
+
+## Description
+High-throughput systems (such as UI state dispatchers, logging collectors, and DataLoader caches) frequently receive dozens of individual read or write calls within the same JavaScript execution frame. Triggering individual network requests or database queries for each call creates significant overhead and causes N+1 bottlenecks.
+
+By deferring execution to the JavaScript **microtask queue** via `queueMicrotask()`, the scheduler allows synchronous code to accumulate multiple items into a buffer, firing a single consolidated batch execution as soon as the synchronous call stack clears, strictly before macrotasks (such as `setTimeout`) or browser render phases run.
+
+```ts
+interface MicrotaskBatcher<T, R> {
+  schedule(item: T): Promise<R>;
+  flush(): Promise<void>;
+}
+```
+
+## Requirements
+- **Coalescing Execution**: Each call to `schedule(item)` appends the item to an internal batch queue and returns an individual `Promise<R>` representing that item's eventual result.
+- **Microtask Scheduling**:
+  - The first call to `schedule()` in an empty queue schedules a flush on the microtask queue using `queueMicrotask()` (or `Promise.resolve().then()` as fallback).
+  - Subsequent calls in the same synchronous execution tick must NOT schedule redundant microtasks; they join the existing pending batch.
+- **Batch Resolution**:
+  - When the microtask executes, it invokes `batchHandler(items)` once with all collected items in insertion order.
+  - Resolves each individual item's promise with its corresponding result at matching index `results[i]`.
+- **Error Handling**: If `batchHandler` throws synchronously or returns a rejecting promise, all pending promises in that batch must reject with that error.
+- **Manual Flush**: `flush()` immediately drains and processes any currently pending items without waiting for the scheduled microtask tick.
+- **Subsequent Batches**: Once a batch finishes flushing, subsequent calls to `schedule()` initialize a new, independent batch.
+

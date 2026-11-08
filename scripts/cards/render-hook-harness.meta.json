@@ -1,0 +1,13 @@
+{
+  "track": "testing-tooling",
+  "title": "Mini renderHook: React Hook Test Harness",
+  "requiresDom": true,
+  "tags": [
+    "testing",
+    "react",
+    "hooks",
+    "lifecycle",
+    "test-runner"
+  ]
+}
+

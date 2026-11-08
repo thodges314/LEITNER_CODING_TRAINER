@@ -1,0 +1,11 @@
+{
+  "track": "typescript-patterns",
+  "title": "TS Type Predicates vs. Assertion Functions",
+  "tags": [
+    "typescript",
+    "type-guards",
+    "assertions",
+    "narrowing",
+    "asserts"
+  ]
+}

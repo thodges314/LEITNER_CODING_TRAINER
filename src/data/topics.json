@@ -23100,5 +23100,370 @@
       }
     ],
     "testHarness": "await (async () => {\n  const fn = typeof createTokenBucket === 'function' ? createTokenBucket : solution;\n\n  // Case 1: tryAcquire consumes tokens when available and returns false when empty\n  const limiter1 = fn({\n    capacity: 2,\n    refillRate: 10, // 10 tokens / sec = 1 token per 100ms\n    initialTokens: 2,\n  });\n\n  const a1 = limiter1.tryAcquire(1);\n  const a2 = limiter1.tryAcquire(1);\n  const a3 = limiter1.tryAcquire(1);\n\n  $test.check(\n    'tryAcquire consumes available tokens and returns false when exhausted without blocking',\n    a1 === true && a2 === true && a3 === false && limiter1.getTokens() < 1,\n    { a1, a2, a3, tokens: limiter1.getTokens() }\n  );\n\n  // Case 2: acquire resolves after tokens refill\n  const limiter2 = fn({\n    capacity: 2,\n    refillRate: 50, // 50 tokens / sec = 1 token per 20ms\n    initialTokens: 0,\n  });\n\n  const start = Date.now();\n  await limiter2.acquire(1);\n  const elapsed = Date.now() - start;\n\n  $test.check(\n    'acquire waits for sufficient tokens to refill before resolving',\n    elapsed >= 15 && limiter2.getTokens() >= 0,\n    { elapsed, tokens: limiter2.getTokens() }\n  );\n\n  // Case 3: FIFO ordering is strictly preserved among queued acquires\n  const limiter3 = fn({\n    capacity: 2,\n    refillRate: 100, // 100 tokens / sec = 1 token per 10ms\n    initialTokens: 0,\n  });\n\n  const resolutionOrder = [];\n  const p1 = limiter3.acquire(1).then(() => resolutionOrder.push('first'));\n  const p2 = limiter3.acquire(1).then(() => resolutionOrder.push('second'));\n  const p3 = limiter3.acquire(1).then(() => resolutionOrder.push('third'));\n\n  await Promise.all([p1, p2, p3]);\n\n  $test.check(\n    'Multiple queued acquire requests are resolved strictly in FIFO order',\n    resolutionOrder.length === 3 &&\n      resolutionOrder[0] === 'first' &&\n      resolutionOrder[1] === 'second' &&\n      resolutionOrder[2] === 'third',\n    { resolutionOrder }\n  );\n\n  // Case 4: Available tokens cannot exceed capacity ceiling over time\n  const limiter4 = fn({\n    capacity: 3,\n    refillRate: 200,\n    initialTokens: 1,\n  });\n\n  await new Promise((r) => setTimeout(r, 40));\n  const tokensCapped = limiter4.getTokens();\n\n  $test.check(\n    'Refilled tokens are capped at the specified capacity limit',\n    tokensCapped <= 3 && tokensCapped >= 2.9,\n    { tokensCapped }\n  );\n})();"
+  },
+  {
+    "id": "microtask-batch-scheduler",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Implement a microtask batch scheduler that coalesces concurrent synchronous requests into a single batched execution using the native `queueMicrotask` API:\n\n### `createMicrotaskBatcher<T, R>(batchHandler: (items: T[]) => R[] | Promise<R[]>): MicrotaskBatcher<T, R>`\n\n## Description\nHigh-throughput systems (such as UI state dispatchers, logging collectors, and DataLoader caches) frequently receive dozens of individual read or write calls within the same JavaScript execution frame. Triggering individual network requests or database queries for each call creates significant overhead and causes N+1 bottlenecks.\n\nBy deferring execution to the JavaScript **microtask queue** via `queueMicrotask()`, the scheduler allows synchronous code to accumulate multiple items into a buffer, firing a single consolidated batch execution as soon as the synchronous call stack clears, strictly before macrotasks (such as `setTimeout`) or browser render phases run.\n\n```ts\ninterface MicrotaskBatcher<T, R> {\n  schedule(item: T): Promise<R>;\n  flush(): Promise<void>;\n}\n```\n\n## Requirements\n- **Coalescing Execution**: Each call to `schedule(item)` appends the item to an internal batch queue and returns an individual `Promise<R>` representing that item's eventual result.\n- **Microtask Scheduling**:\n  - The first call to `schedule()` in an empty queue schedules a flush on the microtask queue using `queueMicrotask()` (or `Promise.resolve().then()` as fallback).\n  - Subsequent calls in the same synchronous execution tick must NOT schedule redundant microtasks; they join the existing pending batch.\n- **Batch Resolution**:\n  - When the microtask executes, it invokes `batchHandler(items)` once with all collected items in insertion order.\n  - Resolves each individual item's promise with its corresponding result at matching index `results[i]`.\n- **Error Handling**: If `batchHandler` throws synchronously or returns a rejecting promise, all pending promises in that batch must reject with that error.\n- **Manual Flush**: `flush()` immediately drains and processes any currently pending items without waiting for the scheduled microtask tick.\n- **Subsequent Batches**: Once a batch finishes flushing, subsequent calls to `schedule()` initialize a new, independent batch.",
+    "track": "async-js",
+    "title": "Microtask Batch Scheduler: queueMicrotask Coalescing",
+    "tags": [
+      "queueMicrotask",
+      "microtask",
+      "batching",
+      "scheduler",
+      "coalescing",
+      "async"
+    ],
+    "difficulty": 3,
+    "concept": "microtasks",
+    "referenceSolution": "function createMicrotaskBatcher(batchHandler) {\n  let queue = [];\n  let isScheduled = false;\n\n  const flush = async () => {\n    if (queue.length === 0) return;\n    const current = queue;\n    queue = [];\n    isScheduled = false;\n\n    const items = current.map((entry) => entry.item);\n    try {\n      const results = await batchHandler(items);\n      current.forEach((entry, idx) => {\n        entry.resolve(results ? results[idx] : undefined);\n      });\n    } catch (err) {\n      current.forEach((entry) => {\n        entry.reject(err);\n      });\n    }\n  };\n\n  const schedule = (item) => {\n    return new Promise((resolve, reject) => {\n      queue.push({ item, resolve, reject });\n      if (!isScheduled) {\n        isScheduled = true;\n        if (typeof queueMicrotask === 'function') {\n          queueMicrotask(flush);\n        } else {\n          Promise.resolve().then(flush);\n        }\n      }\n    });\n  };\n\n  return {\n    schedule,\n    flush,\n  };\n}",
+    "referenceSolutionTs": "interface MicrotaskBatcher<T, R> {\n  schedule(item: T): Promise<R>;\n  flush(): Promise<void>;\n}\n\nfunction createMicrotaskBatcher<T, R>(\n  batchHandler: (items: T[]) => R[] | Promise<R[]>\n): MicrotaskBatcher<T, R> {\n  interface QueueEntry {\n    item: T;\n    resolve: (value: R) => void;\n    reject: (reason?: any) => void;\n  }\n\n  let queue: QueueEntry[] = [];\n  let isScheduled = false;\n\n  const flush = async (): Promise<void> => {\n    if (queue.length === 0) return;\n    const current = queue;\n    queue = [];\n    isScheduled = false;\n\n    const items = current.map((entry) => entry.item);\n    try {\n      const results = await batchHandler(items);\n      current.forEach((entry, idx) => {\n        entry.resolve(results ? results[idx] : (undefined as unknown as R));\n      });\n    } catch (err) {\n      current.forEach((entry) => {\n        entry.reject(err);\n      });\n    }\n  };\n\n  const schedule = (item: T): Promise<R> => {\n    return new Promise<R>((resolve, reject) => {\n      queue.push({ item, resolve, reject });\n      if (!isScheduled) {\n        isScheduled = true;\n        if (typeof queueMicrotask === 'function') {\n          queueMicrotask(flush);\n        } else {\n          Promise.resolve().then(flush);\n        }\n      }\n    });\n  };\n\n  return {\n    schedule,\n    flush,\n  };\n}",
+    "testCases": [
+      {
+        "description": "Coalesces multiple synchronous calls into a single batch execution",
+        "input": "await Promise.all([b.schedule(1), b.schedule(2), b.schedule(3)])",
+        "expected": "[10, 20, 30]"
+      },
+      {
+        "description": "Executes batch on microtask queue strictly before macrotasks fire",
+        "input": "order",
+        "expected": "[\"microtask-batch:itemA\", \"macrotask-timeout\"]"
+      },
+      {
+        "description": "Propagates batchHandler rejection to all pending promises in the batch",
+        "input": "await b.schedule(\"x\")",
+        "expected": "Rejects with Error"
+      },
+      {
+        "description": "Processes subsequent independent batches across separate execution ticks",
+        "input": "batches",
+        "expected": "[[\"a\", \"b\"], [\"c\", \"d\"]]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const fn = typeof createMicrotaskBatcher === 'function'\n    ? createMicrotaskBatcher\n    : (typeof solution === 'function' ? solution : solution?.createMicrotaskBatcher);\n\n  if (typeof fn !== 'function') {\n    $test.check('Coalesces multiple synchronous calls into a single batch execution', false, { error: 'createMicrotaskBatcher is not defined as a function' });\n    $test.check('Executes batch on microtask queue strictly before macrotasks fire', false, { error: 'createMicrotaskBatcher is not defined as a function' });\n    $test.check('Propagates batchHandler rejection to all pending promises in the batch', false, { error: 'createMicrotaskBatcher is not defined as a function' });\n    $test.check('Processes subsequent independent batches across separate execution ticks', false, { error: 'createMicrotaskBatcher is not defined as a function' });\n    return;\n  }\n\n  // Case 1: Coalesces multiple synchronous calls into a single batch execution\n  try {\n    let callCount = 0;\n    const batcher = fn(async (items) => {\n      callCount++;\n      return items.map((x) => x * 10);\n    });\n\n    const p1 = batcher.schedule(1);\n    const p2 = batcher.schedule(2);\n    const p3 = batcher.schedule(3);\n\n    const [r1, r2, r3] = await Promise.all([p1, p2, p3]);\n    const singleBatch = callCount === 1 && r1 === 10 && r2 === 20 && r3 === 30;\n\n    $test.check(\n      'Coalesces multiple synchronous calls into a single batch execution',\n      singleBatch,\n      { callCount, results: [r1, r2, r3] }\n    );\n  } catch (err) {\n    $test.check('Coalesces multiple synchronous calls into a single batch execution', false, { error: err?.message || String(err) });\n  }\n\n  // Case 2: Executes batch on microtask queue strictly before macrotasks fire\n  try {\n    const order = [];\n    const batcher = fn((items) => {\n      order.push(`microtask-batch:${items.join(',')}`);\n      return items;\n    });\n\n    setTimeout(() => {\n      order.push('macrotask-timeout');\n    }, 0);\n\n    const p = batcher.schedule('itemA');\n    await p;\n\n    // Wait a brief moment for the macrotask to execute and verify execution precedence\n    await new Promise((resolve) => setTimeout(resolve, 15));\n\n    const microtaskRanFirst =\n      order.length === 2 &&\n      order[0] === 'microtask-batch:itemA' &&\n      order[1] === 'macrotask-timeout';\n\n    $test.check(\n      'Executes batch on microtask queue strictly before macrotasks fire',\n      microtaskRanFirst,\n      { order }\n    );\n  } catch (err) {\n    $test.check('Executes batch on microtask queue strictly before macrotasks fire', false, { error: err?.message || String(err) });\n  }\n\n  // Case 3: Propagates batchHandler rejection to all pending promises in the batch\n  try {\n    const batcher = fn(() => {\n      throw new Error('Database batch failed');\n    });\n\n    const p1 = batcher.schedule('x');\n    const p2 = batcher.schedule('y');\n\n    let err1 = null;\n    let err2 = null;\n\n    try {\n      await p1;\n    } catch (e) {\n      err1 = e;\n    }\n\n    try {\n      await p2;\n    } catch (e) {\n      err2 = e;\n    }\n\n    const bothRejected =\n      err1 !== null &&\n      err2 !== null &&\n      err1.message === 'Database batch failed' &&\n      err2.message === 'Database batch failed';\n\n    $test.check(\n      'Propagates batchHandler rejection to all pending promises in the batch',\n      bothRejected,\n      { err1: err1?.message, err2: err2?.message }\n    );\n  } catch (err) {\n    $test.check('Propagates batchHandler rejection to all pending promises in the batch', false, { error: err?.message || String(err) });\n  }\n\n  // Case 4: Processes subsequent independent batches across separate execution ticks\n  try {\n    const batches = [];\n    const batcher = fn((items) => {\n      batches.push([...items]);\n      return items.map((x) => `processed-${x}`);\n    });\n\n    const firstRun = await Promise.all([batcher.schedule('a'), batcher.schedule('b')]);\n\n    // Delay to allow event loop to clear before scheduling the next batch\n    await new Promise((resolve) => setTimeout(resolve, 10));\n\n    const secondRun = await Promise.all([batcher.schedule('c'), batcher.schedule('d')]);\n\n    const independentBatches =\n      batches.length === 2 &&\n      batches[0].join(',') === 'a,b' &&\n      batches[1].join(',') === 'c,d' &&\n      firstRun.join(',') === 'processed-a,processed-b' &&\n      secondRun.join(',') === 'processed-c,processed-d';\n\n    $test.check(\n      'Processes subsequent independent batches across separate execution ticks',\n      independentBatches,\n      { batches, firstRun, secondRun }\n    );\n  } catch (err) {\n    $test.check('Processes subsequent independent batches across separate execution ticks', false, { error: err?.message || String(err) });\n  }\n})();"
+  },
+  {
+    "id": "promise-waterfall-pipeline",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Implement an asynchronous waterfall pipeline that executes an array of functions in strict sequence, feeding each stage's resolved output as input to the next:\n\n### `promiseWaterfall<T = any>(stages: Array<(value: any) => any>, initialValue: any): Promise<T>`\n\n## Description\nIn data pipelines, ETL workflows, and middleware architectures, tasks frequently depend on the result of the preceding operation. While parallel helpers like `Promise.all` execute tasks concurrently, a waterfall pipeline chains dynamic asynchronous operations sequentially without intermediate boilerplate.\n\nImplement `promiseWaterfall` to build a flat, continuous promise accumulator chain from scratch using `Array.prototype.reduce`.\n\n## Requirements\n- **Sequential Data Flow**: Executes functions in array order. The first function receives `initialValue`; each subsequent function receives the resolved output value of the previous stage.\n- **Synchronous & Asynchronous Support**: Stages may return either a direct synchronous value or a `Promise`. Both are handled transparently.\n- **Empty Pipeline**: If `stages` is an empty array `[]`, resolves immediately with `initialValue`.\n- **Short-Circuit on Error**: If any stage rejects or throws synchronously:\n  - Immediately stop execution.\n  - Reject the returned promise with that error.\n  - Ensure subsequent stages in the pipeline are never invoked.\n- **Preserve Ordering**: Ensure asynchronous delays in individual stages do not interleave or race; each stage only begins execution after the previous stage's promise has resolved.",
+    "track": "async-js",
+    "title": "Promise Waterfall: Sequential Pipeline Reduction",
+    "tags": [
+      "promise",
+      "async",
+      "reduce",
+      "pipeline",
+      "waterfall",
+      "sequential"
+    ],
+    "difficulty": 2,
+    "concept": "async-control",
+    "referenceSolution": "function promiseWaterfall(stages, initialValue) {\n  return stages.reduce(\n    (chain, stage) => chain.then((val) => stage(val)),\n    Promise.resolve(initialValue)\n  );\n}",
+    "referenceSolutionTs": "function promiseWaterfall<T = any>(\n  stages: Array<(value: any) => any>,\n  initialValue: any\n): Promise<T> {\n  return stages.reduce(\n    (chain, stage) => chain.then((val) => stage(val)),\n    Promise.resolve(initialValue)\n  );\n}",
+    "testCases": [
+      {
+        "description": "Chains synchronous and asynchronous transformations in sequence",
+        "input": "await promiseWaterfall([(x) => x + 10, async (x) => x * 2, (x) => `Total: ${x}`], 5)",
+        "expected": "\"Total: 30\""
+      },
+      {
+        "description": "Resolves immediately with initialValue when stages array is empty",
+        "input": "await promiseWaterfall([], { initialized: true })",
+        "expected": "{\"initialized\":true}"
+      },
+      {
+        "description": "Short-circuits immediately on stage rejection without invoking subsequent stages",
+        "input": "await promiseWaterfall([fn1, failFn, uncalledFn], 0)",
+        "expected": "Rejects with Error"
+      },
+      {
+        "description": "Preserves strict serial ordering across stages with variable async delays",
+        "input": "await promiseWaterfall([delay30, delay10, delay20], \"start\")",
+        "expected": "\"start-1-2-3\""
+      }
+    ],
+    "testHarness": "await (async () => {\n  const fn = typeof promiseWaterfall === 'function'\n    ? promiseWaterfall\n    : (typeof solution === 'function' ? solution : solution?.promiseWaterfall);\n\n  if (typeof fn !== 'function') {\n    $test.check('Chains synchronous and asynchronous transformations in sequence', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Resolves immediately with initialValue when stages array is empty', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Short-circuits immediately on stage rejection without invoking subsequent stages', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Preserves strict serial ordering across stages with variable async delays', false, { error: 'promiseWaterfall is not defined as a function' });\n    return;\n  }\n\n  // Case 1: Chains synchronous and asynchronous transformations in sequence\n  try {\n    const stages = [\n      (x) => x + 10,\n      async (x) => new Promise((resolve) => setTimeout(() => resolve(x * 2), 20)),\n      (x) => `Total: ${x}`,\n    ];\n    const result = await fn(stages, 5);\n    $test.check(\n      'Chains synchronous and asynchronous transformations in sequence',\n      result === 'Total: 30',\n      { expected: 'Total: 30', actual: result }\n    );\n  } catch (err) {\n    $test.check('Chains synchronous and asynchronous transformations in sequence', false, { error: err?.message || String(err) });\n  }\n\n  // Case 2: Resolves immediately with initialValue when stages array is empty\n  try {\n    const emptyResult = await fn([], { initialized: true });\n    $test.check(\n      'Resolves immediately with initialValue when stages array is empty',\n      Boolean(emptyResult && emptyResult.initialized === true),\n      emptyResult\n    );\n  } catch (err) {\n    $test.check('Resolves immediately with initialValue when stages array is empty', false, { error: err?.message || String(err) });\n  }\n\n  // Case 3: Short-circuits immediately on stage rejection without invoking subsequent stages\n  try {\n    const trace = [];\n    const errorStages = [\n      (x) => {\n        trace.push('stage1');\n        return x + 1;\n      },\n      () => {\n        trace.push('stage2-fail');\n        throw new Error('Pipeline failed at step 2');\n      },\n      (x) => {\n        trace.push('stage3-should-not-run');\n        return x * 10;\n      },\n    ];\n\n    let caughtError = null;\n    try {\n      await fn(errorStages, 0);\n    } catch (err) {\n      caughtError = err;\n    }\n\n    const shortCircuited =\n      caughtError !== null &&\n      caughtError.message === 'Pipeline failed at step 2' &&\n      trace.length === 2 &&\n      trace.includes('stage1') &&\n      trace.includes('stage2-fail') &&\n      !trace.includes('stage3-should-not-run');\n\n    $test.check(\n      'Short-circuits immediately on stage rejection without invoking subsequent stages',\n      shortCircuited,\n      { trace, error: caughtError?.message }\n    );\n  } catch (err) {\n    $test.check('Short-circuits immediately on stage rejection without invoking subsequent stages', false, { error: err?.message || String(err) });\n  }\n\n  // Case 4: Preserves strict serial ordering across stages with variable async delays\n  try {\n    const executionOrder = [];\n    const delayStages = [\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step1');\n          resolve(val + '-1');\n        }, 30);\n      }),\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step2');\n          resolve(val + '-2');\n        }, 10);\n      }),\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step3');\n          resolve(val + '-3');\n        }, 20);\n      }),\n    ];\n\n    const finalVal = await fn(delayStages, 'start');\n    const correctlyOrdered =\n      finalVal === 'start-1-2-3' &&\n      executionOrder.join(',') === 'step1,step2,step3';\n\n    $test.check(\n      'Preserves strict serial ordering across stages with variable async delays',\n      correctlyOrdered,\n      { finalVal, executionOrder }\n    );\n  } catch (err) {\n    $test.check('Preserves strict serial ordering across stages with variable async delays', false, { error: err?.message || String(err) });\n  }\n})();"
+  },
+  {
+    "id": "render-hook-harness",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "## Description\n\n```ts\ninterface HookResult<T> {\n  current: T;\n}\n\ninterface RenderHookOptions<P = any> {\n  initialProps?: P;\n  wrapper?: (props: { children: any }) => any;\n}\n\ninterface RenderHookReturn<T, P = any> {\n  result: HookResult<T>;\n  rerender: (newProps?: P) => void;\n  unmount: () => void;\n}\n```\n\nReact's Rules of Hooks enforce that custom hooks (`useState`, `useEffect`, `useReducer`, `useMemo`, etc.) can only be invoked within the body of a React functional component during rendering.\n\nTo test custom hooks in isolation without authoring boilerplate components and DOM markup for every unit test, testing frameworks provide `renderHook`.\n\nWrite a lightweight `renderHook` harness that programmatically mounts a wrapper component, invokes the hook under test, and exposes a live result ref alongside re-rendering and unmounting controls.\n\n### renderHook(renderCallback, options?): RenderHookReturn<T, P>\n\n#### Parameters\n- `renderCallback` (`(props?: P) => T`): A function that calls the hook under test. It is called with the latest props and its return value is stored in `result.current`.\n- `options` (`RenderHookOptions<P>`, optional):\n  - `initialProps` (`P`, optional): Props passed to `renderCallback` on the initial mount.\n  - `wrapper` (`((props: { children: any }) => any)`, optional): An optional React wrapper component (e.g. Context Provider) that wraps the test component.\n\n#### Returns\n- An object with:\n  - `result`: `{ current: T }`. An object whose `.current` property holds the latest return value of `renderCallback`.\n  - `rerender(newProps?: P)`: Re-renders the test component. If `newProps` is provided, subsequent hook executions receive `newProps`; otherwise, the previous props are reused.\n  - `unmount()`: Unmounts the test component, executing any `useEffect` cleanup callbacks and cleaning up the DOM container.\n\n#### Constraints & Environment\n- Environment globals `React`, `ReactDOM` (`ReactDOM.createRoot`), and `document` are pre-loaded in scope.\n- Use `React.act` if available to ensure renders and state updates flush synchronously during mount, rerender, and unmount.\n\n### Example\n\n```js\nconst { result, rerender, unmount } = renderHook(\n  ({ initialCount }) => {\n    const [count, setCount] = useState(initialCount);\n    return { count, increment: () => setCount(c => c + 1) };\n  },\n  { initialProps: { initialCount: 0 } }\n);\n\nexpect(result.current.count).toBe(0);\n\nact(() => {\n  result.current.increment();\n});\nexpect(result.current.count).toBe(1);\n\nrerender({ initialCount: 100 });\nunmount();\n```",
+    "track": "testing-tooling",
+    "title": "Mini renderHook: React Hook Test Harness",
+    "requiresDom": true,
+    "tags": [
+      "testing",
+      "react",
+      "hooks",
+      "lifecycle",
+      "test-runner"
+    ],
+    "difficulty": 4,
+    "concept": "testing-tools",
+    "referenceSolution": "function renderHook(renderCallback, options = {}) {\n  const { initialProps, wrapper } = options;\n  const result = { current: undefined };\n  let currentProps = initialProps;\n\n  function TestComponent({ props }) {\n    result.current = renderCallback(props);\n    return null;\n  }\n\n  function getElement(p) {\n    const probe = React.createElement(TestComponent, { props: p });\n    return wrapper ? React.createElement(wrapper, null, probe) : probe;\n  }\n\n  const domRender = typeof $dom !== 'undefined' && typeof $dom.render === 'function'\n    ? $dom.render\n    : null;\n\n  if (domRender) {\n    const r = domRender(getElement(currentProps));\n    return {\n      result,\n      rerender(newProps) {\n        if (newProps !== undefined) currentProps = newProps;\n        r.rerender(getElement(currentProps));\n      },\n      unmount() {\n        r.unmount();\n      },\n    };\n  }\n\n  const container = document.createElement('div');\n  document.body.appendChild(container);\n  const root = ReactDOM.createRoot(container);\n  const act = typeof $dom !== 'undefined' && typeof $dom.act === 'function'\n    ? $dom.act\n    : (typeof React.act === 'function' ? React.act : (cb) => cb());\n\n  act(() => {\n    root.render(getElement(currentProps));\n  });\n\n  return {\n    result,\n    rerender(newProps) {\n      if (newProps !== undefined) currentProps = newProps;\n      act(() => {\n        root.render(getElement(currentProps));\n      });\n    },\n    unmount() {\n      act(() => {\n        root.unmount();\n      });\n      container.remove();\n    },\n  };\n}",
+    "referenceSolutionTs": "interface HookResult<T> {\n  current: T;\n}\n\ninterface RenderHookOptions<P = any> {\n  initialProps?: P;\n  wrapper?: (props: { children: any }) => any;\n}\n\ninterface RenderHookReturn<T, P = any> {\n  result: HookResult<T>;\n  rerender: (newProps?: P) => void;\n  unmount: () => void;\n}\n\nfunction renderHook<T, P = any>(\n  renderCallback: (props?: P) => T,\n  options?: RenderHookOptions<P>\n): RenderHookReturn<T, P> {\n  const initialProps = options?.initialProps;\n  const wrapper = options?.wrapper;\n  const result: HookResult<T> = { current: undefined as unknown as T };\n  let currentProps = initialProps;\n\n  function TestComponent({ props }: { props?: P }) {\n    result.current = renderCallback(props);\n    return null;\n  }\n\n  function getElement(p?: P) {\n    const probe = React.createElement(TestComponent, { props: p });\n    return wrapper ? React.createElement(wrapper, null, probe) : probe;\n  }\n\n  const domRender = typeof $dom !== 'undefined' && typeof $dom.render === 'function'\n    ? $dom.render\n    : null;\n\n  if (domRender) {\n    const r = domRender(getElement(currentProps));\n    return {\n      result,\n      rerender(newProps?: P) {\n        if (newProps !== undefined) currentProps = newProps;\n        r.rerender(getElement(currentProps));\n      },\n      unmount() {\n        r.unmount();\n      },\n    };\n  }\n\n  const container = document.createElement('div');\n  document.body.appendChild(container);\n  const root = ReactDOM.createRoot(container);\n  const act = typeof $dom !== 'undefined' && typeof $dom.act === 'function'\n    ? $dom.act\n    : (typeof React.act === 'function' ? React.act : (cb: () => void) => cb());\n\n  act(() => {\n    root.render(getElement(currentProps));\n  });\n\n  return {\n    result,\n    rerender(newProps?: P) {\n      if (newProps !== undefined) currentProps = newProps;\n      act(() => {\n        root.render(getElement(currentProps));\n      });\n    },\n    unmount() {\n      act(() => {\n        root.unmount();\n      });\n      container.remove();\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "Mounts hook and provides live result.current across state mutations",
+        "input": "renderHook(() => useCounter()).result.current",
+        "expected": "{ count: 0 }"
+      },
+      {
+        "description": "Re-renders hook with updated initialProps via rerender()",
+        "input": "h.rerender({ step: 20 })",
+        "expected": "{ val: 25 }"
+      },
+      {
+        "description": "Executes useEffect cleanup handler on unmount()",
+        "input": "h.unmount()",
+        "expected": "true"
+      },
+      {
+        "description": "Wraps test component with custom Context provider wrapper",
+        "input": "renderHook(() => useTheme(), { wrapper })",
+        "expected": "\"night-mode\""
+      }
+    ],
+    "testHarness": "await (async () => {\n  const act = typeof $dom !== 'undefined' && typeof $dom.act === 'function'\n    ? $dom.act\n    : (typeof React.act === 'function' ? React.act : (cb) => cb());\n\n  const fn = typeof renderHook === 'function' ? renderHook : (typeof solution === 'function' ? solution : solution?.renderHook);\n  if (typeof fn !== 'function') {\n    $test.check('Mounts hook and provides live result.current across state mutations', false, { error: 'renderHook is not defined as a function' });\n    $test.check('Re-renders hook with updated initialProps via rerender()', false, { error: 'renderHook is not defined as a function' });\n    $test.check('Executes useEffect cleanup handler on unmount()', false, { error: 'renderHook is not defined as a function' });\n    $test.check('Wraps test component with custom Context provider wrapper', false, { error: 'renderHook is not defined as a function' });\n    return;\n  }\n\n  // Case 1: Mounts hook and provides live result.current across state mutations\n  try {\n    let hookRes;\n    await act(async () => {\n      hookRes = fn(() => {\n        const [count, setCount] = React.useState(0);\n        return { count, inc: () => setCount((c) => c + 1) };\n      });\n    });\n\n    const init = hookRes?.result?.current?.count;\n    await act(async () => {\n      hookRes?.result?.current?.inc?.();\n    });\n    const afterFirst = hookRes?.result?.current?.count;\n    await act(async () => {\n      hookRes?.result?.current?.inc?.();\n    });\n    const afterSecond = hookRes?.result?.current?.count;\n    hookRes?.unmount?.();\n\n    $test.check(\n      'Mounts hook and provides live result.current across state mutations',\n      init === 0 && afterFirst === 1 && afterSecond === 2,\n      { init, afterFirst, afterSecond }\n    );\n  } catch (err) {\n    $test.check('Mounts hook and provides live result.current across state mutations', false, { error: err?.message || String(err) });\n  }\n\n  // Case 2: Re-renders hook with updated initialProps via rerender()\n  try {\n    let hookRes;\n    await act(async () => {\n      hookRes = fn(({ step }) => {\n        const [val, setVal] = React.useState(0);\n        return { val, add: () => setVal((v) => v + step) };\n      }, { initialProps: { step: 5 } });\n    });\n\n    await act(async () => {\n      hookRes?.result?.current?.add?.();\n    });\n    const firstVal = hookRes?.result?.current?.val;\n\n    await act(async () => {\n      hookRes?.rerender?.({ step: 20 });\n    });\n    await act(async () => {\n      hookRes?.result?.current?.add?.();\n    });\n    const secondVal = hookRes?.result?.current?.val;\n    hookRes?.unmount?.();\n\n    $test.check(\n      'Re-renders hook with updated initialProps via rerender()',\n      firstVal === 5 && secondVal === 25,\n      { firstVal, secondVal }\n    );\n  } catch (err) {\n    $test.check('Re-renders hook with updated initialProps via rerender()', false, { error: err?.message || String(err) });\n  }\n\n  // Case 3: Executes useEffect cleanup handler on unmount()\n  try {\n    let cleanedUp = false;\n    let hookRes;\n    await act(async () => {\n      hookRes = fn(() => {\n        React.useEffect(() => {\n          return () => { cleanedUp = true; };\n        }, []);\n        return true;\n      });\n    });\n\n    const before = cleanedUp;\n    await act(async () => {\n      hookRes?.unmount?.();\n    });\n    const after = cleanedUp;\n\n    $test.check(\n      'Executes useEffect cleanup handler on unmount()',\n      before === false && after === true,\n      { before, after }\n    );\n  } catch (err) {\n    $test.check('Executes useEffect cleanup handler on unmount()', false, { error: err?.message || String(err) });\n  }\n\n  // Case 4: Wraps test component with custom Context provider wrapper\n  try {\n    const ThemeContext = React.createContext('light');\n    const wrapper = ({ children }) => React.createElement(ThemeContext.Provider, { value: 'night-mode' }, children);\n\n    let hookRes;\n    await act(async () => {\n      hookRes = fn(() => React.useContext(ThemeContext), { wrapper });\n    });\n\n    const theme = hookRes?.result?.current;\n    hookRes?.unmount?.();\n\n    $test.check(\n      'Wraps test component with custom Context provider wrapper',\n      theme === 'night-mode',\n      theme\n    );\n  } catch (err) {\n    $test.check('Wraps test component with custom Context provider wrapper', false, { error: err?.message || String(err) });\n  }\n})();"
+  },
+  {
+    "id": "sql-sequential-gaps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Write a PostgreSQL query to detect missing sequential identifiers (gaps) in an audit tracking log.\n\nIn distributed log ingestion, financial auditing, and sequence processing pipelines, identifying gaps in primary keys or sequence numbers is critical for flagging dropped records, failed transactions, or sync errors.\n\n### Schema: `tracking_logs`\n- `log_id` (INT, PRIMARY KEY): Sequential tracking sequence identifier.\n- `event_name` (TEXT): Name of the recorded system event.\n- `logged_at` (TIMESTAMP): Timestamp of the event log.\n\n### Query Contract\n- Output columns:\n  - `gap_start` (INT): First missing sequence ID in the gap range.\n  - `gap_end` (INT): Last missing sequence ID in the gap range.\n  - `gap_size` (INT): Number of missing sequence IDs in the gap (`gap_end - gap_start + 1`).\n- Sort order: Sort results by `gap_start` ascending (`ORDER BY gap_start ASC`).\n- Logic:\n  - Use `LEAD(log_id) OVER (ORDER BY log_id ASC)` to inspect the next existing ID in the sequence.\n  - A gap occurs whenever `next_id - log_id > 1`.\n  - The gap starts at `log_id + 1` and ends at `next_id - 1`.\n  - Only detect gaps between existing sequence records (do not extrapolate before the table's minimum ID or after its maximum ID).\n  - If all IDs are contiguous (no gaps), return 0 rows (`[]`).\n  - If `tracking_logs` contains fewer than 2 rows, return 0 rows (`[]`).\n\n### Example\nGiven `tracking_logs` records:\n- `{ log_id: 1, event_name: \"auth\", logged_at: \"2024-01-01 10:00:00\" }`\n- `{ log_id: 2, event_name: \"login\", logged_at: \"2024-01-01 10:01:00\" }`\n- `{ log_id: 5, event_name: \"view\", logged_at: \"2024-01-01 10:04:00\" }`\n- `{ log_id: 6, event_name: \"click\", logged_at: \"2024-01-01 10:05:00\" }`\n- `{ log_id: 7, event_name: \"cart\", logged_at: \"2024-01-01 10:06:00\" }`\n- `{ log_id: 10, event_name: \"checkout\", logged_at: \"2024-01-01 10:09:00\" }`\n- `{ log_id: 11, event_name: \"logout\", logged_at: \"2024-01-01 10:10:00\" }`\n\nThe query returns:\n- `[{ \"gap_start\": 3, \"gap_end\": 4, \"gap_size\": 2 }, { \"gap_start\": 8, \"gap_end\": 9, \"gap_size\": 2 }]`\n\nExplanation:\n- Between ID 2 and ID 5, IDs 3 and 4 are missing (start: 3, end: 4, size: 2).\n- Between ID 7 and ID 10, IDs 8 and 9 are missing (start: 8, end: 9, size: 2).",
+    "track": "sql-postgres",
+    "title": "Sequential ID Gaps in Logs (LEAD)",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "gaps-and-islands",
+      "lead-lag",
+      "cte"
+    ],
+    "inputLanguage": "sql",
+    "difficulty": 3,
+    "concept": "sql-gaps-and-islands",
+    "referenceSolution": "WITH ranked_logs AS (\n  SELECT\n    log_id,\n    LEAD(log_id) OVER (ORDER BY log_id ASC) AS next_id\n  FROM tracking_logs\n)\nSELECT\n  log_id + 1 AS gap_start,\n  next_id - 1 AS gap_end,\n  (next_id - log_id - 1) AS gap_size\nFROM ranked_logs\nWHERE next_id - log_id > 1\nORDER BY gap_start ASC;",
+    "referenceSolutionTs": "WITH ranked_logs AS (\n  SELECT\n    log_id,\n    LEAD(log_id) OVER (ORDER BY log_id ASC) AS next_id\n  FROM tracking_logs\n)\nSELECT\n  log_id + 1 AS gap_start,\n  next_id - 1 AS gap_end,\n  (next_id - log_id - 1) AS gap_size\nFROM ranked_logs\nWHERE next_id - log_id > 1\nORDER BY gap_start ASC;",
+    "testCases": [
+      {
+        "description": "Finds multiple missing sequence ranges in tracking log IDs",
+        "input": "query",
+        "expected": "[{\"gap_end\":4,\"gap_size\":2,\"gap_start\":3},{\"gap_end\":9,\"gap_size\":2,\"gap_start\":8}]"
+      },
+      {
+        "description": "Detects single isolated missing identifier gap",
+        "input": "query",
+        "expected": "[{\"gap_end\":12,\"gap_size\":1,\"gap_start\":12}]"
+      },
+      {
+        "description": "Returns empty array when sequence is strictly contiguous",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty array when table contains fewer than two rows",
+        "input": "query",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE tracking_logs (log_id INT PRIMARY KEY, event_name TEXT, logged_at TIMESTAMP);`);\n\n  // Case 1: Multiple sequence gaps in tracking IDs\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (1, 'auth', '2024-01-01 10:00:00'),\n      (2, 'login', '2024-01-01 10:01:00'),\n      (5, 'view', '2024-01-01 10:04:00'),\n      (6, 'click', '2024-01-01 10:05:00'),\n      (7, 'cart', '2024-01-01 10:06:00'),\n      (10, 'checkout', '2024-01-01 10:09:00'),\n      (11, 'logout', '2024-01-01 10:10:00');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Finds multiple missing sequence ranges in tracking log IDs',\n    r1 !== null && $test.equal(r1, [\n      { gap_start: 3, gap_end: 4, gap_size: 2 },\n      { gap_start: 8, gap_end: 9, gap_size: 2 }\n    ]),\n    r1\n  );\n\n  // Case 2: Single missing ID gap of size 1\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (10, 'init', '2024-02-01 08:00:00'),\n      (11, 'start', '2024-02-01 08:01:00'),\n      (13, 'finish', '2024-02-01 08:03:00'),\n      (14, 'cleanup', '2024-02-01 08:04:00');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Detects single isolated missing identifier gap',\n    r2 !== null && $test.equal(r2, [\n      { gap_start: 12, gap_end: 12, gap_size: 1 }\n    ]),\n    r2\n  );\n\n  // Case 3: Contiguous sequence with zero gaps\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (100, 'step1', '2024-03-01 12:00:00'),\n      (101, 'step2', '2024-03-01 12:01:00'),\n      (102, 'step3', '2024-03-01 12:02:00'),\n      (103, 'step4', '2024-03-01 12:03:00');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when sequence is strictly contiguous',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Table with single entry or fewer than two rows\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (42, 'only_record', '2024-04-01 15:00:00');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when table contains fewer than two rows',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();"
+  },
+  {
+    "id": "sql-worker-queue-skip-locked",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue.\n\nIn high-throughput microservices and asynchronous backend architectures, PostgreSQL tables are commonly used as persistent job queues. When multiple worker processes pull jobs simultaneously using a standard `SELECT ... FOR UPDATE`, all other workers block and serialize waiting for the first transaction's lock to release. To allow concurrent workers to immediately claim distinct pending tasks without blocking each other, PostgreSQL provides the `FOR UPDATE SKIP LOCKED` locking clause.\n\n### Schema: `job_queue`\n- `id` (INT, PRIMARY KEY): Unique identifier for the queue task.\n- `task_name` (TEXT): Name of the background job type.\n- `status` (TEXT): Current queue status (`'pending'`, `'processing'`, `'completed'`, `'failed'`).\n- `priority` (INT): Integer priority level (higher number indicates higher priority).\n- `attempts` (INT): Number of previous processing attempts.\n- `created_at` (TIMESTAMP): Creation timestamp of the task.\n\n### Query Contract\n- Target only pending tasks: Filter rows strictly by `status = 'pending'`.\n- Ordering:\n  - Primary: Highest priority first (`priority DESC`).\n  - Secondary: Oldest created task first (`created_at ASC`).\n  - Tie-breaker: Lowest ID first (`id ASC`).\n- Selection count: Claim exactly 1 job (`LIMIT 1`).\n- Output columns:\n  - `id` (INT)\n  - `task_name` (TEXT)\n  - `priority` (INT)\n- Concurrency & Row Locking:\n  - Append the `FOR UPDATE SKIP LOCKED` clause to lock the selected record and skip any rows currently locked by other transactions, preventing worker lock contention.\n- If no pending tasks exist, return 0 rows (`[]`).\n\n### Example\nGiven `job_queue` records:\n- `{ id: 1, task_name: \"send_email\", status: \"pending\", priority: 10, attempts: 0, created_at: \"2024-01-01 10:00:00\" }`\n- `{ id: 2, task_name: \"generate_pdf\", status: \"pending\", priority: 20, attempts: 0, created_at: \"2024-01-01 10:05:00\" }`\n- `{ id: 3, task_name: \"process_video\", status: \"processing\", priority: 30, attempts: 1, created_at: \"2024-01-01 10:02:00\" }`\n- `{ id: 4, task_name: \"sync_contacts\", status: \"pending\", priority: 20, attempts: 0, created_at: \"2024-01-01 10:01:00\" }`\n\nThe query returns:\n- `[{ \"id\": 4, \"task_name\": \"sync_contacts\", \"priority\": 20 }]`\n\nExplanation:\n- Task 3 has priority 30 but is excluded because its status is `'processing'`.\n- Tasks 2 and 4 both have priority 20 (higher than task 1's 10).\n- Task 4 was created earlier (`10:01:00` vs `10:05:00`), so it wins the priority tie-break.\n- The `FOR UPDATE SKIP LOCKED` clause locks task 4 for the claiming worker.",
+    "track": "sql-postgres",
+    "title": "Concurrent Task Queue Claim (FOR UPDATE SKIP LOCKED)",
+    "tags": [
+      "sql",
+      "postgres",
+      "concurrency",
+      "transactions",
+      "row-locking",
+      "queues"
+    ],
+    "inputLanguage": "sql",
+    "difficulty": 3,
+    "concept": "sql-concurrency-transactions",
+    "referenceSolution": "SELECT id, task_name, priority\nFROM job_queue\nWHERE status = 'pending'\nORDER BY priority DESC, created_at ASC, id ASC\nLIMIT 1\nFOR UPDATE SKIP LOCKED;",
+    "referenceSolutionTs": "SELECT id, task_name, priority\nFROM job_queue\nWHERE status = 'pending'\nORDER BY priority DESC, created_at ASC, id ASC\nLIMIT 1\nFOR UPDATE SKIP LOCKED;",
+    "testCases": [
+      {
+        "description": "Claims highest-priority pending task using FOR UPDATE SKIP LOCKED",
+        "input": "query",
+        "expected": "[{\"id\":2,\"priority\":50,\"task_name\":\"process_payment\"}]"
+      },
+      {
+        "description": "Breaks priority ties using oldest created timestamp",
+        "input": "query",
+        "expected": "[{\"id\":11,\"priority\":30,\"task_name\":\"sync_inventory\"}]"
+      },
+      {
+        "description": "Ignores non-pending tasks and picks highest pending task",
+        "input": "query",
+        "expected": "[{\"id\":23,\"priority\":15,\"task_name\":\"send_sms_alert\"}]"
+      },
+      {
+        "description": "Returns empty array when queue has no pending tasks",
+        "input": "query",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const hasSkipLocked = /for\\s+update\\s+skip\\s+locked/i.test(userSql);\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE job_queue (\n      id INT PRIMARY KEY,\n      task_name TEXT NOT NULL,\n      status TEXT NOT NULL,\n      priority INT NOT NULL,\n      attempts INT NOT NULL DEFAULT 0,\n      created_at TIMESTAMP NOT NULL\n    );\n  `);\n\n  // Case 1: Claims highest-priority pending task using FOR UPDATE SKIP LOCKED\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (1, 'send_welcome_email', 'pending', 10, 0, '2024-01-01 10:00:00'),\n      (2, 'process_payment', 'pending', 50, 0, '2024-01-01 10:05:00'),\n      (3, 'generate_analytics', 'processing', 100, 1, '2024-01-01 10:02:00'),\n      (4, 'resize_avatar', 'pending', 20, 0, '2024-01-01 10:01:00');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Claims highest-priority pending task using FOR UPDATE SKIP LOCKED',\n    hasSkipLocked && r1 !== null && $test.equal(r1, [{ id: 2, task_name: 'process_payment', priority: 50 }]),\n    r1\n  );\n\n  // Case 2: Breaks priority ties using oldest created timestamp\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (10, 'export_csv', 'pending', 30, 0, '2024-02-01 09:15:00'),\n      (11, 'sync_inventory', 'pending', 30, 0, '2024-02-01 09:05:00'),\n      (12, 'dispatch_webhook', 'pending', 30, 0, '2024-02-01 09:20:00');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Breaks priority ties using oldest created timestamp',\n    hasSkipLocked && r2 !== null && $test.equal(r2, [{ id: 11, task_name: 'sync_inventory', priority: 30 }]),\n    r2\n  );\n\n  // Case 3: Ignores non-pending tasks and picks highest pending task\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (21, 'rebuild_search_index', 'failed', 99, 3, '2024-03-01 12:00:00'),\n      (22, 'purge_cache', 'completed', 80, 1, '2024-03-01 12:05:00'),\n      (23, 'send_sms_alert', 'pending', 15, 0, '2024-03-01 12:10:00');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Ignores non-pending tasks and picks highest pending task',\n    hasSkipLocked && r3 !== null && $test.equal(r3, [{ id: 23, task_name: 'send_sms_alert', priority: 15 }]),\n    r3\n  );\n\n  // Case 4: Returns empty array when queue has no pending tasks\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (31, 'archive_logs', 'completed', 10, 1, '2024-04-01 15:00:00');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when queue has no pending tasks',\n    hasSkipLocked && r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();"
+  },
+  {
+    "id": "test-each-data-driven",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "## Description\n\n```ts\ntype TestFn = (...args: any[]) => void | Promise<void>;\ntype RegisterTestFn = (title: string, fn: () => void | Promise<void>) => void;\ntype EachRunner = (titlePattern: string, testFn: TestFn) => void;\n```\n\nIn test frameworks like Vitest and Jest, `test.each` enables parameterized, data-driven test suites. Instead of duplicating test blocks across multiple test inputs, `test.each` accepts a matrix of input rows, dynamically interpolates test descriptions, and registers independent test blocks with isolated scopes.\n\nWrite a factory function `createTestEach` that wraps a test registration function and returns a data-driven `test.each` runner.\n\n### createTestEach(registerTest): (table: any[]) => EachRunner\n\n#### Parameters\n- `registerTest` (`RegisterTestFn`): Callback that receives a formatted test title string and a test execution function `() => void | Promise<void>`.\n\n#### Returns\n- A function `each(table)` that accepts an array of test cases and returns `(titlePattern, testFn) => void`.\n\n#### Table & Format Rules\n- `table`: An array of test cases:\n  - 2D array of argument tuples: `[ [arg1, arg2, ...], [arg1, arg2, ...] ]`\n  - 1D array of single-argument values: `[ val1, val2, ... ]` (treated as single-argument rows `[val1]`, `[val2]`)\n  - Array of objects: `[ { a: 1, b: 2, sum: 3 }, ... ]`\n- `titlePattern`: A template string with placeholders:\n  - For array rows:\n    - `%s`: Formatted as `String(val)`\n    - `%i` or `%d`: Formatted as integer (`parseInt(val, 10)`)\n    - `%f`: Formatted as float (`parseFloat(val)`)\n    - `%p` or `%j`: Formatted as JSON (`JSON.stringify(val)`)\n    - Placeholders consume arguments sequentially from left to right (`row[0]`, `row[1]`, etc.). Unmatched placeholders remain unchanged.\n  - For object rows:\n    - `$propName`: Replaced with the corresponding property value from the object row (e.g. `$a + $b = $sum`).\n    - If the property value is an object or array, format it with `JSON.stringify`; otherwise `String(val)`.\n- Test execution:\n  - For array rows, `testFn` is invoked with the row elements spread as arguments: `testFn(...row)`.\n  - For object rows, `testFn` is invoked with the row object as its single argument: `testFn(row)`.\n  - If `testFn` returns a Promise (async test), the wrapper returned to `registerTest` returns that Promise.\n  - If `table` is empty or not an array, no tests are registered.\n\n### Example\n\n```js\nconst registered = [];\nconst testEach = createTestEach((title, fn) => {\n  registered.push({ title, fn });\n});\n\ntestEach([\n  [1, 1, 2],\n  [1, 2, 3],\n  [2, 3, 5]\n])('%i + %i returns %d', (a, b, expected) => {\n  expect(a + b).toBe(expected);\n});\n\n// registered:\n// [\n//   { title: '1 + 1 returns 2', fn: [Function] },\n//   { title: '1 + 2 returns 3', fn: [Function] },\n//   { title: '2 + 3 returns 5', fn: [Function] }\n// ]\n```",
+    "track": "testing-tooling",
+    "title": "Data-Driven Parameterized Tests (test.each)",
+    "tags": [
+      "testing",
+      "vitest",
+      "jest",
+      "parameterized-tests",
+      "test-runner"
+    ],
+    "difficulty": 3,
+    "concept": "testing-tools",
+    "referenceSolution": "function createTestEach(registerTest) {\n  function formatTitle(title, row, isObject) {\n    if (isObject) {\n      return title.replace(/\\$([a-zA-Z0-9_]+)/g, (_, key) => {\n        const v = row[key];\n        return typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v);\n      });\n    }\n    let index = 0;\n    return title.replace(/%([sidfpj])/g, (match, spec) => {\n      if (index >= row.length) return match;\n      const v = row[index++];\n      switch (spec) {\n        case 's': return String(v);\n        case 'i':\n        case 'd': return String(parseInt(v, 10));\n        case 'f': return String(parseFloat(v));\n        case 'p':\n        case 'j': return JSON.stringify(v);\n        default: return String(v);\n      }\n    });\n  }\n\n  return function each(table) {\n    return function test(titlePattern, testFn) {\n      if (!Array.isArray(table) || table.length === 0) return;\n      for (const row of table) {\n        const isObj = typeof row === 'object' && row !== null && !Array.isArray(row);\n        const args = isObj ? [row] : (Array.isArray(row) ? row : [row]);\n        const formattedTitle = formatTitle(titlePattern, isObj ? row : args, isObj);\n        registerTest(formattedTitle, () => testFn(...args));\n      }\n    };\n  };\n}",
+    "referenceSolutionTs": "type TestFn = (...args: any[]) => void | Promise<void>;\ntype RegisterTestFn = (title: string, fn: () => void | Promise<void>) => void;\ntype EachRunner = (titlePattern: string, testFn: TestFn) => void;\n\nfunction createTestEach(registerTest: RegisterTestFn): (table: any[]) => EachRunner {\n  function formatTitle(title: string, row: any, isObject: boolean): string {\n    if (isObject) {\n      return title.replace(/\\$([a-zA-Z0-9_]+)/g, (_: string, key: string) => {\n        const v = row[key];\n        return typeof v === 'object' && v !== null ? JSON.stringify(v) : String(v);\n      });\n    }\n    let index = 0;\n    return title.replace(/%([sidfpj])/g, (match: string, spec: string) => {\n      if (index >= row.length) return match;\n      const v = row[index++];\n      switch (spec) {\n        case 's': return String(v);\n        case 'i':\n        case 'd': return String(parseInt(v, 10));\n        case 'f': return String(parseFloat(v));\n        case 'p':\n        case 'j': return JSON.stringify(v);\n        default: return String(v);\n      }\n    });\n  }\n\n  return function each(table: any[]): EachRunner {\n    return function test(titlePattern: string, testFn: TestFn): void {\n      if (!Array.isArray(table) || table.length === 0) return;\n      for (const row of table) {\n        const isObj = typeof row === 'object' && row !== null && !Array.isArray(row);\n        const args = isObj ? [row] : (Array.isArray(row) ? row : [row]);\n        const formattedTitle = formatTitle(titlePattern, isObj ? row : args, isObj);\n        registerTest(formattedTitle, () => testFn(...args));\n      }\n    };\n  };\n}",
+    "testCases": [
+      {
+        "description": "Registers parameterized test cases from 2D array with formatted titles",
+        "input": "createTestEach(reg)([[1, 2, 3], [4, 5, 9]])(\"%i + %i = %d\", fn)",
+        "expected": "[\"1 + 2 = 3\", \"4 + 5 = 9\"]"
+      },
+      {
+        "description": "Interpolates object properties using $placeholder syntax",
+        "input": "createTestEach(reg)([{ role: \"admin\", level: 1 }])(\"User $role has level $level\", fn)",
+        "expected": "[\"User admin has level 1\"]"
+      },
+      {
+        "description": "Handles 1D array of single-argument values and %s placeholders",
+        "input": "createTestEach(reg)([\"alpha\", \"beta\"])(\"stage %s is valid\", fn)",
+        "expected": "[\"stage alpha is valid\", \"stage beta is valid\"]"
+      },
+      {
+        "description": "Supports asynchronous test execution functions",
+        "input": "createTestEach(reg)([[100]])(\"delays by %d ms\", asyncFn)",
+        "expected": "true"
+      },
+      {
+        "description": "Safely ignores empty or non-array tables without registering tests",
+        "input": "createTestEach(reg)([])(\"test\", fn)",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  // Case 1: Registers parameterized test cases from 2D array with formatted titles\n  {\n    const registered = [];\n    const testEach = createTestEach((title, fn) => {\n      registered.push({ title, fn });\n    });\n\n    const executionLog = [];\n    testEach([\n      [1, 2, 3],\n      [4, 5, 9],\n      [10, 20, 30]\n    ])('%i + %i = %d', (a, b, expected) => {\n      executionLog.push(a + b === expected);\n    });\n\n    const titles = registered.map(r => r.title);\n    for (const r of registered) {\n      r.fn();\n    }\n\n    $test.check(\n      'Registers parameterized test cases from 2D array with formatted titles',\n      $test.equal(titles, ['1 + 2 = 3', '4 + 5 = 9', '10 + 20 = 30']) &&\n      $test.equal(executionLog, [true, true, true]),\n      { titles, executionLog }\n    );\n  }\n\n  // Case 2: Interpolates object properties using $placeholder syntax\n  {\n    const registered = [];\n    const testEach = createTestEach((title, fn) => {\n      registered.push({ title, fn });\n    });\n\n    const received = [];\n    testEach([\n      { role: 'admin', level: 1 },\n      { role: 'guest', level: 0 }\n    ])('User $role has authorization level $level', (row) => {\n      received.push(row.role);\n    });\n\n    const titles = registered.map(r => r.title);\n    for (const r of registered) {\n      r.fn();\n    }\n\n    $test.check(\n      'Interpolates object properties using $placeholder syntax',\n      $test.equal(titles, ['User admin has authorization level 1', 'User guest has authorization level 0']) &&\n      $test.equal(received, ['admin', 'guest']),\n      { titles, received }\n    );\n  }\n\n  // Case 3: Handles 1D array of single-argument values and %s placeholders\n  {\n    const registered = [];\n    const testEach = createTestEach((title, fn) => {\n      registered.push({ title, fn });\n    });\n\n    const values = [];\n    testEach(['alpha', 'beta', 'gamma'])('stage %s is valid', (val) => {\n      values.push(val);\n    });\n\n    const titles = registered.map(r => r.title);\n    for (const r of registered) {\n      r.fn();\n    }\n\n    $test.check(\n      'Handles 1D array of single-argument values and %s placeholders',\n      $test.equal(titles, ['stage alpha is valid', 'stage beta is valid', 'stage gamma is valid']) &&\n      $test.equal(values, ['alpha', 'beta', 'gamma']),\n      { titles, values }\n    );\n  }\n\n  // Case 4: Supports asynchronous test execution functions\n  {\n    const registered = [];\n    const testEach = createTestEach((title, fn) => {\n      registered.push({ title, fn });\n    });\n\n    let asyncDone = false;\n    testEach([[100]])('delays by %d ms', async (ms) => {\n      await new Promise(r => setTimeout(r, 10));\n      asyncDone = true;\n    });\n\n    const promise = registered[0]?.fn();\n    const isPromise = promise && typeof promise.then === 'function';\n    await promise;\n\n    $test.check(\n      'Supports asynchronous test execution functions',\n      isPromise && asyncDone,\n      { isPromise, asyncDone }\n    );\n  }\n\n  // Case 5: Safely ignores empty or non-array tables without registering tests\n  {\n    const registered = [];\n    const testEach = createTestEach((title, fn) => {\n      registered.push({ title, fn });\n    });\n\n    testEach([])('should not register', () => {});\n    testEach(null)('should not register', () => {});\n\n    $test.check(\n      'Safely ignores empty or non-array tables without registering tests',\n      registered.length === 0,\n      registered.length\n    );\n  }\n})();"
+  },
+  {
+    "id": "ts-assertion-functions",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Implement TypeScript type guards and assertion functions to contrast boolean predicates with control-flow narrowing assertion signatures:\n\n### `isDefined<T>(val: T | null | undefined): val is T`\n- Type predicate returning `true` if `val !== null && val !== undefined`; returns `false` for `null` or `undefined`.\n- Allows `if (isDefined(x)) { ... }` branches to narrow `x` to `T`.\n\n### `assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T>`\n- Assertion function that verifies `val` is neither `null` nor `undefined`.\n- If `val === null || val === undefined`, throws a `TypeError` with `message` (or default `'Value is null or undefined'`).\n- If valid, returns `void`. In TypeScript, this narrows `val` in the remaining control flow to `NonNullable<T>` without an `if` block.\n\n### `assertCondition(condition: unknown, message?: string): asserts condition`\n- General invariant assertion function.\n- If `condition` is falsy (`!condition`), throws an `Error` with `message` (or default `'Assertion failed'`).\n- In TypeScript, asserts truthiness of the condition expression for subsequent lines.\n\n### `assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown>`\n- Verifies `val` is a non-null plain dictionary object and not an array.\n- If `val === null || typeof val !== 'object' || Array.isArray(val)`, throws a `TypeError` with `message` (or default `'Value is not a record object'`).\n- If valid, returns `void` and narrows `val` to `Record<string, unknown>`.",
+    "track": "typescript-patterns",
+    "title": "TS Type Predicates vs. Assertion Functions",
+    "tags": [
+      "typescript",
+      "type-guards",
+      "assertions",
+      "narrowing",
+      "asserts"
+    ],
+    "difficulty": 2,
+    "concept": "ts-assertions",
+    "referenceSolution": "function isDefined<T>(val: T | null | undefined): val is T {\n  return val !== null && val !== undefined;\n}\n\nfunction assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T> {\n  if (val === null || val === undefined) {\n    throw new TypeError(message || 'Value is null or undefined');\n  }\n}\n\nfunction assertCondition(condition: unknown, message?: string): asserts condition {\n  if (!condition) {\n    throw new Error(message || 'Assertion failed');\n  }\n}\n\nfunction assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown> {\n  if (val === null || typeof val !== 'object' || Array.isArray(val)) {\n    throw new TypeError(message || 'Value is not a record object');\n  }\n}",
+    "referenceSolutionTs": "function isDefined<T>(val: T | null | undefined): val is T {\n  return val !== null && val !== undefined;\n}\n\nfunction assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T> {\n  if (val === null || val === undefined) {\n    throw new TypeError(message || 'Value is null or undefined');\n  }\n}\n\nfunction assertCondition(condition: unknown, message?: string): asserts condition {\n  if (!condition) {\n    throw new Error(message || 'Assertion failed');\n  }\n}\n\nfunction assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown> {\n  if (val === null || typeof val !== 'object' || Array.isArray(val)) {\n    throw new TypeError(message || 'Value is not a record object');\n  }\n}",
+    "testCases": [
+      {
+        "description": "isDefined returns true for values and false for null/undefined",
+        "input": "[isDefined(\"hello\"), isDefined(0), isDefined(false), isDefined(null), isDefined(undefined)]",
+        "expected": "[true, true, true, false, false]"
+      },
+      {
+        "description": "assertDefined passes valid values and throws TypeError on null/undefined",
+        "input": "let caught = null;\ntry {\n  assertDefined(null, \"Missing\");\n} catch (e: any) {\n  caught = e.message;\n}\n[assertDefined(123) === undefined, caught]",
+        "expected": "[true, \"Missing\"]"
+      },
+      {
+        "description": "assertCondition throws on falsy values with custom message",
+        "input": "let caught = null;\ntry {\n  assertCondition(false, \"Expected truthy\");\n} catch (e: any) {\n  caught = e.message;\n}\n[assertCondition(true) === undefined, caught]",
+        "expected": "[true, \"Expected truthy\"]"
+      },
+      {
+        "description": "assertRecord validates plain records and throws TypeError on arrays/primitives",
+        "input": "let caught = null;\ntry {\n  assertRecord([1, 2, 3]);\n} catch (e: any) {\n  caught = e.message;\n}\n[assertRecord({ a: 1 }) === undefined, caught]",
+        "expected": "[true, \"Value is not a record object\"]"
+      }
+    ],
+    "testHarness": "await $test.run(\"isDefined returns true for values and false for null/undefined\", async () => {\n  const sleep = $test.sleep;\n  return ([isDefined(\"hello\"), isDefined(0), isDefined(false), isDefined(null), isDefined(undefined)]);\n}, () => ([true, true, true, false, false]));\n\nawait $test.run(\"assertDefined passes valid values and throws TypeError on null/undefined\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertDefined(null, \"Missing\");\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertDefined(123) === undefined, caught]);\n}, () => ([true, \"Missing\"]));\n\nawait $test.run(\"assertCondition throws on falsy values with custom message\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertCondition(false, \"Expected truthy\");\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertCondition(true) === undefined, caught]);\n}, () => ([true, \"Expected truthy\"]));\n\nawait $test.run(\"assertRecord validates plain records and throws TypeError on arrays/primitives\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertRecord([1, 2, 3]);\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertRecord({ a: 1 }) === undefined, caught]);\n}, () => ([true, \"Value is not a record object\"]));"
+  },
+  {
+    "id": "ts-tuple-rest-parameters",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "promptSeed": "Implement variadic tuple types and positional rest parameter utilities to manipulate strongly typed parameter lists:\n\n### `type Concat<A extends readonly any[], B extends readonly any[]>`\n- Concatenates two tuple types `A` and `B` into a single combined tuple `[...A, ...B]`.\n\n### `type Shift<T extends readonly any[]>`\n- Extracts a tuple with the first element removed. If `T` has at least one element, returns `Rest` from `[any, ...infer Rest]`; if `T` is empty `[]`, returns `[]`.\n\n### `tuple<T extends any[]>(...elements: [...T]): [...T]`\n- Creates and returns a tuple with its exact literal/positional element types preserved, avoiding implicit array widening (e.g. `tuple(1, 'a', true)` produces `[number, string, boolean]`).\n\n### `partialApply<Leading extends any[], Trailing extends any[], R>(fn: (...args: [...Leading, ...Trailing]) => R, ...head: Leading): (...tail: Trailing) => R`\n- Accepts a function `fn` expecting positional arguments `[...Leading, ...Trailing]`.\n- Binds the leading arguments `...head: Leading`.\n- Returns a new function that takes strictly the remaining `...tail: Trailing` positional arguments and returns `R`.\n\n### `callWithTuple<Args extends any[], R>(fn: (...args: Args) => R, args: [...Args]): R`\n- Executes `fn` by spreading the tuple arguments `args` in position.",
+    "track": "typescript-patterns",
+    "title": "TS Tuple Manipulation: Variadic Tuples and Rest Parameters",
+    "tags": [
+      "typescript",
+      "tuples",
+      "variadic",
+      "rest-parameters",
+      "generics",
+      "currying"
+    ],
+    "difficulty": 3,
+    "concept": "ts-tuples",
+    "referenceSolution": "type Concat<A extends readonly any[], B extends readonly any[]> = [...A, ...B];\n\ntype Shift<T extends readonly any[]> = T extends readonly [any, ...infer Rest] ? Rest : [];\n\nfunction tuple<T extends any[]>(...elements: [...T]): [...T] {\n  return elements;\n}\n\nfunction partialApply<Leading extends any[], Trailing extends any[], R>(\n  fn: (...args: [...Leading, ...Trailing]) => R,\n  ...head: Leading\n): (...tail: Trailing) => R {\n  return (...tail: Trailing): R => fn(...head, ...tail);\n}\n\nfunction callWithTuple<Args extends any[], R>(\n  fn: (...args: Args) => R,\n  args: [...Args]\n): R {\n  return fn(...args);\n}",
+    "referenceSolutionTs": "type Concat<A extends readonly any[], B extends readonly any[]> = [...A, ...B];\n\ntype Shift<T extends readonly any[]> = T extends readonly [any, ...infer Rest] ? Rest : [];\n\nfunction tuple<T extends any[]>(...elements: [...T]): [...T] {\n  return elements;\n}\n\nfunction partialApply<Leading extends any[], Trailing extends any[], R>(\n  fn: (...args: [...Leading, ...Trailing]) => R,\n  ...head: Leading\n): (...tail: Trailing) => R {\n  return (...tail: Trailing): R => fn(...head, ...tail);\n}\n\nfunction callWithTuple<Args extends any[], R>(\n  fn: (...args: Args) => R,\n  args: [...Args]\n): R {\n  return fn(...args);\n}",
+    "testCases": [
+      {
+        "description": "tuple constructs a typed tuple without widening to arbitrary array",
+        "input": "tuple(1, \"ok\", true)",
+        "expected": "[1, \"ok\", true]"
+      },
+      {
+        "description": "partialApply binds leading arguments and returns function for remaining arguments",
+        "input": "const fn = (a: string, b: number, c: boolean) => `${a}-${b}-${c}`;\nconst partial = partialApply(fn, \"x\", 10);\npartial(true)",
+        "expected": "\"x-10-true\""
+      },
+      {
+        "description": "callWithTuple executes function by spreading tuple elements",
+        "input": "callWithTuple((a: number, b: number, c: number) => a * b + c, [3, 4, 5])",
+        "expected": "17"
+      },
+      {
+        "description": "Concat and Shift tuple type contracts compile and verify lengths",
+        "input": "type C = Concat<[number, string], [boolean]>;\ntype S = Shift<[string, number, boolean]>;\nconst c: C = [1, \"two\", true];\nconst s: S = [42, false];\n[c.length, s.length]",
+        "expected": "[3, 2]"
+      }
+    ],
+    "testHarness": "await $test.run(\"tuple constructs a typed tuple without widening to arbitrary array\", async () => {\n  const sleep = $test.sleep;\n  return (tuple(1, \"ok\", true));\n}, () => ([1, \"ok\", true]));\n\nawait $test.run(\"partialApply binds leading arguments and returns function for remaining arguments\", async () => {\n  const sleep = $test.sleep;\n  const fn = (a: string, b: number, c: boolean) => `${a}-${b}-${c}`;\n  const partial = partialApply(fn, \"x\", 10);\n  return (partial(true));\n}, () => (\"x-10-true\"));\n\nawait $test.run(\"callWithTuple executes function by spreading tuple elements\", async () => {\n  const sleep = $test.sleep;\n  return (callWithTuple((a: number, b: number, c: number) => a * b + c, [3, 4, 5]));\n}, () => (17));\n\nawait $test.run(\"Concat and Shift tuple type contracts compile and verify lengths\", async () => {\n  const sleep = $test.sleep;\n  type C = Concat<[number, string], [boolean]>;\n  type S = Shift<[string, number, boolean]>;\n  const c: C = [1, \"two\", true];\n  const s: S = [42, false];\n  return ([c.length, s.length]);\n}, () => ([3, 2]));"
   }
 ]

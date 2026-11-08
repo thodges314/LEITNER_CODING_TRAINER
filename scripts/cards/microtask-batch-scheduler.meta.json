@@ -1,0 +1,13 @@
+{
+  "track": "async-js",
+  "title": "Microtask Batch Scheduler: queueMicrotask Coalescing",
+  "tags": [
+    "queueMicrotask",
+    "microtask",
+    "batching",
+    "scheduler",
+    "coalescing",
+    "async"
+  ]
+}
+

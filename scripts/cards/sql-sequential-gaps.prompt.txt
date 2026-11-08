@@ -1,0 +1,40 @@
+Write a PostgreSQL query to detect missing sequential identifiers (gaps) in an audit tracking log.
+
+In distributed log ingestion, financial auditing, and sequence processing pipelines, identifying gaps in primary keys or sequence numbers is critical for flagging dropped records, failed transactions, or sync errors.
+
+### Schema: `tracking_logs`
+- `log_id` (INT, PRIMARY KEY): Sequential tracking sequence identifier.
+- `event_name` (TEXT): Name of the recorded system event.
+- `logged_at` (TIMESTAMP): Timestamp of the event log.
+
+### Query Contract
+- Output columns:
+  - `gap_start` (INT): First missing sequence ID in the gap range.
+  - `gap_end` (INT): Last missing sequence ID in the gap range.
+  - `gap_size` (INT): Number of missing sequence IDs in the gap (`gap_end - gap_start + 1`).
+- Sort order: Sort results by `gap_start` ascending (`ORDER BY gap_start ASC`).
+- Logic:
+  - Use `LEAD(log_id) OVER (ORDER BY log_id ASC)` to inspect the next existing ID in the sequence.
+  - A gap occurs whenever `next_id - log_id > 1`.
+  - The gap starts at `log_id + 1` and ends at `next_id - 1`.
+  - Only detect gaps between existing sequence records (do not extrapolate before the table's minimum ID or after its maximum ID).
+  - If all IDs are contiguous (no gaps), return 0 rows (`[]`).
+  - If `tracking_logs` contains fewer than 2 rows, return 0 rows (`[]`).
+
+### Example
+Given `tracking_logs` records:
+- `{ log_id: 1, event_name: "auth", logged_at: "2024-01-01 10:00:00" }`
+- `{ log_id: 2, event_name: "login", logged_at: "2024-01-01 10:01:00" }`
+- `{ log_id: 5, event_name: "view", logged_at: "2024-01-01 10:04:00" }`
+- `{ log_id: 6, event_name: "click", logged_at: "2024-01-01 10:05:00" }`
+- `{ log_id: 7, event_name: "cart", logged_at: "2024-01-01 10:06:00" }`
+- `{ log_id: 10, event_name: "checkout", logged_at: "2024-01-01 10:09:00" }`
+- `{ log_id: 11, event_name: "logout", logged_at: "2024-01-01 10:10:00" }`
+
+The query returns:
+- `[{ "gap_start": 3, "gap_end": 4, "gap_size": 2 }, { "gap_start": 8, "gap_end": 9, "gap_size": 2 }]`
+
+Explanation:
+- Between ID 2 and ID 5, IDs 3 and 4 are missing (start: 3, end: 4, size: 2).
+- Between ID 7 and ID 10, IDs 8 and 9 are missing (start: 8, end: 9, size: 2).
+

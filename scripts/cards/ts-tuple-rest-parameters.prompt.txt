@@ -1,0 +1,18 @@
+Implement variadic tuple types and positional rest parameter utilities to manipulate strongly typed parameter lists:
+
+### `type Concat<A extends readonly any[], B extends readonly any[]>`
+- Concatenates two tuple types `A` and `B` into a single combined tuple `[...A, ...B]`.
+
+### `type Shift<T extends readonly any[]>`
+- Extracts a tuple with the first element removed. If `T` has at least one element, returns `Rest` from `[any, ...infer Rest]`; if `T` is empty `[]`, returns `[]`.
+
+### `tuple<T extends any[]>(...elements: [...T]): [...T]`
+- Creates and returns a tuple with its exact literal/positional element types preserved, avoiding implicit array widening (e.g. `tuple(1, 'a', true)` produces `[number, string, boolean]`).
+
+### `partialApply<Leading extends any[], Trailing extends any[], R>(fn: (...args: [...Leading, ...Trailing]) => R, ...head: Leading): (...tail: Trailing) => R`
+- Accepts a function `fn` expecting positional arguments `[...Leading, ...Trailing]`.
+- Binds the leading arguments `...head: Leading`.
+- Returns a new function that takes strictly the remaining `...tail: Trailing` positional arguments and returns `R`.
+
+### `callWithTuple<Args extends any[], R>(fn: (...args: Args) => R, args: [...Args]): R`
+- Executes `fn` by spreading the tuple arguments `args` in position.

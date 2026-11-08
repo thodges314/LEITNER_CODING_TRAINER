@@ -1,0 +1,20 @@
+Implement TypeScript type guards and assertion functions to contrast boolean predicates with control-flow narrowing assertion signatures:
+
+### `isDefined<T>(val: T | null | undefined): val is T`
+- Type predicate returning `true` if `val !== null && val !== undefined`; returns `false` for `null` or `undefined`.
+- Allows `if (isDefined(x)) { ... }` branches to narrow `x` to `T`.
+
+### `assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T>`
+- Assertion function that verifies `val` is neither `null` nor `undefined`.
+- If `val === null || val === undefined`, throws a `TypeError` with `message` (or default `'Value is null or undefined'`).
+- If valid, returns `void`. In TypeScript, this narrows `val` in the remaining control flow to `NonNullable<T>` without an `if` block.
+
+### `assertCondition(condition: unknown, message?: string): asserts condition`
+- General invariant assertion function.
+- If `condition` is falsy (`!condition`), throws an `Error` with `message` (or default `'Assertion failed'`).
+- In TypeScript, asserts truthiness of the condition expression for subsequent lines.
+
+### `assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown>`
+- Verifies `val` is a non-null plain dictionary object and not an array.
+- If `val === null || typeof val !== 'object' || Array.isArray(val)`, throws a `TypeError` with `message` (or default `'Value is not a record object'`).
+- If valid, returns `void` and narrows `val` to `Record<string, unknown>`.
