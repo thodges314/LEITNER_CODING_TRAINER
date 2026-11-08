@@ -189,7 +189,6 @@ const SANDBOX_NAMES = [
   'redirect',
   'notFound',
   'Inter',
-  'UserBadge',
   'articlesStore',
   'setMockPathname',
   'setMockRouter',
@@ -212,6 +211,7 @@ export function createSandboxScope(options: {
   console: unknown;
   mount: (...args: never[]) => void;
   reactDOM: Record<string, unknown>;
+  cardId?: string;
 }): SandboxScope {
   let tools: DomTools | null = null;
   const restoreBuiltins = snapshotBuiltins();
@@ -309,14 +309,20 @@ export function createSandboxScope(options: {
     nextRedirect,
     nextNotFound,
     nextInter,
-    NextUserBadge,
     sandboxArticlesStore,
     setMockPathname,
     setMockRouter,
     setMockSearchParams,
   ];
+
+  const names: string[] = [...SANDBOX_NAMES];
+  if (options.cardId === 'next-client-boundary-guard') {
+    names.push('UserBadge');
+    values.push(NextUserBadge);
+  }
+
   return {
-    names: SANDBOX_NAMES,
+    names,
     values,
     cleanup() {
       try {
@@ -536,6 +542,7 @@ export async function runHarness(
     console: sandboxConsole,
     mount: () => {},
     reactDOM: { createRoot: () => ({ render: () => {}, unmount: () => {} }) },
+    cardId: card.id,
   });
 
   let timedOut = false;

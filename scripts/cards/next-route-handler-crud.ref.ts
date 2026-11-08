@@ -17,7 +17,7 @@ interface CreateItemInput {
 
 const itemsStore = new Map<string, ItemRecord>();
 
-const GET = async (request: Request, context: RouteContext): Promise<NextResponse> => {
+async function GET(request: Request, context: RouteContext): Promise<NextResponse> {
   const id = context?.params?.id;
   const item = itemsStore.get(id);
 
@@ -26,9 +26,9 @@ const GET = async (request: Request, context: RouteContext): Promise<NextRespons
   }
 
   return NextResponse.json(item, { status: 200 });
-};
+}
 
-const POST = async (request: Request, context: RouteContext): Promise<NextResponse> => {
+async function POST(request: Request, context: RouteContext): Promise<NextResponse> {
   const id = context?.params?.id;
   let body: Partial<CreateItemInput> | undefined;
 
@@ -60,5 +60,5 @@ const POST = async (request: Request, context: RouteContext): Promise<NextRespon
   itemsStore.set(id, record);
 
   return NextResponse.json(record, { status: 201 });
-};
+}
 

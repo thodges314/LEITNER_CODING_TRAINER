@@ -1,6 +1,6 @@
 Implement arbitrary-precision string arithmetic without converting whole strings to numbers:
 
-> **Important**: Do not use `BigInt` or `Number()` on whole strings; process digit by digit.
+- **Important**: Do not use `BigInt` or `Number()` on whole strings; process digit by digit.
 
 ### `addBinary(a: string, b: string): string`
 - Adds two binary number strings `a` and `b` and returns their sum as a binary string (e.g. `'11'` + `'1'` -> `'100'`).

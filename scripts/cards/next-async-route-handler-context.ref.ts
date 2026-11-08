@@ -16,7 +16,7 @@ interface MemberRecord {
 
 const membersStore = new Map<string, MemberRecord>();
 
-const GET = async (request: Request, context: RouteContext): Promise<NextResponse> => {
+async function GET(request: Request, context: RouteContext): Promise<NextResponse> {
   let resolvedParams: RouteParams | undefined;
 
   try {
@@ -45,5 +45,5 @@ const GET = async (request: Request, context: RouteContext): Promise<NextRespons
   }
 
   return NextResponse.json(member, { status: 200 });
-};
+}
 

@@ -64,6 +64,18 @@ Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/
 - **Idiomatic Framework Usage (Framework Built-ins & Managed Primitives)**:
   - Target idiomatic framework usage only. Never ask to re-implement framework internals or substitute standard library components with mock HTML tags and synthetic event listeners.
   - When authoring cards for Next.js, React, or other frameworks, learners must consume the authentic framework primitives (`next/link`, `next/navigation`, `next/image`, `next/script`, `next/font`) rather than building synthetic custom wrappers or mocking browser clicks. Provide realistic execution mocks and ambient type declarations in the sandbox runner (`src/utils/nextSandbox.ts`, `src/utils/sandboxNextTypes.ts`).
+- **Function Declarations vs Arrow Functions (Next.js & Framework Conventions)**:
+  - While arrow functions are used for inline callbacks and short utilities, use standard `function` or `async function` declarations for the following Next.js App Router conventions:
+    - **Route Handlers (`route.ts`)**: HTTP method handlers (`async function GET(...)`, `async function POST(...)`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`).
+      - *Reason*: Next.js static analysis, type inference (`RouteContext`), and route manifest indexing expect top-level named function exports.
+    - **Special Metadata & Segment Generation**: `generateStaticParams()`, `generateMetadata()`, `generateViewport()`.
+      - *Reason*: Build-time AST extraction and Next.js compiler indexing target top-level named function signatures.
+    - **Server Actions (`'use server'`)**: Top-level action functions (e.g. `async function updateCartQuantity(...)`, `async function updateProduct(...)`).
+      - *Reason*: The Next.js compiler transform assigns action IDs and serializes manifest bindings against explicit function declarations.
+    - **Special App Router Boundary Pages & Layouts**: Components for `page.tsx`, `layout.tsx`, `template.tsx`, `error.tsx`, `loading.tsx`, `not-found.tsx`, and `default.tsx`.
+      - *Reason*: Guarantees correct component naming in React DevTools/stack traces, avoids Fast Refresh de-optimizations, and prevents Temporal Dead Zone (TDZ) hoisting errors during runner eval execution.
+    - **Root Edge Middleware (`middleware.ts`)**: `function middleware(request: NextRequest)`.
+      - *Reason*: Required runtime convention for Next.js Edge bundle entry-point resolution.
 
 ## Component and Live Preview Conventions
 - **Preview Library Ingestion (`<id>.meta.json`)**:
