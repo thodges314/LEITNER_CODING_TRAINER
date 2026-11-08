@@ -1736,6 +1736,10 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'photoId', type: 'string', defaultValue: 'photo_42', placeholder: 'Photo ID', description: 'Photo ID displayed in modal' },
     { name: 'photoUrl', type: 'string', defaultValue: 'https://www.leitnercoding.dev/Mountains.jpeg', placeholder: 'Photo URL', description: 'Photo URL displayed in modal' },
   ],
+  'next-optimistic-action-mutation': [
+    { name: 'simulateFailure', type: 'boolean', defaultValue: false, description: 'Simulate Server Action failure to trigger automatic rollback' },
+    { name: 'latencyMs', type: 'number', defaultValue: 600, min: 100, max: 2000, step: 100, description: 'Simulated network latency in milliseconds' },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

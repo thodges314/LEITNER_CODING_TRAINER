@@ -5896,5 +5896,53 @@
       "third-party"
     ],
     "summary": "Implement a Next.js third-party script manager component using <Script /> from next/script"
+  },
+  {
+    "id": "next-nested-static-params-matrix",
+    "title": "Next.js 15: Nested generateStaticParams with Catch-All Segments",
+    "track": "nextjs",
+    "concept": "next-static-params",
+    "difficulty": 4,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "generateStaticParams",
+      "static-export",
+      "catch-all",
+      "recursion"
+    ],
+    "summary": "Implement nested static parameter matrix generation for Next.js App Router catch-all dynamic routes"
+  },
+  {
+    "id": "next-optimistic-action-mutation",
+    "title": "Next.js 15 & React 19: useOptimistic with Server Action Rollback",
+    "track": "nextjs",
+    "concept": "next-optimistic-ui",
+    "difficulty": 4,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "react-19",
+      "useOptimistic",
+      "server-actions",
+      "forms"
+    ],
+    "summary": "Implement optimistic UI state transitions with automatic Server Action rollback using React 19 useOptimistic"
+  },
+  {
+    "id": "next-route-segment-config-resolver",
+    "title": "Next.js App Router: Route Segment Config & Cache Inheritance Resolver",
+    "track": "nextjs",
+    "concept": "next-route-segment-config",
+    "difficulty": 4,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-segment-config",
+      "caching",
+      "revalidate",
+      "static-analysis"
+    ],
+    "summary": "Implement the Next.js App Router route segment configuration inheritance and caching resolver"
   }
 ]

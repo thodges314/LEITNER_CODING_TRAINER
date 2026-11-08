@@ -1,0 +1,18 @@
+{
+  "title": "Next.js 15 & React 19: useOptimistic with Server Action Rollback",
+  "track": "nextjs",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "react-19",
+    "useOptimistic",
+    "server-actions",
+    "forms"
+  ],
+  "rendersComponent": true,
+  "requiresDom": true,
+  "previewLibraries": [
+    "react",
+    "tailwind"
+  ]
+}

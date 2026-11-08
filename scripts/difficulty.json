@@ -1623,6 +1623,18 @@
     "difficulty": 3,
     "concept": "next-intercepting-routes"
   },
+  "next-nested-static-params-matrix": {
+    "difficulty": 4,
+    "concept": "next-static-params"
+  },
+  "next-optimistic-action-mutation": {
+    "difficulty": 4,
+    "concept": "next-optimistic-ui"
+  },
+  "next-route-segment-config-resolver": {
+    "difficulty": 4,
+    "concept": "next-route-segment-config"
+  },
   "promise-waterfall-pipeline": {
     "difficulty": 2,
     "concept": "async-control"

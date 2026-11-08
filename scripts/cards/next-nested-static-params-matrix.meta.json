@@ -1,0 +1,13 @@
+{
+  "title": "Next.js 15: Nested generateStaticParams with Catch-All Segments",
+  "track": "nextjs",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "generateStaticParams",
+    "static-export",
+    "catch-all",
+    "recursion"
+  ],
+  "requiresDom": false
+}
