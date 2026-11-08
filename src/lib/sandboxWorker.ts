@@ -129,6 +129,7 @@ self.onmessage = async (e: MessageEvent<WorkerRunMessage>) => {
   const realFetch = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
   const mockFetch = createMockFetch(realFetch);
   const testHelpers = createTestHelpers(workerConsole);
+  const articlesStore = new Map<string, unknown>();
 
   const requireShim = (mod: string) => {
     if (mod === 'graphql') {
@@ -159,6 +160,7 @@ self.onmessage = async (e: MessageEvent<WorkerRunMessage>) => {
     'NextRequest',
     'revalidateTag',
     'revalidatePath',
+    'articlesStore',
   ];
 
   const sandboxValues = [
@@ -175,6 +177,7 @@ self.onmessage = async (e: MessageEvent<WorkerRunMessage>) => {
     NextRequest,
     revalidateTag,
     revalidatePath,
+    articlesStore,
   ];
 
   try {

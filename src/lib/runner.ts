@@ -190,6 +190,7 @@ const SANDBOX_NAMES = [
   'notFound',
   'Inter',
   'UserBadge',
+  'articlesStore',
   'setMockPathname',
   'setMockRouter',
   'setMockSearchParams',
@@ -222,6 +223,7 @@ export function createSandboxScope(options: {
   });
   const realFetch = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
   const customReactDOM = { ...ReactDOMClient, createPortal, ...options.reactDOM };
+  const sandboxArticlesStore = new Map<string, unknown>();
   const requireShim = (mod: string) => {
     if (mod === 'react') return { default: React, ...React };
     if (mod === 'react-dom') return { default: customReactDOM, ...customReactDOM };
@@ -308,6 +310,7 @@ export function createSandboxScope(options: {
     nextNotFound,
     nextInter,
     NextUserBadge,
+    sandboxArticlesStore,
     setMockPathname,
     setMockRouter,
     setMockSearchParams,
@@ -318,6 +321,7 @@ export function createSandboxScope(options: {
     cleanup() {
       try {
         tools?.cleanup();
+        sandboxArticlesStore.clear();
         resetMockRouter();
         resetRevalidationStore();
         (globalThis as unknown as { __mockFetchHandler?: unknown }).__mockFetchHandler = null;
