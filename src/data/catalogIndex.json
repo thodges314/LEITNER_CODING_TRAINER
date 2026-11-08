@@ -5990,7 +5990,7 @@
       "arguments",
       "client"
     ],
-    "summary": "Write a GraphQL query named GetProduct that accepts variables $id: ID! and $withDiscount: Boolean."
+    "summary": "Write a GraphQL query named GetProduct that accepts a required variable $id: ID!."
   },
   {
     "id": "mock-fn-spy-basics",

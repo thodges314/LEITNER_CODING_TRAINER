@@ -2,7 +2,7 @@ await (async () => {
   const userDoc = (typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();
   const testSchema = buildSchema(`
     type Query {
-      product(id: ID!, withDiscount: Boolean): Product
+      product(id: ID!): Product
     }
     type Category {
       id: ID!
@@ -18,10 +18,10 @@ await (async () => {
   `);
 
   const root = {
-    product: ({ id, withDiscount }: { id: string; withDiscount?: boolean }) => ({
+    product: ({ id }: { id: string }) => ({
       id,
       title: 'Trail Runner Pro',
-      price: withDiscount ? 99.99 : 129.99,
+      price: 129.99,
       inStock: true,
       category: { id: 'cat_footwear', name: 'Footwear' },
     }),
@@ -71,15 +71,15 @@ await (async () => {
   const op = parsed.definitions?.find((d: any) => d.kind === 'OperationDefinition');
   const varNames = (op?.variableDefinitions || []).map((v: any) => v.variable?.name?.value);
 
-  // Case 2: Operation named GetProduct and declares $id and $withDiscount
+  // Case 2: Operation named GetProduct and declares $id
   $test.check(
     case2,
-    op?.name?.value === 'GetProduct' && varNames.includes('id') && varNames.includes('withDiscount'),
+    op?.name?.value === 'GetProduct' && varNames.includes('id'),
     { operationName: op?.name?.value, variables: varNames }
   );
 
   // Case 3: Returns product and nested category
-  const res3 = await runSafe({ id: 'prod_42', withDiscount: false });
+  const res3 = await runSafe({ id: 'prod_42' });
   const p = res3.data?.product;
   $test.check(
     case3,
@@ -101,4 +101,3 @@ await (async () => {
     { errors: res4.errors }
   );
 })();
-

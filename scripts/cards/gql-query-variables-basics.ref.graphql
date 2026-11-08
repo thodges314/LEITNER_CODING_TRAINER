@@ -1,5 +1,5 @@
-query GetProduct($id: ID!, $withDiscount: Boolean) {
-  product(id: $id, withDiscount: $withDiscount) {
+query GetProduct($id: ID!) {
+  product(id: $id) {
     id
     title
     price

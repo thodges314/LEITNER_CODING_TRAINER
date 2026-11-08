@@ -56,12 +56,12 @@ export default {
     ),
     r(
       'Executes GetProduct operation with required $id variable',
-      'query GetProduct($id: ID!, $withDiscount: Boolean)',
+      'query GetProduct($id: ID!)',
       'Operation named GetProduct with variable $id: ID!'
     ),
     r(
       'Selects product title, price, inStock, and nested category fields',
-      'graphql({ variableValues: { id: "prod_42", withDiscount: false } })',
+      'graphql({ variableValues: { id: "prod_42" } })',
       '{ data: { product: { id: "prod_42", title: "Trail Runner Pro", price: 129.99, inStock: true, category: { id: "cat_footwear", name: "Footwear" } } } }'
     ),
     r(

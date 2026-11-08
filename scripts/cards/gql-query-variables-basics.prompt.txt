@@ -1,8 +1,8 @@
-Write a GraphQL query named `GetProduct` that accepts variables `$id: ID!` and `$withDiscount: Boolean`.
+Write a GraphQL query named `GetProduct` that accepts a required variable `$id: ID!`.
 
 ### Requirements
-- Operation signature: `query GetProduct($id: ID!, $withDiscount: Boolean)`
-- Top-level field: `product(id: $id, withDiscount: $withDiscount)`
+- Operation signature: `query GetProduct($id: ID!)`
+- Top-level field: `product(id: $id)`
 - Fields to select on `product`:
   - `id`
   - `title`
@@ -13,7 +13,7 @@ Write a GraphQL query named `GetProduct` that accepts variables `$id: ID!` and `
 ### Schema Context
 ```graphql
 type Query {
-  product(id: ID!, withDiscount: Boolean): Product
+  product(id: ID!): Product
 }
 type Category {
   id: ID!
@@ -29,7 +29,7 @@ type Product {
 ```
 
 ### Example
-When executed with variables `{ id: "prod_42", withDiscount: false }`, returns:
+When executed with variables `{ id: "prod_42" }`, returns:
 ```json
 {
   "product": {
@@ -41,4 +41,3 @@ When executed with variables `{ id: "prod_42", withDiscount: false }`, returns:
   }
 }
 ```
-
