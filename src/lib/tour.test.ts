@@ -34,9 +34,9 @@ describe('catalog tour steps', () => {
 });
 
 describe('arena tour steps', () => {
-  it('has 5 steps with unique ids and real copy', () => {
-    expect(ARENA_TOUR_STEPS).toHaveLength(5);
-    expect(new Set(ARENA_TOUR_STEPS.map((s) => s.id)).size).toBe(5);
+  it('has 7 steps with unique ids and real copy', () => {
+    expect(ARENA_TOUR_STEPS).toHaveLength(7);
+    expect(new Set(ARENA_TOUR_STEPS.map((s) => s.id)).size).toBe(7);
     for (const s of ARENA_TOUR_STEPS) {
       expect(s.title.length, s.id).toBeGreaterThan(3);
       expect(s.body.length, s.id).toBeGreaterThan(30);
@@ -51,8 +51,8 @@ describe('arena tour steps', () => {
     }
   });
 
-  it('exactly one step is a centered note (no anchor)', () => {
-    expect(ARENA_TOUR_STEPS.filter((s) => s.anchors.length === 0).map((s) => s.id)).toEqual(['next']);
+  it('exactly two steps are centered notes without anchors', () => {
+    expect(ARENA_TOUR_STEPS.filter((s) => s.anchors.length === 0).map((s) => s.id)).toEqual(['next', 'ai-review']);
   });
 
   it('the first step spotlights the problem description together with the contract table', () => {
@@ -63,15 +63,15 @@ describe('arena tour steps', () => {
 describe('availableSteps', () => {
   it('drops steps whose anchor is not on the page and keeps anchor-less steps', () => {
     const onPage = new Set([tourAnchorSelector('editor'), tourAnchorSelector('settings')]);
-    expect(availableSteps(ARENA_TOUR_STEPS, (sel) => onPage.has(sel)).map((s) => s.id)).toEqual(['editor', 'next', 'settings']);
+    expect(availableSteps(ARENA_TOUR_STEPS, (sel) => onPage.has(sel)).map((s) => s.id)).toEqual(['editor', 'next', 'ai-review', 'settings']);
   });
   it('keeps a multi-anchor step when at least one of its anchors is on the page', () => {
     const onlyContract = new Set([tourAnchorSelector('contract')]);
-    expect(availableSteps(ARENA_TOUR_STEPS, (sel) => onlyContract.has(sel)).map((s) => s.id)).toEqual(['contract', 'next']);
+    expect(availableSteps(ARENA_TOUR_STEPS, (sel) => onlyContract.has(sel)).map((s) => s.id)).toEqual(['contract', 'next', 'ai-review']);
   });
   it('keeps everything when every anchor exists, and only the note when none do', () => {
-    expect(availableSteps(ARENA_TOUR_STEPS, () => true)).toHaveLength(5);
-    expect(availableSteps(ARENA_TOUR_STEPS, () => false).map((s) => s.id)).toEqual(['next']);
+    expect(availableSteps(ARENA_TOUR_STEPS, () => true)).toHaveLength(7);
+    expect(availableSteps(ARENA_TOUR_STEPS, () => false).map((s) => s.id)).toEqual(['next', 'ai-review']);
     expect(availableSteps(CATALOG_TOUR_STEPS, () => true)).toHaveLength(7);
   });
 });

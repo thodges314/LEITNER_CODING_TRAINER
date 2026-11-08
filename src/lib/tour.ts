@@ -22,7 +22,7 @@ export const CATALOG_TOUR_STEPS: TourStep[] = [
   },
   {
     id: 'deck-selector',
-    anchors: ['deck-selector'],
+    anchors: ['deck-selector', 'deck-dropdown'],
     title: '3. Study Decks & Preset Curricula',
     body: 'The trainer comes pre-loaded with focused preset decks (like Frontend Specialist, React Architect, or Algorithm Fundamentals), and lets you build your own custom decks. If a card does not fit your current study goals, you can remove it from your active deck at any time using the remove button on the far right of any row, or directly from the practice arena.',
   },
@@ -60,28 +60,40 @@ export const ARENA_TOUR_STEPS: TourStep[] = [
     body: 'The description says what to build. The table under it lists the exact calls and the output your code must produce: these are the checks your answer is graded on.',
   },
   {
+    id: 'ai-clarification',
+    anchors: ['ai-clarification', 'ai-clarification-panel'],
+    title: '2. Question Context & Socratic Hints',
+    body: 'Need extra clarity or background on a challenge before you write code? Click the question mark icon in the top-right corner of the problem description. It opens a Socratic AI coach where you can ask clarifying questions, explore edge cases, or request high-level conceptual hints without spoiling the implementation.',
+  },
+  {
     id: 'editor',
     anchors: ['editor'],
-    title: '2. Solve it yourself',
+    title: '3. Solve it yourself',
     body: 'The editor starts nearly empty on purpose: no autocomplete, no hints. Working the pattern out unaided is what makes it stick.',
   },
   {
     id: 'actions',
     anchors: ['actions'],
-    title: '3. Check, then submit',
-    body: 'Run Code / Test checks your work as often as you like and never counts. Submit Final Answer is your one scored attempt. Skip Card moves on.',
+    title: '4. Check, Submit & Deck Controls',
+    body: 'Run Code / Test checks your work as often as you like and never counts against your score. Submit Final Answer is your one graded attempt. Skip Card moves on to the next card.\n\nThe Remove From Deck button lets you drop cards that do not match your current goals. If you are practicing a built-in preset deck, clicking this will prompt you to create a custom deck with that card removed so your original preset remains unchanged.',
   },
   {
     id: 'next',
     anchors: [],
-    title: '4. One next step',
+    title: '5. One next step',
     body: 'After you submit there is exactly one button: continue, or, if you missed it, practice the pattern in a short unscored drill. Cards you miss come back sooner; cards you nail come back later.',
+  },
+  {
+    id: 'ai-review',
+    anchors: [],
+    title: '6. AI Dialogue & Solution Inquiries',
+    body: 'After submitting with an AI key connected, the AI coach reviews your code structure, checks algorithmic complexity, and uncovers subtle edge cases. You can ask follow-up questions directly on your critique to explore alternative solutions, clarify why a test failed, or ask for deep explanations of the canonical solution.',
   },
   {
     id: 'settings',
     anchors: ['settings'],
-    title: '5. Settings & AI Reviews',
-    body: 'Add an AI key in Settings for written critiques, back up or export your progress, change the theme, and review keyboard shortcuts. You can replay either tour at any time from About.',
+    title: '7. Settings & AI Keys',
+    body: 'Add an AI key in Settings for written critiques and Socratic assistance, back up or export your progress, change the theme, and review keyboard shortcuts. You can replay either tour at any time from About.',
   },
 ];
 

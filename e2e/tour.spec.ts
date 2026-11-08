@@ -3,17 +3,26 @@ import type { Page } from '@playwright/test';
 
 const tourDialog = (page: Page) => page.getByRole('dialog', { name: 'Guided tour' });
 
-/** The spotlight box must fully surround the element carrying data-tour="<anchor>". */
+/** At least one spotlight box must fully surround the element carrying data-tour="<anchor>". */
 async function expectSpotlightAround(page: Page, anchor: string) {
-  const spot = page.getByTestId('tour-spotlight');
-  await expect(spot).toBeVisible();
+  const target = page.locator(`[data-tour="${anchor}"]`);
+  await expect(target).toBeVisible();
+  const spots = page.getByTestId('tour-spotlight');
+  await expect(spots.first()).toBeVisible();
   await expect
     .poll(async () => {
-      const t = await page.locator(`[data-tour="${anchor}"]`).boundingBox();
-      const s = await spot.boundingBox();
-      if (!t || !s) return false;
-      const tol = 2;
-      return s.x <= t.x + tol && s.y <= t.y + tol && s.x + s.width >= t.x + t.width - tol && s.y + s.height >= t.y + t.height - tol;
+      const t = await target.boundingBox();
+      if (!t) return false;
+      const count = await spots.count();
+      const tol = 3;
+      for (let i = 0; i < count; i++) {
+        const s = await spots.nth(i).boundingBox();
+        if (!s) continue;
+        if (s.x <= t.x + tol && s.y <= t.y + tol && s.x + s.width >= t.x + t.width - tol && s.y + s.height >= t.y + t.height - tol) {
+          return true;
+        }
+      }
+      return false;
     }, { message: `spotlight should surround [data-tour="${anchor}"]` })
     .toBe(true);
 }
@@ -47,8 +56,10 @@ test.describe('guided tour', () => {
     await next();
     await expect(tour).toContainText('Step 3 of 7');
     await expect(tour).toContainText('Study Decks & Preset Curricula');
-    await expectSpotlightAround(page, 'deck-selector');
     await expect(page.getByTestId('deck-dropdown-menu')).toBeVisible();
+    await expectSpotlightAround(page, 'deck-selector');
+    await expectSpotlightAround(page, 'deck-dropdown');
+    await expect(page.getByTestId('tour-spotlight')).toHaveCount(1);
 
     // Step 4: AI Interview Strategy & Privacy
     await next();
@@ -78,32 +89,51 @@ test.describe('guided tour', () => {
     await tour.getByRole('button', { name: 'Finish' }).click();
     await expect(tourDialog(page)).toHaveCount(0);
 
-    // Launch Practice Arena: first visit auto-triggers the 5-step arena tour
+    // Launch Practice Arena: first visit auto-triggers the 7-step arena tour
     await page.getByRole('button', { name: /Resume Practice Arena/i }).click();
     await expect(tourDialog(page)).toBeVisible();
-    await expect(tour).toContainText('Step 1 of 5');
+    await expect(tour).toContainText('Step 1 of 7');
     await expect(tour).toContainText('Read the problem and its contract');
     await expectSpotlightAround(page, 'problem');
     await expectSpotlightAround(page, 'contract');
 
+    // Step 2: Question Context & Socratic Hints (Socratic panel opens automatically)
     await next();
-    await expect(tour).toContainText('Step 2 of 5');
+    await expect(tour).toContainText('Step 2 of 7');
+    await expect(tour).toContainText('Question Context & Socratic Hints');
+    await expect(page.getByTestId('socratic-assistant-panel')).toBeVisible();
+    await expectSpotlightAround(page, 'ai-clarification-panel');
+    await expect(page.getByTestId('tour-spotlight')).toHaveCount(1);
+
+    // Step 3: Solve it yourself
+    await next();
+    await expect(tour).toContainText('Step 3 of 7');
     await expect(tour).toContainText('Solve it yourself');
     await expectSpotlightAround(page, 'editor');
 
+    // Step 4: Check, Submit & Deck Controls (Remove From Deck prompt)
     await next();
-    await expect(tour).toContainText('Step 3 of 5');
-    await expect(tour).toContainText('Submit Final Answer');
+    await expect(tour).toContainText('Step 4 of 7');
+    await expect(tour).toContainText('Check, Submit & Deck Controls');
+    await expect(tour).toContainText('Remove From Deck');
     await expectSpotlightAround(page, 'actions');
 
+    // Step 5: One next step (centered note)
     await next();
-    await expect(tour).toContainText('Step 4 of 5');
+    await expect(tour).toContainText('Step 5 of 7');
     await expect(tour).toContainText('One next step');
     await expect(page.getByTestId('tour-spotlight')).toHaveCount(0);
 
+    // Step 6: AI Dialogue & Solution Inquiries (centered note)
     await next();
-    await expect(tour).toContainText('Step 5 of 5');
-    await expect(tour).toContainText('Settings & AI Reviews');
+    await expect(tour).toContainText('Step 6 of 7');
+    await expect(tour).toContainText('AI Dialogue & Solution Inquiries');
+    await expect(page.getByTestId('tour-spotlight')).toHaveCount(0);
+
+    // Step 7: Settings & AI Keys
+    await next();
+    await expect(tour).toContainText('Step 7 of 7');
+    await expect(tour).toContainText('Settings & AI Keys');
     await expectSpotlightAround(page, 'settings');
 
     await tour.getByRole('button', { name: 'Finish' }).click();

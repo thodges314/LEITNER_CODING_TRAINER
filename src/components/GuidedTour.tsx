@@ -13,42 +13,99 @@ const TOOLTIP_WIDTH = 380;
 const TOOLTIP_HEIGHT_ESTIMATE = 280;
 
 /**
- * The spotlight rectangle covering all the anchors of a step that are on the page, as a short string (a stable value
- * for useSyncExternalStore), or '' if there is nothing to point at.
+ * The spotlight rectangles covering all the anchors of a step that are on the page, as a string
+ * (a stable value for useSyncExternalStore), or '' if there is nothing to point at.
  */
-function readBox(anchors: string[]): string {
-  let top = Infinity;
-  let left = Infinity;
-  let right = -Infinity;
-  let bottom = -Infinity;
-  for (const anchor of anchors) {
+function readBoxes(step: TourStep | null): Box[] {
+  if (!step) return [];
+
+  // Special case 1: deck-selector step - wrap both deck-selector and deck-dropdown in ONE large highlight box with margin
+  if (step.id === 'deck-selector') {
+    const selEl = document.querySelector(tourAnchorSelector('deck-selector'));
+    const dropEl = document.querySelector(tourAnchorSelector('deck-dropdown'));
+    if (selEl && dropEl) {
+      const r1 = selEl.getBoundingClientRect();
+      const r2 = dropEl.getBoundingClientRect();
+      if (r1.width > 0 && r2.width > 0) {
+        const MARGIN = 10;
+        const top = Math.min(r1.top, r2.top) - MARGIN;
+        const left = Math.min(r1.left, r2.left) - MARGIN;
+        const right = Math.max(r1.right, r2.right) + MARGIN;
+        const bottom = Math.max(r1.bottom, r2.bottom) + MARGIN;
+        return [{
+          top: Math.round(top),
+          left: Math.round(left),
+          width: Math.round(right - left),
+          height: Math.round(bottom - top),
+        }];
+      }
+    }
+  }
+
+  // Special case 2: ai-clarification step - if the panel is open, only highlight the open panel, not the question mark
+  if (step.id === 'ai-clarification') {
+    const panelEl = document.querySelector(tourAnchorSelector('ai-clarification-panel'));
+    if (panelEl) {
+      const r = panelEl.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        return [{
+          top: Math.round(r.top - PAD),
+          left: Math.round(r.left - PAD),
+          width: Math.round(r.width + PAD * 2),
+          height: Math.round(r.height + PAD * 2),
+        }];
+      }
+    }
+  }
+
+  // Default: calculate bounding box for each anchor
+  const boxes: Box[] = [];
+  for (const anchor of step.anchors) {
     const el = document.querySelector(tourAnchorSelector(anchor));
     if (!el) continue;
     const r = el.getBoundingClientRect();
-    top = Math.min(top, r.top);
-    left = Math.min(left, r.left);
-    right = Math.max(right, r.right);
-    bottom = Math.max(bottom, r.bottom);
+    if (r.width === 0 || r.height === 0) continue;
+    boxes.push({
+      top: Math.round(r.top - PAD),
+      left: Math.round(r.left - PAD),
+      width: Math.round(r.width + PAD * 2),
+      height: Math.round(r.height + PAD * 2),
+    });
   }
-  if (!Number.isFinite(top)) return '';
-  return [top - PAD, left - PAD, right - left + PAD * 2, bottom - top + PAD * 2].map(Math.round).join('|');
+  return boxes;
+}
+
+function readBoxesString(step: TourStep | null): string {
+  const boxes = readBoxes(step);
+  if (boxes.length === 0) return '';
+  return boxes.map((b) => `${b.top}|${b.left}|${b.width}|${b.height}`).join(';');
+}
+
+function parseBoxes(value: string): Box[] {
+  if (!value) return [];
+  return value.split(';').map((str) => {
+    const [top, left, width, height] = str.split('|').map(Number);
+    return { top, left, width, height };
+  });
 }
 
 function subscribe(onChange: () => void): () => void {
   window.addEventListener('resize', onChange);
   window.addEventListener('scroll', onChange, true);
   const poll = window.setInterval(onChange, 300); // catches layout shifts that fire no event (images, fonts, panels opening)
+  let observer: MutationObserver | null = null;
+  if (typeof document !== 'undefined' && document.body) {
+    observer = new MutationObserver(() => {
+      onChange();
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+  }
   return () => {
     window.removeEventListener('resize', onChange);
     window.removeEventListener('scroll', onChange, true);
     window.clearInterval(poll);
+    observer?.disconnect();
   };
-}
-
-function parseBox(value: string): Box | null {
-  if (!value) return null;
-  const [top, left, width, height] = value.split('|').map(Number);
-  return { top, left, width, height };
 }
 
 /**
@@ -68,32 +125,51 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ steps: initialSteps, onC
     if (trigger && trigger.getAttribute('aria-expanded') === 'true') {
       trigger.click();
     }
+    const socraticClose = document.querySelector<HTMLButtonElement>('[data-testid="socratic-assistant-close"]');
+    if (socraticClose) {
+      socraticClose.click();
+    }
     onClose();
   }, [onClose]);
 
-  // If entering the deck-selector step, automatically pop open the dropdown
+  // Dropdown & Socratic panel toggles
   useEffect(() => {
+    // 1. Deck selector dropdown
+    const trigger = document.querySelector<HTMLButtonElement>('[data-testid="deck-dropdown-trigger"]');
     if (step?.id === 'deck-selector') {
-      const trigger = document.querySelector<HTMLButtonElement>('[data-testid="deck-dropdown-trigger"]');
       if (trigger && trigger.getAttribute('aria-expanded') !== 'true') {
         trigger.click();
         window.dispatchEvent(new Event('resize'));
       }
     } else {
-      const trigger = document.querySelector<HTMLButtonElement>('[data-testid="deck-dropdown-trigger"]');
       if (trigger && trigger.getAttribute('aria-expanded') === 'true') {
         trigger.click();
         window.dispatchEvent(new Event('resize'));
       }
     }
+
+    // 2. Socratic Clarification panel
+    if (step?.id === 'ai-clarification') {
+      const socraticBtn = document.querySelector<HTMLButtonElement>('[data-tour="ai-clarification"]');
+      if (socraticBtn && socraticBtn.getAttribute('aria-expanded') !== 'true') {
+        socraticBtn.click();
+        window.dispatchEvent(new Event('resize'));
+      }
+    } else {
+      const socraticClose = document.querySelector<HTMLButtonElement>('[data-testid="socratic-assistant-close"]');
+      if (socraticClose) {
+        socraticClose.click();
+        window.dispatchEvent(new Event('resize'));
+      }
+    }
   }, [step?.id]);
 
-  const boxValue = useSyncExternalStore(
+  const boxesValue = useSyncExternalStore(
     subscribe,
-    () => readBox(step ? step.anchors : []),
+    () => readBoxesString(step ?? null),
     () => ''
   );
-  const box = parseBox(boxValue);
+  const boxes = parseBoxes(boxesValue);
 
   const [tipHeight, setTipHeight] = useState(TOOLTIP_HEIGHT_ESTIMATE);
 
@@ -109,6 +185,13 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ steps: initialSteps, onC
   // Bring the target into view when the step changes.
   useLayoutEffect(() => {
     if (step) {
+      if (step.id === 'catalog-table') {
+        const el = document.querySelector(tourAnchorSelector('catalog-table'));
+        if (el) {
+          el.scrollIntoView({ block: 'start', behavior: 'auto' });
+        }
+        return;
+      }
       const first = step.anchors.map((a) => document.querySelector(tourAnchorSelector(a))).find((el) => el !== null);
       if (first) {
         const rect = first.getBoundingClientRect();
@@ -152,29 +235,79 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ steps: initialSteps, onC
 
   if (!step) return null;
 
-  const placement = placeTooltip(box, { width: TOOLTIP_WIDTH, height: tipHeight }, { width: window.innerWidth, height: window.innerHeight });
+  let placement = placeTooltip(
+    boxes[0] ?? null,
+    { width: TOOLTIP_WIDTH, height: tipHeight },
+    { width: window.innerWidth, height: window.innerHeight }
+  );
+
+  // Position overrides so floating menus/drawers remain unobstructed
+  if (step?.id === 'deck-selector') {
+    const selEl = document.querySelector(tourAnchorSelector('deck-selector'));
+    const sRect = selEl?.getBoundingClientRect();
+    if (sRect) {
+      placement = {
+        top: Math.min(window.innerHeight - tipHeight - 16, sRect.bottom + 14),
+        left: Math.max(16, sRect.left + 16),
+      };
+    }
+  } else if (step?.id === 'ai-clarification') {
+    const problemEl = document.querySelector('[data-tour="problem"]');
+    const pRect = problemEl ? problemEl.getBoundingClientRect() : boxes[0];
+    if (pRect) {
+      placement = {
+        top: Math.min(window.innerHeight - tipHeight - 16, Math.max(16, pRect.top + 40)),
+        left: Math.max(16, pRect.left + 16),
+      };
+    }
+  } else if (step?.id === 'catalog-table' && boxes[0]) {
+    placement = {
+      top: Math.max(16, Math.min(window.innerHeight - tipHeight - 20, Math.max(80, boxes[0].top + 60))),
+      left: Math.max(16, (window.innerWidth - TOOLTIP_WIDTH) / 2),
+    };
+  }
 
   return createPortal(
     <div data-testid="guided-tour" style={{ position: 'fixed', inset: 0, zIndex: 3000 }}>
       {/* Blocks clicks on the page behind the tour. */}
       <div style={{ position: 'absolute', inset: 0 }} aria-hidden="true" />
-      {box ? (
-        <div
-          data-testid="tour-spotlight"
+      {boxes.length > 0 ? (
+        <svg
           aria-hidden="true"
-          style={{
-            position: 'fixed',
-            top: box.top,
-            left: box.left,
-            width: box.width,
-            height: box.height,
-            borderRadius: '10px',
-            border: '2px solid var(--accent-primary, #38bdf8)',
-            boxShadow: '0 0 0 9999px rgba(2, 6, 23, 0.72)',
-            pointerEvents: 'none',
-            transition: 'top 0.18s ease, left 0.18s ease, width 0.18s ease, height 0.18s ease',
-          }}
-        />
+          style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 3000 }}
+        >
+          <defs>
+            <mask id="tour-cutout">
+              <rect x="0" y="0" width="100%" height="100%" fill="white" />
+              {boxes.map((b, i) => (
+                <rect
+                  key={i}
+                  x={b.left}
+                  y={b.top}
+                  width={b.width}
+                  height={b.height}
+                  rx="8"
+                  fill="black"
+                />
+              ))}
+            </mask>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill="rgba(2, 6, 23, 0.72)" mask="url(#tour-cutout)" />
+          {boxes.map((b, i) => (
+            <rect
+              key={i}
+              data-testid="tour-spotlight"
+              x={b.left}
+              y={b.top}
+              width={b.width}
+              height={b.height}
+              rx="8"
+              fill="none"
+              stroke="var(--accent-primary, #38bdf8)"
+              strokeWidth="2"
+            />
+          ))}
+        </svg>
       ) : (
         <div aria-hidden="true" style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(2, 6, 23, 0.72)', pointerEvents: 'none' }} />
       )}
