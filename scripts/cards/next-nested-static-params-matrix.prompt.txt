@@ -1,0 +1,45 @@
+Implement nested static parameter matrix generation for Next.js App Router catch-all dynamic routes:
+
+## Description
+
+### Application Context
+In a Next.js 15 documentation or CMS portal (`app/[category]/[...slug]/page.tsx`), static export generation (`output: 'export'`) requires `generateStaticParams()` to return an array of route parameters covering all valid parent/child route permutations. When dynamic segments are nested alongside catch-all routes (`[...slug]`), the generator must compute the full Cartesian product of top-level category segments paired with all recursive subpage path arrays.
+
+```ts
+interface ArticleNode {
+  slug: string;
+  subpages?: ArticleNode[];
+}
+
+interface CategoryTree {
+  category: string;
+  articles: ArticleNode[];
+}
+
+interface RouteParams {
+  category: string;
+  slug: string[];
+}
+```
+
+### `generateStaticParams(categories: CategoryTree[]): Promise<RouteParams[]>`
+
+Traverses the hierarchical category forest and returns a Promise resolving to the complete matrix of static route param objects:
+
+- **Slug Path Accumulation**:
+  - For each article, generates its individual path segment array relative to its parent hierarchy.
+  - A root article with `slug: "quickstart"` produces `slug: ["quickstart"]`.
+  - If that article contains nested `subpages` (e.g. `slug: "installation"`), it generates both `["quickstart"]` and the descendant path `["quickstart", "installation"]`.
+  - Recurses to arbitrary nested subpage depths.
+- **Cartesian Product Pairing**:
+  - Each valid descendant path array is paired with its trimmed parent `category` segment.
+  - Example: Category `"guides"` with article `"auth"` having subpage `"oauth"` yields:
+    - `{ category: "guides", slug: ["auth"] }`
+    - `{ category: "guides", slug: ["auth", "oauth"] }`
+- **Normalization & Invariants**:
+  - Trims and URI-decodes all category and slug strings (e.g. `"api%20reference"` -> `"api reference"`).
+  - Skips empty, missing, or whitespace-only category strings.
+  - Skips any article node with empty, missing, or whitespace-only slug strings.
+  - If a category has no valid articles or `categories` is empty, produces no entries for that category.
+  - Returns a Promise resolving to `RouteParams[]`.
+

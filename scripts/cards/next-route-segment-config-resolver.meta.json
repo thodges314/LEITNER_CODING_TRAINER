@@ -1,0 +1,14 @@
+{
+  "title": "Next.js App Router: Route Segment Config & Cache Inheritance Resolver",
+  "track": "nextjs",
+  "tags": [
+    "nextjs",
+    "app-router",
+    "route-segment-config",
+    "caching",
+    "revalidate",
+    "static-analysis"
+  ],
+  "requiresDom": false
+}
+

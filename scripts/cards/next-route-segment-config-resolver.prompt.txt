@@ -1,0 +1,64 @@
+Implement the Next.js App Router route segment configuration inheritance and caching resolver:
+
+## Description
+
+### Application Context
+In the Next.js App Router, developers configure caching, rendering mode, and data fetching behavior across route segments using exported route segment configuration options (`export const dynamic = ...`, `export const revalidate = ...`, `export const fetchCache = ...`). When a page renders inside nested layouts (`app/layout.tsx` -> `app/dashboard/layout.tsx` -> `app/dashboard/page.tsx`), Next.js evaluates segment options in a hierarchical chain. The build pipeline resolves the effective runtime caching behavior, calculates the lowest shared revalidation frequency, and detects conflicting inheritance constraints.
+
+```ts
+type DynamicOption = 'auto' | 'force-dynamic' | 'error' | 'force-static';
+type RevalidateOption = false | 0 | number;
+type FetchCacheOption =
+  | 'auto'
+  | 'default-cache'
+  | 'only-cache'
+  | 'force-cache'
+  | 'force-no-store'
+  | 'default-no-store'
+  | 'only-no-store';
+
+interface SegmentConfig {
+  segmentPath: string;
+  dynamic?: DynamicOption;
+  revalidate?: RevalidateOption;
+  fetchCache?: FetchCacheOption;
+}
+
+interface ResolvedRouteConfig {
+  effectiveDynamic: DynamicOption;
+  effectiveRevalidate: RevalidateOption;
+  effectiveFetchCache: FetchCacheOption;
+  routeMode: 'static' | 'isr' | 'dynamic';
+  hasConflict: boolean;
+  conflictReason?: string;
+}
+```
+
+### `resolveRouteSegmentConfig(segments: SegmentConfig[]): ResolvedRouteConfig`
+
+Analyzes an ordered segment inheritance hierarchy (`[rootLayout, ...intermediateLayouts, page]`) and computes the effective route configuration:
+
+- **Inheritance Resolution**:
+  - `effectiveDynamic`:
+    - Defaults to `'auto'`.
+    - If any segment specifies `'force-dynamic'`, the effective dynamic setting becomes `'force-dynamic'`.
+    - If no segment specifies `'force-dynamic'` and a segment specifies `'force-static'`, it becomes `'force-static'`.
+    - If neither, inherits the last defined explicit option (or `'auto'`).
+  - `effectiveRevalidate`:
+    - Defaults to `false` (infinite / build-time static cache).
+    - If `0` appears in any segment, the effective revalidate is `0` (dynamic per-request).
+    - If multiple segments specify positive numbers (e.g. Layout specifies `300`, Page specifies `60`), the **minimum** positive number applies to the entire route (e.g. `60`).
+  - `effectiveFetchCache`:
+    - Defaults to `'auto'`.
+    - Options starting with `'force-'` take highest precedence (e.g. `'force-no-store'` or `'force-cache'`).
+    - Otherwise, inherits the last explicitly declared option across the segment chain.
+- **Route Mode Classification**:
+  - `'dynamic'`: If `effectiveDynamic === 'force-dynamic'`, or `effectiveRevalidate === 0`, or `effectiveFetchCache === 'force-no-store'`.
+  - `'isr'`: If not dynamic, and `typeof effectiveRevalidate === 'number'` with `effectiveRevalidate > 0`.
+  - `'static'`: Otherwise.
+- **Conflict Detection**:
+  - Flags `hasConflict: true` with an explanatory `conflictReason` string if:
+    - Any segment specifies `dynamic: 'force-static'` while another specifies `dynamic: 'force-dynamic'`.
+    - `dynamic: 'force-static'` is combined with `revalidate: 0` or `fetchCache: 'force-no-store'`.
+  - If no conflict occurs: `hasConflict: false` and `conflictReason: undefined`.
+

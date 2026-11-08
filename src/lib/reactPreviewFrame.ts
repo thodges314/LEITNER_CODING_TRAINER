@@ -597,6 +597,13 @@ ${libScripts.join('\n')}
           ])
         ]);
       };
+
+      window.Script = function Script(props) {
+        return React.createElement('script', Object.assign({
+          'data-next-script': 'true',
+          'data-strategy': props.strategy || 'afterInteractive',
+        }, props));
+      };
     }
 
     // Safe mock shims for $dom, $test, and mount so that any test harness code
@@ -870,6 +877,7 @@ ${libScripts.join('\n')}
           }
           if (mod === 'next/link') return { default: window.Link, Link: window.Link };
           if (mod === 'next/image') return { default: window.Image, Image: window.Image };
+          if (mod === 'next/script') return { default: window.Script, Script: window.Script };
           if (mod === 'next/navigation') {
             return {
               useRouter: window.useRouter,

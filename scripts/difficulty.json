@@ -1623,6 +1623,26 @@
     "difficulty": 3,
     "concept": "next-intercepting-routes"
   },
+  "next-nested-static-params-matrix": {
+    "difficulty": 4,
+    "concept": "next-static-params"
+  },
+  "next-optimistic-action-mutation": {
+    "difficulty": 4,
+    "concept": "next-optimistic-ui"
+  },
+  "next-route-segment-config-resolver": {
+    "difficulty": 4,
+    "concept": "next-route-segment-config"
+  },
+  "next-after-lifecycle-deferred": {
+    "difficulty": 5,
+    "concept": "next-after-api"
+  },
+  "next-ppr-streaming-boundaries": {
+    "difficulty": 5,
+    "concept": "next-ppr-streaming"
+  },
   "promise-waterfall-pipeline": {
     "difficulty": 2,
     "concept": "async-control"

@@ -1736,6 +1736,34 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     { name: 'photoId', type: 'string', defaultValue: 'photo_42', placeholder: 'Photo ID', description: 'Photo ID displayed in modal' },
     { name: 'photoUrl', type: 'string', defaultValue: 'https://www.leitnercoding.dev/Mountains.jpeg', placeholder: 'Photo URL', description: 'Photo URL displayed in modal' },
   ],
+  'next-optimistic-action-mutation': [
+    { name: 'simulateFailure', type: 'boolean', defaultValue: false, description: 'Simulate Server Action failure to trigger automatic rollback' },
+    { name: 'latencyMs', type: 'number', defaultValue: 600, min: 100, max: 2000, step: 100, description: 'Simulated network latency in milliseconds' },
+  ],
+  'next-ppr-streaming-boundaries': [
+    { name: 'inventoryDelay', type: 'number', defaultValue: 800, min: 100, max: 3000, step: 100, description: 'Inventory streaming delay in milliseconds' },
+    { name: 'reviewsDelay', type: 'number', defaultValue: 1600, min: 100, max: 5000, step: 200, description: 'Reviews streaming delay in milliseconds' },
+    { name: 'stockCount', type: 'number', defaultValue: 14, min: 0, max: 100, step: 1, description: 'Available warehouse stock count' },
+    { name: 'lowStockAlert', type: 'boolean', defaultValue: false, description: 'Trigger low stock warning badge' },
+  ],
+  'next-layout-template-composition': [
+    {
+      name: 'pathname',
+      type: 'enum',
+      defaultValue: '/dashboard/analytics',
+      options: ['/dashboard/analytics', '/dashboard/settings', '/dashboard/billing'],
+      description: 'Active dashboard route segment triggering template remount',
+    },
+  ],
+  'next-script-strategies': [
+    {
+      name: 'analyticsId',
+      type: 'string',
+      defaultValue: 'UA-998877',
+      placeholder: 'Analytics Property ID',
+      description: 'Tracking property ID passed to afterInteractive script',
+    },
+  ],
 };
 
 export function getComponentPropsConfig(cardId: string): PropDefinition[] {

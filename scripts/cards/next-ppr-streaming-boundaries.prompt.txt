@@ -1,0 +1,71 @@
+# Next.js Streaming & Partial Prerendering (PPR) Architecture
+
+## Description
+Next.js App Router Partial Prerendering (PPR) combines instant static shell delivery with dynamic Server Component streaming. The static layout shell (product title, category, price, and media container) renders immediately from the edge cache, while dynamic components (real-time warehouse inventory and customer reviews) stream independently inside decoupled `Suspense` boundaries without blocking one another.
+
+Implement an App Router page component `ProductPPRPage` that renders a static product shell immediately and wraps independent dynamic data streams (`inventoryPromise` and `reviewsPromise`) in dedicated `<Suspense>` boundaries using `React.use()` and `<Suspense>`.
+
+```ts
+interface ProductData {
+  id: string;
+  title: string;
+  category: string;
+  price: number;
+}
+
+interface InventoryStatusData {
+  stockCount: number;
+  warehouse: string;
+  lowStockAlert: boolean;
+}
+
+interface ReviewItem {
+  id: string;
+  author: string;
+  rating: number;
+  comment: string;
+}
+
+interface ProductPPRPageProps {
+  product: ProductData;
+  inventoryPromise: Promise<InventoryStatusData>;
+  reviewsPromise: Promise<ReviewItem[]>;
+}
+```
+
+### ProductPPRPage(props: ProductPPRPageProps): React.ReactElement
+
+#### Requirements
+1. **App Router Page Boundary Declaration**:
+   - Declare `ProductPPRPage` using a standard `function` declaration (`function ProductPPRPage(...)`), matching the App Router boundary page convention.
+   - Internal helper stream components (`InventoryStream`, `ReviewsStream`) and skeleton fallbacks must be arrow functions (`const InventoryStream = (...) => ...`).
+2. **Static Shell Structure**:
+   - Container element must have `data-testid="static-product-shell"`.
+   - Render the static product details immediately on mount:
+     - `data-testid="product-title"`: `product.title`
+     - `data-testid="product-category"`: `product.category`
+     - `data-testid="product-price"`: formatted price with two decimals prefixed by `$` (e.g. `$189.00`).
+3. **Inventory Streaming Boundary**:
+   - Wrap dynamic inventory streaming in `<Suspense fallback={<InventorySkeleton />}>`.
+   - Fallback skeleton must have `data-testid="inventory-skeleton"` (e.g. containing `"Checking stock..."`).
+   - Stream component resolves `inventoryPromise` using `React.use(inventoryPromise)`.
+   - Render resolved container with `data-testid="inventory-status"`:
+     - If `status.lowStockAlert` is `true`, render text containing `"Only ${status.stockCount} left! (${status.warehouse})"`.
+     - Otherwise, render text containing `"${status.stockCount} in stock (${status.warehouse})"`.
+4. **Reviews Streaming Boundary**:
+   - Wrap dynamic customer reviews in a separate `<Suspense fallback={<ReviewsSkeleton />}>`.
+   - Fallback skeleton must have `data-testid="reviews-skeleton"` (e.g. containing `"Loading reviews..."`).
+   - Stream component resolves `reviewsPromise` using `React.use(reviewsPromise)`.
+   - Render resolved container with `data-testid="reviews-list"`:
+     - For each review in `reviews`, render an item element with `data-testid={`review-item-${review.id}`}` containing the author name, rating, and comment.
+     - If `reviews.length === 0`, render `<div data-testid="no-reviews">No reviews yet.</div>`.
+5. **Decoupled Isolation**:
+   - The two `Suspense` boundaries must be completely separate siblings so that slow reviews do not delay inventory rendering and slow inventory does not delay reviews.
+
+#### Optional Styling (CSS is not graded)
+Optional helper classes are available in the preview environment:
+- `.card-container`: Card surface with rounded borders and subtle shadow.
+- `.skeleton-pulse`: Animated shimmer effect for loading states.
+- `.badge-emerald`, `.badge-amber`: Semantic pill badges.
+You may use these classes, custom styles, or your own class names.
+

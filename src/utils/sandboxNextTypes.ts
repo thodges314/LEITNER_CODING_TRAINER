@@ -136,6 +136,7 @@ export const SANDBOX_NEXT_TYPES = `
   declare module 'next/server' {
     export import NextRequest = NextServer.NextRequest;
     export import NextResponse = NextServer.NextResponse;
+    export function after(task: (() => void | Promise<void>) | Promise<any>): void;
   }
 
   declare module 'next/cache' {
@@ -239,6 +240,10 @@ export const SANDBOX_NEXT_TYPES = `
   declare function setMockRouter(router: any): void;
   declare function setMockSearchParams(params: any): void;
   declare function UserBadge(props: { user: any }): React.ReactElement;
+  declare function after(task: (() => void | Promise<void>) | Promise<any>): void;
+  declare var scheduledAfterTasks: any[];
+  declare function flushAfterTasks(): Promise<void>;
+  declare function resetAfterTasks(): void;
   declare var articlesStore: Map<string, any>;
   declare var membersStore: Map<string, any>;
 

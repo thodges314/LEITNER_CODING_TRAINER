@@ -8,7 +8,7 @@ import {
 import { createMockFetch } from './mockFetch';
 import { createTestHelpers, classifyLogLine } from './testHelpers';
 import type { HarnessReport } from './testHelpers';
-import { NextResponse, NextRequest, revalidateTag, revalidatePath } from '../utils/nextSandbox';
+import { NextResponse, NextRequest, revalidateTag, revalidatePath, after, flushAfterTasks, resetAfterTasks } from '../utils/nextSandbox';
 
 export interface WorkerRunMessage {
   type: 'run';
@@ -142,7 +142,7 @@ self.onmessage = async (e: MessageEvent<WorkerRunMessage>) => {
         validate: validateGraphql,
       };
     }
-    if (mod === 'next/server') return { default: { NextResponse, NextRequest }, NextResponse, NextRequest };
+    if (mod === 'next/server') return { default: { NextResponse, NextRequest, after }, NextResponse, NextRequest, after };
     if (mod === 'next/cache') return { default: { revalidateTag, revalidatePath }, revalidateTag, revalidatePath };
     throw new Error(`Cannot find module '${mod}' in sandbox worker`);
   };
@@ -163,6 +163,9 @@ self.onmessage = async (e: MessageEvent<WorkerRunMessage>) => {
     'revalidatePath',
     'articlesStore',
     'membersStore',
+    'after',
+    'flushAfterTasks',
+    'resetAfterTasks',
   ];
 
   const sandboxValues = [
@@ -181,6 +184,9 @@ self.onmessage = async (e: MessageEvent<WorkerRunMessage>) => {
     revalidatePath,
     articlesStore,
     membersStore,
+    after,
+    flushAfterTasks,
+    resetAfterTasks,
   ];
 
   try {

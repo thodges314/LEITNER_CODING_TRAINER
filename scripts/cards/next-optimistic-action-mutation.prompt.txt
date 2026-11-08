@@ -1,0 +1,48 @@
+Implement optimistic UI state transitions with automatic Server Action rollback using React 19 `useOptimistic`:
+
+## Description
+
+### Application Context
+In Next.js 15 App Router applications, mutating data via Server Actions can cause perceived UI latency if the interface waits for the network roundtrip before reflecting user interaction. React 19's `useOptimistic` hook paired with `startTransition` enables instant UI updates that render optimistic pending states immediately and automatically revert to committed server state if the underlying Server Action fails or throws.
+
+```ts
+interface TodoItem {
+  id: string;
+  title: string;
+  completed: boolean;
+  isPending?: boolean;
+}
+
+interface TodoListOptimisticProps {
+  initialTodos: TodoItem[];
+  onToggleAction: (todoId: string, completed: boolean) => Promise<void>;
+}
+```
+
+### `const TodoListOptimistic = ({ initialTodos, onToggleAction }: TodoListOptimisticProps): React.ReactElement`
+
+An interactive client component (`'use client'`) that manages optimistic task completion:
+
+- **State Management**:
+  - Initializes committed state `todos` from `initialTodos`.
+  - Configures `useOptimistic(todos, (state, update: { id: string; completed: boolean }) => ...)`:
+    - Returns updated todo list where the matching `id` has `completed: update.completed` and `isPending: true`.
+  - Tracks optional `errorMessage` string state (initially `null`).
+- **Interaction & Transition (`handleToggle(id, currentCompleted)`)**:
+  - Clears any previous `errorMessage`.
+  - Wraps the update inside `React.startTransition(async () => { ... })`:
+    1. Synchronously dispatches optimistic update: `setOptimisticTodos({ id, completed: !currentCompleted })`.
+    2. Awaits `onToggleAction(id, !currentCompleted)`.
+    3. On success: commits state via `setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !currentCompleted } : t))`.
+    4. On error / rejection: catches error and sets `errorMessage: err.message || 'Failed to update todo'`, allowing `useOptimistic` to automatically roll back to the committed `todos` state.
+- **Render Output**:
+  - If `errorMessage` is set: renders `<div data-testid="optimistic-error" role="alert">{errorMessage}</div>`.
+  - Renders `<ul data-testid="todo-list">` with each optimistic todo item:
+    - `<li data-testid="todo-item-${todo.id}">`
+    - `<button type="button" data-testid="todo-toggle-${todo.id}">`:
+      - Shows text `"Completed"` if `todo.completed` is true, otherwise `"Pending"`.
+      - Has attribute `aria-pressed={todo.completed}`.
+      - Clicking triggers `handleToggle(todo.id, todo.completed)`.
+    - `<span data-testid="todo-title-${todo.id}">{todo.title}</span>`.
+    - If `todo.isPending` is true: renders `<span data-testid="pending-badge">Saving...</span>`.
+
