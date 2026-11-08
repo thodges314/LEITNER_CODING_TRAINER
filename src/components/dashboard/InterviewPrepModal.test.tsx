@@ -12,6 +12,7 @@ describe('InterviewPrepModal Component', () => {
 
   beforeEach(() => {
     localStorage.clear();
+    localStorage.setItem('leitner_ai_api_key', 'gsk_test_key_1234');
     container = document.createElement('div');
     document.body.appendChild(container);
     root = ReactDOMClient.createRoot(container);
@@ -238,5 +239,63 @@ describe('InterviewPrepModal Component', () => {
 
     // Verify draft was purged
     expect(localStorage.getItem('leitner_interview_prep_draft')).toBeNull();
+  });
+
+  it('greys out form and displays AI key banner when keyless while preserving drafts and existing dossiers', async () => {
+    localStorage.removeItem('leitner_ai_api_key');
+    localStorage.setItem(
+      'leitner_interview_prep_draft',
+      JSON.stringify({
+        company: 'Datadog',
+        role: 'Senior Frontend Engineer',
+        targetDate: '',
+        deckSizeMode: 'auto',
+        targetCardCount: 16,
+        rawNotes: 'Focus on D3 and high-cardinality telemetry.',
+        selectedWeaknesses: [],
+        syncBox1Cards: false,
+      })
+    );
+
+    const handleOpenSettings = vi.fn();
+    const handleClose = vi.fn();
+
+    await act(async () => {
+      root?.render(
+        <InterviewPrepModal
+          isOpen={true}
+          onClose={handleClose}
+          onCreateCustomDeck={vi.fn()}
+          onOpenSettings={handleOpenSettings}
+        />
+      );
+    });
+
+    // Keyless banner is displayed
+    const banner = document.querySelector('[data-testid="ai-prep-keyless-banner"]');
+    expect(banner).not.toBeNull();
+    expect(banner?.textContent).toContain('AI API Key Required');
+    expect(banner?.textContent).toContain('free API keys');
+    expect(banner?.textContent).toContain('openai/gpt-oss-120b');
+
+    // Draft values are still preserved in the greyed-out form
+    const fieldset = document.querySelector('fieldset.ai-prep-form-fieldset') as HTMLFieldSetElement;
+    expect(fieldset).not.toBeNull();
+    expect(fieldset.disabled).toBe(true);
+
+    const companyInput = document.querySelector('[data-testid="ai-prep-company-input"]') as HTMLInputElement;
+    expect(companyInput.value).toBe('Datadog');
+
+    const generateBtn = document.querySelector('[data-testid="ai-prep-generate-btn"]') as HTMLButtonElement;
+    expect(generateBtn.disabled).toBe(true);
+
+    // Clicking Configure AI Key opens settings to the AI section
+    const configBtn = document.querySelector('[data-testid="ai-prep-configure-key-btn"]') as HTMLButtonElement;
+    expect(configBtn).not.toBeNull();
+    await act(async () => {
+      configBtn.click();
+    });
+    expect(handleClose).toHaveBeenCalled();
+    expect(handleOpenSettings).toHaveBeenCalledWith('ai');
   });
 });

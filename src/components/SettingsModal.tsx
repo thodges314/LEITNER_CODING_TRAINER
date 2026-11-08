@@ -205,7 +205,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setStoredProvider(p);
     let defaultModel = model;
     if (p === 'gemini') defaultModel = 'gemini-2.5-flash';
-    else if (p === 'groq') defaultModel = 'llama-3.3-70b-versatile';
+    else if (p === 'groq') defaultModel = 'openai/gpt-oss-120b';
     else if (p === 'cerebras') defaultModel = 'llama3.3-70b';
     else if (p === 'mistral') defaultModel = 'codestral-latest';
     else if (p === 'anthropic') defaultModel = 'claude-3-5-sonnet-20241022';

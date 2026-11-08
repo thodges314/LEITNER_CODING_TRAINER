@@ -26,6 +26,8 @@ import {
   Upload,
   Pencil,
   Check,
+  KeyRound,
+  Settings,
 } from 'lucide-react';
 import { MarkdownContent } from '../MarkdownContent';
 import catalogIndexData from '../../data/catalogIndex.json';
@@ -43,6 +45,7 @@ import {
   type DossierMessage,
 } from '../../lib/interviewPrep';
 import {
+  getStoredApiKey,
   getStoredProvider,
   getStoredModel,
 } from '../../lib/ai';
@@ -143,6 +146,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   currentBox1CardIds = [],
   initialDossierId,
   initialStep,
+  onOpenSettings,
   onEditCustomDeck,
 }) => {
   // Saved briefings history
@@ -201,6 +205,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // AI Model info
+  const hasApiKey = Boolean(getStoredApiKey().trim());
   const activeProvider = getStoredProvider();
   const activeModel = getStoredModel();
 
@@ -210,10 +215,10 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (step === 'input') {
+    if (step === 'input' && hasApiKey) {
       companyInputRef.current?.focus();
     }
-  }, [step]);
+  }, [step, hasApiKey]);
 
   // Persist form draft as user edits so partial inputs are never lost on accidental modal close or refresh
   useEffect(() => {
@@ -938,7 +943,43 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
           {/* STEP 1: INPUT FORM */}
           {step === 'input' && (
             <form onSubmit={handleStartGeneration} className="ai-prep-form">
-              <div className="ai-prep-form-rows">
+              {!hasApiKey && (
+                <div className="ai-prep-keyless-banner" data-testid="ai-prep-keyless-banner" role="alert">
+                  <div className="ai-prep-keyless-banner-left">
+                    <div className="ai-prep-keyless-icon-wrap">
+                      <KeyRound size={17} />
+                    </div>
+                    <div className="ai-prep-keyless-text">
+                      <div className="ai-prep-keyless-title">
+                        AI API Key Required to Synthesize Strategy
+                      </div>
+                      <p className="ai-prep-keyless-desc">
+                        Add an API key in Settings to generate a custom interview prep curriculum. Several <strong>free API keys</strong> are available with no credit card required — we recommend <strong>Groq</strong> (<code>openai/gpt-oss-120b</code>) for ultra-fast responses or <strong>Google Gemini</strong> (<code>gemini-2.5-flash</code>).{savedDossiers.length > 0 ? ' Your saved briefings remain accessible above.' : ' You can also restore a saved .json backup above.'}
+                      </p>
+                    </div>
+                  </div>
+                  {onOpenSettings && (
+                    <button
+                      type="button"
+                      className="btn btn-primary ai-prep-configure-key-btn"
+                      onClick={() => {
+                        onClose();
+                        onOpenSettings('ai');
+                      }}
+                      data-testid="ai-prep-configure-key-btn"
+                    >
+                      <Settings size={14} />
+                      <span>Configure AI Key</span>
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <fieldset
+                disabled={!hasApiKey}
+                className={`ai-prep-form-fieldset ${!hasApiKey ? 'is-disabled' : ''}`}
+              >
+                <div className="ai-prep-form-rows">
                 {/* Row 1: Target Company (Full width) */}
                 <div className="ai-prep-form-row">
                   <label htmlFor="ai-prep-company" className="ai-prep-label">
@@ -1118,13 +1159,20 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 {/* Model & Provider Badge */}
                 <div className="ai-prep-provider-bar">
                   <div className="ai-prep-provider-badge">
-                    <span className="provider-dot" />
-                    <span>
-                      Active Model: <strong>{activeModel || activeProvider}</strong> ({activeProvider})
-                    </span>
+                    <span className={`provider-dot ${!hasApiKey ? 'is-offline' : ''}`} />
+                    {hasApiKey ? (
+                      <span>
+                        Active Model: <strong>{activeModel || activeProvider}</strong> ({activeProvider})
+                      </span>
+                    ) : (
+                      <span>
+                        No AI API key configured — connect a free key in Settings to enable synthesis
+                      </span>
+                    )}
                   </div>
                 </div>
-              </div>
+                </div>
+              </fieldset>
 
               {/* Actions */}
               <div className="modal-actions ai-prep-actions">
@@ -1139,6 +1187,7 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                 <button
                   type="submit"
                   className="btn btn-primary ai-prep-generate-btn"
+                  disabled={!hasApiKey}
                   data-testid="ai-prep-generate-btn"
                 >
                   <Sparkles size={15} />
@@ -1413,25 +1462,53 @@ const InterviewPrepModalDialog: React.FC<InterviewPrepModalProps> = ({
                   </div>
 
                   {/* Input form */}
+                  {!hasApiKey && (
+                    <div className="ai-prep-dialogue-keyless-bar" data-testid="ai-prep-dialogue-keyless-bar">
+                      <div className="ai-prep-dialogue-keyless-msg">
+                        <KeyRound size={14} />
+                        <span>
+                          Connect a free AI key in Settings (e.g. <strong>Groq</strong> or <strong>Gemini</strong>) to continue live coaching on this dossier.
+                        </span>
+                      </div>
+                      {onOpenSettings && (
+                        <button
+                          type="button"
+                          className="btn btn-outline ai-prep-dialogue-key-btn"
+                          onClick={() => {
+                            onClose();
+                            onOpenSettings('ai');
+                          }}
+                        >
+                          <Settings size={13} />
+                          <span>Configure AI Key</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
+                      if (!hasApiKey) return;
                       handleSendDialogueMessage();
                     }}
-                    className="dialogue-input-bar"
+                    className={`dialogue-input-bar ${!hasApiKey ? 'is-disabled' : ''}`}
                   >
                     <input
                       type="text"
                       className="dialogue-text-input"
-                      placeholder="Ask the coach to modify cards, explain drill choices, or report your progress..."
+                      placeholder={
+                        hasApiKey
+                          ? 'Ask the coach to modify cards, explain drill choices, or report your progress...'
+                          : 'AI API key required in Settings to chat with the AI Coach...'
+                      }
                       value={dialogueInput}
                       onChange={(e) => setDialogueInput(e.target.value)}
-                      disabled={isDialogueLoading}
+                      disabled={!hasApiKey || isDialogueLoading}
                     />
                     <button
                       type="submit"
                       className="dialogue-send-btn"
-                      disabled={isDialogueLoading || !dialogueInput.trim()}
+                      disabled={!hasApiKey || isDialogueLoading || !dialogueInput.trim()}
                       title="Send message to AI Coach"
                     >
                       {isDialogueLoading ? (

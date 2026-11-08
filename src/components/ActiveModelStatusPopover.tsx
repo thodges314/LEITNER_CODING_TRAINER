@@ -108,9 +108,8 @@ export const ActiveModelStatusPopover: React.FC<ActiveModelStatusPopoverProps> =
         style={{
           position: 'fixed',
           inset: 0,
-          zIndex: 110,
-          backgroundColor: 'rgba(0, 0, 0, 0.25)',
-          backdropFilter: 'blur(2px)',
+          zIndex: 90,
+          backgroundColor: 'transparent',
         }}
         aria-hidden="true"
       />

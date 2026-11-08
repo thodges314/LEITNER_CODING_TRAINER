@@ -195,7 +195,7 @@ export const AiProviderVaultSection: React.FC<AiProviderVaultSectionProps> = ({
         >
           <Zap size={15} color="var(--accent-cyan)" style={{ flexShrink: 0 }} />
           <span>
-            <strong style={{ color: isLight ? 'var(--accent-primary)' : 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong style={{ color: isLight ? 'var(--text-primary)' : undefined }}>Groq</strong> (llama-3.3-70b-versatile) or <strong style={{ color: isLight ? 'var(--text-primary)' : undefined }}>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
+            <strong style={{ color: isLight ? 'var(--accent-primary)' : 'var(--accent-cyan)' }}>Tip:</strong> For the fastest zero-cost evaluations, use <strong style={{ color: isLight ? 'var(--text-primary)' : undefined }}>Groq</strong> (openai/gpt-oss-120b) or <strong style={{ color: isLight ? 'var(--text-primary)' : undefined }}>Google Gemini</strong> (gemini-2.5-flash). Both provide free developer tiers with no credit card required.
           </span>
         </div>
       </div>
@@ -844,7 +844,7 @@ export const AiProviderVaultSection: React.FC<AiProviderVaultSectionProps> = ({
                 provider === 'gemini'
                   ? 'gemini-2.5-flash'
                   : provider === 'groq'
-                  ? 'llama-3.3-70b-versatile'
+                  ? 'openai/gpt-oss-120b'
                   : provider === 'cerebras'
                   ? 'llama3.3-70b'
                   : provider === 'mistral'
