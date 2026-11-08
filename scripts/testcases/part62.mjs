@@ -1,5 +1,6 @@
 import { c } from './part1.mjs';
 const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by PostgreSQL harness', ...o });
+const rHarness = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by component harness', ...o });
 
 export default {
   'sql-sequential-gaps': [
@@ -188,6 +189,144 @@ export default {
       'Concat and Shift tuple type contracts compile and verify lengths',
       'type C = Concat<[number, string], [boolean]>;\ntype S = Shift<[string, number, boolean]>;\nconst c: C = [1, "two", true];\nconst s: S = [42, false];\n[c.length, s.length]',
       '[3, 2]'
+    ),
+  ],
+
+  'next-server-client-leaf-boundary': [
+    rHarness(
+      'FavoriteButton renders with initial state and accessible aria-pressed',
+      '<FavoriteButton productId="p-1" initialFavorited={false} />',
+      'renders button with aria-pressed="false" and text "Add to Favorites"'
+    ),
+    rHarness(
+      'FavoriteButton toggles state and calls onToggle callback on click',
+      'fire.click(button)',
+      'toggles aria-pressed="true", text "Favorited", and fires onToggle("p-1", true)'
+    ),
+    rHarness(
+      'ProductCard renders server product details and embeds FavoriteButton',
+      '<ProductCard product={{ id: "prod-99", name: "Wireless Headphones", price: 99 }} />',
+      'renders server title "Wireless Headphones", price "$99", and leaf FavoriteButton'
+    ),
+    rHarness(
+      'ProductCard forwards initialFavorited state and toggle callback to leaf component',
+      '<ProductCard product={{ id: "prod-99", name: "Wireless Headphones", price: 99 }} initialFavorited={true} onFavoriteToggle={fn} />',
+      'starts with aria-pressed="true" and forwards click event to onFavoriteToggle'
+    ),
+  ],
+
+  'next-fetch-cache-revalidate': [
+    c(
+      'buildDataCacheConfig builds static cache configuration with force-cache and static segment',
+      'buildDataCacheConfig({ strategy: "static", tags: ["blog", "posts"] })',
+      '{"fetchOptions":{"cache":"force-cache","next":{"tags":["blog","posts"]}},"segmentConfig":{"dynamic":"force-static","revalidate":false}}'
+    ),
+    c(
+      'buildDataCacheConfig builds timed ISR configuration with explicit revalidate seconds',
+      'buildDataCacheConfig({ strategy: "timed", revalidateSeconds: 120, tags: ["products"] })',
+      '{"fetchOptions":{"next":{"revalidate":120,"tags":["products"]}},"segmentConfig":{"revalidate":120}}'
+    ),
+    c(
+      'buildDataCacheConfig defaults revalidateSeconds to 60 when omitted or non-positive',
+      'buildDataCacheConfig({ strategy: "timed" })',
+      '{"fetchOptions":{"next":{"revalidate":60}},"segmentConfig":{"revalidate":60}}'
+    ),
+    c(
+      'buildDataCacheConfig builds dynamic no-store configuration with force-dynamic segment',
+      'buildDataCacheConfig({ strategy: "dynamic" })',
+      '{"fetchOptions":{"cache":"no-store"},"segmentConfig":{"dynamic":"force-dynamic","revalidate":0}}'
+    ),
+  ],
+
+  'sql-basic-select-filter': [
+    r(
+      'Filters by category and stock, sorts by price ASC then name ASC, and limits to 3',
+      'query',
+      '[{"id":2,"name":"Keyboard","price":50,"stock":25},{"id":3,"name":"Mouse","price":50,"stock":15},{"id":6,"name":"Webcam","price":75,"stock":8}]'
+    ),
+    r(
+      'Excludes out-of-stock electronics even if price is lowest',
+      'query',
+      '[{"id":2,"name":"Flash Drive","price":15,"stock":4}]'
+    ),
+    r(
+      'Returns empty array when no matching in-stock electronics exist',
+      'query',
+      '[]'
+    ),
+    r(
+      'Returns empty array on completely empty products table',
+      'query',
+      '[]'
+    ),
+  ],
+
+  'sql-basic-inner-join': [
+    r(
+      'Joins orders with customers and aliases columns ordered by order_id ASC',
+      'query',
+      '[{"amount":150,"customer_name":"Alice","order_id":101},{"amount":200,"customer_name":"Charlie","order_id":102},{"amount":75,"customer_name":"Alice","order_id":103}]'
+    ),
+    r(
+      'Excludes customers who have placed zero orders',
+      'query',
+      '[{"amount":320,"customer_name":"Diana","order_id":50}]'
+    ),
+    r(
+      'Excludes orders referencing non-matching customer_ids',
+      'query',
+      '[]'
+    ),
+    r(
+      'Returns empty array when orders table is empty',
+      'query',
+      '[]'
+    ),
+  ],
+
+  'basic-assertion-library': [
+    c(
+      'ok passes truthy values and throws on falsy values',
+      'const a = createAssert();\nlet caught = null;\ntry {\n  a.ok(true);\n  a.ok(1);\n  a.ok("ok");\n  a.ok(0, "Zero is falsy");\n} catch (e) {\n  caught = e.message;\n}\n[caught]',
+      '["Zero is falsy"]'
+    ),
+    c(
+      'equal passes matching values using Object.is and throws on mismatch',
+      'const a = createAssert();\nlet caught = null;\ntry {\n  a.equal(5, 5);\n  a.equal("abc", "abc");\n  a.equal(1, 2, "1 does not equal 2");\n} catch (e) {\n  caught = e.message;\n}\n[caught]',
+      '["1 does not equal 2"]'
+    ),
+    c(
+      'throws validates thrown errors matching string substring or regex pattern',
+      'const a = createAssert();\na.throws(() => { throw new Error("database timeout"); }, "timeout");\na.throws(() => { throw new TypeError("invalid arg: 42"); }, /invalid arg/);\n"all passed"',
+      '"all passed"'
+    ),
+    c(
+      'throws fails when function does not throw an error',
+      'const a = createAssert();\nlet caught = null;\ntry {\n  a.throws(() => { return 42; });\n} catch (e) {\n  caught = e.message;\n}\n[caught]',
+      '["Expected function to throw"]'
+    ),
+  ],
+
+  'dom-toggle-active-class': [
+    rHarness(
+      'Initializes default closed state and aria-expanded="false"',
+      'bindClassToggle({ triggerId: "btn-1", targetId: "menu-1" })',
+      'menu has no "active" class, button has aria-expanded="false", isExpanded() is false'
+    ),
+    rHarness(
+      'Toggles active class and aria-expanded on click',
+      'btn.dispatchEvent(new MouseEvent("click"))',
+      'toggles "active" class on menu and synchronizes aria-expanded between "true" and "false"'
+    ),
+    rHarness(
+      'Initializes with custom active class and initialExpanded=true',
+      'bindClassToggle({ triggerId: "btn-2", targetId: "drawer-2", activeClass: "drawer-open", initialExpanded: true })',
+      'drawer starts with "drawer-open" class and button has aria-expanded="true"'
+    ),
+    rHarness(
+      'Throws error when target element is missing and removes listener on destroy',
+      'c.destroy(); btn.click()',
+      'throws on missing DOM nodes and cleans up click event listener so subsequent clicks do not toggle state'
     ),
   ],
 };

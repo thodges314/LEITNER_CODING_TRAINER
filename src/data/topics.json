@@ -4029,7 +4029,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "dom",
       "events",
@@ -14543,7 +14543,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "testing",
       "spy",
@@ -18973,7 +18973,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "sql",
       "postgres",
@@ -23234,5 +23234,276 @@
       }
     ],
     "testHarness": "await $test.run(\"tuple constructs a typed tuple without widening to arbitrary array\", async () => {\n  const sleep = $test.sleep;\n  return (tuple(1, \"ok\", true));\n}, () => ([1, \"ok\", true]));\n\nawait $test.run(\"partialApply binds leading arguments and returns function for remaining arguments\", async () => {\n  const sleep = $test.sleep;\n  const fn = (a: string, b: number, c: boolean) => `${a}-${b}-${c}`;\n  const partial = partialApply(fn, \"x\", 10);\n  return (partial(true));\n}, () => (\"x-10-true\"));\n\nawait $test.run(\"callWithTuple executes function by spreading tuple elements\", async () => {\n  const sleep = $test.sleep;\n  return (callWithTuple((a: number, b: number, c: number) => a * b + c, [3, 4, 5]));\n}, () => (17));\n\nawait $test.run(\"Concat and Shift tuple type contracts compile and verify lengths\", async () => {\n  const sleep = $test.sleep;\n  type C = Concat<[number, string], [boolean]>;\n  type S = Shift<[string, number, boolean]>;\n  const c: C = [1, \"two\", true];\n  const s: S = [42, false];\n  return ([c.length, s.length]);\n}, () => ([3, 2]));"
+  },
+  {
+    "id": "next-fetch-cache-revalidate",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Implement a Next.js App Router data caching and route segment revalidation config resolver:\n\n## Description\n\n### Application Context\nIn the Next.js App Router (`app/products/page.tsx`), data freshness is governed by both native extended `fetch()` options and route segment configurations (`export const revalidate = ...`). Developers often mix up when to use `{ cache: 'force-cache' }`, `{ cache: 'no-store' }`, and `{ next: { revalidate: seconds } }`. You are building a centralized configuration resolver that translates high-level caching strategies (`'static'`, `'timed'`, `'dynamic'`) into the precise fetch options and route segment directives required by Next.js.\n\n```ts\ntype CacheStrategy = 'static' | 'timed' | 'dynamic';\n\ninterface CacheStrategyOptions {\n  strategy: CacheStrategy;\n  revalidateSeconds?: number;\n  tags?: string[];\n}\n\ninterface NextFetchInit {\n  cache?: 'force-cache' | 'no-store';\n  next?: {\n    revalidate?: number | false;\n    tags?: string[];\n  };\n}\n\ninterface SegmentConfig {\n  revalidate?: number | false;\n  dynamic?: 'auto' | 'force-dynamic' | 'force-static';\n}\n\ninterface NextDataCacheConfig {\n  fetchOptions: NextFetchInit;\n  segmentConfig: SegmentConfig;\n}\n```\n\n### `buildDataCacheConfig(options: CacheStrategyOptions): NextDataCacheConfig`\n\nResolves the configuration based on `options.strategy`:\n\n- **Static Caching (`strategy === 'static'`)**:\n  - For immutable or infrequently changing data (e.g. blog posts, marketing pages).\n  - `fetchOptions`: Sets `cache: 'force-cache'`. If `options.tags` is provided with non-empty strings, sets `next: { tags: options.tags }`.\n  - `segmentConfig`: Sets `dynamic: 'force-static'` and `revalidate: false`.\n- **Time-Based Revalidation (`strategy === 'timed'`)**:\n  - For Incremental Static Regeneration (ISR) where data refreshes periodically in the background (e.g. product listings, news feeds).\n  - Determines effective revalidation window: uses `options.revalidateSeconds` if it is a positive number (`> 0`); otherwise defaults to `60`.\n  - `fetchOptions`: Does NOT set `cache`. Sets `next: { revalidate: seconds }`. If `options.tags` is provided with non-empty strings, adds `tags: options.tags` inside `next`.\n  - `segmentConfig`: Sets `revalidate: seconds`. (Does not set `dynamic`).\n- **Dynamic Real-Time (`strategy === 'dynamic'`)**:\n  - For user-specific or real-time data that must never be cached (e.g. shopping carts, account balances, live stock tickers).\n  - `fetchOptions`: Sets `cache: 'no-store'`. (Does NOT set `next`).\n  - `segmentConfig`: Sets `dynamic: 'force-dynamic'` and `revalidate: 0`.",
+    "track": "nextjs",
+    "title": "Next.js App Router Data Cache & Revalidation Config",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "caching",
+      "isr",
+      "revalidation",
+      "fetch"
+    ],
+    "difficulty": 1,
+    "concept": "next-cache-revalidation",
+    "referenceSolution": "type CacheStrategy = 'static' | 'timed' | 'dynamic';\n\ninterface CacheStrategyOptions {\n  strategy: CacheStrategy;\n  revalidateSeconds?: number;\n  tags?: string[];\n}\n\ninterface NextFetchInit {\n  cache?: 'force-cache' | 'no-store';\n  next?: {\n    revalidate?: number | false;\n    tags?: string[];\n  };\n}\n\ninterface SegmentConfig {\n  revalidate?: number | false;\n  dynamic?: 'auto' | 'force-dynamic' | 'force-static';\n}\n\ninterface NextDataCacheConfig {\n  fetchOptions: NextFetchInit;\n  segmentConfig: SegmentConfig;\n}\n\nfunction buildDataCacheConfig(options: CacheStrategyOptions): NextDataCacheConfig {\n  const { strategy, revalidateSeconds, tags } = options;\n\n  if (strategy === 'static') {\n    const fetchOptions: NextFetchInit = { cache: 'force-cache' };\n    if (tags && tags.length > 0) {\n      fetchOptions.next = { tags };\n    }\n    return {\n      fetchOptions,\n      segmentConfig: { dynamic: 'force-static', revalidate: false },\n    };\n  }\n\n  if (strategy === 'timed') {\n    const seconds =\n      typeof revalidateSeconds === 'number' && revalidateSeconds > 0\n        ? revalidateSeconds\n        : 60;\n    const nextInit: { revalidate: number; tags?: string[] } = { revalidate: seconds };\n    if (tags && tags.length > 0) {\n      nextInit.tags = tags;\n    }\n    return {\n      fetchOptions: { next: nextInit },\n      segmentConfig: { revalidate: seconds },\n    };\n  }\n\n  return {\n    fetchOptions: { cache: 'no-store' },\n    segmentConfig: { dynamic: 'force-dynamic', revalidate: 0 },\n  };\n}",
+    "referenceSolutionTs": "type CacheStrategy = 'static' | 'timed' | 'dynamic';\n\ninterface CacheStrategyOptions {\n  strategy: CacheStrategy;\n  revalidateSeconds?: number;\n  tags?: string[];\n}\n\ninterface NextFetchInit {\n  cache?: 'force-cache' | 'no-store';\n  next?: {\n    revalidate?: number | false;\n    tags?: string[];\n  };\n}\n\ninterface SegmentConfig {\n  revalidate?: number | false;\n  dynamic?: 'auto' | 'force-dynamic' | 'force-static';\n}\n\ninterface NextDataCacheConfig {\n  fetchOptions: NextFetchInit;\n  segmentConfig: SegmentConfig;\n}\n\nfunction buildDataCacheConfig(options: CacheStrategyOptions): NextDataCacheConfig {\n  const { strategy, revalidateSeconds, tags } = options;\n\n  if (strategy === 'static') {\n    const fetchOptions: NextFetchInit = { cache: 'force-cache' };\n    if (tags && tags.length > 0) {\n      fetchOptions.next = { tags };\n    }\n    return {\n      fetchOptions,\n      segmentConfig: { dynamic: 'force-static', revalidate: false },\n    };\n  }\n\n  if (strategy === 'timed') {\n    const seconds =\n      typeof revalidateSeconds === 'number' && revalidateSeconds > 0\n        ? revalidateSeconds\n        : 60;\n    const nextInit: { revalidate: number; tags?: string[] } = { revalidate: seconds };\n    if (tags && tags.length > 0) {\n      nextInit.tags = tags;\n    }\n    return {\n      fetchOptions: { next: nextInit },\n      segmentConfig: { revalidate: seconds },\n    };\n  }\n\n  return {\n    fetchOptions: { cache: 'no-store' },\n    segmentConfig: { dynamic: 'force-dynamic', revalidate: 0 },\n  };\n}",
+    "testCases": [
+      {
+        "description": "buildDataCacheConfig builds static cache configuration with force-cache and static segment",
+        "input": "buildDataCacheConfig({ strategy: \"static\", tags: [\"blog\", \"posts\"] })",
+        "expected": "{\"fetchOptions\":{\"cache\":\"force-cache\",\"next\":{\"tags\":[\"blog\",\"posts\"]}},\"segmentConfig\":{\"dynamic\":\"force-static\",\"revalidate\":false}}"
+      },
+      {
+        "description": "buildDataCacheConfig builds timed ISR configuration with explicit revalidate seconds",
+        "input": "buildDataCacheConfig({ strategy: \"timed\", revalidateSeconds: 120, tags: [\"products\"] })",
+        "expected": "{\"fetchOptions\":{\"next\":{\"revalidate\":120,\"tags\":[\"products\"]}},\"segmentConfig\":{\"revalidate\":120}}"
+      },
+      {
+        "description": "buildDataCacheConfig defaults revalidateSeconds to 60 when omitted or non-positive",
+        "input": "buildDataCacheConfig({ strategy: \"timed\" })",
+        "expected": "{\"fetchOptions\":{\"next\":{\"revalidate\":60}},\"segmentConfig\":{\"revalidate\":60}}"
+      },
+      {
+        "description": "buildDataCacheConfig builds dynamic no-store configuration with force-dynamic segment",
+        "input": "buildDataCacheConfig({ strategy: \"dynamic\" })",
+        "expected": "{\"fetchOptions\":{\"cache\":\"no-store\"},\"segmentConfig\":{\"dynamic\":\"force-dynamic\",\"revalidate\":0}}"
+      }
+    ],
+    "testHarness": "await $test.run(\"buildDataCacheConfig builds static cache configuration with force-cache and static segment\", async () => {\n  const sleep = $test.sleep;\n  return (buildDataCacheConfig({ strategy: \"static\", tags: [\"blog\", \"posts\"] }));\n}, () => ({\"fetchOptions\":{\"cache\":\"force-cache\",\"next\":{\"tags\":[\"blog\",\"posts\"]}},\"segmentConfig\":{\"dynamic\":\"force-static\",\"revalidate\":false}}));\n\nawait $test.run(\"buildDataCacheConfig builds timed ISR configuration with explicit revalidate seconds\", async () => {\n  const sleep = $test.sleep;\n  return (buildDataCacheConfig({ strategy: \"timed\", revalidateSeconds: 120, tags: [\"products\"] }));\n}, () => ({\"fetchOptions\":{\"next\":{\"revalidate\":120,\"tags\":[\"products\"]}},\"segmentConfig\":{\"revalidate\":120}}));\n\nawait $test.run(\"buildDataCacheConfig defaults revalidateSeconds to 60 when omitted or non-positive\", async () => {\n  const sleep = $test.sleep;\n  return (buildDataCacheConfig({ strategy: \"timed\" }));\n}, () => ({\"fetchOptions\":{\"next\":{\"revalidate\":60}},\"segmentConfig\":{\"revalidate\":60}}));\n\nawait $test.run(\"buildDataCacheConfig builds dynamic no-store configuration with force-dynamic segment\", async () => {\n  const sleep = $test.sleep;\n  return (buildDataCacheConfig({ strategy: \"dynamic\" }));\n}, () => ({\"fetchOptions\":{\"cache\":\"no-store\"},\"segmentConfig\":{\"dynamic\":\"force-dynamic\",\"revalidate\":0}}));"
+  },
+  {
+    "id": "next-server-client-leaf-boundary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Implement Next.js App Router leaf Client Component and Server Component composition:\n\n## Description\n\n### Application Context\nIn the Next.js App Router, all components in the `app/` directory are React Server Components (RSCs) by default. A frequent architectural pitfall is marking an entire page or large card component with `'use client'` simply because a single interactive button needs state or an event listener. Adding `'use client'` at a high level pulls the entire component subtree and its dependencies into the client JavaScript bundle.\n\nThe official Next.js best practice is: **Move Client Components to the Leaves**. Keep data-fetching container components as Server Components, and extract client-side interactivity (event listeners, `useState`) into small, focused leaf components marked with `'use client'`.\n\n```ts\ninterface Product {\n  id: string;\n  name: string;\n  price: number;\n}\n\ninterface FavoriteButtonProps {\n  productId: string;\n  initialFavorited?: boolean;\n  onToggle?: (productId: string, favorited: boolean) => void;\n}\n\ninterface ProductCardProps {\n  product: Product;\n  initialFavorited?: boolean;\n  onFavoriteToggle?: (productId: string, favorited: boolean) => void;\n}\n```\n\n### `FavoriteButton({ productId, initialFavorited = false, onToggle }: FavoriteButtonProps): React.ReactElement`\n\nA focused interactive leaf Client Component (representing `'use client'`):\n- **Local State**: Initializes boolean `favorited` state from `initialFavorited` (defaults to `false`).\n- **Render Output**:\n  - Renders a `<button>` element with:\n    - `type=\"button\"`\n    - `data-testid=\"favorite-button\"`\n    - `aria-pressed={favorited}`\n    - `className={favorited ? 'favorited' : ''}`\n    - Text label: `favorited ? 'Favorited' : 'Add to Favorites'`\n- **Interaction**:\n  - `onClick`: Toggles `favorited` state and invokes `onToggle?.(productId, nextFavorited)` with the new favorited boolean.\n\n### `ProductCard({ product, initialFavorited = false, onFavoriteToggle }: ProductCardProps): React.ReactElement`\n\nA Server Component container that renders static product data server-side and embeds the leaf client component:\n- **Render Output**:\n  - Renders an `<article>` container with `data-testid=\"product-card\"`.\n  - Inside the article:\n    - An `<h3>` element with `data-testid=\"product-title\"` displaying `product.name`.\n    - A `<p>` element with `data-testid=\"product-price\"` displaying `$${product.price}`.\n    - An embedded `<FavoriteButton>` passing `productId={product.id}`, `initialFavorited={initialFavorited}`, and `onToggle={onFavoriteToggle}`.",
+    "track": "nextjs",
+    "title": "Next.js Architecture: Move Client Components to the Leaves",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "rsc",
+      "client-components",
+      "architecture",
+      "react"
+    ],
+    "rendersComponent": true,
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "next-client-components",
+    "referenceSolution": "interface Product {\n  id: string;\n  name: string;\n  price: number;\n}\n\ninterface FavoriteButtonProps {\n  productId: string;\n  initialFavorited?: boolean;\n  onToggle?: (productId: string, favorited: boolean) => void;\n}\n\ninterface ProductCardProps {\n  product: Product;\n  initialFavorited?: boolean;\n  onFavoriteToggle?: (productId: string, favorited: boolean) => void;\n}\n\nfunction FavoriteButton({\n  productId,\n  initialFavorited = false,\n  onToggle,\n}: FavoriteButtonProps): React.ReactElement {\n  const [favorited, setFavorited] = React.useState<boolean>(initialFavorited);\n\n  const handleClick = () => {\n    const next = !favorited;\n    setFavorited(next);\n    if (onToggle) {\n      onToggle(productId, next);\n    }\n  };\n\n  return (\n    <button\n      type=\"button\"\n      data-testid=\"favorite-button\"\n      aria-pressed={favorited}\n      className={favorited ? 'favorited' : ''}\n      onClick={handleClick}\n    >\n      {favorited ? 'Favorited' : 'Add to Favorites'}\n    </button>\n  );\n}\n\nfunction ProductCard({\n  product,\n  initialFavorited = false,\n  onFavoriteToggle,\n}: ProductCardProps): React.ReactElement {\n  return (\n    <article data-testid=\"product-card\">\n      <h3 data-testid=\"product-title\">{product.name}</h3>\n      <p data-testid=\"product-price\">${product.price}</p>\n      <FavoriteButton\n        productId={product.id}\n        initialFavorited={initialFavorited}\n        onToggle={onFavoriteToggle}\n      />\n    </article>\n  );\n}",
+    "referenceSolutionTs": "interface Product {\n  id: string;\n  name: string;\n  price: number;\n}\n\ninterface FavoriteButtonProps {\n  productId: string;\n  initialFavorited?: boolean;\n  onToggle?: (productId: string, favorited: boolean) => void;\n}\n\ninterface ProductCardProps {\n  product: Product;\n  initialFavorited?: boolean;\n  onFavoriteToggle?: (productId: string, favorited: boolean) => void;\n}\n\nfunction FavoriteButton({\n  productId,\n  initialFavorited = false,\n  onToggle,\n}: FavoriteButtonProps): React.ReactElement {\n  const [favorited, setFavorited] = React.useState<boolean>(initialFavorited);\n\n  const handleClick = () => {\n    const next = !favorited;\n    setFavorited(next);\n    if (onToggle) {\n      onToggle(productId, next);\n    }\n  };\n\n  return (\n    <button\n      type=\"button\"\n      data-testid=\"favorite-button\"\n      aria-pressed={favorited}\n      className={favorited ? 'favorited' : ''}\n      onClick={handleClick}\n    >\n      {favorited ? 'Favorited' : 'Add to Favorites'}\n    </button>\n  );\n}\n\nfunction ProductCard({\n  product,\n  initialFavorited = false,\n  onFavoriteToggle,\n}: ProductCardProps): React.ReactElement {\n  return (\n    <article data-testid=\"product-card\">\n      <h3 data-testid=\"product-title\">{product.name}</h3>\n      <p data-testid=\"product-price\">${product.price}</p>\n      <FavoriteButton\n        productId={product.id}\n        initialFavorited={initialFavorited}\n        onToggle={onFavoriteToggle}\n      />\n    </article>\n  );\n}",
+    "testCases": [
+      {
+        "description": "FavoriteButton renders with initial state and accessible aria-pressed",
+        "input": "<FavoriteButton productId=\"p-1\" initialFavorited={false} />",
+        "expected": "renders button with aria-pressed=\"false\" and text \"Add to Favorites\""
+      },
+      {
+        "description": "FavoriteButton toggles state and calls onToggle callback on click",
+        "input": "fire.click(button)",
+        "expected": "toggles aria-pressed=\"true\", text \"Favorited\", and fires onToggle(\"p-1\", true)"
+      },
+      {
+        "description": "ProductCard renders server product details and embeds FavoriteButton",
+        "input": "<ProductCard product={{ id: \"prod-99\", name: \"Wireless Headphones\", price: 99 }} />",
+        "expected": "renders server title \"Wireless Headphones\", price \"$99\", and leaf FavoriteButton"
+      },
+      {
+        "description": "ProductCard forwards initialFavorited state and toggle callback to leaf component",
+        "input": "<ProductCard product={{ id: \"prod-99\", name: \"Wireless Headphones\", price: 99 }} initialFavorited={true} onFavoriteToggle={fn} />",
+        "expected": "starts with aria-pressed=\"true\" and forwards click event to onFavoriteToggle"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const { render, fire, q } = $dom;\n  const FavComp = typeof FavoriteButton === 'function' ? FavoriteButton : (typeof solution === 'object' && solution?.FavoriteButton);\n  const CardComp = typeof ProductCard === 'function' ? ProductCard : (typeof solution === 'object' && solution?.ProductCard);\n\n  if (!FavComp || !CardComp) {\n    $test.check('FavoriteButton renders with initial state and accessible aria-pressed', false, { error: 'FavoriteButton or ProductCard is not defined' });\n    $test.check('FavoriteButton toggles state and calls onToggle callback on click', false, { error: 'FavoriteButton or ProductCard is not defined' });\n    $test.check('ProductCard renders server product details and embeds FavoriteButton', false, { error: 'FavoriteButton or ProductCard is not defined' });\n    $test.check('ProductCard forwards initialFavorited state and toggle callback to leaf component', false, { error: 'FavoriteButton or ProductCard is not defined' });\n    return;\n  }\n\n  // Case 1: FavoriteButton renders with initial state and accessible aria-pressed\n  const { container: c1, unmount: u1 } = render(\n    React.createElement(FavComp, { productId: 'p-1', initialFavorited: false })\n  );\n  const b1 = q('[data-testid=\"favorite-button\"]', c1);\n  const isAriaFalse = b1?.getAttribute('aria-pressed') === 'false';\n  const labelAdd = b1?.textContent?.trim() === 'Add to Favorites';\n  const isTypeBtn = b1?.getAttribute('type') === 'button';\n  $test.check(\n    'FavoriteButton renders with initial state and accessible aria-pressed',\n    b1 !== null && isAriaFalse && labelAdd && isTypeBtn,\n    { found: Boolean(b1), ariaPressed: b1?.getAttribute('aria-pressed'), text: b1?.textContent?.trim() }\n  );\n  u1();\n\n  // Case 2: FavoriteButton toggles state and calls onToggle callback on click\n  const toggles2 = [{ id: '', fav: false }];\n  toggles2.length = 0;\n  const onToggleHandler2 = function () {\n    toggles2.push({ id: String(arguments[0]), fav: Boolean(arguments[1]) });\n  };\n\n  const { container: c2, unmount: u2 } = render(\n    React.createElement(FavComp, {\n      productId: 'p-1',\n      initialFavorited: false,\n      onToggle: onToggleHandler2,\n    })\n  );\n  const b2 = q('[data-testid=\"favorite-button\"]', c2);\n  if (b2) fire.click(b2);\n  const isAriaTrue = b2?.getAttribute('aria-pressed') === 'true';\n  const labelFav = b2?.textContent?.trim() === 'Favorited';\n  const firedCorrectly = toggles2.length === 1 && toggles2[0].id === 'p-1' && toggles2[0].fav === true;\n  $test.check(\n    'FavoriteButton toggles state and calls onToggle callback on click',\n    isAriaTrue && labelFav && firedCorrectly,\n    { ariaPressed: b2?.getAttribute('aria-pressed'), text: b2?.textContent?.trim(), toggles: toggles2 }\n  );\n  u2();\n\n  // Case 3: ProductCard renders server product details and embeds FavoriteButton\n  const { container: c3, unmount: u3 } = render(\n    React.createElement(CardComp, {\n      product: { id: 'prod-99', name: 'Wireless Headphones', price: 99 },\n    })\n  );\n  const cardEl = q('[data-testid=\"product-card\"]', c3);\n  const titleEl = q('[data-testid=\"product-title\"]', c3);\n  const priceEl = q('[data-testid=\"product-price\"]', c3);\n  const embeddedBtn = q('[data-testid=\"favorite-button\"]', c3);\n  $test.check(\n    'ProductCard renders server product details and embeds FavoriteButton',\n    cardEl !== null &&\n      titleEl?.textContent?.trim() === 'Wireless Headphones' &&\n      priceEl?.textContent?.trim() === '$99' &&\n      embeddedBtn !== null,\n    {\n      title: titleEl?.textContent?.trim(),\n      price: priceEl?.textContent?.trim(),\n      hasButton: Boolean(embeddedBtn),\n    }\n  );\n  u3();\n\n  // Case 4: ProductCard forwards initialFavorited state and toggle callback to leaf component\n  const toggles4 = [{ id: '', fav: false }];\n  toggles4.length = 0;\n  const onToggleHandler4 = function () {\n    toggles4.push({ id: String(arguments[0]), fav: Boolean(arguments[1]) });\n  };\n\n  const { container: c4, unmount: u4 } = render(\n    React.createElement(CardComp, {\n      product: { id: 'prod-99', name: 'Wireless Headphones', price: 99 },\n      initialFavorited: true,\n      onFavoriteToggle: onToggleHandler4,\n    })\n  );\n  const b4 = q('[data-testid=\"favorite-button\"]', c4);\n  const startsFavorited = b4?.getAttribute('aria-pressed') === 'true';\n  if (b4) fire.click(b4);\n  const firedToggle4 = toggles4.length === 1 && toggles4[0].id === 'prod-99' && toggles4[0].fav === false;\n  $test.check(\n    'ProductCard forwards initialFavorited state and toggle callback to leaf component',\n    startsFavorited && firedToggle4,\n    { startsFavorited, toggles4 }\n  );\n  u4();\n})();"
+  },
+  {
+    "id": "sql-basic-inner-join",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Write a PostgreSQL query to join customer and order tables using an inner join:\n\n## Description\n\n### Application Context\nIn an e-commerce reporting dashboard (`sales/orders`), you need to generate a consolidated order manifest linking each placed order to its registered customer name.\n\n```ts\ninterface CustomerRecord {\n  id: number;\n  name: string;\n  city: string;\n}\n\ninterface OrderRecord {\n  id: number;\n  customer_id: number;\n  amount: number;\n}\n\ninterface OrderJoinResult {\n  order_id: number;\n  customer_name: string;\n  amount: number;\n}\n```\n\n### Table Schema\n\n- **`customers`**:\n  - `id`: `INT` (Primary Key)\n  - `name`: `VARCHAR(50)`\n  - `city`: `VARCHAR(50)`\n- **`orders`**:\n  - `id`: `INT` (Primary Key)\n  - `customer_id`: `INT` (Foreign Key referencing `customers.id`)\n  - `amount`: `INT`\n\n### Requirements\n\nWrite a SQL query string assigned to `const query`:\n- **Join**: Perform an `INNER JOIN` (or `JOIN`) between `orders` and `customers` on `orders.customer_id = customers.id`.\n- **Projection**:\n  - `orders.id` aliased as `order_id`\n  - `customers.name` aliased as `customer_name`\n  - `orders.amount` aliased as `amount`\n- **Sort**: Order results by `order_id ASC`.",
+    "track": "sql-postgres",
+    "title": "SQL Table Joins: Two-Table Inner Join",
+    "tags": [
+      "sql",
+      "postgresql",
+      "join",
+      "inner-join",
+      "foreign-key",
+      "aliases"
+    ],
+    "difficulty": 1,
+    "concept": "sql-joins",
+    "referenceSolution": "const query = `\nSELECT o.id AS order_id, c.name AS customer_name, o.amount\nFROM orders o\nJOIN customers c ON o.customer_id = c.id\nORDER BY o.id ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT o.id AS order_id, c.name AS customer_name, o.amount\nFROM orders o\nJOIN customers c ON o.customer_id = c.id\nORDER BY o.id ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Joins orders with customers and aliases columns ordered by order_id ASC",
+        "input": "query",
+        "expected": "[{\"amount\":150,\"customer_name\":\"Alice\",\"order_id\":101},{\"amount\":200,\"customer_name\":\"Charlie\",\"order_id\":102},{\"amount\":75,\"customer_name\":\"Alice\",\"order_id\":103}]"
+      },
+      {
+        "description": "Excludes customers who have placed zero orders",
+        "input": "query",
+        "expected": "[{\"amount\":320,\"customer_name\":\"Diana\",\"order_id\":50}]"
+      },
+      {
+        "description": "Excludes orders referencing non-matching customer_ids",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty array when orders table is empty",
+        "input": "query",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE customers (id INT PRIMARY KEY, name VARCHAR(50), city VARCHAR(50));\n    CREATE TABLE orders (id INT PRIMARY KEY, customer_id INT, amount INT);\n  `);\n\n  // Case 1: Joins orders with customers and aliases columns ordered by order_id ASC\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'Alice', 'New York'), (2, 'Bob', 'Chicago'), (3, 'Charlie', 'Austin');\n    INSERT INTO orders VALUES (101, 1, 150), (102, 3, 200), (103, 1, 75);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Joins orders with customers and aliases columns ordered by order_id ASC',\n    r1 !== null && $test.equal(r1, [\n      { order_id: 101, customer_name: 'Alice', amount: 150 },\n      { order_id: 102, customer_name: 'Charlie', amount: 200 },\n      { order_id: 103, customer_name: 'Alice', amount: 75 }\n    ]),\n    r1\n  );\n\n  // Case 2: Excludes customers who have placed zero orders\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'Diana', 'Seattle'), (2, 'Evan', 'Boston');\n    INSERT INTO orders VALUES (50, 1, 320);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Excludes customers who have placed zero orders',\n    r2 !== null && $test.equal(r2, [\n      { order_id: 50, customer_name: 'Diana', amount: 320 }\n    ]),\n    r2\n  );\n\n  // Case 3: Excludes orders referencing non-matching customer_ids\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'Fiona', 'Denver');\n    INSERT INTO orders VALUES (90, 999, 500);\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Excludes orders referencing non-matching customer_ids',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Returns empty array when orders table is empty\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'George', 'Miami');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when orders table is empty',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();"
+  },
+  {
+    "id": "sql-basic-select-filter",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Write a PostgreSQL query to filter, sort, and paginate product inventory:\n\n## Description\n\n### Application Context\nIn a retail database (`inventory/products`), you need to retrieve in-stock electronics for a featured catalog section.\n\n```ts\ninterface ProductRecord {\n  id: number;\n  name: string;\n  category: string;\n  price: number;\n  stock: number;\n}\n\ninterface ProductFilterResult {\n  id: number;\n  name: string;\n  price: number;\n  stock: number;\n}\n```\n\n### Table Schema\n\n- **`products`**:\n  - `id`: `INT` (Primary Key)\n  - `name`: `VARCHAR(50)`\n  - `category`: `VARCHAR(50)`\n  - `price`: `INT`\n  - `stock`: `INT`\n\n### Requirements\n\nWrite a SQL query string assigned to `const query`:\n- **Projection**: Select `id`, `name`, `price`, and `stock` from `products`.\n- **Filter**: Include only products where `category = 'Electronics'` and `stock > 0`.\n- **Sort**: Order results by `price ASC` (cheapest first). For items with identical price, break ties by `name ASC` alphabetically.\n- **Pagination**: Limit the output to the first `3` records.",
+    "track": "sql-postgres",
+    "title": "SQL Query Basics: Filter, Sort, and Limit",
+    "tags": [
+      "sql",
+      "postgresql",
+      "select",
+      "where",
+      "order-by",
+      "limit"
+    ],
+    "difficulty": 1,
+    "concept": "sql-query-basics",
+    "referenceSolution": "const query = `\nSELECT id, name, price, stock\nFROM products\nWHERE category = 'Electronics' AND stock > 0\nORDER BY price ASC, name ASC\nLIMIT 3;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT id, name, price, stock\nFROM products\nWHERE category = 'Electronics' AND stock > 0\nORDER BY price ASC, name ASC\nLIMIT 3;\n`;",
+    "testCases": [
+      {
+        "description": "Filters by category and stock, sorts by price ASC then name ASC, and limits to 3",
+        "input": "query",
+        "expected": "[{\"id\":2,\"name\":\"Keyboard\",\"price\":50,\"stock\":25},{\"id\":3,\"name\":\"Mouse\",\"price\":50,\"stock\":15},{\"id\":6,\"name\":\"Webcam\",\"price\":75,\"stock\":8}]"
+      },
+      {
+        "description": "Excludes out-of-stock electronics even if price is lowest",
+        "input": "query",
+        "expected": "[{\"id\":2,\"name\":\"Flash Drive\",\"price\":15,\"stock\":4}]"
+      },
+      {
+        "description": "Returns empty array when no matching in-stock electronics exist",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty array on completely empty products table",
+        "input": "query",
+        "expected": "[]"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE products (\n      id INT PRIMARY KEY,\n      name VARCHAR(50),\n      category VARCHAR(50),\n      price INT,\n      stock INT\n    );\n  `);\n\n  // Case 1: Filters by category and stock, sorts by price ASC then name ASC, and limits to 3\n  await db.exec(`\n    DELETE FROM products;\n    INSERT INTO products VALUES\n      (1, 'Laptop', 'Electronics', 999, 10),\n      (2, 'Keyboard', 'Electronics', 50, 25),\n      (3, 'Mouse', 'Electronics', 50, 15),\n      (4, 'Desk Lamp', 'Home', 40, 5),\n      (5, 'Headphones', 'Electronics', 120, 0),\n      (6, 'Webcam', 'Electronics', 75, 8);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Filters by category and stock, sorts by price ASC then name ASC, and limits to 3',\n    r1 !== null && $test.equal(r1, [\n      { id: 2, name: 'Keyboard', price: 50, stock: 25 },\n      { id: 3, name: 'Mouse', price: 50, stock: 15 },\n      { id: 6, name: 'Webcam', price: 75, stock: 8 }\n    ]),\n    r1\n  );\n\n  // Case 2: Excludes out-of-stock electronics even if price is lowest\n  await db.exec(`\n    DELETE FROM products;\n    INSERT INTO products VALUES\n      (1, 'USB Cable', 'Electronics', 10, 0),\n      (2, 'Flash Drive', 'Electronics', 15, 4);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Excludes out-of-stock electronics even if price is lowest',\n    r2 !== null && $test.equal(r2, [\n      { id: 2, name: 'Flash Drive', price: 15, stock: 4 }\n    ]),\n    r2\n  );\n\n  // Case 3: Returns empty array when no matching in-stock electronics exist\n  await db.exec(`\n    DELETE FROM products;\n    INSERT INTO products VALUES\n      (1, 'Sofa', 'Home', 500, 2),\n      (2, 'Chair', 'Home', 150, 5);\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when no matching in-stock electronics exist',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Returns empty array on completely empty products table\n  await db.exec(`DELETE FROM products;`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array on completely empty products table',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();"
+  },
+  {
+    "id": "basic-assertion-library",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Implement a foundational unit-test assertion suite providing ok, equal, and throws:\n\n## Description\n\n### Application Context\nWhen building testing frameworks or writing custom assertions (`test/assert.ts`), developers need primitive assertion helpers to verify state and validate thrown errors without relying on heavy external dependencies. You are implementing a lightweight assertion runner factory.\n\n```ts\ninterface AssertionSuite {\n  ok(value: unknown, message?: string): void;\n  equal(actual: unknown, expected: unknown, message?: string): void;\n  throws(fn: () => void, expectedError?: string | RegExp): void;\n}\n```\n\n### `createAssert(): AssertionSuite`\n\nReturns an object with three assertion methods:\n\n- **`ok(value: unknown, message?: string): void`**:\n  - Asserts that `value` is truthy.\n  - If falsy (e.g. `false`, `0`, `\"\"`, `null`, `undefined`, `NaN`), throws `new Error(message || 'Expected truthy value')`.\n- **`equal(actual: unknown, expected: unknown, message?: string): void`**:\n  - Compares `actual` and `expected` using `Object.is(actual, expected)`.\n  - If not equal, throws `new Error(message || 'Values are not equal')`.\n- **`throws(fn: () => void, expectedError?: string | RegExp): void`**:\n  - Executes `fn()`.\n  - If `fn` finishes without throwing an error, throws `new Error('Expected function to throw')`.\n  - If `fn` throws an error `err`:\n    - If `expectedError` is a `string`: verifies `err.message` contains `expectedError`. If not, throws `new Error('Error message did not match string')`.\n    - If `expectedError` is a `RegExp`: verifies `expectedError.test(err.message)` is `true`. If not, throws `new Error('Error message did not match pattern')`.\n    - If `expectedError` is omitted or `undefined`: passes silently.",
+    "track": "testing-tooling",
+    "title": "Basic Test Assertions: ok, equal, and throws",
+    "tags": [
+      "testing",
+      "assertions",
+      "assert",
+      "unit-testing"
+    ],
+    "difficulty": 1,
+    "concept": "testing-tools",
+    "referenceSolution": "function createAssert() {\n  return {\n    ok(value, message) {\n      if (!value) {\n        throw new Error(message || 'Expected truthy value');\n      }\n    },\n\n    equal(actual, expected, message) {\n      if (!Object.is(actual, expected)) {\n        throw new Error(message || 'Values are not equal');\n      }\n    },\n\n    throws(fn, expectedError) {\n      let threw = false;\n      let caughtError;\n\n      try {\n        fn();\n      } catch (err) {\n        threw = true;\n        caughtError = err;\n      }\n\n      if (!threw) {\n        throw new Error('Expected function to throw');\n      }\n\n      if (expectedError !== undefined) {\n        const msg = caughtError instanceof Error ? caughtError.message : String(caughtError);\n        if (typeof expectedError === 'string') {\n          if (!msg.includes(expectedError)) {\n            throw new Error('Error message did not match string');\n          }\n        } else if (expectedError instanceof RegExp) {\n          if (!expectedError.test(msg)) {\n            throw new Error('Error message did not match pattern');\n          }\n        }\n      }\n    },\n  };\n}",
+    "referenceSolutionTs": "interface AssertionSuite {\n  ok(value: unknown, message?: string): void;\n  equal(actual: unknown, expected: unknown, message?: string): void;\n  throws(fn: () => void, expectedError?: string | RegExp): void;\n}\n\nfunction createAssert(): AssertionSuite {\n  return {\n    ok(value: unknown, message?: string): void {\n      if (!value) {\n        throw new Error(message || 'Expected truthy value');\n      }\n    },\n\n    equal(actual: unknown, expected: unknown, message?: string): void {\n      if (!Object.is(actual, expected)) {\n        throw new Error(message || 'Values are not equal');\n      }\n    },\n\n    throws(fn: () => void, expectedError?: string | RegExp): void {\n      let threw = false;\n      let caughtError: unknown;\n\n      try {\n        fn();\n      } catch (err: unknown) {\n        threw = true;\n        caughtError = err;\n      }\n\n      if (!threw) {\n        throw new Error('Expected function to throw');\n      }\n\n      if (expectedError !== undefined) {\n        const msg = caughtError instanceof Error ? caughtError.message : String(caughtError);\n        if (typeof expectedError === 'string') {\n          if (!msg.includes(expectedError)) {\n            throw new Error('Error message did not match string');\n          }\n        } else if (expectedError instanceof RegExp) {\n          if (!expectedError.test(msg)) {\n            throw new Error('Error message did not match pattern');\n          }\n        }\n      }\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "ok passes truthy values and throws on falsy values",
+        "input": "const a = createAssert();\nlet caught = null;\ntry {\n  a.ok(true);\n  a.ok(1);\n  a.ok(\"ok\");\n  a.ok(0, \"Zero is falsy\");\n} catch (e) {\n  caught = e.message;\n}\n[caught]",
+        "expected": "[\"Zero is falsy\"]"
+      },
+      {
+        "description": "equal passes matching values using Object.is and throws on mismatch",
+        "input": "const a = createAssert();\nlet caught = null;\ntry {\n  a.equal(5, 5);\n  a.equal(\"abc\", \"abc\");\n  a.equal(1, 2, \"1 does not equal 2\");\n} catch (e) {\n  caught = e.message;\n}\n[caught]",
+        "expected": "[\"1 does not equal 2\"]"
+      },
+      {
+        "description": "throws validates thrown errors matching string substring or regex pattern",
+        "input": "const a = createAssert();\na.throws(() => { throw new Error(\"database timeout\"); }, \"timeout\");\na.throws(() => { throw new TypeError(\"invalid arg: 42\"); }, /invalid arg/);\n\"all passed\"",
+        "expected": "\"all passed\""
+      },
+      {
+        "description": "throws fails when function does not throw an error",
+        "input": "const a = createAssert();\nlet caught = null;\ntry {\n  a.throws(() => { return 42; });\n} catch (e) {\n  caught = e.message;\n}\n[caught]",
+        "expected": "[\"Expected function to throw\"]"
+      }
+    ],
+    "testHarness": "await $test.run(\"ok passes truthy values and throws on falsy values\", async () => {\n  const sleep = $test.sleep;\n  const a = createAssert();\n  let caught = null;\n  try {\n    a.ok(true);\n    a.ok(1);\n    a.ok(\"ok\");\n    a.ok(0, \"Zero is falsy\");\n  } catch (e) {\n    caught = e.message;\n  }\n  return ([caught]);\n}, () => ([\"Zero is falsy\"]));\n\nawait $test.run(\"equal passes matching values using Object.is and throws on mismatch\", async () => {\n  const sleep = $test.sleep;\n  const a = createAssert();\n  let caught = null;\n  try {\n    a.equal(5, 5);\n    a.equal(\"abc\", \"abc\");\n    a.equal(1, 2, \"1 does not equal 2\");\n  } catch (e) {\n    caught = e.message;\n  }\n  return ([caught]);\n}, () => ([\"1 does not equal 2\"]));\n\nawait $test.run(\"throws validates thrown errors matching string substring or regex pattern\", async () => {\n  const sleep = $test.sleep;\n  const a = createAssert();\n  a.throws(() => { throw new Error(\"database timeout\"); }, \"timeout\");\n  a.throws(() => { throw new TypeError(\"invalid arg: 42\"); }, /invalid arg/);\n  return (\"all passed\");\n}, () => (\"all passed\"));\n\nawait $test.run(\"throws fails when function does not throw an error\", async () => {\n  const sleep = $test.sleep;\n  const a = createAssert();\n  let caught = null;\n  try {\n    a.throws(() => { return 42; });\n  } catch (e) {\n    caught = e.message;\n  }\n  return ([caught]);\n}, () => ([\"Expected function to throw\"]));"
+  },
+  {
+    "id": "dom-toggle-active-class",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Implement a foundational DOM utility that binds a click listener to toggle an active class and synchronize aria-expanded:\n\n## Description\n\n### Application Context\nWhen building accessible interactive widgets without a heavy framework (`nav/disclosure.ts`), developers frequently need a clean vanilla DOM helper to bind a trigger button to a target drawer, panel, or menu, toggling an active class while keeping ARIA attributes synchronized. You are implementing a DOM binding controller.\n\n```ts\ninterface ToggleBindingOptions {\n  triggerId: string;\n  targetId: string;\n  activeClass?: string;\n  initialExpanded?: boolean;\n}\n\ninterface ToggleBindingController {\n  isExpanded(): boolean;\n  destroy(): void;\n}\n```\n\n### `bindClassToggle(options: ToggleBindingOptions): ToggleBindingController`\n\nFinds the trigger and target DOM elements by ID, initializes their state, and wires a click listener:\n\n- **Element Lookup & Validation**:\n  - Finds the trigger element with `document.getElementById(options.triggerId)` and target element with `document.getElementById(options.targetId)`.\n  - If either element is not found in the DOM, throws `new Error('Required element not found')`.\n- **Configuration Defaults**:\n  - `activeClass`: Defaults to `'active'`.\n  - `initialExpanded`: Defaults to `false`.\n- **Initial State Setup**:\n  - If `initialExpanded` is `true`:\n    - Adds `activeClass` to `target.classList`.\n    - Sets `trigger.setAttribute('aria-expanded', 'true')`.\n  - If `initialExpanded` is `false`:\n    - Removes `activeClass` from `target.classList`.\n    - Sets `trigger.setAttribute('aria-expanded', 'false')`.\n- **Event Handling**:\n  - Listens for `'click'` events on the trigger element.\n  - On click:\n    - Toggles `activeClass` on `target.classList`.\n    - Reads whether `target.classList.contains(activeClass)`.\n    - Updates `trigger.setAttribute('aria-expanded', String(isNowActive))`.\n- **Return Controller**:\n  - Returns an object implementing `ToggleBindingController`:\n    - **`isExpanded(): boolean`**: Returns `target.classList.contains(activeClass)`.\n    - **`destroy(): void`**: Removes the `'click'` event listener from the trigger element using `removeEventListener` so subsequent clicks no longer mutate state.",
+    "track": "dom-browser",
+    "title": "DOM Event Listener: Toggle Active Class & Aria-Expanded",
+    "tags": [
+      "dom",
+      "browser",
+      "events",
+      "class-list",
+      "aria",
+      "event-listener"
+    ],
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "dom",
+    "referenceSolution": "function bindClassToggle(options) {\n  const trigger = document.getElementById(options.triggerId);\n  const target = document.getElementById(options.targetId);\n\n  if (!trigger || !target) {\n    throw new Error('Required element not found');\n  }\n\n  const activeClass = options.activeClass || 'active';\n  const initialExpanded = Boolean(options.initialExpanded);\n\n  if (initialExpanded) {\n    target.classList.add(activeClass);\n    trigger.setAttribute('aria-expanded', 'true');\n  } else {\n    target.classList.remove(activeClass);\n    trigger.setAttribute('aria-expanded', 'false');\n  }\n\n  const handleClick = () => {\n    const isNowActive = target.classList.toggle(activeClass);\n    trigger.setAttribute('aria-expanded', String(isNowActive));\n  };\n\n  trigger.addEventListener('click', handleClick);\n\n  return {\n    isExpanded() {\n      return target.classList.contains(activeClass);\n    },\n    destroy() {\n      trigger.removeEventListener('click', handleClick);\n    },\n  };\n}",
+    "referenceSolutionTs": "interface ToggleBindingOptions {\n  triggerId: string;\n  targetId: string;\n  activeClass?: string;\n  initialExpanded?: boolean;\n}\n\ninterface ToggleBindingController {\n  isExpanded(): boolean;\n  destroy(): void;\n}\n\nfunction bindClassToggle(options: ToggleBindingOptions): ToggleBindingController {\n  const trigger = document.getElementById(options.triggerId);\n  const target = document.getElementById(options.targetId);\n\n  if (!trigger || !target) {\n    throw new Error('Required element not found');\n  }\n\n  const activeClass = options.activeClass || 'active';\n  const initialExpanded = Boolean(options.initialExpanded);\n\n  if (initialExpanded) {\n    target.classList.add(activeClass);\n    trigger.setAttribute('aria-expanded', 'true');\n  } else {\n    target.classList.remove(activeClass);\n    trigger.setAttribute('aria-expanded', 'false');\n  }\n\n  const handleClick = () => {\n    const isNowActive = target.classList.toggle(activeClass);\n    trigger.setAttribute('aria-expanded', String(isNowActive));\n  };\n\n  trigger.addEventListener('click', handleClick);\n\n  return {\n    isExpanded(): boolean {\n      return target.classList.contains(activeClass);\n    },\n    destroy(): void {\n      trigger.removeEventListener('click', handleClick);\n    },\n  };\n}",
+    "testCases": [
+      {
+        "description": "Initializes default closed state and aria-expanded=\"false\"",
+        "input": "bindClassToggle({ triggerId: \"btn-1\", targetId: \"menu-1\" })",
+        "expected": "menu has no \"active\" class, button has aria-expanded=\"false\", isExpanded() is false"
+      },
+      {
+        "description": "Toggles active class and aria-expanded on click",
+        "input": "btn.dispatchEvent(new MouseEvent(\"click\"))",
+        "expected": "toggles \"active\" class on menu and synchronizes aria-expanded between \"true\" and \"false\""
+      },
+      {
+        "description": "Initializes with custom active class and initialExpanded=true",
+        "input": "bindClassToggle({ triggerId: \"btn-2\", targetId: \"drawer-2\", activeClass: \"drawer-open\", initialExpanded: true })",
+        "expected": "drawer starts with \"drawer-open\" class and button has aria-expanded=\"true\""
+      },
+      {
+        "description": "Throws error when target element is missing and removes listener on destroy",
+        "input": "c.destroy(); btn.click()",
+        "expected": "throws on missing DOM nodes and cleans up click event listener so subsequent clicks do not toggle state"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const fn = typeof bindClassToggle === 'function' ? bindClassToggle : (typeof solution === 'object' && solution?.bindClassToggle);\n\n  if (!fn) {\n    $test.check('Initializes default closed state and aria-expanded=\"false\"', false, { error: 'bindClassToggle is not defined' });\n    $test.check('Toggles active class and aria-expanded on click', false, { error: 'bindClassToggle is not defined' });\n    $test.check('Initializes with custom active class and initialExpanded=true', false, { error: 'bindClassToggle is not defined' });\n    $test.check('Throws error when target element is missing and removes listener on destroy', false, { error: 'bindClassToggle is not defined' });\n    return;\n  }\n\n  // Set up DOM container\n  const container = document.createElement('div');\n  document.body.appendChild(container);\n\n  try {\n    // Case 1: Initializes default closed state and aria-expanded=\"false\"\n    container.innerHTML = `\n      <button id=\"btn-1\">Toggle Menu</button>\n      <nav id=\"menu-1\">Items</nav>\n    `;\n    const c1 = fn({ triggerId: 'btn-1', targetId: 'menu-1' });\n    const btn1 = document.getElementById('btn-1');\n    const menu1 = document.getElementById('menu-1');\n    const initClosed = !menu1?.classList.contains('active');\n    const ariaFalse = btn1?.getAttribute('aria-expanded') === 'false';\n    const isExpandedFalse = c1?.isExpanded() === false;\n    $test.check(\n      'Initializes default closed state and aria-expanded=\"false\"',\n      initClosed && ariaFalse && isExpandedFalse,\n      { initClosed, aria: btn1?.getAttribute('aria-expanded'), isExpanded: c1?.isExpanded() }\n    );\n\n    // Case 2: Toggles active class and aria-expanded on click\n    if (btn1) btn1.dispatchEvent(new MouseEvent('click', { bubbles: true }));\n    const clickedOpen = Boolean(menu1?.classList.contains('active')) && btn1?.getAttribute('aria-expanded') === 'true' && c1?.isExpanded() === true;\n    if (btn1) btn1.dispatchEvent(new MouseEvent('click', { bubbles: true }));\n    const clickedClosed = !menu1?.classList.contains('active') && btn1?.getAttribute('aria-expanded') === 'false' && c1?.isExpanded() === false;\n    $test.check(\n      'Toggles active class and aria-expanded on click',\n      clickedOpen && clickedClosed,\n      { clickedOpen, clickedClosed }\n    );\n    c1?.destroy();\n\n    // Case 3: Initializes with custom active class and initialExpanded=true\n    container.innerHTML = `\n      <button id=\"btn-2\">Toggle Drawer</button>\n      <div id=\"drawer-2\">Drawer Content</div>\n    `;\n    const c2 = fn({\n      triggerId: 'btn-2',\n      targetId: 'drawer-2',\n      activeClass: 'drawer-open',\n      initialExpanded: true,\n    });\n    const btn2 = document.getElementById('btn-2');\n    const drawer2 = document.getElementById('drawer-2');\n    const customInit = Boolean(drawer2?.classList.contains('drawer-open')) && btn2?.getAttribute('aria-expanded') === 'true' && c2?.isExpanded() === true;\n    $test.check(\n      'Initializes with custom active class and initialExpanded=true',\n      customInit,\n      { customInit, classList: drawer2 ? Array.from(drawer2.classList) : [], aria: btn2?.getAttribute('aria-expanded') }\n    );\n\n    // Case 4: Throws error when target element is missing and removes listener on destroy\n    let threwOnMissing = false;\n    try {\n      fn({ triggerId: 'nonexistent-btn', targetId: 'drawer-2' });\n    } catch {\n      threwOnMissing = true;\n    }\n    c2?.destroy();\n    // After destroy, click should NOT mutate class\n    if (btn2) btn2.dispatchEvent(new MouseEvent('click', { bubbles: true }));\n    const retainedStateAfterDestroy = Boolean(drawer2?.classList.contains('drawer-open')) && btn2?.getAttribute('aria-expanded') === 'true';\n    $test.check(\n      'Throws error when target element is missing and removes listener on destroy',\n      threwOnMissing && retainedStateAfterDestroy,\n      { threwOnMissing, retainedStateAfterDestroy }\n    );\n  } finally {\n    document.body.removeChild(container);\n  }\n})();"
   }
 ]

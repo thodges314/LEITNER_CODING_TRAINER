@@ -1,0 +1,52 @@
+Implement a Next.js App Router data caching and route segment revalidation config resolver:
+
+## Description
+
+### Application Context
+In the Next.js App Router (`app/products/page.tsx`), data freshness is governed by both native extended `fetch()` options and route segment configurations (`export const revalidate = ...`). Developers often mix up when to use `{ cache: 'force-cache' }`, `{ cache: 'no-store' }`, and `{ next: { revalidate: seconds } }`. You are building a centralized configuration resolver that translates high-level caching strategies (`'static'`, `'timed'`, `'dynamic'`) into the precise fetch options and route segment directives required by Next.js.
+
+```ts
+type CacheStrategy = 'static' | 'timed' | 'dynamic';
+
+interface CacheStrategyOptions {
+  strategy: CacheStrategy;
+  revalidateSeconds?: number;
+  tags?: string[];
+}
+
+interface NextFetchInit {
+  cache?: 'force-cache' | 'no-store';
+  next?: {
+    revalidate?: number | false;
+    tags?: string[];
+  };
+}
+
+interface SegmentConfig {
+  revalidate?: number | false;
+  dynamic?: 'auto' | 'force-dynamic' | 'force-static';
+}
+
+interface NextDataCacheConfig {
+  fetchOptions: NextFetchInit;
+  segmentConfig: SegmentConfig;
+}
+```
+
+### `buildDataCacheConfig(options: CacheStrategyOptions): NextDataCacheConfig`
+
+Resolves the configuration based on `options.strategy`:
+
+- **Static Caching (`strategy === 'static'`)**:
+  - For immutable or infrequently changing data (e.g. blog posts, marketing pages).
+  - `fetchOptions`: Sets `cache: 'force-cache'`. If `options.tags` is provided with non-empty strings, sets `next: { tags: options.tags }`.
+  - `segmentConfig`: Sets `dynamic: 'force-static'` and `revalidate: false`.
+- **Time-Based Revalidation (`strategy === 'timed'`)**:
+  - For Incremental Static Regeneration (ISR) where data refreshes periodically in the background (e.g. product listings, news feeds).
+  - Determines effective revalidation window: uses `options.revalidateSeconds` if it is a positive number (`> 0`); otherwise defaults to `60`.
+  - `fetchOptions`: Does NOT set `cache`. Sets `next: { revalidate: seconds }`. If `options.tags` is provided with non-empty strings, adds `tags: options.tags` inside `next`.
+  - `segmentConfig`: Sets `revalidate: seconds`. (Does not set `dynamic`).
+- **Dynamic Real-Time (`strategy === 'dynamic'`)**:
+  - For user-specific or real-time data that must never be cached (e.g. shopping carts, account balances, live stock tickers).
+  - `fetchOptions`: Sets `cache: 'no-store'`. (Does NOT set `next`).
+  - `segmentConfig`: Sets `dynamic: 'force-dynamic'` and `revalidate: 0`.

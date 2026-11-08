@@ -279,6 +279,10 @@
     "difficulty": 4,
     "concept": "router"
   },
+  "dom-toggle-active-class": {
+    "difficulty": 1,
+    "concept": "dom"
+  },
   "event-delegation": {
     "difficulty": 2,
     "concept": "dom"
@@ -879,6 +883,10 @@
     "difficulty": 4,
     "concept": "testing-tools"
   },
+  "basic-assertion-library": {
+    "difficulty": 1,
+    "concept": "testing-tools"
+  },
   "mini-expect": {
     "difficulty": 3,
     "concept": "testing-tools"
@@ -1307,6 +1315,14 @@
     "difficulty": 3,
     "concept": "sql-conditional-aggregation"
   },
+  "sql-basic-select-filter": {
+    "difficulty": 1,
+    "concept": "sql-query-basics"
+  },
+  "sql-basic-inner-join": {
+    "difficulty": 1,
+    "concept": "sql-joins"
+  },
   "sql-customers-who-never-order": {
     "difficulty": 2,
     "concept": "sql-joins"
@@ -1550,6 +1566,14 @@
   "next-static-params-generator": {
     "difficulty": 2,
     "concept": "next-static-params"
+  },
+  "next-server-client-leaf-boundary": {
+    "difficulty": 1,
+    "concept": "next-client-components"
+  },
+  "next-fetch-cache-revalidate": {
+    "difficulty": 1,
+    "concept": "next-cache-revalidation"
   },
   "next-revalidation-tag-cache": {
     "difficulty": 3,

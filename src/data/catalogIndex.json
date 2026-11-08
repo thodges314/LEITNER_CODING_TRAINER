@@ -5632,5 +5632,99 @@
       "currying"
     ],
     "summary": "Implement variadic tuple types and positional rest parameter utilities to manipulate strongly typed parameter lists"
+  },
+  {
+    "id": "next-fetch-cache-revalidate",
+    "title": "Next.js App Router Data Cache & Revalidation Config",
+    "track": "nextjs",
+    "concept": "next-cache-revalidation",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "caching",
+      "isr",
+      "revalidation",
+      "fetch"
+    ],
+    "summary": "Implement a Next.js App Router data caching and route segment revalidation config resolver"
+  },
+  {
+    "id": "next-server-client-leaf-boundary",
+    "title": "Next.js Architecture: Move Client Components to the Leaves",
+    "track": "nextjs",
+    "concept": "next-client-components",
+    "difficulty": 1,
+    "tags": [
+      "nextjs",
+      "app-router",
+      "rsc",
+      "client-components",
+      "architecture",
+      "react"
+    ],
+    "summary": "Implement Next.js App Router leaf Client Component and Server Component composition"
+  },
+  {
+    "id": "sql-basic-inner-join",
+    "title": "SQL Table Joins: Two-Table Inner Join",
+    "track": "sql-postgres",
+    "concept": "sql-joins",
+    "difficulty": 1,
+    "tags": [
+      "sql",
+      "postgresql",
+      "join",
+      "inner-join",
+      "foreign-key",
+      "aliases"
+    ],
+    "summary": "Write a PostgreSQL query to join customer and order tables using an inner join"
+  },
+  {
+    "id": "sql-basic-select-filter",
+    "title": "SQL Query Basics: Filter, Sort, and Limit",
+    "track": "sql-postgres",
+    "concept": "sql-query-basics",
+    "difficulty": 1,
+    "tags": [
+      "sql",
+      "postgresql",
+      "select",
+      "where",
+      "order-by",
+      "limit"
+    ],
+    "summary": "Write a PostgreSQL query to filter, sort, and paginate product inventory"
+  },
+  {
+    "id": "basic-assertion-library",
+    "title": "Basic Test Assertions: ok, equal, and throws",
+    "track": "testing-tooling",
+    "concept": "testing-tools",
+    "difficulty": 1,
+    "tags": [
+      "testing",
+      "assertions",
+      "assert",
+      "unit-testing"
+    ],
+    "summary": "Implement a foundational unit-test assertion suite providing ok, equal, and throws"
+  },
+  {
+    "id": "dom-toggle-active-class",
+    "title": "DOM Event Listener: Toggle Active Class & Aria-Expanded",
+    "track": "dom-browser",
+    "concept": "dom",
+    "difficulty": 1,
+    "tags": [
+      "dom",
+      "browser",
+      "events",
+      "class-list",
+      "aria",
+      "event-listener"
+    ],
+    "summary": "Implement a foundational DOM utility that binds a click listener to toggle an active class and synchronize aria-expanded"
   }
 ]
