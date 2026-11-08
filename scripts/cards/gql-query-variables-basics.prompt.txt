@@ -1,0 +1,43 @@
+Write a GraphQL query named `GetProduct` that accepts a required variable `$id: ID!`.
+
+### Requirements
+- Operation signature: `query GetProduct($id: ID!)`
+- Top-level field: `product(id: $id)`
+- Fields to select on `product`:
+  - `id`
+  - `title`
+  - `price`
+  - `inStock`
+  - `category`: select `id` and `name`
+
+### Schema Context
+```graphql
+type Query {
+  product(id: ID!): Product
+}
+type Category {
+  id: ID!
+  name: String!
+}
+type Product {
+  id: ID!
+  title: String!
+  price: Float!
+  inStock: Boolean!
+  category: Category!
+}
+```
+
+### Example
+When executed with variables `{ id: "prod_42" }`, returns:
+```json
+{
+  "product": {
+    "id": "prod_42",
+    "title": "Trail Runner Pro",
+    "price": 129.99,
+    "inStock": true,
+    "category": { "id": "cat_footwear", "name": "Footwear" }
+  }
+}
+```

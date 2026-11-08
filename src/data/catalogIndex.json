@@ -5976,5 +5976,50 @@
       "app-router"
     ],
     "summary": "Next.js App Router Partial Prerendering (PPR) combines instant static shell delivery with dynamic Server Component streaming. The static layout she..."
+  },
+  {
+    "id": "gql-query-variables-basics",
+    "title": "GraphQL Query: Operation Variables & Arguments",
+    "track": "graphql",
+    "concept": "gql-queries",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "query",
+      "variables",
+      "arguments",
+      "client"
+    ],
+    "summary": "Write a GraphQL query named GetProduct that accepts a required variable $id: ID!."
+  },
+  {
+    "id": "mock-fn-spy-basics",
+    "title": "Mock Function Spy: Call Tracking & Return Values",
+    "track": "testing-tooling",
+    "concept": "mock-functions",
+    "difficulty": 1,
+    "tags": [
+      "testing",
+      "mocking",
+      "spy",
+      "assertions",
+      "functions"
+    ],
+    "summary": "In unit testing frameworks (Vitest, Jest), function spies observe invocations without necessarily modifying the original function's implementation...."
+  },
+  {
+    "id": "promise-sleep-delay",
+    "title": "Promise Delay & Value Timer",
+    "track": "async-js",
+    "concept": "promise-delay",
+    "difficulty": 1,
+    "tags": [
+      "async",
+      "promises",
+      "timer",
+      "delay",
+      "sleep"
+    ],
+    "summary": "A fundamental building block in asynchronous JavaScript is creating a delay timer promise that pauses execution for a given duration. This pattern ..."
   }
 ]

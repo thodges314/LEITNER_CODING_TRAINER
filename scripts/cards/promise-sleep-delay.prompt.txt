@@ -1,0 +1,27 @@
+# Promise Delay & Value Timer
+
+## Description
+A fundamental building block in asynchronous JavaScript is creating a delay timer promise that pauses execution for a given duration. This pattern is foundational for rate limiting, retry backoff pacing, simulated latency, and polling intervals.
+
+Implement two foundational asynchronous utility functions:
+1. `delay(ms)`: returns a `Promise<void>` that resolves after `ms` milliseconds.
+2. `delayValue(value, ms)`: returns a `Promise<T>` that resolves with the provided `value` after `ms` milliseconds.
+
+```ts
+function delay(ms: number): Promise<void>;
+function delayValue<T>(value: T, ms: number): Promise<T>;
+```
+
+### delay(ms: number): Promise<void>
+
+#### Requirements
+- If `ms` is greater than 0, schedule resolution after `ms` milliseconds using `setTimeout`.
+- If `ms` is less than or equal to 0, or not a positive number, resolve immediately.
+- Returns a `Promise<void>` that resolves to `undefined`.
+
+### delayValue<T>(value: T, ms: number): Promise<T>
+
+#### Requirements
+- Pauses for `ms` milliseconds and resolves with the supplied `value`.
+- If `ms <= 0`, resolves with `value` immediately.
+

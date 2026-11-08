@@ -1678,5 +1678,17 @@
   "k-way-stream-merger": {
     "difficulty": 4,
     "concept": "streams-external-merge"
+  },
+  "promise-sleep-delay": {
+    "difficulty": 1,
+    "concept": "promise-delay"
+  },
+  "mock-fn-spy-basics": {
+    "difficulty": 1,
+    "concept": "mock-functions"
+  },
+  "gql-query-variables-basics": {
+    "difficulty": 1,
+    "concept": "gql-queries"
   }
 }

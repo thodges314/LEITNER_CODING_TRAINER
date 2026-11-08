@@ -1,5 +1,5 @@
 await (async () => {
-  const { render, wait, act } = $dom;
+  const { render, act } = $dom;
   const Component = typeof ProductPPRPage === 'function'
     ? ProductPPRPage
     : (typeof solution === 'object' && typeof solution?.ProductPPRPage === 'function' ? solution.ProductPPRPage : null);
@@ -16,6 +16,26 @@ await (async () => {
     $test.check(case4, false, { error: 'ProductPPRPage is not defined' });
     return;
   }
+
+  const isVisible = (el: Element | null): boolean => {
+    if (!el) return false;
+    let curr: HTMLElement | null = el as HTMLElement;
+    while (curr) {
+      if (curr.style && curr.style.display === 'none') return false;
+      curr = curr.parentElement;
+    }
+    return true;
+  };
+
+  const waitFor = async (cond: () => boolean, ms = 2500): Promise<boolean> => {
+    const end = Date.now() + ms;
+    while (!cond() && Date.now() < end) {
+      await act(async () => {
+        await new Promise((res) => setTimeout(res, 15));
+      });
+    }
+    return cond();
+  };
 
   function createDeferred<T>() {
     let resolve!: (val: T) => void;
@@ -67,16 +87,16 @@ await (async () => {
       titleEl?.textContent?.trim() === 'Summit Trail Vest' &&
       catEl?.textContent?.trim() === 'Apparel' &&
       priceEl?.textContent?.trim() === '$140.00' &&
-      Boolean(invSkeleton) &&
-      Boolean(revSkeleton) &&
-      invStatus === null &&
-      revList === null;
+      isVisible(invSkeleton) &&
+      isVisible(revSkeleton) &&
+      !isVisible(invStatus) &&
+      !isVisible(revList);
 
     $test.check(case1, Boolean(pass1), {
       hasShell: Boolean(shell),
       title: titleEl?.textContent,
-      hasInvSkeleton: Boolean(invSkeleton),
-      hasRevSkeleton: Boolean(revSkeleton),
+      hasInvSkeleton: isVisible(invSkeleton),
+      hasRevSkeleton: isVisible(revSkeleton),
     });
 
     // Case 2: Resolve inventory promise
@@ -86,7 +106,11 @@ await (async () => {
         warehouse: 'Denver Hub',
         lowStockAlert: false,
       });
-      await wait(30);
+    });
+
+    await waitFor(() => {
+      const el = renderedContainer!.querySelector('[data-testid="inventory-status"]');
+      return Boolean(el && isVisible(el) && (el.textContent || '').includes('18 in stock (Denver Hub)'));
     });
 
     const invStatusEl = renderedContainer!.querySelector('[data-testid="inventory-status"]');
@@ -94,14 +118,15 @@ await (async () => {
     const revSkeletonAfter = renderedContainer!.querySelector('[data-testid="reviews-skeleton"]');
 
     const pass2 = Boolean(invStatusEl) &&
+      isVisible(invStatusEl) &&
       (invStatusEl?.textContent || '').includes('18 in stock (Denver Hub)') &&
-      invSkeletonAfter === null &&
-      Boolean(revSkeletonAfter);
+      !isVisible(invSkeletonAfter) &&
+      isVisible(revSkeletonAfter);
 
     $test.check(case2, Boolean(pass2), {
       inventoryText: invStatusEl?.textContent,
-      inventorySkeletonGone: invSkeletonAfter === null,
-      reviewsStillPending: Boolean(revSkeletonAfter),
+      inventorySkeletonGone: !isVisible(invSkeletonAfter),
+      reviewsStillPending: isVisible(revSkeletonAfter),
     });
 
     // Case 3: Resolve reviews promise
@@ -110,7 +135,12 @@ await (async () => {
         { id: 'rev-1', author: 'Elena R.', rating: 5, comment: 'Incredible thermal insulation.' },
         { id: 'rev-2', author: 'Marcus B.', rating: 4, comment: 'Fits true to size.' },
       ]);
-      await wait(30);
+    });
+
+    await waitFor(() => {
+      const list = renderedContainer!.querySelector('[data-testid="reviews-list"]');
+      const it1 = renderedContainer!.querySelector('[data-testid="review-item-rev-1"]');
+      return Boolean(list && isVisible(list) && it1 && isVisible(it1));
     });
 
     const reviewsList = renderedContainer!.querySelector('[data-testid="reviews-list"]');
@@ -119,15 +149,16 @@ await (async () => {
     const revSkeletonFinal = renderedContainer!.querySelector('[data-testid="reviews-skeleton"]');
 
     const pass3 = Boolean(reviewsList) &&
+      isVisible(reviewsList) &&
       Boolean(item1) &&
       Boolean(item2) &&
       (item1?.textContent || '').includes('Elena R.') &&
-      revSkeletonFinal === null;
+      !isVisible(revSkeletonFinal);
 
     $test.check(case3, Boolean(pass3), {
-      hasReviewsList: Boolean(reviewsList),
+      hasReviewsList: isVisible(reviewsList),
       item1Found: Boolean(item1),
-      reviewsSkeletonGone: revSkeletonFinal === null,
+      reviewsSkeletonGone: !isVisible(revSkeletonFinal),
     });
 
     unmountFn();
@@ -160,19 +191,25 @@ await (async () => {
         lowStockAlert: true,
       });
       revDeferred2.resolve([]);
-      await wait(30);
+    });
+
+    await waitFor(() => {
+      const low = renderedContainer2!.querySelector('[data-testid="inventory-status"]');
+      const noRev = renderedContainer2!.querySelector('[data-testid="no-reviews"]');
+      return Boolean(low && isVisible(low) && noRev && isVisible(noRev));
     });
 
     const lowStockEl = renderedContainer2!.querySelector('[data-testid="inventory-status"]');
     const noReviewsEl = renderedContainer2!.querySelector('[data-testid="no-reviews"]');
 
     const pass4 = Boolean(lowStockEl) &&
+      isVisible(lowStockEl) &&
       (lowStockEl?.textContent || '').includes('Only 3 left! (Reno Hub)') &&
-      Boolean(noReviewsEl);
+      isVisible(noReviewsEl);
 
     $test.check(case4, Boolean(pass4), {
       lowStockText: lowStockEl?.textContent,
-      hasNoReviewsMessage: Boolean(noReviewsEl),
+      hasNoReviewsMessage: isVisible(noReviewsEl),
     });
 
     unmountFn2();

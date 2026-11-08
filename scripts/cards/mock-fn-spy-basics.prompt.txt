@@ -1,0 +1,43 @@
+# Mock Function Spy: Call Tracking & Return Values
+
+## Description
+In unit testing frameworks (Vitest, Jest), function spies observe invocations without necessarily modifying the original function's implementation. A spy records each call's arguments, invocation counts, and return values, and allows overriding return values or implementations during tests.
+
+Implement a test spy factory `createSpy(implementation?)`.
+
+```ts
+interface SpyCall {
+  args: unknown[];
+  returned?: unknown;
+  threw?: unknown;
+}
+
+interface MockSpy<TArgs extends unknown[] = unknown[], TReturn = unknown> {
+  (...args: TArgs): TReturn;
+  calls: SpyCall[];
+  callCount: number;
+  mockReturnValue(val: TReturn): MockSpy<TArgs, TReturn>;
+  mockImplementation(fn: (...args: TArgs) => TReturn): MockSpy<TArgs, TReturn>;
+  mockReset(): void;
+}
+
+function createSpy<TArgs extends unknown[] = unknown[], TReturn = unknown>(
+  implementation?: (...args: TArgs) => TReturn
+): MockSpy<TArgs, TReturn>;
+```
+
+### createSpy(implementation?): MockSpy
+
+#### Requirements
+1. **Invocation**:
+   - The returned object must be directly callable as a function (`spy(...args)`).
+   - If an `implementation` function was provided, invoke it with `args` and return its result.
+   - If no implementation was provided, return `undefined` by default (unless overridden via `mockReturnValue`).
+2. **Call Tracking**:
+   - `spy.calls`: an array of call records `{ args: [...args], returned: result }`. If the implementation throws, record `{ args: [...args], threw: error }` and rethrow the error.
+   - `spy.callCount`: a number indicating how many times the spy has been invoked (starts at `0`).
+3. **Chainable Helpers**:
+   - `spy.mockReturnValue(val)`: overrides the implementation so future invocations return `val`. Returns `spy` for chaining.
+   - `spy.mockImplementation(fn)`: sets a new implementation function. Returns `spy` for chaining.
+   - `spy.mockReset()`: clears `spy.calls` to an empty array and resets `spy.callCount` to `0`.
+

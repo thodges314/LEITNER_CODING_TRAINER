@@ -1,0 +1,14 @@
+{
+  "track": "graphql",
+  "title": "GraphQL Query: Operation Variables & Arguments",
+  "tags": [
+    "graphql",
+    "query",
+    "variables",
+    "arguments",
+    "client"
+  ],
+  "concept": "gql-queries",
+  "inputLanguage": "graphql"
+}
+

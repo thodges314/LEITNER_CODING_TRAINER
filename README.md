@@ -97,12 +97,12 @@ Switchable in Settings between two spaced-repetition models:
 
 ## Content & Authoring Pipeline
 
-The repository includes **420 curated cards** across 17 topic tracks with **2,676 test cases**:
+The repository includes **423 curated cards** across 17 topic tracks with **2,688 test cases**:
 - **Advanced Algorithms** (57 cards)
 - **JS Utilities** (44 cards)
 - **React Components** (41 cards)
 - **Algorithms** (30 cards)
-- **Async JS** (27 cards)
+- **Async JS** (28 cards)
 - **React Hooks & Patterns** (27 cards)
 - **JS Language Core** (25 cards)
 - **Next.js App Router** (23 cards)
@@ -113,8 +113,8 @@ The repository includes **420 curated cards** across 17 topic tracks with **2,67
 - **TypeScript Patterns** (16 cards)
 - **Node.js Runtime & Architecture** (15 cards)
 - **Tailwind CSS** (15 cards)
-- **Testing & Tooling** (11 cards)
-- **GraphQL APIs & Execution** (10 cards)
+- **Testing & Tooling** (12 cards)
+- **GraphQL APIs & Execution** (11 cards)
 
 ### Card Structure (`scripts/cards/`)
 Each card consists of audited modular sources:
