@@ -1690,5 +1690,25 @@
   "gql-query-variables-basics": {
     "difficulty": 1,
     "concept": "gql-queries"
+  },
+  "sql-basic-aggregate-group": {
+    "difficulty": 1,
+    "concept": "sql-aggregates"
+  },
+  "test-suite-runner-describe-it": {
+    "difficulty": 1,
+    "concept": "test-runners"
+  },
+  "gql-query-field-alias-basics": {
+    "difficulty": 1,
+    "concept": "gql-queries"
+  },
+  "tailwind-button-basics": {
+    "difficulty": 1,
+    "concept": "tailwind-button"
+  },
+  "promise-timeout-reject": {
+    "difficulty": 1,
+    "concept": "promise"
   }
 }

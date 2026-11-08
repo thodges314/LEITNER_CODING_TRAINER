@@ -6021,5 +6021,82 @@
       "sleep"
     ],
     "summary": "A fundamental building block in asynchronous JavaScript is creating a delay timer promise that pauses execution for a given duration. This pattern ..."
+  },
+  {
+    "id": "gql-query-field-alias-basics",
+    "title": "GraphQL Query: Field Aliasing",
+    "track": "graphql",
+    "concept": "gql-queries",
+    "difficulty": 1,
+    "tags": [
+      "graphql",
+      "query",
+      "aliases",
+      "arguments",
+      "fields"
+    ],
+    "summary": "Write a GraphQL query named GetUserAvatars that queries a user by ID and uses field aliases to request two different avatar sizes from the same und..."
+  },
+  {
+    "id": "sql-basic-aggregate-group",
+    "title": "SQL Aggregation Basics: GROUP BY and HAVING",
+    "track": "sql-postgres",
+    "concept": "sql-aggregates",
+    "difficulty": 1,
+    "tags": [
+      "sql",
+      "postgresql",
+      "aggregates",
+      "group-by",
+      "having",
+      "count",
+      "avg"
+    ],
+    "summary": "Write a SQL query that aggregates the employees table by department to find department size and average compensation for teams with multiple members."
+  },
+  {
+    "id": "test-suite-runner-describe-it",
+    "title": "Test Suite Runner: describe, it, and getReport",
+    "track": "testing-tooling",
+    "concept": "test-runners",
+    "difficulty": 1,
+    "tags": [
+      "testing",
+      "bdd",
+      "runner",
+      "assertions",
+      "suite"
+    ],
+    "summary": "Implement a synchronous test runner factory createTestRunner() providing BDD-style describe, it, getReport, and reset functions."
+  },
+  {
+    "id": "promise-timeout-reject",
+    "title": "Promise Timeout: withTimeout Wrapper",
+    "track": "async-js",
+    "concept": "promise",
+    "difficulty": 1,
+    "tags": [
+      "async",
+      "promises",
+      "timeout",
+      "timer",
+      "race"
+    ],
+    "summary": "function promiseTimeout<T>("
+  },
+  {
+    "id": "tailwind-button-basics",
+    "title": "Tailwind Button: Interactive States & Variants",
+    "track": "tailwind",
+    "concept": "tailwind-button",
+    "difficulty": 1,
+    "tags": [
+      "tailwind",
+      "button",
+      "interactive",
+      "variants",
+      "components"
+    ],
+    "summary": "type ButtonVariant = 'primary' | 'outline';"
   }
 ]

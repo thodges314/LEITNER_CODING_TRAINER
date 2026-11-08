@@ -1,0 +1,33 @@
+### `promiseTimeout(promise: Promise<T>, ms: number, message?: string): Promise<T>`
+
+## Description
+
+```ts
+function promiseTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  message?: string
+): Promise<T>;
+```
+
+Wrap an asynchronous promise with a strict timeout deadline. If the wrapped promise settles (fulfills or rejects) before `ms` milliseconds elapse, settle with its outcome. If `ms` milliseconds pass before the promise settles, reject with an `Error`.
+
+### Requirements
+- **Settles Before Timeout**:
+  - If `promise` fulfills before `ms` milliseconds, fulfill with its resolved value.
+  - If `promise` rejects before `ms` milliseconds, reject with its original rejection reason.
+  - Clear the scheduled timeout timer using `clearTimeout` upon settlement to avoid dangling handles.
+- **Exceeds Timeout**:
+  - If `ms` milliseconds elapse before `promise` settles, reject with `new Error(message || 'Operation timed out')`.
+- **Default Message**:
+  - The fallback message must default to `'Operation timed out'`.
+
+### Example
+```ts
+const fetchFast = promiseTimeout(fetchData(), 500);
+// Resolves if fetchData() completes within 500ms
+
+const fetchSlow = promiseTimeout(fetchData(), 100, 'Network request timed out');
+// Rejects with Error('Network request timed out') if > 100ms
+```
+

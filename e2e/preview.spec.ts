@@ -548,6 +548,35 @@ test.describe('React preview window', () => {
     expect(hasReact).toBe(true);
   });
 
+  test('tailwind-button-basics: displays Live Preview Window, loads React and Tailwind, and renders button', async ({ page }) => {
+    const card = topics.find((t) => t.id === 'tailwind-button-basics');
+    expect(card).toBeDefined();
+    const solution = card?.referenceSolution || card?.solution || '';
+
+    await openCard(page, 'tailwind-button-basics', solution);
+
+    const previewWindow = page.locator('[data-testid="react-preview-window"]');
+    await expect(previewWindow).toBeVisible();
+
+    await page.getByRole('button', { name: /Run Code \/ Test/ }).click();
+
+    await expect(previewWindow.locator('[data-testid="preview-status-badge"]')).toContainText('Live');
+    await expect(previewWindow.getByRole('alert')).toHaveCount(0);
+
+    const frame = page.frameLocator('[data-testid="react-preview-window"] iframe');
+    const button = frame.locator('button');
+    await expect(button).toBeVisible({ timeout: 5000 });
+    await expect(button).toContainText('Save Changes');
+
+    const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
+    expect(hasReact).toBe(true);
+
+    const hasTailwindCdn = await frame.locator('head').evaluate((head) => {
+      return Array.from(head.querySelectorAll('script')).some((s) => s.src.includes('tailwindcss.com'));
+    });
+    expect(hasTailwindCdn).toBe(true);
+  });
+
   test('tailwind-dismissible-banner: loads React and Tailwind, renders alert banner, and dismisses on click', async ({ page }) => {
     const card = topics.find((t) => t.id === 'tailwind-dismissible-banner');
     expect(card).toBeDefined();

@@ -1,0 +1,36 @@
+Write a GraphQL query named `GetUserAvatars` that queries a user by ID and uses field aliases to request two different avatar sizes from the same underlying field.
+
+### Requirements
+- Operation signature: `query GetUserAvatars($id: ID!)`
+- Top-level field: `user(id: $id)`
+- Fields to select on `user`:
+  - `id`
+  - `username`
+  - `thumb`: aliased to `avatarUrl(size: 64)`
+  - `hero`: aliased to `avatarUrl(size: 512)`
+
+### Schema Context
+```graphql
+type Query {
+  user(id: ID!): User
+}
+type User {
+  id: ID!
+  username: String!
+  avatarUrl(size: Int!): String!
+}
+```
+
+### Example Output
+When executed with variables `{ id: "user_1" }`, returns:
+```json
+{
+  "user": {
+    "id": "user_1",
+    "username": "codemaster",
+    "thumb": "https://cdn.example.com/avatars/user_1_64.png",
+    "hero": "https://cdn.example.com/avatars/user_1_512.png"
+  }
+}
+```
+

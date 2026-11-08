@@ -1,0 +1,27 @@
+Write a SQL query that aggregates the `employees` table by department to find department size and average compensation for teams with multiple members.
+
+### Schema Context
+```sql
+CREATE TABLE employees (
+  id INT PRIMARY KEY,
+  name VARCHAR(50),
+  department VARCHAR(50),
+  salary INT
+);
+```
+
+### Requirements
+- Group records by `department`.
+- Select the following columns:
+  - `department`: the name of the department.
+  - `employee_count`: the total number of employees in the department (`COUNT(*)`).
+  - `avg_salary`: the average salary for the department, rounded to 2 decimal places (`ROUND(AVG(salary), 2)`).
+- Filter out departments with fewer than 2 employees using `HAVING COUNT(*) >= 2`.
+- Order results by `employee_count DESC`, then by `department ASC`.
+
+### Example Output
+| department | employee_count | avg_salary |
+| :--- | :--- | :--- |
+| Engineering | 3 | 115000.00 |
+| Marketing | 2 | 75000.00 |
+

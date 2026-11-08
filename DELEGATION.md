@@ -4,7 +4,7 @@ Read `ARCHITECTURE_AND_ROADMAP.md` first (system map, card pipeline, gotchas). T
 criteria**, plus the rules every contributor follows. Tasks marked **[owner decision]** need the owner's approval before coding.
 
 ## Current state (keep this block up to date in the same commit as any change it describes)
-- `master` = the deployed app. **423 cards** (across 17 first-class topic tracks, organized into 5 built-in preset study decks: Full Library [423], Full-Stack Core [366], Frontend Specialist [285], Algorithms & Data Structures [103], and Data Scaling & Streams [17]), **2,688 documented cases**, **100% Markdown formatted instructions** across all 423 cards, **100% TypeScript dual solutions** across all 423 cards, 2,672 unit tests (70 test files), 913 browser tests. A push to `master` deploys (Markdown changes ignored in deploy workflow to conserve Actions minutes), and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
+- `master` = the deployed app. **428 cards** (across 17 first-class topic tracks, organized into 5 built-in preset study decks: Full Library [428], Full-Stack Core [371], Frontend Specialist [286], Algorithms & Data Structures [103], and Data Scaling & Streams [17]), **2,708 documented cases**, **100% Markdown formatted instructions** across all 428 cards, **100% TypeScript dual solutions** across all 428 cards, 2,698 unit tests (70 test files), 924 browser tests. A push to `master` deploys (Markdown changes ignored in deploy workflow to conserve Actions minutes), and the deploy waits for the browser suite (`.github/workflows/deploy.yml`, job `e2e`).
 - Quick rules for any contributor are in `AGENTS.md`. `npm run check:cards` is a read-only check that `src/data/topics.json` and `src/data/catalogIndex.json` match the card sources (run it, or `build:cards`, after any card edit).
 - AI evaluator replies are parsed by `parseEvaluationPayload` (`src/lib/ai.ts`); malformed replies are shown raw (`rawOutput`) in the evaluation panel instead of being split into lists.
 - First-4-problems backup advisory & export spotlight feature: alerts users after 4 completed problems (scored reviews, excluding unscored reinforcement repeats) to export their `localStorage` state to JSON, with spotlight pulse & callout bubble on the Deck Catalog export button. Verified by unit tests (`src/lib/backupAdvisory.test.ts`) and Playwright E2E (`e2e/backup-advisory.spec.ts`).
@@ -19,7 +19,7 @@ criteria**, plus the rules every contributor follows. Tasks marked **[owner deci
 | Foundational Curriculum Warm-Up Cards & Next.js Audit | feature/curriculum-warmup-cards | antigravity | Ready to merge |
 | Next.js Curriculum Expansion & Advanced App Router Cards | feature/nextjs-curriculum-expansion | antigravity | Ready to merge |
 | Curriculum Warm-Up Cards Expansion (Async JS, Testing, GraphQL) | feature/more-warmup-cards | antigravity | Ready to merge |
-| Curriculum Warm-Up Cards Batch 2 (SQL, Testing, Tailwind, GraphQL, Async) | feature/warmup-cards-batch2 | antigravity | In progress |
+| Curriculum Warm-Up Cards Batch 2 (SQL, Testing, Tailwind, GraphQL, Async) | feature/warmup-cards-batch2 | antigravity | Ready to merge |
 
 
 

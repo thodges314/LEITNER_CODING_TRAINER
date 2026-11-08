@@ -18480,7 +18480,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "sql",
       "postgres",
@@ -21341,7 +21341,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "promptSeed": "### `Button({ variant = 'primary', size = 'md', loading = false, disabled = false, children, onClick, ...props }: ButtonProps): JSX.Element`\n\n## Description\n\n```ts\ntype ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'outline';\ntype ButtonSize = 'sm' | 'md' | 'lg';\n\ninterface ButtonProps {\n  variant?: ButtonVariant;\n  size?: ButtonSize;\n  loading?: boolean;\n  disabled?: boolean;\n  children?: any;\n  onClick?: (event: any) => void;\n  [key: string]: any;\n}\n```\n\nInteractive, accessible buttons with cohesive hover, focus-visible rings, press transitions, and asynchronous loading states form the bedrock of any component library.\n\nBuild an accessible, versatile React button styled with Tailwind CSS utility classes:\n\n### Requirements\n\n- **Base Layout & Pseudo-States (`<button>`)**:\n  - Elements: `<button type=\"button\" ...>` (defaults to `type=\"button\"` unless specified in `props`).\n  - Base classes: `inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-95 cursor-pointer`\n  - Forwards extra props (such as `aria-label`, `data-testid`, or `id`) to the underlying `<button>`.\n\n- **Variant Styling**:\n  - `'primary'` (default): `bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:ring-indigo-600`\n  - `'secondary'`: `bg-slate-800 text-slate-100 hover:bg-slate-700 focus-visible:ring-slate-500`\n  - `'destructive'`: `bg-rose-600 text-white hover:bg-rose-500 focus-visible:ring-rose-600`\n  - `'outline'`: `border border-slate-700 text-slate-200 hover:bg-slate-800 focus-visible:ring-slate-500`\n\n- **Sizes & Spacing**:\n  - `'sm'`: `text-xs px-2.5 py-1.5 rounded-lg gap-1.5`\n  - `'md'` (default): `text-sm px-4 py-2 rounded-xl gap-2`\n  - `'lg'`: `text-base px-5 py-2.5 rounded-xl gap-2.5`\n\n- **Disabled State**:\n  - When `disabled` is `true` or `loading` is `true`:\n    - Sets HTML attribute `disabled={true}` on the `<button>`.\n    - Includes disabled utility classes: `disabled:opacity-50 disabled:pointer-events-none cursor-not-allowed`\n\n- **Loading State**:\n  - When `loading` is `true`:\n    - Sets `aria-busy=\"true\"` on the `<button>`.\n    - Renders an inline SVG spinner before `children`:\n      `<svg class=\"animate-spin h-4 w-4\" fill=\"none\" viewBox=\"0 0 24 24\"><circle class=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle><path class=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8v8H4z\"></path></svg>`",
     "title": "Tailwind Interactive Button & States",
     "track": "tailwind",
@@ -24427,5 +24427,235 @@
       }
     ],
     "testHarness": "await (async () => {\n  const dFn = typeof delay === 'function' ? delay : (globalThis as any).delay;\n  const dvFn = typeof delayValue === 'function' ? delayValue : (globalThis as any).delayValue;\n\n  const case1 = 'delay(ms) resolves after specified duration with undefined';\n  const case2 = 'delayValue(value, ms) resolves with given value after timer';\n  const case3 = 'delay handles non-positive values immediately without error';\n  const case4 = 'Chains sequential delays correctly';\n\n  if (typeof dFn !== 'function' || typeof dvFn !== 'function') {\n    $test.check(case1, false, { error: 'delay or delayValue is not defined' });\n    $test.check(case2, false, { error: 'delay or delayValue is not defined' });\n    $test.check(case3, false, { error: 'delay or delayValue is not defined' });\n    $test.check(case4, false, { error: 'delay or delayValue is not defined' });\n    return;\n  }\n\n  // Case 1\n  const t0 = Date.now();\n  const res1 = await dFn(30);\n  const elapsed1 = Date.now() - t0;\n  $test.check(\n    case1,\n    res1 === undefined && elapsed1 >= 20,\n    { elapsed: elapsed1, res: res1 }\n  );\n\n  // Case 2\n  const t1 = Date.now();\n  const res2 = await dvFn('data_payload', 30);\n  const elapsed2 = Date.now() - t1;\n  $test.check(\n    case2,\n    res2 === 'data_payload' && elapsed2 >= 20,\n    { elapsed: elapsed2, res: res2 }\n  );\n\n  // Case 3\n  const t2 = Date.now();\n  const res3A = await dFn(0);\n  const res3B = await dFn(-100);\n  const res3C = await dvFn(42, 0);\n  const elapsed3 = Date.now() - t2;\n  $test.check(\n    case3,\n    res3A === undefined && res3B === undefined && res3C === 42 && elapsed3 < 40,\n    { elapsed: elapsed3, res3C }\n  );\n\n  // Case 4\n  const t3 = Date.now();\n  await dFn(15);\n  const res4 = await dvFn({ ready: true }, 15);\n  const elapsed4 = Date.now() - t3;\n  $test.check(\n    case4,\n    res4 && res4.ready === true && elapsed4 >= 25,\n    { elapsed: elapsed4, res4 }\n  );\n})();"
+  },
+  {
+    "id": "gql-query-field-alias-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Write a GraphQL query named `GetUserAvatars` that queries a user by ID and uses field aliases to request two different avatar sizes from the same underlying field.\n\n### Requirements\n- Operation signature: `query GetUserAvatars($id: ID!)`\n- Top-level field: `user(id: $id)`\n- Fields to select on `user`:\n  - `id`\n  - `username`\n  - `thumb`: aliased to `avatarUrl(size: 64)`\n  - `hero`: aliased to `avatarUrl(size: 512)`\n\n### Schema Context\n```graphql\ntype Query {\n  user(id: ID!): User\n}\ntype User {\n  id: ID!\n  username: String!\n  avatarUrl(size: Int!): String!\n}\n```\n\n### Example Output\nWhen executed with variables `{ id: \"user_1\" }`, returns:\n```json\n{\n  \"user\": {\n    \"id\": \"user_1\",\n    \"username\": \"codemaster\",\n    \"thumb\": \"https://cdn.example.com/avatars/user_1_64.png\",\n    \"hero\": \"https://cdn.example.com/avatars/user_1_512.png\"\n  }\n}\n```",
+    "track": "graphql",
+    "title": "GraphQL Query: Field Aliasing",
+    "tags": [
+      "graphql",
+      "query",
+      "aliases",
+      "arguments",
+      "fields"
+    ],
+    "concept": "gql-queries",
+    "inputLanguage": "graphql",
+    "difficulty": 1,
+    "referenceSolution": "query GetUserAvatars($id: ID!) {\n  user(id: $id) {\n    id\n    username\n    thumb: avatarUrl(size: 64)\n    hero: avatarUrl(size: 512)\n  }\n}",
+    "referenceSolutionTs": "query GetUserAvatars($id: ID!) {\n  user(id: $id) {\n    id\n    username\n    thumb: avatarUrl(size: 64)\n    hero: avatarUrl(size: 512)\n  }\n}",
+    "testCases": [
+      {
+        "description": "Query parses and validates against avatar GraphQL schema",
+        "input": "validateGraphql(testSchema, parseGraphql(userDoc))",
+        "expected": "[] (zero validation errors)"
+      },
+      {
+        "description": "Defines named query GetUserAvatars with required $id variable",
+        "input": "query GetUserAvatars($id: ID!)",
+        "expected": "Operation named GetUserAvatars with variable $id: ID!"
+      },
+      {
+        "description": "Queries user with thumb and hero field aliases with size arguments",
+        "input": "user(id: $id) { thumb: avatarUrl(size: 64) hero: avatarUrl(size: 512) }",
+        "expected": "Both aliases declared and bound to avatarUrl field"
+      },
+      {
+        "description": "Returns distinct URLs mapped to alias keys in result data",
+        "input": "graphql({ variableValues: { id: \"user_42\" } })",
+        "expected": "{ data: { user: { thumb: \"..._64.png\", hero: \"..._512.png\" } } }"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userDoc = (typeof query === 'string' ? query : typeof solution === 'string' ? solution : '').trim();\n  const testSchema = buildSchema(`\n    type Query {\n      user(id: ID!): User\n    }\n    type User {\n      id: ID!\n      username: String!\n      avatarUrl(size: Int!): String!\n    }\n  `);\n\n  const root = {\n    user: ({ id }: { id: string }) => ({\n      id,\n      username: 'codemaster',\n      avatarUrl: ({ size }: { size: number }) => `https://cdn.example.com/avatars/${id}_${size}.png`,\n    }),\n  };\n\n  async function runSafe(vars: Record<string, unknown>) {\n    try {\n      const res = await graphql({\n        schema: testSchema,\n        source: userDoc,\n        rootValue: root,\n        variableValues: vars,\n      });\n      return res;\n    } catch (e) {\n      return { errors: [e] };\n    }\n  }\n\n  const case1 = 'Query parses and validates against avatar GraphQL schema';\n  const case2 = 'Defines named query GetUserAvatars with required $id variable';\n  const case3 = 'Queries user with thumb and hero field aliases with size arguments';\n  const case4 = 'Returns distinct URLs mapped to alias keys in result data';\n\n  if (!userDoc) {\n    $test.check(case1, false, { error: 'Empty query document' });\n    $test.check(case2, false, { error: 'Empty query document' });\n    $test.check(case3, false, { error: 'Empty query document' });\n    $test.check(case4, false, { error: 'Empty query document' });\n    return;\n  }\n\n  let parsed: any;\n  try {\n    parsed = parseGraphql(userDoc);\n  } catch (err: any) {\n    $test.check(case1, false, { error: err?.message });\n    $test.check(case2, false, { error: 'Parse failed' });\n    $test.check(case3, false, { error: 'Parse failed' });\n    $test.check(case4, false, { error: 'Parse failed' });\n    return;\n  }\n\n  const errors = validateGraphql(testSchema, parsed);\n  $test.check(case1, errors.length === 0, { errors: errors.map((e: any) => e.message) });\n\n  const op = parsed.definitions?.find((d: any) => d.kind === 'OperationDefinition');\n  const varNames = (op?.variableDefinitions || []).map((v: any) => v.variable?.name?.value);\n\n  // Case 2: Named query GetUserAvatars with $id\n  $test.check(\n    case2,\n    op?.name?.value === 'GetUserAvatars' && varNames.includes('id'),\n    { operationName: op?.name?.value, variables: varNames }\n  );\n\n  // Case 3: Verify thumb and hero alias regex or AST\n  const hasThumb = /thumb\\s*:\\s*avatarUrl\\b/.test(userDoc);\n  const hasHero = /hero\\s*:\\s*avatarUrl\\b/.test(userDoc);\n  $test.check(case3, hasThumb && hasHero, { hasThumb, hasHero, query: userDoc });\n\n  // Case 4: Execute query and check distinct URLs on alias keys\n  const res = await runSafe({ id: 'user_42' });\n  const u = res.data?.user;\n  $test.check(\n    case4,\n    !res.errors &&\n      u?.id === 'user_42' &&\n      u?.username === 'codemaster' &&\n      u?.thumb === 'https://cdn.example.com/avatars/user_42_64.png' &&\n      u?.hero === 'https://cdn.example.com/avatars/user_42_512.png',\n    res\n  );\n})();"
+  },
+  {
+    "id": "sql-basic-aggregate-group",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Write a SQL query that aggregates the `employees` table by department to find department size and average compensation for teams with multiple members.\n\n### Schema Context\n```sql\nCREATE TABLE employees (\n  id INT PRIMARY KEY,\n  name VARCHAR(50),\n  department VARCHAR(50),\n  salary INT\n);\n```\n\n### Requirements\n- Group records by `department`.\n- Select the following columns:\n  - `department`: the name of the department.\n  - `employee_count`: the total number of employees in the department (`COUNT(*)`).\n  - `avg_salary`: the average salary for the department, rounded to 2 decimal places (`ROUND(AVG(salary), 2)`).\n- Filter out departments with fewer than 2 employees using `HAVING COUNT(*) >= 2`.\n- Order results by `employee_count DESC`, then by `department ASC`.\n\n### Example Output\n| department | employee_count | avg_salary |\n| :--- | :--- | :--- |\n| Engineering | 3 | 115000.00 |\n| Marketing | 2 | 75000.00 |",
+    "track": "sql-postgres",
+    "title": "SQL Aggregation Basics: GROUP BY and HAVING",
+    "tags": [
+      "sql",
+      "postgresql",
+      "aggregates",
+      "group-by",
+      "having",
+      "count",
+      "avg"
+    ],
+    "difficulty": 1,
+    "concept": "sql-aggregates",
+    "referenceSolution": "const query = `\nSELECT\n  department,\n  COUNT(*) AS employee_count,\n  ROUND(AVG(salary), 2) AS avg_salary\nFROM employees\nGROUP BY department\nHAVING COUNT(*) >= 2\nORDER BY employee_count DESC, department ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT\n  department,\n  COUNT(*) AS employee_count,\n  ROUND(AVG(salary), 2) AS avg_salary\nFROM employees\nGROUP BY department\nHAVING COUNT(*) >= 2\nORDER BY employee_count DESC, department ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Groups by department with count >= 2, calculates avg_salary, and sorts by employee_count DESC then department ASC",
+        "input": "SELECT department, COUNT(*), ROUND(AVG(salary), 2) FROM employees GROUP BY department HAVING COUNT(*) >= 2 ORDER BY ...",
+        "expected": "Engineering (3, 110000), Marketing (2, 75000)"
+      },
+      {
+        "description": "Excludes single-employee departments via HAVING filter",
+        "input": "HAVING COUNT(*) >= 2 on single-employee teams",
+        "expected": "Finance (1) and HR (1) excluded, Support (2) returned"
+      },
+      {
+        "description": "Rounds average salary accurately to 2 decimal places",
+        "input": "ROUND(AVG(salary), 2) on Research salaries",
+        "expected": "{ department: \"Research\", employee_count: 3, avg_salary: 102500 }"
+      },
+      {
+        "description": "Returns empty array when no department has at least 2 employees",
+        "input": "HAVING COUNT(*) >= 2 when all teams have 1 member",
+        "expected": "[] (empty array)"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db: any, sql: string) {\n    try {\n      const res = await db.query(sql);\n      return res.rows.map((row: any) => ({\n        ...row,\n        employee_count: Number(row.employee_count),\n        avg_salary: Number(row.avg_salary),\n      }));\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE employees (\n      id INT PRIMARY KEY,\n      name VARCHAR(50),\n      department VARCHAR(50),\n      salary INT\n    );\n  `);\n\n  const case1 = 'Groups by department with count >= 2, calculates avg_salary, and sorts by employee_count DESC then department ASC';\n  const case2 = 'Excludes single-employee departments via HAVING filter';\n  const case3 = 'Rounds average salary accurately to 2 decimal places';\n  const case4 = 'Returns empty array when no department has at least 2 employees';\n\n  // Case 1: Standard aggregation and multi-key sorting\n  await db.exec(`\n    DELETE FROM employees;\n    INSERT INTO employees VALUES\n      (1, 'Alice', 'Engineering', 120000),\n      (2, 'Bob', 'Engineering', 100000),\n      (3, 'Charlie', 'Engineering', 110000),\n      (4, 'Diana', 'Marketing', 80000),\n      (5, 'Evan', 'Marketing', 70000),\n      (6, 'Fiona', 'Design', 95000);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    case1,\n    r1 !== null && $test.equal(r1, [\n      { department: 'Engineering', employee_count: 3, avg_salary: 110000 },\n      { department: 'Marketing', employee_count: 2, avg_salary: 75000 },\n    ]),\n    r1\n  );\n\n  // Case 2: Excludes departments with only 1 employee\n  await db.exec(`\n    DELETE FROM employees;\n    INSERT INTO employees VALUES\n      (1, 'George', 'Finance', 90000),\n      (2, 'Hannah', 'HR', 75000),\n      (3, 'Ian', 'Support', 60000),\n      (4, 'Julia', 'Support', 64000);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    case2,\n    r2 !== null && $test.equal(r2, [\n      { department: 'Support', employee_count: 2, avg_salary: 62000 },\n    ]),\n    r2\n  );\n\n  // Case 3: Rounds average salary to 2 decimal places\n  await db.exec(`\n    DELETE FROM employees;\n    INSERT INTO employees VALUES\n      (1, 'Kevin', 'Research', 100000),\n      (2, 'Laura', 'Research', 105000),\n      (3, 'Mike', 'Research', 102500);\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    case3,\n    r3 !== null && r3.length === 1 && r3[0].department === 'Research' && r3[0].employee_count === 3 && r3[0].avg_salary === 102500,\n    r3\n  );\n\n  // Case 4: Returns empty array when no department has at least 2 employees\n  await db.exec(`\n    DELETE FROM employees;\n    INSERT INTO employees VALUES\n      (1, 'Nina', 'Legal', 130000),\n      (2, 'Oscar', 'Security', 115000);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    case4,\n    r4 !== null && Array.isArray(r4) && r4.length === 0,\n    r4\n  );\n})();"
+  },
+  {
+    "id": "test-suite-runner-describe-it",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "Implement a synchronous test runner factory `createTestRunner()` providing BDD-style `describe`, `it`, `getReport`, and `reset` functions.\n\n```ts\ninterface TestFailure {\n  suite: string;\n  test: string;\n  message: string;\n}\n\ninterface TestReport {\n  total: number;\n  passed: number;\n  failed: number;\n  errors: TestFailure[];\n}\n\ninterface TestRunner {\n  describe: (name: string, fn: () => void) => void;\n  it: (name: string, fn: () => void) => void;\n  getReport: () => TestReport;\n  reset: () => void;\n}\n```\n\n### `createTestRunner(): TestRunner`\n\n### Requirements\n- **`describe(name: string, fn: () => void)`**:\n  - Sets the current suite name context and executes `fn()`.\n  - Restores the previous suite name when `fn()` completes or throws.\n- **`it(name: string, fn: () => void)`**:\n  - Increments `total`.\n  - Executes `fn()`.\n  - If `fn()` completes without throwing, increments `passed`.\n  - If `fn()` throws, increments `failed` and records `{ suite: currentSuite, test: name, message }` in `errors`, where `message` is `err.message` (or `String(err)` if not an Error object).\n- **`getReport(): TestReport`**:\n  - Returns a snapshot of `{ total, passed, failed, errors }`.\n- **`reset(): void`**:\n  - Resets all counts to `0` and clears the `errors` array.\n\n### Example\n```ts\nconst { describe, it, getReport } = createTestRunner();\n\ndescribe('Math', () => {\n  it('adds numbers', () => {\n    if (1 + 1 !== 2) throw new Error('Math broken');\n  });\n\n  it('fails bad math', () => {\n    throw new Error('Expected 4 but got 5');\n  });\n});\n\nconsole.log(getReport());\n// {\n//   total: 2,\n//   passed: 1,\n//   failed: 1,\n//   errors: [{ suite: 'Math', test: 'fails bad math', message: 'Expected 4 but got 5' }]\n// }\n```",
+    "track": "testing-tooling",
+    "title": "Test Suite Runner: describe, it, and getReport",
+    "tags": [
+      "testing",
+      "bdd",
+      "runner",
+      "assertions",
+      "suite"
+    ],
+    "concept": "test-runners",
+    "difficulty": 1,
+    "referenceSolution": "function createTestRunner() {\n  let currentSuite = '';\n  let total = 0;\n  let passed = 0;\n  let failed = 0;\n  let errors = [];\n\n  function describe(name, fn) {\n    const prev = currentSuite;\n    currentSuite = name;\n    try {\n      fn();\n    } finally {\n      currentSuite = prev;\n    }\n  }\n\n  function it(name, fn) {\n    total++;\n    try {\n      fn();\n      passed++;\n    } catch (err) {\n      failed++;\n      const message = err && err.message ? err.message : String(err);\n      errors.push({ suite: currentSuite, test: name, message });\n    }\n  }\n\n  function getReport() {\n    return {\n      total,\n      passed,\n      failed,\n      errors: [...errors],\n    };\n  }\n\n  function reset() {\n    total = 0;\n    passed = 0;\n    failed = 0;\n    errors = [];\n    currentSuite = '';\n  }\n\n  return { describe, it, getReport, reset };\n}",
+    "referenceSolutionTs": "interface TestFailure {\n  suite: string;\n  test: string;\n  message: string;\n}\n\ninterface TestReport {\n  total: number;\n  passed: number;\n  failed: number;\n  errors: TestFailure[];\n}\n\ninterface TestRunner {\n  describe: (name: string, fn: () => void) => void;\n  it: (name: string, fn: () => void) => void;\n  getReport: () => TestReport;\n  reset: () => void;\n}\n\nfunction createTestRunner(): TestRunner {\n  let currentSuite = '';\n  let total = 0;\n  let passed = 0;\n  let failed = 0;\n  let errors: TestFailure[] = [];\n\n  function describe(name: string, fn: () => void): void {\n    const prev = currentSuite;\n    currentSuite = name;\n    try {\n      fn();\n    } finally {\n      currentSuite = prev;\n    }\n  }\n\n  function it(name: string, fn: () => void): void {\n    total++;\n    try {\n      fn();\n      passed++;\n    } catch (err: unknown) {\n      failed++;\n      const message =\n        err instanceof Error\n          ? err.message\n          : (err as { message?: string })?.message || String(err);\n      errors.push({ suite: currentSuite, test: name, message });\n    }\n  }\n\n  function getReport(): TestReport {\n    return {\n      total,\n      passed,\n      failed,\n      errors: [...errors],\n    };\n  }\n\n  function reset(): void {\n    total = 0;\n    passed = 0;\n    failed = 0;\n    errors = [];\n    currentSuite = '';\n  }\n\n  return { describe, it, getReport, reset };\n}",
+    "testCases": [
+      {
+        "description": "Records passed tests and increments total and passed counts",
+        "input": "runner.describe(\"Arithmetic\", () => { runner.it(\"adds\", () => {}); runner.it(\"multiplies\", () => {}); }); runner.getReport()",
+        "expected": "{ total: 2, passed: 2, failed: 0, errors: [] }"
+      },
+      {
+        "description": "Catches thrown errors, increments failed count, and captures error message with suite name",
+        "input": "runner.it(\"fails\", () => { throw new Error(\"Null value prohibited\"); })",
+        "expected": "{ total: 2, passed: 1, failed: 1, errors: [{ suite: \"Validation\", test: \"fails on null\", message: \"Null value prohibited\" }] }"
+      },
+      {
+        "description": "Supports multiple suites with correct suite attribution in errors",
+        "input": "runner.describe(\"Suite A\", ...); runner.describe(\"Suite B\", ...)",
+        "expected": "{ total: 4, passed: 2, failed: 2, errors: [{ suite: \"Suite A\", ... }, { suite: \"Suite B\", ... }] }"
+      },
+      {
+        "description": "reset() clears recorded tests and errors back to zero",
+        "input": "runner.reset(); runner.getReport()",
+        "expected": "{ total: 0, passed: 0, failed: 0, errors: [] }"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const factory = typeof createTestRunner === 'function' ? createTestRunner : (typeof globalThis !== 'undefined' ? globalThis.createTestRunner : undefined);\n\n  const case1 = 'Records passed tests and increments total and passed counts';\n  const case2 = 'Catches thrown errors, increments failed count, and captures error message with suite name';\n  const case3 = 'Supports multiple suites with correct suite attribution in errors';\n  const case4 = 'reset() clears recorded tests and errors back to zero';\n\n  if (typeof factory !== 'function') {\n    $test.check(case1, false, { error: 'createTestRunner is not defined' });\n    $test.check(case2, false, { error: 'createTestRunner is not defined' });\n    $test.check(case3, false, { error: 'createTestRunner is not defined' });\n    $test.check(case4, false, { error: 'createTestRunner is not defined' });\n    return;\n  }\n\n  // Case 1: All passed\n  const runner1 = factory();\n  runner1.describe('Arithmetic', () => {\n    runner1.it('adds numbers', () => {});\n    runner1.it('multiplies numbers', () => {});\n  });\n  const r1 = runner1.getReport();\n  $test.check(\n    case1,\n    r1.total === 2 && r1.passed === 2 && r1.failed === 0 && r1.errors.length === 0,\n    r1\n  );\n\n  // Case 2: Catches errors and reports failure details\n  const runner2 = factory();\n  runner2.describe('Validation', () => {\n    runner2.it('passes valid input', () => {});\n    runner2.it('fails on null', () => {\n      throw new Error('Null value prohibited');\n    });\n  });\n  const r2 = runner2.getReport();\n  $test.check(\n    case2,\n    r2.total === 2 &&\n      r2.passed === 1 &&\n      r2.failed === 1 &&\n      r2.errors.length === 1 &&\n      r2.errors[0].suite === 'Validation' &&\n      r2.errors[0].test === 'fails on null' &&\n      r2.errors[0].message === 'Null value prohibited',\n    r2\n  );\n\n  // Case 3: Multiple suites with proper attribution\n  const runner3 = factory();\n  runner3.describe('Suite A', () => {\n    runner3.it('test A1', () => {});\n    runner3.it('test A2 fails', () => {\n      throw new Error('Error in A');\n    });\n  });\n  runner3.describe('Suite B', () => {\n    runner3.it('test B1 fails', () => {\n      throw new Error('Error in B');\n    });\n    runner3.it('test B2', () => {});\n  });\n  const r3 = runner3.getReport();\n  $test.check(\n    case3,\n    r3.total === 4 &&\n      r3.passed === 2 &&\n      r3.failed === 2 &&\n      r3.errors.length === 2 &&\n      r3.errors[0].suite === 'Suite A' &&\n      r3.errors[0].message === 'Error in A' &&\n      r3.errors[1].suite === 'Suite B' &&\n      r3.errors[1].message === 'Error in B',\n    r3\n  );\n\n  // Case 4: reset() clears all stats and errors\n  runner3.reset();\n  const r4 = runner3.getReport();\n  $test.check(\n    case4,\n    r4.total === 0 && r4.passed === 0 && r4.failed === 0 && r4.errors.length === 0,\n    r4\n  );\n})();"
+  },
+  {
+    "id": "promise-timeout-reject",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "### `promiseTimeout(promise: Promise<T>, ms: number, message?: string): Promise<T>`\n\n## Description\n\n```ts\nfunction promiseTimeout<T>(\n  promise: Promise<T>,\n  ms: number,\n  message?: string\n): Promise<T>;\n```\n\nWrap an asynchronous promise with a strict timeout deadline. If the wrapped promise settles (fulfills or rejects) before `ms` milliseconds elapse, settle with its outcome. If `ms` milliseconds pass before the promise settles, reject with an `Error`.\n\n### Requirements\n- **Settles Before Timeout**:\n  - If `promise` fulfills before `ms` milliseconds, fulfill with its resolved value.\n  - If `promise` rejects before `ms` milliseconds, reject with its original rejection reason.\n  - Clear the scheduled timeout timer using `clearTimeout` upon settlement to avoid dangling handles.\n- **Exceeds Timeout**:\n  - If `ms` milliseconds elapse before `promise` settles, reject with `new Error(message || 'Operation timed out')`.\n- **Default Message**:\n  - The fallback message must default to `'Operation timed out'`.\n\n### Example\n```ts\nconst fetchFast = promiseTimeout(fetchData(), 500);\n// Resolves if fetchData() completes within 500ms\n\nconst fetchSlow = promiseTimeout(fetchData(), 100, 'Network request timed out');\n// Rejects with Error('Network request timed out') if > 100ms\n```",
+    "track": "async-js",
+    "title": "Promise Timeout: withTimeout Wrapper",
+    "tags": [
+      "async",
+      "promises",
+      "timeout",
+      "timer",
+      "race"
+    ],
+    "concept": "promise",
+    "difficulty": 1,
+    "referenceSolution": "function promiseTimeout(promise, ms, message = 'Operation timed out') {\n  return new Promise((resolve, reject) => {\n    const timer = setTimeout(() => {\n      reject(new Error(message));\n    }, ms);\n\n    promise\n      .then((val) => {\n        clearTimeout(timer);\n        resolve(val);\n      })\n      .catch((err) => {\n        clearTimeout(timer);\n        reject(err);\n      });\n  });\n}",
+    "referenceSolutionTs": "function promiseTimeout<T>(\n  promise: Promise<T>,\n  ms: number,\n  message: string = 'Operation timed out'\n): Promise<T> {\n  return new Promise<T>((resolve, reject) => {\n    const timer = setTimeout(() => {\n      reject(new Error(message));\n    }, ms);\n\n    promise\n      .then((val) => {\n        clearTimeout(timer);\n        resolve(val);\n      })\n      .catch((err) => {\n        clearTimeout(timer);\n        reject(err);\n      });\n  });\n}",
+    "testCases": [
+      {
+        "description": "Resolves with the promise value when fulfilled before timeout",
+        "input": "promiseTimeout(resolveAfter(10, \"ok\"), 80)",
+        "expected": "\"ok\""
+      },
+      {
+        "description": "Rejects with the original error when promise rejects before timeout",
+        "input": "promiseTimeout(rejectAfter(10, new Error(\"err\")), 80)",
+        "expected": "rejects with Error(\"err\")"
+      },
+      {
+        "description": "Rejects with default Error(\"Operation timed out\") when duration exceeds timeout",
+        "input": "promiseTimeout(resolveAfter(100), 20)",
+        "expected": "rejects with Error(\"Operation timed out\")"
+      },
+      {
+        "description": "Rejects with custom error message when specified upon timeout",
+        "input": "promiseTimeout(resolveAfter(100), 20, \"Gateway request timed out\")",
+        "expected": "rejects with Error(\"Gateway request timed out\")"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const fn = typeof promiseTimeout === 'function' ? promiseTimeout : (typeof globalThis !== 'undefined' ? globalThis.promiseTimeout : undefined);\n\n  const case1 = 'Resolves with the promise value when fulfilled before timeout';\n  const case2 = 'Rejects with the original error when promise rejects before timeout';\n  const case3 = 'Rejects with default Error(\"Operation timed out\") when duration exceeds timeout';\n  const case4 = 'Rejects with custom error message when specified upon timeout';\n\n  if (typeof fn !== 'function') {\n    $test.check(case1, false, { error: 'promiseTimeout is not defined' });\n    $test.check(case2, false, { error: 'promiseTimeout is not defined' });\n    $test.check(case3, false, { error: 'promiseTimeout is not defined' });\n    $test.check(case4, false, { error: 'promiseTimeout is not defined' });\n    return;\n  }\n\n  // Case 1: Fast resolve before timeout\n  try {\n    const quickPromise = new Promise((resolve) => setTimeout(() => resolve('success-val'), 10));\n    const result1 = await fn(quickPromise, 80);\n    $test.check(case1, result1 === 'success-val', { result: result1 });\n  } catch (err) {\n    $test.check(case1, false, { error: err && err.message });\n  }\n\n  // Case 2: Fast reject before timeout\n  try {\n    const failPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Network failure')), 10));\n    failPromise.catch(() => {});\n    let caught2 = null;\n    try {\n      await fn(failPromise, 80);\n    } catch (err) {\n      caught2 = err;\n    }\n    const pass2 = caught2 instanceof Error && caught2.message === 'Network failure';\n    $test.check(case2, Boolean(pass2), { message: caught2 && caught2.message });\n  } catch (err) {\n    $test.check(case2, false, { error: err && err.message });\n  }\n\n  // Case 3: Slow promise exceeds timeout with default error message\n  try {\n    const slowPromise = new Promise((resolve) => setTimeout(() => resolve('too-late'), 100));\n    slowPromise.catch(() => {});\n    let caught3 = null;\n    try {\n      await fn(slowPromise, 20);\n    } catch (err) {\n      caught3 = err;\n    }\n    const pass3 = caught3 instanceof Error && caught3.message === 'Operation timed out';\n    $test.check(case3, Boolean(pass3), { message: caught3 && caught3.message });\n  } catch (err) {\n    $test.check(case3, false, { error: err && err.message });\n  }\n\n  // Case 4: Slow promise exceeds timeout with custom error message\n  try {\n    const slowPromise2 = new Promise((resolve) => setTimeout(() => resolve('too-late'), 100));\n    slowPromise2.catch(() => {});\n    let caught4 = null;\n    try {\n      await fn(slowPromise2, 20, 'Gateway request timed out');\n    } catch (err) {\n      caught4 = err;\n    }\n    const pass4 = caught4 instanceof Error && caught4.message === 'Gateway request timed out';\n    $test.check(case4, Boolean(pass4), { message: caught4 && caught4.message });\n  } catch (err) {\n    $test.check(case4, false, { error: err && err.message });\n  }\n})();"
+  },
+  {
+    "id": "tailwind-button-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "promptSeed": "### `Button({ variant = 'primary', disabled = false, children, ...props }: ButtonProps): JSX.Element`\n\n## Description\n\n```ts\ntype ButtonVariant = 'primary' | 'outline';\n\ninterface ButtonProps {\n  variant?: ButtonVariant;\n  disabled?: boolean;\n  children?: any;\n  onClick?: (event: any) => void;\n  [key: string]: any;\n}\n```\n\nBuild an accessible, versatile button component styled with Tailwind CSS utility classes:\n\n### Requirements\n- **Container (`<button>`)**:\n  - Element: `<button type=\"button\" ...>` (defaults to `type=\"button\"` unless specified in `props`).\n  - Base classes: `inline-flex items-center justify-center font-medium rounded-lg px-4 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 active:scale-95 cursor-pointer`\n  - Forwards extra props (such as `onClick`, `data-testid`, or `aria-label`) to the underlying `<button>`.\n- **Variants**:\n  - `'primary'` (default): `bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500`\n  - `'outline'`: `border border-gray-300 text-gray-700 hover:bg-gray-50 focus-visible:ring-gray-400`\n- **Disabled State**:\n  - When `disabled` is `true`:\n    - Sets HTML attribute `disabled={true}` on the `<button>`.\n    - Includes disabled utility classes: `disabled:opacity-50 disabled:pointer-events-none cursor-not-allowed`\n\n### Example Usage\n```tsx\n<Button variant=\"primary\" onClick={() => console.log('clicked')}>\n  Save Changes\n</Button>\n<Button variant=\"outline\" disabled={true}>\n  Cancel\n</Button>\n```",
+    "track": "tailwind",
+    "title": "Tailwind Button: Interactive States & Variants",
+    "tags": [
+      "tailwind",
+      "button",
+      "interactive",
+      "variants",
+      "components"
+    ],
+    "concept": "tailwind-button",
+    "requiresDom": true,
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 1,
+    "referenceSolution": "function Button({\n  variant = 'primary',\n  disabled = false,\n  children,\n  type = 'button',\n  ...props\n}) {\n  const baseClasses =\n    'inline-flex items-center justify-center font-medium rounded-lg px-4 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 active:scale-95 cursor-pointer';\n\n  const variantClasses =\n    variant === 'outline'\n      ? 'border border-gray-300 text-gray-700 hover:bg-gray-50 focus-visible:ring-gray-400'\n      : 'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500';\n\n  const disabledClasses = disabled\n    ? 'disabled:opacity-50 disabled:pointer-events-none cursor-not-allowed'\n    : '';\n\n  const className = [baseClasses, variantClasses, disabledClasses, props.className]\n    .filter(Boolean)\n    .join(' ');\n\n  return React.createElement(\n    'button',\n    {\n      type,\n      disabled,\n      className,\n      ...props,\n    },\n    children\n  );\n}",
+    "referenceSolutionTs": "type ButtonVariant = 'primary' | 'outline';\n\ninterface ButtonProps {\n  variant?: ButtonVariant;\n  disabled?: boolean;\n  children?: any;\n  onClick?: (event: any) => void;\n  type?: 'button' | 'submit' | 'reset';\n  className?: string;\n  [key: string]: any;\n}\n\nfunction Button({\n  variant = 'primary',\n  disabled = false,\n  children,\n  type = 'button',\n  ...props\n}: ButtonProps): React.ReactElement {\n  const baseClasses =\n    'inline-flex items-center justify-center font-medium rounded-lg px-4 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 active:scale-95 cursor-pointer';\n\n  const variantClasses =\n    variant === 'outline'\n      ? 'border border-gray-300 text-gray-700 hover:bg-gray-50 focus-visible:ring-gray-400'\n      : 'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500';\n\n  const disabledClasses = disabled\n    ? 'disabled:opacity-50 disabled:pointer-events-none cursor-not-allowed'\n    : '';\n\n  const className = [baseClasses, variantClasses, disabledClasses, props.className]\n    .filter(Boolean)\n    .join(' ');\n\n  return React.createElement(\n    'button',\n    {\n      type,\n      disabled,\n      className,\n      ...props,\n    },\n    children\n  );\n}",
+    "testCases": [
+      {
+        "description": "Renders button with default primary variant and base interactive classes",
+        "input": "<Button>Submit</Button>",
+        "expected": "button with bg-blue-600, text-white, rounded-lg, type=\"button\""
+      },
+      {
+        "description": "Applies outline variant classes when variant=\"outline\"",
+        "input": "<Button variant=\"outline\">Cancel</Button>",
+        "expected": "button with border-gray-300, text-gray-700, hover:bg-gray-50"
+      },
+      {
+        "description": "Applies disabled attribute and opacity/pointer-events utilities when disabled=true",
+        "input": "<Button disabled={true}>Disabled</Button>",
+        "expected": "disabled attribute present, disabled:opacity-50, disabled:pointer-events-none"
+      },
+      {
+        "description": "Forwards extra props such as onClick and data-testid",
+        "input": "<Button data-testid=\"custom-btn\" onClick={...}>Click</Button>",
+        "expected": "button receives extra attributes and fires click handlers"
+      }
+    ],
+    "testHarness": "await (async () => {\n  const { render } = $dom;\n  const Component = typeof Button === 'function' ? Button : (typeof globalThis !== 'undefined' ? globalThis.Button : undefined);\n\n  const case1 = 'Renders button with default primary variant and base interactive classes';\n  const case2 = 'Applies outline variant classes when variant=\"outline\"';\n  const case3 = 'Applies disabled attribute and opacity/pointer-events utilities when disabled=true';\n  const case4 = 'Forwards extra props such as onClick and data-testid';\n\n  if (typeof Component !== 'function') {\n    $test.check(case1, false, { error: 'Button is not defined' });\n    $test.check(case2, false, { error: 'Button is not defined' });\n    $test.check(case3, false, { error: 'Button is not defined' });\n    $test.check(case4, false, { error: 'Button is not defined' });\n    return;\n  }\n\n  // Case 1: Primary default\n  const { container: c1, unmount: u1 } = render(React.createElement(Component, null, 'Submit'));\n  const btn1 = c1.querySelector('button');\n  const cls1 = btn1?.className || '';\n  const pass1 = Boolean(btn1) &&\n    btn1?.getAttribute('type') === 'button' &&\n    cls1.includes('bg-blue-600') &&\n    cls1.includes('text-white') &&\n    cls1.includes('hover:bg-blue-700') &&\n    cls1.includes('rounded-lg') &&\n    btn1?.textContent === 'Submit';\n  $test.check(case1, Boolean(pass1), { classList: cls1, text: btn1?.textContent });\n  u1();\n\n  // Case 2: Outline variant\n  const { container: c2, unmount: u2 } = render(\n    React.createElement(Component, { variant: 'outline' }, 'Cancel')\n  );\n  const btn2 = c2.querySelector('button');\n  const cls2 = btn2?.className || '';\n  const pass2 = Boolean(btn2) &&\n    cls2.includes('border-gray-300') &&\n    cls2.includes('text-gray-700') &&\n    cls2.includes('hover:bg-gray-50');\n  $test.check(case2, Boolean(pass2), { classList: cls2 });\n  u2();\n\n  // Case 3: Disabled state\n  const { container: c3, unmount: u3 } = render(\n    React.createElement(Component, { disabled: true }, 'Disabled')\n  );\n  const btn3 = c3.querySelector('button');\n  const cls3 = btn3?.className || '';\n  const pass3 = Boolean(btn3) &&\n    btn3?.hasAttribute('disabled') &&\n    cls3.includes('disabled:opacity-50') &&\n    cls3.includes('disabled:pointer-events-none');\n  $test.check(case3, Boolean(pass3), { hasDisabled: btn3?.hasAttribute('disabled'), classList: cls3 });\n  u3();\n\n  // Case 4: Extra props forwarding\n  let clicked = false;\n  const { container: c4, unmount: u4 } = render(\n    React.createElement(\n      Component,\n      {\n        'data-testid': 'custom-btn',\n        'aria-label': 'Custom Action',\n        onClick: () => { clicked = true; },\n      },\n      'Click Me'\n    )\n  );\n  const btn4 = c4.querySelector('button[data-testid=\"custom-btn\"]');\n  btn4?.click();\n  const pass4 = Boolean(btn4) &&\n    btn4?.getAttribute('aria-label') === 'Custom Action' &&\n    clicked === true;\n  $test.check(case4, Boolean(pass4), { found: Boolean(btn4), clicked });\n  u4();\n})();",
+    "previewCode": "function ButtonPreview() {\n  const {\n    variant = 'primary',\n    disabled = false,\n    label = 'Save Changes',\n  } = usePreviewProps({\n    variant: 'primary',\n    disabled: false,\n    label: 'Save Changes',\n  });\n\n  return (\n    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '160px', padding: '24px' }}>\n      <Button\n        key={`${variant}-${disabled}-${label}`}\n        variant={variant}\n        disabled={Boolean(disabled)}\n        onClick={() => {\n          if (typeof log === 'function') log('onClick', { variant, disabled, label });\n        }}\n      >\n        {label}\n      </Button>\n    </div>\n  );\n}\n\n<ButtonPreview />"
   }
 ]

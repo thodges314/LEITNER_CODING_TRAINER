@@ -1430,6 +1430,27 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
       description: 'Callback fired when the user dismisses the banner: () => void',
     },
   ],
+  'tailwind-button-basics': [
+    {
+      name: 'variant',
+      type: 'enum',
+      defaultValue: 'primary',
+      options: ['primary', 'outline'],
+      description: 'Button visual variant',
+    },
+    {
+      name: 'disabled',
+      type: 'boolean',
+      defaultValue: false,
+      description: 'Disables button interactions',
+    },
+    {
+      name: 'label',
+      type: 'string',
+      defaultValue: 'Save Changes',
+      description: 'Button text label',
+    },
+  ],
   'tailwind-button-states': [
     {
       name: 'variant',
