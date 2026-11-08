@@ -44,7 +44,9 @@ export const DEFAULT_DECK_CATALOG_PREFERENCES: DeckCatalogPreferences = {
   searchQuery: '',
 };
 
-export const DECK_CATALOG_STORAGE_KEY = 'leitner_deck_catalog_preferences';
+import { STORAGE_KEYS, getDefaultStorage, safeSetJson, safeRemoveItem } from './storage';
+
+export const DECK_CATALOG_STORAGE_KEY = STORAGE_KEYS.DECK_CATALOG_PREFS;
 
 const VALID_STATUSES: readonly CatalogStatusFilter[] = [
   'all',
@@ -78,7 +80,7 @@ const VALID_SORT_OPTIONS: readonly CatalogSortOption[] = [
 
 export function loadDeckCatalogPreferences(storage?: Storage): DeckCatalogPreferences {
   try {
-    const store = storage ?? (typeof localStorage !== 'undefined' ? localStorage : null);
+    const store = storage ?? getDefaultStorage();
     if (!store) return { ...DEFAULT_DECK_CATALOG_PREFERENCES };
 
     const raw = store.getItem(DECK_CATALOG_STORAGE_KEY);
@@ -158,21 +160,9 @@ export function saveDeckCatalogPreferences(
   prefs: DeckCatalogPreferences,
   storage?: Storage
 ): void {
-  try {
-    const store = storage ?? (typeof localStorage !== 'undefined' ? localStorage : null);
-    if (!store) return;
-    store.setItem(DECK_CATALOG_STORAGE_KEY, JSON.stringify(prefs));
-  } catch {
-    // Gracefully ignore quota exceptions or disabled storage
-  }
+  safeSetJson(DECK_CATALOG_STORAGE_KEY, prefs, storage ?? getDefaultStorage());
 }
 
 export function clearDeckCatalogPreferences(storage?: Storage): void {
-  try {
-    const store = storage ?? (typeof localStorage !== 'undefined' ? localStorage : null);
-    if (!store) return;
-    store.removeItem(DECK_CATALOG_STORAGE_KEY);
-  } catch {
-    // Gracefully ignore storage exceptions
-  }
+  safeRemoveItem(DECK_CATALOG_STORAGE_KEY, storage ?? getDefaultStorage());
 }

@@ -1,6 +1,7 @@
 import { isTsOnlyCard } from './tsOnly';
+import { STORAGE_KEYS, safeGetItem, safeSetItem } from './storage';
 
-export const TS_HOVER_ENABLED_KEY = 'leitner_ts_hover_enabled';
+export const TS_HOVER_ENABLED_KEY = STORAGE_KEYS.TS_HOVER_ENABLED;
 
 /**
  * Returns whether TypeScript QuickInfo hover tooltips are enabled.
@@ -8,11 +9,7 @@ export const TS_HOVER_ENABLED_KEY = 'leitner_ts_hover_enabled';
  */
 export function getTsHoverEnabled(): boolean {
   if (typeof window === 'undefined') return true;
-  try {
-    return localStorage.getItem(TS_HOVER_ENABLED_KEY) !== 'false';
-  } catch {
-    return true;
-  }
+  return safeGetItem(TS_HOVER_ENABLED_KEY) !== 'false';
 }
 
 /**
@@ -20,15 +17,11 @@ export function getTsHoverEnabled(): boolean {
  */
 export function setTsHoverEnabled(enabled: boolean): void {
   if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(TS_HOVER_ENABLED_KEY, String(enabled));
-  } catch {
-    /* ignore */
-  }
+  safeSetItem(TS_HOVER_ENABLED_KEY, String(enabled));
 }
 
 export type PreferredExecutionMode = 'js' | 'ts';
-export const PREFERRED_EXECUTION_MODE_KEY = 'leitner_preferred_execution_mode';
+export const PREFERRED_EXECUTION_MODE_KEY = STORAGE_KEYS.PREFERRED_EXECUTION_MODE;
 
 /**
  * Returns the user's preferred default execution mode for non-TS tracks.
@@ -36,12 +29,7 @@ export const PREFERRED_EXECUTION_MODE_KEY = 'leitner_preferred_execution_mode';
  */
 export function getPreferredExecutionMode(): PreferredExecutionMode {
   if (typeof window === 'undefined') return 'js';
-  try {
-    const val = localStorage.getItem(PREFERRED_EXECUTION_MODE_KEY);
-    return val === 'ts' ? 'ts' : 'js';
-  } catch {
-    return 'js';
-  }
+  return safeGetItem(PREFERRED_EXECUTION_MODE_KEY) === 'ts' ? 'ts' : 'js';
 }
 
 /**
@@ -49,11 +37,7 @@ export function getPreferredExecutionMode(): PreferredExecutionMode {
  */
 export function setPreferredExecutionMode(mode: PreferredExecutionMode): void {
   if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(PREFERRED_EXECUTION_MODE_KEY, mode);
-  } catch {
-    /* ignore */
-  }
+  safeSetItem(PREFERRED_EXECUTION_MODE_KEY, mode);
 }
 
 /**

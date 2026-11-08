@@ -1,5 +1,7 @@
-export const DECK_STORAGE_KEY = 'leitner_coding_deck';
-export const WELCOMED_KEY = 'leitner_welcomed';
+import { STORAGE_KEYS, getDefaultStorage, safeSetItem } from './storage';
+
+export const DECK_STORAGE_KEY = STORAGE_KEYS.DECK;
+export const WELCOMED_KEY = STORAGE_KEYS.WELCOMED;
 const NARROW_QUERY = '(max-width: 820px)';
 
 /**
@@ -8,7 +10,7 @@ const NARROW_QUERY = '(max-width: 820px)';
  * creates and saves its default deck.
  */
 export function isFirstVisit(
-  storage: Pick<Storage, 'getItem'> | null = typeof localStorage === 'undefined' ? null : localStorage,
+  storage: Pick<Storage, 'getItem'> | null = getDefaultStorage(),
   matchMedia: ((q: string) => { matches: boolean }) | null = typeof window === 'undefined' || !window.matchMedia ? null : window.matchMedia.bind(window)
 ): boolean {
   if (!storage) return false;
@@ -21,10 +23,6 @@ export function isFirstVisit(
   }
 }
 
-export function markWelcomed(storage: Pick<Storage, 'setItem'> | null = typeof localStorage === 'undefined' ? null : localStorage): void {
-  try {
-    storage?.setItem(WELCOMED_KEY, '1');
-  } catch {
-    // storage unavailable: the welcome may show again, which is harmless
-  }
+export function markWelcomed(storage: Pick<Storage, 'setItem'> | null = getDefaultStorage()): void {
+  safeSetItem(WELCOMED_KEY, '1', storage);
 }

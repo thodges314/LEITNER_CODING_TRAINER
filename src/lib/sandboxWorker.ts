@@ -6,7 +6,7 @@ import {
   validate as validateGraphql,
 } from 'graphql';
 import { createMockFetch } from './mockFetch';
-import { createTestHelpers, classifyLogLine } from './testHelpers';
+import { createTestHelpers, classifyLogLine, stringifyArg } from './testHelpers';
 import type { HarnessReport } from './testHelpers';
 import { NextResponse, NextRequest, revalidateTag, revalidatePath, after, flushAfterTasks, resetAfterTasks } from '../utils/nextSandbox';
 
@@ -36,16 +36,6 @@ export interface WorkerErrorMessage {
   type: 'error';
   id: string;
   error: string;
-}
-
-function stringifyArg(arg: unknown): string {
-  if (typeof arg === 'string') return arg;
-  if (arg instanceof Error) return `${arg.name}: ${arg.message}`;
-  try {
-    return JSON.stringify(arg) ?? String(arg);
-  } catch {
-    return String(arg);
-  }
 }
 
 function serializeSafe(value: unknown, seen = new WeakSet<object>()): unknown {

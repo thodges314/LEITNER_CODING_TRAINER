@@ -1,7 +1,8 @@
 import type { TopicItem, TrackType } from './leitner';
+import { STORAGE_KEYS, safeGetItem, safeSetItem, safeGetJson, safeSetJson } from './storage';
 
-export const ACTIVE_DECK_STORAGE_KEY = 'leitner_active_deck_id';
-export const CUSTOM_DECKS_STORAGE_KEY = 'leitner_custom_decks';
+export const ACTIVE_DECK_STORAGE_KEY = STORAGE_KEYS.ACTIVE_DECK_ID;
+export const CUSTOM_DECKS_STORAGE_KEY = STORAGE_KEYS.CUSTOM_DECKS;
 
 export const FRONTEND_TRACKS: ReadonlySet<TrackType> = new Set<TrackType>([
   'nextjs',
@@ -138,48 +139,27 @@ export function getDeckName(deckId: string, customDecks: CustomDeck[] = []): str
 }
 
 export function getStoredActiveDeckId(): string {
-  if (typeof localStorage === 'undefined') return 'full-library';
-  try {
-    const val = localStorage.getItem(ACTIVE_DECK_STORAGE_KEY);
-    if (!val) return 'full-library';
-    if (val === 'core-algorithms' || val === 'advanced-algorithms') return 'algorithms';
-    return val;
-  } catch {
-    return 'full-library';
-  }
+  const val = safeGetItem(ACTIVE_DECK_STORAGE_KEY);
+  if (!val) return 'full-library';
+  if (val === 'core-algorithms' || val === 'advanced-algorithms') return 'algorithms';
+  return val;
 }
 
 export function setStoredActiveDeckId(id: string): void {
-  if (typeof localStorage === 'undefined') return;
-  try {
-    localStorage.setItem(ACTIVE_DECK_STORAGE_KEY, id);
-  } catch {
-    // Ignore storage quota/security errors
-  }
+  safeSetItem(ACTIVE_DECK_STORAGE_KEY, id);
 }
 
 export function getStoredCustomDecks(): CustomDeck[] {
-  if (typeof localStorage === 'undefined') return [];
-  try {
-    const raw = localStorage.getItem(CUSTOM_DECKS_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (d) => d && typeof d.id === 'string' && typeof d.name === 'string' && Array.isArray(d.cardIds)
-    );
-  } catch {
-    return [];
-  }
+  const parsed = safeGetJson<unknown>(CUSTOM_DECKS_STORAGE_KEY, null);
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(
+    (d): d is CustomDeck =>
+      Boolean(d && typeof d.id === 'string' && typeof d.name === 'string' && Array.isArray(d.cardIds))
+  );
 }
 
 export function setStoredCustomDecks(decks: CustomDeck[]): void {
-  if (typeof localStorage === 'undefined') return;
-  try {
-    localStorage.setItem(CUSTOM_DECKS_STORAGE_KEY, JSON.stringify(decks));
-  } catch {
-    // Ignore storage quota errors
-  }
+  safeSetJson(CUSTOM_DECKS_STORAGE_KEY, decks);
 }
 
 /**

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   HelpCircle,
   X,
@@ -7,86 +7,21 @@ import {
   Loader2,
   KeyRound,
 } from 'lucide-react';
-import { MarkdownContent } from '../MarkdownContent';
+import { StreamedMarkdown } from '../StreamedMarkdown';
 import {
   askSocraticClarification,
   getStoredApiKey,
   type CritiqueFollowUpMessage,
 } from '../../lib/ai';
 import type { TopicItem } from '../../lib/leitner';
+import type { AppTheme } from '../../lib/theme';
 
 interface SocraticClarificationAssistantProps {
   topic: TopicItem;
   currentCode: string;
-  theme?: 'dark' | 'apple-gsos';
+  theme?: AppTheme;
   onOpenSettings?: (section?: 'ai') => void;
 }
-
-const StreamedAssistantReply: React.FC<{
-  text: string;
-  isNew: boolean;
-  onScrollToBottom: () => void;
-  onComplete?: () => void;
-}> = ({ text, isNew, onScrollToBottom, onComplete }) => {
-  const tokens = useMemo(() => {
-    return text.match(/(\s+|\S+)/g) || [text];
-  }, [text]);
-
-  const [tokenCount, setTokenCount] = useState(() => (isNew ? 0 : tokens.length));
-  const [isDone, setIsDone] = useState(!isNew);
-
-  const onCompleteRef = useRef(onComplete);
-  const onScrollToBottomRef = useRef(onScrollToBottom);
-
-  useEffect(() => {
-    onCompleteRef.current = onComplete;
-    onScrollToBottomRef.current = onScrollToBottom;
-  });
-
-  useEffect(() => {
-    if (!isNew) return;
-
-    let current = 0;
-    const interval = setInterval(() => {
-      current += 2;
-      if (current >= tokens.length) {
-        setTokenCount(tokens.length);
-        setIsDone(true);
-        clearInterval(interval);
-        onCompleteRef.current?.();
-      } else {
-        setTokenCount(current);
-      }
-      onScrollToBottomRef.current?.();
-    }, 20);
-
-    return () => clearInterval(interval);
-  }, [isNew, tokens]);
-
-  const currentText = useMemo(() => {
-    if (isDone || !isNew) return text;
-    return tokens.slice(0, tokenCount).join('');
-  }, [isDone, isNew, text, tokens, tokenCount]);
-
-  return (
-    <div style={{ lineHeight: 1.55 }}>
-      <MarkdownContent text={currentText} />
-      {!isDone && (
-        <span
-          style={{
-            display: 'inline-block',
-            width: '6px',
-            height: '14px',
-            backgroundColor: '#38bdf8',
-            verticalAlign: 'text-bottom',
-            marginLeft: '4px',
-            animation: 'socraticCursorBlink 0.75s infinite',
-          }}
-        />
-      )}
-    </div>
-  );
-};
 
 export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssistantProps> = ({
   topic,
@@ -510,9 +445,11 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                         borderLeft: '2px solid #38bdf8',
                       }}
                     >
-                      <StreamedAssistantReply
+                      <StreamedMarkdown
                         text={msg.content}
                         isNew={idx === animatingIndex}
+                        intervalMs={20}
+                        cursorAnimation="socraticCursorBlink 0.75s infinite"
                         onScrollToBottom={scrollToBottom}
                         onComplete={() => setAnimatingIndex(null)}
                       />

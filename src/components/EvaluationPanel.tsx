@@ -30,67 +30,12 @@ import { askCritiqueFollowUp, getStoredApiKey, type EvaluationResult } from '../
 import { summarizeVerdict } from '../lib/verdict';
 import { stripPredefinedPromptTypes } from '../utils/cardPromptTypes';
 import { getThemeColors } from '../styles/colors';
-
+import type { AppTheme } from '../lib/theme';
 import { MarkdownContent } from './MarkdownContent';
-
-const StreamedMarkdownReply: React.FC<{
-  text: string;
-  isNew?: boolean;
-  onScrollToBottom?: () => void;
-}> = ({ text, isNew = false, onScrollToBottom }) => {
-  // Tokenize text into words and whitespace for natural ChatGPT-style streaming
-  const tokens = useMemo(() => {
-    return text.split(/(\s+)/);
-  }, [text]);
-
-  const [tokenCount, setTokenCount] = useState(() => (isNew ? 1 : tokens.length));
-  const [isDone, setIsDone] = useState(!isNew);
-
-  useEffect(() => {
-    if (!isNew) return;
-
-    let idx = 1;
-    const interval = setInterval(() => {
-      idx = Math.min(tokens.length, idx + 2);
-      setTokenCount(idx);
-      onScrollToBottom?.();
-      if (idx >= tokens.length) {
-        setIsDone(true);
-        clearInterval(interval);
-      }
-    }, 22);
-
-    return () => clearInterval(interval);
-  }, [isNew, tokens, onScrollToBottom]);
-
-  const currentText = useMemo(() => {
-    if (isDone || !isNew) return text;
-    return tokens.slice(0, tokenCount).join('');
-  }, [isDone, isNew, text, tokens, tokenCount]);
-
-  return (
-    <div style={{ lineHeight: 1.55 }}>
-      <MarkdownContent text={currentText} />
-      {!isDone && (
-        <span
-          className="followup-cursor"
-          style={{
-            display: 'inline-block',
-            width: '6px',
-            height: '14px',
-            backgroundColor: '#38bdf8',
-            verticalAlign: 'text-bottom',
-            marginLeft: '4px',
-            animation: 'followupCursorBlink 0.75s infinite',
-          }}
-        />
-      )}
-    </div>
-  );
-};
+import { StreamedMarkdown } from './StreamedMarkdown';
 
 interface EvaluationPanelProps {
-  theme?: 'dark' | 'apple-gsos';
+  theme?: AppTheme;
   topic: TopicItem;
   submittedCode: string;
   result: EvaluationResult;
@@ -959,9 +904,12 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
                     </div>
                   ) : (
                     <div style={{ color: 'var(--text-primary)', fontSize: '13.5px', lineHeight: 1.55 }}>
-                      <StreamedMarkdownReply
+                      <StreamedMarkdown
                         text={msg.content}
                         isNew={idx === followUpMessages.length - 1}
+                        intervalMs={22}
+                        cursorClassName="followup-cursor"
+                        cursorAnimation="followupCursorBlink 0.75s infinite"
                         onScrollToBottom={scrollToBottom}
                       />
                       {msg.content.includes('requires an AI provider API key') && onOpenSettings && (

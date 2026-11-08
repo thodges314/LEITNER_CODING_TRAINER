@@ -28,7 +28,7 @@ in the browser; state lives in `localStorage`.
 | Tracks | 17 tracks, **every concept (difficulty ladder) lives in exactly one track** (enforced by `src/lib/tracks.test.ts`): advanced-algorithms 57, js-utilities 44, react-components 41, algorithms 30, async-js 29, react 27, js-language 25, nextjs 23, d3 22, dom-browser 21, sql-postgres 20, graphql-server 17, typescript-patterns 16, tailwind 16, node 15, testing-tooling 13, graphql 12. Retired track ids (`react-patterns`, `async-web-plumbing`, `js-runtime-fundamentals`, `collections-transformations`, `data-structures`, `algorithmic-screens`, `algorithms-advanced`) are mapped by `TRACK_ALIASES` in `leitner.ts` for saved Focus filters/presets, custom cards and imported backups |
 | Tracks defined but empty | *(none)* |
 | Complexity metadata | `targetTime`, `targetSpace`, `complexityExplanation` exist only on algorithm-style cards: tracks `algorithms` and `advanced-algorithms`, plus the `collections`, `flatten`, `array-polyfills`, `equality-clone` and `lru` concepts of `js-utilities` (see `wantsComplexity` in `scripts/enrich-complexities.mjs`); UI, hook, TS and language cards intentionally have none and the UI hides the complexity badges for them (see §4) |
-| Automated tests | 2,703 Vitest tests (jsdom/node across 71 test files): every card's harness must pass with its reference solution **and fail with an empty solution**, plus state schema migration tests, Web Worker sandbox runner unit tests, preview guard tests mounting reference solutions, Socratic assistant tests, TypeScript dual-mode tests, scheduling, preset decks, custom deck management, catalog index pipeline, AI interview prep copilot, ladder, drafts, focus, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
+| Automated tests | 2,708 Vitest tests (jsdom/node across 72 test files): every card's harness must pass with its reference solution **and fail with an empty solution**, plus state schema migration tests, Web Worker sandbox runner unit tests, preview guard tests mounting reference solutions, Socratic assistant tests, TypeScript dual-mode tests, scheduling, preset decks, custom deck management, catalog index pipeline, AI interview prep copilot, ladder, drafts, focus, storage, formatter and runner tests. Timing-based harnesses can flake when the machine is heavily loaded (e.g. while the browser suite runs); run `npm test` on an idle machine |
 | Browser verification | `npm run e2e` runs ALL 428 cards in real Chromium against the production build (reference solution PASSES, empty solution FAILS; 856 card tests + 13 navigation/shortcut tests + 19 preview tests + 5 answer-flow tests + 6 guided-tour tests + 2 catalog-hint tests + 4 backup advisory tests + 2 stats-view tests + 2 deck-selector tests + 2 remove-from-deck tests + 3 custom-deck tests + 1 interview-prep test + 4 starter-buffer tests + 1 key-warning test + 3 activity tests + 2 worker-timeout sandbox tests = 925 browser tests across 17 files). See §7.4a. Re-run after changing cards, the runner or `domTools` |
 
 ## 3. Repository map
@@ -42,12 +42,15 @@ src/
     dashboard/                 modular catalog subcomponents (CatalogControls, CatalogTable, TierFilterBar, TopicFilterBar, DeckSelector, DeactivateModal, DeckEditorModal)
     FocusModal.tsx             practice focus: include/exclude tracks+tags, difficulty range, presets
     DifficultyBadge.tsx        ●●●○○ label
-    AddTopicModal.tsx, SettingsModal.tsx, EvaluationPanel.tsx
+    AddTopicModal.tsx, SettingsModal.tsx, EvaluationPanel.tsx, StreamedMarkdown.tsx
     LivePreview.tsx            universal sandboxed iframe preview (React, D3, Tailwind HTML), pop-out window with live sync, event output (aliased as ReactPreview.tsx)
     practice/                  modular arena subcomponents (PracticeHeader, ContractTable, EditorToolbar, ConsoleRunnerDrawer, ComponentPreviewPane, PropsControlPanel, ReinforcementBanner, starterSnippet, consoleFormat, ReactTestErrorBoundary)
   lib/
     leitner.ts                 ALL scheduling/state logic (Leitner + Graduated Interval Recall, localStorage persistence)
     leitner.test.ts            unit tests for Leitner & Graduated Interval algorithms
+    trackMeta.ts               track types (`TrackType`), visual badge palettes, labels, and track helpers (`TRACK_METADATA`, `getTrackMeta`)
+    storage.ts                 centralized `STORAGE_KEYS` registry and fail-safe `localStorage` accessors (`safeGetItem`, `safeSetItem`, `safeGetJson`, `safeSetJson`)
+    storage.test.ts            unit tests for storage registry and fail-safe accessors
     deckMigrations.ts          state schema versioning (`deckVersion`: 3) and sequential migrations (`migrateV1ToV2`, `migrateV2ToV3`)
     deckMigrations.test.ts     unit tests for sequential schema migrations and backward compatibility
     decks.ts                   preset study decks architecture (Full Library, Full-Stack Core, Frontend Specialist, Algorithms & Data Structures, Data Scaling & Streams, Custom Decks)

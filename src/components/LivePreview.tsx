@@ -18,6 +18,7 @@ import { transpileForExecution, prepareHtmlCode } from '../lib/runner';
 import type { ExecutionMode } from '../lib/runner';
 import { stripTestRunnerBlock } from '../lib/stripTestRunner';
 import { isTsOnlyCard } from '../lib/tsOnly';
+import type { AppTheme } from '../lib/theme';
 import { PropsControlPanel } from './practice/PropsControlPanel';
 import { getComponentPropsConfig, getInitialPropValues } from '../lib/previewPropsConfig';
 import { getCardPreviewConfig } from '../lib/previewConfig';
@@ -29,7 +30,7 @@ export interface LivePreviewProps {
   card: TopicItem;
   code: string;
   executionMode: ExecutionMode;
-  theme?: 'dark' | 'apple-gsos';
+  theme?: AppTheme;
   isLive?: boolean;
   runTrigger?: number;
   onClose?: () => void;

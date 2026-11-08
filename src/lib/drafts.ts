@@ -1,45 +1,36 @@
+import { STORAGE_KEYS, getDefaultStorage, safeGetItem, safeSetItem, safeRemoveItem } from './storage';
+
 /** Per-card code drafts, so a frozen tab or a reload never costs you what you typed. */
-const PREFIX = 'leitner_draft:';
+const PREFIX = STORAGE_KEYS.DRAFT_PREFIX;
 
 export function loadDraft(cardId: string | undefined): string | null {
-  if (!cardId || typeof localStorage === 'undefined') return null;
-  try {
-    return localStorage.getItem(PREFIX + cardId);
-  } catch {
-    return null;
-  }
+  if (!cardId) return null;
+  return safeGetItem(PREFIX + cardId);
 }
 
 export function saveDraft(cardId: string | undefined, code: string): void {
-  if (!cardId || typeof localStorage === 'undefined') return;
-  try {
-    localStorage.setItem(PREFIX + cardId, code);
-  } catch {
-    /* quota exceeded: drafts are best-effort */
-  }
+  if (!cardId) return;
+  safeSetItem(PREFIX + cardId, code);
 }
 
 export function clearDraft(cardId: string | undefined): void {
-  if (!cardId || typeof localStorage === 'undefined') return;
-  try {
-    localStorage.removeItem(PREFIX + cardId);
-  } catch {
-    /* ignore */
-  }
+  if (!cardId) return;
+  safeRemoveItem(PREFIX + cardId);
 }
 
 export function clearAllDrafts(): void {
-  if (typeof localStorage === 'undefined') return;
+  const store = getDefaultStorage();
+  if (!store) return;
   try {
     const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
+    for (let i = 0; i < store.length; i++) {
+      const key = store.key(i);
       if (key && key.startsWith(PREFIX)) {
         keysToRemove.push(key);
       }
     }
     for (const key of keysToRemove) {
-      localStorage.removeItem(key);
+      store.removeItem(key);
     }
   } catch {
     /* ignore */

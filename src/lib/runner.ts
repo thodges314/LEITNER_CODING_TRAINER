@@ -376,6 +376,34 @@ export function bufferContainsHarness(code: string, harness: string): boolean {
   return code.split('\n').some((l) => l.trim() === first);
 }
 
+const LEADING_COMMENTS_RE = /^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g;
+const JS_STATEMENT_START_RE = /^(?:const|let|var|function|class|export|import)\b/;
+
+function prepareDslCode(
+  code: string,
+  testHarness: string | undefined,
+  declarationPattern: RegExp,
+  wrapCleanText: (cleanText: string) => string
+): string {
+  const stripped = stripTestRunnerBlock(code, testHarness);
+  if (declarationPattern.test(code)) {
+    return code;
+  }
+
+  const withoutLeadingComments = stripped.replace(LEADING_COMMENTS_RE, '').trim();
+  if (JS_STATEMENT_START_RE.test(withoutLeadingComments)) {
+    return code;
+  }
+
+  const cleanText = stripped
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('//'))
+    .join('\n')
+    .trim();
+
+  return wrapCleanText(cleanText);
+}
+
 /**
  * Normalizes user code for SQL / PostgreSQL track cards.
  * Accepts:
@@ -384,34 +412,12 @@ export function bufferContainsHarness(code: string, harness: string): boolean {
  * 2. Raw SQL (e.g. `SELECT ...` or `WITH ...`), with or without starter comments or SQL comments (`--`).
  */
 export function prepareSqlCode(code: string, testHarness?: string): string {
-  // If the user buffer includes the example test runner block, strip it first for analysis
-  const stripped = stripTestRunnerBlock(code, testHarness);
-
-  // Check if the user declared `query` or `solution` using JS/TS declaration syntax anywhere
-  const hasJsDeclaration = /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:query|solution)\b/.test(code);
-  if (hasJsDeclaration) {
-    return code;
-  }
-
-  // Strip leading JS/TS comments and whitespace to see if the first code token is a JS keyword
-  const withoutLeadingComments = stripped
-    .replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, '')
-    .trim();
-
-  const startsWithJs = /^(?:const|let|var|function|class|export|import)\b/.test(withoutLeadingComments);
-  if (startsWithJs) {
-    return code;
-  }
-
-  // Otherwise, user provided raw SQL text.
-  // Strip lines starting with `//` (like `// Write your implementation below`) which are invalid in PostgreSQL.
-  const cleanSql = stripped
-    .split('\n')
-    .filter((line) => !line.trim().startsWith('//'))
-    .join('\n')
-    .trim();
-
-  return `const query = ${JSON.stringify(cleanSql)};\nconst solution = query;\n`;
+  return prepareDslCode(
+    code,
+    testHarness,
+    /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:query|solution)\b/,
+    (cleanSql) => `const query = ${JSON.stringify(cleanSql)};\nconst solution = query;\n`
+  );
 }
 
 /**
@@ -422,29 +428,12 @@ export function prepareSqlCode(code: string, testHarness?: string): string {
  * 2. Raw GraphQL text (e.g. `query GetUser { ... }` or `type User { ... }`).
  */
 export function prepareGraphqlCode(code: string, testHarness?: string): string {
-  const stripped = stripTestRunnerBlock(code, testHarness);
-
-  const hasJsDeclaration = /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:query|schema|solution)\b/.test(code);
-  if (hasJsDeclaration) {
-    return code;
-  }
-
-  const withoutLeadingComments = stripped
-    .replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, '')
-    .trim();
-
-  const startsWithJs = /^(?:const|let|var|function|class|export|import)\b/.test(withoutLeadingComments);
-  if (startsWithJs) {
-    return code;
-  }
-
-  const cleanGql = stripped
-    .split('\n')
-    .filter((line) => !line.trim().startsWith('//'))
-    .join('\n')
-    .trim();
-
-  return `const query = ${JSON.stringify(cleanGql)};\nconst schema = query;\nconst solution = query;\n`;
+  return prepareDslCode(
+    code,
+    testHarness,
+    /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:query|schema|solution)\b/,
+    (cleanGql) => `const query = ${JSON.stringify(cleanGql)};\nconst schema = query;\nconst solution = query;\n`
+  );
 }
 
 /**
@@ -454,29 +443,12 @@ export function prepareGraphqlCode(code: string, testHarness?: string): string {
  * 2. Raw HTML markup text (e.g. `<div class="...">...</div>`).
  */
 export function prepareHtmlCode(code: string, testHarness?: string): string {
-  const stripped = stripTestRunnerBlock(code, testHarness);
-
-  const hasJsDeclaration = /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:html|template|solution|render\w*)\b/.test(code);
-  if (hasJsDeclaration) {
-    return code;
-  }
-
-  const withoutLeadingComments = stripped
-    .replace(/^\s*(?:\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*/g, '')
-    .trim();
-
-  const startsWithJs = /^(?:const|let|var|function|class|export|import)\b/.test(withoutLeadingComments);
-  if (startsWithJs) {
-    return code;
-  }
-
-  const cleanHtml = stripped
-    .split('\n')
-    .filter((line) => !line.trim().startsWith('//'))
-    .join('\n')
-    .trim();
-
-  return `const html = ${JSON.stringify(cleanHtml)};\nconst solution = html;\n`;
+  return prepareDslCode(
+    code,
+    testHarness,
+    /(?:^|\n)\s*(?:export\s+)?(?:const|let|var|function|class)\s+(?:html|template|solution|render\w*)\b/,
+    (cleanHtml) => `const html = ${JSON.stringify(cleanHtml)};\nconst solution = html;\n`
+  );
 }
 
 /**

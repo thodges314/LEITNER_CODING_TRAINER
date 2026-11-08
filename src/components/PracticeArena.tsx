@@ -39,6 +39,7 @@ import { formatCode } from '../lib/formatter';
 import { getTimedModeEnabled, getTimedModeDuration } from '../lib/timedMode';
 import { MarkdownContent } from './MarkdownContent';
 import { isTsOnlyCard } from '../lib/tsOnly';
+import type { AppTheme } from '../lib/theme';
 
 import { ReinforcementBanner } from './practice/ReinforcementBanner';
 import { PracticeHeader } from './practice/PracticeHeader';
@@ -63,7 +64,7 @@ interface PracticeArenaProps {
   onOpenSettings?: (section?: 'ai') => void;
   isReinforcement?: boolean;
   onFinishReinforcement?: () => void;
-  theme?: 'dark' | 'apple-gsos';
+  theme?: AppTheme;
 }
 
 export const PracticeArena: React.FC<PracticeArenaProps> = ({

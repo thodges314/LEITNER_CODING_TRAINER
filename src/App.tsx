@@ -31,6 +31,7 @@ import type {
 } from './lib/leitner';
 import { getStoredApiKey, getStoredProvider, getStoredModel } from './lib/ai';
 import { clearDraft, clearAllDrafts } from './lib/drafts';
+import { STORAGE_KEYS, safeGetItem, safeSetItem, safeRemoveItem } from './lib/storage';
 import { getStoredTheme, setStoredTheme, applyThemeToDocument } from './lib/theme';
 import type { AppTheme } from './lib/theme';
 import {
@@ -119,8 +120,10 @@ export function App() {
   const [isCatalogTourOpen, setIsCatalogTourOpen] = useState(false);
   const [isArenaTourOpen, setIsArenaTourOpen] = useState(false);
   const [pendingArenaTour, setPendingArenaTour] = useState(() => {
-    if (typeof localStorage === 'undefined') return false;
-    return localStorage.getItem('leitner_pending_arena_tour') === '1' && !localStorage.getItem('leitner_arena_tour_seen');
+    return (
+      safeGetItem(STORAGE_KEYS.PENDING_ARENA_TOUR) === '1' &&
+      !safeGetItem(STORAGE_KEYS.ARENA_TOUR_SEEN)
+    );
   });
   const [backHint, setBackHint] = useState(false);
   const [isAiRecommendOpen, setIsAiRecommendOpen] = useState(false);
@@ -145,7 +148,8 @@ export function App() {
   const [interviewPrepStep, setInterviewPrepStep] = useState<'input' | 'review' | undefined>(undefined);
 
   const savedDossiersCount = useMemo(() => {
-    return isInterviewPrepModalOpen ? getAllSavedDossiers().length : getAllSavedDossiers().length;
+    void isInterviewPrepModalOpen;
+    return getAllSavedDossiers().length;
   }, [isInterviewPrepModalOpen]);
 
   const handleOpenInterviewPrep = (dossierId?: string, step?: 'input' | 'review') => {
@@ -185,14 +189,10 @@ export function App() {
   // Auto-trigger Arena Tour once on first visit to Practice Arena
   useEffect(() => {
     if (activeView === 'practice' && pendingArenaTour && !isCatalogTourOpen && !isAboutOpen) {
-      const seen = localStorage.getItem('leitner_arena_tour_seen');
+      const seen = safeGetItem(STORAGE_KEYS.ARENA_TOUR_SEEN);
       if (!seen) {
-        try {
-          localStorage.setItem('leitner_arena_tour_seen', '1');
-          localStorage.removeItem('leitner_pending_arena_tour');
-        } catch {
-          // storage unavailable
-        }
+        safeSetItem(STORAGE_KEYS.ARENA_TOUR_SEEN, '1');
+        safeRemoveItem(STORAGE_KEYS.PENDING_ARENA_TOUR);
         const timer = setTimeout(() => {
           setPendingArenaTour(false);
           setIsArenaTourOpen(true);
@@ -211,7 +211,7 @@ export function App() {
   }, [backHint]);
 
   // Derive currently active card
-  const currentCard: TopicItem | null = (() => {
+  const currentCard = useMemo<TopicItem | null>(() => {
     if (selectedCardId) {
       const found = shownTopics.find((t) => t.id === selectedCardId && t.status === 'active');
       if (found) return found;
@@ -225,7 +225,7 @@ export function App() {
       scheduleFilter(deckState),
       algorithm
     );
-  })();
+  }, [selectedCardId, shownTopics, deckState, activeDeckId, customDecks, algorithm]);
 
   const [cardSnapshotBeforeReview, setCardSnapshotBeforeReview] = useState<TopicItem | null>(null);
   const [practiceSessionKey, setPracticeSessionKey] = useState(0);
@@ -940,11 +940,7 @@ export function App() {
           if (welcomeMode) {
             markWelcomed();
             setWelcomeMode(false);
-            try {
-              localStorage.setItem('leitner_pending_arena_tour', '1');
-            } catch {
-              // storage unavailable
-            }
+            safeSetItem(STORAGE_KEYS.PENDING_ARENA_TOUR, '1');
             setPendingArenaTour(true);
           }
           setIsCatalogTourOpen(true);
