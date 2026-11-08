@@ -757,7 +757,7 @@ describe('scheduling algorithm switching and backup', () => {
       expect(stats).toEqual({ attempted: 0, promoted: 0, demoted: 0 });
     });
 
-    it('accurately counts attempted, promoted, and demoted cards in the last 24 hours', () => {
+    it('accurately counts attempted, promoted, and demoted cards in the last 24 hours without counting unchanged levels', () => {
       const now = 1700000000000;
       const hour = 3600 * 1000;
       const reviews = [
@@ -767,19 +767,21 @@ describe('scheduling algorithm switching and backup', () => {
         { topicId: 'c2', passed: false, box: 1, previousBox: 2, trial: 2, timestamp: now - 5 * hour },
         // 8 hours ago: promoted (box 2 -> 3)
         { topicId: 'c3', passed: true, box: 3, previousBox: 2, trial: 3, timestamp: now - 8 * hour },
-        // 12 hours ago: failed in box 1 (box 1 -> 1, demoted/setback)
-        { topicId: 'c4', passed: false, box: 1, previousBox: 1, trial: 4, timestamp: now - 12 * hour },
+        // 10 hours ago: failed at lowest level (box 1 -> 1, NOT demoted because level did not change)
+        { topicId: 'c4', passed: false, box: 1, previousBox: 1, trial: 4, timestamp: now - 10 * hour },
+        // 12 hours ago: passed at highest level cap (box 5 -> 5, NOT promoted because level did not change)
+        { topicId: 'c5', passed: true, box: 5, previousBox: 5, trial: 5, timestamp: now - 12 * hour },
         // 30 hours ago: outside rolling 24h window (ignored)
-        { topicId: 'c5', passed: true, box: 4, previousBox: 3, trial: 5, timestamp: now - 30 * hour },
+        { topicId: 'c6', passed: true, box: 4, previousBox: 3, trial: 6, timestamp: now - 30 * hour },
       ];
 
       const stats = computeRolling24HourStats(reviews, undefined, now);
-      expect(stats.attempted).toBe(4);
+      expect(stats.attempted).toBe(5);
       expect(stats.promoted).toBe(2);
-      expect(stats.demoted).toBe(2);
+      expect(stats.demoted).toBe(1);
     });
 
-    it('falls back to today dailyStats if recentReviews has no entries in window', () => {
+    it('falls back to today dailyStats if recentReviews has no entries in window without overcounting Box 1 failures as demotions', () => {
       const now = 1700000000000;
       const today = localDateKey(now);
       const dailyStats = {
@@ -789,7 +791,7 @@ describe('scheduling algorithm switching and backup', () => {
       const stats = computeRolling24HourStats([], dailyStats, now);
       expect(stats.attempted).toBe(10);
       expect(stats.promoted).toBe(7);
-      expect(stats.demoted).toBe(3);
+      expect(stats.demoted).toBe(0);
     });
   });
 });

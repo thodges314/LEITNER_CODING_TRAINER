@@ -3,8 +3,6 @@ import type { HarnessReport } from './testHelpers';
 import type { WorkerLogMessage, WorkerResultMessage, WorkerRunMessage } from './sandboxWorker';
 
 let activeWorker: Worker | null = null;
-let idleWorker: Worker | null = null;
-let idleWorkerCtor: unknown = null;
 let activeTimer: ReturnType<typeof setTimeout> | undefined;
 
 /**
@@ -74,21 +72,6 @@ export async function runInWorker(
   return new Promise((resolve) => {
     let worker: Worker | null = null;
     const id = `run_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const releaseToIdle = () => {
-      if (activeTimer) {
-        clearTimeout(activeTimer);
-        activeTimer = undefined;
-      }
-      if (worker) {
-        worker.onmessage = null;
-        worker.onerror = null;
-        if (activeWorker === worker) {
-          activeWorker = null;
-        }
-        idleWorker = worker;
-        worker = null;
-      }
-    };
 
     const cleanup = () => {
       if (activeTimer) {
@@ -103,9 +86,6 @@ export async function runInWorker(
         }
         if (activeWorker === worker) {
           activeWorker = null;
-        }
-        if (idleWorker === worker) {
-          idleWorker = null;
         }
         worker = null;
       }
@@ -130,24 +110,10 @@ export async function runInWorker(
     }, timeoutMs);
 
     try {
-      if (idleWorker && idleWorkerCtor === globalThis.Worker) {
-        worker = idleWorker;
-        idleWorker = null;
-      } else {
-        if (idleWorker) {
-          try {
-            idleWorker.terminate();
-          } catch {
-            // ignore
-          }
-          idleWorker = null;
-        }
-        // Vite bundles workers created via new URL(..., import.meta.url) into dedicated chunks
-        worker = new Worker(new URL('./sandboxWorker.ts', import.meta.url), {
-          type: 'module',
-        });
-        idleWorkerCtor = globalThis.Worker;
-      }
+      // Vite bundles workers created via new URL(..., import.meta.url) into dedicated chunks
+      worker = new Worker(new URL('./sandboxWorker.ts', import.meta.url), {
+        type: 'module',
+      });
       activeWorker = worker;
 
       worker.onmessage = (e: MessageEvent<WorkerLogMessage | WorkerResultMessage>) => {
@@ -157,7 +123,7 @@ export async function runInWorker(
         if (data.type === 'log') {
           options.onLog?.(data);
         } else if (data.type === 'result') {
-          releaseToIdle();
+          cleanup();
           resolve({
             report: data.report,
             returnValue: data.returnValue,
