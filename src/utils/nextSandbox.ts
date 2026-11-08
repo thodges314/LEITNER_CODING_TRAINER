@@ -274,14 +274,14 @@ export function notFound(): never {
 // ---------------------------------------------------------------------------
 
 export interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
-  href: string | { pathname?: string; query?: any };
+  href: string | { pathname?: string; query?: Record<string, unknown> };
   prefetch?: boolean;
   scroll?: boolean;
   replace?: boolean;
   children?: React.ReactNode;
 }
 
-export function Link({ href, prefetch, scroll, replace, children, className, ...rest }: LinkProps) {
+export function Link({ href, prefetch, scroll, children, className, ...rest }: LinkProps) {
   const url = typeof href === 'object' ? href.pathname || '/' : href;
   return React.createElement(
     'a',
@@ -319,7 +319,7 @@ export function Image({
   className,
   ...rest
 }: NextImageProps) {
-  const imgProps: Record<string, any> = {
+  const imgProps: Record<string, unknown> = {
     src,
     alt,
     'data-next-image': 'true',
@@ -346,8 +346,8 @@ export function Image({
 export interface NextScriptProps extends React.ScriptHTMLAttributes<HTMLScriptElement> {
   src?: string;
   strategy?: 'beforeInteractive' | 'afterInteractive' | 'lazyOnload' | 'worker';
-  onLoad?: (e: any) => void;
-  onError?: (e: any) => void;
+  onLoad?: (e: unknown) => void;
+  onError?: (e: unknown) => void;
   children?: string;
 }
 
@@ -355,7 +355,6 @@ export function Script({
   src,
   strategy = 'afterInteractive',
   onLoad,
-  onError,
   children,
   ...rest
 }: NextScriptProps) {
