@@ -39,7 +39,6 @@ test.describe('Dashboard 2x2 KPI and Stats Widget', () => {
     // Verify PracticeActionHero tile exists alongside DeckStatsWidget
     const heroTile = page.getByTestId('practice-action-hero');
     await expect(heroTile).toBeVisible();
-    await expect(heroTile.getByText('Practice Momentum')).toBeVisible();
     await expect(heroTile.getByText('24-Hour Rolling Window')).toBeVisible();
     await expect(heroTile.getByTestId('hero-stat-attempted')).toBeVisible();
     await expect(heroTile.getByTestId('hero-stat-promoted')).toBeVisible();

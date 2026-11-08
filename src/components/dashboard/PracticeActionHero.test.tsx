@@ -49,9 +49,12 @@ describe('PracticeActionHero', () => {
       );
     });
 
-    expect(container.textContent).toContain('Practice Momentum');
     expect(container.textContent).toContain('24-Hour Rolling Window');
-    expect(container.textContent).toContain('25 Active Cards');
+    expect(container.textContent).not.toContain('Practice Momentum');
+    expect(container.textContent).not.toContain('Active Cards');
+    expect(container.textContent).not.toContain('in last 24h');
+    expect(container.textContent).not.toContain('tier advanced');
+    expect(container.textContent).not.toContain('needs review');
 
     const attempted = container.querySelector('[data-testid="hero-stat-attempted"]');
     const promoted = container.querySelector('[data-testid="hero-stat-promoted"]');

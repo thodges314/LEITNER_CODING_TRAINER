@@ -53,30 +53,24 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
-  min-height: 260px;
+  min-height: 220px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   position: relative;
   overflow: hidden;
 }
 
 [data-theme="apple-gsos"] .practice-action-hero {
-  border: 1.5px solid #8A887E;
-  background-color: #FFFFFF;
+  border: 1.5px solid var(--border-medium);
+  background-color: var(--bg-card);
   box-shadow: 2px 2px 0px rgba(28, 28, 28, 0.12);
 }
 
 .practice-hero-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-}
-
-.practice-hero-title-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .practice-hero-badge {
@@ -87,46 +81,11 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--accent-cyan, #38BDF8);
-}
-
-[data-theme="apple-gsos"] .practice-hero-badge {
-  color: #0284C7;
+  color: var(--accent-cyan);
 }
 
 .practice-hero-sparkle {
-  color: var(--accent-cyan, #38BDF8);
-}
-
-.practice-hero-title {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.practice-hero-rotation-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 600;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  color: var(--accent-cyan, #38BDF8);
-}
-
-[data-theme="apple-gsos"] .practice-hero-rotation-pill {
-  background: #E0F2FE;
-  border-color: #7DD3FC;
-  color: #0369A1;
-}
-
-.practice-hero-zap {
-  color: #F59E0B;
+  color: var(--accent-cyan);
 }
 
 /* 24-Hour Metrics Grid */
@@ -149,8 +108,8 @@
 }
 
 [data-theme="apple-gsos"] .practice-hero-metric-tile {
-  background-color: #F8FAFC;
-  border: 1px solid #CBD5E1;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
 }
 
 .practice-hero-metric-label {
@@ -171,36 +130,19 @@
 }
 
 .metric-cyan {
-  color: var(--accent-cyan, #38BDF8);
+  color: var(--accent-cyan);
 }
 
 .metric-emerald {
-  color: #10B981;
+  color: var(--accent-emerald);
 }
 
 .metric-rose {
-  color: #F43F5E;
-}
-
-[data-theme="apple-gsos"] .metric-cyan {
-  color: #0284C7;
-}
-
-[data-theme="apple-gsos"] .metric-emerald {
-  color: #059669;
-}
-
-[data-theme="apple-gsos"] .metric-rose {
-  color: #E11D48;
+  color: var(--accent-rose);
 }
 
 .metric-trend-icon {
   flex-shrink: 0;
-}
-
-.practice-hero-metric-sub {
-  font-size: 11px;
-  color: var(--text-secondary);
 }
 
 /* Action Launch Button & Subtext */
@@ -237,14 +179,6 @@
 
 .practice-hero-launch-text {
   letter-spacing: -0.01em;
-}
-
-.practice-hero-launch-arrow {
-  transition: transform 0.15s ease;
-}
-
-.practice-hero-launch-btn:hover .practice-hero-launch-arrow {
-  transform: translateX(3px);
 }
 
 .practice-hero-next-hint {

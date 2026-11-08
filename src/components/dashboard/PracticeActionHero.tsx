@@ -1,37 +1,27 @@
 import React from 'react';
-import { Play, ArrowRight, Zap, TrendingUp, TrendingDown, Sparkles } from 'lucide-react';
+import { Play, TrendingUp, TrendingDown, Sparkles } from 'lucide-react';
 import type { TopicItem, Rolling24HourStats } from '../../lib/leitner';
 
 export interface PracticeActionHeroProps {
   stats: Rolling24HourStats;
   nextCard?: TopicItem | null;
-  activeCount: number;
-  totalCards: number;
+  activeCount?: number;
+  totalCards?: number;
   onResumePractice: () => void;
 }
 
 export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
   stats,
   nextCard,
-  activeCount,
-  totalCards,
   onResumePractice,
 }) => {
   return (
     <div className="glass-panel practice-action-hero" data-testid="practice-action-hero">
       {/* Top Banner Row */}
       <div className="practice-hero-header">
-        <div className="practice-hero-title-group">
-          <div className="practice-hero-badge">
-            <Sparkles size={12} className="practice-hero-sparkle" />
-            <span>24-Hour Rolling Window</span>
-          </div>
-          <h2 className="practice-hero-title">Practice Momentum</h2>
-        </div>
-
-        <div className="practice-hero-rotation-pill" title={`${activeCount} of ${totalCards} cards active in study rotation`}>
-          <Zap size={13} className="practice-hero-zap" />
-          <span>{activeCount} Active Cards</span>
+        <div className="practice-hero-badge">
+          <Sparkles size={12} className="practice-hero-sparkle" />
+          <span>24-Hour Rolling Window</span>
         </div>
       </div>
 
@@ -43,7 +33,6 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
           <div className="practice-hero-metric-val metric-cyan" data-testid="hero-stat-attempted">
             {stats.attempted}
           </div>
-          <div className="practice-hero-metric-sub">in last 24h</div>
         </div>
 
         {/* Promoted */}
@@ -53,7 +42,6 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
             <TrendingUp size={16} className="metric-trend-icon" />
             <span>{stats.promoted}</span>
           </div>
-          <div className="practice-hero-metric-sub">tier advanced</div>
         </div>
 
         {/* Demoted */}
@@ -63,7 +51,6 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
             <TrendingDown size={16} className="metric-trend-icon" />
             <span>{stats.demoted}</span>
           </div>
-          <div className="practice-hero-metric-sub">needs review</div>
         </div>
       </div>
 
@@ -78,7 +65,6 @@ export const PracticeActionHero: React.FC<PracticeActionHeroProps> = ({
         >
           <Play size={18} fill="currentColor" />
           <span className="practice-hero-launch-text">Resume Practice Arena</span>
-          <ArrowRight size={16} className="practice-hero-launch-arrow" />
         </button>
 
         <div className="practice-hero-next-hint">
