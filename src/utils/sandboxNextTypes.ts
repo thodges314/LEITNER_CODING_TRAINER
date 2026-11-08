@@ -130,6 +130,8 @@ export const SANDBOX_NEXT_TYPES = `
 
   declare function revalidateTag(tag: string): void;
   declare function revalidatePath(path: string, type?: 'page' | 'layout'): void;
+  declare var activeRevalidationStore: { tags: Set<string>; paths: Set<string> };
+  declare function resetRevalidationStore(): void;
 
   declare module 'next/server' {
     export import NextRequest = NextServer.NextRequest;
@@ -232,6 +234,7 @@ export const SANDBOX_NEXT_TYPES = `
   declare function useSearchParams(): URLSearchParams;
   declare function redirect(url: string, type?: any): never;
   declare function notFound(): never;
+  declare function Inter(options?: any): any;
   declare function setMockPathname(pathname: string): void;
   declare function setMockRouter(router: any): void;
   declare function setMockSearchParams(params: any): void;

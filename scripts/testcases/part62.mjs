@@ -217,24 +217,24 @@ export default {
 
   'next-fetch-cache-revalidate': [
     c(
-      'buildDataCacheConfig builds static cache configuration with force-cache and static segment',
-      'buildDataCacheConfig({ strategy: "static", tags: ["blog", "posts"] })',
-      '{"fetchOptions":{"cache":"force-cache","next":{"tags":["blog","posts"]}},"segmentConfig":{"dynamic":"force-static","revalidate":false}}'
+      'fetchProductCatalog requests products with revalidate: 60 and category cache tags',
+      'fetchProductCatalog("laptops")',
+      'fetches from https://api.example.com/products?category=laptops with next.revalidate=60 and tags'
     ),
     c(
-      'buildDataCacheConfig builds timed ISR configuration with explicit revalidate seconds',
-      'buildDataCacheConfig({ strategy: "timed", revalidateSeconds: 120, tags: ["products"] })',
-      '{"fetchOptions":{"next":{"revalidate":120,"tags":["products"]}},"segmentConfig":{"revalidate":120}}'
+      'fetchProductCatalog throws Error when HTTP response is not ok',
+      'fetchProductCatalog("invalid")',
+      'throws Error("Failed to fetch product catalog")'
     ),
     c(
-      'buildDataCacheConfig defaults revalidateSeconds to 60 when omitted or non-positive',
-      'buildDataCacheConfig({ strategy: "timed" })',
-      '{"fetchOptions":{"next":{"revalidate":60}},"segmentConfig":{"revalidate":60}}'
+      'fetchLiveInventory requests inventory with cache: "no-store"',
+      'fetchLiveInventory("p-100")',
+      'fetches from https://api.example.com/inventory/p-100 with cache: "no-store"'
     ),
     c(
-      'buildDataCacheConfig builds dynamic no-store configuration with force-dynamic segment',
-      'buildDataCacheConfig({ strategy: "dynamic" })',
-      '{"fetchOptions":{"cache":"no-store"},"segmentConfig":{"dynamic":"force-dynamic","revalidate":0}}'
+      'fetchLiveInventory throws Error when HTTP response is not ok',
+      'fetchLiveInventory("unknown")',
+      'throws Error("Failed to fetch live inventory")'
     ),
   ],
 

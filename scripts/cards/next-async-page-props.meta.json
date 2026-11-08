@@ -1,6 +1,6 @@
 {
   "track": "nextjs",
-  "title": "Async Request APIs: Dynamic Params & SearchParams",
+  "title": "Next.js 15: Async Server Component Page Props",
   "tags": [
     "nextjs",
     "app-router",
@@ -9,6 +9,6 @@
     "typescript",
     "nextjs-15"
   ],
-  "requiresDom": false
+  "requiresDom": true
 }
 

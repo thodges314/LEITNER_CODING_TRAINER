@@ -4,47 +4,47 @@ const r = (d, i, e, o = {}) => c(d, i, e, { v: false, note: 'covered by Next.js 
 export default {
   'next-client-boundary-guard': [
     r(
-      '{ title: "Next.js", count: 10, ok: true, d: new Date("2026-01-01T00:00:00.000Z") }',
-      '{"errors":[],"sanitizedProps":{"count":10,"d":"2026-01-01T00:00:00.000Z","ok":true,"title":"Next.js"},"valid":true}',
-      'Passes valid primitive and date props, serializing Date to ISO string'
+      'Serializes valid user record converting Dates to ISO strings',
+      'serializeUserForClient({ id: "u-101", name: "Alice", email: "alice@example.com", role: "admin", passwordHash: "secret", createdAt: new Date("2026-01-15T12:00:00.000Z"), updatedAt: new Date("2026-01-20T18:30:00.000Z") })',
+      '{ success: true, data: { id: "u-101", name: "Alice", email: "alice@example.com", role: "admin", createdAt: "2026-01-15T12:00:00.000Z", updatedAt: "2026-01-20T18:30:00.000Z" } }'
     ),
     r(
-      '{ handler: () => {}, id: "btn-1" }',
-      '{"errors":[{"message":"Functions cannot be passed across RSC client boundaries. Pass an identifier or Server Action reference instead.","path":"handler","type":"function"}],"valid":false}',
-      'Rejects function prop with explanatory error and path'
+      'Strips sensitive passwordHash field from client output',
+      'serializeUserForClient(user).data.passwordHash',
+      'undefined'
     ),
     r(
-      '(() => { class Customer { name = "Alice"; } return { user: new Customer() }; })()',
-      '{"errors":[{"message":"Class instance Customer cannot be passed to Client Components. Convert to a plain object.","path":"user","type":"class_instance"}],"valid":false}',
-      'Rejects non-plain class instance prop'
+      'Returns error when createdAt or updatedAt is invalid',
+      'serializeUserForClient({ ...user, createdAt: new Date("invalid") })',
+      '{ success: false, error: "Invalid date fields" }'
     ),
     r(
-      '(() => { const o = { name: "loop" }; o.self = o; return { item: o }; })()',
-      '{"errors":[{"message":"Circular reference detected at item.self.","path":"item.self","type":"circular_reference"}],"valid":false}',
-      'Rejects circular reference graph'
+      'Returns error when required string fields are missing or empty',
+      'serializeUserForClient({ ...user, id: "" })',
+      '{ success: false, error: "Missing required user fields" }'
     ),
   ],
 
   'next-parallel-intercepting-routes': [
     r(
-      '{ routePattern: "/feed/@modal/(..)photo/[id]", slotName: "modal", targetPattern: "/photo/[id]" }, { currentPath: "/feed", targetUrl: "/photo/42", isSoftNavigation: true }',
-      '{"activeSlot":"modal","isIntercepted":true,"params":{"id":"42"},"renderedPattern":"/feed/@modal/(..)photo/[id]"}',
-      'Intercepts soft navigation into parallel modal slot with extracted params'
+      'FeedLayout renders children and parallel modal slot when modal prop is present',
+      '<FeedLayout modal={<Modal />}><div>Feed Items</div></FeedLayout>',
+      'renders children in feed-content and modal in modal-slot'
     ),
     r(
-      '{ routePattern: "/feed/@modal/(..)photo/[id]", slotName: "modal", targetPattern: "/photo/[id]" }, { currentPath: "/feed", targetUrl: "/photo/42", isSoftNavigation: false }',
-      '{"isIntercepted":false,"params":{"id":"42"},"renderedPattern":"/photo/[id]"}',
-      'Renders canonical standalone route on hard navigation without intercepting'
+      'FeedLayout omits modal slot container when modal prop is absent',
+      '<FeedLayout><div>Solo Feed</div></FeedLayout>',
+      'omits modal-slot container'
     ),
     r(
-      '{ routePattern: "/dashboard/@drawer/(...)photo/[id]", slotName: "drawer", targetPattern: "/photo/[id]" }, { currentPath: "/dashboard/stats", targetUrl: "/photo/99", isSoftNavigation: true }',
-      '{"activeSlot":"drawer","isIntercepted":true,"params":{"id":"99"},"renderedPattern":"/dashboard/@drawer/(...)photo/[id]"}',
-      'Intercepts across root boundary (...) on soft navigation'
+      'PhotoModal renders dialog with photo image and close button',
+      '<PhotoModal id="pic-42" photoUrl="https://images.example.com/pic-42.jpg" />',
+      'renders modal-dialog with img and close button'
     ),
     r(
-      '{ routePattern: "/feed/@modal/(..)photo/[id]", slotName: "modal", targetPattern: "/photo/[id]" }, { currentPath: "/feed", targetUrl: "/settings", isSoftNavigation: true }',
-      '{"isIntercepted":false,"params":{},"renderedPattern":"/photo/[id]"}',
-      'Returns un-intercepted result with empty params on route mismatch'
+      'Clicking close button triggers router.back() and optional onDismiss callback',
+      'fireEvent.click(modalCloseButton)',
+      'invokes onDismiss and router.back()'
     ),
   ],
 };

@@ -1,60 +1,40 @@
-type CacheStrategy = 'static' | 'timed' | 'dynamic';
-
-interface CacheStrategyOptions {
-  strategy: CacheStrategy;
-  revalidateSeconds?: number;
-  tags?: string[];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
 }
 
-interface NextFetchInit {
-  cache?: 'force-cache' | 'no-store';
-  next?: {
-    revalidate?: number | false;
-    tags?: string[];
-  };
+interface InventoryData {
+  productId: string;
+  stock: number;
+  available: boolean;
 }
 
-interface SegmentConfig {
-  revalidate?: number | false;
-  dynamic?: 'auto' | 'force-dynamic' | 'force-static';
-}
+async function fetchProductCatalog(category: string): Promise<Product[]> {
+  const url = `https://api.example.com/products?category=${encodeURIComponent(category)}`;
+  const res = await fetch(url, {
+    next: {
+      revalidate: 60,
+      tags: ['products', `category-${category}`],
+    },
+  });
 
-interface NextDataCacheConfig {
-  fetchOptions: NextFetchInit;
-  segmentConfig: SegmentConfig;
-}
-
-function buildDataCacheConfig(options: CacheStrategyOptions): NextDataCacheConfig {
-  const { strategy, revalidateSeconds, tags } = options;
-
-  if (strategy === 'static') {
-    const fetchOptions: NextFetchInit = { cache: 'force-cache' };
-    if (tags && tags.length > 0) {
-      fetchOptions.next = { tags };
-    }
-    return {
-      fetchOptions,
-      segmentConfig: { dynamic: 'force-static', revalidate: false },
-    };
+  if (!res.ok) {
+    throw new Error('Failed to fetch product catalog');
   }
 
-  if (strategy === 'timed') {
-    const seconds =
-      typeof revalidateSeconds === 'number' && revalidateSeconds > 0
-        ? revalidateSeconds
-        : 60;
-    const nextInit: { revalidate: number; tags?: string[] } = { revalidate: seconds };
-    if (tags && tags.length > 0) {
-      nextInit.tags = tags;
-    }
-    return {
-      fetchOptions: { next: nextInit },
-      segmentConfig: { revalidate: seconds },
-    };
+  return res.json();
+}
+
+async function fetchLiveInventory(productId: string): Promise<InventoryData> {
+  const url = `https://api.example.com/inventory/${encodeURIComponent(productId)}`;
+  const res = await fetch(url, {
+    cache: 'no-store',
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch live inventory');
   }
 
-  return {
-    fetchOptions: { cache: 'no-store' },
-    segmentConfig: { dynamic: 'force-dynamic', revalidate: 0 },
-  };
+  return res.json();
 }

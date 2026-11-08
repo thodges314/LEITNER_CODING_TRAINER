@@ -6,49 +6,32 @@ interface TemplateProps {
   children: React.ReactNode;
 }
 
-interface RemountCoordinator {
-  shouldRemountLayout(fromPath: string, toPath: string): boolean;
-  shouldRemountTemplate(fromPath: string, toPath: string): boolean;
-  getTemplateKey(pathname: string, visitCount: number): string;
+interface DashboardRootProps {
+  pathname: string;
+  children: React.ReactNode;
 }
 
-const DashboardLayout = ({ children }: LayoutProps): React.ReactElement => {
-  return (
-    <div data-testid="dashboard-layout" className="dashboard-layout">
-      {children}
-    </div>
+function DashboardLayout({ children }: LayoutProps): React.ReactElement {
+  return React.createElement(
+    'div',
+    { 'data-testid': 'dashboard-layout' },
+    React.createElement('header', { 'data-testid': 'dashboard-header' }, 'Dashboard Shell'),
+    React.createElement('main', null, children)
   );
-};
+}
 
-const DashboardTemplate = ({ children }: TemplateProps): React.ReactElement => {
-  return (
-    <div data-testid="dashboard-template" className="dashboard-template">
-      {children}
-    </div>
+function DashboardTemplate({ children }: TemplateProps): React.ReactElement {
+  return React.createElement(
+    'div',
+    { 'data-testid': 'dashboard-template', className: 'template-enter' },
+    children
   );
-};
+}
 
-const createRemountCoordinator = (): RemountCoordinator => {
-  const getLayoutRoot = (path: string): string => {
-    const segments = path.split('/').filter(Boolean);
-    return segments.length > 0 ? `/${segments[0]}` : '/';
-  };
-
-  const shouldRemountLayout = (fromPath: string, toPath: string): boolean => {
-    return getLayoutRoot(fromPath) !== getLayoutRoot(toPath);
-  };
-
-  const shouldRemountTemplate = (fromPath: string, toPath: string): boolean => {
-    return fromPath !== toPath;
-  };
-
-  const getTemplateKey = (pathname: string, visitCount: number): string => {
-    return `template-${pathname}-${visitCount}`;
-  };
-
-  return {
-    shouldRemountLayout,
-    shouldRemountTemplate,
-    getTemplateKey,
-  };
-};
+function DashboardRoot({ pathname, children }: DashboardRootProps): React.ReactElement {
+  return React.createElement(
+    DashboardLayout,
+    null,
+    React.createElement(DashboardTemplate, { key: pathname }, children)
+  );
+}

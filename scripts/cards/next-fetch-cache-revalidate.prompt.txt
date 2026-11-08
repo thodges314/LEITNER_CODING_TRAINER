@@ -1,52 +1,35 @@
-Implement a Next.js App Router data caching and route segment revalidation config resolver:
+Implement Next.js App Router data-fetching service functions with extended `fetch()` cache and revalidation options:
 
 ## Description
 
 ### Application Context
-In the Next.js App Router (`app/products/page.tsx`), data freshness is governed by both native extended `fetch()` options and route segment configurations (`export const revalidate = ...`). Developers often mix up when to use `{ cache: 'force-cache' }`, `{ cache: 'no-store' }`, and `{ next: { revalidate: seconds } }`. You are building a centralized configuration resolver that translates high-level caching strategies (`'static'`, `'timed'`, `'dynamic'`) into the precise fetch options and route segment directives required by Next.js.
+In the Next.js App Router (`app/products/page.tsx`), data freshness is controlled directly via Next.js-extended `fetch()` options:
+- **Time-Based Incremental Static Regeneration (ISR)**: Cached in the Data Cache and automatically refreshed after a given interval using `{ next: { revalidate: 60, tags: [...] } }`.
+- **Dynamic Real-Time Data**: Bypasses the cache entirely for live inventory, user carts, or real-time balances using `{ cache: 'no-store' }`.
 
 ```ts
-type CacheStrategy = 'static' | 'timed' | 'dynamic';
-
-interface CacheStrategyOptions {
-  strategy: CacheStrategy;
-  revalidateSeconds?: number;
-  tags?: string[];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
 }
 
-interface NextFetchInit {
-  cache?: 'force-cache' | 'no-store';
-  next?: {
-    revalidate?: number | false;
-    tags?: string[];
-  };
-}
-
-interface SegmentConfig {
-  revalidate?: number | false;
-  dynamic?: 'auto' | 'force-dynamic' | 'force-static';
-}
-
-interface NextDataCacheConfig {
-  fetchOptions: NextFetchInit;
-  segmentConfig: SegmentConfig;
+interface InventoryData {
+  productId: string;
+  stock: number;
+  available: boolean;
 }
 ```
 
-### `buildDataCacheConfig(options: CacheStrategyOptions): NextDataCacheConfig`
+### Functions
 
-Resolves the configuration based on `options.strategy`:
-
-- **Static Caching (`strategy === 'static'`)**:
-  - For immutable or infrequently changing data (e.g. blog posts, marketing pages).
-  - `fetchOptions`: Sets `cache: 'force-cache'`. If `options.tags` is provided with non-empty strings, sets `next: { tags: options.tags }`.
-  - `segmentConfig`: Sets `dynamic: 'force-static'` and `revalidate: false`.
-- **Time-Based Revalidation (`strategy === 'timed'`)**:
-  - For Incremental Static Regeneration (ISR) where data refreshes periodically in the background (e.g. product listings, news feeds).
-  - Determines effective revalidation window: uses `options.revalidateSeconds` if it is a positive number (`> 0`); otherwise defaults to `60`.
-  - `fetchOptions`: Does NOT set `cache`. Sets `next: { revalidate: seconds }`. If `options.tags` is provided with non-empty strings, adds `tags: options.tags` inside `next`.
-  - `segmentConfig`: Sets `revalidate: seconds`. (Does not set `dynamic`).
-- **Dynamic Real-Time (`strategy === 'dynamic'`)**:
-  - For user-specific or real-time data that must never be cached (e.g. shopping carts, account balances, live stock tickers).
-  - `fetchOptions`: Sets `cache: 'no-store'`. (Does NOT set `next`).
-  - `segmentConfig`: Sets `dynamic: 'force-dynamic'` and `revalidate: 0`.
+- **`fetchProductCatalog(category: string): Promise<Product[]>`**:
+  - Performs a `fetch` GET request to `https://api.example.com/products?category=${encodeURIComponent(category)}`.
+  - Sets Next.js extended options: `{ next: { revalidate: 60, tags: ['products', `category-${category}`] } }`.
+  - If `!res.ok`, throws `new Error('Failed to fetch product catalog')`.
+  - Returns the parsed JSON array of products.
+- **`fetchLiveInventory(productId: string): Promise<InventoryData>`**:
+  - Performs a `fetch` GET request to `https://api.example.com/inventory/${encodeURIComponent(productId)}`.
+  - Sets Next.js extended options: `{ cache: 'no-store' }`.
+  - If `!res.ok`, throws `new Error('Failed to fetch live inventory')`.
+  - Returns the parsed JSON inventory data.

@@ -50,29 +50,24 @@ export default {
 
   'next-revalidation-tag-cache': [
     r(
-      'Stores and retrieves data with tags',
-      'cache.set("/api/products/1", { id: 1 }, { tags: ["products"] }); cache.get("/api/products/1")',
-      '{ id: 1 }'
+      'Mutates product price via PATCH request to external API',
+      'updateProduct({ id: "p-1", price: 99 })',
+      'dispatches PATCH to "https://api.example.com/products/p-1" and returns { success: true }'
     ),
     r(
-      'revalidateTag purges matching entries and returns purged count',
-      'cache.revalidateTag("audio")',
-      'returns 1 and purges tagged entry'
+      'Purges products cache tag on successful update',
+      'updateProduct({ id: "p-1", price: 99 })',
+      'invokes revalidateTag("products")'
     ),
     r(
-      'Revalidating shared tag purges all items associated with that tag',
-      'cache.revalidateTag("products")',
-      'purges all entries associated with "products" tag'
+      'Purges specific product detail path on successful update',
+      'updateProduct({ id: "p-1", price: 99 })',
+      'invokes revalidatePath("/products/p-1")'
     ),
     r(
-      'Entries with ttlMs expire automatically after duration passes',
-      'cache.set("/api/temp", data, { ttlMs: 1 }); wait 10ms; cache.get("/api/temp")',
-      'null'
-    ),
-    r(
-      'clear wipes all cached items and tag associations',
-      'cache.clear()',
-      'wipes all cached items and tag mappings'
+      'Returns failure result and does not purge caches on HTTP error',
+      'updateProduct({ id: "p-2", price: 150 }) (when API responds 500)',
+      'returns { success: false, error: "Update failed" } without purging tags or paths'
     ),
   ],
 };

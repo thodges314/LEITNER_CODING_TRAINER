@@ -1,12 +1,12 @@
 {
-  "title": "Next.js RSC Client Boundary Serialization Guard",
+  "title": "Next.js RSC Boundary: Client DTO Serialization",
   "track": "nextjs",
   "tags": [
     "nextjs",
     "rsc",
     "serialization",
     "client-components",
-    "validation"
+    "dto"
   ],
   "requiresDom": false
 }

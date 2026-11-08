@@ -3,17 +3,31 @@ await (async () => {
 
   const LayoutComp = typeof DashboardLayout === 'function' ? DashboardLayout : (typeof solution === 'object' && solution?.DashboardLayout);
   const TemplateComp = typeof DashboardTemplate === 'function' ? DashboardTemplate : (typeof solution === 'object' && solution?.DashboardTemplate);
-  const coordinatorFactory = typeof createRemountCoordinator === 'function' ? createRemountCoordinator : (typeof solution === 'object' && solution?.createRemountCoordinator);
+  const RootComp = typeof DashboardRoot === 'function' ? DashboardRoot : (typeof solution === 'object' && solution?.DashboardRoot);
 
-  // Case 1: DashboardLayout renders children with data-testid="dashboard-layout"
+  const case1 = 'DashboardLayout renders children inside data-testid="dashboard-layout" with header shell';
+  const case2 = 'DashboardTemplate renders children inside data-testid="dashboard-template" with template-enter class';
+  const case3 = 'DashboardRoot nests DashboardTemplate with key={pathname} inside DashboardLayout';
+  const case4 = 'DashboardRoot updates template key on route change while maintaining layout wrapper';
+
+  if (!LayoutComp || !TemplateComp || !RootComp) {
+    $test.check(case1, false, { error: 'DashboardLayout, DashboardTemplate, or DashboardRoot not found' });
+    $test.check(case2, false, { error: 'DashboardLayout, DashboardTemplate, or DashboardRoot not found' });
+    $test.check(case3, false, { error: 'DashboardLayout, DashboardTemplate, or DashboardRoot not found' });
+    $test.check(case4, false, { error: 'DashboardLayout, DashboardTemplate, or DashboardRoot not found' });
+    return;
+  }
+
+  // Case 1: DashboardLayout renders children with data-testid="dashboard-layout" and header shell
   const { container: c1 } = render(
     React.createElement(LayoutComp, null, React.createElement('span', null, 'Layout Content'))
   );
   const layoutEl = q('[data-testid="dashboard-layout"]', c1);
+  const headerEl = q('[data-testid="dashboard-header"]', c1);
   $test.check(
-    'DashboardLayout renders children inside data-testid="dashboard-layout"',
-    layoutEl !== null && layoutEl.textContent === 'Layout Content',
-    { text: layoutEl?.textContent }
+    case1,
+    layoutEl !== null && headerEl !== null && layoutEl.textContent.includes('Layout Content') && headerEl.textContent === 'Dashboard Shell',
+    { hasLayout: !!layoutEl, headerText: headerEl?.textContent }
   );
 
   // Case 2: DashboardTemplate renders children with data-testid="dashboard-template"
@@ -22,34 +36,41 @@ await (async () => {
   );
   const templateEl = q('[data-testid="dashboard-template"]', c2);
   $test.check(
-    'DashboardTemplate renders children inside data-testid="dashboard-template"',
-    templateEl !== null && templateEl.textContent === 'Template Content',
-    { text: templateEl?.textContent }
+    case2,
+    templateEl !== null && templateEl.classList.contains('template-enter') && templateEl.textContent === 'Template Content',
+    { hasTemplate: !!templateEl, hasClass: templateEl?.classList?.contains('template-enter') }
   );
 
-  const coordinator = coordinatorFactory();
+  // Case 3: DashboardRoot nests Template with key inside Layout
+  const rootEl1 = React.createElement(
+    RootComp,
+    { pathname: '/dashboard/analytics' },
+    React.createElement('span', { 'data-testid': 'page-content' }, 'Analytics Page')
+  );
+  const { container: c3 } = render(rootEl1);
+  const nestedLayout = q('[data-testid="dashboard-layout"]', c3);
+  const nestedTemplate = q('[data-testid="dashboard-template"]', c3);
+  const pageContent = q('[data-testid="page-content"]', c3);
+  const templateInsideLayout = nestedLayout && nestedTemplate && nestedLayout.contains(nestedTemplate);
 
-  // Case 3: Coordinator preserves layout on sibling navigation (/dashboard/analytics to /dashboard/settings)
-  const remountSibling = coordinator.shouldRemountLayout('/dashboard/analytics', '/dashboard/settings');
-  const remountAcross = coordinator.shouldRemountLayout('/dashboard/analytics', '/login');
+  // Check key on the element returned by DashboardRoot
+  const rootResult = RootComp({ pathname: '/dashboard/analytics', children: 'Child' });
+  const innerTemplate = rootResult?.props?.children;
+  const hasPathnameKey = innerTemplate?.key === '/dashboard/analytics' || innerTemplate?.props?.key === '/dashboard/analytics';
+
   $test.check(
-    'shouldRemountLayout preserves layout across sibling routes and remounts across roots',
-    remountSibling === false && remountAcross === true,
-    { remountSibling, remountAcross }
+    case3,
+    templateInsideLayout && pageContent?.textContent === 'Analytics Page' && hasPathnameKey,
+    { templateInsideLayout, hasPathnameKey, key: innerTemplate?.key }
   );
 
-  // Case 4: Coordinator enforces template remount on any path transition with unique keys
-  const remountTemplateNav = coordinator.shouldRemountTemplate('/dashboard/analytics', '/dashboard/settings');
-  const remountTemplateSame = coordinator.shouldRemountTemplate('/dashboard/analytics', '/dashboard/analytics');
-  const key1 = coordinator.getTemplateKey('/dashboard/settings', 1);
-  const key2 = coordinator.getTemplateKey('/dashboard/settings', 2);
+  // Case 4: DashboardRoot updates template key on route change
+  const rootResult2 = RootComp({ pathname: '/dashboard/settings', children: 'Settings' });
+  const innerTemplate2 = rootResult2?.props?.children;
+  const key2 = innerTemplate2?.key || innerTemplate2?.props?.key;
   $test.check(
-    'shouldRemountTemplate triggers on navigation and produces distinct template keys',
-    remountTemplateNav === true &&
-      remountTemplateSame === false &&
-      key1 === 'template-/dashboard/settings-1' &&
-      key2 === 'template-/dashboard/settings-2',
-    { remountTemplateNav, key1, key2 }
+    case4,
+    key2 === '/dashboard/settings' && rootResult2?.type === LayoutComp,
+    { key2, isLayoutType: rootResult2?.type === LayoutComp }
   );
 })();
-

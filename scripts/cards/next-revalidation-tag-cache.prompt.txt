@@ -1,49 +1,37 @@
-Implement an in-memory tagged cache manager mirroring Next.js App Router on-demand revalidation:
+Implement an idiomatic Next.js Server Action that performs a data mutation and purges the Next.js Data Cache:
 
 ## Description
 
 ### Application Context
-In an on-demand Incremental Static Regeneration (ISR) system (`app/lib/tagCache.ts`), you are implementing the underlying tagged cache manager that mirrors Next.js fetch caching (`{ next: { tags: ['products', 'item-42'] } }`) and purge propagation via `revalidateTag`.
+In Next.js App Router applications (`app/actions/products.ts`), data mutations are commonly performed in Server Actions marked with the `'use server'` directive. Next.js manages full route caching and data caching automatically. When a write operation completes successfully, developers call `revalidateTag` and `revalidatePath` from `next/cache` to purge stale cached data on-demand across all routes consuming that tag or path.
+
+You are writing a Server Action `updateProduct` that sends a `PATCH` request to an external product API, checks the response status, purges relevant cache tags on success, and returns a structured action result.
 
 ```ts
-interface CacheItem<T = any> {
-  data: T;
-  tags: string[];
-  expiresAt?: number;
+interface UpdateProductInput {
+  id: string;
+  price: number;
 }
 
-interface TagCacheOptions {
-  tags?: string[];
-  ttlMs?: number;
-}
-
-interface TagCacheManager {
-  set<T = any>(key: string, data: T, options?: TagCacheOptions): void;
-  get<T = any>(key: string): T | null;
-  has(key: string): boolean;
-  revalidateTag(tag: string): number;
-  clear(): void;
+interface ActionResult {
+  success: boolean;
+  error?: string;
 }
 ```
 
-### `createTagCacheManager(): TagCacheManager`
+### `updateProduct({ id, price }: UpdateProductInput): Promise<ActionResult>`
 
-Returns an object implementing `TagCacheManager`:
-
-- **`set<T>(key: string, data: T, options?: TagCacheOptions): void`**:
-  - Stores `data`, normalized `tags` (defaults to `[]`), and optional `expiresAt` (`ttlMs ? Date.now() + ttlMs : undefined`).
-  - Indexing: associates the key with each specified tag for instant tag-based invalidation.
-- **`get<T>(key: string): T | null`**:
-  - Retrieves the cached item by `key`.
-  - If missing, returns `null`.
-  - If expired (`item.expiresAt && Date.now() >= item.expiresAt`), removes the item and returns `null`.
-  - Otherwise, returns `item.data`.
-- **`has(key: string): boolean`**:
-  - Returns `true` if the item exists and is not expired; otherwise `false` (purging expired entries).
-- **`revalidateTag(tag: string): number`**:
-  - Finds all cached keys associated with `tag`.
-  - Purges each found key from cache.
-  - Cleans up tag associations and returns the count of purged items.
-- **`clear(): void`**:
-  - Completely wipes all cached items and tag associations.
-
+- **Server Action Context**:
+  - Operates as a Server Action (you may include the `'use server'` directive).
+- **Data Mutation**:
+  - Dispatches a `PATCH` request to `https://api.example.com/products/${id}` via `fetch()` with:
+    - `method: 'PATCH'`
+    - `headers: { 'Content-Type': 'application/json' }`
+    - `body: JSON.stringify({ price })`
+- **Error Handling**:
+  - If the response is not ok (`!res.ok`), does NOT purge any caches, and returns `{ success: false, error: 'Update failed' }`.
+- **On-Demand Cache Purging**:
+  - When `res.ok` is `true`:
+    - Purges the collection tag by calling `revalidateTag('products')` from `next/cache` (or ambient `revalidateTag`).
+    - Purges the product detail path by calling `revalidatePath('/products/' + id)` from `next/cache` (or ambient `revalidatePath`).
+    - Returns `{ success: true }`.

@@ -1575,6 +1575,22 @@
     "difficulty": 1,
     "concept": "next-navigation"
   },
+  "next-image-component": {
+    "difficulty": 1,
+    "concept": "next-image"
+  },
+  "next-navigation-hooks": {
+    "difficulty": 1,
+    "concept": "next-navigation"
+  },
+  "next-font-optimization": {
+    "difficulty": 1,
+    "concept": "next-fonts"
+  },
+  "next-script-strategies": {
+    "difficulty": 1,
+    "concept": "next-scripts"
+  },
   "next-server-client-leaf-boundary": {
     "difficulty": 1,
     "concept": "next-client-components"

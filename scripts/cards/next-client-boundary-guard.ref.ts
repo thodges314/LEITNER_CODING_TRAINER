@@ -1,120 +1,59 @@
-interface BoundaryValidationError {
-  path: string;
-  type: string;
-  message: string;
+interface ServerUserRecord {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user' | 'guest';
+  passwordHash: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-interface BoundaryValidationResult {
-  valid: boolean;
-  errors: BoundaryValidationError[];
-  sanitizedProps?: Record<string, unknown>;
+interface ClientUserDTO {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'user' | 'guest';
+  createdAt: string;
+  updatedAt: string;
 }
 
-const validateClientBoundaryProps = (props: Record<string, unknown>): BoundaryValidationResult => {
-  const errors: BoundaryValidationError[] = [];
-  const seenObjects = new Set<unknown>();
+interface SerializationResult {
+  success: boolean;
+  data?: ClientUserDTO;
+  error?: string;
+}
 
-  const traverse = (value: unknown, path: string): unknown => {
-    if (value === null || value === undefined) {
-      return value;
-    }
+function serializeUserForClient(user: unknown): SerializationResult {
+  if (typeof user !== 'object' || user === null) {
+    return { success: false, error: 'Invalid user record' };
+  }
 
-    const valueType = typeof value;
+  const u = user as Record<string, unknown>;
+  const { id, name, email, role, createdAt, updatedAt } = u;
 
-    if (valueType === 'function') {
-      errors.push({
-        path,
-        type: 'function',
-        message: 'Functions cannot be passed across RSC client boundaries. Pass an identifier or Server Action reference instead.',
-      });
-      return undefined;
-    }
+  if (
+    typeof id !== 'string' || !id.trim() ||
+    typeof name !== 'string' || !name.trim() ||
+    typeof email !== 'string' || !email.trim() ||
+    typeof role !== 'string' || !role.trim()
+  ) {
+    return { success: false, error: 'Missing required user fields' };
+  }
 
-    if (valueType === 'symbol') {
-      errors.push({
-        path,
-        type: 'symbol',
-        message: 'Symbols are not serializable across client boundaries.',
-      });
-      return undefined;
-    }
-
-    if (valueType === 'bigint') {
-      errors.push({
-        path,
-        type: 'bigint',
-        message: 'BigInt values cannot be serialized in RSC boundary props without custom formatting.',
-      });
-      return undefined;
-    }
-
-    if (valueType === 'string' || valueType === 'number' || valueType === 'boolean') {
-      return value;
-    }
-
-    if (value instanceof Date) {
-      return value.toISOString();
-    }
-
-    if (typeof value === 'object') {
-      if (seenObjects.has(value)) {
-        errors.push({
-          path,
-          type: 'circular_reference',
-          message: `Circular reference detected at ${path}.`,
-        });
-        return undefined;
-      }
-      seenObjects.add(value);
-
-      if (Array.isArray(value)) {
-        const sanitizedArray = value.map((item, index) =>
-          traverse(item, path ? `${path}[${index}]` : `[${index}]`)
-        );
-        seenObjects.delete(value);
-        return sanitizedArray;
-      }
-
-      const proto = Object.getPrototypeOf(value);
-      const isPlain = proto === Object.prototype || proto === null;
-
-      if (!isPlain) {
-        const constructorName = (value as { constructor?: { name?: string } }).constructor?.name || 'Object';
-        errors.push({
-          path,
-          type: 'class_instance',
-          message: `Class instance ${constructorName} cannot be passed to Client Components. Convert to a plain object.`,
-        });
-        seenObjects.delete(value);
-        return undefined;
-      }
-
-      const sanitizedObj: Record<string, unknown> = {};
-      const record = value as Record<string, unknown>;
-      for (const key of Object.keys(record)) {
-        const childPath = path ? `${path}.${key}` : key;
-        sanitizedObj[key] = traverse(record[key], childPath);
-      }
-      seenObjects.delete(value);
-      return sanitizedObj;
-    }
-
-    return value;
-  };
-
-  const sanitized = traverse(props, '') as Record<string, unknown>;
-
-  if (errors.length > 0) {
-    return {
-      valid: false,
-      errors,
-    };
+  const isValidDate = (d: unknown): d is Date => d instanceof Date && !isNaN(d.getTime());
+  if (!isValidDate(createdAt) || !isValidDate(updatedAt)) {
+    return { success: false, error: 'Invalid date fields' };
   }
 
   return {
-    valid: true,
-    errors: [],
-    sanitizedProps: sanitized,
+    success: true,
+    data: {
+      id: id.trim(),
+      name: name.trim(),
+      email: email.trim(),
+      role: role.trim() as 'admin' | 'user' | 'guest',
+      createdAt: createdAt.toISOString(),
+      updatedAt: updatedAt.toISOString(),
+    },
   };
-};
-
+}

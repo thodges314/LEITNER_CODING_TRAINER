@@ -1,0 +1,13 @@
+{
+  "title": "Next.js Image: Fixed Dimensions & Responsive Fill",
+  "track": "nextjs",
+  "tags": [
+    "nextjs",
+    "image",
+    "optimization",
+    "core-web-vitals",
+    "responsive"
+  ],
+  "requiresDom": true
+}
+

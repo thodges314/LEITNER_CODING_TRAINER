@@ -1,5 +1,5 @@
 {
-  "title": "Next.js Parallel & Intercepting Route Evaluator",
+  "title": "Next.js Parallel Routes: Slot Layout & Modal Dismiss",
   "track": "nextjs",
   "tags": [
     "nextjs",
@@ -8,6 +8,6 @@
     "intercepting-routes",
     "app-router"
   ],
-  "requiresDom": false
+  "requiresDom": true
 }
 

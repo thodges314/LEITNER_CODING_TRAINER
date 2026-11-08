@@ -16,6 +16,8 @@ import {
   NextRequest,
   revalidateTag,
   revalidatePath,
+  activeRevalidationStore,
+  resetRevalidationStore,
   Link as NextLink,
   Image as NextImage,
   Script as NextScript,
@@ -175,6 +177,8 @@ const SANDBOX_NAMES = [
   'NextRequest',
   'revalidateTag',
   'revalidatePath',
+  'activeRevalidationStore',
+  'resetRevalidationStore',
   'Link',
   'Image',
   'Script',
@@ -290,6 +294,8 @@ export function createSandboxScope(options: {
     NextRequest,
     revalidateTag,
     revalidatePath,
+    activeRevalidationStore,
+    resetRevalidationStore,
     NextLink,
     NextImage,
     NextScript,
@@ -310,6 +316,8 @@ export function createSandboxScope(options: {
       try {
         tools?.cleanup();
         resetMockRouter();
+        resetRevalidationStore();
+        (globalThis as unknown as { __mockFetchHandler?: unknown }).__mockFetchHandler = null;
       } finally {
         tools = null;
         restoreBuiltins();

@@ -1,6 +1,6 @@
 {
   "track": "nextjs",
-  "title": "Next.js App Router Data Cache & Revalidation Config",
+  "title": "Next.js Data Fetching: Extended fetch() & ISR",
   "tags": [
     "nextjs",
     "app-router",
