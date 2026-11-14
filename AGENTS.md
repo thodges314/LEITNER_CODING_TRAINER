@@ -10,8 +10,8 @@ Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_
 - **`<Sparkles />` is strictly reserved for AI features**: Only use the `Sparkles` icon on buttons, badges, headers, or popovers that directly invoke or represent AI-powered functionality (e.g. *Build Interview Deck with AI*, *Quick Add Topic with AI*, *Socratic Clarification*, *AI Critique / Follow-Up*, *AI Engine Status*). Never use `Sparkles` for non-AI items such as starter decks (use `Layers`), Prettier code formatting (use `Wand2`), backup callouts (use `Download`), or staged unlock toasts (use `Zap`).
 - **No trailing ellipses on action buttons**: Action buttons that open modals or workflows (e.g. `Build Custom Deck`, `Build Interview Deck with AI`) should be written cleanly without trailing `...` ellipses.
 
-## Card content: edit the sources, not `src/data/topics.json` or `src/data/catalogIndex.json`
-`src/data/topics.json` and `src/data/catalogIndex.json` are **generated** by `npm run build:cards`. They are committed, but never edit them by hand: the next build would overwrite the change. Edit the source instead:
+## Card content: edit the sources, not the generated JSON files
+`src/data/topics.json`, `src/data/topicsMeta.json`, `src/data/tracks/*.json`, and `src/data/catalogIndex.json` are **generated** by `npm run build:cards`. They are committed, but never edit them by hand: the next build would overwrite the change. Edit the source instead:
 
 | To change | Edit |
 | --- | --- |
@@ -115,9 +115,8 @@ Model replies are untrusted. Parse them with `parseEvaluationPayload` (`src/lib/
 
 ## Keep the `.md` files current (same commit as the change)
 Docs drift quickly, so update them whenever you change what they describe. Don't wait to be reminded.
-- **Counts** (cards, cases, Vitest tests, Playwright tests): `README.md`, `DELEGATION.md` "Current state", `ARCHITECTURE_AND_DETAILS.md`, `ARCHITECTURE_AND_ROADMAP.md`. Get the real numbers from `npm test` and `npx playwright test --list`; don't guess.
-- **New or moved files, scripts, or `lib/` behaviour**: the file map in `ARCHITECTURE_AND_ROADMAP.md` (§3) and the relevant section of `ARCHITECTURE_AND_DETAILS.md`.
-- **TypeScript dual-solution progress** (`.ref.ts` count, batch status): `TYPESCRIPT_SUPPORT_PLAN.md`, then the summary in the roadmap. The `.ts` twin of the plan is a token-saving scratch copy; keep the two consistent.
+- **Counts** (cards, cases, Vitest tests, Playwright tests): `README.md`, `DELEGATION.md` "Current state", `ARCHITECTURE_AND_ROADMAP.md`. Get the real numbers from `npm test` and `npx playwright test --list`; don't guess.
+- **New or moved files, scripts, or `lib/` behaviour**: the repository map and relevant sections in `ARCHITECTURE_AND_ROADMAP.md`.
 - **Branch claims**: the `DELEGATION.md` claim table. Add your row on a branch, and remove it when merged.
 - **Card or pipeline conventions** (like the ones in this file): update `AGENTS.md` itself.
 - Markdown-only commits don't trigger a deploy, so there is no cost to doing this.

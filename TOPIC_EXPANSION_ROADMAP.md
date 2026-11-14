@@ -1,7 +1,8 @@
 # Topic Expansion Roadmap: Extension Tracks & Modern Interview Packs
 
 > **Status:** Strategic Roadmap & Authoring Specification  
-> **Target Tracks:** `tailwind-css`, `graphql`, `sql-postgres`, `realtime-streaming`, `web-performance`, `offline-storage`, `frontend-security`  
+> **Shipped Tracks:** `tailwind` (16 cards), `graphql` (12 cards) + `graphql-server` (17 cards), `sql-postgres` (20 cards)  
+> **Upcoming Tracks (Unbuilt):** `realtime-streaming`, `web-performance`, `offline-storage`, `frontend-security`  
 > **Architecture:** Zero-backend, 100% in-browser client execution  
 > **Delivery Model:** **Optional Extension Packs** (Strictly preserves the 224-card core default deck untouched)  
 > **Use Case:** Self-study, AI generation with Claude, and targeted full-stack/frontend interview preparation

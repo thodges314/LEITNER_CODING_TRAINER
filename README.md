@@ -11,10 +11,10 @@ Built with **React 19 + TypeScript + Vite**. Zero backend — everything runs lo
 ```bash
 npm install
 npm run dev           # Start Vite development server (localhost:5173)
-npm test              # Run Vitest suite (2,708 tests across 72 test files)
-npm run e2e           # Run Playwright E2E suite in real Chromium (925 tests across 17 test files)
-npm run check:cards   # Read-only check: verify topics.json & catalogIndex.json match source cards
-npm run build:cards   # Rebuild topics.json & catalogIndex.json from scripts/cards/ sources
+npm test              # Run Vitest suite (2,715 tests across 74 test files)
+npm run e2e           # Run Playwright E2E suite in real Chromium (924 tests across 17 test files)
+npm run check:cards   # Read-only check: verify generated card JSONs match source cards
+npm run build:cards   # Rebuild topics.json, topicsMeta.json, tracks/*.json & catalogIndex.json
 npm run lint          # Run ESLint across workspace
 npm run build         # Type-check + compile production bundle into dist/
 ```
@@ -130,20 +130,9 @@ Each card consists of audited modular sources:
 
 ## Roadmaps & Future Extensions
 
-- **[CUSTOM_DECKS_AND_AI_INTERVIEW_PREP_ROADMAP.md](CUSTOM_DECKS_AND_AI_INTERVIEW_PREP_ROADMAP.md)**:
-  - Dropdown Deck Switcher (Full-Stack Core, Frontend Specialist, Core Algorithms, MAANG Algorithms, and Custom Decks).
-  - AI Interview Prep Copilot (Job description & recruiter note analysis, candidate calibration, curated card assembly).
-  - AI Socratic Clarification & Hint Assistant (in-arena `?` button for conceptual hints and contract clarification without code spoilers).
-  - One-Click Downloadable PDF Study Guide & 24-Hour Countdown Checklist.
-- **[TOPIC_EXPANSION_ROADMAP.md](TOPIC_EXPANSION_ROADMAP.md)**:
-  - In-browser execution specifications for upcoming Optional Extension Packs:
-    - **Tailwind CSS** (`tailwind-css`): Class conflict resolution (`twMerge`), component variant authorities (`cva`), responsive layouts.
-    - **GraphQL** (`graphql`): SDL validation, query builders, resolver pipelines, and `DataLoader` batching.
-    - **SQL / PostgreSQL** (`sql-postgres`): In-browser execution via `sql.js` (WebAssembly SQLite) covering window functions, CTEs, cohorts, and aggregations.
-    - **Real-Time Streaming** (`realtime-streaming`): Server-Sent Events (SSE) readers and reconnecting WebSockets.
-    - **Web Performance** (`web-performance`): Long-task chunking with `scheduler.yield()`, CLS/INP performance observers.
-    - **Offline Storage** (`offline-storage`): Promisified IndexedDB and mutation replay queues.
-    - **Frontend Security** (`frontend-security`): HTML sanitizers and secure postMessage bridges.
+- **[ARCHITECTURE_AND_ROADMAP.md](ARCHITECTURE_AND_ROADMAP.md)**: System architecture, repository map, open difficulty-ladder / card-family gaps, and assistant conventions.
+- **[TOPIC_EXPANSION_ROADMAP.md](TOPIC_EXPANSION_ROADMAP.md)**: Specifications for upcoming extension tracks (`realtime-streaming`, `web-performance`, `offline-storage`, `frontend-security`).
+- **[AI_TRACK_GENERATION.md](AI_TRACK_GENERATION.md)**: Proposal (low priority, unbuilt) for AI-generated custom tracks with machine verification.
 
 ---
 

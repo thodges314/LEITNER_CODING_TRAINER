@@ -48,11 +48,11 @@ console.log(`\nRemaining (${total - done}):`);
 for (const [track, r] of tracks) if (r.missing.length) console.log(`  ${track}: ${r.missing.join(', ')}`);
 
 if (process.argv.includes('--check')) {
-  const plan = fs.readFileSync(path.join(root, 'TYPESCRIPT_SUPPORT_PLAN.md'), 'utf8');
-  const m = plan.match(/Fully Typed Cards Completed:\*\*\s*\*\*(\d+)\s*\/\s*(\d+)/);
+  const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+  const m = readme.match(/Dual TypeScript Solutions\s*\(`(\d+)\s*\/\s*(\d+)\s*Cards`\)/);
   if (!m || Number(m[1]) !== done || Number(m[2]) !== total) {
-    console.error(`\nTYPESCRIPT_SUPPORT_PLAN.md says ${m ? `${m[1]}/${m[2]}` : '(no figure found)'}, real figure is ${done}/${total}. Update the plan.`);
+    console.error(`\nREADME.md says ${m ? `${m[1]}/${m[2]}` : '(no figure found)'}, real figure is ${done}/${total}. Update README.md.`);
     process.exit(1);
   }
-  console.log('\nTYPESCRIPT_SUPPORT_PLAN.md matches.');
+  console.log('\nREADME.md matches.');
 }
