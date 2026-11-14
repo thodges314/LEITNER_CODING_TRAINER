@@ -1,0 +1,1004 @@
+{
+  "async-fetch-error-handling": {
+    "promptSeed": "Write an async HTTP request utility using native `fetch`:\n\n### `fetchData(url: string): Promise<any>`\n- Fetches `url` asynchronously using `fetch(url)`.\n- **Response Validation**:\n  - Checks `response.ok`. If false, throws an `Error` whose message includes the HTTP status code (e.g. `404`).\n  - If `response.ok` is true, returns the parsed JSON body via `await response.json()`.\n- **Error Propagation**:\n  - Network failures (where `fetch` itself rejects) must **not** be swallowed; the returned promise must reject with the original network error (if using `try`/`catch`, rethrow it).",
+    "testHarness": "await $test.run(\"200 OK resolves with the parsed JSON body\", async () => {\n  const sleep = $test.sleep;\n  return (fetchData('https://jsonplaceholder.typicode.com/todos/1'));\n}, () => ({ userId: 1, id: 1, title: 'delectus aut autem', completed: false }));\n\nawait $test.rejects(\"Non-2xx response rejects with an Error that includes the status code\", async () => {\n  const sleep = $test.sleep;\n  return (fetchData('https://jsonplaceholder.typicode.com/invalid-path-404'));\n}, \"404\");\n\nawait $test.rejects(\"Network failure is not swallowed\", async () => {\n  const sleep = $test.sleep;\n  return (fetchData('https://invalid-non-existent-url-domain.org'));\n}, \"TypeError: Failed to fetch\");\n\nawait $test.run(\"Another 200 endpoint resolves with its own JSON body\", async () => {\n  const sleep = $test.sleep;\n  return (fetchData('https://jsonplaceholder.typicode.com/todos/2'));\n}, () => ({ userId: 1, id: 2, title: 'quis ut nam facilis et officia qui', completed: false }));",
+    "referenceSolution": "const fetchData = async (url) => {\n  const response = await fetch(url);\n  if (!response.ok) {\n    throw new Error(`HTTP error! status: ${response.status}`);\n  }\n  return await response.json();\n}",
+    "referenceSolutionTs": "const fetchData = async (url: string): Promise<any> => {\n  const response = await fetch(url);\n  if (!response.ok) {\n    throw new Error(`HTTP error! status: ${response.status}`);\n  }\n  return await response.json();\n}",
+    "testCases": [
+      {
+        "description": "200 OK resolves with the parsed JSON body",
+        "input": "fetchData('https://jsonplaceholder.typicode.com/todos/1')",
+        "expected": "{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }"
+      },
+      {
+        "description": "Non-2xx response rejects with an Error that includes the status code",
+        "input": "fetchData('https://jsonplaceholder.typicode.com/invalid-path-404')",
+        "expected": "Rejects with Error — message contains \"404\""
+      },
+      {
+        "description": "Network failure is not swallowed",
+        "input": "fetchData('https://invalid-non-existent-url-domain.org')",
+        "expected": "Rejects with the network error (TypeError: Failed to fetch)"
+      },
+      {
+        "description": "Another 200 endpoint resolves with its own JSON body",
+        "input": "fetchData('https://jsonplaceholder.typicode.com/todos/2')",
+        "expected": "{ userId: 1, id: 2, title: 'quis ut nam facilis et officia qui', completed: false }"
+      }
+    ]
+  },
+  "promise-chaining-syntax": {
+    "promptSeed": "Write a promise pipeline using explicit chaining syntax (`.then()`, `.catch()`, `.finally()`) without `async`/`await`:\n\n### `getUserData(url: string): Promise<any>`\n- Fetches `url` via `fetch(url)`.\n- **`.then(res => ...)`**:\n  - Treats non-2xx responses (`!res.ok`) as an error by throwing an `Error` whose message includes the status code (e.g. `HTTP ${res.status}`).\n  - Resolves with parsed JSON (`res.json()`).\n- **`.catch(err => ...)`**:\n  - Logs the error via `console.error(...)`.\n  - Rethrows `err` so the returned promise rejects downstream.\n- **`.finally(() => ...)`**:\n  - Calls `console.log(...)` exactly once to signal completion (runs on both success and rejection).\n  - Do not call `console.log` anywhere else.",
+    "testHarness": "await $test.run(\"Resolves with parsed JSON (no async/await)\", async () => {\n  const sleep = $test.sleep;\n  return ((await getUserData('https://jsonplaceholder.typicode.com/users/1')).name);\n}, () => ('Leanne Graham'));\n\nawait $test.rejects(\"HTTP error still rejects after the .catch() log (error is rethrown)\", async () => {\n  const sleep = $test.sleep;\n  return (getUserData('https://jsonplaceholder.typicode.com/invalid-path-404'));\n}, \"404\");\n\nawait $test.run(\"Cleanup log runs in .finally() after a success\", async () => {\n  const sleep = $test.sleep;\n  const lines = [];\n  const realConsole = console;\n  console = { log: (...a) => lines.push(a.join(' ')), error() {}, warn() {}, info() {} };\n  try { await getUserData('https://jsonplaceholder.typicode.com/users/1'); } finally { console = realConsole; }\n  return (lines.length);\n}, () => (1));\n\nawait $test.run(\"Cleanup log runs in .finally() after a failure too\", async () => {\n  const sleep = $test.sleep;\n  const lines = [];\n  const realConsole = console;\n  console = { log: (...a) => lines.push(a.join(' ')), error() {}, warn() {}, info() {} };\n  try { await getUserData('https://jsonplaceholder.typicode.com/invalid-path-404'); } catch {} finally { console = realConsole; }\n  return (lines.length);\n}, () => (1));",
+    "referenceSolution": "const getUserData = (url) => {\n  return fetch(url)\n    .then((res) => {\n      if (!res.ok) throw new Error(`HTTP ${res.status}`);\n      return res.json();\n    })\n    .catch((err) => {\n      console.error('Caught in chain:', err.message);\n      throw err;\n    })\n    .finally(() => {\n      console.log('Cleanup: fetch attempt completed');\n    });\n}",
+    "referenceSolutionTs": "const getUserData = (url: string): Promise<any> => {\n  return fetch(url)\n    .then((res) => {\n      if (!res.ok) throw new Error(`HTTP ${res.status}`);\n      return res.json();\n    })\n    .catch((err: any) => {\n      console.error('Caught in chain:', err.message);\n      throw err;\n    })\n    .finally(() => {\n      console.log('Cleanup: fetch attempt completed');\n    });\n}",
+    "testCases": [
+      {
+        "description": "Resolves with parsed JSON (no async/await)",
+        "input": "(await getUserData('https://jsonplaceholder.typicode.com/users/1')).name",
+        "expected": "'Leanne Graham'"
+      },
+      {
+        "description": "HTTP error still rejects after the .catch() log (error is rethrown)",
+        "input": "getUserData('https://jsonplaceholder.typicode.com/invalid-path-404')",
+        "expected": "Rejects with Error — message contains \"404\""
+      },
+      {
+        "description": "Cleanup log runs in .finally() after a success",
+        "input": "const lines = [];\nconst realConsole = console;\nconsole = { log: (...a) => lines.push(a.join(' ')), error() {}, warn() {}, info() {} };\ntry { await getUserData('https://jsonplaceholder.typicode.com/users/1'); } finally { console = realConsole; }\nlines.length",
+        "expected": "1  (exactly one console.log, from .finally())"
+      },
+      {
+        "description": "Cleanup log runs in .finally() after a failure too",
+        "input": "const lines = [];\nconst realConsole = console;\nconsole = { log: (...a) => lines.push(a.join(' ')), error() {}, warn() {}, info() {} };\ntry { await getUserData('https://jsonplaceholder.typicode.com/invalid-path-404'); } catch {} finally { console = realConsole; }\nlines.length",
+        "expected": "1  (exactly one console.log, from .finally())"
+      }
+    ]
+  },
+  "promise-all-vs-settled": {
+    "promptSeed": "Write an async function `fetchAllUsers(urls)` that requests all URLs in parallel using `Promise.allSettled`:\n\n### `fetchAllUsers(urls: string[]): Promise<any[]>`\n- **Parallel Execution**: Requests all URLs concurrently via `fetch(url).then(r => r.json())`.\n- **Filtering & Order**: Returns an array containing the parsed JSON payloads of the requests that succeeded (`status === 'fulfilled'`), preserving their original input order.\n- **Failures**: Silently drops any request that failed (`status === 'rejected'`).\n- **Edge Cases**: An empty `urls` array or an invocation where every request fails resolves to `[]`.",
+    "testHarness": "await $test.run(\"Fulfilled payloads only; the failing URL is dropped\", async () => {\n  const sleep = $test.sleep;\n  return (fetchAllUsers(['https://jsonplaceholder.typicode.com/todos/1', 'https://invalid-non-existent-url-domain.org', 'https://jsonplaceholder.typicode.com/todos/2']));\n}, () => ([{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }, { userId: 1, id: 2, title: 'quis ut nam facilis et officia qui', completed: false }]));\n\nawait $test.run(\"Empty input\", async () => {\n  const sleep = $test.sleep;\n  return (fetchAllUsers([]));\n}, () => ([]));\n\nawait $test.run(\"All requests fail\", async () => {\n  const sleep = $test.sleep;\n  return (fetchAllUsers(['https://invalid-non-existent-url-domain.org']));\n}, () => ([]));\n\nawait $test.run(\"The surviving results keep the order of the URLs\", async () => {\n  const sleep = $test.sleep;\n  return ((await fetchAllUsers(['https://jsonplaceholder.typicode.com/todos/2', 'https://invalid-non-existent-url-domain.org', 'https://jsonplaceholder.typicode.com/todos/1'])).map((t) => t.id));\n}, () => ([2, 1]));",
+    "referenceSolution": "const fetchAllUsers = async (urls) => {\n  const results = await Promise.allSettled(urls.map((url) => fetch(url).then((r) => r.json())));\n  return results\n    .filter((r) => r.status === 'fulfilled')\n    .map((r) => r.value);\n}",
+    "referenceSolutionTs": "const fetchAllUsers = async (urls: string[]): Promise<any[]> => {\n  const results = await Promise.allSettled(urls.map((url) => fetch(url).then((r) => r.json())));\n  return results\n    .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled')\n    .map((r) => r.value);\n}",
+    "testCases": [
+      {
+        "description": "Fulfilled payloads only; the failing URL is dropped",
+        "input": "fetchAllUsers(['https://jsonplaceholder.typicode.com/todos/1', 'https://invalid-non-existent-url-domain.org', 'https://jsonplaceholder.typicode.com/todos/2'])",
+        "expected": "[{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }, { userId: 1, id: 2, title: 'quis ut nam facilis et officia qui', completed: false }]"
+      },
+      {
+        "description": "Empty input",
+        "input": "fetchAllUsers([])",
+        "expected": "[]"
+      },
+      {
+        "description": "All requests fail",
+        "input": "fetchAllUsers(['https://invalid-non-existent-url-domain.org'])",
+        "expected": "[]"
+      },
+      {
+        "description": "The surviving results keep the order of the URLs",
+        "input": "(await fetchAllUsers(['https://jsonplaceholder.typicode.com/todos/2', 'https://invalid-non-existent-url-domain.org', 'https://jsonplaceholder.typicode.com/todos/1'])).map((t) => t.id)",
+        "expected": "[2, 1]"
+      }
+    ]
+  },
+  "fetch-abort-controller": {
+    "promptSeed": "Write an HTTP fetch utility that enforces request timeouts using `AbortController`:\n\n### `fetchWithTimeout(url: string, timeoutMs: number): Promise<any>`\n- Creates an `AbortController` and links its signal to `fetch(url, { signal: controller.signal })`.\n- Sets a timer via `setTimeout(() => controller.abort(), timeoutMs)`:\n  - If the request does not settle within `timeoutMs`, the controller aborts and the returned promise rejects with an `AbortError` (`err.name === 'AbortError'`).\n- If the fetch completes successfully before the timeout:\n  - Clears the pending timer with `clearTimeout(timer)` so it never fires later.\n  - Resolves with the parsed JSON (`await res.json()`).\n- On any failure or abort, ensures the timer is cleared before re-throwing or rejecting.",
+    "testHarness": "await $test.rejects(\"Request slower than timeoutMs is aborted\", async () => {\n  const sleep = $test.sleep;\n  return (fetchWithTimeout('https://jsonplaceholder.typicode.com/photos', 1));\n}, \"abort\");\n\nawait $test.run(\"Fast request resolves with its JSON and the timer is cleared\", async () => {\n  const sleep = $test.sleep;\n  return (fetchWithTimeout('https://jsonplaceholder.typicode.com/todos/1', 5000));\n}, () => ({ userId: 1, id: 1, title: 'delectus aut autem', completed: false }));\n\nawait $test.run(\"clearTimeout is called after a successful response\", async () => {\n  const sleep = $test.sleep;\n  const realClear = globalThis.clearTimeout;\n  let cleared = 0;\n  globalThis.clearTimeout = (id) => { cleared++; return realClear(id); };\n  try { await fetchWithTimeout('https://jsonplaceholder.typicode.com/todos/1', 5000); } finally { globalThis.clearTimeout = realClear; }\n  return (cleared >= 1);\n}, () => (true));\n\nawait $test.rejects(\"A network failure rejects with the original error instead of hanging\", async () => {\n  const sleep = $test.sleep;\n  return (fetchWithTimeout('https://invalid-non-existent-url-domain.org', 5000));\n}, \"TypeError: Failed to fetch\");",
+    "referenceSolution": "const fetchWithTimeout = async (url, timeoutMs) => {\n  const controller = new AbortController();\n  const timer = setTimeout(() => controller.abort(), timeoutMs);\n  try {\n    const res = await fetch(url, { signal: controller.signal });\n    clearTimeout(timer);\n    return await res.json();\n  } catch (err) {\n    clearTimeout(timer);\n    throw err;\n  }\n}",
+    "referenceSolutionTs": "const fetchWithTimeout = async (url: string, timeoutMs: number): Promise<any> => {\n  const controller = new AbortController();\n  const timer = setTimeout(() => controller.abort(), timeoutMs);\n  try {\n    const res = await fetch(url, { signal: controller.signal });\n    clearTimeout(timer);\n    return await res.json();\n  } catch (err) {\n    clearTimeout(timer);\n    throw err;\n  }\n}",
+    "testCases": [
+      {
+        "description": "Request slower than timeoutMs is aborted",
+        "input": "fetchWithTimeout('https://jsonplaceholder.typicode.com/photos', 1)",
+        "expected": "Rejects with AbortError (err.name === 'AbortError')"
+      },
+      {
+        "description": "Fast request resolves with its JSON and the timer is cleared",
+        "input": "fetchWithTimeout('https://jsonplaceholder.typicode.com/todos/1', 5000)",
+        "expected": "{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }"
+      },
+      {
+        "description": "clearTimeout is called after a successful response",
+        "input": "const realClear = globalThis.clearTimeout;\nlet cleared = 0;\nglobalThis.clearTimeout = (id) => { cleared++; return realClear(id); };\ntry { await fetchWithTimeout('https://jsonplaceholder.typicode.com/todos/1', 5000); } finally { globalThis.clearTimeout = realClear; }\ncleared >= 1",
+        "expected": "true"
+      },
+      {
+        "description": "A network failure rejects with the original error instead of hanging",
+        "input": "fetchWithTimeout('https://invalid-non-existent-url-domain.org', 5000)",
+        "expected": "Rejects with the network error (TypeError: Failed to fetch)"
+      }
+    ]
+  },
+  "promise-all-polyfill": {
+    "promptSeed": "Implement three core Promise concurrency combinators: `promiseAll`, `promiseAllSettled`, and `promiseRace`.\n\n### `promiseAll<T>(iterable: Iterable<T | Promise<T>>): Promise<T[]>`\n- Resolves with an array of values preserving input order.\n- Accepts non-promise values (wraps them).\n- An empty iterable resolves immediately to `[]`.\n- Rejects immediately with the first rejection reason encountered.\n\n### `promiseAllSettled<T>(iterable: Iterable<T | Promise<T>>): Promise<PromiseSettledResult<T>[]>`\n- Resolves only after all inputs have settled (never rejects).\n- Resolves to an array of result objects:\n  - `{ status: 'fulfilled', value }` for resolved items.\n  - `{ status: 'rejected', reason }` for rejected items.\n- An empty iterable resolves immediately to `[]`.\n\n### `promiseRace<T>(iterable: Iterable<T | Promise<T>>): Promise<T>`\n- Settles (fulfills or rejects) with the eventual state of the first input promise to settle.\n- An empty iterable remains pending forever.",
+    "testHarness": "await $test.run(\"Mix of promises and plain values keeps order\", async () => {\n  const sleep = $test.sleep;\n  return (await promiseAll([Promise.resolve(1), 2, Promise.resolve(3)]));\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"Order follows input, not completion time\", async () => {\n  const sleep = $test.sleep;\n  return (await promiseAll([new Promise((r) => setTimeout(r, 30, 'slow')), new Promise((r) => setTimeout(r, 5, 'fast'))]));\n}, () => (['slow', 'fast']));\n\nawait $test.run(\"Empty iterable resolves to []\", async () => {\n  const sleep = $test.sleep;\n  return (await promiseAll([]));\n}, () => ([]));\n\nawait $test.rejects(\"First rejection rejects the result\", async () => {\n  const sleep = $test.sleep;\n  return (promiseAll([Promise.resolve(1), Promise.reject(new Error('boom'))]));\n}, \"boom\");\n\nawait $test.run(\"allSettled variant\", async () => {\n  const sleep = $test.sleep;\n  return (await promiseAllSettled([Promise.resolve(1), Promise.reject('x')]));\n}, () => ([{ status: 'fulfilled', value: 1 }, { status: 'rejected', reason: 'x' }]));\n\nawait $test.run(\"race variant resolves with the first to settle\", async () => {\n  const sleep = $test.sleep;\n  return (await promiseRace([new Promise((r) => setTimeout(r, 30, 'slow')), new Promise((r) => setTimeout(r, 5, 'fast'))]));\n}, () => ('fast'));",
+    "referenceSolution": "const promiseAll = (iterable) => {\n  return new Promise((resolve, reject) => {\n    const items = Array.from(iterable);\n    if (items.length === 0) return resolve([]);\n    const results = new Array(items.length);\n    let completed = 0;\n    items.forEach((item, i) => {\n      Promise.resolve(item).then((val) => {\n        results[i] = val;\n        if (++completed === items.length) resolve(results);\n      }, reject);\n    });\n  });\n}\n\nconst promiseAllSettled = (iterable) => {\n  return promiseAll(\n    Array.from(iterable, (item) =>\n      Promise.resolve(item).then(\n        (value) => ({ status: 'fulfilled', value }),\n        (reason) => ({ status: 'rejected', reason })\n      )\n    )\n  );\n}\n\nfunction promiseRace(iterable) {\n  return new Promise((resolve, reject) => {\n    for (const item of iterable) Promise.resolve(item).then(resolve, reject);\n  });\n}",
+    "referenceSolutionTs": "const promiseAll = <T,>(iterable: Iterable<T | Promise<T>>): Promise<T[]> => {\n  return new Promise<T[]>((resolve, reject) => {\n    const items = Array.from(iterable);\n    if (items.length === 0) return resolve([]);\n    const results = new Array<T>(items.length);\n    let completed = 0;\n    items.forEach((item, i) => {\n      Promise.resolve(item).then((val) => {\n        results[i] = val;\n        if (++completed === items.length) resolve(results);\n      }, reject);\n    });\n  });\n}\n\nconst promiseAllSettled = <T,>(iterable: Iterable<T | Promise<T>>): Promise<PromiseSettledResult<T>[]> => {\n  return promiseAll(\n    Array.from(iterable, (item) =>\n      Promise.resolve(item).then(\n        (value): PromiseSettledResult<T> => ({ status: 'fulfilled', value }),\n        (reason): PromiseSettledResult<T> => ({ status: 'rejected', reason })\n      )\n    )\n  );\n}\n\nfunction promiseRace<T>(iterable: Iterable<T | Promise<T>>): Promise<T> {\n  return new Promise<T>((resolve, reject) => {\n    for (const item of iterable) Promise.resolve(item).then(resolve, reject);\n  });\n}",
+    "testCases": [
+      {
+        "description": "Mix of promises and plain values keeps order",
+        "input": "await promiseAll([Promise.resolve(1), 2, Promise.resolve(3)])",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "Order follows input, not completion time",
+        "input": "await promiseAll([new Promise((r) => setTimeout(r, 30, 'slow')), new Promise((r) => setTimeout(r, 5, 'fast'))])",
+        "expected": "['slow', 'fast']"
+      },
+      {
+        "description": "Empty iterable resolves to []",
+        "input": "await promiseAll([])",
+        "expected": "[]"
+      },
+      {
+        "description": "First rejection rejects the result",
+        "input": "promiseAll([Promise.resolve(1), Promise.reject(new Error('boom'))])",
+        "expected": "Rejects with Error: boom"
+      },
+      {
+        "description": "allSettled variant",
+        "input": "await promiseAllSettled([Promise.resolve(1), Promise.reject('x')])",
+        "expected": "[{ status: 'fulfilled', value: 1 }, { status: 'rejected', reason: 'x' }]"
+      },
+      {
+        "description": "race variant resolves with the first to settle",
+        "input": "await promiseRace([new Promise((r) => setTimeout(r, 30, 'slow')), new Promise((r) => setTimeout(r, 5, 'fast'))])",
+        "expected": "'fast'"
+      }
+    ]
+  },
+  "promise-pool": {
+    "promptSeed": "Implement concurrent asynchronous task throttling:\n\n### `pool<T>(tasks: (() => Promise<T>)[], limit: number): Promise<T[]>`\n- Executes an array of async functions `tasks` with a maximum concurrency of `limit` tasks running simultaneously.\n- Starts a new task immediately as soon as any running task settles.\n- Resolves with an array of all completed results in their original input order.\n- Rejects immediately on the first task error, preventing new tasks from starting.",
+    "testHarness": "await $test.run(\"Results come back in input order\", async () => {\n  const sleep = $test.sleep;\n  return (await pool([() => Promise.resolve('a'), () => Promise.resolve('b'), () => Promise.resolve('c')], 2));\n}, () => (['a', 'b', 'c']));\n\nawait $test.run(\"Order follows input even if a later task finishes first\", async () => {\n  const sleep = $test.sleep;\n  return (await pool([() => new Promise((r) => setTimeout(r, 30, 'slow')), () => Promise.resolve('fast')], 2));\n}, () => (['slow', 'fast']));\n\nawait $test.run(\"Never more than `limit` tasks at once (5 tasks, limit 2)\", async () => {\n  const sleep = $test.sleep;\n  let running = 0, peak = 0;\n  const task = () => new Promise((r) => { running++; peak = Math.max(peak, running); setTimeout(() => { running--; r(); }, 20); });\n  await pool([task, task, task, task, task], 2);\n  return (peak);\n}, () => (2));\n\nawait $test.rejects(\"A failing task rejects the pool\", async () => {\n  const sleep = $test.sleep;\n  return (pool([() => Promise.resolve(1), () => Promise.reject(new Error('bad'))], 2));\n}, \"bad\");\n\nawait $test.run(\"No tasks\", async () => {\n  const sleep = $test.sleep;\n  return (await pool([], 3));\n}, () => ([]));",
+    "referenceSolution": "const pool = async (tasks, limit) => {\n  const results = new Array(tasks.length);\n  let next = 0;\n  let failed = false;\n  async function worker() {\n    while (!failed && next < tasks.length) {\n      const i = next++;\n      try {\n        results[i] = await tasks[i]();\n      } catch (err) {\n        failed = true; // stop starting new tasks after the first failure\n        throw err;\n      }\n    }\n  }\n  await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, worker));\n  return results;\n}",
+    "referenceSolutionTs": "const pool = async <T,>(tasks: (() => Promise<T>)[], limit: number): Promise<T[]> => {\n  const results = new Array<T>(tasks.length);\n  let next = 0;\n  let failed = false;\n  async function worker(): Promise<void> {\n    while (!failed && next < tasks.length) {\n      const i = next++;\n      try {\n        results[i] = await tasks[i]();\n      } catch (err) {\n        failed = true;\n        throw err;\n      }\n    }\n  }\n  await Promise.all(Array.from({ length: Math.min(limit, tasks.length) }, worker));\n  return results;\n}",
+    "testCases": [
+      {
+        "description": "Results come back in input order",
+        "input": "await pool([() => Promise.resolve('a'), () => Promise.resolve('b'), () => Promise.resolve('c')], 2)",
+        "expected": "['a', 'b', 'c']"
+      },
+      {
+        "description": "Order follows input even if a later task finishes first",
+        "input": "await pool([() => new Promise((r) => setTimeout(r, 30, 'slow')), () => Promise.resolve('fast')], 2)",
+        "expected": "['slow', 'fast']"
+      },
+      {
+        "description": "Never more than `limit` tasks at once (5 tasks, limit 2)",
+        "input": "let running = 0, peak = 0;\nconst task = () => new Promise((r) => { running++; peak = Math.max(peak, running); setTimeout(() => { running--; r(); }, 20); });\nawait pool([task, task, task, task, task], 2);\npeak",
+        "expected": "2"
+      },
+      {
+        "description": "A failing task rejects the pool",
+        "input": "pool([() => Promise.resolve(1), () => Promise.reject(new Error('bad'))], 2)",
+        "expected": "Rejects with Error: bad"
+      },
+      {
+        "description": "No tasks",
+        "input": "await pool([], 3)",
+        "expected": "[]"
+      }
+    ]
+  },
+  "retry-with-backoff": {
+    "promptSeed": "Implement `retry(fn, options)` for an async function `fn`:\n\n### `retry<T>(fn: (attempt: number) => Promise<T>, options?: RetryOptions): Promise<T>`\n- **Options**: `{ retries = 3, baseDelay = 20, factor = 2, signal?: AbortSignal }`.\n- **Execution Limits**: Invokes `fn` at most `retries + 1` times (1 initial attempt + `retries` retry attempts).\n- **Exponential Backoff**: Waits `baseDelay * (factor ** n)` ms before attempt `n + 1` (e.g. `baseDelay`, then `baseDelay * factor`, etc.).\n- **Resolution & Rejection**:\n  - Resolves immediately with the first successful result.\n  - If all attempts fail, rejects with the error thrown on the final attempt.\n- **`AbortSignal` Support**:\n  - If `signal` is already aborted on entry, rejects immediately without calling `fn`.\n  - If `signal` aborts during a backoff delay, terminates waiting immediately and rejects with the signal's abort reason (`AbortError`).",
+    "testHarness": "await $test.run(\"Succeeds after one failure\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const flaky = async () => { if (++calls < 2) throw new Error('fail'); return 'success'; };\n  return (await retry(flaky, { retries: 3, baseDelay: 10 }));\n}, () => ('success'));\n\nawait $test.run(\"Attempt count is failures + 1\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const flaky = async () => { if (++calls < 3) throw new Error('fail'); return 'ok'; };\n  await retry(flaky, { retries: 5, baseDelay: 5 });\n  return (calls);\n}, () => (3));\n\nawait $test.run(\"Gives up after `retries` retries (1 try + 2 retries = 3 calls)\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  await retry(async () => { calls++; throw new Error('nope'); }, { retries: 2, baseDelay: 5 }).catch(() => {});\n  return (calls);\n}, () => (3));\n\nawait $test.rejects(\"The last error is what rejects\", async () => {\n  const sleep = $test.sleep;\n  return (retry(async () => { throw new Error('nope'); }, { retries: 1, baseDelay: 5 }));\n}, \"nope\");\n\nawait $test.run(\"Delay between attempts grows by `factor` (30 ms, then 60 ms)\", async () => {\n  const sleep = $test.sleep;\n  const stamps = [];\n  await retry(async () => { stamps.push(Date.now()); throw new Error('x'); }, { retries: 2, baseDelay: 30, factor: 2 }).catch(() => {});\n  const gaps = [stamps[1] - stamps[0], stamps[2] - stamps[1]];\n  return (gaps[0] >= 25 && gaps[0] < 60 && gaps[1] >= 55 && gaps[1] < 120);\n}, () => (true));\n\nawait $test.run(\"Aborting during a backoff wait rejects promptly with the abort reason\", async () => {\n  const sleep = $test.sleep;\n  const ac = new AbortController();\n  const p = retry(async () => { throw new Error('fail'); }, { retries: 5, baseDelay: 1000, signal: ac.signal });\n  setTimeout(() => ac.abort(), 20);\n  const t0 = Date.now();\n  const err = await p.catch((e) => e);\n  return ([err.name, Date.now() - t0 < 200]);\n}, () => (['AbortError', true]));\n\nawait $test.run(\"Already-aborted signal rejects without calling fn\", async () => {\n  const sleep = $test.sleep;\n  const ac = new AbortController();\n  ac.abort();\n  let called = false;\n  await retry(async () => { called = true; }, { signal: ac.signal }).catch(() => {});\n  return (called);\n}, () => (false));\n\nawait $test.run(\"Defaults to 3 retries (4 calls in total)\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  await retry(async () => { calls++; throw new Error('x'); }).catch(() => {});\n  return (calls);\n}, () => (4));\n\nawait $test.run(\"The default delays (20, 40, 80 ms) really are waited\", async () => {\n  const sleep = $test.sleep;\n  const t0 = Date.now();\n  await retry(async () => { throw new Error('x'); }).catch(() => {});\n  const elapsed = Date.now() - t0;\n  return (elapsed >= 130 && elapsed < 450);\n}, () => (true));",
+    "referenceSolution": "const retry = async (fn, { retries = 3, baseDelay = 20, factor = 2, signal } = {}) => {\n  const abortReason = () => signal.reason ?? new DOMException('Aborted', 'AbortError');\n\n  // A delay that ends immediately (rejecting with the abort reason) when the signal fires.\n  const wait = (ms) =>\n    new Promise((resolve, reject) => {\n      if (signal?.aborted) return reject(abortReason());\n      const onAbort = () => {\n        clearTimeout(timer);\n        reject(abortReason());\n      };\n      const timer = setTimeout(() => {\n        signal?.removeEventListener('abort', onAbort);\n        resolve();\n      }, ms);\n      signal?.addEventListener('abort', onAbort, { once: true });\n    });\n\n  for (let attempt = 0; ; attempt++) {\n    if (signal?.aborted) throw abortReason();\n    try {\n      return await fn(attempt);\n    } catch (err) {\n      if (attempt >= retries) throw err;\n      await wait(baseDelay * factor ** attempt); // baseDelay, baseDelay*factor, baseDelay*factor^2, ...\n    }\n  }\n}",
+    "referenceSolutionTs": "interface RetryOptions {\n  retries?: number;\n  baseDelay?: number;\n  factor?: number;\n  signal?: AbortSignal;\n}\n\nconst retry = async <T,>(\n  fn: (attempt: number) => Promise<T>,\n  { retries = 3, baseDelay = 20, factor = 2, signal }: RetryOptions = {}\n): Promise<T> => {\n  const abortReason = (): any => signal?.reason ?? new DOMException('Aborted', 'AbortError');\n\n  const wait = (ms: number): Promise<void> =>\n    new Promise<void>((resolve, reject) => {\n      if (signal?.aborted) return reject(abortReason());\n      const onAbort = (): void => {\n        clearTimeout(timer);\n        reject(abortReason());\n      };\n      const timer = setTimeout(() => {\n        signal?.removeEventListener('abort', onAbort);\n        resolve();\n      }, ms);\n      signal?.addEventListener('abort', onAbort, { once: true });\n    });\n\n  for (let attempt = 0; ; attempt++) {\n    if (signal?.aborted) throw abortReason();\n    try {\n      return await fn(attempt);\n    } catch (err) {\n      if (attempt >= retries) throw err;\n      await wait(baseDelay * factor ** attempt);\n    }\n  }\n}",
+    "testCases": [
+      {
+        "description": "Succeeds after one failure",
+        "input": "let calls = 0;\nconst flaky = async () => { if (++calls < 2) throw new Error('fail'); return 'success'; };\nawait retry(flaky, { retries: 3, baseDelay: 10 })",
+        "expected": "'success'"
+      },
+      {
+        "description": "Attempt count is failures + 1",
+        "input": "let calls = 0;\nconst flaky = async () => { if (++calls < 3) throw new Error('fail'); return 'ok'; };\nawait retry(flaky, { retries: 5, baseDelay: 5 });\ncalls",
+        "expected": "3"
+      },
+      {
+        "description": "Gives up after `retries` retries (1 try + 2 retries = 3 calls)",
+        "input": "let calls = 0;\nawait retry(async () => { calls++; throw new Error('nope'); }, { retries: 2, baseDelay: 5 }).catch(() => {});\ncalls",
+        "expected": "3"
+      },
+      {
+        "description": "The last error is what rejects",
+        "input": "retry(async () => { throw new Error('nope'); }, { retries: 1, baseDelay: 5 })",
+        "expected": "Rejects with Error: nope"
+      },
+      {
+        "description": "Delay between attempts grows by `factor` (30 ms, then 60 ms)",
+        "input": "const stamps = [];\nawait retry(async () => { stamps.push(Date.now()); throw new Error('x'); }, { retries: 2, baseDelay: 30, factor: 2 }).catch(() => {});\nconst gaps = [stamps[1] - stamps[0], stamps[2] - stamps[1]];\ngaps[0] >= 25 && gaps[0] < 60 && gaps[1] >= 55 && gaps[1] < 120",
+        "expected": "true  (gaps ≈ 30 ms then ≈ 60 ms)"
+      },
+      {
+        "description": "Aborting during a backoff wait rejects promptly with the abort reason",
+        "input": "const ac = new AbortController();\nconst p = retry(async () => { throw new Error('fail'); }, { retries: 5, baseDelay: 1000, signal: ac.signal });\nsetTimeout(() => ac.abort(), 20);\nconst t0 = Date.now();\nconst err = await p.catch((e) => e);\n[err.name, Date.now() - t0 < 200]",
+        "expected": "['AbortError', true]"
+      },
+      {
+        "description": "Already-aborted signal rejects without calling fn",
+        "input": "const ac = new AbortController();\nac.abort();\nlet called = false;\nawait retry(async () => { called = true; }, { signal: ac.signal }).catch(() => {});\ncalled",
+        "expected": "false"
+      },
+      {
+        "description": "Defaults to 3 retries (4 calls in total)",
+        "input": "let calls = 0;\nawait retry(async () => { calls++; throw new Error('x'); }).catch(() => {});\ncalls",
+        "expected": "4"
+      },
+      {
+        "description": "The default delays (20, 40, 80 ms) really are waited",
+        "input": "const t0 = Date.now();\nawait retry(async () => { throw new Error('x'); }).catch(() => {});\nconst elapsed = Date.now() - t0;\nelapsed >= 130 && elapsed < 450",
+        "expected": "true  (about 140 ms of waiting in total)"
+      }
+    ]
+  },
+  "fetch-timeout-dedupe": {
+    "promptSeed": "Implement request deduplication with timeout abortion:\n\n### `dedupeFetch<T>(key: string, fn: (signal: AbortSignal) => Promise<T>, timeoutMs?: number): Promise<T>`\n- `fn(signal)` is a factory function that returns a Promise for the asynchronous request.\n\n#### Deduplication Behavior\n- Concurrent invocations sharing the same `key` return the identical in-flight `Promise`.\n- The entry is removed from the cache in a `.finally()` handler once the request settles (on success, rejection, or timeout) so subsequent calls trigger a fresh fetch.\n\n#### Timeout & Cancellation\n- If the operation does not settle within `timeoutMs` (defaults to 5000):\n  - Triggers abortion via the `AbortSignal` passed to `fn(signal)`.\n  - Rejects the returned promise with an `Error` (e.g. `Timed out after ${timeoutMs}ms`).\n- Clears the pending timeout timer when the request finishes before the deadline.",
+    "testHarness": "await $test.run(\"Two concurrent calls with the same key share one request\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const req = () => new Promise((r) => setTimeout(() => { calls++; r('data'); }, 30));\n  const [a, b] = await Promise.all([dedupeFetch('item-1', req), dedupeFetch('item-1', req)]);\n  return ([a, b, calls]);\n}, () => (['data', 'data', 1]));\n\nawait $test.run(\"Different keys are not shared\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const req = () => new Promise((r) => setTimeout(() => { calls++; r('d'); }, 10));\n  await Promise.all([dedupeFetch('k1', req), dedupeFetch('k2', req)]);\n  return (calls);\n}, () => (2));\n\nawait $test.run(\"Entry is removed once settled, so a later call refetches\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const req = () => new Promise((r) => setTimeout(() => { calls++; r('d'); }, 10));\n  await dedupeFetch('k', req);\n  await dedupeFetch('k', req);\n  return (calls);\n}, () => (2));\n\nawait $test.run(\"A rejected request is also removed\", async () => {\n  const sleep = $test.sleep;\n  await dedupeFetch('k', () => Promise.reject(new Error('x'))).catch(() => {});\n  return (await dedupeFetch('k', () => Promise.resolve('ok')));\n}, () => ('ok'));",
+    "referenceSolution": "const inFlight = new Map();\n\nconst dedupeFetch = (key, fn, timeoutMs = 5000) => {\n  if (inFlight.has(key)) return inFlight.get(key);\n\n  const controller = new AbortController();\n  let timer;\n  const timeout = new Promise((_, reject) => {\n    timer = setTimeout(() => {\n      controller.abort();\n      reject(new Error(`Timed out after ${timeoutMs}ms`));\n    }, timeoutMs);\n  });\n\n  const promise = Promise.race([fn(controller.signal), timeout]).finally(() => {\n    clearTimeout(timer);\n    inFlight.delete(key);\n  });\n  inFlight.set(key, promise);\n  return promise;\n}",
+    "referenceSolutionTs": "const inFlight = new Map<string, Promise<any>>();\n\nconst dedupeFetch = <T,>(key: string, fn: (signal: AbortSignal) => Promise<T>, timeoutMs: number = 5000): Promise<T> => {\n  if (inFlight.has(key)) return inFlight.get(key) as Promise<T>;\n\n  const controller = new AbortController();\n  let timer: any;\n  const timeout = new Promise<never>((_, reject) => {\n    timer = setTimeout(() => {\n      controller.abort();\n      reject(new Error(`Timed out after ${timeoutMs}ms`));\n    }, timeoutMs);\n  });\n\n  const promise = Promise.race([fn(controller.signal), timeout]).finally(() => {\n    clearTimeout(timer);\n    inFlight.delete(key);\n  });\n  inFlight.set(key, promise);\n  return promise;\n}",
+    "testCases": [
+      {
+        "description": "Two concurrent calls with the same key share one request",
+        "input": "let calls = 0;\nconst req = () => new Promise((r) => setTimeout(() => { calls++; r('data'); }, 30));\nconst [a, b] = await Promise.all([dedupeFetch('item-1', req), dedupeFetch('item-1', req)]);\n[a, b, calls]",
+        "expected": "['data', 'data', 1]"
+      },
+      {
+        "description": "Different keys are not shared",
+        "input": "let calls = 0;\nconst req = () => new Promise((r) => setTimeout(() => { calls++; r('d'); }, 10));\nawait Promise.all([dedupeFetch('k1', req), dedupeFetch('k2', req)]);\ncalls",
+        "expected": "2"
+      },
+      {
+        "description": "Entry is removed once settled, so a later call refetches",
+        "input": "let calls = 0;\nconst req = () => new Promise((r) => setTimeout(() => { calls++; r('d'); }, 10));\nawait dedupeFetch('k', req);\nawait dedupeFetch('k', req);\ncalls",
+        "expected": "2"
+      },
+      {
+        "description": "A rejected request is also removed",
+        "input": "await dedupeFetch('k', () => Promise.reject(new Error('x'))).catch(() => {});\nawait dedupeFetch('k', () => Promise.resolve('ok'))",
+        "expected": "'ok'"
+      }
+    ]
+  },
+  "async-queue-scheduler": {
+    "promptSeed": "Build a sequential asynchronous task queue:\n\n### `class AsyncQueue`\n- Manages strict serial execution of asynchronous tasks in FIFO order.\n\n### `add<T>(task: () => Promise<T> | T): Promise<T>`\n- Enqueues `task` (a zero-argument function returning a promise).\n- Returns a `Promise` that settles with the result of that specific task.\n- Tasks execute one at a time: the next task starts only after the previous task has settled.\n- **Fault Tolerance**: If a task fails, only its own returned promise rejects; queued tasks behind it continue executing normally without being blocked or dropped.",
+    "testHarness": "await $test.run(\"Tasks run in the order added\", async () => {\n  const sleep = $test.sleep;\n  const q = new AsyncQueue();\n  const order = [];\n  q.add(async () => { order.push(1); });\n  q.add(async () => { order.push(2); });\n  await q.add(async () => { order.push(3); });\n  return (order);\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"add() resolves with the task's own result\", async () => {\n  const sleep = $test.sleep;\n  const q = new AsyncQueue();\n  const [a, b] = await Promise.all([q.add(async () => 'x'), q.add(async () => 'y')]);\n  return ([a, b]);\n}, () => (['x', 'y']));\n\nawait $test.run(\"A slow first task still finishes before the next starts\", async () => {\n  const sleep = $test.sleep;\n  const q = new AsyncQueue();\n  const order = [];\n  q.add(() => new Promise((r) => setTimeout(() => { order.push('slow'); r(); }, 30)));\n  await q.add(async () => { order.push('fast'); });\n  return (order);\n}, () => (['slow', 'fast']));\n\nawait $test.run(\"A failing task rejects only its own promise; the queue continues\", async () => {\n  const sleep = $test.sleep;\n  const q = new AsyncQueue();\n  const bad = q.add(async () => { throw new Error('boom'); }).catch((e) => e.message);\n  const good = q.add(async () => 'ok');\n  return ([await bad, await good]);\n}, () => (['boom', 'ok']));",
+    "referenceSolution": "class AsyncQueue {\n  constructor() {\n    this.queue = Promise.resolve();\n  }\n  add(task) {\n    return new Promise((resolve, reject) => {\n      this.queue = this.queue.then(() => Promise.resolve().then(task).then(resolve, reject));\n    });\n  }\n}",
+    "referenceSolutionTs": "class AsyncQueue {\n  private queue: Promise<any> = Promise.resolve();\n\n  add<T>(task: () => Promise<T> | T): Promise<T> {\n    return new Promise<T>((resolve, reject) => {\n      this.queue = this.queue.then(() => Promise.resolve().then(task).then(resolve, reject));\n    });\n  }\n}",
+    "testCases": [
+      {
+        "description": "Tasks run in the order added",
+        "input": "const q = new AsyncQueue();\nconst order = [];\nq.add(async () => { order.push(1); });\nq.add(async () => { order.push(2); });\nawait q.add(async () => { order.push(3); });\norder",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "add() resolves with the task's own result",
+        "input": "const q = new AsyncQueue();\nconst [a, b] = await Promise.all([q.add(async () => 'x'), q.add(async () => 'y')]);\n[a, b]",
+        "expected": "['x', 'y']"
+      },
+      {
+        "description": "A slow first task still finishes before the next starts",
+        "input": "const q = new AsyncQueue();\nconst order = [];\nq.add(() => new Promise((r) => setTimeout(() => { order.push('slow'); r(); }, 30)));\nawait q.add(async () => { order.push('fast'); });\norder",
+        "expected": "['slow', 'fast']"
+      },
+      {
+        "description": "A failing task rejects only its own promise; the queue continues",
+        "input": "const q = new AsyncQueue();\nconst bad = q.add(async () => { throw new Error('boom'); }).catch((e) => e.message);\nconst good = q.add(async () => 'ok');\n[await bad, await good]",
+        "expected": "['boom', 'ok']"
+      }
+    ]
+  },
+  "express-middleware-chain": {
+    "promptSeed": "Implement a minimal Express-style middleware execution pipeline:\n\n### `class MiddlewarePipeline`\n- Maintains an ordered stack of middleware functions.\n\n### `use(fn: Function): this`\n- Appends middleware function `fn` to the pipeline stack.\n- Returns `this` for chaining.\n\n### `handle(req: any, res: any): void`\n- Executes layers sequentially using `next(err)`:\n  - **Standard Middleware (`fn.length < 4`)**: Called with `(req, res, next)`. Skipped when an error is currently active.\n  - **Error Middleware (`fn.length === 4`)**: Called with `(err, req, res, next)`. Executed only when an error has been passed or thrown.\n  - **Async Support**: Catches thrown synchronous errors and rejected promises from middleware handlers.\n  - **Unhandled Errors**: If an error reaches the end of the stack without being handled, sets `res.statusCode = 500` (and calls `res.end('Internal Server Error')` if available).\n  - **Re-entrance Protection**: Calling `next()` more than once from the same middleware layer must be ignored.",
+    "testHarness": "await $test.run(\"Runs in registration order via next()\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const trail = [];\n  app.use((req, res, next) => { trail.push('A'); next(); });\n  app.use((req, res, next) => { trail.push('B'); next(); });\n  app.handle({}, {});\n  return (trail);\n}, () => (['A', 'B']));\n\nawait $test.run(\"Middleware shares req/res\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const res = {};\n  app.use((req, res, next) => { req.user = 'tom'; next(); });\n  app.use((req, res) => { res.body = 'hi ' + req.user; });\n  app.handle({}, res);\n  return (res.body);\n}, () => ('hi tom'));\n\nawait $test.run(\"Chain stops when next() is not called\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const trail = [];\n  app.use(() => { trail.push('A'); });\n  app.use(() => { trail.push('B'); });\n  app.handle({}, {});\n  return (trail);\n}, () => (['A']));\n\nawait $test.run(\"Async handler: next() after await still continues the chain\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const res = {};\n  app.use(async (req, res, next) => { await sleep(10); res.v = 1; next(); });\n  app.use((req, res) => { res.done = true; });\n  app.handle({}, res);\n  await sleep(40);\n  return (res);\n}, () => ({ v: 1, done: true }));\n\nawait $test.run(\"Error-handling middleware (err, req, res, next) receives a thrown error\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const res = {};\n  app.use(() => { throw new Error('boom'); });\n  app.use((err, req, res, next) => { res.status = 500; res.msg = err.message; });\n  app.handle({}, res);\n  return (res);\n}, () => ({ status: 500, msg: 'boom' }));\n\nawait $test.run(\"Calling next() twice must not run later layers twice\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const ran = [];\n  app.use((req, res, next) => { next(); next(); });\n  app.use(() => { ran.push('B'); });\n  app.use(() => { ran.push('C'); });\n  app.handle({}, {});\n  return (ran);\n}, () => (['B']));\n\nawait $test.run(\"A rejected promise from an async handler reaches the error handler\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const res = {};\n  app.use(async () => { throw new Error('late'); });\n  app.use((err, req, res, next) => { res.msg = err.message; });\n  app.handle({}, res);\n  await sleep(10);\n  return (res.msg);\n}, () => ('late'));\n\nawait $test.run(\"An error skips normal middleware\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const trail = [];\n  app.use(() => { throw new Error('x'); });\n  app.use(() => { trail.push('normal'); });\n  app.use((err, req, res, next) => { trail.push('error'); });\n  app.handle({}, {});\n  return (trail);\n}, () => (['error']));\n\nawait $test.run(\"An unhandled error sets res.statusCode = 500\", async () => {\n  const sleep = $test.sleep;\n  const app = new MiddlewarePipeline();\n  const res = {};\n  app.use(() => { throw new Error('x'); });\n  app.handle({}, res);\n  return (res.statusCode);\n}, () => (500));",
+    "referenceSolution": "class MiddlewarePipeline {\n  constructor() {\n    this.stack = [];\n  }\n  use(fn) {\n    this.stack.push(fn);\n    return this;\n  }\n  handle(req, res) {\n    let index = -1;\n    const dispatch = (i, err) => {\n      if (i <= index) return; // next() called twice from the same layer: ignore\n      index = i;\n      const layer = this.stack[i];\n      if (!layer) {\n        if (err) {\n          res.statusCode = 500;\n          if (typeof res.end === 'function') res.end('Internal Server Error');\n        }\n        return;\n      }\n      const isErrorHandler = layer.length === 4;\n      // Errors only reach error handlers; normal requests skip error handlers.\n      if (Boolean(err) !== isErrorHandler) return dispatch(i + 1, err);\n      const next = (e) => dispatch(i + 1, e);\n      try {\n        const out = isErrorHandler ? layer(err, req, res, next) : layer(req, res, next);\n        if (out && typeof out.then === 'function') out.catch(next);\n      } catch (e) {\n        next(e);\n      }\n    };\n    dispatch(0);\n  }\n}",
+    "referenceSolutionTs": "type Middleware = (req: any, res: any, next: (err?: any) => void) => any;\ntype ErrorMiddleware = (err: any, req: any, res: any, next: (err?: any) => void) => any;\n\nclass MiddlewarePipeline {\n  stack: (Middleware | ErrorMiddleware)[] = [];\n\n  use(fn: Middleware | ErrorMiddleware): this {\n    this.stack.push(fn);\n    return this;\n  }\n\n  handle(req: any, res: any): void {\n    let index = -1;\n    const dispatch = (i: number, err?: any): void => {\n      if (i <= index) return;\n      index = i;\n      const layer = this.stack[i];\n      if (!layer) {\n        if (err) {\n          res.statusCode = 500;\n          if (typeof res.end === 'function') res.end('Internal Server Error');\n        }\n        return;\n      }\n      const isErrorHandler = layer.length === 4;\n      if (Boolean(err) !== isErrorHandler) return dispatch(i + 1, err);\n      const next = (e?: any): void => dispatch(i + 1, e);\n      try {\n        const out = isErrorHandler\n          ? (layer as ErrorMiddleware)(err, req, res, next)\n          : (layer as Middleware)(req, res, next);\n        if (out && typeof out.then === 'function') out.catch(next);\n      } catch (e) {\n        next(e);\n      }\n    };\n    dispatch(0);\n  }\n}",
+    "testCases": [
+      {
+        "description": "Runs in registration order via next()",
+        "input": "const app = new MiddlewarePipeline();\nconst trail = [];\napp.use((req, res, next) => { trail.push('A'); next(); });\napp.use((req, res, next) => { trail.push('B'); next(); });\napp.handle({}, {});\ntrail",
+        "expected": "['A', 'B']"
+      },
+      {
+        "description": "Middleware shares req/res",
+        "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use((req, res, next) => { req.user = 'tom'; next(); });\napp.use((req, res) => { res.body = 'hi ' + req.user; });\napp.handle({}, res);\nres.body",
+        "expected": "'hi tom'"
+      },
+      {
+        "description": "Chain stops when next() is not called",
+        "input": "const app = new MiddlewarePipeline();\nconst trail = [];\napp.use(() => { trail.push('A'); });\napp.use(() => { trail.push('B'); });\napp.handle({}, {});\ntrail",
+        "expected": "['A']"
+      },
+      {
+        "description": "Async handler: next() after await still continues the chain",
+        "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use(async (req, res, next) => { await sleep(10); res.v = 1; next(); });\napp.use((req, res) => { res.done = true; });\napp.handle({}, res);\nawait sleep(40);\nres",
+        "expected": "{ v: 1, done: true }"
+      },
+      {
+        "description": "Error-handling middleware (err, req, res, next) receives a thrown error",
+        "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use(() => { throw new Error('boom'); });\napp.use((err, req, res, next) => { res.status = 500; res.msg = err.message; });\napp.handle({}, res);\nres",
+        "expected": "{ status: 500, msg: 'boom' }"
+      },
+      {
+        "description": "Calling next() twice must not run later layers twice",
+        "input": "const app = new MiddlewarePipeline();\nconst ran = [];\napp.use((req, res, next) => { next(); next(); });\napp.use(() => { ran.push('B'); });\napp.use(() => { ran.push('C'); });\napp.handle({}, {});\nran",
+        "expected": "['B']"
+      },
+      {
+        "description": "A rejected promise from an async handler reaches the error handler",
+        "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use(async () => { throw new Error('late'); });\napp.use((err, req, res, next) => { res.msg = err.message; });\napp.handle({}, res);\nawait sleep(10);\nres.msg",
+        "expected": "'late'"
+      },
+      {
+        "description": "An error skips normal middleware",
+        "input": "const app = new MiddlewarePipeline();\nconst trail = [];\napp.use(() => { throw new Error('x'); });\napp.use(() => { trail.push('normal'); });\napp.use((err, req, res, next) => { trail.push('error'); });\napp.handle({}, {});\ntrail",
+        "expected": "['error']"
+      },
+      {
+        "description": "An unhandled error sets res.statusCode = 500",
+        "input": "const app = new MiddlewarePipeline();\nconst res = {};\napp.use(() => { throw new Error('x'); });\napp.handle({}, res);\nres.statusCode",
+        "expected": "500"
+      }
+    ]
+  },
+  "promise-class-scratch": {
+    "promptSeed": "Implement `class MyPromise<T>(executor)` from scratch without using native Promises for internal state:\n\n### `MyPromise<T>`\n- **Settlement & State**:\n  - Settles at most once: subsequent calls to `resolve` or `reject` are ignored.\n  - If the `executor` throws synchronously, reject the promise with the thrown exception.\n  - Resolving a promise with itself must reject with a `TypeError`.\n- **`.then<TResult1 = T, TResult2 = never>(onFulfilled?, onRejected?): MyPromise<TResult1 | TResult2>`**:\n  - Returns a **NEW** `MyPromise` instance.\n  - Callbacks always execute asynchronously as microtasks (`queueMicrotask`), even when the promise is already settled.\n  - Handler return value resolves the derived promise; returned thenables/promises are adopted; thrown errors reject it.\n  - Omitted handlers pass values or rejection reasons through to the derived promise.\n- **`.catch<TResult = never>(onRejected?): MyPromise<T | TResult>`**: Equivalent to `.then(null, onRejected)`.\n- **`.finally(callback: () => void): MyPromise<T>`**: Runs `callback` on both fulfillment and rejection, preserving and passing the original fulfillment value or rejection reason through.\n- **Static Methods**:\n  - `MyPromise.resolve<U>(value: U | MyPromise<U>): MyPromise<U>`: Returns a resolved promise (or adopts a `MyPromise` input).\n  - `MyPromise.reject<U = never>(reason?: any): MyPromise<U>`: Returns a rejected promise with `reason`.",
+    "testHarness": "await $test.run(\"then callbacks run asynchronously, after the synchronous code\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  new MyPromise((resolve) => resolve(1)).then(() => log.push('then'));\n  log.push('sync');\n  await sleep(0);\n  return (log);\n}, () => (['sync', 'then']));\n\nawait $test.run(\"Chaining passes each return value along\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((resolve) => resolve(1)).then((v) => v + 1).then((v) => v * 10));\n}, () => (20));\n\nawait $test.run(\"A rejection skips then() and reaches catch()\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((_, reject) => reject(new Error('x'))).then(() => 'skipped').catch((e) => e.message));\n}, () => ('x'));\n\nawait $test.run(\"A throw inside a handler rejects the derived promise\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then(() => { throw new Error('boom'); }).catch((e) => e.message));\n}, () => ('boom'));\n\nawait $test.run(\"Returning a MyPromise from then() adopts its eventual value\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then((v) => new MyPromise((resolve) => setTimeout(() => resolve(v + 1), 10))));\n}, () => (2));\n\nawait $test.run(\"Returning a native promise (any thenable) is adopted too\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(1).then((v) => Promise.resolve(v + 5)));\n}, () => (6));\n\nawait $test.run(\"Only the first resolve/reject call counts\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise((resolve, reject) => { resolve('a'); reject(new Error('b')); resolve('c'); }));\n}, () => ('a'));\n\nawait $test.run(\"An executor that throws rejects the promise\", async () => {\n  const sleep = $test.sleep;\n  return (await new MyPromise(() => { throw new Error('exec'); }).catch((e) => e.message));\n}, () => ('exec'));\n\nawait $test.run(\"Missing handlers pass the value through\", async () => {\n  const sleep = $test.sleep;\n  return (await MyPromise.resolve(7).then().then(undefined, () => 0));\n}, () => (7));\n\nawait $test.run(\"Several then() calls on one promise run in registration order\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const p = MyPromise.resolve(1);\n  p.then(() => log.push('a'));\n  p.then(() => log.push('b'));\n  await p.then(() => log.push('c'));\n  return (log);\n}, () => (['a', 'b', 'c']));\n\nawait $test.run(\"finally() runs on both outcomes and passes the result through\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const a = await MyPromise.resolve(1).finally(() => log.push('f'));\n  const b = await MyPromise.reject(new Error('e')).finally(() => log.push('f')).catch((e) => e.message);\n  return ([a, b, log.length]);\n}, () => ([1, 'e', 2]));\n\nawait $test.run(\"Resolving a promise with itself rejects with a TypeError\", async () => {\n  const sleep = $test.sleep;\n  const p = MyPromise.resolve(1).then(() => p);\n  return (await p.catch((e) => e instanceof TypeError));\n}, () => (true));",
+    "referenceSolution": "class MyPromise {\n  constructor(executor) {\n    this.state = 'pending';\n    this.value = undefined;\n    this.callbacks = [];\n\n    const settle = (state, value) => {\n      this.state = state;\n      this.value = value;\n      const pending = this.callbacks;\n      this.callbacks = [];\n      pending.forEach((cb) => queueMicrotask(cb));\n    };\n\n    // The promise resolution procedure: adopt thenables, reject on a cycle.\n    const resolveValue = (v) => {\n      if (v === this) return settle('rejected', new TypeError('Chaining cycle detected for promise'));\n      if (v !== null && (typeof v === 'object' || typeof v === 'function')) {\n        let then;\n        try {\n          then = v.then;\n        } catch (e) {\n          return settle('rejected', e);\n        }\n        if (typeof then === 'function') {\n          let called = false;\n          try {\n            then.call(\n              v,\n              (y) => {\n                if (!called) {\n                  called = true;\n                  resolveValue(y);\n                }\n              },\n              (r) => {\n                if (!called) {\n                  called = true;\n                  settle('rejected', r);\n                }\n              }\n            );\n          } catch (e) {\n            if (!called) {\n              called = true;\n              settle('rejected', e);\n            }\n          }\n          return;\n        }\n      }\n      settle('fulfilled', v);\n    };\n\n    let done = false; // only the first resolve/reject call counts\n    const resolve = (v) => {\n      if (done) return;\n      done = true;\n      resolveValue(v);\n    };\n    const reject = (r) => {\n      if (done) return;\n      done = true;\n      settle('rejected', r);\n    };\n\n    try {\n      executor(resolve, reject);\n    } catch (e) {\n      reject(e);\n    }\n  }\n\n  then(onFulfilled, onRejected) {\n    return new MyPromise((resolve, reject) => {\n      const run = () => {\n        const handler = this.state === 'fulfilled' ? onFulfilled : onRejected;\n        if (typeof handler !== 'function') {\n          return this.state === 'fulfilled' ? resolve(this.value) : reject(this.value);\n        }\n        try {\n          resolve(handler(this.value));\n        } catch (e) {\n          reject(e);\n        }\n      };\n      if (this.state === 'pending') this.callbacks.push(run);\n      else queueMicrotask(run);\n    });\n  }\n\n  catch(onRejected) {\n    return this.then(undefined, onRejected);\n  }\n\n  finally(fn) {\n    return this.then(\n      (value) => MyPromise.resolve(fn()).then(() => value),\n      (reason) =>\n        MyPromise.resolve(fn()).then(() => {\n          throw reason;\n        })\n    );\n  }\n\n  static resolve(value) {\n    return value instanceof MyPromise ? value : new MyPromise((resolve) => resolve(value));\n  }\n\n  static reject(reason) {\n    return new MyPromise((_, reject) => reject(reason));\n  }\n}",
+    "referenceSolutionTs": "type MyPromiseState = 'pending' | 'fulfilled' | 'rejected';\ntype Executor<T> = (resolve: (value?: any) => void, reject: (reason?: any) => void) => void;\n\nclass MyPromise<T = any> {\n  state: MyPromiseState = 'pending';\n  value: any = undefined;\n  callbacks: (() => void)[] = [];\n\n  constructor(executor: Executor<T>) {\n    const settle = (state: MyPromiseState, value: any): void => {\n      this.state = state;\n      this.value = value;\n      const pending = this.callbacks;\n      this.callbacks = [];\n      pending.forEach((cb) => queueMicrotask(cb));\n    };\n\n    const resolveValue = (v: any): void => {\n      if (v === this) return settle('rejected', new TypeError('Chaining cycle detected for promise'));\n      if (v !== null && (typeof v === 'object' || typeof v === 'function')) {\n        let then: any;\n        try {\n          then = v.then;\n        } catch (e) {\n          return settle('rejected', e);\n        }\n        if (typeof then === 'function') {\n          let called = false;\n          try {\n            then.call(\n              v,\n              (y: any) => {\n                if (!called) {\n                  called = true;\n                  resolveValue(y);\n                }\n              },\n              (r: any) => {\n                if (!called) {\n                  called = true;\n                  settle('rejected', r);\n                }\n              }\n            );\n          } catch (e) {\n            if (!called) {\n              called = true;\n              settle('rejected', e);\n            }\n          }\n          return;\n        }\n      }\n      settle('fulfilled', v);\n    };\n\n    let done = false;\n    const resolve = (v?: any): void => {\n      if (done) return;\n      done = true;\n      resolveValue(v);\n    };\n    const reject = (r?: any): void => {\n      if (done) return;\n      done = true;\n      settle('rejected', r);\n    };\n\n    try {\n      executor(resolve, reject);\n    } catch (e) {\n      reject(e);\n    }\n  }\n\n  then<TResult1 = T, TResult2 = never>(\n    onFulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,\n    onRejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null\n  ): MyPromise<TResult1 | TResult2> {\n    return new MyPromise((resolve, reject) => {\n      const run = (): void => {\n        const handler = this.state === 'fulfilled' ? onFulfilled : onRejected;\n        if (typeof handler !== 'function') {\n          return this.state === 'fulfilled' ? resolve(this.value) : reject(this.value);\n        }\n        try {\n          resolve(handler(this.value));\n        } catch (e) {\n          reject(e);\n        }\n      };\n      if (this.state === 'pending') this.callbacks.push(run);\n      else queueMicrotask(run);\n    });\n  }\n\n  catch<TResult = never>(onRejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null): MyPromise<T | TResult> {\n    return this.then(undefined, onRejected);\n  }\n\n  finally(fn: () => void): MyPromise<T> {\n    return this.then(\n      (value) => MyPromise.resolve(fn()).then(() => value),\n      (reason) =>\n        MyPromise.resolve(fn()).then(() => {\n          throw reason;\n        })\n    );\n  }\n\n  static resolve<U>(value?: U | PromiseLike<U>): MyPromise<U> {\n    return value instanceof MyPromise ? (value as MyPromise<U>) : new MyPromise<U>((resolve) => resolve(value));\n  }\n\n  static reject<U = never>(reason?: any): MyPromise<U> {\n    return new MyPromise<U>((_, reject) => reject(reason));\n  }\n}",
+    "testCases": [
+      {
+        "description": "then callbacks run asynchronously, after the synchronous code",
+        "input": "const log = [];\nnew MyPromise((resolve) => resolve(1)).then(() => log.push('then'));\nlog.push('sync');\nawait sleep(0);\nlog",
+        "expected": "['sync', 'then']"
+      },
+      {
+        "description": "Chaining passes each return value along",
+        "input": "await new MyPromise((resolve) => resolve(1)).then((v) => v + 1).then((v) => v * 10)",
+        "expected": "20"
+      },
+      {
+        "description": "A rejection skips then() and reaches catch()",
+        "input": "await new MyPromise((_, reject) => reject(new Error('x'))).then(() => 'skipped').catch((e) => e.message)",
+        "expected": "'x'"
+      },
+      {
+        "description": "A throw inside a handler rejects the derived promise",
+        "input": "await MyPromise.resolve(1).then(() => { throw new Error('boom'); }).catch((e) => e.message)",
+        "expected": "'boom'"
+      },
+      {
+        "description": "Returning a MyPromise from then() adopts its eventual value",
+        "input": "await MyPromise.resolve(1).then((v) => new MyPromise((resolve) => setTimeout(() => resolve(v + 1), 10)))",
+        "expected": "2"
+      },
+      {
+        "description": "Returning a native promise (any thenable) is adopted too",
+        "input": "await MyPromise.resolve(1).then((v) => Promise.resolve(v + 5))",
+        "expected": "6"
+      },
+      {
+        "description": "Only the first resolve/reject call counts",
+        "input": "await new MyPromise((resolve, reject) => { resolve('a'); reject(new Error('b')); resolve('c'); })",
+        "expected": "'a'"
+      },
+      {
+        "description": "An executor that throws rejects the promise",
+        "input": "await new MyPromise(() => { throw new Error('exec'); }).catch((e) => e.message)",
+        "expected": "'exec'"
+      },
+      {
+        "description": "Missing handlers pass the value through",
+        "input": "await MyPromise.resolve(7).then().then(undefined, () => 0)",
+        "expected": "7"
+      },
+      {
+        "description": "Several then() calls on one promise run in registration order",
+        "input": "const log = [];\nconst p = MyPromise.resolve(1);\np.then(() => log.push('a'));\np.then(() => log.push('b'));\nawait p.then(() => log.push('c'));\nlog",
+        "expected": "['a', 'b', 'c']"
+      },
+      {
+        "description": "finally() runs on both outcomes and passes the result through",
+        "input": "const log = [];\nconst a = await MyPromise.resolve(1).finally(() => log.push('f'));\nconst b = await MyPromise.reject(new Error('e')).finally(() => log.push('f')).catch((e) => e.message);\n[a, b, log.length]",
+        "expected": "[1, 'e', 2]"
+      },
+      {
+        "description": "Resolving a promise with itself rejects with a TypeError",
+        "input": "const p = MyPromise.resolve(1).then(() => p);\nawait p.catch((e) => e instanceof TypeError)",
+        "expected": "true"
+      }
+    ]
+  },
+  "promisify-callback": {
+    "promptSeed": "Implement a Node.js callback-to-promise adapter:\n\n### `promisify(fn: (...args: any[]) => void): (...args: any[]) => Promise<any>`\n- Converts a Node-style callback function (where the last argument is a callback `(err: any, result?: any) => void`) into a function returning a `Promise`.\n- The returned promise resolves with `result`, or rejects with `err` when `err` is truthy.\n- Forwards all arguments, preserves `this` context, and rejects if `fn` throws synchronously.",
+    "testHarness": "await $test.run(\"Resolves with the callback result\", async () => {\n  const sleep = $test.sleep;\n  const readLater = (name, cb) => setTimeout(() => cb(null, name.toUpperCase()), 5);\n  return (await promisify(readLater)('abc'));\n}, () => ('ABC'));\n\nawait $test.run(\"Rejects with the callback error\", async () => {\n  const sleep = $test.sleep;\n  const failing = (cb) => setTimeout(() => cb(new Error('disk full')), 5);\n  return (await promisify(failing)().catch((e) => e.message));\n}, () => ('disk full'));\n\nawait $test.run(\"Forwards every argument\", async () => {\n  const sleep = $test.sleep;\n  const add = (a, b, cb) => cb(null, a + b);\n  return (await promisify(add)(2, 3));\n}, () => (5));\n\nawait $test.run(\"Preserves this\", async () => {\n  const sleep = $test.sleep;\n  const obj = { n: 10, plus(x, cb) { cb(null, this.n + x); } };\n  obj.plusAsync = promisify(obj.plus);\n  return (await obj.plusAsync(5));\n}, () => (15));\n\nawait $test.run(\"A synchronous throw becomes a rejection\", async () => {\n  const sleep = $test.sleep;\n  const bad = () => { throw new Error('sync'); };\n  return (await promisify(bad)().catch((e) => e.message));\n}, () => ('sync'));\n\nawait $test.run(\"A falsy error means success\", async () => {\n  const sleep = $test.sleep;\n  return (await promisify((cb) => cb(null, 0))());\n}, () => (0));",
+    "referenceSolution": "const promisify = (fn) => {\n  return function (...args) {\n    return new Promise((resolve, reject) => {\n      fn.call(this, ...args, (err, result) => {\n        if (err) reject(err);\n        else resolve(result);\n      });\n    });\n  };\n}",
+    "referenceSolutionTs": "const promisify = <T = any,>(fn: (...args: any[]) => void): (...args: any[]) => Promise<T> => {\n  return function (this: any, ...args: any[]): Promise<T> {\n    return new Promise<T>((resolve, reject) => {\n      try {\n        fn.call(this, ...args, (err: any, result: T) => {\n          if (err) reject(err);\n          else resolve(result);\n        });\n      } catch (e) {\n        reject(e);\n      }\n    });\n  };\n}",
+    "testCases": [
+      {
+        "description": "Resolves with the callback result",
+        "input": "const readLater = (name, cb) => setTimeout(() => cb(null, name.toUpperCase()), 5);\nawait promisify(readLater)('abc')",
+        "expected": "'ABC'"
+      },
+      {
+        "description": "Rejects with the callback error",
+        "input": "const failing = (cb) => setTimeout(() => cb(new Error('disk full')), 5);\nawait promisify(failing)().catch((e) => e.message)",
+        "expected": "'disk full'"
+      },
+      {
+        "description": "Forwards every argument",
+        "input": "const add = (a, b, cb) => cb(null, a + b);\nawait promisify(add)(2, 3)",
+        "expected": "5"
+      },
+      {
+        "description": "Preserves this",
+        "input": "const obj = { n: 10, plus(x, cb) { cb(null, this.n + x); } };\nobj.plusAsync = promisify(obj.plus);\nawait obj.plusAsync(5)",
+        "expected": "15"
+      },
+      {
+        "description": "A synchronous throw becomes a rejection",
+        "input": "const bad = () => { throw new Error('sync'); };\nawait promisify(bad)().catch((e) => e.message)",
+        "expected": "'sync'"
+      },
+      {
+        "description": "A falsy error means success",
+        "input": "await promisify((cb) => cb(null, 0))()",
+        "expected": "0"
+      }
+    ]
+  },
+  "run-in-sequence": {
+    "promptSeed": "Tasks are zero-argument functions returning a `Promise` (or a value).\n\n### `runSequentially<T>(tasks: (() => T | Promise<T>)[]): Promise<T[]>`\n- Executes each task strictly one after another in order.\n- Each subsequent task is invoked only after the previous task's promise resolves.\n- Resolves to an array containing each task's result in corresponding order.\n- **Fail-Fast**: If any task rejects, immediately stops execution and rejects with that error without initiating any remaining tasks.\n\n### `runInParallel<T>(tasks: (() => T | Promise<T>)[]): Promise<T[]>`\n- Invokes all task functions concurrently at the same time.\n- Resolves to an array containing each task's resolved result in the original input order.\n- Rejects immediately if any task's promise rejects.",
+    "testHarness": "await $test.run(\"runSequentially returns the results in order\", async () => {\n  const sleep = $test.sleep;\n  return (await runSequentially([() => 1, async () => 2, () => Promise.resolve(3)]));\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"runSequentially starts a task only after the previous finished\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const task = (name, ms) => async () => { log.push('start ' + name); await sleep(ms); log.push('end ' + name); return name; };\n  await runSequentially([task('a', 30), task('b', 5)]);\n  return (log);\n}, () => (['start a', 'end a', 'start b', 'end b']));\n\nawait $test.run(\"runSequentially stops at the first failure\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  await runSequentially([async () => log.push('one'), async () => { throw new Error('stop'); }, async () => log.push('three')]).catch(() => {});\n  return (log);\n}, () => (['one']));\n\nawait $test.run(\"runSequentially rejects with the failing error\", async () => {\n  const sleep = $test.sleep;\n  return (await runSequentially([() => 1, () => { throw new Error('boom'); }]).catch((e) => e.message));\n}, () => ('boom'));\n\nawait $test.run(\"runInParallel starts everything at once but keeps result order\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const task = (name, ms) => async () => { log.push('start ' + name); await sleep(ms); return name; };\n  const out = await runInParallel([task('slow', 30), task('fast', 5)]);\n  return ([out, log]);\n}, () => ([['slow', 'fast'], ['start slow', 'start fast']]));\n\nawait $test.run(\"Empty task lists resolve to an empty array\", async () => {\n  const sleep = $test.sleep;\n  return ([await runSequentially([]), await runInParallel([])]);\n}, () => ([[], []]));",
+    "referenceSolution": "const runSequentially = async (tasks) => {\n  const results = [];\n  for (const task of tasks) {\n    results.push(await task());\n  }\n  return results;\n}\n\nconst runInParallel = (tasks) => {\n  return Promise.all(tasks.map((task) => task()));\n}",
+    "referenceSolutionTs": "const runSequentially = async <T,>(tasks: (() => T | Promise<T>)[]): Promise<T[]> => {\n  const results: T[] = [];\n  for (const task of tasks) {\n    results.push(await task());\n  }\n  return results;\n}\n\nconst runInParallel = <T,>(tasks: (() => T | Promise<T>)[]): Promise<T[]> => {\n  return Promise.all(tasks.map((task) => task()));\n}",
+    "testCases": [
+      {
+        "description": "runSequentially returns the results in order",
+        "input": "await runSequentially([() => 1, async () => 2, () => Promise.resolve(3)])",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "runSequentially starts a task only after the previous finished",
+        "input": "const log = [];\nconst task = (name, ms) => async () => { log.push('start ' + name); await sleep(ms); log.push('end ' + name); return name; };\nawait runSequentially([task('a', 30), task('b', 5)]);\nlog",
+        "expected": "['start a', 'end a', 'start b', 'end b']"
+      },
+      {
+        "description": "runSequentially stops at the first failure",
+        "input": "const log = [];\nawait runSequentially([async () => log.push('one'), async () => { throw new Error('stop'); }, async () => log.push('three')]).catch(() => {});\nlog",
+        "expected": "['one']"
+      },
+      {
+        "description": "runSequentially rejects with the failing error",
+        "input": "await runSequentially([() => 1, () => { throw new Error('boom'); }]).catch((e) => e.message)",
+        "expected": "'boom'"
+      },
+      {
+        "description": "runInParallel starts everything at once but keeps result order",
+        "input": "const log = [];\nconst task = (name, ms) => async () => { log.push('start ' + name); await sleep(ms); return name; };\nconst out = await runInParallel([task('slow', 30), task('fast', 5)]);\n[out, log]",
+        "expected": "[['slow', 'fast'], ['start slow', 'start fast']]"
+      },
+      {
+        "description": "Empty task lists resolve to an empty array",
+        "input": "[await runSequentially([]), await runInParallel([])]",
+        "expected": "[[], []]"
+      }
+    ]
+  },
+  "sleep-and-delay": {
+    "promptSeed": "Implement asynchronous timing helpers using Promises:\n\n### `sleep(ms: number): Promise<void>`\n- Returns a Promise that resolves (with `undefined`) after `ms` milliseconds via `setTimeout`.\n\n### `delay<T>(value: T, ms: number): Promise<T>`\n- Resolves with `value` after `ms` milliseconds.\n\n### `measure(fn: () => any | Promise<any>): Promise<number>`\n- Awaits `fn()` and returns the elapsed time in milliseconds as a number.",
+    "testHarness": "await $test.run(\"sleep resolves with undefined after about ms\", async () => {\n  const sleep = $test.sleep;\n  const t = Date.now();\n  const v = await sleep(40);\n  return ([v, Date.now() - t >= 35]);\n}, () => ([undefined, true]));\n\nawait $test.run(\"sleep does not resolve early\", async () => {\n  const sleep = $test.sleep;\n  let done = false;\n  sleep(60).then(() => { done = true; });\n  await sleep(20);\n  return (done);\n}, () => (false));\n\nawait $test.run(\"delay resolves with the value\", async () => {\n  const sleep = $test.sleep;\n  return (await delay('hello', 20));\n}, () => ('hello'));\n\nawait $test.run(\"delay keeps non-string values\", async () => {\n  const sleep = $test.sleep;\n  return (await delay({ a: 1 }, 5));\n}, () => ({ a: 1 }));\n\nawait $test.run(\"measure returns elapsed milliseconds\", async () => {\n  const sleep = $test.sleep;\n  const ms = await measure(() => sleep(50));\n  return (ms >= 45 && ms < 400);\n}, () => (true));\n\nawait $test.run(\"measure waits for the promise returned by fn\", async () => {\n  const sleep = $test.sleep;\n  let finished = false;\n  await measure(async () => { await sleep(20); finished = true; });\n  return (finished);\n}, () => (true));",
+    "referenceSolution": "const sleep = (ms) => {\n  return new Promise((resolve) => setTimeout(resolve, ms));\n};\n\nconst delay = (value, ms) => {\n  return sleep(ms).then(() => value);\n};\n\nconst measure = async (fn) => {\n  const start = Date.now();\n  await fn();\n  return Date.now() - start;\n}",
+    "referenceSolutionTs": "const sleep = (ms: number): Promise<void> => {\n  return new Promise<void>((resolve) => setTimeout(resolve, ms));\n};\n\nconst delay = <T,>(value: T, ms: number): Promise<T> => {\n  return sleep(ms).then(() => value);\n};\n\nconst measure = async (fn: () => any | Promise<any>): Promise<number> => {\n  const start = Date.now();\n  await fn();\n  return Date.now() - start;\n}",
+    "testCases": [
+      {
+        "description": "sleep resolves with undefined after about ms",
+        "input": "const t = Date.now();\nconst v = await sleep(40);\n[v, Date.now() - t >= 35]",
+        "expected": "[undefined, true]"
+      },
+      {
+        "description": "sleep does not resolve early",
+        "input": "let done = false;\nsleep(60).then(() => { done = true; });\nawait sleep(20);\ndone",
+        "expected": "false"
+      },
+      {
+        "description": "delay resolves with the value",
+        "input": "await delay('hello', 20)",
+        "expected": "'hello'"
+      },
+      {
+        "description": "delay keeps non-string values",
+        "input": "await delay({ a: 1 }, 5)",
+        "expected": "{ a: 1 }"
+      },
+      {
+        "description": "measure returns elapsed milliseconds",
+        "input": "const ms = await measure(() => sleep(50));\nms >= 45 && ms < 400",
+        "expected": "true"
+      },
+      {
+        "description": "measure waits for the promise returned by fn",
+        "input": "let finished = false;\nawait measure(async () => { await sleep(20); finished = true; });\nfinished",
+        "expected": "true"
+      }
+    ]
+  },
+  "compose-middleware": {
+    "promptSeed": "Implement Koa-style middleware composition:\n\n### `compose<T = any>(fns: MiddlewareFn<T>[]): (ctx: T) => Promise<any>`\n- Each element of `fns` is a function `(ctx, next)` that may be async.\n- Returns a function `run(ctx)` that returns a `Promise`.\n- Calls `fns[0](ctx, next)` where `next()` runs the following function and returns its promise.\n- After the last function in the chain, `next()` resolves immediately.\n- A function that does not call `next()` stops the chain.\n- Code after `await next()` runs on the way back (onion model).\n- A throw or rejection in any middleware rejects the promise returned by `run`.\n- `compose([])` resolves immediately.",
+    "testHarness": "await $test.run(\"Middleware run in order, then unwind (onion model)\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const run = compose([\n    async (ctx, next) => { log.push('a1'); await next(); log.push('a2'); },\n    async (ctx, next) => { log.push('b1'); await next(); log.push('b2'); },\n  ]);\n  await run({});\n  return (log);\n}, () => (['a1', 'b1', 'b2', 'a2']));\n\nawait $test.run(\"Middleware share and mutate ctx\", async () => {\n  const sleep = $test.sleep;\n  const run = compose([\n    (ctx, next) => { ctx.n = 1; return next(); },\n    (ctx, next) => { ctx.n += 10; return next(); },\n  ]);\n  const ctx = {};\n  await run(ctx);\n  return (ctx.n);\n}, () => (11));\n\nawait $test.run(\"Not calling next stops the chain\", async () => {\n  const sleep = $test.sleep;\n  const log = [];\n  const run = compose([\n    () => { log.push('first'); },\n    () => { log.push('never'); },\n  ]);\n  await run({});\n  return (log);\n}, () => (['first']));\n\nawait $test.run(\"compose([]) resolves\", async () => {\n  const sleep = $test.sleep;\n  return (await compose([])({}));\n}, () => (undefined));\n\nawait $test.run(\"next after the last function resolves\", async () => {\n  const sleep = $test.sleep;\n  let reached = false;\n  await compose([async (ctx, next) => { await next(); reached = true; }])({});\n  return (reached);\n}, () => (true));\n\nawait $test.rejects(\"A thrown error rejects run()\", async () => {\n  const sleep = $test.sleep;\n  return (await compose([() => { throw new Error('bad'); }])({}));\n}, \"bad\");\n\nawait $test.rejects(\"A rejection from a later middleware reaches the caller\", async () => {\n  const sleep = $test.sleep;\n  return (await compose([(ctx, next) => next(), async () => { throw new Error('late'); }])({}));\n}, \"late\");\n\nawait $test.run(\"run returns a promise\", async () => {\n  const sleep = $test.sleep;\n  return (compose([])({}) instanceof Promise);\n}, () => (true));",
+    "referenceSolution": "const compose = (fns) => {\n  return function run(ctx) {\n    const dispatch = (i) => {\n      const fn = fns[i];\n      if (!fn) return Promise.resolve();\n      try {\n        return Promise.resolve(fn(ctx, () => dispatch(i + 1)));\n      } catch (err) {\n        return Promise.reject(err);\n      }\n    };\n    return dispatch(0);\n  };\n}",
+    "referenceSolutionTs": "type NextFn = () => Promise<any>;\ntype MiddlewareFn<T = any> = (ctx: T, next: NextFn) => any;\n\nconst compose = <T = any,>(fns: MiddlewareFn<T>[]): (ctx: T) => Promise<any> => {\n  return function run(ctx: T): Promise<any> {\n    const dispatch = (i: number): Promise<any> => {\n      const fn = fns[i];\n      if (!fn) return Promise.resolve();\n      try {\n        return Promise.resolve(fn(ctx, () => dispatch(i + 1)));\n      } catch (err) {\n        return Promise.reject(err);\n      }\n    };\n    return dispatch(0);\n  };\n}",
+    "testCases": [
+      {
+        "description": "Middleware run in order, then unwind (onion model)",
+        "input": "const log = [];\nconst run = compose([\n  async (ctx, next) => { log.push('a1'); await next(); log.push('a2'); },\n  async (ctx, next) => { log.push('b1'); await next(); log.push('b2'); },\n]);\nawait run({});\nlog",
+        "expected": "['a1', 'b1', 'b2', 'a2']"
+      },
+      {
+        "description": "Middleware share and mutate ctx",
+        "input": "const run = compose([\n  (ctx, next) => { ctx.n = 1; return next(); },\n  (ctx, next) => { ctx.n += 10; return next(); },\n]);\nconst ctx = {};\nawait run(ctx);\nctx.n",
+        "expected": "11"
+      },
+      {
+        "description": "Not calling next stops the chain",
+        "input": "const log = [];\nconst run = compose([\n  () => { log.push('first'); },\n  () => { log.push('never'); },\n]);\nawait run({});\nlog",
+        "expected": "['first']"
+      },
+      {
+        "description": "compose([]) resolves",
+        "input": "await compose([])({})",
+        "expected": "undefined"
+      },
+      {
+        "description": "next after the last function resolves",
+        "input": "let reached = false;\nawait compose([async (ctx, next) => { await next(); reached = true; }])({});\nreached",
+        "expected": "true"
+      },
+      {
+        "description": "A thrown error rejects run()",
+        "input": "await compose([() => { throw new Error('bad'); }])({})",
+        "expected": "Rejects with Error — message matches /bad/"
+      },
+      {
+        "description": "A rejection from a later middleware reaches the caller",
+        "input": "await compose([(ctx, next) => next(), async () => { throw new Error('late'); }])({})",
+        "expected": "Rejects with Error — message matches /late/"
+      },
+      {
+        "description": "run returns a promise",
+        "input": "compose([])({}) instanceof Promise",
+        "expected": "true"
+      }
+    ]
+  },
+  "event-loop-order": {
+    "promptSeed": "Demonstrate JavaScript event loop execution order, microtasks, macrotasks, and async/await mechanics:\n\n### `orderOfEvents(): Promise<string[]>`\n- Returns a `Promise` that resolves to an array of string labels recorded in actual execution order.\n- In the constructor/executor body, perform these actions in exact code order:\n  1. Synchronously push `'start'`.\n  2. Schedule a macrotask timer `setTimeout(..., 0)` that pushes `'timeout'` and then resolves the promise with the log array.\n  3. Schedule a microtask `Promise.resolve().then(...)` that pushes `'promise'`.\n  4. Synchronously push `'end'`.\n- Resolves with `['start', 'end', 'promise', 'timeout']`.\n\n### `asyncOrder(): Promise<string[]>`\n- Asynchronous function that tests microtask interleaving with `await null`.\n- Defines an internal async function `f(log)`:\n  - Pushes `'f1'`.\n  - Executes `await null` (yielding to the microtask queue).\n  - Pushes `'f2'`.\n- In `asyncOrder`:\n  1. Pushes `'before'`.\n  2. Calls `f(log)`.\n  3. Pushes `'after'`.\n  4. Awaits completion of `f(log)`.\n  5. Returns `log` (resolving with `['before', 'f1', 'after', 'f2']`).",
+    "testHarness": "await $test.run(\"orderOfEvents: sync first, then microtask, then timeout\", async () => {\n  const sleep = $test.sleep;\n  return (await orderOfEvents());\n}, () => (['start', 'end', 'promise', 'timeout']));\n\nawait $test.run(\"orderOfEvents returns a promise\", async () => {\n  const sleep = $test.sleep;\n  return (orderOfEvents() instanceof Promise);\n}, () => (true));\n\nawait $test.run(\"asyncOrder: code after await runs after the caller continues\", async () => {\n  const sleep = $test.sleep;\n  return (await asyncOrder());\n}, () => (['before', 'f1', 'after', 'f2']));\n\nawait $test.run(\"asyncOrder returns a promise\", async () => {\n  const sleep = $test.sleep;\n  return (asyncOrder() instanceof Promise);\n}, () => (true));",
+    "referenceSolution": "const orderOfEvents = () => {\n  const log = [];\n  return new Promise((resolve) => {\n    log.push('start');\n    setTimeout(() => {\n      log.push('timeout');\n      resolve(log);\n    }, 0);\n    Promise.resolve().then(() => log.push('promise'));\n    log.push('end');\n  });\n}\n\nconst asyncOrder = async () => {\n  const log = [];\n  async function f(log) {\n    log.push('f1');\n    await null;\n    log.push('f2');\n  }\n  log.push('before');\n  const p = f(log);\n  log.push('after');\n  await p;\n  return log;\n}",
+    "referenceSolutionTs": "const orderOfEvents = (): Promise<string[]> => {\n  const log: string[] = [];\n  return new Promise<string[]>((resolve) => {\n    log.push('start');\n    setTimeout(() => {\n      log.push('timeout');\n      resolve(log);\n    }, 0);\n    Promise.resolve().then(() => log.push('promise'));\n    log.push('end');\n  });\n}\n\nconst asyncOrder = async (): Promise<string[]> => {\n  const log: string[] = [];\n  async function f(l: string[]): Promise<void> {\n    l.push('f1');\n    await null;\n    l.push('f2');\n  }\n  log.push('before');\n  const p = f(log);\n  log.push('after');\n  await p;\n  return log;\n}",
+    "testCases": [
+      {
+        "description": "orderOfEvents: sync first, then microtask, then timeout",
+        "input": "await orderOfEvents()",
+        "expected": "['start', 'end', 'promise', 'timeout']"
+      },
+      {
+        "description": "orderOfEvents returns a promise",
+        "input": "orderOfEvents() instanceof Promise",
+        "expected": "true"
+      },
+      {
+        "description": "asyncOrder: code after await runs after the caller continues",
+        "input": "await asyncOrder()",
+        "expected": "['before', 'f1', 'after', 'f2']"
+      },
+      {
+        "description": "asyncOrder returns a promise",
+        "input": "asyncOrder() instanceof Promise",
+        "expected": "true"
+      }
+    ]
+  },
+  "promise-all-by-hand": {
+    "promptSeed": "Without using native `Promise.all`, implement an array concurrency combinator:\n\n### `myAll<T>(items: (T | Promise<T>)[]): Promise<T[]>`\n- Takes an array `items` of values and/or promises.\n- Returns a `Promise` resolving to an array of results in the **exact same index order** as `items` (not order of completion).\n- **Completion Tracking**:\n  - Uses a remaining counter to track how many items have resolved.\n  - Resolves when all items have finished.\n- **Immediate Rejection**:\n  - Rejects as soon as any item's promise rejects (with that rejection reason).\n- **Edge Case**:\n  - `myAll([])` resolves immediately to `[]`.",
+    "testHarness": "await $test.run(\"myAll keeps input order for mixed values and promises\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([1, Promise.resolve(2), new Promise((r) => setTimeout(() => r(3), 20))]));\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"Result order is the input order, not completion order\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([new Promise((r) => setTimeout(() => r('slow'), 30)), new Promise((r) => setTimeout(() => r('fast'), 5))]));\n}, () => (['slow', 'fast']));\n\nawait $test.run(\"An empty array resolves to []\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([]));\n}, () => ([]));\n\nawait $test.rejects(\"The first rejection rejects the result\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([Promise.resolve(1), Promise.reject(new Error('boom')), Promise.resolve(3)]));\n}, \"boom\");\n\nawait $test.rejects(\"Rejects even when an earlier promise is still pending\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll([new Promise((r) => setTimeout(r, 40)), Promise.reject(new Error('early'))]));\n}, \"early\");\n\nawait $test.run(\"Plain values only\", async () => {\n  const sleep = $test.sleep;\n  return (await myAll(['a', 'b']));\n}, () => (['a', 'b']));\n\nawait $test.run(\"Returns a promise\", async () => {\n  const sleep = $test.sleep;\n  return (myAll([1]) instanceof Promise);\n}, () => (true));",
+    "referenceSolution": "const myAll = (items) => {\n  return new Promise((resolve, reject) => {\n    const results = new Array(items.length);\n    let remaining = items.length;\n    if (remaining === 0) {\n      resolve(results);\n      return;\n    }\n    items.forEach((item, index) => {\n      Promise.resolve(item).then((value) => {\n        results[index] = value;\n        remaining--;\n        if (remaining === 0) resolve(results);\n      }, reject);\n    });\n  });\n}",
+    "referenceSolutionTs": "const myAll = <T,>(items: (T | Promise<T>)[]): Promise<T[]> => {\n  return new Promise<T[]>((resolve, reject) => {\n    const results = new Array<T>(items.length);\n    let remaining = items.length;\n    if (remaining === 0) {\n      resolve(results);\n      return;\n    }\n    items.forEach((item, index) => {\n      Promise.resolve(item).then((value) => {\n        results[index] = value;\n        remaining--;\n        if (remaining === 0) resolve(results);\n      }, reject);\n    });\n  });\n}",
+    "testCases": [
+      {
+        "description": "myAll keeps input order for mixed values and promises",
+        "input": "await myAll([1, Promise.resolve(2), new Promise((r) => setTimeout(() => r(3), 20))])",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "Result order is the input order, not completion order",
+        "input": "await myAll([new Promise((r) => setTimeout(() => r('slow'), 30)), new Promise((r) => setTimeout(() => r('fast'), 5))])",
+        "expected": "['slow', 'fast']"
+      },
+      {
+        "description": "An empty array resolves to []",
+        "input": "await myAll([])",
+        "expected": "[]"
+      },
+      {
+        "description": "The first rejection rejects the result",
+        "input": "await myAll([Promise.resolve(1), Promise.reject(new Error('boom')), Promise.resolve(3)])",
+        "expected": "Rejects with Error — message matches /boom/"
+      },
+      {
+        "description": "Rejects even when an earlier promise is still pending",
+        "input": "await myAll([new Promise((r) => setTimeout(r, 40)), Promise.reject(new Error('early'))])",
+        "expected": "Rejects with Error — message matches /early/"
+      },
+      {
+        "description": "Plain values only",
+        "input": "await myAll(['a', 'b'])",
+        "expected": "['a', 'b']"
+      },
+      {
+        "description": "Returns a promise",
+        "input": "myAll([1]) instanceof Promise",
+        "expected": "true"
+      }
+    ]
+  },
+  "async-generator-pagination": {
+    "promptSeed": "Build streaming utilities using asynchronous generators and `for await...of`:\n\n### `async function* paginateAll<T>(fetchPage: (cursor: any | null) => Promise<{ items?: T[]; nextCursor?: any | null }>): AsyncGenerator<T>`\n- Takes `fetchPage(cursor)`, which returns a `Promise` resolving to `{ items: Array, nextCursor: any | null }`.\n- Repeatedly invokes `fetchPage` starting with cursor `null`.\n- Yields each item from `items` one by one.\n- Continues fetching subsequent pages passing the returned `nextCursor` until `nextCursor === null` or `nextCursor === undefined`.\n\n### `async function* filterAsyncGenerator<T>(asyncGen: AsyncIterable<T>, predicate: (item: T) => boolean | Promise<boolean>): AsyncGenerator<T>`\n- Iterates over `asyncGen` via `for await (const item of asyncGen)`.\n- Yields only items for which `await predicate(item)` evaluates to truthy.\n\n### `async function collectGenerator<T>(asyncGen: AsyncIterable<T>, limit?: number): Promise<T[]>`\n- Consumes values from `asyncGen` via `for await...of`.\n- Returns an array containing up to `limit` collected items (defaults to `Infinity`, breaking early once `limit` is reached).",
+    "testHarness": "await $test.run(\"paginateAll streams items across multiple cursor-based pages\", async () => {\n  const sleep = $test.sleep;\n  const mockApi = async (cursor) => {\n    if (cursor === null) return { items: ['a', 'b'], nextCursor: 'page2' };\n    if (cursor === 'page2') return { items: ['c', 'd'], nextCursor: null };\n    return { items: [], nextCursor: null };\n  };\n  return (await collectGenerator(paginateAll(mockApi)));\n}, () => (['a', 'b', 'c', 'd']));\n\nawait $test.run(\"collectGenerator respects limit option\", async () => {\n  const sleep = $test.sleep;\n  const mockApi = async (cursor) => ({\n    items: [1, 2, 3],\n    nextCursor: cursor ? null : 'next'\n  });\n  return (await collectGenerator(paginateAll(mockApi), 2));\n}, () => ([1, 2]));\n\nawait $test.run(\"filterAsyncGenerator filters yielded stream items\", async () => {\n  const sleep = $test.sleep;\n  async function* numbers() {\n    yield 1; yield 2; yield 3; yield 4; yield 5;\n  }\n  return (await collectGenerator(filterAsyncGenerator(numbers(), async (n) => n % 2 === 1)));\n}, () => ([1, 3, 5]));\n\nawait $test.run(\"An empty first page yields nothing and stops\", async () => {\n  const sleep = $test.sleep;\n  const api = async () => ({ items: [], nextCursor: null });\n  return (await collectGenerator(paginateAll(api)));\n}, () => ([]));\n\nawait $test.run(\"Each request receives the nextCursor of the previous page\", async () => {\n  const sleep = $test.sleep;\n  const seen = [];\n  const api = async (cursor) => {\n    seen.push(cursor);\n    return cursor === null ? { items: [1], nextCursor: 'b' } : { items: [2], nextCursor: null };\n  };\n  await collectGenerator(paginateAll(api));\n  return (seen);\n}, () => ([null, 'b']));",
+    "referenceSolution": "async function* paginateAll(fetchPage) {\n  let cursor = null;\n  while (true) {\n    const page = await fetchPage(cursor);\n    if (page && page.items) {\n      for (const item of page.items) {\n        yield item;\n      }\n    }\n    if (!page || page.nextCursor === null || page.nextCursor === undefined) {\n      break;\n    }\n    cursor = page.nextCursor;\n  }\n}\n\nasync function* filterAsyncGenerator(asyncGen, predicate) {\n  for await (const item of asyncGen) {\n    if (await predicate(item)) {\n      yield item;\n    }\n  }\n}\n\nasync function collectGenerator(asyncGen, limit = Infinity) {\n  const result = [];\n  for await (const item of asyncGen) {\n    result.push(item);\n    if (result.length >= limit) break;\n  }\n  return result;\n}",
+    "referenceSolutionTs": "interface PageResult<T> {\n  items?: T[];\n  nextCursor?: any;\n}\n\nasync function* paginateAll<T>(fetchPage: (cursor: any | null) => Promise<PageResult<T>>): AsyncGenerator<T, void, unknown> {\n  let cursor: any = null;\n  while (true) {\n    const page = await fetchPage(cursor);\n    if (page && page.items) {\n      for (const item of page.items) {\n        yield item;\n      }\n    }\n    if (!page || page.nextCursor === null || page.nextCursor === undefined) {\n      break;\n    }\n    cursor = page.nextCursor;\n  }\n}\n\nasync function* filterAsyncGenerator<T>(\n  asyncGen: AsyncIterable<T>,\n  predicate: (item: T) => boolean | Promise<boolean>\n): AsyncGenerator<T, void, unknown> {\n  for await (const item of asyncGen) {\n    if (await predicate(item)) {\n      yield item;\n    }\n  }\n}\n\nasync function collectGenerator<T>(asyncGen: AsyncIterable<T>, limit: number = Infinity): Promise<T[]> {\n  const result: T[] = [];\n  for await (const item of asyncGen) {\n    result.push(item);\n    if (result.length >= limit) break;\n  }\n  return result;\n}",
+    "testCases": [
+      {
+        "description": "paginateAll streams items across multiple cursor-based pages",
+        "input": "const mockApi = async (cursor) => {\n  if (cursor === null) return { items: ['a', 'b'], nextCursor: 'page2' };\n  if (cursor === 'page2') return { items: ['c', 'd'], nextCursor: null };\n  return { items: [], nextCursor: null };\n};\nawait collectGenerator(paginateAll(mockApi))",
+        "expected": "['a', 'b', 'c', 'd']"
+      },
+      {
+        "description": "collectGenerator respects limit option",
+        "input": "const mockApi = async (cursor) => ({\n  items: [1, 2, 3],\n  nextCursor: cursor ? null : 'next'\n});\nawait collectGenerator(paginateAll(mockApi), 2)",
+        "expected": "[1, 2]"
+      },
+      {
+        "description": "filterAsyncGenerator filters yielded stream items",
+        "input": "async function* numbers() {\n  yield 1; yield 2; yield 3; yield 4; yield 5;\n}\nawait collectGenerator(filterAsyncGenerator(numbers(), async (n) => n % 2 === 1))",
+        "expected": "[1, 3, 5]"
+      },
+      {
+        "description": "An empty first page yields nothing and stops",
+        "input": "const api = async () => ({ items: [], nextCursor: null });\nawait collectGenerator(paginateAll(api))",
+        "expected": "[]"
+      },
+      {
+        "description": "Each request receives the nextCursor of the previous page",
+        "input": "const seen = [];\nconst api = async (cursor) => {\n  seen.push(cursor);\n  return cursor === null ? { items: [1], nextCursor: 'b' } : { items: [2], nextCursor: null };\n};\nawait collectGenerator(paginateAll(api));\nseen",
+        "expected": "[null, 'b']"
+      }
+    ]
+  },
+  "cancelable-promise-abort": {
+    "promptSeed": "Implement two asynchronous control-flow utilities: `makeCancelable` and `withTimeout`.\n\n### `makeCancelable<T>(promise: Promise<T>): { promise: Promise<T>; cancel: () => void }`\n- Wraps an input promise and returns an object `{ promise, cancel }`.\n- If `cancel()` is invoked while the promise is still pending, the wrapped promise rejects with `{ isCanceled: true }`.\n- If the promise has already fulfilled or rejected prior to calling `cancel()`, its final settlement is preserved unchanged.\n\n### `withTimeout<T>(promise: Promise<T>, ms: number, timeoutError?: Error): Promise<T>`\n- Returns a Promise that settles with the outcome of `promise` if it settles within `ms` milliseconds.\n- If `ms` elapses before the promise settles, rejects with `timeoutError` (defaults to `new Error('Timeout')`).\n- If `promise` settles first, clears the timer handle to prevent resource leaks.",
+    "testHarness": "await $test.run(\"makeCancelable resolves normally if not canceled\", async () => {\n  const sleep = $test.sleep;\n  const cp = makeCancelable(Promise.resolve('data'));\n  return (await cp.promise);\n}, () => ('data'));\n\nawait $test.run(\"makeCancelable rejects with isCanceled if cancel() called before settlement\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  const cp = makeCancelable(new Promise((r) => setTimeout(() => r('late'), 40)));\n  cp.cancel();\n  try {\n    await cp.promise;\n  } catch (err) {\n    caught = err;\n  }\n  return (caught);\n}, () => ({ isCanceled: true }));\n\nawait $test.run(\"withTimeout resolves if promise settles before timeout\", async () => {\n  const sleep = $test.sleep;\n  const p = new Promise((r) => setTimeout(() => r('quick'), 10));\n  return (await withTimeout(p, 50));\n}, () => ('quick'));\n\nawait $test.run(\"withTimeout rejects if promise exceeds timeout\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  const p = new Promise((r) => setTimeout(() => r('too-late'), 50));\n  try {\n    await withTimeout(p, 10, new Error('Timed out'));\n  } catch (err) {\n    caught = err.message;\n  }\n  return (caught);\n}, () => ('Timed out'));",
+    "referenceSolution": "const makeCancelable = (promise) => {\n  let hasCanceled = false;\n  const wrappedPromise = new Promise((resolve, reject) => {\n    promise.then(\n      (val) => (hasCanceled ? reject({ isCanceled: true }) : resolve(val)),\n      (err) => (hasCanceled ? reject({ isCanceled: true }) : reject(err))\n    );\n  });\n  return {\n    promise: wrappedPromise,\n    cancel() {\n      hasCanceled = true;\n    }\n  };\n}\n\nconst withTimeout = (promise, ms, timeoutError = new Error('Timeout')) => {\n  let timer;\n  const timeoutPromise = new Promise((_, reject) => {\n    timer = setTimeout(() => reject(timeoutError), ms);\n  });\n  return Promise.race([promise, timeoutPromise]).finally(() => {\n    clearTimeout(timer);\n  });\n}",
+    "referenceSolutionTs": "interface CancelableResult<T> {\n  promise: Promise<T>;\n  cancel: () => void;\n}\n\nconst makeCancelable = <T,>(promise: Promise<T>): CancelableResult<T> => {\n  let hasCanceled = false;\n  const wrappedPromise = new Promise<T>((resolve, reject) => {\n    promise.then(\n      (val) => (hasCanceled ? reject({ isCanceled: true }) : resolve(val)),\n      (err) => (hasCanceled ? reject({ isCanceled: true }) : reject(err))\n    );\n  });\n  return {\n    promise: wrappedPromise,\n    cancel() {\n      hasCanceled = true;\n    }\n  };\n}\n\nconst withTimeout = <T,>(promise: Promise<T>, ms: number, timeoutError: Error = new Error('Timeout')): Promise<T> => {\n  let timer: any;\n  const timeoutPromise = new Promise<never>((_, reject) => {\n    timer = setTimeout(() => reject(timeoutError), ms);\n  });\n  return Promise.race([promise, timeoutPromise]).finally(() => {\n    clearTimeout(timer);\n  });\n}",
+    "testCases": [
+      {
+        "description": "makeCancelable resolves normally if not canceled",
+        "input": "const cp = makeCancelable(Promise.resolve('data'));\nawait cp.promise",
+        "expected": "'data'"
+      },
+      {
+        "description": "makeCancelable rejects with isCanceled if cancel() called before settlement",
+        "input": "let caught = null;\nconst cp = makeCancelable(new Promise((r) => setTimeout(() => r('late'), 40)));\ncp.cancel();\ntry {\n  await cp.promise;\n} catch (err) {\n  caught = err;\n}\ncaught",
+        "expected": "{ isCanceled: true }"
+      },
+      {
+        "description": "withTimeout resolves if promise settles before timeout",
+        "input": "const p = new Promise((r) => setTimeout(() => r('quick'), 10));\nawait withTimeout(p, 50)",
+        "expected": "'quick'"
+      },
+      {
+        "description": "withTimeout rejects if promise exceeds timeout",
+        "input": "let caught = null;\nconst p = new Promise((r) => setTimeout(() => r('too-late'), 50));\ntry {\n  await withTimeout(p, 10, new Error('Timed out'));\n} catch (err) {\n  caught = err.message;\n}\ncaught",
+        "expected": "'Timed out'"
+      }
+    ]
+  },
+  "polling-exponential-backoff": {
+    "promptSeed": "Write `pollUntil(fn, predicate, options = {})`:\n\n### `pollUntil<T>(fn: () => Promise<T>, predicate: (result: T) => boolean, options?: PollOptions): Promise<T>`\n- Repeatedly calls `async` function `fn()` until `predicate(result)` returns `true`.\n- **Options & Defaults**: `{ initialInterval = 50, backoffFactor = 2, maxAttempts = 5 }`.\n- **Polling Loop**:\n  - Calls `fn()` and passes the result to `predicate(result)`.\n  - If `predicate(result)` is `true`, resolves immediately with `result`.\n  - If `false` and `attempts < maxAttempts`, sleeps for the current interval, multiplies interval by `backoffFactor`, and retries.\n- **Timeout**: If `attempts` reaches `maxAttempts` and `predicate` continues returning `false`, rejects with `new Error('Polling timed out')`.",
+    "testHarness": "await $test.run(\"pollUntil returns result when predicate matches on initial call\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  const fn = async () => ++calls;\n  return (await pollUntil(fn, (val) => val === 1, { initialInterval: 5, maxAttempts: 3 }));\n}, () => (1));\n\nawait $test.run(\"pollUntil retries until predicate returns true\", async () => {\n  const sleep = $test.sleep;\n  let attempts = 0;\n  const fn = async () => {\n    attempts++;\n    return { status: attempts === 3 ? 'ready' : 'pending' };\n  };\n  const res = await pollUntil(fn, (r) => r.status === 'ready', { initialInterval: 5, backoffFactor: 1.5, maxAttempts: 5 });\n  return ([res.status, attempts]);\n}, () => (['ready', 3]));\n\nawait $test.run(\"pollUntil throws if maxAttempts exceeded without match\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  const fn = async () => 'always-pending';\n  try {\n    await pollUntil(fn, (x) => x === 'done', { initialInterval: 5, backoffFactor: 1, maxAttempts: 3 });\n  } catch (err) {\n    caught = err.message;\n  }\n  return (caught);\n}, () => ('Polling timed out'));\n\nawait $test.run(\"Defaults to 5 attempts\", async () => {\n  const sleep = $test.sleep;\n  let calls = 0;\n  await pollUntil(async () => ++calls, () => false, { initialInterval: 1 }).catch(() => {});\n  return (calls);\n}, () => (5));\n\nawait $test.run(\"The delay is waited between attempts but not after the last one\", async () => {\n  const sleep = $test.sleep;\n  const t0 = Date.now();\n  await pollUntil(async () => 0, () => false, { initialInterval: 100, backoffFactor: 2, maxAttempts: 2 }).catch(() => {});\n  const elapsed = Date.now() - t0;\n  return (elapsed >= 95 && elapsed < 250);\n}, () => (true));\n\nawait $test.run(\"The default backoff factor doubles the wait\", async () => {\n  const sleep = $test.sleep;\n  const stamps = [];\n  await pollUntil(async () => stamps.push(Date.now()), () => false, { initialInterval: 100, maxAttempts: 3 }).catch(() => {});\n  const g1 = stamps[1] - stamps[0];\n  const g2 = stamps[2] - stamps[1];\n  return (g2 / g1 > 1.6 && g2 / g1 < 2.6);\n}, () => (true));",
+    "referenceSolution": "const pollUntil = async (fn, predicate, options = {}) => {\n  const initialInterval = options.initialInterval ?? 50;\n  const backoffFactor = options.backoffFactor ?? 2;\n  const maxAttempts = options.maxAttempts ?? 5;\n\n  let currentInterval = initialInterval;\n  for (let attempt = 1; attempt <= maxAttempts; attempt++) {\n    const result = await fn();\n    if (predicate(result)) {\n      return result;\n    }\n    if (attempt < maxAttempts) {\n      await new Promise((r) => setTimeout(r, currentInterval));\n      currentInterval *= backoffFactor;\n    }\n  }\n  throw new Error('Polling timed out');\n}",
+    "referenceSolutionTs": "interface PollOptions {\n  initialInterval?: number;\n  backoffFactor?: number;\n  maxAttempts?: number;\n}\n\nconst pollUntil = async <T,>(\n  fn: () => Promise<T>,\n  predicate: (result: T) => boolean,\n  options: PollOptions = {}\n): Promise<T> => {\n  const initialInterval = options.initialInterval ?? 50;\n  const backoffFactor = options.backoffFactor ?? 2;\n  const maxAttempts = options.maxAttempts ?? 5;\n\n  let currentInterval = initialInterval;\n  for (let attempt = 1; attempt <= maxAttempts; attempt++) {\n    const result = await fn();\n    if (predicate(result)) {\n      return result;\n    }\n    if (attempt < maxAttempts) {\n      await new Promise((r) => setTimeout(r, currentInterval));\n      currentInterval *= backoffFactor;\n    }\n  }\n  throw new Error('Polling timed out');\n}",
+    "testCases": [
+      {
+        "description": "pollUntil returns result when predicate matches on initial call",
+        "input": "let calls = 0;\nconst fn = async () => ++calls;\nawait pollUntil(fn, (val) => val === 1, { initialInterval: 5, maxAttempts: 3 })",
+        "expected": "1"
+      },
+      {
+        "description": "pollUntil retries until predicate returns true",
+        "input": "let attempts = 0;\nconst fn = async () => {\n  attempts++;\n  return { status: attempts === 3 ? 'ready' : 'pending' };\n};\nconst res = await pollUntil(fn, (r) => r.status === 'ready', { initialInterval: 5, backoffFactor: 1.5, maxAttempts: 5 });\n[res.status, attempts]",
+        "expected": "['ready', 3]"
+      },
+      {
+        "description": "pollUntil throws if maxAttempts exceeded without match",
+        "input": "let caught = null;\nconst fn = async () => 'always-pending';\ntry {\n  await pollUntil(fn, (x) => x === 'done', { initialInterval: 5, backoffFactor: 1, maxAttempts: 3 });\n} catch (err) {\n  caught = err.message;\n}\ncaught",
+        "expected": "'Polling timed out'"
+      },
+      {
+        "description": "Defaults to 5 attempts",
+        "input": "let calls = 0;\nawait pollUntil(async () => ++calls, () => false, { initialInterval: 1 }).catch(() => {});\ncalls",
+        "expected": "5"
+      },
+      {
+        "description": "The delay is waited between attempts but not after the last one",
+        "input": "const t0 = Date.now();\nawait pollUntil(async () => 0, () => false, { initialInterval: 100, backoffFactor: 2, maxAttempts: 2 }).catch(() => {});\nconst elapsed = Date.now() - t0;\nelapsed >= 95 && elapsed < 250",
+        "expected": "true  (one 100 ms wait, none after attempt 2)"
+      },
+      {
+        "description": "The default backoff factor doubles the wait",
+        "input": "const stamps = [];\nawait pollUntil(async () => stamps.push(Date.now()), () => false, { initialInterval: 100, maxAttempts: 3 }).catch(() => {});\nconst g1 = stamps[1] - stamps[0];\nconst g2 = stamps[2] - stamps[1];\ng2 / g1 > 1.6 && g2 / g1 < 2.6",
+        "expected": "true  (gaps of about 100 ms, then 200 ms)"
+      }
+    ]
+  },
+  "promise-any-aggregate": {
+    "promptSeed": "Write `promiseAny(promises)`:\n\n### `promiseAny<T>(promises: Iterable<T | Promise<T>>): Promise<T>`\n- **Input**: Takes an iterable of promises (or plain values).\n- **Fulfillment**: Returns a Promise that fulfills as soon as **any** input promise fulfills, resolving with that first fulfillment value.\n- **Rejection & `AggregateError`**:\n  - If **ALL** input promises reject (or if the iterable is empty), the returned Promise rejects with an `AggregateError`.\n  - The `AggregateError` must have `message: 'All promises were rejected'`.\n  - Its `.errors` property contains all rejection reasons in their original input order.",
+    "testHarness": "await $test.run(\"promiseAny resolves with the fastest fulfilling promise\", async () => {\n  const sleep = $test.sleep;\n  const p1 = new Promise((_, r) => setTimeout(() => r('fail1'), 10));\n  p1.catch(() => {});\n  const p2 = new Promise((res) => setTimeout(() => res('win'), 20));\n  const p3 = new Promise((res) => setTimeout(() => res('slow'), 50));\n  return (await promiseAny([p1, p2, p3]));\n}, () => ('win'));\n\nawait $test.run(\"promiseAny fulfills immediately if an element is a non-promise value\", async () => {\n  const sleep = $test.sleep;\n  return (await promiseAny([Promise.reject('err'), 42, Promise.resolve(99)]));\n}, () => (42));\n\nawait $test.run(\"promiseAny rejects with AggregateError when all promises reject\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    await promiseAny([Promise.reject('err1'), Promise.reject('err2')]);\n  } catch (err) {\n    caught = { name: err.name, message: err.message, errors: err.errors };\n  }\n  return (caught);\n}, () => ({ name: 'AggregateError', message: 'All promises were rejected', errors: ['err1', 'err2'] }));\n\nawait $test.run(\"promiseAny with empty iterable rejects with AggregateError\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    await promiseAny([]);\n  } catch (err) {\n    caught = { name: err.name, errors: err.errors };\n  }\n  return (caught);\n}, () => ({ name: 'AggregateError', errors: [] }));",
+    "referenceSolution": "const promiseAny = (promises) => {\n  const items = Array.from(promises);\n  if (items.length === 0) {\n    const err = typeof AggregateError !== 'undefined'\n      ? new AggregateError([], 'All promises were rejected')\n      : Object.assign(new Error('All promises were rejected'), { name: 'AggregateError', errors: [] });\n    return Promise.reject(err);\n  }\n  return new Promise((resolve, reject) => {\n    const errors = new Array(items.length);\n    let rejectedCount = 0;\n    items.forEach((p, index) => {\n      Promise.resolve(p).then(\n        (val) => resolve(val),\n        (reason) => {\n          errors[index] = reason;\n          rejectedCount++;\n          if (rejectedCount === items.length) {\n            const err = typeof AggregateError !== 'undefined'\n              ? new AggregateError(errors, 'All promises were rejected')\n              : Object.assign(new Error('All promises were rejected'), { name: 'AggregateError', errors });\n            reject(err);\n          }\n        }\n      );\n    });\n  });\n}",
+    "referenceSolutionTs": "const promiseAny = <T,>(promises: Iterable<T | Promise<T>>): Promise<T> => {\n  const items = Array.from(promises);\n  if (items.length === 0) {\n    const err = typeof AggregateError !== 'undefined'\n      ? new AggregateError([], 'All promises were rejected')\n      : Object.assign(new Error('All promises were rejected'), { name: 'AggregateError', errors: [] });\n    return Promise.reject(err);\n  }\n  return new Promise<T>((resolve, reject) => {\n    const errors = new Array<any>(items.length);\n    let rejectedCount = 0;\n    items.forEach((p, index) => {\n      Promise.resolve(p).then(\n        (val) => resolve(val),\n        (reason) => {\n          errors[index] = reason;\n          rejectedCount++;\n          if (rejectedCount === items.length) {\n            const err = typeof AggregateError !== 'undefined'\n              ? new AggregateError(errors, 'All promises were rejected')\n              : Object.assign(new Error('All promises were rejected'), { name: 'AggregateError', errors });\n            reject(err);\n          }\n        }\n      );\n    });\n  });\n}",
+    "testCases": [
+      {
+        "description": "promiseAny resolves with the fastest fulfilling promise",
+        "input": "const p1 = new Promise((_, r) => setTimeout(() => r('fail1'), 10));\np1.catch(() => {});\nconst p2 = new Promise((res) => setTimeout(() => res('win'), 20));\nconst p3 = new Promise((res) => setTimeout(() => res('slow'), 50));\nawait promiseAny([p1, p2, p3])",
+        "expected": "'win'"
+      },
+      {
+        "description": "promiseAny fulfills immediately if an element is a non-promise value",
+        "input": "await promiseAny([Promise.reject('err'), 42, Promise.resolve(99)])",
+        "expected": "42"
+      },
+      {
+        "description": "promiseAny rejects with AggregateError when all promises reject",
+        "input": "let caught = null;\ntry {\n  await promiseAny([Promise.reject('err1'), Promise.reject('err2')]);\n} catch (err) {\n  caught = { name: err.name, message: err.message, errors: err.errors };\n}\ncaught",
+        "expected": "{ name: 'AggregateError', message: 'All promises were rejected', errors: ['err1', 'err2'] }"
+      },
+      {
+        "description": "promiseAny with empty iterable rejects with AggregateError",
+        "input": "let caught = null;\ntry {\n  await promiseAny([]);\n} catch (err) {\n  caught = { name: err.name, errors: err.errors };\n}\ncaught",
+        "expected": "{ name: 'AggregateError', errors: [] }"
+      }
+    ]
+  },
+  "stream-event-micro-batcher": {
+    "promptSeed": "Implement a high-throughput stream event micro-batcher that groups incoming events by count limit or maximum time window:\n\n## Description\n\nIn high-throughput event processing (telemetry collectors, WebSocket ingestors, Kafka/SQS worker pipelines), dispatching I/O writes or network requests for every individual event overloads downstream services. A micro-batcher buffers incoming items and flushes them in batches whenever either a maximum batch size is reached or a maximum time delay expires.\n\n```ts\ninterface MicroBatcherOptions<T> {\n  maxBatchSize: number;\n  maxWaitMs: number;\n  flushHandler: (batch: T[]) => Promise<void> | void;\n}\n\ninterface MicroBatcher<T> {\n  add(item: T): Promise<void>;\n  flush(): Promise<void>;\n  size(): number;\n  drain(): Promise<void>;\n}\n```\n\n### createMicroBatcher<T>(options: MicroBatcherOptions<T>): MicroBatcher<T>\n\nCreates a micro-batcher instance with the given configuration:\n- **`add(item: T): Promise<void>`**:\n  - Enqueues `item` into the internal buffer.\n  - Returns a Promise that resolves when this specific item has been successfully flushed via `flushHandler`, or rejects if `flushHandler` fails for its batch.\n  - If the buffer length reaches `maxBatchSize`:\n    - Clears any pending wait timer.\n    - Immediately triggers a batch flush.\n  - If the buffer length is strictly less than `maxBatchSize` and no timer is currently active:\n    - Schedules a timer to flush the buffer after `maxWaitMs` milliseconds.\n- **`flush(): Promise<void>`**:\n  - Immediately drains and flushes any currently buffered items.\n  - Clears any scheduled timer.\n  - Guarantees sequential flush execution: if a flush is already active, waits for it to complete before running subsequent flushes.\n  - Resolves when all items in the triggered flush have completed.\n- **`size(): number`**:\n  - Returns the number of items currently buffered and awaiting a flush.\n- **`drain(): Promise<void>`**:\n  - Flushes any remaining items in the buffer and waits for all active and pending flushes to resolve.",
+    "testHarness": "await (async () => {\n  const fn = typeof createMicroBatcher === 'function' ? createMicroBatcher : solution;\n\n  // Case 1: Count threshold immediately flushes when reaching maxBatchSize\n  const batches1 = [];\n  const batcher1 = fn({\n    maxBatchSize: 3,\n    maxWaitMs: 500,\n    flushHandler: (batch) => {\n      batches1.push([...batch]);\n    },\n  });\n\n  const p1 = batcher1.add('a');\n  const p2 = batcher1.add('b');\n  $test.check('Buffering 2 items does not flush yet (size === 2)', batcher1.size() === 2 && batches1.length === 0, { size: batcher1.size() });\n  const p3 = batcher1.add('c');\n  await Promise.all([p1, p2, p3]);\n\n  $test.check(\n    'Reaching maxBatchSize 3 immediately flushes batch and clears buffer',\n    batches1.length === 1 && batches1[0].join('') === 'abc' && batcher1.size() === 0,\n    { batches: batches1, size: batcher1.size() }\n  );\n\n  // Case 2: Time window flushes after maxWaitMs expires\n  const batches2 = [];\n  const batcher2 = fn({\n    maxBatchSize: 5,\n    maxWaitMs: 30,\n    flushHandler: (batch) => {\n      batches2.push([...batch]);\n    },\n  });\n\n  const p4 = batcher2.add('x');\n  const p5 = batcher2.add('y');\n  await new Promise((r) => setTimeout(r, 60));\n  await Promise.all([p4, p5]);\n\n  $test.check(\n    'Fewer items than maxBatchSize flush when maxWaitMs window expires',\n    batches2.length === 1 && batches2[0].join('') === 'xy' && batcher2.size() === 0,\n    { batches: batches2 }\n  );\n\n  // Case 3: Manual flush flushes immediately\n  const batches3 = [];\n  const batcher3 = fn({\n    maxBatchSize: 10,\n    maxWaitMs: 1000,\n    flushHandler: (batch) => {\n      batches3.push([...batch]);\n    },\n  });\n\n  batcher3.add(1);\n  batcher3.add(2);\n  await batcher3.flush();\n  $test.check(\n    'Manual flush() drains buffer immediately before time window expires',\n    batches3.length === 1 && batches3[0].length === 2 && batcher3.size() === 0,\n    { batches: batches3 }\n  );\n\n  // Case 4: Error in flushHandler rejects promises for all items in that batch\n  const batcher4 = fn({\n    maxBatchSize: 2,\n    maxWaitMs: 500,\n    flushHandler: async () => {\n      throw new Error('Database sink connection failed');\n    },\n  });\n\n  let errCount = 0;\n  const p6 = batcher4.add('err1').catch(() => { errCount++; });\n  const p7 = batcher4.add('err2').catch(() => { errCount++; });\n  await Promise.all([p6, p7]);\n\n  $test.check(\n    'flushHandler error rejects all item promises in the failing batch',\n    errCount === 2,\n    { errCount }\n  );\n})();",
+    "referenceSolution": "const createMicroBatcher = (options) => {\n  let buffer = [];\n  let timerId = null;\n  let activeFlushPromise = Promise.resolve();\n\n  const clearWaitTimer = () => {\n    if (timerId !== null) {\n      clearTimeout(timerId);\n      timerId = null;\n    }\n  };\n\n  const scheduleWaitTimer = () => {\n    if (timerId === null) {\n      timerId = setTimeout(() => {\n        timerId = null;\n        triggerFlush();\n      }, options.maxWaitMs);\n    }\n  };\n\n  const triggerFlush = () => {\n    clearWaitTimer();\n    const currentBatch = buffer;\n    buffer = [];\n\n    if (currentBatch.length === 0) {\n      return activeFlushPromise;\n    }\n\n    const itemsToFlush = currentBatch.map((p) => p.item);\n\n    const executeFlush = async () => {\n      try {\n        await options.flushHandler(itemsToFlush);\n        for (const p of currentBatch) {\n          p.resolve();\n        }\n      } catch (err) {\n        for (const p of currentBatch) {\n          p.reject(err);\n        }\n      }\n    };\n\n    activeFlushPromise = activeFlushPromise.then(executeFlush, executeFlush);\n    return activeFlushPromise;\n  };\n\n  const add = (item) => {\n    return new Promise((resolve, reject) => {\n      buffer.push({ item, resolve, reject });\n\n      if (buffer.length >= options.maxBatchSize) {\n        triggerFlush();\n      } else {\n        scheduleWaitTimer();\n      }\n    });\n  };\n\n  const flush = () => {\n    return triggerFlush();\n  };\n\n  const size = () => {\n    return buffer.length;\n  };\n\n  const drain = async () => {\n    await triggerFlush();\n    await activeFlushPromise;\n  };\n\n  return {\n    add,\n    flush,\n    size,\n    drain,\n  };\n};",
+    "referenceSolutionTs": "interface MicroBatcherOptions<T> {\n  maxBatchSize: number;\n  maxWaitMs: number;\n  flushHandler: (batch: T[]) => Promise<void> | void;\n}\n\ninterface MicroBatcher<T> {\n  add(item: T): Promise<void>;\n  flush(): Promise<void>;\n  size(): number;\n  drain(): Promise<void>;\n}\n\ninterface PendingItem<T> {\n  item: T;\n  resolve: () => void;\n  reject: (err: unknown) => void;\n}\n\nconst createMicroBatcher = <T>(options: MicroBatcherOptions<T>): MicroBatcher<T> => {\n  let buffer: PendingItem<T>[] = [];\n  let timerId: ReturnType<typeof setTimeout> | null = null;\n  let activeFlushPromise: Promise<void> = Promise.resolve();\n\n  const clearWaitTimer = (): void => {\n    if (timerId !== null) {\n      clearTimeout(timerId);\n      timerId = null;\n    }\n  };\n\n  const scheduleWaitTimer = (): void => {\n    if (timerId === null) {\n      timerId = setTimeout(() => {\n        timerId = null;\n        triggerFlush();\n      }, options.maxWaitMs);\n    }\n  };\n\n  const triggerFlush = (): Promise<void> => {\n    clearWaitTimer();\n    const currentBatch = buffer;\n    buffer = [];\n\n    if (currentBatch.length === 0) {\n      return activeFlushPromise;\n    }\n\n    const itemsToFlush = currentBatch.map((p) => p.item);\n\n    const executeFlush = async (): Promise<void> => {\n      try {\n        await options.flushHandler(itemsToFlush);\n        for (const p of currentBatch) {\n          p.resolve();\n        }\n      } catch (err) {\n        for (const p of currentBatch) {\n          p.reject(err);\n        }\n      }\n    };\n\n    activeFlushPromise = activeFlushPromise.then(executeFlush, executeFlush);\n    return activeFlushPromise;\n  };\n\n  const add = (item: T): Promise<void> => {\n    return new Promise<void>((resolve, reject) => {\n      buffer.push({ item, resolve, reject });\n\n      if (buffer.length >= options.maxBatchSize) {\n        triggerFlush();\n      } else {\n        scheduleWaitTimer();\n      }\n    });\n  };\n\n  const flush = (): Promise<void> => {\n    return triggerFlush();\n  };\n\n  const size = (): number => {\n    return buffer.length;\n  };\n\n  const drain = async (): Promise<void> => {\n    await triggerFlush();\n    await activeFlushPromise;\n  };\n\n  return {\n    add,\n    flush,\n    size,\n    drain,\n  };\n};",
+    "testCases": [
+      {
+        "description": "Buffering 2 items does not flush yet (size === 2)",
+        "input": "batcher.add(\"a\"); batcher.add(\"b\"); batcher.size()",
+        "expected": "2"
+      },
+      {
+        "description": "Reaching maxBatchSize 3 immediately flushes batch and clears buffer",
+        "input": "batcher.add(\"c\"); await Promise.all([p1, p2, p3])",
+        "expected": "[[\"a\", \"b\", \"c\"]]"
+      },
+      {
+        "description": "Fewer items than maxBatchSize flush when maxWaitMs window expires",
+        "input": "batcher.add(\"x\"); batcher.add(\"y\"); await sleep(60)",
+        "expected": "[[\"x\", \"y\"]]"
+      },
+      {
+        "description": "Manual flush() drains buffer immediately before time window expires",
+        "input": "batcher.add(1); batcher.add(2); await batcher.flush()",
+        "expected": "[[1, 2]]"
+      },
+      {
+        "description": "flushHandler error rejects all item promises in the failing batch",
+        "input": "batcher.add(\"err1\"); batcher.add(\"err2\")",
+        "expected": "Rejects with Error"
+      }
+    ]
+  },
+  "web-stream-transform-pipeline": {
+    "promptSeed": "Implement a text line streaming sanitizer and execution pipeline using the standard Web Streams API:\n\n## Description\n\nThe Web Streams API (`ReadableStream`, `TransformStream`, `WritableStream`) is the universal standard for chunked data processing across browsers, Node.js (18+), and Edge runtimes. Rather than buffering an entire dataset in memory, a transform stream operates on chunks as they arrive over the network, emitting processed pieces down the pipe.\n\n```ts\ninterface TransformPipelineRunner {\n  createLineSanitizerTransform(censorWords: string[]): TransformStream<string, string>;\n  runStreamPipeline(chunks: string[], transform: TransformStream<string, string>): Promise<string[]>;\n}\n```\n\n### `createLineSanitizerTransform(censorWords: string[]): TransformStream<string, string>`\n\nCreates a standard Web `TransformStream<string, string>` that buffers incoming arbitrary text chunks, splits on newline characters (`'\\n'`), redacts sensitive words, and enqueues clean lines:\n- **Chunk Buffering**:\n  - Incoming chunks may be fragments of lines (e.g. `'hel'` followed by `'lo\\n'`).\n  - Buffers text until a newline delimiter is encountered.\n  - Splits each complete line, redacts sensitive content, and calls `controller.enqueue(line)` without the trailing newline.\n- **Redaction**:\n  - For each word in `censorWords`, replaces case-insensitive whole-word occurrences with `'[REDACTED]'`.\n  - Non-sensitive content and spacing are preserved.\n- **Flush Handling**:\n  - In `flush(controller)`: If any un-terminated text remains in the internal buffer, sanitizes it and enqueues the final line before closing.\n\n### `runStreamPipeline(chunks: string[], transform: TransformStream<string, string>): Promise<string[]>`\n\nExecutes a complete Web Streams pipeline:\n- Constructs a `ReadableStream<string>` that enqueues each string in `chunks` and closes.\n- Pipes the readable stream through `transform` via `readable.pipeThrough(transform)`.\n- Consumes the resulting stream using a reader (`getReader()`), collects all emitted lines into an array, and returns it.",
+    "testHarness": "await (async () => {\n  const factory = typeof createLineSanitizerTransform === 'function'\n    ? createLineSanitizerTransform\n    : (typeof solution === 'object' ? solution?.createLineSanitizerTransform : solution);\n  const runner = typeof runStreamPipeline === 'function'\n    ? runStreamPipeline\n    : (typeof solution === 'object' ? solution?.runStreamPipeline : undefined);\n\n  // Case 1: Chunks with fragmented lines and redaction\n  const transform1 = factory(['secret', 'token']);\n  const chunks1 = ['Hello secret\\nHow are ', 'you? token is here\\nDone.'];\n  const res1 = await runner(chunks1, transform1);\n\n  $test.check(\n    'Reassembles fragmented chunks and redacts words with flush of final line',\n    res1.length === 3 &&\n      res1[0] === 'Hello [REDACTED]' &&\n      res1[1] === 'How are you? [REDACTED] is here' &&\n      res1[2] === 'Done.',\n    { lines: res1 }\n  );\n\n  // Case 2: Case-insensitive matching and word-boundary safety\n  const transform2 = factory(['api', 'key']);\n  const chunks2 = ['API is active\\napiKey should not be redacted\\nmy key is valid\\n'];\n  const res2 = await runner(chunks2, transform2);\n\n  $test.check(\n    'Case-insensitive whole-word redaction preserves substrings (apiKey not matched as key)',\n    res2.length === 3 &&\n      res2[0] === '[REDACTED] is active' &&\n      res2[1] === 'apiKey should not be redacted' &&\n      res2[2] === 'my [REDACTED] is valid',\n    { lines: res2 }\n  );\n\n  // Case 3: Empty input chunks produce empty result\n  const transform3 = factory(['hidden']);\n  const res3 = await runner([], transform3);\n  $test.check(\n    'Empty input chunks produce empty array',\n    Array.isArray(res3) && res3.length === 0,\n    { res3 }\n  );\n\n  // Case 4: Multiple newlines in a single chunk\n  const transform4 = factory(['password']);\n  const chunks4 = ['line1 password\\nline2\\nline3\\n'];\n  const res4 = await runner(chunks4, transform4);\n  $test.check(\n    'Multiple newlines in a single chunk are each emitted as separate lines',\n    res4.length === 3 &&\n      res4[0] === 'line1 [REDACTED]' &&\n      res4[1] === 'line2' &&\n      res4[2] === 'line3',\n    { lines: res4 }\n  );\n})();",
+    "referenceSolution": "const createLineSanitizerTransform = (censorWords) => {\n  let buffer = '';\n\n  const sanitizeLine = (line) => {\n    let result = line;\n    for (const word of censorWords) {\n      if (!word) continue;\n      const escaped = word.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n      const regex = new RegExp(`\\\\b${escaped}\\\\b`, 'gi');\n      result = result.replace(regex, '[REDACTED]');\n    }\n    return result;\n  };\n\n  return new TransformStream({\n    transform(chunk, controller) {\n      buffer += chunk;\n      let newlineIndex;\n      while ((newlineIndex = buffer.indexOf('\\n')) !== -1) {\n        const line = buffer.slice(0, newlineIndex);\n        buffer = buffer.slice(newlineIndex + 1);\n        controller.enqueue(sanitizeLine(line));\n      }\n    },\n    flush(controller) {\n      if (buffer.length > 0) {\n        controller.enqueue(sanitizeLine(buffer));\n        buffer = '';\n      }\n    },\n  });\n};\n\nconst runStreamPipeline = async (chunks, transform) => {\n  const readable = new ReadableStream({\n    start(controller) {\n      for (const chunk of chunks) {\n        controller.enqueue(chunk);\n      }\n      controller.close();\n    },\n  });\n\n  const transformedStream = readable.pipeThrough(transform);\n  const reader = transformedStream.getReader();\n  const results = [];\n\n  while (true) {\n    const { value, done } = await reader.read();\n    if (done) break;\n    if (value !== undefined) {\n      results.push(value);\n    }\n  }\n\n  return results;\n};",
+    "referenceSolutionTs": "const createLineSanitizerTransform = (censorWords: string[]): TransformStream<string, string> => {\n  let buffer = '';\n\n  const sanitizeLine = (line: string): string => {\n    let result = line;\n    for (const word of censorWords) {\n      if (!word) continue;\n      const escaped = word.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n      const regex = new RegExp(`\\\\b${escaped}\\\\b`, 'gi');\n      result = result.replace(regex, '[REDACTED]');\n    }\n    return result;\n  };\n\n  return new TransformStream<string, string>({\n    transform(chunk, controller) {\n      buffer += chunk;\n      let newlineIndex: number;\n      while ((newlineIndex = buffer.indexOf('\\n')) !== -1) {\n        const line = buffer.slice(0, newlineIndex);\n        buffer = buffer.slice(newlineIndex + 1);\n        controller.enqueue(sanitizeLine(line));\n      }\n    },\n    flush(controller) {\n      if (buffer.length > 0) {\n        controller.enqueue(sanitizeLine(buffer));\n        buffer = '';\n      }\n    },\n  });\n};\n\nconst runStreamPipeline = async (\n  chunks: string[],\n  transform: TransformStream<string, string>\n): Promise<string[]> => {\n  const readable = new ReadableStream<string>({\n    start(controller) {\n      for (const chunk of chunks) {\n        controller.enqueue(chunk);\n      }\n      controller.close();\n    },\n  });\n\n  const transformedStream = readable.pipeThrough(transform);\n  const reader = transformedStream.getReader();\n  const results: string[] = [];\n\n  while (true) {\n    const { value, done } = await reader.read();\n    if (done) break;\n    if (value !== undefined) {\n      results.push(value);\n    }\n  }\n\n  return results;\n};",
+    "testCases": [
+      {
+        "description": "Reassembles fragmented chunks and redacts words with flush of final line",
+        "input": "runStreamPipeline([\"Hello secret\\nHow are \", \"you? token is here\\nDone.\"], transform)",
+        "expected": "[\"Hello [REDACTED]\", \"How are you? [REDACTED] is here\", \"Done.\"]"
+      },
+      {
+        "description": "Case-insensitive whole-word redaction preserves substrings (apiKey not matched as key)",
+        "input": "runStreamPipeline([\"API is active\\napiKey should not be redacted\\nmy key is valid\\n\"], transform)",
+        "expected": "[\"[REDACTED] is active\", \"apiKey should not be redacted\", \"my [REDACTED] is valid\"]"
+      },
+      {
+        "description": "Empty input chunks produce empty array",
+        "input": "runStreamPipeline([], transform)",
+        "expected": "[]"
+      },
+      {
+        "description": "Multiple newlines in a single chunk are each emitted as separate lines",
+        "input": "runStreamPipeline([\"line1 password\\nline2\\nline3\\n\"], transform)",
+        "expected": "[\"line1 [REDACTED]\", \"line2\", \"line3\"]"
+      }
+    ]
+  },
+  "chunked-batch-pipeline": {
+    "promptSeed": "Implement a memory-safe batch processing pipeline with bounded concurrency and granular error collection:\n\n## Description\n\nWhen processing large datasets (e.g. 50,000 webhook payloads or database records), executing all operations concurrently with `Promise.all` overwhelms downstream APIs and causes out-of-memory crashes. Slicing items into discrete chunks and limiting active in-flight worker promises ensures predictable memory footprints and resilient throughput.\n\n```ts\ninterface ChunkBatchOptions<T, R> {\n  batchSize: number;\n  concurrency: number;\n  processItem: (item: T, index: number) => Promise<R>;\n  onError?: (item: T, error: Error, index: number) => void;\n}\n\ninterface ChunkBatchResult<R> {\n  results: (R | null)[];\n  successfulCount: number;\n  failureCount: number;\n}\n```\n\n### `chunkedBatchPipeline<T, R>(items: T[], options: ChunkBatchOptions<T, R>): Promise<ChunkBatchResult<R>>`\n\nProcesses an array of items in successive batches of `options.batchSize`, running at most `options.concurrency` items concurrently:\n\n- **Batch Partitioning**:\n  - Divides `items` into slices of length `batchSize` (the final slice may be shorter).\n  - Processes batches sequentially from first to last: each batch must completely finish (all items either resolved or rejected) before the next batch starts.\n- **Bounded Concurrency within Batches**:\n  - Within each batch, runs items concurrently up to `concurrency` simultaneous active workers (e.g. using a pool or queue).\n  - As soon as one worker completes an item, the next pending item in that batch begins processing.\n- **Result Ordering**:\n  - The returned `results` array must preserve the exact original ordering of `items` (`results[i]` corresponds to `items[i]`).\n- **Error Handling & Dead-Letter Safety**:\n  - If `processItem(item, i)` throws or rejects:\n    - Calls `onError(item, error, i)` if provided.\n    - Sets `results[i] = null`.\n    - Increments `failureCount`.\n    - Does **not** reject the pipeline; execution continues for all remaining items.\n- **Successful Processing**:\n  - On fulfillment, stores the returned value at `results[i]` and increments `successfulCount`.\n- **Edge Cases**:\n  - Empty `items` array resolves with `{ results: [], successfulCount: 0, failureCount: 0 }`.",
+    "testHarness": "await (async () => {\n  const fn = typeof chunkedBatchPipeline === 'function' ? chunkedBatchPipeline : solution;\n\n  // Case 1: Bounded concurrency and ordering\n  let activeWorkers = 0;\n  let maxActiveObserved = 0;\n  const items1 = [1, 2, 3, 4, 5, 6, 7];\n  const res1 = await fn(items1, {\n    batchSize: 4,\n    concurrency: 2,\n    processItem: async (n) => {\n      activeWorkers++;\n      maxActiveObserved = Math.max(maxActiveObserved, activeWorkers);\n      await new Promise((r) => setTimeout(r, 10));\n      activeWorkers--;\n      return n * 10;\n    },\n  });\n\n  $test.check(\n    'Processes all items preserving index and respecting concurrency limit',\n    res1.successfulCount === 7 &&\n      res1.failureCount === 0 &&\n      maxActiveObserved <= 2 &&\n      JSON.stringify(res1.results) === JSON.stringify([10, 20, 30, 40, 50, 60, 70]),\n    { res1, maxActiveObserved }\n  );\n\n  // Case 2: Error handling with dead-letter onError callback\n  const errorItems = [];\n  const res2 = await fn([10, -5, 20, -1, 30], {\n    batchSize: 5,\n    concurrency: 3,\n    processItem: async (n) => {\n      if (n < 0) throw new Error(`Negative value: ${n}`);\n      return n / 2;\n    },\n    onError: (item, err, idx) => {\n      errorItems.push({ item, idx, msg: err.message });\n    },\n  });\n\n  $test.check(\n    'Failed items record null in results and invoke onError without failing the pipeline',\n    res2.successfulCount === 3 &&\n      res2.failureCount === 2 &&\n      JSON.stringify(res2.results) === JSON.stringify([5, null, 10, null, 15]) &&\n      errorItems.length === 2 &&\n      errorItems[0].item === -5 &&\n      errorItems[1].item === -1,\n    { res2, errorItems }\n  );\n\n  // Case 3: Sequential batch execution: Batch 2 does not start until Batch 1 completes\n  const batchStartedAt = [];\n  let batch1Done = false;\n  let batch2StartedPrematurely = false;\n  await fn(['a', 'b', 'c', 'd'], {\n    batchSize: 2,\n    concurrency: 2,\n    processItem: async (item, idx) => {\n      if (idx >= 2 && !batch1Done) {\n        batch2StartedPrematurely = true;\n      }\n      await new Promise((r) => setTimeout(r, 20));\n      if (idx === 1) batch1Done = true;\n      return item;\n    },\n  });\n\n  $test.check(\n    'Sequential batching waits for each batch to completely finish before starting next batch',\n    !batch2StartedPrematurely,\n    { batch2StartedPrematurely }\n  );\n\n  // Case 4: Empty items array\n  const res4 = await fn([], {\n    batchSize: 10,\n    concurrency: 2,\n    processItem: async (x) => x,\n  });\n\n  $test.check(\n    'Empty input returns zero counts and empty results array',\n    res4.successfulCount === 0 &&\n      res4.failureCount === 0 &&\n      Array.isArray(res4.results) &&\n      res4.results.length === 0,\n    { res4 }\n  );\n})();",
+    "referenceSolution": "const chunkedBatchPipeline = async (items, options) => {\n  const { batchSize, concurrency, processItem, onError } = options;\n  const results = new Array(items.length).fill(null);\n  let successfulCount = 0;\n  let failureCount = 0;\n\n  for (let batchStart = 0; batchStart < items.length; batchStart += batchSize) {\n    const batchEnd = Math.min(batchStart + batchSize, items.length);\n    let nextIndex = batchStart;\n\n    const worker = async () => {\n      while (nextIndex < batchEnd) {\n        const currentIndex = nextIndex++;\n        const item = items[currentIndex];\n        try {\n          const res = await processItem(item, currentIndex);\n          results[currentIndex] = res;\n          successfulCount++;\n        } catch (err) {\n          failureCount++;\n          if (typeof onError === 'function') {\n            onError(item, err instanceof Error ? err : new Error(String(err)), currentIndex);\n          }\n        }\n      }\n    };\n\n    const workerCount = Math.min(concurrency, batchEnd - batchStart);\n    const workers = [];\n    for (let i = 0; i < workerCount; i++) {\n      workers.push(worker());\n    }\n    await Promise.all(workers);\n  }\n\n  return {\n    results,\n    successfulCount,\n    failureCount,\n  };\n};",
+    "referenceSolutionTs": "interface ChunkBatchOptions<T, R> {\n  batchSize: number;\n  concurrency: number;\n  processItem: (item: T, index: number) => Promise<R>;\n  onError?: (item: T, error: Error, index: number) => void;\n}\n\ninterface ChunkBatchResult<R> {\n  results: (R | null)[];\n  successfulCount: number;\n  failureCount: number;\n}\n\nconst chunkedBatchPipeline = async <T, R>(\n  items: T[],\n  options: ChunkBatchOptions<T, R>\n): Promise<ChunkBatchResult<R>> => {\n  const { batchSize, concurrency, processItem, onError } = options;\n  const results: (R | null)[] = new Array(items.length).fill(null);\n  let successfulCount = 0;\n  let failureCount = 0;\n\n  for (let batchStart = 0; batchStart < items.length; batchStart += batchSize) {\n    const batchEnd = Math.min(batchStart + batchSize, items.length);\n    let nextIndex = batchStart;\n\n    const worker = async (): Promise<void> => {\n      while (nextIndex < batchEnd) {\n        const currentIndex = nextIndex++;\n        const item = items[currentIndex];\n        try {\n          const res = await processItem(item, currentIndex);\n          results[currentIndex] = res;\n          successfulCount++;\n        } catch (err) {\n          failureCount++;\n          if (typeof onError === 'function') {\n            onError(item, err instanceof Error ? err : new Error(String(err)), currentIndex);\n          }\n        }\n      }\n    };\n\n    const workerCount = Math.min(concurrency, batchEnd - batchStart);\n    const workers: Promise<void>[] = [];\n    for (let i = 0; i < workerCount; i++) {\n      workers.push(worker());\n    }\n    await Promise.all(workers);\n  }\n\n  return {\n    results,\n    successfulCount,\n    failureCount,\n  };\n};",
+    "testCases": [
+      {
+        "description": "Processes all items preserving index and respecting concurrency limit",
+        "input": "chunkedBatchPipeline([1, 2, 3, 4, 5, 6, 7], { batchSize: 4, concurrency: 2, processItem })",
+        "expected": "{ results: [10, 20, 30, 40, 50, 60, 70], successfulCount: 7, failureCount: 0 }"
+      },
+      {
+        "description": "Failed items record null in results and invoke onError without failing the pipeline",
+        "input": "chunkedBatchPipeline([10, -5, 20, -1, 30], { batchSize: 5, concurrency: 3, processItem, onError })",
+        "expected": "{ results: [5, null, 10, null, 15], successfulCount: 3, failureCount: 2 }"
+      },
+      {
+        "description": "Sequential batching waits for each batch to completely finish before starting next batch",
+        "input": "chunkedBatchPipeline([\"a\", \"b\", \"c\", \"d\"], { batchSize: 2, concurrency: 2, processItem })",
+        "expected": "Batch 2 waits for Batch 1"
+      },
+      {
+        "description": "Empty input returns zero counts and empty results array",
+        "input": "chunkedBatchPipeline([], { batchSize: 10, concurrency: 2, processItem })",
+        "expected": "{ results: [], successfulCount: 0, failureCount: 0 }"
+      }
+    ]
+  },
+  "stream-token-bucket-shaper": {
+    "promptSeed": "Implement a high-performance token-bucket rate limiter and stream shaper:\n\n## Description\n\nThe Token Bucket algorithm is the industry-standard traffic-shaping pattern for streaming architectures, API gateways, and message consumers. Tokens accumulate in a bucket of fixed capacity at a steady refill rate. When events or stream chunks arrive, they must consume tokens. If sufficient tokens are available, the event passes immediately; otherwise, the event waits in a FIFO queue until tokens refill.\n\n```ts\ninterface TokenBucketOptions {\n  capacity: number;\n  refillRate: number;\n  initialTokens?: number;\n}\n\ninterface TokenBucketLimiter {\n  acquire(tokens?: number): Promise<void>;\n  tryAcquire(tokens?: number): boolean;\n  getTokens(): number;\n}\n```\n\n### `createTokenBucket(options: TokenBucketOptions): TokenBucketLimiter`\n\nInstantiates a token-bucket rate limiter with the following parameters and behavior:\n\n- **Parameters**:\n  - `capacity`: Maximum number of tokens the bucket can hold.\n  - `refillRate`: Number of tokens added to the bucket per second (floating-point rate).\n  - `initialTokens`: Initial number of tokens present in the bucket (defaults to `capacity` if omitted).\n- **Continuous Refill**:\n  - Refills tokens continuously based on elapsed time since the last calculation: `added = (now - lastRefill) * (refillRate / 1000)`.\n  - Available tokens can never exceed `capacity`.\n- **`tryAcquire(tokens = 1): boolean`**:\n  - Checks if at least `tokens` are available in the bucket without waiting.\n  - If enough tokens exist and no pending `acquire` requests are waiting in the queue, decrements available tokens and returns `true`.\n  - Otherwise returns `false` immediately without blocking or modifying tokens.\n- **`acquire(tokens = 1): Promise<void>`**:\n  - Returns a Promise that resolves when `tokens` become available and are consumed.\n  - If sufficient tokens are currently available and the wait queue is empty, decrements tokens and resolves immediately.\n  - If insufficient tokens exist (or previous requests are still pending), enqueues the request.\n  - Queued requests **must be resolved strictly in FIFO order** (first arrived, first served) to prevent starvation.\n  - Schedules a timer to re-evaluate and drain queue items as tokens refill over time.\n- **`getTokens(): number`**:\n  - Returns current available tokens after recalculating refill up to the current timestamp.",
+    "testHarness": "await (async () => {\n  const fn = typeof createTokenBucket === 'function' ? createTokenBucket : solution;\n\n  // Case 1: tryAcquire consumes tokens when available and returns false when empty\n  const limiter1 = fn({\n    capacity: 2,\n    refillRate: 10, // 10 tokens / sec = 1 token per 100ms\n    initialTokens: 2,\n  });\n\n  const a1 = limiter1.tryAcquire(1);\n  const a2 = limiter1.tryAcquire(1);\n  const a3 = limiter1.tryAcquire(1);\n\n  $test.check(\n    'tryAcquire consumes available tokens and returns false when exhausted without blocking',\n    a1 === true && a2 === true && a3 === false && limiter1.getTokens() < 1,\n    { a1, a2, a3, tokens: limiter1.getTokens() }\n  );\n\n  // Case 2: acquire resolves after tokens refill\n  const limiter2 = fn({\n    capacity: 2,\n    refillRate: 50, // 50 tokens / sec = 1 token per 20ms\n    initialTokens: 0,\n  });\n\n  const start = Date.now();\n  await limiter2.acquire(1);\n  const elapsed = Date.now() - start;\n\n  $test.check(\n    'acquire waits for sufficient tokens to refill before resolving',\n    elapsed >= 15 && limiter2.getTokens() >= 0,\n    { elapsed, tokens: limiter2.getTokens() }\n  );\n\n  // Case 3: FIFO ordering is strictly preserved among queued acquires\n  const limiter3 = fn({\n    capacity: 2,\n    refillRate: 100, // 100 tokens / sec = 1 token per 10ms\n    initialTokens: 0,\n  });\n\n  const resolutionOrder = [];\n  const p1 = limiter3.acquire(1).then(() => resolutionOrder.push('first'));\n  const p2 = limiter3.acquire(1).then(() => resolutionOrder.push('second'));\n  const p3 = limiter3.acquire(1).then(() => resolutionOrder.push('third'));\n\n  await Promise.all([p1, p2, p3]);\n\n  $test.check(\n    'Multiple queued acquire requests are resolved strictly in FIFO order',\n    resolutionOrder.length === 3 &&\n      resolutionOrder[0] === 'first' &&\n      resolutionOrder[1] === 'second' &&\n      resolutionOrder[2] === 'third',\n    { resolutionOrder }\n  );\n\n  // Case 4: Available tokens cannot exceed capacity ceiling over time\n  const limiter4 = fn({\n    capacity: 3,\n    refillRate: 200,\n    initialTokens: 1,\n  });\n\n  await new Promise((r) => setTimeout(r, 40));\n  const tokensCapped = limiter4.getTokens();\n\n  $test.check(\n    'Refilled tokens are capped at the specified capacity limit',\n    tokensCapped <= 3 && tokensCapped >= 2.9,\n    { tokensCapped }\n  );\n})();",
+    "referenceSolution": "const createTokenBucket = (options) => {\n  const { capacity, refillRate, initialTokens } = options;\n  let tokens = initialTokens !== undefined ? Math.min(capacity, initialTokens) : capacity;\n  let lastRefillTime = Date.now();\n  let timerId = null;\n\n  const queue = [];\n\n  const refill = () => {\n    const now = Date.now();\n    const elapsed = now - lastRefillTime;\n    tokens = Math.min(capacity, tokens + elapsed * (refillRate / 1000));\n    lastRefillTime = now;\n  };\n\n  const scheduleDrain = () => {\n    if (timerId !== null || queue.length === 0) return;\n    refill();\n    const needed = queue[0].tokens - tokens;\n    const waitMs = Math.max(1, Math.ceil((Math.max(0, needed) / refillRate) * 1000));\n    timerId = setTimeout(drainQueue, waitMs);\n  };\n\n  const drainQueue = () => {\n    timerId = null;\n    refill();\n    if (queue.length === 0) return;\n\n    while (queue.length > 0) {\n      const next = queue[0];\n      if (tokens >= next.tokens) {\n        tokens -= next.tokens;\n        queue.shift();\n        next.resolve();\n      } else {\n        scheduleDrain();\n        return;\n      }\n    }\n  };\n\n  return {\n    tryAcquire(requested = 1) {\n      refill();\n      if (queue.length === 0 && tokens >= requested) {\n        tokens -= requested;\n        return true;\n      }\n      return false;\n    },\n\n    acquire(requested = 1) {\n      refill();\n      if (queue.length === 0 && tokens >= requested) {\n        tokens -= requested;\n        return Promise.resolve();\n      }\n\n      return new Promise((resolve) => {\n        queue.push({ tokens: requested, resolve });\n        scheduleDrain();\n      });\n    },\n\n    getTokens() {\n      refill();\n      return tokens;\n    },\n  };\n};",
+    "referenceSolutionTs": "interface TokenBucketOptions {\n  capacity: number;\n  refillRate: number;\n  initialTokens?: number;\n}\n\ninterface TokenBucketLimiter {\n  acquire(tokens?: number): Promise<void>;\n  tryAcquire(tokens?: number): boolean;\n  getTokens(): number;\n}\n\nconst createTokenBucket = (options: TokenBucketOptions): TokenBucketLimiter => {\n  const { capacity, refillRate, initialTokens } = options;\n  let tokens = initialTokens !== undefined ? Math.min(capacity, initialTokens) : capacity;\n  let lastRefillTime = Date.now();\n  let timerId: ReturnType<typeof setTimeout> | null = null;\n\n  interface QueuedRequest {\n    tokens: number;\n    resolve: () => void;\n  }\n\n  const queue: QueuedRequest[] = [];\n\n  const refill = (): void => {\n    const now = Date.now();\n    const elapsed = now - lastRefillTime;\n    tokens = Math.min(capacity, tokens + elapsed * (refillRate / 1000));\n    lastRefillTime = now;\n  };\n\n  const scheduleDrain = (): void => {\n    if (timerId !== null || queue.length === 0) return;\n    refill();\n    const needed = queue[0].tokens - tokens;\n    const waitMs = Math.max(1, Math.ceil((Math.max(0, needed) / refillRate) * 1000));\n    timerId = setTimeout(drainQueue, waitMs);\n  };\n\n  const drainQueue = (): void => {\n    timerId = null;\n    refill();\n    if (queue.length === 0) return;\n\n    while (queue.length > 0) {\n      const next = queue[0];\n      if (tokens >= next.tokens) {\n        tokens -= next.tokens;\n        queue.shift();\n        next.resolve();\n      } else {\n        scheduleDrain();\n        return;\n      }\n    }\n  };\n\n  return {\n    tryAcquire(requested = 1): boolean {\n      refill();\n      if (queue.length === 0 && tokens >= requested) {\n        tokens -= requested;\n        return true;\n      }\n      return false;\n    },\n\n    acquire(requested = 1): Promise<void> {\n      refill();\n      if (queue.length === 0 && tokens >= requested) {\n        tokens -= requested;\n        return Promise.resolve();\n      }\n\n      return new Promise<void>((resolve) => {\n        queue.push({ tokens: requested, resolve });\n        scheduleDrain();\n      });\n    },\n\n    getTokens(): number {\n      refill();\n      return tokens;\n    },\n  };\n};",
+    "testCases": [
+      {
+        "description": "tryAcquire consumes available tokens and returns false when exhausted without blocking",
+        "input": "limiter.tryAcquire(1); limiter.tryAcquire(1); limiter.tryAcquire(1)",
+        "expected": "true, true, false"
+      },
+      {
+        "description": "acquire waits for sufficient tokens to refill before resolving",
+        "input": "await limiter.acquire(1)",
+        "expected": "Resolves after token refill duration"
+      },
+      {
+        "description": "Multiple queued acquire requests are resolved strictly in FIFO order",
+        "input": "limiter.acquire(1); limiter.acquire(1); limiter.acquire(1)",
+        "expected": "[\"first\", \"second\", \"third\"]"
+      },
+      {
+        "description": "Refilled tokens are capped at the specified capacity limit",
+        "input": "limiter.getTokens() after wait",
+        "expected": "<= capacity"
+      }
+    ]
+  },
+  "microtask-batch-scheduler": {
+    "promptSeed": "Implement a microtask batch scheduler that coalesces concurrent synchronous requests into a single batched execution using the native `queueMicrotask` API:\n\n### `createMicrotaskBatcher<T, R>(batchHandler: (items: T[]) => R[] | Promise<R[]>): MicrotaskBatcher<T, R>`\n\n## Description\nHigh-throughput systems (such as UI state dispatchers, logging collectors, and DataLoader caches) frequently receive dozens of individual read or write calls within the same JavaScript execution frame. Triggering individual network requests or database queries for each call creates significant overhead and causes N+1 bottlenecks.\n\nBy deferring execution to the JavaScript **microtask queue** via `queueMicrotask()`, the scheduler allows synchronous code to accumulate multiple items into a buffer, firing a single consolidated batch execution as soon as the synchronous call stack clears, strictly before macrotasks (such as `setTimeout`) or browser render phases run.\n\n```ts\ninterface MicrotaskBatcher<T, R> {\n  schedule(item: T): Promise<R>;\n  flush(): Promise<void>;\n}\n```\n\n## Requirements\n- **Coalescing Execution**: Each call to `schedule(item)` appends the item to an internal batch queue and returns an individual `Promise<R>` representing that item's eventual result.\n- **Microtask Scheduling**:\n  - The first call to `schedule()` in an empty queue schedules a flush on the microtask queue using `queueMicrotask()` (or `Promise.resolve().then()` as fallback).\n  - Subsequent calls in the same synchronous execution tick must NOT schedule redundant microtasks; they join the existing pending batch.\n- **Batch Resolution**:\n  - When the microtask executes, it invokes `batchHandler(items)` once with all collected items in insertion order.\n  - Resolves each individual item's promise with its corresponding result at matching index `results[i]`.\n- **Error Handling**: If `batchHandler` throws synchronously or returns a rejecting promise, all pending promises in that batch must reject with that error.\n- **Manual Flush**: `flush()` immediately drains and processes any currently pending items without waiting for the scheduled microtask tick.\n- **Subsequent Batches**: Once a batch finishes flushing, subsequent calls to `schedule()` initialize a new, independent batch.",
+    "testHarness": "await (async () => {\n  const fn = typeof createMicrotaskBatcher === 'function'\n    ? createMicrotaskBatcher\n    : (typeof solution === 'function' ? solution : solution?.createMicrotaskBatcher);\n\n  if (typeof fn !== 'function') {\n    $test.check('Coalesces multiple synchronous calls into a single batch execution', false, { error: 'createMicrotaskBatcher is not defined as a function' });\n    $test.check('Executes batch on microtask queue strictly before macrotasks fire', false, { error: 'createMicrotaskBatcher is not defined as a function' });\n    $test.check('Propagates batchHandler rejection to all pending promises in the batch', false, { error: 'createMicrotaskBatcher is not defined as a function' });\n    $test.check('Processes subsequent independent batches across separate execution ticks', false, { error: 'createMicrotaskBatcher is not defined as a function' });\n    return;\n  }\n\n  // Case 1: Coalesces multiple synchronous calls into a single batch execution\n  try {\n    let callCount = 0;\n    const batcher = fn(async (items) => {\n      callCount++;\n      return items.map((x) => x * 10);\n    });\n\n    const p1 = batcher.schedule(1);\n    const p2 = batcher.schedule(2);\n    const p3 = batcher.schedule(3);\n\n    const [r1, r2, r3] = await Promise.all([p1, p2, p3]);\n    const singleBatch = callCount === 1 && r1 === 10 && r2 === 20 && r3 === 30;\n\n    $test.check(\n      'Coalesces multiple synchronous calls into a single batch execution',\n      singleBatch,\n      { callCount, results: [r1, r2, r3] }\n    );\n  } catch (err) {\n    $test.check('Coalesces multiple synchronous calls into a single batch execution', false, { error: err?.message || String(err) });\n  }\n\n  // Case 2: Executes batch on microtask queue strictly before macrotasks fire\n  try {\n    const order = [];\n    const batcher = fn((items) => {\n      order.push(`microtask-batch:${items.join(',')}`);\n      return items;\n    });\n\n    setTimeout(() => {\n      order.push('macrotask-timeout');\n    }, 0);\n\n    const p = batcher.schedule('itemA');\n    await p;\n\n    // Wait a brief moment for the macrotask to execute and verify execution precedence\n    await new Promise((resolve) => setTimeout(resolve, 15));\n\n    const microtaskRanFirst =\n      order.length === 2 &&\n      order[0] === 'microtask-batch:itemA' &&\n      order[1] === 'macrotask-timeout';\n\n    $test.check(\n      'Executes batch on microtask queue strictly before macrotasks fire',\n      microtaskRanFirst,\n      { order }\n    );\n  } catch (err) {\n    $test.check('Executes batch on microtask queue strictly before macrotasks fire', false, { error: err?.message || String(err) });\n  }\n\n  // Case 3: Propagates batchHandler rejection to all pending promises in the batch\n  try {\n    const batcher = fn(() => {\n      throw new Error('Database batch failed');\n    });\n\n    const p1 = batcher.schedule('x');\n    const p2 = batcher.schedule('y');\n\n    let err1 = null;\n    let err2 = null;\n\n    try {\n      await p1;\n    } catch (e) {\n      err1 = e;\n    }\n\n    try {\n      await p2;\n    } catch (e) {\n      err2 = e;\n    }\n\n    const bothRejected =\n      err1 !== null &&\n      err2 !== null &&\n      err1.message === 'Database batch failed' &&\n      err2.message === 'Database batch failed';\n\n    $test.check(\n      'Propagates batchHandler rejection to all pending promises in the batch',\n      bothRejected,\n      { err1: err1?.message, err2: err2?.message }\n    );\n  } catch (err) {\n    $test.check('Propagates batchHandler rejection to all pending promises in the batch', false, { error: err?.message || String(err) });\n  }\n\n  // Case 4: Processes subsequent independent batches across separate execution ticks\n  try {\n    const batches = [];\n    const batcher = fn((items) => {\n      batches.push([...items]);\n      return items.map((x) => `processed-${x}`);\n    });\n\n    const firstRun = await Promise.all([batcher.schedule('a'), batcher.schedule('b')]);\n\n    // Delay to allow event loop to clear before scheduling the next batch\n    await new Promise((resolve) => setTimeout(resolve, 10));\n\n    const secondRun = await Promise.all([batcher.schedule('c'), batcher.schedule('d')]);\n\n    const independentBatches =\n      batches.length === 2 &&\n      batches[0].join(',') === 'a,b' &&\n      batches[1].join(',') === 'c,d' &&\n      firstRun.join(',') === 'processed-a,processed-b' &&\n      secondRun.join(',') === 'processed-c,processed-d';\n\n    $test.check(\n      'Processes subsequent independent batches across separate execution ticks',\n      independentBatches,\n      { batches, firstRun, secondRun }\n    );\n  } catch (err) {\n    $test.check('Processes subsequent independent batches across separate execution ticks', false, { error: err?.message || String(err) });\n  }\n})();",
+    "referenceSolution": "function createMicrotaskBatcher(batchHandler) {\n  let queue = [];\n  let isScheduled = false;\n\n  const flush = async () => {\n    if (queue.length === 0) return;\n    const current = queue;\n    queue = [];\n    isScheduled = false;\n\n    const items = current.map((entry) => entry.item);\n    try {\n      const results = await batchHandler(items);\n      current.forEach((entry, idx) => {\n        entry.resolve(results ? results[idx] : undefined);\n      });\n    } catch (err) {\n      current.forEach((entry) => {\n        entry.reject(err);\n      });\n    }\n  };\n\n  const schedule = (item) => {\n    return new Promise((resolve, reject) => {\n      queue.push({ item, resolve, reject });\n      if (!isScheduled) {\n        isScheduled = true;\n        if (typeof queueMicrotask === 'function') {\n          queueMicrotask(flush);\n        } else {\n          Promise.resolve().then(flush);\n        }\n      }\n    });\n  };\n\n  return {\n    schedule,\n    flush,\n  };\n}",
+    "referenceSolutionTs": "interface MicrotaskBatcher<T, R> {\n  schedule(item: T): Promise<R>;\n  flush(): Promise<void>;\n}\n\nfunction createMicrotaskBatcher<T, R>(\n  batchHandler: (items: T[]) => R[] | Promise<R[]>\n): MicrotaskBatcher<T, R> {\n  interface QueueEntry {\n    item: T;\n    resolve: (value: R) => void;\n    reject: (reason?: any) => void;\n  }\n\n  let queue: QueueEntry[] = [];\n  let isScheduled = false;\n\n  const flush = async (): Promise<void> => {\n    if (queue.length === 0) return;\n    const current = queue;\n    queue = [];\n    isScheduled = false;\n\n    const items = current.map((entry) => entry.item);\n    try {\n      const results = await batchHandler(items);\n      current.forEach((entry, idx) => {\n        entry.resolve(results ? results[idx] : (undefined as unknown as R));\n      });\n    } catch (err) {\n      current.forEach((entry) => {\n        entry.reject(err);\n      });\n    }\n  };\n\n  const schedule = (item: T): Promise<R> => {\n    return new Promise<R>((resolve, reject) => {\n      queue.push({ item, resolve, reject });\n      if (!isScheduled) {\n        isScheduled = true;\n        if (typeof queueMicrotask === 'function') {\n          queueMicrotask(flush);\n        } else {\n          Promise.resolve().then(flush);\n        }\n      }\n    });\n  };\n\n  return {\n    schedule,\n    flush,\n  };\n}",
+    "testCases": [
+      {
+        "description": "Coalesces multiple synchronous calls into a single batch execution",
+        "input": "await Promise.all([b.schedule(1), b.schedule(2), b.schedule(3)])",
+        "expected": "[10, 20, 30]"
+      },
+      {
+        "description": "Executes batch on microtask queue strictly before macrotasks fire",
+        "input": "order",
+        "expected": "[\"microtask-batch:itemA\", \"macrotask-timeout\"]"
+      },
+      {
+        "description": "Propagates batchHandler rejection to all pending promises in the batch",
+        "input": "await b.schedule(\"x\")",
+        "expected": "Rejects with Error"
+      },
+      {
+        "description": "Processes subsequent independent batches across separate execution ticks",
+        "input": "batches",
+        "expected": "[[\"a\", \"b\"], [\"c\", \"d\"]]"
+      }
+    ]
+  },
+  "promise-waterfall-pipeline": {
+    "promptSeed": "Implement an asynchronous waterfall pipeline that executes an array of functions in strict sequence, feeding each stage's resolved output as input to the next:\n\n### `promiseWaterfall<T = any>(stages: Array<(value: any) => any>, initialValue: any): Promise<T>`\n\n## Description\nIn data pipelines, ETL workflows, and middleware architectures, tasks frequently depend on the result of the preceding operation. While parallel helpers like `Promise.all` execute tasks concurrently, a waterfall pipeline chains dynamic asynchronous operations sequentially without intermediate boilerplate.\n\nImplement `promiseWaterfall` to build a flat, continuous promise accumulator chain from scratch using `Array.prototype.reduce`.\n\n## Requirements\n- **Sequential Data Flow**: Executes functions in array order. The first function receives `initialValue`; each subsequent function receives the resolved output value of the previous stage.\n- **Synchronous & Asynchronous Support**: Stages may return either a direct synchronous value or a `Promise`. Both are handled transparently.\n- **Empty Pipeline**: If `stages` is an empty array `[]`, resolves immediately with `initialValue`.\n- **Short-Circuit on Error**: If any stage rejects or throws synchronously:\n  - Immediately stop execution.\n  - Reject the returned promise with that error.\n  - Ensure subsequent stages in the pipeline are never invoked.\n- **Preserve Ordering**: Ensure asynchronous delays in individual stages do not interleave or race; each stage only begins execution after the previous stage's promise has resolved.",
+    "testHarness": "await (async () => {\n  const fn = typeof promiseWaterfall === 'function'\n    ? promiseWaterfall\n    : (typeof solution === 'function' ? solution : solution?.promiseWaterfall);\n\n  if (typeof fn !== 'function') {\n    $test.check('Chains synchronous and asynchronous transformations in sequence', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Resolves immediately with initialValue when stages array is empty', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Short-circuits immediately on stage rejection without invoking subsequent stages', false, { error: 'promiseWaterfall is not defined as a function' });\n    $test.check('Preserves strict serial ordering across stages with variable async delays', false, { error: 'promiseWaterfall is not defined as a function' });\n    return;\n  }\n\n  // Case 1: Chains synchronous and asynchronous transformations in sequence\n  try {\n    const stages = [\n      (x) => x + 10,\n      async (x) => new Promise((resolve) => setTimeout(() => resolve(x * 2), 20)),\n      (x) => `Total: ${x}`,\n    ];\n    const result = await fn(stages, 5);\n    $test.check(\n      'Chains synchronous and asynchronous transformations in sequence',\n      result === 'Total: 30',\n      { expected: 'Total: 30', actual: result }\n    );\n  } catch (err) {\n    $test.check('Chains synchronous and asynchronous transformations in sequence', false, { error: err?.message || String(err) });\n  }\n\n  // Case 2: Resolves immediately with initialValue when stages array is empty\n  try {\n    const emptyResult = await fn([], { initialized: true });\n    $test.check(\n      'Resolves immediately with initialValue when stages array is empty',\n      Boolean(emptyResult && emptyResult.initialized === true),\n      emptyResult\n    );\n  } catch (err) {\n    $test.check('Resolves immediately with initialValue when stages array is empty', false, { error: err?.message || String(err) });\n  }\n\n  // Case 3: Short-circuits immediately on stage rejection without invoking subsequent stages\n  try {\n    const trace = [];\n    const errorStages = [\n      (x) => {\n        trace.push('stage1');\n        return x + 1;\n      },\n      () => {\n        trace.push('stage2-fail');\n        throw new Error('Pipeline failed at step 2');\n      },\n      (x) => {\n        trace.push('stage3-should-not-run');\n        return x * 10;\n      },\n    ];\n\n    let caughtError = null;\n    try {\n      await fn(errorStages, 0);\n    } catch (err) {\n      caughtError = err;\n    }\n\n    const shortCircuited =\n      caughtError !== null &&\n      caughtError.message === 'Pipeline failed at step 2' &&\n      trace.length === 2 &&\n      trace.includes('stage1') &&\n      trace.includes('stage2-fail') &&\n      !trace.includes('stage3-should-not-run');\n\n    $test.check(\n      'Short-circuits immediately on stage rejection without invoking subsequent stages',\n      shortCircuited,\n      { trace, error: caughtError?.message }\n    );\n  } catch (err) {\n    $test.check('Short-circuits immediately on stage rejection without invoking subsequent stages', false, { error: err?.message || String(err) });\n  }\n\n  // Case 4: Preserves strict serial ordering across stages with variable async delays\n  try {\n    const executionOrder = [];\n    const delayStages = [\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step1');\n          resolve(val + '-1');\n        }, 30);\n      }),\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step2');\n          resolve(val + '-2');\n        }, 10);\n      }),\n      (val) => new Promise((resolve) => {\n        setTimeout(() => {\n          executionOrder.push('step3');\n          resolve(val + '-3');\n        }, 20);\n      }),\n    ];\n\n    const finalVal = await fn(delayStages, 'start');\n    const correctlyOrdered =\n      finalVal === 'start-1-2-3' &&\n      executionOrder.join(',') === 'step1,step2,step3';\n\n    $test.check(\n      'Preserves strict serial ordering across stages with variable async delays',\n      correctlyOrdered,\n      { finalVal, executionOrder }\n    );\n  } catch (err) {\n    $test.check('Preserves strict serial ordering across stages with variable async delays', false, { error: err?.message || String(err) });\n  }\n})();",
+    "referenceSolution": "function promiseWaterfall(stages, initialValue) {\n  return stages.reduce(\n    (chain, stage) => chain.then((val) => stage(val)),\n    Promise.resolve(initialValue)\n  );\n}",
+    "referenceSolutionTs": "function promiseWaterfall<T = any>(\n  stages: Array<(value: any) => any>,\n  initialValue: any\n): Promise<T> {\n  return stages.reduce(\n    (chain, stage) => chain.then((val) => stage(val)),\n    Promise.resolve(initialValue)\n  );\n}",
+    "testCases": [
+      {
+        "description": "Chains synchronous and asynchronous transformations in sequence",
+        "input": "await promiseWaterfall([(x) => x + 10, async (x) => x * 2, (x) => `Total: ${x}`], 5)",
+        "expected": "\"Total: 30\""
+      },
+      {
+        "description": "Resolves immediately with initialValue when stages array is empty",
+        "input": "await promiseWaterfall([], { initialized: true })",
+        "expected": "{\"initialized\":true}"
+      },
+      {
+        "description": "Short-circuits immediately on stage rejection without invoking subsequent stages",
+        "input": "await promiseWaterfall([fn1, failFn, uncalledFn], 0)",
+        "expected": "Rejects with Error"
+      },
+      {
+        "description": "Preserves strict serial ordering across stages with variable async delays",
+        "input": "await promiseWaterfall([delay30, delay10, delay20], \"start\")",
+        "expected": "\"start-1-2-3\""
+      }
+    ]
+  },
+  "promise-sleep-delay": {
+    "promptSeed": "# Promise Delay & Value Timer\n\n## Description\nA fundamental building block in asynchronous JavaScript is creating a delay timer promise that pauses execution for a given duration. This pattern is foundational for rate limiting, retry backoff pacing, simulated latency, and polling intervals.\n\nImplement two foundational asynchronous utility functions:\n1. `delay(ms)`: returns a `Promise<void>` that resolves after `ms` milliseconds.\n2. `delayValue(value, ms)`: returns a `Promise<T>` that resolves with the provided `value` after `ms` milliseconds.\n\n```ts\nfunction delay(ms: number): Promise<void>;\nfunction delayValue<T>(value: T, ms: number): Promise<T>;\n```\n\n### delay(ms: number): Promise<void>\n\n#### Requirements\n- If `ms` is greater than 0, schedule resolution after `ms` milliseconds using `setTimeout`.\n- If `ms` is less than or equal to 0, or not a positive number, resolve immediately.\n- Returns a `Promise<void>` that resolves to `undefined`.\n\n### delayValue<T>(value: T, ms: number): Promise<T>\n\n#### Requirements\n- Pauses for `ms` milliseconds and resolves with the supplied `value`.\n- If `ms <= 0`, resolves with `value` immediately.",
+    "testHarness": "await (async () => {\n  const dFn = typeof delay === 'function' ? delay : (globalThis as any).delay;\n  const dvFn = typeof delayValue === 'function' ? delayValue : (globalThis as any).delayValue;\n\n  const case1 = 'delay(ms) resolves after specified duration with undefined';\n  const case2 = 'delayValue(value, ms) resolves with given value after timer';\n  const case3 = 'delay handles non-positive values immediately without error';\n  const case4 = 'Chains sequential delays correctly';\n\n  if (typeof dFn !== 'function' || typeof dvFn !== 'function') {\n    $test.check(case1, false, { error: 'delay or delayValue is not defined' });\n    $test.check(case2, false, { error: 'delay or delayValue is not defined' });\n    $test.check(case3, false, { error: 'delay or delayValue is not defined' });\n    $test.check(case4, false, { error: 'delay or delayValue is not defined' });\n    return;\n  }\n\n  // Case 1\n  const t0 = Date.now();\n  const res1 = await dFn(30);\n  const elapsed1 = Date.now() - t0;\n  $test.check(\n    case1,\n    res1 === undefined && elapsed1 >= 20,\n    { elapsed: elapsed1, res: res1 }\n  );\n\n  // Case 2\n  const t1 = Date.now();\n  const res2 = await dvFn('data_payload', 30);\n  const elapsed2 = Date.now() - t1;\n  $test.check(\n    case2,\n    res2 === 'data_payload' && elapsed2 >= 20,\n    { elapsed: elapsed2, res: res2 }\n  );\n\n  // Case 3\n  const t2 = Date.now();\n  const res3A = await dFn(0);\n  const res3B = await dFn(-100);\n  const res3C = await dvFn(42, 0);\n  const elapsed3 = Date.now() - t2;\n  $test.check(\n    case3,\n    res3A === undefined && res3B === undefined && res3C === 42 && elapsed3 < 40,\n    { elapsed: elapsed3, res3C }\n  );\n\n  // Case 4\n  const t3 = Date.now();\n  await dFn(15);\n  const res4 = await dvFn({ ready: true }, 15);\n  const elapsed4 = Date.now() - t3;\n  $test.check(\n    case4,\n    res4 && res4.ready === true && elapsed4 >= 25,\n    { elapsed: elapsed4, res4 }\n  );\n})();",
+    "referenceSolution": "function delay(ms) {\n  const duration = typeof ms === 'number' && ms > 0 ? ms : 0;\n  return new Promise((resolve) => setTimeout(resolve, duration));\n}\n\nfunction delayValue(value, ms) {\n  const duration = typeof ms === 'number' && ms > 0 ? ms : 0;\n  return new Promise((resolve) => setTimeout(() => resolve(value), duration));\n}",
+    "referenceSolutionTs": "function delay(ms: number): Promise<void> {\n  const duration = typeof ms === 'number' && ms > 0 ? ms : 0;\n  return new Promise<void>((resolve) => setTimeout(resolve, duration));\n}\n\nfunction delayValue<T>(value: T, ms: number): Promise<T> {\n  const duration = typeof ms === 'number' && ms > 0 ? ms : 0;\n  return new Promise<T>((resolve) => setTimeout(() => resolve(value), duration));\n}",
+    "testCases": [
+      {
+        "description": "delay(ms) resolves after specified duration with undefined",
+        "input": "await delay(30)",
+        "expected": "resolves undefined after >= 20ms"
+      },
+      {
+        "description": "delayValue(value, ms) resolves with given value after timer",
+        "input": "await delayValue(\"data_payload\", 30)",
+        "expected": "\"data_payload\""
+      },
+      {
+        "description": "delay handles non-positive values immediately without error",
+        "input": "await delay(0); await delay(-100); await delayValue(42, 0)",
+        "expected": "resolves immediately with 42"
+      },
+      {
+        "description": "Chains sequential delays correctly",
+        "input": "await delay(15); await delayValue({ ready: true }, 15)",
+        "expected": "{ ready: true }"
+      }
+    ]
+  },
+  "promise-timeout-reject": {
+    "promptSeed": "### `promiseTimeout(promise: Promise<T>, ms: number, message?: string): Promise<T>`\n\n## Description\n\n```ts\nfunction promiseTimeout<T>(\n  promise: Promise<T>,\n  ms: number,\n  message?: string\n): Promise<T>;\n```\n\nWrap an asynchronous promise with a strict timeout deadline. If the wrapped promise settles (fulfills or rejects) before `ms` milliseconds elapse, settle with its outcome. If `ms` milliseconds pass before the promise settles, reject with an `Error`.\n\n### Requirements\n- **Settles Before Timeout**:\n  - If `promise` fulfills before `ms` milliseconds, fulfill with its resolved value.\n  - If `promise` rejects before `ms` milliseconds, reject with its original rejection reason.\n  - Clear the scheduled timeout timer using `clearTimeout` upon settlement to avoid dangling handles.\n- **Exceeds Timeout**:\n  - If `ms` milliseconds elapse before `promise` settles, reject with `new Error(message || 'Operation timed out')`.\n- **Default Message**:\n  - The fallback message must default to `'Operation timed out'`.\n\n### Example\n```ts\nconst fetchFast = promiseTimeout(fetchData(), 500);\n// Resolves if fetchData() completes within 500ms\n\nconst fetchSlow = promiseTimeout(fetchData(), 100, 'Network request timed out');\n// Rejects with Error('Network request timed out') if > 100ms\n```",
+    "testHarness": "await (async () => {\n  const fn = typeof promiseTimeout === 'function' ? promiseTimeout : (typeof globalThis !== 'undefined' ? globalThis.promiseTimeout : undefined);\n\n  const case1 = 'Resolves with the promise value when fulfilled before timeout';\n  const case2 = 'Rejects with the original error when promise rejects before timeout';\n  const case3 = 'Rejects with default Error(\"Operation timed out\") when duration exceeds timeout';\n  const case4 = 'Rejects with custom error message when specified upon timeout';\n\n  if (typeof fn !== 'function') {\n    $test.check(case1, false, { error: 'promiseTimeout is not defined' });\n    $test.check(case2, false, { error: 'promiseTimeout is not defined' });\n    $test.check(case3, false, { error: 'promiseTimeout is not defined' });\n    $test.check(case4, false, { error: 'promiseTimeout is not defined' });\n    return;\n  }\n\n  // Case 1: Fast resolve before timeout\n  try {\n    const quickPromise = new Promise((resolve) => setTimeout(() => resolve('success-val'), 10));\n    const result1 = await fn(quickPromise, 80);\n    $test.check(case1, result1 === 'success-val', { result: result1 });\n  } catch (err) {\n    $test.check(case1, false, { error: err && err.message });\n  }\n\n  // Case 2: Fast reject before timeout\n  try {\n    const failPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Network failure')), 10));\n    failPromise.catch(() => {});\n    let caught2 = null;\n    try {\n      await fn(failPromise, 80);\n    } catch (err) {\n      caught2 = err;\n    }\n    const pass2 = caught2 instanceof Error && caught2.message === 'Network failure';\n    $test.check(case2, Boolean(pass2), { message: caught2 && caught2.message });\n  } catch (err) {\n    $test.check(case2, false, { error: err && err.message });\n  }\n\n  // Case 3: Slow promise exceeds timeout with default error message\n  try {\n    const slowPromise = new Promise((resolve) => setTimeout(() => resolve('too-late'), 100));\n    slowPromise.catch(() => {});\n    let caught3 = null;\n    try {\n      await fn(slowPromise, 20);\n    } catch (err) {\n      caught3 = err;\n    }\n    const pass3 = caught3 instanceof Error && caught3.message === 'Operation timed out';\n    $test.check(case3, Boolean(pass3), { message: caught3 && caught3.message });\n  } catch (err) {\n    $test.check(case3, false, { error: err && err.message });\n  }\n\n  // Case 4: Slow promise exceeds timeout with custom error message\n  try {\n    const slowPromise2 = new Promise((resolve) => setTimeout(() => resolve('too-late'), 100));\n    slowPromise2.catch(() => {});\n    let caught4 = null;\n    try {\n      await fn(slowPromise2, 20, 'Gateway request timed out');\n    } catch (err) {\n      caught4 = err;\n    }\n    const pass4 = caught4 instanceof Error && caught4.message === 'Gateway request timed out';\n    $test.check(case4, Boolean(pass4), { message: caught4 && caught4.message });\n  } catch (err) {\n    $test.check(case4, false, { error: err && err.message });\n  }\n})();",
+    "referenceSolution": "function promiseTimeout(promise, ms, message = 'Operation timed out') {\n  return new Promise((resolve, reject) => {\n    const timer = setTimeout(() => {\n      reject(new Error(message));\n    }, ms);\n\n    promise\n      .then((val) => {\n        clearTimeout(timer);\n        resolve(val);\n      })\n      .catch((err) => {\n        clearTimeout(timer);\n        reject(err);\n      });\n  });\n}",
+    "referenceSolutionTs": "function promiseTimeout<T>(\n  promise: Promise<T>,\n  ms: number,\n  message: string = 'Operation timed out'\n): Promise<T> {\n  return new Promise<T>((resolve, reject) => {\n    const timer = setTimeout(() => {\n      reject(new Error(message));\n    }, ms);\n\n    promise\n      .then((val) => {\n        clearTimeout(timer);\n        resolve(val);\n      })\n      .catch((err) => {\n        clearTimeout(timer);\n        reject(err);\n      });\n  });\n}",
+    "testCases": [
+      {
+        "description": "Resolves with the promise value when fulfilled before timeout",
+        "input": "promiseTimeout(resolveAfter(10, \"ok\"), 80)",
+        "expected": "\"ok\""
+      },
+      {
+        "description": "Rejects with the original error when promise rejects before timeout",
+        "input": "promiseTimeout(rejectAfter(10, new Error(\"err\")), 80)",
+        "expected": "rejects with Error(\"err\")"
+      },
+      {
+        "description": "Rejects with default Error(\"Operation timed out\") when duration exceeds timeout",
+        "input": "promiseTimeout(resolveAfter(100), 20)",
+        "expected": "rejects with Error(\"Operation timed out\")"
+      },
+      {
+        "description": "Rejects with custom error message when specified upon timeout",
+        "input": "promiseTimeout(resolveAfter(100), 20, \"Gateway request timed out\")",
+        "expected": "rejects with Error(\"Gateway request timed out\")"
+      }
+    ]
+  }
+}

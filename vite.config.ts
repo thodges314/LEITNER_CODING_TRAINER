@@ -28,9 +28,6 @@ export default defineConfig({
     rolldownOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('src/data/topics.json')) {
-            return 'seed-topics';
-          }
           if (
             id.includes('node_modules/@codemirror/view') ||
             id.includes('node_modules/@codemirror/state') ||

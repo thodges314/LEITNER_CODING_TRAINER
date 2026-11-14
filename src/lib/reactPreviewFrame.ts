@@ -1,6 +1,35 @@
-import { REACT_PREVIEW_BUNDLE, D3_PREVIEW_BUNDLE } from './reactPreviewBundle';
 import { getThemeColors } from '../styles/colors';
 import { getCardPreviewConfig, type CardPreviewConfig } from './previewConfig';
+
+let cachedReactBundle: string | null = null;
+let cachedD3Bundle: string | null = null;
+
+export function arePreviewBundlesLoaded(libraries: string[]): boolean {
+  if (libraries.includes('react') && cachedReactBundle === null) return false;
+  if (libraries.includes('d3') && cachedD3Bundle === null) return false;
+  return true;
+}
+
+export async function ensurePreviewBundlesLoaded(libraries: string[]): Promise<void> {
+  const tasks: Promise<void>[] = [];
+  if (libraries.includes('react') && cachedReactBundle === null) {
+    tasks.push(
+      import('./reactPreviewBundle').then((m) => {
+        cachedReactBundle = m.REACT_PREVIEW_BUNDLE;
+      })
+    );
+  }
+  if (libraries.includes('d3') && cachedD3Bundle === null) {
+    tasks.push(
+      import('./d3PreviewBundle').then((m) => {
+        cachedD3Bundle = m.D3_PREVIEW_BUNDLE;
+      })
+    );
+  }
+  if (tasks.length > 0) {
+    await Promise.all(tasks);
+  }
+}
 
 export interface CardThemeColors {
   border: string;
@@ -327,12 +356,12 @@ export function createPreviewSrcDoc(
   if (config.libraries.includes('tailwind')) {
     libScripts.push('  <script src="https://cdn.tailwindcss.com"></script>');
   }
-  if (config.libraries.includes('d3')) {
-    const safeD3 = D3_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
+  if (config.libraries.includes('d3') && cachedD3Bundle) {
+    const safeD3 = cachedD3Bundle.replace(/<\/script/gi, '<\\/script');
     libScripts.push(`  <script>${safeD3}</script>`);
   }
-  if (config.libraries.includes('react')) {
-    const safeReact = REACT_PREVIEW_BUNDLE.replace(/<\/script/gi, '<\\/script');
+  if (config.libraries.includes('react') && cachedReactBundle) {
+    const safeReact = cachedReactBundle.replace(/<\/script/gi, '<\\/script');
     libScripts.push(`  <script>${safeReact}</script>`);
   }
 

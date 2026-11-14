@@ -1,0 +1,7950 @@
+[
+  {
+    "id": "async-fetch-error-handling",
+    "track": "async-js",
+    "title": "Fetch with Async/Await & HTTP Error Handling",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "fetch",
+      "async-await",
+      "promises"
+    ],
+    "difficulty": 2,
+    "concept": "fetch"
+  },
+  {
+    "id": "promise-chaining-syntax",
+    "track": "async-js",
+    "title": "Promise Chaining without Async/Await",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "promises",
+      "then",
+      "catch"
+    ],
+    "difficulty": 2,
+    "concept": "promise"
+  },
+  {
+    "id": "promise-all-vs-settled",
+    "track": "async-js",
+    "title": "Parallel Network Requests (allSettled)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "promises",
+      "concurrency"
+    ],
+    "difficulty": 2,
+    "concept": "promise-combinators"
+  },
+  {
+    "id": "fetch-abort-controller",
+    "track": "async-js",
+    "title": "Request Cancellation via AbortController",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "fetch",
+      "abort-controller",
+      "cancellation"
+    ],
+    "difficulty": 3,
+    "concept": "fetch"
+  },
+  {
+    "id": "debounce-implementation",
+    "track": "js-utilities",
+    "title": "Debounce Function Implementation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "closures",
+      "debounce",
+      "timers"
+    ],
+    "difficulty": 2,
+    "concept": "rate-limiting"
+  },
+  {
+    "id": "throttle-implementation",
+    "track": "js-utilities",
+    "title": "Throttle Function Implementation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "closures",
+      "throttle",
+      "timers"
+    ],
+    "difficulty": 2,
+    "concept": "rate-limiting"
+  },
+  {
+    "id": "map-frequency-counter",
+    "track": "js-utilities",
+    "title": "Frequency Counter via Native Map",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "map",
+      "frequency-counter"
+    ],
+    "difficulty": 1,
+    "concept": "collections"
+  },
+  {
+    "id": "set-unique-operations",
+    "track": "js-utilities",
+    "title": "Set Operations & Array Deduplication",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "set",
+      "dedup",
+      "intersection"
+    ],
+    "difficulty": 1,
+    "concept": "collections"
+  },
+  {
+    "id": "array-flatten-recursive",
+    "track": "js-utilities",
+    "title": "Recursive Array Flattening",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "recursion",
+      "arrays"
+    ],
+    "difficulty": 2,
+    "concept": "flatten"
+  },
+  {
+    "id": "custom-array-reduce",
+    "track": "js-utilities",
+    "title": "Custom Array.prototype.reduce",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "arrays",
+      "prototypes",
+      "reduce"
+    ],
+    "difficulty": 2,
+    "concept": "array-polyfills"
+  },
+  {
+    "id": "object-deep-clone",
+    "track": "js-utilities",
+    "title": "Deep Clone of Plain Objects",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "objects",
+      "recursion",
+      "cloning"
+    ],
+    "difficulty": 2,
+    "concept": "equality-clone"
+  },
+  {
+    "id": "lru-cache-implementation",
+    "track": "js-utilities",
+    "title": "LRU Cache Implementation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "lru",
+      "cache",
+      "map"
+    ],
+    "difficulty": 3,
+    "concept": "lru"
+  },
+  {
+    "id": "controlled-vs-uncontrolled-input",
+    "track": "react",
+    "title": "Controlled Search Form",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "forms",
+      "controlled-inputs"
+    ],
+    "difficulty": 1,
+    "concept": "react-forms",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "hook-use-previous",
+    "track": "react",
+    "title": "usePrevious Hook via useRef",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "custom-hooks",
+      "useref"
+    ],
+    "difficulty": 1,
+    "concept": "react-hooks-utility",
+    "requiresDom": true
+  },
+  {
+    "id": "use-reducer-todo-list",
+    "track": "react",
+    "title": "Complex State with useReducer",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "usereducer",
+      "state"
+    ],
+    "difficulty": 2,
+    "concept": "reducer",
+    "requiresDom": true
+  },
+  {
+    "id": "context-provider-consumer",
+    "track": "react",
+    "title": "React Context Provider with Custom Hook",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "context"
+    ],
+    "difficulty": 2,
+    "concept": "context",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "two-pointer-sorted-sum",
+    "track": "algorithms",
+    "title": "Two-Pointer Sorted Pair Sum",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "algorithms",
+      "two-pointers"
+    ],
+    "difficulty": 2,
+    "concept": "two-pointer"
+  },
+  {
+    "id": "sliding-window-fixed",
+    "track": "algorithms",
+    "title": "Maximum Sum Subarray of Size K",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "algorithms",
+      "sliding-window"
+    ],
+    "difficulty": 2,
+    "concept": "sliding-window"
+  },
+  {
+    "id": "valid-parentheses-stack",
+    "track": "algorithms",
+    "title": "Valid Parentheses via Stack",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "algorithms",
+      "stack"
+    ],
+    "difficulty": 2,
+    "concept": "stack"
+  },
+  {
+    "id": "binary-search-exact",
+    "track": "algorithms",
+    "title": "Binary Search Implementation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "algorithms",
+      "binary-search"
+    ],
+    "difficulty": 2,
+    "concept": "binary-search"
+  },
+  {
+    "id": "merge-intervals",
+    "track": "algorithms",
+    "title": "Merge Overlapping Intervals",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "algorithms",
+      "intervals",
+      "sorting"
+    ],
+    "difficulty": 3,
+    "concept": "intervals"
+  },
+  {
+    "id": "debounce",
+    "track": "js-utilities",
+    "title": "Debounce with Cancel and Flush",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "closures",
+      "timers",
+      "this-binding"
+    ],
+    "difficulty": 3,
+    "concept": "rate-limiting"
+  },
+  {
+    "id": "throttle",
+    "track": "js-utilities",
+    "title": "Throttle with Leading/Trailing Options",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "closures",
+      "timers",
+      "rate-limiting"
+    ],
+    "difficulty": 3,
+    "concept": "rate-limiting"
+  },
+  {
+    "id": "memoize",
+    "track": "js-utilities",
+    "title": "Memoize with Custom Key Resolver",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "closures",
+      "caching",
+      "map"
+    ],
+    "difficulty": 2,
+    "concept": "memoize"
+  },
+  {
+    "id": "bind-call-apply",
+    "track": "js-language",
+    "title": "Function.prototype bind / call / apply Polyfills",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "this-binding",
+      "prototype",
+      "polyfill"
+    ],
+    "difficulty": 4,
+    "concept": "this-binding"
+  },
+  {
+    "id": "deep-clone",
+    "track": "js-utilities",
+    "title": "Deep Clone with Cycles",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "recursion",
+      "weakmap",
+      "types"
+    ],
+    "difficulty": 4,
+    "concept": "equality-clone"
+  },
+  {
+    "id": "event-emitter",
+    "track": "js-utilities",
+    "title": "Event Emitter (on / off / once / emit)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "pub-sub",
+      "typescript",
+      "generics"
+    ],
+    "difficulty": 3,
+    "concept": "emitter"
+  },
+  {
+    "id": "curry-compose",
+    "track": "js-utilities",
+    "title": "Curry and Compose/Pipe",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "functional",
+      "closures",
+      "arity"
+    ],
+    "difficulty": 2,
+    "concept": "currying"
+  },
+  {
+    "id": "promise-all-polyfill",
+    "track": "async-js",
+    "title": "Promise.all / allSettled / race Polyfills",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "promises",
+      "polyfill",
+      "concurrency"
+    ],
+    "difficulty": 3,
+    "concept": "promise-combinators"
+  },
+  {
+    "id": "promise-pool",
+    "track": "async-js",
+    "title": "Concurrency-Limited Promise Pool",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "concurrency",
+      "queue",
+      "async"
+    ],
+    "difficulty": 4,
+    "concept": "async-control"
+  },
+  {
+    "id": "retry-with-backoff",
+    "track": "async-js",
+    "title": "Retry with Exponential Backoff and Abort",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "async",
+      "abortcontroller",
+      "fetch"
+    ],
+    "difficulty": 3,
+    "concept": "async-control"
+  },
+  {
+    "id": "fetch-timeout-dedupe",
+    "track": "async-js",
+    "title": "Fetch with Timeout and In-Flight Deduplication",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "fetch",
+      "dedupe",
+      "abortcontroller"
+    ],
+    "difficulty": 4,
+    "concept": "fetch"
+  },
+  {
+    "id": "async-queue-scheduler",
+    "track": "async-js",
+    "title": "Sequential Async Task Queue",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "queue",
+      "promises",
+      "ordering"
+    ],
+    "difficulty": 3,
+    "concept": "async-control"
+  },
+  {
+    "id": "express-middleware-chain",
+    "track": "async-js",
+    "title": "Express-Style Middleware Pipeline",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "middleware",
+      "composition"
+    ],
+    "difficulty": 4,
+    "concept": "middleware"
+  },
+  {
+    "id": "rate-limiter-middleware",
+    "track": "js-utilities",
+    "title": "In-Memory Rate Limiter Middleware",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "rate-limiting",
+      "token-bucket"
+    ],
+    "difficulty": 4,
+    "concept": "rate-limiting"
+  },
+  {
+    "id": "lru-cache-ttl",
+    "track": "js-utilities",
+    "title": "LRU Cache with TTL",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "cache",
+      "map",
+      "ttl",
+      "data-structures"
+    ],
+    "difficulty": 4,
+    "concept": "lru"
+  },
+  {
+    "id": "flatten-array-object",
+    "track": "js-utilities",
+    "title": "Flatten Nested Arrays and Objects",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "recursion",
+      "arrays",
+      "objects"
+    ],
+    "difficulty": 3,
+    "concept": "flatten"
+  },
+  {
+    "id": "group-by-count-by",
+    "track": "js-utilities",
+    "title": "groupBy / countBy / keyBy with reduce",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "reduce",
+      "aggregation",
+      "objects"
+    ],
+    "difficulty": 2,
+    "concept": "collections"
+  },
+  {
+    "id": "array-method-polyfills",
+    "track": "js-utilities",
+    "title": "Array map / filter / reduce Polyfills",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "polyfill",
+      "arrays",
+      "sparse"
+    ],
+    "difficulty": 3,
+    "concept": "array-polyfills"
+  },
+  {
+    "id": "get-set-path",
+    "track": "js-utilities",
+    "title": "Safe get / set by Path",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "objects",
+      "parsing",
+      "lodash"
+    ],
+    "difficulty": 3,
+    "concept": "collections"
+  },
+  {
+    "id": "deep-equal",
+    "track": "js-utilities",
+    "title": "Deep Equality Comparison",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "recursion",
+      "equality",
+      "edge-cases"
+    ],
+    "difficulty": 4,
+    "concept": "equality-clone"
+  },
+  {
+    "id": "unique-sort-dedupe",
+    "track": "js-utilities",
+    "title": "Immutable Dedupe and Multi-Key Sort",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sorting",
+      "immutability",
+      "stability"
+    ],
+    "difficulty": 2,
+    "concept": "collections"
+  },
+  {
+    "id": "use-debounce-hook",
+    "track": "react",
+    "title": "useDebounce and useThrottle Hooks",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "effects",
+      "cleanup"
+    ],
+    "difficulty": 3,
+    "concept": "react-hooks-utility",
+    "requiresDom": true
+  },
+  {
+    "id": "use-fetch-hook",
+    "track": "react",
+    "title": "useFetch with Race-Condition Safety",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "fetch",
+      "abortcontroller",
+      "race-conditions"
+    ],
+    "difficulty": 3,
+    "concept": "react-fetch",
+    "requiresDom": true
+  },
+  {
+    "id": "typeahead-autocomplete",
+    "track": "react-components",
+    "title": "Typeahead / Autocomplete Component",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "components",
+      "debounce",
+      "keyboard",
+      "a11y"
+    ],
+    "difficulty": 4,
+    "concept": "typeahead",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "use-previous-latest-ref",
+    "track": "react",
+    "title": "usePrevious, useLatest, and useInterval",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "refs",
+      "stale-closures"
+    ],
+    "difficulty": 3,
+    "concept": "react-hooks-utility",
+    "requiresDom": true
+  },
+  {
+    "id": "infinite-scroll-list",
+    "track": "react-components",
+    "title": "Infinite Scroll with IntersectionObserver",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "components",
+      "intersection-observer",
+      "pagination"
+    ],
+    "difficulty": 3,
+    "concept": "infinite-scroll",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "modal-portal-focus",
+    "track": "react-components",
+    "title": "Accessible Modal with Portal and Focus Trap",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "portal",
+      "a11y",
+      "focus",
+      "events"
+    ],
+    "difficulty": 4,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "todo-list-reducer",
+    "track": "react",
+    "title": "Todo List State: Reducer + Selectors",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "useReducer",
+      "state",
+      "immutability",
+      "keys"
+    ],
+    "difficulty": 3,
+    "concept": "reducer",
+    "requiresDom": true
+  },
+  {
+    "id": "tabs-accordion-compound",
+    "track": "react-components",
+    "title": "Compound Components (Tabs)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "context",
+      "composition",
+      "a11y",
+      "typescript"
+    ],
+    "difficulty": 3,
+    "concept": "compound",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "two-sum-hashmap",
+    "track": "algorithms",
+    "title": "Two Sum and Hash-Map Lookups",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "hashmap",
+      "arrays",
+      "complexity"
+    ],
+    "difficulty": 1,
+    "concept": "hashing"
+  },
+  {
+    "id": "tree-traversal-dom",
+    "track": "algorithms",
+    "title": "DOM / Tree Traversal (BFS, DFS, getElementsByClassName)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "trees",
+      "recursion",
+      "dom",
+      "bfs-dfs"
+    ],
+    "difficulty": 4,
+    "concept": "trees"
+  },
+  {
+    "id": "ts-discriminated-unions-exhaustiveness",
+    "track": "typescript-patterns",
+    "title": "Discriminated Unions & Exhaustiveness Checking",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "discriminated-unions",
+      "never",
+      "type-narrowing"
+    ],
+    "difficulty": 3,
+    "concept": "ts-unions"
+  },
+  {
+    "id": "ts-generic-api-client",
+    "track": "typescript-patterns",
+    "title": "Generic Fetch Client with Typed Payloads",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "generics",
+      "fetch",
+      "promises"
+    ],
+    "difficulty": 3,
+    "concept": "ts-generics"
+  },
+  {
+    "id": "ts-custom-utility-types",
+    "track": "typescript-patterns",
+    "title": "Custom Utility Types (DeepPartial & PickByType)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "generics",
+      "utility-types",
+      "conditional-types"
+    ],
+    "difficulty": 4,
+    "concept": "ts-types"
+  },
+  {
+    "id": "ts-generic-component-props",
+    "track": "typescript-patterns",
+    "title": "Generic React Component Props (Generic Select<T>)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "react",
+      "generics",
+      "props"
+    ],
+    "difficulty": 2,
+    "concept": "ts-generics"
+  },
+  {
+    "id": "ts-custom-type-guards",
+    "track": "typescript-patterns",
+    "title": "Custom User-Defined Type Guards (isRecord, isError)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "typescript",
+      "type-guards",
+      "narrowing"
+    ],
+    "difficulty": 2,
+    "concept": "ts-narrowing"
+  },
+  {
+    "id": "ts-typed-event-emitter",
+    "track": "typescript-patterns",
+    "title": "Strictly Typed Event Emitter Map",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "generics",
+      "mapped-types",
+      "pub-sub"
+    ],
+    "difficulty": 3,
+    "concept": "ts-generics"
+  },
+  {
+    "id": "classnames-utility",
+    "track": "js-utilities",
+    "title": "classNames / clsx Utility",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "css",
+      "classnames",
+      "recursion",
+      "utility"
+    ],
+    "difficulty": 1,
+    "concept": "string-utils"
+  },
+  {
+    "id": "closures-private-state",
+    "track": "js-language",
+    "title": "Closures: Private State, once, and Loop Capture",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "closures",
+      "scope",
+      "encapsulation",
+      "once"
+    ],
+    "difficulty": 2,
+    "concept": "closures"
+  },
+  {
+    "id": "css-specificity",
+    "track": "dom-browser",
+    "title": "CSS Selector Specificity Calculator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "css",
+      "specificity",
+      "regex",
+      "parsing"
+    ],
+    "difficulty": 3,
+    "concept": "css",
+    "requiresDom": true
+  },
+  {
+    "id": "format-utilities",
+    "track": "js-utilities",
+    "title": "Formatting: Numbers, Bytes, Relative Time, Truncate",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "formatting",
+      "intl",
+      "dates",
+      "strings"
+    ],
+    "difficulty": 2,
+    "concept": "string-utils"
+  },
+  {
+    "id": "infinite-currying-sum",
+    "track": "js-utilities",
+    "title": "Infinite Currying: sum(1)(2)(3)()",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "currying",
+      "closures",
+      "valueOf",
+      "functional"
+    ],
+    "difficulty": 3,
+    "concept": "currying"
+  },
+  {
+    "id": "iterators-generators",
+    "track": "js-language",
+    "title": "Iterators and Generators",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "generator",
+      "iterator",
+      "symbol.iterator",
+      "lazy"
+    ],
+    "difficulty": 3,
+    "concept": "iterators"
+  },
+  {
+    "id": "json-stringify-polyfill",
+    "track": "js-utilities",
+    "title": "JSON.stringify Polyfill",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "json",
+      "recursion",
+      "serialization",
+      "edge-cases"
+    ],
+    "difficulty": 4,
+    "concept": "serialization"
+  },
+  {
+    "id": "new-instanceof-create",
+    "track": "js-language",
+    "title": "Implement new, instanceof and Object.create",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "prototype",
+      "new",
+      "instanceof",
+      "object.create"
+    ],
+    "difficulty": 4,
+    "concept": "this-binding"
+  },
+  {
+    "id": "promise-class-scratch",
+    "track": "async-js",
+    "title": "Promise Class from Scratch",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "promise",
+      "thenable",
+      "microtask",
+      "chaining"
+    ],
+    "difficulty": 5,
+    "concept": "promise"
+  },
+  {
+    "id": "promisify-callback",
+    "track": "async-js",
+    "title": "promisify: Callback API to Promise",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "promisify",
+      "callbacks",
+      "node-style",
+      "this"
+    ],
+    "difficulty": 2,
+    "concept": "promise"
+  },
+  {
+    "id": "query-string-url",
+    "track": "js-utilities",
+    "title": "Query String Parse / Stringify",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "url",
+      "query-string",
+      "encoding",
+      "parsing"
+    ],
+    "difficulty": 2,
+    "concept": "string-utils"
+  },
+  {
+    "id": "client-side-router",
+    "track": "dom-browser",
+    "title": "Client-Side Router with Params and History",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "router",
+      "history",
+      "params",
+      "url"
+    ],
+    "difficulty": 4,
+    "concept": "router",
+    "requiresDom": true
+  },
+  {
+    "id": "event-delegation",
+    "track": "dom-browser",
+    "title": "Event Delegation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dom",
+      "events",
+      "bubbling",
+      "closest"
+    ],
+    "difficulty": 2,
+    "concept": "dom",
+    "requiresDom": true
+  },
+  {
+    "id": "storage-ttl-wrapper",
+    "track": "dom-browser",
+    "title": "localStorage Wrapper with TTL and Namespacing",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "localstorage",
+      "json",
+      "ttl",
+      "error-handling"
+    ],
+    "difficulty": 3,
+    "concept": "storage",
+    "requiresDom": true
+  },
+  {
+    "id": "vnode-to-dom",
+    "track": "dom-browser",
+    "title": "Render a Virtual Node Tree to the DOM",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dom",
+      "virtual-dom",
+      "createElement",
+      "rendering"
+    ],
+    "difficulty": 3,
+    "concept": "dom",
+    "previewLibraries": [],
+    "rendersComponent": true,
+    "requiresDom": true
+  },
+  {
+    "id": "error-boundary-reset",
+    "track": "react-components",
+    "title": "Error Boundary with Reset",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "error-boundary",
+      "class-component",
+      "resilience",
+      "resetKeys"
+    ],
+    "difficulty": 3,
+    "concept": "resilience",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "external-store-hook",
+    "track": "react",
+    "title": "External Store with useSyncExternalStore",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "state-management",
+      "useSyncExternalStore",
+      "selectors"
+    ],
+    "difficulty": 4,
+    "concept": "state-management",
+    "requiresDom": true
+  },
+  {
+    "id": "forward-ref-imperative-handle",
+    "track": "react",
+    "title": "forwardRef and useImperativeHandle",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "refs",
+      "forwardRef",
+      "useImperativeHandle",
+      "api-design"
+    ],
+    "difficulty": 3,
+    "concept": "refs",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "memo-stable-callbacks",
+    "track": "react",
+    "title": "React.memo and Stable Callbacks",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "performance",
+      "memo",
+      "useCallback",
+      "re-renders"
+    ],
+    "difficulty": 3,
+    "concept": "react-perf",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "on-click-outside-hook",
+    "track": "react",
+    "title": "useOnClickOutside Hook",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "events",
+      "refs",
+      "cleanup"
+    ],
+    "difficulty": 3,
+    "concept": "react-hooks-utility",
+    "requiresDom": true
+  },
+  {
+    "id": "use-local-storage-hook",
+    "track": "react",
+    "title": "useLocalStorage Hook",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "localstorage",
+      "storage-event",
+      "sync"
+    ],
+    "difficulty": 3,
+    "concept": "react-hooks-utility",
+    "requiresDom": true
+  },
+  {
+    "id": "bind-method-partial",
+    "track": "js-language",
+    "title": "Losing and Keeping this: bindMethod and partial",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "this",
+      "bind",
+      "partial-application",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "this-binding"
+  },
+  {
+    "id": "callback-emitter",
+    "track": "js-utilities",
+    "title": "Tiny Event Emitter (on / emit)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "events",
+      "callbacks",
+      "observer",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "emitter"
+  },
+  {
+    "id": "fifo-cache",
+    "track": "js-utilities",
+    "title": "Fixed-Size Cache (evict oldest)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "cache",
+      "map",
+      "eviction",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "lru"
+  },
+  {
+    "id": "focus-on-mount",
+    "track": "react",
+    "title": "Focus an Input on Mount (useRef + useEffect)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "refs",
+      "useEffect",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "refs",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "interval-overlap",
+    "track": "algorithms",
+    "title": "Do Two Intervals Overlap?",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "intervals",
+      "arrays",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "intervals"
+  },
+  {
+    "id": "memoize-basics",
+    "track": "js-utilities",
+    "title": "Memoize a Single-Argument Function",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "memoize",
+      "cache",
+      "map",
+      "closures"
+    ],
+    "difficulty": 1,
+    "concept": "memoize"
+  },
+  {
+    "id": "parse-path-params",
+    "track": "dom-browser",
+    "title": "Parse Path Params from a URL Pattern",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "router",
+      "url",
+      "params",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "router",
+    "requiresDom": true
+  },
+  {
+    "id": "parse-style-string",
+    "track": "dom-browser",
+    "title": "Parse and Build Inline Style Strings",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "css",
+      "strings",
+      "parsing",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "css",
+    "requiresDom": true
+  },
+  {
+    "id": "run-in-sequence",
+    "track": "async-js",
+    "title": "Run Async Tasks in Sequence and in Parallel",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "async-await",
+      "promises",
+      "sequencing",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "async-control"
+  },
+  {
+    "id": "safe-json-storage",
+    "track": "dom-browser",
+    "title": "Safe JSON Read and Write",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "json",
+      "localstorage",
+      "error-handling",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "storage",
+    "requiresDom": true
+  },
+  {
+    "id": "shallow-copy-equal",
+    "track": "js-utilities",
+    "title": "Shallow Copy and Shallow Equal",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "objects",
+      "copy",
+      "equality",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "equality-clone"
+  },
+  {
+    "id": "sleep-and-delay",
+    "track": "async-js",
+    "title": "sleep(ms) and delay(value, ms)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "promise",
+      "timers",
+      "async-await",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "promise"
+  },
+  {
+    "id": "tree-depth-sum",
+    "track": "advanced-algorithms",
+    "title": "Binary Tree: Depth, Sum, Count",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tree",
+      "recursion",
+      "dfs",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "advanced-trees"
+  },
+  {
+    "id": "countdown-component",
+    "track": "react-components",
+    "title": "Countdown Timer Component",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "timers",
+      "useEffect",
+      "cleanup"
+    ],
+    "difficulty": 2,
+    "concept": "react-timers",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "file-explorer-tree",
+    "track": "react-components",
+    "title": "File Explorer Tree",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "recursion",
+      "tree",
+      "aria"
+    ],
+    "difficulty": 3,
+    "concept": "tree-ui",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "star-rating-component",
+    "track": "react-components",
+    "title": "Star Rating Component",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "a11y",
+      "radiogroup",
+      "keyboard"
+    ],
+    "difficulty": 2,
+    "concept": "rating-controls",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "a11y-form-field",
+    "track": "react-components",
+    "title": "Accessible Form Field and Toggle Button",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "a11y",
+      "aria",
+      "forms",
+      "labels"
+    ],
+    "difficulty": 2,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "accordion-component",
+    "track": "react-components",
+    "title": "Accordion Component",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "aria",
+      "disclosure",
+      "state"
+    ],
+    "difficulty": 2,
+    "concept": "compound",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "filter-list",
+    "track": "react-components",
+    "title": "Filterable List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "controlled-input",
+      "derived-state",
+      "a11y"
+    ],
+    "difficulty": 2,
+    "concept": "typeahead",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "load-more-list",
+    "track": "react-components",
+    "title": "Paginated List with \"Load more\"",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "async",
+      "pagination",
+      "error-handling"
+    ],
+    "difficulty": 2,
+    "concept": "infinite-scroll",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "simple-error-boundary",
+    "track": "react-components",
+    "title": "Minimal Error Boundary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "error-boundary",
+      "class-component",
+      "fallback",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "resilience",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "use-toggle-counter",
+    "track": "react",
+    "title": "useToggle and useCounter",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "hooks",
+      "state",
+      "useCallback",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "react-hooks-utility",
+    "requiresDom": true
+  },
+  {
+    "id": "data-table",
+    "track": "react-components",
+    "title": "Data Table: Sort, Filter, Paginate",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "table",
+      "sorting",
+      "pagination"
+    ],
+    "difficulty": 4,
+    "concept": "tables",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "dropdown-menu",
+    "track": "react-components",
+    "title": "Accessible Dropdown Menu",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "keyboard",
+      "focus-management"
+    ],
+    "difficulty": 4,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "form-state-hook",
+    "track": "react",
+    "title": "useForm: Values, Errors, Touched, Submit",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "forms",
+      "validation",
+      "async"
+    ],
+    "difficulty": 3,
+    "concept": "react-forms",
+    "requiresDom": true
+  },
+  {
+    "id": "memo-derived-list",
+    "track": "react",
+    "title": "useMemo for a Derived List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "performance",
+      "useMemo",
+      "derived-state",
+      "re-renders"
+    ],
+    "difficulty": 2,
+    "concept": "react-perf",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "simple-table",
+    "track": "react-components",
+    "title": "Simple Data Table",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "table",
+      "props",
+      "empty-state"
+    ],
+    "difficulty": 1,
+    "concept": "tables",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "undo-redo-hook",
+    "track": "react",
+    "title": "useHistory: Undo / Redo",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hooks",
+      "state",
+      "undo-redo",
+      "immutability"
+    ],
+    "difficulty": 3,
+    "concept": "history-state",
+    "requiresDom": true
+  },
+  {
+    "id": "virtual-list",
+    "track": "react-components",
+    "title": "Virtualized (Windowed) List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "performance",
+      "virtualization",
+      "scroll"
+    ],
+    "difficulty": 4,
+    "concept": "virtualization",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "image-carousel",
+    "track": "react-components",
+    "title": "Carousel with Dots and Autoplay",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "keyboard",
+      "timers"
+    ],
+    "difficulty": 3,
+    "concept": "carousel",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "optimistic-like-button",
+    "track": "react-components",
+    "title": "Optimistic Like Button with Rollback",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "optimistic-ui",
+      "async",
+      "error-handling"
+    ],
+    "difficulty": 3,
+    "concept": "optimistic-ui",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "toast-queue",
+    "track": "react-components",
+    "title": "Toast Notifications (Provider + useToast)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "context",
+      "timers",
+      "a11y"
+    ],
+    "difficulty": 3,
+    "concept": "notifications",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "anagram-palindrome",
+    "track": "algorithms",
+    "title": "Strings: Anagram, Palindrome, Common Prefix",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "string",
+      "hash-map",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "strings"
+  },
+  {
+    "id": "binary-search-variants",
+    "track": "algorithms",
+    "title": "Binary Search: Classic, Lower Bound, Integer Square Root",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "binary-search",
+      "array",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "binary-search"
+  },
+  {
+    "id": "bst-search-insert",
+    "track": "advanced-algorithms",
+    "title": "Binary Search Tree: Search, Insert, Min/Max",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tree",
+      "bst",
+      "recursion",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "bst"
+  },
+  {
+    "id": "bst-validate-lca-invert",
+    "track": "advanced-algorithms",
+    "title": "Binary Tree: Validate BST, Invert, Lowest Common Ancestor",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "bst",
+      "recursion",
+      "lca"
+    ],
+    "difficulty": 3,
+    "concept": "bst"
+  },
+  {
+    "id": "climb-stairs-fib-dp",
+    "track": "advanced-algorithms",
+    "title": "Dynamic Programming: Fibonacci and Climbing Stairs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "dp",
+      "memoization",
+      "recursion",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "dp"
+  },
+  {
+    "id": "coin-change-dp",
+    "track": "advanced-algorithms",
+    "title": "Dynamic Programming: Coin Change",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "bottom-up",
+      "array"
+    ],
+    "difficulty": 3,
+    "concept": "dp"
+  },
+  {
+    "id": "course-schedule-topo",
+    "track": "advanced-algorithms",
+    "title": "Graph: Course Schedule (Topological Sort)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "topological-sort",
+      "bfs",
+      "cycle"
+    ],
+    "difficulty": 4,
+    "concept": "graphs"
+  },
+  {
+    "id": "flood-fill-islands",
+    "track": "advanced-algorithms",
+    "title": "Grid DFS: Flood Fill and Number of Islands",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "grid",
+      "dfs",
+      "bfs"
+    ],
+    "difficulty": 3,
+    "concept": "graphs"
+  },
+  {
+    "id": "group-anagrams-top-k",
+    "track": "algorithms",
+    "title": "Hash Map: Group Anagrams and Top K Frequent",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "hash-map",
+      "sorting",
+      "frequency"
+    ],
+    "difficulty": 2,
+    "concept": "hashing"
+  },
+  {
+    "id": "kadane-prefix-sum",
+    "track": "algorithms",
+    "title": "Arrays: Maximum Subarray and Prefix Sums",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "array",
+      "dp",
+      "prefix-sum",
+      "kadane"
+    ],
+    "difficulty": 2,
+    "concept": "arrays"
+  },
+  {
+    "id": "linked-list-cycle-merge",
+    "track": "algorithms",
+    "title": "Linked List: Cycle Detection and Merge Sorted Lists",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "linked-list",
+      "two-pointer",
+      "floyd"
+    ],
+    "difficulty": 2,
+    "concept": "linked-lists"
+  },
+  {
+    "id": "lis-house-robber-dp",
+    "track": "advanced-algorithms",
+    "title": "Dynamic Programming: House Robber and Longest Increasing Subsequence",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "subsequence",
+      "array"
+    ],
+    "difficulty": 3,
+    "concept": "dp"
+  },
+  {
+    "id": "matrix-rotate-spiral",
+    "track": "algorithms",
+    "title": "Matrix: Rotate 90 Degrees and Spiral Order",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "matrix",
+      "2d-array",
+      "simulation"
+    ],
+    "difficulty": 3,
+    "concept": "matrix"
+  },
+  {
+    "id": "merge-sort-quick-sort",
+    "track": "algorithms",
+    "title": "Sorting: Merge Sort and Quick Sort",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sorting",
+      "recursion",
+      "divide-and-conquer"
+    ],
+    "difficulty": 3,
+    "concept": "sorting"
+  },
+  {
+    "id": "min-heap-class",
+    "track": "advanced-algorithms",
+    "title": "Heap: MinHeap From Scratch",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "heap",
+      "priority-queue",
+      "class",
+      "array"
+    ],
+    "difficulty": 3,
+    "concept": "heap"
+  },
+  {
+    "id": "min-stack",
+    "track": "algorithms",
+    "title": "MinStack and Queue From Two Stacks",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "stack",
+      "queue",
+      "design",
+      "class"
+    ],
+    "difficulty": 2,
+    "concept": "stack"
+  },
+  {
+    "id": "permutations-subsets-backtracking",
+    "track": "advanced-algorithms",
+    "title": "Backtracking: Subsets, Permutations, Parentheses",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "backtracking",
+      "recursion",
+      "combinatorics"
+    ],
+    "difficulty": 3,
+    "concept": "backtracking"
+  },
+  {
+    "id": "reverse-linked-list",
+    "track": "algorithms",
+    "title": "Linked List: Reverse and Middle",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "linked-list",
+      "pointers",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "linked-lists"
+  },
+  {
+    "id": "search-rotated-array",
+    "track": "algorithms",
+    "title": "Binary Search: Rotated Sorted Array",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "binary-search",
+      "array",
+      "rotated"
+    ],
+    "difficulty": 4,
+    "concept": "binary-search"
+  },
+  {
+    "id": "trie-prefix-tree",
+    "track": "advanced-algorithms",
+    "title": "Trie: Insert, Search, Prefix",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "trie",
+      "class",
+      "string",
+      "design"
+    ],
+    "difficulty": 3,
+    "concept": "trie"
+  },
+  {
+    "id": "binary-strings-combinations",
+    "track": "advanced-algorithms",
+    "title": "Backtracking: Binary Strings and Combinations",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "backtracking",
+      "recursion",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "backtracking"
+  },
+  {
+    "id": "compose-middleware",
+    "track": "async-js",
+    "title": "Middleware: compose(fns) With next()",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "middleware",
+      "compose",
+      "async",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "middleware"
+  },
+  {
+    "id": "event-loop-order",
+    "track": "async-js",
+    "title": "Event Loop: Sync, Microtask, Timeout Order",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "event-loop",
+      "microtask",
+      "promise",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "event-loop"
+  },
+  {
+    "id": "graph-adjacency-bfs",
+    "track": "advanced-algorithms",
+    "title": "Graph Basics: Adjacency List and BFS Path",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graph",
+      "bfs",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "graphs"
+  },
+  {
+    "id": "heap-array-basics",
+    "track": "advanced-algorithms",
+    "title": "Heap Basics: Index Math, isMinHeap, siftUp",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "heap",
+      "array",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "heap"
+  },
+  {
+    "id": "insertion-sort-basic",
+    "track": "algorithms",
+    "title": "Sorting: Insertion Sort, Selection Sort, isSorted",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "sorting",
+      "array",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "sorting"
+  },
+  {
+    "id": "iterable-range-class",
+    "track": "js-language",
+    "title": "Iterators: Iterable Range Class and take()",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "iterator",
+      "symbol",
+      "class",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "iterators"
+  },
+  {
+    "id": "matrix-basics",
+    "track": "algorithms",
+    "title": "Matrix Basics: Create, Sum, Diagonal",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "matrix",
+      "2d-array",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "matrix"
+  },
+  {
+    "id": "promise-all-by-hand",
+    "track": "async-js",
+    "title": "Promise.all By Hand (Counter)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "promise",
+      "combinators",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "promise-combinators"
+  },
+  {
+    "id": "simple-stringify",
+    "track": "js-utilities",
+    "title": "Serialization: simpleStringify (Primitives and Arrays)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "json",
+      "serialization",
+      "recursion",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "serialization"
+  },
+  {
+    "id": "trie-nested-object",
+    "track": "advanced-algorithms",
+    "title": "Trie From Nested Objects",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "trie",
+      "string",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "trie"
+  },
+  {
+    "id": "ts-identity-first-generics",
+    "track": "typescript-patterns",
+    "title": "TS Generics: identity, first, Box<T>",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "typescript",
+      "generics",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "ts-generics"
+  },
+  {
+    "id": "ts-narrowing-typeof-in",
+    "track": "typescript-patterns",
+    "title": "TS Unions: Narrowing With typeof and in",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "typescript",
+      "unions",
+      "narrowing",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "ts-unions"
+  },
+  {
+    "id": "ts-reimplement-utility-types",
+    "track": "typescript-patterns",
+    "title": "TS Types: Rebuild Partial, Readonly, Pick, Record",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "typescript",
+      "mapped-types",
+      "utility-types",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "ts-types"
+  },
+  {
+    "id": "copy-descriptors-mixin",
+    "track": "js-language",
+    "title": "Descriptors: Clone With Descriptors and Mixin",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "descriptors",
+      "mixin",
+      "clone",
+      "getOwnPropertyDescriptors"
+    ],
+    "difficulty": 3,
+    "concept": "descriptors"
+  },
+  {
+    "id": "descriptor-basics",
+    "track": "js-language",
+    "title": "Property Descriptors: Hidden, Constant, Flags",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "defineProperty",
+      "descriptor",
+      "enumerable",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "descriptors"
+  },
+  {
+    "id": "getter-setter-pairs",
+    "track": "js-language",
+    "title": "Descriptors: Getter/Setter Pairs and Lazy Properties",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "defineProperty",
+      "getter",
+      "setter",
+      "lazy"
+    ],
+    "difficulty": 2,
+    "concept": "descriptors"
+  },
+  {
+    "id": "manual-prototype-linking",
+    "track": "js-language",
+    "title": "Prototypes: ES5 Constructor Inheritance (Animal, Dog)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "prototype",
+      "constructor",
+      "inheritance",
+      "es5"
+    ],
+    "difficulty": 2,
+    "concept": "prototypes"
+  },
+  {
+    "id": "proto-chain-hasinstance",
+    "track": "js-language",
+    "title": "Prototypes: Chain Walking and Custom instanceof",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "prototype",
+      "instanceof",
+      "Symbol.hasInstance",
+      "chain"
+    ],
+    "difficulty": 3,
+    "concept": "prototypes"
+  },
+  {
+    "id": "proto-object-create",
+    "track": "js-language",
+    "title": "Prototypes: Object.create, hasOwn, Chain Length",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "prototype",
+      "Object.create",
+      "inheritance",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "prototypes"
+  },
+  {
+    "id": "proxy-default-logging",
+    "track": "js-language",
+    "title": "Proxy: Default Values and Access Counting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "proxy",
+      "reflect",
+      "get-trap",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "proxy"
+  },
+  {
+    "id": "proxy-negative-index",
+    "track": "js-language",
+    "title": "Proxy: Negative Array Indexing",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "proxy",
+      "array",
+      "get-trap",
+      "set-trap"
+    ],
+    "difficulty": 2,
+    "concept": "proxy"
+  },
+  {
+    "id": "proxy-revocable-readonly",
+    "track": "js-language",
+    "title": "Proxy: Revocable Deep Read-Only View",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "proxy",
+      "revocable",
+      "immutability",
+      "traps"
+    ],
+    "difficulty": 3,
+    "concept": "proxy"
+  },
+  {
+    "id": "proxy-validation-traps",
+    "track": "js-language",
+    "title": "Proxy: Validation, Delete and Has Traps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "proxy",
+      "validation",
+      "set-trap",
+      "traps"
+    ],
+    "difficulty": 3,
+    "concept": "proxy"
+  },
+  {
+    "id": "weak-tag-seen",
+    "track": "js-language",
+    "title": "WeakMap and WeakSet: Tagging and Seen-Marks",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "weakmap",
+      "weakset",
+      "metadata",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "weak-collections"
+  },
+  {
+    "id": "weakmap-memoize-object",
+    "track": "js-language",
+    "title": "WeakMap: Memoize By Object and Stable IDs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "weakmap",
+      "memoize",
+      "cache",
+      "identity"
+    ],
+    "difficulty": 2,
+    "concept": "weak-collections"
+  },
+  {
+    "id": "weakmap-private-state",
+    "track": "js-language",
+    "title": "WeakMap: Private Instance State (Counter, Stack)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "weakmap",
+      "privacy",
+      "class",
+      "encapsulation"
+    ],
+    "difficulty": 2,
+    "concept": "weak-collections"
+  },
+  {
+    "id": "weakset-cycle-detection",
+    "track": "js-language",
+    "title": "WeakSet: Cycle Detection and Object Counting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "weakset",
+      "graph",
+      "recursion",
+      "cycle"
+    ],
+    "difficulty": 3,
+    "concept": "weak-collections"
+  },
+  {
+    "id": "bit-basics",
+    "track": "advanced-algorithms",
+    "title": "Bit Manipulation: Single Number, Count Bits, Power of Two",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "bit-manipulation",
+      "xor",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "bits"
+  },
+  {
+    "id": "bit-tricks-more",
+    "track": "advanced-algorithms",
+    "title": "Bit Manipulation: Missing Number, Hamming, Counting Bits, Bit Flags",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "bit-manipulation",
+      "xor",
+      "dp"
+    ],
+    "difficulty": 2,
+    "concept": "bits"
+  },
+  {
+    "id": "container-water-two-pointer",
+    "track": "algorithms",
+    "title": "Two Pointers: Container With Most Water and Trapping Rain Water",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "two-pointer",
+      "greedy",
+      "array"
+    ],
+    "difficulty": 3,
+    "concept": "two-pointer"
+  },
+  {
+    "id": "edit-distance-knapsack",
+    "track": "advanced-algorithms",
+    "title": "2D DP: Edit Distance and 0/1 Knapsack",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "2d-dp",
+      "string",
+      "knapsack"
+    ],
+    "difficulty": 4,
+    "concept": "dp2d"
+  },
+  {
+    "id": "greedy-intervals-circuit",
+    "track": "advanced-algorithms",
+    "title": "Greedy: Non-Overlapping Intervals, Meetings, Gas Station",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "greedy",
+      "intervals",
+      "sorting"
+    ],
+    "difficulty": 3,
+    "concept": "greedy"
+  },
+  {
+    "id": "jump-game-greedy",
+    "track": "advanced-algorithms",
+    "title": "Greedy: Jump Game and Minimum Jumps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "greedy",
+      "array",
+      "reachability"
+    ],
+    "difficulty": 2,
+    "concept": "greedy"
+  },
+  {
+    "id": "lcs-subsequence",
+    "track": "advanced-algorithms",
+    "title": "2D DP: Longest Common Subsequence and isSubsequence",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "2d-dp",
+      "string",
+      "subsequence"
+    ],
+    "difficulty": 3,
+    "concept": "dp2d"
+  },
+  {
+    "id": "min-path-sum-grid",
+    "track": "advanced-algorithms",
+    "title": "2D DP: Minimum Path Sum and Triangle",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "2d-dp",
+      "grid",
+      "triangle"
+    ],
+    "difficulty": 3,
+    "concept": "dp2d"
+  },
+  {
+    "id": "monotonic-stack-basics",
+    "track": "advanced-algorithms",
+    "title": "Monotonic Stack: Next Greater Element and Daily Temperatures",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "stack",
+      "monotonic-stack",
+      "array"
+    ],
+    "difficulty": 2,
+    "concept": "monotonic-stack"
+  },
+  {
+    "id": "monotonic-stack-histogram",
+    "track": "advanced-algorithms",
+    "title": "Monotonic Stack: Stock Span and Largest Rectangle in Histogram",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "stack",
+      "monotonic-stack",
+      "histogram"
+    ],
+    "difficulty": 4,
+    "concept": "monotonic-stack"
+  },
+  {
+    "id": "unique-paths-grid",
+    "track": "advanced-algorithms",
+    "title": "2D DP: Unique Paths and Unique Paths With Obstacles",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "dp",
+      "2d-dp",
+      "grid",
+      "combinatorics"
+    ],
+    "difficulty": 2,
+    "concept": "dp2d"
+  },
+  {
+    "id": "dp-array-variants",
+    "track": "advanced-algorithms",
+    "title": "DP: Circular House Robber, Max Product Subarray, Min Cost Stairs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "array",
+      "1d-dp"
+    ],
+    "difficulty": 3,
+    "concept": "dp"
+  },
+  {
+    "id": "longest-palindrome-substring",
+    "track": "advanced-algorithms",
+    "title": "Strings: Longest Palindromic Substring and Count",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "string",
+      "palindrome",
+      "expand-around-center"
+    ],
+    "difficulty": 3,
+    "concept": "advanced-strings"
+  },
+  {
+    "id": "longest-substring-window",
+    "track": "algorithms",
+    "title": "Sliding Window: Longest Substring Without Repeats and K Distinct",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sliding-window",
+      "string",
+      "hash-map"
+    ],
+    "difficulty": 3,
+    "concept": "sliding-window"
+  },
+  {
+    "id": "min-window-permutation",
+    "track": "advanced-algorithms",
+    "title": "Sliding Window: Minimum Window Substring, Permutation, Anagram Indices",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sliding-window",
+      "string",
+      "frequency"
+    ],
+    "difficulty": 3,
+    "concept": "advanced-sliding-window"
+  },
+  {
+    "id": "partition-subset-sum",
+    "track": "advanced-algorithms",
+    "title": "DP: Partition Equal Subset Sum and Target Sum Ways",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "subset-sum",
+      "knapsack"
+    ],
+    "difficulty": 4,
+    "concept": "dp"
+  },
+  {
+    "id": "stock-profit-dp",
+    "track": "advanced-algorithms",
+    "title": "DP: Best Time to Buy and Sell Stock (One, Many, Cooldown)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "array",
+      "state-machine",
+      "greedy"
+    ],
+    "difficulty": 3,
+    "concept": "dp"
+  },
+  {
+    "id": "string-arithmetic",
+    "track": "advanced-algorithms",
+    "title": "Strings: Add Binary, Add Big Numbers, Multiply Strings",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "string",
+      "math",
+      "carry",
+      "big-number"
+    ],
+    "difficulty": 3,
+    "concept": "advanced-strings"
+  },
+  {
+    "id": "strings-basics",
+    "track": "algorithms",
+    "title": "Strings: Reverse Words, Run-Length Encoding, Rotation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "string",
+      "basics",
+      "encoding"
+    ],
+    "difficulty": 1,
+    "concept": "strings"
+  },
+  {
+    "id": "window-replacement-ones",
+    "track": "advanced-algorithms",
+    "title": "Sliding Window: Character Replacement, Longest Ones, Shortest Subarray",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sliding-window",
+      "array",
+      "two-pointer"
+    ],
+    "difficulty": 3,
+    "concept": "advanced-sliding-window"
+  },
+  {
+    "id": "word-break-decode",
+    "track": "advanced-algorithms",
+    "title": "DP: Word Break and Decode Ways",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dp",
+      "1d-dp",
+      "string"
+    ],
+    "difficulty": 3,
+    "concept": "dp"
+  },
+  {
+    "id": "bst-kth-insert-build",
+    "track": "advanced-algorithms",
+    "title": "BST: Kth Smallest/Largest, Insert, Sorted Array to BST",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "bst",
+      "inorder",
+      "recursion"
+    ],
+    "difficulty": 3,
+    "concept": "bst"
+  },
+  {
+    "id": "list-add-numbers",
+    "track": "advanced-algorithms",
+    "title": "Linked Lists: Add Two Numbers, Odd-Even, Intersection",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "linked-list",
+      "carry",
+      "two-pointer"
+    ],
+    "difficulty": 3,
+    "concept": "advanced-linked-lists"
+  },
+  {
+    "id": "list-remove-reorder",
+    "track": "algorithms",
+    "title": "Linked Lists: Remove Nth From End, Reorder, Remove Duplicates",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "linked-list",
+      "two-pointer",
+      "in-place"
+    ],
+    "difficulty": 2,
+    "concept": "linked-lists"
+  },
+  {
+    "id": "list-reverse-k-group",
+    "track": "advanced-algorithms",
+    "title": "Linked Lists: Reverse in K-Groups, Reverse Between, Swap Pairs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "linked-list",
+      "reversal",
+      "pointers"
+    ],
+    "difficulty": 4,
+    "concept": "advanced-linked-lists"
+  },
+  {
+    "id": "tree-build-serialize",
+    "track": "advanced-algorithms",
+    "title": "Trees: Build from Preorder + Inorder, Serialize / Deserialize",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "recursion",
+      "serialization"
+    ],
+    "difficulty": 4,
+    "concept": "advanced-trees"
+  },
+  {
+    "id": "tree-diameter-balanced",
+    "track": "advanced-algorithms",
+    "title": "Trees: Diameter, Balanced, Symmetric",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "dfs",
+      "height"
+    ],
+    "difficulty": 3,
+    "concept": "advanced-trees"
+  },
+  {
+    "id": "tree-level-order",
+    "track": "advanced-algorithms",
+    "title": "Trees: Level Order, Right Side View, Zigzag",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "bfs",
+      "queue"
+    ],
+    "difficulty": 2,
+    "concept": "advanced-trees"
+  },
+  {
+    "id": "tree-max-path-sum",
+    "track": "advanced-algorithms",
+    "title": "Trees: Max Path Sum, Root-to-Leaf Numbers, Good Nodes",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "dfs",
+      "post-order"
+    ],
+    "difficulty": 4,
+    "concept": "advanced-trees"
+  },
+  {
+    "id": "tree-path-sum",
+    "track": "advanced-algorithms",
+    "title": "Trees: Path Sum, All Root-to-Leaf Paths, Min Depth",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "tree",
+      "dfs",
+      "recursion"
+    ],
+    "difficulty": 2,
+    "concept": "advanced-trees"
+  },
+  {
+    "id": "graph-clone-bipartite",
+    "track": "advanced-algorithms",
+    "title": "Graphs: Clone Graph, Bipartite Check, Valid Tree",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "bfs",
+      "union-find",
+      "coloring"
+    ],
+    "difficulty": 3,
+    "concept": "graphs"
+  },
+  {
+    "id": "graph-components-paths",
+    "track": "advanced-algorithms",
+    "title": "Graphs: Connected Components, Valid Path, Star Center",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graph",
+      "bfs",
+      "dfs",
+      "adjacency-list"
+    ],
+    "difficulty": 2,
+    "concept": "graphs"
+  },
+  {
+    "id": "graph-grid-bfs",
+    "track": "advanced-algorithms",
+    "title": "Graphs: Rotting Oranges, Binary Matrix Path, 01 Matrix (Multi-Source BFS)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "bfs",
+      "grid",
+      "multi-source"
+    ],
+    "difficulty": 3,
+    "concept": "graphs"
+  },
+  {
+    "id": "graph-word-ladder",
+    "track": "advanced-algorithms",
+    "title": "Graphs: Word Ladder, Minimum Gene Mutation, Open the Lock",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graph",
+      "bfs",
+      "implicit-graph",
+      "strings"
+    ],
+    "difficulty": 4,
+    "concept": "graphs"
+  },
+  {
+    "id": "heap-kth-largest",
+    "track": "advanced-algorithms",
+    "title": "Heaps: Kth Largest, Streaming Kth Largest, Last Stone Weight",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "heap",
+      "priority-queue",
+      "top-k"
+    ],
+    "difficulty": 2,
+    "concept": "heap"
+  },
+  {
+    "id": "heap-median-stream",
+    "track": "advanced-algorithms",
+    "title": "Heaps: Median from a Data Stream and Task Scheduler",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "heap",
+      "two-heaps",
+      "median",
+      "greedy"
+    ],
+    "difficulty": 4,
+    "concept": "heap"
+  },
+  {
+    "id": "heap-merge-k-lists",
+    "track": "advanced-algorithms",
+    "title": "Heaps: Merge K Sorted Lists and Arrays, K Closest Points",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "heap",
+      "merge",
+      "k-way"
+    ],
+    "difficulty": 4,
+    "concept": "heap"
+  },
+  {
+    "id": "backtrack-combination-sum",
+    "track": "advanced-algorithms",
+    "title": "Backtracking: Combination Sum I, II and III",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "backtracking",
+      "combinations",
+      "recursion"
+    ],
+    "difficulty": 3,
+    "concept": "backtracking"
+  },
+  {
+    "id": "backtrack-n-queens",
+    "track": "advanced-algorithms",
+    "title": "Backtracking: N-Queens (Boards and Count)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "backtracking",
+      "n-queens",
+      "constraint"
+    ],
+    "difficulty": 4,
+    "concept": "backtracking"
+  },
+  {
+    "id": "backtrack-palindrome-partition",
+    "track": "advanced-algorithms",
+    "title": "Backtracking: Palindrome Partitioning, Phone Letters, Restore IPs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "backtracking",
+      "strings",
+      "partition"
+    ],
+    "difficulty": 3,
+    "concept": "backtracking"
+  },
+  {
+    "id": "backtrack-subsets-permute-unique",
+    "track": "advanced-algorithms",
+    "title": "Backtracking: Subsets II, Permutations II, Combinations",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "backtracking",
+      "duplicates",
+      "permutations"
+    ],
+    "difficulty": 3,
+    "concept": "backtracking"
+  },
+  {
+    "id": "backtrack-word-search",
+    "track": "advanced-algorithms",
+    "title": "Backtracking: Word Search and Word Search II",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "backtracking",
+      "grid",
+      "dfs"
+    ],
+    "difficulty": 3,
+    "concept": "backtracking"
+  },
+  {
+    "id": "generators-coroutines",
+    "track": "js-language",
+    "title": "Generators: Coroutines, Bidirectional Communication, Mini-Co Runner",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "generators",
+      "coroutines",
+      "async",
+      "co"
+    ],
+    "difficulty": 4,
+    "concept": "iterators"
+  },
+  {
+    "id": "hoisting-tdz-scope",
+    "track": "js-language",
+    "title": "Scope: Hoisting, Temporal Dead Zone, Loop Closure Capture",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "scope",
+      "hoisting",
+      "tdz",
+      "closures"
+    ],
+    "difficulty": 2,
+    "concept": "closures"
+  },
+  {
+    "id": "symbol-async-iterator",
+    "track": "js-language",
+    "title": "Async Iterators: Symbol.asyncIterator, For-Await-Of, Async Range",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "iterators",
+      "async",
+      "symbol",
+      "stream"
+    ],
+    "difficulty": 3,
+    "concept": "iterators"
+  },
+  {
+    "id": "tagged-template-literals",
+    "track": "js-language",
+    "title": "Tagged Templates: Safe HTML Escaping, Raw Strings, Highlighting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "template-literals",
+      "tagged-templates",
+      "security",
+      "strings"
+    ],
+    "difficulty": 2,
+    "concept": "tagged-templates"
+  },
+  {
+    "id": "this-context-binding",
+    "track": "js-language",
+    "title": "Context: this Resolution, Detached Methods, Explicit Context Invocation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "this",
+      "context",
+      "arrow-functions",
+      "oop"
+    ],
+    "difficulty": 3,
+    "concept": "this-binding"
+  },
+  {
+    "id": "async-generator-pagination",
+    "track": "async-js",
+    "title": "Async Generators: Paginated Streaming API, Filter and Collect",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "async-generator",
+      "pagination",
+      "streams",
+      "iterators"
+    ],
+    "difficulty": 4,
+    "concept": "async-control"
+  },
+  {
+    "id": "cancelable-promise-abort",
+    "track": "async-js",
+    "title": "Async Control: Cancelable Promises and withTimeout Wrapper",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "async",
+      "promise",
+      "cancellation",
+      "timeout"
+    ],
+    "difficulty": 3,
+    "concept": "async-control"
+  },
+  {
+    "id": "polling-exponential-backoff",
+    "track": "async-js",
+    "title": "Async Control: Polling with Exponential Backoff and Jitter Limit",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "async",
+      "polling",
+      "backoff",
+      "retry"
+    ],
+    "difficulty": 3,
+    "concept": "async-control"
+  },
+  {
+    "id": "promise-any-aggregate",
+    "track": "async-js",
+    "title": "Promises: Promise.any and AggregateError Polyfill",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "promise",
+      "promise-combinators",
+      "aggregate-error",
+      "async"
+    ],
+    "difficulty": 3,
+    "concept": "promise-combinators"
+  },
+  {
+    "id": "pub-sub-wildcard-emitter",
+    "track": "js-utilities",
+    "title": "Event Architecture: PubSub with Wildcard Topics and Once Listeners",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "pub-sub",
+      "event-emitter",
+      "wildcard",
+      "observer"
+    ],
+    "difficulty": 3,
+    "concept": "emitter"
+  },
+  {
+    "id": "ts-branded-nominal-types",
+    "track": "typescript-patterns",
+    "title": "TS Branded Types: Nominal IDs, Validated Email, Brand Helpers",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "types",
+      "branded-types",
+      "nominal-typing"
+    ],
+    "difficulty": 2,
+    "concept": "ts-types"
+  },
+  {
+    "id": "ts-infer-conditional-unpack",
+    "track": "typescript-patterns",
+    "title": "TS Conditional Types: infer, Function Unwrappers, DeepAwaited",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "types",
+      "conditional-types",
+      "infer"
+    ],
+    "difficulty": 3,
+    "concept": "ts-types"
+  },
+  {
+    "id": "ts-mapped-modifiers-deep-readonly",
+    "track": "typescript-patterns",
+    "title": "TS Mapped Modifiers: DeepReadonly, Mutable, Concrete, KeyRemap",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "types",
+      "mapped-types",
+      "modifiers",
+      "key-remapping"
+    ],
+    "difficulty": 4,
+    "concept": "ts-types"
+  },
+  {
+    "id": "ts-overloads-exhaustive-narrowing",
+    "track": "typescript-patterns",
+    "title": "TS Function Overloads: Type-Safe Event Map, assertNever",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "narrowing",
+      "overloads",
+      "exhaustiveness"
+    ],
+    "difficulty": 3,
+    "concept": "ts-narrowing"
+  },
+  {
+    "id": "ts-template-literal-strings",
+    "track": "typescript-patterns",
+    "title": "TS Template Literals: KebabCase, Split, and DotPaths",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "typescript",
+      "types",
+      "template-literals",
+      "string-manipulation"
+    ],
+    "difficulty": 3,
+    "concept": "ts-types"
+  },
+  {
+    "id": "fake-timers",
+    "track": "testing-tooling",
+    "title": "Fake Timers: Virtual Micro-Clock Harness",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "timers",
+      "fake-timers",
+      "event-loop"
+    ],
+    "difficulty": 4,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "mini-expect",
+    "track": "testing-tooling",
+    "title": "Mini Expect: Assertion Runner with Deep Equality & Not Chaining",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "assertions",
+      "expect",
+      "deep-equality"
+    ],
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "mock-fn",
+    "track": "testing-tooling",
+    "title": "Mock Function: Call & Argument Tracker (Jest-Style fn)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "mock",
+      "spy",
+      "jest"
+    ],
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "next-route-matcher",
+    "track": "dom-browser",
+    "title": "Next.js-Style Dynamic Route Matcher (Static, Params, Catch-all, Optional)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "routing",
+      "nextjs",
+      "pattern-matching",
+      "regex"
+    ],
+    "difficulty": 3,
+    "concept": "router",
+    "requiresDom": true
+  },
+  {
+    "id": "test-runner-lifecycle",
+    "track": "testing-tooling",
+    "title": "Test Runner Lifecycle: Nested Describe, Hooks & Hierarchical Reporter",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "framework",
+      "lifecycle",
+      "architecture",
+      "expert"
+    ],
+    "difficulty": 5,
+    "concept": "architecture"
+  },
+  {
+    "id": "breadcrumbs-router",
+    "track": "react-components",
+    "title": "Breadcrumbs: Dynamic Path Breadcrumb Generator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "routing",
+      "breadcrumbs",
+      "navigation",
+      "a11y"
+    ],
+    "difficulty": 2,
+    "concept": "routing-ui",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "nested-checkbox-tree",
+    "track": "react-components",
+    "title": "Nested Checkbox Tree: Tri-State Parent Selection (Indeterminate)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react",
+      "state",
+      "tree",
+      "indeterminate",
+      "checkbox"
+    ],
+    "difficulty": 3,
+    "concept": "tree-ui",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "transfer-list",
+    "track": "react-components",
+    "title": "Transfer List: Dual-Column Item Picker",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react",
+      "state",
+      "transfer-list",
+      "ui-patterns"
+    ],
+    "difficulty": 3,
+    "concept": "dual-list",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "use-is-mounted",
+    "track": "react",
+    "title": "useIsMounted Hook: Component Mount Status Guard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "hooks",
+      "lifecycle",
+      "ref"
+    ],
+    "difficulty": 1,
+    "concept": "react-hooks-utility",
+    "requiresDom": true
+  },
+  {
+    "id": "use-media-query",
+    "track": "react",
+    "title": "useMediaQuery Hook: Responsive MatchMedia Listener",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react",
+      "hooks",
+      "responsive",
+      "media-query"
+    ],
+    "difficulty": 2,
+    "concept": "react-hooks-utility",
+    "requiresDom": true
+  },
+  {
+    "id": "multi-step-form",
+    "track": "react-components",
+    "title": "Multi-Step Form Wizard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "forms",
+      "state",
+      "validation"
+    ],
+    "difficulty": 4,
+    "concept": "wizard",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "pagination-controls",
+    "track": "react-components",
+    "title": "Pagination Controls with Ellipsis",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "pagination",
+      "a11y"
+    ],
+    "difficulty": 3,
+    "concept": "pagination",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tag-input",
+    "track": "react-components",
+    "title": "Tag / Chip Input",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "controlled",
+      "keyboard",
+      "a11y"
+    ],
+    "difficulty": 3,
+    "concept": "tag-input",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "progress-bar",
+    "track": "react-components",
+    "title": "Accessible Progress Bar",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "a11y",
+      "progressbar",
+      "props"
+    ],
+    "difficulty": 1,
+    "concept": "progress",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "stopwatch",
+    "track": "react-components",
+    "title": "Stopwatch with Laps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "timers",
+      "effects",
+      "cleanup"
+    ],
+    "difficulty": 3,
+    "concept": "react-timers",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tic-tac-toe",
+    "track": "react-components",
+    "title": "Tic-Tac-Toe Board",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "state",
+      "game",
+      "derived-state"
+    ],
+    "difficulty": 3,
+    "concept": "game-board",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "theme-switcher",
+    "track": "react",
+    "title": "Theme Switcher (Context + localStorage)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "context",
+      "hooks",
+      "localStorage",
+      "dom"
+    ],
+    "difficulty": 3,
+    "concept": "context",
+    "requiresDom": true
+  },
+  {
+    "id": "tooltip",
+    "track": "react-components",
+    "title": "Accessible Tooltip",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "overlay",
+      "cloneElement"
+    ],
+    "difficulty": 3,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "calculate-winner",
+    "track": "algorithms",
+    "title": "Tic-Tac-Toe: Who Won?",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "game",
+      "board",
+      "logic",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "board-game-logic"
+  },
+  {
+    "id": "create-store-basic",
+    "track": "react",
+    "title": "A Tiny Store: getState, setState, subscribe",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "state",
+      "store",
+      "subscribe",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "state-management",
+    "requiresDom": true
+  },
+  {
+    "id": "paginate-items",
+    "track": "js-utilities",
+    "title": "Paginate a List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "pagination",
+      "arrays",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "pagination-utility"
+  },
+  {
+    "id": "add-tag-rules",
+    "track": "js-utilities",
+    "title": "Tag Input Rules: Add, Remove, Paste",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tag-input",
+      "strings",
+      "component-logic",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "tag-rules"
+  },
+  {
+    "id": "flatten-visible-tree",
+    "track": "algorithms",
+    "title": "Flatten a Tree into Visible Rows",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tree",
+      "recursion",
+      "component-logic",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "tree-virtualization"
+  },
+  {
+    "id": "visible-window-range",
+    "track": "algorithms",
+    "title": "Windowing Math for a Virtual List",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "virtualization",
+      "math",
+      "component-logic",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "windowing-math"
+  },
+  {
+    "id": "carousel-index-math",
+    "track": "js-utilities",
+    "title": "Carousel Index Math",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "carousel",
+      "modulo",
+      "component-logic",
+      "basics"
+    ],
+    "difficulty": 1,
+    "concept": "carousel-math"
+  },
+  {
+    "id": "history-stack-basic",
+    "track": "react",
+    "title": "Undo / Redo History Stack",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "history",
+      "undo-redo",
+      "state",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "history-state",
+    "requiresDom": true
+  },
+  {
+    "id": "move-between-lists",
+    "track": "js-utilities",
+    "title": "Move Items Between Two Lists",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "transfer-list",
+      "arrays",
+      "component-logic",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "dual-list-logic"
+  },
+  {
+    "id": "optimistic-list-update",
+    "track": "js-utilities",
+    "title": "Optimistic Update: Apply, Confirm, Roll Back",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "optimistic-ui",
+      "state",
+      "component-logic",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "optimistic-state"
+  },
+  {
+    "id": "toast-queue-logic",
+    "track": "js-utilities",
+    "title": "Toast Queue Logic",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "notifications",
+      "toast",
+      "component-logic",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "toast-queue-state"
+  },
+  {
+    "id": "wizard-step-logic",
+    "track": "js-utilities",
+    "title": "Wizard Step Logic",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "wizard",
+      "forms",
+      "component-logic",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "wizard-logic"
+  },
+  {
+    "id": "call-recorder-spy",
+    "track": "testing-tooling",
+    "title": "A Call-Recording Spy",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "testing",
+      "spy",
+      "mock",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "use-fetch-basic",
+    "track": "react",
+    "title": "useFetch: Load JSON on Mount",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react",
+      "hooks",
+      "fetch",
+      "basics"
+    ],
+    "difficulty": 2,
+    "concept": "react-fetch",
+    "requiresDom": true
+  },
+  {
+    "id": "live-announcer",
+    "track": "react-components",
+    "title": "Screen-Reader Announcer (aria-live)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "aria-live",
+      "context"
+    ],
+    "difficulty": 3,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "roving-tabindex-toolbar",
+    "track": "react-components",
+    "title": "Toolbar with Roving tabindex",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "keyboard",
+      "focus-management"
+    ],
+    "difficulty": 3,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "switch-toggle-a11y",
+    "track": "react-components",
+    "title": "Accessible Switch (role=switch)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "component",
+      "a11y",
+      "aria",
+      "keyboard"
+    ],
+    "difficulty": 1,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "form-error-summary",
+    "track": "react-components",
+    "title": "Accessible Form Error Summary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "forms",
+      "validation"
+    ],
+    "difficulty": 3,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "route-focus-and-skip-link",
+    "track": "react-components",
+    "title": "SPA Route Change: Skip Link and Focus",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "focus-management",
+      "routing"
+    ],
+    "difficulty": 3,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "action-state-form",
+    "track": "react",
+    "title": "React 19 Form Action with useActionState",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react19",
+      "forms",
+      "useActionState",
+      "actions"
+    ],
+    "difficulty": 3,
+    "concept": "react-forms",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "suspense-use-promise",
+    "track": "react",
+    "title": "React 19 use(promise) with Suspense",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "react19",
+      "suspense",
+      "use",
+      "data-fetching"
+    ],
+    "difficulty": 2,
+    "concept": "suspense-transitions",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tabs-transition-suspense",
+    "track": "react",
+    "title": "Tabs with useTransition + Suspense",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react19",
+      "suspense",
+      "transition",
+      "use"
+    ],
+    "difficulty": 4,
+    "concept": "suspense-transitions",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "cookie-parse-serialize",
+    "track": "dom-browser",
+    "title": "Cookie Parse and Serialize",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "cookies",
+      "parsing",
+      "encoding",
+      "http"
+    ],
+    "difficulty": 2,
+    "concept": "storage",
+    "requiresDom": true
+  },
+  {
+    "id": "copy-to-clipboard",
+    "track": "dom-browser",
+    "title": "Copy to Clipboard with Fallback",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "clipboard",
+      "async",
+      "fallback",
+      "dom"
+    ],
+    "difficulty": 2,
+    "concept": "clipboard",
+    "requiresDom": true
+  },
+  {
+    "id": "keyboard-shortcut-matcher",
+    "track": "dom-browser",
+    "title": "Keyboard Shortcut Matcher",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "keyboard",
+      "events",
+      "shortcuts",
+      "modifiers"
+    ],
+    "difficulty": 2,
+    "concept": "keyboard",
+    "requiresDom": true
+  },
+  {
+    "id": "drop-index-from-pointer",
+    "track": "dom-browser",
+    "title": "Drag and Drop: Drop Index and Reorder",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "drag-and-drop",
+      "reorder",
+      "pointer",
+      "lists"
+    ],
+    "difficulty": 2,
+    "concept": "drag-drop",
+    "requiresDom": true
+  },
+  {
+    "id": "lazy-load-observer",
+    "track": "dom-browser",
+    "title": "Lazy-Load Images with IntersectionObserver",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "intersectionobserver",
+      "lazy-loading",
+      "images",
+      "dom"
+    ],
+    "difficulty": 3,
+    "concept": "observers",
+    "requiresDom": true
+  },
+  {
+    "id": "raf-throttle",
+    "track": "dom-browser",
+    "title": "requestAnimationFrame Throttle",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "requestanimationframe",
+      "throttle",
+      "performance",
+      "events"
+    ],
+    "difficulty": 2,
+    "concept": "animation-frame",
+    "requiresDom": true
+  },
+  {
+    "id": "key-sequence-matcher",
+    "track": "dom-browser",
+    "title": "Key Sequence Matcher (g then i)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "keyboard",
+      "events",
+      "shortcuts",
+      "state-machine"
+    ],
+    "difficulty": 3,
+    "concept": "keyboard",
+    "requiresDom": true
+  },
+  {
+    "id": "resize-breakpoints",
+    "track": "dom-browser",
+    "title": "Element Breakpoints (ResizeObserver)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "resizeobserver",
+      "responsive",
+      "observers",
+      "cleanup"
+    ],
+    "difficulty": 2,
+    "concept": "resize-observer",
+    "requiresDom": true
+  },
+  {
+    "id": "watch-added-elements",
+    "track": "dom-browser",
+    "title": "Watch for Added Elements (MutationObserver)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "mutationobserver",
+      "dom",
+      "observers",
+      "cleanup"
+    ],
+    "difficulty": 3,
+    "concept": "mutation-observer",
+    "requiresDom": true
+  },
+  {
+    "id": "focus-trap-keydown",
+    "track": "dom-browser",
+    "title": "Focus Trap for a Dialog (Tab handling)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "a11y",
+      "focus-management",
+      "keyboard",
+      "dialog"
+    ],
+    "difficulty": 3,
+    "concept": "focus-management",
+    "requiresDom": true
+  },
+  {
+    "id": "mini-history-router",
+    "track": "dom-browser",
+    "title": "Mini Router (history.pushState)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "history",
+      "router",
+      "popstate",
+      "url-params"
+    ],
+    "difficulty": 3,
+    "concept": "history-api",
+    "requiresDom": true
+  },
+  {
+    "id": "calendar-month-grid",
+    "track": "js-utilities",
+    "title": "Calendar Month Grid",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "dates",
+      "calendar",
+      "date-picker",
+      "arrays"
+    ],
+    "difficulty": 3,
+    "concept": "dates"
+  },
+  {
+    "id": "deep-merge-objects",
+    "track": "js-utilities",
+    "title": "Deep Merge Objects",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "objects",
+      "recursion",
+      "immutability",
+      "security"
+    ],
+    "difficulty": 3,
+    "concept": "object-merge"
+  },
+  {
+    "id": "highlight-matches",
+    "track": "js-utilities",
+    "title": "Highlight Search Matches",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "strings",
+      "regex",
+      "search",
+      "escaping"
+    ],
+    "difficulty": 2,
+    "concept": "string-search"
+  },
+  {
+    "id": "object-diff",
+    "track": "js-utilities",
+    "title": "Object Diff (changed, added, removed)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "objects",
+      "recursion",
+      "diff",
+      "paths"
+    ],
+    "difficulty": 3,
+    "concept": "object-diff"
+  },
+  {
+    "id": "nested-comments",
+    "track": "react-components",
+    "title": "Nested Comments Thread",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "comments",
+      "recursion",
+      "tree",
+      "hierarchy"
+    ],
+    "difficulty": 3,
+    "concept": "comments",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "popover",
+    "track": "react-components",
+    "title": "Popover with Anchor Placement",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "popover",
+      "overlay",
+      "a11y",
+      "positioning"
+    ],
+    "difficulty": 3,
+    "concept": "popover",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "stepper",
+    "track": "react-components",
+    "title": "Interactive Stepper",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "wizard",
+      "stepper",
+      "navigation",
+      "a11y"
+    ],
+    "difficulty": 3,
+    "concept": "wizard",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "combobox-autocomplete-a11y",
+    "track": "react-components",
+    "title": "Accessible Combobox: W3C APG ARIA 1.2 Autocomplete Pattern",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "a11y",
+      "combobox",
+      "autocomplete",
+      "aria",
+      "keyboard",
+      "expert"
+    ],
+    "difficulty": 5,
+    "concept": "a11y-components",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "drag-sortable-list",
+    "track": "react-components",
+    "title": "Drag & Keyboard Sortable List: Accessible Reordering",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "reorder",
+      "drag-drop",
+      "list",
+      "a11y",
+      "keyboard"
+    ],
+    "difficulty": 3,
+    "concept": "reorder",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "kanban-board",
+    "track": "react-components",
+    "title": "Kanban Board: Multi-Column State, Card Movement & Creation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "component",
+      "kanban",
+      "board",
+      "state-management",
+      "workflow"
+    ],
+    "difficulty": 4,
+    "concept": "kanban",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "node-cli-argv-parser",
+    "track": "node",
+    "title": "CLI Argument & Option Parser",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "cli",
+      "parsing",
+      "tooling"
+    ],
+    "difficulty": 1,
+    "concept": "cli-tooling"
+  },
+  {
+    "id": "node-event-emitter",
+    "track": "node",
+    "title": "Custom EventEmitter with Prepend & Error Trapping",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "events",
+      "architecture",
+      "patterns"
+    ],
+    "difficulty": 1,
+    "concept": "event-emitter"
+  },
+  {
+    "id": "node-path-resolve",
+    "track": "node",
+    "title": "Path Resolution & Traversal Guard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "path",
+      "security",
+      "filesystem"
+    ],
+    "difficulty": 1,
+    "concept": "path-resolution"
+  },
+  {
+    "id": "node-buffer-tlv-codec",
+    "track": "node",
+    "title": "Buffer TLV Codec",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "buffer",
+      "binary",
+      "encoding",
+      "network"
+    ],
+    "difficulty": 2,
+    "concept": "buffers-binary"
+  },
+  {
+    "id": "node-env-parser-expander",
+    "track": "node",
+    "title": "Dotenv Parser & Variable Expander",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "env",
+      "configuration",
+      "parser",
+      "interpolation"
+    ],
+    "difficulty": 2,
+    "concept": "configuration"
+  },
+  {
+    "id": "node-querystring-parser",
+    "track": "node",
+    "title": "Querystring Parser & Stringifier",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "node",
+      "url",
+      "querystring",
+      "parser",
+      "encoding"
+    ],
+    "difficulty": 2,
+    "concept": "url-query"
+  },
+  {
+    "id": "node-http-accept-negotiator",
+    "track": "node",
+    "title": "HTTP Accept Header Negotiator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "http",
+      "headers",
+      "content-negotiation",
+      "mime"
+    ],
+    "difficulty": 3,
+    "concept": "http-content-negotiation"
+  },
+  {
+    "id": "node-ndjson-stream-splitter",
+    "track": "node",
+    "title": "NDJSON Stream Splitter",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "streams",
+      "ndjson",
+      "jsonl",
+      "parser",
+      "streaming"
+    ],
+    "difficulty": 3,
+    "concept": "streaming-parser"
+  },
+  {
+    "id": "node-radix-trie-router",
+    "track": "node",
+    "title": "Radix Trie HTTP Router",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "http",
+      "routing",
+      "radix",
+      "trie",
+      "fastify"
+    ],
+    "difficulty": 3,
+    "concept": "http-routing"
+  },
+  {
+    "id": "node-stream-backpressure-pipe",
+    "track": "node",
+    "title": "Stream Backpressure Pipe",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "streams",
+      "backpressure",
+      "flow-control",
+      "events"
+    ],
+    "difficulty": 3,
+    "concept": "streams-backpressure"
+  },
+  {
+    "id": "node-commonjs-module-loader",
+    "track": "node",
+    "title": "CommonJS Module Loader",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "modules",
+      "commonjs",
+      "require",
+      "circular-dependency"
+    ],
+    "difficulty": 4,
+    "concept": "module-system"
+  },
+  {
+    "id": "node-length-prefixed-ipc-framing",
+    "track": "node",
+    "title": "Length-Prefixed IPC Framing",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "buffer",
+      "binary",
+      "ipc",
+      "protocol",
+      "framing"
+    ],
+    "difficulty": 4,
+    "concept": "ipc-framing"
+  },
+  {
+    "id": "node-virtual-fs",
+    "track": "node",
+    "title": "Virtual Hierarchical File System",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "fs",
+      "filesystem",
+      "tree",
+      "vfs"
+    ],
+    "difficulty": 4,
+    "concept": "file-system"
+  },
+  {
+    "id": "node-graceful-shutdown-coordinator",
+    "track": "node",
+    "title": "Graceful Shutdown Coordinator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "process",
+      "lifecycle",
+      "shutdown",
+      "signals"
+    ],
+    "difficulty": 5,
+    "concept": "process-lifecycle"
+  },
+  {
+    "id": "node-worker-pool-dispatcher",
+    "track": "node",
+    "title": "Worker Pool Task Dispatcher",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "node",
+      "workers",
+      "threads",
+      "concurrency",
+      "dispatcher",
+      "queue"
+    ],
+    "difficulty": 5,
+    "concept": "worker-threads"
+  },
+  {
+    "id": "graphql-context-auth-guard",
+    "track": "graphql-server",
+    "title": "GraphQL Middleware: Context Auth Guard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "middleware",
+      "auth",
+      "resolvers"
+    ],
+    "difficulty": 3,
+    "concept": "graphql-middleware"
+  },
+  {
+    "id": "graphql-cursor-pagination-extractor",
+    "track": "graphql-server",
+    "title": "GraphQL Cursor Pagination Argument Parser",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "cursor",
+      "validation",
+      "api-design"
+    ],
+    "difficulty": 4,
+    "concept": "graphql-pagination"
+  },
+  {
+    "id": "graphql-dataloader-batching",
+    "track": "graphql-server",
+    "title": "GraphQL DataLoader: Microtask Request Batching",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "performance",
+      "n-plus-one",
+      "dataloader",
+      "promises",
+      "microtasks"
+    ],
+    "difficulty": 4,
+    "concept": "graphql-dataloader"
+  },
+  {
+    "id": "graphql-discriminated-union-resolver",
+    "track": "graphql-server",
+    "title": "GraphQL Resolvers: Discriminated Union Resolver",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "resolvers",
+      "unions",
+      "schema"
+    ],
+    "difficulty": 2,
+    "concept": "graphql-resolvers"
+  },
+  {
+    "id": "graphql-extract-operation-name",
+    "track": "graphql-server",
+    "title": "GraphQL AST: Extract Operation Name",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "ast",
+      "regex",
+      "parsing",
+      "query"
+    ],
+    "difficulty": 1,
+    "concept": "graphql-ast"
+  },
+  {
+    "id": "graphql-format-error-masking",
+    "track": "graphql-server",
+    "title": "GraphQL Errors: Error Masking and Formatting",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "errors",
+      "security",
+      "sanitization"
+    ],
+    "difficulty": 3,
+    "concept": "graphql-errors"
+  },
+  {
+    "id": "graphql-input-object-sanitizer",
+    "track": "graphql-server",
+    "title": "GraphQL Validation: Input Object Sanitizer",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "validation",
+      "mutation",
+      "input"
+    ],
+    "difficulty": 2,
+    "concept": "graphql-validation"
+  },
+  {
+    "id": "graphql-mini-client",
+    "track": "graphql-server",
+    "title": "GraphQL Client: Fetch with Error Handling",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "client",
+      "fetch",
+      "network",
+      "async"
+    ],
+    "difficulty": 1,
+    "concept": "graphql-client"
+  },
+  {
+    "id": "graphql-nested-field-resolvers",
+    "track": "graphql-server",
+    "title": "GraphQL Resolvers: Nested Relational Field Resolvers",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "resolvers",
+      "relational",
+      "schema"
+    ],
+    "difficulty": 3,
+    "concept": "graphql-resolvers"
+  },
+  {
+    "id": "graphql-query-complexity-calculator",
+    "track": "graphql-server",
+    "title": "GraphQL Query Complexity Cost Calculator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "security",
+      "dos-protection",
+      "complexity",
+      "recursion",
+      "ast"
+    ],
+    "difficulty": 4,
+    "concept": "graphql-complexity"
+  },
+  {
+    "id": "graphql-relay-connection-builder",
+    "track": "graphql-server",
+    "title": "GraphQL Relay Connection & Cursor Pagination Spec",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "connections",
+      "cursors",
+      "specifications"
+    ],
+    "difficulty": 5,
+    "concept": "graphql-relay"
+  },
+  {
+    "id": "graphql-schema-stitching-merger",
+    "track": "graphql-server",
+    "title": "GraphQL Schema Stitching Resolver Merger",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "schema-stitching",
+      "federation",
+      "resolvers",
+      "conflict-detection",
+      "microservices"
+    ],
+    "difficulty": 5,
+    "concept": "graphql-stitching"
+  },
+  {
+    "id": "graphql-sdl-type-generator",
+    "track": "graphql-server",
+    "title": "GraphQL SDL: Type Definition Generator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "codegen"
+    ],
+    "difficulty": 2,
+    "concept": "graphql-sdl"
+  },
+  {
+    "id": "graphql-variable-validator",
+    "track": "graphql-server",
+    "title": "GraphQL Variables: Required Variable Validator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "variables",
+      "validation",
+      "schema"
+    ],
+    "difficulty": 1,
+    "concept": "graphql-variables"
+  },
+  {
+    "id": "sql-cancellation-rate",
+    "track": "sql-postgres",
+    "title": "Trips Cancellation Rate (CASE WHEN)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "case-when",
+      "round",
+      "analytics"
+    ],
+    "difficulty": 3,
+    "concept": "sql-conditional-aggregation",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-customer-order-frequency",
+    "track": "sql-postgres",
+    "title": "High-Volume Customers (HAVING Filter)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "sql",
+      "postgres",
+      "group-by",
+      "having",
+      "join"
+    ],
+    "difficulty": 2,
+    "concept": "sql-grouping",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-department-average-salary",
+    "track": "sql-postgres",
+    "title": "Employees Above Department Average Salary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "subquery",
+      "aggregate",
+      "filter"
+    ],
+    "difficulty": 3,
+    "concept": "sql-aggregates",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-department-highest-salary",
+    "track": "sql-postgres",
+    "title": "Department Highest Salary (DENSE_RANK)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "join",
+      "cte"
+    ],
+    "difficulty": 3,
+    "concept": "sql-window-functions",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-running-total-sales",
+    "track": "sql-postgres",
+    "title": "Cumulative Running Total Sales",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "running-total"
+    ],
+    "difficulty": 3,
+    "concept": "sql-window-functions",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-second-highest-salary",
+    "track": "sql-postgres",
+    "title": "Second Highest Salary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "aggregate",
+      "subquery"
+    ],
+    "difficulty": 2,
+    "concept": "sql-aggregates",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "gql-mutation-input-payload",
+    "track": "graphql",
+    "title": "Mutation with Input Object & Result Payload",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "mutation",
+      "input-objects",
+      "payload",
+      "errors"
+    ],
+    "difficulty": 2,
+    "concept": "gql-mutations",
+    "inputLanguage": "graphql"
+  },
+  {
+    "id": "gql-query-aliases-fragments",
+    "track": "graphql",
+    "title": "Field Aliases & Named Fragments",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "query",
+      "aliases",
+      "fragments"
+    ],
+    "difficulty": 2,
+    "concept": "gql-fragments",
+    "inputLanguage": "graphql"
+  },
+  {
+    "id": "gql-query-nested-fields",
+    "track": "graphql",
+    "title": "Querying Nested Fields & Arguments",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "query",
+      "nested-fields",
+      "arguments"
+    ],
+    "difficulty": 1,
+    "concept": "gql-queries",
+    "inputLanguage": "graphql"
+  },
+  {
+    "id": "gql-query-pagination",
+    "track": "graphql",
+    "title": "Relay Cursor Connection Query",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "query",
+      "pagination",
+      "relay",
+      "connections"
+    ],
+    "difficulty": 3,
+    "concept": "gql-relay-queries",
+    "inputLanguage": "graphql"
+  },
+  {
+    "id": "gql-query-variables-directives",
+    "track": "graphql",
+    "title": "Variables & Conditional Directives",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "query",
+      "directives",
+      "include",
+      "skip",
+      "variables"
+    ],
+    "difficulty": 2,
+    "concept": "gql-directives",
+    "inputLanguage": "graphql"
+  },
+  {
+    "id": "gql-schema-sdl-enums-unions",
+    "track": "graphql",
+    "title": "Schema Definition: Enums & Unions",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "enums",
+      "unions"
+    ],
+    "difficulty": 3,
+    "concept": "gql-schema-definitions",
+    "inputLanguage": "graphql"
+  },
+  {
+    "id": "gql-schema-sdl-types",
+    "track": "graphql",
+    "title": "Schema Definition: Types & Input Objects",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "types",
+      "input"
+    ],
+    "difficulty": 2,
+    "concept": "gql-schema-types",
+    "inputLanguage": "graphql"
+  },
+  {
+    "id": "sql-consecutive-numbers",
+    "track": "sql-postgres",
+    "title": "Consecutive Numbers in Logs",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "lead-lag",
+      "consecutive"
+    ],
+    "difficulty": 3,
+    "concept": "sql-window-functions",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-org-hierarchy-cte",
+    "track": "sql-postgres",
+    "title": "Organization Hierarchy & Reporting Depth",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "recursive-cte",
+      "hierarchy",
+      "trees"
+    ],
+    "difficulty": 4,
+    "concept": "sql-recursive-cte",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-top-three-salaries",
+    "track": "sql-postgres",
+    "title": "Department Top Three Salaries",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "dense-rank",
+      "join"
+    ],
+    "difficulty": 4,
+    "concept": "sql-window-functions",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-customers-who-never-order",
+    "track": "sql-postgres",
+    "title": "Customers Who Never Order",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "joins",
+      "anti-join",
+      "null-check"
+    ],
+    "difficulty": 2,
+    "concept": "sql-joins",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-deduplicate-keep-lowest-id",
+    "track": "sql-postgres",
+    "title": "Deduplicate Rows (Keep Lowest ID)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "deduplication",
+      "row-number"
+    ],
+    "difficulty": 3,
+    "concept": "sql-window-functions",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-monthly-active-users-retention",
+    "track": "sql-postgres",
+    "title": "Monthly Active User Retention",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "retention",
+      "self-join",
+      "date-trunc"
+    ],
+    "difficulty": 4,
+    "concept": "sql-cohort-retention",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-pivot-monthly-sales",
+    "track": "sql-postgres",
+    "title": "Pivot Monthly Product Sales",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "aggregation",
+      "pivot",
+      "filter-clause"
+    ],
+    "difficulty": 3,
+    "concept": "sql-conditional-aggregation",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-seat-swap-consecutive",
+    "track": "sql-postgres",
+    "title": "Consecutive Seat Swaps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "case-expressions",
+      "math",
+      "subqueries"
+    ],
+    "difficulty": 3,
+    "concept": "sql-conditional-logic",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "sql-user-session-timeout",
+    "track": "sql-postgres",
+    "title": "Sessionize Event Stream (30-Minute Timeout)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "gaps-and-islands",
+      "sessionization",
+      "lead-lag"
+    ],
+    "difficulty": 4,
+    "concept": "sql-gaps-and-islands",
+    "inputLanguage": "sql"
+  },
+  {
+    "id": "ocean-view-buildings",
+    "track": "advanced-algorithms",
+    "title": "Ocean View Buildings (Monotonic Sightline)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "stack",
+      "monotonic-stack",
+      "array",
+      "capital-one",
+      "skyscraper",
+      "skyscrapers"
+    ],
+    "difficulty": 2,
+    "concept": "monotonic-stack"
+  },
+  {
+    "id": "min-floors-ocean-view",
+    "track": "advanced-algorithms",
+    "title": "Minimum Floors for Full Ocean View",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "greedy",
+      "array",
+      "scan",
+      "capital-one",
+      "codesignal",
+      "skyscraper",
+      "skyscrapers"
+    ],
+    "difficulty": 2,
+    "concept": "greedy"
+  },
+  {
+    "id": "simplify-path",
+    "track": "algorithms",
+    "title": "Simplify Path (Canonical Unix Path)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "stack",
+      "string",
+      "unix",
+      "capital-one"
+    ],
+    "difficulty": 2,
+    "concept": "stack"
+  },
+  {
+    "id": "sort-colors",
+    "track": "algorithms",
+    "title": "Sort Colors (Dutch National Flag)",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "two-pointer",
+      "array",
+      "sorting",
+      "in-place",
+      "capital-one"
+    ],
+    "difficulty": 2,
+    "concept": "two-pointer"
+  },
+  {
+    "id": "longest-continuous-subarray-limit",
+    "track": "advanced-algorithms",
+    "title": "Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "sliding-window",
+      "monotonic-queue",
+      "deque",
+      "array",
+      "capital-one"
+    ],
+    "difficulty": 3,
+    "concept": "advanced-sliding-window"
+  },
+  {
+    "id": "text-justification",
+    "track": "advanced-algorithms",
+    "title": "Text Justification",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "string",
+      "simulation",
+      "formatting",
+      "greedy",
+      "capital-one"
+    ],
+    "difficulty": 3,
+    "concept": "advanced-strings"
+  },
+  {
+    "id": "d3-react-imperative-chart",
+    "track": "d3",
+    "title": "D3 in React: Imperative Handle Chart Bridge",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react",
+      "d3",
+      "useimperativehandle",
+      "forwardref",
+      "svg",
+      "charts"
+    ],
+    "difficulty": 3,
+    "concept": "d3-react",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "d3"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "d3-css-coordinate-layout",
+    "track": "d3",
+    "title": "D3 Coordinate Layout for HTML/CSS",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "d3",
+      "layout",
+      "scales",
+      "css",
+      "dom",
+      "coordinates"
+    ],
+    "difficulty": 3,
+    "concept": "d3-layout",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "d3-graph-theory-visualizer",
+    "track": "d3",
+    "title": "D3 Graph Theory Force Simulation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "d3",
+      "force-simulation",
+      "graphs",
+      "svg",
+      "network"
+    ],
+    "difficulty": 3,
+    "concept": "d3-force-graph",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-dismissible-banner",
+    "track": "tailwind",
+    "title": "Tailwind Dismissible Alert Banner",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "tags": [
+      "react",
+      "tailwind",
+      "notification",
+      "accessibility"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-banner",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-pricing-card",
+    "track": "tailwind",
+    "title": "Tailwind Responsive Pricing Card",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "tags": [
+      "tailwind",
+      "react",
+      "responsive",
+      "card"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-card",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-metric-card",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Tailwind Stat Metric Card",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "html",
+      "css",
+      "layout"
+    ],
+    "previewLibraries": [
+      "tailwind"
+    ],
+    "difficulty": 1,
+    "concept": "tailwind-stat",
+    "inputLanguage": "html",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-svg-bar-chart",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "D3 SVG Bar Chart with Scales and Axes",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "charts",
+      "bar-chart",
+      "svg",
+      "scales",
+      "axes"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 2,
+    "concept": "d3-bar-chart",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-svg-line-chart",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 SVG Line Chart with Path Generator",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "charts",
+      "line-chart",
+      "svg",
+      "paths",
+      "generators"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 3,
+    "concept": "d3-line-chart",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-svg-donut-chart",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 SVG Donut & Pie Chart Generator",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "data-visualization",
+      "svg",
+      "pie-chart",
+      "donut-chart",
+      "arc-generator"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 3,
+    "concept": "d3-donut-chart",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-svg-scatter-plot",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "D3 SVG Scatter Plot",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "data-visualization",
+      "svg",
+      "scatter-plot",
+      "linear-scale",
+      "axes"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 2,
+    "concept": "d3-scatter-plot",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-quadtree-spatial-index",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Quadtree Spatial Index",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "quadtree",
+      "spatial-index",
+      "nearest-neighbor",
+      "geometry",
+      "algorithms"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 4,
+    "concept": "d3-quadtree-spatial",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-stratify-nested-hierarchy",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Stratify Nested Hierarchy",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "hierarchy",
+      "stratify",
+      "tree",
+      "data-structures",
+      "algorithms"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 3,
+    "concept": "d3-hierarchy-stratify",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-delaunay-voronoi-snapping",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Delaunay & Voronoi Snapping",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "data-visualization",
+      "voronoi",
+      "delaunay",
+      "computational-geometry",
+      "svg"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 4,
+    "concept": "d3-voronoi-geometry",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-treemap-squarified-tiling",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Squarified Treemap Layout",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "data-visualization",
+      "treemap",
+      "hierarchy",
+      "svg",
+      "layout"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 3,
+    "concept": "d3-treemap-layout",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-brush-zoom-coordinator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Brush & Focus-Context Coordinator",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "brush",
+      "zoom",
+      "linked-views",
+      "svg",
+      "time-series",
+      "data-visualization"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 4,
+    "concept": "d3-brush-interaction",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-force-simulation-headless",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Headless Force Simulation & Convergence",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "force-simulation",
+      "physics",
+      "graph",
+      "convergence",
+      "algorithms"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 4,
+    "concept": "d3-force-simulation",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-contour-density-grid",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 2D Kernel Density Estimation & Contours",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "contour",
+      "density",
+      "kde",
+      "statistics",
+      "svg",
+      "data-visualization"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 4,
+    "concept": "d3-contour-density",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-geo-projection-path",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 GeoJSON Cartographic Projection & Path",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "geo",
+      "cartography",
+      "geojson",
+      "projection",
+      "svg",
+      "data-visualization"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 3,
+    "concept": "d3-geo-projection",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-data-join-enter-update-exit",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "D3 Keyed Data Join (Enter, Update, Exit)",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "data-join",
+      "selection",
+      "svg",
+      "dom"
+    ],
+    "rendersComponent": true,
+    "difficulty": 1,
+    "concept": "d3-data-join",
+    "previewLibraries": [
+      "d3"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "d3-scales-domain-range-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "D3 Linear & Band Scales (Domain, Range & Invert)",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "scales",
+      "coordinates",
+      "algorithms"
+    ],
+    "difficulty": 1,
+    "concept": "d3-scales-basics",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-transitions-stagger-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "D3 Transitions (Duration, Easing & Stagger)",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "transitions",
+      "animation",
+      "stagger",
+      "svg"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "d3"
+    ],
+    "difficulty": 1,
+    "concept": "d3-transitions-basics",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-data-rollup-histogram-bins",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "D3 Data Rollup, Binning & Grouping",
+    "track": "d3",
+    "tags": [
+      "d3",
+      "data",
+      "rollup",
+      "group",
+      "bin",
+      "algorithms"
+    ],
+    "difficulty": 2,
+    "concept": "d3-aggregation-bins",
+    "requiresDom": true
+  },
+  {
+    "id": "d3-stacked-area-series",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Stacked Area Series (Baselines & Layers)",
+    "track": "d3",
+    "rendersComponent": true,
+    "tags": [
+      "d3",
+      "stack",
+      "area",
+      "charts",
+      "visualizations"
+    ],
+    "difficulty": 3,
+    "concept": "d3-stacked-series",
+    "previewLibraries": [
+      "d3"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "d3-zoom-pan-rescale",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Zoom, Pan & Rescale (Geometric Transforms)",
+    "track": "d3",
+    "rendersComponent": true,
+    "tags": [
+      "d3",
+      "zoom",
+      "pan",
+      "scales",
+      "transforms",
+      "charts"
+    ],
+    "difficulty": 3,
+    "concept": "d3-zoom-rescale",
+    "previewLibraries": [
+      "d3"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "d3-drag-force-graph",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "D3 Drag & Force Simulation (Graph Layout & Pinning)",
+    "track": "d3",
+    "rendersComponent": true,
+    "tags": [
+      "d3",
+      "force",
+      "drag",
+      "physics",
+      "graph",
+      "charts"
+    ],
+    "difficulty": 3,
+    "concept": "d3-force-drag",
+    "previewLibraries": [
+      "d3"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-cva-variants",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Tailwind Component Variant Authority (cva)",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "cva",
+      "variants",
+      "design-system",
+      "utilities"
+    ],
+    "difficulty": 3,
+    "concept": "tailwind-cva",
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-merge-classes",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Tailwind Class Conflict Resolver (twMerge)",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "twmerge",
+      "utilities",
+      "classnames",
+      "conflict-resolution"
+    ],
+    "difficulty": 3,
+    "concept": "tailwind-merge",
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-button-states",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Tailwind Interactive Button & States",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "react",
+      "button",
+      "interactive",
+      "states",
+      "a11y"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-button",
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-arbitrary-parser",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Tailwind Arbitrary Value Parser",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "parser",
+      "jit",
+      "regex",
+      "utilities",
+      "arbitrary-values"
+    ],
+    "difficulty": 3,
+    "concept": "tailwind-parser",
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-badge-component",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Tailwind Dynamic Status Badge",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "react",
+      "badge",
+      "status",
+      "tokens"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-badge",
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-modal-dialog",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Tailwind Accessible Modal Dialog",
+    "track": "tailwind",
+    "concept": "tailwind-modal",
+    "difficulty": 3,
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "tags": [
+      "tailwind",
+      "css",
+      "react",
+      "dialog",
+      "modal",
+      "accessibility"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-responsive-card",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Tailwind Responsive Product Card",
+    "track": "tailwind",
+    "concept": "tailwind-responsive",
+    "difficulty": 2,
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "tags": [
+      "tailwind",
+      "css",
+      "react",
+      "responsive",
+      "layout",
+      "flexbox"
+    ],
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-segmented-control",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "tailwind",
+    "title": "Tailwind Segmented Control",
+    "tags": [
+      "react",
+      "tailwind",
+      "tabs",
+      "accessibility",
+      "keyboard"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-tabs",
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-skeleton-loader",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "tailwind",
+    "title": "Tailwind Skeleton Loader",
+    "tags": [
+      "react",
+      "tailwind",
+      "skeleton",
+      "loading",
+      "accessibility"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-skeleton",
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-accordion",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Tailwind Accessible Accordion",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "react",
+      "accordion",
+      "disclosure",
+      "a11y"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-accordion",
+    "requiresDom": true
+  },
+  {
+    "id": "tailwind-avatar-group",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Tailwind Avatar Group Stack",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "react",
+      "avatar",
+      "stack",
+      "tokens"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-avatar",
+    "requiresDom": true
+  },
+  {
+    "id": "async-flush-promises",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "testing-tooling",
+    "title": "Async Testing Utilities: Microtask Flush & Polling Pump",
+    "tags": [
+      "testing",
+      "async",
+      "event-loop",
+      "promises",
+      "microtasks"
+    ],
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "custom-matcher-expect",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "testing-tooling",
+    "title": "Custom Matchers: Jest/Vitest expect.extend Plugin Architecture",
+    "tags": [
+      "testing",
+      "assertions",
+      "expect",
+      "custom-matchers",
+      "plugin"
+    ],
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "dom-query-testing-library",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "testing-tooling",
+    "title": "Mini DOM Testing Library: Semantic Role & Text Queries",
+    "tags": [
+      "testing",
+      "dom",
+      "accessibility",
+      "aria",
+      "queries"
+    ],
+    "difficulty": 3,
+    "concept": "testing-tools",
+    "requiresDom": true
+  },
+  {
+    "id": "graphql-normalized-cache",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "graphql-server",
+    "title": "GraphQL Client: Normalized Response Cache & Tree Reconstruction",
+    "tags": [
+      "graphql",
+      "cache",
+      "normalization",
+      "client",
+      "state-management"
+    ],
+    "difficulty": 3,
+    "concept": "graphql-client"
+  },
+  {
+    "id": "graphql-optimistic-cache",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "graphql-server",
+    "title": "GraphQL Client: Optimistic Mutation Layers & Rollback",
+    "tags": [
+      "graphql",
+      "cache",
+      "optimistic-ui",
+      "mutations",
+      "client"
+    ],
+    "difficulty": 4,
+    "concept": "graphql-client"
+  },
+  {
+    "id": "graphql-relay-pagination-merger",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "graphql-server",
+    "title": "GraphQL Client: Relay Connection Pagination Merger",
+    "tags": [
+      "graphql",
+      "relay",
+      "pagination",
+      "cursor",
+      "client",
+      "cache"
+    ],
+    "difficulty": 4,
+    "concept": "graphql-client"
+  },
+  {
+    "id": "gql-inline-fragments-union",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "graphql",
+    "title": "Inline Fragments & Union Type Conditions",
+    "tags": [
+      "graphql",
+      "queries",
+      "unions",
+      "fragments",
+      "inline-fragments"
+    ],
+    "inputLanguage": "graphql",
+    "difficulty": 3,
+    "concept": "gql-fragments"
+  },
+  {
+    "id": "gql-schema-sdl-interfaces-directives",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "graphql",
+    "title": "Schema Definition: Interfaces & Directives",
+    "tags": [
+      "graphql",
+      "sdl",
+      "schema",
+      "interfaces",
+      "directives"
+    ],
+    "inputLanguage": "graphql",
+    "difficulty": 4,
+    "concept": "gql-schema-definitions"
+  },
+  {
+    "id": "gql-subscription-document",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "graphql",
+    "title": "Subscription with Filter Arguments & Selection",
+    "tags": [
+      "graphql",
+      "subscriptions",
+      "realtime",
+      "operations",
+      "documents"
+    ],
+    "inputLanguage": "graphql",
+    "difficulty": 3,
+    "concept": "gql-subscriptions"
+  },
+  {
+    "id": "next-middleware-auth-redirect",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "nextjs",
+    "title": "Middleware: Edge Auth Guard & Redirection",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "middleware",
+      "cookies",
+      "auth",
+      "http",
+      "async"
+    ],
+    "difficulty": 3,
+    "concept": "next-middleware"
+  },
+  {
+    "id": "next-route-handler-crud",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Route Handlers: App Router GET & POST",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-handlers",
+      "http",
+      "api",
+      "async"
+    ],
+    "difficulty": 2,
+    "concept": "next-route-handlers"
+  },
+  {
+    "id": "next-server-action-form",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Server Action: Form State & Validation",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "server-actions",
+      "forms",
+      "validation",
+      "async"
+    ],
+    "difficulty": 2,
+    "concept": "next-server-actions"
+  },
+  {
+    "id": "next-generate-metadata",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Dynamic Metadata: OpenGraph & SEO Generator",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "metadata",
+      "seo",
+      "opengraph",
+      "async"
+    ],
+    "difficulty": 2,
+    "concept": "next-metadata"
+  },
+  {
+    "id": "next-revalidation-tag-cache",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "nextjs",
+    "title": "Next.js Server Actions: Data Mutation & revalidateTag",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "server-actions",
+      "revalidateTag",
+      "revalidatePath",
+      "cache"
+    ],
+    "difficulty": 3,
+    "concept": "next-cache-revalidation",
+    "requiresDom": true
+  },
+  {
+    "id": "next-static-params-generator",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Static Route Matrix: generateStaticParams",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "ssg",
+      "static-generation",
+      "routing",
+      "algorithms"
+    ],
+    "difficulty": 2,
+    "concept": "next-static-params"
+  },
+  {
+    "id": "next-async-page-props",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Next.js 15: Async Server Component Page Props",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "async-params",
+      "search-params",
+      "typescript",
+      "nextjs-15"
+    ],
+    "difficulty": 2,
+    "concept": "next-async-params",
+    "requiresDom": true,
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ]
+  },
+  {
+    "id": "next-async-route-handler-context",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "nextjs",
+    "title": "Async Route Context: Dynamic Segment Typing",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-handlers",
+      "async-params",
+      "typescript",
+      "nextjs-15"
+    ],
+    "difficulty": 3,
+    "concept": "next-async-context"
+  },
+  {
+    "id": "next-layout-template-composition",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Layouts vs. Templates: Prop Typing & Remount Semantics",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "layouts",
+      "templates",
+      "react-node",
+      "typescript"
+    ],
+    "requiresDom": true,
+    "difficulty": 2,
+    "concept": "next-layouts-templates",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ]
+  },
+  {
+    "id": "next-client-boundary-guard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Next.js RSC Boundary: Safe Client Component Props",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "rsc",
+      "server-components",
+      "client-components",
+      "props-boundary"
+    ],
+    "difficulty": 3,
+    "concept": "next-rsc-boundaries",
+    "requiresDom": true,
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ]
+  },
+  {
+    "id": "next-parallel-intercepting-routes",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Next.js Parallel Routes: Slot Layout & Modal Dismiss",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "router",
+      "parallel-routes",
+      "intercepting-routes",
+      "app-router"
+    ],
+    "difficulty": 3,
+    "concept": "next-intercepting-routes",
+    "requiresDom": true,
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ]
+  },
+  {
+    "id": "stream-event-micro-batcher",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Stream Event Micro-Batcher (Size & Time Window)",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "streams",
+      "batching",
+      "scaling",
+      "performance"
+    ],
+    "difficulty": 3,
+    "concept": "streams-batching"
+  },
+  {
+    "id": "web-stream-transform-pipeline",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Web Stream Transform Pipeline (TransformStream)",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "streams",
+      "transform",
+      "web-streams",
+      "scaling"
+    ],
+    "difficulty": 3,
+    "concept": "streams-transform"
+  },
+  {
+    "id": "chunked-batch-pipeline",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Chunked Batch Pipeline with Bounded Concurrency",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "concurrency",
+      "batching",
+      "streams",
+      "error-handling",
+      "performance"
+    ],
+    "difficulty": 3,
+    "concept": "streams-chunking"
+  },
+  {
+    "id": "k-way-stream-merger",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "K-Way Merge on Async Streams",
+    "track": "algorithms",
+    "tags": [
+      "algorithms",
+      "heap",
+      "priority-queue",
+      "streams",
+      "async-generators",
+      "sorting"
+    ],
+    "difficulty": 4,
+    "concept": "streams-external-merge"
+  },
+  {
+    "id": "stream-token-bucket-shaper",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Token Bucket Rate Shaper",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "rate-limiting",
+      "streams",
+      "token-bucket",
+      "algorithms",
+      "performance"
+    ],
+    "difficulty": 4,
+    "concept": "streams-rate-shaping"
+  },
+  {
+    "id": "microtask-batch-scheduler",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "async-js",
+    "title": "Microtask Batch Scheduler: queueMicrotask Coalescing",
+    "tags": [
+      "queueMicrotask",
+      "microtask",
+      "batching",
+      "scheduler",
+      "coalescing",
+      "async"
+    ],
+    "difficulty": 3,
+    "concept": "microtasks"
+  },
+  {
+    "id": "promise-waterfall-pipeline",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "async-js",
+    "title": "Promise Waterfall: Sequential Pipeline Reduction",
+    "tags": [
+      "promise",
+      "async",
+      "reduce",
+      "pipeline",
+      "waterfall",
+      "sequential"
+    ],
+    "difficulty": 2,
+    "concept": "async-control"
+  },
+  {
+    "id": "render-hook-harness",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "testing-tooling",
+    "title": "Mini renderHook: React Hook Test Harness",
+    "requiresDom": true,
+    "tags": [
+      "testing",
+      "react",
+      "hooks",
+      "lifecycle",
+      "test-runner"
+    ],
+    "difficulty": 4,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "sql-sequential-gaps",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "sql-postgres",
+    "title": "Sequential ID Gaps in Logs (LEAD)",
+    "tags": [
+      "sql",
+      "postgres",
+      "window-functions",
+      "gaps-and-islands",
+      "lead-lag",
+      "cte"
+    ],
+    "inputLanguage": "sql",
+    "difficulty": 3,
+    "concept": "sql-gaps-and-islands"
+  },
+  {
+    "id": "sql-worker-queue-skip-locked",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "sql-postgres",
+    "title": "Concurrent Task Queue Claim (FOR UPDATE SKIP LOCKED)",
+    "tags": [
+      "sql",
+      "postgres",
+      "concurrency",
+      "transactions",
+      "row-locking",
+      "queues"
+    ],
+    "inputLanguage": "sql",
+    "difficulty": 3,
+    "concept": "sql-concurrency-transactions"
+  },
+  {
+    "id": "test-each-data-driven",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "testing-tooling",
+    "title": "Data-Driven Parameterized Tests (test.each)",
+    "tags": [
+      "testing",
+      "vitest",
+      "jest",
+      "parameterized-tests",
+      "test-runner"
+    ],
+    "difficulty": 3,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "ts-assertion-functions",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "typescript-patterns",
+    "title": "TS Type Predicates vs. Assertion Functions",
+    "tags": [
+      "typescript",
+      "type-guards",
+      "assertions",
+      "narrowing",
+      "asserts"
+    ],
+    "difficulty": 2,
+    "concept": "ts-assertions"
+  },
+  {
+    "id": "ts-tuple-rest-parameters",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "track": "typescript-patterns",
+    "title": "TS Tuple Manipulation: Variadic Tuples and Rest Parameters",
+    "tags": [
+      "typescript",
+      "tuples",
+      "variadic",
+      "rest-parameters",
+      "generics",
+      "currying"
+    ],
+    "difficulty": 3,
+    "concept": "ts-tuples"
+  },
+  {
+    "id": "next-fetch-cache-revalidate",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Next.js Data Fetching: Extended fetch() & ISR",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "caching",
+      "isr",
+      "revalidation",
+      "fetch"
+    ],
+    "difficulty": 1,
+    "concept": "next-cache-revalidation"
+  },
+  {
+    "id": "next-server-client-leaf-boundary",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Next.js Architecture: Move Client Components to the Leaves",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "rsc",
+      "client-components",
+      "architecture",
+      "react"
+    ],
+    "rendersComponent": true,
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "next-client-components",
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ]
+  },
+  {
+    "id": "sql-basic-inner-join",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "sql-postgres",
+    "title": "SQL Table Joins: Two-Table Inner Join",
+    "tags": [
+      "sql",
+      "postgresql",
+      "join",
+      "inner-join",
+      "foreign-key",
+      "aliases"
+    ],
+    "difficulty": 1,
+    "concept": "sql-joins"
+  },
+  {
+    "id": "sql-basic-select-filter",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "sql-postgres",
+    "title": "SQL Query Basics: Filter, Sort, and Limit",
+    "tags": [
+      "sql",
+      "postgresql",
+      "select",
+      "where",
+      "order-by",
+      "limit"
+    ],
+    "difficulty": 1,
+    "concept": "sql-query-basics"
+  },
+  {
+    "id": "basic-assertion-library",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "testing-tooling",
+    "title": "Basic Test Assertions: ok, equal, and throws",
+    "tags": [
+      "testing",
+      "assertions",
+      "assert",
+      "unit-testing"
+    ],
+    "difficulty": 1,
+    "concept": "testing-tools"
+  },
+  {
+    "id": "dom-toggle-active-class",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "dom-browser",
+    "title": "DOM Event Listener: Toggle Active Class & Aria-Expanded",
+    "tags": [
+      "dom",
+      "browser",
+      "events",
+      "class-list",
+      "aria",
+      "event-listener"
+    ],
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "dom"
+  },
+  {
+    "id": "next-link-navigation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "nextjs",
+    "title": "Next.js Navigation: Link & usePathname",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "link",
+      "navigation",
+      "usePathname",
+      "accessibility"
+    ],
+    "rendersComponent": true,
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "next-navigation",
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ]
+  },
+  {
+    "id": "tailwind-alert-banner",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "tailwind",
+    "title": "Tailwind CSS: Alert Notification Banner Markup",
+    "tags": [
+      "tailwind",
+      "css",
+      "html",
+      "flexbox",
+      "alert",
+      "banner"
+    ],
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "tailwind-banner",
+    "inputLanguage": "html"
+  },
+  {
+    "id": "next-font-optimization",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Next.js Font Optimization: Google Fonts",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "font",
+      "optimization",
+      "google-fonts",
+      "root-layout"
+    ],
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "next-fonts"
+  },
+  {
+    "id": "next-image-component",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Next.js Image: Fixed Dimensions & Responsive Fill",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "image",
+      "optimization",
+      "core-web-vitals",
+      "responsive"
+    ],
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "next-image",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ]
+  },
+  {
+    "id": "next-navigation-hooks",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Next.js Navigation: useRouter & useSearchParams",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "router",
+      "navigation",
+      "hooks",
+      "client-components"
+    ],
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "next-navigation"
+  },
+  {
+    "id": "next-script-strategies",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Next.js Script: Loading Strategies",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "script",
+      "performance",
+      "optimization",
+      "third-party"
+    ],
+    "requiresDom": true,
+    "difficulty": 1,
+    "concept": "next-scripts",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ]
+  },
+  {
+    "id": "next-nested-static-params-matrix",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Next.js 15: Nested generateStaticParams with Catch-All Segments",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "generateStaticParams",
+      "static-export",
+      "catch-all",
+      "recursion"
+    ],
+    "difficulty": 4,
+    "concept": "next-static-params"
+  },
+  {
+    "id": "next-optimistic-action-mutation",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Next.js 15 & React 19: useOptimistic with Server Action Rollback",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "react-19",
+      "useOptimistic",
+      "server-actions",
+      "forms"
+    ],
+    "rendersComponent": true,
+    "requiresDom": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 4,
+    "concept": "next-optimistic-ui"
+  },
+  {
+    "id": "next-route-segment-config-resolver",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Next.js App Router: Route Segment Config & Cache Inheritance Resolver",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "route-segment-config",
+      "caching",
+      "revalidate",
+      "static-analysis"
+    ],
+    "difficulty": 4,
+    "concept": "next-route-segment-config"
+  },
+  {
+    "id": "next-after-lifecycle-deferred",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Next.js 15: Background Work with the after() API",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "app-router",
+      "after",
+      "async",
+      "lifecycle",
+      "server"
+    ],
+    "concept": "next-after-api",
+    "difficulty": 5
+  },
+  {
+    "id": "next-ppr-streaming-boundaries",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Next.js Streaming & Partial Prerendering (PPR) Architecture",
+    "track": "nextjs",
+    "tags": [
+      "nextjs",
+      "react",
+      "ppr",
+      "streaming",
+      "suspense",
+      "app-router"
+    ],
+    "concept": "next-ppr-streaming",
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 5,
+    "requiresDom": true
+  },
+  {
+    "id": "gql-query-variables-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "graphql",
+    "title": "GraphQL Query: Operation Variables & Arguments",
+    "tags": [
+      "graphql",
+      "query",
+      "variables",
+      "arguments",
+      "client"
+    ],
+    "concept": "gql-queries",
+    "inputLanguage": "graphql",
+    "difficulty": 1
+  },
+  {
+    "id": "mock-fn-spy-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Mock Function Spy: Call Tracking & Return Values",
+    "track": "testing-tooling",
+    "tags": [
+      "testing",
+      "mocking",
+      "spy",
+      "assertions",
+      "functions"
+    ],
+    "concept": "mock-functions",
+    "difficulty": 1
+  },
+  {
+    "id": "promise-sleep-delay",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Promise Delay & Value Timer",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "promises",
+      "timer",
+      "delay",
+      "sleep"
+    ],
+    "concept": "promise-delay",
+    "difficulty": 1
+  },
+  {
+    "id": "gql-query-field-alias-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "graphql",
+    "title": "GraphQL Query: Field Aliasing",
+    "tags": [
+      "graphql",
+      "query",
+      "aliases",
+      "arguments",
+      "fields"
+    ],
+    "concept": "gql-queries",
+    "inputLanguage": "graphql",
+    "difficulty": 1
+  },
+  {
+    "id": "sql-basic-aggregate-group",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "sql-postgres",
+    "title": "SQL Aggregation Basics: GROUP BY and HAVING",
+    "tags": [
+      "sql",
+      "postgresql",
+      "aggregates",
+      "group-by",
+      "having",
+      "count",
+      "avg"
+    ],
+    "difficulty": 1,
+    "concept": "sql-aggregates"
+  },
+  {
+    "id": "test-suite-runner-describe-it",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "testing-tooling",
+    "title": "Test Suite Runner: describe, it, and getReport",
+    "tags": [
+      "testing",
+      "bdd",
+      "runner",
+      "assertions",
+      "suite"
+    ],
+    "concept": "test-runners",
+    "difficulty": 1
+  },
+  {
+    "id": "promise-timeout-reject",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "async-js",
+    "title": "Promise Timeout: withTimeout Wrapper",
+    "tags": [
+      "async",
+      "promises",
+      "timeout",
+      "timer",
+      "race"
+    ],
+    "concept": "promise",
+    "difficulty": 1
+  },
+  {
+    "id": "tailwind-button-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "tailwind",
+    "title": "Tailwind Button: Interactive States & Variants",
+    "tags": [
+      "tailwind",
+      "button",
+      "interactive",
+      "variants",
+      "components"
+    ],
+    "concept": "tailwind-button",
+    "requiresDom": true,
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 1
+  }
+]

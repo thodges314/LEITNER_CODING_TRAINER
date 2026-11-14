@@ -200,6 +200,52 @@ if (fs.existsSync(indexFile)) {
   indexCommittedText = fs.readFileSync(indexFile, 'utf8');
 }
 
+const HEAVY_FIELDS = new Set([
+  'promptSeed',
+  'starterCode',
+  'testHarness',
+  'solution',
+  'referenceSolution',
+  'referenceSolutionTs',
+  'testCases',
+  'targetTime',
+  'targetSpace',
+  'complexityExplanation',
+  'previewCode',
+]);
+
+const topicsMeta = topics.map((t) => {
+  const metaEntry = {};
+  for (const [k, v] of Object.entries(t)) {
+    if (!HEAVY_FIELDS.has(k)) metaEntry[k] = v;
+  }
+  return metaEntry;
+});
+const metaFile = path.join(here, '..', 'src/data/topicsMeta.json');
+const metaOutput = JSON.stringify(topicsMeta, null, 2) + '\n';
+const metaCommittedText = fs.existsSync(metaFile) ? fs.readFileSync(metaFile, 'utf8') : '';
+
+const tracksDir = path.join(here, '..', 'src/data/tracks');
+const trackPayloads = new Map();
+for (const t of topics) {
+  let trackMap = trackPayloads.get(t.track);
+  if (!trackMap) {
+    trackMap = {};
+    trackPayloads.set(t.track, trackMap);
+  }
+  const heavy = {};
+  for (const field of HEAVY_FIELDS) {
+    if (t[field] !== undefined) heavy[field] = t[field];
+  }
+  trackMap[t.id] = heavy;
+}
+const trackOutputs = new Map(
+  [...trackPayloads.entries()].map(([track, payload]) => [
+    track,
+    JSON.stringify(payload, null, 2) + '\n',
+  ])
+);
+
 if (process.argv.includes('--check')) {
   // Read-only: report cards whose committed topics.json entry differs from a fresh build. Never writes.
   const committed = JSON.parse(committedText);
@@ -217,9 +263,16 @@ if (process.argv.includes('--check')) {
   }
   for (const id of byId.keys()) if (!topics.some((t) => t.id === id)) stale.push(`${id} (in topics.json but no source)`);
   const indexStale = indexOutput !== indexCommittedText;
+  const metaStale = metaOutput !== metaCommittedText;
+  const staleTracks = [];
+  for (const [track, trackOut] of trackOutputs.entries()) {
+    const tf = path.join(tracksDir, `${track}.json`);
+    const committedTrack = fs.existsSync(tf) ? fs.readFileSync(tf, 'utf8') : '';
+    if (trackOut !== committedTrack) staleTracks.push(track);
+  }
 
-  if (stale.length === 0 && output === committedText && !indexStale) {
-    console.log('topics.json and catalogIndex.json are up to date.');
+  if (stale.length === 0 && output === committedText && !indexStale && !metaStale && staleTracks.length === 0) {
+    console.log('topics.json, topicsMeta.json, tracks/*.json, and catalogIndex.json are up to date.');
     process.exit(0);
   }
   const errors = [];
@@ -229,10 +282,21 @@ if (process.argv.includes('--check')) {
   if (indexStale) {
     errors.push('catalogIndex.json is STALE or missing.');
   }
+  if (metaStale) {
+    errors.push('topicsMeta.json is STALE or missing.');
+  }
+  if (staleTracks.length > 0) {
+    errors.push(`src/data/tracks/*.json is STALE for: ${staleTracks.join(', ')}`);
+  }
   console.error(errors.join('\n') + '\nRun: npm run build:cards');
   process.exit(1);
 }
 
 fs.writeFileSync(file, output);
 fs.writeFileSync(indexFile, indexOutput);
-console.log(`built ${topics.length} cards, ${n} test cases, and catalogIndex.json (${catalogIndex.length} indexed cards)`);
+fs.writeFileSync(metaFile, metaOutput);
+fs.mkdirSync(tracksDir, { recursive: true });
+for (const [track, trackOut] of trackOutputs.entries()) {
+  fs.writeFileSync(path.join(tracksDir, `${track}.json`), trackOut);
+}
+console.log(`built ${topics.length} cards, ${n} test cases, topicsMeta.json, ${trackOutputs.size} track chunks, and catalogIndex.json (${catalogIndex.length} indexed cards)`);

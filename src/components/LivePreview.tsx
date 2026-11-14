@@ -86,15 +86,21 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
     propValuesRef.current = propValues;
   }, [propValues]);
 
+  const [, setBundlesRevision] = useState(0);
+
   useEffect(() => {
     let alive = true;
-    void import('../lib/reactPreviewFrame').then((m) => {
-      if (alive) setFrameModule(m);
+    void import('../lib/reactPreviewFrame').then(async (m) => {
+      await m.ensurePreviewBundlesLoaded(previewConfig.libraries);
+      if (alive) {
+        setFrameModule(m);
+        setBundlesRevision((r) => r + 1);
+      }
     });
     return () => {
       alive = false;
     };
-  }, []);
+  }, [previewConfig.libraries]);
   const [readyEnvKey, setReadyEnvKey] = useState<string | null>(null);
   const isIframeReady = readyEnvKey === currentEnvKey;
 
@@ -609,7 +615,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
         className={`react-preview-iframe-wrapper ${isPoppedOut ? 'react-preview-iframe-wrapper-popout' : ''}`}
         style={{ display: isLive ? 'block' : 'none' }}
       >
-        {frameModule && (
+        {frameModule && frameModule.arePreviewBundlesLoaded(previewConfig.libraries) && (
           <iframe
             key={currentEnvKey}
             ref={iframeRef}

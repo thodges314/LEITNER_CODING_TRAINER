@@ -1,0 +1,562 @@
+{
+  "sql-cancellation-rate": {
+    "promptSeed": "Write a PostgreSQL query to compute the cancellation rate of requests involving unbanned users for each day.\n\n### Schema: `Trips`\n- `id` (INT, PRIMARY KEY)\n- `client_id` (INT): User id of rider\n- `driver_id` (INT): User id of driver\n- `status` (TEXT): `'completed'`, `'cancelled_by_driver'`, or `'cancelled_by_client'`\n- `request_at` (TEXT): Date in `'YYYY-MM-DD'` format\n\n### Schema: `Users`\n- `id` (INT, PRIMARY KEY)\n- `banned` (TEXT): `'Yes'` or `'No'`\n- `role` (TEXT): `'client'`, `'driver'`, or `'partner'`\n\n### Query Contract\n- Both the client and the driver must not be banned (`banned = 'No'`).\n- The cancellation rate is the number of cancelled requests (by client or driver) divided by the total number of unbanned requests on that day.\n- Returns columns `\"Day\"` and `\"Cancellation Rate\"`.\n- `\"Cancellation Rate\"` must be rounded to 2 decimal places using `ROUND(..., 2)::float`.\n- Ordered by `\"Day\"` ASC.\n\n### Example\n`Users`:\n- `{ id: 1, banned: \"No\", role: \"client\" }`\n- `{ id: 2, banned: \"Yes\", role: \"client\" }`\n- `{ id: 10, banned: \"No\", role: \"driver\" }`\n- `{ id: 11, banned: \"No\", role: \"driver\" }`\n\n`Trips`:\n- `{ id: 1, client_id: 1, driver_id: 10, status: \"completed\", request_at: \"2024-03-01\" }`\n- `{ id: 2, client_id: 1, driver_id: 11, status: \"cancelled_by_driver\", request_at: \"2024-03-01\" }`\n- `{ id: 3, client_id: 2, driver_id: 10, status: \"cancelled_by_client\", request_at: \"2024-03-01\" }` (ignored: client 2 is banned)\n\nReturns for `2024-03-01`:\n- 1 completed + 1 cancelled = 2 trips. Cancellation rate = 1 / 2 = 0.50.\n- `[{ \"Day\": \"2024-03-01\", \"Cancellation Rate\": 0.5 }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE Users (id INT PRIMARY KEY, banned TEXT, role TEXT);\n    CREATE TABLE Trips (id INT PRIMARY KEY, client_id INT, driver_id INT, status TEXT, request_at TEXT);\n  `);\n\n  // Case 1: Multiple trips across days with banned users filtered\n  await db.exec(`\n    INSERT INTO Users VALUES\n      (1, 'No', 'client'),\n      (2, 'Yes', 'client'),\n      (3, 'No', 'client'),\n      (10, 'No', 'driver'),\n      (11, 'No', 'driver'),\n      (12, 'Yes', 'driver');\n    INSERT INTO Trips VALUES\n      (1, 1, 10, 'completed', '2024-03-01'),\n      (2, 1, 11, 'cancelled_by_driver', '2024-03-01'),\n      (3, 2, 10, 'cancelled_by_client', '2024-03-01'),\n      (4, 3, 10, 'completed', '2024-03-02'),\n      (5, 1, 12, 'cancelled_by_client', '2024-03-02');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Computes cancellation rate for unbanned users', r1 !== null && $test.equal(r1, [\n    { Day: '2024-03-01', 'Cancellation Rate': 0.5 },\n    { Day: '2024-03-02', 'Cancellation Rate': 0 },\n  ]), r1);\n\n  // Case 2: All trips completed (0.0 cancellation rate)\n  await db.exec(`\n    DELETE FROM Trips;\n    INSERT INTO Trips VALUES (1, 1, 10, 'completed', '2024-03-05');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Returns 0 when all trips are completed', r2 !== null && $test.equal(r2, [\n    { Day: '2024-03-05', 'Cancellation Rate': 0 },\n  ]), r2);\n\n  // Case 3: Empty trips\n  await db.exec(`DELETE FROM Trips;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty when no trips exist', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: 100% cancellation rate\n  await db.exec(`\n    DELETE FROM Trips; DELETE FROM Users;\n    INSERT INTO Users VALUES (1, 'No', 'client'), (10, 'No', 'driver');\n    INSERT INTO Trips VALUES (1, 1, 10, 'cancelled_by_client', '2024-04-01');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Returns 1 when all unbanned trips are cancelled', r4 !== null && $test.equal(r4, [\n    { Day: '2024-04-01', 'Cancellation Rate': 1 },\n  ]), r4);\n})();",
+    "referenceSolution": "SELECT t.request_at AS \"Day\",\n       ROUND(SUM(CASE WHEN t.status != 'completed' THEN 1.0 ELSE 0.0 END) / COUNT(*), 2)::float AS \"Cancellation Rate\"\nFROM Trips t\nJOIN Users c ON t.client_id = c.id AND c.banned = 'No'\nJOIN Users d ON t.driver_id = d.id AND d.banned = 'No'\nGROUP BY t.request_at\nORDER BY t.request_at ASC;",
+    "referenceSolutionTs": "SELECT t.request_at AS \"Day\",\n       ROUND(SUM(CASE WHEN t.status != 'completed' THEN 1.0 ELSE 0.0 END) / COUNT(*), 2)::float AS \"Cancellation Rate\"\nFROM Trips t\nJOIN Users c ON t.client_id = c.id AND c.banned = 'No'\nJOIN Users d ON t.driver_id = d.id AND d.banned = 'No'\nGROUP BY t.request_at\nORDER BY t.request_at ASC;",
+    "testCases": [
+      {
+        "description": "Computes cancellation rate for unbanned users",
+        "input": "query",
+        "expected": "[{\"Day\": \"2024-03-01\", \"Cancellation Rate\": 0.5}, {\"Day\": \"2024-03-02\", \"Cancellation Rate\": 0}]"
+      },
+      {
+        "description": "Returns 0 when all trips are completed",
+        "input": "query",
+        "expected": "[{\"Day\": \"2024-03-05\", \"Cancellation Rate\": 0}]"
+      },
+      {
+        "description": "Returns empty when no trips exist",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns 1 when all unbanned trips are cancelled",
+        "input": "query",
+        "expected": "[{\"Day\": \"2024-04-01\", \"Cancellation Rate\": 1}]"
+      }
+    ]
+  },
+  "sql-customer-order-frequency": {
+    "promptSeed": "Write a PostgreSQL query to find customers who have placed at least 2 orders.\n\n### Schema: `Customers`\n- `id` (INT, PRIMARY KEY)\n- `name` (TEXT): Customer full name\n- `email` (TEXT): Customer email address\n\n### Schema: `Orders`\n- `id` (INT, PRIMARY KEY)\n- `customer_id` (INT): Foreign key referencing `Customers(id)`\n- `amount` (INT): Order cost\n\n### Query Contract\n- Returns columns `email`, `order_count`, and `total_spent`.\n- Only includes customers with `COUNT(Orders.id) >= 2`.\n- Ordered by `total_spent` DESC, then `email` ASC.\n\n### Example\n`Customers`:\n- `{ id: 1, name: \"Alice\", email: \"alice@example.com\" }`\n- `{ id: 2, name: \"Bob\", email: \"bob@example.com\" }`\n- `{ id: 3, name: \"Carol\", email: \"carol@example.com\" }`\n\n`Orders`:\n- `{ id: 101, customer_id: 1, amount: 50 }`\n- `{ id: 102, customer_id: 1, amount: 70 }`\n- `{ id: 103, customer_id: 2, amount: 200 }`\n- `{ id: 104, customer_id: 3, amount: 30 }`\n- `{ id: 105, customer_id: 3, amount: 40 }`\n\nReturns:\n- `[{ email: \"alice@example.com\", order_count: 2, total_spent: 120 }, { email: \"carol@example.com\", order_count: 2, total_spent: 70 }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE Customers (id INT PRIMARY KEY, name TEXT, email TEXT);\n    CREATE TABLE Orders (id INT PRIMARY KEY, customer_id INT, amount INT);\n  `);\n\n  // Case 1: Multiple customers, only those with >= 2 orders returned\n  await db.exec(`\n    INSERT INTO Customers VALUES\n      (1, 'Alice', 'alice@example.com'),\n      (2, 'Bob', 'bob@example.com'),\n      (3, 'Carol', 'carol@example.com');\n    INSERT INTO Orders VALUES\n      (101, 1, 50),\n      (102, 1, 70),\n      (103, 2, 200),\n      (104, 3, 30),\n      (105, 3, 40);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Returns customers with >= 2 orders sorted by total spent', r1 !== null && $test.equal(r1, [\n    { email: 'alice@example.com', order_count: 2, total_spent: 120 },\n    { email: 'carol@example.com', order_count: 2, total_spent: 70 },\n  ]), r1);\n\n  // Case 2: No customers meet threshold\n  await db.exec(`\n    DELETE FROM Orders;\n    INSERT INTO Orders VALUES (201, 1, 100), (202, 2, 100), (203, 3, 100);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Returns empty when no customer has at least 2 orders', r2 !== null && $test.equal(r2, []), r2);\n\n  // Case 3: Empty orders\n  await db.exec(`DELETE FROM Orders;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty when no orders exist', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: Breaks ties in total spent by customer email ascending\n  await db.exec(`\n    DELETE FROM Orders;\n    DELETE FROM Customers;\n    INSERT INTO Customers VALUES (1, 'Zoe', 'zoe@example.com'), (2, 'Aaron', 'aaron@example.com');\n    INSERT INTO Orders VALUES (1, 1, 50), (2, 1, 50), (3, 2, 40), (4, 2, 60);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Breaks ties in total spent by customer email ascending', r4 !== null && $test.equal(r4, [\n    { email: 'aaron@example.com', order_count: 2, total_spent: 100 },\n    { email: 'zoe@example.com', order_count: 2, total_spent: 100 },\n  ]), r4);\n})();",
+    "referenceSolution": "SELECT c.email, COUNT(o.id) AS order_count, SUM(o.amount) AS total_spent\nFROM Customers c\nJOIN Orders o ON c.id = o.customer_id\nGROUP BY c.id, c.email\nHAVING COUNT(o.id) >= 2\nORDER BY total_spent DESC, c.email ASC;",
+    "referenceSolutionTs": "SELECT c.email, COUNT(o.id) AS order_count, SUM(o.amount) AS total_spent\nFROM Customers c\nJOIN Orders o ON c.id = o.customer_id\nGROUP BY c.id, c.email\nHAVING COUNT(o.id) >= 2\nORDER BY total_spent DESC, c.email ASC;",
+    "testCases": [
+      {
+        "description": "Returns customers with >= 2 orders sorted by total spent",
+        "input": "query",
+        "expected": "[{\"email\": \"alice@example.com\", \"order_count\": 2, \"total_spent\": 120}, {\"email\": \"carol@example.com\", \"order_count\": 2, \"total_spent\": 70}]"
+      },
+      {
+        "description": "Returns empty when no customer has at least 2 orders",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty when no orders exist",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Breaks ties in total spent by customer email ascending",
+        "input": "query",
+        "expected": "[{\"email\": \"aaron@example.com\", \"order_count\": 2, \"total_spent\": 100}, {\"email\": \"zoe@example.com\", \"order_count\": 2, \"total_spent\": 100}]"
+      }
+    ]
+  },
+  "sql-department-average-salary": {
+    "promptSeed": "Write a PostgreSQL query to find all employees whose salary is strictly greater than the average salary of their respective department.\n\n### Schema: `Employee`\n- `id` (INT, PRIMARY KEY)\n- `name` (TEXT): Employee name\n- `salary` (INT): Compensation\n- `department_id` (INT): Department identifier\n\n### Query Contract\n- Returns columns `\"Employee\"`, `\"Salary\"`, and `\"DepartmentId\"`.\n- Filters out employees who earn less than or equal to their department's average salary.\n- Ordered by `\"DepartmentId\"` ASC, then `\"Salary\"` DESC, then `\"Employee\"` ASC.\n\n### Example\nGiven `Employee`:\n- `{ id: 1, name: \"Alice\", salary: 100, department_id: 1 }` (Dept 1 avg: 85)\n- `{ id: 2, name: \"Bob\", salary: 70, department_id: 1 }`\n- `{ id: 3, name: \"Charlie\", salary: 120, department_id: 2 }` (Dept 2 avg: 110)\n- `{ id: 4, name: \"David\", salary: 100, department_id: 2 }`\n\nReturns:\n- `[{ \"Employee\": \"Alice\", \"Salary\": 100, \"DepartmentId\": 1 }, { \"Employee\": \"Charlie\", \"Salary\": 120, \"DepartmentId\": 2 }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE Employee (id INT PRIMARY KEY, name TEXT, salary INT, department_id INT);`);\n\n  // Case 1: Standard comparison\n  await db.exec(`\n    INSERT INTO Employee VALUES\n      (1, 'Alice', 100, 1),\n      (2, 'Bob', 70, 1),\n      (3, 'Charlie', 120, 2),\n      (4, 'David', 100, 2);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Returns employees strictly above department average', r1 !== null && $test.equal(r1, [\n    { Employee: 'Alice', Salary: 100, DepartmentId: 1 },\n    { Employee: 'Charlie', Salary: 120, DepartmentId: 2 },\n  ]), r1);\n\n  // Case 2: All employees have same salary (none above average)\n  await db.exec(`DELETE FROM Employee; INSERT INTO Employee VALUES (1, 'Eve', 100, 1), (2, 'Frank', 100, 1);`);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Returns empty when all salaries are equal to average', r2 !== null && $test.equal(r2, []), r2);\n\n  // Case 3: Empty table\n  await db.exec(`DELETE FROM Employee;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty when table has no records', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: Solo employee matching average vs multi-employee department\n  await db.exec(`\n    DELETE FROM Employee;\n    INSERT INTO Employee VALUES (1, 'Solo', 100, 1), (2, 'Low', 50, 2), (3, 'High', 150, 2);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Filters out solo department employees matching average and keeps above-average in multi-employee departments', r4 !== null && $test.equal(r4, [\n    { Employee: 'High', Salary: 150, DepartmentId: 2 },\n  ]), r4);\n})();",
+    "referenceSolution": "SELECT e.name AS \"Employee\", e.salary AS \"Salary\", e.department_id AS \"DepartmentId\"\nFROM Employee e\nWHERE e.salary > (\n  SELECT AVG(salary)\n  FROM Employee\n  WHERE department_id = e.department_id\n)\nORDER BY e.department_id ASC, e.salary DESC, e.name ASC;",
+    "referenceSolutionTs": "SELECT e.name AS \"Employee\", e.salary AS \"Salary\", e.department_id AS \"DepartmentId\"\nFROM Employee e\nWHERE e.salary > (\n  SELECT AVG(salary)\n  FROM Employee\n  WHERE department_id = e.department_id\n)\nORDER BY e.department_id ASC, e.salary DESC, e.name ASC;",
+    "testCases": [
+      {
+        "description": "Returns employees strictly above department average",
+        "input": "query",
+        "expected": "[{\"Employee\": \"Alice\", \"Salary\": 100, \"DepartmentId\": 1}, {\"Employee\": \"Charlie\", \"Salary\": 120, \"DepartmentId\": 2}]"
+      },
+      {
+        "description": "Returns empty when all salaries are equal to average",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty when table has no records",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Filters out solo department employees matching average and keeps above-average in multi-employee departments",
+        "input": "query",
+        "expected": "[{\"Employee\": \"High\", \"Salary\": 150, \"DepartmentId\": 2}]"
+      }
+    ]
+  },
+  "sql-department-highest-salary": {
+    "promptSeed": "Write a PostgreSQL query to find employees who have the highest salary in each department using `DENSE_RANK()`.\n\n### Schema: `Employee`\n- `id` (INT, PRIMARY KEY)\n- `name` (TEXT): Employee full name\n- `salary` (INT): Compensation amount\n- `department_id` (INT): Foreign key referencing `Department(id)`\n\n### Schema: `Department`\n- `id` (INT, PRIMARY KEY)\n- `name` (TEXT): Department name\n\n### Query Contract\n- Returns columns `\"Department\"`, `\"Employee\"`, and `\"Salary\"`.\n- If multiple employees in the same department tie for the highest salary, include all tied employees.\n- Result should be ordered by `\"Department\"` ASC, then `\"Employee\"` ASC.\n\n### Example\n`Department`:\n- `{ id: 1, name: \"IT\" }`\n- `{ id: 2, name: \"Sales\" }`\n\n`Employee`:\n- `{ id: 1, name: \"Joe\", salary: 70000, department_id: 1 }`\n- `{ id: 2, name: \"Jim\", salary: 90000, department_id: 1 }`\n- `{ id: 3, name: \"Henry\", salary: 80000, department_id: 2 }`\n- `{ id: 4, name: \"Sam\", salary: 60000, department_id: 2 }`\n- `{ id: 5, name: \"Max\", salary: 90000, department_id: 1 }`\n\nReturns:\n- `[{ \"Department\": \"IT\", \"Employee\": \"Jim\", \"Salary\": 90000 }, { \"Department\": \"IT\", \"Employee\": \"Max\", \"Salary\": 90000 }, { \"Department\": \"Sales\", \"Employee\": \"Henry\", \"Salary\": 80000 }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE Department (id INT PRIMARY KEY, name TEXT);\n    CREATE TABLE Employee (id INT PRIMARY KEY, name TEXT, salary INT, department_id INT);\n  `);\n\n  // Case 1: Standard department rankings with tie\n  await db.exec(`\n    INSERT INTO Department VALUES (1, 'IT'), (2, 'Sales');\n    INSERT INTO Employee VALUES\n      (1, 'Joe', 70000, 1),\n      (2, 'Jim', 90000, 1),\n      (3, 'Henry', 80000, 2),\n      (4, 'Sam', 60000, 2),\n      (5, 'Max', 90000, 1);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Returns department top earners preserving ties', r1 !== null && $test.equal(r1, [\n    { Department: 'IT', Employee: 'Jim', Salary: 90000 },\n    { Department: 'IT', Employee: 'Max', Salary: 90000 },\n    { Department: 'Sales', Employee: 'Henry', Salary: 80000 },\n  ]), r1);\n\n  // Case 2: Single department\n  await db.exec(`\n    DELETE FROM Employee;\n    DELETE FROM Department;\n    INSERT INTO Department VALUES (10, 'Engineering');\n    INSERT INTO Employee VALUES (1, 'Alice', 120000, 10), (2, 'Bob', 110000, 10);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Works with single department', r2 !== null && $test.equal(r2, [\n    { Department: 'Engineering', Employee: 'Alice', Salary: 120000 },\n  ]), r2);\n\n  // Case 3: Empty departments\n  await db.exec(`DELETE FROM Employee; DELETE FROM Department;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty list when tables are empty', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: Distinct non-tied departments\n  await db.exec(`\n    DELETE FROM Employee;\n    DELETE FROM Department;\n    INSERT INTO Department VALUES (1, 'Finance'), (2, 'HR');\n    INSERT INTO Employee VALUES (1, 'Amy', 50000, 2), (2, 'Bob', 75000, 1);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Returns highest earner across distinct non-tied departments', r4 !== null && $test.equal(r4, [\n    { Department: 'Finance', Employee: 'Bob', Salary: 75000 },\n    { Department: 'HR', Employee: 'Amy', Salary: 50000 },\n  ]), r4);\n})();",
+    "referenceSolution": "WITH Ranked AS (\n  SELECT d.name AS \"Department\", e.name AS \"Employee\", e.salary AS \"Salary\",\n         DENSE_RANK() OVER (PARTITION BY e.department_id ORDER BY e.salary DESC) AS rnk\n  FROM Employee e\n  JOIN Department d ON e.department_id = d.id\n)\nSELECT \"Department\", \"Employee\", \"Salary\"\nFROM Ranked\nWHERE rnk = 1\nORDER BY \"Department\" ASC, \"Employee\" ASC;",
+    "referenceSolutionTs": "WITH Ranked AS (\n  SELECT d.name AS \"Department\", e.name AS \"Employee\", e.salary AS \"Salary\",\n         DENSE_RANK() OVER (PARTITION BY e.department_id ORDER BY e.salary DESC) AS rnk\n  FROM Employee e\n  JOIN Department d ON e.department_id = d.id\n)\nSELECT \"Department\", \"Employee\", \"Salary\"\nFROM Ranked\nWHERE rnk = 1\nORDER BY \"Department\" ASC, \"Employee\" ASC;",
+    "testCases": [
+      {
+        "description": "Returns department top earners preserving ties",
+        "input": "query",
+        "expected": "[{\"Department\": \"IT\", \"Employee\": \"Jim\", \"Salary\": 90000}, {\"Department\": \"IT\", \"Employee\": \"Max\", \"Salary\": 90000}, {\"Department\": \"Sales\", \"Employee\": \"Henry\", \"Salary\": 80000}]"
+      },
+      {
+        "description": "Works with single department",
+        "input": "query",
+        "expected": "[{\"Department\": \"Engineering\", \"Employee\": \"Alice\", \"Salary\": 120000}]"
+      },
+      {
+        "description": "Returns empty list when tables are empty",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns highest earner across distinct non-tied departments",
+        "input": "query",
+        "expected": "[{\"Department\": \"Finance\", \"Employee\": \"Bob\", \"Salary\": 75000}, {\"Department\": \"HR\", \"Employee\": \"Amy\", \"Salary\": 50000}]"
+      }
+    ]
+  },
+  "sql-running-total-sales": {
+    "promptSeed": "Write a PostgreSQL query to compute a running cumulative sum of order amounts over time.\n\n### Schema: `Orders`\n- `id` (INT, PRIMARY KEY)\n- `order_date` (TEXT): Date in `'YYYY-MM-DD'` format\n- `amount` (INT): Order revenue amount\n\n### Query Contract\n- Returns columns `order_date`, `amount`, and `running_total`.\n- The running total must accumulate preceding order amounts up to and including the current row.\n- Ordered by `order_date` ASC, then `id` ASC.\n\n### Example\nGiven `Orders`:\n- `{ id: 1, order_date: \"2024-01-01\", amount: 100 }`\n- `{ id: 2, order_date: \"2024-01-02\", amount: 150 }`\n- `{ id: 3, order_date: \"2024-01-03\", amount: 200 }`\n\nReturns:\n- `[{ order_date: \"2024-01-01\", amount: 100, running_total: 100 }, { order_date: \"2024-01-02\", amount: 150, running_total: 250 }, { order_date: \"2024-01-03\", amount: 200, running_total: 450 }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE Orders (id INT PRIMARY KEY, order_date TEXT, amount INT);`);\n\n  // Case 1: Multiple daily orders\n  await db.exec(`\n    INSERT INTO Orders VALUES\n      (1, '2024-01-01', 100),\n      (2, '2024-01-02', 150),\n      (3, '2024-01-03', 200);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Computes cumulative running total', r1 !== null && $test.equal(r1, [\n    { order_date: '2024-01-01', amount: 100, running_total: 100 },\n    { order_date: '2024-01-02', amount: 150, running_total: 250 },\n    { order_date: '2024-01-03', amount: 200, running_total: 450 },\n  ]), r1);\n\n  // Case 2: Same date multiple orders\n  await db.exec(`\n    DELETE FROM Orders;\n    INSERT INTO Orders VALUES\n      (1, '2024-02-01', 50),\n      (2, '2024-02-01', 25),\n      (3, '2024-02-02', 25);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Breaks ties on same date using id', r2 !== null && $test.equal(r2, [\n    { order_date: '2024-02-01', amount: 50, running_total: 50 },\n    { order_date: '2024-02-01', amount: 25, running_total: 75 },\n    { order_date: '2024-02-02', amount: 25, running_total: 100 },\n  ]), r2);\n\n  // Case 3: Empty orders\n  await db.exec(`DELETE FROM Orders;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns empty when no orders exist', r3 !== null && $test.equal(r3, []), r3);\n\n  // Case 4: Single order\n  await db.exec(`\n    DELETE FROM Orders;\n    INSERT INTO Orders VALUES (1, '2024-05-10', 42);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Computes running total correctly for a single order', r4 !== null && $test.equal(r4, [\n    { order_date: '2024-05-10', amount: 42, running_total: 42 },\n  ]), r4);\n})();",
+    "referenceSolution": "SELECT order_date, amount,\n       SUM(amount) OVER (ORDER BY order_date ASC, id ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total\nFROM Orders\nORDER BY order_date ASC, id ASC;",
+    "referenceSolutionTs": "SELECT order_date, amount,\n       SUM(amount) OVER (ORDER BY order_date ASC, id ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total\nFROM Orders\nORDER BY order_date ASC, id ASC;",
+    "testCases": [
+      {
+        "description": "Computes cumulative running total",
+        "input": "query",
+        "expected": "[{\"order_date\": \"2024-01-01\", \"amount\": 100, \"running_total\": 100}, {\"order_date\": \"2024-01-02\", \"amount\": 150, \"running_total\": 250}, {\"order_date\": \"2024-01-03\", \"amount\": 200, \"running_total\": 450}]"
+      },
+      {
+        "description": "Breaks ties on same date using id",
+        "input": "query",
+        "expected": "[{\"order_date\": \"2024-02-01\", \"amount\": 50, \"running_total\": 50}, {\"order_date\": \"2024-02-01\", \"amount\": 25, \"running_total\": 75}, {\"order_date\": \"2024-02-02\", \"amount\": 25, \"running_total\": 100}]"
+      },
+      {
+        "description": "Returns empty when no orders exist",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Computes running total correctly for a single order",
+        "input": "query",
+        "expected": "[{\"order_date\": \"2024-05-10\", \"amount\": 42, \"running_total\": 42}]"
+      }
+    ]
+  },
+  "sql-second-highest-salary": {
+    "promptSeed": "Write a PostgreSQL query to find the second highest distinct salary from the `Employee` table.\n\n### Schema: `Employee`\n- `id` (INT, PRIMARY KEY): Unique employee identifier.\n- `salary` (INT): Employee compensation amount.\n\n### Query Contract\n- Returns a single row with column `\"SecondHighestSalary\"`.\n- If the second highest salary does not exist (e.g. fewer than 2 distinct salaries), the query must return `NULL` as the value for `\"SecondHighestSalary\"`.\n\n### Example\nGiven `Employee` records:\n- `{ id: 1, salary: 100 }`\n- `{ id: 2, salary: 200 }`\n- `{ id: 3, salary: 300 }`\n\nThe query returns:\n- `[{ \"SecondHighestSalary\": 200 }]`\n\nIf `Employee` has only `{ id: 1, salary: 100 }`:\n- Returns `[{ \"SecondHighestSalary\": null }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE Employee (id INT PRIMARY KEY, salary INT);`);\n\n  // Case 1: Standard 3 distinct salaries\n  await db.exec(`DELETE FROM Employee; INSERT INTO Employee VALUES (1, 100), (2, 200), (3, 300);`);\n  const r1 = await runSafe(db, userSql);\n  $test.check('Returns second highest salary when multiple distinct salaries exist', r1 !== null && $test.equal(r1, [{ SecondHighestSalary: 200 }]), r1);\n\n  // Case 2: Only 1 employee\n  await db.exec(`DELETE FROM Employee; INSERT INTO Employee VALUES (1, 100);`);\n  const r2 = await runSafe(db, userSql);\n  $test.check('Returns null when only 1 record exists', r2 !== null && $test.equal(r2, [{ SecondHighestSalary: null }]), r2);\n\n  // Case 3: Empty table\n  await db.exec(`DELETE FROM Employee;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check('Returns null when table is empty', r3 !== null && $test.equal(r3, [{ SecondHighestSalary: null }]), r3);\n\n  // Case 4: Duplicate top salaries\n  await db.exec(`INSERT INTO Employee VALUES (1, 500), (2, 500), (3, 400), (4, 300);`);\n  const r4 = await runSafe(db, userSql);\n  $test.check('Handles duplicate highest salaries correctly', r4 !== null && $test.equal(r4, [{ SecondHighestSalary: 400 }]), r4);\n})();",
+    "referenceSolution": "SELECT MAX(salary) AS \"SecondHighestSalary\"\nFROM Employee\nWHERE salary < (SELECT MAX(salary) FROM Employee);",
+    "referenceSolutionTs": "SELECT MAX(salary) AS \"SecondHighestSalary\"\nFROM Employee\nWHERE salary < (SELECT MAX(salary) FROM Employee);",
+    "testCases": [
+      {
+        "description": "Returns second highest salary when multiple distinct salaries exist",
+        "input": "query",
+        "expected": "[{\"SecondHighestSalary\": 200}]"
+      },
+      {
+        "description": "Returns null when only 1 record exists",
+        "input": "query",
+        "expected": "[{\"SecondHighestSalary\": null}]"
+      },
+      {
+        "description": "Returns null when table is empty",
+        "input": "query",
+        "expected": "[{\"SecondHighestSalary\": null}]"
+      },
+      {
+        "description": "Handles duplicate highest salaries correctly",
+        "input": "query",
+        "expected": "[{\"SecondHighestSalary\": 400}]"
+      }
+    ]
+  },
+  "sql-consecutive-numbers": {
+    "promptSeed": "Write a PostgreSQL query to find all numbers that appear at least three times consecutively in the `Logs` table.\n\n### Schema: `Logs`\n- `id` (INT, PRIMARY KEY): Auto-incrementing row identifier.\n- `num` (INT): Logged numeric value.\n\n### Query Contract\n- Returns a column named `\"ConsecutiveNums\"` containing the distinct numbers that appear at least three consecutive times (where consecutive rows have sequential IDs `id`, `id + 1`, and `id + 2` with identical `num` values).\n- Results must be ordered by `\"ConsecutiveNums\"` ascending.\n- If no numbers repeat consecutively at least three times, return an empty result set (0 rows).\n\n### Example\nGiven `Logs` records:\n- `{ id: 1, num: 1 }`\n- `{ id: 2, num: 1 }`\n- `{ id: 3, num: 1 }`\n- `{ id: 4, num: 2 }`\n- `{ id: 5, num: 1 }`\n- `{ id: 6, num: 2 }`\n- `{ id: 7, num: 2 }`\n\nThe query returns:\n- `[{ \"ConsecutiveNums\": 1 }]`\n\nNotice that `1` is the only number that appears for at least three consecutive IDs (`1`, `2`, `3`). While `2` appears three times total, it only appears two times consecutively in rows 6 and 7.",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE Logs (id INT PRIMARY KEY, num INT);`);\n\n  // Case 1: Standard sequence with single consecutive number\n  await db.exec(`DELETE FROM Logs; INSERT INTO Logs VALUES (1, 1), (2, 1), (3, 1), (4, 2), (5, 1), (6, 2), (7, 2);`);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Finds single number appearing three consecutive times',\n    r1 !== null && $test.equal(r1, [{ ConsecutiveNums: 1 }]),\n    r1\n  );\n\n  // Case 2: Multiple distinct numbers appearing consecutively\n  await db.exec(`DELETE FROM Logs; INSERT INTO Logs VALUES (1, 1), (2, 1), (3, 1), (4, 2), (5, 3), (6, 3), (7, 3);`);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Finds multiple numbers that appear at least three consecutive times',\n    r2 !== null && $test.equal(r2, [{ ConsecutiveNums: 1 }, { ConsecutiveNums: 3 }]),\n    r2\n  );\n\n  // Case 3: No consecutive repeats\n  await db.exec(`DELETE FROM Logs; INSERT INTO Logs VALUES (1, 1), (2, 2), (3, 1), (4, 2), (5, 1);`);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty list when no numbers repeat consecutively',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Four consecutive identical numbers (should only return distinct row once)\n  await db.exec(`DELETE FROM Logs; INSERT INTO Logs VALUES (1, 5), (2, 5), (3, 5), (4, 5), (5, 9);`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Handles runs of four or more consecutive identical numbers without duplicate rows',\n    r4 !== null && $test.equal(r4, [{ ConsecutiveNums: 5 }]),\n    r4\n  );\n})();",
+    "referenceSolution": "SELECT DISTINCT l1.num AS \"ConsecutiveNums\"\nFROM Logs l1\nJOIN Logs l2 ON l1.id = l2.id - 1\nJOIN Logs l3 ON l1.id = l3.id - 2\nWHERE l1.num = l2.num AND l2.num = l3.num\nORDER BY \"ConsecutiveNums\" ASC;",
+    "referenceSolutionTs": "SELECT DISTINCT l1.num AS \"ConsecutiveNums\"\nFROM Logs l1\nJOIN Logs l2 ON l1.id = l2.id - 1\nJOIN Logs l3 ON l1.id = l3.id - 2\nWHERE l1.num = l2.num AND l2.num = l3.num\nORDER BY \"ConsecutiveNums\" ASC;",
+    "testCases": [
+      {
+        "description": "Finds single number appearing three consecutive times",
+        "input": "query",
+        "expected": "[{\"ConsecutiveNums\": 1}]"
+      },
+      {
+        "description": "Finds multiple numbers that appear at least three consecutive times",
+        "input": "query",
+        "expected": "[{\"ConsecutiveNums\": 1}, {\"ConsecutiveNums\": 3}]"
+      },
+      {
+        "description": "Returns empty list when no numbers repeat consecutively",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Handles runs of four or more consecutive identical numbers without duplicate rows",
+        "input": "query",
+        "expected": "[{\"ConsecutiveNums\": 5}]"
+      }
+    ]
+  },
+  "sql-org-hierarchy-cte": {
+    "promptSeed": "Write a PostgreSQL query using a recursive Common Table Expression (`WITH RECURSIVE`) to traverse an organization's reporting hierarchy.\n\nStarting from top-level executives (employees where `manager_id IS NULL` at depth 0), calculate each employee's depth in the reporting chain and identify the root executive at the top of their chain.\n\n### Schema: `Employees`\n- `id` (INT, PRIMARY KEY): Unique employee identifier.\n- `name` (VARCHAR): Employee name.\n- `manager_id` (INT, NULLABLE): Identifier of employee's direct manager (`NULL` for root leaders).\n\n### Query Contract\n- Returns columns:\n  - `\"id\"` (INT): Employee identifier.\n  - `\"name\"` (VARCHAR): Employee name.\n  - `\"depth\"` (INT): 0 for root executives, 1 for direct reports, 2 for skip-level reports, etc.\n  - `\"root_leader\"` (VARCHAR): Name of the root executive at the top of this employee's reporting chain.\n- Ordered by `\"depth\"` ASC, `\"name\"` ASC, and `\"id\"` ASC.\n\n### Example\nGiven `Employees`:\n- `{ id: 1, name: \"Satya\", manager_id: null }`\n- `{ id: 2, name: \"Kevin\", manager_id: 1 }`\n- `{ id: 3, name: \"Amy\", manager_id: 1 }`\n- `{ id: 4, name: \"Phil\", manager_id: 2 }`\n\nThe query returns:\n- `[{ \"id\": 1, \"name\": \"Satya\", \"depth\": 0, \"root_leader\": \"Satya\" }, { \"id\": 3, \"name\": \"Amy\", \"depth\": 1, \"root_leader\": \"Satya\" }, { \"id\": 2, \"name\": \"Kevin\", \"depth\": 1, \"root_leader\": \"Satya\" }, { \"id\": 4, \"name\": \"Phil\", \"depth\": 2, \"root_leader\": \"Satya\" }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE Employees (id INT PRIMARY KEY, name VARCHAR(50), manager_id INT);`);\n\n  // Case 1: Standard multi-level hierarchy\n  await db.exec(`\n    DELETE FROM Employees;\n    INSERT INTO Employees VALUES\n      (1, 'Satya', NULL),\n      (2, 'Kevin', 1),\n      (3, 'Amy', 1),\n      (4, 'Phil', 2);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Traverses multi-level organization reporting hierarchy with correct depths and root leaders',\n    r1 !== null && $test.equal(r1, [\n      { id: 1, name: 'Satya', depth: 0, root_leader: 'Satya' },\n      { id: 3, name: 'Amy', depth: 1, root_leader: 'Satya' },\n      { id: 2, name: 'Kevin', depth: 1, root_leader: 'Satya' },\n      { id: 4, name: 'Phil', depth: 2, root_leader: 'Satya' },\n    ]),\n    r1\n  );\n\n  // Case 2: Disjoint trees (two CEOs with separate reporting chains)\n  await db.exec(`\n    DELETE FROM Employees;\n    INSERT INTO Employees VALUES\n      (10, 'Alice', NULL),\n      (11, 'Bob', 10),\n      (20, 'Carol', NULL),\n      (21, 'Dan', 20),\n      (22, 'Eve', 21);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Handles multiple disjoint trees with separate root leaders',\n    r2 !== null && $test.equal(r2, [\n      { id: 10, name: 'Alice', depth: 0, root_leader: 'Alice' },\n      { id: 20, name: 'Carol', depth: 0, root_leader: 'Carol' },\n      { id: 11, name: 'Bob', depth: 1, root_leader: 'Alice' },\n      { id: 21, name: 'Dan', depth: 1, root_leader: 'Carol' },\n      { id: 22, name: 'Eve', depth: 2, root_leader: 'Carol' },\n    ]),\n    r2\n  );\n\n  // Case 3: Single isolated executive without reports\n  await db.exec(`DELETE FROM Employees; INSERT INTO Employees VALUES (1, 'Solo', NULL);`);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns depth 0 for an isolated executive without reports',\n    r3 !== null && $test.equal(r3, [{ id: 1, name: 'Solo', depth: 0, root_leader: 'Solo' }]),\n    r3\n  );\n\n  // Case 4: Empty table\n  await db.exec(`DELETE FROM Employees;`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty list when employees table is empty',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "WITH RECURSIVE OrgChart AS (\n  SELECT\n    id,\n    name,\n    0 AS depth,\n    name AS root_leader\n  FROM Employees\n  WHERE manager_id IS NULL\n\n  UNION ALL\n\n  SELECT\n    e.id,\n    e.name,\n    o.depth + 1 AS depth,\n    o.root_leader\n  FROM Employees e\n  JOIN OrgChart o ON e.manager_id = o.id\n)\nSELECT\n  id,\n  name,\n  depth,\n  root_leader\nFROM OrgChart\nORDER BY depth ASC, name ASC, id ASC;",
+    "referenceSolutionTs": "WITH RECURSIVE OrgChart AS (\n  SELECT\n    id,\n    name,\n    0 AS depth,\n    name AS root_leader\n  FROM Employees\n  WHERE manager_id IS NULL\n\n  UNION ALL\n\n  SELECT\n    e.id,\n    e.name,\n    o.depth + 1 AS depth,\n    o.root_leader\n  FROM Employees e\n  JOIN OrgChart o ON e.manager_id = o.id\n)\nSELECT\n  id,\n  name,\n  depth,\n  root_leader\nFROM OrgChart\nORDER BY depth ASC, name ASC, id ASC;",
+    "testCases": [
+      {
+        "description": "Traverses multi-level organization reporting hierarchy with correct depths and root leaders",
+        "input": "query",
+        "expected": "[{\"id\": 1, \"name\": \"Satya\", \"depth\": 0, \"root_leader\": \"Satya\"}, {\"id\": 3, \"name\": \"Amy\", \"depth\": 1, \"root_leader\": \"Satya\"}, {\"id\": 2, \"name\": \"Kevin\", \"depth\": 1, \"root_leader\": \"Satya\"}, {\"id\": 4, \"name\": \"Phil\", \"depth\": 2, \"root_leader\": \"Satya\"}]"
+      },
+      {
+        "description": "Handles multiple disjoint trees with separate root leaders",
+        "input": "query",
+        "expected": "[{\"id\": 10, \"name\": \"Alice\", \"depth\": 0, \"root_leader\": \"Alice\"}, {\"id\": 20, \"name\": \"Carol\", \"depth\": 0, \"root_leader\": \"Carol\"}, {\"id\": 11, \"name\": \"Bob\", \"depth\": 1, \"root_leader\": \"Alice\"}, {\"id\": 21, \"name\": \"Dan\", \"depth\": 1, \"root_leader\": \"Carol\"}, {\"id\": 22, \"name\": \"Eve\", \"depth\": 2, \"root_leader\": \"Carol\"}]"
+      },
+      {
+        "description": "Returns depth 0 for an isolated executive without reports",
+        "input": "query",
+        "expected": "[{\"id\": 1, \"name\": \"Solo\", \"depth\": 0, \"root_leader\": \"Solo\"}]"
+      },
+      {
+        "description": "Returns empty list when employees table is empty",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-top-three-salaries": {
+    "promptSeed": "A company's executives are interested in seeing who earns the most money in each of the company's departments. A high earner in a department is an employee who has a salary in the top **three unique** salaries for that department.\n\nWrite a PostgreSQL query to find the employees who are high earners in each department.\n\n### Schema: `Department`\n- `id` (INT, PRIMARY KEY): Department identifier.\n- `name` (VARCHAR): Department name.\n\n### Schema: `Employee`\n- `id` (INT, PRIMARY KEY): Unique employee identifier.\n- `name` (VARCHAR): Employee name.\n- `salary` (INT): Employee compensation amount.\n- `departmentId` (INT): Foreign key referencing `Department(id)`.\n\n### Query Contract\n- Returns columns:\n  - `\"Department\"`: Department name.\n  - `\"Employee\"`: Employee name.\n  - `\"Salary\"`: Employee compensation amount.\n- An employee is included if their salary's dense rank within their department is `<= 3` (e.g. `DENSE_RANK() OVER (PARTITION BY departmentId ORDER BY salary DESC) <= 3`).\n- Ties must be preserved: if multiple employees in the same department share the same salary, all tied employees are included as long as their unique salary rank is `<= 3`.\n- Output rows ordered by `\"Department\"` ASC, `\"Salary\"` DESC, and `\"Employee\"` ASC.\n- If a department has fewer than 3 employees, all employees in that department are included.\n\n### Example\nGiven `Department`:\n- `{ id: 1, name: \"IT\" }`\n- `{ id: 2, name: \"Sales\" }`\n\nGiven `Employee`:\n- `{ id: 1, name: \"Joe\", salary: 85000, departmentId: 1 }`\n- `{ id: 2, name: \"Henry\", salary: 80000, departmentId: 2 }`\n- `{ id: 3, name: \"Sam\", salary: 60000, departmentId: 2 }`\n- `{ id: 4, name: \"Max\", salary: 90000, departmentId: 1 }`\n- `{ id: 5, name: \"Janet\", salary: 69000, departmentId: 1 }`\n- `{ id: 6, name: \"Randy\", salary: 85000, departmentId: 1 }`\n- `{ id: 7, name: \"Will\", salary: 70000, departmentId: 1 }`\n\nThe query returns:\n- `[{ \"Department\": \"IT\", \"Employee\": \"Max\", \"Salary\": 90000 }, { \"Department\": \"IT\", \"Employee\": \"Joe\", \"Salary\": 85000 }, { \"Department\": \"IT\", \"Employee\": \"Randy\", \"Salary\": 85000 }, { \"Department\": \"IT\", \"Employee\": \"Will\", \"Salary\": 70000 }, { \"Department\": \"Sales\", \"Employee\": \"Henry\", \"Salary\": 80000 }, { \"Department\": \"Sales\", \"Employee\": \"Sam\", \"Salary\": 60000 }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE Department (id INT PRIMARY KEY, name VARCHAR(50));\n    CREATE TABLE Employee (id INT PRIMARY KEY, name VARCHAR(50), salary INT, departmentId INT);\n  `);\n\n  // Case 1: Standard case with ties in IT and fewer in Sales\n  await db.exec(`\n    DELETE FROM Employee; DELETE FROM Department;\n    INSERT INTO Department VALUES (1, 'IT'), (2, 'Sales');\n    INSERT INTO Employee VALUES\n      (1, 'Joe', 85000, 1),\n      (2, 'Henry', 80000, 2),\n      (3, 'Sam', 60000, 2),\n      (4, 'Max', 90000, 1),\n      (5, 'Janet', 69000, 1),\n      (6, 'Randy', 85000, 1),\n      (7, 'Will', 70000, 1);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Selects top three unique salaries preserving ties across departments',\n    r1 !== null && $test.equal(r1, [\n      { Department: 'IT', Employee: 'Max', Salary: 90000 },\n      { Department: 'IT', Employee: 'Joe', Salary: 85000 },\n      { Department: 'IT', Employee: 'Randy', Salary: 85000 },\n      { Department: 'IT', Employee: 'Will', Salary: 70000 },\n      { Department: 'Sales', Employee: 'Henry', Salary: 80000 },\n      { Department: 'Sales', Employee: 'Sam', Salary: 60000 },\n    ]),\n    r1\n  );\n\n  // Case 2: Department with fewer than 3 employees\n  await db.exec(`\n    DELETE FROM Employee; DELETE FROM Department;\n    INSERT INTO Department VALUES (1, 'Engineering');\n    INSERT INTO Employee VALUES (10, 'Alice', 120000, 1), (11, 'Bob', 110000, 1);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Includes all employees when department has fewer than three distinct salaries',\n    r2 !== null && $test.equal(r2, [\n      { Department: 'Engineering', Employee: 'Alice', Salary: 120000 },\n      { Department: 'Engineering', Employee: 'Bob', Salary: 110000 },\n    ]),\n    r2\n  );\n\n  // Case 3: Empty tables\n  await db.exec(`DELETE FROM Employee; DELETE FROM Department;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty list when employees table is empty',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Multiple salaries in one department where rank > 3 must be filtered out\n  await db.exec(`\n    DELETE FROM Employee; DELETE FROM Department;\n    INSERT INTO Department VALUES (1, 'R&D');\n    INSERT INTO Employee VALUES\n      (1, 'Lead', 150000, 1),\n      (2, 'SeniorA', 130000, 1),\n      (3, 'SeniorB', 130000, 1),\n      (4, 'Mid', 110000, 1),\n      (5, 'Junior', 90000, 1),\n      (6, 'Intern', 60000, 1);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Filters out rank 4 and lower salaries when more than three unique salary tiers exist',\n    r4 !== null && $test.equal(r4, [\n      { Department: 'R&D', Employee: 'Lead', Salary: 150000 },\n      { Department: 'R&D', Employee: 'SeniorA', Salary: 130000 },\n      { Department: 'R&D', Employee: 'SeniorB', Salary: 130000 },\n      { Department: 'R&D', Employee: 'Mid', Salary: 110000 },\n    ]),\n    r4\n  );\n})();",
+    "referenceSolution": "WITH RankedEmployees AS (\n  SELECT\n    d.name AS \"Department\",\n    e.name AS \"Employee\",\n    e.salary AS \"Salary\",\n    DENSE_RANK() OVER (\n      PARTITION BY e.departmentId\n      ORDER BY e.salary DESC\n    ) AS rank\n  FROM Employee e\n  JOIN Department d ON e.departmentId = d.id\n)\nSELECT \"Department\", \"Employee\", \"Salary\"\nFROM RankedEmployees\nWHERE rank <= 3\nORDER BY \"Department\" ASC, \"Salary\" DESC, \"Employee\" ASC;",
+    "referenceSolutionTs": "WITH RankedEmployees AS (\n  SELECT\n    d.name AS \"Department\",\n    e.name AS \"Employee\",\n    e.salary AS \"Salary\",\n    DENSE_RANK() OVER (\n      PARTITION BY e.departmentId\n      ORDER BY e.salary DESC\n    ) AS rank\n  FROM Employee e\n  JOIN Department d ON e.departmentId = d.id\n)\nSELECT \"Department\", \"Employee\", \"Salary\"\nFROM RankedEmployees\nWHERE rank <= 3\nORDER BY \"Department\" ASC, \"Salary\" DESC, \"Employee\" ASC;",
+    "testCases": [
+      {
+        "description": "Selects top three unique salaries preserving ties across departments",
+        "input": "query",
+        "expected": "[{\"Department\": \"IT\", \"Employee\": \"Max\", \"Salary\": 90000}, {\"Department\": \"IT\", \"Employee\": \"Joe\", \"Salary\": 85000}, {\"Department\": \"IT\", \"Employee\": \"Randy\", \"Salary\": 85000}, {\"Department\": \"IT\", \"Employee\": \"Will\", \"Salary\": 70000}, {\"Department\": \"Sales\", \"Employee\": \"Henry\", \"Salary\": 80000}, {\"Department\": \"Sales\", \"Employee\": \"Sam\", \"Salary\": 60000}]"
+      },
+      {
+        "description": "Includes all employees when department has fewer than three distinct salaries",
+        "input": "query",
+        "expected": "[{\"Department\": \"Engineering\", \"Employee\": \"Alice\", \"Salary\": 120000}, {\"Department\": \"Engineering\", \"Employee\": \"Bob\", \"Salary\": 110000}]"
+      },
+      {
+        "description": "Returns empty list when employees table is empty",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Filters out rank 4 and lower salaries when more than three unique salary tiers exist",
+        "input": "query",
+        "expected": "[{\"Department\": \"R&D\", \"Employee\": \"Lead\", \"Salary\": 150000}, {\"Department\": \"R&D\", \"Employee\": \"SeniorA\", \"Salary\": 130000}, {\"Department\": \"R&D\", \"Employee\": \"SeniorB\", \"Salary\": 130000}, {\"Department\": \"R&D\", \"Employee\": \"Mid\", \"Salary\": 110000}]"
+      }
+    ]
+  },
+  "sql-customers-who-never-order": {
+    "promptSeed": "Write a PostgreSQL query to find all customers who have never placed any orders.\n\n### Schema: `customers`\n- `id` (INT, PRIMARY KEY): Unique identifier for each customer.\n- `name` (VARCHAR): Customer's name.\n\n### Schema: `orders`\n- `id` (INT, PRIMARY KEY): Unique identifier for each order.\n- `customer_id` (INT): Foreign key referencing `customers.id`.\n- `amount` (INT): Order total amount.\n\n### Query Contract\n- Output column: `customer_name` (the customer's name from `customers.name`).\n- Return only customers who have no corresponding rows in `orders`.\n- Sort results by `customer_name` ascending (`ORDER BY customer_name ASC`).\n- If all customers have placed orders or if `customers` is empty, return an empty result set (0 rows).\n\n### Example\nGiven `customers` records:\n- `{ id: 1, name: \"Joe\" }`\n- `{ id: 2, name: \"Henry\" }`\n- `{ id: 3, name: \"Sam\" }`\n- `{ id: 4, name: \"Max\" }`\n\nGiven `orders` records:\n- `{ id: 1, customer_id: 3, amount: 150 }`\n- `{ id: 2, customer_id: 1, amount: 200 }`\n\nThe query returns:\n- `[{ \"customer_name\": \"Henry\" }, { \"customer_name\": \"Max\" }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE customers (id INT PRIMARY KEY, name VARCHAR(50));\n    CREATE TABLE orders (id INT PRIMARY KEY, customer_id INT, amount INT);\n  `);\n\n  // Case 1: Identifies customers with no orders in orders table\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'Joe'), (2, 'Henry'), (3, 'Sam'), (4, 'Max');\n    INSERT INTO orders VALUES (1, 3, 150), (2, 1, 200);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Identifies customers with no orders in orders table',\n    r1 !== null && $test.equal(r1, [\n      { customer_name: 'Henry' },\n      { customer_name: 'Max' }\n    ]),\n    r1\n  );\n\n  // Case 2: Returns empty array when all customers have placed at least one order\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'Alice'), (2, 'Bob');\n    INSERT INTO orders VALUES (1, 1, 50), (2, 2, 75), (3, 1, 25);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when all customers have placed at least one order',\n    r2 !== null && $test.equal(r2, []),\n    r2\n  );\n\n  // Case 3: Returns all customers when orders table is completely empty\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (10, 'Zack'), (20, 'Yvonne');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns all customers when orders table is completely empty',\n    r3 !== null && $test.equal(r3, [\n      { customer_name: 'Yvonne' },\n      { customer_name: 'Zack' }\n    ]),\n    r3\n  );\n\n  // Case 4: Returns empty array when customers table is empty\n  await db.exec(`DELETE FROM orders; DELETE FROM customers;`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when customers table is empty',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "SELECT c.name AS customer_name\nFROM customers c\nLEFT JOIN orders o ON c.id = o.customer_id\nWHERE o.id IS NULL\nORDER BY customer_name ASC;",
+    "referenceSolutionTs": "SELECT c.name AS customer_name\nFROM customers c\nLEFT JOIN orders o ON c.id = o.customer_id\nWHERE o.id IS NULL\nORDER BY customer_name ASC;",
+    "testCases": [
+      {
+        "description": "Identifies customers with no orders in orders table",
+        "input": "query",
+        "expected": "[{\"customer_name\": \"Henry\"}, {\"customer_name\": \"Max\"}]"
+      },
+      {
+        "description": "Returns empty array when all customers have placed at least one order",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns all customers when orders table is completely empty",
+        "input": "query",
+        "expected": "[{\"customer_name\": \"Yvonne\"}, {\"customer_name\": \"Zack\"}]"
+      },
+      {
+        "description": "Returns empty array when customers table is empty",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-deduplicate-keep-lowest-id": {
+    "promptSeed": "Write a PostgreSQL query to deduplicate email contacts from the `contacts` table, retaining only the record with the lowest `id` for each duplicate `email` address.\n\n### Schema: `contacts`\n- `id` (INT, PRIMARY KEY): Unique identifier for each contact record.\n- `name` (VARCHAR): Contact full name.\n- `email` (VARCHAR): Contact email address (may contain duplicates).\n\n### Query Contract\n- Output columns: `id`, `name`, `email`.\n- For each unique `email`, select the single row that has the minimum `id`.\n- Sort the final result set by `id` ascending (`ORDER BY id ASC`).\n- If `contacts` is empty, return an empty result set (0 rows).\n\n### Example\nGiven `contacts` records:\n- `{ id: 1, name: \"Alice Smith\", email: \"alice@example.com\" }`\n- `{ id: 2, name: \"Bob Jones\", email: \"bob@example.com\" }`\n- `{ id: 3, name: \"Alice S.\", email: \"alice@example.com\" }`\n- `{ id: 4, name: \"Charlie Brown\", email: \"charlie@example.com\" }`\n- `{ id: 5, name: \"Bob Duplicate\", email: \"bob@example.com\" }`\n\nThe query returns:\n- `[{ \"id\": 1, \"name\": \"Alice Smith\", \"email\": \"alice@example.com\" }, { \"id\": 2, \"name\": \"Bob Jones\", \"email\": \"bob@example.com\" }, { \"id\": 4, \"name\": \"Charlie Brown\", \"email\": \"charlie@example.com\" }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE contacts (id INT PRIMARY KEY, name VARCHAR(50), email VARCHAR(100));`);\n\n  // Case 1: Deduplicates multiple identical emails retaining the row with lowest id\n  await db.exec(`DELETE FROM contacts; INSERT INTO contacts VALUES (1, 'Alice Smith', 'alice@example.com'), (2, 'Bob Jones', 'bob@example.com'), (3, 'Alice S.', 'alice@example.com'), (4, 'Charlie Brown', 'charlie@example.com'), (5, 'Bob Duplicate', 'bob@example.com');`);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Deduplicates multiple identical emails retaining the row with lowest id',\n    r1 !== null && $test.equal(r1, [\n      { id: 1, name: 'Alice Smith', email: 'alice@example.com' },\n      { id: 2, name: 'Bob Jones', email: 'bob@example.com' },\n      { id: 4, name: 'Charlie Brown', email: 'charlie@example.com' }\n    ]),\n    r1\n  );\n\n  // Case 2: Preserves all records when all emails are already distinct\n  await db.exec(`DELETE FROM contacts; INSERT INTO contacts VALUES (10, 'Dave', 'dave@example.com'), (20, 'Eve', 'eve@example.com');`);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Preserves all records when all emails are already distinct',\n    r2 !== null && $test.equal(r2, [\n      { id: 10, name: 'Dave', email: 'dave@example.com' },\n      { id: 20, name: 'Eve', email: 'eve@example.com' }\n    ]),\n    r2\n  );\n\n  // Case 3: Returns empty array when contacts table is empty\n  await db.exec(`DELETE FROM contacts;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when contacts table is empty',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Correctly chooses lowest id when duplicate records appear out of order\n  await db.exec(`DELETE FROM contacts; INSERT INTO contacts VALUES (99, 'Zoe Late', 'zoe@example.com'), (5, 'Zoe First', 'zoe@example.com'), (42, 'Zoe Mid', 'zoe@example.com');`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Correctly chooses lowest id when duplicate records appear out of order',\n    r4 !== null && $test.equal(r4, [\n      { id: 5, name: 'Zoe First', email: 'zoe@example.com' }\n    ]),\n    r4\n  );\n})();",
+    "referenceSolution": "WITH ranked AS (\n  SELECT id, name, email,\n         ROW_NUMBER() OVER (PARTITION BY email ORDER BY id ASC) AS rn\n  FROM contacts\n)\nSELECT id, name, email\nFROM ranked\nWHERE rn = 1\nORDER BY id ASC;",
+    "referenceSolutionTs": "WITH ranked AS (\n  SELECT id, name, email,\n         ROW_NUMBER() OVER (PARTITION BY email ORDER BY id ASC) AS rn\n  FROM contacts\n)\nSELECT id, name, email\nFROM ranked\nWHERE rn = 1\nORDER BY id ASC;",
+    "testCases": [
+      {
+        "description": "Deduplicates multiple identical emails retaining the row with lowest id",
+        "input": "query",
+        "expected": "[{\"id\": 1, \"name\": \"Alice Smith\", \"email\": \"alice@example.com\"}, {\"id\": 2, \"name\": \"Bob Jones\", \"email\": \"bob@example.com\"}, {\"id\": 4, \"name\": \"Charlie Brown\", \"email\": \"charlie@example.com\"}]"
+      },
+      {
+        "description": "Preserves all records when all emails are already distinct",
+        "input": "query",
+        "expected": "[{\"id\": 10, \"name\": \"Dave\", \"email\": \"dave@example.com\"}, {\"id\": 20, \"name\": \"Eve\", \"email\": \"eve@example.com\"}]"
+      },
+      {
+        "description": "Returns empty array when contacts table is empty",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Correctly chooses lowest id when duplicate records appear out of order",
+        "input": "query",
+        "expected": "[{\"id\": 5, \"name\": \"Zoe First\", \"email\": \"zoe@example.com\"}]"
+      }
+    ]
+  },
+  "sql-monthly-active-users-retention": {
+    "promptSeed": "Write a PostgreSQL query to calculate the number of retained active users for each calendar month.\n\nA user is considered \"retained\" in month $M$ if they performed at least one action in both month $M-1$ and month $M$.\n\n### Schema: `user_actions`\n- `user_id` (INT): Unique user identifier.\n- `action_date` (DATE): Date of the user action.\n- `action_type` (VARCHAR): Action name (e.g. `'login'`, `'purchase'`, `'view'`).\n\n### Query Contract\n- Output columns: `month` (formatted as `'YYYY-MM'`), `retained_users` (integer count of distinct users who were active in both that month and the immediately preceding month).\n- Only include months that have at least one retained user (`retained_users > 0`).\n- Cast count to integer (or `COUNT(DISTINCT ...) :: INT`).\n- Sort results by `month` ascending (`ORDER BY month ASC`).\n- If no users are retained or if `user_actions` is empty, return an empty result set (0 rows).\n\n### Example\nGiven `user_actions` records:\n- `{ user_id: 1, action_date: \"2024-01-15\", action_type: \"login\" }`\n- `{ user_id: 2, action_date: \"2024-01-20\", action_type: \"login\" }`\n- `{ user_id: 1, action_date: \"2024-02-05\", action_type: \"purchase\" }`\n- `{ user_id: 3, action_date: \"2024-02-18\", action_type: \"login\" }`\n- `{ user_id: 1, action_date: \"2024-03-12\", action_type: \"login\" }`\n- `{ user_id: 3, action_date: \"2024-03-25\", action_type: \"login\" }`\n\nThe query returns:\n- `[{ \"month\": \"2024-02\", \"retained_users\": 1 }, { \"month\": \"2024-03\", \"retained_users\": 2 }]`\n\nExplanation:\n- In `2024-02`, only user 1 was active in both January and February (count: 1).\n- In `2024-03`, users 1 and 3 were active in both February and March (count: 2).",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE user_actions (user_id INT, action_date DATE, action_type VARCHAR(20));`);\n\n  // Case 1: Calculates month-over-month retained users across consecutive months\n  await db.exec(`\n    DELETE FROM user_actions;\n    INSERT INTO user_actions VALUES\n      (1, '2024-01-15', 'login'),\n      (2, '2024-01-20', 'login'),\n      (1, '2024-02-05', 'purchase'),\n      (3, '2024-02-18', 'login'),\n      (1, '2024-03-12', 'login'),\n      (3, '2024-03-25', 'login');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Calculates month-over-month retained users across consecutive months',\n    r1 !== null && $test.equal(r1, [\n      { month: '2024-02', retained_users: 1 },\n      { month: '2024-03', retained_users: 2 }\n    ]),\n    r1\n  );\n\n  // Case 2: Returns empty array when users are active in non-consecutive months only\n  await db.exec(`\n    DELETE FROM user_actions;\n    INSERT INTO user_actions VALUES\n      (1, '2024-01-10', 'login'),\n      (1, '2024-03-10', 'login'),\n      (2, '2024-02-15', 'login'),\n      (2, '2024-04-15', 'login');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when users are active in non-consecutive months only',\n    r2 !== null && $test.equal(r2, []),\n    r2\n  );\n\n  // Case 3: Only counts each user once even with multiple actions in each month\n  await db.exec(`\n    DELETE FROM user_actions;\n    INSERT INTO user_actions VALUES\n      (10, '2024-05-01', 'login'),\n      (10, '2024-05-15', 'purchase'),\n      (10, '2024-06-02', 'view'),\n      (10, '2024-06-20', 'login');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Only counts each user once even with multiple actions in each month',\n    r3 !== null && $test.equal(r3, [\n      { month: '2024-06', retained_users: 1 }\n    ]),\n    r3\n  );\n\n  // Case 4: Returns empty array when user_actions table is empty\n  await db.exec(`DELETE FROM user_actions;`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when user_actions table is empty',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "WITH user_months AS (\n  SELECT DISTINCT user_id, DATE_TRUNC('month', action_date)::DATE AS act_month\n  FROM user_actions\n)\nSELECT TO_CHAR(curr.act_month, 'YYYY-MM') AS month,\n       COUNT(DISTINCT curr.user_id)::INT AS retained_users\nFROM user_months curr\nJOIN user_months prev\n  ON curr.user_id = prev.user_id\n AND curr.act_month = (prev.act_month + INTERVAL '1 month')::DATE\nGROUP BY curr.act_month\nORDER BY month ASC;",
+    "referenceSolutionTs": "WITH user_months AS (\n  SELECT DISTINCT user_id, DATE_TRUNC('month', action_date)::DATE AS act_month\n  FROM user_actions\n)\nSELECT TO_CHAR(curr.act_month, 'YYYY-MM') AS month,\n       COUNT(DISTINCT curr.user_id)::INT AS retained_users\nFROM user_months curr\nJOIN user_months prev\n  ON curr.user_id = prev.user_id\n AND curr.act_month = (prev.act_month + INTERVAL '1 month')::DATE\nGROUP BY curr.act_month\nORDER BY month ASC;",
+    "testCases": [
+      {
+        "description": "Calculates month-over-month retained users across consecutive months",
+        "input": "query",
+        "expected": "[{\"month\": \"2024-02\", \"retained_users\": 1}, {\"month\": \"2024-03\", \"retained_users\": 2}]"
+      },
+      {
+        "description": "Returns empty array when users are active in non-consecutive months only",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Only counts each user once even with multiple actions in each month",
+        "input": "query",
+        "expected": "[{\"month\": \"2024-06\", \"retained_users\": 1}]"
+      },
+      {
+        "description": "Returns empty array when user_actions table is empty",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-pivot-monthly-sales": {
+    "promptSeed": "Write a PostgreSQL query to pivot product sales into monthly total columns for the first quarter of 2024 (`'2024-01'`, `'2024-02'`, and `'2024-03'`).\n\n### Schema: `product_sales`\n- `id` (INT, PRIMARY KEY): Sales record identifier.\n- `product` (VARCHAR): Product name.\n- `sale_date` (DATE): Date the sale took place.\n- `amount` (INT): Sale amount.\n\n### Query Contract\n- Output columns: `product`, `jan_sales`, `feb_sales`, `mar_sales`.\n- `jan_sales`: Total amount for `'2024-01'`, or `0` if no sales occurred in January for that product.\n- `feb_sales`: Total amount for `'2024-02'`, or `0` if no sales occurred in February for that product.\n- `mar_sales`: Total amount for `'2024-03'`, or `0` if no sales occurred in March for that product.\n- All sales totals must be integers (e.g. `COALESCE(SUM(...) FILTER (WHERE ...), 0)::INT`).\n- Group by `product` and sort by `product` ascending (`ORDER BY product ASC`).\n- If `product_sales` is empty, return an empty result set (0 rows).\n\n### Example\nGiven `product_sales` records:\n- `{ id: 1, product: \"Widget\", sale_date: \"2024-01-10\", amount: 100 }`\n- `{ id: 2, product: \"Widget\", sale_date: \"2024-01-20\", amount: 150 }`\n- `{ id: 3, product: \"Widget\", sale_date: \"2024-02-14\", amount: 200 }`\n- `{ id: 4, product: \"Gadget\", sale_date: \"2024-02-05\", amount: 300 }`\n- `{ id: 5, product: \"Gadget\", sale_date: \"2024-03-22\", amount: 400 }`\n\nThe query returns:\n- `[{ \"product\": \"Gadget\", \"jan_sales\": 0, \"feb_sales\": 300, \"mar_sales\": 400 }, { \"product\": \"Widget\", \"jan_sales\": 250, \"feb_sales\": 200, \"mar_sales\": 0 }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE product_sales (id INT PRIMARY KEY, product VARCHAR(50), sale_date DATE, amount INT);`);\n\n  // Case 1: Pivots Q1 sales across products with zero-filled gaps\n  await db.exec(`DELETE FROM product_sales; INSERT INTO product_sales VALUES (1, 'Widget', '2024-01-10', 100), (2, 'Widget', '2024-01-20', 150), (3, 'Widget', '2024-02-14', 200), (4, 'Gadget', '2024-02-05', 300), (5, 'Gadget', '2024-03-22', 400);`);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Pivots Q1 sales across products with zero-filled gaps',\n    r1 !== null && $test.equal(r1, [\n      { product: 'Gadget', jan_sales: 0, feb_sales: 300, mar_sales: 400 },\n      { product: 'Widget', jan_sales: 250, feb_sales: 200, mar_sales: 0 }\n    ]),\n    r1\n  );\n\n  // Case 2: Handles single product with sales in all three months\n  await db.exec(`DELETE FROM product_sales; INSERT INTO product_sales VALUES (1, 'Alpha', '2024-01-01', 50), (2, 'Alpha', '2024-02-01', 60), (3, 'Alpha', '2024-03-01', 70);`);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Handles single product with sales in all three months',\n    r2 !== null && $test.equal(r2, [\n      { product: 'Alpha', jan_sales: 50, feb_sales: 60, mar_sales: 70 }\n    ]),\n    r2\n  );\n\n  // Case 3: Returns empty array when product_sales table is empty\n  await db.exec(`DELETE FROM product_sales;`);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when product_sales table is empty',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Ignores sales dates outside Q1 2024\n  await db.exec(`DELETE FROM product_sales; INSERT INTO product_sales VALUES (1, 'Beta', '2023-12-31', 500), (2, 'Beta', '2024-04-01', 900), (3, 'Beta', '2024-01-15', 80);`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Ignores sales dates outside Q1 2024',\n    r4 !== null && $test.equal(r4, [\n      { product: 'Beta', jan_sales: 80, feb_sales: 0, mar_sales: 0 }\n    ]),\n    r4\n  );\n})();",
+    "referenceSolution": "SELECT product,\n       COALESCE(SUM(amount) FILTER (WHERE TO_CHAR(sale_date, 'YYYY-MM') = '2024-01'), 0)::INT AS jan_sales,\n       COALESCE(SUM(amount) FILTER (WHERE TO_CHAR(sale_date, 'YYYY-MM') = '2024-02'), 0)::INT AS feb_sales,\n       COALESCE(SUM(amount) FILTER (WHERE TO_CHAR(sale_date, 'YYYY-MM') = '2024-03'), 0)::INT AS mar_sales\nFROM product_sales\nGROUP BY product\nORDER BY product ASC;",
+    "referenceSolutionTs": "SELECT product,\n       COALESCE(SUM(amount) FILTER (WHERE TO_CHAR(sale_date, 'YYYY-MM') = '2024-01'), 0)::INT AS jan_sales,\n       COALESCE(SUM(amount) FILTER (WHERE TO_CHAR(sale_date, 'YYYY-MM') = '2024-02'), 0)::INT AS feb_sales,\n       COALESCE(SUM(amount) FILTER (WHERE TO_CHAR(sale_date, 'YYYY-MM') = '2024-03'), 0)::INT AS mar_sales\nFROM product_sales\nGROUP BY product\nORDER BY product ASC;",
+    "testCases": [
+      {
+        "description": "Pivots Q1 sales across products with zero-filled gaps",
+        "input": "query",
+        "expected": "[{\"product\": \"Gadget\", \"jan_sales\": 0, \"feb_sales\": 300, \"mar_sales\": 400}, {\"product\": \"Widget\", \"jan_sales\": 250, \"feb_sales\": 200, \"mar_sales\": 0}]"
+      },
+      {
+        "description": "Handles single product with sales in all three months",
+        "input": "query",
+        "expected": "[{\"product\": \"Alpha\", \"jan_sales\": 50, \"feb_sales\": 60, \"mar_sales\": 70}]"
+      },
+      {
+        "description": "Returns empty array when product_sales table is empty",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Ignores sales dates outside Q1 2024",
+        "input": "query",
+        "expected": "[{\"product\": \"Beta\", \"jan_sales\": 80, \"feb_sales\": 0, \"mar_sales\": 0}]"
+      }
+    ]
+  },
+  "sql-seat-swap-consecutive": {
+    "promptSeed": "Write a PostgreSQL query to swap the seat `id` of every two consecutive students in the classroom seating chart. If the total number of students is odd, the seat ID of the last student is not swapped.\n\n### Schema: `seat`\n- `id` (INT, PRIMARY KEY): Continuous sequential integer (1, 2, 3, ...).\n- `student` (VARCHAR): Student name.\n\n### Query Contract\n- Output columns: `id`, `student`.\n- Swap seat 1 with seat 2, seat 3 with seat 4, etc.\n- If total student count is odd, leave the final student's seat `id` unchanged.\n- Order the output by `id` ascending (`ORDER BY id ASC`).\n- If `seat` is empty, return an empty result set (0 rows).\n\n### Example\nGiven `seat` records:\n- `{ id: 1, student: \"Abbot\" }`\n- `{ id: 2, student: \"Doris\" }`\n- `{ id: 3, student: \"Emerson\" }`\n- `{ id: 4, student: \"Green\" }`\n- `{ id: 5, student: \"Jeames\" }`\n\nThe query returns:\n- `[{ \"id\": 1, \"student\": \"Doris\" }, { \"id\": 2, \"student\": \"Abbot\" }, { \"id\": 3, \"student\": \"Green\" }, { \"id\": 4, \"student\": \"Emerson\" }, { \"id\": 5, \"student\": \"Jeames\" }]`",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE seat (id INT PRIMARY KEY, student VARCHAR(50));`);\n\n  // Case 1: Swaps seats for odd count keeping last student seat unchanged\n  await db.exec(`DELETE FROM seat; INSERT INTO seat VALUES (1, 'Abbot'), (2, 'Doris'), (3, 'Emerson'), (4, 'Green'), (5, 'Jeames');`);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Swaps seats for odd count keeping last student seat unchanged',\n    r1 !== null && $test.equal(r1, [\n      { id: 1, student: 'Doris' },\n      { id: 2, student: 'Abbot' },\n      { id: 3, student: 'Green' },\n      { id: 4, student: 'Emerson' },\n      { id: 5, student: 'Jeames' }\n    ]),\n    r1\n  );\n\n  // Case 2: Swaps seats for even count swapping every pair\n  await db.exec(`DELETE FROM seat; INSERT INTO seat VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie'), (4, 'Diana');`);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Swaps seats for even count swapping every pair',\n    r2 !== null && $test.equal(r2, [\n      { id: 1, student: 'Bob' },\n      { id: 2, student: 'Alice' },\n      { id: 3, student: 'Diana' },\n      { id: 4, student: 'Charlie' }\n    ]),\n    r2\n  );\n\n  // Case 3: Leaves single student seat unchanged\n  await db.exec(`DELETE FROM seat; INSERT INTO seat VALUES (1, 'Solo');`);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Leaves single student seat unchanged',\n    r3 !== null && $test.equal(r3, [\n      { id: 1, student: 'Solo' }\n    ]),\n    r3\n  );\n\n  // Case 4: Returns empty array when seat table is empty\n  await db.exec(`DELETE FROM seat;`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when seat table is empty',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "SELECT CASE\n         WHEN id % 2 = 1 AND id = (SELECT COUNT(*) FROM seat) THEN id\n         WHEN id % 2 = 1 THEN id + 1\n         ELSE id - 1\n       END AS id,\n       student\nFROM seat\nORDER BY id ASC;",
+    "referenceSolutionTs": "SELECT CASE\n         WHEN id % 2 = 1 AND id = (SELECT COUNT(*) FROM seat) THEN id\n         WHEN id % 2 = 1 THEN id + 1\n         ELSE id - 1\n       END AS id,\n       student\nFROM seat\nORDER BY id ASC;",
+    "testCases": [
+      {
+        "description": "Swaps seats for odd count keeping last student seat unchanged",
+        "input": "query",
+        "expected": "[{\"id\": 1, \"student\": \"Doris\"}, {\"id\": 2, \"student\": \"Abbot\"}, {\"id\": 3, \"student\": \"Green\"}, {\"id\": 4, \"student\": \"Emerson\"}, {\"id\": 5, \"student\": \"Jeames\"}]"
+      },
+      {
+        "description": "Swaps seats for even count swapping every pair",
+        "input": "query",
+        "expected": "[{\"id\": 1, \"student\": \"Bob\"}, {\"id\": 2, \"student\": \"Alice\"}, {\"id\": 3, \"student\": \"Diana\"}, {\"id\": 4, \"student\": \"Charlie\"}]"
+      },
+      {
+        "description": "Leaves single student seat unchanged",
+        "input": "query",
+        "expected": "[{\"id\": 1, \"student\": \"Solo\"}]"
+      },
+      {
+        "description": "Returns empty array when seat table is empty",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-user-session-timeout": {
+    "promptSeed": "Write a PostgreSQL query to sessionize user event streams into distinct browsing sessions. A new session begins whenever an event occurs more than 30 minutes after the user's immediately preceding event, or when an event is the user's first recorded event.\n\n### Schema: `user_events`\n- `event_id` (INT, PRIMARY KEY): Unique event identifier.\n- `user_id` (INT): User identifier.\n- `event_time` (TIMESTAMP): Timestamp of the event.\n\n### Query Contract\n- Output columns: `event_id`, `user_id`, `session_id`.\n- `session_id`: String formatted as `<user_id>-<session_seq>` (e.g. `'1-1'`, `'1-2'`, `'2-1'`), where `session_seq` starts at 1 for each user and increments sequentially by 1 on every new session for that user.\n- Sort results by `event_id` ascending (`ORDER BY event_id ASC`).\n- If `user_events` is empty, return an empty result set (0 rows).\n\n### Example\nGiven `user_events` records:\n- `{ event_id: 1, user_id: 1, event_time: \"2024-01-01 10:00:00\" }`\n- `{ event_id: 2, user_id: 1, event_time: \"2024-01-01 10:15:00\" }`\n- `{ event_id: 3, user_id: 1, event_time: \"2024-01-01 10:50:00\" }`\n- `{ event_id: 4, user_id: 2, event_time: \"2024-01-01 12:00:00\" }`\n\nThe query returns:\n- `[{ \"event_id\": 1, \"user_id\": 1, \"session_id\": \"1-1\" }, { \"event_id\": 2, \"user_id\": 1, \"session_id\": \"1-1\" }, { \"event_id\": 3, \"user_id\": 1, \"session_id\": \"1-2\" }, { \"event_id\": 4, \"user_id\": 2, \"session_id\": \"2-1\" }]`\n\nExplanation:\n- Event 2 is 15 minutes after Event 1 (`<= 30 min`), so it stays in session `'1-1'`.\n- Event 3 is 35 minutes after Event 2 (> 30 min), so it increments to session `'1-2'`.\n- Event 4 is user 2's first event, so it begins session `'2-1'`.",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE user_events (event_id INT PRIMARY KEY, user_id INT, event_time TIMESTAMP);`);\n\n  // Case 1: Sessionizes user events into distinct sessions based on 30-minute inactivity gap\n  await db.exec(`\n    DELETE FROM user_events;\n    INSERT INTO user_events VALUES\n      (1, 1, '2024-01-01 10:00:00'),\n      (2, 1, '2024-01-01 10:15:00'),\n      (3, 1, '2024-01-01 10:50:00'),\n      (4, 2, '2024-01-01 12:00:00');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Sessionizes user events into distinct sessions based on 30-minute inactivity gap',\n    r1 !== null && $test.equal(r1, [\n      { event_id: 1, user_id: 1, session_id: '1-1' },\n      { event_id: 2, user_id: 1, session_id: '1-1' },\n      { event_id: 3, user_id: 1, session_id: '1-2' },\n      { event_id: 4, user_id: 2, session_id: '2-1' }\n    ]),\n    r1\n  );\n\n  // Case 2: Groups all events into single session when intervals never exceed 30 minutes\n  await db.exec(`\n    DELETE FROM user_events;\n    INSERT INTO user_events VALUES\n      (10, 5, '2024-02-01 08:00:00'),\n      (11, 5, '2024-02-01 08:20:00'),\n      (12, 5, '2024-02-01 08:45:00');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Groups all events into single session when intervals never exceed 30 minutes',\n    r2 !== null && $test.equal(r2, [\n      { event_id: 10, user_id: 5, session_id: '5-1' },\n      { event_id: 11, user_id: 5, session_id: '5-1' },\n      { event_id: 12, user_id: 5, session_id: '5-1' }\n    ]),\n    r2\n  );\n\n  // Case 3: Creates separate session for every event when gap between each event exceeds 30 minutes\n  await db.exec(`\n    DELETE FROM user_events;\n    INSERT INTO user_events VALUES\n      (21, 9, '2024-03-01 09:00:00'),\n      (22, 9, '2024-03-01 10:00:00'),\n      (23, 9, '2024-03-01 11:30:00');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Creates separate session for every event when gap between each event exceeds 30 minutes',\n    r3 !== null && $test.equal(r3, [\n      { event_id: 21, user_id: 9, session_id: '9-1' },\n      { event_id: 22, user_id: 9, session_id: '9-2' },\n      { event_id: 23, user_id: 9, session_id: '9-3' }\n    ]),\n    r3\n  );\n\n  // Case 4: Returns empty array when user_events table is empty\n  await db.exec(`DELETE FROM user_events;`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when user_events table is empty',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "WITH event_gaps AS (\n  SELECT event_id, user_id, event_time,\n         CASE\n           WHEN event_time - LAG(event_time) OVER (PARTITION BY user_id ORDER BY event_time) > INTERVAL '30 minutes'\n             OR LAG(event_time) OVER (PARTITION BY user_id ORDER BY event_time) IS NULL\n           THEN 1\n           ELSE 0\n         END AS is_new_session\n  FROM user_events\n),\nsession_numbered AS (\n  SELECT event_id, user_id, event_time,\n         SUM(is_new_session) OVER (PARTITION BY user_id ORDER BY event_time ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS session_seq\n  FROM event_gaps\n)\nSELECT event_id, user_id,\n       user_id || '-' || session_seq AS session_id\nFROM session_numbered\nORDER BY event_id ASC;",
+    "referenceSolutionTs": "WITH event_gaps AS (\n  SELECT event_id, user_id, event_time,\n         CASE\n           WHEN event_time - LAG(event_time) OVER (PARTITION BY user_id ORDER BY event_time) > INTERVAL '30 minutes'\n             OR LAG(event_time) OVER (PARTITION BY user_id ORDER BY event_time) IS NULL\n           THEN 1\n           ELSE 0\n         END AS is_new_session\n  FROM user_events\n),\nsession_numbered AS (\n  SELECT event_id, user_id, event_time,\n         SUM(is_new_session) OVER (PARTITION BY user_id ORDER BY event_time ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS session_seq\n  FROM event_gaps\n)\nSELECT event_id, user_id,\n       user_id || '-' || session_seq AS session_id\nFROM session_numbered\nORDER BY event_id ASC;",
+    "testCases": [
+      {
+        "description": "Sessionizes user events into distinct sessions based on 30-minute inactivity gap",
+        "input": "query",
+        "expected": "[{\"event_id\": 1, \"user_id\": 1, \"session_id\": \"1-1\"}, {\"event_id\": 2, \"user_id\": 1, \"session_id\": \"1-1\"}, {\"event_id\": 3, \"user_id\": 1, \"session_id\": \"1-2\"}, {\"event_id\": 4, \"user_id\": 2, \"session_id\": \"2-1\"}]"
+      },
+      {
+        "description": "Groups all events into single session when intervals never exceed 30 minutes",
+        "input": "query",
+        "expected": "[{\"event_id\": 10, \"user_id\": 5, \"session_id\": \"5-1\"}, {\"event_id\": 11, \"user_id\": 5, \"session_id\": \"5-1\"}, {\"event_id\": 12, \"user_id\": 5, \"session_id\": \"5-1\"}]"
+      },
+      {
+        "description": "Creates separate session for every event when gap between each event exceeds 30 minutes",
+        "input": "query",
+        "expected": "[{\"event_id\": 21, \"user_id\": 9, \"session_id\": \"9-1\"}, {\"event_id\": 22, \"user_id\": 9, \"session_id\": \"9-2\"}, {\"event_id\": 23, \"user_id\": 9, \"session_id\": \"9-3\"}]"
+      },
+      {
+        "description": "Returns empty array when user_events table is empty",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-sequential-gaps": {
+    "promptSeed": "Write a PostgreSQL query to detect missing sequential identifiers (gaps) in an audit tracking log.\n\nIn distributed log ingestion, financial auditing, and sequence processing pipelines, identifying gaps in primary keys or sequence numbers is critical for flagging dropped records, failed transactions, or sync errors.\n\n### Schema: `tracking_logs`\n- `log_id` (INT, PRIMARY KEY): Sequential tracking sequence identifier.\n- `event_name` (TEXT): Name of the recorded system event.\n- `logged_at` (TIMESTAMP): Timestamp of the event log.\n\n### Query Contract\n- Output columns:\n  - `gap_start` (INT): First missing sequence ID in the gap range.\n  - `gap_end` (INT): Last missing sequence ID in the gap range.\n  - `gap_size` (INT): Number of missing sequence IDs in the gap (`gap_end - gap_start + 1`).\n- Sort order: Sort results by `gap_start` ascending (`ORDER BY gap_start ASC`).\n- Logic:\n  - Use `LEAD(log_id) OVER (ORDER BY log_id ASC)` to inspect the next existing ID in the sequence.\n  - A gap occurs whenever `next_id - log_id > 1`.\n  - The gap starts at `log_id + 1` and ends at `next_id - 1`.\n  - Only detect gaps between existing sequence records (do not extrapolate before the table's minimum ID or after its maximum ID).\n  - If all IDs are contiguous (no gaps), return 0 rows (`[]`).\n  - If `tracking_logs` contains fewer than 2 rows, return 0 rows (`[]`).\n\n### Example\nGiven `tracking_logs` records:\n- `{ log_id: 1, event_name: \"auth\", logged_at: \"2024-01-01 10:00:00\" }`\n- `{ log_id: 2, event_name: \"login\", logged_at: \"2024-01-01 10:01:00\" }`\n- `{ log_id: 5, event_name: \"view\", logged_at: \"2024-01-01 10:04:00\" }`\n- `{ log_id: 6, event_name: \"click\", logged_at: \"2024-01-01 10:05:00\" }`\n- `{ log_id: 7, event_name: \"cart\", logged_at: \"2024-01-01 10:06:00\" }`\n- `{ log_id: 10, event_name: \"checkout\", logged_at: \"2024-01-01 10:09:00\" }`\n- `{ log_id: 11, event_name: \"logout\", logged_at: \"2024-01-01 10:10:00\" }`\n\nThe query returns:\n- `[{ \"gap_start\": 3, \"gap_end\": 4, \"gap_size\": 2 }, { \"gap_start\": 8, \"gap_end\": 9, \"gap_size\": 2 }]`\n\nExplanation:\n- Between ID 2 and ID 5, IDs 3 and 4 are missing (start: 3, end: 4, size: 2).\n- Between ID 7 and ID 10, IDs 8 and 9 are missing (start: 8, end: 9, size: 2).",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`CREATE TABLE tracking_logs (log_id INT PRIMARY KEY, event_name TEXT, logged_at TIMESTAMP);`);\n\n  // Case 1: Multiple sequence gaps in tracking IDs\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (1, 'auth', '2024-01-01 10:00:00'),\n      (2, 'login', '2024-01-01 10:01:00'),\n      (5, 'view', '2024-01-01 10:04:00'),\n      (6, 'click', '2024-01-01 10:05:00'),\n      (7, 'cart', '2024-01-01 10:06:00'),\n      (10, 'checkout', '2024-01-01 10:09:00'),\n      (11, 'logout', '2024-01-01 10:10:00');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Finds multiple missing sequence ranges in tracking log IDs',\n    r1 !== null && $test.equal(r1, [\n      { gap_start: 3, gap_end: 4, gap_size: 2 },\n      { gap_start: 8, gap_end: 9, gap_size: 2 }\n    ]),\n    r1\n  );\n\n  // Case 2: Single missing ID gap of size 1\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (10, 'init', '2024-02-01 08:00:00'),\n      (11, 'start', '2024-02-01 08:01:00'),\n      (13, 'finish', '2024-02-01 08:03:00'),\n      (14, 'cleanup', '2024-02-01 08:04:00');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Detects single isolated missing identifier gap',\n    r2 !== null && $test.equal(r2, [\n      { gap_start: 12, gap_end: 12, gap_size: 1 }\n    ]),\n    r2\n  );\n\n  // Case 3: Contiguous sequence with zero gaps\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (100, 'step1', '2024-03-01 12:00:00'),\n      (101, 'step2', '2024-03-01 12:01:00'),\n      (102, 'step3', '2024-03-01 12:02:00'),\n      (103, 'step4', '2024-03-01 12:03:00');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when sequence is strictly contiguous',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Table with single entry or fewer than two rows\n  await db.exec(`\n    DELETE FROM tracking_logs;\n    INSERT INTO tracking_logs VALUES\n      (42, 'only_record', '2024-04-01 15:00:00');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when table contains fewer than two rows',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "WITH ranked_logs AS (\n  SELECT\n    log_id,\n    LEAD(log_id) OVER (ORDER BY log_id ASC) AS next_id\n  FROM tracking_logs\n)\nSELECT\n  log_id + 1 AS gap_start,\n  next_id - 1 AS gap_end,\n  (next_id - log_id - 1) AS gap_size\nFROM ranked_logs\nWHERE next_id - log_id > 1\nORDER BY gap_start ASC;",
+    "referenceSolutionTs": "WITH ranked_logs AS (\n  SELECT\n    log_id,\n    LEAD(log_id) OVER (ORDER BY log_id ASC) AS next_id\n  FROM tracking_logs\n)\nSELECT\n  log_id + 1 AS gap_start,\n  next_id - 1 AS gap_end,\n  (next_id - log_id - 1) AS gap_size\nFROM ranked_logs\nWHERE next_id - log_id > 1\nORDER BY gap_start ASC;",
+    "testCases": [
+      {
+        "description": "Finds multiple missing sequence ranges in tracking log IDs",
+        "input": "query",
+        "expected": "[{\"gap_end\":4,\"gap_size\":2,\"gap_start\":3},{\"gap_end\":9,\"gap_size\":2,\"gap_start\":8}]"
+      },
+      {
+        "description": "Detects single isolated missing identifier gap",
+        "input": "query",
+        "expected": "[{\"gap_end\":12,\"gap_size\":1,\"gap_start\":12}]"
+      },
+      {
+        "description": "Returns empty array when sequence is strictly contiguous",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty array when table contains fewer than two rows",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-worker-queue-skip-locked": {
+    "promptSeed": "Write a PostgreSQL query to claim the next highest-priority available job from a concurrent task queue.\n\nIn high-throughput microservices and asynchronous backend architectures, PostgreSQL tables are commonly used as persistent job queues. When multiple worker processes pull jobs simultaneously using a standard `SELECT ... FOR UPDATE`, all other workers block and serialize waiting for the first transaction's lock to release. To allow concurrent workers to immediately claim distinct pending tasks without blocking each other, PostgreSQL provides the `FOR UPDATE SKIP LOCKED` locking clause.\n\n### Schema: `job_queue`\n- `id` (INT, PRIMARY KEY): Unique identifier for the queue task.\n- `task_name` (TEXT): Name of the background job type.\n- `status` (TEXT): Current queue status (`'pending'`, `'processing'`, `'completed'`, `'failed'`).\n- `priority` (INT): Integer priority level (higher number indicates higher priority).\n- `attempts` (INT): Number of previous processing attempts.\n- `created_at` (TIMESTAMP): Creation timestamp of the task.\n\n### Query Contract\n- Target only pending tasks: Filter rows strictly by `status = 'pending'`.\n- Ordering:\n  - Primary: Highest priority first (`priority DESC`).\n  - Secondary: Oldest created task first (`created_at ASC`).\n  - Tie-breaker: Lowest ID first (`id ASC`).\n- Selection count: Claim exactly 1 job (`LIMIT 1`).\n- Output columns:\n  - `id` (INT)\n  - `task_name` (TEXT)\n  - `priority` (INT)\n- Concurrency & Row Locking:\n  - Append the `FOR UPDATE SKIP LOCKED` clause to lock the selected record and skip any rows currently locked by other transactions, preventing worker lock contention.\n- If no pending tasks exist, return 0 rows (`[]`).\n\n### Example\nGiven `job_queue` records:\n- `{ id: 1, task_name: \"send_email\", status: \"pending\", priority: 10, attempts: 0, created_at: \"2024-01-01 10:00:00\" }`\n- `{ id: 2, task_name: \"generate_pdf\", status: \"pending\", priority: 20, attempts: 0, created_at: \"2024-01-01 10:05:00\" }`\n- `{ id: 3, task_name: \"process_video\", status: \"processing\", priority: 30, attempts: 1, created_at: \"2024-01-01 10:02:00\" }`\n- `{ id: 4, task_name: \"sync_contacts\", status: \"pending\", priority: 20, attempts: 0, created_at: \"2024-01-01 10:01:00\" }`\n\nThe query returns:\n- `[{ \"id\": 4, \"task_name\": \"sync_contacts\", \"priority\": 20 }]`\n\nExplanation:\n- Task 3 has priority 30 but is excluded because its status is `'processing'`.\n- Tasks 2 and 4 both have priority 20 (higher than task 1's 10).\n- Task 4 was created earlier (`10:01:00` vs `10:05:00`), so it wins the priority tie-break.\n- The `FOR UPDATE SKIP LOCKED` clause locks task 4 for the claiming worker.",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const hasSkipLocked = /for\\s+update\\s+skip\\s+locked/i.test(userSql);\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE job_queue (\n      id INT PRIMARY KEY,\n      task_name TEXT NOT NULL,\n      status TEXT NOT NULL,\n      priority INT NOT NULL,\n      attempts INT NOT NULL DEFAULT 0,\n      created_at TIMESTAMP NOT NULL\n    );\n  `);\n\n  // Case 1: Claims highest-priority pending task using FOR UPDATE SKIP LOCKED\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (1, 'send_welcome_email', 'pending', 10, 0, '2024-01-01 10:00:00'),\n      (2, 'process_payment', 'pending', 50, 0, '2024-01-01 10:05:00'),\n      (3, 'generate_analytics', 'processing', 100, 1, '2024-01-01 10:02:00'),\n      (4, 'resize_avatar', 'pending', 20, 0, '2024-01-01 10:01:00');\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Claims highest-priority pending task using FOR UPDATE SKIP LOCKED',\n    hasSkipLocked && r1 !== null && $test.equal(r1, [{ id: 2, task_name: 'process_payment', priority: 50 }]),\n    r1\n  );\n\n  // Case 2: Breaks priority ties using oldest created timestamp\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (10, 'export_csv', 'pending', 30, 0, '2024-02-01 09:15:00'),\n      (11, 'sync_inventory', 'pending', 30, 0, '2024-02-01 09:05:00'),\n      (12, 'dispatch_webhook', 'pending', 30, 0, '2024-02-01 09:20:00');\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Breaks priority ties using oldest created timestamp',\n    hasSkipLocked && r2 !== null && $test.equal(r2, [{ id: 11, task_name: 'sync_inventory', priority: 30 }]),\n    r2\n  );\n\n  // Case 3: Ignores non-pending tasks and picks highest pending task\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (21, 'rebuild_search_index', 'failed', 99, 3, '2024-03-01 12:00:00'),\n      (22, 'purge_cache', 'completed', 80, 1, '2024-03-01 12:05:00'),\n      (23, 'send_sms_alert', 'pending', 15, 0, '2024-03-01 12:10:00');\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Ignores non-pending tasks and picks highest pending task',\n    hasSkipLocked && r3 !== null && $test.equal(r3, [{ id: 23, task_name: 'send_sms_alert', priority: 15 }]),\n    r3\n  );\n\n  // Case 4: Returns empty array when queue has no pending tasks\n  await db.exec(`\n    DELETE FROM job_queue;\n    INSERT INTO job_queue VALUES\n      (31, 'archive_logs', 'completed', 10, 1, '2024-04-01 15:00:00');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when queue has no pending tasks',\n    hasSkipLocked && r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "SELECT id, task_name, priority\nFROM job_queue\nWHERE status = 'pending'\nORDER BY priority DESC, created_at ASC, id ASC\nLIMIT 1\nFOR UPDATE SKIP LOCKED;",
+    "referenceSolutionTs": "SELECT id, task_name, priority\nFROM job_queue\nWHERE status = 'pending'\nORDER BY priority DESC, created_at ASC, id ASC\nLIMIT 1\nFOR UPDATE SKIP LOCKED;",
+    "testCases": [
+      {
+        "description": "Claims highest-priority pending task using FOR UPDATE SKIP LOCKED",
+        "input": "query",
+        "expected": "[{\"id\":2,\"priority\":50,\"task_name\":\"process_payment\"}]"
+      },
+      {
+        "description": "Breaks priority ties using oldest created timestamp",
+        "input": "query",
+        "expected": "[{\"id\":11,\"priority\":30,\"task_name\":\"sync_inventory\"}]"
+      },
+      {
+        "description": "Ignores non-pending tasks and picks highest pending task",
+        "input": "query",
+        "expected": "[{\"id\":23,\"priority\":15,\"task_name\":\"send_sms_alert\"}]"
+      },
+      {
+        "description": "Returns empty array when queue has no pending tasks",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-basic-inner-join": {
+    "promptSeed": "Write a PostgreSQL query to join customer and order tables using an inner join:\n\n## Description\n\n### Application Context\nIn an e-commerce reporting dashboard (`sales/orders`), you need to generate a consolidated order manifest linking each placed order to its registered customer name.\n\n```ts\ninterface CustomerRecord {\n  id: number;\n  name: string;\n  city: string;\n}\n\ninterface OrderRecord {\n  id: number;\n  customer_id: number;\n  amount: number;\n}\n\ninterface OrderJoinResult {\n  order_id: number;\n  customer_name: string;\n  amount: number;\n}\n```\n\n### Table Schema\n\n- **`customers`**:\n  - `id`: `INT` (Primary Key)\n  - `name`: `VARCHAR(50)`\n  - `city`: `VARCHAR(50)`\n- **`orders`**:\n  - `id`: `INT` (Primary Key)\n  - `customer_id`: `INT` (Foreign Key referencing `customers.id`)\n  - `amount`: `INT`\n\n### Requirements\n\nWrite a SQL query string assigned to `const query`:\n- **Join**: Perform an `INNER JOIN` (or `JOIN`) between `orders` and `customers` on `orders.customer_id = customers.id`.\n- **Projection**:\n  - `orders.id` aliased as `order_id`\n  - `customers.name` aliased as `customer_name`\n  - `orders.amount` aliased as `amount`\n- **Sort**: Order results by `order_id ASC`.",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE customers (id INT PRIMARY KEY, name VARCHAR(50), city VARCHAR(50));\n    CREATE TABLE orders (id INT PRIMARY KEY, customer_id INT, amount INT);\n  `);\n\n  // Case 1: Joins orders with customers and aliases columns ordered by order_id ASC\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'Alice', 'New York'), (2, 'Bob', 'Chicago'), (3, 'Charlie', 'Austin');\n    INSERT INTO orders VALUES (101, 1, 150), (102, 3, 200), (103, 1, 75);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Joins orders with customers and aliases columns ordered by order_id ASC',\n    r1 !== null && $test.equal(r1, [\n      { order_id: 101, customer_name: 'Alice', amount: 150 },\n      { order_id: 102, customer_name: 'Charlie', amount: 200 },\n      { order_id: 103, customer_name: 'Alice', amount: 75 }\n    ]),\n    r1\n  );\n\n  // Case 2: Excludes customers who have placed zero orders\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'Diana', 'Seattle'), (2, 'Evan', 'Boston');\n    INSERT INTO orders VALUES (50, 1, 320);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Excludes customers who have placed zero orders',\n    r2 !== null && $test.equal(r2, [\n      { order_id: 50, customer_name: 'Diana', amount: 320 }\n    ]),\n    r2\n  );\n\n  // Case 3: Excludes orders referencing non-matching customer_ids\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'Fiona', 'Denver');\n    INSERT INTO orders VALUES (90, 999, 500);\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Excludes orders referencing non-matching customer_ids',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Returns empty array when orders table is empty\n  await db.exec(`\n    DELETE FROM orders; DELETE FROM customers;\n    INSERT INTO customers VALUES (1, 'George', 'Miami');\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when orders table is empty',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "const query = `\nSELECT o.id AS order_id, c.name AS customer_name, o.amount\nFROM orders o\nJOIN customers c ON o.customer_id = c.id\nORDER BY o.id ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT o.id AS order_id, c.name AS customer_name, o.amount\nFROM orders o\nJOIN customers c ON o.customer_id = c.id\nORDER BY o.id ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Joins orders with customers and aliases columns ordered by order_id ASC",
+        "input": "query",
+        "expected": "[{\"amount\":150,\"customer_name\":\"Alice\",\"order_id\":101},{\"amount\":200,\"customer_name\":\"Charlie\",\"order_id\":102},{\"amount\":75,\"customer_name\":\"Alice\",\"order_id\":103}]"
+      },
+      {
+        "description": "Excludes customers who have placed zero orders",
+        "input": "query",
+        "expected": "[{\"amount\":320,\"customer_name\":\"Diana\",\"order_id\":50}]"
+      },
+      {
+        "description": "Excludes orders referencing non-matching customer_ids",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty array when orders table is empty",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-basic-select-filter": {
+    "promptSeed": "Write a PostgreSQL query to filter, sort, and paginate product inventory:\n\n## Description\n\n### Application Context\nIn a retail database (`inventory/products`), you need to retrieve in-stock electronics for a featured catalog section.\n\n```ts\ninterface ProductRecord {\n  id: number;\n  name: string;\n  category: string;\n  price: number;\n  stock: number;\n}\n\ninterface ProductFilterResult {\n  id: number;\n  name: string;\n  price: number;\n  stock: number;\n}\n```\n\n### Table Schema\n\n- **`products`**:\n  - `id`: `INT` (Primary Key)\n  - `name`: `VARCHAR(50)`\n  - `category`: `VARCHAR(50)`\n  - `price`: `INT`\n  - `stock`: `INT`\n\n### Requirements\n\nWrite a SQL query string assigned to `const query`:\n- **Projection**: Select `id`, `name`, `price`, and `stock` from `products`.\n- **Filter**: Include only products where `category = 'Electronics'` and `stock > 0`.\n- **Sort**: Order results by `price ASC` (cheapest first). For items with identical price, break ties by `name ASC` alphabetically.\n- **Pagination**: Limit the output to the first `3` records.",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db, sql) {\n    try {\n      return (await db.query(sql)).rows;\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE products (\n      id INT PRIMARY KEY,\n      name VARCHAR(50),\n      category VARCHAR(50),\n      price INT,\n      stock INT\n    );\n  `);\n\n  // Case 1: Filters by category and stock, sorts by price ASC then name ASC, and limits to 3\n  await db.exec(`\n    DELETE FROM products;\n    INSERT INTO products VALUES\n      (1, 'Laptop', 'Electronics', 999, 10),\n      (2, 'Keyboard', 'Electronics', 50, 25),\n      (3, 'Mouse', 'Electronics', 50, 15),\n      (4, 'Desk Lamp', 'Home', 40, 5),\n      (5, 'Headphones', 'Electronics', 120, 0),\n      (6, 'Webcam', 'Electronics', 75, 8);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    'Filters by category and stock, sorts by price ASC then name ASC, and limits to 3',\n    r1 !== null && $test.equal(r1, [\n      { id: 2, name: 'Keyboard', price: 50, stock: 25 },\n      { id: 3, name: 'Mouse', price: 50, stock: 15 },\n      { id: 6, name: 'Webcam', price: 75, stock: 8 }\n    ]),\n    r1\n  );\n\n  // Case 2: Excludes out-of-stock electronics even if price is lowest\n  await db.exec(`\n    DELETE FROM products;\n    INSERT INTO products VALUES\n      (1, 'USB Cable', 'Electronics', 10, 0),\n      (2, 'Flash Drive', 'Electronics', 15, 4);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    'Excludes out-of-stock electronics even if price is lowest',\n    r2 !== null && $test.equal(r2, [\n      { id: 2, name: 'Flash Drive', price: 15, stock: 4 }\n    ]),\n    r2\n  );\n\n  // Case 3: Returns empty array when no matching in-stock electronics exist\n  await db.exec(`\n    DELETE FROM products;\n    INSERT INTO products VALUES\n      (1, 'Sofa', 'Home', 500, 2),\n      (2, 'Chair', 'Home', 150, 5);\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array when no matching in-stock electronics exist',\n    r3 !== null && $test.equal(r3, []),\n    r3\n  );\n\n  // Case 4: Returns empty array on completely empty products table\n  await db.exec(`DELETE FROM products;`);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    'Returns empty array on completely empty products table',\n    r4 !== null && $test.equal(r4, []),\n    r4\n  );\n})();",
+    "referenceSolution": "const query = `\nSELECT id, name, price, stock\nFROM products\nWHERE category = 'Electronics' AND stock > 0\nORDER BY price ASC, name ASC\nLIMIT 3;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT id, name, price, stock\nFROM products\nWHERE category = 'Electronics' AND stock > 0\nORDER BY price ASC, name ASC\nLIMIT 3;\n`;",
+    "testCases": [
+      {
+        "description": "Filters by category and stock, sorts by price ASC then name ASC, and limits to 3",
+        "input": "query",
+        "expected": "[{\"id\":2,\"name\":\"Keyboard\",\"price\":50,\"stock\":25},{\"id\":3,\"name\":\"Mouse\",\"price\":50,\"stock\":15},{\"id\":6,\"name\":\"Webcam\",\"price\":75,\"stock\":8}]"
+      },
+      {
+        "description": "Excludes out-of-stock electronics even if price is lowest",
+        "input": "query",
+        "expected": "[{\"id\":2,\"name\":\"Flash Drive\",\"price\":15,\"stock\":4}]"
+      },
+      {
+        "description": "Returns empty array when no matching in-stock electronics exist",
+        "input": "query",
+        "expected": "[]"
+      },
+      {
+        "description": "Returns empty array on completely empty products table",
+        "input": "query",
+        "expected": "[]"
+      }
+    ]
+  },
+  "sql-basic-aggregate-group": {
+    "promptSeed": "Write a SQL query that aggregates the `employees` table by department to find department size and average compensation for teams with multiple members.\n\n### Schema Context\n```sql\nCREATE TABLE employees (\n  id INT PRIMARY KEY,\n  name VARCHAR(50),\n  department VARCHAR(50),\n  salary INT\n);\n```\n\n### Requirements\n- Group records by `department`.\n- Select the following columns:\n  - `department`: the name of the department.\n  - `employee_count`: the total number of employees in the department (`COUNT(*)`).\n  - `avg_salary`: the average salary for the department, rounded to 2 decimal places (`ROUND(AVG(salary), 2)`).\n- Filter out departments with fewer than 2 employees using `HAVING COUNT(*) >= 2`.\n- Order results by `employee_count DESC`, then by `department ASC`.\n\n### Example Output\n| department | employee_count | avg_salary |\n| :--- | :--- | :--- |\n| Engineering | 3 | 115000.00 |\n| Marketing | 2 | 75000.00 |",
+    "testHarness": "await (async () => {\n  const userSql = typeof query === 'function' ? query() : (typeof query !== 'undefined' ? query : '');\n  async function runSafe(db: any, sql: string) {\n    try {\n      const res = await db.query(sql);\n      return res.rows.map((row: any) => ({\n        ...row,\n        employee_count: Number(row.employee_count),\n        avg_salary: Number(row.avg_salary),\n      }));\n    } catch {\n      return null;\n    }\n  }\n\n  const db = new PGlite();\n  await db.exec(`\n    CREATE TABLE employees (\n      id INT PRIMARY KEY,\n      name VARCHAR(50),\n      department VARCHAR(50),\n      salary INT\n    );\n  `);\n\n  const case1 = 'Groups by department with count >= 2, calculates avg_salary, and sorts by employee_count DESC then department ASC';\n  const case2 = 'Excludes single-employee departments via HAVING filter';\n  const case3 = 'Rounds average salary accurately to 2 decimal places';\n  const case4 = 'Returns empty array when no department has at least 2 employees';\n\n  // Case 1: Standard aggregation and multi-key sorting\n  await db.exec(`\n    DELETE FROM employees;\n    INSERT INTO employees VALUES\n      (1, 'Alice', 'Engineering', 120000),\n      (2, 'Bob', 'Engineering', 100000),\n      (3, 'Charlie', 'Engineering', 110000),\n      (4, 'Diana', 'Marketing', 80000),\n      (5, 'Evan', 'Marketing', 70000),\n      (6, 'Fiona', 'Design', 95000);\n  `);\n  const r1 = await runSafe(db, userSql);\n  $test.check(\n    case1,\n    r1 !== null && $test.equal(r1, [\n      { department: 'Engineering', employee_count: 3, avg_salary: 110000 },\n      { department: 'Marketing', employee_count: 2, avg_salary: 75000 },\n    ]),\n    r1\n  );\n\n  // Case 2: Excludes departments with only 1 employee\n  await db.exec(`\n    DELETE FROM employees;\n    INSERT INTO employees VALUES\n      (1, 'George', 'Finance', 90000),\n      (2, 'Hannah', 'HR', 75000),\n      (3, 'Ian', 'Support', 60000),\n      (4, 'Julia', 'Support', 64000);\n  `);\n  const r2 = await runSafe(db, userSql);\n  $test.check(\n    case2,\n    r2 !== null && $test.equal(r2, [\n      { department: 'Support', employee_count: 2, avg_salary: 62000 },\n    ]),\n    r2\n  );\n\n  // Case 3: Rounds average salary to 2 decimal places\n  await db.exec(`\n    DELETE FROM employees;\n    INSERT INTO employees VALUES\n      (1, 'Kevin', 'Research', 100000),\n      (2, 'Laura', 'Research', 105000),\n      (3, 'Mike', 'Research', 102500);\n  `);\n  const r3 = await runSafe(db, userSql);\n  $test.check(\n    case3,\n    r3 !== null && r3.length === 1 && r3[0].department === 'Research' && r3[0].employee_count === 3 && r3[0].avg_salary === 102500,\n    r3\n  );\n\n  // Case 4: Returns empty array when no department has at least 2 employees\n  await db.exec(`\n    DELETE FROM employees;\n    INSERT INTO employees VALUES\n      (1, 'Nina', 'Legal', 130000),\n      (2, 'Oscar', 'Security', 115000);\n  `);\n  const r4 = await runSafe(db, userSql);\n  $test.check(\n    case4,\n    r4 !== null && Array.isArray(r4) && r4.length === 0,\n    r4\n  );\n})();",
+    "referenceSolution": "const query = `\nSELECT\n  department,\n  COUNT(*) AS employee_count,\n  ROUND(AVG(salary), 2) AS avg_salary\nFROM employees\nGROUP BY department\nHAVING COUNT(*) >= 2\nORDER BY employee_count DESC, department ASC;\n`;",
+    "referenceSolutionTs": "const query: string = `\nSELECT\n  department,\n  COUNT(*) AS employee_count,\n  ROUND(AVG(salary), 2) AS avg_salary\nFROM employees\nGROUP BY department\nHAVING COUNT(*) >= 2\nORDER BY employee_count DESC, department ASC;\n`;",
+    "testCases": [
+      {
+        "description": "Groups by department with count >= 2, calculates avg_salary, and sorts by employee_count DESC then department ASC",
+        "input": "SELECT department, COUNT(*), ROUND(AVG(salary), 2) FROM employees GROUP BY department HAVING COUNT(*) >= 2 ORDER BY ...",
+        "expected": "Engineering (3, 110000), Marketing (2, 75000)"
+      },
+      {
+        "description": "Excludes single-employee departments via HAVING filter",
+        "input": "HAVING COUNT(*) >= 2 on single-employee teams",
+        "expected": "Finance (1) and HR (1) excluded, Support (2) returned"
+      },
+      {
+        "description": "Rounds average salary accurately to 2 decimal places",
+        "input": "ROUND(AVG(salary), 2) on Research salaries",
+        "expected": "{ department: \"Research\", employee_count: 3, avg_salary: 102500 }"
+      },
+      {
+        "description": "Returns empty array when no department has at least 2 employees",
+        "input": "HAVING COUNT(*) >= 2 when all teams have 1 member",
+        "expected": "[] (empty array)"
+      }
+    ]
+  }
+}

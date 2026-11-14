@@ -1,4 +1,4 @@
-import seedTopicsData from '../data/topics.json';
+import seedTopicsData from '../data/topicsMeta.json';
 import { extractHarnessContracts } from './harnessContracts';
 import { clearDraft } from './drafts';
 import { recordDailyStat, updateDailyStatVerdict, sanitizeDailyStats } from './dailyStats';

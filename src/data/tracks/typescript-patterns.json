@@ -1,0 +1,570 @@
+{
+  "ts-discriminated-unions-exhaustiveness": {
+    "promptSeed": "Define a generic discriminated union and exhaustive state formatter:\n\n### `type AsyncState<T>`\n- Discriminated by `status`:\n  - `{ status: 'idle' }`\n  - `{ status: 'loading' }`\n  - `{ status: 'success'; data: T }`\n  - `{ status: 'error'; error: Error }`\n\n### `formatState<T>(state: AsyncState<T>): string`\n- Uses a `switch` statement that returns:\n  - `'Idle'` for `'idle'`\n  - `'Loading...'` for `'loading'`\n  - `'Loaded: ' + JSON.stringify(state.data)` for `'success'`\n  - `'Failed: ' + state.error.message` for `'error'`\n- In the `default` branch, assigns `state` to a variable of type `never` (`const _exhaustiveCheck: never = state; throw new Error(...)`), ensuring unhandled statuses fail compilation.",
+    "testHarness": "await $test.run(\"idle\", async () => {\n  const sleep = $test.sleep;\n  return (formatState({ status: 'idle' }));\n}, () => ('Idle'));\n\nawait $test.run(\"loading\", async () => {\n  const sleep = $test.sleep;\n  return (formatState({ status: 'loading' }));\n}, () => ('Loading...'));\n\nawait $test.run(\"success serialises its data\", async () => {\n  const sleep = $test.sleep;\n  return (formatState({ status: 'success', data: { id: 1 } }));\n}, () => ('Loaded: {\"id\":1}'));\n\nawait $test.run(\"error shows the message\", async () => {\n  const sleep = $test.sleep;\n  return (formatState({ status: 'error', error: new Error('boom') }));\n}, () => ('Failed: boom'));\n\n// Compile-time checks (strict TS mode): these lines must be type errors, otherwise the directive itself errors.\nconst compileChecks60 = () => {\n  // @ts-expect-error — an unknown status must be rejected\n  formatState({ status: 'oops' });\n  // @ts-expect-error — the success state requires its data\n  formatState({ status: 'success' });\n};\n$test.check('Compile time: unknown status and missing data are rejected', typeof compileChecks60 === 'function');",
+    "referenceSolution": "type AsyncState<T> =\n  | { status: 'idle' }\n  | { status: 'loading' }\n  | { status: 'success'; data: T }\n  | { status: 'error'; error: Error };\n\nfunction formatState<T>(state: AsyncState<T>): string {\n  switch (state.status) {\n    case 'idle':\n      return 'Idle';\n    case 'loading':\n      return 'Loading...';\n    case 'success':\n      return `Loaded: ${JSON.stringify(state.data)}`;\n    case 'error':\n      return `Failed: ${state.error.message}`;\n    default: {\n      const _exhaustiveCheck: never = state;\n      throw new Error(`Unhandled state: ${_exhaustiveCheck}`);\n    }\n  }\n}",
+    "referenceSolutionTs": "type AsyncState<T> =\n  | { status: 'idle' }\n  | { status: 'loading' }\n  | { status: 'success'; data: T }\n  | { status: 'error'; error: Error };\n\nfunction formatState<T>(state: AsyncState<T>): string {\n  switch (state.status) {\n    case 'idle':\n      return 'Idle';\n    case 'loading':\n      return 'Loading...';\n    case 'success':\n      return `Loaded: ${JSON.stringify(state.data)}`;\n    case 'error':\n      return `Failed: ${state.error.message}`;\n    default: {\n      const _exhaustiveCheck: never = state;\n      throw new Error(`Unhandled state: ${_exhaustiveCheck}`);\n    }\n  }\n}",
+    "testCases": [
+      {
+        "description": "idle",
+        "input": "formatState({ status: 'idle' })",
+        "expected": "'Idle'"
+      },
+      {
+        "description": "loading",
+        "input": "formatState({ status: 'loading' })",
+        "expected": "'Loading...'"
+      },
+      {
+        "description": "success serialises its data",
+        "input": "formatState({ status: 'success', data: { id: 1 } })",
+        "expected": "'Loaded: {\"id\":1}'"
+      },
+      {
+        "description": "error shows the message",
+        "input": "formatState({ status: 'error', error: new Error('boom') })",
+        "expected": "'Failed: boom'"
+      },
+      {
+        "description": "Compile time: unknown status is rejected",
+        "input": "formatState({ status: 'oops' })",
+        "expected": "TS2345 — Argument of type '{ status: \"oops\"; }' is not assignable to parameter of type 'AsyncState<unknown>'"
+      },
+      {
+        "description": "Compile time: forgetting a case",
+        "input": "add { status: 'cancelled' } to AsyncState without a case",
+        "expected": "TS2322 — Type '{ status: \"cancelled\" }' is not assignable to type 'never' (in the default branch)"
+      }
+    ]
+  },
+  "ts-generic-api-client": {
+    "promptSeed": "Implement a type-safe HTTP client wrapper and custom error class:\n\n### `class ApiError extends Error`\n- Has numeric property `status: number`.\n- `constructor(status: number)` calls `super(\\`Request failed with status \\${status}\\`)`, sets `this.name = 'ApiError'` and `this.status = status`.\n\n### `apiGet<T>(url: string): Promise<T>`\n- Fetches `url`.\n- For non-2xx responses (`!res.ok`), throws an `ApiError(res.status)`.\n- On success, returns the parsed JSON cast to `T` (`(await res.json()) as T`).\n- Network failures propagate unchanged.",
+    "testHarness": "await $test.run(\"Resolves typed JSON\", async () => {\n  const sleep = $test.sleep;\n  interface Todo { id: number; title: string; completed: boolean; }\n  return ((await apiGet<Todo>('https://jsonplaceholder.typicode.com/todos/1')).title);\n}, () => ('delectus aut autem'));\n\nawait $test.run(\"Whole payload\", async () => {\n  const sleep = $test.sleep;\n  interface Todo { id: number; title: string; completed: boolean; }\n  return (await apiGet<Todo>('https://jsonplaceholder.typicode.com/todos/1'));\n}, () => ({ userId: 1, id: 1, title: 'delectus aut autem', completed: false }));\n\nawait $test.run(\"Non-2xx rejects with an ApiError carrying the status\", async () => {\n  const sleep = $test.sleep;\n  const err = await apiGet<unknown>('https://jsonplaceholder.typicode.com/invalid-path-404').catch((e: unknown) => e);\n  return ([err instanceof ApiError, (err as ApiError).status, err instanceof Error]);\n}, () => ([true, 404, true]));\n\nawait $test.run(\"The ApiError message includes the status\", async () => {\n  const sleep = $test.sleep;\n  const err = await apiGet<unknown>('https://jsonplaceholder.typicode.com/invalid-path-404').catch((e: unknown) => e);\n  return ((err as Error).message.includes('404'));\n}, () => (true));\n\ninterface TodoShape { id: number; title: string; completed: boolean }\nconst compileChecks61 = async () => {\n  const todo = await apiGet<TodoShape>('https://jsonplaceholder.typicode.com/todos/1');\n  const id: number = todo.id;\n  // @ts-expect-error — the result is typed as TodoShape, which has no `nope`\n  todo.nope;\n  return id;\n};\n$test.check('Compile time: result is typed as T', typeof compileChecks61 === 'function');",
+    "referenceSolution": "class ApiError extends Error {\n  status: number;\n  constructor(status: number) {\n    super(`Request failed with status ${status}`);\n    this.name = 'ApiError';\n    this.status = status;\n  }\n}\n\nasync function apiGet<T>(url: string): Promise<T> {\n  const res = await fetch(url);\n  if (!res.ok) {\n    throw new ApiError(res.status);\n  }\n  return (await res.json()) as T;\n}",
+    "referenceSolutionTs": "class ApiError extends Error {\n  status: number;\n  constructor(status: number) {\n    super(`Request failed with status ${status}`);\n    this.name = 'ApiError';\n    this.status = status;\n  }\n}\n\nasync function apiGet<T>(url: string): Promise<T> {\n  const res = await fetch(url);\n  if (!res.ok) {\n    throw new ApiError(res.status);\n  }\n  return (await res.json()) as T;\n}",
+    "testCases": [
+      {
+        "description": "Resolves typed JSON",
+        "input": "interface Todo { id: number; title: string; completed: boolean; }\n(await apiGet<Todo>('https://jsonplaceholder.typicode.com/todos/1')).title",
+        "expected": "'delectus aut autem'"
+      },
+      {
+        "description": "Whole payload",
+        "input": "interface Todo { id: number; title: string; completed: boolean; }\nawait apiGet<Todo>('https://jsonplaceholder.typicode.com/todos/1')",
+        "expected": "{ userId: 1, id: 1, title: 'delectus aut autem', completed: false }"
+      },
+      {
+        "description": "Non-2xx rejects with an ApiError carrying the status",
+        "input": "const err = await apiGet<unknown>('https://jsonplaceholder.typicode.com/invalid-path-404').catch((e: unknown) => e);\n[err instanceof ApiError, (err as ApiError).status, err instanceof Error]",
+        "expected": "[true, 404, true]"
+      },
+      {
+        "description": "The ApiError message includes the status",
+        "input": "const err = await apiGet<unknown>('https://jsonplaceholder.typicode.com/invalid-path-404').catch((e: unknown) => e);\n(err as Error).message.includes('404')",
+        "expected": "true"
+      },
+      {
+        "description": "Compile time: result is typed as T",
+        "input": "const t = await apiGet<Todo>(url);\nt.nope",
+        "expected": "TS2339 — Property 'nope' does not exist on type 'Todo'"
+      }
+    ]
+  },
+  "ts-custom-utility-types": {
+    "promptSeed": "Implement advanced TypeScript generic utility types:\n\n### `DeepPartial<T>`\n- Recursively traverses type `T`, making all nested object properties optional (`?`) while preserving primitive types as-is.\n\n### `PickByType<T, ValueType>`\n- Constructs a type by picking only the properties of `T` whose value types extend `ValueType`.\n- Uses mapped types and key remapping (`as`) with conditional types.",
+    "testHarness": "await $test.run(\"Runtime: value typed with PickByType compiles and runs\", async () => {\n  const sleep = $test.sleep;\n  const check: PickByType<{ id: number; name: string; age: number }, number> = { id: 1, age: 30 };\n  return ([check.id, check.age]);\n}, () => ([1, 30]));\n\ntype Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;\nconst assertType = <T extends true>(): void => {};\n\ntype Obj = { id: number; name: string; age: number; active: boolean };\nassertType<Equal<PickByType<Obj, number>, { id: number; age: number }>>();\nassertType<Equal<PickByType<Obj, string>, { name: string }>>();\nassertType<Equal<PickByType<Obj, Date>, {}>>();\n\ntype Cfg = { a: number; b: { c: string; d: { e: boolean } } };\nassertType<Equal<DeepPartial<Cfg>, { a?: number; b?: { c?: string; d?: { e?: boolean } } }>>();\n\n// @ts-expect-error — `name` is a string, so it is not part of PickByType<Obj, number>\nconst badPick: PickByType<Obj, number> = { id: 1, name: 'x' };\n$test.check('Compile time: PickByType and DeepPartial have the expected shapes', typeof badPick === 'object');",
+    "referenceSolution": "type DeepPartial<T> = {\n  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];\n};\n\ntype PickByType<T, ValueType> = {\n  [P in keyof T as T[P] extends ValueType ? P : never]: T[P];\n};",
+    "referenceSolutionTs": "type DeepPartial<T> = {\n  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];\n};\n\ntype PickByType<T, ValueType> = {\n  [P in keyof T as T[P] extends ValueType ? P : never]: T[P];\n};",
+    "testCases": [
+      {
+        "description": "PickByType keeps only number-valued keys",
+        "input": "PickByType<{ id: number; name: string; age: number; active: boolean }, number>",
+        "expected": "{ id: number; age: number }"
+      },
+      {
+        "description": "PickByType, string",
+        "input": "PickByType<{ a: string; b: boolean }, string>",
+        "expected": "{ a: string }"
+      },
+      {
+        "description": "PickByType, nothing matches",
+        "input": "PickByType<{ a: string }, number>",
+        "expected": "{}"
+      },
+      {
+        "description": "DeepPartial makes every nested property optional",
+        "input": "DeepPartial<{ a: number; b: { c: string; d: { e: boolean } } }>",
+        "expected": "{ a?: number; b?: { c?: string; d?: { e?: boolean } } }"
+      },
+      {
+        "description": "Runtime: value typed with PickByType compiles and runs",
+        "input": "const check: PickByType<{ id: number; name: string; age: number }, number> = { id: 1, age: 30 };\n[check.id, check.age]",
+        "expected": "[1, 30]"
+      },
+      {
+        "description": "Compile time: extra key is rejected",
+        "input": "const x: PickByType<{ id: number; name: string }, number> = { id: 1, name: 'x' };",
+        "expected": "TS2353 — Object literal may only specify known properties; 'name' does not exist"
+      }
+    ]
+  },
+  "ts-generic-component-props": {
+    "promptSeed": "Define a generic component prop interface and rendering function where TypeScript enforces type parity across items and value:\n\n### `SelectProps<T>`\nInterface with the following properties:\n- `items: T[]` — array of options.\n- `value: T` — currently selected option of the same type `T`.\n- `onChange: (item: T) => void` — callback invoked with an item of type `T`.\n- `getLabel: (item: T) => string` — returns the display string for an item.\n\n### `renderSelect<T>(props: SelectProps<T>): string`\n- Maps each element in `props.items` through `props.getLabel(item)`.\n- Joins the labels with `', '` (returns `''` when `items` is empty).\n- Enforces at compile-time that `items` and `value` share the exact same type `T`.",
+    "testHarness": "await $test.run(\"Labels joined\", async () => {\n  const sleep = $test.sleep;\n  interface Item { code: string; label: string; }\n  const items: Item[] = [{ code: 'a', label: 'Option A' }, { code: 'b', label: 'Option B' }];\n  return (renderSelect<Item>({ items, value: items[0], onChange: () => {}, getLabel: (i) => i.label }));\n}, () => ('Option A, Option B'));\n\nawait $test.run(\"Works with other T\", async () => {\n  const sleep = $test.sleep;\n  return (renderSelect<number>({ items: [1, 2, 3], value: 2, onChange: () => {}, getLabel: (n) => `#${n}` }));\n}, () => ('#1, #2, #3'));\n\nawait $test.run(\"No items\", async () => {\n  const sleep = $test.sleep;\n  return (renderSelect<string>({ items: [], value: '', onChange: () => {}, getLabel: (s) => s }));\n}, () => (''));\n\nconst compileChecks63 = () => {\n  // @ts-expect-error — value must have the same type as items\n  renderSelect<string>({ items: ['a'], value: 5, onChange: () => {}, getLabel: (s) => s });\n  // @ts-expect-error — T cannot be both number (items) and string (value)\n  renderSelect({ items: [1, 2], value: 'x', onChange: () => {}, getLabel: (n) => String(n) });\n};\n$test.check('Compile time: items and value must share one type', typeof compileChecks63 === 'function');",
+    "referenceSolution": "interface SelectProps<T> {\n  items: T[];\n  value: T;\n  onChange: (item: T) => void;\n  getLabel: (item: T) => string;\n}\n\nfunction renderSelect<T>(props: SelectProps<T>): string {\n  return props.items.map(item => props.getLabel(item)).join(', ');\n}",
+    "referenceSolutionTs": "interface SelectProps<T> {\n  items: T[];\n  value: T;\n  onChange: (item: T) => void;\n  getLabel: (item: T) => string;\n}\n\nfunction renderSelect<T>(props: SelectProps<T>): string {\n  return props.items.map(item => props.getLabel(item)).join(', ');\n}",
+    "testCases": [
+      {
+        "description": "Labels joined",
+        "input": "interface Item { code: string; label: string; }\nconst items: Item[] = [{ code: 'a', label: 'Option A' }, { code: 'b', label: 'Option B' }];\nrenderSelect<Item>({ items, value: items[0], onChange: () => {}, getLabel: (i) => i.label })",
+        "expected": "'Option A, Option B'"
+      },
+      {
+        "description": "Works with other T",
+        "input": "renderSelect<number>({ items: [1, 2, 3], value: 2, onChange: () => {}, getLabel: (n) => `#${n}` })",
+        "expected": "'#1, #2, #3'"
+      },
+      {
+        "description": "No items",
+        "input": "renderSelect<string>({ items: [], value: '', onChange: () => {}, getLabel: (s) => s })",
+        "expected": "''"
+      },
+      {
+        "description": "Compile time: value must have the same type as items",
+        "input": "renderSelect<string>({ items: ['a'], value: 5, onChange: () => {}, getLabel: (s) => s })",
+        "expected": "TS2322 — Type 'number' is not assignable to type 'string'"
+      }
+    ]
+  },
+  "ts-custom-type-guards": {
+    "promptSeed": "Implement TypeScript custom type guards for runtime validation:\n\n### `isRecord(val: unknown): val is Record<string, unknown>`\n- Returns `true` if `val` is a non-null object that is not an array; `false` for primitives, arrays, and `null`/`undefined`.\n\n### `isError(val: unknown): val is Error`\n- Returns `true` if `val` is an instance of `Error` or a record object containing a string `message` property.",
+    "testHarness": "await $test.run(\"Plain object\", async () => {\n  const sleep = $test.sleep;\n  return (isRecord({}));\n}, () => (true));\n\nawait $test.run(\"Object with keys\", async () => {\n  const sleep = $test.sleep;\n  return (isRecord({ a: 1 }));\n}, () => (true));\n\nawait $test.run(\"Array is not a record\", async () => {\n  const sleep = $test.sleep;\n  return (isRecord([]));\n}, () => (false));\n\nawait $test.run(\"null is not a record\", async () => {\n  const sleep = $test.sleep;\n  return (isRecord(null));\n}, () => (false));\n\nawait $test.run(\"Primitive is not a record\", async () => {\n  const sleep = $test.sleep;\n  return (isRecord('x'));\n}, () => (false));\n\nawait $test.run(\"Real Error\", async () => {\n  const sleep = $test.sleep;\n  return (isError(new Error('boom')));\n}, () => (true));\n\nawait $test.run(\"Error subclass\", async () => {\n  const sleep = $test.sleep;\n  return (isError(new TypeError('t')));\n}, () => (true));\n\nawait $test.run(\"String is not an Error\", async () => {\n  const sleep = $test.sleep;\n  return (isError('boom'));\n}, () => (false));\n\nawait $test.run(\"null / empty object are not Errors\", async () => {\n  const sleep = $test.sleep;\n  return (isError(null) || isError({}));\n}, () => (false));\n\nconst sample: unknown = { a: 1 };\n$test.check(\n  'Compile time: isRecord narrows unknown inside the guard only',\n  (() => {\n    if (isRecord(sample)) {\n      const a: unknown = sample.a;\n      return a === 1;\n    }\n    return false;\n  })()\n);\n// @ts-expect-error — `sample` is still unknown outside the guard\nvoid sample.a;",
+    "referenceSolution": "function isRecord(val: unknown): val is Record<string, unknown> {\n  return typeof val === 'object' && val !== null && !Array.isArray(val);\n}\n\nfunction isError(val: unknown): val is Error {\n  return val instanceof Error || (isRecord(val) && typeof (val as Record<string, unknown>).message === 'string');\n}",
+    "referenceSolutionTs": "function isRecord(val: unknown): val is Record<string, unknown> {\n  return typeof val === 'object' && val !== null && !Array.isArray(val);\n}\n\nfunction isError(val: unknown): val is Error {\n  return val instanceof Error || (isRecord(val) && typeof (val as Record<string, unknown>).message === 'string');\n}",
+    "testCases": [
+      {
+        "description": "Plain object",
+        "input": "isRecord({})",
+        "expected": "true"
+      },
+      {
+        "description": "Object with keys",
+        "input": "isRecord({ a: 1 })",
+        "expected": "true"
+      },
+      {
+        "description": "Array is not a record",
+        "input": "isRecord([])",
+        "expected": "false"
+      },
+      {
+        "description": "null is not a record",
+        "input": "isRecord(null)",
+        "expected": "false"
+      },
+      {
+        "description": "Primitive is not a record",
+        "input": "isRecord('x')",
+        "expected": "false"
+      },
+      {
+        "description": "Real Error",
+        "input": "isError(new Error('boom'))",
+        "expected": "true"
+      },
+      {
+        "description": "Error subclass",
+        "input": "isError(new TypeError('t'))",
+        "expected": "true"
+      },
+      {
+        "description": "String is not an Error",
+        "input": "isError('boom')",
+        "expected": "false"
+      },
+      {
+        "description": "null / empty object are not Errors",
+        "input": "isError(null) || isError({})",
+        "expected": "false"
+      },
+      {
+        "description": "Compile time: narrowing",
+        "input": "const v: unknown = { a: 1 };\nif (isRecord(v)) { v.a }  // OK\nv.a                       // outside the guard",
+        "expected": "TS2339 outside the guard — Property 'a' does not exist on type 'unknown'"
+      }
+    ]
+  },
+  "ts-typed-event-emitter": {
+    "promptSeed": "Create a type-safe event emitter class `TypedEmitter<Events extends Record<string, any>>`:\n\n### `on<K extends keyof Events>(event: K, listener: (payload: Events[K]) => void): void`\n- Registers a `listener` callback for event `event`, strictly typed to accept payload `Events[K]`.\n\n### `emit<K extends keyof Events>(event: K, payload: Events[K]): void`\n- Triggers all listeners registered for `event`, passing `payload` matching `Events[K]`.\n- Emitting an event with no registered listeners is a safe no-op.",
+    "testHarness": "await $test.run(\"Listener receives the typed payload\", async () => {\n  const sleep = $test.sleep;\n  interface AppEvents { login: { userId: string }; logout: undefined; }\n  const emitter = new TypedEmitter<AppEvents>();\n  let capturedId = '';\n  emitter.on('login', (data) => { capturedId = data.userId; });\n  emitter.emit('login', { userId: 'usr_42' });\n  return (capturedId);\n}, () => ('usr_42'));\n\nawait $test.run(\"Several listeners run in order\", async () => {\n  const sleep = $test.sleep;\n  const e = new TypedEmitter<{ n: number }>();\n  const got: number[] = [];\n  e.on('n', (x) => got.push(x));\n  e.on('n', (x) => got.push(x * 10));\n  e.emit('n', 2);\n  return (got);\n}, () => ([2, 20]));\n\nawait $test.run(\"Emitting with no listeners is a no-op\", async () => {\n  const sleep = $test.sleep;\n  const e = new TypedEmitter<{ n: number }>();\n  return (e.emit('n', 1));\n}, () => (undefined));\n\ninterface Events65 { login: { userId: string }; logout: undefined }\nconst typedEmitter = new TypedEmitter<Events65>();\nconst compileChecks65 = () => {\n  // @ts-expect-error — payload must be { userId: string }\n  typedEmitter.emit('login', { userId: 42 });\n  // @ts-expect-error — unknown event name\n  typedEmitter.emit('nope', 1);\n  // @ts-expect-error — the listener parameter must match the payload type\n  typedEmitter.on('login', (d: number) => {});\n};\n$test.check('Compile time: payloads and event names are type-checked', typeof compileChecks65 === 'function');",
+    "referenceSolution": "class TypedEmitter<Events extends Record<string, any>> {\n  private listeners = new Map<keyof Events, Array<(payload: any) => void>>();\n\n  on<K extends keyof Events>(event: K, listener: (payload: Events[K]) => void): void {\n    if (!this.listeners.has(event)) this.listeners.set(event, []);\n    this.listeners.get(event)!.push(listener);\n  }\n\n  emit<K extends keyof Events>(event: K, payload: Events[K]): void {\n    (this.listeners.get(event) || []).forEach(fn => fn(payload));\n  }\n}",
+    "referenceSolutionTs": "class TypedEmitter<Events extends Record<string, any>> {\n  private listeners = new Map<keyof Events, Array<(payload: any) => void>>();\n\n  on<K extends keyof Events>(event: K, listener: (payload: Events[K]) => void): void {\n    if (!this.listeners.has(event)) this.listeners.set(event, []);\n    this.listeners.get(event)!.push(listener);\n  }\n\n  emit<K extends keyof Events>(event: K, payload: Events[K]): void {\n    (this.listeners.get(event) || []).forEach(fn => fn(payload));\n  }\n}",
+    "testCases": [
+      {
+        "description": "Listener receives the typed payload",
+        "input": "interface AppEvents { login: { userId: string }; logout: undefined; }\nconst emitter = new TypedEmitter<AppEvents>();\nlet capturedId = '';\nemitter.on('login', (data) => { capturedId = data.userId; });\nemitter.emit('login', { userId: 'usr_42' });\ncapturedId",
+        "expected": "'usr_42'"
+      },
+      {
+        "description": "Several listeners run in order",
+        "input": "const e = new TypedEmitter<{ n: number }>();\nconst got: number[] = [];\ne.on('n', (x) => got.push(x));\ne.on('n', (x) => got.push(x * 10));\ne.emit('n', 2);\ngot",
+        "expected": "[2, 20]"
+      },
+      {
+        "description": "Emitting with no listeners is a no-op",
+        "input": "const e = new TypedEmitter<{ n: number }>();\ne.emit('n', 1)",
+        "expected": "undefined"
+      },
+      {
+        "description": "Compile time: wrong payload type",
+        "input": "emitter.emit('login', { userId: 42 })",
+        "expected": "TS2322 — Type 'number' is not assignable to type 'string'"
+      },
+      {
+        "description": "Compile time: unknown event name",
+        "input": "emitter.emit('nope', 1)",
+        "expected": "TS2345 — Argument of type '\"nope\"' is not assignable to parameter of type 'keyof AppEvents'"
+      }
+    ]
+  },
+  "ts-identity-first-generics": {
+    "promptSeed": "Implement generic TypeScript helper functions and container types without using `any`:\n\n### `identity<T>(value: T): T`\n- Returns the provided value unchanged with its exact type preserved.\n\n### `first<T>(items: T[]): T | undefined`\n- Returns the first element of `items`, or `undefined` if the array is empty.\n\n### `interface Box<T>`\n- Container type with property `{ value: T }`.\n\n### `makeBox<T>(value: T): Box<T>`\n- Wraps `value` inside a `{ value }` container.\n\n### `mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U>`\n- Transforms `box.value` using `fn` and returns a new `Box<U>`.",
+    "testHarness": "await $test.run(\"identity returns its argument\", async () => {\n  const sleep = $test.sleep;\n  return ([identity(5), identity('a'), identity(true)]);\n}, () => ([5, 'a', true]));\n\nawait $test.run(\"first returns the first element or undefined\", async () => {\n  const sleep = $test.sleep;\n  return ([first([3, 4]), first(['x']), first([])]);\n}, () => ([3, 'x', undefined]));\n\nawait $test.run(\"makeBox wraps a value\", async () => {\n  const sleep = $test.sleep;\n  return (makeBox(7));\n}, () => ({ value: 7 }));\n\nawait $test.run(\"mapBox maps the boxed value\", async () => {\n  const sleep = $test.sleep;\n  return (mapBox(makeBox(3), (v) => v * 2));\n}, () => ({ value: 6 }));\n\nawait $test.run(\"mapBox can change the type\", async () => {\n  const sleep = $test.sleep;\n  return (mapBox(makeBox(3), (v) => 'n' + v));\n}, () => ({ value: 'n3' }));\n\nconst compileChecksG1 = () => {\n  const n: number = identity(5);\n  const s: string = identity('a');\n  // @ts-expect-error — identity('a') is a string, not a number\n  const bad: number = identity('a');\n  // @ts-expect-error — first of a number[] is number | undefined, never a string\n  const bad2: string = first([1, 2]);\n  const box: Box<number> = makeBox(3);\n  const mapped: Box<string> = mapBox(box, (v) => String(v));\n  // @ts-expect-error — mapping to a string gives Box<string>, not Box<number>\n  const bad3: Box<number> = mapBox(box, (v) => String(v));\n  return [n, s, bad, bad2, mapped, bad3];\n};\n$test.check('Compile time: generic results are inferred and checked', typeof compileChecksG1 === 'function');",
+    "referenceSolution": "function identity<T>(value: T): T {\n  return value;\n}\n\nfunction first<T>(items: T[]): T | undefined {\n  return items[0];\n}\n\ninterface Box<T> {\n  value: T;\n}\n\nfunction makeBox<T>(value: T): Box<T> {\n  return { value };\n}\n\nfunction mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U> {\n  return { value: fn(box.value) };\n}",
+    "referenceSolutionTs": "function identity<T>(value: T): T {\n  return value;\n}\n\nfunction first<T>(items: T[]): T | undefined {\n  return items[0];\n}\n\ninterface Box<T> {\n  value: T;\n}\n\nfunction makeBox<T>(value: T): Box<T> {\n  return { value };\n}\n\nfunction mapBox<T, U>(box: Box<T>, fn: (value: T) => U): Box<U> {\n  return { value: fn(box.value) };\n}",
+    "testCases": [
+      {
+        "description": "identity returns its argument",
+        "input": "[identity(5), identity('a'), identity(true)]",
+        "expected": "[5, 'a', true]"
+      },
+      {
+        "description": "first returns the first element or undefined",
+        "input": "[first([3, 4]), first(['x']), first([])]",
+        "expected": "[3, 'x', undefined]"
+      },
+      {
+        "description": "makeBox wraps a value",
+        "input": "makeBox(7)",
+        "expected": "{ value: 7 }"
+      },
+      {
+        "description": "mapBox maps the boxed value",
+        "input": "mapBox(makeBox(3), (v) => v * 2)",
+        "expected": "{ value: 6 }"
+      },
+      {
+        "description": "mapBox can change the type",
+        "input": "mapBox(makeBox(3), (v) => 'n' + v)",
+        "expected": "{ value: 'n3' }"
+      },
+      {
+        "description": "Compile time: generic results are inferred",
+        "input": "const x: number = identity('a');",
+        "expected": "TS2322 — Type 'string' is not assignable to type 'number'"
+      }
+    ]
+  },
+  "ts-narrowing-typeof-in": {
+    "promptSeed": "Implement TypeScript narrowing using `typeof`, `Array.isArray`, and `in`:\n\n### `describe(value: string | number | string[]): string`\n- Returns `'string:<length>'` for a string.\n- Returns `'number:<value with one decimal, via toFixed(1)>'` for a number.\n- Returns `'list:<length>'` for an array.\n- Narrows using `typeof` and `Array.isArray`.\n\n### `type Shape`\n- Defined as `{ radius: number } | { width: number; height: number }`.\n\n### `area(shape: Shape): number`\n- Narrows `shape` using the `in` operator.\n- Circle: returns `Math.PI * radius ** 2` rounded to 2 decimals (`Math.round(Math.PI * shape.radius ** 2 * 100) / 100`).\n- Rectangle: returns `width * height`.",
+    "testHarness": "await $test.run(\"describe a string\", async () => {\n  const sleep = $test.sleep;\n  return (describe('hello'));\n}, () => ('string:5'));\n\nawait $test.run(\"describe a number with one decimal\", async () => {\n  const sleep = $test.sleep;\n  return ([describe(3), describe(2.55)]);\n}, () => (['number:3.0', (2.55).toFixed(1) === '2.5' ? 'number:2.5' : 'number:2.6']));\n\nawait $test.run(\"describe an array\", async () => {\n  const sleep = $test.sleep;\n  return (describe(['a', 'b', 'c']));\n}, () => ('list:3'));\n\nawait $test.run(\"area of a rectangle\", async () => {\n  const sleep = $test.sleep;\n  return (area({ width: 3, height: 4 }));\n}, () => (12));\n\nawait $test.run(\"area of a circle is rounded to 2 decimals\", async () => {\n  const sleep = $test.sleep;\n  return (area({ radius: 2 }));\n}, () => (12.57));\n\nconst compileChecksU1 = () => {\n  // @ts-expect-error — a boolean is not part of the accepted union\n  describe(true);\n  // @ts-expect-error — a shape needs radius or width and height\n  area({ side: 2 });\n  // @ts-expect-error — the rectangle variant requires height too\n  area({ width: 2 });\n};\n$test.check('Compile time: values outside the union are rejected', typeof compileChecksU1 === 'function');",
+    "referenceSolution": "function describe(value: string | number | string[]): string {\n  if (typeof value === 'string') return 'string:' + value.length;\n  if (typeof value === 'number') return 'number:' + value.toFixed(1);\n  return 'list:' + value.length;\n}\n\ntype Shape = { radius: number } | { width: number; height: number };\n\nfunction area(shape: Shape): number {\n  if ('radius' in shape) {\n    return Math.round(Math.PI * shape.radius ** 2 * 100) / 100;\n  }\n  return shape.width * shape.height;\n}",
+    "referenceSolutionTs": "function describe(value: string | number | string[]): string {\n  if (typeof value === 'string') return 'string:' + value.length;\n  if (typeof value === 'number') return 'number:' + value.toFixed(1);\n  return 'list:' + value.length;\n}\n\ntype Shape = { radius: number } | { width: number; height: number };\n\nfunction area(shape: Shape): number {\n  if ('radius' in shape) {\n    return Math.round(Math.PI * shape.radius ** 2 * 100) / 100;\n  }\n  return shape.width * shape.height;\n}",
+    "testCases": [
+      {
+        "description": "describe a string",
+        "input": "describe('hello')",
+        "expected": "'string:5'"
+      },
+      {
+        "description": "describe a number with one decimal",
+        "input": "[describe(3), describe(2.55)]",
+        "expected": "['number:3.0', 'number:2.5']"
+      },
+      {
+        "description": "describe an array",
+        "input": "describe(['a', 'b', 'c'])",
+        "expected": "'list:3'"
+      },
+      {
+        "description": "area of a rectangle",
+        "input": "area({ width: 3, height: 4 })",
+        "expected": "12"
+      },
+      {
+        "description": "area of a circle is rounded to 2 decimals",
+        "input": "area({ radius: 2 })",
+        "expected": "12.57"
+      },
+      {
+        "description": "Compile time: values outside the union are rejected",
+        "input": "describe(true)",
+        "expected": "TS2345 — Argument of type 'boolean' is not assignable to parameter of type 'string | number | string[]'"
+      }
+    ]
+  },
+  "ts-reimplement-utility-types": {
+    "promptSeed": "Without using built-in TypeScript utility types, define foundational mapped types:\n\n### `MyPartial<T>`\n- Makes every property of `T` optional (`?`).\n\n### `MyReadonly<T>`\n- Makes every property of `T` `readonly`.\n\n### `MyPick<T, K extends keyof T>`\n- Constructs a type picking only keys `K` from `T`.\n\n### `MyRecord<K extends keyof any, V>`\n- Constructs an object type with property keys `K` and values of type `V`.",
+    "testHarness": "await $test.run(\"MyPartial allows missing properties\", async () => {\n  const sleep = $test.sleep;\n  const p: MyPartial<{ a: number; b: string }> = { a: 1 };\n  return (p);\n}, () => ({ a: 1 }));\n\nawait $test.run(\"MyPick keeps only the chosen keys\", async () => {\n  const sleep = $test.sleep;\n  const p: MyPick<{ id: number; name: string }, 'id'> = { id: 1 };\n  return (p);\n}, () => ({ id: 1 }));\n\nawait $test.run(\"MyRecord maps every key to the value type\", async () => {\n  const sleep = $test.sleep;\n  const r: MyRecord<'a' | 'b', number> = { a: 1, b: 2 };\n  return (r);\n}, () => ({ a: 1, b: 2 }));\n\nawait $test.run(\"MyReadonly values can be read\", async () => {\n  const sleep = $test.sleep;\n  const r: MyReadonly<{ id: number }> = { id: 5 };\n  return (r.id);\n}, () => (5));\n\ntype Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;\nconst assertType = <T extends true>(): void => {};\n\ntype User = { id: number; name: string };\nassertType<Equal<MyPartial<User>, { id?: number; name?: string }>>();\nassertType<Equal<MyReadonly<User>, { readonly id: number; readonly name: string }>>();\nassertType<Equal<MyPick<User, 'id'>, { id: number }>>();\nassertType<Equal<MyRecord<'a' | 'b', number>, { a: number; b: number }>>();\n\nconst compileChecksT1 = () => {\n  const ro: MyReadonly<User> = { id: 1, name: 'a' };\n  // @ts-expect-error — properties of MyReadonly cannot be assigned\n  ro.id = 2;\n  // @ts-expect-error — name is not part of MyPick<User, 'id'>\n  const picked: MyPick<User, 'id'> = { id: 1, name: 'x' };\n  return [ro, picked];\n};\n$test.check('Compile time: the rebuilt utility types have the right shapes', typeof compileChecksT1 === 'function');",
+    "referenceSolution": "type MyPartial<T> = { [P in keyof T]?: T[P] };\n\ntype MyReadonly<T> = { readonly [P in keyof T]: T[P] };\n\ntype MyPick<T, K extends keyof T> = { [P in K]: T[P] };\n\ntype MyRecord<K extends keyof any, V> = { [P in K]: V };",
+    "referenceSolutionTs": "type MyPartial<T> = { [P in keyof T]?: T[P] };\n\ntype MyReadonly<T> = { readonly [P in keyof T]: T[P] };\n\ntype MyPick<T, K extends keyof T> = { [P in K]: T[P] };\n\ntype MyRecord<K extends keyof any, V> = { [P in K]: V };",
+    "testCases": [
+      {
+        "description": "MyPartial allows missing properties",
+        "input": "const p: MyPartial<{ a: number; b: string }> = { a: 1 };\np",
+        "expected": "{ a: 1 }"
+      },
+      {
+        "description": "MyPick keeps only the chosen keys",
+        "input": "const p: MyPick<{ id: number; name: string }, 'id'> = { id: 1 };\np",
+        "expected": "{ id: 1 }"
+      },
+      {
+        "description": "MyRecord maps every key to the value type",
+        "input": "const r: MyRecord<'a' | 'b', number> = { a: 1, b: 2 };\nr",
+        "expected": "{ a: 1, b: 2 }"
+      },
+      {
+        "description": "MyReadonly values can be read",
+        "input": "const r: MyReadonly<{ id: number }> = { id: 5 };\nr.id",
+        "expected": "5"
+      },
+      {
+        "description": "Compile time: MyReadonly rejects assignment",
+        "input": "const r: MyReadonly<{ id: number }> = { id: 1 };\nr.id = 2;",
+        "expected": "TS2540 — Cannot assign to 'id' because it is a read-only property"
+      },
+      {
+        "description": "Compile time: MyPick rejects other keys",
+        "input": "const p: MyPick<{ id: number; name: string }, 'id'> = { id: 1, name: 'x' };",
+        "expected": "TS2353 — Object literal may only specify known properties; 'name' does not exist"
+      }
+    ]
+  },
+  "ts-branded-nominal-types": {
+    "promptSeed": "Define a generic nominal branding type and brand constructor functions to prevent accidental assignment between identical underlying primitives:\n\n### `Brand<K, T>`\n- Intersects type `K` with `{ readonly __brand: T }`.\n\n### Branded Types\n- `type UserId = Brand<string, 'UserId'>`\n- `type OrderId = Brand<string, 'OrderId'>`\n- `type PositiveNumber = Brand<number, 'PositiveNumber'>`\n\n### `toUserId(id: string): UserId`\n- Casts a string to `UserId`.\n\n### `toOrderId(id: string): OrderId`\n- Casts a string to `OrderId`.\n\n### `toPositiveNumber(n: number): PositiveNumber`\n- If `n <= 0`, throws an `Error('Number must be positive')`.\n- Otherwise, returns `n` cast to `PositiveNumber`.",
+    "testHarness": "await $test.run(\"toUserId and toOrderId return branded values\", async () => {\n  const sleep = $test.sleep;\n  const u = toUserId('u-123');\n  const o = toOrderId('o-456');\n  return ([u, o]);\n}, () => (['u-123', 'o-456']));\n\nawait $test.run(\"toPositiveNumber returns positive numbers\", async () => {\n  const sleep = $test.sleep;\n  const pos = toPositiveNumber(42);\n  return (pos);\n}, () => (42));\n\nawait $test.run(\"toPositiveNumber throws on non-positive input\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    toPositiveNumber(-5);\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return (caught);\n}, () => ('Number must be positive'));\n\nawait $test.run(\"Branded value is assignable to base primitive type\", async () => {\n  const sleep = $test.sleep;\n  const u: UserId = toUserId('id-1');\n  const s: string = u;\n  return (s);\n}, () => ('id-1'));",
+    "referenceSolution": "type Brand<K, T> = K & { readonly __brand: T };\n\ntype UserId = Brand<string, 'UserId'>;\ntype OrderId = Brand<string, 'OrderId'>;\ntype PositiveNumber = Brand<number, 'PositiveNumber'>;\n\nfunction toUserId(id: string): UserId {\n  return id as UserId;\n}\n\nfunction toOrderId(id: string): OrderId {\n  return id as OrderId;\n}\n\nfunction toPositiveNumber(n: number): PositiveNumber {\n  if (n <= 0) throw new Error('Number must be positive');\n  return n as PositiveNumber;\n}",
+    "referenceSolutionTs": "type Brand<K, T> = K & { readonly __brand: T };\n\ntype UserId = Brand<string, 'UserId'>;\ntype OrderId = Brand<string, 'OrderId'>;\ntype PositiveNumber = Brand<number, 'PositiveNumber'>;\n\nfunction toUserId(id: string): UserId {\n  return id as UserId;\n}\n\nfunction toOrderId(id: string): OrderId {\n  return id as OrderId;\n}\n\nfunction toPositiveNumber(n: number): PositiveNumber {\n  if (n <= 0) throw new Error('Number must be positive');\n  return n as PositiveNumber;\n}",
+    "testCases": [
+      {
+        "description": "toUserId and toOrderId return branded values",
+        "input": "const u = toUserId('u-123');\nconst o = toOrderId('o-456');\n[u, o]",
+        "expected": "['u-123', 'o-456']"
+      },
+      {
+        "description": "toPositiveNumber returns positive numbers",
+        "input": "const pos = toPositiveNumber(42);\npos",
+        "expected": "42"
+      },
+      {
+        "description": "toPositiveNumber throws on non-positive input",
+        "input": "let caught = null;\ntry {\n  toPositiveNumber(-5);\n} catch (e: any) {\n  caught = e.message;\n}\ncaught",
+        "expected": "'Number must be positive'"
+      },
+      {
+        "description": "Branded value is assignable to base primitive type",
+        "input": "const u: UserId = toUserId('id-1');\nconst s: string = u;\ns",
+        "expected": "'id-1'"
+      }
+    ]
+  },
+  "ts-infer-conditional-unpack": {
+    "promptSeed": "Define advanced conditional utility types using the `infer` keyword:\n\n### `MyReturnType<T>`\n- Extracts the return type of function type `T`.\n- Evaluates to `never` if `T` is not a function.\n\n### `MyParameters<T>`\n- Extracts the parameter tuple type of function type `T`.\n- Evaluates to `never` if `T` is not a function.\n\n### `DeepAwaited<T>`\n- Recursively unwraps nested `Promise` or `PromiseLike` types (e.g., `Promise<Promise<number>>` unwraps to `number`).\n- Evaluates to `T` if it is not a `PromiseLike`.\n\n### `TupleToUnion<T>`\n- Extracts a union of all element types from tuple or array type `T`.\n\n### `Flatten<T>`\n- Unwraps one array layer if `T` is an array type (`(infer U)[] -> U`).\n- Returns `T` unchanged if it is not an array.",
+    "testHarness": "await $test.run(\"MyReturnType extracts function return type\", async () => {\n  const sleep = $test.sleep;\n  const a: MyReturnType<() => number> = 42;\n  return (a);\n}, () => (42));\n\nawait $test.run(\"MyReturnType handles boolean return and parameters\", async () => {\n  const sleep = $test.sleep;\n  const b: MyReturnType<(x: string) => boolean> = true;\n  return (b);\n}, () => (true));\n\nawait $test.run(\"MyParameters extracts parameter tuple\", async () => {\n  const sleep = $test.sleep;\n  const p: MyParameters<(x: string, y: number) => void> = ['hello', 10];\n  return (p);\n}, () => (['hello', 10]));\n\nawait $test.run(\"DeepAwaited unwraps nested Promise types\", async () => {\n  const sleep = $test.sleep;\n  const d: DeepAwaited<Promise<Promise<string>>> = 'unwrapped';\n  return (d);\n}, () => ('unwrapped'));\n\nawait $test.run(\"TupleToUnion creates union from array\", async () => {\n  const sleep = $test.sleep;\n  const u: TupleToUnion<['red', 'green', 'blue']> = 'green';\n  return (u);\n}, () => ('green'));\n\nawait $test.run(\"Flatten unwraps array element type\", async () => {\n  const sleep = $test.sleep;\n  const f: Flatten<number[][]> = [1, 2, 3];\n  return (f);\n}, () => ([1, 2, 3]));\n\nawait $test.run(\"Flatten leaves non-array primitive type untouched\", async () => {\n  const sleep = $test.sleep;\n  const f2: Flatten<string> = 'plain';\n  return (f2);\n}, () => ('plain'));",
+    "referenceSolution": "type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;\n\ntype MyParameters<T> = T extends (...args: infer P) => any ? P : never;\n\ntype DeepAwaited<T> = T extends PromiseLike<infer U> ? DeepAwaited<U> : T;\n\ntype TupleToUnion<T> = T extends readonly (infer U)[] ? U : never;\n\ntype Flatten<T> = T extends (infer U)[] ? U : T;",
+    "referenceSolutionTs": "type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;\n\ntype MyParameters<T> = T extends (...args: infer P) => any ? P : never;\n\ntype DeepAwaited<T> = T extends PromiseLike<infer U> ? DeepAwaited<U> : T;\n\ntype TupleToUnion<T> = T extends readonly (infer U)[] ? U : never;\n\ntype Flatten<T> = T extends (infer U)[] ? U : T;",
+    "testCases": [
+      {
+        "description": "MyReturnType extracts function return type",
+        "input": "const a: MyReturnType<() => number> = 42;\na",
+        "expected": "42"
+      },
+      {
+        "description": "MyReturnType handles boolean return and parameters",
+        "input": "const b: MyReturnType<(x: string) => boolean> = true;\nb",
+        "expected": "true"
+      },
+      {
+        "description": "MyParameters extracts parameter tuple",
+        "input": "const p: MyParameters<(x: string, y: number) => void> = ['hello', 10];\np",
+        "expected": "['hello', 10]"
+      },
+      {
+        "description": "DeepAwaited unwraps nested Promise types",
+        "input": "const d: DeepAwaited<Promise<Promise<string>>> = 'unwrapped';\nd",
+        "expected": "'unwrapped'"
+      },
+      {
+        "description": "TupleToUnion creates union from array",
+        "input": "const u: TupleToUnion<['red', 'green', 'blue']> = 'green';\nu",
+        "expected": "'green'"
+      },
+      {
+        "description": "Flatten unwraps array element type",
+        "input": "const f: Flatten<number[][]> = [1, 2, 3];\nf",
+        "expected": "[1, 2, 3]"
+      },
+      {
+        "description": "Flatten leaves non-array primitive type untouched",
+        "input": "const f2: Flatten<string> = 'plain';\nf2",
+        "expected": "'plain'"
+      }
+    ]
+  },
+  "ts-mapped-modifiers-deep-readonly": {
+    "promptSeed": "Define advanced TypeScript mapped types using modifier removal (`-readonly`, `-?`), key remapping (`as`), and a runtime helper:\n\n### `DeepReadonly<T>`\n- Recursively marks all properties of object or array `T` as `readonly` (preserving functions as-is).\n\n### `Mutable<T>`\n- Removes `readonly` from all direct properties of `T`: `{-readonly [P in keyof T]: T[P]}`.\n\n### `Concrete<T>`\n- Removes the optional modifier (`?`) from all direct properties of `T`: `{[P in keyof T]-?: T[P]}`.\n\n### `Getters<T>`\n- Remaps property keys using `as` to produce getter method signatures (e.g. `{ name: string }` becomes `{ getName: () => string }`).\n\n### `makeGetters<T extends Record<string, any>>(obj: T): Getters<T>`\n- Runtime function that returns an object where each key in `obj` has a corresponding `get<Prop>()` method returning its current value.",
+    "testHarness": "await $test.run(\"DeepReadonly allows nested property read access\", async () => {\n  const sleep = $test.sleep;\n  const obj = { a: 1, b: { c: 'nested' } };\n  const r: DeepReadonly<typeof obj> = obj;\n  return (r.b.c);\n}, () => ('nested'));\n\nawait $test.run(\"Mutable removes readonly modifiers allowing property mutation\", async () => {\n  const sleep = $test.sleep;\n  type ReadonlyUser = { readonly id: number; readonly name: string };\n  const u: Mutable<ReadonlyUser> = { id: 1, name: 'Alice' };\n  u.name = 'Bob';\n  return (u.name);\n}, () => ('Bob'));\n\nawait $test.run(\"Concrete removes optional modifier requiring all properties\", async () => {\n  const sleep = $test.sleep;\n  type PartialConfig = { host?: string; port?: number };\n  const c: Concrete<PartialConfig> = { host: 'localhost', port: 8080 };\n  return ([c.host, c.port]);\n}, () => (['localhost', 8080]));\n\nawait $test.run(\"makeGetters generates get<Prop> methods for object properties\", async () => {\n  const sleep = $test.sleep;\n  const g = makeGetters({ name: 'Alice', age: 30 });\n  return ([g.getName(), g.getAge()]);\n}, () => (['Alice', 30]));",
+    "referenceSolution": "type DeepReadonly<T> = T extends Function\n  ? T\n  : T extends Array<infer U>\n    ? ReadonlyArray<DeepReadonly<U>>\n    : T extends object\n      ? { readonly [P in keyof T]: DeepReadonly<T[P]> }\n      : T;\n\ntype Mutable<T> = {\n  -readonly [P in keyof T]: T[P];\n};\n\ntype Concrete<T> = {\n  [P in keyof T]-?: T[P];\n};\n\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends Record<string, any>>(obj: T): Getters<T> {\n  const result: Record<string, any> = {};\n  for (const key of Object.keys(obj)) {\n    const capitalized = key.charAt(0).toUpperCase() + key.slice(1);\n    result[`get${capitalized}`] = () => obj[key];\n  }\n  return result as Getters<T>;\n}",
+    "referenceSolutionTs": "type DeepReadonly<T> = T extends Function\n  ? T\n  : T extends Array<infer U>\n    ? ReadonlyArray<DeepReadonly<U>>\n    : T extends object\n      ? { readonly [P in keyof T]: DeepReadonly<T[P]> }\n      : T;\n\ntype Mutable<T> = {\n  -readonly [P in keyof T]: T[P];\n};\n\ntype Concrete<T> = {\n  [P in keyof T]-?: T[P];\n};\n\ntype Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\nfunction makeGetters<T extends Record<string, any>>(obj: T): Getters<T> {\n  const result: Record<string, any> = {};\n  for (const key of Object.keys(obj)) {\n    const capitalized = key.charAt(0).toUpperCase() + key.slice(1);\n    result[`get${capitalized}`] = () => obj[key];\n  }\n  return result as Getters<T>;\n}",
+    "testCases": [
+      {
+        "description": "DeepReadonly allows nested property read access",
+        "input": "const obj = { a: 1, b: { c: 'nested' } };\nconst r: DeepReadonly<typeof obj> = obj;\nr.b.c",
+        "expected": "'nested'"
+      },
+      {
+        "description": "Mutable removes readonly modifiers allowing property mutation",
+        "input": "type ReadonlyUser = { readonly id: number; readonly name: string };\nconst u: Mutable<ReadonlyUser> = { id: 1, name: 'Alice' };\nu.name = 'Bob';\nu.name",
+        "expected": "'Bob'"
+      },
+      {
+        "description": "Concrete removes optional modifier requiring all properties",
+        "input": "type PartialConfig = { host?: string; port?: number };\nconst c: Concrete<PartialConfig> = { host: 'localhost', port: 8080 };\n[c.host, c.port]",
+        "expected": "['localhost', 8080]"
+      },
+      {
+        "description": "makeGetters generates get<Prop> methods for object properties",
+        "input": "const g = makeGetters({ name: 'Alice', age: 30 });\n[g.getName(), g.getAge()]",
+        "expected": "['Alice', 30]"
+      }
+    ]
+  },
+  "ts-overloads-exhaustive-narrowing": {
+    "promptSeed": "Write function overloads and exhaustive checking utilities:\n\n### `formatInput` (Overloaded)\n- `formatInput(value: string, toUpper: boolean): string`\n  - Formats string to uppercase if `toUpper` is `true`, lowercase if `false`.\n- `formatInput(value: number, precision: number): string`\n  - Formats number with `toFixed(precision)`.\n\n### `assertNever(x: never, message?: string): never`\n- Throws an `Error(message || \\`Unexpected value: \\${x}\\`)`.\n- In `switch` statements, assigning an unhandled branch to `assertNever` ensures exhaustiveness at compile time.\n\n### `isTagged<T extends { tag: string }, K extends string>(item: T, tag: K): item is Extract<T, { tag: K }>`\n- Custom type guard narrowing a discriminated union `item` by its `tag` property.",
+    "testHarness": "await $test.run(\"formatInput formats strings with boolean flag\", async () => {\n  const sleep = $test.sleep;\n  return ([formatInput('hello', true), formatInput('WORLD', false)]);\n}, () => (['HELLO', 'world']));\n\nawait $test.run(\"formatInput formats numbers with decimal precision\", async () => {\n  const sleep = $test.sleep;\n  return ([formatInput(3.14159, 2), formatInput(42, 0)]);\n}, () => (['3.14', '42']));\n\nawait $test.run(\"assertNever throws with provided or default message\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertNever('invalid' as never);\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return (caught);\n}, () => ('Unexpected value: invalid'));\n\nawait $test.run(\"isTagged narrows union item by tag\", async () => {\n  const sleep = $test.sleep;\n  type Action = { tag: 'add'; val: number } | { tag: 'reset' };\n  const a: Action = { tag: 'add', val: 5 };\n  return (isTagged(a, 'add') ? a.val : 0);\n}, () => (5));\n\nawait $test.run(\"isTagged returns false when tag does not match\", async () => {\n  const sleep = $test.sleep;\n  type Action = { tag: 'add'; val: number } | { tag: 'reset' };\n  const a: Action = { tag: 'reset' };\n  return (isTagged(a, 'add'));\n}, () => (false));",
+    "referenceSolution": "function formatInput(value: string, toUpper: boolean): string;\nfunction formatInput(value: number, precision: number): string;\nfunction formatInput(value: string | number, option: boolean | number): string {\n  if (typeof value === 'string') {\n    return option ? value.toUpperCase() : value.toLowerCase();\n  }\n  return value.toFixed(option as number);\n}\n\nfunction assertNever(x: never, message?: string): never {\n  throw new Error(message || `Unexpected value: ${x}`);\n}\n\nfunction isTagged<T extends { tag: string }, K extends string>(\n  item: T,\n  tag: K\n): item is Extract<T, { tag: K }> {\n  return item.tag === tag;\n}",
+    "referenceSolutionTs": "function formatInput(value: string, toUpper: boolean): string;\nfunction formatInput(value: number, precision: number): string;\nfunction formatInput(value: string | number, option: boolean | number): string {\n  if (typeof value === 'string') {\n    return option ? value.toUpperCase() : value.toLowerCase();\n  }\n  return value.toFixed(option as number);\n}\n\nfunction assertNever(x: never, message?: string): never {\n  throw new Error(message || `Unexpected value: ${x}`);\n}\n\nfunction isTagged<T extends { tag: string }, K extends string>(\n  item: T,\n  tag: K\n): item is Extract<T, { tag: K }> {\n  return item.tag === tag;\n}",
+    "testCases": [
+      {
+        "description": "formatInput formats strings with boolean flag",
+        "input": "[formatInput('hello', true), formatInput('WORLD', false)]",
+        "expected": "['HELLO', 'world']"
+      },
+      {
+        "description": "formatInput formats numbers with decimal precision",
+        "input": "[formatInput(3.14159, 2), formatInput(42, 0)]",
+        "expected": "['3.14', '42']"
+      },
+      {
+        "description": "assertNever throws with provided or default message",
+        "input": "let caught = null;\ntry {\n  assertNever('invalid' as never);\n} catch (e: any) {\n  caught = e.message;\n}\ncaught",
+        "expected": "'Unexpected value: invalid'"
+      },
+      {
+        "description": "isTagged narrows union item by tag",
+        "input": "type Action = { tag: 'add'; val: number } | { tag: 'reset' };\nconst a: Action = { tag: 'add', val: 5 };\nisTagged(a, 'add') ? a.val : 0",
+        "expected": "5"
+      },
+      {
+        "description": "isTagged returns false when tag does not match",
+        "input": "type Action = { tag: 'add'; val: number } | { tag: 'reset' };\nconst a: Action = { tag: 'reset' };\nisTagged(a, 'add')",
+        "expected": "false"
+      }
+    ]
+  },
+  "ts-template-literal-strings": {
+    "promptSeed": "Define recursive template literal string types and a runtime path resolution helper:\n\n### `CamelToKebab<S extends string>`\n- Recursively converts a camelCase string literal type to kebab-case (e.g. `'userName'` -> `'user-name'`, `'isReady'` -> `'is-ready'`).\n\n### `Split<S extends string, Delim extends string>`\n- Splits string literal `S` by delimiter `Delim` into a tuple of string segments.\n\n### `DeepDotPath<T>`\n- Recursively constructs a union of all dot-separated property paths for nested object `T` (e.g. `{ user: { name: string } }` produces `'user' | 'user.name'`).\n\n### `getByPath(obj: any, path: string): any`\n- Retrieves the nested value at the dot-separated `path` in `obj`.\n- Returns `undefined` if `obj` or `path` is empty or if any intermediate segment is not found.",
+    "testHarness": "await $test.run(\"CamelToKebab converts single camel hump to kebab-case\", async () => {\n  const sleep = $test.sleep;\n  const k: CamelToKebab<'userName'> = 'user-name';\n  return (k);\n}, () => ('user-name'));\n\nawait $test.run(\"CamelToKebab converts multiple camel humps\", async () => {\n  const sleep = $test.sleep;\n  const k2: CamelToKebab<'isReadyNow'> = 'is-ready-now';\n  return (k2);\n}, () => ('is-ready-now'));\n\nawait $test.run(\"Split splits string by delimiter into tuple\", async () => {\n  const sleep = $test.sleep;\n  const s: Split<'a.b.c', '.'> = ['a', 'b', 'c'];\n  return (s);\n}, () => (['a', 'b', 'c']));\n\nawait $test.run(\"DeepDotPath allows valid nested property path string\", async () => {\n  const sleep = $test.sleep;\n  const p: DeepDotPath<{ user: { name: string; profile: { avatar: string } } }> = 'user.profile.avatar';\n  return (p);\n}, () => ('user.profile.avatar'));\n\nawait $test.run(\"getByPath retrieves nested object value along path\", async () => {\n  const sleep = $test.sleep;\n  const obj = { a: { b: { c: 99 } } };\n  return (getByPath(obj, 'a.b.c'));\n}, () => (99));\n\nawait $test.run(\"getByPath returns undefined on non-existent path\", async () => {\n  const sleep = $test.sleep;\n  const obj = { x: 10 };\n  return (getByPath(obj, 'x.missing.deep'));\n}, () => (undefined));",
+    "referenceSolution": "type CamelToKebab<S extends string> = S extends `${infer Head}${infer Tail}`\n  ? Tail extends Uncapitalize<Tail>\n    ? `${Lowercase<Head>}${CamelToKebab<Tail>}`\n    : `${Lowercase<Head>}-${CamelToKebab<Uncapitalize<Tail>>}`\n  : S;\n\ntype Split<S extends string, Delim extends string> = string extends S\n  ? string[]\n  : S extends ''\n    ? []\n    : S extends `${infer Head}${Delim}${infer Tail}`\n      ? [Head, ...Split<Tail, Delim>]\n      : [S];\n\ntype DeepDotPath<T> = T extends object\n  ? {\n      [K in keyof T & string]: K | `${K}.${DeepDotPath<T[K]>}`;\n    }[keyof T & string]\n  : never;\n\nfunction getByPath(obj: any, path: string): any {\n  if (!obj || !path) return undefined;\n  return path.split('.').reduce((acc, part) => (acc != null ? acc[part] : undefined), obj);\n}",
+    "referenceSolutionTs": "type CamelToKebab<S extends string> = S extends `${infer Head}${infer Tail}`\n  ? Tail extends Uncapitalize<Tail>\n    ? `${Lowercase<Head>}${CamelToKebab<Tail>}`\n    : `${Lowercase<Head>}-${CamelToKebab<Uncapitalize<Tail>>}`\n  : S;\n\ntype Split<S extends string, Delim extends string> = string extends S\n  ? string[]\n  : S extends ''\n    ? []\n    : S extends `${infer Head}${Delim}${infer Tail}`\n      ? [Head, ...Split<Tail, Delim>]\n      : [S];\n\ntype DeepDotPath<T> = T extends object\n  ? {\n      [K in keyof T & string]: K | `${K}.${DeepDotPath<T[K]>}`;\n    }[keyof T & string]\n  : never;\n\nfunction getByPath(obj: any, path: string): any {\n  if (!obj || !path) return undefined;\n  return path.split('.').reduce((acc, part) => (acc != null ? acc[part] : undefined), obj);\n}",
+    "testCases": [
+      {
+        "description": "CamelToKebab converts single camel hump to kebab-case",
+        "input": "const k: CamelToKebab<'userName'> = 'user-name';\nk",
+        "expected": "'user-name'"
+      },
+      {
+        "description": "CamelToKebab converts multiple camel humps",
+        "input": "const k2: CamelToKebab<'isReadyNow'> = 'is-ready-now';\nk2",
+        "expected": "'is-ready-now'"
+      },
+      {
+        "description": "Split splits string by delimiter into tuple",
+        "input": "const s: Split<'a.b.c', '.'> = ['a', 'b', 'c'];\ns",
+        "expected": "['a', 'b', 'c']"
+      },
+      {
+        "description": "DeepDotPath allows valid nested property path string",
+        "input": "const p: DeepDotPath<{ user: { name: string; profile: { avatar: string } } }> = 'user.profile.avatar';\np",
+        "expected": "'user.profile.avatar'"
+      },
+      {
+        "description": "getByPath retrieves nested object value along path",
+        "input": "const obj = { a: { b: { c: 99 } } };\ngetByPath(obj, 'a.b.c')",
+        "expected": "99"
+      },
+      {
+        "description": "getByPath returns undefined on non-existent path",
+        "input": "const obj = { x: 10 };\ngetByPath(obj, 'x.missing.deep')",
+        "expected": "undefined"
+      }
+    ]
+  },
+  "ts-assertion-functions": {
+    "promptSeed": "Implement TypeScript type guards and assertion functions to contrast boolean predicates with control-flow narrowing assertion signatures:\n\n### `isDefined<T>(val: T | null | undefined): val is T`\n- Type predicate returning `true` if `val !== null && val !== undefined`; returns `false` for `null` or `undefined`.\n- Allows `if (isDefined(x)) { ... }` branches to narrow `x` to `T`.\n\n### `assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T>`\n- Assertion function that verifies `val` is neither `null` nor `undefined`.\n- If `val === null || val === undefined`, throws a `TypeError` with `message` (or default `'Value is null or undefined'`).\n- If valid, returns `void`. In TypeScript, this narrows `val` in the remaining control flow to `NonNullable<T>` without an `if` block.\n\n### `assertCondition(condition: unknown, message?: string): asserts condition`\n- General invariant assertion function.\n- If `condition` is falsy (`!condition`), throws an `Error` with `message` (or default `'Assertion failed'`).\n- In TypeScript, asserts truthiness of the condition expression for subsequent lines.\n\n### `assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown>`\n- Verifies `val` is a non-null plain dictionary object and not an array.\n- If `val === null || typeof val !== 'object' || Array.isArray(val)`, throws a `TypeError` with `message` (or default `'Value is not a record object'`).\n- If valid, returns `void` and narrows `val` to `Record<string, unknown>`.",
+    "testHarness": "await $test.run(\"isDefined returns true for values and false for null/undefined\", async () => {\n  const sleep = $test.sleep;\n  return ([isDefined(\"hello\"), isDefined(0), isDefined(false), isDefined(null), isDefined(undefined)]);\n}, () => ([true, true, true, false, false]));\n\nawait $test.run(\"assertDefined passes valid values and throws TypeError on null/undefined\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertDefined(null, \"Missing\");\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertDefined(123) === undefined, caught]);\n}, () => ([true, \"Missing\"]));\n\nawait $test.run(\"assertCondition throws on falsy values with custom message\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertCondition(false, \"Expected truthy\");\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertCondition(true) === undefined, caught]);\n}, () => ([true, \"Expected truthy\"]));\n\nawait $test.run(\"assertRecord validates plain records and throws TypeError on arrays/primitives\", async () => {\n  const sleep = $test.sleep;\n  let caught = null;\n  try {\n    assertRecord([1, 2, 3]);\n  } catch (e: any) {\n    caught = e.message;\n  }\n  return ([assertRecord({ a: 1 }) === undefined, caught]);\n}, () => ([true, \"Value is not a record object\"]));",
+    "referenceSolution": "function isDefined<T>(val: T | null | undefined): val is T {\n  return val !== null && val !== undefined;\n}\n\nfunction assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T> {\n  if (val === null || val === undefined) {\n    throw new TypeError(message || 'Value is null or undefined');\n  }\n}\n\nfunction assertCondition(condition: unknown, message?: string): asserts condition {\n  if (!condition) {\n    throw new Error(message || 'Assertion failed');\n  }\n}\n\nfunction assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown> {\n  if (val === null || typeof val !== 'object' || Array.isArray(val)) {\n    throw new TypeError(message || 'Value is not a record object');\n  }\n}",
+    "referenceSolutionTs": "function isDefined<T>(val: T | null | undefined): val is T {\n  return val !== null && val !== undefined;\n}\n\nfunction assertDefined<T>(val: T, message?: string): asserts val is NonNullable<T> {\n  if (val === null || val === undefined) {\n    throw new TypeError(message || 'Value is null or undefined');\n  }\n}\n\nfunction assertCondition(condition: unknown, message?: string): asserts condition {\n  if (!condition) {\n    throw new Error(message || 'Assertion failed');\n  }\n}\n\nfunction assertRecord(val: unknown, message?: string): asserts val is Record<string, unknown> {\n  if (val === null || typeof val !== 'object' || Array.isArray(val)) {\n    throw new TypeError(message || 'Value is not a record object');\n  }\n}",
+    "testCases": [
+      {
+        "description": "isDefined returns true for values and false for null/undefined",
+        "input": "[isDefined(\"hello\"), isDefined(0), isDefined(false), isDefined(null), isDefined(undefined)]",
+        "expected": "[true, true, true, false, false]"
+      },
+      {
+        "description": "assertDefined passes valid values and throws TypeError on null/undefined",
+        "input": "let caught = null;\ntry {\n  assertDefined(null, \"Missing\");\n} catch (e: any) {\n  caught = e.message;\n}\n[assertDefined(123) === undefined, caught]",
+        "expected": "[true, \"Missing\"]"
+      },
+      {
+        "description": "assertCondition throws on falsy values with custom message",
+        "input": "let caught = null;\ntry {\n  assertCondition(false, \"Expected truthy\");\n} catch (e: any) {\n  caught = e.message;\n}\n[assertCondition(true) === undefined, caught]",
+        "expected": "[true, \"Expected truthy\"]"
+      },
+      {
+        "description": "assertRecord validates plain records and throws TypeError on arrays/primitives",
+        "input": "let caught = null;\ntry {\n  assertRecord([1, 2, 3]);\n} catch (e: any) {\n  caught = e.message;\n}\n[assertRecord({ a: 1 }) === undefined, caught]",
+        "expected": "[true, \"Value is not a record object\"]"
+      }
+    ]
+  },
+  "ts-tuple-rest-parameters": {
+    "promptSeed": "Implement variadic tuple types and positional rest parameter utilities to manipulate strongly typed parameter lists:\n\n### `type Concat<A extends readonly any[], B extends readonly any[]>`\n- Concatenates two tuple types `A` and `B` into a single combined tuple `[...A, ...B]`.\n\n### `type Shift<T extends readonly any[]>`\n- Extracts a tuple with the first element removed. If `T` has at least one element, returns `Rest` from `[any, ...infer Rest]`; if `T` is empty `[]`, returns `[]`.\n\n### `tuple<T extends any[]>(...elements: [...T]): [...T]`\n- Creates and returns a tuple with its exact literal/positional element types preserved, avoiding implicit array widening (e.g. `tuple(1, 'a', true)` produces `[number, string, boolean]`).\n\n### `partialApply<Leading extends any[], Trailing extends any[], R>(fn: (...args: [...Leading, ...Trailing]) => R, ...head: Leading): (...tail: Trailing) => R`\n- Accepts a function `fn` expecting positional arguments `[...Leading, ...Trailing]`.\n- Binds the leading arguments `...head: Leading`.\n- Returns a new function that takes strictly the remaining `...tail: Trailing` positional arguments and returns `R`.\n\n### `callWithTuple<Args extends any[], R>(fn: (...args: Args) => R, args: [...Args]): R`\n- Executes `fn` by spreading the tuple arguments `args` in position.",
+    "testHarness": "await $test.run(\"tuple constructs a typed tuple without widening to arbitrary array\", async () => {\n  const sleep = $test.sleep;\n  return (tuple(1, \"ok\", true));\n}, () => ([1, \"ok\", true]));\n\nawait $test.run(\"partialApply binds leading arguments and returns function for remaining arguments\", async () => {\n  const sleep = $test.sleep;\n  const fn = (a: string, b: number, c: boolean) => `${a}-${b}-${c}`;\n  const partial = partialApply(fn, \"x\", 10);\n  return (partial(true));\n}, () => (\"x-10-true\"));\n\nawait $test.run(\"callWithTuple executes function by spreading tuple elements\", async () => {\n  const sleep = $test.sleep;\n  return (callWithTuple((a: number, b: number, c: number) => a * b + c, [3, 4, 5]));\n}, () => (17));\n\nawait $test.run(\"Concat and Shift tuple type contracts compile and verify lengths\", async () => {\n  const sleep = $test.sleep;\n  type C = Concat<[number, string], [boolean]>;\n  type S = Shift<[string, number, boolean]>;\n  const c: C = [1, \"two\", true];\n  const s: S = [42, false];\n  return ([c.length, s.length]);\n}, () => ([3, 2]));",
+    "referenceSolution": "type Concat<A extends readonly any[], B extends readonly any[]> = [...A, ...B];\n\ntype Shift<T extends readonly any[]> = T extends readonly [any, ...infer Rest] ? Rest : [];\n\nfunction tuple<T extends any[]>(...elements: [...T]): [...T] {\n  return elements;\n}\n\nfunction partialApply<Leading extends any[], Trailing extends any[], R>(\n  fn: (...args: [...Leading, ...Trailing]) => R,\n  ...head: Leading\n): (...tail: Trailing) => R {\n  return (...tail: Trailing): R => fn(...head, ...tail);\n}\n\nfunction callWithTuple<Args extends any[], R>(\n  fn: (...args: Args) => R,\n  args: [...Args]\n): R {\n  return fn(...args);\n}",
+    "referenceSolutionTs": "type Concat<A extends readonly any[], B extends readonly any[]> = [...A, ...B];\n\ntype Shift<T extends readonly any[]> = T extends readonly [any, ...infer Rest] ? Rest : [];\n\nfunction tuple<T extends any[]>(...elements: [...T]): [...T] {\n  return elements;\n}\n\nfunction partialApply<Leading extends any[], Trailing extends any[], R>(\n  fn: (...args: [...Leading, ...Trailing]) => R,\n  ...head: Leading\n): (...tail: Trailing) => R {\n  return (...tail: Trailing): R => fn(...head, ...tail);\n}\n\nfunction callWithTuple<Args extends any[], R>(\n  fn: (...args: Args) => R,\n  args: [...Args]\n): R {\n  return fn(...args);\n}",
+    "testCases": [
+      {
+        "description": "tuple constructs a typed tuple without widening to arbitrary array",
+        "input": "tuple(1, \"ok\", true)",
+        "expected": "[1, \"ok\", true]"
+      },
+      {
+        "description": "partialApply binds leading arguments and returns function for remaining arguments",
+        "input": "const fn = (a: string, b: number, c: boolean) => `${a}-${b}-${c}`;\nconst partial = partialApply(fn, \"x\", 10);\npartial(true)",
+        "expected": "\"x-10-true\""
+      },
+      {
+        "description": "callWithTuple executes function by spreading tuple elements",
+        "input": "callWithTuple((a: number, b: number, c: number) => a * b + c, [3, 4, 5])",
+        "expected": "17"
+      },
+      {
+        "description": "Concat and Shift tuple type contracts compile and verify lengths",
+        "input": "type C = Concat<[number, string], [boolean]>;\ntype S = Shift<[string, number, boolean]>;\nconst c: C = [1, \"two\", true];\nconst s: S = [42, false];\n[c.length, s.length]",
+        "expected": "[3, 2]"
+      }
+    ]
+  }
+}

@@ -30,6 +30,11 @@ import type {
   SpacedAlgorithm,
 } from './lib/leitner';
 import { getStoredApiKey, getStoredProvider, getStoredModel } from './lib/ai';
+import {
+  isCardContentHydrated,
+  loadTrackContent,
+  hydrateDeckStateWithTrack,
+} from './lib/trackContentLoader';
 import { clearDraft, clearAllDrafts } from './lib/drafts';
 import { STORAGE_KEYS, safeGetItem, safeSetItem, safeRemoveItem } from './lib/storage';
 import { getStoredTheme, setStoredTheme, applyThemeToDocument } from './lib/theme';
@@ -268,6 +273,18 @@ export function App() {
 
   const [cardSnapshotBeforeReview, setCardSnapshotBeforeReview] = useState<TopicItem | null>(null);
   const [practiceSessionKey, setPracticeSessionKey] = useState(0);
+
+  useEffect(() => {
+    if (activeView !== 'practice' || !currentCard || isCardContentHydrated(currentCard)) return;
+    let alive = true;
+    void loadTrackContent(currentCard.track).then((contentById) => {
+      if (!alive) return;
+      setDeckState((prev) => hydrateDeckStateWithTrack(prev, currentCard.track, contentById));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [activeView, currentCard]);
 
   useEffect(() => {
     const onSyncStorage = () => {
@@ -867,23 +884,32 @@ export function App() {
       {/* Main Container */}
       <main className="app-main">
         {activeView === 'practice' ? (
-          <PracticeArena
-            key={`${currentCard?.id || 'none'}-${practiceSessionKey}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
-            currentCard={currentCard}
-            totalCompletedReviews={deckState.totalCompletedReviews}
-            activeDeckSize={activeCount}
-            algorithm={algorithm}
-            theme={theme}
-            onCommitReview={handleCommitReview}
-            onRecordReview={handleRecordReview}
-            onOverrideReview={handleOverrideReview}
-            onSkipCard={handleSkipCard}
-            onRemoveFromDeck={handleInitiateRemoveFromDeck}
-            onOpenDeckView={() => setActiveView('dashboard')}
-            onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
-            isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
-            onFinishReinforcement={handleFinishReinforcement}
-          />
+          currentCard && !isCardContentHydrated(currentCard) ? (
+            <div
+              className="practice-loading-state"
+              style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-secondary)' }}
+            >
+              Loading challenge...
+            </div>
+          ) : (
+            <PracticeArena
+              key={`${currentCard?.id || 'none'}-${practiceSessionKey}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
+              currentCard={currentCard}
+              totalCompletedReviews={deckState.totalCompletedReviews}
+              activeDeckSize={activeCount}
+              algorithm={algorithm}
+              theme={theme}
+              onCommitReview={handleCommitReview}
+              onRecordReview={handleRecordReview}
+              onOverrideReview={handleOverrideReview}
+              onSkipCard={handleSkipCard}
+              onRemoveFromDeck={handleInitiateRemoveFromDeck}
+              onOpenDeckView={() => setActiveView('dashboard')}
+              onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
+              isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
+              onFinishReinforcement={handleFinishReinforcement}
+            />
+          )
         ) : (
           <DeckDashboard
             theme={theme}
