@@ -49,8 +49,12 @@ import {
   getDeckName,
 } from './lib/decks';
 import type { CustomDeck } from './lib/decks';
-import { PracticeArena } from './components/PracticeArena';
 import { DeckDashboard } from './components/DeckDashboard';
+
+const loadPracticeArena = () => import('./components/PracticeArena');
+const PracticeArena = lazy(() =>
+  loadPracticeArena().then((m) => ({ default: m.PracticeArena }))
+);
 import { getAllSavedDossiers } from './lib/dossierStorage';
 import { FEATURES } from './lib/features';
 import { recordProblemCompletion, markBackupAdvisorySeen } from './lib/backupAdvisory';
@@ -284,6 +288,24 @@ export function App() {
     return () => {
       alive = false;
     };
+  }, [activeView, currentCard]);
+
+  // Background-prefetch PracticeArena (CodeMirror + transpiler) and the next card's track
+  // once the Catalog has rendered and the browser is idle.
+  useEffect(() => {
+    if (activeView !== 'dashboard') return undefined;
+    const prefetch = () => {
+      void loadPracticeArena();
+      if (currentCard && !isCardContentHydrated(currentCard)) {
+        void loadTrackContent(currentCard.track);
+      }
+    };
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(prefetch, { timeout: 1500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(prefetch, 600);
+    return () => clearTimeout(timer);
   }, [activeView, currentCard]);
 
   useEffect(() => {
@@ -892,23 +914,34 @@ export function App() {
               Loading challenge...
             </div>
           ) : (
-            <PracticeArena
-              key={`${currentCard?.id || 'none'}-${practiceSessionKey}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
-              currentCard={currentCard}
-              totalCompletedReviews={deckState.totalCompletedReviews}
-              activeDeckSize={activeCount}
-              algorithm={algorithm}
-              theme={theme}
-              onCommitReview={handleCommitReview}
-              onRecordReview={handleRecordReview}
-              onOverrideReview={handleOverrideReview}
-              onSkipCard={handleSkipCard}
-              onRemoveFromDeck={handleInitiateRemoveFromDeck}
-              onOpenDeckView={() => setActiveView('dashboard')}
-              onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
-              isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
-              onFinishReinforcement={handleFinishReinforcement}
-            />
+            <Suspense
+              fallback={
+                <div
+                  className="practice-loading-state"
+                  style={{ padding: '48px 24px', textAlign: 'center', color: 'var(--text-secondary)' }}
+                >
+                  Loading practice arena...
+                </div>
+              }
+            >
+              <PracticeArena
+                key={`${currentCard?.id || 'none'}-${practiceSessionKey}-${reinforcingCardId ? 'reinforce' : 'cold'}-${aiSettingsVersion}`}
+                currentCard={currentCard}
+                totalCompletedReviews={deckState.totalCompletedReviews}
+                activeDeckSize={activeCount}
+                algorithm={algorithm}
+                theme={theme}
+                onCommitReview={handleCommitReview}
+                onRecordReview={handleRecordReview}
+                onOverrideReview={handleOverrideReview}
+                onSkipCard={handleSkipCard}
+                onRemoveFromDeck={handleInitiateRemoveFromDeck}
+                onOpenDeckView={() => setActiveView('dashboard')}
+                onOpenSettings={(section) => handleOpenSettings(section || 'ai')}
+                isReinforcement={Boolean(reinforcingCardId && currentCard && reinforcingCardId === currentCard.id)}
+                onFinishReinforcement={handleFinishReinforcement}
+              />
+            </Suspense>
           )
         ) : (
           <DeckDashboard

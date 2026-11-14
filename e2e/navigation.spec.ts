@@ -9,6 +9,7 @@ async function openApp(page: Page) {
   await page.goto('/');
   await expect(page.locator('.app-header')).toBeVisible();
   const welcomeBtn = page.getByRole('button', { name: CLOSE_WELCOME });
+  await welcomeBtn.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
   if (await welcomeBtn.isVisible()) {
     await welcomeBtn.click();
     await expect(welcomeBtn).toHaveCount(0);
