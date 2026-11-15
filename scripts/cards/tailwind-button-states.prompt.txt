@@ -23,30 +23,29 @@ Build an accessible, versatile React button styled with Tailwind CSS utility cla
 
 ### Requirements
 
-- **Base Layout & Pseudo-States (`<button>`)**:
+- **Base Layout & Pseudo-States** (`<button>`):
   - Elements: `<button type="button" ...>` (defaults to `type="button"` unless specified in `props`).
-  - Base classes: `inline-flex items-center justify-center font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-95 cursor-pointer`
+  - Layout & interactive base utilities: inline-flex centered alignment, medium font weight, smooth transitions, `focus-visible` outline removal with a 2px ring and offset, active press scale-down, and pointer cursor.
   - Forwards extra props (such as `aria-label`, `data-testid`, or `id`) to the underlying `<button>`.
 
 - **Variant Styling**:
-  - `'primary'` (default): `bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:ring-indigo-600`
-  - `'secondary'`: `bg-slate-800 text-slate-100 hover:bg-slate-700 focus-visible:ring-slate-500`
-  - `'destructive'`: `bg-rose-600 text-white hover:bg-rose-500 focus-visible:ring-rose-600`
-  - `'outline'`: `border border-slate-700 text-slate-200 hover:bg-slate-800 focus-visible:ring-slate-500`
+  - `'primary'` (default): indigo/blue solid background with white text, lighter hover state, and matching `focus-visible` ring.
+  - `'secondary'`: dark slate/neutral background with light text, lighter hover state, and slate `focus-visible` ring.
+  - `'destructive'`: rose/red solid background with white text, lighter hover state, and matching `focus-visible` ring.
+  - `'outline'`: bordered button using midtone slate border/text, translucent hover fill, and slate `focus-visible` ring.
 
 - **Sizes & Spacing**:
-  - `'sm'`: `text-xs px-2.5 py-1.5 rounded-lg gap-1.5`
-  - `'md'` (default): `text-sm px-4 py-2 rounded-xl gap-2`
-  - `'lg'`: `text-base px-5 py-2.5 rounded-xl gap-2.5`
+  - `'sm'`: extra-small text, compact padding, rounded corners, and small flex gap.
+  - `'md'` (default): small text, standard padding, larger rounded corners, and medium flex gap.
+  - `'lg'`: base text, generous padding, larger rounded corners, and wider flex gap.
 
 - **Disabled State**:
   - When `disabled` is `true` or `loading` is `true`:
-    - Sets HTML attribute `disabled={true}` on the `<button>`.
-    - Includes disabled utility classes: `disabled:opacity-50 disabled:pointer-events-none cursor-not-allowed`
+    - Disables the `<button>` element via its `disabled` attribute.
+    - Includes Tailwind disabled utilities for reduced opacity, disabled pointer events, and a not-allowed cursor.
 
 - **Loading State**:
   - When `loading` is `true`:
     - Sets `aria-busy="true"` on the `<button>`.
-    - Renders an inline SVG spinner before `children`:
-      `<svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>`
+    - Renders an animated spinning inline `<svg>` indicator before `children`.
 

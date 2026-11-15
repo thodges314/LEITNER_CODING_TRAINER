@@ -6098,5 +6098,61 @@
       "components"
     ],
     "summary": "type ButtonVariant = 'primary' | 'outline';"
+  },
+  {
+    "id": "render-counter-basics",
+    "title": "Render Counter with useRef",
+    "track": "react",
+    "concept": "react-perf",
+    "difficulty": 1,
+    "tags": [
+      "performance",
+      "useRef",
+      "re-renders",
+      "basics"
+    ],
+    "summary": "Build a basic render counter component to track how many times a component renders using useRef"
+  },
+  {
+    "id": "tabs-basic",
+    "title": "Basic Tabs Component",
+    "track": "react-components",
+    "concept": "compound",
+    "difficulty": 1,
+    "tags": [
+      "component",
+      "tabs",
+      "state",
+      "a11y"
+    ],
+    "summary": "Build a basic accessible tabs component using local state (without React Context)"
+  },
+  {
+    "id": "two-step-wizard",
+    "title": "Two-Step Form Wizard",
+    "track": "react-components",
+    "concept": "wizard",
+    "difficulty": 1,
+    "tags": [
+      "component",
+      "wizard",
+      "forms",
+      "state"
+    ],
+    "summary": "Build a basic two-step form wizard that preserves field values when navigating between steps"
+  },
+  {
+    "id": "tailwind-theme-card",
+    "title": "Tailwind Theme-Adaptive Card (dark:)",
+    "track": "tailwind",
+    "concept": "tailwind-theme",
+    "difficulty": 2,
+    "tags": [
+      "tailwind",
+      "react",
+      "dark-mode",
+      "theming"
+    ],
+    "summary": "Build a theme-adaptive card using Tailwind dark: variants so it adapts cleanly between Light and Dark mode"
   }
 ]

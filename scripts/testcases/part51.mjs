@@ -108,13 +108,13 @@ export default {
     r(
       'Basic non-popular tier renders semantic article with slate border and features list',
       "<PricingCard tier={{ name: 'Starter', price: 15, features: ['1 Project', 'Community Support'] }} />",
-      '<article class="... border-slate-700 ..."> with h3, $15/mo, and button',
+      '<article> with neutral border, h3, $15/mo, and neutral CTA button',
       { callSignature: '<PricingCard tier={tier} />' }
     ),
     r(
       'Popular tier renders popular badge and indigo ring styling',
       "<PricingCard tier={{ name: 'Pro', price: 49, popular: true, features: ['Unlimited Projects'] }} />",
-      'article has border-indigo-500 ring-2, badge with "Most Popular", button has bg-indigo-600',
+      'article has accent border and ring, "Most Popular" pill badge, and accent CTA button',
       { callSignature: '<PricingCard tier={popularTier} />' }
     ),
     r(
@@ -134,19 +134,19 @@ export default {
     r(
       "Default info variant renders with role='alert' and sky color classes",
       '<DismissibleBanner title="Info Note" message="System is operational." />',
-      'renders role="alert" with bg-sky-50 and border-sky-200 and Dismiss button',
+      'renders role="alert" with sky/blue background & border and Dismiss button',
       { callSignature: '<DismissibleBanner title="Info" message="..." />' }
     ),
     r(
       'Success variant applies emerald color classes',
       '<DismissibleBanner variant="success" title="Saved" message="All changes saved." />',
-      'renders role="alert" with bg-emerald-50 and border-emerald-200',
+      'renders role="alert" with emerald/green background & border',
       { callSignature: '<DismissibleBanner variant="success" ... />' }
     ),
     r(
       'Warning and error variants apply matching amber and rose classes',
       '<DismissibleBanner variant="warning" ... /> and <DismissibleBanner variant="error" ... />',
-      'renders matching bg-amber-50 and bg-rose-50 classes',
+      'renders matching amber/yellow and rose/red background & border classes',
       { callSignature: '<DismissibleBanner variant="warning|error" ... />' }
     ),
     r(
@@ -160,25 +160,25 @@ export default {
     r(
       'Card container has dark background, border, padding, and max-width classes',
       'container.firstElementChild',
-      'classList contains max-w-sm, rounded-2xl, p-6, bg-slate-900, border-slate-800',
+      'container has max-width, rounded corners, padding, background, and border classes',
       { callSignature: 'html' }
     ),
     r(
       'Header contains metric title and trend badge with emerald colors',
-      'container.querySelector("span.text-slate-400"), container.querySelector("span.text-emerald-400")',
-      'displays "Total Revenue" and "+12.5%" rounded-full badge',
+      'header elements',
+      'displays "Total Revenue" and "+12.5%" emerald/green rounded pill badge',
       { callSignature: 'html' }
     ),
     r(
       'Displays formatted stat value and comparison subtext',
-      'container.querySelector(".text-3xl"), container.querySelector("p.text-slate-500")',
-      'displays "$48,250" and "vs. $42,890 last month"',
+      'stat value and subtext elements',
+      'displays "$48,250" (large bold text) and "vs. $42,890 last month"',
       { callSignature: 'html' }
     ),
     r(
       'Action button is styled with indigo background, rounded corners, and focus ring',
       'container.querySelector("button")',
-      'button has type="button", "View Detailed Report", bg-indigo-600, w-full, rounded-xl',
+      'button has type="button", "View Detailed Report", primary background, full width, and rounded corners',
       { callSignature: 'html' }
     ),
   ],

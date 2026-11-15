@@ -343,7 +343,7 @@ export function createPreviewSrcDoc(
   const isReact = config.isReact;
   const palette = getThemeColors(theme);
   const isLight = palette.isLight;
-  const bg = palette.bgMain;
+  const bg = isLight ? '#ffffff' : palette.bgMain;
   const text = palette.textPrimary;
   const border = palette.borderMedium;
   const cardBg = palette.bgCard;
@@ -355,6 +355,7 @@ export function createPreviewSrcDoc(
   const libScripts: string[] = [];
   if (config.libraries.includes('tailwind')) {
     libScripts.push('  <script src="https://cdn.tailwindcss.com"></script>');
+    libScripts.push("  <script>if (window.tailwind) window.tailwind.config = { darkMode: 'class' };</script>");
   }
   if (config.libraries.includes('d3') && cachedD3Bundle) {
     const safeD3 = cachedD3Bundle.replace(/<\/script/gi, '<\\/script');
@@ -366,7 +367,7 @@ export function createPreviewSrcDoc(
   }
 
   return `<!DOCTYPE html>
-<html>
+<html${isLight ? '' : ' class="dark"'}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -1,0 +1,24 @@
+```ts
+interface WizardData {
+  name: string;
+  email: string;
+}
+
+interface TwoStepWizardProps {
+  onSubmit: (data: WizardData) => void;
+}
+```
+
+Build a basic two-step form wizard that preserves field values when navigating between steps:
+
+### TwoStepWizard({ onSubmit }: TwoStepWizardProps): JSX.Element
+- **Step 1 (initial)**:
+  - Render a controlled `<input aria-label="Name" placeholder="Name" />` bound to `name`.
+  - Render `<button type="button">Next</button>`, disabled while `name.trim() === ''`.
+  - Clicking `Next` advances to Step 2.
+- **Step 2**:
+  - Render a controlled `<input aria-label="Email" placeholder="Email" />` bound to `email`.
+  - Render `<button type="button">Back</button>`; clicking returns to Step 1 while preserving `name` (and `email` if the user returns to Step 2).
+  - Render `<button type="button">Submit</button>`, disabled while `email.trim() === ''`.
+  - Clicking `Submit` calls `onSubmit({ name, email })`.
+

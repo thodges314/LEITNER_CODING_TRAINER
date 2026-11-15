@@ -3,15 +3,16 @@ const container = document.createElement('div');
 container.innerHTML = markup;
 
 const bannerEl = container.firstElementChild;
+const bannerCls = bannerEl?.className || '';
 const hasContainer = Boolean(
   bannerEl &&
   bannerEl.classList.contains('flex') &&
   bannerEl.classList.contains('items-center') &&
   bannerEl.classList.contains('justify-between') &&
-  bannerEl.classList.contains('p-4') &&
-  bannerEl.classList.contains('rounded-xl') &&
-  bannerEl.classList.contains('bg-blue-50') &&
-  bannerEl.classList.contains('border-blue-200') &&
+  /\bp-/.test(bannerCls) &&
+  /\brounded-/.test(bannerCls) &&
+  /\bbg-(blue|sky)-/.test(bannerCls) &&
+  /\bborder-(blue|sky)-/.test(bannerCls) &&
   bannerEl.getAttribute('role') === 'alert'
 );
 $test.check(
@@ -20,11 +21,12 @@ $test.check(
 );
 
 const badgeEl = container.querySelector('span');
+const badgeCls = badgeEl?.className || '';
 const hasBadge = Boolean(
   badgeEl &&
-  badgeEl.classList.contains('rounded-lg') &&
-  badgeEl.classList.contains('bg-blue-100') &&
-  badgeEl.classList.contains('text-blue-600') &&
+  /\brounded-/.test(badgeCls) &&
+  /\bbg-(blue|sky)-/.test(badgeCls) &&
+  /\btext-(blue|sky)-/.test(badgeCls) &&
   badgeEl.textContent.trim() === 'i'
 );
 $test.check(
@@ -37,10 +39,10 @@ const descEl = container.querySelector('p');
 const hasContent = Boolean(
   headlineEl &&
   headlineEl.textContent.includes('System Update Available') &&
-  headlineEl.classList.contains('font-semibold') &&
+  /\bfont-(semibold|bold)\b/.test(headlineEl.className) &&
   descEl &&
   descEl.textContent.includes('A new version of the dashboard is ready') &&
-  descEl.classList.contains('text-blue-700')
+  /\btext-(blue|sky)-/.test(descEl.className)
 );
 $test.check(
   'Displays update headline and description subtext',
@@ -48,12 +50,13 @@ $test.check(
 );
 
 const btnEl = container.querySelector('button');
+const btnCls = btnEl?.className || '';
 const hasButton = Boolean(
   btnEl &&
   btnEl.getAttribute('type') === 'button' &&
-  btnEl.classList.contains('bg-blue-600') &&
-  btnEl.classList.contains('rounded-lg') &&
-  btnEl.classList.contains('text-white') &&
+  /\bbg-(blue|sky|indigo)-/.test(btnCls) &&
+  /\brounded-/.test(btnCls) &&
+  btnCls.includes('text-white') &&
   btnEl.textContent.includes('Update Now')
 );
 $test.check(

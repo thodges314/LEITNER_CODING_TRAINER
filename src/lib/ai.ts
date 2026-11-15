@@ -1,5 +1,5 @@
-import { TRACK_TYPES, isTrackType } from './leitner';
-import type { TopicItem, TrackType } from './leitner';
+import { TRACK_TYPES } from './leitner';
+import type { TopicItem } from './leitner';
 import type { HarnessReport } from './runner';
 import { isTsOnlyCard } from './tsOnly';
 import { stripTestRunnerBlock } from './stripTestRunner';
@@ -25,7 +25,6 @@ import {
 import type { AIProvider, CritiqueFollowUpMessage } from './aiProviders';
 import {
   EVALUATION_SYSTEM_PROMPT,
-  DRAFT_SYSTEM_PROMPT,
   buildCritiqueFollowUpSystemPrompt,
   SOCRATIC_CLARIFICATION_SYSTEM_PROMPT,
 } from './aiPrompts';
@@ -49,7 +48,6 @@ export {
   setStoredBaseUrl,
   requestProviderCompletion,
   EVALUATION_SYSTEM_PROMPT,
-  DRAFT_SYSTEM_PROMPT,
   buildCritiqueFollowUpSystemPrompt,
   SOCRATIC_CLARIFICATION_SYSTEM_PROMPT,
   TRACK_TYPES,
@@ -68,22 +66,6 @@ export interface EvaluationResult {
   rawOutput?: string;
   /** Result of running the card's test harness; when present it decides pass/fail. */
   harness?: HarnessReport;
-}
-
-export interface DraftedTopic {
-  id: string;
-  track: TrackType;
-  title: string;
-  promptSeed: string;
-  tags: string[];
-  targetTime?: string;
-  targetSpace?: string;
-  complexityExplanation?: string;
-  starterCode?: string;
-  referenceSolution?: string;
-  testHarness?: string;
-  difficulty?: number;
-  concept?: string;
 }
 
 const SCHEMA_KEYS = ['passed', 'timeComplexity', 'spaceComplexity', 'invariantsMet', 'invariantsMissed', 'critique'];
@@ -376,92 +358,6 @@ Evaluate functional correctness and invariants according to your system instruct
     const msg = err instanceof Error ? err.message : String(err);
     fallback.critique = `[Notice: Live API call returned an error (${msg || 'connection failure'}). Fallback offline evaluation applied]: ${fallback.critique}`;
     return fallback;
-  }
-}
-
-export async function draftTopicWithAI(userNote: string): Promise<DraftedTopic> {
-  const apiKey = getStoredApiKey();
-  const provider = getStoredProvider();
-
-  // Smart heuristic draft if no API key
-  if (!apiKey) {
-    await new Promise((r) => setTimeout(r, 500));
-    const lower = userNote.toLowerCase();
-
-    let track: TrackType = 'algorithms';
-    if (lower.includes('hook') || lower.includes('react') || lower.includes('state') || lower.includes('render') || lower.includes('reducer')) {
-      track = 'react';
-    } else if (lower.includes('async') || lower.includes('promise') || lower.includes('fetch') || lower.includes('timeout') || lower.includes('await')) {
-      track = 'async-js';
-    } else if (lower.includes('map') || lower.includes('set') || lower.includes('tree') || lower.includes('lru') || lower.includes('cache') || lower.includes('heap') || lower.includes('queue')) {
-      track = 'js-utilities';
-    }
-
-    const words = userNote.trim().split(/\s+/).slice(0, 5).join(' ');
-    const idSlug = words.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || `custom-topic-${Date.now()}`;
-
-    return {
-      id: idSlug,
-      track,
-      title: words.charAt(0).toUpperCase() + words.slice(1),
-      promptSeed: `Implement a production-grade solution for: ${userNote.trim()}.\n\nInvariants to fulfill:\n1. Specify exact input types, outputs, and edge cases (e.g. empty inputs or boundary values).\n2. Adhere to optimal time and space complexity without auxiliary bloat.\n3. Include proper error boundaries or null-check guards.\n4. Write clean, self-documenting cold-start code from scratch.`,
-      tags: [track, 'cold-start', 'custom'],
-      targetTime: 'O(n)',
-      targetSpace: 'O(1)',
-      complexityExplanation: 'Linear time scan with constant extra auxiliary memory.',
-      starterCode: `export function solution() {\n  // Write cold-start solution here\n}\n`,
-      referenceSolution: `export function solution() {\n  // Canonical implementation\n  return true;\n}\n`,
-      testHarness: `{\n  $test.check('Defined function exists', typeof solution === 'function');\n}\n`,
-      difficulty: 2,
-    };
-  }
-
-  try {
-    const rawJson = await requestProviderCompletion({
-      provider,
-      apiKey,
-      systemPrompt: DRAFT_SYSTEM_PROMPT,
-      userPrompt: userNote,
-      temperature: 0.2,
-      maxTokens: 2048,
-      jsonMode: true,
-    });
-
-    const cleaned = rawJson.replace(/```(?:json)?\s*([\s\S]*?)\s*```/g, '$1').trim();
-    const parsed = JSON.parse(cleaned);
-
-    const track: TrackType = isTrackType(parsed.track) ? parsed.track : 'algorithms';
-
-    return {
-      id: String(parsed.id || `topic-${Date.now()}`),
-      track,
-      title: String(parsed.title || 'Untitled Topic'),
-      promptSeed: String(parsed.promptSeed || userNote),
-      tags: Array.isArray(parsed.tags) ? parsed.tags.map(String) : [track],
-      targetTime: parsed.targetTime ? String(parsed.targetTime) : 'O(n)',
-      targetSpace: parsed.targetSpace ? String(parsed.targetSpace) : 'O(1)',
-      complexityExplanation: parsed.complexityExplanation ? String(parsed.complexityExplanation) : undefined,
-      starterCode: parsed.starterCode ? String(parsed.starterCode) : undefined,
-      referenceSolution: parsed.referenceSolution ? String(parsed.referenceSolution) : undefined,
-      testHarness: parsed.testHarness ? String(parsed.testHarness) : undefined,
-      difficulty: typeof parsed.difficulty === 'number' ? parsed.difficulty : 2,
-    };
-  } catch (err) {
-    console.warn('API draft failed; falling back to heuristic drafter:', err);
-    return {
-      id: userNote.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 30) || 'custom-topic',
-      track: 'algorithms',
-      title: userNote.slice(0, 40),
-      promptSeed: `Implement: ${userNote}.\n\nInvariants:\n1. Functional correctness.\n2. Invariant verification.\n3. Clean cold-start code.`,
-      tags: ['custom'],
-      targetTime: 'O(n)',
-      targetSpace: 'O(1)',
-      complexityExplanation: 'Linear time scan with constant extra memory.',
-      starterCode: `export function solution() {\n  // Write cold-start solution here\n}\n`,
-      referenceSolution: `export function solution() {\n  // Canonical implementation\n  return true;\n}\n`,
-      testHarness: `{\n  $test.check('Defined function exists', typeof solution === 'function');\n}\n`,
-      difficulty: 2,
-    };
   }
 }
 

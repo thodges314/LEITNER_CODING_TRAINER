@@ -1710,5 +1710,21 @@
   "promise-timeout-reject": {
     "difficulty": 1,
     "concept": "promise"
+  },
+  "tabs-basic": {
+    "difficulty": 1,
+    "concept": "compound"
+  },
+  "render-counter-basics": {
+    "difficulty": 1,
+    "concept": "react-perf"
+  },
+  "two-step-wizard": {
+    "difficulty": 1,
+    "concept": "wizard"
+  },
+  "tailwind-theme-card": {
+    "difficulty": 2,
+    "concept": "tailwind-theme"
   }
 }

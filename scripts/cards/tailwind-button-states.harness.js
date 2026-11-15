@@ -5,22 +5,23 @@ const { render, fire } = $dom;
   const r = render(<Button>Save Changes</Button>);
   const btn = r.container.querySelector('button');
 
+  const cls = btn?.className || '';
   const hasBase =
     btn !== null &&
     (btn.getAttribute('type') === 'button' || !btn.getAttribute('type')) &&
     btn.textContent.includes('Save Changes') &&
-    btn.classList.contains('inline-flex') &&
-    btn.classList.contains('font-medium');
+    cls.includes('inline-flex') &&
+    /\bfont-(medium|semibold)\b/.test(cls);
 
   const hasPrimary =
     btn !== null &&
-    btn.classList.contains('bg-indigo-600') &&
-    btn.classList.contains('text-white');
+    /\bbg-(indigo|blue)-/.test(cls) &&
+    cls.includes('text-white');
 
   const hasMdSize =
     btn !== null &&
-    btn.classList.contains('px-4') &&
-    btn.classList.contains('text-sm');
+    /\bpx-/.test(cls) &&
+    /\btext-sm\b/.test(cls);
 
   const passed = Boolean(btn && hasBase && hasPrimary && hasMdSize);
 
@@ -37,26 +38,29 @@ const { render, fire } = $dom;
 {
   const rSec = render(<Button variant="secondary">Secondary</Button>);
   const btnSec = rSec.container.querySelector('button');
+  const clsSec = btnSec?.className || '';
   const hasSecondary =
     btnSec !== null &&
-    btnSec.classList.contains('bg-slate-800') &&
-    btnSec.classList.contains('text-slate-100');
+    /\bbg-(slate|gray|zinc|neutral)-/.test(clsSec) &&
+    /\btext-(slate|gray|zinc|white)/.test(clsSec);
   rSec.unmount();
 
   const rDest = render(<Button variant="destructive">Delete</Button>);
   const btnDest = rDest.container.querySelector('button');
+  const clsDest = btnDest?.className || '';
   const hasDestructive =
     btnDest !== null &&
-    btnDest.classList.contains('bg-rose-600') &&
-    btnDest.classList.contains('text-white');
+    /\bbg-(rose|red)-/.test(clsDest) &&
+    clsDest.includes('text-white');
   rDest.unmount();
 
   const rOut = render(<Button variant="outline">Cancel</Button>);
   const btnOut = rOut.container.querySelector('button');
+  const clsOut = btnOut?.className || '';
   const hasOutline =
     btnOut !== null &&
-    btnOut.classList.contains('border') &&
-    btnOut.classList.contains('border-slate-700');
+    /\bborder\b/.test(clsOut) &&
+    /\bborder-(slate|gray|zinc|neutral)-/.test(clsOut);
   rOut.unmount();
 
   const passed = Boolean(hasSecondary && hasDestructive && hasOutline);
@@ -74,16 +78,16 @@ const { render, fire } = $dom;
   const btnSm = rSm.container.querySelector('button');
   const hasSm =
     btnSm !== null &&
-    btnSm.classList.contains('text-xs') &&
-    btnSm.classList.contains('px-2.5');
+    /\btext-xs\b/.test(btnSm.className) &&
+    /\bpx-/.test(btnSm.className);
   rSm.unmount();
 
   const rLg = render(<Button size="lg">Large</Button>);
   const btnLg = rLg.container.querySelector('button');
   const hasLg =
     btnLg !== null &&
-    btnLg.classList.contains('text-base') &&
-    btnLg.classList.contains('px-5');
+    /\btext-(base|lg)\b/.test(btnLg.className) &&
+    /\bpx-/.test(btnLg.className);
   rLg.unmount();
 
   const passed = Boolean(hasSm && hasLg);

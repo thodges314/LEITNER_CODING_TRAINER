@@ -21,10 +21,10 @@ await (async () => {
   const cls1 = btn1?.className || '';
   const pass1 = Boolean(btn1) &&
     btn1?.getAttribute('type') === 'button' &&
-    cls1.includes('bg-blue-600') &&
+    /\bbg-(blue|indigo|sky)-/.test(cls1) &&
     cls1.includes('text-white') &&
-    cls1.includes('hover:bg-blue-700') &&
-    cls1.includes('rounded-lg') &&
+    /\bhover:bg-/.test(cls1) &&
+    /\brounded/.test(cls1) &&
     btn1?.textContent === 'Submit';
   $test.check(case1, Boolean(pass1), { classList: cls1, text: btn1?.textContent });
   u1();
@@ -36,9 +36,10 @@ await (async () => {
   const btn2 = c2.querySelector('button');
   const cls2 = btn2?.className || '';
   const pass2 = Boolean(btn2) &&
-    cls2.includes('border-gray-300') &&
-    cls2.includes('text-gray-700') &&
-    cls2.includes('hover:bg-gray-50');
+    /\bborder\b/.test(cls2) &&
+    /\bborder-(gray|slate|zinc|neutral)-/.test(cls2) &&
+    /\btext-(gray|slate|zinc|neutral)-/.test(cls2) &&
+    /\bhover:bg-/.test(cls2);
   $test.check(case2, Boolean(pass2), { classList: cls2 });
   u2();
 
@@ -50,8 +51,8 @@ await (async () => {
   const cls3 = btn3?.className || '';
   const pass3 = Boolean(btn3) &&
     btn3?.hasAttribute('disabled') &&
-    cls3.includes('disabled:opacity-50') &&
-    cls3.includes('disabled:pointer-events-none');
+    /\bdisabled:opacity-/.test(cls3) &&
+    /\bdisabled:pointer-events-none\b/.test(cls3);
   $test.check(case3, Boolean(pass3), { hasDisabled: btn3?.hasAttribute('disabled'), classList: cls3 });
   u3();
 

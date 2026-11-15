@@ -21,31 +21,23 @@ Build an accessible, responsive status badge React component styled with Tailwin
 
 ### Requirements
 
-- **Badge Container (`<span>`)**:
-  - Base classes: `inline-flex items-center font-medium rounded-full border transition-colors`
+- **Badge Container** (`<span>`):
+  - Uses inline-flex centered layout, medium font weight, pill rounding, a border, and color transitions.
   - Forwards extra props (such as `data-testid` or `aria-label`) to the outer `<span>`.
 
 - **Variant Styling & Translucent Tokens**:
-  - `'success'`: `bg-emerald-500/10 text-emerald-400 border-emerald-500/20`
-  - `'warning'`: `bg-amber-500/10 text-amber-400 border-amber-500/20`
-  - `'danger'`: `bg-rose-500/10 text-rose-400 border-rose-500/20`
-  - `'info'`: `bg-sky-500/10 text-sky-400 border-sky-500/20`
-  - `'neutral'` (default): `bg-slate-500/10 text-slate-300 border-slate-500/20`
+  - Apply subtle translucent background fills, readable text, and matching translucent borders for each semantic variant:
+    - `'success'`: emerald/green tones
+    - `'warning'`: amber/yellow tones
+    - `'danger'`: rose/red tones
+    - `'info'`: sky/blue tones
+    - `'neutral'` (default): midtone slate/gray tones
 
 - **Sizes & Spacing**:
-  - `'sm'`: `text-xs px-2 py-0.5 gap-1`
-  - `'md'` (default): `text-sm px-2.5 py-1 gap-1.5`
+  - `'sm'`: extra-small text, compact padding, and tight flex gap.
+  - `'md'` (default): small text, slightly wider padding, and standard flex gap.
 
-- **Dot Indicator (`dot: true`)**:
-  - When `dot: true`, renders a decorative dot `<span class="..." aria-hidden="true"></span>` before `children`.
-  - Dot base classes: `rounded-full shrink-0`
-  - Dot sizing:
-    - `'sm'`: `h-1.5 w-1.5`
-    - `'md'`: `h-2 w-2`
-  - Dot color matches the active variant:
-    - `'success'`: `bg-emerald-400`
-    - `'warning'`: `bg-amber-400`
-    - `'danger'`: `bg-rose-400`
-    - `'info'`: `bg-sky-400`
-    - `'neutral'`: `bg-slate-400`
+- **Dot Indicator** (`dot: true`):
+  - When `dot` is `true`, renders a decorative `<span aria-hidden="true"></span>` before `children`.
+  - Styled as a non-shrinking circle that scales down for `'sm'` vs `'md'` and uses a background color matching the active variant.
 

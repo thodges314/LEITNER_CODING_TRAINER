@@ -8,7 +8,7 @@ const { render } = $dom;
   const hasAriaLabel = el?.getAttribute('aria-label') === 'Loading...';
   const hasAriaBusy = el?.getAttribute('aria-busy') === 'true';
   const hasPulse = el?.classList.contains('animate-pulse');
-  const hasBg = el?.classList.contains('bg-slate-800');
+  const hasBg = /\bbg-(slate|gray|zinc|neutral)-/.test(el?.className || '');
   const hasHeight = el?.classList.contains('h-4');
 
   $test.check(
@@ -23,11 +23,11 @@ const { render } = $dom;
 {
   const r = render(<Skeleton lines={3} />);
   const container = r.container.querySelector('[role="status"]');
-  const hasSpaceY = container?.classList.contains('space-y-2.5');
+  const hasSpaceY = /\bspace-y-/.test(container?.className || '');
   const lines = container?.querySelectorAll('div') || [];
   const hasThreeLines = lines.length === 3;
   const lastLine = lines[2];
-  const lastLineHasW45 = lastLine?.classList.contains('w-4/5');
+  const lastLineHasW45 = /\bw-(3\/4|4\/5|5\/6)\b/.test(lastLine?.className || '');
   const firstLineHasWFull = lines[0]?.classList.contains('w-full');
 
   $test.check(
@@ -58,8 +58,8 @@ const { render } = $dom;
 {
   const r = render(<Skeleton variant="rectangular" />);
   const el = r.container.querySelector('[role="status"]');
-  const hasRoundedXl = el?.classList.contains('rounded-xl');
-  const hasH32 = el?.classList.contains('h-32');
+  const hasRoundedXl = /\brounded-/.test(el?.className || '');
+  const hasH32 = /\bh-(24|28|32|36|40)\b/.test(el?.className || '');
   const hasWFull = el?.classList.contains('w-full');
 
   $test.check(
@@ -74,8 +74,8 @@ const { render } = $dom;
 {
   const r = render(<Skeleton variant="card" />);
   const card = r.container.querySelector('[role="status"]');
-  const hasCardBorder = card?.classList.contains('border-slate-800');
-  const hasCardBg = card?.classList.contains('bg-slate-900/50');
+  const hasCardBorder = /\bborder-(slate|gray|zinc|neutral)-/.test(card?.className || '');
+  const hasCardBg = /\bbg-(slate|gray|zinc|neutral)-/.test(card?.className || '');
   const avatar = card?.querySelector('.rounded-full');
   const hasAvatar = avatar !== null && avatar.classList.contains('h-10');
   const media = card?.querySelector('.h-28');

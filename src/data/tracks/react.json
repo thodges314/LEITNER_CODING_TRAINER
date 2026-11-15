@@ -1079,5 +1079,34 @@
       }
     ],
     "previewCode": "function Demo() {\n  const {\n    delayMs = 600,\n    load,\n  } = usePreviewProps({\n    delayMs: 600,\n  });\n\n  const cacheRef = useRef(new Map());\n\n  const handleLoad = useCallback((tab) => {\n    if (load) return load(tab);\n    if (!cacheRef.current.has(tab)) {\n      cacheRef.current.set(\n        tab,\n        new Promise((resolve) => {\n          setTimeout(() => {\n            log('tabLoaded', tab);\n            if (tab === 'home') resolve('Home content: Welcome to the React 19 transition demo!');\n            else if (tab === 'posts') resolve('Posts content: Articles rendered with use() and useTransition.');\n            else resolve('About content: Concurrent rendering keeps old UI visible while loading.');\n          }, Number(delayMs) || 600);\n        })\n      );\n    }\n    return cacheRef.current.get(tab);\n  }, [delayMs, load]);\n\n  return (\n    <div style={{ fontFamily: 'system-ui, sans-serif', padding: 16 }}>\n      <TabbedViewer load={handleLoad} />\n    </div>\n  );\n}\n\n<Demo />"
+  },
+  "render-counter-basics": {
+    "promptSeed": "Build a basic render counter component to track how many times a component renders using `useRef`:\n\n### RenderCounter({ label = 'Clicks' }: { label?: string }): JSX.Element\n- `label`: optional button label prefix (defaults to `'Clicks'`).\n- **State & Ref**:\n  - Store `count` in `useState(0)`.\n  - Track the render count in `useRef(0)` and increment `renders.current` on each render (do **not** store render count in state, which would cause an infinite re-render loop).\n- **DOM Structure**:\n  - Render `<button type=\"button\">` displaying `{label}: {count}`.\n  - Render `<span>` displaying `Renders: {renders.current}`.\n- **Interactions**:\n  - Clicking the button increments `count` by 1, triggering a re-render that increments `Renders:` as well.\n  - Parent re-renders increment `Renders:` while preserving `count`.",
+    "testHarness": "const { render, fire, q } = $dom;\n\n{\n  const r = render(<RenderCounter />);\n  const btn = q('button', r.container);\n  const span = q('span', r.container);\n  $test.check(\n    'Initial render shows Count 0 and Renders: 1',\n    btn?.textContent === 'Clicks: 0' && span?.textContent === 'Renders: 1',\n    { btn: btn?.textContent, span: span?.textContent }\n  );\n  r.unmount();\n}\n\n{\n  const r = render(<RenderCounter label=\"Taps\" />);\n  const btn = q('button', r.container);\n  fire.click(btn);\n  fire.click(btn);\n  const span = q('span', r.container);\n  $test.check(\n    'Clicking increments count and render count together',\n    btn?.textContent === 'Taps: 2' && span?.textContent === 'Renders: 3',\n    { btn: btn?.textContent, span: span?.textContent }\n  );\n  r.unmount();\n}\n\n{\n  const r = render(<RenderCounter label=\"A\" />);\n  fire.click(q('button', r.container));\n  r.rerender(<RenderCounter label=\"B\" />);\n  const btn = q('button', r.container);\n  const span = q('span', r.container);\n  $test.check(\n    'Parent rerender increments Renders while preserving count',\n    btn?.textContent === 'B: 1' && span?.textContent === 'Renders: 3',\n    { btn: btn?.textContent, span: span?.textContent }\n  );\n  r.unmount();\n}\n\n{\n  const r = render(<RenderCounter />);\n  const btn = q('button', r.container);\n  $test.check(\n    'Button uses type=\"button\"',\n    btn?.getAttribute('type') === 'button',\n    btn?.outerHTML\n  );\n  r.unmount();\n}",
+    "referenceSolution": "function RenderCounter({ label = 'Clicks' }) {\n  const [count, setCount] = useState(0);\n  const renders = useRef(0);\n  renders.current += 1;\n\n  return (\n    <div>\n      <button type=\"button\" onClick={() => setCount((c) => c + 1)}>\n        {label}: {count}\n      </button>\n      <span>Renders: {renders.current}</span>\n    </div>\n  );\n}",
+    "referenceSolutionTs": "function RenderCounter({ label = 'Clicks' }: { label?: string }): JSX.Element {\n  const [count, setCount] = useState<number>(0);\n  const renders = useRef<number>(0);\n  renders.current += 1;\n\n  return (\n    <div>\n      <button type=\"button\" onClick={() => setCount((c: number) => c + 1)}>\n        {label}: {count}\n      </button>\n      <span>Renders: {renders.current}</span>\n    </div>\n  );\n}",
+    "testCases": [
+      {
+        "description": "Initial render shows Count 0 and Renders: 1",
+        "input": "<RenderCounter />",
+        "expected": "button \"Clicks: 0\" and span \"Renders: 1\""
+      },
+      {
+        "description": "Clicking increments count and render count together",
+        "input": "<RenderCounter label=\"Taps\" />; click button twice",
+        "expected": "button \"Taps: 2\" and span \"Renders: 3\""
+      },
+      {
+        "description": "Parent rerender increments Renders while preserving count",
+        "input": "click button once, then rerender(<RenderCounter label=\"B\" />)",
+        "expected": "button \"B: 1\" and span \"Renders: 3\""
+      },
+      {
+        "description": "Button uses type=\"button\"",
+        "input": "<RenderCounter />",
+        "expected": "button has attribute type=\"button\""
+      }
+    ],
+    "previewCode": "function Demo() {\n  const { label = 'Clicks' } = usePreviewProps({\n    label: 'Clicks',\n  });\n\n  return (\n    <div style={{ padding: '16px' }}>\n      <RenderCounter label={label} />\n    </div>\n  );\n}\n\n<Demo />"
   }
 }

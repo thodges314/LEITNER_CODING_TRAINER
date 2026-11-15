@@ -121,6 +121,14 @@ const x = 42;
     expect(nodes[2]).toBe(' world');
   });
 
+  it('renders double-backtick inline code containing single backticks', () => {
+    act(() => {
+      root.render(<MarkdownContent text={'Use ``id={`accordion-header-${item.id}`}`` here.'} />);
+    });
+    const code = container.querySelector('code.markdown-inline-code');
+    expect(code?.textContent).toBe('id={`accordion-header-${item.id}`}');
+  });
+
   it('preserves JSX/HTML tags as visible text', () => {
     act(() => {
       root.render(<MarkdownContent text="Render a <table> with a <thead> row and <button>." />);

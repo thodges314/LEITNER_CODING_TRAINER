@@ -28,7 +28,7 @@ const Button = ({
     primary: 'bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:ring-indigo-600',
     secondary: 'bg-slate-800 text-slate-100 hover:bg-slate-700 focus-visible:ring-slate-500',
     destructive: 'bg-rose-600 text-white hover:bg-rose-500 focus-visible:ring-rose-600',
-    outline: 'border border-slate-700 text-slate-200 hover:bg-slate-800 focus-visible:ring-slate-500',
+    outline: 'border border-slate-500 text-slate-500 hover:bg-slate-500/15 focus-visible:ring-slate-500',
   };
 
   const sizeClasses: Record<ButtonSize, string> = {

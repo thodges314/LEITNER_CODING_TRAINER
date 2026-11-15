@@ -365,6 +365,12 @@ code {
   user-select: none;
 }
 
+[data-theme="apple-gsos"] .solution-codemirror-wrapper .cm-gutters {
+  background-color: var(--cm-gutter-bg);
+  color: var(--cm-gutter-text);
+  border-right: 1px solid var(--border-subtle);
+}
+
 .solution-codemirror-wrapper .cm-content,
 .solution-codemirror-wrapper .cm-line {
   padding: 0 4px;

@@ -13,12 +13,10 @@ import {
   computeRolling24HourStats,
 } from '../lib/leitner';
 import type { TopicItem, LeitnerDeckState, TrackType } from '../lib/leitner';
-import { FEATURES } from '../lib/features';
 import { isHintSeen, markHintSeen, TRACK_FILTER_HINT_KEY } from '../lib/hints';
 import {
   Download,
   Upload,
-  Plus,
   Sparkles,
   X,
   Printer,
@@ -67,7 +65,6 @@ interface DeckDashboardProps {
   onOpenInterviewPrepDossier?: (dossierId?: string, step?: 'input' | 'review') => void;
   onDeleteInterviewDossier?: (dossierId: string) => void;
   onStateUpdated: (newState: LeitnerDeckState) => void;
-  onOpenAddModal: () => void;
   /** Opens the Focus dialog (used by the one-time hint under the track filter). */
   onOpenFocus?: () => void;
   highlightExport?: boolean;
@@ -95,7 +92,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
   onOpenInterviewPrepDossier,
   onDeleteInterviewDossier,
   onStateUpdated,
-  onOpenAddModal,
   onOpenFocus,
   highlightExport = false,
   onDismissHighlightExport,
@@ -540,11 +536,6 @@ export const DeckDashboard: React.FC<DeckDashboardProps> = ({
         </div>
 
         <div className="dashboard-actions">
-          {FEATURES.quickAdd && (
-            <button className="btn btn-primary" onClick={onOpenAddModal}>
-              <Plus size={16} /> Quick Add Topic
-            </button>
-          )}
           <div style={{ position: 'relative' }}>
             <button
               className={`btn btn-secondary ${highlightExport ? 'btn-export-highlight' : ''}`}

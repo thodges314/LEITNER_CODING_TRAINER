@@ -1,5 +1,3 @@
-import { TRACK_TYPES } from './trackMeta';
-
 export const EVALUATION_SYSTEM_PROMPT = `Evaluate cold-start code practice against invariants and functional correctness. Do NOT grade based on verbatim similarity to a reference solution.
 Respect the indicated language mode (JavaScript vs TypeScript). Do NOT criticize, dock points, or demand TypeScript type annotations or interfaces unless the problem is explicitly in TypeScript mode or requires TypeScript invariants. Valid idiomatic JavaScript without types is expected and completely correct when running in JavaScript mode.
 Standard React hooks and primitives (React, useState, useEffect, useRef, useMemo, useCallback, useReducer, etc.), d3, ListNode, TreeNode, GraphNode, and all TypeScript interfaces/types shown in the problem instructions are pre-injected environment globals in this trainer. Do NOT criticize, dock points, or comment on the absence of explicit import statements (such as 'import { useState } from "react"') or the absence of re-declared prompt TypeScript interfaces/types in the submitted code. Both implicit globals/preloaded prompt types and explicit local declarations are valid and accepted in this environment.
@@ -13,22 +11,6 @@ Return pure JSON:
   "invariantsMet": string[],
   "invariantsMissed": string[],
   "critique": string
-}`;
-
-export const DRAFT_SYSTEM_PROMPT = `The user will describe a coding pattern or interview concept informally. 
-Extract and return ONLY a valid JSON object matching this schema:
-{
-  "id": string (kebab-case identifier),
-  "track": one of ${TRACK_TYPES.map((t) => `'${t}'`).join(' | ')},
-  "title": string (concise name),
-  "promptSeed": string (a clear, cold-start prompt describing what to write, requirements, and invariants to satisfy),
-  "tags": string[],
-  "targetTime": string (e.g. "O(1)", "O(n)", "O(n log n)"),
-  "targetSpace": string (e.g. "O(1)", "O(n)"),
-  "complexityExplanation": string (succinct 1-2 sentence explanation of the target time and space complexity),
-  "starterCode": string (minimal boilerplate function or component signature stub),
-  "referenceSolution": string (canonical, optimal, clean implementation),
-  "testHarness": string (executable test verification script using $test.check('description', condition))
 }`;
 
 export function buildCritiqueFollowUpSystemPrompt(topicTitle: string): string {

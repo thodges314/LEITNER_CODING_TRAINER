@@ -25,34 +25,31 @@ Build a flexible, accessible React accordion component styled with Tailwind CSS 
 
 ### Requirements
 
-- **Accordion Container (`<div>`)**:
-  - Base classes: `divide-y divide-slate-800 border border-slate-800 rounded-xl overflow-hidden bg-slate-900/50`
+- **Accordion Container** (`<div>`):
+  - Vertical item dividers, subtle border, rounded corners, clipped overflow, and neutral surface background.
   - Safely merges external `className` and forwards extra `props`.
 
-- **Item Header & Trigger (`<button>`)**:
+- **Item Header & Trigger** (`<button>`):
   - Semantic `<button type="button">` disclosure control.
-  - ARIA attributes:
-    - `id={`accordion-header-${item.id}`}`
-    - `aria-expanded={isOpen ? 'true' : 'false'}`
-    - `aria-controls={`accordion-panel-${item.id}`}`
-    - `disabled={Boolean(item.disabled)}`
-  - Base trigger classes: `w-full flex items-center justify-between py-4 px-5 text-left font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`
-  - Active states:
-    - When open (`isOpen: true`): text color highlights with `text-indigo-400`.
-    - When closed (`isOpen: false`): default text color `text-slate-200`.
-    - Hover: `hover:bg-slate-800/40` when enabled.
-    - Disabled: `opacity-40 cursor-not-allowed` when `item.disabled: true`.
+  - ARIA & state attributes:
+    - ``id={`accordion-header-${item.id}`}``
+    - `aria-expanded`: `"true"` when the item is open, `"false"` otherwise.
+    - ``aria-controls={`accordion-panel-${item.id}`}``
+    - `disabled`: disabled when `item.disabled` is truthy.
+  - Layout & states: full-width flex row spaced apart, comfortable padding, left-aligned medium text, color transition, and `focus-visible` ring.
+    - Open (`isOpen: true`): accent text highlight (e.g. indigo/blue).
+    - Closed (`isOpen: false`): default neutral text with subtle hover background when enabled.
+    - Disabled (`item.disabled: true`): reduced opacity and not-allowed cursor.
   - Rotating Chevron Icon:
-    - Inline SVG chevron with classes `h-4 w-4 text-slate-400 transition-transform duration-200`.
-    - Rotates `rotate-180` when `isOpen: true`.
+    - Inline SVG chevron with smooth transform transition that rotates 180 degrees when `isOpen` is `true`.
 
-- **Content Panel (`<div>`)**:
+- **Content Panel** (`<div>`):
   - Attributes:
-    - `id={`accordion-panel-${item.id}`}`
+    - ``id={`accordion-panel-${item.id}`}``
     - `role="region"`
-    - `aria-labelledby={`accordion-header-${item.id}`}`
-    - `hidden={!isOpen}`
-  - Inner panel classes: `px-5 pb-4 pt-1 text-sm text-slate-400 leading-relaxed`
+    - ``aria-labelledby={`accordion-header-${item.id}`}``
+    - `hidden`: hidden whenever the item is closed.
+  - Inner panel styling: horizontal/bottom padding matching the trigger, small muted text, and relaxed line height.
 
 - **Expansion Behavior**:
   - Controlled by local state initialized from `defaultExpandedIds`.

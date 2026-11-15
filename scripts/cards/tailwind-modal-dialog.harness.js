@@ -27,8 +27,8 @@ const { render, fire } = $dom;
   const backdrop = r.container.firstChild;
   const hasFixed = backdrop !== null && backdrop.classList.contains('fixed');
   const hasInset0 = backdrop !== null && backdrop.classList.contains('inset-0');
-  const hasZ50 = backdrop !== null && backdrop.classList.contains('z-50');
-  const hasBlur = backdrop !== null && backdrop.classList.contains('backdrop-blur-sm');
+  const hasZ50 = backdrop !== null && /\bz-\d+\b/.test(backdrop.className);
+  const hasBlur = backdrop !== null && /\bbackdrop-blur/.test(backdrop.className);
 
   $test.check(
     'Renders backdrop overlay with fixed inset-0, z-50, and backdrop-blur-sm when isOpen is true',

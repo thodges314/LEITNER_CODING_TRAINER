@@ -81,7 +81,6 @@ describe('DeckDashboard tier pill filtering and multiselect', () => {
           onResetBox={vi.fn()}
           onDeleteTopic={vi.fn()}
           onStateUpdated={vi.fn()}
-          onOpenAddModal={vi.fn()}
         />
       );
     });

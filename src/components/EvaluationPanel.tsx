@@ -172,6 +172,7 @@ export const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
 
       {/* Reveal Canonical / Recommended Solution */}
       <SolutionRevealSection
+        theme={theme}
         topic={topic}
         executionMode={executionMode}
         effectiveVerdict={effectiveVerdict}

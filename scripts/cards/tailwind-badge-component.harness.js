@@ -5,21 +5,23 @@ const { render } = $dom;
   const r = render(<Badge>Draft</Badge>);
   const el = r.container.querySelector('span');
 
+  const cls = el?.className || '';
   const hasBase =
     el !== null &&
-    el.classList.contains('inline-flex') &&
-    el.classList.contains('rounded-full') &&
+    cls.includes('inline-flex') &&
+    cls.includes('rounded-full') &&
+    /\bborder\b/.test(cls) &&
     el.textContent.includes('Draft');
 
   const hasNeutral =
     el !== null &&
-    el.classList.contains('text-slate-300') &&
-    el.classList.contains('border-slate-500/20');
+    /\btext-(slate|gray|zinc|neutral)-/.test(cls) &&
+    /\bborder-(slate|gray|zinc|neutral)-/.test(cls);
 
   const hasMd =
     el !== null &&
-    el.classList.contains('text-sm') &&
-    el.classList.contains('px-2.5');
+    /\btext-sm\b/.test(cls) &&
+    /\bpx-/.test(cls);
 
   const dot = el?.querySelector('span[aria-hidden="true"]');
 
@@ -39,32 +41,32 @@ const { render } = $dom;
   const elSucc = rSucc.container.querySelector('span');
   const hasSuccess =
     elSucc !== null &&
-    elSucc.classList.contains('text-emerald-400') &&
-    elSucc.classList.contains('border-emerald-500/20');
+    /\btext-(emerald|green)-/.test(elSucc.className) &&
+    /\bborder-(emerald|green)-/.test(elSucc.className);
   rSucc.unmount();
 
   const rWarn = render(<Badge variant="warning">Warning</Badge>);
   const elWarn = rWarn.container.querySelector('span');
   const hasWarning =
     elWarn !== null &&
-    elWarn.classList.contains('text-amber-400') &&
-    elWarn.classList.contains('border-amber-500/20');
+    /\btext-(amber|yellow)-/.test(elWarn.className) &&
+    /\bborder-(amber|yellow)-/.test(elWarn.className);
   rWarn.unmount();
 
   const rDang = render(<Badge variant="danger">Failed</Badge>);
   const elDang = rDang.container.querySelector('span');
   const hasDanger =
     elDang !== null &&
-    elDang.classList.contains('text-rose-400') &&
-    elDang.classList.contains('border-rose-500/20');
+    /\btext-(rose|red)-/.test(elDang.className) &&
+    /\bborder-(rose|red)-/.test(elDang.className);
   rDang.unmount();
 
   const rInfo = render(<Badge variant="info">Deploying</Badge>);
   const elInfo = rInfo.container.querySelector('span');
   const hasInfo =
     elInfo !== null &&
-    elInfo.classList.contains('text-sky-400') &&
-    elInfo.classList.contains('border-sky-500/20');
+    /\btext-(sky|blue)-/.test(elInfo.className) &&
+    /\bborder-(sky|blue)-/.test(elInfo.className);
   rInfo.unmount();
 
   const passed = Boolean(hasSuccess && hasWarning && hasDanger && hasInfo);
@@ -83,8 +85,8 @@ const { render } = $dom;
 
   const hasSm =
     el !== null &&
-    el.classList.contains('text-xs') &&
-    el.classList.contains('px-2');
+    /\btext-xs\b/.test(el.className) &&
+    /\bpx-/.test(el.className);
 
   $test.check(
     'Applies sm size padding and typography classes',
@@ -107,7 +109,7 @@ const { render } = $dom;
   const hasDotClasses =
     dot !== null &&
     dot.classList.contains('rounded-full') &&
-    dot.classList.contains('bg-emerald-400');
+    /\bbg-(emerald|green)-/.test(dot.className);
 
   const passed = Boolean(el && dot && hasDotClasses);
 

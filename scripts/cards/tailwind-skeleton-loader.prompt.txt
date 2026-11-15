@@ -25,25 +25,21 @@ Build an accessible, versatile skeleton loader React component styled with Tailw
   - The outer container element must declare `role="status"`, `aria-label="Loading..."`, and `aria-busy="true"`.
 
 - **Base Animation & Tone**:
-  - Base classes for all skeleton shapes: `animate-pulse bg-slate-800`.
+  - All skeleton shapes use Tailwind's pulsing animation and a neutral muted background fill.
 
 - **Variant Shapes**:
   - `'text'` (default):
-    - When `lines === 1`: A single bar with `h-4 rounded-md`.
-    - When `lines > 1`: Renders a container (`space-y-2.5`) holding `lines` bars. Each bar is `h-4 rounded-md`. Earlier lines have `w-full`, while the final line has `w-4/5` (80% width) for realistic paragraph flow.
+    - When `lines === 1`: a single rounded text-height bar.
+    - When `lines > 1`: a vertically spaced container holding `lines` rounded text bars where earlier lines span full width and the final line is shortened (~75–80% width) for realistic paragraph flow.
   - `'circular'`:
-    - Classes: `rounded-full shrink-0`.
-    - Default size: `h-10 w-10` when `width` and `height` are omitted.
+    - Non-shrinking circle defaulting to `2.5rem` (`10` spacing units) width and height when `width` and `height` are omitted.
   - `'rectangular'`:
-    - Classes: `rounded-xl`.
-    - Default size: `h-32 w-full` when `width` and `height` are omitted.
+    - Large rounded rectangle defaulting to full width and `8rem` (`32` spacing units) height when `width` and `height` are omitted.
   - `'card'`:
-    - Composite card layout container: `p-5 rounded-2xl border border-slate-800 bg-slate-900/50 space-y-4`.
-    - Header row (`flex items-center gap-3`):
-      - Circular avatar skeleton: `h-10 w-10 rounded-full shrink-0`.
-      - Stacked title and subtitle bars (`space-y-1.5 flex-1`): title `h-3.5 w-28 rounded-md` and subtitle `h-2.5 w-20 rounded-md`.
-    - Media placeholder: `h-28 w-full rounded-xl`.
-    - Content body bars (`space-y-2`): two text lines, first `h-3 w-full rounded-md` and second `h-3 w-3/4 rounded-md`.
+    - Composite card container with padding, rounded corners, subtle border, surface background, and vertical spacing:
+      - Header row: circular avatar skeleton alongside stacked title and subtitle bars.
+      - Media placeholder: full-width rounded block.
+      - Content body bars: two stacked text lines (full width and shortened final line).
 
 - **Dimension Handling & Props**:
   - If `width` or `height` is passed as a number, convert it to pixel dimensions in inline `style` (e.g. `width: 80` becomes `style={{ width: '80px' }}`).

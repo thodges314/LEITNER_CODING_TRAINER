@@ -7,8 +7,10 @@ import CodeMirror from '@uiw/react-codemirror';
 import { EditorView } from '@codemirror/view';
 import { stripPredefinedPromptTypes } from '../../utils/cardPromptTypes';
 import { useCodeMirrorLanguage } from '../../hooks/useCodeMirrorLanguage';
+import type { AppTheme } from '../../lib/theme';
 
 export interface SolutionRevealSectionProps {
+  theme?: AppTheme;
   topic: TopicItem;
   executionMode: 'js' | 'ts';
   effectiveVerdict: boolean;
@@ -17,6 +19,7 @@ export interface SolutionRevealSectionProps {
 }
 
 export const SolutionRevealSection: React.FC<SolutionRevealSectionProps> = ({
+  theme,
   topic,
   executionMode,
   effectiveVerdict,
@@ -286,7 +289,7 @@ export const SolutionRevealSection: React.FC<SolutionRevealSectionProps> = ({
         >
           <CodeMirror
             value={canonicalCode}
-            theme="dark"
+            theme={theme === 'apple-gsos' ? 'light' : 'dark'}
             editable={false}
             readOnly={true}
             basicSetup={solutionCmBasicSetup}

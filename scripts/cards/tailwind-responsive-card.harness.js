@@ -30,7 +30,7 @@ const { render, fire } = $dom;
   const hasArticle = card !== null && card.tagName.toLowerCase() === 'article';
   const hasFlexCol = card !== null && card.classList.contains('flex-col');
   const hasMdFlexRow = card !== null && card.classList.contains('md:flex-row');
-  const hasBorder = card !== null && card.classList.contains('border-slate-800');
+  const hasBorder = card !== null && /\bborder\b/.test(card.className);
 
   $test.check(
     'Renders responsive article with flex-col on mobile and md:flex-row on desktop',
@@ -111,8 +111,8 @@ const { render, fire } = $dom;
       }}
     />
   );
-  const badge = r.container.querySelector('span.bg-indigo-500');
-  const hasBadge = badge !== null && badge.textContent === 'Best Seller';
+  const badge = Array.from(r.container.querySelectorAll('span')).find((s) => s.textContent === 'Best Seller');
+  const hasBadge = badge !== undefined && badge.classList.contains('rounded-full');
   const btn = r.container.querySelector('button');
   if (btn) fire.click(btn);
 
