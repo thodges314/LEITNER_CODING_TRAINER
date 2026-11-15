@@ -2,8 +2,8 @@ import React from 'react';
 
 export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
   const parts: React.ReactNode[] = [];
-  // Match `inline code`, **bold**, *italic*, _italic_, <br>
-  const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_|<br\s*\/?>)/gi;
+  // Match ``inline code with `backticks` ``, `inline code`, **bold**, *italic*, _italic_, <br>
+  const regex = /(``(?:[^`]|`(?!`))+``|`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_|<br\s*\/?>)/gi;
   let lastIdx = 0;
   let match: RegExpExecArray | null;
 
@@ -13,6 +13,10 @@ export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
     }
     const token = match[0];
     if (token.startsWith('`') && token.endsWith('`')) {
+      const codeText =
+        token.startsWith('``') && token.endsWith('``') && token.length >= 4
+          ? token.slice(2, -2)
+          : token.slice(1, -1);
       parts.push(
         React.createElement(
           'code',
@@ -30,7 +34,7 @@ export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
               wordBreak: 'break-word',
             },
           },
-          token.slice(1, -1)
+          codeText
         )
       );
     } else if (token.startsWith('**') && token.endsWith('**')) {
