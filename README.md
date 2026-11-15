@@ -132,7 +132,6 @@ Each card consists of audited modular sources:
 
 - **[ARCHITECTURE_AND_ROADMAP.md](ARCHITECTURE_AND_ROADMAP.md)**: System architecture, repository map, open difficulty-ladder / card-family gaps, and assistant conventions.
 - **[TOPIC_EXPANSION_ROADMAP.md](TOPIC_EXPANSION_ROADMAP.md)**: Specifications for upcoming extension tracks (`realtime-streaming`, `web-performance`, `offline-storage`, `frontend-security`).
-- **[AI_TRACK_GENERATION.md](AI_TRACK_GENERATION.md)**: Proposal (low priority, unbuilt) for AI-generated custom tracks with machine verification.
 
 ---
 

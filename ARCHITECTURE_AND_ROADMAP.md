@@ -1,7 +1,7 @@
 # Leitner Coding Trainer — Architecture and Roadmap
 
 > **Live app & quick rules:** [README.md](README.md) · [AGENTS.md](AGENTS.md) · [DELEGATION.md](DELEGATION.md)  
-> **Upcoming expansions:** [TOPIC_EXPANSION_ROADMAP.md](TOPIC_EXPANSION_ROADMAP.md) · [AI_TRACK_GENERATION.md](AI_TRACK_GENERATION.md)
+> **Upcoming expansions:** [TOPIC_EXPANSION_ROADMAP.md](TOPIC_EXPANSION_ROADMAP.md)
 
 ---
 
@@ -84,7 +84,7 @@ Pure-function and TS starter rungs are complete. Remaining React/DOM concepts wh
 ### 5.3 Product & Quality Backlog
 - **Session Mode:** Practice `N` cards drawn strictly from the current Focus filter.
 - **Mutation & Complexity Audit:** Complete survivor triage on `scripts/mutation-baseline.jsonl` (`npm run mutation`) and human spot-check on auto-generated `targetTime`/`targetSpace`/`complexityExplanation` fields.
-- **Parked — Quick Add Topic with AI (`FEATURES.quickAdd = false`):** Hidden until a verify-and-repair loop (started on branch `feature/quick-add-verified`) guarantees AI-drafted reference solutions pass their own drafted tests. Larger AI-generated track proposal lives in [AI_TRACK_GENERATION.md](AI_TRACK_GENERATION.md) (low priority).
+- **Dropped — User-Authored / AI-Generated Cards:** Scrapped (`AddTopicModal` and `FEATURES.quickAdd` removed); existing curated cards already require heavy auditing and fine-tuning.
 
 ---
 

@@ -724,61 +724,6 @@ export function resetCardBox(state: LeitnerDeckState, topicId: string): LeitnerD
   return nextState;
 }
 
-export function addCustomTopicToDeck(
-  state: LeitnerDeckState,
-  newCard: {
-    id: string;
-    track: TrackType;
-    title: string;
-    promptSeed: string;
-    tags: string[];
-    targetTime?: string;
-    targetSpace?: string;
-    complexityExplanation?: string;
-    starterCode?: string;
-    referenceSolution?: string;
-    testHarness?: string;
-    difficulty?: number;
-    concept?: string;
-  }
-): LeitnerDeckState {
-  // Ensure id is unique
-  let safeId = newCard.id.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '-');
-  if (!safeId) safeId = `custom-topic-${Date.now()}`;
-  if (state.topics.some((t) => t.id === safeId)) {
-    safeId = `${safeId}-${Date.now().toString(36)}`;
-  }
-
-  const createdTopic: TopicItem = {
-    id: safeId,
-    track: newCard.track,
-    title: newCard.title.trim(),
-    box: 1,
-    streak: 0,
-    nextEligibleTrial: state.totalCompletedReviews,
-    status: 'active',
-    tags: newCard.tags.map((tg) => tg.trim()).filter(Boolean),
-    promptSeed: newCard.promptSeed.trim(),
-    targetTime: newCard.targetTime?.trim() || 'O(n)',
-    targetSpace: newCard.targetSpace?.trim() || 'O(1)',
-    complexityExplanation: newCard.complexityExplanation?.trim(),
-    starterCode: newCard.starterCode?.trim(),
-    solution: newCard.referenceSolution?.trim(),
-    referenceSolution: newCard.referenceSolution?.trim(),
-    testHarness: newCard.testHarness?.trim(),
-    difficulty: newCard.difficulty ?? 2,
-    concept: newCard.concept?.trim(),
-  };
-
-  const nextState: LeitnerDeckState = {
-    ...state,
-    topics: [createdTopic, ...state.topics],
-  };
-
-  saveDeckState(nextState);
-  return nextState;
-}
-
 /** Removes a topic and remembers deleted seed topics so they are not re-added on load. */
 export function deleteTopicFromDeck(state: LeitnerDeckState, topicId: string): LeitnerDeckState {
   clearDraft(topicId);

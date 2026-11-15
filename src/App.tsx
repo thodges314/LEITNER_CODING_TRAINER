@@ -8,7 +8,6 @@ import {
   unlockSingleCard,
   lockSingleCard,
   resetCardBox,
-  addCustomTopicToDeck,
   deleteTopicFromDeck,
   getDefaultDeckState,
   EMPTY_FILTER,
@@ -26,7 +25,6 @@ import type {
   PracticeFilter,
   LeitnerDeckState,
   TopicItem,
-  TrackType,
   SpacedAlgorithm,
 } from './lib/leitner';
 import { getStoredApiKey, getStoredProvider, getStoredModel } from './lib/ai';
@@ -56,7 +54,6 @@ const PracticeArena = lazy(() =>
   loadPracticeArena().then((m) => ({ default: m.PracticeArena }))
 );
 import { getAllSavedDossiers } from './lib/dossierStorage';
-import { FEATURES } from './lib/features';
 import { recordProblemCompletion, markBackupAdvisorySeen } from './lib/backupAdvisory';
 import { DOUBLE_BACK_WINDOW_MS, useBackNavigation } from './lib/backNavigation';
 import { isFirstVisit, markWelcomed } from './lib/welcome';
@@ -78,11 +75,6 @@ const RemoveFromDeckModal = lazy(() =>
 const DeckEditorModal = lazy(() =>
   import('./components/dashboard/DeckEditorModal').then((m) => ({
     default: m.DeckEditorModal,
-  }))
-);
-const AddTopicModal = lazy(() =>
-  import('./components/AddTopicModal').then((m) => ({
-    default: m.AddTopicModal,
   }))
 );
 const SettingsModal = lazy(() =>
@@ -154,7 +146,6 @@ export function App() {
   };
 
   // Modals
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settingsInitialSection, setSettingsInitialSection] = useState<'ai' | null>(null);
 
@@ -725,27 +716,6 @@ export function App() {
     if (selectedCardId === topicId) setSelectedCardId(null);
   };
 
-  const handleAddTopic = (newTopic: {
-    id: string;
-    track: TrackType;
-    title: string;
-    promptSeed: string;
-    tags: string[];
-    targetTime?: string;
-    targetSpace?: string;
-    complexityExplanation?: string;
-    starterCode?: string;
-    referenceSolution?: string;
-    testHarness?: string;
-    difficulty?: number;
-    concept?: string;
-  }) => {
-    const next = addCustomTopicToDeck(deckState, newTopic);
-    setDeckState(next);
-    setSelectedCardId(newTopic.id);
-    setActiveView('practice');
-  };
-
   const handleResetDeckToDefaults = () => {
     const defaultDeck = getDefaultDeckState();
     if (confirm(`Reset entire deck back to the ${defaultDeck.topics.length} original topics? All custom progress will be reset.`)) {
@@ -1000,7 +970,6 @@ export function App() {
             onOpenInterviewPrepDossier={handleOpenInterviewPrep}
             onDeleteInterviewDossier={handleDeleteDossier}
             onStateUpdated={(newState: LeitnerDeckState) => setDeckState(newState)}
-            onOpenAddModal={() => setIsAddModalOpen(true)}
             highlightExport={highlightExport}
             onDismissHighlightExport={() => setHighlightExport(false)}
             onResumePractice={() => setActiveView('practice')}
@@ -1121,16 +1090,6 @@ export function App() {
         </div>
       )}
 
-
-      {FEATURES.quickAdd && isAddModalOpen && (
-        <Suspense fallback={null}>
-          <AddTopicModal
-            isOpen={isAddModalOpen}
-            onClose={() => setIsAddModalOpen(false)}
-            onAddTopic={handleAddTopic}
-          />
-        </Suspense>
-      )}
 
       {isBackupAdvisoryOpen && (
         <Suspense fallback={null}>
