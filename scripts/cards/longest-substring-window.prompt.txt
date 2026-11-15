@@ -1,11 +1,16 @@
-Implement variable-size sliding window algorithms for substring character frequency constraints:
+Implement substring character-constraint algorithms in $O(n)$ time:
 
 ### `lengthOfLongestSubstring(s: string): number`
-- Returns the length of the longest substring containing no duplicate characters.
-- Uses a sliding window and a hash map of last-seen character indices in O(n) time.
-- Returns `0` if `s` is empty `''`.
+Find the length of the longest **contiguous substring** (no skipping characters) that contains **no repeated characters**.
+- **Examples**:
+  - `lengthOfLongestSubstring('abcabcbb')` $\to$ `3` (`'abc'`).
+  - `lengthOfLongestSubstring('bbbbb')` $\to$ `1` (`'b'`).
+  - `lengthOfLongestSubstring('pwwkew')` $\to$ `3` (`'wke'`; note `'pwke'` is not contiguous).
+- **Edge Case**: Returns `0` if `s` is empty `''`.
 
 ### `longestKDistinct(s: string, k: number): number`
-- Returns the maximum length of a substring containing at most `k` distinct characters.
-- Uses a sliding window and character frequency count tracking.
-- Returns `0` if `k === 0` or if `s` is empty `''`.
+Find the length of the longest **contiguous substring** that contains **at most `k` distinct characters**.
+- **Examples**:
+  - `longestKDistinct('eceba', 2)` $\to$ `3` (`'ece'` has 2 distinct chars: `'e'` and `'c'`).
+  - `longestKDistinct('aa', 1)` $\to$ `2` (`'aa'` has 1 distinct char).
+- **Edge Case**: Returns `0` if `k === 0` or if `s` is empty `''`.

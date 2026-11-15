@@ -187,7 +187,17 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
       targetWindow = getTargetWindow();
     }
 
-    if (!card.previewCode || !targetWindow) return;
+    const previewCode =
+      card.previewCode ||
+      (isHtmlCard(card)
+        ? `(function() {
+  const root = document.getElementById('preview-root');
+  if (!root) return;
+  const markup = typeof html === 'string' ? html : (typeof solution === 'string' ? solution : '');
+  root.innerHTML = markup;
+})();`
+        : '');
+    if (!previewCode || !targetWindow) return;
 
     setStatus('compiling');
     const userComponentCode = isHtmlCard(card) ? prepareHtmlCode(code) : stripTestRunnerBlock(code);
@@ -205,7 +215,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
       }
     }
 
-    const combined = `${userComponentCode}\n\n${card.previewCode}`;
+    const combined = `${userComponentCode}\n\n${previewCode}`;
     const transpiled = await transpileForExecution(combined, 'js', 800);
 
     if (!transpiled.ok) {
@@ -307,12 +317,11 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
   useEffect(() => {
     if (runTrigger !== prevRunTriggerRef.current) {
       prevRunTriggerRef.current = runTrigger;
-      if (isLive && !hasTimedOutRef.current) {
-        setReadyEnvKey(currentEnvKey);
+      if (isLive && isIframeReady && !hasTimedOutRef.current) {
         void sendToIframe();
       }
     }
-  }, [runTrigger, isLive, currentEnvKey, sendToIframe]);
+  }, [runTrigger, isLive, isIframeReady, sendToIframe]);
 
   // Re-render debounced (500ms) on typing when live
   const prevCodeRef = useRef(code);

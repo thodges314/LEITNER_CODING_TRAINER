@@ -67,7 +67,7 @@ export function usePracticeCodeExecution({
   const handleRunCode = async () => {
     setIsPreviewLive(true);
     setPreviewRunTrigger((c) => c + 1);
-    if (!code.trim() || isRunning) return;
+    if (isRunning) return;
     setIsOutputOpen(true);
     setIsRunning(true);
     setExecutionStatus('running');
@@ -137,17 +137,40 @@ export function usePracticeCodeExecution({
             ? prepareHtmlCode(code, currentCard?.testHarness)
             : code;
     const executableSource =
-      isWrappedInput &&
       currentCard?.testHarness &&
       !bufferContainsHarness(rawCodeToRun, currentCard.testHarness)
         ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`
         : rawCodeToRun;
 
     const effectiveMode = isWrappedInput ? 'js' : executionMode;
+    if (effectiveMode === 'ts') {
+      const codeToCheck = isTsTrack ? executableSource : rawCodeToRun;
+      const typeCheckOutcome = await transpileForExecution(
+        codeToCheck,
+        'ts',
+        3000,
+        isTsTrack ? undefined : currentCard?.promptSeed
+      );
+      if (!typeCheckOutcome.ok) {
+        for (const diag of typeCheckOutcome.diagnostics) {
+          logs.push({
+            type: diag.type === 'warn' ? 'warn' : 'error',
+            content: diag.formatted,
+            timestamp: now(),
+            failure: diag.type !== 'warn',
+          });
+        }
+        if (typeCheckOutcome.diagnostics.length > 0) setOutputLogs([...logs]);
+        setExecutionStatus('error');
+        setIsRunning(false);
+        return;
+      }
+    }
+
     const transpiled = await transpileForExecution(
       executableSource,
-      effectiveMode,
-      3000,
+      'js',
+      1500,
       isTsTrack ? undefined : currentCard?.promptSeed
     );
     for (const diag of transpiled.diagnostics) {
@@ -244,6 +267,7 @@ export function usePracticeCodeExecution({
     });
 
     try {
+      await new Promise<void>((r) => setTimeout(r, 0));
       const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
       const fn = new AsyncFunction(...scope.names, executableCode);
       let runTimer: ReturnType<typeof setTimeout> | undefined;

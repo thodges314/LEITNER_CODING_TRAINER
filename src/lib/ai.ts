@@ -244,7 +244,11 @@ function heuristicEvaluateCode(topic: TopicItem, code: string, harness?: Harness
     timeComplexity,
     spaceComplexity,
     invariantsMet: invariantsMet.length > 0 ? invariantsMet : ['Code syntactically constructed'],
-    invariantsMissed: invariantsMissed.length > 0 ? invariantsMissed : ['Verify edge cases for null/empty collections'],
+    invariantsMissed: passed
+      ? []
+      : invariantsMissed.length > 0
+      ? invariantsMissed
+      : ['Verify edge cases for null/empty collections'],
     harness,
     critique: passed
       ? `Test harness passed (${harness?.summary}) for "${topic.title}". Structural checks below are advisory; use the override if a test depends on the network or timing.`

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act } from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 import { MarkdownContent } from './MarkdownContent';
@@ -250,5 +250,181 @@ const x = 42;
     expect(alert?.textContent).toContain('Single-File Sandbox & Module Architecture');
     expect(alert?.textContent).toContain('In production Next.js, FavoriteButton lives in its own file.');
     expect(alert?.textContent).toContain("In this single-file exercise, do NOT add 'use client'.");
+  });
+
+  it('renders bold inline code (**`code`**) inside bullet lists', () => {
+    const text = `- **\`recordEntry(entry: LayoutShiftEntry): number\`**: Ignores entries.`;
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const strong = container.querySelector('li strong');
+    expect(strong).not.toBeNull();
+    const code = strong?.querySelector('code');
+    expect(code).not.toBeNull();
+    expect(code?.textContent).toBe('recordEntry(entry: LayoutShiftEntry): number');
+  });
+
+  it('renders inline and display KaTeX math expressions ($...$ and $$...$$)', async () => {
+    const text =
+      'Maintain a Min-Heap of size $K$ in $O(N \\log K)$ time.\n\n$$T(t) = \\min\\left(C,\\; T(t_0) + \\frac{(t - t_0) \\cdot r}{1000}\\right)$$';
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    await vi.waitFor(() => {
+      const katexNodes = container.querySelectorAll('.katex');
+      expect(katexNodes.length).toBe(3);
+      expect(container.querySelector('.markdown-math-display .katex-display')).not.toBeNull();
+    });
+  });
+
+  it('renders array-trace fenced blocks as visual array boxes with indices', () => {
+    const text = [
+      '```array-trace',
+      JSON.stringify({
+        title: 'Trace example',
+        rows: [
+          {
+            caption: 'Step 1:',
+            offset: 2,
+            items: [
+              { value: 10, index: 2, state: 'mid' },
+              { value: 20, index: 3, state: 'removed' },
+            ],
+          },
+        ],
+      }),
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const block = container.querySelector('.array-trace-block');
+    expect(block).not.toBeNull();
+    expect(block?.textContent).toContain('Trace example');
+    expect(block?.textContent).toContain('Step 1:');
+    expect(block?.textContent).toContain('10');
+    expect(block?.textContent).toContain('20');
+  });
+
+  it('renders linked-list fenced blocks with pointers, null termination, and cycles', () => {
+    const text = [
+      '```linked-list',
+      JSON.stringify({
+        title: 'Linked List Diagram',
+        rows: [
+          {
+            caption: 'Normal list:',
+            nodes: [{ val: 1, pointers: ['head'] }, { val: 2 }],
+          },
+          {
+            caption: 'Cycle list:',
+            nodes: [{ val: 1, pointers: ['h'] }, { val: 2, state: 'cycle' }],
+            cycleToIndex: 1,
+          },
+        ],
+      }),
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const block = container.querySelector('.linked-list-block');
+    expect(block).not.toBeNull();
+    expect(block?.textContent).toContain('Linked List Diagram');
+    expect(block?.textContent).toContain('head');
+    expect(block?.textContent).toContain('null');
+    expect(block?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('renders grid-board fenced blocks with highlighted cells and step badges', () => {
+    const text = [
+      '```grid-board',
+      JSON.stringify({
+        title: 'Word Search Board',
+        boards: [
+          {
+            caption: 'Path:',
+            grid: [
+              ['A', 'B'],
+              ['C', 'D'],
+            ],
+            highlights: [{ row: 0, col: 0, state: 'start', step: 1 }],
+          },
+        ],
+      }),
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const block = container.querySelector('.grid-board-block');
+    expect(block).not.toBeNull();
+    expect(block?.textContent).toContain('Word Search Board');
+    expect(block?.textContent).toContain('A');
+    expect(block?.textContent).toContain('1');
+  });
+
+  it('renders multiple TypeScript interface/type declarations side-by-side in columns', () => {
+    const text = [
+      '```ts',
+      'interface TreeNode {',
+      '  id: string;',
+      '}',
+      '',
+      'interface VisibleRow {',
+      '  id: string;',
+      '  depth: number;',
+      '}',
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const grid = container.querySelector('.ts-type-columns');
+    expect(grid).not.toBeNull();
+    const cards = container.querySelectorAll('.ts-type-column-card');
+    expect(cards.length).toBe(2);
+    expect(cards[0].textContent).toContain('interface TreeNode');
+    expect(cards[1].textContent).toContain('interface VisibleRow');
+  });
+
+  it('renders decision-tree fenced blocks with nodes and edge labels', () => {
+    const text = [
+      '```decision-tree',
+      JSON.stringify({
+        title: 'Decision Tree',
+        root: {
+          label: '""',
+          state: 'root',
+          children: [
+            { label: '"0"', edgeLabel: "+'0'", state: 'solution' },
+            { label: '"1"', edgeLabel: "+'1'", state: 'solution' },
+          ],
+        },
+      }),
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const block = container.querySelector('.decision-tree-block');
+    expect(block).not.toBeNull();
+    expect(block?.textContent).toContain('Decision Tree');
+    expect(block?.textContent).toContain('"0"');
+    expect(block?.textContent).toContain("+'1'");
   });
 });

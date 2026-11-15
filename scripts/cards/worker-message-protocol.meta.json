@@ -1,0 +1,13 @@
+{
+  "title": "Typed Worker Request/Response Protocol",
+  "track": "dom-browser",
+  "tags": [
+    "dom",
+    "web-worker",
+    "messaging",
+    "async",
+    "protocol"
+  ],
+  "requiresDom": true
+}
+

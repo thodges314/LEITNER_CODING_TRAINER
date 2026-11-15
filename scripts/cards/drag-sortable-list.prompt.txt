@@ -13,7 +13,7 @@ export interface DragSortableListProps {
 }
 ```
 
-### DragSortableList({ items, onReorder }: DragSortableListProps): JSX.Element
+### `DragSortableList({ items, onReorder }: DragSortableListProps): JSX.Element`
 - **List Rendering**:
   - Renders a list container with `data-sortable-list`.
   - Each item is rendered with `data-item-id={item.id}`, `data-item-index={index}`, and attribute `draggable="true"`.

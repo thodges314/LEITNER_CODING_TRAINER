@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import rainbowBrackets from 'rainbowbrackets';
+import rainbowBrackets from '../lib/rainbowBrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
 import { createTsHoverExtension } from './practice/tsHoverExtension';
@@ -341,11 +341,23 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const handleSubmit = async () => {
     setIsPreviewLive(true);
     setPreviewRunTrigger((c) => c + 1);
-    if (!currentCard || !code.trim() || isEvaluating) return;
+    if (!currentCard || isEvaluating) return;
     setIsEvaluating(true);
     setShowSolution(false);
     try {
-      const harness = await runHarness(currentCard, code, executionMode);
+      const hasCode = code.trim().length > 0;
+      const harness = hasCode
+        ? await runHarness(currentCard, code, executionMode)
+        : {
+            ran: false,
+            passed: false,
+            passCount: 0,
+            failCount: 1,
+            errorCount: 0,
+            timedOut: false,
+            summary: 'No implementation submitted',
+            lines: ['FAIL: No implementation submitted'],
+          };
       const res = await evaluateCodeSubmission(currentCard, code, harness, executionMode);
       setEvalResult(res);
       setShowSolution(!res.passed);
@@ -498,6 +510,36 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           onOpenSettings={onOpenSettings}
         />
         <MarkdownContent text={currentCard.promptSeed} />
+        <p
+          style={{
+            marginTop: '12px',
+            marginBottom: 0,
+            fontSize: '12px',
+            color: 'var(--text-muted, #94a3b8)',
+          }}
+        >
+          Stuck? Click{' '}
+          <span
+            aria-hidden="true"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '16px',
+              height: '16px',
+              borderRadius: '50%',
+              border: '1px solid currentColor',
+              fontSize: '10px',
+              fontWeight: 600,
+              lineHeight: 1,
+              verticalAlign: 'text-bottom',
+              margin: '0 2px',
+            }}
+          >
+            ?
+          </span>{' '}
+          in the top-right to open the Socratic AI Tutor (available when an AI API key is configured in Settings).
+        </p>
       </div>
 
       {/* Target Contract (Input vs Expected Output) */}
@@ -610,15 +652,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             }
             editable={!evalResult}
             readOnly={Boolean(evalResult)}
-            placeholder={
-              getCardInputLanguage(currentCard) === 'html'
-                ? '<!-- Write your HTML markup here...\n     Press [Tab] for 2-space indentation.\n     Autoclosing tags and quotes are enabled. -->'
-                : getCardInputLanguage(currentCard) === 'sql'
-                  ? '-- Write your SQL query here...\n-- Press [Tab] for 2-space indentation.'
-                  : getCardInputLanguage(currentCard) === 'graphql'
-                    ? '# Write your GraphQL query or schema here...\n# Press [Tab] for 2-space indentation.'
-                    : '// Type your solution from scratch without autocomplete or hints...\n// Press [Tab] for 2-space indentation.\n// Bracket pair colorization and autoclosing brackets/quotes are enabled.'
-            }
             autoFocus
           />
         </div>

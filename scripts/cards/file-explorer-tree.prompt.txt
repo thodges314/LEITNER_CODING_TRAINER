@@ -5,7 +5,7 @@ interface FileNode {
 }
 ```
 
-### FileTree({ nodes, onSelect }: { nodes: FileNode[]; onSelect?: (path: string) => void }): JSX.Element:
+### `FileTree({ nodes, onSelect }: { nodes: FileNode[]; onSelect?: (path: string) => void }): JSX.Element`
 
 Build a file explorer tree where `nodes` is `FileNode[]`. An item with a `children` array is a folder.
 

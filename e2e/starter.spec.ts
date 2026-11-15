@@ -41,18 +41,16 @@ const run = (page: Page) => page.getByRole('button', { name: /Run Code \/ Test/ 
 const solved = (id: string) => `${byId(id).referenceSolution}\n\n// Test runner example:\n${byId(id).testHarness!.trim()}\n`;
 
 test.describe('starter buffer', () => {
-  test('the card checks are live code, and there is no comment toggle', async ({ page }) => {
+  test('starter buffer omits test runner code and comment toggle', async ({ page }) => {
     await openCard(page, 'binary-search-exact', null);
     const editor = page.locator('.cm-content');
-    await expect(editor).toContainText('Test runner example:');
     const text = await editor.innerText();
-    const afterMarker = text.slice(text.indexOf('Test runner example:'));
-    expect(afterMarker).toContain('await $test.run("Target in the right half"');
-    expect(afterMarker).not.toContain('// await $test.run');
+    expect(text).not.toContain('Test runner example:');
+    expect(text).not.toContain('Write your implementation below');
     await expect(page.getByRole('button', { name: /Toggle Test Comments/ })).toHaveCount(0);
   });
 
-  test('Run on the untouched buffer reports the checks as failing instead of crashing', async ({ page }) => {
+  test('Run on the untouched buffer executes card checks and reports failures', async ({ page }) => {
     await openCard(page, 'binary-search-exact', null);
     await run(page).click();
     await expect(page.getByText(/Target in the right half/).first()).toBeVisible({ timeout: 15000 });

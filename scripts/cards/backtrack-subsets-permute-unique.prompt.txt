@@ -1,5 +1,7 @@
 Implement duplicate-handling backtracking algorithms:
 
+{{include:backtracking-explanation.md}}
+
 ### `subsetsWithDup(nums: number[]): number[][]`
 - Generates all unique subsets (power set) of array `nums`, which may contain duplicate numbers.
 - The solution set must not contain duplicate subsets.

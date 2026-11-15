@@ -46,6 +46,21 @@ export const DATA_SCALING_CARD_IDS: ReadonlySet<string> = new Set<string>([
   'k-way-stream-merger',
 ]);
 
+export const SENIOR_PLATFORM_CARD_IDS: ReadonlySet<string> = new Set<string>([
+  'sse-stream-parser',
+  'websocket-heartbeat-monitor',
+  'reconnecting-websocket',
+  'main-thread-chunking-yield',
+  'performance-observer-cls',
+  'resource-hint-preloader',
+  'xss-html-sanitizer',
+  'secure-postmessage-bridge',
+  'worker-message-protocol',
+  'offline-mutation-replay',
+  'promisified-indexeddb',
+  'react-use-promise',
+]);
+
 export interface DeckPreset {
   id: string;
   name: string;
@@ -115,6 +130,13 @@ export const BUILT_IN_DECKS: DeckPreset[] = [
         tags.includes('backpressure')
       );
     },
+  },
+  {
+    id: 'senior-frontend-systems',
+    name: 'Senior Frontend & Browser Systems',
+    description: 'Realtime SSE/WebSockets, Core Web Vitals (INP/CLS), offline-first IndexedDB & replay queues, XSS/postMessage security, Worker RPC, and React 19 Suspense',
+    isBuiltIn: true,
+    filter: (card) => SENIOR_PLATFORM_CARD_IDS.has(card.id),
   },
 ];
 

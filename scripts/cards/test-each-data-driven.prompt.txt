@@ -10,7 +10,7 @@ In test frameworks like Vitest and Jest, `test.each` enables parameterized, data
 
 Write a factory function `createTestEach` that wraps a test registration function and returns a data-driven `test.each` runner.
 
-### createTestEach(registerTest): (table: any[]) => EachRunner
+### `createTestEach(registerTest): (table: any[]) => EachRunner`
 
 #### Parameters
 - `registerTest` (`RegisterTestFn`): Callback that receives a formatted test title string and a test execution function `() => void | Promise<void>`.

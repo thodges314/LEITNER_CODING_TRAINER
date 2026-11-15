@@ -1,9 +1,56 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+
+type KatexModule = typeof import('katex');
+let cachedKatex: KatexModule | null = null;
+let katexLoadPromise: Promise<KatexModule> | null = null;
+
+function loadKatex(): Promise<KatexModule> {
+  if (cachedKatex) return Promise.resolve(cachedKatex);
+  if (!katexLoadPromise) {
+    katexLoadPromise = Promise.all([
+      import('katex'),
+      import('katex/dist/katex.min.css'),
+    ]).then(([mod]) => {
+      const resolved = (mod as unknown as { default?: KatexModule }).default ?? mod;
+      cachedKatex = resolved;
+      return resolved;
+    });
+  }
+  return katexLoadPromise;
+}
+
+const KatexMath: React.FC<{ tex: string; displayMode?: boolean }> = ({ tex, displayMode = false }) => {
+  const [loadedKatex, setLoadedKatex] = useState<KatexModule | null>(() => cachedKatex);
+
+  useEffect(() => {
+    if (loadedKatex) return;
+    let active = true;
+    void loadKatex().then((katex) => {
+      if (active) {
+        setLoadedKatex(katex);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [loadedKatex]);
+
+  const katex = loadedKatex ?? cachedKatex;
+  if (!katex) {
+    return React.createElement('span', { className: 'markdown-math-fallback' }, tex);
+  }
+  const html = katex.renderToString(tex, { throwOnError: false, displayMode });
+  return React.createElement(displayMode ? 'div' : 'span', {
+    className: displayMode ? 'markdown-math-display' : 'markdown-math-inline',
+    style: displayMode ? { overflowX: 'auto', margin: '4px 0' } : undefined,
+    dangerouslySetInnerHTML: { __html: html },
+  });
+};
 
 export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
   const parts: React.ReactNode[] = [];
-  // Match ``inline code with `backticks` ``, `inline code`, **bold**, *italic*, _italic_, <br>
-  const regex = /(``(?:[^`]|`(?!`))+``|`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_|<br\s*\/?>)/gi;
+  // Match ``inline code with `backticks` ``, `inline code`, $$display math$$, $inline math$, **bold**, *italic*, _italic_, <br>
+  const regex = /(``(?:[^`]|`(?!`))+``|`[^`]+`|\$\$[^$]+\$\$|\$(?!\s)(?:[^$\n]*?[^\s$\\]|[^\s$\\])\$|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_|<br\s*\/?>)/gi;
   let lastIdx = 0;
   let match: RegExpExecArray | null;
 
@@ -37,6 +84,22 @@ export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
           codeText
         )
       );
+    } else if (token.startsWith('$$') && token.endsWith('$$') && token.length > 4) {
+      parts.push(
+        React.createElement(KatexMath, {
+          key: match.index,
+          tex: token.slice(2, -2).trim(),
+          displayMode: true,
+        })
+      );
+    } else if (token.startsWith('$') && token.endsWith('$') && token.length > 2) {
+      parts.push(
+        React.createElement(KatexMath, {
+          key: match.index,
+          tex: token.slice(1, -1),
+          displayMode: false,
+        })
+      );
     } else if (token.startsWith('**') && token.endsWith('**')) {
       parts.push(
         React.createElement(
@@ -45,7 +108,7 @@ export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
             key: match.index,
             style: { fontWeight: 600, color: 'var(--text-primary)' },
           },
-          token.slice(2, -2)
+          renderInlineMarkdown(token.slice(2, -2))
         )
       );
     } else if (
@@ -59,7 +122,7 @@ export const renderInlineMarkdown = (text: string): React.ReactNode[] => {
             key: match.index,
             style: { fontStyle: 'italic', color: 'var(--text-primary)' },
           },
-          token.slice(1, -1)
+          renderInlineMarkdown(token.slice(1, -1))
         )
       );
     } else if (token.toLowerCase().startsWith('<br')) {

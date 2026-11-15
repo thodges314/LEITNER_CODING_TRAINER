@@ -2,14 +2,14 @@ Implement bitwise tricks, Hamming distances, and bit-level flags:
 
 ### `missingNumber(nums: number[]): number`
 - Finds the single missing number from an array containing `n` distinct numbers in the range `0...n`.
-- Uses XOR of array indices and values in O(n) time and O(1) space.
+- Uses XOR of array indices and values in $O(n)$ time and $O(1)$ space.
 
 ### `hammingDistance(a: number, b: number): number`
 - Returns the number of bit positions in which the binary representations of two non-negative integers `a` and `b` differ.
 
 ### `countBitsUpTo(n: number): number[]`
 - Returns an array of size `n + 1` where each index `i` contains the number of 1-bits in `i` for all `0 <= i <= n`.
-- Uses the recurrence `bits[i] = bits[i >> 1] + (i & 1)` to run in O(n) time.
+- Uses the recurrence `bits[i] = bits[i >> 1] + (i & 1)` to run in $O(n)$ time.
 
 ### `getBit(n: number, i: number): number`
 - Returns `0` or `1` representing the bit at 0-indexed position `i` from the least significant bit.

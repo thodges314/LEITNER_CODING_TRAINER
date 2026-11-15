@@ -1,8 +1,8 @@
-Implement interval merging on an array of `[start, end]` pairs:
+Implement interval merging on an array of `[start, end]` pairs in $O(n \log n)$ time:
 
 ### `mergeIntervals(intervals: [number, number][]): [number, number][]`
-- Merges all overlapping, contained, or touching intervals:
-  - Input may be unsorted: sorts intervals by start position in O(n log n) time.
-  - Merges intervals that overlap or touch at an endpoint (e.g., `[1, 4]` and `[4, 5]` merge into `[1, 5]`).
-- Returns the merged intervals in ascending order.
-- Returns `[]` if `intervals` is empty.
+Given a list of ranges `[start, end]` (such as calendar meetings or numeric spans; input may be unsorted), combine any ranges that **overlap** or **touch at an endpoint** into a minimal list of non-overlapping ranges sorted by start position.
+- **Examples**:
+  - `mergeIntervals([[1, 3], [2, 6], [8, 10], [15, 18]])` $\to$ `[[1, 6], [8, 10], [15, 18]]` (`[1, 3]` and `[2, 6]` overlap).
+  - `mergeIntervals([[1, 4], [4, 5]])` $\to$ `[[1, 5]]` (touching at `4` still merges).
+- **Edge Case**: Returns `[]` if `intervals` is empty.

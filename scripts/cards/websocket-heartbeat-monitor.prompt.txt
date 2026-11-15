@@ -1,0 +1,53 @@
+Implement a WebSocket heartbeat monitor that sends periodic ping frames and closes stale connections when a pong is not received in time:
+
+## Description
+
+Long-lived WebSocket connections can silently drop due to NAT timeouts, proxy resets, or mobile network switches without firing an immediate `close` event. A heartbeat monitor periodically sends lightweight `PING` frames and enforces a `PONG` response deadline so dead sockets are detected and torn down cleanly.
+
+```ts
+interface HeartbeatSocket {
+  send(data: string): void;
+  close(code?: number, reason?: string): void;
+  addEventListener(type: 'message' | 'close', listener: (event: any) => void): void;
+  removeEventListener(type: 'message' | 'close', listener: (event: any) => void): void;
+}
+
+interface HeartbeatOptions {
+  intervalMs: number;
+  timeoutMs: number;
+  pingPayload?: string;
+  pongPayload?: string;
+  onTimeout?: () => void;
+}
+
+interface HeartbeatMonitor {
+  start(): void;
+  stop(): void;
+  isRunning(): boolean;
+}
+```
+
+### `createHeartbeatMonitor(socket: HeartbeatSocket, options: HeartbeatOptions): HeartbeatMonitor`
+
+Creates a controllable heartbeat monitor for `socket`:
+- **`start(): void`**:
+  - Idempotent: calling `start()` while already running is a no-op.
+  - Registers `'message'` and `'close'` event listeners on `socket`.
+  - Starts a recurring `intervalMs` timer that:
+    - Sends `pingPayload` (defaults to `'PING'`) via `socket.send(...)`.
+    - Starts a `timeoutMs` deadline timer (if one is not already active).
+  - If the deadline expires before a matching pong arrives:
+    - Calls `stop()` to clean up timers and listeners.
+    - Invokes `onTimeout?.()`.
+    - Closes the socket with `socket.close(4000, 'Heartbeat timeout')`.
+- **Pong & Close Handling**:
+  - When a `'message'` event arrives whose `data` equals `pongPayload` (defaults to `'PONG'`), clears the active timeout timer.
+  - Non-pong messages do not clear the heartbeat timeout.
+  - When `socket` emits `'close'`, automatically calls `stop()`.
+- **`stop(): void`**:
+  - Clears the interval timer and any pending timeout timer.
+  - Removes the `'message'` and `'close'` listeners from `socket`.
+  - Sets running state to `false`.
+- **`isRunning(): boolean`**:
+  - Returns `true` while the monitor is active, `false` otherwise.
+

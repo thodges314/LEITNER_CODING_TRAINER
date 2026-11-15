@@ -81,12 +81,22 @@ for (const id of componentCards) {
   if (!topics.some((t) => t.id === id)) throw new Error(`scripts/component-cards.json: unknown card id "${id}"`);
 }
 
+function resolvePromptIncludes(text) {
+  return text.replace(/\{\{include:([a-zA-Z0-9_.-]+)\}\}/g, (_, name) => {
+    const partialPath = path.join(here, 'cards', 'partials', name);
+    if (!fs.existsSync(partialPath)) {
+      throw new Error(`Missing prompt partial: ${partialPath}`);
+    }
+    return fs.readFileSync(partialPath, 'utf8').replace(/\n$/, '');
+  });
+}
+
 let n = 0;
 for (const t of topics) {
   if (!cases[t.id]) throw new Error(`No cases authored for ${t.id}`);
 
   const prompt = read(t.id, 'prompt.txt');
-  if (prompt) t.promptSeed = prompt;
+  if (prompt) t.promptSeed = resolvePromptIncludes(prompt);
 
   const refHtml = read(t.id, 'ref.html');
   const refSql = read(t.id, 'ref.sql');

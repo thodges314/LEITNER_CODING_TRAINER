@@ -1,4 +1,4 @@
-### Layout({ path, title, children }: { path: string; title: string; children?: React.ReactNode }): JSX.Element:
+### `Layout({ path, title, children }: { path: string; title: string; children?: React.ReactNode }): JSX.Element`
 
 Build `Layout` for accessible client-side routing:
 

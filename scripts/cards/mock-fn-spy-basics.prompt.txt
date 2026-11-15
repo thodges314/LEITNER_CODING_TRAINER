@@ -26,7 +26,7 @@ function createSpy<TArgs extends unknown[] = unknown[], TReturn = unknown>(
 ): MockSpy<TArgs, TReturn>;
 ```
 
-### createSpy(implementation?): MockSpy
+### `createSpy(implementation?): MockSpy`
 
 #### Requirements
 1. **Invocation**:

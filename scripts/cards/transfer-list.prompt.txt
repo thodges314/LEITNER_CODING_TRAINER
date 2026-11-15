@@ -13,7 +13,7 @@ interface TransferListResult {
 }
 ```
 
-### useTransferList({ initialLeft = [], initialRight = [] }: { initialLeft?: string[]; initialRight?: string[] } = {}): TransferListResult:
+### `useTransferList({ initialLeft = [], initialRight = [] }: { initialLeft?: string[]; initialRight?: string[] } = {}): TransferListResult`
 
 Implement a dual-column selection manager hook `useTransferList`.
 

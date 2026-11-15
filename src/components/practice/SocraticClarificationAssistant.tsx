@@ -115,25 +115,6 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
     }
   };
 
-  const CHIPS = [
-    {
-      label: '❓ Clarify Prompt',
-      query: 'Could you clarify the problem requirements and what the function is expected to do in simple terms?',
-    },
-    {
-      label: '🧠 Concept Refresher',
-      query: 'Could you give me a conceptual reminder of how the underlying algorithm or pattern works in plain English (no code)?',
-    },
-    {
-      label: '⚠️ Edge Cases',
-      query: 'What tricky edge cases, boundary inputs, or subtle invariants should I watch out for in this problem?',
-    },
-    {
-      label: '🔍 Why is current approach broken?',
-      query: 'Looking at my current code in the editor, what flaws, logic bugs, or unhandled conditions should I investigate?',
-    },
-  ];
-
   return (
     <>
       <style>{`
@@ -285,19 +266,6 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
                 <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--text-primary)' }}>
                   Socratic AI Tutor
                 </span>
-                <span
-                  style={{
-                    marginLeft: '8px',
-                    fontSize: '11px',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    backgroundColor: isLight ? 'rgba(16, 185, 129, 0.1)' : 'rgba(16, 185, 129, 0.2)',
-                    color: 'var(--accent-emerald)',
-                    fontFamily: 'var(--font-mono, monospace)',
-                  }}
-                >
-                  No code spoilers
-                </span>
               </div>
             </div>
 
@@ -381,31 +349,14 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
             }}
           >
             {messages.length === 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div
-                  style={{
-                    fontSize: '13px',
-                    color: 'var(--text-dim)',
-                    lineHeight: 1.5,
-                  }}
-                >
-                  Need a conceptual nudge or clarification without spoiling the solution? Select a topic chip or ask anything below:
-                </div>
-
-                {/* Quick Action Prompt Chips */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {CHIPS.map((chip, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      className="socratic-chip-btn"
-                      onClick={() => handleSendMessage(chip.query)}
-                      disabled={isLoading}
-                    >
-                      <span>{chip.label}</span>
-                    </button>
-                  ))}
-                </div>
+              <div
+                style={{
+                  fontSize: '13px',
+                  color: 'var(--text-dim)',
+                  lineHeight: 1.5,
+                }}
+              >
+                I can see your current code in the editor. Ask for clarification on the question, why your approach is failing, what edge case you&apos;re missing, or for a nudge without spoiling the solution:
               </div>
             ) : (
               messages.map((msg, idx) => (
@@ -476,32 +427,6 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
             )}
           </div>
 
-          {/* Follow-up Chips when already in conversation */}
-          {messages.length > 0 && !isLoading && (
-            <div
-              style={{
-                padding: '6px 14px',
-                display: 'flex',
-                gap: '6px',
-                flexWrap: 'wrap',
-                borderTop: `1px solid ${isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)'}`,
-                backgroundColor: isLight ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.15)',
-              }}
-            >
-              {CHIPS.map((chip, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className="socratic-chip-btn"
-                  style={{ fontSize: '11px', padding: '3px 8px' }}
-                  onClick={() => handleSendMessage(chip.query)}
-                >
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-          )}
-
           {/* Hairline Retro Prompt Form */}
           <form
             onSubmit={(e) => {
@@ -532,7 +457,7 @@ export const SocraticClarificationAssistant: React.FC<SocraticClarificationAssis
               ref={inputRef}
               type="text"
               value={inputVal}
-              placeholder={hasApiKey ? 'Ask a question or clarify a concept...' : 'Ask question (offline guidance)...'}
+              placeholder={hasApiKey ? 'Ask about your current code or approach...' : 'Ask a question (offline guidance)...'}
               onChange={(e) => setInputVal(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {

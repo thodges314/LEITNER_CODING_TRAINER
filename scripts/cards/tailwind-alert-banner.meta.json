@@ -11,5 +11,5 @@
   ],
   "inputLanguage": "html",
   "previewLibraries": ["tailwind"],
-  "rendersComponent": false
+  "rendersComponent": true
 }

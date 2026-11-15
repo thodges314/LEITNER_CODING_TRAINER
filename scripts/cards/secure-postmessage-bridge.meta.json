@@ -1,0 +1,13 @@
+{
+  "title": "Origin-Checked postMessage Bridge",
+  "track": "dom-browser",
+  "tags": [
+    "dom",
+    "security",
+    "postmessage",
+    "iframes",
+    "messaging"
+  ],
+  "requiresDom": true
+}
+

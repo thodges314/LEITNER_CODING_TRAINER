@@ -13,7 +13,7 @@ interface AccordionProps {
 
 Build an accessible accordion where items can be expanded and collapsed:
 
-### Accordion({ items, allowMultiple = false }: AccordionProps): JSX.Element
+### `Accordion({ items, allowMultiple = false }: AccordionProps): JSX.Element`
 - `items`: array of `AccordionItem` objects (`[{ id, title, content }]`).
 - `allowMultiple`: optional boolean (defaults to `false`). When `true`, multiple panels can stay open at once; when `false`, opening one panel closes any currently open panel.
 - **Accessibility & ARIA**:

@@ -1,0 +1,40 @@
+Implement a clean `async`/`await` wrapper around the callback- and event-driven IndexedDB API:
+
+## Description
+
+IndexedDB is the browser's built-in transactional key-value/object database for offline-first apps, but its native `IDBRequest` API relies on `onsuccess`, `onerror`, and `onupgradeneeded` event handlers. Wrapping `open` and object-store transactions in Promises provides an ergonomic, type-safe storage client.
+
+```ts
+interface OpenDbOptions {
+  name: string;
+  version?: number;
+  stores: string[];
+  keyPath?: string;
+  indexedDb?: IDBFactory;
+}
+
+interface PromisifiedDb {
+  get<T = unknown>(storeName: string, key: IDBValidKey): Promise<T | undefined>;
+  put<T = unknown>(storeName: string, value: T, key?: IDBValidKey): Promise<IDBValidKey>;
+  delete(storeName: string, key: IDBValidKey): Promise<void>;
+  getAll<T = unknown>(storeName: string): Promise<T[]>;
+  close(): void;
+}
+```
+
+### `openDatabase(options: OpenDbOptions): Promise<PromisifiedDb>`
+
+Opens (and upgrades if needed) an IndexedDB database and returns a `PromisifiedDb` client:
+- **Opening & Schema Upgrade**:
+  - Uses `options.indexedDb ?? window.indexedDB` and calls `.open(name, version ?? 1)`.
+  - Inside `onupgradeneeded`, iterates `options.stores` and calls `db.createObjectStore(storeName, options.keyPath ? { keyPath: options.keyPath } : undefined)` for any store not already in `db.objectStoreNames.contains(storeName)`.
+  - Rejects if `onerror` or `onblocked` fires during open.
+- **Transactional Operations**:
+  - `get(storeName, key)`: opens a `'readonly'` transaction, awaits `store.get(key)`, and resolves to `request.result` (`undefined` if missing).
+  - `put(storeName, value, key?)`: opens a `'readwrite'` transaction, calls `key !== undefined ? store.put(value, key) : store.put(value)`, and resolves with the resulting key (`request.result`) once the request/transaction succeeds.
+  - `delete(storeName, key)`: opens a `'readwrite'` transaction, calls `store.delete(key)`, and resolves to `undefined` on success.
+  - `getAll(storeName)`: opens a `'readonly'` transaction, calls `store.getAll()`, and resolves to `request.result ?? []`.
+  - Rejects with `request.error ?? new Error('IndexedDB request failed')` if any request or transaction errors.
+- **`close()`**:
+  - Closes the underlying `IDBDatabase` connection (`db.close()`).
+

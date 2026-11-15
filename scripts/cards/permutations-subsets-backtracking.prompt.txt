@@ -1,5 +1,7 @@
 Implement classic backtracking search algorithms:
 
+{{include:backtracking-explanation.md}}
+
 ### `subsets<T>(nums: T[]): T[][]`
 - Generates the power set (all unique subsets) of an array of distinct integers `nums`.
 - Returns `[[]]` if `nums` is empty (`[]`).

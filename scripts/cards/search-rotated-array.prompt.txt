@@ -1,9 +1,14 @@
-Implement binary search algorithms in O(log n) time on a sorted, rotated array of distinct numbers (e.g. `[4, 5, 6, 7, 0, 1, 2]`):
+Implement binary search algorithms in $O(\log n)$ time on a **rotated sorted array** of distinct numbers.
+
+> **What is a rotated sorted array?** Take an ascending array like `[0, 1, 2, 4, 5, 6, 7]` and shift the front elements to the back around a pivot: `[4, 5, 6, 7, 0, 1, 2]`.
 
 ### `findMin(nums: number[]): number | undefined`
-- Finds and returns the minimum value in the rotated sorted array in O(log n) time.
-- Returns `undefined` if `nums` is empty (`nums.length === 0`).
+- Finds and returns the smallest value in the rotated sorted array in $O(\log n)$ time.
+- **Example**: `findMin([4, 5, 6, 7, 0, 1, 2])` $\to$ `0`.
+- **Edge Case**: Returns `undefined` if `nums` is empty (`nums.length === 0`).
 
 ### `searchRotated(nums: number[], target: number): number`
-- Searches for `target` in the rotated sorted array in O(log n) time.
-- Returns the 0-based index of `target` if found; otherwise returns `-1`.
+- Searches for `target` in the rotated sorted array in $O(\log n)$ time, returning its 0-based index (or `-1` if absent).
+- **Examples**:
+  - `searchRotated([4, 5, 6, 7, 0, 1, 2], 0)` $\to$ `4`
+  - `searchRotated([4, 5, 6, 7, 0, 1, 2], 3)` $\to$ `-1`

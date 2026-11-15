@@ -1,12 +1,12 @@
 Prevent needless re-renders using `React.memo` and stable callbacks:
 
-### Parent({ items, onListRender }: { items: string[]; onListRender?: () => void }): JSX.Element:
+### `Parent({ items, onListRender }: { items: string[]; onListRender?: () => void }): JSX.Element`
 - Has a counter button labelled `Count: N` (increments on click).
 - Shows `Selected: <item or none>`.
 - Renders `<List items={items} onSelect={...} onRender={onListRender} />`.
 - Clicking the counter or selecting an item must **not** re-render `List`; passing a new `items` array must.
 
-### List({ items, onSelect, onRender }: { items: string[]; onSelect: (item: string) => void; onRender?: () => void }): JSX.Element:
+### `List({ items, onSelect, onRender }: { items: string[]; onSelect: (item: string) => void; onRender?: () => void }): JSX.Element`
 - Wrapped in `React.memo`.
 - Renders a `<ul>` with one `<li>` per item string (clicking an `<li>` calls `onSelect(item)`).
 - Calls `onRender()` every time it renders.

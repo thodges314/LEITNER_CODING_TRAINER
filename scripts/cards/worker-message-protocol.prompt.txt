@@ -1,0 +1,49 @@
+Implement a correlated request/response RPC client over a Web Worker's `postMessage` channel:
+
+## Description
+
+Web Workers only expose fire-and-forget `postMessage` and `message` events. To call worker tasks with `async`/`await` (including concurrent in-flight requests, transferable buffers, timeouts, and clean teardown), a client must tag each outbound message with a unique correlation ID and resolve or reject the matching `Promise` when the worker responds.
+
+```ts
+interface WorkerLike {
+  postMessage(message: unknown, transfer?: Transferable[]): void;
+  addEventListener(type: 'message' | 'error', listener: (event: any) => void): void;
+  removeEventListener(type: 'message' | 'error', listener: (event: any) => void): void;
+  terminate?: () => void;
+}
+
+interface WorkerRequestOptions {
+  timeoutMs?: number;
+  transfer?: Transferable[];
+}
+
+interface WorkerClient {
+  request<TReq = unknown, TRes = unknown>(
+    type: string,
+    payload: TReq,
+    options?: WorkerRequestOptions
+  ): Promise<TRes>;
+  pendingCount(): number;
+  dispose(): void;
+}
+```
+
+### `createWorkerClient(worker: WorkerLike): WorkerClient`
+
+Wraps `worker` with correlated request/response handling:
+- **`request(type, payload, options?)`**:
+  - If already disposed, returns a rejected Promise (`new Error('Worker client disposed')`).
+  - Generates a unique string `id` and stores `{ resolve, reject, timer }` in a pending map.
+  - Calls `worker.postMessage({ id, type, payload }, options.transfer)` when `options?.transfer` is provided, or `worker.postMessage({ id, type, payload })` otherwise.
+  - If `options?.timeoutMs` is a positive finite number, rejects with `new Error('Worker request timed out')` and removes the pending entry if no response arrives in time.
+- **Response & Error Handling**:
+  - On `'message'` event with `event.data` matching a pending `id`:
+    - Clears any timeout timer and removes the pending entry.
+    - If `event.data.ok` is truthy, resolves with `event.data.result`.
+    - Otherwise rejects with `new Error(event.data.error ?? 'Worker error')`.
+  - On `'error'` event from `worker`:
+    - Rejects all currently pending requests with `new Error(event?.message || 'Worker error')` and clears their timers.
+- **`pendingCount(): number`** and **`dispose(): void`**:
+  - `pendingCount()` returns the number of in-flight requests.
+  - `dispose()` detaches `'message'` and `'error'` listeners, rejects any pending requests with `new Error('Worker client disposed')`, and clears all timers.
+

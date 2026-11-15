@@ -1,5 +1,7 @@
 Implement target-sum combination search algorithms using backtracking:
 
+{{include:backtracking-explanation.md}}
+
 ### `combinationSum(candidates: number[], target: number): number[][]`
 - Finds all unique combinations of distinct positive integers from `candidates` that sum to `target`.
 - The same candidate number may be chosen an unlimited number of times.

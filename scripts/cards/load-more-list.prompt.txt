@@ -11,7 +11,7 @@ interface LoadMoreListProps {
 }
 ```
 
-### LoadMoreList({ fetchPage }: LoadMoreListProps): JSX.Element
+### `LoadMoreList({ fetchPage }: LoadMoreListProps): JSX.Element`
 - `fetchPage(page)` returns a `Promise` resolving to `{ items: string[], hasMore: boolean }` (page indices start at `1`).
 - On initial mount, fetches page `1`.
 

@@ -12,7 +12,7 @@ function delay(ms: number): Promise<void>;
 function delayValue<T>(value: T, ms: number): Promise<T>;
 ```
 
-### delay(ms: number): Promise<void>
+### `delay(ms: number): Promise<void>`
 
 #### Requirements
 - If `ms` is greater than 0, schedule resolution after `ms` milliseconds using `setTimeout`.

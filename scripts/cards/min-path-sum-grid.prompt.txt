@@ -7,4 +7,4 @@ Implement minimum path sum dynamic programming algorithms on 2D structures:
 ### `minimumTotal(triangle: number[][]): number`
 - Calculates the minimum path sum from the top to the bottom of a numeric triangle array (where row `i` contains `i + 1` elements).
 - Each step moves to adjacent numbers on the row below (from column `j` to either `j` or `j + 1`).
-- Solvable bottom-up in O(n) auxiliary space.
+- Solvable bottom-up in $O(n)$ auxiliary space.

@@ -1,0 +1,30 @@
+Implement a dynamic resource hint injector that adds deduplicated `<link rel="preload">` and `<link rel="prefetch">` tags with priority hints to the document head:
+
+## Description
+
+Optimizing Largest Contentful Paint (LCP) and route transitions often requires dynamically injecting `<link rel="preload">` or `<link rel="prefetch">` hints for hero images, fonts, or upcoming route chunks—while avoiding duplicate tags and setting `crossOrigin` and `fetchpriority` attributes properly.
+
+```ts
+interface ResourceHint {
+  href: string;
+  rel?: 'preload' | 'prefetch';
+  as?: 'image' | 'script' | 'style' | 'font' | 'fetch';
+  fetchPriority?: 'high' | 'low' | 'auto';
+  crossOrigin?: 'anonymous' | 'use-credentials' | '';
+}
+```
+
+### `preloadResources(resources: ResourceHint[], targetHead?: HTMLElement): HTMLLinkElement[]`
+
+Injects `<link>` resource hint elements into `targetHead` (defaulting to `document.head`) and returns only the newly created `HTMLLinkElement` nodes:
+- **Deduplication**:
+  - Checks existing `<link>` elements inside `targetHead` as well as earlier items in the `resources` array.
+  - Skips any entry where a `<link>` with the same `rel` (default `'preload'`) and `href` attribute already exists in `targetHead`.
+- **Element Configuration**:
+  - Sets `rel` (defaults to `'preload'`) and `href` attributes.
+  - When `as` is provided, sets `link.as = as` (and `as` attribute).
+  - When `fetchPriority` is provided, sets `link.setAttribute('fetchpriority', fetchPriority)`.
+  - Sets `crossOrigin`: uses `resource.crossOrigin` if provided; otherwise, if `as === 'font'`, automatically sets `crossOrigin = 'anonymous'` (required by browsers for font preloads).
+- **DOM Insertion**:
+  - Appends each newly created `<link>` to `targetHead` in order and returns the array of newly inserted `HTMLLinkElement` elements.
+

@@ -2,7 +2,7 @@ Implement heap-based selection and simulation algorithms (include an internal bi
 
 ### `findKthLargest(nums: number[], k: number): number`
 - Finds the `k`-th largest element in an unsorted array `nums` (duplicate values count as separate ranks).
-- Solved in O(n log k) time by maintaining a min-heap capped at size `k`.
+- Solved in $O(n \log k)$ time by maintaining a min-heap capped at size `k`.
 
 ### `KthLargest`
 - **`constructor(k: number, nums: number[])`**: Initializes the data structure to track the `k`-th largest element given an initial array `nums`.

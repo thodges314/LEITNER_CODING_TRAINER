@@ -7,8 +7,8 @@
 
 ## 1. Current State (Snapshot)
 
-- **Curriculum:** **432 cards** across **17 tracks** with **2,727 documented test cases** and **100% dual JS/TS reference solutions** (`432 / 432`).
-- **Verification:** **2,715 Vitest unit tests** (74 test files) and **924 Playwright E2E tests** (17 spec files).
+- **Curriculum:** **444 cards** across **17 tracks** with **2,775 documented test cases** and **100% dual JS/TS reference solutions** (`444 / 444`).
+- **Verification:** **2,813 Vitest unit tests** (75 test files) and **956 Playwright E2E tests** (17 spec files).
 - **Bundle & Startup:** Initial Catalog boot is **`432.1 KB` gzip** (`1,459.2 KB` raw), with [`PracticeArena`](src/components/PracticeArena.tsx) and the next card's track payload prefetched in the background during browser idle time.
 - **Persistence:** Zero backend; user progress, settings, custom decks, interview dossiers, and AI keys (multi-key vault) live in `localStorage` via [`src/lib/storage.ts`](src/lib/storage.ts) and [`src/lib/leitner.ts`](src/lib/leitner.ts). `slimForStorage()` strips heavy card payloads before writing to `localStorage`.
 
@@ -20,7 +20,7 @@
 - **Entry & Shell:** [`src/App.tsx`](src/App.tsx) (lazy-loads all 9 secondary modals + `PracticeArena` with idle prefetch, hydrates per-track content before mounting Practice), [`src/main.tsx`](src/main.tsx).
 - **Design System & Colors:** [`src/styles/colors.ts`](src/styles/colors.ts), [`src/styles/colors.css`](src/styles/colors.css), [`src/styles/components/`](src/styles/components/) (`deck-dashboard.css`, `deck-selector.css`, `interview-prep.css`, `deck-editor.css`, `popovers.css`, etc.).
 - **Data & Lazy Track Payloads (`src/data/`):**
-  - [`topicsMeta.json`](src/data/topicsMeta.json): Lightweight 432-card metadata loaded synchronously at boot.
+  - [`topicsMeta.json`](src/data/topicsMeta.json): Lightweight 444-card metadata loaded synchronously at boot.
   - `src/data/tracks/<track>.json`: 17 per-track chunks containing heavy card fields (`promptSeed`, `testHarness`, `testCases`, `referenceSolution`, `referenceSolutionTs`, `previewCode`, `complexityExplanation`), loaded on demand by [`src/lib/trackContentLoader.ts`](src/lib/trackContentLoader.ts).
   - [`catalogIndex.json`](src/data/catalogIndex.json): Compact catalog summary used by AI Interview Prep & dossier printing.
   - [`topics.json`](src/data/topics.json): Complete combined seed dataset kept for Node/Vitest reference-solution verification and authoring scripts (not bundled into the browser app).
@@ -30,12 +30,12 @@
   - AI & Interview Prep: [`ai.ts`](src/lib/ai.ts), [`aiProviders.ts`](src/lib/aiProviders.ts), [`aiPrompts.ts`](src/lib/aiPrompts.ts), [`modelDiscovery.ts`](src/lib/modelDiscovery.ts), [`interviewPrep.ts`](src/lib/interviewPrep.ts), [`dossierStorage.ts`](src/lib/dossierStorage.ts), [`printDossier.ts`](src/lib/printDossier.ts).
 - **UI & Hooks (`src/components/`, `src/hooks/`, `src/utils/`):**
   - Dashboard & Catalog: [`DeckDashboard.tsx`](src/components/DeckDashboard.tsx), [`DeckStatsWidget.tsx`](src/components/DeckStatsWidget.tsx), [`ActivityView.tsx`](src/components/ActivityView.tsx), [`src/components/dashboard/`](src/components/dashboard/) (`DeckSelector.tsx`, `DeckEditorModal.tsx`, `InterviewPrepModal.tsx`, `RemoveFromDeckModal.tsx`).
-  - Practice Arena: [`PracticeArena.tsx`](src/components/PracticeArena.tsx), [`LivePreview.tsx`](src/components/LivePreview.tsx), [`src/components/practice/`](src/components/practice/), [`src/components/evaluation/`](src/components/evaluation/), [`src/hooks/`](src/hooks/) (`usePracticeCodeExecution.ts`, `useTimedPractice.ts`, `useLegacyComponentPopup.ts`, `useCodeMirrorLanguage.ts`, `usePreviewProps.ts`).
+  - Practice Arena: [`PracticeArena.tsx`](src/components/PracticeArena.tsx), [`LivePreview.tsx`](src/components/LivePreview.tsx), [`MarkdownContent.tsx`](src/components/MarkdownContent.tsx), [`ArrayTraceBlock.tsx`](src/components/ArrayTraceBlock.tsx), [`LinkedListBlock.tsx`](src/components/LinkedListBlock.tsx), [`GridBoardBlock.tsx`](src/components/GridBoardBlock.tsx), [`DecisionTreeBlock.tsx`](src/components/DecisionTreeBlock.tsx), [`src/components/practice/`](src/components/practice/), [`src/components/evaluation/`](src/components/evaluation/), [`src/hooks/`](src/hooks/) (`usePracticeCodeExecution.ts`, `useTimedPractice.ts`, `useLegacyComponentPopup.ts`, `useCodeMirrorLanguage.ts`, `usePreviewProps.ts`).
   - Settings: [`SettingsModal.tsx`](src/components/SettingsModal.tsx) + [`src/components/settings/`](src/components/settings/).
   - TypeScript Sandbox: [`src/utils/typeChecker.ts`](src/utils/typeChecker.ts), [`sandboxD3Types.ts`](src/utils/sandboxD3Types.ts), [`sandboxNextTypes.ts`](src/utils/sandboxNextTypes.ts), [`nextSandbox.ts`](src/utils/nextSandbox.ts), [`cardPromptTypes.ts`](src/utils/cardPromptTypes.ts).
 
 ### Card Authoring & Scripts (`scripts/`)
-- Card sources live in `scripts/cards/` (`<id>.{meta.json,prompt.txt,ref.js,ref.ts,harness.js,extra.js,preview.js}`), contract test cases in `scripts/testcases/part*.mjs`, difficulty ladders in `scripts/difficulty.json`, and optional packs in `scripts/packs.json`.
+- Card sources live in `scripts/cards/` (`<id>.{meta.json,prompt.txt,ref.js,ref.ts,harness.js,extra.js,preview.js}`), reusable prompt partials live in `scripts/cards/partials/` (included via `{{include:<filename>.md}}`), contract test cases in `scripts/testcases/part*.mjs`, difficulty ladders in `scripts/difficulty.json`, and optional packs in `scripts/packs.json`.
 - `npm run build:cards` ([`scripts/build-cards.mjs`](scripts/build-cards.mjs)) compiles `topics.json`, `topicsMeta.json`, `src/data/tracks/*.json`, and `catalogIndex.json`.
 - `npm run check:cards` verifies all generated JSON artifacts match source files without writing.
 

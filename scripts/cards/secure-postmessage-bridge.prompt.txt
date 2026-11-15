@@ -1,0 +1,50 @@
+Implement a secure cross-window `postMessage` bridge that enforces strict origin verification, optional source identity checks, and channel scoping:
+
+## Description
+
+Embedded iframes, OAuth popups, and payment widgets communicate across window boundaries via `window.postMessage`. Accepting unverified messages lets any third-party frame spoof commands. A secure bridge pins `targetOrigin` on outbound calls, validates `event.origin` against an explicit allowlist on inbound events, and scopes messages to a dedicated channel identifier.
+
+```ts
+interface PostMessageTarget {
+  postMessage(message: unknown, targetOrigin: string): void;
+}
+
+interface PostMessageReceiver {
+  addEventListener(type: 'message', listener: (event: MessageEvent) => void): void;
+  removeEventListener(type: 'message', listener: (event: MessageEvent) => void): void;
+}
+
+interface SecureBridgeOptions {
+  targetWindow: PostMessageTarget;
+  listenWindow?: PostMessageReceiver;
+  targetOrigin: string;
+  allowedOrigins: string[];
+  channel?: string;
+  requireSourceMatch?: boolean;
+  onMessage?: (type: string, payload: unknown, origin: string) => void;
+}
+
+interface SecureBridge {
+  send(type: string, payload?: unknown): void;
+  destroy(): void;
+  getChannel(): string;
+}
+```
+
+### `createSecureBridge(options: SecureBridgeOptions): SecureBridge`
+
+Creates a channel-scoped, origin-checked `postMessage` bridge:
+- **Channel Initialization**:
+  - Uses `options.channel` if provided, otherwise generates a unique channel token via `crypto.randomUUID()` (with a random string fallback).
+  - Attaches a `'message'` listener to `options.listenWindow ?? window`.
+- **Outbound (`send(type, payload?)`)**:
+  - If not destroyed, calls `targetWindow.postMessage({ __channel: channel, type, payload }, targetOrigin)`.
+  - No-op after `destroy()`.
+- **Inbound Verification**:
+  - Ignores any `MessageEvent` whose `event.origin` is not in `allowedOrigins` (never trust `'*'` or substring matches).
+  - If `requireSourceMatch` is `true`, ignores events where `event.source !== targetWindow`.
+  - Ignores events whose `data` is not an object with `__channel === channel` and a string `type`.
+  - For verified messages, invokes `onMessage?.(event.data.type, event.data.payload, event.origin)`.
+- **Cleanup (`destroy()`)**:
+  - Removes the `'message'` listener from `listenWindow` and disables further `send()` calls.
+

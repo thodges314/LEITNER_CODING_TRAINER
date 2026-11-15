@@ -204,12 +204,12 @@ export interface LeitnerDeckState {
 export const STORAGE_KEY = STORAGE_KEYS.DECK;
 
 /**
- * Specifies whether a card authors and renders a React component UI
- * (backed by explicit build annotation card.rendersComponent and/or card.previewCode).
+ * Specifies whether a card authors and renders a UI preview
+ * (backed by explicit build annotation card.rendersComponent, card.previewCode, or HTML input).
  */
 export function isReactComponentCard(card?: TopicItem | null): boolean {
   if (!card) return false;
-  return Boolean(card.rendersComponent || card.previewCode);
+  return Boolean(card.rendersComponent || card.previewCode || isHtmlCard(card));
 }
 
 export function setEnabledPacks(state: LeitnerDeckState, packs: string[]): LeitnerDeckState {

@@ -1,0 +1,13 @@
+{
+  "title": "Long Task Yielding (scheduler.yield)",
+  "track": "async-js",
+  "tags": [
+    "async",
+    "performance",
+    "inp",
+    "scheduling",
+    "abort-signal"
+  ],
+  "requiresDom": false
+}
+

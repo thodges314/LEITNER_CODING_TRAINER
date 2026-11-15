@@ -18,7 +18,7 @@ export interface ComboboxProps {
 }
 ```
 
-### AccessibleCombobox({ id, label, options, onSelect, placeholder }: ComboboxProps): JSX.Element
+### `AccessibleCombobox({ id, label, options, onSelect, placeholder }: ComboboxProps): JSX.Element`
 - **ARIA Structure & Semantics**:
   - Renders a `<label htmlFor={id}>` containing `label`.
   - Input attributes:

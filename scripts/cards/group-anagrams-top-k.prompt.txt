@@ -1,10 +1,14 @@
 Implement grouping and frequency ranking algorithms using hash maps:
 
 ### `groupAnagrams(words: string[]): string[][]`
-- Groups an array of strings into an array of anagram clusters (arrays of words that contain the same characters with identical frequencies).
-- Preserves the order in which groups first appear and the original relative order of words within each group.
-- Returns `[]` for an empty input.
+Two words are **anagrams** if they contain the exact same characters in the same counts (just rearranged, like `'eat'` and `'tea'`). Group `words` into subarrays of anagrams.
+- Preserve the order in which each group first appears and the original relative order of words inside each group.
+- **Example**: `groupAnagrams(['eat', 'tea', 'tan', 'ate', 'nat', 'bat'])` $\to$ `[['eat', 'tea', 'ate'], ['tan', 'nat'], ['bat']]`.
+- **Edge Case**: Returns `[]` for an empty input.
 
 ### `topKFrequent(nums: number[], k: number): number[]`
-- Returns the `k` most frequent elements in `nums`, ordered from most frequent to least frequent.
-- Breaks frequency ties by choosing the smaller numeric value first (`a < b`).
+Given an integer array `nums` and an integer `k`, return the `k` most frequent numbers ordered from **most frequent to least frequent**.
+- **Tie-Breaking**: If two numbers appear the same number of times, place the smaller numeric value first (`a < b`).
+- **Examples**:
+  - `topKFrequent([1, 1, 1, 2, 2, 3], 2)` $\to$ `[1, 2]` (`1` appears 3 times, `2` appears 2 times).
+  - `topKFrequent([4, 4, 1, 1, 2], 2)` $\to$ `[1, 4]` (both appear twice, so smaller `1` comes before `4`).

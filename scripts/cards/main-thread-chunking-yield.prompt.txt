@@ -1,0 +1,30 @@
+Implement a time-sliced array processor that yields back to the main thread when a frame budget is exceeded:
+
+## Description
+
+To keep Interaction to Next Paint (INP) responsive during heavy synchronous work (parsing, indexing, filtering large datasets), long tasks must periodically yield to the browser's event loop so user input and paint frames are not blocked.
+
+```ts
+interface ChunkOptions {
+  budgetMs?: number;
+  yieldToMain?: () => Promise<void>;
+  now?: () => number;
+  signal?: AbortSignal;
+}
+```
+
+### `processInChunks<T, R>(items: T[], worker: (item: T, index: number) => R, options?: ChunkOptions): Promise<R[]>`
+
+Processes every item in `items` in order, yielding to the main thread whenever the current time slice reaches `budgetMs`:
+- **Defaults**:
+  - `budgetMs` defaults to `16` ms.
+  - `now` defaults to `() => performance.now()`.
+  - `yieldToMain` defaults to calling `scheduler.yield()` when `globalThis.scheduler?.yield` is available, falling back to `new Promise((resolve) => setTimeout(resolve, 0))`.
+- **Time-Slicing**:
+  - Records `sliceStart = now()` at the start of each slice.
+  - Calls `worker(items[i], i)` for each item and collects the returned values in order.
+  - After processing item `i`, if more items remain (`i < items.length - 1`) and `now() - sliceStart >= budgetMs`, awaits `yieldToMain()` and resets `sliceStart = now()`.
+  - Does not yield unnecessarily after the final item.
+- **Cancellation**:
+  - If `options?.signal?.aborted` is `true` before starting or immediately after resuming from a yield, throws/rejects with `signal.reason ?? new Error('Aborted')`.
+

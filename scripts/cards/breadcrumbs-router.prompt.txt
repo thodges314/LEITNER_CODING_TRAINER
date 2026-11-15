@@ -7,7 +7,7 @@ interface BreadcrumbsProps {
 
 Implement an accessible React breadcrumb navigation component:
 
-### Breadcrumbs({ pathname, labels = {} }: BreadcrumbsProps): JSX.Element
+### `Breadcrumbs({ pathname, labels = {} }: BreadcrumbsProps): JSX.Element`
 - Normalizes consecutive or trailing slashes in `pathname` (e.g. `'/products/123/'` -> segments `['products', '123']`).
 - Always includes a root crumb `{ path: '/', label: labels['/'] || 'Home' }`.
 - For each subpath segment, constructs the cumulative route path (e.g. `'/products'`, `'/products/123'`).

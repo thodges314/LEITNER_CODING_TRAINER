@@ -1,5 +1,44 @@
 Implement grid word-search backtracking on a 2D board of single-character strings:
 
+{{include:backtracking-explanation.md}}
+
+```grid-board
+{
+  "title": "Example Board (exist(board, 'ABCCED') -> true)",
+  "boards": [
+    {
+      "caption": "Valid path 1→2→3→4→5→6 (horizontally/vertically adjacent, no cell reused):",
+      "grid": [
+        ["A", "B", "C", "E"],
+        ["S", "F", "C", "S"],
+        ["A", "D", "E", "E"]
+      ],
+      "highlights": [
+        { "row": 0, "col": 0, "state": "start", "step": 1 },
+        { "row": 0, "col": 1, "state": "path", "step": 2 },
+        { "row": 0, "col": 2, "state": "path", "step": 3 },
+        { "row": 1, "col": 2, "state": "path", "step": 4 },
+        { "row": 2, "col": 2, "state": "path", "step": 5 },
+        { "row": 2, "col": 1, "state": "end", "step": 6 }
+      ]
+    },
+    {
+      "caption": "Why 'ABCB' fails: after A→B→C, cell (0,1) 'B' is already visited:",
+      "grid": [
+        ["A", "B", "C", "E"],
+        ["S", "F", "C", "S"],
+        ["A", "D", "E", "E"]
+      ],
+      "highlights": [
+        { "row": 0, "col": 0, "state": "start", "step": 1 },
+        { "row": 0, "col": 1, "state": "blocked", "step": 2 },
+        { "row": 0, "col": 2, "state": "path", "step": 3 }
+      ]
+    }
+  ]
+}
+```
+
 ### `exist(board: string[][], word: string): boolean`
 - Checks whether `word` exists in the grid.
 - The word can be constructed from letters of sequentially adjacent cells (horizontally or vertically neighboring).

@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement classic binary tree and BST algorithms on nodes shaped `{ val, left, right }`:
 
 ### `isValidBST(root: TreeNode<number> | null, lo?: number, hi?: number): boolean`

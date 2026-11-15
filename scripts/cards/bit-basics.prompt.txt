@@ -2,7 +2,7 @@ Implement essential bitwise operations using bit manipulation:
 
 ### `singleNumber(nums: number[]): number`
 - In an array where every integer appears twice except for one, finds and returns the single unpaired integer.
-- Operates in O(n) time and O(1) auxiliary space using the bitwise XOR (`^`) operator.
+- Operates in $O(n)$ time and $O(1)$ auxiliary space using the bitwise XOR (`^`) operator.
 
 ### `countOneBits(n: number): number`
 - Calculates the Hamming weight (number of set `1` bits) in the binary representation of a non-negative integer `n` (up to 2^32 - 1).
@@ -12,4 +12,4 @@ Implement essential bitwise operations using bit manipulation:
 ### `isPowerOfTwo(n: number): boolean`
 - Determines whether integer `n` is a power of two (`1, 2, 4, 8, ...`).
 - Returns `false` for `0` and negative numbers.
-- Must execute in O(1) time using a bitwise test without loops or `Math.log`.
+- Must execute in $O(1)$ time using a bitwise test without loops or `Math.log`.

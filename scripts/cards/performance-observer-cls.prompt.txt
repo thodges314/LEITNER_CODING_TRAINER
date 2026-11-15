@@ -1,0 +1,46 @@
+Implement a Cumulative Layout Shift (CLS) tracker using the Core Web Vitals session-window algorithm and `PerformanceObserver`:
+
+## Description
+
+Cumulative Layout Shift (CLS) measures visual stability. Instead of summing every layout shift over an entire page lifetime, Core Web Vitals defines CLS as the **maximum session window** of layout shifts—where shifts belong to the same window if they occur within 1 second of the previous shift and within 5 seconds of the window's start—excluding shifts caused by recent user input (`hadRecentInput`):
+
+$$\text{CLS} = \max_{W} \sum_{e \in W} \text{value}(e) \quad \text{subject to} \quad t_i - t_{i-1} < 1000\text{ ms},\;\; t_i - t_0 \le 5000\text{ ms}$$
+
+```ts
+interface LayoutShiftEntry {
+  value: number;
+  startTime: number;
+  hadRecentInput: boolean;
+}
+
+interface ClsTrackerOptions {
+  onUpdate?: (cls: number) => void;
+}
+
+interface ClsTracker {
+  recordEntry(entry: LayoutShiftEntry): number;
+  startObserving(ObserverCtor?: typeof PerformanceObserver): () => void;
+  getCls(): number;
+  reset(): void;
+}
+```
+
+### `createClsTracker(options?: ClsTrackerOptions): ClsTracker`
+
+Creates a CLS aggregator implementing the session-window specification:
+- **`recordEntry(entry: LayoutShiftEntry): number`**:
+  - Ignores entries where `entry.hadRecentInput` is `true` (returns current CLS unchanged).
+  - If an active session window exists and `entry.startTime - lastEntryTime < 1000` and `entry.startTime - windowStartTime <= 5000`:
+    - Adds `entry.value` to the current window total and updates `lastEntryTime = entry.startTime`.
+  - Otherwise, starts a new session window with `windowStartTime = entry.startTime`, `lastEntryTime = entry.startTime`, and `windowValue = entry.value`.
+  - Updates `maxCls = Math.max(maxCls, windowValue)`.
+  - If `maxCls` increased, invokes `options?.onUpdate?.(maxCls)`.
+  - Returns the current `maxCls`.
+- **`startObserving(ObserverCtor?: typeof PerformanceObserver): () => void`**:
+  - Instantiates `ObserverCtor ?? PerformanceObserver` (if available) to call `recordEntry` for each entry in `list.getEntries()`.
+  - Calls `observer.observe({ type: 'layout-shift', buffered: true })`.
+  - Returns a cleanup function that calls `observer.disconnect()`.
+- **`getCls(): number`** and **`reset(): void`**:
+  - `getCls()` returns the highest session-window CLS score observed so far.
+  - `reset()` clears the active window and resets `maxCls` to `0`.
+

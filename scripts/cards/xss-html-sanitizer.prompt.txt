@@ -1,0 +1,28 @@
+Implement an allowlist-based HTML sanitizer using `DOMParser` to strip XSS vectors while preserving safe markup:
+
+## Description
+
+Rendering user-generated HTML with `innerHTML` or `dangerouslySetInnerHTML` exposes applications to Cross-Site Scripting (XSS) via `<script>` tags, `<iframe>` embeds, inline `on*` event handlers, and `javascript:` URIs. Using `DOMParser` to parse untrusted markup into an inert document allows safe DOM-tree traversal and allowlist filtering.
+
+### `sanitizeHtml(dirtyHtml: string): string`
+
+Parses `dirtyHtml` with `new DOMParser().parseFromString(dirtyHtml, 'text/html')` and returns sanitized `body.innerHTML`:
+
+> [!NOTE]
+> `ALLOWED_TAGS: Set<string>` and `DROP_TAGS: Set<string>` (uppercase tag names) are preloaded in scope so you do not need to type out the tag lists:
+> - `ALLOWED_TAGS`: `A`, `B`, `BLOCKQUOTE`, `BR`, `CODE`, `DIV`, `EM`, `H1`–`H6`, `I`, `LI`, `OL`, `P`, `PRE`, `SPAN`, `STRONG`, `UL`
+> - `DROP_TAGS`: `SCRIPT`, `STYLE`, `IFRAME`, `OBJECT`, `EMBED`, `NOSCRIPT`, `TEMPLATE`, `SVG`, `MATH`
+
+- **Element Filtering**:
+  - Completely removes any element whose uppercase `tagName` is in `DROP_TAGS` (including its contents).
+  - Preserves elements in `ALLOWED_TAGS`.
+  - Unwraps any other non-allowlisted elements (replacing the element with its sanitized child nodes).
+- **Attribute Filtering**:
+  - Strips all `on*` event handler attributes (e.g., `onclick`, `onerror`, `onload`) and `style`.
+  - Keeps only safe attributes: `title` and `class` on any allowlisted element, plus `href`, `target`, and `rel` on `<a>` elements.
+- **URL Protocol Safety (`href`)**:
+  - Strips control characters and whitespace when inspecting the scheme (catching obfuscated payloads like `java\nscript:`).
+  - Allows only `http:`, `https:`, `mailto:`, or relative paths (`/`, `#`, `?`, or paths without a scheme).
+  - Removes `href` if it uses `javascript:`, `vbscript:`, `data:`, or any other disallowed scheme.
+  - On `<a target="_blank">`, sets `rel="noopener noreferrer"`.
+

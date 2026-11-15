@@ -1,4 +1,4 @@
-Implement set operations on arrays using JavaScript `Set` in O(n + m) time:
+Implement set operations on arrays using JavaScript `Set` in $O(n + m)$ time:
 
 ### `arrayIntersection<T>(a: T[], b: T[]): T[]`
 - Returns an array of unique elements present in both `a` and `b`.

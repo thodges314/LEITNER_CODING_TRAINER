@@ -27,8 +27,11 @@ Instantiates a token-bucket rate limiter with the following parameters and behav
   - `refillRate`: Number of tokens added to the bucket per second (floating-point rate).
   - `initialTokens`: Initial number of tokens present in the bucket (defaults to `capacity` if omitted).
 - **Continuous Refill**:
-  - Refills tokens continuously based on elapsed time since the last calculation: `added = (now - lastRefill) * (refillRate / 1000)`.
-  - Available tokens can never exceed `capacity`.
+  - Refills tokens continuously based on elapsed time since the last calculation (capped at capacity $C$, with refill rate $r$ tokens/sec):
+
+$$T(t) = \min\!\left(C,\; T(t_0) + \frac{(t - t_0) \cdot r}{1000}\right)$$
+
+  - Equivalently: `added = (now - lastRefill) * (refillRate / 1000)`. Available tokens can never exceed `capacity`.
 - **`tryAcquire(tokens = 1): boolean`**:
   - Checks if at least `tokens` are available in the bucket without waiting.
   - If enough tokens exist and no pending `acquire` requests are waiting in the queue, decrements available tokens and returns `true`.

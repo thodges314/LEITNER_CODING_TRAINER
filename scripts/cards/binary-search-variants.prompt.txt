@@ -1,6 +1,8 @@
-Implement binary search algorithms in O(log n) time on sorted arrays:
+Implement binary search algorithms in $O(\log n)$ time on sorted arrays:
 
 ### `binarySearch(sorted: number[], target: number): number`
+{{include:binary-search-explanation.md}}
+
 - Searches for `target` in an ascending sorted array.
 - Returns the 0-based index if `target` is present; otherwise returns `-1`.
 
@@ -8,7 +10,15 @@ Implement binary search algorithms in O(log n) time on sorted arrays:
 - Returns the first index `i` such that `sorted[i] >= target`.
 - Returns `sorted.length` if no such element exists.
 - Correctly handles duplicate elements.
+- **Examples**:
+  - `lowerBound([1, 2, 2, 2, 5], 2)` $\to$ `1` (first `2` is at index `1`)
+  - `lowerBound([1, 3, 5, 7], 4)` $\to$ `2` (first element $\ge 4$ is `5` at index `2`)
+  - `lowerBound([1, 3, 5], 10)` $\to$ `3` (`sorted.length`)
 
 ### `mySqrt(x: number): number`
 - Computes and returns the floor of the square root ($\lfloor\sqrt{x}\rfloor$) for a non-negative integer `x`.
 - Must use binary search without calling `Math.sqrt`.
+- **Examples**:
+  - `mySqrt(8)` $\to$ `2` ($\sqrt{8} \approx 2.828$, floored to `2`)
+  - `mySqrt(16)` $\to$ `4`
+  - `mySqrt(0)` $\to$ `0`

@@ -13,7 +13,7 @@ interface PopoverProps {
 
 Build an accessible, anchored popover component with configurable placement and outside-click dismissal:
 
-### Popover({ trigger, content, placement = 'bottom', isOpen: controlledIsOpen, onToggle, title }: PopoverProps): JSX.Element
+### `Popover({ trigger, content, placement = 'bottom', isOpen: controlledIsOpen, onToggle, title }: PopoverProps): JSX.Element`
 - **Trigger Element**:
   - Render a container wrapping the trigger button.
   - The trigger element must have `aria-haspopup="dialog"` and `aria-expanded={isOpen}`.

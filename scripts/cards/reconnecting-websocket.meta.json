@@ -1,0 +1,13 @@
+{
+  "title": "Resilient Reconnecting WebSocket Client",
+  "track": "async-js",
+  "tags": [
+    "async",
+    "websockets",
+    "realtime",
+    "backoff",
+    "resilience"
+  ],
+  "requiresDom": false
+}
+

@@ -1,9 +1,18 @@
+```ts
+interface ListNode<T = any> {
+  val: T;
+  next: ListNode<T> | null;
+}
+```
+
 Implement multi-way merge and spatial selection algorithms (include an internal binary heap helper; list nodes are shaped `{ val, next }`):
 
 ### `mergeKLists(lists: (ListNode<number> | null)[]): ListNode<number> | null`
 - Merges `k` sorted linked lists into a single sorted linked list using a min-heap of current node heads.
 - Individual list entries may be `null`.
 - Returns `null` if all lists are empty or `lists` is empty.
+
+{{include:linked-list-explanation.md}}
 
 ### `mergeKSortedArrays(arrays: number[][]): number[]`
 - Merges `k` sorted number arrays into one flat sorted array using a min-heap.

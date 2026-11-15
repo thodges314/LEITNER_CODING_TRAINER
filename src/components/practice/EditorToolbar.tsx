@@ -110,7 +110,6 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
   onSubmit,
   isEvaluating,
   isRunning,
-  code,
   isReinforcement,
 }) => {
   const isHtml = inputLanguage === 'html';
@@ -215,7 +214,7 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
                 type="button"
                 className="btn btn-secondary arena-controls-btn-run"
                 onClick={onRunCode}
-                disabled={!code.trim() || isEvaluating || isRunning}
+                disabled={isEvaluating || isRunning}
                 {...shortcutAttrs('run')}
               >
                 {isRunning ? (
@@ -234,7 +233,7 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
                 type="button"
                 className="btn btn-primary arena-controls-btn-submit"
                 onClick={onSubmit}
-                disabled={isEvaluating || isRunning || !code.trim()}
+                disabled={isEvaluating || isRunning}
                 {...shortcutAttrs('submit')}
               >
                 {isEvaluating ? (

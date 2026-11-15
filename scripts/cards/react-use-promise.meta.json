@@ -1,0 +1,15 @@
+{
+  "track": "react",
+  "title": "React 19 Async Data with use() and Suspense",
+  "tags": [
+    "react19",
+    "use",
+    "suspense",
+    "async",
+    "promises"
+  ],
+  "previewLibraries": [
+    "react"
+  ]
+}
+

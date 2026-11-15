@@ -32,7 +32,7 @@ declare function recordAuditLog(entry: AuditLogRecord): Promise<void>;
 declare function after(task: (() => void | Promise<void>) | Promise<any>): void;
 ```
 
-### POST(request: Request): Promise<NextResponse>
+### `POST(request: Request): Promise<NextResponse>`
 
 #### Requirements
 1. **Request Body Parsing & Validation**:

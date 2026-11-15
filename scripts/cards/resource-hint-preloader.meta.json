@@ -1,0 +1,13 @@
+{
+  "title": "Dynamic Resource Preloader & Priority Hint",
+  "track": "dom-browser",
+  "tags": [
+    "dom",
+    "performance",
+    "lcp",
+    "preload",
+    "hints"
+  ],
+  "requiresDom": true
+}
+

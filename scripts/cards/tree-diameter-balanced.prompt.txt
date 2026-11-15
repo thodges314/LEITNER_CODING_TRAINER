@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement structural binary tree algorithms on nodes shaped `{ val, left, right }`:
 
 ### `diameterOfBinaryTree(root: TreeNode<number> | null): number`
@@ -7,7 +15,7 @@ Implement structural binary tree algorithms on nodes shaped `{ val, left, right 
 
 ### `isBalanced(root: TreeNode<number> | null): boolean`
 - Determines whether the tree is height-balanced (for every node, left and right subtree heights differ by at most 1).
-- Operates in a single O(n) bottom-up pass.
+- Operates in a single $O(n)$ bottom-up pass.
 - Returns `true` for a balanced tree (or empty tree); returns `false` otherwise.
 
 ### `isSymmetric(root: TreeNode<number> | null): boolean`

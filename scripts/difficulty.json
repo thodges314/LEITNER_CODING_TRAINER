@@ -1726,5 +1726,53 @@
   "tailwind-theme-card": {
     "difficulty": 2,
     "concept": "tailwind-theme"
+  },
+  "sse-stream-parser": {
+    "difficulty": 3,
+    "concept": "streams"
+  },
+  "websocket-heartbeat-monitor": {
+    "difficulty": 2,
+    "concept": "websockets"
+  },
+  "reconnecting-websocket": {
+    "difficulty": 4,
+    "concept": "websockets"
+  },
+  "main-thread-chunking-yield": {
+    "difficulty": 3,
+    "concept": "scheduling"
+  },
+  "performance-observer-cls": {
+    "difficulty": 3,
+    "concept": "performance"
+  },
+  "resource-hint-preloader": {
+    "difficulty": 2,
+    "concept": "performance"
+  },
+  "xss-html-sanitizer": {
+    "difficulty": 3,
+    "concept": "security"
+  },
+  "secure-postmessage-bridge": {
+    "difficulty": 3,
+    "concept": "security"
+  },
+  "worker-message-protocol": {
+    "difficulty": 3,
+    "concept": "messaging"
+  },
+  "offline-mutation-replay": {
+    "difficulty": 3,
+    "concept": "offline"
+  },
+  "promisified-indexeddb": {
+    "difficulty": 4,
+    "concept": "offline"
+  },
+  "react-use-promise": {
+    "difficulty": 2,
+    "concept": "react19"
   }
 }

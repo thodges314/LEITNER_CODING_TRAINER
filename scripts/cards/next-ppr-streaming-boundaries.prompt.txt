@@ -33,7 +33,7 @@ interface ProductPPRPageProps {
 }
 ```
 
-### ProductPPRPage(props: ProductPPRPageProps): React.ReactElement
+### `ProductPPRPage(props: ProductPPRPageProps): React.ReactElement`
 
 #### Requirements
 1. **App Router Page Boundary Declaration**:

@@ -1,7 +1,8 @@
-Implement fixed-size sliding window summation in O(n) time:
+Implement fixed-size subarray summation in $O(n)$ time and $O(1)$ space:
 
 ### `maxSubarraySum(arr: number[], k: number): number | null`
-- Computes the maximum sum among all contiguous subarrays of length `k`.
-- Operates in O(n) time complexity using a sliding window.
-- Correctly handles negative numbers.
-- If `k > arr.length` or `arr.length === 0`, returns `null`.
+Given an array of numbers `arr` and a window size `k`, find the **largest sum of any `k` consecutive elements** in `arr`.
+- **Examples**:
+  - `maxSubarraySum([2, 1, 5, 1, 3, 2], 3)` $\to$ `9` (subarray `[5, 1, 3]`).
+  - `maxSubarraySum([-4, -2, -1, -3], 2)` $\to$ `-3` (subarray `[-2, -1]`, handles all-negative arrays).
+- **Edge Cases**: If `k <= 0`, `k > arr.length`, or `arr.length === 0`, returns `null`.
