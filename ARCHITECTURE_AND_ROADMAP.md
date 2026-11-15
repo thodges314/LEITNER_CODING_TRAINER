@@ -8,7 +8,7 @@
 ## 1. Current State (Snapshot)
 
 - **Curriculum:** **444 cards** across **17 tracks** with **2,775 documented test cases** and **100% dual JS/TS reference solutions** (`444 / 444`).
-- **Verification:** **2,810 Vitest unit tests** (75 test files) and **956 Playwright E2E tests** (17 spec files).
+- **Verification:** **2,813 Vitest unit tests** (75 test files) and **956 Playwright E2E tests** (17 spec files).
 - **Bundle & Startup:** Initial Catalog boot is **`432.1 KB` gzip** (`1,459.2 KB` raw), with [`PracticeArena`](src/components/PracticeArena.tsx) and the next card's track payload prefetched in the background during browser idle time.
 - **Persistence:** Zero backend; user progress, settings, custom decks, interview dossiers, and AI keys (multi-key vault) live in `localStorage` via [`src/lib/storage.ts`](src/lib/storage.ts) and [`src/lib/leitner.ts`](src/lib/leitner.ts). `slimForStorage()` strips heavy card payloads before writing to `localStorage`.
 
@@ -30,7 +30,7 @@
   - AI & Interview Prep: [`ai.ts`](src/lib/ai.ts), [`aiProviders.ts`](src/lib/aiProviders.ts), [`aiPrompts.ts`](src/lib/aiPrompts.ts), [`modelDiscovery.ts`](src/lib/modelDiscovery.ts), [`interviewPrep.ts`](src/lib/interviewPrep.ts), [`dossierStorage.ts`](src/lib/dossierStorage.ts), [`printDossier.ts`](src/lib/printDossier.ts).
 - **UI & Hooks (`src/components/`, `src/hooks/`, `src/utils/`):**
   - Dashboard & Catalog: [`DeckDashboard.tsx`](src/components/DeckDashboard.tsx), [`DeckStatsWidget.tsx`](src/components/DeckStatsWidget.tsx), [`ActivityView.tsx`](src/components/ActivityView.tsx), [`src/components/dashboard/`](src/components/dashboard/) (`DeckSelector.tsx`, `DeckEditorModal.tsx`, `InterviewPrepModal.tsx`, `RemoveFromDeckModal.tsx`).
-  - Practice Arena: [`PracticeArena.tsx`](src/components/PracticeArena.tsx), [`LivePreview.tsx`](src/components/LivePreview.tsx), [`MarkdownContent.tsx`](src/components/MarkdownContent.tsx), [`ArrayTraceBlock.tsx`](src/components/ArrayTraceBlock.tsx), [`LinkedListBlock.tsx`](src/components/LinkedListBlock.tsx), [`src/components/practice/`](src/components/practice/), [`src/components/evaluation/`](src/components/evaluation/), [`src/hooks/`](src/hooks/) (`usePracticeCodeExecution.ts`, `useTimedPractice.ts`, `useLegacyComponentPopup.ts`, `useCodeMirrorLanguage.ts`, `usePreviewProps.ts`).
+  - Practice Arena: [`PracticeArena.tsx`](src/components/PracticeArena.tsx), [`LivePreview.tsx`](src/components/LivePreview.tsx), [`MarkdownContent.tsx`](src/components/MarkdownContent.tsx), [`ArrayTraceBlock.tsx`](src/components/ArrayTraceBlock.tsx), [`LinkedListBlock.tsx`](src/components/LinkedListBlock.tsx), [`GridBoardBlock.tsx`](src/components/GridBoardBlock.tsx), [`DecisionTreeBlock.tsx`](src/components/DecisionTreeBlock.tsx), [`src/components/practice/`](src/components/practice/), [`src/components/evaluation/`](src/components/evaluation/), [`src/hooks/`](src/hooks/) (`usePracticeCodeExecution.ts`, `useTimedPractice.ts`, `useLegacyComponentPopup.ts`, `useCodeMirrorLanguage.ts`, `usePreviewProps.ts`).
   - Settings: [`SettingsModal.tsx`](src/components/SettingsModal.tsx) + [`src/components/settings/`](src/components/settings/).
   - TypeScript Sandbox: [`src/utils/typeChecker.ts`](src/utils/typeChecker.ts), [`sandboxD3Types.ts`](src/utils/sandboxD3Types.ts), [`sandboxNextTypes.ts`](src/utils/sandboxNextTypes.ts), [`nextSandbox.ts`](src/utils/nextSandbox.ts), [`cardPromptTypes.ts`](src/utils/cardPromptTypes.ts).
 

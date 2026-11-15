@@ -174,3 +174,12 @@ Follow these repository rules strictly:
 2. **Phase 1 (Frontend Modernization)**: `tailwind-css` & `realtime-streaming` (SSE + WebSocket).
 3. **Phase 2 (Senior Architecture)**: `web-performance` (INP chunking) & `offline-storage` (IndexedDB).
 4. **Phase 3 (Enterprise & Full-Stack)**: `graphql`, `sql-postgres` (`sql.js` WASM), & `frontend-security`.
+
+---
+
+## 11. Future Candidate Tracks (Backlog Ideas)
+
+- **AI / LLM Engineering (`ai-engineering`)**: Streaming SSE/tool-calling loops, structured JSON/schema validation & repair, token/chunking & sliding-window context management, cosine similarity / simple vector search, retry + fallback model routing.
+- **State Machines & Complex Client State (`state-machines`)**: Finite state machines (transitions, guards, context), undo/redo command history, optimistic updates with rollback queues, offline-first sync / conflict resolution.
+- **Resilience & Distributed Patterns (`resilience-patterns`)**: Token-bucket / sliding-window rate limiters, circuit breakers, idempotency keys, job queues with dead-letter retries.
+- **Modern Browser APIs (`browser-apis`)**: `IntersectionObserver` / `ResizeObserver` / `MutationObserver` patterns, Web Workers & `BroadcastChannel`, `Intl` formatting/i18n, Clipboard/Drag-and-Drop/File System APIs.

@@ -1,5 +1,7 @@
 Implement string partitioning and generation algorithms using backtracking:
 
+{{include:backtracking-explanation.md}}
+
 ### `partition(s: string): string[][]`
 - Splits non-empty string `s` into all possible partitions where every substring is a palindrome.
 - Returns matching partitions as an array of string arrays in any order.

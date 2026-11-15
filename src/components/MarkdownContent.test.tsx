@@ -343,4 +343,88 @@ const x = 42;
     expect(block?.textContent).toContain('null');
     expect(block?.querySelector('svg')).not.toBeNull();
   });
+
+  it('renders grid-board fenced blocks with highlighted cells and step badges', () => {
+    const text = [
+      '```grid-board',
+      JSON.stringify({
+        title: 'Word Search Board',
+        boards: [
+          {
+            caption: 'Path:',
+            grid: [
+              ['A', 'B'],
+              ['C', 'D'],
+            ],
+            highlights: [{ row: 0, col: 0, state: 'start', step: 1 }],
+          },
+        ],
+      }),
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const block = container.querySelector('.grid-board-block');
+    expect(block).not.toBeNull();
+    expect(block?.textContent).toContain('Word Search Board');
+    expect(block?.textContent).toContain('A');
+    expect(block?.textContent).toContain('1');
+  });
+
+  it('renders multiple TypeScript interface/type declarations side-by-side in columns', () => {
+    const text = [
+      '```ts',
+      'interface TreeNode {',
+      '  id: string;',
+      '}',
+      '',
+      'interface VisibleRow {',
+      '  id: string;',
+      '  depth: number;',
+      '}',
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const grid = container.querySelector('.ts-type-columns');
+    expect(grid).not.toBeNull();
+    const cards = container.querySelectorAll('.ts-type-column-card');
+    expect(cards.length).toBe(2);
+    expect(cards[0].textContent).toContain('interface TreeNode');
+    expect(cards[1].textContent).toContain('interface VisibleRow');
+  });
+
+  it('renders decision-tree fenced blocks with nodes and edge labels', () => {
+    const text = [
+      '```decision-tree',
+      JSON.stringify({
+        title: 'Decision Tree',
+        root: {
+          label: '""',
+          state: 'root',
+          children: [
+            { label: '"0"', edgeLabel: "+'0'", state: 'solution' },
+            { label: '"1"', edgeLabel: "+'1'", state: 'solution' },
+          ],
+        },
+      }),
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const block = container.querySelector('.decision-tree-block');
+    expect(block).not.toBeNull();
+    expect(block?.textContent).toContain('Decision Tree');
+    expect(block?.textContent).toContain('"0"');
+    expect(block?.textContent).toContain("+'1'");
+  });
 });

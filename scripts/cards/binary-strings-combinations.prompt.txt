@@ -1,6 +1,6 @@
 Implement two recursive **backtracking** generators that produce every valid result in sorted order:
 
-> **What is Backtracking?** Think of it like a choose-your-own-adventure tree: pick a choice, follow it until you hit a full answer, save that answer, then **step back** ("backtrack") to try the next choice. For `binaryStrings(2)`: start with `""` $\to$ add `'0'` (`"0"`) $\to$ add `'0'` (`"00"`, save!) $\to$ step back to `"0"` $\to$ add `'1'` (`"01"`, save!) $\to$ step back to `""` $\to$ add `'1'` (`"1"`), and repeat to get `"10"` and `"11"`.
+{{include:backtracking-explanation.md}}
 
 ### `binaryStrings(n: number): string[]`
 Generates **every possible string of length `n` made only of `'0'` and `'1'`**, sorted in dictionary (alphabetical) order (`'0'` before `'1'`).

@@ -1,5 +1,30 @@
 Implement the classic N-Queens puzzle algorithms:
 
+{{include:backtracking-explanation.md}}
+
+```grid-board
+{
+  "title": "Example 4×4 Solution (['.Q..', '...Q', 'Q...', '..Q.'])",
+  "boards": [
+    {
+      "caption": "No two queens share a row, column, or diagonal:",
+      "grid": [
+        [".", "Q", ".", "."],
+        [".", ".", ".", "Q"],
+        ["Q", ".", ".", "."],
+        [".", ".", "Q", "."]
+      ],
+      "highlights": [
+        { "row": 0, "col": 1, "state": "queen" },
+        { "row": 1, "col": 3, "state": "queen" },
+        { "row": 2, "col": 0, "state": "queen" },
+        { "row": 3, "col": 2, "state": "queen" }
+      ]
+    }
+  ]
+}
+```
+
 ### `solveNQueens(n: number): string[][]`
 - Finds all distinct board configurations for placing `n` queens on an `n x n` chessboard such that no two queens attack each other.
 - Each solution is represented as an array of `n` strings, where `'Q'` represents a queen and `'.'` represents an empty cell.

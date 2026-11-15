@@ -2,6 +2,54 @@ import React from 'react';
 import { renderInlineMarkdown, parseParagraphLines, type MarkdownListItem } from '../lib/markdown';
 import { ArrayTraceBlock, type ArrayTraceData } from './ArrayTraceBlock';
 import { LinkedListBlock, type LinkedListData } from './LinkedListBlock';
+import { GridBoardBlock, type GridBoardData } from './GridBoardBlock';
+import { DecisionTreeBlock, type DecisionTreeData } from './DecisionTreeBlock';
+
+interface TypeDeclItem {
+  kind: 'interface' | 'type';
+  name: string;
+  code: string;
+}
+
+/**
+ * Splits a `ts` / `typescript` code block into individual top-level `interface` or `type`
+ * declarations when the block contains only type definitions. Returns `null` for regular code.
+ */
+function parseTypeDefinitionColumns(tsCode: string): TypeDeclItem[] | null {
+  const trimmed = tsCode.trim();
+  if (!trimmed) return null;
+
+  const chunks: string[] = [];
+  let current: string[] = [];
+  let depth = 0;
+
+  for (const line of trimmed.split('\n')) {
+    const lineTrimmed = line.trim();
+    if (
+      depth === 0 &&
+      current.length > 0 &&
+      /^(?:export\s+)?(?:interface|type)\s+[A-Za-z_$]/.test(lineTrimmed)
+    ) {
+      chunks.push(current.join('\n').trim());
+      current = [];
+    }
+    current.push(line);
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '{' || line[i] === '(') depth++;
+      else if (line[i] === '}' || line[i] === ')') depth--;
+    }
+  }
+  if (current.length > 0) chunks.push(current.join('\n').trim());
+  if (chunks.length === 0) return null;
+
+  const items: TypeDeclItem[] = [];
+  for (const chunk of chunks) {
+    const m = chunk.match(/^(?:export\s+)?(interface|type)\s+([A-Za-z0-9_$]+)/);
+    if (!m) return null;
+    items.push({ kind: m[1] as 'interface' | 'type', name: m[2], code: chunk });
+  }
+  return items;
+}
 
 export interface MarkdownContentProps {
   text: string;
@@ -111,8 +159,92 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
               // Fall back to regular code block if JSON is invalid
             }
           }
+          if (raw.startsWith('grid-board\n')) {
+            try {
+              const data = JSON.parse(raw.slice('grid-board\n'.length)) as GridBoardData;
+              if (data && Array.isArray(data.boards)) {
+                return <GridBoardBlock key={bIdx} data={data} />;
+              }
+            } catch {
+              // Fall back to regular code block if JSON is invalid
+            }
+          }
+          if (raw.startsWith('decision-tree\n')) {
+            try {
+              const data = JSON.parse(raw.slice('decision-tree\n'.length)) as DecisionTreeData;
+              if (data && data.root) {
+                return <DecisionTreeBlock key={bIdx} data={data} />;
+              }
+            } catch {
+              // Fall back to regular code block if JSON is invalid
+            }
+          }
           // Strip leading language tag if present (e.g. ```javascript\n)
-          const code = raw.replace(/^[a-zA-Z0-9_-]+\n/, '');
+          const langMatch = raw.match(/^([a-zA-Z0-9_-]+)\n/);
+          const lang = langMatch?.[1]?.toLowerCase() ?? '';
+          const code = langMatch ? raw.slice(langMatch[0].length) : raw;
+          if (lang === 'ts' || lang === 'typescript') {
+            const typeDecls = parseTypeDefinitionColumns(code);
+            if (typeDecls) {
+              return (
+                <div
+                  key={bIdx}
+                  className="ts-type-columns"
+                  style={{
+                    margin: '6px 0',
+                    display: 'grid',
+                    gridTemplateColumns:
+                      typeDecls.length > 1 ? 'repeat(auto-fit, minmax(220px, 1fr))' : '1fr',
+                    gap: '10px',
+                    alignItems: 'stretch',
+                  }}
+                >
+                  {typeDecls.map((decl, dIdx) => (
+                    <div
+                      key={dIdx}
+                      className="ts-type-column-card"
+                      style={{
+                        borderRadius: '6px',
+                        backgroundColor: 'var(--bg-editor, rgba(15, 23, 42, 0.9))',
+                        border: '1px solid var(--border-subtle, rgba(56, 189, 248, 0.22))',
+                        borderTop: '2px solid var(--accent-cyan, #38bdf8)',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: '4px 10px',
+                          fontSize: '11px',
+                          fontFamily: 'var(--font-mono, monospace)',
+                          fontWeight: 600,
+                          color: 'var(--accent-cyan, #38bdf8)',
+                          backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                          borderBottom: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
+                        }}
+                      >
+                        {decl.kind} {decl.name}
+                      </div>
+                      <pre
+                        style={{
+                          margin: 0,
+                          padding: '10px 12px',
+                          fontFamily: 'var(--font-mono, monospace)',
+                          fontSize: '12.5px',
+                          overflowX: 'auto',
+                          color: 'var(--text-primary)',
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <code>{decl.code}</code>
+                      </pre>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+          }
           return (
             <pre
               key={bIdx}
