@@ -15,7 +15,7 @@ Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_
 
 | To change | Edit |
 | --- | --- |
-| Instructions shown to the learner | `scripts/cards/<id>.prompt.txt` |
+| Instructions shown to the learner | `scripts/cards/<id>.prompt.txt` (shared snippets in `scripts/cards/partials/<name>.md` via `{{include:<name>.md}}`) |
 | JavaScript / TypeScript reference solution | `scripts/cards/<id>.ref.js` / `<id>.ref.ts` |
 | Title, tags, track, overrides | `scripts/cards/<id>.meta.json` |
 | Contract table + generated harness | `scripts/testcases/part*.mjs` |
@@ -40,7 +40,7 @@ Short version only. Read `DELEGATION.md` (rules, claim table) and `ARCHITECTURE_
 ## Escaping conventions in card text
 - Contract inputs and expected values are **JavaScript source text**. `'a\nb'` is a string with a real newline; its expected output `'"a\\nb"'` is the five characters `"a\nb"` (a backslash followed by `n`).
 - Don't hand-count backslashes: write expected values with `String.raw` in `testcases/part*.mjs`, and say in the case description what the characters mean.
-- Prompts are rendered as Markdown (supporting headings, lists, tables, code blocks, blockquotes, and GitHub-style alerts like `> [!NOTE]`).
+- Prompts are rendered as Markdown (supporting headings, lists, tables, code blocks, KaTeX math `$...$`/`$$...$$`, blockquotes, GitHub-style alerts like `> [!NOTE]`, and visual diagrams via ```` ```array-trace ```` / ```` ```linked-list ```` fenced blocks).
 - The contract table's "input" column is shown by `sanitizeCallSignature` (`src/lib/harnessContracts.ts`). It converts `\n` to a line break only outside string literals.
 
 ## AI evaluator output
