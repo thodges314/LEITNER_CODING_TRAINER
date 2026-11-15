@@ -1,0 +1,54 @@
+Implement a resilient WebSocket client wrapper with exponential backoff reconnection and offline message buffering:
+
+## Description
+
+Real-time web clients must survive transient network drops without losing outbound messages or triggering thundering-herd reconnect storms. A reconnecting WebSocket wrapper manages connection lifecycle, buffers `send()` calls while disconnected, ignores stale events from superseded sockets, and schedules retries with capped exponential backoff.
+
+```ts
+interface SocketLike {
+  readyState: number;
+  send(data: string): void;
+  close(code?: number, reason?: string): void;
+  addEventListener(type: 'open' | 'message' | 'close' | 'error', listener: (event: any) => void): void;
+  removeEventListener(type: 'open' | 'message' | 'close' | 'error', listener: (event: any) => void): void;
+}
+
+interface ReconnectSocketOptions {
+  createSocket?: (url: string) => SocketLike;
+  baseDelayMs?: number;
+  maxDelayMs?: number;
+  maxRetries?: number;
+  jitter?: number;
+  onOpen?: () => void;
+  onMessage?: (event: any) => void;
+  onClose?: (event: any) => void;
+  onReconnect?: (attempt: number, delayMs: number) => void;
+}
+
+interface ReconnectingSocket {
+  send(data: string): void;
+  close(code?: number, reason?: string): void;
+  getReadyState(): number;
+  getQueuedCount(): number;
+}
+```
+
+### `createReconnectingWebSocket(url: string, options?: ReconnectSocketOptions): ReconnectingSocket`
+
+Connects immediately to `url` using `options.createSocket ?? ((u) => new WebSocket(u))` and returns a managed `ReconnectingSocket`:
+- **Outbound Queue & Flush**:
+  - `send(data)`: if the active socket is open (`readyState === 1`), sends immediately; if disconnected or connecting, buffers `data` in FIFO order (no-op if `close()` has been called).
+  - When `open` fires, resets the retry counter to `0`, flushes all buffered messages in order, and invokes `onOpen?.()`.
+- **Exponential Backoff & Jitter**:
+  - On unexpected `close` (when not manually closed) and `retryCount < maxRetries` (defaults: `baseDelayMs = 100`, `maxDelayMs = 5000`, `maxRetries = Infinity`, `jitter = 0`):
+
+$$d_k = \min(d_{\max},\; d_0 \cdot 2^k), \qquad \text{delay}_k = d_k \cdot (1 + u \cdot \text{jitter}), \quad u \sim \mathcal{U}(0, 1)$$
+
+    - Computes `delay = Math.min(maxDelayMs, baseDelayMs * (2 ** retryCount))` plus optional jitter `delay * Math.random() * jitter`.
+    - Increments `retryCount`, invokes `onReconnect?.(retryCount, delayMs)`, and schedules `connect()` after `delayMs`.
+- **Stale Socket & Manual Close Safety**:
+  - Each `connect()` detaches listeners from any previous socket and ignores events from superseded socket instances.
+  - `close(code?, reason?)`: marks the client permanently closed, cancels any pending reconnect timer, clears the outbound queue, and closes the active socket.
+  - `getReadyState()`: returns the active socket's `readyState` (or `3` when closed).
+  - `getQueuedCount()`: returns the number of buffered outbound messages.
+

@@ -344,6 +344,40 @@ const SANDBOX_GLOBALS = `
     getContext(contextId: string, options?: any): any;
     [key: string]: any;
   }
+  declare var HTMLLinkElement: any;
+  interface HTMLLinkElement extends HTMLElement {
+    rel: string;
+    href: string;
+    as: string;
+    crossOrigin: string | null;
+    [key: string]: any;
+  }
+  declare var DOMParser: { new(): { parseFromString(source: string, mimeType: string): any } };
+  interface MessageEvent<T = any> {
+    readonly data: T;
+    readonly origin: string;
+    readonly source: any;
+    [key: string]: any;
+  }
+  type Transferable = any;
+  declare var WebSocket: any;
+  declare var PerformanceObserver: any;
+  declare var performance: { now(): number; [key: string]: any };
+  declare var crypto: { randomUUID?: () => string; [key: string]: any };
+  type IDBValidKey = string | number | Date | ArrayBufferView | ArrayBuffer | IDBValidKey[];
+  interface IDBRequest<T = any> {
+    readonly result: T;
+    readonly error: Error | null;
+    onsuccess: ((this: IDBRequest<T>, ev: any) => any) | null;
+    onerror: ((this: IDBRequest<T>, ev: any) => any) | null;
+    onupgradeneeded?: ((this: any, ev: any) => any) | null;
+    onblocked?: ((this: any, ev: any) => any) | null;
+    [key: string]: any;
+  }
+  interface IDBFactory {
+    open(name: string, version?: number): IDBRequest<any>;
+    [key: string]: any;
+  }
   declare var SVGElement: any;
   interface SVGElement extends Element { [key: string]: any; }
   declare var SVGSVGElement: any;
@@ -379,6 +413,8 @@ const SANDBOX_GLOBALS = `
   declare var cancelAnimationFrame: (handle: number) => void;
   declare var $test: any;
   declare var $dom: any;
+  declare var ALLOWED_TAGS: Set<string>;
+  declare var DROP_TAGS: Set<string>;
   declare var PGlite: any;
   declare var graphql: any;
   declare var buildSchema: any;

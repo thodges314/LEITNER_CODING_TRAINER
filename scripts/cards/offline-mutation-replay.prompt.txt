@@ -1,0 +1,63 @@
+Implement a persistent offline mutation queue that buffers failed or offline API writes in storage and replays them sequentially when connectivity returns:
+
+## Description
+
+Local-first and mobile-resilient web apps cannot drop user edits when the network goes offline. By persisting pending mutations to `localStorage` (or a `Storage`-compatible backend) and draining them sequentially on the browser's `'online'` event, the app preserves write ordering and survives page reloads.
+
+```ts
+interface QueuedMutation<TPayload = unknown> {
+  id: string;
+  type: string;
+  payload: TPayload;
+  createdAt: number;
+}
+
+interface StorageLike {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+
+interface OnlineEventTarget {
+  addEventListener(type: 'online', listener: () => void): void;
+  removeEventListener(type: 'online', listener: () => void): void;
+}
+
+interface OfflineQueueOptions<TPayload = unknown> {
+  execute: (mutation: QueuedMutation<TPayload>) => Promise<void>;
+  storageKey?: string;
+  storage?: StorageLike;
+  onlineTarget?: OnlineEventTarget;
+}
+
+interface FlushResult {
+  succeeded: number;
+  failed: number;
+  remaining: number;
+}
+
+interface OfflineMutationQueue<TPayload = unknown> {
+  enqueue(type: string, payload: TPayload): QueuedMutation<TPayload>;
+  flush(): Promise<FlushResult>;
+  getPending(): QueuedMutation<TPayload>[];
+  destroy(): void;
+}
+```
+
+### `createOfflineMutationQueue<TPayload = unknown>(options: OfflineQueueOptions<TPayload>): OfflineMutationQueue<TPayload>`
+
+Creates a persistent offline mutation queue:
+- **Persistence**:
+  - Reads/writes JSON-serialized `QueuedMutation[]` under `storageKey` (defaults to `'offline_mutations'`) using `storage` (defaults to `window.localStorage`).
+  - Safely falls back to an empty array if stored JSON is missing or malformed.
+- **`enqueue(type, payload)`**:
+  - Creates a `QueuedMutation` with a unique `id`, `type`, `payload`, and `createdAt: Date.now()`.
+  - Appends it to the persisted queue and returns the created entry.
+- **`flush()`**:
+  - Replays pending mutations sequentially in FIFO order via `await execute(mutation)`.
+  - Removes each mutation from storage immediately after its `execute()` resolves so partial progress is preserved.
+  - If an `execute()` call rejects, stops draining (preserving FIFO order for remaining items) and returns `{ succeeded, failed: 1, remaining }`.
+  - Coalesces concurrent `flush()` calls by returning the in-flight promise.
+- **Connectivity Listener & Cleanup**:
+  - Attaches an `'online'` listener to `onlineTarget ?? window` that triggers `flush()`.
+  - `destroy()` removes the `'online'` listener.
+

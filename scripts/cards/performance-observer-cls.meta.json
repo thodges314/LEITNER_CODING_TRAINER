@@ -1,0 +1,13 @@
+{
+  "title": "Cumulative Layout Shift (CLS) Aggregator",
+  "track": "dom-browser",
+  "tags": [
+    "dom",
+    "performance",
+    "cwv",
+    "cls",
+    "observers"
+  ],
+  "requiresDom": true
+}
+

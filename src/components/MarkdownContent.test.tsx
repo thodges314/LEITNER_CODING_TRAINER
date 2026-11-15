@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act } from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 import { MarkdownContent } from './MarkdownContent';
@@ -250,5 +250,34 @@ const x = 42;
     expect(alert?.textContent).toContain('Single-File Sandbox & Module Architecture');
     expect(alert?.textContent).toContain('In production Next.js, FavoriteButton lives in its own file.');
     expect(alert?.textContent).toContain("In this single-file exercise, do NOT add 'use client'.");
+  });
+
+  it('renders bold inline code (**`code`**) inside bullet lists', () => {
+    const text = `- **\`recordEntry(entry: LayoutShiftEntry): number\`**: Ignores entries.`;
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const strong = container.querySelector('li strong');
+    expect(strong).not.toBeNull();
+    const code = strong?.querySelector('code');
+    expect(code).not.toBeNull();
+    expect(code?.textContent).toBe('recordEntry(entry: LayoutShiftEntry): number');
+  });
+
+  it('renders inline and display KaTeX math expressions ($...$ and $$...$$)', async () => {
+    const text =
+      'Maintain a Min-Heap of size $K$ in $O(N \\log K)$ time.\n\n$$T(t) = \\min\\left(C,\\; T(t_0) + \\frac{(t - t_0) \\cdot r}{1000}\\right)$$';
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    await vi.waitFor(() => {
+      const katexNodes = container.querySelectorAll('.katex');
+      expect(katexNodes.length).toBe(3);
+      expect(container.querySelector('.markdown-math-display .katex-display')).not.toBeNull();
+    });
   });
 });

@@ -1,0 +1,13 @@
+{
+  "title": "Zero-Dependency HTML Sanitizer",
+  "track": "dom-browser",
+  "tags": [
+    "dom",
+    "security",
+    "xss",
+    "sanitization",
+    "domparser"
+  ],
+  "requiresDom": true
+}
+

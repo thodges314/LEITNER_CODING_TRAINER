@@ -18,6 +18,7 @@ describe('previewConfig and modular library injection', () => {
     const html = createPreviewSrcDoc('dark', 'env-react', 'tic-tac-toe', config);
     expect(html).toContain('window.React');
     expect(html).not.toContain('https://cdn.tailwindcss.com');
+    expect(html).not.toContain('virtual:tailwindcss/index.css');
   });
 
   it('correctly configures hybrid React + D3 cards from explicit previewLibraries', async () => {
@@ -62,7 +63,8 @@ describe('previewConfig and modular library injection', () => {
 
     await ensurePreviewBundlesLoaded(config.libraries);
     const html = createPreviewSrcDoc('dark', 'env-tailwind', 'tailwind-pricing-card', config);
-    expect(html).toContain('https://cdn.tailwindcss.com');
+    expect(html).toContain('virtual:tailwindcss/index.css');
+    expect(html).not.toContain('https://cdn.tailwindcss.com');
   });
 
   it('correctly configures Tailwind + React cards loading both explicitly', async () => {
@@ -74,7 +76,8 @@ describe('previewConfig and modular library injection', () => {
     await ensurePreviewBundlesLoaded(config.libraries);
     const html = createPreviewSrcDoc('dark', 'env-tw-react', 'tailwind-react-card', config);
     expect(html).toContain('window.React');
-    expect(html).toContain('https://cdn.tailwindcss.com');
+    expect(html).toContain('virtual:tailwindcss/index.css');
+    expect(html).not.toContain('https://cdn.tailwindcss.com');
   });
 
   it('falls back to track when previewLibraries is undefined', () => {

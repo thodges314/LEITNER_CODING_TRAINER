@@ -23,7 +23,7 @@ describe('preset decks architecture', () => {
     localStorage.clear();
   });
 
-  it('declares 5 built-in preset decks', () => {
+  it('declares 6 built-in preset decks', () => {
     const decks = getBuiltInDecks();
     expect(decks.map((d) => d.id)).toEqual([
       'full-library',
@@ -31,6 +31,7 @@ describe('preset decks architecture', () => {
       'frontend-specialist',
       'algorithms',
       'data-scaling-streams',
+      'senior-frontend-systems',
     ]);
   });
 

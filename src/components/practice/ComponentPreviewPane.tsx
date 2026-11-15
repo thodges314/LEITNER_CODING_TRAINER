@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { LivePreview } from '../LivePreview';
 import { ReactTestErrorBoundary } from './ReactTestErrorBoundary';
-import type { TopicItem } from '../../lib/leitner';
+import { isHtmlCard, type TopicItem } from '../../lib/leitner';
 
 export interface ComponentPreviewPaneProps {
   currentCard: TopicItem;
@@ -43,7 +43,7 @@ export const ComponentPreviewPane: React.FC<ComponentPreviewPaneProps> = ({
   setMountedComponent,
   setIsOutputOpen,
 }) => {
-  if (currentCard?.previewCode) {
+  if (currentCard?.previewCode || isHtmlCard(currentCard)) {
     return (
       <LivePreview
         card={currentCard}

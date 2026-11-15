@@ -1632,7 +1632,7 @@
       "prefix-sum",
       "kadane"
     ],
-    "summary": "Implement array prefix sum, product, and dynamic programming algorithms"
+    "summary": "Implement array prefix sum, product, and dynamic programming algorithms in $O(n)$ time"
   },
   {
     "id": "linked-list-cycle-merge",
@@ -2188,7 +2188,7 @@
       "greedy",
       "array"
     ],
-    "summary": "Implement geometric two-pointer algorithms in O(n) time"
+    "summary": "Implement two classic geometric two-pointer algorithms in $O(n)$ time and $O(1)$ space"
   },
   {
     "id": "edit-distance-knapsack",
@@ -2202,7 +2202,7 @@
       "string",
       "knapsack"
     ],
-    "summary": "Implement classical 2D dynamic programming algorithms"
+    "summary": "Implement two classical 2D dynamic programming algorithms"
   },
   {
     "id": "greedy-intervals-circuit",
@@ -6154,5 +6154,185 @@
       "theming"
     ],
     "summary": "Build a theme-adaptive card using Tailwind dark: variants so it adapts cleanly between Light and Dark mode"
+  },
+  {
+    "id": "main-thread-chunking-yield",
+    "title": "Long Task Yielding (scheduler.yield)",
+    "track": "async-js",
+    "concept": "scheduling",
+    "difficulty": 3,
+    "tags": [
+      "async",
+      "performance",
+      "inp",
+      "scheduling",
+      "abort-signal"
+    ],
+    "summary": "Implement a time-sliced array processor that yields back to the main thread when a frame budget is exceeded"
+  },
+  {
+    "id": "offline-mutation-replay",
+    "title": "Offline Mutation Replay Queue",
+    "track": "dom-browser",
+    "concept": "offline",
+    "difficulty": 3,
+    "tags": [
+      "dom",
+      "offline",
+      "storage",
+      "resilience",
+      "queue"
+    ],
+    "summary": "Implement a persistent offline mutation queue that buffers failed or offline API writes in storage and replays them sequentially when connectivity ..."
+  },
+  {
+    "id": "performance-observer-cls",
+    "title": "Cumulative Layout Shift (CLS) Aggregator",
+    "track": "dom-browser",
+    "concept": "performance",
+    "difficulty": 3,
+    "tags": [
+      "dom",
+      "performance",
+      "cwv",
+      "cls",
+      "observers"
+    ],
+    "summary": "Implement a Cumulative Layout Shift (CLS) tracker using the Core Web Vitals session-window algorithm and PerformanceObserver"
+  },
+  {
+    "id": "promisified-indexeddb",
+    "title": "Promisified IndexedDB Wrapper",
+    "track": "dom-browser",
+    "concept": "offline",
+    "difficulty": 4,
+    "tags": [
+      "dom",
+      "indexeddb",
+      "offline",
+      "storage",
+      "async"
+    ],
+    "summary": "Implement a clean async/await wrapper around the callback- and event-driven IndexedDB API"
+  },
+  {
+    "id": "react-use-promise",
+    "title": "React 19 Async Data with use() and Suspense",
+    "track": "react",
+    "concept": "react19",
+    "difficulty": 2,
+    "tags": [
+      "react19",
+      "use",
+      "suspense",
+      "async",
+      "promises"
+    ],
+    "summary": "Implement a React 19 component pair that unwraps a Promise directly during render with React.use() inside a <React.Suspense> boundary"
+  },
+  {
+    "id": "reconnecting-websocket",
+    "title": "Resilient Reconnecting WebSocket Client",
+    "track": "async-js",
+    "concept": "websockets",
+    "difficulty": 4,
+    "tags": [
+      "async",
+      "websockets",
+      "realtime",
+      "backoff",
+      "resilience"
+    ],
+    "summary": "Implement a resilient WebSocket client wrapper with exponential backoff reconnection and offline message buffering"
+  },
+  {
+    "id": "resource-hint-preloader",
+    "title": "Dynamic Resource Preloader & Priority Hint",
+    "track": "dom-browser",
+    "concept": "performance",
+    "difficulty": 2,
+    "tags": [
+      "dom",
+      "performance",
+      "lcp",
+      "preload",
+      "hints"
+    ],
+    "summary": "Implement a dynamic resource hint injector that adds deduplicated <link rel=\"preload\"> and <link rel=\"prefetch\"> tags with priority hints to the do..."
+  },
+  {
+    "id": "secure-postmessage-bridge",
+    "title": "Origin-Checked postMessage Bridge",
+    "track": "dom-browser",
+    "concept": "security",
+    "difficulty": 3,
+    "tags": [
+      "dom",
+      "security",
+      "postmessage",
+      "iframes",
+      "messaging"
+    ],
+    "summary": "Implement a secure cross-window postMessage bridge that enforces strict origin verification, optional source identity checks, and channel scoping"
+  },
+  {
+    "id": "sse-stream-parser",
+    "title": "Server-Sent Events (SSE) Stream Reader",
+    "track": "async-js",
+    "concept": "streams",
+    "difficulty": 3,
+    "tags": [
+      "async",
+      "streams",
+      "sse",
+      "realtime",
+      "generators"
+    ],
+    "summary": "Implement an async generator that parses a Server-Sent Events (SSE) byte stream into structured event objects"
+  },
+  {
+    "id": "websocket-heartbeat-monitor",
+    "title": "WebSocket Heartbeat Ping/Pong Monitor",
+    "track": "async-js",
+    "concept": "websockets",
+    "difficulty": 2,
+    "tags": [
+      "async",
+      "websockets",
+      "realtime",
+      "timers",
+      "cleanup"
+    ],
+    "summary": "Implement a WebSocket heartbeat monitor that sends periodic ping frames and closes stale connections when a pong is not received in time"
+  },
+  {
+    "id": "worker-message-protocol",
+    "title": "Typed Worker Request/Response Protocol",
+    "track": "dom-browser",
+    "concept": "messaging",
+    "difficulty": 3,
+    "tags": [
+      "dom",
+      "web-worker",
+      "messaging",
+      "async",
+      "protocol"
+    ],
+    "summary": "Implement a correlated request/response RPC client over a Web Worker's postMessage channel"
+  },
+  {
+    "id": "xss-html-sanitizer",
+    "title": "Zero-Dependency HTML Sanitizer",
+    "track": "dom-browser",
+    "concept": "security",
+    "difficulty": 3,
+    "tags": [
+      "dom",
+      "security",
+      "xss",
+      "sanitization",
+      "domparser"
+    ],
+    "summary": "Implement an allowlist-based HTML sanitizer using DOMParser to strip XSS vectors while preserving safe markup"
   }
 ]

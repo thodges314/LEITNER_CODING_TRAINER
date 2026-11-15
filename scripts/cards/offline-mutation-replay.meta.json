@@ -1,0 +1,13 @@
+{
+  "title": "Offline Mutation Replay Queue",
+  "track": "dom-browser",
+  "tags": [
+    "dom",
+    "offline",
+    "storage",
+    "resilience",
+    "queue"
+  ],
+  "requiresDom": true
+}
+

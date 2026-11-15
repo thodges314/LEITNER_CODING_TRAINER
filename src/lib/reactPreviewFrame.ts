@@ -3,10 +3,12 @@ import { getCardPreviewConfig, type CardPreviewConfig } from './previewConfig';
 
 let cachedReactBundle: string | null = null;
 let cachedD3Bundle: string | null = null;
+let cachedTailwindBundle: string | null = null;
 
 export function arePreviewBundlesLoaded(libraries: string[]): boolean {
   if (libraries.includes('react') && cachedReactBundle === null) return false;
   if (libraries.includes('d3') && cachedD3Bundle === null) return false;
+  if (libraries.includes('tailwind') && cachedTailwindBundle === null) return false;
   return true;
 }
 
@@ -23,6 +25,13 @@ export async function ensurePreviewBundlesLoaded(libraries: string[]): Promise<v
     tasks.push(
       import('./d3PreviewBundle').then((m) => {
         cachedD3Bundle = m.D3_PREVIEW_BUNDLE;
+      })
+    );
+  }
+  if (libraries.includes('tailwind') && cachedTailwindBundle === null) {
+    tasks.push(
+      import('./tailwindPreviewBundle').then((m) => {
+        cachedTailwindBundle = m.TAILWIND_PREVIEW_BUNDLE;
       })
     );
   }
@@ -352,10 +361,12 @@ export function createPreviewSrcDoc(
   const accentPrimary = palette.accentPrimary;
   const hoverBg = isLight ? palette.bgElevated : palette.borderMedium;
 
+  const hasTailwind = config.libraries.includes('tailwind');
   const libScripts: string[] = [];
-  if (config.libraries.includes('tailwind')) {
-    libScripts.push('  <script src="https://cdn.tailwindcss.com"></script>');
-    libScripts.push("  <script>if (window.tailwind) window.tailwind.config = { darkMode: 'class' };</script>");
+  if (hasTailwind && cachedTailwindBundle) {
+    const safeTailwind = cachedTailwindBundle.replace(/<\/script/gi, '<\\/script');
+    libScripts.push(`  <script>${safeTailwind}</script>`);
+    libScripts.push('  <style type="text/tailwindcss">@custom-variant dark (&:where(.dark, .dark *));</style>');
   }
   if (config.libraries.includes('d3') && cachedD3Bundle) {
     const safeD3 = cachedD3Bundle.replace(/<\/script/gi, '<\\/script');
@@ -387,7 +398,10 @@ export function createPreviewSrcDoc(
       font-family: inherit;
       font-size: inherit;
     }
-    button {
+${
+  hasTailwind
+    ? ''
+    : `    button {
       cursor: pointer;
       padding: 6px 12px;
       border: 1px solid ${border};
@@ -432,7 +446,8 @@ export function createPreviewSrcDoc(
       border-radius: 8px;
       padding: 12px;
       background: ${cardBg};
-    }
+    }`
+}
 ${getCardSpecificStyles(cardId, { border, cardBg, colBg, subtleText, accentPrimary, hoverBg, isLight })}
   </style>
 ${libScripts.join('\n')}

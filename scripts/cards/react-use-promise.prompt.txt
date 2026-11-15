@@ -1,0 +1,35 @@
+Implement a React 19 component pair that unwraps a Promise directly during render with `React.use()` inside a `<React.Suspense>` boundary:
+
+## Description
+
+React 19 introduces the `use(resource)` API, which lets components read a `Promise` directly during render (suspending until the promise settles) without `useEffect` + `useState` boilerplate. Unlike hooks, `use()` can even be called conditionally, and works seamlessly with `<React.Suspense>` fallback boundaries.
+
+```ts
+interface UserRecord {
+  name: string;
+  role: string;
+}
+
+interface UserProfileProps {
+  userPromise: Promise<UserRecord>;
+}
+
+interface UserProfileContainerProps {
+  userPromise: Promise<UserRecord>;
+  fallback?: React.ReactNode;
+}
+```
+
+### `UserProfile({ userPromise }: UserProfileProps)`
+
+Unwraps `userPromise` with `React.use(userPromise)` and renders the resolved user details:
+- Renders `<div data-testid="user-card">`:
+  - `<h3>{user.name}</h3>`
+  - `<p>{user.role}</p>`
+
+### `UserProfileContainer({ userPromise, fallback }: UserProfileContainerProps)`
+
+Wraps `<UserProfile userPromise={userPromise} />` inside `<React.Suspense>`:
+- Passes `fallback ?? <p>Loading user...</p>` to `<React.Suspense fallback={...}>`.
+- Shows the fallback while `userPromise` is pending, then swaps to `<UserProfile />` once resolved.
+

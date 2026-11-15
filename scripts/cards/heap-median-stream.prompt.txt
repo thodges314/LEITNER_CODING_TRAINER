@@ -1,11 +1,19 @@
 Implement streaming median finding and CPU task scheduling (include an internal binary heap helper):
 
 ### `MedianFinder`
-- Maintains a continuous data stream of numbers to compute running medians in O(log n) time per insertion.
-- Uses a max-heap for the lower half and a min-heap for the upper half, keeping sizes balanced within a difference of at most 1.
-- **`addNum(num: number): void`**: Adds integer `num` from the data stream into the structure.
-- **`findMedian(): number | undefined`**: Returns the median of all numbers added so far. When the count is even, returns the mean of the two middle values; returns `undefined` if no numbers have been added.
+Maintains a continuous stream of numbers and returns the running median in $O(\log n)$ per insertion and $O(1)$ per query.
+- Keep a **max-heap** for the smaller half of numbers and a **min-heap** for the larger half, balancing their sizes so `0 <= maxHeap.size - minHeap.size <= 1`:
+
+$$\text{median} = \begin{cases} \text{top}(\text{maxHeap}) & \text{if } |\text{maxHeap}| > |\text{minHeap}| \\ \dfrac{\text{top}(\text{maxHeap}) + \text{top}(\text{minHeap})}{2} & \text{if } |\text{maxHeap}| = |\text{minHeap}| \end{cases}$$
+
+- **`addNum(num: number): void`**: Inserts `num` into the appropriate heap and rebalances if needed.
+- **`findMedian(): number | undefined`**: Returns the median (mean of the two middle values when count is even; `undefined` if empty).
+- **Example**: After `addNum(1)`, `addNum(2)` $\to$ `findMedian()` is `1.5`; after `addNum(3)` $\to$ `findMedian()` is `2`.
 
 ### `leastInterval(tasks: string[], n: number): number`
-- Calculates the minimum number of CPU time intervals needed to complete all tasks in array `tasks`.
-- Tasks are represented by letters, and identical tasks must be separated by at least `n` cooldown intervals (during which the CPU may idle or perform other tasks).
+Given an array of CPU task labels (e.g. `['A', 'A', 'A', 'B', 'B', 'B']`) and a cooldown `n`, identical tasks must be separated by at least `n` intervals (either other tasks or `idle` slots). Return the minimum total intervals to finish all tasks.
+- Let $f_{\max}$ be the highest frequency of any task and $c_{\max}$ be how many distinct tasks share that frequency $f_{\max}$. Scheduling the most frequent tasks first creates $f_{\max} - 1$ blocks of length $n + 1$, followed by the final $c_{\max}$ tasks (or `tasks.length` if other tasks fill all idle gaps):
+
+$$T_{\min} = \max\!\Bigl(|\text{tasks}|,\; (f_{\max} - 1)(n + 1) + c_{\max}\Bigr)$$
+
+- **Example**: `leastInterval(['A','A','A','B','B','B'], 2)` returns `8` (`A -> B -> idle -> A -> B -> idle -> A -> B`).

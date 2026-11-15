@@ -1,0 +1,13 @@
+{
+  "title": "Promisified IndexedDB Wrapper",
+  "track": "dom-browser",
+  "tags": [
+    "dom",
+    "indexeddb",
+    "offline",
+    "storage",
+    "async"
+  ],
+  "requiresDom": true
+}
+

@@ -274,12 +274,14 @@ describe('EvaluationPanel context-aware solution reveal', () => {
     );
     expect(copyBtn).toBeDefined();
 
-    await act(async () => {
-      copyBtn?.click();
+    // Wait for async GraphQL Prettier formatter effect to resolve before asserting
+    await vi.waitFor(async () => {
+      writeTextMock.mockClear();
+      await act(async () => {
+        copyBtn?.click();
+      });
+      expect(writeTextMock).toHaveBeenCalledWith('query CompareUsers {\n  user {\n    id\n  }\n}');
     });
-
-    // Expect writeText to be called with the automatically formatted code
-    expect(writeTextMock).toHaveBeenCalledWith('query CompareUsers {\n  user {\n    id\n  }\n}');
   });
 
   it('formats recommended solution with automatic formatter across SQL and JS', async () => {

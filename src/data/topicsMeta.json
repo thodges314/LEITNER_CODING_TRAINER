@@ -7598,7 +7598,11 @@
     "requiresDom": true,
     "difficulty": 1,
     "concept": "tailwind-banner",
-    "inputLanguage": "html"
+    "inputLanguage": "html",
+    "previewLibraries": [
+      "tailwind"
+    ],
+    "rendersComponent": true
   },
   {
     "id": "next-font-optimization",
@@ -8035,5 +8039,229 @@
     "difficulty": 2,
     "concept": "tailwind-theme",
     "requiresDom": true
+  },
+  {
+    "id": "main-thread-chunking-yield",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Long Task Yielding (scheduler.yield)",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "performance",
+      "inp",
+      "scheduling",
+      "abort-signal"
+    ],
+    "difficulty": 3,
+    "concept": "scheduling"
+  },
+  {
+    "id": "offline-mutation-replay",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Offline Mutation Replay Queue",
+    "track": "dom-browser",
+    "tags": [
+      "dom",
+      "offline",
+      "storage",
+      "resilience",
+      "queue"
+    ],
+    "requiresDom": true,
+    "difficulty": 3,
+    "concept": "offline"
+  },
+  {
+    "id": "performance-observer-cls",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Cumulative Layout Shift (CLS) Aggregator",
+    "track": "dom-browser",
+    "tags": [
+      "dom",
+      "performance",
+      "cwv",
+      "cls",
+      "observers"
+    ],
+    "requiresDom": true,
+    "difficulty": 3,
+    "concept": "performance"
+  },
+  {
+    "id": "promisified-indexeddb",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Promisified IndexedDB Wrapper",
+    "track": "dom-browser",
+    "tags": [
+      "dom",
+      "indexeddb",
+      "offline",
+      "storage",
+      "async"
+    ],
+    "requiresDom": true,
+    "difficulty": 4,
+    "concept": "offline"
+  },
+  {
+    "id": "react-use-promise",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "react",
+    "title": "React 19 Async Data with use() and Suspense",
+    "tags": [
+      "react19",
+      "use",
+      "suspense",
+      "async",
+      "promises"
+    ],
+    "difficulty": 2,
+    "concept": "react19",
+    "requiresDom": true
+  },
+  {
+    "id": "reconnecting-websocket",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Resilient Reconnecting WebSocket Client",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "websockets",
+      "realtime",
+      "backoff",
+      "resilience"
+    ],
+    "difficulty": 4,
+    "concept": "websockets"
+  },
+  {
+    "id": "resource-hint-preloader",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Dynamic Resource Preloader & Priority Hint",
+    "track": "dom-browser",
+    "tags": [
+      "dom",
+      "performance",
+      "lcp",
+      "preload",
+      "hints"
+    ],
+    "requiresDom": true,
+    "difficulty": 2,
+    "concept": "performance"
+  },
+  {
+    "id": "secure-postmessage-bridge",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Origin-Checked postMessage Bridge",
+    "track": "dom-browser",
+    "tags": [
+      "dom",
+      "security",
+      "postmessage",
+      "iframes",
+      "messaging"
+    ],
+    "requiresDom": true,
+    "difficulty": 3,
+    "concept": "security"
+  },
+  {
+    "id": "sse-stream-parser",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Server-Sent Events (SSE) Stream Reader",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "streams",
+      "sse",
+      "realtime",
+      "generators"
+    ],
+    "difficulty": 3,
+    "concept": "streams"
+  },
+  {
+    "id": "websocket-heartbeat-monitor",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "WebSocket Heartbeat Ping/Pong Monitor",
+    "track": "async-js",
+    "tags": [
+      "async",
+      "websockets",
+      "realtime",
+      "timers",
+      "cleanup"
+    ],
+    "difficulty": 2,
+    "concept": "websockets"
+  },
+  {
+    "id": "worker-message-protocol",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Typed Worker Request/Response Protocol",
+    "track": "dom-browser",
+    "tags": [
+      "dom",
+      "web-worker",
+      "messaging",
+      "async",
+      "protocol"
+    ],
+    "requiresDom": true,
+    "difficulty": 3,
+    "concept": "messaging"
+  },
+  {
+    "id": "xss-html-sanitizer",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "locked",
+    "title": "Zero-Dependency HTML Sanitizer",
+    "track": "dom-browser",
+    "tags": [
+      "dom",
+      "security",
+      "xss",
+      "sanitization",
+      "domparser"
+    ],
+    "requiresDom": true,
+    "difficulty": 3,
+    "concept": "security"
   }
 ]

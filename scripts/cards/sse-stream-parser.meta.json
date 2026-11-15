@@ -1,0 +1,13 @@
+{
+  "title": "Server-Sent Events (SSE) Stream Reader",
+  "track": "async-js",
+  "tags": [
+    "async",
+    "streams",
+    "sse",
+    "realtime",
+    "generators"
+  ],
+  "requiresDom": false
+}
+

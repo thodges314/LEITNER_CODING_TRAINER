@@ -1,0 +1,13 @@
+{
+  "title": "WebSocket Heartbeat Ping/Pong Monitor",
+  "track": "async-js",
+  "tags": [
+    "async",
+    "websockets",
+    "realtime",
+    "timers",
+    "cleanup"
+  ],
+  "requiresDom": false
+}
+

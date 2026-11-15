@@ -1,0 +1,35 @@
+Implement an async generator that parses a Server-Sent Events (SSE) byte stream into structured event objects:
+
+## Description
+
+Server-Sent Events (`text/event-stream`) power AI token streaming, live feeds, and real-time notifications over standard HTTP. Because `fetch()` delivers response bodies as arbitrary `Uint8Array` chunks via `ReadableStream`, a client parser must decode UTF-8 incrementally, buffer partial lines across chunk boundaries, and assemble multi-line `data:` payloads until a blank line terminates each event.
+
+```ts
+interface SseEvent {
+  event: string;
+  data: string;
+  id?: string;
+  retry?: number;
+}
+```
+
+### `parseSseStream(stream: ReadableStream<Uint8Array>): AsyncGenerator<SseEvent, void, unknown>`
+
+Reads `stream` using `stream.getReader()` and `TextDecoder` (with `{ stream: true }`), yielding each complete `SseEvent`:
+- **Line & Chunk Buffering**:
+  - Decodes incoming `Uint8Array` chunks incrementally so multi-byte UTF-8 characters and lines split across chunks are reassembled cleanly.
+  - Handles `\r\n`, `\r`, and `\n` line endings.
+  - Always releases the reader lock (`reader.releaseLock()`) in a `finally` block.
+- **SSE Field Parsing**:
+  - Lines starting with `:` are comments and ignored.
+  - Fields are split at the first `:` (`field` before, `value` after). If `value` begins with a single leading space (`' '`), strip that one space.
+  - `data`: appends `value` to the current event's data lines; when dispatched, `data` joins all collected lines with `'\n'`.
+  - `event`: sets the event type (defaults to `'message'` when omitted).
+  - `id`: sets `id` on the event (if `value` does not contain a null character `'\0'`).
+  - `retry`: if `value` consists strictly of ASCII digits (`/^\d+$/`), sets `retry` to `Number(value)`.
+  - Unknown fields are ignored.
+- **Event Dispatch**:
+  - A blank line (`''`) dispatches the current event if at least one `data:` line was collected, then resets the event state (`event` back to `'message'`, `data` lines cleared, `id` and `retry` cleared).
+  - If a blank line occurs with no `data:` lines collected, reset any pending `event`/`id`/`retry` state without yielding.
+  - Per the SSE specification, an unterminated block at EOF without a trailing blank line is not dispatched.
+

@@ -1,11 +1,16 @@
 Implement classical unbounded knapsack dynamic programming solutions for coin change:
 
+$$dp[x] = \min_{c \in \text{coins},\; c \le x} \bigl(1 + dp[x - c]\bigr), \qquad \text{ways}[x] = \sum_{c \in \text{coins}} \text{ways}[x - c]$$
+
 ### `coinChange(coins: number[], amount: number): number`
-- Computes the minimum number of coins needed to make up `amount` given an array of coin denominations `coins` (assuming an unlimited supply of each coin).
-- Returns `-1` if that amount of money cannot be made up by any combination of the coins.
-- Returns `0` when `amount` is `0`.
+Computes the **fewest number of coins** needed to sum up to `amount`, assuming an unlimited supply of each denomination in `coins`.
+- Build a 1D table `dp[0..amount]` initialized to `Infinity` (`dp[0] = 0`). For each target sum `x` from `1` to `amount`, try every coin `c <= x` and take `1 + dp[x - c]`.
+- **Example**: `coinChange([1, 2, 5], 11)` returns `3` ($5 + 5 + 1 = 11$).
+- **Example (Impossible)**: `coinChange([2], 3)` returns `-1`.
+- **Edge Case**: Returns `0` when `amount` is `0`.
 
 ### `countWays(coins: number[], amount: number): number`
-- Computes the number of distinct combinations of coins that sum up to `amount` (where order of coins does not matter).
-- Returns `1` when `amount` is `0` (`countWays(coins, 0) === 1`).
-- Uses dynamic programming to avoid counting duplicate permutations.
+Computes the number of **distinct combinations** of coins that sum to `amount` (order does **not** matter, so `1 + 2` and `2 + 1` count as one combination).
+- Iterate over `coins` in the **outer loop** and `x` from `coin` to `amount` in the **inner loop** (`ways[x] += ways[x - coin]`) so each coin is considered in a fixed order and duplicate permutations are avoided.
+- **Example**: `countWays([1, 2, 5], 5)` returns `4` (`5`, `2+2+1`, `2+1+1+1`, `1+1+1+1+1`).
+- **Edge Case**: Returns `1` when `amount` is `0` (the empty combination).

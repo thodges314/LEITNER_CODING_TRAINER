@@ -1,10 +1,19 @@
-Implement classical 2D dynamic programming algorithms:
+Implement two classical 2D dynamic programming algorithms:
 
 ### `editDistance(a: string, b: string): number`
-- Computes the Levenshtein distance: the minimum number of single-character operations (insertions, deletions, substitutions) required to transform string `a` into string `b`.
-- Example: `editDistance("horse", "ros")` returns `3`.
+Computes the **Levenshtein distance**: the minimum number of single-character edits (**insert**, **delete**, or **replace**) needed to transform string `a` into string `b`.
+- Let `dp[i][j]` be the minimum edits to convert the prefix `a[0..i-1]` into `b[0..j-1]`, with base cases `dp[i][0] = i` and `dp[0][j] = j`:
+
+$$dp[i][j] = \begin{cases} dp[i-1][j-1] & \text{if } a_{i-1} = b_{j-1} \\ 1 + \min\bigl(dp[i-1][j],\; dp[i][j-1],\; dp[i-1][j-1]\bigr) & \text{otherwise} \end{cases}$$
+
+- Here `dp[i-1][j]` corresponds to **delete**, `dp[i][j-1]` to **insert**, and `dp[i-1][j-1]` to **replace**.
+- **Example**: `editDistance("horse", "ros")` returns `3` (`horse` $\to$ `rorse` $\to$ `rose` $\to$ `ros`).
 
 ### `knapsack(weights: number[], values: number[], capacity: number): number`
-- Solves the 0/1 knapsack problem: determines the maximum total value achievable by selecting a subset of items such that their combined weight does not exceed `capacity`.
-- Each item can be included at most once.
-- Returns `0` when `capacity` is `0` or no items fit.
+Solves the **0/1 Knapsack** problem: given `n` items where item $i$ has weight `weights[i]` and value `values[i]`, find the maximum total value achievable without exceeding `capacity`. Each item can be chosen **at most once** (either take it or skip it).
+- Let `K[i][w]` be the best value using the first `i` items within weight limit `w`:
+
+$$K[i][w] = \max\bigl(K[i-1][w],\; v_i + K[i-1][w - w_i]\bigr) \quad (\text{when } w_i \le w)$$
+
+- **Example**: `knapsack([1, 3, 4], [15, 20, 30], 4)` returns `35` (pick items `0` and `1`: weight $1 + 3 = 4$, value $15 + 20 = 35$).
+- **Edge Case**: Returns `0` when `capacity` is `0` or no items fit.

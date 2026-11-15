@@ -137,16 +137,39 @@ export function usePracticeCodeExecution({
             ? prepareHtmlCode(code, currentCard?.testHarness)
             : code;
     const executableSource =
-      isWrappedInput &&
       currentCard?.testHarness &&
       !bufferContainsHarness(rawCodeToRun, currentCard.testHarness)
         ? `${rawCodeToRun}\n\n${currentCard.testHarness}\n`
         : rawCodeToRun;
 
     const effectiveMode = isWrappedInput ? 'js' : executionMode;
+    if (effectiveMode === 'ts') {
+      const codeToCheck = isTsTrack ? executableSource : rawCodeToRun;
+      const typeCheckOutcome = await transpileForExecution(
+        codeToCheck,
+        'ts',
+        3000,
+        isTsTrack ? undefined : currentCard?.promptSeed
+      );
+      if (!typeCheckOutcome.ok) {
+        for (const diag of typeCheckOutcome.diagnostics) {
+          logs.push({
+            type: diag.type === 'warn' ? 'warn' : 'error',
+            content: diag.formatted,
+            timestamp: now(),
+            failure: diag.type !== 'warn',
+          });
+        }
+        if (typeCheckOutcome.diagnostics.length > 0) setOutputLogs([...logs]);
+        setExecutionStatus('error');
+        setIsRunning(false);
+        return;
+      }
+    }
+
     const transpiled = await transpileForExecution(
       executableSource,
-      effectiveMode,
+      'js',
       3000,
       isTsTrack ? undefined : currentCard?.promptSeed
     );

@@ -341,11 +341,23 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
   const handleSubmit = async () => {
     setIsPreviewLive(true);
     setPreviewRunTrigger((c) => c + 1);
-    if (!currentCard || !code.trim() || isEvaluating) return;
+    if (!currentCard || isEvaluating) return;
     setIsEvaluating(true);
     setShowSolution(false);
     try {
-      const harness = await runHarness(currentCard, code, executionMode);
+      const hasCode = code.trim().length > 0;
+      const harness = hasCode
+        ? await runHarness(currentCard, code, executionMode)
+        : {
+            ran: false,
+            passed: false,
+            passCount: 0,
+            failCount: 1,
+            errorCount: 0,
+            timedOut: false,
+            summary: 'No implementation submitted',
+            lines: ['FAIL: No implementation submitted'],
+          };
       const res = await evaluateCodeSubmission(currentCard, code, harness, executionMode);
       setEvalResult(res);
       setShowSolution(!res.passed);
@@ -610,15 +622,6 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
             }
             editable={!evalResult}
             readOnly={Boolean(evalResult)}
-            placeholder={
-              getCardInputLanguage(currentCard) === 'html'
-                ? '<!-- Write your HTML markup here...\n     Press [Tab] for 2-space indentation.\n     Autoclosing tags and quotes are enabled. -->'
-                : getCardInputLanguage(currentCard) === 'sql'
-                  ? '-- Write your SQL query here...\n-- Press [Tab] for 2-space indentation.'
-                  : getCardInputLanguage(currentCard) === 'graphql'
-                    ? '# Write your GraphQL query or schema here...\n# Press [Tab] for 2-space indentation.'
-                    : '// Type your solution from scratch without autocomplete or hints...\n// Press [Tab] for 2-space indentation.\n// Bracket pair colorization and autoclosing brackets/quotes are enabled.'
-            }
             autoFocus
           />
         </div>

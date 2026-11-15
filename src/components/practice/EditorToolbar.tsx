@@ -234,7 +234,7 @@ export const EditorActionControls: React.FC<EditorActionControlsProps> = ({
                 type="button"
                 className="btn btn-primary arena-controls-btn-submit"
                 onClick={onSubmit}
-                disabled={isEvaluating || isRunning || !code.trim()}
+                disabled={isEvaluating || isRunning}
                 {...shortcutAttrs('submit')}
               >
                 {isEvaluating ? (
