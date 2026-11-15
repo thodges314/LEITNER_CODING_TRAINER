@@ -23,11 +23,11 @@ const { render } = $dom;
 {
   const r = render(<Skeleton lines={3} />);
   const container = r.container.querySelector('[role="status"]');
-  const hasSpaceY = container?.classList.contains('space-y-2.5');
+  const hasSpaceY = /\bspace-y-/.test(container?.className || '');
   const lines = container?.querySelectorAll('div') || [];
   const hasThreeLines = lines.length === 3;
   const lastLine = lines[2];
-  const lastLineHasW45 = lastLine?.classList.contains('w-4/5');
+  const lastLineHasW45 = /\bw-(3\/4|4\/5|5\/6)\b/.test(lastLine?.className || '');
   const firstLineHasWFull = lines[0]?.classList.contains('w-full');
 
   $test.check(
@@ -58,8 +58,8 @@ const { render } = $dom;
 {
   const r = render(<Skeleton variant="rectangular" />);
   const el = r.container.querySelector('[role="status"]');
-  const hasRoundedXl = el?.classList.contains('rounded-xl');
-  const hasH32 = el?.classList.contains('h-32');
+  const hasRoundedXl = /\brounded-/.test(el?.className || '');
+  const hasH32 = /\bh-(24|28|32|36|40)\b/.test(el?.className || '');
   const hasWFull = el?.classList.contains('w-full');
 
   $test.check(

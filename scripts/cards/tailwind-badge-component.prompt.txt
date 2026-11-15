@@ -21,8 +21,8 @@ Build an accessible, responsive status badge React component styled with Tailwin
 
 ### Requirements
 
-- **Badge Container (`<span>`)**:
-  - Uses inline-flex centered layout, medium font weight, pill rounding (`rounded-full`), a border, and color transitions.
+- **Badge Container** (`<span>`):
+  - Uses inline-flex centered layout, medium font weight, pill rounding, a border, and color transitions.
   - Forwards extra props (such as `data-testid` or `aria-label`) to the outer `<span>`.
 
 - **Variant Styling & Translucent Tokens**:
@@ -37,7 +37,7 @@ Build an accessible, responsive status badge React component styled with Tailwin
   - `'sm'`: extra-small text, compact padding, and tight flex gap.
   - `'md'` (default): small text, slightly wider padding, and standard flex gap.
 
-- **Dot Indicator (`dot: true`)**:
+- **Dot Indicator** (`dot: true`):
   - When `dot` is `true`, renders a decorative `<span aria-hidden="true"></span>` before `children`.
-  - Styled as a non-shrinking circle (`rounded-full shrink-0`) that scales down for `'sm'` vs `'md'` and uses a background color matching the active variant.
+  - Styled as a non-shrinking circle that scales down for `'sm'` vs `'md'` and uses a background color matching the active variant.
 

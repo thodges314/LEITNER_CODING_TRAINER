@@ -23,7 +23,7 @@ Build an accessible, versatile React button styled with Tailwind CSS utility cla
 
 ### Requirements
 
-- **Base Layout & Pseudo-States (`<button>`)**:
+- **Base Layout & Pseudo-States** (`<button>`):
   - Elements: `<button type="button" ...>` (defaults to `type="button"` unless specified in `props`).
   - Layout & interactive base utilities: inline-flex centered alignment, medium font weight, smooth transitions, `focus-visible` outline removal with a 2px ring and offset, active press scale-down, and pointer cursor.
   - Forwards extra props (such as `aria-label`, `data-testid`, or `id`) to the underlying `<button>`.
@@ -41,11 +41,11 @@ Build an accessible, versatile React button styled with Tailwind CSS utility cla
 
 - **Disabled State**:
   - When `disabled` is `true` or `loading` is `true`:
-    - Sets HTML attribute `disabled={true}` on the `<button>`.
+    - Disables the `<button>` element via its `disabled` attribute.
     - Includes Tailwind disabled utilities for reduced opacity, disabled pointer events, and a not-allowed cursor.
 
 - **Loading State**:
   - When `loading` is `true`:
     - Sets `aria-busy="true"` on the `<button>`.
-    - Renders an animated inline `<svg>` spinner (with `animate-spin` and sizing utilities) before `children`.
+    - Renders an animated spinning inline `<svg>` indicator before `children`.
 

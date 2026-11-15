@@ -17,7 +17,7 @@ interface ButtonProps {
 Build an accessible, versatile button component styled with Tailwind CSS utility classes:
 
 ### Requirements
-- **Container (`<button>`)**:
+- **Container** (`<button>`):
   - Element: `<button type="button" ...>` (defaults to `type="button"` unless specified in `props`).
   - Layout & interactive base utilities: inline-flex centered alignment, medium font weight, rounded corners, horizontal and vertical padding, small text sizing, color transition, `focus-visible` outline removal with a focus ring, active press scale-down, and pointer cursor.
   - Forwards extra props (such as `onClick`, `data-testid`, or `aria-label`) to the underlying `<button>`.
@@ -26,7 +26,7 @@ Build an accessible, versatile button component styled with Tailwind CSS utility
   - `'outline'`: bordered button with neutral gray border and text, subtle light-gray hover background, and gray `focus-visible` ring.
 - **Disabled State**:
   - When `disabled` is `true`:
-    - Sets HTML attribute `disabled={true}` on the `<button>`.
+    - Disables the `<button>` element via its `disabled` attribute.
     - Includes Tailwind disabled utilities for reduced opacity, disabled pointer events, and a not-allowed cursor.
 
 ### Example Usage

@@ -125,19 +125,19 @@ empty()`,
     r(
       'Renders button element with primary variant and md size by default',
       '<Button>Save Changes</Button>',
-      'Button rendered with type="button", primary bg-indigo-600, text-white, px-4, and text-sm',
+      'Button rendered with type="button", primary background, white text, horizontal padding, and text-sm',
       { callSignature: '<Button>Save Changes</Button>' }
     ),
     r(
       'Applies secondary, destructive, and outline variant styling classes',
       '<Button variant="secondary" />, <Button variant="destructive" />, <Button variant="outline" />',
-      'Applies bg-slate-800, bg-rose-600, and border border-slate-700 styling classes',
+      'Applies neutral secondary, rose/red destructive, and bordered outline styling classes',
       { callSignature: '<Button variant={variant} />' }
     ),
     r(
       'Applies sm and lg size padding and typography classes',
       '<Button size="sm" />, <Button size="lg" />',
-      'sm applies text-xs px-2.5; lg applies text-base px-5',
+      'sm applies text-xs with compact padding; lg applies text-base/lg with wider padding',
       { callSignature: '<Button size={size} />' }
     ),
     r(
@@ -210,25 +210,25 @@ empty()`,
     r(
       'Renders neutral badge with md size and no dot by default',
       '<Badge>Draft</Badge>',
-      'Renders span with inline-flex, rounded-full, text-slate-300, and border-slate-500/20',
+      'Renders span with inline-flex, rounded-full, neutral text/border, and md sizing',
       { callSignature: '<Badge>Draft</Badge>' }
     ),
     r(
       'Applies success, warning, danger, and info variant color tokens',
       '<Badge variant="success" />, <Badge variant="warning" />, <Badge variant="danger" />, <Badge variant="info" />',
-      'Applies emerald, amber, rose, and sky translucent background and text color tokens',
+      'Applies emerald/green, amber/yellow, rose/red, and sky/blue translucent background and text/border tokens',
       { callSignature: '<Badge variant={variant} />' }
     ),
     r(
       'Applies sm size padding and typography classes',
       '<Badge size="sm">Small</Badge>',
-      'Applies text-xs and px-2 size classes',
+      'Applies text-xs and horizontal padding classes',
       { callSignature: '<Badge size="sm" />' }
     ),
     r(
       'Renders decorative dot indicator with matching variant color when dot=true',
       '<Badge variant="success" dot={true}>Active</Badge>',
-      'Renders child span with rounded-full and bg-emerald-400',
+      'Renders child span with rounded-full and matching emerald/green background',
       { callSignature: '<Badge dot={true} />' }
     ),
     r(
@@ -306,13 +306,13 @@ empty()`,
     r(
       'Renders semantic tablist container with base Tailwind styling',
       '<SegmentedControl options={sampleOptions} value="daily" onChange={fn} />',
-      'Renders role="tablist", aria-orientation="horizontal", and rounded-xl container',
+      'Renders role="tablist", aria-orientation="horizontal", and rounded container',
       { callSignature: '<SegmentedControl options={opts} value="daily" onChange={fn} />' }
     ),
     r(
       'Renders options with proper tab roles, selected state, and styling',
       '<SegmentedControl options={sampleOptions} value="weekly" onChange={fn} />',
-      'Renders 4 role="tab" buttons, active bg-indigo-600, tabindex="0", and disabled styling',
+      'Renders 4 role="tab" buttons, active accent background, tabindex="0", and disabled styling',
       { callSignature: '<SegmentedControl options={opts} value="weekly" onChange={fn} />' }
     ),
     r(
@@ -338,13 +338,13 @@ empty()`,
     r(
       'Single text line declares accessibility attributes and base pulse classes',
       '<Skeleton />',
-      'Declares role="status", aria-label="Loading...", aria-busy="true", animate-pulse, and h-4',
+      'Declares role="status", aria-label="Loading...", aria-busy="true", animate-pulse, and text bar height',
       { callSignature: '<Skeleton />' }
     ),
     r(
       'Multi-line text variant renders lines container with 80% final line',
       '<Skeleton lines={3} />',
-      'Renders space-y-2.5 container with 3 bars, last bar having w-4/5',
+      'Renders vertically spaced container with 3 bars, last bar shortened (~75-80% width)',
       { callSignature: '<Skeleton lines={3} />' }
     ),
     r(
@@ -356,7 +356,7 @@ empty()`,
     r(
       'Rectangular variant renders rounded-xl and default h-32',
       '<Skeleton variant="rectangular" />',
-      'Renders rounded-xl with default h-32 and w-full',
+      'Renders rounded rectangle with default height and full width',
       { callSignature: '<Skeleton variant="rectangular" />' }
     ),
     r(
@@ -402,7 +402,7 @@ empty()`,
     r(
       'Renders individual Avatar with initials, base classes, and status dot',
       '<Avatar name="Alice Walker" status="online" size="md" />',
-      'Renders AW initials with rounded-full, bg-slate-800, and emerald status dot',
+      'Renders AW initials with rounded-full, neutral background, and emerald/green status dot',
       { callSignature: '<Avatar name="Alice Walker" status="online" />' }
     ),
     r(
@@ -414,7 +414,7 @@ empty()`,
     r(
       'Renders AvatarGroup container with semantic group role and -space-x-2 overlap',
       '<AvatarGroup avatars={sampleAvatars.slice(0, 3)} max={4} />',
-      'Renders group role container with -space-x-2 and exactly 3 visible avatars',
+      'Renders group role container with negative horizontal overlap and 3 visible avatars',
       { callSignature: '<AvatarGroup avatars={avatars} max={4} />' }
     ),
     r(
@@ -426,7 +426,7 @@ empty()`,
     r(
       'Applies size variants sm and lg correctly across avatars and overflow pill',
       '<AvatarGroup avatars={sampleAvatars} max={2} size="sm" />',
-      'Applies h-8 w-8 for sm and h-12 w-12 for lg across avatars and overflow pill',
+      'Scales avatar and overflow pill width/height progressively between sm and lg',
       { callSignature: '<AvatarGroup avatars={avatars} size="sm" />' }
     ),
   ],

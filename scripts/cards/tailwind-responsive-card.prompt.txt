@@ -27,23 +27,23 @@ interface ResponsiveCardProps {
 
 #### Structural & Styling Requirements
 - **Root Element**:
-  - Semantic `<article>` element using `flex flex-col` on mobile and `md:flex-row` on desktop.
-  - Styled with rounded corners, subtle border, neutral surface background, `overflow-hidden`, and shadow.
+  - Semantic `<article>` element using a vertical flex column on mobile and a horizontal flex row at the `md` breakpoint.
+  - Styled with rounded corners, subtle border, neutral surface background, clipped overflow, and shadow.
 - **Media / Image Section**:
-  - Relative container spanning `w-full aspect-video` on mobile and switching to `md:w-48 md:aspect-square md:shrink-0` on desktop.
-  - Child `<img>` filling the container with `object-cover`, using `product.imageUrl` (fallback to `'/keyboard-preview.jpeg'` if omitted) and `alt={product.title}`.
-  - If `product.badge` is provided, render an absolute overlay pill (`<span>`) anchored at top-left (`absolute top-3 left-3`) with accent background, white extra-small semibold text, compact padding, and `rounded-full`.
+  - Relative container spanning full width with a 16:9 aspect ratio on mobile, switching to a fixed-width non-shrinking square (`md:w-48 md:aspect-square`) at the `md` breakpoint.
+  - Child `<img>` filling the container and cropped to cover, using `product.imageUrl` (fallback to `'/keyboard-preview.jpeg'` if omitted) and `alt={product.title}`.
+  - If `product.badge` is provided, render an absolute overlay pill (`<span>`) anchored in the top-left corner with accent background, white extra-small semibold text, compact padding, and pill rounding.
 - **Content Section**:
-  - Flexible container (`flex-1`) with padding and `flex flex-col justify-between`.
+  - Flexible container growing to fill remaining space with padding and vertical flex spacing between header and CTA.
   - Heading (`<h3>`): large bold title displaying `product.title`.
-  - Description (`<p>`): small muted text with top margin and 2-line truncation (`line-clamp-2`) displaying `product.description`.
-  - Price & Rating Row (`flex items-center justify-between` with top margin):
-    - Price container (`flex items-baseline`):
+  - Description (`<p>`): small muted text with top margin and 2-line clamping displaying `product.description`.
+  - Price & Rating Row (flex row spaced apart with top margin):
+    - Price container (baseline-aligned flex row):
       - Current price (`<span>`): extra-large extrabold text displaying `$${product.price}`.
-      - If `product.originalPrice` is provided: small muted strikethrough (`line-through`) `<span>` with left margin displaying `$${product.originalPrice}`.
+      - If `product.originalPrice` is provided: small muted strikethrough `<span>` with left margin displaying `$${product.originalPrice}`.
     - If `product.rating` is provided: inline rating container with amber/yellow small medium text.
   - Add to Cart button:
-    - `<button type="button" onClick={onAddToCart}>` labeled `"Add to Cart"`, full-width on mobile and auto-width on desktop (`w-full md:w-auto`), with padding, rounded corners, accent background + hover state, white medium text, transition, and pointer cursor.
+    - `<button type="button" onClick={onAddToCart}>` labeled `"Add to Cart"`, full-width on mobile and auto-width at the `md` breakpoint, with padding, rounded corners, accent background + hover state, white medium text, transition, and pointer cursor.
 
 #### Edge Cases
 - When `product` is nullish, return `null`.

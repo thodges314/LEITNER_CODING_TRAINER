@@ -28,14 +28,14 @@ Build an accessible, responsive segmented control React component styled with Ta
 
 ### Requirements
 
-- **Container (`<div role="tablist">`)**:
+- **Container** (`<div role="tablist">`):
   - Semantic attributes: `role="tablist"`, `aria-orientation="horizontal"`.
-  - Inline-flex centered pill track with small padding, neutral background and border, rounded corners, and `select-none`.
-  - When `fullWidth` is `true`, includes `w-full` (otherwise `w-auto`).
+  - Inline-flex centered pill track with small padding, neutral background and border, rounded corners, and non-selectable text.
+  - Spans full width when `fullWidth` is `true` (auto width otherwise).
   - Merges any caller-provided `className` without clobbering base classes.
   - Forwards extra props (`...props`) to the outer container.
 
-- **Segment Item (`<button role="tab">`)**:
+- **Segment Item** (`<button role="tab">`):
   - Semantic attributes:
     - `type="button"`
     - `role="tab"`
@@ -43,15 +43,15 @@ Build an accessible, responsive segmented control React component styled with Ta
     - `tabIndex={isSelected ? 0 : -1}`
     - `disabled={Boolean(option.disabled)}`
   - Base styling: inline-flex centered button with medium font weight, rounded corners, smooth transitions, centered text, pointer cursor, and `focus-visible` ring.
-  - When `fullWidth` is `true`, includes `flex-1`.
+  - When `fullWidth` is `true`, segments grow equally to fill the track.
   - Size variants (`'sm'`, `'md'` default, `'lg'`): scale text size and horizontal/vertical padding progressively.
   - State styling:
     - Selected item (`isSelected`): accent background (e.g. indigo/blue), white text, and subtle shadow.
     - Inactive item (`!isSelected` and `!option.disabled`): muted text with brighter text and subtle background on hover.
-    - Disabled item (`option.disabled`): `opacity-40`, `cursor-not-allowed`, and `pointer-events-none`.
+    - Disabled item (`option.disabled`): dimmed opacity with not-allowed cursor and disabled pointer events.
   - Clicking an enabled option calls `onChange(option.value)`.
 
-- **Keyboard Navigation (`keydown`)**:
+- **Keyboard Navigation** (`keydown`):
   - When a tab button receives keyboard focus:
     - `ArrowRight` or `ArrowDown`: Selects the next enabled option (wrapping from the last enabled option back to the first).
     - `ArrowLeft` or `ArrowUp`: Selects the previous enabled option (wrapping from the first enabled option to the last).

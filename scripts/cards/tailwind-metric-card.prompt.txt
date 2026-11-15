@@ -10,15 +10,15 @@ Write raw HTML markup for a metric stat card:
 
 #### Card Structure & Tailwind Styling
 
-- **Card Container (`<div>`)**:
-  - Constrained max width (`max-w-sm`), rounded corners, generous padding, dark/neutral card surface background, subtle border, and drop shadow.
-- **Header Row (`<div>`)**:
-  - Flex row with centered items and `justify-between` spacing:
+- **Card Container** (`<div>`):
+  - Constrained max width (`sm`), rounded corners, generous padding, dark/neutral card surface background, subtle border, and drop shadow.
+- **Header Row** (`<div>`):
+  - Flex row with centered items spaced apart:
   - Metric title (`<span>`): `"Total Revenue"` in small, medium-weight muted text.
-  - Trend badge (`<span>`): `"+12.5%"` styled as a pill (`rounded-full`) with extra-small semibold text, translucent emerald/green background, emerald/green text, and subtle matching border.
-- **Metric Value (`<div>`)**:
+  - Trend badge (`<span>`): `"+12.5%"` styled as a pill with extra-small semibold text, translucent emerald/green background, emerald/green text, and subtle matching border.
+- **Metric Value** (`<div>`):
   - `"$48,250"` with top margin, large bold/extrabold display typography, tight tracking, and high-contrast text.
-- **Comparison Subtext (`<p>`)**:
+- **Comparison Subtext** (`<p>`):
   - `"vs. $42,890 last month"` with small top margin and extra-small muted text.
-- **Action Button (`<button type="button">`)**:
-  - `"View Detailed Report"` styled full width (`w-full`) with top margin, vertical/horizontal padding, rounded corners, indigo/blue primary background with white medium text, hover state, color transition, and focus ring.
+- **Action Button** (`<button type="button">`):
+  - `"View Detailed Report"` styled full width with top margin, vertical/horizontal padding, rounded corners, indigo/blue primary background with white medium text, hover state, color transition, and focus ring.

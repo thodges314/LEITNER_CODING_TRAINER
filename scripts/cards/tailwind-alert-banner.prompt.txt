@@ -11,14 +11,14 @@ Write raw HTML markup for an alert banner:
 
 #### Banner Structure & Tailwind Styling
 
-- **Banner Container (`<div role="alert">`)**:
-  - Flex row aligning items and spacing content across (`flex items-center justify-between`), with gap, padding, rounded corners, subtle shadow, light blue background tint, matching border, and dark blue text.
-- **Content Group (`<div>`)**:
+- **Banner Container** (`<div role="alert">`):
+  - Horizontal flex row with vertically centered items spaced between the content group and action button, with gap, padding, rounded corners, subtle shadow, light blue background tint, matching border, and dark blue text.
+- **Content Group** (`<div>`):
   - Flex row aligning an icon badge and text container with a horizontal gap.
-  - **Icon Badge (`<span>`)**:
-    - Centered square badge (`inline-flex items-center justify-center`) with rounded corners, soft blue background, bold blue `"i"` indicator.
-  - **Text Container (`<div>`)**:
+  - **Icon Badge** (`<span>`):
+    - Centered inline-flex square badge with rounded corners, soft blue background, and bold blue `"i"` indicator.
+  - **Text Container** (`<div>`):
     - Headline (`<h4>`): `"System Update Available"` in small semibold text.
     - Subtext caption (`<p>`): `"A new version of the dashboard is ready for deployment."` in extra-small blue-tinted text.
-- **Action Button (`<button type="button">`)**:
+- **Action Button** (`<button type="button">`):
   - `"Update Now"` styled with compact padding, rounded corners, extra-small medium white text, solid blue background with darker hover state, color transition, and focus ring.

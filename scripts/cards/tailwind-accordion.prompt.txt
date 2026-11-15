@@ -25,25 +25,25 @@ Build a flexible, accessible React accordion component styled with Tailwind CSS 
 
 ### Requirements
 
-- **Accordion Container (`<div>`)**:
-  - Vertical item dividers (`divide-y`), subtle border, rounded corners, `overflow-hidden`, and neutral surface background.
+- **Accordion Container** (`<div>`):
+  - Vertical item dividers, subtle border, rounded corners, clipped overflow, and neutral surface background.
   - Safely merges external `className` and forwards extra `props`.
 
-- **Item Header & Trigger (`<button>`)**:
+- **Item Header & Trigger** (`<button>`):
   - Semantic `<button type="button">` disclosure control.
   - ARIA attributes:
     - `id={`accordion-header-${item.id}`}`
     - `aria-expanded={isOpen ? 'true' : 'false'}`
     - `aria-controls={`accordion-panel-${item.id}`}`
     - `disabled={Boolean(item.disabled)}`
-  - Layout & states: full-width flex row (`justify-between`), comfortable padding, left-aligned medium text, color transition, and `focus-visible` ring.
+  - Layout & states: full-width flex row spaced apart, comfortable padding, left-aligned medium text, color transition, and `focus-visible` ring.
     - Open (`isOpen: true`): accent text highlight (e.g. indigo/blue).
     - Closed (`isOpen: false`): default neutral text with subtle hover background when enabled.
-    - Disabled (`item.disabled: true`): reduced opacity and `cursor-not-allowed`.
+    - Disabled (`item.disabled: true`): reduced opacity and not-allowed cursor.
   - Rotating Chevron Icon:
-    - Inline SVG chevron with smooth transform transition that rotates 180 degrees (`rotate-180`) when `isOpen` is `true`.
+    - Inline SVG chevron with smooth transform transition that rotates 180 degrees when `isOpen` is `true`.
 
-- **Content Panel (`<div>`)**:
+- **Content Panel** (`<div>`):
   - Attributes:
     - `id={`accordion-panel-${item.id}`}`
     - `role="region"`

@@ -75,22 +75,26 @@ export default {
     r(
       'Renders button with default primary variant and base interactive classes',
       '<Button>Submit</Button>',
-      'button with bg-blue-600, text-white, rounded-lg, type="button"'
+      'button with primary blue/indigo background, white text, rounded corners, and type="button"',
+      { callSignature: '<Button>Submit</Button>' }
     ),
     r(
       'Applies outline variant classes when variant="outline"',
       '<Button variant="outline">Cancel</Button>',
-      'button with border-gray-300, text-gray-700, hover:bg-gray-50'
+      'button with neutral border, neutral text, and subtle hover background',
+      { callSignature: '<Button variant="outline">Cancel</Button>' }
     ),
     r(
       'Applies disabled attribute and opacity/pointer-events utilities when disabled=true',
       '<Button disabled={true}>Disabled</Button>',
-      'disabled attribute present, disabled:opacity-50, disabled:pointer-events-none'
+      'disabled attribute present with disabled:opacity-* and disabled:pointer-events-none utilities',
+      { callSignature: '<Button disabled={true}>Disabled</Button>' }
     ),
     r(
       'Forwards extra props such as onClick and data-testid',
       '<Button data-testid="custom-btn" onClick={...}>Click</Button>',
-      'button receives extra attributes and fires click handlers'
+      'button receives extra attributes and fires click handlers',
+      { callSignature: '<Button onClick={fn} {...props}>Click</Button>' }
     ),
   ],
 

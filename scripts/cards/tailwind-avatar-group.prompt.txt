@@ -34,22 +34,22 @@ Build an accessible, responsive `AvatarGroup` component (and supporting `Avatar`
 
 ### Requirements
 
-- **Individual `Avatar` Component**:
+- **Individual** `Avatar` **Component**:
   - Container (`<span>`):
-    - Relative, non-shrinking inline-flex centered circle (`rounded-full`) with semibold non-selectable text, a 2px ring (`ring-2`) for stack separation, and neutral slate/gray background and text.
+    - Relative, non-shrinking inline-flex centered circle with semibold non-selectable text, a 2px ring for stack separation, and neutral slate/gray background and text.
     - Sizes scale width, height, and font size progressively (`'sm'`, `'md'` default, `'lg'`).
     - Forwards extra `props` (like `data-testid` or `onClick`).
   - Image & Initials Fallback:
-    - If `src` is provided and loads without error, renders a full-bleed circular `<img>` (`object-cover`, `rounded-full`) with `alt={alt || name}`.
+    - If `src` is provided and loads without error, renders a full-bleed circular `<img>` (cropped to cover) with `alt={alt || name}`.
     - If `src` is missing or fails to load (`onError`), renders uppercase initials from `name`:
       - Single-word name: first 2 characters (e.g. `'Sarah'` -> `'SA'`).
       - Multi-word name: first letter of the first word and first letter of the last word (e.g. `'Alex Rivera'` -> `'AR'`, `'John Fitzgerald Kennedy'` -> `'JK'`).
   - Status Indicator Dot:
-    - When `status` is provided, renders `<span aria-label={status} />` anchored at the bottom-right corner (`absolute bottom-0 right-0`) as a circle with a 2px ring, scaled to match `size`.
+    - When `status` is provided, renders `<span aria-label={status} />` anchored at the bottom-right corner as a circle with a 2px ring, scaled to match `size`.
     - Variant background colors: `'online'` (emerald/green), `'busy'` (rose/red), `'away'` (amber/yellow), `'offline'` (slate/gray).
 
-- **`AvatarGroup` Stack Component**:
-  - Container: `<div role="group" aria-label="Team avatars" {...props}>` with `inline-flex items-center -space-x-2 overflow-hidden` (plus any external `className`).
+- `AvatarGroup` **Stack Component**:
+  - Container: `<div role="group" aria-label="Team avatars" {...props}>` as a centered inline-flex horizontal stack with negative horizontal spacing so avatars overlap and clipped overflow (plus any external `className`).
   - Overlap & Truncation:
     - If `avatars.length <= max`: renders all avatars in order.
     - If `avatars.length > max`: renders the first `max` avatars, followed by a circular overflow counter pill matching the active `size`, styled with the same 2px ring, neutral surface, hover state, and transition:

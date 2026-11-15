@@ -59,7 +59,7 @@ const sampleAvatars = [
   const r = render(<AvatarGroup avatars={sampleAvatars.slice(0, 3)} max={4} />);
   const group = r.container.querySelector('[role="group"]');
   const hasGroup = group !== null && group.getAttribute('aria-label') === 'Team avatars';
-  const hasOverlap = group !== null && group.classList.contains('-space-x-2');
+  const hasOverlap = group !== null && /-space-x-/.test(group.className);
   const avatarCount = group?.querySelectorAll(':scope > span').length;
 
   $test.check(

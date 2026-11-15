@@ -22,10 +22,10 @@ Implement an interactive React component (`PricingCard`) styled with Tailwind CS
 
 ### Requirements
 
-- **Card Container (`<article>`)**:
+- **Card Container** (`<article>`):
   - Rounded corners, generous padding, border, and smooth transitions.
   - When `tier.popular` is `true`:
-    - Highlighted with an accent border (e.g. indigo/blue) and a 2px ring (`ring-2`).
+    - Highlighted with an accent border (e.g. indigo/blue) and a 2px ring.
     - Renders a pill `<span>` badge inside with text `"Most Popular"` in uppercase semibold extra-small white text on an accent background.
   - When `tier.popular` is `false` or omitted:
     - Neutral slate/gray border and subtle surface background.
@@ -36,12 +36,12 @@ Implement an interactive React component (`PricingCard`) styled with Tailwind CS
     - Price (`<span>`): large extrabold display text displaying `$${tier.price}`.
     - Period (`<span>`): small muted text with left margin displaying `tier.period || '/mo'`.
 
-- **Features List (`<ul>`)**:
-  - Vertically spaced list (`space-y-3 my-6`) where each item in `tier.features` renders as a small flex-aligned `<li>` containing a `<span>` with the feature text.
+- **Features List** (`<ul>`):
+  - Vertically spaced list with vertical margin where each item in `tier.features` renders as a small flex-aligned `<li>` containing a `<span>` with the feature text.
   - When `tier.features` is empty or omitted, renders an empty `<ul>`.
 
-- **Call-to-Action Button (`<button type="button">`)**:
-  - Full-width (`w-full`), padded, rounded corners, medium font weight, color transition, and pointer cursor.
+- **Call-to-Action Button** (`<button type="button">`):
+  - Full-width, padded, rounded corners, medium font weight, color transition, and pointer cursor.
   - When `tier.popular` is `true`: accent background (e.g. indigo/blue) with hover state and white text.
   - When `tier.popular` is `false` or omitted: neutral dark background with hover state and white text.
   - Content: `tier.ctaText || 'Get Started'`

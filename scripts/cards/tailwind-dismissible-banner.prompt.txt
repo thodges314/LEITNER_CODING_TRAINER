@@ -15,8 +15,8 @@ Implement an interactive React component (`DismissibleBanner`) styled with Tailw
 - **State**:
   - Manages internal visibility state initialized to `true` with `useState(true)`.
   - When dismissed, returns `null`.
-- **Accessibility & Container (`<div role="alert">`)**:
-  - Flex row (`items-start`) with gap, padding, rounded corners, border, and smooth transitions.
+- **Accessibility & Container** (`<div role="alert">`):
+  - Top-aligned flex row with gap, padding, rounded corners, border, and smooth transitions.
   - Semantic variant color tokens (soft tinted background, high-contrast text, and matching border):
     - `'info'`: sky/blue tones
     - `'success'`: emerald/green tones
@@ -25,8 +25,8 @@ Implement an interactive React component (`DismissibleBanner`) styled with Tailw
 - **Content Area**:
   - Title: block-level `<strong>` in small semibold text displaying `title`.
   - Message: `<p>` in small slightly muted text with top margin displaying `message`.
-- **Dismiss Button (`<button>`)**:
+- **Dismiss Button** (`<button>`):
   - Attributes: `type="button"`, `aria-label="Dismiss"`
-  - Pushed to the right (`ml-auto`), compact padding, rounded corners, opacity transition on hover, focus ring, and pointer cursor.
+  - Pushed to the trailing/right edge (auto left margin), compact padding, rounded corners, opacity transition on hover, focus ring, and pointer cursor.
   - Content: `&times;` (or `'×'`)
   - Clicking sets visibility to `false` and calls `onDismiss?.()`.
