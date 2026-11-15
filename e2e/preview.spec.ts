@@ -545,11 +545,12 @@ test.describe('React preview window', () => {
     await expect(article).toContainText('Pro Cloud');
     await expect(article).toContainText('$29');
 
-    // Verify Tailwind CDN script is present in iframe head
-    const hasTailwindCdn = await frame.locator('head').evaluate((head) => {
-      return Array.from(head.querySelectorAll('script')).some((s) => s.src.includes('tailwindcss.com'));
-    });
-    expect(hasTailwindCdn).toBe(true);
+    // Verify offline Tailwind bundle compiled styles in iframe head
+    await expect.poll(async () => {
+      return frame.locator('head').evaluate((head) =>
+        Array.from(head.querySelectorAll('style')).some((s) => /--tw-|@layer/.test(s.textContent || ''))
+      );
+    }).toBe(true);
 
     // Verify React is loaded in React + Tailwind preview
     const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
@@ -579,10 +580,11 @@ test.describe('React preview window', () => {
     const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
     expect(hasReact).toBe(true);
 
-    const hasTailwindCdn = await frame.locator('head').evaluate((head) => {
-      return Array.from(head.querySelectorAll('script')).some((s) => s.src.includes('tailwindcss.com'));
-    });
-    expect(hasTailwindCdn).toBe(true);
+    await expect.poll(async () => {
+      return frame.locator('head').evaluate((head) =>
+        Array.from(head.querySelectorAll('style')).some((s) => /--tw-|@layer/.test(s.textContent || ''))
+      );
+    }).toBe(true);
   });
 
   test('tailwind-dismissible-banner: loads React and Tailwind, renders alert banner, and dismisses on click', async ({ page }) => {
@@ -609,10 +611,11 @@ test.describe('React preview window', () => {
     const hasReact = await frame.locator('body').evaluate(() => typeof (window as unknown as { React?: unknown }).React !== 'undefined');
     expect(hasReact).toBe(true);
 
-    const hasTailwindCdn = await frame.locator('head').evaluate((head) => {
-      return Array.from(head.querySelectorAll('script')).some((s) => s.src.includes('tailwindcss.com'));
-    });
-    expect(hasTailwindCdn).toBe(true);
+    await expect.poll(async () => {
+      return frame.locator('head').evaluate((head) =>
+        Array.from(head.querySelectorAll('style')).some((s) => /--tw-|@layer/.test(s.textContent || ''))
+      );
+    }).toBe(true);
 
     // Dismiss the banner
     const dismissBtn = alert.locator('button[aria-label="Dismiss"]');

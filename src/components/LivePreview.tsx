@@ -317,12 +317,11 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
   useEffect(() => {
     if (runTrigger !== prevRunTriggerRef.current) {
       prevRunTriggerRef.current = runTrigger;
-      if (isLive && !hasTimedOutRef.current) {
-        setReadyEnvKey(currentEnvKey);
+      if (isLive && isIframeReady && !hasTimedOutRef.current) {
         void sendToIframe();
       }
     }
-  }, [runTrigger, isLive, currentEnvKey, sendToIframe]);
+  }, [runTrigger, isLive, isIframeReady, sendToIframe]);
 
   // Re-render debounced (500ms) on typing when live
   const prevCodeRef = useRef(code);

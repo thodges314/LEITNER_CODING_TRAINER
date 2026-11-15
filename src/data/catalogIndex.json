@@ -225,7 +225,7 @@
       "algorithms",
       "sliding-window"
     ],
-    "summary": "Implement fixed-size sliding window summation in O(n) time"
+    "summary": "Implement fixed-size subarray summation in $O(n)$ time and $O(1)$ space"
   },
   {
     "id": "valid-parentheses-stack",
@@ -262,7 +262,7 @@
       "intervals",
       "sorting"
     ],
-    "summary": "Implement interval merging on an array of [start, end] pairs"
+    "summary": "Implement interval merging on an array of [start, end] pairs in $O(n \\log n)$ time"
   },
   {
     "id": "debounce",
@@ -1564,7 +1564,7 @@
       "recursion",
       "basics"
     ],
-    "summary": "Implement dynamic programming fundamentals for sequence and counting problems"
+    "summary": "Implement two classic sequence-counting problems in $O(n)$ time and $O(1)$ space"
   },
   {
     "id": "coin-change-dp",
@@ -1632,7 +1632,7 @@
       "prefix-sum",
       "kadane"
     ],
-    "summary": "Implement array prefix sum, product, and dynamic programming algorithms in $O(n)$ time"
+    "summary": "Implement array subarray and product problems in $O(n)$ time"
   },
   {
     "id": "linked-list-cycle-merge",
@@ -1751,7 +1751,7 @@
       "array",
       "rotated"
     ],
-    "summary": "Implement binary search algorithms in O(log n) time on a sorted, rotated array of distinct numbers (e.g. [4, 5, 6, 7, 0, 1, 2])"
+    "summary": "Implement binary search algorithms in $O(\\log n)$ time on a **rotated sorted array** of distinct numbers."
   },
   {
     "id": "trie-prefix-tree",
@@ -1778,7 +1778,7 @@
       "recursion",
       "basics"
     ],
-    "summary": "Implement combinatorial generation utilities"
+    "summary": "Implement two recursive **backtracking** generators that produce every valid result in sorted order"
   },
   {
     "id": "compose-middleware",
@@ -2188,7 +2188,7 @@
       "greedy",
       "array"
     ],
-    "summary": "Implement two classic geometric two-pointer algorithms in $O(n)$ time and $O(1)$ space"
+    "summary": "Implement two classic geometric array algorithms in $O(n)$ time and $O(1)$ space"
   },
   {
     "id": "edit-distance-knapsack",
@@ -2335,7 +2335,7 @@
       "string",
       "hash-map"
     ],
-    "summary": "Implement variable-size sliding window algorithms for substring character frequency constraints"
+    "summary": "Implement substring character-constraint algorithms in $O(n)$ time"
   },
   {
     "id": "min-window-permutation",

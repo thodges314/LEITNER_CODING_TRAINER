@@ -90,11 +90,9 @@ describe('SocraticClarificationAssistant', () => {
     });
 
     expect(container?.textContent).toContain('Socratic AI Tutor');
-    expect(container?.textContent).toContain('No code spoilers');
-    expect(container?.textContent).toContain('Clarify Prompt');
-    expect(container?.textContent).toContain('Concept Refresher');
-    expect(container?.textContent).toContain('Edge Cases');
-    expect(container?.textContent).toContain('Why is current approach broken?');
+    expect(container?.textContent).not.toContain('No code spoilers');
+    expect(container?.textContent).toContain('I can see your current code in the editor');
+    expect(container?.querySelectorAll('.socratic-chip-btn').length).toBe(0);
   });
 
   it('closes panel when clicking the close button', async () => {
@@ -121,7 +119,7 @@ describe('SocraticClarificationAssistant', () => {
     expect(container?.textContent).not.toContain('Socratic AI Tutor');
   });
 
-  it('submits question and shows Socratic response when clicking a prompt chip', async () => {
+  it('submits question via input form and shows Socratic response without chip buttons', async () => {
     await act(async () => {
       root?.render(
         <SocraticClarificationAssistant
@@ -136,12 +134,19 @@ describe('SocraticClarificationAssistant', () => {
       btn.click();
     });
 
-    const chipBtns = Array.from(container?.querySelectorAll('.socratic-chip-btn') || []) as HTMLButtonElement[];
-    const conceptChip = chipBtns.find((b) => b.textContent?.includes('Concept Refresher'));
-    expect(conceptChip).toBeDefined();
+    const input = container?.querySelector('input[type="text"]') as HTMLInputElement;
+    const form = container?.querySelector('form') as HTMLFormElement;
+    expect(input).not.toBeNull();
+    expect(form).not.toBeNull();
 
     await act(async () => {
-      conceptChip?.click();
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      setter?.call(input, 'Why is my current approach failing?');
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    await act(async () => {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     });
 
     expect(aiModule.askSocraticClarification).toHaveBeenCalledTimes(1);
@@ -155,6 +160,7 @@ describe('SocraticClarificationAssistant', () => {
     }
 
     expect(container?.textContent).toContain('Binary search');
+    expect(container?.querySelectorAll('.socratic-chip-btn').length).toBe(0);
   });
 
   it('displays offline notice and Add Key button when no API key is saved', async () => {
@@ -188,43 +194,6 @@ describe('SocraticClarificationAssistant', () => {
     expect(onOpenSettings).toHaveBeenCalledTimes(1);
   });
 
-  it('renders all four follow-up chips when in active conversation', async () => {
-    await act(async () => {
-      root?.render(
-        <SocraticClarificationAssistant
-          topic={sampleTopic}
-          currentCode="function binarySearch() {}"
-        />
-      );
-    });
-
-    const openBtn = container?.querySelector('button[aria-label="Ask AI Tutor for Clarification or Hints"]') as HTMLButtonElement;
-    await act(async () => {
-      openBtn.click();
-    });
-
-    const firstChip = Array.from(container?.querySelectorAll('.socratic-chip-btn') || [])[0] as HTMLButtonElement;
-    await act(async () => {
-      firstChip.click();
-    });
-
-    // Wait for reply and streaming
-    for (let i = 0; i < 25; i++) {
-      const chips = container?.querySelectorAll('.socratic-chip-btn');
-      if (chips && chips.length === 4) break;
-      await act(async () => {
-        await new Promise((r) => setTimeout(r, 40));
-      });
-    }
-
-    const followUpChips = Array.from(container?.querySelectorAll('.socratic-chip-btn') || []);
-    expect(followUpChips.length).toBe(4);
-    expect(followUpChips.some((b) => b.textContent?.includes('Clarify Prompt'))).toBe(true);
-    expect(followUpChips.some((b) => b.textContent?.includes('Concept Refresher'))).toBe(true);
-    expect(followUpChips.some((b) => b.textContent?.includes('Edge Cases'))).toBe(true);
-    expect(followUpChips.some((b) => b.textContent?.includes('Why is current approach broken?'))).toBe(true);
-  });
-
   it('does not replay streaming animation when closing and reopening chat', async () => {
     await act(async () => {
       root?.render(
@@ -240,9 +209,15 @@ describe('SocraticClarificationAssistant', () => {
       openBtn.click();
     });
 
-    const firstChip = Array.from(container?.querySelectorAll('.socratic-chip-btn') || [])[0] as HTMLButtonElement;
+    const input = container?.querySelector('input[type="text"]') as HTMLInputElement;
+    const form = container?.querySelector('form') as HTMLFormElement;
     await act(async () => {
-      firstChip.click();
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      setter?.call(input, 'Why is my code failing?');
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await act(async () => {
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     });
 
     // Wait until streaming completely finishes (onComplete fires and clears animatingIndex)

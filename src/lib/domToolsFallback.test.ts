@@ -17,6 +17,7 @@ const ids = [
   'typeahead-autocomplete',
   'infinite-scroll-list',
   'use-previous-latest-ref',
+  'react-use-promise',
 ];
 
 describe('DOM tools without React.act (production build behaviour)', () => {

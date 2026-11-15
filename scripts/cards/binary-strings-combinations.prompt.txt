@@ -1,12 +1,17 @@
-Implement combinatorial generation utilities:
+Implement two recursive **backtracking** generators that produce every valid result in sorted order:
+
+> **What is Backtracking?** Think of it like a choose-your-own-adventure tree: pick a choice, follow it until you hit a full answer, save that answer, then **step back** ("backtrack") to try the next choice. For `binaryStrings(2)`: start with `""` $\to$ add `'0'` (`"0"`) $\to$ add `'0'` (`"00"`, save!) $\to$ step back to `"0"` $\to$ add `'1'` (`"01"`, save!) $\to$ step back to `""` $\to$ add `'1'` (`"1"`), and repeat to get `"10"` and `"11"`.
 
 ### `binaryStrings(n: number): string[]`
-- Generates every binary string of length `n` in lexicographically ascending order.
-- For example, `binaryStrings(2)` returns `['00', '01', '10', '11']`.
-- Returns `['']` when `n === 0`.
+Generates **every possible string of length `n` made only of `'0'` and `'1'`**, sorted in dictionary (alphabetical) order (`'0'` before `'1'`).
+- **Examples**:
+  - `binaryStrings(0)` $\to$ `['']`
+  - `binaryStrings(2)` $\to$ `['00', '01', '10', '11']`
+  - `binaryStrings(3)` $\to$ `['000', '001', '010', '011', '100', '101', '110', '111']` (total $2^n$ strings).
 
 ### `combine(n: number, k: number): number[][]`
-- Generates every combination of `k` numbers chosen from range `1...n`.
-- Each individual combination must be an array sorted in ascending order.
-- Combinations must be returned in lexicographical order (e.g. `combine(4, 2)` starts with `[1, 2]`, `[1, 3]`).
-- Returns `[[]]` for `k === 0`; returns `[]` when `k > n`.
+Given two integers `n` and `k`, return **all unique groups of `k` numbers chosen from `1` through `n`** (order inside a group doesn't matter, so `[1, 2]` and `[2, 1]` are the same group — only include `[1, 2]`).
+- **Ordering Rules**:
+  - Each group is sorted in ascending order (e.g. `[1, 3]`, never `[3, 1]`).
+  - The list of groups is returned in dictionary order: `combine(4, 2)` $\to$ `[[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]]`.
+- **Edge Cases**: Returns `[[]]` for `k === 0`; returns `[]` when `k > n`.

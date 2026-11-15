@@ -1,10 +1,16 @@
-Implement dynamic programming fundamentals for sequence and counting problems:
+Implement two classic sequence-counting problems in $O(n)$ time and $O(1)$ space:
 
 ### `fib(n: number): number`
-- Computes the n-th Fibonacci number where `fib(0) = 0` and `fib(1) = 1`.
-- Must return in O(n) time and O(1) space (e.g. iterative tabulation or memoization) so that large values like `fib(50)` return instantly without recursion stack overflow or timeout.
+Computes the $n$-th Fibonacci number, where each number is the sum of the two preceding ones:
+- Base cases: `fib(0) = 0`, `fib(1) = 1`.
+- Recurrence: $F_n = F_{n-1} + F_{n-2}$ (sequence: `0, 1, 1, 2, 3, 5, 8, 13, ...`).
+- Must run in $O(n)$ time and $O(1)$ space so large inputs like `fib(50)` (`12586269025`) return immediately without stack overflow or timeout.
 
 ### `climbStairs(n: number): number`
-- Calculates the number of distinct ways to climb a staircase of `n` steps when taking either 1 or 2 steps at a time.
-- Returns `1` for `climbStairs(0)` and `climbStairs(1)`.
-- Runs in O(n) time and O(1) space.
+Imagine a staircase with `n` steps. On each move, you can climb either **1 step** or **2 steps**. Return how many **distinct sequences of moves** reach the top (step `n`).
+- **Examples**:
+  - `climbStairs(0)` $\to$ `1` (1 way: do nothing) and `climbStairs(1)` $\to$ `1` (`[1]`).
+  - `climbStairs(2)` $\to$ `2` (`[1, 1]`, `[2]`).
+  - `climbStairs(3)` $\to$ `3` (`[1, 1, 1]`, `[1, 2]`, `[2, 1]`).
+  - `climbStairs(4)` $\to$ `5` (`[1,1,1,1]`, `[1,1,2]`, `[1,2,1]`, `[2,1,1]`, `[2,2]`).
+- Runs in $O(n)$ time and $O(1)$ space.

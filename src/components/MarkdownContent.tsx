@@ -122,6 +122,19 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
               const trimmed = para.trim();
               if (!trimmed) return null;
 
+              if (/^(-{3,}|\*{3,})$/.test(trimmed)) {
+                return (
+                  <hr
+                    key={pIdx}
+                    style={{
+                      border: 'none',
+                      borderTop: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.12))',
+                      margin: '10px 0 4px 0',
+                    }}
+                  />
+                );
+              }
+
               const groups = parseParagraphLines(trimmed);
 
               return (
@@ -134,7 +147,7 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
                       const headingStyles = {
                         fontWeight: 600,
                         color: 'var(--text-primary)',
-                        margin: '4px 0 2px 0',
+                        margin: gIdx === 0 ? '0 0 2px 0' : '18px 0 2px 0',
                         lineHeight: 1.3,
                       };
                       if (group.level === 1) {
@@ -158,13 +171,30 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
                         );
                       }
                       if (group.level === 3) {
+                        const showDivider = !(bIdx === 0 && pIdx === 0 && gIdx === 0);
                         return (
-                          <h4
-                            key={gIdx}
-                            style={{ ...headingStyles, fontSize: '14px' }}
-                          >
-                            {renderInlineMarkdown(group.text)}
-                          </h4>
+                          <React.Fragment key={gIdx}>
+                            {showDivider && (
+                              <hr
+                                style={{
+                                  border: 'none',
+                                  borderTop: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.12))',
+                                  margin: '12px 0 6px 0',
+                                }}
+                              />
+                            )}
+                            <h4
+                              style={{
+                                ...headingStyles,
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                borderLeft: '3px solid var(--accent-cyan, #38bdf8)',
+                                paddingLeft: '10px',
+                              }}
+                            >
+                              {renderInlineMarkdown(group.text)}
+                            </h4>
+                          </React.Fragment>
                         );
                       }
                       if (group.level === 4) {

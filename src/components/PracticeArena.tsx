@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import type { ReactCodeMirrorRef } from '@uiw/react-codemirror';
-import rainbowBrackets from 'rainbowbrackets';
+import rainbowBrackets from '../lib/rainbowBrackets';
 import { EditorView, keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
 import { createTsHoverExtension } from './practice/tsHoverExtension';
@@ -510,6 +510,36 @@ export const PracticeArena: React.FC<PracticeArenaProps> = ({
           onOpenSettings={onOpenSettings}
         />
         <MarkdownContent text={currentCard.promptSeed} />
+        <p
+          style={{
+            marginTop: '12px',
+            marginBottom: 0,
+            fontSize: '12px',
+            color: 'var(--text-muted, #94a3b8)',
+          }}
+        >
+          Stuck? Click{' '}
+          <span
+            aria-hidden="true"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '16px',
+              height: '16px',
+              borderRadius: '50%',
+              border: '1px solid currentColor',
+              fontSize: '10px',
+              fontWeight: 600,
+              lineHeight: 1,
+              verticalAlign: 'text-bottom',
+              margin: '0 2px',
+            }}
+          >
+            ?
+          </span>{' '}
+          in the top-right to open the Socratic AI Tutor (available when an AI API key is configured in Settings).
+        </p>
       </div>
 
       {/* Target Contract (Input vs Expected Output) */}

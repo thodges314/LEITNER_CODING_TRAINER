@@ -67,7 +67,7 @@ export function usePracticeCodeExecution({
   const handleRunCode = async () => {
     setIsPreviewLive(true);
     setPreviewRunTrigger((c) => c + 1);
-    if (!code.trim() || isRunning) return;
+    if (isRunning) return;
     setIsOutputOpen(true);
     setIsRunning(true);
     setExecutionStatus('running');
