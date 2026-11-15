@@ -17,6 +17,7 @@ function TwoStepWizard({ onSubmit }: TwoStepWizardProps): JSX.Element {
       <div>
         <input
           aria-label="Name"
+          placeholder="Name"
           value={name}
           onChange={(e: { target: { value: string } }) => setName(e.target.value)}
         />
@@ -35,6 +36,7 @@ function TwoStepWizard({ onSubmit }: TwoStepWizardProps): JSX.Element {
     <div>
       <input
         aria-label="Email"
+        placeholder="Email"
         value={email}
         onChange={(e: { target: { value: string } }) => setEmail(e.target.value)}
       />

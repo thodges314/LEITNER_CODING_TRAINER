@@ -8,6 +8,7 @@ function TwoStepWizard({ onSubmit }) {
       <div>
         <input
           aria-label="Name"
+          placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -26,6 +27,7 @@ function TwoStepWizard({ onSubmit }) {
     <div>
       <input
         aria-label="Email"
+        placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
