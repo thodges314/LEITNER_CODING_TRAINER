@@ -154,7 +154,14 @@ export function createDomTools() {
     const container = document.createElement('div');
     container.style.cssText = 'position:absolute;left:-10000px;top:0;';
     document.body.appendChild(container);
-    const root = createRoot(container);
+    let uncaughtTimeout: Error | null = null;
+    const root = createRoot(container, {
+      onUncaughtError(err) {
+        if (!uncaughtTimeout && err instanceof Error && err.message.includes('infinite loop detected')) {
+          uncaughtTimeout = err;
+        }
+      },
+    });
     const entry = { root, container, unmounted: false };
     mounted.push(entry);
 
@@ -166,6 +173,9 @@ export function createDomTools() {
     act(() => {
       root.render(initialElement);
     });
+    if (uncaughtTimeout) {
+      throw uncaughtTimeout;
+    }
 
     const result: RenderResult = {
       container,

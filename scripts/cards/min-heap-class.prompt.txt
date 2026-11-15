@@ -2,8 +2,8 @@ Implement an array-backed binary min-heap and sorting utility:
 
 ### `MinHeap`
 - Backed by an internal array where child indices for node `i` are `2i + 1` and `2i + 2`.
-- **`push(x: number): void`**: Inserts `x` into the heap using sift-up in O(log n) time.
-- **`pop(): number | undefined`**: Removes and returns the minimum element using sift-down in O(log n) time; returns `undefined` if empty.
+- **`push(x: number): void`**: Inserts `x` into the heap using sift-up in $O(\log n)$ time.
+- **`pop(): number | undefined`**: Removes and returns the minimum element using sift-down in $O(\log n)$ time; returns `undefined` if empty.
 - **`peek(): number | undefined`**: Returns the minimum element without removing it; returns `undefined` if empty.
 - **`size(): number`**: Returns the number of elements currently stored.
 

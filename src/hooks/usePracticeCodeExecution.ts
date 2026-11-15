@@ -170,7 +170,7 @@ export function usePracticeCodeExecution({
     const transpiled = await transpileForExecution(
       executableSource,
       'js',
-      3000,
+      1500,
       isTsTrack ? undefined : currentCard?.promptSeed
     );
     for (const diag of transpiled.diagnostics) {
@@ -267,6 +267,7 @@ export function usePracticeCodeExecution({
     });
 
     try {
+      await new Promise<void>((r) => setTimeout(r, 0));
       const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
       const fn = new AsyncFunction(...scope.names, executableCode);
       let runTimer: ReturnType<typeof setTimeout> | undefined;

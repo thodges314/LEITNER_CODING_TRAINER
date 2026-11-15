@@ -6,5 +6,5 @@ Implement subsequence comparison algorithms:
 - Returns `0` if either string is empty.
 
 ### `isSubsequence(s: string, t: string): boolean`
-- Determines whether string `s` is a subsequence of string `t` using a two-pointer approach in O(length of t) time.
+- Determines whether string `s` is a subsequence of string `t` using a two-pointer approach in $O(\text{length of } t)$ time.
 - Returns `true` if `s` is the empty string `""`.

@@ -1,7 +1,7 @@
 Implement cycle detection and sorted list merging on singly linked list nodes (`{ val, next }`):
 
 ### `hasCycle<T>(head: ListNode<T> | null): boolean`
-- Detects whether a linked list contains a cycle using Floyd's Tortoise and Hare algorithm in O(1) auxiliary space.
+- Detects whether a linked list contains a cycle using Floyd's Tortoise and Hare algorithm in $O(1)$ auxiliary space.
 - Returns `true` if any node can be reached more than once by following `next` pointers; otherwise `false`.
 
 ### `mergeTwoLists(a: ListNode<number> | null, b: ListNode<number> | null): ListNode<number> | null`

@@ -2,7 +2,7 @@ Implement tree reconstruction and serialization algorithms on nodes shaped `{ va
 
 ### `buildTree(preorder: number[], inorder: number[]): TreeNode<number> | null`
 - Reconstructs a binary tree from its `preorder` and `inorder` traversal arrays (where all node values are distinct).
-- Operates in O(n) time complexity using a value-to-index map for `inorder` lookups.
+- Operates in $O(n)$ time complexity using a value-to-index map for `inorder` lookups.
 - Returns `null` if the arrays are empty (`[]`).
 
 ### `serialize(root: TreeNode<number> | null): string`

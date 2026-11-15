@@ -1,4 +1,4 @@
-Implement a Least Recently Used (LRU) cache class operating in O(1) time complexity for all operations:
+Implement a Least Recently Used (LRU) cache class operating in $O(1)$ time complexity for all operations:
 
 ### `new LRUCache<K = number, V = number>(capacity: number): LRUCache<K, V>`
 

@@ -1,6 +1,11 @@
 Implement classical exact binary search on sorted sequences:
 
 ### `binarySearch(nums, target)`
+{{include:binary-search-explanation.md}}
+
 - Finds the exact index of `target` in a sorted ascending array of numbers `nums`.
 - Returns the 0-based index if `target` is found, or `-1` if `target` is not present.
-- Must run in O(log n) time and O(1) auxiliary space.
+- **Examples**:
+  - `binarySearch([-1, 0, 3, 5, 9, 12], 9)` $\to$ `4`
+  - `binarySearch([-1, 0, 3, 5, 9, 12], 2)` $\to$ `-1`
+- Must run in $O(\log n)$ time and $O(1)$ auxiliary space.

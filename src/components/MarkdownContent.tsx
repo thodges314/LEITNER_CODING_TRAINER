@@ -1,5 +1,6 @@
 import React from 'react';
 import { renderInlineMarkdown, parseParagraphLines, type MarkdownListItem } from '../lib/markdown';
+import { ArrayTraceBlock, type ArrayTraceData } from './ArrayTraceBlock';
 
 export interface MarkdownContentProps {
   text: string;
@@ -89,6 +90,16 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
 
         if (block.startsWith('```') && block.endsWith('```')) {
           const raw = block.slice(3, -3);
+          if (raw.startsWith('array-trace\n')) {
+            try {
+              const data = JSON.parse(raw.slice('array-trace\n'.length)) as ArrayTraceData;
+              if (data && Array.isArray(data.rows)) {
+                return <ArrayTraceBlock key={bIdx} data={data} />;
+              }
+            } catch {
+              // Fall back to regular code block if JSON is invalid
+            }
+          }
           // Strip leading language tag if present (e.g. ```javascript\n)
           const code = raw.replace(/^[a-zA-Z0-9_-]+\n/, '');
           return (

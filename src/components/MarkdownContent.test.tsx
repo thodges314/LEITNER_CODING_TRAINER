@@ -280,4 +280,35 @@ const x = 42;
       expect(container.querySelector('.markdown-math-display .katex-display')).not.toBeNull();
     });
   });
+
+  it('renders array-trace fenced blocks as visual array boxes with indices', () => {
+    const text = [
+      '```array-trace',
+      JSON.stringify({
+        title: 'Trace example',
+        rows: [
+          {
+            caption: 'Step 1:',
+            offset: 2,
+            items: [
+              { value: 10, index: 2, state: 'mid' },
+              { value: 20, index: 3, state: 'removed' },
+            ],
+          },
+        ],
+      }),
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const block = container.querySelector('.array-trace-block');
+    expect(block).not.toBeNull();
+    expect(block?.textContent).toContain('Trace example');
+    expect(block?.textContent).toContain('Step 1:');
+    expect(block?.textContent).toContain('10');
+    expect(block?.textContent).toContain('20');
+  });
 });

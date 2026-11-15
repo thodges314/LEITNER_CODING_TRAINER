@@ -99,7 +99,7 @@
       "dedup",
       "intersection"
     ],
-    "summary": "Implement set operations on arrays using JavaScript Set in O(n + m) time"
+    "summary": "Implement set operations on arrays using JavaScript Set in $O(n + m)$ time"
   },
   {
     "id": "array-flatten-recursive",
@@ -150,7 +150,7 @@
       "cache",
       "map"
     ],
-    "summary": "Implement a Least Recently Used (LRU) cache class operating in O(1) time complexity for all operations"
+    "summary": "Implement a Least Recently Used (LRU) cache class operating in $O(1)$ time complexity for all operations"
   },
   {
     "id": "controlled-vs-uncontrolled-input",
@@ -213,7 +213,7 @@
       "algorithms",
       "two-pointers"
     ],
-    "summary": "Implement two sum on a pre-sorted array using two pointers in O(n) time and O(1) space"
+    "summary": "Implement two sum on a pre-sorted array using two pointers in $O(n)$ time and $O(1)$ space"
   },
   {
     "id": "sliding-window-fixed",
@@ -458,7 +458,7 @@
       "ttl",
       "data-structures"
     ],
-    "summary": "Implement a Least Recently Used (LRU) cache class with Time-To-Live (TTL) expiration in O(1) time"
+    "summary": "Implement a Least Recently Used (LRU) cache class with Time-To-Live (TTL) expiration in $O(1)$ time"
   },
   {
     "id": "flatten-array-object",
@@ -658,7 +658,7 @@
       "arrays",
       "complexity"
     ],
-    "summary": "Implement the classic two sum lookup algorithm in O(n) time using a hash map"
+    "summary": "Implement the classic two sum lookup algorithm in $O(n)$ time using a hash map"
   },
   {
     "id": "tree-traversal-dom",
@@ -1522,7 +1522,7 @@
       "array",
       "basics"
     ],
-    "summary": "Implement binary search algorithms in O(log n) time on sorted arrays"
+    "summary": "Implement binary search algorithms in $O(\\log n)$ time on sorted arrays"
   },
   {
     "id": "bst-search-insert",
@@ -1712,7 +1712,7 @@
       "design",
       "class"
     ],
-    "summary": "Implement stack and queue data structures with O(1) performance"
+    "summary": "Implement stack and queue data structures with $O(1)$ performance"
   },
   {
     "id": "permutations-subsets-backtracking",
@@ -2269,7 +2269,7 @@
       "monotonic-stack",
       "array"
     ],
-    "summary": "Implement linear-time monotonic stack algorithms in O(n) time"
+    "summary": "Implement linear-time monotonic stack algorithms in $O(n)$ time"
   },
   {
     "id": "monotonic-stack-histogram",
@@ -2282,7 +2282,7 @@
       "monotonic-stack",
       "histogram"
     ],
-    "summary": "Implement classic monotonic stack algorithms in O(n) time"
+    "summary": "Implement classic monotonic stack algorithms in $O(n)$ time"
   },
   {
     "id": "unique-paths-grid",

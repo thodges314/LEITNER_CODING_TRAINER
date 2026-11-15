@@ -1,11 +1,11 @@
-Implement stack and queue data structures with O(1) performance:
+Implement stack and queue data structures with $O(1)$ performance:
 
 ### `MinStack`
-- **`push(x: number): void`**: Pushes element `x` onto the stack in O(1) time.
+- **`push(x: number): void`**: Pushes element `x` onto the stack in $O(1)$ time.
 - **`pop(): number | undefined`**: Removes and returns the top value from the stack; returns `undefined` if empty.
 - **`top(): number | undefined`**: Returns the top value without removing it; returns `undefined` if empty.
 - **`size(): number`**: Returns the total number of elements currently stored.
-- **`getMin(): number | undefined`**: Retrieves the minimum value currently in the stack in O(1) time; returns `undefined` if empty.
+- **`getMin(): number | undefined`**: Retrieves the minimum value currently in the stack in $O(1)$ time; returns `undefined` if empty.
 
 ### `QueueFromStacks<T = any>`
 - Implements a FIFO queue using exactly two internal arrays treated strictly as stacks (only using `push` and `pop` at array ends).

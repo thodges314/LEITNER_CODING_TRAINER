@@ -10,5 +10,5 @@ Implement connectivity and topological properties on undirected graphs with `n` 
 - Returns `true` if connected; `false` otherwise (a vertex always reaches itself).
 
 ### `findCenter(edges: [number, number][]): number`
-- Given an array of edges representing a star graph with `n` vertices and `n - 1` edges, finds the center vertex in O(1) time.
+- Given an array of edges representing a star graph with `n` vertices and `n - 1` edges, finds the center vertex in $O(1)$ time.
 - The center vertex is connected to every other vertex and appears in every edge.
