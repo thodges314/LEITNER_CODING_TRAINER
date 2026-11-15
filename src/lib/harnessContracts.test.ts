@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { extractHarnessContracts, sanitizeCallSignature } from './harnessContracts';
+import {
+  extractContractHelpers,
+  extractHarnessContracts,
+  humanizeContractExpression,
+  sanitizeCallSignature,
+} from './harnessContracts';
 
 describe('extractHarnessContracts', () => {
   it('returns nothing for an empty harness', () => {
@@ -106,6 +111,35 @@ hasCycle(h)`;
     expect(sanitizeCallSignature(raw)).toBe(
       `const h = renderHook(() => useHook());\nh.result.current`
     );
+  });
+});
+
+describe('extractContractHelpers', () => {
+  it('detects stripped helpers that are actually called in the cases', () => {
+    const cases = [
+      {
+        input: `const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nconst toArray = (node) => { const out = []; while (node) { out.push(node.val); node = node.next; } return out; };\ntoArray(mergeTwoLists(list(1, 3), list(2, 4)))`,
+      },
+      {
+        input: `const list = (...vals) => vals.reduceRight((next, val) => ({ val, next }), null);\nhasCycle(list(1, 2))`,
+      },
+    ];
+    const helpers = extractContractHelpers(cases);
+    expect(helpers.map((h) => h.name)).toEqual(['list', 'toArray']);
+  });
+
+  it('ignores normal user variables with the same name when not called as helpers', () => {
+    const cases = [{ input: `const list = [{ id: 1 }];\naddToast(list, 'hi')` }];
+    expect(extractContractHelpers(cases)).toEqual([]);
+  });
+});
+
+describe('humanizeContractExpression', () => {
+  it('preserves sanitized JS expressions cleanly', () => {
+    expect(humanizeContractExpression('hasCycle(list(1, 2, 3, 4))')).toBe(
+      'hasCycle(list(1, 2, 3, 4))'
+    );
+    expect(humanizeContractExpression('')).toBe('');
   });
 });
 

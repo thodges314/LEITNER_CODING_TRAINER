@@ -1,4 +1,6 @@
-Implement linked list reversal algorithms on nodes shaped `{ val, next }` (`null` ends the list):
+Implement linked list reversal algorithms on nodes shaped `{ val, next }` (`null` ends the list).
+
+{{include:linked-list-explanation.md}}
 
 ### `reverseKGroup<T>(head: ListNode<T> | null, k: number): ListNode<T> | null`
 - Reverses nodes of the list `k` at a time and returns the new `head`.

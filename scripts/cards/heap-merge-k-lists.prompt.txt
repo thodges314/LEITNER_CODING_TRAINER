@@ -5,6 +5,8 @@ Implement multi-way merge and spatial selection algorithms (include an internal 
 - Individual list entries may be `null`.
 - Returns `null` if all lists are empty or `lists` is empty.
 
+{{include:linked-list-explanation.md}}
+
 ### `mergeKSortedArrays(arrays: number[][]): number[]`
 - Merges `k` sorted number arrays into one flat sorted array using a min-heap.
 - Handles empty subarrays properly.

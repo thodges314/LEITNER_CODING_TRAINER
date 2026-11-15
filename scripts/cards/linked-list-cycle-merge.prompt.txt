@@ -1,4 +1,24 @@
-Implement cycle detection and sorted list merging on singly linked list nodes (`{ val, next }`):
+Implement cycle detection and sorted list merging on singly linked list nodes (`{ val, next }`).
+
+{{include:linked-list-explanation.md}}
+
+```linked-list
+{
+  "title": "Cycle Example (h.next.next.next.next = h.next)",
+  "rows": [
+    {
+      "caption": "Node 4's .next points back to node 2 (h.next) instead of null, creating a cycle:",
+      "nodes": [
+        { "val": 1, "pointers": ["h"] },
+        { "val": 2, "pointers": ["h.next"], "state": "cycle" },
+        { "val": 3 },
+        { "val": 4, "state": "cycle" }
+      ],
+      "cycleToIndex": 1
+    }
+  ]
+}
+```
 
 ### `hasCycle<T>(head: ListNode<T> | null): boolean`
 - Detects whether a linked list contains a cycle using Floyd's Tortoise and Hare algorithm in $O(1)$ auxiliary space.

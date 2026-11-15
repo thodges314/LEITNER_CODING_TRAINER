@@ -1,4 +1,6 @@
-Implement linked list algorithms on nodes shaped `{ val, next }` (`null` ends the list):
+Implement linked list algorithms on nodes shaped `{ val, next }` (`null` ends the list).
+
+{{include:linked-list-explanation.md}}
 
 ### `addTwoNumbers(l1: ListNode<number> | null, l2: ListNode<number> | null): ListNode<number> | null`
 - Adds two numbers represented by linked lists whose digits are stored in reverse order (e.g. `2 -> 4 -> 3` represents 342).

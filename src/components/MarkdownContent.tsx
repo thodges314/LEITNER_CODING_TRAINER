@@ -1,6 +1,7 @@
 import React from 'react';
 import { renderInlineMarkdown, parseParagraphLines, type MarkdownListItem } from '../lib/markdown';
 import { ArrayTraceBlock, type ArrayTraceData } from './ArrayTraceBlock';
+import { LinkedListBlock, type LinkedListData } from './LinkedListBlock';
 
 export interface MarkdownContentProps {
   text: string;
@@ -95,6 +96,16 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
               const data = JSON.parse(raw.slice('array-trace\n'.length)) as ArrayTraceData;
               if (data && Array.isArray(data.rows)) {
                 return <ArrayTraceBlock key={bIdx} data={data} />;
+              }
+            } catch {
+              // Fall back to regular code block if JSON is invalid
+            }
+          }
+          if (raw.startsWith('linked-list\n')) {
+            try {
+              const data = JSON.parse(raw.slice('linked-list\n'.length)) as LinkedListData;
+              if (data && Array.isArray(data.rows)) {
+                return <LinkedListBlock key={bIdx} data={data} />;
               }
             } catch {
               // Fall back to regular code block if JSON is invalid

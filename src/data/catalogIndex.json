@@ -1645,7 +1645,7 @@
       "two-pointer",
       "floyd"
     ],
-    "summary": "Implement cycle detection and sorted list merging on singly linked list nodes ({ val, next })"
+    "summary": "Implement cycle detection and sorted list merging on singly linked list nodes ({ val, next })."
   },
   {
     "id": "lis-house-robber-dp",
@@ -1738,7 +1738,7 @@
       "pointers",
       "basics"
     ],
-    "summary": "Implement singly linked list utilities on nodes shaped as { val, next } (terminal node has next: null)"
+    "summary": "Implement singly linked list utilities on nodes shaped as { val, next } (terminal node has next: null)."
   },
   {
     "id": "search-rotated-array",
@@ -2454,7 +2454,7 @@
       "carry",
       "two-pointer"
     ],
-    "summary": "Implement linked list algorithms on nodes shaped { val, next } (null ends the list)"
+    "summary": "Implement linked list algorithms on nodes shaped { val, next } (null ends the list)."
   },
   {
     "id": "list-remove-reorder",
@@ -2467,7 +2467,7 @@
       "two-pointer",
       "in-place"
     ],
-    "summary": "Implement in-place linked list manipulations on nodes shaped { val, next } (null ends the list)"
+    "summary": "Implement in-place linked list manipulations on nodes shaped { val, next } (null ends the list)."
   },
   {
     "id": "list-reverse-k-group",
@@ -2480,7 +2480,7 @@
       "reversal",
       "pointers"
     ],
-    "summary": "Implement linked list reversal algorithms on nodes shaped { val, next } (null ends the list)"
+    "summary": "Implement linked list reversal algorithms on nodes shaped { val, next } (null ends the list)."
   },
   {
     "id": "tree-build-serialize",

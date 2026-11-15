@@ -1,4 +1,6 @@
-Implement singly linked list utilities on nodes shaped as `{ val, next }` (terminal node has `next: null`):
+Implement singly linked list utilities on nodes shaped as `{ val, next }` (terminal node has `next: null`).
+
+{{include:linked-list-explanation.md}}
 
 ### `reverseList<T>(head: ListNode<T> | null): ListNode<T> | null`
 - Reverses the linked list in-place by updating pointer references.

@@ -1,4 +1,6 @@
-Implement in-place linked list manipulations on nodes shaped `{ val, next }` (`null` ends the list):
+Implement in-place linked list manipulations on nodes shaped `{ val, next }` (`null` ends the list).
+
+{{include:linked-list-explanation.md}}
 
 ### `removeNthFromEnd<T>(head: ListNode<T> | null, n: number): ListNode<T> | null`
 - Removes the `n`-th node from the end of the list in a single pass using two pointers spaced `n` nodes apart.

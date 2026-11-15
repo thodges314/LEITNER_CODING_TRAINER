@@ -311,4 +311,36 @@ const x = 42;
     expect(block?.textContent).toContain('10');
     expect(block?.textContent).toContain('20');
   });
+
+  it('renders linked-list fenced blocks with pointers, null termination, and cycles', () => {
+    const text = [
+      '```linked-list',
+      JSON.stringify({
+        title: 'Linked List Diagram',
+        rows: [
+          {
+            caption: 'Normal list:',
+            nodes: [{ val: 1, pointers: ['head'] }, { val: 2 }],
+          },
+          {
+            caption: 'Cycle list:',
+            nodes: [{ val: 1, pointers: ['h'] }, { val: 2, state: 'cycle' }],
+            cycleToIndex: 1,
+          },
+        ],
+      }),
+      '```',
+    ].join('\n');
+
+    act(() => {
+      root.render(<MarkdownContent text={text} />);
+    });
+
+    const block = container.querySelector('.linked-list-block');
+    expect(block).not.toBeNull();
+    expect(block?.textContent).toContain('Linked List Diagram');
+    expect(block?.textContent).toContain('head');
+    expect(block?.textContent).toContain('null');
+    expect(block?.querySelector('svg')).not.toBeNull();
+  });
 });

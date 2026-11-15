@@ -250,3 +250,113 @@ export function sanitizeCallSignature(input?: string): string {
   return cleanLines.length > 0 ? cleanLines.join('\n') : input;
 }
 
+export interface ContractHelperInfo {
+  name: string;
+  signature: string;
+  description: string;
+  definition: string;
+}
+
+const CONTRACT_HELPER_META: Record<string, { signature: string; description: string }> = {
+  list: {
+    signature: 'list(...vals)',
+    description: 'Builds a { val, next } linked list (null-terminated) and returns its head node',
+  },
+  toArray: {
+    signature: 'toArray(head)',
+    description: 'Collects linked-list .val fields into an array',
+  },
+  n: {
+    signature: 'n(val, left?, right?)',
+    description: 'Binary tree node { val, left, right } (defaults to null)',
+  },
+  ser: {
+    signature: 'ser(root)',
+    description: 'Serializes a binary tree as [val, left, right] (or null)',
+  },
+  norm: {
+    signature: 'norm(groups)',
+    description: 'Sorts inner & outer arrays so any group order passes',
+  },
+  mk: {
+    signature: 'mk(...)',
+    description: 'Builds a test node/graph from compact input',
+  },
+  dump: {
+    signature: 'dump(node)',
+    description: 'Serializes a graph into sorted [val, neighbors] pairs',
+  },
+  fails: {
+    signature: 'fails(fn)',
+    description: 'Returns true if calling fn() throws an Error',
+  },
+  brief: {
+    signature: 'brief(rows)',
+    description: 'Formats rows as "depth:id" strings',
+  },
+};
+
+function unescapeNewlinesOutsideStrings(input: string): string {
+  let raw = '';
+  let quote: string | null = null;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    if (quote) {
+      raw += ch;
+      if (ch === '\\' && i + 1 < input.length) raw += input[++i];
+      else if (ch === quote) quote = null;
+    } else if (ch === '\\' && input[i + 1] === 'n') {
+      raw += '\n';
+      i++;
+    } else {
+      if (ch === '"' || ch === "'" || ch === '`') quote = ch;
+      raw += ch;
+    }
+  }
+  return raw;
+}
+
+const HELPER_DECL_RE =
+  /^(?:(?:const|let|var)\s+(list|toArray|norm|ser|mk|dump|fails|n|brief)\s*=|function\s+(list|toArray|norm|ser|mk|dump|fails|n|brief)\b)/;
+
+/**
+ * Extracts known test-harness helpers whose declarations are stripped by `sanitizeCallSignature`
+ * so the contract table can display a concise legend only when a card uses them.
+ */
+export function extractContractHelpers(
+  cases: Array<{ input?: string; callSignature?: string }>
+): ContractHelperInfo[] {
+  const found = new Map<string, string>();
+  for (const tc of cases) {
+    const source = tc.callSignature || tc.input;
+    if (!source) continue;
+    const raw = unescapeNewlinesOutsideStrings(source);
+    const sanitized = sanitizeCallSignature(source);
+    for (const line of raw.split('\n')) {
+      const trimmed = line.trim();
+      const match = trimmed.match(HELPER_DECL_RE);
+      const name = match?.[1] || match?.[2];
+      if (!name || found.has(name)) continue;
+      if (new RegExp(`\\b${name}\\s*\\(`).test(sanitized)) {
+        found.set(name, trimmed);
+      }
+    }
+  }
+
+  const helpers: ContractHelperInfo[] = [];
+  for (const [name, definition] of found) {
+    const meta = CONTRACT_HELPER_META[name];
+    if (!meta) continue;
+    helpers.push({ name, signature: meta.signature, description: meta.description, definition });
+  }
+  return helpers;
+}
+
+/**
+ * Placeholder hook for contract-expression readability formatting.
+ * Preserves valid JS syntax while pairing with the Contract Helpers legend.
+ */
+export function humanizeContractExpression(sanitized: string): string {
+  return sanitized || '';
+}
+

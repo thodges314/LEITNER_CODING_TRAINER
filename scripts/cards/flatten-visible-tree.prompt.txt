@@ -16,18 +16,54 @@ interface VisibleRow {
 
 Tree nodes have the structure `{ id: string, label: string, children?: TreeNode[] }`.
 
-Write tree flattening and expansion utilities for virtualized tree rendering:
+Think of a file explorer sidebar (like VS Code): folders and files form a nested tree, but a virtualized list can only render a **flat array of currently visible rows**. Each row tracks its `depth` (for indentation), `hasChildren` (whether to show a folder chevron), and `expanded` (whether that folder is currently open).
 
 ### flattenVisible(nodes: TreeNode[], expandedIds: Set<string>): VisibleRow[]:
-- Flattens hierarchical tree nodes into an ordered array of visible row objects (depth-first traversal, parent before children, siblings in order).
-- `expandedIds` is a `Set` containing IDs of currently expanded nodes.
-- Each row is `{ id, label, depth, hasChildren, expanded }`:
-  - `depth`: integer starting at `0` for root nodes and incrementing with each nesting level.
-  - `hasChildren`: `true` only if `Array.isArray(node.children) && node.children.length > 0`.
-  - `expanded`: `true` only if `hasChildren` is true and `expandedIds.has(node.id)`.
-- Children are visited and included only when their immediate parent is `expanded`. A collapsed parent hides its entire subtree (even if a nested descendant's ID is in `expandedIds`).
+- Flattens hierarchical tree nodes into an ordered array of visible row objects using **depth-first traversal** (parent first, then its children in order, then the next sibling).
+- `expandedIds` is a `Set` containing the `id`s of currently expanded nodes.
+- Each output row has `{ id, label, depth, hasChildren, expanded }`:
+  - `depth`: integer starting at `0` for root nodes and incrementing by `1` for each nested level.
+  - `hasChildren`: `true` only if `Array.isArray(node.children) && node.children.length > 0`. (A node with `children: []` is treated as a leaf, so `hasChildren` is `false`.)
+  - `expanded`: `true` only if `hasChildren` is `true` **and** `expandedIds.has(node.id)`. (A leaf ID in `expandedIds` still has `expanded: false`.)
+- Children are visited and included **only** when their immediate parent is `expanded`. If a parent is collapsed, its entire subtree is hidden — even if a nested descendant's `id` is in `expandedIds`.
 
 ### toggleExpanded(expandedIds: Set<string>, id: string): Set<string>:
 - Immutably toggles membership of `id` in `expandedIds`.
-- Returns a **new `Set`** with `id` added if previously missing, or deleted if previously present.
+- Returns a **new `Set`** with `id` added if previously missing, or removed if previously present.
 - Does not mutate the input `expandedIds` set.
+
+#### Example (sample `tree` used in the contract below)
+```js
+const tree = [
+  {
+    id: 'src',
+    label: 'src',
+    children: [
+      { id: 'app', label: 'app.js' },
+      { id: 'lib', label: 'lib', children: [{ id: 'util', label: 'util.js' }] },
+    ],
+  },
+  { id: 'readme', label: 'README.md' },
+];
+```
+
+- **All collapsed** — `flattenVisible(tree, new Set())`:
+  - Visible rows: `src` (depth `0`, `hasChildren: true`, `expanded: false`), `README.md` (depth `0`, `hasChildren: false`, `expanded: false`).
+  - Returns:
+    ```js
+    [
+      { id: 'src', label: 'src', depth: 0, hasChildren: true, expanded: false },
+      { id: 'readme', label: 'README.md', depth: 0, hasChildren: false, expanded: false },
+    ]
+    ```
+- **Expand `'src'`** — `flattenVisible(tree, new Set(['src']))`:
+  - `src` (depth `0`, `expanded: true`) → `app.js` (depth `1`) → `lib` (depth `1`, `hasChildren: true`, `expanded: false`) → `README.md` (depth `0`).
+  - Notice `util.js` is hidden because its parent `'lib'` is not expanded.
+- **Expand `'src'` and `'lib'`** — `flattenVisible(tree, new Set(['src', 'lib']))`:
+  - `src` (depth `0`) → `app.js` (depth `1`) → `lib` (depth `1`) → `util.js` (depth `2`) → `README.md` (depth `0`).
+- **Only `'lib'` in `expandedIds`** — `flattenVisible(tree, new Set(['lib']))`:
+  - Returns only `src` and `README.md` (depth `0`) because `'src'` is collapsed, hiding its whole subtree.
+- **Toggling**:
+  - `const a = new Set(['x']);`
+  - `const b = toggleExpanded(a, 'y');` → `Set { 'x', 'y' }` (`a` is still `Set { 'x' }`, and `a !== b`)
+  - `const c = toggleExpanded(b, 'x');` → `Set { 'y' }`
