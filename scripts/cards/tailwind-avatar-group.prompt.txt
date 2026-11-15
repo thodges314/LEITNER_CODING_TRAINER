@@ -49,7 +49,7 @@ Build an accessible, responsive `AvatarGroup` component (and supporting `Avatar`
     - Variant background colors: `'online'` (emerald/green), `'busy'` (rose/red), `'away'` (amber/yellow), `'offline'` (slate/gray).
 
 - `AvatarGroup` **Stack Component**:
-  - Container: `<div role="group" aria-label="Team avatars" {...props}>` as a centered inline-flex horizontal stack with negative horizontal spacing so avatars overlap and clipped overflow (plus any external `className`).
+  - Container: `<div role="group" aria-label="Team avatars" {...props}>` as a centered inline-flex horizontal stack with negative horizontal spacing for overlapping avatars and hidden overflow (plus any external `className`).
   - Overlap & Truncation:
     - If `avatars.length <= max`: renders all avatars in order.
     - If `avatars.length > max`: renders the first `max` avatars, followed by a circular overflow counter pill matching the active `size`, styled with the same 2px ring, neutral surface, hover state, and transition:
