@@ -7,7 +7,7 @@
 
 ## 1. Current State (Snapshot)
 
-- **Curriculum:** **428 cards** across **17 tracks** with **2,708 documented test cases** and **100% dual JS/TS reference solutions** (`428 / 428`).
+- **Curriculum:** **431 cards** across **17 tracks** with **2,722 documented test cases** and **100% dual JS/TS reference solutions** (`431 / 431`).
 - **Verification:** **2,715 Vitest unit tests** (74 test files) and **924 Playwright E2E tests** (17 spec files).
 - **Bundle & Startup:** Initial Catalog boot is **`432.1 KB` gzip** (`1,459.2 KB` raw), with [`PracticeArena`](src/components/PracticeArena.tsx) and the next card's track payload prefetched in the background during browser idle time.
 - **Persistence:** Zero backend; user progress, settings, custom decks, interview dossiers, and AI keys (multi-key vault) live in `localStorage` via [`src/lib/storage.ts`](src/lib/storage.ts) and [`src/lib/leitner.ts`](src/lib/leitner.ts). `slimForStorage()` strips heavy card payloads before writing to `localStorage`.
@@ -20,7 +20,7 @@
 - **Entry & Shell:** [`src/App.tsx`](src/App.tsx) (lazy-loads all 9 secondary modals + `PracticeArena` with idle prefetch, hydrates per-track content before mounting Practice), [`src/main.tsx`](src/main.tsx).
 - **Design System & Colors:** [`src/styles/colors.ts`](src/styles/colors.ts), [`src/styles/colors.css`](src/styles/colors.css), [`src/styles/components/`](src/styles/components/) (`deck-dashboard.css`, `deck-selector.css`, `interview-prep.css`, `deck-editor.css`, `popovers.css`, etc.).
 - **Data & Lazy Track Payloads (`src/data/`):**
-  - [`topicsMeta.json`](src/data/topicsMeta.json): Lightweight 428-card metadata loaded synchronously at boot.
+  - [`topicsMeta.json`](src/data/topicsMeta.json): Lightweight 431-card metadata loaded synchronously at boot.
   - `src/data/tracks/<track>.json`: 17 per-track chunks containing heavy card fields (`promptSeed`, `testHarness`, `testCases`, `referenceSolution`, `referenceSolutionTs`, `previewCode`, `complexityExplanation`), loaded on demand by [`src/lib/trackContentLoader.ts`](src/lib/trackContentLoader.ts).
   - [`catalogIndex.json`](src/data/catalogIndex.json): Compact catalog summary used by AI Interview Prep & dossier printing.
   - [`topics.json`](src/data/topics.json): Complete combined seed dataset kept for Node/Vitest reference-solution verification and authoring scripts (not bundled into the browser app).
@@ -64,15 +64,8 @@ Switchable in Settings ([`src/lib/scheduling.ts`](src/lib/scheduling.ts) + [`src
 
 > Completed tracks, TypeScript migration, React/D3 previews, Custom Decks, AI Interview Prep, and bundle splitting are shipped and tracked in git history. Only **unbuilt / open** items remain below.
 
-### 5.1 Open Difficulty Ladder Holes (React / DOM)
-Pure-function and TS starter rungs are complete. Remaining React/DOM concepts whose lowest rung is still ≥ 3 (each needs a hand-written `$dom` harness + Playwright verification):
-- `compound` (d1 static `Tabs` without context; d2 `Accordion` with `useState`)
-- `resilience` (d2 minimal `ErrorBoundary` fallback)
-- `react-perf` (d1 re-render counter; d2 `useMemo` derived list)
-- `typeahead` (d2 sync filter-as-you-type list)
-- `infinite-scroll` (d2 paginated list with "Load more")
-- `a11y-components` (d2 `aria-pressed` toggle button, `aria-describedby` labelled field)
-- `wizard` (lowest card currently d4) and `architecture` (capstone d5)
+### 5.1 Difficulty Ladder Status (Closed)
+- Pure-function, TypeScript, and React/DOM starter rungs (`tabs-basic` d1, `render-counter-basics` d1, `two-step-wizard` d1, `switch-toggle-a11y` d1, plus d2 starters `accordion-component`, `simple-error-boundary`, `memo-derived-list`, `filter-list`, `load-more-list`, `a11y-form-field`) are complete. Only `architecture` stays a single d5 capstone.
 
 ### 5.2 Remaining Card Families & Tracks
 - **Extension Tracks:** See [TOPIC_EXPANSION_ROADMAP.md](TOPIC_EXPANSION_ROADMAP.md) for the 4 unbuilt tracks: `realtime-streaming`, `web-performance`, `offline-storage`, `frontend-security`.

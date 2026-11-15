@@ -1,0 +1,25 @@
+```ts
+interface TabItem {
+  id: string;
+  label: string;
+  content: string;
+}
+
+interface TabsProps {
+  tabs: TabItem[];
+  defaultIndex?: number;
+}
+```
+
+Build a basic accessible tabs component using local state (without React Context):
+
+### Tabs({ tabs, defaultIndex = 0 }: TabsProps): JSX.Element
+- `tabs`: array of `TabItem` objects (`[{ id, label, content }]`).
+- `defaultIndex`: optional initial active tab index (defaults to `0`).
+- **DOM & ARIA**:
+  - Render a `<div role="tablist">` containing one `<button type="button" role="tab">` per item in `tabs`, displaying `tab.label`.
+  - Set `aria-selected` (`true` / `false`) on each tab button to reflect the active tab.
+  - Render a `<div role="tabpanel">` displaying the active tab's `content` (omit the panel when `tabs` is empty).
+- **Interactions**:
+  - Clicking a tab button updates the active index and displays that tab's `content`.
+

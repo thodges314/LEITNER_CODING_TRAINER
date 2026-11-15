@@ -1672,7 +1672,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "component",
       "aria",
@@ -1840,7 +1840,7 @@
     "box": 1,
     "streak": 0,
     "nextEligibleTrial": 0,
-    "status": "active",
+    "status": "locked",
     "tags": [
       "performance",
       "useMemo",
@@ -7946,5 +7946,71 @@
       "tailwind"
     ],
     "difficulty": 1
+  },
+  {
+    "id": "render-counter-basics",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "react",
+    "title": "Render Counter with useRef",
+    "tags": [
+      "performance",
+      "useRef",
+      "re-renders",
+      "basics"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "difficulty": 1,
+    "concept": "react-perf",
+    "requiresDom": true
+  },
+  {
+    "id": "tabs-basic",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "react-components",
+    "title": "Basic Tabs Component",
+    "tags": [
+      "component",
+      "tabs",
+      "state",
+      "a11y"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "difficulty": 1,
+    "concept": "compound",
+    "requiresDom": true
+  },
+  {
+    "id": "two-step-wizard",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "track": "react-components",
+    "title": "Two-Step Form Wizard",
+    "tags": [
+      "component",
+      "wizard",
+      "forms",
+      "state"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react"
+    ],
+    "difficulty": 1,
+    "concept": "wizard",
+    "requiresDom": true
   }
 ]

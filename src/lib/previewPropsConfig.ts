@@ -115,6 +115,25 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
     },
     { name: 'allowMultiple', type: 'boolean', defaultValue: false, description: 'Allow expanding multiple accordion panels simultaneously' },
   ],
+  'tabs-basic': [
+    {
+      name: 'tabs',
+      type: 'json',
+      defaultValue: [
+        { id: 'overview', label: 'Overview', content: 'Summary of component props and usage.' },
+        { id: 'api', label: 'API', content: 'Tabs accepts tabs[] and an optional defaultIndex.' },
+        { id: 'examples', label: 'Examples', content: 'Switch tabs to view each panel.' },
+      ],
+      description: 'Array of TabItem objects ({ id, label, content })',
+    },
+    { name: 'defaultIndex', type: 'number', defaultValue: 0, min: 0, max: 2, description: 'Initial active tab index (uncontrolled)' },
+  ],
+  'render-counter-basics': [
+    { name: 'label', type: 'string', defaultValue: 'Clicks', placeholder: 'Button label', description: 'Prefix displayed on the counter button' },
+  ],
+  'two-step-wizard': [
+    { name: 'onSubmit', type: 'function', description: 'Callback invoked with { name, email } on Step 2 submit' },
+  ],
   'tabs-accordion-compound': [
     {
       name: 'defaultValue',

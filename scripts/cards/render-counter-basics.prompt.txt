@@ -1,0 +1,14 @@
+Build a basic render counter component to track how many times a component renders using `useRef`:
+
+### RenderCounter({ label = 'Clicks' }: { label?: string }): JSX.Element
+- `label`: optional button label prefix (defaults to `'Clicks'`).
+- **State & Ref**:
+  - Store `count` in `useState(0)`.
+  - Track the render count in `useRef(0)` and increment `renders.current` on each render (do **not** store render count in state, which would cause an infinite re-render loop).
+- **DOM Structure**:
+  - Render `<button type="button">` displaying `{label}: {count}`.
+  - Render `<span>` displaying `Renders: {renders.current}`.
+- **Interactions**:
+  - Clicking the button increments `count` by 1, triggering a re-render that increments `Renders:` as well.
+  - Parent re-renders increment `Renders:` while preserving `count`.
+

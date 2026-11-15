@@ -1,0 +1,15 @@
+{
+  "track": "react-components",
+  "title": "Two-Step Form Wizard",
+  "tags": [
+    "component",
+    "wizard",
+    "forms",
+    "state"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react"
+  ]
+}
+

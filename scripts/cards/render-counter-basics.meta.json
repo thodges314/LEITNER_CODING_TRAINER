@@ -1,0 +1,15 @@
+{
+  "track": "react",
+  "title": "Render Counter with useRef",
+  "tags": [
+    "performance",
+    "useRef",
+    "re-renders",
+    "basics"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react"
+  ]
+}
+

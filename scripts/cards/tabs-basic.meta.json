@@ -1,0 +1,15 @@
+{
+  "track": "react-components",
+  "title": "Basic Tabs Component",
+  "tags": [
+    "component",
+    "tabs",
+    "state",
+    "a11y"
+  ],
+  "rendersComponent": true,
+  "previewLibraries": [
+    "react"
+  ]
+}
+
