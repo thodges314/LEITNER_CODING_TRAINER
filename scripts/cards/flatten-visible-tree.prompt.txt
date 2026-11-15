@@ -18,7 +18,7 @@ Tree nodes have the structure `{ id: string, label: string, children?: TreeNode[
 
 Think of a file explorer sidebar (like VS Code): folders and files form a nested tree, but a virtualized list can only render a **flat array of currently visible rows**. Each row tracks its `depth` (for indentation), `hasChildren` (whether to show a folder chevron), and `expanded` (whether that folder is currently open).
 
-### flattenVisible(nodes: TreeNode[], expandedIds: Set<string>): VisibleRow[]:
+### `flattenVisible(nodes: TreeNode[], expandedIds: Set<string>): VisibleRow[]`
 - Flattens hierarchical tree nodes into an ordered array of visible row objects using **depth-first traversal** (parent first, then its children in order, then the next sibling).
 - `expandedIds` is a `Set` containing the `id`s of currently expanded nodes.
 - Each output row has `{ id, label, depth, hasChildren, expanded }`:
@@ -27,7 +27,7 @@ Think of a file explorer sidebar (like VS Code): folders and files form a nested
   - `expanded`: `true` only if `hasChildren` is `true` **and** `expandedIds.has(node.id)`. (A leaf ID in `expandedIds` still has `expanded: false`.)
 - Children are visited and included **only** when their immediate parent is `expanded`. If a parent is collapsed, its entire subtree is hidden — even if a nested descendant's `id` is in `expandedIds`.
 
-### toggleExpanded(expandedIds: Set<string>, id: string): Set<string>:
+### `toggleExpanded(expandedIds: Set<string>, id: string): Set<string>`
 - Immutably toggles membership of `id` in `expandedIds`.
 - Returns a **new `Set`** with `id` added if previously missing, or removed if previously present.
 - Does not mutate the input `expandedIds` set.

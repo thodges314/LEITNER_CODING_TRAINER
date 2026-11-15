@@ -15,7 +15,7 @@ interface StepperProps {
 
 Build an accessible multi-step progress stepper navigation component:
 
-### Stepper({ steps, initialStep = 0, onStepChange, onComplete }: StepperProps): JSX.Element
+### `Stepper({ steps, initialStep = 0, onStepChange, onComplete }: StepperProps): JSX.Element`
 - **Progress Navigation**:
   - Render a `<nav aria-label="Progress">` containing an `<ol>` list of all steps in order.
   - Each step is rendered as an `<li>` element containing a `<button type="button">`:

@@ -11,7 +11,7 @@ interface TwoStepWizardProps {
 
 Build a basic two-step form wizard that preserves field values when navigating between steps:
 
-### TwoStepWizard({ onSubmit }: TwoStepWizardProps): JSX.Element
+### `TwoStepWizard({ onSubmit }: TwoStepWizardProps): JSX.Element`
 - **Step 1 (initial)**:
   - Render a controlled `<input aria-label="Name" placeholder="Name" />` bound to `name`.
   - Render `<button type="button">Next</button>`, disabled while `name.trim() === ''`.

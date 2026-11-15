@@ -21,7 +21,7 @@ export interface KanbanBoardProps {
 }
 ```
 
-### KanbanBoard({ initialColumns, onCardMove, onCardAdd }: KanbanBoardProps): JSX.Element
+### `KanbanBoard({ initialColumns, onCardMove, onCardAdd }: KanbanBoardProps): JSX.Element`
 - **Column Layout**:
   - Renders a container with `data-kanban-board` holding all columns.
   - Each column container has `data-column-id={column.id}`.

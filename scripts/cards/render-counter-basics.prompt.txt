@@ -1,6 +1,6 @@
 Build a basic render counter component to track how many times a component renders using `useRef`:
 
-### RenderCounter({ label = 'Clicks' }: { label?: string }): JSX.Element
+### `RenderCounter({ label = 'Clicks' }: { label?: string }): JSX.Element`
 - `label`: optional button label prefix (defaults to `'Clicks'`).
 - **State & Ref**:
   - Store `count` in `useState(0)`.

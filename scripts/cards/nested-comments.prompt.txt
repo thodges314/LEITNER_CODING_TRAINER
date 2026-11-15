@@ -16,7 +16,7 @@ interface NestedCommentsProps {
 
 Build a recursive threaded nested comments component with reply creation and branch collapsing:
 
-### NestedComments({ comments, onAddReply, maxDepth = 4 }: NestedCommentsProps): JSX.Element
+### `NestedComments({ comments, onAddReply, maxDepth = 4 }: NestedCommentsProps): JSX.Element`
 - **Comment Tree Hierarchy**:
   - Render an unordered list `<ul>` of comments. Each comment is an `<li>` element with `data-comment-id={comment.id}`.
   - Display author info with `<strong data-author>{comment.author}</strong>` and timestamp `<span data-time>{comment.timestamp}</span>`.

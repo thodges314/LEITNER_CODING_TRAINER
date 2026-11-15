@@ -193,7 +193,8 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
                         );
                       }
                       if (group.level === 3) {
-                        const showDivider = !(bIdx === 0 && pIdx === 0 && gIdx === 0);
+                        const prevWasHeading = gIdx > 0 && groups[gIdx - 1].type === 'heading';
+                        const showDivider = !(bIdx === 0 && pIdx === 0 && gIdx === 0) && !prevWasHeading;
                         return (
                           <React.Fragment key={gIdx}>
                             {showDivider && (

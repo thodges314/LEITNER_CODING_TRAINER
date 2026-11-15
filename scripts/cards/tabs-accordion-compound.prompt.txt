@@ -23,7 +23,7 @@ interface TabPanelProps {
 
 Implement compound components sharing state via context:
 
-### Tabs({ defaultValue, value, onChange, children }: TabsProps): JSX.Element
+### `Tabs({ defaultValue, value, onChange, children }: TabsProps): JSX.Element`
 - `TabList({ children }: TabListProps): JSX.Element`: container for tab buttons.
 - `Tab({ value, children }: TabProps): JSX.Element`: single tab button.
 - `TabPanel({ value, children }: TabPanelProps): JSX.Element | null`: content panel associated with a tab.

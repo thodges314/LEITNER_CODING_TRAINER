@@ -5,7 +5,7 @@ interface ToolbarItem {
 }
 ```
 
-### Toolbar({ label, items }: { label: string; items: ToolbarItem[] }): JSX.Element:
+### `Toolbar({ label, items }: { label: string; items: ToolbarItem[] }): JSX.Element`
 
 Build a toolbar with roving tabindex where `items` is `ToolbarItem[]`.
 

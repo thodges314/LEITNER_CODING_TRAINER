@@ -8,7 +8,7 @@ Extra spaces between words should be distributed as evenly as possible. If the n
 
 For the last line of text, it should be left-justified, and no extra space is inserted between words (i.e. single space between words, with trailing spaces padding out the rest of `maxWidth`). A line containing only one word is also left-justified and padded with spaces on the right.
 
-### fullJustify(words: string[], maxWidth: number): string[]
+### `fullJustify(words: string[], maxWidth: number): string[]`
 
 #### Parameters
 - `words: string[]`: An array of words where each word consists of non-space characters.

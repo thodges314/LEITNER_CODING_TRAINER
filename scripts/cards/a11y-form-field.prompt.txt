@@ -21,12 +21,12 @@ interface FormFieldProps {
 
 Build accessible form field and toggle components:
 
-### ToggleButton({ pressed, onPressedChange, children }: ToggleButtonProps): JSX.Element
+### `ToggleButton({ pressed, onPressedChange, children }: ToggleButtonProps): JSX.Element`
 - Renders `<button type="button" aria-pressed={pressed}>`.
 - On click, invokes `onPressedChange(!pressed)`.
 - Renders `children` inside the button.
 
-### FormField({ label, hint, error, children }: FormFieldProps): JSX.Element
+### `FormField({ label, hint, error, children }: FormFieldProps): JSX.Element`
 - Generates a unique base id via `useId()`.
 - Generates sub-ids: `hintId = id + '-hint'` and `errorId = id + '-error'`.
 - Computes `describedBy`: joins active IDs (`hintId`, `errorId`) separated by a space (or `undefined` if neither exists).

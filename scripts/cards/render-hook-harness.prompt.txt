@@ -23,7 +23,7 @@ To test custom hooks in isolation without authoring boilerplate components and D
 
 Write a lightweight `renderHook` harness that programmatically mounts a wrapper component, invokes the hook under test, and exposes a live result ref alongside re-rendering and unmounting controls.
 
-### renderHook(renderCallback, options?): RenderHookReturn<T, P>
+### `renderHook(renderCallback, options?): RenderHookReturn<T, P>`
 
 #### Parameters
 - `renderCallback` (`(props?: P) => T`): A function that calls the hook under test. It is called with the latest props and its return value is stored in `result.current`.

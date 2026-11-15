@@ -9,7 +9,7 @@ interface SignupFormProps {
 }
 ```
 
-### SignupForm({ onSubmit }: SignupFormProps): JSX.Element
+### `SignupForm({ onSubmit }: SignupFormProps): JSX.Element`
 
 Build a signup form with two labelled text inputs: Name (`id="name"`) and Email (`id="email"`), and a submit button inside `<form noValidate>` (validating only on submit).
 

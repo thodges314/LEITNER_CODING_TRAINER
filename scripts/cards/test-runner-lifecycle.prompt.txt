@@ -19,8 +19,7 @@ interface RunnerReport {
 }
 ```
 
-### createTestRunner(): TestRunner:
-### new TestRunner(): TestRunner:
+### `createTestRunner(): TestRunner` / `new TestRunner(): TestRunner`
 
 Implement an asynchronous, in-memory test runner engine `createTestRunner()` (or `class TestRunner`) supporting nested suites, lifecycle hooks, and hierarchical reporting:
 

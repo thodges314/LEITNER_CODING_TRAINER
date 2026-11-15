@@ -7,7 +7,7 @@ type DiffChange =
 
 Implement structural object diffing producing path-level change records:
 
-### diff(a: Record<string, unknown>, b: Record<string, unknown>): DiffChange[]:
+### `diff(a: Record<string, unknown>, b: Record<string, unknown>): DiffChange[]`
 - Recursively compares plain objects `a` and `b` and returns an array of change records:
   - `{ path, type: 'added', to }` — key exists in `b` but not `a`.
   - `{ path, type: 'removed', from }` — key exists in `a` but not `b`.
