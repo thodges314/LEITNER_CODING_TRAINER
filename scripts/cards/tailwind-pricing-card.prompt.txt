@@ -34,7 +34,7 @@ Implement an interactive React component (`PricingCard`) styled with Tailwind CS
   - Tier name (`<h3>`): large bold heading displaying `tier.name`.
   - Price row (`<div>` with top margin and baseline flex alignment):
     - Price (`<span>`): large extrabold display text displaying `$${tier.price}`.
-    - Period (`<span>`): small muted text with left margin displaying `tier.period || '/mo'`.
+    - Period (`<span>`): small muted text with left margin displaying `tier.period` (defaulting to `'/mo'`).
 
 - **Features List** (`<ul>`):
   - Vertically spaced list with vertical margin where each item in `tier.features` renders as a small flex-aligned `<li>` containing a `<span>` with the feature text.
@@ -44,5 +44,5 @@ Implement an interactive React component (`PricingCard`) styled with Tailwind CS
   - Full-width, padded, rounded corners, medium font weight, color transition, and pointer cursor.
   - When `tier.popular` is `true`: accent background (e.g. indigo/blue) with hover state and white text.
   - When `tier.popular` is `false` or omitted: neutral dark background with hover state and white text.
-  - Content: `tier.ctaText || 'Get Started'`
+  - Label: displays `tier.ctaText`, defaulting to `'Get Started'`.
   - Optional `onSelect` callback: when provided, clicking the button invokes `onSelect(tier)`.
