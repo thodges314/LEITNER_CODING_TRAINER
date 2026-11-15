@@ -24,7 +24,7 @@ export const CATALOG_TOUR_STEPS: TourStep[] = [
     id: 'deck-selector',
     anchors: ['deck-selector', 'deck-dropdown'],
     title: '3. Study Decks & Preset Curricula',
-    body: 'The trainer comes pre-loaded with focused preset decks (like Frontend Specialist, React Architect, or Algorithm Fundamentals), and lets you build your own custom decks. If a card does not fit your current study goals, you can remove it from your active deck at any time using the remove button on the far right of any row, or directly from the practice arena.',
+    body: 'The trainer comes pre-loaded with focused preset decks (like Frontend Specialist, Full-Stack Core, or Algorithms & Data Structures), and lets you build your own custom decks. If a card does not fit your current study goals, you can remove it from your active deck at any time using the remove button on the far right of any row, or directly from the practice arena.',
   },
   {
     id: 'interview-strategy',
