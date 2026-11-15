@@ -6153,6 +6153,6 @@
       "dark-mode",
       "theming"
     ],
-    "summary": "Build a theme-adaptive card using Tailwind dark: variants so it looks crisp in both Light and Dark mode"
+    "summary": "Build a theme-adaptive card using Tailwind dark: variants so it adapts cleanly between Light and Dark mode"
   }
 ]

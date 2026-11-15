@@ -17,6 +17,9 @@ const { render, q } = $dom;
     'Article container uses light and dark surface/border classes',
     Boolean(
       article &&
+        article.classList.contains('border') &&
+        /\brounded-/.test(article.className) &&
+        /\bp-\d/.test(article.className) &&
         article.classList.contains('bg-white') &&
         article.classList.contains('dark:bg-slate-900') &&
         article.classList.contains('border-slate-200') &&
@@ -70,3 +73,4 @@ const { render, q } = $dom;
   );
   r.unmount();
 }
+

@@ -6,17 +6,17 @@ interface ThemeCardProps {
 }
 ```
 
-Build a theme-adaptive card using Tailwind `dark:` variants so it looks crisp in both Light and Dark mode:
+Build a theme-adaptive card using Tailwind `dark:` variants so it adapts cleanly between Light and Dark mode:
 
 > [!TIP]
 > Flip the theme toggle in the app's top bar to test how your card adapts between Light and Dark mode in the Live Preview.
 
 ### ThemeCard({ title, description, badge }: ThemeCardProps): JSX.Element
 - **Container (`<article>`)**:
-  - `rounded-xl border p-5 transition-colors bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700`
-- **Title (`<h3>`)**:
-  - `text-base font-semibold text-slate-900 dark:text-slate-100` displaying `title`.
-- **Optional Badge (`<span>`)**:
-  - When `badge` is provided, render a `<span>` with `inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-indigo-500/15 text-indigo-600 dark:text-indigo-300` displaying `badge`.
+  - Rounded card with padding, a `1px` border, and smooth color transitions (`transition-colors`).
+  - Surface & border palette: **light** `white` background with `slate-200` border; **dark** `slate-900` background with `slate-700` border.
+- **Header (`<h3>` + optional `<span>`)**:
+  - Render `title` in an `<h3>` with semibold base text (`slate-900` in light mode, `slate-100` in dark mode).
+  - When `badge` is provided, render a pill `<span>` beside the title using a translucent indigo background (`indigo-500/15`) and `indigo-600` text in light mode / `indigo-300` in dark mode. Omit the `<span>` when `badge` is not provided.
 - **Description (`<p>`)**:
-  - `mt-2 text-sm text-slate-600 dark:text-slate-300` displaying `description`.
+  - Render `description` in a `<p>` below the header with small text (`slate-600` in light mode, `slate-300` in dark mode).

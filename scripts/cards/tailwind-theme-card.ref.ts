@@ -23,3 +23,4 @@ function ThemeCard({ title, description, badge }: ThemeCardProps): JSX.Element {
     </article>
   );
 }
+

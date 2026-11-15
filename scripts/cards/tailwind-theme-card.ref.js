@@ -17,3 +17,4 @@ function ThemeCard({ title, description, badge }) {
     </article>
   );
 }
+
