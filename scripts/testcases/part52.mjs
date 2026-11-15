@@ -280,7 +280,7 @@ empty()`,
     r(
       'Renders backdrop overlay with fixed inset-0, z-50, and backdrop-blur-sm when isOpen is true',
       '<ModalDialog isOpen={true} onClose={fn} title="Settings">Body</ModalDialog>',
-      'Renders fixed inset-0 z-50 backdrop overlay with backdrop-blur-sm',
+      'Renders fixed inset-0 overlay with z-index and backdrop blur',
       { callSignature: '<ModalDialog isOpen={true} onClose={fn} title="Settings" />' }
     ),
     r(
