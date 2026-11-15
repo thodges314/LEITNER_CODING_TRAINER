@@ -1,3 +1,10 @@
+```ts
+interface ListNode<T = any> {
+  val: T;
+  next: ListNode<T> | null;
+}
+```
+
 Implement linked list reversal algorithms on nodes shaped `{ val, next }` (`null` ends the list).
 
 {{include:linked-list-explanation.md}}

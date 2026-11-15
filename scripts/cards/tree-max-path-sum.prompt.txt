@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement advanced tree path and valuation algorithms on binary tree nodes `{ val, left, right }`:
 
 ### `maxPathSum(root: TreeNode<number> | null): number`

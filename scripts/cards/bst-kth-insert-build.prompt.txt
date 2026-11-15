@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement operations for Binary Search Trees whose nodes are `{ val, left, right }`:
 
 ### `kthSmallest(root: TreeNode<number> | null, k: number): number | undefined`

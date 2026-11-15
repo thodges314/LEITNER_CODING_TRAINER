@@ -152,12 +152,16 @@ function countBraces(line: string): number {
   return delta;
 }
 
+const AMBIENT_PREDEFINED_TYPES = new Set(['ListNode', 'TreeNode', 'GraphNode']);
+
 /**
  * Returns the combined TypeScript `interface` / `type` source blocks from a card's prompt
  * suitable for appending to the global sandbox type definitions.
  */
 export function extractPromptTypeBlocks(promptSeed?: string, track?: string): string {
-  const decls = extractPromptTypeDeclarations(promptSeed, track);
+  const decls = extractPromptTypeDeclarations(promptSeed, track).filter(
+    (d) => !AMBIENT_PREDEFINED_TYPES.has(d.name)
+  );
   if (decls.length === 0) return '';
   return decls.map((d) => d.code).join('\n\n');
 }

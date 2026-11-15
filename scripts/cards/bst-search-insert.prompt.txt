@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement core Binary Search Tree (BST) operations on nodes shaped `{ val, left, right }` (where `left.val < node.val < right.val`, with no duplicates):
 
 ### `searchBST(root: TreeNode<number> | null, val: number): TreeNode<number> | null`

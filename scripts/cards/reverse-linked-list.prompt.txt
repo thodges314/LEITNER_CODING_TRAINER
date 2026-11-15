@@ -1,3 +1,10 @@
+```ts
+interface ListNode<T = any> {
+  val: T;
+  next: ListNode<T> | null;
+}
+```
+
 Implement singly linked list utilities on nodes shaped as `{ val, next }` (terminal node has `next: null`).
 
 {{include:linked-list-explanation.md}}

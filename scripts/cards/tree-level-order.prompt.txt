@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement breadth-first level-order traversals on binary tree nodes shaped `{ val, left, right }`:
 
 ### `levelOrder(root: TreeNode<number> | null): number[][]`

@@ -1,3 +1,10 @@
+```ts
+interface ListNode<T = any> {
+  val: T;
+  next: ListNode<T> | null;
+}
+```
+
 Implement multi-way merge and spatial selection algorithms (include an internal binary heap helper; list nodes are shaped `{ val, next }`):
 
 ### `mergeKLists(lists: (ListNode<number> | null)[]): ListNode<number> | null`

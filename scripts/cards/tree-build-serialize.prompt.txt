@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement tree reconstruction and serialization algorithms on nodes shaped `{ val, left, right }`:
 
 ### `buildTree(preorder: number[], inorder: number[]): TreeNode<number> | null`

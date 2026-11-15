@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement recursive binary tree calculations on nodes shaped `{ val, left, right }`:
 
 ### `maxDepth(root: TreeNode<number> | null): number`

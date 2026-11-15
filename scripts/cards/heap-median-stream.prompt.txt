@@ -4,7 +4,7 @@ Implement streaming median finding and CPU task scheduling (include an internal 
 Maintains a continuous stream of numbers and returns the running median in $O(\log n)$ per insertion and $O(1)$ per query.
 - Keep a **max-heap** for the smaller half of numbers and a **min-heap** for the larger half, balancing their sizes so `0 <= maxHeap.size - minHeap.size <= 1`:
 
-$$\text{median} = \begin{cases} \text{top}(\text{maxHeap}) & \text{if } |\text{maxHeap}| > |\text{minHeap}| \\ \dfrac{\text{top}(\text{maxHeap}) + \text{top}(\text{minHeap})}{2} & \text{if } |\text{maxHeap}| = |\text{minHeap}| \end{cases}$$
+$$\text{median} = \begin{cases} \text{top}(\text{maxHeap}) & \text{if } |\text{maxHeap}| > |\text{minHeap}| \\[8pt] \dfrac{\text{top}(\text{maxHeap}) + \text{top}(\text{minHeap})}{2} & \text{if } |\text{maxHeap}| = |\text{minHeap}| \end{cases}$$
 
 - **`addNum(num: number): void`**: Inserts `num` into the appropriate heap and rebalances if needed.
 - **`findMedian(): number | undefined`**: Returns the median (mean of the two middle values when count is even; `undefined` if empty).

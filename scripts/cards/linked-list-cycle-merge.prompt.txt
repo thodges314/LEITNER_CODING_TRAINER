@@ -1,3 +1,10 @@
+```ts
+interface ListNode<T = any> {
+  val: T;
+  next: ListNode<T> | null;
+}
+```
+
 Implement cycle detection and sorted list merging on singly linked list nodes (`{ val, next }`).
 
 {{include:linked-list-explanation.md}}

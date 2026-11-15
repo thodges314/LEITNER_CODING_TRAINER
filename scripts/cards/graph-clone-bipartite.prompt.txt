@@ -1,3 +1,10 @@
+```ts
+interface GraphNode<T = any> {
+  val: T;
+  neighbors: GraphNode<T>[];
+}
+```
+
 Implement deep graph cloning, coloring, and tree-validation algorithms:
 
 ### `cloneGraph(node: GraphNode | null): GraphNode | null`

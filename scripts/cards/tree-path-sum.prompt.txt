@@ -1,3 +1,11 @@
+```ts
+interface TreeNode<T = any> {
+  val: T;
+  left: TreeNode<T> | null;
+  right: TreeNode<T> | null;
+}
+```
+
 Implement root-to-leaf path algorithms on binary tree nodes shaped `{ val, left, right }`:
 
 ### `hasPathSum(root: TreeNode<number> | null, target: number): boolean`
