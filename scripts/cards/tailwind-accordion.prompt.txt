@@ -31,11 +31,11 @@ Build a flexible, accessible React accordion component styled with Tailwind CSS 
 
 - **Item Header & Trigger** (`<button>`):
   - Semantic `<button type="button">` disclosure control.
-  - ARIA attributes:
+  - ARIA & state attributes:
     - ``id={`accordion-header-${item.id}`}``
-    - `aria-expanded={isOpen ? 'true' : 'false'}`
+    - `aria-expanded`: `"true"` when the item is open, `"false"` otherwise.
     - ``aria-controls={`accordion-panel-${item.id}`}``
-    - `disabled={Boolean(item.disabled)}`
+    - `disabled`: disabled when `item.disabled` is truthy.
   - Layout & states: full-width flex row spaced apart, comfortable padding, left-aligned medium text, color transition, and `focus-visible` ring.
     - Open (`isOpen: true`): accent text highlight (e.g. indigo/blue).
     - Closed (`isOpen: false`): default neutral text with subtle hover background when enabled.
@@ -48,7 +48,7 @@ Build a flexible, accessible React accordion component styled with Tailwind CSS 
     - ``id={`accordion-panel-${item.id}`}``
     - `role="region"`
     - ``aria-labelledby={`accordion-header-${item.id}`}``
-    - `hidden={!isOpen}`
+    - `hidden`: hidden whenever the item is closed.
   - Inner panel styling: horizontal/bottom padding matching the trigger, small muted text, and relaxed line height.
 
 - **Expansion Behavior**:
