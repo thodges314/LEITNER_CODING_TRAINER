@@ -8012,5 +8012,28 @@
     "difficulty": 1,
     "concept": "wizard",
     "requiresDom": true
+  },
+  {
+    "id": "tailwind-theme-card",
+    "box": 1,
+    "streak": 0,
+    "nextEligibleTrial": 0,
+    "status": "active",
+    "title": "Tailwind Theme-Adaptive Card (dark:)",
+    "track": "tailwind",
+    "tags": [
+      "tailwind",
+      "react",
+      "dark-mode",
+      "theming"
+    ],
+    "rendersComponent": true,
+    "previewLibraries": [
+      "react",
+      "tailwind"
+    ],
+    "difficulty": 2,
+    "concept": "tailwind-theme",
+    "requiresDom": true
   }
 ]

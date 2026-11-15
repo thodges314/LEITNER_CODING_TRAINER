@@ -46,7 +46,7 @@ const Badge = ({
       dotColor: 'bg-sky-400',
     },
     neutral: {
-      classes: 'bg-slate-500/10 text-slate-300 border-slate-500/20',
+      classes: 'bg-slate-500/15 text-slate-500 border-slate-500/30',
       dotColor: 'bg-slate-400',
     },
   };

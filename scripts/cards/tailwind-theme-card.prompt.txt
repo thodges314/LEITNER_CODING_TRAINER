@@ -1,0 +1,22 @@
+```ts
+interface ThemeCardProps {
+  title: string;
+  description: string;
+  badge?: string;
+}
+```
+
+Build a theme-adaptive card using Tailwind `dark:` variants so it looks crisp in both Light and Dark mode:
+
+> [!TIP]
+> Flip the theme toggle in the app's top bar to test how your card adapts between Light and Dark mode in the Live Preview.
+
+### ThemeCard({ title, description, badge }: ThemeCardProps): JSX.Element
+- **Container (`<article>`)**:
+  - `rounded-xl border p-5 transition-colors bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700`
+- **Title (`<h3>`)**:
+  - `text-base font-semibold text-slate-900 dark:text-slate-100` displaying `title`.
+- **Optional Badge (`<span>`)**:
+  - When `badge` is provided, render a `<span>` with `inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-indigo-500/15 text-indigo-600 dark:text-indigo-300` displaying `badge`.
+- **Description (`<p>`)**:
+  - `mt-2 text-sm text-slate-600 dark:text-slate-300` displaying `description`.

@@ -78,4 +78,31 @@ export default {
       'onSubmit called once with { name: "Ada", email: "ada@example.com" }'
     ),
   ],
+  'tailwind-theme-card': [
+    r(
+      'Article container uses light and dark surface/border classes',
+      '<ThemeCard title="Adaptive Surface" description="Uses dark: variants..." badge="v2" />',
+      'article has bg-white, dark:bg-slate-900, border-slate-200, dark:border-slate-700'
+    ),
+    r(
+      'Title uses light and dark text contrast classes',
+      '<ThemeCard title="Adaptive Surface" ... />',
+      'h3 has text-slate-900 and dark:text-slate-100'
+    ),
+    r(
+      'Description uses light and dark muted text classes',
+      '<ThemeCard ... description="Uses dark: variants..." />',
+      'p has text-slate-600 and dark:text-slate-300'
+    ),
+    r(
+      'Optional badge renders when provided with adaptive classes',
+      '<ThemeCard ... badge="v2" />',
+      'span renders "v2" with text-indigo-600 and dark:text-indigo-300'
+    ),
+    r(
+      'Omits badge span when badge prop is undefined',
+      '<ThemeCard title="No Badge" description="Plain card" />',
+      'no badge <span> rendered'
+    ),
+  ],
 };

@@ -134,6 +134,11 @@ export const COMPONENT_PROPS_REGISTRY: Record<string, PropDefinition[]> = {
   'two-step-wizard': [
     { name: 'onSubmit', type: 'function', description: 'Callback invoked with { name, email } on Step 2 submit' },
   ],
+  'tailwind-theme-card': [
+    { name: 'title', type: 'string', defaultValue: 'Theme-Adaptive Card', placeholder: 'Card title', description: 'Heading displayed in the card' },
+    { name: 'description', type: 'string', defaultValue: 'Flip the theme switch in the top bar to test Light and Dark mode.', placeholder: 'Card description', description: 'Body copy displayed below the title' },
+    { name: 'badge', type: 'string', defaultValue: 'Adaptive', placeholder: 'Optional badge', description: 'Optional status pill in the header' },
+  ],
   'tabs-accordion-compound': [
     {
       name: 'defaultValue',

@@ -13,8 +13,8 @@ const { render } = $dom;
 
   const hasNeutral =
     el !== null &&
-    el.classList.contains('text-slate-300') &&
-    el.classList.contains('border-slate-500/20');
+    el.classList.contains('text-slate-500') &&
+    el.classList.contains('border-slate-500/30');
 
   const hasMd =
     el !== null &&

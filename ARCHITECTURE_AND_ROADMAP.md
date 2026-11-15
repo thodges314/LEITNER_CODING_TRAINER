@@ -7,7 +7,7 @@
 
 ## 1. Current State (Snapshot)
 
-- **Curriculum:** **431 cards** across **17 tracks** with **2,722 documented test cases** and **100% dual JS/TS reference solutions** (`431 / 431`).
+- **Curriculum:** **432 cards** across **17 tracks** with **2,727 documented test cases** and **100% dual JS/TS reference solutions** (`432 / 432`).
 - **Verification:** **2,715 Vitest unit tests** (74 test files) and **924 Playwright E2E tests** (17 spec files).
 - **Bundle & Startup:** Initial Catalog boot is **`432.1 KB` gzip** (`1,459.2 KB` raw), with [`PracticeArena`](src/components/PracticeArena.tsx) and the next card's track payload prefetched in the background during browser idle time.
 - **Persistence:** Zero backend; user progress, settings, custom decks, interview dossiers, and AI keys (multi-key vault) live in `localStorage` via [`src/lib/storage.ts`](src/lib/storage.ts) and [`src/lib/leitner.ts`](src/lib/leitner.ts). `slimForStorage()` strips heavy card payloads before writing to `localStorage`.
@@ -20,7 +20,7 @@
 - **Entry & Shell:** [`src/App.tsx`](src/App.tsx) (lazy-loads all 9 secondary modals + `PracticeArena` with idle prefetch, hydrates per-track content before mounting Practice), [`src/main.tsx`](src/main.tsx).
 - **Design System & Colors:** [`src/styles/colors.ts`](src/styles/colors.ts), [`src/styles/colors.css`](src/styles/colors.css), [`src/styles/components/`](src/styles/components/) (`deck-dashboard.css`, `deck-selector.css`, `interview-prep.css`, `deck-editor.css`, `popovers.css`, etc.).
 - **Data & Lazy Track Payloads (`src/data/`):**
-  - [`topicsMeta.json`](src/data/topicsMeta.json): Lightweight 431-card metadata loaded synchronously at boot.
+  - [`topicsMeta.json`](src/data/topicsMeta.json): Lightweight 432-card metadata loaded synchronously at boot.
   - `src/data/tracks/<track>.json`: 17 per-track chunks containing heavy card fields (`promptSeed`, `testHarness`, `testCases`, `referenceSolution`, `referenceSolutionTs`, `previewCode`, `complexityExplanation`), loaded on demand by [`src/lib/trackContentLoader.ts`](src/lib/trackContentLoader.ts).
   - [`catalogIndex.json`](src/data/catalogIndex.json): Compact catalog summary used by AI Interview Prep & dossier printing.
   - [`topics.json`](src/data/topics.json): Complete combined seed dataset kept for Node/Vitest reference-solution verification and authoring scripts (not bundled into the browser app).

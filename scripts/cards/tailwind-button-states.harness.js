@@ -56,7 +56,7 @@ const { render, fire } = $dom;
   const hasOutline =
     btnOut !== null &&
     btnOut.classList.contains('border') &&
-    btnOut.classList.contains('border-slate-700');
+    btnOut.classList.contains('border-slate-500');
   rOut.unmount();
 
   const passed = Boolean(hasSecondary && hasDestructive && hasOutline);
