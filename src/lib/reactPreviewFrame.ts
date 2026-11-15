@@ -343,7 +343,7 @@ export function createPreviewSrcDoc(
   const isReact = config.isReact;
   const palette = getThemeColors(theme);
   const isLight = palette.isLight;
-  const bg = palette.bgMain;
+  const bg = isLight ? '#ffffff' : palette.bgMain;
   const text = palette.textPrimary;
   const border = palette.borderMedium;
   const cardBg = palette.bgCard;

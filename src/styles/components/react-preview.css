@@ -54,7 +54,7 @@
 }
 
 [data-theme="apple-gsos"] .react-preview-titlebar {
-  background-color: var(--text-primary);
+  background-color: var(--bg-elevated);
   border-bottom: 1px solid #C4C3BA;
 }
 
