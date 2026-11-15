@@ -167,6 +167,7 @@ export function App() {
   const [welcomeMode, setWelcomeMode] = useState(FIRST_VISIT);
   const [isCatalogTourOpen, setIsCatalogTourOpen] = useState(false);
   const [isArenaTourOpen, setIsArenaTourOpen] = useState(false);
+  const [pendingManualArenaTour, setPendingManualArenaTour] = useState(false);
   const [pendingArenaTour, setPendingArenaTour] = useState(() => {
     return (
       safeGetItem(STORAGE_KEYS.PENDING_ARENA_TOUR) === '1' &&
@@ -234,22 +235,6 @@ export function App() {
     return () => clearTimeout(timer);
   }, [unlockToast]);
 
-  // Auto-trigger Arena Tour once on first visit to Practice Arena
-  useEffect(() => {
-    if (activeView === 'practice' && pendingArenaTour && !isCatalogTourOpen && !isAboutOpen) {
-      const seen = safeGetItem(STORAGE_KEYS.ARENA_TOUR_SEEN);
-      if (!seen) {
-        safeSetItem(STORAGE_KEYS.ARENA_TOUR_SEEN, '1');
-        safeRemoveItem(STORAGE_KEYS.PENDING_ARENA_TOUR);
-        const timer = setTimeout(() => {
-          setPendingArenaTour(false);
-          setIsArenaTourOpen(true);
-        }, 250);
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [activeView, pendingArenaTour, isCatalogTourOpen, isAboutOpen]);
-
   // Back = to the deck and stay; a quick second Back leaves the app.
   useBackNavigation({ view: activeView, onShowDeck: () => setActiveView('dashboard'), onHint: () => setBackHint(true) });
   useEffect(() => {
@@ -289,6 +274,57 @@ export function App() {
       alive = false;
     };
   }, [activeView, currentCard]);
+
+  // Auto-trigger or replay Arena Tour only after PracticeArena chunk and card content are mounted
+  useEffect(() => {
+    const wantsAuto =
+      pendingArenaTour && !safeGetItem(STORAGE_KEYS.ARENA_TOUR_SEEN);
+    if (
+      activeView !== 'practice' ||
+      isCatalogTourOpen ||
+      isAboutOpen ||
+      (currentCard && !isCardContentHydrated(currentCard)) ||
+      (!wantsAuto && !pendingManualArenaTour)
+    ) {
+      return undefined;
+    }
+
+    let alive = true;
+    let pollId: ReturnType<typeof setInterval> | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const launchTour = () => {
+      if (!alive) return;
+      if (wantsAuto) {
+        safeSetItem(STORAGE_KEYS.ARENA_TOUR_SEEN, '1');
+        safeRemoveItem(STORAGE_KEYS.PENDING_ARENA_TOUR);
+        setPendingArenaTour(false);
+      }
+      setPendingManualArenaTour(false);
+      setIsArenaTourOpen(true);
+    };
+
+    const isArenaDomReady = () =>
+      !currentCard || document.querySelector('[data-tour="problem"]') !== null;
+
+    if (isArenaDomReady()) {
+      timeoutId = setTimeout(launchTour, 50);
+    } else {
+      pollId = setInterval(() => {
+        if (isArenaDomReady()) {
+          if (pollId) clearInterval(pollId);
+          pollId = undefined;
+          timeoutId = setTimeout(launchTour, 50);
+        }
+      }, 25);
+    }
+
+    return () => {
+      alive = false;
+      if (pollId) clearInterval(pollId);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [activeView, currentCard, pendingArenaTour, pendingManualArenaTour, isCatalogTourOpen, isAboutOpen]);
 
   // Background-prefetch PracticeArena (CodeMirror + transpiler) and the next card's track
   // once the Catalog has rendered and the browser is idle.
@@ -1057,7 +1093,7 @@ export function App() {
             onStartArenaTour={() => {
               setIsAboutOpen(false);
               setActiveView('practice');
-              window.setTimeout(() => setIsArenaTourOpen(true), 150);
+              setPendingManualArenaTour(true);
             }}
             onStartPractice={() => {
               setIsAboutOpen(false);
