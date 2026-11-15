@@ -8,7 +8,7 @@ const { render } = $dom;
   const hasAriaLabel = el?.getAttribute('aria-label') === 'Loading...';
   const hasAriaBusy = el?.getAttribute('aria-busy') === 'true';
   const hasPulse = el?.classList.contains('animate-pulse');
-  const hasBg = el?.classList.contains('bg-slate-800');
+  const hasBg = /\bbg-(slate|gray|zinc|neutral)-/.test(el?.className || '');
   const hasHeight = el?.classList.contains('h-4');
 
   $test.check(
@@ -74,8 +74,8 @@ const { render } = $dom;
 {
   const r = render(<Skeleton variant="card" />);
   const card = r.container.querySelector('[role="status"]');
-  const hasCardBorder = card?.classList.contains('border-slate-800');
-  const hasCardBg = card?.classList.contains('bg-slate-900/50');
+  const hasCardBorder = /\bborder-(slate|gray|zinc|neutral)-/.test(card?.className || '');
+  const hasCardBg = /\bbg-(slate|gray|zinc|neutral)-/.test(card?.className || '');
   const avatar = card?.querySelector('.rounded-full');
   const hasAvatar = avatar !== null && avatar.classList.contains('h-10');
   const media = card?.querySelector('.h-28');

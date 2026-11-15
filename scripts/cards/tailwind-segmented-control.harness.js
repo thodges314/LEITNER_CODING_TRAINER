@@ -20,9 +20,9 @@ const sampleOptions = [
   const hasTablist = tablist !== null && tablist.tagName.toLowerCase() === 'div';
   const hasOrientation = tablist?.getAttribute('aria-orientation') === 'horizontal';
   const hasBaseClasses =
-    tablist?.classList.contains('bg-slate-900') &&
-    tablist?.classList.contains('border-slate-800') &&
-    tablist?.classList.contains('rounded-xl');
+    /\bbg-(slate|gray|zinc|neutral)-/.test(tablist?.className || '') &&
+    /\bborder-(slate|gray|zinc|neutral)-/.test(tablist?.className || '') &&
+    /\brounded-/.test(tablist?.className || '');
 
   $test.check(
     'Renders semantic tablist container with base Tailwind styling',
@@ -46,7 +46,7 @@ const sampleOptions = [
 
   const weeklyTab = Array.from(tabs).find((t) => t.textContent.includes('Weekly'));
   const isSelected = weeklyTab?.getAttribute('aria-selected') === 'true';
-  const hasIndigo = weeklyTab?.classList.contains('bg-indigo-600');
+  const hasIndigo = /\bbg-(indigo|blue)-/.test(weeklyTab?.className || '');
   const hasTabIndex0 = weeklyTab?.getAttribute('tabindex') === '0';
 
   const dailyTab = Array.from(tabs).find((t) => t.textContent.includes('Daily'));

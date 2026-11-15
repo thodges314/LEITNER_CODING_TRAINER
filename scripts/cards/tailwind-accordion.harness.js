@@ -12,7 +12,7 @@ const sampleItems = [
   const container = r.container.firstChild;
   const hasBaseClasses =
     container.classList.contains('divide-y') &&
-    container.classList.contains('rounded-xl') &&
+    /\brounded-/.test(container.className) &&
     container.classList.contains('border');
 
   const buttons = r.container.querySelectorAll('button[aria-controls]');

@@ -36,36 +36,23 @@ Build an accessible, responsive `AvatarGroup` component (and supporting `Avatar`
 
 - **Individual `Avatar` Component**:
   - Container (`<span>`):
-    - Base classes: `relative inline-flex shrink-0 items-center justify-center rounded-full font-semibold select-none ring-2 ring-slate-900 bg-slate-800 text-slate-200`
-    - Sizes:
-      - `'sm'`: `h-8 w-8 text-xs`
-      - `'md'` (default): `h-10 w-10 text-sm`
-      - `'lg'`: `h-12 w-12 text-base`
+    - Relative, non-shrinking inline-flex centered circle (`rounded-full`) with semibold non-selectable text, a 2px ring (`ring-2`) for stack separation, and neutral slate/gray background and text.
+    - Sizes scale width, height, and font size progressively (`'sm'`, `'md'` default, `'lg'`).
     - Forwards extra `props` (like `data-testid` or `onClick`).
   - Image & Initials Fallback:
-    - If `src` is provided and loads without error, renders `<img src={src} alt={alt || name} className="h-full w-full rounded-full object-cover" />`.
+    - If `src` is provided and loads without error, renders a full-bleed circular `<img>` (`object-cover`, `rounded-full`) with `alt={alt || name}`.
     - If `src` is missing or fails to load (`onError`), renders uppercase initials from `name`:
       - Single-word name: first 2 characters (e.g. `'Sarah'` -> `'SA'`).
       - Multi-word name: first letter of the first word and first letter of the last word (e.g. `'Alex Rivera'` -> `'AR'`, `'John Fitzgerald Kennedy'` -> `'JK'`).
   - Status Indicator Dot:
-    - When `status` is provided, renders `<span className="..." aria-label={status} />` positioned at `absolute bottom-0 right-0 rounded-full ring-2 ring-slate-900`.
-    - Variant background colors:
-      - `'online'`: `bg-emerald-500`
-      - `'busy'`: `bg-rose-500`
-      - `'away'`: `bg-amber-500`
-      - `'offline'`: `bg-slate-500`
-    - Indicator dimensions:
-      - `'sm'`: `h-2 w-2`
-      - `'md'`: `h-2.5 w-2.5`
-      - `'lg'`: `h-3 w-3`
+    - When `status` is provided, renders `<span aria-label={status} />` anchored at the bottom-right corner (`absolute bottom-0 right-0`) as a circle with a 2px ring, scaled to match `size`.
+    - Variant background colors: `'online'` (emerald/green), `'busy'` (rose/red), `'away'` (amber/yellow), `'offline'` (slate/gray).
 
 - **`AvatarGroup` Stack Component**:
-  - Container: `<div className={containerClasses} role="group" aria-label="Team avatars" {...props}>`
-  - Base classes: `inline-flex items-center -space-x-2 overflow-hidden`
+  - Container: `<div role="group" aria-label="Team avatars" {...props}>` with `inline-flex items-center -space-x-2 overflow-hidden` (plus any external `className`).
   - Overlap & Truncation:
     - If `avatars.length <= max`: renders all avatars in order.
-    - If `avatars.length > max`: renders the first `max` avatars, followed by an overflow indicator pill:
-      - Overflow pill: `relative inline-flex shrink-0 items-center justify-center rounded-full font-medium ring-2 ring-slate-900 bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors` matching the active `size` dimensions.
+    - If `avatars.length > max`: renders the first `max` avatars, followed by a circular overflow counter pill matching the active `size`, styled with the same 2px ring, neutral surface, hover state, and transition:
       - Displays text `+${avatars.length - max}`.
       - Has attribute `aria-label={`${avatars.length - max} more team members`}`.
 

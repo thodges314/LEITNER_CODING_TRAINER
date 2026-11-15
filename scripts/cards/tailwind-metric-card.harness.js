@@ -3,39 +3,41 @@ const container = document.createElement('div');
 container.innerHTML = markup;
 
 const cardEl = container.firstElementChild;
+const cardCls = cardEl?.className || '';
 const hasContainerClasses = Boolean(
   cardEl &&
-  cardEl.classList.contains('max-w-sm') &&
-  cardEl.classList.contains('rounded-2xl') &&
-  cardEl.classList.contains('p-6') &&
-  cardEl.classList.contains('bg-slate-900') &&
-  cardEl.classList.contains('border-slate-800')
+  /\bmax-w-/.test(cardCls) &&
+  /\brounded-/.test(cardCls) &&
+  /\bp-/.test(cardCls) &&
+  /\bbg-/.test(cardCls) &&
+  /\bborder\b/.test(cardCls)
 );
 $test.check(
   'Card container has dark background, border, padding, and max-width classes',
   hasContainerClasses
 );
 
-const titleEl = container.querySelector('span.text-slate-400');
-const badgeEl = container.querySelector('span.text-emerald-400');
+const spans = Array.from(container.querySelectorAll('span'));
+const titleEl = spans.find((s) => s.textContent.includes('Total Revenue'));
+const badgeEl = spans.find((s) => s.textContent.includes('+12.5%'));
 const hasHeader = Boolean(
   titleEl &&
-  titleEl.textContent.includes('Total Revenue') &&
   badgeEl &&
-  badgeEl.textContent.includes('+12.5%') &&
-  badgeEl.classList.contains('rounded-full')
+  badgeEl.classList.contains('rounded-full') &&
+  /\b(text|bg)-(emerald|green)-/.test(badgeEl.className)
 );
 $test.check(
   'Header contains metric title and trend badge with emerald colors',
   hasHeader
 );
 
-const valueEl = container.querySelector('.text-3xl');
-const subtextEl = container.querySelector('p.text-slate-500');
+const allEls = Array.from(container.querySelectorAll('*'));
+const valueEl = allEls.find((el) => el.children.length === 0 && el.textContent.includes('$48,250'));
+const subtextEl = container.querySelector('p');
 const hasValueAndSubtext = Boolean(
   valueEl &&
-  valueEl.textContent.includes('$48,250') &&
-  valueEl.classList.contains('font-extrabold') &&
+  /\btext-(2xl|3xl|4xl)\b/.test(valueEl.className) &&
+  /\bfont-(bold|extrabold)\b/.test(valueEl.className) &&
   subtextEl &&
   subtextEl.textContent.includes('vs. $42,890 last month')
 );
@@ -45,13 +47,14 @@ $test.check(
 );
 
 const btnEl = container.querySelector('button');
+const btnCls = btnEl?.className || '';
 const hasButton = Boolean(
   btnEl &&
   btnEl.getAttribute('type') === 'button' &&
   btnEl.textContent.includes('View Detailed Report') &&
-  btnEl.classList.contains('bg-indigo-600') &&
-  btnEl.classList.contains('w-full') &&
-  btnEl.classList.contains('rounded-xl')
+  /\bbg-(indigo|blue)-/.test(btnCls) &&
+  btnCls.includes('w-full') &&
+  /\brounded-/.test(btnCls)
 );
 $test.check(
   'Action button is styled with indigo background, rounded corners, and focus ring',

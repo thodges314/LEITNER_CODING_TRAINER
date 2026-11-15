@@ -16,11 +16,11 @@ const sampleAvatars = [
   const hasBaseClasses =
     avatar.classList.contains('rounded-full') &&
     avatar.classList.contains('ring-2') &&
-    avatar.classList.contains('bg-slate-800');
+    /\bbg-(slate|gray|zinc|neutral)-/.test(avatar.className);
   const hasInitials = avatar.textContent.includes('AW');
 
   const dot = avatar.querySelector('span[aria-label="online"]');
-  const hasDot = dot !== null && dot.classList.contains('bg-emerald-500');
+  const hasDot = dot !== null && /\bbg-(emerald|green)-/.test(dot.className);
 
   $test.check(
     'Renders individual Avatar with initials, base classes, and status dot',
@@ -80,7 +80,7 @@ const sampleAvatars = [
   const overflowPill = Array.from(children).find((el) => el.textContent.includes('+3'));
   const hasOverflowPill = overflowPill !== null;
   const hasAriaLabel = overflowPill?.getAttribute('aria-label') === '3 more team members';
-  const hasOverflowClasses = overflowPill?.classList.contains('rounded-full') && overflowPill?.classList.contains('bg-slate-800');
+  const hasOverflowClasses = overflowPill?.classList.contains('rounded-full') && /\bbg-(slate|gray|zinc|neutral)-/.test(overflowPill?.className || '');
 
   $test.check(
     'Truncates at max and displays +N overflow counter pill with aria-label',
@@ -94,12 +94,12 @@ const sampleAvatars = [
 {
   const rSm = render(<AvatarGroup avatars={sampleAvatars} max={2} size="sm" />);
   const smPill = rSm.container.querySelector('[role="group"] > span:last-child');
-  const hasSm = smPill?.classList.contains('h-8') && smPill?.classList.contains('w-8');
+  const hasSm = /\bh-(6|7|8|9)\b/.test(smPill?.className || '') && /\bw-(6|7|8|9)\b/.test(smPill?.className || '');
   rSm.unmount();
 
   const rLg = render(<AvatarGroup avatars={sampleAvatars} max={2} size="lg" />);
   const lgPill = rLg.container.querySelector('[role="group"] > span:last-child');
-  const hasLg = lgPill?.classList.contains('h-12') && lgPill?.classList.contains('w-12');
+  const hasLg = /\bh-(11|12|14)\b/.test(lgPill?.className || '') && /\bw-(11|12|14)\b/.test(lgPill?.className || '');
   rLg.unmount();
 
   $test.check(

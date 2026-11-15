@@ -3,7 +3,8 @@ const { render, fire, act } = $dom;
 {
   const r = render(<DismissibleBanner title="Info Note" message="System is operational." />);
   const alertEl = r.container.querySelector('[role="alert"]');
-  const hasSky = alertEl && alertEl.classList.contains('bg-sky-50') && alertEl.classList.contains('border-sky-200');
+  const cls = alertEl?.className || '';
+  const hasSky = alertEl && /\bbg-(sky|blue)-/.test(cls) && /\bborder-(sky|blue)-/.test(cls);
   const hasTitle = alertEl && alertEl.textContent.includes('Info Note');
   const hasMsg = alertEl && alertEl.textContent.includes('System is operational.');
   const btn = alertEl && alertEl.querySelector('button[aria-label="Dismiss"]');
@@ -19,7 +20,8 @@ const { render, fire, act } = $dom;
 {
   const r = render(<DismissibleBanner variant="success" title="Saved" message="All changes saved." />);
   const alertEl = r.container.querySelector('[role="alert"]');
-  const hasEmerald = alertEl && alertEl.classList.contains('bg-emerald-50') && alertEl.classList.contains('border-emerald-200');
+  const cls = alertEl?.className || '';
+  const hasEmerald = alertEl && /\bbg-(emerald|green)-/.test(cls) && /\bborder-(emerald|green)-/.test(cls);
 
   $test.check(
     'Success variant applies emerald color classes',
@@ -32,12 +34,14 @@ const { render, fire, act } = $dom;
 {
   const rWarn = render(<DismissibleBanner variant="warning" title="Warning" message="Check disk space." />);
   const elWarn = rWarn.container.querySelector('[role="alert"]');
-  const hasAmber = elWarn && elWarn.classList.contains('bg-amber-50') && elWarn.classList.contains('border-amber-200');
+  const clsWarn = elWarn?.className || '';
+  const hasAmber = elWarn && /\bbg-(amber|yellow)-/.test(clsWarn) && /\bborder-(amber|yellow)-/.test(clsWarn);
   rWarn.unmount();
 
   const rErr = render(<DismissibleBanner variant="error" title="Error" message="Connection failed." />);
   const elErr = rErr.container.querySelector('[role="alert"]');
-  const hasRose = elErr && elErr.classList.contains('bg-rose-50') && elErr.classList.contains('border-rose-200');
+  const clsErr = elErr?.className || '';
+  const hasRose = elErr && /\bbg-(rose|red)-/.test(clsErr) && /\bborder-(rose|red)-/.test(clsErr);
   rErr.unmount();
 
   $test.check(

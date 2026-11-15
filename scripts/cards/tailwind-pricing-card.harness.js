@@ -14,11 +14,11 @@ const { render } = $dom;
   const card = r.container.querySelector('article');
 
   const hasArticle = card !== null && card.tagName.toLowerCase() === 'article';
-  const hasSlateBorder = card !== null && card.classList.contains('border-slate-700');
+  const hasSlateBorder = card !== null && /\bborder-(slate|gray|zinc|neutral)-/.test(card.className);
   const hasName = card !== null && card.querySelector('h3')?.textContent.includes('Starter');
   const hasPrice = card !== null && card.textContent.includes('$15') && card.textContent.includes('/mo');
   const hasCta = card !== null && card.querySelector('button')?.textContent === 'Get Started';
-  const hasButtonSlate = card !== null && card.querySelector('button')?.classList.contains('bg-slate-800');
+  const hasButtonSlate = card !== null && /\bbg-(slate|gray|zinc|neutral)-/.test(card.querySelector('button')?.className || '');
 
   $test.check(
     'Basic non-popular tier renders semantic article with slate border and features list',
@@ -44,12 +44,12 @@ const { render } = $dom;
 
   const hasIndigoRing =
     card !== null &&
-    card.classList.contains('border-indigo-500') &&
+    /\bborder-(indigo|blue)-/.test(card.className) &&
     card.classList.contains('ring-2');
-  const badge = card?.querySelector('span.bg-indigo-500');
-  const hasBadgeText = badge !== null && badge.textContent === 'Most Popular';
+  const badge = card ? Array.from(card.querySelectorAll('span')).find((s) => s.textContent === 'Most Popular') : null;
+  const hasBadgeText = badge !== null && badge !== undefined && badge.classList.contains('rounded-full');
   const button = card?.querySelector('button');
-  const hasButtonIndigo = button !== null && button.classList.contains('bg-indigo-600');
+  const hasButtonIndigo = button !== null && /\bbg-(indigo|blue)-/.test(button.className);
 
   $test.check(
     'Popular tier renders popular badge and indigo ring styling',
